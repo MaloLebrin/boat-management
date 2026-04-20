@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:18-alpine
+    container_name: 3d-website-postgres
+    environment:
+      POSTGRES_DB: 3d-website_dev
+      POSTGRES_USER: 3d-website
+      POSTGRES_PASSWORD: 3d-website
+    ports:
+      - "5431:5432"
+    volumes:
+      - 3d-website_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U 3d-website -d 3d-website_dev"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+volumes:
+  3d-website_pg_data:
