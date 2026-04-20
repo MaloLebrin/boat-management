@@ -7,8 +7,196 @@
 import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
+export class BoatEngineSchema extends BaseModel {
+  static $columns = [
+    'boatId',
+    'brand',
+    'createdAt',
+    'fuel',
+    'hours',
+    'id',
+    'kind',
+    'manufacturedAt',
+    'model',
+    'powerHp',
+    'powerKw',
+    'serialNumber',
+    'updatedAt',
+  ] as const
+  $columns = BoatEngineSchema.$columns
+  @column()
+  declare boatId: number
+  @column()
+  declare brand: string | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare fuel: string | null
+  @column()
+  declare hours: number | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare kind: string
+  @column.date()
+  declare manufacturedAt: DateTime | null
+  @column()
+  declare model: string | null
+  @column()
+  declare powerHp: number | null
+  @column()
+  declare powerKw: number | null
+  @column()
+  declare serialNumber: string | null
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class BoatRigSchema extends BaseModel {
+  static $columns = [
+    'boatId',
+    'createdAt',
+    'id',
+    'manufacturedAt',
+    'mastCount',
+    'rigType',
+    'spreaders',
+    'updatedAt',
+  ] as const
+  $columns = BoatRigSchema.$columns
+  @column()
+  declare boatId: number
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column.date()
+  declare manufacturedAt: DateTime | null
+  @column()
+  declare mastCount: number | null
+  @column()
+  declare rigType: string
+  @column()
+  declare spreaders: number | null
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class BoatSailSchema extends BaseModel {
+  static $columns = [
+    'areaM2',
+    'boatId',
+    'createdAt',
+    'id',
+    'manufacturedAt',
+    'material',
+    'reefPoints',
+    'sailType',
+    'updatedAt',
+  ] as const
+  $columns = BoatSailSchema.$columns
+  @column()
+  declare areaM2: number | null
+  @column()
+  declare boatId: number
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column.date()
+  declare manufacturedAt: DateTime | null
+  @column()
+  declare material: string | null
+  @column()
+  declare reefPoints: number | null
+  @column()
+  declare sailType: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class BoatSchema extends BaseModel {
+  static $columns = [
+    'beamM',
+    'createdAt',
+    'draftM',
+    'hullMaterial',
+    'id',
+    'lengthM',
+    'manufacturedAt',
+    'manufacturer',
+    'mastHeightM',
+    'model',
+    'name',
+    'organizationId',
+    'propulsionType',
+    'registrationNumber',
+    'type',
+    'updatedAt',
+    'yearBuilt',
+  ] as const
+  $columns = BoatSchema.$columns
+  @column()
+  declare beamM: number | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare draftM: number | null
+  @column()
+  declare hullMaterial: string | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare lengthM: number | null
+  @column.date()
+  declare manufacturedAt: DateTime | null
+  @column()
+  declare manufacturer: string | null
+  @column()
+  declare mastHeightM: number | null
+  @column()
+  declare model: string | null
+  @column()
+  declare name: string
+  @column()
+  declare organizationId: number
+  @column()
+  declare propulsionType: string | null
+  @column()
+  declare registrationNumber: string | null
+  @column()
+  declare type: string | null
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare yearBuilt: number | null
+}
+
+export class OrganizationSchema extends BaseModel {
+  static $columns = ['createdAt', 'id', 'name', 'slug', 'updatedAt'] as const
+  $columns = OrganizationSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare name: string
+  @column()
+  declare slug: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class UserSchema extends BaseModel {
-  static $columns = ['createdAt', 'email', 'fullName', 'id', 'password', 'updatedAt'] as const
+  static $columns = [
+    'createdAt',
+    'email',
+    'fullName',
+    'id',
+    'organizationId',
+    'password',
+    'updatedAt',
+  ] as const
   $columns = UserSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -18,6 +206,8 @@ export class UserSchema extends BaseModel {
   declare fullName: string | null
   @column({ isPrimary: true })
   declare id: number
+  @column()
+  declare organizationId: number | null
   @column({ serializeAs: null })
   declare password: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })

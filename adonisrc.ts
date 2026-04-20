@@ -2,6 +2,7 @@ import { indexPages } from '@adonisjs/inertia'
 import { indexEntities } from '@adonisjs/core'
 import { defineConfig } from '@adonisjs/core/app'
 import { generateRegistry } from '@tuyau/core/hooks'
+import { indexPolicies } from '@adonisjs/bouncer'
 
 export default defineConfig({
   /*
@@ -30,6 +31,7 @@ export default defineConfig({
     () => import('@adonisjs/lucid/commands'),
     () => import('@adonisjs/session/commands'),
     () => import('@adonisjs/inertia/commands'),
+    () => import('@adonisjs/bouncer/commands'),
   ],
 
   /*
@@ -58,6 +60,7 @@ export default defineConfig({
     () => import('@adonisjs/cors/cors_provider'),
     () => import('@adonisjs/inertia/inertia_provider'),
     () => import('@adonisjs/auth/auth_provider'),
+    () => import('@adonisjs/bouncer/bouncer_provider'),
     () => import('#providers/api_provider'),
   ],
 
@@ -132,6 +135,7 @@ export default defineConfig({
       }),
       indexPages({ framework: 'vue3' }),
       generateRegistry(),
+      indexPolicies(),
     ],
     buildStarting: [() => import('@adonisjs/vite/build_hook')],
   },
