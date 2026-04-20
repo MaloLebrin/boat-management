@@ -1,0 +1,22 @@
+---
+description: Enforce 100% Inertia-style auth and form handling
+alwaysApply: true
+---
+
+# Auth & Inertia – Project Rule
+
+- **Authentication must be handled 100% via Inertia.**
+  - For login, password flows, and any session-based auth, **use Inertia form submissions** (`router.post`, `router.put`, `useForm`) and let the AdonisJS controllers respond with **Inertia redirects + flash messages**, as in the official Inertia/Adonis docs.
+  - Do **not** introduce new `fetch`/`axios` calls for auth endpoints in the React code. If an auth route already has an Inertia page, use that page’s form and `router` instead.
+
+- **Session/user state must come from Inertia shared props, not custom JSON polling.**
+  - Prefer `usePage().props.user` (and other shared props) as the source of truth for the authenticated user.
+  - Do **not** add new `getCurrentSession`-style helpers that poll `/auth/me` or autres endpoints pour récupérer l’utilisateur courant, sauf cas d’API vraiment séparée du front Inertia.
+
+- **Navigation after auth should be done via redirects, not `window.location` ou parsing manuel des réponses.**
+  - Les contrôleurs Adonis doivent faire des `response.redirect('/dashboard')` ou des redirections Inertia, et la navigation côté client doit être gérée par Inertia (`router.visit` ou redirection de réponse), pas par inspection des codes HTTP depuis `fetch`.
+
+- **JSON APIs restent possibles, mais pas pour les écrans déjà gérés par Inertia.**
+  - Quand il y a une page Inertia pour une action (auth, formulaires dashboard, etc.), cette page doit utiliser `router.post` / `router.put` et rester dans le cycle Inertia.
+  - Les endpoints JSON (`/api/**`, `/auth/me`, etc.) sont réservés aux usages API (autres clients, scripts, exports) et ne doivent pas être réintroduits dans les écrans Inertia si une alternative Inertia existe déjà.
+

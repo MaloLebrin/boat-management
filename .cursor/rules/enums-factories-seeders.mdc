@@ -1,0 +1,111 @@
+---
+description: Règles pour enums métier, modèles, factories et seeders
+alwaysApply: true
+---
+
+# Enums, modèles, factories et seeders
+
+Ces règles s’appliquent **à chaque fois** que tu ajoutes ou modifies :
+- des colonnes avec un ensemble de valeurs finies (types, statuts, rôles, etc.),
+- un nouveau modèle métier,
+- des jobs de queue ou tables associées.
+
+## 1. Colonnes \"enum\" → constantes + types TS
+
+À chaque fois que tu introduis une colonne avec un petit nombre de valeurs autorisées (ex. `status`, `type`, `role`, `scope`) :
+
+- **Toujours** créer une constante d’enum + un type TypeScript dans le modèle correspondant, sur le même pattern que `USERS_ROLES` :
+
+```ts
+export const BULK_JOB_STATUSES = {
+  PENDING: 'pending',
+  PROCESSING: 'processing',
+  COMPLETED: 'completed',
+  FAILED: 'failed',
+} as const
+
+export type BulkJobStatus = (typeof BULK_JOB_STATUSES)[keyof typeof BULK_JOB_STATUSES]
+```
+
+- Ne jamais utiliser de chaînes magiques directement dans le code métier ou les migrations : **réutiliser ces constantes**.
+
+## 2. Contraintes SQL `CHECK` synchronisées avec les enums
+
+Quand tu ajoutes une contrainte de type `CHECK (...)` sur une colonne \"enum-like\" (ex. `role`, `status`, `type`) dans une migration :
+
+- Importer le tableau de valeurs depuis le modèle (comme dans `1771946144495_create_update_users_table.ts` avec `userRolesValues`).
+- Générer la contrainte à partir de ces valeurs :
+
+```ts
+this.schema.raw(`
+  ALTER TABLE "${this.tableName}"
+  ADD CONSTRAINT "${this.tableName}_status_check"
+  CHECK (status IS NULL OR status IN (${bulkJobStatusValues.map((s) => `'${s}'`).join(',')}))
+`)
+```
+
+Objectif : garder **TS, modèle et base de données parfaitement synchronisés**.
+
+## 3. Modèles non vides et lisibles
+
+Quand un modèle est généré automatiquement (via `database/schema.ts` ou `make:model`) :
+
+- Si le modèle est utilisé dans le métier (services, contrôleurs, jobs) :
+  - Ajouter les décorateurs `@column`, `@belongsTo`, `@hasMany`, etc., au lieu de laisser un simple `extends SomeSchema` opaque.
+  - Ajouter les enums/constantes et types associés quand il y a des statuts/types.
+- Tu peux conserver l’héritage `extends XSchema`, mais ce **n’est pas suffisant seul** dès qu’il y a de la logique métier ou des enums.
+
+## 4. Factories systématiques pour les nouveaux modèles
+
+Pour **chaque nouveau modèle métier** (ex. `BulkJob`, `Notification`, futur `ExportJob`, etc.) :
+
+- Créer une **factory** dans `database/factories` avec des valeurs réalistes :
+  - Ids valides vers `User` / `Organization` si nécessaire.
+  - Champs enum choisis parmi les constantes (ex. `BULK_JOB_STATUSES.PENDING`).
+  - `meta` rempli avec un JSON simple mais cohérent.
+
+Exemple (schématique) :
+
+```ts
+import Factory from '@adonisjs/lucid/factories'
+import BulkJob from '#models/bulk_job'
+import { BULK_JOB_STATUSES, BULK_JOB_TYPES } from '#models/bulk_job'
+
+export const BulkJobFactory = Factory.define(BulkJob, ({ faker }) => {
+  return {
+    type: BULK_JOB_TYPES.EMAILS,
+    scope: 'org',
+    status: BULK_JOB_STATUSES.PENDING,
+    meta: {},
+  }
+}).build()
+```
+
+Ces factories doivent être utilisées dans les tests (Japa) dès que possible.
+
+## 5. Seeders pour tester en local
+
+Quand un nouveau modèle est utilisé par l’UX (pages, écrans de suivi, dashboards) :
+
+- Créer **au moins un seeder** dans `database/seeders` pour générer des données de démo :
+  - Quelques enregistrements dans différents statuts (`pending`, `processing`, `completed`, `failed`).
+  - Des liens vers `User` / `Organization` variés pour tester les règles d’accès.
+
+- Documenter rapidement dans `docs/README.md` ou dans les commentaires du seeder **comment** lancer ces seeders (`node ace db:seed`) pour reproduire les écrans en local.
+
+## 6. Application aux jobs de queue
+
+Pour les jobs et tables liées aux queues (`bulk_jobs`, `queue_jobs` custom, etc.) :
+
+- **Toujours** :
+  - définir des enums/constantes pour les statuts/types de jobs,
+  - ajouter une contrainte `CHECK` basée sur ces enums,
+  - prévoir factory + seeder quand ces jobs sont visibles dans l’interface (liste de jobs, suivi UX).
+
+Ne pas considérer l’intégration d’un nouveau job ou d’une nouvelle table de tracking \"terminée\" tant que :
+
+- les constantes/types TS sont en place,
+- la base a une contrainte `CHECK` correspondante,
+- une factory existe pour le modèle,
+- un seeder est disponible si le modèle est exposé dans l’UI.
+

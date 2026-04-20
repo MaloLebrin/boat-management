@@ -1,0 +1,12 @@
+---
+description: Enforce 100% Inertia form handling
+alwaysApply: true
+---
+
+# Form & Inertia – Project Rule
+
+Utilise les methodes de soumissions de formulaire recommandées par Adonis et intertia sur cette doc: https://docs.adonisjs.com/tutorial/hypermedia/forms-and-validation
+https://docs.adonisjs.com/guides/frontend/inertia#link-and-form-components
+
+
+

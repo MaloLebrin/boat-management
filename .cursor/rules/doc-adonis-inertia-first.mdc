@@ -1,0 +1,24 @@
+---
+description: Consulter systématiquement la doc AdonisJS puis Inertia en premier lieu
+alwaysApply: true
+---
+
+# Documentation : AdonisJS puis Inertia
+
+Avant d’implémenter ou de modifier du code lié au **backend** (routes, contrôleurs, modèles, services, middleware, etc.) ou au **frontend** (pages, composants Inertia, formulaires, etc.) :
+
+1. **En premier** : consulter la documentation **AdonisJS** pour tout ce qui touche au backend (routing, requêtes, validation, auth, base de données, etc.).
+2. **Ensuite** : consulter la documentation **Inertia** pour tout ce qui touche au frontend (pages, composants, formulaires, partage de données, etc.).
+
+## Références officielles
+
+- **AdonisJS** : https://docs.adonisjs.com/
+- **Inertia** : https://inertiajs.com/ (ou la doc du client utilisé, ex. React)
+
+## Comportement attendu
+
+- Utiliser la doc pour vérifier les APIs, conventions et bonnes pratiques avant d’écrire ou modifier le code.
+- En cas de doute sur un usage (ex. validation, sessions, Inertia shared data), chercher la réponse dans la doc concernée avant de proposer une solution.
+- Ne pas se baser uniquement sur des habitudes ou de la mémoire : privilégier la doc à jour.
+
+Cette règle s’applique en priorité lorsque la tâche concerne le framework (AdonisJS ou Inertia) ; pour du code métier pur (logique applicative sans dépendance directe au framework), la consultation peut être ciblée selon le besoin.

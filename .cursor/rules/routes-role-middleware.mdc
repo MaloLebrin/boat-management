@@ -1,0 +1,40 @@
+---
+description: Autorisations par rôle via middleware sur les routes Adonis — pas de duplication dans les contrôleurs
+globs:
+  - app/controllers/**/*.ts
+  - start/routes/**/*.ts
+alwaysApply: false
+---
+
+# Rôles et middlewares (Adonis)
+
+## Principe
+
+- **Les contrôles d’accès par rôle** (`super_admin`, `admin`, conseiller, candidat, etc.) se configurent sur **les routes** avec les middlewares nommés (`start/kernel.ts` → `router.named`), **pas** en répétant `if (!auth.user)` / `if (auth.user.role !== …)` dans les contrôleurs lorsque la route est déjà protégée par le bon middleware.
+
+## Middlewares disponibles (référence)
+
+- `middleware.auth()` — utilisateur connecté (sinon redirection login).
+- `middleware.superAdmin()` — super admin uniquement (`#middleware/super_admin_middleware`, helper `isSuperAdmin`).
+- `middleware.admin()` — admin ou super admin.
+- `middleware.advisorOrAdmin()` — advisor, admin ou super admin.
+- `middleware.guest()` — invité uniquement.
+- `middleware.checkOnboarding()` — onboarding selon les règles du projet.
+
+Enchaînement typique : **d’abord** `auth()`, **puis** le middleware de rôle (ex. groupe super admin : `[middleware.auth(), middleware.superAdmin()]`).
+
+## Dans les contrôleurs
+
+- **Ne pas** dupliquer les vérifications de rôle si toutes les routes qui pointent vers l’action concernée passent déjà par le middleware adéquat.
+- Le contrôleur peut supposer l’utilisateur autorisé **uniquement** pour ces entrées documentées par les routes ; pour les champs nécessaires (ex. `auth.user!.id` pour un job ou un log), utiliser l’utilisateur déjà garanti par la pile middleware, sans réimplémenter le contrôle d’accès.
+
+## Nouvelles zones protégées
+
+1. Ajouter ou réutiliser un middleware dans `app/middleware/` (ex. aligné sur `#shared/helpers/roles`).
+2. L’enregistrer dans `start/kernel.ts` si besoin.
+3. L’appliquer sur le **groupe ou la route** dans `start/routes/**`.
+4. Tester l’autorisation au niveau **middleware** (ou test fonctionnel de la route), pas en copiant les mêmes `if` dans le contrôleur.
+
+## Exceptions
+
+- Endpoints **hors** de la même pile (ex. route sans middleware historique) : soit les faire entrer dans un groupe avec middleware, soit justifier explicitement un contrôle ponctuel — par défaut, **préférer le middleware sur la route**.

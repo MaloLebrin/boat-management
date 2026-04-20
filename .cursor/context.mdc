@@ -1,0 +1,48 @@
+---
+alwaysApply: true
+---
+# **3d-website** (boat-management)
+*Application web de gestion de bateaux et de flotte (organisations, coques, moteurs, voilures, gréement)*
+
+---
+
+## **Description**
+**3d-website** est une **application web full-stack** pour suivre des **bateaux** rattachés à des **organisations**, avec le détail technique (**moteurs**, **voiles**, **gréement**) et l’**authentification** des utilisateurs. Le dépôt est un **monolithe** : backend et frontend Inertia vivent dans le même projet.
+
+**Stack technique** :
+- **Backend** : AdonisJS 7 (Node.js / TypeScript), VineJS pour la validation, Bouncer pour l’ACL.
+- **Frontend** : Vue 3 (Composition API, `<script setup>`) + Inertia.js + Tailwind CSS 4.
+- **Données** : Lucid ORM ; SQLite via `better-sqlite3` en local ; `docker-compose` prévoit PostgreSQL pour un environnement proche de la prod.
+- **Tests** : Japa (backend) ; Vitest + Testing Library côté frontend (selon conventions du projet).
+- **Build** : Vite 7, déploiement type Docker + CI (voir `CLAUDE.md`).
+
+---
+
+## **Fonctionnalités clés**
+
+| Fonctionnalité | Description |
+|----------------|-------------|
+| **Authentification** | Inscription, connexion, déconnexion ; routes invité vs utilisateur connecté (`middleware.guest()` / `middleware.auth()`). |
+| **CRUD bateaux** | Liste, création, fiche, édition, suppression des bateaux (réservé aux utilisateurs authentifiés). |
+| **Modèle métier** | Organisations, utilisateurs liés aux organisations, bateaux avec specs ; moteurs, voiles et gréement en relations Lucid. |
+| **Pages Inertia** | Accueil public ; pages auth ; pages `boats/*` pour le parcours gestionnaire. |
+
+---
+
+## **Structure du projet**
+
+```bash
+3d-website/
+├── app/                    # Contrôleurs, modèles, services, validators, middleware, policies
+├── config/                 # Adonis, auth, database, inertia, vite, etc.
+├── database/               # Migrations, seeders, factories, schémas Lucid
+├── inertia/                # App Vue (pages, composants, layouts, css)
+├── start/                  # routes.ts, kernel.ts
+├── tests/                  # Tests Japa (unit / functional)
+├── bin/, ace               # CLI Adonis
+├── docker-compose.yml      # PostgreSQL de développement (optionnel)
+├── package.json            # Scripts : dev, build, test, lint, typecheck
+└── CLAUDE.md               # Conventions globales stack et workflow agents
+```
+
+Les routes HTTP sont définies dans `start/routes.ts` (objectif projet : les scinder par entité / groupes nommés — voir `.cursor/routes.mdc`).

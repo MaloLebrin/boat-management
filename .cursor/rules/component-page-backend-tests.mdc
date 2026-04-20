@@ -1,0 +1,39 @@
+---
+description: Tester systématiquement composants, pages, modèles, services et contrôleurs à chaque création ou modification
+alwaysApply: true
+---
+
+# Tests : composants, pages, modèles, services, contrôleurs
+
+À **chaque création** ou **modification** des éléments suivants, écrire ou mettre à jour les tests correspondants, puis les exécuter pour valider.
+
+## 1. Composants et pages (frontend Inertia)
+
+- **Composants** : `inertia/components/**/*.tsx`
+- **Pages** : `inertia/pages/**/*.tsx`
+
+**À faire :**
+- Créer ou modifier un fichier de test dans `tests/inertia/` en miroir du chemin (ex. `inertia/components/ui/Button.tsx` → `tests/inertia/components/ui/Button.spec.tsx`).
+- Utiliser **Vitest** et **Testing Library** (`@testing-library/react`, `jest-dom`).
+- Tester le rendu, les props, les interactions utilisateur pertinentes et les cas limites (données vides, undefined).
+- Lancer les tests : `npm run test:inertia` (ou `vitest run`).
+
+## 2. Modèles, services, contrôleurs (backend)
+
+- **Modèles** : `app/models/**/*.ts`
+- **Services** : `app/services/**/*.ts`
+- **Contrôleurs** : `app/controllers/**/*.ts`
+
+**À faire :**
+- Créer ou modifier un fichier de test dans `tests/unit/` (ex. `app/services/auth_service.ts` → `tests/unit/services/auth_service.spec.ts`).
+- Utiliser le runner Adonis : `node ace test` (ou `npm run test`) avec la suite `unit`.
+- Tester les cas nominaux, les erreurs et les edge cases (ex. entrées invalides, droits d’accès).
+
+## Récap
+
+| Zone | Fichiers concernés | Dossier de tests | Commande |
+|------|--------------------|------------------|----------|
+| Composants / pages | `inertia/components/**`, `inertia/pages/**` | `tests/inertia/` | `npm run test:inertia` |
+| Modèles / services / contrôleurs | `app/models/**`, `app/services/**`, `app/controllers/**` | `tests/unit/` | `node ace test` (suite unit) |
+
+Ne pas considérer une tâche terminée tant que les tests ajoutés ou modifiés ne passent pas. En cas de modification d’un fichier existant, mettre à jour les tests existants si le comportement change.

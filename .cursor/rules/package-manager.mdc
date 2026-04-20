@@ -1,0 +1,8 @@
+---
+description: Utilisation de pnpm comme package manager
+alwaysApply: true
+---
+
+# Utilisation de pnpm comme package manager
+
+Lorsque tu lances des commandes comme npm run XXXXX utilise pnpm à la place

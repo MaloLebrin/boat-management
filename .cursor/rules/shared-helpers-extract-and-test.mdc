@@ -1,0 +1,28 @@
+---
+description: Extract shared helpers to shared/helpers and always test them
+globs: "**/*.{ts,tsx}"
+alwaysApply: false
+---
+
+# Shared helpers must live in `shared/helpers` and be tested
+
+- **No local helper functions** in pages/components when the logic is reusable (date formatting, label mapping, parsing, etc.).
+- **Extract** reusable helpers to `shared/helpers/<domain>.ts` (pick a domain-oriented filename like `exercises.ts`, `date.ts`, `support_plan.ts`).
+- **Write/Update unit tests** for every helper you add or modify.
+  - Place tests under `tests/inertia/helpers/` when the helper is used by Inertia/React code.
+  - **One helper file = one test file** (e.g. `shared/helpers/date.ts` → `tests/inertia/helpers/date.spec.ts`).
+  - Use `test()` (not `it()`), Vitest + Testing Library when needed.
+- **Pages/components should import helpers** (e.g. `import { formatSessionDate } from '#shared/helpers/date'`), not duplicate them.
+
+## Example
+
+```ts
+// ✅ GOOD: shared helper
+export function getExerciseTitle(type: string): string { /* ... */ }
+```
+
+```tsx
+// ✅ GOOD: page/component imports helper
+import { getExerciseTitle } from '#shared/helpers/exercises'
+```
+

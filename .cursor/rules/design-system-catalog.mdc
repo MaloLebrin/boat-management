@@ -1,0 +1,31 @@
+# Design System : catalogue obligatoire
+
+Cette règle s’applique à **toute création ou modification** de composants UI génériques.
+
+## Portée
+
+- Composants UI génériques : `inertia/components/ui/**/*.vue`
+- Page catalogue : `inertia/pages/admin/design_system.vue`
+- Tests Inertia : `tests/inertia/**/*.spec.ts`
+
+## Règles
+
+1. **Catalogue obligatoire**
+   - Quand tu **ajoutes** un composant dans `inertia/components/ui/`, tu dois l’ajouter dans la page
+     `inertia/pages/admin/design_system.vue` avec :
+     - ses **variants** pertinents (props/slots/états : `disabled`, `invalid`, etc.)
+     - au moins un exemple minimal “nominal”.
+
+2. **Tests obligatoires**
+   - Tout nouveau composant générique doit avoir **au moins un test** sous `tests/inertia/`.
+   - Respecter le naming snake_case (ex: `ui_input.spec.ts`) et utiliser `test()` (pas `it()`).
+
+3. **Validation**
+   - Ne pas considérer la tâche terminée tant que :
+     - `pnpm test:inertia` passe
+     - et `pnpm typecheck` passe
+
+## Intention
+
+Le catalogue sert de référence vivante pour le design system : il doit rester complet et à jour pour éviter la duplication de styles et garantir la cohérence UI.
+

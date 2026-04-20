@@ -1,0 +1,29 @@
+---
+description: Écrire des tests avant ou avec chaque correctif de bug pour valider le fix et éviter les régressions
+alwaysApply: true
+---
+
+# Bugfix : tests avant / avec le correctif
+
+Lorsque tu corriges un bug, **systématiquement** :
+
+1. **Écrire un (ou plusieurs) test(s)** qui :
+   - Reproduisent le bug (comportement ou donnée qui provoquait l’erreur), **ou**
+   - Décrivent le comportement attendu une fois le bug corrigé.
+   - Utilisent le framework de test du projet (ex. Vitest/Jest pour le front, node ace test pour le backend).
+
+2. **Valider le correctif** :
+   - Si le test a été écrit avant le fix : il doit échouer avant le fix, puis passer après.
+   - Si le test est écrit après le fix : il doit passer et couvrir le cas qui posait problème.
+
+3. **Objectif** : s’assurer que le bug est bien corrigé et qu’il ne réapparaîtra pas (non-régression).
+
+## Exemples
+
+- **Crash sur donnée manquante** : test qui rend le composant avec des props `undefined` / `[]` et vérifie qu’il ne lève pas (pas de `toThrow()`).
+- **Mauvaise valeur affichée** : test qui fournit une entrée connue et vérifie le texte ou le rendu attendu.
+- **Erreur backend** : test fonctionnel ou unitaire qui appelle la route / le service avec le cas problématique et vérifie la réponse ou l’absence d’exception.
+
+## Quand c’est difficile
+
+Si écrire le test avant le fix est trop coûteux (ex. bug complexe, environnement lourd), écrire le test **juste après** le fix, en décrivant clairement le cas qui posait problème. Ne pas livrer un fix sans test de non-régression associé.

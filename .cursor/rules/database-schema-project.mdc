@@ -1,0 +1,9 @@
+---
+alwaysApply: true
+---
+
+# Schema de la base de données
+
+Voici le schéma de la base de données du projet :
+
+il se trouve dans le fichier : database/schema.ts

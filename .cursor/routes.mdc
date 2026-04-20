@@ -1,0 +1,9 @@
+---
+alwaysApply: false
+---
+## les routes de l'application
+
+les routes de l'application sont définies dans le fichier `start/routes.ts`
+je veux qu'elle soient triées dans des dossers et fichiers distincts pour chaque entité de l'application.
+on peut utiliser les groupes de routes pour regrouper les routes par entité ou par auth
+chaque routes doit être nommée avec le nom de l'entité ou le nom de la ressource et le nom de l'action

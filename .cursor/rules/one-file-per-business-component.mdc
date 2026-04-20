@@ -1,0 +1,18 @@
+---
+description: One component per file + one business responsibility per file
+alwaysApply: true
+---
+
+# One file per business responsibility
+
+## Frontend (Inertia/Vue)
+
+- **One component per file**: every Vue component must live in its own `.vue` file.
+- If a page/layout grows, **extract dedicated components** under `inertia/components/**` rather than keeping large blocks inline.
+
+## Backend (AdonisJS)
+
+- **One business responsibility per file** (services/controllers/jobs/helpers).
+- If a service/controller/job becomes large, **split by business function** into smaller files.
+- Avoid “god files” that mix unrelated business concerns.
+
