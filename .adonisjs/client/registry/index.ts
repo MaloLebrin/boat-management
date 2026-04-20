@@ -12,6 +12,12 @@ const routes = {
     tokens: [{"old":"/","type":0,"val":"/","end":""}],
     types: placeholder as Registry['home']['types'],
   },
+  'design_system': {
+    methods: ["GET","HEAD"],
+    pattern: '/design-system',
+    tokens: [{"old":"/design-system","type":0,"val":"design-system","end":""}],
+    types: placeholder as Registry['design_system']['types'],
+  },
   'boats.index': {
     methods: ["GET","HEAD"],
     pattern: '/boats',

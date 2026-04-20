@@ -9,14 +9,14 @@ alwaysApply: true
 
 ## 1. Composants et pages (frontend Inertia)
 
-- **Composants** : `inertia/components/**/*.tsx`
-- **Pages** : `inertia/pages/**/*.tsx`
+- **Composants** : `inertia/components/**/*.vue`
+- **Pages** : `inertia/pages/**/*.vue`
 
 **À faire :**
-- Créer ou modifier un fichier de test dans `tests/inertia/` en miroir du chemin (ex. `inertia/components/ui/Button.tsx` → `tests/inertia/components/ui/Button.spec.tsx`).
-- Utiliser **Vitest** et **Testing Library** (`@testing-library/react`, `jest-dom`).
+- Créer ou modifier un fichier de test dans `tests/inertia/` (ex. `inertia/components/base/BaseButton.vue` → `tests/inertia/base_button.spec.ts`).
+- Utiliser **Vitest** et **Vue Test Utils** (`@vue/test-utils`).
 - Tester le rendu, les props, les interactions utilisateur pertinentes et les cas limites (données vides, undefined).
-- Lancer les tests : `npm run test:inertia` (ou `vitest run`).
+- Lancer les tests : `pnpm test:inertia` (ou `vitest run`).
 
 ## 2. Modèles, services, contrôleurs (backend)
 
@@ -33,7 +33,7 @@ alwaysApply: true
 
 | Zone | Fichiers concernés | Dossier de tests | Commande |
 |------|--------------------|------------------|----------|
-| Composants / pages | `inertia/components/**`, `inertia/pages/**` | `tests/inertia/` | `npm run test:inertia` |
+| Composants / pages | `inertia/components/**`, `inertia/pages/**` | `tests/inertia/` | `pnpm test:inertia` |
 | Modèles / services / contrôleurs | `app/models/**`, `app/services/**`, `app/controllers/**` | `tests/unit/` | `node ace test` (suite unit) |
 
 Ne pas considérer une tâche terminée tant que les tests ajoutés ou modifiés ne passent pas. En cas de modification d’un fichier existant, mettre à jour les tests existants si le comportement change.

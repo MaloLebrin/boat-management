@@ -1,10 +1,116 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@import "@fontsource/sora/400.css";
+@import "@fontsource/sora/600.css";
+@import "@fontsource/sora/700.css";
+@import "@fontsource/source-sans-3/400.css";
+@import "@fontsource/source-sans-3/600.css";
+
+@theme {
+  /* Pastel multi-teinte — lavande, pêche, menthe, ciel + lagoon/coral adoucis */
+
+  --color-lilac-50: #f7f5ff;
+  --color-lilac-100: #ede9fe;
+  --color-lilac-200: #ddd6fe;
+  --color-lilac-300: #c4b5fd;
+  --color-lilac-700: #6d28d9;
+  --color-lilac-800: #5b21b6;
+
+  --color-peach-50: #fff8f3;
+  --color-peach-100: #ffedd5;
+  --color-peach-200: #fed7aa;
+  --color-peach-300: #fdba74;
+  --color-peach-700: #c2410c;
+  --color-peach-800: #9a3412;
+
+  --color-mint-50: #f0fdfa;
+  --color-mint-100: #ccfbf1;
+  --color-mint-200: #99f6e4;
+  --color-mint-300: #5eead4;
+  --color-mint-600: #3cb8a2;
+  --color-mint-700: #2d9b87;
+  --color-mint-800: #267a6c;
+
+  --color-sky-50: #f0f9ff;
+  --color-sky-100: #e0f2fe;
+  --color-sky-200: #bae6fd;
+  --color-sky-300: #7dd3fc;
+  --color-sky-700: #0369a1;
+  --color-sky-800: #075985;
+
+  /* Héritage « nautique » — teintes atténuées */
+  --color-abyss-50: #eef2f8;
+  --color-abyss-100: #dce4f0;
+  --color-abyss-200: #b8c6dc;
+  --color-abyss-700: #4a5d78;
+  --color-abyss-800: #3d4d63;
+  --color-abyss-900: #354056;
+  --color-abyss-950: #2a3444;
+
+  --color-foam-50: #f0f9ff;
+  --color-foam-100: #e0f2fe;
+  --color-foam-200: #bae6fd;
+  --color-foam-300: #93d4f8;
+
+  --color-lagoon-400: #7ddbcf;
+  --color-lagoon-500: #5dcec0;
+  --color-lagoon-600: #45b8aa;
+  --color-lagoon-700: #3a9d91;
+
+  --color-coral-400: #fcaa7d;
+  --color-coral-500: #f8956f;
+  --color-coral-600: #e87a5a;
+
+  /* Semantic — surfaces tirant lilas / écume, texte bleu-gris adouci */
+  --color-surface: #f4f6fd;
+  --color-surface-elevated: #fffdff;
+  --color-surface-muted: #eceaf8;
+  --color-fg: var(--color-abyss-900);
+  --color-fg-muted: var(--color-abyss-800);
+  --color-fg-subtle: #62708a;
+  --color-border: #dde4f2;
+  --color-border-strong: #c5cfe0;
+
+  --color-brand: var(--color-mint-600);
+  --color-brand-hover: var(--color-mint-700);
+  --color-brand-soft: var(--color-mint-300);
+  --color-accent: var(--color-peach-700);
+  --color-accent-hover: var(--color-peach-800);
+
+  --color-danger: #e85d5d;
+  --color-danger-soft: #fef1f1;
+  --color-success: var(--color-mint-700);
+  --color-warning: #ca8a04;
+  --color-info: var(--color-sky-700);
+
+  --font-display: "Sora", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Source Sans 3", ui-sans-serif, system-ui, sans-serif;
+
+  --radius-card: 1rem;
+  --radius-control: 0.5rem;
+
+  --shadow-card: 0 4px 24px -4px rgb(61 77 99 / 0.07), 0 2px 8px -2px rgb(109 40 217 / 0.04);
+  --shadow-card-hover: 0 12px 40px -8px rgb(61 77 99 / 0.1), 0 4px 12px -4px rgb(60 184 162 / 0.08);
+
+  --background-image-gradient-mesh: radial-gradient(
+      ellipse 100% 70% at 95% 0%,
+      rgb(196 181 253 / 0.35),
+      transparent 55%
+    ),
+    radial-gradient(ellipse 90% 60% at 0% 100%, rgb(253 186 116 / 0.28), transparent 50%),
+    radial-gradient(ellipse 70% 50% at 50% 50%, rgb(153 246 228 / 0.2), transparent 55%),
+    linear-gradient(165deg, var(--color-lilac-50) 0%, var(--color-surface) 45%, var(--color-mint-50) 100%);
+}
 
 html,
 body {
   height: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--color-fg);
+  -webkit-font-smoothing: antialiased;
 }
 
 [x-cloak] {

@@ -4,6 +4,7 @@ import { usePage } from '@inertiajs/vue3'
 import { toast, Toaster } from 'vue-sonner'
 import type { Data } from '@generated/data'
 import { Link, Form } from '@adonisjs/inertia/vue'
+import BaseButton from '~/components/base/BaseButton.vue'
 
 const page = usePage<Data.SharedProps>()
 
@@ -27,10 +28,12 @@ watch(
 </script>
 
 <template>
-  <div class="min-h-screen bg-zinc-50 text-zinc-900">
-    <header class="border-b border-zinc-200 bg-white/80 backdrop-blur">
+  <div
+    class="min-h-screen bg-gradient-to-br from-lilac-50 via-peach-50 to-mint-100 text-fg"
+  >
+    <header class="border-b border-border bg-surface-elevated/85 backdrop-blur-md">
       <div class="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
-        <Link route="home" class="inline-flex items-center gap-3 text-zinc-900 hover:text-zinc-700">
+        <Link route="home" class="inline-flex items-center gap-3 text-fg hover:text-brand">
           <svg
             width="66"
             height="24"
@@ -46,38 +49,41 @@ watch(
           <span class="sr-only">Home</span>
         </Link>
 
-        <nav class="flex items-center gap-4">
+        <nav class="flex items-center gap-3 sm:gap-4">
+          <Link
+            route="design_system"
+            class="hidden text-sm font-medium text-fg-muted hover:text-brand sm:inline-flex"
+          >
+            Design
+          </Link>
           <template v-if="page.props.user">
             <a
               href="/boats"
-              class="inline-flex h-9 items-center justify-center rounded-md px-3 text-sm font-medium text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900"
+              class="inline-flex h-9 items-center justify-center rounded-[var(--radius-control)] px-3 text-sm font-medium text-fg-muted hover:bg-surface-muted hover:text-fg"
             >
               Boats
             </a>
             <span
-              class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-zinc-100 text-sm font-medium text-zinc-700 ring-1 ring-zinc-200"
+              class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-surface-muted text-sm font-semibold text-fg-muted ring-1 ring-border"
             >
               {{ page.props.user.initials }}
             </span>
             <Form route="session.destroy">
-              <button
-                type="submit"
-                class="inline-flex h-9 items-center justify-center rounded-md bg-zinc-900 px-3 text-sm font-medium text-white hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60"
-              >
+              <BaseButton type="submit" size="md" variant="primary">
                 Logout
-              </button>
+              </BaseButton>
             </Form>
           </template>
           <template v-else>
             <Link
               route="new_account.create"
-              class="inline-flex h-9 items-center justify-center rounded-md px-3 text-sm font-medium text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900"
+              class="inline-flex h-10 items-center justify-center rounded-[var(--radius-control)] px-4 text-sm font-semibold text-fg-muted transition-colors hover:bg-surface-muted hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30 focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
             >
               Signup
             </Link>
             <Link
               route="session.create"
-              class="inline-flex h-9 items-center justify-center rounded-md bg-zinc-900 px-3 text-sm font-medium text-white hover:bg-zinc-800"
+              class="inline-flex h-10 items-center justify-center rounded-[var(--radius-control)] bg-brand px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
             >
               Login
             </Link>
@@ -87,7 +93,9 @@ watch(
     </header>
 
     <main class="mx-auto w-full max-w-6xl px-6 py-10">
-      <div class="rounded-xl border border-zinc-200 bg-white shadow-sm">
+      <div
+        class="rounded-[var(--radius-card)] border border-border bg-surface-elevated shadow-[var(--shadow-card)]"
+      >
         <slot />
       </div>
     </main>
