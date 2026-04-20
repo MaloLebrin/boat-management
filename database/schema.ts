@@ -52,6 +52,78 @@ export class BoatEngineSchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class BoatMaintenanceEventSchema extends BaseModel {
+  static $columns = [
+    'boatEngineId',
+    'boatId',
+    'boatRigId',
+    'boatSailId',
+    'createdAt',
+    'engineCaption',
+    'id',
+    'notes',
+    'performedAt',
+    'sailCaption',
+    'subject',
+    'title',
+    'updatedAt',
+  ] as const
+  $columns = BoatMaintenanceEventSchema.$columns
+  @column()
+  declare boatEngineId: number | null
+  @column()
+  declare boatId: number
+  @column()
+  declare boatRigId: number | null
+  @column()
+  declare boatSailId: number | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare engineCaption: string | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare notes: string | null
+  @column.date()
+  declare performedAt: DateTime
+  @column()
+  declare sailCaption: string | null
+  @column()
+  declare subject: string
+  @column()
+  declare title: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class BoatMaintenancePartSchema extends BaseModel {
+  static $columns = [
+    'createdAt',
+    'id',
+    'maintenanceEventId',
+    'name',
+    'notes',
+    'quantity',
+    'updatedAt',
+  ] as const
+  $columns = BoatMaintenancePartSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare maintenanceEventId: number
+  @column()
+  declare name: string
+  @column()
+  declare notes: string | null
+  @column()
+  declare quantity: number | null
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class BoatRigSchema extends BaseModel {
   static $columns = [
     'boatId',

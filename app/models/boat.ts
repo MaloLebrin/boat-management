@@ -1,6 +1,7 @@
 import { BoatSchema } from '#database/schema'
 import Organization from '#models/organization'
 import BoatEngine from '#models/boat_engine'
+import BoatMaintenanceEvent from '#models/boat_maintenance_event'
 import BoatRig from '#models/boat_rig'
 import BoatSail from '#models/boat_sail'
 import { belongsTo, hasMany, hasOne } from '@adonisjs/lucid/orm'
@@ -18,4 +19,7 @@ export default class Boat extends BoatSchema {
 
   @hasOne(() => BoatRig)
   declare rig: HasOne<typeof BoatRig>
+
+  @hasMany(() => BoatMaintenanceEvent)
+  declare maintenanceEvents: HasMany<typeof BoatMaintenanceEvent>
 }

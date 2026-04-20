@@ -1,3 +1,4 @@
+import BoatMaintenanceService from '#services/boat_maintenance_service'
 import BoatService, { BoatNotFoundError } from '#services/boat_service'
 import { createBoatValidator, updateBoatValidator } from '#validators/boat'
 import type { HttpContext } from '@adonisjs/core/http'
@@ -43,7 +44,10 @@ export default class BoatsController {
     try {
       const boat = await boatService.getForUserOrFail(user, Number(params.id))
       await bouncer.authorize('boatView', boat)
-      return inertia.render('boats/show', { boat })
+      const maintenanceService = new BoatMaintenanceService()
+      const maintenanceEvents = await maintenanceService.listForBoat(user, boat)
+      const canManageMaintenance = await bouncer.allows('boatUpdate', boat)
+      return inertia.render('boats/show', { boat, maintenanceEvents, canManageMaintenance })
     } catch (error) {
       if (error instanceof BoatNotFoundError) {
         response.redirect('/boats')

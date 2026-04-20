@@ -4,9 +4,17 @@ import BoatRig from '#models/boat_rig'
 import BoatSail from '#models/boat_sail'
 import type User from '#models/user'
 import db from '@adonisjs/lucid/services/db'
+import { DateTime } from 'luxon'
 
 export class BoatNotFoundError extends Error {
   name = 'BoatNotFoundError'
+}
+
+function toDateOrNull(value: Date | string | DateTime | null | undefined): DateTime | null {
+  if (value === null || value === undefined) return null
+  if (DateTime.isDateTime(value)) return value
+  if (value instanceof Date) return DateTime.fromJSDate(value)
+  return DateTime.fromISO(String(value))
 }
 
 export default class BoatService {
@@ -43,7 +51,7 @@ export default class BoatService {
       registrationNumber?: string | null
       type?: string | null
 
-      manufacturedAt?: Date | string | null
+      manufacturedAt?: Date | string | DateTime | null
       propulsionType?: string | null
       lengthM?: number | null
       beamM?: number | null
@@ -60,20 +68,20 @@ export default class BoatService {
         brand?: string | null
         model?: string | null
         serialNumber?: string | null
-        manufacturedAt?: Date | string | null
+        manufacturedAt?: Date | string | DateTime | null
         powerHp?: number | null
         hours?: number | null
       }>
       sails?: Array<{
         sailType: string
-        manufacturedAt?: Date | string | null
+        manufacturedAt?: Date | string | DateTime | null
         areaM2?: number | null
         material?: string | null
         reefPoints?: number | null
       }>
       rig?: {
         rigType: string
-        manufacturedAt?: Date | string | null
+        manufacturedAt?: Date | string | DateTime | null
         mastCount?: number | null
         spreaders?: number | null
       } | null
@@ -97,7 +105,7 @@ export default class BoatService {
           name: payload.name,
           registrationNumber: payload.registrationNumber ?? null,
           type: payload.type ?? null,
-          manufacturedAt: payload.manufacturedAt ?? null,
+          manufacturedAt: toDateOrNull(payload.manufacturedAt),
 
           propulsionType: payload.propulsionType ?? null,
           lengthM: payload.lengthM ?? null,
@@ -121,7 +129,7 @@ export default class BoatService {
             brand: e.brand ?? null,
             model: e.model ?? null,
             serialNumber: e.serialNumber ?? null,
-            manufacturedAt: e.manufacturedAt ?? null,
+            manufacturedAt: toDateOrNull(e.manufacturedAt),
             powerHp: e.powerHp ?? null,
             hours: e.hours ?? null,
           })),
@@ -134,7 +142,7 @@ export default class BoatService {
           payload.sails.map((s) => ({
             boatId: boat.id,
             sailType: s.sailType,
-            manufacturedAt: s.manufacturedAt ?? null,
+            manufacturedAt: toDateOrNull(s.manufacturedAt),
             areaM2: s.areaM2 ?? null,
             material: s.material ?? null,
             reefPoints: s.reefPoints ?? null,
@@ -148,7 +156,7 @@ export default class BoatService {
           {
             boatId: boat.id,
             rigType: payload.rig.rigType,
-            manufacturedAt: payload.rig.manufacturedAt ?? null,
+            manufacturedAt: toDateOrNull(payload.rig.manufacturedAt),
             mastCount: payload.rig.mastCount ?? null,
             spreaders: payload.rig.spreaders ?? null,
           },
@@ -171,7 +179,7 @@ export default class BoatService {
       registrationNumber?: string | null
       type?: string | null
 
-      manufacturedAt?: Date | string | null
+      manufacturedAt?: Date | string | DateTime | null
       propulsionType?: string | null
       lengthM?: number | null
       beamM?: number | null
@@ -188,20 +196,20 @@ export default class BoatService {
         brand?: string | null
         model?: string | null
         serialNumber?: string | null
-        manufacturedAt?: Date | string | null
+        manufacturedAt?: Date | string | DateTime | null
         powerHp?: number | null
         hours?: number | null
       }>
       sails?: Array<{
         sailType: string
-        manufacturedAt?: Date | string | null
+        manufacturedAt?: Date | string | DateTime | null
         areaM2?: number | null
         material?: string | null
         reefPoints?: number | null
       }>
       rig?: {
         rigType: string
-        manufacturedAt?: Date | string | null
+        manufacturedAt?: Date | string | DateTime | null
         mastCount?: number | null
         spreaders?: number | null
       } | null
@@ -224,7 +232,7 @@ export default class BoatService {
       boat.name = payload.name
       boat.registrationNumber = payload.registrationNumber ?? null
       boat.type = payload.type ?? null
-      boat.manufacturedAt = payload.manufacturedAt ?? null
+      boat.manufacturedAt = toDateOrNull(payload.manufacturedAt)
 
       boat.propulsionType = payload.propulsionType ?? null
       boat.lengthM = payload.lengthM ?? null
@@ -249,7 +257,7 @@ export default class BoatService {
               brand: e.brand ?? null,
               model: e.model ?? null,
               serialNumber: e.serialNumber ?? null,
-              manufacturedAt: e.manufacturedAt ?? null,
+              manufacturedAt: toDateOrNull(e.manufacturedAt),
               powerHp: e.powerHp ?? null,
               hours: e.hours ?? null,
             })),
@@ -265,7 +273,7 @@ export default class BoatService {
             payload.sails.map((s) => ({
               boatId: boat.id,
               sailType: s.sailType,
-              manufacturedAt: s.manufacturedAt ?? null,
+              manufacturedAt: toDateOrNull(s.manufacturedAt),
               areaM2: s.areaM2 ?? null,
               material: s.material ?? null,
               reefPoints: s.reefPoints ?? null,
@@ -282,7 +290,7 @@ export default class BoatService {
             {
               boatId: boat.id,
               rigType: payload.rig.rigType,
-              manufacturedAt: payload.rig.manufacturedAt ?? null,
+              manufacturedAt: toDateOrNull(payload.rig.manufacturedAt),
               mastCount: payload.rig.mastCount ?? null,
               spreaders: payload.rig.spreaders ?? null,
             },

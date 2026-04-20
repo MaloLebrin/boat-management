@@ -1,0 +1,39 @@
+import vine from '@vinejs/vine'
+
+export const maintenanceSubjects = ['boat', 'engine', 'sail', 'rig'] as const
+
+function optionalIdFromForm() {
+  return vine
+    .string()
+    .trim()
+    .optional()
+    .transform((s) => {
+      if (s === undefined || s === '') return null
+      const n = Number.parseInt(s, 10)
+      if (!Number.isInteger(n) || n < 1) return null
+      return n
+    })
+}
+
+export const createBoatMaintenanceValidator = vine.compile(
+  vine.object({
+    subject: vine.enum(maintenanceSubjects),
+    boatEngineId: optionalIdFromForm(),
+    boatSailId: optionalIdFromForm(),
+    boatRigId: optionalIdFromForm(),
+    engineCaption: vine.string().trim().maxLength(240).nullable().optional(),
+    sailCaption: vine.string().trim().maxLength(240).nullable().optional(),
+    performedAt: vine.date(),
+    title: vine.string().trim().minLength(2).maxLength(200),
+    notes: vine.string().trim().maxLength(8000).nullable().optional(),
+    parts: vine
+      .array(
+        vine.object({
+          name: vine.string().trim().optional(),
+          quantity: vine.string().trim().optional(),
+          notes: vine.string().trim().maxLength(500).nullable().optional(),
+        })
+      )
+      .optional(),
+  })
+)
