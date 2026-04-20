@@ -1,38 +1,15 @@
-/** Form row types aligned with Vine validators / API payloads (string fields for HTML inputs). */
+/** Form row types and hull-only edit payload (engines / sails / rig are managed on the boat detail page). */
 
 export type EngineKind = 'inboard' | 'outboard' | 'electric' | 'hybrid' | 'other'
 export type EngineFuel = 'diesel' | 'essence' | 'electric' | 'other' | ''
 
-export type EngineFormRow = {
-  kind: EngineKind
-  fuel: EngineFuel
-  brand: string
-  model: string
-  serialNumber: string
-  powerHp: string
-  hours: string
-}
-
 export type SailType = 'main' | 'genoa' | 'jib' | 'spinnaker' | 'gennaker' | 'storm_jib' | 'other'
-
-export type SailFormRow = {
-  sailType: SailType
-  areaM2: string
-  material: string
-  reefPoints: string
-}
 
 export type RigType = 'sloop' | 'cutter' | 'ketch' | 'yawl' | 'schooner' | 'cat_rig' | 'other'
 
-export type RigFormRow = {
-  rigType: RigType
-  mastCount: string
-  spreaders: string
-}
-
 export type PropulsionTypeUi = 'sailboat' | 'motorboat' | 'catamaran' | 'rib' | 'other' | ''
 
-/** Server shape for edit page (Inertia props). */
+/** Server shape for hull-only edit page (Inertia props). */
 export type BoatEditPayload = {
   id: number
   name: string
@@ -48,32 +25,6 @@ export type BoatEditPayload = {
   yearBuilt: number | null
   manufacturer: string | null
   model: string | null
-  engines: Array<{
-    id: number
-    kind: string
-    fuel: string | null
-    brand: string | null
-    model: string | null
-    serialNumber: string | null
-    manufacturedAt: string | null
-    powerHp: number | null
-    hours: number | null
-  }>
-  sails: Array<{
-    id: number
-    sailType: string
-    manufacturedAt: string | null
-    areaM2: number | null
-    material: string | null
-    reefPoints: number | null
-  }>
-  rig: {
-    id: number
-    rigType: string
-    manufacturedAt: string | null
-    mastCount: number | null
-    spreaders: number | null
-  } | null
 }
 
 const ENGINE_KINDS: readonly EngineKind[] = ['inboard', 'outboard', 'electric', 'hybrid', 'other']

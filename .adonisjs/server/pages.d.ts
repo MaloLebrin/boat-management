@@ -12,8 +12,11 @@ declare module '@adonisjs/inertia/types' {
     'auth/login': ExtractProps<(typeof import('../../inertia/pages/auth/login.vue'))['default']>
     'auth/signup': ExtractProps<(typeof import('../../inertia/pages/auth/signup.vue'))['default']>
     'boats/edit': ExtractProps<(typeof import('../../inertia/pages/boats/edit.vue'))['default']>
+    'boats/engine_edit': ExtractProps<(typeof import('../../inertia/pages/boats/engine_edit.vue'))['default']>
     'boats/index': ExtractProps<(typeof import('../../inertia/pages/boats/index.vue'))['default']>
     'boats/new': ExtractProps<(typeof import('../../inertia/pages/boats/new.vue'))['default']>
+    'boats/rig_edit': ExtractProps<(typeof import('../../inertia/pages/boats/rig_edit.vue'))['default']>
+    'boats/sail_edit': ExtractProps<(typeof import('../../inertia/pages/boats/sail_edit.vue'))['default']>
     'boats/show': ExtractProps<(typeof import('../../inertia/pages/boats/show.vue'))['default']>
     'errors/not_found': ExtractProps<(typeof import('../../inertia/pages/errors/not_found.vue'))['default']>
     'errors/server_error': ExtractProps<(typeof import('../../inertia/pages/errors/server_error.vue'))['default']>

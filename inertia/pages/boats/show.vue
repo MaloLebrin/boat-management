@@ -1,15 +1,16 @@
 <script setup lang="ts">
-import BoatShowEnginesCard from '~/components/boats/BoatShowEnginesCard.vue'
-import BoatShowMaintenanceSection from '~/components/boats/BoatShowMaintenanceSection.vue'
-import BoatShowRigCard from '~/components/boats/BoatShowRigCard.vue'
-import BoatShowSailsCard from '~/components/boats/BoatShowSailsCard.vue'
-import BoatShowSpecsCard from '~/components/boats/BoatShowSpecsCard.vue'
+import BoatShowEnginesCard from '~/components/boats/engine/BoatShowEnginesCard.vue'
+import BoatShowMaintenanceSection from '~/components/boats/maintenance/BoatShowMaintenanceSection.vue'
+import BoatShowRigCard from '~/components/boats/rig/BoatShowRigCard.vue'
+import BoatShowSailsCard from '~/components/boats/sail/BoatShowSailsCard.vue'
+import BoatShowSpecsCard from '~/components/boats/hull/BoatShowSpecsCard.vue'
 import type { BoatShowDetail, MaintenanceEventRow } from '~/types/boat_show'
 
 defineProps<{
   boat: BoatShowDetail
   maintenanceEvents: MaintenanceEventRow[]
   canManageMaintenance: boolean
+  canManageEquipment: boolean
 }>()
 </script>
 
@@ -42,9 +43,9 @@ defineProps<{
 
     <div class="mt-8 grid grid-cols-1 gap-6">
       <BoatShowSpecsCard :boat="boat" />
-      <BoatShowEnginesCard :engines="boat.engines" />
-      <BoatShowSailsCard :sails="boat.sails" />
-      <BoatShowRigCard v-if="boat.rig" :rig="boat.rig" />
+      <BoatShowEnginesCard :boat-id="boat.id" :engines="boat.engines" :can-manage="canManageEquipment" />
+      <BoatShowSailsCard :boat-id="boat.id" :sails="boat.sails" :can-manage="canManageEquipment" />
+      <BoatShowRigCard :boat-id="boat.id" :rig="boat.rig" :can-manage="canManageEquipment" />
       <BoatShowMaintenanceSection
         :boat="boat"
         :maintenance-events="maintenanceEvents"

@@ -7,6 +7,7 @@ export type BoatShowEngine = {
   brand: string | null
   model: string | null
   serialNumber: string | null
+  manufacturedAt: string | null
   powerHp: number | null
   hours: number | null
 }
@@ -14,6 +15,7 @@ export type BoatShowEngine = {
 export type BoatShowSail = {
   id: number
   sailType: string
+  manufacturedAt: string | null
   areaM2: number | null
   material: string | null
   reefPoints: number | null
@@ -22,6 +24,7 @@ export type BoatShowSail = {
 export type BoatShowRig = {
   id: number
   rigType: string
+  manufacturedAt: string | null
   mastCount: number | null
   spreaders: number | null
 }

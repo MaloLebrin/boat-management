@@ -8,10 +8,15 @@ import User from '#models/user'
 import Boat from '#models/boat'
 import BoatEngine from '#models/boat_engine'
 import BoatMaintenanceEvent from '#models/boat_maintenance_event'
+import BoatRig from '#models/boat_rig'
+import BoatSail from '#models/boat_sail'
 
 test.group('BoatMaintenanceService (unit)', (group) => {
   group.each.teardown(async () => {
     await BoatMaintenanceEvent.query().delete()
+    await BoatEngine.query().delete()
+    await BoatSail.query().delete()
+    await BoatRig.query().delete()
     await Boat.query().delete()
     await User.query().delete()
     await Organization.query().delete()
@@ -117,9 +122,9 @@ test.group('BoatMaintenanceService (unit)', (group) => {
       name: 'Sloop',
       propulsionType: 'sailboat',
       mastHeightM: 12,
-      sails: [{ sailType: 'main', areaM2: 28 }],
-      rig: { rigType: 'sloop', mastCount: 1 },
     })
+    await boatService.createSail(user, boat, { sailType: 'main', areaM2: 28 })
+    await boatService.upsertRig(user, boat, { rigType: 'sloop', mastCount: 1 })
 
     await boat.load('sails')
     await boat.load('rig')

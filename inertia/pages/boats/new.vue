@@ -1,13 +1,11 @@
 <script setup lang="ts">
 import { Form } from '@adonisjs/inertia/vue'
-import BoatFormEnginesEditor from '~/components/boats/BoatFormEnginesEditor.vue'
-import BoatFormHullFields from '~/components/boats/BoatFormHullFields.vue'
-import BoatFormRigEditor from '~/components/boats/BoatFormRigEditor.vue'
-import BoatFormSailsEditor from '~/components/boats/BoatFormSailsEditor.vue'
-import { useBoatForm } from '~/composables/use_boat_form'
+import BoatFormHullFields from '~/components/boats/hull/BoatFormHullFields.vue'
+import { computed, ref } from 'vue'
+import type { PropulsionTypeUi } from '~/types/boat_form'
 
-const { propulsionType, engines, sails, rig, showSailFields, addEngine, removeEngine, addSail, removeSail } =
-  useBoatForm()
+const propulsionType = ref<PropulsionTypeUi>('')
+const showSailFields = computed(() => propulsionType.value === 'sailboat')
 </script>
 
 <template>
@@ -26,21 +24,6 @@ const { propulsionType, engines, sails, rig, showSailFields, addEngine, removeEn
             :show-mast-height="showSailFields"
             :errors="errors"
           />
-
-          <BoatFormEnginesEditor
-            v-model:engines="engines"
-            @add="addEngine"
-            @remove="removeEngine"
-          />
-
-          <BoatFormSailsEditor
-            v-if="showSailFields"
-            v-model:sails="sails"
-            @add="addSail"
-            @remove="removeSail"
-          />
-
-          <BoatFormRigEditor v-if="showSailFields" v-model:rig="rig" />
 
           <div class="flex items-center gap-3">
             <button

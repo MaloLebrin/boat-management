@@ -4,10 +4,16 @@ import BoatService from '#services/boat_service'
 import Organization from '#models/organization'
 import User from '#models/user'
 import Boat from '#models/boat'
+import BoatEngine from '#models/boat_engine'
+import BoatRig from '#models/boat_rig'
+import BoatSail from '#models/boat_sail'
 import * as abilities from '#abilities/main'
 
 test.group('MVP org/users/boats/permissions (unit)', (group) => {
   group.each.teardown(async () => {
+    await BoatEngine.query().delete()
+    await BoatSail.query().delete()
+    await BoatRig.query().delete()
     await Boat.query().delete()
     await User.query().delete()
     await Organization.query().delete()
@@ -60,7 +66,9 @@ test.group('MVP org/users/boats/permissions (unit)', (group) => {
     assert.equal(boats[0]!.name, 'Org1 Boat')
   })
 
-  test('BoatService.createForUser creates multiple engines and rig/sails', async ({ assert }) => {
+  test('BoatService hull create then equipment methods add engines, sails, and rig', async ({
+    assert,
+  }) => {
     const org = await Organization.create({ name: 'Org', slug: 'org-create' })
     const user = await User.create({
       email: 'builder@example.com',
@@ -78,36 +86,38 @@ test.group('MVP org/users/boats/permissions (unit)', (group) => {
       lengthM: 10.5,
       beamM: 3.2,
       hullMaterial: 'fiberglass',
-      engines: [
-        {
-          kind: 'inboard',
-          fuel: 'diesel',
-          brand: 'Yanmar',
-          model: '3YM',
-          manufacturedAt: '2019-05-01',
-          powerHp: 28,
-          hours: 1200,
-        },
-        {
-          kind: 'electric',
-          fuel: 'electric',
-          brand: 'Torqeedo',
-          model: 'Cruise',
-          manufacturedAt: '2021-09-15',
-          powerHp: 6.7,
-          hours: 50,
-        },
-      ],
-      sails: [
-        {
-          sailType: 'main',
-          manufacturedAt: '2020-02-02',
-          areaM2: 35,
-          material: 'dacron',
-          reefPoints: 2,
-        },
-      ],
-      rig: { rigType: 'sloop', manufacturedAt: '2020-03-03', mastCount: 1, spreaders: 2 },
+    })
+
+    await boatService.createEngine(user, boat, {
+      kind: 'inboard',
+      fuel: 'diesel',
+      brand: 'Yanmar',
+      model: '3YM',
+      manufacturedAt: '2019-05-01',
+      powerHp: 28,
+      hours: 1200,
+    })
+    await boatService.createEngine(user, boat, {
+      kind: 'electric',
+      fuel: 'electric',
+      brand: 'Torqeedo',
+      model: 'Cruise',
+      manufacturedAt: '2021-09-15',
+      powerHp: 6.7,
+      hours: 50,
+    })
+    await boatService.createSail(user, boat, {
+      sailType: 'main',
+      manufacturedAt: '2020-02-02',
+      areaM2: 35,
+      material: 'dacron',
+      reefPoints: 2,
+    })
+    await boatService.upsertRig(user, boat, {
+      rigType: 'sloop',
+      manufacturedAt: '2020-03-03',
+      mastCount: 1,
+      spreaders: 2,
     })
 
     await boat.load('engines')

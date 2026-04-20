@@ -47,7 +47,13 @@ export default class BoatsController {
       const maintenanceService = new BoatMaintenanceService()
       const maintenanceEvents = await maintenanceService.listForBoat(user, boat)
       const canManageMaintenance = await bouncer.allows('boatUpdate', boat)
-      return inertia.render('boats/show', { boat, maintenanceEvents, canManageMaintenance })
+      const canManageEquipment = canManageMaintenance
+      return inertia.render('boats/show', {
+        boat,
+        maintenanceEvents,
+        canManageMaintenance,
+        canManageEquipment,
+      })
     } catch (error) {
       if (error instanceof BoatNotFoundError) {
         response.redirect('/boats')
