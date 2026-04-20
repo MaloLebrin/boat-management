@@ -27,10 +27,10 @@ watch(
 </script>
 
 <template>
-  <header>
-    <div>
-      <div>
-        <Link route="home">
+  <div class="min-h-screen bg-zinc-50 text-zinc-900">
+    <header class="border-b border-zinc-200 bg-white/80 backdrop-blur">
+      <div class="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
+        <Link route="home" class="inline-flex items-center gap-3 text-zinc-900 hover:text-zinc-700">
           <svg
             width="66"
             height="24"
@@ -43,28 +43,49 @@ watch(
               fill="currentColor"
             />
           </svg>
+          <span class="sr-only">Home</span>
         </Link>
-      </div>
-      <div>
-        <nav>
+
+        <nav class="flex items-center gap-4">
           <template v-if="page.props.user">
-            <span>{{ page.props.user.initials }}</span>
+            <span
+              class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-zinc-100 text-sm font-medium text-zinc-700 ring-1 ring-zinc-200"
+            >
+              {{ page.props.user.initials }}
+            </span>
             <Form route="session.destroy">
-              <button type="submit">Logout</button>
+              <button
+                type="submit"
+                class="inline-flex h-9 items-center justify-center rounded-md bg-zinc-900 px-3 text-sm font-medium text-white hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                Logout
+              </button>
             </Form>
           </template>
           <template v-else>
-            <Link route="new_account.create">Signup</Link>
-            <Link route="session.create">Login</Link>
+            <Link
+              route="new_account.create"
+              class="inline-flex h-9 items-center justify-center rounded-md px-3 text-sm font-medium text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900"
+            >
+              Signup
+            </Link>
+            <Link
+              route="session.create"
+              class="inline-flex h-9 items-center justify-center rounded-md bg-zinc-900 px-3 text-sm font-medium text-white hover:bg-zinc-800"
+            >
+              Login
+            </Link>
           </template>
         </nav>
       </div>
-    </div>
-  </header>
+    </header>
 
-  <main>
-    <slot />
-  </main>
+    <main class="mx-auto w-full max-w-6xl px-6 py-10">
+      <div class="rounded-xl border border-zinc-200 bg-white shadow-sm">
+        <slot />
+      </div>
+    </main>
 
-  <Toaster position="top-center" rich-colors />
+    <Toaster position="top-center" rich-colors />
+  </div>
 </template>
