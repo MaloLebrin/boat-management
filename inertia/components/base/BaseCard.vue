@@ -1,13 +1,23 @@
 <script setup lang="ts">
-defineProps<{
+withDefaults(defineProps<{
   padded?: boolean
-}>()
+  isAnimated?: boolean
+}>(), {
+  padded: true,
+  isAnimated: false,
+})
+
 </script>
 
 <template>
-  <div class="group perspective-[60rem]">
+  <div :class="{ 'group perspective-[60rem]': isAnimated }">
     <div
-      class="rounded-(--radius-card) border border-border bg-surface-elevated shadow-(--shadow-card) hover:shadow-(--shadow-card-hover) transition-[rotate,scale,box-shadow] duration-400 ease-[cubic-bezier(0.2,0.8,0.2,1)] group-hover:rotate-[y_10deg] group-hover:scale-[1.05]"
+      :class="[
+        'rounded-(--radius-card) border border-border bg-surface-elevated shadow-(--shadow-card)',
+        {
+          'hover:shadow-(--shadow-card-hover) transition-[rotate,scale,box-shadow] duration-400 ease-premium group-hover:rotate-[y_10deg] group-hover:scale-[1.05]': isAnimated,
+        }
+      ]"
     >
       <div v-if="$slots.header" class="px-6 py-4 border-b border-border">
         <slot name="header" />
