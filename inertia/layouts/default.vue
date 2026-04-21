@@ -34,7 +34,7 @@ watch(
   >
     <header class="border-b backdrop-blur-md border-border bg-surface-elevated/85">
       <div class="flex justify-between items-center px-6 mx-auto max-w-7xl h-16">
-        <Link route="home" class="inline-flex gap-3 items-center text-fg hover:text-brand">
+        <a href="/en" class="inline-flex gap-3 items-center text-fg hover:text-brand">
           <img
             :src="brandIconUrl"
             alt="Fleetide AI"
@@ -44,7 +44,7 @@ watch(
             <span class="font-display text-sm font-semibold text-fg">Fleetide AI</span>
             <span class="text-xs font-semibold text-fg-subtle">Fleet intelligence</span>
           </div>
-        </Link>
+        </a>
 
         <nav class="flex gap-3 items-center sm:gap-4">
           <Link
@@ -55,7 +55,7 @@ watch(
           </Link>
           <template v-if="page.props.user">
             <Link
-              route="home"
+              route="dashboard"
               class="inline-flex h-9 items-center justify-center rounded-(--radius-control) px-3 text-sm font-medium text-fg-muted hover:bg-surface-muted hover:text-fg"
             >
               Dashboard

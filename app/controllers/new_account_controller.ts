@@ -13,6 +13,6 @@ export default class NewAccountController {
     const { user } = await userService.signupWithOrganization(payload)
 
     await auth.use('web').login(user)
-    response.redirect().toRoute('home')
+    response.redirect().toRoute('dashboard')
   }
 }

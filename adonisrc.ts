@@ -64,6 +64,7 @@ export default defineConfig({
     () => import('@adonisjs/bouncer/bouncer_provider'),
     () => import('#providers/api_provider'),
     () => import('@adonisjs/queue/queue_provider'),
+    () => import('@adonisjs/i18n/i18n_provider'),
   ],
 
   /*
@@ -130,6 +131,10 @@ export default defineConfig({
     },
     {
       pattern: 'public/**',
+      reloadServer: false,
+    },
+    {
+      pattern: 'resources/lang/**/*.{json,yaml,yml}',
       reloadServer: false,
     },
   ],

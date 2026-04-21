@@ -1,0 +1,170 @@
+{
+  "brand": {
+    "name": "Fleetide AI",
+    "tagline": "Fleet intelligence"
+  },
+  "nav": {
+    "pricing": "Tarifs",
+    "login": "Connexion",
+    "signup": "Inscription",
+    "dashboard": "Dashboard"
+  },
+  "home": {
+    "hero": {
+      "eyebrow": "Fleetide AI",
+      "title": "La maintenance de flotte, avec la clarté de l’IA.",
+      "subtitle": "Suivez bateaux, équipements et tâches de maintenance au niveau de votre organisation — avec des signaux intelligents pour anticiper."
+    },
+    "cta": {
+      "primary": "Commencer",
+      "secondary": "Voir les tarifs"
+    },
+    "sections": {
+      "social_proof": {
+        "title": "Approuvé par les équipes terrain",
+        "logo1": "HarborWorks",
+        "logo2": "BlueSkipper",
+        "logo3": "DockOps",
+        "logo4": "Rig & Co",
+        "logo5": "SeaPulse",
+        "logo6": "MarinaTech"
+      },
+      "stats": {
+        "title": "Des signaux actionnables",
+        "item1_label": "En retard",
+        "item1_value": "3",
+        "item1_hint": "tâches urgentes",
+        "item2_label": "À venir",
+        "item2_value": "7",
+        "item2_hint": "dans 14 jours",
+        "item3_label": "Actifs",
+        "item3_value": "42",
+        "item3_hint": "équipements suivis"
+      },
+      "problem": {
+        "title": "Du chaos au suivi fiable",
+        "item1_title": "L’historique est dispersé",
+        "item1_description": "Tableurs, messages et mémoire rendent le suivi difficile à fiabiliser.",
+        "item2_title": "L’urgence se perd",
+        "item2_description": "Sans dates claires ou compteur d’heures, l’essentiel glisse en silence."
+      },
+      "features": {
+        "title": "Tout ce qu’il faut pour une flotte",
+        "subtitle": "Pensé pour les organisations, avec des workflows propres et une automation subtile.",
+        "item1_title": "Bateaux & équipements",
+        "item1_description": "Specs structurées : coque, moteurs, voiles, systèmes critiques.",
+        "item2_title": "Tâches de maintenance",
+        "item2_description": "Planifiez par date ou heures moteur, assignez et validez.",
+        "item3_title": "Historique & pièces",
+        "item3_description": "Journalisez les interventions et les pièces remplacées.",
+        "item4_title": "Périmètre organisation",
+        "item4_description": "Multi-tenant par design : chaque équipe voit le bon périmètre.",
+        "item5_title": "Dashboard urgences",
+        "item5_description": "Retards + alertes à venir, pour garder un backlog sain.",
+        "item6_title": "Assistant IA",
+        "item6_description": "Posez des questions en contexte et obtenez la prochaine action."
+      },
+      "use_cases": {
+        "title": "Pour les vrais opérateurs",
+        "item1_title": "Fleet manager",
+        "item1_description": "Augmentez l’uptime avec une source de vérité maintenance.",
+        "item2_title": "Responsable technique",
+        "item2_description": "Standardisez checklists, pièces et qualité d’intervention.",
+        "item3_title": "Propriétaire / opérateur",
+        "item3_description": "Sachez ce qui est dû, urgent, et à budgéter ensuite."
+      },
+      "preview": {
+        "title": "Un dashboard qui reste calme",
+        "subtitle": "L’essentiel d’abord : urgences, à venir, et contexte par bateau."
+      },
+      "security": {
+        "title": "Sécurité & fiabilité, sans friction",
+        "item1_title": "Auth par session",
+        "item1_description": "Sessions sécurisées et patterns d’accès cohérents.",
+        "item2_title": "Frontières d’organisation",
+        "item2_description": "Données scoppées par org par défaut — pas de fuite accidentelle.",
+        "item3_title": "Traçabilité",
+        "item3_description": "Historique maintenance structuré et consultable dans le temps.",
+        "item4_title": "Backups-ready",
+        "item4_description": "Conçu pour supporter des backups et des restores propres."
+      },
+      "faq": {
+        "title": "FAQ",
+        "item1_q": "Fleetide AI est un outil maintenance ou un CMMS ?",
+        "item1_a": "Un système moderne orienté flotte : bateaux, équipements, heures et historique.",
+        "item2_q": "Gérez-vous plusieurs organisations ?",
+        "item2_a": "Oui. L’app est multi-tenant et scope l’accès par organisation.",
+        "item3_q": "Que fait l’IA concrètement ?",
+        "item3_a": "Elle aide à faire remonter des signaux et répondre à des questions contextualisées.",
+        "item4_q": "Je peux commencer sans facturation ?",
+        "item4_a": "Oui. Les tarifs sont indicatifs, la facturation peut venir ensuite.",
+        "item5_q": "C’est utilisable sur mobile ?",
+        "item5_a": "L’UI est responsive et pensée pour le terrain.",
+        "item6_q": "Puis-je exporter mes données ?",
+        "item6_a": "Le modèle est structuré pour faciliter export et reporting."
+      },
+      "final_cta": {
+        "title": "Commencez clair. Montez en puissance sereinement.",
+        "subtitle": "Constituez un registre maintenance propre, puis laissez l’IA signaler l’action.",
+        "primary": "Créer un compte",
+        "secondary": "Voir les tarifs"
+      }
+    }
+  },
+  "pricing": {
+    "title": "Tarifs",
+    "subtitle": "Des plans simples pour les flottes de toute taille. Commencez petit, montez en puissance.",
+    "plans": {
+      "starter": {
+        "name": "Starter",
+        "price": "Gratuit",
+        "badge": "Démarrer",
+        "feature1": "Suivi bateaux & équipements",
+        "feature2": "Historique maintenance",
+        "feature3": "Tâches planifiées"
+      },
+      "pro": {
+        "name": "Pro",
+        "price": "29€ / org / mois",
+        "badge": "Le plus choisi",
+        "feature1": "Tout Starter",
+        "feature2": "Assistant IA",
+        "feature3": "Dashboard urgences maintenance"
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "price": "Sur devis",
+        "badge": "Avancé",
+        "feature1": "Tout Pro",
+        "feature2": "SLA & support prioritaire",
+        "feature3": "Workflows & SSO (placeholder)"
+      }
+    },
+    "compare": {
+      "title": "Inclus (tous les plans)",
+      "item1": "Accès scoppé par organisation",
+      "item2": "Bateaux & équipements structurés",
+      "item3": "Historique maintenance & pièces",
+      "item4": "Tâches par date ou heures moteur",
+      "item5": "Modèle export-ready",
+      "item6": "UI rapide et responsive"
+    },
+    "faq": {
+      "title": "FAQ tarifs",
+      "item1_q": "Puis-je changer de plan plus tard ?",
+      "item1_a": "Oui. Commencez sur Starter puis upgradez quand nécessaire.",
+      "item2_q": "La facturation est-elle intégrée ?",
+      "item2_a": "Pas encore — ces plans sont indicatifs et peuvent être connectés ensuite.",
+      "item3_q": "Remises pour grosses flottes ?",
+      "item3_a": "Enterprise peut être ajusté selon volume et support."
+    },
+    "cta": {
+      "title": "Prêt à remettre de l’ordre dans la maintenance ?",
+      "subtitle": "Commencez gratuitement, puis ajoutez des signaux IA en grandissant.",
+      "primary": "Démarrer",
+      "secondary": "Retour accueil"
+    },
+    "note": "Tarifs indicatifs — la facturation peut être ajoutée ensuite."
+  }
+}
+

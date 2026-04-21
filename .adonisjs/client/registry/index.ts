@@ -6,12 +6,6 @@ import type { ApiDefinition } from './tree.d.ts'
 const placeholder: any = {}
 
 const routes = {
-  'home': {
-    methods: ["GET","HEAD"],
-    pattern: '/',
-    tokens: [{"old":"/","type":0,"val":"/","end":""}],
-    types: placeholder as Registry['home']['types'],
-  },
   'design_system': {
     methods: ["GET","HEAD"],
     pattern: '/design-system',
@@ -191,6 +185,42 @@ const routes = {
     pattern: '/ai/chat',
     tokens: [{"old":"/ai/chat","type":0,"val":"ai","end":""},{"old":"/ai/chat","type":0,"val":"chat","end":""}],
     types: placeholder as Registry['ai.chat']['types'],
+  },
+  'root': {
+    methods: ["GET","HEAD"],
+    pattern: '/',
+    tokens: [{"old":"/","type":0,"val":"/","end":""}],
+    types: placeholder as Registry['root']['types'],
+  },
+  'marketing.en.home': {
+    methods: ["GET","HEAD"],
+    pattern: '/en',
+    tokens: [{"old":"/en","type":0,"val":"en","end":""}],
+    types: placeholder as Registry['marketing.en.home']['types'],
+  },
+  'marketing.en.pricing': {
+    methods: ["GET","HEAD"],
+    pattern: '/en/tarifs',
+    tokens: [{"old":"/en/tarifs","type":0,"val":"en","end":""},{"old":"/en/tarifs","type":0,"val":"tarifs","end":""}],
+    types: placeholder as Registry['marketing.en.pricing']['types'],
+  },
+  'marketing.fr.home': {
+    methods: ["GET","HEAD"],
+    pattern: '/fr',
+    tokens: [{"old":"/fr","type":0,"val":"fr","end":""}],
+    types: placeholder as Registry['marketing.fr.home']['types'],
+  },
+  'marketing.fr.pricing': {
+    methods: ["GET","HEAD"],
+    pattern: '/fr/tarifs',
+    tokens: [{"old":"/fr/tarifs","type":0,"val":"fr","end":""},{"old":"/fr/tarifs","type":0,"val":"tarifs","end":""}],
+    types: placeholder as Registry['marketing.fr.pricing']['types'],
+  },
+  'dashboard': {
+    methods: ["GET","HEAD"],
+    pattern: '/dashboard',
+    tokens: [{"old":"/dashboard","type":0,"val":"dashboard","end":""}],
+    types: placeholder as Registry['dashboard']['types'],
   },
 } as const satisfies Record<string, AdonisEndpoint>
 

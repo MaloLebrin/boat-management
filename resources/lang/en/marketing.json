@@ -1,0 +1,170 @@
+{
+  "brand": {
+    "name": "Fleetide AI",
+    "tagline": "Fleet intelligence"
+  },
+  "nav": {
+    "pricing": "Pricing",
+    "login": "Login",
+    "signup": "Signup",
+    "dashboard": "Dashboard"
+  },
+  "home": {
+    "hero": {
+      "eyebrow": "Fleetide AI",
+      "title": "Fleet maintenance, powered by AI clarity.",
+      "subtitle": "Track boats, equipment, and maintenance tasks across your organization — with intelligent signals to stay ahead."
+    },
+    "cta": {
+      "primary": "Get started",
+      "secondary": "View pricing"
+    },
+    "sections": {
+      "social_proof": {
+        "title": "Trusted by hands-on teams",
+        "logo1": "HarborWorks",
+        "logo2": "BlueSkipper",
+        "logo3": "DockOps",
+        "logo4": "Rig & Co",
+        "logo5": "SeaPulse",
+        "logo6": "MarinaTech"
+      },
+      "stats": {
+        "title": "Signals you can act on",
+        "item1_label": "Overdue",
+        "item1_value": "3",
+        "item1_hint": "urgent tasks",
+        "item2_label": "Due soon",
+        "item2_value": "7",
+        "item2_hint": "next 14 days",
+        "item3_label": "Assets",
+        "item3_value": "42",
+        "item3_hint": "tracked equipments"
+      },
+      "problem": {
+        "title": "From scattered notes to confident maintenance",
+        "item1_title": "History is fragmented",
+        "item1_description": "Spreadsheets, messages, and memories make it hard to trust what’s been done.",
+        "item2_title": "Urgency gets lost",
+        "item2_description": "Without clear due dates or hour counters, critical work slips quietly."
+      },
+      "features": {
+        "title": "Everything your fleet needs",
+        "subtitle": "Built on organization-scoped data with clean workflows and subtle automation.",
+        "item1_title": "Boats & equipment",
+        "item1_description": "Structured specs for hull, engines, sails, and critical systems.",
+        "item2_title": "Maintenance tasks",
+        "item2_description": "Plan by date or engine hours, assign, and track completion.",
+        "item3_title": "History & parts",
+        "item3_description": "Log interventions with replaced parts for future diagnostics.",
+        "item4_title": "Organization scope",
+        "item4_description": "Multi-tenant by design: teams see exactly what they should.",
+        "item5_title": "Urgent dashboard",
+        "item5_description": "Overdue + due-soon signals, so your backlog stays safe.",
+        "item6_title": "AI assistant",
+        "item6_description": "Ask questions in context and get the next best action."
+      },
+      "use_cases": {
+        "title": "Made for real operators",
+        "item1_title": "Fleet manager",
+        "item1_description": "Keep uptime high with a single source of truth for maintenance.",
+        "item2_title": "Technical lead",
+        "item2_description": "Standardize checklists, parts tracking, and intervention quality.",
+        "item3_title": "Owner / operator",
+        "item3_description": "Know what’s due, what’s urgent, and what to budget next."
+      },
+      "preview": {
+        "title": "A dashboard that stays calm",
+        "subtitle": "You get the essentials first: urgent work, upcoming work, and context per boat."
+      },
+      "security": {
+        "title": "Security & reliability, without drama",
+        "item1_title": "Session-based auth",
+        "item1_description": "Secure sessions and consistent access patterns.",
+        "item2_title": "Organization boundaries",
+        "item2_description": "Data scoped to your org by default — no accidental leaks.",
+        "item3_title": "Audit-friendly",
+        "item3_description": "Maintenance history is structured and traceable over time.",
+        "item4_title": "Backups-ready",
+        "item4_description": "Designed to support safe backups and restore workflows."
+      },
+      "faq": {
+        "title": "FAQ",
+        "item1_q": "Is Fleetide AI a maintenance app or a CMMS?",
+        "item1_a": "It’s a modern maintenance system focused on fleet realities: boats, equipment, hours, and history.",
+        "item2_q": "Do you support multiple organizations?",
+        "item2_a": "Yes. The app is multi-tenant and scopes access by organization.",
+        "item3_q": "What does “AI” do here?",
+        "item3_a": "It helps surface signals and answer contextual questions from your data.",
+        "item4_q": "Can I start without billing?",
+        "item4_a": "Yes. Pricing is illustrative today; billing can be connected later.",
+        "item5_q": "Is it usable on mobile?",
+        "item5_a": "The UI is responsive and optimized for operators on the move.",
+        "item6_q": "Can I export my data?",
+        "item6_a": "The model is structured to enable exports and reporting."
+      },
+      "final_cta": {
+        "title": "Start with clarity. Scale with confidence.",
+        "subtitle": "Get a clean fleet record, then let AI highlight what needs action.",
+        "primary": "Create an account",
+        "secondary": "See pricing"
+      }
+    }
+  },
+  "pricing": {
+    "title": "Pricing",
+    "subtitle": "Simple plans for fleets of any size. Start small, scale safely.",
+    "plans": {
+      "starter": {
+        "name": "Starter",
+        "price": "Free",
+        "badge": "Start",
+        "feature1": "Boats & equipment tracking",
+        "feature2": "Maintenance history",
+        "feature3": "Planned tasks"
+      },
+      "pro": {
+        "name": "Pro",
+        "price": "$29 / org / month",
+        "badge": "Most popular",
+        "feature1": "Everything in Starter",
+        "feature2": "AI assistant",
+        "feature3": "Urgent maintenance dashboard"
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "price": "Let’s talk",
+        "badge": "Advanced",
+        "feature1": "Everything in Pro",
+        "feature2": "SLA & priority support",
+        "feature3": "Custom workflows & SSO (placeholder)"
+      }
+    },
+    "compare": {
+      "title": "What you get (all plans)",
+      "item1": "Organization-scoped access",
+      "item2": "Structured boats & equipment",
+      "item3": "Maintenance history & parts",
+      "item4": "Tasks by date or engine hours",
+      "item5": "Export-ready model",
+      "item6": "Fast, responsive UI"
+    },
+    "faq": {
+      "title": "Pricing FAQ",
+      "item1_q": "Can I switch plans later?",
+      "item1_a": "Yes. Start on Starter and upgrade when you’re ready.",
+      "item2_q": "Is billing integrated?",
+      "item2_a": "Not yet — these plans are illustrative and can be wired later.",
+      "item3_q": "Do you offer discounts for large fleets?",
+      "item3_a": "Enterprise can be tailored for volume and support requirements."
+    },
+    "cta": {
+      "title": "Ready to bring order to maintenance?",
+      "subtitle": "Start free, then add AI signals when your fleet grows.",
+      "primary": "Start now",
+      "secondary": "Back to home"
+    },
+    "note": "Pricing is illustrative — connect billing later."
+  }
+}
+

@@ -4,7 +4,6 @@ type ParamValue = string | number | bigint | boolean
 
 export type ScannedRoutes = {
   ALL: {
-    'home': { paramsTuple?: []; params?: {} }
     'design_system': { paramsTuple?: []; params?: {} }
     'boats.index': { paramsTuple?: []; params?: {} }
     'boats.create': { paramsTuple?: []; params?: {} }
@@ -35,9 +34,14 @@ export type ScannedRoutes = {
     'session.store': { paramsTuple?: []; params?: {} }
     'session.destroy': { paramsTuple?: []; params?: {} }
     'ai.chat': { paramsTuple?: []; params?: {} }
+    'root': { paramsTuple?: []; params?: {} }
+    'marketing.en.home': { paramsTuple?: []; params?: {} }
+    'marketing.en.pricing': { paramsTuple?: []; params?: {} }
+    'marketing.fr.home': { paramsTuple?: []; params?: {} }
+    'marketing.fr.pricing': { paramsTuple?: []; params?: {} }
+    'dashboard': { paramsTuple?: []; params?: {} }
   }
   GET: {
-    'home': { paramsTuple?: []; params?: {} }
     'design_system': { paramsTuple?: []; params?: {} }
     'boats.index': { paramsTuple?: []; params?: {} }
     'boats.create': { paramsTuple?: []; params?: {} }
@@ -48,9 +52,14 @@ export type ScannedRoutes = {
     'boat_equipment.edit_rig': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'new_account.create': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }
+    'root': { paramsTuple?: []; params?: {} }
+    'marketing.en.home': { paramsTuple?: []; params?: {} }
+    'marketing.en.pricing': { paramsTuple?: []; params?: {} }
+    'marketing.fr.home': { paramsTuple?: []; params?: {} }
+    'marketing.fr.pricing': { paramsTuple?: []; params?: {} }
+    'dashboard': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
-    'home': { paramsTuple?: []; params?: {} }
     'design_system': { paramsTuple?: []; params?: {} }
     'boats.index': { paramsTuple?: []; params?: {} }
     'boats.create': { paramsTuple?: []; params?: {} }
@@ -61,6 +70,12 @@ export type ScannedRoutes = {
     'boat_equipment.edit_rig': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'new_account.create': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }
+    'root': { paramsTuple?: []; params?: {} }
+    'marketing.en.home': { paramsTuple?: []; params?: {} }
+    'marketing.en.pricing': { paramsTuple?: []; params?: {} }
+    'marketing.fr.home': { paramsTuple?: []; params?: {} }
+    'marketing.fr.pricing': { paramsTuple?: []; params?: {} }
+    'dashboard': { paramsTuple?: []; params?: {} }
   }
   POST: {
     'boats.store': { paramsTuple?: []; params?: {} }

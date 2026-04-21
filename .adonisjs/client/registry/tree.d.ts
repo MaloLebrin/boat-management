@@ -2,7 +2,6 @@
 import type { routes } from './index.ts'
 
 export interface ApiDefinition {
-  home: typeof routes['home']
   designSystem: typeof routes['design_system']
   boats: {
     index: typeof routes['boats.index']
@@ -47,4 +46,16 @@ export interface ApiDefinition {
   ai: {
     chat: typeof routes['ai.chat']
   }
+  root: typeof routes['root']
+  marketing: {
+    en: {
+      home: typeof routes['marketing.en.home']
+      pricing: typeof routes['marketing.en.pricing']
+    }
+    fr: {
+      home: typeof routes['marketing.fr.home']
+      pricing: typeof routes['marketing.fr.pricing']
+    }
+  }
+  dashboard: typeof routes['dashboard']
 }
