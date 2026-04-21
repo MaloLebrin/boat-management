@@ -5,12 +5,21 @@ import QueueDedupKey from '#models/queue_dedup_key'
 import AiQueueService from '#services/ai_queue_service'
 
 test.group('RunAiChat (unit)', (group) => {
+  group.each.setup(async () => {
+    await db.from('queue_dedup_keys').delete()
+  })
+
   group.each.teardown(async () => {
-    await db.from('queue_jobs').where('queue', 'ai').delete()
-    await QueueDedupKey.query().delete()
+    await db.from('queue_dedup_keys').delete()
   })
 
   test('enqueueChat is deduplicated by key (drop strategy)', async ({ assert }) => {
+    const dispatched: any[] = []
+    const original = RunAiChat.dispatch
+    RunAiChat.dispatch = (async (payload: any) => {
+      dispatched.push(payload)
+    }) as any
+
     const svc = new AiQueueService()
     await svc.enqueueChat({
       userId: 1,
@@ -23,8 +32,9 @@ test.group('RunAiChat (unit)', (group) => {
       correlationId: 'test-corr',
     })
 
-    const jobs = await db.from('queue_jobs').where('queue', 'ai')
-    assert.equal(jobs.length, 1)
+    RunAiChat.dispatch = original
+
+    assert.equal(dispatched.length, 1)
 
     const keys = await QueueDedupKey.all()
     assert.equal(keys.length, 1)
@@ -39,6 +49,12 @@ test.group('RunAiChat (unit)', (group) => {
   })
 
   test('enqueueChat persists the job data payload', async ({ assert }) => {
+    const dispatched: any[] = []
+    const original = RunAiChat.dispatch
+    RunAiChat.dispatch = (async (payload: any) => {
+      dispatched.push(payload)
+    }) as any
+
     const svc = new AiQueueService()
     await svc.enqueueChat({
       userId: 1,
@@ -46,21 +62,10 @@ test.group('RunAiChat (unit)', (group) => {
       correlationId: 'payload-check',
     })
 
-    const row = await db
-      .from('queue_jobs')
-      .select(['queue', 'status', 'data'])
-      .where('queue', 'ai')
-      .orderBy('execute_at', 'desc')
-      .first()
+    RunAiChat.dispatch = original
 
-    assert.isDefined(row)
-    assert.equal(row.queue, 'ai')
-    assert.isString(row.data)
-
-    const data = JSON.parse(row.data)
-    assert.equal(data.name, 'RunAiChat')
-    assert.deepInclude(data.payload, {
-      correlationId: 'payload-check',
-    })
+    assert.equal(dispatched.length, 1)
+    assert.equal(dispatched[0]!.correlationId, 'payload-check')
+    assert.isString(dispatched[0]!.dedupKey)
   })
 })

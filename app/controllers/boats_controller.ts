@@ -1,19 +1,21 @@
 import BoatMaintenanceService from '#services/boat_maintenance_service'
 import BoatMaintenanceTaskService from '#services/boat_maintenance_task_service'
+import BoatListService from '#services/boat_list_service'
 import BoatService, { BoatNotFoundError } from '#services/boat_service'
 import { createBoatValidator, updateBoatValidator } from '#validators/boat'
 import type { HttpContext } from '@adonisjs/core/http'
 
 export default class BoatsController {
-  async index({ inertia, auth }: HttpContext) {
+  async index({ inertia, auth, request }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
-    const boatService = new BoatService()
-    const boats = await boatService.listForUser(user)
+    const boatListService = new BoatListService()
+    const { boats, filters } = await boatListService.listForUser(user, request.qs())
 
     return inertia.render('boats/index', {
       boats,
+      filters,
     })
   }
 

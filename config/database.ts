@@ -6,7 +6,7 @@ const dbConfig = defineConfig({
   /**
    * Default connection used for all queries.
    */
-  connection: 'pg',
+  connection: process.env.NODE_ENV === 'test' ? 'sqlite' : 'pg',
 
   connections: {
     /**
@@ -19,7 +19,11 @@ const dbConfig = defineConfig({
         /**
          * Database file location.
          */
-        filename: app.tmpPath('db.sqlite3'),
+        filename:
+          (process.env.DB_SQLITE_FILENAME && String(process.env.DB_SQLITE_FILENAME)) ||
+          (process.env.NODE_ENV === 'test'
+            ? app.tmpPath('db.test.sqlite3')
+            : app.tmpPath('db.sqlite3')),
       },
 
       /**

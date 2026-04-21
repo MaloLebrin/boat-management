@@ -31,7 +31,15 @@ export const plugins: Config['plugins'] = [
  * The teardown functions are executed after all the tests
  */
 export const runnerHooks: Required<Pick<Config, 'setup' | 'teardown'>> = {
-  setup: [],
+  setup: [
+    async () => {
+      /**
+       * Ensure we never run tests against the dev Postgres database.
+       * With `config/database.ts` selecting sqlite in test env, this will migrate an isolated SQLite DB.
+       */
+      await testUtils.db().migrate()
+    },
+  ],
   teardown: [],
 }
 
@@ -40,6 +48,7 @@ export const runnerHooks: Required<Pick<Config, 'setup' | 'teardown'>> = {
  * Learn more - https://japa.dev/docs/test-suites#lifecycle-hooks
  */
 export const configureSuite: Config['configureSuite'] = (suite) => {
+  suite.setup(() => testUtils.db().withGlobalTransaction())
   if (['browser', 'functional', 'e2e'].includes(suite.name)) {
     return suite.setup(() => testUtils.httpServer().start())
   }

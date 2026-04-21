@@ -6,7 +6,7 @@ export default defineConfig({
 
   adapters: {
     database: drivers.database({
-      connectionName: 'pg',
+      connectionName: process.env.NODE_ENV === 'test' ? 'sqlite' : 'pg',
     }),
     sync: drivers.sync(),
   },

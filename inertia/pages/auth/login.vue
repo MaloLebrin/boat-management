@@ -15,6 +15,22 @@ import BaseInput from '~/components/base/BaseInput.vue'
 
 const showPassword = ref(false)
 const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
+
+// #region agent log
+fetch('http://127.0.0.1:7680/ingest/3ee2a2c5-a72e-44a9-98be-158686a1c217', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': 'cde605' },
+  body: JSON.stringify({
+    sessionId: 'cde605',
+    runId: 'pre-fix',
+    hypothesisId: 'H1',
+    location: 'inertia/pages/auth/login.vue:setup',
+    message: 'login page loaded',
+    data: { hasRouteHelper: typeof (globalThis as any).route },
+    timestamp: Date.now(),
+  }),
+}).catch(() => {})
+// #endregion agent log
 </script>
 
 <template>

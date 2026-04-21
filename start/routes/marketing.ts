@@ -564,6 +564,23 @@ router
   .group(() => {
     router
       .get('/dashboard', async ({ inertia, auth }) => {
+        // #region agent log
+        try {
+          const fs = await import('node:fs')
+          fs.appendFileSync(
+            '/Users/malolebrin/Documents/3d-website/.cursor/debug-cde605.log',
+            `${JSON.stringify({
+              sessionId: 'cde605',
+              runId: 'pre-fix',
+              hypothesisId: 'H5',
+              location: 'start/routes/marketing.ts:/dashboard',
+              message: 'dashboard handler entered',
+              data: {},
+              timestamp: Date.now(),
+            })}\n`
+          )
+        } catch {}
+        // #endregion agent log
         await auth.authenticate()
         const user = auth.getUserOrFail()
         const dashboardService = new DashboardService()

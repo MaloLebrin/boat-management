@@ -11,6 +11,7 @@
 */
 
 process.env.NODE_ENV = 'test'
+process.env.DB_SQLITE_FILENAME = `${process.cwd()}/tmp/db.test.${process.pid}.${Date.now()}.sqlite3`
 
 import 'reflect-metadata'
 import { Ignitor, prettyPrintError } from '@adonisjs/core'
