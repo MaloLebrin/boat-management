@@ -4,12 +4,16 @@ import BoatEquipmentEngineFields from './BoatEquipmentEngineFields.vue'
 import type { BoatShowEngine } from '~/types/boat_show'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
+import BaseModal from '~/components/base/BaseModal.vue'
+import { ref } from 'vue'
 
 defineProps<{
   boatId: number
   engines: BoatShowEngine[]
   canManage: boolean
 }>()
+
+const isCreateOpen = ref(false)
 
 function performedDisplay(iso: string | null) {
   if (!iso) return null
@@ -21,7 +25,19 @@ function performedDisplay(iso: string | null) {
 <template>
   <BaseCard padded>
     <template #header>
-      <p class="text-sm font-semibold text-fg">Engines</p>
+      <div class="flex items-center justify-between gap-3">
+        <p class="text-sm font-semibold text-fg">Engines</p>
+        <BaseButton
+          v-if="canManage"
+          variant="secondary"
+          size="sm"
+          type="button"
+          aria-label="Add an engine"
+          @click="isCreateOpen = true"
+        >
+          Add engine
+        </BaseButton>
+      </div>
     </template>
     <div v-if="engines.length === 0" class="text-sm text-fg-muted">No engines.</div>
     <ul v-else class="space-y-3 text-sm">
@@ -60,18 +76,18 @@ function performedDisplay(iso: string | null) {
       </li>
     </ul>
 
-    <div v-if="canManage" class="mt-6 border-t border-border pt-4">
-      <p class="text-xs font-semibold uppercase tracking-wide text-fg-subtle">Add engine</p>
+    <BaseModal v-model:open="isCreateOpen" title="Add engine" close-label="Close">
       <Form
         :action="{ url: `/boats/${boatId}/engines`, method: 'post' }"
-        class="mt-3"
+        class="space-y-4"
         #default="{ processing, errors }"
       >
         <BoatEquipmentEngineFields :errors="errors" />
-        <div class="mt-4">
+        <div class="flex items-center justify-end gap-2 pt-2">
+          <BaseButton variant="ghost" type="button" @click="isCreateOpen = false">Cancel</BaseButton>
           <BaseButton type="submit" :disabled="processing">Add engine</BaseButton>
         </div>
       </Form>
-    </div>
+    </BaseModal>
   </BaseCard>
 </template>
