@@ -24,11 +24,6 @@ const areaM2 = ref('')
 const material = ref('')
 const reefPoints = ref('')
 
-function err(key: string): string | undefined {
-  const v = props.errors[key]
-  return Array.isArray(v) ? v[0] : v
-}
-
 function syncFromProps() {
   const s = props.sail
   sailType.value = s?.sailType ?? SAIL_TYPE_OPTIONS[0]?.value ?? 'main'
@@ -53,7 +48,7 @@ watch(
       label="Type"
       :options="SAIL_TYPE_OPTIONS"
       v-model="sailType"
-      :error="err('sailType')"
+      :errors="errors"
     />
 
     <BaseInput
@@ -62,7 +57,7 @@ watch(
       label="Manufacturing date"
       type="date"
       v-model="manufacturedAt"
-      :error="err('manufacturedAt')"
+      :errors="errors"
     />
 
     <BaseInput
@@ -73,7 +68,7 @@ watch(
       step="0.1"
       inputmode="decimal"
       v-model="areaM2"
-      :error="err('areaM2')"
+      :errors="errors"
     />
 
     <BaseInput
@@ -81,7 +76,7 @@ watch(
       name="material"
       label="Material"
       v-model="material"
-      :error="err('material')"
+      :errors="errors"
     />
 
     <BaseInput
@@ -91,7 +86,7 @@ watch(
       type="number"
       inputmode="numeric"
       v-model="reefPoints"
-      :error="err('reefPoints')"
+      :errors="errors"
     />
   </div>
 </template>

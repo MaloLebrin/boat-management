@@ -2,6 +2,7 @@
 import BaseField from '~/components/base/BaseField.vue'
 import { inputClass } from '~/utils/form_styles'
 import { computed, useSlots } from 'vue'
+import { getFieldError, nameToErrorKey, type FormErrors } from '~/utils/form_errors'
 
 type InputMode = 'none' | 'text' | 'tel' | 'url' | 'email' | 'numeric' | 'decimal' | 'search'
 
@@ -10,6 +11,8 @@ const props = withDefaults(
     label?: string
     hint?: string
     error?: string
+    errors?: FormErrors
+    errorKey?: string
     id?: string
     name?: string
     type?: string
@@ -41,10 +44,16 @@ defineEmits<{
 const slots = useSlots()
 const hasTrailing = computed(() => Boolean(slots.trailing))
 const inputPaddingClass = computed(() => (hasTrailing.value ? 'pr-24' : ''))
+
+const resolvedError = computed(() => {
+  if (props.error) return props.error
+  const key = props.errorKey ?? nameToErrorKey(props.name ?? '')
+  return getFieldError(props.errors, key)
+})
 </script>
 
 <template>
-  <BaseField :label="label" :hint="hint" :error="error" :html-for="id">
+  <BaseField :label="label" :hint="hint" :error="resolvedError" :html-for="id">
     <div class="relative">
       <input
         :id="id"
@@ -61,8 +70,8 @@ const inputPaddingClass = computed(() => (hasTrailing.value ? 'pr-24' : ''))
         :placeholder="placeholder"
         :disabled="disabled"
         :value="modelValue"
-        :data-invalid="error ? 'true' : undefined"
-        :aria-invalid="error ? 'true' : undefined"
+        :data-invalid="resolvedError ? 'true' : undefined"
+        :aria-invalid="resolvedError ? 'true' : undefined"
         :class="[
           inputClass,
           inputPaddingClass,

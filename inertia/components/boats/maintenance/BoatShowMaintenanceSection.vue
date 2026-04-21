@@ -17,13 +17,6 @@ const props = defineProps<{
 
 type Subject = 'boat' | 'engine' | 'sail' | 'rig'
 
-function firstError(errors: Record<string, unknown>, key: string): string | undefined {
-  const v = errors[key]
-  if (typeof v === 'string') return v
-  if (Array.isArray(v)) return typeof v[0] === 'string' ? v[0] : undefined
-  return undefined
-}
-
 const subject = ref<'boat' | 'engine' | 'sail' | 'rig'>('boat')
 const boatEngineId = ref<string>('')
 const boatSailId = ref<string>('')
@@ -199,7 +192,7 @@ const openTasks = computed(() => props.maintenanceTasks.filter((t) => t.status =
           label="Subject"
           :options="subjectOptions"
           v-model="taskSubject"
-          :error="firstError(errors, 'subject')"
+          :errors="errors"
         />
 
         <template v-if="taskSubject === 'engine'">
@@ -212,7 +205,7 @@ const openTasks = computed(() => props.maintenanceTasks.filter((t) => t.status =
             :allow-empty="true"
             :options="engineOptions"
             v-model="taskBoatEngineId"
-            :error="firstError(errors, 'boatEngineId')"
+            :errors="errors"
           />
 
           <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -225,7 +218,7 @@ const openTasks = computed(() => props.maintenanceTasks.filter((t) => t.status =
               min="0"
               step="1"
               v-model="taskDueEngineHours"
-              :error="firstError(errors, 'dueEngineHours')"
+              :errors="errors"
             />
             <BaseInput
               id="task-recur-hours"
@@ -236,7 +229,7 @@ const openTasks = computed(() => props.maintenanceTasks.filter((t) => t.status =
               min="0"
               step="1"
               v-model="taskRecurrenceEngineHours"
-              :error="firstError(errors, 'recurrenceIntervalEngineHours')"
+              :errors="errors"
             />
           </div>
         </template>
@@ -251,7 +244,7 @@ const openTasks = computed(() => props.maintenanceTasks.filter((t) => t.status =
             :allow-empty="true"
             :options="sailOptions"
             v-model="taskBoatSailId"
-            :error="firstError(errors, 'boatSailId')"
+            :errors="errors"
           />
         </template>
 
@@ -268,7 +261,7 @@ const openTasks = computed(() => props.maintenanceTasks.filter((t) => t.status =
             label="Due date (optional)"
             type="date"
             v-model="taskDueAt"
-            :error="firstError(errors, 'dueAt')"
+            :errors="errors"
           />
           <BaseInput
             id="task-recur-months"
@@ -279,7 +272,7 @@ const openTasks = computed(() => props.maintenanceTasks.filter((t) => t.status =
             min="0"
             step="1"
             v-model="taskRecurrenceMonths"
-            :error="firstError(errors, 'recurrenceIntervalMonths')"
+            :errors="errors"
           />
         </div>
 
@@ -290,7 +283,7 @@ const openTasks = computed(() => props.maintenanceTasks.filter((t) => t.status =
           required
           placeholder="e.g. Oil change, inspect rigging"
           v-model="taskTitle"
-          :error="firstError(errors, 'title')"
+          :errors="errors"
         />
 
         <BaseTextarea
@@ -299,7 +292,7 @@ const openTasks = computed(() => props.maintenanceTasks.filter((t) => t.status =
           label="Notes"
           :rows="3"
           v-model="taskNotes"
-          :error="firstError(errors, 'notes')"
+          :errors="errors"
         />
 
         <BaseButton type="submit" :disabled="processing || (taskSubject === 'rig' && !boat.rig)">
@@ -350,7 +343,7 @@ const openTasks = computed(() => props.maintenanceTasks.filter((t) => t.status =
             label="Subject"
             :options="subjectOptions"
             v-model="subject"
-            :error="firstError(errors, 'subject')"
+            :errors="errors"
           />
 
           <template v-if="subject === 'engine'">
@@ -363,7 +356,7 @@ const openTasks = computed(() => props.maintenanceTasks.filter((t) => t.status =
               :allow-empty="true"
               :options="engineOptions"
               v-model="boatEngineId"
-              :error="firstError(errors, 'boatEngineId')"
+              :errors="errors"
             />
 
             <BaseInput
@@ -372,7 +365,7 @@ const openTasks = computed(() => props.maintenanceTasks.filter((t) => t.status =
               label="Label"
               placeholder="e.g. Inboard diesel port"
               v-model="engineCaptionManual"
-              :error="firstError(errors, 'engineCaption')"
+              :errors="errors"
             />
           </template>
 
@@ -386,7 +379,7 @@ const openTasks = computed(() => props.maintenanceTasks.filter((t) => t.status =
               :allow-empty="true"
               :options="sailOptions"
               v-model="boatSailId"
-              :error="firstError(errors, 'boatSailId')"
+              :errors="errors"
             />
 
             <BaseInput
@@ -395,7 +388,7 @@ const openTasks = computed(() => props.maintenanceTasks.filter((t) => t.status =
               label="Label"
               placeholder="e.g. Main — 3 reefs"
               v-model="sailCaptionManual"
-              :error="firstError(errors, 'sailCaption')"
+              :errors="errors"
             />
           </template>
 
@@ -412,7 +405,7 @@ const openTasks = computed(() => props.maintenanceTasks.filter((t) => t.status =
             type="date"
             required
             v-model="performedAt"
-            :error="firstError(errors, 'performedAt')"
+            :errors="errors"
           />
 
           <BaseInput
@@ -422,7 +415,7 @@ const openTasks = computed(() => props.maintenanceTasks.filter((t) => t.status =
             required
             placeholder="e.g. Oil change, batten replacement"
             v-model="entryTitle"
-            :error="firstError(errors, 'title')"
+            :errors="errors"
           />
 
           <BaseTextarea
@@ -431,7 +424,7 @@ const openTasks = computed(() => props.maintenanceTasks.filter((t) => t.status =
             label="Notes"
             :rows="3"
             v-model="entryNotes"
-            :error="firstError(errors, 'notes')"
+            :errors="errors"
           />
 
           <div>

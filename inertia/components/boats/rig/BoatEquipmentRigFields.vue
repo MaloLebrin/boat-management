@@ -21,11 +21,6 @@ const manufacturedAt = ref('')
 const mastCount = ref('')
 const spreaders = ref('')
 
-function err(key: string): string | undefined {
-  const v = props.errors[key]
-  return Array.isArray(v) ? v[0] : v
-}
-
 function syncFromProps() {
   const r = props.rig
   rigType.value = r?.rigType ?? RIG_TYPE_OPTIONS[0]?.value ?? 'sloop'
@@ -49,7 +44,7 @@ watch(
       label="Rig type"
       :options="RIG_TYPE_OPTIONS"
       v-model="rigType"
-      :error="err('rigType')"
+      :errors="errors"
     />
 
     <BaseInput
@@ -58,7 +53,7 @@ watch(
       label="Manufacturing date"
       type="date"
       v-model="manufacturedAt"
-      :error="err('manufacturedAt')"
+      :errors="errors"
     />
 
     <BaseInput
@@ -68,7 +63,7 @@ watch(
       type="number"
       inputmode="numeric"
       v-model="mastCount"
-      :error="err('mastCount')"
+      :errors="errors"
     />
 
     <BaseInput
@@ -78,7 +73,7 @@ watch(
       type="number"
       inputmode="numeric"
       v-model="spreaders"
-      :error="err('spreaders')"
+      :errors="errors"
     />
   </div>
 </template>

@@ -33,7 +33,7 @@ const passwordConfirmationType = computed(() =>
             label="Full name"
             placeholder="Your name"
             autocomplete="name"
-            :error="errors.fullName"
+            :errors="errors"
           />
 
           <BaseInput
@@ -43,7 +43,7 @@ const passwordConfirmationType = computed(() =>
             autocomplete="email"
             label="Email"
             placeholder="you@company.com"
-            :error="errors.email"
+            :errors="errors"
           />
 
           <BaseInput
@@ -53,7 +53,7 @@ const passwordConfirmationType = computed(() =>
             autocomplete="new-password"
             label="Password"
             placeholder="••••••••"
-            :error="errors.password"
+            :errors="errors"
           >
             <template #trailing>
               <button
@@ -75,7 +75,7 @@ const passwordConfirmationType = computed(() =>
             autocomplete="new-password"
             label="Confirm password"
             placeholder="••••••••"
-            :error="errors.passwordConfirmation"
+            :errors="errors"
           >
             <template #trailing>
               <button

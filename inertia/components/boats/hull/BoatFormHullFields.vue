@@ -27,11 +27,6 @@ const yearBuilt = ref('')
 const manufacturer = ref('')
 const model = ref('')
 
-function err(key: string): string | undefined {
-  const v = props.errors[key]
-  return Array.isArray(v) ? v[0] : v
-}
-
 function syncFromBoat() {
   if (props.mode !== 'edit' || !props.boat) return
   const b = props.boat
@@ -58,17 +53,17 @@ watch(
 
 <template>
   <div class="space-y-6">
-    <BaseInput id="name" name="name" label="Name" v-model="name" :error="err('name')" />
+    <BaseInput id="name" name="name" label="Name" v-model="name" :errors="errors" />
 
     <BaseInput
       id="registrationNumber"
       name="registrationNumber"
       label="Registration number"
       v-model="registrationNumber"
-      :error="err('registrationNumber')"
+      :errors="errors"
     />
 
-    <BaseInput id="type" name="type" label="Type" v-model="type" :error="err('type')" />
+    <BaseInput id="type" name="type" label="Type" v-model="type" :errors="errors" />
 
     <BaseSelect
       id="propulsionType"
@@ -78,7 +73,7 @@ watch(
       :allow-empty="true"
       :options="PROPULSION_OPTIONS"
       v-model="propulsionType"
-      :error="err('propulsionType')"
+      :errors="errors"
     />
 
     <BaseInput
@@ -87,7 +82,7 @@ watch(
       label="Manufacturing date"
       type="date"
       v-model="manufacturedAt"
-      :error="err('manufacturedAt')"
+      :errors="errors"
     />
 
     <div class="grid grid-cols-2 gap-4">
@@ -99,7 +94,7 @@ watch(
         step="0.01"
         inputmode="decimal"
         v-model="lengthM"
-        :error="err('lengthM')"
+        :errors="errors"
       />
       <BaseInput
         id="beamM"
@@ -109,7 +104,7 @@ watch(
         step="0.01"
         inputmode="decimal"
         v-model="beamM"
-        :error="err('beamM')"
+        :errors="errors"
       />
       <BaseInput
         id="draftM"
@@ -119,7 +114,7 @@ watch(
         step="0.01"
         inputmode="decimal"
         v-model="draftM"
-        :error="err('draftM')"
+        :errors="errors"
       />
       <BaseInput
         v-if="showMastHeight"
@@ -130,7 +125,7 @@ watch(
         step="0.01"
         inputmode="decimal"
         v-model="mastHeightM"
-        :error="err('mastHeightM')"
+        :errors="errors"
       />
     </div>
 
@@ -143,7 +138,7 @@ watch(
         :allow-empty="true"
         :options="HULL_MATERIAL_OPTIONS"
         v-model="hullMaterial"
-        :error="err('hullMaterial')"
+        :errors="errors"
       />
       <BaseInput
         id="yearBuilt"
@@ -152,16 +147,16 @@ watch(
         type="number"
         inputmode="numeric"
         v-model="yearBuilt"
-        :error="err('yearBuilt')"
+        :errors="errors"
       />
       <BaseInput
         id="manufacturer"
         name="manufacturer"
         label="Manufacturer"
         v-model="manufacturer"
-        :error="err('manufacturer')"
+        :errors="errors"
       />
-      <BaseInput id="model" name="model" label="Model" v-model="model" :error="err('model')" />
+      <BaseInput id="model" name="model" label="Model" v-model="model" :errors="errors" />
     </div>
   </div>
 </template>

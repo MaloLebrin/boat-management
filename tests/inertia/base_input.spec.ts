@@ -21,3 +21,16 @@ test('renders trailing slot', () => {
   })
   expect(w.text()).toContain('Show')
 })
+
+test('renders error from errors object using name', () => {
+  const w = mount(BaseInput, {
+    props: {
+      id: 'email',
+      name: 'email',
+      label: 'Email',
+      modelValue: '',
+      errors: { email: 'Invalid email' },
+    },
+  })
+  expect(w.get('[role="alert"]').text()).toBe('Invalid email')
+})

@@ -30,7 +30,7 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
             autocomplete="username"
             label="Email"
             placeholder="you@company.com"
-            :error="errors.email"
+            :errors="errors"
           />
 
           <BaseInput
@@ -40,7 +40,7 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
             autocomplete="current-password"
             label="Password"
             placeholder="••••••••"
-            :error="errors.password"
+            :errors="errors"
           >
             <template #trailing>
               <button

@@ -12,3 +12,16 @@ test('emits update:modelValue on input', async () => {
   await w.find('textarea').setValue('Hi')
   expect(w.emitted('update:modelValue')?.[0]).toEqual(['Hi'])
 })
+
+test('renders error from errors object using name', () => {
+  const w = mount(BaseTextarea, {
+    props: {
+      id: 'notes',
+      name: 'notes',
+      label: 'Notes',
+      modelValue: '',
+      errors: { notes: 'Too long' },
+    },
+  })
+  expect(w.get('[role="alert"]').text()).toBe('Too long')
+})

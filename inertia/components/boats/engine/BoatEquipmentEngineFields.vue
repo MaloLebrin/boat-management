@@ -30,11 +30,6 @@ const manufacturedAt = ref('')
 const powerHp = ref('')
 const hours = ref('')
 
-function err(key: string): string | undefined {
-  const v = props.errors[key]
-  return Array.isArray(v) ? v[0] : v
-}
-
 function syncFromProps() {
   const e = props.engine
   kind.value = e?.kind ?? ENGINE_KIND_OPTIONS[0]?.value ?? ''
@@ -62,7 +57,7 @@ watch(
       label="Kind"
       :options="ENGINE_KIND_OPTIONS"
       v-model="kind"
-      :error="err('kind')"
+      :errors="errors"
     />
 
     <BaseSelect
@@ -73,17 +68,17 @@ watch(
       :allow-empty="true"
       :options="ENGINE_FUEL_OPTIONS"
       v-model="fuel"
-      :error="err('fuel')"
+      :errors="errors"
     />
 
-    <BaseInput id="brand" name="brand" label="Brand" v-model="brand" :error="err('brand')" />
-    <BaseInput id="model" name="model" label="Model" v-model="model" :error="err('model')" />
+    <BaseInput id="brand" name="brand" label="Brand" v-model="brand" :errors="errors" />
+    <BaseInput id="model" name="model" label="Model" v-model="model" :errors="errors" />
     <BaseInput
       id="serialNumber"
       name="serialNumber"
       label="Serial number"
       v-model="serialNumber"
-      :error="err('serialNumber')"
+      :errors="errors"
     />
     <BaseInput
       id="manufacturedAt"
@@ -91,7 +86,7 @@ watch(
       label="Manufacturing date"
       type="date"
       v-model="manufacturedAt"
-      :error="err('manufacturedAt')"
+      :errors="errors"
     />
     <BaseInput
       id="powerHp"
@@ -101,7 +96,7 @@ watch(
       step="0.1"
       inputmode="decimal"
       v-model="powerHp"
-      :error="err('powerHp')"
+      :errors="errors"
     />
     <BaseInput
       id="hours"
@@ -110,7 +105,7 @@ watch(
       type="number"
       inputmode="numeric"
       v-model="hours"
-      :error="err('hours')"
+      :errors="errors"
     />
   </div>
 </template>

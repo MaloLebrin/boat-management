@@ -46,3 +46,17 @@ test('can emit empty value when allowEmpty is true', async () => {
   await w.find('select').setValue('')
   expect(w.emitted('update:modelValue')?.[0]).toEqual([''])
 })
+
+test('renders error from errors object using name', () => {
+  const w = mount(BaseSelect, {
+    props: {
+      id: 'kind',
+      name: 'kind',
+      label: 'Kind',
+      options: [{ label: 'Inboard', value: 'inboard' }],
+      modelValue: '',
+      errors: { kind: 'Required' },
+    },
+  })
+  expect(w.get('[role="alert"]').text()).toBe('Required')
+})
