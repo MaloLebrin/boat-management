@@ -2,7 +2,7 @@
 import { Form, Link } from '@adonisjs/inertia/vue'
 import type { Data } from '@generated/data'
 import { usePage } from '@inertiajs/vue3'
-import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
+import { nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { Toaster, toast } from 'vue-sonner'
 import brandIconUrl from '~/assets/brand/fleetide_ai_icon_C.svg?url'
 import BaseButton from '~/components/base/BaseButton.vue'
@@ -12,8 +12,6 @@ import Header from '~/components/layout/Header.vue'
 const page = usePage<Data.SharedProps>()
 const isSidebarOpen = ref(false)
 const closeButtonEl = ref<HTMLButtonElement | null>(null)
-
-const isAuthed = computed(() => Boolean(page.props.user))
 const drawerTitleId = 'auth-sidebar-title'
 
 function closeSidebar() {
@@ -72,23 +70,19 @@ onBeforeUnmount(() => {
   <div
     class="min-h-screen bg-linear-to-br from-lilac-50 via-peach-50 to-mint-100 text-fg"
   >
-    <Header :is-authed="isAuthed" :is-sidebar-open="isSidebarOpen" :open-sidebar="openSidebar" :user="page.props.user" />
+    <Header :is-sidebar-open="isSidebarOpen" :open-sidebar="openSidebar" :user="page.props.user" />
 
-    <main class="px-6 py-10 mx-auto w-full max-w-7xl">
-      <div v-if="!isAuthed" class="rounded-(--radius-card) border border-border bg-surface-elevated shadow-(--shadow-card)">
-        <slot />
-      </div>
-
-      <div v-else class="grid gap-6 lg:grid-cols-[16rem_1fr]">
+    <main class="px-6 py-10 mx-auto w-full">
+      <div class="grid gap-6 lg:grid-cols-[16rem_1fr]">
         <AsideMenu :user="page.props.user" />
 
-        <div class="rounded-(--radius-card) border border-border bg-surface-elevated shadow-(--shadow-card)">
+        <div class="rounded-(--radius-card) border border-border bg-surface-elevated shadow-(--shadow-card) max-w-7xl">
           <slot />
         </div>
       </div>
     </main>
 
-    <div v-if="isAuthed && isSidebarOpen" class="fixed inset-0 z-50 lg:hidden">
+    <div v-if="isSidebarOpen" class="fixed inset-0 z-50 lg:hidden">
       <button
         type="button"
         class="absolute inset-0 bg-black/20 backdrop-blur-sm"

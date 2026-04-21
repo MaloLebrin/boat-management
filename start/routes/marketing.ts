@@ -9,7 +9,6 @@ router
     router
       .get('/', ({ inertia, i18n }) => {
         return inertia.render('marketing/home', {
-          locale: 'en',
           t: {
             brand: {
               name: i18n.t('marketing.brand.name'),
@@ -193,7 +192,6 @@ router
     router
       .get('/tarifs', ({ inertia, i18n }) => {
         return inertia.render('marketing/pricing', {
-          locale: 'en',
           t: {
             brand: {
               name: i18n.t('marketing.brand.name'),
@@ -289,7 +287,6 @@ router
     router
       .get('/', ({ inertia, i18n }) => {
         return inertia.render('marketing/home', {
-          locale: 'fr',
           t: {
             brand: {
               name: i18n.t('marketing.brand.name'),
@@ -473,7 +470,6 @@ router
     router
       .get('/tarifs', ({ inertia, i18n }) => {
         return inertia.render('marketing/pricing', {
-          locale: 'fr',
           t: {
             brand: {
               name: i18n.t('marketing.brand.name'),

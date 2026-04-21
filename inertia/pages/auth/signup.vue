@@ -1,3 +1,11 @@
+<script lang="ts">
+import PublicLayout from '~/layouts/public.vue'
+
+export default {
+  layout: PublicLayout,
+}
+</script>
+
 <script setup lang="ts">
 import { Form } from '@adonisjs/inertia/vue'
 import { computed, ref } from 'vue'

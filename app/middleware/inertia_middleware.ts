@@ -27,6 +27,8 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
      */
     return {
       errors: ctx.inertia.always(this.getValidationErrors(ctx)),
+      locale: ctx.inertia.always(ctx.i18n.locale),
+      path: ctx.inertia.always(ctx.request.url().split('?')[0]),
       flash: ctx.inertia.always({
         error,
         success,

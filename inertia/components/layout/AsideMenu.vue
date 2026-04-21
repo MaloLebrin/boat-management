@@ -10,18 +10,18 @@ type AuthUser = {
 }
 
 const props = defineProps<{
-  user: AuthUser
+  user?: AuthUser
 }>()
 </script>
 
 <template>
   <aside class="hidden lg:block">
-    <div class="sticky top-20 rounded-(--radius-card) border border-border bg-surface-elevated shadow-(--shadow-card)">
+    <div class="sticky top-20 rounded-(--radius-card) border border-border bg-surface-elevated shadow-(--shadow-card) min-h-[calc(100vh-10rem)]">
       <div class="px-4 py-4 border-b border-border">
         <p class="text-xs font-semibold uppercase tracking-wider text-fg-subtle">Workspace</p>
         <p class="mt-1 text-sm font-semibold text-fg">{{ user?.fullName ?? 'Account' }}</p>
       </div>
-      <nav class="p-2">
+      <nav class="p-2 h-full">
         <Link route="dashboard"
           class="flex items-center gap-2 rounded-(--radius-control) px-3 py-2 text-sm font-semibold text-fg-muted hover:bg-surface-muted hover:text-fg">
         Dashboard
@@ -35,14 +35,14 @@ const props = defineProps<{
         Design system
         </Link>
 
-        <div class="mt-2 border-t border-border pt-2">
-          <Form route="session.destroy">
-            <BaseButton type="submit" size="sm" variant="danger" class="w-full">
-              Logout
-            </BaseButton>
-          </Form>
-        </div>
       </nav>
+      <div class="mt-2 border-t border-border p-2">
+        <Form route="session.destroy">
+          <BaseButton type="submit" size="sm" variant="danger" class="w-full">
+            Logout
+          </BaseButton>
+        </Form>
+      </div>
     </div>
   </aside>
 </template>

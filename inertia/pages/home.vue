@@ -1,3 +1,11 @@
+<script lang="ts">
+import PublicLayout from '~/layouts/public.vue'
+
+export default {
+  layout: PublicLayout,
+}
+</script>
+
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3'
 import BaseCard from '~/components/base/BaseCard.vue'

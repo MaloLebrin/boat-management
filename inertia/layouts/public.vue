@@ -2,14 +2,28 @@
 import { Link } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
 import brandIconUrl from '~/assets/brand/fleetide_ai_icon_C.svg?url'
+import { computed } from 'vue'
+import { usePage } from '@inertiajs/vue3'
 
 const props = defineProps<{
-  locale: 'en' | 'fr'
+  locale?: 'en' | 'fr'
   path?: string
 }>()
 
-const otherLocale = props.locale === 'en' ? 'fr' : 'en'
-const otherHref = `/${otherLocale}${props.path || ''}`
+type SharedProps = {
+  locale?: 'en' | 'fr'
+  path?: string
+  user?: unknown
+}
+
+const page = usePage<SharedProps>()
+
+const locale = computed<'en' | 'fr'>(() => props.locale ?? page.props.locale ?? 'en')
+const path = computed(() => props.path ?? page.props.path ?? '')
+const isAuthed = computed(() => Boolean(page.props.user))
+
+const otherLocale = computed(() => (locale.value === 'en' ? 'fr' : 'en'))
+const otherHref = computed(() => `/${otherLocale.value}${path.value || ''}`)
 </script>
 
 <template>
@@ -64,16 +78,25 @@ const otherHref = `/${otherLocale}${props.path || ''}`
           >
             {{ locale === 'en' ? 'FR' : 'EN' }}
           </Link>
-          <a href="/login">
-            <BaseButton variant="ghost" size="sm">
-              {{ locale === 'fr' ? 'Connexion' : 'Login' }}
-            </BaseButton>
-          </a>
-          <a href="/signup">
-            <BaseButton size="sm">
-              {{ locale === 'fr' ? 'Inscription' : 'Signup' }}
-            </BaseButton>
-          </a>
+          <template v-if="isAuthed">
+            <a href="/dashboard">
+              <BaseButton size="sm">
+                {{ locale === 'fr' ? 'Dashboard' : 'Dashboard' }}
+              </BaseButton>
+            </a>
+          </template>
+          <template v-else>
+            <a href="/login">
+              <BaseButton variant="ghost" size="sm">
+                {{ locale === 'fr' ? 'Connexion' : 'Login' }}
+              </BaseButton>
+            </a>
+            <a href="/signup">
+              <BaseButton size="sm">
+                {{ locale === 'fr' ? 'Inscription' : 'Signup' }}
+              </BaseButton>
+            </a>
+          </template>
         </div>
       </div>
     </header>

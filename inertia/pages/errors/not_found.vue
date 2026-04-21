@@ -1,4 +1,10 @@
-<script setup lang="ts"></script>
+<script lang="ts">
+import PublicLayout from '~/layouts/public.vue'
+
+export default {
+  layout: PublicLayout,
+}
+</script>
 
 <template>
   <div>

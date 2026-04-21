@@ -6,15 +6,15 @@ export default {
 }
 </script>
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3'
+import { Head, Link, usePage } from '@inertiajs/vue3'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseStatCard from '~/components/base/BaseStatCard.vue'
+import { computed } from 'vue'
 
 type PageProps = {
-  locale: 'en' | 'fr'
   t: {
     brand: { name: string; tagline: string }
     nav: { pricing: string; login: string; signup: string }
@@ -41,8 +41,11 @@ type PageProps = {
   }
 }
 
+type SharedProps = { locale?: 'en' | 'fr' }
+const page = usePage<SharedProps>()
+
 const props = defineProps<PageProps>()
-const locale = props.locale
+const locale = computed<'en' | 'fr'>(() => page.props.locale ?? 'en')
 const t = props.t
 
 const hreflangEn = '/en'
