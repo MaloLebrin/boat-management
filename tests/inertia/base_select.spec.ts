@@ -21,6 +21,7 @@ test('emits update:modelValue on change', async () => {
     props: {
       id: 's2',
       label: 'Type',
+      allowEmpty: true,
       options: [
         { label: 'One', value: '1' },
         { label: 'Two', value: '2' },
@@ -30,4 +31,18 @@ test('emits update:modelValue on change', async () => {
   })
   await w.find('select').setValue('2')
   expect(w.emitted('update:modelValue')?.[0]).toEqual(['2'])
+})
+
+test('can emit empty value when allowEmpty is true', async () => {
+  const w = mount(BaseSelect, {
+    props: {
+      id: 's3',
+      label: 'Type',
+      allowEmpty: true,
+      options: [{ label: 'One', value: '1' }],
+      modelValue: '1',
+    },
+  })
+  await w.find('select').setValue('')
+  expect(w.emitted('update:modelValue')?.[0]).toEqual([''])
 })

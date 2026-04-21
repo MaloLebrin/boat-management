@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ENGINE_FUEL_OPTIONS, ENGINE_KIND_OPTIONS } from '~/constants/boat_form_options'
-import { inputClass, selectClass } from '~/utils/form_styles'
+import { ref, watch } from 'vue'
+import BaseInput from '~/components/base/BaseInput.vue'
+import BaseSelect from '~/components/base/BaseSelect.vue'
 
 export type BoatEquipmentEngineFieldsModel = {
   id?: number
@@ -19,115 +21,96 @@ const props = defineProps<{
   engine?: BoatEquipmentEngineFieldsModel | null
 }>()
 
+const kind = ref('')
+const fuel = ref('')
+const brand = ref('')
+const model = ref('')
+const serialNumber = ref('')
+const manufacturedAt = ref('')
+const powerHp = ref('')
+const hours = ref('')
+
 function err(key: string): string | undefined {
   const v = props.errors[key]
   return Array.isArray(v) ? v[0] : v
 }
 
-function dateValue(): string {
-  const raw = props.engine?.manufacturedAt
-  if (!raw) return ''
-  return raw.slice(0, 10)
+function syncFromProps() {
+  const e = props.engine
+  kind.value = e?.kind ?? ENGINE_KIND_OPTIONS[0]?.value ?? ''
+  fuel.value = e?.fuel ?? ''
+  brand.value = e?.brand ?? ''
+  model.value = e?.model ?? ''
+  serialNumber.value = e?.serialNumber ?? ''
+  manufacturedAt.value = e?.manufacturedAt ? e.manufacturedAt.slice(0, 10) : ''
+  powerHp.value = e?.powerHp === null || e?.powerHp === undefined ? '' : String(e.powerHp)
+  hours.value = e?.hours === null || e?.hours === undefined ? '' : String(e.hours)
 }
+
+watch(
+  () => props.engine,
+  () => syncFromProps(),
+  { immediate: true }
+)
 </script>
 
 <template>
   <div class="grid grid-cols-2 gap-4">
-    <div>
-      <label class="mb-1 block text-sm font-medium text-zinc-800">Kind</label>
-      <select
-        id="kind"
-        name="kind"
-        :class="selectClass"
-        :data-invalid="err('kind') ? 'true' : undefined"
-      >
-        <option v-for="o in ENGINE_KIND_OPTIONS" :key="o.value" :value="o.value" :selected="engine?.kind === o.value">
-          {{ o.label }}
-        </option>
-      </select>
-      <p v-if="err('kind')" class="mt-2 text-sm font-medium text-red-600">{{ err('kind') }}</p>
-    </div>
-    <div>
-      <label class="mb-1 block text-sm font-medium text-zinc-800">Fuel</label>
-      <select
-        id="fuel"
-        name="fuel"
-        :class="selectClass"
-        :data-invalid="err('fuel') ? 'true' : undefined"
-      >
-        <option value="__none__" :selected="!engine?.fuel">—</option>
-        <option v-for="o in ENGINE_FUEL_OPTIONS" :key="o.value" :value="o.value" :selected="engine?.fuel === o.value">
-          {{ o.label }}
-        </option>
-      </select>
-      <p v-if="err('fuel')" class="mt-2 text-sm font-medium text-red-600">{{ err('fuel') }}</p>
-    </div>
-    <div>
-      <label class="mb-1 block text-sm font-medium text-zinc-800">Brand</label>
-      <input
-        type="text"
-        name="brand"
-        :value="engine?.brand ?? ''"
-        :class="inputClass"
-        :data-invalid="err('brand') ? 'true' : undefined"
-      />
-      <p v-if="err('brand')" class="mt-2 text-sm font-medium text-red-600">{{ err('brand') }}</p>
-    </div>
-    <div>
-      <label class="mb-1 block text-sm font-medium text-zinc-800">Model</label>
-      <input
-        type="text"
-        name="model"
-        :value="engine?.model ?? ''"
-        :class="inputClass"
-        :data-invalid="err('model') ? 'true' : undefined"
-      />
-      <p v-if="err('model')" class="mt-2 text-sm font-medium text-red-600">{{ err('model') }}</p>
-    </div>
-    <div>
-      <label class="mb-1 block text-sm font-medium text-zinc-800">Serial number</label>
-      <input
-        type="text"
-        name="serialNumber"
-        :value="engine?.serialNumber ?? ''"
-        :class="inputClass"
-        :data-invalid="err('serialNumber') ? 'true' : undefined"
-      />
-      <p v-if="err('serialNumber')" class="mt-2 text-sm font-medium text-red-600">{{ err('serialNumber') }}</p>
-    </div>
-    <div>
-      <label class="mb-1 block text-sm font-medium text-zinc-800">Manufacturing date</label>
-      <input
-        type="date"
-        name="manufacturedAt"
-        :value="dateValue()"
-        :class="inputClass"
-        :data-invalid="err('manufacturedAt') ? 'true' : undefined"
-      />
-      <p v-if="err('manufacturedAt')" class="mt-2 text-sm font-medium text-red-600">{{ err('manufacturedAt') }}</p>
-    </div>
-    <div>
-      <label class="mb-1 block text-sm font-medium text-zinc-800">Power (hp)</label>
-      <input
-        type="number"
-        step="0.1"
-        name="powerHp"
-        :value="engine?.powerHp === null || engine?.powerHp === undefined ? '' : String(engine.powerHp)"
-        :class="inputClass"
-        :data-invalid="err('powerHp') ? 'true' : undefined"
-      />
-      <p v-if="err('powerHp')" class="mt-2 text-sm font-medium text-red-600">{{ err('powerHp') }}</p>
-    </div>
-    <div>
-      <label class="mb-1 block text-sm font-medium text-zinc-800">Hours</label>
-      <input
-        type="number"
-        name="hours"
-        :value="engine?.hours === null || engine?.hours === undefined ? '' : String(engine.hours)"
-        :class="inputClass"
-        :data-invalid="err('hours') ? 'true' : undefined"
-      />
-      <p v-if="err('hours')" class="mt-2 text-sm font-medium text-red-600">{{ err('hours') }}</p>
-    </div>
+    <BaseSelect
+      id="kind"
+      name="kind"
+      label="Kind"
+      :options="ENGINE_KIND_OPTIONS"
+      v-model="kind"
+      :error="err('kind')"
+    />
+
+    <BaseSelect
+      id="fuel"
+      name="fuel"
+      label="Fuel"
+      placeholder="—"
+      :allow-empty="true"
+      :options="ENGINE_FUEL_OPTIONS"
+      v-model="fuel"
+      :error="err('fuel')"
+    />
+
+    <BaseInput id="brand" name="brand" label="Brand" v-model="brand" :error="err('brand')" />
+    <BaseInput id="model" name="model" label="Model" v-model="model" :error="err('model')" />
+    <BaseInput
+      id="serialNumber"
+      name="serialNumber"
+      label="Serial number"
+      v-model="serialNumber"
+      :error="err('serialNumber')"
+    />
+    <BaseInput
+      id="manufacturedAt"
+      name="manufacturedAt"
+      label="Manufacturing date"
+      type="date"
+      v-model="manufacturedAt"
+      :error="err('manufacturedAt')"
+    />
+    <BaseInput
+      id="powerHp"
+      name="powerHp"
+      label="Power (hp)"
+      type="number"
+      step="0.1"
+      inputmode="decimal"
+      v-model="powerHp"
+      :error="err('powerHp')"
+    />
+    <BaseInput
+      id="hours"
+      name="hours"
+      label="Hours"
+      type="number"
+      inputmode="numeric"
+      v-model="hours"
+      :error="err('hours')"
+    />
   </div>
 </template>

@@ -5,6 +5,8 @@ import BoatShowRigCard from '~/components/boats/rig/BoatShowRigCard.vue'
 import BoatShowSailsCard from '~/components/boats/sail/BoatShowSailsCard.vue'
 import BoatShowSpecsCard from '~/components/boats/hull/BoatShowSpecsCard.vue'
 import type { BoatShowDetail, MaintenanceEventRow, MaintenanceTaskRow } from '~/types/boat_show'
+import BaseButton from '~/components/base/BaseButton.vue'
+import BaseHeading from '~/components/base/BaseHeading.vue'
 
 defineProps<{
   boat: BoatShowDetail
@@ -16,29 +18,26 @@ defineProps<{
 </script>
 
 <template>
-  <div class="mx-auto w-full max-w-3xl px-8 py-10">
+  <div class="mx-auto w-full max-w-3xl px-6 py-10 sm:px-8">
     <div class="flex items-start justify-between gap-6">
       <div>
-        <h1 class="text-3xl font-semibold tracking-tight text-zinc-900">{{ boat.name }}</h1>
-        <p class="mt-2 text-base text-zinc-600">
-          Registration: <span class="font-medium text-zinc-900">{{ boat.registrationNumber ?? '—' }}</span>
+        <BaseHeading level="1">{{ boat.name }}</BaseHeading>
+        <p class="mt-2 text-base text-fg-muted">
+          Registration: <span class="font-semibold text-fg">{{ boat.registrationNumber ?? '—' }}</span>
         </p>
-        <p class="mt-1 text-base text-zinc-600">
-          Type: <span class="font-medium text-zinc-900">{{ boat.type ?? '—' }}</span>
+        <p class="mt-1 text-base text-fg-muted">
+          Type: <span class="font-semibold text-fg">{{ boat.type ?? '—' }}</span>
         </p>
-        <p class="mt-1 text-base text-zinc-600">
-          Propulsion: <span class="font-medium text-zinc-900">{{ boat.propulsionType ?? '—' }}</span>
+        <p class="mt-1 text-base text-fg-muted">
+          Propulsion: <span class="font-semibold text-fg">{{ boat.propulsionType ?? '—' }}</span>
         </p>
       </div>
 
       <div class="flex items-center gap-3">
-        <a
-          :href="`/boats/${boat.id}/edit`"
-          class="inline-flex h-10 items-center justify-center rounded-md bg-zinc-900 px-4 text-sm font-medium text-white shadow-sm hover:bg-zinc-800"
-        >
-          Edit
+        <a :href="`/boats/${boat.id}/edit`">
+          <BaseButton>Edit</BaseButton>
         </a>
-        <a href="/boats" class="text-sm font-medium text-zinc-700 hover:underline">Back</a>
+        <a href="/boats" class="text-sm font-semibold text-fg-muted hover:text-fg hover:underline">Back</a>
       </div>
     </div>
 

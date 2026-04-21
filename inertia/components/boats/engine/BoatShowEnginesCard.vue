@@ -2,6 +2,8 @@
 import { Form } from '@adonisjs/inertia/vue'
 import BoatEquipmentEngineFields from './BoatEquipmentEngineFields.vue'
 import type { BoatShowEngine } from '~/types/boat_show'
+import BaseButton from '~/components/base/BaseButton.vue'
+import BaseCard from '~/components/base/BaseCard.vue'
 
 defineProps<{
   boatId: number
@@ -17,28 +19,30 @@ function performedDisplay(iso: string | null) {
 </script>
 
 <template>
-  <div class="rounded-lg border border-zinc-200 bg-white p-4">
-    <h2 class="text-sm font-semibold text-zinc-900">Engines</h2>
-    <div v-if="engines.length === 0" class="mt-3 text-sm text-zinc-600">No engines.</div>
-    <ul v-else class="mt-3 space-y-3 text-sm">
-      <li v-for="e in engines" :key="e.id" class="rounded-md border border-zinc-200 p-3">
+  <BaseCard padded>
+    <template #header>
+      <p class="text-sm font-semibold text-fg">Engines</p>
+    </template>
+    <div v-if="engines.length === 0" class="text-sm text-fg-muted">No engines.</div>
+    <ul v-else class="space-y-3 text-sm">
+      <li v-for="e in engines" :key="e.id" class="rounded-(--radius-control) border border-border bg-surface-muted/40 p-3">
         <div class="flex flex-wrap items-start justify-between gap-2">
           <div>
-            <p class="font-medium text-zinc-900">
+            <p class="font-semibold text-fg">
               {{ e.kind }}<span v-if="e.fuel"> · {{ e.fuel }}</span>
             </p>
-            <p class="text-zinc-700">
+            <p class="text-fg-muted">
               {{ e.brand ?? '—' }} {{ e.model ?? '' }}<span v-if="e.powerHp !== null"> · {{ e.powerHp }} hp</span
               ><span v-if="e.hours !== null"> · {{ e.hours }} h</span>
             </p>
-            <p v-if="performedDisplay(e.manufacturedAt)" class="mt-1 text-zinc-600">
+            <p v-if="performedDisplay(e.manufacturedAt)" class="mt-1 text-fg-subtle">
               Mfg. {{ performedDisplay(e.manufacturedAt) }}
             </p>
           </div>
           <div v-if="canManage" class="flex flex-wrap items-center gap-2">
             <a
               :href="`/boats/${boatId}/engines/${e.id}/edit`"
-              class="text-sm font-medium text-zinc-700 hover:underline"
+              class="text-sm font-semibold text-fg-muted hover:text-fg hover:underline"
             >
               Edit
             </a>
@@ -47,35 +51,27 @@ function performedDisplay(iso: string | null) {
               #default="{ processing }"
               class="inline"
             >
-              <button
-                type="submit"
-                :disabled="processing"
-                class="text-sm font-medium text-red-700 hover:underline disabled:opacity-60"
-              >
+              <BaseButton type="submit" variant="danger" size="sm" :disabled="processing">
                 Remove
-              </button>
+              </BaseButton>
             </Form>
           </div>
         </div>
       </li>
     </ul>
 
-    <div v-if="canManage" class="mt-6 border-t border-zinc-100 pt-4">
-      <h3 class="text-xs font-semibold uppercase tracking-wide text-zinc-600">Add engine</h3>
+    <div v-if="canManage" class="mt-6 border-t border-border pt-4">
+      <p class="text-xs font-semibold uppercase tracking-wide text-fg-subtle">Add engine</p>
       <Form
         :action="{ url: `/boats/${boatId}/engines`, method: 'post' }"
         class="mt-3"
         #default="{ processing, errors }"
       >
         <BoatEquipmentEngineFields :errors="errors" />
-        <button
-          type="submit"
-          :disabled="processing"
-          class="mt-4 inline-flex h-10 items-center justify-center rounded-md bg-zinc-900 px-4 text-sm font-medium text-white shadow-sm hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          Add engine
-        </button>
+        <div class="mt-4">
+          <BaseButton type="submit" :disabled="processing">Add engine</BaseButton>
+        </div>
       </Form>
     </div>
-  </div>
+  </BaseCard>
 </template>

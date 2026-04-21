@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { RIG_TYPE_OPTIONS } from '~/constants/boat_form_options'
-import { inputClass, selectClass } from '~/utils/form_styles'
+import { ref, watch } from 'vue'
+import BaseInput from '~/components/base/BaseInput.vue'
+import BaseSelect from '~/components/base/BaseSelect.vue'
 
 export type BoatEquipmentRigFieldsModel = {
   rigType: string
@@ -14,71 +16,69 @@ const props = defineProps<{
   rig?: BoatEquipmentRigFieldsModel | null
 }>()
 
+const rigType = ref('')
+const manufacturedAt = ref('')
+const mastCount = ref('')
+const spreaders = ref('')
+
 function err(key: string): string | undefined {
   const v = props.errors[key]
   return Array.isArray(v) ? v[0] : v
 }
 
-function dateValue(): string {
-  const raw = props.rig?.manufacturedAt
-  if (!raw) return ''
-  return raw.slice(0, 10)
+function syncFromProps() {
+  const r = props.rig
+  rigType.value = r?.rigType ?? RIG_TYPE_OPTIONS[0]?.value ?? 'sloop'
+  manufacturedAt.value = r?.manufacturedAt ? r.manufacturedAt.slice(0, 10) : ''
+  mastCount.value = r?.mastCount === null || r?.mastCount === undefined ? '' : String(r.mastCount)
+  spreaders.value = r?.spreaders === null || r?.spreaders === undefined ? '' : String(r.spreaders)
 }
+
+watch(
+  () => props.rig,
+  () => syncFromProps(),
+  { immediate: true }
+)
 </script>
 
 <template>
   <div class="grid grid-cols-2 gap-4">
-    <div>
-      <label class="mb-1 block text-sm font-medium text-zinc-800">Rig type</label>
-      <select
-        id="rigType"
-        name="rigType"
-        :class="selectClass"
-        :data-invalid="err('rigType') ? 'true' : undefined"
-      >
-        <option
-          v-for="o in RIG_TYPE_OPTIONS"
-          :key="o.value"
-          :value="o.value"
-          :selected="(rig?.rigType ?? 'sloop') === o.value"
-        >
-          {{ o.label }}
-        </option>
-      </select>
-      <p v-if="err('rigType')" class="mt-2 text-sm font-medium text-red-600">{{ err('rigType') }}</p>
-    </div>
-    <div>
-      <label class="mb-1 block text-sm font-medium text-zinc-800">Manufacturing date</label>
-      <input
-        type="date"
-        name="manufacturedAt"
-        :value="dateValue()"
-        :class="inputClass"
-        :data-invalid="err('manufacturedAt') ? 'true' : undefined"
-      />
-      <p v-if="err('manufacturedAt')" class="mt-2 text-sm font-medium text-red-600">{{ err('manufacturedAt') }}</p>
-    </div>
-    <div>
-      <label class="mb-1 block text-sm font-medium text-zinc-800">Mast count</label>
-      <input
-        type="number"
-        name="mastCount"
-        :value="rig?.mastCount === null || rig?.mastCount === undefined ? '' : String(rig.mastCount)"
-        :class="inputClass"
-        :data-invalid="err('mastCount') ? 'true' : undefined"
-      />
-      <p v-if="err('mastCount')" class="mt-2 text-sm font-medium text-red-600">{{ err('mastCount') }}</p>
-    </div>
-    <div>
-      <label class="mb-1 block text-sm font-medium text-zinc-800">Spreaders</label>
-      <input
-        type="number"
-        name="spreaders"
-        :value="rig?.spreaders === null || rig?.spreaders === undefined ? '' : String(rig.spreaders)"
-        :class="inputClass"
-        :data-invalid="err('spreaders') ? 'true' : undefined"
-      />
-      <p v-if="err('spreaders')" class="mt-2 text-sm font-medium text-red-600">{{ err('spreaders') }}</p>
-    </div>
+    <BaseSelect
+      id="rigType"
+      name="rigType"
+      label="Rig type"
+      :options="RIG_TYPE_OPTIONS"
+      v-model="rigType"
+      :error="err('rigType')"
+    />
+
+    <BaseInput
+      id="manufacturedAt"
+      name="manufacturedAt"
+      label="Manufacturing date"
+      type="date"
+      v-model="manufacturedAt"
+      :error="err('manufacturedAt')"
+    />
+
+    <BaseInput
+      id="mastCount"
+      name="mastCount"
+      label="Mast count"
+      type="number"
+      inputmode="numeric"
+      v-model="mastCount"
+      :error="err('mastCount')"
+    />
+
+    <BaseInput
+      id="spreaders"
+      name="spreaders"
+      label="Spreaders"
+      type="number"
+      inputmode="numeric"
+      v-model="spreaders"
+      :error="err('spreaders')"
+    />
   </div>
 </template>

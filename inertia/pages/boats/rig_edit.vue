@@ -2,6 +2,9 @@
 import { Form } from '@adonisjs/inertia/vue'
 import BoatEquipmentRigFields from '~/components/boats/rig/BoatEquipmentRigFields.vue'
 import type { BoatEquipmentRigFieldsModel } from '~/components/boats/rig/BoatEquipmentRigFields.vue'
+import BaseButton from '~/components/base/BaseButton.vue'
+import BaseHeading from '~/components/base/BaseHeading.vue'
+import BaseCard from '~/components/base/BaseCard.vue'
 
 defineProps<{
   boat: { id: number; name: string }
@@ -10,29 +13,23 @@ defineProps<{
 </script>
 
 <template>
-  <div class="mx-auto w-full max-w-xl px-8 py-10">
-    <div>
-      <h1 class="text-3xl font-semibold tracking-tight text-zinc-900">
-        {{ rig ? 'Edit rig' : 'Add rig' }}
-      </h1>
-      <p class="mt-2 text-base text-zinc-600">{{ boat.name }}</p>
+  <div class="mx-auto w-full max-w-xl px-6 py-10 sm:px-8">
+    <div class="space-y-2">
+      <BaseHeading level="1">{{ rig ? 'Edit rig' : 'Add rig' }}</BaseHeading>
+      <p class="text-base text-fg-muted">{{ boat.name }}</p>
     </div>
 
     <div class="mt-8">
       <Form :action="{ url: `/boats/${boat.id}/rig`, method: 'put' }" #default="{ processing, errors }">
-        <div class="space-y-6 rounded-lg border border-zinc-200 bg-white p-4">
+        <BaseCard padded>
           <BoatEquipmentRigFields :errors="errors" :rig="rig" />
-          <div class="flex items-center gap-3">
-            <button
-              type="submit"
-              :disabled="processing"
-              class="inline-flex h-10 items-center justify-center rounded-md bg-zinc-900 px-4 text-sm font-medium text-white shadow-sm hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              Save
-            </button>
-            <a :href="`/boats/${boat.id}`" class="text-sm font-medium text-zinc-700 hover:underline">Cancel</a>
+          <div class="mt-6 flex items-center gap-3">
+            <BaseButton type="submit" :disabled="processing">Save</BaseButton>
+            <a :href="`/boats/${boat.id}`" class="text-sm font-semibold text-fg-muted hover:text-fg hover:underline">
+              Cancel
+            </a>
           </div>
-        </div>
+        </BaseCard>
       </Form>
     </div>
   </div>

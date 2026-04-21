@@ -3,6 +3,8 @@ import BaseField from '~/components/base/BaseField.vue'
 import { inputClass } from '~/utils/form_styles'
 import { computed, useSlots } from 'vue'
 
+type InputMode = 'none' | 'text' | 'tel' | 'url' | 'email' | 'numeric' | 'decimal' | 'search'
+
 const props = withDefaults(
   defineProps<{
     label?: string
@@ -15,11 +17,20 @@ const props = withDefaults(
     placeholder?: string
     modelValue?: string
     disabled?: boolean
+    step?: string | number
+    min?: string | number
+    max?: string | number
+    inputmode?: InputMode
+    pattern?: string
+    required?: boolean
+    readonly?: boolean
   }>(),
   {
     type: 'text',
     modelValue: '',
     disabled: false,
+    required: false,
+    readonly: false,
   }
 )
 
@@ -39,6 +50,13 @@ const inputPaddingClass = computed(() => (hasTrailing.value ? 'pr-24' : ''))
         :id="id"
         :name="name"
         :type="props.type"
+        :step="step"
+        :min="min"
+        :max="max"
+        :inputmode="inputmode"
+        :pattern="pattern"
+        :required="required"
+        :readonly="readonly"
         :autocomplete="autocomplete"
         :placeholder="placeholder"
         :disabled="disabled"

@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { SAIL_TYPE_OPTIONS } from '~/constants/boat_form_options'
-import { inputClass, selectClass } from '~/utils/form_styles'
+import { ref, watch } from 'vue'
+import BaseInput from '~/components/base/BaseInput.vue'
+import BaseSelect from '~/components/base/BaseSelect.vue'
 
 export type BoatEquipmentSailFieldsModel = {
   id?: number
@@ -16,83 +18,80 @@ const props = defineProps<{
   sail?: BoatEquipmentSailFieldsModel | null
 }>()
 
+const sailType = ref('')
+const manufacturedAt = ref('')
+const areaM2 = ref('')
+const material = ref('')
+const reefPoints = ref('')
+
 function err(key: string): string | undefined {
   const v = props.errors[key]
   return Array.isArray(v) ? v[0] : v
 }
 
-function dateValue(): string {
-  const raw = props.sail?.manufacturedAt
-  if (!raw) return ''
-  return raw.slice(0, 10)
+function syncFromProps() {
+  const s = props.sail
+  sailType.value = s?.sailType ?? SAIL_TYPE_OPTIONS[0]?.value ?? 'main'
+  manufacturedAt.value = s?.manufacturedAt ? s.manufacturedAt.slice(0, 10) : ''
+  areaM2.value = s?.areaM2 === null || s?.areaM2 === undefined ? '' : String(s.areaM2)
+  material.value = s?.material ?? ''
+  reefPoints.value = s?.reefPoints === null || s?.reefPoints === undefined ? '' : String(s.reefPoints)
 }
+
+watch(
+  () => props.sail,
+  () => syncFromProps(),
+  { immediate: true }
+)
 </script>
 
 <template>
   <div class="grid grid-cols-2 gap-4">
-    <div>
-      <label class="mb-1 block text-sm font-medium text-zinc-800">Type</label>
-      <select
-        id="sailType"
-        name="sailType"
-        :class="selectClass"
-        :data-invalid="err('sailType') ? 'true' : undefined"
-      >
-        <option
-          v-for="o in SAIL_TYPE_OPTIONS"
-          :key="o.value"
-          :value="o.value"
-          :selected="(sail?.sailType ?? 'main') === o.value"
-        >
-          {{ o.label }}
-        </option>
-      </select>
-      <p v-if="err('sailType')" class="mt-2 text-sm font-medium text-red-600">{{ err('sailType') }}</p>
-    </div>
-    <div>
-      <label class="mb-1 block text-sm font-medium text-zinc-800">Manufacturing date</label>
-      <input
-        type="date"
-        name="manufacturedAt"
-        :value="dateValue()"
-        :class="inputClass"
-        :data-invalid="err('manufacturedAt') ? 'true' : undefined"
-      />
-      <p v-if="err('manufacturedAt')" class="mt-2 text-sm font-medium text-red-600">{{ err('manufacturedAt') }}</p>
-    </div>
-    <div>
-      <label class="mb-1 block text-sm font-medium text-zinc-800">Area (m²)</label>
-      <input
-        type="number"
-        step="0.1"
-        name="areaM2"
-        :value="sail?.areaM2 === null || sail?.areaM2 === undefined ? '' : String(sail.areaM2)"
-        :class="inputClass"
-        :data-invalid="err('areaM2') ? 'true' : undefined"
-      />
-      <p v-if="err('areaM2')" class="mt-2 text-sm font-medium text-red-600">{{ err('areaM2') }}</p>
-    </div>
-    <div>
-      <label class="mb-1 block text-sm font-medium text-zinc-800">Material</label>
-      <input
-        type="text"
-        name="material"
-        :value="sail?.material ?? ''"
-        :class="inputClass"
-        :data-invalid="err('material') ? 'true' : undefined"
-      />
-      <p v-if="err('material')" class="mt-2 text-sm font-medium text-red-600">{{ err('material') }}</p>
-    </div>
-    <div>
-      <label class="mb-1 block text-sm font-medium text-zinc-800">Reef points</label>
-      <input
-        type="number"
-        name="reefPoints"
-        :value="sail?.reefPoints === null || sail?.reefPoints === undefined ? '' : String(sail.reefPoints)"
-        :class="inputClass"
-        :data-invalid="err('reefPoints') ? 'true' : undefined"
-      />
-      <p v-if="err('reefPoints')" class="mt-2 text-sm font-medium text-red-600">{{ err('reefPoints') }}</p>
-    </div>
+    <BaseSelect
+      id="sailType"
+      name="sailType"
+      label="Type"
+      :options="SAIL_TYPE_OPTIONS"
+      v-model="sailType"
+      :error="err('sailType')"
+    />
+
+    <BaseInput
+      id="manufacturedAt"
+      name="manufacturedAt"
+      label="Manufacturing date"
+      type="date"
+      v-model="manufacturedAt"
+      :error="err('manufacturedAt')"
+    />
+
+    <BaseInput
+      id="areaM2"
+      name="areaM2"
+      label="Area (m²)"
+      type="number"
+      step="0.1"
+      inputmode="decimal"
+      v-model="areaM2"
+      :error="err('areaM2')"
+    />
+
+    <BaseInput
+      id="material"
+      name="material"
+      label="Material"
+      v-model="material"
+      :error="err('material')"
+    />
+
+    <BaseInput
+      id="reefPoints"
+      name="reefPoints"
+      label="Reef points"
+      type="number"
+      inputmode="numeric"
+      v-model="reefPoints"
+      :error="err('reefPoints')"
+    />
   </div>
 </template>

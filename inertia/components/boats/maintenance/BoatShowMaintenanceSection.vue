@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { Form } from '@adonisjs/inertia/vue'
 import { computed, ref, watch } from 'vue'
+import BaseButton from '~/components/base/BaseButton.vue'
+import BaseCard from '~/components/base/BaseCard.vue'
+import BaseInput from '~/components/base/BaseInput.vue'
+import BaseSelect from '~/components/base/BaseSelect.vue'
+import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import type { BoatShowDetail, MaintenanceEventRow, MaintenanceTaskRow } from '~/types/boat_show'
 
 const props = defineProps<{
@@ -10,12 +15,24 @@ const props = defineProps<{
   canManageMaintenance: boolean
 }>()
 
+type Subject = 'boat' | 'engine' | 'sail' | 'rig'
+
+function firstError(errors: Record<string, unknown>, key: string): string | undefined {
+  const v = errors[key]
+  if (typeof v === 'string') return v
+  if (Array.isArray(v)) return typeof v[0] === 'string' ? v[0] : undefined
+  return undefined
+}
+
 const subject = ref<'boat' | 'engine' | 'sail' | 'rig'>('boat')
 const boatEngineId = ref<string>('')
 const boatSailId = ref<string>('')
 const engineCaptionManual = ref('')
 const sailCaptionManual = ref('')
 const partRows = ref<Array<{ name: string; quantity: string; notes: string }>>([])
+const performedAt = ref('')
+const entryTitle = ref('')
+const entryNotes = ref('')
 
 // task form
 const taskSubject = ref<'boat' | 'engine' | 'sail' | 'rig'>('boat')
@@ -25,12 +42,39 @@ const taskDueAt = ref('')
 const taskRecurrenceMonths = ref('')
 const taskDueEngineHours = ref('')
 const taskRecurrenceEngineHours = ref('')
+const taskTitle = ref('')
+const taskNotes = ref('')
+
+const subjectOptions: ReadonlyArray<{ label: string; value: Subject }> = [
+  { label: 'Whole boat', value: 'boat' },
+  { label: 'Engine', value: 'engine' },
+  { label: 'Sail', value: 'sail' },
+  { label: 'Rig', value: 'rig' },
+]
+
+const engineOptions = computed(() =>
+  props.boat.engines.map((e) => ({
+    value: String(e.id),
+    label: `${e.kind} · ${e.brand ?? ''} ${e.model ?? ''}`.trim(),
+  }))
+)
+
+const sailOptions = computed(() =>
+  props.boat.sails.map((s) => ({
+    value: String(s.id),
+    label: `${s.sailType}${s.areaM2 !== null ? ` · ${s.areaM2} m²` : ''}`,
+  }))
+)
 
 watch(subject, () => {
   boatEngineId.value = ''
   boatSailId.value = ''
   engineCaptionManual.value = ''
   sailCaptionManual.value = ''
+  performedAt.value = ''
+  entryTitle.value = ''
+  entryNotes.value = ''
+  partRows.value = []
 })
 
 watch(taskSubject, () => {
@@ -38,6 +82,8 @@ watch(taskSubject, () => {
   taskBoatSailId.value = ''
   taskDueEngineHours.value = ''
   taskRecurrenceEngineHours.value = ''
+  taskTitle.value = ''
+  taskNotes.value = ''
 })
 
 function addPartRow() {
@@ -77,481 +123,371 @@ function performedDisplay(iso: string) {
   return d || iso
 }
 
-const canSubmitRig = computed(() => props.boat.rig !== null)
 const openTasks = computed(() => props.maintenanceTasks.filter((t) => t.status === 'open'))
 </script>
 
 <template>
-  <div class="rounded-lg border border-zinc-200 bg-white p-4">
-    <h2 class="text-sm font-semibold text-zinc-900">Planned maintenance</h2>
-    <p class="mt-1 text-sm text-zinc-600">Open tasks (date-based and engine-hour based).</p>
+  <BaseCard padded>
+    <template #header>
+      <div class="space-y-1">
+        <p class="text-sm font-semibold text-fg">Planned maintenance</p>
+        <p class="text-sm text-fg-muted">Open tasks (date-based and engine-hour based).</p>
+      </div>
+    </template>
 
-    <div v-if="openTasks.length === 0" class="mt-4 text-sm text-zinc-600">No planned tasks.</div>
-    <ul v-else class="mt-4 space-y-3">
-      <li v-for="t in openTasks" :key="t.id" class="rounded-md border border-zinc-200 p-3 text-sm">
+    <div v-if="openTasks.length === 0" class="text-sm text-fg-muted">No planned tasks.</div>
+    <ul v-else class="space-y-3">
+      <li v-for="t in openTasks" :key="t.id"
+        class="rounded-(--radius-control) border border-border bg-surface-muted/40 p-3 text-sm">
         <div class="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <p class="font-medium text-zinc-900">{{ t.title }}</p>
-            <p class="text-zinc-600">{{ subjectLabel(t.subject) }}</p>
-            <p v-if="t.dueAt" class="mt-1 text-xs text-zinc-600">Due {{ t.dueAt }}</p>
-            <p v-else-if="t.dueEngineHours !== null" class="mt-1 text-xs text-zinc-600">
+            <p class="font-semibold text-fg">{{ t.title }}</p>
+            <p class="text-fg-muted">{{ subjectLabel(t.subject) }}</p>
+            <p v-if="t.dueAt" class="mt-1 text-xs text-fg-subtle">Due {{ t.dueAt }}</p>
+            <p v-else-if="t.dueEngineHours !== null" class="mt-1 text-xs text-fg-subtle">
               Due at {{ t.dueEngineHours }}h
             </p>
-            <p v-if="t.notes" class="mt-2 text-zinc-700">{{ t.notes }}</p>
+            <p v-if="t.notes" class="mt-2 text-fg-muted">{{ t.notes }}</p>
           </div>
 
           <div v-if="canManageMaintenance" class="flex items-center gap-3">
-            <Form
-              v-if="t.dueEngineHours !== null"
+            <Form v-if="t.dueEngineHours !== null"
               :action="{ url: `/boats/${boat.id}/maintenance-tasks/${t.id}/done`, method: 'put' }"
-              class="flex items-center gap-2"
-              #default="{ processing }"
-            >
-              <input
-                type="number"
-                min="0"
-                step="1"
-                name="doneEngineHours"
-                required
-                placeholder="Done @ hours"
-                class="h-9 w-32 rounded-md border border-zinc-300 bg-white px-2 text-sm"
-              />
-              <button
-                type="submit"
-                :disabled="processing"
-                class="text-xs font-medium text-zinc-900 hover:underline disabled:opacity-50"
-              >
+              class="flex items-center gap-2" #default="{ processing }">
+              <div class="w-36">
+                <BaseInput
+                  id="doneEngineHours"
+                  name="doneEngineHours"
+                  type="number"
+                  inputmode="numeric"
+                  min="0"
+                  step="1"
+                  required
+                  placeholder="Done @ hours"
+                />
+              </div>
+              <BaseButton type="submit" variant="secondary" size="sm" :disabled="processing">
                 Mark done
-              </button>
+              </BaseButton>
             </Form>
 
-            <Form
-              v-else
-              :action="{ url: `/boats/${boat.id}/maintenance-tasks/${t.id}/done`, method: 'put' }"
-              #default="{ processing }"
-            >
-              <button
-                type="submit"
-                :disabled="processing"
-                class="text-xs font-medium text-zinc-900 hover:underline disabled:opacity-50"
-              >
+            <Form v-else :action="{ url: `/boats/${boat.id}/maintenance-tasks/${t.id}/done`, method: 'put' }"
+              #default="{ processing }">
+              <BaseButton type="submit" variant="secondary" size="sm" :disabled="processing">
                 Mark done
-              </button>
+              </BaseButton>
             </Form>
 
-            <Form
-              :action="{ url: `/boats/${boat.id}/maintenance-tasks/${t.id}`, method: 'delete' }"
-              #default="{ processing }"
-            >
-              <button
-                type="submit"
-                :disabled="processing"
-                class="text-xs font-medium text-red-700 hover:underline disabled:opacity-50"
-              >
+            <Form :action="{ url: `/boats/${boat.id}/maintenance-tasks/${t.id}`, method: 'delete' }"
+              #default="{ processing }">
+              <BaseButton type="submit" variant="danger" size="sm" :disabled="processing">
                 Delete
-              </button>
+              </BaseButton>
             </Form>
           </div>
         </div>
       </li>
     </ul>
 
-    <div v-if="canManageMaintenance" class="mt-6 border-t border-zinc-100 pt-6">
-      <h3 class="text-sm font-medium text-zinc-900">Add task</h3>
-      <Form
-        :action="{ url: `/boats/${boat.id}/maintenance-tasks`, method: 'post' }"
-        class="mt-4 space-y-4"
-        #default="{ processing, errors }"
-      >
-        <div>
-          <label class="mb-1 block text-sm font-medium text-zinc-800" for="task-subject">Subject</label>
-          <select
-            id="task-subject"
-            v-model="taskSubject"
-            name="subject"
-            class="h-10 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm shadow-sm focus:border-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900/10"
-          >
-            <option value="boat">Whole boat</option>
-            <option value="engine">Engine</option>
-            <option value="sail">Sail</option>
-            <option value="rig" :disabled="!canSubmitRig">Rig</option>
-          </select>
-          <p v-if="errors.subject" class="mt-1 text-sm text-red-600">{{ errors.subject }}</p>
-        </div>
+    <div v-if="canManageMaintenance" class="mt-6 border-t border-border pt-6">
+      <p class="text-sm font-semibold text-fg">Add task</p>
+      <Form :action="{ url: `/boats/${boat.id}/maintenance-tasks`, method: 'post' }" class="mt-4 space-y-4"
+        #default="{ processing, errors }">
+        <BaseSelect
+          id="task-subject"
+          name="subject"
+          label="Subject"
+          :options="subjectOptions"
+          v-model="taskSubject"
+          :error="firstError(errors, 'subject')"
+        />
 
         <template v-if="taskSubject === 'engine'">
-          <div v-if="boat.engines.length">
-            <label class="mb-1 block text-sm font-medium text-zinc-800" for="task-engine">Engine</label>
-            <select
-              id="task-engine"
-              v-model="taskBoatEngineId"
-              name="boatEngineId"
-              class="h-10 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm shadow-sm focus:border-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900/10"
-            >
-              <option value="">— Select —</option>
-              <option v-for="e in boat.engines" :key="e.id" :value="String(e.id)">
-                {{ e.kind }} · {{ e.brand ?? '' }} {{ e.model ?? '' }}
-              </option>
-            </select>
-            <p v-if="errors.boatEngineId" class="mt-1 text-sm text-red-600">{{ errors.boatEngineId }}</p>
-          </div>
+          <BaseSelect
+            v-if="engineOptions.length"
+            id="task-engine"
+            name="boatEngineId"
+            label="Engine"
+            placeholder="— Select —"
+            :allow-empty="true"
+            :options="engineOptions"
+            v-model="taskBoatEngineId"
+            :error="firstError(errors, 'boatEngineId')"
+          />
 
           <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div>
-              <label class="mb-1 block text-sm font-medium text-zinc-800" for="task-due-hours">Due hours</label>
-              <input
-                id="task-due-hours"
-                v-model="taskDueEngineHours"
-                type="number"
-                min="0"
-                step="1"
-                name="dueEngineHours"
-                class="h-10 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm shadow-sm"
-              />
-              <p v-if="errors.dueEngineHours" class="mt-1 text-sm text-red-600">{{ errors.dueEngineHours }}</p>
-            </div>
-            <div>
-              <label class="mb-1 block text-sm font-medium text-zinc-800" for="task-recur-hours">
-                Recurrence hours
-              </label>
-              <input
-                id="task-recur-hours"
-                v-model="taskRecurrenceEngineHours"
-                type="number"
-                min="0"
-                step="1"
-                name="recurrenceIntervalEngineHours"
-                class="h-10 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm shadow-sm"
-              />
-              <p v-if="errors.recurrenceIntervalEngineHours" class="mt-1 text-sm text-red-600">
-                {{ errors.recurrenceIntervalEngineHours }}
-              </p>
-            </div>
+            <BaseInput
+              id="task-due-hours"
+              name="dueEngineHours"
+              label="Due hours"
+              type="number"
+              inputmode="numeric"
+              min="0"
+              step="1"
+              v-model="taskDueEngineHours"
+              :error="firstError(errors, 'dueEngineHours')"
+            />
+            <BaseInput
+              id="task-recur-hours"
+              name="recurrenceIntervalEngineHours"
+              label="Recurrence hours"
+              type="number"
+              inputmode="numeric"
+              min="0"
+              step="1"
+              v-model="taskRecurrenceEngineHours"
+              :error="firstError(errors, 'recurrenceIntervalEngineHours')"
+            />
           </div>
         </template>
 
         <template v-if="taskSubject === 'sail'">
-          <div v-if="boat.sails.length">
-            <label class="mb-1 block text-sm font-medium text-zinc-800" for="task-sail">Sail</label>
-            <select
-              id="task-sail"
-              v-model="taskBoatSailId"
-              name="boatSailId"
-              class="h-10 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm shadow-sm focus:border-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900/10"
-            >
-              <option value="">— Select —</option>
-              <option v-for="s in boat.sails" :key="s.id" :value="String(s.id)">
-                {{ s.sailType }}<span v-if="s.areaM2 !== null"> · {{ s.areaM2 }} m²</span>
-              </option>
-            </select>
-            <p v-if="errors.boatSailId" class="mt-1 text-sm text-red-600">{{ errors.boatSailId }}</p>
-          </div>
+          <BaseSelect
+            v-if="sailOptions.length"
+            id="task-sail"
+            name="boatSailId"
+            label="Sail"
+            placeholder="— Select —"
+            :allow-empty="true"
+            :options="sailOptions"
+            v-model="taskBoatSailId"
+            :error="firstError(errors, 'boatSailId')"
+          />
         </template>
 
         <template v-if="taskSubject === 'rig'">
           <input v-if="boat.rig" type="hidden" name="boatRigId" :value="boat.rig.id" />
-          <p v-if="!boat.rig" class="text-sm text-amber-800">Save a rig on this boat before planning rig tasks.</p>
-          <p v-if="errors.boatRigId" class="mt-1 text-sm text-red-600">{{ errors.boatRigId }}</p>
+          <p v-if="!boat.rig" class="text-sm text-warning">Save a rig on this boat before planning rig tasks.</p>
+          <p v-if="errors.boatRigId" class="mt-1 text-xs font-medium text-danger">{{ errors.boatRigId }}</p>
         </template>
 
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div>
-            <label class="mb-1 block text-sm font-medium text-zinc-800" for="task-due-at">
-              Due date <span class="font-normal text-zinc-500">(optional)</span>
-            </label>
-            <input
-              id="task-due-at"
-              v-model="taskDueAt"
-              type="date"
-              name="dueAt"
-              class="h-10 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm shadow-sm"
-            />
-            <p v-if="errors.dueAt" class="mt-1 text-sm text-red-600">{{ errors.dueAt }}</p>
-          </div>
-          <div>
-            <label class="mb-1 block text-sm font-medium text-zinc-800" for="task-recur-months">
-              Recurrence months
-            </label>
-            <input
-              id="task-recur-months"
-              v-model="taskRecurrenceMonths"
-              type="number"
-              min="0"
-              step="1"
-              name="recurrenceIntervalMonths"
-              class="h-10 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm shadow-sm"
-            />
-            <p v-if="errors.recurrenceIntervalMonths" class="mt-1 text-sm text-red-600">
-              {{ errors.recurrenceIntervalMonths }}
-            </p>
-          </div>
-        </div>
-
-        <div>
-          <label class="mb-1 block text-sm font-medium text-zinc-800" for="task-title">Title</label>
-          <input
-            id="task-title"
-            type="text"
-            name="title"
-            required
-            class="h-10 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm shadow-sm focus:border-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900/10"
-            placeholder="e.g. Oil change, inspect rigging"
+          <BaseInput
+            id="task-due-at"
+            name="dueAt"
+            label="Due date (optional)"
+            type="date"
+            v-model="taskDueAt"
+            :error="firstError(errors, 'dueAt')"
           />
-          <p v-if="errors.title" class="mt-1 text-sm text-red-600">{{ errors.title }}</p>
-        </div>
-
-        <div>
-          <label class="mb-1 block text-sm font-medium text-zinc-800" for="task-notes">Notes</label>
-          <textarea
-            id="task-notes"
-            name="notes"
-            rows="3"
-            class="w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900/10"
+          <BaseInput
+            id="task-recur-months"
+            name="recurrenceIntervalMonths"
+            label="Recurrence months"
+            type="number"
+            inputmode="numeric"
+            min="0"
+            step="1"
+            v-model="taskRecurrenceMonths"
+            :error="firstError(errors, 'recurrenceIntervalMonths')"
           />
-          <p v-if="errors.notes" class="mt-1 text-sm text-red-600">{{ errors.notes }}</p>
         </div>
 
-        <button
-          type="submit"
-          :disabled="processing || (taskSubject === 'rig' && !boat.rig)"
-          class="inline-flex h-10 items-center justify-center rounded-md bg-zinc-900 px-4 text-sm font-medium text-white shadow-sm hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-50"
-        >
+        <BaseInput
+          id="task-title"
+          name="title"
+          label="Title"
+          required
+          placeholder="e.g. Oil change, inspect rigging"
+          v-model="taskTitle"
+          :error="firstError(errors, 'title')"
+        />
+
+        <BaseTextarea
+          id="task-notes"
+          name="notes"
+          label="Notes"
+          :rows="3"
+          v-model="taskNotes"
+          :error="firstError(errors, 'notes')"
+        />
+
+        <BaseButton type="submit" :disabled="processing || (taskSubject === 'rig' && !boat.rig)">
           Create task
-        </button>
+        </BaseButton>
       </Form>
     </div>
 
-    <div class="mt-10 border-t border-zinc-100 pt-8">
-      <h2 class="text-sm font-semibold text-zinc-900">Maintenance history</h2>
-      <p class="mt-1 text-sm text-zinc-600">
+    <div class="mt-10 border-t border-border pt-8">
+      <p class="text-sm font-semibold text-fg">Maintenance history</p>
+      <p class="mt-1 text-sm text-fg-muted">
         Work done on the hull, an engine, a sail, or the rig, with replaced parts.
       </p>
 
-    <div v-if="maintenanceEvents.length === 0" class="mt-4 text-sm text-zinc-600">No entries yet.</div>
-    <ul v-else class="mt-4 space-y-4">
-      <li
-        v-for="ev in maintenanceEvents"
-        :key="ev.id"
-        class="rounded-md border border-zinc-200 p-3 text-sm"
-      >
-        <div class="flex flex-wrap items-start justify-between gap-2">
-          <div>
-            <p class="font-medium text-zinc-900">{{ performedDisplay(ev.performedAt) }} — {{ ev.title }}</p>
-            <p class="text-zinc-600">{{ subjectLabel(ev.subject) }} · {{ targetDescription(ev) }}</p>
-            <p v-if="ev.notes" class="mt-2 text-zinc-700">{{ ev.notes }}</p>
-            <ul v-if="ev.parts.length" class="mt-2 list-inside list-disc text-zinc-700">
-              <li v-for="p in ev.parts" :key="p.id">
-                {{ p.name }}<template v-if="p.quantity !== null"> × {{ p.quantity }}</template>
-                <template v-if="p.notes"> — {{ p.notes }}</template>
-              </li>
-            </ul>
+      <div v-if="maintenanceEvents.length === 0" class="mt-4 text-sm text-fg-muted">No entries yet.</div>
+      <ul v-else class="mt-4 space-y-4">
+        <li v-for="ev in maintenanceEvents" :key="ev.id"
+          class="rounded-(--radius-control) border border-border bg-surface-muted/40 p-3 text-sm">
+          <div class="flex flex-wrap items-start justify-between gap-2">
+            <div>
+              <p class="font-semibold text-fg">{{ performedDisplay(ev.performedAt) }} — {{ ev.title }}</p>
+              <p class="text-fg-muted">{{ subjectLabel(ev.subject) }} · {{ targetDescription(ev) }}</p>
+              <p v-if="ev.notes" class="mt-2 text-fg-muted">{{ ev.notes }}</p>
+              <ul v-if="ev.parts.length" class="mt-2 list-inside list-disc text-fg-muted">
+                <li v-for="p in ev.parts" :key="p.id">
+                  {{ p.name }}<template v-if="p.quantity !== null"> × {{ p.quantity }}</template>
+                  <template v-if="p.notes"> — {{ p.notes }}</template>
+                </li>
+              </ul>
+            </div>
+            <Form v-if="canManageMaintenance"
+              :action="{ url: `/boats/${boat.id}/maintenance/${ev.id}`, method: 'delete' }" #default="{ processing }">
+              <BaseButton type="submit" variant="danger" size="sm" :disabled="processing">
+                Remove
+              </BaseButton>
+            </Form>
           </div>
-          <Form
-            v-if="canManageMaintenance"
-            :action="{ url: `/boats/${boat.id}/maintenance/${ev.id}`, method: 'delete' }"
-            #default="{ processing }"
-          >
-            <button
-              type="submit"
-              :disabled="processing"
-              class="text-xs font-medium text-red-700 hover:underline disabled:opacity-50"
-            >
-              Remove
-            </button>
-          </Form>
-        </div>
-      </li>
-    </ul>
+        </li>
+      </ul>
 
-    <div v-if="canManageMaintenance" class="mt-6 border-t border-zinc-100 pt-6">
-      <h3 class="text-sm font-medium text-zinc-900">Add entry</h3>
-      <Form
-        :action="{ url: `/boats/${boat.id}/maintenance`, method: 'post' }"
-        class="mt-4 space-y-4"
-        #default="{ processing, errors }"
-      >
-        <div>
-          <label class="mb-1 block text-sm font-medium text-zinc-800" for="maint-subject">Subject</label>
-          <select
+      <div v-if="canManageMaintenance" class="mt-6 border-t border-border pt-6">
+        <p class="text-sm font-semibold text-fg">Add entry</p>
+        <Form :action="{ url: `/boats/${boat.id}/maintenance`, method: 'post' }" class="mt-4 space-y-4"
+          #default="{ processing, errors }">
+          <BaseSelect
             id="maint-subject"
-            v-model="subject"
             name="subject"
-            class="h-10 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm shadow-sm focus:border-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900/10"
-          >
-            <option value="boat">Whole boat</option>
-            <option value="engine">Engine</option>
-            <option value="sail">Sail</option>
-            <option value="rig" :disabled="!canSubmitRig">Rig</option>
-          </select>
-          <p v-if="errors.subject" class="mt-1 text-sm text-red-600">{{ errors.subject }}</p>
-        </div>
+            label="Subject"
+            :options="subjectOptions"
+            v-model="subject"
+            :error="firstError(errors, 'subject')"
+          />
 
-        <template v-if="subject === 'engine'">
-          <div v-if="boat.engines.length">
-            <label class="mb-1 block text-sm font-medium text-zinc-800" for="maint-engine">Engine</label>
-            <select
+          <template v-if="subject === 'engine'">
+            <BaseSelect
+              v-if="engineOptions.length"
               id="maint-engine"
-              v-model="boatEngineId"
               name="boatEngineId"
-              class="h-10 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm shadow-sm focus:border-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900/10"
-            >
-              <option value="">— Select —</option>
-              <option v-for="e in boat.engines" :key="e.id" :value="String(e.id)">
-                {{ e.kind }} · {{ e.brand ?? '' }} {{ e.model ?? '' }}
-              </option>
-            </select>
-            <p v-if="errors.boatEngineId" class="mt-1 text-sm text-red-600">{{ errors.boatEngineId }}</p>
-          </div>
-          <div>
-            <label class="mb-1 block text-sm font-medium text-zinc-800" for="maint-engine-caption">
-              Label <span v-if="!boat.engines.length" class="text-red-600">*</span>
-              <span v-else class="font-normal text-zinc-500">(if not selecting an engine)</span>
-            </label>
-            <input
+              label="Engine"
+              placeholder="— Select —"
+              :allow-empty="true"
+              :options="engineOptions"
+              v-model="boatEngineId"
+              :error="firstError(errors, 'boatEngineId')"
+            />
+
+            <BaseInput
               id="maint-engine-caption"
-              v-model="engineCaptionManual"
-              type="text"
               name="engineCaption"
-              class="h-10 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm shadow-sm focus:border-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900/10"
+              label="Label"
               placeholder="e.g. Inboard diesel port"
+              v-model="engineCaptionManual"
+              :error="firstError(errors, 'engineCaption')"
             />
-            <p v-if="errors.engineCaption" class="mt-1 text-sm text-red-600">{{ errors.engineCaption }}</p>
-          </div>
-        </template>
+          </template>
 
-        <template v-if="subject === 'sail'">
-          <div v-if="boat.sails.length">
-            <label class="mb-1 block text-sm font-medium text-zinc-800" for="maint-sail">Sail</label>
-            <select
+          <template v-if="subject === 'sail'">
+            <BaseSelect
+              v-if="sailOptions.length"
               id="maint-sail"
-              v-model="boatSailId"
               name="boatSailId"
-              class="h-10 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm shadow-sm focus:border-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900/10"
-            >
-              <option value="">— Select —</option>
-              <option v-for="s in boat.sails" :key="s.id" :value="String(s.id)">
-                {{ s.sailType }}<span v-if="s.areaM2 !== null"> · {{ s.areaM2 }} m²</span>
-              </option>
-            </select>
-            <p v-if="errors.boatSailId" class="mt-1 text-sm text-red-600">{{ errors.boatSailId }}</p>
-          </div>
-          <div>
-            <label class="mb-1 block text-sm font-medium text-zinc-800" for="maint-sail-caption">
-              Label <span v-if="!boat.sails.length" class="text-red-600">*</span>
-              <span v-else class="font-normal text-zinc-500">(if not selecting a sail)</span>
-            </label>
-            <input
-              id="maint-sail-caption"
-              v-model="sailCaptionManual"
-              type="text"
-              name="sailCaption"
-              class="h-10 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm shadow-sm focus:border-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900/10"
-              placeholder="e.g. Main — 3 reefs"
+              label="Sail"
+              placeholder="— Select —"
+              :allow-empty="true"
+              :options="sailOptions"
+              v-model="boatSailId"
+              :error="firstError(errors, 'boatSailId')"
             />
-            <p v-if="errors.sailCaption" class="mt-1 text-sm text-red-600">{{ errors.sailCaption }}</p>
-          </div>
-        </template>
 
-        <template v-if="subject === 'rig'">
-          <input v-if="boat.rig" type="hidden" name="boatRigId" :value="boat.rig.id" />
-          <p v-if="!boat.rig" class="text-sm text-amber-800">Save a rig on this boat before logging rig maintenance.</p>
-          <p v-if="errors.boatRigId" class="mt-1 text-sm text-red-600">{{ errors.boatRigId }}</p>
-        </template>
+            <BaseInput
+              id="maint-sail-caption"
+              name="sailCaption"
+              label="Label"
+              placeholder="e.g. Main — 3 reefs"
+              v-model="sailCaptionManual"
+              :error="firstError(errors, 'sailCaption')"
+            />
+          </template>
 
-        <div>
-          <label class="mb-1 block text-sm font-medium text-zinc-800" for="maint-date">Date</label>
-          <input
+          <template v-if="subject === 'rig'">
+            <input v-if="boat.rig" type="hidden" name="boatRigId" :value="boat.rig.id" />
+            <p v-if="!boat.rig" class="text-sm text-warning">Save a rig on this boat before logging rig maintenance.</p>
+            <p v-if="errors.boatRigId" class="mt-1 text-xs font-medium text-danger">{{ errors.boatRigId }}</p>
+          </template>
+
+          <BaseInput
             id="maint-date"
-            type="date"
             name="performedAt"
+            label="Date"
+            type="date"
             required
-            class="h-10 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm shadow-sm focus:border-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900/10"
+            v-model="performedAt"
+            :error="firstError(errors, 'performedAt')"
           />
-          <p v-if="errors.performedAt" class="mt-1 text-sm text-red-600">{{ errors.performedAt }}</p>
-        </div>
 
-        <div>
-          <label class="mb-1 block text-sm font-medium text-zinc-800" for="maint-title">Title</label>
-          <input
+          <BaseInput
             id="maint-title"
-            type="text"
             name="title"
+            label="Title"
             required
-            class="h-10 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm shadow-sm focus:border-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900/10"
             placeholder="e.g. Oil change, batten replacement"
+            v-model="entryTitle"
+            :error="firstError(errors, 'title')"
           />
-          <p v-if="errors.title" class="mt-1 text-sm text-red-600">{{ errors.title }}</p>
-        </div>
 
-        <div>
-          <label class="mb-1 block text-sm font-medium text-zinc-800" for="maint-notes">Notes</label>
-          <textarea
+          <BaseTextarea
             id="maint-notes"
             name="notes"
-            rows="3"
-            class="w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900/10"
+            label="Notes"
+            :rows="3"
+            v-model="entryNotes"
+            :error="firstError(errors, 'notes')"
           />
-          <p v-if="errors.notes" class="mt-1 text-sm text-red-600">{{ errors.notes }}</p>
-        </div>
 
-        <div>
-          <div class="flex items-center justify-between gap-2">
-            <label class="text-sm font-medium text-zinc-800">Parts replaced (optional)</label>
-            <button type="button" class="text-xs font-medium text-zinc-700 hover:underline" @click="addPartRow">
-              + Add part
-            </button>
-          </div>
-          <div
-            v-for="(row, i) in partRows"
-            :key="i"
-            class="mt-3 grid grid-cols-1 gap-2 rounded-md border border-zinc-100 p-3 sm:grid-cols-12"
-          >
-            <div class="sm:col-span-5">
-              <input
-                v-model="row.name"
-                type="text"
-                :name="`parts[${i}][name]`"
-                placeholder="Part name"
-                class="h-9 w-full rounded-md border border-zinc-300 bg-white px-2 text-sm"
-              />
-            </div>
-            <div class="sm:col-span-2">
-              <input
-                v-model="row.quantity"
-                type="number"
-                min="1"
-                step="1"
-                :name="`parts[${i}][quantity]`"
-                placeholder="Qty"
-                class="h-9 w-full rounded-md border border-zinc-300 bg-white px-2 text-sm"
-              />
-            </div>
-            <div class="sm:col-span-4">
-              <input
-                v-model="row.notes"
-                type="text"
-                :name="`parts[${i}][notes]`"
-                placeholder="Notes"
-                class="h-9 w-full rounded-md border border-zinc-300 bg-white px-2 text-sm"
-              />
-            </div>
-            <div class="flex items-center sm:col-span-1">
-              <button type="button" class="text-xs text-red-700 hover:underline" @click="removePartRow(i)">
-                Remove
+          <div>
+            <div class="flex items-center justify-between gap-2">
+              <label class="text-sm font-semibold text-fg">Parts replaced (optional)</label>
+              <button
+                type="button"
+                class="text-xs font-semibold text-fg-muted hover:text-fg hover:underline"
+                @click="addPartRow"
+              >
+                + Add part
               </button>
             </div>
+            <div v-for="(row, i) in partRows" :key="i"
+              class="mt-3 grid grid-cols-1 gap-2 rounded-(--radius-control) border border-border bg-surface-muted/40 p-3 sm:grid-cols-12">
+              <div class="sm:col-span-5">
+                <BaseInput
+                  :id="`part-name-${i}`"
+                  :name="`parts[${i}][name]`"
+                  placeholder="Part name"
+                  v-model="row.name"
+                />
+              </div>
+              <div class="sm:col-span-2">
+                <BaseInput
+                  :id="`part-qty-${i}`"
+                  :name="`parts[${i}][quantity]`"
+                  type="number"
+                  inputmode="numeric"
+                  min="1"
+                  step="1"
+                  placeholder="Qty"
+                  v-model="row.quantity"
+                />
+              </div>
+              <div class="sm:col-span-4">
+                <BaseInput
+                  :id="`part-notes-${i}`"
+                  :name="`parts[${i}][notes]`"
+                  placeholder="Notes"
+                  v-model="row.notes"
+                />
+              </div>
+              <div class="flex items-center sm:col-span-1">
+                <button type="button" class="text-xs text-red-700 hover:underline" @click="removePartRow(i)">
+                  Remove
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
 
-        <button
-          type="submit"
-          :disabled="processing || (subject === 'rig' && !boat.rig)"
-          class="inline-flex h-10 items-center justify-center rounded-md bg-zinc-900 px-4 text-sm font-medium text-white shadow-sm hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          Save entry
-        </button>
-      </Form>
+          <BaseButton type="submit" :disabled="processing || (subject === 'rig' && !boat.rig)">
+            Save entry
+          </BaseButton>
+        </Form>
+      </div>
     </div>
-    </div>
-  </div>
+  </BaseCard>
 </template>

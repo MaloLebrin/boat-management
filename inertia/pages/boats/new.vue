@@ -3,16 +3,18 @@ import { Form } from '@adonisjs/inertia/vue'
 import BoatFormHullFields from '~/components/boats/hull/BoatFormHullFields.vue'
 import { computed, ref } from 'vue'
 import type { PropulsionTypeUi } from '~/types/boat_form'
+import BaseButton from '~/components/base/BaseButton.vue'
+import BaseHeading from '~/components/base/BaseHeading.vue'
 
 const propulsionType = ref<PropulsionTypeUi>('')
 const showSailFields = computed(() => propulsionType.value === 'sailboat')
 </script>
 
 <template>
-  <div class="mx-auto w-full max-w-xl px-8 py-10">
-    <div>
-      <h1 class="text-3xl font-semibold tracking-tight text-zinc-900">New boat</h1>
-      <p class="mt-2 text-base text-zinc-600">Create a new boat in your organization</p>
+  <div class="mx-auto w-full max-w-xl px-6 py-10 sm:px-8">
+    <div class="space-y-2">
+      <BaseHeading level="1">New boat</BaseHeading>
+      <p class="text-base text-fg-muted">Create a new boat in your organization</p>
     </div>
 
     <div class="mt-8">
@@ -26,14 +28,10 @@ const showSailFields = computed(() => propulsionType.value === 'sailboat')
           />
 
           <div class="flex items-center gap-3">
-            <button
-              type="submit"
-              :disabled="processing"
-              class="inline-flex h-10 items-center justify-center rounded-md bg-zinc-900 px-4 text-sm font-medium text-white shadow-sm hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              Create
-            </button>
-            <a href="/boats" class="text-sm font-medium text-zinc-700 hover:underline">Cancel</a>
+            <BaseButton type="submit" :disabled="processing">Create</BaseButton>
+            <a href="/boats" class="text-sm font-semibold text-fg-muted hover:text-fg hover:underline">
+              Cancel
+            </a>
           </div>
         </div>
       </Form>

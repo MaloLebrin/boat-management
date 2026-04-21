@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import BaseButton from '~/components/base/BaseButton.vue'
+import BaseHeading from '~/components/base/BaseHeading.vue'
+
 defineProps<{
   boats: Array<{
     id: number
@@ -11,43 +14,40 @@ defineProps<{
 </script>
 
 <template>
-  <div class="mx-auto w-full max-w-5xl px-8 py-10">
+  <div class="mx-auto w-full max-w-5xl px-6 py-10 sm:px-8">
     <div class="flex items-center justify-between">
       <div>
-        <h1 class="text-3xl font-semibold tracking-tight text-zinc-900">Boats</h1>
-        <p class="mt-2 text-base text-zinc-600">All boats in your organization</p>
+        <BaseHeading level="1">Boats</BaseHeading>
+        <p class="mt-2 text-base text-fg-muted">All boats in your organization</p>
       </div>
-      <a
-        href="/boats/new"
-        class="inline-flex h-10 items-center justify-center rounded-md bg-zinc-900 px-4 text-sm font-medium text-white shadow-sm hover:bg-zinc-800"
-      >
-        New boat
+      <a href="/boats/new">
+        <BaseButton variant="primary">New boat</BaseButton>
       </a>
     </div>
 
-    <div class="mt-8 overflow-hidden rounded-lg border border-zinc-200 bg-white">
+    <div class="mt-8 overflow-hidden rounded-(--radius-card) border border-border bg-surface-elevated shadow-(--shadow-card)">
       <table class="w-full text-left text-sm">
-        <thead class="bg-zinc-50 text-zinc-700">
+        <thead class="bg-surface-muted text-fg-muted">
           <tr>
-            <th class="px-4 py-3 font-medium">Name</th>
-            <th class="px-4 py-3 font-medium">Registration</th>
-            <th class="px-4 py-3 font-medium">Type</th>
-            <th class="px-4 py-3 font-medium">Propulsion</th>
+            <th class="px-4 py-3 font-semibold">Name</th>
+            <th class="px-4 py-3 font-semibold">Registration</th>
+            <th class="px-4 py-3 font-semibold">Type</th>
+            <th class="px-4 py-3 font-semibold">Propulsion</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="boat in boats" :key="boat.id" class="border-t border-zinc-200">
+          <tr v-for="boat in boats" :key="boat.id" class="border-t border-border">
             <td class="px-4 py-3">
-              <a :href="`/boats/${boat.id}`" class="font-medium text-zinc-900 hover:underline">
+              <a :href="`/boats/${boat.id}`" class="font-semibold text-fg hover:underline">
                 {{ boat.name }}
               </a>
             </td>
-            <td class="px-4 py-3 text-zinc-700">{{ boat.registrationNumber ?? '—' }}</td>
-            <td class="px-4 py-3 text-zinc-700">{{ boat.type ?? '—' }}</td>
-            <td class="px-4 py-3 text-zinc-700">{{ boat.propulsionType ?? '—' }}</td>
+            <td class="px-4 py-3 text-fg-muted">{{ boat.registrationNumber ?? '—' }}</td>
+            <td class="px-4 py-3 text-fg-muted">{{ boat.type ?? '—' }}</td>
+            <td class="px-4 py-3 text-fg-muted">{{ boat.propulsionType ?? '—' }}</td>
           </tr>
           <tr v-if="boats.length === 0">
-            <td class="px-4 py-8 text-center text-zinc-600" colspan="4">
+            <td class="px-4 py-10 text-center text-fg-muted" colspan="4">
               No boats yet.
             </td>
           </tr>

@@ -14,12 +14,14 @@ withDefaults(
     modelValue?: OptionValue | ''
     disabled?: boolean
     placeholder?: string
-    options: Array<{ label: string; value: OptionValue }>
+    allowEmpty?: boolean
+    options: ReadonlyArray<{ label: string; value: OptionValue }>
   }>(),
   {
     modelValue: '',
     disabled: false,
     placeholder: 'Select…',
+    allowEmpty: false,
   }
 )
 
@@ -49,7 +51,7 @@ defineEmits<{
           )
         "
       >
-        <option value="" disabled>
+        <option value="" :disabled="!allowEmpty">
           {{ placeholder }}
         </option>
         <option v-for="opt in options" :key="String(opt.value)" :value="opt.value">
