@@ -81,6 +81,7 @@
     "@adonisjs/static": "^2.0.1",
     "@adonisjs/vite": "^5.1.0",
     "@inertiajs/vue3": "^2.3.18",
+    "@mistralai/mistralai": "^2.2.0",
     "@tuyau/core": "^1.2.2",
     "@vinejs/vine": "^4.3.1",
     "better-sqlite3": "^12.9.0",
