@@ -2,10 +2,17 @@
 import { Link } from '@adonisjs/inertia/vue';
 import brandIconUrl from '~/assets/brand/fleetide_ai_icon_C.svg?url';
 
+type AuthUser = {
+  id: number
+  email: string
+  fullName: string | null
+  initials: string
+}
+
 const props = defineProps<{
   isAuthed: boolean
   isSidebarOpen: boolean
-  user: User
+  user?: AuthUser
   openSidebar: () => void
 }>()
 </script>
