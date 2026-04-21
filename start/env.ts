@@ -35,4 +35,9 @@ export default await Env.create(new URL('../', import.meta.url), {
 
   // Queue
   QUEUE_DRIVER: Env.schema.enum(['sync', 'database', 'redis'] as const),
+
+  // AI
+  AI_PROVIDER: Env.schema.string(),
+  AI_MODEL: Env.schema.string.optional(),
+  MISTRAL_API_KEY: Env.schema.secret(),
 })

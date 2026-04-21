@@ -367,4 +367,16 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/session_controller').default['destroy']>>>
     }
   }
+  'ai.chat': {
+    methods: ["POST"]
+    pattern: '/ai/chat'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/ai_controller').default['chat']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/ai_controller').default['chat']>>>
+    }
+  }
 }

@@ -11,3 +11,4 @@
 import './routes/home.js'
 import './routes/boats.js'
 import './routes/auth.js'
+import './routes/ai.js'

@@ -34,6 +34,7 @@ export type ScannedRoutes = {
     'session.create': { paramsTuple?: []; params?: {} }
     'session.store': { paramsTuple?: []; params?: {} }
     'session.destroy': { paramsTuple?: []; params?: {} }
+    'ai.chat': { paramsTuple?: []; params?: {} }
   }
   GET: {
     'home': { paramsTuple?: []; params?: {} }
@@ -70,6 +71,7 @@ export type ScannedRoutes = {
     'new_account.store': { paramsTuple?: []; params?: {} }
     'session.store': { paramsTuple?: []; params?: {} }
     'session.destroy': { paramsTuple?: []; params?: {} }
+    'ai.chat': { paramsTuple?: []; params?: {} }
   }
   PUT: {
     'boats.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }

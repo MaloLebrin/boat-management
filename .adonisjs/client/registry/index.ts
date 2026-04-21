@@ -186,6 +186,12 @@ const routes = {
     tokens: [{"old":"/logout","type":0,"val":"logout","end":""}],
     types: placeholder as Registry['session.destroy']['types'],
   },
+  'ai.chat': {
+    methods: ["POST"],
+    pattern: '/ai/chat',
+    tokens: [{"old":"/ai/chat","type":0,"val":"ai","end":""},{"old":"/ai/chat","type":0,"val":"chat","end":""}],
+    types: placeholder as Registry['ai.chat']['types'],
+  },
 } as const satisfies Record<string, AdonisEndpoint>
 
 export { routes }

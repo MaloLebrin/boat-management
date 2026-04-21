@@ -44,4 +44,7 @@ export interface ApiDefinition {
     store: typeof routes['session.store']
     destroy: typeof routes['session.destroy']
   }
+  ai: {
+    chat: typeof routes['ai.chat']
+  }
 }
