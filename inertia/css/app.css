@@ -89,6 +89,22 @@
   --radius-card: 1rem;
   --radius-control: 0.5rem;
 
+  /* Motion tokens */
+  --motion-fast: 150ms;
+  --motion-normal: 220ms;
+  --motion-slow: 320ms;
+  --ease-premium: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* Rings */
+  --ring-focus: 0 0 0 4px rgb(60 184 162 / 0.22);
+  --ring-invalid: 0 0 0 4px rgb(232 93 93 / 0.18);
+
+  /* Elevation */
+  --shadow-xs: 0 1px 2px rgb(61 77 99 / 0.06);
+  --shadow-sm: 0 2px 10px -4px rgb(61 77 99 / 0.12), 0 1px 3px rgb(61 77 99 / 0.06);
+  --shadow-md: 0 10px 30px -16px rgb(61 77 99 / 0.2), 0 6px 12px -8px rgb(61 77 99 / 0.12);
+  --shadow-lg: 0 24px 64px -28px rgb(61 77 99 / 0.28), 0 16px 24px -20px rgb(61 77 99 / 0.18);
+
   --shadow-card: 0 4px 24px -4px rgb(61 77 99 / 0.07), 0 2px 8px -2px rgb(109 40 217 / 0.04);
   --shadow-card-hover: 0 12px 40px -8px rgb(61 77 99 / 0.1), 0 4px 12px -4px rgb(60 184 162 / 0.08);
 
@@ -111,6 +127,22 @@ body {
   font-family: var(--font-sans);
   color: var(--color-fg);
   -webkit-font-smoothing: antialiased;
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 1ms !important;
+    animation-duration: 1ms !important;
+  }
 }
 
 [x-cloak] {

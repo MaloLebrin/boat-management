@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { watch } from 'vue'
-import { usePage } from '@inertiajs/vue3'
-import { toast, Toaster } from 'vue-sonner'
+import { Form, Link } from '@adonisjs/inertia/vue'
 import type { Data } from '@generated/data'
-import { Link, Form } from '@adonisjs/inertia/vue'
+import { usePage } from '@inertiajs/vue3'
+import { watch } from 'vue'
+import { Toaster, toast } from 'vue-sonner'
 import BaseButton from '~/components/base/BaseButton.vue'
 
 const page = usePage<Data.SharedProps>()
@@ -29,11 +29,11 @@ watch(
 
 <template>
   <div
-    class="min-h-screen bg-gradient-to-br from-lilac-50 via-peach-50 to-mint-100 text-fg"
+    class="min-h-screen bg-linear-to-br from-lilac-50 via-peach-50 to-mint-100 text-fg"
   >
-    <header class="border-b border-border bg-surface-elevated/85 backdrop-blur-md">
-      <div class="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
-        <Link route="home" class="inline-flex items-center gap-3 text-fg hover:text-brand">
+    <header class="border-b backdrop-blur-md border-border bg-surface-elevated/85">
+      <div class="flex justify-between items-center px-6 mx-auto max-w-7xl h-16">
+        <Link route="home" class="inline-flex gap-3 items-center text-fg hover:text-brand">
           <svg
             width="66"
             height="24"
@@ -49,7 +49,7 @@ watch(
           <span class="sr-only">Home</span>
         </Link>
 
-        <nav class="flex items-center gap-3 sm:gap-4">
+        <nav class="flex gap-3 items-center sm:gap-4">
           <Link
             route="design_system"
             class="hidden text-sm font-medium text-fg-muted hover:text-brand sm:inline-flex"
@@ -57,6 +57,12 @@ watch(
             Design
           </Link>
           <template v-if="page.props.user">
+            <Link
+              route="home"
+              class="inline-flex h-9 items-center justify-center rounded-[var(--radius-control)] px-3 text-sm font-medium text-fg-muted hover:bg-surface-muted hover:text-fg"
+            >
+              Dashboard
+            </Link>
             <a
               href="/boats"
               class="inline-flex h-9 items-center justify-center rounded-[var(--radius-control)] px-3 text-sm font-medium text-fg-muted hover:bg-surface-muted hover:text-fg"
@@ -64,7 +70,7 @@ watch(
               Boats
             </a>
             <span
-              class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-surface-muted text-sm font-semibold text-fg-muted ring-1 ring-border"
+              class="inline-flex justify-center items-center w-9 h-9 text-sm font-semibold rounded-full ring-1 bg-surface-muted text-fg-muted ring-border"
             >
               {{ page.props.user.initials }}
             </span>
@@ -92,9 +98,9 @@ watch(
       </div>
     </header>
 
-    <main class="mx-auto w-full max-w-6xl px-6 py-10">
+    <main class="px-6 py-10 mx-auto w-full max-w-7xl">
       <div
-        class="rounded-[var(--radius-card)] border border-border bg-surface-elevated shadow-[var(--shadow-card)]"
+        class="rounded-(--radius-card) border border-border bg-surface-elevated shadow-(--shadow-card)"
       >
         <slot />
       </div>
