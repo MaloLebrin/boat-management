@@ -138,6 +138,24 @@ const routes = {
     tokens: [{"old":"/boats/:boatId/maintenance/:eventId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/maintenance/:eventId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/maintenance/:eventId","type":0,"val":"maintenance","end":""},{"old":"/boats/:boatId/maintenance/:eventId","type":1,"val":"eventId","end":""}],
     types: placeholder as Registry['boat_maintenances.destroy']['types'],
   },
+  'boats.maintenanceTasks.store': {
+    methods: ["POST"],
+    pattern: '/boats/:boatId/maintenance-tasks',
+    tokens: [{"old":"/boats/:boatId/maintenance-tasks","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/maintenance-tasks","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/maintenance-tasks","type":0,"val":"maintenance-tasks","end":""}],
+    types: placeholder as Registry['boats.maintenanceTasks.store']['types'],
+  },
+  'boats.maintenanceTasks.done': {
+    methods: ["PUT"],
+    pattern: '/boats/:boatId/maintenance-tasks/:taskId/done',
+    tokens: [{"old":"/boats/:boatId/maintenance-tasks/:taskId/done","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/maintenance-tasks/:taskId/done","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/maintenance-tasks/:taskId/done","type":0,"val":"maintenance-tasks","end":""},{"old":"/boats/:boatId/maintenance-tasks/:taskId/done","type":1,"val":"taskId","end":""},{"old":"/boats/:boatId/maintenance-tasks/:taskId/done","type":0,"val":"done","end":""}],
+    types: placeholder as Registry['boats.maintenanceTasks.done']['types'],
+  },
+  'boats.maintenanceTasks.destroy': {
+    methods: ["DELETE"],
+    pattern: '/boats/:boatId/maintenance-tasks/:taskId',
+    tokens: [{"old":"/boats/:boatId/maintenance-tasks/:taskId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/maintenance-tasks/:taskId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/maintenance-tasks/:taskId","type":0,"val":"maintenance-tasks","end":""},{"old":"/boats/:boatId/maintenance-tasks/:taskId","type":1,"val":"taskId","end":""}],
+    types: placeholder as Registry['boats.maintenanceTasks.destroy']['types'],
+  },
   'new_account.create': {
     methods: ["GET","HEAD"],
     pattern: '/signup',

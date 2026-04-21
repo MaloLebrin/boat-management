@@ -12,6 +12,11 @@ export interface ApiDefinition {
     edit: typeof routes['boats.edit']
     update: typeof routes['boats.update']
     destroy: typeof routes['boats.destroy']
+    maintenanceTasks: {
+      store: typeof routes['boats.maintenanceTasks.store']
+      done: typeof routes['boats.maintenanceTasks.done']
+      destroy: typeof routes['boats.maintenanceTasks.destroy']
+    }
   }
   boatEquipment: {
     storeEngine: typeof routes['boat_equipment.store_engine']

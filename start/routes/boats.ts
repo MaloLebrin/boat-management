@@ -28,5 +28,21 @@ router
 
     router.post('boats/:boatId/maintenance', [controllers.BoatMaintenances, 'store'])
     router.delete('boats/:boatId/maintenance/:eventId', [controllers.BoatMaintenances, 'destroy'])
+
+    router
+      .post('boats/:boatId/maintenance-tasks', [controllers.BoatMaintenanceTasks, 'store'])
+      .as('boats.maintenanceTasks.store')
+    router
+      .put('boats/:boatId/maintenance-tasks/:taskId/done', [
+        controllers.BoatMaintenanceTasks,
+        'markDone',
+      ])
+      .as('boats.maintenanceTasks.done')
+    router
+      .delete('boats/:boatId/maintenance-tasks/:taskId', [
+        controllers.BoatMaintenanceTasks,
+        'destroy',
+      ])
+      .as('boats.maintenanceTasks.destroy')
   })
   .use(middleware.auth())

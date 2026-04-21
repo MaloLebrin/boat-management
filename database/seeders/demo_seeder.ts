@@ -1,5 +1,6 @@
 import { BaseSeeder } from '@adonisjs/lucid/seeders'
 import BoatMaintenanceEvent from '#models/boat_maintenance_event'
+import BoatMaintenanceTask from '#models/boat_maintenance_task'
 import Boat from '#models/boat'
 import BoatService from '#services/boat_service'
 import BoatMaintenanceService from '#services/boat_maintenance_service'
@@ -161,6 +162,40 @@ export default class extends BaseSeeder {
         .first()
       if (exists) continue
 
+      // If legacy seed entry had a due date, it now becomes a planned task (not part of history)
+      if (e.dueAt) {
+        const engineId = e.subject === 'engine' ? (boat.engines[0]?.id ?? null) : null
+        const sailId = e.subject === 'sail' ? (boat.sails[0]?.id ?? null) : null
+        const rigId = e.subject === 'rig' ? (boat.rig?.id ?? null) : null
+
+        const existingTask = await BoatMaintenanceTask.query()
+          .where('boatId', boat.id)
+          .where('title', e.title)
+          .where('status', 'open')
+          .where('dueAt', e.dueAt)
+          .first()
+
+        if (!existingTask) {
+          await BoatMaintenanceTask.create({
+            boatId: boat.id,
+            subject: e.subject,
+            boatEngineId: engineId,
+            boatSailId: sailId,
+            boatRigId: rigId,
+            title: e.title,
+            notes: null,
+            status: 'open',
+            doneAt: null,
+            dueAt: DateTime.fromISO(e.dueAt),
+            recurrenceIntervalMonths: null,
+            dueEngineHours: null,
+            recurrenceIntervalEngineHours: null,
+            lastDoneEngineHours: null,
+            doneEngineHours: null,
+          })
+        }
+      }
+
       if (e.subject === 'engine') {
         const engine = boat.engines[0]
         await maintenanceService.createForBoat(user, boat, {
@@ -168,7 +203,6 @@ export default class extends BaseSeeder {
           boatEngineId: engine?.id ?? null,
           engineCaption: engine ? null : 'Outboard',
           performedAt: e.performedAt,
-          dueAt: e.dueAt,
           title: e.title,
         })
         continue
@@ -181,7 +215,6 @@ export default class extends BaseSeeder {
           boatSailId: sail?.id ?? null,
           sailCaption: sail ? null : 'Main',
           performedAt: e.performedAt,
-          dueAt: e.dueAt,
           title: e.title,
         })
         continue
@@ -193,7 +226,6 @@ export default class extends BaseSeeder {
           subject: 'rig',
           boatRigId: boat.rig.id,
           performedAt: e.performedAt,
-          dueAt: e.dueAt,
           title: e.title,
         })
         continue
@@ -202,7 +234,6 @@ export default class extends BaseSeeder {
       await maintenanceService.createForBoat(user, boat, {
         subject: 'boat',
         performedAt: e.performedAt,
-        dueAt: e.dueAt,
         title: e.title,
       })
     }

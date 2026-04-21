@@ -4,11 +4,12 @@ import BoatShowMaintenanceSection from '~/components/boats/maintenance/BoatShowM
 import BoatShowRigCard from '~/components/boats/rig/BoatShowRigCard.vue'
 import BoatShowSailsCard from '~/components/boats/sail/BoatShowSailsCard.vue'
 import BoatShowSpecsCard from '~/components/boats/hull/BoatShowSpecsCard.vue'
-import type { BoatShowDetail, MaintenanceEventRow } from '~/types/boat_show'
+import type { BoatShowDetail, MaintenanceEventRow, MaintenanceTaskRow } from '~/types/boat_show'
 
 defineProps<{
   boat: BoatShowDetail
   maintenanceEvents: MaintenanceEventRow[]
+  maintenanceTasks: MaintenanceTaskRow[]
   canManageMaintenance: boolean
   canManageEquipment: boolean
 }>()
@@ -49,6 +50,7 @@ defineProps<{
       <BoatShowMaintenanceSection
         :boat="boat"
         :maintenance-events="maintenanceEvents"
+        :maintenance-tasks="maintenanceTasks"
         :can-manage-maintenance="canManageMaintenance"
       />
     </div>

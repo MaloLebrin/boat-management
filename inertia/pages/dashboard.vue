@@ -19,8 +19,10 @@ type UrgentMaintenanceRow = {
   boatName: string
   subject: string
   title: string
-  dueAt: string
-  performedAt: string
+  kind: 'date' | 'hours'
+  dueAt: string | null
+  dueEngineHours: number | null
+  currentEngineHours: number | null
 }
 
 defineProps<{
@@ -101,15 +103,23 @@ function isOverdue(dueAtIso: string) {
               <div
                 class="shrink-0 rounded-full px-2 py-1 text-xs font-semibold"
                 :class="
-                  isOverdue(ev.dueAt)
+                  ev.kind === 'date' && ev.dueAt && isOverdue(ev.dueAt)
                     ? 'bg-danger/10 text-danger ring-1 ring-danger/20'
-                    : 'bg-amber-500/10 text-amber-800 ring-1 ring-amber-500/20'
+                    : ev.kind === 'date'
+                      ? 'bg-amber-500/10 text-amber-800 ring-1 ring-amber-500/20'
+                      : 'bg-sky-500/10 text-sky-800 ring-1 ring-sky-500/20'
                 "
               >
-                {{ isOverdue(ev.dueAt) ? 'Overdue' : 'Due soon' }}
+                <span v-if="ev.kind === 'date'">
+                  {{ ev.dueAt && isOverdue(ev.dueAt) ? 'Overdue' : 'Due soon' }}
+                </span>
+                <span v-else>Hours</span>
               </div>
             </div>
-            <p class="mt-2 text-xs text-fg-subtle">Due {{ ev.dueAt }} · last done {{ ev.performedAt }}</p>
+            <p v-if="ev.kind === 'date'" class="mt-2 text-xs text-fg-subtle">Due {{ ev.dueAt }}</p>
+            <p v-else class="mt-2 text-xs text-fg-subtle">
+              Due at {{ ev.dueEngineHours }}h · current {{ ev.currentEngineHours }}h
+            </p>
           </li>
         </ul>
       </BaseCard>

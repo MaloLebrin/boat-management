@@ -37,7 +37,6 @@ export default class BoatMaintenancesController {
         engineCaption: payload.engineCaption ?? null,
         sailCaption: payload.sailCaption ?? null,
         performedAt: payload.performedAt,
-        dueAt: payload.dueAt ?? null,
         title: payload.title,
         notes: payload.notes ?? null,
         parts: payload.parts,

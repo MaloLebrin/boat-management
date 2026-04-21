@@ -21,7 +21,7 @@ const showSailFields = computed(() => propulsionType.value === 'sailboat')
     </div>
 
     <div class="mt-8">
-      <Form :action="`/boats/${boat.id}`" method="put" #default="{ processing, errors }">
+      <Form :action="{ url: `/boats/${boat.id}`, method: 'put' }" #default="{ processing, errors }">
         <div class="space-y-6">
           <BoatFormHullFields
             v-model:propulsion-type="propulsionType"
@@ -46,7 +46,11 @@ const showSailFields = computed(() => propulsionType.value === 'sailboat')
         </div>
       </Form>
 
-      <Form :action="`/boats/${boat.id}`" method="delete" class="mt-6 flex justify-end" #default="{ processing: deleting }">
+      <Form
+        :action="{ url: `/boats/${boat.id}`, method: 'delete' }"
+        class="mt-6 flex justify-end"
+        #default="{ processing: deleting }"
+      >
         <button
           type="submit"
           :disabled="deleting"

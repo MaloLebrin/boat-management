@@ -5,6 +5,7 @@
 
 export const controllers = {
   BoatEquipment: () => import('#controllers/boat_equipment_controller'),
+  BoatMaintenanceTasks: () => import('#controllers/boat_maintenance_tasks_controller'),
   BoatMaintenances: () => import('#controllers/boat_maintenances_controller'),
   Boats: () => import('#controllers/boats_controller'),
   Home: () => import('#controllers/home_controller'),

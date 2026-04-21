@@ -62,7 +62,17 @@ export default class BoatEquipmentController {
 
     return inertia.render('boats/engine_edit', {
       boat: { id: boat.id, name: boat.name },
-      engine,
+      engine: {
+        id: engine.id,
+        kind: engine.kind,
+        fuel: engine.fuel,
+        brand: engine.brand,
+        model: engine.model,
+        serialNumber: engine.serialNumber,
+        manufacturedAt: engine.manufacturedAt ? engine.manufacturedAt.toISODate() : null,
+        powerHp: engine.powerHp,
+        hours: engine.hours,
+      },
     })
   }
 
@@ -151,7 +161,14 @@ export default class BoatEquipmentController {
 
     return inertia.render('boats/sail_edit', {
       boat: { id: boat.id, name: boat.name },
-      sail,
+      sail: {
+        id: sail.id,
+        sailType: sail.sailType,
+        manufacturedAt: sail.manufacturedAt ? sail.manufacturedAt.toISODate() : null,
+        areaM2: sail.areaM2,
+        material: sail.material,
+        reefPoints: sail.reefPoints,
+      },
     })
   }
 
@@ -218,7 +235,15 @@ export default class BoatEquipmentController {
 
     return inertia.render('boats/rig_edit', {
       boat: { id: boat.id, name: boat.name },
-      rig: boat.rig,
+      rig: boat.rig
+        ? {
+            id: boat.rig.id,
+            rigType: boat.rig.rigType,
+            manufacturedAt: boat.rig.manufacturedAt ? boat.rig.manufacturedAt.toISODate() : null,
+            mastCount: boat.rig.mastCount,
+            spreaders: boat.rig.spreaders,
+          }
+        : null,
     })
   }
 

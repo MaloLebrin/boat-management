@@ -1,6 +1,8 @@
 import Boat from '#models/boat'
-import BoatMaintenanceEvent from '#models/boat_maintenance_event'
+import BoatEngine from '#models/boat_engine'
+import BoatMaintenanceTask from '#models/boat_maintenance_task'
 import type User from '#models/user'
+import db from '@adonisjs/lucid/services/db'
 import { DateTime } from 'luxon'
 
 export type DashboardBoatSummary = {
@@ -18,8 +20,10 @@ export type DashboardUrgentMaintenanceRow = {
   boatName: string
   subject: string
   title: string
-  dueAt: string
-  performedAt: string
+  kind: 'date' | 'hours'
+  dueAt: string | null
+  dueEngineHours: number | null
+  currentEngineHours: number | null
 }
 
 export type DashboardStats = {
@@ -35,6 +39,7 @@ export default class DashboardService {
     user: User,
     opts?: {
       urgentWithinDays?: number
+      urgentWithinEngineHours?: number
       urgentLimit?: number
     }
   ): Promise<{
@@ -51,6 +56,7 @@ export default class DashboardService {
     }
 
     const urgentWithinDays = opts?.urgentWithinDays ?? 14
+    const urgentWithinEngineHours = opts?.urgentWithinEngineHours ?? 10
     const urgentLimit = opts?.urgentLimit ?? 10
 
     const boats = await Boat.query()
@@ -77,25 +83,105 @@ export default class DashboardService {
       urgentMaintenance: 0,
     }
 
-    const threshold = DateTime.now().startOf('day').plus({ days: urgentWithinDays })
+    const thresholdDate = DateTime.now().startOf('day').plus({ days: urgentWithinDays })
 
-    const urgentEvents = await BoatMaintenanceEvent.query()
-      .whereNotNull('dueAt')
-      .where('dueAt', '<=', threshold.toISODate()!)
+    const openTasks = await BoatMaintenanceTask.query()
+      .where('status', 'open')
       .whereHas('boat', (q) => q.where('organizationId', user.organizationId!))
+      .where((q) => {
+        q.where((q2) => q2.whereNotNull('dueAt').where('dueAt', '<=', thresholdDate.toISODate()!))
+        q.orWhereNotNull('dueEngineHours')
+      })
       .preload('boat')
       .orderBy('dueAt', 'asc')
-      .limit(urgentLimit)
+      .orderBy('id', 'desc')
+      .limit(urgentLimit * 3) // we filter hours-based in-memory
 
-    const urgentMaintenance: DashboardUrgentMaintenanceRow[] = urgentEvents.map((ev) => ({
-      id: ev.id,
-      boatId: ev.boatId,
-      boatName: ev.boat?.name ?? `#${ev.boatId}`,
-      subject: ev.subject,
-      title: ev.title,
-      dueAt: ev.dueAt!.toISODate()!,
-      performedAt: ev.performedAt.toISODate()!,
-    }))
+    const engineIds = Array.from(
+      new Set(
+        openTasks.map((t) => t.boatEngineId).filter((id): id is number => typeof id === 'number')
+      )
+    )
+
+    const engines = engineIds.length
+      ? await BoatEngine.query().whereIn('id', engineIds).select(['id', 'hours'])
+      : []
+
+    const maxDoneByEngine =
+      engineIds.length === 0
+        ? new Map<number, number>()
+        : new Map(
+            (
+              await db
+                .from('boat_maintenance_tasks')
+                .where('status', 'done')
+                .whereIn('boat_engine_id', engineIds)
+                .whereNotNull('done_engine_hours')
+                .groupBy('boat_engine_id')
+                .select('boat_engine_id as boatEngineId')
+                .max('done_engine_hours as maxDone')
+            ).map((r: any) => [Number(r.boatEngineId), Number(r.maxDone)])
+          )
+
+    const engineHoursNow = new Map<number, number | null>()
+    for (const e of engines) {
+      const fallback = maxDoneByEngine.get(e.id)
+      const current =
+        e.hours ?? (fallback === undefined || Number.isNaN(fallback) ? null : fallback)
+      engineHoursNow.set(e.id, current)
+    }
+
+    const urgentMaintenance: DashboardUrgentMaintenanceRow[] = []
+
+    for (const task of openTasks) {
+      if (urgentMaintenance.length >= urgentLimit) break
+
+      if (task.dueAt) {
+        urgentMaintenance.push({
+          id: task.id,
+          boatId: task.boatId,
+          boatName: task.boat?.name ?? `#${task.boatId}`,
+          subject: task.subject,
+          title: task.title,
+          kind: 'date',
+          dueAt: task.dueAt.toISODate()!,
+          dueEngineHours: null,
+          currentEngineHours: null,
+        })
+        continue
+      }
+
+      if (task.dueEngineHours !== null && task.boatEngineId) {
+        const current = engineHoursNow.get(task.boatEngineId) ?? null
+        if (current === null) continue
+
+        const remaining = task.dueEngineHours - current
+        if (remaining <= urgentWithinEngineHours) {
+          urgentMaintenance.push({
+            id: task.id,
+            boatId: task.boatId,
+            boatName: task.boat?.name ?? `#${task.boatId}`,
+            subject: task.subject,
+            title: task.title,
+            kind: 'hours',
+            dueAt: null,
+            dueEngineHours: task.dueEngineHours,
+            currentEngineHours: current,
+          })
+        }
+      }
+    }
+
+    urgentMaintenance.sort((a, b) => {
+      if (a.kind !== b.kind) return a.kind === 'date' ? -1 : 1
+      if (a.kind === 'date' && b.kind === 'date') {
+        return (a.dueAt ?? '').localeCompare(b.dueAt ?? '')
+      }
+      // hours: sort by remaining asc
+      const ar = (a.dueEngineHours ?? 0) - (a.currentEngineHours ?? 0)
+      const br = (b.dueEngineHours ?? 0) - (b.currentEngineHours ?? 0)
+      return ar - br
+    })
 
     stats.urgentMaintenance = urgentMaintenance.length
 

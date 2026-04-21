@@ -18,9 +18,21 @@ export default await Env.create(new URL('../', import.meta.url), {
   HOST: Env.schema.string({ format: 'host' }),
   LOG_LEVEL: Env.schema.string(),
 
+  // Database (PostgreSQL)
+  DB_HOST: Env.schema.string({ format: 'host' }),
+  DB_PORT: Env.schema.number(),
+  DB_USER: Env.schema.string(),
+  DB_PASSWORD: Env.schema.string(),
+  DB_DATABASE: Env.schema.string(),
+
   // App
+  APP_NAME: Env.schema.string(),
   APP_KEY: Env.schema.secret(),
+  APP_URL: Env.schema.string(),
 
   // Session
   SESSION_DRIVER: Env.schema.enum(['cookie', 'memory', 'database'] as const),
+
+  // Queue
+  QUEUE_DRIVER: Env.schema.enum(['sync', 'database', 'redis'] as const),
 })

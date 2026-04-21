@@ -18,8 +18,7 @@ defineProps<{
 
     <div class="mt-8">
       <Form
-        :action="`/boats/${boat.id}/engines/${engine.id}`"
-        method="put"
+        :action="{ url: `/boats/${boat.id}/engines/${engine.id}`, method: 'put' }"
         #default="{ processing, errors }"
       >
         <div class="space-y-6 rounded-lg border border-zinc-200 bg-white p-4">

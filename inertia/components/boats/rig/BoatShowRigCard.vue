@@ -19,8 +19,7 @@ defineProps<{
         </a>
         <Form
           v-if="rig"
-          :action="`/boats/${boatId}/rig`"
-          method="delete"
+          :action="{ url: `/boats/${boatId}/rig`, method: 'delete' }"
           #default="{ processing }"
           class="inline"
         >

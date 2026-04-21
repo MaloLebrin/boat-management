@@ -41,8 +41,7 @@ function performedDisplay(iso: string | null) {
               Edit
             </a>
             <Form
-              :action="`/boats/${boatId}/sails/${s.id}`"
-              method="delete"
+              :action="{ url: `/boats/${boatId}/sails/${s.id}`, method: 'delete' }"
               #default="{ processing }"
               class="inline"
             >
@@ -61,7 +60,11 @@ function performedDisplay(iso: string | null) {
 
     <div v-if="canManage" class="mt-6 border-t border-zinc-100 pt-4">
       <h3 class="text-xs font-semibold uppercase tracking-wide text-zinc-600">Add sail</h3>
-      <Form :action="`/boats/${boatId}/sails`" method="post" class="mt-3" #default="{ processing, errors }">
+      <Form
+        :action="{ url: `/boats/${boatId}/sails`, method: 'post' }"
+        class="mt-3"
+        #default="{ processing, errors }"
+      >
         <BoatEquipmentSailFields :errors="errors" />
         <button
           type="submit"

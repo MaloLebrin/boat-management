@@ -127,6 +127,66 @@ export class BoatMaintenancePartSchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class BoatMaintenanceTaskSchema extends BaseModel {
+  static $columns = [
+    'boatEngineId',
+    'boatId',
+    'boatRigId',
+    'boatSailId',
+    'createdAt',
+    'doneAt',
+    'doneEngineHours',
+    'dueAt',
+    'dueEngineHours',
+    'id',
+    'lastDoneEngineHours',
+    'notes',
+    'recurrenceIntervalEngineHours',
+    'recurrenceIntervalMonths',
+    'status',
+    'subject',
+    'title',
+    'updatedAt',
+  ] as const
+  $columns = BoatMaintenanceTaskSchema.$columns
+  @column()
+  declare boatEngineId: number | null
+  @column()
+  declare boatId: number
+  @column()
+  declare boatRigId: number | null
+  @column()
+  declare boatSailId: number | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column.date()
+  declare doneAt: DateTime | null
+  @column()
+  declare doneEngineHours: number | null
+  @column.date()
+  declare dueAt: DateTime | null
+  @column()
+  declare dueEngineHours: number | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare lastDoneEngineHours: number | null
+  @column()
+  declare notes: string | null
+  @column()
+  declare recurrenceIntervalEngineHours: number | null
+  @column()
+  declare recurrenceIntervalMonths: number | null
+  @column()
+  declare status: string
+  @column()
+  declare subject: string
+  @column()
+  declare title: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class BoatRigSchema extends BaseModel {
   static $columns = [
     'boatId',

@@ -271,6 +271,42 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_maintenances_controller').default['destroy']>>>
     }
   }
+  'boats.maintenanceTasks.store': {
+    methods: ["POST"]
+    pattern: '/boats/:boatId/maintenance-tasks'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/boat_maintenance_task').createBoatMaintenanceTaskValidator)>>
+      paramsTuple: [ParamValue]
+      params: { boatId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/boat_maintenance_task').createBoatMaintenanceTaskValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_maintenance_tasks_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_maintenance_tasks_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'boats.maintenanceTasks.done': {
+    methods: ["PUT"]
+    pattern: '/boats/:boatId/maintenance-tasks/:taskId/done'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/boat_maintenance_task').markBoatMaintenanceTaskDoneValidator)>>
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; taskId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/boat_maintenance_task').markBoatMaintenanceTaskDoneValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_maintenance_tasks_controller').default['markDone']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_maintenance_tasks_controller').default['markDone']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'boats.maintenanceTasks.destroy': {
+    methods: ["DELETE"]
+    pattern: '/boats/:boatId/maintenance-tasks/:taskId'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; taskId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_maintenance_tasks_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_maintenance_tasks_controller').default['destroy']>>>
+    }
+  }
   'new_account.create': {
     methods: ["GET","HEAD"]
     pattern: '/signup'

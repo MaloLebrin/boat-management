@@ -45,7 +45,6 @@ export type CreateMaintenancePayload = {
   engineCaption?: string | null
   sailCaption?: string | null
   performedAt: Date | string | DateTime
-  dueAt?: Date | string | DateTime | null
   title: string
   notes?: string | null
   parts?: Array<{ name?: string | null; quantity?: string | null; notes?: string | null }>
@@ -130,7 +129,6 @@ export default class BoatMaintenanceService {
     }
 
     const notes = payload.notes?.trim() ? payload.notes.trim() : null
-    const dueAt = payload.dueAt ? toDateTime(payload.dueAt) : null
 
     return await db.transaction(async (trx) => {
       const event = await BoatMaintenanceEvent.create(
@@ -143,7 +141,6 @@ export default class BoatMaintenanceService {
           engineCaption,
           sailCaption,
           performedAt: toDateTime(payload.performedAt),
-          dueAt,
           title: payload.title.trim(),
           notes,
         },

@@ -16,7 +16,7 @@ const showSailFields = computed(() => propulsionType.value === 'sailboat')
     </div>
 
     <div class="mt-8">
-      <Form method="post" action="/boats" #default="{ processing, errors }">
+      <Form :action="{ url: '/boats', method: 'post' }" #default="{ processing, errors }">
         <div class="space-y-6">
           <BoatFormHullFields
             v-model:propulsion-type="propulsionType"

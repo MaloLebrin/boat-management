@@ -19,7 +19,7 @@ defineProps<{
     </div>
 
     <div class="mt-8">
-      <Form :action="`/boats/${boat.id}/rig`" method="put" #default="{ processing, errors }">
+      <Form :action="{ url: `/boats/${boat.id}/rig`, method: 'put' }" #default="{ processing, errors }">
         <div class="space-y-6 rounded-lg border border-zinc-200 bg-white p-4">
           <BoatEquipmentRigFields :errors="errors" :rig="rig" />
           <div class="flex items-center gap-3">

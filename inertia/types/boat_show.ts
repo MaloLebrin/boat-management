@@ -68,3 +68,18 @@ export type MaintenanceEventRow = {
   boatRigId: number | null
   parts: MaintenancePartRow[]
 }
+
+export type MaintenanceTaskRow = {
+  id: number
+  subject: string
+  title: string
+  notes: string | null
+  status: 'open' | 'done'
+  dueAt: string | null
+  dueEngineHours: number | null
+  boatEngineId: number | null
+  boatSailId: number | null
+  boatRigId: number | null
+  recurrenceIntervalMonths: number | null
+  recurrenceIntervalEngineHours: number | null
+}

@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { Form } from '@adonisjs/inertia/vue'
 import { computed, ref, watch } from 'vue'
-import type { BoatShowDetail, MaintenanceEventRow } from '~/types/boat_show'
+import type { BoatShowDetail, MaintenanceEventRow, MaintenanceTaskRow } from '~/types/boat_show'
 
 const props = defineProps<{
   boat: BoatShowDetail
   maintenanceEvents: MaintenanceEventRow[]
+  maintenanceTasks: MaintenanceTaskRow[]
   canManageMaintenance: boolean
 }>()
 
@@ -16,11 +17,27 @@ const engineCaptionManual = ref('')
 const sailCaptionManual = ref('')
 const partRows = ref<Array<{ name: string; quantity: string; notes: string }>>([])
 
+// task form
+const taskSubject = ref<'boat' | 'engine' | 'sail' | 'rig'>('boat')
+const taskBoatEngineId = ref<string>('')
+const taskBoatSailId = ref<string>('')
+const taskDueAt = ref('')
+const taskRecurrenceMonths = ref('')
+const taskDueEngineHours = ref('')
+const taskRecurrenceEngineHours = ref('')
+
 watch(subject, () => {
   boatEngineId.value = ''
   boatSailId.value = ''
   engineCaptionManual.value = ''
   sailCaptionManual.value = ''
+})
+
+watch(taskSubject, () => {
+  taskBoatEngineId.value = ''
+  taskBoatSailId.value = ''
+  taskDueEngineHours.value = ''
+  taskRecurrenceEngineHours.value = ''
 })
 
 function addPartRow() {
@@ -61,14 +78,254 @@ function performedDisplay(iso: string) {
 }
 
 const canSubmitRig = computed(() => props.boat.rig !== null)
+const openTasks = computed(() => props.maintenanceTasks.filter((t) => t.status === 'open'))
 </script>
 
 <template>
   <div class="rounded-lg border border-zinc-200 bg-white p-4">
-    <h2 class="text-sm font-semibold text-zinc-900">Maintenance history</h2>
-    <p class="mt-1 text-sm text-zinc-600">
-      Work done on the hull, an engine, a sail, or the rig, with replaced parts.
-    </p>
+    <h2 class="text-sm font-semibold text-zinc-900">Planned maintenance</h2>
+    <p class="mt-1 text-sm text-zinc-600">Open tasks (date-based and engine-hour based).</p>
+
+    <div v-if="openTasks.length === 0" class="mt-4 text-sm text-zinc-600">No planned tasks.</div>
+    <ul v-else class="mt-4 space-y-3">
+      <li v-for="t in openTasks" :key="t.id" class="rounded-md border border-zinc-200 p-3 text-sm">
+        <div class="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <p class="font-medium text-zinc-900">{{ t.title }}</p>
+            <p class="text-zinc-600">{{ subjectLabel(t.subject) }}</p>
+            <p v-if="t.dueAt" class="mt-1 text-xs text-zinc-600">Due {{ t.dueAt }}</p>
+            <p v-else-if="t.dueEngineHours !== null" class="mt-1 text-xs text-zinc-600">
+              Due at {{ t.dueEngineHours }}h
+            </p>
+            <p v-if="t.notes" class="mt-2 text-zinc-700">{{ t.notes }}</p>
+          </div>
+
+          <div v-if="canManageMaintenance" class="flex items-center gap-3">
+            <Form
+              v-if="t.dueEngineHours !== null"
+              :action="{ url: `/boats/${boat.id}/maintenance-tasks/${t.id}/done`, method: 'put' }"
+              class="flex items-center gap-2"
+              #default="{ processing }"
+            >
+              <input
+                type="number"
+                min="0"
+                step="1"
+                name="doneEngineHours"
+                required
+                placeholder="Done @ hours"
+                class="h-9 w-32 rounded-md border border-zinc-300 bg-white px-2 text-sm"
+              />
+              <button
+                type="submit"
+                :disabled="processing"
+                class="text-xs font-medium text-zinc-900 hover:underline disabled:opacity-50"
+              >
+                Mark done
+              </button>
+            </Form>
+
+            <Form
+              v-else
+              :action="{ url: `/boats/${boat.id}/maintenance-tasks/${t.id}/done`, method: 'put' }"
+              #default="{ processing }"
+            >
+              <button
+                type="submit"
+                :disabled="processing"
+                class="text-xs font-medium text-zinc-900 hover:underline disabled:opacity-50"
+              >
+                Mark done
+              </button>
+            </Form>
+
+            <Form
+              :action="{ url: `/boats/${boat.id}/maintenance-tasks/${t.id}`, method: 'delete' }"
+              #default="{ processing }"
+            >
+              <button
+                type="submit"
+                :disabled="processing"
+                class="text-xs font-medium text-red-700 hover:underline disabled:opacity-50"
+              >
+                Delete
+              </button>
+            </Form>
+          </div>
+        </div>
+      </li>
+    </ul>
+
+    <div v-if="canManageMaintenance" class="mt-6 border-t border-zinc-100 pt-6">
+      <h3 class="text-sm font-medium text-zinc-900">Add task</h3>
+      <Form
+        :action="{ url: `/boats/${boat.id}/maintenance-tasks`, method: 'post' }"
+        class="mt-4 space-y-4"
+        #default="{ processing, errors }"
+      >
+        <div>
+          <label class="mb-1 block text-sm font-medium text-zinc-800" for="task-subject">Subject</label>
+          <select
+            id="task-subject"
+            v-model="taskSubject"
+            name="subject"
+            class="h-10 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm shadow-sm focus:border-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900/10"
+          >
+            <option value="boat">Whole boat</option>
+            <option value="engine">Engine</option>
+            <option value="sail">Sail</option>
+            <option value="rig" :disabled="!canSubmitRig">Rig</option>
+          </select>
+          <p v-if="errors.subject" class="mt-1 text-sm text-red-600">{{ errors.subject }}</p>
+        </div>
+
+        <template v-if="taskSubject === 'engine'">
+          <div v-if="boat.engines.length">
+            <label class="mb-1 block text-sm font-medium text-zinc-800" for="task-engine">Engine</label>
+            <select
+              id="task-engine"
+              v-model="taskBoatEngineId"
+              name="boatEngineId"
+              class="h-10 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm shadow-sm focus:border-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900/10"
+            >
+              <option value="">— Select —</option>
+              <option v-for="e in boat.engines" :key="e.id" :value="String(e.id)">
+                {{ e.kind }} · {{ e.brand ?? '' }} {{ e.model ?? '' }}
+              </option>
+            </select>
+            <p v-if="errors.boatEngineId" class="mt-1 text-sm text-red-600">{{ errors.boatEngineId }}</p>
+          </div>
+
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div>
+              <label class="mb-1 block text-sm font-medium text-zinc-800" for="task-due-hours">Due hours</label>
+              <input
+                id="task-due-hours"
+                v-model="taskDueEngineHours"
+                type="number"
+                min="0"
+                step="1"
+                name="dueEngineHours"
+                class="h-10 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm shadow-sm"
+              />
+              <p v-if="errors.dueEngineHours" class="mt-1 text-sm text-red-600">{{ errors.dueEngineHours }}</p>
+            </div>
+            <div>
+              <label class="mb-1 block text-sm font-medium text-zinc-800" for="task-recur-hours">
+                Recurrence hours
+              </label>
+              <input
+                id="task-recur-hours"
+                v-model="taskRecurrenceEngineHours"
+                type="number"
+                min="0"
+                step="1"
+                name="recurrenceIntervalEngineHours"
+                class="h-10 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm shadow-sm"
+              />
+              <p v-if="errors.recurrenceIntervalEngineHours" class="mt-1 text-sm text-red-600">
+                {{ errors.recurrenceIntervalEngineHours }}
+              </p>
+            </div>
+          </div>
+        </template>
+
+        <template v-if="taskSubject === 'sail'">
+          <div v-if="boat.sails.length">
+            <label class="mb-1 block text-sm font-medium text-zinc-800" for="task-sail">Sail</label>
+            <select
+              id="task-sail"
+              v-model="taskBoatSailId"
+              name="boatSailId"
+              class="h-10 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm shadow-sm focus:border-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900/10"
+            >
+              <option value="">— Select —</option>
+              <option v-for="s in boat.sails" :key="s.id" :value="String(s.id)">
+                {{ s.sailType }}<span v-if="s.areaM2 !== null"> · {{ s.areaM2 }} m²</span>
+              </option>
+            </select>
+            <p v-if="errors.boatSailId" class="mt-1 text-sm text-red-600">{{ errors.boatSailId }}</p>
+          </div>
+        </template>
+
+        <template v-if="taskSubject === 'rig'">
+          <input v-if="boat.rig" type="hidden" name="boatRigId" :value="boat.rig.id" />
+          <p v-if="!boat.rig" class="text-sm text-amber-800">Save a rig on this boat before planning rig tasks.</p>
+          <p v-if="errors.boatRigId" class="mt-1 text-sm text-red-600">{{ errors.boatRigId }}</p>
+        </template>
+
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div>
+            <label class="mb-1 block text-sm font-medium text-zinc-800" for="task-due-at">
+              Due date <span class="font-normal text-zinc-500">(optional)</span>
+            </label>
+            <input
+              id="task-due-at"
+              v-model="taskDueAt"
+              type="date"
+              name="dueAt"
+              class="h-10 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm shadow-sm"
+            />
+            <p v-if="errors.dueAt" class="mt-1 text-sm text-red-600">{{ errors.dueAt }}</p>
+          </div>
+          <div>
+            <label class="mb-1 block text-sm font-medium text-zinc-800" for="task-recur-months">
+              Recurrence months
+            </label>
+            <input
+              id="task-recur-months"
+              v-model="taskRecurrenceMonths"
+              type="number"
+              min="0"
+              step="1"
+              name="recurrenceIntervalMonths"
+              class="h-10 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm shadow-sm"
+            />
+            <p v-if="errors.recurrenceIntervalMonths" class="mt-1 text-sm text-red-600">
+              {{ errors.recurrenceIntervalMonths }}
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <label class="mb-1 block text-sm font-medium text-zinc-800" for="task-title">Title</label>
+          <input
+            id="task-title"
+            type="text"
+            name="title"
+            required
+            class="h-10 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm shadow-sm focus:border-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900/10"
+            placeholder="e.g. Oil change, inspect rigging"
+          />
+          <p v-if="errors.title" class="mt-1 text-sm text-red-600">{{ errors.title }}</p>
+        </div>
+
+        <div>
+          <label class="mb-1 block text-sm font-medium text-zinc-800" for="task-notes">Notes</label>
+          <textarea
+            id="task-notes"
+            name="notes"
+            rows="3"
+            class="w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900/10"
+          />
+          <p v-if="errors.notes" class="mt-1 text-sm text-red-600">{{ errors.notes }}</p>
+        </div>
+
+        <button
+          type="submit"
+          :disabled="processing || (taskSubject === 'rig' && !boat.rig)"
+          class="inline-flex h-10 items-center justify-center rounded-md bg-zinc-900 px-4 text-sm font-medium text-white shadow-sm hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          Create task
+        </button>
+      </Form>
+    </div>
+
+    <div class="mt-10 border-t border-zinc-100 pt-8">
+      <h2 class="text-sm font-semibold text-zinc-900">Maintenance history</h2>
+      <p class="mt-1 text-sm text-zinc-600">
+        Work done on the hull, an engine, a sail, or the rig, with replaced parts.
+      </p>
 
     <div v-if="maintenanceEvents.length === 0" class="mt-4 text-sm text-zinc-600">No entries yet.</div>
     <ul v-else class="mt-4 space-y-4">
@@ -91,8 +348,7 @@ const canSubmitRig = computed(() => props.boat.rig !== null)
           </div>
           <Form
             v-if="canManageMaintenance"
-            :action="`/boats/${boat.id}/maintenance/${ev.id}`"
-            method="delete"
+            :action="{ url: `/boats/${boat.id}/maintenance/${ev.id}`, method: 'delete' }"
             #default="{ processing }"
           >
             <button
@@ -110,8 +366,7 @@ const canSubmitRig = computed(() => props.boat.rig !== null)
     <div v-if="canManageMaintenance" class="mt-6 border-t border-zinc-100 pt-6">
       <h3 class="text-sm font-medium text-zinc-900">Add entry</h3>
       <Form
-        :action="`/boats/${boat.id}/maintenance`"
-        method="post"
+        :action="{ url: `/boats/${boat.id}/maintenance`, method: 'post' }"
         class="mt-4 space-y-4"
         #default="{ processing, errors }"
       >
@@ -216,19 +471,6 @@ const canSubmitRig = computed(() => props.boat.rig !== null)
         </div>
 
         <div>
-          <label class="mb-1 block text-sm font-medium text-zinc-800" for="maint-due-at">
-            Due date <span class="font-normal text-zinc-500">(optional)</span>
-          </label>
-          <input
-            id="maint-due-at"
-            type="date"
-            name="dueAt"
-            class="h-10 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm shadow-sm focus:border-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900/10"
-          />
-          <p v-if="errors.dueAt" class="mt-1 text-sm text-red-600">{{ errors.dueAt }}</p>
-        </div>
-
-        <div>
           <label class="mb-1 block text-sm font-medium text-zinc-800" for="maint-title">Title</label>
           <input
             id="maint-title"
@@ -309,6 +551,7 @@ const canSubmitRig = computed(() => props.boat.rig !== null)
           Save entry
         </button>
       </Form>
+    </div>
     </div>
   </div>
 </template>
