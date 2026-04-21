@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import BaseField from '~/components/base/BaseField.vue'
 import { inputClass } from '~/utils/form_styles'
+import { computed, useSlots } from 'vue'
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     label?: string
     hint?: string
@@ -25,25 +26,35 @@ withDefaults(
 defineEmits<{
   (e: 'update:modelValue', value: string): void
 }>()
+
+const slots = useSlots()
+const hasTrailing = computed(() => Boolean(slots.trailing))
+const inputPaddingClass = computed(() => (hasTrailing.value ? 'pr-24' : ''))
 </script>
 
 <template>
   <BaseField :label="label" :hint="hint" :error="error" :html-for="id">
-    <input
-      :id="id"
-      :name="name"
-      :type="type"
-      :autocomplete="autocomplete"
-      :placeholder="placeholder"
-      :disabled="disabled"
-      :value="modelValue"
-      :data-invalid="error ? 'true' : undefined"
-      :aria-invalid="error ? 'true' : undefined"
-      :class="[
-        inputClass,
-        'transition-[box-shadow,transform] duration-(--motion-fast) ease-premium focus:shadow-(--shadow-xs)',
-      ]"
-      @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
-    />
+    <div class="relative">
+      <input
+        :id="id"
+        :name="name"
+        :type="props.type"
+        :autocomplete="autocomplete"
+        :placeholder="placeholder"
+        :disabled="disabled"
+        :value="modelValue"
+        :data-invalid="error ? 'true' : undefined"
+        :aria-invalid="error ? 'true' : undefined"
+        :class="[
+          inputClass,
+          inputPaddingClass,
+          'transition-[box-shadow,transform] duration-(--motion-fast) ease-premium focus:shadow-(--shadow-xs)',
+        ]"
+        @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
+      />
+      <div v-if="hasTrailing" class="absolute inset-y-0 right-0 flex items-center pr-3">
+        <slot name="trailing" />
+      </div>
+    </div>
   </BaseField>
 </template>

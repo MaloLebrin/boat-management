@@ -13,3 +13,11 @@ test('emits update:modelValue on input', async () => {
   await w.find('input').setValue('Hello')
   expect(w.emitted('update:modelValue')?.[0]).toEqual(['Hello'])
 })
+
+test('renders trailing slot', () => {
+  const w = mount(BaseInput, {
+    props: { id: 'pw', label: 'Password', modelValue: '' },
+    slots: { trailing: '<button type="button">Show</button>' },
+  })
+  expect(w.text()).toContain('Show')
+})
