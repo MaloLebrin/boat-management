@@ -4,6 +4,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 export default class AiController {
   async chat({ request, response, auth }: HttpContext) {
     await auth.authenticate()
+    const user = auth.getUserOrFail()
 
     const messages = request.input('messages')
     if (!Array.isArray(messages) || messages.length === 0) {
@@ -11,7 +12,7 @@ export default class AiController {
     }
 
     const queue = new AiQueueService()
-    await queue.enqueueChat({ messages })
+    await queue.enqueueChat({ userId: user.id, messages })
 
     return response.accepted({ status: 'queued' })
   }

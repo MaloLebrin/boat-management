@@ -322,6 +322,42 @@ export class OrganizationSchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class QueueDedupKeySchema extends BaseModel {
+  static $columns = [
+    'completedAt',
+    'createdAt',
+    'jobName',
+    'key',
+    'lastError',
+    'payloadHash',
+    'queue',
+    'queueJobId',
+    'status',
+    'updatedAt',
+  ] as const
+  $columns = QueueDedupKeySchema.$columns
+  @column.dateTime()
+  declare completedAt: DateTime | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare jobName: string
+  @column({ isPrimary: true })
+  declare key: string
+  @column()
+  declare lastError: string | null
+  @column()
+  declare payloadHash: string | null
+  @column()
+  declare queue: string
+  @column()
+  declare queueJobId: string | null
+  @column()
+  declare status: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
+}
+
 export class QueueJobSchema extends BaseModel {
   static $columns = [
     'acquiredAt',
