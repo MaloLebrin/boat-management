@@ -62,8 +62,8 @@ function update(partial: Partial<BoatListFilters>) {
 
 <template>
   <div class="mt-8 space-y-4">
-    <div class="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-      <div class="flex-1">
+    <div class="grid gap-3 md:grid-cols-12 md:items-end">
+      <div class="md:col-span-6">
         <BaseInput
           :model-value="qDraft"
           label="Search"
@@ -83,8 +83,8 @@ function update(partial: Partial<BoatListFilters>) {
         </BaseInput>
       </div>
 
-      <div class="flex flex-col gap-2 sm:flex-row sm:items-end">
-        <div class="min-w-48">
+      <div class="grid gap-2 sm:grid-cols-2 md:col-span-6 md:justify-end">
+        <div>
           <BaseSelect
             label="Type"
             allow-empty
@@ -94,7 +94,7 @@ function update(partial: Partial<BoatListFilters>) {
             @update:model-value="(v) => update({ type: String(v || '') || undefined, page: 1 })"
           />
         </div>
-        <div class="min-w-48">
+        <div>
           <BaseSelect
             label="Propulsion"
             allow-empty
@@ -107,8 +107,8 @@ function update(partial: Partial<BoatListFilters>) {
       </div>
     </div>
 
-    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-      <div class="flex flex-wrap items-center gap-2">
+    <div class="grid gap-3 md:grid-cols-12 md:items-center">
+      <div class="flex flex-wrap items-center gap-2 md:col-span-6">
         <BaseTabs
           :model-value="viewMode"
           :tabs="viewTabs"
@@ -121,8 +121,8 @@ function update(partial: Partial<BoatListFilters>) {
         </p>
       </div>
 
-      <div class="flex flex-wrap items-center gap-2 justify-end">
-        <div class="min-w-40">
+      <div class="grid gap-2 sm:grid-cols-3 md:col-span-6 md:justify-end">
+        <div>
           <BaseSelect
             label="Sort"
             :model-value="filters.sort"
@@ -130,7 +130,7 @@ function update(partial: Partial<BoatListFilters>) {
             @update:model-value="(v) => update({ sort: v as any, page: 1 })"
           />
         </div>
-        <div class="min-w-32">
+        <div>
           <BaseSelect
             label="Direction"
             :model-value="filters.direction"

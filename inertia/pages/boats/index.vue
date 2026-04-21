@@ -62,7 +62,7 @@ function reset() {
 </script>
 
 <template>
-  <div class="mx-auto w-full px-6 py-10 sm:px-8">
+  <div class="mx-auto flex min-h-[calc(100vh-8rem)] w-full flex-col px-6 py-10 sm:px-8">
     <div class="flex items-center justify-between">
       <div>
         <BaseHeading level="1">Boats</BaseHeading>
@@ -85,7 +85,7 @@ function reset() {
       @reset="reset"
     />
 
-    <div class="mt-6">
+    <div class="mt-6 flex-1">
       <div v-if="boatsData.length">
         <div class="hidden md:block" v-if="viewMode === 'table'">
           <BoatTable :boats="boatsData" />
@@ -98,10 +98,6 @@ function reset() {
         <div class="hidden md:block" v-if="viewMode === 'cards'">
           <BoatCards :boats="boatsData" />
         </div>
-
-        <div class="mt-6">
-          <BoatPagination :meta="boats.meta" @update:page="(p) => navigate({ ...filters, page: p })" />
-        </div>
       </div>
 
       <div v-else class="mt-8">
@@ -112,6 +108,10 @@ function reset() {
           @action="() => router.visit('/boats/new')"
         />
       </div>
+    </div>
+
+    <div v-if="boatsData.length && boats.meta.lastPage > 1" class="sticky bottom-0 mt-6">
+      <BoatPagination :meta="boats.meta" @update:page="(p) => navigate({ ...filters, page: p })" />
     </div>
   </div>
 </template>
