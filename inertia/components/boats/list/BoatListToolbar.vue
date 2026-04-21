@@ -1,11 +1,11 @@
 <script setup lang="ts">
+import { useDebounceFn } from '@vueuse/core'
+import { computed, ref, watch } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseTabs from '~/components/base/BaseTabs.vue'
-import { useDebounceFn } from '@vueuse/core'
 import type { BoatListDirection, BoatListFilters, BoatListSort } from './types'
-import { computed, ref, watch } from 'vue'
 
 const props = defineProps<{
   filters: BoatListFilters
@@ -38,6 +38,10 @@ const directionOptions: Array<{ label: string; value: BoatListDirection }> = [
 ]
 
 const qDraft = ref(props.filters.q ?? '')
+
+const hasActiveFilters = computed(() => {
+  return Boolean(props.filters.q?.trim()) || Boolean(props.filters.type) || Boolean(props.filters.propulsionType)
+})
 
 watch(
   () => props.filters.q,
@@ -84,7 +88,7 @@ function update(partial: Partial<BoatListFilters>) {
       </div>
 
       <div class="grid gap-2 sm:grid-cols-2 md:col-span-6 md:justify-end">
-        <div>
+        <div v-if="typeOptions.length > 0">
           <BaseSelect
             label="Type"
             allow-empty
@@ -94,7 +98,7 @@ function update(partial: Partial<BoatListFilters>) {
             @update:model-value="(v) => update({ type: String(v || '') || undefined, page: 1 })"
           />
         </div>
-        <div>
+        <div v-if="propulsionOptions.length > 0">
           <BaseSelect
             label="Propulsion"
             allow-empty
@@ -138,9 +142,25 @@ function update(partial: Partial<BoatListFilters>) {
             @update:model-value="(v) => update({ direction: v as any, page: 1 })"
           />
         </div>
-        <BaseButton variant="secondary" size="sm" type="button" @click="emit('reset')">
-          Reset
-        </BaseButton>
+        <div class="flex items-end justify-end">
+          <BaseButton
+            v-if="hasActiveFilters"
+            variant="ghost"
+            size="sm"
+            type="button"
+            aria-label="Clear filters"
+            title="Clear filters"
+            @click="emit('reset')"
+          >
+            <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path
+                fill-rule="evenodd"
+                d="M4.47 4.47a.75.75 0 0 1 1.06 0L10 8.94l4.47-4.47a.75.75 0 1 1 1.06 1.06L11.06 10l4.47 4.47a.75.75 0 1 1-1.06 1.06L10 11.06l-4.47 4.47a.75.75 0 0 1-1.06-1.06L8.94 10 4.47 5.53a.75.75 0 0 1 0-1.06Z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </BaseButton>
+        </div>
       </div>
     </div>
   </div>

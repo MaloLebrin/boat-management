@@ -57,7 +57,15 @@ function navigate(next: BoatListFilters) {
 }
 
 function reset() {
-  navigate({ sort: 'recent', direction: 'desc', page: 1, perPage: props.filters.perPage })
+  navigate({
+    q: undefined,
+    type: undefined,
+    propulsionType: undefined,
+    sort: props.filters.sort,
+    direction: props.filters.direction,
+    page: 1,
+    perPage: props.filters.perPage,
+  })
 }
 </script>
 
