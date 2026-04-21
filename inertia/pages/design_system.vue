@@ -21,6 +21,8 @@ import BaseTabs from '~/components/base/BaseTabs.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import BaseToggle from '~/components/base/BaseToggle.vue'
 
+import brandIconUrl from '~/assets/brand/fleetide_ai_icon_C.svg?url'
+
 const tab = ref<'overview' | 'components' | 'patterns'>('overview')
 const page = ref(1)
 const modalOpen = ref(false)
@@ -111,6 +113,50 @@ const tableRows = computed(() => {
     </header>
 
     <section v-if="tab === 'overview'" class="space-y-10">
+      <BaseCard padded>
+        <template #header>
+          <div class="flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+              <img
+                :src="brandIconUrl"
+                alt="Fleetide AI icon"
+                class="h-10 w-10 rounded-(--radius-control) shadow-(--shadow-xs)"
+              />
+              <div>
+                <p class="font-display text-sm font-semibold text-fg">Fleetide AI</p>
+                <p class="text-xs font-semibold text-fg-subtle">Horizon · wave · AI spark</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <BaseBadge variant="info">icon</BaseBadge>
+              <BaseBadge variant="success">pastel</BaseBadge>
+            </div>
+          </div>
+        </template>
+        <div class="grid gap-6 md:grid-cols-3">
+          <div class="rounded-(--radius-control) border border-border bg-surface-elevated p-4 shadow-(--shadow-xs)">
+            <p class="text-xs font-semibold text-fg-muted">Usage</p>
+            <p class="mt-2 text-sm text-fg-muted">
+              Utiliser l’icône seule pour favicon/app icon. Préférer le lockup “Fleetide AI” dans le header.
+            </p>
+          </div>
+          <div class="rounded-(--radius-control) border border-border bg-surface-elevated p-4 shadow-(--shadow-xs)">
+            <p class="text-xs font-semibold text-fg-muted">Do</p>
+            <ul class="mt-2 space-y-1 text-sm text-fg-muted">
+              <li>Fond clair/pastel, marges généreuses.</li>
+              <li>Contraste net sur petits formats.</li>
+            </ul>
+          </div>
+          <div class="rounded-(--radius-control) border border-border bg-surface-elevated p-4 shadow-(--shadow-xs)">
+            <p class="text-xs font-semibold text-fg-muted">Don’t</p>
+            <ul class="mt-2 space-y-1 text-sm text-fg-muted">
+              <li>Ne pas ajouter de bruit/texture.</li>
+              <li>Ne pas animer le logo (branding stable).</li>
+            </ul>
+          </div>
+        </div>
+      </BaseCard>
+
       <div class="grid gap-6 lg:grid-cols-3">
         <BaseCard padded>
           <template #header>
