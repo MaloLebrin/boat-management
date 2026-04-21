@@ -216,6 +216,19 @@ const canSubmitRig = computed(() => props.boat.rig !== null)
         </div>
 
         <div>
+          <label class="mb-1 block text-sm font-medium text-zinc-800" for="maint-due-at">
+            Due date <span class="font-normal text-zinc-500">(optional)</span>
+          </label>
+          <input
+            id="maint-due-at"
+            type="date"
+            name="dueAt"
+            class="h-10 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm shadow-sm focus:border-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900/10"
+          />
+          <p v-if="errors.dueAt" class="mt-1 text-sm text-red-600">{{ errors.dueAt }}</p>
+        </div>
+
+        <div>
           <label class="mb-1 block text-sm font-medium text-zinc-800" for="maint-title">Title</label>
           <input
             id="maint-title"

@@ -59,6 +59,7 @@ export class BoatMaintenanceEventSchema extends BaseModel {
     'boatRigId',
     'boatSailId',
     'createdAt',
+    'dueAt',
     'engineCaption',
     'id',
     'notes',
@@ -79,6 +80,8 @@ export class BoatMaintenanceEventSchema extends BaseModel {
   declare boatSailId: number | null
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
+  @column.date()
+  declare dueAt: DateTime | null
   @column()
   declare engineCaption: string | null
   @column({ isPrimary: true })

@@ -24,6 +24,11 @@ export const createBoatMaintenanceValidator = vine.compile(
     engineCaption: vine.string().trim().maxLength(240).nullable().optional(),
     sailCaption: vine.string().trim().maxLength(240).nullable().optional(),
     performedAt: vine.date(),
+    dueAt: vine
+      .date()
+      .parse((v) => (v === '' ? null : v))
+      .nullable()
+      .optional(),
     title: vine.string().trim().minLength(2).maxLength(200),
     notes: vine.string().trim().maxLength(8000).nullable().optional(),
     parts: vine

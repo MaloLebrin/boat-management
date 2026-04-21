@@ -7,6 +7,7 @@ export const controllers = {
   BoatEquipment: () => import('#controllers/boat_equipment_controller'),
   BoatMaintenances: () => import('#controllers/boat_maintenances_controller'),
   Boats: () => import('#controllers/boats_controller'),
+  Home: () => import('#controllers/home_controller'),
   NewAccount: () => import('#controllers/new_account_controller'),
   Session: () => import('#controllers/session_controller'),
 }
