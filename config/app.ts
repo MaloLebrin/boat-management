@@ -1,5 +1,5 @@
-import app from '@adonisjs/core/services/app'
 import { defineConfig } from '@adonisjs/core/http'
+import app from '@adonisjs/core/services/app'
 
 /**
  * The configuration settings used by the HTTP server
@@ -56,7 +56,7 @@ export const http = defineConfig({
     /**
      * Default lifetime for cookies managed by the HTTP layer.
      */
-    maxAge: '2h',
+    maxAge: '5d',
 
     /**
      * Prevent JavaScript access to the cookie in the browser.
