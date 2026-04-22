@@ -1,10 +1,21 @@
 <script setup lang="ts">
+import { Link } from '@adonisjs/inertia/vue'
+import { computed } from 'vue'
+
 const props = withDefaults(
   defineProps<{
     variant?: 'primary' | 'secondary' | 'ghost' | 'danger'
     size?: 'sm' | 'md' | 'lg'
     disabled?: boolean
     type?: 'button' | 'submit' | 'reset'
+    route?: string
+    href?: string
+    target?: string
+    rel?: string
+    method?: 'get' | 'post' | 'put' | 'patch' | 'delete'
+    preserveScroll?: boolean
+    preserveState?: boolean
+    replace?: boolean
   }>(),
   {
     variant: 'primary',
@@ -13,6 +24,15 @@ const props = withDefaults(
     type: 'button',
   }
 )
+
+const isInertiaLink = computed(() => Boolean(props.route))
+const isAnchorLink = computed(() => !isInertiaLink.value && Boolean(props.href))
+
+const componentTag = computed(() => {
+  if (isInertiaLink.value) return Link
+  if (isAnchorLink.value) return 'a'
+  return 'button'
+})
 
 const variantClass: Record<NonNullable<typeof props.variant>, string> = {
   primary:
@@ -30,18 +50,48 @@ const sizeClass: Record<NonNullable<typeof props.size>, string> = {
   md: 'h-10 rounded-[var(--radius-control)] px-4 text-sm font-semibold',
   lg: 'h-11 rounded-[var(--radius-control)] px-5 text-base font-semibold',
 }
+
+const baseClass = computed(() => {
+  const classList = [
+    'inline-flex items-center justify-center gap-2 transition-colors cursor-pointer',
+    'disabled:cursor-not-allowed disabled:opacity-50',
+    variantClass[props.variant],
+    sizeClass[props.size],
+  ]
+
+  if ((isInertiaLink.value || isAnchorLink.value) && props.disabled) {
+    classList.push('cursor-not-allowed opacity-50 pointer-events-none')
+  }
+
+  return classList
+})
+
+function onClick(e: MouseEvent) {
+  if ((isInertiaLink.value || isAnchorLink.value) && props.disabled) {
+    e.preventDefault()
+    e.stopPropagation()
+  }
+}
 </script>
 
 <template>
-  <button
-    :type="type"
-    :disabled="disabled"
-    :class="[
-      'inline-flex items-center justify-center gap-2 transition-colors disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer',
-      variantClass[variant],
-      sizeClass[size],
-    ]"
+  <component
+    :is="componentTag"
+    :type="componentTag === 'button' ? type : undefined"
+    :disabled="componentTag === 'button' ? disabled : undefined"
+    :route="isInertiaLink ? route : undefined"
+    :method="isInertiaLink ? method : undefined"
+    :preserve-scroll="isInertiaLink ? preserveScroll : undefined"
+    :preserve-state="isInertiaLink ? preserveState : undefined"
+    :replace="isInertiaLink ? replace : undefined"
+    :href="isAnchorLink ? href : undefined"
+    :target="isAnchorLink ? target : undefined"
+    :rel="isAnchorLink ? rel : undefined"
+    :aria-disabled="componentTag !== 'button' && disabled ? 'true' : undefined"
+    :tabindex="componentTag !== 'button' && disabled ? -1 : undefined"
+    :class="baseClass"
+    @click="onClick"
   >
     <slot />
-  </button>
+  </component>
 </template>
