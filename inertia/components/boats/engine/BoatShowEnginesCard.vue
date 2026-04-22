@@ -2,6 +2,7 @@
 import { Form } from '@adonisjs/inertia/vue'
 import BoatEquipmentEngineFields from './BoatEquipmentEngineFields.vue'
 import type { BoatShowEngine } from '~/types/boat_show'
+import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseModal from '~/components/base/BaseModal.vue'
@@ -41,33 +42,56 @@ function performedDisplay(iso: string | null) {
     </template>
     <div v-if="engines.length === 0" class="text-sm text-fg-muted">No engines.</div>
     <ul v-else class="space-y-3 text-sm">
-      <li v-for="e in engines" :key="e.id" class="rounded-(--radius-control) border border-border bg-surface-muted/40 p-3">
-        <div class="flex flex-wrap items-start justify-between gap-2">
-          <div>
-            <p class="font-semibold text-fg">
-              {{ e.kind }}<span v-if="e.fuel"> · {{ e.fuel }}</span>
-            </p>
-            <p class="text-fg-muted">
-              {{ e.brand ?? '—' }} {{ e.model ?? '' }}<span v-if="e.powerHp !== null"> · {{ e.powerHp }} hp</span
-              ><span v-if="e.hours !== null"> · {{ e.hours }} h</span>
-            </p>
-            <p v-if="performedDisplay(e.manufacturedAt)" class="mt-1 text-fg-subtle">
-              Mfg. {{ performedDisplay(e.manufacturedAt) }}
-            </p>
+      <li
+        v-for="e in engines"
+        :key="e.id"
+        class="rounded-(--radius-control) border border-border bg-surface-muted/40 p-4"
+      >
+        <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+          <div class="min-w-0">
+            <div class="flex flex-wrap items-center gap-2">
+              <p class="truncate text-sm font-semibold text-fg">{{ e.kind }}</p>
+              <BaseBadge v-if="e.fuel" variant="neutral">
+                {{ e.fuel }}
+              </BaseBadge>
+            </div>
+
+            <div class="mt-2 flex flex-wrap gap-2 text-xs text-fg-subtle">
+              <span class="rounded-full bg-surface-elevated px-2 py-1 ring-1 ring-border">
+                {{ e.brand ?? '—' }} {{ e.model ?? '' }}
+              </span>
+              <span
+                v-if="e.powerHp !== null"
+                class="rounded-full bg-surface-elevated px-2 py-1 ring-1 ring-border"
+              >
+                {{ e.powerHp }} hp
+              </span>
+              <span
+                v-if="e.hours !== null"
+                class="rounded-full bg-surface-elevated px-2 py-1 ring-1 ring-border"
+              >
+                {{ e.hours }} h
+              </span>
+            </div>
+
+            <div class="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-fg-subtle">
+              <span v-if="performedDisplay(e.manufacturedAt)">Mfg. {{ performedDisplay(e.manufacturedAt) }}</span>
+              <span v-if="e.serialNumber">SN {{ e.serialNumber }}</span>
+            </div>
           </div>
-          <div v-if="canManage" class="flex flex-wrap items-center gap-2">
-            <a
-              :href="`/boats/${boatId}/engines/${e.id}/edit`"
-              class="text-sm font-semibold text-fg-muted hover:text-fg hover:underline"
-            >
-              Edit
+
+          <div v-if="canManage" class="flex flex-wrap items-center gap-2 md:justify-end">
+            <a :href="`/boats/${boatId}/engines/${e.id}/edit`">
+              <BaseButton variant="ghost" size="sm" type="button" aria-label="Edit engine">
+                Edit
+              </BaseButton>
             </a>
             <Form
               :action="{ url: `/boats/${boatId}/engines/${e.id}`, method: 'delete' }"
               #default="{ processing }"
               class="inline"
             >
-              <BaseButton type="submit" variant="danger" size="sm" :disabled="processing">
+              <BaseButton type="submit" variant="danger" size="sm" :disabled="processing" aria-label="Remove engine">
                 Remove
               </BaseButton>
             </Form>
