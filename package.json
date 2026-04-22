@@ -38,6 +38,7 @@
     "#database/*": "./database/*.js",
     "#tests/*": "./tests/*.js",
     "#start/*": "./start/*.js",
+    "#shared/*": "./shared/*.js",
     "#config/*": "./config/*.js"
   },
   "devDependencies": {

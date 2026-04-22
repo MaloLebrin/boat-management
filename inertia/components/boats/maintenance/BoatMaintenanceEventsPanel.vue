@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Form } from '@adonisjs/inertia/vue'
+import { TrashIcon } from '@heroicons/vue/24/outline'
 import { computed, ref, watch } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
@@ -102,7 +103,7 @@ function removePartRow(index: number) {
             #default="{ processing }"
           >
             <BaseButton type="submit" variant="danger" size="sm" :disabled="processing">
-              Remove
+              <TrashIcon class="w-4 h-4 text-red-800" />
             </BaseButton>
           </Form>
         </div>

@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { Form } from '@adonisjs/inertia/vue'
-import type { BoatShowRig } from '~/types/boat_show'
+import { PencilSquareIcon, PlusCircleIcon, TrashIcon } from '@heroicons/vue/24/outline'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
+import type { BoatShowRig } from '~/types/boat_show'
 
 defineProps<{
   boatId: number
@@ -18,7 +19,8 @@ defineProps<{
         <p class="text-sm font-semibold text-fg">Rig</p>
       <div v-if="canManage" class="flex flex-wrap items-center gap-2">
         <a :href="`/boats/${boatId}/rig/edit`" class="text-sm font-semibold text-fg-muted hover:text-fg hover:underline">
-          {{ rig ? 'Edit' : 'Add rig' }}
+          <PencilSquareIcon v-if="rig" class="w-4 h-4" />
+          <PlusCircleIcon v-else class="w-4 h-4" />
         </a>
         <Form
           v-if="rig"
@@ -27,7 +29,7 @@ defineProps<{
           class="inline"
         >
           <BaseButton type="submit" variant="danger" size="sm" :disabled="processing">
-            Remove
+            <TrashIcon class="w-4 h-4 text-red-800" />
           </BaseButton>
         </Form>
       </div>

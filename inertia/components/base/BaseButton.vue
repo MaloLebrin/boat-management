@@ -22,7 +22,7 @@ const variantClass: Record<NonNullable<typeof props.variant>, string> = {
   ghost:
     'text-fg-muted hover:bg-surface-muted hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30 focus-visible:ring-offset-2 focus-visible:ring-offset-surface',
   danger:
-    'bg-danger text-white shadow-sm hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger/40 focus-visible:ring-offset-2 focus-visible:ring-offset-surface',
+    'bg-red-200 text-red-800 shadow-sm hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-800/40 focus-visible:ring-offset-2 focus-visible:ring-offset-surface',
 }
 
 const sizeClass: Record<NonNullable<typeof props.size>, string> = {

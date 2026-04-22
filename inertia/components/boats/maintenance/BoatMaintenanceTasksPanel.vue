@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Form } from '@adonisjs/inertia/vue'
+import { TrashIcon } from '@heroicons/vue/24/outline'
 import { computed, ref, watch } from 'vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
@@ -154,7 +155,7 @@ watch(
                 />
               </div>
               <BaseButton type="submit" variant="secondary" size="sm" :disabled="processing">
-                Mark done
+                Done
               </BaseButton>
             </Form>
 
@@ -164,7 +165,7 @@ watch(
               #default="{ processing }"
             >
               <BaseButton type="submit" variant="secondary" size="sm" :disabled="processing">
-                Mark done
+                Done
               </BaseButton>
             </Form>
 
@@ -173,7 +174,7 @@ watch(
               #default="{ processing }"
             >
               <BaseButton type="submit" variant="danger" size="sm" :disabled="processing">
-                Delete
+                <TrashIcon class="w-4 h-4 text-red-800" />
               </BaseButton>
             </Form>
           </div>

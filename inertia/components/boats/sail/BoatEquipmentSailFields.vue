@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { SAIL_TYPE_OPTIONS } from '~/constants/boat_form_options'
+import { SAIL_TYPE_OPTIONS } from '#shared/constants/boats/boat_form_options'
 import { ref, watch } from 'vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'

@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { Form } from '@adonisjs/inertia/vue'
-import BoatEquipmentSailFields from './BoatEquipmentSailFields.vue'
-import type { BoatShowSail } from '~/types/boat_show'
+import { PencilSquareIcon, TrashIcon } from '@heroicons/vue/24/outline'
+import { ref } from 'vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseModal from '~/components/base/BaseModal.vue'
-import { ref } from 'vue'
+import type { BoatShowSail } from '~/types/boat_show'
+import BoatEquipmentSailFields from './BoatEquipmentSailFields.vue'
 
 defineProps<{
   boatId: number
@@ -78,8 +79,8 @@ function performedDisplay(iso: string | null) {
 
           <div v-if="canManage" class="flex flex-wrap items-center gap-2 md:justify-end">
             <a :href="`/boats/${boatId}/sails/${s.id}/edit`">
-              <BaseButton variant="ghost" size="sm" type="button" aria-label="Edit sail">
-                Edit
+              <BaseButton variant="secondary" size="sm" type="button" aria-label="Edit sail">
+                <PencilSquareIcon class="w-4 h-4" />
               </BaseButton>
             </a>
             <Form
@@ -88,7 +89,7 @@ function performedDisplay(iso: string | null) {
               class="inline"
             >
               <BaseButton type="submit" variant="danger" size="sm" :disabled="processing" aria-label="Remove sail">
-                Remove
+                <TrashIcon class="w-4 h-4 text-red-800" />
               </BaseButton>
             </Form>
           </div>

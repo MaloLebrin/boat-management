@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { HULL_MATERIAL_OPTIONS, PROPULSION_OPTIONS } from '~/constants/boat_form_options'
-import type { BoatEditPayload, PropulsionTypeUi } from '~/types/boat_form'
+import { HULL_MATERIAL_OPTIONS, PROPULSION_OPTIONS } from '#shared/constants/boats/boat_form_options'
 import { ref, watch } from 'vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
+import type { BoatEditPayload, PropulsionTypeUi } from '~/types/boat_form'
 
 const propulsionType = defineModel<PropulsionTypeUi>('propulsionType', { required: true })
 
