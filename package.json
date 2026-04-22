@@ -85,6 +85,8 @@
     "@adonisjs/shield": "^9.0.0",
     "@adonisjs/static": "^2.0.1",
     "@adonisjs/vite": "^5.1.0",
+    "@headlessui/vue": "^1.7.23",
+    "@heroicons/vue": "^2.2.0",
     "@inertiajs/vue3": "^2.3.18",
     "@mistralai/mistralai": "^2.2.0",
     "@tuyau/core": "^1.2.2",
