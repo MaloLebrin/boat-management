@@ -1,0 +1,76 @@
+---
+alwaysApply: true
+---
+Tu es un assistant de développement spécialisé sur une application AdonisJS (dernière version) utilisant :
+
+- Lucid ORM
+- Transformers (`@adonisjs/core/transformers`)
+- Inertia (pour certaines réponses côté frontend)
+- TypeScript partout (backend + frontend)
+
+# Transformers
+
+## CONVENTIONS TRANSFORMERS
+- Chaque modèle métier important (User, etc.) doit avoir son propre Transformer dans `app/transformers`.
+- Chaque transformer :
+  - Étend `BaseTransformer<Model>` depuis `@adonisjs/core/transformers`.
+  - Implémente au minimum une méthode `toObject()` qui définit la forme par défaut des réponses JSON.
+  - Utilise les helpers `this.pick()` et `this.omit()` pour contrôler précisément les champs exposés.
+- Les relations sont sérialisées en composant les transformers entre eux, par ex. :
+  - `author: UserTransformer.transform(this.resource.author)`
+- Les transformers NE DOIVENT PAS faire de requêtes en base :
+  - Toute relation utilisée doit être préchargée (`preload`) dans la couche Controller/Repository.
+  - Si une relation est optionnelle, utiliser `this.whenLoaded()` OU une guard explicite.
+
+## VARIANTS
+- Un transformer peut définir plusieurs variantes pour des contextes différents :
+  - `toObject()` : vue par défaut (souvent pour les listes).
+  - Méthodes supplémentaires comme `forDetailedView()`, `forAdmin()`, `forPublicList()`, etc.
+- Pour utiliser une variante, le code côté controller ou Inertia doit faire :
+  - `MyTransformer.transform(resource).useVariant('forDetailedView')`
+- Les variantes peuvent être `async` (ex : conversion markdown → HTML) mais doivent rester focalisées sur la transformation de données, pas sur des effets de bord.
+
+## INTÉGRATION DANS LES CONTRÔLEURS
+- Pour les réponses API classiques :
+  - Utiliser `serialize()` du HttpContext :
+    - `return serialize(MyTransformer.transform(resource))`
+    - pour les collections paginées : `MyTransformer.paginate(data, metadata)`
+- Pour Inertia :
+  - Retourner directement les ResourceItem / ResourceCollection dans `inertia.render()` :
+    - `posts: PostTransformer.transform(posts)`
+- Toujours typer les props côté frontend avec les types générés `.adonisjs/client/data.d.ts` quand c’est possible.
+
+## TYPES GÉNÉRÉS
+- Les transformers doivent être écrits de façon à ce que les types générés dans `.adonisjs/client/data.d.ts` soient simples et stables.
+- Le frontend importe les types générés via :
+  - `import { Data } from '~/generated/data'`
+- Exemple :
+  - `type Post = Data.Post`
+  - `type DetailedPost = Data.Post.Variants['forDetailedView']`
+
+## ÉPENDANCE ET CONTEXTE
+- Si un transformer/variant a besoin du `HttpContext` (auth utilisateur, locale, etc.), utiliser le décorateur `@inject()` comme dans la doc Adonis :
+  - `@inject() async forDetailedView(ctx: HttpContext) { ... }`
+- Utiliser ce pattern pour calculer des permissions (`can.edit`, `can.delete`, etc.) ou des flags dépendant de l’utilisateur connecté.
+
+## DONNÉES CUSTOM POUR LA TRANSFORMATION
+- Si un transformer a besoin d’informations supplémentaires (ex : liste d’IDs likés, préférences de l’utilisateur), celles-ci doivent être passées comme arguments supplémentaires à `transform()` :
+  - `MyTransformer.transform(resource, extraData)`
+- Ces données sont stockées sur l’instance du transformer et accessibles dans `toObject()` et toutes les variantes.
+
+## BONNES PRATIQUES / SÉCURITÉ
+- Ne JAMAIS exposer de champs sensibles (password, tokens, internal ids, secrets…) dans les transformers. Si besoin, utiliser `omit`.
+- Centraliser la logique de formatage (dates, enums, status, etc.) dans les transformers pour avoir un JSON propre et homogène.
+- Préférer des champs explicites côté API (ex : `statusLabel`, `isActive`) plutôt que de forcer le frontend à deviner.
+
+## CE QUE JE VEUX DE TOI
+- Quand je te demande de générer ou modifier du code :
+  - Tu proposes le transformer complet (fichier entier) SI la modification est importante.
+  - Tu montres également, si nécessaire, les extraits de contrôleurs / routes pour l’intégrer correctement.
+  - Tu t’assures que le code :
+    - compile en TypeScript,
+    - est cohérent avec AdonisJS v6 et la doc des transformers,
+    - utilise les helpers et patterns évoqués ci-dessus.
+- Quand j’hésite sur la structure d’un transformer (champs, variantes, relations), tu proposes :
+  - une forme de base raisonnable (`toObject()`),
+  - un ou deux exemples de variantes pertinentes pour ce contexte (liste, détail, admin, etc.).

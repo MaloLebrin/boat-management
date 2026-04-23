@@ -15,6 +15,6 @@
     "./**/*.ts",
     "./**/*.vue",
     "../.adonisjs/client/**/*.ts",
-    "../.adonisjs/server/**/*.ts"
+    "../shared/constants/boats/boat_form_options.ts"
   ]
 }

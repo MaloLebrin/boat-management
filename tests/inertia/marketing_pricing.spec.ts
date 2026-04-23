@@ -8,13 +8,13 @@ vi.mock('@inertiajs/vue3', async () => {
     ...actual,
     Head: { template: '<div><slot /></div>' },
     Link: { template: '<a><slot /></a>' },
+    usePage: () => ({ props: { locale: 'fr' } }),
   }
 })
 
 test('renders pricing title (fr)', () => {
   const w = mount(MarketingPricing, {
     props: {
-      locale: 'fr',
       t: {
         brand: { name: 'Fleetide AI' },
         nav: { login: 'Connexion', signup: 'Inscription' },

@@ -1,6 +1,6 @@
 import { defineConfig } from '@adonisjs/core/bodyparser'
 
-const bodyParserConfig = defineConfig({
+const bodyParserConfig: ReturnType<typeof defineConfig> = defineConfig({
   /**
    * Parse request bodies for these HTTP methods.
    * Keep this aligned with methods that receive payloads in your routes.

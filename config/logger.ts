@@ -2,7 +2,7 @@ import env from '#start/env'
 import app from '@adonisjs/core/services/app'
 import { defineConfig, targets } from '@adonisjs/core/logger'
 
-const loggerConfig = defineConfig({
+const loggerConfig: ReturnType<typeof defineConfig> = defineConfig({
   /**
    * Default logger name used by ctx.logger and app logger calls.
    */

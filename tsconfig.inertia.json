@@ -1,8 +1,25 @@
 {
   "extends": "./inertia/tsconfig.json",
   "compilerOptions": {
-    "rootDir": "./inertia",
-    "composite": true
+    "composite": true,
+    "noEmit": false,
+    "declaration": true,
+    "declarationMap": false,
+    "emitDeclarationOnly": true,
+    "rootDir": ".",
+    "outDir": "./build/.tsbuild/inertia"
   },
-  "include": ["./inertia/**/*.ts", "./inertia/**/*.vue"]
+  "include": [
+    "./inertia/**/*.ts",
+    "./inertia/**/*.vue",
+    "./shared/**/*.ts",
+    "./app/**/*.ts",
+    "./config/**/*.ts",
+    "./database/**/*.ts",
+    "./start/**/*.ts",
+    "./providers/**/*.ts",
+    "./adonisrc.ts",
+    "./.adonisjs/**/*.ts",
+    "./.adonisjs/**/*.d.ts"
+  ]
 }

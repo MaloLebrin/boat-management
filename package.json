@@ -16,7 +16,7 @@
     "test": "node ace test",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "typecheck": "tsc --noEmit && vue-tsc --noEmit --project inertia/tsconfig.json",
+    "typecheck": "tsc -b && vue-tsc --noEmit --project inertia/tsconfig.json",
     "test:inertia": "vitest run"
   },
   "imports": {

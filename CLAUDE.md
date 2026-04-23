@@ -2,13 +2,14 @@
 
 ## Stack principale
 - **Backend** : AdonisJS v7 (TypeScript strict)
-- **Frontend** : Vue 3 (Composition API)
-- **Base de données** : PostgreSQL via Lucid ORM
-- **ORM** : Lucid (migrations, seeders, factories)
-- **Auth** : @adonisjs/auth avec bouncer pour les ACL
-- **Tests backend** : Japa
-- **Tests frontend** : Vitest + Testing Library
-- **Package manager** : npm (sauf indication contraire)
+- **Frontend** : Vue 3 (Composition API) + Inertia.js (SSR)
+- **Base de données** : PostgreSQL via Lucid ORM (SQLite pour les tests)
+- **ORM** : Lucid (migrations, seeders)
+- **Auth** : @adonisjs/auth avec bouncer + abilities pour les ACL
+- **IA** : Mistral AI via `@mistralai/mistralai` + système de queue AdonisJS
+- **Tests backend** : Japa (functional + unit)
+- **Tests frontend** : Vitest + @vue/test-utils
+- **Package manager** : pnpm
 - **Déploiement** : Docker + CI/CD GitHub Actions
 
 ## Conventions de code
@@ -21,23 +22,29 @@
 
 ### AdonisJS
 - Controllers fins : logique métier dans les Services (`app/services/`)
-- Un fichier par ressource : `user_service`, `post_service`, etc.
+- Un fichier par ressource : `user_service`, `boat_service`, etc.
 - Validation via VineJS (validators dans `app/validators/`)
+- Transformers dans `app/transformers/` pour formater les données envoyées au frontend
 - Routes RESTful : nommage `resource.action` (ex: `users.index`, `users.store`)
+- Routes découpées par domaine dans `start/routes/` (auth.ts, boats.ts, ai.ts…)
 - Middleware dans `app/middleware/`
 - Events dans `app/events/` + Listeners dans `app/listeners/`
+- Abilities (Bouncer) dans `app/abilities/`
+- Jobs de queue dans `app/jobs/`
 
 ### Base de données
 - Migrations : toujours avec rollback (`down()` implémenté)
 - Nommage tables : snake_case pluriel (`user_profiles`, `refresh_tokens`)
-- Factories pour les tests, Seeders pour les données de démo
+- Seeders pour les données de démo (`database/seeders/`)
 - Jamais de `SELECT *` en production — colonnes explicites
 
-### Frontend (Vue 3)
+### Frontend (Vue 3 + Inertia)
 - `<script setup>` systématiquement
-- Composables dans `composables/use*.ts`
-- Props typées avec `defineProps<{}>()` 
-- Pas de `Options API`
+- Pages dans `inertia/pages/` (organisées par domaine : auth, boats, marketing…)
+- Composants dans `inertia/components/`
+- Composables dans `inertia/composables/`
+- Props typées avec `defineProps<{}>()`, pas d'Options API
+- Code partagé backend/frontend dans `shared/` (types, helpers, constants)
 
 ## Workflow agent
 1. **Toujours lire les fichiers existants** avant de modifier
@@ -46,31 +53,38 @@
 4. **Pas de `console.log`** en commit — utiliser le logger Adonis
 5. **Migrations** : ne jamais modifier une migration déjà exécutée en production
 
-## Structure projet type
+## Structure projet
 ```
 app/
   controllers/     # HTTP Controllers (fins)
   services/        # Logique métier
   models/          # Modèles Lucid
   validators/      # VineJS validators
+  transformers/    # Formatage des données → frontend
   middleware/      # Middleware HTTP
-  policies/        # Bouncer policies (ACL)
-  jobs/            # Background jobs
+  abilities/       # Bouncer abilities (ACL)
+  jobs/            # Background jobs (queue)
   events/          # Event definitions
   listeners/       # Event listeners
 config/
 database/
   migrations/
   seeders/
-  factories/
-resources/
-  views/           # Edge templates ou Inertia
+inertia/           # Frontend Vue 3 + Inertia
+  pages/           # Pages par domaine (auth, boats, marketing…)
+  components/      # Composants Vue
+  composables/     # Composables Vue
+  types/           # Types frontend
+shared/            # Code partagé backend ↔ frontend (types, helpers, constants)
+providers/         # Service providers AdonisJS
 start/
+  routes/          # Routes découpées par domaine
   routes.ts
   kernel.ts
+  scheduler.ts
 tests/
-  unit/
-  functional/
+  functional/      # Tests Japa (HTTP)
+  inertia/         # Tests Vitest (composants Vue)
 ```
 
 ## Ne jamais faire
@@ -78,3 +92,4 @@ tests/
 - Utiliser `Model.query()` dans un Controller (→ déléguer au Service)
 - Committer des secrets ou `.env`
 - Supprimer des migrations existantes
+- Mettre de la logique de formatage dans les controllers (→ utiliser un transformer)
