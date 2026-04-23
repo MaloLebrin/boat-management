@@ -1,0 +1,207 @@
+{
+  "common": {
+    "yes": "Oui",
+    "no": "Non",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "save": "Enregistrer",
+    "close": "Fermer",
+    "all": "Tous",
+    "unknown": "Inconnu",
+    "loading": "Chargement…",
+    "none": "Aucun"
+  },
+  "nav": {
+    "workspace": "Espace de travail",
+    "dashboard": "Tableau de bord",
+    "boats": "Bateaux",
+    "designSystem": "Système de design",
+    "menu": "Menu",
+    "logout": "Déconnexion"
+  },
+  "auth": {
+    "login": {
+      "title": "Connexion",
+      "subtitle": "Entrez vos informations pour vous connecter.",
+      "emailLabel": "Email",
+      "emailPlaceholder": "vous@entreprise.com",
+      "passwordLabel": "Mot de passe",
+      "showPassword": "Afficher",
+      "hidePassword": "Masquer",
+      "submit": "Se connecter"
+    },
+    "signup": {
+      "title": "Créer un compte",
+      "subtitle": "Entrez vos informations pour créer votre compte.",
+      "fullNameLabel": "Nom complet",
+      "fullNamePlaceholder": "Votre nom",
+      "emailLabel": "Email",
+      "emailPlaceholder": "vous@entreprise.com",
+      "passwordLabel": "Mot de passe",
+      "passwordConfirmLabel": "Confirmer le mot de passe",
+      "showPassword": "Afficher",
+      "hidePassword": "Masquer",
+      "submit": "S'inscrire"
+    }
+  },
+  "dashboard": {
+    "title": "Tableau de bord",
+    "subtitle": "Vue d'ensemble de votre flotte et de la maintenance à venir.",
+    "newBoat": "Nouveau bateau",
+    "stats": {
+      "boats": "Bateaux",
+      "engines": "Moteurs",
+      "sails": "Voiles",
+      "rigs": "Gréements",
+      "urgentMaintenance": "Maintenance urgente"
+    },
+    "urgentMaintenance": {
+      "title": "Maintenance urgente",
+      "period": "14 prochains jours",
+      "empty": "Aucune maintenance urgente à venir.",
+      "overdue": "En retard",
+      "dueSoon": "Bientôt dû",
+      "hours": "Heures",
+      "dueAt": "Dû le {date}",
+      "dueAtHours": "Dû à {hours}h · actuel {current}h"
+    },
+    "yourBoats": {
+      "title": "Vos bateaux",
+      "viewAll": "Voir tout",
+      "columns": {
+        "name": "Nom",
+        "propulsion": "Propulsion",
+        "engines": "Moteurs",
+        "sails": "Voiles",
+        "rig": "Gréement"
+      },
+      "empty": "Aucun bateau pour l'instant."
+    }
+  },
+  "boats": {
+    "index": {
+      "title": "Bateaux",
+      "subtitle": "Tous les bateaux de votre organisation",
+      "newBoat": "Nouveau bateau",
+      "empty": {
+        "title": "Aucun bateau pour l'instant",
+        "description": "Créez votre premier navire pour commencer le suivi.",
+        "action": "Créer un bateau"
+      }
+    },
+    "show": {
+      "registration": "Immatriculation",
+      "type": "Type",
+      "propulsion": "Propulsion",
+      "addTask": "Ajouter une tâche",
+      "addEntry": "Ajouter une entrée",
+      "editBoat": "Modifier le bateau",
+      "deleteBoat": "Supprimer le bateau",
+      "tabs": {
+        "maintenance": "Maintenance",
+        "overview": "Aperçu",
+        "equipment": "Équipement"
+      },
+      "nextTasks": "Prochaines tâches",
+      "status": {
+        "urgent": "Urgent",
+        "upcoming": "À venir",
+        "ok": "OK"
+      }
+    },
+    "list": {
+      "search": "Rechercher",
+      "searchPlaceholder": "Rechercher par nom ou immatriculation…",
+      "type": "Type",
+      "propulsion": "Propulsion",
+      "sort": "Tri",
+      "direction": "Ordre",
+      "recent": "Récent",
+      "name": "Nom",
+      "asc": "Croissant",
+      "desc": "Décroissant",
+      "boats": "bateaux",
+      "clearFilters": "Effacer les filtres",
+      "table": {
+        "name": "Nom",
+        "registration": "Immatriculation",
+        "type": "Type",
+        "propulsion": "Propulsion",
+        "maintenance": "Maintenance"
+      },
+      "cards": {
+        "unknownType": "Type inconnu",
+        "unknownPropulsion": "Propulsion inconnue"
+      },
+      "maintenance": {
+        "urgent": "{count} urgent",
+        "upcoming": "{count} à venir",
+        "ok": "OK"
+      },
+      "viewTable": "Tableau",
+      "viewCards": "Cartes"
+    },
+    "maintenance": {
+      "events": {
+        "title": "Historique de maintenance",
+        "subtitle": "Travaux effectués sur la coque, un moteur, une voile ou le gréement.",
+        "empty": "Aucune entrée pour l'instant.",
+        "addEntry": "Ajouter une entrée",
+        "label": "Libellé",
+        "subject": "Sujet",
+        "wholeBoat": "Bateau entier",
+        "engine": "Moteur",
+        "sail": "Voile",
+        "rig": "Gréement",
+        "performedAt": "Effectué le",
+        "titleField": "Titre",
+        "titlePlaceholder": "ex. Changement du filtre à huile",
+        "notes": "Notes",
+        "parts": "Pièces",
+        "addPart": "Ajouter une pièce",
+        "noParts": "Aucune pièce.",
+        "partName": "Nom",
+        "partQty": "Qté",
+        "partNotes": "Notes",
+        "removePart": "Supprimer",
+        "createEntry": "Créer l'entrée",
+        "noRig": "Enregistrez un gréement sur ce bateau avant d'ajouter des entrées gréement.",
+        "enginePlaceholder": "ex. Moteur diesel intérieur bâbord",
+        "sailPlaceholder": "ex. Génois n°2",
+        "selectPlaceholder": "— Sélectionner —"
+      },
+      "tasks": {
+        "title": "Maintenance planifiée",
+        "subtitle": "Tâches ouvertes (par date et par heures moteur).",
+        "empty": "Aucune tâche planifiée.",
+        "addTask": "Ajouter une tâche",
+        "modalTitle": "Ajouter une tâche",
+        "done": "Terminé",
+        "doneHoursPlaceholder": "Terminé à (heures)",
+        "urgent": "Urgent",
+        "open": "Ouvert",
+        "dueAt": "Dû le {date}",
+        "dueHours": "Dû à {hours}h",
+        "cancel": "Annuler",
+        "createTask": "Créer la tâche",
+        "noRig": "Enregistrez un gréement sur ce bateau avant de planifier des tâches gréement.",
+        "subject": "Sujet",
+        "wholeBoat": "Bateau entier",
+        "engine": "Moteur",
+        "sail": "Voile",
+        "rig": "Gréement",
+        "engineLabel": "Moteur",
+        "sailLabel": "Voile",
+        "dueDate": "Date d'échéance (optionnel)",
+        "recurrenceMonths": "Récurrence (mois)",
+        "dueEngineHours": "Heures d'échéance",
+        "recurrenceEngineHours": "Récurrence (heures)",
+        "titleField": "Titre",
+        "titlePlaceholder": "ex. Vidange, inspection du gréement",
+        "notes": "Notes",
+        "selectPlaceholder": "— Sélectionner —"
+      }
+    }
+  }
+}

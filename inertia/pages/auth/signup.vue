@@ -12,6 +12,9 @@ import { computed, ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
+import { useT } from '~/composables/useT'
+
+const { t } = useT()
 
 const showPassword = ref(false)
 const showPasswordConfirmation = ref(false)
@@ -26,9 +29,9 @@ const passwordConfirmationType = computed(() =>
     class="mx-auto flex min-h-[calc(100vh-16rem)] w-full max-w-md flex-col justify-center px-6 py-14 sm:px-8"
   >
     <div class="space-y-2">
-      <BaseHeading level="1">Signup</BaseHeading>
+      <BaseHeading level="1">{{ t('auth.signup.title') }}</BaseHeading>
       <p class="text-pretty text-base text-fg-muted">
-        Enter your details below to create your account.
+        {{ t('auth.signup.subtitle') }}
       </p>
     </div>
 
@@ -38,8 +41,8 @@ const passwordConfirmationType = computed(() =>
           <BaseInput
             id="fullName"
             name="fullName"
-            label="Full name"
-            placeholder="Your name"
+            :label="t('auth.signup.fullNameLabel')"
+            :placeholder="t('auth.signup.fullNamePlaceholder')"
             autocomplete="name"
             :errors="errors"
           />
@@ -49,8 +52,8 @@ const passwordConfirmationType = computed(() =>
             name="email"
             type="email"
             autocomplete="email"
-            label="Email"
-            placeholder="you@company.com"
+            :label="t('auth.signup.emailLabel')"
+            :placeholder="t('auth.signup.emailPlaceholder')"
             :errors="errors"
           />
 
@@ -59,7 +62,7 @@ const passwordConfirmationType = computed(() =>
             name="password"
             :type="passwordType"
             autocomplete="new-password"
-            label="Password"
+            :label="t('auth.signup.passwordLabel')"
             placeholder="••••••••"
             :errors="errors"
           >
@@ -67,11 +70,11 @@ const passwordConfirmationType = computed(() =>
               <button
                 type="button"
                 class="inline-flex items-center text-sm font-semibold text-fg-muted hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30 focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
-                :aria-label="showPassword ? 'Hide password' : 'Show password'"
+                :aria-label="showPassword ? t('auth.signup.hidePassword') : t('auth.signup.showPassword')"
                 :aria-pressed="showPassword ? 'true' : 'false'"
                 @click="showPassword = !showPassword"
               >
-                {{ showPassword ? 'Hide' : 'Show' }}
+                {{ showPassword ? t('auth.signup.hidePassword') : t('auth.signup.showPassword') }}
               </button>
             </template>
           </BaseInput>
@@ -81,7 +84,7 @@ const passwordConfirmationType = computed(() =>
             name="passwordConfirmation"
             :type="passwordConfirmationType"
             autocomplete="new-password"
-            label="Confirm password"
+            :label="t('auth.signup.passwordConfirmLabel')"
             placeholder="••••••••"
             :errors="errors"
           >
@@ -89,18 +92,18 @@ const passwordConfirmationType = computed(() =>
               <button
                 type="button"
                 class="inline-flex items-center text-sm font-semibold text-fg-muted hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30 focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
-                :aria-label="showPasswordConfirmation ? 'Hide password confirmation' : 'Show password confirmation'"
+                :aria-label="showPasswordConfirmation ? t('auth.signup.hidePassword') : t('auth.signup.showPassword')"
                 :aria-pressed="showPasswordConfirmation ? 'true' : 'false'"
                 @click="showPasswordConfirmation = !showPasswordConfirmation"
               >
-                {{ showPasswordConfirmation ? 'Hide' : 'Show' }}
+                {{ showPasswordConfirmation ? t('auth.signup.hidePassword') : t('auth.signup.showPassword') }}
               </button>
             </template>
           </BaseInput>
 
           <div class="pt-1">
             <BaseButton type="submit" size="lg" :disabled="processing" class="w-full">
-              Sign up
+              {{ t('auth.signup.submit') }}
             </BaseButton>
           </div>
         </div>

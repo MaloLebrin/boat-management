@@ -6,6 +6,9 @@ import BaseInput from '~/components/base/BaseInput.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseTabs from '~/components/base/BaseTabs.vue'
 import type { BoatListDirection, BoatListFilters, BoatListSort } from './types'
+import { useT } from '~/composables/useT'
+
+const { t } = useT()
 
 const props = defineProps<{
   filters: BoatListFilters
@@ -23,19 +26,19 @@ const emit = defineEmits<{
 }>()
 
 const viewTabs = computed(() => [
-  { key: 'table', label: 'Table' },
-  { key: 'cards', label: 'Cards' },
+  { key: 'table', label: t('boats.list.viewTable') },
+  { key: 'cards', label: t('boats.list.viewCards') },
 ])
 
-const sortOptions: Array<{ label: string; value: BoatListSort }> = [
-  { label: 'Recent', value: 'recent' },
-  { label: 'Name', value: 'name' },
-]
+const sortOptions = computed<Array<{ label: string; value: BoatListSort }>>(() => [
+  { label: t('boats.list.recent'), value: 'recent' },
+  { label: t('boats.list.name'), value: 'name' },
+])
 
-const directionOptions: Array<{ label: string; value: BoatListDirection }> = [
-  { label: 'Asc', value: 'asc' },
-  { label: 'Desc', value: 'desc' },
-]
+const directionOptions = computed<Array<{ label: string; value: BoatListDirection }>>(() => [
+  { label: t('boats.list.asc'), value: 'asc' },
+  { label: t('boats.list.desc'), value: 'desc' },
+])
 
 const qDraft = ref(props.filters.q ?? '')
 
@@ -70,9 +73,9 @@ function update(partial: Partial<BoatListFilters>) {
       <div class="md:col-span-6">
         <BaseInput
           :model-value="qDraft"
-          label="Search"
+          :label="t('boats.list.search')"
           inputmode="search"
-          placeholder="Search by name or registration…"
+          :placeholder="t('boats.list.searchPlaceholder')"
           @update:model-value="onSearchInput"
         >
           <template #trailing>
@@ -90,7 +93,7 @@ function update(partial: Partial<BoatListFilters>) {
       <div class="grid gap-2 sm:grid-cols-2 md:col-span-6 md:justify-end">
         <div v-if="typeOptions.length > 0">
           <BaseSelect
-            label="Type"
+            :label="t('boats.list.type')"
             allow-empty
             placeholder="All"
             :model-value="filters.type ?? ''"
@@ -100,7 +103,7 @@ function update(partial: Partial<BoatListFilters>) {
         </div>
         <div v-if="propulsionOptions.length > 0">
           <BaseSelect
-            label="Propulsion"
+            :label="t('boats.list.propulsion')"
             allow-empty
             placeholder="All"
             :model-value="filters.propulsionType ?? ''"
@@ -120,15 +123,15 @@ function update(partial: Partial<BoatListFilters>) {
         />
         <p class="text-sm text-fg-muted">
           <span class="font-semibold text-fg">{{ total }}</span>
-          boats
-          <span v-if="isLoading" class="ml-2 inline-block text-fg-subtle">Loading…</span>
+          {{ t('boats.list.boats') }}
+          <span v-if="isLoading" class="ml-2 inline-block text-fg-subtle">{{ t('common.loading') }}</span>
         </p>
       </div>
 
       <div class="grid gap-2 sm:grid-cols-3 md:col-span-6 md:justify-end">
         <div>
           <BaseSelect
-            label="Sort"
+            :label="t('boats.list.sort')"
             :model-value="filters.sort"
             :options="sortOptions"
             @update:model-value="(v) => update({ sort: v as any, page: 1 })"
@@ -136,7 +139,7 @@ function update(partial: Partial<BoatListFilters>) {
         </div>
         <div>
           <BaseSelect
-            label="Direction"
+            :label="t('boats.list.direction')"
             :model-value="filters.direction"
             :options="directionOptions"
             @update:model-value="(v) => update({ direction: v as any, page: 1 })"
@@ -148,8 +151,8 @@ function update(partial: Partial<BoatListFilters>) {
             variant="ghost"
             size="sm"
             type="button"
-            aria-label="Clear filters"
-            title="Clear filters"
+            :aria-label="t('boats.list.clearFilters')"
+            :title="t('boats.list.clearFilters')"
             @click="emit('reset')"
           >
             <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">

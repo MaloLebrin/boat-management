@@ -10,6 +10,9 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseTabs from '~/components/base/BaseTabs.vue'
 import { computed, ref } from 'vue'
+import { useT } from '~/composables/useT'
+
+const { t } = useT()
 
 const props = defineProps<{
   boat: BoatShowDetail
@@ -39,9 +42,9 @@ const nextTasks = computed(() => {
 })
 
 const statusBadge = computed(() => {
-  if (overdueTasks.value.length > 0) return { variant: 'warning' as const, label: 'Urgent' }
-  if (openTasks.value.length > 0) return { variant: 'info' as const, label: 'Upcoming' }
-  return { variant: 'success' as const, label: 'OK' }
+  if (overdueTasks.value.length > 0) return { variant: 'warning' as const, label: t('boats.show.status.urgent') }
+  if (openTasks.value.length > 0) return { variant: 'info' as const, label: t('boats.show.status.upcoming') }
+  return { variant: 'success' as const, label: t('boats.show.status.ok') }
 })
 
 function goToMaintenance(section: 'tasks' | 'events') {
@@ -70,15 +73,15 @@ function goToMaintenance(section: 'tasks' | 'events') {
           </div>
           <div class="mt-3 flex flex-wrap gap-x-6 gap-y-1 text-sm text-fg-muted">
             <p>
-              Registration:
+              {{ t('boats.show.registration') }}:
               <span class="font-semibold text-fg">{{ boat.registrationNumber ?? '—' }}</span>
             </p>
             <p>
-              Type:
+              {{ t('boats.show.type') }}:
               <span class="font-semibold text-fg">{{ boat.type ?? '—' }}</span>
             </p>
             <p>
-              Propulsion:
+              {{ t('boats.show.propulsion') }}:
               <span class="font-semibold text-fg">{{ boat.propulsionType ?? '—' }}</span>
             </p>
           </div>
@@ -90,26 +93,26 @@ function goToMaintenance(section: 'tasks' | 'events') {
             variant="secondary"
             size="sm"
             type="button"
-            aria-label="Add a maintenance task"
+            :aria-label="t('boats.show.addTask')"
             @click="goToMaintenance('tasks')"
           >
-            Add task
+            {{ t('boats.show.addTask') }}
           </BaseButton>
           <BaseButton
             v-if="canManageMaintenance"
             variant="secondary"
             size="sm"
             type="button"
-            aria-label="Log a maintenance entry"
+            :aria-label="t('boats.show.addEntry')"
             @click="goToMaintenance('events')"
           >
-            Log maintenance
+            {{ t('boats.show.addEntry') }}
           </BaseButton>
           <a :href="`/boats/${boat.id}/edit`">
-            <BaseButton size="sm">Edit</BaseButton>
+            <BaseButton size="sm">{{ t('boats.show.editBoat') }}</BaseButton>
           </a>
           <a href="/boats" class="text-sm font-semibold text-fg-muted hover:text-fg hover:underline">
-            Back
+            {{ t('boats.show.deleteBoat') }}
           </a>
         </div>
       </div>
@@ -118,14 +121,14 @@ function goToMaintenance(section: 'tasks' | 'events') {
         <BaseTabs
           v-model="tab"
           :tabs="[
-            { key: 'maintenance', label: 'Maintenance', badge: String(openTasks.length) },
-            { key: 'overview', label: 'Overview' },
-            { key: 'equipment', label: 'Equipment' },
+            { key: 'maintenance', label: t('boats.show.tabs.maintenance'), badge: String(openTasks.value.length) },
+            { key: 'overview', label: t('boats.show.tabs.overview') },
+            { key: 'equipment', label: t('boats.show.tabs.equipment') },
           ]"
         />
 
         <div v-if="nextTasks.length" class="text-sm text-fg-muted">
-          <span class="font-semibold text-fg">Next:</span>
+          <span class="font-semibold text-fg">{{ t('boats.show.nextTasks') }}:</span>
           <span class="ml-2">
             {{ nextTasks[0]!.title }}
             <span v-if="nextTasks[0]!.dueAt" class="text-fg-subtle">· {{ nextTasks[0]!.dueAt }}</span>

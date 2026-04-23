@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import type { BoatListItem } from './types'
+import { useT } from '~/composables/useT'
+
+const { t } = useT()
 
 defineProps<{
   boats: BoatListItem[]
@@ -13,9 +16,9 @@ function maintenanceVariant(b: BoatListItem) {
 }
 
 function maintenanceLabel(b: BoatListItem) {
-  if (b.maintenance.urgentCount > 0) return `${b.maintenance.urgentCount} urgent`
-  if (b.maintenance.upcomingCount > 0) return `${b.maintenance.upcomingCount} upcoming`
-  return 'OK'
+  if (b.maintenance.urgentCount > 0) return t('boats.list.maintenance.urgent', { count: b.maintenance.urgentCount })
+  if (b.maintenance.upcomingCount > 0) return t('boats.list.maintenance.upcoming', { count: b.maintenance.upcomingCount })
+  return t('boats.list.maintenance.ok')
 }
 </script>
 
@@ -24,11 +27,11 @@ function maintenanceLabel(b: BoatListItem) {
     <table class="w-full text-left text-sm">
       <thead class="bg-surface-muted text-fg-muted">
         <tr>
-          <th class="px-4 py-3 font-semibold">Name</th>
-          <th class="px-4 py-3 font-semibold">Registration</th>
-          <th class="px-4 py-3 font-semibold">Type</th>
-          <th class="px-4 py-3 font-semibold">Propulsion</th>
-          <th class="px-4 py-3 font-semibold">Maintenance</th>
+          <th class="px-4 py-3 font-semibold">{{ t('boats.list.table.name') }}</th>
+          <th class="px-4 py-3 font-semibold">{{ t('boats.list.table.registration') }}</th>
+          <th class="px-4 py-3 font-semibold">{{ t('boats.list.table.type') }}</th>
+          <th class="px-4 py-3 font-semibold">{{ t('boats.list.table.propulsion') }}</th>
+          <th class="px-4 py-3 font-semibold">{{ t('boats.list.table.maintenance') }}</th>
         </tr>
       </thead>
       <tbody class="divide-y divide-border">

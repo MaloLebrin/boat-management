@@ -10,6 +10,9 @@ import BoatListToolbar from '~/components/boats/list/BoatListToolbar.vue'
 import BoatPagination from '~/components/boats/list/BoatPagination.vue'
 import BoatTable from '~/components/boats/list/BoatTable.vue'
 import type { BoatListFilters, BoatsPaginated } from '~/components/boats/list/types'
+import { useT } from '~/composables/useT'
+
+const { t } = useT()
 
 const props = defineProps<{
   boats: BoatsPaginated
@@ -73,11 +76,11 @@ function reset() {
   <div class="mx-auto flex min-h-[calc(100vh-8rem)] w-full flex-col px-6 py-10 sm:px-8">
     <div class="flex items-center justify-between">
       <div>
-        <BaseHeading level="1">Boats</BaseHeading>
-        <p class="mt-2 text-base text-fg-muted">All boats in your organization</p>
+        <BaseHeading level="1">{{ t('boats.index.title') }}</BaseHeading>
+        <p class="mt-2 text-base text-fg-muted">{{ t('boats.index.subtitle') }}</p>
       </div>
       <a href="/boats/new">
-        <BaseButton variant="primary">New boat</BaseButton>
+        <BaseButton variant="primary">{{ t('boats.index.newBoat') }}</BaseButton>
       </a>
     </div>
 
@@ -110,9 +113,9 @@ function reset() {
 
       <div v-else class="mt-8">
         <BaseEmptyState
-          title="Aucun bateau pour l’instant"
-          description="Créez votre premier navire pour commencer le suivi."
-          action-label="Créer un bateau"
+          :title="t('boats.index.empty.title')"
+          :description="t('boats.index.empty.description')"
+          :action-label="t('boats.index.empty.action')"
           @action="() => router.visit('/boats/new')"
         />
       </div>

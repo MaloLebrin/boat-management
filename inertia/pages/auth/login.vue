@@ -12,25 +12,12 @@ import { computed, ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
+import { useT } from '~/composables/useT'
+
+const { t } = useT()
 
 const showPassword = ref(false)
 const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
-
-// #region agent log
-fetch('http://127.0.0.1:7680/ingest/3ee2a2c5-a72e-44a9-98be-158686a1c217', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': 'cde605' },
-  body: JSON.stringify({
-    sessionId: 'cde605',
-    runId: 'pre-fix',
-    hypothesisId: 'H1',
-    location: 'inertia/pages/auth/login.vue:setup',
-    message: 'login page loaded',
-    data: { hasRouteHelper: typeof (globalThis as any).route },
-    timestamp: Date.now(),
-  }),
-}).catch(() => {})
-// #endregion agent log
 </script>
 
 <template>
@@ -38,9 +25,9 @@ fetch('http://127.0.0.1:7680/ingest/3ee2a2c5-a72e-44a9-98be-158686a1c217', {
     class="mx-auto flex min-h-[calc(100vh-16rem)] w-full max-w-md flex-col justify-center px-6 py-14 sm:px-8"
   >
     <div class="space-y-2">
-      <BaseHeading level="1">Login</BaseHeading>
+      <BaseHeading level="1">{{ t('auth.login.title') }}</BaseHeading>
       <p class="text-pretty text-base text-fg-muted">
-        Enter your details below to login to your account.
+        {{ t('auth.login.subtitle') }}
       </p>
     </div>
 
@@ -52,8 +39,8 @@ fetch('http://127.0.0.1:7680/ingest/3ee2a2c5-a72e-44a9-98be-158686a1c217', {
             name="email"
             type="email"
             autocomplete="username"
-            label="Email"
-            placeholder="you@company.com"
+            :label="t('auth.login.emailLabel')"
+            :placeholder="t('auth.login.emailPlaceholder')"
             :errors="errors"
           />
 
@@ -62,7 +49,7 @@ fetch('http://127.0.0.1:7680/ingest/3ee2a2c5-a72e-44a9-98be-158686a1c217', {
             name="password"
             :type="passwordType"
             autocomplete="current-password"
-            label="Password"
+            :label="t('auth.login.passwordLabel')"
             placeholder="••••••••"
             :errors="errors"
           >
@@ -70,18 +57,18 @@ fetch('http://127.0.0.1:7680/ingest/3ee2a2c5-a72e-44a9-98be-158686a1c217', {
               <button
                 type="button"
                 class="inline-flex items-center text-sm font-semibold text-fg-muted hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30 focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
-                :aria-label="showPassword ? 'Hide password' : 'Show password'"
+                :aria-label="showPassword ? t('auth.login.hidePassword') : t('auth.login.showPassword')"
                 :aria-pressed="showPassword ? 'true' : 'false'"
                 @click="showPassword = !showPassword"
               >
-                {{ showPassword ? 'Hide' : 'Show' }}
+                {{ showPassword ? t('auth.login.hidePassword') : t('auth.login.showPassword') }}
               </button>
             </template>
           </BaseInput>
 
           <div class="pt-1">
             <BaseButton type="submit" size="lg" :disabled="processing" class="w-full">
-              Login
+              {{ t('auth.login.submit') }}
             </BaseButton>
           </div>
         </div>

@@ -25,9 +25,18 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
      * Data shared with all Inertia pages. Make sure you are using
      * transformers for rich data-types like Models.
      */
+    const { i18n } = ctx as Partial<HttpContext>
+
     return {
       errors: ctx.inertia.always(this.getValidationErrors(ctx)),
-      locale: ctx.inertia.always(ctx.i18n.locale),
+      locale: ctx.inertia.always(i18n?.locale ?? 'en'),
+      appT: ctx.inertia.always(
+        Object.fromEntries(
+          Object.entries(i18n?.localeTranslations ?? {})
+            .filter(([k]) => k.startsWith('app.'))
+            .map(([k, v]) => [k.slice(4), v])
+        )
+      ),
       path: ctx.inertia.always(ctx.request.url().split('?')[0]),
       flash: ctx.inertia.always({
         error,

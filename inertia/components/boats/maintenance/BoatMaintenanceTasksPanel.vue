@@ -10,6 +10,9 @@ import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import type { BoatShowDetail, MaintenanceTaskRow } from '~/types/boat_show'
 import { subjectLabel } from './utils'
+import { useT } from '~/composables/useT'
+
+const { t } = useT()
 
 type Subject = 'boat' | 'engine' | 'sail' | 'rig'
 
@@ -23,7 +26,7 @@ const props = defineProps<{
 const todayIso = computed(() => new Date().toISOString().slice(0, 10))
 
 const openTasks = computed(() => {
-  const tasks = props.tasks.filter((t) => t.status === 'open')
+  const tasks = props.tasks.filter((task) => task.status === 'open')
   tasks.sort((a, b) => {
     const ad = a.dueAt ? String(a.dueAt) : null
     const bd = b.dueAt ? String(b.dueAt) : null
@@ -35,8 +38,8 @@ const openTasks = computed(() => {
   return tasks
 })
 
-function urgencyVariant(t: MaintenanceTaskRow) {
-  if (t.dueAt && String(t.dueAt) <= todayIso.value) return 'warning'
+function urgencyVariant(task: MaintenanceTaskRow) {
+  if (task.dueAt && String(task.dueAt) <= todayIso.value) return 'warning'
   return 'neutral'
 }
 
@@ -53,12 +56,12 @@ const taskRecurrenceEngineHours = ref('')
 const taskTitle = ref('')
 const taskNotes = ref('')
 
-const subjectOptions: ReadonlyArray<{ label: string; value: Subject }> = [
-  { label: 'Whole boat', value: 'boat' },
-  { label: 'Engine', value: 'engine' },
-  { label: 'Sail', value: 'sail' },
-  { label: 'Rig', value: 'rig' },
-]
+const subjectOptions = computed<ReadonlyArray<{ label: string; value: Subject }>>(() => [
+  { label: t('boats.maintenance.tasks.wholeBoat'), value: 'boat' },
+  { label: t('boats.maintenance.tasks.engine'), value: 'engine' },
+  { label: t('boats.maintenance.tasks.sail'), value: 'sail' },
+  { label: t('boats.maintenance.tasks.rig'), value: 'rig' },
+])
 
 const engineOptions = computed(() =>
   props.boat.engines.map((e) => ({
@@ -97,48 +100,48 @@ watch(
   <div class="space-y-5">
     <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
       <div class="space-y-1">
-        <p class="text-sm font-semibold text-fg">Planned maintenance</p>
-        <p class="text-sm text-fg-muted">Open tasks (date-based and engine-hour based).</p>
+        <p class="text-sm font-semibold text-fg">{{ t('boats.maintenance.tasks.title') }}</p>
+        <p class="text-sm text-fg-muted">{{ t('boats.maintenance.tasks.subtitle') }}</p>
       </div>
       <BaseButton
         v-if="canManageMaintenance"
         variant="secondary"
         size="sm"
         type="button"
-        aria-label="Add a maintenance task"
+        :aria-label="t('boats.maintenance.tasks.addTask')"
         @click="isCreateOpen = true"
       >
-        Add task
+        {{ t('boats.maintenance.tasks.addTask') }}
       </BaseButton>
     </div>
 
-    <div v-if="openTasks.length === 0" class="text-sm text-fg-muted">No planned tasks.</div>
+    <div v-if="openTasks.length === 0" class="text-sm text-fg-muted">{{ t('boats.maintenance.tasks.empty') }}</div>
     <ul v-else class="space-y-3">
       <li
-        v-for="t in openTasks"
-        :key="t.id"
+        v-for="task in openTasks"
+        :key="task.id"
         class="rounded-(--radius-control) border border-border bg-surface-muted/40 p-3 text-sm"
       >
         <div class="flex flex-wrap items-start justify-between gap-3">
           <div>
             <div class="flex flex-wrap items-center gap-2">
-              <p class="font-semibold text-fg">{{ t.title }}</p>
-              <BaseBadge :variant="urgencyVariant(t)">
-                {{ t.dueAt && String(t.dueAt) <= todayIso ? 'Urgent' : 'Open' }}
+              <p class="font-semibold text-fg">{{ task.title }}</p>
+              <BaseBadge :variant="urgencyVariant(task)">
+                {{ task.dueAt && String(task.dueAt) <= todayIso ? t('boats.maintenance.tasks.urgent') : t('boats.maintenance.tasks.open') }}
               </BaseBadge>
             </div>
-            <p class="text-fg-muted">{{ subjectLabel(t.subject) }}</p>
-            <p v-if="t.dueAt" class="mt-1 text-xs text-fg-subtle">Due {{ t.dueAt }}</p>
-            <p v-else-if="t.dueEngineHours !== null" class="mt-1 text-xs text-fg-subtle">
-              Due at {{ t.dueEngineHours }}h
+            <p class="text-fg-muted">{{ subjectLabel(task.subject) }}</p>
+            <p v-if="task.dueAt" class="mt-1 text-xs text-fg-subtle">{{ t('boats.maintenance.tasks.dueAt', { date: task.dueAt }) }}</p>
+            <p v-else-if="task.dueEngineHours !== null" class="mt-1 text-xs text-fg-subtle">
+              {{ t('boats.maintenance.tasks.dueHours', { hours: task.dueEngineHours }) }}
             </p>
-            <p v-if="t.notes" class="mt-2 text-fg-muted">{{ t.notes }}</p>
+            <p v-if="task.notes" class="mt-2 text-fg-muted">{{ task.notes }}</p>
           </div>
 
           <div v-if="canManageMaintenance" class="flex items-center gap-3">
             <Form
-              v-if="t.dueEngineHours !== null"
-              :action="{ url: `/boats/${boat.id}/maintenance-tasks/${t.id}/done`, method: 'put' }"
+              v-if="task.dueEngineHours !== null"
+              :action="{ url: `/boats/${boat.id}/maintenance-tasks/${task.id}/done`, method: 'put' }"
               class="flex items-center gap-2"
               #default="{ processing }"
             >
@@ -151,26 +154,26 @@ watch(
                   min="0"
                   step="1"
                   required
-                  placeholder="Done @ hours"
+                  :placeholder="t('boats.maintenance.tasks.doneHoursPlaceholder')"
                 />
               </div>
               <BaseButton type="submit" variant="secondary" size="sm" :disabled="processing">
-                Done
+                {{ t('boats.maintenance.tasks.done') }}
               </BaseButton>
             </Form>
 
             <Form
               v-else
-              :action="{ url: `/boats/${boat.id}/maintenance-tasks/${t.id}/done`, method: 'put' }"
+              :action="{ url: `/boats/${boat.id}/maintenance-tasks/${task.id}/done`, method: 'put' }"
               #default="{ processing }"
             >
               <BaseButton type="submit" variant="secondary" size="sm" :disabled="processing">
-                Done
+                {{ t('boats.maintenance.tasks.done') }}
               </BaseButton>
             </Form>
 
             <Form
-              :action="{ url: `/boats/${boat.id}/maintenance-tasks/${t.id}`, method: 'delete' }"
+              :action="{ url: `/boats/${boat.id}/maintenance-tasks/${task.id}`, method: 'delete' }"
               #default="{ processing }"
             >
               <BaseButton type="submit" variant="danger" size="sm" :disabled="processing">
@@ -182,7 +185,7 @@ watch(
       </li>
     </ul>
 
-    <BaseModal v-model:open="isCreateOpen" title="Add task" close-label="Close">
+    <BaseModal v-model:open="isCreateOpen" :title="t('boats.maintenance.tasks.modalTitle')" close-label="Close">
       <Form
         :action="{ url: `/boats/${boat.id}/maintenance-tasks`, method: 'post' }"
         class="space-y-4"
@@ -191,7 +194,7 @@ watch(
         <BaseSelect
           id="task-subject"
           name="subject"
-          label="Subject"
+          :label="t('boats.maintenance.tasks.subject')"
           :options="subjectOptions"
           v-model="taskSubject"
           :errors="errors"
@@ -202,8 +205,8 @@ watch(
             v-if="engineOptions.length"
             id="task-engine"
             name="boatEngineId"
-            label="Engine"
-            placeholder="— Select —"
+            :label="t('boats.maintenance.tasks.engineLabel')"
+            :placeholder="t('boats.maintenance.tasks.selectPlaceholder')"
             :allow-empty="true"
             :options="engineOptions"
             v-model="taskBoatEngineId"
@@ -214,7 +217,7 @@ watch(
             <BaseInput
               id="task-due-hours"
               name="dueEngineHours"
-              label="Due hours"
+              :label="t('boats.maintenance.tasks.dueEngineHours')"
               type="number"
               inputmode="numeric"
               min="0"
@@ -225,7 +228,7 @@ watch(
             <BaseInput
               id="task-recur-hours"
               name="recurrenceIntervalEngineHours"
-              label="Recurrence hours"
+              :label="t('boats.maintenance.tasks.recurrenceEngineHours')"
               type="number"
               inputmode="numeric"
               min="0"
@@ -241,8 +244,8 @@ watch(
             v-if="sailOptions.length"
             id="task-sail"
             name="boatSailId"
-            label="Sail"
-            placeholder="— Select —"
+            :label="t('boats.maintenance.tasks.sailLabel')"
+            :placeholder="t('boats.maintenance.tasks.selectPlaceholder')"
             :allow-empty="true"
             :options="sailOptions"
             v-model="taskBoatSailId"
@@ -253,7 +256,7 @@ watch(
         <template v-if="taskSubject === 'rig'">
           <input v-if="boat.rig" type="hidden" name="boatRigId" :value="boat.rig.id" />
           <p v-if="!boat.rig" class="text-sm text-warning">
-            Save a rig on this boat before planning rig tasks.
+            {{ t('boats.maintenance.tasks.noRig') }}
           </p>
           <p v-if="errors.boatRigId" class="mt-1 text-xs font-medium text-danger">
             {{ errors.boatRigId }}
@@ -264,7 +267,7 @@ watch(
           <BaseInput
             id="task-due-at"
             name="dueAt"
-            label="Due date (optional)"
+            :label="t('boats.maintenance.tasks.dueDate')"
             type="date"
             v-model="taskDueAt"
             :errors="errors"
@@ -272,7 +275,7 @@ watch(
           <BaseInput
             id="task-recur-months"
             name="recurrenceIntervalMonths"
-            label="Recurrence months"
+            :label="t('boats.maintenance.tasks.recurrenceMonths')"
             type="number"
             inputmode="numeric"
             min="0"
@@ -285,9 +288,9 @@ watch(
         <BaseInput
           id="task-title"
           name="title"
-          label="Title"
+          :label="t('boats.maintenance.tasks.titleField')"
           required
-          placeholder="e.g. Oil change, inspect rigging"
+          :placeholder="t('boats.maintenance.tasks.titlePlaceholder')"
           v-model="taskTitle"
           :errors="errors"
         />
@@ -295,16 +298,16 @@ watch(
         <BaseTextarea
           id="task-notes"
           name="notes"
-          label="Notes"
+          :label="t('boats.maintenance.tasks.notes')"
           :rows="3"
           v-model="taskNotes"
           :errors="errors"
         />
 
         <div class="flex items-center justify-end gap-2 pt-2">
-          <BaseButton variant="ghost" type="button" @click="isCreateOpen = false">Cancel</BaseButton>
+          <BaseButton variant="ghost" type="button" @click="isCreateOpen = false">{{ t('boats.maintenance.tasks.cancel') }}</BaseButton>
           <BaseButton type="submit" :disabled="processing || (taskSubject === 'rig' && !boat.rig)">
-            Create task
+            {{ t('boats.maintenance.tasks.createTask') }}
           </BaseButton>
         </div>
       </Form>

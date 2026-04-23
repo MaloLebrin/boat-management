@@ -3,6 +3,9 @@ import { Head } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseStatCard from '~/components/base/BaseStatCard.vue'
+import { useT } from '~/composables/useT'
+
+const { t } = useT()
 
 type BoatSummary = {
   id: number
@@ -44,31 +47,31 @@ function isOverdue(dueAtIso: string) {
 </script>
 
 <template>
-  <Head title="Dashboard" />
+  <Head :title="t('dashboard.title')" />
 
   <div class="px-8 py-10">
     <div class="flex flex-wrap items-start justify-between gap-4">
       <div>
-        <h1 class="text-3xl font-semibold tracking-tight text-fg">Dashboard</h1>
-        <p class="mt-2 text-base text-fg-muted">Overview of your fleet and upcoming maintenance.</p>
+        <h1 class="text-3xl font-semibold tracking-tight text-fg">{{ t('dashboard.title') }}</h1>
+        <p class="mt-2 text-base text-fg-muted">{{ t('dashboard.subtitle') }}</p>
       </div>
       <div class="flex items-center gap-2">
         <a href="/boats">
-          <BaseButton variant="secondary">Boats</BaseButton>
+          <BaseButton variant="secondary">{{ t('nav.boats') }}</BaseButton>
         </a>
         <a href="/boats/new">
-          <BaseButton variant="primary">New boat</BaseButton>
+          <BaseButton variant="primary">{{ t('dashboard.newBoat') }}</BaseButton>
         </a>
       </div>
     </div>
 
     <div class="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
-      <BaseStatCard label="Boats" :value="String(stats.boats)" tone="info" />
-      <BaseStatCard label="Engines" :value="String(stats.engines)" tone="neutral" />
-      <BaseStatCard label="Sails" :value="String(stats.sails)" tone="neutral" />
-      <BaseStatCard label="Rigs" :value="String(stats.rigs)" tone="neutral" />
+      <BaseStatCard :label="t('dashboard.stats.boats')" :value="String(stats.boats)" tone="info" />
+      <BaseStatCard :label="t('dashboard.stats.engines')" :value="String(stats.engines)" tone="neutral" />
+      <BaseStatCard :label="t('dashboard.stats.sails')" :value="String(stats.sails)" tone="neutral" />
+      <BaseStatCard :label="t('dashboard.stats.rigs')" :value="String(stats.rigs)" tone="neutral" />
       <BaseStatCard
-        label="Urgent maintenance"
+        :label="t('dashboard.stats.urgentMaintenance')"
         :value="String(stats.urgentMaintenance)"
         :tone="stats.urgentMaintenance ? 'warning' : 'success'"
       />
@@ -78,13 +81,13 @@ function isOverdue(dueAtIso: string) {
       <BaseCard class="lg:col-span-1">
         <template #header>
           <div class="flex items-center justify-between">
-            <h2 class="text-sm font-semibold text-fg">Urgent maintenance</h2>
-            <span class="text-xs font-medium text-fg-muted">Next 14 days</span>
+            <h2 class="text-sm font-semibold text-fg">{{ t('dashboard.urgentMaintenance.title') }}</h2>
+            <span class="text-xs font-medium text-fg-muted">{{ t('dashboard.urgentMaintenance.period') }}</span>
           </div>
         </template>
 
         <div v-if="urgentMaintenance.length === 0" class="text-sm text-fg-muted">
-          No urgent maintenance due soon.
+          {{ t('dashboard.urgentMaintenance.empty') }}
         </div>
 
         <ul v-else class="space-y-3 text-sm">
@@ -111,14 +114,14 @@ function isOverdue(dueAtIso: string) {
                 "
               >
                 <span v-if="ev.kind === 'date'">
-                  {{ ev.dueAt && isOverdue(ev.dueAt) ? 'Overdue' : 'Due soon' }}
+                  {{ ev.dueAt && isOverdue(ev.dueAt) ? t('dashboard.urgentMaintenance.overdue') : t('dashboard.urgentMaintenance.dueSoon') }}
                 </span>
-                <span v-else>Hours</span>
+                <span v-else>{{ t('dashboard.urgentMaintenance.hours') }}</span>
               </div>
             </div>
-            <p v-if="ev.kind === 'date'" class="mt-2 text-xs text-fg-subtle">Due {{ ev.dueAt }}</p>
+            <p v-if="ev.kind === 'date'" class="mt-2 text-xs text-fg-subtle">{{ t('dashboard.urgentMaintenance.dueAt', { date: ev.dueAt ?? '' }) }}</p>
             <p v-else class="mt-2 text-xs text-fg-subtle">
-              Due at {{ ev.dueEngineHours }}h · current {{ ev.currentEngineHours }}h
+              {{ t('dashboard.urgentMaintenance.dueAtHours', { hours: ev.dueEngineHours ?? 0, current: ev.currentEngineHours ?? 0 }) }}
             </p>
           </li>
         </ul>
@@ -127,8 +130,8 @@ function isOverdue(dueAtIso: string) {
       <BaseCard class="lg:col-span-2">
         <template #header>
           <div class="flex items-center justify-between">
-            <h2 class="text-sm font-semibold text-fg">Your boats</h2>
-            <a href="/boats" class="text-sm font-semibold text-brand hover:underline">View all</a>
+            <h2 class="text-sm font-semibold text-fg">{{ t('dashboard.yourBoats.title') }}</h2>
+            <a href="/boats" class="text-sm font-semibold text-brand hover:underline">{{ t('dashboard.yourBoats.viewAll') }}</a>
           </div>
         </template>
 
@@ -136,11 +139,11 @@ function isOverdue(dueAtIso: string) {
           <table class="w-full text-left text-sm">
             <thead class="bg-surface-muted text-fg-muted">
               <tr>
-                <th class="px-4 py-3 font-semibold">Name</th>
-                <th class="px-4 py-3 font-semibold">Propulsion</th>
-                <th class="px-4 py-3 font-semibold">Engines</th>
-                <th class="px-4 py-3 font-semibold">Sails</th>
-                <th class="px-4 py-3 font-semibold">Rig</th>
+                <th class="px-4 py-3 font-semibold">{{ t('dashboard.yourBoats.columns.name') }}</th>
+                <th class="px-4 py-3 font-semibold">{{ t('dashboard.yourBoats.columns.propulsion') }}</th>
+                <th class="px-4 py-3 font-semibold">{{ t('dashboard.yourBoats.columns.engines') }}</th>
+                <th class="px-4 py-3 font-semibold">{{ t('dashboard.yourBoats.columns.sails') }}</th>
+                <th class="px-4 py-3 font-semibold">{{ t('dashboard.yourBoats.columns.rig') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -153,10 +156,10 @@ function isOverdue(dueAtIso: string) {
                 <td class="px-4 py-3 text-fg-muted">{{ b.propulsionType ?? '—' }}</td>
                 <td class="px-4 py-3 text-fg-muted">{{ b.enginesCount }}</td>
                 <td class="px-4 py-3 text-fg-muted">{{ b.sailsCount }}</td>
-                <td class="px-4 py-3 text-fg-muted">{{ b.hasRig ? 'Yes' : 'No' }}</td>
+                <td class="px-4 py-3 text-fg-muted">{{ b.hasRig ? t('common.yes') : t('common.no') }}</td>
               </tr>
               <tr v-if="boats.length === 0">
-                <td class="px-4 py-8 text-center text-fg-muted" colspan="5">No boats yet.</td>
+                <td class="px-4 py-8 text-center text-fg-muted" colspan="5">{{ t('dashboard.yourBoats.empty') }}</td>
               </tr>
             </tbody>
           </table>

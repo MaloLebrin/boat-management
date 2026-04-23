@@ -2,6 +2,9 @@
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import type { BoatListItem } from './types'
+import { useT } from '~/composables/useT'
+
+const { t } = useT()
 
 defineProps<{
   boats: BoatListItem[]
@@ -14,9 +17,9 @@ function maintenanceVariant(b: BoatListItem) {
 }
 
 function maintenanceLabel(b: BoatListItem) {
-  if (b.maintenance.urgentCount > 0) return `${b.maintenance.urgentCount} urgent`
-  if (b.maintenance.upcomingCount > 0) return `${b.maintenance.upcomingCount} upcoming`
-  return 'OK'
+  if (b.maintenance.urgentCount > 0) return t('boats.list.maintenance.urgent', { count: b.maintenance.urgentCount })
+  if (b.maintenance.upcomingCount > 0) return t('boats.list.maintenance.upcoming', { count: b.maintenance.upcomingCount })
+  return t('boats.list.maintenance.ok')
 }
 </script>
 
@@ -49,12 +52,12 @@ function maintenanceLabel(b: BoatListItem) {
           <span
             class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-surface-muted text-fg-muted ring-1 ring-border"
           >
-            {{ boat.type ?? 'Unknown type' }}
+            {{ boat.type ?? t('boats.list.cards.unknownType') }}
           </span>
           <span
             class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-surface-muted text-fg-muted ring-1 ring-border"
           >
-            {{ boat.propulsionType ?? 'Unknown propulsion' }}
+            {{ boat.propulsionType ?? t('boats.list.cards.unknownPropulsion') }}
           </span>
         </div>
       </BaseCard>

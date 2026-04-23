@@ -13,7 +13,9 @@ Cette documentation décrit **fonctionnellement** et **techniquement** le projet
   - `docs/domain/dashboard.md`
   - `docs/domain/auth-acl.md`
 - **Données**: `docs/data/schema.md`
-- **Frontend (Inertia/Vue)**: `docs/frontend/ui-map.md`
+- **Frontend (Inertia/Vue)**:
+  - `docs/frontend/ui-map.md`
+  - `docs/frontend/i18n.md` — internationalisation, `useT()`, ajouter une langue
 - **Tests**: `docs/dev/testing.md`
 - **Contribution**: `docs/dev/contributing.md`
 - **Process “doc à jour”**: `docs/process/keeping-docs-up-to-date.md`

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import brandIconUrl from '~/assets/brand/fleetide_ai_icon_C.svg?url';
+import { useT } from '~/composables/useT';
 
 type AuthUser = {
   id: number
@@ -13,6 +14,8 @@ const props = defineProps<{
   user?: AuthUser
   openSidebar: () => void
 }>()
+
+const { t } = useT()
 </script>
 
 <template>
@@ -31,7 +34,7 @@ const props = defineProps<{
           <button type="button"
             class="inline-flex h-10 items-center justify-center rounded-(--radius-control) px-3 text-sm font-semibold text-fg-muted hover:bg-surface-muted hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30 focus-visible:ring-offset-2 focus-visible:ring-offset-surface lg:hidden"
             aria-controls="auth-sidebar-drawer" :aria-expanded="isSidebarOpen ? 'true' : 'false'" @click="openSidebar">
-            Menu
+            {{ t('nav.menu') }}
           </button>
 
           <span
