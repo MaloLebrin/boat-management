@@ -1,0 +1,46 @@
+{
+  "engine": {
+    "added": "Moteur ajouté.",
+    "updated": "Moteur mis à jour.",
+    "removed": "Moteur supprimé.",
+    "notFound": "Moteur introuvable."
+  },
+  "sail": {
+    "added": "Voile ajoutée.",
+    "updated": "Voile mise à jour.",
+    "removed": "Voile supprimée.",
+    "notFound": "Voile introuvable."
+  },
+  "rig": {
+    "saved": "Gréement enregistré.",
+    "removed": "Gréement supprimé."
+  },
+  "maintenance": {
+    "recorded": "Maintenance enregistrée.",
+    "removed": "Entrée de maintenance supprimée.",
+    "notFound": "Entrée de maintenance introuvable.",
+    "invalidBoat": "Bateau invalide.",
+    "engineNotBelongs": "Ce moteur n'appartient pas à ce bateau.",
+    "sailNotBelongs": "Cette voile n'appartient pas à ce bateau.",
+    "rigNotBelongs": "Ce gréement n'appartient pas à ce bateau.",
+    "sailCaptionRequired": "Un libellé est requis pour la maintenance de voile.",
+    "rigIdRequired": "Un gréement est requis pour la maintenance de gréement.",
+    "invalidSubject": "Sujet de maintenance invalide.",
+    "partQtyInvalid": "Les quantités de pièces doivent être des entiers positifs."
+  },
+  "maintenanceTasks": {
+    "created": "Tâche de maintenance créée.",
+    "markedDone": "Tâche marquée comme terminée.",
+    "removed": "Tâche supprimée.",
+    "notFound": "Tâche introuvable.",
+    "titleRequired": "Un titre est requis.",
+    "dueRequired": "Une date d'échéance ou des heures moteur d'échéance sont requises.",
+    "engineSubjectRequired": "Les tâches basées sur les heures moteur doivent avoir le sujet défini sur moteur.",
+    "engineIdRequired": "Un moteur est requis pour les tâches basées sur les heures moteur.",
+    "doneEngineHoursRequired": "Les heures moteur à l'achèvement sont requises.",
+    "doneEngineHoursInvalid": "Les heures moteur à l'achèvement doivent être supérieures ou égales à 0."
+  },
+  "ai": {
+    "messagesRequired": "Le champ messages est obligatoire."
+  }
+}

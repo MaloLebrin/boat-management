@@ -7,7 +7,7 @@ import { createBoatMaintenanceValidator } from '#validators/boat_maintenance'
 import type { HttpContext } from '@adonisjs/core/http'
 
 export default class BoatMaintenancesController {
-  async store({ request, response, auth, params, bouncer, session }: HttpContext) {
+  async store({ request, response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
@@ -43,18 +43,18 @@ export default class BoatMaintenancesController {
       })
     } catch (error) {
       if (error instanceof BoatMaintenanceValidationError) {
-        session.flash('error', error.message)
+        session.flash('error', i18n.t(`flash.maintenance.${error.errorCode}`))
         response.redirect(`/boats/${boat.id}`)
         return
       }
       throw error
     }
 
-    session.flash('success', 'Maintenance recorded.')
+    session.flash('success', i18n.t('flash.maintenance.recorded'))
     response.redirect(`/boats/${boat.id}`)
   }
 
-  async destroy({ response, auth, params, bouncer, session }: HttpContext) {
+  async destroy({ response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
@@ -78,14 +78,14 @@ export default class BoatMaintenancesController {
       await maintenanceService.deleteForBoat(user, boat, Number(params.eventId))
     } catch (error) {
       if (error instanceof BoatMaintenanceNotFoundError) {
-        session.flash('error', 'Maintenance entry not found.')
+        session.flash('error', i18n.t('flash.maintenance.notFound'))
         response.redirect(`/boats/${boat.id}`)
         return
       }
       throw error
     }
 
-    session.flash('success', 'Maintenance entry removed.')
+    session.flash('success', i18n.t('flash.maintenance.removed'))
     response.redirect(`/boats/${boat.id}`)
   }
 }

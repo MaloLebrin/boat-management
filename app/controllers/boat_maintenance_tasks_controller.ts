@@ -10,7 +10,7 @@ import {
 import type { HttpContext } from '@adonisjs/core/http'
 
 export default class BoatMaintenanceTasksController {
-  async store({ request, response, auth, params, bouncer, session }: HttpContext) {
+  async store({ request, response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
@@ -46,18 +46,18 @@ export default class BoatMaintenanceTasksController {
       })
     } catch (error) {
       if (error instanceof BoatMaintenanceTaskValidationError) {
-        session.flash('error', error.message)
+        session.flash('error', i18n.t(`flash.maintenanceTasks.${error.errorCode}`))
         response.redirect(`/boats/${boat.id}`)
         return
       }
       throw error
     }
 
-    session.flash('success', 'Maintenance task created.')
+    session.flash('success', i18n.t('flash.maintenanceTasks.created'))
     response.redirect(`/boats/${boat.id}`)
   }
 
-  async markDone({ request, response, auth, params, bouncer, session }: HttpContext) {
+  async markDone({ request, response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
@@ -85,23 +85,23 @@ export default class BoatMaintenanceTasksController {
       })
     } catch (error) {
       if (error instanceof BoatMaintenanceTaskNotFoundError) {
-        session.flash('error', 'Task not found.')
+        session.flash('error', i18n.t('flash.maintenanceTasks.notFound'))
         response.redirect(`/boats/${boat.id}`)
         return
       }
       if (error instanceof BoatMaintenanceTaskValidationError) {
-        session.flash('error', error.message)
+        session.flash('error', i18n.t(`flash.maintenanceTasks.${error.errorCode}`))
         response.redirect(`/boats/${boat.id}`)
         return
       }
       throw error
     }
 
-    session.flash('success', 'Task marked done.')
+    session.flash('success', i18n.t('flash.maintenanceTasks.markedDone'))
     response.redirect(`/boats/${boat.id}`)
   }
 
-  async destroy({ response, auth, params, bouncer, session }: HttpContext) {
+  async destroy({ response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
@@ -125,14 +125,14 @@ export default class BoatMaintenanceTasksController {
       await taskService.deleteForBoat(user, boat, Number(params.taskId))
     } catch (error) {
       if (error instanceof BoatMaintenanceTaskNotFoundError) {
-        session.flash('error', 'Task not found.')
+        session.flash('error', i18n.t('flash.maintenanceTasks.notFound'))
         response.redirect(`/boats/${boat.id}`)
         return
       }
       throw error
     }
 
-    session.flash('success', 'Task removed.')
+    session.flash('success', i18n.t('flash.maintenanceTasks.removed'))
     response.redirect(`/boats/${boat.id}`)
   }
 }

@@ -1,0 +1,18 @@
+{
+  "messages": {
+    "required": "The {field} field is required.",
+    "string": "The {field} field must be a string.",
+    "email": "The {field} must be a valid email address.",
+    "unique": "This {field} is already in use.",
+    "minLength": "The {field} must be at least {min} characters.",
+    "maxLength": "The {field} must not exceed {max} characters.",
+    "confirmed": "The {field} confirmation does not match.",
+    "enum": "The selected {field} is invalid.",
+    "in": "The selected {field} is invalid.",
+    "number": "The {field} must be a number.",
+    "range": "The {field} must be between {min} and {max}.",
+    "date": "The {field} must be a valid date.",
+    "positive": "The {field} must be a positive number.",
+    "withoutDecimals": "The {field} must be a whole number."
+  }
+}

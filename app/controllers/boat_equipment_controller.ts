@@ -30,7 +30,7 @@ export default class BoatEquipmentController {
     }
   }
 
-  async storeEngine({ request, response, auth, params, bouncer, session }: HttpContext) {
+  async storeEngine({ request, response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
     const loaded = await this.loadBoatForEquipment({ auth, response, params })
     if (!loaded) return
@@ -41,11 +41,11 @@ export default class BoatEquipmentController {
     const body = (await request.validateUsing(storeBoatEngineValidator)) as BoatEngineFormBody
     await boatService.createEngine(loaded.user, boat, equipmentBodyToEnginePayload(body))
 
-    session.flash('success', 'Engine added.')
+    session.flash('success', i18n.t('flash.engine.added'))
     response.redirect(`/boats/${boat.id}`)
   }
 
-  async editEngine({ inertia, response, auth, params, bouncer, session }: HttpContext) {
+  async editEngine({ inertia, response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
     const loaded = await this.loadBoatForEquipment({ auth, response, params })
     if (!loaded) return
@@ -55,7 +55,7 @@ export default class BoatEquipmentController {
 
     const engine = boat.engines.find((e) => e.id === Number(params.engineId))
     if (!engine) {
-      session.flash('error', 'Engine not found.')
+      session.flash('error', i18n.t('flash.engine.notFound'))
       response.redirect(`/boats/${boat.id}`)
       return
     }
@@ -76,7 +76,7 @@ export default class BoatEquipmentController {
     })
   }
 
-  async updateEngine({ request, response, auth, params, bouncer, session }: HttpContext) {
+  async updateEngine({ request, response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
     const loaded = await this.loadBoatForEquipment({ auth, response, params })
     if (!loaded) return
@@ -95,18 +95,18 @@ export default class BoatEquipmentController {
       )
     } catch (error) {
       if (error instanceof BoatEquipmentNotFoundError) {
-        session.flash('error', 'Engine not found.')
+        session.flash('error', i18n.t('flash.engine.notFound'))
         response.redirect(`/boats/${boat.id}`)
         return
       }
       throw error
     }
 
-    session.flash('success', 'Engine updated.')
+    session.flash('success', i18n.t('flash.engine.updated'))
     response.redirect(`/boats/${boat.id}`)
   }
 
-  async destroyEngine({ response, auth, params, bouncer, session }: HttpContext) {
+  async destroyEngine({ response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
     const loaded = await this.loadBoatForEquipment({ auth, response, params })
     if (!loaded) return
@@ -118,18 +118,18 @@ export default class BoatEquipmentController {
       await boatService.deleteEngine(loaded.user, boat, Number(params.engineId))
     } catch (error) {
       if (error instanceof BoatEquipmentNotFoundError) {
-        session.flash('error', 'Engine not found.')
+        session.flash('error', i18n.t('flash.engine.notFound'))
         response.redirect(`/boats/${boat.id}`)
         return
       }
       throw error
     }
 
-    session.flash('success', 'Engine removed.')
+    session.flash('success', i18n.t('flash.engine.removed'))
     response.redirect(`/boats/${boat.id}`)
   }
 
-  async storeSail({ request, response, auth, params, bouncer, session }: HttpContext) {
+  async storeSail({ request, response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
     const loaded = await this.loadBoatForEquipment({ auth, response, params })
     if (!loaded) return
@@ -140,11 +140,11 @@ export default class BoatEquipmentController {
     const body = (await request.validateUsing(storeBoatSailValidator)) as BoatSailFormBody
     await boatService.createSail(loaded.user, boat, equipmentBodyToSailPayload(body))
 
-    session.flash('success', 'Sail added.')
+    session.flash('success', i18n.t('flash.sail.added'))
     response.redirect(`/boats/${boat.id}`)
   }
 
-  async editSail({ inertia, response, auth, params, bouncer, session }: HttpContext) {
+  async editSail({ inertia, response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
     const loaded = await this.loadBoatForEquipment({ auth, response, params })
     if (!loaded) return
@@ -154,7 +154,7 @@ export default class BoatEquipmentController {
 
     const sail = boat.sails.find((s) => s.id === Number(params.sailId))
     if (!sail) {
-      session.flash('error', 'Sail not found.')
+      session.flash('error', i18n.t('flash.sail.notFound'))
       response.redirect(`/boats/${boat.id}`)
       return
     }
@@ -172,7 +172,7 @@ export default class BoatEquipmentController {
     })
   }
 
-  async updateSail({ request, response, auth, params, bouncer, session }: HttpContext) {
+  async updateSail({ request, response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
     const loaded = await this.loadBoatForEquipment({ auth, response, params })
     if (!loaded) return
@@ -191,18 +191,18 @@ export default class BoatEquipmentController {
       )
     } catch (error) {
       if (error instanceof BoatEquipmentNotFoundError) {
-        session.flash('error', 'Sail not found.')
+        session.flash('error', i18n.t('flash.sail.notFound'))
         response.redirect(`/boats/${boat.id}`)
         return
       }
       throw error
     }
 
-    session.flash('success', 'Sail updated.')
+    session.flash('success', i18n.t('flash.sail.updated'))
     response.redirect(`/boats/${boat.id}`)
   }
 
-  async destroySail({ response, auth, params, bouncer, session }: HttpContext) {
+  async destroySail({ response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
     const loaded = await this.loadBoatForEquipment({ auth, response, params })
     if (!loaded) return
@@ -214,14 +214,14 @@ export default class BoatEquipmentController {
       await boatService.deleteSail(loaded.user, boat, Number(params.sailId))
     } catch (error) {
       if (error instanceof BoatEquipmentNotFoundError) {
-        session.flash('error', 'Sail not found.')
+        session.flash('error', i18n.t('flash.sail.notFound'))
         response.redirect(`/boats/${boat.id}`)
         return
       }
       throw error
     }
 
-    session.flash('success', 'Sail removed.')
+    session.flash('success', i18n.t('flash.sail.removed'))
     response.redirect(`/boats/${boat.id}`)
   }
 
@@ -247,7 +247,7 @@ export default class BoatEquipmentController {
     })
   }
 
-  async upsertRig({ request, response, auth, params, bouncer, session }: HttpContext) {
+  async upsertRig({ request, response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
     const loaded = await this.loadBoatForEquipment({ auth, response, params })
     if (!loaded) return
@@ -258,11 +258,11 @@ export default class BoatEquipmentController {
     const body = (await request.validateUsing(upsertBoatRigValidator)) as BoatRigFormBody
     await boatService.upsertRig(loaded.user, boat, equipmentBodyToRigPayload(body))
 
-    session.flash('success', 'Rig saved.')
+    session.flash('success', i18n.t('flash.rig.saved'))
     response.redirect(`/boats/${boat.id}`)
   }
 
-  async destroyRig({ response, auth, params, bouncer, session }: HttpContext) {
+  async destroyRig({ response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
     const loaded = await this.loadBoatForEquipment({ auth, response, params })
     if (!loaded) return
@@ -272,7 +272,7 @@ export default class BoatEquipmentController {
 
     await boatService.deleteRig(loaded.user, boat)
 
-    session.flash('success', 'Rig removed.')
+    session.flash('success', i18n.t('flash.rig.removed'))
     response.redirect(`/boats/${boat.id}`)
   }
 }

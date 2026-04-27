@@ -1,0 +1,18 @@
+{
+  "messages": {
+    "required": "Le champ {field} est obligatoire.",
+    "string": "Le champ {field} doit être une chaîne de caractères.",
+    "email": "Le champ {field} doit être une adresse email valide.",
+    "unique": "Ce {field} est déjà utilisé.",
+    "minLength": "Le champ {field} doit contenir au moins {min} caractères.",
+    "maxLength": "Le champ {field} ne doit pas dépasser {max} caractères.",
+    "confirmed": "La confirmation du champ {field} ne correspond pas.",
+    "enum": "La valeur sélectionnée pour {field} est invalide.",
+    "in": "La valeur sélectionnée pour {field} est invalide.",
+    "number": "Le champ {field} doit être un nombre.",
+    "range": "Le champ {field} doit être compris entre {min} et {max}.",
+    "date": "Le champ {field} doit être une date valide.",
+    "positive": "Le champ {field} doit être un nombre positif.",
+    "withoutDecimals": "Le champ {field} doit être un nombre entier."
+  }
+}

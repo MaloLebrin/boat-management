@@ -2,13 +2,13 @@ import AiQueueService from '#services/ai_queue_service'
 import type { HttpContext } from '@adonisjs/core/http'
 
 export default class AiController {
-  async chat({ request, response, auth }: HttpContext) {
+  async chat({ request, response, auth, i18n }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
     const messages = request.input('messages')
     if (!Array.isArray(messages) || messages.length === 0) {
-      return response.badRequest({ error: 'messages is required' })
+      return response.badRequest({ error: i18n.t('flash.ai.messagesRequired') })
     }
 
     const queue = new AiQueueService()

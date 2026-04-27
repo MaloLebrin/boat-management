@@ -9,6 +9,12 @@ export class BoatMaintenanceTaskNotFoundError extends Error {
 
 export class BoatMaintenanceTaskValidationError extends Error {
   name = 'BoatMaintenanceTaskValidationError'
+  constructor(
+    message: string,
+    readonly errorCode: string
+  ) {
+    super(message)
+  }
 }
 
 export type MaintenanceTaskSubject = 'boat' | 'engine' | 'sail' | 'rig'
@@ -60,25 +66,34 @@ export default class BoatMaintenanceTaskService {
     assertBoatScope(user, boat)
 
     const title = payload.title.trim()
-    if (!title) throw new BoatMaintenanceTaskValidationError('title is required')
+    if (!title) throw new BoatMaintenanceTaskValidationError('title is required', 'titleRequired')
 
     const dueAt = payload.dueAt ? toDateTime(payload.dueAt) : null
     const dueEngineHours = payload.dueEngineHours ?? null
     const recurrenceEngineHours = payload.recurrenceIntervalEngineHours ?? null
 
     if (!dueAt && dueEngineHours === null) {
-      throw new BoatMaintenanceTaskValidationError('Either dueAt or dueEngineHours is required')
+      throw new BoatMaintenanceTaskValidationError(
+        'Either dueAt or dueEngineHours is required',
+        'dueRequired'
+      )
     }
 
     if (
       (dueEngineHours !== null || recurrenceEngineHours !== null) &&
       payload.subject !== 'engine'
     ) {
-      throw new BoatMaintenanceTaskValidationError('Engine-hour tasks must have subject=engine')
+      throw new BoatMaintenanceTaskValidationError(
+        'Engine-hour tasks must have subject=engine',
+        'engineSubjectRequired'
+      )
     }
 
     if ((dueEngineHours !== null || recurrenceEngineHours !== null) && !payload.boatEngineId) {
-      throw new BoatMaintenanceTaskValidationError('boatEngineId is required for engine-hour tasks')
+      throw new BoatMaintenanceTaskValidationError(
+        'boatEngineId is required for engine-hour tasks',
+        'engineIdRequired'
+      )
     }
 
     const notes = payload.notes?.trim() ? payload.notes.trim() : null
@@ -120,12 +135,14 @@ export default class BoatMaintenanceTaskService {
       const raw = payload.doneEngineHours
       if (raw === null || raw === undefined) {
         throw new BoatMaintenanceTaskValidationError(
-          'doneEngineHours is required to complete this task'
+          'doneEngineHours is required to complete this task',
+          'doneEngineHoursRequired'
         )
       }
       if (!Number.isInteger(raw) || raw < 0) {
         throw new BoatMaintenanceTaskValidationError(
-          'doneEngineHours must be a non-negative integer'
+          'doneEngineHours must be a non-negative integer',
+          'doneEngineHoursInvalid'
         )
       }
       doneEngineHours = raw

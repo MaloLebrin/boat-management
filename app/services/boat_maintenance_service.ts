@@ -14,6 +14,12 @@ export class BoatMaintenanceNotFoundError extends Error {
 
 export class BoatMaintenanceValidationError extends Error {
   name = 'BoatMaintenanceValidationError'
+  constructor(
+    message: string,
+    readonly errorCode: string
+  ) {
+    super(message)
+  }
 }
 
 function toDateTime(value: Date | string | DateTime): DateTime {
@@ -60,7 +66,7 @@ export default class BoatMaintenanceService {
 
   async createForBoat(user: User, boat: Boat, payload: CreateMaintenancePayload) {
     if (user.organizationId === null || user.organizationId !== boat.organizationId) {
-      throw new BoatMaintenanceValidationError('Invalid boat')
+      throw new BoatMaintenanceValidationError('Invalid boat', 'invalidBoat')
     }
 
     let boatEngineId: number | null = null
@@ -80,14 +86,18 @@ export default class BoatMaintenanceService {
             .where('boatId', boat.id)
             .first()
           if (!engine) {
-            throw new BoatMaintenanceValidationError('Engine does not belong to this boat')
+            throw new BoatMaintenanceValidationError(
+              'Engine does not belong to this boat',
+              'engineNotBelongs'
+            )
           }
           boatEngineId = engine.id
           if (!caption) caption = buildEngineCaption(engine)
         }
         if (!caption) {
           throw new BoatMaintenanceValidationError(
-            'engineCaption is required for engine maintenance'
+            'engineCaption is required for engine maintenance',
+            'sailCaptionRequired'
           )
         }
         engineCaption = caption
@@ -101,13 +111,19 @@ export default class BoatMaintenanceService {
             .where('boatId', boat.id)
             .first()
           if (!sail) {
-            throw new BoatMaintenanceValidationError('Sail does not belong to this boat')
+            throw new BoatMaintenanceValidationError(
+              'Sail does not belong to this boat',
+              'sailNotBelongs'
+            )
           }
           boatSailId = sail.id
           if (!caption) caption = buildSailCaption(sail)
         }
         if (!caption) {
-          throw new BoatMaintenanceValidationError('sailCaption is required for sail maintenance')
+          throw new BoatMaintenanceValidationError(
+            'sailCaption is required for sail maintenance',
+            'sailCaptionRequired'
+          )
         }
         sailCaption = caption
         break
@@ -115,17 +131,23 @@ export default class BoatMaintenanceService {
       case 'rig': {
         const rigId = payload.boatRigId
         if (!rigId) {
-          throw new BoatMaintenanceValidationError('boatRigId is required for rig maintenance')
+          throw new BoatMaintenanceValidationError(
+            'boatRigId is required for rig maintenance',
+            'rigIdRequired'
+          )
         }
         const rig = await BoatRig.query().where('id', rigId).where('boatId', boat.id).first()
         if (!rig) {
-          throw new BoatMaintenanceValidationError('Rig does not belong to this boat')
+          throw new BoatMaintenanceValidationError(
+            'Rig does not belong to this boat',
+            'rigNotBelongs'
+          )
         }
         boatRigId = rig.id
         break
       }
       default:
-        throw new BoatMaintenanceValidationError('Invalid subject')
+        throw new BoatMaintenanceValidationError('Invalid subject', 'invalidSubject')
     }
 
     const notes = payload.notes?.trim() ? payload.notes.trim() : null
@@ -158,7 +180,10 @@ export default class BoatMaintenanceService {
 
       for (const p of cleanParts) {
         if (p.quantity !== null && (!Number.isInteger(p.quantity) || p.quantity < 1)) {
-          throw new BoatMaintenanceValidationError('Each part quantity must be a positive integer')
+          throw new BoatMaintenanceValidationError(
+            'Each part quantity must be a positive integer',
+            'partQtyInvalid'
+          )
         }
       }
 

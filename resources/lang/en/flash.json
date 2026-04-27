@@ -1,0 +1,46 @@
+{
+  "engine": {
+    "added": "Engine added.",
+    "updated": "Engine updated.",
+    "removed": "Engine removed.",
+    "notFound": "Engine not found."
+  },
+  "sail": {
+    "added": "Sail added.",
+    "updated": "Sail updated.",
+    "removed": "Sail removed.",
+    "notFound": "Sail not found."
+  },
+  "rig": {
+    "saved": "Rig saved.",
+    "removed": "Rig removed."
+  },
+  "maintenance": {
+    "recorded": "Maintenance recorded.",
+    "removed": "Maintenance entry removed.",
+    "notFound": "Maintenance entry not found.",
+    "invalidBoat": "Invalid boat.",
+    "engineNotBelongs": "This engine does not belong to this boat.",
+    "sailNotBelongs": "This sail does not belong to this boat.",
+    "rigNotBelongs": "This rig does not belong to this boat.",
+    "sailCaptionRequired": "A label is required for sail maintenance.",
+    "rigIdRequired": "A rig is required for rig maintenance.",
+    "invalidSubject": "Invalid maintenance subject.",
+    "partQtyInvalid": "Part quantities must be positive integers."
+  },
+  "maintenanceTasks": {
+    "created": "Maintenance task created.",
+    "markedDone": "Task marked done.",
+    "removed": "Task removed.",
+    "notFound": "Task not found.",
+    "titleRequired": "A title is required.",
+    "dueRequired": "Either a due date or due engine hours is required.",
+    "engineSubjectRequired": "Engine-hour tasks must have the subject set to engine.",
+    "engineIdRequired": "An engine is required for engine-hour tasks.",
+    "doneEngineHoursRequired": "Engine hours at completion is required.",
+    "doneEngineHoursInvalid": "Engine hours at completion must be 0 or more."
+  },
+  "ai": {
+    "messagesRequired": "The messages field is required."
+  }
+}
