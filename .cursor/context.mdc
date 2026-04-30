@@ -1,48 +1,116 @@
 ---
 alwaysApply: true
 ---
-# **3d-website** (boat-management)
-*Application web de gestion de bateaux et de flotte (organisations, coques, moteurs, voilures, gréement)*
+# **Fleetide AI** — Contexte Métier
+
+*Application SaaS de gestion de maintenance de flotte maritime*
 
 ---
 
-## **Description**
-**3d-website** est une **application web full-stack** pour suivre des **bateaux** rattachés à des **organisations**, avec le détail technique (**moteurs**, **voiles**, **gréement**) et l’**authentification** des utilisateurs. Le dépôt est un **monolithe** : backend et frontend Inertia vivent dans le même projet.
+## **Problème métier résolu**
 
-**Stack technique** :
-- **Backend** : AdonisJS 7 (Node.js / TypeScript), VineJS pour la validation, Bouncer pour l’ACL.
-- **Frontend** : Vue 3 (Composition API, `<script setup>`) + Inertia.js + Tailwind CSS 4.
-- **Données** : Lucid ORM ; SQLite via `better-sqlite3` en local ; `docker-compose` prévoit PostgreSQL pour un environnement proche de la prod.
-- **Tests** : Japa (backend) ; Vitest + Testing Library côté frontend (selon conventions du projet).
-- **Build** : Vite 7, déploiement type Docker + CI (voir `CLAUDE.md`).
+Les opérateurs maritimes (capitaines, gestionnaires de flotte, propriétaires) gèrent leur maintenance dans des **tableurs, carnets papier ou messages épars**. Résultat : maintenances oubliées, pannes évitables, pertes financières et risques de sécurité. Fleetide centralise l'historique et la planification de maintenance de toute une flotte, avec une IA pour anticiper les prochaines actions critiques.
 
 ---
 
-## **Fonctionnalités clés**
+## **Utilisateurs cibles & personas**
 
-| Fonctionnalité | Description |
-|----------------|-------------|
-| **Authentification** | Inscription, connexion, déconnexion ; routes invité vs utilisateur connecté (`middleware.guest()` / `middleware.auth()`). |
-| **CRUD bateaux** | Liste, création, fiche, édition, suppression des bateaux (réservé aux utilisateurs authentifiés). |
-| **Modèle métier** | Organisations, utilisateurs liés aux organisations, bateaux avec specs ; moteurs, voiles et gréement en relations Lucid. |
-| **Pages Inertia** | Accueil public ; pages auth ; pages `boats/*` pour le parcours gestionnaire. |
+| Persona | Description |
+|---------|-------------|
+| **Gestionnaire de flotte** | Supervise plusieurs bateaux pour une organisation (loueur, club nautique, entreprise). A besoin d'une vue d'ensemble et d'alertes sur les urgences. |
+| **Technicien / Mécano** | Saisit les interventions réalisées (événements de maintenance) et les pièces remplacées. |
+| **Propriétaire de bateau** | Suit son propre bateau ou une petite flotte. Veut être alerté avant que des maintenances ne deviennent critiques. |
+
+Tous les utilisateurs appartiennent à une **Organisation** : les données sont cloisonnées par organisation (multi-tenant). Il n'existe pas de hiérarchie de rôles interne — tout membre d'une organisation a accès à toute la flotte de cette organisation.
 
 ---
 
-## **Structure du projet**
+## **Modèle de données métier**
 
-```bash
-3d-website/
-├── app/                    # Contrôleurs, modèles, services, validators, middleware, policies
-├── config/                 # Adonis, auth, database, inertia, vite, etc.
-├── database/               # Migrations, seeders, factories, schémas Lucid
-├── inertia/                # App Vue (pages, composants, layouts, css)
-├── start/                  # routes.ts, kernel.ts
-├── tests/                  # Tests Japa (unit / functional)
-├── bin/, ace               # CLI Adonis
-├── docker-compose.yml      # PostgreSQL de développement (optionnel)
-├── package.json            # Scripts : dev, build, test, lint, typecheck
-└── CLAUDE.md               # Conventions globales stack et workflow agents
+### Flotte & équipements
+
+```
+Organisation
+  └── Bateau (hull, dimensions, immatriculation, propulsion, type)
+        ├── Moteur(s)       → puissance HP/KW, carburant, marque, modèle, heures actuelles
+        ├── Voile(s)        → type, surface m², matériau, points de ris
+        └── Gréement        → type, nombre de mâts, barres de flèche
 ```
 
-Les routes HTTP sont définies dans `start/routes.ts` (objectif projet : les scinder par entité / groupes nommés — voir `.cursor/routes.mdc`).
+**Un bateau appartient à une organisation.** Il a des specs fixes (longueur, bau, tirant d'eau, hauteur de mât, année de construction, numéro d'immatriculation, matériau de coque) et des équipements qui évoluent (moteurs, voiles, gréement).
+
+### Maintenance
+
+```
+Bateau
+  ├── Événements de maintenance  → ce qui a été fait (historique)
+  │     └── Pièces remplacées   → nom, quantité, notes
+  └── Tâches de maintenance     → ce qui est planifié (futur)
+        ├── Déclencheur : date calendaire OU seuil d'heures moteur
+        └── Récurrence : manuelle ou automatique
+```
+
+---
+
+## **Flux métier principaux**
+
+### 1. Gestion de flotte (CRUD)
+- Créer un bateau avec ses specs et ses équipements
+- Modifier / archiver un bateau ou son équipement
+- Consulter la fiche d'un bateau : specs, équipements, historique, tâches planifiées
+
+### 2. Suivi de maintenance historique
+- Saisir un **événement de maintenance** : date, titre, description, composant concerné (moteur, voile, etc.)
+- Ajouter les **pièces remplacées** lors de l'intervention (nom, quantité, notes)
+- Consulter l'historique chronologique par bateau
+
+### 3. Planification de maintenance (tâches)
+- Créer une **tâche de maintenance** avec deux modes de déclenchement :
+  - **Par date** : ex. « changer l'huile le 01/06/2026 »
+  - **Par heures moteur** : ex. « révision tous les 250 heures »
+- Marquer une tâche comme **complète** → si elle est récurrente, une nouvelle tâche est auto-générée pour la prochaine échéance
+- Une tâche peut être **ouverte**, **complète** ou **en retard** (overdue)
+
+### 4. Tableau de bord & alertes
+- Vue d'ensemble de la flotte : nombre de bateaux, moteurs, voiles, gréements
+- **Alertes urgentes** : maintenances en retard + maintenances dues bientôt (seuil configurable)
+- Accès rapide aux tâches critiques par bateau
+
+### 5. Assistant IA
+- L'utilisateur pose des questions en langage naturel sur sa flotte (ex. « Quelles maintenances sont en retard ? », « Quand dois-je réviser le moteur du bateau X ? »)
+- Les réponses sont générées de façon **asynchrone** par Mistral AI avec le contexte de la flotte de l'organisation
+- L'IA aide à prioriser et anticiper les actions de maintenance
+
+---
+
+## **Règles métier importantes**
+
+- Un utilisateur **sans organisation** ne peut pas créer de bateau.
+- Un utilisateur ne peut voir/modifier que les bateaux de **son organisation**.
+- Une tâche récurrente complétée **génère automatiquement** la suivante — il ne faut jamais laisser de trou dans le planning.
+- Les heures moteur d'un moteur sont **mises à jour manuellement** (pas de capteur IoT intégré à ce stade).
+- Les événements de maintenance sont **immuables** une fois créés (journal d'audit).
+
+---
+
+## **Modèle commercial (pricing)**
+
+| Plan | Prix | Usage cible |
+|------|------|-------------|
+| **Starter** | Gratuit | Test, petite flotte perso (1-2 bateaux) |
+| **Pro** | 29 $/mois | Gestionnaire de flotte (jusqu'à ~20 bateaux) |
+| **Enterprise** | Sur devis | Grande flotte, intégrations, support dédié |
+
+---
+
+## **Glossaire métier**
+
+| Terme | Définition |
+|-------|------------|
+| **Flotte** | Ensemble des bateaux d'une organisation |
+| **Événement de maintenance** | Intervention réalisée sur un bateau ou un équipement (passé) |
+| **Tâche de maintenance** | Intervention planifiée, avec échéance date ou heures (futur) |
+| **Pièce** | Composant remplacé lors d'une intervention |
+| **Gréement** | Ensemble des éléments de la mâture (mât, barres de flèche, etc.) |
+| **Overdue** | Tâche dont l'échéance est dépassée et qui n'a pas été complétée |
+| **Organisation** | Entité (entreprise, club, individu) qui regroupe des utilisateurs et une flotte |
