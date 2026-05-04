@@ -11,6 +11,9 @@ export interface ApiDefinition {
     edit: typeof routes['boats.edit']
     update: typeof routes['boats.update']
     destroy: typeof routes['boats.destroy']
+    engines: {
+      show: typeof routes['boats.engines.show']
+    }
     maintenanceTasks: {
       store: typeof routes['boats.maintenanceTasks.store']
       done: typeof routes['boats.maintenanceTasks.done']
@@ -58,4 +61,13 @@ export interface ApiDefinition {
     }
   }
   dashboard: typeof routes['dashboard']
+  planning: {
+    index: typeof routes['planning.index']
+  }
+  settings: {
+    index: typeof routes['settings.index']
+  }
+  maintenance: {
+    history: typeof routes['maintenance.history']
+  }
 }

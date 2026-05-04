@@ -115,6 +115,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_equipment_controller').default['storeEngine']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'boats.engines.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/boats/:boatId/engines/:engineId'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; engineId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_equipment_controller').default['showEngine']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_equipment_controller').default['showEngine']>>>
+    }
+  }
   'boat_equipment.edit_engine': {
     methods: ["GET","HEAD"]
     pattern: '/boats/:boatId/engines/:engineId/edit'
@@ -437,6 +449,42 @@ export interface Registry {
       query: {}
       response: unknown
       errorResponse: unknown
+    }
+  }
+  'planning.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/planning'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/planning_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/planning_controller').default['index']>>>
+    }
+  }
+  'settings.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/settings'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['index']>>>
+    }
+  }
+  'maintenance.history': {
+    methods: ["GET","HEAD"]
+    pattern: '/maintenance/history'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/maintenance_history_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/maintenance_history_controller').default['index']>>>
     }
   }
 }

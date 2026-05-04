@@ -10,6 +10,9 @@ export const controllers = {
   BoatMaintenances: () => import('#controllers/boat_maintenances_controller'),
   Boats: () => import('#controllers/boats_controller'),
   Home: () => import('#controllers/home_controller'),
+  MaintenanceHistory: () => import('#controllers/maintenance_history_controller'),
   NewAccount: () => import('#controllers/new_account_controller'),
+  Planning: () => import('#controllers/planning_controller'),
   Session: () => import('#controllers/session_controller'),
+  Settings: () => import('#controllers/settings_controller'),
 }

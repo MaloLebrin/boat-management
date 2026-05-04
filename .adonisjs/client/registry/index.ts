@@ -60,6 +60,12 @@ const routes = {
     tokens: [{"old":"/boats/:boatId/engines","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/engines","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/engines","type":0,"val":"engines","end":""}],
     types: placeholder as Registry['boat_equipment.store_engine']['types'],
   },
+  'boats.engines.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/boats/:boatId/engines/:engineId',
+    tokens: [{"old":"/boats/:boatId/engines/:engineId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/engines/:engineId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/engines/:engineId","type":0,"val":"engines","end":""},{"old":"/boats/:boatId/engines/:engineId","type":1,"val":"engineId","end":""}],
+    types: placeholder as Registry['boats.engines.show']['types'],
+  },
   'boat_equipment.edit_engine': {
     methods: ["GET","HEAD"],
     pattern: '/boats/:boatId/engines/:engineId/edit',
@@ -221,6 +227,24 @@ const routes = {
     pattern: '/dashboard',
     tokens: [{"old":"/dashboard","type":0,"val":"dashboard","end":""}],
     types: placeholder as Registry['dashboard']['types'],
+  },
+  'planning.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/planning',
+    tokens: [{"old":"/planning","type":0,"val":"planning","end":""}],
+    types: placeholder as Registry['planning.index']['types'],
+  },
+  'settings.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/settings',
+    tokens: [{"old":"/settings","type":0,"val":"settings","end":""}],
+    types: placeholder as Registry['settings.index']['types'],
+  },
+  'maintenance.history': {
+    methods: ["GET","HEAD"],
+    pattern: '/maintenance/history',
+    tokens: [{"old":"/maintenance/history","type":0,"val":"maintenance","end":""},{"old":"/maintenance/history","type":0,"val":"history","end":""}],
+    types: placeholder as Registry['maintenance.history']['types'],
   },
 } as const satisfies Record<string, AdonisEndpoint>
 

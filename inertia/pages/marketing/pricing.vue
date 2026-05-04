@@ -81,26 +81,28 @@ const t = props.t
         </template>
       </BaseCard>
 
-      <BaseCard padded>
-        <template #header>
-          <div class="flex items-center justify-between gap-3">
-            <p class="font-display text-sm font-semibold text-fg">{{ t.pricing.plans.pro.name }}</p>
-            <BaseBadge variant="success">{{ t.pricing.plans.pro.badge }}</BaseBadge>
+      <div class="relative overflow-hidden rounded-xl bg-abyss-900 p-6 ring-2 ring-lagoon-500 shadow-xl shadow-lagoon-500/10">
+        <div class="pointer-events-none absolute top-0 right-0 h-32 w-32 rounded-full bg-lagoon-500/10 blur-2xl" />
+        <div class="relative">
+          <!-- header -->
+          <div class="mb-4 flex items-center justify-between gap-3">
+            <p class="font-display text-sm font-semibold text-white">{{ t.pricing.plans.pro.name }}</p>
+            <span class="inline-flex items-center rounded-full bg-lagoon-500 px-3 py-1 text-xs font-semibold text-white">{{ t.pricing.plans.pro.badge }}</span>
           </div>
-          <p class="mt-2 text-2xl font-semibold text-fg">{{ t.pricing.plans.pro.price }}</p>
-        </template>
-        <ul class="space-y-2 text-sm text-fg-muted">
-          <li v-for="f in t.pricing.plans.pro.features" :key="f" class="flex items-start gap-2">
-            <span class="mt-1 inline-block h-2 w-2 rounded-full bg-mint-600" aria-hidden="true" />
-            <span>{{ f }}</span>
-          </li>
-        </ul>
-        <template #footer>
+          <p class="mb-4 text-3xl font-bold text-white">{{ t.pricing.plans.pro.price }}</p>
+          <!-- features -->
+          <ul class="mb-6 space-y-2 text-sm text-abyss-200">
+            <li v-for="f in t.pricing.plans.pro.features" :key="f" class="flex items-start gap-2">
+              <span class="mt-1 inline-block h-2 w-2 shrink-0 rounded-full bg-lagoon-500" aria-hidden="true" />
+              <span>{{ f }}</span>
+            </li>
+          </ul>
+          <!-- footer -->
           <a href="/signup">
-            <BaseButton>{{ t.nav.signup }}</BaseButton>
+            <button class="w-full rounded-lg bg-lagoon-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-lagoon-600 transition-colors">{{ t.nav.signup }}</button>
           </a>
-        </template>
-      </BaseCard>
+        </div>
+      </div>
 
       <BaseCard padded>
         <template #header>
@@ -158,11 +160,11 @@ const t = props.t
     </section>
 
     <section class="mt-14">
-      <BaseCard padded>
+      <div class="rounded-2xl bg-abyss-950 px-8 py-10 ring-1 ring-abyss-700">
         <div class="grid gap-6 lg:grid-cols-2 lg:items-center">
           <div class="space-y-2">
-            <BaseHeading level="2">{{ t.pricing.cta.title }}</BaseHeading>
-            <p class="text-pretty text-lg text-fg-muted">{{ t.pricing.cta.subtitle }}</p>
+            <h2 class="font-display text-2xl font-bold text-white">{{ t.pricing.cta.title }}</h2>
+            <p class="text-pretty text-lg text-abyss-200">{{ t.pricing.cta.subtitle }}</p>
           </div>
           <div class="flex flex-wrap items-center justify-start gap-3 lg:justify-end">
             <a href="/signup">
@@ -173,7 +175,7 @@ const t = props.t
             </Link>
           </div>
         </div>
-      </BaseCard>
+      </div>
     </section>
 </template>
 

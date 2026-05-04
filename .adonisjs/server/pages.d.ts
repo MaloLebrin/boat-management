@@ -13,6 +13,7 @@ declare module '@adonisjs/inertia/types' {
     'auth/signup': ExtractProps<(typeof import('../../inertia/pages/auth/signup.vue'))['default']>
     'boats/edit': ExtractProps<(typeof import('../../inertia/pages/boats/edit.vue'))['default']>
     'boats/engine_edit': ExtractProps<(typeof import('../../inertia/pages/boats/engine_edit.vue'))['default']>
+    'boats/engine_show': ExtractProps<(typeof import('../../inertia/pages/boats/engine_show.vue'))['default']>
     'boats/index': ExtractProps<(typeof import('../../inertia/pages/boats/index.vue'))['default']>
     'boats/new': ExtractProps<(typeof import('../../inertia/pages/boats/new.vue'))['default']>
     'boats/rig_edit': ExtractProps<(typeof import('../../inertia/pages/boats/rig_edit.vue'))['default']>
@@ -23,7 +24,10 @@ declare module '@adonisjs/inertia/types' {
     'errors/not_found': ExtractProps<(typeof import('../../inertia/pages/errors/not_found.vue'))['default']>
     'errors/server_error': ExtractProps<(typeof import('../../inertia/pages/errors/server_error.vue'))['default']>
     'home': ExtractProps<(typeof import('../../inertia/pages/home.vue'))['default']>
+    'maintenance/history': ExtractProps<(typeof import('../../inertia/pages/maintenance/history.vue'))['default']>
     'marketing/home': ExtractProps<(typeof import('../../inertia/pages/marketing/home.vue'))['default']>
     'marketing/pricing': ExtractProps<(typeof import('../../inertia/pages/marketing/pricing.vue'))['default']>
+    'planning/index': ExtractProps<(typeof import('../../inertia/pages/planning/index.vue'))['default']>
+    'settings/index': ExtractProps<(typeof import('../../inertia/pages/settings/index.vue'))['default']>
   }
 }

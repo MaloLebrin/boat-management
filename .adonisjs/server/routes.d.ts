@@ -13,6 +13,7 @@ export type ScannedRoutes = {
     'boats.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boat_equipment.store_engine': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
+    'boats.engines.show': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
     'boat_equipment.edit_engine': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
     'boat_equipment.update_engine': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
     'boat_equipment.destroy_engine': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
@@ -40,6 +41,9 @@ export type ScannedRoutes = {
     'marketing.fr.home': { paramsTuple?: []; params?: {} }
     'marketing.fr.pricing': { paramsTuple?: []; params?: {} }
     'dashboard': { paramsTuple?: []; params?: {} }
+    'planning.index': { paramsTuple?: []; params?: {} }
+    'settings.index': { paramsTuple?: []; params?: {} }
+    'maintenance.history': { paramsTuple?: []; params?: {} }
   }
   GET: {
     'design_system': { paramsTuple?: []; params?: {} }
@@ -47,6 +51,7 @@ export type ScannedRoutes = {
     'boats.create': { paramsTuple?: []; params?: {} }
     'boats.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'boats.engines.show': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
     'boat_equipment.edit_engine': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
     'boat_equipment.edit_sail': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'sailId': ParamValue} }
     'boat_equipment.edit_rig': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
@@ -58,6 +63,9 @@ export type ScannedRoutes = {
     'marketing.fr.home': { paramsTuple?: []; params?: {} }
     'marketing.fr.pricing': { paramsTuple?: []; params?: {} }
     'dashboard': { paramsTuple?: []; params?: {} }
+    'planning.index': { paramsTuple?: []; params?: {} }
+    'settings.index': { paramsTuple?: []; params?: {} }
+    'maintenance.history': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
     'design_system': { paramsTuple?: []; params?: {} }
@@ -65,6 +73,7 @@ export type ScannedRoutes = {
     'boats.create': { paramsTuple?: []; params?: {} }
     'boats.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'boats.engines.show': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
     'boat_equipment.edit_engine': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
     'boat_equipment.edit_sail': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'sailId': ParamValue} }
     'boat_equipment.edit_rig': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
@@ -76,6 +85,9 @@ export type ScannedRoutes = {
     'marketing.fr.home': { paramsTuple?: []; params?: {} }
     'marketing.fr.pricing': { paramsTuple?: []; params?: {} }
     'dashboard': { paramsTuple?: []; params?: {} }
+    'planning.index': { paramsTuple?: []; params?: {} }
+    'settings.index': { paramsTuple?: []; params?: {} }
+    'maintenance.history': { paramsTuple?: []; params?: {} }
   }
   POST: {
     'boats.store': { paramsTuple?: []; params?: {} }

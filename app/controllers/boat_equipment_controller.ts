@@ -1,3 +1,5 @@
+import BoatMaintenanceEvent from '#models/boat_maintenance_event'
+import BoatMaintenanceTask from '#models/boat_maintenance_task'
 import BoatService, { BoatEquipmentNotFoundError, BoatNotFoundError } from '#services/boat_service'
 import {
   type BoatEngineFormBody,
@@ -274,5 +276,75 @@ export default class BoatEquipmentController {
 
     session.flash('success', i18n.t('flash.rig.removed'))
     response.redirect(`/boats/${boat.id}`)
+  }
+
+  async showEngine({ inertia, response, auth, params, bouncer }: HttpContext) {
+    await auth.authenticate()
+    const loaded = await this.loadBoatForEquipment({ auth, response, params })
+    if (!loaded) return
+
+    const { boat } = loaded
+    const engineId = Number(params.engineId)
+    const engine = boat.engines.find((e) => e.id === engineId)
+
+    if (!engine) {
+      return response.redirect(`/boats/${boat.id}`)
+    }
+
+    const canManage = await bouncer.allows('boatUpdate', boat)
+
+    const maintenanceEvents = await BoatMaintenanceEvent.query()
+      .where('boatId', boat.id)
+      .where('boatEngineId', engineId)
+      .preload('parts')
+      .orderBy('performedAt', 'desc')
+
+    const maintenanceTasks = await BoatMaintenanceTask.query()
+      .where('boatId', boat.id)
+      .where('boatEngineId', engineId)
+      .orderBy('status', 'asc')
+      .orderBy('dueAt', 'asc')
+      .orderBy('id', 'desc')
+
+    return inertia.render('boats/engine_show', {
+      boat: { id: boat.id, name: boat.name },
+      engine: {
+        id: engine.id,
+        kind: engine.kind,
+        fuel: engine.fuel,
+        brand: engine.brand,
+        model: engine.model,
+        serialNumber: engine.serialNumber,
+        manufacturedAt: engine.manufacturedAt ? engine.manufacturedAt.toISODate() : null,
+        powerHp: engine.powerHp,
+        hours: engine.hours,
+      },
+      maintenanceEvents: maintenanceEvents.map((ev) => ({
+        id: ev.id,
+        subject: ev.subject,
+        title: ev.title,
+        notes: ev.notes,
+        performedAt: ev.performedAt.toISODate()!,
+        engineCaption: ev.engineCaption,
+        parts: ev.parts.map((p) => ({
+          id: p.id,
+          name: p.name,
+          quantity: p.quantity,
+          notes: p.notes,
+        })),
+      })),
+      maintenanceTasks: maintenanceTasks.map((t) => ({
+        id: t.id,
+        subject: t.subject,
+        title: t.title,
+        notes: t.notes,
+        status: t.status as 'open' | 'done',
+        dueAt: t.dueAt ? t.dueAt.toISODate() : null,
+        dueEngineHours: t.dueEngineHours,
+        boatEngineId: t.boatEngineId,
+        recurrenceIntervalEngineHours: t.recurrenceIntervalEngineHours,
+      })),
+      canManage,
+    })
   }
 }
