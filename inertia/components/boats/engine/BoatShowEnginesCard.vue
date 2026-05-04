@@ -80,19 +80,25 @@ function performedDisplay(iso: string | null) {
             </div>
           </div>
 
-          <div v-if="canManage" class="flex flex-wrap items-center gap-2 md:justify-end">
-            <a :href="`/boats/${boatId}/engines/${e.id}/edit`">
+          <div class="flex flex-wrap items-center gap-2 md:justify-end">
+            <a :href="`/boats/${boatId}/engines/${e.id}`">
+              <BaseButton variant="secondary" size="sm" type="button">
+                Voir le détail
+              </BaseButton>
+            </a>
+            <a v-if="canManage" :href="`/boats/${boatId}/engines/${e.id}/edit`">
               <BaseButton variant="ghost" size="sm" type="button" aria-label="Edit engine">
-                Edit
+                Modifier
               </BaseButton>
             </a>
             <Form
+              v-if="canManage"
               :action="{ url: `/boats/${boatId}/engines/${e.id}`, method: 'delete' }"
               #default="{ processing }"
               class="inline"
             >
               <BaseButton type="submit" variant="danger" size="sm" :disabled="processing" aria-label="Remove engine">
-                Remove
+                Supprimer
               </BaseButton>
             </Form>
           </div>
