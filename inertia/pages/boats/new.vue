@@ -5,7 +5,9 @@ import { computed, ref } from 'vue'
 import type { PropulsionTypeUi } from '~/types/boat_form'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
+import { useT } from '~/composables/useT'
 
+const { t } = useT()
 const propulsionType = ref<PropulsionTypeUi>('')
 const showSailFields = computed(() => propulsionType.value === 'sailboat')
 </script>
@@ -13,8 +15,8 @@ const showSailFields = computed(() => propulsionType.value === 'sailboat')
 <template>
   <div class="mx-auto w-full max-w-xl px-6 py-10 sm:px-8">
     <div class="space-y-2">
-      <BaseHeading level="1">New boat</BaseHeading>
-      <p class="text-base text-fg-muted">Create a new boat in your organization</p>
+      <BaseHeading level="1">{{ t('boats.new.title') }}</BaseHeading>
+      <p class="text-base text-fg-muted">{{ t('boats.new.subtitle') }}</p>
     </div>
 
     <div class="mt-8">
@@ -28,9 +30,9 @@ const showSailFields = computed(() => propulsionType.value === 'sailboat')
           />
 
           <div class="flex items-center gap-3">
-            <BaseButton type="submit" :disabled="processing">Create</BaseButton>
+            <BaseButton type="submit" :disabled="processing">{{ t('boats.new.submit') }}</BaseButton>
             <a href="/boats" class="text-sm font-semibold text-fg-muted hover:text-fg hover:underline">
-              Cancel
+              {{ t('boats.new.cancel') }}
             </a>
           </div>
         </div>

@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { SAIL_TYPE_OPTIONS } from '#shared/constants/boats/boat_form_options'
 import { ref, watch } from 'vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
+import { useT } from '~/composables/useT'
+import { useBoatOptions } from '~/composables/useBoatOptions'
+import { SAIL_TYPE_OPTIONS } from '#shared/constants/boats/boat_form_options'
 
 export type BoatEquipmentSailFieldsModel = {
   id?: number
@@ -17,6 +19,9 @@ const props = defineProps<{
   errors: Record<string, string | string[] | undefined>
   sail?: BoatEquipmentSailFieldsModel | null
 }>()
+
+const { t } = useT()
+const { sailTypeOptions } = useBoatOptions()
 
 const sailType = ref('')
 const manufacturedAt = ref('')
@@ -45,8 +50,8 @@ watch(
     <BaseSelect
       id="sailType"
       name="sailType"
-      label="Type"
-      :options="SAIL_TYPE_OPTIONS"
+      :label="t('boats.hullFields.type')"
+      :options="sailTypeOptions"
       v-model="sailType"
       :errors="errors"
     />
@@ -54,7 +59,7 @@ watch(
     <BaseInput
       id="manufacturedAt"
       name="manufacturedAt"
-      label="Manufacturing date"
+      :label="t('boats.hullFields.manufacturedAt')"
       type="date"
       v-model="manufacturedAt"
       :errors="errors"
@@ -82,7 +87,7 @@ watch(
     <BaseInput
       id="reefPoints"
       name="reefPoints"
-      label="Reef points"
+      :label="t('boats.sails.reef')"
       type="number"
       inputmode="numeric"
       v-model="reefPoints"

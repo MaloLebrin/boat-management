@@ -5,6 +5,7 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseEmptyState from '~/components/base/BaseEmptyState.vue'
+import { useT } from '~/composables/useT'
 
 interface HistoryEvent {
   id: number
@@ -28,17 +29,19 @@ const props = defineProps<{
   }
 }>()
 
+const { t, locale } = useT()
+
 const search = ref('')
 const subjectFilter = ref<string | null>(null)
 const expandedIds = ref<Set<number>>(new Set())
 
-const subjectFilters = [
-  { key: null, label: 'Tous' },
-  { key: 'engine', label: 'Moteur' },
-  { key: 'sail', label: 'Voile' },
-  { key: 'rig', label: 'Greement' },
-  { key: 'hull', label: 'Coque' },
-]
+const subjectFilters = computed(() => [
+  { key: null, label: t('maintenance.history.filters.all') },
+  { key: 'engine', label: t('maintenance.history.filters.engine') },
+  { key: 'sail', label: t('maintenance.history.filters.sail') },
+  { key: 'rig', label: t('maintenance.history.filters.rig') },
+  { key: 'hull', label: t('maintenance.history.filters.hull') },
+])
 
 const filteredEvents = computed(() => {
   let result = props.events
@@ -70,14 +73,14 @@ const eventsByMonth = computed(() => {
 })
 
 function formatMonthHeader(yearMonth: string): string {
-  return new Date(yearMonth + '-01').toLocaleDateString('fr-FR', {
+  return new Date(yearMonth + '-01').toLocaleDateString(locale.value, {
     month: 'long',
     year: 'numeric',
   })
 }
 
 function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString('fr-FR', {
+  return new Date(iso).toLocaleDateString(locale.value, {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
@@ -111,12 +114,12 @@ function getEquipmentCaption(event: HistoryEvent): string | null {
     <header class="space-y-4">
       <div class="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
         <div>
-          <BaseHeading level="1">Historique de maintenance</BaseHeading>
-          <p class="mt-2 text-fg-muted">Toutes les interventions de votre flotte</p>
+          <BaseHeading level="1">{{ t('maintenance.history.title') }}</BaseHeading>
+          <p class="mt-2 text-fg-muted">{{ t('maintenance.history.subtitle') }}</p>
         </div>
         <!-- TODO: implement PDF export for full maintenance history — GET /maintenance/history.pdf with current filters as query params -->
         <BaseButton variant="secondary" size="sm" disabled>
-          Exporter PDF
+          {{ t('maintenance.history.exportPdf') }}
         </BaseButton>
       </div>
     </header>
@@ -127,7 +130,7 @@ function getEquipmentCaption(event: HistoryEvent): string | null {
         <input
           v-model="search"
           type="text"
-          placeholder="Rechercher par titre ou bateau..."
+          :placeholder="t('maintenance.history.searchPlaceholder')"
           class="w-full rounded-lg border border-border bg-surface-elevated px-4 py-2 text-sm text-fg placeholder-fg-muted focus:outline-none focus:ring-2 focus:ring-brand/30"
         />
       </div>
@@ -153,15 +156,15 @@ function getEquipmentCaption(event: HistoryEvent): string | null {
     <div class="mt-6 grid grid-cols-3 gap-4">
       <div class="rounded-lg border border-border bg-surface-elevated p-4 text-center">
         <p class="text-2xl font-bold text-fg">{{ stats.totalEvents }}</p>
-        <p class="text-sm text-fg-muted">Evenements</p>
+        <p class="text-sm text-fg-muted">{{ t('maintenance.history.stats.events') }}</p>
       </div>
       <div class="rounded-lg border border-border bg-surface-elevated p-4 text-center">
         <p class="text-2xl font-bold text-fg">{{ stats.totalParts }}</p>
-        <p class="text-sm text-fg-muted">Pieces changees</p>
+        <p class="text-sm text-fg-muted">{{ t('maintenance.history.stats.partsChanged') }}</p>
       </div>
       <div class="rounded-lg border border-border bg-surface-elevated p-4 text-center">
         <p class="text-2xl font-bold text-fg">{{ stats.totalBoats }}</p>
-        <p class="text-sm text-fg-muted">Bateaux</p>
+        <p class="text-sm text-fg-muted">{{ t('maintenance.history.stats.boats') }}</p>
       </div>
     </div>
 
@@ -169,9 +172,9 @@ function getEquipmentCaption(event: HistoryEvent): string | null {
     <div class="mt-8">
       <div v-if="filteredEvents.length === 0">
         <BaseEmptyState
-          title="Aucun evenement de maintenance"
-          description="Commencez par ajouter un bateau et enregistrer vos interventions."
-          action-label="Voir les bateaux"
+          :title="t('maintenance.history.empty.title')"
+          :description="t('maintenance.history.empty.description')"
+          :action-label="t('maintenance.history.empty.action')"
           @action="$inertia.visit('/boats')"
         />
       </div>
@@ -183,7 +186,7 @@ function getEquipmentCaption(event: HistoryEvent): string | null {
             <h2 class="text-lg font-semibold text-fg capitalize">
               {{ formatMonthHeader(yearMonth) }}
             </h2>
-            <span class="text-sm text-fg-muted">{{ monthEvents.length }} evenement(s)</span>
+            <span class="text-sm text-fg-muted">{{ t('maintenance.history.timeline.events', { count: String(monthEvents.length) }) }}</span>
           </div>
 
           <!-- Events -->
@@ -198,7 +201,7 @@ function getEquipmentCaption(event: HistoryEvent): string | null {
             >
               <div class="flex items-start gap-4">
                 <!-- Date -->
-                <div class="flex-shrink-0 w-12 text-center">
+                <div class="shrink-0 w-12 text-center">
                   <p class="text-2xl font-bold text-fg">{{ getDayNumber(event.performedAt) }}</p>
                 </div>
 
@@ -212,7 +215,7 @@ function getEquipmentCaption(event: HistoryEvent): string | null {
                       </p>
                     </div>
 
-                    <div class="flex items-center gap-3 flex-shrink-0">
+                    <div class="flex items-center gap-3 shrink-0">
                       <a
                         :href="`/boats/${event.boatId}`"
                         class="inline-flex"
@@ -220,14 +223,14 @@ function getEquipmentCaption(event: HistoryEvent): string | null {
                         <BaseBadge variant="neutral">{{ event.boatName }}</BaseBadge>
                       </a>
                       <span v-if="event.parts.length > 0" class="text-sm text-fg-muted">
-                        {{ event.parts.length }} piece(s)
+                        {{ t('maintenance.history.timeline.pieces', { count: String(event.parts.length) }) }}
                       </span>
                       <button
                         type="button"
                         class="text-sm text-brand hover:underline"
                         @click="toggleExpand(event.id)"
                       >
-                        {{ isExpanded(event.id) ? 'Masquer' : 'Detail' }}
+                        {{ isExpanded(event.id) ? t('maintenance.history.timeline.hide') : t('maintenance.history.timeline.show') }}
                       </button>
                     </div>
                   </div>
@@ -240,14 +243,14 @@ function getEquipmentCaption(event: HistoryEvent): string | null {
                     </div>
 
                     <div v-if="event.parts.length > 0">
-                      <p class="text-sm font-medium text-fg-muted mb-2">Pieces utilisees</p>
+                      <p class="text-sm font-medium text-fg-muted mb-2">{{ t('maintenance.history.timeline.partsUsed') }}</p>
                       <ul class="space-y-1">
                         <li
                           v-for="part in event.parts"
                           :key="part.id"
                           class="text-sm text-fg flex items-center gap-2"
                         >
-                          <span class="w-2 h-2 rounded-full bg-brand flex-shrink-0" />
+                          <span class="w-2 h-2 rounded-full bg-brand shrink-0" />
                           {{ part.name }}
                           <span v-if="part.quantity" class="text-fg-muted">
                             (x{{ part.quantity }})
@@ -257,7 +260,7 @@ function getEquipmentCaption(event: HistoryEvent): string | null {
                     </div>
 
                     <div v-if="!event.notes && event.parts.length === 0" class="text-sm text-fg-muted">
-                      Aucun detail supplementaire
+                      {{ t('maintenance.history.timeline.noDetails') }}
                     </div>
                   </div>
                 </div>

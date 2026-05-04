@@ -3,6 +3,7 @@ import { Form, Link } from '@adonisjs/inertia/vue'
 import { usePage } from '@inertiajs/vue3'
 import { computed } from 'vue'
 import brandIconUrl from '~/assets/brand/fleetide_ai_icon_C.svg?url'
+import { useT } from '~/composables/useT'
 
 type AuthUser = {
   id: number
@@ -17,6 +18,7 @@ const props = defineProps<{
 }>()
 
 const page = usePage()
+const { t } = useT()
 
 const currentPath = computed(() => props.currentRoute ?? page.url)
 
@@ -28,28 +30,28 @@ function isActive(path: string): boolean {
   return current.startsWith(path) || current.includes(path)
 }
 
-const navSections = [
+const navSections = computed(() => [
   {
-    label: 'FLOTTE',
+    label: t('nav.sections.fleet'),
     items: [
-      { name: 'Dashboard', path: '/dashboard', route: 'dashboard', icon: 'house' },
-      { name: 'Mes bateaux', path: '/boats', route: null, icon: 'boat' },
+      { name: t('nav.dashboard'), path: '/dashboard', route: 'dashboard', icon: 'house' },
+      { name: t('nav.myBoats'), path: '/boats', route: null, icon: 'boat' },
     ],
   },
   {
-    label: 'MAINTENANCE',
+    label: t('nav.sections.maintenance'),
     items: [
-      { name: 'Planning', path: '/planning', route: null, icon: 'calendar' },
-      { name: 'Historique', path: '/maintenance/history', route: null, icon: 'clock' },
+      { name: t('nav.planning'), path: '/planning', route: null, icon: 'calendar' },
+      { name: t('nav.history'), path: '/maintenance/history', route: null, icon: 'clock' },
     ],
   },
   {
-    label: 'PREFERENCES',
+    label: t('nav.sections.preferences'),
     items: [
-      { name: 'Reglages', path: '/settings', route: null, icon: 'gear' },
+      { name: t('nav.settings'), path: '/settings', route: null, icon: 'gear' },
     ],
   },
-]
+])
 </script>
 
 <template>
@@ -158,7 +160,7 @@ const navSections = [
         </div>
         <div class="flex-1 min-w-0">
           <p class="text-sm font-medium text-white truncate">
-            {{ user?.fullName ?? 'Utilisateur' }}
+            {{ user?.fullName ?? t('nav.unknownUser') }}
           </p>
           <p class="text-xs text-abyss-300 truncate">
             {{ user?.email ?? '' }}
@@ -173,7 +175,7 @@ const navSections = [
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
           </svg>
-          <span>Deconnexion</span>
+          <span>{{ t('nav.logout') }}</span>
         </button>
       </Form>
     </div>

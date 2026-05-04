@@ -16,9 +16,19 @@
     "workspace": "Espace de travail",
     "dashboard": "Tableau de bord",
     "boats": "Bateaux",
+    "planning": "Planning",
+    "history": "Historique",
+    "settings": "Réglages",
     "designSystem": "Système de design",
     "menu": "Menu",
-    "logout": "Déconnexion"
+    "logout": "Déconnexion",
+    "myBoats": "Mes bateaux",
+    "unknownUser": "Utilisateur",
+    "sections": {
+      "fleet": "FLOTTE",
+      "maintenance": "MAINTENANCE",
+      "preferences": "PRÉFÉRENCES"
+    }
   },
   "auth": {
     "login": {
@@ -49,6 +59,13 @@
     "title": "Tableau de bord",
     "subtitle": "Vue d'ensemble de votre flotte et de la maintenance à venir.",
     "newBoat": "Nouveau bateau",
+    "overdueAlert": "{count} tâche(s) en retard",
+    "viewPlanning": "Voir le planning",
+    "analyzeFleet": "Analyser la flotte",
+    "aiPanel": {
+      "title": "Assistant IA",
+      "suggestions": "Suggestions"
+    },
     "stats": {
       "boats": "Bateaux",
       "engines": "Moteurs",
@@ -79,7 +96,263 @@
       "empty": "Aucun bateau pour l'instant."
     }
   },
+  "planning": {
+    "title": "Planning de maintenance",
+    "subtitle": "Vue d'ensemble des tâches pour tous vos bateaux",
+    "viewKanban": "Kanban",
+    "viewCalendar": "Calendrier",
+    "empty": {
+      "title": "Aucune tâche de maintenance",
+      "description": "Créez des tâches de maintenance depuis la fiche d'un bateau.",
+      "action": "Voir mes bateaux"
+    },
+    "kanban": {
+      "overdue": "En retard",
+      "overdueEmpty": "Aucune tâche en retard",
+      "soon": "À venir bientôt",
+      "soonEmpty": "Aucune tâche imminente",
+      "planned": "Planifiées",
+      "plannedEmpty": "Aucune tâche planifiée",
+      "completed": "Complétées",
+      "completedEmpty": "Les tâches complétées apparaissent ici"
+    },
+    "taskKind": {
+      "date": "date",
+      "hours": "heures"
+    },
+    "calendar": {
+      "more": "+{count} autres",
+      "withoutDate": "Sans date planifiée",
+      "schedule": "Planifier",
+      "hourTriggered": "Déclenchées par les heures moteur"
+    }
+  },
+  "maintenance": {
+    "history": {
+      "title": "Historique de maintenance",
+      "subtitle": "Toutes les interventions de votre flotte",
+      "exportPdf": "Exporter PDF",
+      "searchPlaceholder": "Rechercher par titre ou bateau...",
+      "filters": {
+        "all": "Tous",
+        "engine": "Moteur",
+        "sail": "Voile",
+        "rig": "Gréement",
+        "hull": "Coque"
+      },
+      "stats": {
+        "events": "Événements",
+        "partsChanged": "Pièces changées",
+        "boats": "Bateaux"
+      },
+      "timeline": {
+        "events": "{count} événement(s)",
+        "pieces": "{count} pièce(s)",
+        "show": "Détail",
+        "hide": "Masquer",
+        "partsUsed": "Pièces utilisées",
+        "noDetails": "Aucun détail supplémentaire"
+      },
+      "empty": {
+        "title": "Aucun événement de maintenance",
+        "description": "Commencez par ajouter un bateau et enregistrer vos interventions.",
+        "action": "Voir les bateaux"
+      }
+    }
+  },
+  "settings": {
+    "title": "Paramètres",
+    "sections": {
+      "org": "Profil organisation",
+      "members": "Membres et accès",
+      "billing": "Facturation et plan",
+      "me": "Mon profil"
+    },
+    "org": {
+      "title": "Profil organisation",
+      "nameLabel": "Nom de l'organisation",
+      "namePlaceholder": "Mon organisation",
+      "logoLabel": "Logo",
+      "logoPlaceholder": "Logo",
+      "changeLogo": "Changer le logo",
+      "save": "Enregistrer"
+    },
+    "members": {
+      "title": "Membres et accès",
+      "invite": "Inviter un membre",
+      "columns": {
+        "member": "Membre",
+        "role": "Rôle",
+        "status": "Statut"
+      },
+      "noName": "Sans nom",
+      "roles": {
+        "admin": "Admin"
+      },
+      "statuses": {
+        "active": "Actif"
+      },
+      "you": "Vous"
+    },
+    "billing": {
+      "title": "Facturation et plan",
+      "currentPlan": "Plan actuel",
+      "freePlan": "Gratuit",
+      "freeDescription": "Vous utilisez actuellement le plan gratuit avec des fonctionnalités limitées.",
+      "features": {
+        "upTo3Boats": "Jusqu'à 3 bateaux",
+        "maintenanceHistory": "Historique de maintenance",
+        "aiSuggestions": "Suggestions IA"
+      },
+      "upgradePro": "Passer au plan Pro",
+      "paymentMethod": "Méthode de paiement",
+      "noPaymentMethod": "Aucune méthode de paiement configurée.",
+      "addCard": "Ajouter une carte"
+    },
+    "me": {
+      "title": "Mon profil",
+      "fullNameLabel": "Nom complet",
+      "fullNamePlaceholder": "Jean Dupont",
+      "emailLabel": "Adresse email",
+      "emailHint": "L'adresse email ne peut pas être modifiée.",
+      "save": "Enregistrer les modifications"
+    }
+  },
+  "errors": {
+    "notFound": {
+      "title": "Page introuvable",
+      "description": "La page que vous cherchez n'existe pas ou a été déplacée.",
+      "action": "Retour au tableau de bord"
+    },
+    "serverError": {
+      "title": "Une erreur est survenue",
+      "description": "Une erreur inattendue s'est produite. Veuillez réessayer ou contacter le support.",
+      "action": "Retour au tableau de bord"
+    }
+  },
   "boats": {
+    "new": {
+      "title": "Nouveau bateau",
+      "subtitle": "Créer un nouveau bateau dans votre organisation",
+      "submit": "Créer",
+      "cancel": "Annuler"
+    },
+    "edit": {
+      "title": "Modifier le bateau",
+      "subtitle": "Mettre à jour les informations du bateau",
+      "submit": "Enregistrer",
+      "cancel": "Annuler"
+    },
+    "hullFields": {
+      "name": "Nom",
+      "registrationNumber": "Immatriculation",
+      "type": "Type",
+      "propulsionType": "Type de propulsion",
+      "manufacturedAt": "Date de fabrication",
+      "lengthM": "Longueur (m)",
+      "beamM": "Largeur (m)",
+      "draftM": "Tirant d'eau (m)",
+      "mastHeightM": "Hauteur de mât (m)",
+      "hullMaterial": "Matériau de coque",
+      "yearBuilt": "Année de construction",
+      "manufacturer": "Constructeur",
+      "model": "Modèle"
+    },
+    "engines": {
+      "title": "Moteurs",
+      "addEngine": "Ajouter un moteur",
+      "noEngines": "Aucun moteur.",
+      "viewDetail": "Voir le détail",
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "mfg": "Installé le",
+      "sn": "N° série",
+      "fields": {
+        "kind": "Type",
+        "fuel": "Carburant",
+        "brand": "Marque",
+        "model": "Modèle",
+        "serialNumber": "Numéro de série",
+        "manufacturedAt": "Date d'installation",
+        "powerHp": "Puissance (ch)",
+        "hours": "Heures"
+      },
+      "modal": {
+        "title": "Ajouter un moteur",
+        "cancel": "Annuler",
+        "submit": "Ajouter le moteur"
+      }
+    },
+    "sails": {
+      "title": "Voiles",
+      "addSail": "Ajouter une voile",
+      "noSails": "Aucune voile.",
+      "reef": "Ris",
+      "mfg": "Fabriqué le",
+      "modal": {
+        "title": "Ajouter une voile",
+        "cancel": "Annuler",
+        "submit": "Ajouter la voile"
+      }
+    },
+    "rig": {
+      "title": "Gréement",
+      "noRig": "Aucun gréement enregistré.",
+      "fields": {
+        "rigType": "Type de gréement",
+        "mastCount": "Nombre de mâts",
+        "spreaders": "Barres de flèche",
+        "manufacturedAt": "Date de fabrication"
+      }
+    },
+    "options": {
+      "propulsion": {
+        "sailboat": "Voilier",
+        "motorboat": "Bateau à moteur",
+        "catamaran": "Catamaran",
+        "rib": "Semi-rigide",
+        "other": "Autre"
+      },
+      "hullMaterial": {
+        "fiberglass": "Fibre de verre",
+        "aluminum": "Aluminium",
+        "steel": "Acier",
+        "wood": "Bois",
+        "carbon": "Carbone",
+        "other": "Autre"
+      },
+      "engineKind": {
+        "inboard": "Inbord",
+        "outboard": "Hors-bord",
+        "electric": "Électrique",
+        "hybrid": "Hybride",
+        "other": "Autre"
+      },
+      "engineFuel": {
+        "diesel": "Diesel",
+        "essence": "Essence",
+        "electric": "Électrique",
+        "other": "Autre"
+      },
+      "sailType": {
+        "main": "Grand-voile",
+        "genoa": "Génois",
+        "jib": "Foc",
+        "spinnaker": "Spinnaker",
+        "gennaker": "Gennaker",
+        "storm_jib": "Tourmentin",
+        "other": "Autre"
+      },
+      "rigType": {
+        "sloop": "Sloop",
+        "cutter": "Cotre",
+        "ketch": "Ketch",
+        "yawl": "Yawl",
+        "schooner": "Goélette",
+        "cat_rig": "Misainier",
+        "other": "Autre"
+      }
+    },
     "index": {
       "title": "Bateaux",
       "subtitle": "Tous les bateaux de votre organisation",

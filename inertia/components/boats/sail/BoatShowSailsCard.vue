@@ -8,6 +8,7 @@ import BaseCard from '~/components/base/BaseCard.vue'
 import BaseModal from '~/components/base/BaseModal.vue'
 import type { BoatShowSail } from '~/types/boat_show'
 import BoatEquipmentSailFields from './BoatEquipmentSailFields.vue'
+import { useT } from '~/composables/useT'
 
 defineProps<{
   boatId: number
@@ -15,6 +16,7 @@ defineProps<{
   canManage: boolean
 }>()
 
+const { t } = useT()
 const isCreateOpen = ref(false)
 
 function performedDisplay(iso: string | null) {
@@ -28,20 +30,20 @@ function performedDisplay(iso: string | null) {
   <BaseCard padded>
     <template #header>
       <div class="flex items-center justify-between gap-3">
-        <p class="text-sm font-semibold text-fg">Sails</p>
+        <p class="text-sm font-semibold text-fg">{{ t('boats.sails.title') }}</p>
         <BaseButton
           v-if="canManage"
           variant="secondary"
           size="sm"
           type="button"
-          aria-label="Add a sail"
+          :aria-label="t('boats.sails.addSail')"
           @click="isCreateOpen = true"
         >
-          Add sail
+          {{ t('boats.sails.addSail') }}
         </BaseButton>
       </div>
     </template>
-    <div v-if="sails.length === 0" class="text-sm text-fg-muted">No sails.</div>
+    <div v-if="sails.length === 0" class="text-sm text-fg-muted">{{ t('boats.sails.noSails') }}</div>
     <ul v-else class="space-y-3 text-sm">
       <li
         v-for="s in sails"
@@ -68,18 +70,18 @@ function performedDisplay(iso: string | null) {
                 v-if="s.reefPoints !== null"
                 class="rounded-full bg-surface-elevated px-2 py-1 ring-1 ring-border"
               >
-                Reef {{ s.reefPoints }}
+                {{ t('boats.sails.reef') }} {{ s.reefPoints }}
               </span>
             </div>
 
             <div class="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-fg-subtle">
-              <span v-if="performedDisplay(s.manufacturedAt)">Mfg. {{ performedDisplay(s.manufacturedAt) }}</span>
+              <span v-if="performedDisplay(s.manufacturedAt)">{{ t('boats.sails.mfg') }} {{ performedDisplay(s.manufacturedAt) }}</span>
             </div>
           </div>
 
           <div v-if="canManage" class="flex flex-wrap items-center gap-2 md:justify-end">
             <a :href="`/boats/${boatId}/sails/${s.id}/edit`">
-              <BaseButton variant="secondary" size="sm" type="button" aria-label="Edit sail">
+              <BaseButton variant="secondary" size="sm" type="button" :aria-label="t('common.edit')">
                 <PencilSquareIcon class="w-4 h-4" />
               </BaseButton>
             </a>
@@ -88,7 +90,7 @@ function performedDisplay(iso: string | null) {
               #default="{ processing }"
               class="inline"
             >
-              <BaseButton type="submit" variant="danger" size="sm" :disabled="processing" aria-label="Remove sail">
+              <BaseButton type="submit" variant="danger" size="sm" :disabled="processing" :aria-label="t('common.delete')">
                 <TrashIcon class="w-4 h-4 text-red-800" />
               </BaseButton>
             </Form>
@@ -97,7 +99,7 @@ function performedDisplay(iso: string | null) {
       </li>
     </ul>
 
-    <BaseModal v-model:open="isCreateOpen" title="Add sail" close-label="Close">
+    <BaseModal v-model:open="isCreateOpen" :title="t('boats.sails.modal.title')" :close-label="t('common.close')">
       <Form
         :action="{ url: `/boats/${boatId}/sails`, method: 'post' }"
         class="space-y-4"
@@ -105,8 +107,8 @@ function performedDisplay(iso: string | null) {
       >
         <BoatEquipmentSailFields :errors="errors" />
         <div class="flex items-center justify-end gap-2 pt-2">
-          <BaseButton variant="ghost" type="button" @click="isCreateOpen = false">Cancel</BaseButton>
-          <BaseButton type="submit" :disabled="processing">Add sail</BaseButton>
+          <BaseButton variant="ghost" type="button" @click="isCreateOpen = false">{{ t('boats.sails.modal.cancel') }}</BaseButton>
+          <BaseButton type="submit" :disabled="processing">{{ t('boats.sails.modal.submit') }}</BaseButton>
         </div>
       </Form>
     </BaseModal>

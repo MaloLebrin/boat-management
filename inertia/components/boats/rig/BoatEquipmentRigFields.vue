@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { RIG_TYPE_OPTIONS } from '#shared/constants/boats/boat_form_options'
 import { ref, watch } from 'vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
+import { useT } from '~/composables/useT'
+import { useBoatOptions } from '~/composables/useBoatOptions'
+import { RIG_TYPE_OPTIONS } from '#shared/constants/boats/boat_form_options'
 
 export type BoatEquipmentRigFieldsModel = {
   rigType: string
@@ -15,6 +17,9 @@ const props = defineProps<{
   errors: Record<string, string | string[] | undefined>
   rig?: BoatEquipmentRigFieldsModel | null
 }>()
+
+const { t } = useT()
+const { rigTypeOptions } = useBoatOptions()
 
 const rigType = ref('')
 const manufacturedAt = ref('')
@@ -41,8 +46,8 @@ watch(
     <BaseSelect
       id="rigType"
       name="rigType"
-      label="Rig type"
-      :options="RIG_TYPE_OPTIONS"
+      :label="t('boats.rig.fields.rigType')"
+      :options="rigTypeOptions"
       v-model="rigType"
       :errors="errors"
     />
@@ -50,7 +55,7 @@ watch(
     <BaseInput
       id="manufacturedAt"
       name="manufacturedAt"
-      label="Manufacturing date"
+      :label="t('boats.rig.fields.manufacturedAt')"
       type="date"
       v-model="manufacturedAt"
       :errors="errors"
@@ -59,7 +64,7 @@ watch(
     <BaseInput
       id="mastCount"
       name="mastCount"
-      label="Mast count"
+      :label="t('boats.rig.fields.mastCount')"
       type="number"
       inputmode="numeric"
       v-model="mastCount"
@@ -69,7 +74,7 @@ watch(
     <BaseInput
       id="spreaders"
       name="spreaders"
-      label="Spreaders"
+      :label="t('boats.rig.fields.spreaders')"
       type="number"
       inputmode="numeric"
       v-model="spreaders"

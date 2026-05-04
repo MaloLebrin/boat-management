@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { ENGINE_FUEL_OPTIONS, ENGINE_KIND_OPTIONS } from '#shared/constants/boats/boat_form_options'
 import { ref, watch } from 'vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
+import { useT } from '~/composables/useT'
+import { useBoatOptions } from '~/composables/useBoatOptions'
+import { ENGINE_KIND_OPTIONS } from '#shared/constants/boats/boat_form_options'
 
 export type BoatEquipmentEngineFieldsModel = {
   id?: number
@@ -20,6 +22,9 @@ const props = defineProps<{
   errors: Record<string, string | string[] | undefined>
   engine?: BoatEquipmentEngineFieldsModel | null
 }>()
+
+const { t } = useT()
+const { engineKindOptions, engineFuelOptions } = useBoatOptions()
 
 const kind = ref('')
 const fuel = ref('')
@@ -54,8 +59,8 @@ watch(
     <BaseSelect
       id="kind"
       name="kind"
-      label="Kind"
-      :options="ENGINE_KIND_OPTIONS"
+      :label="t('boats.engines.fields.kind')"
+      :options="engineKindOptions"
       v-model="kind"
       :errors="errors"
     />
@@ -63,27 +68,27 @@ watch(
     <BaseSelect
       id="fuel"
       name="fuel"
-      label="Fuel"
+      :label="t('boats.engines.fields.fuel')"
       placeholder="—"
       :allow-empty="true"
-      :options="ENGINE_FUEL_OPTIONS"
+      :options="engineFuelOptions"
       v-model="fuel"
       :errors="errors"
     />
 
-    <BaseInput id="brand" name="brand" label="Brand" v-model="brand" :errors="errors" />
-    <BaseInput id="model" name="model" label="Model" v-model="model" :errors="errors" />
+    <BaseInput id="brand" name="brand" :label="t('boats.engines.fields.brand')" v-model="brand" :errors="errors" />
+    <BaseInput id="model" name="model" :label="t('boats.engines.fields.model')" v-model="model" :errors="errors" />
     <BaseInput
       id="serialNumber"
       name="serialNumber"
-      label="Serial number"
+      :label="t('boats.engines.fields.serialNumber')"
       v-model="serialNumber"
       :errors="errors"
     />
     <BaseInput
       id="manufacturedAt"
       name="manufacturedAt"
-      label="Manufacturing date"
+      :label="t('boats.engines.fields.manufacturedAt')"
       type="date"
       v-model="manufacturedAt"
       :errors="errors"
@@ -91,7 +96,7 @@ watch(
     <BaseInput
       id="powerHp"
       name="powerHp"
-      label="Power (hp)"
+      :label="t('boats.engines.fields.powerHp')"
       type="number"
       step="0.1"
       inputmode="decimal"
@@ -101,7 +106,7 @@ watch(
     <BaseInput
       id="hours"
       name="hours"
-      label="Hours"
+      :label="t('boats.engines.fields.hours')"
       type="number"
       inputmode="numeric"
       v-model="hours"

@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { HULL_MATERIAL_OPTIONS, PROPULSION_OPTIONS } from '#shared/constants/boats/boat_form_options'
 import { ref, watch } from 'vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import type { BoatEditPayload, PropulsionTypeUi } from '~/types/boat_form'
+import { useT } from '~/composables/useT'
+import { useBoatOptions } from '~/composables/useBoatOptions'
 
 const propulsionType = defineModel<PropulsionTypeUi>('propulsionType', { required: true })
 
@@ -13,6 +14,9 @@ const props = defineProps<{
   showMastHeight: boolean
   errors: Record<string, string | string[] | undefined>
 }>()
+
+const { t } = useT()
+const { propulsionOptions, hullMaterialOptions } = useBoatOptions()
 
 const name = ref('')
 const registrationNumber = ref('')
@@ -53,25 +57,25 @@ watch(
 
 <template>
   <div class="space-y-6">
-    <BaseInput id="name" name="name" label="Name" v-model="name" :errors="errors" />
+    <BaseInput id="name" name="name" :label="t('boats.hullFields.name')" v-model="name" :errors="errors" />
 
     <BaseInput
       id="registrationNumber"
       name="registrationNumber"
-      label="Registration number"
+      :label="t('boats.hullFields.registrationNumber')"
       v-model="registrationNumber"
       :errors="errors"
     />
 
-    <BaseInput id="type" name="type" label="Type" v-model="type" :errors="errors" />
+    <BaseInput id="type" name="type" :label="t('boats.hullFields.type')" v-model="type" :errors="errors" />
 
     <BaseSelect
       id="propulsionType"
       name="propulsionType"
-      label="Propulsion type"
+      :label="t('boats.hullFields.propulsionType')"
       placeholder="—"
       :allow-empty="true"
-      :options="PROPULSION_OPTIONS"
+      :options="propulsionOptions"
       v-model="propulsionType"
       :errors="errors"
     />
@@ -79,7 +83,7 @@ watch(
     <BaseInput
       id="manufacturedAt"
       name="manufacturedAt"
-      label="Manufacturing date"
+      :label="t('boats.hullFields.manufacturedAt')"
       type="date"
       v-model="manufacturedAt"
       :errors="errors"
@@ -89,7 +93,7 @@ watch(
       <BaseInput
         id="lengthM"
         name="lengthM"
-        label="Length (m)"
+        :label="t('boats.hullFields.lengthM')"
         type="number"
         step="0.01"
         inputmode="decimal"
@@ -99,7 +103,7 @@ watch(
       <BaseInput
         id="beamM"
         name="beamM"
-        label="Beam (m)"
+        :label="t('boats.hullFields.beamM')"
         type="number"
         step="0.01"
         inputmode="decimal"
@@ -109,7 +113,7 @@ watch(
       <BaseInput
         id="draftM"
         name="draftM"
-        label="Draft (m)"
+        :label="t('boats.hullFields.draftM')"
         type="number"
         step="0.01"
         inputmode="decimal"
@@ -120,7 +124,7 @@ watch(
         v-if="showMastHeight"
         id="mastHeightM"
         name="mastHeightM"
-        label="Mast height (m)"
+        :label="t('boats.hullFields.mastHeightM')"
         type="number"
         step="0.01"
         inputmode="decimal"
@@ -133,17 +137,17 @@ watch(
       <BaseSelect
         id="hullMaterial"
         name="hullMaterial"
-        label="Hull material"
+        :label="t('boats.hullFields.hullMaterial')"
         placeholder="—"
         :allow-empty="true"
-        :options="HULL_MATERIAL_OPTIONS"
+        :options="hullMaterialOptions"
         v-model="hullMaterial"
         :errors="errors"
       />
       <BaseInput
         id="yearBuilt"
         name="yearBuilt"
-        label="Year built"
+        :label="t('boats.hullFields.yearBuilt')"
         type="number"
         inputmode="numeric"
         v-model="yearBuilt"
@@ -152,11 +156,11 @@ watch(
       <BaseInput
         id="manufacturer"
         name="manufacturer"
-        label="Manufacturer"
+        :label="t('boats.hullFields.manufacturer')"
         v-model="manufacturer"
         :errors="errors"
       />
-      <BaseInput id="model" name="model" label="Model" v-model="model" :errors="errors" />
+      <BaseInput id="model" name="model" :label="t('boats.hullFields.model')" v-model="model" :errors="errors" />
     </div>
   </div>
 </template>

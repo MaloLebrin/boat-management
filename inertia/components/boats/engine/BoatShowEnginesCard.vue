@@ -7,6 +7,7 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseModal from '~/components/base/BaseModal.vue'
 import { ref } from 'vue'
+import { useT } from '~/composables/useT'
 
 defineProps<{
   boatId: number
@@ -14,6 +15,7 @@ defineProps<{
   canManage: boolean
 }>()
 
+const { t } = useT()
 const isCreateOpen = ref(false)
 
 function performedDisplay(iso: string | null) {
@@ -27,20 +29,20 @@ function performedDisplay(iso: string | null) {
   <BaseCard padded>
     <template #header>
       <div class="flex items-center justify-between gap-3">
-        <p class="text-sm font-semibold text-fg">Engines</p>
+        <p class="text-sm font-semibold text-fg">{{ t('boats.engines.title') }}</p>
         <BaseButton
           v-if="canManage"
           variant="secondary"
           size="sm"
           type="button"
-          aria-label="Add an engine"
+          :aria-label="t('boats.engines.addEngine')"
           @click="isCreateOpen = true"
         >
-          Add engine
+          {{ t('boats.engines.addEngine') }}
         </BaseButton>
       </div>
     </template>
-    <div v-if="engines.length === 0" class="text-sm text-fg-muted">No engines.</div>
+    <div v-if="engines.length === 0" class="text-sm text-fg-muted">{{ t('boats.engines.noEngines') }}</div>
     <ul v-else class="space-y-3 text-sm">
       <li
         v-for="e in engines"
@@ -75,20 +77,20 @@ function performedDisplay(iso: string | null) {
             </div>
 
             <div class="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-fg-subtle">
-              <span v-if="performedDisplay(e.manufacturedAt)">Mfg. {{ performedDisplay(e.manufacturedAt) }}</span>
-              <span v-if="e.serialNumber">SN {{ e.serialNumber }}</span>
+              <span v-if="performedDisplay(e.manufacturedAt)">{{ t('boats.engines.mfg') }} {{ performedDisplay(e.manufacturedAt) }}</span>
+              <span v-if="e.serialNumber">{{ t('boats.engines.sn') }} {{ e.serialNumber }}</span>
             </div>
           </div>
 
           <div class="flex flex-wrap items-center gap-2 md:justify-end">
             <a :href="`/boats/${boatId}/engines/${e.id}`">
               <BaseButton variant="secondary" size="sm" type="button">
-                Voir le détail
+                {{ t('boats.engines.viewDetail') }}
               </BaseButton>
             </a>
             <a v-if="canManage" :href="`/boats/${boatId}/engines/${e.id}/edit`">
-              <BaseButton variant="ghost" size="sm" type="button" aria-label="Edit engine">
-                Modifier
+              <BaseButton variant="ghost" size="sm" type="button" :aria-label="t('boats.engines.edit')">
+                {{ t('boats.engines.edit') }}
               </BaseButton>
             </a>
             <Form
@@ -97,8 +99,8 @@ function performedDisplay(iso: string | null) {
               #default="{ processing }"
               class="inline"
             >
-              <BaseButton type="submit" variant="danger" size="sm" :disabled="processing" aria-label="Remove engine">
-                Supprimer
+              <BaseButton type="submit" variant="danger" size="sm" :disabled="processing" :aria-label="t('boats.engines.delete')">
+                {{ t('boats.engines.delete') }}
               </BaseButton>
             </Form>
           </div>
@@ -106,7 +108,7 @@ function performedDisplay(iso: string | null) {
       </li>
     </ul>
 
-    <BaseModal v-model:open="isCreateOpen" title="Add engine" close-label="Close">
+    <BaseModal v-model:open="isCreateOpen" :title="t('boats.engines.modal.title')" :close-label="t('common.close')">
       <Form
         :action="{ url: `/boats/${boatId}/engines`, method: 'post' }"
         class="space-y-4"
@@ -114,8 +116,8 @@ function performedDisplay(iso: string | null) {
       >
         <BoatEquipmentEngineFields :errors="errors" />
         <div class="flex items-center justify-end gap-2 pt-2">
-          <BaseButton variant="ghost" type="button" @click="isCreateOpen = false">Cancel</BaseButton>
-          <BaseButton type="submit" :disabled="processing">Add engine</BaseButton>
+          <BaseButton variant="ghost" type="button" @click="isCreateOpen = false">{{ t('boats.engines.modal.cancel') }}</BaseButton>
+          <BaseButton type="submit" :disabled="processing">{{ t('boats.engines.modal.submit') }}</BaseButton>
         </div>
       </Form>
     </BaseModal>

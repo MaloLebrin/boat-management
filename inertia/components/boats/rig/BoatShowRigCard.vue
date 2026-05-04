@@ -4,19 +4,22 @@ import { PencilSquareIcon, PlusCircleIcon, TrashIcon } from '@heroicons/vue/24/o
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import type { BoatShowRig } from '~/types/boat_show'
+import { useT } from '~/composables/useT'
 
 defineProps<{
   boatId: number
   rig: BoatShowRig | null
   canManage: boolean
 }>()
+
+const { t } = useT()
 </script>
 
 <template>
   <BaseCard padded>
     <template #header>
       <div class="flex flex-wrap items-start justify-between gap-2">
-        <p class="text-sm font-semibold text-fg">Rig</p>
+        <p class="text-sm font-semibold text-fg">{{ t('boats.rig.title') }}</p>
       <div v-if="canManage" class="flex flex-wrap items-center gap-2">
         <a :href="`/boats/${boatId}/rig/edit`" class="text-sm font-semibold text-fg-muted hover:text-fg hover:underline">
           <PencilSquareIcon v-if="rig" class="w-4 h-4" />
@@ -36,22 +39,22 @@ defineProps<{
       </div>
     </template>
 
-    <div v-if="!rig" class="text-sm text-fg-muted">No rig recorded.</div>
+    <div v-if="!rig" class="text-sm text-fg-muted">{{ t('boats.rig.noRig') }}</div>
     <dl v-else class="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
       <div>
-        <dt class="text-fg-muted">Rig type</dt>
+        <dt class="text-fg-muted">{{ t('boats.rig.fields.rigType') }}</dt>
         <dd class="font-semibold text-fg">{{ rig.rigType }}</dd>
       </div>
       <div>
-        <dt class="text-fg-muted">Mast count</dt>
+        <dt class="text-fg-muted">{{ t('boats.rig.fields.mastCount') }}</dt>
         <dd class="font-semibold text-fg">{{ rig.mastCount ?? '—' }}</dd>
       </div>
       <div>
-        <dt class="text-fg-muted">Spreaders</dt>
+        <dt class="text-fg-muted">{{ t('boats.rig.fields.spreaders') }}</dt>
         <dd class="font-semibold text-fg">{{ rig.spreaders ?? '—' }}</dd>
       </div>
       <div v-if="rig.manufacturedAt">
-        <dt class="text-fg-muted">Manufacturing date</dt>
+        <dt class="text-fg-muted">{{ t('boats.rig.fields.manufacturedAt') }}</dt>
         <dd class="font-semibold text-fg">{{ rig.manufacturedAt.slice(0, 10) }}</dd>
       </div>
     </dl>

@@ -16,9 +16,19 @@
     "workspace": "Workspace",
     "dashboard": "Dashboard",
     "boats": "Boats",
+    "planning": "Planning",
+    "history": "History",
+    "settings": "Settings",
     "designSystem": "Design system",
     "menu": "Menu",
-    "logout": "Logout"
+    "logout": "Logout",
+    "myBoats": "My boats",
+    "unknownUser": "User",
+    "sections": {
+      "fleet": "FLEET",
+      "maintenance": "MAINTENANCE",
+      "preferences": "PREFERENCES"
+    }
   },
   "auth": {
     "login": {
@@ -49,6 +59,13 @@
     "title": "Dashboard",
     "subtitle": "Overview of your fleet and upcoming maintenance.",
     "newBoat": "New boat",
+    "overdueAlert": "{count} overdue task(s)",
+    "viewPlanning": "View planning",
+    "analyzeFleet": "Analyze fleet",
+    "aiPanel": {
+      "title": "AI Assistant",
+      "suggestions": "Suggestions"
+    },
     "stats": {
       "boats": "Boats",
       "engines": "Engines",
@@ -79,7 +96,263 @@
       "empty": "No boats yet."
     }
   },
+  "planning": {
+    "title": "Maintenance planning",
+    "subtitle": "Overview of tasks across all your boats",
+    "viewKanban": "Kanban",
+    "viewCalendar": "Calendar",
+    "empty": {
+      "title": "No maintenance tasks",
+      "description": "Create maintenance tasks from a boat's detail page.",
+      "action": "View my boats"
+    },
+    "kanban": {
+      "overdue": "Overdue",
+      "overdueEmpty": "No overdue tasks",
+      "soon": "Coming soon",
+      "soonEmpty": "No imminent tasks",
+      "planned": "Planned",
+      "plannedEmpty": "No planned tasks",
+      "completed": "Completed",
+      "completedEmpty": "Completed tasks appear here"
+    },
+    "taskKind": {
+      "date": "date",
+      "hours": "hours"
+    },
+    "calendar": {
+      "more": "+{count} more",
+      "withoutDate": "Without a planned date",
+      "schedule": "Schedule",
+      "hourTriggered": "Triggered by engine hours"
+    }
+  },
+  "maintenance": {
+    "history": {
+      "title": "Maintenance history",
+      "subtitle": "All interventions across your fleet",
+      "exportPdf": "Export PDF",
+      "searchPlaceholder": "Search by title or boat...",
+      "filters": {
+        "all": "All",
+        "engine": "Engine",
+        "sail": "Sail",
+        "rig": "Rig",
+        "hull": "Hull"
+      },
+      "stats": {
+        "events": "Events",
+        "partsChanged": "Parts replaced",
+        "boats": "Boats"
+      },
+      "timeline": {
+        "events": "{count} event(s)",
+        "pieces": "{count} part(s)",
+        "show": "Detail",
+        "hide": "Hide",
+        "partsUsed": "Parts used",
+        "noDetails": "No additional details"
+      },
+      "empty": {
+        "title": "No maintenance events",
+        "description": "Start by adding a boat and recording your interventions.",
+        "action": "View boats"
+      }
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "sections": {
+      "org": "Organisation profile",
+      "members": "Members & access",
+      "billing": "Billing & plan",
+      "me": "My profile"
+    },
+    "org": {
+      "title": "Organisation profile",
+      "nameLabel": "Organisation name",
+      "namePlaceholder": "My organisation",
+      "logoLabel": "Logo",
+      "logoPlaceholder": "Logo",
+      "changeLogo": "Change logo",
+      "save": "Save"
+    },
+    "members": {
+      "title": "Members & access",
+      "invite": "Invite a member",
+      "columns": {
+        "member": "Member",
+        "role": "Role",
+        "status": "Status"
+      },
+      "noName": "No name",
+      "roles": {
+        "admin": "Admin"
+      },
+      "statuses": {
+        "active": "Active"
+      },
+      "you": "You"
+    },
+    "billing": {
+      "title": "Billing & plan",
+      "currentPlan": "Current plan",
+      "freePlan": "Free",
+      "freeDescription": "You are currently on the free plan with limited features.",
+      "features": {
+        "upTo3Boats": "Up to 3 boats",
+        "maintenanceHistory": "Maintenance history",
+        "aiSuggestions": "AI suggestions"
+      },
+      "upgradePro": "Upgrade to Pro plan",
+      "paymentMethod": "Payment method",
+      "noPaymentMethod": "No payment method configured.",
+      "addCard": "Add a card"
+    },
+    "me": {
+      "title": "My profile",
+      "fullNameLabel": "Full name",
+      "fullNamePlaceholder": "Jane Doe",
+      "emailLabel": "Email address",
+      "emailHint": "Email address cannot be changed.",
+      "save": "Save changes"
+    }
+  },
+  "errors": {
+    "notFound": {
+      "title": "Page not found",
+      "description": "The page you are looking for does not exist or has been moved.",
+      "action": "Back to dashboard"
+    },
+    "serverError": {
+      "title": "Something went wrong",
+      "description": "An unexpected error occurred. Please try again or contact support.",
+      "action": "Back to dashboard"
+    }
+  },
   "boats": {
+    "new": {
+      "title": "New boat",
+      "subtitle": "Create a new boat in your organization",
+      "submit": "Create",
+      "cancel": "Cancel"
+    },
+    "edit": {
+      "title": "Edit boat",
+      "subtitle": "Update boat details",
+      "submit": "Save",
+      "cancel": "Cancel"
+    },
+    "hullFields": {
+      "name": "Name",
+      "registrationNumber": "Registration number",
+      "type": "Type",
+      "propulsionType": "Propulsion type",
+      "manufacturedAt": "Manufacturing date",
+      "lengthM": "Length (m)",
+      "beamM": "Beam (m)",
+      "draftM": "Draft (m)",
+      "mastHeightM": "Mast height (m)",
+      "hullMaterial": "Hull material",
+      "yearBuilt": "Year built",
+      "manufacturer": "Manufacturer",
+      "model": "Model"
+    },
+    "engines": {
+      "title": "Engines",
+      "addEngine": "Add engine",
+      "noEngines": "No engines.",
+      "viewDetail": "View detail",
+      "edit": "Edit",
+      "delete": "Delete",
+      "mfg": "Mfg.",
+      "sn": "SN",
+      "fields": {
+        "kind": "Kind",
+        "fuel": "Fuel",
+        "brand": "Brand",
+        "model": "Model",
+        "serialNumber": "Serial number",
+        "manufacturedAt": "Manufacturing date",
+        "powerHp": "Power (hp)",
+        "hours": "Hours"
+      },
+      "modal": {
+        "title": "Add engine",
+        "cancel": "Cancel",
+        "submit": "Add engine"
+      }
+    },
+    "sails": {
+      "title": "Sails",
+      "addSail": "Add sail",
+      "noSails": "No sails.",
+      "reef": "Reef",
+      "mfg": "Mfg.",
+      "modal": {
+        "title": "Add sail",
+        "cancel": "Cancel",
+        "submit": "Add sail"
+      }
+    },
+    "rig": {
+      "title": "Rig",
+      "noRig": "No rig recorded.",
+      "fields": {
+        "rigType": "Rig type",
+        "mastCount": "Mast count",
+        "spreaders": "Spreaders",
+        "manufacturedAt": "Manufacturing date"
+      }
+    },
+    "options": {
+      "propulsion": {
+        "sailboat": "Sailboat",
+        "motorboat": "Motorboat",
+        "catamaran": "Catamaran",
+        "rib": "RIB",
+        "other": "Other"
+      },
+      "hullMaterial": {
+        "fiberglass": "Fiberglass",
+        "aluminum": "Aluminum",
+        "steel": "Steel",
+        "wood": "Wood",
+        "carbon": "Carbon",
+        "other": "Other"
+      },
+      "engineKind": {
+        "inboard": "Inboard",
+        "outboard": "Outboard",
+        "electric": "Electric",
+        "hybrid": "Hybrid",
+        "other": "Other"
+      },
+      "engineFuel": {
+        "diesel": "Diesel",
+        "essence": "Gasoline",
+        "electric": "Electric",
+        "other": "Other"
+      },
+      "sailType": {
+        "main": "Main",
+        "genoa": "Genoa",
+        "jib": "Jib",
+        "spinnaker": "Spinnaker",
+        "gennaker": "Gennaker",
+        "storm_jib": "Storm jib",
+        "other": "Other"
+      },
+      "rigType": {
+        "sloop": "Sloop",
+        "cutter": "Cutter",
+        "ketch": "Ketch",
+        "yawl": "Yawl",
+        "schooner": "Schooner",
+        "cat_rig": "Cat rig",
+        "other": "Other"
+      }
+    },
     "index": {
       "title": "Boats",
       "subtitle": "All boats in your organization",
