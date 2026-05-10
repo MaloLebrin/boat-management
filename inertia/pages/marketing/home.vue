@@ -2,17 +2,16 @@
 import PublicLayout from '~/layouts/public.vue'
 
 export default {
-    layout: PublicLayout,
+  layout: PublicLayout,
 }
 </script>
 <script setup lang="ts">
 import { Head, Link, usePage } from '@inertiajs/vue3'
+import { computed } from 'vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
-import BaseStatCard from '~/components/base/BaseStatCard.vue'
-import { computed } from 'vue'
 
 type PageProps = {
   t: {
@@ -53,6 +52,7 @@ const hreflangFr = '/fr'
 </script>
 
 <template>
+
   <Head :title="t.meta.title">
     <meta name="description" :content="t.meta.description" />
     <meta property="og:title" :content="t.meta.title" />
@@ -62,28 +62,41 @@ const hreflangFr = '/fr'
     <link rel="alternate" hreflang="fr" :href="hreflangFr" />
   </Head>
 
-    <section class="relative overflow-hidden rounded-2xl bg-abyss-950 px-8 py-16 lg:px-16 lg:py-20">
-      <!-- Subtle gradient blob in the background -->
+  <div class="max-w-7xl mx-auto">
+
+
+    <!-- Hero — fond navy-900 -->
+    <section class="relative overflow-hidden rounded-2xl bg-navy-900 px-8 py-16 lg:px-16 lg:py-20">
       <div class="pointer-events-none absolute inset-0 overflow-hidden">
-        <div class="absolute -top-24 right-0 h-96 w-96 rounded-full bg-lagoon-500/10 blur-3xl" />
-        <div class="absolute bottom-0 left-1/4 h-64 w-64 rounded-full bg-coral-400/10 blur-2xl" />
+        <div class="absolute -top-24 right-0 h-96 w-96 rounded-full bg-navy-500/10 blur-3xl" />
+        <div class="absolute bottom-0 left-1/4 h-64 w-64 rounded-full bg-coral-500/8 blur-2xl" />
       </div>
 
       <div class="relative grid gap-12 lg:grid-cols-2 lg:items-center">
         <div class="max-w-xl space-y-6">
-          <span class="inline-flex items-center gap-2 rounded-full bg-lagoon-500/15 px-3 py-1 text-sm font-semibold text-lagoon-400">
-            &#10022; {{ t.home.hero.eyebrow }}
+          <span
+            class="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm font-medium text-white/70">
+            <svg width="16" height="16" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true">
+              <circle cx="32" cy="32" r="28" stroke="#faf6ee" stroke-width="3.5" />
+              <path d="M32 9 L37.5 32 L32 36.5 L26.5 32 Z" fill="#faf6ee" />
+              <path d="M32 55 L37.5 32 L32 27.5 L26.5 32 Z" fill="#e2674f" />
+            </svg>
+            {{ t.home.hero.eyebrow }}
           </span>
-          <h1 class="font-display text-4xl font-bold leading-tight tracking-tight text-white lg:text-5xl">
+          <h1 class="font-display text-4xl italic leading-tight tracking-tight text-white lg:text-5xl">
             {{ t.home.hero.title }}
           </h1>
-          <p class="text-pretty text-lg text-abyss-200">{{ t.home.hero.subtitle }}</p>
+          <p class="text-pretty text-lg text-white/65">{{ t.home.hero.subtitle }}</p>
           <div class="flex flex-wrap items-center gap-3">
             <a href="/signup">
-              <BaseButton size="lg" class="bg-lagoon-500 hover:bg-lagoon-600 text-white shadow-lg">{{ t.home.cta.primary }}</BaseButton>
+              <BaseButton size="lg" class="bg-white! text-navy-900! shadow-lg hover:bg-white/90!">{{ t.home.cta.primary
+              }}</BaseButton>
             </a>
             <Link :href="`/${locale}/tarifs`">
-              <BaseButton size="lg" variant="ghost" class="border border-abyss-600 text-abyss-200 hover:bg-abyss-800 hover:text-white">{{ t.home.cta.secondary }}</BaseButton>
+              <BaseButton size="lg" variant="ghost"
+                class="border! border-white/25! text-white/80! hover:bg-white/10! hover:text-white!">{{
+                  t.home.cta.secondary }}</BaseButton>
             </Link>
           </div>
         </div>
@@ -93,23 +106,22 @@ const hreflangFr = '/fr'
           <div class="rounded-xl border border-abyss-700 bg-abyss-900 p-4">
             <div class="mb-3 flex items-center justify-between">
               <p class="text-sm font-semibold text-white">{{ t.home.socialProof.title }}</p>
-              <span class="inline-flex items-center rounded-full bg-mint-600/20 px-2 py-0.5 text-xs font-medium text-mint-400">Live</span>
+              <span
+                class="inline-flex items-center rounded-full bg-white/10 px-2 py-0.5 text-xs font-medium text-white/60">Live</span>
             </div>
             <div class="grid grid-cols-3 gap-2">
-              <div
-                v-for="logo in t.home.socialProof.logos"
-                :key="logo"
-                class="flex h-10 items-center justify-center rounded-lg border border-abyss-700 bg-abyss-800 text-xs font-semibold text-abyss-300"
-              >
+              <div v-for="logo in t.home.socialProof.logos" :key="logo"
+                class="flex h-10 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-xs font-medium text-white/50">
                 {{ logo }}
               </div>
             </div>
           </div>
 
           <div class="grid grid-cols-3 gap-3">
-            <div v-for="s in t.home.stats.items" :key="s.label" class="rounded-xl border border-abyss-700 bg-abyss-900 p-3 text-center">
-              <p class="font-display text-xl font-bold text-white">{{ s.value }}</p>
-              <p class="mt-0.5 text-xs text-abyss-400">{{ s.label }}</p>
+            <div v-for="s in t.home.stats.items" :key="s.label"
+              class="rounded-xl border border-white/10 bg-white/5 p-3 text-center">
+              <p class="font-display text-xl italic text-white">{{ s.value }}</p>
+              <p class="mt-0.5 text-xs text-white/50">{{ s.label }}</p>
             </div>
           </div>
         </div>
@@ -122,11 +134,8 @@ const hreflangFr = '/fr'
           <p class="font-display text-sm font-semibold text-fg">{{ t.home.problem.title }}</p>
         </template>
         <div class="grid gap-3">
-          <div
-            v-for="it in t.home.problem.items"
-            :key="it.title"
-            class="rounded-(--radius-control) border border-border border-l-4 border-l-coral-400/60 bg-surface-muted px-4 py-3"
-          >
+          <div v-for="it in t.home.problem.items" :key="it.title"
+            class="rounded-(--radius-control) border border-border border-l-4 border-l-coral-400/60 bg-surface-muted px-4 py-3">
             <p class="text-sm font-semibold text-fg">{{ it.title }}</p>
             <p class="mt-1 text-sm text-fg-muted">{{ it.description }}</p>
           </div>
@@ -141,11 +150,8 @@ const hreflangFr = '/fr'
           </div>
         </template>
         <div class="grid gap-3 sm:grid-cols-2">
-          <div
-            v-for="f in t.home.features.items"
-            :key="f.title"
-            class="rounded-(--radius-control) border border-border border-l-2 border-l-lagoon-500/40 bg-surface-elevated px-4 py-4 shadow-(--shadow-xs)"
-          >
+          <div v-for="f in t.home.features.items" :key="f.title"
+            class="rounded-(--radius-control) border border-border border-l-2 border-l-lagoon-500/40 bg-surface-elevated px-4 py-4 shadow-(--shadow-xs)">
             <p class="text-sm font-semibold text-fg">{{ f.title }}</p>
             <p class="mt-1 text-sm text-fg-muted">{{ f.description }}</p>
           </div>
@@ -159,11 +165,8 @@ const hreflangFr = '/fr'
           <p class="font-display text-sm font-semibold text-fg">{{ t.home.useCases.title }}</p>
         </template>
         <div class="grid gap-4 md:grid-cols-3">
-          <div
-            v-for="uc in t.home.useCases.items"
-            :key="uc.title"
-            class="rounded-(--radius-control) border border-border bg-surface-muted px-5 py-5"
-          >
+          <div v-for="uc in t.home.useCases.items" :key="uc.title"
+            class="rounded-(--radius-control) border border-border bg-surface-muted px-5 py-5">
             <p class="text-sm font-semibold text-fg">{{ uc.title }}</p>
             <p class="mt-1 text-sm text-fg-muted">{{ uc.description }}</p>
           </div>
@@ -177,38 +180,38 @@ const hreflangFr = '/fr'
         <p class="text-pretty text-lg text-fg-muted">{{ t.home.preview.subtitle }}</p>
       </div>
 
-      <div class="rounded-xl border border-abyss-700 bg-abyss-900 p-5">
+      <div class="rounded-xl border border-navy-800 bg-navy-900 p-5">
         <div class="flex items-center justify-between gap-3">
           <p class="text-sm font-semibold text-white">{{ t.brand.name }}</p>
           <BaseBadge variant="success">{{ locale === 'fr' ? 'Aperçu' : 'Preview' }}</BaseBadge>
         </div>
 
         <div class="mt-4 grid gap-3 sm:grid-cols-2">
-          <div class="rounded-(--radius-control) border border-abyss-700 bg-abyss-800 px-4 py-4">
-            <p class="text-xs font-semibold text-abyss-400">{{ locale === 'fr' ? 'Urgent' : 'Urgent' }}</p>
+          <div class="rounded-(--radius-control) border border-white/10 bg-white/5 px-4 py-4">
+            <p class="text-xs font-semibold text-coral-400">{{ locale === 'fr' ? 'Urgent' : 'Urgent' }}</p>
             <p class="mt-1 text-2xl font-semibold text-white">3</p>
-            <p class="mt-1 text-xs font-semibold text-abyss-300">
+            <p class="mt-1 text-xs text-white/50">
               {{ locale === 'fr' ? 'tâches en retard' : 'overdue tasks' }}
             </p>
           </div>
-          <div class="rounded-(--radius-control) border border-abyss-700 bg-abyss-800 px-4 py-4">
-            <p class="text-xs font-semibold text-abyss-400">{{ locale === 'fr' ? 'À venir' : 'Due soon' }}</p>
+          <div class="rounded-(--radius-control) border border-white/10 bg-white/5 px-4 py-4">
+            <p class="text-xs font-semibold text-amber-600">{{ locale === 'fr' ? 'À venir' : 'Due soon' }}</p>
             <p class="mt-1 text-2xl font-semibold text-white">7</p>
-            <p class="mt-1 text-xs font-semibold text-abyss-300">
+            <p class="mt-1 text-xs text-white/50">
               {{ locale === 'fr' ? 'dans 14 jours' : 'within 14 days' }}
             </p>
           </div>
         </div>
 
-        <div class="mt-3 rounded-(--radius-control) border border-abyss-700 bg-abyss-800 px-4 py-4">
+        <div class="mt-3 rounded-(--radius-control) border border-white/10 bg-white/5 px-4 py-4">
           <div class="flex items-center justify-between gap-3">
             <p class="text-sm font-semibold text-white">{{ locale === 'fr' ? 'Bateau' : 'Boat' }} · Aurore</p>
             <BaseBadge variant="info">{{ locale === 'fr' ? 'Moteur' : 'Engine' }} 1</BaseBadge>
           </div>
-          <p class="mt-2 text-sm text-abyss-300">
+          <p class="mt-2 text-sm text-white/55">
             {{
               locale === 'fr'
-                ? 'Dernière vidange: il y a 3 mois. Prochaine: dans 42h.'
+                ? 'Dernière vidange : il y a 3 mois. Prochaine : dans 42h.'
                 : 'Last oil change: 3 months ago. Next: in 42h.'
             }}
           </p>
@@ -222,11 +225,8 @@ const hreflangFr = '/fr'
           <p class="font-display text-sm font-semibold text-fg">{{ t.home.security.title }}</p>
         </template>
         <div class="grid gap-4 md:grid-cols-2">
-          <div
-            v-for="s in t.home.security.items"
-            :key="s.title"
-            class="rounded-(--radius-control) border border-border bg-surface-muted px-5 py-5"
-          >
+          <div v-for="s in t.home.security.items" :key="s.title"
+            class="rounded-(--radius-control) border border-border bg-surface-muted px-5 py-5">
             <p class="text-sm font-semibold text-fg">{{ s.title }}</p>
             <p class="mt-1 text-sm text-fg-muted">{{ s.description }}</p>
           </div>
@@ -240,11 +240,8 @@ const hreflangFr = '/fr'
           <p class="font-display text-sm font-semibold text-fg">{{ t.home.faq.title }}</p>
         </template>
         <div class="grid gap-3">
-          <div
-            v-for="qa in t.home.faq.items"
-            :key="qa.q"
-            class="rounded-(--radius-control) border border-border bg-surface-elevated px-5 py-4 shadow-(--shadow-xs)"
-          >
+          <div v-for="qa in t.home.faq.items" :key="qa.q"
+            class="rounded-(--radius-control) border border-border bg-surface-elevated px-5 py-4 shadow-(--shadow-xs)">
             <p class="text-sm font-semibold text-fg">{{ qa.q }}</p>
             <p class="mt-1 text-sm text-fg-muted">{{ qa.a }}</p>
           </div>
@@ -253,22 +250,25 @@ const hreflangFr = '/fr'
     </section>
 
     <section class="mt-14">
-      <div class="rounded-2xl bg-abyss-950 px-8 py-10 ring-1 ring-abyss-700">
+      <div class="rounded-2xl bg-navy-900 px-8 py-10 ring-1 ring-white/10">
         <div class="grid gap-6 lg:grid-cols-2 lg:items-center">
           <div class="space-y-2">
-            <h2 class="font-display text-2xl font-bold text-white">{{ t.home.finalCta.title }}</h2>
-            <p class="text-pretty text-lg text-abyss-200">{{ t.home.finalCta.subtitle }}</p>
+            <h2 class="font-display text-2xl italic text-white">{{ t.home.finalCta.title }}</h2>
+            <p class="text-pretty text-base text-white/65">{{ t.home.finalCta.subtitle }}</p>
           </div>
           <div class="flex flex-wrap items-center justify-start gap-3 lg:justify-end">
             <a href="/signup">
-              <BaseButton size="lg">{{ t.home.finalCta.primary }}</BaseButton>
+              <BaseButton size="lg" class="bg-white! text-navy-900! hover:bg-white/90!">{{ t.home.finalCta.primary }}
+              </BaseButton>
             </a>
             <Link :href="`/${locale}/tarifs`">
-              <BaseButton size="lg" variant="secondary">{{ t.home.finalCta.secondary }}</BaseButton>
+              <BaseButton size="lg" variant="ghost"
+                class="border! border-white/25! text-white/70! hover:bg-white/10! hover:text-white!">{{
+                  t.home.finalCta.secondary }}</BaseButton>
             </Link>
           </div>
         </div>
       </div>
     </section>
+  </div>
 </template>
-

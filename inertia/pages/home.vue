@@ -1,5 +1,5 @@
 <script lang="ts">
-import PublicLayout from '~/layouts/public.vue'
+import PublicLayout from '~/layouts/public.vue';
 
 export default {
   layout: PublicLayout,
@@ -7,15 +7,16 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { Head } from '@inertiajs/vue3'
-import BaseCard from '~/components/base/BaseCard.vue'
-import BaseHeading from '~/components/base/BaseHeading.vue'
+import { Head } from '@inertiajs/vue3';
+import BaseCard from '~/components/base/BaseCard.vue';
+import BaseHeading from '~/components/base/BaseHeading.vue';
 </script>
 
 <template>
+
   <Head title="Homepage" />
 
-  <div class="px-6 py-14 sm:px-8">
+  <div class="px-6 py-14 sm:px-8 max-w-7xl">
     <div class="max-w-3xl">
       <BaseHeading level="display">
         It works — welcome to the power of a full-stack Vue app

@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@import "@fontsource/instrument-serif/400.css";
+@import "@fontsource/instrument-serif/400-italic.css";
 @import "@fontsource/sora/400.css";
 @import "@fontsource/sora/600.css";
 @import "@fontsource/sora/700.css";
@@ -7,115 +9,195 @@
 @import "@fontsource/source-sans-3/600.css";
 
 @theme {
-  /* Pastel multi-teinte — lavande, pêche, menthe, ciel + lagoon/coral adoucis */
+  /* ============================================================
+     NAVY — couleur principale brand (profondeurs marines)
+     ============================================================ */
+  --color-navy-900: #0b1d2e;   /* hull — sidebar, backgrounds profonds */
+  --color-navy-800: #102a40;
+  --color-navy-700: #1a3a55;   /* primary interactive — boutons, accents */
+  --color-navy-600: #2a527a;
+  --color-navy-500: #3d6f9c;   /* accent clair */
+  --color-navy-100: #dde7f0;
+  --color-navy-50:  #eef3f8;
 
-  --color-lilac-50: #f7f5ff;
+  /* Alias abyss → navy (rétrocompatibilité composants existants) */
+  --color-abyss-950: #0b1d2e;
+  --color-abyss-900: #102a40;
+  --color-abyss-800: #1a3a55;
+  --color-abyss-700: #2a527a;
+  --color-abyss-600: #3d6f9c;
+  --color-abyss-500: #56697d;
+  --color-abyss-400: #8a9aab;
+  --color-abyss-300: #b8c6d9;
+  --color-abyss-200: #dde7f0;
+  --color-abyss-100: #eef3f8;
+  --color-abyss-50:  #f8fafb;
+
+  /* ============================================================
+     NEUTRALS CHAUDS — canvas, surfaces (inspiration Clay)
+     ============================================================ */
+  --color-cream:  #faf6ee;   /* canvas — fond principal pages publiques */
+  --color-paper:  #f4ede0;   /* sunken surface / footer */
+  --color-bone:   #ebe2d0;   /* borders, dividers */
+  --color-sand:   #d6c9ad;   /* border-strong */
+
+  /* Legacy lilac / peach / mint / sky / foam — gardés pour rétrocompatibilité */
+  --color-lilac-50:  #f7f5ff;
   --color-lilac-100: #ede9fe;
   --color-lilac-200: #ddd6fe;
   --color-lilac-300: #c4b5fd;
   --color-lilac-700: #6d28d9;
   --color-lilac-800: #5b21b6;
 
-  --color-peach-50: #fff8f3;
+  --color-peach-50:  #fff8f3;
   --color-peach-100: #ffedd5;
   --color-peach-200: #fed7aa;
   --color-peach-300: #fdba74;
   --color-peach-700: #c2410c;
   --color-peach-800: #9a3412;
 
-  --color-mint-50: #f0fdfa;
-  --color-mint-100: #ccfbf1;
-  --color-mint-200: #99f6e4;
-  --color-mint-300: #5eead4;
-  --color-mint-600: #3cb8a2;
-  --color-mint-700: #2d9b87;
-  --color-mint-800: #267a6c;
-
-  --color-sky-50: #f0f9ff;
+  --color-sky-50:  #f0f9ff;
   --color-sky-100: #e0f2fe;
   --color-sky-200: #bae6fd;
   --color-sky-300: #7dd3fc;
   --color-sky-700: #0369a1;
   --color-sky-800: #075985;
 
-  /* Héritage « nautique » — teintes atténuées */
-  --color-abyss-50: #eef2f8;
-  --color-abyss-100: #dce4f0;
-  --color-abyss-200: #b8c6dc;
-  --color-abyss-700: #4a5d78;
-  --color-abyss-800: #3d4d63;
-  --color-abyss-900: #354056;
-  --color-abyss-950: #2a3444;
-
-  --color-foam-50: #f0f9ff;
+  --color-foam-50:  #f0f9ff;
   --color-foam-100: #e0f2fe;
   --color-foam-200: #bae6fd;
   --color-foam-300: #93d4f8;
 
-  --color-lagoon-400: #7ddbcf;
-  --color-lagoon-500: #5dcec0;
-  --color-lagoon-600: #45b8aa;
-  --color-lagoon-700: #3a9d91;
+  /* Lagoon → alias navy-500/600 */
+  --color-lagoon-400: #4d83b5;
+  --color-lagoon-500: #3d6f9c;
+  --color-lagoon-600: #2a527a;
+  --color-lagoon-700: #1a3a55;
 
-  --color-coral-400: #fcaa7d;
-  --color-coral-500: #f8956f;
-  --color-coral-600: #e87a5a;
+  /* ============================================================
+     CORAL — alertes vives, actions urgentes
+     ============================================================ */
+  --color-coral-700: #c84a3a;
+  --color-coral-500: #e2674f;
+  --color-coral-400: #ea7f6a;
+  --color-coral-100: #fadcd2;
+  --color-coral-50:  #fdeee8;
+  --color-coral-600: #d05540;
 
-  /* Semantic — surfaces tirant lilas / écume, texte bleu-gris adouci */
-  --color-surface: #f4f6fd;
-  --color-surface-elevated: #fffdff;
-  --color-surface-muted: #eceaf8;
-  --color-fg: var(--color-abyss-900);
-  --color-fg-muted: var(--color-abyss-800);
-  --color-fg-subtle: #62708a;
-  --color-border: #dde4f2;
-  --color-border-strong: #c5cfe0;
+  /* ============================================================
+     MINT — succès / complété (vert forêt, pas seafoam)
+     ============================================================ */
+  --color-mint-700: #1f6b54;
+  --color-mint-600: #27856a;
+  --color-mint-300: #7fbfa8;
+  --color-mint-200: #cfe8de;
+  --color-mint-100: #cfe8de;
+  --color-mint-50:  #e6f3ec;
 
-  --color-brand: var(--color-mint-600);
-  --color-brand-hover: var(--color-mint-700);
-  --color-brand-soft: var(--color-mint-300);
-  --color-accent: var(--color-peach-700);
-  --color-accent-hover: var(--color-peach-800);
+  /* ============================================================
+     AMBER — bientôt dû / avertissement
+     ============================================================ */
+  --color-amber-700: #965e0e;
+  --color-amber-600: #b87b1d;
+  --color-amber-100: #fbeacb;
+  --color-amber-50:  #fcf4e0;
 
-  --color-danger: #e85d5d;
-  --color-danger-soft: #fef1f1;
-  --color-success: var(--color-mint-700);
-  --color-warning: #ca8a04;
-  --color-info: var(--color-sky-700);
+  /* ============================================================
+     VIOLET — IA / suggestions Fleetide
+     ============================================================ */
+  --color-violet-700: #5a4a8a;
+  --color-violet-100: #e0dcec;
+  --color-violet-50:  #efedf6;
 
-  --font-display: "Sora", ui-sans-serif, system-ui, sans-serif;
-  --font-sans: "Source Sans 3", ui-sans-serif, system-ui, sans-serif;
+  /* ============================================================
+     SÉMANTIQUE — surfaces
+     ============================================================ */
+  --color-surface:          var(--color-cream);
+  --color-surface-elevated: #ffffff;
+  --color-surface-muted:    var(--color-paper);
+  --color-surface-inverse:  var(--color-navy-900);
 
-  --radius-card: 1rem;
+  /* ============================================================
+     SÉMANTIQUE — texte
+     ============================================================ */
+  --color-fg:        #0d1b26;
+  --color-fg-muted:  #56697d;
+  --color-fg-subtle: #8a9aab;
+  --color-fg-inverse: var(--color-cream);
+
+  /* ============================================================
+     SÉMANTIQUE — bordures
+     ============================================================ */
+  --color-border:        var(--color-bone);
+  --color-border-strong: var(--color-sand);
+
+  /* ============================================================
+     BRAND — navy-700 comme couleur principale
+     ============================================================ */
+  --color-brand:       var(--color-navy-700);
+  --color-brand-hover: var(--color-navy-800);
+  --color-brand-soft:  var(--color-navy-100);
+
+  /* Accent secondaire pour les zones de danger */
+  --color-accent:       var(--color-coral-500);
+  --color-accent-hover: var(--color-coral-700);
+
+  /* ============================================================
+     STATUTS SÉMANTIQUES
+     ============================================================ */
+  --color-danger:      var(--color-coral-500);
+  --color-danger-soft: var(--color-coral-50);
+  --color-success:     var(--color-mint-700);
+  --color-warning:     var(--color-amber-600);
+  --color-info:        var(--color-navy-500);
+
+  /* ============================================================
+     TYPOGRAPHIE
+     ============================================================ */
+  --font-display: "Instrument Serif", "Iowan Old Style", Georgia, serif;
+  --font-sans:    "Source Sans 3", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono:    "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* ============================================================
+     RAYONS
+     ============================================================ */
+  --radius-card:    1rem;
   --radius-control: 0.5rem;
 
-  /* Motion tokens */
-  --motion-fast: 150ms;
+  /* ============================================================
+     MOTION
+     ============================================================ */
+  --motion-fast:   150ms;
   --motion-normal: 220ms;
-  --motion-slow: 320ms;
-  --ease-premium: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --motion-slow:   320ms;
+  --ease-premium:  cubic-bezier(0.2, 0.8, 0.2, 1);
 
-  /* Rings */
-  --ring-focus: 0 0 0 4px rgb(60 184 162 / 0.22);
-  --ring-invalid: 0 0 0 4px rgb(232 93 93 / 0.18);
+  /* ============================================================
+     FOCUS RINGS
+     ============================================================ */
+  --ring-focus:   0 0 0 3px rgb(26 58 85 / 0.25);
+  --ring-invalid: 0 0 0 3px rgb(226 103 79 / 0.28);
 
-  /* Elevation */
-  --shadow-xs: 0 1px 2px rgb(61 77 99 / 0.06);
-  --shadow-sm: 0 2px 10px -4px rgb(61 77 99 / 0.12), 0 1px 3px rgb(61 77 99 / 0.06);
-  --shadow-md: 0 10px 30px -16px rgb(61 77 99 / 0.2), 0 6px 12px -8px rgb(61 77 99 / 0.12);
-  --shadow-lg: 0 24px 64px -28px rgb(61 77 99 / 0.28), 0 16px 24px -20px rgb(61 77 99 / 0.18);
+  /* ============================================================
+     OMBRES (ink = navy-900)
+     ============================================================ */
+  --shadow-xs: 0 1px 2px rgb(11 29 46 / 0.05);
+  --shadow-sm: 0 2px 10px -4px rgb(11 29 46 / 0.10), 0 1px 3px rgb(11 29 46 / 0.05);
+  --shadow-md: 0 10px 30px -16px rgb(11 29 46 / 0.16), 0 6px 12px -8px rgb(11 29 46 / 0.08);
+  --shadow-lg: 0 24px 64px -28px rgb(11 29 46 / 0.22), 0 16px 24px -20px rgb(11 29 46 / 0.12);
 
-  --shadow-card: 0 4px 24px -4px rgb(61 77 99 / 0.07), 0 2px 8px -2px rgb(109 40 217 / 0.04);
-  --shadow-card-hover: 0 12px 40px -8px rgb(61 77 99 / 0.1), 0 4px 12px -4px rgb(60 184 162 / 0.08);
+  --shadow-card:       0 4px 24px -4px rgb(11 29 46 / 0.07), 0 2px 8px -2px rgb(26 58 85 / 0.04);
+  --shadow-card-hover: 0 12px 40px -8px rgb(11 29 46 / 0.10), 0 4px 12px -4px rgb(26 58 85 / 0.06);
 
+  /* Dégradé de fond pour les pages app (intérieur) */
   --background-image-gradient-mesh: radial-gradient(
       ellipse 100% 70% at 95% 0%,
-      rgb(196 181 253 / 0.35),
+      rgb(221 231 240 / 0.35),
       transparent 55%
     ),
-    radial-gradient(ellipse 90% 60% at 0% 100%, rgb(253 186 116 / 0.28), transparent 50%),
-    radial-gradient(ellipse 70% 50% at 50% 50%, rgb(153 246 228 / 0.2), transparent 55%),
-    linear-gradient(165deg, var(--color-lilac-50) 0%, var(--color-surface) 45%, var(--color-mint-50) 100%);
+    radial-gradient(ellipse 90% 60% at 0% 100%, rgb(250 220 210 / 0.20), transparent 50%),
+    radial-gradient(ellipse 70% 50% at 50% 50%, rgb(207 232 222 / 0.15), transparent 55%),
+    linear-gradient(165deg, var(--color-cream) 0%, var(--color-surface) 45%, var(--color-paper) 100%);
 }
 
 html,
@@ -126,6 +208,7 @@ body {
 body {
   font-family: var(--font-sans);
   color: var(--color-fg);
+  background: var(--color-surface);
   -webkit-font-smoothing: antialiased;
 }
 

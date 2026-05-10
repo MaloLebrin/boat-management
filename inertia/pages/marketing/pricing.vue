@@ -2,16 +2,16 @@
 import PublicLayout from '~/layouts/public.vue'
 
 export default {
-    layout: PublicLayout,
+  layout: PublicLayout,
 }
 </script>
 <script setup lang="ts">
 import { Head, Link, usePage } from '@inertiajs/vue3'
+import { computed } from 'vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
-import { computed } from 'vue'
 
 type PageProps = {
   t: {
@@ -44,6 +44,7 @@ const t = props.t
 </script>
 
 <template>
+
   <Head :title="t.meta.title">
     <meta name="description" :content="t.meta.description" />
     <meta property="og:title" :content="t.meta.title" />
@@ -52,6 +53,8 @@ const t = props.t
     <link rel="alternate" hreflang="en" href="/en/tarifs" />
     <link rel="alternate" hreflang="fr" href="/fr/tarifs" />
   </Head>
+
+  <div class="max-w-7xl mx-auto">
 
     <section class="max-w-3xl space-y-4">
       <BaseBadge variant="info">{{ t.brand.name }}</BaseBadge>
@@ -81,25 +84,31 @@ const t = props.t
         </template>
       </BaseCard>
 
-      <div class="relative overflow-hidden rounded-xl bg-abyss-900 p-6 ring-2 ring-lagoon-500 shadow-xl shadow-lagoon-500/10">
-        <div class="pointer-events-none absolute top-0 right-0 h-32 w-32 rounded-full bg-lagoon-500/10 blur-2xl" />
+      <!-- Plan Pro — mis en avant, fond navy-800 -->
+      <div
+        class="relative overflow-hidden rounded-xl bg-navy-800 p-6 ring-2 ring-navy-600 shadow-xl shadow-navy-900/20 -translate-y-2">
+        <div class="pointer-events-none absolute top-0 right-0 h-32 w-32 rounded-full bg-white/5 blur-2xl" />
         <div class="relative">
           <!-- header -->
           <div class="mb-4 flex items-center justify-between gap-3">
-            <p class="font-display text-sm font-semibold text-white">{{ t.pricing.plans.pro.name }}</p>
-            <span class="inline-flex items-center rounded-full bg-lagoon-500 px-3 py-1 text-xs font-semibold text-white">{{ t.pricing.plans.pro.badge }}</span>
+            <p class="font-display text-sm italic text-white">{{ t.pricing.plans.pro.name }}</p>
+            <span
+              class="inline-flex items-center rounded-full bg-white/15 px-3 py-1 text-xs font-medium text-white/80">{{
+                t.pricing.plans.pro.badge }}</span>
           </div>
-          <p class="mb-4 text-3xl font-bold text-white">{{ t.pricing.plans.pro.price }}</p>
+          <p class="mb-4 font-display text-3xl italic text-white">{{ t.pricing.plans.pro.price }}</p>
           <!-- features -->
-          <ul class="mb-6 space-y-2 text-sm text-abyss-200">
+          <ul class="mb-6 space-y-2 text-sm text-white/70">
             <li v-for="f in t.pricing.plans.pro.features" :key="f" class="flex items-start gap-2">
-              <span class="mt-1 inline-block h-2 w-2 shrink-0 rounded-full bg-lagoon-500" aria-hidden="true" />
+              <span class="mt-1 inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-white/50" aria-hidden="true" />
               <span>{{ f }}</span>
             </li>
           </ul>
           <!-- footer -->
           <a href="/signup">
-            <button class="w-full rounded-lg bg-lagoon-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-lagoon-600 transition-colors">{{ t.nav.signup }}</button>
+            <button
+              class="w-full rounded-lg bg-white px-4 py-2.5 text-sm font-semibold text-navy-900 hover:bg-white/90 transition-colors">{{
+                t.nav.signup }}</button>
           </a>
         </div>
       </div>
@@ -147,11 +156,8 @@ const t = props.t
           <p class="font-display text-sm font-semibold text-fg">{{ t.pricing.faq.title }}</p>
         </template>
         <div class="grid gap-3">
-          <div
-            v-for="qa in t.pricing.faq.items"
-            :key="qa.q"
-            class="rounded-(--radius-control) border border-border bg-surface-elevated px-5 py-4 shadow-(--shadow-xs)"
-          >
+          <div v-for="qa in t.pricing.faq.items" :key="qa.q"
+            class="rounded-(--radius-control) border border-border bg-surface-elevated px-5 py-4 shadow-(--shadow-xs)">
             <p class="text-sm font-semibold text-fg">{{ qa.q }}</p>
             <p class="mt-1 text-sm text-fg-muted">{{ qa.a }}</p>
           </div>
@@ -160,22 +166,25 @@ const t = props.t
     </section>
 
     <section class="mt-14">
-      <div class="rounded-2xl bg-abyss-950 px-8 py-10 ring-1 ring-abyss-700">
+      <div class="rounded-2xl bg-navy-900 px-8 py-10 ring-1 ring-white/10">
         <div class="grid gap-6 lg:grid-cols-2 lg:items-center">
           <div class="space-y-2">
-            <h2 class="font-display text-2xl font-bold text-white">{{ t.pricing.cta.title }}</h2>
-            <p class="text-pretty text-lg text-abyss-200">{{ t.pricing.cta.subtitle }}</p>
+            <h2 class="font-display text-2xl italic text-white">{{ t.pricing.cta.title }}</h2>
+            <p class="text-pretty text-base text-white/65">{{ t.pricing.cta.subtitle }}</p>
           </div>
           <div class="flex flex-wrap items-center justify-start gap-3 lg:justify-end">
             <a href="/signup">
-              <BaseButton size="lg">{{ t.pricing.cta.primary }}</BaseButton>
+              <BaseButton size="lg" class="bg-white! text-navy-900! hover:bg-white/90!">{{ t.pricing.cta.primary }}
+              </BaseButton>
             </a>
             <Link :href="`/${locale}`">
-              <BaseButton size="lg" variant="secondary">{{ t.pricing.cta.secondary }}</BaseButton>
+              <BaseButton size="lg" variant="ghost"
+                class="border! border-white/25! text-white/70! hover:bg-white/10! hover:text-white!">{{
+                  t.pricing.cta.secondary }}</BaseButton>
             </Link>
           </div>
         </div>
       </div>
     </section>
+  </div>
 </template>
-

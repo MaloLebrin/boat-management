@@ -25,39 +25,54 @@ const passwordConfirmationType = computed(() =>
 </script>
 
 <template>
+  <!-- Split layout : panneau gauche navy-800 · panneau droit crème -->
   <div class="-mx-6 -my-10 sm:-mx-8 flex min-h-[calc(100vh-4rem)] overflow-hidden">
-    <!-- Left dark panel -->
-    <div class="hidden w-1/2 flex-col justify-between bg-abyss-950 px-12 py-16 lg:flex">
+
+    <!-- Panneau gauche navy (42 % desktop) -->
+    <div class="hidden w-[42%] flex-col justify-between bg-navy-800 px-12 py-16 lg:flex">
       <div>
-        <div class="inline-flex items-center gap-2 rounded-full bg-lagoon-500/15 px-3 py-1.5 text-sm font-semibold text-lagoon-400">
-          &#10022; Fleetide AI
+        <div class="inline-flex items-center gap-2">
+          <svg width="28" height="28" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <circle cx="32" cy="32" r="28" stroke="#faf6ee" stroke-width="2.6"/>
+            <path d="M32 9 L37.5 32 L32 36.5 L26.5 32 Z" fill="#faf6ee"/>
+            <path d="M32 55 L37.5 32 L32 27.5 L26.5 32 Z" fill="#e2674f"/>
+            <circle cx="32" cy="32" r="2.4" fill="#102a40" stroke="#faf6ee" stroke-width="1.4"/>
+          </svg>
+          <span class="font-display text-base text-white" style="letter-spacing:-0.025em">Fleet<em style="font-style:italic;color:#e2674f">Ai</em></span>
         </div>
-        <h2 class="mt-8 font-display text-3xl font-bold leading-tight text-white">
-          Demarrez gratuitement en 2 minutes
+        <h2 class="mt-8 font-display text-3xl italic leading-snug text-white">
+          Crée ta flotte en 2 minutes.
         </h2>
-        <p class="mt-4 text-base text-abyss-300">
-          Creez votre compte et commencez a suivre l'etat technique de vos bateaux des aujourd'hui.
+        <p class="mt-4 text-base leading-relaxed text-white/70">
+          14 jours d'essai gratuits · pas de carte bleue.
+          Importe tes données depuis Excel en quelques clics.
         </p>
       </div>
-      <ul class="space-y-4">
-        <li v-for="item in [
-          { icon: '&#9989;', text: 'Gratuit jusqu\'a 3 bateaux' },
-          { icon: '&#9989;', text: 'Sans carte bancaire' },
-          { icon: '&#9989;', text: 'Migration depuis vos tableurs en 1 clic' },
-        ]" :key="item.text" class="flex items-center gap-3 text-sm text-abyss-200">
-          <span class="text-lagoon-400" v-html="item.icon" />
-          {{ item.text }}
+
+      <ul class="space-y-3">
+        <li
+          v-for="item in [
+            'Gratuit jusqu\'à 3 bateaux',
+            'Sans carte bancaire',
+            'Migration depuis vos tableurs en 1 clic',
+          ]"
+          :key="item"
+          class="flex items-center gap-3 text-sm text-white/70"
+        >
+          <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-white/50" />
+          {{ item }}
         </li>
       </ul>
-      <p class="text-xs text-abyss-500">© {{ new Date().getFullYear() }} Fleetide AI</p>
+
+      <p class="text-xs text-white/30">© {{ new Date().getFullYear() }} FleetAi</p>
     </div>
 
-    <!-- Right form panel -->
-    <div class="flex flex-1 flex-col justify-center bg-linear-to-br from-lilac-50 via-peach-50 to-mint-100 px-8 py-12 lg:px-16">
+    <!-- Panneau droit — fond crème -->
+    <div class="flex flex-1 flex-col justify-center bg-cream px-8 py-12 lg:px-16">
       <div class="mx-auto w-full max-w-sm">
         <div class="space-y-2">
-          <h1 class="font-display text-2xl font-bold text-fg">{{ t('auth.signup.title') }}</h1>
-          <p class="text-base text-fg-muted">{{ t('auth.signup.subtitle') }}</p>
+          <h1 class="font-display text-2xl italic text-fg">{{ t('auth.signup.title') }}</h1>
+          <p class="text-sm text-fg-muted">{{ t('auth.signup.subtitle') }}</p>
         </div>
 
         <div class="mt-8">

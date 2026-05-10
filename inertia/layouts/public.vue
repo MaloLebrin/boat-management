@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
-import brandIconUrl from '~/assets/brand/fleetide_ai_icon_C.svg?url';
 import BaseButton from '~/components/base/BaseButton.vue';
 
 const props = defineProps<{
@@ -26,46 +25,49 @@ const otherHref = computed(() => `/${otherLocale.value}${path.value || ''}`)
 </script>
 
 <template>
-  <div class="min-h-screen bg-linear-to-br from-lilac-50 via-peach-50 to-mint-100 text-fg">
-    <header class="sticky top-0 z-40 border-b border-abyss-800 bg-abyss-950">
-      <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
-        <Link :href="`/${locale}`" class="inline-flex items-center gap-3 text-white hover:text-lagoon-400">
-          <img :src="brandIconUrl" alt="Fleetide AI" class="h-9 w-9 rounded-(--radius-control) shadow-(--shadow-xs)" />
-          <div class="hidden sm:flex flex-col leading-tight">
-            <span class="font-display text-sm font-semibold text-white">Fleetide AI</span>
-            <span class="text-xs font-semibold text-abyss-300">Fleet intelligence</span>
-          </div>
+  <div class="min-h-screen bg-cream text-fg">
+    <!-- Header crème clair — style marketing -->
+    <header class="sticky top-0 z-40 border-b border-bone bg-cream/95 backdrop-blur-sm">
+      <div class="mx-auto flex h-16 max-w-7xl items-center justify-between">
+        <!-- Logo -->
+        <Link :href="`/${locale}`"
+          class="inline-flex items-center gap-2.5 transition-opacity duration-(--motion-fast) hover:opacity-80">
+          <svg width="36" height="36" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true">
+            <circle cx="32" cy="32" r="28" stroke="#0b1d2e" stroke-width="2.6" />
+            <path d="M32 9 L37.5 32 L32 36.5 L26.5 32 Z" fill="#0b1d2e" />
+            <path d="M32 55 L37.5 32 L32 27.5 L26.5 32 Z" fill="#e2674f" />
+            <circle cx="32" cy="32" r="2.4" fill="#faf6ee" stroke="#0b1d2e" stroke-width="1.4" />
+          </svg>
+          <span class="font-display text-lg leading-none text-fg" style="letter-spacing:-0.025em">Fleet<em
+              style="font-style:italic;color:#e2674f">Ai</em></span>
         </Link>
 
-        <nav class="hidden items-center gap-2 md:flex">
+        <!-- Nav -->
+        <nav class="hidden items-center gap-1 md:flex">
           <Link :href="`/${locale}#features`"
-            class="rounded-(--radius-control) px-3 py-2 text-sm font-semibold text-abyss-200 transition-colors duration-(--motion-fast) ease-premium hover:bg-abyss-800 hover:text-white">
-            Features
+            class="rounded-(--radius-control) px-3 py-2 text-sm font-medium text-fg-muted transition-colors duration-(--motion-fast) ease-premium hover:bg-paper hover:text-fg">
+            {{ locale === 'fr' ? 'Fonctionnalités' : 'Features' }}
           </Link>
           <Link :href="`/${locale}/tarifs`"
-            class="rounded-(--radius-control) px-3 py-2 text-sm font-semibold text-abyss-200 transition-colors duration-(--motion-fast) ease-premium hover:bg-abyss-800 hover:text-white">
+            class="rounded-(--radius-control) px-3 py-2 text-sm font-medium text-fg-muted transition-colors duration-(--motion-fast) ease-premium hover:bg-paper hover:text-fg">
             {{ locale === 'fr' ? 'Tarifs' : 'Pricing' }}
           </Link>
           <a href="https://docs.adonisjs.com/" target="_blank" rel="noreferrer"
-            class="rounded-(--radius-control) px-3 py-2 text-sm font-semibold text-abyss-200 transition-colors duration-(--motion-fast) ease-premium hover:bg-abyss-800 hover:text-white">
+            class="rounded-(--radius-control) px-3 py-2 text-sm font-medium text-fg-muted transition-colors duration-(--motion-fast) ease-premium hover:bg-paper hover:text-fg">
             Docs
           </a>
-          <Link href="/design-system"
-            class="rounded-(--radius-control) px-3 py-2 text-sm font-semibold text-abyss-200 transition-colors duration-(--motion-fast) ease-premium hover:bg-abyss-800 hover:text-white">
-            Design
-          </Link>
         </nav>
 
+        <!-- Actions -->
         <div class="flex items-center gap-2">
           <Link :href="otherHref"
-            class="inline-flex h-10 items-center justify-center rounded-(--radius-control) px-3 text-sm font-semibold text-abyss-200 hover:bg-abyss-800 hover:text-white">
+            class="inline-flex h-9 items-center justify-center rounded-(--radius-control) px-3 text-sm font-medium text-fg-muted transition-colors duration-(--motion-fast) hover:bg-paper hover:text-fg">
             {{ locale === 'en' ? 'FR' : 'EN' }}
           </Link>
           <template v-if="isAuthed">
             <a href="/dashboard">
-              <BaseButton size="sm">
-                {{ locale === 'fr' ? 'Dashboard' : 'Dashboard' }}
-              </BaseButton>
+              <BaseButton size="sm">Dashboard</BaseButton>
             </a>
           </template>
           <template v-else>
@@ -76,7 +78,7 @@ const otherHref = computed(() => `/${otherLocale.value}${path.value || ''}`)
             </a>
             <a href="/signup">
               <BaseButton size="sm">
-                {{ locale === 'fr' ? 'Inscription' : 'Signup' }}
+                {{ locale === 'fr' ? 'Essayer gratuitement' : 'Try free' }}
               </BaseButton>
             </a>
           </template>
@@ -84,10 +86,67 @@ const otherHref = computed(() => `/${otherLocale.value}${path.value || ''}`)
       </div>
     </header>
 
-    <main class="mx-auto w-full max-w-7xl px-6 py-10">
+    <!-- Contenu principal -->
+    <main class="mx-auto w-full px-6 py-10">
       <slot />
     </main>
 
-    <PublicFooter :locale="locale" />
+    <!-- Footer papier chaud -->
+    <footer class="border-t border-bone bg-paper">
+      <div class="mx-auto grid max-w-7xl gap-10 px-6 py-12 md:grid-cols-4">
+        <div class="space-y-3">
+          <p class="font-display text-sm text-fg" style="letter-spacing:-0.025em">Fleet<em
+              style="font-style:italic;color:#e2674f">Ai</em></p>
+          <p class="text-sm text-fg-muted">
+            {{ locale === 'fr'
+              ? 'La maintenance maritime, sans douleur.'
+              : 'Maritime fleet maintenance, made simple.' }}
+          </p>
+        </div>
+
+        <div class="space-y-3">
+          <p class="text-xs font-semibold uppercase tracking-wider text-fg-subtle">
+            {{ locale === 'fr' ? 'Produit' : 'Product' }}
+          </p>
+          <div class="grid gap-2 text-sm font-medium text-fg-muted">
+            <Link :href="`/${locale}#features`" class="transition-colors hover:text-fg">
+              {{ locale === 'fr' ? 'Fonctionnalités' : 'Features' }}
+            </Link>
+            <Link :href="`/${locale}/tarifs`" class="transition-colors hover:text-fg">
+              {{ locale === 'fr' ? 'Tarifs' : 'Pricing' }}
+            </Link>
+            <Link href="/design-system" class="transition-colors hover:text-fg">Design system</Link>
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          <p class="text-xs font-semibold uppercase tracking-wider text-fg-subtle">
+            {{ locale === 'fr' ? 'Entreprise' : 'Company' }}
+          </p>
+          <div class="grid gap-2 text-sm font-medium text-fg-muted">
+            <a class="transition-colors hover:text-fg" href="#">{{ locale === 'fr' ? 'Contact' : 'Contact' }}</a>
+            <a class="transition-colors hover:text-fg" href="#">{{ locale === 'fr' ? 'À propos' : 'About' }}</a>
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          <p class="text-xs font-semibold uppercase tracking-wider text-fg-subtle">
+            {{ locale === 'fr' ? 'Légal' : 'Legal' }}
+          </p>
+          <div class="grid gap-2 text-sm font-medium text-fg-muted">
+            <a class="transition-colors hover:text-fg" href="#">{{ locale === 'fr' ? 'Confidentialité' : 'Privacy'
+            }}</a>
+            <a class="transition-colors hover:text-fg" href="#">{{ locale === 'fr' ? 'Conditions' : 'Terms' }}</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="border-t border-bone">
+        <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 text-xs font-medium text-fg-subtle">
+          <span>© {{ new Date().getFullYear() }} FleetAi</span>
+          <span>{{ locale === 'fr' ? 'Bilingue FR/EN · Hébergé en UE' : 'Bilingual EN/FR · EU-hosted' }}</span>
+        </div>
+      </div>
+    </footer>
   </div>
 </template>

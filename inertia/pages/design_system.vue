@@ -54,9 +54,10 @@ const tableRows = computed(() => {
 </script>
 
 <template>
+
   <Head title="Charte graphique & design system" />
 
-  <div class="px-6 py-10 space-y-16 sm:px-8">
+  <div class="px-6 py-10 space-y-16 sm:px-8 max-w-7xl">
     <header class="space-y-8">
       <div class="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
         <div class="space-y-4">
@@ -67,10 +68,7 @@ const tableRows = computed(() => {
             Un design premium, pastel
           </BaseHeading>
           <div class="flex flex-wrap gap-3 items-center">
-            <Link
-              route="home"
-              class="inline-flex text-sm font-semibold text-brand hover:text-brand-hover"
-            >
+            <Link route="home" class="inline-flex text-sm font-semibold text-brand hover:text-brand-hover">
               ← Retour à l’accueil
             </Link>
             <BaseBadge variant="info">
@@ -101,14 +99,11 @@ const tableRows = computed(() => {
       </div>
 
       <div class="flex flex-wrap gap-4 justify-between items-center">
-        <BaseTabs
-          v-model="tab"
-          :tabs="[
-            { key: 'overview', label: 'Foundations', badge: 'tokens' },
-            { key: 'components', label: 'Components', badge: 'base' },
-            { key: 'patterns', label: 'Patterns', badge: 'examples' },
-          ]"
-        />
+        <BaseTabs v-model="tab" :tabs="[
+          { key: 'overview', label: 'Foundations', badge: 'tokens' },
+          { key: 'components', label: 'Components', badge: 'base' },
+          { key: 'patterns', label: 'Patterns', badge: 'examples' },
+        ]" />
         <div class="hidden gap-2 items-center sm:flex">
           <BaseButton variant="ghost" size="sm" disabled>
             Reduced motion
@@ -125,11 +120,8 @@ const tableRows = computed(() => {
         <template #header>
           <div class="flex items-center justify-between gap-4">
             <div class="flex items-center gap-3">
-              <img
-                :src="brandIconUrl"
-                alt="Fleetide AI icon"
-                class="h-10 w-10 rounded-(--radius-control) shadow-(--shadow-xs)"
-              />
+              <img :src="brandIconUrl" alt="Fleetide AI icon"
+                class="h-10 w-10 rounded-(--radius-control) shadow-(--shadow-xs)" />
               <div>
                 <p class="font-display text-sm font-semibold text-fg">Fleetide AI</p>
                 <p class="text-xs font-semibold text-fg-subtle">Horizon · wave · AI spark</p>
@@ -181,16 +173,20 @@ const tableRows = computed(() => {
             <h3 class="text-sm font-semibold font-display text-fg">Couleurs</h3>
           </template>
           <div class="grid grid-cols-2 gap-3">
-            <div class="rounded-(--radius-control) border border-border bg-lilac-100 px-3 py-2 text-xs font-semibold text-lilac-800 ring-1 ring-lilac-200">
+            <div
+              class="rounded-(--radius-control) border border-border bg-lilac-100 px-3 py-2 text-xs font-semibold text-lilac-800 ring-1 ring-lilac-200">
               lilac
             </div>
-            <div class="rounded-(--radius-control) border border-border bg-peach-100 px-3 py-2 text-xs font-semibold text-peach-800 ring-1 ring-peach-200">
+            <div
+              class="rounded-(--radius-control) border border-border bg-peach-100 px-3 py-2 text-xs font-semibold text-peach-800 ring-1 ring-peach-200">
               peach
             </div>
-            <div class="rounded-(--radius-control) border border-border bg-mint-100 px-3 py-2 text-xs font-semibold text-mint-800 ring-1 ring-mint-200">
+            <div
+              class="rounded-(--radius-control) border border-border bg-mint-100 px-3 py-2 text-xs font-semibold text-mint-800 ring-1 ring-mint-200">
               mint
             </div>
-            <div class="rounded-(--radius-control) border border-border bg-sky-100 px-3 py-2 text-xs font-semibold text-sky-800 ring-1 ring-sky-200">
+            <div
+              class="rounded-(--radius-control) border border-border bg-sky-100 px-3 py-2 text-xs font-semibold text-sky-800 ring-1 ring-sky-200">
               sky
             </div>
           </div>
@@ -217,7 +213,8 @@ const tableRows = computed(() => {
         <span class="font-semibold font-display text-fg">Sora</span> pour les titres ;
         <span class="font-semibold text-fg">Source Sans 3</span> pour le corps et les formulaires.
       </p>
-      <div class="space-y-4 rounded-(--radius-card) border border-border bg-surface-elevated p-6 shadow-(--shadow-card)">
+      <div
+        class="space-y-4 rounded-(--radius-card) border border-border bg-surface-elevated p-6 shadow-(--shadow-card)">
         <BaseHeading level="display">
           Display
         </BaseHeading>
@@ -286,28 +283,16 @@ const tableRows = computed(() => {
           </template>
           <div class="grid gap-5">
             <BaseInput v-model="shipName" id="shipName" label="Nom du navire" hint="Visible sur la flotte" />
-            <BaseSelect
-              v-model="engineType"
-              id="engineType"
-              label="Type de propulsion"
-              :options="[
-                { label: 'Sailboat', value: 'sail' },
-                { label: 'Motor', value: 'motor' },
-                { label: 'Catamaran', value: 'cat' },
-              ]"
-              placeholder="Choisir…"
-            />
+            <BaseSelect v-model="engineType" id="engineType" label="Type de propulsion" :options="[
+              { label: 'Sailboat', value: 'sail' },
+              { label: 'Motor', value: 'motor' },
+              { label: 'Catamaran', value: 'cat' },
+            ]" placeholder="Choisir…" />
             <BaseTextarea v-model="notes" id="notes" label="Notes" placeholder="Ex. vérification annuelle…" />
-            <BaseRadio
-              v-model="radioValue"
-              label="Priorité"
-              name="priority"
-              :options="[
-                { label: 'Safe', value: 'safe' },
-                { label: 'Fast', value: 'fast' },
-              ]"
-              hint="Démo d’un choix exclusif"
-            />
+            <BaseRadio v-model="radioValue" label="Priorité" name="priority" :options="[
+              { label: 'Safe', value: 'safe' },
+              { label: 'Fast', value: 'fast' },
+            ]" hint="Démo d’un choix exclusif" />
             <BaseCheckbox v-model="agree" id="agree" label="Consentement">
               J’accepte les règles de sécurité
             </BaseCheckbox>
@@ -322,13 +307,10 @@ const tableRows = computed(() => {
             <p class="text-sm font-semibold font-display text-fg">Navigation & feedback</p>
           </template>
           <div class="grid gap-5">
-            <BaseTabs
-              v-model="radioValue"
-              :tabs="[
-                { key: 'safe', label: 'Safe' },
-                { key: 'fast', label: 'Fast', badge: 'beta' },
-              ]"
-            />
+            <BaseTabs v-model="radioValue" :tabs="[
+              { key: 'safe', label: 'Safe' },
+              { key: 'fast', label: 'Fast', badge: 'beta' },
+            ]" />
             <BasePagination v-model:page="page" :page-count="5" />
             <BaseAlert variant="info" title="Info">
               Les actions principales restent en menthe, le reste en surfaces douces.
@@ -348,27 +330,15 @@ const tableRows = computed(() => {
           </template>
           <div class="grid gap-6">
             <BaseField label="Champ custom" hint="Utilise un slot libre (input, select, etc.)" html-for="customField">
-              <input
-                id="customField"
-                type="text"
+              <input id="customField" type="text"
                 class="h-10 w-full rounded-(--radius-control) border border-border bg-surface-elevated px-3 text-sm text-fg shadow-sm placeholder:text-fg-subtle focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20 transition-shadow duration-(--motion-fast) ease-premium"
-                placeholder="Libre"
-              />
+                placeholder="Libre" />
             </BaseField>
 
-            <BaseField
-              label="Champ invalide"
-              error="Message d’erreur clair et lisible."
-              html-for="invalidField"
-            >
-              <input
-                id="invalidField"
-                type="text"
-                data-invalid="true"
-                aria-invalid="true"
+            <BaseField label="Champ invalide" error="Message d’erreur clair et lisible." html-for="invalidField">
+              <input id="invalidField" type="text" data-invalid="true" aria-invalid="true"
                 class="h-10 w-full rounded-(--radius-control) border border-border bg-surface-elevated px-3 text-sm text-fg shadow-sm placeholder:text-fg-subtle focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20 data-[invalid=true]:border-danger transition-shadow duration-(--motion-fast) ease-premium"
-                value="Oops"
-              />
+                value="Oops" />
             </BaseField>
           </div>
         </BaseCard>
@@ -402,20 +372,14 @@ const tableRows = computed(() => {
                 Actions
               </template>
               <template #default="{ close }">
-                <button
-                  type="button"
+                <button type="button"
                   class="w-full rounded-(--radius-control) px-3 py-2 text-left text-sm font-semibold text-fg-muted transition-colors duration-(--motion-fast) ease-premium hover:bg-surface-muted hover:text-fg"
-                  role="menuitem"
-                  @click="close()"
-                >
+                  role="menuitem" @click="close()">
                   Exporter CSV
                 </button>
-                <button
-                  type="button"
+                <button type="button"
                   class="w-full rounded-(--radius-control) px-3 py-2 text-left text-sm font-semibold text-fg-muted transition-colors duration-(--motion-fast) ease-premium hover:bg-surface-muted hover:text-fg"
-                  role="menuitem"
-                  @click="close()"
-                >
+                  role="menuitem" @click="close()">
                   Archiver
                 </button>
               </template>
@@ -426,11 +390,8 @@ const tableRows = computed(() => {
           </div>
         </BaseCard>
 
-        <BaseEmptyState
-          title="Aucun bateau pour l’instant"
-          description="Créez votre premier navire et commencez le suivi technique."
-          action-label="Créer un bateau"
-        />
+        <BaseEmptyState title="Aucun bateau pour l’instant"
+          description="Créez votre premier navire et commencez le suivi technique." action-label="Créer un bateau" />
       </div>
 
       <BaseCard padded>
@@ -450,11 +411,8 @@ const tableRows = computed(() => {
               </tr>
             </thead>
             <tbody class="divide-y divide-border bg-surface-elevated">
-              <tr
-                v-for="row in tableRows"
-                :key="row.name"
-                class="transition-colors duration-(--motion-fast) ease-premium hover:bg-lilac-50/60"
-              >
+              <tr v-for="row in tableRows" :key="row.name"
+                class="transition-colors duration-(--motion-fast) ease-premium hover:bg-lilac-50/60">
                 <td class="px-4 py-3 font-semibold text-fg">{{ row.name }}</td>
                 <td class="px-4 py-3 text-fg-muted">{{ row.type }}</td>
                 <td class="px-4 py-3">
