@@ -264,6 +264,12 @@ const routes = {
     tokens: [{"old":"/settings","type":0,"val":"settings","end":""}],
     types: placeholder as Registry['settings.index']['types'],
   },
+  'locale.set': {
+    methods: ["POST"],
+    pattern: '/locale',
+    tokens: [{"old":"/locale","type":0,"val":"locale","end":""}],
+    types: placeholder as Registry['locale.set']['types'],
+  },
   'maintenance.history': {
     methods: ["GET","HEAD"],
     pattern: '/maintenance/history',

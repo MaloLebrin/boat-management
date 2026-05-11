@@ -71,6 +71,9 @@ export interface ApiDefinition {
   settings: {
     index: typeof routes['settings.index']
   }
+  locale: {
+    set: typeof routes['locale.set']
+  }
   maintenance: {
     history: typeof routes['maintenance.history']
   }

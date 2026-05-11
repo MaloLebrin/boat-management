@@ -6,6 +6,7 @@ import { nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { Toaster, toast } from 'vue-sonner'
 import brandIconUrl from '~/assets/brand/fleetai_compass.svg'
 import AsideMenu from '~/components/layout/AsideMenu.vue'
+import LanguageSwitcher from '~/components/layout/LanguageSwitcher.vue'
 
 const page = usePage<Data.SharedProps>()
 const isSidebarOpen = ref(false)
@@ -198,6 +199,9 @@ onBeforeUnmount(() => {
 
         <!-- Drawer footer with user info -->
         <div class="absolute bottom-0 left-0 right-0 border-t border-abyss-800 px-4 py-4 bg-abyss-950">
+          <div class="mb-3">
+            <LanguageSwitcher />
+          </div>
           <div class="flex items-center gap-3 mb-3">
             <div
               class="flex items-center justify-center w-10 h-10 rounded-full bg-lagoon-500 text-white font-semibold text-sm">

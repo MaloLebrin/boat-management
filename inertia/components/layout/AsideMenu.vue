@@ -3,6 +3,7 @@ import { Form, Link } from '@adonisjs/inertia/vue'
 import { usePage } from '@inertiajs/vue3'
 import { computed } from 'vue'
 import Logo from '~/components/Logo.vue'
+import LanguageSwitcher from '~/components/layout/LanguageSwitcher.vue'
 import { useT } from '~/composables/useT'
 
 type AuthUser = {
@@ -156,6 +157,9 @@ const navSections = computed(() => [
 
     <!-- User info + Logout -->
     <div class="mt-auto border-t border-abyss-800 px-4 py-4">
+      <div class="flex items-center justify-between mb-3 px-0">
+        <LanguageSwitcher />
+      </div>
       <div class="flex items-center gap-3 mb-3">
         <div
           class="flex items-center justify-center w-10 h-10 rounded-full bg-lagoon-500 text-white font-semibold text-sm">

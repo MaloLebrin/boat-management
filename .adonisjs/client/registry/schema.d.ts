@@ -523,6 +523,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['index']>>>
     }
   }
+  'locale.set': {
+    methods: ["POST"]
+    pattern: '/locale'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
   'maintenance.history': {
     methods: ["GET","HEAD"]
     pattern: '/maintenance/history'

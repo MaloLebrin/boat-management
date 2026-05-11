@@ -31,6 +31,11 @@ export default class DetectUserLocaleMiddleware {
       return firstSegment
     }
 
+    const cookieLocale = ctx.request.cookie('locale')
+    if (cookieLocale === 'en' || cookieLocale === 'fr') {
+      return cookieLocale
+    }
+
     const userLanguages = ctx.request.languages()
     return i18nManager.getSupportedLocaleFor(userLanguages)
   }
