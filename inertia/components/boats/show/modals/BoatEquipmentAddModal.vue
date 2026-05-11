@@ -41,32 +41,21 @@ function close() {
 </script>
 
 <template>
-  <BaseModal
-    v-model:open="open"
-    title="Nouvel équipement"
-    :subtitle="`Sur ${boat.name} · l'équipement deviendra suivable pour la maintenance`"
-    close-label="Annuler"
-    size="xl"
-  >
+  <BaseModal :open="open" title="Nouvel équipement"
+    :subtitle="`Sur ${boat.name} · l'équipement deviendra suivable pour la maintenance`" close-label="Annuler" size="xl"
+    @update:open="close">
     <!-- Category selector -->
     <div class="mb-5">
       <p class="mb-2 text-sm font-semibold text-fg">Catégorie <span class="text-danger">*</span></p>
       <div class="flex flex-wrap gap-2">
-        <button
-          v-for="cat in categories"
-          :key="cat.key"
-          type="button"
-          :disabled="!cat.supported"
-          :class="[
-            'flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition-colors',
-            selectedCategory === cat.key
-              ? 'bg-brand text-white'
-              : cat.supported
-                ? 'bg-surface-muted text-fg-muted hover:bg-surface-elevated hover:text-fg'
-                : 'cursor-not-allowed bg-surface-muted/50 text-fg-subtle',
-          ]"
-          @click="cat.supported && (selectedCategory = cat.key)"
-        >
+        <button v-for="cat in categories" :key="cat.key" type="button" :disabled="!cat.supported" :class="[
+          'flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition-colors',
+          selectedCategory === cat.key
+            ? 'bg-brand text-white'
+            : cat.supported
+              ? 'bg-surface-muted text-fg-muted hover:bg-surface-elevated hover:text-fg'
+              : 'cursor-not-allowed bg-surface-muted/50 text-fg-subtle',
+        ]" @click="cat.supported && (selectedCategory = cat.key)">
           <span>{{ cat.icon }}</span>
           {{ cat.label }}
           <span v-if="!cat.supported" class="text-xs opacity-70">(bientôt)</span>
@@ -75,21 +64,15 @@ function close() {
     </div>
 
     <!-- Coming soon notice -->
-    <div
-      v-if="selectedCategory === 'other'"
-      class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-6 text-center text-sm text-amber-800"
-    >
+    <div v-if="selectedCategory === 'other'"
+      class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-6 text-center text-sm text-amber-800">
       <p class="font-semibold">Catégorie bientôt disponible</p>
       <p class="mt-1 text-xs">Sélectionnez Moteur, Voile ou Gréement pour ajouter un équipement.</p>
     </div>
 
     <!-- Dynamic form by category -->
     <template v-else>
-      <Form
-        :action="actionByCategory[selectedCategory]"
-        class="space-y-4"
-        #default="{ processing, errors }"
-      >
+      <Form :action="actionByCategory[selectedCategory]" class="space-y-4" #default="{ processing, errors }">
         <BoatEquipmentEngineFields v-if="selectedCategory === 'engine'" :errors="errors" />
         <BoatEquipmentSailFields v-else-if="selectedCategory === 'sail'" :errors="errors" />
         <BoatEquipmentRigFields v-else-if="selectedCategory === 'rig'" :errors="errors" :rig="boat.rig" />
