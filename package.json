@@ -61,6 +61,7 @@
     "@vue/server-renderer": "^3.5.32",
     "@vue/test-utils": "^2.4.6",
     "eslint": "^10.2.0",
+    "eslint-plugin-vue": "^10.9.1",
     "happy-dom": "^20.9.0",
     "hot-hook": "^1.0.0",
     "pino-pretty": "^13.1.3",

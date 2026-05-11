@@ -32,7 +32,7 @@ const otherHref = computed(() => {
 <template>
   <div class="min-h-screen bg-cream text-fg">
     <!-- Header crème clair — style marketing -->
-    <header class="sticky top-0 z-40 border-b border-bone bg-cream/95 backdrop-blur-sm">
+    <header class="sticky top-0 z-40 border-b border-bone bg-cream/95 backdrop-blur-sm px-2.5 md:px-0">
       <div class="mx-auto flex h-16 max-w-7xl items-center justify-between">
         <!-- Logo -->
         <Link :href="`/${locale}`"
