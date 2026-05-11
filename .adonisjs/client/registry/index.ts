@@ -12,6 +12,12 @@ const routes = {
     tokens: [{"old":"/design-system","type":0,"val":"design-system","end":""}],
     types: placeholder as Registry['design_system']['types'],
   },
+  'sitemap': {
+    methods: ["GET","HEAD"],
+    pattern: '/sitemap.xml',
+    tokens: [{"old":"/sitemap.xml","type":0,"val":"sitemap.xml","end":""}],
+    types: placeholder as Registry['sitemap']['types'],
+  },
   'boats.index': {
     methods: ["GET","HEAD"],
     pattern: '/boats',

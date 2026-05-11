@@ -9,6 +9,9 @@ export default {
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3'
 import { computed, ref } from 'vue'
+
+const props = defineProps<{ meta?: { title: string; description: string } }>()
+
 import BaseAlert from '~/components/base/BaseAlert.vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
@@ -29,7 +32,7 @@ import BaseTabs from '~/components/base/BaseTabs.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import BaseToggle from '~/components/base/BaseToggle.vue'
 
-import brandIconUrl from '~/assets/brand/fleetide_ai_icon_C.svg?url'
+import brandIconUrl from '~/assets/brand/fleetai_compass.svg?url'
 
 const tab = ref<'overview' | 'components' | 'patterns'>('overview')
 const page = ref(1)
@@ -54,8 +57,11 @@ const tableRows = computed(() => {
 </script>
 
 <template>
-
-  <Head title="Charte graphique & design system" />
+  <Head :title="props.meta?.title ?? 'Design System – FleetAi'">
+    <meta name="description" :content="props.meta?.description ?? 'Foundations, components and patterns of the FleetAi design system.'" />
+    <meta property="og:title" :content="props.meta?.title ?? 'Design System – FleetAi'" />
+    <link rel="canonical" href="/design-system" />
+  </Head>
 
   <div class="px-6 py-10 space-y-16 sm:px-8 max-w-7xl">
     <header class="space-y-8">

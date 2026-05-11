@@ -184,6 +184,23 @@ router
                 primary: i18n.t('marketing.home.sections.final_cta.primary'),
                 secondary: i18n.t('marketing.home.sections.final_cta.secondary'),
               },
+              howItWorks: {
+                title: i18n.t('marketing.home.sections.how_it_works.title'),
+                subtitle: i18n.t('marketing.home.sections.how_it_works.subtitle'),
+                items: [
+                  { step: i18n.t('marketing.home.sections.how_it_works.step1_number'), title: i18n.t('marketing.home.sections.how_it_works.step1_title'), description: i18n.t('marketing.home.sections.how_it_works.step1_description') },
+                  { step: i18n.t('marketing.home.sections.how_it_works.step2_number'), title: i18n.t('marketing.home.sections.how_it_works.step2_title'), description: i18n.t('marketing.home.sections.how_it_works.step2_description') },
+                  { step: i18n.t('marketing.home.sections.how_it_works.step3_number'), title: i18n.t('marketing.home.sections.how_it_works.step3_title'), description: i18n.t('marketing.home.sections.how_it_works.step3_description') },
+                ],
+              },
+              testimonials: {
+                title: i18n.t('marketing.home.sections.testimonials.title'),
+                items: [
+                  { quote: i18n.t('marketing.home.sections.testimonials.item1_quote'), author: i18n.t('marketing.home.sections.testimonials.item1_author'), role: i18n.t('marketing.home.sections.testimonials.item1_role') },
+                  { quote: i18n.t('marketing.home.sections.testimonials.item2_quote'), author: i18n.t('marketing.home.sections.testimonials.item2_author'), role: i18n.t('marketing.home.sections.testimonials.item2_role') },
+                  { quote: i18n.t('marketing.home.sections.testimonials.item3_quote'), author: i18n.t('marketing.home.sections.testimonials.item3_author'), role: i18n.t('marketing.home.sections.testimonials.item3_role') },
+                ],
+              },
             },
           },
         })
@@ -273,6 +290,32 @@ router
                 subtitle: i18n.t('marketing.pricing.cta.subtitle'),
                 primary: i18n.t('marketing.pricing.cta.primary'),
                 secondary: i18n.t('marketing.pricing.cta.secondary'),
+              },
+              billing: {
+                monthly: i18n.t('marketing.pricing.billing.monthly'),
+                annual: i18n.t('marketing.pricing.billing.annual'),
+                hint: i18n.t('marketing.pricing.billing.hint'),
+              },
+              trust: {
+                noCard: i18n.t('marketing.pricing.trust.no_card'),
+                cancel: i18n.t('marketing.pricing.trust.cancel'),
+                euData: i18n.t('marketing.pricing.trust.eu_data'),
+              },
+              compareTable: {
+                headers: {
+                  feature: i18n.t('marketing.pricing.compare_table.header_feature'),
+                  starter: i18n.t('marketing.pricing.compare_table.header_starter'),
+                  pro: i18n.t('marketing.pricing.compare_table.header_pro'),
+                  enterprise: i18n.t('marketing.pricing.compare_table.header_enterprise'),
+                },
+                rows: [
+                  { feature: i18n.t('marketing.pricing.compare_table.row1_feature'), starter: i18n.t('marketing.pricing.compare_table.row1_starter'), pro: i18n.t('marketing.pricing.compare_table.row1_pro'), enterprise: i18n.t('marketing.pricing.compare_table.row1_enterprise') },
+                  { feature: i18n.t('marketing.pricing.compare_table.row2_feature'), starter: i18n.t('marketing.pricing.compare_table.row2_starter'), pro: i18n.t('marketing.pricing.compare_table.row2_pro'), enterprise: i18n.t('marketing.pricing.compare_table.row2_enterprise') },
+                  { feature: i18n.t('marketing.pricing.compare_table.row3_feature'), starter: i18n.t('marketing.pricing.compare_table.row3_starter'), pro: i18n.t('marketing.pricing.compare_table.row3_pro'), enterprise: i18n.t('marketing.pricing.compare_table.row3_enterprise') },
+                  { feature: i18n.t('marketing.pricing.compare_table.row4_feature'), starter: i18n.t('marketing.pricing.compare_table.row4_starter'), pro: i18n.t('marketing.pricing.compare_table.row4_pro'), enterprise: i18n.t('marketing.pricing.compare_table.row4_enterprise') },
+                  { feature: i18n.t('marketing.pricing.compare_table.row5_feature'), starter: i18n.t('marketing.pricing.compare_table.row5_starter'), pro: i18n.t('marketing.pricing.compare_table.row5_pro'), enterprise: i18n.t('marketing.pricing.compare_table.row5_enterprise') },
+                  { feature: i18n.t('marketing.pricing.compare_table.row6_feature'), starter: i18n.t('marketing.pricing.compare_table.row6_starter'), pro: i18n.t('marketing.pricing.compare_table.row6_pro'), enterprise: i18n.t('marketing.pricing.compare_table.row6_enterprise') },
+                ],
               },
             },
           },
@@ -462,6 +505,23 @@ router
                 primary: i18n.t('marketing.home.sections.final_cta.primary'),
                 secondary: i18n.t('marketing.home.sections.final_cta.secondary'),
               },
+              howItWorks: {
+                title: i18n.t('marketing.home.sections.how_it_works.title'),
+                subtitle: i18n.t('marketing.home.sections.how_it_works.subtitle'),
+                items: [
+                  { step: i18n.t('marketing.home.sections.how_it_works.step1_number'), title: i18n.t('marketing.home.sections.how_it_works.step1_title'), description: i18n.t('marketing.home.sections.how_it_works.step1_description') },
+                  { step: i18n.t('marketing.home.sections.how_it_works.step2_number'), title: i18n.t('marketing.home.sections.how_it_works.step2_title'), description: i18n.t('marketing.home.sections.how_it_works.step2_description') },
+                  { step: i18n.t('marketing.home.sections.how_it_works.step3_number'), title: i18n.t('marketing.home.sections.how_it_works.step3_title'), description: i18n.t('marketing.home.sections.how_it_works.step3_description') },
+                ],
+              },
+              testimonials: {
+                title: i18n.t('marketing.home.sections.testimonials.title'),
+                items: [
+                  { quote: i18n.t('marketing.home.sections.testimonials.item1_quote'), author: i18n.t('marketing.home.sections.testimonials.item1_author'), role: i18n.t('marketing.home.sections.testimonials.item1_role') },
+                  { quote: i18n.t('marketing.home.sections.testimonials.item2_quote'), author: i18n.t('marketing.home.sections.testimonials.item2_author'), role: i18n.t('marketing.home.sections.testimonials.item2_role') },
+                  { quote: i18n.t('marketing.home.sections.testimonials.item3_quote'), author: i18n.t('marketing.home.sections.testimonials.item3_author'), role: i18n.t('marketing.home.sections.testimonials.item3_role') },
+                ],
+              },
             },
           },
         })
@@ -551,6 +611,32 @@ router
                 subtitle: i18n.t('marketing.pricing.cta.subtitle'),
                 primary: i18n.t('marketing.pricing.cta.primary'),
                 secondary: i18n.t('marketing.pricing.cta.secondary'),
+              },
+              billing: {
+                monthly: i18n.t('marketing.pricing.billing.monthly'),
+                annual: i18n.t('marketing.pricing.billing.annual'),
+                hint: i18n.t('marketing.pricing.billing.hint'),
+              },
+              trust: {
+                noCard: i18n.t('marketing.pricing.trust.no_card'),
+                cancel: i18n.t('marketing.pricing.trust.cancel'),
+                euData: i18n.t('marketing.pricing.trust.eu_data'),
+              },
+              compareTable: {
+                headers: {
+                  feature: i18n.t('marketing.pricing.compare_table.header_feature'),
+                  starter: i18n.t('marketing.pricing.compare_table.header_starter'),
+                  pro: i18n.t('marketing.pricing.compare_table.header_pro'),
+                  enterprise: i18n.t('marketing.pricing.compare_table.header_enterprise'),
+                },
+                rows: [
+                  { feature: i18n.t('marketing.pricing.compare_table.row1_feature'), starter: i18n.t('marketing.pricing.compare_table.row1_starter'), pro: i18n.t('marketing.pricing.compare_table.row1_pro'), enterprise: i18n.t('marketing.pricing.compare_table.row1_enterprise') },
+                  { feature: i18n.t('marketing.pricing.compare_table.row2_feature'), starter: i18n.t('marketing.pricing.compare_table.row2_starter'), pro: i18n.t('marketing.pricing.compare_table.row2_pro'), enterprise: i18n.t('marketing.pricing.compare_table.row2_enterprise') },
+                  { feature: i18n.t('marketing.pricing.compare_table.row3_feature'), starter: i18n.t('marketing.pricing.compare_table.row3_starter'), pro: i18n.t('marketing.pricing.compare_table.row3_pro'), enterprise: i18n.t('marketing.pricing.compare_table.row3_enterprise') },
+                  { feature: i18n.t('marketing.pricing.compare_table.row4_feature'), starter: i18n.t('marketing.pricing.compare_table.row4_starter'), pro: i18n.t('marketing.pricing.compare_table.row4_pro'), enterprise: i18n.t('marketing.pricing.compare_table.row4_enterprise') },
+                  { feature: i18n.t('marketing.pricing.compare_table.row5_feature'), starter: i18n.t('marketing.pricing.compare_table.row5_starter'), pro: i18n.t('marketing.pricing.compare_table.row5_pro'), enterprise: i18n.t('marketing.pricing.compare_table.row5_enterprise') },
+                  { feature: i18n.t('marketing.pricing.compare_table.row6_feature'), starter: i18n.t('marketing.pricing.compare_table.row6_starter'), pro: i18n.t('marketing.pricing.compare_table.row6_pro'), enterprise: i18n.t('marketing.pricing.compare_table.row6_enterprise') },
+                ],
               },
             },
           },

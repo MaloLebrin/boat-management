@@ -108,6 +108,31 @@
         "subtitle": "Get a clean fleet record, then let AI highlight what needs action.",
         "primary": "Create an account",
         "secondary": "See pricing"
+      },
+      "how_it_works": {
+        "title": "How it works",
+        "subtitle": "From onboarding to AI-driven signals in minutes.",
+        "step1_number": "01",
+        "step1_title": "Add your fleet",
+        "step1_description": "Register boats, engines, sails and equipment in a few clicks. Import from a spreadsheet in seconds.",
+        "step2_number": "02",
+        "step2_title": "Log maintenance",
+        "step2_description": "Record every task, part replaced and engine hour. History is immutable and always at hand.",
+        "step3_number": "03",
+        "step3_title": "Act on AI signals",
+        "step3_description": "FleetAi surfaces what's urgent, predicts upcoming work and writes maintenance reports for you."
+      },
+      "testimonials": {
+        "title": "Trusted by real operators",
+        "item1_quote": "Since FleetAi, I know what needs doing before it starts squeaking. The AI reports save me an hour every week.",
+        "item1_author": "Marc",
+        "item1_role": "Fleet manager · Marina Bleue",
+        "item2_quote": "Our entire maintenance log is now in one place. No more chasing spreadsheets across three email threads.",
+        "item2_author": "Sophie",
+        "item2_role": "Technical lead · BaySail Co.",
+        "item3_quote": "As a solo owner with two boats, the urgent dashboard is a game-changer. I never miss a service interval.",
+        "item3_author": "Thomas",
+        "item3_role": "Owner/operator · Private fleet"
       }
     }
   },
@@ -163,6 +188,46 @@
       "subtitle": "Start free, then add AI signals when your fleet grows.",
       "primary": "Start now",
       "secondary": "Back to home"
+    },
+    "billing": {
+      "monthly": "Monthly",
+      "annual": "Annual",
+      "hint": "Save 2 months with annual billing"
+    },
+    "trust": {
+      "no_card": "No credit card required",
+      "cancel": "Cancel anytime",
+      "eu_data": "Data hosted in EU"
+    },
+    "compare_table": {
+      "header_feature": "Feature",
+      "header_starter": "Starter",
+      "header_pro": "Pro",
+      "header_enterprise": "Enterprise",
+      "row1_feature": "Boats & equipment",
+      "row1_starter": "Up to 3 boats",
+      "row1_pro": "Unlimited",
+      "row1_enterprise": "Unlimited",
+      "row2_feature": "Maintenance history",
+      "row2_starter": "true",
+      "row2_pro": "true",
+      "row2_enterprise": "true",
+      "row3_feature": "AI assistant",
+      "row3_starter": "false",
+      "row3_pro": "true",
+      "row3_enterprise": "true",
+      "row4_feature": "Urgent dashboard",
+      "row4_starter": "false",
+      "row4_pro": "true",
+      "row4_enterprise": "true",
+      "row5_feature": "Custom SLA / SSO",
+      "row5_starter": "false",
+      "row5_pro": "false",
+      "row5_enterprise": "true",
+      "row6_feature": "Priority support",
+      "row6_starter": "false",
+      "row6_pro": "Email",
+      "row6_enterprise": "Dedicated"
     },
     "note": "Pricing is illustrative — connect billing later."
   }

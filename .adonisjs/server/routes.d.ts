@@ -5,6 +5,7 @@ type ParamValue = string | number | bigint | boolean
 export type ScannedRoutes = {
   ALL: {
     'design_system': { paramsTuple?: []; params?: {} }
+    'sitemap': { paramsTuple?: []; params?: {} }
     'boats.index': { paramsTuple?: []; params?: {} }
     'boats.create': { paramsTuple?: []; params?: {} }
     'boats.store': { paramsTuple?: []; params?: {} }
@@ -47,6 +48,7 @@ export type ScannedRoutes = {
   }
   GET: {
     'design_system': { paramsTuple?: []; params?: {} }
+    'sitemap': { paramsTuple?: []; params?: {} }
     'boats.index': { paramsTuple?: []; params?: {} }
     'boats.create': { paramsTuple?: []; params?: {} }
     'boats.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -69,6 +71,7 @@ export type ScannedRoutes = {
   }
   HEAD: {
     'design_system': { paramsTuple?: []; params?: {} }
+    'sitemap': { paramsTuple?: []; params?: {} }
     'boats.index': { paramsTuple?: []; params?: {} }
     'boats.create': { paramsTuple?: []; params?: {} }
     'boats.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }

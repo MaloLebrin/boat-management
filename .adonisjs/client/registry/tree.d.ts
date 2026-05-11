@@ -3,6 +3,7 @@ import type { routes } from './index.ts'
 
 export interface ApiDefinition {
   designSystem: typeof routes['design_system']
+  sitemap: typeof routes['sitemap']
   boats: {
     index: typeof routes['boats.index']
     create: typeof routes['boats.create']

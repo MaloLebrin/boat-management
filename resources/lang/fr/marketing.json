@@ -108,6 +108,31 @@
         "subtitle": "Constituez un registre maintenance propre, puis laissez l’IA signaler l’action.",
         "primary": "Créer un compte",
         "secondary": "Voir les tarifs"
+      },
+      "how_it_works": {
+        "title": "Comment ça marche",
+        "subtitle": "De l’inscription aux signaux IA en quelques minutes.",
+        "step1_number": "01",
+        "step1_title": "Ajoutez votre flotte",
+        "step1_description": "Enregistrez bateaux, moteurs, voiles et équipements en quelques clics. Importez depuis un tableur en quelques secondes.",
+        "step2_number": "02",
+        "step2_title": "Enregistrez la maintenance",
+        "step2_description": "Notez chaque tâche, pièce remplacée et heure moteur. L’historique est immuable et toujours disponible.",
+        "step3_number": "03",
+        "step3_title": "Agissez sur les signaux IA",
+        "step3_description": "FleetAi remonte ce qui est urgent, prédit les prochains travaux et rédige les rapports de maintenance à votre place."
+      },
+      "testimonials": {
+        "title": "La confiance de vrais opérateurs",
+        "item1_quote": "Depuis FleetAi, je sais ce qui doit être fait avant que ça grince. Les rapports IA me font gagner une heure par semaine.",
+        "item1_author": "Marc",
+        "item1_role": "Gestionnaire de flotte · Marina Bleue",
+        "item2_quote": "Tout notre historique de maintenance est maintenant au même endroit. Fini les tableurs éparpillés dans les emails.",
+        "item2_author": "Sophie",
+        "item2_role": "Responsable technique · BaySail Co.",
+        "item3_quote": "En tant que propriétaire solo avec deux bateaux, le tableau de bord urgent change tout. Je ne rate plus aucune échéance.",
+        "item3_author": "Thomas",
+        "item3_role": "Propriétaire · Flotte privée"
       }
     }
   },
@@ -163,6 +188,46 @@
       "subtitle": "Commencez gratuitement, puis ajoutez des signaux IA en grandissant.",
       "primary": "Démarrer",
       "secondary": "Retour accueil"
+    },
+    "billing": {
+      "monthly": "Mensuel",
+      "annual": "Annuel",
+      "hint": "Économisez 2 mois avec la facturation annuelle"
+    },
+    "trust": {
+      "no_card": "Sans carte bancaire",
+      "cancel": "Annulez à tout moment",
+      "eu_data": "Données hébergées en UE"
+    },
+    "compare_table": {
+      "header_feature": "Fonctionnalité",
+      "header_starter": "Starter",
+      "header_pro": "Pro",
+      "header_enterprise": "Enterprise",
+      "row1_feature": "Bateaux & équipements",
+      "row1_starter": "Jusqu’à 3 bateaux",
+      "row1_pro": "Illimité",
+      "row1_enterprise": "Illimité",
+      "row2_feature": "Historique de maintenance",
+      "row2_starter": "true",
+      "row2_pro": "true",
+      "row2_enterprise": "true",
+      "row3_feature": "Assistant IA",
+      "row3_starter": "false",
+      "row3_pro": "true",
+      "row3_enterprise": "true",
+      "row4_feature": "Tableau de bord urgent",
+      "row4_starter": "false",
+      "row4_pro": "true",
+      "row4_enterprise": "true",
+      "row5_feature": "SLA personnalisé / SSO",
+      "row5_starter": "false",
+      "row5_pro": "false",
+      "row5_enterprise": "true",
+      "row6_feature": "Support prioritaire",
+      "row6_starter": "false",
+      "row6_pro": "Email",
+      "row6_enterprise": "Dédié"
     },
     "note": "Tarifs indicatifs — la facturation peut être ajoutée ensuite."
   }
