@@ -2,6 +2,7 @@
 import { Link, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import BaseButton from '~/components/base/BaseButton.vue';
+import { useT } from '~/composables/useT';
 
 const props = defineProps<{
   locale?: 'en' | 'fr'
@@ -17,6 +18,7 @@ type SharedProps = {
 const page = usePage<SharedProps>()
 
 const locale = computed<'en' | 'fr'>(() => props.locale ?? page.props.locale ?? 'en')
+const { t } = useT()
 const path = computed(() => props.path ?? page.props.path ?? '')
 const isAuthed = computed(() => Boolean(page.props.user))
 
@@ -52,11 +54,11 @@ const otherHref = computed(() => {
         <nav class="hidden items-center gap-1 md:flex">
           <Link :href="`/${locale}#features`"
             class="rounded-(--radius-control) px-3 py-2 text-sm font-medium text-fg-muted transition-colors duration-(--motion-fast) ease-premium hover:bg-paper hover:text-fg">
-            {{ locale === 'fr' ? 'Fonctionnalités' : 'Features' }}
+            {{ t('public.nav.features') }}
           </Link>
           <Link :href="`/${locale}/tarifs`"
             class="rounded-(--radius-control) px-3 py-2 text-sm font-medium text-fg-muted transition-colors duration-(--motion-fast) ease-premium hover:bg-paper hover:text-fg">
-            {{ locale === 'fr' ? 'Tarifs' : 'Pricing' }}
+            {{ t('public.nav.pricing') }}
           </Link>
           <Link href="/design-system"
             class="rounded-(--radius-control) px-3 py-2 text-sm font-medium text-fg-muted transition-colors duration-(--motion-fast) ease-premium hover:bg-paper hover:text-fg">
@@ -77,12 +79,12 @@ const otherHref = computed(() => {
           <template v-else>
             <a href="/login">
               <BaseButton variant="ghost" size="sm">
-                {{ locale === 'fr' ? 'Connexion' : 'Login' }}
+                {{ t('public.actions.login') }}
               </BaseButton>
             </a>
             <a href="/signup">
               <BaseButton size="sm">
-                {{ locale === 'fr' ? 'Essayer gratuitement' : 'Try free' }}
+                {{ t('public.actions.tryFree') }}
               </BaseButton>
             </a>
           </template>
@@ -102,22 +104,20 @@ const otherHref = computed(() => {
           <p class="font-display text-sm text-fg" style="letter-spacing:-0.025em">Fleet<em
               style="font-style:italic;color:#e2674f">Ai</em></p>
           <p class="text-sm text-fg-muted">
-            {{ locale === 'fr'
-              ? 'La maintenance maritime, sans douleur.'
-              : 'Maritime fleet maintenance, made simple.' }}
+            {{ t('public.footer.tagline') }}
           </p>
         </div>
 
         <div class="space-y-3">
           <p class="text-xs font-semibold uppercase tracking-wider text-fg-subtle">
-            {{ locale === 'fr' ? 'Produit' : 'Product' }}
+            {{ t('public.footer.product') }}
           </p>
           <div class="grid gap-2 text-sm font-medium text-fg-muted">
             <Link :href="`/${locale}#features`" class="transition-colors hover:text-fg">
-              {{ locale === 'fr' ? 'Fonctionnalités' : 'Features' }}
+              {{ t('public.footer.features') }}
             </Link>
             <Link :href="`/${locale}/tarifs`" class="transition-colors hover:text-fg">
-              {{ locale === 'fr' ? 'Tarifs' : 'Pricing' }}
+              {{ t('public.footer.pricing') }}
             </Link>
             <Link href="/design-system" class="transition-colors hover:text-fg">Design system</Link>
           </div>
@@ -125,22 +125,21 @@ const otherHref = computed(() => {
 
         <div class="space-y-3">
           <p class="text-xs font-semibold uppercase tracking-wider text-fg-subtle">
-            {{ locale === 'fr' ? 'Entreprise' : 'Company' }}
+            {{ t('public.footer.company') }}
           </p>
           <div class="grid gap-2 text-sm font-medium text-fg-muted">
-            <a class="transition-colors hover:text-fg" href="#">{{ locale === 'fr' ? 'Contact' : 'Contact' }}</a>
-            <a class="transition-colors hover:text-fg" href="#">{{ locale === 'fr' ? 'À propos' : 'About' }}</a>
+            <a class="transition-colors hover:text-fg" href="#">{{ t('public.footer.contact') }}</a>
+            <a class="transition-colors hover:text-fg" href="#">{{ t('public.footer.about') }}</a>
           </div>
         </div>
 
         <div class="space-y-3">
           <p class="text-xs font-semibold uppercase tracking-wider text-fg-subtle">
-            {{ locale === 'fr' ? 'Légal' : 'Legal' }}
+            {{ t('public.footer.legal') }}
           </p>
           <div class="grid gap-2 text-sm font-medium text-fg-muted">
-            <a class="transition-colors hover:text-fg" href="#">{{ locale === 'fr' ? 'Confidentialité' : 'Privacy'
-              }}</a>
-            <a class="transition-colors hover:text-fg" href="#">{{ locale === 'fr' ? 'Conditions' : 'Terms' }}</a>
+            <a class="transition-colors hover:text-fg" href="#">{{ t('public.footer.privacy') }}</a>
+            <a class="transition-colors hover:text-fg" href="#">{{ t('public.footer.terms') }}</a>
           </div>
         </div>
       </div>
@@ -148,7 +147,7 @@ const otherHref = computed(() => {
       <div class="border-t border-bone">
         <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 text-xs font-medium text-fg-subtle">
           <span>© {{ new Date().getFullYear() }} FleetAi</span>
-          <span>{{ locale === 'fr' ? 'Bilingue FR/EN · Hébergé en UE' : 'Bilingual EN/FR · EU-hosted' }}</span>
+          <span>{{ t('public.footer.bilingual') }}</span>
         </div>
       </div>
     </footer>

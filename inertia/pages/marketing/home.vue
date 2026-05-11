@@ -14,6 +14,7 @@ import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseStatCard from '~/components/base/BaseStatCard.vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import { useScrollReveal } from '~/composables/useScrollReveal'
+import { useT } from '~/composables/useT'
 
 type PageProps = {
   t: {
@@ -55,6 +56,7 @@ const page = usePage<SharedProps>()
 const props = defineProps<PageProps>()
 const locale = computed<'en' | 'fr'>(() => page.props.locale ?? 'en')
 const t = props.t
+const { t: tApp } = useT()
 
 const hreflangEn = '/en'
 const hreflangFr = '/fr'
@@ -176,13 +178,13 @@ onUnmounted(() => {
             </Link>
             <a href="#demo">
               <BaseButton variant="ghost" size="sm" class="text-white/80 hover:text-white border-white/20">
-                Voir une demo (2 min) ▶
+                {{ tApp('homePreview.demoButton') }}
               </BaseButton>
             </a>
           </div>
-          <div class="mt-3 text-sm text-white/40">★★★★★ 4,8/5 · 120 avis · G2, Capterra, Product Hunt</div>
+          <div class="mt-3 text-sm text-white/40">{{ tApp('homePreview.socialProof') }}</div>
           <div class="mt-10 aspect-video w-full rounded-xl border border-white/10 bg-navy-800/60 flex items-center justify-center text-sm text-white/30">
-            capture du dashboard
+            {{ tApp('homePreview.dashboardAlt') }}
           </div>
         </div>
 
@@ -394,29 +396,29 @@ onUnmounted(() => {
       <div class="rounded-xl border border-navy-800 bg-navy-900 p-5">
         <div class="flex items-center justify-between gap-3">
           <p class="text-sm font-semibold text-white">{{ t.brand.name }}</p>
-          <BaseBadge variant="success">{{ locale === 'fr' ? 'Aperçu' : 'Preview' }}</BaseBadge>
+          <BaseBadge variant="success">{{ tApp('homePreview.badge') }}</BaseBadge>
         </div>
 
         <div class="mt-4 grid gap-3 sm:grid-cols-2">
           <div class="rounded-(--radius-control) border border-white/10 bg-white/5 px-4 py-4">
-            <p class="text-xs font-semibold text-coral-400">{{ locale === 'fr' ? 'Urgent' : 'Urgent' }}</p>
+            <p class="text-xs font-semibold text-coral-400">{{ tApp('homePreview.urgent') }}</p>
             <p class="mt-1 text-2xl font-semibold text-white">3</p>
-            <p class="mt-1 text-xs text-white/50">{{ locale === 'fr' ? 'tâches en retard' : 'overdue tasks' }}</p>
+            <p class="mt-1 text-xs text-white/50">{{ tApp('homePreview.overdueHint') }}</p>
           </div>
           <div class="rounded-(--radius-control) border border-white/10 bg-white/5 px-4 py-4">
-            <p class="text-xs font-semibold text-amber-600">{{ locale === 'fr' ? 'À venir' : 'Due soon' }}</p>
+            <p class="text-xs font-semibold text-amber-600">{{ tApp('homePreview.dueSoon') }}</p>
             <p class="mt-1 text-2xl font-semibold text-white">7</p>
-            <p class="mt-1 text-xs text-white/50">{{ locale === 'fr' ? 'dans 14 jours' : 'within 14 days' }}</p>
+            <p class="mt-1 text-xs text-white/50">{{ tApp('homePreview.dueSoonHint') }}</p>
           </div>
         </div>
 
         <div class="mt-3 rounded-(--radius-control) border border-white/10 bg-white/5 px-4 py-4">
           <div class="flex items-center justify-between gap-3">
-            <p class="text-sm font-semibold text-white">{{ locale === 'fr' ? 'Bateau' : 'Boat' }} · Aurore</p>
-            <BaseBadge variant="info">{{ locale === 'fr' ? 'Moteur' : 'Engine' }} 1</BaseBadge>
+            <p class="text-sm font-semibold text-white">{{ tApp('homePreview.boat') }} · Aurore</p>
+            <BaseBadge variant="info">{{ tApp('homePreview.engine') }} 1</BaseBadge>
           </div>
           <p class="mt-2 text-sm text-white/55">
-            {{ locale === 'fr' ? 'Dernière vidange : il y a 3 mois. Prochaine : dans 42h.' : 'Last oil change: 3 months ago. Next: in 42h.' }}
+            {{ tApp('homePreview.engineDetail') }}
           </p>
         </div>
       </div>

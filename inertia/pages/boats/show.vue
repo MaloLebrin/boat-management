@@ -44,12 +44,12 @@ const statusBadge = computed(() => {
 })
 
 const tabs = computed(() => [
-  { key: 'overview', label: "Vue d'ensemble" },
-  { key: 'specs', label: 'Specifications' },
-  { key: 'equipment', label: 'Equipements' },
-  { key: 'history', label: 'Historique' },
-  { key: 'tasks', label: 'Taches', badge: openTasks.value.length > 0 ? String(openTasks.value.length) : undefined },
-  { key: 'documents', label: 'Documents' },
+  { key: 'overview', label: t('boats.show.tabs.overview') },
+  { key: 'specs', label: t('boats.show.tabs.specs') },
+  { key: 'equipment', label: t('boats.show.tabs.equipment') },
+  { key: 'history', label: t('boats.show.tabs.history') },
+  { key: 'tasks', label: t('boats.show.tabs.tasks'), badge: openTasks.value.length > 0 ? String(openTasks.value.length) : undefined },
+  { key: 'documents', label: t('boats.show.tabs.documents') },
 ])
 
 function goToTab(key: TabKey | string) {
@@ -59,7 +59,7 @@ function goToTab(key: TabKey | string) {
 
 <template>
   <div class="w-full max-w-7xl px-6 py-10 sm:px-8">
-    <BaseBreadcrumb :items="[{ label: 'Flotte', href: '/boats' }, { label: 'Bateaux' }, { label: boat.name }]" />
+    <BaseBreadcrumb :items="[{ label: t('boats.show.breadcrumbFleet'), href: '/boats' }, { label: t('nav.boats') }, { label: boat.name }]" />
 
     <!-- Header -->
     <header class="space-y-6">
@@ -82,15 +82,15 @@ function goToTab(key: TabKey | string) {
 
         <div class="flex flex-wrap items-center gap-2 justify-end">
           <a :href="`/boats/${boat.id}/edit`">
-            <BaseButton variant="secondary" size="sm">Modifier</BaseButton>
+            <BaseButton variant="secondary" size="sm">{{ t('boats.show.editBoat') }}</BaseButton>
           </a>
           <BaseButton v-if="canManageMaintenance" variant="secondary" size="sm" type="button"
             @click="goToTab('history'); createEventNonce++">
-            + Evenement
+            + {{ t('boats.show.addEntry') }}
           </BaseButton>
           <BaseButton v-if="canManageMaintenance" variant="primary" size="sm" type="button"
             @click="goToTab('tasks'); createTaskNonce++">
-            + Tache
+            + {{ t('boats.show.addTask') }}
           </BaseButton>
         </div>
       </div>

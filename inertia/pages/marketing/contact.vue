@@ -6,6 +6,7 @@ export default { layout: PublicLayout }
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3'
 import { ref } from 'vue'
+import { useT } from '~/composables/useT'
 
 type PageProps = {
   t: {
@@ -29,6 +30,7 @@ type PageProps = {
 
 const props = defineProps<PageProps>()
 const t = props.t
+const { t: tApp } = useT()
 const selectedSubject = ref<string | null>(null)
 </script>
 
@@ -72,7 +74,7 @@ const selectedSubject = ref<string | null>(null)
           <div>
             <label class="mb-1 block text-sm font-medium text-fg">{{ t.contact.form.fleetSize }}</label>
             <select name="fleetSize" class="w-full rounded-(--radius-control) border border-bone bg-cream px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand/30">
-              <option value="">Selectionner...</option>
+              <option value="">{{ tApp('common.selectPlaceholder') }}</option>
               <option>1-4</option><option>5-20</option><option>21-50</option><option>51+</option>
             </select>
           </div>

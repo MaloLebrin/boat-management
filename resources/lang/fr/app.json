@@ -10,7 +10,8 @@
     "all": "Tous",
     "unknown": "Inconnu",
     "loading": "Chargement…",
-    "none": "Aucun"
+    "none": "Aucun",
+    "selectPlaceholder": "Sélectionner..."
   },
   "nav": {
     "workspace": "Espace de travail",
@@ -39,7 +40,24 @@
       "passwordLabel": "Mot de passe",
       "showPassword": "Afficher",
       "hidePassword": "Masquer",
-      "submit": "Se connecter"
+      "submit": "Se connecter",
+      "withGoogle": "Continuer avec Google",
+      "withApple": "Continuer avec Apple",
+      "withEmail": "ou avec email",
+      "rememberMe": "Rester connecté 30 jours",
+      "forgotPassword": "Oublié ?",
+      "noAccount": "Pas encore de compte ?",
+      "createOrg": "Créer une organisation",
+      "marketing": {
+        "tagline": "Mer calme, flotte sereine.",
+        "subtitle": "La plateforme de maintenance pour gestionnaires de flotte maritime — historique immuable, planification intelligente, IA Mistral.",
+        "feature0": "Historique de maintenance complet",
+        "feature1": "Planning intelligent par heures moteur",
+        "feature2": "Suggestions IA personnalisées",
+        "testimonial": "Depuis FleetAi, je sais ce qui doit être fait avant que ça grince.",
+        "testimonialAuthor": "— Marc, Marina Bleue",
+        "copyright": "© {year} FleetAi"
+      }
     },
     "signup": {
       "title": "Créer un compte",
@@ -52,7 +70,46 @@
       "passwordConfirmLabel": "Confirmer le mot de passe",
       "showPassword": "Afficher",
       "hidePassword": "Masquer",
-      "submit": "S'inscrire"
+      "submit": "S'inscrire",
+      "withGoogle": "Continuer avec Google",
+      "withApple": "Continuer avec Apple",
+      "withEmail": "ou avec email",
+      "firstNameLabel": "Prénom",
+      "firstNamePlaceholder": "Marc",
+      "lastNameLabel": "Nom",
+      "lastNamePlaceholder": "Lefevre",
+      "orgSection": "Ton organisation",
+      "orgNameLabel": "Nom de l'organisation",
+      "orgNamePlaceholder": "Marina Bleue",
+      "orgTypeLabel": "Type",
+      "fleetSizeLabel": "Taille de flotte",
+      "orgTypes": {
+        "rental": "Loueur de bateaux",
+        "school": "École de voile",
+        "marina": "Marina / Port",
+        "private": "Armateur privé"
+      },
+      "fleetSizes": {
+        "s1": "1-4 bateaux",
+        "s2": "5-20 bateaux",
+        "s3": "21-50 bateaux",
+        "s4": "51+ bateaux"
+      },
+      "cgu": "CGU",
+      "privacyPolicy": "politique de confidentialité",
+      "acceptTermsPrefix": "J'accepte les",
+      "acceptTermsConjunction": "et la",
+      "createOrg": "Créer mon organisation →",
+      "hasAccount": "Déjà un compte ?",
+      "signIn": "Se connecter",
+      "marketing": {
+        "tagline": "Crée ta flotte en 2 minutes.",
+        "description": "14 jours d'essai gratuits · pas de carte bleue. Importe tes données depuis Excel en quelques clics.",
+        "feature0": "Gratuit jusqu'à 3 bateaux",
+        "feature1": "Sans carte bancaire",
+        "feature2": "Migration depuis vos tableurs en 1 clic",
+        "copyright": "© {year} FleetAi"
+      }
     }
   },
   "dashboard": {
@@ -374,8 +431,13 @@
       "tabs": {
         "maintenance": "Maintenance",
         "overview": "Aperçu",
-        "equipment": "Équipement"
+        "equipment": "Équipement",
+        "specs": "Spécifications",
+        "history": "Historique",
+        "tasks": "Tâches",
+        "documents": "Documents"
       },
+      "breadcrumbFleet": "Flotte",
       "nextTasks": "Prochaines tâches",
       "status": {
         "urgent": "Urgent",
@@ -414,6 +476,102 @@
       },
       "viewTable": "Tableau",
       "viewCards": "Cartes"
+    },
+    "engineShow": {
+      "breadcrumb": {
+        "equipment": "Équipements"
+      },
+      "maintenanceRequired": "Maintenance requise",
+      "installedIn": "Installé en {year}",
+      "tabs": {
+        "overview": "Vue d'ensemble",
+        "specs": "Spécifications",
+        "maintenance": "Maintenance",
+        "notes": "Notes",
+        "parts": "Pièces",
+        "documents": "Documents"
+      },
+      "actions": {
+        "edit": "Modifier",
+        "addEvent": "+ Événement",
+        "schedule": "Planifier",
+        "markDone": "Marquer fait",
+        "exportPdf": "Exporter PDF"
+      },
+      "overview": {
+        "totalHours": "Heures total",
+        "sinceLast": "Depuis dernière maint.",
+        "costYear": "Coût 12 mois",
+        "gauge": "Jauge heures moteur",
+        "recentMaintenance": "Maintenance récente",
+        "noEvent": "Aucun événement enregistré",
+        "aiTitle": "Assistant IA",
+        "aiPrompt1": "Quand faire la prochaine vidange ?",
+        "aiPrompt2": "Historique des pannes moteur",
+        "nextDue": "Prochaines échéances",
+        "noTaskPlanned": "Aucune tâche planifiée"
+      },
+      "overdue": {
+        "title": "Maintenance en retard",
+        "detail": "{title} - Seuil de {hours} heures dépassé"
+      },
+      "specs": {
+        "identity": "Identité",
+        "brand": "Marque",
+        "model": "Modèle",
+        "serialNumber": "Numéro de série",
+        "installYear": "Année d'installation",
+        "installHours": "Heures à l'installation",
+        "characteristics": "Caractéristiques",
+        "power": "Puissance",
+        "fuel": "Carburant",
+        "type": "Type",
+        "thresholds": "Seuils de maintenance",
+        "noThreshold": "Aucun seuil défini",
+        "every": "Toutes les {hours} h",
+        "editHint": "Pour modifier les spécifications de ce moteur, utilisez le bouton Modifier en haut de page."
+      },
+      "maintenance": {
+        "upcoming": "À venir",
+        "noUpcoming": "Aucune tâche à venir",
+        "history": "Historique",
+        "noHistory": "Aucun événement enregistré",
+        "taskStatus": {
+          "overdue": "En retard",
+          "soon": "Bientôt",
+          "planned": "Planifié"
+        },
+        "dueAt": "Échéance : {date}",
+        "dueHours": "{hours} heures",
+        "totalEvents": "Total événements",
+        "totalParts": "Total pièces",
+        "parts": "{count} pièce(s)"
+      },
+      "notes": {
+        "title": "Notes libres",
+        "add": "+ Note",
+        "types": "Types de notes disponibles",
+        "followUp": "À suivre",
+        "anomaly": "Anomalie",
+        "idea": "Idée",
+        "comingSoon": "Bientôt disponible"
+      },
+      "parts": {
+        "title": "Pièces compatibles",
+        "designation": "Désignation",
+        "reference": "Référence",
+        "stock": "Quantité en stock",
+        "supplier": "Fournisseur",
+        "empty": "Aucune pièce enregistrée",
+        "comingSoon": "Bientôt disponible"
+      },
+      "documents": {
+        "manual": "Manuel technique",
+        "invoices": "Factures",
+        "other": "Autres documents",
+        "dropzone": "Déposez un fichier ou cliquez pour télécharger",
+        "comingSoon": "Fonctionnalité à venir"
+      }
     },
     "maintenance": {
       "events": {
@@ -475,6 +633,42 @@
         "notes": "Notes",
         "selectPlaceholder": "— Sélectionner —"
       }
+    }
+  },
+  "homePreview": {
+    "badge": "Aperçu",
+    "urgent": "Urgent",
+    "overdueHint": "tâches en retard",
+    "dueSoon": "À venir",
+    "dueSoonHint": "dans 14 jours",
+    "boat": "Bateau",
+    "engine": "Moteur",
+    "engineDetail": "Dernière vidange : il y a 3 mois. Prochaine : dans 42h.",
+    "demoButton": "Voir une démo (2 min) ▶",
+    "socialProof": "★★★★★ 4,8/5 · 120 avis · G2, Capterra, Product Hunt",
+    "dashboardAlt": "capture du dashboard"
+  },
+  "public": {
+    "nav": {
+      "features": "Fonctionnalités",
+      "pricing": "Tarifs"
+    },
+    "actions": {
+      "login": "Connexion",
+      "tryFree": "Essayer gratuitement"
+    },
+    "footer": {
+      "tagline": "La maintenance maritime, sans douleur.",
+      "product": "Produit",
+      "company": "Entreprise",
+      "legal": "Légal",
+      "features": "Fonctionnalités",
+      "pricing": "Tarifs",
+      "contact": "Contact",
+      "about": "À propos",
+      "privacy": "Confidentialité",
+      "terms": "Conditions",
+      "bilingual": "Bilingue FR/EN · Hébergé en UE"
     }
   }
 }

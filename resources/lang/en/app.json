@@ -10,7 +10,8 @@
     "all": "All",
     "unknown": "Unknown",
     "loading": "Loading…",
-    "none": "None"
+    "none": "None",
+    "selectPlaceholder": "Select..."
   },
   "nav": {
     "workspace": "Workspace",
@@ -39,7 +40,24 @@
       "passwordLabel": "Password",
       "showPassword": "Show",
       "hidePassword": "Hide",
-      "submit": "Login"
+      "submit": "Login",
+      "withGoogle": "Continue with Google",
+      "withApple": "Continue with Apple",
+      "withEmail": "or with email",
+      "rememberMe": "Stay logged in for 30 days",
+      "forgotPassword": "Forgot?",
+      "noAccount": "No account yet?",
+      "createOrg": "Create an organization",
+      "marketing": {
+        "tagline": "Calm sea, serene fleet.",
+        "subtitle": "The maintenance platform for maritime fleet managers — immutable history, smart planning, Mistral AI.",
+        "feature0": "Complete maintenance history",
+        "feature1": "Smart planning by engine hours",
+        "feature2": "Personalized AI suggestions",
+        "testimonial": "Since FleetAi, I know what needs to be done before things go wrong.",
+        "testimonialAuthor": "— Marc, Marina Bleue",
+        "copyright": "© {year} FleetAi"
+      }
     },
     "signup": {
       "title": "Signup",
@@ -52,7 +70,46 @@
       "passwordConfirmLabel": "Confirm password",
       "showPassword": "Show",
       "hidePassword": "Hide",
-      "submit": "Sign up"
+      "submit": "Sign up",
+      "withGoogle": "Continue with Google",
+      "withApple": "Continue with Apple",
+      "withEmail": "or with email",
+      "firstNameLabel": "First name",
+      "firstNamePlaceholder": "Marc",
+      "lastNameLabel": "Last name",
+      "lastNamePlaceholder": "Smith",
+      "orgSection": "Your organization",
+      "orgNameLabel": "Organization name",
+      "orgNamePlaceholder": "Blue Marina",
+      "orgTypeLabel": "Type",
+      "fleetSizeLabel": "Fleet size",
+      "orgTypes": {
+        "rental": "Boat rental",
+        "school": "Sailing school",
+        "marina": "Marina / Harbor",
+        "private": "Private owner"
+      },
+      "fleetSizes": {
+        "s1": "1-4 boats",
+        "s2": "5-20 boats",
+        "s3": "21-50 boats",
+        "s4": "51+ boats"
+      },
+      "cgu": "Terms of service",
+      "privacyPolicy": "privacy policy",
+      "acceptTermsPrefix": "I accept the",
+      "acceptTermsConjunction": "and the",
+      "createOrg": "Create my organization →",
+      "hasAccount": "Already have an account?",
+      "signIn": "Sign in",
+      "marketing": {
+        "tagline": "Build your fleet in 2 minutes.",
+        "description": "14-day free trial · no credit card. Import your data from Excel in a few clicks.",
+        "feature0": "Free up to 3 boats",
+        "feature1": "No credit card",
+        "feature2": "Migrate from spreadsheets in 1 click",
+        "copyright": "© {year} FleetAi"
+      }
     }
   },
   "dashboard": {
@@ -374,8 +431,13 @@
       "tabs": {
         "maintenance": "Maintenance",
         "overview": "Overview",
-        "equipment": "Equipment"
+        "equipment": "Equipment",
+        "specs": "Specifications",
+        "history": "History",
+        "tasks": "Tasks",
+        "documents": "Documents"
       },
+      "breadcrumbFleet": "Fleet",
       "nextTasks": "Next tasks",
       "status": {
         "urgent": "Urgent",
@@ -414,6 +476,102 @@
       },
       "viewTable": "Table",
       "viewCards": "Cards"
+    },
+    "engineShow": {
+      "breadcrumb": {
+        "equipment": "Equipment"
+      },
+      "maintenanceRequired": "Maintenance required",
+      "installedIn": "Installed in {year}",
+      "tabs": {
+        "overview": "Overview",
+        "specs": "Specifications",
+        "maintenance": "Maintenance",
+        "notes": "Notes",
+        "parts": "Parts",
+        "documents": "Documents"
+      },
+      "actions": {
+        "edit": "Edit",
+        "addEvent": "+ Event",
+        "schedule": "Schedule",
+        "markDone": "Mark done",
+        "exportPdf": "Export PDF"
+      },
+      "overview": {
+        "totalHours": "Total hours",
+        "sinceLast": "Since last maint.",
+        "costYear": "12-month cost",
+        "gauge": "Engine hours gauge",
+        "recentMaintenance": "Recent maintenance",
+        "noEvent": "No event recorded",
+        "aiTitle": "AI Assistant",
+        "aiPrompt1": "When is the next oil change due?",
+        "aiPrompt2": "Engine failure history",
+        "nextDue": "Next due",
+        "noTaskPlanned": "No planned tasks"
+      },
+      "overdue": {
+        "title": "Maintenance overdue",
+        "detail": "{title} - Threshold of {hours} hours exceeded"
+      },
+      "specs": {
+        "identity": "Identity",
+        "brand": "Brand",
+        "model": "Model",
+        "serialNumber": "Serial number",
+        "installYear": "Installation year",
+        "installHours": "Hours at installation",
+        "characteristics": "Characteristics",
+        "power": "Power",
+        "fuel": "Fuel",
+        "type": "Type",
+        "thresholds": "Maintenance thresholds",
+        "noThreshold": "No threshold defined",
+        "every": "Every {hours} h",
+        "editHint": "To edit this engine's specifications, use the Edit button at the top of the page."
+      },
+      "maintenance": {
+        "upcoming": "Upcoming",
+        "noUpcoming": "No upcoming tasks",
+        "history": "History",
+        "noHistory": "No event recorded",
+        "taskStatus": {
+          "overdue": "Overdue",
+          "soon": "Soon",
+          "planned": "Planned"
+        },
+        "dueAt": "Due: {date}",
+        "dueHours": "{hours} hours",
+        "totalEvents": "Total events",
+        "totalParts": "Total parts",
+        "parts": "{count} part(s)"
+      },
+      "notes": {
+        "title": "Free notes",
+        "add": "+ Note",
+        "types": "Available note types",
+        "followUp": "Follow-up",
+        "anomaly": "Anomaly",
+        "idea": "Idea",
+        "comingSoon": "Coming soon"
+      },
+      "parts": {
+        "title": "Compatible parts",
+        "designation": "Designation",
+        "reference": "Reference",
+        "stock": "Stock quantity",
+        "supplier": "Supplier",
+        "empty": "No parts recorded",
+        "comingSoon": "Coming soon"
+      },
+      "documents": {
+        "manual": "Technical manual",
+        "invoices": "Invoices",
+        "other": "Other documents",
+        "dropzone": "Drop a file or click to upload",
+        "comingSoon": "Feature coming soon"
+      }
     },
     "maintenance": {
       "events": {
@@ -475,6 +633,42 @@
         "notes": "Notes",
         "selectPlaceholder": "— Select —"
       }
+    }
+  },
+  "homePreview": {
+    "badge": "Preview",
+    "urgent": "Urgent",
+    "overdueHint": "overdue tasks",
+    "dueSoon": "Due soon",
+    "dueSoonHint": "within 14 days",
+    "boat": "Boat",
+    "engine": "Engine",
+    "engineDetail": "Last oil change: 3 months ago. Next: in 42h.",
+    "demoButton": "Watch a demo (2 min) ▶",
+    "socialProof": "★★★★★ 4.8/5 · 120 reviews · G2, Capterra, Product Hunt",
+    "dashboardAlt": "dashboard screenshot"
+  },
+  "public": {
+    "nav": {
+      "features": "Features",
+      "pricing": "Pricing"
+    },
+    "actions": {
+      "login": "Login",
+      "tryFree": "Try free"
+    },
+    "footer": {
+      "tagline": "Maritime fleet maintenance, made simple.",
+      "product": "Product",
+      "company": "Company",
+      "legal": "Legal",
+      "features": "Features",
+      "pricing": "Pricing",
+      "contact": "Contact",
+      "about": "About",
+      "privacy": "Privacy",
+      "terms": "Terms",
+      "bilingual": "Bilingual EN/FR · EU-hosted"
     }
   }
 }
