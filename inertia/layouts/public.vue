@@ -20,8 +20,13 @@ const locale = computed<'en' | 'fr'>(() => props.locale ?? page.props.locale ?? 
 const path = computed(() => props.path ?? page.props.path ?? '')
 const isAuthed = computed(() => Boolean(page.props.user))
 
-const otherLocale = computed(() => (locale.value === 'en' ? 'fr' : 'en'))
-const otherHref = computed(() => `/${otherLocale.value}${path.value || ''}`)
+const otherHref = computed(() => {
+  const otherLang = locale.value === 'en' ? 'fr' : 'en';
+  const cleanPath = path.value.replace(/^\/[a-zA-Z]{2}/, '');
+
+  return `/${otherLang}${cleanPath || ''}`;
+})
+
 </script>
 
 <template>
@@ -60,10 +65,10 @@ const otherHref = computed(() => `/${otherLocale.value}${path.value || ''}`)
 
         <!-- Actions -->
         <div class="flex items-center gap-2">
-          <Link :href="otherHref"
+          <a :href="otherHref"
             class="inline-flex h-9 items-center justify-center rounded-(--radius-control) px-3 text-sm font-medium text-fg-muted transition-colors duration-(--motion-fast) hover:bg-paper hover:text-fg">
             {{ locale === 'en' ? 'FR' : 'EN' }}
-          </Link>
+          </a>
           <template v-if="isAuthed">
             <a href="/dashboard">
               <BaseButton size="sm">Dashboard</BaseButton>
