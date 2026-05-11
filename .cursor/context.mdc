@@ -1,9 +1,10 @@
 ---
 alwaysApply: true
 ---
-# **Fleetide AI** — Contexte Métier
 
-*Application SaaS de gestion de maintenance de flotte maritime*
+# **Fleet AI** — Contexte Métier
+
+_Application SaaS de gestion de maintenance de flotte maritime_
 
 ---
 
@@ -15,11 +16,11 @@ Les opérateurs maritimes (capitaines, gestionnaires de flotte, propriétaires) 
 
 ## **Utilisateurs cibles & personas**
 
-| Persona | Description |
-|---------|-------------|
+| Persona                    | Description                                                                                                                                         |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Gestionnaire de flotte** | Supervise plusieurs bateaux pour une organisation (loueur, club nautique, entreprise). A besoin d'une vue d'ensemble et d'alertes sur les urgences. |
-| **Technicien / Mécano** | Saisit les interventions réalisées (événements de maintenance) et les pièces remplacées. |
-| **Propriétaire de bateau** | Suit son propre bateau ou une petite flotte. Veut être alerté avant que des maintenances ne deviennent critiques. |
+| **Technicien / Mécano**    | Saisit les interventions réalisées (événements de maintenance) et les pièces remplacées.                                                            |
+| **Propriétaire de bateau** | Suit son propre bateau ou une petite flotte. Veut être alerté avant que des maintenances ne deviennent critiques.                                   |
 
 Tous les utilisateurs appartiennent à une **Organisation** : les données sont cloisonnées par organisation (multi-tenant). Il n'existe pas de hiérarchie de rôles interne — tout membre d'une organisation a accès à toute la flotte de cette organisation.
 
@@ -55,16 +56,19 @@ Bateau
 ## **Flux métier principaux**
 
 ### 1. Gestion de flotte (CRUD)
+
 - Créer un bateau avec ses specs et ses équipements
 - Modifier / archiver un bateau ou son équipement
 - Consulter la fiche d'un bateau : specs, équipements, historique, tâches planifiées
 
 ### 2. Suivi de maintenance historique
+
 - Saisir un **événement de maintenance** : date, titre, description, composant concerné (moteur, voile, etc.)
 - Ajouter les **pièces remplacées** lors de l'intervention (nom, quantité, notes)
 - Consulter l'historique chronologique par bateau
 
 ### 3. Planification de maintenance (tâches)
+
 - Créer une **tâche de maintenance** avec deux modes de déclenchement :
   - **Par date** : ex. « changer l'huile le 01/06/2026 »
   - **Par heures moteur** : ex. « révision tous les 250 heures »
@@ -72,11 +76,13 @@ Bateau
 - Une tâche peut être **ouverte**, **complète** ou **en retard** (overdue)
 
 ### 4. Tableau de bord & alertes
+
 - Vue d'ensemble de la flotte : nombre de bateaux, moteurs, voiles, gréements
 - **Alertes urgentes** : maintenances en retard + maintenances dues bientôt (seuil configurable)
 - Accès rapide aux tâches critiques par bateau
 
 ### 5. Assistant IA
+
 - L'utilisateur pose des questions en langage naturel sur sa flotte (ex. « Quelles maintenances sont en retard ? », « Quand dois-je réviser le moteur du bateau X ? »)
 - Les réponses sont générées de façon **asynchrone** par Mistral AI avec le contexte de la flotte de l'organisation
 - L'IA aide à prioriser et anticiper les actions de maintenance
@@ -95,22 +101,22 @@ Bateau
 
 ## **Modèle commercial (pricing)**
 
-| Plan | Prix | Usage cible |
-|------|------|-------------|
-| **Starter** | Gratuit | Test, petite flotte perso (1-2 bateaux) |
-| **Pro** | 29 $/mois | Gestionnaire de flotte (jusqu'à ~20 bateaux) |
-| **Enterprise** | Sur devis | Grande flotte, intégrations, support dédié |
+| Plan           | Prix      | Usage cible                                  |
+| -------------- | --------- | -------------------------------------------- |
+| **Starter**    | Gratuit   | Test, petite flotte perso (1-2 bateaux)      |
+| **Pro**        | 29 $/mois | Gestionnaire de flotte (jusqu'à ~20 bateaux) |
+| **Enterprise** | Sur devis | Grande flotte, intégrations, support dédié   |
 
 ---
 
 ## **Glossaire métier**
 
-| Terme | Définition |
-|-------|------------|
-| **Flotte** | Ensemble des bateaux d'une organisation |
-| **Événement de maintenance** | Intervention réalisée sur un bateau ou un équipement (passé) |
-| **Tâche de maintenance** | Intervention planifiée, avec échéance date ou heures (futur) |
-| **Pièce** | Composant remplacé lors d'une intervention |
-| **Gréement** | Ensemble des éléments de la mâture (mât, barres de flèche, etc.) |
-| **Overdue** | Tâche dont l'échéance est dépassée et qui n'a pas été complétée |
-| **Organisation** | Entité (entreprise, club, individu) qui regroupe des utilisateurs et une flotte |
+| Terme                        | Définition                                                                      |
+| ---------------------------- | ------------------------------------------------------------------------------- |
+| **Flotte**                   | Ensemble des bateaux d'une organisation                                         |
+| **Événement de maintenance** | Intervention réalisée sur un bateau ou un équipement (passé)                    |
+| **Tâche de maintenance**     | Intervention planifiée, avec échéance date ou heures (futur)                    |
+| **Pièce**                    | Composant remplacé lors d'une intervention                                      |
+| **Gréement**                 | Ensemble des éléments de la mâture (mât, barres de flèche, etc.)                |
+| **Overdue**                  | Tâche dont l'échéance est dépassée et qui n'a pas été complétée                 |
+| **Organisation**             | Entité (entreprise, club, individu) qui regroupe des utilisateurs et une flotte |

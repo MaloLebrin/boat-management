@@ -1,6 +1,6 @@
 {
   "brand": {
-    "name": "Fleetide AI",
+    "name": "Fleet AI",
     "tagline": "Fleet intelligence"
   },
   "nav": {
@@ -11,7 +11,7 @@
   },
   "home": {
     "hero": {
-      "eyebrow": "Fleetide AI",
+      "eyebrow": "Fleet AI",
       "title": "Fleet maintenance, powered by AI clarity.",
       "subtitle": "Track boats, equipment, and maintenance tasks across your organization — with intelligent signals to stay ahead."
     },

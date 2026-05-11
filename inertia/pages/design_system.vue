@@ -1,5 +1,5 @@
 <script lang="ts">
-import PublicLayout from '~/layouts/public.vue'
+import PublicLayout from '~/layouts/public.vue';
 
 export default {
   layout: PublicLayout,
@@ -7,8 +7,8 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3'
-import { computed, ref } from 'vue'
+import { Head, Link } from '@inertiajs/vue3';
+import { computed, ref } from 'vue';
 
 const props = defineProps<{ meta?: { title: string; description: string } }>()
 
@@ -57,8 +57,10 @@ const tableRows = computed(() => {
 </script>
 
 <template>
+
   <Head :title="props.meta?.title ?? 'Design System – FleetAi'">
-    <meta name="description" :content="props.meta?.description ?? 'Foundations, components and patterns of the FleetAi design system.'" />
+    <meta name="description"
+      :content="props.meta?.description ?? 'Foundations, components and patterns of the FleetAi design system.'" />
     <meta property="og:title" :content="props.meta?.title ?? 'Design System – FleetAi'" />
     <link rel="canonical" href="/design-system" />
   </Head>
@@ -126,10 +128,10 @@ const tableRows = computed(() => {
         <template #header>
           <div class="flex items-center justify-between gap-4">
             <div class="flex items-center gap-3">
-              <img :src="brandIconUrl" alt="Fleetide AI icon"
+              <img :src="brandIconUrl" alt="Fleet AI icon"
                 class="h-10 w-10 rounded-(--radius-control) shadow-(--shadow-xs)" />
               <div>
-                <p class="font-display text-sm font-semibold text-fg">Fleetide AI</p>
+                <p class="font-display text-sm font-semibold text-fg">Fleet AI</p>
                 <p class="text-xs font-semibold text-fg-subtle">Horizon · wave · AI spark</p>
               </div>
             </div>
@@ -143,7 +145,7 @@ const tableRows = computed(() => {
           <div class="rounded-(--radius-control) border border-border bg-surface-elevated p-4 shadow-(--shadow-xs)">
             <p class="text-xs font-semibold text-fg-muted">Usage</p>
             <p class="mt-2 text-sm text-fg-muted">
-              Utiliser l’icône seule pour favicon/app icon. Préférer le lockup “Fleetide AI” dans le header.
+              Utiliser l’icône seule pour favicon/app icon. Préférer le lockup “Fleet AI” dans le header.
             </p>
           </div>
           <div class="rounded-(--radius-control) border border-border bg-surface-elevated p-4 shadow-(--shadow-xs)">

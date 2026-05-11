@@ -22,9 +22,9 @@ const { t } = useT()
   <header class="border-b backdrop-blur-md border-border bg-surface-elevated/85">
     <div class="flex justify-between items-center px-6 mx-auto max-w-7xl h-16">
       <a href="/en" class="inline-flex gap-3 items-center text-fg hover:text-brand">
-        <img :src="brandIconUrl" alt="Fleetide AI" class="h-9 w-9 rounded-(--radius-control) shadow-(--shadow-xs)" />
+        <img :src="brandIconUrl" alt="Fleet AI" class="h-9 w-9 rounded-(--radius-control) shadow-(--shadow-xs)" />
         <div class="hidden sm:flex flex-col leading-tight">
-          <span class="font-display text-sm font-semibold text-fg">Fleetide AI</span>
+          <span class="font-display text-sm font-semibold text-fg">Fleet AI</span>
           <span class="text-xs font-semibold text-fg-subtle">Fleet intelligence</span>
         </div>
       </a>

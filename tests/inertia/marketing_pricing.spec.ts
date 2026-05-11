@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { test, expect, vi } from 'vitest'
+import { expect, test, vi } from 'vitest'
 import MarketingPricing from '../../inertia/pages/marketing/pricing.vue'
 
 vi.mock('@inertiajs/vue3', async () => {
@@ -16,7 +16,7 @@ test('renders pricing title (fr)', () => {
   const w = mount(MarketingPricing, {
     props: {
       t: {
-        brand: { name: 'Fleetide AI' },
+        brand: { name: 'Fleet AI' },
         nav: { login: 'Connexion', signup: 'Inscription' },
         meta: { title: 'Tarifs', description: 'Desc' },
         pricing: {
