@@ -41,6 +41,9 @@ export type ScannedRoutes = {
     'marketing.en.pricing': { paramsTuple?: []; params?: {} }
     'marketing.fr.home': { paramsTuple?: []; params?: {} }
     'marketing.fr.pricing': { paramsTuple?: []; params?: {} }
+    'marketing.en.about': { paramsTuple?: []; params?: {} }
+    'marketing.fr.about': { paramsTuple?: []; params?: {} }
+    'marketing.contact': { paramsTuple?: []; params?: {} }
     'dashboard': { paramsTuple?: []; params?: {} }
     'planning.index': { paramsTuple?: []; params?: {} }
     'settings.index': { paramsTuple?: []; params?: {} }
@@ -64,6 +67,9 @@ export type ScannedRoutes = {
     'marketing.en.pricing': { paramsTuple?: []; params?: {} }
     'marketing.fr.home': { paramsTuple?: []; params?: {} }
     'marketing.fr.pricing': { paramsTuple?: []; params?: {} }
+    'marketing.en.about': { paramsTuple?: []; params?: {} }
+    'marketing.fr.about': { paramsTuple?: []; params?: {} }
+    'marketing.contact': { paramsTuple?: []; params?: {} }
     'dashboard': { paramsTuple?: []; params?: {} }
     'planning.index': { paramsTuple?: []; params?: {} }
     'settings.index': { paramsTuple?: []; params?: {} }
@@ -87,6 +93,9 @@ export type ScannedRoutes = {
     'marketing.en.pricing': { paramsTuple?: []; params?: {} }
     'marketing.fr.home': { paramsTuple?: []; params?: {} }
     'marketing.fr.pricing': { paramsTuple?: []; params?: {} }
+    'marketing.en.about': { paramsTuple?: []; params?: {} }
+    'marketing.fr.about': { paramsTuple?: []; params?: {} }
+    'marketing.contact': { paramsTuple?: []; params?: {} }
     'dashboard': { paramsTuple?: []; params?: {} }
     'planning.index': { paramsTuple?: []; params?: {} }
     'settings.index': { paramsTuple?: []; params?: {} }

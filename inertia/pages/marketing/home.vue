@@ -29,11 +29,22 @@ type PageProps = {
       features: { title: string; subtitle: string; items: Array<{ title: string; description: string }> }
       useCases: { title: string; items: Array<{ title: string; description: string }> }
       preview: { title: string; subtitle: string }
-      security: { title: string; items: Array<{ title: string; description: string }> }
+      security: { title: string; items: Array<{ icon: string; title: string; description: string }> }
       faq: { title: string; items: Array<{ q: string; a: string }> }
       finalCta: { title: string; subtitle: string; primary: string; secondary: string }
       howItWorks: { title: string; subtitle: string; items: Array<{ step: string; title: string; description: string }> }
       testimonials: { title: string; items: Array<{ quote: string; author: string; role: string }> }
+      threeThings: { title: string; items: Array<{ icon: string; title: string; description: string }> }
+      bentoGrid: { title: string; items: Array<{ title: string; description: string }> }
+      pullQuote: { quote: string; author: string; role: string }
+      personas: { title: string; cta: string; items: Array<{ icon: string; title: string; description: string; example: string }> }
+      comparisonTable: {
+        title: string; subtitle: string
+        cols: { feature: string; excel: string; paper: string; fleetai: string }
+        rows: string[]
+        vals: { no: string; partial: string; yes: string; manual: string; auto: string; eu: string }
+      }
+      blog: { title: string; subtitle: string; cta: string; articles: Array<{ cat: string; title: string; meta: string }> }
     }
   }
 }
@@ -58,6 +69,27 @@ const { el: useCasesEl, isVisible: useCasesVisible } = useScrollReveal()
 const { el: testimonialsEl, isVisible: testimonialsVisible } = useScrollReveal()
 const { el: securityEl, isVisible: securityVisible } = useScrollReveal()
 const { el: faqEl, isVisible: faqVisible } = useScrollReveal()
+const { el: threeThingsEl, isVisible: threeThingsVisible } = useScrollReveal()
+const { el: bentoEl, isVisible: bentoVisible } = useScrollReveal()
+const { el: personasEl, isVisible: personasVisible } = useScrollReveal()
+const { el: comparisonEl, isVisible: comparisonVisible } = useScrollReveal()
+const { el: blogEl, isVisible: blogVisible } = useScrollReveal()
+
+function getComparisonVal(row: string, col: 'excel' | 'paper' | 'fleetai'): string {
+  const v = t.home.comparisonTable.vals
+  const data: Record<string, [string, string, string]> = {
+    [t.home.comparisonTable.rows[0]]: [v.no, v.partial, v.yes],
+    [t.home.comparisonTable.rows[1]]: [v.no, v.no, v.yes],
+    [t.home.comparisonTable.rows[2]]: [v.partial, v.no, v.yes],
+    [t.home.comparisonTable.rows[3]]: [v.no, v.yes, v.yes],
+    [t.home.comparisonTable.rows[4]]: [v.no, v.no, v.yes],
+    [t.home.comparisonTable.rows[5]]: [v.no, v.partial, v.yes],
+    [t.home.comparisonTable.rows[6]]: [v.no, v.manual, v.auto],
+    [t.home.comparisonTable.rows[7]]: [v.partial, v.no, v.eu],
+  }
+  const idx = col === 'excel' ? 0 : col === 'paper' ? 1 : 2
+  return data[row]?.[idx] ?? '—'
+}
 
 // Duplicated logos for marquee effect
 const duplicatedLogos = computed(() => [...t.home.socialProof.logos, ...t.home.socialProof.logos])
@@ -142,6 +174,15 @@ onUnmounted(() => {
                 {{ t.home.cta.secondary }}
               </BaseButton>
             </Link>
+            <a href="#demo">
+              <BaseButton variant="ghost" size="sm" class="text-white/80 hover:text-white border-white/20">
+                Voir une demo (2 min) ▶
+              </BaseButton>
+            </a>
+          </div>
+          <div class="mt-3 text-sm text-white/40">★★★★★ 4,8/5 · 120 avis · G2, Capterra, Product Hunt</div>
+          <div class="mt-10 aspect-video w-full rounded-xl border border-white/10 bg-navy-800/60 flex items-center justify-center text-sm text-white/30">
+            capture du dashboard
           </div>
         </div>
 
@@ -172,6 +213,26 @@ onUnmounted(() => {
           >
             {{ logo }}
           </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section: Three things -->
+    <section
+      :ref="(el) => threeThingsEl = el as HTMLElement"
+      class="mt-14 reveal py-16"
+      :class="{ visible: threeThingsVisible }"
+    >
+      <div class="mb-10 text-center">
+        <p class="text-xs font-semibold uppercase tracking-widest text-fg-subtle">Comment ca marche</p>
+        <h2 class="mt-2 font-display text-3xl italic text-fg">{{ t.home.threeThings.title }}</h2>
+      </div>
+      <div class="grid gap-6 md:grid-cols-3">
+        <div v-for="item in t.home.threeThings.items" :key="item.title"
+          class="rounded-xl border border-bone bg-paper p-6">
+          <div class="text-3xl">{{ item.icon }}</div>
+          <h3 class="mt-3 font-semibold text-fg">{{ item.title }}</h3>
+          <p class="mt-2 text-sm leading-relaxed text-fg-muted">{{ item.description }}</p>
         </div>
       </div>
     </section>
@@ -225,6 +286,74 @@ onUnmounted(() => {
           </div>
         </div>
       </BaseCard>
+    </section>
+
+    <!-- Section: Bento grid -->
+    <section
+      :ref="(el) => bentoEl = el as HTMLElement"
+      class="mt-14 reveal rounded-2xl bg-paper py-14 px-8"
+      :class="{ visible: bentoVisible }"
+    >
+      <h2 class="mb-8 text-center font-display text-2xl italic text-fg">{{ t.home.bentoGrid.title }}</h2>
+      <div class="grid gap-3" style="grid-template-columns: 2fr 1fr 1fr; grid-auto-rows: 160px;">
+        <!-- Item 1: Vue marina (span 2 rows) -->
+        <div class="rounded-xl border border-bone bg-cream p-5" style="grid-row: span 2;">
+          <p class="font-semibold text-fg">{{ t.home.bentoGrid.items[0].title }}</p>
+          <p class="mt-1 text-sm text-fg-muted">{{ t.home.bentoGrid.items[0].description }}</p>
+          <div class="mt-4 flex h-24 items-center justify-center rounded-lg border border-bone bg-paper text-xs text-fg-subtle">illustration ponton</div>
+        </div>
+        <!-- Items 2-3 -->
+        <div v-for="item in t.home.bentoGrid.items.slice(1, 3)" :key="item.title"
+          class="rounded-xl border border-bone bg-cream p-4">
+          <p class="font-semibold text-sm text-fg">{{ item.title }}</p>
+          <p class="mt-1 text-xs text-fg-muted">{{ item.description }}</p>
+        </div>
+        <!-- Item 4: span 2 cols -->
+        <div class="rounded-xl border border-bone bg-cream p-4" style="grid-column: span 2;">
+          <p class="font-semibold text-sm text-fg">{{ t.home.bentoGrid.items[3].title }}</p>
+          <p class="mt-1 text-xs text-fg-muted">{{ t.home.bentoGrid.items[3].description }}</p>
+        </div>
+        <!-- Items 5-6 -->
+        <div v-for="item in t.home.bentoGrid.items.slice(4)" :key="item.title"
+          class="rounded-xl border border-bone bg-cream p-4">
+          <p class="font-semibold text-sm text-fg">{{ item.title }}</p>
+          <p class="mt-1 text-xs text-fg-muted">{{ item.description }}</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section: Pull quote -->
+    <section class="py-14 text-center">
+      <div class="mx-auto max-w-2xl">
+        <div class="mb-4 h-10 w-10 mx-auto rounded-full bg-bone flex items-center justify-center text-sm text-fg-muted">👤</div>
+        <blockquote class="font-display text-2xl italic leading-snug text-fg">
+          "{{ t.home.pullQuote.quote }}"
+        </blockquote>
+        <p class="mt-4 text-sm text-fg-muted">{{ t.home.pullQuote.author }} — {{ t.home.pullQuote.role }}</p>
+      </div>
+    </section>
+
+    <!-- Section: Personas -->
+    <section
+      :ref="(el) => personasEl = el as HTMLElement"
+      class="reveal py-14"
+      :class="{ visible: personasVisible }"
+    >
+      <div class="mb-10 text-center">
+        <p class="text-xs font-semibold uppercase tracking-widest text-fg-subtle">Pour qui</p>
+        <h2 class="mt-2 font-display text-3xl italic text-fg">{{ t.home.personas.title }}</h2>
+      </div>
+      <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div v-for="item in t.home.personas.items" :key="item.title"
+          class="flex flex-col rounded-xl border border-bone bg-paper p-5">
+          <div class="text-3xl">{{ item.icon }}</div>
+          <h3 class="mt-3 font-semibold text-fg">{{ item.title }}</h3>
+          <p class="mt-2 text-sm leading-relaxed text-fg-muted grow">{{ item.description }}</p>
+          <hr class="my-4 border-bone" />
+          <p class="text-xs text-fg-subtle">{{ item.example }}</p>
+          <a href="#" class="mt-3 text-xs font-medium text-brand hover:underline">{{ t.home.personas.cta }}</a>
+        </div>
+      </div>
     </section>
 
     <!-- Section 5: How it works -->
@@ -363,6 +492,39 @@ onUnmounted(() => {
       </div>
     </section>
 
+    <!-- Section: Comparison table -->
+    <section
+      :ref="(el) => comparisonEl = el as HTMLElement"
+      class="mt-14 reveal rounded-2xl bg-paper py-14 px-8"
+      :class="{ visible: comparisonVisible }"
+    >
+      <div class="mb-8 text-center">
+        <p class="text-xs font-semibold uppercase tracking-widest text-fg-subtle">{{ t.home.comparisonTable.subtitle }}</p>
+        <h2 class="mt-2 font-display text-2xl italic text-fg">{{ t.home.comparisonTable.title }}</h2>
+      </div>
+      <div class="mx-auto max-w-3xl overflow-hidden rounded-xl border border-bone">
+        <table class="w-full text-sm">
+          <thead class="bg-bone/40 text-xs font-semibold uppercase tracking-wider text-fg-subtle">
+            <tr>
+              <th class="px-4 py-3 text-left">{{ t.home.comparisonTable.cols.feature }}</th>
+              <th class="px-4 py-3 text-center">{{ t.home.comparisonTable.cols.excel }}</th>
+              <th class="px-4 py-3 text-center">{{ t.home.comparisonTable.cols.paper }}</th>
+              <th class="px-4 py-3 text-center bg-brand/8 text-brand font-bold">{{ t.home.comparisonTable.cols.fleetai }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(row, i) in t.home.comparisonTable.rows" :key="row"
+              :class="i % 2 === 0 ? 'bg-cream' : 'bg-paper'">
+              <td class="px-4 py-3 font-medium text-fg">{{ row }}</td>
+              <td class="px-4 py-3 text-center text-fg-subtle">{{ getComparisonVal(row, 'excel') }}</td>
+              <td class="px-4 py-3 text-center text-fg-subtle">{{ getComparisonVal(row, 'paper') }}</td>
+              <td class="px-4 py-3 text-center bg-brand/5 font-semibold text-brand">{{ getComparisonVal(row, 'fleetai') }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
     <!-- Section 10: Security -->
     <section
       :ref="(el) => securityEl = el as HTMLElement"
@@ -379,11 +541,38 @@ onUnmounted(() => {
             :key="s.title"
             class="rounded-(--radius-control) border border-border bg-surface-muted px-5 py-5"
           >
+            <div class="text-2xl mb-2">{{ s.icon }}</div>
             <p class="text-sm font-semibold text-fg">{{ s.title }}</p>
             <p class="mt-1 text-sm text-fg-muted">{{ s.description }}</p>
           </div>
         </div>
       </BaseCard>
+    </section>
+
+    <!-- Section: Blog -->
+    <section
+      :ref="(el) => blogEl = el as HTMLElement"
+      class="mt-14 reveal rounded-2xl bg-paper py-14 px-8"
+      :class="{ visible: blogVisible }"
+    >
+      <div class="mb-8 flex items-end justify-between">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-widest text-fg-subtle">{{ t.home.blog.subtitle }}</p>
+          <h2 class="mt-1 font-display text-2xl italic text-fg">{{ t.home.blog.title }}</h2>
+        </div>
+        <a href="#" class="text-sm font-medium text-brand hover:underline">{{ t.home.blog.cta }}</a>
+      </div>
+      <div class="grid gap-5 sm:grid-cols-3">
+        <div v-for="article in t.home.blog.articles" :key="article.title"
+          class="overflow-hidden rounded-xl border border-bone bg-cream">
+          <div class="flex h-32 items-center justify-center bg-bone/40 text-xs text-fg-subtle">image article</div>
+          <div class="p-4">
+            <span class="inline-block rounded-full bg-paper px-2 py-0.5 text-xs font-medium text-fg-muted border border-bone">{{ article.cat }}</span>
+            <p class="mt-2 font-semibold text-sm leading-snug text-fg">{{ article.title }}</p>
+            <p class="mt-1 text-xs text-fg-subtle">{{ article.meta }}</p>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- Section 11: FAQ accordion -->

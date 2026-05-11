@@ -228,6 +228,24 @@ const routes = {
     tokens: [{"old":"/fr/tarifs","type":0,"val":"fr","end":""},{"old":"/fr/tarifs","type":0,"val":"tarifs","end":""}],
     types: placeholder as Registry['marketing.fr.pricing']['types'],
   },
+  'marketing.en.about': {
+    methods: ["GET","HEAD"],
+    pattern: '/en/about',
+    tokens: [{"old":"/en/about","type":0,"val":"en","end":""},{"old":"/en/about","type":0,"val":"about","end":""}],
+    types: placeholder as Registry['marketing.en.about']['types'],
+  },
+  'marketing.fr.about': {
+    methods: ["GET","HEAD"],
+    pattern: '/fr/a-propos',
+    tokens: [{"old":"/fr/a-propos","type":0,"val":"fr","end":""},{"old":"/fr/a-propos","type":0,"val":"a-propos","end":""}],
+    types: placeholder as Registry['marketing.fr.about']['types'],
+  },
+  'marketing.contact': {
+    methods: ["GET","HEAD"],
+    pattern: '/contact',
+    tokens: [{"old":"/contact","type":0,"val":"contact","end":""}],
+    types: placeholder as Registry['marketing.contact']['types'],
+  },
   'dashboard': {
     methods: ["GET","HEAD"],
     pattern: '/dashboard',

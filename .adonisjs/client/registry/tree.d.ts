@@ -55,11 +55,14 @@ export interface ApiDefinition {
     en: {
       home: typeof routes['marketing.en.home']
       pricing: typeof routes['marketing.en.pricing']
+      about: typeof routes['marketing.en.about']
     }
     fr: {
       home: typeof routes['marketing.fr.home']
       pricing: typeof routes['marketing.fr.pricing']
+      about: typeof routes['marketing.fr.about']
     }
+    contact: typeof routes['marketing.contact']
   }
   dashboard: typeof routes['dashboard']
   planning: {

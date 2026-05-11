@@ -451,6 +451,42 @@ export interface Registry {
       errorResponse: unknown
     }
   }
+  'marketing.en.about': {
+    methods: ["GET","HEAD"]
+    pattern: '/en/about'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'marketing.fr.about': {
+    methods: ["GET","HEAD"]
+    pattern: '/fr/a-propos'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'marketing.contact': {
+    methods: ["GET","HEAD"]
+    pattern: '/contact'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
   'dashboard': {
     methods: ["GET","HEAD"]
     pattern: '/dashboard'

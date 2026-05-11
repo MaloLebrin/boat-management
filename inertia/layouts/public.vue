@@ -53,10 +53,9 @@ const otherHref = computed(() => `/${otherLocale.value}${path.value || ''}`)
             class="rounded-(--radius-control) px-3 py-2 text-sm font-medium text-fg-muted transition-colors duration-(--motion-fast) ease-premium hover:bg-paper hover:text-fg">
             {{ locale === 'fr' ? 'Tarifs' : 'Pricing' }}
           </Link>
-          <a href="https://docs.adonisjs.com/" target="_blank" rel="noreferrer"
+          <Link href="/design-system"
             class="rounded-(--radius-control) px-3 py-2 text-sm font-medium text-fg-muted transition-colors duration-(--motion-fast) ease-premium hover:bg-paper hover:text-fg">
-            Docs
-          </a>
+            Design system</Link>
         </nav>
 
         <!-- Actions -->

@@ -1,0 +1,121 @@
+<script lang="ts">
+import PublicLayout from '~/layouts/public.vue'
+export default { layout: PublicLayout }
+</script>
+
+<script setup lang="ts">
+import { Head } from '@inertiajs/vue3'
+import { useScrollReveal } from '~/composables/useScrollReveal'
+
+type PageProps = {
+  t: {
+    meta: { title: string; description: string }
+    about: {
+      hero: { eyebrow: string; title: string; subtitle: string }
+      story: { title: string; p1: string; p2: string }
+      values: { title: string; items: Array<{ icon: string; title: string; description: string }> }
+      team: { title: string; members: Array<{ name: string; role: string; bio: string }> }
+      stats: Array<{ value: string; label: string }>
+      cta: { title: string; subtitle: string; button: string }
+    }
+  }
+}
+
+const props = defineProps<PageProps>()
+const t = props.t
+
+const { el: storyEl, isVisible: storyVisible } = useScrollReveal()
+const { el: valuesEl, isVisible: valuesVisible } = useScrollReveal()
+const { el: teamEl, isVisible: teamVisible } = useScrollReveal()
+const { el: statsEl, isVisible: statsVisible } = useScrollReveal()
+</script>
+
+<template>
+  <Head :title="t.meta.title">
+    <meta name="description" :content="t.meta.description" />
+    <meta property="og:title" :content="t.meta.title" />
+    <meta property="og:description" :content="t.meta.description" />
+  </Head>
+
+  <div class="mx-auto max-w-7xl space-y-8">
+    <!-- Hero -->
+    <section class="py-16 text-center">
+      <p class="text-xs font-semibold uppercase tracking-widest text-fg-subtle">{{ t.about.hero.eyebrow }}</p>
+      <h1 class="mx-auto mt-4 max-w-2xl font-display text-4xl italic leading-tight text-fg">{{ t.about.hero.title }}</h1>
+      <p class="mx-auto mt-4 max-w-xl text-base leading-relaxed text-fg-muted">{{ t.about.hero.subtitle }}</p>
+    </section>
+
+    <!-- Story -->
+    <section
+      :ref="(el) => storyEl = el as HTMLElement"
+      class="reveal rounded-2xl bg-paper px-8 py-14"
+      :class="{ visible: storyVisible }"
+    >
+      <div class="mx-auto grid max-w-3xl gap-8 md:grid-cols-[200px_1fr] md:items-start">
+        <div class="flex h-48 items-center justify-center rounded-xl border border-bone bg-bone/40 text-xs text-fg-subtle">photo equipe</div>
+        <div>
+          <h2 class="font-display text-2xl italic text-fg">{{ t.about.story.title }}</h2>
+          <p class="mt-4 text-sm leading-relaxed text-fg-muted">{{ t.about.story.p1 }}</p>
+          <p class="mt-3 text-sm leading-relaxed text-fg-muted">{{ t.about.story.p2 }}</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Values -->
+    <section
+      :ref="(el) => valuesEl = el as HTMLElement"
+      class="reveal py-14"
+      :class="{ visible: valuesVisible }"
+    >
+      <h2 class="mb-8 text-center font-display text-2xl italic text-fg">{{ t.about.values.title }}</h2>
+      <div class="grid gap-5 md:grid-cols-3">
+        <div v-for="item in t.about.values.items" :key="item.title"
+          class="rounded-xl border border-bone bg-paper p-6">
+          <div class="text-3xl">{{ item.icon }}</div>
+          <h3 class="mt-3 font-semibold text-fg">{{ item.title }}</h3>
+          <p class="mt-2 text-sm leading-relaxed text-fg-muted">{{ item.description }}</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Team -->
+    <section
+      :ref="(el) => teamEl = el as HTMLElement"
+      class="reveal rounded-2xl bg-paper px-8 py-14"
+      :class="{ visible: teamVisible }"
+    >
+      <h2 class="mb-8 text-center font-display text-2xl italic text-fg">{{ t.about.team.title }}</h2>
+      <div class="flex flex-wrap justify-center gap-8">
+        <div v-for="member in t.about.team.members" :key="member.name" class="text-center w-32">
+          <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-bone text-2xl">👤</div>
+          <p class="mt-2 font-semibold text-sm text-fg">{{ member.name }}</p>
+          <p class="text-xs text-fg-muted">{{ member.role }}</p>
+          <p class="text-xs text-fg-subtle">{{ member.bio }}</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stats -->
+    <section
+      :ref="(el) => statsEl = el as HTMLElement"
+      class="reveal py-10"
+      :class="{ visible: statsVisible }"
+    >
+      <div class="grid grid-cols-2 gap-6 md:grid-cols-4">
+        <div v-for="stat in t.about.stats" :key="stat.label" class="text-center">
+          <div class="font-display text-4xl italic text-fg">{{ stat.value }}</div>
+          <p class="mt-1 text-xs font-medium uppercase tracking-wider text-fg-subtle">{{ stat.label }}</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="rounded-2xl bg-navy-900 px-8 py-14 text-center">
+      <h2 class="font-display text-3xl italic text-white">{{ t.about.cta.title }}</h2>
+      <p class="mt-3 text-sm text-white/70">{{ t.about.cta.subtitle }}</p>
+      <a href="/signup" class="mt-6 inline-block rounded-(--radius-control) bg-white px-6 py-3 text-sm font-semibold text-fg hover:bg-cream transition-colors">
+        {{ t.about.cta.button }}
+      </a>
+    </section>
+  </div>
+</template>
