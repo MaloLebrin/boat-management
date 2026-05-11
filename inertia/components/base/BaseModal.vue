@@ -6,9 +6,11 @@ const props = withDefaults(
   defineProps<{
     open: boolean
     title?: string
+    subtitle?: string
     closeLabel?: string
+    size?: 'md' | 'lg' | 'xl' | '2xl'
   }>(),
-  { title: undefined, closeLabel: 'Close' }
+  { title: undefined, subtitle: undefined, closeLabel: 'Close', size: 'lg' }
 )
 
 const emit = defineEmits<{
@@ -49,15 +51,21 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeyDown))
       />
       <div class="absolute inset-0 flex items-center justify-center p-6">
         <div
-          class="w-full max-w-lg rounded-(--radius-card) border border-border bg-surface-elevated shadow-(--shadow-lg)"
+          :class="[
+            'w-full rounded-(--radius-card) border border-border bg-surface-elevated shadow-(--shadow-lg)',
+            size === 'md' ? 'max-w-md' : size === 'xl' ? 'max-w-xl' : size === '2xl' ? 'max-w-2xl' : 'max-w-lg',
+          ]"
           role="dialog"
           aria-modal="true"
           :aria-label="title || 'Modal'"
         >
           <div class="flex items-center justify-between gap-4 border-b border-border px-5 py-4">
-            <p v-if="title" class="font-display text-base font-semibold text-fg">
-              {{ title }}
-            </p>
+            <div>
+              <p v-if="title" class="font-display text-base font-semibold text-fg">
+                {{ title }}
+              </p>
+              <p v-if="subtitle" class="mt-0.5 text-xs text-fg-muted">{{ subtitle }}</p>
+            </div>
             <div class="ml-auto">
               <BaseButton variant="ghost" size="sm" type="button" @click="close">
                 {{ closeLabel }}

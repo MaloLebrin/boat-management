@@ -3,19 +3,27 @@ import { ref } from 'vue'
 import BoatShowEnginesCard from '~/components/boats/engine/BoatShowEnginesCard.vue'
 import BoatShowRigCard from '~/components/boats/rig/BoatShowRigCard.vue'
 import BoatShowSailsCard from '~/components/boats/sail/BoatShowSailsCard.vue'
+import BoatEquipmentAddModal from '~/components/boats/show/modals/BoatEquipmentAddModal.vue'
 import type { BoatShowDetail } from '~/types/boat_show'
 
-defineProps<{
+const props = defineProps<{
   boat: BoatShowDetail
   canManageEquipment: boolean
 }>()
 
 const equipmentFilter = ref<'all' | 'engine' | 'sail' | 'rig'>('all')
+const isAddModalOpen = ref(false)
 </script>
 
 <template>
+  <BoatEquipmentAddModal
+    v-model:open="isAddModalOpen"
+    :boat="boat"
+    :can-manage-equipment="canManageEquipment"
+  />
+
   <div class="space-y-6">
-    <!-- Header row with filter pills -->
+    <!-- Header row with filter pills and add button -->
     <div class="flex flex-wrap items-center justify-between gap-4">
       <div class="flex flex-wrap gap-2">
         <button v-for="filter in [
@@ -32,6 +40,14 @@ const equipmentFilter = ref<'all' | 'engine' | 'sail' | 'rig'>('all')
           {{ filter.label }}
         </button>
       </div>
+      <button
+        v-if="canManageEquipment"
+        type="button"
+        class="rounded-lg border border-brand px-3 py-1.5 text-sm font-medium text-brand hover:bg-brand hover:text-white transition-colors"
+        @click="isAddModalOpen = true"
+      >
+        + Ajouter un équipement
+      </button>
     </div>
 
     <!-- Engine cards -->

@@ -27,6 +27,7 @@ const props = defineProps<{
 type TabKey = 'overview' | 'specs' | 'equipment' | 'history' | 'tasks' | 'documents'
 const tab = ref<TabKey>('overview')
 const createTaskNonce = ref(0)
+const createEventNonce = ref(0)
 
 const todayIso = computed(() => new Date().toISOString().slice(0, 10))
 
@@ -84,7 +85,7 @@ function goToTab(key: TabKey | string) {
             <BaseButton variant="secondary" size="sm">Modifier</BaseButton>
           </a>
           <BaseButton v-if="canManageMaintenance" variant="secondary" size="sm" type="button"
-            @click="goToTab('history'); createTaskNonce++">
+            @click="goToTab('history'); createEventNonce++">
             + Evenement
           </BaseButton>
           <BaseButton v-if="canManageMaintenance" variant="primary" size="sm" type="button"
@@ -115,7 +116,13 @@ function goToTab(key: TabKey | string) {
         :can-manage-equipment="canManageEquipment"
       />
 
-      <BoatShowTabHistory v-else-if="tab === 'history'" :maintenance-events="maintenanceEvents" />
+      <BoatShowTabHistory
+        v-else-if="tab === 'history'"
+        :boat="boat"
+        :maintenance-events="maintenanceEvents"
+        :can-manage-maintenance="canManageMaintenance"
+        :create-event-nonce="createEventNonce"
+      />
 
       <BoatShowTabTasks
         v-else-if="tab === 'tasks'"
@@ -125,7 +132,7 @@ function goToTab(key: TabKey | string) {
         :create-task-nonce="createTaskNonce"
       />
 
-      <BoatShowTabDocuments v-else-if="tab === 'documents'" />
+      <BoatShowTabDocuments v-else-if="tab === 'documents'" :boat="boat" />
     </div>
   </div>
 </template>

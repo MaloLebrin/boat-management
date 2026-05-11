@@ -1,23 +1,27 @@
 <script setup lang="ts">
 import { DocumentTextIcon } from '@heroicons/vue/24/outline'
+import { ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
+import BoatDocumentAddModal from '~/components/boats/show/modals/BoatDocumentAddModal.vue'
+import type { BoatShowDetail } from '~/types/boat_show'
+
+const props = defineProps<{
+  boat: BoatShowDetail
+}>()
+
+const isAddModalOpen = ref(false)
 </script>
 
 <template>
+  <BoatDocumentAddModal v-model:open="isAddModalOpen" :boat="boat" />
+
   <div class="space-y-6">
     <!-- Header -->
     <div class="flex items-center justify-between">
-      <p class="text-sm text-fg-muted">Gerez les documents de votre bateau.</p>
-      <!-- TODO: implement document upload: create BoatDocument model + migration, POST /boats/:id/documents, store in S3/local -->
-      <BaseButton variant="secondary" size="sm" disabled>
+      <p class="text-sm text-fg-muted">Gérez les documents de votre bateau.</p>
+      <BaseButton variant="secondary" size="sm" @click="isAddModalOpen = true">
         + Ajouter un document
       </BaseButton>
-    </div>
-
-    <!-- TODO: remove this banner once document upload is implemented -->
-    <!-- Note banner -->
-    <div class="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
-      Fonctionnalite a venir : la gestion des documents sera bientot disponible.
     </div>
 
     <!-- Document groups -->

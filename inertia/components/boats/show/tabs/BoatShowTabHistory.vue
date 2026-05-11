@@ -1,15 +1,30 @@
 <script setup lang="ts">
 import { DocumentTextIcon } from '@heroicons/vue/24/outline'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import { subjectLabel, targetDescription } from '~/components/boats/maintenance/utils'
-import type { MaintenanceEventRow } from '~/types/boat_show'
+import BoatMaintenanceEventModal from '~/components/boats/show/modals/BoatMaintenanceEventModal.vue'
+import type { BoatShowDetail, MaintenanceEventRow } from '~/types/boat_show'
 
 const props = defineProps<{
+  boat: BoatShowDetail
   maintenanceEvents: MaintenanceEventRow[]
+  canManageMaintenance: boolean
+  createEventNonce?: number
 }>()
+
+const isEventModalOpen = ref(false)
+
+watch(
+  () => props.createEventNonce,
+  (v) => {
+    if (!v) return
+    if (!props.canManageMaintenance) return
+    isEventModalOpen.value = true
+  }
+)
 
 const historyFilter = ref<'all' | 'engine' | 'sail' | 'rig' | 'boat'>('all')
 const historySearch = ref('')
@@ -58,9 +73,22 @@ function toggleEventDetails(eventId: number) {
 </script>
 
 <template>
+  <BoatMaintenanceEventModal
+    v-model:open="isEventModalOpen"
+    :boat="boat"
+    :can-manage-maintenance="canManageMaintenance"
+  />
+
   <div class="flex flex-col lg:flex-row gap-6">
     <!-- Main content -->
     <div class="flex-1 space-y-6">
+      <!-- Header with action button -->
+      <div v-if="canManageMaintenance" class="flex items-center justify-end">
+        <BaseButton variant="secondary" size="sm" type="button" @click="isEventModalOpen = true">
+          + Ajouter un événement
+        </BaseButton>
+      </div>
+
       <!-- Search and filters -->
       <div class="flex flex-wrap items-center gap-4">
         <input v-model="historySearch" type="text" placeholder="Rechercher..."
