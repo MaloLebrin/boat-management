@@ -2,9 +2,10 @@
 import { computed, ref } from 'vue'
 import { router } from '@inertiajs/vue3'
 import { Form } from '@adonisjs/inertia/vue'
-import BaseCard from '~/components/base/BaseCard.vue'
-import BaseButton from '~/components/base/BaseButton.vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
+import BaseBreadcrumb from '~/components/base/BaseBreadcrumb.vue'
+import BaseButton from '~/components/base/BaseButton.vue'
+import BaseCard from '~/components/base/BaseCard.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseTabs from '~/components/base/BaseTabs.vue'
 
@@ -163,16 +164,12 @@ const totalParts = computed(() => {
 
 <template>
   <div class="mx-auto w-full max-w-6xl px-6 py-10 sm:px-8">
-    <!-- Breadcrumb -->
-    <nav class="mb-4 text-sm text-fg-muted">
-      <a href="/boats" class="hover:text-fg hover:underline">Flotte</a>
-      <span class="mx-2">/</span>
-      <a :href="`/boats/${boat.id}`" class="hover:text-fg hover:underline">{{ boat.name }}</a>
-      <span class="mx-2">/</span>
-      <span>Equipements</span>
-      <span class="mx-2">/</span>
-      <span class="text-fg font-medium">{{ engineTitle }}</span>
-    </nav>
+    <BaseBreadcrumb :items="[
+      { label: 'Flotte', href: '/boats' },
+      { label: boat.name, href: `/boats/${boat.id}` },
+      { label: 'Equipements' },
+      { label: engineTitle },
+    ]" />
 
     <!-- Header -->
     <header class="space-y-6">

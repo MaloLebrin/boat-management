@@ -17,10 +17,10 @@ defineEmits<{
 <template>
   <div class="inline-flex rounded-(--radius-card) border border-border bg-surface-elevated p-1 shadow-(--shadow-xs)">
     <button v-for="tab in tabs" :key="tab.key" type="button" :class="[
-      'relative inline-flex items-center gap-2 rounded-(--radius-control) px-3 py-2 text-sm font-semibold transition-[background-color,transform,box-shadow] duration-(--motion-fast) ease-premium focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/30 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed active:select-auto',
+      'relative inline-flex items-center gap-2 rounded-(--radius-control) px-3 py-2 text-sm font-semibold transition-[background-color,transform,box-shadow] duration-(--motion-fast) ease-premium focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/30  disabled:opacity-50 disabled:cursor-not-allowed',
       tab.key === modelValue
-        ? 'bg-surface-muted text-fg shadow-(--shadow-xs)'
-        : 'text-fg-muted hover:bg-lilac-100/60 hover:text-fg',
+        ? 'bg-surface-muted text-fg shadow-(--shadow-xs) cursor-default'
+        : 'text-fg-muted hover:bg-lilac-100/60 hover:text-fg cursor-pointer',
     ]" @click="$emit('update:modelValue', tab.key)">
       <span>{{ tab.label }}</span>
       <span v-if="tab.badge"

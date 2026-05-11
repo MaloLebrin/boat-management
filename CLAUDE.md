@@ -45,6 +45,8 @@
 - Composables dans `inertia/composables/`
 - Props typées avec `defineProps<{}>()`, pas d'Options API
 - Code partagé backend/frontend dans `shared/` (types, helpers, constants)
+- **Taille max des composants Vue : 250 lignes** (enforced par ESLint `max-lines`) — au-delà, extraire en sous-composants
+- Pages complexes à onglets : chaque onglet = un composant dans `components/<domaine>/show/tabs/`
 
 ## Workflow agent
 1. **Toujours lire les fichiers existants** avant de modifier
