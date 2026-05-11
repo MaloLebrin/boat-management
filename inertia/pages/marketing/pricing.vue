@@ -105,11 +105,10 @@ const t = props.t
             </li>
           </ul>
           <!-- footer -->
-          <a href="/signup">
-            <button
-              class="w-full rounded-lg bg-white px-4 py-2.5 text-sm font-semibold text-navy-900 hover:bg-white/90 transition-colors">{{
-                t.nav.signup }}</button>
-          </a>
+
+          <BaseButton href="/signup" variant="secondary">
+            {{ t.nav.signup }}
+          </BaseButton>
         </div>
       </div>
 
