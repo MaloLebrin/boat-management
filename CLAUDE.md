@@ -48,6 +48,14 @@
 - **Taille max des composants Vue : 250 lignes** (enforced par ESLint `max-lines`) — au-delà, extraire en sous-composants
 - Pages complexes à onglets : chaque onglet = un composant dans `components/<domaine>/show/tabs/`
 
+### Internationalisation
+- **Toute chaîne visible par l'utilisateur doit passer par `t()`** — jamais de texte en dur dans les templates
+- Pattern obligatoire : `import { useT } from '~/composables/useT'` → `const { t } = useT()` → `{{ t('clé') }}`
+- Clés organisées par domaine dans `resources/lang/{en,fr}/app.json` (et par namespace : `flash.json`, `marketing.json`, `validator.json`)
+- Interpolation ICU : `t('clé', { count: String(n) })` — les valeurs doivent être des strings
+- Pas de ternaire inline `locale === 'fr' ? '...' : '...'` — utiliser `t()` à la place
+- Toute PR qui ajoute un composant ou une page doit ajouter les clés correspondantes dans les **deux locales** (`en` et `fr`)
+
 ## Workflow agent
 1. **Toujours lire les fichiers existants** avant de modifier
 2. **Plan d'abord** : décrire ce qui va être fait avant de coder
@@ -95,3 +103,5 @@ tests/
 - Committer des secrets ou `.env`
 - Supprimer des migrations existantes
 - Mettre de la logique de formatage dans les controllers (→ utiliser un transformer)
+- **Écrire du texte visible en dur dans un template Vue** (→ utiliser `t('clé')`)
+- **Utiliser des ternaires `locale === 'fr' ? ... : ...`** (→ utiliser `t()` avec clé dans les deux JSON)
