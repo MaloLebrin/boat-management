@@ -2,7 +2,7 @@
 import { Form, Link } from '@adonisjs/inertia/vue'
 import { usePage } from '@inertiajs/vue3'
 import { computed } from 'vue'
-import brandIconUrl from '~/assets/brand/fleetai_compass.svg'
+import Logo from '~/components/Logo.vue'
 import { useT } from '~/composables/useT'
 
 type AuthUser = {
@@ -58,13 +58,7 @@ const navSections = computed(() => [
   <aside class="hidden lg:flex flex-col w-64 h-full bg-abyss-950 text-white">
     <!-- Logo -->
     <div class="px-5 py-6 border-b border-abyss-800">
-      <a href="/dashboard" class="flex items-center gap-3">
-        <img :src="brandIconUrl" alt="FleetAi" class="h-10 w-10 rounded-lg shadow-md" />
-        <div class="flex flex-col leading-tight">
-          <span class="font-display text-base font-semibold text-white">FleetAi</span>
-          <span class="text-xs font-medium text-abyss-300">Fleet intelligence</span>
-        </div>
-      </a>
+      <Logo />
     </div>
 
     <!-- Navigation -->
