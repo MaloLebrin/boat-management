@@ -24,7 +24,7 @@ const otherHref = computed(() => {
   const otherLang = locale.value === 'en' ? 'fr' : 'en';
   const cleanPath = path.value.replace(/^\/[a-zA-Z]{2}/, '');
 
-  return `/${otherLang}${cleanPath || ''}`;
+  return `/${otherLang}/${cleanPath || ''}`;
 })
 
 </script>
@@ -139,7 +139,7 @@ const otherHref = computed(() => {
           </p>
           <div class="grid gap-2 text-sm font-medium text-fg-muted">
             <a class="transition-colors hover:text-fg" href="#">{{ locale === 'fr' ? 'Confidentialité' : 'Privacy'
-            }}</a>
+              }}</a>
             <a class="transition-colors hover:text-fg" href="#">{{ locale === 'fr' ? 'Conditions' : 'Terms' }}</a>
           </div>
         </div>

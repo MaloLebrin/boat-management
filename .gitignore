@@ -27,3 +27,6 @@ yarn-error.log
 
 # Claude
 .claude/settings.json
+
+# cursor
+.cursor/debug*.log
