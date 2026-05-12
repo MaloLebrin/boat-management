@@ -2,7 +2,7 @@ import env from '#start/env'
 import app from '@adonisjs/core/services/app'
 import { defineConfig, targets } from '@adonisjs/core/logger'
 
-const loggerConfig: ReturnType<typeof defineConfig> = defineConfig({
+const loggerConfig = defineConfig({
   /**
    * Default logger name used by ctx.logger and app logger calls.
    */
@@ -46,5 +46,6 @@ export default loggerConfig
  * in your application.
  */
 declare module '@adonisjs/core/types' {
-  export interface LoggersList extends InferLoggers<typeof loggerConfig> {}
+  type LoggersBase = (typeof loggerConfig)['loggers']
+  export interface LoggersList extends LoggersBase {}
 }

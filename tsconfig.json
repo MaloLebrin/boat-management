@@ -11,6 +11,5 @@
     "bower_components/**",
     "jspm_packages/**",
     "tests/inertia/**"
-  ],
-  "references": [{ "path": "./tsconfig.inertia.json" }]
+  ]
 }
