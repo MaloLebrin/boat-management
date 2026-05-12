@@ -636,6 +636,8 @@
     }
   },
   "homePreview": {
+    "eyebrowHowItWorks": "Comment ça marche",
+    "eyebrowForWho": "Pour qui",
     "badge": "Aperçu",
     "urgent": "Urgent",
     "overdueHint": "tâches en retard",
