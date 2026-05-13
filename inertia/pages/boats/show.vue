@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { router, usePage } from '@inertiajs/vue3'
+import { computed, ref, watch } from 'vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseBreadcrumb from '~/components/base/BaseBreadcrumb.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
@@ -25,7 +26,24 @@ const props = defineProps<{
 }>()
 
 type TabKey = 'overview' | 'specs' | 'equipment' | 'history' | 'tasks' | 'documents'
-const tab = ref<TabKey>('overview')
+
+const page = usePage()
+const urlParams = new URLSearchParams(window.location.search)
+const initialTab = (urlParams.get('tab') as TabKey) || 'overview'
+
+const tab = ref<TabKey>(initialTab)
+
+watch(tab, (newTab) => {
+  const url = new URL(window.location.href)
+  if (newTab === 'overview') {
+    url.searchParams.delete('tab')
+  } else {
+    url.searchParams.set('tab', newTab)
+  }
+  // On met à jour l'URL sans déclencher de requête Inertia
+  window.history.replaceState(window.history.state, '', url.pathname + url.search)
+})
+
 const createTaskNonce = ref(0)
 const createEventNonce = ref(0)
 
