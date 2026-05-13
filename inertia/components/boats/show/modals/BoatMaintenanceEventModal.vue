@@ -81,7 +81,7 @@ function close() {
   <BaseModal :open="open" :title="t('boats.maintenance.events.addEntry')"
     :subtitle="`${boat.name} · ${t('boats.maintenance.events.subtitle') || 'Enregistrement immuable une fois sauvegardé'}`"
     close-label="Annuler" size="xl" @update:open="close">
-    <Form :action="{ url: `/boats/${boat.id}/maintenance`, method: 'post' }" class="space-y-4"
+    <Form :action="{ url: `/boats/${boat.id}/maintenance`, method: 'post' }" @success="close" class="space-y-4"
       #default="{ processing, errors }">
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <BaseSelect id="maint-subject" name="subject" :label="t('boats.maintenance.events.subject')"

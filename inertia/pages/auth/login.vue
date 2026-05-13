@@ -30,13 +30,15 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
     <div class="hidden w-[42%] flex-col justify-between bg-navy-800 px-12 py-16 lg:flex">
       <div>
         <div class="inline-flex items-center gap-2">
-          <svg width="28" height="28" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <circle cx="32" cy="32" r="28" stroke="#faf6ee" stroke-width="2.6"/>
-            <path d="M32 9 L37.5 32 L32 36.5 L26.5 32 Z" fill="#faf6ee"/>
-            <path d="M32 55 L37.5 32 L32 27.5 L26.5 32 Z" fill="#e2674f"/>
-            <circle cx="32" cy="32" r="2.4" fill="#102a40" stroke="#faf6ee" stroke-width="1.4"/>
+          <svg width="28" height="28" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true">
+            <circle cx="32" cy="32" r="28" stroke="#faf6ee" stroke-width="2.6" />
+            <path d="M32 9 L37.5 32 L32 36.5 L26.5 32 Z" fill="#faf6ee" />
+            <path d="M32 55 L37.5 32 L32 27.5 L26.5 32 Z" fill="#e2674f" />
+            <circle cx="32" cy="32" r="2.4" fill="#102a40" stroke="#faf6ee" stroke-width="1.4" />
           </svg>
-          <span class="font-display text-base text-white" style="letter-spacing:-0.025em">Fleet<em style="font-style:italic;color:#e2674f">Ai</em></span>
+          <span class="font-display text-base text-white" style="letter-spacing:-0.025em">Fleet<em
+              style="font-style:italic;color:#e2674f">Ai</em></span>
         </div>
         <h2 class="mt-8 font-display text-3xl italic leading-snug text-white">
           {{ t('auth.login.marketing.tagline') }}
@@ -49,9 +51,7 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
       <ul class="space-y-3">
         <li
           v-for="key in ['auth.login.marketing.feature0', 'auth.login.marketing.feature1', 'auth.login.marketing.feature2']"
-          :key="key"
-          class="flex items-center gap-3 text-sm text-white/70"
-        >
+          :key="key" class="flex items-center gap-3 text-sm text-white/70">
           <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-white/50" />
           {{ t(key) }}
         </li>
@@ -64,7 +64,9 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
         <footer class="mt-2 text-xs text-white/40">{{ t('auth.login.marketing.testimonialAuthor') }}</footer>
       </blockquote>
 
-      <p class="text-xs text-white/30">{{ t('auth.login.marketing.copyright', { year: String(new Date().getFullYear()) }) }}</p>
+      <p class="text-xs text-white/30">{{ t('auth.login.marketing.copyright', {
+        year: String(new Date().getFullYear())
+        }) }}</p>
     </div>
 
     <!-- Panneau droit — fond crème -->
@@ -77,7 +79,7 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
 
         <div class="mt-8">
           <!-- SSO buttons -->
-          <div class="space-y-2">
+          <!-- <div class="space-y-2">
             <button type="button"
               class="flex w-full items-center justify-center gap-3 rounded-(--radius-control) border border-bone bg-paper py-2.5 text-sm font-medium text-fg transition-colors hover:bg-bone">
               <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
@@ -100,36 +102,20 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
           <div class="relative my-5">
             <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-bone"></div></div>
             <div class="relative flex justify-center"><span class="bg-cream px-3 text-xs text-fg-subtle">{{ t('auth.login.withEmail') }}</span></div>
-          </div>
+          </div> -->
 
           <Form route="session.store" #default="{ processing, errors }">
             <div class="space-y-5">
-              <BaseInput
-                id="email"
-                name="email"
-                type="email"
-                autocomplete="username"
-                :label="t('auth.login.emailLabel')"
-                :placeholder="t('auth.login.emailPlaceholder')"
-                :errors="errors"
-              />
+              <BaseInput id="email" name="email" type="email" autocomplete="username"
+                :label="t('auth.login.emailLabel')" :placeholder="t('auth.login.emailPlaceholder')" :errors="errors" />
 
-              <BaseInput
-                id="password"
-                name="password"
-                :type="passwordType"
-                autocomplete="current-password"
-                :label="t('auth.login.passwordLabel')"
-                placeholder="••••••••"
-                :errors="errors"
-              >
+              <BaseInput id="password" name="password" :type="passwordType" autocomplete="current-password"
+                :label="t('auth.login.passwordLabel')" placeholder="••••••••" :errors="errors">
                 <template #trailing>
-                  <button
-                    type="button"
+                  <button type="button"
                     class="inline-flex items-center text-sm font-medium text-fg-muted hover:text-fg focus-visible:outline-none"
                     :aria-label="showPassword ? t('auth.login.hidePassword') : t('auth.login.showPassword')"
-                    @click="showPassword = !showPassword"
-                  >
+                    @click="showPassword = !showPassword">
                     {{ showPassword ? t('auth.login.hidePassword') : t('auth.login.showPassword') }}
                   </button>
                 </template>

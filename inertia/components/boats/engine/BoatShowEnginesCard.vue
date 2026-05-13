@@ -111,6 +111,7 @@ function performedDisplay(iso: string | null) {
     <BaseModal v-model:open="isCreateOpen" :title="t('boats.engines.modal.title')" :close-label="t('common.close')">
       <Form
         :action="{ url: `/boats/${boatId}/engines`, method: 'post' }"
+        @success="isCreateOpen = false"
         class="space-y-4"
         #default="{ processing, errors }"
       >

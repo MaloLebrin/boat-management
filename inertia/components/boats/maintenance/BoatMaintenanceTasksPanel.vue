@@ -188,6 +188,7 @@ watch(
     <BaseModal v-model:open="isCreateOpen" :title="t('boats.maintenance.tasks.modalTitle')" close-label="Close">
       <Form
         :action="{ url: `/boats/${boat.id}/maintenance-tasks`, method: 'post' }"
+        @success="isCreateOpen = false"
         class="space-y-4"
         #default="{ processing, errors }"
       >

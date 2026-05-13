@@ -87,7 +87,7 @@
         "rental": "Loueur de bateaux",
         "school": "École de voile",
         "marina": "Marina / Port",
-        "private": "Armateur privé"
+        "private": "Amateur privé"
       },
       "fleetSizes": {
         "s1": "1-4 bateaux",
@@ -444,6 +444,25 @@
         "upcoming": "À venir",
         "ok": "OK"
       }
+    },
+    "equipmentAddModal": {
+      "title": "Nouvel équipement",
+      "subtitle": "Sur {name} · l'équipement deviendra suivable pour la maintenance",
+      "category": "Catégorie",
+      "categories": {
+        "engine": "Moteur",
+        "sail": "Voile",
+        "rig": "Gréement",
+        "other": "Autre"
+      },
+      "comingSoon": {
+        "title": "Catégorie bientôt disponible",
+        "description": "Sélectionnez Moteur, Voile ou Gréement pour ajouter un équipement.",
+        "badge": "bientôt"
+      },
+      "rigNotice": "ⓘ Ce bateau a déjà un gréement — l'enregistrement mettra à jour les informations existantes.",
+      "submit": "Créer l'équipement",
+      "cancel": "Annuler"
     },
     "list": {
       "search": "Rechercher",
