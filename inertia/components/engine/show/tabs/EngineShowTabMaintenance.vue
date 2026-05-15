@@ -93,8 +93,8 @@ function formatDate(iso: string): string {
                   {{ t('boats.engineShow.actions.schedule') }}
                 </BaseButton>
                 <Form
-                  :action="`/boats/${boat.id}/maintenance/tasks/${task.id}/complete`"
-                  method="post"
+                  :action="`/boats/${boat.id}/maintenance-tasks/${task.id}/done`"
+                  method="put"
                   class="inline"
                 >
                   <BaseButton variant="secondary" size="sm" type="submit">

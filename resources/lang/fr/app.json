@@ -616,6 +616,7 @@
         "partNotes": "Notes",
         "removePart": "Supprimer",
         "createEntry": "Créer l'entrée",
+        "immutable": "Une fois enregistré, cet événement devient immuable.",
         "noRig": "Enregistrez un gréement sur ce bateau avant d'ajouter des entrées gréement.",
         "enginePlaceholder": "ex. Moteur diesel intérieur bâbord",
         "sailPlaceholder": "ex. Génois n°2",

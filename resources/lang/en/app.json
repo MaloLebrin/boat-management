@@ -597,6 +597,7 @@
         "partNotes": "Notes",
         "removePart": "Remove",
         "createEntry": "Create entry",
+        "immutable": "Once saved, this event becomes immutable.",
         "noRig": "Save a rig on this boat before adding rig entries.",
         "enginePlaceholder": "e.g. Inboard diesel port",
         "sailPlaceholder": "e.g. Genoa #2",

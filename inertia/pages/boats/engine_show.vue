@@ -5,6 +5,7 @@ import BaseBreadcrumb from '~/components/base/BaseBreadcrumb.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseTabs from '~/components/base/BaseTabs.vue'
+import EngineMaintenanceEventModal from '~/components/engine/show/EngineMaintenanceEventModal.vue'
 import EngineShowTabDocuments from '~/components/engine/show/tabs/EngineShowTabDocuments.vue'
 import EngineShowTabMaintenance from '~/components/engine/show/tabs/EngineShowTabMaintenance.vue'
 import EngineShowTabNotes from '~/components/engine/show/tabs/EngineShowTabNotes.vue'
@@ -26,6 +27,7 @@ const props = defineProps<{
 
 type TabKey = 'overview' | 'specs' | 'maintenance' | 'notes' | 'parts' | 'documents'
 const tab = ref<TabKey>('overview')
+const addEventOpen = ref(false)
 
 const openTasks = computed(() => props.maintenanceTasks.filter((t) => t.status === 'open'))
 
@@ -140,7 +142,7 @@ function formatYear(iso: string): string {
           >
             {{ t('boats.engineShow.actions.edit') }}
           </BaseButton>
-          <BaseButton size="sm" :href="`/boats/${boat.id}/maintenance/events/new?engineId=${engine.id}`">
+          <BaseButton size="sm" @click="addEventOpen = true">
             {{ t('boats.engineShow.actions.addEvent') }}
           </BaseButton>
         </div>
@@ -193,5 +195,12 @@ function formatYear(iso: string): string {
       <EngineShowTabParts v-else-if="tab === 'parts'" />
       <EngineShowTabDocuments v-else-if="tab === 'documents'" />
     </div>
+
+    <EngineMaintenanceEventModal
+      v-if="canManage"
+      :boat="boat"
+      :engine="engine"
+      v-model:open="addEventOpen"
+    />
   </div>
 </template>

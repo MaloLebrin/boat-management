@@ -33,7 +33,7 @@ export default class extends BaseSeeder {
       ;({ user } = await userService.signupWithOrganization({
         email: adminEmail,
         password: adminPassword,
-        fullName: 'Admin',
+        fullName: 'Administrateur',
       }))
     }
 
@@ -113,37 +113,37 @@ export default class extends BaseSeeder {
     const today = DateTime.now().startOf('day')
     const eventsToEnsure = [
       {
-        title: 'Annual antifouling',
+        title: 'Antifouling annuel',
         subject: 'boat' as const,
         performedAt: today.minus({ days: 120 }).toISODate()!,
         dueAt: today.plus({ days: 30 }).toISODate()!,
       },
       {
-        title: 'Engine oil check',
+        title: 'Révision moteur',
         subject: 'engine' as const,
         performedAt: today.minus({ days: 20 }).toISODate()!,
         dueAt: today.minus({ days: 1 }).toISODate()!, // overdue
       },
       {
-        title: 'Rig inspection',
+        title: 'Inspection du gréement',
         subject: 'rig' as const,
         performedAt: today.minus({ days: 200 }).toISODate()!,
         dueAt: today.plus({ days: 7 }).toISODate()!, // due soon
       },
       {
-        title: 'Main sail stitching',
+        title: 'Réparation couture grand-voile',
         subject: 'sail' as const,
         performedAt: today.minus({ days: 60 }).toISODate()!,
         dueAt: today.plus({ days: 60 }).toISODate()!,
       },
       {
-        title: 'Safety gear check',
+        title: 'Contrôle matériel de sécurité',
         subject: 'boat' as const,
         performedAt: today.minus({ days: 10 }).toISODate()!,
         dueAt: null,
       },
       {
-        title: 'Deck hardware retightening',
+        title: 'Resserrage de l\'accastillage',
         subject: 'boat' as const,
         performedAt: today.minus({ days: 15 }).toISODate()!,
         dueAt: today.plus({ days: 90 }).toISODate()!,
@@ -201,7 +201,7 @@ export default class extends BaseSeeder {
         await maintenanceService.createForBoat(user, boat, {
           subject: 'engine',
           boatEngineId: engine?.id ?? null,
-          engineCaption: engine ? null : 'Outboard',
+          engineCaption: engine ? null : 'Hors-bord',
           performedAt: e.performedAt,
           title: e.title,
         })
@@ -213,7 +213,7 @@ export default class extends BaseSeeder {
         await maintenanceService.createForBoat(user, boat, {
           subject: 'sail',
           boatSailId: sail?.id ?? null,
-          sailCaption: sail ? null : 'Main',
+          sailCaption: sail ? null : 'Grand-voile',
           performedAt: e.performedAt,
           title: e.title,
         })
