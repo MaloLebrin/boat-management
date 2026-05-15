@@ -47,6 +47,7 @@ export type BoatEnginePayload = {
   manufacturedAt?: Date | string | DateTime | null
   powerHp?: number | null
   hours?: number | null
+  installHours?: number | null
   status?: string | null
 }
 
@@ -192,6 +193,7 @@ export default class BoatService {
       manufacturedAt: toDateOrNull(payload.manufacturedAt),
       powerHp: payload.powerHp ?? null,
       hours: payload.hours ?? null,
+      installHours: payload.installHours ?? null,
     })
 
     return engine
@@ -213,6 +215,7 @@ export default class BoatService {
     engine.manufacturedAt = toDateOrNull(payload.manufacturedAt)
     engine.powerHp = payload.powerHp ?? null
     engine.hours = payload.hours ?? null
+    engine.installHours = payload.installHours ?? null
 
     await engine.save()
     return engine

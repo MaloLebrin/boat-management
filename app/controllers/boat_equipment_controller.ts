@@ -76,6 +76,7 @@ export default class BoatEquipmentController {
         manufacturedAt: engine.manufacturedAt ? engine.manufacturedAt.toISODate() : null,
         powerHp: engine.powerHp,
         hours: engine.hours,
+        installHours: engine.installHours,
         status: engine.status,
       },
     })
@@ -324,6 +325,7 @@ export default class BoatEquipmentController {
         manufacturedAt: engine.manufacturedAt ? engine.manufacturedAt.toISODate() : null,
         powerHp: engine.powerHp,
         hours: engine.hours,
+        installHours: engine.installHours,
         status: engine.status,
       },
       maintenanceEvents: maintenanceEvents.map((ev) => ({
