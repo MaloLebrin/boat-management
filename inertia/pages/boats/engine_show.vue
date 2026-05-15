@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
 import { router } from '@inertiajs/vue3'
+import { computed, ref } from 'vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseBreadcrumb from '~/components/base/BaseBreadcrumb.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
@@ -136,7 +136,7 @@ function formatYear(iso: string): string {
     <BaseBreadcrumb :items="[
       { label: t('boats.show.breadcrumbFleet'), href: '/boats' },
       { label: boat.name, href: `/boats/${boat.id}` },
-      { label: t('boats.engineShow.breadcrumb.equipment') },
+      { label: t('boats.engineShow.breadcrumb.equipment'), href: `/boats/${boat.id}/engine?tab=equipment` },
       { label: engineTitle },
     ]" />
 
@@ -150,20 +150,14 @@ function formatYear(iso: string): string {
           <div class="mt-3 flex flex-wrap gap-x-6 gap-y-1 text-sm text-fg-muted">
             <p v-if="engine.fuel">{{ engine.fuel }}</p>
             <p v-if="engine.powerHp">{{ engine.powerHp }} HP</p>
-            <p v-if="engine.manufacturedAt">{{ t('boats.engineShow.installedIn', { year: formatYear(engine.manufacturedAt) }) }}</p>
+            <p v-if="engine.manufacturedAt">{{ t('boats.engineShow.installedIn', {
+              year:
+                formatYear(engine.manufacturedAt) }) }}</p>
           </div>
           <div class="mt-3">
-            <BaseSelect
-              v-if="canManage"
-              id="engine-status"
-              name="status"
-              :label="t('equipment.status.label')"
-              :options="statusOptions"
-              :model-value="engine.status"
-              :errors="{}"
-              class="w-48"
-              @update:model-value="changeStatus"
-            />
+            <BaseSelect v-if="canManage" id="engine-status" name="status" :label="t('equipment.status.label')"
+              :options="statusOptions" :model-value="engine.status" :errors="{}" class="w-48"
+              @update:model-value="changeStatus" />
             <BaseBadge v-else :variant="statusVariant(engine.status)">
               {{ t(`equipment.status.${engine.status}`) }}
             </BaseBadge>
@@ -171,11 +165,7 @@ function formatYear(iso: string): string {
         </div>
 
         <div v-if="canManage" class="flex flex-wrap items-center gap-2 justify-end">
-          <BaseButton
-            variant="secondary"
-            size="sm"
-            :href="`/boats/${boat.id}/engines/${engine.id}/edit`"
-          >
+          <BaseButton variant="secondary" size="sm" :href="`/boats/${boat.id}/engines/${engine.id}/edit`">
             {{ t('boats.engineShow.actions.edit') }}
           </BaseButton>
           <BaseButton size="sm" @click="addEventOpen = true">
@@ -184,61 +174,33 @@ function formatYear(iso: string): string {
         </div>
       </div>
 
-      <BaseTabs
-        v-model="tab"
-        :tabs="[
-          { key: 'overview', label: t('boats.engineShow.tabs.overview') },
-          { key: 'specs', label: t('boats.engineShow.tabs.specs') },
-          { key: 'maintenance', label: t('boats.engineShow.tabs.maintenance'), badge: String(openTasks.length) },
-          { key: 'notes', label: t('boats.engineShow.tabs.notes') },
-          { key: 'parts', label: t('boats.engineShow.tabs.parts') },
-          { key: 'documents', label: t('boats.engineShow.tabs.documents') },
-        ]"
-      />
+      <BaseTabs v-model="tab" :tabs="[
+        { key: 'overview', label: t('boats.engineShow.tabs.overview') },
+        { key: 'specs', label: t('boats.engineShow.tabs.specs') },
+        { key: 'maintenance', label: t('boats.engineShow.tabs.maintenance'), badge: String(openTasks.length) },
+        { key: 'notes', label: t('boats.engineShow.tabs.notes') },
+        { key: 'parts', label: t('boats.engineShow.tabs.parts') },
+        { key: 'documents', label: t('boats.engineShow.tabs.documents') },
+      ]" />
     </header>
 
     <Transition name="tab" mode="out-in">
       <div :key="tab" class="mt-8">
-      <EngineShowTabOverview
-        v-if="tab === 'overview'"
-        :engine="engine"
-        :overdue-task="overdueTask"
-        :recent-events="recentEvents"
-        :hours-since-last-maint="hoursSinceLastMaint"
-        :nearest-threshold="nearestThreshold"
-        :hours-progress="hoursProgress"
-        :is-over-threshold="isOverThreshold"
-        :sorted-open-tasks="sortedOpenTasks"
-      />
-      <EngineShowTabSpecs
-        v-else-if="tab === 'specs'"
-        :boat="boat"
-        :engine="engine"
-        :open-tasks="openTasks"
-        :can-manage="canManage"
-      />
-      <EngineShowTabMaintenance
-        v-else-if="tab === 'maintenance'"
-        :boat="boat"
-        :engine="engine"
-        :maintenance-events="maintenanceEvents"
-        :open-tasks="openTasks"
-        :sorted-open-tasks="sortedOpenTasks"
-        :total-parts="totalParts"
-        :can-manage="canManage"
-        :events-by-year-month="eventsByYearMonth"
-      />
-      <EngineShowTabNotes v-else-if="tab === 'notes'" />
-      <EngineShowTabParts v-else-if="tab === 'parts'" />
-      <EngineShowTabDocuments v-else-if="tab === 'documents'" />
+        <EngineShowTabOverview v-if="tab === 'overview'" :engine="engine" :overdue-task="overdueTask"
+          :recent-events="recentEvents" :hours-since-last-maint="hoursSinceLastMaint"
+          :nearest-threshold="nearestThreshold" :hours-progress="hoursProgress" :is-over-threshold="isOverThreshold"
+          :sorted-open-tasks="sortedOpenTasks" />
+        <EngineShowTabSpecs v-else-if="tab === 'specs'" :boat="boat" :engine="engine" :open-tasks="openTasks"
+          :can-manage="canManage" />
+        <EngineShowTabMaintenance v-else-if="tab === 'maintenance'" :boat="boat" :engine="engine"
+          :maintenance-events="maintenanceEvents" :open-tasks="openTasks" :sorted-open-tasks="sortedOpenTasks"
+          :total-parts="totalParts" :can-manage="canManage" :events-by-year-month="eventsByYearMonth" />
+        <EngineShowTabNotes v-else-if="tab === 'notes'" />
+        <EngineShowTabParts v-else-if="tab === 'parts'" />
+        <EngineShowTabDocuments v-else-if="tab === 'documents'" />
       </div>
     </Transition>
 
-    <EngineMaintenanceEventModal
-      v-if="canManage"
-      :boat="boat"
-      :engine="engine"
-      v-model:open="addEventOpen"
-    />
+    <EngineMaintenanceEventModal v-if="canManage" :boat="boat" :engine="engine" v-model:open="addEventOpen" />
   </div>
 </template>

@@ -224,6 +224,43 @@ export class BoatSchema extends BaseModel {
   declare yearBuilt: number | null
 }
 
+export class MediaSchema extends BaseModel {
+  static $columns = ['bytes', 'caption', 'cloudinaryPublicId', 'createdAt', 'entityId', 'entityType', 'format', 'height', 'id', 'kind', 'originalFilename', 'position', 'secureUrl', 'updatedAt', 'uploadedById', 'width'] as const
+  $columns = MediaSchema.$columns
+  @column()
+  declare bytes: number
+  @column()
+  declare caption: string | null
+  @column()
+  declare cloudinaryPublicId: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare entityId: number
+  @column()
+  declare entityType: string
+  @column()
+  declare format: string
+  @column()
+  declare height: number | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare kind: string
+  @column()
+  declare originalFilename: string
+  @column()
+  declare position: number
+  @column()
+  declare secureUrl: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare uploadedById: number | null
+  @column()
+  declare width: number | null
+}
+
 export class OrganizationSchema extends BaseModel {
   static $columns = ['createdAt', 'id', 'name', 'slug', 'updatedAt'] as const
   $columns = OrganizationSchema.$columns

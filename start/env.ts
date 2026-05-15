@@ -40,4 +40,9 @@ export default await Env.create(new URL('../', import.meta.url), {
   AI_PROVIDER: Env.schema.string(),
   AI_MODEL: Env.schema.string.optional(),
   MISTRAL_API_KEY: Env.schema.secret(),
+
+  // Cloudinary
+  CLOUDINARY_CLOUD_NAME: Env.schema.string(),
+  CLOUDINARY_API_KEY: Env.schema.string(),
+  CLOUDINARY_API_SECRET: Env.schema.secret(),
 })
