@@ -74,6 +74,7 @@ export default class BoatEquipmentController {
         manufacturedAt: engine.manufacturedAt ? engine.manufacturedAt.toISODate() : null,
         powerHp: engine.powerHp,
         hours: engine.hours,
+        status: engine.status,
       },
     })
   }
@@ -170,6 +171,7 @@ export default class BoatEquipmentController {
         areaM2: sail.areaM2,
         material: sail.material,
         reefPoints: sail.reefPoints,
+        status: sail.status,
       },
     })
   }
@@ -244,6 +246,7 @@ export default class BoatEquipmentController {
             manufacturedAt: boat.rig.manufacturedAt ? boat.rig.manufacturedAt.toISODate() : null,
             mastCount: boat.rig.mastCount,
             spreaders: boat.rig.spreaders,
+            status: boat.rig.status,
           }
         : null,
     })
