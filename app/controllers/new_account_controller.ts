@@ -1,5 +1,6 @@
 import { signupValidator } from '#validators/user'
 import UserService from '#services/user_service'
+import EmailQueueService from '#services/email_queue_service'
 import type { HttpContext } from '@adonisjs/core/http'
 
 export default class NewAccountController {
@@ -13,6 +14,10 @@ export default class NewAccountController {
     const { user } = await userService.signupWithOrganization(payload)
 
     await auth.use('web').login(user)
+
+    const emailService = new EmailQueueService()
+    await emailService.sendWelcome({ to: user.email, name: user.fullName })
+
     response.redirect().toRoute('dashboard')
   }
 }
