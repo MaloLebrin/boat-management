@@ -109,7 +109,7 @@ function getEquipmentCaption(event: HistoryEvent): string | null {
 </script>
 
 <template>
-  <div class="mx-auto w-full max-w-6xl px-6 py-10 sm:px-8">
+  <div class="w-full max-w-7xl px-6 py-10 sm:px-8">
     <!-- Header -->
     <header class="space-y-4">
       <div class="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">

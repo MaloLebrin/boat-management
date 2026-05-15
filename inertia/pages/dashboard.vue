@@ -56,7 +56,7 @@ function dismissAlert() {
 <template>
   <Head :title="t('dashboard.title')" />
 
-  <div class="px-8 py-10">
+  <div class="w-full max-w-7xl px-6 py-10 sm:px-8">
     <BaseAlert
       v-if="stats.urgentMaintenance > 0 && showAlert"
       variant="warning"

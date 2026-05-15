@@ -36,7 +36,7 @@ const localFullName = ref(props.user.fullName ?? '')
 </script>
 
 <template>
-  <div class="mx-auto flex min-h-[calc(100vh-8rem)] w-full max-w-6xl px-6 py-10 sm:px-8">
+  <div class="flex w-full max-w-7xl px-6 py-10 sm:px-8">
     <div class="flex w-full gap-8">
       <!-- Left sidebar navigation -->
       <nav class="w-56 shrink-0">

@@ -73,7 +73,7 @@ function reset() {
 </script>
 
 <template>
-  <div class="mx-auto flex min-h-[calc(100vh-8rem)] w-full flex-col px-6 py-10 sm:px-8">
+  <div class="w-full max-w-7xl flex-col px-6 py-10 sm:px-8">
     <div class="flex items-center justify-between">
       <div>
         <BaseHeading level="1">{{ t('boats.index.title') }}</BaseHeading>

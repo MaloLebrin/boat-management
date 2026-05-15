@@ -90,7 +90,7 @@ function taskPillClass(task: PlanningTask): string {
 </script>
 
 <template>
-  <div class="flex min-h-full flex-col px-6 py-8 sm:px-8">
+  <div class="w-full max-w-7xl flex-col px-6 py-10 sm:px-8">
     <!-- Page header -->
     <div class="mb-6 flex flex-wrap items-start justify-between gap-4">
       <div>
