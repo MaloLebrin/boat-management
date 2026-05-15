@@ -66,6 +66,10 @@ function formatYear(iso: string): string {
             <dt class="text-fg-muted">{{ t('boats.engineShow.specs.type') }}</dt>
             <dd class="font-medium text-fg">{{ engine.kind }}</dd>
           </div>
+          <div v-if="engine.strokeType">
+            <dt class="text-fg-muted">{{ t('boats.engineShow.specs.strokeType') }}</dt>
+            <dd class="font-medium text-fg">{{ t(`boats.options.strokeType.${engine.strokeType}`) }}</dd>
+          </div>
         </dl>
       </BaseCard>
 

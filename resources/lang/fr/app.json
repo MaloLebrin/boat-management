@@ -341,7 +341,8 @@
         "serialNumber": "Numéro de série",
         "manufacturedAt": "Date d'installation",
         "powerHp": "Puissance (ch)",
-        "hours": "Heures"
+        "hours": "Heures",
+        "strokeType": "Cycle moteur"
       },
       "modal": {
         "title": "Ajouter un moteur",
@@ -417,6 +418,10 @@
         "schooner": "Goélette",
         "cat_rig": "Misainier",
         "other": "Autre"
+      },
+      "strokeType": {
+        "2_stroke": "2 temps",
+        "4_stroke": "4 temps"
       }
     },
     "index": {
@@ -557,7 +562,8 @@
         "thresholds": "Seuils de maintenance",
         "noThreshold": "Aucun seuil défini",
         "every": "Toutes les {hours} h",
-        "editHint": "Pour modifier les spécifications de ce moteur, utilisez le bouton Modifier en haut de page."
+        "editHint": "Pour modifier les spécifications de ce moteur, utilisez le bouton Modifier en haut de page.",
+        "strokeType": "Cycle moteur"
       },
       "maintenance": {
         "upcoming": "À venir",

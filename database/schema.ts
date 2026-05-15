@@ -8,7 +8,7 @@ import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
 export class BoatEngineSchema extends BaseModel {
-  static $columns = ['boatId', 'brand', 'createdAt', 'fuel', 'hours', 'id', 'kind', 'manufacturedAt', 'model', 'powerHp', 'powerKw', 'serialNumber', 'status', 'updatedAt'] as const
+  static $columns = ['boatId', 'brand', 'createdAt', 'fuel', 'hours', 'id', 'kind', 'manufacturedAt', 'model', 'powerHp', 'powerKw', 'serialNumber', 'status', 'strokeType', 'updatedAt'] as const
   $columns = BoatEngineSchema.$columns
   @column()
   declare boatId: number
@@ -36,6 +36,8 @@ export class BoatEngineSchema extends BaseModel {
   declare serialNumber: string | null
   @column()
   declare status: string
+  @column()
+  declare strokeType: string | null
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
 }

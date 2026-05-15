@@ -7,9 +7,15 @@ export type EquipmentStatus = (typeof equipmentStatuses)[number]
 
 const fuelChoices = [...engineFuels, '', '__none__'] as string[]
 
+export const engineStrokeTypes = ['2_stroke', '4_stroke'] as const
+export type EngineStrokeType = (typeof engineStrokeTypes)[number]
+
+const strokeTypeChoices = [...engineStrokeTypes, '', '__none__'] as string[]
+
 const enginePayload = vine.object({
   kind: vine.enum(engineKinds),
   fuel: vine.string().trim().maxLength(32).in(fuelChoices).optional(),
+  strokeType: vine.string().trim().in(strokeTypeChoices).optional(),
   brand: vine.string().trim().maxLength(120).optional(),
   model: vine.string().trim().maxLength(120).optional(),
   serialNumber: vine.string().trim().maxLength(120).optional(),
@@ -26,6 +32,7 @@ export const updateBoatEngineValidator = vine.compile(enginePayload)
 export type BoatEngineFormBody = {
   kind: string
   fuel?: string
+  strokeType?: string
   brand?: string
   model?: string
   serialNumber?: string
@@ -67,6 +74,10 @@ const rigPayload = vine.object({
 
 export const upsertBoatRigValidator = vine.compile(rigPayload)
 
+export const updateEquipmentStatusValidator = vine.compile(
+  vine.object({ status: vine.enum(equipmentStatuses) })
+)
+
 export type BoatRigFormBody = {
   rigType: string
   manufacturedAt?: string
@@ -99,10 +110,15 @@ function emptyToNull(s: string | undefined): string | null {
 export function equipmentBodyToEnginePayload(body: BoatEngineFormBody): BoatEnginePayload {
   const fuel =
     body.fuel === undefined || body.fuel === '' || body.fuel === '__none__' ? null : body.fuel
+  const strokeType =
+    body.strokeType === undefined || body.strokeType === '' || body.strokeType === '__none__'
+      ? null
+      : (body.strokeType as EngineStrokeType)
 
   return {
     kind: body.kind,
     fuel,
+    strokeType,
     brand: emptyToNull(body.brand),
     model: emptyToNull(body.model),
     serialNumber: emptyToNull(body.serialNumber),

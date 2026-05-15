@@ -32,6 +32,11 @@ export const ENGINE_FUEL_OPTIONS = [
   { value: 'other', label: 'Other' },
 ] as const
 
+export const ENGINE_STROKE_TYPE_OPTIONS = [
+  { value: '2_stroke', label: '2-stroke' },
+  { value: '4_stroke', label: '4-stroke' },
+] as const
+
 export const SAIL_TYPE_OPTIONS = [
   { value: 'main', label: 'Main' },
   { value: 'genoa', label: 'Genoa' },

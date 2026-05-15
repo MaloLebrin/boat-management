@@ -341,7 +341,8 @@
         "serialNumber": "Serial number",
         "manufacturedAt": "Manufacturing date",
         "powerHp": "Power (hp)",
-        "hours": "Hours"
+        "hours": "Hours",
+        "strokeType": "Engine cycle"
       },
       "modal": {
         "title": "Add engine",
@@ -417,6 +418,10 @@
         "schooner": "Schooner",
         "cat_rig": "Cat rig",
         "other": "Other"
+      },
+      "strokeType": {
+        "2_stroke": "2-stroke",
+        "4_stroke": "4-stroke"
       }
     },
     "index": {
@@ -538,7 +543,8 @@
         "thresholds": "Maintenance thresholds",
         "noThreshold": "No threshold defined",
         "every": "Every {hours} h",
-        "editHint": "To edit this engine's specifications, use the Edit button at the top of the page."
+        "editHint": "To edit this engine's specifications, use the Edit button at the top of the page.",
+        "strokeType": "Engine cycle"
       },
       "maintenance": {
         "upcoming": "Upcoming",

@@ -163,6 +163,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_equipment_controller').default['updateEngine']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'boat_equipment.update_engine_status': {
+    methods: ["PATCH"]
+    pattern: '/boats/:boatId/engines/:engineId/status'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/boat_equipment').updateEquipmentStatusValidator)>>
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; engineId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/boat_equipment').updateEquipmentStatusValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_equipment_controller').default['updateEngineStatus']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_equipment_controller').default['updateEngineStatus']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'boat_equipment.destroy_engine': {
     methods: ["DELETE"]
     pattern: '/boats/:boatId/engines/:engineId'

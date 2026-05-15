@@ -4,6 +4,7 @@ export type BoatShowEngine = {
   id: number
   kind: string
   fuel: string | null
+  strokeType: '2_stroke' | '4_stroke' | null
   brand: string | null
   model: string | null
   serialNumber: string | null

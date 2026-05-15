@@ -12,6 +12,7 @@ import {
   storeBoatSailValidator,
   updateBoatEngineValidator,
   updateBoatSailValidator,
+  updateEquipmentStatusValidator,
   upsertBoatRigValidator,
 } from '#validators/boat_equipment'
 import type { HttpContext } from '@adonisjs/core/http'
@@ -68,6 +69,7 @@ export default class BoatEquipmentController {
         id: engine.id,
         kind: engine.kind,
         fuel: engine.fuel,
+        strokeType: engine.strokeType,
         brand: engine.brand,
         model: engine.model,
         serialNumber: engine.serialNumber,
@@ -315,12 +317,14 @@ export default class BoatEquipmentController {
         id: engine.id,
         kind: engine.kind,
         fuel: engine.fuel,
+        strokeType: engine.strokeType,
         brand: engine.brand,
         model: engine.model,
         serialNumber: engine.serialNumber,
         manufacturedAt: engine.manufacturedAt ? engine.manufacturedAt.toISODate() : null,
         powerHp: engine.powerHp,
         hours: engine.hours,
+        status: engine.status,
       },
       maintenanceEvents: maintenanceEvents.map((ev) => ({
         id: ev.id,
@@ -349,5 +353,29 @@ export default class BoatEquipmentController {
       })),
       canManage,
     })
+  }
+
+  async updateEngineStatus({ request, response, auth, params, bouncer, session, i18n }: HttpContext) {
+    await auth.authenticate()
+    const loaded = await this.loadBoatForEquipment({ auth, response, params })
+    if (!loaded) return
+
+    const { boat, boatService } = loaded
+    await bouncer.authorize('boatUpdate', boat)
+
+    const { status } = await request.validateUsing(updateEquipmentStatusValidator)
+
+    try {
+      await boatService.updateEngineStatus(loaded.user, boat, Number(params.engineId), status)
+    } catch (error) {
+      if (error instanceof BoatEquipmentNotFoundError) {
+        session.flash('error', i18n.t('flash.engine.notFound'))
+        response.redirect(`/boats/${boat.id}`)
+        return
+      }
+      throw error
+    }
+
+    response.redirect().back()
   }
 }

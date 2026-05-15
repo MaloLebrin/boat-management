@@ -90,17 +90,27 @@ onBeforeUnmount(() => {
 
       <!-- Scrollable content area -->
       <main class="flex-1 overflow-y-auto bg-linear-to-br from-lilac-50 via-peach-50 to-mint-100">
-        <slot />
+        <Transition name="page" mode="out-in">
+          <div :key="page.url">
+            <slot />
+          </div>
+        </Transition>
       </main>
     </div>
 
     <!-- Mobile sidebar drawer -->
-    <div v-if="isSidebarOpen" class="fixed inset-0 z-50 lg:hidden">
-      <button type="button" class="absolute inset-0 bg-black/40 backdrop-blur-sm" aria-label="Fermer le menu"
-        @click="closeSidebar" />
-
-      <div id="auth-sidebar-drawer" role="dialog" aria-modal="true" :aria-labelledby="drawerTitleId"
-        class="absolute left-0 top-0 h-full w-64 bg-abyss-950 shadow-xl">
+    <Transition name="drawer-overlay">
+      <button
+        v-if="isSidebarOpen"
+        type="button"
+        class="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm lg:hidden"
+        aria-label="Fermer le menu"
+        @click="closeSidebar"
+      />
+    </Transition>
+    <Transition name="drawer-panel">
+      <div v-if="isSidebarOpen" id="auth-sidebar-drawer" role="dialog" aria-modal="true" :aria-labelledby="drawerTitleId"
+        class="fixed left-0 top-0 z-50 h-full w-64 bg-abyss-950 shadow-xl lg:hidden">
         <!-- Drawer header -->
         <div class="flex items-center justify-between px-5 py-4 border-b border-abyss-800">
           <div class="flex items-center gap-3">

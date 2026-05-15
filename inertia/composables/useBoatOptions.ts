@@ -2,6 +2,7 @@ import { computed } from 'vue'
 import {
   ENGINE_FUEL_OPTIONS,
   ENGINE_KIND_OPTIONS,
+  ENGINE_STROKE_TYPE_OPTIONS,
   HULL_MATERIAL_OPTIONS,
   PROPULSION_OPTIONS,
   RIG_TYPE_OPTIONS,
@@ -28,6 +29,10 @@ export function useBoatOptions() {
     ENGINE_FUEL_OPTIONS.map((o) => ({ value: o.value, label: t(`boats.options.engineFuel.${o.value}`) }))
   )
 
+  const engineStrokeTypeOptions = computed(() =>
+    ENGINE_STROKE_TYPE_OPTIONS.map((o) => ({ value: o.value, label: t(`boats.options.strokeType.${o.value}`) }))
+  )
+
   const sailTypeOptions = computed(() =>
     SAIL_TYPE_OPTIONS.map((o) => ({ value: o.value, label: t(`boats.options.sailType.${o.value}`) }))
   )
@@ -41,6 +46,7 @@ export function useBoatOptions() {
     hullMaterialOptions,
     engineKindOptions,
     engineFuelOptions,
+    engineStrokeTypeOptions,
     sailTypeOptions,
     rigTypeOptions,
   }

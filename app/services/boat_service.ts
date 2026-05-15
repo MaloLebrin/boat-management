@@ -40,6 +40,7 @@ export type BoatHullPayload = {
 export type BoatEnginePayload = {
   kind: string
   fuel?: string | null
+  strokeType?: string | null
   brand?: string | null
   model?: string | null
   serialNumber?: string | null
@@ -184,6 +185,7 @@ export default class BoatService {
       boatId: boat.id,
       kind: payload.kind,
       fuel: payload.fuel ?? null,
+      strokeType: payload.strokeType ?? null,
       brand: payload.brand ?? null,
       model: payload.model ?? null,
       serialNumber: payload.serialNumber ?? null,
@@ -204,6 +206,7 @@ export default class BoatService {
 
     engine.kind = payload.kind
     engine.fuel = payload.fuel ?? null
+    engine.strokeType = payload.strokeType ?? null
     engine.brand = payload.brand ?? null
     engine.model = payload.model ?? null
     engine.serialNumber = payload.serialNumber ?? null
@@ -223,6 +226,17 @@ export default class BoatService {
     if (!engine) throw new BoatEquipmentNotFoundError()
 
     await engine.delete()
+  }
+
+  async updateEngineStatus(user: User, boat: Boat, engineId: number, status: string) {
+    assertBoatInUserOrg(user, boat)
+
+    const engine = await BoatEngine.query().where('id', engineId).where('boatId', boat.id).first()
+
+    if (!engine) throw new BoatEquipmentNotFoundError()
+
+    engine.status = status
+    await engine.save()
   }
 
   async createSail(user: User, boat: Boat, payload: BoatSailPayload) {

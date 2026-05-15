@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { router } from '@inertiajs/vue3'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseBreadcrumb from '~/components/base/BaseBreadcrumb.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
+import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseTabs from '~/components/base/BaseTabs.vue'
 import EngineMaintenanceEventModal from '~/components/engine/show/EngineMaintenanceEventModal.vue'
 import EngineShowTabDocuments from '~/components/engine/show/tabs/EngineShowTabDocuments.vue'
@@ -28,6 +30,24 @@ const props = defineProps<{
 type TabKey = 'overview' | 'specs' | 'maintenance' | 'notes' | 'parts' | 'documents'
 const tab = ref<TabKey>('overview')
 const addEventOpen = ref(false)
+
+const statusOptions = computed(() => [
+  { value: 'operational', label: t('equipment.status.operational') },
+  { value: 'in_maintenance', label: t('equipment.status.in_maintenance') },
+  { value: 'out_of_service', label: t('equipment.status.out_of_service') },
+  { value: 'retired', label: t('equipment.status.retired') },
+])
+
+function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutral' {
+  if (status === 'operational') return 'success'
+  if (status === 'in_maintenance') return 'info'
+  if (status === 'out_of_service') return 'warning'
+  return 'neutral'
+}
+
+function changeStatus(newStatus: string) {
+  router.patch(`/boats/${props.boat.id}/engines/${props.engine.id}/status`, { status: newStatus }, { preserveScroll: true })
+}
 
 const openTasks = computed(() => props.maintenanceTasks.filter((t) => t.status === 'open'))
 
@@ -131,6 +151,22 @@ function formatYear(iso: string): string {
             <p v-if="engine.fuel">{{ engine.fuel }}</p>
             <p v-if="engine.powerHp">{{ engine.powerHp }} HP</p>
             <p v-if="engine.manufacturedAt">{{ t('boats.engineShow.installedIn', { year: formatYear(engine.manufacturedAt) }) }}</p>
+          </div>
+          <div class="mt-3">
+            <BaseSelect
+              v-if="canManage"
+              id="engine-status"
+              name="status"
+              :label="t('equipment.status.label')"
+              :options="statusOptions"
+              :model-value="engine.status"
+              :errors="{}"
+              class="w-48"
+              @update:model-value="changeStatus"
+            />
+            <BaseBadge v-else :variant="statusVariant(engine.status)">
+              {{ t(`equipment.status.${engine.status}`) }}
+            </BaseBadge>
           </div>
         </div>
 

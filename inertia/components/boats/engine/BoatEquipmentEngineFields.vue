@@ -10,6 +10,7 @@ export type BoatEquipmentEngineFieldsModel = {
   id?: number
   kind: string
   fuel: string | null
+  strokeType: '2_stroke' | '4_stroke' | null
   brand: string | null
   model: string | null
   serialNumber: string | null
@@ -25,7 +26,7 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
-const { engineKindOptions, engineFuelOptions } = useBoatOptions()
+const { engineKindOptions, engineFuelOptions, engineStrokeTypeOptions } = useBoatOptions()
 
 const statusOptions = computed(() => [
   { value: 'operational', label: t('equipment.status.operational') },
@@ -36,6 +37,7 @@ const statusOptions = computed(() => [
 
 const kind = ref('')
 const fuel = ref('')
+const strokeType = ref('')
 const brand = ref('')
 const model = ref('')
 const serialNumber = ref('')
@@ -48,6 +50,7 @@ function syncFromProps() {
   const e = props.engine
   kind.value = e?.kind ?? ENGINE_KIND_OPTIONS[0]?.value ?? ''
   fuel.value = e?.fuel ?? ''
+  strokeType.value = e?.strokeType ?? ''
   brand.value = e?.brand ?? ''
   model.value = e?.model ?? ''
   serialNumber.value = e?.serialNumber ?? ''
@@ -83,6 +86,17 @@ watch(
       :allow-empty="true"
       :options="engineFuelOptions"
       v-model="fuel"
+      :errors="errors"
+    />
+
+    <BaseSelect
+      id="strokeType"
+      name="strokeType"
+      :label="t('boats.engines.fields.strokeType')"
+      placeholder="—"
+      :allow-empty="true"
+      :options="engineStrokeTypeOptions"
+      v-model="strokeType"
       :errors="errors"
     />
 
