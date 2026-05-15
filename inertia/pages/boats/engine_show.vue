@@ -197,7 +197,8 @@ function formatYear(iso: string): string {
       />
     </header>
 
-    <div class="mt-8">
+    <Transition name="tab" mode="out-in">
+      <div :key="tab" class="mt-8">
       <EngineShowTabOverview
         v-if="tab === 'overview'"
         :engine="engine"
@@ -230,7 +231,8 @@ function formatYear(iso: string): string {
       <EngineShowTabNotes v-else-if="tab === 'notes'" />
       <EngineShowTabParts v-else-if="tab === 'parts'" />
       <EngineShowTabDocuments v-else-if="tab === 'documents'" />
-    </div>
+      </div>
+    </Transition>
 
     <EngineMaintenanceEventModal
       v-if="canManage"

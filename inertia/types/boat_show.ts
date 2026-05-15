@@ -11,6 +11,7 @@ export type BoatShowEngine = {
   manufacturedAt: string | null
   powerHp: number | null
   hours: number | null
+  installHours: number | null
   status: 'operational' | 'in_maintenance' | 'out_of_service' | 'retired'
 }
 

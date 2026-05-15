@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { router, usePage } from '@inertiajs/vue3'
 import { computed, ref, watch } from 'vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseBreadcrumb from '~/components/base/BaseBreadcrumb.vue'
@@ -27,7 +26,6 @@ const props = defineProps<{
 
 type TabKey = 'overview' | 'specs' | 'equipment' | 'history' | 'tasks' | 'documents'
 
-const page = usePage()
 const urlParams = new URLSearchParams(window.location.search)
 const initialTab = (urlParams.get('tab') as TabKey) || 'overview'
 
@@ -77,7 +75,8 @@ function goToTab(key: TabKey | string) {
 
 <template>
   <div class="w-full max-w-7xl px-6 py-10 sm:px-8">
-    <BaseBreadcrumb :items="[{ label: t('boats.show.breadcrumbFleet'), href: '/boats' }, { label: t('nav.boats') }, { label: boat.name }]" />
+    <BaseBreadcrumb
+      :items="[{ label: t('boats.show.breadcrumbFleet'), href: '/boats' }, { label: t('nav.boats') }, { label: boat.name }]" />
 
     <!-- Header -->
     <header class="space-y-6">
@@ -117,40 +116,23 @@ function goToTab(key: TabKey | string) {
       <BaseTabs v-model="tab" :tabs="tabs" />
     </header>
 
-    <div class="mt-8">
-      <BoatShowTabOverview
-        v-if="tab === 'overview'"
-        :boat="boat"
-        :maintenance-tasks="maintenanceTasks"
-        :maintenance-events="maintenanceEvents"
-        @go-to-tab="goToTab"
-      />
+    <Transition name="tab" mode="out-in">
+      <div :key="tab" class="mt-8">
+        <BoatShowTabOverview v-if="tab === 'overview'" :boat="boat" :maintenance-tasks="maintenanceTasks"
+          :maintenance-events="maintenanceEvents" @go-to-tab="goToTab" />
 
-      <BoatShowTabSpecs v-else-if="tab === 'specs'" :boat="boat" />
+        <BoatShowTabSpecs v-else-if="tab === 'specs'" :boat="boat" />
 
-      <BoatShowTabEquipment
-        v-else-if="tab === 'equipment'"
-        :boat="boat"
-        :can-manage-equipment="canManageEquipment"
-      />
+        <BoatShowTabEquipment v-else-if="tab === 'equipment'" :boat="boat" :can-manage-equipment="canManageEquipment" />
 
-      <BoatShowTabHistory
-        v-else-if="tab === 'history'"
-        :boat="boat"
-        :maintenance-events="maintenanceEvents"
-        :can-manage-maintenance="canManageMaintenance"
-        :create-event-nonce="createEventNonce"
-      />
+        <BoatShowTabHistory v-else-if="tab === 'history'" :boat="boat" :maintenance-events="maintenanceEvents"
+          :can-manage-maintenance="canManageMaintenance" :create-event-nonce="createEventNonce" />
 
-      <BoatShowTabTasks
-        v-else-if="tab === 'tasks'"
-        :boat="boat"
-        :maintenance-tasks="maintenanceTasks"
-        :can-manage-maintenance="canManageMaintenance"
-        :create-task-nonce="createTaskNonce"
-      />
+        <BoatShowTabTasks v-else-if="tab === 'tasks'" :boat="boat" :maintenance-tasks="maintenanceTasks"
+          :can-manage-maintenance="canManageMaintenance" :create-task-nonce="createTaskNonce" />
 
-      <BoatShowTabDocuments v-else-if="tab === 'documents'" :boat="boat" />
-    </div>
+        <BoatShowTabDocuments v-else-if="tab === 'documents'" :boat="boat" />
+      </div>
+    </Transition>
   </div>
 </template>

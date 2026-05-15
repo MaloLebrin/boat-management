@@ -342,7 +342,8 @@
         "manufacturedAt": "Date d'installation",
         "powerHp": "Puissance (ch)",
         "hours": "Heures",
-        "strokeType": "Cycle moteur"
+        "strokeType": "Cycle moteur",
+        "installHours": "Heures à l'installation"
       },
       "modal": {
         "title": "Ajouter un moteur",

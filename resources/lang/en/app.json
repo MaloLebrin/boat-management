@@ -342,7 +342,8 @@
         "manufacturedAt": "Manufacturing date",
         "powerHp": "Power (hp)",
         "hours": "Hours",
-        "strokeType": "Engine cycle"
+        "strokeType": "Engine cycle",
+        "installHours": "Hours at installation"
       },
       "modal": {
         "title": "Add engine",

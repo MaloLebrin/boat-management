@@ -20,10 +20,10 @@ export class BoatEngineSchema extends BaseModel {
   declare fuel: string | null
   @column()
   declare hours: number | null
-  @column()
-  declare installHours: number | null
   @column({ isPrimary: true })
   declare id: number
+  @column()
+  declare installHours: number | null
   @column()
   declare kind: string
   @column.date()

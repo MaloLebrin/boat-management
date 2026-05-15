@@ -24,10 +24,11 @@ function maintenanceLabel(b: BoatListItem) {
 </script>
 
 <template>
-  <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+  <TransitionGroup name="list" tag="div" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
     <a
-      v-for="boat in boats"
+      v-for="(boat, i) in boats"
       :key="boat.id"
+      :style="{ '--i': i }"
       :href="`/boats/${boat.id}`"
       class="block focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/30 rounded-(--radius-card)"
     >
@@ -62,6 +63,6 @@ function maintenanceLabel(b: BoatListItem) {
         </div>
       </BaseCard>
     </a>
-  </div>
+  </TransitionGroup>
 </template>
 

@@ -60,14 +60,16 @@ onBeforeUnmount(() => {
       </svg>
     </button>
 
-    <div
-      v-if="open"
-      class="absolute top-full z-20 mt-2 min-w-56 rounded-(--radius-card) border border-border bg-surface-elevated p-1 shadow-(--shadow-md)"
-      :class="align === 'right' ? 'right-0' : 'left-0'"
-      role="menu"
-    >
-      <slot :close="close" />
-    </div>
+    <Transition name="dropdown">
+      <div
+        v-if="open"
+        class="absolute top-full z-20 mt-2 min-w-56 rounded-(--radius-card) border border-border bg-surface-elevated p-1 shadow-(--shadow-md)"
+        :class="align === 'right' ? 'right-0' : 'left-0'"
+        role="menu"
+      >
+        <slot :close="close" />
+      </div>
+    </Transition>
   </div>
 </template>
 

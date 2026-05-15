@@ -16,11 +16,7 @@ const isAddModalOpen = ref(false)
 </script>
 
 <template>
-  <BoatEquipmentAddModal
-    v-model:open="isAddModalOpen"
-    :boat="boat"
-    :can-manage-equipment="canManageEquipment"
-  />
+  <BoatEquipmentAddModal v-model:open="isAddModalOpen" :boat="boat" :can-manage-equipment="canManageEquipment" />
 
   <div class="space-y-6">
     <!-- Header row with filter pills and add button -->
@@ -32,7 +28,7 @@ const isAddModalOpen = ref(false)
           { key: 'sail', label: 'Voiles' },
           { key: 'rig', label: 'Greement' },
         ]" :key="filter.key" type="button" :class="[
-          'rounded-full px-3 py-1.5 text-sm font-medium transition-colors',
+          'rounded-full px-3 py-1.5 text-sm font-medium transition-colors cursor-pointer',
           equipmentFilter === filter.key
             ? 'bg-brand text-white'
             : 'bg-surface-muted text-fg-muted hover:bg-surface-elevated hover:text-fg',
@@ -40,12 +36,9 @@ const isAddModalOpen = ref(false)
           {{ filter.label }}
         </button>
       </div>
-      <button
-        v-if="canManageEquipment"
-        type="button"
+      <button v-if="canManageEquipment" type="button"
         class="rounded-lg border border-brand px-3 py-1.5 text-sm font-medium text-brand hover:bg-brand hover:text-white transition-colors"
-        @click="isAddModalOpen = true"
-      >
+        @click="isAddModalOpen = true">
         + Ajouter un équipement
       </button>
     </div>

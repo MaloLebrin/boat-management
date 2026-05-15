@@ -17,6 +17,7 @@ export type BoatEquipmentEngineFieldsModel = {
   manufacturedAt: string | null
   powerHp: number | null
   hours: number | null
+  installHours: number | null
   status: 'operational' | 'in_maintenance' | 'out_of_service' | 'retired'
 }
 
@@ -38,6 +39,7 @@ const statusOptions = computed(() => [
 const kind = ref('')
 const fuel = ref('')
 const strokeType = ref('')
+const installHours = ref('')
 const brand = ref('')
 const model = ref('')
 const serialNumber = ref('')
@@ -51,6 +53,7 @@ function syncFromProps() {
   kind.value = e?.kind ?? ENGINE_KIND_OPTIONS[0]?.value ?? ''
   fuel.value = e?.fuel ?? ''
   strokeType.value = e?.strokeType ?? ''
+  installHours.value = e?.installHours === null || e?.installHours === undefined ? '' : String(e.installHours)
   brand.value = e?.brand ?? ''
   model.value = e?.model ?? ''
   serialNumber.value = e?.serialNumber ?? ''
@@ -134,6 +137,15 @@ watch(
       type="number"
       inputmode="numeric"
       v-model="hours"
+      :errors="errors"
+    />
+    <BaseInput
+      id="installHours"
+      name="installHours"
+      :label="t('boats.engines.fields.installHours')"
+      type="number"
+      inputmode="numeric"
+      v-model="installHours"
       :errors="errors"
     />
 

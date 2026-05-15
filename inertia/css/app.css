@@ -250,6 +250,64 @@ body {
   to   { transform: translateX(-50%); }
 }
 
+/* ── App-wide motion primitives ───────────────────────────────── */
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.94) translateY(12px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes overlayIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes fadeUpList {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideFromLeft {
+  from { opacity: 0; transform: translateX(-100%); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ── Vue Transition classes ───────────────────────────────────── */
+
+/* Page transitions (Inertia navigation) */
+.page-enter-active { animation: fadeUp var(--motion-normal) var(--ease-premium) both; }
+.page-leave-active { animation: fadeIn var(--motion-fast) var(--ease-premium) reverse both; }
+
+/* Modal overlay */
+.modal-overlay-enter-active { animation: overlayIn var(--motion-fast) ease both; }
+.modal-overlay-leave-active { animation: overlayIn var(--motion-fast) ease reverse both; }
+
+/* Modal panel */
+.modal-panel-enter-active { animation: modalIn var(--motion-normal) var(--ease-premium) both; }
+.modal-panel-leave-active { animation: modalIn var(--motion-fast) var(--ease-premium) reverse both; }
+
+/* Dropdown */
+.dropdown-enter-active { animation: slideDown var(--motion-fast) var(--ease-premium) both; }
+.dropdown-leave-active { animation: slideDown var(--motion-fast) var(--ease-premium) reverse both; }
+
+/* Tab content crossfade */
+.tab-enter-active { animation: fadeIn var(--motion-fast) var(--ease-premium) both; }
+.tab-leave-active { animation: fadeIn var(--motion-fast) var(--ease-premium) reverse both; }
+
+/* List items (TransitionGroup) */
+.list-enter-active {
+  animation: fadeUpList var(--motion-normal) var(--ease-premium) both;
+  animation-delay: calc(var(--i, 0) * 40ms);
+}
+.list-leave-active { animation: fadeUpList var(--motion-fast) var(--ease-premium) reverse both; }
+.list-move         { transition: transform var(--motion-normal) var(--ease-premium); }
+
+/* Mobile drawer */
+.drawer-overlay-enter-active { animation: overlayIn var(--motion-normal) ease both; }
+.drawer-overlay-leave-active { animation: overlayIn var(--motion-fast) ease reverse both; }
+.drawer-panel-enter-active   { animation: slideFromLeft var(--motion-normal) var(--ease-premium) both; }
+.drawer-panel-leave-active   { animation: slideFromLeft var(--motion-fast) var(--ease-premium) reverse both; }
+
 .reveal {
   opacity: 0;
   transform: translateY(20px);

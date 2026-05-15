@@ -86,14 +86,15 @@ function dismissAlert() {
     </div>
 
     <div class="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
-      <BaseStatCard :label="t('dashboard.stats.boats')" :value="String(stats.boats)" tone="info" />
-      <BaseStatCard :label="t('dashboard.stats.engines')" :value="String(stats.engines)" tone="neutral" />
-      <BaseStatCard :label="t('dashboard.stats.sails')" :value="String(stats.sails)" tone="neutral" />
-      <BaseStatCard :label="t('dashboard.stats.rigs')" :value="String(stats.rigs)" tone="neutral" />
+      <BaseStatCard :label="t('dashboard.stats.boats')" :value="String(stats.boats)" tone="info" :style="{ animation: 'fadeUp var(--motion-normal) var(--ease-premium) both', animationDelay: '0ms' }" />
+      <BaseStatCard :label="t('dashboard.stats.engines')" :value="String(stats.engines)" tone="neutral" :style="{ animation: 'fadeUp var(--motion-normal) var(--ease-premium) both', animationDelay: '60ms' }" />
+      <BaseStatCard :label="t('dashboard.stats.sails')" :value="String(stats.sails)" tone="neutral" :style="{ animation: 'fadeUp var(--motion-normal) var(--ease-premium) both', animationDelay: '120ms' }" />
+      <BaseStatCard :label="t('dashboard.stats.rigs')" :value="String(stats.rigs)" tone="neutral" :style="{ animation: 'fadeUp var(--motion-normal) var(--ease-premium) both', animationDelay: '180ms' }" />
       <BaseStatCard
         :label="t('dashboard.stats.urgentMaintenance')"
         :value="String(stats.urgentMaintenance)"
         :tone="stats.urgentMaintenance ? 'warning' : 'success'"
+        :style="{ animation: 'fadeUp var(--motion-normal) var(--ease-premium) both', animationDelay: '240ms' }"
       />
     </div>
 

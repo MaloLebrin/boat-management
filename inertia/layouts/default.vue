@@ -238,7 +238,7 @@ onBeforeUnmount(() => {
           </Form>
         </div>
       </div>
-    </div>
+    </Transition>
 
     <Toaster position="top-center" rich-colors />
   </div>

@@ -44,12 +44,15 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeyDown))
 
 <template>
   <Teleport to="body">
-    <div v-if="open" class="fixed inset-0 z-50">
+    <Transition name="modal-overlay">
       <div
-        class="absolute inset-0 bg-abyss-950/30 backdrop-blur-[2px]"
+        v-if="open"
+        class="fixed inset-0 z-50 bg-abyss-950/30 backdrop-blur-[2px]"
         @click="close"
       />
-      <div class="absolute inset-0 flex items-center justify-center p-6">
+    </Transition>
+    <Transition name="modal-panel">
+      <div v-if="open" class="fixed inset-0 z-51 flex items-center justify-center p-6">
         <div
           :class="[
             'w-full rounded-(--radius-card) border border-border bg-surface-elevated shadow-(--shadow-lg)',
@@ -80,7 +83,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeyDown))
           </div>
         </div>
       </div>
-    </div>
+    </Transition>
   </Teleport>
 </template>
 

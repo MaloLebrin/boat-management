@@ -45,7 +45,7 @@ function formatYear(iso: string): string {
           </div>
           <div>
             <dt class="text-fg-muted">{{ t('boats.engineShow.specs.installHours') }}</dt>
-            <dd class="font-medium text-fg">0</dd>
+            <dd class="font-medium text-fg">{{ engine.installHours ?? '-' }}</dd>
           </div>
         </dl>
       </BaseCard>
