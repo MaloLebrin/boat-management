@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { DocumentArrowUpIcon } from '@heroicons/vue/24/outline'
+import { useForm } from '@inertiajs/vue3'
 import { ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseModal from '~/components/base/BaseModal.vue'
+import { useT } from '~/composables/useT'
 import type { BoatShowDetail } from '~/types/boat_show'
-
-type DocCategory = 'reglementaire' | 'assurance' | 'constructeur' | 'divers'
 
 const props = defineProps<{
   boat: BoatShowDetail
@@ -16,15 +16,22 @@ const emit = defineEmits<{
   (e: 'update:open', value: boolean): void
 }>()
 
-const selectedCategory = ref<DocCategory>('reglementaire')
+const { t } = useT()
+const fileInput = ref<HTMLInputElement>()
 const isDragging = ref(false)
 
-const categories: Array<{ key: DocCategory; label: string }> = [
-  { key: 'reglementaire', label: 'Réglementaire' },
-  { key: 'assurance', label: 'Assurance' },
-  { key: 'constructeur', label: 'Constructeur' },
-  { key: 'divers', label: 'Divers' },
-]
+const form = useForm({ file: null as File | null, caption: '' })
+
+function formatBytes(bytes: number): string {
+  if (bytes < 1024) return `${bytes} o`
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} Ko`
+  return `${(bytes / (1024 * 1024)).toFixed(1)} Mo`
+}
+
+function onFileChange(e: Event) {
+  const input = e.target as HTMLInputElement
+  form.file = input.files?.[0] ?? null
+}
 
 function onDragOver(e: DragEvent) {
   e.preventDefault()
@@ -38,64 +45,91 @@ function onDragLeave() {
 function onDrop(e: DragEvent) {
   e.preventDefault()
   isDragging.value = false
+  form.file = e.dataTransfer?.files?.[0] ?? null
 }
 
 function close() {
+  form.reset()
   emit('update:open', false)
+}
+
+function submit() {
+  if (!form.file) return
+  form.post(`/boats/${props.boat.id}/documents`, {
+    forceFormData: true,
+    onSuccess: () => close(),
+  })
 }
 </script>
 
 <template>
-  <BaseModal :open="open" title="Ajouter un document" :subtitle="`${boat.name} · Stocké chiffré`" close-label="Annuler"
-    size="xl" @update:open="close">
+  <BaseModal
+    :open="open"
+    :title="t('boats.show.mediaUpload.modalTitle')"
+    :subtitle="t('boats.show.mediaUpload.modalSubtitle', { name: boat.name })"
+    close-label="Annuler"
+    size="xl"
+    @update:open="close"
+  >
     <div class="space-y-5">
-      <!-- Coming soon banner -->
-      <div class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-        Fonctionnalité à venir — la gestion des documents sera bientôt disponible.
-      </div>
-
-      <!-- Category selector -->
-      <div>
-        <p class="mb-2 text-sm font-semibold text-fg">Catégorie</p>
-        <div class="flex flex-wrap gap-2">
-          <button v-for="cat in categories" :key="cat.key" type="button" :class="[
-            'rounded-full px-3 py-1.5 text-sm font-medium transition-colors',
-            selectedCategory === cat.key
-              ? 'bg-brand text-white'
-              : 'bg-surface-muted text-fg-muted hover:bg-surface-elevated hover:text-fg',
-          ]" @click="selectedCategory = cat.key">
-            {{ cat.label }}
-          </button>
-        </div>
-      </div>
+      <input
+        ref="fileInput"
+        type="file"
+        accept=".pdf,.csv,.xlsx,.docx,.doc"
+        class="hidden"
+        @change="onFileChange"
+      />
 
       <!-- Drop zone -->
-      <div :class="[
-        'rounded-lg border-2 border-dashed p-8 text-center transition-colors',
-        isDragging ? 'border-brand bg-brand/5' : 'border-border bg-surface-muted/30',
-      ]" @dragover="onDragOver" @dragleave="onDragLeave" @drop="onDrop">
+      <div
+        :class="[
+          'rounded-lg border-2 border-dashed p-8 text-center transition-colors cursor-pointer',
+          isDragging ? 'border-brand bg-brand/5' : 'border-border bg-surface-muted/30 hover:border-brand/50',
+        ]"
+        @click="fileInput?.click()"
+        @dragover="onDragOver"
+        @dragleave="onDragLeave"
+        @drop="onDrop"
+      >
         <DocumentArrowUpIcon class="mx-auto h-10 w-10 text-fg-subtle" />
-        <p class="mt-3 font-semibold text-fg">Glisser les fichiers ici</p>
-        <p class="mt-1 text-sm text-fg-muted">PDF, JPG, PNG, HEIC · max 25 Mo par fichier</p>
-        <BaseButton variant="secondary" size="sm" class="mt-4" disabled>
-          Parcourir…
+        <p class="mt-3 font-semibold text-fg">{{ t('boats.show.mediaUpload.dropzone') }}</p>
+        <p class="mt-1 text-sm text-fg-muted">{{ t('boats.show.mediaUpload.documentFormats') }}</p>
+        <BaseButton variant="secondary" size="sm" class="mt-4" type="button" @click.stop="fileInput?.click()">
+          {{ t('boats.show.mediaUpload.browse') }}
         </BaseButton>
       </div>
 
-      <!-- Link to entity -->
+      <!-- Selected file -->
+      <div v-if="form.file" class="rounded-lg border border-border bg-surface-elevated px-4 py-3 text-sm">
+        <p class="font-semibold text-fg">{{ t('boats.show.mediaUpload.selectedFile') }}</p>
+        <p class="mt-1 text-fg-muted">{{ form.file.name }} · {{ formatBytes(form.file.size) }}</p>
+      </div>
+      <p v-if="form.errors.file" class="text-sm text-danger">{{ form.errors.file }}</p>
+
+      <!-- Caption -->
       <div>
-        <p class="mb-2 text-sm font-semibold text-fg">Lier à</p>
-        <div class="flex flex-wrap gap-2">
-          <button v-for="link in ['Aucun', 'Un équipement', 'Un événement', 'Une tâche']" :key="link" type="button"
-            class="rounded-full bg-surface-muted px-3 py-1.5 text-sm font-medium text-fg-muted" disabled>
-            {{ link }}
-          </button>
-        </div>
+        <label class="block text-sm font-semibold text-fg mb-1">
+          {{ t('boats.show.mediaUpload.caption') }}
+        </label>
+        <input
+          v-model="form.caption"
+          type="text"
+          maxlength="255"
+          class="h-10 w-full rounded-(--radius-control) border border-border bg-surface-elevated px-3 text-sm text-fg shadow-sm placeholder:text-fg-subtle focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+        />
       </div>
 
       <div class="flex items-center justify-end gap-2 pt-2">
-        <BaseButton variant="ghost" type="button" @click="close">Annuler</BaseButton>
-        <BaseButton disabled>Téléverser</BaseButton>
+        <BaseButton variant="ghost" type="button" @click="close">
+          {{ t('common.cancel') }}
+        </BaseButton>
+        <BaseButton
+          type="button"
+          :disabled="!form.file || form.processing"
+          @click="submit"
+        >
+          {{ form.processing ? t('boats.show.mediaUpload.uploading') : t('boats.show.mediaUpload.upload') }}
+        </BaseButton>
       </div>
     </div>
   </BaseModal>

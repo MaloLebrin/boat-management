@@ -48,5 +48,9 @@ router
         'destroy',
       ])
       .as('boats.maintenanceTasks.destroy')
+
+    router.post('boats/:boatId/photos', [controllers.BoatMedia, 'storePhoto'])
+    router.post('boats/:boatId/documents', [controllers.BoatMedia, 'storeDocument'])
+    router.delete('boats/:boatId/media/:mediaId', [controllers.BoatMedia, 'destroy'])
   })
   .use(middleware.auth())

@@ -39,6 +39,11 @@ export interface ApiDefinition {
     store: typeof routes['boat_maintenances.store']
     destroy: typeof routes['boat_maintenances.destroy']
   }
+  boatMedia: {
+    storePhoto: typeof routes['boat_media.store_photo']
+    storeDocument: typeof routes['boat_media.store_document']
+    destroy: typeof routes['boat_media.destroy']
+  }
   newAccount: {
     create: typeof routes['new_account.create']
     store: typeof routes['new_account.store']

@@ -2,6 +2,7 @@ import BoatMaintenanceService from '#services/boat_maintenance_service'
 import BoatMaintenanceTaskService from '#services/boat_maintenance_task_service'
 import BoatListService from '#services/boat_list_service'
 import BoatService, { BoatNotFoundError } from '#services/boat_service'
+import MediaService from '#services/media_service'
 import { createBoatValidator, updateBoatValidator } from '#validators/boat'
 import type { HttpContext } from '@adonisjs/core/http'
 
@@ -53,6 +54,8 @@ export default class BoatsController {
       const maintenanceTasks = await taskService.listForBoat(user, boat)
       const canManageMaintenance = await bouncer.allows('boatUpdate', boat)
       const canManageEquipment = canManageMaintenance
+      const mediaService = new MediaService()
+      const boatMedia = await mediaService.listForEntity('boat', boat.id)
       return inertia.render('boats/show', {
         boat: {
           id: boat.id,
@@ -101,6 +104,19 @@ export default class BoatsController {
                 status: boat.rig.status,
               }
             : null,
+          media: boatMedia.map((m) => ({
+            id: m.id,
+            kind: m.kind as 'photo' | 'document',
+            secureUrl: m.secureUrl,
+            cloudinaryPublicId: m.cloudinaryPublicId,
+            originalFilename: m.originalFilename,
+            format: m.format,
+            bytes: m.bytes,
+            width: m.width,
+            height: m.height,
+            position: m.position,
+            caption: m.caption,
+          })),
         },
         maintenanceEvents: maintenanceEvents.map((ev) => ({
           id: ev.id,

@@ -331,6 +331,42 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_maintenance_tasks_controller').default['destroy']>>>
     }
   }
+  'boat_media.store_photo': {
+    methods: ["POST"]
+    pattern: '/boats/:boatId/photos'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/media').storeBoatPhotoValidator)>>
+      paramsTuple: [ParamValue]
+      params: { boatId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/media').storeBoatPhotoValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_media_controller').default['storePhoto']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_media_controller').default['storePhoto']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'boat_media.store_document': {
+    methods: ["POST"]
+    pattern: '/boats/:boatId/documents'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/media').storeBoatDocumentValidator)>>
+      paramsTuple: [ParamValue]
+      params: { boatId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/media').storeBoatDocumentValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_media_controller').default['storeDocument']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_media_controller').default['storeDocument']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'boat_media.destroy': {
+    methods: ["DELETE"]
+    pattern: '/boats/:boatId/media/:mediaId'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; mediaId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_media_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_media_controller').default['destroy']>>>
+    }
+  }
   'new_account.create': {
     methods: ["GET","HEAD"]
     pattern: '/signup'

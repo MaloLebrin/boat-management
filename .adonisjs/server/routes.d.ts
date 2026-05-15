@@ -31,6 +31,9 @@ export type ScannedRoutes = {
     'boats.maintenanceTasks.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'boats.maintenanceTasks.done': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'taskId': ParamValue} }
     'boats.maintenanceTasks.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'taskId': ParamValue} }
+    'boat_media.store_photo': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
+    'boat_media.store_document': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
+    'boat_media.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'mediaId': ParamValue} }
     'new_account.create': { paramsTuple?: []; params?: {} }
     'new_account.store': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }
@@ -109,6 +112,8 @@ export type ScannedRoutes = {
     'boat_equipment.store_sail': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'boat_maintenances.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'boats.maintenanceTasks.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
+    'boat_media.store_photo': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
+    'boat_media.store_document': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'new_account.store': { paramsTuple?: []; params?: {} }
     'session.store': { paramsTuple?: []; params?: {} }
     'session.destroy': { paramsTuple?: []; params?: {} }
@@ -129,6 +134,7 @@ export type ScannedRoutes = {
     'boat_equipment.destroy_rig': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'boat_maintenances.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'eventId': ParamValue} }
     'boats.maintenanceTasks.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'taskId': ParamValue} }
+    'boat_media.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'mediaId': ParamValue} }
   }
   PATCH: {
     'boat_equipment.update_engine_status': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }

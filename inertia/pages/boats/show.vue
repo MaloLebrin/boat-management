@@ -119,7 +119,7 @@ function goToTab(key: TabKey | string) {
     <Transition name="tab" mode="out-in">
       <div :key="tab" class="mt-8">
         <BoatShowTabOverview v-if="tab === 'overview'" :boat="boat" :maintenance-tasks="maintenanceTasks"
-          :maintenance-events="maintenanceEvents" @go-to-tab="goToTab" />
+          :maintenance-events="maintenanceEvents" :can-manage="canManageEquipment" @go-to-tab="goToTab" />
 
         <BoatShowTabSpecs v-else-if="tab === 'specs'" :boat="boat" />
 
@@ -131,7 +131,7 @@ function goToTab(key: TabKey | string) {
         <BoatShowTabTasks v-else-if="tab === 'tasks'" :boat="boat" :maintenance-tasks="maintenanceTasks"
           :can-manage-maintenance="canManageMaintenance" :create-task-nonce="createTaskNonce" />
 
-        <BoatShowTabDocuments v-else-if="tab === 'documents'" :boat="boat" />
+        <BoatShowTabDocuments v-else-if="tab === 'documents'" :boat="boat" :can-manage="canManageEquipment" />
       </div>
     </Transition>
   </div>

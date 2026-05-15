@@ -42,5 +42,10 @@
   },
   "ai": {
     "messagesRequired": "The messages field is required."
+  },
+  "media": {
+    "photoAdded": "Photo added.",
+    "documentAdded": "Document added.",
+    "deleted": "File deleted."
   }
 }

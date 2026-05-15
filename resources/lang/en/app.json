@@ -458,6 +458,27 @@
         "urgent": "Urgent",
         "upcoming": "Upcoming",
         "ok": "OK"
+      },
+      "mediaUpload": {
+        "addPhoto": "Add a photo",
+        "addDocument": "Add a document",
+        "dropzone": "Drop a file here or click to browse",
+        "browse": "Browse…",
+        "selectedFile": "Selected file",
+        "noFile": "No file selected",
+        "caption": "Caption (optional)",
+        "upload": "Upload",
+        "uploading": "Uploading…",
+        "photos": "Photos",
+        "documents": "Documents",
+        "noPhotos": "No photos yet.",
+        "noDocuments": "No documents yet.",
+        "photoFormats": "JPG, PNG, HEIC, WebP · max 10 MB",
+        "documentFormats": "PDF, XLSX, DOCX, CSV · max 20 MB",
+        "deletePhoto": "Delete photo",
+        "deleteDocument": "Delete document",
+        "modalTitle": "Add a document",
+        "modalSubtitle": "{name} · Stored on Cloudinary"
       }
     },
     "list": {

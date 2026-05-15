@@ -5,12 +5,14 @@ import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import { subjectLabel } from '~/components/boats/maintenance/utils'
+import BoatPhotoGallery from '~/components/boats/show/BoatPhotoGallery.vue'
 import type { BoatShowDetail, MaintenanceEventRow, MaintenanceTaskRow } from '~/types/boat_show'
 
 const props = defineProps<{
   boat: BoatShowDetail
   maintenanceTasks: MaintenanceTaskRow[]
   maintenanceEvents: MaintenanceEventRow[]
+  canManage: boolean
 }>()
 
 const emit = defineEmits<{
@@ -63,6 +65,9 @@ function formatDate(iso: string | null): string {
   <div class="flex flex-col lg:flex-row gap-6">
     <!-- Left column -->
     <div class="flex-1 space-y-6">
+      <!-- Photo gallery -->
+      <BoatPhotoGallery :boat="boat" :can-manage="canManage" />
+
       <!-- Overdue alert -->
       <div v-if="overdueTasks.length > 0" class="rounded-lg border border-coral-300 bg-coral-50 p-4">
         <div class="flex items-start gap-3">

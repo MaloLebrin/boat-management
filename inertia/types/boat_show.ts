@@ -1,5 +1,20 @@
 /** Inertia props shapes for boat detail / maintenance UI. */
 
+export type MediaRow = {
+  id: number
+  kind: 'photo' | 'document'
+  secureUrl: string
+  cloudinaryPublicId: string
+  originalFilename: string
+  format: string
+  bytes: number
+  width: number | null
+  height: number | null
+  position: number
+  caption: string | null
+}
+
+
 export type BoatShowEngine = {
   id: number
   kind: string
@@ -51,6 +66,7 @@ export type BoatShowDetail = {
   engines: BoatShowEngine[]
   sails: BoatShowSail[]
   rig: BoatShowRig | null
+  media: MediaRow[]
 }
 
 export type MaintenancePartRow = {

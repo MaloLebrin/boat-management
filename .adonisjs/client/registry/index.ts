@@ -168,6 +168,24 @@ const routes = {
     tokens: [{"old":"/boats/:boatId/maintenance-tasks/:taskId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/maintenance-tasks/:taskId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/maintenance-tasks/:taskId","type":0,"val":"maintenance-tasks","end":""},{"old":"/boats/:boatId/maintenance-tasks/:taskId","type":1,"val":"taskId","end":""}],
     types: placeholder as Registry['boats.maintenanceTasks.destroy']['types'],
   },
+  'boat_media.store_photo': {
+    methods: ["POST"],
+    pattern: '/boats/:boatId/photos',
+    tokens: [{"old":"/boats/:boatId/photos","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/photos","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/photos","type":0,"val":"photos","end":""}],
+    types: placeholder as Registry['boat_media.store_photo']['types'],
+  },
+  'boat_media.store_document': {
+    methods: ["POST"],
+    pattern: '/boats/:boatId/documents',
+    tokens: [{"old":"/boats/:boatId/documents","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/documents","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/documents","type":0,"val":"documents","end":""}],
+    types: placeholder as Registry['boat_media.store_document']['types'],
+  },
+  'boat_media.destroy': {
+    methods: ["DELETE"],
+    pattern: '/boats/:boatId/media/:mediaId',
+    tokens: [{"old":"/boats/:boatId/media/:mediaId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/media/:mediaId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/media/:mediaId","type":0,"val":"media","end":""},{"old":"/boats/:boatId/media/:mediaId","type":1,"val":"mediaId","end":""}],
+    types: placeholder as Registry['boat_media.destroy']['types'],
+  },
   'new_account.create': {
     methods: ["GET","HEAD"],
     pattern: '/signup',
