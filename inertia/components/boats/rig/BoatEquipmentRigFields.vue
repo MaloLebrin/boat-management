@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import { useT } from '~/composables/useT'
@@ -11,6 +11,7 @@ export type BoatEquipmentRigFieldsModel = {
   manufacturedAt: string | null
   mastCount: number | null
   spreaders: number | null
+  status: 'operational' | 'in_maintenance' | 'out_of_service' | 'retired'
 }
 
 const props = defineProps<{
@@ -21,10 +22,18 @@ const props = defineProps<{
 const { t } = useT()
 const { rigTypeOptions } = useBoatOptions()
 
+const statusOptions = computed(() => [
+  { value: 'operational', label: t('equipment.status.operational') },
+  { value: 'in_maintenance', label: t('equipment.status.in_maintenance') },
+  { value: 'out_of_service', label: t('equipment.status.out_of_service') },
+  { value: 'retired', label: t('equipment.status.retired') },
+])
+
 const rigType = ref('')
 const manufacturedAt = ref('')
 const mastCount = ref('')
 const spreaders = ref('')
+const status = ref('')
 
 function syncFromProps() {
   const r = props.rig
@@ -32,6 +41,7 @@ function syncFromProps() {
   manufacturedAt.value = r?.manufacturedAt ? r.manufacturedAt.slice(0, 10) : ''
   mastCount.value = r?.mastCount === null || r?.mastCount === undefined ? '' : String(r.mastCount)
   spreaders.value = r?.spreaders === null || r?.spreaders === undefined ? '' : String(r.spreaders)
+  status.value = r?.status ?? 'operational'
 }
 
 watch(
@@ -78,6 +88,15 @@ watch(
       type="number"
       inputmode="numeric"
       v-model="spreaders"
+      :errors="errors"
+    />
+
+    <BaseSelect
+      id="status"
+      name="status"
+      :label="t('equipment.status.label')"
+      :options="statusOptions"
+      v-model="status"
       :errors="errors"
     />
   </div>

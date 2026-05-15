@@ -78,6 +78,7 @@ export default class BoatsController {
             manufacturedAt: e.manufacturedAt ? e.manufacturedAt.toISODate() : null,
             powerHp: e.powerHp,
             hours: e.hours,
+            status: e.status,
           })),
           sails: boat.sails.map((s) => ({
             id: s.id,
@@ -86,6 +87,7 @@ export default class BoatsController {
             areaM2: s.areaM2,
             material: s.material,
             reefPoints: s.reefPoints,
+            status: s.status,
           })),
           rig: boat.rig
             ? {
@@ -96,6 +98,7 @@ export default class BoatsController {
                   : null,
                 mastCount: boat.rig.mastCount,
                 spreaders: boat.rig.spreaders,
+                status: boat.rig.status,
               }
             : null,
         },

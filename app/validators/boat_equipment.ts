@@ -2,6 +2,9 @@ import vine from '@vinejs/vine'
 import { engineFuels, engineKinds, rigTypes, sailTypes } from '#validators/boat'
 import type { BoatEnginePayload, BoatRigPayload, BoatSailPayload } from '#services/boat_service'
 
+export const equipmentStatuses = ['operational', 'in_maintenance', 'out_of_service', 'retired'] as const
+export type EquipmentStatus = (typeof equipmentStatuses)[number]
+
 const fuelChoices = [...engineFuels, '', '__none__'] as string[]
 
 const enginePayload = vine.object({
@@ -13,6 +16,7 @@ const enginePayload = vine.object({
   manufacturedAt: vine.string().trim().optional(),
   powerHp: vine.string().trim().optional(),
   hours: vine.string().trim().optional(),
+  status: vine.enum(equipmentStatuses).optional(),
 })
 
 export const storeBoatEngineValidator = vine.compile(enginePayload)
@@ -28,6 +32,7 @@ export type BoatEngineFormBody = {
   manufacturedAt?: string
   powerHp?: string
   hours?: string
+  status?: string
 }
 
 const sailPayload = vine.object({
@@ -36,6 +41,7 @@ const sailPayload = vine.object({
   areaM2: vine.string().trim().optional(),
   material: vine.string().trim().maxLength(120).optional(),
   reefPoints: vine.string().trim().optional(),
+  status: vine.enum(equipmentStatuses).optional(),
 })
 
 export const storeBoatSailValidator = vine.compile(sailPayload)
@@ -48,6 +54,7 @@ export type BoatSailFormBody = {
   areaM2?: string
   material?: string
   reefPoints?: string
+  status?: string
 }
 
 const rigPayload = vine.object({
@@ -55,6 +62,7 @@ const rigPayload = vine.object({
   manufacturedAt: vine.string().trim().optional(),
   mastCount: vine.string().trim().optional(),
   spreaders: vine.string().trim().optional(),
+  status: vine.enum(equipmentStatuses).optional(),
 })
 
 export const upsertBoatRigValidator = vine.compile(rigPayload)
@@ -64,6 +72,7 @@ export type BoatRigFormBody = {
   manufacturedAt?: string
   mastCount?: string
   spreaders?: string
+  status?: string
 }
 
 function parseOptionalPositiveFloat(raw: string | undefined): number | null {
@@ -100,6 +109,7 @@ export function equipmentBodyToEnginePayload(body: BoatEngineFormBody): BoatEngi
     manufacturedAt: emptyToNull(body.manufacturedAt),
     powerHp: parseOptionalPositiveFloat(body.powerHp),
     hours: parseOptionalNonNegativeInt(body.hours),
+    status: (body.status ?? 'operational') as EquipmentStatus,
   }
 }
 
@@ -110,6 +120,7 @@ export function equipmentBodyToSailPayload(body: BoatSailFormBody): BoatSailPayl
     areaM2: parseOptionalPositiveFloat(body.areaM2),
     material: emptyToNull(body.material),
     reefPoints: parseOptionalNonNegativeInt(body.reefPoints),
+    status: (body.status ?? 'operational') as EquipmentStatus,
   }
 }
 
@@ -119,5 +130,6 @@ export function equipmentBodyToRigPayload(body: BoatRigFormBody): BoatRigPayload
     manufacturedAt: emptyToNull(body.manufacturedAt),
     mastCount: parseOptionalNonNegativeInt(body.mastCount),
     spreaders: parseOptionalNonNegativeInt(body.spreaders),
+    status: (body.status ?? 'operational') as EquipmentStatus,
   }
 }

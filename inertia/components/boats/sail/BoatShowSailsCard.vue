@@ -24,6 +24,13 @@ function performedDisplay(iso: string | null) {
   const d = iso.slice(0, 10)
   return d || iso
 }
+
+function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutral' {
+  if (status === 'operational') return 'success'
+  if (status === 'in_maintenance') return 'info'
+  if (status === 'out_of_service') return 'warning'
+  return 'neutral'
+}
 </script>
 
 <template>
@@ -56,6 +63,9 @@ function performedDisplay(iso: string | null) {
               <p class="truncate text-sm font-semibold text-fg">{{ s.sailType }}</p>
               <BaseBadge v-if="s.material" variant="neutral">
                 {{ s.material }}
+              </BaseBadge>
+              <BaseBadge :variant="statusVariant(s.status)">
+                {{ t(`equipment.status.${s.status}`) }}
               </BaseBadge>
             </div>
 

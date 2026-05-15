@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Form } from '@adonisjs/inertia/vue'
 import { PencilSquareIcon, PlusCircleIcon, TrashIcon } from '@heroicons/vue/24/outline'
+import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import type { BoatShowRig } from '~/types/boat_show'
@@ -13,6 +14,13 @@ defineProps<{
 }>()
 
 const { t } = useT()
+
+function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutral' {
+  if (status === 'operational') return 'success'
+  if (status === 'in_maintenance') return 'info'
+  if (status === 'out_of_service') return 'warning'
+  return 'neutral'
+}
 </script>
 
 <template>
@@ -40,23 +48,30 @@ const { t } = useT()
     </template>
 
     <div v-if="!rig" class="text-sm text-fg-muted">{{ t('boats.rig.noRig') }}</div>
-    <dl v-else class="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
-      <div>
-        <dt class="text-fg-muted">{{ t('boats.rig.fields.rigType') }}</dt>
-        <dd class="font-semibold text-fg">{{ rig.rigType }}</dd>
+    <template v-else>
+      <div class="mb-3">
+        <BaseBadge :variant="statusVariant(rig.status)">
+          {{ t(`equipment.status.${rig.status}`) }}
+        </BaseBadge>
       </div>
-      <div>
-        <dt class="text-fg-muted">{{ t('boats.rig.fields.mastCount') }}</dt>
-        <dd class="font-semibold text-fg">{{ rig.mastCount ?? '—' }}</dd>
-      </div>
-      <div>
-        <dt class="text-fg-muted">{{ t('boats.rig.fields.spreaders') }}</dt>
-        <dd class="font-semibold text-fg">{{ rig.spreaders ?? '—' }}</dd>
-      </div>
-      <div v-if="rig.manufacturedAt">
-        <dt class="text-fg-muted">{{ t('boats.rig.fields.manufacturedAt') }}</dt>
-        <dd class="font-semibold text-fg">{{ rig.manufacturedAt.slice(0, 10) }}</dd>
-      </div>
-    </dl>
+      <dl class="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
+        <div>
+          <dt class="text-fg-muted">{{ t('boats.rig.fields.rigType') }}</dt>
+          <dd class="font-semibold text-fg">{{ rig.rigType }}</dd>
+        </div>
+        <div>
+          <dt class="text-fg-muted">{{ t('boats.rig.fields.mastCount') }}</dt>
+          <dd class="font-semibold text-fg">{{ rig.mastCount ?? '—' }}</dd>
+        </div>
+        <div>
+          <dt class="text-fg-muted">{{ t('boats.rig.fields.spreaders') }}</dt>
+          <dd class="font-semibold text-fg">{{ rig.spreaders ?? '—' }}</dd>
+        </div>
+        <div v-if="rig.manufacturedAt">
+          <dt class="text-fg-muted">{{ t('boats.rig.fields.manufacturedAt') }}</dt>
+          <dd class="font-semibold text-fg">{{ rig.manufacturedAt.slice(0, 10) }}</dd>
+        </div>
+      </dl>
+    </template>
   </BaseCard>
 </template>

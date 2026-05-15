@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import { useT } from '~/composables/useT'
@@ -13,6 +13,7 @@ export type BoatEquipmentSailFieldsModel = {
   areaM2: number | null
   material: string | null
   reefPoints: number | null
+  status: 'operational' | 'in_maintenance' | 'out_of_service' | 'retired'
 }
 
 const props = defineProps<{
@@ -23,11 +24,19 @@ const props = defineProps<{
 const { t } = useT()
 const { sailTypeOptions } = useBoatOptions()
 
+const statusOptions = computed(() => [
+  { value: 'operational', label: t('equipment.status.operational') },
+  { value: 'in_maintenance', label: t('equipment.status.in_maintenance') },
+  { value: 'out_of_service', label: t('equipment.status.out_of_service') },
+  { value: 'retired', label: t('equipment.status.retired') },
+])
+
 const sailType = ref('')
 const manufacturedAt = ref('')
 const areaM2 = ref('')
 const material = ref('')
 const reefPoints = ref('')
+const status = ref('')
 
 function syncFromProps() {
   const s = props.sail
@@ -36,6 +45,7 @@ function syncFromProps() {
   areaM2.value = s?.areaM2 === null || s?.areaM2 === undefined ? '' : String(s.areaM2)
   material.value = s?.material ?? ''
   reefPoints.value = s?.reefPoints === null || s?.reefPoints === undefined ? '' : String(s.reefPoints)
+  status.value = s?.status ?? 'operational'
 }
 
 watch(
@@ -91,6 +101,15 @@ watch(
       type="number"
       inputmode="numeric"
       v-model="reefPoints"
+      :errors="errors"
+    />
+
+    <BaseSelect
+      id="status"
+      name="status"
+      :label="t('equipment.status.label')"
+      :options="statusOptions"
+      v-model="status"
       :errors="errors"
     />
   </div>

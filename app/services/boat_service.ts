@@ -46,6 +46,7 @@ export type BoatEnginePayload = {
   manufacturedAt?: Date | string | DateTime | null
   powerHp?: number | null
   hours?: number | null
+  status?: string | null
 }
 
 export type BoatSailPayload = {
@@ -54,6 +55,7 @@ export type BoatSailPayload = {
   areaM2?: number | null
   material?: string | null
   reefPoints?: number | null
+  status?: string | null
 }
 
 export type BoatRigPayload = {
@@ -61,6 +63,7 @@ export type BoatRigPayload = {
   manufacturedAt?: Date | string | DateTime | null
   mastCount?: number | null
   spreaders?: number | null
+  status?: string | null
 }
 
 function assertBoatInUserOrg(user: User, boat: Boat) {

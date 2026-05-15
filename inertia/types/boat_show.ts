@@ -10,6 +10,7 @@ export type BoatShowEngine = {
   manufacturedAt: string | null
   powerHp: number | null
   hours: number | null
+  status: 'operational' | 'in_maintenance' | 'out_of_service' | 'retired'
 }
 
 export type BoatShowSail = {
@@ -19,6 +20,7 @@ export type BoatShowSail = {
   areaM2: number | null
   material: string | null
   reefPoints: number | null
+  status: 'operational' | 'in_maintenance' | 'out_of_service' | 'retired'
 }
 
 export type BoatShowRig = {
@@ -27,6 +29,7 @@ export type BoatShowRig = {
   manufacturedAt: string | null
   mastCount: number | null
   spreaders: number | null
+  status: 'operational' | 'in_maintenance' | 'out_of_service' | 'retired'
 }
 
 export type BoatShowDetail = {

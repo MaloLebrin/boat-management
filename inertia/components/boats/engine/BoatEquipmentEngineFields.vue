@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import { useT } from '~/composables/useT'
@@ -16,6 +16,7 @@ export type BoatEquipmentEngineFieldsModel = {
   manufacturedAt: string | null
   powerHp: number | null
   hours: number | null
+  status: 'operational' | 'in_maintenance' | 'out_of_service' | 'retired'
 }
 
 const props = defineProps<{
@@ -26,6 +27,13 @@ const props = defineProps<{
 const { t } = useT()
 const { engineKindOptions, engineFuelOptions } = useBoatOptions()
 
+const statusOptions = computed(() => [
+  { value: 'operational', label: t('equipment.status.operational') },
+  { value: 'in_maintenance', label: t('equipment.status.in_maintenance') },
+  { value: 'out_of_service', label: t('equipment.status.out_of_service') },
+  { value: 'retired', label: t('equipment.status.retired') },
+])
+
 const kind = ref('')
 const fuel = ref('')
 const brand = ref('')
@@ -34,6 +42,7 @@ const serialNumber = ref('')
 const manufacturedAt = ref('')
 const powerHp = ref('')
 const hours = ref('')
+const status = ref('')
 
 function syncFromProps() {
   const e = props.engine
@@ -45,6 +54,7 @@ function syncFromProps() {
   manufacturedAt.value = e?.manufacturedAt ? e.manufacturedAt.slice(0, 10) : ''
   powerHp.value = e?.powerHp === null || e?.powerHp === undefined ? '' : String(e.powerHp)
   hours.value = e?.hours === null || e?.hours === undefined ? '' : String(e.hours)
+  status.value = e?.status ?? 'operational'
 }
 
 watch(
@@ -110,6 +120,15 @@ watch(
       type="number"
       inputmode="numeric"
       v-model="hours"
+      :errors="errors"
+    />
+
+    <BaseSelect
+      id="status"
+      name="status"
+      :label="t('equipment.status.label')"
+      :options="statusOptions"
+      v-model="status"
       :errors="errors"
     />
   </div>
