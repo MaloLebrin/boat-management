@@ -28,7 +28,7 @@ CLOUDINARY_API_SECRET=
 ## Arborescence Cloudinary
 
 ```
-organizations/{org-slug}/
+{env}/organizations/{org-slug}/
   boats/{boat-id}/
     photos/
     documents/
@@ -48,13 +48,14 @@ organizations/{org-slug}/
     avatar/
 ```
 
-Les chemins sont générés par `CloudinaryFolders` (exporté depuis `cloudinary_service.ts`).
+Les chemins sont générés par `CloudinaryFolders` (exporté depuis `cloudinary_service.ts`). Le préfixe `dev/` ou `production/` est ajouté automatiquement selon `app.inProduction`.
 
 ```ts
 import { CloudinaryFolders } from '#services/cloudinary_service'
 
 const folder = CloudinaryFolders.boatPhotos(org.slug, boat.id)
-// → "organizations/my-org/boats/42/photos"
+// dev     → "dev/organizations/my-org/boats/42/photos"
+// prod    → "production/organizations/my-org/boats/42/photos"
 ```
 
 ---

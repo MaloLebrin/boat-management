@@ -1,5 +1,10 @@
+import app from '@adonisjs/core/services/app'
 import type { MultipartFile } from '@adonisjs/core/bodyparser'
 import cloudinary from '#config/cloudinary'
+
+function envPrefix(): string {
+  return app.inProduction ? 'production' : 'dev'
+}
 
 export interface CloudinaryUploadResult {
   publicId: string
@@ -20,52 +25,53 @@ type UploadOptions = {
 }
 
 export const CloudinaryFolders = {
-  boat: (orgSlug: string, boatId: number) => `organizations/${orgSlug}/boats/${boatId}`,
+  boat: (orgSlug: string, boatId: number) =>
+    `${envPrefix()}/organizations/${orgSlug}/boats/${boatId}`,
 
   boatPhotos: (orgSlug: string, boatId: number) =>
-    `organizations/${orgSlug}/boats/${boatId}/photos`,
+    `${envPrefix()}/organizations/${orgSlug}/boats/${boatId}/photos`,
 
   boatDocuments: (orgSlug: string, boatId: number) =>
-    `organizations/${orgSlug}/boats/${boatId}/documents`,
+    `${envPrefix()}/organizations/${orgSlug}/boats/${boatId}/documents`,
 
   boatEngine: (orgSlug: string, boatId: number, engineId: number) =>
-    `organizations/${orgSlug}/boats/${boatId}/engines/${engineId}`,
+    `${envPrefix()}/organizations/${orgSlug}/boats/${boatId}/engines/${engineId}`,
 
   boatEnginePhotos: (orgSlug: string, boatId: number, engineId: number) =>
-    `organizations/${orgSlug}/boats/${boatId}/engines/${engineId}/photos`,
+    `${envPrefix()}/organizations/${orgSlug}/boats/${boatId}/engines/${engineId}/photos`,
 
   boatEngineDocuments: (orgSlug: string, boatId: number, engineId: number) =>
-    `organizations/${orgSlug}/boats/${boatId}/engines/${engineId}/documents`,
+    `${envPrefix()}/organizations/${orgSlug}/boats/${boatId}/engines/${engineId}/documents`,
 
   boatSail: (orgSlug: string, boatId: number, sailId: number) =>
-    `organizations/${orgSlug}/boats/${boatId}/sails/${sailId}`,
+    `${envPrefix()}/organizations/${orgSlug}/boats/${boatId}/sails/${sailId}`,
 
   boatSailPhotos: (orgSlug: string, boatId: number, sailId: number) =>
-    `organizations/${orgSlug}/boats/${boatId}/sails/${sailId}/photos`,
+    `${envPrefix()}/organizations/${orgSlug}/boats/${boatId}/sails/${sailId}/photos`,
 
   boatSailDocuments: (orgSlug: string, boatId: number, sailId: number) =>
-    `organizations/${orgSlug}/boats/${boatId}/sails/${sailId}/documents`,
+    `${envPrefix()}/organizations/${orgSlug}/boats/${boatId}/sails/${sailId}/documents`,
 
   boatRig: (orgSlug: string, boatId: number) =>
-    `organizations/${orgSlug}/boats/${boatId}/rig`,
+    `${envPrefix()}/organizations/${orgSlug}/boats/${boatId}/rig`,
 
   boatRigPhotos: (orgSlug: string, boatId: number) =>
-    `organizations/${orgSlug}/boats/${boatId}/rig/photos`,
+    `${envPrefix()}/organizations/${orgSlug}/boats/${boatId}/rig/photos`,
 
   boatRigDocuments: (orgSlug: string, boatId: number) =>
-    `organizations/${orgSlug}/boats/${boatId}/rig/documents`,
+    `${envPrefix()}/organizations/${orgSlug}/boats/${boatId}/rig/documents`,
 
   maintenance: (orgSlug: string, boatId: number, eventId: number) =>
-    `organizations/${orgSlug}/boats/${boatId}/maintenance/${eventId}`,
+    `${envPrefix()}/organizations/${orgSlug}/boats/${boatId}/maintenance/${eventId}`,
 
   maintenancePhotos: (orgSlug: string, boatId: number, eventId: number) =>
-    `organizations/${orgSlug}/boats/${boatId}/maintenance/${eventId}/photos`,
+    `${envPrefix()}/organizations/${orgSlug}/boats/${boatId}/maintenance/${eventId}/photos`,
 
   maintenanceDocuments: (orgSlug: string, boatId: number, eventId: number) =>
-    `organizations/${orgSlug}/boats/${boatId}/maintenance/${eventId}/documents`,
+    `${envPrefix()}/organizations/${orgSlug}/boats/${boatId}/maintenance/${eventId}/documents`,
 
   userAvatar: (orgSlug: string, userId: number) =>
-    `organizations/${orgSlug}/users/${userId}/avatar`,
+    `${envPrefix()}/organizations/${orgSlug}/users/${userId}/avatar`,
 }
 
 export class CloudinaryService {
