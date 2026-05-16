@@ -108,6 +108,18 @@ const routes = {
     tokens: [{"old":"/boats/:boatId/engines/:engineId/media/:mediaId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/engines/:engineId/media/:mediaId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/engines/:engineId/media/:mediaId","type":0,"val":"engines","end":""},{"old":"/boats/:boatId/engines/:engineId/media/:mediaId","type":1,"val":"engineId","end":""},{"old":"/boats/:boatId/engines/:engineId/media/:mediaId","type":0,"val":"media","end":""},{"old":"/boats/:boatId/engines/:engineId/media/:mediaId","type":1,"val":"mediaId","end":""}],
     types: placeholder as Registry['boat_media.destroy_engine_media']['types'],
   },
+  'boat_media.download_media': {
+    methods: ["GET","HEAD"],
+    pattern: '/boats/:boatId/media/:mediaId/download',
+    tokens: [{"old":"/boats/:boatId/media/:mediaId/download","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/media/:mediaId/download","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/media/:mediaId/download","type":0,"val":"media","end":""},{"old":"/boats/:boatId/media/:mediaId/download","type":1,"val":"mediaId","end":""},{"old":"/boats/:boatId/media/:mediaId/download","type":0,"val":"download","end":""}],
+    types: placeholder as Registry['boat_media.download_media']['types'],
+  },
+  'boat_media.download_engine_media': {
+    methods: ["GET","HEAD"],
+    pattern: '/boats/:boatId/engines/:engineId/media/:mediaId/download',
+    tokens: [{"old":"/boats/:boatId/engines/:engineId/media/:mediaId/download","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/engines/:engineId/media/:mediaId/download","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/engines/:engineId/media/:mediaId/download","type":0,"val":"engines","end":""},{"old":"/boats/:boatId/engines/:engineId/media/:mediaId/download","type":1,"val":"engineId","end":""},{"old":"/boats/:boatId/engines/:engineId/media/:mediaId/download","type":0,"val":"media","end":""},{"old":"/boats/:boatId/engines/:engineId/media/:mediaId/download","type":1,"val":"mediaId","end":""},{"old":"/boats/:boatId/engines/:engineId/media/:mediaId/download","type":0,"val":"download","end":""}],
+    types: placeholder as Registry['boat_media.download_engine_media']['types'],
+  },
   'boat_equipment.store_sail': {
     methods: ["POST"],
     pattern: '/boats/:boatId/sails',

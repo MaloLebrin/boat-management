@@ -96,6 +96,7 @@ export class CloudinaryService {
     return this.upload(file, folder, 'raw', options)
   }
 
+
   private async uploadCompressedPdf(
     file: MultipartFile,
     folder: string,
@@ -111,7 +112,7 @@ export class CloudinaryService {
     try {
       compressedResult = await pdfService.compress(file.tmpPath)
       return await this.uploadFromPath(
-        compressedResult.outputPath,
+        compressedResult!.outputPath,
         file.clientName,
         folder,
         'raw',
@@ -144,17 +145,39 @@ export class CloudinaryService {
       unique_filename: true,
     })
 
+    const ext = originalFilename.split('.').pop() ?? ''
     return {
       publicId: result.public_id,
       url: result.url,
       secureUrl: result.secure_url,
-      format: result.format,
+      format: result.format || ext,
       resourceType: result.resource_type,
       bytes: result.bytes,
       width: result.width,
       height: result.height,
       originalFilename: originalFilename.replace(/\.[^.]+$/, ''),
     }
+  }
+
+  async downloadAsBuffer(
+    publicId: string,
+    resourceType: 'image' | 'raw',
+    format: string
+  ): Promise<{ buffer: Buffer; contentType: string }> {
+    const downloadUrl = cloudinary.utils.private_download_url(publicId, format, {
+      resource_type: resourceType,
+      type: 'upload',
+      expires_at: Math.floor(Date.now() / 1000) + 3600,
+    })
+
+    const fetchResponse = await fetch(downloadUrl)
+    if (!fetchResponse.ok) {
+      throw new Error(`Cloudinary download failed: ${fetchResponse.status} ${fetchResponse.statusText}`)
+    }
+
+    const buffer = Buffer.from(await fetchResponse.arrayBuffer())
+    const contentType = fetchResponse.headers.get('content-type') ?? 'application/octet-stream'
+    return { buffer, contentType }
   }
 
   async deleteFile(publicId: string, resourceType: 'image' | 'raw' = 'image'): Promise<void> {
@@ -186,11 +209,12 @@ export class CloudinaryService {
       unique_filename: true,
     })
 
+    const ext = (file.clientName ?? '').split('.').pop() ?? ''
     return {
       publicId: result.public_id,
       url: result.url,
       secureUrl: result.secure_url,
-      format: result.format,
+      format: result.format || ext,
       resourceType: result.resource_type,
       bytes: result.bytes,
       width: result.width,

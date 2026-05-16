@@ -211,6 +211,30 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_media_controller').default['destroyEngineMedia']>>>
     }
   }
+  'boat_media.download_media': {
+    methods: ["GET","HEAD"]
+    pattern: '/boats/:boatId/media/:mediaId/download'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; mediaId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_media_controller').default['downloadMedia']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_media_controller').default['downloadMedia']>>>
+    }
+  }
+  'boat_media.download_engine_media': {
+    methods: ["GET","HEAD"]
+    pattern: '/boats/:boatId/engines/:engineId/media/:mediaId/download'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue, ParamValue]
+      params: { boatId: ParamValue; engineId: ParamValue; mediaId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_media_controller').default['downloadEngineMedia']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_media_controller').default['downloadEngineMedia']>>>
+    }
+  }
   'boat_equipment.store_sail': {
     methods: ["POST"]
     pattern: '/boats/:boatId/sails'

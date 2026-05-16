@@ -79,9 +79,7 @@ function formatBytes(bytes: number): string {
           </p>
         </div>
         <a
-          :href="doc.secureUrl"
-          target="_blank"
-          rel="noopener noreferrer"
+          :href="`/boats/${boat.id}/media/${doc.id}/download`"
           class="shrink-0 text-sm font-medium text-brand hover:underline"
         >
           ↓

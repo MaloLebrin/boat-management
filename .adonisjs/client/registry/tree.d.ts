@@ -38,6 +38,8 @@ export interface ApiDefinition {
   boatMedia: {
     storeEngineDocument: typeof routes['boat_media.store_engine_document']
     destroyEngineMedia: typeof routes['boat_media.destroy_engine_media']
+    downloadMedia: typeof routes['boat_media.download_media']
+    downloadEngineMedia: typeof routes['boat_media.download_engine_media']
     storePhoto: typeof routes['boat_media.store_photo']
     storeDocument: typeof routes['boat_media.store_document']
     destroy: typeof routes['boat_media.destroy']

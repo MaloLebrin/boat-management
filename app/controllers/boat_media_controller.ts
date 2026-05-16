@@ -2,7 +2,7 @@ import Media from '#models/media'
 import Organization from '#models/organization'
 import BoatService, { BoatNotFoundError } from '#services/boat_service'
 import MediaService, { MediaNotFoundError } from '#services/media_service'
-import { CloudinaryFolders } from '#services/cloudinary_service'
+import { CloudinaryFolders, CloudinaryService } from '#services/cloudinary_service'
 import { storeBoatPhotoValidator, storeBoatDocumentValidator } from '#validators/media'
 import type { HttpContext } from '@adonisjs/core/http'
 
@@ -172,5 +172,81 @@ export default class BoatMediaController {
 
     session.flash('success', i18n.t('flash.media.deleted'))
     response.redirect(`/boats/${boat.id}/engines/${engineId}?tab=documents`)
+  }
+
+  async downloadMedia({ response, auth, params }: HttpContext) {
+    await auth.authenticate()
+    const loaded = await this.loadBoat({ auth, response, params })
+    if (!loaded) return
+
+    const { boat } = loaded
+    const mediaId = Number(params.mediaId)
+
+    const media = await Media.query()
+      .where('id', mediaId)
+      .where('entityType', 'boat')
+      .where('entityId', boat.id)
+      .first()
+
+    if (!media) {
+      response.redirect(`/boats/${boat.id}`)
+      return
+    }
+
+    const cloudinaryService = new CloudinaryService()
+    const resourceType = media.format === 'pdf' ? 'raw' : 'image'
+    const { buffer, contentType } = await cloudinaryService.downloadAsBuffer(
+      media.cloudinaryPublicId,
+      resourceType,
+      media.format
+    )
+
+    response.header('Content-Type', contentType)
+    response.header(
+      'Content-Disposition',
+      `attachment; filename="${media.originalFilename}.${media.format}"`
+    )
+    return response.send(buffer)
+  }
+
+  async downloadEngineMedia({ response, auth, params }: HttpContext) {
+    await auth.authenticate()
+    const loaded = await this.loadBoat({ auth, response, params })
+    if (!loaded) return
+
+    const { boat } = loaded
+    const engineId = Number(params.engineId)
+    const engine = boat.engines.find((e) => e.id === engineId)
+    if (!engine) {
+      response.redirect(`/boats/${boat.id}`)
+      return
+    }
+
+    const mediaId = Number(params.mediaId)
+    const media = await Media.query()
+      .where('id', mediaId)
+      .where('entityType', 'boat_engine')
+      .where('entityId', engineId)
+      .first()
+
+    if (!media) {
+      response.redirect(`/boats/${boat.id}/engines/${engineId}?tab=documents`)
+      return
+    }
+
+    const cloudinaryService = new CloudinaryService()
+    const resourceType = media.format === 'pdf' ? 'raw' : 'image'
+    const { buffer, contentType } = await cloudinaryService.downloadAsBuffer(
+      media.cloudinaryPublicId,
+      resourceType,
+      media.format
+    )
+
+    response.header('Content-Type', contentType)
+    response.header(
+      'Content-Disposition',
+      `attachment; filename="${media.originalFilename}.${media.format}"`
+    )
+    return response.send(buffer)
   }
 }

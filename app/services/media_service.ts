@@ -17,8 +17,10 @@ export type UploadMediaPayload = {
   caption?: string | null
 }
 
-function resourceTypeFromKind(kind: MediaKind): 'image' | 'raw' {
-  return kind === 'photo' ? 'image' : 'raw'
+function resourceTypeFromKind(kind: MediaKind, format?: string): 'image' | 'raw' {
+  if (kind === 'photo') return 'image'
+  if (format === 'pdf') return 'image'
+  return 'raw'
 }
 
 export default class MediaService {
@@ -62,7 +64,7 @@ export default class MediaService {
     const media = await Media.find(mediaId)
     if (!media) throw new MediaNotFoundError()
 
-    await this.cloudinary.deleteFile(media.cloudinaryPublicId, resourceTypeFromKind(media.kind))
+    await this.cloudinary.deleteFile(media.cloudinaryPublicId, resourceTypeFromKind(media.kind, media.format))
     await media.delete()
   }
 

@@ -32,6 +32,11 @@ router
       controllers.BoatMedia,
       'destroyEngineMedia',
     ])
+    router.get('boats/:boatId/media/:mediaId/download', [controllers.BoatMedia, 'downloadMedia'])
+    router.get('boats/:boatId/engines/:engineId/media/:mediaId/download', [
+      controllers.BoatMedia,
+      'downloadEngineMedia',
+    ])
 
     router.post('boats/:boatId/sails', [controllers.BoatEquipment, 'storeSail'])
     router.get('boats/:boatId/sails/:sailId/edit', [controllers.BoatEquipment, 'editSail'])
