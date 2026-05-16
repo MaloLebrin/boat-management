@@ -110,6 +110,24 @@
         "feature2": "Migrate from spreadsheets in 1 click",
         "copyright": "© {year} FleetAi"
       }
+    },
+    "forgotPassword": {
+      "title": "Forgot password",
+      "subtitle": "Enter your email and we will send you a reset link.",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@company.com",
+      "submit": "Send reset link",
+      "backToLogin": "Back to login"
+    },
+    "resetPassword": {
+      "title": "New password",
+      "subtitle": "Choose a new password for your account.",
+      "passwordLabel": "New password",
+      "passwordConfirmLabel": "Confirm password",
+      "showPassword": "Show",
+      "hidePassword": "Hide",
+      "submit": "Reset password",
+      "backToLogin": "Back to login"
     }
   },
   "dashboard": {

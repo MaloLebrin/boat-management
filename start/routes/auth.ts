@@ -9,6 +9,11 @@ router
 
     router.get('login', [controllers.Session, 'create'])
     router.post('login', [controllers.Session, 'store'])
+
+    router.get('forgot-password', [controllers.PasswordReset, 'create']).as('password.forgot')
+    router.post('forgot-password', [controllers.PasswordReset, 'store'])
+    router.get('reset-password', [controllers.PasswordReset, 'edit']).as('password.reset')
+    router.post('reset-password', [controllers.PasswordReset, 'update'])
   })
   .use(middleware.guest())
 

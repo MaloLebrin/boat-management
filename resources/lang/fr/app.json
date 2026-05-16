@@ -110,6 +110,24 @@
         "feature2": "Migration depuis vos tableurs en 1 clic",
         "copyright": "© {year} FleetAi"
       }
+    },
+    "forgotPassword": {
+      "title": "Mot de passe oublié",
+      "subtitle": "Entrez votre adresse email et nous vous enverrons un lien de réinitialisation.",
+      "emailLabel": "Email",
+      "emailPlaceholder": "vous@entreprise.com",
+      "submit": "Envoyer le lien",
+      "backToLogin": "Retour à la connexion"
+    },
+    "resetPassword": {
+      "title": "Nouveau mot de passe",
+      "subtitle": "Choisissez un nouveau mot de passe pour votre compte.",
+      "passwordLabel": "Nouveau mot de passe",
+      "passwordConfirmLabel": "Confirmer le mot de passe",
+      "showPassword": "Afficher",
+      "hidePassword": "Masquer",
+      "submit": "Réinitialiser le mot de passe",
+      "backToLogin": "Retour à la connexion"
     }
   },
   "dashboard": {

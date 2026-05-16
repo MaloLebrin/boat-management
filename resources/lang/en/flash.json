@@ -47,5 +47,14 @@
     "photoAdded": "Photo added.",
     "documentAdded": "Document added.",
     "deleted": "File deleted."
+  },
+  "auth": {
+    "passwordResetSent": "If this email is associated with an account, you will receive a reset link.",
+    "passwordResetSuccess": "Password updated. You can now log in.",
+    "passwordResetTokenInvalid": "This reset link is invalid or has expired."
+  },
+  "settings": {
+    "profileUpdated": "Profile updated.",
+    "orgUpdated": "Organisation updated."
   }
 }

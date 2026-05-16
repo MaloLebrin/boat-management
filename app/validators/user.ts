@@ -10,3 +10,12 @@ export const signupValidator = vine.create({
     confirmationField: 'passwordConfirmation',
   }),
 })
+
+export const forgotPasswordValidator = vine.create({
+  email: email(),
+})
+
+export const resetPasswordValidator = vine.create({
+  token: vine.string().minLength(64),
+  password: password().confirmed({ confirmationField: 'passwordConfirmation' }),
+})
