@@ -12,6 +12,15 @@
 - **Package manager** : pnpm
 - **Déploiement** : Docker + CI/CD GitHub Actions
 
+## Dépendances système
+
+### Ghostscript (compression PDF)
+Les PDFs uploadés sont compressés avant envoi sur Cloudinary via `app/services/pdf_service.ts` (`-dPDFSETTINGS=/ebook`).
+
+- **Local** : `brew install ghostscript`
+- **Docker/prod** : `apt-get install -y ghostscript` dans le Dockerfile
+- **Fallback** : si `gs` n'est pas disponible, le PDF original est envoyé sans compression (warning loggé, pas de crash)
+
 ## Conventions de code
 
 ### TypeScript
