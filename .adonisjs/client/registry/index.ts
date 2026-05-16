@@ -210,6 +210,30 @@ const routes = {
     tokens: [{"old":"/login","type":0,"val":"login","end":""}],
     types: placeholder as Registry['session.store']['types'],
   },
+  'password.forgot': {
+    methods: ["GET","HEAD"],
+    pattern: '/forgot-password',
+    tokens: [{"old":"/forgot-password","type":0,"val":"forgot-password","end":""}],
+    types: placeholder as Registry['password.forgot']['types'],
+  },
+  'password_reset.store': {
+    methods: ["POST"],
+    pattern: '/forgot-password',
+    tokens: [{"old":"/forgot-password","type":0,"val":"forgot-password","end":""}],
+    types: placeholder as Registry['password_reset.store']['types'],
+  },
+  'password.reset': {
+    methods: ["GET","HEAD"],
+    pattern: '/reset-password',
+    tokens: [{"old":"/reset-password","type":0,"val":"reset-password","end":""}],
+    types: placeholder as Registry['password.reset']['types'],
+  },
+  'password_reset.update': {
+    methods: ["POST"],
+    pattern: '/reset-password',
+    tokens: [{"old":"/reset-password","type":0,"val":"reset-password","end":""}],
+    types: placeholder as Registry['password_reset.update']['types'],
+  },
   'session.destroy': {
     methods: ["POST"],
     pattern: '/logout',
@@ -287,6 +311,18 @@ const routes = {
     pattern: '/settings',
     tokens: [{"old":"/settings","type":0,"val":"settings","end":""}],
     types: placeholder as Registry['settings.index']['types'],
+  },
+  'settings.profile.update': {
+    methods: ["PUT"],
+    pattern: '/settings/profile',
+    tokens: [{"old":"/settings/profile","type":0,"val":"settings","end":""},{"old":"/settings/profile","type":0,"val":"profile","end":""}],
+    types: placeholder as Registry['settings.profile.update']['types'],
+  },
+  'settings.org.update': {
+    methods: ["PUT"],
+    pattern: '/settings/org',
+    tokens: [{"old":"/settings/org","type":0,"val":"settings","end":""},{"old":"/settings/org","type":0,"val":"org","end":""}],
+    types: placeholder as Registry['settings.org.update']['types'],
   },
   'locale.set': {
     methods: ["POST"],

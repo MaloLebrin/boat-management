@@ -53,6 +53,14 @@ export interface ApiDefinition {
     store: typeof routes['session.store']
     destroy: typeof routes['session.destroy']
   }
+  password: {
+    forgot: typeof routes['password.forgot']
+    reset: typeof routes['password.reset']
+  }
+  passwordReset: {
+    store: typeof routes['password_reset.store']
+    update: typeof routes['password_reset.update']
+  }
   ai: {
     chat: typeof routes['ai.chat']
   }
@@ -76,6 +84,12 @@ export interface ApiDefinition {
   }
   settings: {
     index: typeof routes['settings.index']
+    profile: {
+      update: typeof routes['settings.profile.update']
+    }
+    org: {
+      update: typeof routes['settings.org.update']
+    }
   }
   locale: {
     set: typeof routes['locale.set']
