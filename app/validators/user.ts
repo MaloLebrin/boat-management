@@ -19,3 +19,11 @@ export const resetPasswordValidator = vine.create({
   token: vine.string().minLength(64),
   password: password().confirmed({ confirmationField: 'passwordConfirmation' }),
 })
+
+export const updateProfileValidator = vine.create({
+  fullName: vine.string().maxLength(255).nullable(),
+})
+
+export const updateOrganizationValidator = vine.create({
+  name: vine.string().minLength(1).maxLength(255),
+})

@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
+import { Form } from '@adonisjs/inertia/vue'
+import { usePage } from '@inertiajs/vue3'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
@@ -7,6 +9,7 @@ import BaseInput from '~/components/base/BaseInput.vue'
 import { useT } from '~/composables/useT'
 
 const { t } = useT()
+const page = usePage()
 
 const props = defineProps<{
   user: {
@@ -14,31 +17,28 @@ const props = defineProps<{
     email: string
     fullName: string | null
   }
+  organization: {
+    id: number
+    name: string
+  }
 }>()
 
 type SettingsSection = 'org' | 'members' | 'billing' | 'me'
 
 const activeSection = ref<SettingsSection>('me')
 
-const sections = computed(() => [
+const sections = [
+  { key: 'me' as SettingsSection, label: t('settings.sections.me') },
   { key: 'org' as SettingsSection, label: t('settings.sections.org') },
   { key: 'members' as SettingsSection, label: t('settings.sections.members') },
   { key: 'billing' as SettingsSection, label: t('settings.sections.billing') },
-  { key: 'me' as SettingsSection, label: t('settings.sections.me') },
-])
-
-const localFullName = ref(props.user.fullName ?? '')
-
-// TODO: implement PUT /settings/profile to save fullName — wire the save button to a Form submit
-// TODO: implement org profile (org name, logo) — requires an Organisation model and PUT /settings/org endpoint
-// TODO: implement member invitation — requires sending an invite email and a pending-member flow
-// TODO: implement billing — integrate Stripe or another payment provider for plan upgrades
+]
 </script>
 
 <template>
   <div class="flex w-full max-w-7xl px-6 py-10 sm:px-8">
     <div class="flex w-full gap-8">
-      <!-- Left sidebar navigation -->
+      <!-- Sidebar navigation -->
       <nav class="w-56 shrink-0">
         <BaseHeading level="2" class="mb-6">{{ t('settings.title') }}</BaseHeading>
         <ul class="space-y-1">
@@ -59,49 +59,83 @@ const localFullName = ref(props.user.fullName ?? '')
         </ul>
       </nav>
 
-      <!-- Main content area -->
+      <!-- Main content -->
       <div class="flex-1">
-        <!-- Organisation Profile Section -->
-        <div v-if="activeSection === 'org'">
-          <BaseHeading level="2" class="mb-6">{{ t('settings.org.title') }}</BaseHeading>
-          <BaseCard>
-            <div class="space-y-6">
-              <div>
-                <label class="block text-sm font-medium text-fg mb-2">{{ t('settings.org.nameLabel') }}</label>
-                <BaseInput
-                  :placeholder="t('settings.org.namePlaceholder')"
-                  disabled
-                />
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-fg mb-2">{{ t('settings.org.logoLabel') }}</label>
-                <div class="flex items-center gap-4">
-                  <div class="flex h-16 w-16 items-center justify-center rounded-lg border border-dashed border-border bg-surface-muted">
-                    <span class="text-fg-muted text-xs">{{ t('settings.org.logoPlaceholder') }}</span>
-                  </div>
-                  <!-- TODO: implement logo upload — POST /settings/org/logo, store in S3/local, display preview -->
-                  <BaseButton variant="secondary" size="sm" disabled>
-                    {{ t('settings.org.changeLogo') }}
-                  </BaseButton>
-                </div>
-              </div>
-            </div>
-            <template #footer>
-              <div class="flex justify-end">
-                <!-- TODO: wire to PUT /settings/org once Organisation model exists -->
-                <BaseButton variant="primary" disabled>
-                  {{ t('settings.org.save') }}
-                </BaseButton>
-              </div>
-            </template>
-          </BaseCard>
+        <!-- Flash messages -->
+        <div
+          v-if="page.props.flash?.success"
+          class="mb-6 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800"
+        >
+          {{ page.props.flash.success }}
+        </div>
+        <div
+          v-if="page.props.flash?.error"
+          class="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"
+        >
+          {{ page.props.flash.error }}
         </div>
 
-        <!-- Members Section -->
+        <!-- My Profile -->
+        <div v-if="activeSection === 'me'">
+          <BaseHeading level="2" class="mb-6">{{ t('settings.me.title') }}</BaseHeading>
+          <Form method="PUT" action="/settings/profile" #default="{ processing, errors }">
+            <BaseCard>
+              <div class="space-y-6">
+                <BaseInput
+                  name="fullName"
+                  :label="t('settings.me.fullNameLabel')"
+                  :model-value="user.fullName ?? ''"
+                  :placeholder="t('settings.me.fullNamePlaceholder')"
+                  :errors="errors"
+                />
+                <BaseInput
+                  :label="t('settings.me.emailLabel')"
+                  :model-value="user.email"
+                  disabled
+                  readonly
+                />
+                <p class="text-xs text-fg-muted">{{ t('settings.me.emailHint') }}</p>
+              </div>
+              <template #footer>
+                <div class="flex justify-end">
+                  <BaseButton type="submit" variant="primary" :disabled="processing">
+                    {{ t('settings.me.save') }}
+                  </BaseButton>
+                </div>
+              </template>
+            </BaseCard>
+          </Form>
+        </div>
+
+        <!-- Organisation Profile -->
+        <div v-if="activeSection === 'org'">
+          <BaseHeading level="2" class="mb-6">{{ t('settings.org.title') }}</BaseHeading>
+          <Form method="PUT" action="/settings/org" #default="{ processing, errors }">
+            <BaseCard>
+              <div class="space-y-6">
+                <BaseInput
+                  name="name"
+                  :label="t('settings.org.nameLabel')"
+                  :model-value="organization.name"
+                  :placeholder="t('settings.org.namePlaceholder')"
+                  :errors="errors"
+                />
+              </div>
+              <template #footer>
+                <div class="flex justify-end">
+                  <BaseButton type="submit" variant="primary" :disabled="processing">
+                    {{ t('settings.org.save') }}
+                  </BaseButton>
+                </div>
+              </template>
+            </BaseCard>
+          </Form>
+        </div>
+
+        <!-- Members -->
         <div v-if="activeSection === 'members'">
           <div class="mb-6 flex items-center justify-between">
             <BaseHeading level="2">{{ t('settings.members.title') }}</BaseHeading>
-            <!-- TODO: open an invite modal that POSTs email to /settings/members/invite and sends an invitation email -->
             <BaseButton variant="primary" size="sm" disabled>
               {{ t('settings.members.invite') }}
             </BaseButton>
@@ -126,7 +160,7 @@ const localFullName = ref(props.user.fullName ?? '')
                 <tr class="border-b border-border last:border-b-0">
                   <td class="px-6 py-4">
                     <div class="flex items-center gap-3">
-                      <div class="flex h-8 w-8 items-center justify-center rounded-full bg-brand text-white text-sm font-medium">
+                      <div class="flex h-8 w-8 items-center justify-center rounded-full bg-brand text-sm font-medium text-white">
                         {{ user.fullName?.charAt(0)?.toUpperCase() ?? user.email.charAt(0).toUpperCase() }}
                       </div>
                       <div>
@@ -154,7 +188,7 @@ const localFullName = ref(props.user.fullName ?? '')
           </BaseCard>
         </div>
 
-        <!-- Billing Section -->
+        <!-- Billing -->
         <div v-if="activeSection === 'billing'">
           <BaseHeading level="2" class="mb-6">{{ t('settings.billing.title') }}</BaseHeading>
           <div class="space-y-6">
@@ -168,9 +202,7 @@ const localFullName = ref(props.user.fullName ?? '')
                 </div>
               </template>
               <div class="space-y-4">
-                <p class="text-sm text-fg-muted">
-                  {{ t('settings.billing.freeDescription') }}
-                </p>
+                <p class="text-sm text-fg-muted">{{ t('settings.billing.freeDescription') }}</p>
                 <ul class="space-y-2 text-sm text-fg-muted">
                   <li class="flex items-center gap-2">
                     <span class="text-green-600">&#10003;</span>
@@ -187,7 +219,6 @@ const localFullName = ref(props.user.fullName ?? '')
                 </ul>
               </div>
               <template #footer>
-                <!-- TODO: integrate Stripe Checkout — redirect to a Stripe session URL returned by POST /billing/checkout -->
                 <BaseButton variant="primary" disabled>
                   {{ t('settings.billing.upgradePro') }}
                 </BaseButton>
@@ -198,52 +229,14 @@ const localFullName = ref(props.user.fullName ?? '')
               <template #header>
                 <span class="text-sm font-semibold text-fg">{{ t('settings.billing.paymentMethod') }}</span>
               </template>
-              <p class="text-sm text-fg-muted">
-                {{ t('settings.billing.noPaymentMethod') }}
-              </p>
+              <p class="text-sm text-fg-muted">{{ t('settings.billing.noPaymentMethod') }}</p>
               <template #footer>
-                <!-- TODO: integrate Stripe Customer Portal or Stripe Elements for payment method management -->
                 <BaseButton variant="secondary" size="sm" disabled>
                   {{ t('settings.billing.addCard') }}
                 </BaseButton>
               </template>
             </BaseCard>
           </div>
-        </div>
-
-        <!-- My Profile Section -->
-        <div v-if="activeSection === 'me'">
-          <BaseHeading level="2" class="mb-6">{{ t('settings.me.title') }}</BaseHeading>
-          <BaseCard>
-            <div class="space-y-6">
-              <div>
-                <BaseInput
-                  :label="t('settings.me.fullNameLabel')"
-                  v-model="localFullName"
-                  :placeholder="t('settings.me.fullNamePlaceholder')"
-                />
-              </div>
-              <div>
-                <BaseInput
-                  :label="t('settings.me.emailLabel')"
-                  :model-value="user.email"
-                  disabled
-                  readonly
-                />
-                <p class="mt-1 text-xs text-fg-muted">
-                  {{ t('settings.me.emailHint') }}
-                </p>
-              </div>
-            </div>
-            <template #footer>
-              <div class="flex justify-end">
-                <!-- TODO: wrap in a Form with action PUT /settings/profile and remove the `disabled` attribute -->
-                <BaseButton variant="primary" disabled>
-                  {{ t('settings.me.save') }}
-                </BaseButton>
-              </div>
-            </template>
-          </BaseCard>
         </div>
       </div>
     </div>

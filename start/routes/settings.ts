@@ -6,6 +6,8 @@ const SettingsController = () => import('#controllers/settings_controller')
 router
   .group(() => {
     router.get('settings', [SettingsController, 'index']).as('settings.index')
+    router.put('settings/profile', [SettingsController, 'updateProfile']).as('settings.profile.update')
+    router.put('settings/org', [SettingsController, 'updateOrganization']).as('settings.org.update')
   })
   .use(middleware.auth())
 
