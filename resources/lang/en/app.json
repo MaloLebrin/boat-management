@@ -625,7 +625,8 @@
         "invoices": "Invoices",
         "other": "Other documents",
         "dropzone": "Drop a file or click to upload",
-        "comingSoon": "Feature coming soon"
+        "comingSoon": "Feature coming soon",
+        "modalSubtitle": "{name} · Stored on Cloudinary"
       }
     },
     "maintenance": {

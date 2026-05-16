@@ -14,27 +14,45 @@ export function useBoatOptions() {
   const { t } = useT()
 
   const propulsionOptions = computed(() =>
-    PROPULSION_OPTIONS.map((o) => ({ value: o.value, label: t(`boats.options.propulsion.${o.value}`) }))
+    PROPULSION_OPTIONS.map((o) => ({
+      value: o.value,
+      label: t(`boats.options.propulsion.${o.value}`),
+    }))
   )
 
   const hullMaterialOptions = computed(() =>
-    HULL_MATERIAL_OPTIONS.map((o) => ({ value: o.value, label: t(`boats.options.hullMaterial.${o.value}`) }))
+    HULL_MATERIAL_OPTIONS.map((o) => ({
+      value: o.value,
+      label: t(`boats.options.hullMaterial.${o.value}`),
+    }))
   )
 
   const engineKindOptions = computed(() =>
-    ENGINE_KIND_OPTIONS.map((o) => ({ value: o.value, label: t(`boats.options.engineKind.${o.value}`) }))
+    ENGINE_KIND_OPTIONS.map((o) => ({
+      value: o.value,
+      label: t(`boats.options.engineKind.${o.value}`),
+    }))
   )
 
   const engineFuelOptions = computed(() =>
-    ENGINE_FUEL_OPTIONS.map((o) => ({ value: o.value, label: t(`boats.options.engineFuel.${o.value}`) }))
+    ENGINE_FUEL_OPTIONS.map((o) => ({
+      value: o.value,
+      label: t(`boats.options.engineFuel.${o.value}`),
+    }))
   )
 
   const engineStrokeTypeOptions = computed(() =>
-    ENGINE_STROKE_TYPE_OPTIONS.map((o) => ({ value: o.value, label: t(`boats.options.strokeType.${o.value}`) }))
+    ENGINE_STROKE_TYPE_OPTIONS.map((o) => ({
+      value: o.value,
+      label: t(`boats.options.strokeType.${o.value}`),
+    }))
   )
 
   const sailTypeOptions = computed(() =>
-    SAIL_TYPE_OPTIONS.map((o) => ({ value: o.value, label: t(`boats.options.sailType.${o.value}`) }))
+    SAIL_TYPE_OPTIONS.map((o) => ({
+      value: o.value,
+      label: t(`boats.options.sailType.${o.value}`),
+    }))
   )
 
   const rigTypeOptions = computed(() =>

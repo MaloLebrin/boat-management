@@ -1,5 +1,6 @@
 import BoatMaintenanceEvent from '#models/boat_maintenance_event'
 import BoatMaintenanceTask from '#models/boat_maintenance_task'
+import Media from '#models/media'
 import BoatService, { BoatEquipmentNotFoundError, BoatNotFoundError } from '#services/boat_service'
 import {
   type BoatEngineFormBody,
@@ -312,6 +313,12 @@ export default class BoatEquipmentController {
       .orderBy('dueAt', 'asc')
       .orderBy('id', 'desc')
 
+    const engineDocuments = await Media.query()
+      .where('entityType', 'boat_engine')
+      .where('entityId', engineId)
+      .where('kind', 'document')
+      .orderBy('position', 'asc')
+
     return inertia.render('boats/engine_show', {
       boat: { id: boat.id, name: boat.name },
       engine: {
@@ -327,6 +334,19 @@ export default class BoatEquipmentController {
         hours: engine.hours,
         installHours: engine.installHours,
         status: engine.status,
+        documents: engineDocuments.map((m) => ({
+          id: m.id,
+          kind: m.kind,
+          secureUrl: m.secureUrl,
+          cloudinaryPublicId: m.cloudinaryPublicId,
+          originalFilename: m.originalFilename,
+          format: m.format,
+          bytes: m.bytes,
+          width: m.width,
+          height: m.height,
+          position: m.position,
+          caption: m.caption,
+        })),
       },
       maintenanceEvents: maintenanceEvents.map((ev) => ({
         id: ev.id,
@@ -357,7 +377,15 @@ export default class BoatEquipmentController {
     })
   }
 
-  async updateEngineStatus({ request, response, auth, params, bouncer, session, i18n }: HttpContext) {
+  async updateEngineStatus({
+    request,
+    response,
+    auth,
+    params,
+    bouncer,
+    session,
+    i18n,
+  }: HttpContext) {
     await auth.authenticate()
     const loaded = await this.loadBoatForEquipment({ auth, response, params })
     if (!loaded) return

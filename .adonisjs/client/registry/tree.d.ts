@@ -35,14 +35,16 @@ export interface ApiDefinition {
     upsertRig: typeof routes['boat_equipment.upsert_rig']
     destroyRig: typeof routes['boat_equipment.destroy_rig']
   }
-  boatMaintenances: {
-    store: typeof routes['boat_maintenances.store']
-    destroy: typeof routes['boat_maintenances.destroy']
-  }
   boatMedia: {
+    storeEngineDocument: typeof routes['boat_media.store_engine_document']
+    destroyEngineMedia: typeof routes['boat_media.destroy_engine_media']
     storePhoto: typeof routes['boat_media.store_photo']
     storeDocument: typeof routes['boat_media.store_document']
     destroy: typeof routes['boat_media.destroy']
+  }
+  boatMaintenances: {
+    store: typeof routes['boat_maintenances.store']
+    destroy: typeof routes['boat_maintenances.destroy']
   }
   newAccount: {
     create: typeof routes['new_account.create']

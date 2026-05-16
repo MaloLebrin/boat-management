@@ -1,3 +1,4 @@
+import Media from '#models/media'
 import Organization from '#models/organization'
 import BoatService, { BoatNotFoundError } from '#services/boat_service'
 import MediaService, { MediaNotFoundError } from '#services/media_service'
@@ -90,5 +91,86 @@ export default class BoatMediaController {
 
     session.flash('success', i18n.t('flash.media.deleted'))
     response.redirect(`/boats/${boat.id}`)
+  }
+
+  async storeEngineDocument({
+    request,
+    response,
+    auth,
+    params,
+    bouncer,
+    session,
+    i18n,
+  }: HttpContext) {
+    await auth.authenticate()
+    const loaded = await this.loadBoat({ auth, response, params })
+    if (!loaded) return
+
+    const { boat, user } = loaded
+    await bouncer.authorize('boatUpdate', boat)
+
+    const engineId = Number(params.engineId)
+    const engine = boat.engines.find((e) => e.id === engineId)
+    if (!engine) {
+      response.redirect(`/boats/${boat.id}`)
+      return
+    }
+
+    const payload = await request.validateUsing(storeBoatDocumentValidator)
+    const org = await Organization.findOrFail(boat.organizationId)
+
+    const mediaService = new MediaService()
+    await mediaService.upload(user, payload.file, {
+      folder: CloudinaryFolders.boatEngineDocuments(org.slug, boat.id, engineId),
+      entityType: 'boat_engine',
+      entityId: engineId,
+      kind: 'document',
+      caption: payload.caption ?? null,
+    })
+
+    session.flash('success', i18n.t('flash.media.documentAdded'))
+    response.redirect(`/boats/${boat.id}/engines/${engineId}?tab=documents`)
+  }
+
+  async destroyEngineMedia({ response, auth, params, bouncer, session, i18n }: HttpContext) {
+    await auth.authenticate()
+    const loaded = await this.loadBoat({ auth, response, params })
+    if (!loaded) return
+
+    const { boat } = loaded
+    await bouncer.authorize('boatUpdate', boat)
+
+    const engineId = Number(params.engineId)
+    const engine = boat.engines.find((e) => e.id === engineId)
+    if (!engine) {
+      response.redirect(`/boats/${boat.id}`)
+      return
+    }
+
+    const mediaId = Number(params.mediaId)
+    const media = await Media.query()
+      .where('id', mediaId)
+      .where('entityType', 'boat_engine')
+      .where('entityId', engineId)
+      .first()
+
+    if (!media) {
+      response.redirect(`/boats/${boat.id}/engines/${engineId}?tab=documents`)
+      return
+    }
+
+    const mediaService = new MediaService()
+    try {
+      await mediaService.deleteById(mediaId)
+    } catch (error) {
+      if (error instanceof MediaNotFoundError) {
+        response.redirect(`/boats/${boat.id}/engines/${engineId}?tab=documents`)
+        return
+      }
+      throw error
+    }
+
+    session.flash('success', i18n.t('flash.media.deleted'))
+    response.redirect(`/boats/${boat.id}/engines/${engineId}?tab=documents`)
   }
 }

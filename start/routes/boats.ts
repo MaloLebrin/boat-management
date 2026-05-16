@@ -18,8 +18,20 @@ router
       .as('boats.engines.show')
     router.get('boats/:boatId/engines/:engineId/edit', [controllers.BoatEquipment, 'editEngine'])
     router.put('boats/:boatId/engines/:engineId', [controllers.BoatEquipment, 'updateEngine'])
-    router.patch('boats/:boatId/engines/:engineId/status', [controllers.BoatEquipment, 'updateEngineStatus'])
+    router.patch('boats/:boatId/engines/:engineId/status', [
+      controllers.BoatEquipment,
+      'updateEngineStatus',
+    ])
     router.delete('boats/:boatId/engines/:engineId', [controllers.BoatEquipment, 'destroyEngine'])
+
+    router.post('boats/:boatId/engines/:engineId/documents', [
+      controllers.BoatMedia,
+      'storeEngineDocument',
+    ])
+    router.delete('boats/:boatId/engines/:engineId/media/:mediaId', [
+      controllers.BoatMedia,
+      'destroyEngineMedia',
+    ])
 
     router.post('boats/:boatId/sails', [controllers.BoatEquipment, 'storeSail'])
     router.get('boats/:boatId/sails/:sailId/edit', [controllers.BoatEquipment, 'editSail'])

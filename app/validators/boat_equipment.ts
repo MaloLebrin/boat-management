@@ -2,7 +2,12 @@ import vine from '@vinejs/vine'
 import { engineFuels, engineKinds, rigTypes, sailTypes } from '#validators/boat'
 import type { BoatEnginePayload, BoatRigPayload, BoatSailPayload } from '#services/boat_service'
 
-export const equipmentStatuses = ['operational', 'in_maintenance', 'out_of_service', 'retired'] as const
+export const equipmentStatuses = [
+  'operational',
+  'in_maintenance',
+  'out_of_service',
+  'retired',
+] as const
 export type EquipmentStatus = (typeof equipmentStatuses)[number]
 
 const fuelChoices = [...engineFuels, '', '__none__'] as string[]

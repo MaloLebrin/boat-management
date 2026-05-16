@@ -143,7 +143,7 @@ export default class extends BaseSeeder {
         dueAt: null,
       },
       {
-        title: 'Resserrage de l\'accastillage',
+        title: "Resserrage de l'accastillage",
         subject: 'boat' as const,
         performedAt: today.minus({ days: 15 }).toISODate()!,
         dueAt: today.plus({ days: 90 }).toISODate()!,

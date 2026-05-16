@@ -187,6 +187,30 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_equipment_controller').default['destroyEngine']>>>
     }
   }
+  'boat_media.store_engine_document': {
+    methods: ["POST"]
+    pattern: '/boats/:boatId/engines/:engineId/documents'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/media').storeBoatDocumentValidator)>>
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; engineId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/media').storeBoatDocumentValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_media_controller').default['storeEngineDocument']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_media_controller').default['storeEngineDocument']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'boat_media.destroy_engine_media': {
+    methods: ["DELETE"]
+    pattern: '/boats/:boatId/engines/:engineId/media/:mediaId'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue, ParamValue]
+      params: { boatId: ParamValue; engineId: ParamValue; mediaId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_media_controller').default['destroyEngineMedia']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_media_controller').default['destroyEngineMedia']>>>
+    }
+  }
   'boat_equipment.store_sail': {
     methods: ["POST"]
     pattern: '/boats/:boatId/sails'

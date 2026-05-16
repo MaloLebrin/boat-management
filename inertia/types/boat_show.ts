@@ -14,7 +14,6 @@ export type MediaRow = {
   caption: string | null
 }
 
-
 export type BoatShowEngine = {
   id: number
   kind: string
@@ -28,6 +27,7 @@ export type BoatShowEngine = {
   hours: number | null
   installHours: number | null
   status: 'operational' | 'in_maintenance' | 'out_of_service' | 'retired'
+  documents: MediaRow[]
 }
 
 export type BoatShowSail = {
