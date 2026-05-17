@@ -215,6 +215,12 @@
         "rig": "Gréement",
         "hull": "Coque"
       },
+      "subjects": {
+        "boat": "Coque",
+        "engine": "Moteur",
+        "sail": "Voile",
+        "rig": "Gréement"
+      },
       "stats": {
         "events": "Événements",
         "partsChanged": "Pièces changées",

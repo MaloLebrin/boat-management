@@ -70,6 +70,16 @@ function formatMonth(monthKey: string): string {
 function toggleEventDetails(eventId: number) {
   expandedEventId.value = expandedEventId.value === eventId ? null : eventId
 }
+
+function getSubjectLink(ev: MaintenanceEventRow): string {
+  if (ev.subject === 'engine' && ev.boatEngineId) {
+    return `/boats/${props.boat.id}/engines/${ev.boatEngineId}`
+  }
+  if (ev.subject === 'sail' || ev.subject === 'rig') {
+    return `/boats/${props.boat.id}?tab=equipment`
+  }
+  return `/boats/${props.boat.id}`
+}
 </script>
 
 <template>
@@ -131,10 +141,12 @@ function toggleEventDetails(eventId: number) {
                   <div>
                     <p class="font-semibold text-fg">{{ ev.title }}</p>
                     <p class="text-sm text-fg-muted">
-                      {{ subjectLabel(ev.subject) }}
-                      <span v-if="targetDescription(ev) !== subjectLabel(ev.subject)">
-                        · {{ targetDescription(ev) }}
-                      </span>
+                      <a :href="getSubjectLink(ev)" class="hover:text-brand hover:underline transition-colors">
+                        {{ subjectLabel(ev.subject) }}
+                        <span v-if="targetDescription(ev) !== subjectLabel(ev.subject)">
+                          · {{ targetDescription(ev) }}
+                        </span>
+                      </a>
                     </p>
                     <div v-if="ev.parts.length > 0" class="mt-2 flex items-center gap-2">
                       <BaseBadge variant="neutral">{{ ev.parts.length }} piece(s)</BaseBadge>

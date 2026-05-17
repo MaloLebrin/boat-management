@@ -215,6 +215,12 @@
         "rig": "Rig",
         "hull": "Hull"
       },
+      "subjects": {
+        "boat": "Hull",
+        "engine": "Engine",
+        "sail": "Sail",
+        "rig": "Rig"
+      },
       "stats": {
         "events": "Events",
         "partsChanged": "Parts replaced",

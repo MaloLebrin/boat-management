@@ -17,6 +17,9 @@ interface HistoryEvent {
   performedAt: string
   engineCaption: string | null
   sailCaption: string | null
+  boatEngineId: number | null
+  boatSailId: number | null
+  boatRigId: number | null
   parts: Array<{ id: number; name: string; quantity: number | null }>
 }
 
@@ -105,6 +108,16 @@ function isExpanded(id: number): boolean {
 
 function getEquipmentCaption(event: HistoryEvent): string | null {
   return event.engineCaption || event.sailCaption || null
+}
+
+function getSubjectLink(event: HistoryEvent): string {
+  if (event.subject === 'engine' && event.boatEngineId) {
+    return `/boats/${event.boatId}/engines/${event.boatEngineId}`
+  }
+  if (event.subject === 'sail' || event.subject === 'rig') {
+    return `/boats/${event.boatId}?tab=equipment`
+  }
+  return `/boats/${event.boatId}`
 }
 </script>
 
@@ -216,11 +229,11 @@ function getEquipmentCaption(event: HistoryEvent): string | null {
                     </div>
 
                     <div class="flex items-center gap-3 shrink-0">
-                      <a
-                        :href="`/boats/${event.boatId}`"
-                        class="inline-flex"
-                      >
+                      <a :href="`/boats/${event.boatId}`" class="inline-flex">
                         <BaseBadge variant="neutral">{{ event.boatName }}</BaseBadge>
+                      </a>
+                      <a :href="getSubjectLink(event)" class="inline-flex">
+                        <BaseBadge variant="brand">{{ t(`maintenance.history.subjects.${event.subject}`) }}</BaseBadge>
                       </a>
                       <span v-if="event.parts.length > 0" class="text-sm text-fg-muted">
                         {{ t('maintenance.history.timeline.pieces', { count: String(event.parts.length) }) }}

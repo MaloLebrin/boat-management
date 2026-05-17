@@ -12,6 +12,9 @@ interface MaintenanceHistoryEvent {
   performedAt: string
   engineCaption: string | null
   sailCaption: string | null
+  boatEngineId: number | null
+  boatSailId: number | null
+  boatRigId: number | null
   parts: Array<{ id: number; name: string; quantity: number | null }>
 }
 
@@ -59,6 +62,9 @@ export default class MaintenanceHistoryController {
       performedAt: ev.performedAt.toISODate()!,
       engineCaption: ev.engineCaption,
       sailCaption: ev.sailCaption,
+      boatEngineId: ev.boatEngineId,
+      boatSailId: ev.boatSailId,
+      boatRigId: ev.boatRigId,
       parts: ev.parts.map((p) => ({
         id: p.id,
         name: p.name,
