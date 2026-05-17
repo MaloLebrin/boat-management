@@ -26,6 +26,7 @@ export interface ApiDefinition {
     editEngine: typeof routes['boat_equipment.edit_engine']
     updateEngine: typeof routes['boat_equipment.update_engine']
     updateEngineStatus: typeof routes['boat_equipment.update_engine_status']
+    updateEngineNotes: typeof routes['boat_equipment.update_engine_notes']
     destroyEngine: typeof routes['boat_equipment.destroy_engine']
     storeSail: typeof routes['boat_equipment.store_sail']
     editSail: typeof routes['boat_equipment.edit_sail']

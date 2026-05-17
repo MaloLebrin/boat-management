@@ -13,6 +13,7 @@ import {
   storeBoatSailValidator,
   updateBoatEngineValidator,
   updateBoatSailValidator,
+  updateEquipmentNotesValidator,
   updateEquipmentStatusValidator,
   upsertBoatRigValidator,
 } from '#validators/boat_equipment'
@@ -176,6 +177,7 @@ export default class BoatEquipmentController {
         material: sail.material,
         reefPoints: sail.reefPoints,
         status: sail.status,
+        notes: sail.notes,
       },
     })
   }
@@ -251,6 +253,7 @@ export default class BoatEquipmentController {
             mastCount: boat.rig.mastCount,
             spreaders: boat.rig.spreaders,
             status: boat.rig.status,
+            notes: boat.rig.notes,
           }
         : null,
     })
@@ -334,6 +337,7 @@ export default class BoatEquipmentController {
         hours: engine.hours,
         installHours: engine.installHours,
         status: engine.status,
+        notes: engine.notes,
         documents: engineDocuments.map((m) => ({
           id: m.id,
           kind: m.kind,
@@ -397,6 +401,43 @@ export default class BoatEquipmentController {
 
     try {
       await boatService.updateEngineStatus(loaded.user, boat, Number(params.engineId), status)
+    } catch (error) {
+      if (error instanceof BoatEquipmentNotFoundError) {
+        session.flash('error', i18n.t('flash.engine.notFound'))
+        response.redirect(`/boats/${boat.id}`)
+        return
+      }
+      throw error
+    }
+
+    response.redirect().back()
+  }
+
+  async updateEngineNotes({
+    request,
+    response,
+    auth,
+    params,
+    bouncer,
+    session,
+    i18n,
+  }: HttpContext) {
+    await auth.authenticate()
+    const loaded = await this.loadBoatForEquipment({ auth, response, params })
+    if (!loaded) return
+
+    const { boat, boatService } = loaded
+    await bouncer.authorize('boatUpdate', boat)
+
+    const { notes } = await request.validateUsing(updateEquipmentNotesValidator)
+
+    try {
+      await boatService.updateEngineNotes(
+        loaded.user,
+        boat,
+        Number(params.engineId),
+        notes ?? null
+      )
     } catch (error) {
       if (error instanceof BoatEquipmentNotFoundError) {
         session.flash('error', i18n.t('flash.engine.notFound'))

@@ -90,6 +90,12 @@ const routes = {
     tokens: [{"old":"/boats/:boatId/engines/:engineId/status","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/engines/:engineId/status","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/engines/:engineId/status","type":0,"val":"engines","end":""},{"old":"/boats/:boatId/engines/:engineId/status","type":1,"val":"engineId","end":""},{"old":"/boats/:boatId/engines/:engineId/status","type":0,"val":"status","end":""}],
     types: placeholder as Registry['boat_equipment.update_engine_status']['types'],
   },
+  'boat_equipment.update_engine_notes': {
+    methods: ["PATCH"],
+    pattern: '/boats/:boatId/engines/:engineId/notes',
+    tokens: [{"old":"/boats/:boatId/engines/:engineId/notes","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/engines/:engineId/notes","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/engines/:engineId/notes","type":0,"val":"engines","end":""},{"old":"/boats/:boatId/engines/:engineId/notes","type":1,"val":"engineId","end":""},{"old":"/boats/:boatId/engines/:engineId/notes","type":0,"val":"notes","end":""}],
+    types: placeholder as Registry['boat_equipment.update_engine_notes']['types'],
+  },
   'boat_equipment.destroy_engine': {
     methods: ["DELETE"],
     pattern: '/boats/:boatId/engines/:engineId',

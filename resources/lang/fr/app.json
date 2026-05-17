@@ -318,6 +318,10 @@
       "in_maintenance": "En maintenance",
       "out_of_service": "Hors service",
       "retired": "Retiré"
+    },
+    "notes": {
+      "label": "Notes libres",
+      "placeholder": "Observations, remarques, historique..."
     }
   },
   "boats": {
@@ -629,12 +633,11 @@
       },
       "notes": {
         "title": "Notes libres",
-        "add": "+ Note",
-        "types": "Types de notes disponibles",
-        "followUp": "À suivre",
-        "anomaly": "Anomalie",
-        "idea": "Idée",
-        "comingSoon": "Bientôt disponible"
+        "edit": "Modifier",
+        "save": "Enregistrer",
+        "cancel": "Annuler",
+        "empty": "Aucune note. Cliquez sur Modifier pour en ajouter.",
+        "placeholder": "Saisissez vos notes libres ici..."
       },
       "parts": {
         "title": "Pièces compatibles",

@@ -27,6 +27,7 @@ export type BoatShowEngine = {
   hours: number | null
   installHours: number | null
   status: 'operational' | 'in_maintenance' | 'out_of_service' | 'retired'
+  notes: string | null
   documents: MediaRow[]
 }
 

@@ -1,36 +1,88 @@
 <script setup lang="ts">
-import BaseBadge from '~/components/base/BaseBadge.vue'
+import { router } from '@inertiajs/vue3'
+import { ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
+import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import { useT } from '~/composables/useT'
+import type { BoatShowEngine } from '~/types/boat_show'
+
+const props = defineProps<{
+  engine: BoatShowEngine
+  boat: { id: number; name: string }
+  canManage: boolean
+}>()
 
 const { t } = useT()
+
+const editing = ref(false)
+const draft = ref(props.engine.notes ?? '')
+const saving = ref(false)
+
+function startEdit() {
+  draft.value = props.engine.notes ?? ''
+  editing.value = true
+}
+
+function cancelEdit() {
+  editing.value = false
+}
+
+function save() {
+  saving.value = true
+  router.patch(
+    `/boats/${props.boat.id}/engines/${props.engine.id}/notes`,
+    { notes: draft.value || null },
+    {
+      preserveScroll: true,
+      onFinish: () => {
+        saving.value = false
+        editing.value = false
+      },
+    }
+  )
+}
 </script>
 
 <template>
-  <div class="space-y-6">
+  <div class="space-y-4">
     <div class="flex items-center justify-between">
       <h2 class="text-lg font-semibold text-fg">{{ t('boats.engineShow.notes.title') }}</h2>
-      <BaseButton variant="secondary" size="sm" disabled>
-        {{ t('boats.engineShow.notes.add') }}
+      <BaseButton
+        v-if="canManage && !editing"
+        variant="secondary"
+        size="sm"
+        type="button"
+        @click="startEdit"
+      >
+        {{ t('boats.engineShow.notes.edit') }}
       </BaseButton>
     </div>
 
-    <div class="border-2 border-dashed border-border rounded-lg p-8 text-center">
-      <div class="space-y-4 text-fg-muted">
-        <p class="font-medium">{{ t('boats.engineShow.notes.types') }}</p>
-        <div class="flex flex-wrap justify-center gap-4 text-sm">
-          <span class="flex items-center gap-1">
-            <span>&#128204;</span> {{ t('boats.engineShow.notes.followUp') }}
-          </span>
-          <span class="flex items-center gap-1">
-            <span>&#9888;</span> {{ t('boats.engineShow.notes.anomaly') }}
-          </span>
-          <span class="flex items-center gap-1">
-            <span>&#128161;</span> {{ t('boats.engineShow.notes.idea') }}
-          </span>
-        </div>
+    <!-- Edit mode -->
+    <div v-if="editing" class="space-y-3">
+      <BaseTextarea
+        v-model="draft"
+        :rows="8"
+        :placeholder="t('boats.engineShow.notes.placeholder')"
+      />
+      <div class="flex gap-2 justify-end">
+        <BaseButton variant="ghost" size="sm" type="button" @click="cancelEdit">
+          {{ t('boats.engineShow.notes.cancel') }}
+        </BaseButton>
+        <BaseButton variant="primary" size="sm" type="button" :disabled="saving" @click="save">
+          {{ t('boats.engineShow.notes.save') }}
+        </BaseButton>
       </div>
-      <BaseBadge variant="info" class="mt-6">{{ t('boats.engineShow.notes.comingSoon') }}</BaseBadge>
+    </div>
+
+    <!-- Read mode -->
+    <div v-else>
+      <div v-if="engine.notes" class="rounded-lg border border-border bg-surface-elevated p-4">
+        <p class="text-sm text-fg whitespace-pre-wrap">{{ engine.notes }}</p>
+      </div>
+      <div v-else class="rounded-lg border-2 border-dashed border-border p-8 text-center">
+        <p class="text-sm text-fg-muted">{{ t('boats.engineShow.notes.empty') }}</p>
+      </div>
     </div>
   </div>
 </template>

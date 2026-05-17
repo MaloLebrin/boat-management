@@ -22,6 +22,10 @@ router
       controllers.BoatEquipment,
       'updateEngineStatus',
     ])
+    router.patch('boats/:boatId/engines/:engineId/notes', [
+      controllers.BoatEquipment,
+      'updateEngineNotes',
+    ])
     router.delete('boats/:boatId/engines/:engineId', [controllers.BoatEquipment, 'destroyEngine'])
 
     router.post('boats/:boatId/engines/:engineId/documents', [

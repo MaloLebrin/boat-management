@@ -195,7 +195,7 @@ function formatYear(iso: string): string {
         <EngineShowTabMaintenance v-else-if="tab === 'maintenance'" :boat="boat" :engine="engine"
           :maintenance-events="maintenanceEvents" :open-tasks="openTasks" :sorted-open-tasks="sortedOpenTasks"
           :total-parts="totalParts" :can-manage="canManage" :events-by-year-month="eventsByYearMonth" />
-        <EngineShowTabNotes v-else-if="tab === 'notes'" />
+        <EngineShowTabNotes v-else-if="tab === 'notes'" :engine="engine" :boat="boat" :can-manage="canManage" />
         <EngineShowTabParts v-else-if="tab === 'parts'" />
         <EngineShowTabDocuments v-else-if="tab === 'documents'" :boat="boat" :engine="engine" :can-manage="canManage" />
       </div>

@@ -2,6 +2,7 @@
 import { computed, ref, watch } from 'vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
+import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import { useT } from '~/composables/useT'
 import { useBoatOptions } from '~/composables/useBoatOptions'
 import { RIG_TYPE_OPTIONS } from '#shared/constants/boats/boat_form_options'
@@ -12,6 +13,7 @@ export type BoatEquipmentRigFieldsModel = {
   mastCount: number | null
   spreaders: number | null
   status: 'operational' | 'in_maintenance' | 'out_of_service' | 'retired'
+  notes: string | null
 }
 
 const props = defineProps<{
@@ -34,6 +36,7 @@ const manufacturedAt = ref('')
 const mastCount = ref('')
 const spreaders = ref('')
 const status = ref('')
+const notes = ref('')
 
 function syncFromProps() {
   const r = props.rig
@@ -42,6 +45,7 @@ function syncFromProps() {
   mastCount.value = r?.mastCount === null || r?.mastCount === undefined ? '' : String(r.mastCount)
   spreaders.value = r?.spreaders === null || r?.spreaders === undefined ? '' : String(r.spreaders)
   status.value = r?.status ?? 'operational'
+  notes.value = r?.notes ?? ''
 }
 
 watch(
@@ -99,5 +103,17 @@ watch(
       v-model="status"
       :errors="errors"
     />
+
+    <div class="col-span-2">
+      <BaseTextarea
+        id="notes"
+        name="notes"
+        :label="t('boats.equipment.notes.label')"
+        :placeholder="t('boats.equipment.notes.placeholder')"
+        :rows="4"
+        v-model="notes"
+        :errors="errors"
+      />
+    </div>
   </div>
 </template>

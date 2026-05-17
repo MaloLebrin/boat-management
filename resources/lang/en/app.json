@@ -318,6 +318,10 @@
       "in_maintenance": "In maintenance",
       "out_of_service": "Out of service",
       "retired": "Retired"
+    },
+    "notes": {
+      "label": "Free notes",
+      "placeholder": "Observations, remarks, history..."
     }
   },
   "boats": {
@@ -610,12 +614,11 @@
       },
       "notes": {
         "title": "Free notes",
-        "add": "+ Note",
-        "types": "Available note types",
-        "followUp": "Follow-up",
-        "anomaly": "Anomaly",
-        "idea": "Idea",
-        "comingSoon": "Coming soon"
+        "edit": "Edit",
+        "save": "Save",
+        "cancel": "Cancel",
+        "empty": "No notes yet. Click Edit to add some.",
+        "placeholder": "Type your free notes here..."
       },
       "parts": {
         "title": "Compatible parts",

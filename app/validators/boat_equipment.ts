@@ -56,6 +56,7 @@ const sailPayload = vine.object({
   material: vine.string().trim().maxLength(120).optional(),
   reefPoints: vine.string().trim().optional(),
   status: vine.enum(equipmentStatuses).optional(),
+  notes: vine.string().trim().maxLength(5000).optional(),
 })
 
 export const storeBoatSailValidator = vine.compile(sailPayload)
@@ -69,6 +70,7 @@ export type BoatSailFormBody = {
   material?: string
   reefPoints?: string
   status?: string
+  notes?: string
 }
 
 const rigPayload = vine.object({
@@ -77,6 +79,7 @@ const rigPayload = vine.object({
   mastCount: vine.string().trim().optional(),
   spreaders: vine.string().trim().optional(),
   status: vine.enum(equipmentStatuses).optional(),
+  notes: vine.string().trim().maxLength(5000).optional(),
 })
 
 export const upsertBoatRigValidator = vine.compile(rigPayload)
@@ -85,12 +88,17 @@ export const updateEquipmentStatusValidator = vine.compile(
   vine.object({ status: vine.enum(equipmentStatuses) })
 )
 
+export const updateEquipmentNotesValidator = vine.compile(
+  vine.object({ notes: vine.string().trim().maxLength(5000).optional().nullable() })
+)
+
 export type BoatRigFormBody = {
   rigType: string
   manufacturedAt?: string
   mastCount?: string
   spreaders?: string
   status?: string
+  notes?: string
 }
 
 function parseOptionalPositiveFloat(raw: string | undefined): number | null {
@@ -145,6 +153,7 @@ export function equipmentBodyToSailPayload(body: BoatSailFormBody): BoatSailPayl
     material: emptyToNull(body.material),
     reefPoints: parseOptionalNonNegativeInt(body.reefPoints),
     status: (body.status ?? 'operational') as EquipmentStatus,
+    notes: emptyToNull(body.notes),
   }
 }
 
@@ -155,5 +164,6 @@ export function equipmentBodyToRigPayload(body: BoatRigFormBody): BoatRigPayload
     mastCount: parseOptionalNonNegativeInt(body.mastCount),
     spreaders: parseOptionalNonNegativeInt(body.spreaders),
     status: (body.status ?? 'operational') as EquipmentStatus,
+    notes: emptyToNull(body.notes),
   }
 }

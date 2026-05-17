@@ -8,7 +8,7 @@ import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
 export class BoatEngineSchema extends BaseModel {
-  static $columns = ['boatId', 'brand', 'createdAt', 'fuel', 'hours', 'id', 'installHours', 'kind', 'manufacturedAt', 'model', 'powerHp', 'powerKw', 'serialNumber', 'status', 'strokeType', 'updatedAt'] as const
+  static $columns = ['boatId', 'brand', 'createdAt', 'fuel', 'hours', 'id', 'installHours', 'kind', 'manufacturedAt', 'model', 'notes', 'powerHp', 'powerKw', 'serialNumber', 'status', 'strokeType', 'updatedAt'] as const
   $columns = BoatEngineSchema.$columns
   @column()
   declare boatId: number
@@ -30,6 +30,8 @@ export class BoatEngineSchema extends BaseModel {
   declare manufacturedAt: DateTime | null
   @column()
   declare model: string | null
+  @column()
+  declare notes: string | null
   @column()
   declare powerHp: number | null
   @column()
@@ -138,7 +140,7 @@ export class BoatMaintenanceTaskSchema extends BaseModel {
 }
 
 export class BoatRigSchema extends BaseModel {
-  static $columns = ['boatId', 'createdAt', 'id', 'manufacturedAt', 'mastCount', 'rigType', 'spreaders', 'status', 'updatedAt'] as const
+  static $columns = ['boatId', 'createdAt', 'id', 'manufacturedAt', 'mastCount', 'notes', 'rigType', 'spreaders', 'status', 'updatedAt'] as const
   $columns = BoatRigSchema.$columns
   @column()
   declare boatId: number
@@ -151,6 +153,8 @@ export class BoatRigSchema extends BaseModel {
   @column()
   declare mastCount: number | null
   @column()
+  declare notes: string | null
+  @column()
   declare rigType: string
   @column()
   declare spreaders: number | null
@@ -161,7 +165,7 @@ export class BoatRigSchema extends BaseModel {
 }
 
 export class BoatSailSchema extends BaseModel {
-  static $columns = ['areaM2', 'boatId', 'createdAt', 'id', 'manufacturedAt', 'material', 'reefPoints', 'sailType', 'status', 'updatedAt'] as const
+  static $columns = ['areaM2', 'boatId', 'createdAt', 'id', 'manufacturedAt', 'material', 'notes', 'reefPoints', 'sailType', 'status', 'updatedAt'] as const
   $columns = BoatSailSchema.$columns
   @column()
   declare areaM2: number | null
@@ -175,6 +179,8 @@ export class BoatSailSchema extends BaseModel {
   declare manufacturedAt: DateTime | null
   @column()
   declare material: string | null
+  @column()
+  declare notes: string | null
   @column()
   declare reefPoints: number | null
   @column()

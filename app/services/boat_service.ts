@@ -58,6 +58,7 @@ export type BoatSailPayload = {
   material?: string | null
   reefPoints?: number | null
   status?: string | null
+  notes?: string | null
 }
 
 export type BoatRigPayload = {
@@ -66,6 +67,7 @@ export type BoatRigPayload = {
   mastCount?: number | null
   spreaders?: number | null
   status?: string | null
+  notes?: string | null
 }
 
 function assertBoatInUserOrg(user: User, boat: Boat) {
@@ -269,6 +271,7 @@ export default class BoatService {
     sail.areaM2 = payload.areaM2 ?? null
     sail.material = payload.material ?? null
     sail.reefPoints = payload.reefPoints ?? null
+    sail.notes = payload.notes ?? null
 
     await sail.save()
     return sail
@@ -294,6 +297,7 @@ export default class BoatService {
       rig.manufacturedAt = toDateOrNull(payload.manufacturedAt)
       rig.mastCount = payload.mastCount ?? null
       rig.spreaders = payload.spreaders ?? null
+      rig.notes = payload.notes ?? null
       await rig.save()
     } else {
       rig = await BoatRig.create({
@@ -302,10 +306,22 @@ export default class BoatService {
         manufacturedAt: toDateOrNull(payload.manufacturedAt),
         mastCount: payload.mastCount ?? null,
         spreaders: payload.spreaders ?? null,
+        notes: payload.notes ?? null,
       })
     }
 
     return rig
+  }
+
+  async updateEngineNotes(user: User, boat: Boat, engineId: number, notes: string | null) {
+    assertBoatInUserOrg(user, boat)
+
+    const engine = await BoatEngine.query().where('id', engineId).where('boatId', boat.id).first()
+
+    if (!engine) throw new BoatEquipmentNotFoundError()
+
+    engine.notes = notes
+    await engine.save()
   }
 
   async deleteRig(user: User, boat: Boat) {
