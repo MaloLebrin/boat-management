@@ -149,3 +149,5 @@ export type MaintenanceSheetRow = {
   notes: string | null
   items: MaintenanceSheetItemRow[]
 }
+
+export type AiSuggestion = { text: string }

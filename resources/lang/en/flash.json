@@ -41,7 +41,8 @@
     "doneEngineHoursInvalid": "Engine hours at completion must be 0 or more."
   },
   "ai": {
-    "messagesRequired": "The messages field is required."
+    "messagesRequired": "The messages field is required.",
+    "analysisError": "An error occurred while generating the analysis. Please try again."
   },
   "media": {
     "photoAdded": "Photo added.",

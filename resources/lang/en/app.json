@@ -139,7 +139,10 @@
     "analyzeFleet": "Analyze fleet",
     "aiPanel": {
       "title": "AI Assistant",
-      "suggestions": "Suggestions"
+      "suggestions": "Suggestions",
+      "empty": "Click 'Analyze fleet' to get personalized suggestions.",
+      "analyzing": "Analyzing...",
+      "noSuggestions": "No suggestions at this time."
     },
     "stats": {
       "boats": "Boats",
@@ -574,8 +577,9 @@
         "recentActivityEmpty": "No recent activity.",
         "viewHistory": "View full history →",
         "aiTitle": "AI Assistant",
-        "aiSuggestion0": "Optimize my maintenance schedule",
-        "aiSuggestion1": "Estimate annual costs",
+        "aiEmpty": "Click 'Refresh' to get AI-powered suggestions.",
+        "aiRefresh": "Refresh",
+        "aiRefreshing": "Analyzing...",
         "homePortTitle": "Home port",
         "homePortEmpty": "Not specified"
       }

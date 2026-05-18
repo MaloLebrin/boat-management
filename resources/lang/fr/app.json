@@ -139,7 +139,10 @@
     "analyzeFleet": "Analyser la flotte",
     "aiPanel": {
       "title": "Assistant IA",
-      "suggestions": "Suggestions"
+      "suggestions": "Suggestions",
+      "empty": "Cliquez sur 'Analyser la flotte' pour des suggestions personnalisées.",
+      "analyzing": "Analyse en cours...",
+      "noSuggestions": "Aucune suggestion pour le moment."
     },
     "stats": {
       "boats": "Bateaux",
@@ -574,8 +577,9 @@
         "recentActivityEmpty": "Aucune activité récente.",
         "viewHistory": "Voir tout l'historique →",
         "aiTitle": "Assistant IA",
-        "aiSuggestion0": "Optimiser mon planning de maintenance",
-        "aiSuggestion1": "Estimer les coûts annuels",
+        "aiEmpty": "Cliquez sur 'Actualiser' pour des suggestions IA.",
+        "aiRefresh": "Actualiser",
+        "aiRefreshing": "Analyse...",
         "homePortTitle": "Port d'attache",
         "homePortEmpty": "Non renseigné"
       }

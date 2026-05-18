@@ -667,6 +667,30 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/ai_controller').default['chat']>>>
     }
   }
+  'ai.fleetAnalysis': {
+    methods: ["POST"]
+    pattern: '/ai/fleet-analysis'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/ai_controller').default['fleetAnalysis']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/ai_controller').default['fleetAnalysis']>>>
+    }
+  }
+  'ai.boatSuggestions': {
+    methods: ["POST"]
+    pattern: '/ai/boats/:id/suggestions'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/ai_controller').default['boatSuggestions']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/ai_controller').default['boatSuggestions']>>>
+    }
+  }
   'root': {
     methods: ["GET","HEAD"]
     pattern: '/'

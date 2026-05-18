@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { ExclamationTriangleIcon } from '@heroicons/vue/24/outline'
-import { computed } from 'vue'
+import { router } from '@inertiajs/vue3'
+import { computed, ref } from 'vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
+import BaseSkeleton from '~/components/base/BaseSkeleton.vue'
 import { subjectLabel } from '~/components/boats/maintenance/utils'
 import BoatPhotoGallery from '~/components/boats/show/BoatPhotoGallery.vue'
 import { useT } from '~/composables/useT'
@@ -16,11 +18,22 @@ const props = defineProps<{
   maintenanceTasks: MaintenanceTaskRow[]
   maintenanceEvents: MaintenanceEventRow[]
   canManage: boolean
+  aiSuggestions: Array<{ text: string }> | null
 }>()
 
 const emit = defineEmits<{
   'go-to-tab': [tab: string]
 }>()
+
+const isRefreshing = ref(false)
+
+function refreshSuggestions() {
+  isRefreshing.value = true
+  router.post(`/ai/boats/${props.boat.id}/suggestions`, {}, {
+    preserveScroll: true,
+    onFinish: () => { isRefreshing.value = false },
+  })
+}
 
 const todayIso = computed(() => new Date().toISOString().slice(0, 10))
 
@@ -174,22 +187,44 @@ function formatDate(iso: string | null): string {
 
     <!-- Right column (w-72) -->
     <div class="w-full lg:w-72 space-y-6">
-      <!-- TODO: replace hardcoded AI suggestions with real Mistral suggestions from backend -->
-      <!-- TODO: wire each suggestion button to open a chat/prompt flow -->
       <!-- AI panel -->
       <div class="bg-abyss-900 text-white rounded-xl p-4">
-        <p class="font-semibold flex items-center gap-2">
-          <span class="text-lg">&#10022;</span>
-          {{ t('boats.show.overview.aiTitle') }}
-        </p>
-        <div class="mt-3 space-y-2">
-          <div class="rounded-lg bg-abyss-800 px-3 py-2 text-sm">
-            {{ t('boats.show.overview.aiSuggestion0') }}
-          </div>
-          <div class="rounded-lg bg-abyss-800 px-3 py-2 text-sm">
-            {{ t('boats.show.overview.aiSuggestion1') }}
-          </div>
+        <div class="flex items-center justify-between mb-3">
+          <p class="font-semibold flex items-center gap-2">
+            <span class="text-lg">&#10022;</span>
+            {{ t('boats.show.overview.aiTitle') }}
+          </p>
+          <button
+            type="button"
+            class="text-xs text-lagoon-400 hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
+            :disabled="isRefreshing"
+            @click="refreshSuggestions"
+          >
+            {{ isRefreshing ? t('boats.show.overview.aiRefreshing') : t('boats.show.overview.aiRefresh') }}
+          </button>
         </div>
+
+        <!-- Loading -->
+        <template v-if="isRefreshing">
+          <BaseSkeleton height-class="h-10" rounded-class="rounded-lg" class="mb-2 opacity-30" />
+          <BaseSkeleton height-class="h-10" rounded-class="rounded-lg" class="opacity-20" />
+        </template>
+
+        <!-- Pas encore d'analyse -->
+        <template v-else-if="!aiSuggestions">
+          <p class="text-sm text-abyss-400">{{ t('boats.show.overview.aiEmpty') }}</p>
+        </template>
+
+        <!-- Suggestions réelles -->
+        <template v-else>
+          <div
+            v-for="(s, i) in aiSuggestions"
+            :key="i"
+            class="rounded-lg bg-abyss-800 px-3 py-2 text-sm mb-2 last:mb-0"
+          >
+            {{ s.text }}
+          </div>
+        </template>
       </div>
 
       <!-- TODO: add a `homePort` field to the Boat model/migration/form and display it here instead of registrationNumber -->

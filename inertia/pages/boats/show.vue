@@ -13,7 +13,7 @@ import BoatShowTabSpecs from '~/components/boats/show/tabs/BoatShowTabSpecs.vue'
 import BoatShowTabSheets from '~/components/boats/show/tabs/BoatShowTabSheets.vue'
 import BoatShowTabTasks from '~/components/boats/show/tabs/BoatShowTabTasks.vue'
 import { useT } from '~/composables/useT'
-import type { BoatShowDetail, MaintenanceEventRow, MaintenanceSheetRow, MaintenanceTaskRow } from '~/types/boat_show'
+import type { AiSuggestion, BoatShowDetail, MaintenanceEventRow, MaintenanceSheetRow, MaintenanceTaskRow } from '~/types/boat_show'
 
 const { t } = useT()
 
@@ -24,6 +24,7 @@ const props = defineProps<{
   maintenanceSheets: MaintenanceSheetRow[]
   canManageMaintenance: boolean
   canManageEquipment: boolean
+  aiSuggestions: AiSuggestion[] | null
 }>()
 
 type TabKey = 'overview' | 'specs' | 'equipment' | 'history' | 'tasks' | 'documents' | 'sheets'
@@ -122,7 +123,7 @@ function goToTab(key: TabKey | string) {
     <Transition name="tab" mode="out-in">
       <div :key="tab" class="mt-8">
         <BoatShowTabOverview v-if="tab === 'overview'" :boat="boat" :maintenance-tasks="maintenanceTasks"
-          :maintenance-events="maintenanceEvents" :can-manage="canManageEquipment" @go-to-tab="goToTab" />
+          :maintenance-events="maintenanceEvents" :can-manage="canManageEquipment" :ai-suggestions="aiSuggestions" @go-to-tab="goToTab" />
 
         <BoatShowTabSpecs v-else-if="tab === 'specs'" :boat="boat" />
 

@@ -59,6 +59,8 @@ export type ScannedRoutes = {
     'password_reset.update': { paramsTuple?: []; params?: {} }
     'session.destroy': { paramsTuple?: []; params?: {} }
     'ai.chat': { paramsTuple?: []; params?: {} }
+    'ai.fleetAnalysis': { paramsTuple?: []; params?: {} }
+    'ai.boatSuggestions': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'root': { paramsTuple?: []; params?: {} }
     'marketing.en.home': { paramsTuple?: []; params?: {} }
     'marketing.en.pricing': { paramsTuple?: []; params?: {} }
@@ -153,6 +155,8 @@ export type ScannedRoutes = {
     'password_reset.update': { paramsTuple?: []; params?: {} }
     'session.destroy': { paramsTuple?: []; params?: {} }
     'ai.chat': { paramsTuple?: []; params?: {} }
+    'ai.fleetAnalysis': { paramsTuple?: []; params?: {} }
+    'ai.boatSuggestions': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'locale.set': { paramsTuple?: []; params?: {} }
   }
   PUT: {

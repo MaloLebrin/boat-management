@@ -41,7 +41,8 @@
     "doneEngineHoursInvalid": "Les heures moteur à l'achèvement doivent être supérieures ou égales à 0."
   },
   "ai": {
-    "messagesRequired": "Le champ messages est obligatoire."
+    "messagesRequired": "Le champ messages est obligatoire.",
+    "analysisError": "Une erreur s'est produite lors de la génération de l'analyse. Veuillez réessayer."
   },
   "media": {
     "photoAdded": "Photo ajoutée.",

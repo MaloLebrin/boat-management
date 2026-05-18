@@ -86,6 +86,8 @@ export interface ApiDefinition {
   }
   ai: {
     chat: typeof routes['ai.chat']
+    fleetAnalysis: typeof routes['ai.fleetAnalysis']
+    boatSuggestions: typeof routes['ai.boatSuggestions']
   }
   root: typeof routes['root']
   marketing: {

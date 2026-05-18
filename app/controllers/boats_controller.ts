@@ -1,3 +1,4 @@
+import AiAnalysisService, { type AiSuggestion } from '#services/ai_analysis_service'
 import BoatMaintenanceService from '#services/boat_maintenance_service'
 import BoatMaintenanceSheetService from '#services/boat_maintenance_sheet_service'
 import BoatMaintenanceTaskService from '#services/boat_maintenance_task_service'
@@ -60,6 +61,11 @@ export default class BoatsController {
       const mediaService = new MediaService()
       const boatMedia = await mediaService.listForEntity('boat', boat.id)
       await boat.load('safetyEquipment')
+      const aiAnalysisService = new AiAnalysisService()
+      const latestSuggestions = await aiAnalysisService.getLatestBoatSuggestions(user.id, boat.id)
+      const aiSuggestions: AiSuggestion[] | null = latestSuggestions
+        ? (JSON.parse(latestSuggestions.responseText) as AiSuggestion[])
+        : null
       return inertia.render('boats/show', {
         boat: {
           id: boat.id,
@@ -185,6 +191,7 @@ export default class BoatsController {
         })),
         canManageMaintenance,
         canManageEquipment,
+        aiSuggestions,
       })
     } catch (error) {
       if (error instanceof BoatNotFoundError) {

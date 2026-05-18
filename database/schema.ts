@@ -7,6 +7,23 @@
 import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
+export class AiAnalysisSchema extends BaseModel {
+  static $columns = ['boatId', 'createdAt', 'id', 'kind', 'responseText', 'userId'] as const
+  $columns = AiAnalysisSchema.$columns
+  @column()
+  declare boatId: number | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare kind: string
+  @column()
+  declare responseText: string
+  @column()
+  declare userId: number
+}
+
 export class BoatEnginePartSchema extends BaseModel {
   static $columns = ['boatEngineId', 'createdAt', 'designation', 'id', 'notes', 'reference', 'stock', 'supplier', 'updatedAt'] as const
   $columns = BoatEnginePartSchema.$columns

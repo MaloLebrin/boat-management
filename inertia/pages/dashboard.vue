@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { Head } from '@inertiajs/vue3'
+import { Head, router } from '@inertiajs/vue3'
 import { ref } from 'vue'
 import BaseAlert from '~/components/base/BaseAlert.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
+import BaseSkeleton from '~/components/base/BaseSkeleton.vue'
 import BaseStatCard from '~/components/base/BaseStatCard.vue'
 import { useT } from '~/composables/useT'
+import type { AiSuggestion } from '~/types/boat_show'
 
 const { t } = useT()
 
@@ -40,9 +42,19 @@ const props = defineProps<{
     rigs: number
     urgentMaintenance: number
   }
+  aiFleetAnalysis: AiSuggestion[] | null
 }>()
 
 const showAlert = ref(true)
+const isAnalyzing = ref(false)
+
+function analyzeFleet() {
+  isAnalyzing.value = true
+  router.post('/ai/fleet-analysis', {}, {
+    preserveScroll: true,
+    onFinish: () => { isAnalyzing.value = false },
+  })
+}
 
 function isOverdue(dueAtIso: string) {
   return dueAtIso < new Date().toISOString().slice(0, 10)
@@ -98,9 +110,7 @@ function dismissAlert() {
       />
     </div>
 
-    <!-- Main grid with AI panel on the right -->
     <div class="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_16rem]">
-      <!-- Left column: urgent maintenance + boats table -->
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_2fr]">
         <BaseCard>
           <template #header>
@@ -191,7 +201,6 @@ function dismissAlert() {
         </BaseCard>
       </div>
 
-      <!-- Right column: AI suggestions panel -->
       <div class="bg-abyss-900 text-white rounded-xl p-5">
         <div class="flex items-center gap-2 mb-1">
           <span class="text-lagoon-400">&#10022;</span>
@@ -199,34 +208,37 @@ function dismissAlert() {
         </div>
         <p class="text-xs text-abyss-300 mb-4">{{ t('dashboard.aiPanel.suggestions') }}</p>
 
-        <!-- TODO: replace hardcoded AI suggestions with real data from backend (e.g. GET /ai/suggestions) -->
-        <div class="space-y-3 mb-5">
-          <div class="bg-abyss-800/60 rounded-lg p-3 border border-abyss-700">
-            <p class="text-sm text-abyss-100">
-              Verifiez l'antifouling du <span class="font-medium text-white">Nautica 42</span> - derniere application il y a 14 mois
-            </p>
-          </div>
-          <div class="bg-abyss-800/60 rounded-lg p-3 border border-abyss-700">
-            <p class="text-sm text-abyss-100">
-              Le moteur du <span class="font-medium text-white">Beneteau First</span> approche des 500h - planifier vidange
-            </p>
-          </div>
-          <div class="bg-abyss-800/60 rounded-lg p-3 border border-abyss-700">
-            <p class="text-sm text-abyss-100">
-              3 bateaux ont des controles annuels en <span class="font-medium text-white">juin 2026</span>
-            </p>
+        <div v-if="isAnalyzing" class="space-y-3 mb-5">
+          <BaseSkeleton height-class="h-14" rounded-class="rounded-lg" class="opacity-30" />
+          <BaseSkeleton height-class="h-14" rounded-class="rounded-lg" class="opacity-20" />
+          <BaseSkeleton height-class="h-10" rounded-class="rounded-lg" class="opacity-10" />
+        </div>
+        <div v-else-if="!aiFleetAnalysis" class="mb-5">
+          <p class="text-sm text-abyss-400">{{ t('dashboard.aiPanel.empty') }}</p>
+        </div>
+        <div v-else-if="aiFleetAnalysis.length === 0" class="mb-5">
+          <p class="text-sm text-abyss-400">{{ t('dashboard.aiPanel.noSuggestions') }}</p>
+        </div>
+        <div v-else class="space-y-3 mb-5">
+          <div
+            v-for="(s, i) in aiFleetAnalysis"
+            :key="i"
+            class="bg-abyss-800/60 rounded-lg p-3 border border-abyss-700"
+          >
+            <p class="text-sm text-abyss-100">{{ s.text }}</p>
           </div>
         </div>
 
-        <!-- TODO: wire "Analyser la flotte" to POST /ai/fleet-analysis and stream the Mistral response -->
         <button
           type="button"
-          class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-lagoon-500 hover:bg-lagoon-600 text-white text-sm font-medium transition-colors"
+          :disabled="isAnalyzing"
+          class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-lagoon-500 hover:bg-lagoon-600 disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-medium transition-colors"
+          @click="analyzeFleet"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
           </svg>
-          <span>{{ t('dashboard.analyzeFleet') }}</span>
+          <span>{{ isAnalyzing ? t('dashboard.aiPanel.analyzing') : t('dashboard.analyzeFleet') }}</span>
         </button>
       </div>
     </div>

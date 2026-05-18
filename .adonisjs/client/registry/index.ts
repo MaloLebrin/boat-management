@@ -336,6 +336,18 @@ const routes = {
     tokens: [{"old":"/ai/chat","type":0,"val":"ai","end":""},{"old":"/ai/chat","type":0,"val":"chat","end":""}],
     types: placeholder as Registry['ai.chat']['types'],
   },
+  'ai.fleetAnalysis': {
+    methods: ["POST"],
+    pattern: '/ai/fleet-analysis',
+    tokens: [{"old":"/ai/fleet-analysis","type":0,"val":"ai","end":""},{"old":"/ai/fleet-analysis","type":0,"val":"fleet-analysis","end":""}],
+    types: placeholder as Registry['ai.fleetAnalysis']['types'],
+  },
+  'ai.boatSuggestions': {
+    methods: ["POST"],
+    pattern: '/ai/boats/:id/suggestions',
+    tokens: [{"old":"/ai/boats/:id/suggestions","type":0,"val":"ai","end":""},{"old":"/ai/boats/:id/suggestions","type":0,"val":"boats","end":""},{"old":"/ai/boats/:id/suggestions","type":1,"val":"id","end":""},{"old":"/ai/boats/:id/suggestions","type":0,"val":"suggestions","end":""}],
+    types: placeholder as Registry['ai.boatSuggestions']['types'],
+  },
   'root': {
     methods: ["GET","HEAD"],
     pattern: '/',
