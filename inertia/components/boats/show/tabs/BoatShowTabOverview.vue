@@ -136,7 +136,8 @@ function formatDate(iso: string | null): string {
           </div>
         </dl>
         <div class="mt-4">
-          <button type="button" class="text-sm font-semibold text-brand hover:underline" @click="emit('go-to-tab', 'specs')">
+          <button type="button" class="text-sm font-semibold text-brand hover:underline"
+            @click="emit('go-to-tab', 'specs')">
             Voir les specifications &rarr;
           </button>
         </div>
@@ -193,7 +194,7 @@ function formatDate(iso: string | null): string {
       <BaseCard padded>
         <p class="text-sm font-semibold text-fg">Port d'attache</p>
         <p class="mt-2 text-sm text-fg-muted">
-          {{ boat.registrationNumber ?? 'Non renseigne' }}
+          {{ boat.homePort ?? 'Non renseigne' }}
         </p>
       </BaseCard>
     </div>
