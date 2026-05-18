@@ -44,7 +44,7 @@ function buildSailCaption(sail: BoatSail): string {
 }
 
 export type CreateMaintenancePayload = {
-  subject: 'boat' | 'engine' | 'sail' | 'rig'
+  subject: 'boat' | 'hull' | 'engine' | 'sail' | 'rig' | 'electrical' | 'plumbing' | 'safety' | 'deck' | 'other'
   boatEngineId?: number | null
   boatSailId?: number | null
   boatRigId?: number | null
@@ -77,6 +77,12 @@ export default class BoatMaintenanceService {
 
     switch (payload.subject) {
       case 'boat':
+      case 'hull':
+      case 'electrical':
+      case 'plumbing':
+      case 'safety':
+      case 'deck':
+      case 'other':
         break
       case 'engine': {
         let caption = payload.engineCaption?.trim() || null

@@ -210,16 +210,28 @@
       "searchPlaceholder": "Rechercher par titre ou bateau...",
       "filters": {
         "all": "Tous",
+        "boat": "Bateau entier",
+        "hull": "Coque",
         "engine": "Moteur",
         "sail": "Voile",
         "rig": "Gréement",
-        "hull": "Coque"
+        "electrical": "Électricité",
+        "plumbing": "Plomberie",
+        "safety": "Sécurité",
+        "deck": "Pont",
+        "other": "Autre"
       },
       "subjects": {
-        "boat": "Coque",
+        "boat": "Bateau",
+        "hull": "Coque",
         "engine": "Moteur",
         "sail": "Voile",
-        "rig": "Gréement"
+        "rig": "Gréement",
+        "electrical": "Électricité",
+        "plumbing": "Plomberie",
+        "safety": "Sécurité",
+        "deck": "Pont",
+        "other": "Autre"
       },
       "stats": {
         "events": "Événements",
@@ -670,15 +682,21 @@
     "maintenance": {
       "events": {
         "title": "Historique de maintenance",
-        "subtitle": "Travaux effectués sur la coque, un moteur, une voile ou le gréement.",
+        "subtitle": "Travaux effectués sur le bateau, la coque, un moteur, une voile, le gréement ou autre équipement.",
         "empty": "Aucune entrée pour l'instant.",
         "addEntry": "Ajouter une entrée",
         "label": "Libellé",
         "subject": "Sujet",
         "wholeBoat": "Bateau entier",
+        "hull": "Coque",
         "engine": "Moteur",
         "sail": "Voile",
         "rig": "Gréement",
+        "electrical": "Électricité",
+        "plumbing": "Plomberie",
+        "safety": "Sécurité",
+        "deck": "Pont / Accastillage",
+        "other": "Autre",
         "performedAt": "Effectué le",
         "titleField": "Titre",
         "titlePlaceholder": "ex. Changement du filtre à huile",

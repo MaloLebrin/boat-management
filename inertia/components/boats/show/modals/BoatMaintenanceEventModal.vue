@@ -9,7 +9,7 @@ import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import { useT } from '~/composables/useT'
 import type { BoatShowDetail } from '~/types/boat_show'
 
-type Subject = 'boat' | 'engine' | 'sail' | 'rig'
+type Subject = 'boat' | 'hull' | 'engine' | 'sail' | 'rig' | 'electrical' | 'plumbing' | 'safety' | 'deck' | 'other'
 
 const props = defineProps<{
   boat: BoatShowDetail
@@ -35,9 +35,15 @@ const entryNotes = ref('')
 
 const subjectOptions = computed<ReadonlyArray<{ label: string; value: Subject }>>(() => [
   { label: t('boats.maintenance.events.wholeBoat'), value: 'boat' },
+  { label: t('boats.maintenance.events.hull'), value: 'hull' },
   { label: t('boats.maintenance.events.engine'), value: 'engine' },
   { label: t('boats.maintenance.events.sail'), value: 'sail' },
   { label: t('boats.maintenance.events.rig'), value: 'rig' },
+  { label: t('boats.maintenance.events.electrical'), value: 'electrical' },
+  { label: t('boats.maintenance.events.plumbing'), value: 'plumbing' },
+  { label: t('boats.maintenance.events.safety'), value: 'safety' },
+  { label: t('boats.maintenance.events.deck'), value: 'deck' },
+  { label: t('boats.maintenance.events.other'), value: 'other' },
 ])
 
 const engineOptions = computed(() =>

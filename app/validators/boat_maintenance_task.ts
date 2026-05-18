@@ -1,6 +1,6 @@
 import vine from '@vinejs/vine'
 
-const subjectChoices = ['boat', 'engine', 'sail', 'rig'] as string[]
+const subjectChoices = ['boat', 'hull', 'engine', 'sail', 'rig', 'electrical', 'plumbing', 'safety', 'deck', 'other'] as string[]
 
 function optionalIdFromForm() {
   return vine

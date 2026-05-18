@@ -40,10 +40,16 @@ const expandedIds = ref<Set<number>>(new Set())
 
 const subjectFilters = computed(() => [
   { key: null, label: t('maintenance.history.filters.all') },
+  { key: 'boat', label: t('maintenance.history.filters.boat') },
+  { key: 'hull', label: t('maintenance.history.filters.hull') },
   { key: 'engine', label: t('maintenance.history.filters.engine') },
   { key: 'sail', label: t('maintenance.history.filters.sail') },
   { key: 'rig', label: t('maintenance.history.filters.rig') },
-  { key: 'hull', label: t('maintenance.history.filters.hull') },
+  { key: 'electrical', label: t('maintenance.history.filters.electrical') },
+  { key: 'plumbing', label: t('maintenance.history.filters.plumbing') },
+  { key: 'safety', label: t('maintenance.history.filters.safety') },
+  { key: 'deck', label: t('maintenance.history.filters.deck') },
+  { key: 'other', label: t('maintenance.history.filters.other') },
 ])
 
 const filteredEvents = computed(() => {

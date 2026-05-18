@@ -1,6 +1,6 @@
 import vine from '@vinejs/vine'
 
-export const maintenanceSubjects = ['boat', 'engine', 'sail', 'rig'] as const
+export const maintenanceSubjects = ['boat', 'hull', 'engine', 'sail', 'rig', 'electrical', 'plumbing', 'safety', 'deck', 'other'] as const
 
 function optionalIdFromForm() {
   return vine

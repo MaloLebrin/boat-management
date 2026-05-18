@@ -210,16 +210,28 @@
       "searchPlaceholder": "Search by title or boat...",
       "filters": {
         "all": "All",
+        "boat": "Whole boat",
+        "hull": "Hull",
         "engine": "Engine",
         "sail": "Sail",
         "rig": "Rig",
-        "hull": "Hull"
+        "electrical": "Electrical",
+        "plumbing": "Plumbing",
+        "safety": "Safety",
+        "deck": "Deck",
+        "other": "Other"
       },
       "subjects": {
-        "boat": "Hull",
+        "boat": "Boat",
+        "hull": "Hull",
         "engine": "Engine",
         "sail": "Sail",
-        "rig": "Rig"
+        "rig": "Rig",
+        "electrical": "Electrical",
+        "plumbing": "Plumbing",
+        "safety": "Safety",
+        "deck": "Deck",
+        "other": "Other"
       },
       "stats": {
         "events": "Events",
@@ -651,15 +663,21 @@
     "maintenance": {
       "events": {
         "title": "Maintenance history",
-        "subtitle": "Work done on the hull, an engine, a sail, or the rig.",
+        "subtitle": "Work done on the boat, hull, engine, sail, rig, or other equipment.",
         "empty": "No entries yet.",
         "addEntry": "Add entry",
         "label": "Label",
         "subject": "Subject",
         "wholeBoat": "Whole boat",
+        "hull": "Hull",
         "engine": "Engine",
         "sail": "Sail",
         "rig": "Rig",
+        "electrical": "Electrical",
+        "plumbing": "Plumbing",
+        "safety": "Safety equipment",
+        "deck": "Deck & hardware",
+        "other": "Other",
         "performedAt": "Performed at",
         "titleField": "Title",
         "titlePlaceholder": "e.g. Changed oil filter",
