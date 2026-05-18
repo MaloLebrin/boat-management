@@ -554,6 +554,29 @@
         "deleteDocument": "Supprimer le document",
         "modalTitle": "Ajouter un document",
         "modalSubtitle": "{name} · Stocké sur Cloudinary"
+      },
+      "overview": {
+        "overdueTasks": "{count} tâche(s) en retard",
+        "schedule": "Planifier",
+        "engineHours": "Heures moteur",
+        "engineCount": "{count} moteur(s)",
+        "lastMaintenance": "Dernière maintenance",
+        "nextTask": "Prochaine tâche",
+        "overdue": "En retard",
+        "dimensionsTitle": "Dimensions",
+        "length": "Longueur",
+        "beam": "Bau",
+        "draft": "Tirant d'eau",
+        "mastHeight": "Hauteur de mât",
+        "viewSpecs": "Voir les spécifications →",
+        "recentActivityTitle": "Activité récente",
+        "recentActivityEmpty": "Aucune activité récente.",
+        "viewHistory": "Voir tout l'historique →",
+        "aiTitle": "Assistant IA",
+        "aiSuggestion0": "Optimiser mon planning de maintenance",
+        "aiSuggestion1": "Estimer les coûts annuels",
+        "homePortTitle": "Port d'attache",
+        "homePortEmpty": "Non renseigné"
       }
     },
     "specs": {

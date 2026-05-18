@@ -6,7 +6,10 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import { subjectLabel } from '~/components/boats/maintenance/utils'
 import BoatPhotoGallery from '~/components/boats/show/BoatPhotoGallery.vue'
+import { useT } from '~/composables/useT'
 import type { BoatShowDetail, MaintenanceEventRow, MaintenanceTaskRow } from '~/types/boat_show'
+
+const { t } = useT()
 
 const props = defineProps<{
   boat: BoatShowDetail
@@ -73,14 +76,14 @@ function formatDate(iso: string | null): string {
         <div class="flex items-start gap-3">
           <ExclamationTriangleIcon class="h-5 w-5 text-coral-600 shrink-0 mt-0.5" />
           <div class="flex-1">
-            <p class="font-semibold text-coral-900">{{ overdueTasks.length }} tache(s) en retard</p>
+            <p class="font-semibold text-coral-900">{{ t('boats.show.overview.overdueTasks', { count: String(overdueTasks.length) }) }}</p>
             <ul class="mt-2 space-y-1 text-sm text-coral-800">
               <li v-for="task in overdueTasks.slice(0, 3)" :key="task.id">
                 {{ task.title }} - {{ formatDate(task.dueAt) }}
               </li>
             </ul>
             <BaseButton variant="secondary" size="sm" class="mt-3" @click="emit('go-to-tab', 'tasks')">
-              Planifier
+              {{ t('boats.show.overview.schedule') }}
             </BaseButton>
           </div>
         </div>
@@ -91,22 +94,22 @@ function formatDate(iso: string | null): string {
         <BaseCard padded>
           <div class="text-center">
             <p class="text-2xl font-bold text-fg">{{ totalEngineHours ?? '—' }}</p>
-            <p class="text-sm text-fg-muted">Heures moteur</p>
-            <p class="text-xs text-fg-subtle">{{ boat.engines.length }} moteur(s)</p>
+            <p class="text-sm text-fg-muted">{{ t('boats.show.overview.engineHours') }}</p>
+            <p class="text-xs text-fg-subtle">{{ t('boats.show.overview.engineCount', { count: String(boat.engines.length) }) }}</p>
           </div>
         </BaseCard>
         <BaseCard padded>
           <div class="text-center">
             <p class="text-2xl font-bold text-fg">{{ formatDate(lastMaintenanceDate) }}</p>
-            <p class="text-sm text-fg-muted">Derniere maintenance</p>
+            <p class="text-sm text-fg-muted">{{ t('boats.show.overview.lastMaintenance') }}</p>
           </div>
         </BaseCard>
         <BaseCard padded>
           <div class="text-center">
             <p class="text-2xl font-bold text-fg">{{ formatDate(nextTaskDueDate) }}</p>
-            <p class="text-sm text-fg-muted">Prochaine tache</p>
+            <p class="text-sm text-fg-muted">{{ t('boats.show.overview.nextTask') }}</p>
             <BaseBadge v-if="nextTaskDueDate && nextTaskDueDate <= todayIso" variant="warning" class="mt-1">
-              En retard
+              {{ t('boats.show.overview.overdue') }}
             </BaseBadge>
           </div>
         </BaseCard>
@@ -115,30 +118,30 @@ function formatDate(iso: string | null): string {
       <!-- Specs summary card -->
       <BaseCard padded>
         <template #header>
-          <p class="text-sm font-semibold text-fg">Dimensions</p>
+          <p class="text-sm font-semibold text-fg">{{ t('boats.show.overview.dimensionsTitle') }}</p>
         </template>
         <dl class="grid grid-cols-2 gap-4 text-sm">
           <div>
-            <dt class="text-fg-muted">Longueur</dt>
+            <dt class="text-fg-muted">{{ t('boats.show.overview.length') }}</dt>
             <dd class="font-semibold text-fg">{{ boat.lengthM ? `${boat.lengthM} m` : '—' }}</dd>
           </div>
           <div>
-            <dt class="text-fg-muted">Bau</dt>
+            <dt class="text-fg-muted">{{ t('boats.show.overview.beam') }}</dt>
             <dd class="font-semibold text-fg">{{ boat.beamM ? `${boat.beamM} m` : '—' }}</dd>
           </div>
           <div>
-            <dt class="text-fg-muted">Tirant d'eau</dt>
+            <dt class="text-fg-muted">{{ t('boats.show.overview.draft') }}</dt>
             <dd class="font-semibold text-fg">{{ boat.draftM ? `${boat.draftM} m` : '—' }}</dd>
           </div>
           <div>
-            <dt class="text-fg-muted">Hauteur de mat</dt>
+            <dt class="text-fg-muted">{{ t('boats.show.overview.mastHeight') }}</dt>
             <dd class="font-semibold text-fg">{{ boat.mastHeightM ? `${boat.mastHeightM} m` : '—' }}</dd>
           </div>
         </dl>
         <div class="mt-4">
           <button type="button" class="text-sm font-semibold text-brand hover:underline"
             @click="emit('go-to-tab', 'specs')">
-            Voir les specifications &rarr;
+            {{ t('boats.show.overview.viewSpecs') }}
           </button>
         </div>
       </BaseCard>
@@ -146,10 +149,10 @@ function formatDate(iso: string | null): string {
       <!-- Recent activity card -->
       <BaseCard padded>
         <template #header>
-          <p class="text-sm font-semibold text-fg">Activite recente</p>
+          <p class="text-sm font-semibold text-fg">{{ t('boats.show.overview.recentActivityTitle') }}</p>
         </template>
         <div v-if="recentEvents.length === 0" class="text-sm text-fg-muted">
-          Aucune activite recente.
+          {{ t('boats.show.overview.recentActivityEmpty') }}
         </div>
         <ul v-else class="space-y-3 text-sm">
           <li v-for="ev in recentEvents" :key="ev.id" class="flex items-start justify-between gap-3">
@@ -163,7 +166,7 @@ function formatDate(iso: string | null): string {
         <div class="mt-4">
           <button type="button" class="text-sm font-semibold text-brand hover:underline"
             @click="emit('go-to-tab', 'history')">
-            Voir tout l'historique &rarr;
+            {{ t('boats.show.overview.viewHistory') }}
           </button>
         </div>
       </BaseCard>
@@ -177,14 +180,14 @@ function formatDate(iso: string | null): string {
       <div class="bg-abyss-900 text-white rounded-xl p-4">
         <p class="font-semibold flex items-center gap-2">
           <span class="text-lg">&#10022;</span>
-          Assistant IA
+          {{ t('boats.show.overview.aiTitle') }}
         </p>
         <div class="mt-3 space-y-2">
           <div class="rounded-lg bg-abyss-800 px-3 py-2 text-sm">
-            Optimiser mon planning de maintenance
+            {{ t('boats.show.overview.aiSuggestion0') }}
           </div>
           <div class="rounded-lg bg-abyss-800 px-3 py-2 text-sm">
-            Estimer les couts annuels
+            {{ t('boats.show.overview.aiSuggestion1') }}
           </div>
         </div>
       </div>
@@ -192,9 +195,9 @@ function formatDate(iso: string | null): string {
       <!-- TODO: add a `homePort` field to the Boat model/migration/form and display it here instead of registrationNumber -->
       <!-- Location placeholder -->
       <BaseCard padded>
-        <p class="text-sm font-semibold text-fg">Port d'attache</p>
+        <p class="text-sm font-semibold text-fg">{{ t('boats.show.overview.homePortTitle') }}</p>
         <p class="mt-2 text-sm text-fg-muted">
-          {{ boat.homePort ?? 'Non renseigne' }}
+          {{ boat.homePort ?? t('boats.show.overview.homePortEmpty') }}
         </p>
       </BaseCard>
     </div>

@@ -554,6 +554,29 @@
         "deleteDocument": "Delete document",
         "modalTitle": "Add a document",
         "modalSubtitle": "{name} · Stored on Cloudinary"
+      },
+      "overview": {
+        "overdueTasks": "{count} overdue task(s)",
+        "schedule": "Schedule",
+        "engineHours": "Engine hours",
+        "engineCount": "{count} engine(s)",
+        "lastMaintenance": "Last maintenance",
+        "nextTask": "Next task",
+        "overdue": "Overdue",
+        "dimensionsTitle": "Dimensions",
+        "length": "Length",
+        "beam": "Beam",
+        "draft": "Draft",
+        "mastHeight": "Mast height",
+        "viewSpecs": "View specifications →",
+        "recentActivityTitle": "Recent activity",
+        "recentActivityEmpty": "No recent activity.",
+        "viewHistory": "View full history →",
+        "aiTitle": "AI Assistant",
+        "aiSuggestion0": "Optimize my maintenance schedule",
+        "aiSuggestion1": "Estimate annual costs",
+        "homePortTitle": "Home port",
+        "homePortEmpty": "Not specified"
       }
     },
     "specs": {
