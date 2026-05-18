@@ -322,6 +322,11 @@ export default class BoatEquipmentController {
       .where('kind', 'document')
       .orderBy('position', 'asc')
 
+    const BoatEnginePart = (await import('#models/boat_engine_part')).default
+    const engineParts = await BoatEnginePart.query()
+      .where('boatEngineId', engineId)
+      .orderBy('id', 'asc')
+
     return inertia.render('boats/engine_show', {
       boat: { id: boat.id, name: boat.name },
       engine: {
@@ -350,6 +355,14 @@ export default class BoatEquipmentController {
           height: m.height,
           position: m.position,
           caption: m.caption,
+        })),
+        parts: engineParts.map((p) => ({
+          id: p.id,
+          designation: p.designation,
+          reference: p.reference,
+          stock: p.stock,
+          supplier: p.supplier,
+          notes: p.notes,
         })),
       },
       maintenanceEvents: maintenanceEvents.map((ev) => ({

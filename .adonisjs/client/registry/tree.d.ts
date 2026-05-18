@@ -45,6 +45,11 @@ export interface ApiDefinition {
     storeDocument: typeof routes['boat_media.store_document']
     destroy: typeof routes['boat_media.destroy']
   }
+  boatEngineParts: {
+    store: typeof routes['boat_engine_parts.store']
+    update: typeof routes['boat_engine_parts.update']
+    destroy: typeof routes['boat_engine_parts.destroy']
+  }
   boatMaintenances: {
     store: typeof routes['boat_maintenances.store']
     destroy: typeof routes['boat_maintenances.destroy']

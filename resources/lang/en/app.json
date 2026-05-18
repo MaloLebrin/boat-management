@@ -627,7 +627,17 @@
         "stock": "Stock quantity",
         "supplier": "Supplier",
         "empty": "No parts recorded",
-        "comingSoon": "Coming soon"
+        "comingSoon": "Coming soon",
+        "add": "Add a part",
+        "edit": "Edit",
+        "save": "Save",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "confirmDelete": "Delete this part?",
+        "notes": "Notes",
+        "actions": "Actions",
+        "addModalTitle": "Add a part",
+        "editModalTitle": "Edit part"
       },
       "documents": {
         "manual": "Technical manual",

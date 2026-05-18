@@ -36,6 +36,17 @@ router
       controllers.BoatMedia,
       'destroyEngineMedia',
     ])
+
+    router.post('boats/:boatId/engines/:engineId/parts', [controllers.BoatEngineParts, 'store'])
+    router.put('boats/:boatId/engines/:engineId/parts/:partId', [
+      controllers.BoatEngineParts,
+      'update',
+    ])
+    router.delete('boats/:boatId/engines/:engineId/parts/:partId', [
+      controllers.BoatEngineParts,
+      'destroy',
+    ])
+
     router.get('boats/:boatId/media/:mediaId/download', [controllers.BoatMedia, 'downloadMedia'])
     router.get('boats/:boatId/engines/:engineId/media/:mediaId/download', [
       controllers.BoatMedia,

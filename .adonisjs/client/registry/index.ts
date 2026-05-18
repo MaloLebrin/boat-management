@@ -114,6 +114,24 @@ const routes = {
     tokens: [{"old":"/boats/:boatId/engines/:engineId/media/:mediaId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/engines/:engineId/media/:mediaId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/engines/:engineId/media/:mediaId","type":0,"val":"engines","end":""},{"old":"/boats/:boatId/engines/:engineId/media/:mediaId","type":1,"val":"engineId","end":""},{"old":"/boats/:boatId/engines/:engineId/media/:mediaId","type":0,"val":"media","end":""},{"old":"/boats/:boatId/engines/:engineId/media/:mediaId","type":1,"val":"mediaId","end":""}],
     types: placeholder as Registry['boat_media.destroy_engine_media']['types'],
   },
+  'boat_engine_parts.store': {
+    methods: ["POST"],
+    pattern: '/boats/:boatId/engines/:engineId/parts',
+    tokens: [{"old":"/boats/:boatId/engines/:engineId/parts","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/engines/:engineId/parts","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/engines/:engineId/parts","type":0,"val":"engines","end":""},{"old":"/boats/:boatId/engines/:engineId/parts","type":1,"val":"engineId","end":""},{"old":"/boats/:boatId/engines/:engineId/parts","type":0,"val":"parts","end":""}],
+    types: placeholder as Registry['boat_engine_parts.store']['types'],
+  },
+  'boat_engine_parts.update': {
+    methods: ["PUT"],
+    pattern: '/boats/:boatId/engines/:engineId/parts/:partId',
+    tokens: [{"old":"/boats/:boatId/engines/:engineId/parts/:partId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/engines/:engineId/parts/:partId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/engines/:engineId/parts/:partId","type":0,"val":"engines","end":""},{"old":"/boats/:boatId/engines/:engineId/parts/:partId","type":1,"val":"engineId","end":""},{"old":"/boats/:boatId/engines/:engineId/parts/:partId","type":0,"val":"parts","end":""},{"old":"/boats/:boatId/engines/:engineId/parts/:partId","type":1,"val":"partId","end":""}],
+    types: placeholder as Registry['boat_engine_parts.update']['types'],
+  },
+  'boat_engine_parts.destroy': {
+    methods: ["DELETE"],
+    pattern: '/boats/:boatId/engines/:engineId/parts/:partId',
+    tokens: [{"old":"/boats/:boatId/engines/:engineId/parts/:partId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/engines/:engineId/parts/:partId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/engines/:engineId/parts/:partId","type":0,"val":"engines","end":""},{"old":"/boats/:boatId/engines/:engineId/parts/:partId","type":1,"val":"engineId","end":""},{"old":"/boats/:boatId/engines/:engineId/parts/:partId","type":0,"val":"parts","end":""},{"old":"/boats/:boatId/engines/:engineId/parts/:partId","type":1,"val":"partId","end":""}],
+    types: placeholder as Registry['boat_engine_parts.destroy']['types'],
+  },
   'boat_media.download_media': {
     methods: ["GET","HEAD"],
     pattern: '/boats/:boatId/media/:mediaId/download',

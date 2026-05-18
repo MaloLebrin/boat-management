@@ -196,7 +196,13 @@ function formatYear(iso: string): string {
           :maintenance-events="maintenanceEvents" :open-tasks="openTasks" :sorted-open-tasks="sortedOpenTasks"
           :total-parts="totalParts" :can-manage="canManage" :events-by-year-month="eventsByYearMonth" />
         <EngineShowTabNotes v-else-if="tab === 'notes'" :engine="engine" :boat="boat" :can-manage="canManage" />
-        <EngineShowTabParts v-else-if="tab === 'parts'" />
+        <EngineShowTabParts
+          v-else-if="tab === 'parts'"
+          :parts="engine.parts"
+          :boat-id="boat.id"
+          :engine-id="engine.id"
+          :can-manage="canManage"
+        />
         <EngineShowTabDocuments v-else-if="tab === 'documents'" :boat="boat" :engine="engine" :can-manage="canManage" />
       </div>
     </Transition>

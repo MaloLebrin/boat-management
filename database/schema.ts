@@ -7,6 +7,29 @@
 import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
+export class BoatEnginePartSchema extends BaseModel {
+  static $columns = ['boatEngineId', 'createdAt', 'designation', 'id', 'notes', 'reference', 'stock', 'supplier', 'updatedAt'] as const
+  $columns = BoatEnginePartSchema.$columns
+  @column()
+  declare boatEngineId: number
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare designation: string
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare notes: string | null
+  @column()
+  declare reference: string | null
+  @column()
+  declare stock: number | null
+  @column()
+  declare supplier: string | null
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class BoatEngineSchema extends BaseModel {
   static $columns = ['boatId', 'brand', 'createdAt', 'fuel', 'hours', 'id', 'installHours', 'kind', 'manufacturedAt', 'model', 'notes', 'powerHp', 'powerKw', 'serialNumber', 'status', 'strokeType', 'updatedAt'] as const
   $columns = BoatEngineSchema.$columns

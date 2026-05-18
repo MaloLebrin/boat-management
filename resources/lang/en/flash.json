@@ -56,5 +56,11 @@
   "settings": {
     "profileUpdated": "Profile updated.",
     "orgUpdated": "Organisation updated."
+  },
+  "enginePart": {
+    "created": "Part added.",
+    "updated": "Part updated.",
+    "deleted": "Part deleted.",
+    "notFound": "Part not found."
   }
 }

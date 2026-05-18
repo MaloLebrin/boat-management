@@ -70,6 +70,14 @@ export type BoatRigPayload = {
   notes?: string | null
 }
 
+export type BoatEnginePartPayload = {
+  designation: string
+  reference?: string | null
+  stock?: number | null
+  supplier?: string | null
+  notes?: string | null
+}
+
 function assertBoatInUserOrg(user: User, boat: Boat) {
   if (user.organizationId === null || user.organizationId !== boat.organizationId) {
     throw new BoatNotFoundError()
@@ -328,5 +336,58 @@ export default class BoatService {
     assertBoatInUserOrg(user, boat)
 
     await BoatRig.query().where('boatId', boat.id).delete()
+  }
+
+  async createEnginePart(user: User, boat: Boat, engineId: number, payload: BoatEnginePartPayload) {
+    assertBoatInUserOrg(user, boat)
+    const engine = boat.engines.find((e) => e.id === engineId)
+    if (!engine) throw new BoatEquipmentNotFoundError()
+    const BoatEnginePart = (await import('#models/boat_engine_part')).default
+    return await BoatEnginePart.create({
+      boatEngineId: engineId,
+      designation: payload.designation,
+      reference: payload.reference ?? null,
+      stock: payload.stock ?? null,
+      supplier: payload.supplier ?? null,
+      notes: payload.notes ?? null,
+    })
+  }
+
+  async updateEnginePart(
+    user: User,
+    boat: Boat,
+    engineId: number,
+    partId: number,
+    payload: BoatEnginePartPayload
+  ) {
+    assertBoatInUserOrg(user, boat)
+    const engine = boat.engines.find((e) => e.id === engineId)
+    if (!engine) throw new BoatEquipmentNotFoundError()
+    const BoatEnginePart = (await import('#models/boat_engine_part')).default
+    const part = await BoatEnginePart.query()
+      .where('id', partId)
+      .where('boatEngineId', engineId)
+      .first()
+    if (!part) throw new BoatEquipmentNotFoundError()
+    part.designation = payload.designation
+    part.reference = payload.reference ?? null
+    part.stock = payload.stock ?? null
+    part.supplier = payload.supplier ?? null
+    part.notes = payload.notes ?? null
+    await part.save()
+    return part
+  }
+
+  async deleteEnginePart(user: User, boat: Boat, engineId: number, partId: number) {
+    assertBoatInUserOrg(user, boat)
+    const engine = boat.engines.find((e) => e.id === engineId)
+    if (!engine) throw new BoatEquipmentNotFoundError()
+    const BoatEnginePart = (await import('#models/boat_engine_part')).default
+    const part = await BoatEnginePart.query()
+      .where('id', partId)
+      .where('boatEngineId', engineId)
+      .first()
+    if (!part) throw new BoatEquipmentNotFoundError()
+    await part.delete()
   }
 }

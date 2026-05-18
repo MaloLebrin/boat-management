@@ -56,5 +56,11 @@
   "settings": {
     "profileUpdated": "Profil mis à jour.",
     "orgUpdated": "Organisation mise à jour."
+  },
+  "enginePart": {
+    "created": "Pièce ajoutée.",
+    "updated": "Pièce mise à jour.",
+    "deleted": "Pièce supprimée.",
+    "notFound": "Pièce introuvable."
   }
 }

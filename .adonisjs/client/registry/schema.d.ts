@@ -223,6 +223,42 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_media_controller').default['destroyEngineMedia']>>>
     }
   }
+  'boat_engine_parts.store': {
+    methods: ["POST"]
+    pattern: '/boats/:boatId/engines/:engineId/parts'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/boat_engine_part').createEnginePartValidator)>>
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; engineId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/boat_engine_part').createEnginePartValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_engine_parts_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_engine_parts_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'boat_engine_parts.update': {
+    methods: ["PUT"]
+    pattern: '/boats/:boatId/engines/:engineId/parts/:partId'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/boat_engine_part').updateEnginePartValidator)>>
+      paramsTuple: [ParamValue, ParamValue, ParamValue]
+      params: { boatId: ParamValue; engineId: ParamValue; partId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/boat_engine_part').updateEnginePartValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_engine_parts_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_engine_parts_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'boat_engine_parts.destroy': {
+    methods: ["DELETE"]
+    pattern: '/boats/:boatId/engines/:engineId/parts/:partId'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue, ParamValue]
+      params: { boatId: ParamValue; engineId: ParamValue; partId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_engine_parts_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_engine_parts_controller').default['destroy']>>>
+    }
+  }
   'boat_media.download_media': {
     methods: ["GET","HEAD"]
     pattern: '/boats/:boatId/media/:mediaId/download'

@@ -646,7 +646,17 @@
         "stock": "Quantité en stock",
         "supplier": "Fournisseur",
         "empty": "Aucune pièce enregistrée",
-        "comingSoon": "Bientôt disponible"
+        "comingSoon": "Bientôt disponible",
+        "add": "Ajouter une pièce",
+        "edit": "Modifier",
+        "save": "Enregistrer",
+        "cancel": "Annuler",
+        "delete": "Supprimer",
+        "confirmDelete": "Supprimer cette pièce ?",
+        "notes": "Notes",
+        "actions": "Actions",
+        "addModalTitle": "Ajouter une pièce",
+        "editModalTitle": "Modifier la pièce"
       },
       "documents": {
         "manual": "Manuel technique",

@@ -17,4 +17,5 @@ export const controllers = {
   Planning: () => import('#controllers/planning_controller'),
   Session: () => import('#controllers/session_controller'),
   Settings: () => import('#controllers/settings_controller'),
+  BoatEngineParts: () => import('#controllers/boat_engine_parts_controller'),
 }
