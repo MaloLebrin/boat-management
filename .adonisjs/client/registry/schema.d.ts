@@ -463,6 +463,42 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_media_controller').default['destroy']>>>
     }
   }
+  'boat_safety_equipment.store': {
+    methods: ["POST"]
+    pattern: '/boats/:boatId/safety-equipment'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/boat_safety_equipment').createSafetyEquipmentValidator)>>
+      paramsTuple: [ParamValue]
+      params: { boatId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/boat_safety_equipment').createSafetyEquipmentValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_safety_equipment_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_safety_equipment_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'boat_safety_equipment.update': {
+    methods: ["PUT"]
+    pattern: '/boats/:boatId/safety-equipment/:itemId'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/boat_safety_equipment').updateSafetyEquipmentValidator)>>
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; itemId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/boat_safety_equipment').updateSafetyEquipmentValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_safety_equipment_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_safety_equipment_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'boat_safety_equipment.destroy': {
+    methods: ["DELETE"]
+    pattern: '/boats/:boatId/safety-equipment/:itemId'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; itemId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_safety_equipment_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_safety_equipment_controller').default['destroy']>>>
+    }
+  }
   'new_account.create': {
     methods: ["GET","HEAD"]
     pattern: '/signup'

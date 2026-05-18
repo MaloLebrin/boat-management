@@ -35,6 +35,13 @@ export type BoatHullPayload = {
   yearBuilt?: number | null
   manufacturer?: string | null
   model?: string | null
+
+  homePort?: string | null
+  navigationCategory?: string | null
+  hullIdentificationNumber?: string | null
+  francisationNumber?: string | null
+  flagCountry?: string | null
+  maxPersons?: number | null
 }
 
 export type BoatEnginePayload = {
@@ -75,6 +82,14 @@ export type BoatEnginePartPayload = {
   reference?: string | null
   stock?: number | null
   supplier?: string | null
+  notes?: string | null
+}
+
+export type BoatSafetyEquipmentPayload = {
+  equipmentType: string
+  quantity?: number | null
+  expiryDate?: Date | string | DateTime | null
+  status?: string | null
   notes?: string | null
 }
 
@@ -139,6 +154,13 @@ export default class BoatService {
       yearBuilt: payload.yearBuilt ?? null,
       manufacturer: payload.manufacturer ?? null,
       model: payload.model ?? null,
+
+      homePort: payload.homePort ?? null,
+      navigationCategory: payload.navigationCategory ?? null,
+      hullIdentificationNumber: payload.hullIdentificationNumber ?? null,
+      francisationNumber: payload.francisationNumber ?? null,
+      flagCountry: payload.flagCountry ?? null,
+      maxPersons: payload.maxPersons ?? null,
     })
 
     await boat.load('engines')
@@ -171,6 +193,13 @@ export default class BoatService {
     boat.yearBuilt = payload.yearBuilt ?? null
     boat.manufacturer = payload.manufacturer ?? null
     boat.model = payload.model ?? null
+
+    boat.homePort = payload.homePort ?? null
+    boat.navigationCategory = payload.navigationCategory ?? null
+    boat.hullIdentificationNumber = payload.hullIdentificationNumber ?? null
+    boat.francisationNumber = payload.francisationNumber ?? null
+    boat.flagCountry = payload.flagCountry ?? null
+    boat.maxPersons = payload.maxPersons ?? null
 
     await boat.save()
 
@@ -389,5 +418,51 @@ export default class BoatService {
       .first()
     if (!part) throw new BoatEquipmentNotFoundError()
     await part.delete()
+  }
+
+  async createSafetyEquipment(user: User, boat: Boat, payload: BoatSafetyEquipmentPayload) {
+    assertBoatInUserOrg(user, boat)
+    const BoatSafetyEquipment = (await import('#models/boat_safety_equipment')).default
+    return await BoatSafetyEquipment.create({
+      boatId: boat.id,
+      equipmentType: payload.equipmentType,
+      quantity: payload.quantity ?? null,
+      expiryDate: toDateOrNull(payload.expiryDate),
+      status: (payload.status as 'ok' | 'to_check' | 'expired') ?? 'ok',
+      notes: payload.notes ?? null,
+    })
+  }
+
+  async updateSafetyEquipment(
+    user: User,
+    boat: Boat,
+    itemId: number,
+    payload: BoatSafetyEquipmentPayload
+  ) {
+    assertBoatInUserOrg(user, boat)
+    const BoatSafetyEquipment = (await import('#models/boat_safety_equipment')).default
+    const item = await BoatSafetyEquipment.query()
+      .where('id', itemId)
+      .where('boatId', boat.id)
+      .first()
+    if (!item) throw new BoatEquipmentNotFoundError()
+    item.equipmentType = payload.equipmentType
+    item.quantity = payload.quantity ?? null
+    item.expiryDate = toDateOrNull(payload.expiryDate)
+    item.status = (payload.status as 'ok' | 'to_check' | 'expired') ?? item.status
+    item.notes = payload.notes ?? null
+    await item.save()
+    return item
+  }
+
+  async deleteSafetyEquipment(user: User, boat: Boat, itemId: number) {
+    assertBoatInUserOrg(user, boat)
+    const BoatSafetyEquipment = (await import('#models/boat_safety_equipment')).default
+    const item = await BoatSafetyEquipment.query()
+      .where('id', itemId)
+      .where('boatId', boat.id)
+      .first()
+    if (!item) throw new BoatEquipmentNotFoundError()
+    await item.delete()
   }
 }

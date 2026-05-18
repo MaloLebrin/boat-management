@@ -84,5 +84,12 @@ router
     router.post('boats/:boatId/photos', [controllers.BoatMedia, 'storePhoto'])
     router.post('boats/:boatId/documents', [controllers.BoatMedia, 'storeDocument'])
     router.delete('boats/:boatId/media/:mediaId', [controllers.BoatMedia, 'destroy'])
+
+    router.post('boats/:boatId/safety-equipment', [controllers.BoatSafetyEquipment, 'store'])
+    router.put('boats/:boatId/safety-equipment/:itemId', [controllers.BoatSafetyEquipment, 'update'])
+    router.delete('boats/:boatId/safety-equipment/:itemId', [
+      controllers.BoatSafetyEquipment,
+      'destroy',
+    ])
   })
   .use(middleware.auth())

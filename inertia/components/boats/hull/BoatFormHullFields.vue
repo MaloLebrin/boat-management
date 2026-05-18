@@ -16,7 +16,7 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
-const { propulsionOptions, hullMaterialOptions } = useBoatOptions()
+const { propulsionOptions, hullMaterialOptions, navigationCategoryOptions } = useBoatOptions()
 
 const name = ref('')
 const registrationNumber = ref('')
@@ -30,6 +30,12 @@ const hullMaterial = ref('')
 const yearBuilt = ref('')
 const manufacturer = ref('')
 const model = ref('')
+const homePort = ref('')
+const navigationCategory = ref('')
+const hullIdentificationNumber = ref('')
+const francisationNumber = ref('')
+const flagCountry = ref('')
+const maxPersons = ref('')
 
 function syncFromBoat() {
   if (props.mode !== 'edit' || !props.boat) return
@@ -46,6 +52,12 @@ function syncFromBoat() {
   yearBuilt.value = b.yearBuilt === null || b.yearBuilt === undefined ? '' : String(b.yearBuilt)
   manufacturer.value = b.manufacturer ?? ''
   model.value = b.model ?? ''
+  homePort.value = b.homePort ?? ''
+  navigationCategory.value = b.navigationCategory ?? ''
+  hullIdentificationNumber.value = b.hullIdentificationNumber ?? ''
+  francisationNumber.value = b.francisationNumber ?? ''
+  flagCountry.value = b.flagCountry ?? ''
+  maxPersons.value = b.maxPersons === null || b.maxPersons === undefined ? '' : String(b.maxPersons)
 }
 
 watch(
@@ -162,5 +174,60 @@ watch(
       />
       <BaseInput id="model" name="model" :label="t('boats.hullFields.model')" v-model="model" :errors="errors" />
     </div>
+
+    <BaseInput
+      id="homePort"
+      name="homePort"
+      :label="t('boats.hullFields.homePort')"
+      v-model="homePort"
+      :errors="errors"
+    />
+
+    <div class="grid grid-cols-2 gap-4">
+      <BaseSelect
+        id="navigationCategory"
+        name="navigationCategory"
+        :label="t('boats.hullFields.navigationCategory')"
+        placeholder="—"
+        :allow-empty="true"
+        :options="navigationCategoryOptions"
+        v-model="navigationCategory"
+        :errors="errors"
+      />
+      <BaseInput
+        id="maxPersons"
+        name="maxPersons"
+        :label="t('boats.hullFields.maxPersons')"
+        type="number"
+        inputmode="numeric"
+        v-model="maxPersons"
+        :errors="errors"
+      />
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <BaseInput
+        id="hullIdentificationNumber"
+        name="hullIdentificationNumber"
+        :label="t('boats.hullFields.hullIdentificationNumber')"
+        v-model="hullIdentificationNumber"
+        :errors="errors"
+      />
+      <BaseInput
+        id="francisationNumber"
+        name="francisationNumber"
+        :label="t('boats.hullFields.francisationNumber')"
+        v-model="francisationNumber"
+        :errors="errors"
+      />
+    </div>
+
+    <BaseInput
+      id="flagCountry"
+      name="flagCountry"
+      :label="t('boats.hullFields.flagCountry')"
+      v-model="flagCountry"
+      :errors="errors"
+    />
   </div>
 </template>

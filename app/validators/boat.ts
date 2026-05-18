@@ -25,6 +25,27 @@ export const rigTypes = [
   'other',
 ] as const
 
+export const navigationCategories = ['A', 'B', 'C', 'D'] as const
+export const safetyEquipmentTypes = [
+  'life_jacket',
+  'life_raft',
+  'fire_extinguisher',
+  'vhf_radio',
+  'flare',
+  'epirb',
+  'first_aid_kit',
+  'harness',
+  'lifebuoy',
+  'anchor',
+  'bilge_pump',
+  'compass',
+  'ais',
+  'gps',
+  'radar',
+  'other',
+] as const
+export const safetyEquipmentStatuses = ['ok', 'to_check', 'expired'] as const
+
 export const createBoatValidator = vine.create({
   name: vine.string().trim().minLength(2).maxLength(120),
   registrationNumber: vine.string().trim().maxLength(64).nullable().optional(),
@@ -42,6 +63,13 @@ export const createBoatValidator = vine.create({
   yearBuilt: vine.number().withoutDecimals().range([1800, 2200]).nullable().optional(),
   manufacturer: vine.string().trim().maxLength(120).nullable().optional(),
   model: vine.string().trim().maxLength(120).nullable().optional(),
+
+  homePort: vine.string().trim().maxLength(120).nullable().optional(),
+  navigationCategory: vine.enum(navigationCategories).nullable().optional(),
+  hullIdentificationNumber: vine.string().trim().maxLength(64).nullable().optional(),
+  francisationNumber: vine.string().trim().maxLength(64).nullable().optional(),
+  flagCountry: vine.string().trim().maxLength(8).nullable().optional(),
+  maxPersons: vine.number().withoutDecimals().positive().nullable().optional(),
 })
 
 /** Same hull-only schema as creation (no nested engines / sails / rig). */
@@ -63,5 +91,12 @@ export const updateBoatValidator = vine.compile(
     yearBuilt: vine.number().withoutDecimals().range([1800, 2200]).nullable().optional(),
     manufacturer: vine.string().trim().maxLength(120).nullable().optional(),
     model: vine.string().trim().maxLength(120).nullable().optional(),
+
+    homePort: vine.string().trim().maxLength(120).nullable().optional(),
+    navigationCategory: vine.enum(navigationCategories).nullable().optional(),
+    hullIdentificationNumber: vine.string().trim().maxLength(64).nullable().optional(),
+    francisationNumber: vine.string().trim().maxLength(64).nullable().optional(),
+    flagCountry: vine.string().trim().maxLength(8).nullable().optional(),
+    maxPersons: vine.number().withoutDecimals().positive().nullable().optional(),
   })
 )

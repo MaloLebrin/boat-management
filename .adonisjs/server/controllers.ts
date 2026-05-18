@@ -5,10 +5,12 @@
 
 export const controllers = {
   Ai: () => import('#controllers/ai_controller'),
+  BoatEngineParts: () => import('#controllers/boat_engine_parts_controller'),
   BoatEquipment: () => import('#controllers/boat_equipment_controller'),
   BoatMaintenanceTasks: () => import('#controllers/boat_maintenance_tasks_controller'),
   BoatMaintenances: () => import('#controllers/boat_maintenances_controller'),
   BoatMedia: () => import('#controllers/boat_media_controller'),
+  BoatSafetyEquipment: () => import('#controllers/boat_safety_equipment_controller'),
   Boats: () => import('#controllers/boats_controller'),
   Home: () => import('#controllers/home_controller'),
   MaintenanceHistory: () => import('#controllers/maintenance_history_controller'),
@@ -17,5 +19,4 @@ export const controllers = {
   Planning: () => import('#controllers/planning_controller'),
   Session: () => import('#controllers/session_controller'),
   Settings: () => import('#controllers/settings_controller'),
-  BoatEngineParts: () => import('#controllers/boat_engine_parts_controller'),
 }

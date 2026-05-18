@@ -362,7 +362,13 @@
       "hullMaterial": "Matériau de coque",
       "yearBuilt": "Année de construction",
       "manufacturer": "Constructeur",
-      "model": "Modèle"
+      "model": "Modèle",
+      "homePort": "Port d'attache",
+      "navigationCategory": "Catégorie de navigation",
+      "hullIdentificationNumber": "N° de coque (HIN/WIN)",
+      "francisationNumber": "N° de francisation",
+      "flagCountry": "Pavillon",
+      "maxPersons": "Personnes max à bord"
     },
     "engines": {
       "title": "Moteurs",
@@ -463,6 +469,35 @@
       "strokeType": {
         "2_stroke": "2 temps",
         "4_stroke": "4 temps"
+      },
+      "navigationCategory": {
+        "A": "Catégorie A – Navigation hauturière (>8 Bf, >4 m)",
+        "B": "Catégorie B – Navigation hauturière (≤8 Bf, ≤4 m)",
+        "C": "Catégorie C – Navigation côtière (≤6 Bf, ≤2 m)",
+        "D": "Catégorie D – Eaux abritées (≤4 Bf, ≤0,3 m)"
+      },
+      "safetyEquipmentType": {
+        "life_jacket": "Gilet de sauvetage",
+        "life_raft": "Radeau de sauvetage",
+        "fire_extinguisher": "Extincteur",
+        "vhf_radio": "Radio VHF",
+        "flare": "Signal de détresse / Fusée",
+        "epirb": "Balise EPIRB / PLB",
+        "first_aid_kit": "Trousse de premiers secours",
+        "harness": "Harnais de sécurité",
+        "lifebuoy": "Bouée de sauvetage",
+        "anchor": "Ancre",
+        "bilge_pump": "Pompe de cale",
+        "compass": "Compas",
+        "ais": "Transpondeur AIS",
+        "gps": "GPS / Traceur",
+        "radar": "Radar",
+        "other": "Autre"
+      },
+      "safetyEquipmentStatus": {
+        "ok": "OK",
+        "to_check": "À vérifier",
+        "expired": "Périmé"
       }
     },
     "index": {
@@ -520,6 +555,32 @@
         "modalTitle": "Ajouter un document",
         "modalSubtitle": "{name} · Stocké sur Cloudinary"
       }
+    },
+    "specs": {
+      "identity": "Identité",
+      "dimensions": "Dimensions",
+      "hullMaterials": "Coque & matériaux",
+      "registration": "Immatriculation & pavillon",
+      "equipmentOnBoard": "Équipements à bord",
+      "editHint": "Les spécifications peuvent être modifiées dans la page d'édition du bateau."
+    },
+    "safetyEquipment": {
+      "title": "Armement de sécurité",
+      "add": "Ajouter un équipement",
+      "noItems": "Aucun équipement de sécurité enregistré.",
+      "equipmentType": "Type",
+      "quantity": "Quantité",
+      "expiryDate": "Date d'expiration",
+      "status": "Statut",
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "modal": {
+        "title": "Ajouter un équipement",
+        "editTitle": "Modifier l'équipement",
+        "cancel": "Annuler",
+        "submit": "Enregistrer"
+      },
+      "confirmDelete": "Supprimer cet équipement ?"
     },
     "equipmentAddModal": {
       "title": "Nouvel équipement",

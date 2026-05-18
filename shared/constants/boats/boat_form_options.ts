@@ -56,3 +56,35 @@ export const RIG_TYPE_OPTIONS = [
   { value: 'cat_rig', label: 'Cat rig' },
   { value: 'other', label: 'Other' },
 ] as const
+
+export const NAVIGATION_CATEGORY_OPTIONS = [
+  { value: 'A', label: 'A' },
+  { value: 'B', label: 'B' },
+  { value: 'C', label: 'C' },
+  { value: 'D', label: 'D' },
+] as const
+
+export const SAFETY_EQUIPMENT_TYPE_OPTIONS = [
+  { value: 'life_jacket', label: 'Life jacket' },
+  { value: 'life_raft', label: 'Life raft' },
+  { value: 'fire_extinguisher', label: 'Fire extinguisher' },
+  { value: 'vhf_radio', label: 'VHF radio' },
+  { value: 'flare', label: 'Flare / distress signal' },
+  { value: 'epirb', label: 'EPIRB / PLB' },
+  { value: 'first_aid_kit', label: 'First aid kit' },
+  { value: 'harness', label: 'Safety harness' },
+  { value: 'lifebuoy', label: 'Lifebuoy' },
+  { value: 'anchor', label: 'Anchor' },
+  { value: 'bilge_pump', label: 'Bilge pump' },
+  { value: 'compass', label: 'Compass' },
+  { value: 'ais', label: 'AIS transponder' },
+  { value: 'gps', label: 'GPS / chartplotter' },
+  { value: 'radar', label: 'Radar' },
+  { value: 'other', label: 'Other' },
+] as const
+
+export const SAFETY_EQUIPMENT_STATUS_OPTIONS = [
+  { value: 'ok', label: 'OK' },
+  { value: 'to_check', label: 'To check' },
+  { value: 'expired', label: 'Expired' },
+] as const

@@ -234,6 +234,24 @@ const routes = {
     tokens: [{"old":"/boats/:boatId/media/:mediaId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/media/:mediaId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/media/:mediaId","type":0,"val":"media","end":""},{"old":"/boats/:boatId/media/:mediaId","type":1,"val":"mediaId","end":""}],
     types: placeholder as Registry['boat_media.destroy']['types'],
   },
+  'boat_safety_equipment.store': {
+    methods: ["POST"],
+    pattern: '/boats/:boatId/safety-equipment',
+    tokens: [{"old":"/boats/:boatId/safety-equipment","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/safety-equipment","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/safety-equipment","type":0,"val":"safety-equipment","end":""}],
+    types: placeholder as Registry['boat_safety_equipment.store']['types'],
+  },
+  'boat_safety_equipment.update': {
+    methods: ["PUT"],
+    pattern: '/boats/:boatId/safety-equipment/:itemId',
+    tokens: [{"old":"/boats/:boatId/safety-equipment/:itemId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/safety-equipment/:itemId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/safety-equipment/:itemId","type":0,"val":"safety-equipment","end":""},{"old":"/boats/:boatId/safety-equipment/:itemId","type":1,"val":"itemId","end":""}],
+    types: placeholder as Registry['boat_safety_equipment.update']['types'],
+  },
+  'boat_safety_equipment.destroy': {
+    methods: ["DELETE"],
+    pattern: '/boats/:boatId/safety-equipment/:itemId',
+    tokens: [{"old":"/boats/:boatId/safety-equipment/:itemId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/safety-equipment/:itemId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/safety-equipment/:itemId","type":0,"val":"safety-equipment","end":""},{"old":"/boats/:boatId/safety-equipment/:itemId","type":1,"val":"itemId","end":""}],
+    types: placeholder as Registry['boat_safety_equipment.destroy']['types'],
+  },
   'new_account.create': {
     methods: ["GET","HEAD"],
     pattern: '/signup',

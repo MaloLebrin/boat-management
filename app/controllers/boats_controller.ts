@@ -56,6 +56,7 @@ export default class BoatsController {
       const canManageEquipment = canManageMaintenance
       const mediaService = new MediaService()
       const boatMedia = await mediaService.listForEntity('boat', boat.id)
+      await boat.load('safetyEquipment')
       return inertia.render('boats/show', {
         boat: {
           id: boat.id,
@@ -71,6 +72,12 @@ export default class BoatsController {
           yearBuilt: boat.yearBuilt,
           manufacturer: boat.manufacturer,
           model: boat.model,
+          homePort: boat.homePort,
+          navigationCategory: boat.navigationCategory,
+          hullIdentificationNumber: boat.hullIdentificationNumber,
+          francisationNumber: boat.francisationNumber,
+          flagCountry: boat.flagCountry,
+          maxPersons: boat.maxPersons,
           engines: boat.engines.map((e) => ({
             id: e.id,
             kind: e.kind,
@@ -116,6 +123,14 @@ export default class BoatsController {
             height: m.height,
             position: m.position,
             caption: m.caption,
+          })),
+          safetyEquipment: boat.safetyEquipment.map((item) => ({
+            id: item.id,
+            equipmentType: item.equipmentType,
+            quantity: item.quantity,
+            expiryDate: item.expiryDate ? item.expiryDate.toISODate() : null,
+            status: item.status,
+            notes: item.notes,
           })),
         },
         maintenanceEvents: maintenanceEvents.map((ev) => ({
@@ -186,6 +201,12 @@ export default class BoatsController {
           manufacturer: boat.manufacturer,
           model: boat.model,
           manufacturedAt: boat.manufacturedAt ? boat.manufacturedAt.toISODate() : null,
+          homePort: boat.homePort,
+          navigationCategory: boat.navigationCategory,
+          hullIdentificationNumber: boat.hullIdentificationNumber,
+          francisationNumber: boat.francisationNumber,
+          flagCountry: boat.flagCountry,
+          maxPersons: boat.maxPersons,
         },
       })
     } catch (error) {

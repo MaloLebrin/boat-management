@@ -62,5 +62,11 @@
     "updated": "Part updated.",
     "deleted": "Part deleted.",
     "notFound": "Part not found."
+  },
+  "safetyEquipment": {
+    "created": "Equipment added.",
+    "updated": "Equipment updated.",
+    "deleted": "Equipment deleted.",
+    "notFound": "Equipment not found."
   }
 }

@@ -71,6 +71,7 @@ Les PDFs uploadés sont compressés avant envoi sur Cloudinary via `app/services
 3. **Tests obligatoires** pour toute logique métier nouvelle
 4. **Pas de `console.log`** en commit — utiliser le logger Adonis
 5. **Migrations** : ne jamais modifier une migration déjà exécutée en production
+6. **Documentation obligatoire** : toute nouvelle feature doit être ajoutée en haut de `docs/changelog.md` avec la date et une description en français (routes, champs, comportements notables)
 
 ## Structure projet
 ```

@@ -187,6 +187,29 @@ export class BoatRigSchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class BoatSafetyEquipmentSchema extends BaseModel {
+  static $columns = ['boatId', 'createdAt', 'equipmentType', 'expiryDate', 'id', 'notes', 'quantity', 'status', 'updatedAt'] as const
+  $columns = BoatSafetyEquipmentSchema.$columns
+  @column()
+  declare boatId: number
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare equipmentType: string
+  @column.date()
+  declare expiryDate: DateTime | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare notes: string | null
+  @column()
+  declare quantity: number | null
+  @column()
+  declare status: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class BoatSailSchema extends BaseModel {
   static $columns = ['areaM2', 'boatId', 'createdAt', 'id', 'manufacturedAt', 'material', 'notes', 'reefPoints', 'sailType', 'status', 'updatedAt'] as const
   $columns = BoatSailSchema.$columns
@@ -215,7 +238,7 @@ export class BoatSailSchema extends BaseModel {
 }
 
 export class BoatSchema extends BaseModel {
-  static $columns = ['beamM', 'createdAt', 'draftM', 'hullMaterial', 'id', 'lengthM', 'manufacturedAt', 'manufacturer', 'mastHeightM', 'model', 'name', 'organizationId', 'propulsionType', 'registrationNumber', 'type', 'updatedAt', 'yearBuilt'] as const
+  static $columns = ['beamM', 'createdAt', 'draftM', 'flagCountry', 'francisationNumber', 'homePort', 'hullIdentificationNumber', 'hullMaterial', 'id', 'lengthM', 'manufacturedAt', 'manufacturer', 'mastHeightM', 'maxPersons', 'model', 'name', 'navigationCategory', 'organizationId', 'propulsionType', 'registrationNumber', 'type', 'updatedAt', 'yearBuilt'] as const
   $columns = BoatSchema.$columns
   @column()
   declare beamM: number | null
@@ -223,6 +246,14 @@ export class BoatSchema extends BaseModel {
   declare createdAt: DateTime
   @column()
   declare draftM: number | null
+  @column()
+  declare flagCountry: string | null
+  @column()
+  declare francisationNumber: string | null
+  @column()
+  declare homePort: string | null
+  @column()
+  declare hullIdentificationNumber: string | null
   @column()
   declare hullMaterial: string | null
   @column({ isPrimary: true })
@@ -236,9 +267,13 @@ export class BoatSchema extends BaseModel {
   @column()
   declare mastHeightM: number | null
   @column()
+  declare maxPersons: number | null
+  @column()
   declare model: string | null
   @column()
   declare name: string
+  @column()
+  declare navigationCategory: string | null
   @column()
   declare organizationId: number
   @column()

@@ -1,6 +1,7 @@
 /** Form row types and hull-only edit payload (engines / sails / rig are managed on the boat detail page). */
 
 export type EngineKind = 'inboard' | 'outboard' | 'electric' | 'hybrid' | 'other'
+export type NavigationCategory = 'A' | 'B' | 'C' | 'D'
 export type EngineFuel = 'diesel' | 'essence' | 'electric' | 'other' | ''
 
 export type SailType = 'main' | 'genoa' | 'jib' | 'spinnaker' | 'gennaker' | 'storm_jib' | 'other'
@@ -25,6 +26,12 @@ export type BoatEditPayload = {
   yearBuilt: number | null
   manufacturer: string | null
   model: string | null
+  homePort: string | null
+  navigationCategory: NavigationCategory | null
+  hullIdentificationNumber: string | null
+  francisationNumber: string | null
+  flagCountry: string | null
+  maxPersons: number | null
 }
 
 const ENGINE_KINDS: readonly EngineKind[] = ['inboard', 'outboard', 'electric', 'hybrid', 'other']

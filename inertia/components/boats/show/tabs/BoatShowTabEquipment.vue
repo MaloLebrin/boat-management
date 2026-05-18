@@ -2,8 +2,10 @@
 import { ref } from 'vue'
 import BoatShowEnginesCard from '~/components/boats/engine/BoatShowEnginesCard.vue'
 import BoatShowRigCard from '~/components/boats/rig/BoatShowRigCard.vue'
+import BoatSafetyEquipmentCard from '~/components/boats/safety/BoatSafetyEquipmentCard.vue'
 import BoatShowSailsCard from '~/components/boats/sail/BoatShowSailsCard.vue'
 import BoatEquipmentAddModal from '~/components/boats/show/modals/BoatEquipmentAddModal.vue'
+import { useT } from '~/composables/useT'
 import type { BoatShowDetail } from '~/types/boat_show'
 
 const props = defineProps<{
@@ -11,7 +13,9 @@ const props = defineProps<{
   canManageEquipment: boolean
 }>()
 
-const equipmentFilter = ref<'all' | 'engine' | 'sail' | 'rig'>('all')
+const { t } = useT()
+
+const equipmentFilter = ref<'all' | 'engine' | 'sail' | 'rig' | 'safety'>('all')
 const isAddModalOpen = ref(false)
 </script>
 
@@ -23,10 +27,11 @@ const isAddModalOpen = ref(false)
     <div class="flex flex-wrap items-center justify-between gap-4">
       <div class="flex flex-wrap gap-2">
         <button v-for="filter in [
-          { key: 'all', label: 'Tous' },
-          { key: 'engine', label: 'Moteur' },
-          { key: 'sail', label: 'Voiles' },
-          { key: 'rig', label: 'Greement' },
+          { key: 'all', label: t('common.all') },
+          { key: 'engine', label: t('boats.equipmentAddModal.categories.engine') },
+          { key: 'sail', label: t('boats.equipmentAddModal.categories.sail') },
+          { key: 'rig', label: t('boats.equipmentAddModal.categories.rig') },
+          { key: 'safety', label: t('boats.safetyEquipment.title') },
         ]" :key="filter.key" type="button" :class="[
           'rounded-full px-3 py-1.5 text-sm font-medium transition-colors cursor-pointer',
           equipmentFilter === filter.key
@@ -39,7 +44,7 @@ const isAddModalOpen = ref(false)
       <button v-if="canManageEquipment" type="button"
         class="rounded-lg border border-brand px-3 py-1.5 text-sm font-medium text-brand hover:bg-brand hover:text-white transition-colors"
         @click="isAddModalOpen = true">
-        + Ajouter un équipement
+        + {{ t('boats.equipmentAddModal.title') }}
       </button>
     </div>
 
@@ -56,6 +61,15 @@ const isAddModalOpen = ref(false)
     <!-- Rig card -->
     <div v-if="equipmentFilter === 'all' || equipmentFilter === 'rig'">
       <BoatShowRigCard :boat-id="boat.id" :rig="boat.rig" :can-manage="canManageEquipment" />
+    </div>
+
+    <!-- Safety equipment card -->
+    <div v-if="equipmentFilter === 'all' || equipmentFilter === 'safety'">
+      <BoatSafetyEquipmentCard
+        :boat-id="boat.id"
+        :items="boat.safetyEquipment"
+        :can-manage="canManageEquipment"
+      />
     </div>
   </div>
 </template>

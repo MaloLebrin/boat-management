@@ -1,5 +1,14 @@
 /** Inertia props shapes for boat detail / maintenance UI. */
 
+export type BoatShowSafetyEquipment = {
+  id: number
+  equipmentType: string
+  quantity: number | null
+  expiryDate: string | null
+  status: 'ok' | 'to_check' | 'expired'
+  notes: string | null
+}
+
 export type MediaRow = {
   id: number
   kind: 'photo' | 'document'
@@ -74,10 +83,17 @@ export type BoatShowDetail = {
   yearBuilt: number | null
   manufacturer: string | null
   model: string | null
+  homePort: string | null
+  navigationCategory: string | null
+  hullIdentificationNumber: string | null
+  francisationNumber: string | null
+  flagCountry: string | null
+  maxPersons: number | null
   engines: BoatShowEngine[]
   sails: BoatShowSail[]
   rig: BoatShowRig | null
   media: MediaRow[]
+  safetyEquipment: BoatShowSafetyEquipment[]
 }
 
 export type MaintenancePartRow = {

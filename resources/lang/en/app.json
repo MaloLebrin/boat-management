@@ -362,7 +362,13 @@
       "hullMaterial": "Hull material",
       "yearBuilt": "Year built",
       "manufacturer": "Manufacturer",
-      "model": "Model"
+      "model": "Model",
+      "homePort": "Home port",
+      "navigationCategory": "Navigation category",
+      "hullIdentificationNumber": "Hull ID number (HIN/WIN)",
+      "francisationNumber": "Francisation number",
+      "flagCountry": "Flag",
+      "maxPersons": "Max persons on board"
     },
     "engines": {
       "title": "Engines",
@@ -463,6 +469,35 @@
       "strokeType": {
         "2_stroke": "2-stroke",
         "4_stroke": "4-stroke"
+      },
+      "navigationCategory": {
+        "A": "Category A – Ocean (>Force 8, >4m)",
+        "B": "Category B – Offshore (≤Force 8, ≤4m)",
+        "C": "Category C – Coastal (≤Force 6, ≤2m)",
+        "D": "Category D – Sheltered (≤Force 4, ≤0.3m)"
+      },
+      "safetyEquipmentType": {
+        "life_jacket": "Life jacket",
+        "life_raft": "Life raft",
+        "fire_extinguisher": "Fire extinguisher",
+        "vhf_radio": "VHF radio",
+        "flare": "Flare / distress signal",
+        "epirb": "EPIRB / PLB",
+        "first_aid_kit": "First aid kit",
+        "harness": "Safety harness",
+        "lifebuoy": "Lifebuoy",
+        "anchor": "Anchor",
+        "bilge_pump": "Bilge pump",
+        "compass": "Compass",
+        "ais": "AIS transponder",
+        "gps": "GPS / Chartplotter",
+        "radar": "Radar",
+        "other": "Other"
+      },
+      "safetyEquipmentStatus": {
+        "ok": "OK",
+        "to_check": "To check",
+        "expired": "Expired"
       }
     },
     "index": {
@@ -520,6 +555,32 @@
         "modalTitle": "Add a document",
         "modalSubtitle": "{name} · Stored on Cloudinary"
       }
+    },
+    "specs": {
+      "identity": "Identity",
+      "dimensions": "Dimensions",
+      "hullMaterials": "Hull & materials",
+      "registration": "Registration & flag",
+      "equipmentOnBoard": "Equipment on board",
+      "editHint": "Specifications can be edited on the boat's edit page."
+    },
+    "safetyEquipment": {
+      "title": "Safety equipment",
+      "add": "Add equipment",
+      "noItems": "No safety equipment recorded.",
+      "equipmentType": "Type",
+      "quantity": "Quantity",
+      "expiryDate": "Expiry date",
+      "status": "Status",
+      "edit": "Edit",
+      "delete": "Delete",
+      "modal": {
+        "title": "Add equipment",
+        "editTitle": "Edit equipment",
+        "cancel": "Cancel",
+        "submit": "Save"
+      },
+      "confirmDelete": "Delete this item?"
     },
     "list": {
       "search": "Search",
