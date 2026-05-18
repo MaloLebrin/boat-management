@@ -499,6 +499,54 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_safety_equipment_controller').default['destroy']>>>
     }
   }
+  'boats.maintenanceSheets.store': {
+    methods: ["POST"]
+    pattern: '/boats/:boatId/maintenance-sheets'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/boat_maintenance_sheet').createBoatMaintenanceSheetValidator)>>
+      paramsTuple: [ParamValue]
+      params: { boatId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/boat_maintenance_sheet').createBoatMaintenanceSheetValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_maintenance_sheets_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_maintenance_sheets_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'boats.maintenanceSheets.complete': {
+    methods: ["PUT"]
+    pattern: '/boats/:boatId/maintenance-sheets/:sheetId/complete'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; sheetId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_maintenance_sheets_controller').default['complete']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_maintenance_sheets_controller').default['complete']>>>
+    }
+  }
+  'boats.maintenanceSheets.destroy': {
+    methods: ["DELETE"]
+    pattern: '/boats/:boatId/maintenance-sheets/:sheetId'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; sheetId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_maintenance_sheets_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_maintenance_sheets_controller').default['destroy']>>>
+    }
+  }
+  'boats.maintenanceSheetItems.update': {
+    methods: ["PUT"]
+    pattern: '/boats/:boatId/maintenance-sheets/:sheetId/items/:itemId'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/boat_maintenance_sheet').updateSheetItemValidator)>>
+      paramsTuple: [ParamValue, ParamValue, ParamValue]
+      params: { boatId: ParamValue; sheetId: ParamValue; itemId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/boat_maintenance_sheet').updateSheetItemValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_maintenance_sheet_items_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_maintenance_sheet_items_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'new_account.create': {
     methods: ["GET","HEAD"]
     pattern: '/signup'

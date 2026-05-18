@@ -20,6 +20,14 @@ export interface ApiDefinition {
       done: typeof routes['boats.maintenanceTasks.done']
       destroy: typeof routes['boats.maintenanceTasks.destroy']
     }
+    maintenanceSheets: {
+      store: typeof routes['boats.maintenanceSheets.store']
+      complete: typeof routes['boats.maintenanceSheets.complete']
+      destroy: typeof routes['boats.maintenanceSheets.destroy']
+    }
+    maintenanceSheetItems: {
+      update: typeof routes['boats.maintenanceSheetItems.update']
+    }
   }
   boatEquipment: {
     storeEngine: typeof routes['boat_equipment.store_engine']

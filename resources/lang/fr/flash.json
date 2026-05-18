@@ -68,5 +68,12 @@
     "updated": "Équipement mis à jour.",
     "deleted": "Équipement supprimé.",
     "notFound": "Équipement introuvable."
+  },
+  "maintenanceSheets": {
+    "created": "Fiche créée.",
+    "completed": "Fiche marquée comme terminée.",
+    "removed": "Fiche supprimée.",
+    "notFound": "Fiche introuvable.",
+    "itemUpdated": "Item mis à jour."
   }
 }

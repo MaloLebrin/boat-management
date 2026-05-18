@@ -131,3 +131,21 @@ export type MaintenanceTaskRow = {
   recurrenceIntervalMonths: number | null
   recurrenceIntervalEngineHours: number | null
 }
+
+export type MaintenanceSheetItemRow = {
+  id: number
+  label: string
+  isDone: boolean
+  notes: string | null
+  position: number
+}
+
+export type MaintenanceSheetRow = {
+  id: number
+  type: 'entretien' | 'montage' | 'hivernage' | 'dehivernage' | 'atelier'
+  title: string
+  status: 'in_progress' | 'completed'
+  performedAt: string
+  notes: string | null
+  items: MaintenanceSheetItemRow[]
+}

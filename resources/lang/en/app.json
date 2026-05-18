@@ -525,7 +525,8 @@
         "specs": "Specifications",
         "history": "History",
         "tasks": "Tasks",
-        "documents": "Documents"
+        "documents": "Documents",
+        "sheets": "Sheets"
       },
       "breadcrumbFleet": "Fleet",
       "nextTasks": "Next tasks",
@@ -811,6 +812,35 @@
         "notes": "Notes",
         "selectPlaceholder": "— Select —"
       }
+    },
+    "sheets": {
+      "title": "Maintenance sheets",
+      "subtitle": "Guided checklists for maintenance, rigging, winterization, spring commissioning, and workshop.",
+      "empty": "No sheets yet.",
+      "addSheet": "New sheet",
+      "modalTitle": "Create a sheet",
+      "typeLabel": "Sheet type",
+      "typeEntretien": "Maintenance",
+      "typeMontage": "Rigging",
+      "typeHivernage": "Winterization",
+      "typeDehivernage": "Spring commissioning",
+      "typeAtelier": "Workshop",
+      "titleLabel": "Title",
+      "titlePlaceholder": "e.g. Winterization 2025",
+      "performedAtLabel": "Date",
+      "notesLabel": "Notes",
+      "notesPlaceholder": "Optional notes...",
+      "createSheet": "Create sheet",
+      "statusInProgress": "In progress",
+      "statusCompleted": "Completed",
+      "markComplete": "Mark as complete",
+      "progress": "{done}/{total} steps",
+      "expand": "View steps",
+      "collapse": "Hide",
+      "filterAll": "All",
+      "confirmDelete": "Delete this sheet?",
+      "noItems": "No steps in this sheet.",
+      "itemNotesPlaceholder": "Add a note..."
     }
   },
   "homePreview": {

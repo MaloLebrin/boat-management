@@ -252,6 +252,30 @@ const routes = {
     tokens: [{"old":"/boats/:boatId/safety-equipment/:itemId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/safety-equipment/:itemId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/safety-equipment/:itemId","type":0,"val":"safety-equipment","end":""},{"old":"/boats/:boatId/safety-equipment/:itemId","type":1,"val":"itemId","end":""}],
     types: placeholder as Registry['boat_safety_equipment.destroy']['types'],
   },
+  'boats.maintenanceSheets.store': {
+    methods: ["POST"],
+    pattern: '/boats/:boatId/maintenance-sheets',
+    tokens: [{"old":"/boats/:boatId/maintenance-sheets","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/maintenance-sheets","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/maintenance-sheets","type":0,"val":"maintenance-sheets","end":""}],
+    types: placeholder as Registry['boats.maintenanceSheets.store']['types'],
+  },
+  'boats.maintenanceSheets.complete': {
+    methods: ["PUT"],
+    pattern: '/boats/:boatId/maintenance-sheets/:sheetId/complete',
+    tokens: [{"old":"/boats/:boatId/maintenance-sheets/:sheetId/complete","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/maintenance-sheets/:sheetId/complete","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/maintenance-sheets/:sheetId/complete","type":0,"val":"maintenance-sheets","end":""},{"old":"/boats/:boatId/maintenance-sheets/:sheetId/complete","type":1,"val":"sheetId","end":""},{"old":"/boats/:boatId/maintenance-sheets/:sheetId/complete","type":0,"val":"complete","end":""}],
+    types: placeholder as Registry['boats.maintenanceSheets.complete']['types'],
+  },
+  'boats.maintenanceSheets.destroy': {
+    methods: ["DELETE"],
+    pattern: '/boats/:boatId/maintenance-sheets/:sheetId',
+    tokens: [{"old":"/boats/:boatId/maintenance-sheets/:sheetId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/maintenance-sheets/:sheetId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/maintenance-sheets/:sheetId","type":0,"val":"maintenance-sheets","end":""},{"old":"/boats/:boatId/maintenance-sheets/:sheetId","type":1,"val":"sheetId","end":""}],
+    types: placeholder as Registry['boats.maintenanceSheets.destroy']['types'],
+  },
+  'boats.maintenanceSheetItems.update': {
+    methods: ["PUT"],
+    pattern: '/boats/:boatId/maintenance-sheets/:sheetId/items/:itemId',
+    tokens: [{"old":"/boats/:boatId/maintenance-sheets/:sheetId/items/:itemId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/maintenance-sheets/:sheetId/items/:itemId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/maintenance-sheets/:sheetId/items/:itemId","type":0,"val":"maintenance-sheets","end":""},{"old":"/boats/:boatId/maintenance-sheets/:sheetId/items/:itemId","type":1,"val":"sheetId","end":""},{"old":"/boats/:boatId/maintenance-sheets/:sheetId/items/:itemId","type":0,"val":"items","end":""},{"old":"/boats/:boatId/maintenance-sheets/:sheetId/items/:itemId","type":1,"val":"itemId","end":""}],
+    types: placeholder as Registry['boats.maintenanceSheetItems.update']['types'],
+  },
   'new_account.create': {
     methods: ["GET","HEAD"],
     pattern: '/signup',

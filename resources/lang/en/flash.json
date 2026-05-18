@@ -68,5 +68,12 @@
     "updated": "Equipment updated.",
     "deleted": "Equipment deleted.",
     "notFound": "Equipment not found."
+  },
+  "maintenanceSheets": {
+    "created": "Sheet created.",
+    "completed": "Sheet marked as complete.",
+    "removed": "Sheet deleted.",
+    "notFound": "Sheet not found.",
+    "itemUpdated": "Item updated."
   }
 }

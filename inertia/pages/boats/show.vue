@@ -10,9 +10,10 @@ import BoatShowTabEquipment from '~/components/boats/show/tabs/BoatShowTabEquipm
 import BoatShowTabHistory from '~/components/boats/show/tabs/BoatShowTabHistory.vue'
 import BoatShowTabOverview from '~/components/boats/show/tabs/BoatShowTabOverview.vue'
 import BoatShowTabSpecs from '~/components/boats/show/tabs/BoatShowTabSpecs.vue'
+import BoatShowTabSheets from '~/components/boats/show/tabs/BoatShowTabSheets.vue'
 import BoatShowTabTasks from '~/components/boats/show/tabs/BoatShowTabTasks.vue'
 import { useT } from '~/composables/useT'
-import type { BoatShowDetail, MaintenanceEventRow, MaintenanceTaskRow } from '~/types/boat_show'
+import type { BoatShowDetail, MaintenanceEventRow, MaintenanceSheetRow, MaintenanceTaskRow } from '~/types/boat_show'
 
 const { t } = useT()
 
@@ -20,11 +21,12 @@ const props = defineProps<{
   boat: BoatShowDetail
   maintenanceEvents: MaintenanceEventRow[]
   maintenanceTasks: MaintenanceTaskRow[]
+  maintenanceSheets: MaintenanceSheetRow[]
   canManageMaintenance: boolean
   canManageEquipment: boolean
 }>()
 
-type TabKey = 'overview' | 'specs' | 'equipment' | 'history' | 'tasks' | 'documents'
+type TabKey = 'overview' | 'specs' | 'equipment' | 'history' | 'tasks' | 'documents' | 'sheets'
 
 const urlParams = new URLSearchParams(window.location.search)
 const initialTab = (urlParams.get('tab') as TabKey) || 'overview'
@@ -65,6 +67,7 @@ const tabs = computed(() => [
   { key: 'equipment', label: t('boats.show.tabs.equipment') },
   { key: 'history', label: t('boats.show.tabs.history') },
   { key: 'tasks', label: t('boats.show.tabs.tasks'), badge: openTasks.value.length > 0 ? String(openTasks.value.length) : undefined },
+  { key: 'sheets', label: t('boats.show.tabs.sheets') },
   { key: 'documents', label: t('boats.show.tabs.documents') },
 ])
 
@@ -130,6 +133,8 @@ function goToTab(key: TabKey | string) {
 
         <BoatShowTabTasks v-else-if="tab === 'tasks'" :boat="boat" :maintenance-tasks="maintenanceTasks"
           :can-manage-maintenance="canManageMaintenance" :create-task-nonce="createTaskNonce" />
+
+        <BoatShowTabSheets v-else-if="tab === 'sheets'" :boat="boat" :sheets="maintenanceSheets" :can-manage="canManageMaintenance" />
 
         <BoatShowTabDocuments v-else-if="tab === 'documents'" :boat="boat" :can-manage="canManageEquipment" />
       </div>

@@ -10,6 +10,7 @@ Cette documentation décrit **fonctionnellement** et **techniquement** le projet
   - `docs/domain/boats.md`
   - `docs/domain/maintenance-events.md`
   - `docs/domain/maintenance-tasks.md`
+  - `docs/domain/maintenance-sheets.md`
   - `docs/domain/dashboard.md`
   - `docs/domain/auth-acl.md`
 - **Données**: `docs/data/schema.md`

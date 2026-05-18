@@ -525,7 +525,8 @@
         "specs": "Spécifications",
         "history": "Historique",
         "tasks": "Tâches",
-        "documents": "Documents"
+        "documents": "Documents",
+        "sheets": "Fiches"
       },
       "breadcrumbFleet": "Flotte",
       "nextTasks": "Prochaines tâches",
@@ -830,6 +831,35 @@
         "notes": "Notes",
         "selectPlaceholder": "— Sélectionner —"
       }
+    },
+    "sheets": {
+      "title": "Fiches de maintenance",
+      "subtitle": "Listes de contrôle guidées pour l'entretien, le montage, l'hivernage, le déshivernage et l'atelier.",
+      "empty": "Aucune fiche pour l'instant.",
+      "addSheet": "Nouvelle fiche",
+      "modalTitle": "Créer une fiche",
+      "typeLabel": "Type de fiche",
+      "typeEntretien": "Entretien",
+      "typeMontage": "Montage",
+      "typeHivernage": "Hivernage",
+      "typeDehivernage": "Déshivernage",
+      "typeAtelier": "Atelier",
+      "titleLabel": "Titre",
+      "titlePlaceholder": "ex. Hivernage 2025",
+      "performedAtLabel": "Date",
+      "notesLabel": "Notes",
+      "notesPlaceholder": "Notes optionnelles...",
+      "createSheet": "Créer la fiche",
+      "statusInProgress": "En cours",
+      "statusCompleted": "Terminée",
+      "markComplete": "Marquer terminée",
+      "progress": "{done}/{total} etapes",
+      "expand": "Voir les étapes",
+      "collapse": "Masquer les étapes",
+      "filterAll": "Toutes",
+      "confirmDelete": "Supprimer cette fiche ?",
+      "noItems": "Aucune etape dans cette fiche.",
+      "itemNotesPlaceholder": "Ajouter une note..."
     }
   },
   "homePreview": {

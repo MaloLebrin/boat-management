@@ -91,5 +91,27 @@ router
       controllers.BoatSafetyEquipment,
       'destroy',
     ])
+
+    router
+      .post('boats/:boatId/maintenance-sheets', [controllers.BoatMaintenanceSheets, 'store'])
+      .as('boats.maintenanceSheets.store')
+    router
+      .put('boats/:boatId/maintenance-sheets/:sheetId/complete', [
+        controllers.BoatMaintenanceSheets,
+        'complete',
+      ])
+      .as('boats.maintenanceSheets.complete')
+    router
+      .delete('boats/:boatId/maintenance-sheets/:sheetId', [
+        controllers.BoatMaintenanceSheets,
+        'destroy',
+      ])
+      .as('boats.maintenanceSheets.destroy')
+    router
+      .put('boats/:boatId/maintenance-sheets/:sheetId/items/:itemId', [
+        controllers.BoatMaintenanceSheetItems,
+        'update',
+      ])
+      .as('boats.maintenanceSheetItems.update')
   })
   .use(middleware.auth())

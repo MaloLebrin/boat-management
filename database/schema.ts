@@ -121,6 +121,50 @@ export class BoatMaintenancePartSchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class BoatMaintenanceSheetItemSchema extends BaseModel {
+  static $columns = ['boatMaintenanceSheetId', 'createdAt', 'id', 'isDone', 'label', 'notes', 'position', 'updatedAt'] as const
+  $columns = BoatMaintenanceSheetItemSchema.$columns
+  @column()
+  declare boatMaintenanceSheetId: number
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare isDone: boolean
+  @column()
+  declare label: string
+  @column()
+  declare notes: string | null
+  @column()
+  declare position: number
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class BoatMaintenanceSheetSchema extends BaseModel {
+  static $columns = ['boatId', 'createdAt', 'id', 'notes', 'performedAt', 'status', 'title', 'type', 'updatedAt'] as const
+  $columns = BoatMaintenanceSheetSchema.$columns
+  @column()
+  declare boatId: number
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare notes: string | null
+  @column.date()
+  declare performedAt: DateTime
+  @column()
+  declare status: string
+  @column()
+  declare title: string
+  @column()
+  declare type: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class BoatMaintenanceTaskSchema extends BaseModel {
   static $columns = ['boatEngineId', 'boatId', 'boatRigId', 'boatSailId', 'createdAt', 'doneAt', 'doneEngineHours', 'dueAt', 'dueEngineHours', 'id', 'lastDoneEngineHours', 'notes', 'recurrenceIntervalEngineHours', 'recurrenceIntervalMonths', 'status', 'subject', 'title', 'updatedAt'] as const
   $columns = BoatMaintenanceTaskSchema.$columns

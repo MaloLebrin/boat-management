@@ -1,4 +1,5 @@
 import BoatMaintenanceService from '#services/boat_maintenance_service'
+import BoatMaintenanceSheetService from '#services/boat_maintenance_sheet_service'
 import BoatMaintenanceTaskService from '#services/boat_maintenance_task_service'
 import BoatListService from '#services/boat_list_service'
 import BoatService, { BoatNotFoundError } from '#services/boat_service'
@@ -52,6 +53,8 @@ export default class BoatsController {
       const maintenanceEvents = await maintenanceService.listForBoat(user, boat)
       const taskService = new BoatMaintenanceTaskService()
       const maintenanceTasks = await taskService.listForBoat(user, boat)
+      const sheetService = new BoatMaintenanceSheetService()
+      const maintenanceSheets = await sheetService.listForBoat(user, boat)
       const canManageMaintenance = await bouncer.allows('boatUpdate', boat)
       const canManageEquipment = canManageMaintenance
       const mediaService = new MediaService()
@@ -164,6 +167,21 @@ export default class BoatsController {
           boatRigId: t.boatRigId,
           recurrenceIntervalMonths: t.recurrenceIntervalMonths,
           recurrenceIntervalEngineHours: t.recurrenceIntervalEngineHours,
+        })),
+        maintenanceSheets: maintenanceSheets.map((s) => ({
+          id: s.id,
+          type: s.type as 'entretien' | 'montage' | 'hivernage' | 'dehivernage' | 'atelier',
+          title: s.title,
+          status: s.status as 'in_progress' | 'completed',
+          performedAt: s.performedAt.toISODate()!,
+          notes: s.notes,
+          items: s.items.map((item) => ({
+            id: item.id,
+            label: item.label,
+            isDone: item.isDone,
+            notes: item.notes,
+            position: item.position,
+          })),
         })),
         canManageMaintenance,
         canManageEquipment,
