@@ -36,7 +36,7 @@ export default class PortsController {
 
     const portService = new PortService()
     try {
-      const port = await portService.getWithPontoonsOrFail(user, Number(params.id))
+      const port = await portService.getWithPontoonsAndMouillagesOrFail(user, Number(params.id))
       return inertia.render('ports/show', { port })
     } catch (error) {
       if (error instanceof PortNotFoundError) return response.redirect('/ports')
@@ -50,7 +50,7 @@ export default class PortsController {
 
     const portService = new PortService()
     try {
-      const port = await portService.getWithPontoonsOrFail(user, Number(params.id))
+      const port = await portService.getWithPontoonsAndMouillagesOrFail(user, Number(params.id))
       return inertia.render('ports/edit', { port })
     } catch (error) {
       if (error instanceof PortNotFoundError) return response.redirect('/ports')

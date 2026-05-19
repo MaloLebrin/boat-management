@@ -336,6 +336,24 @@ const routes = {
     tokens: [{"old":"/ports/:portId/pontoons/:pontoonId","type":0,"val":"ports","end":""},{"old":"/ports/:portId/pontoons/:pontoonId","type":1,"val":"portId","end":""},{"old":"/ports/:portId/pontoons/:pontoonId","type":0,"val":"pontoons","end":""},{"old":"/ports/:portId/pontoons/:pontoonId","type":1,"val":"pontoonId","end":""}],
     types: placeholder as Registry['ports.pontoons.destroy']['types'],
   },
+  'ports.mouillages.store': {
+    methods: ["POST"],
+    pattern: '/ports/:portId/mouillages',
+    tokens: [{"old":"/ports/:portId/mouillages","type":0,"val":"ports","end":""},{"old":"/ports/:portId/mouillages","type":1,"val":"portId","end":""},{"old":"/ports/:portId/mouillages","type":0,"val":"mouillages","end":""}],
+    types: placeholder as Registry['ports.mouillages.store']['types'],
+  },
+  'ports.mouillages.update': {
+    methods: ["PUT"],
+    pattern: '/ports/:portId/mouillages/:mouillageId',
+    tokens: [{"old":"/ports/:portId/mouillages/:mouillageId","type":0,"val":"ports","end":""},{"old":"/ports/:portId/mouillages/:mouillageId","type":1,"val":"portId","end":""},{"old":"/ports/:portId/mouillages/:mouillageId","type":0,"val":"mouillages","end":""},{"old":"/ports/:portId/mouillages/:mouillageId","type":1,"val":"mouillageId","end":""}],
+    types: placeholder as Registry['ports.mouillages.update']['types'],
+  },
+  'ports.mouillages.destroy': {
+    methods: ["DELETE"],
+    pattern: '/ports/:portId/mouillages/:mouillageId',
+    tokens: [{"old":"/ports/:portId/mouillages/:mouillageId","type":0,"val":"ports","end":""},{"old":"/ports/:portId/mouillages/:mouillageId","type":1,"val":"portId","end":""},{"old":"/ports/:portId/mouillages/:mouillageId","type":0,"val":"mouillages","end":""},{"old":"/ports/:portId/mouillages/:mouillageId","type":1,"val":"mouillageId","end":""}],
+    types: placeholder as Registry['ports.mouillages.destroy']['types'],
+  },
   'new_account.create': {
     methods: ["GET","HEAD"],
     pattern: '/signup',

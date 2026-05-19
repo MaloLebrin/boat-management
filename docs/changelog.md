@@ -7,6 +7,18 @@ Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
 ## 2026-05-19
 
+### Ajout des mouillages aux ports
+
+- Nouvelle entité `Mouillage` (table `mouillages`) : nom, description, appartient à un port (CASCADE on delete)
+- CRUD complet sur la page détail d'un port : section "Mouillages" avec formulaire inline et cartes (`MouillageCard`, `MouillageFormModal`)
+- Affectation d'un bateau à un mouillage (exclusif avec le ponton) : champ `mouillage_id` sur `boats`, formulaire bateau mis à jour avec deux selects mutuellement exclusifs (Ponton | Mouillage)
+- Historique de position étendu : `mouillage_id` sur `boat_position_history`, `portName` résolu depuis le mouillage si pas de ponton
+- Protection suppression : impossible de supprimer un mouillage ou un port si des bateaux y sont affectés
+- Routes : `POST/PUT/DELETE /ports/:portId/mouillages[/:mouillageId]`
+- i18n EN + FR complets (`ports.mouillages.*`, `boats.hullFields.mouillage`)
+
+---
+
 ### Refonte pages Pricing, About, Contact — Frontend
 
 Implémentation complète des trois pages marketing depuis un design prototype (Claude Design). Chaque page est décomposée en composants Vue 3 autonomes (`<script setup>`), avec props typées et i18n EN+FR.

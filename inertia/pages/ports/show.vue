@@ -5,10 +5,12 @@ import { ArrowLeftIcon, MapPinIcon, PencilIcon, PlusIcon, TrashIcon } from '@her
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
+import MouillageCard from '~/components/ports/show/MouillageCard.vue'
+import MouillageFormModal from '~/components/ports/modals/MouillageFormModal.vue'
 import PontoonCard from '~/components/ports/show/PontoonCard.vue'
 import PontoonFormModal from '~/components/ports/modals/PontoonFormModal.vue'
 import { useT } from '~/composables/useT'
-import type { PortShowDetail, PontoonRow } from '~/types/port'
+import type { PortShowDetail, PontoonRow, MouillageRow } from '~/types/port'
 
 const props = defineProps<{
   port: PortShowDetail
@@ -18,6 +20,9 @@ const { t } = useT()
 
 const showPontoonForm = ref(false)
 const editingPontoon = ref<PontoonRow | null>(null)
+
+const showMouillageForm = ref(false)
+const editingMouillage = ref<MouillageRow | null>(null)
 
 function handleAddPontoon() {
   editingPontoon.value = null
@@ -34,8 +39,25 @@ function handleCloseForm() {
   editingPontoon.value = null
 }
 
+function handleAddMouillage() {
+  editingMouillage.value = null
+  showMouillageForm.value = true
+}
+
+function handleEditMouillage(mouillage: MouillageRow) {
+  editingMouillage.value = mouillage
+  showMouillageForm.value = true
+}
+
+function handleCloseMouillageForm() {
+  showMouillageForm.value = false
+  editingMouillage.value = null
+}
+
 function handleDeletePort() {
-  const hasBoats = props.port.pontoons.some((p) => p.boats.length > 0)
+  const hasBoats =
+    props.port.pontoons.some((p) => p.boats.length > 0) ||
+    props.port.mouillages.some((m) => m.boats.length > 0)
   if (hasBoats) {
     alert(t('ports.hasBoats'))
     return
@@ -136,6 +158,43 @@ function handleDeletePort() {
             :port-id="port.id"
             @edit="handleEditPontoon"
           />
+        </div>
+
+        <!-- Mouillages section -->
+        <div class="mt-8 space-y-4">
+          <div class="flex items-center justify-between">
+            <h2 class="text-lg font-semibold text-fg">{{ t('ports.mouillages.title') }}</h2>
+            <BaseButton size="sm" @click="handleAddMouillage">
+              <PlusIcon class="h-4 w-4" />
+              {{ t('ports.mouillages.add') }}
+            </BaseButton>
+          </div>
+
+          <!-- Mouillage form -->
+          <MouillageFormModal
+            v-if="showMouillageForm"
+            :port-id="port.id"
+            :mouillage="editingMouillage"
+            @close="handleCloseMouillageForm"
+          />
+
+          <!-- Empty state -->
+          <BaseCard v-if="port.mouillages.length === 0 && !showMouillageForm" padded>
+            <p class="text-center text-sm text-fg-muted py-4">
+              {{ t('ports.mouillages.empty') }}
+            </p>
+          </BaseCard>
+
+          <!-- Mouillages list -->
+          <div v-else class="space-y-4">
+            <MouillageCard
+              v-for="mouillage in port.mouillages"
+              :key="mouillage.id"
+              :mouillage="mouillage"
+              :port-id="port.id"
+              @edit="handleEditMouillage"
+            />
+          </div>
         </div>
       </div>
     </div>

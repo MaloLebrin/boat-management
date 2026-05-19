@@ -21,5 +21,15 @@ router
     router
       .delete('ports/:portId/pontoons/:pontoonId', [controllers.Pontoons, 'destroy'])
       .as('ports.pontoons.destroy')
+
+    router
+      .post('ports/:portId/mouillages', [controllers.Mouillages, 'store'])
+      .as('ports.mouillages.store')
+    router
+      .put('ports/:portId/mouillages/:mouillageId', [controllers.Mouillages, 'update'])
+      .as('ports.mouillages.update')
+    router
+      .delete('ports/:portId/mouillages/:mouillageId', [controllers.Mouillages, 'destroy'])
+      .as('ports.mouillages.destroy')
   })
   .use(middleware.auth())

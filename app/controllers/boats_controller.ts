@@ -34,6 +34,7 @@ export default class BoatsController {
         ? await Port.query()
             .where('organizationId', user.organizationId)
             .preload('pontoons', (q) => q.orderBy('name', 'asc'))
+            .preload('mouillages', (q) => q.orderBy('name', 'asc'))
             .orderBy('name', 'asc')
         : []
 
@@ -42,6 +43,7 @@ export default class BoatsController {
         id: p.id,
         name: p.name,
         pontoons: p.pontoons.map((pt) => ({ id: pt.id, name: pt.name })),
+        mouillages: p.mouillages.map((m) => ({ id: m.id, name: m.name })),
       })),
     })
   }
@@ -82,10 +84,14 @@ export default class BoatsController {
       if (boat.pontoonId !== null) {
         await boat.load('pontoon', (q) => q.preload('port'))
       }
+      if (boat.mouillageId !== null) {
+        await boat.load('mouillage', (q) => q.preload('port'))
+      }
 
       const positionHistory = await BoatPositionHistory.query()
         .where('boatId', boat.id)
         .preload('pontoon', (q) => q.preload('port'))
+        .preload('mouillage', (q) => q.preload('port'))
         .orderBy('startedAt', 'desc')
         .limit(20)
 
@@ -116,6 +122,7 @@ export default class BoatsController {
           flagCountry: boat.flagCountry,
           maxPersons: boat.maxPersons,
           pontoonId: boat.pontoonId ?? null,
+          mouillageId: boat.mouillageId ?? null,
           spotIdentifier: boat.spotIdentifier ?? null,
           pontoon: boat.pontoon
             ? {
@@ -125,11 +132,21 @@ export default class BoatsController {
                 portName: boat.pontoon.port.name,
               }
             : null,
+          mouillage: boat.mouillage
+            ? {
+                id: boat.mouillage.id,
+                name: boat.mouillage.name,
+                portId: boat.mouillage.portId,
+                portName: boat.mouillage.port.name,
+              }
+            : null,
           positionHistory: positionHistory.map((h) => ({
             id: h.id,
             pontoonId: h.pontoonId,
             pontoonName: h.pontoon?.name ?? null,
-            portName: h.pontoon?.port?.name ?? null,
+            mouillageId: h.mouillageId,
+            mouillageNom: h.mouillage?.name ?? null,
+            portName: h.pontoon?.port?.name ?? h.mouillage?.port?.name ?? null,
             spotIdentifier: h.spotIdentifier,
             startedAt: h.startedAt.toISODate()!,
             endedAt: h.endedAt ? h.endedAt.toISODate() : null,
@@ -263,6 +280,7 @@ export default class BoatsController {
           ? await Port.query()
               .where('organizationId', user.organizationId)
               .preload('pontoons', (q) => q.orderBy('name', 'asc'))
+              .preload('mouillages', (q) => q.orderBy('name', 'asc'))
               .orderBy('name', 'asc')
           : []
 
@@ -289,12 +307,14 @@ export default class BoatsController {
           flagCountry: boat.flagCountry,
           maxPersons: boat.maxPersons,
           pontoonId: boat.pontoonId ?? null,
+          mouillageId: boat.mouillageId ?? null,
           spotIdentifier: boat.spotIdentifier ?? null,
         },
         ports: ports.map((p) => ({
           id: p.id,
           name: p.name,
           pontoons: p.pontoons.map((pt) => ({ id: pt.id, name: pt.name })),
+          mouillages: p.mouillages.map((m) => ({ id: m.id, name: m.name })),
         })),
       })
     } catch (error) {

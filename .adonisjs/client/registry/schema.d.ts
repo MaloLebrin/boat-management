@@ -667,6 +667,42 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/pontoons_controller').default['destroy']>>>
     }
   }
+  'ports.mouillages.store': {
+    methods: ["POST"]
+    pattern: '/ports/:portId/mouillages'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/mouillage').createMouillageValidator)>>
+      paramsTuple: [ParamValue]
+      params: { portId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/mouillage').createMouillageValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/mouillages_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/mouillages_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'ports.mouillages.update': {
+    methods: ["PUT"]
+    pattern: '/ports/:portId/mouillages/:mouillageId'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/mouillage').updateMouillageValidator)>>
+      paramsTuple: [ParamValue, ParamValue]
+      params: { portId: ParamValue; mouillageId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/mouillage').updateMouillageValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/mouillages_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/mouillages_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'ports.mouillages.destroy': {
+    methods: ["DELETE"]
+    pattern: '/ports/:portId/mouillages/:mouillageId'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { portId: ParamValue; mouillageId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/mouillages_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/mouillages_controller').default['destroy']>>>
+    }
+  }
   'new_account.create': {
     methods: ["GET","HEAD"]
     pattern: '/signup'

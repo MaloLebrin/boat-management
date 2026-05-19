@@ -373,6 +373,7 @@
       "flagCountry": "Flag",
       "maxPersons": "Max persons on board",
       "pontoon": "Pontoon",
+      "mouillage": "Anchorage",
       "spotIdentifier": "Berth number"
     },
     "engines": {
@@ -927,11 +928,25 @@
         "description": "Description"
       }
     },
+    "mouillages": {
+      "title": "Anchorages",
+      "empty": "No anchorage yet.",
+      "add": "Add anchorage",
+      "edit": "Edit",
+      "delete": "Delete",
+      "deleteConfirm": "Delete this anchorage?",
+      "hasBoats": "This anchorage has boats assigned. Move them before deleting.",
+      "fields": {
+        "name": "Anchorage name",
+        "description": "Description"
+      }
+    },
     "show": {
       "boats": "Boats",
       "spot": "Berth",
       "emptySpot": "Unassigned",
-      "noBoats": "No boats on this pontoon."
+      "noBoats": "No boats on this pontoon.",
+      "noBoatsMouillage": "No boats at this anchorage."
     }
   }
 }

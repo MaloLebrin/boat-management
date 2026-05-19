@@ -373,6 +373,7 @@
       "flagCountry": "Pavillon",
       "maxPersons": "Personnes max à bord",
       "pontoon": "Ponton",
+      "mouillage": "Mouillage",
       "spotIdentifier": "N° d'emplacement"
     },
     "engines": {
@@ -946,11 +947,25 @@
         "description": "Description"
       }
     },
+    "mouillages": {
+      "title": "Mouillages",
+      "empty": "Aucun mouillage.",
+      "add": "Ajouter un mouillage",
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "deleteConfirm": "Supprimer ce mouillage ?",
+      "hasBoats": "Ce mouillage contient des bateaux. Déplacez-les avant de supprimer.",
+      "fields": {
+        "name": "Nom du mouillage",
+        "description": "Description"
+      }
+    },
     "show": {
       "boats": "Bateaux",
       "spot": "Emplacement",
       "emptySpot": "Non assigné",
-      "noBoats": "Aucun bateau sur ce ponton."
+      "noBoats": "Aucun bateau sur ce ponton.",
+      "noBoatsMouillage": "Aucun bateau sur ce mouillage."
     }
   }
 }

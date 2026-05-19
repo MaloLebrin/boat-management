@@ -224,7 +224,7 @@ export class BoatMaintenanceTaskSchema extends BaseModel {
 }
 
 export class BoatPositionHistorySchema extends BaseModel {
-  static $columns = ['boatId', 'createdAt', 'endedAt', 'id', 'notes', 'pontoonId', 'spotIdentifier', 'startedAt', 'updatedAt'] as const
+  static $columns = ['boatId', 'createdAt', 'endedAt', 'id', 'mouillageId', 'notes', 'pontoonId', 'spotIdentifier', 'startedAt', 'updatedAt'] as const
   $columns = BoatPositionHistorySchema.$columns
   @column()
   declare boatId: number
@@ -234,6 +234,8 @@ export class BoatPositionHistorySchema extends BaseModel {
   declare endedAt: DateTime | null
   @column({ isPrimary: true })
   declare id: number
+  @column()
+  declare mouillageId: number | null
   @column()
   declare notes: string | null
   @column()
@@ -322,7 +324,7 @@ export class BoatSailSchema extends BaseModel {
 }
 
 export class BoatSchema extends BaseModel {
-  static $columns = ['beamM', 'createdAt', 'draftM', 'flagCountry', 'francisationNumber', 'homePort', 'hullIdentificationNumber', 'hullMaterial', 'id', 'lengthM', 'manufacturedAt', 'manufacturer', 'mastHeightM', 'maxPersons', 'model', 'name', 'navigationCategory', 'organizationId', 'pontoonId', 'propulsionType', 'registrationNumber', 'spotIdentifier', 'type', 'updatedAt', 'yearBuilt'] as const
+  static $columns = ['beamM', 'createdAt', 'draftM', 'flagCountry', 'francisationNumber', 'homePort', 'hullIdentificationNumber', 'hullMaterial', 'id', 'lengthM', 'manufacturedAt', 'manufacturer', 'mastHeightM', 'maxPersons', 'model', 'mouillageId', 'name', 'navigationCategory', 'organizationId', 'pontoonId', 'propulsionType', 'registrationNumber', 'spotIdentifier', 'type', 'updatedAt', 'yearBuilt'] as const
   $columns = BoatSchema.$columns
   @column()
   declare beamM: number | null
@@ -354,6 +356,8 @@ export class BoatSchema extends BaseModel {
   declare maxPersons: number | null
   @column()
   declare model: string | null
+  @column()
+  declare mouillageId: number | null
   @column()
   declare name: string
   @column()
@@ -411,6 +415,23 @@ export class MediaSchema extends BaseModel {
   declare uploadedById: number | null
   @column()
   declare width: number | null
+}
+
+export class MouillageSchema extends BaseModel {
+  static $columns = ['createdAt', 'description', 'id', 'name', 'portId', 'updatedAt'] as const
+  $columns = MouillageSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare description: string | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare name: string
+  @column()
+  declare portId: number
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
 }
 
 export class OrganizationSchema extends BaseModel {

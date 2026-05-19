@@ -72,6 +72,7 @@ export const createBoatValidator = vine.create({
   maxPersons: vine.number().withoutDecimals().positive().nullable().optional(),
 
   pontoonId: vine.number().withoutDecimals().positive().nullable().optional(),
+  mouillageId: vine.number().withoutDecimals().positive().nullable().optional(),
   spotIdentifier: vine.string().trim().maxLength(16).nullable().optional(),
 })
 
@@ -103,6 +104,7 @@ export const updateBoatValidator = vine.compile(
     maxPersons: vine.number().withoutDecimals().positive().nullable().optional(),
 
     pontoonId: vine.number().withoutDecimals().positive().nullable().optional(),
+    mouillageId: vine.number().withoutDecimals().positive().nullable().optional(),
     spotIdentifier: vine.string().trim().maxLength(16).nullable().optional(),
   })
 )

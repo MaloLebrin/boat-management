@@ -80,6 +80,11 @@ export interface ApiDefinition {
       update: typeof routes['ports.pontoons.update']
       destroy: typeof routes['ports.pontoons.destroy']
     }
+    mouillages: {
+      store: typeof routes['ports.mouillages.store']
+      update: typeof routes['ports.mouillages.update']
+      destroy: typeof routes['ports.mouillages.destroy']
+    }
   }
   newAccount: {
     create: typeof routes['new_account.create']

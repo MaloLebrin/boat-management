@@ -2,6 +2,7 @@ import { BaseModel, column, belongsTo, hasMany } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
 import Organization from '#models/organization'
+import Mouillage from '#models/mouillage'
 import Pontoon from '#models/pontoon'
 
 export default class Port extends BaseModel {
@@ -39,4 +40,7 @@ export default class Port extends BaseModel {
 
   @hasMany(() => Pontoon)
   declare pontoons: HasMany<typeof Pontoon>
+
+  @hasMany(() => Mouillage)
+  declare mouillages: HasMany<typeof Mouillage>
 }
