@@ -93,7 +93,7 @@ const otherHref = computed(() => {
     </header>
 
     <!-- Contenu principal -->
-    <main class="mx-auto w-full px-6 py-10">
+    <main class="w-full">
       <slot />
     </main>
 

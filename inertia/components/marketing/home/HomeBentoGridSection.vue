@@ -32,7 +32,7 @@ const cards = [
     class="mt-14 reveal rounded-2xl bg-paper py-14 px-8"
     :class="{ visible: sectionVisible }"
   >
-    <h2 class="mb-8 text-center font-display text-2xl italic text-fg">{{ bentoGrid.title }}</h2>
+    <h2 class="mb-8 text-center font-display text-3xl leading-tight italic text-fg lg:text-4xl">{{ bentoGrid.title }}</h2>
 
     <div class="grid gap-3" style="grid-template-columns: 2fr 1fr 1fr; grid-auto-rows: 180px;">
 

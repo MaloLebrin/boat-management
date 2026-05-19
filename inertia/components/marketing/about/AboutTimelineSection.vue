@@ -1,50 +1,77 @@
 <script setup lang="ts">
-import BaseHeading from '~/components/base/BaseHeading.vue'
 import { useScrollReveal } from '~/composables/useScrollReveal'
 
+interface TimelineItem {
+  d: string
+  t: string
+  sub: string
+  tone?: string
+}
+
 defineProps<{
-  timeline: {
-    title: string
-    items: Array<{ year: string; label: string; description: string }>
-  }
+  eyebrow: string
+  title: string
+  titleHighlight: string
+  subtitle: string
+  items: TimelineItem[]
 }>()
 
-const { el: sectionEl, isVisible: sectionVisible } = useScrollReveal()
+const { el, isVisible } = useScrollReveal()
+
+function dotBg(tone?: string) {
+  if (tone === 'coral') return '#e2674f'
+  if (tone === 'mint') return '#1f6b54'
+  return '#fff'
+}
+
+function dotBorder(tone?: string) {
+  if (tone === 'coral') return '#fadcd2'
+  if (tone === 'mint') return '#cfe8de'
+  return '#dde7f0'
+}
 </script>
 
 <template>
   <section
-    :ref="(el) => sectionEl = el as HTMLElement"
-    class="reveal py-14"
-    :class="{ visible: sectionVisible }"
+    :ref="(r) => (el = r as HTMLElement)"
+    class="reveal bg-cream px-6 py-20 lg:px-8"
+    :class="{ visible: isVisible }"
   >
-    <!-- Title -->
-    <div class="text-center mb-12">
-      <BaseHeading level="2">{{ timeline.title }}</BaseHeading>
-    </div>
-
-    <!-- Timeline -->
-    <div class="relative before:absolute before:left-1/2 before:top-0 before:bottom-0 before:w-px before:bg-bone">
-      <div
-        v-for="(item, idx) in timeline.items"
-        :key="item.year"
-        class="reveal relative grid grid-cols-2 gap-8 py-6"
-        :class="[`reveal-delay-${idx + 1}`, { visible: sectionVisible }]"
-      >
-        <!-- Year (left) -->
-        <div class="text-right pr-8">
-          <p class="font-display text-2xl italic text-navy-700">{{ item.year }}</p>
+    <div class="mx-auto max-w-7xl">
+      <div class="grid gap-12 lg:grid-cols-[1fr_2fr] lg:gap-20">
+        <!-- Left: heading -->
+        <div class="lg:pt-2">
+          <p class="font-mono text-xs font-semibold uppercase tracking-widest text-fg-subtle">
+            {{ eyebrow }}
+          </p>
+          <h2 class="mt-3 font-display text-3xl leading-tight text-fg lg:text-4xl">
+            {{ title }} <em class="text-coral-500">{{ titleHighlight }}</em>
+          </h2>
+          <p class="mt-3 text-fg-muted">{{ subtitle }}</p>
         </div>
 
-        <!-- Central point -->
-        <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-          <div class="h-3 w-3 rounded-full bg-navy-700 border-2 border-white" />
-        </div>
-
-        <!-- Content (right) -->
-        <div class="pl-8">
-          <p class="font-semibold text-fg">{{ item.label }}</p>
-          <p class="text-sm text-fg-muted">{{ item.description }}</p>
+        <!-- Right: timeline -->
+        <div class="relative">
+          <div class="absolute bottom-0 left-4 top-2 w-px border-l border-dashed border-bone" />
+          <div
+            v-for="(item, idx) in items"
+            :key="idx"
+            class="relative pb-8 pl-12"
+          >
+            <!-- Dot -->
+            <div
+              class="absolute left-[9px] top-1 h-[15px] w-[15px] rounded-full ring-1 ring-bone"
+              :style="{
+                background: dotBg(item.tone),
+                border: `3px solid ${dotBorder(item.tone)}`,
+              }"
+            />
+            <p class="font-mono text-[11px] font-semibold uppercase tracking-wider text-fg-subtle">
+              {{ item.d }}
+            </p>
+            <p class="mt-1.5 font-semibold text-fg">{{ item.t }}</p>
+            <p class="mt-1 text-sm text-fg-muted">{{ item.sub }}</p>
+          </div>
         </div>
       </div>
     </div>

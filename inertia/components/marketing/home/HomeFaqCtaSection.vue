@@ -52,7 +52,7 @@ const { el: faqEl, isVisible: faqVisible } = useScrollReveal()
     <div class="rounded-2xl bg-navy-900 px-8 py-10 ring-1 ring-white/10">
       <div class="grid gap-6 lg:grid-cols-2 lg:items-center">
         <div class="space-y-2">
-          <h2 class="font-display text-2xl italic text-white">{{ finalCta.title }}</h2>
+          <h2 class="font-display text-3xl leading-tight italic text-white lg:text-4xl">{{ finalCta.title }}</h2>
           <p class="text-pretty text-base text-white/65">{{ finalCta.subtitle }}</p>
         </div>
         <div class="flex flex-wrap items-center justify-start gap-3 lg:justify-end">

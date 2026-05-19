@@ -7,6 +7,48 @@ Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
 ## 2026-05-19
 
+### Refonte pages Pricing, About, Contact — Frontend
+
+Implémentation complète des trois pages marketing depuis un design prototype (Claude Design). Chaque page est décomposée en composants Vue 3 autonomes (`<script setup>`), avec props typées et i18n EN+FR.
+
+**Pages et composants créés :**
+
+- **`marketing/pricing.vue`** + 7 sections : `PricingHeroSection` (toggle billing mensuel/annuel), `PricingTiersSection` (3 plans avec prices billing-aware), `PricingROISection` (calculateur interactif), `PricingTestimonialsSection`, `PricingDetailedTableSection` (8 groupes accordéon), `PricingExtrasSection`, `PricingFaqSection`
+- **`marketing/about.vue`** + 8 sections : `AboutHeroSection`, `AboutOriginSection`, `AboutValuesSection`, `AboutTeamSection`, `AboutNumbersSection`, `AboutTimelineSection`, `AboutOfficeSection`, `HomeFinalCtaSection`
+- **`marketing/contact.vue`** + 5 sections : `ContactHeroSection`, `ContactChannelsSection`, `ContactFormSection`, `ContactOfficesSection`, `ContactFaqSection`
+
+**Routes mises à jour** (`start/routes/marketing.ts`) :
+- `buildPricingPageData(i18n)` → `/en/tarifs`, `/fr/tarifs`
+- `buildAboutPageData(i18n)` → `/en/about`, `/fr/a-propos`
+- `buildContactPageData(i18n)` → `/contact`
+
+**i18n** : namespaces `pricing2`, `about2`, `contact2` ajoutés dans `fr/marketing.json` et `en/marketing.json`.
+
+---
+
+### Refonte complète de la landing page marketing — Frontend
+
+Implémentation de la landing page FleetAi depuis un design prototype (Claude Design). La page `marketing/home.vue` a été entièrement redessinée avec les sections suivantes :
+
+- **Hero persona-aware** : H1 Instrument Serif 84px, persona switcher (loueurs / écoles / marinas), mock dashboard dans un frame navigateur macOS
+- **Logos band** : défilement marquee, 8 clients fictifs
+- **Section Problème** : 3 cartes avec stats corail (73 %, 1 200 €, 4h/sem)
+- **Section Piliers** : 3 piliers solution (Historique immuable, Planification intelligente, Fleetide IA)
+- **3 Feature deep-dives** : layouts alternés gauche/droite avec mocks applicatifs (fiche bateau, planning calendrier, chat Fleetide)
+- **Section Personas** : 4 onglets (loueurs / écoles / marinas / armateurs), quote + stat par persona
+- **Bande de stats** : 4 métriques en grand Instrument Serif
+- **Table comparatif** : fond navy, comparaison Excel / Papier / FleetAi
+- **Mur de témoignages** : 1 featured + 3 petits
+- **Sécurité & conformité** : 6 cartes (UE, RGPD, chiffrement, etc.)
+- **FAQ accordéon** : 8 questions
+- **CTA final** : fond navy gradient avec déco boussole SVG
+
+Nouveaux composants créés : `HomeBrowserFrame`, `HomeMockDashboard`, `HomeMockBoatDetail`, `HomeMockPlanning`, `HomeMockFleetide`, `HomeProblemSection`, `HomePillarsSection`, `HomeFeatureSection`, `HomePersonasSection`, `HomeStatsBandSection`, `HomeComparisonSection`, `HomeTestimonialsSection`, `HomeSecuritySection`, `HomeFaqSection`, `HomeFinalCtaSection`.
+
+Layout `public.vue` modifié : `<main>` désormais `w-full` (suppression du padding pour permettre les sections pleine-largeur).
+
+Routes marketing.ts : ajout de la fonction `buildHomePageData()` avec toutes les clés i18n. Clés ajoutées dans `fr/marketing.json` et `en/marketing.json`.
+
 ### Gestion des ports, pontons et emplacements bateaux — Backend + Frontend
 
 Nouveau système complet de localisation des bateaux dans les marinas.

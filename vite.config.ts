@@ -6,7 +6,7 @@ import inertia from '@adonisjs/inertia/vite'
 export default defineConfig({
   plugins: [
     vue(),
-    inertia({ ssr: { enabled: false, entrypoint: 'inertia/ssr.ts' } }),
+    inertia({ ssr: { enabled: true, entrypoint: 'inertia/ssr.ts' } }),
     adonisjs({ entrypoints: ['inertia/app.ts'], reload: ['resources/views/**/*.edge'] }),
   ],
 

@@ -124,7 +124,7 @@ function getComparisonVal(row: string, col: 'excel' | 'paper' | 'fleetai'): stri
   >
     <div class="mb-8 text-center">
       <p class="text-xs font-semibold uppercase tracking-widest text-fg-subtle">{{ comparisonTable.subtitle }}</p>
-      <h2 class="mt-2 font-display text-2xl italic text-fg">{{ comparisonTable.title }}</h2>
+      <h2 class="mt-2 font-display text-3xl leading-tight italic text-fg lg:text-4xl">{{ comparisonTable.title }}</h2>
     </div>
     <div class="mx-auto max-w-3xl overflow-hidden rounded-xl border border-bone">
       <table class="w-full text-sm">
@@ -182,7 +182,7 @@ function getComparisonVal(row: string, col: 'excel' | 'paper' | 'fleetai'): stri
     <div class="mb-8 flex items-end justify-between">
       <div>
         <p class="text-xs font-semibold uppercase tracking-widest text-fg-subtle">{{ blog.subtitle }}</p>
-        <h2 class="mt-1 font-display text-2xl italic text-fg">{{ blog.title }}</h2>
+        <h2 class="mt-1 font-display text-3xl leading-tight italic text-fg lg:text-4xl">{{ blog.title }}</h2>
       </div>
       <a href="#" class="text-sm font-medium text-brand hover:underline">{{ blog.cta }}</a>
     </div>

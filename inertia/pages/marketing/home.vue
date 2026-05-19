@@ -7,83 +7,123 @@ export default {
 </script>
 <script setup lang="ts">
 import { Head, usePage } from '@inertiajs/vue3'
-import { computed, onMounted, onUnmounted } from 'vue'
-import HomeFaqCtaSection from '~/components/marketing/home/HomeFaqCtaSection.vue'
-import HomeContentSections from '~/components/marketing/home/HomeContentSections.vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import HomeHeroSection from '~/components/marketing/home/HomeHeroSection.vue'
-import HomeHowItWorksSection from '~/components/marketing/home/HomeHowItWorksSection.vue'
-import HomeProofSections from '~/components/marketing/home/HomeProofSections.vue'
-import HomeScreenshotsSection from '~/components/marketing/home/HomeScreenshotsSection.vue'
-import HomeIndustriesSection from '~/components/marketing/home/HomeIndustriesSection.vue'
-import HomeCaseStudySection from '~/components/marketing/home/HomeCaseStudySection.vue'
+import HomeProblemSection from '~/components/marketing/home/HomeProblemSection.vue'
+import HomePillarsSection from '~/components/marketing/home/HomePillarsSection.vue'
+import HomeFeatureSection from '~/components/marketing/home/HomeFeatureSection.vue'
+import HomePersonasSection from '~/components/marketing/home/HomePersonasSection.vue'
+import HomeStatsBandSection from '~/components/marketing/home/HomeStatsBandSection.vue'
+import HomeComparisonSection from '~/components/marketing/home/HomeComparisonSection.vue'
+import HomeTestimonialsSection from '~/components/marketing/home/HomeTestimonialsSection.vue'
+import HomeSecuritySection from '~/components/marketing/home/HomeSecuritySection.vue'
+import HomeFaqSection from '~/components/marketing/home/HomeFaqSection.vue'
+import HomeFinalCtaSection from '~/components/marketing/home/HomeFinalCtaSection.vue'
 
-type ScreenshotsItem = { label: string; description: string; hint: string }
-type IndustryItem = {
+type Persona = 'loueurs' | 'ecoles' | 'marinas' | 'armateurs'
+
+interface HeroContent {
+  title: string
+  titleHighlight: string
+  subtitle: string
+}
+
+interface ProblemItem {
+  number: string
+  label: string
+  title: string
+  stat: string
+  statSub: string
+  body: string
+}
+
+interface PillarItem {
+  number: string
+  title: string
+  description: string
+  isAi?: boolean
+}
+
+interface FeatureData {
+  eyebrow: string
+  title: string
+  titleHighlight: string
+  body: string
+  bullets: string[]
+}
+
+interface PersonaItem {
+  key: Persona
   icon: string
+  tabLabel: string
   title: string
   subtitle: string
-  pains: string[]
-  benefits: string[]
+  bullets: string[]
   quote: { text: string; author: string; role: string }
+  stat: { value: string; label: string }
 }
-type TestimonialItem = { quote: string; author: string; role: string; fleet: string; since: string }
-type HowItWorksItem = { step: string; title: string; description: string; detail: string }
 
-type PageProps = {
+interface ComparisonRow {
+  feature: string
+  excel: string
+  paper: string
+  fleetai: string
+}
+
+interface TestimonialItem {
+  quote: string
+  author: string
+  role: string
+  featured?: boolean
+}
+
+interface SecurityItem {
+  icon: string
+  title: string
+  description: string
+}
+
+interface FaqItem {
+  q: string
+  a: string
+}
+
+interface PageProps {
   t: {
     brand: { name: string; tagline: string }
-    nav: { pricing: string; login: string; signup: string }
     meta: { title: string; description: string }
     home: {
-      hero: { eyebrow: string; title: string; subtitle: string }
-      cta: { primary: string; secondary: string }
-      socialProof: { title: string; logos: string[] }
-      stats: { title: string; items: Array<{ label: string; value: string; hint: string }> }
-      problem: { title: string; items: Array<{ title: string; description: string }> }
-      features: { title: string; subtitle: string; items: Array<{ title: string; description: string }> }
-      useCases: { title: string; items: Array<{ title: string; description: string }> }
-      preview: { title: string; subtitle: string }
-      security: { title: string; items: Array<{ icon: string; title: string; description: string }> }
-      faq: { title: string; items: Array<{ q: string; a: string }> }
-      finalCta: { title: string; subtitle: string; primary: string; secondary: string }
-      howItWorks: {
+      hero: {
+        cta: { primary: string; secondary: string }
+        caption: string
+        content: Record<Persona, HeroContent>
+      }
+      socialProof: { eyebrow: string; logos: string[] }
+      problem: { title: string; titleHighlight: string; items: ProblemItem[] }
+      pillars: { title: string; titleHighlight: string; items: PillarItem[] }
+      features: FeatureData[]
+      personas: { title: string; subtitle: string; ctaLabel: string; items: PersonaItem[] }
+      statsBand: Array<{ value: string; label: string }>
+      comparison: {
         title: string
         subtitle: string
-        items: HowItWorksItem[]
-        timeline: { title: string; items: Array<{ day: string; label: string }> }
+        cols: { feature: string; excel: string; paper: string; fleetai: string }
+        rows: ComparisonRow[]
       }
       testimonials: { title: string; items: TestimonialItem[] }
-      threeThings: { title: string; items: Array<{ icon: string; title: string; description: string }> }
-      bentoGrid: { title: string; items: Array<{ title: string; description: string }> }
-      pullQuote: { quote: string; author: string; role: string }
-      personas: { title: string; cta: string; items: Array<{ icon: string; title: string; description: string; example: string }> }
-      comparisonTable: {
-        title: string; subtitle: string
-        cols: { feature: string; excel: string; paper: string; fleetai: string }
-        rows: string[]
-        vals: { no: string; partial: string; yes: string; manual: string; auto: string; eu: string }
-      }
-      blog: { title: string; subtitle: string; cta: string; articles: Array<{ cat: string; title: string; meta: string }> }
-      screenshots: { title: string; subtitle: string; items: ScreenshotsItem[] }
-      industries: {
+      security: { title: string; subtitle: string; items: SecurityItem[] }
+      faq: {
         title: string
         subtitle: string
-        painsLabel: string
-        benefitsLabel: string
-        items: IndustryItem[]
+        cta: { label: string; href: string }
+        items: FaqItem[]
       }
-      caseStudy: {
+      finalCta: {
         title: string
+        titleHighlight: string
         subtitle: string
-        company: string
-        challengeLabel: string
-        challenge: string
-        solutionLabel: string
-        solution: string
-        resultsLabel: string
-        results: string[]
-        metrics: Array<{ value: string; label: string }>
-        cta: { text: string; href: string }
+        primaryCta: string
+        secondaryCta: string
       }
     }
   }
@@ -95,6 +135,12 @@ const page = usePage<SharedProps>()
 const props = defineProps<PageProps>()
 const locale = computed<'en' | 'fr'>(() => (page.props.locale ?? 'en') as 'en' | 'fr')
 const t = props.t
+
+const activePersona = ref<Persona>('loueurs')
+
+function handlePersonaChange(persona: Persona) {
+  activePersona.value = persona
+}
 
 const hreflangEn = '/en'
 const hreflangFr = '/fr'
@@ -131,44 +177,108 @@ onUnmounted(() => {
     <link rel="alternate" hreflang="fr" :href="hreflangFr" />
   </Head>
 
-  <div class="max-w-7xl mx-auto">
-    <HomeHeroSection
-      :brand="t.brand"
-      :hero="t.home.hero"
-      :cta="t.home.cta"
-      :stats="t.home.stats"
-      :social-proof="t.home.socialProof"
-      :locale="locale"
-    />
-    <HomeScreenshotsSection :screenshots="t.home.screenshots" />
-    <HomeContentSections
-      :three-things="t.home.threeThings"
-      :problem="t.home.problem"
-      :features="t.home.features"
-      :bento-grid="t.home.bentoGrid"
-      :pull-quote="t.home.pullQuote"
-      :personas="t.home.personas"
-    />
-    <HomeHowItWorksSection
-      :how-it-works="t.home.howItWorks"
-      :preview="t.home.preview"
-      :brand="t.brand"
-      :locale="locale"
-    />
-    <HomeIndustriesSection :industries="t.home.industries" />
-    <HomeProofSections
-      :stats="t.home.stats"
-      :use-cases="t.home.useCases"
-      :testimonials="t.home.testimonials"
-      :comparison-table="t.home.comparisonTable"
-      :security="t.home.security"
-      :blog="t.home.blog"
-    />
-    <HomeCaseStudySection :case-study="t.home.caseStudy" />
-    <HomeFaqCtaSection
-      :faq="t.home.faq"
-      :final-cta="t.home.finalCta"
-      :locale="locale"
-    />
-  </div>
+  <!-- 1. Hero -->
+  <HomeHeroSection
+    :active-persona="activePersona"
+    :hero-content="t.home.hero.content"
+    :cta="t.home.hero.cta"
+    :caption="t.home.hero.caption"
+    :social-proof="t.home.socialProof"
+    :locale="locale"
+  />
+
+  <!-- 2. Problem -->
+  <HomeProblemSection
+    :title="t.home.problem.title"
+    :title-highlight="t.home.problem.titleHighlight"
+    :items="t.home.problem.items"
+  />
+
+  <!-- 3. Pillars -->
+  <HomePillarsSection
+    :title="t.home.pillars.title"
+    :title-highlight="t.home.pillars.titleHighlight"
+    :items="t.home.pillars.items"
+  />
+
+  <!-- 4. Feature deep-dives -->
+  <HomeFeatureSection
+    :eyebrow="t.home.features[0].eyebrow"
+    :title="t.home.features[0].title"
+    :title-highlight="t.home.features[0].titleHighlight"
+    :body="t.home.features[0].body"
+    :bullets="t.home.features[0].bullets"
+    mock-type="boatDetail"
+    bg-class="bg-cream"
+  />
+  <HomeFeatureSection
+    :eyebrow="t.home.features[1].eyebrow"
+    :title="t.home.features[1].title"
+    :title-highlight="t.home.features[1].titleHighlight"
+    :body="t.home.features[1].body"
+    :bullets="t.home.features[1].bullets"
+    mock-type="planning"
+    bg-class="bg-paper"
+    reversed
+  />
+  <HomeFeatureSection
+    :eyebrow="t.home.features[2].eyebrow"
+    :title="t.home.features[2].title"
+    :title-highlight="t.home.features[2].titleHighlight"
+    :body="t.home.features[2].body"
+    :bullets="t.home.features[2].bullets"
+    mock-type="fleetide"
+    bg-class="bg-cream"
+    is-ai
+  />
+
+  <!-- 5. Personas -->
+  <HomePersonasSection
+    :title="t.home.personas.title"
+    :subtitle="t.home.personas.subtitle"
+    :cta-label="t.home.personas.ctaLabel"
+    :items="t.home.personas.items"
+    @persona-change="handlePersonaChange"
+  />
+
+  <!-- 6. Stats band -->
+  <HomeStatsBandSection :stats="t.home.statsBand" />
+
+  <!-- 7. Comparison table -->
+  <HomeComparisonSection
+    :title="t.home.comparison.title"
+    :subtitle="t.home.comparison.subtitle"
+    :cols="t.home.comparison.cols"
+    :rows="t.home.comparison.rows"
+  />
+
+  <!-- 8. Testimonials -->
+  <HomeTestimonialsSection
+    :title="t.home.testimonials.title"
+    :items="t.home.testimonials.items"
+  />
+
+  <!-- 9. Security -->
+  <HomeSecuritySection
+    :title="t.home.security.title"
+    :subtitle="t.home.security.subtitle"
+    :items="t.home.security.items"
+  />
+
+  <!-- 10. FAQ -->
+  <HomeFaqSection
+    :title="t.home.faq.title"
+    :subtitle="t.home.faq.subtitle"
+    :cta="t.home.faq.cta"
+    :items="t.home.faq.items"
+  />
+
+  <!-- 11. Final CTA -->
+  <HomeFinalCtaSection
+    :title="t.home.finalCta.title"
+    :title-highlight="t.home.finalCta.titleHighlight"
+    :subtitle="t.home.finalCta.subtitle"
+    :primary-cta="t.home.finalCta.primaryCta"
+    :secondary-cta="t.home.finalCta.secondaryCta"
+  />
 </template>
