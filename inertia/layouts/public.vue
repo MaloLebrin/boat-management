@@ -26,7 +26,7 @@ const otherHref = computed(() => {
   const otherLang = locale.value === 'en' ? 'fr' : 'en';
   const cleanPath = path.value.replace(/^\/[a-zA-Z]{2}/, '');
 
-  return `/${otherLang}/${cleanPath || ''}`;
+  return `/${otherLang}${cleanPath || ''}`;
 })
 
 </script>

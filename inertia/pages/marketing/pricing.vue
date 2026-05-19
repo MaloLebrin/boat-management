@@ -8,28 +8,39 @@ export default {
 <script setup lang="ts">
 import { Head, Link, usePage } from '@inertiajs/vue3'
 import { computed, ref } from 'vue'
+import { ChevronDownIcon } from '@heroicons/vue/24/outline'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
-import BaseCard from '~/components/base/BaseCard.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
+import PricingPlansGrid from '~/components/marketing/pricing/PricingPlansGrid.vue'
 import { useScrollReveal } from '~/composables/useScrollReveal'
+
+type PlanQuote = { text: string; author: string }
+type Plan = {
+  name: string
+  price: string
+  priceAnnual?: string
+  badge: string
+  features: string[]
+  idealFor: string[]
+  quote: PlanQuote
+}
 
 type PageProps = {
   t: {
     brand: { name: string }
     nav: { login: string; signup: string }
     meta: { title: string; description: string }
-
     pricing: {
       title: string
       subtitle: string
       note: string
       billing: { monthly: string; annual: string; hint: string }
-      trust: { noCard: string; cancel: string; euData: string }
+      trust: { noCard: string; cancel: string; euData: string; trial: string; joinedBy: string }
       plans: {
-        starter: { name: string; price: string; badge: string; features: string[] }
-        pro: { name: string; price: string; priceAnnual?: string; badge: string; features: string[] }
-        enterprise: { name: string; price: string; badge: string; features: string[] }
+        starter: Plan
+        pro: Plan
+        enterprise: Plan
       }
       compare: { title: string; items: string[] }
       compareTable: {
@@ -49,22 +60,12 @@ const props = defineProps<PageProps>()
 const locale = computed<'en' | 'fr'>(() => page.props.locale ?? 'en')
 const t = props.t
 
-// Billing toggle
 const billing = ref<'monthly' | 'annual'>('monthly')
 
-// Scroll reveal instances
 const { el: plansEl, isVisible: plansVisible } = useScrollReveal()
 const { el: compareEl, isVisible: compareVisible } = useScrollReveal()
 const { el: faqEl, isVisible: faqVisible } = useScrollReveal()
 const { el: ctaEl, isVisible: ctaVisible } = useScrollReveal()
-
-// Pro price based on billing
-const proPrice = computed(() => {
-  if (billing.value === 'annual' && t.pricing.plans.pro.priceAnnual) {
-    return t.pricing.plans.pro.priceAnnual
-  }
-  return t.pricing.plans.pro.price
-})
 </script>
 
 <template>
@@ -82,10 +83,14 @@ const proPrice = computed(() => {
   </Head>
 
   <div class="max-w-7xl mx-auto">
+    <!-- Header -->
     <section class="max-w-3xl space-y-4">
       <BaseBadge variant="info">{{ t.brand.name }}</BaseBadge>
       <BaseHeading level="display">{{ t.pricing.title }}</BaseHeading>
       <p class="text-pretty text-lg text-fg-muted">{{ t.pricing.subtitle }}</p>
+      <p v-if="t.pricing.trust?.joinedBy" class="text-sm font-semibold text-mint-700">
+        {{ t.pricing.trust.joinedBy }}
+      </p>
     </section>
 
     <!-- Billing toggle -->
@@ -112,90 +117,17 @@ const proPrice = computed(() => {
     <!-- Plans -->
     <section
       :ref="(el) => plansEl = el as HTMLElement"
-      class="mt-8 reveal grid gap-6 lg:grid-cols-3"
+      class="mt-8 reveal"
       :class="{ visible: plansVisible }"
     >
-      <BaseCard padded>
-        <template #header>
-          <div class="flex items-center justify-between gap-3">
-            <p class="font-display text-sm font-semibold text-fg">{{ t.pricing.plans.starter.name }}</p>
-            <BaseBadge>{{ t.pricing.plans.starter.badge }}</BaseBadge>
-          </div>
-          <p class="mt-2 text-2xl font-semibold text-fg">{{ t.pricing.plans.starter.price }}</p>
-        </template>
-        <ul class="space-y-2 text-sm text-fg-muted">
-          <li v-for="f in t.pricing.plans.starter.features" :key="f" class="flex items-start gap-2">
-            <span class="mt-1 inline-block h-2 w-2 rounded-full bg-lilac-300" aria-hidden="true" />
-            <span>{{ f }}</span>
-          </li>
-        </ul>
-        <template #footer>
-          <a href="/signup">
-            <BaseButton variant="secondary">{{ t.nav.signup }}</BaseButton>
-          </a>
-        </template>
-      </BaseCard>
-
-      <!-- Plan Pro -->
-      <div class="relative overflow-hidden rounded-xl bg-navy-800 p-6 ring-2 ring-navy-600 shadow-xl shadow-navy-900/20 -translate-y-2">
-        <div class="pointer-events-none absolute top-0 right-0 h-32 w-32 rounded-full bg-white/5 blur-2xl" />
-        <div class="relative">
-          <div class="mb-4 flex items-center justify-between gap-3">
-            <p class="font-display text-sm italic text-white">{{ t.pricing.plans.pro.name }}</p>
-            <span class="inline-flex items-center rounded-full bg-white/15 px-3 py-1 text-xs font-medium text-white/80">
-              {{ t.pricing.plans.pro.badge }}
-            </span>
-          </div>
-          <p class="mb-4 font-display text-3xl italic text-white">{{ proPrice }}</p>
-          <ul class="mb-6 space-y-2 text-sm text-white/70">
-            <li v-for="f in t.pricing.plans.pro.features" :key="f" class="flex items-start gap-2">
-              <span class="mt-1 inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-white/50" aria-hidden="true" />
-              <span>{{ f }}</span>
-            </li>
-          </ul>
-          <BaseButton href="/signup" variant="secondary">
-            {{ t.nav.signup }}
-          </BaseButton>
-        </div>
-      </div>
-
-      <BaseCard padded>
-        <template #header>
-          <div class="flex items-center justify-between gap-3">
-            <p class="font-display text-sm font-semibold text-fg">{{ t.pricing.plans.enterprise.name }}</p>
-            <BaseBadge variant="warning">{{ t.pricing.plans.enterprise.badge }}</BaseBadge>
-          </div>
-          <p class="mt-2 text-2xl font-semibold text-fg">{{ t.pricing.plans.enterprise.price }}</p>
-        </template>
-        <ul class="space-y-2 text-sm text-fg-muted">
-          <li v-for="f in t.pricing.plans.enterprise.features" :key="f" class="flex items-start gap-2">
-            <span class="mt-1 inline-block h-2 w-2 rounded-full bg-peach-300" aria-hidden="true" />
-            <span>{{ f }}</span>
-          </li>
-        </ul>
-        <template #footer>
-          <a href="/signup">
-            <BaseButton variant="secondary">{{ locale === 'fr' ? 'Parlons-en' : 'Talk to us' }}</BaseButton>
-          </a>
-        </template>
-      </BaseCard>
+      <PricingPlansGrid
+        :plans="t.pricing.plans"
+        :billing="billing"
+        :trust="t.pricing.trust"
+        :signup-label="t.nav.signup"
+        :locale="locale"
+      />
     </section>
-
-    <!-- Trust signals -->
-    <div class="mt-6 flex flex-wrap items-center justify-center gap-4 text-sm text-fg-muted">
-      <span v-if="t.pricing.trust?.noCard" class="flex items-center gap-1.5">
-        <span class="h-1.5 w-1.5 rounded-full bg-mint-700" />
-        {{ t.pricing.trust.noCard }}
-      </span>
-      <span v-if="t.pricing.trust?.cancel" class="flex items-center gap-1.5">
-        <span class="h-1.5 w-1.5 rounded-full bg-mint-700" />
-        {{ t.pricing.trust.cancel }}
-      </span>
-      <span v-if="t.pricing.trust?.euData" class="flex items-center gap-1.5">
-        <span class="h-1.5 w-1.5 rounded-full bg-mint-700" />
-        {{ t.pricing.trust.euData }}
-      </span>
-    </div>
 
     <!-- Comparison table -->
     <section
@@ -242,23 +174,7 @@ const proPrice = computed(() => {
       <p class="mt-6 text-sm font-semibold text-fg-subtle">{{ t.pricing.note }}</p>
     </section>
 
-    <!-- Fallback to old compare if no compareTable -->
-    <section v-else class="mt-10">
-      <BaseCard padded>
-        <template #header>
-          <p class="font-display text-sm font-semibold text-fg">{{ t.pricing.compare.title }}</p>
-        </template>
-        <ul class="grid gap-2 text-sm text-fg-muted md:grid-cols-2">
-          <li v-for="it in t.pricing.compare.items" :key="it" class="flex items-start gap-2">
-            <span class="mt-1 inline-block h-2 w-2 rounded-full bg-sky-300" aria-hidden="true" />
-            <span>{{ it }}</span>
-          </li>
-        </ul>
-      </BaseCard>
-      <p class="mt-6 text-sm font-semibold text-fg-subtle">{{ t.pricing.note }}</p>
-    </section>
-
-    <!-- FAQ accordion -->
+    <!-- FAQ -->
     <section
       :ref="(el) => faqEl = el as HTMLElement"
       class="mt-14 reveal"
@@ -274,17 +190,9 @@ const proPrice = computed(() => {
           :open="idx === 0"
           class="group"
         >
-          <summary class="flex items-center justify-between gap-4 px-5 py-4 font-semibold text-fg">
+          <summary class="flex items-center justify-between gap-4 px-5 py-4 font-semibold text-fg cursor-pointer">
             {{ qa.q }}
-            <svg
-              class="accordion-chevron h-5 w-5 shrink-0 text-fg-muted"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-            </svg>
+            <ChevronDownIcon class="h-5 w-5 shrink-0 text-fg-muted transition-transform duration-300 group-open:rotate-180" />
           </summary>
           <div class="mt-2 text-sm text-fg-muted pb-4 px-5">{{ qa.a }}</div>
         </details>
@@ -305,7 +213,7 @@ const proPrice = computed(() => {
           </div>
           <div class="flex flex-wrap items-center justify-start gap-3 lg:justify-end">
             <a href="/signup">
-              <BaseButton size="lg" class="bg-white! text-navy-900! hover:bg-white/90!">
+              <BaseButton size="lg" class="relative overflow-hidden bg-white! text-navy-900! hover:bg-white/90! before:absolute before:inset-0 before:bg-linear-to-r before:from-transparent before:via-white/20 before:to-transparent before:translate-x-[-200%] hover:before:translate-x-[200%] before:transition-transform before:duration-700">
                 {{ t.pricing.cta.primary }}
               </BaseButton>
             </a>

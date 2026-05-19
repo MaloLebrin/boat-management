@@ -13,6 +13,21 @@ import HomeContentSections from '~/components/marketing/home/HomeContentSections
 import HomeHeroSection from '~/components/marketing/home/HomeHeroSection.vue'
 import HomeHowItWorksSection from '~/components/marketing/home/HomeHowItWorksSection.vue'
 import HomeProofSections from '~/components/marketing/home/HomeProofSections.vue'
+import HomeScreenshotsSection from '~/components/marketing/home/HomeScreenshotsSection.vue'
+import HomeIndustriesSection from '~/components/marketing/home/HomeIndustriesSection.vue'
+import HomeCaseStudySection from '~/components/marketing/home/HomeCaseStudySection.vue'
+
+type ScreenshotsItem = { label: string; description: string; hint: string }
+type IndustryItem = {
+  icon: string
+  title: string
+  subtitle: string
+  pains: string[]
+  benefits: string[]
+  quote: { text: string; author: string; role: string }
+}
+type TestimonialItem = { quote: string; author: string; role: string; fleet: string; since: string }
+type HowItWorksItem = { step: string; title: string; description: string; detail: string }
 
 type PageProps = {
   t: {
@@ -31,8 +46,13 @@ type PageProps = {
       security: { title: string; items: Array<{ icon: string; title: string; description: string }> }
       faq: { title: string; items: Array<{ q: string; a: string }> }
       finalCta: { title: string; subtitle: string; primary: string; secondary: string }
-      howItWorks: { title: string; subtitle: string; items: Array<{ step: string; title: string; description: string }> }
-      testimonials: { title: string; items: Array<{ quote: string; author: string; role: string }> }
+      howItWorks: {
+        title: string
+        subtitle: string
+        items: HowItWorksItem[]
+        timeline: { title: string; items: Array<{ day: string; label: string }> }
+      }
+      testimonials: { title: string; items: TestimonialItem[] }
       threeThings: { title: string; items: Array<{ icon: string; title: string; description: string }> }
       bentoGrid: { title: string; items: Array<{ title: string; description: string }> }
       pullQuote: { quote: string; author: string; role: string }
@@ -44,6 +64,27 @@ type PageProps = {
         vals: { no: string; partial: string; yes: string; manual: string; auto: string; eu: string }
       }
       blog: { title: string; subtitle: string; cta: string; articles: Array<{ cat: string; title: string; meta: string }> }
+      screenshots: { title: string; subtitle: string; items: ScreenshotsItem[] }
+      industries: {
+        title: string
+        subtitle: string
+        painsLabel: string
+        benefitsLabel: string
+        items: IndustryItem[]
+      }
+      caseStudy: {
+        title: string
+        subtitle: string
+        company: string
+        challengeLabel: string
+        challenge: string
+        solutionLabel: string
+        solution: string
+        resultsLabel: string
+        results: string[]
+        metrics: Array<{ value: string; label: string }>
+        cta: { text: string; href: string }
+      }
     }
   }
 }
@@ -58,7 +99,6 @@ const t = props.t
 const hreflangEn = '/en'
 const hreflangFr = '/fr'
 
-// JSON-LD injection (Vue template compiler rejects <script> tags inside <Head>)
 let jsonLdEl: HTMLScriptElement | null = null
 onMounted(() => {
   jsonLdEl = document.createElement('script')
@@ -100,6 +140,7 @@ onUnmounted(() => {
       :social-proof="t.home.socialProof"
       :locale="locale"
     />
+    <HomeScreenshotsSection :screenshots="t.home.screenshots" />
     <HomeContentSections
       :three-things="t.home.threeThings"
       :problem="t.home.problem"
@@ -114,6 +155,7 @@ onUnmounted(() => {
       :brand="t.brand"
       :locale="locale"
     />
+    <HomeIndustriesSection :industries="t.home.industries" />
     <HomeProofSections
       :stats="t.home.stats"
       :use-cases="t.home.useCases"
@@ -122,6 +164,7 @@ onUnmounted(() => {
       :security="t.home.security"
       :blog="t.home.blog"
     />
+    <HomeCaseStudySection :case-study="t.home.caseStudy" />
     <HomeFaqCtaSection
       :faq="t.home.faq"
       :final-cta="t.home.finalCta"

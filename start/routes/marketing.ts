@@ -206,23 +206,35 @@ router
                     step: i18n.t('marketing.home.sections.how_it_works.step1_number'),
                     title: i18n.t('marketing.home.sections.how_it_works.step1_title'),
                     description: i18n.t('marketing.home.sections.how_it_works.step1_description'),
+                    detail: i18n.t('marketing.home.sections.how_it_works.step1_detail'),
                   },
                   {
                     step: i18n.t('marketing.home.sections.how_it_works.step2_number'),
                     title: i18n.t('marketing.home.sections.how_it_works.step2_title'),
                     description: i18n.t('marketing.home.sections.how_it_works.step2_description'),
+                    detail: i18n.t('marketing.home.sections.how_it_works.step2_detail'),
                   },
                   {
                     step: i18n.t('marketing.home.sections.how_it_works.step3_number'),
                     title: i18n.t('marketing.home.sections.how_it_works.step3_title'),
                     description: i18n.t('marketing.home.sections.how_it_works.step3_description'),
+                    detail: i18n.t('marketing.home.sections.how_it_works.step3_detail'),
                   },
                   {
                     step: i18n.t('marketing.home.sections.how_it_works.step4_number'),
                     title: i18n.t('marketing.home.sections.how_it_works.step4_title'),
                     description: i18n.t('marketing.home.sections.how_it_works.step4_description'),
+                    detail: i18n.t('marketing.home.sections.how_it_works.step4_detail'),
                   },
                 ],
+                timeline: {
+                  title: i18n.t('marketing.home.sections.how_it_works.timeline_title'),
+                  items: [
+                    { day: i18n.t('marketing.home.sections.how_it_works.timeline_item1_day'), label: i18n.t('marketing.home.sections.how_it_works.timeline_item1_label') },
+                    { day: i18n.t('marketing.home.sections.how_it_works.timeline_item2_day'), label: i18n.t('marketing.home.sections.how_it_works.timeline_item2_label') },
+                    { day: i18n.t('marketing.home.sections.how_it_works.timeline_item3_day'), label: i18n.t('marketing.home.sections.how_it_works.timeline_item3_label') },
+                  ],
+                },
               },
               testimonials: {
                 title: i18n.t('marketing.home.sections.testimonials.title'),
@@ -231,16 +243,43 @@ router
                     quote: i18n.t('marketing.home.sections.testimonials.item1_quote'),
                     author: i18n.t('marketing.home.sections.testimonials.item1_author'),
                     role: i18n.t('marketing.home.sections.testimonials.item1_role'),
+                    fleet: i18n.t('marketing.home.sections.testimonials.item1_fleet'),
+                    since: i18n.t('marketing.home.sections.testimonials.item1_since'),
                   },
                   {
                     quote: i18n.t('marketing.home.sections.testimonials.item2_quote'),
                     author: i18n.t('marketing.home.sections.testimonials.item2_author'),
                     role: i18n.t('marketing.home.sections.testimonials.item2_role'),
+                    fleet: i18n.t('marketing.home.sections.testimonials.item2_fleet'),
+                    since: i18n.t('marketing.home.sections.testimonials.item2_since'),
                   },
                   {
                     quote: i18n.t('marketing.home.sections.testimonials.item3_quote'),
                     author: i18n.t('marketing.home.sections.testimonials.item3_author'),
                     role: i18n.t('marketing.home.sections.testimonials.item3_role'),
+                    fleet: i18n.t('marketing.home.sections.testimonials.item3_fleet'),
+                    since: i18n.t('marketing.home.sections.testimonials.item3_since'),
+                  },
+                  {
+                    quote: i18n.t('marketing.home.sections.testimonials.item4_quote'),
+                    author: i18n.t('marketing.home.sections.testimonials.item4_author'),
+                    role: i18n.t('marketing.home.sections.testimonials.item4_role'),
+                    fleet: i18n.t('marketing.home.sections.testimonials.item4_fleet'),
+                    since: i18n.t('marketing.home.sections.testimonials.item4_since'),
+                  },
+                  {
+                    quote: i18n.t('marketing.home.sections.testimonials.item5_quote'),
+                    author: i18n.t('marketing.home.sections.testimonials.item5_author'),
+                    role: i18n.t('marketing.home.sections.testimonials.item5_role'),
+                    fleet: i18n.t('marketing.home.sections.testimonials.item5_fleet'),
+                    since: i18n.t('marketing.home.sections.testimonials.item5_since'),
+                  },
+                  {
+                    quote: i18n.t('marketing.home.sections.testimonials.item6_quote'),
+                    author: i18n.t('marketing.home.sections.testimonials.item6_author'),
+                    role: i18n.t('marketing.home.sections.testimonials.item6_role'),
+                    fleet: i18n.t('marketing.home.sections.testimonials.item6_fleet'),
+                    since: i18n.t('marketing.home.sections.testimonials.item6_since'),
                   },
                 ],
               },
@@ -378,6 +417,72 @@ router
                   },
                 ],
               },
+              screenshots: {
+                title: i18n.t('marketing.home.sections.screenshots.title'),
+                subtitle: i18n.t('marketing.home.sections.screenshots.subtitle'),
+                items: [
+                  { label: i18n.t('marketing.home.sections.screenshots.item1_label'), description: i18n.t('marketing.home.sections.screenshots.item1_description'), hint: i18n.t('marketing.home.sections.screenshots.item1_hint') },
+                  { label: i18n.t('marketing.home.sections.screenshots.item2_label'), description: i18n.t('marketing.home.sections.screenshots.item2_description'), hint: i18n.t('marketing.home.sections.screenshots.item2_hint') },
+                  { label: i18n.t('marketing.home.sections.screenshots.item3_label'), description: i18n.t('marketing.home.sections.screenshots.item3_description'), hint: i18n.t('marketing.home.sections.screenshots.item3_hint') },
+                  { label: i18n.t('marketing.home.sections.screenshots.item4_label'), description: i18n.t('marketing.home.sections.screenshots.item4_description'), hint: i18n.t('marketing.home.sections.screenshots.item4_hint') },
+                ],
+              },
+              industries: {
+                title: i18n.t('marketing.home.sections.industries.title'),
+                subtitle: i18n.t('marketing.home.sections.industries.subtitle'),
+                painsLabel: i18n.t('marketing.home.sections.industries.pains_label'),
+                benefitsLabel: i18n.t('marketing.home.sections.industries.benefits_label'),
+                items: [
+                  {
+                    icon: i18n.t('marketing.home.sections.industries.item1_icon'),
+                    title: i18n.t('marketing.home.sections.industries.item1_title'),
+                    subtitle: i18n.t('marketing.home.sections.industries.item1_subtitle'),
+                    pains: [i18n.t('marketing.home.sections.industries.item1_pain1'), i18n.t('marketing.home.sections.industries.item1_pain2'), i18n.t('marketing.home.sections.industries.item1_pain3')],
+                    benefits: [i18n.t('marketing.home.sections.industries.item1_benefit1'), i18n.t('marketing.home.sections.industries.item1_benefit2'), i18n.t('marketing.home.sections.industries.item1_benefit3')],
+                    quote: { text: i18n.t('marketing.home.sections.industries.item1_quote_text'), author: i18n.t('marketing.home.sections.industries.item1_quote_author'), role: i18n.t('marketing.home.sections.industries.item1_quote_role') },
+                  },
+                  {
+                    icon: i18n.t('marketing.home.sections.industries.item2_icon'),
+                    title: i18n.t('marketing.home.sections.industries.item2_title'),
+                    subtitle: i18n.t('marketing.home.sections.industries.item2_subtitle'),
+                    pains: [i18n.t('marketing.home.sections.industries.item2_pain1'), i18n.t('marketing.home.sections.industries.item2_pain2'), i18n.t('marketing.home.sections.industries.item2_pain3')],
+                    benefits: [i18n.t('marketing.home.sections.industries.item2_benefit1'), i18n.t('marketing.home.sections.industries.item2_benefit2'), i18n.t('marketing.home.sections.industries.item2_benefit3')],
+                    quote: { text: i18n.t('marketing.home.sections.industries.item2_quote_text'), author: i18n.t('marketing.home.sections.industries.item2_quote_author'), role: i18n.t('marketing.home.sections.industries.item2_quote_role') },
+                  },
+                  {
+                    icon: i18n.t('marketing.home.sections.industries.item3_icon'),
+                    title: i18n.t('marketing.home.sections.industries.item3_title'),
+                    subtitle: i18n.t('marketing.home.sections.industries.item3_subtitle'),
+                    pains: [i18n.t('marketing.home.sections.industries.item3_pain1'), i18n.t('marketing.home.sections.industries.item3_pain2'), i18n.t('marketing.home.sections.industries.item3_pain3')],
+                    benefits: [i18n.t('marketing.home.sections.industries.item3_benefit1'), i18n.t('marketing.home.sections.industries.item3_benefit2'), i18n.t('marketing.home.sections.industries.item3_benefit3')],
+                    quote: { text: i18n.t('marketing.home.sections.industries.item3_quote_text'), author: i18n.t('marketing.home.sections.industries.item3_quote_author'), role: i18n.t('marketing.home.sections.industries.item3_quote_role') },
+                  },
+                ],
+              },
+              caseStudy: {
+                title: i18n.t('marketing.home.sections.case_study.title'),
+                subtitle: i18n.t('marketing.home.sections.case_study.subtitle'),
+                company: i18n.t('marketing.home.sections.case_study.company'),
+                challengeLabel: i18n.t('marketing.home.sections.case_study.challenge_label'),
+                challenge: i18n.t('marketing.home.sections.case_study.challenge'),
+                solutionLabel: i18n.t('marketing.home.sections.case_study.solution_label'),
+                solution: i18n.t('marketing.home.sections.case_study.solution'),
+                resultsLabel: i18n.t('marketing.home.sections.case_study.results_label'),
+                results: [
+                  i18n.t('marketing.home.sections.case_study.result1'),
+                  i18n.t('marketing.home.sections.case_study.result2'),
+                  i18n.t('marketing.home.sections.case_study.result3'),
+                ],
+                metrics: [
+                  { value: i18n.t('marketing.home.sections.case_study.metric1_value'), label: i18n.t('marketing.home.sections.case_study.metric1_label') },
+                  { value: i18n.t('marketing.home.sections.case_study.metric2_value'), label: i18n.t('marketing.home.sections.case_study.metric2_label') },
+                  { value: i18n.t('marketing.home.sections.case_study.metric3_value'), label: i18n.t('marketing.home.sections.case_study.metric3_label') },
+                ],
+                cta: {
+                  text: i18n.t('marketing.home.sections.case_study.cta_text'),
+                  href: i18n.t('marketing.home.sections.case_study.cta_href'),
+                },
+              },
             },
           },
         })
@@ -412,6 +517,15 @@ router
                     i18n.t('marketing.pricing.plans.starter.feature2'),
                     i18n.t('marketing.pricing.plans.starter.feature3'),
                   ],
+                  idealFor: [
+                    i18n.t('marketing.pricing.plans.starter.idealFor1'),
+                    i18n.t('marketing.pricing.plans.starter.idealFor2'),
+                    i18n.t('marketing.pricing.plans.starter.idealFor3'),
+                  ],
+                  quote: {
+                    text: i18n.t('marketing.pricing.plans.starter.quote_text'),
+                    author: i18n.t('marketing.pricing.plans.starter.quote_author'),
+                  },
                 },
                 pro: {
                   name: i18n.t('marketing.pricing.plans.pro.name'),
@@ -422,6 +536,15 @@ router
                     i18n.t('marketing.pricing.plans.pro.feature2'),
                     i18n.t('marketing.pricing.plans.pro.feature3'),
                   ],
+                  idealFor: [
+                    i18n.t('marketing.pricing.plans.pro.idealFor1'),
+                    i18n.t('marketing.pricing.plans.pro.idealFor2'),
+                    i18n.t('marketing.pricing.plans.pro.idealFor3'),
+                  ],
+                  quote: {
+                    text: i18n.t('marketing.pricing.plans.pro.quote_text'),
+                    author: i18n.t('marketing.pricing.plans.pro.quote_author'),
+                  },
                 },
                 enterprise: {
                   name: i18n.t('marketing.pricing.plans.enterprise.name'),
@@ -432,6 +555,15 @@ router
                     i18n.t('marketing.pricing.plans.enterprise.feature2'),
                     i18n.t('marketing.pricing.plans.enterprise.feature3'),
                   ],
+                  idealFor: [
+                    i18n.t('marketing.pricing.plans.enterprise.idealFor1'),
+                    i18n.t('marketing.pricing.plans.enterprise.idealFor2'),
+                    i18n.t('marketing.pricing.plans.enterprise.idealFor3'),
+                  ],
+                  quote: {
+                    text: i18n.t('marketing.pricing.plans.enterprise.quote_text'),
+                    author: i18n.t('marketing.pricing.plans.enterprise.quote_author'),
+                  },
                 },
               },
               compare: {
@@ -448,26 +580,15 @@ router
               faq: {
                 title: i18n.t('marketing.pricing.faq.title'),
                 items: [
-                  {
-                    q: i18n.t('marketing.pricing.faq.item1_q'),
-                    a: i18n.t('marketing.pricing.faq.item1_a'),
-                  },
-                  {
-                    q: i18n.t('marketing.pricing.faq.item2_q'),
-                    a: i18n.t('marketing.pricing.faq.item2_a'),
-                  },
-                  {
-                    q: i18n.t('marketing.pricing.faq.item3_q'),
-                    a: i18n.t('marketing.pricing.faq.item3_a'),
-                  },
-                  {
-                    q: i18n.t('marketing.pricing.faq.item4_q'),
-                    a: i18n.t('marketing.pricing.faq.item4_a'),
-                  },
-                  {
-                    q: i18n.t('marketing.pricing.faq.item5_q'),
-                    a: i18n.t('marketing.pricing.faq.item5_a'),
-                  },
+                  { q: i18n.t('marketing.pricing.faq.item1_q'), a: i18n.t('marketing.pricing.faq.item1_a') },
+                  { q: i18n.t('marketing.pricing.faq.item2_q'), a: i18n.t('marketing.pricing.faq.item2_a') },
+                  { q: i18n.t('marketing.pricing.faq.item3_q'), a: i18n.t('marketing.pricing.faq.item3_a') },
+                  { q: i18n.t('marketing.pricing.faq.item4_q'), a: i18n.t('marketing.pricing.faq.item4_a') },
+                  { q: i18n.t('marketing.pricing.faq.item5_q'), a: i18n.t('marketing.pricing.faq.item5_a') },
+                  { q: i18n.t('marketing.pricing.faq.item6_q'), a: i18n.t('marketing.pricing.faq.item6_a') },
+                  { q: i18n.t('marketing.pricing.faq.item7_q'), a: i18n.t('marketing.pricing.faq.item7_a') },
+                  { q: i18n.t('marketing.pricing.faq.item8_q'), a: i18n.t('marketing.pricing.faq.item8_a') },
+                  { q: i18n.t('marketing.pricing.faq.item9_q'), a: i18n.t('marketing.pricing.faq.item9_a') },
                 ],
               },
               cta: {
@@ -485,6 +606,8 @@ router
                 noCard: i18n.t('marketing.pricing.trust.no_card'),
                 cancel: i18n.t('marketing.pricing.trust.cancel'),
                 euData: i18n.t('marketing.pricing.trust.eu_data'),
+                trial: i18n.t('marketing.pricing.trust.trial'),
+                joinedBy: i18n.t('marketing.pricing.trust.joined_by'),
               },
               compareTable: {
                 headers: {
@@ -742,23 +865,35 @@ router
                     step: i18n.t('marketing.home.sections.how_it_works.step1_number'),
                     title: i18n.t('marketing.home.sections.how_it_works.step1_title'),
                     description: i18n.t('marketing.home.sections.how_it_works.step1_description'),
+                    detail: i18n.t('marketing.home.sections.how_it_works.step1_detail'),
                   },
                   {
                     step: i18n.t('marketing.home.sections.how_it_works.step2_number'),
                     title: i18n.t('marketing.home.sections.how_it_works.step2_title'),
                     description: i18n.t('marketing.home.sections.how_it_works.step2_description'),
+                    detail: i18n.t('marketing.home.sections.how_it_works.step2_detail'),
                   },
                   {
                     step: i18n.t('marketing.home.sections.how_it_works.step3_number'),
                     title: i18n.t('marketing.home.sections.how_it_works.step3_title'),
                     description: i18n.t('marketing.home.sections.how_it_works.step3_description'),
+                    detail: i18n.t('marketing.home.sections.how_it_works.step3_detail'),
                   },
                   {
                     step: i18n.t('marketing.home.sections.how_it_works.step4_number'),
                     title: i18n.t('marketing.home.sections.how_it_works.step4_title'),
                     description: i18n.t('marketing.home.sections.how_it_works.step4_description'),
+                    detail: i18n.t('marketing.home.sections.how_it_works.step4_detail'),
                   },
                 ],
+                timeline: {
+                  title: i18n.t('marketing.home.sections.how_it_works.timeline_title'),
+                  items: [
+                    { day: i18n.t('marketing.home.sections.how_it_works.timeline_item1_day'), label: i18n.t('marketing.home.sections.how_it_works.timeline_item1_label') },
+                    { day: i18n.t('marketing.home.sections.how_it_works.timeline_item2_day'), label: i18n.t('marketing.home.sections.how_it_works.timeline_item2_label') },
+                    { day: i18n.t('marketing.home.sections.how_it_works.timeline_item3_day'), label: i18n.t('marketing.home.sections.how_it_works.timeline_item3_label') },
+                  ],
+                },
               },
               testimonials: {
                 title: i18n.t('marketing.home.sections.testimonials.title'),
@@ -767,16 +902,43 @@ router
                     quote: i18n.t('marketing.home.sections.testimonials.item1_quote'),
                     author: i18n.t('marketing.home.sections.testimonials.item1_author'),
                     role: i18n.t('marketing.home.sections.testimonials.item1_role'),
+                    fleet: i18n.t('marketing.home.sections.testimonials.item1_fleet'),
+                    since: i18n.t('marketing.home.sections.testimonials.item1_since'),
                   },
                   {
                     quote: i18n.t('marketing.home.sections.testimonials.item2_quote'),
                     author: i18n.t('marketing.home.sections.testimonials.item2_author'),
                     role: i18n.t('marketing.home.sections.testimonials.item2_role'),
+                    fleet: i18n.t('marketing.home.sections.testimonials.item2_fleet'),
+                    since: i18n.t('marketing.home.sections.testimonials.item2_since'),
                   },
                   {
                     quote: i18n.t('marketing.home.sections.testimonials.item3_quote'),
                     author: i18n.t('marketing.home.sections.testimonials.item3_author'),
                     role: i18n.t('marketing.home.sections.testimonials.item3_role'),
+                    fleet: i18n.t('marketing.home.sections.testimonials.item3_fleet'),
+                    since: i18n.t('marketing.home.sections.testimonials.item3_since'),
+                  },
+                  {
+                    quote: i18n.t('marketing.home.sections.testimonials.item4_quote'),
+                    author: i18n.t('marketing.home.sections.testimonials.item4_author'),
+                    role: i18n.t('marketing.home.sections.testimonials.item4_role'),
+                    fleet: i18n.t('marketing.home.sections.testimonials.item4_fleet'),
+                    since: i18n.t('marketing.home.sections.testimonials.item4_since'),
+                  },
+                  {
+                    quote: i18n.t('marketing.home.sections.testimonials.item5_quote'),
+                    author: i18n.t('marketing.home.sections.testimonials.item5_author'),
+                    role: i18n.t('marketing.home.sections.testimonials.item5_role'),
+                    fleet: i18n.t('marketing.home.sections.testimonials.item5_fleet'),
+                    since: i18n.t('marketing.home.sections.testimonials.item5_since'),
+                  },
+                  {
+                    quote: i18n.t('marketing.home.sections.testimonials.item6_quote'),
+                    author: i18n.t('marketing.home.sections.testimonials.item6_author'),
+                    role: i18n.t('marketing.home.sections.testimonials.item6_role'),
+                    fleet: i18n.t('marketing.home.sections.testimonials.item6_fleet'),
+                    since: i18n.t('marketing.home.sections.testimonials.item6_since'),
                   },
                 ],
               },
@@ -914,6 +1076,72 @@ router
                   },
                 ],
               },
+              screenshots: {
+                title: i18n.t('marketing.home.sections.screenshots.title'),
+                subtitle: i18n.t('marketing.home.sections.screenshots.subtitle'),
+                items: [
+                  { label: i18n.t('marketing.home.sections.screenshots.item1_label'), description: i18n.t('marketing.home.sections.screenshots.item1_description'), hint: i18n.t('marketing.home.sections.screenshots.item1_hint') },
+                  { label: i18n.t('marketing.home.sections.screenshots.item2_label'), description: i18n.t('marketing.home.sections.screenshots.item2_description'), hint: i18n.t('marketing.home.sections.screenshots.item2_hint') },
+                  { label: i18n.t('marketing.home.sections.screenshots.item3_label'), description: i18n.t('marketing.home.sections.screenshots.item3_description'), hint: i18n.t('marketing.home.sections.screenshots.item3_hint') },
+                  { label: i18n.t('marketing.home.sections.screenshots.item4_label'), description: i18n.t('marketing.home.sections.screenshots.item4_description'), hint: i18n.t('marketing.home.sections.screenshots.item4_hint') },
+                ],
+              },
+              industries: {
+                title: i18n.t('marketing.home.sections.industries.title'),
+                subtitle: i18n.t('marketing.home.sections.industries.subtitle'),
+                painsLabel: i18n.t('marketing.home.sections.industries.pains_label'),
+                benefitsLabel: i18n.t('marketing.home.sections.industries.benefits_label'),
+                items: [
+                  {
+                    icon: i18n.t('marketing.home.sections.industries.item1_icon'),
+                    title: i18n.t('marketing.home.sections.industries.item1_title'),
+                    subtitle: i18n.t('marketing.home.sections.industries.item1_subtitle'),
+                    pains: [i18n.t('marketing.home.sections.industries.item1_pain1'), i18n.t('marketing.home.sections.industries.item1_pain2'), i18n.t('marketing.home.sections.industries.item1_pain3')],
+                    benefits: [i18n.t('marketing.home.sections.industries.item1_benefit1'), i18n.t('marketing.home.sections.industries.item1_benefit2'), i18n.t('marketing.home.sections.industries.item1_benefit3')],
+                    quote: { text: i18n.t('marketing.home.sections.industries.item1_quote_text'), author: i18n.t('marketing.home.sections.industries.item1_quote_author'), role: i18n.t('marketing.home.sections.industries.item1_quote_role') },
+                  },
+                  {
+                    icon: i18n.t('marketing.home.sections.industries.item2_icon'),
+                    title: i18n.t('marketing.home.sections.industries.item2_title'),
+                    subtitle: i18n.t('marketing.home.sections.industries.item2_subtitle'),
+                    pains: [i18n.t('marketing.home.sections.industries.item2_pain1'), i18n.t('marketing.home.sections.industries.item2_pain2'), i18n.t('marketing.home.sections.industries.item2_pain3')],
+                    benefits: [i18n.t('marketing.home.sections.industries.item2_benefit1'), i18n.t('marketing.home.sections.industries.item2_benefit2'), i18n.t('marketing.home.sections.industries.item2_benefit3')],
+                    quote: { text: i18n.t('marketing.home.sections.industries.item2_quote_text'), author: i18n.t('marketing.home.sections.industries.item2_quote_author'), role: i18n.t('marketing.home.sections.industries.item2_quote_role') },
+                  },
+                  {
+                    icon: i18n.t('marketing.home.sections.industries.item3_icon'),
+                    title: i18n.t('marketing.home.sections.industries.item3_title'),
+                    subtitle: i18n.t('marketing.home.sections.industries.item3_subtitle'),
+                    pains: [i18n.t('marketing.home.sections.industries.item3_pain1'), i18n.t('marketing.home.sections.industries.item3_pain2'), i18n.t('marketing.home.sections.industries.item3_pain3')],
+                    benefits: [i18n.t('marketing.home.sections.industries.item3_benefit1'), i18n.t('marketing.home.sections.industries.item3_benefit2'), i18n.t('marketing.home.sections.industries.item3_benefit3')],
+                    quote: { text: i18n.t('marketing.home.sections.industries.item3_quote_text'), author: i18n.t('marketing.home.sections.industries.item3_quote_author'), role: i18n.t('marketing.home.sections.industries.item3_quote_role') },
+                  },
+                ],
+              },
+              caseStudy: {
+                title: i18n.t('marketing.home.sections.case_study.title'),
+                subtitle: i18n.t('marketing.home.sections.case_study.subtitle'),
+                company: i18n.t('marketing.home.sections.case_study.company'),
+                challengeLabel: i18n.t('marketing.home.sections.case_study.challenge_label'),
+                challenge: i18n.t('marketing.home.sections.case_study.challenge'),
+                solutionLabel: i18n.t('marketing.home.sections.case_study.solution_label'),
+                solution: i18n.t('marketing.home.sections.case_study.solution'),
+                resultsLabel: i18n.t('marketing.home.sections.case_study.results_label'),
+                results: [
+                  i18n.t('marketing.home.sections.case_study.result1'),
+                  i18n.t('marketing.home.sections.case_study.result2'),
+                  i18n.t('marketing.home.sections.case_study.result3'),
+                ],
+                metrics: [
+                  { value: i18n.t('marketing.home.sections.case_study.metric1_value'), label: i18n.t('marketing.home.sections.case_study.metric1_label') },
+                  { value: i18n.t('marketing.home.sections.case_study.metric2_value'), label: i18n.t('marketing.home.sections.case_study.metric2_label') },
+                  { value: i18n.t('marketing.home.sections.case_study.metric3_value'), label: i18n.t('marketing.home.sections.case_study.metric3_label') },
+                ],
+                cta: {
+                  text: i18n.t('marketing.home.sections.case_study.cta_text'),
+                  href: i18n.t('marketing.home.sections.case_study.cta_href'),
+                },
+              },
             },
           },
         })
@@ -948,6 +1176,15 @@ router
                     i18n.t('marketing.pricing.plans.starter.feature2'),
                     i18n.t('marketing.pricing.plans.starter.feature3'),
                   ],
+                  idealFor: [
+                    i18n.t('marketing.pricing.plans.starter.idealFor1'),
+                    i18n.t('marketing.pricing.plans.starter.idealFor2'),
+                    i18n.t('marketing.pricing.plans.starter.idealFor3'),
+                  ],
+                  quote: {
+                    text: i18n.t('marketing.pricing.plans.starter.quote_text'),
+                    author: i18n.t('marketing.pricing.plans.starter.quote_author'),
+                  },
                 },
                 pro: {
                   name: i18n.t('marketing.pricing.plans.pro.name'),
@@ -958,6 +1195,15 @@ router
                     i18n.t('marketing.pricing.plans.pro.feature2'),
                     i18n.t('marketing.pricing.plans.pro.feature3'),
                   ],
+                  idealFor: [
+                    i18n.t('marketing.pricing.plans.pro.idealFor1'),
+                    i18n.t('marketing.pricing.plans.pro.idealFor2'),
+                    i18n.t('marketing.pricing.plans.pro.idealFor3'),
+                  ],
+                  quote: {
+                    text: i18n.t('marketing.pricing.plans.pro.quote_text'),
+                    author: i18n.t('marketing.pricing.plans.pro.quote_author'),
+                  },
                 },
                 enterprise: {
                   name: i18n.t('marketing.pricing.plans.enterprise.name'),
@@ -968,6 +1214,15 @@ router
                     i18n.t('marketing.pricing.plans.enterprise.feature2'),
                     i18n.t('marketing.pricing.plans.enterprise.feature3'),
                   ],
+                  idealFor: [
+                    i18n.t('marketing.pricing.plans.enterprise.idealFor1'),
+                    i18n.t('marketing.pricing.plans.enterprise.idealFor2'),
+                    i18n.t('marketing.pricing.plans.enterprise.idealFor3'),
+                  ],
+                  quote: {
+                    text: i18n.t('marketing.pricing.plans.enterprise.quote_text'),
+                    author: i18n.t('marketing.pricing.plans.enterprise.quote_author'),
+                  },
                 },
               },
               compare: {
@@ -984,26 +1239,15 @@ router
               faq: {
                 title: i18n.t('marketing.pricing.faq.title'),
                 items: [
-                  {
-                    q: i18n.t('marketing.pricing.faq.item1_q'),
-                    a: i18n.t('marketing.pricing.faq.item1_a'),
-                  },
-                  {
-                    q: i18n.t('marketing.pricing.faq.item2_q'),
-                    a: i18n.t('marketing.pricing.faq.item2_a'),
-                  },
-                  {
-                    q: i18n.t('marketing.pricing.faq.item3_q'),
-                    a: i18n.t('marketing.pricing.faq.item3_a'),
-                  },
-                  {
-                    q: i18n.t('marketing.pricing.faq.item4_q'),
-                    a: i18n.t('marketing.pricing.faq.item4_a'),
-                  },
-                  {
-                    q: i18n.t('marketing.pricing.faq.item5_q'),
-                    a: i18n.t('marketing.pricing.faq.item5_a'),
-                  },
+                  { q: i18n.t('marketing.pricing.faq.item1_q'), a: i18n.t('marketing.pricing.faq.item1_a') },
+                  { q: i18n.t('marketing.pricing.faq.item2_q'), a: i18n.t('marketing.pricing.faq.item2_a') },
+                  { q: i18n.t('marketing.pricing.faq.item3_q'), a: i18n.t('marketing.pricing.faq.item3_a') },
+                  { q: i18n.t('marketing.pricing.faq.item4_q'), a: i18n.t('marketing.pricing.faq.item4_a') },
+                  { q: i18n.t('marketing.pricing.faq.item5_q'), a: i18n.t('marketing.pricing.faq.item5_a') },
+                  { q: i18n.t('marketing.pricing.faq.item6_q'), a: i18n.t('marketing.pricing.faq.item6_a') },
+                  { q: i18n.t('marketing.pricing.faq.item7_q'), a: i18n.t('marketing.pricing.faq.item7_a') },
+                  { q: i18n.t('marketing.pricing.faq.item8_q'), a: i18n.t('marketing.pricing.faq.item8_a') },
+                  { q: i18n.t('marketing.pricing.faq.item9_q'), a: i18n.t('marketing.pricing.faq.item9_a') },
                 ],
               },
               cta: {
@@ -1021,6 +1265,8 @@ router
                 noCard: i18n.t('marketing.pricing.trust.no_card'),
                 cancel: i18n.t('marketing.pricing.trust.cancel'),
                 euData: i18n.t('marketing.pricing.trust.eu_data'),
+                trial: i18n.t('marketing.pricing.trust.trial'),
+                joinedBy: i18n.t('marketing.pricing.trust.joined_by'),
               },
               compareTable: {
                 headers: {
@@ -1114,6 +1360,16 @@ router
                 title: i18n.t('marketing.about.value3_title'),
                 description: i18n.t('marketing.about.value3_description'),
               },
+              {
+                icon: i18n.t('marketing.about.value4_icon'),
+                title: i18n.t('marketing.about.value4_title'),
+                description: i18n.t('marketing.about.value4_description'),
+              },
+              {
+                icon: i18n.t('marketing.about.value5_icon'),
+                title: i18n.t('marketing.about.value5_title'),
+                description: i18n.t('marketing.about.value5_description'),
+              },
             ],
           },
           team: {
@@ -1148,6 +1404,28 @@ router
             title: i18n.t('marketing.about.cta_title'),
             subtitle: i18n.t('marketing.about.cta_subtitle'),
             button: i18n.t('marketing.about.cta_button'),
+          },
+          mission: {
+            eyebrow: i18n.t('marketing.about.mission_eyebrow'),
+            statement: i18n.t('marketing.about.mission_statement'),
+            body: i18n.t('marketing.about.mission_body'),
+          },
+          timeline: {
+            title: i18n.t('marketing.about.timeline_title'),
+            items: [
+              { year: i18n.t('marketing.about.timeline_item1_year'), label: i18n.t('marketing.about.timeline_item1_label'), description: i18n.t('marketing.about.timeline_item1_description') },
+              { year: i18n.t('marketing.about.timeline_item2_year'), label: i18n.t('marketing.about.timeline_item2_label'), description: i18n.t('marketing.about.timeline_item2_description') },
+              { year: i18n.t('marketing.about.timeline_item3_year'), label: i18n.t('marketing.about.timeline_item3_label'), description: i18n.t('marketing.about.timeline_item3_description') },
+              { year: i18n.t('marketing.about.timeline_item4_year'), label: i18n.t('marketing.about.timeline_item4_label'), description: i18n.t('marketing.about.timeline_item4_description') },
+            ],
+          },
+          press: {
+            title: i18n.t('marketing.about.press_title'),
+            items: [
+              { name: i18n.t('marketing.about.press_item1_name'), quote: i18n.t('marketing.about.press_item1_quote') },
+              { name: i18n.t('marketing.about.press_item2_name'), quote: i18n.t('marketing.about.press_item2_quote') },
+              { name: i18n.t('marketing.about.press_item3_name'), quote: i18n.t('marketing.about.press_item3_quote') },
+            ],
           },
         },
       },
@@ -1193,6 +1471,16 @@ router
                 title: i18n.t('marketing.about.value3_title'),
                 description: i18n.t('marketing.about.value3_description'),
               },
+              {
+                icon: i18n.t('marketing.about.value4_icon'),
+                title: i18n.t('marketing.about.value4_title'),
+                description: i18n.t('marketing.about.value4_description'),
+              },
+              {
+                icon: i18n.t('marketing.about.value5_icon'),
+                title: i18n.t('marketing.about.value5_title'),
+                description: i18n.t('marketing.about.value5_description'),
+              },
             ],
           },
           team: {
@@ -1227,6 +1515,28 @@ router
             title: i18n.t('marketing.about.cta_title'),
             subtitle: i18n.t('marketing.about.cta_subtitle'),
             button: i18n.t('marketing.about.cta_button'),
+          },
+          mission: {
+            eyebrow: i18n.t('marketing.about.mission_eyebrow'),
+            statement: i18n.t('marketing.about.mission_statement'),
+            body: i18n.t('marketing.about.mission_body'),
+          },
+          timeline: {
+            title: i18n.t('marketing.about.timeline_title'),
+            items: [
+              { year: i18n.t('marketing.about.timeline_item1_year'), label: i18n.t('marketing.about.timeline_item1_label'), description: i18n.t('marketing.about.timeline_item1_description') },
+              { year: i18n.t('marketing.about.timeline_item2_year'), label: i18n.t('marketing.about.timeline_item2_label'), description: i18n.t('marketing.about.timeline_item2_description') },
+              { year: i18n.t('marketing.about.timeline_item3_year'), label: i18n.t('marketing.about.timeline_item3_label'), description: i18n.t('marketing.about.timeline_item3_description') },
+              { year: i18n.t('marketing.about.timeline_item4_year'), label: i18n.t('marketing.about.timeline_item4_label'), description: i18n.t('marketing.about.timeline_item4_description') },
+            ],
+          },
+          press: {
+            title: i18n.t('marketing.about.press_title'),
+            items: [
+              { name: i18n.t('marketing.about.press_item1_name'), quote: i18n.t('marketing.about.press_item1_quote') },
+              { name: i18n.t('marketing.about.press_item2_name'), quote: i18n.t('marketing.about.press_item2_quote') },
+              { name: i18n.t('marketing.about.press_item3_name'), quote: i18n.t('marketing.about.press_item3_quote') },
+            ],
           },
         },
       },

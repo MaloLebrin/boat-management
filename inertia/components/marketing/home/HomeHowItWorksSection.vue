@@ -1,11 +1,19 @@
 <script setup lang="ts">
+import { BellAlertIcon, ChartBarIcon, ClipboardDocumentListIcon } from '@heroicons/vue/24/outline'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import { useScrollReveal } from '~/composables/useScrollReveal'
 import { useT } from '~/composables/useT'
 
+const stepIcons = [ClipboardDocumentListIcon, BellAlertIcon, ChartBarIcon]
+
 defineProps<{
-  howItWorks: { title: string; subtitle: string; items: Array<{ step: string; title: string; description: string }> }
+  howItWorks: {
+    title: string
+    subtitle: string
+    items: Array<{ step: string; title: string; description: string; detail: string }>
+    timeline: { title: string; items: Array<{ day: string; label: string }> }
+  }
   preview: { title: string; subtitle: string }
   brand: { name: string }
   locale: 'en' | 'fr'
@@ -32,12 +40,38 @@ const { el: previewEl, isVisible: previewVisible } = useScrollReveal()
       <div
         v-for="(step, idx) in howItWorks.items"
         :key="step.step"
-        class="reveal bg-paper border border-bone rounded-xl px-6 py-8"
+        class="reveal bg-paper border border-bone rounded-xl px-6 py-8 hover:-translate-y-1 hover:shadow-md transition-all duration-300"
         :class="[`reveal-delay-${idx + 1}`, { visible: howItWorksVisible }]"
       >
+        <component :is="stepIcons[idx]" class="h-8 w-8 text-coral-500 mb-3" />
         <p class="font-display text-5xl italic text-coral-500/20">{{ step.step }}</p>
         <p class="mt-4 text-sm font-semibold text-fg">{{ step.title }}</p>
         <p class="mt-2 text-sm text-fg-muted">{{ step.description }}</p>
+        <p v-if="step.detail" class="mt-3 text-xs text-fg-subtle italic border-t border-bone/60 pt-2">{{ step.detail }}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Timeline J1/J7/J30 -->
+  <section class="mt-8 px-8 py-8 bg-navy-900 rounded-xl">
+    <p class="text-center text-sm font-semibold text-white/70 mb-6">{{ howItWorks.timeline.title }}</p>
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-center sm:gap-12">
+      <div
+        v-for="(item, idx) in howItWorks.timeline.items"
+        :key="item.day"
+        class="flex items-start gap-3 sm:flex-col sm:items-center sm:text-center"
+      >
+        <template v-if="idx === 0">
+          <span class="relative flex h-3 w-3 mt-2.5 sm:mt-0 sm:mb-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-coral-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-3 w-3 bg-coral-500"></span>
+          </span>
+        </template>
+        <span v-else class="shrink-0 inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-xs font-bold text-white">{{ idx + 1 }}</span>
+        <div>
+          <p class="text-xs font-semibold text-coral-400">{{ item.day }}</p>
+          <p class="text-sm text-white/80">{{ item.label }}</p>
+        </div>
       </div>
     </div>
   </section>
