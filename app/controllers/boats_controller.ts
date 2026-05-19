@@ -7,6 +7,8 @@ import BoatService, { BoatNotFoundError } from '#services/boat_service'
 import MediaService from '#services/media_service'
 import { createBoatValidator, updateBoatValidator } from '#validators/boat'
 import type { HttpContext } from '@adonisjs/core/http'
+import BoatPositionHistory from '#models/boat_position_history'
+import Port from '#models/port'
 
 export default class BoatsController {
   async index({ inertia, auth, request }: HttpContext) {
@@ -24,9 +26,24 @@ export default class BoatsController {
 
   async create({ inertia, auth, bouncer }: HttpContext) {
     await auth.authenticate()
+    const user = auth.getUserOrFail()
     await bouncer.authorize('boatCreate')
 
-    return inertia.render('boats/new', {})
+    const ports =
+      user.organizationId !== null
+        ? await Port.query()
+            .where('organizationId', user.organizationId)
+            .preload('pontoons', (q) => q.orderBy('name', 'asc'))
+            .orderBy('name', 'asc')
+        : []
+
+    return inertia.render('boats/new', {
+      ports: ports.map((p) => ({
+        id: p.id,
+        name: p.name,
+        pontoons: p.pontoons.map((pt) => ({ id: pt.id, name: pt.name })),
+      })),
+    })
   }
 
   async store({ request, response, auth, bouncer }: HttpContext) {
@@ -61,6 +78,17 @@ export default class BoatsController {
       const mediaService = new MediaService()
       const boatMedia = await mediaService.listForEntity('boat', boat.id)
       await boat.load('safetyEquipment')
+
+      if (boat.pontoonId !== null) {
+        await boat.load('pontoon', (q) => q.preload('port'))
+      }
+
+      const positionHistory = await BoatPositionHistory.query()
+        .where('boatId', boat.id)
+        .preload('pontoon', (q) => q.preload('port'))
+        .orderBy('startedAt', 'desc')
+        .limit(20)
+
       const aiAnalysisService = new AiAnalysisService()
       const latestSuggestions = await aiAnalysisService.getLatestBoatSuggestions(user.id, boat.id)
       const aiSuggestions: AiSuggestion[] | null = latestSuggestions
@@ -87,6 +115,25 @@ export default class BoatsController {
           francisationNumber: boat.francisationNumber,
           flagCountry: boat.flagCountry,
           maxPersons: boat.maxPersons,
+          pontoonId: boat.pontoonId ?? null,
+          spotIdentifier: boat.spotIdentifier ?? null,
+          pontoon: boat.pontoon
+            ? {
+                id: boat.pontoon.id,
+                name: boat.pontoon.name,
+                portId: boat.pontoon.portId,
+                portName: boat.pontoon.port.name,
+              }
+            : null,
+          positionHistory: positionHistory.map((h) => ({
+            id: h.id,
+            pontoonId: h.pontoonId,
+            pontoonName: h.pontoon?.name ?? null,
+            portName: h.pontoon?.port?.name ?? null,
+            spotIdentifier: h.spotIdentifier,
+            startedAt: h.startedAt.toISODate()!,
+            endedAt: h.endedAt ? h.endedAt.toISODate() : null,
+          })),
           engines: boat.engines.map((e) => ({
             id: e.id,
             kind: e.kind,
@@ -210,6 +257,15 @@ export default class BoatsController {
     try {
       const boat = await boatService.getForUserOrFail(user, Number(params.id))
       await bouncer.authorize('boatUpdate', boat)
+
+      const ports =
+        user.organizationId !== null
+          ? await Port.query()
+              .where('organizationId', user.organizationId)
+              .preload('pontoons', (q) => q.orderBy('name', 'asc'))
+              .orderBy('name', 'asc')
+          : []
+
       return inertia.render('boats/edit', {
         boat: {
           id: boat.id,
@@ -232,7 +288,14 @@ export default class BoatsController {
           francisationNumber: boat.francisationNumber,
           flagCountry: boat.flagCountry,
           maxPersons: boat.maxPersons,
+          pontoonId: boat.pontoonId ?? null,
+          spotIdentifier: boat.spotIdentifier ?? null,
         },
+        ports: ports.map((p) => ({
+          id: p.id,
+          name: p.name,
+          pontoons: p.pontoons.map((pt) => ({ id: pt.id, name: pt.name })),
+        })),
       })
     } catch (error) {
       if (error instanceof BoatNotFoundError) {

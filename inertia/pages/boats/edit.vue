@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Form } from '@adonisjs/inertia/vue'
 import BoatFormHullFields from '~/components/boats/hull/BoatFormHullFields.vue'
-import type { BoatEditPayload, PropulsionTypeUi } from '~/types/boat_form'
+import type { BoatEditPayload, PortForForm, PropulsionTypeUi } from '~/types/boat_form'
 import { parsePropulsionType } from '~/types/boat_form'
 import { computed, ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
@@ -12,6 +12,7 @@ const { t } = useT()
 
 const props = defineProps<{
   boat: BoatEditPayload
+  ports: PortForForm[]
 }>()
 
 const propulsionType = ref<PropulsionTypeUi>(parsePropulsionType(props.boat.propulsionType))
@@ -34,6 +35,7 @@ const showSailFields = computed(() => propulsionType.value === 'sailboat')
             :boat="boat"
             :show-mast-height="showSailFields"
             :errors="errors"
+            :ports="ports"
           />
 
           <div class="flex items-center gap-3">

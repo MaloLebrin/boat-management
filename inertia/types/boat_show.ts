@@ -69,6 +69,16 @@ export type BoatShowRig = {
   status: 'operational' | 'in_maintenance' | 'out_of_service' | 'retired'
 }
 
+export type BoatPositionHistoryRow = {
+  id: number
+  pontoonId: number | null
+  pontoonName: string | null
+  portName: string | null
+  spotIdentifier: string | null
+  startedAt: string
+  endedAt: string | null
+}
+
 export type BoatShowDetail = {
   id: number
   name: string
@@ -89,6 +99,10 @@ export type BoatShowDetail = {
   francisationNumber: string | null
   flagCountry: string | null
   maxPersons: number | null
+  pontoonId: number | null
+  spotIdentifier: string | null
+  pontoon: { id: number; name: string; portId: number; portName: string } | null
+  positionHistory: BoatPositionHistoryRow[]
   engines: BoatShowEngine[]
   sails: BoatShowSail[]
   rig: BoatShowRig | null

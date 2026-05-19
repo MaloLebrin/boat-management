@@ -154,6 +154,35 @@ const { t } = useT()
           </div>
         </dl>
       </BaseCard>
+
+      <!-- Current position card -->
+      <BaseCard padded>
+        <template #header>
+          <p class="text-sm font-semibold text-fg">{{ t('boats.show.position.title') }}</p>
+        </template>
+        <dl class="grid grid-cols-2 gap-4 text-sm">
+          <template v-if="boat.pontoon">
+            <div>
+              <dt class="text-fg-muted">{{ t('ports.title') }}</dt>
+              <dd class="font-semibold text-fg">{{ boat.pontoon.portName }}</dd>
+            </div>
+            <div>
+              <dt class="text-fg-muted">{{ t('boats.hullFields.pontoon') }}</dt>
+              <dd class="font-semibold text-fg">{{ boat.pontoon.name }}</dd>
+            </div>
+            <div>
+              <dt class="text-fg-muted">{{ t('boats.hullFields.spotIdentifier') }}</dt>
+              <dd class="font-semibold text-fg">{{ boat.spotIdentifier ?? '—' }}</dd>
+            </div>
+          </template>
+          <template v-else>
+            <div class="col-span-2">
+              <dt class="text-fg-muted">{{ t('boats.hullFields.homePort') }}</dt>
+              <dd class="font-semibold text-fg">{{ boat.homePort ?? '—' }}</dd>
+            </div>
+          </template>
+        </dl>
+      </BaseCard>
     </div>
 
     <!-- Right column (w-64) -->

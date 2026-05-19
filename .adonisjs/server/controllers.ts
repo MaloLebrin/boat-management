@@ -19,6 +19,8 @@ export const controllers = {
   NewAccount: () => import('#controllers/new_account_controller'),
   PasswordReset: () => import('#controllers/password_reset_controller'),
   Planning: () => import('#controllers/planning_controller'),
+  Pontoons: () => import('#controllers/pontoons_controller'),
+  Ports: () => import('#controllers/ports_controller'),
   Session: () => import('#controllers/session_controller'),
   Settings: () => import('#controllers/settings_controller'),
 }

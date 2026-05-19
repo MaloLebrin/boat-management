@@ -10,6 +10,7 @@
 
 import './routes/home.js'
 import './routes/boats.js'
+import './routes/ports.js'
 import './routes/auth.js'
 import './routes/ai.js'
 import './routes/marketing.js'

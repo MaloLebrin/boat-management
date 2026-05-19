@@ -75,6 +75,17 @@ function formatDate(iso: string | null): string {
   if (!iso) return '—'
   return iso.slice(0, 10)
 }
+
+const currentPositionLabel = computed(() => {
+  if (props.boat.pontoon) {
+    const parts = [props.boat.pontoon.portName, props.boat.pontoon.name]
+    if (props.boat.spotIdentifier) {
+      parts.push(`#${props.boat.spotIdentifier}`)
+    }
+    return parts.join(' / ')
+  }
+  return props.boat.homePort ?? null
+})
 </script>
 
 <template>
@@ -227,12 +238,11 @@ function formatDate(iso: string | null): string {
         </template>
       </div>
 
-      <!-- TODO: add a `homePort` field to the Boat model/migration/form and display it here instead of registrationNumber -->
-      <!-- Location placeholder -->
+      <!-- Current position -->
       <BaseCard padded>
-        <p class="text-sm font-semibold text-fg">{{ t('boats.show.overview.homePortTitle') }}</p>
+        <p class="text-sm font-semibold text-fg">{{ t('boats.show.overview.positionTitle') }}</p>
         <p class="mt-2 text-sm text-fg-muted">
-          {{ boat.homePort ?? t('boats.show.overview.homePortEmpty') }}
+          {{ currentPositionLabel ?? t('boats.show.overview.positionEmpty') }}
         </p>
       </BaseCard>
     </div>

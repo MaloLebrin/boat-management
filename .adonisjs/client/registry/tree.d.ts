@@ -67,6 +67,20 @@ export interface ApiDefinition {
     update: typeof routes['boat_safety_equipment.update']
     destroy: typeof routes['boat_safety_equipment.destroy']
   }
+  ports: {
+    index: typeof routes['ports.index']
+    create: typeof routes['ports.create']
+    store: typeof routes['ports.store']
+    show: typeof routes['ports.show']
+    edit: typeof routes['ports.edit']
+    update: typeof routes['ports.update']
+    destroy: typeof routes['ports.destroy']
+    pontoons: {
+      store: typeof routes['ports.pontoons.store']
+      update: typeof routes['ports.pontoons.update']
+      destroy: typeof routes['ports.pontoons.destroy']
+    }
+  }
   newAccount: {
     create: typeof routes['new_account.create']
     store: typeof routes['new_account.store']

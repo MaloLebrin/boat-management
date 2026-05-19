@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
-import type { BoatEditPayload, PropulsionTypeUi } from '~/types/boat_form'
+import type { BoatEditPayload, PropulsionTypeUi, PortForForm } from '~/types/boat_form'
 import { useT } from '~/composables/useT'
 import { useBoatOptions } from '~/composables/useBoatOptions'
 
@@ -13,6 +13,7 @@ const props = defineProps<{
   boat?: BoatEditPayload
   showMastHeight: boolean
   errors: Record<string, string | string[] | undefined>
+  ports?: PortForForm[]
 }>()
 
 const { t } = useT()
@@ -36,6 +37,23 @@ const hullIdentificationNumber = ref('')
 const francisationNumber = ref('')
 const flagCountry = ref('')
 const maxPersons = ref('')
+const selectedPortId = ref<number | ''>('')
+const pontoonId = ref<number | ''>('')
+const spotIdentifier = ref('')
+
+const portOptions = computed(() =>
+  (props.ports ?? []).map((p) => ({ label: p.name, value: p.id }))
+)
+
+const pontoonOptions = computed(() => {
+  if (!selectedPortId.value) return []
+  const port = (props.ports ?? []).find((p) => p.id === selectedPortId.value)
+  return port?.pontoons.map((pt) => ({ label: pt.name, value: pt.id })) ?? []
+})
+
+watch(selectedPortId, () => {
+  pontoonId.value = ''
+})
 
 function syncFromBoat() {
   if (props.mode !== 'edit' || !props.boat) return
@@ -58,6 +76,13 @@ function syncFromBoat() {
   francisationNumber.value = b.francisationNumber ?? ''
   flagCountry.value = b.flagCountry ?? ''
   maxPersons.value = b.maxPersons === null || b.maxPersons === undefined ? '' : String(b.maxPersons)
+  pontoonId.value = b.pontoonId ?? ''
+  spotIdentifier.value = b.spotIdentifier ?? ''
+  // Find portId from pontoonId
+  if (b.pontoonId && props.ports) {
+    const portWithPontoon = props.ports.find((p) => p.pontoons.some((pt) => pt.id === b.pontoonId))
+    selectedPortId.value = portWithPontoon?.id ?? ''
+  }
 }
 
 watch(
@@ -70,164 +95,47 @@ watch(
 <template>
   <div class="space-y-6">
     <BaseInput id="name" name="name" :label="t('boats.hullFields.name')" v-model="name" :errors="errors" />
-
-    <BaseInput
-      id="registrationNumber"
-      name="registrationNumber"
-      :label="t('boats.hullFields.registrationNumber')"
-      v-model="registrationNumber"
-      :errors="errors"
-    />
-
+    <BaseInput id="registrationNumber" name="registrationNumber" :label="t('boats.hullFields.registrationNumber')" v-model="registrationNumber" :errors="errors" />
     <BaseInput id="type" name="type" :label="t('boats.hullFields.type')" v-model="type" :errors="errors" />
-
-    <BaseSelect
-      id="propulsionType"
-      name="propulsionType"
-      :label="t('boats.hullFields.propulsionType')"
-      placeholder="—"
-      :allow-empty="true"
-      :options="propulsionOptions"
-      v-model="propulsionType"
-      :errors="errors"
-    />
-
-    <BaseInput
-      id="manufacturedAt"
-      name="manufacturedAt"
-      :label="t('boats.hullFields.manufacturedAt')"
-      type="date"
-      v-model="manufacturedAt"
-      :errors="errors"
-    />
+    <BaseSelect id="propulsionType" name="propulsionType" :label="t('boats.hullFields.propulsionType')" placeholder="—" :allow-empty="true" :options="propulsionOptions" v-model="propulsionType" :errors="errors" />
+    <BaseInput id="manufacturedAt" name="manufacturedAt" :label="t('boats.hullFields.manufacturedAt')" type="date" v-model="manufacturedAt" :errors="errors" />
 
     <div class="grid grid-cols-2 gap-4">
-      <BaseInput
-        id="lengthM"
-        name="lengthM"
-        :label="t('boats.hullFields.lengthM')"
-        type="number"
-        step="0.01"
-        inputmode="decimal"
-        v-model="lengthM"
-        :errors="errors"
-      />
-      <BaseInput
-        id="beamM"
-        name="beamM"
-        :label="t('boats.hullFields.beamM')"
-        type="number"
-        step="0.01"
-        inputmode="decimal"
-        v-model="beamM"
-        :errors="errors"
-      />
-      <BaseInput
-        id="draftM"
-        name="draftM"
-        :label="t('boats.hullFields.draftM')"
-        type="number"
-        step="0.01"
-        inputmode="decimal"
-        v-model="draftM"
-        :errors="errors"
-      />
-      <BaseInput
-        v-if="showMastHeight"
-        id="mastHeightM"
-        name="mastHeightM"
-        :label="t('boats.hullFields.mastHeightM')"
-        type="number"
-        step="0.01"
-        inputmode="decimal"
-        v-model="mastHeightM"
-        :errors="errors"
-      />
+      <BaseInput id="lengthM" name="lengthM" :label="t('boats.hullFields.lengthM')" type="number" step="0.01" inputmode="decimal" v-model="lengthM" :errors="errors" />
+      <BaseInput id="beamM" name="beamM" :label="t('boats.hullFields.beamM')" type="number" step="0.01" inputmode="decimal" v-model="beamM" :errors="errors" />
+      <BaseInput id="draftM" name="draftM" :label="t('boats.hullFields.draftM')" type="number" step="0.01" inputmode="decimal" v-model="draftM" :errors="errors" />
+      <BaseInput v-if="showMastHeight" id="mastHeightM" name="mastHeightM" :label="t('boats.hullFields.mastHeightM')" type="number" step="0.01" inputmode="decimal" v-model="mastHeightM" :errors="errors" />
     </div>
 
     <div class="grid grid-cols-2 gap-4">
-      <BaseSelect
-        id="hullMaterial"
-        name="hullMaterial"
-        :label="t('boats.hullFields.hullMaterial')"
-        placeholder="—"
-        :allow-empty="true"
-        :options="hullMaterialOptions"
-        v-model="hullMaterial"
-        :errors="errors"
-      />
-      <BaseInput
-        id="yearBuilt"
-        name="yearBuilt"
-        :label="t('boats.hullFields.yearBuilt')"
-        type="number"
-        inputmode="numeric"
-        v-model="yearBuilt"
-        :errors="errors"
-      />
-      <BaseInput
-        id="manufacturer"
-        name="manufacturer"
-        :label="t('boats.hullFields.manufacturer')"
-        v-model="manufacturer"
-        :errors="errors"
-      />
+      <BaseSelect id="hullMaterial" name="hullMaterial" :label="t('boats.hullFields.hullMaterial')" placeholder="—" :allow-empty="true" :options="hullMaterialOptions" v-model="hullMaterial" :errors="errors" />
+      <BaseInput id="yearBuilt" name="yearBuilt" :label="t('boats.hullFields.yearBuilt')" type="number" inputmode="numeric" v-model="yearBuilt" :errors="errors" />
+      <BaseInput id="manufacturer" name="manufacturer" :label="t('boats.hullFields.manufacturer')" v-model="manufacturer" :errors="errors" />
       <BaseInput id="model" name="model" :label="t('boats.hullFields.model')" v-model="model" :errors="errors" />
     </div>
 
-    <BaseInput
-      id="homePort"
-      name="homePort"
-      :label="t('boats.hullFields.homePort')"
-      v-model="homePort"
-      :errors="errors"
-    />
+    <BaseInput id="homePort" name="homePort" :label="t('boats.hullFields.homePort')" v-model="homePort" :errors="errors" />
 
     <div class="grid grid-cols-2 gap-4">
-      <BaseSelect
-        id="navigationCategory"
-        name="navigationCategory"
-        :label="t('boats.hullFields.navigationCategory')"
-        placeholder="—"
-        :allow-empty="true"
-        :options="navigationCategoryOptions"
-        v-model="navigationCategory"
-        :errors="errors"
-      />
-      <BaseInput
-        id="maxPersons"
-        name="maxPersons"
-        :label="t('boats.hullFields.maxPersons')"
-        type="number"
-        inputmode="numeric"
-        v-model="maxPersons"
-        :errors="errors"
-      />
+      <BaseSelect id="navigationCategory" name="navigationCategory" :label="t('boats.hullFields.navigationCategory')" placeholder="—" :allow-empty="true" :options="navigationCategoryOptions" v-model="navigationCategory" :errors="errors" />
+      <BaseInput id="maxPersons" name="maxPersons" :label="t('boats.hullFields.maxPersons')" type="number" inputmode="numeric" v-model="maxPersons" :errors="errors" />
     </div>
 
     <div class="grid grid-cols-2 gap-4">
-      <BaseInput
-        id="hullIdentificationNumber"
-        name="hullIdentificationNumber"
-        :label="t('boats.hullFields.hullIdentificationNumber')"
-        v-model="hullIdentificationNumber"
-        :errors="errors"
-      />
-      <BaseInput
-        id="francisationNumber"
-        name="francisationNumber"
-        :label="t('boats.hullFields.francisationNumber')"
-        v-model="francisationNumber"
-        :errors="errors"
-      />
+      <BaseInput id="hullIdentificationNumber" name="hullIdentificationNumber" :label="t('boats.hullFields.hullIdentificationNumber')" v-model="hullIdentificationNumber" :errors="errors" />
+      <BaseInput id="francisationNumber" name="francisationNumber" :label="t('boats.hullFields.francisationNumber')" v-model="francisationNumber" :errors="errors" />
     </div>
 
-    <BaseInput
-      id="flagCountry"
-      name="flagCountry"
-      :label="t('boats.hullFields.flagCountry')"
-      v-model="flagCountry"
-      :errors="errors"
-    />
+    <BaseInput id="flagCountry" name="flagCountry" :label="t('boats.hullFields.flagCountry')" v-model="flagCountry" :errors="errors" />
+
+    <!-- Current position section -->
+    <div v-if="ports && ports.length > 0" class="space-y-4 rounded-lg border border-border p-4">
+      <p class="text-sm font-semibold text-fg">{{ t('boats.show.position.title') }}</p>
+      <div class="grid grid-cols-2 gap-4">
+        <BaseSelect id="portId" name="portId" :label="t('ports.title')" :placeholder="t('common.selectPlaceholder')" :allow-empty="true" :options="portOptions" v-model="selectedPortId" />
+        <BaseSelect id="pontoonId" name="pontoonId" :label="t('boats.hullFields.pontoon')" :placeholder="t('common.selectPlaceholder')" :allow-empty="true" :options="pontoonOptions" :disabled="!selectedPortId" v-model="pontoonId" :errors="errors" />
+      </div>
+      <BaseInput id="spotIdentifier" name="spotIdentifier" :label="t('boats.hullFields.spotIdentifier')" v-model="spotIdentifier" :errors="errors" maxlength="16" />
+    </div>
   </div>
 </template>

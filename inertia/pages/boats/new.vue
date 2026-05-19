@@ -5,11 +5,15 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import BoatFormHullFields from '~/components/boats/hull/BoatFormHullFields.vue'
 import { useT } from '~/composables/useT'
-import type { PropulsionTypeUi } from '~/types/boat_form'
+import type { PortForForm, PropulsionTypeUi } from '~/types/boat_form'
 
 const { t } = useT()
 const propulsionType = ref<PropulsionTypeUi>('')
 const showSailFields = computed(() => propulsionType.value === 'sailboat')
+
+defineProps<{
+  ports: PortForForm[]
+}>()
 </script>
 
 <template>
@@ -23,7 +27,7 @@ const showSailFields = computed(() => propulsionType.value === 'sailboat')
       <Form :action="{ url: '/boats', method: 'post' }" #default="{ processing, errors }">
         <div class="space-y-6">
           <BoatFormHullFields v-model:propulsion-type="propulsionType" mode="create" :show-mast-height="showSailFields"
-            :errors="errors" />
+            :errors="errors" :ports="ports" />
 
           <div class="flex items-center gap-3">
             <BaseButton type="submit" :disabled="processing">{{ t('boats.new.submit') }}</BaseButton>

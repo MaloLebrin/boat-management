@@ -371,7 +371,9 @@
       "hullIdentificationNumber": "Hull ID number (HIN/WIN)",
       "francisationNumber": "Francisation number",
       "flagCountry": "Flag",
-      "maxPersons": "Max persons on board"
+      "maxPersons": "Max persons on board",
+      "pontoon": "Pontoon",
+      "spotIdentifier": "Berth number"
     },
     "engines": {
       "title": "Engines",
@@ -581,7 +583,16 @@
         "aiRefresh": "Refresh",
         "aiRefreshing": "Analyzing...",
         "homePortTitle": "Home port",
-        "homePortEmpty": "Not specified"
+        "homePortEmpty": "Not specified",
+        "positionTitle": "Current berth",
+        "positionEmpty": "No berth assigned"
+      },
+      "position": {
+        "title": "Current berth",
+        "history": "Position history",
+        "arrivedOn": "Since",
+        "leftOn": "Until",
+        "noHistory": "No position history yet."
       }
     },
     "specs": {
@@ -883,6 +894,44 @@
       "privacy": "Privacy",
       "terms": "Terms",
       "bilingual": "Bilingual EN/FR · EU-hosted"
+    }
+  },
+  "ports": {
+    "nav": "Ports",
+    "title": "My ports",
+    "empty": "No port registered yet.",
+    "emptyDescription": "Add a port to organize your pontoons and boat berths.",
+    "create": "New port",
+    "edit": "Edit port",
+    "delete": "Delete port",
+    "deleteConfirm": "Delete this port?",
+    "hasBoats": "This port has boats assigned. Move them before deleting.",
+    "backToList": "← Ports",
+    "fields": {
+      "name": "Port name",
+      "city": "City",
+      "country": "Country",
+      "address": "Address",
+      "notes": "Notes"
+    },
+    "pontoons": {
+      "title": "Pontoons",
+      "empty": "No pontoon yet.",
+      "add": "Add pontoon",
+      "edit": "Edit",
+      "delete": "Delete",
+      "deleteConfirm": "Delete this pontoon?",
+      "hasBoats": "This pontoon has boats assigned. Move them before deleting.",
+      "fields": {
+        "name": "Pontoon name",
+        "description": "Description"
+      }
+    },
+    "show": {
+      "boats": "Boats",
+      "spot": "Berth",
+      "emptySpot": "Unassigned",
+      "noBoats": "No boats on this pontoon."
     }
   }
 }

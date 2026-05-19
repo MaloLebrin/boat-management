@@ -42,6 +42,9 @@ export type BoatHullPayload = {
   francisationNumber?: string | null
   flagCountry?: string | null
   maxPersons?: number | null
+
+  pontoonId?: number | null
+  spotIdentifier?: string | null
 }
 
 export type BoatEnginePayload = {
@@ -161,7 +164,14 @@ export default class BoatService {
       francisationNumber: payload.francisationNumber ?? null,
       flagCountry: payload.flagCountry ?? null,
       maxPersons: payload.maxPersons ?? null,
+
+      pontoonId: payload.pontoonId ?? null,
+      spotIdentifier: payload.spotIdentifier ?? null,
     })
+
+    if (payload.pontoonId !== undefined && payload.pontoonId !== null) {
+      await this._logBerthChange(boat, payload.pontoonId, payload.spotIdentifier ?? null)
+    }
 
     await boat.load('engines')
     await boat.load('sails')
@@ -201,12 +211,47 @@ export default class BoatService {
     boat.flagCountry = payload.flagCountry ?? null
     boat.maxPersons = payload.maxPersons ?? null
 
+    if (payload.pontoonId !== undefined) {
+      const berthChanged =
+        payload.pontoonId !== boat.pontoonId ||
+        (payload.spotIdentifier ?? null) !== boat.spotIdentifier
+
+      if (berthChanged) {
+        await this._logBerthChange(boat, payload.pontoonId, payload.spotIdentifier ?? null)
+      }
+
+      boat.pontoonId = payload.pontoonId
+      boat.spotIdentifier = payload.spotIdentifier ?? null
+    }
+
     await boat.save()
 
     await boat.load('engines')
     await boat.load('sails')
     await boat.load('rig')
     return boat
+  }
+
+  private async _logBerthChange(
+    boat: Boat,
+    newPontoonId: number | null,
+    newSpotIdentifier: string | null
+  ) {
+    const BoatPositionHistory = (await import('#models/boat_position_history')).default
+    await BoatPositionHistory.query()
+      .where('boatId', boat.id)
+      .whereNull('endedAt')
+      .update({ endedAt: DateTime.now().toSQL() })
+
+    if (newPontoonId !== null) {
+      await BoatPositionHistory.create({
+        boatId: boat.id,
+        pontoonId: newPontoonId,
+        spotIdentifier: newSpotIdentifier,
+        startedAt: DateTime.now(),
+        endedAt: null,
+      })
+    }
   }
 
   async deleteForUser(user: User, boat: Boat) {

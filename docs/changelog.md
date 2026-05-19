@@ -7,6 +7,59 @@ Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
 ## 2026-05-19
 
+### Gestion des ports, pontons et emplacements bateaux — Backend + Frontend
+
+Nouveau système complet de localisation des bateaux dans les marinas.
+
+**Migrations** (4 nouvelles) :
+- `create_ports_table` : table `ports` (organization_id FK, name, city, country, address, notes)
+- `create_pontoons_table` : table `pontoons` (port_id FK, name, description)
+- `alter_boats_add_pontoon_fields` : ajout `pontoon_id` (FK nullable) et `spot_identifier` (varchar 16) sur `boats`
+- `create_boat_position_history_table` : historique des positions (boat_id, pontoon_id, spot_identifier, started_at, ended_at)
+
+**Modèles** : `Port`, `Pontoon`, `BoatPositionHistory` + relations ajoutées sur `Boat` (pontoon, positionHistory) et `Organization` (ports)
+
+**Services** :
+- `port_service.ts` : CRUD ports + garde `PortHasBoatsError` / `PontoonHasBoatsError`
+- `pontoon_service.ts` : CRUD pontons avec vérification bateaux avant suppression
+- `boat_service.ts` : ajout champs `pontoonId`/`spotIdentifier` + méthode `_logBerthChange` pour historique automatique à chaque changement d'emplacement
+
+**Controllers** : `ports_controller`, `pontoons_controller` + mise à jour `boats_controller` (pontoon + historique dans show, ports dans edit/create)
+
+**Routes** : `start/routes/ports.ts` — CRUD ports (`ports.*`) + CRUD pontons (`ports.pontoons.*`)
+
+**Validators** : `port.ts`, `pontoon.ts` + ajout `pontoonId`/`spotIdentifier` dans `boat.ts`
+
+---
+
+### Gestion des ports et pontons — Frontend
+
+Nouvelles pages et composants Vue 3 pour la gestion des ports et pontons :
+
+**Pages ports** (`inertia/pages/ports/`) :
+- `index.vue` : liste des ports avec cards (nom, ville, nb pontons, nb bateaux), empty state, bouton "Nouveau port"
+- `new.vue` : formulaire de creation de port (name, city, country, address, notes)
+- `show.vue` : detail d'un port avec liste des pontons, formulaire inline d'ajout/modification de ponton
+- `edit.vue` : formulaire d'edition de port
+
+**Composants ports** (`inertia/components/ports/`) :
+- `show/PontoonCard.vue` : affiche un ponton avec sa liste de bateaux et liens vers les fiches bateau
+- `modals/PontoonFormModal.vue` : formulaire inline de creation/modification de ponton
+
+**Modifications bateaux** :
+- `BoatFormHullFields.vue` : nouvelle section "Emplacement actuel" avec selects Port > Ponton cascades + champ N° d'emplacement
+- `BoatShowTabSpecs.vue` : nouvelle carte "Emplacement actuel" affichant le port/ponton ou fallback sur homePort
+- `BoatShowTabOverview.vue` : affichage de l'emplacement actuel (Port / Ponton / #spot) dans la sidebar
+
+**Types** :
+- `inertia/types/port.ts` : `PortListItem`, `PontoonRow`, `PortShowDetail`, `PortEditPayload`
+
+**i18n** : toutes les cles sont deja presentes dans `resources/lang/{en,fr}/app.json` (namespace `ports.*`)
+
+---
+
+## 2026-05-19
+
 ### Refonte landing pages marketing — contenu enrichi et nouvelles sections
 
 **Home page** — 3 nouvelles sections + sections existantes enrichies :

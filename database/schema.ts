@@ -223,6 +223,29 @@ export class BoatMaintenanceTaskSchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class BoatPositionHistorySchema extends BaseModel {
+  static $columns = ['boatId', 'createdAt', 'endedAt', 'id', 'notes', 'pontoonId', 'spotIdentifier', 'startedAt', 'updatedAt'] as const
+  $columns = BoatPositionHistorySchema.$columns
+  @column()
+  declare boatId: number
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column.dateTime()
+  declare endedAt: DateTime | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare notes: string | null
+  @column()
+  declare pontoonId: number | null
+  @column()
+  declare spotIdentifier: string | null
+  @column.dateTime()
+  declare startedAt: DateTime
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class BoatRigSchema extends BaseModel {
   static $columns = ['boatId', 'createdAt', 'id', 'manufacturedAt', 'mastCount', 'notes', 'rigType', 'spreaders', 'status', 'updatedAt'] as const
   $columns = BoatRigSchema.$columns
@@ -299,7 +322,7 @@ export class BoatSailSchema extends BaseModel {
 }
 
 export class BoatSchema extends BaseModel {
-  static $columns = ['beamM', 'createdAt', 'draftM', 'flagCountry', 'francisationNumber', 'homePort', 'hullIdentificationNumber', 'hullMaterial', 'id', 'lengthM', 'manufacturedAt', 'manufacturer', 'mastHeightM', 'maxPersons', 'model', 'name', 'navigationCategory', 'organizationId', 'propulsionType', 'registrationNumber', 'type', 'updatedAt', 'yearBuilt'] as const
+  static $columns = ['beamM', 'createdAt', 'draftM', 'flagCountry', 'francisationNumber', 'homePort', 'hullIdentificationNumber', 'hullMaterial', 'id', 'lengthM', 'manufacturedAt', 'manufacturer', 'mastHeightM', 'maxPersons', 'model', 'name', 'navigationCategory', 'organizationId', 'pontoonId', 'propulsionType', 'registrationNumber', 'spotIdentifier', 'type', 'updatedAt', 'yearBuilt'] as const
   $columns = BoatSchema.$columns
   @column()
   declare beamM: number | null
@@ -338,9 +361,13 @@ export class BoatSchema extends BaseModel {
   @column()
   declare organizationId: number
   @column()
+  declare pontoonId: number | null
+  @column()
   declare propulsionType: string | null
   @column()
   declare registrationNumber: string | null
+  @column()
+  declare spotIdentifier: string | null
   @column()
   declare type: string | null
   @column.dateTime({ autoCreate: true, autoUpdate: true })
@@ -414,6 +441,46 @@ export class PasswordResetTokenSchema extends BaseModel {
   declare id: number
   @column()
   declare token: string
+}
+
+export class PontoonSchema extends BaseModel {
+  static $columns = ['createdAt', 'description', 'id', 'name', 'portId', 'updatedAt'] as const
+  $columns = PontoonSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare description: string | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare name: string
+  @column()
+  declare portId: number
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class PortSchema extends BaseModel {
+  static $columns = ['address', 'city', 'country', 'createdAt', 'id', 'name', 'notes', 'organizationId', 'updatedAt'] as const
+  $columns = PortSchema.$columns
+  @column()
+  declare address: string | null
+  @column()
+  declare city: string | null
+  @column()
+  declare country: string | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare name: string
+  @column()
+  declare notes: string | null
+  @column()
+  declare organizationId: number
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
 }
 
 export class QueueDedupKeySchema extends BaseModel {

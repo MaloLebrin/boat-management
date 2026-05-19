@@ -547,6 +547,126 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_maintenance_sheet_items_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'ports.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/ports'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/ports_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/ports_controller').default['index']>>>
+    }
+  }
+  'ports.create': {
+    methods: ["GET","HEAD"]
+    pattern: '/ports/new'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/ports_controller').default['create']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/ports_controller').default['create']>>>
+    }
+  }
+  'ports.store': {
+    methods: ["POST"]
+    pattern: '/ports'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/port').createPortValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/port').createPortValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/ports_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/ports_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'ports.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/ports/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/ports_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/ports_controller').default['show']>>>
+    }
+  }
+  'ports.edit': {
+    methods: ["GET","HEAD"]
+    pattern: '/ports/:id/edit'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/ports_controller').default['edit']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/ports_controller').default['edit']>>>
+    }
+  }
+  'ports.update': {
+    methods: ["PUT"]
+    pattern: '/ports/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/port').updatePortValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/port').updatePortValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/ports_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/ports_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'ports.destroy': {
+    methods: ["DELETE"]
+    pattern: '/ports/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/ports_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/ports_controller').default['destroy']>>>
+    }
+  }
+  'ports.pontoons.store': {
+    methods: ["POST"]
+    pattern: '/ports/:portId/pontoons'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/pontoon').createPontoonValidator)>>
+      paramsTuple: [ParamValue]
+      params: { portId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/pontoon').createPontoonValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/pontoons_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/pontoons_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'ports.pontoons.update': {
+    methods: ["PUT"]
+    pattern: '/ports/:portId/pontoons/:pontoonId'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/pontoon').updatePontoonValidator)>>
+      paramsTuple: [ParamValue, ParamValue]
+      params: { portId: ParamValue; pontoonId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/pontoon').updatePontoonValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/pontoons_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/pontoons_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'ports.pontoons.destroy': {
+    methods: ["DELETE"]
+    pattern: '/ports/:portId/pontoons/:pontoonId'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { portId: ParamValue; pontoonId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/pontoons_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/pontoons_controller').default['destroy']>>>
+    }
+  }
   'new_account.create': {
     methods: ["GET","HEAD"]
     pattern: '/signup'

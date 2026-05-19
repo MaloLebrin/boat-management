@@ -10,6 +10,12 @@ export type RigType = 'sloop' | 'cutter' | 'ketch' | 'yawl' | 'schooner' | 'cat_
 
 export type PropulsionTypeUi = 'sailboat' | 'motorboat' | 'catamaran' | 'rib' | 'other' | ''
 
+export type PortForForm = {
+  id: number
+  name: string
+  pontoons: Array<{ id: number; name: string }>
+}
+
 /** Server shape for hull-only edit page (Inertia props). */
 export type BoatEditPayload = {
   id: number
@@ -32,6 +38,8 @@ export type BoatEditPayload = {
   francisationNumber: string | null
   flagCountry: string | null
   maxPersons: number | null
+  pontoonId: number | null
+  spotIdentifier: string | null
 }
 
 const ENGINE_KINDS: readonly EngineKind[] = ['inboard', 'outboard', 'electric', 'hybrid', 'other']
