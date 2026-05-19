@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseBreadcrumb from '~/components/base/BaseBreadcrumb.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
@@ -29,10 +29,13 @@ const props = defineProps<{
 
 type TabKey = 'overview' | 'specs' | 'equipment' | 'history' | 'tasks' | 'documents' | 'sheets'
 
-const urlParams = new URLSearchParams(window.location.search)
-const initialTab = (urlParams.get('tab') as TabKey) || 'overview'
+const tab = ref<TabKey>('overview')
 
-const tab = ref<TabKey>(initialTab)
+onMounted(() => {
+  const urlParams = new URLSearchParams(window.location.search)
+  const fromUrl = urlParams.get('tab') as TabKey | null
+  if (fromUrl) tab.value = fromUrl
+})
 
 watch(tab, (newTab) => {
   const url = new URL(window.location.href)
