@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import BaseCard from '~/components/base/BaseCard.vue'
+import HomeBentoGridSection from '~/components/marketing/home/HomeBentoGridSection.vue'
 import { useScrollReveal } from '~/composables/useScrollReveal'
 import { useT } from '~/composables/useT'
 
@@ -17,7 +18,7 @@ const { t: tApp } = useT()
 const { el: threeThingsEl, isVisible: threeThingsVisible } = useScrollReveal()
 const { el: problemEl, isVisible: problemVisible } = useScrollReveal()
 const { el: featuresEl, isVisible: featuresVisible } = useScrollReveal()
-const { el: bentoEl, isVisible: bentoVisible } = useScrollReveal()
+
 const { el: personasEl, isVisible: personasVisible } = useScrollReveal()
 </script>
 
@@ -94,38 +95,7 @@ const { el: personasEl, isVisible: personasVisible } = useScrollReveal()
   </section>
 
   <!-- Section: Bento grid -->
-  <section
-    :ref="(el) => bentoEl = el as HTMLElement"
-    class="mt-14 reveal rounded-2xl bg-paper py-14 px-8"
-    :class="{ visible: bentoVisible }"
-  >
-    <h2 class="mb-8 text-center font-display text-2xl italic text-fg">{{ bentoGrid.title }}</h2>
-    <div class="grid gap-3" style="grid-template-columns: 2fr 1fr 1fr; grid-auto-rows: 160px;">
-      <!-- Item 1: Vue marina (span 2 rows) -->
-      <div class="rounded-xl border border-bone bg-cream p-5" style="grid-row: span 2;">
-        <p class="font-semibold text-fg">{{ bentoGrid.items[0].title }}</p>
-        <p class="mt-1 text-sm text-fg-muted">{{ bentoGrid.items[0].description }}</p>
-        <div class="mt-4 flex h-24 items-center justify-center rounded-lg border border-bone bg-paper text-xs text-fg-subtle">illustration ponton</div>
-      </div>
-      <!-- Items 2-3 -->
-      <div v-for="item in bentoGrid.items.slice(1, 3)" :key="item.title"
-        class="rounded-xl border border-bone bg-cream p-4">
-        <p class="font-semibold text-sm text-fg">{{ item.title }}</p>
-        <p class="mt-1 text-xs text-fg-muted">{{ item.description }}</p>
-      </div>
-      <!-- Item 4: span 2 cols -->
-      <div class="rounded-xl border border-bone bg-cream p-4" style="grid-column: span 2;">
-        <p class="font-semibold text-sm text-fg">{{ bentoGrid.items[3].title }}</p>
-        <p class="mt-1 text-xs text-fg-muted">{{ bentoGrid.items[3].description }}</p>
-      </div>
-      <!-- Items 5-6 -->
-      <div v-for="item in bentoGrid.items.slice(4)" :key="item.title"
-        class="rounded-xl border border-bone bg-cream p-4">
-        <p class="font-semibold text-sm text-fg">{{ item.title }}</p>
-        <p class="mt-1 text-xs text-fg-muted">{{ item.description }}</p>
-      </div>
-    </div>
-  </section>
+  <HomeBentoGridSection :bento-grid="bentoGrid" />
 
   <!-- Section: Pull quote -->
   <section class="py-14 text-center">

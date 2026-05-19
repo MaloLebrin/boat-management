@@ -196,17 +196,17 @@
       "bento_grid": {
         "title": "Everything you need to run your fleet",
         "item1_title": "Marina view",
-        "item1_description": "Your pontoons, your boats, their status at a glance.",
+        "item1_description": "Your pontoons at a glance — boat status, last inspection, upcoming tasks.",
         "item2_title": "Calendar + Kanban",
-        "item2_description": "Switch between views",
+        "item2_description": "Drag, drop, done. Switch between timeline and board view in one click.",
         "item3_title": "Mobile on the pontoon",
-        "item3_description": "Quick entry in boots",
-        "item4_title": "Documents & insurance",
-        "item4_description": "Everything in one place, AI classifies automatically",
-        "item5_title": "Multi-organization",
-        "item5_description": "Fleet-level compartmentalization",
-        "item6_title": "PDF export",
-        "item6_description": "For resale, insurance"
+        "item3_description": "Log a check from the pontoon. No office, no paper, no delay.",
+        "item4_title": "Documents & AI",
+        "item4_description": "Upload once — FleetAi auto-classifies certificates, manuals and insurance.",
+        "item5_title": "Multi-fleet",
+        "item5_description": "One account, multiple fleets. Strict data isolation per organization.",
+        "item6_title": "PDF reports",
+        "item6_description": "One-click export for audits, insurance renewals and regulatory checks."
       },
       "pull_quote": {
         "quote": "We used to manage 14 boats in a spreadsheet. Now we manage 22 without hiring anyone.",

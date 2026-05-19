@@ -196,17 +196,17 @@
       "bento_grid": {
         "title": "Tout ce dont tu as besoin pour piloter ta flotte",
         "item1_title": "Vue marina",
-        "item1_description": "Tes pontons, tes bateaux, leur état en un coup d'œil.",
+        "item1_description": "Tes pontons en un coup d'œil — état des bateaux, dernier contrôle, prochaines tâches.",
         "item2_title": "Calendrier + Kanban",
-        "item2_description": "Bascule entre les vues",
+        "item2_description": "Glisse, dépose, c'est fait. Bascule entre timeline et tableau en un clic.",
         "item3_title": "Mobile sur le ponton",
-        "item3_description": "Saisie rapide en bottes",
-        "item4_title": "Documents & assurances",
-        "item4_description": "Tout au même endroit, l'IA classe automatiquement",
-        "item5_title": "Multi-organisation",
-        "item5_description": "Cloisonnement par flotte",
-        "item6_title": "Export PDF",
-        "item6_description": "Pour la revente, l'assurance"
+        "item3_description": "Saisie depuis le ponton. Sans bureau, sans papier, sans délai.",
+        "item4_title": "Documents & IA",
+        "item4_description": "Importe une fois — FleetAi classe automatiquement certificats, manuels et assurances.",
+        "item5_title": "Multi-flotte",
+        "item5_description": "Un compte, plusieurs flottes. Cloisonnement strict des données par organisation.",
+        "item6_title": "Rapports PDF",
+        "item6_description": "Export en un clic pour audits, renouvellements d'assurance et contrôles réglementaires."
       },
       "pull_quote": {
         "quote": "On gérait 14 bateaux dans un Excel. Maintenant on en gère 22 sans embaucher.",
