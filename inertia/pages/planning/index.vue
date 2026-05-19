@@ -32,14 +32,14 @@ type ViewMode = 'kanban' | 'calendar'
 const viewMode = ref<ViewMode>('kanban')
 
 const today = new Date()
-const currentYear = today.getFullYear()
-const currentMonth = today.getMonth()
+const currentYear = ref(today.getFullYear())
+const currentMonth = ref(today.getMonth())
 
-// TODO: add month navigation — make currentYear/currentMonth reactive refs and add prev/next buttons
+// TODO: add month navigation — add prev/next buttons that mutate currentYear/currentMonth
 // TODO: load done tasks from backend and show them in the "Complétées" kanban column
 
 const monthLabel = computed(() =>
-  new Date(currentYear, currentMonth).toLocaleDateString(locale.value, { month: 'long', year: 'numeric' })
+  new Date(currentYear.value, currentMonth.value).toLocaleDateString(locale.value, { month: 'long', year: 'numeric' })
 )
 
 const weekdays = computed(() => {
@@ -51,16 +51,16 @@ const weekdays = computed(() => {
   })
 })
 
-const daysInMonth = computed(() => new Date(currentYear, currentMonth + 1, 0).getDate())
+const daysInMonth = computed(() => new Date(currentYear.value, currentMonth.value + 1, 0).getDate())
 const firstWeekday = computed(() => {
-  const d = new Date(currentYear, currentMonth, 1).getDay()
+  const d = new Date(currentYear.value, currentMonth.value, 1).getDay()
   return d === 0 ? 6 : d - 1
 })
 
 const calendarDays = computed(() => {
   const days: Array<{ day: number; tasks: PlanningTask[] }> = []
   for (let d = 1; d <= daysInMonth.value; d++) {
-    const iso = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`
+    const iso = `${currentYear.value}-${String(currentMonth.value + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`
     days.push({
       day: d,
       tasks: props.tasks.filter((t) => t.dueAt === iso),

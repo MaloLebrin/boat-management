@@ -20,6 +20,7 @@ const page = usePage<SharedProps>()
 const locale = computed<'en' | 'fr'>(() => props.locale ?? page.props.locale ?? 'en')
 const { t } = useT()
 const path = computed(() => props.path ?? page.props.path ?? '')
+const copyrightYear = new Date().getFullYear()
 const isAuthed = computed(() => Boolean(page.props.user))
 
 const otherHref = computed(() => {
@@ -146,7 +147,7 @@ const otherHref = computed(() => {
 
       <div class="border-t border-bone">
         <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 text-xs font-medium text-fg-subtle">
-          <span>© {{ new Date().getFullYear() }} FleetAi</span>
+          <span>© {{ copyrightYear }} FleetAi</span>
           <span>{{ t('public.footer.bilingual') }}</span>
         </div>
       </div>
