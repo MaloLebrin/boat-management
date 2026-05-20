@@ -1,3 +1,4 @@
+import { MediaNotFoundError } from '#exceptions/media_errors'
 import type { MultipartFile } from '@adonisjs/core/bodyparser'
 import db from '@adonisjs/lucid/services/db'
 import type { MediaEntityType, MediaKind } from '#shared/constants/media'
@@ -5,9 +6,7 @@ import Media from '#models/media'
 import type User from '#models/user'
 import { CloudinaryService } from '#services/cloudinary_service'
 
-export class MediaNotFoundError extends Error {
-  name = 'MediaNotFoundError'
-}
+export { MediaNotFoundError }
 
 export type UploadMediaPayload = {
   folder: string

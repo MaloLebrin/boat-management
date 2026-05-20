@@ -1,3 +1,7 @@
+import {
+  BoatMaintenanceSheetItemNotFoundError,
+  BoatMaintenanceSheetNotFoundError,
+} from '#exceptions/maintenance_errors'
 import BoatMaintenanceSheet from '#models/boat_maintenance_sheet'
 import BoatMaintenanceSheetItem from '#models/boat_maintenance_sheet_item'
 import BoatMaintenanceSheetTemplateService from '#services/boat_maintenance_sheet_template_service'
@@ -6,17 +10,11 @@ import type Boat from '#models/boat'
 import type User from '#models/user'
 import { DateTime } from 'luxon'
 
+export { BoatMaintenanceSheetItemNotFoundError, BoatMaintenanceSheetNotFoundError }
+
 function toDateTime(value: Date | DateTime): DateTime {
   if (DateTime.isDateTime(value)) return value
   return DateTime.fromJSDate(value)
-}
-
-export class BoatMaintenanceSheetNotFoundError extends Error {
-  name = 'BoatMaintenanceSheetNotFoundError'
-}
-
-export class BoatMaintenanceSheetItemNotFoundError extends Error {
-  name = 'BoatMaintenanceSheetItemNotFoundError'
 }
 
 function assertBoatScope(user: User, boat: Boat) {

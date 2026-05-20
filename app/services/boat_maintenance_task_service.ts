@@ -1,21 +1,13 @@
+import {
+  BoatMaintenanceTaskNotFoundError,
+  BoatMaintenanceTaskValidationError,
+} from '#exceptions/maintenance_errors'
 import BoatMaintenanceTask from '#models/boat_maintenance_task'
 import type Boat from '#models/boat'
 import type User from '#models/user'
 import { DateTime } from 'luxon'
 
-export class BoatMaintenanceTaskNotFoundError extends Error {
-  name = 'BoatMaintenanceTaskNotFoundError'
-}
-
-export class BoatMaintenanceTaskValidationError extends Error {
-  name = 'BoatMaintenanceTaskValidationError'
-  constructor(
-    message: string,
-    readonly errorCode: string
-  ) {
-    super(message)
-  }
-}
+export { BoatMaintenanceTaskNotFoundError, BoatMaintenanceTaskValidationError }
 
 export type MaintenanceTaskSubject = 'boat' | 'engine' | 'sail' | 'rig'
 

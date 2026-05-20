@@ -1,3 +1,4 @@
+import { BoatEquipmentNotFoundError, BoatNotFoundError } from '#exceptions/boat_errors'
 import Boat from '#models/boat'
 import BoatEngine from '#models/boat_engine'
 import BoatRig from '#models/boat_rig'
@@ -5,13 +6,7 @@ import BoatSail from '#models/boat_sail'
 import type User from '#models/user'
 import { DateTime } from 'luxon'
 
-export class BoatNotFoundError extends Error {
-  name = 'BoatNotFoundError'
-}
-
-export class BoatEquipmentNotFoundError extends Error {
-  name = 'BoatEquipmentNotFoundError'
-}
+export { BoatEquipmentNotFoundError, BoatNotFoundError }
 
 function toDateOrNull(value: Date | string | DateTime | null | undefined): DateTime | null {
   if (value === null || value === undefined) return null

@@ -63,7 +63,7 @@ Généré le 2026-05-20. Se référer à ce fichier pour suivre l'avancement des
   - Concerne ~95 % des controllers : `boats_controller.ts`, `ai_controller.ts`, `ports_controller.ts`, `boat_maintenances_controller.ts`, `boat_maintenance_tasks_controller.ts`, `boat_maintenance_sheets_controller.ts`, `boat_equipment_controller.ts`, `boat_media_controller.ts`, `mouillages_controller.ts`, `pontoons_controller.ts`, `new_account_controller.ts`, `password_reset_controller.ts`
   - Fix : ajouter `@inject()` + déclarer chaque service en constructeur (modèle : `BoatsController` pour `BoatService`)
 
-- [ ] **REF-P1-2 — Classes d'erreur dans les services au lieu de `app/exceptions/`**
+- [x] **REF-P1-2 — Classes d'erreur dans les services au lieu de `app/exceptions/`**
   - `app/services/boat_service.ts` → `BoatNotFoundError`, `BoatEquipmentNotFoundError`
   - `app/services/boat_maintenance_service.ts` → `BoatMaintenanceNotFoundError`, `BoatMaintenanceValidationError`
   - `app/services/boat_maintenance_task_service.ts` → `BoatMaintenanceTaskNotFoundError`, `BoatMaintenanceTaskValidationError`

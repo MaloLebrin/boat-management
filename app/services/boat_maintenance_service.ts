@@ -1,3 +1,7 @@
+import {
+  BoatMaintenanceNotFoundError,
+  BoatMaintenanceValidationError,
+} from '#exceptions/maintenance_errors'
 import type Boat from '#models/boat'
 import BoatEngine from '#models/boat_engine'
 import BoatMaintenanceEvent from '#models/boat_maintenance_event'
@@ -8,19 +12,7 @@ import type User from '#models/user'
 import db from '@adonisjs/lucid/services/db'
 import { DateTime } from 'luxon'
 
-export class BoatMaintenanceNotFoundError extends Error {
-  name = 'BoatMaintenanceNotFoundError'
-}
-
-export class BoatMaintenanceValidationError extends Error {
-  name = 'BoatMaintenanceValidationError'
-  constructor(
-    message: string,
-    readonly errorCode: string
-  ) {
-    super(message)
-  }
-}
+export { BoatMaintenanceNotFoundError, BoatMaintenanceValidationError }
 
 function toDateTime(value: Date | string | DateTime): DateTime {
   if (DateTime.isDateTime(value)) return value
