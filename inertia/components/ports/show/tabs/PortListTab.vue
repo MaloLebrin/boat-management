@@ -32,9 +32,9 @@ function handleEditPontoon(pontoon: PontoonRow) {
   showPontoonForm.value = true
 }
 
-function handleCloseForm() {
-  showPontoonForm.value = false
-  editingPontoon.value = null
+function handlePontoonModalOpen(open: boolean) {
+  showPontoonForm.value = open
+  if (!open) editingPontoon.value = null
 }
 
 function handleAddMouillage() {
@@ -47,9 +47,9 @@ function handleEditMouillage(mouillage: MouillageRow) {
   showMouillageForm.value = true
 }
 
-function handleCloseMouillageForm() {
-  showMouillageForm.value = false
-  editingMouillage.value = null
+function handleMouillageModalOpen(open: boolean) {
+  showMouillageForm.value = open
+  if (!open) editingMouillage.value = null
 }
 </script>
 
@@ -82,16 +82,8 @@ function handleCloseMouillageForm() {
         </BaseButton>
       </div>
 
-      <!-- Pontoon form -->
-      <PontoonFormModal
-        v-if="showPontoonForm"
-        :port-id="port.id"
-        :pontoon="editingPontoon"
-        @close="handleCloseForm"
-      />
-
       <!-- Empty state -->
-      <BaseCard v-if="port.pontoons.length === 0 && !showPontoonForm" padded>
+      <BaseCard v-if="port.pontoons.length === 0" padded>
         <p class="text-center text-sm text-fg-muted py-4">
           {{ t('ports.pontoons.empty') }}
         </p>
@@ -118,16 +110,8 @@ function handleCloseMouillageForm() {
           </BaseButton>
         </div>
 
-        <!-- Mouillage form -->
-        <MouillageFormModal
-          v-if="showMouillageForm"
-          :port-id="port.id"
-          :mouillage="editingMouillage"
-          @close="handleCloseMouillageForm"
-        />
-
         <!-- Empty state -->
-        <BaseCard v-if="port.mouillages.length === 0 && !showMouillageForm" padded>
+        <BaseCard v-if="port.mouillages.length === 0" padded>
           <p class="text-center text-sm text-fg-muted py-4">
             {{ t('ports.mouillages.empty') }}
           </p>
@@ -146,4 +130,18 @@ function handleCloseMouillageForm() {
       </div>
     </div>
   </div>
+
+  <!-- Modals -->
+  <PontoonFormModal
+    :open="showPontoonForm"
+    :port-id="port.id"
+    :pontoon="editingPontoon"
+    @update:open="handlePontoonModalOpen"
+  />
+  <MouillageFormModal
+    :open="showMouillageForm"
+    :port-id="port.id"
+    :mouillage="editingMouillage"
+    @update:open="handleMouillageModalOpen"
+  />
 </template>

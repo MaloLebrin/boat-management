@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
 import { router } from '@inertiajs/vue3'
+import { PlusIcon } from '@heroicons/vue/24/outline'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BoatAssignModal from '~/components/ports/modals/BoatAssignModal.vue'
+import MouillageFormModal from '~/components/ports/modals/MouillageFormModal.vue'
+import PontoonFormModal from '~/components/ports/modals/PontoonFormModal.vue'
 import MarinaCanvas from '~/components/ports/show/MarinaCanvas.vue'
 import { useT } from '~/composables/useT'
 import type { PortShowDetail, PontoonRow, MouillageRow } from '~/types/port'
@@ -24,6 +27,8 @@ const localMouillages = ref<LocalMouillage[]>([])
 const selectedBoat = ref<{ id: number; name: string } | null>(null)
 const assignTarget = ref<AssignTarget | null>(null)
 const assignModalOpen = ref(false)
+const showPontoonForm = ref(false)
+const showMouillageForm = ref(false)
 
 onMounted(() => {
   localPontoons.value = props.port.pontoons.map((pt, i) => ({
@@ -45,10 +50,33 @@ watch(
       const updated = newPort.pontoons.find((p) => p.id === lp.id)
       return updated ? { ...lp, boats: updated.boats } : lp
     })
+    const existingPIds = new Set(localPontoons.value.map((lp) => lp.id))
+    newPort.pontoons
+      .filter((p) => !existingPIds.has(p.id))
+      .forEach((pt, i) => {
+        const idx = localPontoons.value.length + i
+        localPontoons.value.push({
+          ...pt,
+          x: pt.positionX ?? 80 + (idx % 3) * 300,
+          y: pt.positionY ?? 80 + Math.floor(idx / 3) * 200,
+        })
+      })
+
     localMouillages.value = localMouillages.value.map((lm) => {
       const updated = newPort.mouillages.find((m) => m.id === lm.id)
       return updated ? { ...lm, boats: updated.boats } : lm
     })
+    const existingMIds = new Set(localMouillages.value.map((lm) => lm.id))
+    newPort.mouillages
+      .filter((m) => !existingMIds.has(m.id))
+      .forEach((m, i) => {
+        const idx = localMouillages.value.length + i
+        localMouillages.value.push({
+          ...m,
+          x: m.positionX ?? 80 + (idx % 3) * 300,
+          y: m.positionY ?? 80 + Math.floor(idx / 3) * 200,
+        })
+      })
   },
   { deep: true }
 )
@@ -131,8 +159,17 @@ function handleCloseAssignModal(v: boolean) {
 <template>
   <div class="space-y-4">
     <!-- Toolbar -->
-    <div class="flex items-center justify-between">
-      <p class="text-sm text-fg-muted">{{ t('ports.plan.hint') }}</p>
+    <div class="flex items-center justify-between gap-3 flex-wrap">
+      <div class="flex items-center gap-2">
+        <BaseButton size="sm" variant="secondary" @click="showPontoonForm = !showPontoonForm">
+          <PlusIcon class="h-4 w-4" />
+          {{ t('ports.pontoons.add') }}
+        </BaseButton>
+        <BaseButton size="sm" variant="secondary" @click="showMouillageForm = !showMouillageForm">
+          <PlusIcon class="h-4 w-4" />
+          {{ t('ports.mouillages.add') }}
+        </BaseButton>
+      </div>
       <BaseButton
         :variant="editMode ? 'primary' : 'secondary'"
         size="sm"
@@ -141,6 +178,24 @@ function handleCloseAssignModal(v: boolean) {
         {{ editMode ? t('ports.plan.viewOnly') : t('ports.plan.editLayout') }}
       </BaseButton>
     </div>
+
+    <!-- Add modals -->
+    <PontoonFormModal
+      :open="showPontoonForm"
+      :port-id="port.id"
+      @update:open="showPontoonForm = $event"
+    />
+    <MouillageFormModal
+      :open="showMouillageForm"
+      :port-id="port.id"
+      @update:open="showMouillageForm = $event"
+    />
+
+    <!-- Hint / selected boat indicator -->
+    <p v-if="selectedBoat" class="text-sm text-brand font-medium">
+      {{ t('ports.plan.boatSelected', { name: selectedBoat.name }) }}
+    </p>
+    <p v-else class="text-sm text-fg-muted">{{ t('ports.plan.hint') }}</p>
 
     <!-- Empty state -->
     <BaseCard v-if="localPontoons.length === 0 && localMouillages.length === 0" padded>
@@ -162,11 +217,6 @@ function handleCloseAssignModal(v: boolean) {
         @canvas-click="handleCanvasClick"
       />
     </div>
-
-    <!-- Selected boat indicator -->
-    <p v-if="selectedBoat" class="text-sm text-brand font-medium">
-      {{ t('ports.plan.boatSelected', { name: selectedBoat.name }) }}
-    </p>
 
     <!-- Boat assign modal -->
     <BoatAssignModal
