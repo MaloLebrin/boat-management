@@ -1,18 +1,15 @@
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue'
-import { router } from '@inertiajs/vue3'
+import { ref, watch, onMounted, computed } from 'vue'
 import { PlusIcon, QuestionMarkCircleIcon } from '@heroicons/vue/24/outline'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
-import BaseModal from '~/components/base/BaseModal.vue'
+import MarinaCanvas from '~/components/ports/show/MarinaCanvas.vue'
+import MarinaHelpModal from '~/components/ports/modals/MarinaHelpModal.vue'
 import MouillageFormModal from '~/components/ports/modals/MouillageFormModal.vue'
 import PontoonFormModal from '~/components/ports/modals/PontoonFormModal.vue'
-import MarinaCanvas from '~/components/ports/show/MarinaCanvas.vue'
+import { useMarinaInteractions, type LocalPontoon, type LocalMouillage } from '~/composables/useMarinaInteractions'
 import { useT } from '~/composables/useT'
-import type { PortShowDetail, PontoonRow, MouillageRow } from '~/types/port'
-
-type LocalPontoon = PontoonRow & { x: number; y: number }
-type LocalMouillage = MouillageRow & { x: number; y: number }
+import type { PortShowDetail } from '~/types/port'
 
 const props = defineProps<{
   port: PortShowDetail
@@ -23,10 +20,13 @@ const { t } = useT()
 const editMode = ref(false)
 const localPontoons = ref<LocalPontoon[]>([])
 const localMouillages = ref<LocalMouillage[]>([])
-const selectedBoat = ref<{ id: number; name: string } | null>(null)
 const showPontoonForm = ref(false)
 const showMouillageForm = ref(false)
 const showHelp = ref(false)
+
+const portId = computed(() => props.port.id)
+const { selectedBoat, handlePontoonDragEnd, handleMouillageDragEnd, handleCanvasClick, handleSpotClick } =
+  useMarinaInteractions(portId, localPontoons, localMouillages)
 
 onMounted(() => {
   localPontoons.value = props.port.pontoons.map((pt, i) => ({
@@ -78,62 +78,6 @@ watch(
   },
   { deep: true }
 )
-
-function patchPosition(url: string, body: { x: number; y: number }) {
-  router.patch(url, body, { preserveScroll: true })
-}
-
-function patchAssignment(url: string, spotId: number) {
-  router.patch(
-    url,
-    { spotId },
-    {
-      preserveScroll: true,
-      only: ['port'],
-      onSuccess: () => {
-        selectedBoat.value = null
-      },
-    }
-  )
-}
-
-function handlePontoonDragEnd(pontoonId: number, x: number, y: number) {
-  const pt = localPontoons.value.find((p) => p.id === pontoonId)
-  if (!pt) return
-  pt.x = x
-  pt.y = y
-  patchPosition(`/ports/${props.port.id}/pontoons/${pontoonId}/position`, { x, y })
-}
-
-function handleMouillageDragEnd(mouillageId: number, x: number, y: number) {
-  const m = localMouillages.value.find((mo) => mo.id === mouillageId)
-  if (!m) return
-  m.x = x
-  m.y = y
-  patchPosition(`/ports/${props.port.id}/mouillages/${mouillageId}/position`, { x, y })
-}
-
-function handleCanvasClick() {
-  selectedBoat.value = null
-}
-
-function handleSpotClick(info: { spotId: number; boat: { id: number; name: string } | null }) {
-  if (info.boat && selectedBoat.value?.id === info.boat.id) {
-    selectedBoat.value = null
-    return
-  }
-  if (info.boat && !selectedBoat.value) {
-    selectedBoat.value = info.boat
-    return
-  }
-  if (!info.boat && selectedBoat.value) {
-    patchAssignment(`/boats/${selectedBoat.value.id}/assignment`, info.spotId)
-    return
-  }
-  if (info.boat && selectedBoat.value && info.boat.id !== selectedBoat.value.id) {
-    patchAssignment(`/boats/${selectedBoat.value.id}/assignment`, info.spotId)
-  }
-}
 </script>
 
 <template>
@@ -174,32 +118,7 @@ function handleSpotClick(info: { spotId: number; boat: { id: number; name: strin
       </div>
     </div>
 
-    <!-- Help modal -->
-    <BaseModal
-      :open="showHelp"
-      :title="t('ports.plan.help.title')"
-      size="md"
-      @update:open="showHelp = $event"
-    >
-      <ol class="space-y-4">
-        <li class="flex items-start gap-3">
-          <span class="text-xl leading-none mt-0.5">⛵</span>
-          <span class="text-sm text-fg-muted">{{ t('ports.plan.help.select') }}</span>
-        </li>
-        <li class="flex items-start gap-3">
-          <span class="text-xl leading-none mt-0.5">📍</span>
-          <span class="text-sm text-fg-muted">{{ t('ports.plan.help.assign') }}</span>
-        </li>
-        <li class="flex items-start gap-3">
-          <span class="text-xl leading-none mt-0.5">🖱️</span>
-          <span class="text-sm text-fg-muted">{{ t('ports.plan.help.deselect') }}</span>
-        </li>
-        <li class="flex items-start gap-3">
-          <span class="text-xl leading-none mt-0.5">✋</span>
-          <span class="text-sm text-fg-muted">{{ t('ports.plan.help.move') }}</span>
-        </li>
-      </ol>
-    </BaseModal>
+    <MarinaHelpModal :open="showHelp" @update:open="showHelp = $event" />
 
     <!-- Add modals -->
     <PontoonFormModal

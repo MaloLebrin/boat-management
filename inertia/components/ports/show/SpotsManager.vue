@@ -6,6 +6,7 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseConfirmModal from '~/components/base/BaseConfirmModal.vue'
 import SpotFormModal from '~/components/ports/modals/SpotFormModal.vue'
 import { useT } from '~/composables/useT'
+import { routes } from '~/utils/routes'
 import type { SpotRow } from '~/types/port'
 
 const props = defineProps<{
@@ -39,7 +40,7 @@ function handleDeleteSpot(spot: SpotRow) {
 
 function confirmDeleteSpot() {
   if (!spotToDelete.value) return
-  router.delete(`/spots/${spotToDelete.value.id}`)
+  router.delete(routes.spots.destroy(spotToDelete.value.id))
   spotToDelete.value = null
 }
 
