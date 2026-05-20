@@ -76,40 +76,14 @@ function handleSpotClick(spot: SpotRow) {
       style="cursor: pointer"
       @click.stop="handleSpotClick(spot)"
     >
-      <!-- Boat hull shape (if occupied) -->
-      <path
-        v-if="spot.boat"
-        d="M 22 2 C 40 2, 42 18, 42 32 C 42 48, 36 57, 28 59 L 16 59 C 8 57, 2 48, 2 32 C 2 18, 4 2, 22 2 Z"
-        :fill="getSpotFill(spot)"
-        :stroke="getSpotStroke(spot)"
-        stroke-width="1.5"
-      />
-      <!-- Empty spot rect -->
       <rect
-        v-else
         :width="SLOT_W"
         :height="SLOT_H"
         rx="3"
-        fill="none"
-        stroke="#5D4037"
-        stroke-dasharray="4 3"
+        :fill="getSpotFill(spot)"
+        :stroke="getSpotStroke(spot)"
+        :stroke-dasharray="spot.boat ? 'none' : '4 3'"
         stroke-width="1.5"
-      />
-      <!-- Mast line (if occupied) -->
-      <line
-        v-if="spot.boat"
-        x1="22" y1="10" x2="22" y2="52"
-        stroke="rgba(255,255,255,0.2)"
-        stroke-width="1"
-        pointer-events="none"
-      />
-      <!-- Boom (if occupied) -->
-      <line
-        v-if="spot.boat"
-        x1="12" y1="30" x2="32" y2="30"
-        stroke="rgba(255,255,255,0.2)"
-        stroke-width="1"
-        pointer-events="none"
       />
       <!-- Spot name -->
       <text
@@ -126,9 +100,9 @@ function handleSpotClick(spot: SpotRow) {
       <!-- Divider (only if occupied) -->
       <line
         v-if="spot.boat"
-        :x1="8"
+        :x1="6"
         :y1="24"
-        :x2="SLOT_W - 8"
+        :x2="SLOT_W - 6"
         y2="24"
         stroke="rgba(255,255,255,0.3)"
         stroke-width="1"
@@ -137,10 +111,10 @@ function handleSpotClick(spot: SpotRow) {
       <text
         v-if="spot.boat"
         :x="SLOT_W / 2"
-        y="44"
+        y="38"
         text-anchor="middle"
         font-size="8"
-        fill="rgba(255,255,255,0.9)"
+        fill="rgba(255,255,255,0.85)"
         pointer-events="none"
       >
         {{ spot.boat.name.slice(0, 6) }}
