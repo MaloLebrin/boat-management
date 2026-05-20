@@ -15,7 +15,7 @@ Généré le 2026-05-20. Se référer à ce fichier pour suivre l'avancement des
   - Risque : header splitting via `\r\n` dans le nom de fichier
   - Fix : `encodeURIComponent()` + filtrage des caractères de contrôle, ou syntaxe RFC 5987 (`filename*=UTF-8''...`)
 
-- [ ] **SEC-H2 — Login sans validation VineJS** `app/controllers/session_controller.ts:9`
+- [x] **SEC-H2 — Login sans validation VineJS** `app/controllers/session_controller.ts:9`
   - `request.all()` brut sans contrainte de longueur ou de format sur email/password
   - Fix : créer un `loginValidator` (`vine.string().email().maxLength(254)` + `vine.string().minLength(1).maxLength(255)`)
 
