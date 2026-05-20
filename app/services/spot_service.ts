@@ -2,11 +2,7 @@ import Spot from '#models/spot'
 import type Mouillage from '#models/mouillage'
 import type Pontoon from '#models/pontoon'
 import type Port from '#models/port'
-
-export type SpotPayload = {
-  name: string
-  description?: string | null
-}
+import type { SpotPayload } from '#shared/types/spot'
 
 export default class SpotService {
   async createForPontoon(pontoon: Pontoon, port: Port, payload: SpotPayload) {
