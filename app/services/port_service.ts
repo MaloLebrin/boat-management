@@ -100,7 +100,7 @@ export default class PortService {
         mouillageCount: Number(p.$extras['mouillages_count'] ?? 0),
         boatCount,
         totalSpots,
-        freeSpots: totalSpots - boatCount,
+        freeSpots: Math.max(0, totalSpots - boatCount),
       }
     })
   }
