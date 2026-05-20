@@ -1,6 +1,6 @@
 import vine from '@vinejs/vine'
 
-export const storeBoatPhotoValidator = vine.compile(
+export const storeBoatPhotoValidator = vine.create(
   vine.object({
     file: vine.file({
       size: '10mb',
@@ -10,7 +10,7 @@ export const storeBoatPhotoValidator = vine.compile(
   })
 )
 
-export const storeBoatDocumentValidator = vine.compile(
+export const storeBoatDocumentValidator = vine.create(
   vine.object({
     file: vine.file({
       size: '20mb',

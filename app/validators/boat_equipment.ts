@@ -31,9 +31,9 @@ const enginePayload = vine.object({
   status: vine.enum(equipmentStatuses).optional(),
 })
 
-export const storeBoatEngineValidator = vine.compile(enginePayload)
+export const storeBoatEngineValidator = vine.create(enginePayload)
 
-export const updateBoatEngineValidator = vine.compile(enginePayload)
+export const updateBoatEngineValidator = vine.create(enginePayload)
 
 export type BoatEngineFormBody = {
   kind: string
@@ -59,9 +59,9 @@ const sailPayload = vine.object({
   notes: vine.string().trim().maxLength(5000).optional(),
 })
 
-export const storeBoatSailValidator = vine.compile(sailPayload)
+export const storeBoatSailValidator = vine.create(sailPayload)
 
-export const updateBoatSailValidator = vine.compile(sailPayload)
+export const updateBoatSailValidator = vine.create(sailPayload)
 
 export type BoatSailFormBody = {
   sailType: string
@@ -82,13 +82,13 @@ const rigPayload = vine.object({
   notes: vine.string().trim().maxLength(5000).optional(),
 })
 
-export const upsertBoatRigValidator = vine.compile(rigPayload)
+export const upsertBoatRigValidator = vine.create(rigPayload)
 
-export const updateEquipmentStatusValidator = vine.compile(
+export const updateEquipmentStatusValidator = vine.create(
   vine.object({ status: vine.enum(equipmentStatuses) })
 )
 
-export const updateEquipmentNotesValidator = vine.compile(
+export const updateEquipmentNotesValidator = vine.create(
   vine.object({ notes: vine.string().trim().maxLength(5000).optional().nullable() })
 )
 

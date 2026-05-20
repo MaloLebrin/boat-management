@@ -75,7 +75,7 @@ export const createBoatValidator = vine.create({
 })
 
 /** Same hull-only schema as creation (no nested engines / sails / rig). */
-export const updateBoatValidator = vine.compile(
+export const updateBoatValidator = vine.create(
   vine.object({
     name: vine.string().trim().minLength(2).maxLength(120),
     registrationNumber: vine.string().trim().maxLength(64).nullable().optional(),

@@ -1,6 +1,6 @@
 import vine from '@vinejs/vine'
 
-export const createEnginePartValidator = vine.compile(
+export const createEnginePartValidator = vine.create(
   vine.object({
     designation: vine.string().trim().minLength(1).maxLength(200),
     reference: vine.string().trim().maxLength(100).nullable().optional(),
@@ -19,7 +19,7 @@ export const createEnginePartValidator = vine.compile(
   })
 )
 
-export const updateEnginePartValidator = vine.compile(
+export const updateEnginePartValidator = vine.create(
   vine.object({
     designation: vine.string().trim().minLength(1).maxLength(200),
     reference: vine.string().trim().maxLength(100).nullable().optional(),

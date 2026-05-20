@@ -28,7 +28,7 @@ function optionalNonNegativeIntFromForm() {
     })
 }
 
-export const createBoatMaintenanceTaskValidator = vine.compile(
+export const createBoatMaintenanceTaskValidator = vine.create(
   vine.object({
     subject: vine.string().in(subjectChoices),
     boatEngineId: optionalIdFromForm(),
@@ -48,7 +48,7 @@ export const createBoatMaintenanceTaskValidator = vine.compile(
   })
 )
 
-export const markBoatMaintenanceTaskDoneValidator = vine.compile(
+export const markBoatMaintenanceTaskDoneValidator = vine.create(
   vine.object({
     doneAt: vine
       .date()
