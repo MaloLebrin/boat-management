@@ -77,11 +77,12 @@ function formatDate(iso: string | null): string {
 }
 
 const currentPositionLabel = computed(() => {
-  if (props.boat.pontoon) {
-    const parts = [props.boat.pontoon.portName, props.boat.pontoon.name]
-    if (props.boat.spotIdentifier) {
-      parts.push(`#${props.boat.spotIdentifier}`)
-    }
+  if (props.boat.spot) {
+    const parts: string[] = []
+    if (props.boat.spot.portName) parts.push(props.boat.spot.portName)
+    if (props.boat.spot.pontoonName) parts.push(props.boat.spot.pontoonName)
+    if (props.boat.spot.mouillageNom) parts.push(props.boat.spot.mouillageNom)
+    parts.push(props.boat.spot.name)
     return parts.join(' / ')
   }
   return props.boat.homePort ?? null

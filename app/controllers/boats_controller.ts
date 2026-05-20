@@ -1,17 +1,17 @@
+import Boat from '#models/boat'
+import BoatPositionHistory from '#models/boat_position_history'
+import Port from '#models/port'
+import Spot from '#models/spot'
 import AiAnalysisService, { type AiSuggestion } from '#services/ai_analysis_service'
+import BoatListService from '#services/boat_list_service'
 import BoatMaintenanceService from '#services/boat_maintenance_service'
 import BoatMaintenanceSheetService from '#services/boat_maintenance_sheet_service'
 import BoatMaintenanceTaskService from '#services/boat_maintenance_task_service'
-import BoatListService from '#services/boat_list_service'
 import BoatService, { BoatNotFoundError } from '#services/boat_service'
 import MediaService from '#services/media_service'
 import { createBoatValidator, updateBoatValidator } from '#validators/boat'
 import { assignBoatValidator } from '#validators/marina_layout'
 import type { HttpContext } from '@adonisjs/core/http'
-import Boat from '#models/boat'
-import BoatPositionHistory from '#models/boat_position_history'
-import Port from '#models/port'
-import Spot from '#models/spot'
 
 export default class BoatsController {
   async index({ inertia, auth, request }: HttpContext) {
@@ -35,18 +35,30 @@ export default class BoatsController {
     const ports =
       user.organizationId !== null
         ? await Port.query()
-            .where('organizationId', user.organizationId)
-            .preload('pontoons', (q) => q.orderBy('name', 'asc'))
-            .preload('mouillages', (q) => q.orderBy('name', 'asc'))
-            .orderBy('name', 'asc')
+          .where('organizationId', user.organizationId)
+          .preload('pontoons', (q) =>
+            q.orderBy('name', 'asc').preload('spots', (sq) => sq.orderBy('name', 'asc'))
+          )
+          .preload('mouillages', (q) =>
+            q.orderBy('name', 'asc').preload('spots', (sq) => sq.orderBy('name', 'asc'))
+          )
+          .orderBy('name', 'asc')
         : []
 
     return inertia.render('boats/new', {
       ports: ports.map((p) => ({
         id: p.id,
         name: p.name,
-        pontoons: p.pontoons.map((pt) => ({ id: pt.id, name: pt.name })),
-        mouillages: p.mouillages.map((m) => ({ id: m.id, name: m.name })),
+        pontoons: p.pontoons.map((pt) => ({
+          id: pt.id,
+          name: pt.name,
+          spots: pt.spots.map((s) => ({ id: s.id, name: s.name })),
+        })),
+        mouillages: p.mouillages.map((m) => ({
+          id: m.id,
+          name: m.name,
+          spots: m.spots.map((s) => ({ id: s.id, name: s.name })),
+        })),
       })),
     })
   }
@@ -86,14 +98,18 @@ export default class BoatsController {
 
       if (boat.spotId !== null) {
         await boat.load('spot', (q) =>
-          q.preload('pontoon', (pq) => pq.preload('port')).preload('mouillage', (mq) => mq.preload('port'))
+          q
+            .preload('pontoon', (pq) => pq.preload('port'))
+            .preload('mouillage', (mq) => mq.preload('port'))
         )
       }
 
       const positionHistory = await BoatPositionHistory.query()
         .where('boatId', boat.id)
         .preload('spot', (q) =>
-          q.preload('pontoon', (pq) => pq.preload('port')).preload('mouillage', (mq) => mq.preload('port'))
+          q
+            .preload('pontoon', (pq) => pq.preload('port'))
+            .preload('mouillage', (mq) => mq.preload('port'))
         )
         .orderBy('startedAt', 'desc')
         .limit(20)
@@ -127,14 +143,14 @@ export default class BoatsController {
           spotId: boat.spotId ?? null,
           spot: boat.spot
             ? {
-                id: boat.spot.id,
-                name: boat.spot.name,
-                pontoonId: boat.spot.pontoonId,
-                pontoonName: boat.spot.pontoon?.name ?? null,
-                mouillageId: boat.spot.mouillageId,
-                mouillageNom: boat.spot.mouillage?.name ?? null,
-                portName: boat.spot.pontoon?.port?.name ?? boat.spot.mouillage?.port?.name ?? null,
-              }
+              id: boat.spot.id,
+              name: boat.spot.name,
+              pontoonId: boat.spot.pontoonId,
+              pontoonName: boat.spot.pontoon?.name ?? null,
+              mouillageId: boat.spot.mouillageId,
+              mouillageNom: boat.spot.mouillage?.name ?? null,
+              portName: boat.spot.pontoon?.port?.name ?? boat.spot.mouillage?.port?.name ?? null,
+            }
             : null,
           positionHistory: positionHistory.map((h) => ({
             id: h.id,
@@ -169,15 +185,15 @@ export default class BoatsController {
           })),
           rig: boat.rig
             ? {
-                id: boat.rig.id,
-                rigType: boat.rig.rigType,
-                manufacturedAt: boat.rig.manufacturedAt
-                  ? boat.rig.manufacturedAt.toISODate()
-                  : null,
-                mastCount: boat.rig.mastCount,
-                spreaders: boat.rig.spreaders,
-                status: boat.rig.status,
-              }
+              id: boat.rig.id,
+              rigType: boat.rig.rigType,
+              manufacturedAt: boat.rig.manufacturedAt
+                ? boat.rig.manufacturedAt.toISODate()
+                : null,
+              mastCount: boat.rig.mastCount,
+              spreaders: boat.rig.spreaders,
+              status: boat.rig.status,
+            }
             : null,
           media: boatMedia.map((m) => ({
             id: m.id,
@@ -273,10 +289,14 @@ export default class BoatsController {
       const ports =
         user.organizationId !== null
           ? await Port.query()
-              .where('organizationId', user.organizationId)
-              .preload('pontoons', (q) => q.orderBy('name', 'asc'))
-              .preload('mouillages', (q) => q.orderBy('name', 'asc'))
-              .orderBy('name', 'asc')
+            .where('organizationId', user.organizationId)
+            .preload('pontoons', (q) =>
+              q.orderBy('name', 'asc').preload('spots', (sq) => sq.orderBy('name', 'asc'))
+            )
+            .preload('mouillages', (q) =>
+              q.orderBy('name', 'asc').preload('spots', (sq) => sq.orderBy('name', 'asc'))
+            )
+            .orderBy('name', 'asc')
           : []
 
       return inertia.render('boats/edit', {
@@ -306,8 +326,16 @@ export default class BoatsController {
         ports: ports.map((p) => ({
           id: p.id,
           name: p.name,
-          pontoons: p.pontoons.map((pt) => ({ id: pt.id, name: pt.name })),
-          mouillages: p.mouillages.map((m) => ({ id: m.id, name: m.name })),
+          pontoons: p.pontoons.map((pt) => ({
+            id: pt.id,
+            name: pt.name,
+            spots: pt.spots.map((s) => ({ id: s.id, name: s.name })),
+          })),
+          mouillages: p.mouillages.map((m) => ({
+            id: m.id,
+            name: m.name,
+            spots: m.spots.map((s) => ({ id: s.id, name: s.name })),
+          })),
         })),
       })
     } catch (error) {

@@ -161,18 +161,22 @@ const { t } = useT()
           <p class="text-sm font-semibold text-fg">{{ t('boats.show.position.title') }}</p>
         </template>
         <dl class="grid grid-cols-2 gap-4 text-sm">
-          <template v-if="boat.pontoon">
-            <div>
+          <template v-if="boat.spot">
+            <div v-if="boat.spot.portName">
               <dt class="text-fg-muted">{{ t('ports.title') }}</dt>
-              <dd class="font-semibold text-fg">{{ boat.pontoon.portName }}</dd>
+              <dd class="font-semibold text-fg">{{ boat.spot.portName }}</dd>
             </div>
-            <div>
+            <div v-if="boat.spot.pontoonName">
               <dt class="text-fg-muted">{{ t('boats.hullFields.pontoon') }}</dt>
-              <dd class="font-semibold text-fg">{{ boat.pontoon.name }}</dd>
+              <dd class="font-semibold text-fg">{{ boat.spot.pontoonName }}</dd>
+            </div>
+            <div v-if="boat.spot.mouillageNom">
+              <dt class="text-fg-muted">{{ t('boats.hullFields.mouillage') }}</dt>
+              <dd class="font-semibold text-fg">{{ boat.spot.mouillageNom }}</dd>
             </div>
             <div>
               <dt class="text-fg-muted">{{ t('boats.hullFields.spotIdentifier') }}</dt>
-              <dd class="font-semibold text-fg">{{ boat.spotIdentifier ?? '—' }}</dd>
+              <dd class="font-semibold text-fg">{{ boat.spot.name }}</dd>
             </div>
           </template>
           <template v-else>

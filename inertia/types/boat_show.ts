@@ -71,12 +71,11 @@ export type BoatShowRig = {
 
 export type BoatPositionHistoryRow = {
   id: number
-  pontoonId: number | null
+  spotId: number | null
+  spotName: string | null
   pontoonName: string | null
-  mouillageId: number | null
   mouillageNom: string | null
   portName: string | null
-  spotIdentifier: string | null
   startedAt: string
   endedAt: string | null
 }
@@ -101,11 +100,16 @@ export type BoatShowDetail = {
   francisationNumber: string | null
   flagCountry: string | null
   maxPersons: number | null
-  pontoonId: number | null
-  mouillageId: number | null
-  spotIdentifier: string | null
-  pontoon: { id: number; name: string; portId: number; portName: string } | null
-  mouillage: { id: number; name: string; portId: number; portName: string } | null
+  spotId: number | null
+  spot: {
+    id: number
+    name: string
+    pontoonId: number | null
+    pontoonName: string | null
+    mouillageId: number | null
+    mouillageNom: string | null
+    portName: string | null
+  } | null
   positionHistory: BoatPositionHistoryRow[]
   engines: BoatShowEngine[]
   sails: BoatShowSail[]

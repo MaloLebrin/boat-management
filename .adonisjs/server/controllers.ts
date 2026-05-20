@@ -16,6 +16,7 @@ export const controllers = {
   Boats: () => import('#controllers/boats_controller'),
   Home: () => import('#controllers/home_controller'),
   MaintenanceHistory: () => import('#controllers/maintenance_history_controller'),
+  Mouillages: () => import('#controllers/mouillages_controller'),
   NewAccount: () => import('#controllers/new_account_controller'),
   PasswordReset: () => import('#controllers/password_reset_controller'),
   Planning: () => import('#controllers/planning_controller'),
@@ -23,6 +24,5 @@ export const controllers = {
   Ports: () => import('#controllers/ports_controller'),
   Session: () => import('#controllers/session_controller'),
   Settings: () => import('#controllers/settings_controller'),
-  Mouillages: () => import('#controllers/mouillages_controller'),
   Spots: () => import('#controllers/spots_controller'),
 }
