@@ -5,8 +5,13 @@ alwaysApply: true
 
 # Form & Inertia – Project Rule
 
-Utilise les methodes de soumissions de formulaire recommandées par Adonis et intertia sur cette doc: https://docs.adonisjs.com/tutorial/hypermedia/forms-and-validation
-https://docs.adonisjs.com/guides/frontend/inertia#link-and-form-components
+Voir aussi **`inertia-no-fetch-json.mdc`** (fetch/JSON interdits sur l’UI Inertia).
 
+Utilise les méthodes recommandées par Adonis et Inertia :
 
+- https://docs.adonisjs.com/tutorial/hypermedia/forms-and-validation
+- https://docs.adonisjs.com/guides/frontend/inertia#link-and-form-components
 
+- Formulaires : `<Form>` ou `useForm` — pas de `fetch` pour soumettre
+- Autres mutations sur écran Inertia : `router.patch` / `router.post` / … — pas de `fetch` + `application/json`
+- Contrôleurs : redirections Inertia — pas `response.json({ ok: true })` pour ces routes

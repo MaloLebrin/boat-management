@@ -376,14 +376,14 @@ export default class BoatsController {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
-    if (user.organizationId === null) return response.status(403).json({ error: 'forbidden' })
+    if (user.organizationId === null) return response.redirect('/boats')
 
     const boat = await Boat.query()
       .where('id', Number(params.id))
       .where('organizationId', user.organizationId)
       .first()
 
-    if (!boat) return response.status(404).json({ error: 'not found' })
+    if (!boat) return response.redirect('/boats')
 
     const payload = await request.validateUsing(assignBoatValidator)
 
@@ -392,11 +392,11 @@ export default class BoatsController {
         .where('id', payload.spotId)
         .where('organizationId', user.organizationId)
         .first()
-      if (!spot) return response.status(404).json({ error: 'spot not found' })
+      if (!spot) return response.redirect().back()
     }
 
     await this.boatService.updateAssignment(boat, { spotId: payload.spotId })
 
-    return response.json({ ok: true })
+    return response.redirect().back()
   }
 }

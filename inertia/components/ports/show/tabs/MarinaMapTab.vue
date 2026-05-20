@@ -79,41 +79,45 @@ watch(
   { deep: true }
 )
 
-function getCsrf() {
-  const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/)
-  return match ? decodeURIComponent(match[1]) : ''
+function patchPosition(url: string, body: { x: number; y: number }) {
+  router.patch(url, body, { preserveScroll: true })
 }
 
-async function patchJSON(url: string, body: Record<string, unknown>) {
-  const res = await fetch(url, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', 'X-XSRF-TOKEN': getCsrf() },
-    body: JSON.stringify(body),
-  })
-  return res.ok
+function patchAssignment(url: string, spotId: number) {
+  router.patch(
+    url,
+    { spotId },
+    {
+      preserveScroll: true,
+      only: ['port'],
+      onSuccess: () => {
+        selectedBoat.value = null
+      },
+    }
+  )
 }
 
-async function handlePontoonDragEnd(pontoonId: number, x: number, y: number) {
+function handlePontoonDragEnd(pontoonId: number, x: number, y: number) {
   const pt = localPontoons.value.find((p) => p.id === pontoonId)
   if (!pt) return
   pt.x = x
   pt.y = y
-  await patchJSON(`/ports/${props.port.id}/pontoons/${pontoonId}/position`, { x, y })
+  patchPosition(`/ports/${props.port.id}/pontoons/${pontoonId}/position`, { x, y })
 }
 
-async function handleMouillageDragEnd(mouillageId: number, x: number, y: number) {
+function handleMouillageDragEnd(mouillageId: number, x: number, y: number) {
   const m = localMouillages.value.find((mo) => mo.id === mouillageId)
   if (!m) return
   m.x = x
   m.y = y
-  await patchJSON(`/ports/${props.port.id}/mouillages/${mouillageId}/position`, { x, y })
+  patchPosition(`/ports/${props.port.id}/mouillages/${mouillageId}/position`, { x, y })
 }
 
 function handleCanvasClick() {
   selectedBoat.value = null
 }
 
-async function handleSpotClick(info: { spotId: number; boat: { id: number; name: string } | null }) {
+function handleSpotClick(info: { spotId: number; boat: { id: number; name: string } | null }) {
   if (info.boat && selectedBoat.value?.id === info.boat.id) {
     selectedBoat.value = null
     return
@@ -123,19 +127,11 @@ async function handleSpotClick(info: { spotId: number; boat: { id: number; name:
     return
   }
   if (!info.boat && selectedBoat.value) {
-    const ok = await patchJSON(`/boats/${selectedBoat.value.id}/assignment`, { spotId: info.spotId })
-    if (ok) {
-      selectedBoat.value = null
-      router.reload({ only: ['port'], preserveScroll: true })
-    }
+    patchAssignment(`/boats/${selectedBoat.value.id}/assignment`, info.spotId)
     return
   }
   if (info.boat && selectedBoat.value && info.boat.id !== selectedBoat.value.id) {
-    const ok = await patchJSON(`/boats/${selectedBoat.value.id}/assignment`, { spotId: info.spotId })
-    if (ok) {
-      selectedBoat.value = null
-      router.reload({ only: ['port'], preserveScroll: true })
-    }
+    patchAssignment(`/boats/${selectedBoat.value.id}/assignment`, info.spotId)
   }
 }
 </script>

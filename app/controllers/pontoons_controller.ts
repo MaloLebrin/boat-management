@@ -91,26 +91,26 @@ export default class PontoonsController {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
-    if (user.organizationId === null) return response.status(403).json({ error: 'forbidden' })
+    if (user.organizationId === null) return response.redirect('/ports')
 
     const port = await Port.query()
       .where('id', Number(params.portId))
       .where('organizationId', user.organizationId)
       .first()
 
-    if (!port) return response.status(404).json({ error: 'not found' })
+    if (!port) return response.redirect('/ports')
 
     const pontoon = await Pontoon.query()
       .where('id', Number(params.pontoonId))
       .where('portId', port.id)
       .first()
 
-    if (!pontoon) return response.status(404).json({ error: 'not found' })
+    if (!pontoon) return response.redirect(`/ports/${port.id}`)
 
     const payload = await request.validateUsing(updatePositionValidator)
     const pontoonService = new PontoonService()
     await pontoonService.updatePosition(pontoon, payload)
 
-    return response.json({ ok: true })
+    return response.redirect().back()
   }
 }
