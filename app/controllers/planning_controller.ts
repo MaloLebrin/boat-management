@@ -2,19 +2,7 @@ import BoatMaintenanceTask from '#models/boat_maintenance_task'
 import Boat from '#models/boat'
 import type { HttpContext } from '@adonisjs/core/http'
 import { DateTime } from 'luxon'
-
-interface PlanningTask {
-  id: number
-  boatId: number
-  boatName: string
-  title: string
-  subject: string
-  kind: 'date' | 'hours'
-  dueAt: string | null
-  dueEngineHours: number | null
-  currentEngineHours: number | null
-  status: 'open' | 'done'
-}
+import type { PlanningTask } from '#shared/types/planning'
 
 export default class PlanningController {
   async index({ inertia, auth }: HttpContext) {

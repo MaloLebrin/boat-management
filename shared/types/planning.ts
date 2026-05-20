@@ -1,0 +1,34 @@
+export interface PlanningTask {
+  id: number
+  boatId: number
+  boatName: string
+  title: string
+  subject: string
+  kind: 'date' | 'hours'
+  dueAt: string | null
+  dueEngineHours: number | null
+  currentEngineHours: number | null
+  status: 'open' | 'done'
+}
+
+export interface MaintenanceHistoryEvent {
+  id: number
+  boatId: number
+  boatName: string
+  subject: string
+  title: string
+  notes: string | null
+  performedAt: string
+  engineCaption: string | null
+  sailCaption: string | null
+  boatEngineId: number | null
+  boatSailId: number | null
+  boatRigId: number | null
+  parts: Array<{ id: number; name: string; quantity: number | null }>
+}
+
+export interface MaintenanceHistoryStats {
+  totalEvents: number
+  totalParts: number
+  totalBoats: number
+}

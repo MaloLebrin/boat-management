@@ -1,28 +1,7 @@
 import Boat from '#models/boat'
 import BoatMaintenanceEvent from '#models/boat_maintenance_event'
 import type { HttpContext } from '@adonisjs/core/http'
-
-interface MaintenanceHistoryEvent {
-  id: number
-  boatId: number
-  boatName: string
-  subject: string
-  title: string
-  notes: string | null
-  performedAt: string
-  engineCaption: string | null
-  sailCaption: string | null
-  boatEngineId: number | null
-  boatSailId: number | null
-  boatRigId: number | null
-  parts: Array<{ id: number; name: string; quantity: number | null }>
-}
-
-interface MaintenanceHistoryStats {
-  totalEvents: number
-  totalParts: number
-  totalBoats: number
-}
+import type { MaintenanceHistoryEvent, MaintenanceHistoryStats } from '#shared/types/planning'
 
 export default class MaintenanceHistoryController {
   async index({ inertia, auth }: HttpContext) {

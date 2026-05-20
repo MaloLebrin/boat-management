@@ -38,7 +38,7 @@ export default class BoatMaintenanceTasksController {
 
     try {
       await this.boatMaintenanceTaskService.createForBoat(user, boat, {
-        subject: payload.subject as any,
+        subject: payload.subject,
         boatEngineId: payload.boatEngineId ?? null,
         boatSailId: payload.boatSailId ?? null,
         boatRigId: payload.boatRigId ?? null,

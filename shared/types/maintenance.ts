@@ -1,5 +1,17 @@
 import type { DateTime } from 'luxon'
 
+export type MaintenanceTaskSubject =
+  | 'boat'
+  | 'hull'
+  | 'engine'
+  | 'sail'
+  | 'rig'
+  | 'electrical'
+  | 'plumbing'
+  | 'safety'
+  | 'deck'
+  | 'other'
+
 export type CreateMaintenancePayload = {
   subject: 'boat' | 'hull' | 'engine' | 'sail' | 'rig' | 'electrical' | 'plumbing' | 'safety' | 'deck' | 'other'
   boatEngineId?: number | null

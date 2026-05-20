@@ -6,10 +6,10 @@ import BoatMaintenanceTask from '#models/boat_maintenance_task'
 import type Boat from '#models/boat'
 import type User from '#models/user'
 import { DateTime } from 'luxon'
+import type { MaintenanceTaskSubject } from '#shared/types/maintenance'
 
 export { BoatMaintenanceTaskNotFoundError, BoatMaintenanceTaskValidationError }
-
-export type MaintenanceTaskSubject = 'boat' | 'engine' | 'sail' | 'rig'
+export type { MaintenanceTaskSubject }
 
 export type CreateMaintenanceTaskPayload = {
   subject: MaintenanceTaskSubject
