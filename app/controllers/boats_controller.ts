@@ -11,9 +11,13 @@ import BoatService, { BoatNotFoundError } from '#services/boat_service'
 import MediaService from '#services/media_service'
 import { createBoatValidator, updateBoatValidator } from '#validators/boat'
 import { assignBoatValidator } from '#validators/marina_layout'
+import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 
+@inject()
 export default class BoatsController {
+  constructor(private boatService: BoatService) {}
+
   async index({ inertia, auth, request }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
@@ -70,8 +74,7 @@ export default class BoatsController {
 
     const payload = await request.validateUsing(createBoatValidator)
 
-    const boatService = new BoatService()
-    const boat = await boatService.createForUser(user, payload)
+    const boat = await this.boatService.createForUser(user, payload)
 
     response.redirect(`/boats/${boat.id}`)
   }
@@ -80,9 +83,8 @@ export default class BoatsController {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
-    const boatService = new BoatService()
     try {
-      const boat = await boatService.getForUserOrFail(user, Number(params.id))
+      const boat = await this.boatService.getForUserOrFail(user, Number(params.id))
       await bouncer.authorize('boatView', boat)
       const maintenanceService = new BoatMaintenanceService()
       const maintenanceEvents = await maintenanceService.listForBoat(user, boat)
@@ -281,9 +283,8 @@ export default class BoatsController {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
-    const boatService = new BoatService()
     try {
-      const boat = await boatService.getForUserOrFail(user, Number(params.id))
+      const boat = await this.boatService.getForUserOrFail(user, Number(params.id))
       await bouncer.authorize('boatUpdate', boat)
 
       const ports =
@@ -351,12 +352,11 @@ export default class BoatsController {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
-    const boatService = new BoatService()
-    const boat = await boatService.getForUserOrFail(user, Number(params.id))
+    const boat = await this.boatService.getForUserOrFail(user, Number(params.id))
     await bouncer.authorize('boatUpdate', boat)
 
     const payload = await request.validateUsing(updateBoatValidator)
-    await boatService.updateForUser(user, boat, payload)
+    await this.boatService.updateForUser(user, boat, payload)
 
     response.redirect(`/boats/${boat.id}`)
   }
@@ -365,11 +365,10 @@ export default class BoatsController {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
-    const boatService = new BoatService()
-    const boat = await boatService.getForUserOrFail(user, Number(params.id))
+    const boat = await this.boatService.getForUserOrFail(user, Number(params.id))
     await bouncer.authorize('boatDelete', boat)
 
-    await boatService.deleteForUser(user, boat)
+    await this.boatService.deleteForUser(user, boat)
     response.redirect('/boats')
   }
 
@@ -396,8 +395,7 @@ export default class BoatsController {
       if (!spot) return response.status(404).json({ error: 'spot not found' })
     }
 
-    const boatService = new BoatService()
-    await boatService.updateAssignment(boat, { spotId: payload.spotId })
+    await this.boatService.updateAssignment(boat, { spotId: payload.spotId })
 
     return response.json({ ok: true })
   }
