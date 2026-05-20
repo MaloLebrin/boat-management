@@ -5,7 +5,7 @@ import Port from '#models/port'
 import Spot from '#models/spot'
 import type User from '#models/user'
 import db from '@adonisjs/lucid/services/db'
-import { PortHasBoatsError, PortNotFoundError } from '#services/port_errors'
+import { PortHasBoatsError, PortNotFoundError } from '#exceptions/port_errors'
 import type { PortPayload } from '#shared/types/port'
 
 type AggRow = { port_id: number; count: string }

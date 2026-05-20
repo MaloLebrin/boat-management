@@ -1,6 +1,6 @@
 import Pontoon from '#models/pontoon'
 import Port from '#models/port'
-import { PontoonHasBoatsError } from '#services/port_errors'
+import { PontoonHasBoatsError } from '#exceptions/port_errors'
 import PontoonService from '#services/pontoon_service'
 import { createPontoonValidator, updatePontoonValidator } from '#validators/pontoon'
 import { updatePositionValidator } from '#validators/marina_layout'
