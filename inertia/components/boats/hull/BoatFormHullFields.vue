@@ -48,24 +48,24 @@ const portOptions = computed(() =>
 
 const pontoonOptions = computed(() => {
   if (!selectedPortId.value) return []
-  const port = (props.ports ?? []).find((p) => p.id === selectedPortId.value)
+  const port = (props.ports ?? []).find((p) => p.id === Number(selectedPortId.value))
   return port?.pontoons.map((pt) => ({ label: pt.name, value: pt.id })) ?? []
 })
 
 const mouillageOptions = computed(() => {
   if (!selectedPortId.value) return []
-  const port = (props.ports ?? []).find((p) => p.id === selectedPortId.value)
+  const port = (props.ports ?? []).find((p) => p.id === Number(selectedPortId.value))
   return port?.mouillages.map((m) => ({ label: m.name, value: m.id })) ?? []
 })
 
 const spotOptions = computed(() => {
-  const port = (props.ports ?? []).find((p) => p.id === selectedPortId.value)
+  const port = (props.ports ?? []).find((p) => p.id === Number(selectedPortId.value))
   if (selectedPontoonId.value) {
-    const pt = port?.pontoons.find((p) => p.id === selectedPontoonId.value)
+    const pt = port?.pontoons.find((p) => p.id === Number(selectedPontoonId.value))
     return pt?.spots.map((s) => ({ label: s.name, value: s.id })) ?? []
   }
   if (selectedMouillageId.value) {
-    const m = port?.mouillages.find((mo) => mo.id === selectedMouillageId.value)
+    const m = port?.mouillages.find((mo) => mo.id === Number(selectedMouillageId.value))
     return m?.spots.map((s) => ({ label: s.name, value: s.id })) ?? []
   }
   return []
