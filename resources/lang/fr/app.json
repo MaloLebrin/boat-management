@@ -936,6 +936,14 @@
           "spotPlaceholder": "ex: A1",
           "confirm": "Affecter"
         }
+      },
+      "help": {
+        "toggle": "Aide",
+        "title": "Comment utiliser le plan marina",
+        "select": "Cliquez sur un spot occupé pour sélectionner le bateau",
+        "assign": "Cliquez sur un spot vide pour y affecter le bateau sélectionné",
+        "deselect": "Cliquez sur le fond du plan pour désélectionner",
+        "move": "En mode \"Modifier le plan\", glissez-déposez un ponton ou mouillage pour le repositionner"
       }
     },
     "spots": {

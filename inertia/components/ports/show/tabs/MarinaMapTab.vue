@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
 import { router } from '@inertiajs/vue3'
-import { PlusIcon } from '@heroicons/vue/24/outline'
+import { PlusIcon, QuestionMarkCircleIcon } from '@heroicons/vue/24/outline'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
+import BaseModal from '~/components/base/BaseModal.vue'
 import MouillageFormModal from '~/components/ports/modals/MouillageFormModal.vue'
 import PontoonFormModal from '~/components/ports/modals/PontoonFormModal.vue'
 import MarinaCanvas from '~/components/ports/show/MarinaCanvas.vue'
@@ -25,6 +26,7 @@ const localMouillages = ref<LocalMouillage[]>([])
 const selectedBoat = ref<{ id: number; name: string } | null>(null)
 const showPontoonForm = ref(false)
 const showMouillageForm = ref(false)
+const showHelp = ref(false)
 
 onMounted(() => {
   localPontoons.value = props.port.pontoons.map((pt, i) => ({
@@ -152,14 +154,56 @@ async function handleSpotClick(info: { spotId: number; boat: { id: number; name:
           {{ t('ports.mouillages.add') }}
         </BaseButton>
       </div>
-      <BaseButton
-        :variant="editMode ? 'primary' : 'secondary'"
-        size="sm"
-        @click="editMode = !editMode"
-      >
-        {{ editMode ? t('ports.plan.viewOnly') : t('ports.plan.editLayout') }}
-      </BaseButton>
+      <div class="flex items-center gap-2">
+        <BaseButton
+          :variant="editMode ? 'primary' : 'secondary'"
+          size="sm"
+          @click="editMode = !editMode"
+        >
+          {{ editMode ? t('ports.plan.viewOnly') : t('ports.plan.editLayout') }}
+        </BaseButton>
+        <button
+          type="button"
+          :class="[
+            'flex items-center gap-1 rounded-md px-2 py-1.5 text-xs font-medium transition-colors',
+            showHelp
+              ? 'bg-brand/10 text-brand'
+              : 'text-fg-muted hover:text-fg hover:bg-surface-hover',
+          ]"
+          @click="showHelp = !showHelp"
+        >
+          <QuestionMarkCircleIcon class="h-4 w-4" />
+          {{ t('ports.plan.help.toggle') }}
+        </button>
+      </div>
     </div>
+
+    <!-- Help modal -->
+    <BaseModal
+      :open="showHelp"
+      :title="t('ports.plan.help.title')"
+      size="md"
+      @update:open="showHelp = $event"
+    >
+      <ol class="space-y-4">
+        <li class="flex items-start gap-3">
+          <span class="text-xl leading-none mt-0.5">⛵</span>
+          <span class="text-sm text-fg-muted">{{ t('ports.plan.help.select') }}</span>
+        </li>
+        <li class="flex items-start gap-3">
+          <span class="text-xl leading-none mt-0.5">📍</span>
+          <span class="text-sm text-fg-muted">{{ t('ports.plan.help.assign') }}</span>
+        </li>
+        <li class="flex items-start gap-3">
+          <span class="text-xl leading-none mt-0.5">🖱️</span>
+          <span class="text-sm text-fg-muted">{{ t('ports.plan.help.deselect') }}</span>
+        </li>
+        <li class="flex items-start gap-3">
+          <span class="text-xl leading-none mt-0.5">✋</span>
+          <span class="text-sm text-fg-muted">{{ t('ports.plan.help.move') }}</span>
+        </li>
+      </ol>
+    </BaseModal>
 
     <!-- Add modals -->
     <PontoonFormModal

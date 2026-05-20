@@ -917,6 +917,14 @@
           "spotPlaceholder": "e.g. A1",
           "confirm": "Assign"
         }
+      },
+      "help": {
+        "toggle": "Help",
+        "title": "How to use the marina plan",
+        "select": "Click an occupied spot to select the boat",
+        "assign": "Click an empty spot to assign the selected boat there",
+        "deselect": "Click on the canvas background to deselect",
+        "move": "In \"Edit layout\" mode, drag a pontoon or anchorage to reposition it"
       }
     },
     "spots": {
