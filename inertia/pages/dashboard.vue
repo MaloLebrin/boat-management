@@ -6,6 +6,7 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseSkeleton from '~/components/base/BaseSkeleton.vue'
 import BaseStatCard from '~/components/base/BaseStatCard.vue'
+import MarinaDashboardCard from '~/components/dashboard/MarinaDashboardCard.vue'
 import { useT } from '~/composables/useT'
 import type { AiSuggestion } from '~/types/boat_show'
 
@@ -32,6 +33,22 @@ type UrgentMaintenanceRow = {
   currentEngineHours: number | null
 }
 
+type PortItem = {
+  id: number
+  name: string
+  city: string | null
+  country: string | null
+  boatCount: number
+  totalSpots: number
+  freeSpots: number
+}
+
+type PortStats = {
+  total: number
+  totalBoats: number
+  totalFreeSpots: number
+}
+
 const props = defineProps<{
   boats: BoatSummary[]
   urgentMaintenance: UrgentMaintenanceRow[]
@@ -43,6 +60,8 @@ const props = defineProps<{
     urgentMaintenance: number
   }
   aiFleetAnalysis: AiSuggestion[] | null
+  ports: PortItem[]
+  portStats: PortStats
 }>()
 
 const showAlert = ref(true)
@@ -110,7 +129,11 @@ function dismissAlert() {
       />
     </div>
 
-    <div class="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_16rem]">
+    <div class="mt-8">
+      <MarinaDashboardCard :ports="ports" :port-stats="portStats" />
+    </div>
+
+    <div class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_16rem]">
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_2fr]">
         <BaseCard>
           <template #header>

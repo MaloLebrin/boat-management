@@ -172,6 +172,18 @@
         "rig": "Rig"
       },
       "empty": "No boats yet."
+    },
+    "marina": {
+      "title": "Marinas",
+      "viewAll": "View all",
+      "addMarina": "Add a marina",
+      "empty": "No marina registered yet.",
+      "totalMarinas": "{count} marina(s)",
+      "totalBoats": "{count} moored boat(s)",
+      "totalFreeSpots": "{count} free spot(s)",
+      "freeSpots": "{free} free / {total}",
+      "fillRate": "Fill: {rate}%",
+      "noSpots": "No spots"
     }
   },
   "planning": {

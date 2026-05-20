@@ -8,6 +8,8 @@ export type PortListItem = {
   pontoonCount: number
   mouillageCount: number
   boatCount: number
+  totalSpots: number
+  freeSpots: number
 }
 
 export type SpotBoatRow = {

@@ -6,6 +6,60 @@ import type { ApiDefinition } from './tree.d.ts'
 const placeholder: any = {}
 
 const routes = {
+  'root': {
+    methods: ["GET","HEAD"],
+    pattern: '/',
+    tokens: [{"old":"/","type":0,"val":"/","end":""}],
+    types: placeholder as Registry['root']['types'],
+  },
+  'marketing.en.home': {
+    methods: ["GET","HEAD"],
+    pattern: '/en',
+    tokens: [{"old":"/en","type":0,"val":"en","end":""}],
+    types: placeholder as Registry['marketing.en.home']['types'],
+  },
+  'marketing.en.pricing': {
+    methods: ["GET","HEAD"],
+    pattern: '/en/tarifs',
+    tokens: [{"old":"/en/tarifs","type":0,"val":"en","end":""},{"old":"/en/tarifs","type":0,"val":"tarifs","end":""}],
+    types: placeholder as Registry['marketing.en.pricing']['types'],
+  },
+  'marketing.fr.home': {
+    methods: ["GET","HEAD"],
+    pattern: '/fr',
+    tokens: [{"old":"/fr","type":0,"val":"fr","end":""}],
+    types: placeholder as Registry['marketing.fr.home']['types'],
+  },
+  'marketing.fr.pricing': {
+    methods: ["GET","HEAD"],
+    pattern: '/fr/tarifs',
+    tokens: [{"old":"/fr/tarifs","type":0,"val":"fr","end":""},{"old":"/fr/tarifs","type":0,"val":"tarifs","end":""}],
+    types: placeholder as Registry['marketing.fr.pricing']['types'],
+  },
+  'marketing.en.about': {
+    methods: ["GET","HEAD"],
+    pattern: '/en/about',
+    tokens: [{"old":"/en/about","type":0,"val":"en","end":""},{"old":"/en/about","type":0,"val":"about","end":""}],
+    types: placeholder as Registry['marketing.en.about']['types'],
+  },
+  'marketing.fr.about': {
+    methods: ["GET","HEAD"],
+    pattern: '/fr/a-propos',
+    tokens: [{"old":"/fr/a-propos","type":0,"val":"fr","end":""},{"old":"/fr/a-propos","type":0,"val":"a-propos","end":""}],
+    types: placeholder as Registry['marketing.fr.about']['types'],
+  },
+  'marketing.contact': {
+    methods: ["GET","HEAD"],
+    pattern: '/contact',
+    tokens: [{"old":"/contact","type":0,"val":"contact","end":""}],
+    types: placeholder as Registry['marketing.contact']['types'],
+  },
+  'dashboard': {
+    methods: ["GET","HEAD"],
+    pattern: '/dashboard',
+    tokens: [{"old":"/dashboard","type":0,"val":"dashboard","end":""}],
+    types: placeholder as Registry['dashboard']['types'],
+  },
   'design_system': {
     methods: ["GET","HEAD"],
     pattern: '/design-system',
@@ -467,60 +521,6 @@ const routes = {
     pattern: '/ai/boats/:id/suggestions',
     tokens: [{"old":"/ai/boats/:id/suggestions","type":0,"val":"ai","end":""},{"old":"/ai/boats/:id/suggestions","type":0,"val":"boats","end":""},{"old":"/ai/boats/:id/suggestions","type":1,"val":"id","end":""},{"old":"/ai/boats/:id/suggestions","type":0,"val":"suggestions","end":""}],
     types: placeholder as Registry['ai.boatSuggestions']['types'],
-  },
-  'root': {
-    methods: ["GET","HEAD"],
-    pattern: '/',
-    tokens: [{"old":"/","type":0,"val":"/","end":""}],
-    types: placeholder as Registry['root']['types'],
-  },
-  'marketing.en.home': {
-    methods: ["GET","HEAD"],
-    pattern: '/en',
-    tokens: [{"old":"/en","type":0,"val":"en","end":""}],
-    types: placeholder as Registry['marketing.en.home']['types'],
-  },
-  'marketing.en.pricing': {
-    methods: ["GET","HEAD"],
-    pattern: '/en/tarifs',
-    tokens: [{"old":"/en/tarifs","type":0,"val":"en","end":""},{"old":"/en/tarifs","type":0,"val":"tarifs","end":""}],
-    types: placeholder as Registry['marketing.en.pricing']['types'],
-  },
-  'marketing.fr.home': {
-    methods: ["GET","HEAD"],
-    pattern: '/fr',
-    tokens: [{"old":"/fr","type":0,"val":"fr","end":""}],
-    types: placeholder as Registry['marketing.fr.home']['types'],
-  },
-  'marketing.fr.pricing': {
-    methods: ["GET","HEAD"],
-    pattern: '/fr/tarifs',
-    tokens: [{"old":"/fr/tarifs","type":0,"val":"fr","end":""},{"old":"/fr/tarifs","type":0,"val":"tarifs","end":""}],
-    types: placeholder as Registry['marketing.fr.pricing']['types'],
-  },
-  'marketing.en.about': {
-    methods: ["GET","HEAD"],
-    pattern: '/en/about',
-    tokens: [{"old":"/en/about","type":0,"val":"en","end":""},{"old":"/en/about","type":0,"val":"about","end":""}],
-    types: placeholder as Registry['marketing.en.about']['types'],
-  },
-  'marketing.fr.about': {
-    methods: ["GET","HEAD"],
-    pattern: '/fr/a-propos',
-    tokens: [{"old":"/fr/a-propos","type":0,"val":"fr","end":""},{"old":"/fr/a-propos","type":0,"val":"a-propos","end":""}],
-    types: placeholder as Registry['marketing.fr.about']['types'],
-  },
-  'marketing.contact': {
-    methods: ["GET","HEAD"],
-    pattern: '/contact',
-    tokens: [{"old":"/contact","type":0,"val":"contact","end":""}],
-    types: placeholder as Registry['marketing.contact']['types'],
-  },
-  'dashboard': {
-    methods: ["GET","HEAD"],
-    pattern: '/dashboard',
-    tokens: [{"old":"/dashboard","type":0,"val":"dashboard","end":""}],
-    types: placeholder as Registry['dashboard']['types'],
   },
   'planning.index': {
     methods: ["GET","HEAD"],

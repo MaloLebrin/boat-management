@@ -5,6 +5,16 @@ Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
 ---
 
+## 2026-05-20 — Widget Marina sur le Dashboard
+
+Ajout d'un widget "Marinas" sur la page d'accueil du tableau de bord.
+
+- **`DashboardService`** : fetch des ports via `PortService.listForUser()`, nouveau type `DashboardPortItem` et `DashboardPortStats`
+- **`PortService.listForUser()`** : ajout du comptage des spots totaux (via pontoons et mouillages) — calcul de `totalSpots` et `freeSpots`
+- **`PortListItem`** (type frontend) : nouveaux champs `totalSpots` et `freeSpots`
+- **`MarinaDashboardCard.vue`** : composant affichant la liste des ports avec taux de remplissage (barre de progression), nombre de places libres/total, et stats globales
+- **i18n** : clés `dashboard.marina.*` ajoutées en FR et EN
+
 ## 2026-05-20 — Modele Spot (places de marina)
 
 Introduction du modele `Spot` qui represente une place individuelle au sein d'un ponton ou mouillage. Un bateau est maintenant assigne a un spot (et non plus directement a un ponton/mouillage).

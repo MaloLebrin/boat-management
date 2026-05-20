@@ -2,6 +2,21 @@
 import type { routes } from './index.ts'
 
 export interface ApiDefinition {
+  root: typeof routes['root']
+  marketing: {
+    en: {
+      home: typeof routes['marketing.en.home']
+      pricing: typeof routes['marketing.en.pricing']
+      about: typeof routes['marketing.en.about']
+    }
+    fr: {
+      home: typeof routes['marketing.fr.home']
+      pricing: typeof routes['marketing.fr.pricing']
+      about: typeof routes['marketing.fr.about']
+    }
+    contact: typeof routes['marketing.contact']
+  }
+  dashboard: typeof routes['dashboard']
   designSystem: typeof routes['design_system']
   sitemap: typeof routes['sitemap']
   boats: {
@@ -121,21 +136,6 @@ export interface ApiDefinition {
     fleetAnalysis: typeof routes['ai.fleetAnalysis']
     boatSuggestions: typeof routes['ai.boatSuggestions']
   }
-  root: typeof routes['root']
-  marketing: {
-    en: {
-      home: typeof routes['marketing.en.home']
-      pricing: typeof routes['marketing.en.pricing']
-      about: typeof routes['marketing.en.about']
-    }
-    fr: {
-      home: typeof routes['marketing.fr.home']
-      pricing: typeof routes['marketing.fr.pricing']
-      about: typeof routes['marketing.fr.about']
-    }
-    contact: typeof routes['marketing.contact']
-  }
-  dashboard: typeof routes['dashboard']
   planning: {
     index: typeof routes['planning.index']
   }

@@ -47,6 +47,7 @@ export default class PortService {
 
     const portIds = ports.map((p) => p.id)
     const boatCounts: Record<number, number> = {}
+    const spotCounts: Record<number, number> = {}
 
     if (portIds.length > 0) {
       // Via pontoons -> spots -> boats
@@ -76,19 +77,51 @@ export default class PortService {
         const r = row as unknown as { portId: number; count: string }
         boatCounts[r.portId] = (boatCounts[r.portId] ?? 0) + Number(r.count)
       }
+
+      // Total spots via pontoons
+      const pontoonSpotRows = await Spot.query()
+        .join('pontoons', 'spots.pontoon_id', 'pontoons.id')
+        .whereIn('pontoons.port_id', portIds)
+        .groupBy('pontoons.port_id')
+        .count('spots.id as count')
+        .select('pontoons.port_id as portId')
+
+      for (const row of pontoonSpotRows) {
+        const r = row as unknown as { portId: number; count: string }
+        spotCounts[r.portId] = (spotCounts[r.portId] ?? 0) + Number(r.count)
+      }
+
+      // Total spots via mouillages
+      const mouillageSpotRows = await Spot.query()
+        .join('mouillages', 'spots.mouillage_id', 'mouillages.id')
+        .whereIn('mouillages.port_id', portIds)
+        .groupBy('mouillages.port_id')
+        .count('spots.id as count')
+        .select('mouillages.port_id as portId')
+
+      for (const row of mouillageSpotRows) {
+        const r = row as unknown as { portId: number; count: string }
+        spotCounts[r.portId] = (spotCounts[r.portId] ?? 0) + Number(r.count)
+      }
     }
 
-    return ports.map((p) => ({
-      id: p.id,
-      name: p.name,
-      city: p.city,
-      country: p.country,
-      address: p.address,
-      notes: p.notes,
-      pontoonCount: Number(p.$extras['pontoons_count'] ?? 0),
-      mouillageCount: Number(p.$extras['mouillages_count'] ?? 0),
-      boatCount: boatCounts[p.id] ?? 0,
-    }))
+    return ports.map((p) => {
+      const totalSpots = spotCounts[p.id] ?? 0
+      const boatCount = boatCounts[p.id] ?? 0
+      return {
+        id: p.id,
+        name: p.name,
+        city: p.city,
+        country: p.country,
+        address: p.address,
+        notes: p.notes,
+        pontoonCount: Number(p.$extras['pontoons_count'] ?? 0),
+        mouillageCount: Number(p.$extras['mouillages_count'] ?? 0),
+        boatCount,
+        totalSpots,
+        freeSpots: totalSpots - boatCount,
+      }
+    })
   }
 
   async getWithPontoonsAndMouillagesOrFail(user: User, portId: number) {

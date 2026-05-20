@@ -4,6 +4,15 @@ type ParamValue = string | number | bigint | boolean
 
 export type ScannedRoutes = {
   ALL: {
+    'root': { paramsTuple?: []; params?: {} }
+    'marketing.en.home': { paramsTuple?: []; params?: {} }
+    'marketing.en.pricing': { paramsTuple?: []; params?: {} }
+    'marketing.fr.home': { paramsTuple?: []; params?: {} }
+    'marketing.fr.pricing': { paramsTuple?: []; params?: {} }
+    'marketing.en.about': { paramsTuple?: []; params?: {} }
+    'marketing.fr.about': { paramsTuple?: []; params?: {} }
+    'marketing.contact': { paramsTuple?: []; params?: {} }
+    'dashboard': { paramsTuple?: []; params?: {} }
     'design_system': { paramsTuple?: []; params?: {} }
     'sitemap': { paramsTuple?: []; params?: {} }
     'boats.index': { paramsTuple?: []; params?: {} }
@@ -81,15 +90,6 @@ export type ScannedRoutes = {
     'ai.chat': { paramsTuple?: []; params?: {} }
     'ai.fleetAnalysis': { paramsTuple?: []; params?: {} }
     'ai.boatSuggestions': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'root': { paramsTuple?: []; params?: {} }
-    'marketing.en.home': { paramsTuple?: []; params?: {} }
-    'marketing.en.pricing': { paramsTuple?: []; params?: {} }
-    'marketing.fr.home': { paramsTuple?: []; params?: {} }
-    'marketing.fr.pricing': { paramsTuple?: []; params?: {} }
-    'marketing.en.about': { paramsTuple?: []; params?: {} }
-    'marketing.fr.about': { paramsTuple?: []; params?: {} }
-    'marketing.contact': { paramsTuple?: []; params?: {} }
-    'dashboard': { paramsTuple?: []; params?: {} }
     'planning.index': { paramsTuple?: []; params?: {} }
     'settings.index': { paramsTuple?: []; params?: {} }
     'settings.profile.update': { paramsTuple?: []; params?: {} }
@@ -98,6 +98,15 @@ export type ScannedRoutes = {
     'maintenance.history': { paramsTuple?: []; params?: {} }
   }
   GET: {
+    'root': { paramsTuple?: []; params?: {} }
+    'marketing.en.home': { paramsTuple?: []; params?: {} }
+    'marketing.en.pricing': { paramsTuple?: []; params?: {} }
+    'marketing.fr.home': { paramsTuple?: []; params?: {} }
+    'marketing.fr.pricing': { paramsTuple?: []; params?: {} }
+    'marketing.en.about': { paramsTuple?: []; params?: {} }
+    'marketing.fr.about': { paramsTuple?: []; params?: {} }
+    'marketing.contact': { paramsTuple?: []; params?: {} }
+    'dashboard': { paramsTuple?: []; params?: {} }
     'design_system': { paramsTuple?: []; params?: {} }
     'sitemap': { paramsTuple?: []; params?: {} }
     'boats.index': { paramsTuple?: []; params?: {} }
@@ -118,20 +127,20 @@ export type ScannedRoutes = {
     'session.create': { paramsTuple?: []; params?: {} }
     'password.forgot': { paramsTuple?: []; params?: {} }
     'password.reset': { paramsTuple?: []; params?: {} }
-    'root': { paramsTuple?: []; params?: {} }
-    'marketing.en.home': { paramsTuple?: []; params?: {} }
-    'marketing.en.pricing': { paramsTuple?: []; params?: {} }
-    'marketing.fr.home': { paramsTuple?: []; params?: {} }
-    'marketing.fr.pricing': { paramsTuple?: []; params?: {} }
-    'marketing.en.about': { paramsTuple?: []; params?: {} }
-    'marketing.fr.about': { paramsTuple?: []; params?: {} }
-    'marketing.contact': { paramsTuple?: []; params?: {} }
-    'dashboard': { paramsTuple?: []; params?: {} }
     'planning.index': { paramsTuple?: []; params?: {} }
     'settings.index': { paramsTuple?: []; params?: {} }
     'maintenance.history': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
+    'root': { paramsTuple?: []; params?: {} }
+    'marketing.en.home': { paramsTuple?: []; params?: {} }
+    'marketing.en.pricing': { paramsTuple?: []; params?: {} }
+    'marketing.fr.home': { paramsTuple?: []; params?: {} }
+    'marketing.fr.pricing': { paramsTuple?: []; params?: {} }
+    'marketing.en.about': { paramsTuple?: []; params?: {} }
+    'marketing.fr.about': { paramsTuple?: []; params?: {} }
+    'marketing.contact': { paramsTuple?: []; params?: {} }
+    'dashboard': { paramsTuple?: []; params?: {} }
     'design_system': { paramsTuple?: []; params?: {} }
     'sitemap': { paramsTuple?: []; params?: {} }
     'boats.index': { paramsTuple?: []; params?: {} }
@@ -152,15 +161,6 @@ export type ScannedRoutes = {
     'session.create': { paramsTuple?: []; params?: {} }
     'password.forgot': { paramsTuple?: []; params?: {} }
     'password.reset': { paramsTuple?: []; params?: {} }
-    'root': { paramsTuple?: []; params?: {} }
-    'marketing.en.home': { paramsTuple?: []; params?: {} }
-    'marketing.en.pricing': { paramsTuple?: []; params?: {} }
-    'marketing.fr.home': { paramsTuple?: []; params?: {} }
-    'marketing.fr.pricing': { paramsTuple?: []; params?: {} }
-    'marketing.en.about': { paramsTuple?: []; params?: {} }
-    'marketing.fr.about': { paramsTuple?: []; params?: {} }
-    'marketing.contact': { paramsTuple?: []; params?: {} }
-    'dashboard': { paramsTuple?: []; params?: {} }
     'planning.index': { paramsTuple?: []; params?: {} }
     'settings.index': { paramsTuple?: []; params?: {} }
     'maintenance.history': { paramsTuple?: []; params?: {} }

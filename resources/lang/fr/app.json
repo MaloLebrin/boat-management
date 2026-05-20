@@ -172,6 +172,18 @@
         "rig": "Gréement"
       },
       "empty": "Aucun bateau pour l'instant."
+    },
+    "marina": {
+      "title": "Marinas",
+      "viewAll": "Voir tout",
+      "addMarina": "Ajouter une marina",
+      "empty": "Aucune marina enregistrée.",
+      "totalMarinas": "{count} marina(s)",
+      "totalBoats": "{count} bateau(x) amarré(s)",
+      "totalFreeSpots": "{count} place(s) libre(s)",
+      "freeSpots": "{free} libre(s) / {total}",
+      "fillRate": "Taux : {rate}%",
+      "noSpots": "Aucune place"
     }
   },
   "planning": {

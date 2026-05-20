@@ -2,8 +2,26 @@ import Boat from '#models/boat'
 import BoatEngine from '#models/boat_engine'
 import BoatMaintenanceTask from '#models/boat_maintenance_task'
 import type User from '#models/user'
+import PortService from '#services/port_service'
+import { inject } from '@adonisjs/core'
 import db from '@adonisjs/lucid/services/db'
 import { DateTime } from 'luxon'
+
+export type DashboardPortItem = {
+  id: number
+  name: string
+  city: string | null
+  country: string | null
+  boatCount: number
+  totalSpots: number
+  freeSpots: number
+}
+
+export type DashboardPortStats = {
+  total: number
+  totalBoats: number
+  totalFreeSpots: number
+}
 
 export type DashboardBoatSummary = {
   id: number
@@ -34,7 +52,10 @@ export type DashboardStats = {
   urgentMaintenance: number
 }
 
+@inject()
 export default class DashboardService {
+  constructor(private portService: PortService) {}
+
   async getForUser(
     user: User,
     opts?: {
@@ -46,12 +67,16 @@ export default class DashboardService {
     boats: DashboardBoatSummary[]
     urgentMaintenance: DashboardUrgentMaintenanceRow[]
     stats: DashboardStats
+    ports: DashboardPortItem[]
+    portStats: DashboardPortStats
   }> {
     if (user.organizationId === null) {
       return {
         boats: [],
         urgentMaintenance: [],
         stats: { boats: 0, engines: 0, sails: 0, rigs: 0, urgentMaintenance: 0 },
+        ports: [],
+        portStats: { total: 0, totalBoats: 0, totalFreeSpots: 0 },
       }
     }
 
@@ -185,6 +210,22 @@ export default class DashboardService {
 
     stats.urgentMaintenance = urgentMaintenance.length
 
-    return { boats: boatSummary, urgentMaintenance, stats }
+    const allPorts = await this.portService.listForUser(user)
+    const ports: DashboardPortItem[] = allPorts.map((p) => ({
+      id: p.id,
+      name: p.name,
+      city: p.city,
+      country: p.country,
+      boatCount: p.boatCount,
+      totalSpots: p.totalSpots,
+      freeSpots: p.freeSpots,
+    }))
+    const portStats: DashboardPortStats = {
+      total: ports.length,
+      totalBoats: ports.reduce((acc, p) => acc + p.boatCount, 0),
+      totalFreeSpots: ports.reduce((acc, p) => acc + p.freeSpots, 0),
+    }
+
+    return { boats: boatSummary, urgentMaintenance, stats, ports, portStats }
   }
 }
