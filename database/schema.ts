@@ -224,7 +224,7 @@ export class BoatMaintenanceTaskSchema extends BaseModel {
 }
 
 export class BoatPositionHistorySchema extends BaseModel {
-  static $columns = ['boatId', 'createdAt', 'endedAt', 'id', 'mouillageId', 'notes', 'pontoonId', 'spotIdentifier', 'startedAt', 'updatedAt'] as const
+  static $columns = ['boatId', 'createdAt', 'endedAt', 'id', 'notes', 'spotId', 'startedAt', 'updatedAt'] as const
   $columns = BoatPositionHistorySchema.$columns
   @column()
   declare boatId: number
@@ -235,13 +235,9 @@ export class BoatPositionHistorySchema extends BaseModel {
   @column({ isPrimary: true })
   declare id: number
   @column()
-  declare mouillageId: number | null
-  @column()
   declare notes: string | null
   @column()
-  declare pontoonId: number | null
-  @column()
-  declare spotIdentifier: string | null
+  declare spotId: number | null
   @column.dateTime()
   declare startedAt: DateTime
   @column.dateTime({ autoCreate: true, autoUpdate: true })
@@ -324,7 +320,7 @@ export class BoatSailSchema extends BaseModel {
 }
 
 export class BoatSchema extends BaseModel {
-  static $columns = ['beamM', 'createdAt', 'draftM', 'flagCountry', 'francisationNumber', 'homePort', 'hullIdentificationNumber', 'hullMaterial', 'id', 'lengthM', 'manufacturedAt', 'manufacturer', 'mastHeightM', 'maxPersons', 'model', 'mouillageId', 'name', 'navigationCategory', 'organizationId', 'pontoonId', 'propulsionType', 'registrationNumber', 'spotIdentifier', 'type', 'updatedAt', 'yearBuilt'] as const
+  static $columns = ['beamM', 'createdAt', 'draftM', 'flagCountry', 'francisationNumber', 'homePort', 'hullIdentificationNumber', 'hullMaterial', 'id', 'lengthM', 'manufacturedAt', 'manufacturer', 'mastHeightM', 'maxPersons', 'model', 'name', 'navigationCategory', 'organizationId', 'propulsionType', 'registrationNumber', 'spotId', 'type', 'updatedAt', 'yearBuilt'] as const
   $columns = BoatSchema.$columns
   @column()
   declare beamM: number | null
@@ -357,21 +353,17 @@ export class BoatSchema extends BaseModel {
   @column()
   declare model: string | null
   @column()
-  declare mouillageId: number | null
-  @column()
   declare name: string
   @column()
   declare navigationCategory: string | null
   @column()
   declare organizationId: number
   @column()
-  declare pontoonId: number | null
-  @column()
   declare propulsionType: string | null
   @column()
   declare registrationNumber: string | null
   @column()
-  declare spotIdentifier: string | null
+  declare spotId: number | null
   @column()
   declare type: string | null
   @column.dateTime({ autoCreate: true, autoUpdate: true })
@@ -593,6 +585,27 @@ export class QueueScheduleSchema extends BaseModel {
   declare timezone: string
   @column.dateTime()
   declare toDate: DateTime | null
+}
+
+export class SpotSchema extends BaseModel {
+  static $columns = ['createdAt', 'description', 'id', 'mouillageId', 'name', 'organizationId', 'pontoonId', 'updatedAt'] as const
+  $columns = SpotSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare description: string | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare mouillageId: number | null
+  @column()
+  declare name: string
+  @column()
+  declare organizationId: number
+  @column()
+  declare pontoonId: number | null
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
 }
 
 export class UserSchema extends BaseModel {

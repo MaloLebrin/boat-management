@@ -927,8 +927,8 @@
       "editLayout": "Modifier le plan",
       "viewOnly": "Vue seule",
       "empty": "Ajoutez des pontons ou mouillages pour visualiser le plan",
-      "hint": "Cliquez sur un bateau pour le sélectionner, puis sur une zone pour le réaffecter.",
-      "boatSelected": "Bateau sélectionné : {name} — cliquez sur un ponton ou un mouillage pour l'affecter",
+      "hint": "Cliquez sur un spot libre pour y affecter le bateau sélectionné.",
+      "boatSelected": "Bateau sélectionné : {name} — cliquez sur un spot libre pour l'affecter",
       "boat": {
         "assign": {
           "title": "Affecter {name}",
@@ -937,6 +937,21 @@
           "confirm": "Affecter"
         }
       }
+    },
+    "spots": {
+      "title": "Places",
+      "add": "Ajouter une place",
+      "edit": "Modifier la place",
+      "empty": "Aucune place définie",
+      "manage": "Gérer les places",
+      "occupied": "Occupé",
+      "free": "Libre",
+      "occupiedBy": "Occupé par {name}",
+      "fields": {
+        "name": "Nom de la place",
+        "description": "Description"
+      },
+      "deleteConfirm": "Supprimer cette place ?"
     },
     "empty": "Aucun port enregistré.",
     "emptyDescription": "Ajoutez un port pour organiser vos pontons et emplacements de bateaux.",

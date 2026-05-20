@@ -43,9 +43,7 @@ export type BoatHullPayload = {
   flagCountry?: string | null
   maxPersons?: number | null
 
-  pontoonId?: number | null
-  mouillageId?: number | null
-  spotIdentifier?: string | null
+  spotId?: number | null
 }
 
 export type BoatEnginePayload = {
@@ -166,15 +164,11 @@ export default class BoatService {
       flagCountry: payload.flagCountry ?? null,
       maxPersons: payload.maxPersons ?? null,
 
-      pontoonId: payload.mouillageId ? null : (payload.pontoonId ?? null),
-      mouillageId: payload.pontoonId ? null : (payload.mouillageId ?? null),
-      spotIdentifier: payload.mouillageId ? null : (payload.spotIdentifier ?? null),
+      spotId: payload.spotId ?? null,
     })
 
-    if (boat.pontoonId !== null) {
-      await this._logBerthChange(boat, boat.pontoonId, null, boat.spotIdentifier)
-    } else if (boat.mouillageId !== null) {
-      await this._logBerthChange(boat, null, boat.mouillageId, null)
+    if (boat.spotId !== null) {
+      await this._logBerthChange(boat, boat.spotId)
     }
 
     await boat.load('engines')
@@ -215,23 +209,14 @@ export default class BoatService {
     boat.flagCountry = payload.flagCountry ?? null
     boat.maxPersons = payload.maxPersons ?? null
 
-    if (payload.pontoonId !== undefined || payload.mouillageId !== undefined) {
-      const newPontoonId = payload.mouillageId ? null : (payload.pontoonId ?? null)
-      const newMouillageId = payload.pontoonId ? null : (payload.mouillageId ?? null)
-      const newSpotIdentifier = newMouillageId ? null : (payload.spotIdentifier ?? null)
+    if (payload.spotId !== undefined) {
+      const newSpotId = payload.spotId ?? null
 
-      const berthChanged =
-        newPontoonId !== boat.pontoonId ||
-        newMouillageId !== boat.mouillageId ||
-        newSpotIdentifier !== boat.spotIdentifier
-
-      if (berthChanged) {
-        await this._logBerthChange(boat, newPontoonId, newMouillageId, newSpotIdentifier)
+      if (newSpotId !== boat.spotId) {
+        await this._logBerthChange(boat, newSpotId)
       }
 
-      boat.pontoonId = newPontoonId
-      boat.mouillageId = newMouillageId
-      boat.spotIdentifier = newSpotIdentifier
+      boat.spotId = newSpotId
     }
 
     await boat.save()
@@ -242,24 +227,17 @@ export default class BoatService {
     return boat
   }
 
-  private async _logBerthChange(
-    boat: Boat,
-    newPontoonId: number | null,
-    newMouillageId: number | null,
-    newSpotIdentifier: string | null
-  ) {
+  private async _logBerthChange(boat: Boat, newSpotId: number | null) {
     const BoatPositionHistory = (await import('#models/boat_position_history')).default
     await BoatPositionHistory.query()
       .where('boatId', boat.id)
       .whereNull('endedAt')
       .update({ endedAt: DateTime.now().toSQL() })
 
-    if (newPontoonId !== null || newMouillageId !== null) {
+    if (newSpotId !== null) {
       await BoatPositionHistory.create({
         boatId: boat.id,
-        pontoonId: newPontoonId,
-        mouillageId: newMouillageId,
-        spotIdentifier: newSpotIdentifier,
+        spotId: newSpotId,
         startedAt: DateTime.now(),
         endedAt: null,
       })
@@ -275,27 +253,8 @@ export default class BoatService {
     await boat.delete()
   }
 
-  async updateAssignment(
-    boat: Boat,
-    payload: {
-      pontoonId?: number | null
-      mouillageId?: number | null
-      spotIdentifier?: string | null
-    }
-  ) {
-    if (payload.pontoonId !== undefined && payload.pontoonId !== null) {
-      boat.pontoonId = payload.pontoonId
-      boat.mouillageId = null
-      boat.spotIdentifier = payload.spotIdentifier ?? null
-    } else if (payload.mouillageId !== undefined && payload.mouillageId !== null) {
-      boat.mouillageId = payload.mouillageId
-      boat.pontoonId = null
-      boat.spotIdentifier = null
-    } else {
-      boat.pontoonId = null
-      boat.mouillageId = null
-      boat.spotIdentifier = null
-    }
+  async updateAssignment(boat: Boat, payload: { spotId: number | null }) {
+    boat.spotId = payload.spotId
     await boat.save()
 
     const BoatPositionHistory = (await import('#models/boat_position_history')).default
@@ -308,12 +267,10 @@ export default class BoatService {
       await currentHistory.save()
     }
 
-    if (boat.pontoonId !== null || boat.mouillageId !== null) {
+    if (boat.spotId !== null) {
       await BoatPositionHistory.create({
         boatId: boat.id,
-        pontoonId: boat.pontoonId,
-        mouillageId: boat.mouillageId,
-        spotIdentifier: boat.spotIdentifier,
+        spotId: boat.spotId,
         startedAt: DateTime.now(),
       })
     }

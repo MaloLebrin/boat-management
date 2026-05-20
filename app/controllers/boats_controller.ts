@@ -10,9 +10,8 @@ import { assignBoatValidator } from '#validators/marina_layout'
 import type { HttpContext } from '@adonisjs/core/http'
 import Boat from '#models/boat'
 import BoatPositionHistory from '#models/boat_position_history'
-import Mouillage from '#models/mouillage'
-import Pontoon from '#models/pontoon'
 import Port from '#models/port'
+import Spot from '#models/spot'
 
 export default class BoatsController {
   async index({ inertia, auth, request }: HttpContext) {
@@ -85,17 +84,17 @@ export default class BoatsController {
       const boatMedia = await mediaService.listForEntity('boat', boat.id)
       await boat.load('safetyEquipment')
 
-      if (boat.pontoonId !== null) {
-        await boat.load('pontoon', (q) => q.preload('port'))
-      }
-      if (boat.mouillageId !== null) {
-        await boat.load('mouillage', (q) => q.preload('port'))
+      if (boat.spotId !== null) {
+        await boat.load('spot', (q) =>
+          q.preload('pontoon', (pq) => pq.preload('port')).preload('mouillage', (mq) => mq.preload('port'))
+        )
       }
 
       const positionHistory = await BoatPositionHistory.query()
         .where('boatId', boat.id)
-        .preload('pontoon', (q) => q.preload('port'))
-        .preload('mouillage', (q) => q.preload('port'))
+        .preload('spot', (q) =>
+          q.preload('pontoon', (pq) => pq.preload('port')).preload('mouillage', (mq) => mq.preload('port'))
+        )
         .orderBy('startedAt', 'desc')
         .limit(20)
 
@@ -125,33 +124,25 @@ export default class BoatsController {
           francisationNumber: boat.francisationNumber,
           flagCountry: boat.flagCountry,
           maxPersons: boat.maxPersons,
-          pontoonId: boat.pontoonId ?? null,
-          mouillageId: boat.mouillageId ?? null,
-          spotIdentifier: boat.spotIdentifier ?? null,
-          pontoon: boat.pontoon
+          spotId: boat.spotId ?? null,
+          spot: boat.spot
             ? {
-                id: boat.pontoon.id,
-                name: boat.pontoon.name,
-                portId: boat.pontoon.portId,
-                portName: boat.pontoon.port.name,
-              }
-            : null,
-          mouillage: boat.mouillage
-            ? {
-                id: boat.mouillage.id,
-                name: boat.mouillage.name,
-                portId: boat.mouillage.portId,
-                portName: boat.mouillage.port.name,
+                id: boat.spot.id,
+                name: boat.spot.name,
+                pontoonId: boat.spot.pontoonId,
+                pontoonName: boat.spot.pontoon?.name ?? null,
+                mouillageId: boat.spot.mouillageId,
+                mouillageNom: boat.spot.mouillage?.name ?? null,
+                portName: boat.spot.pontoon?.port?.name ?? boat.spot.mouillage?.port?.name ?? null,
               }
             : null,
           positionHistory: positionHistory.map((h) => ({
             id: h.id,
-            pontoonId: h.pontoonId,
-            pontoonName: h.pontoon?.name ?? null,
-            mouillageId: h.mouillageId,
-            mouillageNom: h.mouillage?.name ?? null,
-            portName: h.pontoon?.port?.name ?? h.mouillage?.port?.name ?? null,
-            spotIdentifier: h.spotIdentifier,
+            spotId: h.spotId,
+            spotName: h.spot?.name ?? null,
+            pontoonName: h.spot?.pontoon?.name ?? null,
+            mouillageNom: h.spot?.mouillage?.name ?? null,
+            portName: h.spot?.pontoon?.port?.name ?? h.spot?.mouillage?.port?.name ?? null,
             startedAt: h.startedAt.toISODate()!,
             endedAt: h.endedAt ? h.endedAt.toISODate() : null,
           })),
@@ -310,9 +301,7 @@ export default class BoatsController {
           francisationNumber: boat.francisationNumber,
           flagCountry: boat.flagCountry,
           maxPersons: boat.maxPersons,
-          pontoonId: boat.pontoonId ?? null,
-          mouillageId: boat.mouillageId ?? null,
-          spotIdentifier: boat.spotIdentifier ?? null,
+          spotId: boat.spotId ?? null,
         },
         ports: ports.map((p) => ({
           id: p.id,
@@ -371,26 +360,16 @@ export default class BoatsController {
 
     const payload = await request.validateUsing(assignBoatValidator)
 
-    const orgId = user.organizationId
-
-    if (payload.pontoonId !== undefined && payload.pontoonId !== null) {
-      const pontoon = await Pontoon.query()
-        .whereHas('port', (q) => q.where('organizationId', orgId))
-        .where('id', payload.pontoonId)
+    if (payload.spotId !== null) {
+      const spot = await Spot.query()
+        .where('id', payload.spotId)
+        .where('organizationId', user.organizationId)
         .first()
-      if (!pontoon) return response.status(404).json({ error: 'pontoon not found' })
-    }
-
-    if (payload.mouillageId !== undefined && payload.mouillageId !== null) {
-      const mouillage = await Mouillage.query()
-        .whereHas('port', (q) => q.where('organizationId', orgId))
-        .where('id', payload.mouillageId)
-        .first()
-      if (!mouillage) return response.status(404).json({ error: 'mouillage not found' })
+      if (!spot) return response.status(404).json({ error: 'spot not found' })
     }
 
     const boatService = new BoatService()
-    await boatService.updateAssignment(boat, payload)
+    await boatService.updateAssignment(boat, { spotId: payload.spotId })
 
     return response.json({ ok: true })
   }

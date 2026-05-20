@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { MouillageRow } from '~/types/port'
+import type { MouillageRow, SpotRow } from '~/types/port'
 
 const RX = 120
 const RY = 75
+const SPOT_SIZE = 28
 
 const props = defineProps<{
   mouillage: MouillageRow
@@ -15,18 +16,30 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   mousedown: [e: MouseEvent]
-  'boat-select': [boat: { id: number; name: string }]
+  'spot-click': [info: { spotId: number; boat: { id: number; name: string } | null }]
   'zone-click': []
 }>()
 
-const boatPositions = computed(() =>
-  props.mouillage.boats.map((b, i) => {
-    const angle = (i / Math.max(props.mouillage.boats.length, 1)) * 2 * Math.PI - Math.PI / 2
-    const bx = Math.cos(angle) * (RX - 20)
-    const by = Math.sin(angle) * (RY - 20)
-    return { ...b, bx, by }
+const spotPositions = computed(() =>
+  props.mouillage.spots.map((spot, i) => {
+    const angle = (i / Math.max(props.mouillage.spots.length, 1)) * 2 * Math.PI - Math.PI / 2
+    const sx = Math.cos(angle) * (RX - 24)
+    const sy = Math.sin(angle) * (RY - 24)
+    return { ...spot, sx, sy }
   })
 )
+
+function getSpotFill(spot: SpotRow): string {
+  if (!spot.boat) return 'rgba(33,150,243,0.2)'
+  if (props.selectedBoatId === spot.boat.id) return '#1A237E'
+  return '#1565C0'
+}
+
+function getSpotStroke(spot: SpotRow): string {
+  if (!spot.boat) return '#2196F3'
+  if (props.selectedBoatId === spot.boat.id) return '#FFD700'
+  return 'white'
+}
 
 function handleMouseDown(e: MouseEvent) {
   emit('mousedown', e)
@@ -36,8 +49,8 @@ function handleZoneClick() {
   emit('zone-click')
 }
 
-function handleBoatClick(boat: { id: number; name: string }) {
-  emit('boat-select', boat)
+function handleSpotClick(spot: SpotRow) {
+  emit('spot-click', { spotId: spot.id, boat: spot.boat })
 }
 </script>
 
@@ -74,24 +87,45 @@ function handleBoatClick(boat: { id: number; name: string }) {
       {{ mouillage.name }}
     </text>
 
-    <!-- Boats in ellipse -->
+    <!-- Spots in ellipse -->
     <g
-      v-for="boat in boatPositions"
-      :key="boat.id"
-      :transform="`translate(${boat.bx - 14}, ${boat.by - 14})`"
+      v-for="spot in spotPositions"
+      :key="spot.id"
+      :transform="`translate(${spot.sx - SPOT_SIZE / 2}, ${spot.sy - SPOT_SIZE / 2})`"
       style="cursor: pointer"
-      @click.stop="handleBoatClick({ id: boat.id, name: boat.name })"
+      @click.stop="handleSpotClick(spot)"
     >
       <rect
-        width="28"
-        height="28"
-        rx="14"
-        :fill="selectedBoatId === boat.id ? '#1A237E' : '#1565C0'"
-        :stroke="selectedBoatId === boat.id ? '#FFD700' : 'white'"
+        :width="SPOT_SIZE"
+        :height="SPOT_SIZE"
+        :rx="SPOT_SIZE / 2"
+        :fill="getSpotFill(spot)"
+        :stroke="getSpotStroke(spot)"
+        :stroke-dasharray="spot.boat ? 'none' : '4 2'"
         stroke-width="2"
       />
-      <text x="14" y="18" text-anchor="middle" font-size="8" fill="white" pointer-events="none">
-        {{ boat.name.slice(0, 4) }}
+      <!-- Spot name -->
+      <text
+        :x="SPOT_SIZE / 2"
+        y="14"
+        text-anchor="middle"
+        font-size="7"
+        :fill="spot.boat ? 'white' : '#2196F3'"
+        pointer-events="none"
+      >
+        {{ spot.name.slice(0, 3) }}
+      </text>
+      <!-- Boat name (if occupied) -->
+      <text
+        v-if="spot.boat"
+        :x="SPOT_SIZE / 2"
+        y="22"
+        text-anchor="middle"
+        font-size="6"
+        fill="rgba(255,255,255,0.75)"
+        pointer-events="none"
+      >
+        {{ spot.boat.name.slice(0, 4) }}
       </text>
     </g>
   </g>

@@ -4,7 +4,6 @@ import { router } from '@inertiajs/vue3'
 import { PlusIcon } from '@heroicons/vue/24/outline'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
-import BoatAssignModal from '~/components/ports/modals/BoatAssignModal.vue'
 import MouillageFormModal from '~/components/ports/modals/MouillageFormModal.vue'
 import PontoonFormModal from '~/components/ports/modals/PontoonFormModal.vue'
 import MarinaCanvas from '~/components/ports/show/MarinaCanvas.vue'
@@ -13,7 +12,6 @@ import type { PortShowDetail, PontoonRow, MouillageRow } from '~/types/port'
 
 type LocalPontoon = PontoonRow & { x: number; y: number }
 type LocalMouillage = MouillageRow & { x: number; y: number }
-type AssignTarget = { type: 'pontoon'; id: number } | { type: 'mouillage'; id: number }
 
 const props = defineProps<{
   port: PortShowDetail
@@ -25,8 +23,6 @@ const editMode = ref(false)
 const localPontoons = ref<LocalPontoon[]>([])
 const localMouillages = ref<LocalMouillage[]>([])
 const selectedBoat = ref<{ id: number; name: string } | null>(null)
-const assignTarget = ref<AssignTarget | null>(null)
-const assignModalOpen = ref(false)
 const showPontoonForm = ref(false)
 const showMouillageForm = ref(false)
 
@@ -48,7 +44,7 @@ watch(
   (newPort) => {
     localPontoons.value = localPontoons.value.map((lp) => {
       const updated = newPort.pontoons.find((p) => p.id === lp.id)
-      return updated ? { ...lp, boats: updated.boats } : lp
+      return updated ? { ...lp, spots: updated.spots } : lp
     })
     const existingPIds = new Set(localPontoons.value.map((lp) => lp.id))
     newPort.pontoons
@@ -64,7 +60,7 @@ watch(
 
     localMouillages.value = localMouillages.value.map((lm) => {
       const updated = newPort.mouillages.find((m) => m.id === lm.id)
-      return updated ? { ...lm, boats: updated.boats } : lm
+      return updated ? { ...lm, spots: updated.spots } : lm
     })
     const existingMIds = new Set(localMouillages.value.map((lm) => lm.id))
     newPort.mouillages
@@ -111,47 +107,33 @@ async function handleMouillageDragEnd(mouillageId: number, x: number, y: number)
   await patchJSON(`/ports/${props.port.id}/mouillages/${mouillageId}/position`, { x, y })
 }
 
-function handleBoatSelect(boat: { id: number; name: string }) {
-  selectedBoat.value = selectedBoat.value?.id === boat.id ? null : boat
-}
-
-function handlePontoonClick(pontoonId: number) {
-  if (!selectedBoat.value) return
-  assignTarget.value = { type: 'pontoon', id: pontoonId }
-  assignModalOpen.value = true
-}
-
-async function handleMouillageClick(mouillageId: number) {
-  if (!selectedBoat.value) return
-  const ok = await patchJSON(`/boats/${selectedBoat.value.id}/assignment`, { mouillageId })
-  if (ok) {
-    selectedBoat.value = null
-    router.reload({ only: ['port'], preserveScroll: true })
-  }
-}
-
 function handleCanvasClick() {
   selectedBoat.value = null
 }
 
-async function handleAssignConfirm(spotIdentifier: string) {
-  if (!selectedBoat.value || !assignTarget.value || assignTarget.value.type !== 'pontoon') return
-  const ok = await patchJSON(`/boats/${selectedBoat.value.id}/assignment`, {
-    pontoonId: assignTarget.value.id,
-    spotIdentifier: spotIdentifier || null,
-  })
-  assignModalOpen.value = false
-  assignTarget.value = null
-  if (ok) {
+async function handleSpotClick(info: { spotId: number; boat: { id: number; name: string } | null }) {
+  if (info.boat && selectedBoat.value?.id === info.boat.id) {
     selectedBoat.value = null
-    router.reload({ only: ['port'], preserveScroll: true })
+    return
   }
-}
-
-function handleCloseAssignModal(v: boolean) {
-  if (!v) {
-    assignModalOpen.value = false
-    assignTarget.value = null
+  if (info.boat && !selectedBoat.value) {
+    selectedBoat.value = info.boat
+    return
+  }
+  if (!info.boat && selectedBoat.value) {
+    const ok = await patchJSON(`/boats/${selectedBoat.value.id}/assignment`, { spotId: info.spotId })
+    if (ok) {
+      selectedBoat.value = null
+      router.reload({ only: ['port'], preserveScroll: true })
+    }
+    return
+  }
+  if (info.boat && selectedBoat.value && info.boat.id !== selectedBoat.value.id) {
+    const ok = await patchJSON(`/boats/${selectedBoat.value.id}/assignment`, { spotId: info.spotId })
+    if (ok) {
+      selectedBoat.value = null
+      router.reload({ only: ['port'], preserveScroll: true })
+    }
   }
 }
 </script>
@@ -211,19 +193,9 @@ function handleCloseAssignModal(v: boolean) {
         :selected-boat-id="selectedBoat?.id ?? null"
         @pontoon-drag-end="handlePontoonDragEnd"
         @mouillage-drag-end="handleMouillageDragEnd"
-        @boat-select="handleBoatSelect"
-        @pontoon-click="handlePontoonClick"
-        @mouillage-click="handleMouillageClick"
+        @spot-click="handleSpotClick"
         @canvas-click="handleCanvasClick"
       />
     </div>
-
-    <!-- Boat assign modal -->
-    <BoatAssignModal
-      :open="assignModalOpen"
-      :boat-name="selectedBoat?.name ?? ''"
-      @confirm="handleAssignConfirm"
-      @update:open="handleCloseAssignModal"
-    />
   </div>
 </template>

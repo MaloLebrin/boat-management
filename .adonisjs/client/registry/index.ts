@@ -372,6 +372,30 @@ const routes = {
     tokens: [{"old":"/ports/:portId/mouillages/:mouillageId/position","type":0,"val":"ports","end":""},{"old":"/ports/:portId/mouillages/:mouillageId/position","type":1,"val":"portId","end":""},{"old":"/ports/:portId/mouillages/:mouillageId/position","type":0,"val":"mouillages","end":""},{"old":"/ports/:portId/mouillages/:mouillageId/position","type":1,"val":"mouillageId","end":""},{"old":"/ports/:portId/mouillages/:mouillageId/position","type":0,"val":"position","end":""}],
     types: placeholder as Registry['ports.mouillages.updatePosition']['types'],
   },
+  'ports.pontoons.spots.store': {
+    methods: ["POST"],
+    pattern: '/ports/:portId/pontoons/:pontoonId/spots',
+    tokens: [{"old":"/ports/:portId/pontoons/:pontoonId/spots","type":0,"val":"ports","end":""},{"old":"/ports/:portId/pontoons/:pontoonId/spots","type":1,"val":"portId","end":""},{"old":"/ports/:portId/pontoons/:pontoonId/spots","type":0,"val":"pontoons","end":""},{"old":"/ports/:portId/pontoons/:pontoonId/spots","type":1,"val":"pontoonId","end":""},{"old":"/ports/:portId/pontoons/:pontoonId/spots","type":0,"val":"spots","end":""}],
+    types: placeholder as Registry['ports.pontoons.spots.store']['types'],
+  },
+  'ports.mouillages.spots.store': {
+    methods: ["POST"],
+    pattern: '/ports/:portId/mouillages/:mouillageId/spots',
+    tokens: [{"old":"/ports/:portId/mouillages/:mouillageId/spots","type":0,"val":"ports","end":""},{"old":"/ports/:portId/mouillages/:mouillageId/spots","type":1,"val":"portId","end":""},{"old":"/ports/:portId/mouillages/:mouillageId/spots","type":0,"val":"mouillages","end":""},{"old":"/ports/:portId/mouillages/:mouillageId/spots","type":1,"val":"mouillageId","end":""},{"old":"/ports/:portId/mouillages/:mouillageId/spots","type":0,"val":"spots","end":""}],
+    types: placeholder as Registry['ports.mouillages.spots.store']['types'],
+  },
+  'spots.update': {
+    methods: ["PUT"],
+    pattern: '/spots/:id',
+    tokens: [{"old":"/spots/:id","type":0,"val":"spots","end":""},{"old":"/spots/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['spots.update']['types'],
+  },
+  'spots.destroy': {
+    methods: ["DELETE"],
+    pattern: '/spots/:id',
+    tokens: [{"old":"/spots/:id","type":0,"val":"spots","end":""},{"old":"/spots/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['spots.destroy']['types'],
+  },
   'new_account.create': {
     methods: ["GET","HEAD"],
     pattern: '/signup',

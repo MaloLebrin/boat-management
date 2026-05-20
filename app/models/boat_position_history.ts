@@ -2,8 +2,7 @@ import { BaseModel, column, belongsTo } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 import Boat from '#models/boat'
-import Mouillage from '#models/mouillage'
-import Pontoon from '#models/pontoon'
+import Spot from '#models/spot'
 
 export default class BoatPositionHistory extends BaseModel {
   static table = 'boat_position_history'
@@ -15,13 +14,7 @@ export default class BoatPositionHistory extends BaseModel {
   declare boatId: number
 
   @column()
-  declare pontoonId: number | null
-
-  @column()
-  declare mouillageId: number | null
-
-  @column()
-  declare spotIdentifier: string | null
+  declare spotId: number | null
 
   @column.dateTime()
   declare startedAt: DateTime
@@ -41,9 +34,6 @@ export default class BoatPositionHistory extends BaseModel {
   @belongsTo(() => Boat)
   declare boat: BelongsTo<typeof Boat>
 
-  @belongsTo(() => Pontoon)
-  declare pontoon: BelongsTo<typeof Pontoon>
-
-  @belongsTo(() => Mouillage)
-  declare mouillage: BelongsTo<typeof Mouillage>
+  @belongsTo(() => Spot)
+  declare spot: BelongsTo<typeof Spot>
 }

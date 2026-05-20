@@ -908,8 +908,8 @@
       "editLayout": "Edit layout",
       "viewOnly": "View only",
       "empty": "Add pontoons or anchorages to visualize the plan",
-      "hint": "Click a boat to select it, then click a zone to reassign it.",
-      "boatSelected": "Selected: {name} - click a pontoon or anchorage to assign",
+      "hint": "Click an empty spot to assign the selected boat.",
+      "boatSelected": "Selected boat: {name} — click an empty spot to assign it",
       "boat": {
         "assign": {
           "title": "Assign {name}",
@@ -918,6 +918,21 @@
           "confirm": "Assign"
         }
       }
+    },
+    "spots": {
+      "title": "Spots",
+      "add": "Add a spot",
+      "edit": "Edit spot",
+      "empty": "No spots defined",
+      "manage": "Manage spots",
+      "occupied": "Occupied",
+      "free": "Free",
+      "occupiedBy": "Occupied by {name}",
+      "fields": {
+        "name": "Spot name",
+        "description": "Description"
+      },
+      "deleteConfirm": "Delete this spot?"
     },
     "empty": "No port registered yet.",
     "emptyDescription": "Add a port to organize your pontoons and boat berths.",

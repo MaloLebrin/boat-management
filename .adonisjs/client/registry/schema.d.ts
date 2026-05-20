@@ -739,6 +739,54 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/mouillages_controller').default['updatePosition']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'ports.pontoons.spots.store': {
+    methods: ["POST"]
+    pattern: '/ports/:portId/pontoons/:pontoonId/spots'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/spot').createSpotValidator)>>
+      paramsTuple: [ParamValue, ParamValue]
+      params: { portId: ParamValue; pontoonId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/spot').createSpotValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/spots_controller').default['storeForPontoon']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/spots_controller').default['storeForPontoon']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'ports.mouillages.spots.store': {
+    methods: ["POST"]
+    pattern: '/ports/:portId/mouillages/:mouillageId/spots'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/spot').createSpotValidator)>>
+      paramsTuple: [ParamValue, ParamValue]
+      params: { portId: ParamValue; mouillageId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/spot').createSpotValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/spots_controller').default['storeForMouillage']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/spots_controller').default['storeForMouillage']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'spots.update': {
+    methods: ["PUT"]
+    pattern: '/spots/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/spot').updateSpotValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/spot').updateSpotValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/spots_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/spots_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'spots.destroy': {
+    methods: ["DELETE"]
+    pattern: '/spots/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/spots_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/spots_controller').default['destroy']>>>
+    }
+  }
   'new_account.create': {
     methods: ["GET","HEAD"]
     pattern: '/signup'

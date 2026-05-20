@@ -13,12 +13,17 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   edit: [mouillage: MouillageRow]
+  'manage-spots': [mouillage: MouillageRow]
 }>()
 
 const { t } = useT()
 
+function hasBoats(): boolean {
+  return props.mouillage.spots.some((s) => s.boat !== null)
+}
+
 function handleDelete() {
-  if (props.mouillage.boats.length > 0) {
+  if (hasBoats()) {
     alert(t('ports.mouillages.hasBoats'))
     return
   }
@@ -49,16 +54,26 @@ function handleDelete() {
       </div>
     </div>
 
+    <!-- Spots list -->
     <div class="mt-4">
-      <p class="text-xs font-semibold uppercase text-fg-muted">{{ t('ports.show.boats') }}</p>
-      <div v-if="mouillage.boats.length === 0" class="mt-2 text-sm text-fg-subtle">
-        {{ t('ports.show.noBoatsMouillage') }}
+      <div class="flex items-center justify-between">
+        <p class="text-xs font-semibold uppercase text-fg-muted">{{ t('ports.spots.title') }}</p>
+        <BaseButton variant="ghost" size="sm" @click="emit('manage-spots', mouillage)">
+          {{ t('ports.spots.manage') }}
+        </BaseButton>
+      </div>
+      <div v-if="mouillage.spots.length === 0" class="mt-2 text-sm text-fg-subtle">
+        {{ t('ports.spots.empty') }}
       </div>
       <ul v-else class="mt-2 space-y-2">
-        <li v-for="boat in mouillage.boats" :key="boat.id">
-          <Link :href="`/boats/${boat.id}`" class="text-sm font-medium text-brand hover:underline">
-            {{ boat.name }}
-          </Link>
+        <li v-for="spot in mouillage.spots" :key="spot.id" class="flex items-center justify-between">
+          <span class="text-sm font-medium text-fg">{{ spot.name }}</span>
+          <template v-if="spot.boat">
+            <Link :href="`/boats/${spot.boat.id}`" class="text-sm text-brand hover:underline">
+              {{ spot.boat.name }}
+            </Link>
+          </template>
+          <span v-else class="text-xs text-fg-muted">{{ t('ports.spots.free') }}</span>
         </li>
       </ul>
     </div>

@@ -10,10 +10,16 @@ export type PortListItem = {
   boatCount: number
 }
 
-export type PontoonBoatRow = {
+export type SpotBoatRow = {
   id: number
   name: string
-  spotIdentifier: string | null
+}
+
+export type SpotRow = {
+  id: number
+  name: string
+  description: string | null
+  boat: SpotBoatRow | null
 }
 
 export type PontoonRow = {
@@ -22,12 +28,7 @@ export type PontoonRow = {
   description: string | null
   positionX: number | null
   positionY: number | null
-  boats: PontoonBoatRow[]
-}
-
-export type MouillageBoatRow = {
-  id: number
-  name: string
+  spots: SpotRow[]
 }
 
 export type MouillageRow = {
@@ -36,7 +37,7 @@ export type MouillageRow = {
   description: string | null
   positionX: number | null
   positionY: number | null
-  boats: MouillageBoatRow[]
+  spots: SpotRow[]
 }
 
 export type PortShowDetail = {

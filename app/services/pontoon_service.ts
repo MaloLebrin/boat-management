@@ -1,5 +1,6 @@
 import Boat from '#models/boat'
 import Pontoon from '#models/pontoon'
+import Spot from '#models/spot'
 import type Port from '#models/port'
 import { PontoonHasBoatsError } from '#services/port_service'
 
@@ -25,9 +26,14 @@ export default class PontoonService {
   }
 
   async deleteForPort(pontoon: Pontoon) {
-    const result = await Boat.query().where('pontoonId', pontoon.id).count('id as count').first()
+    const spots = await Spot.query().where('pontoonId', pontoon.id).select('id')
+    const spotIds = spots.map((s) => s.id)
 
-    if (Number(result?.$extras['count'] ?? 0) > 0) throw new PontoonHasBoatsError()
+    if (spotIds.length > 0) {
+      const result = await Boat.query().whereIn('spotId', spotIds).count('id as count').first()
+
+      if (Number(result?.$extras['count'] ?? 0) > 0) throw new PontoonHasBoatsError()
+    }
 
     await pontoon.delete()
   }

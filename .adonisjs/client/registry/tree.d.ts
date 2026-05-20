@@ -81,13 +81,23 @@ export interface ApiDefinition {
       update: typeof routes['ports.pontoons.update']
       destroy: typeof routes['ports.pontoons.destroy']
       updatePosition: typeof routes['ports.pontoons.updatePosition']
+      spots: {
+        store: typeof routes['ports.pontoons.spots.store']
+      }
     }
     mouillages: {
       store: typeof routes['ports.mouillages.store']
       update: typeof routes['ports.mouillages.update']
       destroy: typeof routes['ports.mouillages.destroy']
       updatePosition: typeof routes['ports.mouillages.updatePosition']
+      spots: {
+        store: typeof routes['ports.mouillages.spots.store']
+      }
     }
+  }
+  spots: {
+    update: typeof routes['spots.update']
+    destroy: typeof routes['spots.destroy']
   }
   newAccount: {
     create: typeof routes['new_account.create']

@@ -17,9 +17,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   'pontoon-drag-end': [id: number, x: number, y: number]
   'mouillage-drag-end': [id: number, x: number, y: number]
-  'boat-select': [boat: { id: number; name: string }]
-  'pontoon-click': [id: number]
-  'mouillage-click': [id: number]
+  'spot-click': [info: { spotId: number; boat: { id: number; name: string } | null }]
   'canvas-click': []
 }>()
 
@@ -87,16 +85,8 @@ function startMouillageDrag(e: MouseEvent, mouillage: { id: number; x: number; y
   }
 }
 
-function handleBoatSelect(boat: { id: number; name: string }) {
-  emit('boat-select', boat)
-}
-
-function handlePontoonClick(id: number) {
-  emit('pontoon-click', id)
-}
-
-function handleMouillageClick(id: number) {
-  emit('mouillage-click', id)
+function handleSpotClick(info: { spotId: number; boat: { id: number; name: string } | null }) {
+  emit('spot-click', info)
 }
 </script>
 
@@ -139,8 +129,8 @@ function handleMouillageClick(id: number) {
             y: currentPos('mouillage', m).y,
           })
       "
-      @boat-select="handleBoatSelect"
-      @zone-click="() => handleMouillageClick(m.id)"
+      @spot-click="handleSpotClick"
+      @zone-click="() => {}"
     />
 
     <!-- Pontoons -->
@@ -160,8 +150,8 @@ function handleMouillageClick(id: number) {
             y: currentPos('pontoon', pt).y,
           })
       "
-      @boat-select="handleBoatSelect"
-      @pier-click="() => handlePontoonClick(pt.id)"
+      @spot-click="handleSpotClick"
+      @pier-click="() => {}"
     />
   </svg>
 </template>

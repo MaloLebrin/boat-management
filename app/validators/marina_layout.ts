@@ -9,8 +9,6 @@ export const updatePositionValidator = vine.compile(
 
 export const assignBoatValidator = vine.compile(
   vine.object({
-    pontoonId: vine.number().nullable().optional(),
-    mouillageId: vine.number().nullable().optional(),
-    spotIdentifier: vine.string().trim().maxLength(16).nullable().optional(),
+    spotId: vine.number().nullable(),
   })
 )

@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { PontoonRow } from '~/types/port'
+import type { PontoonRow, SpotRow } from '~/types/port'
 
 const PIER_H = 24
 const SLOT_W = 44
-const SLOT_H = 56
+const SLOT_H = 60
 const SLOT_GAP = 6
 const PIER_MIN_W = 260
-const MAX_VISIBLE_BOATS = 6
+const MAX_VISIBLE_SPOTS = 6
 
 const props = defineProps<{
   pontoon: PontoonRow
@@ -19,15 +19,35 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   mousedown: [e: MouseEvent]
-  'boat-select': [boat: { id: number; name: string }]
+  'spot-click': [info: { spotId: number; boat: { id: number; name: string } | null }]
   'pier-click': []
 }>()
 
-const visibleBoats = computed(() => props.pontoon.boats.slice(0, MAX_VISIBLE_BOATS))
+const visibleSpots = computed(() => props.pontoon.spots.slice(0, MAX_VISIBLE_SPOTS))
 
 const pierWidth = computed(() =>
-  Math.max(PIER_MIN_W, visibleBoats.value.length * (SLOT_W + SLOT_GAP) + SLOT_GAP)
+  Math.max(PIER_MIN_W, visibleSpots.value.length * (SLOT_W + SLOT_GAP) + SLOT_GAP)
 )
+
+function getSpotFill(spot: SpotRow): string {
+  if (!spot.boat) return 'none'
+  if (props.selectedBoatId === spot.boat.id) return '#1A237E'
+  return '#1565C0'
+}
+
+function getSpotStroke(spot: SpotRow): string {
+  if (!spot.boat) return '#5D4037'
+  if (props.selectedBoatId === spot.boat.id) return '#FFD700'
+  return 'white'
+}
+
+function getNameColor(spot: SpotRow): string {
+  return spot.boat ? 'white' : '#5D4037'
+}
+
+function handleSpotClick(spot: SpotRow) {
+  emit('spot-click', { spotId: spot.id, boat: spot.boat })
+}
 </script>
 
 <template>
@@ -48,38 +68,48 @@ const pierWidth = computed(() =>
       {{ pontoon.name }}
     </text>
 
-    <!-- Boat slots (filled) -->
+    <!-- Spot slots -->
     <g
-      v-for="(boat, i) in visibleBoats"
-      :key="boat.id"
+      v-for="(spot, i) in visibleSpots"
+      :key="spot.id"
       :transform="`translate(${SLOT_GAP + i * (SLOT_W + SLOT_GAP)}, ${PIER_H + 5})`"
       style="cursor: pointer"
-      @click.stop="$emit('boat-select', { id: boat.id, name: boat.name })"
+      @click.stop="handleSpotClick(spot)"
     >
       <rect
         :width="SLOT_W"
         :height="SLOT_H"
         rx="3"
-        :fill="selectedBoatId === boat.id ? '#1A237E' : '#1565C0'"
-        :stroke="selectedBoatId === boat.id ? '#FFD700' : 'white'"
+        :fill="getSpotFill(spot)"
+        :stroke="getSpotStroke(spot)"
+        :stroke-dasharray="spot.boat ? 'none' : '4 3'"
         stroke-width="1.5"
       />
-      <!-- Spot identifier (primary) -->
+      <!-- Spot name -->
       <text
         :x="SLOT_W / 2"
         y="18"
         text-anchor="middle"
         font-size="10"
         font-weight="700"
-        fill="white"
+        :fill="getNameColor(spot)"
         pointer-events="none"
       >
-        {{ boat.spotIdentifier ?? '—' }}
+        {{ spot.name }}
       </text>
-      <!-- Divider -->
-      <line :x1="6" :y1="24" :x2="SLOT_W - 6" y2="24" stroke="rgba(255,255,255,0.3)" stroke-width="1" />
-      <!-- Boat name -->
+      <!-- Divider (only if occupied) -->
+      <line
+        v-if="spot.boat"
+        :x1="6"
+        :y1="24"
+        :x2="SLOT_W - 6"
+        y2="24"
+        stroke="rgba(255,255,255,0.3)"
+        stroke-width="1"
+      />
+      <!-- Boat name (if occupied) -->
       <text
+        v-if="spot.boat"
         :x="SLOT_W / 2"
         y="38"
         text-anchor="middle"
@@ -87,13 +117,13 @@ const pierWidth = computed(() =>
         fill="rgba(255,255,255,0.85)"
         pointer-events="none"
       >
-        {{ boat.name.slice(0, 6) }}
+        {{ spot.boat.name.slice(0, 6) }}
       </text>
     </g>
 
-    <!-- Empty slot placeholders (no boat) -->
+    <!-- Empty slot placeholder (if no spots) -->
     <g
-      v-if="visibleBoats.length === 0"
+      v-if="visibleSpots.length === 0"
       :transform="`translate(${SLOT_GAP}, ${PIER_H + 5})`"
     >
       <rect
@@ -107,15 +137,15 @@ const pierWidth = computed(() =>
       />
     </g>
 
-    <!-- "+N" if more than MAX_VISIBLE_BOATS -->
+    <!-- "+N" if more than MAX_VISIBLE_SPOTS -->
     <text
-      v-if="pontoon.boats.length > MAX_VISIBLE_BOATS"
-      :x="SLOT_GAP + MAX_VISIBLE_BOATS * (SLOT_W + SLOT_GAP) + 4"
+      v-if="pontoon.spots.length > MAX_VISIBLE_SPOTS"
+      :x="SLOT_GAP + MAX_VISIBLE_SPOTS * (SLOT_W + SLOT_GAP) + 4"
       :y="PIER_H + 36"
       font-size="11"
       fill="#5D4037"
     >
-      +{{ pontoon.boats.length - MAX_VISIBLE_BOATS }}
+      +{{ pontoon.spots.length - MAX_VISIBLE_SPOTS }}
     </text>
   </g>
 </template>

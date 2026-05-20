@@ -71,9 +71,7 @@ export const createBoatValidator = vine.create({
   flagCountry: vine.string().trim().maxLength(8).nullable().optional(),
   maxPersons: vine.number().withoutDecimals().positive().nullable().optional(),
 
-  pontoonId: vine.number().withoutDecimals().positive().nullable().optional(),
-  mouillageId: vine.number().withoutDecimals().positive().nullable().optional(),
-  spotIdentifier: vine.string().trim().maxLength(16).nullable().optional(),
+  spotId: vine.number().withoutDecimals().positive().nullable().optional(),
 })
 
 /** Same hull-only schema as creation (no nested engines / sails / rig). */
@@ -103,8 +101,6 @@ export const updateBoatValidator = vine.compile(
     flagCountry: vine.string().trim().maxLength(8).nullable().optional(),
     maxPersons: vine.number().withoutDecimals().positive().nullable().optional(),
 
-    pontoonId: vine.number().withoutDecimals().positive().nullable().optional(),
-    mouillageId: vine.number().withoutDecimals().positive().nullable().optional(),
-    spotIdentifier: vine.string().trim().maxLength(16).nullable().optional(),
+    spotId: vine.number().withoutDecimals().positive().nullable().optional(),
   })
 )

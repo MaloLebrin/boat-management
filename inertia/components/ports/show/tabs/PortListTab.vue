@@ -3,10 +3,12 @@ import { ref } from 'vue'
 import { PlusIcon } from '@heroicons/vue/24/outline'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
+import BaseModal from '~/components/base/BaseModal.vue'
 import MouillageCard from '~/components/ports/show/MouillageCard.vue'
 import MouillageFormModal from '~/components/ports/modals/MouillageFormModal.vue'
 import PontoonCard from '~/components/ports/show/PontoonCard.vue'
 import PontoonFormModal from '~/components/ports/modals/PontoonFormModal.vue'
+import SpotsManager from '~/components/ports/show/SpotsManager.vue'
 import { useT } from '~/composables/useT'
 import type { PortShowDetail, PontoonRow, MouillageRow } from '~/types/port'
 
@@ -21,6 +23,9 @@ const editingPontoon = ref<PontoonRow | null>(null)
 
 const showMouillageForm = ref(false)
 const editingMouillage = ref<MouillageRow | null>(null)
+
+const managingSpotsPontoon = ref<PontoonRow | null>(null)
+const managingSpotsMouillage = ref<MouillageRow | null>(null)
 
 function handleAddPontoon() {
   editingPontoon.value = null
@@ -50,6 +55,22 @@ function handleEditMouillage(mouillage: MouillageRow) {
 function handleMouillageModalOpen(open: boolean) {
   showMouillageForm.value = open
   if (!open) editingMouillage.value = null
+}
+
+function handleManagePontoonSpots(pontoon: PontoonRow) {
+  managingSpotsPontoon.value = pontoon
+}
+
+function handleManageMouillageSpots(mouillage: MouillageRow) {
+  managingSpotsMouillage.value = mouillage
+}
+
+function closePontoonSpotsModal(open: boolean) {
+  if (!open) managingSpotsPontoon.value = null
+}
+
+function closeMouillageSpotsModal(open: boolean) {
+  if (!open) managingSpotsMouillage.value = null
 }
 </script>
 
@@ -97,6 +118,7 @@ function handleMouillageModalOpen(open: boolean) {
           :pontoon="pontoon"
           :port-id="port.id"
           @edit="handleEditPontoon"
+          @manage-spots="handleManagePontoonSpots"
         />
       </div>
 
@@ -125,6 +147,7 @@ function handleMouillageModalOpen(open: boolean) {
             :mouillage="mouillage"
             :port-id="port.id"
             @edit="handleEditMouillage"
+            @manage-spots="handleManageMouillageSpots"
           />
         </div>
       </div>
@@ -144,4 +167,33 @@ function handleMouillageModalOpen(open: boolean) {
     :mouillage="editingMouillage"
     @update:open="handleMouillageModalOpen"
   />
+
+  <!-- Spots manager modals -->
+  <BaseModal
+    :open="!!managingSpotsPontoon"
+    :title="managingSpotsPontoon?.name ?? ''"
+    size="md"
+    @update:open="closePontoonSpotsModal"
+  >
+    <SpotsManager
+      v-if="managingSpotsPontoon"
+      :port-id="port.id"
+      :pontoon-id="managingSpotsPontoon.id"
+      :spots="managingSpotsPontoon.spots"
+    />
+  </BaseModal>
+
+  <BaseModal
+    :open="!!managingSpotsMouillage"
+    :title="managingSpotsMouillage?.name ?? ''"
+    size="md"
+    @update:open="closeMouillageSpotsModal"
+  >
+    <SpotsManager
+      v-if="managingSpotsMouillage"
+      :port-id="port.id"
+      :mouillage-id="managingSpotsMouillage.id"
+      :spots="managingSpotsMouillage.spots"
+    />
+  </BaseModal>
 </template>
