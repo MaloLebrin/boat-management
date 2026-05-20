@@ -4,30 +4,11 @@ import Pontoon from '#models/pontoon'
 import Port from '#models/port'
 import Spot from '#models/spot'
 import type User from '#models/user'
+import db from '@adonisjs/lucid/services/db'
+import { PortHasBoatsError, PortNotFoundError } from '#services/port_errors'
+import type { PortPayload } from '#shared/types/port'
 
-export class PortNotFoundError extends Error {
-  name = 'PortNotFoundError'
-}
-
-export class PortHasBoatsError extends Error {
-  name = 'PortHasBoatsError'
-}
-
-export class PontoonHasBoatsError extends Error {
-  name = 'PontoonHasBoatsError'
-}
-
-export class MouillageHasBoatsError extends Error {
-  name = 'MouillageHasBoatsError'
-}
-
-export type PortPayload = {
-  name: string
-  city?: string | null
-  country?: string | null
-  address?: string | null
-  notes?: string | null
-}
+type AggRow = { port_id: number; count: string }
 
 function assertPortInUserOrg(user: User, port: Port) {
   if (user.organizationId === null || user.organizationId !== port.organizationId) {
@@ -50,58 +31,58 @@ export default class PortService {
     const spotCounts: Record<number, number> = {}
 
     if (portIds.length > 0) {
-      // Via pontoons -> spots -> boats
-      const pontoonRows = await Boat.query()
+      // Boats via pontoon spots
+      const pontoonBoatRows: AggRow[] = await db
+        .from('boats')
         .join('spots', 'boats.spot_id', 'spots.id')
         .join('pontoons', 'spots.pontoon_id', 'pontoons.id')
         .whereIn('pontoons.port_id', portIds)
         .groupBy('pontoons.port_id')
         .count('boats.id as count')
-        .select('pontoons.port_id as portId')
+        .select('pontoons.port_id as port_id')
 
-      for (const row of pontoonRows) {
-        const r = row as unknown as { portId: number; count: string }
-        boatCounts[r.portId] = (boatCounts[r.portId] ?? 0) + Number(r.count)
+      for (const r of pontoonBoatRows) {
+        boatCounts[r.port_id] = (boatCounts[r.port_id] ?? 0) + Number(r.count)
       }
 
-      // Via mouillages -> spots -> boats
-      const mouillageRows = await Boat.query()
+      // Boats via mouillage spots
+      const mouillageBoatRows: AggRow[] = await db
+        .from('boats')
         .join('spots', 'boats.spot_id', 'spots.id')
         .join('mouillages', 'spots.mouillage_id', 'mouillages.id')
         .whereIn('mouillages.port_id', portIds)
         .groupBy('mouillages.port_id')
         .count('boats.id as count')
-        .select('mouillages.port_id as portId')
+        .select('mouillages.port_id as port_id')
 
-      for (const row of mouillageRows) {
-        const r = row as unknown as { portId: number; count: string }
-        boatCounts[r.portId] = (boatCounts[r.portId] ?? 0) + Number(r.count)
+      for (const r of mouillageBoatRows) {
+        boatCounts[r.port_id] = (boatCounts[r.port_id] ?? 0) + Number(r.count)
       }
 
       // Total spots via pontoons
-      const pontoonSpotRows = await Spot.query()
+      const pontoonSpotRows: AggRow[] = await db
+        .from('spots')
         .join('pontoons', 'spots.pontoon_id', 'pontoons.id')
         .whereIn('pontoons.port_id', portIds)
         .groupBy('pontoons.port_id')
         .count('spots.id as count')
-        .select('pontoons.port_id as portId')
+        .select('pontoons.port_id as port_id')
 
-      for (const row of pontoonSpotRows) {
-        const r = row as unknown as { portId: number; count: string }
-        spotCounts[r.portId] = (spotCounts[r.portId] ?? 0) + Number(r.count)
+      for (const r of pontoonSpotRows) {
+        spotCounts[r.port_id] = (spotCounts[r.port_id] ?? 0) + Number(r.count)
       }
 
       // Total spots via mouillages
-      const mouillageSpotRows = await Spot.query()
+      const mouillageSpotRows: AggRow[] = await db
+        .from('spots')
         .join('mouillages', 'spots.mouillage_id', 'mouillages.id')
         .whereIn('mouillages.port_id', portIds)
         .groupBy('mouillages.port_id')
         .count('spots.id as count')
-        .select('mouillages.port_id as portId')
+        .select('mouillages.port_id as port_id')
 
-      for (const row of mouillageSpotRows) {
-        const r = row as unknown as { portId: number; count: string }
-        spotCounts[r.portId] = (spotCounts[r.portId] ?? 0) + Number(r.count)
+      for (const r of mouillageSpotRows) {
+        spotCounts[r.port_id] = (spotCounts[r.port_id] ?? 0) + Number(r.count)
       }
     }
 

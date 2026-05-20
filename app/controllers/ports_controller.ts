@@ -1,5 +1,6 @@
 import Port from '#models/port'
-import PortService, { PortHasBoatsError, PortNotFoundError } from '#services/port_service'
+import PortService from '#services/port_service'
+import { PortHasBoatsError, PortNotFoundError } from '#services/port_errors'
 import { createPortValidator, updatePortValidator } from '#validators/port'
 import type { HttpContext } from '@adonisjs/core/http'
 

@@ -1,34 +1,19 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import type { DashboardPortItem, DashboardPortStats } from '#shared/types/dashboard'
 import BaseCard from '~/components/base/BaseCard.vue'
 import { useT } from '~/composables/useT'
 
-type PortItem = {
-  id: number
-  name: string
-  city: string | null
-  country: string | null
-  boatCount: number
-  totalSpots: number
-  freeSpots: number
-}
-
-type PortStats = {
-  total: number
-  totalBoats: number
-  totalFreeSpots: number
-}
-
 const props = defineProps<{
-  ports: PortItem[]
-  portStats: PortStats
+  ports: DashboardPortItem[]
+  portStats: DashboardPortStats
 }>()
 
 const { t } = useT()
 
 const displayedPorts = computed(() => props.ports.slice(0, 5))
 
-function fillRate(port: PortItem): number {
+function fillRate(port: DashboardPortItem): number {
   if (port.totalSpots === 0) return 0
   return Math.round((port.boatCount / port.totalSpots) * 100)
 }
@@ -39,7 +24,7 @@ function fillRateColor(rate: number): string {
   return 'bg-brand'
 }
 
-function locationLabel(port: PortItem): string {
+function locationLabel(port: DashboardPortItem): string {
   return [port.city, port.country].filter(Boolean).join(', ')
 }
 </script>

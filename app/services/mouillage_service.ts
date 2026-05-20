@@ -2,7 +2,7 @@ import Boat from '#models/boat'
 import Mouillage from '#models/mouillage'
 import Spot from '#models/spot'
 import type Port from '#models/port'
-import { MouillageHasBoatsError } from '#services/port_service'
+import { MouillageHasBoatsError } from '#services/port_errors'
 
 export type MouillagePayload = {
   name: string

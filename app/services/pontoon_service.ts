@@ -2,7 +2,7 @@ import Boat from '#models/boat'
 import Pontoon from '#models/pontoon'
 import Spot from '#models/spot'
 import type Port from '#models/port'
-import { PontoonHasBoatsError } from '#services/port_service'
+import { PontoonHasBoatsError } from '#services/port_errors'
 
 export type PontoonPayload = {
   name: string

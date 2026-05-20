@@ -7,61 +7,25 @@ import BaseCard from '~/components/base/BaseCard.vue'
 import BaseSkeleton from '~/components/base/BaseSkeleton.vue'
 import BaseStatCard from '~/components/base/BaseStatCard.vue'
 import MarinaDashboardCard from '~/components/dashboard/MarinaDashboardCard.vue'
+import type {
+  DashboardBoatSummary,
+  DashboardPortItem,
+  DashboardPortStats,
+  DashboardStats,
+  DashboardUrgentMaintenanceRow,
+} from '#shared/types/dashboard'
 import { useT } from '~/composables/useT'
 import type { AiSuggestion } from '~/types/boat_show'
 
 const { t } = useT()
 
-type BoatSummary = {
-  id: number
-  name: string
-  propulsionType: string | null
-  enginesCount: number
-  sailsCount: number
-  hasRig: boolean
-}
-
-type UrgentMaintenanceRow = {
-  id: number
-  boatId: number
-  boatName: string
-  subject: string
-  title: string
-  kind: 'date' | 'hours'
-  dueAt: string | null
-  dueEngineHours: number | null
-  currentEngineHours: number | null
-}
-
-type PortItem = {
-  id: number
-  name: string
-  city: string | null
-  country: string | null
-  boatCount: number
-  totalSpots: number
-  freeSpots: number
-}
-
-type PortStats = {
-  total: number
-  totalBoats: number
-  totalFreeSpots: number
-}
-
 const props = defineProps<{
-  boats: BoatSummary[]
-  urgentMaintenance: UrgentMaintenanceRow[]
-  stats: {
-    boats: number
-    engines: number
-    sails: number
-    rigs: number
-    urgentMaintenance: number
-  }
+  boats: DashboardBoatSummary[]
+  urgentMaintenance: DashboardUrgentMaintenanceRow[]
+  stats: DashboardStats
   aiFleetAnalysis: AiSuggestion[] | null
-  ports: PortItem[]
-  portStats: PortStats
+  ports: DashboardPortItem[]
+  portStats: DashboardPortStats
 }>()
 
 const showAlert = ref(true)

@@ -1,6 +1,6 @@
 import Mouillage from '#models/mouillage'
 import Port from '#models/port'
-import { MouillageHasBoatsError } from '#services/port_service'
+import { MouillageHasBoatsError } from '#services/port_errors'
 import MouillageService from '#services/mouillage_service'
 import { createMouillageValidator, updateMouillageValidator } from '#validators/mouillage'
 import { updatePositionValidator } from '#validators/marina_layout'
