@@ -17,15 +17,18 @@ import {
   updateEquipmentStatusValidator,
   upsertBoatRigValidator,
 } from '#validators/boat_equipment'
+import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 
+@inject()
 export default class BoatEquipmentController {
+  constructor(private boatService: BoatService) {}
+
   private async loadBoatForEquipment(ctx: Pick<HttpContext, 'auth' | 'response' | 'params'>) {
     const user = ctx.auth.getUserOrFail()
-    const boatService = new BoatService()
     try {
-      const boat = await boatService.getForUserOrFail(user, Number(ctx.params.boatId))
-      return { user, boat, boatService }
+      const boat = await this.boatService.getForUserOrFail(user, Number(ctx.params.boatId))
+      return { user, boat }
     } catch (error) {
       if (error instanceof BoatNotFoundError) {
         ctx.response.redirect('/boats')
@@ -40,11 +43,11 @@ export default class BoatEquipmentController {
     const loaded = await this.loadBoatForEquipment({ auth, response, params })
     if (!loaded) return
 
-    const { boat, boatService } = loaded
+    const { boat } = loaded
     await bouncer.authorize('boatUpdate', boat)
 
     const body = (await request.validateUsing(storeBoatEngineValidator)) as BoatEngineFormBody
-    await boatService.createEngine(loaded.user, boat, equipmentBodyToEnginePayload(body))
+    await this.boatService.createEngine(loaded.user, boat, equipmentBodyToEnginePayload(body))
 
     session.flash('success', i18n.t('flash.engine.added'))
     response.redirect(`/boats/${boat.id}`)
@@ -89,13 +92,13 @@ export default class BoatEquipmentController {
     const loaded = await this.loadBoatForEquipment({ auth, response, params })
     if (!loaded) return
 
-    const { boat, boatService } = loaded
+    const { boat } = loaded
     await bouncer.authorize('boatUpdate', boat)
 
     const body = (await request.validateUsing(updateBoatEngineValidator)) as BoatEngineFormBody
 
     try {
-      await boatService.updateEngine(
+      await this.boatService.updateEngine(
         loaded.user,
         boat,
         Number(params.engineId),
@@ -119,11 +122,11 @@ export default class BoatEquipmentController {
     const loaded = await this.loadBoatForEquipment({ auth, response, params })
     if (!loaded) return
 
-    const { boat, boatService } = loaded
+    const { boat } = loaded
     await bouncer.authorize('boatUpdate', boat)
 
     try {
-      await boatService.deleteEngine(loaded.user, boat, Number(params.engineId))
+      await this.boatService.deleteEngine(loaded.user, boat, Number(params.engineId))
     } catch (error) {
       if (error instanceof BoatEquipmentNotFoundError) {
         session.flash('error', i18n.t('flash.engine.notFound'))
@@ -142,11 +145,11 @@ export default class BoatEquipmentController {
     const loaded = await this.loadBoatForEquipment({ auth, response, params })
     if (!loaded) return
 
-    const { boat, boatService } = loaded
+    const { boat } = loaded
     await bouncer.authorize('boatUpdate', boat)
 
     const body = (await request.validateUsing(storeBoatSailValidator)) as BoatSailFormBody
-    await boatService.createSail(loaded.user, boat, equipmentBodyToSailPayload(body))
+    await this.boatService.createSail(loaded.user, boat, equipmentBodyToSailPayload(body))
 
     session.flash('success', i18n.t('flash.sail.added'))
     response.redirect(`/boats/${boat.id}`)
@@ -187,13 +190,13 @@ export default class BoatEquipmentController {
     const loaded = await this.loadBoatForEquipment({ auth, response, params })
     if (!loaded) return
 
-    const { boat, boatService } = loaded
+    const { boat } = loaded
     await bouncer.authorize('boatUpdate', boat)
 
     const body = (await request.validateUsing(updateBoatSailValidator)) as BoatSailFormBody
 
     try {
-      await boatService.updateSail(
+      await this.boatService.updateSail(
         loaded.user,
         boat,
         Number(params.sailId),
@@ -217,11 +220,11 @@ export default class BoatEquipmentController {
     const loaded = await this.loadBoatForEquipment({ auth, response, params })
     if (!loaded) return
 
-    const { boat, boatService } = loaded
+    const { boat } = loaded
     await bouncer.authorize('boatUpdate', boat)
 
     try {
-      await boatService.deleteSail(loaded.user, boat, Number(params.sailId))
+      await this.boatService.deleteSail(loaded.user, boat, Number(params.sailId))
     } catch (error) {
       if (error instanceof BoatEquipmentNotFoundError) {
         session.flash('error', i18n.t('flash.sail.notFound'))
@@ -264,11 +267,11 @@ export default class BoatEquipmentController {
     const loaded = await this.loadBoatForEquipment({ auth, response, params })
     if (!loaded) return
 
-    const { boat, boatService } = loaded
+    const { boat } = loaded
     await bouncer.authorize('boatUpdate', boat)
 
     const body = (await request.validateUsing(upsertBoatRigValidator)) as BoatRigFormBody
-    await boatService.upsertRig(loaded.user, boat, equipmentBodyToRigPayload(body))
+    await this.boatService.upsertRig(loaded.user, boat, equipmentBodyToRigPayload(body))
 
     session.flash('success', i18n.t('flash.rig.saved'))
     response.redirect(`/boats/${boat.id}`)
@@ -279,10 +282,10 @@ export default class BoatEquipmentController {
     const loaded = await this.loadBoatForEquipment({ auth, response, params })
     if (!loaded) return
 
-    const { boat, boatService } = loaded
+    const { boat } = loaded
     await bouncer.authorize('boatUpdate', boat)
 
-    await boatService.deleteRig(loaded.user, boat)
+    await this.boatService.deleteRig(loaded.user, boat)
 
     session.flash('success', i18n.t('flash.rig.removed'))
     response.redirect(`/boats/${boat.id}`)
@@ -407,13 +410,13 @@ export default class BoatEquipmentController {
     const loaded = await this.loadBoatForEquipment({ auth, response, params })
     if (!loaded) return
 
-    const { boat, boatService } = loaded
+    const { boat } = loaded
     await bouncer.authorize('boatUpdate', boat)
 
     const { status } = await request.validateUsing(updateEquipmentStatusValidator)
 
     try {
-      await boatService.updateEngineStatus(loaded.user, boat, Number(params.engineId), status)
+      await this.boatService.updateEngineStatus(loaded.user, boat, Number(params.engineId), status)
     } catch (error) {
       if (error instanceof BoatEquipmentNotFoundError) {
         session.flash('error', i18n.t('flash.engine.notFound'))
@@ -439,13 +442,13 @@ export default class BoatEquipmentController {
     const loaded = await this.loadBoatForEquipment({ auth, response, params })
     if (!loaded) return
 
-    const { boat, boatService } = loaded
+    const { boat } = loaded
     await bouncer.authorize('boatUpdate', boat)
 
     const { notes } = await request.validateUsing(updateEquipmentNotesValidator)
 
     try {
-      await boatService.updateEngineNotes(
+      await this.boatService.updateEngineNotes(
         loaded.user,
         boat,
         Number(params.engineId),

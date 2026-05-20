@@ -3,11 +3,16 @@ import HomeController from '#controllers/home_controller'
 
 test.group('HomeController (unit)', () => {
   test('renders home when unauthenticated', async ({ assert }) => {
-    const controller = new HomeController({
-      getForUser: async () => {
-        throw new Error('should not be called')
-      },
-    } as any)
+    const controller = new HomeController(
+      {
+        getForUser: async () => {
+          throw new Error('should not be called')
+        },
+      } as any,
+      {
+        getLatestFleetAnalysis: async () => null,
+      } as any
+    )
 
     const rendered: Array<{ component: string; props: any }> = []
 
@@ -28,13 +33,18 @@ test.group('HomeController (unit)', () => {
   })
 
   test('renders dashboard when authenticated', async ({ assert }) => {
-    const controller = new HomeController({
-      getForUser: async () => ({
-        boats: [],
-        urgentMaintenance: [],
-        stats: { boats: 0, engines: 0, sails: 0, rigs: 0, urgentMaintenance: 0 },
-      }),
-    } as any)
+    const controller = new HomeController(
+      {
+        getForUser: async () => ({
+          boats: [],
+          urgentMaintenance: [],
+          stats: { boats: 0, engines: 0, sails: 0, rigs: 0, urgentMaintenance: 0 },
+        }),
+      } as any,
+      {
+        getLatestFleetAnalysis: async () => null,
+      } as any
+    )
 
     const rendered: Array<{ component: string; props: any }> = []
 

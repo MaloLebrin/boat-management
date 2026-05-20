@@ -59,7 +59,7 @@ Généré le 2026-05-20. Se référer à ce fichier pour suivre l'avancement des
 
 ### P1 — Prioritaires
 
-- [ ] **REF-P1-1 — `new X()` inline dans les controllers (pas d'`@inject()`)**
+- [x] **REF-P1-1 — `new X()` inline dans les controllers (pas d'`@inject()`)**
   - Concerne ~95 % des controllers : `boats_controller.ts`, `ai_controller.ts`, `ports_controller.ts`, `boat_maintenances_controller.ts`, `boat_maintenance_tasks_controller.ts`, `boat_maintenance_sheets_controller.ts`, `boat_equipment_controller.ts`, `boat_media_controller.ts`, `mouillages_controller.ts`, `pontoons_controller.ts`, `new_account_controller.ts`, `password_reset_controller.ts`
   - Fix : ajouter `@inject()` + déclarer chaque service en constructeur (modèle : `BoatsController` pour `BoatService`)
 

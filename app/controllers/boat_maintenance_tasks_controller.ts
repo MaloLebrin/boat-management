@@ -7,17 +7,23 @@ import {
   createBoatMaintenanceTaskValidator,
   markBoatMaintenanceTaskDoneValidator,
 } from '#validators/boat_maintenance_task'
+import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 
+@inject()
 export default class BoatMaintenanceTasksController {
+  constructor(
+    private boatService: BoatService,
+    private boatMaintenanceTaskService: BoatMaintenanceTaskService
+  ) {}
+
   async store({ request, response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
-    const boatService = new BoatService()
     let boat
     try {
-      boat = await boatService.getForUserOrFail(user, Number(params.boatId))
+      boat = await this.boatService.getForUserOrFail(user, Number(params.boatId))
     } catch (error) {
       if (error instanceof BoatNotFoundError) {
         response.redirect('/boats')
@@ -29,10 +35,9 @@ export default class BoatMaintenanceTasksController {
     await bouncer.authorize('boatUpdate', boat)
 
     const payload = await request.validateUsing(createBoatMaintenanceTaskValidator)
-    const taskService = new BoatMaintenanceTaskService()
 
     try {
-      await taskService.createForBoat(user, boat, {
+      await this.boatMaintenanceTaskService.createForBoat(user, boat, {
         subject: payload.subject as any,
         boatEngineId: payload.boatEngineId ?? null,
         boatSailId: payload.boatSailId ?? null,
@@ -61,10 +66,9 @@ export default class BoatMaintenanceTasksController {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
-    const boatService = new BoatService()
     let boat
     try {
-      boat = await boatService.getForUserOrFail(user, Number(params.boatId))
+      boat = await this.boatService.getForUserOrFail(user, Number(params.boatId))
     } catch (error) {
       if (error instanceof BoatNotFoundError) {
         response.redirect('/boats')
@@ -76,10 +80,9 @@ export default class BoatMaintenanceTasksController {
     await bouncer.authorize('boatUpdate', boat)
 
     const payload = await request.validateUsing(markBoatMaintenanceTaskDoneValidator)
-    const taskService = new BoatMaintenanceTaskService()
 
     try {
-      await taskService.markDone(user, boat, Number(params.taskId), {
+      await this.boatMaintenanceTaskService.markDone(user, boat, Number(params.taskId), {
         doneAt: payload.doneAt ?? undefined,
         doneEngineHours: payload.doneEngineHours ?? null,
       })
@@ -105,10 +108,9 @@ export default class BoatMaintenanceTasksController {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
-    const boatService = new BoatService()
     let boat
     try {
-      boat = await boatService.getForUserOrFail(user, Number(params.boatId))
+      boat = await this.boatService.getForUserOrFail(user, Number(params.boatId))
     } catch (error) {
       if (error instanceof BoatNotFoundError) {
         response.redirect('/boats')
@@ -119,10 +121,8 @@ export default class BoatMaintenanceTasksController {
 
     await bouncer.authorize('boatUpdate', boat)
 
-    const taskService = new BoatMaintenanceTaskService()
-
     try {
-      await taskService.deleteForBoat(user, boat, Number(params.taskId))
+      await this.boatMaintenanceTaskService.deleteForBoat(user, boat, Number(params.taskId))
     } catch (error) {
       if (error instanceof BoatMaintenanceTaskNotFoundError) {
         session.flash('error', i18n.t('flash.maintenanceTasks.notFound'))

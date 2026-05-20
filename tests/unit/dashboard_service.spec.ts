@@ -1,5 +1,6 @@
 import { test } from '@japa/runner'
 import DashboardService from '#services/dashboard_service'
+import PortService from '#services/port_service'
 import BoatEngine from '#models/boat_engine'
 import BoatMaintenanceTask from '#models/boat_maintenance_task'
 import Organization from '#models/organization'
@@ -87,7 +88,7 @@ test.group('DashboardService (unit)', (group) => {
       recurrenceIntervalEngineHours: null,
     })
 
-    const svc = new DashboardService()
+    const svc = new DashboardService(new PortService())
     const data = await svc.getForUser(user, { urgentWithinDays: 14, urgentLimit: 10 })
 
     assert.equal(data.urgentMaintenance.length, 2)
@@ -141,7 +142,7 @@ test.group('DashboardService (unit)', (group) => {
       lastDoneEngineHours: null,
     })
 
-    const svc = new DashboardService()
+    const svc = new DashboardService(new PortService())
     const data = await svc.getForUser(user, { urgentWithinEngineHours: 10, urgentLimit: 10 })
 
     assert.equal(data.urgentMaintenance.length, 1)

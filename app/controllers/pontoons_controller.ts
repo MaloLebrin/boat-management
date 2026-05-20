@@ -4,9 +4,13 @@ import { PontoonHasBoatsError } from '#exceptions/port_errors'
 import PontoonService from '#services/pontoon_service'
 import { createPontoonValidator, updatePontoonValidator } from '#validators/pontoon'
 import { updatePositionValidator } from '#validators/marina_layout'
+import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 
+@inject()
 export default class PontoonsController {
+  constructor(private pontoonService: PontoonService) {}
+
   async store({ request, params, auth, response }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
@@ -21,8 +25,7 @@ export default class PontoonsController {
     if (!port) return response.redirect('/ports')
 
     const payload = await request.validateUsing(createPontoonValidator)
-    const pontoonService = new PontoonService()
-    await pontoonService.createForPort(port, payload)
+    await this.pontoonService.createForPort(port, payload)
 
     return response.redirect(`/ports/${port.id}`)
   }
@@ -48,8 +51,7 @@ export default class PontoonsController {
     if (!pontoon) return response.redirect(`/ports/${port.id}`)
 
     const payload = await request.validateUsing(updatePontoonValidator)
-    const pontoonService = new PontoonService()
-    await pontoonService.updateForPort(pontoon, payload)
+    await this.pontoonService.updateForPort(pontoon, payload)
 
     return response.redirect(`/ports/${port.id}`)
   }
@@ -74,9 +76,8 @@ export default class PontoonsController {
 
     if (!pontoon) return response.redirect(`/ports/${port.id}`)
 
-    const pontoonService = new PontoonService()
     try {
-      await pontoonService.deleteForPort(pontoon)
+      await this.pontoonService.deleteForPort(pontoon)
       return response.redirect(`/ports/${port.id}`)
     } catch (error) {
       if (error instanceof PontoonHasBoatsError) {
@@ -108,8 +109,7 @@ export default class PontoonsController {
     if (!pontoon) return response.redirect(`/ports/${port.id}`)
 
     const payload = await request.validateUsing(updatePositionValidator)
-    const pontoonService = new PontoonService()
-    await pontoonService.updatePosition(pontoon, payload)
+    await this.pontoonService.updatePosition(pontoon, payload)
 
     return response.redirect().back()
   }

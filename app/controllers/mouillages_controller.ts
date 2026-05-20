@@ -4,9 +4,13 @@ import { MouillageHasBoatsError } from '#exceptions/port_errors'
 import MouillageService from '#services/mouillage_service'
 import { createMouillageValidator, updateMouillageValidator } from '#validators/mouillage'
 import { updatePositionValidator } from '#validators/marina_layout'
+import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 
+@inject()
 export default class MouillagesController {
+  constructor(private mouillageService: MouillageService) {}
+
   async store({ request, params, auth, response }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
@@ -21,8 +25,7 @@ export default class MouillagesController {
     if (!port) return response.redirect('/ports')
 
     const payload = await request.validateUsing(createMouillageValidator)
-    const mouillageService = new MouillageService()
-    await mouillageService.createForPort(port, payload)
+    await this.mouillageService.createForPort(port, payload)
 
     return response.redirect(`/ports/${port.id}`)
   }
@@ -48,8 +51,7 @@ export default class MouillagesController {
     if (!mouillage) return response.redirect(`/ports/${port.id}`)
 
     const payload = await request.validateUsing(updateMouillageValidator)
-    const mouillageService = new MouillageService()
-    await mouillageService.updateForPort(mouillage, payload)
+    await this.mouillageService.updateForPort(mouillage, payload)
 
     return response.redirect(`/ports/${port.id}`)
   }
@@ -74,9 +76,8 @@ export default class MouillagesController {
 
     if (!mouillage) return response.redirect(`/ports/${port.id}`)
 
-    const mouillageService = new MouillageService()
     try {
-      await mouillageService.deleteForPort(mouillage)
+      await this.mouillageService.deleteForPort(mouillage)
       return response.redirect(`/ports/${port.id}`)
     } catch (error) {
       if (error instanceof MouillageHasBoatsError) {
@@ -108,8 +109,7 @@ export default class MouillagesController {
     if (!mouillage) return response.redirect(`/ports/${port.id}`)
 
     const payload = await request.validateUsing(updatePositionValidator)
-    const mouillageService = new MouillageService()
-    await mouillageService.updatePosition(mouillage, payload)
+    await this.mouillageService.updatePosition(mouillage, payload)
 
     return response.redirect().back()
   }

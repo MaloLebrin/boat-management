@@ -4,9 +4,20 @@ import BoatMaintenanceService from '#services/boat_maintenance_service'
 import BoatMaintenanceTaskService from '#services/boat_maintenance_task_service'
 import BoatService, { BoatNotFoundError } from '#services/boat_service'
 import DashboardService from '#services/dashboard_service'
+import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 
+@inject()
 export default class AiController {
+  constructor(
+    private aiQueueService: AiQueueService,
+    private dashboardService: DashboardService,
+    private aiAnalysisService: AiAnalysisService,
+    private boatService: BoatService,
+    private boatMaintenanceService: BoatMaintenanceService,
+    private boatMaintenanceTaskService: BoatMaintenanceTaskService
+  ) {}
+
   async chat({ request, response, auth, i18n }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
@@ -16,8 +27,7 @@ export default class AiController {
       return response.badRequest({ error: i18n.t('flash.ai.messagesRequired') })
     }
 
-    const queue = new AiQueueService()
-    await queue.enqueueChat({ userId: user.id, messages })
+    await this.aiQueueService.enqueueChat({ userId: user.id, messages })
 
     return response.accepted({ status: 'queued' })
   }
@@ -27,9 +37,8 @@ export default class AiController {
     const user = auth.getUserOrFail()
 
     try {
-      const data = await new DashboardService().getForUser(user)
-      const aiService = new AiAnalysisService()
-      await aiService.generateFleetAnalysis(user.id, data)
+      const data = await this.dashboardService.getForUser(user)
+      await this.aiAnalysisService.generateFleetAnalysis(user.id, data)
     } catch {
       session.flash('error', i18n.t('flash.ai.analysisError'))
     }
@@ -43,19 +52,15 @@ export default class AiController {
     const boatId = Number(params.id)
 
     try {
-      const boatService = new BoatService()
-      const boat = await boatService.getForUserOrFail(user, boatId)
+      const boat = await this.boatService.getForUserOrFail(user, boatId)
       await bouncer.authorize('boatView', boat)
       await boat.load('safetyEquipment')
 
-      const maintenanceService = new BoatMaintenanceService()
-      const maintenanceEvents = await maintenanceService.listForBoat(user, boat)
+      const maintenanceEvents = await this.boatMaintenanceService.listForBoat(user, boat)
 
-      const taskService = new BoatMaintenanceTaskService()
-      const maintenanceTasks = await taskService.listForBoat(user, boat)
+      const maintenanceTasks = await this.boatMaintenanceTaskService.listForBoat(user, boat)
 
-      const aiService = new AiAnalysisService()
-      await aiService.generateBoatSuggestions(user.id, boat.id, {
+      await this.aiAnalysisService.generateBoatSuggestions(user.id, boat.id, {
         boat: {
           id: boat.id,
           name: boat.name,

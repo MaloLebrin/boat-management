@@ -4,9 +4,16 @@ import EmailQueueService from '#services/email_queue_service'
 import User from '#models/user'
 import hash from '@adonisjs/core/services/hash'
 import env from '#start/env'
+import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 
+@inject()
 export default class PasswordResetController {
+  constructor(
+    private passwordResetService: PasswordResetService,
+    private emailQueueService: EmailQueueService
+  ) {}
+
   async create({ inertia }: HttpContext) {
     return inertia.render('auth/forgot_password', {})
   }
@@ -14,13 +21,11 @@ export default class PasswordResetController {
   async store({ request, response, session, i18n }: HttpContext) {
     const { email } = await request.validateUsing(forgotPasswordValidator)
 
-    const resetService = new PasswordResetService()
-    const token = await resetService.createToken(email)
+    const token = await this.passwordResetService.createToken(email)
 
     if (token) {
       const resetUrl = `${env.get('APP_URL')}/reset-password?token=${token}`
-      const emailService = new EmailQueueService()
-      await emailService.sendPasswordReset({ to: email, resetUrl })
+      await this.emailQueueService.sendPasswordReset({ to: email, resetUrl })
     }
 
     session.flash('success', i18n.t('flash.auth.passwordResetSent'))
@@ -35,8 +40,7 @@ export default class PasswordResetController {
   async update({ request, response, session, i18n }: HttpContext) {
     const { token, password } = await request.validateUsing(resetPasswordValidator)
 
-    const resetService = new PasswordResetService()
-    const record = await resetService.verifyToken(token)
+    const record = await this.passwordResetService.verifyToken(token)
 
     if (!record) {
       session.flash('error', i18n.t('flash.auth.passwordResetTokenInvalid'))
@@ -52,7 +56,7 @@ export default class PasswordResetController {
     user.password = await hash.make(password)
     await user.save()
 
-    await resetService.invalidateTokensForEmail(record.email)
+    await this.passwordResetService.invalidateTokensForEmail(record.email)
 
     session.flash('success', i18n.t('flash.auth.passwordResetSuccess'))
     return response.redirect().toPath('/login')

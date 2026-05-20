@@ -4,6 +4,7 @@ import BoatService, { BoatNotFoundError } from '#services/boat_service'
 import MediaService, { MediaNotFoundError } from '#services/media_service'
 import { CloudinaryFolders, CloudinaryService } from '#services/cloudinary_service'
 import { storeBoatPhotoValidator, storeBoatDocumentValidator } from '#validators/media'
+import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 
 function buildContentDisposition(filename: string, format: string): string {
@@ -14,12 +15,18 @@ function buildContentDisposition(filename: string, format: string): string {
   return `attachment; filename="${ascii}"; filename*=UTF-8''${encoded}`
 }
 
+@inject()
 export default class BoatMediaController {
+  constructor(
+    private boatService: BoatService,
+    private mediaService: MediaService,
+    private cloudinaryService: CloudinaryService
+  ) {}
+
   private async loadBoat(ctx: Pick<HttpContext, 'auth' | 'response' | 'params'>) {
     const user = ctx.auth.getUserOrFail()
-    const boatService = new BoatService()
     try {
-      const boat = await boatService.getForUserOrFail(user, Number(ctx.params.boatId))
+      const boat = await this.boatService.getForUserOrFail(user, Number(ctx.params.boatId))
       return { user, boat }
     } catch (error) {
       if (error instanceof BoatNotFoundError) {
@@ -41,8 +48,7 @@ export default class BoatMediaController {
     const payload = await request.validateUsing(storeBoatPhotoValidator)
     const org = await Organization.findOrFail(boat.organizationId)
 
-    const mediaService = new MediaService()
-    await mediaService.upload(user, payload.file, {
+    await this.mediaService.upload(user, payload.file, {
       folder: CloudinaryFolders.boatPhotos(org.slug, boat.id),
       entityType: 'boat',
       entityId: boat.id,
@@ -65,8 +71,7 @@ export default class BoatMediaController {
     const payload = await request.validateUsing(storeBoatDocumentValidator)
     const org = await Organization.findOrFail(boat.organizationId)
 
-    const mediaService = new MediaService()
-    await mediaService.upload(user, payload.file, {
+    await this.mediaService.upload(user, payload.file, {
       folder: CloudinaryFolders.boatDocuments(org.slug, boat.id),
       entityType: 'boat',
       entityId: boat.id,
@@ -86,9 +91,8 @@ export default class BoatMediaController {
     const { boat } = loaded
     await bouncer.authorize('boatUpdate', boat)
 
-    const mediaService = new MediaService()
     try {
-      await mediaService.deleteById(Number(params.mediaId))
+      await this.mediaService.deleteById(Number(params.mediaId))
     } catch (error) {
       if (error instanceof MediaNotFoundError) {
         response.redirect(`/boats/${boat.id}`)
@@ -127,8 +131,7 @@ export default class BoatMediaController {
     const payload = await request.validateUsing(storeBoatDocumentValidator)
     const org = await Organization.findOrFail(boat.organizationId)
 
-    const mediaService = new MediaService()
-    await mediaService.upload(user, payload.file, {
+    await this.mediaService.upload(user, payload.file, {
       folder: CloudinaryFolders.boatEngineDocuments(org.slug, boat.id, engineId),
       entityType: 'boat_engine',
       entityId: engineId,
@@ -167,9 +170,8 @@ export default class BoatMediaController {
       return
     }
 
-    const mediaService = new MediaService()
     try {
-      await mediaService.deleteById(mediaId)
+      await this.mediaService.deleteById(mediaId)
     } catch (error) {
       if (error instanceof MediaNotFoundError) {
         response.redirect(`/boats/${boat.id}/engines/${engineId}?tab=documents`)
@@ -201,9 +203,8 @@ export default class BoatMediaController {
       return
     }
 
-    const cloudinaryService = new CloudinaryService()
     const resourceType = media.format === 'pdf' ? 'raw' : 'image'
-    const { buffer, contentType } = await cloudinaryService.downloadAsBuffer(
+    const { buffer, contentType } = await this.cloudinaryService.downloadAsBuffer(
       media.cloudinaryPublicId,
       resourceType,
       media.format
@@ -242,9 +243,8 @@ export default class BoatMediaController {
       return
     }
 
-    const cloudinaryService = new CloudinaryService()
     const resourceType = media.format === 'pdf' ? 'raw' : 'image'
-    const { buffer, contentType } = await cloudinaryService.downloadAsBuffer(
+    const { buffer, contentType } = await this.cloudinaryService.downloadAsBuffer(
       media.cloudinaryPublicId,
       resourceType,
       media.format

@@ -1,5 +1,6 @@
 import { test } from '@japa/runner'
 import PontoonsController from '#controllers/pontoons_controller'
+import PontoonService from '#services/pontoon_service'
 import Organization from '#models/organization'
 import User from '#models/user'
 import Port from '#models/port'
@@ -38,7 +39,7 @@ test.group('PontoonsController.updatePosition (unit)', (group) => {
     })
 
     let redirectedBack = false
-    const controller = new PontoonsController()
+    const controller = new PontoonsController(new PontoonService())
 
     await controller.updatePosition({
       request: {

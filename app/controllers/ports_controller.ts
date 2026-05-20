@@ -2,15 +2,18 @@ import Port from '#models/port'
 import PortService from '#services/port_service'
 import { PortHasBoatsError, PortNotFoundError } from '#exceptions/port_errors'
 import { createPortValidator, updatePortValidator } from '#validators/port'
+import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 
+@inject()
 export default class PortsController {
+  constructor(private portService: PortService) {}
+
   async index({ inertia, auth }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
-    const portService = new PortService()
-    const ports = await portService.listForUser(user)
+    const ports = await this.portService.listForUser(user)
 
     return inertia.render('ports/index', { ports })
   }
@@ -25,8 +28,7 @@ export default class PortsController {
     const user = auth.getUserOrFail()
 
     const payload = await request.validateUsing(createPortValidator)
-    const portService = new PortService()
-    const port = await portService.createForUser(user, payload)
+    const port = await this.portService.createForUser(user, payload)
 
     return response.redirect(`/ports/${port.id}`)
   }
@@ -35,9 +37,8 @@ export default class PortsController {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
-    const portService = new PortService()
     try {
-      const port = await portService.getWithPontoonsAndMouillagesOrFail(user, Number(params.id))
+      const port = await this.portService.getWithPontoonsAndMouillagesOrFail(user, Number(params.id))
       return inertia.render('ports/show', { port })
     } catch (error) {
       if (error instanceof PortNotFoundError) return response.redirect('/ports')
@@ -49,9 +50,8 @@ export default class PortsController {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
-    const portService = new PortService()
     try {
-      const port = await portService.getWithPontoonsAndMouillagesOrFail(user, Number(params.id))
+      const port = await this.portService.getWithPontoonsAndMouillagesOrFail(user, Number(params.id))
       return inertia.render('ports/edit', { port })
     } catch (error) {
       if (error instanceof PortNotFoundError) return response.redirect('/ports')
@@ -73,8 +73,7 @@ export default class PortsController {
     if (!port) return response.redirect('/ports')
 
     const payload = await request.validateUsing(updatePortValidator)
-    const portService = new PortService()
-    await portService.updateForUser(user, port, payload)
+    await this.portService.updateForUser(user, port, payload)
 
     return response.redirect(`/ports/${port.id}`)
   }
@@ -92,9 +91,8 @@ export default class PortsController {
 
     if (!port) return response.redirect('/ports')
 
-    const portService = new PortService()
     try {
-      await portService.deleteForUser(user, port)
+      await this.portService.deleteForUser(user, port)
       return response.redirect('/ports')
     } catch (error) {
       if (error instanceof PortHasBoatsError) {
