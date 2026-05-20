@@ -40,6 +40,7 @@ Les PDFs uploadés sont compressés avant envoi sur Cloudinary via `app/services
 - Events dans `app/events/` + Listeners dans `app/listeners/`
 - Abilities (Bouncer) dans `app/abilities/`
 - Jobs de queue dans `app/jobs/`
+- **Types des controllers/services dans `shared/types/`** : tout type utilisé dans un controller ou service doit vivre dans `shared/types/<domaine>.ts` — jamais défini inline ou dans `app/`. Le frontend importe directement ces types quand pertinent (props, composables, stores).
 
 ### Base de données
 - Migrations : toujours avec rollback (`down()` implémenté)
@@ -96,6 +97,7 @@ inertia/           # Frontend Vue 3 + Inertia
   composables/     # Composables Vue
   types/           # Types frontend
 shared/            # Code partagé backend ↔ frontend (types, helpers, constants)
+  types/           # Types des controllers/services — un fichier par domaine (port.ts, boat.ts…)
 providers/         # Service providers AdonisJS
 start/
   routes/          # Routes découpées par domaine
@@ -113,5 +115,6 @@ tests/
 - Committer des secrets ou `.env`
 - Supprimer des migrations existantes
 - Mettre de la logique de formatage dans les controllers (→ utiliser un transformer)
+- **Définir des types de controllers/services ailleurs que dans `shared/types/`** (→ un fichier par domaine dans `shared/types/`, réutilisé côté front)
 - **Écrire du texte visible en dur dans un template Vue** (→ utiliser `t('clé')`)
 - **Utiliser des ternaires `locale === 'fr' ? ... : ...`** (→ utiliser `t()` avec clé dans les deux JSON)
