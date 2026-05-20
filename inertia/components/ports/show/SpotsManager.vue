@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { router } from '@inertiajs/vue3'
 import { PencilIcon, PlusIcon, TrashIcon } from '@heroicons/vue/24/outline'
 import BaseButton from '~/components/base/BaseButton.vue'
+import BaseConfirmModal from '~/components/base/BaseConfirmModal.vue'
 import SpotFormModal from '~/components/ports/modals/SpotFormModal.vue'
 import { useT } from '~/composables/useT'
 import type { SpotRow } from '~/types/port'
@@ -18,6 +19,8 @@ const { t } = useT()
 
 const showSpotModal = ref(false)
 const editingSpot = ref<{ id: number; name: string; description: string | null } | null>(null)
+const showDeleteConfirm = ref(false)
+const spotToDelete = ref<SpotRow | null>(null)
 
 function handleAddSpot() {
   editingSpot.value = null
@@ -30,8 +33,14 @@ function handleEditSpot(spot: SpotRow) {
 }
 
 function handleDeleteSpot(spot: SpotRow) {
-  if (!confirm(t('ports.spots.deleteConfirm'))) return
-  router.delete(`/spots/${spot.id}`)
+  spotToDelete.value = spot
+  showDeleteConfirm.value = true
+}
+
+function confirmDeleteSpot() {
+  if (!spotToDelete.value) return
+  router.delete(`/spots/${spotToDelete.value.id}`)
+  spotToDelete.value = null
 }
 
 function handleModalClose(open: boolean) {
@@ -83,6 +92,13 @@ function handleModalClose(open: boolean) {
       :mouillage-id="mouillageId"
       :spot="editingSpot"
       @update:open="handleModalClose"
+    />
+
+    <BaseConfirmModal
+      :open="showDeleteConfirm"
+      :title="t('ports.spots.deleteConfirm')"
+      @update:open="showDeleteConfirm = $event"
+      @confirm="confirmDeleteSpot"
     />
   </div>
 </template>
