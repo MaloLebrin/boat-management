@@ -6,6 +6,14 @@ import { CloudinaryFolders, CloudinaryService } from '#services/cloudinary_servi
 import { storeBoatPhotoValidator, storeBoatDocumentValidator } from '#validators/media'
 import type { HttpContext } from '@adonisjs/core/http'
 
+function buildContentDisposition(filename: string, format: string): string {
+  const full = `${filename}.${format}`
+  // Strip control characters (CR, LF, NUL, etc.) and quotes to prevent header splitting
+  const ascii = full.replace(/[\x00-\x1f\x7f"\\]/g, '_')
+  const encoded = encodeURIComponent(full)
+  return `attachment; filename="${ascii}"; filename*=UTF-8''${encoded}`
+}
+
 export default class BoatMediaController {
   private async loadBoat(ctx: Pick<HttpContext, 'auth' | 'response' | 'params'>) {
     const user = ctx.auth.getUserOrFail()
@@ -204,7 +212,7 @@ export default class BoatMediaController {
     response.header('Content-Type', contentType)
     response.header(
       'Content-Disposition',
-      `attachment; filename="${media.originalFilename}.${media.format}"`
+      buildContentDisposition(media.originalFilename, media.format)
     )
     return response.send(buffer)
   }
@@ -245,7 +253,7 @@ export default class BoatMediaController {
     response.header('Content-Type', contentType)
     response.header(
       'Content-Disposition',
-      `attachment; filename="${media.originalFilename}.${media.format}"`
+      buildContentDisposition(media.originalFilename, media.format)
     )
     return response.send(buffer)
   }

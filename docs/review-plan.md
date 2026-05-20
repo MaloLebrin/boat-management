@@ -10,7 +10,7 @@ Généré le 2026-05-20. Se référer à ce fichier pour suivre l'avancement des
 
 ### High
 
-- [ ] **SEC-H1 — Header Injection via filename** `app/controllers/boat_media_controller.ts:204,246`
+- [x] **SEC-H1 — Header Injection via filename** `app/controllers/boat_media_controller.ts:204,246`
   - `media.originalFilename` interpolé directement dans `Content-Disposition` sans sanitisation
   - Risque : header splitting via `\r\n` dans le nom de fichier
   - Fix : `encodeURIComponent()` + filtrage des caractères de contrôle, ou syntaxe RFC 5987 (`filename*=UTF-8''...`)
