@@ -257,23 +257,7 @@ export default class BoatService {
     boat.spotId = payload.spotId
     await boat.save()
 
-    const BoatPositionHistory = (await import('#models/boat_position_history')).default
-    const currentHistory = await BoatPositionHistory.query()
-      .where('boatId', boat.id)
-      .whereNull('endedAt')
-      .first()
-    if (currentHistory) {
-      currentHistory.endedAt = DateTime.now()
-      await currentHistory.save()
-    }
-
-    if (boat.spotId !== null) {
-      await BoatPositionHistory.create({
-        boatId: boat.id,
-        spotId: boat.spotId,
-        startedAt: DateTime.now(),
-      })
-    }
+    await this._logBerthChange(boat, payload.spotId)
 
     return boat
   }
