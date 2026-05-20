@@ -12,6 +12,7 @@ export interface ApiDefinition {
     edit: typeof routes['boats.edit']
     update: typeof routes['boats.update']
     destroy: typeof routes['boats.destroy']
+    assign: typeof routes['boats.assign']
     engines: {
       show: typeof routes['boats.engines.show']
     }
@@ -79,11 +80,13 @@ export interface ApiDefinition {
       store: typeof routes['ports.pontoons.store']
       update: typeof routes['ports.pontoons.update']
       destroy: typeof routes['ports.pontoons.destroy']
+      updatePosition: typeof routes['ports.pontoons.updatePosition']
     }
     mouillages: {
       store: typeof routes['ports.mouillages.store']
       update: typeof routes['ports.mouillages.update']
       destroy: typeof routes['ports.mouillages.destroy']
+      updatePosition: typeof routes['ports.mouillages.updatePosition']
     }
   }
   newAccount: {

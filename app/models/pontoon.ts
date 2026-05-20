@@ -18,6 +18,12 @@ export default class Pontoon extends BaseModel {
   @column()
   declare description: string | null
 
+  @column()
+  declare positionX: number | null
+
+  @column()
+  declare positionY: number | null
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 

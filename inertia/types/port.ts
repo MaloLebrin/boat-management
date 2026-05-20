@@ -20,6 +20,8 @@ export type PontoonRow = {
   id: number
   name: string
   description: string | null
+  positionX: number | null
+  positionY: number | null
   boats: PontoonBoatRow[]
 }
 
@@ -32,6 +34,8 @@ export type MouillageRow = {
   id: number
   name: string
   description: string | null
+  positionX: number | null
+  positionY: number | null
   boats: MouillageBoatRow[]
 }
 

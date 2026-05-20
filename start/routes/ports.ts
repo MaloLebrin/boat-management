@@ -31,5 +31,16 @@ router
     router
       .delete('ports/:portId/mouillages/:mouillageId', [controllers.Mouillages, 'destroy'])
       .as('ports.mouillages.destroy')
+
+    router
+      .patch('ports/:portId/pontoons/:pontoonId/position', [controllers.Pontoons, 'updatePosition'])
+      .as('ports.pontoons.updatePosition')
+
+    router
+      .patch('ports/:portId/mouillages/:mouillageId/position', [
+        controllers.Mouillages,
+        'updatePosition',
+      ])
+      .as('ports.mouillages.updatePosition')
   })
   .use(middleware.auth())

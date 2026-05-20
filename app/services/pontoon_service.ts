@@ -31,4 +31,11 @@ export default class PontoonService {
 
     await pontoon.delete()
   }
+
+  async updatePosition(pontoon: Pontoon, payload: { x: number; y: number }) {
+    pontoon.positionX = payload.x
+    pontoon.positionY = payload.y
+    await pontoon.save()
+    return pontoon
+  }
 }

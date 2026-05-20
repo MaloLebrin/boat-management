@@ -115,6 +115,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boats_controller').default['destroy']>>>
     }
   }
+  'boats.assign': {
+    methods: ["PATCH"]
+    pattern: '/boats/:id/assignment'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/marina_layout').assignBoatValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/marina_layout').assignBoatValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boats_controller').default['assign']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boats_controller').default['assign']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'boat_equipment.store_engine': {
     methods: ["POST"]
     pattern: '/boats/:boatId/engines'
@@ -701,6 +713,30 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/mouillages_controller').default['destroy']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/mouillages_controller').default['destroy']>>>
+    }
+  }
+  'ports.pontoons.updatePosition': {
+    methods: ["PATCH"]
+    pattern: '/ports/:portId/pontoons/:pontoonId/position'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/marina_layout').updatePositionValidator)>>
+      paramsTuple: [ParamValue, ParamValue]
+      params: { portId: ParamValue; pontoonId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/marina_layout').updatePositionValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/pontoons_controller').default['updatePosition']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/pontoons_controller').default['updatePosition']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'ports.mouillages.updatePosition': {
+    methods: ["PATCH"]
+    pattern: '/ports/:portId/mouillages/:mouillageId/position'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/marina_layout').updatePositionValidator)>>
+      paramsTuple: [ParamValue, ParamValue]
+      params: { portId: ParamValue; mouillageId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/marina_layout').updatePositionValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/mouillages_controller').default['updatePosition']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/mouillages_controller').default['updatePosition']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'new_account.create': {

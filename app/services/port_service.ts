@@ -106,11 +106,18 @@ export default class PortService {
             .select('id', 'name', 'pontoon_id', 'spot_identifier')
         : []
 
-    const boatsByPontoon: Record<number, Array<{ id: number; name: string; spotIdentifier: string | null }>> = {}
+    const boatsByPontoon: Record<
+      number,
+      Array<{ id: number; name: string; spotIdentifier: string | null }>
+    > = {}
     for (const b of pontoonBoats) {
       if (b.pontoonId !== null) {
         if (!boatsByPontoon[b.pontoonId]) boatsByPontoon[b.pontoonId] = []
-        boatsByPontoon[b.pontoonId].push({ id: b.id, name: b.name, spotIdentifier: b.spotIdentifier })
+        boatsByPontoon[b.pontoonId].push({
+          id: b.id,
+          name: b.name,
+          spotIdentifier: b.spotIdentifier,
+        })
       }
     }
 
@@ -141,12 +148,16 @@ export default class PortService {
         id: pt.id,
         name: pt.name,
         description: pt.description,
+        positionX: pt.positionX,
+        positionY: pt.positionY,
         boats: boatsByPontoon[pt.id] ?? [],
       })),
       mouillages: port.mouillages.map((m) => ({
         id: m.id,
         name: m.name,
         description: m.description,
+        positionX: m.positionX,
+        positionY: m.positionY,
         boats: boatsByMouillage[m.id] ?? [],
       })),
     }

@@ -6,8 +6,12 @@ import BoatListService from '#services/boat_list_service'
 import BoatService, { BoatNotFoundError } from '#services/boat_service'
 import MediaService from '#services/media_service'
 import { createBoatValidator, updateBoatValidator } from '#validators/boat'
+import { assignBoatValidator } from '#validators/marina_layout'
 import type { HttpContext } from '@adonisjs/core/http'
+import Boat from '#models/boat'
 import BoatPositionHistory from '#models/boat_position_history'
+import Mouillage from '#models/mouillage'
+import Pontoon from '#models/pontoon'
 import Port from '#models/port'
 
 export default class BoatsController {
@@ -350,5 +354,44 @@ export default class BoatsController {
 
     await boatService.deleteForUser(user, boat)
     response.redirect('/boats')
+  }
+
+  async assign({ request, params, auth, response }: HttpContext) {
+    await auth.authenticate()
+    const user = auth.getUserOrFail()
+
+    if (user.organizationId === null) return response.status(403).json({ error: 'forbidden' })
+
+    const boat = await Boat.query()
+      .where('id', Number(params.id))
+      .where('organizationId', user.organizationId)
+      .first()
+
+    if (!boat) return response.status(404).json({ error: 'not found' })
+
+    const payload = await request.validateUsing(assignBoatValidator)
+
+    const orgId = user.organizationId
+
+    if (payload.pontoonId !== undefined && payload.pontoonId !== null) {
+      const pontoon = await Pontoon.query()
+        .whereHas('port', (q) => q.where('organizationId', orgId))
+        .where('id', payload.pontoonId)
+        .first()
+      if (!pontoon) return response.status(404).json({ error: 'pontoon not found' })
+    }
+
+    if (payload.mouillageId !== undefined && payload.mouillageId !== null) {
+      const mouillage = await Mouillage.query()
+        .whereHas('port', (q) => q.where('organizationId', orgId))
+        .where('id', payload.mouillageId)
+        .first()
+      if (!mouillage) return response.status(404).json({ error: 'mouillage not found' })
+    }
+
+    const boatService = new BoatService()
+    await boatService.updateAssignment(boat, payload)
+
+    return response.json({ ok: true })
   }
 }

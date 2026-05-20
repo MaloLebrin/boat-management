@@ -13,6 +13,7 @@ export type ScannedRoutes = {
     'boats.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'boats.assign': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boat_equipment.store_engine': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'boats.engines.show': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
     'boat_equipment.edit_engine': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
@@ -62,6 +63,8 @@ export type ScannedRoutes = {
     'ports.mouillages.store': { paramsTuple: [ParamValue]; params: {'portId': ParamValue} }
     'ports.mouillages.update': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'mouillageId': ParamValue} }
     'ports.mouillages.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'mouillageId': ParamValue} }
+    'ports.pontoons.updatePosition': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'pontoonId': ParamValue} }
+    'ports.mouillages.updatePosition': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'mouillageId': ParamValue} }
     'new_account.create': { paramsTuple?: []; params?: {} }
     'new_account.store': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }
@@ -216,8 +219,11 @@ export type ScannedRoutes = {
     'ports.mouillages.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'mouillageId': ParamValue} }
   }
   PATCH: {
+    'boats.assign': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boat_equipment.update_engine_status': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
     'boat_equipment.update_engine_notes': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
+    'ports.pontoons.updatePosition': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'pontoonId': ParamValue} }
+    'ports.mouillages.updatePosition': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'mouillageId': ParamValue} }
   }
 }
 declare module '@adonisjs/core/types/http' {

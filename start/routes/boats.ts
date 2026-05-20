@@ -12,6 +12,8 @@ router
     router.put('boats/:id', [controllers.Boats, 'update']).as('boats.update')
     router.delete('boats/:id', [controllers.Boats, 'destroy']).as('boats.destroy')
 
+    router.patch('boats/:id/assignment', [controllers.Boats, 'assign']).as('boats.assign')
+
     router.post('boats/:boatId/engines', [controllers.BoatEquipment, 'storeEngine'])
     router
       .get('boats/:boatId/engines/:engineId', [controllers.BoatEquipment, 'showEngine'])

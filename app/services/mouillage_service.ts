@@ -25,10 +25,20 @@ export default class MouillageService {
   }
 
   async deleteForPort(mouillage: Mouillage) {
-    const result = await Boat.query().where('mouillageId', mouillage.id).count('id as count').first()
+    const result = await Boat.query()
+      .where('mouillageId', mouillage.id)
+      .count('id as count')
+      .first()
 
     if (Number(result?.$extras['count'] ?? 0) > 0) throw new MouillageHasBoatsError()
 
     await mouillage.delete()
+  }
+
+  async updatePosition(mouillage: Mouillage, payload: { x: number; y: number }) {
+    mouillage.positionX = payload.x
+    mouillage.positionY = payload.y
+    await mouillage.save()
+    return mouillage
   }
 }

@@ -900,6 +900,25 @@
   "ports": {
     "nav": "Ports",
     "title": "My ports",
+    "tabs": {
+      "list": "List",
+      "plan": "Marina plan"
+    },
+    "plan": {
+      "editLayout": "Edit layout",
+      "viewOnly": "View only",
+      "empty": "Add pontoons or anchorages to visualize the plan",
+      "hint": "Click a boat to select it, then click a zone to reassign it.",
+      "boatSelected": "Selected: {name} - click a pontoon or anchorage to assign",
+      "boat": {
+        "assign": {
+          "title": "Assign {name}",
+          "spot": "Spot identifier",
+          "spotPlaceholder": "e.g. A1",
+          "confirm": "Assign"
+        }
+      }
+    },
     "empty": "No port registered yet.",
     "emptyDescription": "Add a port to organize your pontoons and boat berths.",
     "create": "New port",

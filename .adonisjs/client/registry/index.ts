@@ -60,6 +60,12 @@ const routes = {
     tokens: [{"old":"/boats/:id","type":0,"val":"boats","end":""},{"old":"/boats/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['boats.destroy']['types'],
   },
+  'boats.assign': {
+    methods: ["PATCH"],
+    pattern: '/boats/:id/assignment',
+    tokens: [{"old":"/boats/:id/assignment","type":0,"val":"boats","end":""},{"old":"/boats/:id/assignment","type":1,"val":"id","end":""},{"old":"/boats/:id/assignment","type":0,"val":"assignment","end":""}],
+    types: placeholder as Registry['boats.assign']['types'],
+  },
   'boat_equipment.store_engine': {
     methods: ["POST"],
     pattern: '/boats/:boatId/engines',
@@ -353,6 +359,18 @@ const routes = {
     pattern: '/ports/:portId/mouillages/:mouillageId',
     tokens: [{"old":"/ports/:portId/mouillages/:mouillageId","type":0,"val":"ports","end":""},{"old":"/ports/:portId/mouillages/:mouillageId","type":1,"val":"portId","end":""},{"old":"/ports/:portId/mouillages/:mouillageId","type":0,"val":"mouillages","end":""},{"old":"/ports/:portId/mouillages/:mouillageId","type":1,"val":"mouillageId","end":""}],
     types: placeholder as Registry['ports.mouillages.destroy']['types'],
+  },
+  'ports.pontoons.updatePosition': {
+    methods: ["PATCH"],
+    pattern: '/ports/:portId/pontoons/:pontoonId/position',
+    tokens: [{"old":"/ports/:portId/pontoons/:pontoonId/position","type":0,"val":"ports","end":""},{"old":"/ports/:portId/pontoons/:pontoonId/position","type":1,"val":"portId","end":""},{"old":"/ports/:portId/pontoons/:pontoonId/position","type":0,"val":"pontoons","end":""},{"old":"/ports/:portId/pontoons/:pontoonId/position","type":1,"val":"pontoonId","end":""},{"old":"/ports/:portId/pontoons/:pontoonId/position","type":0,"val":"position","end":""}],
+    types: placeholder as Registry['ports.pontoons.updatePosition']['types'],
+  },
+  'ports.mouillages.updatePosition': {
+    methods: ["PATCH"],
+    pattern: '/ports/:portId/mouillages/:mouillageId/position',
+    tokens: [{"old":"/ports/:portId/mouillages/:mouillageId/position","type":0,"val":"ports","end":""},{"old":"/ports/:portId/mouillages/:mouillageId/position","type":1,"val":"portId","end":""},{"old":"/ports/:portId/mouillages/:mouillageId/position","type":0,"val":"mouillages","end":""},{"old":"/ports/:portId/mouillages/:mouillageId/position","type":1,"val":"mouillageId","end":""},{"old":"/ports/:portId/mouillages/:mouillageId/position","type":0,"val":"position","end":""}],
+    types: placeholder as Registry['ports.mouillages.updatePosition']['types'],
   },
   'new_account.create': {
     methods: ["GET","HEAD"],

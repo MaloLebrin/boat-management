@@ -418,7 +418,7 @@ export class MediaSchema extends BaseModel {
 }
 
 export class MouillageSchema extends BaseModel {
-  static $columns = ['createdAt', 'description', 'id', 'name', 'portId', 'updatedAt'] as const
+  static $columns = ['createdAt', 'description', 'id', 'name', 'portId', 'positionX', 'positionY', 'updatedAt'] as const
   $columns = MouillageSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -430,6 +430,10 @@ export class MouillageSchema extends BaseModel {
   declare name: string
   @column()
   declare portId: number
+  @column()
+  declare positionX: number | null
+  @column()
+  declare positionY: number | null
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
 }
@@ -465,7 +469,7 @@ export class PasswordResetTokenSchema extends BaseModel {
 }
 
 export class PontoonSchema extends BaseModel {
-  static $columns = ['createdAt', 'description', 'id', 'name', 'portId', 'updatedAt'] as const
+  static $columns = ['createdAt', 'description', 'id', 'name', 'portId', 'positionX', 'positionY', 'updatedAt'] as const
   $columns = PontoonSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -477,6 +481,10 @@ export class PontoonSchema extends BaseModel {
   declare name: string
   @column()
   declare portId: number
+  @column()
+  declare positionX: number | null
+  @column()
+  declare positionY: number | null
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
 }

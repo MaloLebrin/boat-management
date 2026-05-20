@@ -1,16 +1,14 @@
 <script setup lang="ts">
 import { Link, router } from '@inertiajs/vue3'
 import { ref } from 'vue'
-import { ArrowLeftIcon, MapPinIcon, PencilIcon, PlusIcon, TrashIcon } from '@heroicons/vue/24/outline'
+import { ArrowLeftIcon, MapPinIcon, PencilIcon, TrashIcon } from '@heroicons/vue/24/outline'
 import BaseButton from '~/components/base/BaseButton.vue'
-import BaseCard from '~/components/base/BaseCard.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
-import MouillageCard from '~/components/ports/show/MouillageCard.vue'
-import MouillageFormModal from '~/components/ports/modals/MouillageFormModal.vue'
-import PontoonCard from '~/components/ports/show/PontoonCard.vue'
-import PontoonFormModal from '~/components/ports/modals/PontoonFormModal.vue'
+import BaseTabs from '~/components/base/BaseTabs.vue'
+import MarinaMapTab from '~/components/ports/show/tabs/MarinaMapTab.vue'
+import PortListTab from '~/components/ports/show/tabs/PortListTab.vue'
 import { useT } from '~/composables/useT'
-import type { PortShowDetail, PontoonRow, MouillageRow } from '~/types/port'
+import type { PortShowDetail } from '~/types/port'
 
 const props = defineProps<{
   port: PortShowDetail
@@ -18,41 +16,12 @@ const props = defineProps<{
 
 const { t } = useT()
 
-const showPontoonForm = ref(false)
-const editingPontoon = ref<PontoonRow | null>(null)
+const activeTab = ref<'list' | 'plan'>('list')
 
-const showMouillageForm = ref(false)
-const editingMouillage = ref<MouillageRow | null>(null)
-
-function handleAddPontoon() {
-  editingPontoon.value = null
-  showPontoonForm.value = true
-}
-
-function handleEditPontoon(pontoon: PontoonRow) {
-  editingPontoon.value = pontoon
-  showPontoonForm.value = true
-}
-
-function handleCloseForm() {
-  showPontoonForm.value = false
-  editingPontoon.value = null
-}
-
-function handleAddMouillage() {
-  editingMouillage.value = null
-  showMouillageForm.value = true
-}
-
-function handleEditMouillage(mouillage: MouillageRow) {
-  editingMouillage.value = mouillage
-  showMouillageForm.value = true
-}
-
-function handleCloseMouillageForm() {
-  showMouillageForm.value = false
-  editingMouillage.value = null
-}
+const tabs = [
+  { key: 'list', label: t('ports.tabs.list') },
+  { key: 'plan', label: t('ports.tabs.plan') },
+]
 
 function handleDeletePort() {
   const hasBoats =
@@ -105,98 +74,15 @@ function handleDeletePort() {
       </div>
     </div>
 
-    <!-- Port details -->
-    <div class="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <!-- Info card -->
-      <BaseCard padded>
-        <dl class="space-y-3 text-sm">
-          <div v-if="port.address">
-            <dt class="text-fg-muted">{{ t('ports.fields.address') }}</dt>
-            <dd class="font-medium text-fg whitespace-pre-line">{{ port.address }}</dd>
-          </div>
-          <div v-if="port.notes">
-            <dt class="text-fg-muted">{{ t('ports.fields.notes') }}</dt>
-            <dd class="font-medium text-fg whitespace-pre-line">{{ port.notes }}</dd>
-          </div>
-          <div v-if="!port.address && !port.notes" class="text-fg-subtle">
-            {{ t('common.none') }}
-          </div>
-        </dl>
-      </BaseCard>
+    <!-- Tabs -->
+    <div class="mt-8">
+      <BaseTabs v-model="activeTab" :tabs="tabs" />
+    </div>
 
-      <!-- Pontoons section -->
-      <div class="lg:col-span-2 space-y-4">
-        <div class="flex items-center justify-between">
-          <h2 class="text-lg font-semibold text-fg">{{ t('ports.pontoons.title') }}</h2>
-          <BaseButton size="sm" @click="handleAddPontoon">
-            <PlusIcon class="h-4 w-4" />
-            {{ t('ports.pontoons.add') }}
-          </BaseButton>
-        </div>
-
-        <!-- Pontoon form -->
-        <PontoonFormModal
-          v-if="showPontoonForm"
-          :port-id="port.id"
-          :pontoon="editingPontoon"
-          @close="handleCloseForm"
-        />
-
-        <!-- Empty state -->
-        <BaseCard v-if="port.pontoons.length === 0 && !showPontoonForm" padded>
-          <p class="text-center text-sm text-fg-muted py-4">
-            {{ t('ports.pontoons.empty') }}
-          </p>
-        </BaseCard>
-
-        <!-- Pontoons list -->
-        <div v-else class="space-y-4">
-          <PontoonCard
-            v-for="pontoon in port.pontoons"
-            :key="pontoon.id"
-            :pontoon="pontoon"
-            :port-id="port.id"
-            @edit="handleEditPontoon"
-          />
-        </div>
-
-        <!-- Mouillages section -->
-        <div class="mt-8 space-y-4">
-          <div class="flex items-center justify-between">
-            <h2 class="text-lg font-semibold text-fg">{{ t('ports.mouillages.title') }}</h2>
-            <BaseButton size="sm" @click="handleAddMouillage">
-              <PlusIcon class="h-4 w-4" />
-              {{ t('ports.mouillages.add') }}
-            </BaseButton>
-          </div>
-
-          <!-- Mouillage form -->
-          <MouillageFormModal
-            v-if="showMouillageForm"
-            :port-id="port.id"
-            :mouillage="editingMouillage"
-            @close="handleCloseMouillageForm"
-          />
-
-          <!-- Empty state -->
-          <BaseCard v-if="port.mouillages.length === 0 && !showMouillageForm" padded>
-            <p class="text-center text-sm text-fg-muted py-4">
-              {{ t('ports.mouillages.empty') }}
-            </p>
-          </BaseCard>
-
-          <!-- Mouillages list -->
-          <div v-else class="space-y-4">
-            <MouillageCard
-              v-for="mouillage in port.mouillages"
-              :key="mouillage.id"
-              :mouillage="mouillage"
-              :port-id="port.id"
-              @edit="handleEditMouillage"
-            />
-          </div>
-        </div>
-      </div>
+    <!-- Tab content -->
+    <div class="mt-6">
+      <PortListTab v-if="activeTab === 'list'" :port="port" />
+      <MarinaMapTab v-if="activeTab === 'plan'" :port="port" />
     </div>
   </div>
 </template>

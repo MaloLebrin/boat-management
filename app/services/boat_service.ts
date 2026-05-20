@@ -275,6 +275,52 @@ export default class BoatService {
     await boat.delete()
   }
 
+  async updateAssignment(
+    boat: Boat,
+    payload: {
+      pontoonId?: number | null
+      mouillageId?: number | null
+      spotIdentifier?: string | null
+    }
+  ) {
+    if (payload.pontoonId !== undefined && payload.pontoonId !== null) {
+      boat.pontoonId = payload.pontoonId
+      boat.mouillageId = null
+      boat.spotIdentifier = payload.spotIdentifier ?? null
+    } else if (payload.mouillageId !== undefined && payload.mouillageId !== null) {
+      boat.mouillageId = payload.mouillageId
+      boat.pontoonId = null
+      boat.spotIdentifier = null
+    } else {
+      boat.pontoonId = null
+      boat.mouillageId = null
+      boat.spotIdentifier = null
+    }
+    await boat.save()
+
+    const BoatPositionHistory = (await import('#models/boat_position_history')).default
+    const currentHistory = await BoatPositionHistory.query()
+      .where('boatId', boat.id)
+      .whereNull('endedAt')
+      .first()
+    if (currentHistory) {
+      currentHistory.endedAt = DateTime.now()
+      await currentHistory.save()
+    }
+
+    if (boat.pontoonId !== null || boat.mouillageId !== null) {
+      await BoatPositionHistory.create({
+        boatId: boat.id,
+        pontoonId: boat.pontoonId,
+        mouillageId: boat.mouillageId,
+        spotIdentifier: boat.spotIdentifier,
+        startedAt: DateTime.now(),
+      })
+    }
+
+    return boat
+  }
+
   async createEngine(user: User, boat: Boat, payload: BoatEnginePayload) {
     assertBoatInUserOrg(user, boat)
 

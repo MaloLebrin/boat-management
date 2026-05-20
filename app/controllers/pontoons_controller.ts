@@ -3,6 +3,7 @@ import Port from '#models/port'
 import { PontoonHasBoatsError } from '#services/port_service'
 import PontoonService from '#services/pontoon_service'
 import { createPontoonValidator, updatePontoonValidator } from '#validators/pontoon'
+import { updatePositionValidator } from '#validators/marina_layout'
 import type { HttpContext } from '@adonisjs/core/http'
 
 export default class PontoonsController {
@@ -84,5 +85,32 @@ export default class PontoonsController {
       }
       throw error
     }
+  }
+
+  async updatePosition({ request, params, auth, response }: HttpContext) {
+    await auth.authenticate()
+    const user = auth.getUserOrFail()
+
+    if (user.organizationId === null) return response.status(403).json({ error: 'forbidden' })
+
+    const port = await Port.query()
+      .where('id', Number(params.portId))
+      .where('organizationId', user.organizationId)
+      .first()
+
+    if (!port) return response.status(404).json({ error: 'not found' })
+
+    const pontoon = await Pontoon.query()
+      .where('id', Number(params.pontoonId))
+      .where('portId', port.id)
+      .first()
+
+    if (!pontoon) return response.status(404).json({ error: 'not found' })
+
+    const payload = await request.validateUsing(updatePositionValidator)
+    const pontoonService = new PontoonService()
+    await pontoonService.updatePosition(pontoon, payload)
+
+    return response.json({ ok: true })
   }
 }
