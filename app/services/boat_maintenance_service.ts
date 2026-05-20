@@ -3,6 +3,7 @@ import {
   BoatMaintenanceValidationError,
 } from '#exceptions/maintenance_errors'
 import type Boat from '#models/boat'
+import type { CreateMaintenancePayload } from '#shared/types/maintenance'
 import BoatEngine from '#models/boat_engine'
 import BoatMaintenanceEvent from '#models/boat_maintenance_event'
 import BoatMaintenancePart from '#models/boat_maintenance_part'
@@ -13,6 +14,7 @@ import db from '@adonisjs/lucid/services/db'
 import { DateTime } from 'luxon'
 
 export { BoatMaintenanceNotFoundError, BoatMaintenanceValidationError }
+export type { CreateMaintenancePayload }
 
 function toDateTime(value: Date | string | DateTime): DateTime {
   if (DateTime.isDateTime(value)) return value
@@ -33,19 +35,6 @@ function buildSailCaption(sail: BoatSail): string {
     sail.areaM2 !== null ? `${sail.areaM2} m²` : null,
   ].filter(Boolean)
   return bits.join(' · ')
-}
-
-export type CreateMaintenancePayload = {
-  subject: 'boat' | 'hull' | 'engine' | 'sail' | 'rig' | 'electrical' | 'plumbing' | 'safety' | 'deck' | 'other'
-  boatEngineId?: number | null
-  boatSailId?: number | null
-  boatRigId?: number | null
-  engineCaption?: string | null
-  sailCaption?: string | null
-  performedAt: Date | string | DateTime
-  title: string
-  notes?: string | null
-  parts?: Array<{ name?: string | null; quantity?: string | null; notes?: string | null }>
 }
 
 export default class BoatMaintenanceService {

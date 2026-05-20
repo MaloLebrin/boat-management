@@ -1,6 +1,6 @@
 import vine from '@vinejs/vine'
 import { engineFuels, engineKinds, rigTypes, sailTypes } from '#validators/boat'
-import type { BoatEnginePayload, BoatRigPayload, BoatSailPayload } from '#services/boat_service'
+import type { BoatEnginePayload, BoatRigPayload, BoatSailPayload } from '#shared/types/boat'
 
 export const equipmentStatuses = [
   'operational',

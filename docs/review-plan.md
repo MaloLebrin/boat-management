@@ -71,7 +71,7 @@ Généré le 2026-05-20. Se référer à ce fichier pour suivre l'avancement des
   - `app/services/media_service.ts` → `MediaNotFoundError`
   - Fix : créer `app/exceptions/boat_errors.ts`, `maintenance_errors.ts`, `media_errors.ts` ; modèle : `app/exceptions/port_errors.ts`
 
-- [ ] **REF-P1-3 — Types payload dans les services au lieu de `shared/types/`**
+- [x] **REF-P1-3 — Types payload dans les services au lieu de `shared/types/`**
   - `app/services/boat_service.ts:23` → `BoatHullPayload`, `BoatEnginePayload`, `BoatSailPayload`, `BoatRigPayload`, `BoatEnginePartPayload`, `BoatSafetyEquipmentPayload`
   - `app/services/boat_maintenance_service.ts` → `CreateMaintenancePayload`
   - Fix : créer `shared/types/boat.ts`, `shared/types/maintenance.ts` et y déplacer ces types
