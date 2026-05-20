@@ -5,6 +5,7 @@ import type { MouillageRow, SpotRow } from '~/types/port'
 const RX = 120
 const RY = 75
 const SPOT_SIZE = 28
+const SPOT_OCCUPIED_SIZE = 38
 
 const props = defineProps<{
   mouillage: MouillageRow
@@ -91,42 +92,64 @@ function handleSpotClick(spot: SpotRow) {
     <g
       v-for="spot in spotPositions"
       :key="spot.id"
-      :transform="`translate(${spot.sx - SPOT_SIZE / 2}, ${spot.sy - SPOT_SIZE / 2})`"
+      :transform="`translate(${spot.sx - (spot.boat ? SPOT_OCCUPIED_SIZE : SPOT_SIZE) / 2}, ${spot.sy - (spot.boat ? SPOT_OCCUPIED_SIZE : SPOT_SIZE) / 2})`"
       style="cursor: pointer"
       @click.stop="handleSpotClick(spot)"
     >
-      <rect
-        :width="SPOT_SIZE"
-        :height="SPOT_SIZE"
-        :rx="SPOT_SIZE / 2"
-        :fill="getSpotFill(spot)"
-        :stroke="getSpotStroke(spot)"
-        :stroke-dasharray="spot.boat ? 'none' : '4 2'"
-        stroke-width="2"
-      />
-      <!-- Spot name -->
-      <text
-        :x="SPOT_SIZE / 2"
-        y="14"
-        text-anchor="middle"
-        font-size="7"
-        :fill="spot.boat ? 'white' : '#2196F3'"
-        pointer-events="none"
-      >
-        {{ spot.name.slice(0, 3) }}
-      </text>
-      <!-- Boat name (if occupied) -->
-      <text
-        v-if="spot.boat"
-        :x="SPOT_SIZE / 2"
-        y="22"
-        text-anchor="middle"
-        font-size="6"
-        fill="rgba(255,255,255,0.75)"
-        pointer-events="none"
-      >
-        {{ spot.boat.name.slice(0, 4) }}
-      </text>
+      <!-- Occupied: large circle + boat icon + name -->
+      <template v-if="spot.boat">
+        <circle
+          :cx="SPOT_OCCUPIED_SIZE / 2"
+          :cy="SPOT_OCCUPIED_SIZE / 2"
+          :r="SPOT_OCCUPIED_SIZE / 2"
+          :fill="getSpotFill(spot)"
+          :stroke="getSpotStroke(spot)"
+          stroke-width="2"
+        />
+        <text
+          :x="SPOT_OCCUPIED_SIZE / 2"
+          y="21"
+          text-anchor="middle"
+          font-size="16"
+          pointer-events="none"
+        >
+          ⛵
+        </text>
+        <text
+          :x="SPOT_OCCUPIED_SIZE / 2"
+          y="33"
+          text-anchor="middle"
+          font-size="8"
+          fill="rgba(255,255,255,0.9)"
+          font-weight="600"
+          pointer-events="none"
+        >
+          {{ spot.boat.name.slice(0, 5) }}
+        </text>
+      </template>
+      <!-- Empty: small dashed circle + spot name -->
+      <template v-else>
+        <rect
+          :width="SPOT_SIZE"
+          :height="SPOT_SIZE"
+          :rx="SPOT_SIZE / 2"
+          fill="rgba(33,150,243,0.2)"
+          stroke="#2196F3"
+          stroke-dasharray="4 2"
+          stroke-width="2"
+        />
+        <text
+          :x="SPOT_SIZE / 2"
+          y="17"
+          text-anchor="middle"
+          font-size="8"
+          fill="#2196F3"
+          font-weight="600"
+          pointer-events="none"
+        >
+          {{ spot.name.slice(0, 3) }}
+        </text>
+      </template>
     </g>
   </g>
 </template>

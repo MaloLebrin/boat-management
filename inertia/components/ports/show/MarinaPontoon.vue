@@ -41,10 +41,6 @@ function getSpotStroke(spot: SpotRow): string {
   return 'white'
 }
 
-function getNameColor(spot: SpotRow): string {
-  return spot.boat ? 'white' : '#5D4037'
-}
-
 function handleSpotClick(spot: SpotRow) {
   emit('spot-click', { spotId: spot.id, boat: spot.boat })
 }
@@ -76,49 +72,71 @@ function handleSpotClick(spot: SpotRow) {
       style="cursor: pointer"
       @click.stop="handleSpotClick(spot)"
     >
-      <rect
-        :width="SLOT_W"
-        :height="SLOT_H"
-        rx="3"
-        :fill="getSpotFill(spot)"
-        :stroke="getSpotStroke(spot)"
-        :stroke-dasharray="spot.boat ? 'none' : '4 3'"
-        stroke-width="1.5"
-      />
-      <!-- Spot name -->
-      <text
-        :x="SLOT_W / 2"
-        y="18"
-        text-anchor="middle"
-        font-size="10"
-        font-weight="700"
-        :fill="getNameColor(spot)"
-        pointer-events="none"
-      >
-        {{ spot.name }}
-      </text>
-      <!-- Divider (only if occupied) -->
-      <line
-        v-if="spot.boat"
-        :x1="6"
-        :y1="24"
-        :x2="SLOT_W - 6"
-        y2="24"
-        stroke="rgba(255,255,255,0.3)"
-        stroke-width="1"
-      />
-      <!-- Boat name (if occupied) -->
-      <text
-        v-if="spot.boat"
-        :x="SLOT_W / 2"
-        y="38"
-        text-anchor="middle"
-        font-size="8"
-        fill="rgba(255,255,255,0.85)"
-        pointer-events="none"
-      >
-        {{ spot.boat.name.slice(0, 6) }}
-      </text>
+      <!-- Occupied: filled rect + badge + boat icon + name -->
+      <template v-if="spot.boat">
+        <rect
+          :width="SLOT_W"
+          :height="SLOT_H"
+          rx="3"
+          :fill="getSpotFill(spot)"
+          :stroke="getSpotStroke(spot)"
+          stroke-width="1.5"
+        />
+        <rect x="4" y="4" width="36" height="14" rx="3" fill="rgba(255,255,255,0.2)" pointer-events="none" />
+        <text
+          :x="SLOT_W / 2"
+          y="14"
+          text-anchor="middle"
+          font-size="9"
+          font-weight="700"
+          fill="white"
+          pointer-events="none"
+        >
+          {{ spot.name }}
+        </text>
+        <text
+          :x="SLOT_W / 2"
+          y="42"
+          text-anchor="middle"
+          font-size="20"
+          pointer-events="none"
+        >
+          ⛵
+        </text>
+        <text
+          :x="SLOT_W / 2"
+          y="57"
+          text-anchor="middle"
+          font-size="8"
+          fill="rgba(255,255,255,0.9)"
+          pointer-events="none"
+        >
+          {{ spot.boat.name.slice(0, 6) }}
+        </text>
+      </template>
+      <!-- Empty: dashed rect + spot name -->
+      <template v-else>
+        <rect
+          :width="SLOT_W"
+          :height="SLOT_H"
+          rx="3"
+          fill="none"
+          stroke="#5D4037"
+          stroke-dasharray="4 3"
+          stroke-width="1.5"
+        />
+        <text
+          :x="SLOT_W / 2"
+          y="18"
+          text-anchor="middle"
+          font-size="10"
+          font-weight="700"
+          fill="#5D4037"
+          pointer-events="none"
+        >
+          {{ spot.name }}
+        </text>
+      </template>
     </g>
 
     <!-- Empty slot placeholder (if no spots) -->
