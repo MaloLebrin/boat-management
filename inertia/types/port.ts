@@ -13,6 +13,7 @@ export type PortListItem = {
 export type SpotBoatRow = {
   id: number
   name: string
+  type: string
 }
 
 export type SpotRow = {
