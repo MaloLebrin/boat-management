@@ -75,27 +75,10 @@ function closeMouillageSpotsModal(open: boolean) {
 </script>
 
 <template>
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <!-- Info card -->
-    <BaseCard padded>
-      <dl class="space-y-3 text-sm">
-        <div v-if="port.address">
-          <dt class="text-fg-muted">{{ t('ports.fields.address') }}</dt>
-          <dd class="font-medium text-fg whitespace-pre-line">{{ port.address }}</dd>
-        </div>
-        <div v-if="port.notes">
-          <dt class="text-fg-muted">{{ t('ports.fields.notes') }}</dt>
-          <dd class="font-medium text-fg whitespace-pre-line">{{ port.notes }}</dd>
-        </div>
-        <div v-if="!port.address && !port.notes" class="text-fg-subtle">
-          {{ t('common.none') }}
-        </div>
-      </dl>
-    </BaseCard>
-
+  <div class="space-y-10">
     <!-- Pontoons section -->
-    <div class="lg:col-span-2 space-y-4">
-      <div class="flex items-center justify-between">
+    <section>
+      <div class="flex items-center justify-between mb-4">
         <h2 class="text-lg font-semibold text-fg">{{ t('ports.pontoons.title') }}</h2>
         <BaseButton size="sm" @click="handleAddPontoon">
           <PlusIcon class="h-4 w-4" />
@@ -121,37 +104,37 @@ function closeMouillageSpotsModal(open: boolean) {
           @manage-spots="handleManagePontoonSpots"
         />
       </div>
+    </section>
 
-      <!-- Mouillages section -->
-      <div class="mt-8 space-y-4">
-        <div class="flex items-center justify-between">
-          <h2 class="text-lg font-semibold text-fg">{{ t('ports.mouillages.title') }}</h2>
-          <BaseButton size="sm" @click="handleAddMouillage">
-            <PlusIcon class="h-4 w-4" />
-            {{ t('ports.mouillages.add') }}
-          </BaseButton>
-        </div>
-
-        <!-- Empty state -->
-        <BaseCard v-if="port.mouillages.length === 0" padded>
-          <p class="text-center text-sm text-fg-muted py-4">
-            {{ t('ports.mouillages.empty') }}
-          </p>
-        </BaseCard>
-
-        <!-- Mouillages list -->
-        <div v-else class="space-y-4">
-          <MouillageCard
-            v-for="mouillage in port.mouillages"
-            :key="mouillage.id"
-            :mouillage="mouillage"
-            :port-id="port.id"
-            @edit="handleEditMouillage"
-            @manage-spots="handleManageMouillageSpots"
-          />
-        </div>
+    <!-- Mouillages section -->
+    <section>
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold text-fg">{{ t('ports.mouillages.title') }}</h2>
+        <BaseButton size="sm" @click="handleAddMouillage">
+          <PlusIcon class="h-4 w-4" />
+          {{ t('ports.mouillages.add') }}
+        </BaseButton>
       </div>
-    </div>
+
+      <!-- Empty state -->
+      <BaseCard v-if="port.mouillages.length === 0" padded>
+        <p class="text-center text-sm text-fg-muted py-4">
+          {{ t('ports.mouillages.empty') }}
+        </p>
+      </BaseCard>
+
+      <!-- Mouillages list -->
+      <div v-else class="space-y-4">
+        <MouillageCard
+          v-for="mouillage in port.mouillages"
+          :key="mouillage.id"
+          :mouillage="mouillage"
+          :port-id="port.id"
+          @edit="handleEditMouillage"
+          @manage-spots="handleManageMouillageSpots"
+        />
+      </div>
+    </section>
   </div>
 
   <!-- Modals -->

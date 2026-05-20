@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Link, router } from '@inertiajs/vue3'
 import { ref } from 'vue'
-import { ArrowLeftIcon, MapPinIcon, PencilIcon, TrashIcon } from '@heroicons/vue/24/outline'
+import { MapPinIcon, PencilIcon, TrashIcon } from '@heroicons/vue/24/outline'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseTabs from '~/components/base/BaseTabs.vue'
@@ -40,12 +40,11 @@ function handleDeletePort() {
 <template>
   <div class="w-full max-w-5xl px-6 py-10 sm:px-8">
     <!-- Breadcrumb -->
-    <div class="mb-6">
-      <Link href="/ports" class="inline-flex items-center gap-1 text-sm text-fg-muted hover:text-fg">
-        <ArrowLeftIcon class="h-4 w-4" />
-        {{ t('ports.backToList') }}
-      </Link>
-    </div>
+    <nav class="mb-6 flex items-center gap-1.5 text-sm text-fg-muted">
+      <Link href="/ports" class="hover:text-fg transition-colors">{{ t('ports.title') }}</Link>
+      <span class="select-none">›</span>
+      <span class="text-fg font-medium">{{ port.name }}</span>
+    </nav>
 
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
@@ -58,6 +57,8 @@ function handleDeletePort() {
           <p v-if="port.city" class="mt-1 text-fg-muted">
             {{ port.city }}<span v-if="port.country">, {{ port.country }}</span>
           </p>
+          <p v-if="port.address" class="mt-0.5 text-sm text-fg-muted">{{ port.address }}</p>
+          <p v-if="port.notes" class="mt-1 text-xs text-fg-subtle italic">{{ port.notes }}</p>
         </div>
       </div>
       <div class="flex items-center gap-2">
