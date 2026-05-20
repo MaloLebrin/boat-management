@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
-import type { BoatEditPayload, PropulsionTypeUi, PortForForm } from '~/types/boat_form'
-import { useT } from '~/composables/useT'
 import { useBoatOptions } from '~/composables/useBoatOptions'
+import { useT } from '~/composables/useT'
+import type { BoatEditPayload, PortForForm, PropulsionTypeUi } from '~/types/boat_form'
 
 const propulsionType = defineModel<PropulsionTypeUi>('propulsionType', { required: true })
 
@@ -38,9 +38,9 @@ const francisationNumber = ref('')
 const flagCountry = ref('')
 const maxPersons = ref('')
 const selectedPortId = ref<number | ''>('')
-const pontoonId = ref<number | ''>('')
-const mouillageId = ref<number | ''>('')
-const spotIdentifier = ref('')
+const selectedPontoonId = ref<number | ''>('')
+const selectedMouillageId = ref<number | ''>('')
+const spotId = ref<number | ''>('')
 
 const portOptions = computed(() =>
   (props.ports ?? []).map((p) => ({ label: p.name, value: p.id }))
@@ -48,32 +48,50 @@ const portOptions = computed(() =>
 
 const pontoonOptions = computed(() => {
   if (!selectedPortId.value) return []
-  const port = (props.ports ?? []).find((p) => p.id === selectedPortId.value)
+  const port = (props.ports ?? []).find((p) => p.id === Number(selectedPortId.value))
   return port?.pontoons.map((pt) => ({ label: pt.name, value: pt.id })) ?? []
 })
 
 const mouillageOptions = computed(() => {
   if (!selectedPortId.value) return []
-  const port = (props.ports ?? []).find((p) => p.id === selectedPortId.value)
+  const port = (props.ports ?? []).find((p) => p.id === Number(selectedPortId.value))
   return port?.mouillages.map((m) => ({ label: m.name, value: m.id })) ?? []
 })
 
+const spotOptions = computed(() => {
+  const port = (props.ports ?? []).find((p) => p.id === Number(selectedPortId.value))
+  if (selectedPontoonId.value) {
+    const pt = port?.pontoons.find((p) => p.id === Number(selectedPontoonId.value))
+    return pt?.spots.map((s) => ({ label: s.name, value: s.id })) ?? []
+  }
+  if (selectedMouillageId.value) {
+    const m = port?.mouillages.find((mo) => mo.id === Number(selectedMouillageId.value))
+    return m?.spots.map((s) => ({ label: s.name, value: s.id })) ?? []
+  }
+  return []
+})
+
 watch(selectedPortId, () => {
-  pontoonId.value = ''
-  mouillageId.value = ''
+  selectedPontoonId.value = ''
+  selectedMouillageId.value = ''
+  spotId.value = ''
 })
 
-watch(pontoonId, (val) => {
-  if (val) mouillageId.value = ''
-})
-
-watch(mouillageId, (val) => {
+watch(selectedPontoonId, (val) => {
   if (val) {
-    pontoonId.value = ''
-    spotIdentifier.value = ''
+    selectedMouillageId.value = ''
+    spotId.value = ''
   }
 })
 
+watch(selectedMouillageId, (val) => {
+  if (val) {
+    selectedPontoonId.value = ''
+    spotId.value = ''
+  }
+})
+
+// TODO: this need to be refactored
 function syncFromBoat() {
   if (props.mode !== 'edit' || !props.boat) return
   const b = props.boat
@@ -95,16 +113,25 @@ function syncFromBoat() {
   francisationNumber.value = b.francisationNumber ?? ''
   flagCountry.value = b.flagCountry ?? ''
   maxPersons.value = b.maxPersons === null || b.maxPersons === undefined ? '' : String(b.maxPersons)
-  pontoonId.value = b.pontoonId ?? ''
-  mouillageId.value = b.mouillageId ?? ''
-  spotIdentifier.value = b.spotIdentifier ?? ''
-  // Find portId from pontoonId or mouillageId
-  if (b.pontoonId && props.ports) {
-    const portWithPontoon = props.ports.find((p) => p.pontoons.some((pt) => pt.id === b.pontoonId))
-    selectedPortId.value = portWithPontoon?.id ?? ''
-  } else if (b.mouillageId && props.ports) {
-    const portWithMouillage = props.ports.find((p) => p.mouillages.some((m) => m.id === b.mouillageId))
-    selectedPortId.value = portWithMouillage?.id ?? ''
+  spotId.value = b.spotId ?? ''
+  // Find which port/pontoon/mouillage owns this spot
+  if (b.spotId && props.ports) {
+    for (const port of props.ports) {
+      for (const pt of port.pontoons) {
+        if (pt.spots.some((s) => s.id === b.spotId)) {
+          selectedPortId.value = port.id
+          selectedPontoonId.value = pt.id
+          return
+        }
+      }
+      for (const m of port.mouillages) {
+        if (m.spots.some((s) => s.id === b.spotId)) {
+          selectedPortId.value = port.id
+          selectedMouillageId.value = m.id
+          return
+        }
+      }
+    }
   }
 }
 
@@ -154,12 +181,48 @@ watch(
     <!-- Current position section -->
     <div v-if="ports && ports.length > 0" class="space-y-4 rounded-lg border border-border p-4">
       <p class="text-sm font-semibold text-fg">{{ t('boats.show.position.title') }}</p>
-      <BaseSelect id="portId" name="portId" :label="t('ports.title')" :placeholder="t('common.selectPlaceholder')" :allow-empty="true" :options="portOptions" v-model="selectedPortId" />
+      <BaseSelect
+        id="portId"
+        name="_portId"
+        :label="t('ports.title')"
+        :placeholder="t('common.selectPlaceholder')"
+        :allow-empty="true"
+        :options="portOptions"
+        v-model="selectedPortId"
+      />
       <div class="grid grid-cols-2 gap-4">
-        <BaseSelect id="pontoonId" name="pontoonId" :label="t('boats.hullFields.pontoon')" :placeholder="t('common.selectPlaceholder')" :allow-empty="true" :options="pontoonOptions" :disabled="!selectedPortId || !!mouillageId" v-model="pontoonId" :errors="errors" />
-        <BaseSelect id="mouillageId" name="mouillageId" :label="t('boats.hullFields.mouillage')" :placeholder="t('common.selectPlaceholder')" :allow-empty="true" :options="mouillageOptions" :disabled="!selectedPortId || !!pontoonId" v-model="mouillageId" :errors="errors" />
+        <BaseSelect
+          id="_pontoonId"
+          name="_pontoonId"
+          :label="t('boats.hullFields.pontoon')"
+          :placeholder="t('common.selectPlaceholder')"
+          :allow-empty="true"
+          :options="pontoonOptions"
+          :disabled="!selectedPortId || !!selectedMouillageId"
+          v-model="selectedPontoonId"
+        />
+        <BaseSelect
+          id="_mouillageId"
+          name="_mouillageId"
+          :label="t('boats.hullFields.mouillage')"
+          :placeholder="t('common.selectPlaceholder')"
+          :allow-empty="true"
+          :options="mouillageOptions"
+          :disabled="!selectedPortId || !!selectedPontoonId"
+          v-model="selectedMouillageId"
+        />
       </div>
-      <BaseInput v-if="!mouillageId" id="spotIdentifier" name="spotIdentifier" :label="t('boats.hullFields.spotIdentifier')" v-model="spotIdentifier" :errors="errors" maxlength="16" />
+      <BaseSelect
+        v-if="selectedPontoonId || selectedMouillageId"
+        id="spotId"
+        name="spotId"
+        :label="t('boats.hullFields.spotIdentifier')"
+        :placeholder="t('common.selectPlaceholder')"
+        :allow-empty="true"
+        :options="spotOptions"
+        v-model="spotId"
+        :errors="errors"
+      />
     </div>
   </div>
 </template>

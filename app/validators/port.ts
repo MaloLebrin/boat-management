@@ -1,6 +1,6 @@
 import vine from '@vinejs/vine'
 
-export const createPortValidator = vine.compile(
+export const createPortValidator = vine.create(
   vine.object({
     name: vine.string().trim().minLength(2).maxLength(120),
     city: vine.string().trim().maxLength(120).nullable().optional(),
@@ -10,7 +10,7 @@ export const createPortValidator = vine.compile(
   })
 )
 
-export const updatePortValidator = vine.compile(
+export const updatePortValidator = vine.create(
   vine.object({
     name: vine.string().trim().minLength(2).maxLength(120),
     city: vine.string().trim().maxLength(120).nullable().optional(),

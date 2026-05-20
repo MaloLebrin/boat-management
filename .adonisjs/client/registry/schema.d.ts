@@ -7,6 +7,114 @@ import type { InferInput, SimpleError } from '@vinejs/vine/types'
 export type ParamValue = string | number | bigint | boolean
 
 export interface Registry {
+  'root': {
+    methods: ["GET","HEAD"]
+    pattern: '/'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'marketing.en.home': {
+    methods: ["GET","HEAD"]
+    pattern: '/en'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'marketing.en.pricing': {
+    methods: ["GET","HEAD"]
+    pattern: '/en/tarifs'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'marketing.fr.home': {
+    methods: ["GET","HEAD"]
+    pattern: '/fr'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'marketing.fr.pricing': {
+    methods: ["GET","HEAD"]
+    pattern: '/fr/tarifs'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'marketing.en.about': {
+    methods: ["GET","HEAD"]
+    pattern: '/en/about'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'marketing.fr.about': {
+    methods: ["GET","HEAD"]
+    pattern: '/fr/a-propos'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'marketing.contact': {
+    methods: ["GET","HEAD"]
+    pattern: '/contact'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'dashboard': {
+    methods: ["GET","HEAD"]
+    pattern: '/dashboard'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/home_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/home_controller').default['index']>>>
+    }
+  }
   'design_system': {
     methods: ["GET","HEAD"]
     pattern: '/design-system'
@@ -113,6 +221,18 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/boats_controller').default['destroy']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boats_controller').default['destroy']>>>
+    }
+  }
+  'boats.assign': {
+    methods: ["PATCH"]
+    pattern: '/boats/:id/assignment'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/marina_layout').assignBoatValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/marina_layout').assignBoatValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boats_controller').default['assign']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boats_controller').default['assign']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'boat_equipment.store_engine': {
@@ -703,6 +823,78 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/mouillages_controller').default['destroy']>>>
     }
   }
+  'ports.pontoons.updatePosition': {
+    methods: ["PATCH"]
+    pattern: '/ports/:portId/pontoons/:pontoonId/position'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/marina_layout').updatePositionValidator)>>
+      paramsTuple: [ParamValue, ParamValue]
+      params: { portId: ParamValue; pontoonId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/marina_layout').updatePositionValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/pontoons_controller').default['updatePosition']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/pontoons_controller').default['updatePosition']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'ports.mouillages.updatePosition': {
+    methods: ["PATCH"]
+    pattern: '/ports/:portId/mouillages/:mouillageId/position'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/marina_layout').updatePositionValidator)>>
+      paramsTuple: [ParamValue, ParamValue]
+      params: { portId: ParamValue; mouillageId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/marina_layout').updatePositionValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/mouillages_controller').default['updatePosition']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/mouillages_controller').default['updatePosition']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'ports.pontoons.spots.store': {
+    methods: ["POST"]
+    pattern: '/ports/:portId/pontoons/:pontoonId/spots'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/spot').createSpotValidator)>>
+      paramsTuple: [ParamValue, ParamValue]
+      params: { portId: ParamValue; pontoonId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/spot').createSpotValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/spots_controller').default['storeForPontoon']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/spots_controller').default['storeForPontoon']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'ports.mouillages.spots.store': {
+    methods: ["POST"]
+    pattern: '/ports/:portId/mouillages/:mouillageId/spots'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/spot').createSpotValidator)>>
+      paramsTuple: [ParamValue, ParamValue]
+      params: { portId: ParamValue; mouillageId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/spot').createSpotValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/spots_controller').default['storeForMouillage']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/spots_controller').default['storeForMouillage']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'spots.update': {
+    methods: ["PUT"]
+    pattern: '/spots/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/spot').updateSpotValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/spot').updateSpotValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/spots_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/spots_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'spots.destroy': {
+    methods: ["DELETE"]
+    pattern: '/spots/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/spots_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/spots_controller').default['destroy']>>>
+    }
+  }
   'new_account.create': {
     methods: ["GET","HEAD"]
     pattern: '/signup'
@@ -845,114 +1037,6 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/ai_controller').default['boatSuggestions']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/ai_controller').default['boatSuggestions']>>>
-    }
-  }
-  'root': {
-    methods: ["GET","HEAD"]
-    pattern: '/'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: unknown
-      errorResponse: unknown
-    }
-  }
-  'marketing.en.home': {
-    methods: ["GET","HEAD"]
-    pattern: '/en'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: unknown
-      errorResponse: unknown
-    }
-  }
-  'marketing.en.pricing': {
-    methods: ["GET","HEAD"]
-    pattern: '/en/tarifs'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: unknown
-      errorResponse: unknown
-    }
-  }
-  'marketing.fr.home': {
-    methods: ["GET","HEAD"]
-    pattern: '/fr'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: unknown
-      errorResponse: unknown
-    }
-  }
-  'marketing.fr.pricing': {
-    methods: ["GET","HEAD"]
-    pattern: '/fr/tarifs'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: unknown
-      errorResponse: unknown
-    }
-  }
-  'marketing.en.about': {
-    methods: ["GET","HEAD"]
-    pattern: '/en/about'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: unknown
-      errorResponse: unknown
-    }
-  }
-  'marketing.fr.about': {
-    methods: ["GET","HEAD"]
-    pattern: '/fr/a-propos'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: unknown
-      errorResponse: unknown
-    }
-  }
-  'marketing.contact': {
-    methods: ["GET","HEAD"]
-    pattern: '/contact'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: unknown
-      errorResponse: unknown
-    }
-  }
-  'dashboard': {
-    methods: ["GET","HEAD"]
-    pattern: '/dashboard'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: unknown
-      errorResponse: unknown
     }
   }
   'planning.index': {

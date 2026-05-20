@@ -2,39 +2,22 @@ import Boat from '#models/boat'
 import BoatEngine from '#models/boat_engine'
 import BoatMaintenanceTask from '#models/boat_maintenance_task'
 import type User from '#models/user'
+import PortService from '#services/port_service'
+import { inject } from '@adonisjs/core'
 import db from '@adonisjs/lucid/services/db'
 import { DateTime } from 'luxon'
+import type {
+  DashboardBoatSummary,
+  DashboardPortItem,
+  DashboardPortStats,
+  DashboardStats,
+  DashboardUrgentMaintenanceRow,
+} from '#shared/types/dashboard'
 
-export type DashboardBoatSummary = {
-  id: number
-  name: string
-  propulsionType: string | null
-  enginesCount: number
-  sailsCount: number
-  hasRig: boolean
-}
-
-export type DashboardUrgentMaintenanceRow = {
-  id: number
-  boatId: number
-  boatName: string
-  subject: string
-  title: string
-  kind: 'date' | 'hours'
-  dueAt: string | null
-  dueEngineHours: number | null
-  currentEngineHours: number | null
-}
-
-export type DashboardStats = {
-  boats: number
-  engines: number
-  sails: number
-  rigs: number
-  urgentMaintenance: number
-}
-
+@inject()
 export default class DashboardService {
+  constructor(private portService: PortService) {}
+
   async getForUser(
     user: User,
     opts?: {
@@ -46,12 +29,16 @@ export default class DashboardService {
     boats: DashboardBoatSummary[]
     urgentMaintenance: DashboardUrgentMaintenanceRow[]
     stats: DashboardStats
+    ports: DashboardPortItem[]
+    portStats: DashboardPortStats
   }> {
     if (user.organizationId === null) {
       return {
         boats: [],
         urgentMaintenance: [],
         stats: { boats: 0, engines: 0, sails: 0, rigs: 0, urgentMaintenance: 0 },
+        ports: [],
+        portStats: { total: 0, totalBoats: 0, totalFreeSpots: 0 },
       }
     }
 
@@ -185,6 +172,22 @@ export default class DashboardService {
 
     stats.urgentMaintenance = urgentMaintenance.length
 
-    return { boats: boatSummary, urgentMaintenance, stats }
+    const allPorts = await this.portService.listForUser(user)
+    const ports: DashboardPortItem[] = allPorts.map((p) => ({
+      id: p.id,
+      name: p.name,
+      city: p.city,
+      country: p.country,
+      boatCount: p.boatCount,
+      totalSpots: p.totalSpots,
+      freeSpots: p.freeSpots,
+    }))
+    const portStats: DashboardPortStats = {
+      total: ports.length,
+      totalBoats: ports.reduce((acc, p) => acc + p.boatCount, 0),
+      totalFreeSpots: ports.reduce((acc, p) => acc + p.freeSpots, 0),
+    }
+
+    return { boats: boatSummary, urgentMaintenance, stats, ports, portStats }
   }
 }

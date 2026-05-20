@@ -3,20 +3,21 @@ import { useForm } from '@inertiajs/vue3'
 import { computed, watch } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
+import BaseModal from '~/components/base/BaseModal.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import { useT } from '~/composables/useT'
 
 const props = defineProps<{
   portId: number
+  open: boolean
   mouillage?: { id: number; name: string; description: string | null } | null
 }>()
 
 const emit = defineEmits<{
-  close: []
+  'update:open': [value: boolean]
 }>()
 
 const { t } = useT()
-
 const isEditing = computed(() => Boolean(props.mouillage?.id))
 
 const form = useForm({
@@ -26,66 +27,62 @@ const form = useForm({
 
 watch(
   () => props.mouillage,
-  (newMouillage) => {
-    form.name = newMouillage?.name ?? ''
-    form.description = newMouillage?.description ?? ''
+  (m) => {
+    form.name = m?.name ?? ''
+    form.description = m?.description ?? ''
   }
+)
+
+watch(
+  () => props.open,
+  (isOpen) => { if (!isOpen) form.reset() }
 )
 
 function submit() {
   if (isEditing.value && props.mouillage) {
     form.put(`/ports/${props.portId}/mouillages/${props.mouillage.id}`, {
-      onSuccess: () => emit('close'),
+      onSuccess: () => emit('update:open', false),
     })
   } else {
     form.post(`/ports/${props.portId}/mouillages`, {
-      onSuccess: () => {
-        form.reset()
-        emit('close')
-      },
+      onSuccess: () => { form.reset(); emit('update:open', false) },
     })
   }
-}
-
-function cancel() {
-  form.reset()
-  emit('close')
 }
 </script>
 
 <template>
-  <div class="rounded-lg border border-border bg-surface-elevated p-4 shadow-sm">
-    <h3 class="text-sm font-semibold text-fg">
-      {{ isEditing ? t('ports.mouillages.edit') : t('ports.mouillages.add') }}
-    </h3>
-
-    <form @submit.prevent="submit" class="mt-4 space-y-4">
+  <BaseModal
+    :open="open"
+    :title="isEditing ? t('ports.mouillages.edit') : t('ports.mouillages.add')"
+    size="md"
+    @update:open="$emit('update:open', $event)"
+  >
+    <form class="space-y-4" @submit.prevent="submit">
       <BaseInput
         id="mouillage-name"
+        v-model="form.name"
         name="name"
         :label="t('ports.mouillages.fields.name')"
-        v-model="form.name"
         :errors="form.errors"
         required
       />
-
       <BaseTextarea
         id="mouillage-description"
+        v-model="form.description"
         name="description"
         :label="t('ports.mouillages.fields.description')"
-        v-model="form.description"
         :errors="form.errors"
         :rows="2"
       />
-
-      <div class="flex items-center gap-3">
-        <BaseButton type="submit" size="sm" :disabled="form.processing">
-          {{ t('common.save') }}
-        </BaseButton>
-        <BaseButton type="button" variant="ghost" size="sm" @click="cancel">
+      <div class="flex justify-end gap-2">
+        <BaseButton type="button" variant="ghost" @click="$emit('update:open', false)">
           {{ t('common.cancel') }}
+        </BaseButton>
+        <BaseButton type="submit" :disabled="form.processing">
+          {{ t('common.save') }}
         </BaseButton>
       </div>
     </form>
-  </div>
+  </BaseModal>
 </template>

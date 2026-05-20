@@ -15,7 +15,7 @@ function optionalIdFromForm() {
     })
 }
 
-export const createBoatMaintenanceValidator = vine.compile(
+export const createBoatMaintenanceValidator = vine.create(
   vine.object({
     subject: vine.enum(maintenanceSubjects),
     boatEngineId: optionalIdFromForm(),

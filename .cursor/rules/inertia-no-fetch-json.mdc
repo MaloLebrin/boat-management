@@ -1,0 +1,52 @@
+---
+description: Interdire fetch/JSON manuel sur les écrans Inertia ; imposer router.* et redirects
+alwaysApply: true
+---
+
+# Inertia — pas de fetch JSON manuel
+
+S’applique à **`inertia/pages/**`** et **`inertia/components/**`** (écrans rendus par Inertia).
+
+## Interdit
+
+- `fetch` / `axios` avec `Content-Type: application/json` pour POST/PATCH/PUT/DELETE
+- Helpers CSRF maison (`getCsrf()`, lecture manuelle du cookie `XSRF-TOKEN`, en-tête `X-XSRF-TOKEN`)
+- Contrôle du succès via `res.ok` puis `router.reload()` manuel quand `router.patch(..., { only: [...] })` suffit
+
+## Obligatoire
+
+| Cas | Frontend | Backend (même route) |
+|-----|----------|----------------------|
+| Formulaire classique | `<Form>` (`@adonisjs/inertia/vue`) ou `useForm` | VineJS + `response.redirect(...)` |
+| Action UI (drag, toggle, assignation…) | `router.patch` / `router.post` / … + `preserveScroll: true` | `response.redirect().back()` ou chemin explicite |
+| Mise à jour partielle des props | `only: ['propName']` sur la visite | Redirection vers la page concernée |
+
+Le client Inertia envoie `X-Inertia` et gère le CSRF via Shield — ne pas dupliquer.
+
+## Exceptions
+
+- Routes **API dédiées** (`/api/**`, autre client, export script) hors cycle Inertia
+- Ne pas réintroduire de JSON « mini-API » dans l’UI Inertia si `router.*` ou `<Form>` est possible
+
+## Docs
+
+- https://docs.adonisjs.com/guides/frontend/inertia#link-and-form-components
+- https://inertiajs.com/manual-visits
+
+## Exemple (plan marina)
+
+```ts
+// ❌
+await fetch(url, { method: 'PATCH', headers: { 'Content-Type': 'application/json', 'X-XSRF-TOKEN': getCsrf() }, body: JSON.stringify(body) })
+
+// ✅
+router.patch(url, body, { preserveScroll: true, only: ['port'] })
+```
+
+```ts
+// ❌ contrôleur
+return response.json({ ok: true })
+
+// ✅ contrôleur
+return response.redirect().back()
+```

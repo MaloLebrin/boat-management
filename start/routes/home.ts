@@ -1,4 +1,12 @@
+import { middleware } from '#start/kernel'
 import router from '@adonisjs/core/services/router'
+
+const HomeController = () => import('#controllers/home_controller')
+
+router
+  .get('/dashboard', [HomeController, 'index'])
+  .as('dashboard')
+  .use(middleware.auth())
 
 router
   .on('/design-system')

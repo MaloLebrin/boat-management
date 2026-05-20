@@ -31,5 +31,30 @@ router
     router
       .delete('ports/:portId/mouillages/:mouillageId', [controllers.Mouillages, 'destroy'])
       .as('ports.mouillages.destroy')
+
+    router
+      .patch('ports/:portId/pontoons/:pontoonId/position', [controllers.Pontoons, 'updatePosition'])
+      .as('ports.pontoons.updatePosition')
+
+    router
+      .patch('ports/:portId/mouillages/:mouillageId/position', [
+        controllers.Mouillages,
+        'updatePosition',
+      ])
+      .as('ports.mouillages.updatePosition')
+
+    // Spots for pontoons
+    router
+      .post('ports/:portId/pontoons/:pontoonId/spots', [controllers.Spots, 'storeForPontoon'])
+      .as('ports.pontoons.spots.store')
+
+    // Spots for mouillages
+    router
+      .post('ports/:portId/mouillages/:mouillageId/spots', [controllers.Spots, 'storeForMouillage'])
+      .as('ports.mouillages.spots.store')
+
+    // Spots CRUD (update/delete)
+    router.put('spots/:id', [controllers.Spots, 'update']).as('spots.update')
+    router.delete('spots/:id', [controllers.Spots, 'destroy']).as('spots.destroy')
   })
   .use(middleware.auth())

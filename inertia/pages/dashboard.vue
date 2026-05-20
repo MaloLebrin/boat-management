@@ -6,43 +6,26 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseSkeleton from '~/components/base/BaseSkeleton.vue'
 import BaseStatCard from '~/components/base/BaseStatCard.vue'
+import MarinaDashboardCard from '~/components/dashboard/MarinaDashboardCard.vue'
+import type {
+  DashboardBoatSummary,
+  DashboardPortItem,
+  DashboardPortStats,
+  DashboardStats,
+  DashboardUrgentMaintenanceRow,
+} from '#shared/types/dashboard'
 import { useT } from '~/composables/useT'
 import type { AiSuggestion } from '~/types/boat_show'
 
 const { t } = useT()
 
-type BoatSummary = {
-  id: number
-  name: string
-  propulsionType: string | null
-  enginesCount: number
-  sailsCount: number
-  hasRig: boolean
-}
-
-type UrgentMaintenanceRow = {
-  id: number
-  boatId: number
-  boatName: string
-  subject: string
-  title: string
-  kind: 'date' | 'hours'
-  dueAt: string | null
-  dueEngineHours: number | null
-  currentEngineHours: number | null
-}
-
 const props = defineProps<{
-  boats: BoatSummary[]
-  urgentMaintenance: UrgentMaintenanceRow[]
-  stats: {
-    boats: number
-    engines: number
-    sails: number
-    rigs: number
-    urgentMaintenance: number
-  }
+  boats: DashboardBoatSummary[]
+  urgentMaintenance: DashboardUrgentMaintenanceRow[]
+  stats: DashboardStats
   aiFleetAnalysis: AiSuggestion[] | null
+  ports: DashboardPortItem[]
+  portStats: DashboardPortStats
 }>()
 
 const showAlert = ref(true)
@@ -110,7 +93,11 @@ function dismissAlert() {
       />
     </div>
 
-    <div class="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_16rem]">
+    <div class="mt-8">
+      <MarinaDashboardCard :ports="ports" :port-stats="portStats" />
+    </div>
+
+    <div class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_16rem]">
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_2fr]">
         <BaseCard>
           <template #header>

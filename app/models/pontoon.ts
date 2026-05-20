@@ -1,7 +1,8 @@
-import { BaseModel, column, belongsTo } from '@adonisjs/lucid/orm'
+import { BaseModel, column, belongsTo, hasMany } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
-import type { BelongsTo } from '@adonisjs/lucid/types/relations'
+import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
 import Port from '#models/port'
+import Spot from '#models/spot'
 
 export default class Pontoon extends BaseModel {
   static table = 'pontoons'
@@ -18,6 +19,12 @@ export default class Pontoon extends BaseModel {
   @column()
   declare description: string | null
 
+  @column()
+  declare positionX: number | null
+
+  @column()
+  declare positionY: number | null
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 
@@ -26,4 +33,7 @@ export default class Pontoon extends BaseModel {
 
   @belongsTo(() => Port)
   declare port: BelongsTo<typeof Port>
+
+  @hasMany(() => Spot)
+  declare spots: HasMany<typeof Spot>
 }

@@ -8,31 +8,38 @@ export type PortListItem = {
   pontoonCount: number
   mouillageCount: number
   boatCount: number
+  totalSpots: number
+  freeSpots: number
 }
 
-export type PontoonBoatRow = {
+export type SpotBoatRow = {
   id: number
   name: string
-  spotIdentifier: string | null
+}
+
+export type SpotRow = {
+  id: number
+  name: string
+  description: string | null
+  boat: SpotBoatRow | null
 }
 
 export type PontoonRow = {
   id: number
   name: string
   description: string | null
-  boats: PontoonBoatRow[]
-}
-
-export type MouillageBoatRow = {
-  id: number
-  name: string
+  positionX: number | null
+  positionY: number | null
+  spots: SpotRow[]
 }
 
 export type MouillageRow = {
   id: number
   name: string
   description: string | null
-  boats: MouillageBoatRow[]
+  positionX: number | null
+  positionY: number | null
+  spots: SpotRow[]
 }
 
 export type PortShowDetail = {

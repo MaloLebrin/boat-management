@@ -1,7 +1,8 @@
 import Boat from '#models/boat'
 import Mouillage from '#models/mouillage'
+import Spot from '#models/spot'
 import type Port from '#models/port'
-import { MouillageHasBoatsError } from '#services/port_service'
+import { MouillageHasBoatsError } from '#exceptions/port_errors'
 
 export type MouillagePayload = {
   name: string
@@ -25,10 +26,22 @@ export default class MouillageService {
   }
 
   async deleteForPort(mouillage: Mouillage) {
-    const result = await Boat.query().where('mouillageId', mouillage.id).count('id as count').first()
+    const spots = await Spot.query().where('mouillageId', mouillage.id).select('id')
+    const spotIds = spots.map((s) => s.id)
 
-    if (Number(result?.$extras['count'] ?? 0) > 0) throw new MouillageHasBoatsError()
+    if (spotIds.length > 0) {
+      const result = await Boat.query().whereIn('spotId', spotIds).count('id as count').first()
+
+      if (Number(result?.$extras['count'] ?? 0) > 0) throw new MouillageHasBoatsError()
+    }
 
     await mouillage.delete()
+  }
+
+  async updatePosition(mouillage: Mouillage, payload: { x: number; y: number }) {
+    mouillage.positionX = payload.x
+    mouillage.positionY = payload.y
+    await mouillage.save()
+    return mouillage
   }
 }

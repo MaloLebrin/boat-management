@@ -5,7 +5,110 @@ Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
 ---
 
+## 2026-05-20 — Plan marina : requêtes Inertia
+
+Le plan marina (`MarinaMapTab`) utilise désormais `router.patch` (cycle Inertia) au lieu de `fetch` JSON manuel.
+
+- **Frontend** : drag des pontons/mouillages et assignation bateau → place via `router.patch` avec `preserveScroll` ; assignation avec partial reload `only: ['port']`
+- **Backend** : `PontoonsController.updatePosition`, `MouillagesController.updatePosition`, `BoatsController.assign` renvoient `response.redirect().back()` (CSRF et validation VineJS inchangés)
+
+## 2026-05-20 — Widget Marina sur le Dashboard
+
+Ajout d'un widget "Marinas" sur la page d'accueil du tableau de bord.
+
+- **`DashboardService`** : fetch des ports via `PortService.listForUser()`, nouveau type `DashboardPortItem` et `DashboardPortStats`
+- **`PortService.listForUser()`** : ajout du comptage des spots totaux (via pontoons et mouillages) — calcul de `totalSpots` et `freeSpots`
+- **`PortListItem`** (type frontend) : nouveaux champs `totalSpots` et `freeSpots`
+- **`MarinaDashboardCard.vue`** : composant affichant la liste des ports avec taux de remplissage (barre de progression), nombre de places libres/total, et stats globales
+- **i18n** : clés `dashboard.marina.*` ajoutées en FR et EN
+
+## 2026-05-20 — Modele Spot (places de marina)
+
+Introduction du modele `Spot` qui represente une place individuelle au sein d'un ponton ou mouillage. Un bateau est maintenant assigne a un spot (et non plus directement a un ponton/mouillage).
+
+**Migrations** :
+- `1779300011000_create_spots_table` : table `spots` (id, name, description, pontoon_id, mouillage_id, organization_id, timestamps)
+- `1779300012000_alter_boats_for_spots` : ajout `spot_id`, suppression `pontoon_id`, `mouillage_id`, `spot_identifier`
+- `1779300013000_alter_boat_position_history_for_spots` : ajout `spot_id`, suppression `pontoon_id`, `mouillage_id`, `spot_identifier`
+
+**Modele** : `app/models/spot.ts` — relations `belongsTo(Pontoon)`, `belongsTo(Mouillage)`, `belongsTo(Organization)`, `hasMany(Boat)`
+
+**Validator** : `app/validators/spot.ts` — `createSpotValidator`, `updateSpotValidator`
+
+**Service** : `app/services/spot_service.ts` — `createForPontoon`, `createForMouillage`, `update`, `delete`
+
+**Controller** : `app/controllers/spots_controller.ts` — actions `storeForPontoon`, `storeForMouillage`, `update`, `destroy`
+
+**Routes** (dans `start/routes/ports.ts`) :
+- `POST /ports/:portId/pontoons/:pontoonId/spots` — creer un spot sur un ponton
+- `POST /ports/:portId/mouillages/:mouillageId/spots` — creer un spot sur un mouillage
+- `PUT /spots/:id` — modifier un spot
+- `DELETE /spots/:id` — supprimer un spot
+
+**Modeles modifies** :
+- `Pontoon`, `Mouillage` : ajout relation `hasMany(Spot)`
+- `Boat` : remplace `pontoonId`, `mouillageId`, `spotIdentifier` par `spotId` + `belongsTo(Spot)`
+- `BoatPositionHistory` : remplace `pontoonId`, `mouillageId`, `spotIdentifier` par `spotId` + `belongsTo(Spot)`
+
+**Services modifies** :
+- `BoatService` : `updateAssignment` prend maintenant `{ spotId }` au lieu de `{ pontoonId, mouillageId, spotIdentifier }`
+- `PortService` : `getWithPontoonsAndMouillagesOrFail` retourne les spots par ponton/mouillage avec le bateau assigne
+- `PontoonService`, `MouillageService` : verification des bateaux via spots avant suppression
+
+---
+
+## 2026-05-20 — Plan interactif 2D de la marina
+
+Ajout d'un onglet "Plan marina" sur la page de detail d'un port. Canvas SVG interactif avec positionnement libre des pontons et mouillages (coordonnees x/y persistees en base), mode edition pour repositionner les elements par drag, et reaffectation des bateaux par clic.
+
+**Composants Vue crees** :
+- `inertia/components/ports/show/tabs/PortListTab.vue` — onglet liste (extrait de show.vue)
+- `inertia/components/ports/show/tabs/MarinaMapTab.vue` — orchestrateur du plan marina
+- `inertia/components/ports/show/MarinaCanvas.vue` — canvas SVG 1400x900 avec drag
+- `inertia/components/ports/show/MarinaPontoon.vue` — composant SVG ponton avec slots bateaux
+- `inertia/components/ports/show/MarinaMouillage.vue` — composant SVG zone mouillage
+- `inertia/components/ports/modals/BoatAssignModal.vue` — modale affectation bateau
+
+**Page modifiee** : `inertia/pages/ports/show.vue` — ajout BaseTabs (list/plan)
+
+**Routes backend utilisees** :
+- `PATCH /ports/:portId/pontoons/:pontoonId/position` — met a jour la position x/y d'un ponton
+- `PATCH /ports/:portId/mouillages/:mouillageId/position` — met a jour la position x/y d'un mouillage  
+- `PATCH /boats/:id/assignment` — reaffecte un bateau a un ponton/mouillage
+
+**i18n** : cles `ports.tabs.*` et `ports.plan.*` ajoutees en FR et EN
+
+---
+
 ## 2026-05-19
+
+### Plan interactif 2D de marina — Backend
+
+Couche backend pour la feature de plan interactif de marina permettant le positionnement drag-and-drop des pontons/mouillages et l'affectation rapide des bateaux.
+
+**Migrations** :
+- `1779300009000_alter_pontoons_add_position` : ajout `position_x`, `position_y` (double, nullable) sur `pontoons`
+- `1779300010000_alter_mouillages_add_position` : idem sur `mouillages`
+
+**Modèles** : `Pontoon` et `Mouillage` — colonnes `positionX`, `positionY` ajoutées
+
+**Validator** : `app/validators/marina_layout.ts`
+- `updatePositionValidator` : `{ x: number, y: number }`
+- `assignBoatValidator` : `{ pontoonId?, mouillageId?, spotIdentifier? }`
+
+**Services** :
+- `PontoonService.updatePosition(pontoon, { x, y })` — sauvegarde position
+- `MouillageService.updatePosition(mouillage, { x, y })` — idem
+- `BoatService.updateAssignment(boat, { pontoonId, mouillageId, spotIdentifier })` — réaffecte un bateau et enregistre l'historique
+
+**Routes** :
+- `PATCH /ports/:portId/pontoons/:pontoonId/position` → `ports.pontoons.updatePosition`
+- `PATCH /ports/:portId/mouillages/:mouillageId/position` → `ports.mouillages.updatePosition`
+- `PATCH /boats/:id/assignment` → `boats.assign`
+
+**PortService** : `getWithPontoonsAndMouillagesOrFail` expose maintenant `positionX`, `positionY` pour pontons et mouillages
+
+---
 
 ### Ajout des mouillages aux ports
 

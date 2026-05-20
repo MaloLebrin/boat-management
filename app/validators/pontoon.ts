@@ -1,15 +1,15 @@
 import vine from '@vinejs/vine'
 
-export const createPontoonValidator = vine.compile(
+export const createPontoonValidator = vine.create(
   vine.object({
-    name: vine.string().trim().minLength(2).maxLength(120),
+    name: vine.string().trim().minLength(1).maxLength(120),
     description: vine.string().trim().nullable().optional(),
   })
 )
 
-export const updatePontoonValidator = vine.compile(
+export const updatePontoonValidator = vine.create(
   vine.object({
-    name: vine.string().trim().minLength(2).maxLength(120),
+    name: vine.string().trim().minLength(1).maxLength(120),
     description: vine.string().trim().nullable().optional(),
   })
 )
