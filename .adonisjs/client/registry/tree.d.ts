@@ -114,6 +114,24 @@ export interface ApiDefinition {
     update: typeof routes['spots.update']
     destroy: typeof routes['spots.destroy']
   }
+  planning: {
+    index: typeof routes['planning.index']
+  }
+  settings: {
+    index: typeof routes['settings.index']
+    profile: {
+      update: typeof routes['settings.profile.update']
+    }
+    org: {
+      update: typeof routes['settings.org.update']
+    }
+  }
+  locale: {
+    set: typeof routes['locale.set']
+  }
+  maintenance: {
+    history: typeof routes['maintenance.history']
+  }
   newAccount: {
     create: typeof routes['new_account.create']
     store: typeof routes['new_account.store']
@@ -135,23 +153,5 @@ export interface ApiDefinition {
     chat: typeof routes['ai.chat']
     fleetAnalysis: typeof routes['ai.fleetAnalysis']
     boatSuggestions: typeof routes['ai.boatSuggestions']
-  }
-  planning: {
-    index: typeof routes['planning.index']
-  }
-  settings: {
-    index: typeof routes['settings.index']
-    profile: {
-      update: typeof routes['settings.profile.update']
-    }
-    org: {
-      update: typeof routes['settings.org.update']
-    }
-  }
-  locale: {
-    set: typeof routes['locale.set']
-  }
-  maintenance: {
-    history: typeof routes['maintenance.history']
   }
 }

@@ -27,8 +27,8 @@ export interface Registry {
       paramsTuple: []
       params: {}
       query: {}
-      response: unknown
-      errorResponse: unknown
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['home']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['home']>>>
     }
   }
   'marketing.en.pricing': {
@@ -39,8 +39,8 @@ export interface Registry {
       paramsTuple: []
       params: {}
       query: {}
-      response: unknown
-      errorResponse: unknown
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['pricing']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['pricing']>>>
     }
   }
   'marketing.fr.home': {
@@ -51,8 +51,8 @@ export interface Registry {
       paramsTuple: []
       params: {}
       query: {}
-      response: unknown
-      errorResponse: unknown
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['home']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['home']>>>
     }
   }
   'marketing.fr.pricing': {
@@ -63,8 +63,8 @@ export interface Registry {
       paramsTuple: []
       params: {}
       query: {}
-      response: unknown
-      errorResponse: unknown
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['pricing']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['pricing']>>>
     }
   }
   'marketing.en.about': {
@@ -75,8 +75,8 @@ export interface Registry {
       paramsTuple: []
       params: {}
       query: {}
-      response: unknown
-      errorResponse: unknown
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['about']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['about']>>>
     }
   }
   'marketing.fr.about': {
@@ -87,8 +87,8 @@ export interface Registry {
       paramsTuple: []
       params: {}
       query: {}
-      response: unknown
-      errorResponse: unknown
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['about']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['about']>>>
     }
   }
   'marketing.contact': {
@@ -99,8 +99,8 @@ export interface Registry {
       paramsTuple: []
       params: {}
       query: {}
-      response: unknown
-      errorResponse: unknown
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['contact']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['contact']>>>
     }
   }
   'dashboard': {
@@ -895,6 +895,78 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/spots_controller').default['destroy']>>>
     }
   }
+  'planning.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/planning'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/planning_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/planning_controller').default['index']>>>
+    }
+  }
+  'settings.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/settings'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['index']>>>
+    }
+  }
+  'settings.profile.update': {
+    methods: ["PUT"]
+    pattern: '/settings/profile'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/user').updateProfileValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/user').updateProfileValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateProfile']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateProfile']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'settings.org.update': {
+    methods: ["PUT"]
+    pattern: '/settings/org'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/user').updateOrganizationValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/user').updateOrganizationValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateOrganization']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateOrganization']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'locale.set': {
+    methods: ["POST"]
+    pattern: '/locale'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'maintenance.history': {
+    methods: ["GET","HEAD"]
+    pattern: '/maintenance/history'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/maintenance_history_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/maintenance_history_controller').default['index']>>>
+    }
+  }
   'new_account.create': {
     methods: ["GET","HEAD"]
     pattern: '/signup'
@@ -1007,12 +1079,12 @@ export interface Registry {
     methods: ["POST"]
     pattern: '/ai/chat'
     types: {
-      body: {}
+      body: ExtractBody<InferInput<(typeof import('#validators/ai').aiChatValidator)>>
       paramsTuple: []
       params: {}
-      query: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/ai').aiChatValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/ai_controller').default['chat']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/ai_controller').default['chat']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/ai_controller').default['chat']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'ai.fleetAnalysis': {
@@ -1037,78 +1109,6 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/ai_controller').default['boatSuggestions']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/ai_controller').default['boatSuggestions']>>>
-    }
-  }
-  'planning.index': {
-    methods: ["GET","HEAD"]
-    pattern: '/planning'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/planning_controller').default['index']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/planning_controller').default['index']>>>
-    }
-  }
-  'settings.index': {
-    methods: ["GET","HEAD"]
-    pattern: '/settings'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['index']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['index']>>>
-    }
-  }
-  'settings.profile.update': {
-    methods: ["PUT"]
-    pattern: '/settings/profile'
-    types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/user').updateProfileValidator)>>
-      paramsTuple: []
-      params: {}
-      query: ExtractQuery<InferInput<(typeof import('#validators/user').updateProfileValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateProfile']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateProfile']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'settings.org.update': {
-    methods: ["PUT"]
-    pattern: '/settings/org'
-    types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/user').updateOrganizationValidator)>>
-      paramsTuple: []
-      params: {}
-      query: ExtractQuery<InferInput<(typeof import('#validators/user').updateOrganizationValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateOrganization']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateOrganization']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'locale.set': {
-    methods: ["POST"]
-    pattern: '/locale'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: unknown
-      errorResponse: unknown
-    }
-  }
-  'maintenance.history': {
-    methods: ["GET","HEAD"]
-    pattern: '/maintenance/history'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/maintenance_history_controller').default['index']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/maintenance_history_controller').default['index']>>>
     }
   }
 }

@@ -450,6 +450,42 @@ const routes = {
     tokens: [{"old":"/spots/:id","type":0,"val":"spots","end":""},{"old":"/spots/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['spots.destroy']['types'],
   },
+  'planning.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/planning',
+    tokens: [{"old":"/planning","type":0,"val":"planning","end":""}],
+    types: placeholder as Registry['planning.index']['types'],
+  },
+  'settings.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/settings',
+    tokens: [{"old":"/settings","type":0,"val":"settings","end":""}],
+    types: placeholder as Registry['settings.index']['types'],
+  },
+  'settings.profile.update': {
+    methods: ["PUT"],
+    pattern: '/settings/profile',
+    tokens: [{"old":"/settings/profile","type":0,"val":"settings","end":""},{"old":"/settings/profile","type":0,"val":"profile","end":""}],
+    types: placeholder as Registry['settings.profile.update']['types'],
+  },
+  'settings.org.update': {
+    methods: ["PUT"],
+    pattern: '/settings/org',
+    tokens: [{"old":"/settings/org","type":0,"val":"settings","end":""},{"old":"/settings/org","type":0,"val":"org","end":""}],
+    types: placeholder as Registry['settings.org.update']['types'],
+  },
+  'locale.set': {
+    methods: ["POST"],
+    pattern: '/locale',
+    tokens: [{"old":"/locale","type":0,"val":"locale","end":""}],
+    types: placeholder as Registry['locale.set']['types'],
+  },
+  'maintenance.history': {
+    methods: ["GET","HEAD"],
+    pattern: '/maintenance/history',
+    tokens: [{"old":"/maintenance/history","type":0,"val":"maintenance","end":""},{"old":"/maintenance/history","type":0,"val":"history","end":""}],
+    types: placeholder as Registry['maintenance.history']['types'],
+  },
   'new_account.create': {
     methods: ["GET","HEAD"],
     pattern: '/signup',
@@ -521,42 +557,6 @@ const routes = {
     pattern: '/ai/boats/:id/suggestions',
     tokens: [{"old":"/ai/boats/:id/suggestions","type":0,"val":"ai","end":""},{"old":"/ai/boats/:id/suggestions","type":0,"val":"boats","end":""},{"old":"/ai/boats/:id/suggestions","type":1,"val":"id","end":""},{"old":"/ai/boats/:id/suggestions","type":0,"val":"suggestions","end":""}],
     types: placeholder as Registry['ai.boatSuggestions']['types'],
-  },
-  'planning.index': {
-    methods: ["GET","HEAD"],
-    pattern: '/planning',
-    tokens: [{"old":"/planning","type":0,"val":"planning","end":""}],
-    types: placeholder as Registry['planning.index']['types'],
-  },
-  'settings.index': {
-    methods: ["GET","HEAD"],
-    pattern: '/settings',
-    tokens: [{"old":"/settings","type":0,"val":"settings","end":""}],
-    types: placeholder as Registry['settings.index']['types'],
-  },
-  'settings.profile.update': {
-    methods: ["PUT"],
-    pattern: '/settings/profile',
-    tokens: [{"old":"/settings/profile","type":0,"val":"settings","end":""},{"old":"/settings/profile","type":0,"val":"profile","end":""}],
-    types: placeholder as Registry['settings.profile.update']['types'],
-  },
-  'settings.org.update': {
-    methods: ["PUT"],
-    pattern: '/settings/org',
-    tokens: [{"old":"/settings/org","type":0,"val":"settings","end":""},{"old":"/settings/org","type":0,"val":"org","end":""}],
-    types: placeholder as Registry['settings.org.update']['types'],
-  },
-  'locale.set': {
-    methods: ["POST"],
-    pattern: '/locale',
-    tokens: [{"old":"/locale","type":0,"val":"locale","end":""}],
-    types: placeholder as Registry['locale.set']['types'],
-  },
-  'maintenance.history': {
-    methods: ["GET","HEAD"],
-    pattern: '/maintenance/history',
-    tokens: [{"old":"/maintenance/history","type":0,"val":"maintenance","end":""},{"old":"/maintenance/history","type":0,"val":"history","end":""}],
-    types: placeholder as Registry['maintenance.history']['types'],
   },
 } as const satisfies Record<string, AdonisEndpoint>
 

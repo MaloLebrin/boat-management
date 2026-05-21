@@ -16,6 +16,7 @@ export const controllers = {
   Boats: () => import('#controllers/boats_controller'),
   Home: () => import('#controllers/home_controller'),
   MaintenanceHistory: () => import('#controllers/maintenance_history_controller'),
+  Marketing: () => import('#controllers/marketing_controller'),
   Mouillages: () => import('#controllers/mouillages_controller'),
   NewAccount: () => import('#controllers/new_account_controller'),
   PasswordReset: () => import('#controllers/password_reset_controller'),

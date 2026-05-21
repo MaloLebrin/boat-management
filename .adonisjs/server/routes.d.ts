@@ -78,6 +78,12 @@ export type ScannedRoutes = {
     'ports.mouillages.spots.store': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'mouillageId': ParamValue} }
     'spots.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'spots.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'planning.index': { paramsTuple?: []; params?: {} }
+    'settings.index': { paramsTuple?: []; params?: {} }
+    'settings.profile.update': { paramsTuple?: []; params?: {} }
+    'settings.org.update': { paramsTuple?: []; params?: {} }
+    'locale.set': { paramsTuple?: []; params?: {} }
+    'maintenance.history': { paramsTuple?: []; params?: {} }
     'new_account.create': { paramsTuple?: []; params?: {} }
     'new_account.store': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }
@@ -90,12 +96,6 @@ export type ScannedRoutes = {
     'ai.chat': { paramsTuple?: []; params?: {} }
     'ai.fleetAnalysis': { paramsTuple?: []; params?: {} }
     'ai.boatSuggestions': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'planning.index': { paramsTuple?: []; params?: {} }
-    'settings.index': { paramsTuple?: []; params?: {} }
-    'settings.profile.update': { paramsTuple?: []; params?: {} }
-    'settings.org.update': { paramsTuple?: []; params?: {} }
-    'locale.set': { paramsTuple?: []; params?: {} }
-    'maintenance.history': { paramsTuple?: []; params?: {} }
   }
   GET: {
     'root': { paramsTuple?: []; params?: {} }
@@ -123,13 +123,13 @@ export type ScannedRoutes = {
     'ports.create': { paramsTuple?: []; params?: {} }
     'ports.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'ports.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'planning.index': { paramsTuple?: []; params?: {} }
+    'settings.index': { paramsTuple?: []; params?: {} }
+    'maintenance.history': { paramsTuple?: []; params?: {} }
     'new_account.create': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }
     'password.forgot': { paramsTuple?: []; params?: {} }
     'password.reset': { paramsTuple?: []; params?: {} }
-    'planning.index': { paramsTuple?: []; params?: {} }
-    'settings.index': { paramsTuple?: []; params?: {} }
-    'maintenance.history': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
     'root': { paramsTuple?: []; params?: {} }
@@ -157,13 +157,13 @@ export type ScannedRoutes = {
     'ports.create': { paramsTuple?: []; params?: {} }
     'ports.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'ports.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'planning.index': { paramsTuple?: []; params?: {} }
+    'settings.index': { paramsTuple?: []; params?: {} }
+    'maintenance.history': { paramsTuple?: []; params?: {} }
     'new_account.create': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }
     'password.forgot': { paramsTuple?: []; params?: {} }
     'password.reset': { paramsTuple?: []; params?: {} }
-    'planning.index': { paramsTuple?: []; params?: {} }
-    'settings.index': { paramsTuple?: []; params?: {} }
-    'maintenance.history': { paramsTuple?: []; params?: {} }
   }
   POST: {
     'boats.store': { paramsTuple?: []; params?: {} }
@@ -182,6 +182,7 @@ export type ScannedRoutes = {
     'ports.mouillages.store': { paramsTuple: [ParamValue]; params: {'portId': ParamValue} }
     'ports.pontoons.spots.store': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'pontoonId': ParamValue} }
     'ports.mouillages.spots.store': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'mouillageId': ParamValue} }
+    'locale.set': { paramsTuple?: []; params?: {} }
     'new_account.store': { paramsTuple?: []; params?: {} }
     'session.store': { paramsTuple?: []; params?: {} }
     'password_reset.store': { paramsTuple?: []; params?: {} }
@@ -190,7 +191,6 @@ export type ScannedRoutes = {
     'ai.chat': { paramsTuple?: []; params?: {} }
     'ai.fleetAnalysis': { paramsTuple?: []; params?: {} }
     'ai.boatSuggestions': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'locale.set': { paramsTuple?: []; params?: {} }
   }
   PUT: {
     'boats.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
