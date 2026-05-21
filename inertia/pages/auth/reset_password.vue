@@ -8,7 +8,7 @@ export default {
 
 <script setup lang="ts">
 import { Form } from '@adonisjs/inertia/vue'
-import { usePage } from '@inertiajs/vue3'
+import { Head, usePage } from '@inertiajs/vue3'
 import { computed, ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseInput from '~/components/base/BaseInput.vue'

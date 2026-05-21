@@ -7,6 +7,7 @@ export default {
 </script>
 
 <script setup lang="ts">
+import { Head } from '@inertiajs/vue3'
 import { Form } from '@adonisjs/inertia/vue'
 import { computed, ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
