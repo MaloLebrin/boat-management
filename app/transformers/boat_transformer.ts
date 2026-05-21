@@ -1,0 +1,208 @@
+import type Boat from '#models/boat'
+import type BoatMaintenanceEvent from '#models/boat_maintenance_event'
+import type BoatMaintenanceSheet from '#models/boat_maintenance_sheet'
+import type BoatMaintenanceTask from '#models/boat_maintenance_task'
+import type BoatPositionHistory from '#models/boat_position_history'
+import type Media from '#models/media'
+import type { AiSuggestion } from '#services/ai_analysis_service'
+
+export interface BoatShowContext {
+  positionHistory: BoatPositionHistory[]
+  boatMedia: Media[]
+  maintenanceEvents: BoatMaintenanceEvent[]
+  maintenanceTasks: BoatMaintenanceTask[]
+  maintenanceSheets: BoatMaintenanceSheet[]
+  aiSuggestions: AiSuggestion[] | null
+  canManageMaintenance: boolean
+  canManageEquipment: boolean
+}
+
+export function toShowProps(boat: Boat, ctx: BoatShowContext) {
+  return {
+    boat: toBoatDetail(boat, ctx),
+    maintenanceEvents: ctx.maintenanceEvents.map(toMaintenanceEvent),
+    maintenanceTasks: ctx.maintenanceTasks.map(toMaintenanceTask),
+    maintenanceSheets: ctx.maintenanceSheets.map(toMaintenanceSheet),
+    canManageMaintenance: ctx.canManageMaintenance,
+    canManageEquipment: ctx.canManageEquipment,
+    aiSuggestions: ctx.aiSuggestions,
+  }
+}
+
+function toBoatDetail(boat: Boat, ctx: Pick<BoatShowContext, 'positionHistory' | 'boatMedia'>) {
+  return {
+    id: boat.id,
+    name: boat.name,
+    registrationNumber: boat.registrationNumber,
+    type: boat.type,
+    propulsionType: boat.propulsionType,
+    lengthM: boat.lengthM,
+    beamM: boat.beamM,
+    draftM: boat.draftM,
+    mastHeightM: boat.mastHeightM,
+    hullMaterial: boat.hullMaterial,
+    yearBuilt: boat.yearBuilt,
+    manufacturer: boat.manufacturer,
+    model: boat.model,
+    homePort: boat.homePort,
+    navigationCategory: boat.navigationCategory,
+    hullIdentificationNumber: boat.hullIdentificationNumber,
+    francisationNumber: boat.francisationNumber,
+    flagCountry: boat.flagCountry,
+    maxPersons: boat.maxPersons,
+    spotId: boat.spotId ?? null,
+    spot: boat.spot ? toSpot(boat.spot) : null,
+    positionHistory: ctx.positionHistory.map(toPositionHistoryEntry),
+    engines: boat.engines.map(toEngine),
+    sails: boat.sails.map(toSail),
+    rig: boat.rig ? toRig(boat.rig) : null,
+    media: ctx.boatMedia.map(toMedia),
+    safetyEquipment: boat.safetyEquipment.map(toSafetyEquipmentItem),
+  }
+}
+
+function toSpot(spot: NonNullable<Boat['spot']>) {
+  return {
+    id: spot.id,
+    name: spot.name,
+    pontoonId: spot.pontoonId,
+    pontoonName: spot.pontoon?.name ?? null,
+    mouillageId: spot.mouillageId,
+    mouillageNom: spot.mouillage?.name ?? null,
+    portName: spot.pontoon?.port?.name ?? spot.mouillage?.port?.name ?? null,
+  }
+}
+
+function toPositionHistoryEntry(h: BoatPositionHistory) {
+  return {
+    id: h.id,
+    spotId: h.spotId,
+    spotName: h.spot?.name ?? null,
+    pontoonName: h.spot?.pontoon?.name ?? null,
+    mouillageNom: h.spot?.mouillage?.name ?? null,
+    portName: h.spot?.pontoon?.port?.name ?? h.spot?.mouillage?.port?.name ?? null,
+    startedAt: h.startedAt.toISODate()!,
+    endedAt: h.endedAt ? h.endedAt.toISODate() : null,
+  }
+}
+
+function toEngine(e: Boat['engines'][number]) {
+  return {
+    id: e.id,
+    kind: e.kind,
+    fuel: e.fuel,
+    brand: e.brand,
+    model: e.model,
+    serialNumber: e.serialNumber,
+    manufacturedAt: e.manufacturedAt ? e.manufacturedAt.toISODate() : null,
+    powerHp: e.powerHp,
+    hours: e.hours,
+    status: e.status,
+  }
+}
+
+function toSail(s: Boat['sails'][number]) {
+  return {
+    id: s.id,
+    sailType: s.sailType,
+    manufacturedAt: s.manufacturedAt ? s.manufacturedAt.toISODate() : null,
+    areaM2: s.areaM2,
+    material: s.material,
+    reefPoints: s.reefPoints,
+    status: s.status,
+  }
+}
+
+function toRig(rig: NonNullable<Boat['rig']>) {
+  return {
+    id: rig.id,
+    rigType: rig.rigType,
+    manufacturedAt: rig.manufacturedAt ? rig.manufacturedAt.toISODate() : null,
+    mastCount: rig.mastCount,
+    spreaders: rig.spreaders,
+    status: rig.status,
+  }
+}
+
+function toMedia(m: Media) {
+  return {
+    id: m.id,
+    kind: m.kind as 'photo' | 'document',
+    secureUrl: m.secureUrl,
+    cloudinaryPublicId: m.cloudinaryPublicId,
+    originalFilename: m.originalFilename,
+    format: m.format,
+    bytes: m.bytes,
+    width: m.width,
+    height: m.height,
+    position: m.position,
+    caption: m.caption,
+  }
+}
+
+function toSafetyEquipmentItem(item: Boat['safetyEquipment'][number]) {
+  return {
+    id: item.id,
+    equipmentType: item.equipmentType,
+    quantity: item.quantity,
+    expiryDate: item.expiryDate ? item.expiryDate.toISODate() : null,
+    status: item.status,
+    notes: item.notes,
+  }
+}
+
+function toMaintenanceEvent(ev: BoatMaintenanceEvent) {
+  return {
+    id: ev.id,
+    subject: ev.subject,
+    title: ev.title,
+    notes: ev.notes,
+    performedAt: ev.performedAt.toISODate()!,
+    engineCaption: ev.engineCaption,
+    sailCaption: ev.sailCaption,
+    boatEngineId: ev.boatEngineId,
+    boatSailId: ev.boatSailId,
+    boatRigId: ev.boatRigId,
+    parts: ev.parts.map((p) => ({
+      id: p.id,
+      name: p.name,
+      quantity: p.quantity,
+      notes: p.notes,
+    })),
+  }
+}
+
+function toMaintenanceTask(t: BoatMaintenanceTask) {
+  return {
+    id: t.id,
+    subject: t.subject,
+    title: t.title,
+    notes: t.notes,
+    status: t.status as 'open' | 'done',
+    dueAt: t.dueAt ? t.dueAt.toISODate() : null,
+    dueEngineHours: t.dueEngineHours,
+    boatEngineId: t.boatEngineId,
+    boatSailId: t.boatSailId,
+    boatRigId: t.boatRigId,
+    recurrenceIntervalMonths: t.recurrenceIntervalMonths,
+    recurrenceIntervalEngineHours: t.recurrenceIntervalEngineHours,
+  }
+}
+
+function toMaintenanceSheet(s: BoatMaintenanceSheet) {
+  return {
+    id: s.id,
+    type: s.type as 'entretien' | 'montage' | 'hivernage' | 'dehivernage' | 'atelier',
+    title: s.title,
+    status: s.status as 'in_progress' | 'completed',
+    performedAt: s.performedAt.toISODate()!,
+    notes: s.notes,
+    items: s.items.map((item) => ({
+      id: item.id,
+      label: item.label,
+      isDone: item.isDone,
+      notes: item.notes,
+      position: item.position,
+    })),
+  }
+}

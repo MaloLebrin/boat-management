@@ -153,20 +153,20 @@ Généré le 2026-05-20. Se référer à ce fichier pour suivre l'avancement des
 
 ### P3 — Suggestions
 
-- [ ] **REF-P3-1 — `boats_controller#show` ~200 lignes** `app/controllers/boats_controller.ts:82`
+- [x] **REF-P3-1 — `boats_controller#show` ~200 lignes** `app/controllers/boats_controller.ts:82`
   - Fix : créer `app/transformers/boat_transformer.ts` avec `toShowProps(boat, ...)` + sous-méthodes par entité
 
-- [ ] **REF-P3-2 — Import dynamique de `BoatEnginePart`** `app/services/boat_service.ts:418,439,460,469,487`
+- [x] **REF-P3-2 — Import dynamique de `BoatEnginePart`** `app/services/boat_service.ts:418,439,460,469,487`
   - `await import('#models/boat_engine_part')` dans des méthodes → import statique en haut du fichier
 
-- [ ] **REF-P3-3 — `BoatService` 513 lignes — candidat à décomposition**
+- [x] **REF-P3-3 — `BoatService` 513 lignes — candidat à décomposition**
   - Gère hull, engines, sails, rig, engine parts, safety equipment
   - Fix : extraire `BoatHullService`, `BoatEquipmentService`
 
-- [ ] **REF-P3-4 — `new AiService()` inline dans `ai_analysis_service.ts`**
+- [x] **REF-P3-4 — `new AiService()` inline dans `ai_analysis_service.ts`**
   - Fix : injecter `AiService` via le constructeur avec `@inject()`
 
-- [ ] **REF-P3-5 — `start/routes/marketing.ts` 1000+ lignes**
+- [x] **REF-P3-5 — `start/routes/marketing.ts` 1000+ lignes**
   - `buildHomePageData`, `buildPricingPageData`, `buildAboutPageData`, `buildContactPageData` dans un fichier de routes
   - Fix : extraire en `app/controllers/marketing_controller.ts` + classes builder dédiées
 
