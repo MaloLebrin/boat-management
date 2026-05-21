@@ -86,11 +86,11 @@ Généré le 2026-05-20. Se référer à ce fichier pour suivre l'avancement des
 
 ### P2 — Importants
 
-- [ ] **REF-P2-1 — N+1 queries dans `boats_controller#show`** `app/controllers/boats_controller.ts:82`
+- [x] **REF-P2-1 — N+1 queries dans `boats_controller#show`** `app/controllers/boats_controller.ts:82`
   - 8+ requêtes en cascade : chargement bateau → engines/sails/rig → maintenance → tasks → sheets → media → safetyEquipment → positionHistory
   - Fix : factoriser dans `BoatService.getFullDetailForUser()` + `Promise.all` pour les requêtes indépendantes
 
-- [ ] **REF-P2-2 — Pattern `loadBoat()` dupliqué ×6**
+- [x] **REF-P2-2 — Pattern `loadBoat()` dupliqué ×6**
   - Présent dans : `boat_equipment_controller.ts`, `boat_media_controller.ts`, `boat_engine_parts_controller.ts`, `boat_safety_equipment_controller.ts`, `boat_maintenance_sheets_controller.ts`, `boat_maintenance_sheet_items_controller.ts`
   - Fix : extraire dans un middleware ou helper partagé `loadBoatOrRedirect(ctx)`
 

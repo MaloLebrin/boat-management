@@ -21,7 +21,7 @@ export type {
   BoatHullPayload,
   BoatRigPayload,
   BoatSafetyEquipmentPayload,
-  BoatSailPayload,
+  BoatSailPayload
 }
 
 function toDateOrNull(value: Date | string | DateTime | null | undefined): DateTime | null {
@@ -70,18 +70,22 @@ export default class BoatService {
     const boat = await Boat.query()
       .where('id', boatId)
       .where('organizationId', user.organizationId)
-      .preload('engines')
-      .preload('sails')
-      .preload('rig')
-      .preload('safetyEquipment')
-      .preload('spot', (q) =>
-        q
-          .preload('pontoon', (pq) => pq.preload('port'))
-          .preload('mouillage', (mq) => mq.preload('port'))
-      )
       .first()
 
     if (!boat) throw new BoatNotFoundError()
+
+    await Promise.all([
+      boat.load('engines'),
+      boat.load('sails'),
+      boat.load('rig'),
+      boat.load('safetyEquipment'),
+      boat.load('spot', (q) =>
+        q
+          .preload('pontoon', (pq) => pq.preload('port'))
+          .preload('mouillage', (mq) => mq.preload('port'))
+      ),
+    ])
+
     return boat
   }
 
