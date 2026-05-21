@@ -1,3 +1,4 @@
+import { inject } from '@adonisjs/core'
 import { execFile } from 'node:child_process'
 import { unlink } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
@@ -7,6 +8,7 @@ import { promisify } from 'node:util'
 
 const execFileAsync = promisify(execFile)
 
+@inject()
 export class PdfService {
   async compress(inputPath: string): Promise<{ outputPath: string; cleanup: () => Promise<void> }> {
     const outputPath = join(tmpdir(), `${randomUUID()}.pdf`)

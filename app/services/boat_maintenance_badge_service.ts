@@ -1,5 +1,6 @@
 import BoatEngine from '#models/boat_engine'
 import BoatMaintenanceTask from '#models/boat_maintenance_task'
+import { inject } from '@adonisjs/core'
 import db from '@adonisjs/lucid/services/db'
 import { DateTime } from 'luxon'
 
@@ -14,6 +15,7 @@ type BadgeOpts = {
   urgentWithinEngineHours?: number
 }
 
+@inject()
 export default class BoatMaintenanceBadgeService {
   async getForBoatIds(
     organizationId: number,

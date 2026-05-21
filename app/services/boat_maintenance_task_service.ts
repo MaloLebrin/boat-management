@@ -5,6 +5,7 @@ import {
 import BoatMaintenanceTask from '#models/boat_maintenance_task'
 import type Boat from '#models/boat'
 import type User from '#models/user'
+import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
 import type { MaintenanceTaskSubject } from '#shared/types/maintenance'
 
@@ -43,6 +44,7 @@ function assertBoatScope(user: User, boat: Boat) {
   }
 }
 
+@inject()
 export default class BoatMaintenanceTaskService {
   async listForBoat(user: User, boat: Boat) {
     assertBoatScope(user, boat)
@@ -193,5 +195,17 @@ export default class BoatMaintenanceTaskService {
     if (!task) throw new BoatMaintenanceTaskNotFoundError()
 
     await task.delete()
+  }
+
+  /**
+   * Lists maintenance tasks for a specific engine.
+   */
+  async listForEngine(boatId: number, engineId: number) {
+    return await BoatMaintenanceTask.query()
+      .where('boatId', boatId)
+      .where('boatEngineId', engineId)
+      .orderBy('status', 'asc')
+      .orderBy('dueAt', 'asc')
+      .orderBy('id', 'desc')
   }
 }

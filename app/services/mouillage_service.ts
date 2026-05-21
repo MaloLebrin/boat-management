@@ -2,14 +2,30 @@ import Boat from '#models/boat'
 import Mouillage from '#models/mouillage'
 import Spot from '#models/spot'
 import type Port from '#models/port'
-import { MouillageHasBoatsError } from '#exceptions/port_errors'
+import { MouillageHasBoatsError, MouillageNotFoundError } from '#exceptions/port_errors'
+import { inject } from '@adonisjs/core'
 
 export type MouillagePayload = {
   name: string
   description?: string | null
 }
 
+@inject()
 export default class MouillageService {
+  /**
+   * Gets a mouillage for the given port or throws MouillageNotFoundError.
+   */
+  async getForPortOrFail(portId: number, mouillageId: number): Promise<Mouillage> {
+    const mouillage = await Mouillage.query()
+      .where('id', mouillageId)
+      .where('portId', portId)
+      .first()
+
+    if (!mouillage) throw new MouillageNotFoundError()
+
+    return mouillage
+  }
+
   async createForPort(port: Port, payload: MouillagePayload) {
     return await Mouillage.create({
       portId: port.id,

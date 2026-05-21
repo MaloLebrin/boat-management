@@ -12,6 +12,7 @@ import type {
   BoatSafetyEquipmentPayload,
   BoatSailPayload,
 } from '#shared/types/boat'
+import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
 
 export { BoatEquipmentNotFoundError, BoatNotFoundError }
@@ -37,6 +38,7 @@ function assertBoatInUserOrg(user: User, boat: Boat) {
   }
 }
 
+@inject()
 export default class BoatService {
   async listForUser(user: User) {
     if (user.organizationId === null) return []
@@ -87,6 +89,23 @@ export default class BoatService {
     ])
 
     return boat
+  }
+
+  /**
+   * Gets the position history for a boat (last 20 entries).
+   */
+  async getPositionHistory(boatId: number) {
+    const module = await import('#models/boat_position_history')
+    const BoatPositionHistoryModel = module.default
+    return await BoatPositionHistoryModel.query()
+      .where('boatId', boatId)
+      .preload('spot', (q) =>
+        q
+          .preload('pontoon', (pq) => pq.preload('port'))
+          .preload('mouillage', (mq) => mq.preload('port'))
+      )
+      .orderBy('startedAt', 'desc')
+      .limit(20)
   }
 
   async createForUser(user: User, payload: BoatHullPayload) {

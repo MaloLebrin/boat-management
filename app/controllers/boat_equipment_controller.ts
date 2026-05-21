@@ -1,7 +1,7 @@
-import BoatMaintenanceEvent from '#models/boat_maintenance_event'
-import BoatMaintenanceTask from '#models/boat_maintenance_task'
-import Media from '#models/media'
+import BoatMaintenanceService from '#services/boat_maintenance_service'
+import BoatMaintenanceTaskService from '#services/boat_maintenance_task_service'
 import BoatService, { BoatEquipmentNotFoundError, BoatNotFoundError } from '#services/boat_service'
+import MediaService from '#services/media_service'
 import {
   type BoatEngineFormBody,
   type BoatRigFormBody,
@@ -22,7 +22,12 @@ import type { HttpContext } from '@adonisjs/core/http'
 
 @inject()
 export default class BoatEquipmentController {
-  constructor(private boatService: BoatService) {}
+  constructor(
+    private boatService: BoatService,
+    private maintenanceService: BoatMaintenanceService,
+    private taskService: BoatMaintenanceTaskService,
+    private mediaService: MediaService
+  ) {}
 
   private async loadBoatForEquipment(ctx: Pick<HttpContext, 'auth' | 'response' | 'params'>) {
     const user = ctx.auth.getUserOrFail()
@@ -306,29 +311,15 @@ export default class BoatEquipmentController {
 
     const canManage = await bouncer.allows('boatUpdate', boat)
 
-    const maintenanceEvents = await BoatMaintenanceEvent.query()
-      .where('boatId', boat.id)
-      .where('boatEngineId', engineId)
-      .preload('parts')
-      .orderBy('performedAt', 'desc')
-
-    const maintenanceTasks = await BoatMaintenanceTask.query()
-      .where('boatId', boat.id)
-      .where('boatEngineId', engineId)
-      .orderBy('status', 'asc')
-      .orderBy('dueAt', 'asc')
-      .orderBy('id', 'desc')
-
-    const engineDocuments = await Media.query()
-      .where('entityType', 'boat_engine')
-      .where('entityId', engineId)
-      .where('kind', 'document')
-      .orderBy('position', 'asc')
-
-    const BoatEnginePart = (await import('#models/boat_engine_part')).default
-    const engineParts = await BoatEnginePart.query()
-      .where('boatEngineId', engineId)
-      .orderBy('id', 'asc')
+    const [maintenanceEvents, maintenanceTasks, engineDocuments, engineParts] = await Promise.all([
+      this.maintenanceService.listEventsForEngine(boat.id, engineId),
+      this.taskService.listForEngine(boat.id, engineId),
+      this.mediaService.listForEntity('boat_engine', engineId),
+      (async () => {
+        const BoatEnginePart = (await import('#models/boat_engine_part')).default
+        return await BoatEnginePart.query().where('boatEngineId', engineId).orderBy('id', 'asc')
+      })(),
+    ])
 
     return inertia.render('boats/engine_show', {
       boat: { id: boat.id, name: boat.name },

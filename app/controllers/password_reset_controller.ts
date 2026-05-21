@@ -1,8 +1,6 @@
 import { forgotPasswordValidator, resetPasswordValidator } from '#validators/user'
 import PasswordResetService from '#services/password_reset_service'
 import EmailQueueService from '#services/email_queue_service'
-import User from '#models/user'
-import hash from '@adonisjs/core/services/hash'
 import env from '#start/env'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
@@ -47,14 +45,11 @@ export default class PasswordResetController {
       return response.redirect().back()
     }
 
-    const user = await User.findBy('email', record.email)
-    if (!user) {
+    const updated = await this.passwordResetService.updatePassword(record.email, password)
+    if (!updated) {
       session.flash('error', i18n.t('flash.auth.passwordResetTokenInvalid'))
       return response.redirect().back()
     }
-
-    user.password = await hash.make(password)
-    await user.save()
 
     await this.passwordResetService.invalidateTokensForEmail(record.email)
 

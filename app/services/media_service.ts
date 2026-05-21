@@ -1,5 +1,6 @@
 import { MediaNotFoundError } from '#exceptions/media_errors'
 import type { MultipartFile } from '@adonisjs/core/bodyparser'
+import { inject } from '@adonisjs/core'
 import db from '@adonisjs/lucid/services/db'
 import type { MediaEntityType, MediaKind } from '#shared/constants/media'
 import Media from '#models/media'
@@ -22,8 +23,9 @@ function resourceTypeFromKind(kind: MediaKind, format?: string): 'image' | 'raw'
   return 'raw'
 }
 
+@inject()
 export default class MediaService {
-  private cloudinary = new CloudinaryService()
+  constructor(private cloudinary: CloudinaryService) {}
 
   async upload(user: User, file: MultipartFile, payload: UploadMediaPayload): Promise<Media> {
     const resourceType = resourceTypeFromKind(payload.kind)
@@ -57,6 +59,21 @@ export default class MediaService {
       .where('entityType', entityType)
       .where('entityId', entityId)
       .orderBy('position', 'asc')
+  }
+
+  /**
+   * Gets a media by ID for a specific entity or returns null.
+   */
+  async getForEntity(
+    mediaId: number,
+    entityType: MediaEntityType,
+    entityId: number
+  ): Promise<Media | null> {
+    return await Media.query()
+      .where('id', mediaId)
+      .where('entityType', entityType)
+      .where('entityId', entityId)
+      .first()
   }
 
   async deleteById(mediaId: number): Promise<void> {

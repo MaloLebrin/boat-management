@@ -10,6 +10,7 @@ import BoatMaintenancePart from '#models/boat_maintenance_part'
 import BoatRig from '#models/boat_rig'
 import BoatSail from '#models/boat_sail'
 import type User from '#models/user'
+import { inject } from '@adonisjs/core'
 import db from '@adonisjs/lucid/services/db'
 import { DateTime } from 'luxon'
 
@@ -37,6 +38,7 @@ function buildSailCaption(sail: BoatSail): string {
   return bits.join(' · ')
 }
 
+@inject()
 export default class BoatMaintenanceService {
   async listForBoat(_user: User, boat: Boat) {
     return await BoatMaintenanceEvent.query()
@@ -204,5 +206,71 @@ export default class BoatMaintenanceService {
     if (!event) throw new BoatMaintenanceNotFoundError()
 
     await event.delete()
+  }
+
+  /**
+   * Lists maintenance events for a specific engine.
+   */
+  async listEventsForEngine(boatId: number, engineId: number) {
+    return await BoatMaintenanceEvent.query()
+      .where('boatId', boatId)
+      .where('boatEngineId', engineId)
+      .preload('parts')
+      .orderBy('performedAt', 'desc')
+  }
+
+  /**
+   * Gets maintenance history for all boats in an organization.
+   */
+  async getHistoryForOrg(user: User) {
+    if (!user.organizationId) {
+      return { events: [], stats: { totalEvents: 0, totalParts: 0, totalBoats: 0 } }
+    }
+
+    const Boat = (await import('#models/boat')).default
+    const boats = await Boat.query().where('organizationId', user.organizationId)
+    const boatIds = boats.map((b) => b.id)
+    const boatMap = new Map(boats.map((b) => [b.id, b.name]))
+
+    if (boatIds.length === 0) {
+      return { events: [], stats: { totalEvents: 0, totalParts: 0, totalBoats: 0 } }
+    }
+
+    const rawEvents = await BoatMaintenanceEvent.query()
+      .whereIn('boatId', boatIds)
+      .preload('parts')
+      .orderBy('performedAt', 'desc')
+
+    const events = rawEvents.map((ev) => ({
+      id: ev.id,
+      boatId: ev.boatId,
+      boatName: boatMap.get(ev.boatId) ?? '',
+      subject: ev.subject,
+      title: ev.title,
+      notes: ev.notes,
+      performedAt: ev.performedAt.toISODate()!,
+      engineCaption: ev.engineCaption,
+      sailCaption: ev.sailCaption,
+      boatEngineId: ev.boatEngineId,
+      boatSailId: ev.boatSailId,
+      boatRigId: ev.boatRigId,
+      parts: ev.parts.map((p) => ({
+        id: p.id,
+        name: p.name,
+        quantity: p.quantity,
+      })),
+    }))
+
+    const distinctBoatIds = new Set(events.map((e) => e.boatId))
+    const totalParts = events.reduce((acc, ev) => acc + ev.parts.length, 0)
+
+    return {
+      events,
+      stats: {
+        totalEvents: events.length,
+        totalParts,
+        totalBoats: distinctBoatIds.size,
+      },
+    }
   }
 }

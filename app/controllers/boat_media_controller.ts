@@ -1,7 +1,6 @@
-import Media from '#models/media'
-import Organization from '#models/organization'
 import BoatService, { BoatNotFoundError } from '#services/boat_service'
 import MediaService, { MediaNotFoundError } from '#services/media_service'
+import OrganizationService from '#services/organization_service'
 import { CloudinaryFolders, CloudinaryService } from '#services/cloudinary_service'
 import { storeBoatPhotoValidator, storeBoatDocumentValidator } from '#validators/media'
 import { inject } from '@adonisjs/core'
@@ -20,7 +19,8 @@ export default class BoatMediaController {
   constructor(
     private boatService: BoatService,
     private mediaService: MediaService,
-    private cloudinaryService: CloudinaryService
+    private cloudinaryService: CloudinaryService,
+    private organizationService: OrganizationService
   ) {}
 
   private async loadBoat(ctx: Pick<HttpContext, 'auth' | 'response' | 'params'>) {
@@ -46,7 +46,7 @@ export default class BoatMediaController {
     await bouncer.authorize('boatUpdate', boat)
 
     const payload = await request.validateUsing(storeBoatPhotoValidator)
-    const org = await Organization.findOrFail(boat.organizationId)
+    const org = await this.organizationService.findOrFail(boat.organizationId)
 
     await this.mediaService.upload(user, payload.file, {
       folder: CloudinaryFolders.boatPhotos(org.slug, boat.id),
@@ -69,7 +69,7 @@ export default class BoatMediaController {
     await bouncer.authorize('boatUpdate', boat)
 
     const payload = await request.validateUsing(storeBoatDocumentValidator)
-    const org = await Organization.findOrFail(boat.organizationId)
+    const org = await this.organizationService.findOrFail(boat.organizationId)
 
     await this.mediaService.upload(user, payload.file, {
       folder: CloudinaryFolders.boatDocuments(org.slug, boat.id),
@@ -129,7 +129,7 @@ export default class BoatMediaController {
     }
 
     const payload = await request.validateUsing(storeBoatDocumentValidator)
-    const org = await Organization.findOrFail(boat.organizationId)
+    const org = await this.organizationService.findOrFail(boat.organizationId)
 
     await this.mediaService.upload(user, payload.file, {
       folder: CloudinaryFolders.boatEngineDocuments(org.slug, boat.id, engineId),
@@ -159,11 +159,7 @@ export default class BoatMediaController {
     }
 
     const mediaId = Number(params.mediaId)
-    const media = await Media.query()
-      .where('id', mediaId)
-      .where('entityType', 'boat_engine')
-      .where('entityId', engineId)
-      .first()
+    const media = await this.mediaService.getForEntity(mediaId, 'boat_engine', engineId)
 
     if (!media) {
       response.redirect(`/boats/${boat.id}/engines/${engineId}?tab=documents`)
@@ -192,11 +188,7 @@ export default class BoatMediaController {
     const { boat } = loaded
     const mediaId = Number(params.mediaId)
 
-    const media = await Media.query()
-      .where('id', mediaId)
-      .where('entityType', 'boat')
-      .where('entityId', boat.id)
-      .first()
+    const media = await this.mediaService.getForEntity(mediaId, 'boat', boat.id)
 
     if (!media) {
       response.redirect(`/boats/${boat.id}`)
@@ -232,11 +224,7 @@ export default class BoatMediaController {
     }
 
     const mediaId = Number(params.mediaId)
-    const media = await Media.query()
-      .where('id', mediaId)
-      .where('entityType', 'boat_engine')
-      .where('entityId', engineId)
-      .first()
+    const media = await this.mediaService.getForEntity(mediaId, 'boat_engine', engineId)
 
     if (!media) {
       response.redirect(`/boats/${boat.id}/engines/${engineId}?tab=documents`)

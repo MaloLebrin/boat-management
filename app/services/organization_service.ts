@@ -1,4 +1,5 @@
 import Organization from '#models/organization'
+import { inject } from '@adonisjs/core'
 import crypto from 'node:crypto'
 import type { TransactionClientContract } from '@adonisjs/lucid/types/database'
 
@@ -14,6 +15,7 @@ function slugify(value: string) {
   return base || 'org'
 }
 
+@inject()
 export default class OrganizationService {
   async createForSignup(
     params: { email: string; fullName?: string | null },
@@ -44,5 +46,12 @@ export default class OrganizationService {
       },
       { client: trx }
     )
+  }
+
+  /**
+   * Gets an organization by ID or throws.
+   */
+  async findOrFail(id: number): Promise<Organization> {
+    return await Organization.findOrFail(id)
   }
 }

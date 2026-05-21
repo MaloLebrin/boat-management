@@ -3,6 +3,7 @@ import db from '@adonisjs/lucid/services/db'
 import RunAiChat from '#jobs/run_ai_chat'
 import QueueDedupKey from '#models/queue_dedup_key'
 import AiQueueService from '#services/ai_queue_service'
+import QueueDedupService from '#services/queue_dedup_service'
 
 test.group('RunAiChat (unit)', (group) => {
   group.each.setup(async () => {
@@ -20,7 +21,7 @@ test.group('RunAiChat (unit)', (group) => {
       dispatched.push(payload)
     }) as any
 
-    const svc = new AiQueueService()
+    const svc = new AiQueueService(new QueueDedupService())
     await svc.enqueueChat({
       userId: 1,
       messages: [{ role: 'user', content: 'Hello' }],
@@ -55,7 +56,7 @@ test.group('RunAiChat (unit)', (group) => {
       dispatched.push(payload)
     }) as any
 
-    const svc = new AiQueueService()
+    const svc = new AiQueueService(new QueueDedupService())
     await svc.enqueueChat({
       userId: 1,
       messages: [{ role: 'user', content: 'Hello' }],

@@ -1,6 +1,7 @@
 import Boat from '#models/boat'
 import BoatMaintenanceBadgeService from '#services/boat_maintenance_badge_service'
 import type User from '#models/user'
+import { inject } from '@adonisjs/core'
 
 export type BoatListSort = 'recent' | 'name'
 export type BoatListDirection = 'asc' | 'desc'
@@ -54,6 +55,7 @@ function normalizeDirection(value: unknown): BoatListDirection | undefined {
   return value === 'asc' || value === 'desc' ? value : undefined
 }
 
+@inject()
 export default class BoatListService {
   normalizeQuery(raw: Record<string, unknown>): Required<BoatListQuery> {
     const q = toTrimmedStringOrUndefined(raw.q) ?? ''

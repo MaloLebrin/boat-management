@@ -7,6 +7,7 @@ import type User from '#models/user'
 import db from '@adonisjs/lucid/services/db'
 import { PortHasBoatsError, PortNotFoundError } from '#exceptions/port_errors'
 import type { PortPayload } from '#shared/types/port'
+import { inject } from '@adonisjs/core'
 
 type AggRow = { port_id: number; count: string }
 
@@ -16,6 +17,7 @@ function assertPortInUserOrg(user: User, port: Port) {
   }
 }
 
+@inject()
 export default class PortService {
   async listForUser(user: User) {
     if (user.organizationId === null) return []
@@ -103,6 +105,40 @@ export default class PortService {
         freeSpots: Math.max(0, totalSpots - boatCount),
       }
     })
+  }
+
+  /**
+   * Gets a port for the user's organization or throws PortNotFoundError.
+   */
+  async getForUserOrFail(user: User, portId: number): Promise<Port> {
+    if (user.organizationId === null) throw new PortNotFoundError()
+
+    const port = await Port.query()
+      .where('id', portId)
+      .where('organizationId', user.organizationId)
+      .first()
+
+    if (!port) throw new PortNotFoundError()
+
+    return port
+  }
+
+  /**
+   * Lists all ports for the user's organization with full preloads for spots.
+   * Used in boat create/edit forms.
+   */
+  async listWithSpotsForOrg(user: User): Promise<Port[]> {
+    if (user.organizationId === null) return []
+
+    return await Port.query()
+      .where('organizationId', user.organizationId)
+      .preload('pontoons', (q) =>
+        q.orderBy('name', 'asc').preload('spots', (sq) => sq.orderBy('name', 'asc'))
+      )
+      .preload('mouillages', (q) =>
+        q.orderBy('name', 'asc').preload('spots', (sq) => sq.orderBy('name', 'asc'))
+      )
+      .orderBy('name', 'asc')
   }
 
   async getWithPontoonsAndMouillagesOrFail(user: User, portId: number) {

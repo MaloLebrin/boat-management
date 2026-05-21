@@ -8,6 +8,7 @@ import BoatMaintenanceSheetTemplateService from '#services/boat_maintenance_shee
 import type { SheetType } from '#services/boat_maintenance_sheet_template_service'
 import type Boat from '#models/boat'
 import type User from '#models/user'
+import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
 
 export { BoatMaintenanceSheetItemNotFoundError, BoatMaintenanceSheetNotFoundError }
@@ -35,6 +36,7 @@ export type UpdateItemPayload = {
   notes: string | null
 }
 
+@inject()
 export default class BoatMaintenanceSheetService {
   /**
    * Lists all maintenance sheets for a boat, ordered by performedAt desc.

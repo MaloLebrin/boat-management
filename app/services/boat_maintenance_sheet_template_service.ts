@@ -1,3 +1,5 @@
+import { inject } from '@adonisjs/core'
+
 export type SheetTemplateItem = { label: string; position: number }
 export type SheetType = 'entretien' | 'montage' | 'hivernage' | 'dehivernage' | 'atelier'
 
@@ -70,6 +72,7 @@ const templates: Record<SheetType, string[]> = {
   ],
 }
 
+@inject()
 export default class BoatMaintenanceSheetTemplateService {
   /**
    * Returns the default items for a given sheet type.

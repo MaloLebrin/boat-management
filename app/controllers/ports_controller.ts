@@ -1,4 +1,3 @@
-import Port from '#models/port'
 import PortService from '#services/port_service'
 import { PortHasBoatsError, PortNotFoundError } from '#exceptions/port_errors'
 import { createPortValidator, updatePortValidator } from '#validators/port'
@@ -63,35 +62,23 @@ export default class PortsController {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
-    if (user.organizationId === null) return response.redirect('/ports')
-
-    const port = await Port.query()
-      .where('id', Number(params.id))
-      .where('organizationId', user.organizationId)
-      .first()
-
-    if (!port) return response.redirect('/ports')
-
-    const payload = await request.validateUsing(updatePortValidator)
-    await this.portService.updateForUser(user, port, payload)
-
-    return response.redirect(`/ports/${port.id}`)
+    try {
+      const port = await this.portService.getForUserOrFail(user, Number(params.id))
+      const payload = await request.validateUsing(updatePortValidator)
+      await this.portService.updateForUser(user, port, payload)
+      return response.redirect(`/ports/${port.id}`)
+    } catch (error) {
+      if (error instanceof PortNotFoundError) return response.redirect('/ports')
+      throw error
+    }
   }
 
   async destroy({ params, auth, response, session }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
-    if (user.organizationId === null) return response.redirect('/ports')
-
-    const port = await Port.query()
-      .where('id', Number(params.id))
-      .where('organizationId', user.organizationId)
-      .first()
-
-    if (!port) return response.redirect('/ports')
-
     try {
+      const port = await this.portService.getForUserOrFail(user, Number(params.id))
       await this.portService.deleteForUser(user, port)
       return response.redirect('/ports')
     } catch (error) {

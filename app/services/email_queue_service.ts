@@ -1,7 +1,10 @@
 import SendEmail, { type SendEmailPayload } from '#jobs/send_email'
 import QueueDedupService from '#services/queue_dedup_service'
+import { inject } from '@adonisjs/core'
 
+@inject()
 export default class EmailQueueService {
+  constructor(private dedup: QueueDedupService) {}
   /**
    * Enqueue a welcome email for a new user.
    */
@@ -23,8 +26,7 @@ export default class EmailQueueService {
     const key = SendEmail.dedupKey(partialPayload)
     const payload: SendEmailPayload = { ...partialPayload, dedupKey: key }
 
-    const dedup = new QueueDedupService()
-    await dedup.enqueueUnique({
+    await this.dedup.enqueueUnique({
       key,
       jobName: SendEmail.name,
       queue: 'emails',
@@ -55,8 +57,7 @@ export default class EmailQueueService {
     const key = SendEmail.dedupKey(partialPayload)
     const payload: SendEmailPayload = { ...partialPayload, dedupKey: key }
 
-    const dedup = new QueueDedupService()
-    await dedup.enqueueUnique({
+    await this.dedup.enqueueUnique({
       key,
       jobName: SendEmail.name,
       queue: 'emails',

@@ -1,7 +1,4 @@
-import Boat from '#models/boat'
-import BoatPositionHistory from '#models/boat_position_history'
-import Port from '#models/port'
-import Spot from '#models/spot'
+import { SpotNotFoundError } from '#exceptions/port_errors'
 import AiAnalysisService, { type AiSuggestion } from '#services/ai_analysis_service'
 import BoatListService from '#services/boat_list_service'
 import BoatMaintenanceService from '#services/boat_maintenance_service'
@@ -9,6 +6,8 @@ import BoatMaintenanceSheetService from '#services/boat_maintenance_sheet_servic
 import BoatMaintenanceTaskService from '#services/boat_maintenance_task_service'
 import BoatService, { BoatNotFoundError } from '#services/boat_service'
 import MediaService from '#services/media_service'
+import PortService from '#services/port_service'
+import SpotService from '#services/spot_service'
 import { createBoatValidator, updateBoatValidator } from '#validators/boat'
 import { assignBoatValidator } from '#validators/marina_layout'
 import { inject } from '@adonisjs/core'
@@ -23,7 +22,9 @@ export default class BoatsController {
     private sheetService: BoatMaintenanceSheetService,
     private mediaService: MediaService,
     private aiAnalysisService: AiAnalysisService,
-    private boatListService: BoatListService
+    private boatListService: BoatListService,
+    private portService: PortService,
+    private spotService: SpotService
   ) {}
 
   async index({ inertia, auth, request }: HttpContext) {
@@ -43,18 +44,7 @@ export default class BoatsController {
     const user = auth.getUserOrFail()
     await bouncer.authorize('boatCreate')
 
-    const ports =
-      user.organizationId !== null
-        ? await Port.query()
-          .where('organizationId', user.organizationId)
-          .preload('pontoons', (q) =>
-            q.orderBy('name', 'asc').preload('spots', (sq) => sq.orderBy('name', 'asc'))
-          )
-          .preload('mouillages', (q) =>
-            q.orderBy('name', 'asc').preload('spots', (sq) => sq.orderBy('name', 'asc'))
-          )
-          .orderBy('name', 'asc')
-        : []
+    const ports = await this.portService.listWithSpotsForOrg(user)
 
     return inertia.render('boats/new', {
       ports: ports.map((p) => ({
@@ -107,15 +97,7 @@ export default class BoatsController {
         this.taskService.listForBoat(user, boat),
         this.sheetService.listForBoat(user, boat),
         this.mediaService.listForEntity('boat', boat.id),
-        BoatPositionHistory.query()
-          .where('boatId', boat.id)
-          .preload('spot', (q) =>
-            q
-              .preload('pontoon', (pq) => pq.preload('port'))
-              .preload('mouillage', (mq) => mq.preload('port'))
-          )
-          .orderBy('startedAt', 'desc')
-          .limit(20),
+        this.boatService.getPositionHistory(boat.id),
         this.aiAnalysisService.getLatestBoatSuggestions(user.id, boat.id),
         bouncer.allows('boatUpdate', boat),
       ])
@@ -290,18 +272,7 @@ export default class BoatsController {
       const boat = await this.boatService.getForUserOrFail(user, Number(params.id))
       await bouncer.authorize('boatUpdate', boat)
 
-      const ports =
-        user.organizationId !== null
-          ? await Port.query()
-            .where('organizationId', user.organizationId)
-            .preload('pontoons', (q) =>
-              q.orderBy('name', 'asc').preload('spots', (sq) => sq.orderBy('name', 'asc'))
-            )
-            .preload('mouillages', (q) =>
-              q.orderBy('name', 'asc').preload('spots', (sq) => sq.orderBy('name', 'asc'))
-            )
-            .orderBy('name', 'asc')
-          : []
+      const ports = await this.portService.listWithSpotsForOrg(user)
 
       return inertia.render('boats/edit', {
         boat: {
@@ -379,27 +350,20 @@ export default class BoatsController {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
-    if (user.organizationId === null) return response.redirect('/boats')
+    try {
+      const boat = await this.boatService.getForUserOrFail(user, Number(params.id))
+      const payload = await request.validateUsing(assignBoatValidator)
 
-    const boat = await Boat.query()
-      .where('id', Number(params.id))
-      .where('organizationId', user.organizationId)
-      .first()
+      if (payload.spotId !== null) {
+        await this.spotService.getForUserOrFail(user, payload.spotId)
+      }
 
-    if (!boat) return response.redirect('/boats')
-
-    const payload = await request.validateUsing(assignBoatValidator)
-
-    if (payload.spotId !== null) {
-      const spot = await Spot.query()
-        .where('id', payload.spotId)
-        .where('organizationId', user.organizationId)
-        .first()
-      if (!spot) return response.redirect().back()
+      await this.boatService.updateAssignment(boat, { spotId: payload.spotId })
+      return response.redirect().back()
+    } catch (error) {
+      if (error instanceof BoatNotFoundError) return response.redirect('/boats')
+      if (error instanceof SpotNotFoundError) return response.redirect().back()
+      throw error
     }
-
-    await this.boatService.updateAssignment(boat, { spotId: payload.spotId })
-
-    return response.redirect().back()
   }
 }

@@ -1,3 +1,4 @@
+import { inject } from '@adonisjs/core'
 import app from '@adonisjs/core/services/app'
 import logger from '@adonisjs/core/services/logger'
 import type { MultipartFile } from '@adonisjs/core/bodyparser'
@@ -76,7 +77,9 @@ export const CloudinaryFolders = {
     `${envPrefix()}/organizations/${orgSlug}/users/${userId}/avatar`,
 }
 
+@inject()
 export class CloudinaryService {
+  constructor(private pdfService: PdfService) {}
   async uploadImage(
     file: MultipartFile,
     folder: string,
@@ -106,11 +109,10 @@ export class CloudinaryService {
       throw new Error('File has no tmpPath — ensure bodyparser autoProcess is enabled')
     }
 
-    const pdfService = new PdfService()
     let compressedResult: { outputPath: string; cleanup: () => Promise<void> } | null = null
 
     try {
-      compressedResult = await pdfService.compress(file.tmpPath)
+      compressedResult = await this.pdfService.compress(file.tmpPath)
       return await this.uploadFromPath(
         compressedResult!.outputPath,
         file.clientName,

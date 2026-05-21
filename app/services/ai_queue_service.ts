@@ -1,7 +1,11 @@
 import RunAiChat, { type RunAiChatPayload } from '#jobs/run_ai_chat'
 import QueueDedupService from '#services/queue_dedup_service'
+import { inject } from '@adonisjs/core'
 
+@inject()
 export default class AiQueueService {
+  constructor(private dedup: QueueDedupService) {}
+
   async enqueueChat(options: {
     userId: number
     messages: RunAiChatPayload['messages']
@@ -14,8 +18,7 @@ export default class AiQueueService {
       dedupKey: key,
     }
 
-    const dedup = new QueueDedupService()
-    await dedup.enqueueUnique({
+    await this.dedup.enqueueUnique({
       key,
       jobName: RunAiChat.name,
       queue: 'ai',

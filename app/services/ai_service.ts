@@ -1,3 +1,4 @@
+import { inject } from '@adonisjs/core'
 import env from '#start/env'
 import { Mistral } from '@mistralai/mistralai'
 
@@ -6,6 +7,7 @@ export type AiChatMessage = {
   content: string
 }
 
+@inject()
 export default class AiService {
   #client: Mistral
   #model: string

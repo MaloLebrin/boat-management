@@ -84,6 +84,44 @@ Généré le 2026-05-20. Se référer à ce fichier pour suivre l'avancement des
 - [x] **REF-P1-5 — `payload.subject as any`** `app/controllers/boat_maintenance_tasks_controller.ts:36`
   - Fix : utiliser `vine.enum([...] as const)` dans le validator pour que TypeScript infère le bon type, ou caster vers `MaintenanceTaskSubject` explicitement
 
+- [x] **REF-P1-6 — Controllers important des modèles Lucid directement**
+  - Violation de la règle CLAUDE.md : "Jamais de `Model.query()` dans un Controller → déléguer au Service"
+  - Fichiers concernés :
+    - `app/controllers/session_controller.ts` → `User`
+    - `app/controllers/boat_media_controller.ts` → `Media`, `Organization`
+    - `app/controllers/pontoons_controller.ts` → `Pontoon`, `Port`
+    - `app/controllers/boats_controller.ts` → `Boat`, `BoatPositionHistory`, `Port`, `Spot`
+    - `app/controllers/planning_controller.ts` → `BoatMaintenanceTask`, `Boat`
+    - `app/controllers/password_reset_controller.ts` → `User`
+    - `app/controllers/boat_equipment_controller.ts` → `BoatMaintenanceEvent`, `BoatMaintenanceTask`, `Media`
+    - `app/controllers/ports_controller.ts` → `Port`
+    - `app/controllers/maintenance_history_controller.ts` → `Boat`, `BoatMaintenanceEvent`
+    - `app/controllers/mouillages_controller.ts` → `Mouillage`, `Port`
+    - `app/controllers/spots_controller.ts` → `Mouillage`, `Pontoon`, `Port`, `Spot`
+  - Fix : déplacer chaque accès modèle dans le service correspondant (créer le service si absent) ; le controller n'appelle que des méthodes de service injectées
+
+- [x] **REF-P1-7 — Modèles Lucid importés statiquement dans les services au lieu de l'injection de dépendance**
+  - Pattern attendu : `constructor(private Boat: typeof Boat)` avec `@inject()` sur la classe
+  - Fichiers concernés :
+    - `app/services/boat_service.ts` → `Boat`, `BoatEngine`, `BoatRig`, `BoatSail`
+    - `app/services/boat_maintenance_service.ts` → `BoatEngine`, `BoatMaintenanceEvent`, `BoatMaintenancePart`, `BoatRig`, `BoatSail`
+    - `app/services/boat_maintenance_sheet_service.ts` → `BoatMaintenanceSheet`, `BoatMaintenanceSheetItem`
+    - `app/services/boat_maintenance_task_service.ts` → `BoatMaintenanceTask`
+    - `app/services/boat_maintenance_badge_service.ts` → `BoatEngine`, `BoatMaintenanceTask`
+    - `app/services/boat_list_service.ts` → `Boat`
+    - `app/services/dashboard_service.ts` → `Boat`, `BoatEngine`, `BoatMaintenanceTask`
+    - `app/services/media_service.ts` → `Media`
+    - `app/services/mouillage_service.ts` → `Boat`, `Mouillage`, `Spot`
+    - `app/services/organization_service.ts` → `Organization`
+    - `app/services/password_reset_service.ts` → `PasswordResetToken`, `User`
+    - `app/services/pontoon_service.ts` → `Boat`, `Pontoon`, `Spot`
+    - `app/services/port_service.ts` → `Boat`, `Mouillage`, `Pontoon`, `Port`, `Spot`
+    - `app/services/queue_dedup_service.ts` → `QueueDedupKey`
+    - `app/services/spot_service.ts` → `Spot`
+    - `app/services/user_service.ts` → `User`
+    - `app/services/ai_analysis_service.ts` → `AiAnalysis`
+  - Fix : ajouter `@inject()` sur chaque service + déclarer chaque modèle en paramètre constructeur `private Model: typeof XModel` ; les `import type` peuvent rester
+
 ### P2 — Importants
 
 - [x] **REF-P2-1 — N+1 queries dans `boats_controller#show`** `app/controllers/boats_controller.ts:82`
@@ -143,14 +181,16 @@ Généré le 2026-05-20. Se référer à ce fichier pour suivre l'avancement des
 5. **REF-P1-3 + REF-P2-5** (créer les fichiers `shared/types/` manquants)
 6. **REF-P1-4** (interfaces inline dans controllers)
 7. **REF-P1-1** (`@inject()` sur tous les controllers — gros chantier, faire par domaine)
-8. **REF-P2-2** (`loadBoat()` dupliqué)
-9. **REF-P2-3** (logique métier dans controllers)
-10. **SEC-H3** (CSP — nécessite de cartographier toutes les origines tierces)
-11. **SEC-M2** (AI controller — Inertia + validation messages)
-12. **REF-P1-5** (`as any` sur subject)
-13. **REF-P2-1** (N+1 queries)
-14. **REF-P2-4** (`any` dans raw queries)
-15. **REF-P2-6** (pattern organisation dupliqué)
-16. **SEC-M3, SEC-M4, SEC-M5** (medium, moins urgents)
-17. **SEC-L1, SEC-L2** (low)
-18. **REF-P3-*** (suggestions, au fil des passages)
+8. **REF-P1-6** (supprimer tous les imports de modèles dans les controllers — faire domaine par domaine, en même temps que REF-P1-7)
+9. **REF-P1-7** (injecter les modèles Lucid via `@inject()` dans les services — faire service par service)
+10. **REF-P2-2** (`loadBoat()` dupliqué)
+11. **REF-P2-3** (logique métier dans controllers)
+12. **SEC-H3** (CSP — nécessite de cartographier toutes les origines tierces)
+13. **SEC-M2** (AI controller — Inertia + validation messages)
+14. **REF-P1-5** (`as any` sur subject)
+15. **REF-P2-1** (N+1 queries)
+16. **REF-P2-4** (`any` dans raw queries)
+17. **REF-P2-6** (pattern organisation dupliqué)
+18. **SEC-M3, SEC-M4, SEC-M5** (medium, moins urgents)
+19. **SEC-L1, SEC-L2** (low)
+20. **REF-P3-*** (suggestions, au fil des passages)

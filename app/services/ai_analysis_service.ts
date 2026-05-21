@@ -1,5 +1,6 @@
 import AiAnalysis from '#models/ai_analysis'
 import AiService from '#services/ai_service'
+import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
 
 export type AiSuggestion = { text: string }
@@ -77,7 +78,9 @@ Réponds UNIQUEMENT avec un tableau JSON valide d'objets. Chaque objet a une seu
 Retourne entre 2 et 5 suggestions. N'inclus aucun texte en dehors du tableau JSON.
 Exemple: [{"text":"Vérifier l'antifouling — dernière application il y a 13 mois"},{"text":"Vidange moteur à planifier — 490h atteintes"}]`
 
+@inject()
 export default class AiAnalysisService {
+  constructor(private aiService: AiService) {}
   /**
    * Get the latest fleet analysis for a user
    */
@@ -108,8 +111,7 @@ export default class AiAnalysisService {
   async generateFleetAnalysis(userId: number, input: FleetAnalysisInput): Promise<AiSuggestion[]> {
     const userMessage = this.#buildFleetUserMessage(input)
 
-    const aiService = new AiService()
-    const rawResponse = await aiService.chat([
+    const rawResponse = await this.aiService.chat([
       { role: 'system', content: SYSTEM_PROMPT },
       { role: 'user', content: userMessage },
     ])
@@ -137,8 +139,7 @@ export default class AiAnalysisService {
   ): Promise<AiSuggestion[]> {
     const userMessage = this.#buildBoatUserMessage(input)
 
-    const aiService = new AiService()
-    const rawResponse = await aiService.chat([
+    const rawResponse = await this.aiService.chat([
       { role: 'system', content: SYSTEM_PROMPT },
       { role: 'user', content: userMessage },
     ])

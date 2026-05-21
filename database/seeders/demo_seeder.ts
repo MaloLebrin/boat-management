@@ -1,4 +1,5 @@
 import { BaseSeeder } from '@adonisjs/lucid/seeders'
+import app from '@adonisjs/core/services/app'
 import BoatMaintenanceEvent from '#models/boat_maintenance_event'
 import BoatMaintenanceTask from '#models/boat_maintenance_task'
 import Boat from '#models/boat'
@@ -29,7 +30,7 @@ export default class extends BaseSeeder {
 
     let user = await User.query().where('email', adminEmail).first()
     if (!user) {
-      const userService = new UserService()
+      const userService = await app.container.make(UserService)
       ;({ user } = await userService.signupWithOrganization({
         email: adminEmail,
         password: adminPassword,

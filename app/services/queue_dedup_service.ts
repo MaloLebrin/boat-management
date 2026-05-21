@@ -1,4 +1,5 @@
 import QueueDedupKey, { QUEUE_DEDUP_KEY_STATUSES } from '#models/queue_dedup_key'
+import { inject } from '@adonisjs/core'
 import db from '@adonisjs/lucid/services/db'
 import { DateTime } from 'luxon'
 import { createHash } from 'node:crypto'
@@ -21,6 +22,7 @@ function isUniqueViolation(error: unknown): boolean {
   return false
 }
 
+@inject()
 export default class QueueDedupService {
   async enqueueUnique<TPayload>(options: {
     key: string

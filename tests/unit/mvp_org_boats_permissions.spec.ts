@@ -1,5 +1,6 @@
 import { test } from '@japa/runner'
 import UserService from '#services/user_service'
+import OrganizationService from '#services/organization_service'
 import BoatService from '#services/boat_service'
 import Organization from '#models/organization'
 import User from '#models/user'
@@ -20,7 +21,7 @@ test.group('MVP org/users/boats/permissions (unit)', (group) => {
   })
 
   test('signupWithOrganization creates org and links user', async ({ assert }) => {
-    const userService = new UserService()
+    const userService = new UserService(new OrganizationService())
 
     const { organization, user } = await userService.signupWithOrganization({
       email: 'alice@example.com',
