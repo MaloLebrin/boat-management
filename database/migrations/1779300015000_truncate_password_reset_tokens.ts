@@ -6,7 +6,7 @@ export default class extends BaseSchema {
   protected tableName = 'password_reset_tokens'
 
   async up() {
-    await this.db.rawQuery('TRUNCATE TABLE ??', [this.tableName])
+    await this.db.rawQuery('DELETE FROM ??', [this.tableName])
   }
 
   async down() {
