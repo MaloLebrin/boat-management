@@ -456,6 +456,12 @@ const routes = {
     tokens: [{"old":"/planning","type":0,"val":"planning","end":""}],
     types: placeholder as Registry['planning.index']['types'],
   },
+  'locale.set': {
+    methods: ["POST"],
+    pattern: '/locale',
+    tokens: [{"old":"/locale","type":0,"val":"locale","end":""}],
+    types: placeholder as Registry['locale.set']['types'],
+  },
   'settings.index': {
     methods: ["GET","HEAD"],
     pattern: '/settings',
@@ -473,12 +479,6 @@ const routes = {
     pattern: '/settings/org',
     tokens: [{"old":"/settings/org","type":0,"val":"settings","end":""},{"old":"/settings/org","type":0,"val":"org","end":""}],
     types: placeholder as Registry['settings.org.update']['types'],
-  },
-  'locale.set': {
-    methods: ["POST"],
-    pattern: '/locale',
-    tokens: [{"old":"/locale","type":0,"val":"locale","end":""}],
-    types: placeholder as Registry['locale.set']['types'],
   },
   'maintenance.history': {
     methods: ["GET","HEAD"],

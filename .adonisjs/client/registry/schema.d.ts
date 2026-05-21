@@ -907,6 +907,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/planning_controller').default['index']>>>
     }
   }
+  'locale.set': {
+    methods: ["POST"]
+    pattern: '/locale'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
   'settings.index': {
     methods: ["GET","HEAD"]
     pattern: '/settings'
@@ -941,18 +953,6 @@ export interface Registry {
       query: ExtractQuery<InferInput<(typeof import('#validators/user').updateOrganizationValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateOrganization']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateOrganization']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'locale.set': {
-    methods: ["POST"]
-    pattern: '/locale'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: unknown
-      errorResponse: unknown
     }
   }
   'maintenance.history': {

@@ -117,6 +117,9 @@ export interface ApiDefinition {
   planning: {
     index: typeof routes['planning.index']
   }
+  locale: {
+    set: typeof routes['locale.set']
+  }
   settings: {
     index: typeof routes['settings.index']
     profile: {
@@ -125,9 +128,6 @@ export interface ApiDefinition {
     org: {
       update: typeof routes['settings.org.update']
     }
-  }
-  locale: {
-    set: typeof routes['locale.set']
   }
   maintenance: {
     history: typeof routes['maintenance.history']

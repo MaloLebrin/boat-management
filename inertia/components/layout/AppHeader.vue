@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { Link, usePage } from '@inertiajs/vue3'
+import { Link, router, usePage } from '@inertiajs/vue3'
 import { computed } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import { useT } from '~/composables/useT'
+import { buildLocaleSwitchHref, type AppLocale } from '#shared/helpers/locale_path'
 
 type SharedProps = {
   locale?: 'en' | 'fr'
@@ -16,11 +17,20 @@ const { t } = useT()
 const locale = computed<'en' | 'fr'>(() => page.props.locale ?? 'en')
 const isAuthed = computed(() => Boolean(page.props.user))
 
-const otherHref = computed(() => {
-  const otherLang = locale.value === 'en' ? 'fr' : 'en'
-  const cleanPath = (page.props.path ?? '').replace(/^\/[a-zA-Z]{2}/, '')
-  return `/${otherLang}${cleanPath || ''}`
-})
+const otherLocale = computed<AppLocale>(() => (locale.value === 'en' ? 'fr' : 'en'))
+
+const localeSwitchHref = computed(() =>
+  buildLocaleSwitchHref(page.props.path ?? '', otherLocale.value)
+)
+
+function switchLocale() {
+  const href = localeSwitchHref.value
+  if (href) {
+    router.visit(href)
+    return
+  }
+  router.post('/locale', { locale: otherLocale.value }, { preserveScroll: true })
+}
 </script>
 
 <template>
@@ -63,24 +73,25 @@ const otherHref = computed(() => {
       </nav>
 
       <div class="flex items-center gap-2">
-        <a
-          :href="otherHref"
+        <button
+          type="button"
           class="inline-flex h-9 items-center justify-center rounded-(--radius-control) px-3 text-sm font-medium text-fg-muted transition-colors duration-(--motion-fast) hover:bg-paper hover:text-fg"
+          @click="switchLocale"
         >
           {{ locale === 'en' ? 'FR' : 'EN' }}
-        </a>
+        </button>
         <template v-if="isAuthed">
-          <a href="/dashboard">
+          <Link href="/dashboard">
             <BaseButton size="sm">Dashboard</BaseButton>
-          </a>
+          </Link>
         </template>
         <template v-else>
-          <a href="/login">
+          <Link href="/login">
             <BaseButton variant="ghost" size="sm">{{ t('public.actions.login') }}</BaseButton>
-          </a>
-          <a href="/signup">
+          </Link>
+          <Link href="/signup">
             <BaseButton size="sm">{{ t('public.actions.tryFree') }}</BaseButton>
-          </a>
+          </Link>
         </template>
       </div>
     </div>
