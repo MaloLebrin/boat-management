@@ -17,6 +17,7 @@ import { useT } from '~/composables/useT'
 const { t } = useT()
 
 const showPassword = ref(false)
+const passwordValue = ref('')
 const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
 </script>
 
@@ -76,6 +77,8 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
                 :label="t('auth.login.passwordLabel')"
                 placeholder="••••••••"
                 :errors="errors"
+                :model-value="passwordValue"
+                @update:model-value="passwordValue = $event"
               >
                 <template #label-right>
                   <a

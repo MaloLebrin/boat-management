@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import BaseField from '~/components/base/BaseField.vue'
-import { inputClass } from '~/utils/form_styles'
 import { computed, useSlots } from 'vue'
+import BaseField from '~/components/base/BaseField.vue'
 import { getFieldError, nameToErrorKey, type FormErrors } from '~/utils/form_errors'
+import { inputClass } from '~/utils/form_styles'
 
 type InputMode = 'none' | 'text' | 'tel' | 'url' | 'email' | 'numeric' | 'decimal' | 'search'
 
@@ -15,7 +15,7 @@ const props = withDefaults(
     errorKey?: string
     id?: string
     name?: string
-    type?: string
+    type?: InputMode | 'password'
     autocomplete?: string
     placeholder?: string
     modelValue?: string
@@ -30,7 +30,6 @@ const props = withDefaults(
   }>(),
   {
     type: 'text',
-    modelValue: '',
     disabled: false,
     required: false,
     readonly: false,
@@ -72,7 +71,7 @@ const resolvedError = computed(() => {
         :autocomplete="autocomplete"
         :placeholder="placeholder"
         :disabled="disabled"
-        :value="modelValue"
+        v-bind="modelValue !== undefined ? { value: modelValue } : {}"
         :data-invalid="resolvedError ? 'true' : undefined"
         :aria-invalid="resolvedError ? 'true' : undefined"
         :class="[
