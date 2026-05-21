@@ -14,6 +14,11 @@ import type {
   DashboardUrgentMaintenanceRow,
 } from '#shared/types/dashboard'
 
+interface MaxDoneRow {
+  boatEngineId: number | string
+  maxDone: number | string
+}
+
 @inject()
 export default class DashboardService {
   constructor(private portService: PortService) {}
@@ -107,7 +112,7 @@ export default class DashboardService {
                 .groupBy('boat_engine_id')
                 .select('boat_engine_id as boatEngineId')
                 .max('done_engine_hours as maxDone')
-            ).map((r: any) => [Number(r.boatEngineId), Number(r.maxDone)])
+            ).map((r: MaxDoneRow) => [Number(r.boatEngineId), Number(r.maxDone)])
           )
 
     const engineHoursNow = new Map<number, number | null>()

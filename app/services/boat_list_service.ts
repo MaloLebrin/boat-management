@@ -30,6 +30,15 @@ export type BoatListItem = {
   }
 }
 
+interface SerializedBoatRow {
+  id: number | string
+  name: string
+  registrationNumber: string | null
+  type: string | null
+  propulsionType: string | null
+  updatedAt: string | null
+}
+
 function toTrimmedStringOrUndefined(value: unknown): string | undefined {
   if (typeof value !== 'string') return undefined
   const trimmed = value.trim()
@@ -107,15 +116,15 @@ export default class BoatListService {
     const paginator = await query.paginate(filters.page, filters.perPage)
 
     const serialized = paginator.serialize()
-    const boatIds = (serialized.data ?? [])
-      .map((b: any) => Number(b.id))
-      .filter((id: any) => id > 0)
+    const boatIds = (serialized.data as SerializedBoatRow[] ?? [])
+      .map((b) => Number(b.id))
+      .filter((id) => id > 0)
 
     const badgeService = new BoatMaintenanceBadgeService()
     const badges = await badgeService.getForBoatIds(user.organizationId, boatIds)
     return {
       boats: {
-        data: (serialized.data ?? []).map((b: any) => ({
+        data: (serialized.data as SerializedBoatRow[] ?? []).map((b) => ({
           id: b.id,
           name: b.name,
           registrationNumber: b.registrationNumber ?? null,

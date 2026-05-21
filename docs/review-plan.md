@@ -132,12 +132,12 @@ Généré le 2026-05-20. Se référer à ce fichier pour suivre l'avancement des
   - Présent dans : `boat_equipment_controller.ts`, `boat_media_controller.ts`, `boat_engine_parts_controller.ts`, `boat_safety_equipment_controller.ts`, `boat_maintenance_sheets_controller.ts`, `boat_maintenance_sheet_items_controller.ts`
   - Fix : extraire dans un middleware ou helper partagé `loadBoatOrRedirect(ctx)`
 
-- [ ] **REF-P2-3 — Logique métier dans des controllers**
+- [x] **REF-P2-3 — Logique métier dans des controllers**
   - `app/controllers/planning_controller.ts` : méthodes `isOverdue()`, `isSoon()` avec logique de date
   - `app/controllers/maintenance_history_controller.ts` : agrégation de stats (`totalParts`, `distinctBoatIds`)
   - Fix : créer `PlanningService` ; enrichir `BoatMaintenanceService` avec les méthodes d'agrégation
 
-- [ ] **REF-P2-4 — `any` dans les raw queries**
+- [x] **REF-P2-4 — `any` dans les raw queries**
   - `app/services/boat_maintenance_badge_service.ts:57,113`
   - `app/services/dashboard_service.ts:110`
   - `app/services/boat_list_service.ts:109`

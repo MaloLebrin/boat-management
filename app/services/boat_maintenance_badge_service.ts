@@ -4,6 +4,16 @@ import { inject } from '@adonisjs/core'
 import db from '@adonisjs/lucid/services/db'
 import { DateTime } from 'luxon'
 
+interface DateBadgeRow {
+  boatId: number | string
+  nextDueAt: string | null
+}
+
+interface MaxDoneRow {
+  boatEngineId: number | string
+  maxDone: number | string
+}
+
 export type BoatMaintenanceBadge = {
   urgentCount: number
   upcomingCount: number
@@ -56,7 +66,7 @@ export default class BoatMaintenanceBadgeService {
       .whereHas('boat', (q) => q.where('organizationId', organizationId))
       .select(['boatId', 'dueAt'])
 
-    for (const row of dateRows as any[]) {
+    for (const row of dateRows as DateBadgeRow[]) {
       const boatId = Number(row.boatId)
       result.set(boatId, {
         urgentCount: 0,
@@ -112,7 +122,7 @@ export default class BoatMaintenanceBadgeService {
                 .groupBy('boat_engine_id')
                 .select('boat_engine_id as boatEngineId')
                 .max('done_engine_hours as maxDone')
-            ).map((r: any) => [Number(r.boatEngineId), Number(r.maxDone)])
+            ).map((r: MaxDoneRow) => [Number(r.boatEngineId), Number(r.maxDone)])
           )
 
     const engineHoursNow = new Map<number, number | null>()
