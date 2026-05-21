@@ -76,12 +76,12 @@ Généré le 2026-05-20. Se référer à ce fichier pour suivre l'avancement des
   - `app/services/boat_maintenance_service.ts` → `CreateMaintenancePayload`
   - Fix : créer `shared/types/boat.ts`, `shared/types/maintenance.ts` et y déplacer ces types
 
-- [ ] **REF-P1-4 — Interfaces définies inline dans des controllers**
+- [x] **REF-P1-4 — Interfaces définies inline dans des controllers**
   - `app/controllers/planning_controller.ts:6` → `interface PlanningTask`
   - `app/controllers/maintenance_history_controller.ts:5` → `interface MaintenanceHistoryEvent`, `MaintenanceHistoryStats`
   - Fix : déplacer dans `shared/types/planning.ts` (à créer)
 
-- [ ] **REF-P1-5 — `payload.subject as any`** `app/controllers/boat_maintenance_tasks_controller.ts:36`
+- [x] **REF-P1-5 — `payload.subject as any`** `app/controllers/boat_maintenance_tasks_controller.ts:36`
   - Fix : utiliser `vine.enum([...] as const)` dans le validator pour que TypeScript infère le bon type, ou caster vers `MaintenanceTaskSubject` explicitement
 
 ### P2 — Importants

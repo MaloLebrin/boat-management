@@ -16,14 +16,21 @@ import type { HttpContext } from '@adonisjs/core/http'
 
 @inject()
 export default class BoatsController {
-  constructor(private boatService: BoatService) {}
+  constructor(
+    private boatService: BoatService,
+    private maintenanceService: BoatMaintenanceService,
+    private taskService: BoatMaintenanceTaskService,
+    private sheetService: BoatMaintenanceSheetService,
+    private mediaService: MediaService,
+    private aiAnalysisService: AiAnalysisService,
+    private boatListService: BoatListService
+  ) {}
 
   async index({ inertia, auth, request }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
-    const boatListService = new BoatListService()
-    const { boats, filters } = await boatListService.listForUser(user, request.qs())
+    const { boats, filters } = await this.boatListService.listForUser(user, request.qs())
 
     return inertia.render('boats/index', {
       boats,
@@ -84,40 +91,36 @@ export default class BoatsController {
     const user = auth.getUserOrFail()
 
     try {
-      const boat = await this.boatService.getForUserOrFail(user, Number(params.id))
+      const boat = await this.boatService.getFullDetailForUser(user, Number(params.id))
       await bouncer.authorize('boatView', boat)
-      const maintenanceService = new BoatMaintenanceService()
-      const maintenanceEvents = await maintenanceService.listForBoat(user, boat)
-      const taskService = new BoatMaintenanceTaskService()
-      const maintenanceTasks = await taskService.listForBoat(user, boat)
-      const sheetService = new BoatMaintenanceSheetService()
-      const maintenanceSheets = await sheetService.listForBoat(user, boat)
-      const canManageMaintenance = await bouncer.allows('boatUpdate', boat)
+
+      const [
+        maintenanceEvents,
+        maintenanceTasks,
+        maintenanceSheets,
+        boatMedia,
+        positionHistory,
+        latestSuggestions,
+        canManageMaintenance,
+      ] = await Promise.all([
+        this.maintenanceService.listForBoat(user, boat),
+        this.taskService.listForBoat(user, boat),
+        this.sheetService.listForBoat(user, boat),
+        this.mediaService.listForEntity('boat', boat.id),
+        BoatPositionHistory.query()
+          .where('boatId', boat.id)
+          .preload('spot', (q) =>
+            q
+              .preload('pontoon', (pq) => pq.preload('port'))
+              .preload('mouillage', (mq) => mq.preload('port'))
+          )
+          .orderBy('startedAt', 'desc')
+          .limit(20),
+        this.aiAnalysisService.getLatestBoatSuggestions(user.id, boat.id),
+        bouncer.allows('boatUpdate', boat),
+      ])
+
       const canManageEquipment = canManageMaintenance
-      const mediaService = new MediaService()
-      const boatMedia = await mediaService.listForEntity('boat', boat.id)
-      await boat.load('safetyEquipment')
-
-      if (boat.spotId !== null) {
-        await boat.load('spot', (q) =>
-          q
-            .preload('pontoon', (pq) => pq.preload('port'))
-            .preload('mouillage', (mq) => mq.preload('port'))
-        )
-      }
-
-      const positionHistory = await BoatPositionHistory.query()
-        .where('boatId', boat.id)
-        .preload('spot', (q) =>
-          q
-            .preload('pontoon', (pq) => pq.preload('port'))
-            .preload('mouillage', (mq) => mq.preload('port'))
-        )
-        .orderBy('startedAt', 'desc')
-        .limit(20)
-
-      const aiAnalysisService = new AiAnalysisService()
-      const latestSuggestions = await aiAnalysisService.getLatestBoatSuggestions(user.id, boat.id)
       const aiSuggestions: AiSuggestion[] | null = latestSuggestions
         ? (JSON.parse(latestSuggestions.responseText) as AiSuggestion[])
         : null

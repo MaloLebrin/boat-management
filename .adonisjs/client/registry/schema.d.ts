@@ -935,12 +935,12 @@ export interface Registry {
     methods: ["POST"]
     pattern: '/login'
     types: {
-      body: {}
+      body: ExtractBody<InferInput<(typeof import('#validators/user').loginValidator)>>
       paramsTuple: []
       params: {}
-      query: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/user').loginValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/session_controller').default['store']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/session_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/session_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'password.forgot': {

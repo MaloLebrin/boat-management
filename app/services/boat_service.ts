@@ -64,6 +64,27 @@ export default class BoatService {
     return boat
   }
 
+  async getFullDetailForUser(user: User, boatId: number) {
+    if (user.organizationId === null) throw new BoatNotFoundError()
+
+    const boat = await Boat.query()
+      .where('id', boatId)
+      .where('organizationId', user.organizationId)
+      .preload('engines')
+      .preload('sails')
+      .preload('rig')
+      .preload('safetyEquipment')
+      .preload('spot', (q) =>
+        q
+          .preload('pontoon', (pq) => pq.preload('port'))
+          .preload('mouillage', (mq) => mq.preload('port'))
+      )
+      .first()
+
+    if (!boat) throw new BoatNotFoundError()
+    return boat
+  }
+
   async createForUser(user: User, payload: BoatHullPayload) {
     if (user.organizationId === null) {
       throw new Error('User must belong to an organization to create boats')
