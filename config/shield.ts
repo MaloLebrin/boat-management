@@ -6,20 +6,26 @@ const shieldConfig = defineConfig({
    * to learn more.
    */
   csp: {
-    /**
-     * Enable the Content-Security-Policy header.
-     */
-    enabled: false,
+    enabled: true,
 
-    /**
-     * Per-resource CSP directives.
-     */
-    directives: {},
+    directives: {
+      defaultSrc: ["'self'"],
+      // nonce géré automatiquement par Shield pour @vite et @inertiaHead
+      scriptSrc: ["'self'", "'nonce-{{nonce}}'"],
+      styleSrc: ["'self'", "'nonce-{{nonce}}'"],
+      // Cloudinary CDN pour les images uploadées
+      imgSrc: ["'self'", 'data:', 'res.cloudinary.com'],
+      // Polices bundlées localement via Fontsource, pas de CDN externe
+      fontSrc: ["'self'"],
+      connectSrc: ["'self'"],
+      frameSrc: ["'none'"],
+      objectSrc: ["'none'"],
+      baseUri: ["'self'"],
+    },
 
-    /**
-     * Report violations without blocking resources.
-     */
-    reportOnly: false,
+    // Mode observation : log les violations sans rien bloquer.
+    // Passer à false une fois zéro violation constatée en production.
+    reportOnly: true,
   },
 
   /**
