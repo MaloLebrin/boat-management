@@ -17,6 +17,7 @@ router
   .post('/locale', ({ request, response }) => {
     const locale = request.input('locale')
     if (locale === 'en' || locale === 'fr') {
+      // httpOnly: false is intentional — the JS language switcher reads this cookie client-side
       response.cookie('locale', locale, { maxAge: '365d', path: '/', httpOnly: false })
     }
     return response.redirect().back()

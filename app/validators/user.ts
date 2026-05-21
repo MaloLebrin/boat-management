@@ -9,7 +9,7 @@ export const loginValidator = vine.create({
 })
 
 export const signupValidator = vine.create({
-  fullName: vine.string().nullable(),
+  fullName: vine.string().maxLength(255).nullable(),
   email: email().unique({ table: 'users', column: 'email' }),
   password: password().confirmed({
     confirmationField: 'passwordConfirmation',
