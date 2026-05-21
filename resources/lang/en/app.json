@@ -463,6 +463,14 @@
       "delete": "Delete",
       "mfg": "Mfg.",
       "sn": "SN",
+      "powerUnit": "hp",
+      "kindValues": {
+        "inboard": "Inboard",
+        "outboard": "Outboard",
+        "electric": "Electric",
+        "hybrid": "Hybrid",
+        "other": "Other"
+      },
       "fields": {
         "kind": "Kind",
         "fuel": "Fuel",

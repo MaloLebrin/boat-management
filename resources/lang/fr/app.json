@@ -463,6 +463,14 @@
       "delete": "Supprimer",
       "mfg": "Installé le",
       "sn": "N° série",
+      "powerUnit": "cv",
+      "kindValues": {
+        "inboard": "Inbord",
+        "outboard": "Hors-bord",
+        "electric": "Électrique",
+        "hybrid": "Hybride",
+        "other": "Autre"
+      },
       "fields": {
         "kind": "Type",
         "fuel": "Carburant",

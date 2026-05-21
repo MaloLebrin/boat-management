@@ -59,7 +59,7 @@ function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutra
         <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
           <div class="min-w-0">
             <div class="flex flex-wrap items-center gap-2">
-              <p class="truncate text-sm font-semibold text-fg">{{ e.kind }}</p>
+              <p class="truncate text-sm font-semibold text-fg">{{ t(`boats.engines.kindValues.${e.kind}`) }}</p>
               <BaseBadge v-if="e.fuel" variant="neutral">
                 {{ e.fuel }}
               </BaseBadge>
@@ -76,7 +76,7 @@ function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutra
                 v-if="e.powerHp !== null"
                 class="rounded-full bg-surface-elevated px-2 py-1 ring-1 ring-border"
               >
-                {{ e.powerHp }} hp
+                {{ e.powerHp }} {{ t('boats.engines.powerUnit') }}
               </span>
               <span
                 v-if="e.hours !== null"
