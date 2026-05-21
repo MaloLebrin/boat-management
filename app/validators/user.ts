@@ -6,6 +6,7 @@ const password = () => vine.string().minLength(8).maxLength(32)
 export const loginValidator = vine.create({
   email: email(),
   password: vine.string().minLength(1).maxLength(255),
+  remember: vine.boolean().optional(),
 })
 
 export const signupValidator = vine.create({

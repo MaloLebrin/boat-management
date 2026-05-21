@@ -12,9 +12,9 @@ export default class SessionController {
   }
 
   async store({ request, auth, response }: HttpContext) {
-    const { email, password } = await request.validateUsing(loginValidator)
+    const { email, password, remember } = await request.validateUsing(loginValidator)
     const user = await this.userService.verifyCredentials(email, password)
-    await auth.use('web').login(user)
+    await auth.use('web').login(user, remember ?? false)
 
     response.redirect().toRoute('dashboard')
   }

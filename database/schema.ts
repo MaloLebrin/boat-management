@@ -587,6 +587,34 @@ export class QueueScheduleSchema extends BaseModel {
   declare toDate: DateTime | null
 }
 
+export class RateLimitSchema extends BaseModel {
+  static $columns = ['expire', 'key', 'points'] as const
+  $columns = RateLimitSchema.$columns
+  @column()
+  declare expire: bigint | number | null
+  @column({ isPrimary: true })
+  declare key: string
+  @column()
+  declare points: number
+}
+
+export class RememberMeTokenSchema extends BaseModel {
+  static $columns = ['createdAt', 'expiresAt', 'hash', 'id', 'tokenableId', 'updatedAt'] as const
+  $columns = RememberMeTokenSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column.dateTime()
+  declare expiresAt: DateTime
+  @column()
+  declare hash: string
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare tokenableId: number | null
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
+}
+
 export class SpotSchema extends BaseModel {
   static $columns = ['createdAt', 'description', 'id', 'mouillageId', 'name', 'organizationId', 'pontoonId', 'updatedAt'] as const
   $columns = SpotSchema.$columns
