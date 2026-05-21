@@ -54,6 +54,9 @@ const resolvedError = computed(() => {
 
 <template>
   <BaseField :label="label" :hint="hint" :error="resolvedError" :html-for="id">
+    <template v-if="$slots['label-right']" #label-right>
+      <slot name="label-right" />
+    </template>
     <div class="relative">
       <input
         :id="id"

@@ -1,15 +1,15 @@
 <script lang="ts">
-import PublicLayout from '~/layouts/public.vue'
+import AuthLayout from '~/layouts/auth.vue'
 
 export default {
-  layout: PublicLayout,
+  layout: AuthLayout,
 }
 </script>
 
 <script setup lang="ts">
 import { Form } from '@adonisjs/inertia/vue'
 import { Head, usePage } from '@inertiajs/vue3'
-import BaseButton from '~/components/base/BaseButton.vue'
+import AuthNavyPanel from '~/components/auth/AuthNavyPanel.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import { useT } from '~/composables/useT'
 
@@ -20,87 +20,123 @@ const page = usePage()
 <template>
   <Head :title="t('auth.forgotPassword.title')" />
 
-  <div class="-mx-6 -my-10 sm:-mx-8 flex min-h-[calc(100vh-4rem)] overflow-hidden">
+  <div class="flex min-h-[calc(100vh-5rem)] overflow-hidden">
 
-    <!-- Panneau gauche navy -->
-    <div class="hidden w-[42%] flex-col justify-between bg-navy-800 px-12 py-16 lg:flex">
-      <div>
-        <div class="inline-flex items-center gap-2">
-          <svg width="28" height="28" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <circle cx="32" cy="32" r="28" stroke="#faf6ee" stroke-width="2.6" />
-            <path d="M32 9 L37.5 32 L32 36.5 L26.5 32 Z" fill="#faf6ee" />
-            <path d="M32 55 L37.5 32 L32 27.5 L26.5 32 Z" fill="#e2674f" />
-            <circle cx="32" cy="32" r="2.4" fill="#102a40" stroke="#faf6ee" stroke-width="1.4" />
-          </svg>
-          <span class="font-display text-base text-white" style="letter-spacing:-0.025em">Fleet<em style="font-style:italic;color:#e2674f">Ai</em></span>
-        </div>
-        <h2 class="mt-8 font-display text-3xl italic leading-snug text-white">
-          {{ t('auth.login.marketing.tagline') }}
-        </h2>
-        <p class="mt-4 text-base leading-relaxed text-white/70">
-          {{ t('auth.login.marketing.subtitle') }}
-        </p>
+    <AuthNavyPanel mode="forgot" />
+
+    <!-- Right panel -->
+    <div class="flex flex-1 flex-col bg-cream">
+
+      <!-- Top-right helper -->
+      <div class="flex items-center justify-end gap-3.5 px-8 py-6">
+        <span class="text-xs text-fg-muted">{{ t('auth.login.needHelp') }}</span>
+        <a
+          href="mailto:support@fleetai.io"
+          class="rounded-md border border-bone bg-white px-2.5 py-1.5 text-xs font-semibold text-fg transition-colors hover:bg-paper"
+        >
+          {{ t('auth.login.contactSupport') }}
+        </a>
       </div>
 
-      <ul class="space-y-3">
-        <li
-          v-for="key in ['auth.login.marketing.feature0', 'auth.login.marketing.feature1', 'auth.login.marketing.feature2']"
-          :key="key" class="flex items-center gap-3 text-sm text-white/70">
-          <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-white/50" />
-          {{ t(key) }}
-        </li>
-      </ul>
+      <!-- Form, vertically centred -->
+      <div class="flex flex-1 flex-col items-center justify-center px-8 pb-12 lg:px-16">
+        <div class="w-full max-w-sm">
 
-      <p class="text-xs text-white/30">{{ t('auth.login.marketing.copyright', { year: String(new Date().getFullYear()) }) }}</p>
-    </div>
-
-    <!-- Panneau droit crème -->
-    <div class="flex flex-1 flex-col justify-center bg-cream px-8 py-12 lg:px-16">
-      <div class="mx-auto w-full max-w-sm">
-        <div class="space-y-1.5">
-          <h1 class="font-display text-2xl italic text-fg">{{ t('auth.forgotPassword.title') }}</h1>
-          <p class="text-sm text-fg-muted">{{ t('auth.forgotPassword.subtitle') }}</p>
-        </div>
-
-        <div class="mt-8">
-          <div
-            v-if="page.props.flash?.success"
-            class="mb-6 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800"
+          <!-- Back link -->
+          <a
+            href="/login"
+            class="mb-4 inline-flex items-center gap-1.5 text-[12px] text-fg-muted no-underline transition-colors hover:text-fg"
           >
-            {{ page.props.flash.success }}
-          </div>
-
-          <div
-            v-if="page.props.flash?.error"
-            class="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"
-          >
-            {{ page.props.flash.error }}
-          </div>
-
-          <Form route="password.forgot" #default="{ processing, errors }">
-            <div class="space-y-5">
-              <BaseInput
-                id="email"
-                name="email"
-                type="email"
-                autocomplete="username"
-                :label="t('auth.forgotPassword.emailLabel')"
-                :placeholder="t('auth.forgotPassword.emailPlaceholder')"
-                :errors="errors"
-              />
-
-              <BaseButton type="submit" size="lg" :disabled="processing" class="w-full">
-                {{ t('auth.forgotPassword.submit') }}
-              </BaseButton>
-            </div>
-          </Form>
-        </div>
-
-        <p class="mt-6 text-center text-sm text-fg-muted">
-          <a href="/login" class="font-semibold text-brand hover:underline">
-            {{ t('auth.forgotPassword.backToLogin') }}
+            ← {{ t('auth.forgotPassword.backToLogin') }}
           </a>
-        </p>
+
+          <p class="text-[11px] font-semibold uppercase tracking-[0.12em] text-fg-muted">
+            {{ t('auth.forgotPassword.eyebrow') }}
+          </p>
+          <h1 class="mt-3.5 font-display text-[36px] leading-[1.05] text-fg" style="letter-spacing:-0.02em">
+            {{ t('auth.forgotPassword.titleNew') }}
+          </h1>
+          <p class="mt-1.5 text-sm text-fg-muted">
+            {{ t('auth.forgotPassword.subtitleNew') }}
+          </p>
+
+          <div class="mt-7 flex flex-col gap-3.5">
+
+            <!-- Flash messages -->
+            <div
+              v-if="page.props.flash?.success"
+              class="flex flex-col gap-2 rounded-[10px] border p-4"
+              style="background:#e6f3ec; border-color:#cfe8de"
+            >
+              <div class="flex items-center gap-2.5">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1f6b54" stroke-width="2.2"
+                  stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M5 12l5 5L20 7" />
+                </svg>
+                <strong class="text-sm text-[#1f6b54]">{{ t('auth.forgotPassword.successTitle') }}</strong>
+              </div>
+              <p class="text-[13px] leading-relaxed text-[#1f6b54]">
+                {{ t('auth.forgotPassword.successContent') }}
+              </p>
+              <a href="/login" class="mt-1 text-[12px] font-semibold text-[#1f6b54]">
+                {{ t('auth.forgotPassword.resend') }}
+              </a>
+            </div>
+
+            <div
+              v-else-if="page.props.flash?.error"
+              class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"
+            >
+              {{ page.props.flash.error }}
+            </div>
+
+            <template v-if="!page.props.flash?.success">
+              <Form route="password.forgot" #default="{ processing, errors }">
+                <div class="flex flex-col gap-3.5">
+                  <BaseInput
+                    id="email"
+                    name="email"
+                    type="email"
+                    autocomplete="username"
+                    :label="t('auth.forgotPassword.emailLabel')"
+                    :placeholder="t('auth.forgotPassword.emailPlaceholder')"
+                    :hint="t('auth.forgotPassword.emailHint')"
+                    :errors="errors"
+                  />
+
+                  <button
+                    type="submit"
+                    :disabled="processing"
+                    class="flex w-full items-center justify-center gap-2 rounded-lg px-5 py-3.5 text-sm font-semibold text-white transition-all duration-150 disabled:opacity-60 hover:brightness-110"
+                    style="background:#0b1d2e"
+                  >
+                    {{ t('auth.forgotPassword.submit') }}
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                      stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M5 12h14M13 6l6 6-6 6" />
+                    </svg>
+                  </button>
+                </div>
+              </Form>
+            </template>
+
+            <!-- Spam warning -->
+            <div
+              class="flex gap-2.5 rounded-lg p-3.5"
+              style="background: rgba(11,29,46,0.04); border: 1px solid #ebe2d0"
+            >
+              <svg class="mt-0.5 shrink-0" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                stroke="#b87b1d" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M10.3 3.9L2.4 18a2 2 0 001.7 3h15.8a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0zM12 9v4M12 17h.01" />
+              </svg>
+              <p class="text-[12px] leading-relaxed text-fg-muted">
+                {{ t('auth.forgotPassword.spamWarning') }}
+              </p>
+            </div>
+
+          </div>
+
+        </div>
       </div>
     </div>
   </div>
