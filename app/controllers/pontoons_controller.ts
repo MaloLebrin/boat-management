@@ -33,13 +33,15 @@ export default class PontoonsController {
     const user = auth.getUserOrFail()
 
     try {
-      const port = await this.portService.getForUserOrFail(user, Number(params.portId))
-      const pontoon = await this.pontoonService.getForPortOrFail(port.id, Number(params.pontoonId))
+      const pontoon = await this.pontoonService.getForUserOrFail(
+        user,
+        Number(params.portId),
+        Number(params.pontoonId)
+      )
       const payload = await request.validateUsing(updatePontoonValidator)
       await this.pontoonService.updateForPort(pontoon, payload)
-      return response.redirect(`/ports/${port.id}`)
+      return response.redirect(`/ports/${params.portId}`)
     } catch (error) {
-      if (error instanceof PortNotFoundError) return response.redirect('/ports')
       if (error instanceof PontoonNotFoundError) return response.redirect(`/ports/${params.portId}`)
       throw error
     }
@@ -50,12 +52,14 @@ export default class PontoonsController {
     const user = auth.getUserOrFail()
 
     try {
-      const port = await this.portService.getForUserOrFail(user, Number(params.portId))
-      const pontoon = await this.pontoonService.getForPortOrFail(port.id, Number(params.pontoonId))
+      const pontoon = await this.pontoonService.getForUserOrFail(
+        user,
+        Number(params.portId),
+        Number(params.pontoonId)
+      )
       await this.pontoonService.deleteForPort(pontoon)
-      return response.redirect(`/ports/${port.id}`)
+      return response.redirect(`/ports/${params.portId}`)
     } catch (error) {
-      if (error instanceof PortNotFoundError) return response.redirect('/ports')
       if (error instanceof PontoonNotFoundError) return response.redirect(`/ports/${params.portId}`)
       if (error instanceof PontoonHasBoatsError) {
         session.flash('error', 'pontoon_has_boats')
@@ -70,13 +74,15 @@ export default class PontoonsController {
     const user = auth.getUserOrFail()
 
     try {
-      const port = await this.portService.getForUserOrFail(user, Number(params.portId))
-      const pontoon = await this.pontoonService.getForPortOrFail(port.id, Number(params.pontoonId))
+      const pontoon = await this.pontoonService.getForUserOrFail(
+        user,
+        Number(params.portId),
+        Number(params.pontoonId)
+      )
       const payload = await request.validateUsing(updatePositionValidator)
       await this.pontoonService.updatePosition(pontoon, payload)
       return response.redirect().back()
     } catch (error) {
-      if (error instanceof PortNotFoundError) return response.redirect('/ports')
       if (error instanceof PontoonNotFoundError) return response.redirect(`/ports/${params.portId}`)
       throw error
     }

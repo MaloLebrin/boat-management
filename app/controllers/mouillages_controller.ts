@@ -33,13 +33,15 @@ export default class MouillagesController {
     const user = auth.getUserOrFail()
 
     try {
-      const port = await this.portService.getForUserOrFail(user, Number(params.portId))
-      const mouillage = await this.mouillageService.getForPortOrFail(port.id, Number(params.mouillageId))
+      const mouillage = await this.mouillageService.getForUserOrFail(
+        user,
+        Number(params.portId),
+        Number(params.mouillageId)
+      )
       const payload = await request.validateUsing(updateMouillageValidator)
       await this.mouillageService.updateForPort(mouillage, payload)
-      return response.redirect(`/ports/${port.id}`)
+      return response.redirect(`/ports/${params.portId}`)
     } catch (error) {
-      if (error instanceof PortNotFoundError) return response.redirect('/ports')
       if (error instanceof MouillageNotFoundError) return response.redirect(`/ports/${params.portId}`)
       throw error
     }
@@ -50,12 +52,14 @@ export default class MouillagesController {
     const user = auth.getUserOrFail()
 
     try {
-      const port = await this.portService.getForUserOrFail(user, Number(params.portId))
-      const mouillage = await this.mouillageService.getForPortOrFail(port.id, Number(params.mouillageId))
+      const mouillage = await this.mouillageService.getForUserOrFail(
+        user,
+        Number(params.portId),
+        Number(params.mouillageId)
+      )
       await this.mouillageService.deleteForPort(mouillage)
-      return response.redirect(`/ports/${port.id}`)
+      return response.redirect(`/ports/${params.portId}`)
     } catch (error) {
-      if (error instanceof PortNotFoundError) return response.redirect('/ports')
       if (error instanceof MouillageNotFoundError) return response.redirect(`/ports/${params.portId}`)
       if (error instanceof MouillageHasBoatsError) {
         session.flash('error', 'mouillage_has_boats')
@@ -70,13 +74,15 @@ export default class MouillagesController {
     const user = auth.getUserOrFail()
 
     try {
-      const port = await this.portService.getForUserOrFail(user, Number(params.portId))
-      const mouillage = await this.mouillageService.getForPortOrFail(port.id, Number(params.mouillageId))
+      const mouillage = await this.mouillageService.getForUserOrFail(
+        user,
+        Number(params.portId),
+        Number(params.mouillageId)
+      )
       const payload = await request.validateUsing(updatePositionValidator)
       await this.mouillageService.updatePosition(mouillage, payload)
       return response.redirect().back()
     } catch (error) {
-      if (error instanceof PortNotFoundError) return response.redirect('/ports')
       if (error instanceof MouillageNotFoundError) return response.redirect(`/ports/${params.portId}`)
       throw error
     }

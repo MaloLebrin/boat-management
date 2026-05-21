@@ -2,6 +2,7 @@ import Boat from '#models/boat'
 import Pontoon from '#models/pontoon'
 import Spot from '#models/spot'
 import type Port from '#models/port'
+import type User from '#models/user'
 import { PontoonHasBoatsError, PontoonNotFoundError } from '#exceptions/port_errors'
 import { inject } from '@adonisjs/core'
 
@@ -15,6 +16,20 @@ export default class PontoonService {
   /**
    * Gets a pontoon for the given port or throws PontoonNotFoundError.
    */
+  async getForUserOrFail(user: User, portId: number, pontoonId: number): Promise<Pontoon> {
+    if (user.organizationId === null) throw new PontoonNotFoundError()
+    const orgId = user.organizationId
+
+    const pontoon = await Pontoon.query()
+      .where('id', pontoonId)
+      .where('portId', portId)
+      .whereHas('port', (q) => q.where('organizationId', orgId))
+      .first()
+
+    if (!pontoon) throw new PontoonNotFoundError()
+    return pontoon
+  }
+
   async getForPortOrFail(portId: number, pontoonId: number): Promise<Pontoon> {
     const pontoon = await Pontoon.query()
       .where('id', pontoonId)

@@ -147,7 +147,7 @@ Généré le 2026-05-20. Se référer à ce fichier pour suivre l'avancement des
   - Manquent : `shared/types/boat.ts`, `shared/types/maintenance.ts`, `shared/types/planning.ts`, `shared/types/media.ts`
   - Note : dépendance de REF-P1-3 et REF-P1-4 — à traiter ensemble
 
-- [ ] **REF-P2-6 — Pattern de vérification d'organisation dupliqué dans les controllers port/pontoon/mouillage**
+- [x] **REF-P2-6 — Pattern de vérification d'organisation dupliqué dans les controllers port/pontoon/mouillage**
   - Présent dans : `ports_controller.ts`, `pontoons_controller.ts`, `mouillages_controller.ts`, `spots_controller.ts`
   - Fix : ajouter `getForUserOrFail()` dans `PontoonService` et `MouillageService` sur le modèle de `BoatService.getForUserOrFail()`
 
