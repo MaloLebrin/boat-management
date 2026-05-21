@@ -19,29 +19,26 @@ Généré le 2026-05-20. Se référer à ce fichier pour suivre l'avancement des
   - `request.all()` brut sans contrainte de longueur ou de format sur email/password
   - Fix : créer un `loginValidator` (`vine.string().email().maxLength(254)` + `vine.string().minLength(1).maxLength(255)`)
 
-- [ ] **SEC-H3 — CSP désactivé** `config/shield.ts:8`
+- [x] **SEC-H3 — CSP désactivé** `config/shield.ts:8`
   - `csp.enabled: false` en production
   - Fix : activer avec `default-src 'self'`, adapter pour Cloudinary (`img-src`), Vite CDN, etc.
 
 ### Medium
 
-- [ ] **SEC-M1 — Absence de rate limiting** `start/routes/auth.ts`, `start/routes/ai.ts`
+- [x] **SEC-M1 — Absence de rate limiting** `start/routes/auth.ts`, `start/routes/ai.ts`
   - Routes concernées : `POST /login`, `POST /forgot-password`, `POST /reset-password`, `POST /ai/chat`, `POST /ai/fleet-analysis`, `POST /ai/boats/:id/suggestions`
   - Fix : intégrer `@adonisjs/limiter` en named middleware sur ces groupes de routes
 
-- [ ] **SEC-M2 — AI Chat : `response.json()` sur route Inertia + messages non validés** `app/controllers/ai_controller.ts:14`
+- [x] **SEC-M2 — AI Chat : `response.json()` sur route Inertia + messages non validés** `app/controllers/ai_controller.ts:14`
   - `response.badRequest({ error })` / `response.accepted(...)` → JSON brut sur route Inertia
   - Tableau `messages` accepté sans validation de structure (rôle, contenu, longueur, nombre)
   - Fix : remplacer par `session.flash()` + `response.redirect().back()` ; ajouter un validator VineJS pour le schéma `{ role: enum, content: string.maxLength(4000) }`
 
-- [ ] **SEC-M3 — `cloudinaryPublicId` exposé dans les props Inertia** `app/controllers/boats_controller.ts:200`, `app/controllers/boat_equipment_controller.ts:346`
+- [x] **SEC-M3 — `cloudinaryPublicId` exposé dans les props Inertia** `app/controllers/boats_controller.ts:200`, `app/controllers/boat_equipment_controller.ts:346`
   - Exposé inutilement dans toutes les props, pas seulement sur les composants de suppression
   - Fix : ne passer `cloudinaryPublicId` que si strictement nécessaire à l'action frontend
 
-- [ ] **SEC-M4 — `/design-system` accessible sans auth** `start/routes/home.ts:12`
-  - Fix : ajouter `.use(middleware.auth())` ou documenter l'accès public intentionnel
-
-- [ ] **SEC-M5 — Token de reset en clair + pas de `timingSafeEqual`** `app/services/password_reset_service.ts:24`
+- [x] **SEC-M5 — Token de reset en clair + pas de `timingSafeEqual`** `app/services/password_reset_service.ts:24`
   - Token stocké en clair en base, comparaison SQL sujette aux timing attacks
   - Fix : stocker un hash SHA-256, comparer avec `crypto.timingSafeEqual`
 

@@ -4,6 +4,7 @@ import BoatMaintenanceService from '#services/boat_maintenance_service'
 import BoatMaintenanceTaskService from '#services/boat_maintenance_task_service'
 import BoatService, { BoatNotFoundError } from '#services/boat_service'
 import DashboardService from '#services/dashboard_service'
+import { aiChatValidator } from '#validators/ai'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 
@@ -18,18 +19,16 @@ export default class AiController {
     private boatMaintenanceTaskService: BoatMaintenanceTaskService
   ) {}
 
-  async chat({ request, response, auth, i18n }: HttpContext) {
+  async chat({ request, response, auth, session, i18n }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
-    const messages = request.input('messages')
-    if (!Array.isArray(messages) || messages.length === 0) {
-      return response.badRequest({ error: i18n.t('flash.ai.messagesRequired') })
-    }
+    const { messages } = await request.validateUsing(aiChatValidator)
 
     await this.aiQueueService.enqueueChat({ userId: user.id, messages })
 
-    return response.accepted({ status: 'queued' })
+    session.flash('info', i18n.t('flash.ai.chatQueued'))
+    return response.redirect().back()
   }
 
   async fleetAnalysis({ response, auth, session, i18n }: HttpContext) {

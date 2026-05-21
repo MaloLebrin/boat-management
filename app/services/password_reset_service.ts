@@ -3,7 +3,11 @@ import User from '#models/user'
 import { inject } from '@adonisjs/core'
 import hashService from '@adonisjs/core/services/hash'
 import { DateTime } from 'luxon'
-import { randomBytes } from 'node:crypto'
+import { createHash, randomBytes, timingSafeEqual } from 'node:crypto'
+
+function sha256(value: string): string {
+  return createHash('sha256').update(value).digest('hex')
+}
 
 @inject()
 export default class PasswordResetService {
@@ -16,7 +20,7 @@ export default class PasswordResetService {
     const token = randomBytes(64).toString('hex')
     await PasswordResetToken.create({
       email,
-      token,
+      token: sha256(token),
       expiresAt: DateTime.now().plus({ hours: 1 }),
     })
 
@@ -24,8 +28,15 @@ export default class PasswordResetService {
   }
 
   async verifyToken(token: string): Promise<PasswordResetToken | null> {
-    const record = await PasswordResetToken.findBy('token', token)
+    const tokenHash = sha256(token)
+    const record = await PasswordResetToken.findBy('token', tokenHash)
     if (!record) return null
+
+    // Defense-in-depth: constant-time comparison of stored vs computed hash
+    const stored = Buffer.from(record.token, 'hex')
+    const computed = Buffer.from(tokenHash, 'hex')
+    if (stored.length !== computed.length || !timingSafeEqual(stored, computed)) return null
+
     if (record.expiresAt < DateTime.now()) return null
     return record
   }

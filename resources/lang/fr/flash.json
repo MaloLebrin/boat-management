@@ -42,6 +42,7 @@
   },
   "ai": {
     "messagesRequired": "Le champ messages est obligatoire.",
+    "chatQueued": "Votre message a bien été envoyé.",
     "analysisError": "Une erreur s'est produite lors de la génération de l'analyse. Veuillez réessayer."
   },
   "media": {

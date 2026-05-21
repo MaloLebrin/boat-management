@@ -13,7 +13,6 @@ export type MediaRow = {
   id: number
   kind: 'photo' | 'document'
   secureUrl: string
-  cloudinaryPublicId: string
   originalFilename: string
   format: string
   bytes: number

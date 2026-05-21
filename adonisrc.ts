@@ -66,6 +66,7 @@ export default defineConfig({
     () => import('@adonisjs/queue/queue_provider'),
     () => import('@adonisjs/i18n/i18n_provider'),
     () => import('@adonisjs/mail/mail_provider'),
+    () => import('@adonisjs/limiter/limiter_provider'),
   ],
 
   /*
@@ -80,6 +81,7 @@ export default defineConfig({
     () => import('#start/routes'),
     () => import('#start/kernel'),
     () => import('#start/validator'),
+    () => import('#start/limiter'),
     {
       file: () => import('#start/scheduler'),
       environment: ['web'],

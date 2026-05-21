@@ -343,7 +343,6 @@ export default class BoatEquipmentController {
           id: m.id,
           kind: m.kind,
           secureUrl: m.secureUrl,
-          cloudinaryPublicId: m.cloudinaryPublicId,
           originalFilename: m.originalFilename,
           format: m.format,
           bytes: m.bytes,

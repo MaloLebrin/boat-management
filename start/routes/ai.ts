@@ -1,4 +1,5 @@
 import { middleware } from '#start/kernel'
+import { aiThrottle } from '#start/limiter'
 import router from '@adonisjs/core/services/router'
 
 router
@@ -14,4 +15,4 @@ router
       ])
       .as('ai.boatSuggestions')
   })
-  .use(middleware.auth())
+  .use([middleware.auth(), aiThrottle])

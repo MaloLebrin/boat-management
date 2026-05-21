@@ -9,7 +9,6 @@ export default class MediaTransformer extends BaseTransformer<Media> {
       'entityId',
       'kind',
       'secureUrl',
-      'cloudinaryPublicId',
       'originalFilename',
       'format',
       'bytes',

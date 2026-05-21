@@ -129,7 +129,6 @@ function toMedia(m: Media) {
     id: m.id,
     kind: m.kind as 'photo' | 'document',
     secureUrl: m.secureUrl,
-    cloudinaryPublicId: m.cloudinaryPublicId,
     originalFilename: m.originalFilename,
     format: m.format,
     bytes: m.bytes,
