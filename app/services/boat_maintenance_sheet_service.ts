@@ -5,13 +5,14 @@ import {
 import BoatMaintenanceSheet from '#models/boat_maintenance_sheet'
 import BoatMaintenanceSheetItem from '#models/boat_maintenance_sheet_item'
 import BoatMaintenanceSheetTemplateService from '#services/boat_maintenance_sheet_template_service'
-import type { SheetType } from '#services/boat_maintenance_sheet_template_service'
+import type { CreateSheetPayload, SheetType, UpdateItemPayload } from '#shared/types/maintenance'
 import type Boat from '#models/boat'
 import type User from '#models/user'
 import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
 
 export { BoatMaintenanceSheetItemNotFoundError, BoatMaintenanceSheetNotFoundError }
+export type { CreateSheetPayload, SheetType, UpdateItemPayload }
 
 function toDateTime(value: Date | DateTime): DateTime {
   if (DateTime.isDateTime(value)) return value
@@ -22,18 +23,6 @@ function assertBoatScope(user: User, boat: Boat) {
   if (user.organizationId === null || user.organizationId !== boat.organizationId) {
     throw new BoatMaintenanceSheetNotFoundError()
   }
-}
-
-export type CreateSheetPayload = {
-  type: SheetType
-  title: string
-  performedAt: Date | DateTime
-  notes: string | null
-}
-
-export type UpdateItemPayload = {
-  isDone: boolean
-  notes: string | null
 }
 
 @inject()

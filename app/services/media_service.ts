@@ -1,21 +1,15 @@
 import { MediaNotFoundError } from '#exceptions/media_errors'
 import type { MultipartFile } from '@adonisjs/core/bodyparser'
+import type { MediaEntityType, MediaKind } from '#shared/constants/media'
+import type { UploadMediaPayload } from '#shared/types/media'
 import { inject } from '@adonisjs/core'
 import db from '@adonisjs/lucid/services/db'
-import type { MediaEntityType, MediaKind } from '#shared/constants/media'
 import Media from '#models/media'
 import type User from '#models/user'
 import { CloudinaryService } from '#services/cloudinary_service'
 
 export { MediaNotFoundError }
-
-export type UploadMediaPayload = {
-  folder: string
-  entityType: MediaEntityType
-  entityId: number
-  kind: MediaKind
-  caption?: string | null
-}
+export type { UploadMediaPayload }
 
 function resourceTypeFromKind(kind: MediaKind, format?: string): 'image' | 'raw' {
   if (kind === 'photo') return 'image'

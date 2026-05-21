@@ -1,7 +1,7 @@
+import type { SheetTemplateItem, SheetType } from '#shared/types/maintenance'
 import { inject } from '@adonisjs/core'
 
-export type SheetTemplateItem = { label: string; position: number }
-export type SheetType = 'entretien' | 'montage' | 'hivernage' | 'dehivernage' | 'atelier'
+export type { SheetTemplateItem, SheetType }
 
 const templates: Record<SheetType, string[]> = {
   entretien: [

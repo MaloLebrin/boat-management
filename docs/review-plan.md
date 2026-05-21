@@ -143,7 +143,7 @@ Généré le 2026-05-20. Se référer à ce fichier pour suivre l'avancement des
   - `app/services/boat_list_service.ts:109`
   - Fix : déclarer des interfaces locales pour les rows Knex bruts (ex: `interface BadgeRow { boatId: number; nextDueAt: string | null }`)
 
-- [ ] **REF-P2-5 — `shared/types/` incomplet**
+- [x] **REF-P2-5 — `shared/types/` incomplet**
   - Manquent : `shared/types/boat.ts`, `shared/types/maintenance.ts`, `shared/types/planning.ts`, `shared/types/media.ts`
   - Note : dépendance de REF-P1-3 et REF-P1-4 — à traiter ensemble
 

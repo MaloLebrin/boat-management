@@ -1,34 +1,15 @@
 import Boat from '#models/boat'
 import BoatMaintenanceBadgeService from '#services/boat_maintenance_badge_service'
+import type {
+  BoatListDirection,
+  BoatListItem,
+  BoatListQuery,
+  BoatListSort,
+} from '#shared/types/boat'
 import type User from '#models/user'
 import { inject } from '@adonisjs/core'
 
-export type BoatListSort = 'recent' | 'name'
-export type BoatListDirection = 'asc' | 'desc'
-
-export type BoatListQuery = {
-  q?: string
-  type?: string
-  propulsionType?: string
-  sort?: BoatListSort
-  direction?: BoatListDirection
-  page?: number
-  perPage?: number
-}
-
-export type BoatListItem = {
-  id: number
-  name: string
-  registrationNumber: string | null
-  type: string | null
-  propulsionType: string | null
-  updatedAt: string | null
-  maintenance: {
-    urgentCount: number
-    upcomingCount: number
-    nextDueAt: string | null
-  }
-}
+export type { BoatListDirection, BoatListItem, BoatListQuery, BoatListSort }
 
 interface SerializedBoatRow {
   id: number | string

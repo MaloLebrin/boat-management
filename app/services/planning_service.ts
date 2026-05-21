@@ -1,16 +1,11 @@
 import Boat from '#models/boat'
 import BoatMaintenanceTask from '#models/boat_maintenance_task'
 import type User from '#models/user'
-import type { PlanningTask } from '#shared/types/planning'
+import type { PlanningResult, PlanningTask } from '#shared/types/planning'
 import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
 
-export interface PlanningResult {
-  tasks: PlanningTask[]
-  overdueTasks: PlanningTask[]
-  soonTasks: PlanningTask[]
-  plannedTasks: PlanningTask[]
-}
+export type { PlanningResult }
 
 @inject()
 export default class PlanningService {

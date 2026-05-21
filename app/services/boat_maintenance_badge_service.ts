@@ -1,8 +1,11 @@
 import BoatEngine from '#models/boat_engine'
 import BoatMaintenanceTask from '#models/boat_maintenance_task'
+import type { BoatMaintenanceBadge } from '#shared/types/maintenance'
 import { inject } from '@adonisjs/core'
 import db from '@adonisjs/lucid/services/db'
 import { DateTime } from 'luxon'
+
+export type { BoatMaintenanceBadge }
 
 interface DateBadgeRow {
   boatId: number | string
@@ -12,12 +15,6 @@ interface DateBadgeRow {
 interface MaxDoneRow {
   boatEngineId: number | string
   maxDone: number | string
-}
-
-export type BoatMaintenanceBadge = {
-  urgentCount: number
-  upcomingCount: number
-  nextDueAt: string | null
 }
 
 type BadgeOpts = {

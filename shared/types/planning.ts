@@ -32,3 +32,10 @@ export interface MaintenanceHistoryStats {
   totalParts: number
   totalBoats: number
 }
+
+export interface PlanningResult {
+  tasks: PlanningTask[]
+  overdueTasks: PlanningTask[]
+  soonTasks: PlanningTask[]
+  plannedTasks: PlanningTask[]
+}

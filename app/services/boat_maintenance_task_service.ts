@@ -7,30 +7,14 @@ import type Boat from '#models/boat'
 import type User from '#models/user'
 import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
-import type { MaintenanceTaskSubject } from '#shared/types/maintenance'
+import type {
+  CreateMaintenanceTaskPayload,
+  MaintenanceTaskSubject,
+  MarkTaskDonePayload,
+} from '#shared/types/maintenance'
 
 export { BoatMaintenanceTaskNotFoundError, BoatMaintenanceTaskValidationError }
-export type { MaintenanceTaskSubject }
-
-export type CreateMaintenanceTaskPayload = {
-  subject: MaintenanceTaskSubject
-  title: string
-  notes?: string | null
-  boatEngineId?: number | null
-  boatSailId?: number | null
-  boatRigId?: number | null
-
-  dueAt?: Date | string | DateTime | null
-  recurrenceIntervalMonths?: number | null
-
-  dueEngineHours?: number | null
-  recurrenceIntervalEngineHours?: number | null
-}
-
-export type MarkTaskDonePayload = {
-  doneAt?: Date | string | DateTime
-  doneEngineHours?: number | null
-}
+export type { CreateMaintenanceTaskPayload, MaintenanceTaskSubject, MarkTaskDonePayload }
 
 function toDateTime(value: Date | string | DateTime): DateTime {
   if (DateTime.isDateTime(value)) return value
