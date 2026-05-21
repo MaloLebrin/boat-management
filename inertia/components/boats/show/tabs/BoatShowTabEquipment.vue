@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { sortEnginesByStatus } from '#shared/helpers/engine'
 import { ref } from 'vue'
 import BoatShowEnginesCard from '~/components/boats/engine/BoatShowEnginesCard.vue'
 import BoatShowRigCard from '~/components/boats/rig/BoatShowRigCard.vue'
@@ -50,7 +51,7 @@ const isAddModalOpen = ref(false)
 
     <!-- Engine cards -->
     <div v-if="equipmentFilter === 'all' || equipmentFilter === 'engine'">
-      <BoatShowEnginesCard :boat-id="boat.id" :engines="boat.engines" :can-manage="canManageEquipment" />
+      <BoatShowEnginesCard :boat-id="boat.id" :engines="sortEnginesByStatus(boat.engines)" :can-manage="canManageEquipment" />
     </div>
 
     <!-- Sail cards -->
