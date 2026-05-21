@@ -1,0 +1,528 @@
+{
+  "new": {
+    "title": "New boat",
+    "subtitle": "Create a new boat in your organization",
+    "submit": "Create",
+    "cancel": "Cancel"
+  },
+  "edit": {
+    "title": "Edit boat",
+    "subtitle": "Update boat details",
+    "submit": "Save",
+    "cancel": "Cancel"
+  },
+  "hullFields": {
+    "name": "Name",
+    "registrationNumber": "Registration number",
+    "type": "Type",
+    "propulsionType": "Propulsion type",
+    "manufacturedAt": "Manufacturing date",
+    "lengthM": "Length (m)",
+    "beamM": "Beam (m)",
+    "draftM": "Draft (m)",
+    "mastHeightM": "Mast height (m)",
+    "hullMaterial": "Hull material",
+    "yearBuilt": "Year built",
+    "manufacturer": "Manufacturer",
+    "model": "Model",
+    "homePort": "Home port",
+    "navigationCategory": "Navigation category",
+    "hullIdentificationNumber": "Hull ID number (HIN/WIN)",
+    "francisationNumber": "Francisation number",
+    "flagCountry": "Flag",
+    "maxPersons": "Max persons on board",
+    "pontoon": "Pontoon",
+    "mouillage": "Anchorage",
+    "spotIdentifier": "Berth number"
+  },
+  "engines": {
+    "title": "Engines",
+    "addEngine": "Add engine",
+    "noEngines": "No engines.",
+    "viewDetail": "View detail",
+    "edit": "Edit",
+    "delete": "Delete",
+    "mfg": "Mfg.",
+    "sn": "SN",
+    "powerUnit": "hp",
+    "kindValues": {
+      "inboard": "Inboard",
+      "outboard": "Outboard",
+      "electric": "Electric",
+      "hybrid": "Hybrid",
+      "other": "Other"
+    },
+    "fields": {
+      "kind": "Kind",
+      "fuel": "Fuel",
+      "brand": "Brand",
+      "model": "Model",
+      "serialNumber": "Serial number",
+      "manufacturedAt": "Manufacturing date",
+      "powerHp": "Power (hp)",
+      "hours": "Hours",
+      "strokeType": "Engine cycle",
+      "installHours": "Hours at installation"
+    },
+    "modal": {
+      "title": "Add engine",
+      "cancel": "Cancel",
+      "submit": "Add engine"
+    }
+  },
+  "sails": {
+    "title": "Sails",
+    "addSail": "Add sail",
+    "noSails": "No sails.",
+    "reef": "Reef",
+    "mfg": "Mfg.",
+    "modal": {
+      "title": "Add sail",
+      "cancel": "Cancel",
+      "submit": "Add sail"
+    }
+  },
+  "rig": {
+    "title": "Rig",
+    "noRig": "No rig recorded.",
+    "fields": {
+      "rigType": "Rig type",
+      "mastCount": "Mast count",
+      "spreaders": "Spreaders",
+      "manufacturedAt": "Manufacturing date"
+    }
+  },
+  "options": {
+    "propulsion": {
+      "sailboat": "Sailboat",
+      "motorboat": "Motorboat",
+      "catamaran": "Catamaran",
+      "rib": "RIB",
+      "other": "Other"
+    },
+    "hullMaterial": {
+      "fiberglass": "Fiberglass",
+      "aluminum": "Aluminum",
+      "steel": "Steel",
+      "wood": "Wood",
+      "carbon": "Carbon",
+      "other": "Other"
+    },
+    "engineKind": {
+      "inboard": "Inboard",
+      "outboard": "Outboard",
+      "electric": "Electric",
+      "hybrid": "Hybrid",
+      "other": "Other"
+    },
+    "engineFuel": {
+      "diesel": "Diesel",
+      "essence": "Gasoline",
+      "electric": "Electric",
+      "other": "Other"
+    },
+    "sailType": {
+      "main": "Main",
+      "genoa": "Genoa",
+      "jib": "Jib",
+      "spinnaker": "Spinnaker",
+      "gennaker": "Gennaker",
+      "storm_jib": "Storm jib",
+      "other": "Other"
+    },
+    "rigType": {
+      "sloop": "Sloop",
+      "cutter": "Cutter",
+      "ketch": "Ketch",
+      "yawl": "Yawl",
+      "schooner": "Schooner",
+      "cat_rig": "Cat rig",
+      "other": "Other"
+    },
+    "strokeType": {
+      "2_stroke": "2-stroke",
+      "4_stroke": "4-stroke"
+    },
+    "navigationCategory": {
+      "A": "Category A – Ocean (>Force 8, >4m)",
+      "B": "Category B – Offshore (≤Force 8, ≤4m)",
+      "C": "Category C – Coastal (≤Force 6, ≤2m)",
+      "D": "Category D – Sheltered (≤Force 4, ≤0.3m)"
+    },
+    "safetyEquipmentType": {
+      "life_jacket": "Life jacket",
+      "life_raft": "Life raft",
+      "fire_extinguisher": "Fire extinguisher",
+      "vhf_radio": "VHF radio",
+      "flare": "Flare / distress signal",
+      "epirb": "EPIRB / PLB",
+      "first_aid_kit": "First aid kit",
+      "harness": "Safety harness",
+      "lifebuoy": "Lifebuoy",
+      "anchor": "Anchor",
+      "bilge_pump": "Bilge pump",
+      "compass": "Compass",
+      "ais": "AIS transponder",
+      "gps": "GPS / Chartplotter",
+      "radar": "Radar",
+      "other": "Other"
+    },
+    "safetyEquipmentStatus": {
+      "ok": "OK",
+      "to_check": "To check",
+      "expired": "Expired"
+    }
+  },
+  "index": {
+    "title": "Boats",
+    "subtitle": "All boats in your organization",
+    "newBoat": "New boat",
+    "empty": {
+      "title": "No boats yet",
+      "description": "Create your first vessel to start tracking.",
+      "action": "Create a boat"
+    }
+  },
+  "show": {
+    "registration": "Registration",
+    "type": "Type",
+    "propulsion": "Propulsion",
+    "addTask": "Add task",
+    "addEntry": "Add entry",
+    "editBoat": "Edit boat",
+    "deleteBoat": "Delete boat",
+    "tabs": {
+      "maintenance": "Maintenance",
+      "overview": "Overview",
+      "equipment": "Equipment",
+      "specs": "Specifications",
+      "history": "History",
+      "tasks": "Tasks",
+      "documents": "Documents",
+      "sheets": "Sheets"
+    },
+    "breadcrumbFleet": "Fleet",
+    "nextTasks": "Next tasks",
+    "status": {
+      "urgent": "Urgent",
+      "upcoming": "Upcoming",
+      "ok": "OK"
+    },
+    "mediaUpload": {
+      "addPhoto": "Add a photo",
+      "addDocument": "Add a document",
+      "dropzone": "Drop a file here or click to browse",
+      "browse": "Browse…",
+      "selectedFile": "Selected file",
+      "noFile": "No file selected",
+      "caption": "Caption (optional)",
+      "upload": "Upload",
+      "uploading": "Uploading…",
+      "photos": "Photos",
+      "documents": "Documents",
+      "noPhotos": "No photos yet.",
+      "noDocuments": "No documents yet.",
+      "photoFormats": "JPG, PNG, HEIC, WebP · max 10 MB",
+      "documentFormats": "PDF, XLSX, DOCX, CSV · max 20 MB",
+      "deletePhoto": "Delete photo",
+      "deleteDocument": "Delete document",
+      "modalTitle": "Add a document",
+      "modalSubtitle": "{name} · Stored on Cloudinary"
+    },
+    "overview": {
+      "overdueTasks": "{count} overdue task(s)",
+      "schedule": "Schedule",
+      "engineHours": "Engine hours",
+      "engineCount": "{count} engine(s)",
+      "lastMaintenance": "Last maintenance",
+      "nextTask": "Next task",
+      "overdue": "Overdue",
+      "dimensionsTitle": "Dimensions",
+      "length": "Length",
+      "beam": "Beam",
+      "draft": "Draft",
+      "mastHeight": "Mast height",
+      "viewSpecs": "View specifications →",
+      "recentActivityTitle": "Recent activity",
+      "recentActivityEmpty": "No recent activity.",
+      "viewHistory": "View full history →",
+      "aiTitle": "AI Assistant",
+      "aiEmpty": "Click 'Refresh' to get AI-powered suggestions.",
+      "aiRefresh": "Refresh",
+      "aiRefreshing": "Analyzing...",
+      "homePortTitle": "Home port",
+      "homePortEmpty": "Not specified",
+      "positionTitle": "Current berth",
+      "positionEmpty": "No berth assigned"
+    },
+    "position": {
+      "title": "Current berth",
+      "history": "Position history",
+      "arrivedOn": "Since",
+      "leftOn": "Until",
+      "noHistory": "No position history yet."
+    }
+  },
+  "specs": {
+    "identity": "Identity",
+    "dimensions": "Dimensions",
+    "hullMaterials": "Hull & materials",
+    "registration": "Registration & flag",
+    "equipmentOnBoard": "Equipment on board",
+    "editHint": "Specifications can be edited on the boat's edit page."
+  },
+  "safetyEquipment": {
+    "title": "Safety equipment",
+    "add": "Add equipment",
+    "noItems": "No safety equipment recorded.",
+    "equipmentType": "Type",
+    "quantity": "Quantity",
+    "expiryDate": "Expiry date",
+    "status": "Status",
+    "edit": "Edit",
+    "delete": "Delete",
+    "modal": {
+      "title": "Add equipment",
+      "editTitle": "Edit equipment",
+      "cancel": "Cancel",
+      "submit": "Save"
+    },
+    "confirmDelete": "Delete this item?"
+  },
+  "list": {
+    "search": "Search",
+    "searchPlaceholder": "Search by name or registration…",
+    "type": "Type",
+    "propulsion": "Propulsion",
+    "sort": "Sort",
+    "direction": "Direction",
+    "recent": "Recent",
+    "name": "Name",
+    "asc": "Asc",
+    "desc": "Desc",
+    "boats": "boats",
+    "clearFilters": "Clear filters",
+    "table": {
+      "name": "Name",
+      "registration": "Registration",
+      "type": "Type",
+      "propulsion": "Propulsion",
+      "maintenance": "Maintenance"
+    },
+    "cards": {
+      "unknownType": "Unknown type",
+      "unknownPropulsion": "Unknown propulsion"
+    },
+    "maintenance": {
+      "urgent": "{count} urgent",
+      "upcoming": "{count} upcoming",
+      "ok": "OK"
+    },
+    "viewTable": "Table",
+    "viewCards": "Cards"
+  },
+  "engineShow": {
+    "breadcrumb": {
+      "equipment": "Equipment"
+    },
+    "maintenanceRequired": "Maintenance required",
+    "installedIn": "Installed in {year}",
+    "tabs": {
+      "overview": "Overview",
+      "specs": "Specifications",
+      "maintenance": "Maintenance",
+      "notes": "Notes",
+      "parts": "Parts",
+      "documents": "Documents"
+    },
+    "actions": {
+      "edit": "Edit",
+      "addEvent": "+ Event",
+      "schedule": "Schedule",
+      "markDone": "Mark done",
+      "exportPdf": "Export PDF"
+    },
+    "overview": {
+      "totalHours": "Total hours",
+      "sinceLast": "Since last maint.",
+      "costYear": "12-month cost",
+      "gauge": "Engine hours gauge",
+      "recentMaintenance": "Recent maintenance",
+      "noEvent": "No event recorded",
+      "aiTitle": "AI Assistant",
+      "aiPrompt1": "When is the next oil change due?",
+      "aiPrompt2": "Engine failure history",
+      "nextDue": "Next due",
+      "noTaskPlanned": "No planned tasks"
+    },
+    "overdue": {
+      "title": "Maintenance overdue",
+      "detail": "{title} - Threshold of {hours} hours exceeded"
+    },
+    "specs": {
+      "identity": "Identity",
+      "brand": "Brand",
+      "model": "Model",
+      "serialNumber": "Serial number",
+      "installYear": "Installation year",
+      "installHours": "Hours at installation",
+      "characteristics": "Characteristics",
+      "power": "Power",
+      "fuel": "Fuel",
+      "type": "Type",
+      "thresholds": "Maintenance thresholds",
+      "noThreshold": "No threshold defined",
+      "every": "Every {hours} h",
+      "editHint": "To edit this engine's specifications, use the Edit button at the top of the page.",
+      "strokeType": "Engine cycle"
+    },
+    "maintenance": {
+      "upcoming": "Upcoming",
+      "noUpcoming": "No upcoming tasks",
+      "history": "History",
+      "noHistory": "No event recorded",
+      "taskStatus": {
+        "overdue": "Overdue",
+        "soon": "Soon",
+        "planned": "Planned"
+      },
+      "dueAt": "Due: {date}",
+      "dueHours": "{hours} hours",
+      "totalEvents": "Total events",
+      "totalParts": "Total parts",
+      "parts": "{count} part(s)"
+    },
+    "notes": {
+      "title": "Free notes",
+      "edit": "Edit",
+      "save": "Save",
+      "cancel": "Cancel",
+      "empty": "No notes yet. Click Edit to add some.",
+      "placeholder": "Type your free notes here..."
+    },
+    "parts": {
+      "title": "Compatible parts",
+      "designation": "Designation",
+      "reference": "Reference",
+      "stock": "Stock quantity",
+      "supplier": "Supplier",
+      "empty": "No parts recorded",
+      "comingSoon": "Coming soon",
+      "add": "Add a part",
+      "edit": "Edit",
+      "save": "Save",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "confirmDelete": "Delete this part?",
+      "notes": "Notes",
+      "actions": "Actions",
+      "addModalTitle": "Add a part",
+      "editModalTitle": "Edit part"
+    },
+    "documents": {
+      "manual": "Technical manual",
+      "invoices": "Invoices",
+      "other": "Other documents",
+      "dropzone": "Drop a file or click to upload",
+      "comingSoon": "Feature coming soon",
+      "modalSubtitle": "{name} · Stored on Cloudinary"
+    }
+  },
+  "maintenance": {
+    "events": {
+      "title": "Maintenance history",
+      "subtitle": "Work done on the boat, hull, engine, sail, rig, or other equipment.",
+      "empty": "No entries yet.",
+      "addEntry": "Add entry",
+      "label": "Label",
+      "subject": "Subject",
+      "wholeBoat": "Whole boat",
+      "hull": "Hull",
+      "engine": "Engine",
+      "sail": "Sail",
+      "rig": "Rig",
+      "electrical": "Electrical",
+      "plumbing": "Plumbing",
+      "safety": "Safety equipment",
+      "deck": "Deck & hardware",
+      "other": "Other",
+      "performedAt": "Performed at",
+      "titleField": "Title",
+      "titlePlaceholder": "e.g. Changed oil filter",
+      "notes": "Notes",
+      "parts": "Parts",
+      "addPart": "Add part",
+      "noParts": "No parts.",
+      "partName": "Name",
+      "partQty": "Qty",
+      "partNotes": "Notes",
+      "removePart": "Remove",
+      "createEntry": "Create entry",
+      "immutable": "Once saved, this event becomes immutable.",
+      "noRig": "Save a rig on this boat before adding rig entries.",
+      "enginePlaceholder": "e.g. Inboard diesel port",
+      "sailPlaceholder": "e.g. Genoa #2",
+      "selectPlaceholder": "— Select —"
+    },
+    "tasks": {
+      "title": "Planned maintenance",
+      "subtitle": "Open tasks (date-based and engine-hour based).",
+      "empty": "No planned tasks.",
+      "addTask": "Add task",
+      "modalTitle": "Add task",
+      "done": "Done",
+      "doneHoursPlaceholder": "Done @ hours",
+      "urgent": "Urgent",
+      "open": "Open",
+      "dueAt": "Due {date}",
+      "dueHours": "Due at {hours}h",
+      "cancel": "Cancel",
+      "createTask": "Create task",
+      "noRig": "Save a rig on this boat before planning rig tasks.",
+      "subject": "Subject",
+      "wholeBoat": "Whole boat",
+      "engine": "Engine",
+      "sail": "Sail",
+      "rig": "Rig",
+      "engineLabel": "Engine",
+      "sailLabel": "Sail",
+      "dueDate": "Due date (optional)",
+      "recurrenceMonths": "Recurrence months",
+      "dueEngineHours": "Due hours",
+      "recurrenceEngineHours": "Recurrence hours",
+      "titleField": "Title",
+      "titlePlaceholder": "e.g. Oil change, inspect rigging",
+      "notes": "Notes",
+      "selectPlaceholder": "— Select —"
+    }
+  },
+  "sheets": {
+    "title": "Maintenance sheets",
+    "subtitle": "Guided checklists for maintenance, rigging, winterization, spring commissioning, and workshop.",
+    "empty": "No sheets yet.",
+    "addSheet": "New sheet",
+    "modalTitle": "Create a sheet",
+    "typeLabel": "Sheet type",
+    "typeEntretien": "Maintenance",
+    "typeMontage": "Rigging",
+    "typeHivernage": "Winterization",
+    "typeDehivernage": "Spring commissioning",
+    "typeAtelier": "Workshop",
+    "titleLabel": "Title",
+    "titlePlaceholder": "e.g. Winterization 2025",
+    "performedAtLabel": "Date",
+    "notesLabel": "Notes",
+    "notesPlaceholder": "Optional notes...",
+    "createSheet": "Create sheet",
+    "statusInProgress": "In progress",
+    "statusCompleted": "Completed",
+    "markComplete": "Mark as complete",
+    "progress": "{done}/{total} steps",
+    "expand": "View steps",
+    "collapse": "Hide",
+    "filterAll": "All",
+    "confirmDelete": "Delete this sheet?",
+    "noItems": "No steps in this sheet.",
+    "itemNotesPlaceholder": "Add a note..."
+  }
+}

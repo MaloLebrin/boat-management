@@ -1,0 +1,31 @@
+{
+  "title": "Maintenance planning",
+  "subtitle": "Overview of tasks across all your boats",
+  "viewKanban": "Kanban",
+  "viewCalendar": "Calendar",
+  "empty": {
+    "title": "No maintenance tasks",
+    "description": "Create maintenance tasks from a boat's detail page.",
+    "action": "View my boats"
+  },
+  "kanban": {
+    "overdue": "Overdue",
+    "overdueEmpty": "No overdue tasks",
+    "soon": "Coming soon",
+    "soonEmpty": "No imminent tasks",
+    "planned": "Planned",
+    "plannedEmpty": "No planned tasks",
+    "completed": "Completed",
+    "completedEmpty": "Completed tasks appear here"
+  },
+  "taskKind": {
+    "date": "date",
+    "hours": "hours"
+  },
+  "calendar": {
+    "more": "+{count} more",
+    "withoutDate": "Without a planned date",
+    "schedule": "Schedule",
+    "hourTriggered": "Triggered by engine hours"
+  }
+}

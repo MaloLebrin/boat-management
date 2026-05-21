@@ -1,0 +1,58 @@
+{
+  "title": "Paramètres",
+  "sections": {
+    "org": "Profil organisation",
+    "members": "Membres et accès",
+    "billing": "Facturation et plan",
+    "me": "Mon profil"
+  },
+  "org": {
+    "title": "Profil organisation",
+    "nameLabel": "Nom de l'organisation",
+    "namePlaceholder": "Mon organisation",
+    "logoLabel": "Logo",
+    "logoPlaceholder": "Logo",
+    "changeLogo": "Changer le logo",
+    "save": "Enregistrer"
+  },
+  "members": {
+    "title": "Membres et accès",
+    "invite": "Inviter un membre",
+    "columns": {
+      "member": "Membre",
+      "role": "Rôle",
+      "status": "Statut"
+    },
+    "noName": "Sans nom",
+    "roles": {
+      "admin": "Admin"
+    },
+    "statuses": {
+      "active": "Actif"
+    },
+    "you": "Vous"
+  },
+  "billing": {
+    "title": "Facturation et plan",
+    "currentPlan": "Plan actuel",
+    "freePlan": "Gratuit",
+    "freeDescription": "Vous utilisez actuellement le plan gratuit avec des fonctionnalités limitées.",
+    "features": {
+      "upTo3Boats": "Jusqu'à 3 bateaux",
+      "maintenanceHistory": "Historique de maintenance",
+      "aiSuggestions": "Suggestions IA"
+    },
+    "upgradePro": "Passer au plan Pro",
+    "paymentMethod": "Méthode de paiement",
+    "noPaymentMethod": "Aucune méthode de paiement configurée.",
+    "addCard": "Ajouter une carte"
+  },
+  "me": {
+    "title": "Mon profil",
+    "fullNameLabel": "Nom complet",
+    "fullNamePlaceholder": "Jean Dupont",
+    "emailLabel": "Adresse email",
+    "emailHint": "L'adresse email ne peut pas être modifiée.",
+    "save": "Enregistrer les modifications"
+  }
+}

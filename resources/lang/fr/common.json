@@ -1,0 +1,14 @@
+{
+  "yes": "Oui",
+  "no": "Non",
+  "cancel": "Annuler",
+  "delete": "Supprimer",
+  "edit": "Modifier",
+  "save": "Enregistrer",
+  "close": "Fermer",
+  "all": "Tous",
+  "unknown": "Inconnu",
+  "loading": "Chargement…",
+  "none": "Aucun",
+  "selectPlaceholder": "Sélectionner..."
+}

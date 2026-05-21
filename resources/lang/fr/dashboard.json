@@ -1,0 +1,56 @@
+{
+  "title": "Tableau de bord",
+  "subtitle": "Vue d'ensemble de votre flotte et de la maintenance à venir.",
+  "newBoat": "Nouveau bateau",
+  "overdueAlert": "{count} tâche(s) en retard",
+  "viewPlanning": "Voir le planning",
+  "analyzeFleet": "Analyser la flotte",
+  "aiPanel": {
+    "title": "Assistant IA",
+    "suggestions": "Suggestions",
+    "empty": "Cliquez sur 'Analyser la flotte' pour des suggestions personnalisées.",
+    "analyzing": "Analyse en cours...",
+    "noSuggestions": "Aucune suggestion pour le moment."
+  },
+  "stats": {
+    "boats": "Bateaux",
+    "engines": "Moteurs",
+    "sails": "Voiles",
+    "rigs": "Gréements",
+    "urgentMaintenance": "Maintenance urgente"
+  },
+  "urgentMaintenance": {
+    "title": "Maintenance urgente",
+    "period": "14 prochains jours",
+    "empty": "Aucune maintenance urgente à venir.",
+    "overdue": "En retard",
+    "dueSoon": "Bientôt dû",
+    "hours": "Heures",
+    "dueAt": "Dû le {date}",
+    "dueAtHours": "Dû à {hours}h · actuel {current}h"
+  },
+  "yourBoats": {
+    "title": "Vos bateaux",
+    "viewAll": "Voir tout",
+    "columns": {
+      "name": "Nom",
+      "propulsion": "Propulsion",
+      "engines": "Moteurs",
+      "sails": "Voiles",
+      "rig": "Gréement"
+    },
+    "empty": "Aucun bateau pour l'instant."
+  },
+  "marina": {
+    "title": "Marinas",
+    "viewAll": "Voir tout",
+    "addMarina": "Ajouter une marina",
+    "empty": "Aucune marina enregistrée.",
+    "totalMarinas": "{count} marina(s)",
+    "totalBoats": "{count} bateau(x) amarré(s)",
+    "totalFreeSpots": "{count} place(s) libre(s)",
+    "freeSpots": "{free} libre(s) / {total}",
+    "fillRate": "Taux : {rate}%",
+    "noSpots": "Aucune place"
+  }
+}

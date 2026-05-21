@@ -1,0 +1,18 @@
+{
+  "workspace": "Workspace",
+  "dashboard": "Dashboard",
+  "boats": "Boats",
+  "planning": "Planning",
+  "history": "History",
+  "settings": "Settings",
+  "designSystem": "Design system",
+  "menu": "Menu",
+  "logout": "Logout",
+  "myBoats": "My boats",
+  "unknownUser": "User",
+  "sections": {
+    "fleet": "FLEET",
+    "maintenance": "MAINTENANCE",
+    "preferences": "PREFERENCES"
+  }
+}

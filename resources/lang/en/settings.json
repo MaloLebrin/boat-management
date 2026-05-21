@@ -1,0 +1,58 @@
+{
+  "title": "Settings",
+  "sections": {
+    "org": "Organisation profile",
+    "members": "Members & access",
+    "billing": "Billing & plan",
+    "me": "My profile"
+  },
+  "org": {
+    "title": "Organisation profile",
+    "nameLabel": "Organisation name",
+    "namePlaceholder": "My organisation",
+    "logoLabel": "Logo",
+    "logoPlaceholder": "Logo",
+    "changeLogo": "Change logo",
+    "save": "Save"
+  },
+  "members": {
+    "title": "Members & access",
+    "invite": "Invite a member",
+    "columns": {
+      "member": "Member",
+      "role": "Role",
+      "status": "Status"
+    },
+    "noName": "No name",
+    "roles": {
+      "admin": "Admin"
+    },
+    "statuses": {
+      "active": "Active"
+    },
+    "you": "You"
+  },
+  "billing": {
+    "title": "Billing & plan",
+    "currentPlan": "Current plan",
+    "freePlan": "Free",
+    "freeDescription": "You are currently on the free plan with limited features.",
+    "features": {
+      "upTo3Boats": "Up to 3 boats",
+      "maintenanceHistory": "Maintenance history",
+      "aiSuggestions": "AI suggestions"
+    },
+    "upgradePro": "Upgrade to Pro plan",
+    "paymentMethod": "Payment method",
+    "noPaymentMethod": "No payment method configured.",
+    "addCard": "Add a card"
+  },
+  "me": {
+    "title": "My profile",
+    "fullNameLabel": "Full name",
+    "fullNamePlaceholder": "Jane Doe",
+    "emailLabel": "Email address",
+    "emailHint": "Email address cannot be changed.",
+    "save": "Save changes"
+  }
+}

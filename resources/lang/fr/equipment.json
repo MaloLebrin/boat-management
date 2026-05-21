@@ -1,0 +1,13 @@
+{
+  "status": {
+    "label": "État",
+    "operational": "Opérationnel",
+    "in_maintenance": "En maintenance",
+    "out_of_service": "Hors service",
+    "retired": "Retiré"
+  },
+  "notes": {
+    "label": "Notes libres",
+    "placeholder": "Observations, remarques, historique..."
+  }
+}

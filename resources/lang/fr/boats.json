@@ -1,0 +1,547 @@
+{
+  "new": {
+    "title": "Nouveau bateau",
+    "subtitle": "Créer un nouveau bateau dans votre organisation",
+    "submit": "Créer",
+    "cancel": "Annuler"
+  },
+  "edit": {
+    "title": "Modifier le bateau",
+    "subtitle": "Mettre à jour les informations du bateau",
+    "submit": "Enregistrer",
+    "cancel": "Annuler"
+  },
+  "hullFields": {
+    "name": "Nom",
+    "registrationNumber": "Immatriculation",
+    "type": "Type",
+    "propulsionType": "Type de propulsion",
+    "manufacturedAt": "Date de fabrication",
+    "lengthM": "Longueur (m)",
+    "beamM": "Largeur (m)",
+    "draftM": "Tirant d'eau (m)",
+    "mastHeightM": "Hauteur de mât (m)",
+    "hullMaterial": "Matériau de coque",
+    "yearBuilt": "Année de construction",
+    "manufacturer": "Constructeur",
+    "model": "Modèle",
+    "homePort": "Port d'attache",
+    "navigationCategory": "Catégorie de navigation",
+    "hullIdentificationNumber": "N° de coque (HIN/WIN)",
+    "francisationNumber": "N° de francisation",
+    "flagCountry": "Pavillon",
+    "maxPersons": "Personnes max à bord",
+    "pontoon": "Ponton",
+    "mouillage": "Mouillage",
+    "spotIdentifier": "N° d'emplacement"
+  },
+  "engines": {
+    "title": "Moteurs",
+    "addEngine": "Ajouter un moteur",
+    "noEngines": "Aucun moteur.",
+    "viewDetail": "Voir le détail",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "mfg": "Installé le",
+    "sn": "N° série",
+    "powerUnit": "cv",
+    "kindValues": {
+      "inboard": "Inbord",
+      "outboard": "Hors-bord",
+      "electric": "Électrique",
+      "hybrid": "Hybride",
+      "other": "Autre"
+    },
+    "fields": {
+      "kind": "Type",
+      "fuel": "Carburant",
+      "brand": "Marque",
+      "model": "Modèle",
+      "serialNumber": "Numéro de série",
+      "manufacturedAt": "Date d'installation",
+      "powerHp": "Puissance (ch)",
+      "hours": "Heures",
+      "strokeType": "Cycle moteur",
+      "installHours": "Heures à l'installation"
+    },
+    "modal": {
+      "title": "Ajouter un moteur",
+      "cancel": "Annuler",
+      "submit": "Ajouter le moteur"
+    }
+  },
+  "sails": {
+    "title": "Voiles",
+    "addSail": "Ajouter une voile",
+    "noSails": "Aucune voile.",
+    "reef": "Ris",
+    "mfg": "Fabriqué le",
+    "modal": {
+      "title": "Ajouter une voile",
+      "cancel": "Annuler",
+      "submit": "Ajouter la voile"
+    }
+  },
+  "rig": {
+    "title": "Gréement",
+    "noRig": "Aucun gréement enregistré.",
+    "fields": {
+      "rigType": "Type de gréement",
+      "mastCount": "Nombre de mâts",
+      "spreaders": "Barres de flèche",
+      "manufacturedAt": "Date de fabrication"
+    }
+  },
+  "options": {
+    "propulsion": {
+      "sailboat": "Voilier",
+      "motorboat": "Bateau à moteur",
+      "catamaran": "Catamaran",
+      "rib": "Semi-rigide",
+      "other": "Autre"
+    },
+    "hullMaterial": {
+      "fiberglass": "Fibre de verre",
+      "aluminum": "Aluminium",
+      "steel": "Acier",
+      "wood": "Bois",
+      "carbon": "Carbone",
+      "other": "Autre"
+    },
+    "engineKind": {
+      "inboard": "Inbord",
+      "outboard": "Hors-bord",
+      "electric": "Électrique",
+      "hybrid": "Hybride",
+      "other": "Autre"
+    },
+    "engineFuel": {
+      "diesel": "Diesel",
+      "essence": "Essence",
+      "electric": "Électrique",
+      "other": "Autre"
+    },
+    "sailType": {
+      "main": "Grand-voile",
+      "genoa": "Génois",
+      "jib": "Foc",
+      "spinnaker": "Spinnaker",
+      "gennaker": "Gennaker",
+      "storm_jib": "Tourmentin",
+      "other": "Autre"
+    },
+    "rigType": {
+      "sloop": "Sloop",
+      "cutter": "Cotre",
+      "ketch": "Ketch",
+      "yawl": "Yawl",
+      "schooner": "Goélette",
+      "cat_rig": "Misainier",
+      "other": "Autre"
+    },
+    "strokeType": {
+      "2_stroke": "2 temps",
+      "4_stroke": "4 temps"
+    },
+    "navigationCategory": {
+      "A": "Catégorie A – Navigation hauturière (>8 Bf, >4 m)",
+      "B": "Catégorie B – Navigation hauturière (≤8 Bf, ≤4 m)",
+      "C": "Catégorie C – Navigation côtière (≤6 Bf, ≤2 m)",
+      "D": "Catégorie D – Eaux abritées (≤4 Bf, ≤0,3 m)"
+    },
+    "safetyEquipmentType": {
+      "life_jacket": "Gilet de sauvetage",
+      "life_raft": "Radeau de sauvetage",
+      "fire_extinguisher": "Extincteur",
+      "vhf_radio": "Radio VHF",
+      "flare": "Signal de détresse / Fusée",
+      "epirb": "Balise EPIRB / PLB",
+      "first_aid_kit": "Trousse de premiers secours",
+      "harness": "Harnais de sécurité",
+      "lifebuoy": "Bouée de sauvetage",
+      "anchor": "Ancre",
+      "bilge_pump": "Pompe de cale",
+      "compass": "Compas",
+      "ais": "Transpondeur AIS",
+      "gps": "GPS / Traceur",
+      "radar": "Radar",
+      "other": "Autre"
+    },
+    "safetyEquipmentStatus": {
+      "ok": "OK",
+      "to_check": "À vérifier",
+      "expired": "Périmé"
+    }
+  },
+  "index": {
+    "title": "Bateaux",
+    "subtitle": "Tous les bateaux de votre organisation",
+    "newBoat": "Nouveau bateau",
+    "empty": {
+      "title": "Aucun bateau pour l'instant",
+      "description": "Créez votre premier navire pour commencer le suivi.",
+      "action": "Créer un bateau"
+    }
+  },
+  "show": {
+    "registration": "Immatriculation",
+    "type": "Type",
+    "propulsion": "Propulsion",
+    "addTask": "Ajouter une tâche",
+    "addEntry": "Ajouter une entrée",
+    "editBoat": "Modifier le bateau",
+    "deleteBoat": "Supprimer le bateau",
+    "tabs": {
+      "maintenance": "Maintenance",
+      "overview": "Aperçu",
+      "equipment": "Équipement",
+      "specs": "Spécifications",
+      "history": "Historique",
+      "tasks": "Tâches",
+      "documents": "Documents",
+      "sheets": "Fiches"
+    },
+    "breadcrumbFleet": "Flotte",
+    "nextTasks": "Prochaines tâches",
+    "status": {
+      "urgent": "Urgent",
+      "upcoming": "À venir",
+      "ok": "OK"
+    },
+    "mediaUpload": {
+      "addPhoto": "Ajouter une photo",
+      "addDocument": "Ajouter un document",
+      "dropzone": "Glissez un fichier ici ou cliquez pour parcourir",
+      "browse": "Parcourir…",
+      "selectedFile": "Fichier sélectionné",
+      "noFile": "Aucun fichier sélectionné",
+      "caption": "Légende (optionnel)",
+      "upload": "Téléverser",
+      "uploading": "Envoi en cours…",
+      "photos": "Photos",
+      "documents": "Documents",
+      "noPhotos": "Aucune photo pour l'instant.",
+      "noDocuments": "Aucun document pour l'instant.",
+      "photoFormats": "JPG, PNG, HEIC, WebP · max 10 Mo",
+      "documentFormats": "PDF, XLSX, DOCX, CSV · max 20 Mo",
+      "deletePhoto": "Supprimer la photo",
+      "deleteDocument": "Supprimer le document",
+      "modalTitle": "Ajouter un document",
+      "modalSubtitle": "{name} · Stocké sur Cloudinary"
+    },
+    "overview": {
+      "overdueTasks": "{count} tâche(s) en retard",
+      "schedule": "Planifier",
+      "engineHours": "Heures moteur",
+      "engineCount": "{count} moteur(s)",
+      "lastMaintenance": "Dernière maintenance",
+      "nextTask": "Prochaine tâche",
+      "overdue": "En retard",
+      "dimensionsTitle": "Dimensions",
+      "length": "Longueur",
+      "beam": "Bau",
+      "draft": "Tirant d'eau",
+      "mastHeight": "Hauteur de mât",
+      "viewSpecs": "Voir les spécifications →",
+      "recentActivityTitle": "Activité récente",
+      "recentActivityEmpty": "Aucune activité récente.",
+      "viewHistory": "Voir tout l'historique →",
+      "aiTitle": "Assistant IA",
+      "aiEmpty": "Cliquez sur 'Actualiser' pour des suggestions IA.",
+      "aiRefresh": "Actualiser",
+      "aiRefreshing": "Analyse...",
+      "homePortTitle": "Port d'attache",
+      "homePortEmpty": "Non renseigné",
+      "positionTitle": "Emplacement actuel",
+      "positionEmpty": "Aucun emplacement assigné"
+    },
+    "position": {
+      "title": "Emplacement actuel",
+      "history": "Historique des positions",
+      "arrivedOn": "Depuis le",
+      "leftOn": "Jusqu'au",
+      "noHistory": "Aucun historique de position."
+    }
+  },
+  "specs": {
+    "identity": "Identité",
+    "dimensions": "Dimensions",
+    "hullMaterials": "Coque & matériaux",
+    "registration": "Immatriculation & pavillon",
+    "equipmentOnBoard": "Équipements à bord",
+    "editHint": "Les spécifications peuvent être modifiées dans la page d'édition du bateau."
+  },
+  "safetyEquipment": {
+    "title": "Armement de sécurité",
+    "add": "Ajouter un équipement",
+    "noItems": "Aucun équipement de sécurité enregistré.",
+    "equipmentType": "Type",
+    "quantity": "Quantité",
+    "expiryDate": "Date d'expiration",
+    "status": "Statut",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "modal": {
+      "title": "Ajouter un équipement",
+      "editTitle": "Modifier l'équipement",
+      "cancel": "Annuler",
+      "submit": "Enregistrer"
+    },
+    "confirmDelete": "Supprimer cet équipement ?"
+  },
+  "equipmentAddModal": {
+    "title": "Nouvel équipement",
+    "subtitle": "Sur {name} · l'équipement deviendra suivable pour la maintenance",
+    "category": "Catégorie",
+    "categories": {
+      "engine": "Moteur",
+      "sail": "Voile",
+      "rig": "Gréement",
+      "other": "Autre"
+    },
+    "comingSoon": {
+      "title": "Catégorie bientôt disponible",
+      "description": "Sélectionnez Moteur, Voile ou Gréement pour ajouter un équipement.",
+      "badge": "bientôt"
+    },
+    "rigNotice": "ⓘ Ce bateau a déjà un gréement — l'enregistrement mettra à jour les informations existantes.",
+    "submit": "Créer l'équipement",
+    "cancel": "Annuler"
+  },
+  "list": {
+    "search": "Rechercher",
+    "searchPlaceholder": "Rechercher par nom ou immatriculation…",
+    "type": "Type",
+    "propulsion": "Propulsion",
+    "sort": "Tri",
+    "direction": "Ordre",
+    "recent": "Récent",
+    "name": "Nom",
+    "asc": "Croissant",
+    "desc": "Décroissant",
+    "boats": "bateaux",
+    "clearFilters": "Effacer les filtres",
+    "table": {
+      "name": "Nom",
+      "registration": "Immatriculation",
+      "type": "Type",
+      "propulsion": "Propulsion",
+      "maintenance": "Maintenance"
+    },
+    "cards": {
+      "unknownType": "Type inconnu",
+      "unknownPropulsion": "Propulsion inconnue"
+    },
+    "maintenance": {
+      "urgent": "{count} urgent",
+      "upcoming": "{count} à venir",
+      "ok": "OK"
+    },
+    "viewTable": "Tableau",
+    "viewCards": "Cartes"
+  },
+  "engineShow": {
+    "breadcrumb": {
+      "equipment": "Équipements"
+    },
+    "maintenanceRequired": "Maintenance requise",
+    "installedIn": "Installé en {year}",
+    "tabs": {
+      "overview": "Vue d'ensemble",
+      "specs": "Spécifications",
+      "maintenance": "Maintenance",
+      "notes": "Notes",
+      "parts": "Pièces",
+      "documents": "Documents"
+    },
+    "actions": {
+      "edit": "Modifier",
+      "addEvent": "+ Événement",
+      "schedule": "Planifier",
+      "markDone": "Marquer fait",
+      "exportPdf": "Exporter PDF"
+    },
+    "overview": {
+      "totalHours": "Heures total",
+      "sinceLast": "Depuis dernière maint.",
+      "costYear": "Coût 12 mois",
+      "gauge": "Jauge heures moteur",
+      "recentMaintenance": "Maintenance récente",
+      "noEvent": "Aucun événement enregistré",
+      "aiTitle": "Assistant IA",
+      "aiPrompt1": "Quand faire la prochaine vidange ?",
+      "aiPrompt2": "Historique des pannes moteur",
+      "nextDue": "Prochaines échéances",
+      "noTaskPlanned": "Aucune tâche planifiée"
+    },
+    "overdue": {
+      "title": "Maintenance en retard",
+      "detail": "{title} - Seuil de {hours} heures dépassé"
+    },
+    "specs": {
+      "identity": "Identité",
+      "brand": "Marque",
+      "model": "Modèle",
+      "serialNumber": "Numéro de série",
+      "installYear": "Année d'installation",
+      "installHours": "Heures à l'installation",
+      "characteristics": "Caractéristiques",
+      "power": "Puissance",
+      "fuel": "Carburant",
+      "type": "Type",
+      "thresholds": "Seuils de maintenance",
+      "noThreshold": "Aucun seuil défini",
+      "every": "Toutes les {hours} h",
+      "editHint": "Pour modifier les spécifications de ce moteur, utilisez le bouton Modifier en haut de page.",
+      "strokeType": "Cycle moteur"
+    },
+    "maintenance": {
+      "upcoming": "À venir",
+      "noUpcoming": "Aucune tâche à venir",
+      "history": "Historique",
+      "noHistory": "Aucun événement enregistré",
+      "taskStatus": {
+        "overdue": "En retard",
+        "soon": "Bientôt",
+        "planned": "Planifié"
+      },
+      "dueAt": "Échéance : {date}",
+      "dueHours": "{hours} heures",
+      "totalEvents": "Total événements",
+      "totalParts": "Total pièces",
+      "parts": "{count} pièce(s)"
+    },
+    "notes": {
+      "title": "Notes libres",
+      "edit": "Modifier",
+      "save": "Enregistrer",
+      "cancel": "Annuler",
+      "empty": "Aucune note. Cliquez sur Modifier pour en ajouter.",
+      "placeholder": "Saisissez vos notes libres ici..."
+    },
+    "parts": {
+      "title": "Pièces compatibles",
+      "designation": "Désignation",
+      "reference": "Référence",
+      "stock": "Quantité en stock",
+      "supplier": "Fournisseur",
+      "empty": "Aucune pièce enregistrée",
+      "comingSoon": "Bientôt disponible",
+      "add": "Ajouter une pièce",
+      "edit": "Modifier",
+      "save": "Enregistrer",
+      "cancel": "Annuler",
+      "delete": "Supprimer",
+      "confirmDelete": "Supprimer cette pièce ?",
+      "notes": "Notes",
+      "actions": "Actions",
+      "addModalTitle": "Ajouter une pièce",
+      "editModalTitle": "Modifier la pièce"
+    },
+    "documents": {
+      "manual": "Manuel technique",
+      "invoices": "Factures",
+      "other": "Autres documents",
+      "dropzone": "Déposez un fichier ou cliquez pour télécharger",
+      "comingSoon": "Fonctionnalité à venir",
+      "modalSubtitle": "{name} · Stocké sur Cloudinary"
+    }
+  },
+  "maintenance": {
+    "events": {
+      "title": "Historique de maintenance",
+      "subtitle": "Travaux effectués sur le bateau, la coque, un moteur, une voile, le gréement ou autre équipement.",
+      "empty": "Aucune entrée pour l'instant.",
+      "addEntry": "Ajouter une entrée",
+      "label": "Libellé",
+      "subject": "Sujet",
+      "wholeBoat": "Bateau entier",
+      "hull": "Coque",
+      "engine": "Moteur",
+      "sail": "Voile",
+      "rig": "Gréement",
+      "electrical": "Électricité",
+      "plumbing": "Plomberie",
+      "safety": "Sécurité",
+      "deck": "Pont / Accastillage",
+      "other": "Autre",
+      "performedAt": "Effectué le",
+      "titleField": "Titre",
+      "titlePlaceholder": "ex. Changement du filtre à huile",
+      "notes": "Notes",
+      "parts": "Pièces",
+      "addPart": "Ajouter une pièce",
+      "noParts": "Aucune pièce.",
+      "partName": "Nom",
+      "partQty": "Qté",
+      "partNotes": "Notes",
+      "removePart": "Supprimer",
+      "createEntry": "Créer l'entrée",
+      "immutable": "Une fois enregistré, cet événement devient immuable.",
+      "noRig": "Enregistrez un gréement sur ce bateau avant d'ajouter des entrées gréement.",
+      "enginePlaceholder": "ex. Moteur diesel intérieur bâbord",
+      "sailPlaceholder": "ex. Génois n°2",
+      "selectPlaceholder": "— Sélectionner —"
+    },
+    "tasks": {
+      "title": "Maintenance planifiée",
+      "subtitle": "Tâches ouvertes (par date et par heures moteur).",
+      "empty": "Aucune tâche planifiée.",
+      "addTask": "Ajouter une tâche",
+      "modalTitle": "Ajouter une tâche",
+      "done": "Terminé",
+      "doneHoursPlaceholder": "Terminé à (heures)",
+      "urgent": "Urgent",
+      "open": "Ouvert",
+      "dueAt": "Dû le {date}",
+      "dueHours": "Dû à {hours}h",
+      "cancel": "Annuler",
+      "createTask": "Créer la tâche",
+      "noRig": "Enregistrez un gréement sur ce bateau avant de planifier des tâches gréement.",
+      "subject": "Sujet",
+      "wholeBoat": "Bateau entier",
+      "engine": "Moteur",
+      "sail": "Voile",
+      "rig": "Gréement",
+      "engineLabel": "Moteur",
+      "sailLabel": "Voile",
+      "dueDate": "Date d'échéance (optionnel)",
+      "recurrenceMonths": "Récurrence (mois)",
+      "dueEngineHours": "Heures d'échéance",
+      "recurrenceEngineHours": "Récurrence (heures)",
+      "titleField": "Titre",
+      "titlePlaceholder": "ex. Vidange, inspection du gréement",
+      "notes": "Notes",
+      "selectPlaceholder": "— Sélectionner —"
+    }
+  },
+  "sheets": {
+    "title": "Fiches de maintenance",
+    "subtitle": "Listes de contrôle guidées pour l'entretien, le montage, l'hivernage, le déshivernage et l'atelier.",
+    "empty": "Aucune fiche pour l'instant.",
+    "addSheet": "Nouvelle fiche",
+    "modalTitle": "Créer une fiche",
+    "typeLabel": "Type de fiche",
+    "typeEntretien": "Entretien",
+    "typeMontage": "Montage",
+    "typeHivernage": "Hivernage",
+    "typeDehivernage": "Déshivernage",
+    "typeAtelier": "Atelier",
+    "titleLabel": "Titre",
+    "titlePlaceholder": "ex. Hivernage 2025",
+    "performedAtLabel": "Date",
+    "notesLabel": "Notes",
+    "notesPlaceholder": "Notes optionnelles...",
+    "createSheet": "Créer la fiche",
+    "statusInProgress": "En cours",
+    "statusCompleted": "Terminée",
+    "markComplete": "Marquer terminée",
+    "progress": "{done}/{total} etapes",
+    "expand": "Voir les étapes",
+    "collapse": "Masquer les étapes",
+    "filterAll": "Toutes",
+    "confirmDelete": "Supprimer cette fiche ?",
+    "noItems": "Aucune etape dans cette fiche.",
+    "itemNotesPlaceholder": "Ajouter une note..."
+  }
+}

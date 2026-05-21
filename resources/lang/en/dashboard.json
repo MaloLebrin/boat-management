@@ -1,0 +1,56 @@
+{
+  "title": "Dashboard",
+  "subtitle": "Overview of your fleet and upcoming maintenance.",
+  "newBoat": "New boat",
+  "overdueAlert": "{count} overdue task(s)",
+  "viewPlanning": "View planning",
+  "analyzeFleet": "Analyze fleet",
+  "aiPanel": {
+    "title": "AI Assistant",
+    "suggestions": "Suggestions",
+    "empty": "Click 'Analyze fleet' to get personalized suggestions.",
+    "analyzing": "Analyzing...",
+    "noSuggestions": "No suggestions at this time."
+  },
+  "stats": {
+    "boats": "Boats",
+    "engines": "Engines",
+    "sails": "Sails",
+    "rigs": "Rigs",
+    "urgentMaintenance": "Urgent maintenance"
+  },
+  "urgentMaintenance": {
+    "title": "Urgent maintenance",
+    "period": "Next 14 days",
+    "empty": "No urgent maintenance due soon.",
+    "overdue": "Overdue",
+    "dueSoon": "Due soon",
+    "hours": "Hours",
+    "dueAt": "Due {date}",
+    "dueAtHours": "Due at {hours}h · current {current}h"
+  },
+  "yourBoats": {
+    "title": "Your boats",
+    "viewAll": "View all",
+    "columns": {
+      "name": "Name",
+      "propulsion": "Propulsion",
+      "engines": "Engines",
+      "sails": "Sails",
+      "rig": "Rig"
+    },
+    "empty": "No boats yet."
+  },
+  "marina": {
+    "title": "Marinas",
+    "viewAll": "View all",
+    "addMarina": "Add a marina",
+    "empty": "No marina registered yet.",
+    "totalMarinas": "{count} marina(s)",
+    "totalBoats": "{count} moored boat(s)",
+    "totalFreeSpots": "{count} free spot(s)",
+    "freeSpots": "{free} free / {total}",
+    "fillRate": "Fill: {rate}%",
+    "noSpots": "No spots"
+  }
+}

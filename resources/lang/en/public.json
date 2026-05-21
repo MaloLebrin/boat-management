@@ -1,0 +1,23 @@
+{
+  "nav": {
+    "features": "Features",
+    "pricing": "Pricing"
+  },
+  "actions": {
+    "login": "Login",
+    "tryFree": "Try free"
+  },
+  "footer": {
+    "tagline": "Maritime fleet maintenance, made simple.",
+    "product": "Product",
+    "company": "Company",
+    "legal": "Legal",
+    "features": "Features",
+    "pricing": "Pricing",
+    "contact": "Contact",
+    "about": "About",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "bilingual": "Bilingual EN/FR · EU-hosted"
+  }
+}

@@ -27,14 +27,15 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
      */
     const { i18n } = ctx as Partial<HttpContext>
 
+    const BACKEND_NAMESPACES = new Set(['flash', 'marketing', 'validator'])
+
     return {
       errors: ctx.inertia.always(this.getValidationErrors(ctx)),
       locale: ctx.inertia.always(i18n?.locale ?? 'en'),
       appT: ctx.inertia.always(
         Object.fromEntries(
           Object.entries(i18n?.localeTranslations ?? {})
-            .filter(([k]) => k.startsWith('app.'))
-            .map(([k, v]) => [k.slice(4), v])
+            .filter(([k]) => !BACKEND_NAMESPACES.has(k.split('.')[0]))
         )
       ),
       path: ctx.inertia.always(ctx.request.url().split('?')[0]),

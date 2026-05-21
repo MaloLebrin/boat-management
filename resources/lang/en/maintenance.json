@@ -1,0 +1,51 @@
+{
+  "history": {
+    "title": "Maintenance history",
+    "subtitle": "All interventions across your fleet",
+    "exportPdf": "Export PDF",
+    "searchPlaceholder": "Search by title or boat...",
+    "filters": {
+      "all": "All",
+      "boat": "Whole boat",
+      "hull": "Hull",
+      "engine": "Engine",
+      "sail": "Sail",
+      "rig": "Rig",
+      "electrical": "Electrical",
+      "plumbing": "Plumbing",
+      "safety": "Safety",
+      "deck": "Deck",
+      "other": "Other"
+    },
+    "subjects": {
+      "boat": "Boat",
+      "hull": "Hull",
+      "engine": "Engine",
+      "sail": "Sail",
+      "rig": "Rig",
+      "electrical": "Electrical",
+      "plumbing": "Plumbing",
+      "safety": "Safety",
+      "deck": "Deck",
+      "other": "Other"
+    },
+    "stats": {
+      "events": "Events",
+      "partsChanged": "Parts replaced",
+      "boats": "Boats"
+    },
+    "timeline": {
+      "events": "{count} event(s)",
+      "pieces": "{count} part(s)",
+      "show": "Detail",
+      "hide": "Hide",
+      "partsUsed": "Parts used",
+      "noDetails": "No additional details"
+    },
+    "empty": {
+      "title": "No maintenance events",
+      "description": "Start by adding a boat and recording your interventions.",
+      "action": "View boats"
+    }
+  }
+}

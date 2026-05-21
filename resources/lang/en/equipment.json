@@ -1,0 +1,13 @@
+{
+  "status": {
+    "label": "Status",
+    "operational": "Operational",
+    "in_maintenance": "In maintenance",
+    "out_of_service": "Out of service",
+    "retired": "Retired"
+  },
+  "notes": {
+    "label": "Free notes",
+    "placeholder": "Observations, remarks, history..."
+  }
+}

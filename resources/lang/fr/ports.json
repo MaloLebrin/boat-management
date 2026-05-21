@@ -1,0 +1,94 @@
+{
+  "nav": "Ports",
+  "title": "Mes ports",
+  "tabs": {
+    "list": "Liste",
+    "plan": "Plan marina"
+  },
+  "plan": {
+    "editLayout": "Modifier le plan",
+    "viewOnly": "Vue seule",
+    "empty": "Ajoutez des pontons ou mouillages pour visualiser le plan",
+    "hint": "Cliquez sur un spot libre pour y affecter le bateau sélectionné.",
+    "boatSelected": "Bateau sélectionné : {name} — cliquez sur un spot libre pour l'affecter",
+    "boat": {
+      "assign": {
+        "title": "Affecter {name}",
+        "spot": "Identifiant de place",
+        "spotPlaceholder": "ex: A1",
+        "confirm": "Affecter"
+      }
+    },
+    "help": {
+      "toggle": "Aide",
+      "title": "Comment utiliser le plan marina",
+      "select": "Cliquez sur un spot occupé pour sélectionner le bateau",
+      "assign": "Cliquez sur un spot vide pour y affecter le bateau sélectionné",
+      "deselect": "Cliquez sur le fond du plan pour désélectionner",
+      "move": "En mode \"Modifier le plan\", glissez-déposez un ponton ou mouillage pour le repositionner"
+    }
+  },
+  "spots": {
+    "title": "Places",
+    "add": "Ajouter une place",
+    "edit": "Modifier la place",
+    "empty": "Aucune place définie",
+    "manage": "Gérer les places",
+    "occupied": "Occupé",
+    "free": "Libre",
+    "occupiedBy": "Occupé par {name}",
+    "fields": {
+      "name": "Nom de la place",
+      "description": "Description"
+    },
+    "deleteConfirm": "Supprimer cette place ?"
+  },
+  "empty": "Aucun port enregistré.",
+  "emptyDescription": "Ajoutez un port pour organiser vos pontons et emplacements de bateaux.",
+  "create": "Nouveau port",
+  "edit": "Modifier le port",
+  "delete": "Supprimer le port",
+  "deleteConfirm": "Supprimer ce port ?",
+  "hasBoats": "Ce port contient des bateaux. Déplacez-les avant de supprimer.",
+  "backToList": "← Ports",
+  "fields": {
+    "name": "Nom du port",
+    "city": "Ville",
+    "country": "Pays",
+    "address": "Adresse",
+    "notes": "Notes"
+  },
+  "pontoons": {
+    "title": "Pontons",
+    "empty": "Aucun ponton.",
+    "add": "Ajouter un ponton",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "deleteConfirm": "Supprimer ce ponton ?",
+    "hasBoats": "Ce ponton contient des bateaux. Déplacez-les avant de supprimer.",
+    "fields": {
+      "name": "Nom du ponton",
+      "description": "Description"
+    }
+  },
+  "mouillages": {
+    "title": "Mouillages",
+    "empty": "Aucun mouillage.",
+    "add": "Ajouter un mouillage",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "deleteConfirm": "Supprimer ce mouillage ?",
+    "hasBoats": "Ce mouillage contient des bateaux. Déplacez-les avant de supprimer.",
+    "fields": {
+      "name": "Nom du mouillage",
+      "description": "Description"
+    }
+  },
+  "show": {
+    "boats": "Bateaux",
+    "spot": "Emplacement",
+    "emptySpot": "Non assigné",
+    "noBoats": "Aucun bateau sur ce ponton.",
+    "noBoatsMouillage": "Aucun bateau sur ce mouillage."
+  }
+}

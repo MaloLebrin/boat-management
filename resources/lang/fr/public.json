@@ -1,0 +1,23 @@
+{
+  "nav": {
+    "features": "Fonctionnalités",
+    "pricing": "Tarifs"
+  },
+  "actions": {
+    "login": "Connexion",
+    "tryFree": "Essayer gratuitement"
+  },
+  "footer": {
+    "tagline": "La maintenance maritime, sans douleur.",
+    "product": "Produit",
+    "company": "Entreprise",
+    "legal": "Légal",
+    "features": "Fonctionnalités",
+    "pricing": "Tarifs",
+    "contact": "Contact",
+    "about": "À propos",
+    "privacy": "Confidentialité",
+    "terms": "Conditions",
+    "bilingual": "Bilingue FR/EN · Hébergé en UE"
+  }
+}

@@ -78,7 +78,8 @@ Références : [Inertia — Link and Form](https://docs.adonisjs.com/guides/fron
 ### Internationalisation
 - **Toute chaîne visible par l'utilisateur doit passer par `t()`** — jamais de texte en dur dans les templates
 - Pattern obligatoire : `import { useT } from '~/composables/useT'` → `const { t } = useT()` → `{{ t('clé') }}`
-- Clés organisées par domaine dans `resources/lang/{en,fr}/app.json` (et par namespace : `flash.json`, `marketing.json`, `validator.json`)
+- Clés organisées par domaine dans `resources/lang/{en,fr}/` — **un fichier par domaine** : `common.json`, `nav.json`, `auth.json`, `dashboard.json`, `planning.json`, `maintenance.json`, `settings.json`, `errors.json`, `equipment.json`, `boats.json`, `homePreview.json`, `public.json`, `ports.json` + namespaces backend-only : `flash.json`, `marketing.json`, `validator.json`
+- Le middleware Inertia exclut les namespaces `flash`, `marketing`, `validator` et passe tout le reste dans `appT`
 - Interpolation ICU : `t('clé', { count: String(n) })` — les valeurs doivent être des strings
 - Pas de ternaire inline `locale === 'fr' ? '...' : '...'` — utiliser `t()` à la place
 - Toute PR qui ajoute un composant ou une page doit ajouter les clés correspondantes dans les **deux locales** (`en` et `fr`)

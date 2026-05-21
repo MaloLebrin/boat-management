@@ -1,0 +1,51 @@
+{
+  "history": {
+    "title": "Historique de maintenance",
+    "subtitle": "Toutes les interventions de votre flotte",
+    "exportPdf": "Exporter PDF",
+    "searchPlaceholder": "Rechercher par titre ou bateau...",
+    "filters": {
+      "all": "Tous",
+      "boat": "Bateau entier",
+      "hull": "Coque",
+      "engine": "Moteur",
+      "sail": "Voile",
+      "rig": "Gréement",
+      "electrical": "Électricité",
+      "plumbing": "Plomberie",
+      "safety": "Sécurité",
+      "deck": "Pont",
+      "other": "Autre"
+    },
+    "subjects": {
+      "boat": "Bateau",
+      "hull": "Coque",
+      "engine": "Moteur",
+      "sail": "Voile",
+      "rig": "Gréement",
+      "electrical": "Électricité",
+      "plumbing": "Plomberie",
+      "safety": "Sécurité",
+      "deck": "Pont",
+      "other": "Autre"
+    },
+    "stats": {
+      "events": "Événements",
+      "partsChanged": "Pièces changées",
+      "boats": "Bateaux"
+    },
+    "timeline": {
+      "events": "{count} événement(s)",
+      "pieces": "{count} pièce(s)",
+      "show": "Détail",
+      "hide": "Masquer",
+      "partsUsed": "Pièces utilisées",
+      "noDetails": "Aucun détail supplémentaire"
+    },
+    "empty": {
+      "title": "Aucun événement de maintenance",
+      "description": "Commencez par ajouter un bateau et enregistrer vos interventions.",
+      "action": "Voir les bateaux"
+    }
+  }
+}
