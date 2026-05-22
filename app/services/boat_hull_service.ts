@@ -5,26 +5,12 @@ import BoatRig from '#models/boat_rig'
 import BoatSail from '#models/boat_sail'
 import type User from '#models/user'
 import type { BoatHullPayload } from '#shared/types/boat'
+import { assertBoatInUserOrg, toDateOrNull } from '#utils/boat_utils'
 import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
 
 export { BoatNotFoundError }
 export type { BoatHullPayload }
-
-// TODO: Move to shared utils
-function toDateOrNull(value: Date | string | DateTime | null | undefined): DateTime | null {
-  if (value === null || value === undefined) return null
-  if (DateTime.isDateTime(value)) return value
-  if (value instanceof Date) return DateTime.fromJSDate(value)
-  return DateTime.fromISO(String(value))
-}
-
-// TODO: Move to shared utils
-function assertBoatInUserOrg(user: User, boat: Boat) {
-  if (user.organizationId === null || user.organizationId !== boat.organizationId) {
-    throw new BoatNotFoundError()
-  }
-}
 
 @inject()
 export default class BoatHullService {

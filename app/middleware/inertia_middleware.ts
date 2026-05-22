@@ -5,17 +5,14 @@ import BaseInertiaMiddleware from '@adonisjs/inertia/inertia_middleware'
 import type { PlanTier } from '#shared/types/plan'
 import type User from '#models/user'
 
-/** Inertia cannot serialize `null` shared props — use `undefined` when absent. */
-export async function resolveSharedCurrentPlan(
-  user: User | undefined
-): Promise<PlanTier | undefined> {
-  if (!user?.organizationId) return undefined
+export async function resolveSharedCurrentPlan(user: User | undefined): Promise<PlanTier | null> {
+  if (!user?.organizationId) return null
   await user.load('organization')
-  return user.organization.plan as PlanTier
+  return user.organization.plan
 }
 
 export default class InertiaMiddleware extends BaseInertiaMiddleware {
-  share(ctx: HttpContext) {
+  async share(ctx: HttpContext) {
     /**
      * The share method is called everytime an Inertia page is rendered. In
      * certain cases, a page may get rendered before the session middleware
@@ -24,21 +21,14 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
      * In that case, we must always assume that HttpContext is not fully hydrated
      * with all the properties
      */
-    const { session, auth } = ctx as Partial<HttpContext>
+    const { session, auth, i18n } = ctx as Partial<HttpContext>
 
-    /**
-     * Fetching the first error from the flash messages
-     */
     const error = session?.flashMessages.get('error') as string
     const success = session?.flashMessages.get('success') as string
 
-    /**
-     * Data shared with all Inertia pages. Make sure you are using
-     * transformers for rich data-types like Models.
-     */
-    const { i18n } = ctx as Partial<HttpContext>
-
     const BACKEND_NAMESPACES = new Set(['flash', 'marketing', 'validator'])
+
+    const currentPlan = await resolveSharedCurrentPlan(auth?.user)
 
     return {
       errors: ctx.inertia.always(this.getValidationErrors(ctx)),
@@ -55,7 +45,7 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
         success,
       }),
       user: ctx.inertia.always(auth?.user ? UserTransformer.transform(auth.user) : undefined),
-      currentPlan: ctx.inertia.always(() => resolveSharedCurrentPlan(auth?.user)),
+      currentPlan: ctx.inertia.always(currentPlan),
     }
   }
 

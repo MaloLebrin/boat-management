@@ -96,7 +96,7 @@ export default class TestPlansSeeder extends BaseSeeder {
     }
 
     // ─── 2. Starter org ──────────────────────────────────────────────────────
-    const { user: starterUser, org: starterOrg } = await ensureOwner(
+    const { org: starterOrg } = await ensureOwner(
       'starter@test.local',
       'Alice Starter',
       'starter'

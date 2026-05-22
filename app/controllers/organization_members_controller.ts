@@ -6,13 +6,18 @@ import {
   MemberNotFoundError,
   UserNotFoundError,
 } from '#exceptions/organization_errors'
+import { QuotaExceededError } from '#exceptions/quota_errors'
+import QuotaService from '#services/quota_service'
 import { inviteMemberValidator, updateMemberRoleValidator } from '#validators/organization_member'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 
 @inject()
 export default class OrganizationMembersController {
-  constructor(private memberService: OrganizationMemberService) {}
+  constructor(
+    private memberService: OrganizationMemberService,
+    private quotaService: QuotaService
+  ) {}
 
   async index({ inertia, auth, bouncer }: HttpContext) {
     await auth.authenticate()
@@ -25,15 +30,21 @@ export default class OrganizationMembersController {
     return inertia.render('organization/members', { members, canManageMembers })
   }
 
-  async store({ request, response, auth, bouncer, session }: HttpContext) {
+  async store({ request, response, auth, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
     await bouncer.with(OrganizationPolicy).authorize('manageMembers')
+    await user.load('organization')
 
     try {
+      await this.quotaService.assertCanAddMember(user.organization)
       const payload = await request.validateUsing(inviteMemberValidator)
       await this.memberService.addMember(user.organizationId!, payload.email, payload.role)
     } catch (error) {
+      if (error instanceof QuotaExceededError) {
+        session.flash('error', i18n.t('flash.quota.membersExceeded'))
+        return response.redirect().back()
+      }
       if (error instanceof UserNotFoundError) {
         session.flash('error', 'member_user_not_found')
         return response.redirect().back()

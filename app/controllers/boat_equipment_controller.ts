@@ -232,7 +232,7 @@ export default class BoatEquipmentController {
     await bouncer.with(BoatPolicy).authorize('edit', boat)
 
     try {
-      await this.boatService.deleteSail(loaded.user, boat, Number(params.sailId))
+      await this.equipmentService.deleteSail(loaded.user, boat, Number(params.sailId))
     } catch (error) {
       if (error instanceof BoatEquipmentNotFoundError) {
         session.flash('error', i18n.t('flash.sail.notFound'))
@@ -279,7 +279,7 @@ export default class BoatEquipmentController {
     await bouncer.with(BoatPolicy).authorize('edit', boat)
 
     const body = (await request.validateUsing(upsertBoatRigValidator)) as BoatRigFormBody
-    await this.boatService.upsertRig(loaded.user, boat, equipmentBodyToRigPayload(body))
+    await this.equipmentService.upsertRig(loaded.user, boat, equipmentBodyToRigPayload(body))
 
     session.flash('success', i18n.t('flash.rig.saved'))
     response.redirect(`/boats/${boat.id}`)
@@ -293,7 +293,7 @@ export default class BoatEquipmentController {
     const { boat } = loaded
     await bouncer.with(BoatPolicy).authorize('edit', boat)
 
-    await this.boatService.deleteRig(loaded.user, boat)
+    await this.equipmentService.deleteRig(loaded.user, boat)
 
     session.flash('success', i18n.t('flash.rig.removed'))
     response.redirect(`/boats/${boat.id}`)
@@ -409,7 +409,7 @@ export default class BoatEquipmentController {
     const { status } = await request.validateUsing(updateEquipmentStatusValidator)
 
     try {
-      await this.boatService.updateEngineStatus(loaded.user, boat, Number(params.engineId), status)
+      await this.equipmentService.updateEngineStatus(loaded.user, boat, Number(params.engineId), status)
     } catch (error) {
       if (error instanceof BoatEquipmentNotFoundError) {
         session.flash('error', i18n.t('flash.engine.notFound'))
@@ -441,7 +441,7 @@ export default class BoatEquipmentController {
     const { notes } = await request.validateUsing(updateEquipmentNotesValidator)
 
     try {
-      await this.boatService.updateEngineNotes(
+      await this.equipmentService.updateEngineNotes(
         loaded.user,
         boat,
         Number(params.engineId),

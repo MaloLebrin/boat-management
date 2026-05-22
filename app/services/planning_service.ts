@@ -14,7 +14,7 @@ export default class PlanningService {
    */
   async getPlanningForOrg(user: User): Promise<PlanningResult> {
     if (user.organizationId === null) {
-      return { tasks: [], overdueTasks: [], soonTasks: [], plannedTasks: [] }
+      return { tasks: [], overdueTasks: [], soonTasks: [], plannedTasks: [], doneTasks: [] }
     }
 
     const boats = await Boat.query().where('organizationId', user.organizationId).preload('engines')
@@ -23,7 +23,7 @@ export default class PlanningService {
     const boatMap = new Map(boats.map((b) => [b.id, b]))
 
     if (boatIds.length === 0) {
-      return { tasks: [], overdueTasks: [], soonTasks: [], plannedTasks: [] }
+      return { tasks: [], overdueTasks: [], soonTasks: [], plannedTasks: [], doneTasks: [] }
     }
 
     const rawTasks = await BoatMaintenanceTask.query()
@@ -32,15 +32,20 @@ export default class PlanningService {
       .orderBy('dueAt', 'asc')
       .orderBy('dueEngineHours', 'asc')
 
+    const rawDoneTasks = await BoatMaintenanceTask.query()
+      .whereIn('boatId', boatIds)
+      .where('status', 'done')
+      .orderBy('updatedAt', 'desc')
+      .limit(20)
+
     const today = DateTime.now().startOf('day')
     const soonDateThreshold = today.plus({ days: 30 })
     const soonHoursThreshold = 50
 
-    const tasks: PlanningTask[] = rawTasks.map((t) => {
+    const toTask = (t: BoatMaintenanceTask): PlanningTask => {
       const boat = boatMap.get(t.boatId)!
       const engine = t.boatEngineId ? boat.engines.find((e) => e.id === t.boatEngineId) : null
       const currentEngineHours = engine?.hours ?? null
-
       return {
         id: t.id,
         boatId: t.boatId,
@@ -53,7 +58,10 @@ export default class PlanningService {
         currentEngineHours,
         status: t.status as 'open' | 'done',
       }
-    })
+    }
+
+    const tasks: PlanningTask[] = rawTasks.map(toTask)
+    const doneTasks: PlanningTask[] = rawDoneTasks.map(toTask)
 
     const overdueTasks: PlanningTask[] = []
     const soonTasks: PlanningTask[] = []
@@ -72,7 +80,7 @@ export default class PlanningService {
       }
     }
 
-    return { tasks, overdueTasks, soonTasks, plannedTasks }
+    return { tasks, overdueTasks, soonTasks, plannedTasks, doneTasks }
   }
 
   private isOverdue(task: PlanningTask, today: DateTime): boolean {

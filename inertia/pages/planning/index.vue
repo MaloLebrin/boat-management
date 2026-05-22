@@ -24,6 +24,7 @@ const props = defineProps<{
   overdueTasks: PlanningTask[]
   soonTasks: PlanningTask[]
   plannedTasks: PlanningTask[]
+  doneTasks: PlanningTask[]
 }>()
 
 const { t, locale } = useT()
@@ -35,8 +36,23 @@ const today = new Date()
 const currentYear = ref(today.getFullYear())
 const currentMonth = ref(today.getMonth())
 
-// TODO: add month navigation — add prev/next buttons that mutate currentYear/currentMonth
-// TODO: load done tasks from backend and show them in the "Complétées" kanban column
+function prevMonth() {
+  if (currentMonth.value === 0) {
+    currentMonth.value = 11
+    currentYear.value--
+  } else {
+    currentMonth.value--
+  }
+}
+
+function nextMonth() {
+  if (currentMonth.value === 11) {
+    currentMonth.value = 0
+    currentYear.value++
+  } else {
+    currentMonth.value++
+  }
+}
 
 const monthLabel = computed(() =>
   new Date(currentYear.value, currentMonth.value).toLocaleDateString(locale.value, { month: 'long', year: 'numeric' })
@@ -87,6 +103,8 @@ function taskPillClass(task: PlanningTask): string {
   if (new Date(dueDate) <= soon) return 'bg-amber-500 text-white'
   return 'bg-lagoon-600 text-white'
 }
+
+const allTasks = computed(() => [...props.tasks, ...props.doneTasks])
 </script>
 
 <template>
@@ -130,7 +148,7 @@ function taskPillClass(task: PlanningTask): string {
     </div>
 
     <!-- Empty state -->
-    <div v-if="tasks.length === 0">
+    <div v-if="allTasks.length === 0">
       <BaseEmptyState
         :title="t('planning.empty.title')"
         :description="t('planning.empty.description')"
@@ -213,16 +231,32 @@ function taskPillClass(task: PlanningTask): string {
         </BaseCard>
       </div>
 
-      <!-- TODO: fetch done tasks from backend (planning controller) and render them here instead of the static empty state -->
       <!-- Complétées -->
       <div class="flex flex-col gap-3">
         <div class="flex items-center gap-2 rounded-lg border-l-4 border-mint-600 bg-mint-50 px-3 py-2">
           <h2 class="text-sm font-semibold text-mint-700">{{ t('planning.kanban.completed') }}</h2>
-          <span class="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-mint-600 px-1.5 text-xs font-semibold text-white">0</span>
+          <span class="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-mint-600 px-1.5 text-xs font-semibold text-white">
+            {{ doneTasks.length }}
+          </span>
         </div>
-        <div class="rounded-lg border border-dashed border-border px-4 py-6 text-center text-sm text-fg-muted">
+        <div v-if="doneTasks.length === 0" class="rounded-lg border border-dashed border-border px-4 py-6 text-center text-sm text-fg-muted">
           {{ t('planning.kanban.completedEmpty') }}
         </div>
+        <BaseCard
+          v-for="task in doneTasks"
+          :key="task.id"
+          class="border-l-4 border-mint-500 opacity-75"
+        >
+          <p class="text-xs font-medium text-fg-muted">{{ task.boatName }}</p>
+          <p class="mt-1 text-sm font-semibold text-fg line-through">{{ task.title }}</p>
+          <p class="mt-1 text-xs text-fg-muted capitalize">{{ task.subject }}</p>
+          <div class="mt-2 flex items-center justify-between">
+            <span class="inline-flex items-center rounded-full bg-mint-100 px-2 py-0.5 text-xs font-medium text-mint-700">
+              {{ formatDue(task) }}
+            </span>
+            <span class="text-xs text-fg-subtle">{{ task.kind === 'date' ? t('planning.taskKind.date') : t('planning.taskKind.hours') }}</span>
+          </div>
+        </BaseCard>
       </div>
     </div>
 
@@ -230,8 +264,27 @@ function taskPillClass(task: PlanningTask): string {
     <div v-else class="space-y-6">
       <BaseCard>
         <template #header>
-          <!-- TODO: add prev/next month navigation buttons — currentYear and currentMonth must become reactive refs -->
-          <h2 class="text-sm font-semibold capitalize text-fg">{{ monthLabel }}</h2>
+          <div class="flex items-center justify-between">
+            <button
+              type="button"
+              class="rounded-md p-1 text-fg-muted hover:bg-surface-muted hover:text-fg"
+              @click="prevMonth"
+            >
+              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <h2 class="text-sm font-semibold capitalize text-fg">{{ monthLabel }}</h2>
+            <button
+              type="button"
+              class="rounded-md p-1 text-fg-muted hover:bg-surface-muted hover:text-fg"
+              @click="nextMonth"
+            >
+              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
         </template>
 
         <!-- Day-of-week header -->
@@ -258,11 +311,11 @@ function taskPillClass(task: PlanningTask): string {
             v-for="cell in calendarDays"
             :key="cell.day"
             class="min-h-20 bg-surface-elevated p-1.5"
-            :class="cell.day === today.getDate() ? 'ring-2 ring-inset ring-lagoon-500' : ''"
+            :class="cell.day === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear() ? 'ring-2 ring-inset ring-lagoon-500' : ''"
           >
             <span
               class="mb-1 flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold"
-              :class="cell.day === today.getDate() ? 'bg-lagoon-500 text-white' : 'text-fg-muted'"
+              :class="cell.day === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear() ? 'bg-lagoon-500 text-white' : 'text-fg-muted'"
             >
               {{ cell.day }}
             </span>
@@ -302,10 +355,13 @@ function taskPillClass(task: PlanningTask): string {
               <p class="text-sm font-medium text-fg">{{ task.title }}</p>
               <p class="text-xs text-fg-muted">{{ task.boatName }} · {{ task.subject }}</p>
             </div>
-            <!-- TODO: replace href with a link to the task edit page or open an inline modal to set the dueAt date -->
-            <a :href="`/boats/${task.boatId}`" class="text-xs font-medium text-brand hover:underline">
+            <button
+              type="button"
+              class="text-xs font-medium text-brand hover:underline"
+              @click="router.visit(`/boats/${task.boatId}`)"
+            >
               {{ t('planning.calendar.schedule') }}
-            </a>
+            </button>
           </div>
         </div>
       </BaseCard>
