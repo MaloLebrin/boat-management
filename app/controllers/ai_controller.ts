@@ -5,6 +5,8 @@ import BoatMaintenanceService from '#services/boat_maintenance_service'
 import BoatMaintenanceTaskService from '#services/boat_maintenance_task_service'
 import BoatService, { BoatNotFoundError } from '#services/boat_service'
 import DashboardService from '#services/dashboard_service'
+import QuotaService from '#services/quota_service'
+import { QuotaExceededError } from '#exceptions/quota_errors'
 import { aiChatValidator } from '#validators/ai'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
@@ -17,12 +19,24 @@ export default class AiController {
     private aiAnalysisService: AiAnalysisService,
     private boatService: BoatService,
     private boatMaintenanceService: BoatMaintenanceService,
-    private boatMaintenanceTaskService: BoatMaintenanceTaskService
+    private boatMaintenanceTaskService: BoatMaintenanceTaskService,
+    private quotaService: QuotaService
   ) {}
 
   async chat({ request, response, auth, session, i18n }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
+
+    await user.load('organization')
+    try {
+      this.quotaService.assertCanUseAI(user.organization)
+    } catch (error) {
+      if (error instanceof QuotaExceededError) {
+        session.flash('error', i18n.t('flash.quota.aiExceeded'))
+        return response.redirect().back()
+      }
+      throw error
+    }
 
     const { messages } = await request.validateUsing(aiChatValidator)
 
@@ -35,6 +49,17 @@ export default class AiController {
   async fleetAnalysis({ response, auth, session, i18n }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
+
+    await user.load('organization')
+    try {
+      this.quotaService.assertCanUseAI(user.organization)
+    } catch (error) {
+      if (error instanceof QuotaExceededError) {
+        session.flash('error', i18n.t('flash.quota.aiExceeded'))
+        return response.redirect().back()
+      }
+      throw error
+    }
 
     try {
       const data = await this.dashboardService.getForUser(user)
@@ -50,6 +75,17 @@ export default class AiController {
     await auth.authenticate()
     const user = auth.getUserOrFail()
     const boatId = Number(params.id)
+
+    await user.load('organization')
+    try {
+      this.quotaService.assertCanUseAI(user.organization)
+    } catch (error) {
+      if (error instanceof QuotaExceededError) {
+        session.flash('error', i18n.t('flash.quota.aiExceeded'))
+        return response.redirect().back()
+      }
+      throw error
+    }
 
     try {
       const boat = await this.boatService.getForUserOrFail(user, boatId)

@@ -87,5 +87,11 @@
     "alreadyUsed": "This invitation has already been accepted.",
     "alreadyMember": "You are already a member of this organisation.",
     "alreadyPending": "An invitation is already pending for this email."
+  },
+  "quota": {
+    "boatsExceeded": "You have reached the boat limit for your plan. Upgrade to add more boats.",
+    "membersExceeded": "You have reached the member limit for your plan. Upgrade to add more members.",
+    "aiExceeded": "AI features are not available on your current plan. Upgrade to Pro or Enterprise.",
+    "exportExceeded": "Export is not available on your current plan. Upgrade to Pro or Enterprise."
   }
 }

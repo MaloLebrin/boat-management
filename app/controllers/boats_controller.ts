@@ -1,4 +1,5 @@
 import { SpotNotFoundError } from '#exceptions/port_errors'
+import { QuotaExceededError } from '#exceptions/quota_errors'
 import AiAnalysisService, { type AiSuggestion } from '#services/ai_analysis_service'
 import BoatListService from '#services/boat_list_service'
 import { toShowProps } from '#transformers/boat_transformer'
@@ -8,6 +9,7 @@ import BoatMaintenanceTaskService from '#services/boat_maintenance_task_service'
 import BoatService, { BoatNotFoundError } from '#services/boat_service'
 import MediaService from '#services/media_service'
 import PortService from '#services/port_service'
+import QuotaService from '#services/quota_service'
 import SpotService from '#services/spot_service'
 import BoatPolicy from '#policies/boat_policy'
 import { createBoatValidator, updateBoatValidator } from '#validators/boat'
@@ -26,7 +28,8 @@ export default class BoatsController {
     private aiAnalysisService: AiAnalysisService,
     private boatListService: BoatListService,
     private portService: PortService,
-    private spotService: SpotService
+    private spotService: SpotService,
+    private quotaService: QuotaService
   ) {}
 
   async index({ inertia, auth, request }: HttpContext) {
@@ -66,13 +69,23 @@ export default class BoatsController {
     })
   }
 
-  async store({ request, response, auth, bouncer }: HttpContext) {
+  async store({ request, response, auth, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
     await bouncer.with(BoatPolicy).authorize('create')
 
-    const payload = await request.validateUsing(createBoatValidator)
+    await user.load('organization')
+    try {
+      await this.quotaService.assertCanAddBoat(user.organization)
+    } catch (error) {
+      if (error instanceof QuotaExceededError) {
+        session.flash('error', i18n.t(`flash.quota.${error.feature}Exceeded`))
+        return response.redirect().back()
+      }
+      throw error
+    }
 
+    const payload = await request.validateUsing(createBoatValidator)
     const boat = await this.boatService.createForUser(user, payload)
 
     response.redirect(`/boats/${boat.id}`)

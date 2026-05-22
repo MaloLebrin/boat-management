@@ -430,6 +430,33 @@ export class MouillageSchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class OrganizationInvitationSchema extends BaseModel {
+  static $columns = ['acceptedAt', 'createdAt', 'email', 'expiresAt', 'id', 'invitedById', 'organizationId', 'role', 'status', 'token', 'updatedAt'] as const
+  $columns = OrganizationInvitationSchema.$columns
+  @column.dateTime()
+  declare acceptedAt: DateTime | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare email: string
+  @column.dateTime()
+  declare expiresAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare invitedById: number | null
+  @column()
+  declare organizationId: number
+  @column()
+  declare role: string
+  @column()
+  declare status: string
+  @column()
+  declare token: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class OrganizationMembershipSchema extends BaseModel {
   static $columns = ['createdAt', 'id', 'organizationId', 'role', 'updatedAt', 'userId'] as const
   $columns = OrganizationMembershipSchema.$columns
@@ -448,7 +475,7 @@ export class OrganizationMembershipSchema extends BaseModel {
 }
 
 export class OrganizationSchema extends BaseModel {
-  static $columns = ['createdAt', 'id', 'name', 'slug', 'updatedAt'] as const
+  static $columns = ['createdAt', 'id', 'name', 'plan', 'slug', 'updatedAt'] as const
   $columns = OrganizationSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -456,6 +483,8 @@ export class OrganizationSchema extends BaseModel {
   declare id: number
   @column()
   declare name: string
+  @column()
+  declare plan: string
   @column()
   declare slug: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })

@@ -2,6 +2,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import type { NextFn } from '@adonisjs/core/types/http'
 import UserTransformer from '#transformers/user_transformer'
 import BaseInertiaMiddleware from '@adonisjs/inertia/inertia_middleware'
+import type { PlanTier } from '#shared/types/plan'
 
 export default class InertiaMiddleware extends BaseInertiaMiddleware {
   share(ctx: HttpContext) {
@@ -44,6 +45,12 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
         success,
       }),
       user: ctx.inertia.always(auth?.user ? UserTransformer.transform(auth.user) : undefined),
+      currentPlan: ctx.inertia.always(async () => {
+        const user = auth?.user
+        if (!user?.organizationId) return null
+        await user.load('organization')
+        return user.organization.plan as PlanTier
+      }),
     }
   }
 

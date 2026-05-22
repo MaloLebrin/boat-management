@@ -3,6 +3,30 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-05-22 — Système de quotas par plan (Starter / Pro / Enterprise)
+
+Mise en place de l'enforcement des limites par plan organisationnel.
+
+- **Migration** : colonne `plan` (enum `starter|pro|enterprise`, défaut `starter`) ajoutée à la table `organizations`
+- **`shared/types/plan.ts`** : constantes `PLAN_LIMITS`, type `PlanTier`, interfaces `PlanQuotas` et `QuotaUsage` — source de vérité partagée backend/frontend
+- **`app/exceptions/quota_errors.ts`** : `QuotaExceededError` avec contexte (feature, limit, current, upgradeTo)
+- **`app/services/quota_service.ts`** : `assertCanAddBoat`, `assertCanAddMember`, `assertCanUseAI`, `assertCanExport`
+- **Enforcement (hard block)** dans les controllers :
+  - `BoatsController.store` : quota bateaux vérifié avant création
+  - `OrganizationInvitationsController.store` : quota membres vérifié avant invitation
+  - `AiController.chat / fleetAnalysis / boatSuggestions` : accès IA vérifié
+- **Inertia shared props** : `currentPlan` exposé à toutes les pages via `InertiaMiddleware`
+- **Page billing** (`settings/billing`) : plan réel, jauges d'usage (bateaux/membres), disponibilité IA/export, CTA de mise à niveau
+- **i18n** : clés `flash.quota.*` et refonte de `settings.billing.*` en EN et FR
+
+Limites :
+| Feature | Starter | Pro | Enterprise |
+|---|---|---|---|
+| Bateaux | 2 | 25 | ∞ |
+| Membres | 1 | ∞ | ∞ |
+| IA / Copilote | ✗ | ✓ | ✓ |
+| Export | ✗ | ✓ | ✓ |
+
 ---
 
 ## 2026-05-22 — Invitations de membres

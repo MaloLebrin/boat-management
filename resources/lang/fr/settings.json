@@ -50,14 +50,26 @@
   "billing": {
     "title": "Facturation et plan",
     "currentPlan": "Plan actuel",
-    "freePlan": "Gratuit",
-    "freeDescription": "Vous utilisez actuellement le plan gratuit avec des fonctionnalités limitées.",
-    "features": {
-      "upTo3Boats": "Jusqu'à 3 bateaux",
-      "maintenanceHistory": "Historique de maintenance",
-      "aiSuggestions": "Suggestions IA"
+    "planName": {
+      "starter": "Starter",
+      "pro": "Pro",
+      "enterprise": "Entreprise"
     },
-    "upgradePro": "Passer au plan Pro",
+    "usage": {
+      "boats": "Bateaux",
+      "members": "Membres",
+      "unlimited": "Illimité",
+      "of": "sur"
+    },
+    "features": {
+      "ai": "IA / Copilote",
+      "export": "Export (PDF / CSV / JSON)",
+      "maintenanceHistory": "Historique de maintenance"
+    },
+    "upgradeTo": {
+      "pro": "Passer au plan Pro",
+      "enterprise": "Passer au plan Entreprise"
+    },
     "paymentMethod": "Méthode de paiement",
     "noPaymentMethod": "Aucune méthode de paiement configurée.",
     "addCard": "Ajouter une carte"

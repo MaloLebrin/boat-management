@@ -4,6 +4,9 @@ import OrganizationPolicy from '#policies/organization_policy'
 import { updateOrganizationValidator, updateProfileValidator } from '#validators/user'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
+import Boat from '#models/boat'
+import OrganizationMembership from '#models/organization_membership'
+import { PLAN_LIMITS } from '#shared/types/plan'
 
 @inject()
 export default class SettingsController {
@@ -54,8 +57,26 @@ export default class SettingsController {
     })
   }
 
-  async billing({ inertia }: HttpContext) {
-    return inertia.render('settings/billing', {})
+  async billing({ inertia, auth }: HttpContext) {
+    const user = await auth.authenticate()
+    await user.load('organization')
+    const org = user.organization
+    const limits = PLAN_LIMITS[org.plan]
+
+    const [boatRows, memberRows] = await Promise.all([
+      Boat.query().where('organizationId', org.id).count('* as total'),
+      OrganizationMembership.query().where('organizationId', org.id).count('* as total'),
+    ])
+
+    return inertia.render('settings/billing', {
+      plan: org.plan,
+      quotaUsage: {
+        boats: { used: Number(boatRows[0].$extras.total), limit: limits.maxBoats },
+        members: { used: Number(memberRows[0].$extras.total), limit: limits.maxMembers },
+        canUseAI: limits.canUseAI,
+        canExport: limits.canExport,
+      },
+    })
   }
 
   async updateProfile({ request, response, session, auth, i18n }: HttpContext) {

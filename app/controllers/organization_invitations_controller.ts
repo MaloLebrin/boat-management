@@ -1,5 +1,6 @@
 import OrganizationInvitationService from '#services/organization_invitation_service'
 import EmailQueueService from '#services/email_queue_service'
+import QuotaService from '#services/quota_service'
 import OrganizationPolicy from '#policies/organization_policy'
 import {
   AlreadyMemberError,
@@ -8,6 +9,7 @@ import {
   InvitationExpiredError,
   InvitationNotFoundError,
 } from '#exceptions/organization_errors'
+import { QuotaExceededError } from '#exceptions/quota_errors'
 import { acceptInvitationValidator, inviteMemberValidator } from '#validators/organization_member'
 import env from '#start/env'
 import { inject } from '@adonisjs/core'
@@ -17,7 +19,8 @@ import type { HttpContext } from '@adonisjs/core/http'
 export default class OrganizationInvitationsController {
   constructor(
     private invitationService: OrganizationInvitationService,
-    private emailQueueService: EmailQueueService
+    private emailQueueService: EmailQueueService,
+    private quotaService: QuotaService
   ) {}
 
   async store({ request, response, auth, bouncer, session, i18n }: HttpContext) {
@@ -29,6 +32,8 @@ export default class OrganizationInvitationsController {
       const payload = await request.validateUsing(inviteMemberValidator)
 
       await user.load('organization')
+      await this.quotaService.assertCanAddMember(user.organization)
+
       const { invitation, plainToken } = await this.invitationService.create(
         user.organizationId!,
         user.id,
@@ -52,6 +57,10 @@ export default class OrganizationInvitationsController {
       }
       if (error instanceof AlreadyMemberError) {
         session.flash('error', i18n.t('flash.invitation.alreadyMember'))
+        return response.redirect().back()
+      }
+      if (error instanceof QuotaExceededError) {
+        session.flash('error', i18n.t(`flash.quota.${error.feature}Exceeded`))
         return response.redirect().back()
       }
       throw error

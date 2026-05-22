@@ -50,14 +50,26 @@
   "billing": {
     "title": "Billing & plan",
     "currentPlan": "Current plan",
-    "freePlan": "Free",
-    "freeDescription": "You are currently on the free plan with limited features.",
-    "features": {
-      "upTo3Boats": "Up to 3 boats",
-      "maintenanceHistory": "Maintenance history",
-      "aiSuggestions": "AI suggestions"
+    "planName": {
+      "starter": "Starter",
+      "pro": "Pro",
+      "enterprise": "Enterprise"
     },
-    "upgradePro": "Upgrade to Pro plan",
+    "usage": {
+      "boats": "Boats",
+      "members": "Members",
+      "unlimited": "Unlimited",
+      "of": "of"
+    },
+    "features": {
+      "ai": "AI / Copilot",
+      "export": "Export (PDF / CSV / JSON)",
+      "maintenanceHistory": "Maintenance history"
+    },
+    "upgradeTo": {
+      "pro": "Upgrade to Pro",
+      "enterprise": "Upgrade to Enterprise"
+    },
     "paymentMethod": "Payment method",
     "noPaymentMethod": "No payment method configured.",
     "addCard": "Add a card"
