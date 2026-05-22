@@ -468,6 +468,30 @@ const routes = {
     tokens: [{"old":"/settings","type":0,"val":"settings","end":""}],
     types: placeholder as Registry['settings.index']['types'],
   },
+  'settings.me': {
+    methods: ["GET","HEAD"],
+    pattern: '/settings/me',
+    tokens: [{"old":"/settings/me","type":0,"val":"settings","end":""},{"old":"/settings/me","type":0,"val":"me","end":""}],
+    types: placeholder as Registry['settings.me']['types'],
+  },
+  'settings.org': {
+    methods: ["GET","HEAD"],
+    pattern: '/settings/org',
+    tokens: [{"old":"/settings/org","type":0,"val":"settings","end":""},{"old":"/settings/org","type":0,"val":"org","end":""}],
+    types: placeholder as Registry['settings.org']['types'],
+  },
+  'settings.members': {
+    methods: ["GET","HEAD"],
+    pattern: '/settings/members',
+    tokens: [{"old":"/settings/members","type":0,"val":"settings","end":""},{"old":"/settings/members","type":0,"val":"members","end":""}],
+    types: placeholder as Registry['settings.members']['types'],
+  },
+  'settings.billing': {
+    methods: ["GET","HEAD"],
+    pattern: '/settings/billing',
+    tokens: [{"old":"/settings/billing","type":0,"val":"settings","end":""},{"old":"/settings/billing","type":0,"val":"billing","end":""}],
+    types: placeholder as Registry['settings.billing']['types'],
+  },
   'settings.profile.update': {
     methods: ["PUT"],
     pattern: '/settings/profile',

@@ -38,5 +38,9 @@ declare module '@adonisjs/inertia/types' {
     'ports/new': ExtractProps<(typeof import('../../inertia/pages/ports/new.vue'))['default']>
     'ports/show': ExtractProps<(typeof import('../../inertia/pages/ports/show.vue'))['default']>
     'settings/index': ExtractProps<(typeof import('../../inertia/pages/settings/index.vue'))['default']>
+    'settings/me': ExtractProps<(typeof import('../../inertia/pages/settings/me.vue'))['default']>
+    'settings/org': ExtractProps<(typeof import('../../inertia/pages/settings/org.vue'))['default']>
+    'settings/members': ExtractProps<(typeof import('../../inertia/pages/settings/members.vue'))['default']>
+    'settings/billing': ExtractProps<(typeof import('../../inertia/pages/settings/billing.vue'))['default']>
   }
 }

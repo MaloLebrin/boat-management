@@ -16,7 +16,11 @@ router
 
 router
   .group(() => {
-    router.get('settings', [SettingsController, 'index']).as('settings.index')
+    router.get('settings', ({ response }) => response.redirect('/settings/me')).as('settings.index')
+    router.get('settings/me', [SettingsController, 'me']).as('settings.me')
+    router.get('settings/org', [SettingsController, 'org']).as('settings.org')
+    router.get('settings/members', [SettingsController, 'members']).as('settings.members')
+    router.get('settings/billing', [SettingsController, 'billing']).as('settings.billing')
     router
       .put('settings/profile', [SettingsController, 'updateProfile'])
       .as('settings.profile.update')

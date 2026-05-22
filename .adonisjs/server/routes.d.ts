@@ -81,6 +81,10 @@ export type ScannedRoutes = {
     'planning.index': { paramsTuple?: []; params?: {} }
     'locale.set': { paramsTuple?: []; params?: {} }
     'settings.index': { paramsTuple?: []; params?: {} }
+    'settings.me': { paramsTuple?: []; params?: {} }
+    'settings.org': { paramsTuple?: []; params?: {} }
+    'settings.members': { paramsTuple?: []; params?: {} }
+    'settings.billing': { paramsTuple?: []; params?: {} }
     'settings.profile.update': { paramsTuple?: []; params?: {} }
     'settings.org.update': { paramsTuple?: []; params?: {} }
     'maintenance.history': { paramsTuple?: []; params?: {} }
@@ -129,6 +133,10 @@ export type ScannedRoutes = {
     'ports.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'planning.index': { paramsTuple?: []; params?: {} }
     'settings.index': { paramsTuple?: []; params?: {} }
+    'settings.me': { paramsTuple?: []; params?: {} }
+    'settings.org': { paramsTuple?: []; params?: {} }
+    'settings.members': { paramsTuple?: []; params?: {} }
+    'settings.billing': { paramsTuple?: []; params?: {} }
     'maintenance.history': { paramsTuple?: []; params?: {} }
     'organization.members.index': { paramsTuple?: []; params?: {} }
     'new_account.create': { paramsTuple?: []; params?: {} }
@@ -164,6 +172,10 @@ export type ScannedRoutes = {
     'ports.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'planning.index': { paramsTuple?: []; params?: {} }
     'settings.index': { paramsTuple?: []; params?: {} }
+    'settings.me': { paramsTuple?: []; params?: {} }
+    'settings.org': { paramsTuple?: []; params?: {} }
+    'settings.members': { paramsTuple?: []; params?: {} }
+    'settings.billing': { paramsTuple?: []; params?: {} }
     'maintenance.history': { paramsTuple?: []; params?: {} }
     'organization.members.index': { paramsTuple?: []; params?: {} }
     'new_account.create': { paramsTuple?: []; params?: {} }

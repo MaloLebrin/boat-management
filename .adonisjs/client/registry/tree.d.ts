@@ -122,11 +122,14 @@ export interface ApiDefinition {
   }
   settings: {
     index: typeof routes['settings.index']
+    me: typeof routes['settings.me']
+    org: typeof routes['settings.org'] & {
+      update: typeof routes['settings.org.update']
+    }
+    members: typeof routes['settings.members']
+    billing: typeof routes['settings.billing']
     profile: {
       update: typeof routes['settings.profile.update']
-    }
-    org: {
-      update: typeof routes['settings.org.update']
     }
   }
   maintenance: {

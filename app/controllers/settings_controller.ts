@@ -2,21 +2,44 @@ import { updateOrganizationValidator, updateProfileValidator } from '#validators
 import type { HttpContext } from '@adonisjs/core/http'
 
 export default class SettingsController {
-  async index({ inertia, auth }: HttpContext) {
+  async me({ inertia, auth }: HttpContext) {
     const user = await auth.authenticate()
-    await user.load('organization')
 
-    return inertia.render('settings/index', {
+    return inertia.render('settings/me', {
       user: {
         id: user.id,
         email: user.email,
         fullName: user.fullName,
       },
+    })
+  }
+
+  async org({ inertia, auth }: HttpContext) {
+    const user = await auth.authenticate()
+    await user.load('organization')
+
+    return inertia.render('settings/org', {
       organization: {
         id: user.organization.id,
         name: user.organization.name,
       },
     })
+  }
+
+  async members({ inertia, auth }: HttpContext) {
+    const user = await auth.authenticate()
+
+    return inertia.render('settings/members', {
+      user: {
+        id: user.id,
+        email: user.email,
+        fullName: user.fullName,
+      },
+    })
+  }
+
+  async billing({ inertia }: HttpContext) {
+    return inertia.render('settings/billing')
   }
 
   async updateProfile({ request, response, session, auth, i18n }: HttpContext) {
