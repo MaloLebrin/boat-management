@@ -1,3 +1,4 @@
+import BoatPolicy from '#policies/boat_policy'
 import BoatEquipmentService, { BoatEquipmentNotFoundError } from '#services/boat_equipment_service'
 import BoatHullService, { BoatNotFoundError } from '#services/boat_hull_service'
 import {
@@ -33,7 +34,7 @@ export default class BoatSafetyEquipmentController {
     const loaded = await this.loadBoat({ auth, response, params })
     if (!loaded) return
     const { user, boat } = loaded
-    await bouncer.authorize('boatUpdate', boat)
+    await bouncer.with(BoatPolicy).authorize('edit', boat)
     const payload = await request.validateUsing(createSafetyEquipmentValidator)
     try {
       await this.equipmentService.createSafetyEquipment(user, boat, payload)
@@ -54,7 +55,7 @@ export default class BoatSafetyEquipmentController {
     const loaded = await this.loadBoat({ auth, response, params })
     if (!loaded) return
     const { user, boat } = loaded
-    await bouncer.authorize('boatUpdate', boat)
+    await bouncer.with(BoatPolicy).authorize('edit', boat)
     const payload = await request.validateUsing(updateSafetyEquipmentValidator)
     try {
       await this.equipmentService.updateSafetyEquipment(user, boat, Number(params.itemId), payload)
@@ -75,7 +76,7 @@ export default class BoatSafetyEquipmentController {
     const loaded = await this.loadBoat({ auth, response, params })
     if (!loaded) return
     const { user, boat } = loaded
-    await bouncer.authorize('boatUpdate', boat)
+    await bouncer.with(BoatPolicy).authorize('edit', boat)
     try {
       await this.equipmentService.deleteSafetyEquipment(user, boat, Number(params.itemId))
     } catch (error) {

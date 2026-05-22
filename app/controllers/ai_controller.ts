@@ -1,3 +1,4 @@
+import BoatPolicy from '#policies/boat_policy'
 import AiAnalysisService from '#services/ai_analysis_service'
 import AiQueueService from '#services/ai_queue_service'
 import BoatMaintenanceService from '#services/boat_maintenance_service'
@@ -52,7 +53,7 @@ export default class AiController {
 
     try {
       const boat = await this.boatService.getForUserOrFail(user, boatId)
-      await bouncer.authorize('boatView', boat)
+      await bouncer.with(BoatPolicy).authorize('view', boat)
       await boat.load('safetyEquipment')
 
       const maintenanceEvents = await this.boatMaintenanceService.listForBoat(user, boat)

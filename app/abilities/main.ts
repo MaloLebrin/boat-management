@@ -1,23 +1,6 @@
 import { Bouncer } from '@adonisjs/bouncer'
-import type Boat from '#models/boat'
-import type User from '#models/user'
 
-function sameOrganization(user: User, boat: Boat) {
-  return user.organizationId !== null && user.organizationId === boat.organizationId
-}
+// Abilities migrated to policies — see app/policies/
+// Kept as empty export to preserve the #abilities/main import used in initialize_bouncer_middleware.ts
 
-export const boatView = Bouncer.ability((user: User, boat: Boat) => {
-  return sameOrganization(user, boat)
-})
-
-export const boatCreate = Bouncer.ability((user: User) => {
-  return user.organizationId !== null
-})
-
-export const boatUpdate = Bouncer.ability((user: User, boat: Boat) => {
-  return sameOrganization(user, boat)
-})
-
-export const boatDelete = Bouncer.ability((user: User, boat: Boat) => {
-  return sameOrganization(user, boat)
-})
+export const _placeholder = Bouncer.ability(() => false)

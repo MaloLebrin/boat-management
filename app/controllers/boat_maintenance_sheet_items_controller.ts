@@ -3,6 +3,7 @@ import BoatMaintenanceSheetService, {
   BoatMaintenanceSheetNotFoundError,
 } from '#services/boat_maintenance_sheet_service'
 import BoatHullService, { BoatNotFoundError } from '#services/boat_hull_service'
+import MaintenancePolicy from '#policies/maintenance_policy'
 import { updateSheetItemValidator } from '#validators/boat_maintenance_sheet'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
@@ -34,7 +35,7 @@ export default class BoatMaintenanceSheetItemsController {
     if (!loaded) return
     const { user, boat } = loaded
 
-    await bouncer.authorize('boatUpdate', boat)
+    await bouncer.with(MaintenancePolicy).authorize('edit', boat)
 
     const payload = await request.validateUsing(updateSheetItemValidator)
 

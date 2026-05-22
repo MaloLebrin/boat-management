@@ -1,6 +1,7 @@
 import { PontoonHasBoatsError, PontoonNotFoundError, PortNotFoundError } from '#exceptions/port_errors'
 import PortService from '#services/port_service'
 import PontoonService from '#services/pontoon_service'
+import PortPolicy from '#policies/port_policy'
 import { createPontoonValidator, updatePontoonValidator } from '#validators/pontoon'
 import { updatePositionValidator } from '#validators/marina_layout'
 import { inject } from '@adonisjs/core'
@@ -13,12 +14,13 @@ export default class PontoonsController {
     private portService: PortService
   ) {}
 
-  async store({ request, params, auth, response }: HttpContext) {
+  async store({ request, params, auth, response, bouncer }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
     try {
       const port = await this.portService.getForUserOrFail(user, Number(params.portId))
+      await bouncer.with(PortPolicy).authorize('create')
       const payload = await request.validateUsing(createPontoonValidator)
       await this.pontoonService.createForPort(port, payload)
       return response.redirect(`/ports/${port.id}`)
@@ -28,11 +30,12 @@ export default class PontoonsController {
     }
   }
 
-  async update({ request, params, auth, response }: HttpContext) {
+  async update({ request, params, auth, response, bouncer }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
     try {
+      await bouncer.with(PortPolicy).authorize('create')
       const pontoon = await this.pontoonService.getForUserOrFail(
         user,
         Number(params.portId),
@@ -47,11 +50,12 @@ export default class PontoonsController {
     }
   }
 
-  async destroy({ params, auth, response, session }: HttpContext) {
+  async destroy({ params, auth, response, session, bouncer }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
     try {
+      await bouncer.with(PortPolicy).authorize('create')
       const pontoon = await this.pontoonService.getForUserOrFail(
         user,
         Number(params.portId),
@@ -69,11 +73,12 @@ export default class PontoonsController {
     }
   }
 
-  async updatePosition({ request, params, auth, response }: HttpContext) {
+  async updatePosition({ request, params, auth, response, bouncer }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
     try {
+      await bouncer.with(PortPolicy).authorize('create')
       const pontoon = await this.pontoonService.getForUserOrFail(
         user,
         Number(params.portId),

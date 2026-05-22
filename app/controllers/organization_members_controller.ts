@@ -1,0 +1,89 @@
+import OrganizationMemberService from '#services/organization_member_service'
+import OrganizationPolicy from '#policies/organization_policy'
+import {
+  AlreadyMemberError,
+  LastAdminError,
+  MemberNotFoundError,
+  UserNotFoundError,
+} from '#exceptions/organization_errors'
+import { inviteMemberValidator, updateMemberRoleValidator } from '#validators/organization_member'
+import { inject } from '@adonisjs/core'
+import type { HttpContext } from '@adonisjs/core/http'
+
+@inject()
+export default class OrganizationMembersController {
+  constructor(private memberService: OrganizationMemberService) {}
+
+  async index({ inertia, auth, bouncer }: HttpContext) {
+    await auth.authenticate()
+    const user = auth.getUserOrFail()
+    await bouncer.with(OrganizationPolicy).authorize('viewMembers')
+
+    const members = await this.memberService.listMembers(user.organizationId!)
+    const canManageMembers = await bouncer.with(OrganizationPolicy).allows('manageMembers')
+
+    return inertia.render('organization/members', { members, canManageMembers })
+  }
+
+  async store({ request, response, auth, bouncer, session }: HttpContext) {
+    await auth.authenticate()
+    const user = auth.getUserOrFail()
+    await bouncer.with(OrganizationPolicy).authorize('manageMembers')
+
+    try {
+      const payload = await request.validateUsing(inviteMemberValidator)
+      await this.memberService.addMember(user.organizationId!, payload.email, payload.role)
+    } catch (error) {
+      if (error instanceof UserNotFoundError) {
+        session.flash('error', 'member_user_not_found')
+        return response.redirect().back()
+      }
+      if (error instanceof AlreadyMemberError) {
+        session.flash('error', 'member_already_member')
+        return response.redirect().back()
+      }
+      throw error
+    }
+
+    return response.redirect().back()
+  }
+
+  async update({ request, params, response, auth, bouncer, session }: HttpContext) {
+    await auth.authenticate()
+    const user = auth.getUserOrFail()
+    await bouncer.with(OrganizationPolicy).authorize('manageMembers')
+
+    try {
+      const payload = await request.validateUsing(updateMemberRoleValidator)
+      await this.memberService.updateRole(Number(params.id), user.organizationId!, payload.role)
+    } catch (error) {
+      if (error instanceof MemberNotFoundError) return response.redirect().back()
+      if (error instanceof LastAdminError) {
+        session.flash('error', 'member_last_admin')
+        return response.redirect().back()
+      }
+      throw error
+    }
+
+    return response.redirect().back()
+  }
+
+  async destroy({ params, response, auth, bouncer, session }: HttpContext) {
+    await auth.authenticate()
+    const user = auth.getUserOrFail()
+    await bouncer.with(OrganizationPolicy).authorize('manageMembers')
+
+    try {
+      await this.memberService.removeMember(Number(params.id), user.organizationId!)
+    } catch (error) {
+      if (error instanceof MemberNotFoundError) return response.redirect().back()
+      if (error instanceof LastAdminError) {
+        session.flash('error', 'member_last_admin')
+        return response.redirect().back()
+      }
+      throw error
+    }
+
+    return response.redirect().back()
+  }
+}

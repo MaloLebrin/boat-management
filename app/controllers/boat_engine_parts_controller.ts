@@ -1,3 +1,4 @@
+import BoatPolicy from '#policies/boat_policy'
 import BoatEquipmentService, { BoatEquipmentNotFoundError } from '#services/boat_equipment_service'
 import BoatHullService, { BoatNotFoundError } from '#services/boat_hull_service'
 import { createEnginePartValidator, updateEnginePartValidator } from '#validators/boat_engine_part'
@@ -30,7 +31,7 @@ export default class BoatEnginePartsController {
     const loaded = await this.loadBoat({ auth, response, params })
     if (!loaded) return
     const { user, boat } = loaded
-    await bouncer.authorize('boatUpdate', boat)
+    await bouncer.with(BoatPolicy).authorize('edit', boat)
     const payload = await request.validateUsing(createEnginePartValidator)
     try {
       await this.equipmentService.createEnginePart(user, boat, Number(params.engineId), payload)
@@ -51,7 +52,7 @@ export default class BoatEnginePartsController {
     const loaded = await this.loadBoat({ auth, response, params })
     if (!loaded) return
     const { user, boat } = loaded
-    await bouncer.authorize('boatUpdate', boat)
+    await bouncer.with(BoatPolicy).authorize('edit', boat)
     const payload = await request.validateUsing(updateEnginePartValidator)
     try {
       await this.equipmentService.updateEnginePart(
@@ -78,7 +79,7 @@ export default class BoatEnginePartsController {
     const loaded = await this.loadBoat({ auth, response, params })
     if (!loaded) return
     const { user, boat } = loaded
-    await bouncer.authorize('boatUpdate', boat)
+    await bouncer.with(BoatPolicy).authorize('edit', boat)
     try {
       await this.equipmentService.deleteEnginePart(
         user,

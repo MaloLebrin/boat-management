@@ -2,6 +2,7 @@ import BoatMaintenanceSheetService, {
   BoatMaintenanceSheetNotFoundError,
 } from '#services/boat_maintenance_sheet_service'
 import BoatService, { BoatNotFoundError } from '#services/boat_service'
+import MaintenancePolicy from '#policies/maintenance_policy'
 import { createBoatMaintenanceSheetValidator } from '#validators/boat_maintenance_sheet'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
@@ -34,7 +35,7 @@ export default class BoatMaintenanceSheetsController {
     if (!loaded) return
     const { user, boat } = loaded
 
-    await bouncer.authorize('boatUpdate', boat)
+    await bouncer.with(MaintenancePolicy).authorize('create', boat)
 
     const payload = await request.validateUsing(createBoatMaintenanceSheetValidator)
 
@@ -55,7 +56,7 @@ export default class BoatMaintenanceSheetsController {
     if (!loaded) return
     const { user, boat } = loaded
 
-    await bouncer.authorize('boatUpdate', boat)
+    await bouncer.with(MaintenancePolicy).authorize('edit', boat)
 
     try {
       await this.boatMaintenanceSheetService.completeSheet(user, boat, Number(params.sheetId))
@@ -78,7 +79,7 @@ export default class BoatMaintenanceSheetsController {
     if (!loaded) return
     const { user, boat } = loaded
 
-    await bouncer.authorize('boatUpdate', boat)
+    await bouncer.with(MaintenancePolicy).authorize('delete', boat)
 
     try {
       await this.boatMaintenanceSheetService.deleteSheet(user, boat, Number(params.sheetId))

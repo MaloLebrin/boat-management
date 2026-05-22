@@ -3,6 +3,7 @@ import BoatMaintenanceService, {
   BoatMaintenanceValidationError,
 } from '#services/boat_maintenance_service'
 import BoatService, { BoatNotFoundError } from '#services/boat_service'
+import MaintenancePolicy from '#policies/maintenance_policy'
 import { createBoatMaintenanceValidator } from '#validators/boat_maintenance'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
@@ -29,7 +30,7 @@ export default class BoatMaintenancesController {
       throw error
     }
 
-    await bouncer.authorize('boatUpdate', boat)
+    await bouncer.with(MaintenancePolicy).authorize('create', boat)
 
     const payload = await request.validateUsing(createBoatMaintenanceValidator)
 
@@ -74,7 +75,7 @@ export default class BoatMaintenancesController {
       throw error
     }
 
-    await bouncer.authorize('boatUpdate', boat)
+    await bouncer.with(MaintenancePolicy).authorize('delete', boat)
 
     try {
       await this.boatMaintenanceService.deleteForBoat(user, boat, Number(params.eventId))

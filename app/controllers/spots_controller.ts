@@ -3,6 +3,7 @@ import MouillageService from '#services/mouillage_service'
 import PontoonService from '#services/pontoon_service'
 import PortService from '#services/port_service'
 import SpotService from '#services/spot_service'
+import PortPolicy from '#policies/port_policy'
 import { createSpotValidator, updateSpotValidator } from '#validators/spot'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
@@ -16,11 +17,12 @@ export default class SpotsController {
     private mouillageService: MouillageService
   ) {}
 
-  async storeForPontoon({ request, params, auth, response }: HttpContext) {
+  async storeForPontoon({ request, params, auth, response, bouncer }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
     try {
+      await bouncer.with(PortPolicy).authorize('create')
       const port = await this.portService.getForUserOrFail(user, Number(params.portId))
       const pontoon = await this.pontoonService.getForPortOrFail(port.id, Number(params.pontoonId))
       const payload = await request.validateUsing(createSpotValidator)
@@ -33,11 +35,12 @@ export default class SpotsController {
     }
   }
 
-  async storeForMouillage({ request, params, auth, response }: HttpContext) {
+  async storeForMouillage({ request, params, auth, response, bouncer }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
     try {
+      await bouncer.with(PortPolicy).authorize('create')
       const port = await this.portService.getForUserOrFail(user, Number(params.portId))
       const mouillage = await this.mouillageService.getForPortOrFail(port.id, Number(params.mouillageId))
       const payload = await request.validateUsing(createSpotValidator)
@@ -50,11 +53,12 @@ export default class SpotsController {
     }
   }
 
-  async update({ request, params, auth, response }: HttpContext) {
+  async update({ request, params, auth, response, bouncer }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
     try {
+      await bouncer.with(PortPolicy).authorize('create')
       const spot = await this.spotService.getForUserOrFail(user, Number(params.id))
       const payload = await request.validateUsing(updateSpotValidator)
       await this.spotService.update(spot, payload)
@@ -65,11 +69,12 @@ export default class SpotsController {
     }
   }
 
-  async destroy({ params, auth, response }: HttpContext) {
+  async destroy({ params, auth, response, bouncer }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
     try {
+      await bouncer.with(PortPolicy).authorize('create')
       const spot = await this.spotService.getForUserOrFail(user, Number(params.id))
       await this.spotService.delete(spot)
       return response.redirect().back()

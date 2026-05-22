@@ -1,3 +1,4 @@
+import BoatPolicy from '#policies/boat_policy'
 import BoatService, { BoatNotFoundError } from '#services/boat_service'
 import MediaService, { MediaNotFoundError } from '#services/media_service'
 import OrganizationService from '#services/organization_service'
@@ -43,7 +44,7 @@ export default class BoatMediaController {
     if (!loaded) return
 
     const { boat, user } = loaded
-    await bouncer.authorize('boatUpdate', boat)
+    await bouncer.with(BoatPolicy).authorize('edit', boat)
 
     const payload = await request.validateUsing(storeBoatPhotoValidator)
     const org = await this.organizationService.findOrFail(boat.organizationId)
@@ -66,7 +67,7 @@ export default class BoatMediaController {
     if (!loaded) return
 
     const { boat, user } = loaded
-    await bouncer.authorize('boatUpdate', boat)
+    await bouncer.with(BoatPolicy).authorize('edit', boat)
 
     const payload = await request.validateUsing(storeBoatDocumentValidator)
     const org = await this.organizationService.findOrFail(boat.organizationId)
@@ -89,7 +90,7 @@ export default class BoatMediaController {
     if (!loaded) return
 
     const { boat } = loaded
-    await bouncer.authorize('boatUpdate', boat)
+    await bouncer.with(BoatPolicy).authorize('edit', boat)
 
     try {
       await this.mediaService.deleteById(Number(params.mediaId))
@@ -119,7 +120,7 @@ export default class BoatMediaController {
     if (!loaded) return
 
     const { boat, user } = loaded
-    await bouncer.authorize('boatUpdate', boat)
+    await bouncer.with(BoatPolicy).authorize('edit', boat)
 
     const engineId = Number(params.engineId)
     const engine = boat.engines.find((e) => e.id === engineId)
@@ -149,7 +150,7 @@ export default class BoatMediaController {
     if (!loaded) return
 
     const { boat } = loaded
-    await bouncer.authorize('boatUpdate', boat)
+    await bouncer.with(BoatPolicy).authorize('edit', boat)
 
     const engineId = Number(params.engineId)
     const engine = boat.engines.find((e) => e.id === engineId)

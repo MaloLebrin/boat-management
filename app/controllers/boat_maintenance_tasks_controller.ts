@@ -3,6 +3,7 @@ import BoatMaintenanceTaskService, {
   BoatMaintenanceTaskValidationError,
 } from '#services/boat_maintenance_task_service'
 import BoatService, { BoatNotFoundError } from '#services/boat_service'
+import MaintenancePolicy from '#policies/maintenance_policy'
 import {
   createBoatMaintenanceTaskValidator,
   markBoatMaintenanceTaskDoneValidator,
@@ -32,7 +33,7 @@ export default class BoatMaintenanceTasksController {
       throw error
     }
 
-    await bouncer.authorize('boatUpdate', boat)
+    await bouncer.with(MaintenancePolicy).authorize('create', boat)
 
     const payload = await request.validateUsing(createBoatMaintenanceTaskValidator)
 
@@ -77,7 +78,7 @@ export default class BoatMaintenanceTasksController {
       throw error
     }
 
-    await bouncer.authorize('boatUpdate', boat)
+    await bouncer.with(MaintenancePolicy).authorize('edit', boat)
 
     const payload = await request.validateUsing(markBoatMaintenanceTaskDoneValidator)
 
@@ -119,7 +120,7 @@ export default class BoatMaintenanceTasksController {
       throw error
     }
 
-    await bouncer.authorize('boatUpdate', boat)
+    await bouncer.with(MaintenancePolicy).authorize('delete', boat)
 
     try {
       await this.boatMaintenanceTaskService.deleteForBoat(user, boat, Number(params.taskId))

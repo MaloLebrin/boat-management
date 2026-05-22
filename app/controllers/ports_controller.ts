@@ -1,5 +1,6 @@
 import PortService from '#services/port_service'
 import { PortHasBoatsError, PortNotFoundError } from '#exceptions/port_errors'
+import PortPolicy from '#policies/port_policy'
 import { createPortValidator, updatePortValidator } from '#validators/port'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
@@ -17,14 +18,16 @@ export default class PortsController {
     return inertia.render('ports/index', { ports })
   }
 
-  async create({ inertia, auth }: HttpContext) {
+  async create({ inertia, auth, bouncer }: HttpContext) {
     await auth.authenticate()
+    await bouncer.with(PortPolicy).authorize('create')
     return inertia.render('ports/new', {})
   }
 
-  async store({ request, response, auth }: HttpContext) {
+  async store({ request, response, auth, bouncer }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
+    await bouncer.with(PortPolicy).authorize('create')
 
     const payload = await request.validateUsing(createPortValidator)
     const port = await this.portService.createForUser(user, payload)
@@ -45,12 +48,13 @@ export default class PortsController {
     }
   }
 
-  async edit({ inertia, params, auth, response }: HttpContext) {
+  async edit({ inertia, params, auth, response, bouncer }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
     try {
       const port = await this.portService.getWithPontoonsAndMouillagesOrFail(user, Number(params.id))
+      await bouncer.with(PortPolicy).authorize('edit', port)
       return inertia.render('ports/edit', { port })
     } catch (error) {
       if (error instanceof PortNotFoundError) return response.redirect('/ports')
@@ -58,12 +62,13 @@ export default class PortsController {
     }
   }
 
-  async update({ request, params, auth, response }: HttpContext) {
+  async update({ request, params, auth, response, bouncer }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
     try {
       const port = await this.portService.getForUserOrFail(user, Number(params.id))
+      await bouncer.with(PortPolicy).authorize('edit', port)
       const payload = await request.validateUsing(updatePortValidator)
       await this.portService.updateForUser(user, port, payload)
       return response.redirect(`/ports/${port.id}`)
@@ -73,12 +78,13 @@ export default class PortsController {
     }
   }
 
-  async destroy({ params, auth, response, session }: HttpContext) {
+  async destroy({ params, auth, response, session, bouncer }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
     try {
       const port = await this.portService.getForUserOrFail(user, Number(params.id))
+      await bouncer.with(PortPolicy).authorize('delete', port)
       await this.portService.deleteForUser(user, port)
       return response.redirect('/ports')
     } catch (error) {

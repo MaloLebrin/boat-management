@@ -9,6 +9,7 @@ import BoatService, { BoatNotFoundError } from '#services/boat_service'
 import MediaService from '#services/media_service'
 import PortService from '#services/port_service'
 import SpotService from '#services/spot_service'
+import BoatPolicy from '#policies/boat_policy'
 import { createBoatValidator, updateBoatValidator } from '#validators/boat'
 import { assignBoatValidator } from '#validators/marina_layout'
 import { inject } from '@adonisjs/core'
@@ -43,7 +44,7 @@ export default class BoatsController {
   async create({ inertia, auth, bouncer }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
-    await bouncer.authorize('boatCreate')
+    await bouncer.with(BoatPolicy).authorize('create')
 
     const ports = await this.portService.listWithSpotsForOrg(user)
 
@@ -68,7 +69,7 @@ export default class BoatsController {
   async store({ request, response, auth, bouncer }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
-    await bouncer.authorize('boatCreate')
+    await bouncer.with(BoatPolicy).authorize('create')
 
     const payload = await request.validateUsing(createBoatValidator)
 
@@ -83,7 +84,7 @@ export default class BoatsController {
 
     try {
       const boat = await this.boatService.getFullDetailForUser(user, Number(params.id))
-      await bouncer.authorize('boatView', boat)
+      await bouncer.with(BoatPolicy).authorize('view', boat)
 
       const [
         maintenanceEvents,
@@ -100,7 +101,7 @@ export default class BoatsController {
         this.mediaService.listForEntity('boat', boat.id),
         this.boatService.getPositionHistory(boat.id),
         this.aiAnalysisService.getLatestBoatSuggestions(user.id, boat.id),
-        bouncer.allows('boatUpdate', boat),
+        bouncer.with(BoatPolicy).allows('edit', boat),
       ])
 
       const canManageEquipment = canManageMaintenance
@@ -132,7 +133,7 @@ export default class BoatsController {
 
     try {
       const boat = await this.boatService.getForUserOrFail(user, Number(params.id))
-      await bouncer.authorize('boatUpdate', boat)
+      await bouncer.with(BoatPolicy).authorize('edit', boat)
 
       const ports = await this.portService.listWithSpotsForOrg(user)
 
@@ -189,7 +190,7 @@ export default class BoatsController {
     const user = auth.getUserOrFail()
 
     const boat = await this.boatService.getForUserOrFail(user, Number(params.id))
-    await bouncer.authorize('boatUpdate', boat)
+    await bouncer.with(BoatPolicy).authorize('edit', boat)
 
     const payload = await request.validateUsing(updateBoatValidator)
     await this.boatService.updateForUser(user, boat, payload)
@@ -202,7 +203,7 @@ export default class BoatsController {
     const user = auth.getUserOrFail()
 
     const boat = await this.boatService.getForUserOrFail(user, Number(params.id))
-    await bouncer.authorize('boatDelete', boat)
+    await bouncer.with(BoatPolicy).authorize('delete', boat)
 
     await this.boatService.deleteForUser(user, boat)
     response.redirect('/boats')

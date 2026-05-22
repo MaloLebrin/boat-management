@@ -1,3 +1,4 @@
+import BoatPolicy from '#policies/boat_policy'
 import BoatEquipmentService, { BoatEquipmentNotFoundError } from '#services/boat_equipment_service'
 import BoatHullService, { BoatNotFoundError } from '#services/boat_hull_service'
 import BoatMaintenanceService from '#services/boat_maintenance_service'
@@ -51,7 +52,7 @@ export default class BoatEquipmentController {
     if (!loaded) return
 
     const { boat } = loaded
-    await bouncer.authorize('boatUpdate', boat)
+    await bouncer.with(BoatPolicy).authorize('edit', boat)
 
     const body = (await request.validateUsing(storeBoatEngineValidator)) as BoatEngineFormBody
     await this.equipmentService.createEngine(loaded.user, boat, equipmentBodyToEnginePayload(body))
@@ -66,7 +67,7 @@ export default class BoatEquipmentController {
     if (!loaded) return
 
     const { boat } = loaded
-    await bouncer.authorize('boatUpdate', boat)
+    await bouncer.with(BoatPolicy).authorize('edit', boat)
 
     const engine = boat.engines.find((e) => e.id === Number(params.engineId))
     if (!engine) {
@@ -100,7 +101,7 @@ export default class BoatEquipmentController {
     if (!loaded) return
 
     const { boat } = loaded
-    await bouncer.authorize('boatUpdate', boat)
+    await bouncer.with(BoatPolicy).authorize('edit', boat)
 
     const body = (await request.validateUsing(updateBoatEngineValidator)) as BoatEngineFormBody
 
@@ -130,7 +131,7 @@ export default class BoatEquipmentController {
     if (!loaded) return
 
     const { boat } = loaded
-    await bouncer.authorize('boatUpdate', boat)
+    await bouncer.with(BoatPolicy).authorize('edit', boat)
 
     try {
       await this.equipmentService.deleteEngine(loaded.user, boat, Number(params.engineId))
@@ -153,7 +154,7 @@ export default class BoatEquipmentController {
     if (!loaded) return
 
     const { boat } = loaded
-    await bouncer.authorize('boatUpdate', boat)
+    await bouncer.with(BoatPolicy).authorize('edit', boat)
 
     const body = (await request.validateUsing(storeBoatSailValidator)) as BoatSailFormBody
     await this.equipmentService.createSail(loaded.user, boat, equipmentBodyToSailPayload(body))
@@ -168,7 +169,7 @@ export default class BoatEquipmentController {
     if (!loaded) return
 
     const { boat } = loaded
-    await bouncer.authorize('boatUpdate', boat)
+    await bouncer.with(BoatPolicy).authorize('edit', boat)
 
     const sail = boat.sails.find((s) => s.id === Number(params.sailId))
     if (!sail) {
@@ -198,7 +199,7 @@ export default class BoatEquipmentController {
     if (!loaded) return
 
     const { boat } = loaded
-    await bouncer.authorize('boatUpdate', boat)
+    await bouncer.with(BoatPolicy).authorize('edit', boat)
 
     const body = (await request.validateUsing(updateBoatSailValidator)) as BoatSailFormBody
 
@@ -228,7 +229,7 @@ export default class BoatEquipmentController {
     if (!loaded) return
 
     const { boat } = loaded
-    await bouncer.authorize('boatUpdate', boat)
+    await bouncer.with(BoatPolicy).authorize('edit', boat)
 
     try {
       await this.boatService.deleteSail(loaded.user, boat, Number(params.sailId))
@@ -251,7 +252,7 @@ export default class BoatEquipmentController {
     if (!loaded) return
 
     const { boat } = loaded
-    await bouncer.authorize('boatUpdate', boat)
+    await bouncer.with(BoatPolicy).authorize('edit', boat)
 
     return inertia.render('boats/rig_edit', {
       boat: { id: boat.id, name: boat.name },
@@ -275,7 +276,7 @@ export default class BoatEquipmentController {
     if (!loaded) return
 
     const { boat } = loaded
-    await bouncer.authorize('boatUpdate', boat)
+    await bouncer.with(BoatPolicy).authorize('edit', boat)
 
     const body = (await request.validateUsing(upsertBoatRigValidator)) as BoatRigFormBody
     await this.boatService.upsertRig(loaded.user, boat, equipmentBodyToRigPayload(body))
@@ -290,7 +291,7 @@ export default class BoatEquipmentController {
     if (!loaded) return
 
     const { boat } = loaded
-    await bouncer.authorize('boatUpdate', boat)
+    await bouncer.with(BoatPolicy).authorize('edit', boat)
 
     await this.boatService.deleteRig(loaded.user, boat)
 
@@ -311,7 +312,7 @@ export default class BoatEquipmentController {
       return response.redirect(`/boats/${boat.id}`)
     }
 
-    const canManage = await bouncer.allows('boatUpdate', boat)
+    const canManage = await bouncer.with(BoatPolicy).allows('edit', boat)
 
     const [maintenanceEvents, maintenanceTasks, engineDocuments, engineParts] = await Promise.all([
       this.maintenanceService.listEventsForEngine(boat.id, engineId),
@@ -403,7 +404,7 @@ export default class BoatEquipmentController {
     if (!loaded) return
 
     const { boat } = loaded
-    await bouncer.authorize('boatUpdate', boat)
+    await bouncer.with(BoatPolicy).authorize('edit', boat)
 
     const { status } = await request.validateUsing(updateEquipmentStatusValidator)
 
@@ -435,7 +436,7 @@ export default class BoatEquipmentController {
     if (!loaded) return
 
     const { boat } = loaded
-    await bouncer.authorize('boatUpdate', boat)
+    await bouncer.with(BoatPolicy).authorize('edit', boat)
 
     const { notes } = await request.validateUsing(updateEquipmentNotesValidator)
 

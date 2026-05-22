@@ -1,0 +1,23 @@
+{
+  "members": {
+    "title": "Membres de l'equipe",
+    "invite": {
+      "title": "Inviter un membre",
+      "email": "Adresse email",
+      "emailPlaceholder": "collegue@exemple.com",
+      "role": "Role",
+      "submit": "Inviter"
+    },
+    "table": {
+      "member": "Membre",
+      "role": "Role",
+      "actions": "Actions"
+    },
+    "roles": {
+      "admin": "Admin",
+      "member": "Membre"
+    },
+    "remove": "Retirer",
+    "noName": "Sans nom"
+  }
+}

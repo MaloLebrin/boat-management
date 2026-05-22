@@ -430,6 +430,23 @@ export class MouillageSchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class OrganizationMembershipSchema extends BaseModel {
+  static $columns = ['createdAt', 'id', 'organizationId', 'role', 'updatedAt', 'userId'] as const
+  $columns = OrganizationMembershipSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare organizationId: number
+  @column()
+  declare role: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare userId: number
+}
+
 export class OrganizationSchema extends BaseModel {
   static $columns = ['createdAt', 'id', 'name', 'slug', 'updatedAt'] as const
   $columns = OrganizationSchema.$columns
