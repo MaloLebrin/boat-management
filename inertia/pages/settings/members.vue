@@ -6,6 +6,7 @@ export default { layout: DefaultLayout }
 <script setup lang="ts">
 import SettingsShell from '~/components/settings/SettingsShell.vue'
 import SettingsMembersTab from '~/components/settings/tabs/SettingsMembersTab.vue'
+import type { OrganizationMemberData, OrganizationInvitationData } from '../../../shared/types/organization'
 
 defineProps<{
   user: {
@@ -13,11 +14,19 @@ defineProps<{
     email: string
     fullName: string | null
   }
+  members: OrganizationMemberData[]
+  pendingInvitations: OrganizationInvitationData[]
+  canManageMembers: boolean
 }>()
 </script>
 
 <template>
   <SettingsShell>
-    <SettingsMembersTab :user="user" />
+    <SettingsMembersTab
+      :user="user"
+      :members="members"
+      :pending-invitations="pendingInvitations"
+      :can-manage-members="canManageMembers"
+    />
   </SettingsShell>
 </template>

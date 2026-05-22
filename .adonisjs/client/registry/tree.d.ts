@@ -142,6 +142,14 @@ export interface ApiDefinition {
       update: typeof routes['organization.members.update']
       destroy: typeof routes['organization.members.destroy']
     }
+    invitations: {
+      store: typeof routes['organization.invitations.store']
+      destroy: typeof routes['organization.invitations.destroy']
+    }
+  }
+  invitations: {
+    show: typeof routes['invitations.show']
+    accept: typeof routes['invitations.accept']
   }
   newAccount: {
     create: typeof routes['new_account.create']

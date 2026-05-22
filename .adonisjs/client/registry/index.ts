@@ -534,6 +534,30 @@ const routes = {
     tokens: [{"old":"/organization/members/:id","type":0,"val":"organization","end":""},{"old":"/organization/members/:id","type":0,"val":"members","end":""},{"old":"/organization/members/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['organization.members.destroy']['types'],
   },
+  'organization.invitations.store': {
+    methods: ["POST"],
+    pattern: '/organization/invitations',
+    tokens: [{"old":"/organization/invitations","type":0,"val":"organization","end":""},{"old":"/organization/invitations","type":0,"val":"invitations","end":""}],
+    types: placeholder as Registry['organization.invitations.store']['types'],
+  },
+  'organization.invitations.destroy': {
+    methods: ["DELETE"],
+    pattern: '/organization/invitations/:id',
+    tokens: [{"old":"/organization/invitations/:id","type":0,"val":"organization","end":""},{"old":"/organization/invitations/:id","type":0,"val":"invitations","end":""},{"old":"/organization/invitations/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['organization.invitations.destroy']['types'],
+  },
+  'invitations.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/invitations/accept',
+    tokens: [{"old":"/invitations/accept","type":0,"val":"invitations","end":""},{"old":"/invitations/accept","type":0,"val":"accept","end":""}],
+    types: placeholder as Registry['invitations.show']['types'],
+  },
+  'invitations.accept': {
+    methods: ["POST"],
+    pattern: '/invitations/accept',
+    tokens: [{"old":"/invitations/accept","type":0,"val":"invitations","end":""},{"old":"/invitations/accept","type":0,"val":"accept","end":""}],
+    types: placeholder as Registry['invitations.accept']['types'],
+  },
   'new_account.create': {
     methods: ["GET","HEAD"],
     pattern: '/signup',

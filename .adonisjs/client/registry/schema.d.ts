@@ -1063,6 +1063,54 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/organization_members_controller').default['destroy']>>>
     }
   }
+  'organization.invitations.store': {
+    methods: ["POST"]
+    pattern: '/organization/invitations'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/organization_member').inviteMemberValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/organization_member').inviteMemberValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/organization_invitations_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/organization_invitations_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'organization.invitations.destroy': {
+    methods: ["DELETE"]
+    pattern: '/organization/invitations/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/organization_invitations_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/organization_invitations_controller').default['destroy']>>>
+    }
+  }
+  'invitations.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/invitations/accept'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/organization_invitations_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/organization_invitations_controller').default['show']>>>
+    }
+  }
+  'invitations.accept': {
+    methods: ["POST"]
+    pattern: '/invitations/accept'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/organization_member').acceptInvitationValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/organization_member').acceptInvitationValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/organization_invitations_controller').default['accept']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/organization_invitations_controller').default['accept']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'new_account.create': {
     methods: ["GET","HEAD"]
     pattern: '/signup'

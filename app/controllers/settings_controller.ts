@@ -1,7 +1,16 @@
+import OrganizationMemberService from '#services/organization_member_service'
+import OrganizationInvitationService from '#services/organization_invitation_service'
+import OrganizationPolicy from '#policies/organization_policy'
 import { updateOrganizationValidator, updateProfileValidator } from '#validators/user'
+import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 
+@inject()
 export default class SettingsController {
+  constructor(
+    private memberService: OrganizationMemberService,
+    private invitationService: OrganizationInvitationService
+  ) {}
   async me({ inertia, auth }: HttpContext) {
     const user = await auth.authenticate()
 
@@ -26,8 +35,12 @@ export default class SettingsController {
     })
   }
 
-  async members({ inertia, auth }: HttpContext) {
+  async members({ inertia, auth, bouncer }: HttpContext) {
     const user = await auth.authenticate()
+
+    const members = await this.memberService.listMembers(user.organizationId!)
+    const pendingInvitations = await this.invitationService.listPending(user.organizationId!)
+    const canManageMembers = await bouncer.with(OrganizationPolicy).allows('manageMembers')
 
     return inertia.render('settings/members', {
       user: {
@@ -35,11 +48,14 @@ export default class SettingsController {
         email: user.email,
         fullName: user.fullName,
       },
+      members,
+      pendingInvitations,
+      canManageMembers,
     })
   }
 
   async billing({ inertia }: HttpContext) {
-    return inertia.render('settings/billing')
+    return inertia.render('settings/billing', {})
   }
 
   async updateProfile({ request, response, session, auth, i18n }: HttpContext) {

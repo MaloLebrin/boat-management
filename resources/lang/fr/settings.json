@@ -18,19 +18,34 @@
   "members": {
     "title": "Membres et accès",
     "invite": "Inviter un membre",
+    "inviteForm": {
+      "email": "Adresse email",
+      "emailPlaceholder": "collegue@exemple.com",
+      "role": "Rôle",
+      "submit": "Envoyer l'invitation",
+      "cancel": "Annuler"
+    },
     "columns": {
       "member": "Membre",
       "role": "Rôle",
-      "status": "Statut"
+      "status": "Statut",
+      "expires": "Expiration",
+      "actions": "Actions"
     },
     "noName": "Sans nom",
     "roles": {
-      "admin": "Admin"
+      "admin": "Admin",
+      "member": "Membre"
     },
     "statuses": {
-      "active": "Actif"
+      "active": "Actif",
+      "pending": "En attente"
     },
-    "you": "Vous"
+    "you": "Vous",
+    "remove": "Supprimer",
+    "cancelInvitation": "Annuler",
+    "pendingInvitations": "Invitations en attente",
+    "activeMembers": "Membres actifs"
   },
   "billing": {
     "title": "Facturation et plan",

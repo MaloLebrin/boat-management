@@ -77,5 +77,15 @@
     "removed": "Fiche supprimée.",
     "notFound": "Fiche introuvable.",
     "itemUpdated": "Item mis à jour."
+  },
+  "invitation": {
+    "sent": "Invitation envoyée.",
+    "cancelled": "Invitation annulée.",
+    "accepted": "Bienvenue ! Vous avez rejoint l'organisation.",
+    "notFound": "Ce lien d'invitation est invalide.",
+    "expired": "Cette invitation a expiré.",
+    "alreadyUsed": "Cette invitation a déjà été acceptée.",
+    "alreadyMember": "Vous êtes déjà membre de cette organisation.",
+    "alreadyPending": "Une invitation est déjà en attente pour cet email."
   }
 }

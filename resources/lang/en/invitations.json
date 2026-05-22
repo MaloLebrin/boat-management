@@ -1,0 +1,14 @@
+{
+  "accept": {
+    "title": "Join {orgName}",
+    "invited_by": "You have been invited by {name} to join {orgName} as {role}.",
+    "invited_anonymous": "You have been invited to join {orgName} as {role}.",
+    "accept_btn": "Accept invitation",
+    "decline_btn": "Decline",
+    "login_required": "You need to be logged in to accept this invitation.",
+    "login_btn": "Log in",
+    "error_not_found": "This invitation link is invalid or has already been used.",
+    "error_expired": "This invitation has expired. Please ask the admin to send a new one.",
+    "error_already_used": "This invitation has already been accepted."
+  }
+}

@@ -12,3 +12,9 @@ export const updateMemberRoleValidator = vine.compile(
     role: vine.enum(['admin', 'member'] as const),
   })
 )
+
+export const acceptInvitationValidator = vine.compile(
+  vine.object({
+    token: vine.string().trim(),
+  })
+)

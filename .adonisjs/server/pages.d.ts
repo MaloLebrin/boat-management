@@ -26,6 +26,7 @@ declare module '@adonisjs/inertia/types' {
     'errors/not_found': ExtractProps<(typeof import('../../inertia/pages/errors/not_found.vue'))['default']>
     'errors/server_error': ExtractProps<(typeof import('../../inertia/pages/errors/server_error.vue'))['default']>
     'home': ExtractProps<(typeof import('../../inertia/pages/home.vue'))['default']>
+    'invitations/accept': ExtractProps<(typeof import('../../inertia/pages/invitations/accept.vue'))['default']>
     'maintenance/history': ExtractProps<(typeof import('../../inertia/pages/maintenance/history.vue'))['default']>
     'marketing/about': ExtractProps<(typeof import('../../inertia/pages/marketing/about.vue'))['default']>
     'marketing/contact': ExtractProps<(typeof import('../../inertia/pages/marketing/contact.vue'))['default']>
@@ -37,10 +38,10 @@ declare module '@adonisjs/inertia/types' {
     'ports/index': ExtractProps<(typeof import('../../inertia/pages/ports/index.vue'))['default']>
     'ports/new': ExtractProps<(typeof import('../../inertia/pages/ports/new.vue'))['default']>
     'ports/show': ExtractProps<(typeof import('../../inertia/pages/ports/show.vue'))['default']>
+    'settings/billing': ExtractProps<(typeof import('../../inertia/pages/settings/billing.vue'))['default']>
     'settings/index': ExtractProps<(typeof import('../../inertia/pages/settings/index.vue'))['default']>
     'settings/me': ExtractProps<(typeof import('../../inertia/pages/settings/me.vue'))['default']>
-    'settings/org': ExtractProps<(typeof import('../../inertia/pages/settings/org.vue'))['default']>
     'settings/members': ExtractProps<(typeof import('../../inertia/pages/settings/members.vue'))['default']>
-    'settings/billing': ExtractProps<(typeof import('../../inertia/pages/settings/billing.vue'))['default']>
+    'settings/org': ExtractProps<(typeof import('../../inertia/pages/settings/org.vue'))['default']>
   }
 }

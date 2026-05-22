@@ -25,3 +25,31 @@ export class LastAdminError extends Error {
     this.name = 'LastAdminError'
   }
 }
+
+export class InvitationNotFoundError extends Error {
+  constructor() {
+    super('Invitation not found')
+    this.name = 'InvitationNotFoundError'
+  }
+}
+
+export class InvitationExpiredError extends Error {
+  constructor() {
+    super('Invitation has expired')
+    this.name = 'InvitationExpiredError'
+  }
+}
+
+export class InvitationAlreadyAcceptedError extends Error {
+  constructor() {
+    super('Invitation has already been accepted or cancelled')
+    this.name = 'InvitationAlreadyAcceptedError'
+  }
+}
+
+export class InvitationAlreadyExistsError extends Error {
+  constructor() {
+    super('An invitation is already pending for this email')
+    this.name = 'InvitationAlreadyExistsError'
+  }
+}

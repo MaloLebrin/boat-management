@@ -77,5 +77,15 @@
     "removed": "Sheet deleted.",
     "notFound": "Sheet not found.",
     "itemUpdated": "Item updated."
+  },
+  "invitation": {
+    "sent": "Invitation sent.",
+    "cancelled": "Invitation cancelled.",
+    "accepted": "Welcome! You have joined the organisation.",
+    "notFound": "This invitation link is invalid.",
+    "expired": "This invitation has expired.",
+    "alreadyUsed": "This invitation has already been accepted.",
+    "alreadyMember": "You are already a member of this organisation.",
+    "alreadyPending": "An invitation is already pending for this email."
   }
 }

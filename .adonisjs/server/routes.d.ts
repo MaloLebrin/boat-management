@@ -92,6 +92,10 @@ export type ScannedRoutes = {
     'organization.members.store': { paramsTuple?: []; params?: {} }
     'organization.members.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'organization.members.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'organization.invitations.store': { paramsTuple?: []; params?: {} }
+    'organization.invitations.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'invitations.show': { paramsTuple?: []; params?: {} }
+    'invitations.accept': { paramsTuple?: []; params?: {} }
     'new_account.create': { paramsTuple?: []; params?: {} }
     'new_account.store': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }
@@ -139,6 +143,7 @@ export type ScannedRoutes = {
     'settings.billing': { paramsTuple?: []; params?: {} }
     'maintenance.history': { paramsTuple?: []; params?: {} }
     'organization.members.index': { paramsTuple?: []; params?: {} }
+    'invitations.show': { paramsTuple?: []; params?: {} }
     'new_account.create': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }
     'password.forgot': { paramsTuple?: []; params?: {} }
@@ -178,6 +183,7 @@ export type ScannedRoutes = {
     'settings.billing': { paramsTuple?: []; params?: {} }
     'maintenance.history': { paramsTuple?: []; params?: {} }
     'organization.members.index': { paramsTuple?: []; params?: {} }
+    'invitations.show': { paramsTuple?: []; params?: {} }
     'new_account.create': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }
     'password.forgot': { paramsTuple?: []; params?: {} }
@@ -202,6 +208,8 @@ export type ScannedRoutes = {
     'ports.mouillages.spots.store': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'mouillageId': ParamValue} }
     'locale.set': { paramsTuple?: []; params?: {} }
     'organization.members.store': { paramsTuple?: []; params?: {} }
+    'organization.invitations.store': { paramsTuple?: []; params?: {} }
+    'invitations.accept': { paramsTuple?: []; params?: {} }
     'new_account.store': { paramsTuple?: []; params?: {} }
     'session.store': { paramsTuple?: []; params?: {} }
     'password_reset.store': { paramsTuple?: []; params?: {} }
@@ -246,6 +254,7 @@ export type ScannedRoutes = {
     'ports.mouillages.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'mouillageId': ParamValue} }
     'spots.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'organization.members.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'organization.invitations.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   PATCH: {
     'boats.assign': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }

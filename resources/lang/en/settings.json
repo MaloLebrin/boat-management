@@ -18,19 +18,34 @@
   "members": {
     "title": "Members & access",
     "invite": "Invite a member",
+    "inviteForm": {
+      "email": "Email address",
+      "emailPlaceholder": "colleague@example.com",
+      "role": "Role",
+      "submit": "Send invitation",
+      "cancel": "Cancel"
+    },
     "columns": {
       "member": "Member",
       "role": "Role",
-      "status": "Status"
+      "status": "Status",
+      "expires": "Expires",
+      "actions": "Actions"
     },
     "noName": "No name",
     "roles": {
-      "admin": "Admin"
+      "admin": "Admin",
+      "member": "Member"
     },
     "statuses": {
-      "active": "Active"
+      "active": "Active",
+      "pending": "Pending"
     },
-    "you": "You"
+    "you": "You",
+    "remove": "Remove",
+    "cancelInvitation": "Cancel",
+    "pendingInvitations": "Pending invitations",
+    "activeMembers": "Active members"
   },
   "billing": {
     "title": "Billing & plan",

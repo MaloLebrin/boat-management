@@ -19,6 +19,7 @@ export const controllers = {
   Marketing: () => import('#controllers/marketing_controller'),
   Mouillages: () => import('#controllers/mouillages_controller'),
   NewAccount: () => import('#controllers/new_account_controller'),
+  OrganizationInvitations: () => import('#controllers/organization_invitations_controller'),
   OrganizationMembers: () => import('#controllers/organization_members_controller'),
   PasswordReset: () => import('#controllers/password_reset_controller'),
   Planning: () => import('#controllers/planning_controller'),
