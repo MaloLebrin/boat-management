@@ -78,7 +78,7 @@ const sections = [
         <!-- My Profile -->
         <div v-if="activeSection === 'me'">
           <BaseHeading level="2" class="mb-6">{{ t('settings.me.title') }}</BaseHeading>
-          <Form method="PUT" action="/settings/profile" #default="{ processing, errors }">
+          <Form :action="{ url: '/settings/profile', method: 'put' }" #default="{ processing, errors }">
             <BaseCard>
               <div class="space-y-6">
                 <BaseInput
@@ -110,7 +110,7 @@ const sections = [
         <!-- Organisation Profile -->
         <div v-if="activeSection === 'org'">
           <BaseHeading level="2" class="mb-6">{{ t('settings.org.title') }}</BaseHeading>
-          <Form method="PUT" action="/settings/org" #default="{ processing, errors }">
+          <Form :action="{ url: '/settings/org', method: 'put' }" #default="{ processing, errors }">
             <BaseCard>
               <div class="space-y-6">
                 <BaseInput

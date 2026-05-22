@@ -486,6 +486,30 @@ const routes = {
     tokens: [{"old":"/maintenance/history","type":0,"val":"maintenance","end":""},{"old":"/maintenance/history","type":0,"val":"history","end":""}],
     types: placeholder as Registry['maintenance.history']['types'],
   },
+  'organization.members.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/organization/members',
+    tokens: [{"old":"/organization/members","type":0,"val":"organization","end":""},{"old":"/organization/members","type":0,"val":"members","end":""}],
+    types: placeholder as Registry['organization.members.index']['types'],
+  },
+  'organization.members.store': {
+    methods: ["POST"],
+    pattern: '/organization/members',
+    tokens: [{"old":"/organization/members","type":0,"val":"organization","end":""},{"old":"/organization/members","type":0,"val":"members","end":""}],
+    types: placeholder as Registry['organization.members.store']['types'],
+  },
+  'organization.members.update': {
+    methods: ["PUT"],
+    pattern: '/organization/members/:id',
+    tokens: [{"old":"/organization/members/:id","type":0,"val":"organization","end":""},{"old":"/organization/members/:id","type":0,"val":"members","end":""},{"old":"/organization/members/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['organization.members.update']['types'],
+  },
+  'organization.members.destroy': {
+    methods: ["DELETE"],
+    pattern: '/organization/members/:id',
+    tokens: [{"old":"/organization/members/:id","type":0,"val":"organization","end":""},{"old":"/organization/members/:id","type":0,"val":"members","end":""},{"old":"/organization/members/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['organization.members.destroy']['types'],
+  },
   'new_account.create': {
     methods: ["GET","HEAD"],
     pattern: '/signup',

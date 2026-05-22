@@ -132,6 +132,14 @@ export interface ApiDefinition {
   maintenance: {
     history: typeof routes['maintenance.history']
   }
+  organization: {
+    members: {
+      index: typeof routes['organization.members.index']
+      store: typeof routes['organization.members.store']
+      update: typeof routes['organization.members.update']
+      destroy: typeof routes['organization.members.destroy']
+    }
+  }
   newAccount: {
     create: typeof routes['new_account.create']
     store: typeof routes['new_account.store']
