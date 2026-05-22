@@ -1,13 +1,14 @@
-import { BaseSeeder } from '@adonisjs/lucid/seeders'
-import app from '@adonisjs/core/services/app'
+import Boat from '#models/boat'
 import BoatMaintenanceEvent from '#models/boat_maintenance_event'
 import BoatMaintenanceTask from '#models/boat_maintenance_task'
-import Boat from '#models/boat'
-import BoatService from '#services/boat_service'
-import BoatMaintenanceService from '#services/boat_maintenance_service'
-import UserService from '#services/user_service'
 import User from '#models/user'
+import BoatMaintenanceService from '#services/boat_maintenance_service'
+import BoatService from '#services/boat_service'
+import UserService from '#services/user_service'
+import app from '@adonisjs/core/services/app'
+import { BaseSeeder } from '@adonisjs/lucid/seeders'
 import { DateTime } from 'luxon'
+import BoatEquipmentService from '../../app/services/boat_equipment_service'
 
 export default class extends BaseSeeder {
   async run() {
@@ -31,11 +32,11 @@ export default class extends BaseSeeder {
     let user = await User.query().where('email', adminEmail).first()
     if (!user) {
       const userService = await app.container.make(UserService)
-      ;({ user } = await userService.signupWithOrganization({
-        email: adminEmail,
-        password: adminPassword,
-        fullName: 'Administrateur',
-      }))
+        ; ({ user } = await userService.signupWithOrganization({
+          email: adminEmail,
+          password: adminPassword,
+          fullName: 'Administrateur',
+        }))
     }
 
     if (user.organizationId === null) {
@@ -43,6 +44,7 @@ export default class extends BaseSeeder {
     }
 
     const boatService = new BoatService()
+    const equipmentService = new BoatEquipmentService()
 
     // Find or create boat
     const existingBoat = await Boat.query()
@@ -72,7 +74,7 @@ export default class extends BaseSeeder {
 
     // Equipment (create only if missing)
     if (boat.engines.length === 0) {
-      await boatService.createEngine(user, boat, {
+      await equipmentService.createEngine(user, boat, {
         kind: 'outboard',
         fuel: 'essence',
         brand: 'Yamaha',
@@ -84,14 +86,14 @@ export default class extends BaseSeeder {
     }
 
     if (boat.sails.length === 0) {
-      await boatService.createSail(user, boat, {
+      await equipmentService.createSail(user, boat, {
         sailType: 'main',
         areaM2: 12.5,
         material: 'dacron',
         reefPoints: 2,
         manufacturedAt: '2020-05-01',
       })
-      await boatService.createSail(user, boat, {
+      await equipmentService.createSail(user, boat, {
         sailType: 'genoa',
         areaM2: 15.0,
         material: 'dacron',
@@ -101,7 +103,7 @@ export default class extends BaseSeeder {
     }
 
     if (!boat.rig) {
-      await boatService.upsertRig(user, boat, {
+      await equipmentService.upsertRig(user, boat, {
         rigType: 'sloop',
         mastCount: 1,
         spreaders: 2,

@@ -1,6 +1,7 @@
 import { UserSchema } from '#database/schema'
 import hash from '@adonisjs/core/services/hash'
 import { compose } from '@adonisjs/core/helpers'
+import { DbRememberMeTokensProvider } from '@adonisjs/auth/session'
 import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
 import Organization from '#models/organization'
 import OrganizationMembership from '#models/organization_membership'
@@ -9,6 +10,8 @@ import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
 import type { OrgRole } from '#shared/types/organization'
 
 export default class User extends compose(UserSchema, withAuthFinder(hash)) {
+  static rememberMeTokens = DbRememberMeTokensProvider.forModel(User)
+
   @belongsTo(() => Organization)
   declare organization: BelongsTo<typeof Organization>
 

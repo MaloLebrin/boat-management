@@ -1,10 +1,10 @@
 import { BoatEquipmentNotFoundError, BoatNotFoundError } from '#exceptions/boat_errors'
+import type Boat from '#models/boat'
 import BoatEngine from '#models/boat_engine'
 import BoatEnginePart from '#models/boat_engine_part'
 import BoatRig from '#models/boat_rig'
 import BoatSafetyEquipment from '#models/boat_safety_equipment'
 import BoatSail from '#models/boat_sail'
-import type Boat from '#models/boat'
 import type User from '#models/user'
 import type {
   BoatEnginePartPayload,
@@ -22,9 +22,10 @@ export type {
   BoatEnginePayload,
   BoatRigPayload,
   BoatSafetyEquipmentPayload,
-  BoatSailPayload,
+  BoatSailPayload
 }
 
+// TODO: Move to shared utils
 function toDateOrNull(value: Date | string | DateTime | null | undefined): DateTime | null {
   if (value === null || value === undefined) return null
   if (DateTime.isDateTime(value)) return value
@@ -32,11 +33,14 @@ function toDateOrNull(value: Date | string | DateTime | null | undefined): DateT
   return DateTime.fromISO(String(value))
 }
 
+// TODO: Move to shared utils
 function assertBoatInUserOrg(user: User, boat: Boat) {
   if (user.organizationId === null || user.organizationId !== boat.organizationId) {
     throw new BoatNotFoundError()
   }
 }
+
+// TODO: split services into smaller services (engine, sail, rig, safety equipment, engine part)
 
 @inject()
 export default class BoatEquipmentService {

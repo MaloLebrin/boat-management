@@ -11,6 +11,7 @@ import { DateTime } from 'luxon'
 export { BoatNotFoundError }
 export type { BoatHullPayload }
 
+// TODO: Move to shared utils
 function toDateOrNull(value: Date | string | DateTime | null | undefined): DateTime | null {
   if (value === null || value === undefined) return null
   if (DateTime.isDateTime(value)) return value
@@ -18,6 +19,7 @@ function toDateOrNull(value: Date | string | DateTime | null | undefined): DateT
   return DateTime.fromISO(String(value))
 }
 
+// TODO: Move to shared utils
 function assertBoatInUserOrg(user: User, boat: Boat) {
   if (user.organizationId === null || user.organizationId !== boat.organizationId) {
     throw new BoatNotFoundError()
