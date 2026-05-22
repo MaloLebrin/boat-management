@@ -8,7 +8,7 @@ import UserService from '#services/user_service'
 import app from '@adonisjs/core/services/app'
 import { BaseSeeder } from '@adonisjs/lucid/seeders'
 import { DateTime } from 'luxon'
-import BoatEquipmentService from '../../app/services/boat_equipment_service'
+import BoatEquipmentService from '#services/boat_equipment_service'
 
 export default class extends BaseSeeder {
   async run() {
@@ -43,8 +43,8 @@ export default class extends BaseSeeder {
       throw new Error('Admin user must belong to an organization')
     }
 
-    const boatService = new BoatService()
-    const equipmentService = new BoatEquipmentService()
+    const boatService = await app.container.make(BoatService)
+    const equipmentService = await app.container.make(BoatEquipmentService)
 
     // Find or create boat
     const existingBoat = await Boat.query()
@@ -112,7 +112,7 @@ export default class extends BaseSeeder {
     }
 
     // Maintenance events (skip if title already exists for this boat)
-    const maintenanceService = new BoatMaintenanceService()
+    const maintenanceService = await app.container.make(BoatMaintenanceService)
     const today = DateTime.now().startOf('day')
     const eventsToEnsure = [
       {
