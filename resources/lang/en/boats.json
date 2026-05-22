@@ -177,6 +177,7 @@
     "title": "Boats",
     "subtitle": "All boats in your organization",
     "newBoat": "New boat",
+    "quotaReached": "Boat limit reached. Upgrade your plan to add more.",
     "empty": {
       "title": "No boats yet",
       "description": "Create your first vessel to start tracking.",

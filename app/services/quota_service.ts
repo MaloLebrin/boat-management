@@ -7,6 +7,13 @@ import { inject } from '@adonisjs/core'
 
 @inject()
 export default class QuotaService {
+  async canAddBoat(org: Organization): Promise<boolean> {
+    const limits = PLAN_LIMITS[org.plan]
+    if (limits.maxBoats === null) return true
+    const rows = await Boat.query().where('organizationId', org.id).count('* as total')
+    return Number(rows[0].$extras.total) < limits.maxBoats
+  }
+
   async assertCanAddBoat(org: Organization): Promise<void> {
     const limits = PLAN_LIMITS[org.plan]
     if (limits.maxBoats === null) return

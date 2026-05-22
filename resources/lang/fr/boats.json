@@ -177,6 +177,7 @@
     "title": "Bateaux",
     "subtitle": "Tous les bateaux de votre organisation",
     "newBoat": "Nouveau bateau",
+    "quotaReached": "Limite de bateaux atteinte. Passez à un plan supérieur pour en ajouter davantage.",
     "empty": {
       "title": "Aucun bateau pour l'instant",
       "description": "Créez votre premier navire pour commencer le suivi.",

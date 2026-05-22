@@ -2,6 +2,7 @@
 import { router, usePage } from '@inertiajs/vue3'
 import { useLocalStorage } from '@vueuse/core'
 import { computed } from 'vue'
+import { toast } from 'vue-sonner'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseEmptyState from '~/components/base/BaseEmptyState.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
@@ -17,7 +18,16 @@ const { t } = useT()
 const props = defineProps<{
   boats: BoatsPaginated
   filters: BoatListFilters
+  canAddBoat: boolean
 }>()
+
+function handleNewBoat() {
+  if (props.canAddBoat) {
+    router.visit('/boats/new')
+  } else {
+    toast.error(t('boats.index.quotaReached'))
+  }
+}
 
 const boatsData = computed(() => props.boats.data)
 
@@ -79,9 +89,7 @@ function reset() {
         <BaseHeading level="1">{{ t('boats.index.title') }}</BaseHeading>
         <p class="mt-2 text-base text-fg-muted">{{ t('boats.index.subtitle') }}</p>
       </div>
-      <a href="/boats/new">
-        <BaseButton variant="primary">{{ t('boats.index.newBoat') }}</BaseButton>
-      </a>
+      <BaseButton variant="primary" @click="handleNewBoat">{{ t('boats.index.newBoat') }}</BaseButton>
     </div>
 
     <BoatListToolbar
@@ -116,7 +124,7 @@ function reset() {
           :title="t('boats.index.empty.title')"
           :description="t('boats.index.empty.description')"
           :action-label="t('boats.index.empty.action')"
-          @action="() => router.visit('/boats/new')"
+          @action="handleNewBoat"
         />
       </div>
     </div>

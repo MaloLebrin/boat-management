@@ -35,12 +35,17 @@ export default class BoatsController {
   async index({ inertia, auth, request }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
+    await user.load('organization')
 
-    const { boats, filters } = await this.boatListService.listForUser(user, request.qs())
+    const [{ boats, filters }, canAddBoat] = await Promise.all([
+      this.boatListService.listForUser(user, request.qs()),
+      this.quotaService.canAddBoat(user.organization),
+    ])
 
     return inertia.render('boats/index', {
       boats,
       filters,
+      canAddBoat,
     })
   }
 
