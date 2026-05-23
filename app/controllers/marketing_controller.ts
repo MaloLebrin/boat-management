@@ -1,5 +1,6 @@
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
+import { PLAN_PRICES } from '../../shared/types/plan.js'
 
 @inject()
 export default class MarketingController {
@@ -453,7 +454,7 @@ export default class MarketingController {
           {
             name: t('tier_starter_name'),
             tag: t('tier_starter_tag'),
-            price: 0,
+            price: PLAN_PRICES.starter.monthly,
             pricePer: t('tier_price_per'),
             sub: t('tier_starter_sub'),
             feats: [
@@ -470,9 +471,9 @@ export default class MarketingController {
           {
             name: t('tier_pro_name'),
             tag: t('tier_pro_tag'),
-            price: 29,
+            price: PLAN_PRICES.pro.monthly,
             pricePer: t('tier_price_per'),
-            priceAnnual: 23,
+            priceAnnual: PLAN_PRICES.pro.annualMonthly,
             priceAnnualPer: t('tier_price_per'),
             sub: t('tier_pro_sub'),
             featured: true,
@@ -493,7 +494,10 @@ export default class MarketingController {
           {
             name: t('tier_enterprise_name'),
             tag: t('tier_enterprise_tag'),
-            price: t('tier_enterprise_price'),
+            price: PLAN_PRICES.enterprise.monthly,
+            pricePer: t('tier_price_per'),
+            priceAnnual: PLAN_PRICES.enterprise.annualMonthly,
+            priceAnnualPer: t('tier_price_per'),
             sub: t('tier_enterprise_sub'),
             feats: [
               [t('tier_enterprise_feat1')],
