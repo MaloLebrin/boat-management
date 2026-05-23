@@ -13,6 +13,18 @@ Source de vérité : `shared/types/plan.ts` — `PLAN_LIMITS`.
 
 `null` = illimité. Le plan est assigné manuellement en BDD sur la table `organizations` (colonne `plan` enum `starter|pro|enterprise`, défaut `starter`). Pas de Stripe.
 
+## Tarifs
+
+| Plan       | Mensuel      | Annuel (−20 %)       |
+|------------|--------------|----------------------|
+| Starter    | Gratuit      | Gratuit              |
+| Pro        | 20 € / mois  | 16 € / mois (192 €/an) |
+| Enterprise | Sur devis    | Sur devis            |
+
+- Facturation par organisation, pas par utilisateur ni par bateau.
+- Réduction annuelle de 20 % appliquée automatiquement (badge `billing_annual_badge: "−20 %"`).
+- Aucun frais caché. Les membres sont illimités sur tous les plans.
+
 ---
 
 ## Architecture
