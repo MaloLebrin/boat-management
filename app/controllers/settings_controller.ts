@@ -1,5 +1,6 @@
 import OrganizationMemberService from '#services/organization_member_service'
 import OrganizationInvitationService from '#services/organization_invitation_service'
+import SubscriptionService from '#services/subscription_service'
 import OrganizationPolicy from '#policies/organization_policy'
 import { updateOrganizationValidator, updateProfileValidator } from '#validators/user'
 import { inject } from '@adonisjs/core'
@@ -12,7 +13,8 @@ import { PLAN_LIMITS } from '#shared/types/plan'
 export default class SettingsController {
   constructor(
     private memberService: OrganizationMemberService,
-    private invitationService: OrganizationInvitationService
+    private invitationService: OrganizationInvitationService,
+    private subscriptionService: SubscriptionService
   ) {}
   async me({ inertia, auth }: HttpContext) {
     const user = await auth.authenticate()
@@ -63,9 +65,10 @@ export default class SettingsController {
     const org = user.organization
     const limits = PLAN_LIMITS[org.plan]
 
-    const [boatRows, memberRows] = await Promise.all([
+    const [boatRows, memberRows, activeSub] = await Promise.all([
       Boat.query().where('organizationId', org.id).count('* as total'),
       OrganizationMembership.query().where('organizationId', org.id).count('* as total'),
+      this.subscriptionService.getActive(org.id),
     ])
 
     return inertia.render('settings/billing', {
@@ -76,6 +79,7 @@ export default class SettingsController {
         canUseAI: limits.canUseAI,
         canExport: limits.canExport,
       },
+      subscription: activeSub ? this.subscriptionService.toInfo(activeSub) : null,
     })
   }
 

@@ -72,7 +72,27 @@
     },
     "paymentMethod": "Payment method",
     "noPaymentMethod": "No payment method configured.",
-    "addCard": "Add a card"
+    "addCard": "Add a card",
+    "subscription": {
+      "status": {
+        "active": "Active",
+        "trialing": "Trialing",
+        "past_due": "Past due",
+        "canceled": "Canceled",
+        "incomplete": "Incomplete",
+        "incomplete_expired": "Expired",
+        "unpaid": "Unpaid",
+        "paused": "Paused"
+      },
+      "renewsOn": "Renews on {date}",
+      "cancelAtPeriodEnd": "Cancellation scheduled for",
+      "manage": "Manage subscription",
+      "interval": {
+        "month": "Monthly",
+        "year": "Annual"
+      },
+      "annualDiscount": "-20%"
+    }
   },
   "me": {
     "title": "My profile",

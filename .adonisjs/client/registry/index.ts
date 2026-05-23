@@ -54,6 +54,12 @@ const routes = {
     tokens: [{"old":"/contact","type":0,"val":"contact","end":""}],
     types: placeholder as Registry['marketing.contact']['types'],
   },
+  'webhooks.stripe': {
+    methods: ["POST"],
+    pattern: '/webhooks/stripe',
+    tokens: [{"old":"/webhooks/stripe","type":0,"val":"webhooks","end":""},{"old":"/webhooks/stripe","type":0,"val":"stripe","end":""}],
+    types: placeholder as Registry['webhooks.stripe']['types'],
+  },
   'dashboard': {
     methods: ["GET","HEAD"],
     pattern: '/dashboard',
@@ -491,6 +497,18 @@ const routes = {
     pattern: '/settings/billing',
     tokens: [{"old":"/settings/billing","type":0,"val":"settings","end":""},{"old":"/settings/billing","type":0,"val":"billing","end":""}],
     types: placeholder as Registry['settings.billing']['types'],
+  },
+  'settings.billing.checkout': {
+    methods: ["POST"],
+    pattern: '/settings/billing/checkout',
+    tokens: [{"old":"/settings/billing/checkout","type":0,"val":"settings","end":""},{"old":"/settings/billing/checkout","type":0,"val":"billing","end":""},{"old":"/settings/billing/checkout","type":0,"val":"checkout","end":""}],
+    types: placeholder as Registry['settings.billing.checkout']['types'],
+  },
+  'settings.billing.portal': {
+    methods: ["POST"],
+    pattern: '/settings/billing/portal',
+    tokens: [{"old":"/settings/billing/portal","type":0,"val":"settings","end":""},{"old":"/settings/billing/portal","type":0,"val":"billing","end":""},{"old":"/settings/billing/portal","type":0,"val":"portal","end":""}],
+    types: placeholder as Registry['settings.billing.portal']['types'],
   },
   'settings.profile.update': {
     methods: ["PUT"],

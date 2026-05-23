@@ -2,6 +2,7 @@ import { middleware } from '#start/kernel'
 import router from '@adonisjs/core/services/router'
 
 const SettingsController = () => import('#controllers/settings_controller')
+const BillingController = () => import('#controllers/billing_controller')
 
 router
   .post('/locale', ({ request, response }) => {
@@ -21,6 +22,12 @@ router
     router.get('settings/org', [SettingsController, 'org']).as('settings.org')
     router.get('settings/members', [SettingsController, 'members']).as('settings.members')
     router.get('settings/billing', [SettingsController, 'billing']).as('settings.billing')
+    router
+      .post('settings/billing/checkout', [BillingController, 'checkout'])
+      .as('settings.billing.checkout')
+    router
+      .post('settings/billing/portal', [BillingController, 'portal'])
+      .as('settings.billing.portal')
     router
       .put('settings/profile', [SettingsController, 'updateProfile'])
       .as('settings.profile.update')

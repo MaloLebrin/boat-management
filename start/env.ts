@@ -46,6 +46,16 @@ export default await Env.create(new URL('../', import.meta.url), {
   CLOUDINARY_API_KEY: Env.schema.string(),
   CLOUDINARY_API_SECRET: Env.schema.secret(),
 
+  // Stripe
+  STRIPE_SECRET_KEY: Env.schema.string.optional(),
+  STRIPE_WEBHOOK_SECRET: Env.schema.string.optional(),
+  STRIPE_PRO_MONTHLY_PRICE_ID: Env.schema.string.optional(),
+  STRIPE_PRO_ANNUAL_PRICE_ID: Env.schema.string.optional(),
+  STRIPE_ENTERPRISE_MONTHLY_PRICE_ID: Env.schema.string.optional(),
+  STRIPE_ENTERPRISE_ANNUAL_PRICE_ID: Env.schema.string.optional(),
+  STRIPE_PUBLIC_KEY: Env.schema.string.optional(),
+  STRIPE_CUSTOMER_PORTAL_ID: Env.schema.string.optional(),
+
   // Mail (SMTP)
   SMTP_HOST: Env.schema.string({ format: 'host' }),
   SMTP_PORT: Env.schema.number(),

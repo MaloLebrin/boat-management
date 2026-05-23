@@ -475,7 +475,7 @@ export class OrganizationMembershipSchema extends BaseModel {
 }
 
 export class OrganizationSchema extends BaseModel {
-  static $columns = ['createdAt', 'id', 'name', 'plan', 'slug', 'updatedAt'] as const
+  static $columns = ['createdAt', 'id', 'name', 'plan', 'slug', 'stripeCustomerId', 'updatedAt'] as const
   $columns = OrganizationSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -487,6 +487,8 @@ export class OrganizationSchema extends BaseModel {
   declare plan: string
   @column()
   declare slug: string
+  @column()
+  declare stripeCustomerId: string | null
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
 }
@@ -680,6 +682,35 @@ export class SpotSchema extends BaseModel {
   declare pontoonId: number | null
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
+}
+
+export class SubscriptionSchema extends BaseModel {
+  static $columns = ['billingInterval', 'cancelAtPeriodEnd', 'createdAt', 'currentPeriodEnd', 'currentPeriodStart', 'id', 'organizationId', 'planTier', 'status', 'stripePriceId', 'stripeSubscriptionId', 'updatedAt'] as const
+  $columns = SubscriptionSchema.$columns
+  @column()
+  declare billingInterval: string
+  @column()
+  declare cancelAtPeriodEnd: boolean
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column.dateTime()
+  declare currentPeriodEnd: DateTime
+  @column.dateTime()
+  declare currentPeriodStart: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare organizationId: number
+  @column()
+  declare planTier: string
+  @column()
+  declare status: string
+  @column()
+  declare stripePriceId: string
+  @column()
+  declare stripeSubscriptionId: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
 }
 
 export class UserSchema extends BaseModel {

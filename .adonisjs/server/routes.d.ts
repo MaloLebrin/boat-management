@@ -12,6 +12,7 @@ export type ScannedRoutes = {
     'marketing.en.about': { paramsTuple?: []; params?: {} }
     'marketing.fr.about': { paramsTuple?: []; params?: {} }
     'marketing.contact': { paramsTuple?: []; params?: {} }
+    'webhooks.stripe': { paramsTuple?: []; params?: {} }
     'dashboard': { paramsTuple?: []; params?: {} }
     'design_system': { paramsTuple?: []; params?: {} }
     'sitemap': { paramsTuple?: []; params?: {} }
@@ -85,6 +86,8 @@ export type ScannedRoutes = {
     'settings.org': { paramsTuple?: []; params?: {} }
     'settings.members': { paramsTuple?: []; params?: {} }
     'settings.billing': { paramsTuple?: []; params?: {} }
+    'settings.billing.checkout': { paramsTuple?: []; params?: {} }
+    'settings.billing.portal': { paramsTuple?: []; params?: {} }
     'settings.profile.update': { paramsTuple?: []; params?: {} }
     'settings.org.update': { paramsTuple?: []; params?: {} }
     'maintenance.history': { paramsTuple?: []; params?: {} }
@@ -190,6 +193,7 @@ export type ScannedRoutes = {
     'password.reset': { paramsTuple?: []; params?: {} }
   }
   POST: {
+    'webhooks.stripe': { paramsTuple?: []; params?: {} }
     'boats.store': { paramsTuple?: []; params?: {} }
     'boat_equipment.store_engine': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'boat_media.store_engine_document': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
@@ -207,6 +211,8 @@ export type ScannedRoutes = {
     'ports.pontoons.spots.store': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'pontoonId': ParamValue} }
     'ports.mouillages.spots.store': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'mouillageId': ParamValue} }
     'locale.set': { paramsTuple?: []; params?: {} }
+    'settings.billing.checkout': { paramsTuple?: []; params?: {} }
+    'settings.billing.portal': { paramsTuple?: []; params?: {} }
     'organization.members.store': { paramsTuple?: []; params?: {} }
     'organization.invitations.store': { paramsTuple?: []; params?: {} }
     'invitations.accept': { paramsTuple?: []; params?: {} }

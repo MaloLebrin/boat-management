@@ -88,6 +88,10 @@
     "alreadyMember": "You are already a member of this organisation.",
     "alreadyPending": "An invitation is already pending for this email."
   },
+  "billing": {
+    "notConfigured": "Payment is not configured yet. Please contact support.",
+    "noSubscription": "No active subscription found."
+  },
   "quota": {
     "boatsExceeded": "You have reached the boat limit for your plan. Upgrade to add more boats.",
     "membersExceeded": "You have reached the member limit for your plan. Upgrade to add more members.",

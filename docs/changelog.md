@@ -3,6 +3,45 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-05-23 — Intégration Stripe — paiement par abonnement
+
+Mise en place du flux de paiement complet via Stripe Billing.
+
+**Backend**
+- Nouvelles tables : `subscriptions` (état de l'abonnement Stripe), colonne `stripe_customer_id` sur `organizations`
+- `StripeService` : création/récupération du customer Stripe, Checkout Session, Customer Portal Session, vérification de signature webhook
+- `SubscriptionService` : synchronisation de l'abonnement depuis les événements Stripe (`checkout.session.completed`, `customer.subscription.updated/deleted`), mise à jour automatique de `organizations.plan`
+- `BillingController` : routes POST `/settings/billing/checkout` (→ Stripe Checkout), POST `/settings/billing/portal` (→ Customer Portal), POST `/webhooks/stripe` (webhook public)
+- Le plan `organizations.plan` est mis à jour automatiquement par les webhooks Stripe
+
+**Frontend**
+- Page `/settings/billing` : prop `subscription` (statut, date de renouvellement, intervalle)
+- Sélecteur mensuel/annuel avant le checkout
+- Badge de statut abonnement (actif, en retard…) + date de renouvellement
+- Bouton "Gérer mon abonnement" → Customer Portal Stripe
+
+**Routes**
+- `POST /settings/billing/checkout` — `settings.billing.checkout`
+- `POST /settings/billing/portal` — `settings.billing.portal`
+- `POST /webhooks/stripe` — `webhooks.stripe` (public, hors auth)
+
+## 2026-05-23 — Mise à jour tarifaire : plan Pro à 20 €/mois
+
+Révision des tarifs du plan Pro. Le modèle reste par organisation (pas par bateau ni par utilisateur).
+
+| Plan    | Mensuel     | Annuel (−20 %)          |
+|---------|-------------|-------------------------|
+| Starter | Gratuit     | Gratuit                 |
+| Pro     | 20 € / mois | 16 € / mois (192 €/an)  |
+| Enterprise | Sur devis | Sur devis              |
+
+**Fichiers mis à jour :**
+- `resources/lang/fr/marketing.json` — prix carte Pro, tableau comparatif, meta description, FAQ (×2)
+- `resources/lang/en/marketing.json` — idem en anglais
+- `docs/quotas.md` — section Tarifs ajoutée
+
+---
+
 ## 2026-05-23 — Enforcement quotas : retour utilisateur anticipé (bateaux)
 
 Amélioration UX : le blocage quota sur l'ajout de bateau remonte désormais au plus tôt, avant toute navigation.

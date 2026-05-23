@@ -2,19 +2,37 @@
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
+import BaseBadge from '~/components/base/BaseBadge.vue'
 import { useT } from '~/composables/useT'
 import type { PlanTier, QuotaUsage } from '../../../../shared/types/plan'
+import type { BillingInterval, SubscriptionInfo, SubscriptionStatus } from '../../../../shared/types/billing'
 import { getUpgradeTier } from '../../../../shared/types/plan'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
+import { useForm } from '@inertiajs/vue3'
 
 const { t } = useT()
 
 const props = defineProps<{
   plan: PlanTier
   quotaUsage: QuotaUsage
+  subscription: SubscriptionInfo | null
 }>()
 
+const interval = ref<BillingInterval>('month')
 const upgradeTier = computed(() => getUpgradeTier(props.plan))
+
+const checkoutForm = useForm({})
+const portalForm = useForm({})
+
+function startCheckout(planTier: 'pro' | 'enterprise') {
+  checkoutForm
+    .transform(() => ({ planTier, interval: interval.value }))
+    .post('/settings/billing/checkout')
+}
+
+function openPortal() {
+  portalForm.post('/settings/billing/portal')
+}
 
 function formatLimit(limit: number | null): string {
   return limit === null ? t('settings.billing.usage.unlimited') : String(limit)
@@ -24,6 +42,21 @@ function usagePercent(used: number, limit: number | null): number {
   if (limit === null) return 0
   return Math.min(100, Math.round((used / limit) * 100))
 }
+
+function formatDate(iso: string): string {
+  return new Date(iso).toLocaleDateString(undefined, {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
+}
+
+const statusVariant = computed((): 'success' | 'warning' | 'neutral' => {
+  const s = props.subscription?.status as SubscriptionStatus | undefined
+  if (s === 'active' || s === 'trialing') return 'success'
+  if (s === 'past_due' || s === 'incomplete' || s === 'unpaid') return 'warning'
+  return 'neutral'
+})
 </script>
 
 <template>
@@ -34,13 +67,31 @@ function usagePercent(used: number, limit: number | null): number {
         <template #header>
           <div class="flex items-center justify-between">
             <span class="text-sm font-semibold text-fg">{{ t('settings.billing.currentPlan') }}</span>
-            <span class="inline-flex items-center rounded-full bg-brand/10 px-3 py-1 text-sm font-medium text-brand">
-              {{ t(`settings.billing.planName.${plan}`) }}
-            </span>
+            <div class="flex items-center gap-2">
+              <BaseBadge v-if="subscription" :variant="statusVariant">
+                {{ t(`settings.billing.subscription.status.${subscription.status}`) }}
+              </BaseBadge>
+              <span class="inline-flex items-center rounded-full bg-brand/10 px-3 py-1 text-sm font-medium text-brand">
+                {{ t(`settings.billing.planName.${plan}`) }}
+              </span>
+            </div>
           </div>
         </template>
 
         <div class="space-y-5">
+          <!-- Subscription info -->
+          <div v-if="subscription" class="rounded-lg bg-surface-2 p-3 text-sm space-y-1">
+            <p v-if="!subscription.cancelAtPeriodEnd" class="text-fg-muted">
+              {{ t('settings.billing.subscription.renewsOn', { date: formatDate(subscription.currentPeriodEnd) }) }}
+              &mdash;
+              {{ t(`settings.billing.subscription.interval.${subscription.billingInterval}`) }}
+            </p>
+            <p v-else class="text-amber-600 font-medium">
+              {{ t('settings.billing.subscription.cancelAtPeriodEnd') }}
+              {{ formatDate(subscription.currentPeriodEnd) }}
+            </p>
+          </div>
+
           <!-- Boats usage -->
           <div>
             <div class="mb-1 flex items-center justify-between text-sm">
@@ -100,22 +151,50 @@ function usagePercent(used: number, limit: number | null): number {
           </ul>
         </div>
 
-        <template v-if="upgradeTier" #footer>
-          <BaseButton variant="primary" disabled>
-            {{ t(`settings.billing.upgradeTo.${upgradeTier}`) }}
-          </BaseButton>
-        </template>
-      </BaseCard>
-
-      <BaseCard>
-        <template #header>
-          <span class="text-sm font-semibold text-fg">{{ t('settings.billing.paymentMethod') }}</span>
-        </template>
-        <p class="text-sm text-fg-muted">{{ t('settings.billing.noPaymentMethod') }}</p>
         <template #footer>
-          <BaseButton variant="secondary" size="sm" disabled>
-            {{ t('settings.billing.addCard') }}
-          </BaseButton>
+          <!-- Abonné : bouton portail -->
+          <div v-if="subscription">
+            <BaseButton
+              variant="secondary"
+              size="sm"
+              :loading="portalForm.processing"
+              @click="openPortal"
+            >
+              {{ t('settings.billing.subscription.manage') }}
+            </BaseButton>
+          </div>
+
+          <!-- Non abonné : sélecteur intervalle + bouton upgrade -->
+          <div v-else-if="upgradeTier" class="space-y-3">
+            <div class="flex gap-2">
+              <button
+                type="button"
+                class="rounded-md px-3 py-1 text-sm font-medium transition-colors"
+                :class="interval === 'month' ? 'bg-brand text-white' : 'bg-surface-2 text-fg-muted hover:text-fg'"
+                @click="interval = 'month'"
+              >
+                {{ t('settings.billing.subscription.interval.month') }}
+              </button>
+              <button
+                type="button"
+                class="flex items-center gap-1.5 rounded-md px-3 py-1 text-sm font-medium transition-colors"
+                :class="interval === 'year' ? 'bg-brand text-white' : 'bg-surface-2 text-fg-muted hover:text-fg'"
+                @click="interval = 'year'"
+              >
+                {{ t('settings.billing.subscription.interval.year') }}
+                <span class="rounded bg-green-100 px-1 text-xs font-semibold text-green-700">
+                  {{ t('settings.billing.subscription.annualDiscount') }}
+                </span>
+              </button>
+            </div>
+            <BaseButton
+              variant="primary"
+              :loading="checkoutForm.processing"
+              @click="startCheckout(upgradeTier as 'pro' | 'enterprise')"
+            >
+              {{ t(`settings.billing.upgradeTo.${upgradeTier}`) }}
+            </BaseButton>
+          </div>
         </template>
       </BaseCard>
     </div>

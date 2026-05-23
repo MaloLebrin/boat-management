@@ -16,6 +16,9 @@ export interface ApiDefinition {
     }
     contact: typeof routes['marketing.contact']
   }
+  webhooks: {
+    stripe: typeof routes['webhooks.stripe']
+  }
   dashboard: typeof routes['dashboard']
   designSystem: typeof routes['design_system']
   sitemap: typeof routes['sitemap']
@@ -127,7 +130,10 @@ export interface ApiDefinition {
       update: typeof routes['settings.org.update']
     }
     members: typeof routes['settings.members']
-    billing: typeof routes['settings.billing']
+    billing: typeof routes['settings.billing'] & {
+      checkout: typeof routes['settings.billing.checkout']
+      portal: typeof routes['settings.billing.portal']
+    }
     profile: {
       update: typeof routes['settings.profile.update']
     }
