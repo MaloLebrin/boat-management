@@ -49,10 +49,16 @@ export default class BoatsController {
     })
   }
 
-  async create({ inertia, auth, bouncer }: HttpContext) {
+  async create({ inertia, auth, bouncer, response, session, i18n }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
     await bouncer.with(BoatPolicy).authorize('create')
+    await user.load('organization')
+
+    if (!(await this.quotaService.canAddBoat(user.organization))) {
+      session.flash('error', i18n.t('flash.quota.boatsExceeded'))
+      return response.redirect('/boats')
+    }
 
     const ports = await this.portService.listWithSpotsForOrg(user)
 

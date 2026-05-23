@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { router, usePage } from '@inertiajs/vue3'
+import { LockClosedIcon } from '@heroicons/vue/24/outline'
 import { useLocalStorage } from '@vueuse/core'
 import { computed } from 'vue'
 import { toast } from 'vue-sonner'
@@ -89,7 +90,10 @@ function reset() {
         <BaseHeading level="1">{{ t('boats.index.title') }}</BaseHeading>
         <p class="mt-2 text-base text-fg-muted">{{ t('boats.index.subtitle') }}</p>
       </div>
-      <BaseButton variant="primary" @click="handleNewBoat">{{ t('boats.index.newBoat') }}</BaseButton>
+      <BaseButton variant="primary" @click="handleNewBoat">
+        <LockClosedIcon v-if="!canAddBoat" class="mr-1.5 h-4 w-4 opacity-70" />
+        {{ t('boats.index.newBoat') }}
+      </BaseButton>
     </div>
 
     <BoatListToolbar

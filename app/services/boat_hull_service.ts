@@ -5,9 +5,10 @@ import BoatRig from '#models/boat_rig'
 import BoatSail from '#models/boat_sail'
 import type User from '#models/user'
 import type { BoatHullPayload } from '#shared/types/boat'
-import { assertBoatInUserOrg, toDateOrNull } from '#utils/boat_utils'
+
 import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
+import { assertBoatInUserOrg, toDateOrNull } from '#utils/boat_utils'
 
 export { BoatNotFoundError }
 export type { BoatHullPayload }
@@ -66,7 +67,7 @@ export default class BoatHullService {
   }
 
   async getPositionHistory(boatId: number) {
-    const module = await import('#models/boat_position_history')
+    const module = await import('#models/boat_position_history') // TODO: use import instead of await import with inject decorator
     const BoatPositionHistoryModel = module.default
     return await BoatPositionHistoryModel.query()
       .where('boatId', boatId)

@@ -1,11 +1,11 @@
-import { BaseSeeder } from '@adonisjs/lucid/seeders'
-import app from '@adonisjs/core/services/app'
-import User from '#models/user'
+import Boat from '#models/boat'
 import Organization from '#models/organization'
 import OrganizationMembership from '#models/organization_membership'
-import Boat from '#models/boat'
+import User from '#models/user'
 import UserService from '#services/user_service'
 import type { PlanTier } from '#shared/types/plan'
+import app from '@adonisjs/core/services/app'
+import { BaseSeeder } from '@adonisjs/lucid/seeders'
 
 const TEST_PASSWORD = 'Password1!'
 
@@ -23,7 +23,11 @@ async function ensureOwner(
 
   if (!user) {
     const userService = await app.container.make(UserService)
-    const result = await userService.signupWithOrganization({ email, password: TEST_PASSWORD, fullName })
+    const result = await userService.signupWithOrganization({
+      email,
+      password: TEST_PASSWORD,
+      fullName,
+    })
     user = result.user
     await result.organization.merge({ plan }).save()
     return { user, org: result.organization }
@@ -50,7 +54,12 @@ async function ensureTeamMember(
 
   let userId: number
   if (!existing) {
-    const member = await User.create({ email, password: TEST_PASSWORD, fullName, organizationId: orgId })
+    const member = await User.create({
+      email,
+      password: TEST_PASSWORD,
+      fullName,
+      organizationId: orgId,
+    })
     userId = member.id
   } else {
     userId = existing.id
@@ -69,7 +78,11 @@ async function ensureTeamMember(
 /**
  * Creates a boat if none with that name exists in the org.
  */
-async function ensureBoat(orgId: number, name: string, extra: Partial<Parameters<typeof Boat.create>[0]> = {}): Promise<void> {
+async function ensureBoat(
+  orgId: number,
+  name: string,
+  extra: Partial<Parameters<typeof Boat.create>[0]> = {}
+): Promise<void> {
   const exists = await Boat.query().where('organizationId', orgId).where('name', name).first()
   if (!exists) {
     await Boat.create({ organizationId: orgId, name, ...extra })
@@ -96,11 +109,7 @@ export default class TestPlansSeeder extends BaseSeeder {
     }
 
     // ─── 2. Starter org ──────────────────────────────────────────────────────
-    const { org: starterOrg } = await ensureOwner(
-      'starter@test.local',
-      'Alice Starter',
-      'starter'
-    )
+    const { org: starterOrg } = await ensureOwner('starter@test.local', 'Alice Starter', 'starter')
     console.log(`✓ starter@test.local (org #${starterOrg.id}, plan=starter)`)
 
     // 2 bateaux — au maximum du plan Starter
@@ -126,11 +135,7 @@ export default class TestPlansSeeder extends BaseSeeder {
     console.log(`  → 2 bateaux (quota max Starter atteint)`)
 
     // ─── 3. Pro org ──────────────────────────────────────────────────────────
-    const { user: _proUser, org: proOrg } = await ensureOwner(
-      'pro@test.local',
-      'Bob Pro',
-      'pro'
-    )
+    const { user: _proUser, org: proOrg } = await ensureOwner('pro@test.local', 'Bob Pro', 'pro')
     console.log(`✓ pro@test.local (org #${proOrg.id}, plan=pro)`)
 
     await ensureTeamMember('pro-alice@test.local', 'Alice Dupont', proOrg.id, 'member')
@@ -209,14 +214,83 @@ export default class TestPlansSeeder extends BaseSeeder {
     console.log(`  → 4 membres d'équipe ajoutés`)
 
     const enterpriseBoats = [
-      { name: 'Oceanis 46.1', lengthM: 14.35, beamM: 4.49, draftM: 2.24, mastHeightM: 21.3, yearBuilt: 2022, manufacturer: 'Beneteau', model: 'Oceanis 46.1' },
-      { name: 'Jeanneau 54 DS', lengthM: 16.38, beamM: 4.67, draftM: 2.3, mastHeightM: 23.1, yearBuilt: 2021, manufacturer: 'Jeanneau', model: '54 DS' },
-      { name: 'Bali 4.2', lengthM: 12.82, beamM: 7.58, draftM: 1.25, yearBuilt: 2020, manufacturer: 'Bali Catamarans', model: '4.2' },
-      { name: 'Lagoon 42', lengthM: 12.81, beamM: 7.55, draftM: 1.23, yearBuilt: 2019, manufacturer: 'Lagoon', model: '42' },
-      { name: 'Fountaine Pajot Elba 45', lengthM: 13.9, beamM: 7.72, draftM: 1.3, yearBuilt: 2023, manufacturer: 'Fountaine Pajot', model: 'Elba 45' },
-      { name: 'Grand Soleil 46 LC', lengthM: 14.43, beamM: 4.4, draftM: 2.3, mastHeightM: 22.0, yearBuilt: 2020, manufacturer: 'Grand Soleil', model: '46 LC' },
-      { name: 'X-Yachts X4°', lengthM: 12.4, beamM: 3.95, draftM: 2.25, mastHeightM: 20.1, yearBuilt: 2018, manufacturer: 'X-Yachts', model: 'X4°' },
-      { name: 'Dehler 38', lengthM: 11.67, beamM: 3.72, draftM: 2.1, mastHeightM: 18.8, yearBuilt: 2017, manufacturer: 'Dehler', model: '38' },
+      {
+        name: 'Oceanis 46.1',
+        lengthM: 14.35,
+        beamM: 4.49,
+        draftM: 2.24,
+        mastHeightM: 21.3,
+        yearBuilt: 2022,
+        manufacturer: 'Beneteau',
+        model: 'Oceanis 46.1',
+      },
+      {
+        name: 'Jeanneau 54 DS',
+        lengthM: 16.38,
+        beamM: 4.67,
+        draftM: 2.3,
+        mastHeightM: 23.1,
+        yearBuilt: 2021,
+        manufacturer: 'Jeanneau',
+        model: '54 DS',
+      },
+      {
+        name: 'Bali 4.2',
+        lengthM: 12.82,
+        beamM: 7.58,
+        draftM: 1.25,
+        yearBuilt: 2020,
+        manufacturer: 'Bali Catamarans',
+        model: '4.2',
+      },
+      {
+        name: 'Lagoon 42',
+        lengthM: 12.81,
+        beamM: 7.55,
+        draftM: 1.23,
+        yearBuilt: 2019,
+        manufacturer: 'Lagoon',
+        model: '42',
+      },
+      {
+        name: 'Fountaine Pajot Elba 45',
+        lengthM: 13.9,
+        beamM: 7.72,
+        draftM: 1.3,
+        yearBuilt: 2023,
+        manufacturer: 'Fountaine Pajot',
+        model: 'Elba 45',
+      },
+      {
+        name: 'Grand Soleil 46 LC',
+        lengthM: 14.43,
+        beamM: 4.4,
+        draftM: 2.3,
+        mastHeightM: 22.0,
+        yearBuilt: 2020,
+        manufacturer: 'Grand Soleil',
+        model: '46 LC',
+      },
+      {
+        name: 'X-Yachts X4°',
+        lengthM: 12.4,
+        beamM: 3.95,
+        draftM: 2.25,
+        mastHeightM: 20.1,
+        yearBuilt: 2018,
+        manufacturer: 'X-Yachts',
+        model: 'X4°',
+      },
+      {
+        name: 'Dehler 38',
+        lengthM: 11.67,
+        beamM: 3.72,
+        draftM: 2.1,
+        mastHeightM: 18.8,
+        yearBuilt: 2017,
+        manufacturer: 'Dehler',
+        model: '38',
+      },
     ]
 
     for (const b of enterpriseBoats) {

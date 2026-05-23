@@ -2,13 +2,13 @@ import Boat from '#models/boat'
 import BoatMaintenanceEvent from '#models/boat_maintenance_event'
 import BoatMaintenanceTask from '#models/boat_maintenance_task'
 import User from '#models/user'
+import BoatEquipmentService from '#services/boat_equipment_service'
 import BoatMaintenanceService from '#services/boat_maintenance_service'
 import BoatService from '#services/boat_service'
 import UserService from '#services/user_service'
 import app from '@adonisjs/core/services/app'
 import { BaseSeeder } from '@adonisjs/lucid/seeders'
 import { DateTime } from 'luxon'
-import BoatEquipmentService from '#services/boat_equipment_service'
 
 export default class extends BaseSeeder {
   async run() {
