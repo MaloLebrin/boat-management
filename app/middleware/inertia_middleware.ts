@@ -5,8 +5,8 @@ import BaseInertiaMiddleware from '@adonisjs/inertia/inertia_middleware'
 import type { PlanTier } from '#shared/types/plan'
 import type User from '#models/user'
 
-export async function resolveSharedCurrentPlan(user: User | undefined): Promise<PlanTier | null> {
-  if (!user?.organizationId) return null
+export async function resolveSharedCurrentPlan(user: User | undefined): Promise<PlanTier | undefined> {
+  if (!user?.organizationId) return undefined
   await user.load('organization')
   return user.organization.plan
 }

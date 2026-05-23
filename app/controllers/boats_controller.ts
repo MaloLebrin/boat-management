@@ -39,7 +39,7 @@ export default class BoatsController {
 
     const [{ boats, filters }, canAddBoat] = await Promise.all([
       this.boatListService.listForUser(user, request.qs()),
-      this.quotaService.canAddBoat(user.organization),
+      user.organization ? this.quotaService.canAddBoat(user.organization) : Promise.resolve(false),
     ])
 
     return inertia.render('boats/index', {
@@ -55,7 +55,7 @@ export default class BoatsController {
     await bouncer.with(BoatPolicy).authorize('create')
     await user.load('organization')
 
-    if (!(await this.quotaService.canAddBoat(user.organization))) {
+    if (!user.organization || !(await this.quotaService.canAddBoat(user.organization))) {
       session.flash('error', i18n.t('flash.quota.boatsExceeded'))
       return response.redirect('/boats')
     }
