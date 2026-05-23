@@ -3,29 +3,67 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-05-23 — Enforcement quotas : retour utilisateur anticipé (bateaux)
+
+Amélioration UX : le blocage quota sur l'ajout de bateau remonte désormais au plus tôt, avant toute navigation.
+
+**4 niveaux de guards pour l'ajout de bateau (defense in depth) :**
+
+1. **Icône cadenas dans le bouton** (`inertia/pages/boats/index.vue`) — signal visuel avant tout clic ; `canAddBoat: false` → `LockClosedIcon` affiché dans le bouton "Nouveau bateau"
+2. **Toast au clic** — `handleNewBoat()` intercepte le clic et affiche `toast.error(t('boats.index.quotaReached'))` au lieu de naviguer
+3. **Redirect dans `GET /boats/new`** (`BoatsController.create`) — si accès direct par URL, redirige vers `/boats` + flash error
+4. **Assert dans `POST /boats`** (`BoatsController.store`) — `quotaService.assertCanAddBoat()` avant toute création en base
+
+**Changements :**
+- `BoatsController.index` : charge l'org et passe `canAddBoat` (boolean) en prop Inertia via `quotaService.canAddBoat()`
+- `BoatsController.create` : vérifie `canAddBoat` avant de rendre le formulaire
+- `inertia/pages/boats/index.vue` : `handleNewBoat()` remplace le lien direct ; bouton avec `LockClosedIcon` conditionnel
+- i18n : `boats.index.quotaReached` ajouté en EN et FR
+
+**Correctif** : import ESM dans `app/services/boat_hull_service.ts` — import relatif `../utils/boat_utils` (sans `.js`) remplacé par l'alias `#utils/boat_utils` (résolution correcte en ESM Node 20)
+
+---
+
 ## 2026-05-22 — Système de quotas par plan (Starter / Pro / Enterprise)
 
-Mise en place de l'enforcement des limites par plan organisationnel.
+Mise en place de l'enforcement des limites par plan organisationnel. Le plan est assigné manuellement en BDD (pas de Stripe).
 
-- **Migration** : colonne `plan` (enum `starter|pro|enterprise`, défaut `starter`) ajoutée à la table `organizations`
-- **`shared/types/plan.ts`** : constantes `PLAN_LIMITS`, type `PlanTier`, interfaces `PlanQuotas` et `QuotaUsage` — source de vérité partagée backend/frontend
-- **`app/exceptions/quota_errors.ts`** : `QuotaExceededError` avec contexte (feature, limit, current, upgradeTo)
-- **`app/services/quota_service.ts`** : `assertCanAddBoat`, `assertCanAddMember`, `assertCanUseAI`, `assertCanExport`
-- **Enforcement (hard block)** dans les controllers :
-  - `BoatsController.store` : quota bateaux vérifié avant création
-  - `OrganizationInvitationsController.store` : quota membres vérifié avant invitation
-  - `AiController.chat / fleetAnalysis / boatSuggestions` : accès IA vérifié
+**Architecture :**
+- **`shared/types/plan.ts`** — source de vérité unique partagée backend/frontend :
+  - `PlanTier` : `'starter' | 'pro' | 'enterprise'`
+  - `PLAN_LIMITS: Record<PlanTier, PlanQuotas>` — limites par plan
+  - `getUpgradeTier(current)` — retourne le tier suivant ou `null`
+  - `QuotaUsage` — interface pour la page billing
+- **`app/exceptions/quota_errors.ts`** : `QuotaExceededError(feature, limit, current, upgradeTo)`
+- **`app/services/quota_service.ts`** :
+  - `canAddBoat(org)` → `Promise<boolean>` — pour l'UI (pas de throw)
+  - `assertCanAddBoat(org)` → throw si dépassé
+  - `assertCanAddMember(org)` → throw si dépassé
+  - `assertCanUseAI(org)` → synchrone, throw si non autorisé
+  - `assertCanExport(org)` → synchrone, throw si non autorisé
+
+**Guards backend (controllers) :**
+- `BoatsController.store` : `assertCanAddBoat` avant `request.validateUsing`
+- `BoatsController.create` : `canAddBoat` pour bloquer l'accès au formulaire
+- `OrganizationInvitationsController.store` : `assertCanAddMember` avant création
+- `AiController.chat`, `fleetAnalysis`, `boatSuggestions` : `assertCanUseAI` en entrée de chaque méthode
+
+**Autres :**
+- **Migration** : colonne `plan` (enum `starter|pro|enterprise`, défaut `starter`) sur `organizations`
 - **Inertia shared props** : `currentPlan` exposé à toutes les pages via `InertiaMiddleware`
-- **Page billing** (`settings/billing`) : plan réel, jauges d'usage (bateaux/membres), disponibilité IA/export, CTA de mise à niveau
-- **i18n** : clés `flash.quota.*` et refonte de `settings.billing.*` en EN et FR
+- **Page billing** (`settings/billing`) : plan réel, jauges usage (bateaux/membres), disponibilité IA/export, CTA mise à niveau
+- **i18n** : `flash.quota.{boatsExceeded,membersExceeded,aiExceeded,exportExceeded}` en EN et FR ; refonte `settings.billing.*`
 
-Limites :
-| Feature | Starter | Pro | Enterprise |
-|---|---|---|---|
-| Bateaux | 2 | 25 | ∞ |
-| Membres | 1 | ∞ | ∞ |
-| IA / Copilote | ✗ | ✓ | ✓ |
-| Export | ✗ | ✓ | ✓ |
+**Limites par plan :**
+
+| Feature        | Starter | Pro | Enterprise |
+|----------------|---------|-----|------------|
+| Bateaux max    | 2       | 25  | ∞          |
+| Membres max    | 1       | 5   | ∞          |
+| IA / Copilote  | ✗       | ✓   | ✓          |
+| Export         | ✗       | ✓   | ✓          |
+
+> Pour tout futur controller d'export : appeler `quotaService.assertCanExport(org)` en entrée.
 
 ---
 
