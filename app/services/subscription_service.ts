@@ -2,6 +2,7 @@ import Organization from '#models/organization'
 import Subscription from '#models/subscription'
 import type { BillingInterval, SubscriptionInfo, SubscriptionStatus } from '#shared/types/billing'
 import type { PlanTier } from '#shared/types/plan'
+import StripeService from '#services/stripe_service'
 import { inject } from '@adonisjs/core'
 import env from '#start/env'
 import { DateTime } from 'luxon'
@@ -9,6 +10,7 @@ import type Stripe from 'stripe'
 
 @inject()
 export default class SubscriptionService {
+  constructor(private stripeService: StripeService) {}
   async getActive(organizationId: number): Promise<Subscription | null> {
     return Subscription.query()
       .where('organizationId', organizationId)
@@ -36,7 +38,7 @@ export default class SubscriptionService {
 
     if (!org) return
 
-    const stripeSub = session.subscription as Stripe.Subscription
+    const stripeSub = await this.stripeService.retrieveSubscription(String(session.subscription))
     await this.upsertSubscription(org.id, stripeSub)
     await this.updateOrgPlan(org, this.planFromPriceId(stripeSub.items.data[0].price.id))
   }

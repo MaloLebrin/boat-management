@@ -5,6 +5,7 @@
 
 export const controllers = {
   Ai: () => import('#controllers/ai_controller'),
+  Billing: () => import('#controllers/billing_controller'),
   BoatEngineParts: () => import('#controllers/boat_engine_parts_controller'),
   BoatEquipment: () => import('#controllers/boat_equipment_controller'),
   BoatMaintenanceSheetItems: () => import('#controllers/boat_maintenance_sheet_items_controller'),
@@ -28,5 +29,4 @@ export const controllers = {
   Session: () => import('#controllers/session_controller'),
   Settings: () => import('#controllers/settings_controller'),
   Spots: () => import('#controllers/spots_controller'),
-  Billing: () => import('#controllers/billing_controller'),
 }

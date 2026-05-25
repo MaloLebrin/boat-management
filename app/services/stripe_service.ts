@@ -55,6 +55,12 @@ export default class StripeService {
     return session.url
   }
 
+  async retrieveSubscription(subscriptionId: string): Promise<Stripe.Subscription> {
+    return this.stripe.subscriptions.retrieve(subscriptionId, {
+      expand: ['items.data.price'],
+    })
+  }
+
   constructWebhookEvent(rawBody: string, signature: string): Stripe.Event {
     const secret = env.get('STRIPE_WEBHOOK_SECRET')
     if (!secret) throw new StripeNotConfiguredError()

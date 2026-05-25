@@ -295,3 +295,12 @@ Utilisateur                App                    Stripe
 | [`app/models/organization.ts`](../app/models/organization.ts) | `plan`, `stripeCustomerId`, relation subscription |
 | [`start/routes/webhooks.ts`](../start/routes/webhooks.ts) | Route publique webhook |
 | [`start/routes/settings.ts`](../start/routes/settings.ts) | Routes billing (checkout, portal) |
+
+Les cartes de test Stripe standard :
+
+Numéro	Résultat
+4242 4242 4242 4242	Paiement réussi
+4000 0000 0000 0002	Carte refusée
+4000 0025 0000 3155	Authentification 3D Secure requise
+4000 0000 0000 9995	Fonds insuffisants
+Pour toutes : date d'expiration n'importe quelle date future, CVC n'importe quels 3 chiffres, code postal n'importe quoi.
