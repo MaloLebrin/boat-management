@@ -1,17 +1,26 @@
 <script setup lang="ts">
 import { ExclamationTriangleIcon } from '@heroicons/vue/24/outline'
-import { router } from '@inertiajs/vue3'
+import { router, usePage } from '@inertiajs/vue3'
 import { computed, ref } from 'vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseSkeleton from '~/components/base/BaseSkeleton.vue'
+import UpgradePlanModal from '~/components/base/UpgradePlanModal.vue'
 import { subjectLabel } from '~/components/boats/maintenance/utils'
 import BoatPhotoGallery from '~/components/boats/show/BoatPhotoGallery.vue'
 import { useT } from '~/composables/useT'
 import type { BoatShowDetail, MaintenanceEventRow, MaintenanceTaskRow } from '~/types/boat_show'
+import { PLAN_LIMITS } from '../../../../../shared/types/plan'
+import type { PlanTier } from '../../../../../shared/types/plan'
 
 const { t } = useT()
+const page = usePage()
+
+const canUseAI = computed(() => {
+  const plan = (page.props.currentPlan as PlanTier | undefined) ?? 'starter'
+  return PLAN_LIMITS[plan].canUseAI
+})
 
 const props = defineProps<{
   boat: BoatShowDetail
@@ -26,8 +35,13 @@ const emit = defineEmits<{
 }>()
 
 const isRefreshing = ref(false)
+const showUpgradeModal = ref(false)
 
 function refreshSuggestions() {
+  if (!canUseAI.value) {
+    showUpgradeModal.value = true
+    return
+  }
   isRefreshing.value = true
   router.post(`/ai/boats/${props.boat.id}/suggestions`, {}, {
     preserveScroll: true,
@@ -248,4 +262,6 @@ const currentPositionLabel = computed(() => {
       </BaseCard>
     </div>
   </div>
+
+  <UpgradePlanModal v-model:open="showUpgradeModal" feature="ai" />
 </template>

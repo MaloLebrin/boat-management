@@ -1,6 +1,7 @@
 import OrganizationMemberService from '#services/organization_member_service'
 import OrganizationInvitationService from '#services/organization_invitation_service'
 import SubscriptionService from '#services/subscription_service'
+import QuotaService from '#services/quota_service'
 import OrganizationPolicy from '#policies/organization_policy'
 import { updateOrganizationValidator, updateProfileValidator } from '#validators/user'
 import { inject } from '@adonisjs/core'
@@ -14,7 +15,8 @@ export default class SettingsController {
   constructor(
     private memberService: OrganizationMemberService,
     private invitationService: OrganizationInvitationService,
-    private subscriptionService: SubscriptionService
+    private subscriptionService: SubscriptionService,
+    private quotaService: QuotaService
   ) {}
   async me({ inertia, auth }: HttpContext) {
     const user = await auth.authenticate()
@@ -42,10 +44,14 @@ export default class SettingsController {
 
   async members({ inertia, auth, bouncer }: HttpContext) {
     const user = await auth.authenticate()
+    await user.load('organization')
 
-    const members = await this.memberService.listMembers(user.organizationId!)
-    const pendingInvitations = await this.invitationService.listPending(user.organizationId!)
-    const canManageMembers = await bouncer.with(OrganizationPolicy).allows('manageMembers')
+    const [members, pendingInvitations, canManageMembers, canAddMember] = await Promise.all([
+      this.memberService.listMembers(user.organizationId!),
+      this.invitationService.listPending(user.organizationId!),
+      bouncer.with(OrganizationPolicy).allows('manageMembers'),
+      this.quotaService.canAddMember(user.organization),
+    ])
 
     return inertia.render('settings/members', {
       user: {
@@ -56,6 +62,7 @@ export default class SettingsController {
       members,
       pendingInvitations,
       canManageMembers,
+      canAddMember,
     })
   }
 

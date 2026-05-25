@@ -94,6 +94,15 @@
       "annualDiscount": "-20%"
     }
   },
+  "upgrade": {
+    "boats": "Vous avez atteint la limite de bateaux de votre plan actuel ({limit} bateaux).",
+    "members": "Vous avez atteint la limite de membres de votre plan actuel ({limit} membres).",
+    "ai": "Les fonctionnalités IA ne sont pas disponibles sur le plan Starter.",
+    "export": "L'export n'est pas disponible sur le plan Starter.",
+    "priceAnnual": "Facturé annuellement — {total} €/an",
+    "contactUs": "Vous êtes déjà sur le plan Entreprise. Contactez-nous pour discuter de vos besoins.",
+    "cancel": "Annuler"
+  },
   "me": {
     "title": "Mon profil",
     "fullNameLabel": "Nom complet",

@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import { router, usePage } from '@inertiajs/vue3'
-import { LockClosedIcon } from '@heroicons/vue/24/outline'
 import { useLocalStorage } from '@vueuse/core'
-import { computed } from 'vue'
-import { toast } from 'vue-sonner'
+import { computed, ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseEmptyState from '~/components/base/BaseEmptyState.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
@@ -11,6 +9,7 @@ import BoatCards from '~/components/boats/list/BoatCards.vue'
 import BoatListToolbar from '~/components/boats/list/BoatListToolbar.vue'
 import BoatPagination from '~/components/boats/list/BoatPagination.vue'
 import BoatTable from '~/components/boats/list/BoatTable.vue'
+import UpgradePlanModal from '~/components/base/UpgradePlanModal.vue'
 import type { BoatListFilters, BoatsPaginated } from '~/components/boats/list/types'
 import { useT } from '~/composables/useT'
 
@@ -22,11 +21,13 @@ const props = defineProps<{
   canAddBoat: boolean
 }>()
 
+const showUpgradeModal = ref(false)
+
 function handleNewBoat() {
   if (props.canAddBoat) {
     router.visit('/boats/new')
   } else {
-    toast.error(t('boats.index.quotaReached'))
+    showUpgradeModal.value = true
   }
 }
 
@@ -91,7 +92,6 @@ function reset() {
         <p class="mt-2 text-base text-fg-muted">{{ t('boats.index.subtitle') }}</p>
       </div>
       <BaseButton variant="primary" @click="handleNewBoat">
-        <LockClosedIcon v-if="!canAddBoat" class="mr-1.5 h-4 w-4 opacity-70" />
         {{ t('boats.index.newBoat') }}
       </BaseButton>
     </div>
@@ -137,5 +137,7 @@ function reset() {
       <BoatPagination :meta="boats.meta" @update:page="(p) => navigate({ ...filters, page: p })" />
     </div>
   </div>
+
+  <UpgradePlanModal v-model:open="showUpgradeModal" feature="boats" />
 </template>
 

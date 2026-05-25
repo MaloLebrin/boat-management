@@ -7,6 +7,7 @@ import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import SettingsMembersInviteForm from '~/components/settings/tabs/SettingsMembersInviteForm.vue'
 import SettingsMembersPendingInvitations from '~/components/settings/tabs/SettingsMembersPendingInvitations.vue'
+import UpgradePlanModal from '~/components/base/UpgradePlanModal.vue'
 import { useT } from '~/composables/useT'
 import type { OrganizationMemberData, OrganizationInvitationData } from '../../../../shared/types/organization'
 
@@ -19,11 +20,21 @@ const props = defineProps<{
   members: OrganizationMemberData[]
   pendingInvitations: OrganizationInvitationData[]
   canManageMembers: boolean
+  canAddMember: boolean
 }>()
 
 const { t } = useT()
 
 const showInviteForm = ref(false)
+const showUpgradeModal = ref(false)
+
+function handleInvite() {
+  if (props.canAddMember) {
+    showInviteForm.value = true
+  } else {
+    showUpgradeModal.value = true
+  }
+}
 
 const roleOptions = computed(() => [
   { label: t('settings.members.roles.admin'), value: 'admin' },
@@ -54,7 +65,7 @@ function removeMember(memberId: number) {
         v-if="canManageMembers && !showInviteForm"
         variant="primary"
         size="sm"
-        @click="showInviteForm = true"
+        @click="handleInvite"
       >
         {{ t('settings.members.invite') }}
       </BaseButton>
@@ -153,4 +164,6 @@ function removeMember(memberId: number) {
       :invitations="pendingInvitations"
     />
   </div>
+
+  <UpgradePlanModal v-model:open="showUpgradeModal" feature="members" />
 </template>

@@ -17,6 +17,7 @@ defineProps<{
   members: OrganizationMemberData[]
   pendingInvitations: OrganizationInvitationData[]
   canManageMembers: boolean
+  canAddMember: boolean
 }>()
 </script>
 
@@ -27,6 +28,7 @@ defineProps<{
       :members="members"
       :pending-invitations="pendingInvitations"
       :can-manage-members="canManageMembers"
+      :can-add-member="canAddMember"
     />
   </SettingsShell>
 </template>

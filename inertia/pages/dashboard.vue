@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { Head, router } from '@inertiajs/vue3'
-import { ref } from 'vue'
+import { Head, router, usePage } from '@inertiajs/vue3'
+import { computed, ref } from 'vue'
 import BaseAlert from '~/components/base/BaseAlert.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseSkeleton from '~/components/base/BaseSkeleton.vue'
 import BaseStatCard from '~/components/base/BaseStatCard.vue'
 import MarinaDashboardCard from '~/components/dashboard/MarinaDashboardCard.vue'
+import UpgradePlanModal from '~/components/base/UpgradePlanModal.vue'
 import type {
   DashboardBoatSummary,
   DashboardPortItem,
@@ -16,8 +17,11 @@ import type {
 } from '#shared/types/dashboard'
 import { useT } from '~/composables/useT'
 import type { AiSuggestion } from '~/types/boat_show'
+import { PLAN_LIMITS } from '../../shared/types/plan'
+import type { PlanTier } from '../../shared/types/plan'
 
 const { t } = useT()
+const page = usePage()
 
 const props = defineProps<{
   boats: DashboardBoatSummary[]
@@ -28,10 +32,20 @@ const props = defineProps<{
   portStats: DashboardPortStats
 }>()
 
+const canUseAI = computed(() => {
+  const plan = (page.props.currentPlan as PlanTier | undefined) ?? 'starter'
+  return PLAN_LIMITS[plan].canUseAI
+})
+
 const showAlert = ref(true)
 const isAnalyzing = ref(false)
+const showUpgradeModal = ref(false)
 
 function analyzeFleet() {
+  if (!canUseAI.value) {
+    showUpgradeModal.value = true
+    return
+  }
   isAnalyzing.value = true
   router.post('/ai/fleet-analysis', {}, {
     preserveScroll: true,
@@ -230,4 +244,6 @@ function dismissAlert() {
       </div>
     </div>
   </div>
+
+  <UpgradePlanModal v-model:open="showUpgradeModal" feature="ai" />
 </template>

@@ -23,7 +23,8 @@ Source de vérité : `shared/types/plan.ts` — `PLAN_LIMITS`.
 
 - Facturation par organisation, pas par utilisateur ni par bateau.
 - Réduction annuelle de 20 % appliquée automatiquement (badge `billing_annual_badge: "−20 %"`).
-- Aucun frais caché. Les membres sont illimités sur tous les plans.
+- Aucun frais caché.
+- Le plan Starter est un plan solo (1 membre = l'owner uniquement). Les plans Pro et Enterprise permettent d'inviter plusieurs membres.
 
 ---
 

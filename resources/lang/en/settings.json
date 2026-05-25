@@ -94,6 +94,15 @@
       "annualDiscount": "-20%"
     }
   },
+  "upgrade": {
+    "boats": "You have reached the boat limit for your current plan ({limit} boats).",
+    "members": "You have reached the member limit for your current plan ({limit} members).",
+    "ai": "AI features are not available on the Starter plan.",
+    "export": "Export is not available on the Starter plan.",
+    "priceAnnual": "Billed annually — {total} €/year",
+    "contactUs": "You are already on the Enterprise plan. Contact us to discuss your needs.",
+    "cancel": "Cancel"
+  },
   "me": {
     "title": "My profile",
     "fullNameLabel": "Full name",

@@ -26,6 +26,15 @@ export default class QuotaService {
     }
   }
 
+  async canAddMember(org: Organization): Promise<boolean> {
+    const limits = PLAN_LIMITS[org.plan]
+    if (limits.maxMembers === null) return true
+    const rows = await OrganizationMembership.query()
+      .where('organizationId', org.id)
+      .count('* as total')
+    return Number(rows[0].$extras.total) < limits.maxMembers
+  }
+
   async assertCanAddMember(org: Organization): Promise<void> {
     const limits = PLAN_LIMITS[org.plan]
     if (limits.maxMembers === null) return
@@ -43,14 +52,14 @@ export default class QuotaService {
   assertCanUseAI(org: Organization): void {
     const limits = PLAN_LIMITS[org.plan]
     if (!limits.canUseAI) {
-      throw new QuotaExceededError('ai', 0, 0, getUpgradeTier(org.plan))
+      throw new QuotaExceededError('ai', null, 0, getUpgradeTier(org.plan))
     }
   }
 
   assertCanExport(org: Organization): void {
     const limits = PLAN_LIMITS[org.plan]
     if (!limits.canExport) {
-      throw new QuotaExceededError('export', 0, 0, getUpgradeTier(org.plan))
+      throw new QuotaExceededError('export', null, 0, getUpgradeTier(org.plan))
     }
   }
 }
