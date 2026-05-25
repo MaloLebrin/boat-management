@@ -48,6 +48,7 @@ new QuotaExceededError(feature: QuotaFeature, limit: number | null, current: num
 | Méthode | Signature | Comportement |
 |---------|-----------|--------------|
 | `canAddBoat(org)` | `Promise<boolean>` | Retourne `false` si quota atteint, sans throw. Pour l'UI. |
+| `canAddMember(org)` | `Promise<boolean>` | Retourne `false` si quota atteint, sans throw. Pour l'UI. |
 | `assertCanAddBoat(org)` | `Promise<void>` | Throw `QuotaExceededError` si `COUNT(boats) >= maxBoats`. |
 | `assertCanAddMember(org)` | `Promise<void>` | Throw si `COUNT(organization_memberships) >= maxMembers`. |
 | `assertCanUseAI(org)` | `void` (synchrone) | Throw si `!canUseAI`. |
@@ -55,24 +56,39 @@ new QuotaExceededError(feature: QuotaFeature, limit: number | null, current: num
 
 ---
 
+## Composant `UpgradePlanModal`
+
+**`inertia/components/base/UpgradePlanModal.vue`**
+
+Modale réutilisable affichée quand un quota est atteint côté frontend, avant tout appel réseau. Elle :
+- lit `currentPlan` via `usePage().props.currentPlan`
+- déduit le plan cible via `getUpgradeTier()` (`shared/types/plan.ts`)
+- affiche le prix mensuel/annuel avec toggle (−20 %)
+- déclenche un checkout Stripe via `useForm().transform(...).post('/settings/billing/checkout')`
+- si `currentPlan === 'enterprise'` → message "Contactez-nous", pas de bouton checkout
+
+```vue
+<UpgradePlanModal v-model:open="showUpgradeModal" feature="boats | members | ai | export" />
+```
+
+---
+
 ## Guards par feature
 
-### Ajout de bateau — 4 niveaux (defense in depth)
+### Ajout de bateau — 3 niveaux (defense in depth)
 
 ```
-[1] Icône cadenas dans le bouton        →  inertia/pages/boats/index.vue
-[2] Toast.error() au clic               →  handleNewBoat() dans index.vue
-[3] Redirect dans GET /boats/new        →  BoatsController.create()
-[4] assertCanAddBoat() dans POST /boats →  BoatsController.store()
+[1] UpgradePlanModal au clic            →  handleNewBoat() dans inertia/pages/boats/index.vue
+[2] Redirect dans GET /boats/new        →  BoatsController.create()
+[3] assertCanAddBoat() dans POST /boats →  BoatsController.store()
 ```
 
-**[1] + [2] — Frontend `inertia/pages/boats/index.vue`**
+**[1] — Frontend `inertia/pages/boats/index.vue`**
 
-Le controller `index()` passe `canAddBoat: boolean` (via `quotaService.canAddBoat()`).
-- `canAddBoat === false` → `LockClosedIcon` visible dans le bouton avant tout clic
-- Clic sur le bouton → `handleNewBoat()` : si quota atteint, `toast.error(t('boats.index.quotaReached'))` et pas de navigation
+Le controller `index()` passe `canAddBoat: boolean` (via `quotaService.canAddBoat()`). Le bouton "Nouveau bateau" reste toujours visible et cliquable.
+- Clic → `handleNewBoat()` : si `canAddBoat === false`, ouvre `UpgradePlanModal` (feature `boats`) ; sinon navigue vers `/boats/new`.
 
-**[3] — `BoatsController.create()` (GET /boats/new)**
+**[2] — `BoatsController.create()` (GET /boats/new)**
 
 ```ts
 if (!(await this.quotaService.canAddBoat(user.organization))) {
@@ -82,7 +98,7 @@ if (!(await this.quotaService.canAddBoat(user.organization))) {
 ```
 Bloque l'accès direct par URL au formulaire de création.
 
-**[4] — `BoatsController.store()` (POST /boats)**
+**[3] — `BoatsController.store()` (POST /boats)**
 
 ```ts
 try {
@@ -99,9 +115,19 @@ Guard final avant écriture en base.
 
 ---
 
-### Ajout de membre — 1 niveau backend
+### Ajout de membre — 2 niveaux
 
-**`OrganizationInvitationsController.store()` (POST /organization/invitations)**
+```
+[1] UpgradePlanModal au clic                          →  handleInvite() dans SettingsMembersTab.vue
+[2] assertCanAddMember() dans POST /organization/invitations →  OrganizationInvitationsController.store()
+```
+
+**[1] — Frontend `inertia/components/settings/tabs/SettingsMembersTab.vue`**
+
+Le controller `members()` passe `canAddMember: boolean` (via `quotaService.canAddMember()`). Le bouton "Inviter" reste toujours visible.
+- Clic → `handleInvite()` : si `canAddMember === false`, ouvre `UpgradePlanModal` (feature `members`) ; sinon affiche le formulaire d'invitation.
+
+**[2] — `OrganizationInvitationsController.store()` (POST /organization/invitations)**
 
 ```ts
 await this.quotaService.assertCanAddMember(user.organization)
@@ -109,13 +135,27 @@ await this.quotaService.assertCanAddMember(user.organization)
 Appelé après `bouncer.authorize('manageMembers')` et validation VineJS, avant `invitationService.create()`.
 Flash : `flash.quota.membersExceeded`.
 
-Pas de guard frontend actuellement (pas d'icône ni de toast anticipé).
-
 ---
 
-### Accès IA — 1 niveau backend
+### Accès IA — 2 niveaux
 
-**`AiController.chat()`, `fleetAnalysis()`, `boatSuggestions()` (POST /ai/chat, /ai/fleet-analysis, /boats/:id/suggestions)**
+```
+[1] UpgradePlanModal au clic              →  dashboard.vue + BoatShowTabOverview.vue
+[2] assertCanUseAI() dans POST /ai/*      →  AiController (tous les endpoints)
+```
+
+**[1] — Frontend**
+
+`canUseAI` est calculé localement depuis `currentPlan` (shared prop, pas de prop controller dédiée) :
+```ts
+const canUseAI = computed(() => PLAN_LIMITS[page.props.currentPlan ?? 'starter'].canUseAI)
+```
+- `inertia/pages/dashboard.vue` → `analyzeFleet()` : si `!canUseAI`, ouvre `UpgradePlanModal` (feature `ai`).
+- `inertia/components/boats/show/tabs/BoatShowTabOverview.vue` → `refreshSuggestions()` : idem.
+
+Les boutons restent toujours visibles et cliquables.
+
+**[2] — `AiController.chat()`, `fleetAnalysis()`, `boatSuggestions()` (POST /ai/chat, /ai/fleet-analysis, /ai/boats/:id/suggestions)**
 
 ```ts
 this.quotaService.assertCanUseAI(user.organization) // synchrone
