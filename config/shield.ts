@@ -1,3 +1,4 @@
+import app from '@adonisjs/core/services/app'
 import { defineConfig } from '@adonisjs/shield'
 
 const shieldConfig = defineConfig({
@@ -23,9 +24,7 @@ const shieldConfig = defineConfig({
       baseUri: ["'self'"],
     },
 
-    // Mode observation : log les violations sans rien bloquer.
-    // Passer à false une fois zéro violation constatée en production.
-    reportOnly: true,
+    reportOnly: !app.inProduction,
   },
 
   /**
