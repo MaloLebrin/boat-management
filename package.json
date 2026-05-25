@@ -73,7 +73,8 @@
     "vite": "^7.3.1",
     "vitest": "^4.1.4",
     "vue-tsc": "^3.2.6",
-    "youch": "^4.1.1"
+    "youch": "^4.1.1",
+    "better-sqlite3": "^12.9.0"
   },
   "dependencies": {
     "@adonisjs/auth": "^10.1.0",
@@ -98,7 +99,6 @@
     "@tuyau/core": "^1.2.2",
     "@vinejs/vine": "^4.3.1",
     "@vueuse/core": "^14.2.1",
-    "better-sqlite3": "^12.9.0",
     "cloudinary": "^2.10.0",
     "edge.js": "^6.5.0",
     "luxon": "^3.7.2",

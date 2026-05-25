@@ -74,9 +74,6 @@ importers:
       '@vueuse/core':
         specifier: ^14.2.1
         version: 14.2.1(vue@3.5.32(typescript@6.0.3))
-      better-sqlite3:
-        specifier: ^12.9.0
-        version: 12.9.0
       cloudinary:
         specifier: ^2.10.0
         version: 2.10.0
@@ -156,6 +153,9 @@ importers:
       '@vue/test-utils':
         specifier: ^2.4.6
         version: 2.4.6
+      better-sqlite3:
+        specifier: ^12.9.0
+        version: 12.9.0
       eslint:
         specifier: ^10.2.0
         version: 10.2.1(jiti@2.6.1)

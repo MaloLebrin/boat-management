@@ -1,0 +1,12 @@
+node_modules
+build
+.git
+.gitignore
+.env
+.env.*
+!.env.example
+tmp
+*.log
+coverage
+tests/inertia
+vitest.config.ts
