@@ -12,31 +12,9 @@ import AboutNumbersSection from '~/components/marketing/about/AboutNumbersSectio
 import AboutTimelineSection from '~/components/marketing/about/AboutTimelineSection.vue'
 import AboutOfficeSection from '~/components/marketing/about/AboutOfficeSection.vue'
 import HomeFinalCtaSection from '~/components/marketing/home/HomeFinalCtaSection.vue'
+import type { AboutPageProps } from '../../../shared/types/marketing'
 
-interface ValueItem { n: string; title: string; desc: string; extra: string }
-interface Member { n: string; r: string; b: string; emoji: string; color: string }
-interface StatItem { value: string; label: string }
-interface TimelineItem { d: string; t: string; sub: string; tone?: string }
-interface Location { city: string; addr: string; role: string }
-interface OfficeCard { city: string; role: string; addr: string; hours: string; team: string; hint: string; gradient: string }
-
-interface PageProps {
-  t: {
-    meta: { title: string; description: string }
-    about: {
-      hero: { line1: string; line1Highlight: string; line2: string; line2Highlight: string; subtitle: string }
-      origin: { eyebrow: string; title: string; paragraphs: string[]; captionDate: string; captionSub: string }
-      values: { eyebrow: string; title: string; titleHighlight: string; items: ValueItem[] }
-      team: { eyebrow: string; title: string; titleHighlight: string; subtitle: string; members: Member[]; hiringTitle: string; hiringSubtitle: string; hiringCta: string }
-      numbers: { eyebrow: string; title: string; titleHighlight: string; stats: StatItem[]; investorsLabel: string; investors: string[] }
-      timeline: { eyebrow: string; title: string; titleHighlight: string; subtitle: string; items: TimelineItem[] }
-      office: { eyebrow: string; title: string; titleHighlight: string; body: string; locationLabel: string; locations: Location[]; officeCards: OfficeCard[] }
-      finalCta: { title: string; titleHighlight: string; subtitle: string; primaryCta: string; secondaryCta: string }
-    }
-  }
-}
-
-const props = defineProps<PageProps>()
+const props = defineProps<AboutPageProps>()
 const t = props.t
 </script>
 
