@@ -5,3 +5,10 @@ export class BoatNotFoundError extends Error {
 export class BoatEquipmentNotFoundError extends Error {
   name = 'BoatEquipmentNotFoundError'
 }
+
+export class InvalidBoatHullError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'InvalidBoatHullError'
+  }
+}

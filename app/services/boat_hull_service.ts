@@ -1,4 +1,5 @@
-import { BoatNotFoundError } from '#exceptions/boat_errors'
+import { BoatNotFoundError, InvalidBoatHullError } from '#exceptions/boat_errors'
+import { UserNotInOrganizationError } from '#exceptions/organization_errors'
 import Boat from '#models/boat'
 import BoatEngine from '#models/boat_engine'
 import BoatRig from '#models/boat_rig'
@@ -82,14 +83,14 @@ export default class BoatHullService {
 
   async createForUser(user: User, payload: BoatHullPayload) {
     if (user.organizationId === null) {
-      throw new Error('User must belong to an organization to create boats')
+      throw new UserNotInOrganizationError()
     }
 
     if (
       payload.propulsionType === 'sailboat' &&
       (payload.mastHeightM === null || payload.mastHeightM === undefined)
     ) {
-      throw new Error('mastHeightM is required when propulsionType is sailboat')
+      throw new InvalidBoatHullError('mastHeightM is required when propulsionType is sailboat')
     }
 
     const boat = await Boat.create({
@@ -136,7 +137,7 @@ export default class BoatHullService {
       payload.propulsionType === 'sailboat' &&
       (payload.mastHeightM === null || payload.mastHeightM === undefined)
     ) {
-      throw new Error('mastHeightM is required when propulsionType is sailboat')
+      throw new InvalidBoatHullError('mastHeightM is required when propulsionType is sailboat')
     }
 
     boat.name = payload.name
