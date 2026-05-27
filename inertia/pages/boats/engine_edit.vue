@@ -5,17 +5,20 @@ import type { BoatEquipmentEngineFieldsModel } from '~/components/boats/engine/B
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
+import { useT } from '~/composables/useT'
 
 defineProps<{
   boat: { id: number; name: string }
   engine: BoatEquipmentEngineFieldsModel & { id: number }
 }>()
+
+const { t } = useT()
 </script>
 
 <template>
   <div class="mx-auto w-full max-w-xl px-6 py-10 sm:px-8">
     <div class="space-y-2">
-      <BaseHeading level="1">Edit engine</BaseHeading>
+      <BaseHeading level="1">{{ t('boats.engines.editTitle') }}</BaseHeading>
       <p class="text-base text-fg-muted">{{ boat.name }}</p>
     </div>
 
@@ -27,9 +30,9 @@ defineProps<{
         <BaseCard padded>
           <BoatEquipmentEngineFields :errors="errors" :engine="engine" />
           <div class="mt-6 flex items-center gap-3">
-            <BaseButton type="submit" :disabled="processing">Save</BaseButton>
+            <BaseButton type="submit" :disabled="processing">{{ t('common.save') }}</BaseButton>
             <a :href="`/boats/${boat.id}`" class="text-sm font-semibold text-fg-muted hover:text-fg hover:underline">
-              Cancel
+              {{ t('common.cancel') }}
             </a>
           </div>
         </BaseCard>

@@ -64,6 +64,7 @@
       "strokeType": "Cycle moteur",
       "installHours": "Heures à l'installation"
     },
+    "editTitle": "Modifier le moteur",
     "modal": {
       "title": "Ajouter un moteur",
       "cancel": "Annuler",
@@ -76,6 +77,7 @@
     "noSails": "Aucune voile.",
     "reef": "Ris",
     "mfg": "Fabriqué le",
+    "editTitle": "Modifier la voile",
     "modal": {
       "title": "Ajouter une voile",
       "cancel": "Annuler",
@@ -84,6 +86,8 @@
   },
   "rig": {
     "title": "Gréement",
+    "editTitle": "Modifier le gréement",
+    "addTitle": "Ajouter un gréement",
     "noRig": "Aucun gréement enregistré.",
     "fields": {
       "rigType": "Type de gréement",

@@ -64,6 +64,7 @@
       "strokeType": "Engine cycle",
       "installHours": "Hours at installation"
     },
+    "editTitle": "Edit engine",
     "modal": {
       "title": "Add engine",
       "cancel": "Cancel",
@@ -76,6 +77,7 @@
     "noSails": "No sails.",
     "reef": "Reef",
     "mfg": "Mfg.",
+    "editTitle": "Edit sail",
     "modal": {
       "title": "Add sail",
       "cancel": "Cancel",
@@ -84,6 +86,8 @@
   },
   "rig": {
     "title": "Rig",
+    "editTitle": "Edit rig",
+    "addTitle": "Add rig",
     "noRig": "No rig recorded.",
     "fields": {
       "rigType": "Rig type",
