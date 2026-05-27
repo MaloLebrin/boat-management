@@ -4,6 +4,7 @@ import logger from '@adonisjs/core/services/logger'
 import type { MultipartFile } from '@adonisjs/core/bodyparser'
 import cloudinary from '#config/cloudinary'
 import { PdfService } from '#services/pdf_service'
+import { CloudinaryDownloadError, MissingTmpPathError } from '#exceptions/media_errors'
 
 function envPrefix(): string {
   return app.inProduction ? 'production' : 'dev'
@@ -106,7 +107,7 @@ export class CloudinaryService {
     options: UploadOptions
   ): Promise<CloudinaryUploadResult> {
     if (!file.tmpPath) {
-      throw new Error('File has no tmpPath — ensure bodyparser autoProcess is enabled')
+      throw new MissingTmpPathError()
     }
 
     let compressedResult: { outputPath: string; cleanup: () => Promise<void> } | null = null
@@ -174,7 +175,7 @@ export class CloudinaryService {
 
     const fetchResponse = await fetch(downloadUrl)
     if (!fetchResponse.ok) {
-      throw new Error(`Cloudinary download failed: ${fetchResponse.status} ${fetchResponse.statusText}`)
+      throw new CloudinaryDownloadError(fetchResponse.status, fetchResponse.statusText)
     }
 
     const buffer = Buffer.from(await fetchResponse.arrayBuffer())
@@ -198,7 +199,7 @@ export class CloudinaryService {
     options: UploadOptions
   ): Promise<CloudinaryUploadResult> {
     if (!file.tmpPath) {
-      throw new Error('File has no tmpPath — ensure bodyparser autoProcess is enabled')
+      throw new MissingTmpPathError()
     }
 
     const result = await cloudinary.uploader.upload(file.tmpPath, {
