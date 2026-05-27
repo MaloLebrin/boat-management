@@ -5,20 +5,13 @@ import type {
   BoatListItem,
   BoatListQuery,
   BoatListSort,
+  BoatSerializedRow,
 } from '#shared/types/boat'
 import type User from '#models/user'
 import { inject } from '@adonisjs/core'
 
 export type { BoatListDirection, BoatListItem, BoatListQuery, BoatListSort }
 
-interface SerializedBoatRow {
-  id: number | string
-  name: string
-  registrationNumber: string | null
-  type: string | null
-  propulsionType: string | null
-  updatedAt: string | null
-}
 
 function toTrimmedStringOrUndefined(value: unknown): string | undefined {
   if (typeof value !== 'string') return undefined
@@ -97,7 +90,7 @@ export default class BoatListService {
     const paginator = await query.paginate(filters.page, filters.perPage)
 
     const serialized = paginator.serialize()
-    const boatIds = (serialized.data as SerializedBoatRow[] ?? [])
+    const boatIds = (serialized.data as BoatSerializedRow[] ?? [])
       .map((b) => Number(b.id))
       .filter((id) => id > 0)
 
@@ -105,7 +98,7 @@ export default class BoatListService {
     const badges = await badgeService.getForBoatIds(user.organizationId, boatIds)
     return {
       boats: {
-        data: (serialized.data as SerializedBoatRow[] ?? []).map((b) => ({
+        data: (serialized.data as BoatSerializedRow[] ?? []).map((b) => ({
           id: b.id,
           name: b.name,
           registrationNumber: b.registrationNumber ?? null,

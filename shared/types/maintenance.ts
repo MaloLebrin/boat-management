@@ -64,3 +64,12 @@ export type UpdateItemPayload = {
   isDone: boolean
   notes: string | null
 }
+
+export type MaintenanceDateBadgeRow = { boatId: number | string; nextDueAt: string | null }
+
+export type MaintenanceMaxDoneRow = { boatEngineId: number | string; maxDone: number | string }
+
+export type MaintenanceBadgeOpts = {
+  urgentWithinDays?: number
+  urgentWithinEngineHours?: number
+}

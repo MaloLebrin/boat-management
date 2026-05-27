@@ -7,10 +7,8 @@ import type User from '#models/user'
 import db from '@adonisjs/lucid/services/db'
 import { PortHasBoatsError, PortNotFoundError } from '#exceptions/port_errors'
 import { UserNotInOrganizationError } from '#exceptions/organization_errors'
-import type { PortPayload } from '#shared/types/port'
+import type { PortAggRow, PortPayload } from '#shared/types/port'
 import { inject } from '@adonisjs/core'
-
-type AggRow = { port_id: number; count: string }
 
 function assertPortInUserOrg(user: User, port: Port) {
   if (user.organizationId === null || user.organizationId !== port.organizationId) {
@@ -35,7 +33,7 @@ export default class PortService {
 
     if (portIds.length > 0) {
       // Boats via pontoon spots
-      const pontoonBoatRows: AggRow[] = await db
+      const pontoonBoatRows: PortAggRow[] = await db
         .from('boats')
         .join('spots', 'boats.spot_id', 'spots.id')
         .join('pontoons', 'spots.pontoon_id', 'pontoons.id')
@@ -49,7 +47,7 @@ export default class PortService {
       }
 
       // Boats via mouillage spots
-      const mouillageBoatRows: AggRow[] = await db
+      const mouillageBoatRows: PortAggRow[] = await db
         .from('boats')
         .join('spots', 'boats.spot_id', 'spots.id')
         .join('mouillages', 'spots.mouillage_id', 'mouillages.id')
@@ -63,7 +61,7 @@ export default class PortService {
       }
 
       // Total spots via pontoons
-      const pontoonSpotRows: AggRow[] = await db
+      const pontoonSpotRows: PortAggRow[] = await db
         .from('spots')
         .join('pontoons', 'spots.pontoon_id', 'pontoons.id')
         .whereIn('pontoons.port_id', portIds)
@@ -76,7 +74,7 @@ export default class PortService {
       }
 
       // Total spots via mouillages
-      const mouillageSpotRows: AggRow[] = await db
+      const mouillageSpotRows: PortAggRow[] = await db
         .from('spots')
         .join('mouillages', 'spots.mouillage_id', 'mouillages.id')
         .whereIn('mouillages.port_id', portIds)

@@ -75,6 +75,15 @@ export type BoatSafetyEquipmentPayload = {
   notes?: string | null
 }
 
+export type BoatSerializedRow = {
+  id: number | string
+  name: string
+  registrationNumber: string | null
+  type: string | null
+  propulsionType: string | null
+  updatedAt: string | null
+}
+
 export type BoatListSort = 'recent' | 'name'
 export type BoatListDirection = 'asc' | 'desc'
 

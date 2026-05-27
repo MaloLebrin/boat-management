@@ -5,6 +5,7 @@ import type { MultipartFile } from '@adonisjs/core/bodyparser'
 import cloudinary from '#config/cloudinary'
 import { PdfService } from '#services/pdf_service'
 import { CloudinaryDownloadError, MissingTmpPathError } from '#exceptions/media_errors'
+import type { CloudinaryUploadOptions } from '#shared/types/media'
 
 function envPrefix(): string {
   return app.inProduction ? 'production' : 'dev'
@@ -20,12 +21,6 @@ export interface CloudinaryUploadResult {
   width?: number
   height?: number
   originalFilename: string
-}
-
-type UploadOptions = {
-  publicId?: string
-  tags?: string[]
-  transformation?: Record<string, unknown>[]
 }
 
 export const CloudinaryFolders = {
@@ -84,7 +79,7 @@ export class CloudinaryService {
   async uploadImage(
     file: MultipartFile,
     folder: string,
-    options: UploadOptions = {}
+    options: CloudinaryUploadOptions = {}
   ): Promise<CloudinaryUploadResult> {
     return this.upload(file, folder, 'image', options)
   }
@@ -92,7 +87,7 @@ export class CloudinaryService {
   async uploadDocument(
     file: MultipartFile,
     folder: string,
-    options: UploadOptions = {}
+    options: CloudinaryUploadOptions = {}
   ): Promise<CloudinaryUploadResult> {
     if (file.extname === 'pdf') {
       return this.uploadCompressedPdf(file, folder, options)
@@ -104,7 +99,7 @@ export class CloudinaryService {
   private async uploadCompressedPdf(
     file: MultipartFile,
     folder: string,
-    options: UploadOptions
+    options: CloudinaryUploadOptions
   ): Promise<CloudinaryUploadResult> {
     if (!file.tmpPath) {
       throw new MissingTmpPathError()
@@ -136,7 +131,7 @@ export class CloudinaryService {
     originalFilename: string,
     folder: string,
     resourceType: 'image' | 'raw',
-    options: UploadOptions
+    options: CloudinaryUploadOptions
   ): Promise<CloudinaryUploadResult> {
     const result = await cloudinary.uploader.upload(filePath, {
       folder,
@@ -196,7 +191,7 @@ export class CloudinaryService {
     file: MultipartFile,
     folder: string,
     resourceType: 'image' | 'raw',
-    options: UploadOptions
+    options: CloudinaryUploadOptions
   ): Promise<CloudinaryUploadResult> {
     if (!file.tmpPath) {
       throw new MissingTmpPathError()
