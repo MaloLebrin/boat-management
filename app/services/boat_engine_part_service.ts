@@ -11,6 +11,10 @@ export type { BoatEnginePartPayload }
 
 @inject()
 export default class BoatEnginePartService {
+  async listForEngine(engineId: number) {
+    return await BoatEnginePart.query().where('boatEngineId', engineId).orderBy('id', 'asc')
+  }
+
   async create(user: User, boat: Boat, engineId: number, payload: BoatEnginePartPayload) {
     assertBoatInUserOrg(user, boat)
 

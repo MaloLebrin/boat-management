@@ -1,5 +1,6 @@
 import BoatPolicy from '#policies/boat_policy'
 import BoatEquipmentService, { BoatEquipmentNotFoundError } from '#services/boat_equipment_service'
+import BoatEnginePartService from '#services/boat_engine_part_service'
 import BoatHullService, { BoatNotFoundError } from '#services/boat_hull_service'
 import BoatMaintenanceService from '#services/boat_maintenance_service'
 import BoatMaintenanceTaskService from '#services/boat_maintenance_task_service'
@@ -29,7 +30,8 @@ export default class BoatEquipmentController {
     private equipmentService: BoatEquipmentService,
     private maintenanceService: BoatMaintenanceService,
     private taskService: BoatMaintenanceTaskService,
-    private mediaService: MediaService
+    private mediaService: MediaService,
+    private enginePartService: BoatEnginePartService
   ) {}
 
   private async loadBoatForEquipment(ctx: Pick<HttpContext, 'auth' | 'response' | 'params'>) {
@@ -318,10 +320,7 @@ export default class BoatEquipmentController {
       this.maintenanceService.listEventsForEngine(boat.id, engineId),
       this.taskService.listForEngine(boat.id, engineId),
       this.mediaService.listForEntity('boat_engine', engineId),
-      (async () => {
-        const BoatEnginePart = (await import('#models/boat_engine_part')).default
-        return await BoatEnginePart.query().where('boatEngineId', engineId).orderBy('id', 'asc')
-      })(),
+      this.enginePartService.listForEngine(engineId),
     ])
 
     return inertia.render('boats/engine_show', {
