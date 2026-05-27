@@ -27,6 +27,8 @@ function assertBoatScope(user: User, boat: Boat) {
 
 @inject()
 export default class BoatMaintenanceSheetService {
+  constructor(private templateService: BoatMaintenanceSheetTemplateService) {}
+
   /**
    * Lists all maintenance sheets for a boat, ordered by performedAt desc.
    * Items are preloaded and ordered by position asc.
@@ -61,8 +63,7 @@ export default class BoatMaintenanceSheetService {
       status: 'in_progress',
     })
 
-    const templateService = new BoatMaintenanceSheetTemplateService()
-    const templateItems = templateService.getItems(payload.type)
+    const templateItems = this.templateService.getItems(payload.type)
 
     await Promise.all(
       templateItems.map((item) =>

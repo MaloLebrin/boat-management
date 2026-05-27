@@ -5,6 +5,7 @@ import type { JobOptions } from '@adonisjs/queue/types'
 import { createHash } from 'node:crypto'
 import QueueDedupService from '#services/queue_dedup_service'
 import env from '#start/env'
+import { inject } from '@adonisjs/core'
 
 export interface SendEmailPayload {
   to: string
@@ -15,10 +16,15 @@ export interface SendEmailPayload {
   dedupKey: string
 }
 
+@inject()
 export default class SendEmail extends Job<SendEmailPayload> {
   static options: JobOptions = {
     queue: 'emails',
     maxRetries: 5,
+  }
+
+  constructor(private dedupService: QueueDedupService) {
+    super()
   }
 
   static dedupKey(payload: Omit<SendEmailPayload, 'dedupKey'>) {
@@ -28,8 +34,7 @@ export default class SendEmail extends Job<SendEmailPayload> {
   }
 
   async execute() {
-    const dedup = new QueueDedupService()
-    await dedup.markRunning(this.payload.dedupKey)
+    await this.dedupService.markRunning(this.payload.dedupKey)
 
     const fromAddress = env.get('MAIL_FROM_ADDRESS')
     const fromName = env.get('MAIL_FROM_NAME')
@@ -45,7 +50,7 @@ export default class SendEmail extends Job<SendEmailPayload> {
       }
     })
 
-    await dedup.markCompleted(this.payload.dedupKey)
+    await this.dedupService.markCompleted(this.payload.dedupKey)
 
     logger.info(
       {
@@ -58,7 +63,6 @@ export default class SendEmail extends Job<SendEmailPayload> {
   }
 
   async failed(error: Error) {
-    const dedup = new QueueDedupService()
-    await dedup.markFailed(this.payload.dedupKey, error)
+    await this.dedupService.markFailed(this.payload.dedupKey, error)
   }
 }

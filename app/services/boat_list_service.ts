@@ -40,6 +40,8 @@ function normalizeDirection(value: unknown): BoatListDirection | undefined {
 
 @inject()
 export default class BoatListService {
+  constructor(private badgeService: BoatMaintenanceBadgeService) {}
+
   normalizeQuery(raw: Record<string, unknown>): Required<BoatListQuery> {
     const q = toTrimmedStringOrUndefined(raw.q) ?? ''
     const type = toTrimmedStringOrUndefined(raw.type) ?? ''
@@ -94,8 +96,7 @@ export default class BoatListService {
       .map((b) => Number(b.id))
       .filter((id) => id > 0)
 
-    const badgeService = new BoatMaintenanceBadgeService()
-    const badges = await badgeService.getForBoatIds(user.organizationId, boatIds)
+    const badges = await this.badgeService.getForBoatIds(user.organizationId, boatIds)
     return {
       boats: {
         data: (serialized.data as BoatSerializedRow[] ?? []).map((b) => ({

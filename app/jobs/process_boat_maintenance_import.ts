@@ -2,6 +2,7 @@ import logger from '@adonisjs/core/services/logger'
 import { Job } from '@adonisjs/queue'
 import type { JobOptions } from '@adonisjs/queue/types'
 import QueueDedupService from '#services/queue_dedup_service'
+import { inject } from '@adonisjs/core'
 
 export interface ProcessBoatMaintenanceImportPayload {
   organizationId: number
@@ -11,10 +12,15 @@ export interface ProcessBoatMaintenanceImportPayload {
   dedupKey: string
 }
 
+@inject()
 export default class ProcessBoatMaintenanceImport extends Job<ProcessBoatMaintenanceImportPayload> {
   static options: JobOptions = {
     queue: 'maintenance',
     maxRetries: 5,
+  }
+
+  constructor(private dedupService: QueueDedupService) {
+    super()
   }
 
   static dedupKey(payload: Omit<ProcessBoatMaintenanceImportPayload, 'dedupKey'>) {
@@ -22,21 +28,17 @@ export default class ProcessBoatMaintenanceImport extends Job<ProcessBoatMainten
   }
 
   async execute() {
-    const dedup = new QueueDedupService()
-    await dedup.markRunning(this.payload.dedupKey)
+    await this.dedupService.markRunning(this.payload.dedupKey)
 
-    // Intentionally minimal: the domain implementation will live in a dedicated
-    // service once the import format/storage is defined.
     logger.info(
       { importId: this.payload.importId, boatId: this.payload.boatId },
       'Maintenance import job placeholder executed'
     )
 
-    await dedup.markCompleted(this.payload.dedupKey)
+    await this.dedupService.markCompleted(this.payload.dedupKey)
   }
 
   async failed(error: Error) {
-    const dedup = new QueueDedupService()
-    await dedup.markFailed(this.payload.dedupKey, error)
+    await this.dedupService.markFailed(this.payload.dedupKey, error)
   }
 }
