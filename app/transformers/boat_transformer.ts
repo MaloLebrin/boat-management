@@ -17,6 +17,32 @@ export interface BoatShowContext {
   canManageEquipment: boolean
 }
 
+export function toEditForm(boat: Boat) {
+  return {
+    id: boat.id,
+    name: boat.name,
+    registrationNumber: boat.registrationNumber,
+    type: boat.type,
+    propulsionType: boat.propulsionType,
+    lengthM: boat.lengthM,
+    beamM: boat.beamM,
+    draftM: boat.draftM,
+    mastHeightM: boat.mastHeightM,
+    hullMaterial: boat.hullMaterial,
+    yearBuilt: boat.yearBuilt,
+    manufacturer: boat.manufacturer,
+    model: boat.model,
+    manufacturedAt: boat.manufacturedAt ? boat.manufacturedAt.toISODate() : null,
+    homePort: boat.homePort,
+    navigationCategory: boat.navigationCategory,
+    hullIdentificationNumber: boat.hullIdentificationNumber,
+    francisationNumber: boat.francisationNumber,
+    flagCountry: boat.flagCountry,
+    maxPersons: boat.maxPersons,
+    spotId: boat.spotId ?? null,
+  }
+}
+
 export function toShowProps(boat: Boat, ctx: BoatShowContext) {
   return {
     boat: toBoatDetail(boat, ctx),

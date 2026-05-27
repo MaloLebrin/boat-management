@@ -2,7 +2,8 @@ import { SpotNotFoundError } from '#exceptions/port_errors'
 import { QuotaExceededError } from '#exceptions/quota_errors'
 import AiAnalysisService, { type AiSuggestion } from '#services/ai_analysis_service'
 import BoatListService from '#services/boat_list_service'
-import { toShowProps } from '#transformers/boat_transformer'
+import { toEditForm, toShowProps } from '#transformers/boat_transformer'
+import { toPortFormOptions } from '#transformers/port_transformer'
 import BoatMaintenanceService from '#services/boat_maintenance_service'
 import BoatMaintenanceSheetService from '#services/boat_maintenance_sheet_service'
 import BoatMaintenanceTaskService from '#services/boat_maintenance_task_service'
@@ -63,20 +64,7 @@ export default class BoatsController {
     const ports = await this.portService.listWithSpotsForOrg(user)
 
     return inertia.render('boats/new', {
-      ports: ports.map((p) => ({
-        id: p.id,
-        name: p.name,
-        pontoons: p.pontoons.map((pt) => ({
-          id: pt.id,
-          name: pt.name,
-          spots: pt.spots.map((s) => ({ id: s.id, name: s.name })),
-        })),
-        mouillages: p.mouillages.map((m) => ({
-          id: m.id,
-          name: m.name,
-          spots: m.spots.map((s) => ({ id: s.id, name: s.name })),
-        })),
-      })),
+      ports: toPortFormOptions(ports),
     })
   }
 
@@ -162,43 +150,8 @@ export default class BoatsController {
       const ports = await this.portService.listWithSpotsForOrg(user)
 
       return inertia.render('boats/edit', {
-        boat: {
-          id: boat.id,
-          name: boat.name,
-          registrationNumber: boat.registrationNumber,
-          type: boat.type,
-          propulsionType: boat.propulsionType,
-          lengthM: boat.lengthM,
-          beamM: boat.beamM,
-          draftM: boat.draftM,
-          mastHeightM: boat.mastHeightM,
-          hullMaterial: boat.hullMaterial,
-          yearBuilt: boat.yearBuilt,
-          manufacturer: boat.manufacturer,
-          model: boat.model,
-          manufacturedAt: boat.manufacturedAt ? boat.manufacturedAt.toISODate() : null,
-          homePort: boat.homePort,
-          navigationCategory: boat.navigationCategory,
-          hullIdentificationNumber: boat.hullIdentificationNumber,
-          francisationNumber: boat.francisationNumber,
-          flagCountry: boat.flagCountry,
-          maxPersons: boat.maxPersons,
-          spotId: boat.spotId ?? null,
-        },
-        ports: ports.map((p) => ({
-          id: p.id,
-          name: p.name,
-          pontoons: p.pontoons.map((pt) => ({
-            id: pt.id,
-            name: pt.name,
-            spots: pt.spots.map((s) => ({ id: s.id, name: s.name })),
-          })),
-          mouillages: p.mouillages.map((m) => ({
-            id: m.id,
-            name: m.name,
-            spots: m.spots.map((s) => ({ id: s.id, name: s.name })),
-          })),
-        })),
+        boat: toEditForm(boat),
+        ports: toPortFormOptions(ports),
       })
     } catch (error) {
       if (error instanceof BoatNotFoundError) {
