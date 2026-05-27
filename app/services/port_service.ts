@@ -6,6 +6,7 @@ import Spot from '#models/spot'
 import type User from '#models/user'
 import db from '@adonisjs/lucid/services/db'
 import { PortHasBoatsError, PortNotFoundError } from '#exceptions/port_errors'
+import { UserNotInOrganizationError } from '#exceptions/organization_errors'
 import type { PortPayload } from '#shared/types/port'
 import { inject } from '@adonisjs/core'
 
@@ -221,7 +222,7 @@ export default class PortService {
 
   async createForUser(user: User, payload: PortPayload) {
     if (user.organizationId === null) {
-      throw new Error('User must belong to an organization to create ports')
+      throw new UserNotInOrganizationError()
     }
 
     return await Port.create({

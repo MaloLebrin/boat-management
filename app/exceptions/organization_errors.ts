@@ -1,3 +1,10 @@
+export class UserNotInOrganizationError extends Error {
+  constructor() {
+    super('User must belong to an organization to perform this action')
+    this.name = 'UserNotInOrganizationError'
+  }
+}
+
 export class MemberNotFoundError extends Error {
   constructor() {
     super('Member not found in this organization')
