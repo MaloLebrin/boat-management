@@ -7,20 +7,29 @@ import { inject } from '@adonisjs/core'
 
 @inject()
 export default class QuotaService {
+  async countBoats(org: Organization): Promise<number> {
+    const rows = await Boat.query().where('organizationId', org.id).count('* as total')
+    return Number(rows[0].$extras.total)
+  }
+
+  async countMembers(org: Organization): Promise<number> {
+    const rows = await OrganizationMembership.query()
+      .where('organizationId', org.id)
+      .count('* as total')
+    return Number(rows[0].$extras.total)
+  }
+
   async canAddBoat(org: Organization): Promise<boolean> {
     const limits = PLAN_LIMITS[org.plan]
     if (limits.maxBoats === null) return true
-    const rows = await Boat.query().where('organizationId', org.id).count('* as total')
-    return Number(rows[0].$extras.total) < limits.maxBoats
+    return (await this.countBoats(org)) < limits.maxBoats
   }
 
   async assertCanAddBoat(org: Organization): Promise<void> {
     const limits = PLAN_LIMITS[org.plan]
     if (limits.maxBoats === null) return
 
-    const rows = await Boat.query().where('organizationId', org.id).count('* as total')
-    const current = Number(rows[0].$extras.total)
-
+    const current = await this.countBoats(org)
     if (current >= limits.maxBoats) {
       throw new QuotaExceededError('boats', limits.maxBoats, current, getUpgradeTier(org.plan))
     }
@@ -29,21 +38,14 @@ export default class QuotaService {
   async canAddMember(org: Organization): Promise<boolean> {
     const limits = PLAN_LIMITS[org.plan]
     if (limits.maxMembers === null) return true
-    const rows = await OrganizationMembership.query()
-      .where('organizationId', org.id)
-      .count('* as total')
-    return Number(rows[0].$extras.total) < limits.maxMembers
+    return (await this.countMembers(org)) < limits.maxMembers
   }
 
   async assertCanAddMember(org: Organization): Promise<void> {
     const limits = PLAN_LIMITS[org.plan]
     if (limits.maxMembers === null) return
 
-    const rows = await OrganizationMembership.query()
-      .where('organizationId', org.id)
-      .count('* as total')
-    const current = Number(rows[0].$extras.total)
-
+    const current = await this.countMembers(org)
     if (current >= limits.maxMembers) {
       throw new QuotaExceededError('members', limits.maxMembers, current, getUpgradeTier(org.plan))
     }
