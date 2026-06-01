@@ -32,7 +32,8 @@
     "stats": {
       "events": "Événements",
       "partsChanged": "Pièces changées",
-      "boats": "Bateaux"
+      "boats": "Bateaux",
+      "totalCost": "Coût total"
     },
     "timeline": {
       "events": "{count} événement(s)",
@@ -40,7 +41,10 @@
       "show": "Détail",
       "hide": "Masquer",
       "partsUsed": "Pièces utilisées",
-      "noDetails": "Aucun détail supplémentaire"
+      "noDetails": "Aucun détail supplémentaire",
+      "totalCost": "Coût total",
+      "unitPrice": "Prix unitaire",
+      "fromCatalog": "Pièce catalogue"
     },
     "empty": {
       "title": "Aucun événement de maintenance",

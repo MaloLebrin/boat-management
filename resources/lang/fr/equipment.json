@@ -17,5 +17,10 @@
     "worn": "Usé",
     "to_replace": "À remplacer",
     "damaged": "Endommagé"
+  },
+  "stock": {
+    "minStockAlert": "Seuil d'alerte stock",
+    "minStockAlertPlaceholder": "ex : 2",
+    "lowStockWarning": "Stock bas — réapprovisionnement conseillé"
   }
 }

@@ -15,6 +15,19 @@ function optionalIdFromForm() {
     })
 }
 
+function optionalDecimalFromForm() {
+  return vine
+    .string()
+    .trim()
+    .optional()
+    .transform((s) => {
+      if (s === undefined || s === '') return null
+      const n = Number.parseFloat(s)
+      if (!Number.isFinite(n) || n < 0) return null
+      return String(Math.round(n * 100) / 100)
+    })
+}
+
 export const createBoatMaintenanceValidator = vine.create(
   vine.object({
     subject: vine.enum(maintenanceSubjects),
@@ -32,6 +45,8 @@ export const createBoatMaintenanceValidator = vine.create(
           name: vine.string().trim().optional(),
           quantity: vine.string().trim().optional(),
           notes: vine.string().trim().maxLength(500).nullable().optional(),
+          enginePartId: optionalIdFromForm(),
+          unitPrice: optionalDecimalFromForm(),
         })
       )
       .optional(),

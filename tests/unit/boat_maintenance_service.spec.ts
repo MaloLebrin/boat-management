@@ -7,6 +7,7 @@ import Organization from '#models/organization'
 import User from '#models/user'
 import Boat from '#models/boat'
 import BoatEngine from '#models/boat_engine'
+import BoatEnginePart from '#models/boat_engine_part'
 import BoatMaintenanceEvent from '#models/boat_maintenance_event'
 import BoatRig from '#models/boat_rig'
 import BoatSail from '#models/boat_sail'
@@ -14,6 +15,7 @@ import BoatSail from '#models/boat_sail'
 test.group('BoatMaintenanceService (unit)', (group) => {
   group.each.teardown(async () => {
     await BoatMaintenanceEvent.query().delete()
+    await BoatEnginePart.query().delete()
     await BoatEngine.query().delete()
     await BoatSail.query().delete()
     await BoatRig.query().delete()
@@ -177,5 +179,84 @@ test.group('BoatMaintenanceService (unit)', (group) => {
     await svc.deleteForBoat(user, boat, ev.id)
     const found = await BoatMaintenanceEvent.find(ev.id)
     assert.isNull(found)
+  })
+
+  test('createForBoat decrements engine part stock when enginePartId is provided', async ({ assert }) => {
+    const org = await Organization.create({ name: 'O', slug: 'o-maint-5' })
+    const user = await User.create({
+      email: 'm5@example.com',
+      password: 'Password123!',
+      fullName: 'M5',
+      organizationId: org.id,
+    })
+    const boat = await Boat.create({ organizationId: org.id, name: 'B5', registrationNumber: null, type: null })
+    const engine = await BoatEngine.create({ boatId: boat.id, kind: 'inboard', fuel: 'diesel', brand: 'Volvo', model: 'D1', serialNumber: null, powerHp: 20, hours: 50 })
+    const catalogPart = await BoatEnginePart.create({ boatEngineId: engine.id, designation: 'Oil filter', stock: 5, wearState: 'good' })
+
+    const svc = new BoatMaintenanceService()
+    await svc.createForBoat(user, boat, {
+      subject: 'engine',
+      boatEngineId: engine.id,
+      performedAt: '2024-09-01',
+      title: 'Oil change',
+      parts: [{ name: 'Oil filter', quantity: '2', enginePartId: catalogPart.id }],
+    })
+
+    await catalogPart.refresh()
+    assert.equal(catalogPart.stock, 3)
+  })
+
+  test('createForBoat sets wearState to_replace when catalog part stock reaches zero', async ({ assert }) => {
+    const org = await Organization.create({ name: 'O', slug: 'o-maint-6' })
+    const user = await User.create({
+      email: 'm6@example.com',
+      password: 'Password123!',
+      fullName: 'M6',
+      organizationId: org.id,
+    })
+    const boat = await Boat.create({ organizationId: org.id, name: 'B6', registrationNumber: null, type: null })
+    const engine = await BoatEngine.create({ boatId: boat.id, kind: 'inboard', fuel: 'diesel', brand: 'Yanmar', model: '2YM', serialNumber: null, powerHp: 15, hours: 80 })
+    const catalogPart = await BoatEnginePart.create({ boatEngineId: engine.id, designation: 'Impeller', stock: 1, wearState: 'good' })
+
+    const svc = new BoatMaintenanceService()
+    await svc.createForBoat(user, boat, {
+      subject: 'engine',
+      boatEngineId: engine.id,
+      performedAt: '2024-10-01',
+      title: 'Impeller replacement',
+      parts: [{ name: 'Impeller', quantity: '1', enginePartId: catalogPart.id }],
+    })
+
+    await catalogPart.refresh()
+    assert.equal(catalogPart.stock, 0)
+    assert.equal(catalogPart.wearState, 'to_replace')
+  })
+
+  test('createForBoat tracks unitPrice and getHistoryForOrg returns totalCost', async ({ assert }) => {
+    const org = await Organization.create({ name: 'O', slug: 'o-maint-7' })
+    const user = await User.create({
+      email: 'm7@example.com',
+      password: 'Password123!',
+      fullName: 'M7',
+      organizationId: org.id,
+    })
+    const boat = await Boat.create({ organizationId: org.id, name: 'B7', registrationNumber: null, type: null })
+
+    const svc = new BoatMaintenanceService()
+    await svc.createForBoat(user, boat, {
+      subject: 'boat',
+      performedAt: '2024-11-01',
+      title: 'Varnish',
+      parts: [
+        { name: 'Varnish can', quantity: '2', unitPrice: '35.50' },
+        { name: 'Brush', quantity: '3', unitPrice: '4.00' },
+      ],
+    })
+
+    const { events, stats } = await svc.getHistoryForOrg(user)
+    const event = events.find((e) => e.title === 'Varnish')
+    assert.isDefined(event)
+    assert.equal(event!.totalCost, 83)
+    assert.equal(stats.totalCost, 83)
   })
 })

@@ -22,6 +22,18 @@ export default class BoatEnginePartService {
       .first()
   }
 
+  /**
+   * Returns parts whose stock is at or below their minStockAlert threshold.
+   * Only returns parts where minStockAlert is set (non-null).
+   */
+  async listLowStock(engineId: number) {
+    return await BoatEnginePart.query()
+      .where('boatEngineId', engineId)
+      .whereNotNull('minStockAlert')
+      .whereRaw('(stock IS NULL OR stock <= min_stock_alert)')
+      .orderBy('designation', 'asc')
+  }
+
   async create(user: User, boat: Boat, engineId: number, payload: BoatEnginePartPayload) {
     assertBoatInUserOrg(user, boat)
 
@@ -33,6 +45,7 @@ export default class BoatEnginePartService {
       designation: payload.designation,
       reference: payload.reference ?? null,
       stock: payload.stock ?? null,
+      minStockAlert: payload.minStockAlert ?? null,
       supplier: payload.supplier ?? null,
       notes: payload.notes ?? null,
       wearState: payload.wearState ?? null,
@@ -60,6 +73,7 @@ export default class BoatEnginePartService {
     part.designation = payload.designation
     part.reference = payload.reference ?? null
     part.stock = payload.stock ?? null
+    part.minStockAlert = payload.minStockAlert ?? null
     part.supplier = payload.supplier ?? null
     part.notes = payload.notes ?? null
     part.wearState = payload.wearState ?? null

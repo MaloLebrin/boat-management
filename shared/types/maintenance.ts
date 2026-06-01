@@ -12,6 +12,14 @@ export type MaintenanceTaskSubject =
   | 'deck'
   | 'other'
 
+export type MaintenancePartInput = {
+  name?: string | null
+  quantity?: string | null
+  notes?: string | null
+  enginePartId?: number | null
+  unitPrice?: string | null
+}
+
 export type CreateMaintenancePayload = {
   subject: 'boat' | 'hull' | 'engine' | 'sail' | 'rig' | 'electrical' | 'plumbing' | 'safety' | 'deck' | 'other'
   boatEngineId?: number | null
@@ -22,7 +30,33 @@ export type CreateMaintenancePayload = {
   performedAt: Date | string | DateTime
   title: string
   notes?: string | null
-  parts?: Array<{ name?: string | null; quantity?: string | null; notes?: string | null }>
+  parts?: Array<MaintenancePartInput>
+}
+
+export type MaintenanceEventPartRow = {
+  id: number
+  name: string
+  quantity: number | null
+  unitPrice: number | null
+  totalCost: number | null
+  enginePartId: number | null
+}
+
+export type MaintenanceEventRow = {
+  id: number
+  boatId: number
+  boatName: string
+  subject: string
+  title: string
+  notes: string | null
+  performedAt: string
+  engineCaption: string | null
+  sailCaption: string | null
+  boatEngineId: number | null
+  boatSailId: number | null
+  boatRigId: number | null
+  parts: MaintenanceEventPartRow[]
+  totalCost: number | null
 }
 
 export type CreateMaintenanceTaskPayload = {
