@@ -60,6 +60,9 @@ export const CloudinaryFolders = {
   boatRigDocuments: (orgSlug: string, boatId: number) =>
     `${envPrefix()}/organizations/${orgSlug}/boats/${boatId}/rig/documents`,
 
+  boatEnginePartDocuments: (orgSlug: string, boatId: number, engineId: number, partId: number) =>
+    `${envPrefix()}/organizations/${orgSlug}/boats/${boatId}/engines/${engineId}/parts/${partId}/documents`,
+
   maintenance: (orgSlug: string, boatId: number, eventId: number) =>
     `${envPrefix()}/organizations/${orgSlug}/boats/${boatId}/maintenance/${eventId}`,
 

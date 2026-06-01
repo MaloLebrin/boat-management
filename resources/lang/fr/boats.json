@@ -430,9 +430,11 @@
       "reference": "Référence",
       "stock": "Quantité en stock",
       "supplier": "Fournisseur",
+      "wearState": "État d'usure",
       "empty": "Aucune pièce enregistrée",
       "comingSoon": "Bientôt disponible",
       "add": "Ajouter une pièce",
+      "view": "Voir",
       "edit": "Modifier",
       "save": "Enregistrer",
       "cancel": "Annuler",
@@ -442,6 +444,21 @@
       "actions": "Actions",
       "addModalTitle": "Ajouter une pièce",
       "editModalTitle": "Modifier la pièce"
+    },
+    "partShow": {
+      "tabs": {
+        "info": "Informations",
+        "documents": "Documents"
+      },
+      "info": {
+        "designation": "Désignation",
+        "reference": "Référence",
+        "stock": "Quantité en stock",
+        "supplier": "Fournisseur",
+        "notes": "Notes",
+        "title": "Informations",
+        "noNotes": "Aucune note."
+      }
     },
     "documents": {
       "manual": "Manuel technique",

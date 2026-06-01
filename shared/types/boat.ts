@@ -59,12 +59,16 @@ export type BoatRigPayload = {
   notes?: string | null
 }
 
+export const PART_WEAR_STATES = ['new', 'good', 'worn', 'to_replace', 'damaged'] as const
+export type PartWearState = (typeof PART_WEAR_STATES)[number]
+
 export type BoatEnginePartPayload = {
   designation: string
   reference?: string | null
   stock?: number | null
   supplier?: string | null
   notes?: string | null
+  wearState?: PartWearState | null
 }
 
 export type BoatSafetyEquipmentPayload = {

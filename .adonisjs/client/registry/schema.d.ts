@@ -367,6 +367,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_engine_parts_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'boats.engines.parts.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/boats/:boatId/engines/:engineId/parts/:partId'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue, ParamValue]
+      params: { boatId: ParamValue; engineId: ParamValue; partId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_engine_parts_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_engine_parts_controller').default['show']>>>
+    }
+  }
   'boat_engine_parts.update': {
     methods: ["PUT"]
     pattern: '/boats/:boatId/engines/:engineId/parts/:partId'
@@ -389,6 +401,42 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_engine_parts_controller').default['destroy']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_engine_parts_controller').default['destroy']>>>
+    }
+  }
+  'boat_engine_parts.store_document': {
+    methods: ["POST"]
+    pattern: '/boats/:boatId/engines/:engineId/parts/:partId/documents'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/media').storeBoatDocumentValidator)>>
+      paramsTuple: [ParamValue, ParamValue, ParamValue]
+      params: { boatId: ParamValue; engineId: ParamValue; partId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/media').storeBoatDocumentValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_engine_parts_controller').default['storeDocument']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_engine_parts_controller').default['storeDocument']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'boat_engine_parts.destroy_media': {
+    methods: ["DELETE"]
+    pattern: '/boats/:boatId/engines/:engineId/parts/:partId/media/:mediaId'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue, ParamValue, ParamValue]
+      params: { boatId: ParamValue; engineId: ParamValue; partId: ParamValue; mediaId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_engine_parts_controller').default['destroyMedia']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_engine_parts_controller').default['destroyMedia']>>>
+    }
+  }
+  'boat_engine_parts.download_media': {
+    methods: ["GET","HEAD"]
+    pattern: '/boats/:boatId/engines/:engineId/parts/:partId/media/:mediaId/download'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue, ParamValue, ParamValue]
+      params: { boatId: ParamValue; engineId: ParamValue; partId: ParamValue; mediaId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_engine_parts_controller').default['downloadMedia']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_engine_parts_controller').default['downloadMedia']>>>
     }
   }
   'boat_media.download_media': {

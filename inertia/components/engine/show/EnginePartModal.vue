@@ -4,6 +4,7 @@ import { computed, ref, watch } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseModal from '~/components/base/BaseModal.vue'
+import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import { useT } from '~/composables/useT'
 import type { BoatShowEnginePart } from '~/types/boat_show'
@@ -26,6 +27,7 @@ const reference = ref('')
 const stock = ref('')
 const supplier = ref('')
 const notes = ref('')
+const wearState = ref('')
 
 const isEditing = computed(() => props.editingPart !== null)
 
@@ -43,6 +45,15 @@ const formAction = computed(() => {
   return { url: baseUrl, method: 'post' as const }
 })
 
+const wearStateOptions = computed(() => [
+  { value: '', label: `— ${t('equipment.wearState.label')} —` },
+  { value: 'new', label: t('equipment.wearState.new') },
+  { value: 'good', label: t('equipment.wearState.good') },
+  { value: 'worn', label: t('equipment.wearState.worn') },
+  { value: 'to_replace', label: t('equipment.wearState.to_replace') },
+  { value: 'damaged', label: t('equipment.wearState.damaged') },
+])
+
 watch(
   () => props.open,
   (isOpen) => {
@@ -52,12 +63,14 @@ watch(
       stock.value = props.editingPart.stock !== null ? String(props.editingPart.stock) : ''
       supplier.value = props.editingPart.supplier ?? ''
       notes.value = props.editingPart.notes ?? ''
+      wearState.value = props.editingPart.wearState ?? ''
     } else if (isOpen) {
       designation.value = ''
       reference.value = ''
       stock.value = ''
       supplier.value = ''
       notes.value = ''
+      wearState.value = ''
     }
   }
 )
@@ -106,6 +119,15 @@ function close() {
         name="supplier"
         :label="t('boats.engineShow.parts.supplier')"
         v-model="supplier"
+        :errors="errors"
+      />
+
+      <BaseSelect
+        id="part-wear-state"
+        name="wearState"
+        :label="t('equipment.wearState.label')"
+        :options="wearStateOptions"
+        v-model="wearState"
         :errors="errors"
       />
 

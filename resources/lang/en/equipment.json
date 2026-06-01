@@ -9,5 +9,13 @@
   "notes": {
     "label": "Free notes",
     "placeholder": "Observations, remarks, history..."
+  },
+  "wearState": {
+    "label": "Wear state",
+    "new": "New",
+    "good": "Good condition",
+    "worn": "Worn",
+    "to_replace": "To replace",
+    "damaged": "Damaged"
   }
 }

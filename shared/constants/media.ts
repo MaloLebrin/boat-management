@@ -1,6 +1,7 @@
 export const MEDIA_ENTITY_TYPES = [
   'boat',
   'boat_engine',
+  'boat_engine_part',
   'boat_sail',
   'boat_rig',
   'boat_maintenance_event',

@@ -9,5 +9,13 @@
   "notes": {
     "label": "Notes libres",
     "placeholder": "Observations, remarques, historique..."
+  },
+  "wearState": {
+    "label": "État d'usure",
+    "new": "Neuf",
+    "good": "Bon état",
+    "worn": "Usé",
+    "to_replace": "À remplacer",
+    "damaged": "Endommagé"
   }
 }

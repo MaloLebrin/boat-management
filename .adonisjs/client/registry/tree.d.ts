@@ -33,6 +33,9 @@ export interface ApiDefinition {
     assign: typeof routes['boats.assign']
     engines: {
       show: typeof routes['boats.engines.show']
+      parts: {
+        show: typeof routes['boats.engines.parts.show']
+      }
     }
     maintenanceTasks: {
       store: typeof routes['boats.maintenanceTasks.store']
@@ -76,6 +79,9 @@ export interface ApiDefinition {
     store: typeof routes['boat_engine_parts.store']
     update: typeof routes['boat_engine_parts.update']
     destroy: typeof routes['boat_engine_parts.destroy']
+    storeDocument: typeof routes['boat_engine_parts.store_document']
+    destroyMedia: typeof routes['boat_engine_parts.destroy_media']
+    downloadMedia: typeof routes['boat_engine_parts.download_media']
   }
   boatMaintenances: {
     store: typeof routes['boat_maintenances.store']

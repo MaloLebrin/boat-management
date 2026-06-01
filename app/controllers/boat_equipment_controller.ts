@@ -358,6 +358,8 @@ export default class BoatEquipmentController {
           stock: p.stock,
           supplier: p.supplier,
           notes: p.notes,
+          wearState: p.wearState,
+          documents: [],
         })),
       },
       maintenanceEvents: maintenanceEvents.map((ev) => ({

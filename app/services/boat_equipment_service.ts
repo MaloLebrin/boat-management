@@ -92,6 +92,10 @@ export default class BoatEquipmentService {
     return this.enginePartService.delete(user, boat, engineId, partId)
   }
 
+  async findEnginePart(engineId: number, partId: number) {
+    return this.enginePartService.findForEngine(engineId, partId)
+  }
+
   async createSafetyEquipment(user: User, boat: Boat, payload: BoatSafetyEquipmentPayload) {
     return this.safetyEquipmentService.create(user, boat, payload)
   }

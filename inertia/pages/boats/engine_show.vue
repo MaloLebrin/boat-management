@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { router } from '@inertiajs/vue3'
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseBreadcrumb from '~/components/base/BaseBreadcrumb.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
@@ -30,6 +30,23 @@ const props = defineProps<{
 type TabKey = 'overview' | 'specs' | 'maintenance' | 'notes' | 'parts' | 'documents'
 const tab = ref<TabKey>('overview')
 const addEventOpen = ref(false)
+
+const VALID_TABS: TabKey[] = ['overview', 'specs', 'maintenance', 'notes', 'parts', 'documents']
+
+onMounted(() => {
+  const fromUrl = new URLSearchParams(window.location.search).get('tab') as TabKey | null
+  if (fromUrl && VALID_TABS.includes(fromUrl)) tab.value = fromUrl
+})
+
+watch(tab, (newTab) => {
+  const url = new URL(window.location.href)
+  if (newTab === 'overview') {
+    url.searchParams.delete('tab')
+  } else {
+    url.searchParams.set('tab', newTab)
+  }
+  window.history.replaceState(window.history.state, '', url.pathname + url.search)
+})
 
 const statusOptions = computed(() => [
   { value: 'operational', label: t('equipment.status.operational') },

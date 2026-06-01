@@ -15,6 +15,7 @@ declare module '@adonisjs/inertia/types' {
     'auth/signup': ExtractProps<(typeof import('../../inertia/pages/auth/signup.vue'))['default']>
     'boats/edit': ExtractProps<(typeof import('../../inertia/pages/boats/edit.vue'))['default']>
     'boats/engine_edit': ExtractProps<(typeof import('../../inertia/pages/boats/engine_edit.vue'))['default']>
+    'boats/engine_part_show': ExtractProps<(typeof import('../../inertia/pages/boats/engine_part_show.vue'))['default']>
     'boats/engine_show': ExtractProps<(typeof import('../../inertia/pages/boats/engine_show.vue'))['default']>
     'boats/index': ExtractProps<(typeof import('../../inertia/pages/boats/index.vue'))['default']>
     'boats/new': ExtractProps<(typeof import('../../inertia/pages/boats/new.vue'))['default']>

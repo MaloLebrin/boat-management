@@ -15,6 +15,13 @@ export default class BoatEnginePartService {
     return await BoatEnginePart.query().where('boatEngineId', engineId).orderBy('id', 'asc')
   }
 
+  async findForEngine(engineId: number, partId: number) {
+    return await BoatEnginePart.query()
+      .where('id', partId)
+      .where('boatEngineId', engineId)
+      .first()
+  }
+
   async create(user: User, boat: Boat, engineId: number, payload: BoatEnginePartPayload) {
     assertBoatInUserOrg(user, boat)
 
@@ -28,6 +35,7 @@ export default class BoatEnginePartService {
       stock: payload.stock ?? null,
       supplier: payload.supplier ?? null,
       notes: payload.notes ?? null,
+      wearState: payload.wearState ?? null,
     })
   }
 
@@ -54,6 +62,7 @@ export default class BoatEnginePartService {
     part.stock = payload.stock ?? null
     part.supplier = payload.supplier ?? null
     part.notes = payload.notes ?? null
+    part.wearState = payload.wearState ?? null
 
     await part.save()
     return part

@@ -411,9 +411,11 @@
       "reference": "Reference",
       "stock": "Stock quantity",
       "supplier": "Supplier",
+      "wearState": "Wear state",
       "empty": "No parts recorded",
       "comingSoon": "Coming soon",
       "add": "Add a part",
+      "view": "View",
       "edit": "Edit",
       "save": "Save",
       "cancel": "Cancel",
@@ -423,6 +425,21 @@
       "actions": "Actions",
       "addModalTitle": "Add a part",
       "editModalTitle": "Edit part"
+    },
+    "partShow": {
+      "tabs": {
+        "info": "Information",
+        "documents": "Documents"
+      },
+      "info": {
+        "designation": "Designation",
+        "reference": "Reference",
+        "stock": "Stock quantity",
+        "supplier": "Supplier",
+        "notes": "Notes",
+        "title": "Information",
+        "noNotes": "No notes."
+      }
     },
     "documents": {
       "manual": "Technical manual",

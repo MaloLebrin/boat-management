@@ -40,6 +40,9 @@ router
     ])
 
     router.post('boats/:boatId/engines/:engineId/parts', [controllers.BoatEngineParts, 'store'])
+    router
+      .get('boats/:boatId/engines/:engineId/parts/:partId', [controllers.BoatEngineParts, 'show'])
+      .as('boats.engines.parts.show')
     router.put('boats/:boatId/engines/:engineId/parts/:partId', [
       controllers.BoatEngineParts,
       'update',
@@ -47,6 +50,18 @@ router
     router.delete('boats/:boatId/engines/:engineId/parts/:partId', [
       controllers.BoatEngineParts,
       'destroy',
+    ])
+    router.post('boats/:boatId/engines/:engineId/parts/:partId/documents', [
+      controllers.BoatEngineParts,
+      'storeDocument',
+    ])
+    router.delete('boats/:boatId/engines/:engineId/parts/:partId/media/:mediaId', [
+      controllers.BoatEngineParts,
+      'destroyMedia',
+    ])
+    router.get('boats/:boatId/engines/:engineId/parts/:partId/media/:mediaId/download', [
+      controllers.BoatEngineParts,
+      'downloadMedia',
     ])
 
     router.get('boats/:boatId/media/:mediaId/download', [controllers.BoatMedia, 'downloadMedia'])

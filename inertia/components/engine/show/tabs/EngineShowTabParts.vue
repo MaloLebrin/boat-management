@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { router } from '@inertiajs/vue3'
 import { ref } from 'vue'
+import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import EnginePartModal from '~/components/engine/show/EnginePartModal.vue'
 import { useT } from '~/composables/useT'
@@ -34,6 +35,14 @@ function deletePart(partId: number) {
     preserveScroll: true,
   })
 }
+
+function wearStateVariant(state: string): 'success' | 'info' | 'warning' | 'neutral' | 'danger' {
+  if (state === 'new') return 'success'
+  if (state === 'good') return 'info'
+  if (state === 'worn') return 'warning'
+  if (state === 'to_replace') return 'danger'
+  return 'neutral'
+}
 </script>
 
 <template>
@@ -57,7 +66,8 @@ function deletePart(partId: number) {
             <th class="px-4 py-3 font-medium">{{ t('boats.engineShow.parts.reference') }}</th>
             <th class="px-4 py-3 font-medium">{{ t('boats.engineShow.parts.stock') }}</th>
             <th class="px-4 py-3 font-medium">{{ t('boats.engineShow.parts.supplier') }}</th>
-            <th v-if="canManage" class="px-4 py-3 font-medium text-right">
+            <th class="px-4 py-3 font-medium">{{ t('boats.engineShow.parts.wearState') }}</th>
+            <th class="px-4 py-3 font-medium text-right">
               {{ t('boats.engineShow.parts.actions') }}
             </th>
           </tr>
@@ -75,14 +85,29 @@ function deletePart(partId: number) {
             <td class="px-4 py-3 text-fg-muted">{{ part.reference ?? '-' }}</td>
             <td class="px-4 py-3 text-fg-muted">{{ part.stock ?? '-' }}</td>
             <td class="px-4 py-3 text-fg-muted">{{ part.supplier ?? '-' }}</td>
-            <td v-if="canManage" class="px-4 py-3 text-right">
+            <td class="px-4 py-3">
+              <BaseBadge v-if="part.wearState" :variant="wearStateVariant(part.wearState)">
+                {{ t(`equipment.wearState.${part.wearState}`) }}
+              </BaseBadge>
+              <span v-else class="text-fg-subtle">-</span>
+            </td>
+            <td class="px-4 py-3 text-right">
               <div class="flex items-center justify-end gap-1">
-                <BaseButton variant="ghost" size="sm" @click="openEdit(part)">
-                  {{ t('boats.engineShow.parts.edit') }}
+                <BaseButton
+                  variant="ghost"
+                  size="sm"
+                  :href="`/boats/${boatId}/engines/${engineId}/parts/${part.id}`"
+                >
+                  {{ t('boats.engineShow.parts.view') }}
                 </BaseButton>
-                <BaseButton variant="ghost" size="sm" @click="deletePart(part.id)">
-                  {{ t('boats.engineShow.parts.delete') }}
-                </BaseButton>
+                <template v-if="canManage">
+                  <BaseButton variant="ghost" size="sm" @click="openEdit(part)">
+                    {{ t('boats.engineShow.parts.edit') }}
+                  </BaseButton>
+                  <BaseButton variant="ghost" size="sm" @click="deletePart(part.id)">
+                    {{ t('boats.engineShow.parts.delete') }}
+                  </BaseButton>
+                </template>
               </div>
             </td>
           </tr>

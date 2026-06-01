@@ -25,7 +25,7 @@ export class AiAnalysisSchema extends BaseModel {
 }
 
 export class BoatEnginePartSchema extends BaseModel {
-  static $columns = ['boatEngineId', 'createdAt', 'designation', 'id', 'notes', 'reference', 'stock', 'supplier', 'updatedAt'] as const
+  static $columns = ['boatEngineId', 'createdAt', 'designation', 'id', 'notes', 'reference', 'stock', 'supplier', 'updatedAt', 'wearState'] as const
   $columns = BoatEnginePartSchema.$columns
   @column()
   declare boatEngineId: number
@@ -45,6 +45,8 @@ export class BoatEnginePartSchema extends BaseModel {
   declare supplier: string | null
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
+  @column()
+  declare wearState: string | null
 }
 
 export class BoatEngineSchema extends BaseModel {
