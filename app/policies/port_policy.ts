@@ -1,5 +1,5 @@
-import User from '#models/user'
-import Port from '#models/port'
+import type User from '#models/user'
+import type Port from '#models/port'
 import { BasePolicy } from '@adonisjs/bouncer'
 import type { AuthorizerResponse } from '@adonisjs/bouncer/types'
 

@@ -41,4 +41,3 @@ Référence: `inertia/app.ts` et `config/inertia.ts`.
 
 - SSR: désactivé (`config/inertia.ts` → `ssr.enabled=false`)
 - Résolution pages: `inertia/pages/**/*.vue` avec layout par défaut `inertia/layouts/default.vue`
-

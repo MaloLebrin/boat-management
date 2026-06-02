@@ -3,8 +3,8 @@ import { computed, ref, watch } from 'vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
-import { useT } from '~/composables/useT'
-import { useBoatOptions } from '~/composables/useBoatOptions'
+import { useT } from '~/composables/use_t'
+import { useBoatOptions } from '~/composables/use_boat_options'
 import { SAIL_TYPE_OPTIONS } from '#shared/constants/boats/boat_form_options'
 
 export type BoatEquipmentSailFieldsModel = {
@@ -47,7 +47,8 @@ function syncFromProps() {
   manufacturedAt.value = s?.manufacturedAt ? s.manufacturedAt.slice(0, 10) : ''
   areaM2.value = s?.areaM2 === null || s?.areaM2 === undefined ? '' : String(s.areaM2)
   material.value = s?.material ?? ''
-  reefPoints.value = s?.reefPoints === null || s?.reefPoints === undefined ? '' : String(s.reefPoints)
+  reefPoints.value =
+    s?.reefPoints === null || s?.reefPoints === undefined ? '' : String(s.reefPoints)
   status.value = s?.status ?? 'operational'
   notes.value = s?.notes ?? ''
 }
@@ -90,13 +91,7 @@ watch(
       :errors="errors"
     />
 
-    <BaseInput
-      id="material"
-      name="material"
-      label="Material"
-      v-model="material"
-      :errors="errors"
-    />
+    <BaseInput id="material" name="material" label="Material" v-model="material" :errors="errors" />
 
     <BaseInput
       id="reefPoints"

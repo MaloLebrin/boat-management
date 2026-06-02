@@ -18,13 +18,17 @@ export function useMarinaInteractions(
   }
 
   function patchAssignment(url: string, spotId: number) {
-    router.patch(url, { spotId }, {
-      preserveScroll: true,
-      only: ['port'],
-      onSuccess: () => {
-        selectedBoat.value = null
-      },
-    })
+    router.patch(
+      url,
+      { spotId },
+      {
+        preserveScroll: true,
+        only: ['port'],
+        onSuccess: () => {
+          selectedBoat.value = null
+        },
+      }
+    )
   }
 
   function handlePontoonDragEnd(pontoonId: number, x: number, y: number) {

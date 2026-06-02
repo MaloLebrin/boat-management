@@ -4,7 +4,7 @@ import { useForm } from '@inertiajs/vue3'
 import { ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseModal from '~/components/base/BaseModal.vue'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 
 const props = defineProps<{
   boat: { id: number; name: string }
@@ -56,10 +56,10 @@ function close() {
 
 function submit() {
   if (!form.file) return
-  form.post(
-    `/boats/${props.boat.id}/engines/${props.engine.id}/parts/${props.part.id}/documents`,
-    { forceFormData: true, onSuccess: () => close() }
-  )
+  form.post(`/boats/${props.boat.id}/engines/${props.engine.id}/parts/${props.part.id}/documents`, {
+    forceFormData: true,
+    onSuccess: () => close(),
+  })
 }
 </script>
 
@@ -84,7 +84,9 @@ function submit() {
       <div
         :class="[
           'rounded-lg border-2 border-dashed p-8 text-center transition-colors cursor-pointer',
-          isDragging ? 'border-brand bg-brand/5' : 'border-border bg-surface-muted/30 hover:border-brand/50',
+          isDragging
+            ? 'border-brand bg-brand/5'
+            : 'border-border bg-surface-muted/30 hover:border-brand/50',
         ]"
         @click="fileInput?.click()"
         @dragover="onDragOver"
@@ -94,12 +96,21 @@ function submit() {
         <DocumentArrowUpIcon class="mx-auto h-10 w-10 text-fg-subtle" />
         <p class="mt-3 font-semibold text-fg">{{ t('boats.show.mediaUpload.dropzone') }}</p>
         <p class="mt-1 text-sm text-fg-muted">{{ t('boats.show.mediaUpload.documentFormats') }}</p>
-        <BaseButton variant="secondary" size="sm" class="mt-4" type="button" @click.stop="fileInput?.click()">
+        <BaseButton
+          variant="secondary"
+          size="sm"
+          class="mt-4"
+          type="button"
+          @click.stop="fileInput?.click()"
+        >
           {{ t('boats.show.mediaUpload.browse') }}
         </BaseButton>
       </div>
 
-      <div v-if="form.file" class="rounded-lg border border-border bg-surface-elevated px-4 py-3 text-sm">
+      <div
+        v-if="form.file"
+        class="rounded-lg border border-border bg-surface-elevated px-4 py-3 text-sm"
+      >
         <p class="font-semibold text-fg">{{ t('boats.show.mediaUpload.selectedFile') }}</p>
         <p class="mt-1 text-fg-muted">{{ form.file.name }} · {{ formatBytes(form.file.size) }}</p>
       </div>
@@ -122,7 +133,11 @@ function submit() {
           {{ t('common.cancel') }}
         </BaseButton>
         <BaseButton type="button" :disabled="!form.file || form.processing" @click="submit">
-          {{ form.processing ? t('boats.show.mediaUpload.uploading') : t('boats.show.mediaUpload.upload') }}
+          {{
+            form.processing
+              ? t('boats.show.mediaUpload.uploading')
+              : t('boats.show.mediaUpload.upload')
+          }}
         </BaseButton>
       </div>
     </div>

@@ -4,7 +4,7 @@ import { Form } from '@adonisjs/inertia/vue'
 import { computed, ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BoatDocumentAddModal from '~/components/boats/show/modals/BoatDocumentAddModal.vue'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 import type { BoatShowDetail, MediaRow } from '~/types/boat_show'
 
 const props = defineProps<{
@@ -33,12 +33,7 @@ function formatBytes(bytes: number): string {
     <!-- Header -->
     <div class="flex items-center justify-between">
       <p class="text-sm text-fg-muted">{{ t('boats.show.mediaUpload.documents') }}</p>
-      <BaseButton
-        v-if="canManage"
-        variant="secondary"
-        size="sm"
-        @click="isAddModalOpen = true"
-      >
+      <BaseButton v-if="canManage" variant="secondary" size="sm" @click="isAddModalOpen = true">
         + {{ t('boats.show.mediaUpload.addDocument') }}
       </BaseButton>
     </div>

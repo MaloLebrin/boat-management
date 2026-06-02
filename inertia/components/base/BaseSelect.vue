@@ -57,7 +57,9 @@ const resolvedError = computed(() => {
         @change="
           $emit(
             'update:modelValue',
-            ($event.target as HTMLSelectElement).value === '' ? '' : ($event.target as HTMLSelectElement).value
+            ($event.target as HTMLSelectElement).value === ''
+              ? ''
+              : ($event.target as HTMLSelectElement).value
           )
         "
       >

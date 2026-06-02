@@ -44,6 +44,7 @@ Référence: `app/controllers/home_controller.ts`.
 ## ACL (Bouncer)
 
 Références:
+
 - abilities: `app/abilities/main.ts`
 - middleware: `app/middleware/initialize_bouncer_middleware.ts`
 
@@ -55,4 +56,3 @@ Abilities existantes:
 - `boatDelete(boat)`
 
 Règle: **même organisation** (ou “appartient à une org” pour create).
-

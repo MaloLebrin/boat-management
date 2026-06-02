@@ -14,7 +14,7 @@ import EngineShowTabNotes from '~/components/engine/show/tabs/EngineShowTabNotes
 import EngineShowTabOverview from '~/components/engine/show/tabs/EngineShowTabOverview.vue'
 import EngineShowTabParts from '~/components/engine/show/tabs/EngineShowTabParts.vue'
 import EngineShowTabSpecs from '~/components/engine/show/tabs/EngineShowTabSpecs.vue'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 import type { BoatShowEngine, MaintenanceEventRow, MaintenanceTaskRow } from '~/types/boat_show'
 
 const { t } = useT()
@@ -63,7 +63,11 @@ function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutra
 }
 
 function changeStatus(newStatus: string) {
-  router.patch(`/boats/${props.boat.id}/engines/${props.engine.id}/status`, { status: newStatus }, { preserveScroll: true })
+  router.patch(
+    `/boats/${props.boat.id}/engines/${props.engine.id}/status`,
+    { status: newStatus },
+    { preserveScroll: true }
+  )
 }
 
 const openTasks = computed(() => props.maintenanceTasks.filter((t) => t.status === 'open'))
@@ -84,7 +88,8 @@ const sortedOpenTasks = computed(() => {
     if (a.dueAt && b.dueAt) return a.dueAt.localeCompare(b.dueAt)
     if (a.dueAt) return -1
     if (b.dueAt) return 1
-    if (a.dueEngineHours !== null && b.dueEngineHours !== null) return a.dueEngineHours - b.dueEngineHours
+    if (a.dueEngineHours !== null && b.dueEngineHours !== null)
+      return a.dueEngineHours - b.dueEngineHours
     return 0
   })
 })
@@ -116,12 +121,18 @@ const hoursProgress = computed(() => {
 })
 
 const isOverThreshold = computed(() => {
-  return props.engine.hours !== null && nearestThreshold.value !== null && props.engine.hours >= nearestThreshold.value
+  return (
+    props.engine.hours !== null &&
+    nearestThreshold.value !== null &&
+    props.engine.hours >= nearestThreshold.value
+  )
 })
 
 const eventsByYearMonth = computed(() => {
   const groups: Record<string, MaintenanceEventRow[]> = {}
-  const sorted = [...props.maintenanceEvents].sort((a, b) => b.performedAt.localeCompare(a.performedAt))
+  const sorted = [...props.maintenanceEvents].sort((a, b) =>
+    b.performedAt.localeCompare(a.performedAt)
+  )
   for (const event of sorted) {
     const key = event.performedAt.slice(0, 7)
     if (!groups[key]) groups[key] = []
@@ -150,31 +161,50 @@ function formatYear(iso: string): string {
 
 <template>
   <div class="w-full max-w-7xl px-6 py-10 sm:px-8">
-    <BaseBreadcrumb :items="[
-      { label: t('boats.show.breadcrumbFleet'), href: '/boats' },
-      { label: boat.name, href: `/boats/${boat.id}` },
-      { label: t('boats.engineShow.breadcrumb.equipment'), href: `/boats/${boat.id}/engine?tab=equipment` },
-      { label: engineTitle },
-    ]" />
+    <BaseBreadcrumb
+      :items="[
+        { label: t('boats.show.breadcrumbFleet'), href: '/boats' },
+        { label: boat.name, href: `/boats/${boat.id}` },
+        {
+          label: t('boats.engineShow.breadcrumb.equipment'),
+          href: `/boats/${boat.id}/engine?tab=equipment`,
+        },
+        { label: engineTitle },
+      ]"
+    />
 
     <header class="space-y-6">
       <div class="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
         <div class="min-w-0">
           <div class="flex flex-wrap items-center gap-3">
             <BaseHeading level="1">{{ engineTitle }}</BaseHeading>
-            <BaseBadge v-if="hasOverdue" variant="warning">{{ t('boats.engineShow.maintenanceRequired') }}</BaseBadge>
+            <BaseBadge v-if="hasOverdue" variant="warning">{{
+              t('boats.engineShow.maintenanceRequired')
+            }}</BaseBadge>
           </div>
           <div class="mt-3 flex flex-wrap gap-x-6 gap-y-1 text-sm text-fg-muted">
             <p v-if="engine.fuel">{{ engine.fuel }}</p>
             <p v-if="engine.powerHp">{{ engine.powerHp }} HP</p>
-            <p v-if="engine.manufacturedAt">{{ t('boats.engineShow.installedIn', {
-              year:
-                formatYear(engine.manufacturedAt) }) }}</p>
+            <p v-if="engine.manufacturedAt">
+              {{
+                t('boats.engineShow.installedIn', {
+                  year: formatYear(engine.manufacturedAt),
+                })
+              }}
+            </p>
           </div>
           <div class="mt-3">
-            <BaseSelect v-if="canManage" id="engine-status" name="status" :label="t('equipment.status.label')"
-              :options="statusOptions" :model-value="engine.status" :errors="{}" class="w-48"
-              @update:model-value="changeStatus" />
+            <BaseSelect
+              v-if="canManage"
+              id="engine-status"
+              name="status"
+              :label="t('equipment.status.label')"
+              :options="statusOptions"
+              :model-value="engine.status"
+              :errors="{}"
+              class="w-48"
+              @update:model-value="changeStatus"
+            />
             <BaseBadge v-else :variant="statusVariant(engine.status)">
               {{ t(`equipment.status.${engine.status}`) }}
             </BaseBadge>
@@ -182,7 +212,11 @@ function formatYear(iso: string): string {
         </div>
 
         <div v-if="canManage" class="flex flex-wrap items-center gap-2 justify-end">
-          <BaseButton variant="secondary" size="sm" :href="`/boats/${boat.id}/engines/${engine.id}/edit`">
+          <BaseButton
+            variant="secondary"
+            size="sm"
+            :href="`/boats/${boat.id}/engines/${engine.id}/edit`"
+          >
             {{ t('boats.engineShow.actions.edit') }}
           </BaseButton>
           <BaseButton size="sm" @click="addEventOpen = true">
@@ -191,28 +225,60 @@ function formatYear(iso: string): string {
         </div>
       </div>
 
-      <BaseTabs v-model="tab" :tabs="[
-        { key: 'overview', label: t('boats.engineShow.tabs.overview') },
-        { key: 'specs', label: t('boats.engineShow.tabs.specs') },
-        { key: 'maintenance', label: t('boats.engineShow.tabs.maintenance'), badge: String(openTasks.length) },
-        { key: 'notes', label: t('boats.engineShow.tabs.notes') },
-        { key: 'parts', label: t('boats.engineShow.tabs.parts') },
-        { key: 'documents', label: t('boats.engineShow.tabs.documents') },
-      ]" />
+      <BaseTabs
+        v-model="tab"
+        :tabs="[
+          { key: 'overview', label: t('boats.engineShow.tabs.overview') },
+          { key: 'specs', label: t('boats.engineShow.tabs.specs') },
+          {
+            key: 'maintenance',
+            label: t('boats.engineShow.tabs.maintenance'),
+            badge: String(openTasks.length),
+          },
+          { key: 'notes', label: t('boats.engineShow.tabs.notes') },
+          { key: 'parts', label: t('boats.engineShow.tabs.parts') },
+          { key: 'documents', label: t('boats.engineShow.tabs.documents') },
+        ]"
+      />
     </header>
 
     <Transition name="tab" mode="out-in">
       <div :key="tab" class="mt-8">
-        <EngineShowTabOverview v-if="tab === 'overview'" :engine="engine" :overdue-task="overdueTask"
-          :recent-events="recentEvents" :hours-since-last-maint="hoursSinceLastMaint"
-          :nearest-threshold="nearestThreshold" :hours-progress="hoursProgress" :is-over-threshold="isOverThreshold"
-          :sorted-open-tasks="sortedOpenTasks" />
-        <EngineShowTabSpecs v-else-if="tab === 'specs'" :boat="boat" :engine="engine" :open-tasks="openTasks"
-          :can-manage="canManage" />
-        <EngineShowTabMaintenance v-else-if="tab === 'maintenance'" :boat="boat" :engine="engine"
-          :maintenance-events="maintenanceEvents" :open-tasks="openTasks" :sorted-open-tasks="sortedOpenTasks"
-          :total-parts="totalParts" :can-manage="canManage" :events-by-year-month="eventsByYearMonth" />
-        <EngineShowTabNotes v-else-if="tab === 'notes'" :engine="engine" :boat="boat" :can-manage="canManage" />
+        <EngineShowTabOverview
+          v-if="tab === 'overview'"
+          :engine="engine"
+          :overdue-task="overdueTask"
+          :recent-events="recentEvents"
+          :hours-since-last-maint="hoursSinceLastMaint"
+          :nearest-threshold="nearestThreshold"
+          :hours-progress="hoursProgress"
+          :is-over-threshold="isOverThreshold"
+          :sorted-open-tasks="sortedOpenTasks"
+        />
+        <EngineShowTabSpecs
+          v-else-if="tab === 'specs'"
+          :boat="boat"
+          :engine="engine"
+          :open-tasks="openTasks"
+          :can-manage="canManage"
+        />
+        <EngineShowTabMaintenance
+          v-else-if="tab === 'maintenance'"
+          :boat="boat"
+          :engine="engine"
+          :maintenance-events="maintenanceEvents"
+          :open-tasks="openTasks"
+          :sorted-open-tasks="sortedOpenTasks"
+          :total-parts="totalParts"
+          :can-manage="canManage"
+          :events-by-year-month="eventsByYearMonth"
+        />
+        <EngineShowTabNotes
+          v-else-if="tab === 'notes'"
+          :engine="engine"
+          :boat="boat"
+          :can-manage="canManage"
+        />
         <EngineShowTabParts
           v-else-if="tab === 'parts'"
           :parts="engine.parts"
@@ -220,10 +286,20 @@ function formatYear(iso: string): string {
           :engine-id="engine.id"
           :can-manage="canManage"
         />
-        <EngineShowTabDocuments v-else-if="tab === 'documents'" :boat="boat" :engine="engine" :can-manage="canManage" />
+        <EngineShowTabDocuments
+          v-else-if="tab === 'documents'"
+          :boat="boat"
+          :engine="engine"
+          :can-manage="canManage"
+        />
       </div>
     </Transition>
 
-    <EngineMaintenanceEventModal v-if="canManage" :boat="boat" :engine="engine" v-model:open="addEventOpen" />
+    <EngineMaintenanceEventModal
+      v-if="canManage"
+      :boat="boat"
+      :engine="engine"
+      v-model:open="addEventOpen"
+    />
   </div>
 </template>

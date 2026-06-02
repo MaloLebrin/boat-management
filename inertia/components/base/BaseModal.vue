@@ -56,7 +56,13 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeyDown))
         <div
           :class="[
             'w-full rounded-(--radius-card) border border-border bg-surface-elevated shadow-(--shadow-lg)',
-            size === 'md' ? 'max-w-md' : size === 'xl' ? 'max-w-xl' : size === '2xl' ? 'max-w-2xl' : 'max-w-lg',
+            size === 'md'
+              ? 'max-w-md'
+              : size === 'xl'
+                ? 'max-w-xl'
+                : size === '2xl'
+                  ? 'max-w-2xl'
+                  : 'max-w-lg',
           ]"
           role="dialog"
           aria-modal="true"
@@ -86,4 +92,3 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeyDown))
     </Transition>
   </Teleport>
 </template>
-

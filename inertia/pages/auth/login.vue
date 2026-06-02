@@ -12,7 +12,7 @@ import { Head } from '@inertiajs/vue3'
 import { computed, ref } from 'vue'
 import AuthNavyPanel from '~/components/auth/AuthNavyPanel.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 
 const { t } = useT()
 
@@ -25,12 +25,10 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
   <Head :title="t('auth.login.title')" />
 
   <div class="flex min-h-[calc(100vh-5rem)] overflow-hidden">
-
     <AuthNavyPanel mode="login" />
 
     <!-- Right panel -->
     <div class="flex flex-1 flex-col bg-cream">
-
       <!-- Top-right helper -->
       <div class="flex items-center justify-end gap-3.5 px-8 py-6">
         <span class="text-xs text-fg-muted">{{ t('auth.login.needHelp') }}</span>
@@ -45,11 +43,13 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
       <!-- Form, vertically centred -->
       <div class="flex flex-1 flex-col items-center justify-center px-8 pb-12 lg:px-16">
         <div class="w-full max-w-sm">
-
           <p class="text-[11px] font-semibold uppercase tracking-[0.12em] text-fg-muted">
             {{ t('auth.login.eyebrow') }}
           </p>
-          <h1 class="mt-3.5 font-display text-[36px] leading-[1.05] text-fg" style="letter-spacing:-0.02em">
+          <h1
+            class="mt-3.5 font-display text-[36px] leading-[1.05] text-fg"
+            style="letter-spacing: -0.02em"
+          >
             {{ t('auth.login.titleNew') }}
           </h1>
           <p class="mt-1.5 max-w-sm text-sm text-fg-muted">
@@ -58,7 +58,6 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
 
           <Form route="session.store" class="mt-7" #default="{ processing, errors }">
             <div class="flex flex-col gap-3.5">
-
               <BaseInput
                 id="email"
                 name="email"
@@ -84,7 +83,7 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
                   <a
                     href="/forgot-password"
                     class="text-[12px] font-semibold text-[#e2674f] no-underline"
-                    style="border-bottom: 1px solid rgba(226,103,79,0.3); padding-bottom:1px"
+                    style="border-bottom: 1px solid rgba(226, 103, 79, 0.3); padding-bottom: 1px"
                   >
                     {{ t('auth.login.forgotPassword') }}
                   </a>
@@ -113,15 +112,23 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
                 type="submit"
                 :disabled="processing"
                 class="mt-1 flex w-full items-center justify-center gap-2 rounded-lg px-5 py-3.5 text-sm font-semibold text-white transition-all duration-150 disabled:opacity-60 hover:brightness-110"
-                style="background:#0b1d2e"
+                style="background: #0b1d2e"
               >
                 {{ t('auth.login.submit') }}
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
-                  stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
                   <path d="M5 12h14M13 6l6 6-6 6" />
                 </svg>
               </button>
-
             </div>
           </Form>
 
@@ -130,12 +137,11 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
             <a
               href="/signup"
               class="font-semibold text-[#e2674f] no-underline"
-              style="border-bottom: 1px solid rgba(226,103,79,0.3); padding-bottom:1px"
+              style="border-bottom: 1px solid rgba(226, 103, 79, 0.3); padding-bottom: 1px"
             >
               {{ t('auth.login.createOrg') }} →
             </a>
           </p>
-
         </div>
       </div>
     </div>

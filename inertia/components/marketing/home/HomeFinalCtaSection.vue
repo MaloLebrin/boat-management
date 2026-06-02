@@ -11,7 +11,9 @@ defineProps<{
 </script>
 
 <template>
-  <section class="relative overflow-hidden bg-gradient-to-b from-navy-900 to-navy-800 px-6 py-20 lg:px-8 lg:py-24">
+  <section
+    class="relative overflow-hidden bg-gradient-to-b from-navy-900 to-navy-800 px-6 py-20 lg:px-8 lg:py-24"
+  >
     <!-- Decorative compass needle SVG -->
     <svg
       class="pointer-events-none absolute right-0 top-1/2 h-96 w-96 -translate-y-1/2 translate-x-1/4 opacity-10"
@@ -36,7 +38,11 @@ defineProps<{
           </BaseButton>
         </a>
         <a href="#demo">
-          <BaseButton size="lg" variant="ghost" class="border! border-white/20! text-white/70! hover:bg-white/10! hover:text-white!">
+          <BaseButton
+            size="lg"
+            variant="ghost"
+            class="border! border-white/20! text-white/70! hover:bg-white/10! hover:text-white!"
+          >
             {{ secondaryCta }}
           </BaseButton>
         </a>

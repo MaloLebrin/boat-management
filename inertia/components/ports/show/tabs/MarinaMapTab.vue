@@ -7,8 +7,12 @@ import MarinaCanvas from '~/components/ports/show/MarinaCanvas.vue'
 import MarinaHelpModal from '~/components/ports/modals/MarinaHelpModal.vue'
 import MouillageFormModal from '~/components/ports/modals/MouillageFormModal.vue'
 import PontoonFormModal from '~/components/ports/modals/PontoonFormModal.vue'
-import { useMarinaInteractions, type LocalPontoon, type LocalMouillage } from '~/composables/useMarinaInteractions'
-import { useT } from '~/composables/useT'
+import {
+  useMarinaInteractions,
+  type LocalPontoon,
+  type LocalMouillage,
+} from '~/composables/use_marina_interactions'
+import { useT } from '~/composables/use_t'
 import type { PortShowDetail } from '~/types/port'
 
 const props = defineProps<{
@@ -25,8 +29,13 @@ const showMouillageForm = ref(false)
 const showHelp = ref(false)
 
 const portId = computed(() => props.port.id)
-const { selectedBoat, handlePontoonDragEnd, handleMouillageDragEnd, handleCanvasClick, handleSpotClick } =
-  useMarinaInteractions(portId, localPontoons, localMouillages)
+const {
+  selectedBoat,
+  handlePontoonDragEnd,
+  handleMouillageDragEnd,
+  handleCanvasClick,
+  handleSpotClick,
+} = useMarinaInteractions(portId, localPontoons, localMouillages)
 
 onMounted(() => {
   localPontoons.value = props.port.pontoons.map((pt, i) => ({

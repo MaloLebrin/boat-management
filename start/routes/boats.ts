@@ -103,7 +103,10 @@ router
     router.delete('boats/:boatId/media/:mediaId', [controllers.BoatMedia, 'destroy'])
 
     router.post('boats/:boatId/safety-equipment', [controllers.BoatSafetyEquipment, 'store'])
-    router.put('boats/:boatId/safety-equipment/:itemId', [controllers.BoatSafetyEquipment, 'update'])
+    router.put('boats/:boatId/safety-equipment/:itemId', [
+      controllers.BoatSafetyEquipment,
+      'update',
+    ])
     router.delete('boats/:boatId/safety-equipment/:itemId', [
       controllers.BoatSafetyEquipment,
       'destroy',

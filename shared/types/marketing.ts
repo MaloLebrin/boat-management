@@ -45,14 +45,62 @@ export interface AboutPageProps {
   t: {
     meta: { title: string; description: string }
     about: {
-      hero: { line1: string; line1Highlight: string; line2: string; line2Highlight: string; subtitle: string }
-      origin: { eyebrow: string; title: string; paragraphs: string[]; captionDate: string; captionSub: string }
+      hero: {
+        line1: string
+        line1Highlight: string
+        line2: string
+        line2Highlight: string
+        subtitle: string
+      }
+      origin: {
+        eyebrow: string
+        title: string
+        paragraphs: string[]
+        captionDate: string
+        captionSub: string
+      }
       values: { eyebrow: string; title: string; titleHighlight: string; items: AboutValueItem[] }
-      team: { eyebrow: string; title: string; titleHighlight: string; subtitle: string; members: AboutMember[]; hiringTitle: string; hiringSubtitle: string; hiringCta: string }
-      numbers: { eyebrow: string; title: string; titleHighlight: string; stats: AboutStatItem[]; investorsLabel: string; investors: string[] }
-      timeline: { eyebrow: string; title: string; titleHighlight: string; subtitle: string; items: AboutTimelineItem[] }
-      office: { eyebrow: string; title: string; titleHighlight: string; body: string; locationLabel: string; locations: AboutLocation[]; officeCards: AboutOfficeCard[] }
-      finalCta: { title: string; titleHighlight: string; subtitle: string; primaryCta: string; secondaryCta: string }
+      team: {
+        eyebrow: string
+        title: string
+        titleHighlight: string
+        subtitle: string
+        members: AboutMember[]
+        hiringTitle: string
+        hiringSubtitle: string
+        hiringCta: string
+      }
+      numbers: {
+        eyebrow: string
+        title: string
+        titleHighlight: string
+        stats: AboutStatItem[]
+        investorsLabel: string
+        investors: string[]
+      }
+      timeline: {
+        eyebrow: string
+        title: string
+        titleHighlight: string
+        subtitle: string
+        items: AboutTimelineItem[]
+      }
+      office: {
+        eyebrow: string
+        title: string
+        titleHighlight: string
+        body: string
+        locationLabel: string
+        locations: AboutLocation[]
+        officeCards: AboutOfficeCard[]
+      }
+      finalCta: {
+        title: string
+        titleHighlight: string
+        subtitle: string
+        primaryCta: string
+        secondaryCta: string
+      }
     }
   }
 }

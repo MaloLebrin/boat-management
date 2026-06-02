@@ -4,7 +4,7 @@ import { ref } from 'vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import EnginePartModal from '~/components/engine/show/EnginePartModal.vue'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 import type { BoatShowEnginePart } from '~/types/boat_show'
 
 const props = defineProps<{

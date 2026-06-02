@@ -20,7 +20,7 @@ const tag = computed(() => {
 })
 
 const levelClass: Record<NonNullable<typeof props.level>, string> = {
-  display: 'font-display text-4xl font-bold tracking-tight text-fg sm:text-5xl',
+  'display': 'font-display text-4xl font-bold tracking-tight text-fg sm:text-5xl',
   '1': 'font-display text-3xl font-bold tracking-tight text-fg sm:text-4xl',
   '2': 'font-display text-2xl font-semibold tracking-tight text-fg',
   '3': 'font-display text-xl font-semibold text-fg',

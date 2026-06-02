@@ -74,7 +74,10 @@ export default class MediaService {
     const media = await Media.find(mediaId)
     if (!media) throw new MediaNotFoundError()
 
-    await this.cloudinary.deleteFile(media.cloudinaryPublicId, resourceTypeFromKind(media.kind, media.format))
+    await this.cloudinary.deleteFile(
+      media.cloudinaryPublicId,
+      resourceTypeFromKind(media.kind, media.format)
+    )
     await media.delete()
   }
 

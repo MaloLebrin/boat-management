@@ -410,7 +410,12 @@ export default class BoatEquipmentController {
     const { status } = await request.validateUsing(updateEquipmentStatusValidator)
 
     try {
-      await this.equipmentService.updateEngineStatus(loaded.user, boat, Number(params.engineId), status)
+      await this.equipmentService.updateEngineStatus(
+        loaded.user,
+        boat,
+        Number(params.engineId),
+        status
+      )
     } catch (error) {
       if (error instanceof BoatEquipmentNotFoundError) {
         session.flash('error', i18n.t('flash.engine.notFound'))

@@ -5,7 +5,7 @@ import type { BoatEquipmentEngineFieldsModel } from '~/components/boats/engine/B
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 
 defineProps<{
   boat: { id: number; name: string }
@@ -31,7 +31,10 @@ const { t } = useT()
           <BoatEquipmentEngineFields :errors="errors" :engine="engine" />
           <div class="mt-6 flex items-center gap-3">
             <BaseButton type="submit" :disabled="processing">{{ t('common.save') }}</BaseButton>
-            <a :href="`/boats/${boat.id}`" class="text-sm font-semibold text-fg-muted hover:text-fg hover:underline">
+            <a
+              :href="`/boats/${boat.id}`"
+              class="text-sm font-semibold text-fg-muted hover:text-fg hover:underline"
+            >
               {{ t('common.cancel') }}
             </a>
           </div>

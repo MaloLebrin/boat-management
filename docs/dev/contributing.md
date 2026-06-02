@@ -16,4 +16,3 @@
 - **Models**: `app/models/**`
 - **Inertia**: `inertia/pages/**` et `inertia/components/**`
 - **Docs**: `docs/**` (mise à jour requise par PR)
-

@@ -3,7 +3,7 @@ import { ArrowRightIcon, CheckCircleIcon } from '@heroicons/vue/24/outline'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
-import { useScrollReveal } from '~/composables/useScrollReveal'
+import { useScrollReveal } from '~/composables/use_scroll_reveal'
 
 defineProps<{
   caseStudy: {
@@ -26,7 +26,7 @@ const { el: sectionEl, isVisible: sectionVisible } = useScrollReveal()
 
 <template>
   <section
-    :ref="(el) => sectionEl = el as HTMLElement"
+    :ref="(el) => (sectionEl = el as HTMLElement)"
     class="reveal mt-14 bg-cream rounded-2xl py-14 px-8"
     :class="{ visible: sectionVisible }"
   >
@@ -67,7 +67,11 @@ const { el: sectionEl, isVisible: sectionVisible } = useScrollReveal()
       <div class="hover:shadow-lg transition-all duration-200 rounded-lg p-4">
         <p class="text-sm font-semibold text-mint-700 mb-2">{{ caseStudy.resultsLabel }}</p>
         <ul class="space-y-1">
-          <li v-for="result in caseStudy.results" :key="result" class="flex items-start gap-2 text-sm text-fg-muted">
+          <li
+            v-for="result in caseStudy.results"
+            :key="result"
+            class="flex items-start gap-2 text-sm text-fg-muted"
+          >
             <CheckCircleIcon class="h-5 w-5 shrink-0 text-mint-700" />
             <span>{{ result }}</span>
           </li>
@@ -79,7 +83,9 @@ const { el: sectionEl, isVisible: sectionVisible } = useScrollReveal()
     <div class="mt-10 text-center">
       <BaseButton size="lg" :href="caseStudy.cta.href" class="group">
         {{ caseStudy.cta.text }}
-        <ArrowRightIcon class="h-4 w-4 ml-1 inline-block transition-transform group-hover:translate-x-1" />
+        <ArrowRightIcon
+          class="h-4 w-4 ml-1 inline-block transition-transform group-hover:translate-x-1"
+        />
       </BaseButton>
     </div>
   </section>

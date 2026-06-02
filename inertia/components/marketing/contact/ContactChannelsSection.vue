@@ -59,7 +59,11 @@ defineProps<{
           <p
             :class="[
               'text-sm font-medium',
-              item.tone === 'navy' ? 'text-coral-400' : item.tone === 'coral' ? 'text-white' : 'text-navy-900',
+              item.tone === 'navy'
+                ? 'text-coral-400'
+                : item.tone === 'coral'
+                  ? 'text-white'
+                  : 'text-navy-900',
             ]"
           >
             {{ item.cta }} →

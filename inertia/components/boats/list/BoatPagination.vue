@@ -18,4 +18,3 @@ defineEmits<{
     @update:page="$emit('update:page', $event)"
   />
 </template>
-

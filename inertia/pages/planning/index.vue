@@ -4,7 +4,7 @@ import BaseCard from '~/components/base/BaseCard.vue'
 import BaseEmptyState from '~/components/base/BaseEmptyState.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import { router } from '@inertiajs/vue3'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 
 interface PlanningTask {
   id: number
@@ -55,7 +55,10 @@ function nextMonth() {
 }
 
 const monthLabel = computed(() =>
-  new Date(currentYear.value, currentMonth.value).toLocaleDateString(locale.value, { month: 'long', year: 'numeric' })
+  new Date(currentYear.value, currentMonth.value).toLocaleDateString(locale.value, {
+    month: 'long',
+    year: 'numeric',
+  })
 )
 
 const weekdays = computed(() => {
@@ -122,12 +125,19 @@ const allTasks = computed(() => [...props.tasks, ...props.doneTasks])
           type="button"
           :class="[
             'flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
-            viewMode === 'kanban' ? 'bg-surface-elevated text-fg shadow-sm' : 'text-fg-muted hover:text-fg',
+            viewMode === 'kanban'
+              ? 'bg-surface-elevated text-fg shadow-sm'
+              : 'text-fg-muted hover:text-fg',
           ]"
           @click="viewMode = 'kanban'"
         >
           <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"
+            />
           </svg>
           {{ t('planning.viewKanban') }}
         </button>
@@ -135,12 +145,19 @@ const allTasks = computed(() => [...props.tasks, ...props.doneTasks])
           type="button"
           :class="[
             'flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
-            viewMode === 'calendar' ? 'bg-surface-elevated text-fg shadow-sm' : 'text-fg-muted hover:text-fg',
+            viewMode === 'calendar'
+              ? 'bg-surface-elevated text-fg shadow-sm'
+              : 'text-fg-muted hover:text-fg',
           ]"
           @click="viewMode = 'calendar'"
         >
           <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+            />
           </svg>
           {{ t('planning.viewCalendar') }}
         </button>
@@ -158,16 +175,26 @@ const allTasks = computed(() => [...props.tasks, ...props.doneTasks])
     </div>
 
     <!-- ===== KANBAN VIEW ===== -->
-    <div v-else-if="viewMode === 'kanban'" class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div
+      v-else-if="viewMode === 'kanban'"
+      class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4"
+    >
       <!-- En retard -->
       <div class="flex flex-col gap-3">
-        <div class="flex items-center gap-2 rounded-lg border-l-4 border-red-500 bg-red-50 px-3 py-2">
+        <div
+          class="flex items-center gap-2 rounded-lg border-l-4 border-red-500 bg-red-50 px-3 py-2"
+        >
           <h2 class="text-sm font-semibold text-red-700">{{ t('planning.kanban.overdue') }}</h2>
-          <span class="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-xs font-semibold text-white">
+          <span
+            class="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-xs font-semibold text-white"
+          >
             {{ overdueTasks.length }}
           </span>
         </div>
-        <div v-if="overdueTasks.length === 0" class="rounded-lg border border-dashed border-border px-4 py-6 text-center text-sm text-fg-muted">
+        <div
+          v-if="overdueTasks.length === 0"
+          class="rounded-lg border border-dashed border-border px-4 py-6 text-center text-sm text-fg-muted"
+        >
           {{ t('planning.kanban.overdueEmpty') }}
         </div>
         <BaseCard v-for="task in overdueTasks" :key="task.id" class="border-l-4 border-red-400">
@@ -175,23 +202,34 @@ const allTasks = computed(() => [...props.tasks, ...props.doneTasks])
           <p class="mt-1 text-sm font-semibold text-fg">{{ task.title }}</p>
           <p class="mt-1 text-xs text-fg-muted capitalize">{{ task.subject }}</p>
           <div class="mt-2 flex items-center justify-between">
-            <span class="inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
+            <span
+              class="inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700"
+            >
               {{ formatDue(task) }}
             </span>
-            <span class="text-xs text-fg-subtle">{{ task.kind === 'date' ? t('planning.taskKind.date') : t('planning.taskKind.hours') }}</span>
+            <span class="text-xs text-fg-subtle">{{
+              task.kind === 'date' ? t('planning.taskKind.date') : t('planning.taskKind.hours')
+            }}</span>
           </div>
         </BaseCard>
       </div>
 
       <!-- À venir bientôt -->
       <div class="flex flex-col gap-3">
-        <div class="flex items-center gap-2 rounded-lg border-l-4 border-amber-400 bg-amber-50 px-3 py-2">
+        <div
+          class="flex items-center gap-2 rounded-lg border-l-4 border-amber-400 bg-amber-50 px-3 py-2"
+        >
           <h2 class="text-sm font-semibold text-amber-700">{{ t('planning.kanban.soon') }}</h2>
-          <span class="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-amber-400 px-1.5 text-xs font-semibold text-white">
+          <span
+            class="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-amber-400 px-1.5 text-xs font-semibold text-white"
+          >
             {{ soonTasks.length }}
           </span>
         </div>
-        <div v-if="soonTasks.length === 0" class="rounded-lg border border-dashed border-border px-4 py-6 text-center text-sm text-fg-muted">
+        <div
+          v-if="soonTasks.length === 0"
+          class="rounded-lg border border-dashed border-border px-4 py-6 text-center text-sm text-fg-muted"
+        >
           {{ t('planning.kanban.soonEmpty') }}
         </div>
         <BaseCard v-for="task in soonTasks" :key="task.id" class="border-l-4 border-amber-300">
@@ -199,23 +237,34 @@ const allTasks = computed(() => [...props.tasks, ...props.doneTasks])
           <p class="mt-1 text-sm font-semibold text-fg">{{ task.title }}</p>
           <p class="mt-1 text-xs text-fg-muted capitalize">{{ task.subject }}</p>
           <div class="mt-2 flex items-center justify-between">
-            <span class="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">
+            <span
+              class="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700"
+            >
               {{ formatDue(task) }}
             </span>
-            <span class="text-xs text-fg-subtle">{{ task.kind === 'date' ? t('planning.taskKind.date') : t('planning.taskKind.hours') }}</span>
+            <span class="text-xs text-fg-subtle">{{
+              task.kind === 'date' ? t('planning.taskKind.date') : t('planning.taskKind.hours')
+            }}</span>
           </div>
         </BaseCard>
       </div>
 
       <!-- Planifiées -->
       <div class="flex flex-col gap-3">
-        <div class="flex items-center gap-2 rounded-lg border-l-4 border-abyss-700 bg-abyss-50 px-3 py-2">
+        <div
+          class="flex items-center gap-2 rounded-lg border-l-4 border-abyss-700 bg-abyss-50 px-3 py-2"
+        >
           <h2 class="text-sm font-semibold text-abyss-700">{{ t('planning.kanban.planned') }}</h2>
-          <span class="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-abyss-700 px-1.5 text-xs font-semibold text-white">
+          <span
+            class="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-abyss-700 px-1.5 text-xs font-semibold text-white"
+          >
             {{ plannedTasks.length }}
           </span>
         </div>
-        <div v-if="plannedTasks.length === 0" class="rounded-lg border border-dashed border-border px-4 py-6 text-center text-sm text-fg-muted">
+        <div
+          v-if="plannedTasks.length === 0"
+          class="rounded-lg border border-dashed border-border px-4 py-6 text-center text-sm text-fg-muted"
+        >
           {{ t('planning.kanban.plannedEmpty') }}
         </div>
         <BaseCard v-for="task in plannedTasks" :key="task.id">
@@ -223,23 +272,34 @@ const allTasks = computed(() => [...props.tasks, ...props.doneTasks])
           <p class="mt-1 text-sm font-semibold text-fg">{{ task.title }}</p>
           <p class="mt-1 text-xs text-fg-muted capitalize">{{ task.subject }}</p>
           <div class="mt-2 flex items-center justify-between">
-            <span class="inline-flex items-center rounded-full bg-surface-muted px-2 py-0.5 text-xs font-medium text-fg-muted">
+            <span
+              class="inline-flex items-center rounded-full bg-surface-muted px-2 py-0.5 text-xs font-medium text-fg-muted"
+            >
               {{ formatDue(task) }}
             </span>
-            <span class="text-xs text-fg-subtle">{{ task.kind === 'date' ? t('planning.taskKind.date') : t('planning.taskKind.hours') }}</span>
+            <span class="text-xs text-fg-subtle">{{
+              task.kind === 'date' ? t('planning.taskKind.date') : t('planning.taskKind.hours')
+            }}</span>
           </div>
         </BaseCard>
       </div>
 
       <!-- Complétées -->
       <div class="flex flex-col gap-3">
-        <div class="flex items-center gap-2 rounded-lg border-l-4 border-mint-600 bg-mint-50 px-3 py-2">
+        <div
+          class="flex items-center gap-2 rounded-lg border-l-4 border-mint-600 bg-mint-50 px-3 py-2"
+        >
           <h2 class="text-sm font-semibold text-mint-700">{{ t('planning.kanban.completed') }}</h2>
-          <span class="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-mint-600 px-1.5 text-xs font-semibold text-white">
+          <span
+            class="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-mint-600 px-1.5 text-xs font-semibold text-white"
+          >
             {{ doneTasks.length }}
           </span>
         </div>
-        <div v-if="doneTasks.length === 0" class="rounded-lg border border-dashed border-border px-4 py-6 text-center text-sm text-fg-muted">
+        <div
+          v-if="doneTasks.length === 0"
+          class="rounded-lg border border-dashed border-border px-4 py-6 text-center text-sm text-fg-muted"
+        >
           {{ t('planning.kanban.completedEmpty') }}
         </div>
         <BaseCard
@@ -251,10 +311,14 @@ const allTasks = computed(() => [...props.tasks, ...props.doneTasks])
           <p class="mt-1 text-sm font-semibold text-fg line-through">{{ task.title }}</p>
           <p class="mt-1 text-xs text-fg-muted capitalize">{{ task.subject }}</p>
           <div class="mt-2 flex items-center justify-between">
-            <span class="inline-flex items-center rounded-full bg-mint-100 px-2 py-0.5 text-xs font-medium text-mint-700">
+            <span
+              class="inline-flex items-center rounded-full bg-mint-100 px-2 py-0.5 text-xs font-medium text-mint-700"
+            >
               {{ formatDue(task) }}
             </span>
-            <span class="text-xs text-fg-subtle">{{ task.kind === 'date' ? t('planning.taskKind.date') : t('planning.taskKind.hours') }}</span>
+            <span class="text-xs text-fg-subtle">{{
+              task.kind === 'date' ? t('planning.taskKind.date') : t('planning.taskKind.hours')
+            }}</span>
           </div>
         </BaseCard>
       </div>
@@ -271,7 +335,12 @@ const allTasks = computed(() => [...props.tasks, ...props.doneTasks])
               @click="prevMonth"
             >
               <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 19l-7-7 7-7"
+                />
               </svg>
             </button>
             <h2 class="text-sm font-semibold capitalize text-fg">{{ monthLabel }}</h2>
@@ -281,7 +350,12 @@ const allTasks = computed(() => [...props.tasks, ...props.doneTasks])
               @click="nextMonth"
             >
               <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 5l7 7-7 7"
+                />
               </svg>
             </button>
           </div>
@@ -289,11 +363,7 @@ const allTasks = computed(() => [...props.tasks, ...props.doneTasks])
 
         <!-- Day-of-week header -->
         <div class="mb-1 grid grid-cols-7 text-center">
-          <div
-            v-for="day in weekdays"
-            :key="day"
-            class="py-1 text-xs font-semibold text-fg-muted"
-          >
+          <div v-for="day in weekdays" :key="day" class="py-1 text-xs font-semibold text-fg-muted">
             {{ day }}
           </div>
         </div>
@@ -311,11 +381,23 @@ const allTasks = computed(() => [...props.tasks, ...props.doneTasks])
             v-for="cell in calendarDays"
             :key="cell.day"
             class="min-h-20 bg-surface-elevated p-1.5"
-            :class="cell.day === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear() ? 'ring-2 ring-inset ring-lagoon-500' : ''"
+            :class="
+              cell.day === today.getDate() &&
+              currentMonth === today.getMonth() &&
+              currentYear === today.getFullYear()
+                ? 'ring-2 ring-inset ring-lagoon-500'
+                : ''
+            "
           >
             <span
               class="mb-1 flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold"
-              :class="cell.day === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear() ? 'bg-lagoon-500 text-white' : 'text-fg-muted'"
+              :class="
+                cell.day === today.getDate() &&
+                currentMonth === today.getMonth() &&
+                currentYear === today.getFullYear()
+                  ? 'bg-lagoon-500 text-white'
+                  : 'text-fg-muted'
+              "
             >
               {{ cell.day }}
             </span>
@@ -323,7 +405,10 @@ const allTasks = computed(() => [...props.tasks, ...props.doneTasks])
               <div
                 v-for="task in cell.tasks.slice(0, 3)"
                 :key="task.id"
-                :class="['truncate rounded px-1 py-0.5 text-xs font-medium cursor-pointer hover:opacity-80', taskPillClass(task)]"
+                :class="[
+                  'truncate rounded px-1 py-0.5 text-xs font-medium cursor-pointer hover:opacity-80',
+                  taskPillClass(task),
+                ]"
                 :title="task.boatName + ' · ' + task.title"
                 @click="router.visit(`/boats/${task.boatId}`)"
               >
@@ -367,13 +452,13 @@ const allTasks = computed(() => [...props.tasks, ...props.doneTasks])
       </BaseCard>
 
       <!-- Tasks triggered by hours -->
-      <BaseCard v-if="tasks.filter(t => t.kind === 'hours').length > 0">
+      <BaseCard v-if="tasks.filter((t) => t.kind === 'hours').length > 0">
         <template #header>
           <h2 class="text-sm font-semibold text-fg">{{ t('planning.calendar.hourTriggered') }}</h2>
         </template>
         <div class="space-y-2">
           <div
-            v-for="task in tasks.filter(t => t.kind === 'hours')"
+            v-for="task in tasks.filter((t) => t.kind === 'hours')"
             :key="task.id"
             class="flex items-center justify-between rounded-lg border border-border px-3 py-2"
           >
@@ -382,12 +467,20 @@ const allTasks = computed(() => [...props.tasks, ...props.doneTasks])
               <p class="text-xs text-fg-muted">{{ task.boatName }} · {{ task.subject }}</p>
             </div>
             <div class="text-right">
-              <p class="text-sm font-semibold text-fg">{{ task.currentEngineHours ?? 0 }}h / {{ task.dueEngineHours }}h</p>
+              <p class="text-sm font-semibold text-fg">
+                {{ task.currentEngineHours ?? 0 }}h / {{ task.dueEngineHours }}h
+              </p>
               <div class="mt-1 h-1.5 w-24 overflow-hidden rounded-full bg-surface-muted">
                 <div
                   class="h-full rounded-full transition-all"
-                  :class="(task.currentEngineHours ?? 0) >= (task.dueEngineHours ?? 1) ? 'bg-red-500' : 'bg-lagoon-500'"
-                  :style="{ width: `${Math.min(100, ((task.currentEngineHours ?? 0) / (task.dueEngineHours ?? 1)) * 100)}%` }"
+                  :class="
+                    (task.currentEngineHours ?? 0) >= (task.dueEngineHours ?? 1)
+                      ? 'bg-red-500'
+                      : 'bg-lagoon-500'
+                  "
+                  :style="{
+                    width: `${Math.min(100, ((task.currentEngineHours ?? 0) / (task.dueEngineHours ?? 1)) * 100)}%`,
+                  }"
                 />
               </div>
             </div>

@@ -3,8 +3,8 @@ import { computed, ref, watch } from 'vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
-import { useT } from '~/composables/useT'
-import { useBoatOptions } from '~/composables/useBoatOptions'
+import { useT } from '~/composables/use_t'
+import { useBoatOptions } from '~/composables/use_boat_options'
 import { RIG_TYPE_OPTIONS } from '#shared/constants/boats/boat_form_options'
 
 export type BoatEquipmentRigFieldsModel = {

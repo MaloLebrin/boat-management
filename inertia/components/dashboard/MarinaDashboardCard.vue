@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import type { DashboardPortItem, DashboardPortStats } from '#shared/types/dashboard'
 import BaseCard from '~/components/base/BaseCard.vue'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 
 const props = defineProps<{
   ports: DashboardPortItem[]
@@ -42,10 +42,7 @@ function locationLabel(port: DashboardPortItem): string {
 
     <div v-if="ports.length === 0" class="flex flex-col items-center gap-3 py-6 text-center">
       <p class="text-sm text-fg-muted">{{ t('dashboard.marina.empty') }}</p>
-      <a
-        href="/ports/new"
-        class="text-sm font-semibold text-brand hover:underline"
-      >
+      <a href="/ports/new" class="text-sm font-semibold text-brand hover:underline">
         {{ t('dashboard.marina.addMarina') }}
       </a>
     </div>
@@ -56,7 +53,9 @@ function locationLabel(port: DashboardPortItem): string {
         <span>·</span>
         <span>{{ t('dashboard.marina.totalBoats', { count: String(portStats.totalBoats) }) }}</span>
         <span>·</span>
-        <span>{{ t('dashboard.marina.totalFreeSpots', { count: String(portStats.totalFreeSpots) }) }}</span>
+        <span>{{
+          t('dashboard.marina.totalFreeSpots', { count: String(portStats.totalFreeSpots) })
+        }}</span>
       </div>
 
       <ul class="space-y-4">
@@ -86,7 +85,12 @@ function locationLabel(port: DashboardPortItem): string {
                   : 'bg-brand/10 text-brand ring-1 ring-brand/20'
               "
             >
-              {{ t('dashboard.marina.freeSpots', { free: String(port.freeSpots), total: String(port.totalSpots) }) }}
+              {{
+                t('dashboard.marina.freeSpots', {
+                  free: String(port.freeSpots),
+                  total: String(port.totalSpots),
+                })
+              }}
             </span>
             <span v-else class="shrink-0 text-xs text-fg-subtle">
               {{ t('dashboard.marina.noSpots') }}

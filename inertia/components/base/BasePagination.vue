@@ -12,7 +12,9 @@ defineEmits<{
 </script>
 
 <template>
-  <div class="flex items-center justify-between gap-4 rounded-(--radius-card) border border-border bg-surface-elevated px-4 py-3 shadow-(--shadow-xs)">
+  <div
+    class="flex items-center justify-between gap-4 rounded-(--radius-card) border border-border bg-surface-elevated px-4 py-3 shadow-(--shadow-xs)"
+  >
     <p class="text-sm text-fg-muted">
       Page <span class="font-semibold text-fg">{{ page }}</span> / {{ pageCount }}
     </p>
@@ -36,4 +38,3 @@ defineEmits<{
     </div>
   </div>
 </template>
-

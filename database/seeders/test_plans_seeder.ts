@@ -135,7 +135,7 @@ export default class TestPlansSeeder extends BaseSeeder {
     console.log(`  → 2 bateaux (quota max Starter atteint)`)
 
     // ─── 3. Pro org ──────────────────────────────────────────────────────────
-    const { user: _proUser, org: proOrg } = await ensureOwner('pro@test.local', 'Bob Pro', 'pro')
+    const { org: proOrg } = await ensureOwner('pro@test.local', 'Bob Pro', 'pro')
     console.log(`✓ pro@test.local (org #${proOrg.id}, plan=pro)`)
 
     await ensureTeamMember('pro-alice@test.local', 'Alice Dupont', proOrg.id, 'member')
@@ -200,7 +200,7 @@ export default class TestPlansSeeder extends BaseSeeder {
     console.log(`  → 5 bateaux`)
 
     // ─── 4. Enterprise org ───────────────────────────────────────────────────
-    const { user: _enterpriseUser, org: enterpriseOrg } = await ensureOwner(
+    const { org: enterpriseOrg } = await ensureOwner(
       'enterprise@test.local',
       'Carol Enterprise',
       'enterprise'

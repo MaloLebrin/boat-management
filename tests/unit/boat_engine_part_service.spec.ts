@@ -23,10 +23,24 @@ test.group('BoatEnginePartService (unit)', (group) => {
       fullName: 'Test',
       organizationId: org.id,
     })
-    const boat = await Boat.create({ organizationId: org.id, name: 'B', registrationNumber: null, type: null })
+    const boat = await Boat.create({
+      organizationId: org.id,
+      name: 'B',
+      registrationNumber: null,
+      type: null,
+    })
     boat.$extras = {}
     await boat.load('engines')
-    const engine = await BoatEngine.create({ boatId: boat.id, kind: 'inboard', fuel: 'diesel', brand: 'Yanmar', model: '3YM', serialNumber: null, powerHp: 30, hours: 100 })
+    const engine = await BoatEngine.create({
+      boatId: boat.id,
+      kind: 'inboard',
+      fuel: 'diesel',
+      brand: 'Yanmar',
+      model: '3YM',
+      serialNumber: null,
+      powerHp: 30,
+      hours: 100,
+    })
     await boat.load('engines')
     return { org, user, boat, engine }
   }
@@ -53,7 +67,11 @@ test.group('BoatEnginePartService (unit)', (group) => {
 
     await svc.create(user, boat, engine.id, { designation: 'Impeller', stock: 1, minStockAlert: 2 })
     await svc.create(user, boat, engine.id, { designation: 'Belt', stock: 5, minStockAlert: 2 })
-    await svc.create(user, boat, engine.id, { designation: 'Fuel filter', stock: 0, minStockAlert: 1 })
+    await svc.create(user, boat, engine.id, {
+      designation: 'Fuel filter',
+      stock: 0,
+      minStockAlert: 1,
+    })
     await svc.create(user, boat, engine.id, { designation: 'Spark plug', stock: 10 })
 
     const lowStock = await svc.listLowStock(engine.id)
@@ -77,8 +95,16 @@ test.group('BoatEnginePartService (unit)', (group) => {
     const { user, boat, engine } = await setup('ep-svc-4')
     const svc = new BoatEnginePartService()
 
-    const part = await svc.create(user, boat, engine.id, { designation: 'Gasket', stock: 3, minStockAlert: 1 })
-    await svc.update(user, boat, engine.id, part.id, { designation: 'Gasket', stock: 3, minStockAlert: 5 })
+    const part = await svc.create(user, boat, engine.id, {
+      designation: 'Gasket',
+      stock: 3,
+      minStockAlert: 1,
+    })
+    await svc.update(user, boat, engine.id, part.id, {
+      designation: 'Gasket',
+      stock: 3,
+      minStockAlert: 5,
+    })
 
     const updated = await BoatEnginePart.findOrFail(part.id)
     assert.equal(updated.minStockAlert, 5)

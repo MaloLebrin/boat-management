@@ -3,7 +3,7 @@ import { Link, router } from '@inertiajs/vue3'
 import { PencilIcon, TrashIcon } from '@heroicons/vue/24/outline'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 import type { PontoonRow } from '~/types/port'
 
 const props = defineProps<{
@@ -12,7 +12,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  edit: [pontoon: PontoonRow]
+  'edit': [pontoon: PontoonRow]
   'manage-spots': [pontoon: PontoonRow]
 }>()
 

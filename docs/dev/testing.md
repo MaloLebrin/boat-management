@@ -14,4 +14,3 @@ Répertoire: `tests/inertia` (selon la structure du repo).
 
 - `pnpm typecheck`
 - `pnpm lint`
-

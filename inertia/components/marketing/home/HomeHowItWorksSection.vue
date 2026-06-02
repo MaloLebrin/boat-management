@@ -2,8 +2,8 @@
 import { BellAlertIcon, ChartBarIcon, ClipboardDocumentListIcon } from '@heroicons/vue/24/outline'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
-import { useScrollReveal } from '~/composables/useScrollReveal'
-import { useT } from '~/composables/useT'
+import { useScrollReveal } from '~/composables/use_scroll_reveal'
+import { useT } from '~/composables/use_t'
 
 const stepIcons = [ClipboardDocumentListIcon, BellAlertIcon, ChartBarIcon]
 
@@ -28,7 +28,7 @@ const { el: previewEl, isVisible: previewVisible } = useScrollReveal()
 <template>
   <!-- Section 5: How it works -->
   <section
-    :ref="(el) => howItWorksEl = el as HTMLElement"
+    :ref="(el) => (howItWorksEl = el as HTMLElement)"
     class="mt-14 reveal bg-cream rounded-xl py-12 px-8"
     :class="{ visible: howItWorksVisible }"
   >
@@ -47,14 +47,21 @@ const { el: previewEl, isVisible: previewVisible } = useScrollReveal()
         <p class="font-display text-5xl italic text-coral-500/20">{{ step.step }}</p>
         <p class="mt-4 text-sm font-semibold text-fg">{{ step.title }}</p>
         <p class="mt-2 text-sm text-fg-muted">{{ step.description }}</p>
-        <p v-if="step.detail" class="mt-3 text-xs text-fg-subtle italic border-t border-bone/60 pt-2">{{ step.detail }}</p>
+        <p
+          v-if="step.detail"
+          class="mt-3 text-xs text-fg-subtle italic border-t border-bone/60 pt-2"
+        >
+          {{ step.detail }}
+        </p>
       </div>
     </div>
   </section>
 
   <!-- Timeline J1/J7/J30 -->
   <section class="mt-8 px-8 py-8 bg-navy-900 rounded-xl">
-    <p class="text-center text-sm font-semibold text-white/70 mb-6">{{ howItWorks.timeline.title }}</p>
+    <p class="text-center text-sm font-semibold text-white/70 mb-6">
+      {{ howItWorks.timeline.title }}
+    </p>
     <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-center sm:gap-12">
       <div
         v-for="(item, idx) in howItWorks.timeline.items"
@@ -63,11 +70,17 @@ const { el: previewEl, isVisible: previewVisible } = useScrollReveal()
       >
         <template v-if="idx === 0">
           <span class="relative flex h-3 w-3 mt-2.5 sm:mt-0 sm:mb-2">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-coral-400 opacity-75"></span>
+            <span
+              class="animate-ping absolute inline-flex h-full w-full rounded-full bg-coral-400 opacity-75"
+            ></span>
             <span class="relative inline-flex rounded-full h-3 w-3 bg-coral-500"></span>
           </span>
         </template>
-        <span v-else class="shrink-0 inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-xs font-bold text-white">{{ idx + 1 }}</span>
+        <span
+          v-else
+          class="shrink-0 inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-xs font-bold text-white"
+          >{{ idx + 1 }}</span
+        >
         <div>
           <p class="text-xs font-semibold text-coral-400">{{ item.day }}</p>
           <p class="text-sm text-white/80">{{ item.label }}</p>
@@ -78,7 +91,7 @@ const { el: previewEl, isVisible: previewVisible } = useScrollReveal()
 
   <!-- Section 6: Preview dashboard mockup -->
   <section
-    :ref="(el) => previewEl = el as HTMLElement"
+    :ref="(el) => (previewEl = el as HTMLElement)"
     class="mt-14 reveal grid gap-6 lg:grid-cols-2 lg:items-center"
     :class="{ visible: previewVisible }"
   >

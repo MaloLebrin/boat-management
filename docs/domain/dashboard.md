@@ -44,4 +44,3 @@ Notes d’implémentation:
 
 - pour les moteurs, l’heure “courante” est `engine.hours` si présent, sinon fallback sur `max(done_engine_hours)` des tasks `done`.
 - les tasks hours-based sont filtrées en mémoire après récupération.
-

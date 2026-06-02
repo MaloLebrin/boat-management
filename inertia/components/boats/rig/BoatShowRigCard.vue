@@ -5,7 +5,7 @@ import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import type { BoatShowRig } from '~/types/boat_show'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 
 defineProps<{
   boatId: number
@@ -28,22 +28,25 @@ function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutra
     <template #header>
       <div class="flex flex-wrap items-start justify-between gap-2">
         <p class="text-sm font-semibold text-fg">{{ t('boats.rig.title') }}</p>
-      <div v-if="canManage" class="flex flex-wrap items-center gap-2">
-        <a :href="`/boats/${boatId}/rig/edit`" class="text-sm font-semibold text-fg-muted hover:text-fg hover:underline">
-          <PencilSquareIcon v-if="rig" class="w-4 h-4" />
-          <PlusCircleIcon v-else class="w-4 h-4" />
-        </a>
-        <Form
-          v-if="rig"
-          :action="{ url: `/boats/${boatId}/rig`, method: 'delete' }"
-          #default="{ processing }"
-          class="inline"
-        >
-          <BaseButton type="submit" variant="danger" size="sm" :disabled="processing">
-            <TrashIcon class="w-4 h-4 text-red-800" />
-          </BaseButton>
-        </Form>
-      </div>
+        <div v-if="canManage" class="flex flex-wrap items-center gap-2">
+          <a
+            :href="`/boats/${boatId}/rig/edit`"
+            class="text-sm font-semibold text-fg-muted hover:text-fg hover:underline"
+          >
+            <PencilSquareIcon v-if="rig" class="w-4 h-4" />
+            <PlusCircleIcon v-else class="w-4 h-4" />
+          </a>
+          <Form
+            v-if="rig"
+            :action="{ url: `/boats/${boatId}/rig`, method: 'delete' }"
+            #default="{ processing }"
+            class="inline"
+          >
+            <BaseButton type="submit" variant="danger" size="sm" :disabled="processing">
+              <TrashIcon class="w-4 h-4 text-red-800" />
+            </BaseButton>
+          </Form>
+        </div>
       </div>
     </template>
 

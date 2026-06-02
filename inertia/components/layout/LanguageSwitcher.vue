@@ -16,9 +16,11 @@ function switchLocale(newLocale: 'en' | 'fr') {
     <button
       type="button"
       class="text-xs font-semibold px-2 py-1 rounded transition-colors"
-      :class="locale === 'en'
-        ? 'bg-lagoon-500 text-white'
-        : 'text-abyss-300 hover:text-white hover:bg-abyss-800'"
+      :class="
+        locale === 'en'
+          ? 'bg-lagoon-500 text-white'
+          : 'text-abyss-300 hover:text-white hover:bg-abyss-800'
+      "
       @click="switchLocale('en')"
     >
       EN
@@ -27,9 +29,11 @@ function switchLocale(newLocale: 'en' | 'fr') {
     <button
       type="button"
       class="text-xs font-semibold px-2 py-1 rounded transition-colors"
-      :class="locale === 'fr'
-        ? 'bg-lagoon-500 text-white'
-        : 'text-abyss-300 hover:text-white hover:bg-abyss-800'"
+      :class="
+        locale === 'fr'
+          ? 'bg-lagoon-500 text-white'
+          : 'text-abyss-300 hover:text-white hover:bg-abyss-800'
+      "
       @click="switchLocale('fr')"
     >
       FR

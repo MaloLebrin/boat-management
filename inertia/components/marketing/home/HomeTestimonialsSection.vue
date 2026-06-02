@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ChatBubbleLeftRightIcon } from '@heroicons/vue/24/outline'
-import { useScrollReveal } from '~/composables/useScrollReveal'
+import { useScrollReveal } from '~/composables/use_scroll_reveal'
 
 interface TestimonialItem {
   quote: string
@@ -20,7 +20,7 @@ const { el: sectionEl, isVisible } = useScrollReveal()
 
 <template>
   <section
-    :ref="(el) => sectionEl = el as HTMLElement"
+    :ref="(el) => (sectionEl = el as HTMLElement)"
     class="reveal bg-paper px-6 py-20 lg:px-8 lg:py-24"
     :class="{ visible: isVisible }"
   >
@@ -55,9 +55,7 @@ const { el: sectionEl, isVisible } = useScrollReveal()
           :class="[`reveal-delay-${idx + 1}`, { visible: isVisible }]"
         >
           <ChatBubbleLeftRightIcon class="mb-3 h-6 w-6 text-coral-300" />
-          <p class="text-sm italic text-fg-muted">
-            "{{ item.quote }}"
-          </p>
+          <p class="text-sm italic text-fg-muted">"{{ item.quote }}"</p>
           <div class="mt-4">
             <p class="font-semibold text-fg">{{ item.author }}</p>
             <p class="text-xs text-fg-subtle">{{ item.role }}</p>

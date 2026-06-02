@@ -25,4 +25,13 @@ export default [
       'vue/multi-word-component-names': 'off',
     },
   },
+  {
+    files: ['inertia/**/*.ts'],
+    rules: {
+      '@adonisjs/no-backend-import-in-frontend': [
+        'error',
+        { allowed: ['../../shared/constants/**'] },
+      ],
+    },
+  },
 ]

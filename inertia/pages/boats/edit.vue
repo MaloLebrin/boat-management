@@ -6,7 +6,7 @@ import { parsePropulsionType } from '~/types/boat_form'
 import { computed, ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 
 const { t } = useT()
 
@@ -39,8 +39,13 @@ const showSailFields = computed(() => propulsionType.value === 'sailboat')
           />
 
           <div class="flex items-center gap-3">
-            <BaseButton type="submit" :disabled="processing">{{ t('boats.edit.submit') }}</BaseButton>
-            <a :href="`/boats/${boat.id}`" class="text-sm font-semibold text-fg-muted hover:text-fg hover:underline">
+            <BaseButton type="submit" :disabled="processing">{{
+              t('boats.edit.submit')
+            }}</BaseButton>
+            <a
+              :href="`/boats/${boat.id}`"
+              class="text-sm font-semibold text-fg-muted hover:text-fg hover:underline"
+            >
               {{ t('boats.edit.cancel') }}
             </a>
           </div>

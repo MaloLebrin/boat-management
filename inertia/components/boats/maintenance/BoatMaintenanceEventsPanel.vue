@@ -9,11 +9,21 @@ import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import type { BoatShowDetail, MaintenanceEventRow } from '~/types/boat_show'
 import { performedDisplay, subjectLabel, targetDescription } from './utils'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 
 const { t } = useT()
 
-type Subject = 'boat' | 'hull' | 'engine' | 'sail' | 'rig' | 'electrical' | 'plumbing' | 'safety' | 'deck' | 'other'
+type Subject =
+  | 'boat'
+  | 'hull'
+  | 'engine'
+  | 'sail'
+  | 'rig'
+  | 'electrical'
+  | 'plumbing'
+  | 'safety'
+  | 'deck'
+  | 'other'
 
 const props = defineProps<{
   boat: BoatShowDetail
@@ -87,7 +97,9 @@ function removePartRow(index: number) {
       </div>
     </template>
 
-    <div v-if="events.length === 0" class="text-sm text-fg-muted">{{ t('boats.maintenance.events.empty') }}</div>
+    <div v-if="events.length === 0" class="text-sm text-fg-muted">
+      {{ t('boats.maintenance.events.empty') }}
+    </div>
     <ul v-else class="space-y-4">
       <li
         v-for="ev in events"
@@ -96,8 +108,12 @@ function removePartRow(index: number) {
       >
         <div class="flex flex-wrap items-start justify-between gap-2">
           <div>
-            <p class="font-semibold text-fg">{{ performedDisplay(ev.performedAt) }} — {{ ev.title }}</p>
-            <p class="text-fg-muted">{{ subjectLabel(ev.subject) }} · {{ targetDescription(ev) }}</p>
+            <p class="font-semibold text-fg">
+              {{ performedDisplay(ev.performedAt) }} — {{ ev.title }}
+            </p>
+            <p class="text-fg-muted">
+              {{ subjectLabel(ev.subject) }} · {{ targetDescription(ev) }}
+            </p>
             <p v-if="ev.notes" class="mt-2 text-fg-muted">{{ ev.notes }}</p>
             <ul v-if="ev.parts.length" class="mt-2 list-inside list-disc text-fg-muted">
               <li v-for="p in ev.parts" :key="p.id">
@@ -119,7 +135,11 @@ function removePartRow(index: number) {
       </li>
     </ul>
 
-    <div v-if="canManageMaintenance" id="maintenance-add-entry" class="mt-6 border-t border-border pt-6">
+    <div
+      v-if="canManageMaintenance"
+      id="maintenance-add-entry"
+      class="mt-6 border-t border-border pt-6"
+    >
       <p class="text-sm font-semibold text-fg">{{ t('boats.maintenance.events.addEntry') }}</p>
       <Form
         :action="{ url: `/boats/${boat.id}/maintenance`, method: 'post' }"
@@ -181,8 +201,12 @@ function removePartRow(index: number) {
 
         <template v-if="subject === 'rig'">
           <input v-if="boat.rig" type="hidden" name="boatRigId" :value="boat.rig.id" />
-          <p v-if="!boat.rig" class="text-sm text-warning">{{ t('boats.maintenance.events.noRig') }}</p>
-          <p v-if="errors.boatRigId" class="mt-1 text-xs font-medium text-danger">{{ errors.boatRigId }}</p>
+          <p v-if="!boat.rig" class="text-sm text-warning">
+            {{ t('boats.maintenance.events.noRig') }}
+          </p>
+          <p v-if="errors.boatRigId" class="mt-1 text-xs font-medium text-danger">
+            {{ errors.boatRigId }}
+          </p>
         </template>
 
         <BaseInput
@@ -221,11 +245,18 @@ function removePartRow(index: number) {
               {{ t('boats.maintenance.events.addPart') }}
             </BaseButton>
           </div>
-          <div v-if="partRows.length === 0" class="mt-3 text-sm text-fg-muted">{{ t('boats.maintenance.events.noParts') }}</div>
+          <div v-if="partRows.length === 0" class="mt-3 text-sm text-fg-muted">
+            {{ t('boats.maintenance.events.noParts') }}
+          </div>
           <div v-else class="mt-4 space-y-3">
             <div v-for="(p, idx) in partRows" :key="idx" class="grid gap-3 sm:grid-cols-6">
               <div class="sm:col-span-3">
-                <BaseInput :id="`part-name-${idx}`" :name="`parts[${idx}][name]`" :label="t('boats.maintenance.events.partName')" v-model="p.name" />
+                <BaseInput
+                  :id="`part-name-${idx}`"
+                  :name="`parts[${idx}][name]`"
+                  :label="t('boats.maintenance.events.partName')"
+                  v-model="p.name"
+                />
               </div>
               <div class="sm:col-span-1">
                 <BaseInput
@@ -269,4 +300,3 @@ function removePartRow(index: number) {
     </div>
   </BaseCard>
 </template>
-

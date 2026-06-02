@@ -2,8 +2,8 @@
 import { computed, ref, watch } from 'vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
-import { useT } from '~/composables/useT'
-import { useBoatOptions } from '~/composables/useBoatOptions'
+import { useT } from '~/composables/use_t'
+import { useBoatOptions } from '~/composables/use_boat_options'
 import { ENGINE_KIND_OPTIONS } from '#shared/constants/boats/boat_form_options'
 
 export type BoatEquipmentEngineFieldsModel = {
@@ -53,7 +53,8 @@ function syncFromProps() {
   kind.value = e?.kind ?? ENGINE_KIND_OPTIONS[0]?.value ?? ''
   fuel.value = e?.fuel ?? ''
   strokeType.value = e?.strokeType ?? ''
-  installHours.value = e?.installHours === null || e?.installHours === undefined ? '' : String(e.installHours)
+  installHours.value =
+    e?.installHours === null || e?.installHours === undefined ? '' : String(e.installHours)
   brand.value = e?.brand ?? ''
   model.value = e?.model ?? ''
   serialNumber.value = e?.serialNumber ?? ''
@@ -103,8 +104,20 @@ watch(
       :errors="errors"
     />
 
-    <BaseInput id="brand" name="brand" :label="t('boats.engines.fields.brand')" v-model="brand" :errors="errors" />
-    <BaseInput id="model" name="model" :label="t('boats.engines.fields.model')" v-model="model" :errors="errors" />
+    <BaseInput
+      id="brand"
+      name="brand"
+      :label="t('boats.engines.fields.brand')"
+      v-model="brand"
+      :errors="errors"
+    />
+    <BaseInput
+      id="model"
+      name="model"
+      :label="t('boats.engines.fields.model')"
+      v-model="model"
+      :errors="errors"
+    />
     <BaseInput
       id="serialNumber"
       name="serialNumber"

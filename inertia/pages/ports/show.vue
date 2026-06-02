@@ -7,7 +7,7 @@ import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseTabs from '~/components/base/BaseTabs.vue'
 import MarinaMapTab from '~/components/ports/show/tabs/MarinaMapTab.vue'
 import PortListTab from '~/components/ports/show/tabs/PortListTab.vue'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 import type { PortShowDetail } from '~/types/port'
 
 const props = defineProps<{

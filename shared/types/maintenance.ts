@@ -21,7 +21,17 @@ export type MaintenancePartInput = {
 }
 
 export type CreateMaintenancePayload = {
-  subject: 'boat' | 'hull' | 'engine' | 'sail' | 'rig' | 'electrical' | 'plumbing' | 'safety' | 'deck' | 'other'
+  subject:
+    | 'boat'
+    | 'hull'
+    | 'engine'
+    | 'sail'
+    | 'rig'
+    | 'electrical'
+    | 'plumbing'
+    | 'safety'
+    | 'deck'
+    | 'other'
   boatEngineId?: number | null
   boatSailId?: number | null
   boatRigId?: number | null

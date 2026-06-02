@@ -17,7 +17,9 @@ defineProps<{
           <path d="M32 9 L37.5 32 L32 36.5 L26.5 32 Z" fill="#faf6ee" />
           <path d="M32 55 L37.5 32 L32 27.5 L26.5 32 Z" fill="#e2674f" />
         </svg>
-        <span class="font-display text-[11px] text-white">Fleet<em class="text-coral-500">Ai</em></span>
+        <span class="font-display text-[11px] text-white"
+          >Fleet<em class="text-coral-500">Ai</em></span
+        >
       </div>
       <nav class="mt-2 flex flex-col gap-0.5 px-2">
         <div class="flex items-center gap-1.5 rounded bg-white/10 px-2 py-1.5 text-white">
@@ -63,8 +65,18 @@ defineProps<{
         <div class="flex-1 overflow-auto p-3">
           <!-- Alert card -->
           <div class="mb-3 flex items-center gap-2 rounded-lg bg-coral-500 px-3 py-2 text-white">
-            <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            <svg
+              class="h-3 w-3"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2.5"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+              />
             </svg>
             <span class="font-medium">3 maintenances en retard</span>
           </div>
@@ -95,7 +107,9 @@ defineProps<{
               <p class="font-semibold text-fg">Flotte</p>
             </div>
             <table class="w-full text-left">
-              <thead class="border-b border-bone bg-paper/50 text-[9px] font-medium uppercase text-fg-muted">
+              <thead
+                class="border-b border-bone bg-paper/50 text-[9px] font-medium uppercase text-fg-muted"
+              >
                 <tr>
                   <th class="px-3 py-1.5">Bateau</th>
                   <th class="px-3 py-1.5">Type</th>
@@ -107,37 +121,67 @@ defineProps<{
                 <tr>
                   <td class="px-3 py-1.5 font-medium">Mistral II</td>
                   <td class="px-3 py-1.5 text-fg-muted">Voilier</td>
-                  <td class="px-3 py-1.5"><span class="rounded-full bg-coral-100 px-1.5 py-0.5 text-[9px] font-medium text-coral-700">Retard</span></td>
+                  <td class="px-3 py-1.5">
+                    <span
+                      class="rounded-full bg-coral-100 px-1.5 py-0.5 text-[9px] font-medium text-coral-700"
+                      >Retard</span
+                    >
+                  </td>
                   <td class="px-3 py-1.5 text-fg-muted">342h</td>
                 </tr>
                 <tr>
                   <td class="px-3 py-1.5 font-medium">Azur</td>
                   <td class="px-3 py-1.5 text-fg-muted">Catamaran</td>
-                  <td class="px-3 py-1.5"><span class="rounded-full bg-amber-100 px-1.5 py-0.5 text-[9px] font-medium text-amber-700">14j</span></td>
+                  <td class="px-3 py-1.5">
+                    <span
+                      class="rounded-full bg-amber-100 px-1.5 py-0.5 text-[9px] font-medium text-amber-700"
+                      >14j</span
+                    >
+                  </td>
                   <td class="px-3 py-1.5 text-fg-muted">128h</td>
                 </tr>
                 <tr>
                   <td class="px-3 py-1.5 font-medium">Sirocco</td>
                   <td class="px-3 py-1.5 text-fg-muted">Moteur</td>
-                  <td class="px-3 py-1.5"><span class="rounded-full bg-mint-100 px-1.5 py-0.5 text-[9px] font-medium text-mint-700">OK</span></td>
+                  <td class="px-3 py-1.5">
+                    <span
+                      class="rounded-full bg-mint-100 px-1.5 py-0.5 text-[9px] font-medium text-mint-700"
+                      >OK</span
+                    >
+                  </td>
                   <td class="px-3 py-1.5 text-fg-muted">89h</td>
                 </tr>
                 <tr>
                   <td class="px-3 py-1.5 font-medium">Alizee</td>
                   <td class="px-3 py-1.5 text-fg-muted">Voilier</td>
-                  <td class="px-3 py-1.5"><span class="rounded-full bg-coral-100 px-1.5 py-0.5 text-[9px] font-medium text-coral-700">Retard</span></td>
+                  <td class="px-3 py-1.5">
+                    <span
+                      class="rounded-full bg-coral-100 px-1.5 py-0.5 text-[9px] font-medium text-coral-700"
+                      >Retard</span
+                    >
+                  </td>
                   <td class="px-3 py-1.5 text-fg-muted">456h</td>
                 </tr>
                 <tr>
                   <td class="px-3 py-1.5 font-medium">Cap Horn</td>
                   <td class="px-3 py-1.5 text-fg-muted">Voilier</td>
-                  <td class="px-3 py-1.5"><span class="rounded-full bg-mint-100 px-1.5 py-0.5 text-[9px] font-medium text-mint-700">OK</span></td>
+                  <td class="px-3 py-1.5">
+                    <span
+                      class="rounded-full bg-mint-100 px-1.5 py-0.5 text-[9px] font-medium text-mint-700"
+                      >OK</span
+                    >
+                  </td>
                   <td class="px-3 py-1.5 text-fg-muted">201h</td>
                 </tr>
                 <tr>
                   <td class="px-3 py-1.5 font-medium">Tramontane</td>
                   <td class="px-3 py-1.5 text-fg-muted">Moteur</td>
-                  <td class="px-3 py-1.5"><span class="rounded-full bg-amber-100 px-1.5 py-0.5 text-[9px] font-medium text-amber-700">14j</span></td>
+                  <td class="px-3 py-1.5">
+                    <span
+                      class="rounded-full bg-amber-100 px-1.5 py-0.5 text-[9px] font-medium text-amber-700"
+                      >14j</span
+                    >
+                  </td>
                   <td class="px-3 py-1.5 text-fg-muted">167h</td>
                 </tr>
               </tbody>
@@ -154,7 +198,9 @@ defineProps<{
               <span class="font-medium">Fleetide</span>
             </div>
             <p class="text-[9px] text-white/80">Mistral II: vidange moteur en retard de 42h.</p>
-            <button class="mt-1.5 w-full rounded bg-white/20 px-2 py-1 text-[9px] font-medium hover:bg-white/30">
+            <button
+              class="mt-1.5 w-full rounded bg-white/20 px-2 py-1 text-[9px] font-medium hover:bg-white/30"
+            >
               Planifier
             </button>
           </div>

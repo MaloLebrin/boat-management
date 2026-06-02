@@ -14,7 +14,7 @@ import AuthNavyPanel from '~/components/auth/AuthNavyPanel.vue'
 import PasswordStrength from '~/components/auth/PasswordStrength.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 
 const { t } = useT()
 
@@ -27,12 +27,10 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
   <Head :title="t('auth.signup.title')" />
 
   <div class="flex min-h-[calc(100vh-5rem)] overflow-hidden">
-
     <AuthNavyPanel mode="register" />
 
     <!-- Right panel -->
     <div class="flex flex-1 flex-col bg-cream">
-
       <!-- Top-right helper -->
       <div class="flex items-center justify-end gap-3.5 px-8 py-6">
         <span class="text-xs text-fg-muted">{{ t('auth.login.needHelp') }}</span>
@@ -47,7 +45,6 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
       <!-- Form, vertically centred -->
       <div class="flex flex-1 flex-col items-center justify-center px-8 pb-12 lg:px-16">
         <div class="w-full max-w-[460px]">
-
           <!-- Trial badge -->
           <div class="flex flex-wrap items-center gap-2">
             <span
@@ -60,7 +57,10 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
             <span class="text-[11px] text-fg-muted">{{ t('auth.signup.trialCaption') }}</span>
           </div>
 
-          <h1 class="mt-3.5 font-display text-[34px] leading-[1.05] text-fg" style="letter-spacing:-0.02em">
+          <h1
+            class="mt-3.5 font-display text-[34px] leading-[1.05] text-fg"
+            style="letter-spacing: -0.02em"
+          >
             {{ t('auth.signup.titleNew') }}
           </h1>
           <p class="mt-1.5 text-sm text-fg-muted">
@@ -69,13 +69,14 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
 
           <Form route="new_account.store" class="mt-6" #default="{ processing, errors }">
             <div class="flex flex-col gap-3.5">
-
               <!-- Section 01 — Toi -->
               <div class="flex items-center gap-3">
                 <span class="font-mono text-[11px] text-fg-subtle">01</span>
                 <div class="h-px flex-1 bg-bone" />
                 <div class="text-right">
-                  <div class="text-[13px] font-semibold text-fg">{{ t('auth.signup.section01Title') }}</div>
+                  <div class="text-[13px] font-semibold text-fg">
+                    {{ t('auth.signup.section01Title') }}
+                  </div>
                   <div class="text-[11px] text-fg-muted">{{ t('auth.signup.section01Sub') }}</div>
                 </div>
               </div>
@@ -128,7 +129,9 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
                       class="px-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-fg-muted focus-visible:outline-none"
                       @click="showPassword = !showPassword"
                     >
-                      {{ showPassword ? t('auth.signup.hidePassword') : t('auth.signup.showPassword') }}
+                      {{
+                        showPassword ? t('auth.signup.hidePassword') : t('auth.signup.showPassword')
+                      }}
                     </button>
                   </template>
                 </BaseInput>
@@ -140,7 +143,9 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
                 <span class="font-mono text-[11px] text-fg-subtle">02</span>
                 <div class="h-px flex-1 bg-bone" />
                 <div class="text-right">
-                  <div class="text-[13px] font-semibold text-fg">{{ t('auth.signup.section02Title') }}</div>
+                  <div class="text-[13px] font-semibold text-fg">
+                    {{ t('auth.signup.section02Title') }}
+                  </div>
                   <div class="text-[11px] text-fg-muted">{{ t('auth.signup.section02Sub') }}</div>
                 </div>
               </div>
@@ -195,7 +200,10 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
                   {{ t('auth.signup.acceptTermsPrefix') }}
                   <a href="#" class="font-semibold text-[#e2674f]">{{ t('auth.signup.cgu') }}</a>
                   {{ t('auth.signup.acceptTermsConjunction') }}
-                  <a href="#" class="font-semibold text-[#e2674f]">{{ t('auth.signup.privacyPolicy') }}</a>.
+                  <a href="#" class="font-semibold text-[#e2674f]">{{
+                    t('auth.signup.privacyPolicy')
+                  }}</a
+                  >.
                   {{ t('auth.signup.termsHosting') }}
                 </span>
               </label>
@@ -205,27 +213,47 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
                 type="submit"
                 :disabled="processing"
                 class="mt-1 flex w-full items-center justify-center gap-2 rounded-lg px-5 py-3.5 text-sm font-semibold text-white transition-all duration-150 disabled:opacity-60 hover:brightness-110"
-                style="background:#e2674f"
+                style="background: #e2674f"
               >
                 {{ t('auth.signup.createOrg') }}
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
-                  stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
                   <path d="M5 12h14M13 6l6 6-6 6" />
                 </svg>
               </button>
 
               <!-- Feature checks -->
               <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[12px] text-fg-muted">
-                <span v-for="key in ['featureCSV', 'featureUsers', 'featureNoCharge']" :key="key"
-                  class="inline-flex items-center gap-1.5">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1f6b54" stroke-width="2.2"
-                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <span
+                  v-for="key in ['featureCSV', 'featureUsers', 'featureNoCharge']"
+                  :key="key"
+                  class="inline-flex items-center gap-1.5"
+                >
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#1f6b54"
+                    stroke-width="2.2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
                     <path d="M5 12l5 5L20 7" />
                   </svg>
                   {{ t(`auth.signup.${key}`) }}
                 </span>
               </div>
-
             </div>
           </Form>
 
@@ -234,12 +262,11 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
             <a
               href="/login"
               class="font-semibold text-[#e2674f] no-underline"
-              style="border-bottom: 1px solid rgba(226,103,79,0.3); padding-bottom:1px"
+              style="border-bottom: 1px solid rgba(226, 103, 79, 0.3); padding-bottom: 1px"
             >
               {{ t('auth.signup.signIn') }} →
             </a>
           </p>
-
         </div>
       </div>
     </div>

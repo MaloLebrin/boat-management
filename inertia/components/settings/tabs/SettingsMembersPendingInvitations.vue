@@ -4,7 +4,7 @@ import BaseCard from '~/components/base/BaseCard.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 import type { OrganizationInvitationData } from '../../../../shared/types/organization'
 
 defineProps<{
@@ -36,16 +36,24 @@ function cancelInvitation(id: number) {
       <table class="w-full">
         <thead>
           <tr class="border-b border-border">
-            <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-fg-muted">
+            <th
+              class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-fg-muted"
+            >
               {{ t('settings.members.columns.member') }}
             </th>
-            <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-fg-muted">
+            <th
+              class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-fg-muted"
+            >
               {{ t('settings.members.columns.role') }}
             </th>
-            <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-fg-muted">
+            <th
+              class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-fg-muted"
+            >
               {{ t('settings.members.columns.expires') }}
             </th>
-            <th class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-fg-muted">
+            <th
+              class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-fg-muted"
+            >
               {{ t('settings.members.columns.actions') }}
             </th>
           </tr>
@@ -58,12 +66,16 @@ function cancelInvitation(id: number) {
           >
             <td class="px-6 py-4">
               <div class="flex items-center gap-3">
-                <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-fg-muted/20 text-sm font-medium text-fg-muted">
+                <div
+                  class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-fg-muted/20 text-sm font-medium text-fg-muted"
+                >
                   {{ invitation.email.charAt(0).toUpperCase() }}
                 </div>
                 <div class="min-w-0">
                   <p class="truncate text-sm font-medium text-fg">{{ invitation.email }}</p>
-                  <p class="truncate text-xs text-fg-muted">{{ t('settings.members.statuses.pending') }}</p>
+                  <p class="truncate text-xs text-fg-muted">
+                    {{ t('settings.members.statuses.pending') }}
+                  </p>
                 </div>
               </div>
             </td>
@@ -76,11 +88,7 @@ function cancelInvitation(id: number) {
               <span class="text-sm text-fg-muted">{{ formatDate(invitation.expiresAt) }}</span>
             </td>
             <td class="px-6 py-4 text-right">
-              <BaseButton
-                variant="danger"
-                size="sm"
-                @click="cancelInvitation(invitation.id)"
-              >
+              <BaseButton variant="danger" size="sm" @click="cancelInvitation(invitation.id)">
                 {{ t('settings.members.cancelInvitation') }}
               </BaseButton>
             </td>

@@ -18,7 +18,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  mousedown: [e: MouseEvent]
+  'mousedown': [e: MouseEvent]
   'spot-click': [info: { spotId: number; boat: { id: number; name: string } | null }]
   'pier-click': []
 }>()
@@ -82,7 +82,15 @@ function handleSpotClick(spot: SpotRow) {
           :stroke="getSpotStroke(spot)"
           stroke-width="1.5"
         />
-        <rect x="4" y="4" width="36" height="14" rx="3" fill="rgba(255,255,255,0.2)" pointer-events="none" />
+        <rect
+          x="4"
+          y="4"
+          width="36"
+          height="14"
+          rx="3"
+          fill="rgba(255,255,255,0.2)"
+          pointer-events="none"
+        />
         <text
           :x="SLOT_W / 2"
           y="14"
@@ -94,13 +102,7 @@ function handleSpotClick(spot: SpotRow) {
         >
           {{ spot.name }}
         </text>
-        <text
-          :x="SLOT_W / 2"
-          y="42"
-          text-anchor="middle"
-          font-size="20"
-          pointer-events="none"
-        >
+        <text :x="SLOT_W / 2" y="42" text-anchor="middle" font-size="20" pointer-events="none">
           ⛵
         </text>
         <text
@@ -140,10 +142,7 @@ function handleSpotClick(spot: SpotRow) {
     </g>
 
     <!-- Empty slot placeholder (if no spots) -->
-    <g
-      v-if="visibleSpots.length === 0"
-      :transform="`translate(${SLOT_GAP}, ${PIER_H + 5})`"
-    >
+    <g v-if="visibleSpots.length === 0" :transform="`translate(${SLOT_GAP}, ${PIER_H + 5})`">
       <rect
         :width="SLOT_W"
         :height="SLOT_H"

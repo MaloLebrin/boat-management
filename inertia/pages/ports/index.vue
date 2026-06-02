@@ -4,7 +4,7 @@ import { MapPinIcon, PlusIcon } from '@heroicons/vue/24/outline'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 import type { PortListItem } from '~/types/port'
 
 defineProps<{
@@ -47,12 +47,7 @@ const { t } = useT()
 
     <!-- Ports grid -->
     <div v-else class="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      <Link
-        v-for="port in ports"
-        :key="port.id"
-        :href="`/ports/${port.id}`"
-        class="group"
-      >
+      <Link v-for="port in ports" :key="port.id" :href="`/ports/${port.id}`" class="group">
         <BaseCard padded class="h-full transition-shadow hover:shadow-md">
           <div class="flex items-start justify-between">
             <div class="flex-1">

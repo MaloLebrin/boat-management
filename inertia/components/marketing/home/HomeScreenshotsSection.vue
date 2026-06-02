@@ -8,7 +8,7 @@ import {
 } from '@heroicons/vue/24/outline'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
-import { useScrollReveal } from '~/composables/useScrollReveal'
+import { useScrollReveal } from '~/composables/use_scroll_reveal'
 
 defineProps<{
   screenshots: {
@@ -26,7 +26,7 @@ const tabIcons = [ComputerDesktopIcon, DocumentTextIcon, ClipboardDocumentCheckI
 
 <template>
   <section
-    :ref="(el) => sectionEl = el as HTMLElement"
+    :ref="(el) => (sectionEl = el as HTMLElement)"
     class="reveal bg-paper rounded-2xl py-14 px-8"
     :class="{ visible: sectionVisible }"
   >
@@ -43,7 +43,11 @@ const tabIcons = [ComputerDesktopIcon, DocumentTextIcon, ClipboardDocumentCheckI
         :key="item.label"
         type="button"
         class="flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200"
-        :class="activeTab === idx ? 'bg-navy-900 text-white scale-100' : 'bg-bone text-fg-muted hover:bg-bone/80 hover:scale-105'"
+        :class="
+          activeTab === idx
+            ? 'bg-navy-900 text-white scale-100'
+            : 'bg-bone text-fg-muted hover:bg-bone/80 hover:scale-105'
+        "
         @click="activeTab = idx"
       >
         <component :is="tabIcons[idx]" class="h-4 w-4" />
@@ -53,15 +57,13 @@ const tabIcons = [ComputerDesktopIcon, DocumentTextIcon, ClipboardDocumentCheckI
 
     <!-- Tab content -->
     <div class="mt-6">
-      <div
-        v-for="(item, idx) in screenshots.items"
-        v-show="activeTab === idx"
-        :key="item.label"
-      >
+      <div v-for="(item, idx) in screenshots.items" v-show="activeTab === idx" :key="item.label">
         <p class="text-center text-fg-muted mb-6">{{ item.description }}</p>
 
         <!-- Placeholder visuel -->
-        <div class="bg-navy-900/5 rounded-xl h-64 flex flex-col items-center justify-center text-fg-subtle text-sm border border-bone transition-all duration-300">
+        <div
+          class="bg-navy-900/5 rounded-xl h-64 flex flex-col items-center justify-center text-fg-subtle text-sm border border-bone transition-all duration-300"
+        >
           <component :is="tabIcons[idx]" class="h-12 w-12 text-fg-subtle mb-2" />
           {{ item.label }}
         </div>

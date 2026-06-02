@@ -12,6 +12,7 @@ Tu es expert en tests automatisés sur la stack AdonisJS + Vue/React.
 ## Backend — Japa (AdonisJS)
 
 ### Structure des tests
+
 ```
 tests/
   unit/           # Tests unitaires (Services, helpers)
@@ -19,6 +20,7 @@ tests/
 ```
 
 ### Test fonctionnel type
+
 ```typescript
 import { test } from '@japa/runner'
 import testUtils from '@adonisjs/core/services/test_utils'
@@ -29,9 +31,7 @@ test.group('Users API', (group) => {
   group.each.setup(() => testUtils.db().withGlobalTransaction())
 
   test('POST /users crée un utilisateur', async ({ client, assert }) => {
-    const admin = await UserFactory.with('role', 1, (r) => 
-      r.merge({ name: 'admin' })
-    ).create()
+    const admin = await UserFactory.with('role', 1, (r) => r.merge({ name: 'admin' })).create()
 
     const response = await client
       .post('/users')
@@ -44,9 +44,7 @@ test.group('Users API', (group) => {
   })
 
   test('POST /users échoue sans auth', async ({ client }) => {
-    const response = await client
-      .post('/users')
-      .json({ name: 'John', email: 'john@example.com' })
+    const response = await client.post('/users').json({ name: 'John', email: 'john@example.com' })
 
     response.assertStatus(401)
   })
@@ -54,12 +52,13 @@ test.group('Users API', (group) => {
 ```
 
 ### Unit test type (Service)
+
 ```typescript
 import { test } from '@japa/runner'
 import UserService from '#services/user_service'
 
 test.group('UserService', () => {
-  test('sanitize transforme l\'email en lowercase', ({ assert }) => {
+  test("sanitize transforme l'email en lowercase", ({ assert }) => {
     const result = UserService.sanitizeEmail('  TEST@EXAMPLE.COM  ')
     assert.equal(result, 'test@example.com')
   })
@@ -67,6 +66,7 @@ test.group('UserService', () => {
 ```
 
 ### Factories — toujours les utiliser
+
 ```typescript
 // database/factories/user_factory.ts
 import factory from '@adonisjs/lucid/factories'
@@ -84,6 +84,7 @@ export const UserFactory = factory
 ## Frontend — Vitest + Testing Library
 
 ### Vue 3 — composant test
+
 ```typescript
 import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
@@ -91,16 +92,16 @@ import { render, screen, fireEvent } from '@testing-library/vue'
 import UserCard from '@/components/UserCard.vue'
 
 describe('UserCard', () => {
-  it('affiche le nom de l\'utilisateur', () => {
+  it("affiche le nom de l'utilisateur", () => {
     render(UserCard, {
-      props: { user: { id: 1, name: 'Alice', email: 'alice@test.com' } }
+      props: { user: { id: 1, name: 'Alice', email: 'alice@test.com' } },
     })
     expect(screen.getByText('Alice')).toBeInTheDocument()
   })
 
-  it('émet l\'event deleted au clic', async () => {
+  it("émet l'event deleted au clic", async () => {
     const { emitted } = mount(UserCard, {
-      props: { user: { id: 1, name: 'Alice' } }
+      props: { user: { id: 1, name: 'Alice' } },
     })
     await fireEvent.click(screen.getByRole('button', { name: /supprimer/i }))
     expect(emitted().deleted).toBeTruthy()
@@ -109,16 +110,17 @@ describe('UserCard', () => {
 ```
 
 ### Composable test (Vue)
+
 ```typescript
 import { describe, it, expect, vi } from 'vitest'
 import { renderHook, waitFor } from '@testing-library/vue'
 
 describe('useUser', () => {
-  it('charge l\'utilisateur depuis l\'API', async () => {
-    vi.mocked(fetch).mockResolvedValueOnce({ 
-      json: () => ({ id: 1, name: 'Alice' }) 
+  it("charge l'utilisateur depuis l'API", async () => {
+    vi.mocked(fetch).mockResolvedValueOnce({
+      json: () => ({ id: 1, name: 'Alice' }),
     } as any)
-    
+
     const { result } = renderHook(() => useUser(1))
     await waitFor(() => expect(result.loading).toBe(false))
     expect(result.user.value?.name).toBe('Alice')
@@ -127,6 +129,7 @@ describe('useUser', () => {
 ```
 
 ## Règles de qualité
+
 - **Arrange / Act / Assert** : structurer chaque test en 3 phases
 - **Un seul assert logique** par test (plusieurs `assert` sur la même chose OK)
 - **Noms descriptifs** : `'devrait [comportement] quand [condition]'`
@@ -135,6 +138,7 @@ describe('useUser', () => {
 - Viser **80%+ de coverage** sur les Services et Controllers
 
 ## Commandes
+
 ```bash
 # Backend
 node ace test                    # tous les tests

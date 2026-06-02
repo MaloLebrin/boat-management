@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { BoatShowDetail } from '~/types/boat_show'
 import BaseCard from '~/components/base/BaseCard.vue'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 
 defineProps<{
   boat: BoatShowDetail

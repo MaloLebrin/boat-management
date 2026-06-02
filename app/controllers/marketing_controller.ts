@@ -587,9 +587,21 @@ export default class MarketingController {
           expandAll: t('table_expand_all'),
           collapseAll: t('table_collapse_all'),
           planHeaders: [
-            { name: t('table_plan_starter'), price: t('table_plan_starter_price'), cta: t('table_plan_starter_cta') },
-            { name: t('table_plan_pro'), price: t('table_plan_pro_price'), cta: t('table_plan_pro_cta') },
-            { name: t('table_plan_enterprise'), price: t('table_plan_enterprise_price'), cta: t('table_plan_enterprise_cta') },
+            {
+              name: t('table_plan_starter'),
+              price: t('table_plan_starter_price'),
+              cta: t('table_plan_starter_cta'),
+            },
+            {
+              name: t('table_plan_pro'),
+              price: t('table_plan_pro_price'),
+              cta: t('table_plan_pro_cta'),
+            },
+            {
+              name: t('table_plan_enterprise'),
+              price: t('table_plan_enterprise_price'),
+              cta: t('table_plan_enterprise_cta'),
+            },
           ],
           groups: [
             {
@@ -782,10 +794,30 @@ export default class MarketingController {
           title: t('values_title'),
           titleHighlight: t('values_title_highlight'),
           items: [
-            { n: t('values_1_n'), title: t('values_1_title'), desc: t('values_1_desc'), extra: t('values_1_extra') },
-            { n: t('values_2_n'), title: t('values_2_title'), desc: t('values_2_desc'), extra: t('values_2_extra') },
-            { n: t('values_3_n'), title: t('values_3_title'), desc: t('values_3_desc'), extra: t('values_3_extra') },
-            { n: t('values_4_n'), title: t('values_4_title'), desc: t('values_4_desc'), extra: t('values_4_extra') },
+            {
+              n: t('values_1_n'),
+              title: t('values_1_title'),
+              desc: t('values_1_desc'),
+              extra: t('values_1_extra'),
+            },
+            {
+              n: t('values_2_n'),
+              title: t('values_2_title'),
+              desc: t('values_2_desc'),
+              extra: t('values_2_extra'),
+            },
+            {
+              n: t('values_3_n'),
+              title: t('values_3_title'),
+              desc: t('values_3_desc'),
+              extra: t('values_3_extra'),
+            },
+            {
+              n: t('values_4_n'),
+              title: t('values_4_title'),
+              desc: t('values_4_desc'),
+              extra: t('values_4_extra'),
+            },
           ],
         },
         team: {
@@ -794,14 +826,32 @@ export default class MarketingController {
           titleHighlight: t('team_title_highlight'),
           subtitle: t('team_subtitle'),
           members: [
-            { n: t('team_m1_n'), r: t('team_m1_r'), b: t('team_m1_b'), emoji: '⛵', color: 'coral' },
+            {
+              n: t('team_m1_n'),
+              r: t('team_m1_r'),
+              b: t('team_m1_b'),
+              emoji: '⛵',
+              color: 'coral',
+            },
             { n: t('team_m2_n'), r: t('team_m2_r'), b: t('team_m2_b'), emoji: '💻', color: 'navy' },
             { n: t('team_m3_n'), r: t('team_m3_r'), b: t('team_m3_b'), emoji: '✏️', color: 'mint' },
             { n: t('team_m4_n'), r: t('team_m4_r'), b: t('team_m4_b'), emoji: '⚡', color: 'navy' },
-            { n: t('team_m5_n'), r: t('team_m5_r'), b: t('team_m5_b'), emoji: '🔧', color: 'coral' },
+            {
+              n: t('team_m5_n'),
+              r: t('team_m5_r'),
+              b: t('team_m5_b'),
+              emoji: '🔧',
+              color: 'coral',
+            },
             { n: t('team_m6_n'), r: t('team_m6_r'), b: t('team_m6_b'), emoji: '📱', color: 'mint' },
             { n: t('team_m7_n'), r: t('team_m7_r'), b: t('team_m7_b'), emoji: '🤖', color: 'navy' },
-            { n: t('team_m8_n'), r: t('team_m8_r'), b: t('team_m8_b'), emoji: '🎨', color: 'coral' },
+            {
+              n: t('team_m8_n'),
+              r: t('team_m8_r'),
+              b: t('team_m8_b'),
+              emoji: '🎨',
+              color: 'coral',
+            },
           ],
           hiringTitle: t('team_hiring_title'),
           hiringSubtitle: t('team_hiring_subtitle'),
@@ -818,7 +868,13 @@ export default class MarketingController {
             { value: t('numbers_stat4_value'), label: t('numbers_stat4_label') },
           ],
           investorsLabel: t('numbers_investors_label'),
-          investors: [t('numbers_inv1'), t('numbers_inv2'), t('numbers_inv3'), t('numbers_inv4'), t('numbers_inv5')],
+          investors: [
+            t('numbers_inv1'),
+            t('numbers_inv2'),
+            t('numbers_inv3'),
+            t('numbers_inv4'),
+            t('numbers_inv5'),
+          ],
         },
         timeline: {
           eyebrow: t('timeline_eyebrow'),
@@ -826,14 +882,44 @@ export default class MarketingController {
           titleHighlight: t('timeline_title_highlight'),
           subtitle: t('timeline_subtitle'),
           items: [
-            { d: t('timeline_i1_d'), t: t('timeline_i1_t'), sub: t('timeline_i1_sub'), tone: 'coral' },
-            { d: t('timeline_i2_d'), t: t('timeline_i2_t'), sub: t('timeline_i2_sub'), tone: 'mint' },
-            { d: t('timeline_i3_d'), t: t('timeline_i3_t'), sub: t('timeline_i3_sub'), tone: 'coral' },
-            { d: t('timeline_i4_d'), t: t('timeline_i4_t'), sub: t('timeline_i4_sub'), tone: 'mint' },
-            { d: t('timeline_i5_d'), t: t('timeline_i5_t'), sub: t('timeline_i5_sub'), tone: 'mint' },
+            {
+              d: t('timeline_i1_d'),
+              t: t('timeline_i1_t'),
+              sub: t('timeline_i1_sub'),
+              tone: 'coral',
+            },
+            {
+              d: t('timeline_i2_d'),
+              t: t('timeline_i2_t'),
+              sub: t('timeline_i2_sub'),
+              tone: 'mint',
+            },
+            {
+              d: t('timeline_i3_d'),
+              t: t('timeline_i3_t'),
+              sub: t('timeline_i3_sub'),
+              tone: 'coral',
+            },
+            {
+              d: t('timeline_i4_d'),
+              t: t('timeline_i4_t'),
+              sub: t('timeline_i4_sub'),
+              tone: 'mint',
+            },
+            {
+              d: t('timeline_i5_d'),
+              t: t('timeline_i5_t'),
+              sub: t('timeline_i5_sub'),
+              tone: 'mint',
+            },
             { d: t('timeline_i6_d'), t: t('timeline_i6_t'), sub: t('timeline_i6_sub'), tone: '' },
             { d: t('timeline_i7_d'), t: t('timeline_i7_t'), sub: t('timeline_i7_sub'), tone: '' },
-            { d: t('timeline_i8_d'), t: t('timeline_i8_t'), sub: t('timeline_i8_sub'), tone: 'coral' },
+            {
+              d: t('timeline_i8_d'),
+              t: t('timeline_i8_t'),
+              sub: t('timeline_i8_sub'),
+              tone: 'coral',
+            },
           ],
         },
         office: {
@@ -843,9 +929,21 @@ export default class MarketingController {
           body: t('office_body'),
           locationLabel: t('office_location_label'),
           locations: [
-            { city: t('office_loc1_city'), addr: t('office_loc1_addr'), role: t('office_loc1_role') },
-            { city: t('office_loc2_city'), addr: t('office_loc2_addr'), role: t('office_loc2_role') },
-            { city: t('office_loc3_city'), addr: t('office_loc3_addr'), role: t('office_loc3_role') },
+            {
+              city: t('office_loc1_city'),
+              addr: t('office_loc1_addr'),
+              role: t('office_loc1_role'),
+            },
+            {
+              city: t('office_loc2_city'),
+              addr: t('office_loc2_addr'),
+              role: t('office_loc2_role'),
+            },
+            {
+              city: t('office_loc3_city'),
+              addr: t('office_loc3_addr'),
+              role: t('office_loc3_role'),
+            },
           ],
           officeCards: [
             {
@@ -895,10 +993,34 @@ export default class MarketingController {
           subtitle: t('hero_subtitle'),
         },
         channels: [
-          { icon: t('ch1_icon'), title: t('ch1_title'), desc: t('ch1_desc'), cta: t('ch1_cta'), tone: 'navy' },
-          { icon: t('ch2_icon'), title: t('ch2_title'), desc: t('ch2_desc'), cta: t('ch2_cta'), tone: 'coral' },
-          { icon: t('ch3_icon'), title: t('ch3_title'), desc: t('ch3_desc'), cta: t('ch3_cta'), tone: '' },
-          { icon: t('ch4_icon'), title: t('ch4_title'), desc: t('ch4_desc'), cta: t('ch4_cta'), tone: '' },
+          {
+            icon: t('ch1_icon'),
+            title: t('ch1_title'),
+            desc: t('ch1_desc'),
+            cta: t('ch1_cta'),
+            tone: 'navy',
+          },
+          {
+            icon: t('ch2_icon'),
+            title: t('ch2_title'),
+            desc: t('ch2_desc'),
+            cta: t('ch2_cta'),
+            tone: 'coral',
+          },
+          {
+            icon: t('ch3_icon'),
+            title: t('ch3_title'),
+            desc: t('ch3_desc'),
+            cta: t('ch3_cta'),
+            tone: '',
+          },
+          {
+            icon: t('ch4_icon'),
+            title: t('ch4_title'),
+            desc: t('ch4_desc'),
+            cta: t('ch4_cta'),
+            tone: '',
+          },
         ],
         form: {
           eyebrow: t('form_eyebrow'),

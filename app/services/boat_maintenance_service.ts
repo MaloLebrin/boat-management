@@ -261,16 +261,23 @@ export default class BoatMaintenanceService {
    */
   async getHistoryForOrg(user: User) {
     if (!user.organizationId) {
-      return { events: [], stats: { totalEvents: 0, totalParts: 0, totalBoats: 0, totalCost: null } }
+      return {
+        events: [],
+        stats: { totalEvents: 0, totalParts: 0, totalBoats: 0, totalCost: null },
+      }
     }
 
-    const Boat = (await import('#models/boat')).default
+    const boatModule = await import('#models/boat')
+    const Boat = boatModule.default
     const boats = await Boat.query().where('organizationId', user.organizationId)
     const boatIds = boats.map((b) => b.id)
     const boatMap = new Map(boats.map((b) => [b.id, b.name]))
 
     if (boatIds.length === 0) {
-      return { events: [], stats: { totalEvents: 0, totalParts: 0, totalBoats: 0, totalCost: null } }
+      return {
+        events: [],
+        stats: { totalEvents: 0, totalParts: 0, totalBoats: 0, totalCost: null },
+      }
     }
 
     const rawEvents = await BoatMaintenanceEvent.query()
@@ -299,7 +306,8 @@ export default class BoatMaintenanceService {
           name: p.name,
           quantity: p.quantity,
           unitPrice: p.unitPrice,
-          totalCost: p.unitPrice !== null ? Math.round(p.unitPrice * (p.quantity ?? 1) * 100) / 100 : null,
+          totalCost:
+            p.unitPrice !== null ? Math.round(p.unitPrice * (p.quantity ?? 1) * 100) / 100 : null,
           enginePartId: p.enginePartId,
         })),
       }

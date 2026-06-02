@@ -98,7 +98,6 @@ export class CloudinaryService {
     return this.upload(file, folder, 'raw', options)
   }
 
-
   private async uploadCompressedPdf(
     file: MultipartFile,
     folder: string,

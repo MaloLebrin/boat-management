@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseModal from '~/components/base/BaseModal.vue'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 
 withDefaults(
   defineProps<{

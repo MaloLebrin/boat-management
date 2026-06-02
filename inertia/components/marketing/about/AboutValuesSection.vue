@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useScrollReveal } from '~/composables/useScrollReveal'
+import { useScrollReveal } from '~/composables/use_scroll_reveal'
 
 interface ValueItem {
   n: string

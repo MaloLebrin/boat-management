@@ -16,10 +16,7 @@ export default class BoatEnginePartService {
   }
 
   async findForEngine(engineId: number, partId: number) {
-    return await BoatEnginePart.query()
-      .where('id', partId)
-      .where('boatEngineId', engineId)
-      .first()
+    return await BoatEnginePart.query().where('id', partId).where('boatEngineId', engineId).first()
   }
 
   /**

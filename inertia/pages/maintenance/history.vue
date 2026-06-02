@@ -5,7 +5,7 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseEmptyState from '~/components/base/BaseEmptyState.vue'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 
 interface HistoryEvent {
   id: number
@@ -62,9 +62,7 @@ const filteredEvents = computed(() => {
   if (search.value.trim()) {
     const query = search.value.toLowerCase()
     result = result.filter(
-      (e) =>
-        e.title.toLowerCase().includes(query) ||
-        e.boatName.toLowerCase().includes(query)
+      (e) => e.title.toLowerCase().includes(query) || e.boatName.toLowerCase().includes(query)
     )
   }
 
@@ -205,7 +203,9 @@ function getSubjectLink(event: HistoryEvent): string {
             <h2 class="text-lg font-semibold text-fg capitalize">
               {{ formatMonthHeader(yearMonth) }}
             </h2>
-            <span class="text-sm text-fg-muted">{{ t('maintenance.history.timeline.events', { count: String(monthEvents.length) }) }}</span>
+            <span class="text-sm text-fg-muted">{{
+              t('maintenance.history.timeline.events', { count: String(monthEvents.length) })
+            }}</span>
           </div>
 
           <!-- Events -->
@@ -239,17 +239,27 @@ function getSubjectLink(event: HistoryEvent): string {
                         <BaseBadge variant="neutral">{{ event.boatName }}</BaseBadge>
                       </a>
                       <a :href="getSubjectLink(event)" class="inline-flex">
-                        <BaseBadge variant="brand">{{ t(`maintenance.history.subjects.${event.subject}`) }}</BaseBadge>
+                        <BaseBadge variant="brand">{{
+                          t(`maintenance.history.subjects.${event.subject}`)
+                        }}</BaseBadge>
                       </a>
                       <span v-if="event.parts.length > 0" class="text-sm text-fg-muted">
-                        {{ t('maintenance.history.timeline.pieces', { count: String(event.parts.length) }) }}
+                        {{
+                          t('maintenance.history.timeline.pieces', {
+                            count: String(event.parts.length),
+                          })
+                        }}
                       </span>
                       <button
                         type="button"
                         class="text-sm text-brand hover:underline"
                         @click="toggleExpand(event.id)"
                       >
-                        {{ isExpanded(event.id) ? t('maintenance.history.timeline.hide') : t('maintenance.history.timeline.show') }}
+                        {{
+                          isExpanded(event.id)
+                            ? t('maintenance.history.timeline.hide')
+                            : t('maintenance.history.timeline.show')
+                        }}
                       </button>
                     </div>
                   </div>
@@ -262,7 +272,9 @@ function getSubjectLink(event: HistoryEvent): string {
                     </div>
 
                     <div v-if="event.parts.length > 0">
-                      <p class="text-sm font-medium text-fg-muted mb-2">{{ t('maintenance.history.timeline.partsUsed') }}</p>
+                      <p class="text-sm font-medium text-fg-muted mb-2">
+                        {{ t('maintenance.history.timeline.partsUsed') }}
+                      </p>
                       <ul class="space-y-1">
                         <li
                           v-for="part in event.parts"
@@ -278,7 +290,10 @@ function getSubjectLink(event: HistoryEvent): string {
                       </ul>
                     </div>
 
-                    <div v-if="!event.notes && event.parts.length === 0" class="text-sm text-fg-muted">
+                    <div
+                      v-if="!event.notes && event.parts.length === 0"
+                      class="text-sm text-fg-muted"
+                    >
                       {{ t('maintenance.history.timeline.noDetails') }}
                     </div>
                   </div>

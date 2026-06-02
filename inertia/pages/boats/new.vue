@@ -4,7 +4,7 @@ import { computed, ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import BoatFormHullFields from '~/components/boats/hull/BoatFormHullFields.vue'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 import type { PortForForm, PropulsionTypeUi } from '~/types/boat_form'
 
 const { t } = useT()
@@ -26,12 +26,22 @@ defineProps<{
     <div class="mt-8">
       <Form :action="{ url: '/boats', method: 'post' }" #default="{ processing, errors }">
         <div class="space-y-6">
-          <BoatFormHullFields v-model:propulsion-type="propulsionType" mode="create" :show-mast-height="showSailFields"
-            :errors="errors" :ports="ports" />
+          <BoatFormHullFields
+            v-model:propulsion-type="propulsionType"
+            mode="create"
+            :show-mast-height="showSailFields"
+            :errors="errors"
+            :ports="ports"
+          />
 
           <div class="flex items-center gap-3">
-            <BaseButton type="submit" :disabled="processing">{{ t('boats.new.submit') }}</BaseButton>
-            <a href="/boats" class="text-sm font-semibold text-fg-muted hover:text-fg hover:underline">
+            <BaseButton type="submit" :disabled="processing">{{
+              t('boats.new.submit')
+            }}</BaseButton>
+            <a
+              href="/boats"
+              class="text-sm font-semibold text-fg-muted hover:text-fg hover:underline"
+            >
               {{ t('boats.new.cancel') }}
             </a>
           </div>

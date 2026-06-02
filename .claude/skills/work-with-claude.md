@@ -21,6 +21,7 @@ A disciplined research -> plan -> annotate -> implement pipeline.
 Ask Claude to deeply read the relevant part of the codebase and write findings to `research.md`.
 
 **Key language to use:**
+
 - "deeply", "in great details", "intricacies" -- signals that surface-level reading is not acceptable
 - Always require a written artifact (`research.md`), never just a chat summary
 
@@ -51,6 +52,7 @@ understood the system before planning. Wrong research -> wrong plan -> wrong imp
 Once research is validated, ask for a detailed implementation plan in `plan.md`.
 
 **The plan must include:**
+
 - Explanation of the approach
 - Code snippets showing actual changes
 - File paths that will be modified
@@ -86,6 +88,7 @@ This is where you add the most value. Open `plan.md` in your editor and add inli
 directly into the document.
 
 **Types of annotations:**
+
 - Domain knowledge Claude doesn't have: "use drizzle:generate for migrations, not raw SQL"
 - Correcting wrong assumptions: "no -- this should be a PATCH, not a PUT"
 - Rejecting an approach: "remove this section, we don't need caching here"
@@ -132,6 +135,7 @@ sure you're not introducing new issues.
 ```
 
 **What each part does:**
+
 - "implement it all" -- do everything in the plan, don't cherry-pick
 - "mark it as completed" -- plan is the source of truth for progress
 - "do not stop" -- no mid-flow confirmation pauses

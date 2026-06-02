@@ -6,7 +6,7 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseModal from '~/components/base/BaseModal.vue'
 import BoatSafetyEquipmentFields from './BoatSafetyEquipmentFields.vue'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 import type { BoatShowSafetyEquipment } from '~/types/boat_show'
 
 defineProps<{

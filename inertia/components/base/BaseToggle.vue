@@ -21,7 +21,9 @@ defineEmits<{
 
 <template>
   <BaseField :label="label" :hint="hint" :error="error" :html-for="id">
-    <label class="flex items-center justify-between gap-4 rounded-(--radius-control) border border-border bg-surface-elevated px-3 py-2 shadow-(--shadow-xs)">
+    <label
+      class="flex items-center justify-between gap-4 rounded-(--radius-control) border border-border bg-surface-elevated px-3 py-2 shadow-(--shadow-xs)"
+    >
       <span class="text-sm text-fg-muted">
         <slot />
       </span>
@@ -39,12 +41,7 @@ defineEmits<{
           :class="modelValue ? 'translate-x-5' : 'translate-x-0'"
         />
       </button>
-      <input
-        :id="id"
-        :name="name"
-        type="hidden"
-        :value="modelValue ? 'true' : 'false'"
-      />
+      <input :id="id" :name="name" type="hidden" :value="modelValue ? 'true' : 'false'" />
     </label>
   </BaseField>
 </template>

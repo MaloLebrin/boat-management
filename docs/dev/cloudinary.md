@@ -18,10 +18,10 @@ CLOUDINARY_API_SECRET=
 
 ### Fichiers
 
-| Fichier | Rôle |
-|---|---|
-| `config/cloudinary.ts` | Configure le SDK Cloudinary v2 et exporte l'instance |
-| `app/services/cloudinary_service.ts` | Service bas niveau : upload, delete, dossiers |
+| Fichier                              | Rôle                                                 |
+| ------------------------------------ | ---------------------------------------------------- |
+| `config/cloudinary.ts`               | Configure le SDK Cloudinary v2 et exporte l'instance |
+| `app/services/cloudinary_service.ts` | Service bas niveau : upload, delete, dossiers        |
 
 ---
 
@@ -66,20 +66,20 @@ Migration : `database/migrations/1776763000000_create_media_table.ts`
 
 Colonnes principales :
 
-| Colonne | Type | Description |
-|---|---|---|
-| `entity_type` | string | Type d'entité : `boat`, `boat_engine`, `boat_sail`, `boat_rig`, `boat_maintenance_event`, `user` |
-| `entity_id` | int | ID de l'entité |
-| `kind` | string | `photo` ou `document` |
-| `cloudinary_public_id` | string | Public ID Cloudinary (nécessaire pour la suppression) |
-| `secure_url` | string | URL HTTPS du fichier |
-| `original_filename` | string | Nom de fichier d'origine |
-| `format` | string | Extension (`jpg`, `pdf`…) |
-| `bytes` | int | Taille en octets |
-| `width` / `height` | int\|null | Dimensions (images uniquement) |
-| `position` | int | Ordre d'affichage (défaut 0) |
-| `caption` | string\|null | Légende facultative |
-| `uploaded_by_id` | FK → users | Auteur de l'upload (SET NULL à la suppression) |
+| Colonne                | Type         | Description                                                                                      |
+| ---------------------- | ------------ | ------------------------------------------------------------------------------------------------ |
+| `entity_type`          | string       | Type d'entité : `boat`, `boat_engine`, `boat_sail`, `boat_rig`, `boat_maintenance_event`, `user` |
+| `entity_id`            | int          | ID de l'entité                                                                                   |
+| `kind`                 | string       | `photo` ou `document`                                                                            |
+| `cloudinary_public_id` | string       | Public ID Cloudinary (nécessaire pour la suppression)                                            |
+| `secure_url`           | string       | URL HTTPS du fichier                                                                             |
+| `original_filename`    | string       | Nom de fichier d'origine                                                                         |
+| `format`               | string       | Extension (`jpg`, `pdf`…)                                                                        |
+| `bytes`                | int          | Taille en octets                                                                                 |
+| `width` / `height`     | int\|null    | Dimensions (images uniquement)                                                                   |
+| `position`             | int          | Ordre d'affichage (défaut 0)                                                                     |
+| `caption`              | string\|null | Légende facultative                                                                              |
+| `uploaded_by_id`       | FK → users   | Auteur de l'upload (SET NULL à la suppression)                                                   |
 
 Index : `(entity_type, entity_id)`.
 
@@ -122,18 +122,18 @@ await mediaService.replaceAvatar(user, file, CloudinaryFolders.userAvatar(org.sl
 
 Définis dans `start/routes/boats.ts`, gérés par `app/controllers/boat_media_controller.ts`.
 
-| Méthode | URL | Action | Auth |
-|---|---|---|---|
-| `POST` | `/boats/:boatId/photos` | Upload photo | `canManageEquipment` |
-| `POST` | `/boats/:boatId/documents` | Upload document | `canManageEquipment` |
+| Méthode  | URL                             | Action             | Auth                 |
+| -------- | ------------------------------- | ------------------ | -------------------- |
+| `POST`   | `/boats/:boatId/photos`         | Upload photo       | `canManageEquipment` |
+| `POST`   | `/boats/:boatId/documents`      | Upload document    | `canManageEquipment` |
 | `DELETE` | `/boats/:boatId/media/:mediaId` | Supprimer un média | `canManageEquipment` |
 
 ### Limites de fichiers (validators dans `app/validators/media.ts`)
 
-| Type | Taille max | Formats acceptés |
-|---|---|---|
-| Photo | 10 Mo | jpg, jpeg, png, heic, webp, gif |
-| Document | 20 Mo | pdf, csv, xlsx, docx, doc |
+| Type     | Taille max | Formats acceptés                |
+| -------- | ---------- | ------------------------------- |
+| Photo    | 10 Mo      | jpg, jpeg, png, heic, webp, gif |
+| Document | 20 Mo      | pdf, csv, xlsx, docx, doc       |
 
 ---
 
@@ -141,11 +141,11 @@ Définis dans `start/routes/boats.ts`, gérés par `app/controllers/boat_media_c
 
 ### Composants
 
-| Composant | Usage |
-|---|---|
-| `components/boats/show/BoatPhotoGallery.vue` | Grille de photos avec upload instantané |
-| `components/boats/show/tabs/BoatShowTabDocuments.vue` | Liste des documents avec téléchargement et suppression |
-| `components/boats/show/modals/BoatDocumentAddModal.vue` | Modale d'ajout de document (drag-and-drop) |
+| Composant                                               | Usage                                                  |
+| ------------------------------------------------------- | ------------------------------------------------------ |
+| `components/boats/show/BoatPhotoGallery.vue`            | Grille de photos avec upload instantané                |
+| `components/boats/show/tabs/BoatShowTabDocuments.vue`   | Liste des documents avec téléchargement et suppression |
+| `components/boats/show/modals/BoatDocumentAddModal.vue` | Modale d'ajout de document (drag-and-drop)             |
 
 ### Upload de fichiers
 

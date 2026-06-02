@@ -5,7 +5,7 @@ import BaseCard from '~/components/base/BaseCard.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 import type { OrgRole } from '../../../../shared/types/organization'
 
 const emit = defineEmits<{
@@ -59,18 +59,10 @@ function submitInvite() {
         />
       </div>
       <div class="flex gap-2">
-        <BaseButton
-          type="submit"
-          variant="primary"
-          :disabled="form.processing"
-        >
+        <BaseButton type="submit" variant="primary" :disabled="form.processing">
           {{ t('settings.members.inviteForm.submit') }}
         </BaseButton>
-        <BaseButton
-          type="button"
-          variant="secondary"
-          @click="emit('close')"
-        >
+        <BaseButton type="button" variant="secondary" @click="emit('close')">
           {{ t('settings.members.inviteForm.cancel') }}
         </BaseButton>
       </div>

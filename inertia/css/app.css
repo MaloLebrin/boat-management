@@ -1,24 +1,24 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 /* @import "@fontsource/instrument-serif/400.css";
 @import "@fontsource/instrument-serif/400-italic.css"; */
-@import "@fontsource/sora/400.css";
-@import "@fontsource/sora/600.css";
-@import "@fontsource/sora/700.css";
-@import "@fontsource/source-sans-3/400.css";
-@import "@fontsource/source-sans-3/600.css";
+@import '@fontsource/sora/400.css';
+@import '@fontsource/sora/600.css';
+@import '@fontsource/sora/700.css';
+@import '@fontsource/source-sans-3/400.css';
+@import '@fontsource/source-sans-3/600.css';
 
 @theme {
   /* ============================================================
      NAVY — couleur principale brand (profondeurs marines)
      ============================================================ */
-  --color-navy-900: #0b1d2e;   /* hull — sidebar, backgrounds profonds */
+  --color-navy-900: #0b1d2e; /* hull — sidebar, backgrounds profonds */
   --color-navy-800: #102a40;
-  --color-navy-700: #1a3a55;   /* primary interactive — boutons, accents */
+  --color-navy-700: #1a3a55; /* primary interactive — boutons, accents */
   --color-navy-600: #2a527a;
-  --color-navy-500: #3d6f9c;   /* accent clair */
+  --color-navy-500: #3d6f9c; /* accent clair */
   --color-navy-100: #dde7f0;
-  --color-navy-50:  #eef3f8;
+  --color-navy-50: #eef3f8;
 
   /* Alias abyss → navy (rétrocompatibilité composants existants) */
   --color-abyss-950: #0b1d2e;
@@ -31,39 +31,39 @@
   --color-abyss-300: #b8c6d9;
   --color-abyss-200: #dde7f0;
   --color-abyss-100: #eef3f8;
-  --color-abyss-50:  #f8fafb;
+  --color-abyss-50: #f8fafb;
 
   /* ============================================================
      NEUTRALS CHAUDS — canvas, surfaces (inspiration Clay)
      ============================================================ */
-  --color-cream:  #faf6ee;   /* canvas — fond principal pages publiques */
-  --color-paper:  #f4ede0;   /* sunken surface / footer */
-  --color-bone:   #ebe2d0;   /* borders, dividers */
-  --color-sand:   #d6c9ad;   /* border-strong */
+  --color-cream: #faf6ee; /* canvas — fond principal pages publiques */
+  --color-paper: #f4ede0; /* sunken surface / footer */
+  --color-bone: #ebe2d0; /* borders, dividers */
+  --color-sand: #d6c9ad; /* border-strong */
 
   /* Legacy lilac / peach / mint / sky / foam — gardés pour rétrocompatibilité */
-  --color-lilac-50:  #f7f5ff;
+  --color-lilac-50: #f7f5ff;
   --color-lilac-100: #ede9fe;
   --color-lilac-200: #ddd6fe;
   --color-lilac-300: #c4b5fd;
   --color-lilac-700: #6d28d9;
   --color-lilac-800: #5b21b6;
 
-  --color-peach-50:  #fff8f3;
+  --color-peach-50: #fff8f3;
   --color-peach-100: #ffedd5;
   --color-peach-200: #fed7aa;
   --color-peach-300: #fdba74;
   --color-peach-700: #c2410c;
   --color-peach-800: #9a3412;
 
-  --color-sky-50:  #f0f9ff;
+  --color-sky-50: #f0f9ff;
   --color-sky-100: #e0f2fe;
   --color-sky-200: #bae6fd;
   --color-sky-300: #7dd3fc;
   --color-sky-700: #0369a1;
   --color-sky-800: #075985;
 
-  --color-foam-50:  #f0f9ff;
+  --color-foam-50: #f0f9ff;
   --color-foam-100: #e0f2fe;
   --color-foam-200: #bae6fd;
   --color-foam-300: #93d4f8;
@@ -81,7 +81,7 @@
   --color-coral-500: #e2674f;
   --color-coral-400: #ea7f6a;
   --color-coral-100: #fadcd2;
-  --color-coral-50:  #fdeee8;
+  --color-coral-50: #fdeee8;
   --color-coral-600: #d05540;
 
   /* ============================================================
@@ -92,7 +92,7 @@
   --color-mint-300: #7fbfa8;
   --color-mint-200: #cfe8de;
   --color-mint-100: #cfe8de;
-  --color-mint-50:  #e6f3ec;
+  --color-mint-50: #e6f3ec;
 
   /* ============================================================
      AMBER — bientôt dû / avertissement
@@ -100,104 +100,106 @@
   --color-amber-700: #965e0e;
   --color-amber-600: #b87b1d;
   --color-amber-100: #fbeacb;
-  --color-amber-50:  #fcf4e0;
+  --color-amber-50: #fcf4e0;
 
   /* ============================================================
      VIOLET — IA / suggestions Fleetide
      ============================================================ */
   --color-violet-700: #5a4a8a;
   --color-violet-100: #e0dcec;
-  --color-violet-50:  #efedf6;
+  --color-violet-50: #efedf6;
 
   /* ============================================================
      SÉMANTIQUE — surfaces
      ============================================================ */
-  --color-surface:          var(--color-cream);
+  --color-surface: var(--color-cream);
   --color-surface-elevated: #ffffff;
-  --color-surface-muted:    var(--color-paper);
-  --color-surface-inverse:  var(--color-navy-900);
+  --color-surface-muted: var(--color-paper);
+  --color-surface-inverse: var(--color-navy-900);
 
   /* ============================================================
      SÉMANTIQUE — texte
      ============================================================ */
-  --color-fg:        #0d1b26;
-  --color-fg-muted:  #56697d;
+  --color-fg: #0d1b26;
+  --color-fg-muted: #56697d;
   --color-fg-subtle: #8a9aab;
   --color-fg-inverse: var(--color-cream);
 
   /* ============================================================
      SÉMANTIQUE — bordures
      ============================================================ */
-  --color-border:        var(--color-bone);
+  --color-border: var(--color-bone);
   --color-border-strong: var(--color-sand);
 
   /* ============================================================
      BRAND — navy-700 comme couleur principale
      ============================================================ */
-  --color-brand:       var(--color-navy-700);
+  --color-brand: var(--color-navy-700);
   --color-brand-hover: var(--color-navy-800);
-  --color-brand-soft:  var(--color-navy-100);
+  --color-brand-soft: var(--color-navy-100);
 
   /* Accent secondaire pour les zones de danger */
-  --color-accent:       var(--color-coral-500);
+  --color-accent: var(--color-coral-500);
   --color-accent-hover: var(--color-coral-700);
 
   /* ============================================================
      STATUTS SÉMANTIQUES
      ============================================================ */
-  --color-danger:      var(--color-coral-500);
+  --color-danger: var(--color-coral-500);
   --color-danger-soft: var(--color-coral-50);
-  --color-success:     var(--color-mint-700);
-  --color-warning:     var(--color-amber-600);
-  --color-info:        var(--color-navy-500);
+  --color-success: var(--color-mint-700);
+  --color-warning: var(--color-amber-600);
+  --color-info: var(--color-navy-500);
 
   /* ============================================================
      TYPOGRAPHIE
      ============================================================ */
-  --font-display: "Instrument Serif", "Iowan Old Style", Georgia, serif;
-  --font-sans:    "Source Sans 3", "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono:    "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --font-display: 'Instrument Serif', 'Iowan Old Style', Georgia, serif;
+  --font-sans: 'Source Sans 3', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
 
   /* ============================================================
      RAYONS
      ============================================================ */
-  --radius-card:    1rem;
+  --radius-card: 1rem;
   --radius-control: 0.5rem;
 
   /* ============================================================
      MOTION
      ============================================================ */
-  --motion-fast:   150ms;
+  --motion-fast: 150ms;
   --motion-normal: 220ms;
-  --motion-slow:   320ms;
-  --ease-premium:  cubic-bezier(0.2, 0.8, 0.2, 1);
+  --motion-slow: 320ms;
+  --ease-premium: cubic-bezier(0.2, 0.8, 0.2, 1);
 
   /* ============================================================
      FOCUS RINGS
      ============================================================ */
-  --ring-focus:   0 0 0 3px rgb(26 58 85 / 0.25);
+  --ring-focus: 0 0 0 3px rgb(26 58 85 / 0.25);
   --ring-invalid: 0 0 0 3px rgb(226 103 79 / 0.28);
 
   /* ============================================================
      OMBRES (ink = navy-900)
      ============================================================ */
   --shadow-xs: 0 1px 2px rgb(11 29 46 / 0.05);
-  --shadow-sm: 0 2px 10px -4px rgb(11 29 46 / 0.10), 0 1px 3px rgb(11 29 46 / 0.05);
+  --shadow-sm: 0 2px 10px -4px rgb(11 29 46 / 0.1), 0 1px 3px rgb(11 29 46 / 0.05);
   --shadow-md: 0 10px 30px -16px rgb(11 29 46 / 0.16), 0 6px 12px -8px rgb(11 29 46 / 0.08);
   --shadow-lg: 0 24px 64px -28px rgb(11 29 46 / 0.22), 0 16px 24px -20px rgb(11 29 46 / 0.12);
 
-  --shadow-card:       0 4px 24px -4px rgb(11 29 46 / 0.07), 0 2px 8px -2px rgb(26 58 85 / 0.04);
-  --shadow-card-hover: 0 12px 40px -8px rgb(11 29 46 / 0.10), 0 4px 12px -4px rgb(26 58 85 / 0.06);
+  --shadow-card: 0 4px 24px -4px rgb(11 29 46 / 0.07), 0 2px 8px -2px rgb(26 58 85 / 0.04);
+  --shadow-card-hover: 0 12px 40px -8px rgb(11 29 46 / 0.1), 0 4px 12px -4px rgb(26 58 85 / 0.06);
 
   /* Dégradé de fond pour les pages app (intérieur) */
-  --background-image-gradient-mesh: radial-gradient(
-      ellipse 100% 70% at 95% 0%,
-      rgb(221 231 240 / 0.35),
-      transparent 55%
-    ),
-    radial-gradient(ellipse 90% 60% at 0% 100%, rgb(250 220 210 / 0.20), transparent 50%),
+  --background-image-gradient-mesh:
+    radial-gradient(ellipse 100% 70% at 95% 0%, rgb(221 231 240 / 0.35), transparent 55%),
+    radial-gradient(ellipse 90% 60% at 0% 100%, rgb(250 220 210 / 0.2), transparent 50%),
     radial-gradient(ellipse 70% 50% at 50% 50%, rgb(207 232 222 / 0.15), transparent 55%),
-    linear-gradient(165deg, var(--color-cream) 0%, var(--color-surface) 45%, var(--color-paper) 100%);
+    linear-gradient(
+      165deg,
+      var(--color-cream) 0%,
+      var(--color-surface) 45%,
+      var(--color-paper) 100%
+    );
 }
 
 html,
@@ -234,110 +236,220 @@ body {
 
 /* ── Scroll-reveal animations ─────────────────────────────────── */
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(24px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 @keyframes scaleIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to   { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 @keyframes marquee {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 /* ── App-wide motion primitives ───────────────────────────────── */
 @keyframes slideDown {
-  from { opacity: 0; transform: translateY(-8px) scale(0.97); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 @keyframes modalIn {
-  from { opacity: 0; transform: scale(0.94) translateY(12px); }
-  to   { opacity: 1; transform: scale(1) translateY(0); }
+  from {
+    opacity: 0;
+    transform: scale(0.94) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 @keyframes overlayIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 @keyframes fadeUpList {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 @keyframes slideFromLeft {
-  from { opacity: 0; transform: translateX(-100%); }
-  to   { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 /* ── Vue Transition classes ───────────────────────────────────── */
 
 /* Page transitions (Inertia navigation) */
-.page-enter-active { animation: fadeUp var(--motion-normal) var(--ease-premium) both; }
-.page-leave-active { animation: fadeIn var(--motion-fast) var(--ease-premium) reverse both; }
+.page-enter-active {
+  animation: fadeUp var(--motion-normal) var(--ease-premium) both;
+}
+.page-leave-active {
+  animation: fadeIn var(--motion-fast) var(--ease-premium) reverse both;
+}
 
 /* Modal overlay */
-.modal-overlay-enter-active { animation: overlayIn var(--motion-fast) ease both; }
-.modal-overlay-leave-active { animation: overlayIn var(--motion-fast) ease reverse both; }
+.modal-overlay-enter-active {
+  animation: overlayIn var(--motion-fast) ease both;
+}
+.modal-overlay-leave-active {
+  animation: overlayIn var(--motion-fast) ease reverse both;
+}
 
 /* Modal panel */
-.modal-panel-enter-active { animation: modalIn var(--motion-normal) var(--ease-premium) both; }
-.modal-panel-leave-active { animation: modalIn var(--motion-fast) var(--ease-premium) reverse both; }
+.modal-panel-enter-active {
+  animation: modalIn var(--motion-normal) var(--ease-premium) both;
+}
+.modal-panel-leave-active {
+  animation: modalIn var(--motion-fast) var(--ease-premium) reverse both;
+}
 
 /* Dropdown */
-.dropdown-enter-active { animation: slideDown var(--motion-fast) var(--ease-premium) both; }
-.dropdown-leave-active { animation: slideDown var(--motion-fast) var(--ease-premium) reverse both; }
+.dropdown-enter-active {
+  animation: slideDown var(--motion-fast) var(--ease-premium) both;
+}
+.dropdown-leave-active {
+  animation: slideDown var(--motion-fast) var(--ease-premium) reverse both;
+}
 
 /* Tab content crossfade */
-.tab-enter-active { animation: fadeIn var(--motion-fast) var(--ease-premium) both; }
-.tab-leave-active { animation: fadeIn var(--motion-fast) var(--ease-premium) reverse both; }
+.tab-enter-active {
+  animation: fadeIn var(--motion-fast) var(--ease-premium) both;
+}
+.tab-leave-active {
+  animation: fadeIn var(--motion-fast) var(--ease-premium) reverse both;
+}
 
 /* List items (TransitionGroup) */
 .list-enter-active {
   animation: fadeUpList var(--motion-normal) var(--ease-premium) both;
   animation-delay: calc(var(--i, 0) * 40ms);
 }
-.list-leave-active { animation: fadeUpList var(--motion-fast) var(--ease-premium) reverse both; }
-.list-move         { transition: transform var(--motion-normal) var(--ease-premium); }
+.list-leave-active {
+  animation: fadeUpList var(--motion-fast) var(--ease-premium) reverse both;
+}
+.list-move {
+  transition: transform var(--motion-normal) var(--ease-premium);
+}
 
 /* Mobile drawer */
-.drawer-overlay-enter-active { animation: overlayIn var(--motion-normal) ease both; }
-.drawer-overlay-leave-active { animation: overlayIn var(--motion-fast) ease reverse both; }
-.drawer-panel-enter-active   { animation: slideFromLeft var(--motion-normal) var(--ease-premium) both; }
-.drawer-panel-leave-active   { animation: slideFromLeft var(--motion-fast) var(--ease-premium) reverse both; }
+.drawer-overlay-enter-active {
+  animation: overlayIn var(--motion-normal) ease both;
+}
+.drawer-overlay-leave-active {
+  animation: overlayIn var(--motion-fast) ease reverse both;
+}
+.drawer-panel-enter-active {
+  animation: slideFromLeft var(--motion-normal) var(--ease-premium) both;
+}
+.drawer-panel-leave-active {
+  animation: slideFromLeft var(--motion-fast) var(--ease-premium) reverse both;
+}
 
 .reveal {
   opacity: 0;
   transform: translateY(20px);
-  transition: opacity 600ms var(--ease-premium), transform 600ms var(--ease-premium);
+  transition:
+    opacity 600ms var(--ease-premium),
+    transform 600ms var(--ease-premium);
 }
 .reveal.visible {
   opacity: 1;
   transform: translateY(0);
 }
-.reveal-delay-1 { transition-delay: 100ms; }
-.reveal-delay-2 { transition-delay: 200ms; }
-.reveal-delay-3 { transition-delay: 300ms; }
-.reveal-delay-4 { transition-delay: 300ms; }
+.reveal-delay-1 {
+  transition-delay: 100ms;
+}
+.reveal-delay-2 {
+  transition-delay: 200ms;
+}
+.reveal-delay-3 {
+  transition-delay: 300ms;
+}
+.reveal-delay-4 {
+  transition-delay: 300ms;
+}
 
 /* FAQ accordion */
-details summary { cursor: pointer; list-style: none; }
-details summary::-webkit-details-marker { display: none; }
-details[open] .accordion-chevron { transform: rotate(180deg); }
-.accordion-chevron { transition: transform 250ms var(--ease-premium); }
+details summary {
+  cursor: pointer;
+  list-style: none;
+}
+details summary::-webkit-details-marker {
+  display: none;
+}
+details[open] .accordion-chevron {
+  transform: rotate(180deg);
+}
+.accordion-chevron {
+  transition: transform 250ms var(--ease-premium);
+}
 
 /* Marquee container */
-.marquee-wrapper { overflow: hidden; }
+.marquee-wrapper {
+  overflow: hidden;
+}
 .marquee-track {
   display: flex;
   width: max-content;
   animation: marquee 28s linear infinite;
 }
-.marquee-track:hover { animation-play-state: paused; }
+.marquee-track:hover {
+  animation-play-state: paused;
+}
 
 @media (prefers-reduced-motion: reduce) {
-  .reveal, .reveal.visible { opacity: 1; transform: none; transition: none; }
-  .marquee-track { animation: none; }
+  .reveal,
+  .reveal.visible {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .marquee-track {
+    animation: none;
+  }
 }

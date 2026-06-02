@@ -6,10 +6,20 @@ import BaseInput from '~/components/base/BaseInput.vue'
 import BaseModal from '~/components/base/BaseModal.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 import type { BoatShowDetail } from '~/types/boat_show'
 
-type Subject = 'boat' | 'hull' | 'engine' | 'sail' | 'rig' | 'electrical' | 'plumbing' | 'safety' | 'deck' | 'other'
+type Subject =
+  | 'boat'
+  | 'hull'
+  | 'engine'
+  | 'sail'
+  | 'rig'
+  | 'electrical'
+  | 'plumbing'
+  | 'safety'
+  | 'deck'
+  | 'other'
 
 const props = defineProps<{
   boat: BoatShowDetail
@@ -84,47 +94,113 @@ function close() {
 </script>
 
 <template>
-  <BaseModal :open="open" :title="t('boats.maintenance.events.addEntry')"
+  <BaseModal
+    :open="open"
+    :title="t('boats.maintenance.events.addEntry')"
     :subtitle="`${boat.name} · ${t('boats.maintenance.events.subtitle') || 'Enregistrement immuable une fois sauvegardé'}`"
-    close-label="Annuler" size="xl" @update:open="close">
-    <Form :action="{ url: `/boats/${boat.id}/maintenance`, method: 'post' }" @success="close" class="space-y-4"
-      #default="{ processing, errors }">
+    close-label="Annuler"
+    size="xl"
+    @update:open="close"
+  >
+    <Form
+      :action="{ url: `/boats/${boat.id}/maintenance`, method: 'post' }"
+      @success="close"
+      class="space-y-4"
+      #default="{ processing, errors }"
+    >
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <BaseSelect id="maint-subject" name="subject" :label="t('boats.maintenance.events.subject')"
-          :options="subjectOptions" v-model="subject" :errors="errors" />
+        <BaseSelect
+          id="maint-subject"
+          name="subject"
+          :label="t('boats.maintenance.events.subject')"
+          :options="subjectOptions"
+          v-model="subject"
+          :errors="errors"
+        />
 
-        <BaseInput id="maint-performed-at" name="performedAt" :label="t('boats.maintenance.events.performedAt')"
-          type="date" required v-model="performedAt" :errors="errors" />
+        <BaseInput
+          id="maint-performed-at"
+          name="performedAt"
+          :label="t('boats.maintenance.events.performedAt')"
+          type="date"
+          required
+          v-model="performedAt"
+          :errors="errors"
+        />
       </div>
 
       <template v-if="subject === 'engine'">
-        <BaseSelect v-if="engineOptions.length" id="maint-engine" name="boatEngineId"
-          :label="t('boats.maintenance.events.engine')" :placeholder="t('boats.maintenance.events.selectPlaceholder')"
-          :allow-empty="true" :options="engineOptions" v-model="boatEngineId" :errors="errors" />
-        <BaseInput id="maint-engine-caption" name="engineCaption" :label="t('boats.maintenance.events.label')"
-          :placeholder="t('boats.maintenance.events.enginePlaceholder')" v-model="engineCaptionManual"
-          :errors="errors" />
+        <BaseSelect
+          v-if="engineOptions.length"
+          id="maint-engine"
+          name="boatEngineId"
+          :label="t('boats.maintenance.events.engine')"
+          :placeholder="t('boats.maintenance.events.selectPlaceholder')"
+          :allow-empty="true"
+          :options="engineOptions"
+          v-model="boatEngineId"
+          :errors="errors"
+        />
+        <BaseInput
+          id="maint-engine-caption"
+          name="engineCaption"
+          :label="t('boats.maintenance.events.label')"
+          :placeholder="t('boats.maintenance.events.enginePlaceholder')"
+          v-model="engineCaptionManual"
+          :errors="errors"
+        />
       </template>
 
       <template v-if="subject === 'sail'">
-        <BaseSelect v-if="sailOptions.length" id="maint-sail" name="boatSailId"
-          :label="t('boats.maintenance.events.sail')" :placeholder="t('boats.maintenance.events.selectPlaceholder')"
-          :allow-empty="true" :options="sailOptions" v-model="boatSailId" :errors="errors" />
-        <BaseInput id="maint-sail-caption" name="sailCaption" :label="t('boats.maintenance.events.label')"
-          :placeholder="t('boats.maintenance.events.sailPlaceholder')" v-model="sailCaptionManual" :errors="errors" />
+        <BaseSelect
+          v-if="sailOptions.length"
+          id="maint-sail"
+          name="boatSailId"
+          :label="t('boats.maintenance.events.sail')"
+          :placeholder="t('boats.maintenance.events.selectPlaceholder')"
+          :allow-empty="true"
+          :options="sailOptions"
+          v-model="boatSailId"
+          :errors="errors"
+        />
+        <BaseInput
+          id="maint-sail-caption"
+          name="sailCaption"
+          :label="t('boats.maintenance.events.label')"
+          :placeholder="t('boats.maintenance.events.sailPlaceholder')"
+          v-model="sailCaptionManual"
+          :errors="errors"
+        />
       </template>
 
       <template v-if="subject === 'rig'">
         <input v-if="boat.rig" type="hidden" name="boatRigId" :value="boat.rig.id" />
-        <p v-if="!boat.rig" class="text-sm text-warning">{{ t('boats.maintenance.events.noRig') }}</p>
-        <p v-if="errors.boatRigId" class="mt-1 text-xs font-medium text-danger">{{ errors.boatRigId }}</p>
+        <p v-if="!boat.rig" class="text-sm text-warning">
+          {{ t('boats.maintenance.events.noRig') }}
+        </p>
+        <p v-if="errors.boatRigId" class="mt-1 text-xs font-medium text-danger">
+          {{ errors.boatRigId }}
+        </p>
       </template>
 
-      <BaseInput id="maint-title" name="title" :label="t('boats.maintenance.events.titleField')" required
-        :placeholder="t('boats.maintenance.events.titlePlaceholder')" v-model="entryTitle" :errors="errors" />
+      <BaseInput
+        id="maint-title"
+        name="title"
+        :label="t('boats.maintenance.events.titleField')"
+        required
+        :placeholder="t('boats.maintenance.events.titlePlaceholder')"
+        v-model="entryTitle"
+        :errors="errors"
+      />
 
-      <BaseTextarea id="maint-notes" name="notes" :label="t('boats.maintenance.events.notes')" :rows="3"
-        v-model="entryNotes" :errors="errors" />
+      <BaseTextarea
+        id="maint-notes"
+        name="notes"
+        :label="t('boats.maintenance.events.notes')"
+        :rows="3"
+        v-model="entryNotes"
+        :errors="errors"
+      />
 
       <!-- Parts section -->
       <div class="rounded-(--radius-control) border border-border bg-surface-muted/40 p-4">
@@ -140,17 +216,32 @@ function close() {
         <div v-else class="mt-4 space-y-3">
           <div v-for="(p, idx) in partRows" :key="idx" class="grid gap-3 sm:grid-cols-6">
             <div class="sm:col-span-3">
-              <BaseInput :id="`part-name-${idx}`" :name="`parts[${idx}][name]`"
-                :label="t('boats.maintenance.events.partName')" v-model="p.name" />
+              <BaseInput
+                :id="`part-name-${idx}`"
+                :name="`parts[${idx}][name]`"
+                :label="t('boats.maintenance.events.partName')"
+                v-model="p.name"
+              />
             </div>
             <div class="sm:col-span-1">
-              <BaseInput :id="`part-qty-${idx}`" :name="`parts[${idx}][quantity]`"
-                :label="t('boats.maintenance.events.partQty')" inputmode="numeric" type="number" min="1" step="1"
-                v-model="p.quantity" />
+              <BaseInput
+                :id="`part-qty-${idx}`"
+                :name="`parts[${idx}][quantity]`"
+                :label="t('boats.maintenance.events.partQty')"
+                inputmode="numeric"
+                type="number"
+                min="1"
+                step="1"
+                v-model="p.quantity"
+              />
             </div>
             <div class="sm:col-span-2">
-              <BaseInput :id="`part-notes-${idx}`" :name="`parts[${idx}][notes]`"
-                :label="t('boats.maintenance.events.partNotes')" v-model="p.notes" />
+              <BaseInput
+                :id="`part-notes-${idx}`"
+                :name="`parts[${idx}][notes]`"
+                :label="t('boats.maintenance.events.partNotes')"
+                v-model="p.notes"
+              />
             </div>
             <div class="sm:col-span-6 flex justify-end">
               <BaseButton variant="ghost" size="sm" type="button" @click="removePartRow(idx)">
@@ -161,8 +252,14 @@ function close() {
         </div>
       </div>
 
-      <p class="rounded-lg border border-border bg-surface-muted/30 px-3 py-2 text-xs text-fg-muted">
-        ⓘ {{ t('boats.maintenance.events.immutable') || 'Une fois enregistré, cet événement devient immuable.' }}
+      <p
+        class="rounded-lg border border-border bg-surface-muted/30 px-3 py-2 text-xs text-fg-muted"
+      >
+        ⓘ
+        {{
+          t('boats.maintenance.events.immutable') ||
+          'Une fois enregistré, cet événement devient immuable.'
+        }}
       </p>
 
       <div class="flex items-center justify-end gap-2 pt-2">

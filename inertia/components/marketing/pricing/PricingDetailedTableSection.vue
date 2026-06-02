@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { ChevronDownIcon, CheckIcon } from '@heroicons/vue/24/solid'
 import BaseButton from '~/components/base/BaseButton.vue'
-import { useScrollReveal } from '~/composables/useScrollReveal'
+import { useScrollReveal } from '~/composables/use_scroll_reveal'
 
 interface GroupRow {
   0: string // feature name
@@ -101,32 +101,19 @@ function collapseAllGroups() {
               <th
                 v-for="(plan, idx) in planHeaders"
                 :key="plan.name"
-                :class="[
-                  'w-1/5 px-4 py-4 text-center',
-                  idx === 1 ? 'bg-navy-900 text-white' : '',
-                ]"
+                :class="['w-1/5 px-4 py-4 text-center', idx === 1 ? 'bg-navy-900 text-white' : '']"
               >
                 <p class="font-semibold">
                   {{ plan.name }}
                   <span v-if="idx === 1" class="text-coral-400">★</span>
                 </p>
-                <p
-                  :class="[
-                    'mt-1 text-xs',
-                    idx === 1 ? 'text-white/60' : 'text-fg-subtle',
-                  ]"
-                >
+                <p :class="['mt-1 text-xs', idx === 1 ? 'text-white/60' : 'text-fg-subtle']">
                   {{ plan.price }}
                 </p>
                 <BaseButton
                   href="/signup"
                   size="sm"
-                  :class="[
-                    'mt-2',
-                    idx === 1
-                      ? 'bg-white! text-navy-900! hover:bg-cream!'
-                      : '',
-                  ]"
+                  :class="['mt-2', idx === 1 ? 'bg-white! text-navy-900! hover:bg-cream!' : '']"
                   :variant="idx === 1 ? 'primary' : 'secondary'"
                 >
                   {{ plan.cta }}
@@ -163,24 +150,13 @@ function collapseAllGroups() {
                   <td
                     v-for="(val, cIdx) in [row[1], row[2], row[3]]"
                     :key="cIdx"
-                    :class="[
-                      'px-4 py-3 text-center',
-                      cIdx === 1 ? 'bg-navy-900/5' : '',
-                    ]"
+                    :class="['px-4 py-3 text-center', cIdx === 1 ? 'bg-navy-900/5' : '']"
                   >
                     <CheckIcon
                       v-if="val === true"
-                      :class="[
-                        'mx-auto h-5 w-5',
-                        cIdx === 1 ? 'text-coral-500' : 'text-mint-600',
-                      ]"
+                      :class="['mx-auto h-5 w-5', cIdx === 1 ? 'text-coral-500' : 'text-mint-600']"
                     />
-                    <span
-                      v-else-if="val === false"
-                      class="text-fg-subtle"
-                    >
-                      —
-                    </span>
+                    <span v-else-if="val === false" class="text-fg-subtle"> — </span>
                     <span v-else class="text-xs text-fg-muted">{{ val }}</span>
                   </td>
                 </tr>

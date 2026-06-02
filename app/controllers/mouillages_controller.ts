@@ -1,4 +1,8 @@
-import { MouillageHasBoatsError, MouillageNotFoundError, PortNotFoundError } from '#exceptions/port_errors'
+import {
+  MouillageHasBoatsError,
+  MouillageNotFoundError,
+  PortNotFoundError,
+} from '#exceptions/port_errors'
 import MouillageService from '#services/mouillage_service'
 import PortService from '#services/port_service'
 import PortPolicy from '#policies/port_policy'
@@ -45,7 +49,8 @@ export default class MouillagesController {
       await this.mouillageService.updateForPort(mouillage, payload)
       return response.redirect(`/ports/${params.portId}`)
     } catch (error) {
-      if (error instanceof MouillageNotFoundError) return response.redirect(`/ports/${params.portId}`)
+      if (error instanceof MouillageNotFoundError)
+        return response.redirect(`/ports/${params.portId}`)
       throw error
     }
   }
@@ -64,7 +69,8 @@ export default class MouillagesController {
       await this.mouillageService.deleteForPort(mouillage)
       return response.redirect(`/ports/${params.portId}`)
     } catch (error) {
-      if (error instanceof MouillageNotFoundError) return response.redirect(`/ports/${params.portId}`)
+      if (error instanceof MouillageNotFoundError)
+        return response.redirect(`/ports/${params.portId}`)
       if (error instanceof MouillageHasBoatsError) {
         session.flash('error', 'mouillage_has_boats')
         return response.redirect(`/ports/${params.portId}`)
@@ -88,7 +94,8 @@ export default class MouillagesController {
       await this.mouillageService.updatePosition(mouillage, payload)
       return response.redirect().back()
     } catch (error) {
-      if (error instanceof MouillageNotFoundError) return response.redirect(`/ports/${params.portId}`)
+      if (error instanceof MouillageNotFoundError)
+        return response.redirect(`/ports/${params.portId}`)
       throw error
     }
   }

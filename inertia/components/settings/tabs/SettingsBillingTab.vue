@@ -3,9 +3,13 @@ import BaseCard from '~/components/base/BaseCard.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 import type { PlanTier, QuotaUsage } from '../../../../shared/types/plan'
-import type { BillingInterval, SubscriptionInfo, SubscriptionStatus } from '../../../../shared/types/billing'
+import type {
+  BillingInterval,
+  SubscriptionInfo,
+  SubscriptionStatus,
+} from '../../../../shared/types/billing'
 import { getUpgradeTier } from '../../../../shared/types/plan'
 import { computed, ref } from 'vue'
 import { useForm } from '@inertiajs/vue3'
@@ -66,12 +70,16 @@ const statusVariant = computed((): 'success' | 'warning' | 'neutral' => {
       <BaseCard>
         <template #header>
           <div class="flex items-center justify-between">
-            <span class="text-sm font-semibold text-fg">{{ t('settings.billing.currentPlan') }}</span>
+            <span class="text-sm font-semibold text-fg">{{
+              t('settings.billing.currentPlan')
+            }}</span>
             <div class="flex items-center gap-2">
               <BaseBadge v-if="subscription" :variant="statusVariant">
                 {{ t(`settings.billing.subscription.status.${subscription.status}`) }}
               </BaseBadge>
-              <span class="inline-flex items-center rounded-full bg-brand/10 px-3 py-1 text-sm font-medium text-brand">
+              <span
+                class="inline-flex items-center rounded-full bg-brand/10 px-3 py-1 text-sm font-medium text-brand"
+              >
                 {{ t(`settings.billing.planName.${plan}`) }}
               </span>
             </div>
@@ -82,7 +90,11 @@ const statusVariant = computed((): 'success' | 'warning' | 'neutral' => {
           <!-- Subscription info -->
           <div v-if="subscription" class="rounded-lg bg-surface-2 p-3 text-sm space-y-1">
             <p v-if="!subscription.cancelAtPeriodEnd" class="text-fg-muted">
-              {{ t('settings.billing.subscription.renewsOn', { date: formatDate(subscription.currentPeriodEnd) }) }}
+              {{
+                t('settings.billing.subscription.renewsOn', {
+                  date: formatDate(subscription.currentPeriodEnd),
+                })
+              }}
               &mdash;
               {{ t(`settings.billing.subscription.interval.${subscription.billingInterval}`) }}
             </p>
@@ -102,11 +114,18 @@ const statusVariant = computed((): 'success' | 'warning' | 'neutral' => {
                 {{ formatLimit(quotaUsage.boats.limit) }}
               </span>
             </div>
-            <div v-if="quotaUsage.boats.limit !== null" class="h-2 w-full overflow-hidden rounded-full bg-surface-2">
+            <div
+              v-if="quotaUsage.boats.limit !== null"
+              class="h-2 w-full overflow-hidden rounded-full bg-surface-2"
+            >
               <div
                 class="h-full rounded-full bg-brand transition-all"
-                :class="{ 'bg-red-500': usagePercent(quotaUsage.boats.used, quotaUsage.boats.limit) >= 100 }"
-                :style="{ width: `${usagePercent(quotaUsage.boats.used, quotaUsage.boats.limit)}%` }"
+                :class="{
+                  'bg-red-500': usagePercent(quotaUsage.boats.used, quotaUsage.boats.limit) >= 100,
+                }"
+                :style="{
+                  width: `${usagePercent(quotaUsage.boats.used, quotaUsage.boats.limit)}%`,
+                }"
               />
             </div>
           </div>
@@ -121,24 +140,38 @@ const statusVariant = computed((): 'success' | 'warning' | 'neutral' => {
                 {{ formatLimit(quotaUsage.members.limit) }}
               </span>
             </div>
-            <div v-if="quotaUsage.members.limit !== null" class="h-2 w-full overflow-hidden rounded-full bg-surface-2">
+            <div
+              v-if="quotaUsage.members.limit !== null"
+              class="h-2 w-full overflow-hidden rounded-full bg-surface-2"
+            >
               <div
                 class="h-full rounded-full bg-brand transition-all"
-                :class="{ 'bg-red-500': usagePercent(quotaUsage.members.used, quotaUsage.members.limit) >= 100 }"
-                :style="{ width: `${usagePercent(quotaUsage.members.used, quotaUsage.members.limit)}%` }"
+                :class="{
+                  'bg-red-500':
+                    usagePercent(quotaUsage.members.used, quotaUsage.members.limit) >= 100,
+                }"
+                :style="{
+                  width: `${usagePercent(quotaUsage.members.used, quotaUsage.members.limit)}%`,
+                }"
               />
             </div>
           </div>
 
           <!-- Features -->
           <ul class="space-y-2 text-sm">
-            <li class="flex items-center gap-2" :class="quotaUsage.canUseAI ? 'text-fg' : 'text-fg-muted'">
+            <li
+              class="flex items-center gap-2"
+              :class="quotaUsage.canUseAI ? 'text-fg' : 'text-fg-muted'"
+            >
               <span :class="quotaUsage.canUseAI ? 'text-green-600' : 'text-fg-muted'">
                 {{ quotaUsage.canUseAI ? '✓' : '✗' }}
               </span>
               {{ t('settings.billing.features.ai') }}
             </li>
-            <li class="flex items-center gap-2" :class="quotaUsage.canExport ? 'text-fg' : 'text-fg-muted'">
+            <li
+              class="flex items-center gap-2"
+              :class="quotaUsage.canExport ? 'text-fg' : 'text-fg-muted'"
+            >
               <span :class="quotaUsage.canExport ? 'text-green-600' : 'text-fg-muted'">
                 {{ quotaUsage.canExport ? '✓' : '✗' }}
               </span>
@@ -170,7 +203,11 @@ const statusVariant = computed((): 'success' | 'warning' | 'neutral' => {
               <button
                 type="button"
                 class="rounded-md px-3 py-1 text-sm font-medium transition-colors"
-                :class="interval === 'month' ? 'bg-brand text-white' : 'bg-surface-2 text-fg-muted hover:text-fg'"
+                :class="
+                  interval === 'month'
+                    ? 'bg-brand text-white'
+                    : 'bg-surface-2 text-fg-muted hover:text-fg'
+                "
                 @click="interval = 'month'"
               >
                 {{ t('settings.billing.subscription.interval.month') }}
@@ -178,7 +215,11 @@ const statusVariant = computed((): 'success' | 'warning' | 'neutral' => {
               <button
                 type="button"
                 class="flex items-center gap-1.5 rounded-md px-3 py-1 text-sm font-medium transition-colors"
-                :class="interval === 'year' ? 'bg-brand text-white' : 'bg-surface-2 text-fg-muted hover:text-fg'"
+                :class="
+                  interval === 'year'
+                    ? 'bg-brand text-white'
+                    : 'bg-surface-2 text-fg-muted hover:text-fg'
+                "
                 @click="interval = 'year'"
               >
                 {{ t('settings.billing.subscription.interval.year') }}

@@ -10,7 +10,7 @@ import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import type { BoatShowDetail, MaintenanceTaskRow } from '~/types/boat_show'
 import { subjectLabel } from './utils'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 
 const { t } = useT()
 
@@ -115,7 +115,9 @@ watch(
       </BaseButton>
     </div>
 
-    <div v-if="openTasks.length === 0" class="text-sm text-fg-muted">{{ t('boats.maintenance.tasks.empty') }}</div>
+    <div v-if="openTasks.length === 0" class="text-sm text-fg-muted">
+      {{ t('boats.maintenance.tasks.empty') }}
+    </div>
     <ul v-else class="space-y-3">
       <li
         v-for="task in openTasks"
@@ -127,11 +129,17 @@ watch(
             <div class="flex flex-wrap items-center gap-2">
               <p class="font-semibold text-fg">{{ task.title }}</p>
               <BaseBadge :variant="urgencyVariant(task)">
-                {{ task.dueAt && String(task.dueAt) <= todayIso ? t('boats.maintenance.tasks.urgent') : t('boats.maintenance.tasks.open') }}
+                {{
+                  task.dueAt && String(task.dueAt) <= todayIso
+                    ? t('boats.maintenance.tasks.urgent')
+                    : t('boats.maintenance.tasks.open')
+                }}
               </BaseBadge>
             </div>
             <p class="text-fg-muted">{{ subjectLabel(task.subject) }}</p>
-            <p v-if="task.dueAt" class="mt-1 text-xs text-fg-subtle">{{ t('boats.maintenance.tasks.dueAt', { date: task.dueAt }) }}</p>
+            <p v-if="task.dueAt" class="mt-1 text-xs text-fg-subtle">
+              {{ t('boats.maintenance.tasks.dueAt', { date: task.dueAt }) }}
+            </p>
             <p v-else-if="task.dueEngineHours !== null" class="mt-1 text-xs text-fg-subtle">
               {{ t('boats.maintenance.tasks.dueHours', { hours: task.dueEngineHours }) }}
             </p>
@@ -141,7 +149,10 @@ watch(
           <div v-if="canManageMaintenance" class="flex items-center gap-3">
             <Form
               v-if="task.dueEngineHours !== null"
-              :action="{ url: `/boats/${boat.id}/maintenance-tasks/${task.id}/done`, method: 'put' }"
+              :action="{
+                url: `/boats/${boat.id}/maintenance-tasks/${task.id}/done`,
+                method: 'put',
+              }"
               class="flex items-center gap-2"
               #default="{ processing }"
             >
@@ -164,7 +175,10 @@ watch(
 
             <Form
               v-else
-              :action="{ url: `/boats/${boat.id}/maintenance-tasks/${task.id}/done`, method: 'put' }"
+              :action="{
+                url: `/boats/${boat.id}/maintenance-tasks/${task.id}/done`,
+                method: 'put',
+              }"
               #default="{ processing }"
             >
               <BaseButton type="submit" variant="secondary" size="sm" :disabled="processing">
@@ -185,7 +199,11 @@ watch(
       </li>
     </ul>
 
-    <BaseModal v-model:open="isCreateOpen" :title="t('boats.maintenance.tasks.modalTitle')" close-label="Close">
+    <BaseModal
+      v-model:open="isCreateOpen"
+      :title="t('boats.maintenance.tasks.modalTitle')"
+      close-label="Close"
+    >
       <Form
         :action="{ url: `/boats/${boat.id}/maintenance-tasks`, method: 'post' }"
         @success="isCreateOpen = false"
@@ -306,7 +324,9 @@ watch(
         />
 
         <div class="flex items-center justify-end gap-2 pt-2">
-          <BaseButton variant="ghost" type="button" @click="isCreateOpen = false">{{ t('boats.maintenance.tasks.cancel') }}</BaseButton>
+          <BaseButton variant="ghost" type="button" @click="isCreateOpen = false">{{
+            t('boats.maintenance.tasks.cancel')
+          }}</BaseButton>
           <BaseButton type="submit" :disabled="processing || (taskSubject === 'rig' && !boat.rig)">
             {{ t('boats.maintenance.tasks.createTask') }}
           </BaseButton>
@@ -315,4 +335,3 @@ watch(
     </BaseModal>
   </div>
 </template>
-

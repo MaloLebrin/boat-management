@@ -29,4 +29,3 @@ Une évolution n’est considérée **terminée** que si:
 - la documentation `docs/` est mise à jour en même temps que la feature
 
 Voir: `docs/process/keeping-docs-up-to-date.md` et `docs/process/pr-checklist.md`.
-

@@ -13,4 +13,3 @@
 - [ ] J’ai mis à jour la doc liée à ma feature.
 - [ ] J’ai vérifié les routes impactées (mapping routes→controller→service→page).
 - [ ] J’ai lancé `pnpm test` et/ou `pnpm test:inertia` si pertinent.
-

@@ -11,6 +11,6 @@
 </template>
 
 <script setup lang="ts">
-import { Link } from '@adonisjs/inertia/vue';
-import brandIconUrl from '~/assets/brand/fleetai_compass.svg';
+import { Link } from '@adonisjs/inertia/vue'
+import brandIconUrl from '~/assets/brand/fleetai_compass.svg'
 </script>

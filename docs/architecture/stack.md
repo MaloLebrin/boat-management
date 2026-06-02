@@ -33,4 +33,3 @@ Référence: `package.json`.
 - `test`: tests backend (Japa)
 - `test:inertia`: tests frontend (Vitest)
 - `typecheck`: `tsc` + `vue-tsc`
-

@@ -57,4 +57,3 @@ Exemple: `BoatShowMaintenanceSection.vue` contient:
 - create task/event
 - mark done
 - delete task/event
-

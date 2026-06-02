@@ -2,28 +2,17 @@
   "mcpServers": {
     "postgres": {
       "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-postgres",
-        "${POSTGRES_CONNECTION_STRING}"
-      ],
+      "args": ["-y", "@modelcontextprotocol/server-postgres", "${POSTGRES_CONNECTION_STRING}"],
       "description": "Accès direct à PostgreSQL — lire le schéma, explorer les données, debugger des requêtes. Ne pas utiliser pour écrire en production."
     },
     "filesystem": {
       "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-filesystem",
-        "${PROJECT_ROOT}"
-      ],
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "${PROJECT_ROOT}"],
       "description": "Accès au système de fichiers du projet courant."
     },
     "github": {
       "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-github"
-      ],
+      "args": ["-y", "@modelcontextprotocol/server-github"],
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
       },
@@ -31,18 +20,12 @@
     },
     "playwright": {
       "command": "npx",
-      "args": [
-        "-y",
-        "@executeautomation/playwright-mcp-server"
-      ],
+      "args": ["-y", "@executeautomation/playwright-mcp-server"],
       "description": "Browser automation — tests E2E, screenshots, scraping. Utile pour tester les pages Inertia."
     },
     "adonis-docs": {
       "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-fetch"
-      ],
+      "args": ["-y", "@modelcontextprotocol/server-fetch"],
       "description": "Fetch de la documentation AdonisJS et autres docs en ligne."
     }
   }

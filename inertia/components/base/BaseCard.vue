@@ -1,12 +1,14 @@
 <script setup lang="ts">
-withDefaults(defineProps<{
-  padded?: boolean
-  isAnimated?: boolean
-}>(), {
-  padded: true,
-  isAnimated: false,
-})
-
+withDefaults(
+  defineProps<{
+    padded?: boolean
+    isAnimated?: boolean
+  }>(),
+  {
+    padded: true,
+    isAnimated: false,
+  }
+)
 </script>
 
 <template>
@@ -15,8 +17,9 @@ withDefaults(defineProps<{
       :class="[
         'rounded-(--radius-card) border border-border bg-surface-elevated shadow-(--shadow-card)',
         {
-          'hover:shadow-(--shadow-card-hover) transition-[rotate,scale,box-shadow] duration-400 ease-premium group-hover:rotate-[y_10deg] group-hover:scale-[1.05]': isAnimated,
-        }
+          'hover:shadow-(--shadow-card-hover) transition-[rotate,scale,box-shadow] duration-400 ease-premium group-hover:rotate-[y_10deg] group-hover:scale-[1.05]':
+            isAnimated,
+        },
       ]"
     >
       <div v-if="$slots.header" class="px-6 py-4 border-b border-border">

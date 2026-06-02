@@ -31,10 +31,7 @@ export default class PontoonService {
   }
 
   async getForPortOrFail(portId: number, pontoonId: number): Promise<Pontoon> {
-    const pontoon = await Pontoon.query()
-      .where('id', pontoonId)
-      .where('portId', portId)
-      .first()
+    const pontoon = await Pontoon.query().where('id', pontoonId).where('portId', portId).first()
 
     if (!pontoon) throw new PontoonNotFoundError()
 

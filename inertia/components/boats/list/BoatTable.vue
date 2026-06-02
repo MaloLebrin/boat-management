@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import type { BoatListItem } from './types'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 
 const { t } = useT()
 
@@ -16,14 +16,18 @@ function maintenanceVariant(b: BoatListItem) {
 }
 
 function maintenanceLabel(b: BoatListItem) {
-  if (b.maintenance.urgentCount > 0) return t('boats.list.maintenance.urgent', { count: b.maintenance.urgentCount })
-  if (b.maintenance.upcomingCount > 0) return t('boats.list.maintenance.upcoming', { count: b.maintenance.upcomingCount })
+  if (b.maintenance.urgentCount > 0)
+    return t('boats.list.maintenance.urgent', { count: b.maintenance.urgentCount })
+  if (b.maintenance.upcomingCount > 0)
+    return t('boats.list.maintenance.upcoming', { count: b.maintenance.upcomingCount })
   return t('boats.list.maintenance.ok')
 }
 </script>
 
 <template>
-  <div class="overflow-hidden rounded-(--radius-card) border border-border bg-surface-elevated shadow-(--shadow-card)">
+  <div
+    class="overflow-hidden rounded-(--radius-card) border border-border bg-surface-elevated shadow-(--shadow-card)"
+  >
     <table class="w-full text-left text-sm">
       <thead class="bg-surface-muted text-fg-muted">
         <tr>
@@ -58,4 +62,3 @@ function maintenanceLabel(b: BoatListItem) {
     </table>
   </div>
 </template>
-

@@ -34,7 +34,9 @@ const duplicatedLogos = computed(() => [...props.socialProof.logos, ...props.soc
         class="mx-auto mb-12 max-w-2xl space-y-6 text-center"
         style="animation: fadeUp 700ms var(--ease-premium) both"
       >
-        <h1 class="font-display text-5xl leading-tight tracking-tight text-fg lg:text-6xl xl:text-7xl">
+        <h1
+          class="font-display text-5xl leading-tight tracking-tight text-fg lg:text-6xl xl:text-7xl"
+        >
           {{ currentHero.title }}
           <em class="text-coral-500">{{ currentHero.titleHighlight }}</em>
         </h1>
@@ -68,9 +70,7 @@ const duplicatedLogos = computed(() => [...props.socialProof.logos, ...props.soc
       </div>
 
       <!-- Browser mock: en dessous, pleine largeur du conteneur -->
-      <div
-        style="animation: fadeUp 700ms var(--ease-premium) both; animation-delay: 300ms"
-      >
+      <div style="animation: fadeUp 700ms var(--ease-premium) both; animation-delay: 300ms">
         <HomeBrowserFrame>
           <HomeMockDashboard :persona="activePersona" />
         </HomeBrowserFrame>

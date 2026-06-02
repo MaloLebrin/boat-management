@@ -24,4 +24,3 @@ La règle est volontairement simple (process-only):
 
 - la **personne** qui implémente la feature met à jour la doc
 - le **reviewer** vérifie la checklist `docs/process/pr-checklist.md`
-

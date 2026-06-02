@@ -5,7 +5,9 @@ import BaseInertiaMiddleware from '@adonisjs/inertia/inertia_middleware'
 import type { PlanTier } from '#shared/types/plan'
 import type User from '#models/user'
 
-export async function resolveSharedCurrentPlan(user: User | undefined): Promise<PlanTier | undefined> {
+export async function resolveSharedCurrentPlan(
+  user: User | undefined
+): Promise<PlanTier | undefined> {
   if (!user?.organizationId) return undefined
   await user.load('organization')
   return user.organization.plan
@@ -35,8 +37,9 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
       locale: ctx.inertia.always(i18n?.locale ?? 'en'),
       appT: ctx.inertia.always(
         Object.fromEntries(
-          Object.entries(i18n?.localeTranslations ?? {})
-            .filter(([k]) => !BACKEND_NAMESPACES.has(k.split('.')[0]))
+          Object.entries(i18n?.localeTranslations ?? {}).filter(
+            ([k]) => !BACKEND_NAMESPACES.has(k.split('.')[0])
+          )
         )
       ),
       path: ctx.inertia.always(ctx.request.url().split('?')[0]),

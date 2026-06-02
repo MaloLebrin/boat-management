@@ -5,7 +5,7 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseModal from '~/components/base/BaseModal.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 
 const props = defineProps<{
   portId: number
@@ -35,7 +35,9 @@ watch(
 
 watch(
   () => props.open,
-  (isOpen) => { if (!isOpen) form.reset() }
+  (isOpen) => {
+    if (!isOpen) form.reset()
+  }
 )
 
 function submit() {
@@ -45,7 +47,10 @@ function submit() {
     })
   } else {
     form.post(`/ports/${props.portId}/pontoons`, {
-      onSuccess: () => { form.reset(); emit('update:open', false) },
+      onSuccess: () => {
+        form.reset()
+        emit('update:open', false)
+      },
     })
   }
 }

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useScrollReveal } from '~/composables/useScrollReveal'
+import { useScrollReveal } from '~/composables/use_scroll_reveal'
 
 interface PillarItem {
   number: string
@@ -19,13 +19,15 @@ const { el: sectionEl, isVisible } = useScrollReveal()
 
 <template>
   <section
-    :ref="(el) => sectionEl = el as HTMLElement"
+    :ref="(el) => (sectionEl = el as HTMLElement)"
     class="reveal bg-paper px-6 py-20 lg:px-8 lg:py-24"
     :class="{ visible: isVisible }"
   >
     <div class="mx-auto max-w-7xl">
       <!-- Title -->
-      <h2 class="mx-auto mb-12 max-w-2xl text-center font-display text-3xl leading-tight text-fg lg:text-4xl">
+      <h2
+        class="mx-auto mb-12 max-w-2xl text-center font-display text-3xl leading-tight text-fg lg:text-4xl"
+      >
         {{ title }} <em class="text-coral-500">{{ titleHighlight }}</em>
       </h2>
 

@@ -1,11 +1,16 @@
 <script setup lang="ts">
 import { Form } from '@adonisjs/inertia/vue'
-import { CheckCircleIcon, ChevronDownIcon, ChevronUpIcon, TrashIcon } from '@heroicons/vue/24/outline'
+import {
+  CheckCircleIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+  TrashIcon,
+} from '@heroicons/vue/24/outline'
 import { computed, ref } from 'vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BoatMaintenanceSheetItemList from '~/components/boats/sheets/BoatMaintenanceSheetItemList.vue'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 import type { BoatShowDetail, MaintenanceSheetRow } from '~/types/boat_show'
 
 const { t } = useT()
@@ -19,13 +24,14 @@ const props = defineProps<{
 const isExpanded = ref(false)
 
 const typeBadgeVariant = computed(() => {
-  const variants: Record<MaintenanceSheetRow['type'], 'neutral' | 'info' | 'success' | 'warning'> = {
-    entretien: 'info',
-    montage: 'neutral',
-    hivernage: 'warning',
-    dehivernage: 'success',
-    atelier: 'neutral',
-  }
+  const variants: Record<MaintenanceSheetRow['type'], 'neutral' | 'info' | 'success' | 'warning'> =
+    {
+      entretien: 'info',
+      montage: 'neutral',
+      hivernage: 'warning',
+      dehivernage: 'success',
+      atelier: 'neutral',
+    }
   return variants[props.sheet.type]
 })
 
@@ -102,10 +108,16 @@ function confirmDelete() {
     </div>
 
     <!-- Actions -->
-    <div v-if="canManage" class="flex flex-wrap items-center gap-2 border-t border-border px-4 py-3 bg-surface-muted/30">
+    <div
+      v-if="canManage"
+      class="flex flex-wrap items-center gap-2 border-t border-border px-4 py-3 bg-surface-muted/30"
+    >
       <Form
         v-if="sheet.status === 'in_progress'"
-        :action="{ url: `/boats/${boat.id}/maintenance-sheets/${sheet.id}/complete`, method: 'put' }"
+        :action="{
+          url: `/boats/${boat.id}/maintenance-sheets/${sheet.id}/complete`,
+          method: 'put',
+        }"
         #default="{ processing }"
       >
         <BaseButton type="submit" variant="secondary" size="sm" :disabled="processing">
@@ -116,7 +128,11 @@ function confirmDelete() {
 
       <Form
         :action="{ url: `/boats/${boat.id}/maintenance-sheets/${sheet.id}`, method: 'delete' }"
-        @submit="(e: Event) => { if (!confirmDelete()) e.preventDefault() }"
+        @submit="
+          (e: Event) => {
+            if (!confirmDelete()) e.preventDefault()
+          }
+        "
         #default="{ processing }"
       >
         <BaseButton type="submit" variant="danger" size="sm" :disabled="processing">

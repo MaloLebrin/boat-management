@@ -70,4 +70,3 @@ La page `inertia/pages/boats/show.vue` passe à `BoatShowMaintenanceSection`:
 - `canManageMaintenance`: active les formulaires (create/delete)
 
 Référence types: `inertia/types/boat_show.ts`.
-

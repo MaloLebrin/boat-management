@@ -4,7 +4,7 @@ import { Form } from '@adonisjs/inertia/vue'
 import { computed, ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import EnginePartDocumentAddModal from '~/components/engine/parts/show/modals/EnginePartDocumentAddModal.vue'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 import type { BoatShowEnginePart, MediaRow } from '~/types/boat_show'
 
 const props = defineProps<{
@@ -51,7 +51,13 @@ function formatBytes(bytes: number): string {
       <DocumentTextIcon class="mx-auto h-8 w-8 text-fg-subtle" />
       <p class="mt-2 text-sm text-fg-muted">{{ t('boats.show.mediaUpload.noDocuments') }}</p>
       <p class="mt-1 text-xs text-fg-subtle">{{ t('boats.show.mediaUpload.documentFormats') }}</p>
-      <BaseButton v-if="canManage" variant="secondary" size="sm" class="mt-4" @click="isAddModalOpen = true">
+      <BaseButton
+        v-if="canManage"
+        variant="secondary"
+        size="sm"
+        class="mt-4"
+        @click="isAddModalOpen = true"
+      >
         {{ t('boats.show.mediaUpload.addDocument') }}
       </BaseButton>
     </div>
@@ -79,7 +85,10 @@ function formatBytes(bytes: number): string {
         </a>
         <Form
           v-if="canManage"
-          :action="{ url: `/boats/${boat.id}/engines/${engine.id}/parts/${part.id}/media/${doc.id}`, method: 'delete' }"
+          :action="{
+            url: `/boats/${boat.id}/engines/${engine.id}/parts/${part.id}/media/${doc.id}`,
+            method: 'delete',
+          }"
           #default="{ processing }"
         >
           <button

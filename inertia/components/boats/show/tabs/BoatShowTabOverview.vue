@@ -9,7 +9,7 @@ import BaseSkeleton from '~/components/base/BaseSkeleton.vue'
 import UpgradePlanModal from '~/components/base/UpgradePlanModal.vue'
 import { subjectLabel } from '~/components/boats/maintenance/utils'
 import BoatPhotoGallery from '~/components/boats/show/BoatPhotoGallery.vue'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 import type { BoatShowDetail, MaintenanceEventRow, MaintenanceTaskRow } from '~/types/boat_show'
 import { PLAN_LIMITS } from '../../../../../shared/types/plan'
 import type { PlanTier } from '../../../../../shared/types/plan'
@@ -43,10 +43,16 @@ function refreshSuggestions() {
     return
   }
   isRefreshing.value = true
-  router.post(`/ai/boats/${props.boat.id}/suggestions`, {}, {
-    preserveScroll: true,
-    onFinish: () => { isRefreshing.value = false },
-  })
+  router.post(
+    `/ai/boats/${props.boat.id}/suggestions`,
+    {},
+    {
+      preserveScroll: true,
+      onFinish: () => {
+        isRefreshing.value = false
+      },
+    }
+  )
 }
 
 const todayIso = computed(() => new Date().toISOString().slice(0, 10))
@@ -111,17 +117,27 @@ const currentPositionLabel = computed(() => {
       <BoatPhotoGallery :boat="boat" :can-manage="canManage" />
 
       <!-- Overdue alert -->
-      <div v-if="overdueTasks.length > 0" class="rounded-lg border border-coral-300 bg-coral-50 p-4">
+      <div
+        v-if="overdueTasks.length > 0"
+        class="rounded-lg border border-coral-300 bg-coral-50 p-4"
+      >
         <div class="flex items-start gap-3">
           <ExclamationTriangleIcon class="h-5 w-5 text-coral-600 shrink-0 mt-0.5" />
           <div class="flex-1">
-            <p class="font-semibold text-coral-900">{{ t('boats.show.overview.overdueTasks', { count: String(overdueTasks.length) }) }}</p>
+            <p class="font-semibold text-coral-900">
+              {{ t('boats.show.overview.overdueTasks', { count: String(overdueTasks.length) }) }}
+            </p>
             <ul class="mt-2 space-y-1 text-sm text-coral-800">
               <li v-for="task in overdueTasks.slice(0, 3)" :key="task.id">
                 {{ task.title }} - {{ formatDate(task.dueAt) }}
               </li>
             </ul>
-            <BaseButton variant="secondary" size="sm" class="mt-3" @click="emit('go-to-tab', 'tasks')">
+            <BaseButton
+              variant="secondary"
+              size="sm"
+              class="mt-3"
+              @click="emit('go-to-tab', 'tasks')"
+            >
               {{ t('boats.show.overview.schedule') }}
             </BaseButton>
           </div>
@@ -134,7 +150,9 @@ const currentPositionLabel = computed(() => {
           <div class="text-center">
             <p class="text-2xl font-bold text-fg">{{ totalEngineHours ?? '—' }}</p>
             <p class="text-sm text-fg-muted">{{ t('boats.show.overview.engineHours') }}</p>
-            <p class="text-xs text-fg-subtle">{{ t('boats.show.overview.engineCount', { count: String(boat.engines.length) }) }}</p>
+            <p class="text-xs text-fg-subtle">
+              {{ t('boats.show.overview.engineCount', { count: String(boat.engines.length) }) }}
+            </p>
           </div>
         </BaseCard>
         <BaseCard padded>
@@ -147,7 +165,11 @@ const currentPositionLabel = computed(() => {
           <div class="text-center">
             <p class="text-2xl font-bold text-fg">{{ formatDate(nextTaskDueDate) }}</p>
             <p class="text-sm text-fg-muted">{{ t('boats.show.overview.nextTask') }}</p>
-            <BaseBadge v-if="nextTaskDueDate && nextTaskDueDate <= todayIso" variant="warning" class="mt-1">
+            <BaseBadge
+              v-if="nextTaskDueDate && nextTaskDueDate <= todayIso"
+              variant="warning"
+              class="mt-1"
+            >
               {{ t('boats.show.overview.overdue') }}
             </BaseBadge>
           </div>
@@ -157,7 +179,9 @@ const currentPositionLabel = computed(() => {
       <!-- Specs summary card -->
       <BaseCard padded>
         <template #header>
-          <p class="text-sm font-semibold text-fg">{{ t('boats.show.overview.dimensionsTitle') }}</p>
+          <p class="text-sm font-semibold text-fg">
+            {{ t('boats.show.overview.dimensionsTitle') }}
+          </p>
         </template>
         <dl class="grid grid-cols-2 gap-4 text-sm">
           <div>
@@ -174,12 +198,17 @@ const currentPositionLabel = computed(() => {
           </div>
           <div>
             <dt class="text-fg-muted">{{ t('boats.show.overview.mastHeight') }}</dt>
-            <dd class="font-semibold text-fg">{{ boat.mastHeightM ? `${boat.mastHeightM} m` : '—' }}</dd>
+            <dd class="font-semibold text-fg">
+              {{ boat.mastHeightM ? `${boat.mastHeightM} m` : '—' }}
+            </dd>
           </div>
         </dl>
         <div class="mt-4">
-          <button type="button" class="text-sm font-semibold text-brand hover:underline"
-            @click="emit('go-to-tab', 'specs')">
+          <button
+            type="button"
+            class="text-sm font-semibold text-brand hover:underline"
+            @click="emit('go-to-tab', 'specs')"
+          >
             {{ t('boats.show.overview.viewSpecs') }}
           </button>
         </div>
@@ -188,13 +217,19 @@ const currentPositionLabel = computed(() => {
       <!-- Recent activity card -->
       <BaseCard padded>
         <template #header>
-          <p class="text-sm font-semibold text-fg">{{ t('boats.show.overview.recentActivityTitle') }}</p>
+          <p class="text-sm font-semibold text-fg">
+            {{ t('boats.show.overview.recentActivityTitle') }}
+          </p>
         </template>
         <div v-if="recentEvents.length === 0" class="text-sm text-fg-muted">
           {{ t('boats.show.overview.recentActivityEmpty') }}
         </div>
         <ul v-else class="space-y-3 text-sm">
-          <li v-for="ev in recentEvents" :key="ev.id" class="flex items-start justify-between gap-3">
+          <li
+            v-for="ev in recentEvents"
+            :key="ev.id"
+            class="flex items-start justify-between gap-3"
+          >
             <div>
               <p class="font-semibold text-fg">{{ ev.title }}</p>
               <p class="text-fg-muted">{{ subjectLabel(ev.subject) }}</p>
@@ -203,8 +238,11 @@ const currentPositionLabel = computed(() => {
           </li>
         </ul>
         <div class="mt-4">
-          <button type="button" class="text-sm font-semibold text-brand hover:underline"
-            @click="emit('go-to-tab', 'history')">
+          <button
+            type="button"
+            class="text-sm font-semibold text-brand hover:underline"
+            @click="emit('go-to-tab', 'history')"
+          >
             {{ t('boats.show.overview.viewHistory') }}
           </button>
         </div>
@@ -226,7 +264,11 @@ const currentPositionLabel = computed(() => {
             :disabled="isRefreshing"
             @click="refreshSuggestions"
           >
-            {{ isRefreshing ? t('boats.show.overview.aiRefreshing') : t('boats.show.overview.aiRefresh') }}
+            {{
+              isRefreshing
+                ? t('boats.show.overview.aiRefreshing')
+                : t('boats.show.overview.aiRefresh')
+            }}
           </button>
         </div>
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { ChevronDownIcon } from '@heroicons/vue/24/outline'
-import { useScrollReveal } from '~/composables/useScrollReveal'
+import { useScrollReveal } from '~/composables/use_scroll_reveal'
 
 interface FaqItem {
   q: string
@@ -57,10 +57,7 @@ function toggle(idx: number) {
                 ]"
               />
             </button>
-            <div
-              v-show="openIndex === idx"
-              class="px-6 pb-4 text-sm leading-relaxed text-fg-muted"
-            >
+            <div v-show="openIndex === idx" class="px-6 pb-4 text-sm leading-relaxed text-fg-muted">
               {{ item.a }}
             </div>
           </div>

@@ -43,4 +43,3 @@ flowchart TD
 - **Services**: contiennent la logique métier réutilisable, testable unitairement.
 - **Validation**: VineJS dans `app/validators/**`.
 - **ACL**: Bouncer abilities dans `app/abilities/main.ts` + middleware `initialize_bouncer_middleware`.
-

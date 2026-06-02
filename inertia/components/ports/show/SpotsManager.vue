@@ -5,7 +5,7 @@ import { PencilIcon, PlusIcon, TrashIcon } from '@heroicons/vue/24/outline'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseConfirmModal from '~/components/base/BaseConfirmModal.vue'
 import SpotFormModal from '~/components/ports/modals/SpotFormModal.vue'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 import { routes } from '~/utils/routes'
 import type { SpotRow } from '~/types/port'
 

@@ -102,4 +102,3 @@ Référence: `database/seeders/demo_seeder.ts`.
 - crée un moteur, des voiles, un rig si absents
 - crée de l’historique de maintenance
 - crée des tasks “planned” pour les entrées ayant une `dueAt`
-

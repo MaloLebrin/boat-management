@@ -12,7 +12,6 @@ import { inject } from '@adonisjs/core'
 
 export type { BoatListDirection, BoatListItem, BoatListQuery, BoatListSort }
 
-
 function toTrimmedStringOrUndefined(value: unknown): string | undefined {
   if (typeof value !== 'string') return undefined
   const trimmed = value.trim()
@@ -92,14 +91,14 @@ export default class BoatListService {
     const paginator = await query.paginate(filters.page, filters.perPage)
 
     const serialized = paginator.serialize()
-    const boatIds = (serialized.data as BoatSerializedRow[] ?? [])
+    const boatIds = ((serialized.data as BoatSerializedRow[]) ?? [])
       .map((b) => Number(b.id))
       .filter((id) => id > 0)
 
     const badges = await this.badgeService.getForBoatIds(user.organizationId, boatIds)
     return {
       boats: {
-        data: (serialized.data as BoatSerializedRow[] ?? []).map((b) => ({
+        data: ((serialized.data as BoatSerializedRow[]) ?? []).map((b) => ({
           id: b.id,
           name: b.name,
           registrationNumber: b.registrationNumber ?? null,

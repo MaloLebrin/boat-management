@@ -10,13 +10,13 @@ Les fiches de maintenance sont des **listes de contrôle structurées et guidée
 
 ## Les cinq types de fiches
 
-| Type | Description | Items par défaut |
-|------|-------------|-----------------|
-| `entretien` | Inspection et entretien courant | 10 |
-| `montage` | Gréage du bateau en début de saison | 10 |
-| `hivernage` | Mise en hivernage / désarmement | 14 |
-| `dehivernage` | Sortie d'hivernage / remise à l'eau | 14 |
-| `atelier` | Travaux spécifiques en atelier | 8 |
+| Type          | Description                         | Items par défaut |
+| ------------- | ----------------------------------- | ---------------- |
+| `entretien`   | Inspection et entretien courant     | 10               |
+| `montage`     | Gréage du bateau en début de saison | 10               |
+| `hivernage`   | Mise en hivernage / désarmement     | 14               |
+| `dehivernage` | Sortie d'hivernage / remise à l'eau | 14               |
+| `atelier`     | Travaux spécifiques en atelier      | 8                |
 
 ## Modèle de données
 
@@ -24,24 +24,24 @@ Références : `app/models/boat_maintenance_sheet.ts`, `app/models/boat_maintena
 
 ### `boat_maintenance_sheets`
 
-| Colonne | Type | Description |
-|---------|------|-------------|
-| `boat_id` | FK | Bateau propriétaire (CASCADE DELETE) |
-| `type` | VARCHAR(20) | `entretien \| montage \| hivernage \| dehivernage \| atelier` |
-| `title` | VARCHAR(200) | Titre libre (ex : "Hivernage 2025") |
-| `status` | VARCHAR(20) | `in_progress` (défaut) ou `completed` |
-| `performed_at` | DATE | Date de réalisation |
-| `notes` | TEXT NULL | Remarques générales sur la fiche |
+| Colonne        | Type         | Description                                                   |
+| -------------- | ------------ | ------------------------------------------------------------- |
+| `boat_id`      | FK           | Bateau propriétaire (CASCADE DELETE)                          |
+| `type`         | VARCHAR(20)  | `entretien \| montage \| hivernage \| dehivernage \| atelier` |
+| `title`        | VARCHAR(200) | Titre libre (ex : "Hivernage 2025")                           |
+| `status`       | VARCHAR(20)  | `in_progress` (défaut) ou `completed`                         |
+| `performed_at` | DATE         | Date de réalisation                                           |
+| `notes`        | TEXT NULL    | Remarques générales sur la fiche                              |
 
 ### `boat_maintenance_sheet_items`
 
-| Colonne | Type | Description |
-|---------|------|-------------|
-| `boat_maintenance_sheet_id` | FK | Fiche parente (CASCADE DELETE) |
-| `label` | VARCHAR(300) | Libellé de l'opération |
-| `is_done` | BOOLEAN | Coché ou non (défaut `false`) |
-| `notes` | TEXT NULL | Remarque libre sur cet item |
-| `position` | INTEGER | Ordre d'affichage (0-based) |
+| Colonne                     | Type         | Description                    |
+| --------------------------- | ------------ | ------------------------------ |
+| `boat_maintenance_sheet_id` | FK           | Fiche parente (CASCADE DELETE) |
+| `label`                     | VARCHAR(300) | Libellé de l'opération         |
+| `is_done`                   | BOOLEAN      | Coché ou non (défaut `false`)  |
+| `notes`                     | TEXT NULL    | Remarque libre sur cet item    |
+| `position`                  | INTEGER      | Ordre d'affichage (0-based)    |
 
 ## Items par défaut par type
 
@@ -60,6 +60,7 @@ Les items sont définis dans `app/services/boat_maintenance_sheet_template_servi
 ## Routes → controllers → services → UI
 
 Références :
+
 - Routes : `start/routes/boats.ts`
 - Controllers : `app/controllers/boat_maintenance_sheets_controller.ts`, `app/controllers/boat_maintenance_sheet_items_controller.ts`
 - Services : `app/services/boat_maintenance_sheet_service.ts`, `app/services/boat_maintenance_sheet_template_service.ts`
@@ -107,6 +108,7 @@ Références :
 La page `inertia/pages/boats/show.vue` reçoit `maintenanceSheets: MaintenanceSheetRow[]` et expose l'onglet `?tab=sheets`.
 
 Composants :
+
 - `BoatShowTabSheets` — wrapper de l'onglet
 - `BoatMaintenanceSheetsPanel` — liste des fiches + filtres par type + bouton création
 - `BoatMaintenanceSheetCard` — carte d'une fiche (expand/collapse, badges type + statut, progression X/Y)

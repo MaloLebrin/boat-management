@@ -8,7 +8,7 @@ import BaseTabs from '~/components/base/BaseTabs.vue'
 import EnginePartModal from '~/components/engine/show/EnginePartModal.vue'
 import EnginePartShowTabDocuments from '~/components/engine/parts/show/tabs/EnginePartShowTabDocuments.vue'
 import EnginePartShowTabInfo from '~/components/engine/parts/show/tabs/EnginePartShowTabInfo.vue'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 import type { BoatShowEnginePart } from '~/types/boat_show'
 
 const { t } = useT()
@@ -57,13 +57,18 @@ function wearStateVariant(state: string): 'success' | 'info' | 'warning' | 'neut
 
 <template>
   <div class="w-full max-w-7xl px-6 py-10 sm:px-8">
-    <BaseBreadcrumb :items="[
-      { label: t('boats.show.breadcrumbFleet'), href: '/boats' },
-      { label: boat.name, href: `/boats/${boat.id}` },
-      { label: t('boats.engineShow.breadcrumb.equipment'), href: `/boats/${boat.id}?tab=equipment` },
-      { label: engineTitle(), href: `/boats/${boat.id}/engines/${engine.id}?tab=parts` },
-      { label: part.designation },
-    ]" />
+    <BaseBreadcrumb
+      :items="[
+        { label: t('boats.show.breadcrumbFleet'), href: '/boats' },
+        { label: boat.name, href: `/boats/${boat.id}` },
+        {
+          label: t('boats.engineShow.breadcrumb.equipment'),
+          href: `/boats/${boat.id}?tab=equipment`,
+        },
+        { label: engineTitle(), href: `/boats/${boat.id}/engines/${engine.id}?tab=parts` },
+        { label: part.designation },
+      ]"
+    />
 
     <header class="space-y-6">
       <div class="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
@@ -94,10 +99,17 @@ function wearStateVariant(state: string): 'success' | 'info' | 'warning' | 'neut
         </div>
       </div>
 
-      <BaseTabs v-model="tab" :tabs="[
-        { key: 'info', label: t('boats.engineShow.partShow.tabs.info') },
-        { key: 'documents', label: t('boats.engineShow.partShow.tabs.documents'), badge: String(part.documents.length || '') },
-      ]" />
+      <BaseTabs
+        v-model="tab"
+        :tabs="[
+          { key: 'info', label: t('boats.engineShow.partShow.tabs.info') },
+          {
+            key: 'documents',
+            label: t('boats.engineShow.partShow.tabs.documents'),
+            badge: String(part.documents.length || ''),
+          },
+        ]"
+      />
     </header>
 
     <Transition name="tab" mode="out-in">

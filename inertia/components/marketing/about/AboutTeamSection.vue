@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import BaseButton from '~/components/base/BaseButton.vue'
-import { useScrollReveal } from '~/composables/useScrollReveal'
+import { useScrollReveal } from '~/composables/use_scroll_reveal'
 
 interface Member {
   n: string
@@ -57,14 +57,18 @@ const { el, isVisible } = useScrollReveal()
           </div>
           <p class="mt-3 font-semibold text-fg">{{ member.n }}</p>
           <p class="text-xs text-fg-muted">{{ member.r }}</p>
-          <p class="mt-3 border-t border-dashed border-bone pt-3 font-mono text-[11px] text-fg-subtle">
+          <p
+            class="mt-3 border-t border-dashed border-bone pt-3 font-mono text-[11px] text-fg-subtle"
+          >
             {{ member.b }}
           </p>
         </div>
       </div>
 
       <!-- Hiring banner -->
-      <div class="mt-8 flex flex-wrap items-center justify-between gap-6 rounded-2xl bg-navy-900 px-8 py-6">
+      <div
+        class="mt-8 flex flex-wrap items-center justify-between gap-6 rounded-2xl bg-navy-900 px-8 py-6"
+      >
         <div class="flex items-center gap-4">
           <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-coral-500 text-xl">
             ⚡
@@ -74,10 +78,7 @@ const { el, isVisible } = useScrollReveal()
             <p class="mt-0.5 text-sm text-white/60">{{ hiringSubtitle }}</p>
           </div>
         </div>
-        <BaseButton
-          href="/careers"
-          class="bg-white! text-navy-900! hover:bg-cream!"
-        >
+        <BaseButton href="/careers" class="bg-white! text-navy-900! hover:bg-cream!">
           {{ hiringCta }}
         </BaseButton>
       </div>

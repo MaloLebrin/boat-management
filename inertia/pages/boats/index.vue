@@ -11,7 +11,7 @@ import BoatPagination from '~/components/boats/list/BoatPagination.vue'
 import BoatTable from '~/components/boats/list/BoatTable.vue'
 import UpgradePlanModal from '~/components/base/UpgradePlanModal.vue'
 import type { BoatListFilters, BoatsPaginated } from '~/components/boats/list/types'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 
 const { t } = useT()
 
@@ -140,4 +140,3 @@ function reset() {
 
   <UpgradePlanModal v-model:open="showUpgradeModal" feature="boats" />
 </template>
-

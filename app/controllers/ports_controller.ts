@@ -40,7 +40,10 @@ export default class PortsController {
     const user = auth.getUserOrFail()
 
     try {
-      const port = await this.portService.getWithPontoonsAndMouillagesOrFail(user, Number(params.id))
+      const port = await this.portService.getWithPontoonsAndMouillagesOrFail(
+        user,
+        Number(params.id)
+      )
       return inertia.render('ports/show', { port })
     } catch (error) {
       if (error instanceof PortNotFoundError) return response.redirect('/ports')
@@ -53,7 +56,10 @@ export default class PortsController {
     const user = auth.getUserOrFail()
 
     try {
-      const port = await this.portService.getWithPontoonsAndMouillagesOrFail(user, Number(params.id))
+      const port = await this.portService.getWithPontoonsAndMouillagesOrFail(
+        user,
+        Number(params.id)
+      )
       await bouncer.with(PortPolicy).authorize('edit', port)
       return inertia.render('ports/edit', { port })
     } catch (error) {

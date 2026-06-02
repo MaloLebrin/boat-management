@@ -29,12 +29,17 @@ function updateIndicator() {
   }
 }
 
-watch(() => props.modelValue, () => nextTick(updateIndicator))
+watch(
+  () => props.modelValue,
+  () => nextTick(updateIndicator)
+)
 onMounted(() => nextTick(updateIndicator))
 </script>
 
 <template>
-  <div class="relative inline-flex rounded-(--radius-card) border border-border bg-surface-elevated p-1 shadow-(--shadow-xs)">
+  <div
+    class="relative inline-flex rounded-(--radius-card) border border-border bg-surface-elevated p-1 shadow-(--shadow-xs)"
+  >
     <!-- Sliding pill indicator -->
     <div
       class="pointer-events-none absolute top-1 h-[calc(100%-8px)] rounded-(--radius-control) bg-surface-muted shadow-(--shadow-xs) transition-[left,width,opacity] duration-(--motion-normal) ease-premium"
@@ -44,11 +49,17 @@ onMounted(() => nextTick(updateIndicator))
     <button
       v-for="(tab, i) in tabs"
       :key="tab.key"
-      :ref="(el) => { if (el) buttonRefs[i] = el as HTMLButtonElement }"
+      :ref="
+        (el) => {
+          if (el) buttonRefs[i] = el as HTMLButtonElement
+        }
+      "
       type="button"
       :class="[
         'relative z-10 inline-flex items-center gap-2 rounded-(--radius-control) px-3 py-2 text-sm font-semibold transition-colors duration-(--motion-fast) ease-premium focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/30 disabled:opacity-50 disabled:cursor-not-allowed',
-        tab.key === modelValue ? 'text-fg cursor-default' : 'text-fg-muted hover:text-fg cursor-pointer',
+        tab.key === modelValue
+          ? 'text-fg cursor-default'
+          : 'text-fg-muted hover:text-fg cursor-pointer',
       ]"
       @click="$emit('update:modelValue', tab.key)"
     >
