@@ -134,10 +134,7 @@ function goToTab(key: TabKey | string) {
             variant="secondary"
             size="sm"
             type="button"
-            @click="
-              goToTab('history')
-              createEventNonce++
-            "
+            @click="goToTab('history'); createEventNonce++"
           >
             + {{ t('boats.show.addEntry') }}
           </BaseButton>
@@ -146,10 +143,7 @@ function goToTab(key: TabKey | string) {
             variant="primary"
             size="sm"
             type="button"
-            @click="
-              goToTab('tasks')
-              createTaskNonce++
-            "
+            @click="goToTab('tasks'); createTaskNonce++"
           >
             + {{ t('boats.show.addTask') }}
           </BaseButton>
