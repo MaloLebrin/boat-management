@@ -10,8 +10,8 @@ import {
   SAFETY_EQUIPMENT_STATUS_OPTIONS,
   SAFETY_EQUIPMENT_TYPE_OPTIONS,
   SAIL_TYPE_OPTIONS,
-} from '#shared/constants/boats/boat_form_options'
-import { useT } from './useT'
+} from '../../shared/constants/boats/boat_form_options'
+import { useT } from './use_t'
 
 export function useBoatOptions() {
   const { t } = useT()

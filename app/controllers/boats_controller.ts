@@ -120,16 +120,19 @@ export default class BoatsController {
       const aiSuggestions: AiSuggestion[] | null = latestSuggestions
         ? (JSON.parse(latestSuggestions.responseText) as AiSuggestion[])
         : null
-      return inertia.render('boats/show', toShowProps(boat, {
-        positionHistory,
-        boatMedia,
-        maintenanceEvents,
-        maintenanceTasks,
-        maintenanceSheets,
-        aiSuggestions,
-        canManageMaintenance,
-        canManageEquipment,
-      }))
+      return inertia.render(
+        'boats/show',
+        toShowProps(boat, {
+          positionHistory,
+          boatMedia,
+          maintenanceEvents,
+          maintenanceTasks,
+          maintenanceSheets,
+          aiSuggestions,
+          canManageMaintenance,
+          canManageEquipment,
+        })
+      )
     } catch (error) {
       if (error instanceof BoatNotFoundError) {
         response.redirect('/boats')

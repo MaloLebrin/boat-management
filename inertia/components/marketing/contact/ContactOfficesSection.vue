@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useScrollReveal } from '~/composables/useScrollReveal'
+import { useScrollReveal } from '~/composables/use_scroll_reveal'
 
 interface OfficeItem {
   city: string
@@ -56,7 +56,11 @@ const { el, isVisible } = useScrollReveal()
               class="pointer-events-none absolute inset-0 h-full w-full opacity-20"
             >
               <path d="M0 130 Q100 110 200 130 T400 130 L400 200 L0 200 Z" fill="#faf6ee" />
-              <path d="M0 150 Q100 130 200 150 T400 150 L400 200 L0 200 Z" fill="#faf6ee" opacity="0.6" />
+              <path
+                d="M0 150 Q100 130 200 150 T400 150 L400 200 L0 200 Z"
+                fill="#faf6ee"
+                opacity="0.6"
+              />
             </svg>
             <div class="relative">
               <p class="font-display text-5xl leading-none text-white">{{ office.city }}</p>

@@ -2,7 +2,7 @@
 import { Link, usePage } from '@inertiajs/vue3'
 import { computed } from 'vue'
 import AppHeader from '~/components/layout/AppHeader.vue'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 
 type SharedProps = {
   locale?: 'en' | 'fr'
@@ -27,23 +27,31 @@ const copyrightYear = new Date().getFullYear()
     <footer class="border-t border-bone bg-paper">
       <div class="mx-auto grid max-w-7xl gap-10 px-6 py-12 md:grid-cols-4">
         <div class="space-y-3">
-          <p class="font-display text-sm text-fg" style="letter-spacing:-0.025em">
-            Fleet<em style="font-style:italic;color:#e2674f">Ai</em>
+          <p class="font-display text-sm text-fg" style="letter-spacing: -0.025em">
+            Fleet<em style="font-style: italic; color: #e2674f">Ai</em>
           </p>
           <p class="text-sm text-fg-muted">{{ t('public.footer.tagline') }}</p>
         </div>
 
         <div class="space-y-3">
-          <p class="text-xs font-semibold uppercase tracking-wider text-fg-subtle">{{ t('public.footer.product') }}</p>
+          <p class="text-xs font-semibold uppercase tracking-wider text-fg-subtle">
+            {{ t('public.footer.product') }}
+          </p>
           <div class="grid gap-2 text-sm font-medium text-fg-muted">
-            <Link :href="`/${locale}#features`" class="transition-colors hover:text-fg">{{ t('public.footer.features') }}</Link>
-            <Link :href="`/${locale}/tarifs`" class="transition-colors hover:text-fg">{{ t('public.footer.pricing') }}</Link>
+            <Link :href="`/${locale}#features`" class="transition-colors hover:text-fg">{{
+              t('public.footer.features')
+            }}</Link>
+            <Link :href="`/${locale}/tarifs`" class="transition-colors hover:text-fg">{{
+              t('public.footer.pricing')
+            }}</Link>
             <Link href="/design-system" class="transition-colors hover:text-fg">Design system</Link>
           </div>
         </div>
 
         <div class="space-y-3">
-          <p class="text-xs font-semibold uppercase tracking-wider text-fg-subtle">{{ t('public.footer.company') }}</p>
+          <p class="text-xs font-semibold uppercase tracking-wider text-fg-subtle">
+            {{ t('public.footer.company') }}
+          </p>
           <div class="grid gap-2 text-sm font-medium text-fg-muted">
             <a class="transition-colors hover:text-fg" href="#">{{ t('public.footer.contact') }}</a>
             <a class="transition-colors hover:text-fg" href="#">{{ t('public.footer.about') }}</a>
@@ -51,7 +59,9 @@ const copyrightYear = new Date().getFullYear()
         </div>
 
         <div class="space-y-3">
-          <p class="text-xs font-semibold uppercase tracking-wider text-fg-subtle">{{ t('public.footer.legal') }}</p>
+          <p class="text-xs font-semibold uppercase tracking-wider text-fg-subtle">
+            {{ t('public.footer.legal') }}
+          </p>
           <div class="grid gap-2 text-sm font-medium text-fg-muted">
             <a class="transition-colors hover:text-fg" href="#">{{ t('public.footer.privacy') }}</a>
             <a class="transition-colors hover:text-fg" href="#">{{ t('public.footer.terms') }}</a>
@@ -60,7 +70,9 @@ const copyrightYear = new Date().getFullYear()
       </div>
 
       <div class="border-t border-bone">
-        <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 text-xs font-medium text-fg-subtle">
+        <div
+          class="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 text-xs font-medium text-fg-subtle"
+        >
           <span>© {{ copyrightYear }} FleetAi</span>
           <span>{{ t('public.footer.bilingual') }}</span>
         </div>

@@ -4,7 +4,7 @@ import { Form } from '@adonisjs/inertia/vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 import type { BoatShowEngine, MaintenanceEventRow, MaintenanceTaskRow } from '~/types/boat_show'
 
 const { t } = useT()
@@ -23,7 +23,11 @@ const props = defineProps<{
 const todayIso = computed(() => new Date().toISOString().slice(0, 10))
 
 function getTaskStatus(task: MaintenanceTaskRow): 'overdue' | 'soon' | 'scheduled' {
-  if (task.dueEngineHours !== null && props.engine.hours !== null && props.engine.hours >= task.dueEngineHours) {
+  if (
+    task.dueEngineHours !== null &&
+    props.engine.hours !== null &&
+    props.engine.hours >= task.dueEngineHours
+  ) {
     return 'overdue'
   }
   if (task.dueAt && task.dueAt <= todayIso.value) {
@@ -50,7 +54,9 @@ function formatDate(iso: string): string {
     <div class="flex-1 space-y-8">
       <!-- A venir -->
       <section>
-        <h2 class="text-lg font-semibold text-fg mb-4">{{ t('boats.engineShow.maintenance.upcoming') }}</h2>
+        <h2 class="text-lg font-semibold text-fg mb-4">
+          {{ t('boats.engineShow.maintenance.upcoming') }}
+        </h2>
         <div v-if="openTasks.length === 0" class="text-sm text-fg-muted">
           {{ t('boats.engineShow.maintenance.noUpcoming') }}
         </div>
@@ -69,23 +75,29 @@ function formatDate(iso: string): string {
                       getTaskStatus(task) === 'overdue'
                         ? 'warning'
                         : getTaskStatus(task) === 'soon'
-                        ? 'info'
-                        : 'neutral'
+                          ? 'info'
+                          : 'neutral'
                     "
                   >
                     {{
                       getTaskStatus(task) === 'overdue'
                         ? t('boats.engineShow.maintenance.taskStatus.overdue')
                         : getTaskStatus(task) === 'soon'
-                        ? t('boats.engineShow.maintenance.taskStatus.soon')
-                        : t('boats.engineShow.maintenance.taskStatus.planned')
+                          ? t('boats.engineShow.maintenance.taskStatus.soon')
+                          : t('boats.engineShow.maintenance.taskStatus.planned')
                     }}
                   </BaseBadge>
                 </div>
                 <p class="text-sm text-fg-muted mt-1">
-                  <span v-if="task.dueAt">{{ t('boats.engineShow.maintenance.dueAt', { date: formatDate(task.dueAt) }) }}</span>
+                  <span v-if="task.dueAt">{{
+                    t('boats.engineShow.maintenance.dueAt', { date: formatDate(task.dueAt) })
+                  }}</span>
                   <span v-if="task.dueAt && task.dueEngineHours"> | </span>
-                  <span v-if="task.dueEngineHours">{{ t('boats.engineShow.maintenance.dueHours', { hours: String(task.dueEngineHours) }) }}</span>
+                  <span v-if="task.dueEngineHours">{{
+                    t('boats.engineShow.maintenance.dueHours', {
+                      hours: String(task.dueEngineHours),
+                    })
+                  }}</span>
                 </p>
               </div>
               <div v-if="canManage" class="flex items-center gap-2">
@@ -109,14 +121,21 @@ function formatDate(iso: string): string {
 
       <!-- Historique -->
       <section>
-        <h2 class="text-lg font-semibold text-fg mb-4">{{ t('boats.engineShow.maintenance.history') }}</h2>
+        <h2 class="text-lg font-semibold text-fg mb-4">
+          {{ t('boats.engineShow.maintenance.history') }}
+        </h2>
         <div v-if="maintenanceEvents.length === 0" class="text-sm text-fg-muted">
           {{ t('boats.engineShow.maintenance.noHistory') }}
         </div>
         <div v-else class="space-y-6">
           <div v-for="(events, yearMonth) in eventsByYearMonth" :key="yearMonth">
             <p class="text-sm font-semibold text-fg-muted mb-3">
-              {{ new Date(yearMonth + '-01').toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }) }}
+              {{
+                new Date(yearMonth + '-01').toLocaleDateString('fr-FR', {
+                  month: 'long',
+                  year: 'numeric',
+                })
+              }}
             </p>
             <div class="space-y-2">
               <div
@@ -129,7 +148,9 @@ function formatDate(iso: string): string {
                   <span class="font-medium text-fg">{{ event.title }}</span>
                 </div>
                 <span v-if="event.parts.length > 0" class="text-sm text-fg-muted">
-                  {{ t('boats.engineShow.maintenance.parts', { count: String(event.parts.length) }) }}
+                  {{
+                    t('boats.engineShow.maintenance.parts', { count: String(event.parts.length) })
+                  }}
                 </span>
               </div>
             </div>

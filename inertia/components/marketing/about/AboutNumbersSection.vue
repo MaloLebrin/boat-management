@@ -52,7 +52,9 @@ defineProps<{
 
       <!-- Investors -->
       <div class="mt-16">
-        <p class="mb-6 text-center font-mono text-xs font-semibold uppercase tracking-widest text-white/40">
+        <p
+          class="mb-6 text-center font-mono text-xs font-semibold uppercase tracking-widest text-white/40"
+        >
           {{ investorsLabel }}
         </p>
         <div class="flex flex-wrap items-center justify-center gap-10 opacity-60">

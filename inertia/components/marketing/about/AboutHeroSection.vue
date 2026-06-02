@@ -18,7 +18,8 @@ defineProps<{
         class="mt-6 font-display text-5xl leading-none tracking-tight text-fg lg:text-6xl xl:text-7xl"
         style="animation: fadeUp 700ms var(--ease-premium) both"
       >
-        {{ line1 }} <em class="text-coral-500">{{ line1Highlight }}</em><br />
+        {{ line1 }} <em class="text-coral-500">{{ line1Highlight }}</em
+        ><br />
         {{ line2 }} <em class="text-coral-500">{{ line2Highlight }}</em>
       </h1>
       <p

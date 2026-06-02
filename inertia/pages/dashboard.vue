@@ -15,7 +15,7 @@ import type {
   DashboardStats,
   DashboardUrgentMaintenanceRow,
 } from '#shared/types/dashboard'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 import type { AiSuggestion } from '~/types/boat_show'
 import { PLAN_LIMITS } from '../../shared/types/plan'
 import type { PlanTier } from '../../shared/types/plan'
@@ -47,10 +47,16 @@ function analyzeFleet() {
     return
   }
   isAnalyzing.value = true
-  router.post('/ai/fleet-analysis', {}, {
-    preserveScroll: true,
-    onFinish: () => { isAnalyzing.value = false },
-  })
+  router.post(
+    '/ai/fleet-analysis',
+    {},
+    {
+      preserveScroll: true,
+      onFinish: () => {
+        isAnalyzing.value = false
+      },
+    }
+  )
 }
 
 function isOverdue(dueAtIso: string) {
@@ -74,7 +80,9 @@ function dismissAlert() {
       class="mb-6"
       @dismiss="dismissAlert"
     >
-      <span class="font-semibold">{{ t('dashboard.overdueAlert', { count: String(stats.urgentMaintenance) }) }}</span>
+      <span class="font-semibold">{{
+        t('dashboard.overdueAlert', { count: String(stats.urgentMaintenance) })
+      }}</span>
       <span class="mx-2">-</span>
       <a href="/planning" class="underline hover:no-underline">{{ t('dashboard.viewPlanning') }}</a>
     </BaseAlert>
@@ -95,15 +103,50 @@ function dismissAlert() {
     </div>
 
     <div class="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
-      <BaseStatCard :label="t('dashboard.stats.boats')" :value="String(stats.boats)" tone="info" :style="{ animation: 'fadeUp var(--motion-normal) var(--ease-premium) both', animationDelay: '0ms' }" />
-      <BaseStatCard :label="t('dashboard.stats.engines')" :value="String(stats.engines)" tone="neutral" :style="{ animation: 'fadeUp var(--motion-normal) var(--ease-premium) both', animationDelay: '60ms' }" />
-      <BaseStatCard :label="t('dashboard.stats.sails')" :value="String(stats.sails)" tone="neutral" :style="{ animation: 'fadeUp var(--motion-normal) var(--ease-premium) both', animationDelay: '120ms' }" />
-      <BaseStatCard :label="t('dashboard.stats.rigs')" :value="String(stats.rigs)" tone="neutral" :style="{ animation: 'fadeUp var(--motion-normal) var(--ease-premium) both', animationDelay: '180ms' }" />
+      <BaseStatCard
+        :label="t('dashboard.stats.boats')"
+        :value="String(stats.boats)"
+        tone="info"
+        :style="{
+          animation: 'fadeUp var(--motion-normal) var(--ease-premium) both',
+          animationDelay: '0ms',
+        }"
+      />
+      <BaseStatCard
+        :label="t('dashboard.stats.engines')"
+        :value="String(stats.engines)"
+        tone="neutral"
+        :style="{
+          animation: 'fadeUp var(--motion-normal) var(--ease-premium) both',
+          animationDelay: '60ms',
+        }"
+      />
+      <BaseStatCard
+        :label="t('dashboard.stats.sails')"
+        :value="String(stats.sails)"
+        tone="neutral"
+        :style="{
+          animation: 'fadeUp var(--motion-normal) var(--ease-premium) both',
+          animationDelay: '120ms',
+        }"
+      />
+      <BaseStatCard
+        :label="t('dashboard.stats.rigs')"
+        :value="String(stats.rigs)"
+        tone="neutral"
+        :style="{
+          animation: 'fadeUp var(--motion-normal) var(--ease-premium) both',
+          animationDelay: '180ms',
+        }"
+      />
       <BaseStatCard
         :label="t('dashboard.stats.urgentMaintenance')"
         :value="String(stats.urgentMaintenance)"
         :tone="stats.urgentMaintenance ? 'warning' : 'success'"
-        :style="{ animation: 'fadeUp var(--motion-normal) var(--ease-premium) both', animationDelay: '240ms' }"
+        :style="{
+          animation: 'fadeUp var(--motion-normal) var(--ease-premium) both',
+          animationDelay: '240ms',
+        }"
       />
     </div>
 
@@ -116,8 +159,12 @@ function dismissAlert() {
         <BaseCard>
           <template #header>
             <div class="flex items-center justify-between">
-              <h2 class="text-sm font-semibold text-fg">{{ t('dashboard.urgentMaintenance.title') }}</h2>
-              <span class="text-xs font-medium text-fg-muted">{{ t('dashboard.urgentMaintenance.period') }}</span>
+              <h2 class="text-sm font-semibold text-fg">
+                {{ t('dashboard.urgentMaintenance.title') }}
+              </h2>
+              <span class="text-xs font-medium text-fg-muted">{{
+                t('dashboard.urgentMaintenance.period')
+              }}</span>
             </div>
           </template>
 
@@ -149,14 +196,25 @@ function dismissAlert() {
                   "
                 >
                   <span v-if="ev.kind === 'date'">
-                    {{ ev.dueAt && isOverdue(ev.dueAt) ? t('dashboard.urgentMaintenance.overdue') : t('dashboard.urgentMaintenance.dueSoon') }}
+                    {{
+                      ev.dueAt && isOverdue(ev.dueAt)
+                        ? t('dashboard.urgentMaintenance.overdue')
+                        : t('dashboard.urgentMaintenance.dueSoon')
+                    }}
                   </span>
                   <span v-else>{{ t('dashboard.urgentMaintenance.hours') }}</span>
                 </div>
               </div>
-              <p v-if="ev.kind === 'date'" class="mt-2 text-xs text-fg-subtle">{{ t('dashboard.urgentMaintenance.dueAt', { date: ev.dueAt ?? '' }) }}</p>
+              <p v-if="ev.kind === 'date'" class="mt-2 text-xs text-fg-subtle">
+                {{ t('dashboard.urgentMaintenance.dueAt', { date: ev.dueAt ?? '' }) }}
+              </p>
               <p v-else class="mt-2 text-xs text-fg-subtle">
-                {{ t('dashboard.urgentMaintenance.dueAtHours', { hours: ev.dueEngineHours ?? 0, current: ev.currentEngineHours ?? 0 }) }}
+                {{
+                  t('dashboard.urgentMaintenance.dueAtHours', {
+                    hours: ev.dueEngineHours ?? 0,
+                    current: ev.currentEngineHours ?? 0,
+                  })
+                }}
               </p>
             </li>
           </ul>
@@ -166,7 +224,9 @@ function dismissAlert() {
           <template #header>
             <div class="flex items-center justify-between">
               <h2 class="text-sm font-semibold text-fg">{{ t('dashboard.yourBoats.title') }}</h2>
-              <a href="/boats" class="text-sm font-semibold text-brand hover:underline">{{ t('dashboard.yourBoats.viewAll') }}</a>
+              <a href="/boats" class="text-sm font-semibold text-brand hover:underline">{{
+                t('dashboard.yourBoats.viewAll')
+              }}</a>
             </div>
           </template>
 
@@ -174,11 +234,21 @@ function dismissAlert() {
             <table class="w-full text-left text-sm">
               <thead class="bg-surface-muted text-fg-muted">
                 <tr>
-                  <th class="px-4 py-3 font-semibold">{{ t('dashboard.yourBoats.columns.name') }}</th>
-                  <th class="px-4 py-3 font-semibold">{{ t('dashboard.yourBoats.columns.propulsion') }}</th>
-                  <th class="px-4 py-3 font-semibold">{{ t('dashboard.yourBoats.columns.engines') }}</th>
-                  <th class="px-4 py-3 font-semibold">{{ t('dashboard.yourBoats.columns.sails') }}</th>
-                  <th class="px-4 py-3 font-semibold">{{ t('dashboard.yourBoats.columns.rig') }}</th>
+                  <th class="px-4 py-3 font-semibold">
+                    {{ t('dashboard.yourBoats.columns.name') }}
+                  </th>
+                  <th class="px-4 py-3 font-semibold">
+                    {{ t('dashboard.yourBoats.columns.propulsion') }}
+                  </th>
+                  <th class="px-4 py-3 font-semibold">
+                    {{ t('dashboard.yourBoats.columns.engines') }}
+                  </th>
+                  <th class="px-4 py-3 font-semibold">
+                    {{ t('dashboard.yourBoats.columns.sails') }}
+                  </th>
+                  <th class="px-4 py-3 font-semibold">
+                    {{ t('dashboard.yourBoats.columns.rig') }}
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -191,10 +261,14 @@ function dismissAlert() {
                   <td class="px-4 py-3 text-fg-muted">{{ b.propulsionType ?? '-' }}</td>
                   <td class="px-4 py-3 text-fg-muted">{{ b.enginesCount }}</td>
                   <td class="px-4 py-3 text-fg-muted">{{ b.sailsCount }}</td>
-                  <td class="px-4 py-3 text-fg-muted">{{ b.hasRig ? t('common.yes') : t('common.no') }}</td>
+                  <td class="px-4 py-3 text-fg-muted">
+                    {{ b.hasRig ? t('common.yes') : t('common.no') }}
+                  </td>
                 </tr>
                 <tr v-if="boats.length === 0">
-                  <td class="px-4 py-8 text-center text-fg-muted" colspan="5">{{ t('dashboard.yourBoats.empty') }}</td>
+                  <td class="px-4 py-8 text-center text-fg-muted" colspan="5">
+                    {{ t('dashboard.yourBoats.empty') }}
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -237,9 +311,16 @@ function dismissAlert() {
           @click="analyzeFleet"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+            />
           </svg>
-          <span>{{ isAnalyzing ? t('dashboard.aiPanel.analyzing') : t('dashboard.analyzeFleet') }}</span>
+          <span>{{
+            isAnalyzing ? t('dashboard.aiPanel.analyzing') : t('dashboard.analyzeFleet')
+          }}</span>
         </button>
       </div>
     </div>

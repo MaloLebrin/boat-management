@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
-import { useScrollReveal } from '~/composables/useScrollReveal'
+import { useScrollReveal } from '~/composables/use_scroll_reveal'
 
 type ProfileKey = 'loueurs' | 'ecoles' | 'marinas' | 'armateurs'
 
@@ -124,9 +124,7 @@ function formatCurrency(val: number) {
               type="button"
               :class="[
                 'rounded-full px-4 py-2 text-sm font-medium transition-colors',
-                profile === key
-                  ? 'bg-navy-900 text-white'
-                  : 'bg-paper text-fg-muted hover:bg-bone',
+                profile === key ? 'bg-navy-900 text-white' : 'bg-paper text-fg-muted hover:bg-bone',
               ]"
               @click="profile = key"
             >
@@ -209,10 +207,7 @@ function formatCurrency(val: number) {
 
           <!-- CTA -->
           <div class="mt-8">
-            <BaseButton
-              href="/signup"
-              class="w-full bg-white! text-navy-900! hover:bg-cream!"
-            >
+            <BaseButton href="/signup" class="w-full bg-white! text-navy-900! hover:bg-cream!">
               {{ ctaLabel }}
             </BaseButton>
           </div>

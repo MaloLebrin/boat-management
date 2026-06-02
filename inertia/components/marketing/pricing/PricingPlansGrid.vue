@@ -48,18 +48,29 @@ const proPrice = computed(() => {
           <p class="mt-2 text-2xl font-semibold text-fg">{{ plans.starter.price }}</p>
         </template>
         <ul v-if="plans.starter.idealFor?.length" class="mb-4 space-y-1 border-b border-bone pb-4">
-          <li v-for="line in plans.starter.idealFor" :key="line" class="flex items-center gap-2 text-xs text-fg-muted">
+          <li
+            v-for="line in plans.starter.idealFor"
+            :key="line"
+            class="flex items-center gap-2 text-xs text-fg-muted"
+          >
             <CheckCircleIcon class="h-4 w-4 shrink-0 text-coral-500" />
             <span>{{ line }}</span>
           </li>
         </ul>
         <ul class="space-y-2">
-          <li v-for="f in plans.starter.features" :key="f" class="flex items-center gap-2 text-sm text-fg-muted">
+          <li
+            v-for="f in plans.starter.features"
+            :key="f"
+            class="flex items-center gap-2 text-sm text-fg-muted"
+          >
             <CheckIcon class="h-4 w-4 shrink-0 text-mint-700" />
             <span>{{ f }}</span>
           </li>
         </ul>
-        <blockquote v-if="plans.starter.quote?.text" class="mt-4 border-t border-bone pt-4 text-xs italic text-fg-subtle">
+        <blockquote
+          v-if="plans.starter.quote?.text"
+          class="mt-4 border-t border-bone pt-4 text-xs italic text-fg-subtle"
+        >
           "{{ plans.starter.quote.text }}"
           <footer class="mt-1 not-italic font-medium">— {{ plans.starter.quote.author }}</footer>
         </blockquote>
@@ -71,31 +82,53 @@ const proPrice = computed(() => {
       </BaseCard>
 
       <!-- Pro -->
-      <div class="relative overflow-hidden rounded-xl bg-navy-800 p-6 ring-2 ring-navy-600 shadow-xl shadow-navy-900/20 -translate-y-2 hover:-translate-y-4 transition-all duration-300">
-        <div class="pointer-events-none absolute top-0 right-0 h-32 w-32 rounded-full bg-white/5 blur-2xl" />
+      <div
+        class="relative overflow-hidden rounded-xl bg-navy-800 p-6 ring-2 ring-navy-600 shadow-xl shadow-navy-900/20 -translate-y-2 hover:-translate-y-4 transition-all duration-300"
+      >
+        <div
+          class="pointer-events-none absolute top-0 right-0 h-32 w-32 rounded-full bg-white/5 blur-2xl"
+        />
         <div class="relative">
           <div class="mb-4 flex items-center justify-between gap-3">
             <p class="font-display text-sm italic text-white">{{ plans.pro.name }}</p>
-            <span class="inline-flex items-center rounded-full bg-white/15 px-3 py-1 text-xs font-medium text-white/80">
+            <span
+              class="inline-flex items-center rounded-full bg-white/15 px-3 py-1 text-xs font-medium text-white/80"
+            >
               {{ plans.pro.badge }}
             </span>
           </div>
           <p class="mb-4 font-display text-3xl italic text-white">{{ proPrice }}</p>
-          <ul v-if="plans.pro.idealFor?.length" class="mb-4 space-y-1 border-b border-white/10 pb-4">
-            <li v-for="line in plans.pro.idealFor" :key="line" class="flex items-center gap-2 text-xs text-white/60">
+          <ul
+            v-if="plans.pro.idealFor?.length"
+            class="mb-4 space-y-1 border-b border-white/10 pb-4"
+          >
+            <li
+              v-for="line in plans.pro.idealFor"
+              :key="line"
+              class="flex items-center gap-2 text-xs text-white/60"
+            >
               <CheckCircleIcon class="h-4 w-4 shrink-0 text-coral-400" />
               <span>{{ line }}</span>
             </li>
           </ul>
           <ul class="mb-6 space-y-2">
-            <li v-for="f in plans.pro.features" :key="f" class="flex items-center gap-2 text-sm text-white/70">
+            <li
+              v-for="f in plans.pro.features"
+              :key="f"
+              class="flex items-center gap-2 text-sm text-white/70"
+            >
               <CheckIcon class="h-4 w-4 shrink-0 text-mint-400" />
               <span>{{ f }}</span>
             </li>
           </ul>
-          <blockquote v-if="plans.pro.quote?.text" class="mb-4 text-xs italic text-white/50 border-t border-white/10 pt-4">
+          <blockquote
+            v-if="plans.pro.quote?.text"
+            class="mb-4 text-xs italic text-white/50 border-t border-white/10 pt-4"
+          >
             "{{ plans.pro.quote.text }}"
-            <footer class="mt-1 not-italic font-medium text-white/40">— {{ plans.pro.quote.author }}</footer>
+            <footer class="mt-1 not-italic font-medium text-white/40">
+              — {{ plans.pro.quote.author }}
+            </footer>
           </blockquote>
           <BaseButton href="/signup" variant="secondary">
             {{ signupLabel }}
@@ -112,19 +145,33 @@ const proPrice = computed(() => {
           </div>
           <p class="mt-2 text-2xl font-semibold text-fg">{{ plans.enterprise.price }}</p>
         </template>
-        <ul v-if="plans.enterprise.idealFor?.length" class="mb-4 space-y-1 border-b border-bone pb-4">
-          <li v-for="line in plans.enterprise.idealFor" :key="line" class="flex items-center gap-2 text-xs text-fg-muted">
+        <ul
+          v-if="plans.enterprise.idealFor?.length"
+          class="mb-4 space-y-1 border-b border-bone pb-4"
+        >
+          <li
+            v-for="line in plans.enterprise.idealFor"
+            :key="line"
+            class="flex items-center gap-2 text-xs text-fg-muted"
+          >
             <CheckCircleIcon class="h-4 w-4 shrink-0 text-coral-500" />
             <span>{{ line }}</span>
           </li>
         </ul>
         <ul class="space-y-2">
-          <li v-for="f in plans.enterprise.features" :key="f" class="flex items-center gap-2 text-sm text-fg-muted">
+          <li
+            v-for="f in plans.enterprise.features"
+            :key="f"
+            class="flex items-center gap-2 text-sm text-fg-muted"
+          >
             <CheckIcon class="h-4 w-4 shrink-0 text-mint-700" />
             <span>{{ f }}</span>
           </li>
         </ul>
-        <blockquote v-if="plans.enterprise.quote?.text" class="mt-4 border-t border-bone pt-4 text-xs italic text-fg-subtle">
+        <blockquote
+          v-if="plans.enterprise.quote?.text"
+          class="mt-4 border-t border-bone pt-4 text-xs italic text-fg-subtle"
+        >
           "{{ plans.enterprise.quote.text }}"
           <footer class="mt-1 not-italic font-medium">— {{ plans.enterprise.quote.author }}</footer>
         </blockquote>

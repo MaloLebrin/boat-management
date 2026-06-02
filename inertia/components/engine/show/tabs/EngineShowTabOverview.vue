@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import BaseCard from '~/components/base/BaseCard.vue'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 import type { BoatShowEngine, MaintenanceEventRow, MaintenanceTaskRow } from '~/types/boat_show'
 
 const { t } = useT()
@@ -29,32 +29,40 @@ function formatDate(iso: string): string {
   <div class="flex flex-col lg:flex-row gap-6">
     <div class="flex-1 space-y-6">
       <!-- Overdue alert -->
-      <div
-        v-if="overdueTask"
-        class="border-l-4 border-coral-400 bg-coral-400/10 rounded-r-lg p-4"
-      >
+      <div v-if="overdueTask" class="border-l-4 border-coral-400 bg-coral-400/10 rounded-r-lg p-4">
         <p class="font-semibold text-coral-700">{{ t('boats.engineShow.overdue.title') }}</p>
         <p class="text-sm text-coral-600 mt-1">
-          {{ t('boats.engineShow.overdue.detail', { title: overdueTask.title, hours: String(overdueTask.dueEngineHours) }) }}
+          {{
+            t('boats.engineShow.overdue.detail', {
+              title: overdueTask.title,
+              hours: String(overdueTask.dueEngineHours),
+            })
+          }}
         </p>
       </div>
 
       <!-- KPI row -->
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <BaseCard>
-          <p class="text-sm font-semibold text-fg-muted">{{ t('boats.engineShow.overview.totalHours') }}</p>
+          <p class="text-sm font-semibold text-fg-muted">
+            {{ t('boats.engineShow.overview.totalHours') }}
+          </p>
           <p class="mt-2 font-display text-3xl font-bold tracking-tight text-fg">
             {{ engine.hours ?? '-' }}
           </p>
         </BaseCard>
         <BaseCard>
-          <p class="text-sm font-semibold text-fg-muted">{{ t('boats.engineShow.overview.sinceLast') }}</p>
+          <p class="text-sm font-semibold text-fg-muted">
+            {{ t('boats.engineShow.overview.sinceLast') }}
+          </p>
           <p class="mt-2 font-display text-3xl font-bold tracking-tight text-fg">
             {{ hoursSinceLastMaint ?? '-' }}
           </p>
         </BaseCard>
         <BaseCard>
-          <p class="text-sm font-semibold text-fg-muted">{{ t('boats.engineShow.overview.costYear') }}</p>
+          <p class="text-sm font-semibold text-fg-muted">
+            {{ t('boats.engineShow.overview.costYear') }}
+          </p>
           <p class="mt-2 font-display text-3xl font-bold tracking-tight text-fg">-</p>
         </BaseCard>
       </div>
@@ -79,7 +87,9 @@ function formatDate(iso: string): string {
 
       <!-- Recent maintenance -->
       <BaseCard>
-        <p class="text-sm font-semibold text-fg mb-4">{{ t('boats.engineShow.overview.recentMaintenance') }}</p>
+        <p class="text-sm font-semibold text-fg mb-4">
+          {{ t('boats.engineShow.overview.recentMaintenance') }}
+        </p>
         <div v-if="recentEvents.length === 0" class="text-sm text-fg-muted">
           {{ t('boats.engineShow.overview.noEvent') }}
         </div>
@@ -115,7 +125,9 @@ function formatDate(iso: string): string {
 
       <!-- Prochaines echeances -->
       <BaseCard>
-        <p class="text-sm font-semibold text-fg mb-4">{{ t('boats.engineShow.overview.nextDue') }}</p>
+        <p class="text-sm font-semibold text-fg mb-4">
+          {{ t('boats.engineShow.overview.nextDue') }}
+        </p>
         <div v-if="sortedOpenTasks.length === 0" class="text-sm text-fg-muted">
           {{ t('boats.engineShow.overview.noTaskPlanned') }}
         </div>

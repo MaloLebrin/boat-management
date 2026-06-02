@@ -3,7 +3,7 @@ import { Link, router } from '@inertiajs/vue3'
 import { PencilIcon, TrashIcon } from '@heroicons/vue/24/outline'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 import type { MouillageRow } from '~/types/port'
 
 const props = defineProps<{
@@ -12,7 +12,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  edit: [mouillage: MouillageRow]
+  'edit': [mouillage: MouillageRow]
   'manage-spots': [mouillage: MouillageRow]
 }>()
 
@@ -66,7 +66,11 @@ function handleDelete() {
         {{ t('ports.spots.empty') }}
       </div>
       <ul v-else class="mt-2 space-y-2">
-        <li v-for="spot in mouillage.spots" :key="spot.id" class="flex items-center justify-between">
+        <li
+          v-for="spot in mouillage.spots"
+          :key="spot.id"
+          class="flex items-center justify-between"
+        >
           <span class="text-sm font-medium text-fg">{{ spot.name }}</span>
           <template v-if="spot.boat">
             <Link :href="`/boats/${spot.boat.id}`" class="text-sm text-brand hover:underline">

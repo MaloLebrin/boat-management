@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
-import { useScrollReveal } from '~/composables/useScrollReveal'
+import { useScrollReveal } from '~/composables/use_scroll_reveal'
 
 interface SidebarContact {
   icon: string
@@ -55,7 +55,9 @@ const fleetSizes = ['1-4', '5-20', '20+']
           <div class="mt-8 space-y-5">
             <!-- Subject pills -->
             <div>
-              <p class="mb-3 text-xs font-semibold uppercase tracking-widest text-fg-subtle">Sujet</p>
+              <p class="mb-3 text-xs font-semibold uppercase tracking-widest text-fg-subtle">
+                Sujet
+              </p>
               <div class="flex flex-wrap gap-2">
                 <button
                   v-for="s in subjects"
@@ -77,7 +79,9 @@ const fleetSizes = ['1-4', '5-20', '20+']
             <!-- Name row -->
             <div class="grid grid-cols-2 gap-4">
               <div>
-                <label class="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-fg-subtle">
+                <label
+                  class="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-fg-subtle"
+                >
                   {{ firstNameLabel }}
                 </label>
                 <input
@@ -87,7 +91,9 @@ const fleetSizes = ['1-4', '5-20', '20+']
                 />
               </div>
               <div>
-                <label class="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-fg-subtle">
+                <label
+                  class="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-fg-subtle"
+                >
                   {{ lastNameLabel }}
                 </label>
                 <input
@@ -100,7 +106,9 @@ const fleetSizes = ['1-4', '5-20', '20+']
 
             <!-- Email -->
             <div>
-              <label class="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-fg-subtle">
+              <label
+                class="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-fg-subtle"
+              >
                 {{ emailLabel }}
               </label>
               <input
@@ -113,7 +121,9 @@ const fleetSizes = ['1-4', '5-20', '20+']
             <!-- Org + Fleet size -->
             <div class="grid grid-cols-[1.5fr_1fr] gap-4">
               <div>
-                <label class="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-fg-subtle">
+                <label
+                  class="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-fg-subtle"
+                >
                   {{ orgLabel }}
                 </label>
                 <input
@@ -123,7 +133,9 @@ const fleetSizes = ['1-4', '5-20', '20+']
                 />
               </div>
               <div>
-                <label class="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-fg-subtle">
+                <label
+                  class="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-fg-subtle"
+                >
                   {{ fleetSizeLabel }}
                 </label>
                 <div class="flex gap-2">
@@ -147,7 +159,9 @@ const fleetSizes = ['1-4', '5-20', '20+']
 
             <!-- Message -->
             <div>
-              <label class="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-fg-subtle">
+              <label
+                class="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-fg-subtle"
+              >
                 {{ messageLabel }}
               </label>
               <textarea
@@ -162,7 +176,8 @@ const fleetSizes = ['1-4', '5-20', '20+']
               <input type="checkbox" class="mt-0.5 accent-navy-900" checked />
               <span>
                 {{ privacyText }}
-                <a href="/privacy" class="text-navy-900 underline">{{ privacyLinkLabel }}</a>.
+                <a href="/privacy" class="text-navy-900 underline">{{ privacyLinkLabel }}</a
+                >.
               </span>
             </label>
 
@@ -179,12 +194,10 @@ const fleetSizes = ['1-4', '5-20', '20+']
               {{ otherMeansTitle }}
             </p>
             <div class="mt-5 space-y-4">
-              <div
-                v-for="c in sidebarContacts"
-                :key="c.label"
-                class="flex items-start gap-3"
-              >
-                <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-bone text-sm">
+              <div v-for="c in sidebarContacts" :key="c.label" class="flex items-start gap-3">
+                <div
+                  class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-bone text-sm"
+                >
                   {{ c.icon }}
                 </div>
                 <div>

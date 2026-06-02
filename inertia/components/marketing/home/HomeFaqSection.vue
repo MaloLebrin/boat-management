@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
-import { useScrollReveal } from '~/composables/useScrollReveal'
+import { useScrollReveal } from '~/composables/use_scroll_reveal'
 
 interface FaqItem {
   q: string
@@ -26,7 +26,7 @@ const { el: sectionEl, isVisible } = useScrollReveal()
 
 <template>
   <section
-    :ref="(el) => sectionEl = el as HTMLElement"
+    :ref="(el) => (sectionEl = el as HTMLElement)"
     class="reveal bg-cream px-6 py-20 lg:px-8 lg:py-24"
     :class="{ visible: isVisible }"
   >
@@ -45,10 +45,7 @@ const { el: sectionEl, isVisible } = useScrollReveal()
 
         <!-- Right: accordion -->
         <div class="divide-y divide-bone overflow-hidden rounded-xl border border-bone bg-white">
-          <div
-            v-for="(item, idx) in items"
-            :key="item.q"
-          >
+          <div v-for="(item, idx) in items" :key="item.q">
             <button
               type="button"
               class="flex w-full items-center justify-between gap-4 px-5 py-4 text-left font-semibold text-fg hover:bg-paper/50"
@@ -59,7 +56,13 @@ const { el: sectionEl, isVisible } = useScrollReveal()
                 class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-bone text-fg-muted transition-transform duration-200"
                 :class="{ 'rotate-45': openIndex === idx }"
               >
-                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <svg
+                  class="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
                   <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6" />
                 </svg>
               </span>

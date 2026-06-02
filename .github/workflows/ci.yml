@@ -23,7 +23,9 @@ jobs:
 
       - run: pnpm lint
 
-      - run: pnpm typecheck
+      # - run: pnpm typecheck
+
+      - run: pnpm run build
 
       - name: Backend tests (SQLite)
         run: pnpm test

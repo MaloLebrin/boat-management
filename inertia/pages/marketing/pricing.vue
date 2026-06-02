@@ -17,34 +17,131 @@ import HomeFinalCtaSection from '~/components/marketing/home/HomeFinalCtaSection
 type SharedProps = { locale?: 'en' | 'fr' }
 const page = usePage<SharedProps>()
 
-interface ReassuranceItem { icon: string; label: string }
-interface TierFeat { 0: string; 1?: string }
-interface Tier {
-  name: string; tag: string; price: string | number
-  pricePer?: string; priceAnnual?: string | number; priceAnnualPer?: string
-  sub: string; featured?: boolean; feats: TierFeat[]; cta: string; ctaVariant: string
+interface ReassuranceItem {
+  icon: string
+  label: string
 }
-interface GroupRow { 0: string; 1: boolean | string; 2: boolean | string; 3: boolean | string }
-interface Group { title: string; rows: GroupRow[] }
-interface PlanHeader { name: string; price: string; cta: string }
-interface TestimonialItem { stat: string; statLabel: string; quote: string; name: string; org: string; role: string; plan: string }
-interface ExtraItem { icon: string; title: string; sub: string; price: string; priceSub: string; tone: string }
-interface FaqItem { q: string; a: string }
+interface TierFeat {
+  0: string
+  1?: string
+}
+interface Tier {
+  name: string
+  tag: string
+  price: string | number
+  pricePer?: string
+  priceAnnual?: string | number
+  priceAnnualPer?: string
+  sub: string
+  featured?: boolean
+  feats: TierFeat[]
+  cta: string
+  ctaVariant: string
+}
+interface GroupRow {
+  0: string
+  1: boolean | string
+  2: boolean | string
+  3: boolean | string
+}
+interface Group {
+  title: string
+  rows: GroupRow[]
+}
+interface PlanHeader {
+  name: string
+  price: string
+  cta: string
+}
+interface TestimonialItem {
+  stat: string
+  statLabel: string
+  quote: string
+  name: string
+  org: string
+  role: string
+  plan: string
+}
+interface ExtraItem {
+  icon: string
+  title: string
+  sub: string
+  price: string
+  priceSub: string
+  tone: string
+}
+interface FaqItem {
+  q: string
+  a: string
+}
 type ProfileKey = 'loueurs' | 'ecoles' | 'marinas' | 'armateurs'
 
 interface PageProps {
   t: {
     meta: { title: string; description: string }
     pricing: {
-      hero: { eyebrowLabel: string; title: string; titleHighlight: string; subtitle: string; monthlyLabel: string; annualLabel: string; annualBadge: string }
+      hero: {
+        eyebrowLabel: string
+        title: string
+        titleHighlight: string
+        subtitle: string
+        monthlyLabel: string
+        annualLabel: string
+        annualBadge: string
+      }
       tiers: Tier[]
       reassurance: ReassuranceItem[]
-      roi: { eyebrow: string; title: string; titleHighlight: string; subtitle: string; profileLabel: string; boatsLabel: string; hourlyLabel: string; studyNote: string; savingsLabel: string; perMonthLabel: string; timeLabel: string; maintLabel: string; fleetideLabel: string; fleetCostLabel: string; roiLabel: string; ctaLabel: string; profiles: Record<ProfileKey, { label: string; emoji: string }> }
-      testimonials: { eyebrow: string; title: string; titleHighlight: string; items: TestimonialItem[] }
-      detailedTable: { eyebrow: string; title: string; titleHighlight: string; subtitle: string; expandAll: string; collapseAll: string; groups: Group[]; planHeaders: PlanHeader[] }
+      roi: {
+        eyebrow: string
+        title: string
+        titleHighlight: string
+        subtitle: string
+        profileLabel: string
+        boatsLabel: string
+        hourlyLabel: string
+        studyNote: string
+        savingsLabel: string
+        perMonthLabel: string
+        timeLabel: string
+        maintLabel: string
+        fleetideLabel: string
+        fleetCostLabel: string
+        roiLabel: string
+        ctaLabel: string
+        profiles: Record<ProfileKey, { label: string; emoji: string }>
+      }
+      testimonials: {
+        eyebrow: string
+        title: string
+        titleHighlight: string
+        items: TestimonialItem[]
+      }
+      detailedTable: {
+        eyebrow: string
+        title: string
+        titleHighlight: string
+        subtitle: string
+        expandAll: string
+        collapseAll: string
+        groups: Group[]
+        planHeaders: PlanHeader[]
+      }
       extras: { eyebrow: string; title: string; subtitle: string; items: ExtraItem[] }
-      faq: { eyebrow: string; title: string; titleHighlight: string; subtitle: string; ctaLabel: string; items: FaqItem[] }
-      finalCta: { title: string; titleHighlight: string; subtitle: string; primaryCta: string; secondaryCta: string }
+      faq: {
+        eyebrow: string
+        title: string
+        titleHighlight: string
+        subtitle: string
+        ctaLabel: string
+        items: FaqItem[]
+      }
+      finalCta: {
+        title: string
+        titleHighlight: string
+        subtitle: string
+        primaryCta: string
+        secondaryCta: string
+      }
     }
   }
 }

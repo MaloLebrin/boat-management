@@ -2,7 +2,7 @@
 import { Link, router, usePage } from '@inertiajs/vue3'
 import { computed } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 import { buildLocaleSwitchHref, type AppLocale } from '#shared/helpers/locale_path'
 
 type SharedProps = {
@@ -34,20 +34,29 @@ function switchLocale() {
 </script>
 
 <template>
-  <header class="sticky top-0 z-40 border-b border-bone bg-cream/95 backdrop-blur-sm px-2.5 md:px-0">
+  <header
+    class="sticky top-0 z-40 border-b border-bone bg-cream/95 backdrop-blur-sm px-2.5 md:px-0"
+  >
     <div class="mx-auto flex h-16 max-w-7xl items-center justify-between">
       <Link
         :href="`/${locale}`"
         class="inline-flex items-center gap-2.5 transition-opacity duration-(--motion-fast) hover:opacity-80"
       >
-        <svg width="36" height="36" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <svg
+          width="36"
+          height="36"
+          viewBox="0 0 64 64"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
+        >
           <circle cx="32" cy="32" r="28" stroke="#0b1d2e" stroke-width="2.6" />
           <path d="M32 9 L37.5 32 L32 36.5 L26.5 32 Z" fill="#0b1d2e" />
           <path d="M32 55 L37.5 32 L32 27.5 L26.5 32 Z" fill="#e2674f" />
           <circle cx="32" cy="32" r="2.4" fill="#faf6ee" stroke="#0b1d2e" stroke-width="1.4" />
         </svg>
-        <span class="font-display text-lg leading-none text-fg" style="letter-spacing:-0.025em">
-          Fleet<em style="font-style:italic;color:#e2674f">Ai</em>
+        <span class="font-display text-lg leading-none text-fg" style="letter-spacing: -0.025em">
+          Fleet<em style="font-style: italic; color: #e2674f">Ai</em>
         </span>
       </Link>
 

@@ -1,4 +1,9 @@
-import { MouillageNotFoundError, PontoonNotFoundError, PortNotFoundError, SpotNotFoundError } from '#exceptions/port_errors'
+import {
+  MouillageNotFoundError,
+  PontoonNotFoundError,
+  PortNotFoundError,
+  SpotNotFoundError,
+} from '#exceptions/port_errors'
 import MouillageService from '#services/mouillage_service'
 import PontoonService from '#services/pontoon_service'
 import PortService from '#services/port_service'
@@ -42,13 +47,17 @@ export default class SpotsController {
     try {
       await bouncer.with(PortPolicy).authorize('create')
       const port = await this.portService.getForUserOrFail(user, Number(params.portId))
-      const mouillage = await this.mouillageService.getForPortOrFail(port.id, Number(params.mouillageId))
+      const mouillage = await this.mouillageService.getForPortOrFail(
+        port.id,
+        Number(params.mouillageId)
+      )
       const payload = await request.validateUsing(createSpotValidator)
       await this.spotService.createForMouillage(mouillage, port, payload)
       return response.redirect().back()
     } catch (error) {
       if (error instanceof PortNotFoundError) return response.redirect('/ports')
-      if (error instanceof MouillageNotFoundError) return response.redirect(`/ports/${params.portId}`)
+      if (error instanceof MouillageNotFoundError)
+        return response.redirect(`/ports/${params.portId}`)
       throw error
     }
   }

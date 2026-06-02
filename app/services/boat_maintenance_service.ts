@@ -4,7 +4,14 @@ import {
 } from '#exceptions/maintenance_errors'
 import type Boat from '#models/boat'
 import type { CreateMaintenancePayload } from '#shared/types/maintenance'
+import {
+  buildEngineCaption,
+  buildSailCaption,
+  computeTotalCost,
+  toDateTime,
+} from '#shared/helpers/maintenance'
 import BoatEngine from '#models/boat_engine'
+import BoatEnginePart from '#models/boat_engine_part'
 import BoatMaintenanceEvent from '#models/boat_maintenance_event'
 import BoatMaintenancePart from '#models/boat_maintenance_part'
 import BoatRig from '#models/boat_rig'
@@ -12,31 +19,9 @@ import BoatSail from '#models/boat_sail'
 import type User from '#models/user'
 import { inject } from '@adonisjs/core'
 import db from '@adonisjs/lucid/services/db'
-import { DateTime } from 'luxon'
 
 export { BoatMaintenanceNotFoundError, BoatMaintenanceValidationError }
 export type { CreateMaintenancePayload }
-
-function toDateTime(value: Date | string | DateTime): DateTime {
-  if (DateTime.isDateTime(value)) return value
-  if (value instanceof Date) return DateTime.fromJSDate(value)
-  return DateTime.fromISO(String(value))
-}
-
-function buildEngineCaption(engine: BoatEngine): string {
-  const bits = [engine.brand, engine.model, engine.serialNumber].filter(Boolean)
-  const label = bits.join(' ').trim()
-  return label || engine.kind
-}
-
-function buildSailCaption(sail: BoatSail): string {
-  const bits = [
-    sail.sailType,
-    sail.material,
-    sail.areaM2 !== null ? `${sail.areaM2} m²` : null,
-  ].filter(Boolean)
-  return bits.join(' · ')
-}
 
 @inject()
 export default class BoatMaintenanceService {
@@ -164,6 +149,8 @@ export default class BoatMaintenanceService {
             name: (p.name ?? '').trim(),
             quantity: p.quantity?.trim() ? Number.parseInt(p.quantity.trim(), 10) : null,
             notes: p.notes?.trim() ? p.notes.trim() : null,
+            enginePartId: p.enginePartId ?? null,
+            unitPrice: p.unitPrice ? Number.parseFloat(p.unitPrice) : null,
           }))
           .filter((p) => p.name.length > 0) ?? []
 
@@ -183,9 +170,31 @@ export default class BoatMaintenanceService {
             name: p.name,
             quantity: p.quantity,
             notes: p.notes,
+            enginePartId: p.enginePartId,
+            unitPrice: p.unitPrice,
           })),
           { client: trx }
         )
+
+        // Decrement stock for catalog parts and auto-update wear state when depleted
+        const catalogParts = cleanParts.filter((p) => p.enginePartId !== null)
+        for (const p of catalogParts) {
+          const enginePart = await BoatEnginePart.query({ client: trx })
+            .where('id', p.enginePartId!)
+            .first()
+
+          if (!enginePart) continue
+
+          const used = p.quantity ?? 1
+          const newStock = enginePart.stock !== null ? Math.max(0, enginePart.stock - used) : null
+          enginePart.stock = newStock
+
+          if (newStock === 0 && enginePart.wearState !== 'damaged') {
+            enginePart.wearState = 'to_replace'
+          }
+
+          await enginePart.save()
+        }
       }
 
       await event.load('parts')
@@ -224,16 +233,23 @@ export default class BoatMaintenanceService {
    */
   async getHistoryForOrg(user: User) {
     if (!user.organizationId) {
-      return { events: [], stats: { totalEvents: 0, totalParts: 0, totalBoats: 0 } }
+      return {
+        events: [],
+        stats: { totalEvents: 0, totalParts: 0, totalBoats: 0, totalCost: null },
+      }
     }
 
-    const Boat = (await import('#models/boat')).default
+    const boatModule = await import('#models/boat')
+    const Boat = boatModule.default
     const boats = await Boat.query().where('organizationId', user.organizationId)
     const boatIds = boats.map((b) => b.id)
     const boatMap = new Map(boats.map((b) => [b.id, b.name]))
 
     if (boatIds.length === 0) {
-      return { events: [], stats: { totalEvents: 0, totalParts: 0, totalBoats: 0 } }
+      return {
+        events: [],
+        stats: { totalEvents: 0, totalParts: 0, totalBoats: 0, totalCost: null },
+      }
     }
 
     const rawEvents = await BoatMaintenanceEvent.query()
@@ -241,28 +257,46 @@ export default class BoatMaintenanceService {
       .preload('parts')
       .orderBy('performedAt', 'desc')
 
-    const events = rawEvents.map((ev) => ({
-      id: ev.id,
-      boatId: ev.boatId,
-      boatName: boatMap.get(ev.boatId) ?? '',
-      subject: ev.subject,
-      title: ev.title,
-      notes: ev.notes,
-      performedAt: ev.performedAt.toISODate()!,
-      engineCaption: ev.engineCaption,
-      sailCaption: ev.sailCaption,
-      boatEngineId: ev.boatEngineId,
-      boatSailId: ev.boatSailId,
-      boatRigId: ev.boatRigId,
-      parts: ev.parts.map((p) => ({
-        id: p.id,
-        name: p.name,
-        quantity: p.quantity,
-      })),
-    }))
+    const events = rawEvents.map((ev) => {
+      const totalCost = computeTotalCost(ev.parts)
+      return {
+        id: ev.id,
+        boatId: ev.boatId,
+        boatName: boatMap.get(ev.boatId) ?? '',
+        subject: ev.subject,
+        title: ev.title,
+        notes: ev.notes,
+        performedAt: ev.performedAt.toISODate()!,
+        engineCaption: ev.engineCaption,
+        sailCaption: ev.sailCaption,
+        boatEngineId: ev.boatEngineId,
+        boatSailId: ev.boatSailId,
+        boatRigId: ev.boatRigId,
+        totalCost,
+        parts: ev.parts.map((p) => ({
+          id: p.id,
+          name: p.name,
+          quantity: p.quantity,
+          unitPrice: p.unitPrice,
+          totalCost:
+            p.unitPrice !== null ? Math.round(p.unitPrice * (p.quantity ?? 1) * 100) / 100 : null,
+          enginePartId: p.enginePartId,
+        })),
+      }
+    })
 
     const distinctBoatIds = new Set(events.map((e) => e.boatId))
     const totalParts = events.reduce((acc, ev) => acc + ev.parts.length, 0)
+
+    let totalCost: number | null = null
+    for (const ev of events) {
+      if (ev.totalCost !== null) {
+        totalCost = (totalCost ?? 0) + ev.totalCost
+      }
+    }
+    if (totalCost !== null) {
+      totalCost = Math.round(totalCost * 100) / 100
+    }
 
     return {
       events,
@@ -270,6 +304,7 @@ export default class BoatMaintenanceService {
         totalEvents: events.length,
         totalParts,
         totalBoats: distinctBoatIds.size,
+        totalCost,
       },
     }
   }

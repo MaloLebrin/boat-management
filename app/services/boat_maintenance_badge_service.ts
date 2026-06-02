@@ -12,7 +12,6 @@ import { DateTime } from 'luxon'
 
 export type { BoatMaintenanceBadge }
 
-
 @inject()
 export default class BoatMaintenanceBadgeService {
   async getForBoatIds(
@@ -97,21 +96,20 @@ export default class BoatMaintenanceBadgeService {
         ? []
         : await BoatEngine.query().whereIn('id', engineIds).select(['id', 'hours'])
 
-    const maxDoneByEngine =
+    const maxDoneRows: MaintenanceMaxDoneRow[] =
       engineIds.length === 0
-        ? new Map<number, number>()
-        : new Map(
-            (
-              await db
-                .from('boat_maintenance_tasks')
-                .where('status', 'done')
-                .whereIn('boat_engine_id', engineIds)
-                .whereNotNull('done_engine_hours')
-                .groupBy('boat_engine_id')
-                .select('boat_engine_id as boatEngineId')
-                .max('done_engine_hours as maxDone')
-            ).map((r: MaintenanceMaxDoneRow) => [Number(r.boatEngineId), Number(r.maxDone)])
-          )
+        ? []
+        : await db
+            .from('boat_maintenance_tasks')
+            .where('status', 'done')
+            .whereIn('boat_engine_id', engineIds)
+            .whereNotNull('done_engine_hours')
+            .groupBy('boat_engine_id')
+            .select('boat_engine_id as boatEngineId')
+            .max('done_engine_hours as maxDone')
+    const maxDoneByEngine = new Map(
+      maxDoneRows.map((r) => [Number(r.boatEngineId), Number(r.maxDone)])
+    )
 
     const engineHoursNow = new Map<number, number | null>()
     for (const e of engines) {

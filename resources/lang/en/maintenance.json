@@ -32,7 +32,8 @@
     "stats": {
       "events": "Events",
       "partsChanged": "Parts replaced",
-      "boats": "Boats"
+      "boats": "Boats",
+      "totalCost": "Total cost"
     },
     "timeline": {
       "events": "{count} event(s)",
@@ -40,7 +41,10 @@
       "show": "Detail",
       "hide": "Hide",
       "partsUsed": "Parts used",
-      "noDetails": "No additional details"
+      "noDetails": "No additional details",
+      "totalCost": "Total cost",
+      "unitPrice": "Unit price",
+      "fromCatalog": "Catalog part"
     },
     "empty": {
       "title": "No maintenance events",

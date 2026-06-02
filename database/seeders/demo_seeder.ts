@@ -32,11 +32,11 @@ export default class extends BaseSeeder {
     let user = await User.query().where('email', adminEmail).first()
     if (!user) {
       const userService = await app.container.make(UserService)
-        ; ({ user } = await userService.signupWithOrganization({
-          email: adminEmail,
-          password: adminPassword,
-          fullName: 'Administrateur',
-        }))
+      ;({ user } = await userService.signupWithOrganization({
+        email: adminEmail,
+        password: adminPassword,
+        fullName: 'Administrateur',
+      }))
     }
 
     if (user.organizationId === null) {

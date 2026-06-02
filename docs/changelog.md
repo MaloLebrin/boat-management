@@ -3,9 +3,50 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-06-01 — Gestion avancée des pièces et suivi des coûts de maintenance
+
+**Nouvelles fonctionnalités**
+
+### Liaison pièces de maintenance → catalogue moteur
+
+- Champ `engine_part_id` (FK nullable) ajouté sur `boat_maintenance_parts` → lien vers `boat_engine_parts`
+- Relation `belongsTo` ajoutée dans `BoatMaintenancePart` → `BoatEnginePart`
+- Champ `enginePartId` accepté dans le payload `parts[]` du formulaire de création d'événement de maintenance
+- Lors de la création d'un événement, si une pièce référence une pièce du catalogue :
+  - Le stock est décrémenté automatiquement (en transaction)
+  - Si le stock atteint 0, le `wearState` passe à `to_replace` (sauf si `damaged`)
+
+### Suivi des coûts de maintenance
+
+- Champ `unit_price` (decimal 10,2) ajouté sur `boat_maintenance_parts`
+- Champ `unitPrice` accepté dans le payload `parts[]`
+- `getHistoryForOrg` retourne `totalCost` par événement et dans les statistiques globales
+- Type `MaintenanceEventPartRow` et `MaintenanceEventRow` ajoutés dans `shared/types/maintenance.ts`
+- Clés i18n ajoutées : `maintenance.history.stats.totalCost`, `maintenance.history.timeline.totalCost/unitPrice/fromCatalog` (EN + FR)
+
+### Seuil d'alerte de stock minimum sur les pièces moteur
+
+- Champ `min_stock_alert` (int nullable) ajouté sur `boat_engine_parts`
+- Champ `minStockAlert` accepté dans les payloads create/update de pièce moteur
+- Méthode `BoatEnginePartService.listLowStock(engineId)` : retourne les pièces dont `stock ≤ min_stock_alert`
+- Clés i18n ajoutées : `equipment.stock.minStockAlert/minStockAlertPlaceholder/lowStockWarning` (EN + FR)
+- Type `LowStockPartRow` ajouté dans `shared/types/boat.ts`
+
+**Migrations ajoutées**
+
+- `1779200000000_link_maintenance_parts_to_engine_parts.ts` — FK `engine_part_id` sur `boat_maintenance_parts`
+- `1779300000000_add_cost_to_maintenance_parts.ts` — colonne `unit_price` sur `boat_maintenance_parts`
+- `1779400000000_add_min_stock_alert_to_engine_parts.ts` — colonne `min_stock_alert` sur `boat_engine_parts`
+
+**Tests ajoutés**
+
+- `tests/unit/boat_maintenance_service.spec.ts` : 3 nouveaux cas (décrément stock, wearState auto, totalCost)
+- `tests/unit/boat_engine_part_service.spec.ts` : 4 cas (create avec minStockAlert, listLowStock, update)
+
 ## 2026-06-01 — États d'usure et documents sur les pièces moteur
 
 **Nouvelles fonctionnalités**
+
 - Champ `wear_state` ajouté sur `boat_engine_parts` : valeurs `new | good | worn | to_replace | damaged`, optionnel (défaut `good`)
 - Les pièces moteur peuvent désormais avoir des documents attachés (PDF, CSV, XLSX, DOCX) via le système Media polymorphique (`entityType: 'boat_engine_part'`)
 - Nouvelle page dédiée `/boats/:boatId/engines/:engineId/parts/:partId` avec deux onglets : **Informations** et **Documents**
@@ -15,6 +56,7 @@ Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 - Clés i18n ajoutées dans `equipment.wearState` (EN + FR) et `boats.engineShow.parts.wearState/view` + `boats.engineShow.partShow` (EN + FR)
 
 **Routes ajoutées**
+
 - `GET  /boats/:boatId/engines/:engineId/parts/:partId` → `BoatEnginePartsController.show`
 - `POST /boats/:boatId/engines/:engineId/parts/:partId/documents` → `storeDocument`
 - `DELETE /boats/:boatId/engines/:engineId/parts/:partId/media/:mediaId` → `destroyMedia`
@@ -25,36 +67,40 @@ Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 ## 2026-05-25 — Correctifs et config Stripe
 
 **Correctifs backend**
+
 - `SubscriptionService.syncFromCheckoutSession` : `session.subscription` était casté en `Stripe.Subscription` alors que c'est un simple ID string → corrigé par un appel `stripeService.retrieveSubscription()` pour récupérer l'objet complet avec `expand: ['items.data.price']`
 - Route `/webhooks/stripe` exclue de la protection CSRF Shield (`config/shield.ts → exceptRoutes`)
 
 **Variables d'environnement requises**
 
-| Variable | Description |
-|---|---|
-| `STRIPE_SECRET_KEY` | Clé secrète Stripe (`sk_live_...` en prod, `sk_test_...` en dev) |
-| `STRIPE_WEBHOOK_SECRET` | Secret de signature webhook (`whsec_...`) |
-| `STRIPE_PUBLIC_KEY` | Clé publique (`pk_live_...` / `pk_test_...`) |
-| `STRIPE_PRO_MONTHLY_PRICE_ID` | Price ID Stripe mensuel Pro (`price_...`) |
-| `STRIPE_PRO_ANNUAL_PRICE_ID` | Price ID Stripe annuel Pro (`price_...`) |
-| `STRIPE_ENTERPRISE_MONTHLY_PRICE_ID` | Price ID Stripe mensuel Enterprise (`price_...`) |
-| `STRIPE_ENTERPRISE_ANNUAL_PRICE_ID` | Price ID Stripe annuel Enterprise (`price_...`) |
-| `STRIPE_CUSTOMER_PORTAL_ID` | ID de configuration du Customer Portal (`bpc_...`, optionnel) |
+| Variable                             | Description                                                      |
+| ------------------------------------ | ---------------------------------------------------------------- |
+| `STRIPE_SECRET_KEY`                  | Clé secrète Stripe (`sk_live_...` en prod, `sk_test_...` en dev) |
+| `STRIPE_WEBHOOK_SECRET`              | Secret de signature webhook (`whsec_...`)                        |
+| `STRIPE_PUBLIC_KEY`                  | Clé publique (`pk_live_...` / `pk_test_...`)                     |
+| `STRIPE_PRO_MONTHLY_PRICE_ID`        | Price ID Stripe mensuel Pro (`price_...`)                        |
+| `STRIPE_PRO_ANNUAL_PRICE_ID`         | Price ID Stripe annuel Pro (`price_...`)                         |
+| `STRIPE_ENTERPRISE_MONTHLY_PRICE_ID` | Price ID Stripe mensuel Enterprise (`price_...`)                 |
+| `STRIPE_ENTERPRISE_ANNUAL_PRICE_ID`  | Price ID Stripe annuel Enterprise (`price_...`)                  |
+| `STRIPE_CUSTOMER_PORTAL_ID`          | ID de configuration du Customer Portal (`bpc_...`, optionnel)    |
 
 ⚠️ Les Price IDs commencent par `price_` (pas `prod_` qui sont des Product IDs).
 
 **Config webhook en production**
+
 1. Dashboard Stripe → **Webhooks** → **Add endpoint** : `https://ton-domaine.com/webhooks/stripe`
 2. Events à écouter : `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`
 3. Copier le `whsec_...` affiché → `STRIPE_WEBHOOK_SECRET` dans les env de prod
 4. Le `whsec_` du CLI (`stripe listen`) est différent de celui du dashboard — ne pas les mélanger
 
 **Dev local**
+
 ```bash
 stripe login                  # si clé CLI expirée
 stripe listen --forward-to localhost:5555/webhooks/stripe
 # copier le whsec_ affiché → STRIPE_WEBHOOK_SECRET dans .env
 ```
+
 Cartes de test : `4242 4242 4242 4242` (succès), `4000 0000 0000 0002` (refusée), `4000 0025 0000 3155` (3DS)
 
 ---
@@ -64,6 +110,7 @@ Cartes de test : `4242 4242 4242 4242` (succès), `4000 0000 0000 0002` (refusé
 Mise en place du flux de paiement complet via Stripe Billing.
 
 **Backend**
+
 - Nouvelles tables : `subscriptions` (état de l'abonnement Stripe), colonne `stripe_customer_id` sur `organizations`
 - `StripeService` : création/récupération du customer Stripe, Checkout Session, Customer Portal Session, vérification de signature webhook
 - `SubscriptionService` : synchronisation de l'abonnement depuis les événements Stripe (`checkout.session.completed`, `customer.subscription.updated/deleted`), mise à jour automatique de `organizations.plan`
@@ -71,12 +118,14 @@ Mise en place du flux de paiement complet via Stripe Billing.
 - Le plan `organizations.plan` est mis à jour automatiquement par les webhooks Stripe
 
 **Frontend**
+
 - Page `/settings/billing` : prop `subscription` (statut, date de renouvellement, intervalle)
 - Sélecteur mensuel/annuel avant le checkout
 - Badge de statut abonnement (actif, en retard…) + date de renouvellement
 - Bouton "Gérer mon abonnement" → Customer Portal Stripe
 
 **Routes**
+
 - `POST /settings/billing/checkout` — `settings.billing.checkout`
 - `POST /settings/billing/portal` — `settings.billing.portal`
 - `POST /webhooks/stripe` — `webhooks.stripe` (public, hors auth)
@@ -85,13 +134,14 @@ Mise en place du flux de paiement complet via Stripe Billing.
 
 Révision des tarifs du plan Pro. Le modèle reste par organisation (pas par bateau ni par utilisateur).
 
-| Plan    | Mensuel     | Annuel (−20 %)          |
-|---------|-------------|-------------------------|
-| Starter | Gratuit     | Gratuit                 |
-| Pro     | 20 € / mois | 16 € / mois (192 €/an)  |
-| Enterprise | Sur devis | Sur devis              |
+| Plan       | Mensuel     | Annuel (−20 %)         |
+| ---------- | ----------- | ---------------------- |
+| Starter    | Gratuit     | Gratuit                |
+| Pro        | 20 € / mois | 16 € / mois (192 €/an) |
+| Enterprise | Sur devis   | Sur devis              |
 
 **Fichiers mis à jour :**
+
 - `resources/lang/fr/marketing.json` — prix carte Pro, tableau comparatif, meta description, FAQ (×2)
 - `resources/lang/en/marketing.json` — idem en anglais
 - `docs/quotas.md` — section Tarifs ajoutée
@@ -110,6 +160,7 @@ Amélioration UX : le blocage quota sur l'ajout de bateau remonte désormais au 
 4. **Assert dans `POST /boats`** (`BoatsController.store`) — `quotaService.assertCanAddBoat()` avant toute création en base
 
 **Changements :**
+
 - `BoatsController.index` : charge l'org et passe `canAddBoat` (boolean) en prop Inertia via `quotaService.canAddBoat()`
 - `BoatsController.create` : vérifie `canAddBoat` avant de rendre le formulaire
 - `inertia/pages/boats/index.vue` : `handleNewBoat()` remplace le lien direct ; bouton avec `LockClosedIcon` conditionnel
@@ -124,6 +175,7 @@ Amélioration UX : le blocage quota sur l'ajout de bateau remonte désormais au 
 Mise en place de l'enforcement des limites par plan organisationnel. Le plan est assigné manuellement en BDD (pas de Stripe).
 
 **Architecture :**
+
 - **`shared/types/plan.ts`** — source de vérité unique partagée backend/frontend :
   - `PlanTier` : `'starter' | 'pro' | 'enterprise'`
   - `PLAN_LIMITS: Record<PlanTier, PlanQuotas>` — limites par plan
@@ -138,12 +190,14 @@ Mise en place de l'enforcement des limites par plan organisationnel. Le plan est
   - `assertCanExport(org)` → synchrone, throw si non autorisé
 
 **Guards backend (controllers) :**
+
 - `BoatsController.store` : `assertCanAddBoat` avant `request.validateUsing`
 - `BoatsController.create` : `canAddBoat` pour bloquer l'accès au formulaire
 - `OrganizationInvitationsController.store` : `assertCanAddMember` avant création
 - `AiController.chat`, `fleetAnalysis`, `boatSuggestions` : `assertCanUseAI` en entrée de chaque méthode
 
 **Autres :**
+
 - **Migration** : colonne `plan` (enum `starter|pro|enterprise`, défaut `starter`) sur `organizations`
 - **Inertia shared props** : `currentPlan` exposé à toutes les pages via `InertiaMiddleware`
 - **Page billing** (`settings/billing`) : plan réel, jauges usage (bateaux/membres), disponibilité IA/export, CTA mise à niveau
@@ -151,12 +205,12 @@ Mise en place de l'enforcement des limites par plan organisationnel. Le plan est
 
 **Limites par plan :**
 
-| Feature        | Starter | Pro | Enterprise |
-|----------------|---------|-----|------------|
-| Bateaux max    | 2       | 25  | ∞          |
-| Membres max    | 1       | 5   | ∞          |
-| IA / Copilote  | ✗       | ✓   | ✓          |
-| Export         | ✗       | ✓   | ✓          |
+| Feature       | Starter | Pro | Enterprise |
+| ------------- | ------- | --- | ---------- |
+| Bateaux max   | 2       | 25  | ∞          |
+| Membres max   | 1       | 5   | ∞          |
+| IA / Copilote | ✗       | ✓   | ✓          |
+| Export        | ✗       | ✓   | ✓          |
 
 > Pour tout futur controller d'export : appeler `quotaService.assertCanExport(org)` en entrée.
 
@@ -165,6 +219,7 @@ Mise en place de l'enforcement des limites par plan organisationnel. Le plan est
 ## 2026-05-22 — Invitations de membres
 
 Feature d'invitation de membres par email :
+
 - Envoi d'une invitation par email avec token signe (expiry 7 jours)
 - Page d'acceptation `/invitations/accept?token=xxx` (publique, auth requise pour accepter)
 - Annulation d'invitation depuis les settings
@@ -204,19 +259,23 @@ Feature d'invitation de membres par email :
 ## 2026-05-21 — Sécurité : corrections SEC-M1 à SEC-M5
 
 **SEC-M1 — Rate limiting** (`@adonisjs/limiter` v3, store database) :
+
 - `POST /login`, `POST /forgot-password`, `POST /reset-password` → 10 req/min par IP (`authThrottle`)
 - `POST /ai/chat`, `POST /ai/fleet-analysis`, `POST /ai/boats/:id/suggestions` → 20 req/min par userId/IP (`aiThrottle`)
 - Migration : `1779300016000_create_rate_limits_table.ts`
 
 **SEC-M2 — AI Chat** (`app/controllers/ai_controller.ts`, `app/validators/ai.ts`) :
+
 - Validation VineJS : tableau `messages` avec `role: enum(['user','assistant'])` et `content: string.maxLength(4000)`, 1–50 éléments
 - Réponse convertie en `session.flash('info')` + `response.redirect().back()` (suppression des `response.badRequest` / `response.accepted` JSON)
 
 **SEC-M3 — cloudinaryPublicId** :
+
 - Supprimé des props Inertia : `app/transformers/boat_transformer.ts`, `app/transformers/media_transformer.ts`, `app/controllers/boat_equipment_controller.ts`, `inertia/types/boat_show.ts`
 - Le champ reste accessible côté serveur (Cloudinary download) mais n'est plus sérialisé vers le client
 
 **SEC-M5 — Token de reset** (`app/services/password_reset_service.ts`) :
+
 - Stockage en SHA-256 hex (plus de plain text en base)
 - Comparaison avec `crypto.timingSafeEqual` pour éliminer les timing attacks
 - Migration : `1779300015000_truncate_password_reset_tokens.ts` (purge des tokens plain-text existants)
@@ -252,6 +311,7 @@ Ajout d'un widget "Marinas" sur la page d'accueil du tableau de bord.
 Introduction du modele `Spot` qui represente une place individuelle au sein d'un ponton ou mouillage. Un bateau est maintenant assigne a un spot (et non plus directement a un ponton/mouillage).
 
 **Migrations** :
+
 - `1779300011000_create_spots_table` : table `spots` (id, name, description, pontoon_id, mouillage_id, organization_id, timestamps)
 - `1779300012000_alter_boats_for_spots` : ajout `spot_id`, suppression `pontoon_id`, `mouillage_id`, `spot_identifier`
 - `1779300013000_alter_boat_position_history_for_spots` : ajout `spot_id`, suppression `pontoon_id`, `mouillage_id`, `spot_identifier`
@@ -265,17 +325,20 @@ Introduction du modele `Spot` qui represente une place individuelle au sein d'un
 **Controller** : `app/controllers/spots_controller.ts` — actions `storeForPontoon`, `storeForMouillage`, `update`, `destroy`
 
 **Routes** (dans `start/routes/ports.ts`) :
+
 - `POST /ports/:portId/pontoons/:pontoonId/spots` — creer un spot sur un ponton
 - `POST /ports/:portId/mouillages/:mouillageId/spots` — creer un spot sur un mouillage
 - `PUT /spots/:id` — modifier un spot
 - `DELETE /spots/:id` — supprimer un spot
 
 **Modeles modifies** :
+
 - `Pontoon`, `Mouillage` : ajout relation `hasMany(Spot)`
 - `Boat` : remplace `pontoonId`, `mouillageId`, `spotIdentifier` par `spotId` + `belongsTo(Spot)`
 - `BoatPositionHistory` : remplace `pontoonId`, `mouillageId`, `spotIdentifier` par `spotId` + `belongsTo(Spot)`
 
 **Services modifies** :
+
 - `BoatService` : `updateAssignment` prend maintenant `{ spotId }` au lieu de `{ pontoonId, mouillageId, spotIdentifier }`
 - `PortService` : `getWithPontoonsAndMouillagesOrFail` retourne les spots par ponton/mouillage avec le bateau assigne
 - `PontoonService`, `MouillageService` : verification des bateaux via spots avant suppression
@@ -287,6 +350,7 @@ Introduction du modele `Spot` qui represente une place individuelle au sein d'un
 Ajout d'un onglet "Plan marina" sur la page de detail d'un port. Canvas SVG interactif avec positionnement libre des pontons et mouillages (coordonnees x/y persistees en base), mode edition pour repositionner les elements par drag, et reaffectation des bateaux par clic.
 
 **Composants Vue crees** :
+
 - `inertia/components/ports/show/tabs/PortListTab.vue` — onglet liste (extrait de show.vue)
 - `inertia/components/ports/show/tabs/MarinaMapTab.vue` — orchestrateur du plan marina
 - `inertia/components/ports/show/MarinaCanvas.vue` — canvas SVG 1400x900 avec drag
@@ -297,8 +361,9 @@ Ajout d'un onglet "Plan marina" sur la page de detail d'un port. Canvas SVG inte
 **Page modifiee** : `inertia/pages/ports/show.vue` — ajout BaseTabs (list/plan)
 
 **Routes backend utilisees** :
+
 - `PATCH /ports/:portId/pontoons/:pontoonId/position` — met a jour la position x/y d'un ponton
-- `PATCH /ports/:portId/mouillages/:mouillageId/position` — met a jour la position x/y d'un mouillage  
+- `PATCH /ports/:portId/mouillages/:mouillageId/position` — met a jour la position x/y d'un mouillage
 - `PATCH /boats/:id/assignment` — reaffecte un bateau a un ponton/mouillage
 
 **i18n** : cles `ports.tabs.*` et `ports.plan.*` ajoutees en FR et EN
@@ -312,21 +377,25 @@ Ajout d'un onglet "Plan marina" sur la page de detail d'un port. Canvas SVG inte
 Couche backend pour la feature de plan interactif de marina permettant le positionnement drag-and-drop des pontons/mouillages et l'affectation rapide des bateaux.
 
 **Migrations** :
+
 - `1779300009000_alter_pontoons_add_position` : ajout `position_x`, `position_y` (double, nullable) sur `pontoons`
 - `1779300010000_alter_mouillages_add_position` : idem sur `mouillages`
 
 **Modèles** : `Pontoon` et `Mouillage` — colonnes `positionX`, `positionY` ajoutées
 
 **Validator** : `app/validators/marina_layout.ts`
+
 - `updatePositionValidator` : `{ x: number, y: number }`
 - `assignBoatValidator` : `{ pontoonId?, mouillageId?, spotIdentifier? }`
 
 **Services** :
+
 - `PontoonService.updatePosition(pontoon, { x, y })` — sauvegarde position
 - `MouillageService.updatePosition(mouillage, { x, y })` — idem
 - `BoatService.updateAssignment(boat, { pontoonId, mouillageId, spotIdentifier })` — réaffecte un bateau et enregistre l'historique
 
 **Routes** :
+
 - `PATCH /ports/:portId/pontoons/:pontoonId/position` → `ports.pontoons.updatePosition`
 - `PATCH /ports/:portId/mouillages/:mouillageId/position` → `ports.mouillages.updatePosition`
 - `PATCH /boats/:id/assignment` → `boats.assign`
@@ -358,6 +427,7 @@ Implémentation complète des trois pages marketing depuis un design prototype (
 - **`marketing/contact.vue`** + 5 sections : `ContactHeroSection`, `ContactChannelsSection`, `ContactFormSection`, `ContactOfficesSection`, `ContactFaqSection`
 
 **Routes mises à jour** (`start/routes/marketing.ts`) :
+
 - `buildPricingPageData(i18n)` → `/en/tarifs`, `/fr/tarifs`
 - `buildAboutPageData(i18n)` → `/en/about`, `/fr/a-propos`
 - `buildContactPageData(i18n)` → `/contact`
@@ -394,6 +464,7 @@ Routes marketing.ts : ajout de la fonction `buildHomePageData()` avec toutes les
 Nouveau système complet de localisation des bateaux dans les marinas.
 
 **Migrations** (4 nouvelles) :
+
 - `create_ports_table` : table `ports` (organization_id FK, name, city, country, address, notes)
 - `create_pontoons_table` : table `pontoons` (port_id FK, name, description)
 - `alter_boats_add_pontoon_fields` : ajout `pontoon_id` (FK nullable) et `spot_identifier` (varchar 16) sur `boats`
@@ -402,6 +473,7 @@ Nouveau système complet de localisation des bateaux dans les marinas.
 **Modèles** : `Port`, `Pontoon`, `BoatPositionHistory` + relations ajoutées sur `Boat` (pontoon, positionHistory) et `Organization` (ports)
 
 **Services** :
+
 - `port_service.ts` : CRUD ports + garde `PortHasBoatsError` / `PontoonHasBoatsError`
 - `pontoon_service.ts` : CRUD pontons avec vérification bateaux avant suppression
 - `boat_service.ts` : ajout champs `pontoonId`/`spotIdentifier` + méthode `_logBerthChange` pour historique automatique à chaque changement d'emplacement
@@ -419,21 +491,25 @@ Nouveau système complet de localisation des bateaux dans les marinas.
 Nouvelles pages et composants Vue 3 pour la gestion des ports et pontons :
 
 **Pages ports** (`inertia/pages/ports/`) :
+
 - `index.vue` : liste des ports avec cards (nom, ville, nb pontons, nb bateaux), empty state, bouton "Nouveau port"
 - `new.vue` : formulaire de creation de port (name, city, country, address, notes)
 - `show.vue` : detail d'un port avec liste des pontons, formulaire inline d'ajout/modification de ponton
 - `edit.vue` : formulaire d'edition de port
 
 **Composants ports** (`inertia/components/ports/`) :
+
 - `show/PontoonCard.vue` : affiche un ponton avec sa liste de bateaux et liens vers les fiches bateau
 - `modals/PontoonFormModal.vue` : formulaire inline de creation/modification de ponton
 
 **Modifications bateaux** :
+
 - `BoatFormHullFields.vue` : nouvelle section "Emplacement actuel" avec selects Port > Ponton cascades + champ N° d'emplacement
 - `BoatShowTabSpecs.vue` : nouvelle carte "Emplacement actuel" affichant le port/ponton ou fallback sur homePort
 - `BoatShowTabOverview.vue` : affichage de l'emplacement actuel (Port / Ponton / #spot) dans la sidebar
 
 **Types** :
+
 - `inertia/types/port.ts` : `PortListItem`, `PontoonRow`, `PortShowDetail`, `PortEditPayload`
 
 **i18n** : toutes les cles sont deja presentes dans `resources/lang/{en,fr}/app.json` (namespace `ports.*`)
@@ -445,6 +521,7 @@ Nouvelles pages et composants Vue 3 pour la gestion des ports et pontons :
 ### Refonte landing pages marketing — contenu enrichi et nouvelles sections
 
 **Home page** — 3 nouvelles sections + sections existantes enrichies :
+
 - `HomeScreenshotsSection` : section "See it before you try it" avec 4 onglets produit (dashboard, fiche bateau, checklist, IA)
 - `HomeIndustriesSection` : accordéon 3 cibles (loueurs & charters, écoles de voile, armateurs privés) avec pain points / bénéfices / micro-quote
 - `HomeCaseStudySection` : étude de cas Marina Bleue — Challenge → Solution → Résultats avec 3 métriques (-80% temps, 22 bateaux, 0 oublié)
@@ -452,12 +529,14 @@ Nouvelles pages et composants Vue 3 pour la gestion des ports et pontons :
 - `HomeHowItWorksSection` : sous-texte pratique par étape + timeline J1/J7/J30
 
 **Pricing page** — sections enrichies :
+
 - "Idéal pour" par plan (3 bullet points ciblés)
 - Micro-quote client par plan
 - Trust signals enrichis (essai 14 jours, rejoint par 40+ flottes)
 - FAQ élargie de 5 à 9 questions
 
 **About page** — nouvelles sections :
+
 - `AboutTimelineSection` : frise chronologique 2024 → aujourd'hui
 - Section Mission sur fond navy (eyebrow, statement, body)
 - Valeurs étendues de 3 à 5 (transparence radicale, conformité maritime)
@@ -482,7 +561,9 @@ Nouvelles pages et composants Vue 3 pour la gestion des ports et pontons :
 ## 2026-05-18
 
 ### Analyse IA avec Mistral — Backend
+
 Intégration complète des suggestions IA via Mistral pour l'analyse de flotte et de bateaux individuels :
+
 - **Migration** : nouvelle table `ai_analyses` (id, user_id, boat_id, kind, response_text, created_at)
 - **Model** : `AiAnalysis` avec relations `User` et `Boat`
 - **Service** : `AiAnalysisService` avec méthodes :
@@ -494,7 +575,7 @@ Intégration complète des suggestions IA via Mistral pour l'analyse de flotte e
 - **Routes** :
   - `POST /ai/fleet-analysis` → `ai.fleetAnalysis` (déclenche l'analyse de flotte)
   - `POST /ai/boats/:id/suggestions` → `ai.boatSuggestions` (déclenche les suggestions bateau)
-- **Props Inertia** : 
+- **Props Inertia** :
   - Dashboard : `aiFleetAnalysis` (tableau de suggestions ou null)
   - Page boat/show : `aiSuggestions` (tableau de suggestions ou null)
 - **i18n** : clé `flash.ai.analysisError` ajoutée (EN/FR)
@@ -505,7 +586,9 @@ Intégration complète des suggestions IA via Mistral pour l'analyse de flotte e
 ## 2026-05-18
 
 ### Fiches de maintenance — Frontend
+
 Interface Vue 3 complète pour les fiches de maintenance :
+
 - **Nouvel onglet** "Fiches" dans la page de détail du bateau (`?tab=sheets`)
 - **Panel principal** (`BoatMaintenanceSheetsPanel`) : création de fiches via modal, filtrage par type
 - **Carte de fiche** (`BoatMaintenanceSheetCard`) : affichage du titre, type (badge couleur), statut, progression, expand/collapse
@@ -519,7 +602,9 @@ Interface Vue 3 complète pour les fiches de maintenance :
 ## 2026-05-18
 
 ### Fiches de maintenance — Backend
+
 Backend complet pour les fiches de maintenance avec checklist pré-remplie :
+
 - **Types de fiches** : entretien (10 items), montage (10 items), hivernage (14 items), déshivernage (14 items), atelier (8 items)
 - **Modèles** : `BoatMaintenanceSheet` et `BoatMaintenanceSheetItem` avec relations Lucid
 - **Service** : `BoatMaintenanceSheetService` (list, create, complete, delete, updateItem)
@@ -538,6 +623,7 @@ Backend complet pour les fiches de maintenance avec checklist pré-remplie :
 ## 2026-05-18
 
 ### Fiche bateau — champs réglementaires français
+
 - **Port d'attache** (`home_port`) : champ texte libre sur le bateau
 - **Catégorie de navigation CE** (`navigation_category`) : A / B / C / D avec descriptions (A = océanique, B = hauturière, C = côtière, D = eaux abritées)
 - **Numéro de coque HIN/WIN** (`hull_identification_number`) : identifiant constructeur
@@ -546,7 +632,9 @@ Backend complet pour les fiches de maintenance avec checklist pré-remplie :
 - **Personnes max à bord** (`max_persons`) : nombre entier
 
 ### Armement de sécurité
+
 Nouvelle section dédiée sur la fiche bateau, avec CRUD complet :
+
 - **Types** : gilet de sauvetage, radeau, extincteur, VHF, fusée/signal de détresse, EPIRB/PLB, trousse de premiers secours, harnais, bouée, ancre, pompe de cale, compas, AIS, GPS, radar, autre
 - **Quantité** : nombre d'unités
 - **Date d'expiration** : suivi du renouvellement obligatoire (gilets, fusées, radeaux…)
@@ -560,11 +648,14 @@ Nouvelle section dédiée sur la fiche bateau, avec CRUD complet :
 ## 2026-05-18
 
 ### Pièces moteur
+
 CRUD complet pour les pièces détachées associées à un moteur :
+
 - Désignation, référence, stock, fournisseur, notes
 - Accessible depuis la fiche moteur (`?tab=parts`)
 
 ### Catégories de maintenance étendues
+
 Ajout des catégories : coque, électricité, plomberie, sécurité, pont, autre (en plus de moteur, voile, gréement)
 
 ---
@@ -572,9 +663,11 @@ Ajout des catégories : coque, électricité, plomberie, sécurité, pont, autre
 ## 2026-05-17
 
 ### Notes libres sur les équipements
+
 Champ `notes` (texte libre) ajouté sur les moteurs, voiles et gréements.
 
 ### Liens contextuels dans l'historique de maintenance
+
 Les sujets de maintenance sont désormais cliquables et renvoient vers l'équipement concerné.
 
 ---
@@ -582,16 +675,20 @@ Les sujets de maintenance sont désormais cliquables et renvoient vers l'équipe
 ## 2026-05-16
 
 ### Téléchargement de documents
+
 - Téléchargement sécurisé des documents attachés aux bateaux et moteurs
 - Compression automatique des PDFs via Ghostscript avant upload Cloudinary (`-dPDFSETTINGS=/ebook`)
 
 ### Documents moteur
+
 Upload de documents (PDFs, images) directement depuis la fiche moteur.
 
 ### Réinitialisation de mot de passe
+
 Flow complet : envoi d'email, lien sécurisé, saisie du nouveau mot de passe.
 
 ### Paramètres profil et organisation
+
 Pages dédiées pour modifier les informations du profil utilisateur et de l'organisation.
 
 ---
@@ -599,24 +696,30 @@ Pages dédiées pour modifier les informations du profil utilisateur et de l'org
 ## 2026-05-15
 
 ### Médias bateaux (photos et documents)
+
 - Upload de photos et documents via Cloudinary
 - Galerie photo sur la fiche bateau (onglet Documents)
 - Chemins Cloudinary préfixés par environnement (isolation prod/staging)
 
 ### Système email
+
 Intégration `@adonisjs/mail` avec transport SMTP — utilisé pour les emails transactionnels (reset password, notifications futures).
 
 ### Enrichissement fiche moteur
+
 - **Heures à l'installation** (`install_hours`) : compteur de référence à la pose
 - **Type de cycle** (`stroke_type`) : 2 temps / 4 temps
 
 ### Statut des équipements
+
 Champ `status` sur les moteurs, voiles et gréements : `operational` · `in_maintenance` · `out_of_service` · `retired`, affiché avec badge coloré dans l'UI.
 
 ### Événements de maintenance depuis la fiche moteur
+
 Ajout d'un événement de maintenance directement depuis la page moteur, sans repasser par la fiche bateau.
 
 ### Transitions UI
+
 Animations de transition sur les onglets (indicateur glissant), modals et pages.
 
 ---
@@ -624,6 +727,7 @@ Animations de transition sur les onglets (indicateur glissant), modals et pages.
 ## 2026-05-13
 
 ### Synchronisation onglet / URL
+
 Le paramètre `?tab=xxx` dans l'URL est synchronisé avec l'onglet actif — lien direct et navigation navigateur opérationnels.
 
 ---
@@ -631,21 +735,27 @@ Le paramètre `?tab=xxx` dans l'URL est synchronisé avec l'onglet actif — lie
 ## 2026-05-11
 
 ### Interface bateau à onglets
+
 Fiche bateau réorganisée en 6 onglets : Vue d'ensemble · Specs · Équipements · Historique · Tâches · Documents.
 
 ### Modal d'ajout d'événement de maintenance
+
 Formulaire modal pour enregistrer un événement depuis la fiche bateau ou moteur.
 
 ### Internationalisation complète
+
 Toutes les chaînes UI sont passées par le système `t()` (useT composable) — support FR/EN sur la totalité des pages et composants.
 
 ### Sélecteur de langue
+
 Composant de changement de langue (FR/EN), persistance dans un cookie.
 
 ### Pages marketing
+
 Pages À propos et Contact avec animations, SEO meta et contenu localisé.
 
 ### PWA
+
 Manifest web app progressif + favicon/branding Fleetide.
 
 ---
@@ -653,9 +763,11 @@ Manifest web app progressif + favicon/branding Fleetide.
 ## 2026-04-27 — 2026-05-10
 
 ### Internationalisation backend
+
 Clés de traduction AdonisJS pour les messages flash, erreurs de validation et emails.
 
 ### Refactoring composables
+
 - `useT` : composable i18n universel côté Vue
 - `useBoatOptions` : options de select centralisées (propulsion, matériau, etc.)
 
@@ -664,18 +776,23 @@ Clés de traduction AdonisJS pour les messages flash, erreurs de validation et e
 ## 2026-04-21
 
 ### Tâches de maintenance planifiées
+
 Séparation tâches ouvertes / historique terminé. Récurrence par mois ou par heures moteur, échéances en heures moteur.
 
 ### Intégration Mistral AI
+
 Service `ai_service.ts` + job de queue pour les analyses IA des maintenances. Interface de prompt sur le tableau de bord.
 
 ### Système de queue (PostgreSQL)
+
 Jobs asynchrones persistés en base (`queue_jobs`), avec déduplication idempotente (`queue_dedup_keys`).
 
 ### Tableau de bord
+
 Page d'accueil authentifiée : maintenances urgentes, tâches en retard, prochaines échéances.
 
 ### Seeder de démo
+
 Données de démonstration (bateau + moteur + voiles + gréement + historique de maintenance) pour initialisation rapide.
 
 ---
@@ -683,6 +800,7 @@ Données de démonstration (bateau + moteur + voiles + gréement + historique de
 ## 2026-04-20 — Initialisation du projet
 
 ### Socle technique
+
 - AdonisJS v7 (TypeScript strict) + Vue 3 / Inertia.js SSR
 - PostgreSQL + Lucid ORM, migrations, seeders
 - Auth @adonisjs/auth + Bouncer (ACL par abilities)
@@ -693,6 +811,7 @@ Données de démonstration (bateau + moteur + voiles + gréement + historique de
 - Design system : composants base (BaseButton, BaseCard, BaseInput, BaseSelect, BaseBadge…)
 
 ### Gestion des bateaux
+
 - CRUD bateaux (coque, moteurs, voiles, gréement)
 - Historique d'entretien avec pièces consommées
 - Architecture REST : hull vs équipements séparés

@@ -66,9 +66,20 @@ export type BoatEnginePartPayload = {
   designation: string
   reference?: string | null
   stock?: number | null
+  minStockAlert?: number | null
   supplier?: string | null
   notes?: string | null
   wearState?: PartWearState | null
+}
+
+export type LowStockPartRow = {
+  id: number
+  designation: string
+  reference: string | null
+  stock: number | null
+  minStockAlert: number | null
+  supplier: string | null
+  wearState: string | null
 }
 
 export type BoatSafetyEquipmentPayload = {

@@ -26,8 +26,8 @@ const openTasks = computed(() => props.maintenanceTasks.filter((t) => t.status =
         <div class="space-y-1">
           <p class="text-sm font-semibold text-fg">Maintenance</p>
           <p class="text-sm text-fg-muted">
-            Tasks first, then history. Subjects: {{ subjectLabel('boat') }}, {{ subjectLabel('engine') }},
-            {{ subjectLabel('sail') }}, {{ subjectLabel('rig') }}.
+            Tasks first, then history. Subjects: {{ subjectLabel('boat') }},
+            {{ subjectLabel('engine') }}, {{ subjectLabel('sail') }}, {{ subjectLabel('rig') }}.
           </p>
         </div>
         <BaseTabs
@@ -57,4 +57,3 @@ const openTasks = computed(() => props.maintenanceTasks.filter((t) => t.status =
     </div>
   </BaseCard>
 </template>
-

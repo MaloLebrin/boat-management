@@ -1,5 +1,4 @@
-<script setup lang="ts">
-</script>
+<script setup lang="ts"></script>
 
 <template>
   <div class="flex h-full w-full overflow-hidden rounded-lg bg-cream" style="font-size: 10px">
@@ -14,7 +13,9 @@
           <path d="M32 9 L37.5 32 L32 36.5 L26.5 32 Z" fill="#faf6ee" />
           <path d="M32 55 L37.5 32 L32 27.5 L26.5 32 Z" fill="#e2674f" />
         </svg>
-        <span class="font-display text-[11px] text-white">Fleet<em class="text-coral-500">Ai</em></span>
+        <span class="font-display text-[11px] text-white"
+          >Fleet<em class="text-coral-500">Ai</em></span
+        >
       </div>
       <nav class="mt-2 flex flex-col gap-0.5 px-2">
         <div class="flex items-center gap-1.5 px-2 py-1.5 text-white/50">
@@ -45,7 +46,9 @@
           <p class="text-[9px] text-fg-muted">Mai 2025</p>
         </div>
         <div class="flex items-center gap-1">
-          <span class="rounded-l bg-navy-100 px-2 py-1 text-[9px] font-medium text-navy-700">Calendrier</span>
+          <span class="rounded-l bg-navy-100 px-2 py-1 text-[9px] font-medium text-navy-700"
+            >Calendrier</span
+          >
           <span class="rounded-r bg-paper px-2 py-1 text-[9px] text-fg-muted">Kanban</span>
         </div>
       </div>
@@ -79,7 +82,9 @@
           <div class="grid grid-cols-7 border-b border-bone">
             <div class="min-h-[48px] border-r border-bone p-1">
               <span>5</span>
-              <div class="mt-0.5 rounded bg-coral-100 px-1 py-0.5 text-[8px] text-coral-700">Mistral II</div>
+              <div class="mt-0.5 rounded bg-coral-100 px-1 py-0.5 text-[8px] text-coral-700">
+                Mistral II
+              </div>
             </div>
             <div class="min-h-[48px] border-r border-bone p-1">6</div>
             <div class="min-h-[48px] border-r border-bone p-1">7</div>
@@ -93,19 +98,25 @@
           <div class="grid grid-cols-7 border-b border-bone">
             <div class="min-h-[48px] border-r border-bone p-1">
               <span>12</span>
-              <div class="mt-0.5 rounded bg-amber-100 px-1 py-0.5 text-[8px] text-amber-700">Azur</div>
+              <div class="mt-0.5 rounded bg-amber-100 px-1 py-0.5 text-[8px] text-amber-700">
+                Azur
+              </div>
             </div>
             <div class="min-h-[48px] border-r border-bone p-1">13</div>
             <div class="min-h-[48px] border-r border-bone p-1">14</div>
             <div class="min-h-[48px] border-r border-bone p-1">
               <span>15</span>
-              <div class="mt-0.5 rounded bg-navy-100 px-1 py-0.5 text-[8px] text-navy-700">Sirocco</div>
+              <div class="mt-0.5 rounded bg-navy-100 px-1 py-0.5 text-[8px] text-navy-700">
+                Sirocco
+              </div>
             </div>
             <div class="min-h-[48px] border-r border-bone p-1">16</div>
             <div class="min-h-[48px] border-r border-bone p-1">17</div>
             <div class="min-h-[48px] p-1">
               <span>18</span>
-              <div class="mt-0.5 rounded bg-amber-100 px-1 py-0.5 text-[8px] text-amber-700">Tramontane</div>
+              <div class="mt-0.5 rounded bg-amber-100 px-1 py-0.5 text-[8px] text-amber-700">
+                Tramontane
+              </div>
             </div>
           </div>
 
@@ -114,7 +125,9 @@
             <div class="min-h-[48px] border-r border-bone p-1">19</div>
             <div class="min-h-[48px] border-r border-bone p-1">
               <span>20</span>
-              <div class="mt-0.5 rounded bg-mint-100 px-1 py-0.5 text-[8px] text-mint-700">Cap Horn</div>
+              <div class="mt-0.5 rounded bg-mint-100 px-1 py-0.5 text-[8px] text-mint-700">
+                Cap Horn
+              </div>
             </div>
             <div class="min-h-[48px] border-r border-bone p-1">21</div>
             <div class="min-h-[48px] border-r border-bone p-1">22</div>
@@ -129,7 +142,9 @@
             <div class="min-h-[48px] border-r border-bone p-1">27</div>
             <div class="min-h-[48px] border-r border-bone p-1">
               <span>28</span>
-              <div class="mt-0.5 rounded bg-coral-100 px-1 py-0.5 text-[8px] text-coral-700">Alizee</div>
+              <div class="mt-0.5 rounded bg-coral-100 px-1 py-0.5 text-[8px] text-coral-700">
+                Alizee
+              </div>
             </div>
             <div class="min-h-[48px] border-r border-bone p-1">29</div>
             <div class="min-h-[48px] border-r border-bone p-1">30</div>

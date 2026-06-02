@@ -59,7 +59,12 @@ test.group('PasswordResetController (unit)', (group) => {
 
   test('store queues a reset email and flashes success for a known email', async ({ assert }) => {
     const org = await Organization.create({ name: 'O', slug: 'o-prc-1' })
-    await User.create({ email: 'ctrl1@example.com', password: 'Password123!', fullName: 'C1', organizationId: org.id })
+    await User.create({
+      email: 'ctrl1@example.com',
+      password: 'Password123!',
+      fullName: 'C1',
+      organizationId: org.id,
+    })
 
     const emailsSent: string[] = []
     const controller = new PasswordResetController(
@@ -86,7 +91,9 @@ test.group('PasswordResetController (unit)', (group) => {
     assert.equal(calls[0], '/forgot-password')
   })
 
-  test('store does not send email and still flashes success for an unknown email', async ({ assert }) => {
+  test('store does not send email and still flashes success for an unknown email', async ({
+    assert,
+  }) => {
     const emailsSent: string[] = []
     const controller = new PasswordResetController(
       {
@@ -132,7 +139,9 @@ test.group('PasswordResetController (unit)', (group) => {
     assert.equal(rendered[0]!.props.token, 'abc123')
   })
 
-  test('edit passes an empty token when none is provided in the query string', async ({ assert }) => {
+  test('edit passes an empty token when none is provided in the query string', async ({
+    assert,
+  }) => {
     const rendered: Array<{ component: string; props: any }> = []
     const controller = new PasswordResetController(
       { createToken: async () => null } as any,
@@ -153,7 +162,12 @@ test.group('PasswordResetController (unit)', (group) => {
 
   test('update resets password and redirects to /login on valid token', async ({ assert }) => {
     const org = await Organization.create({ name: 'O', slug: 'o-prc-2' })
-    await User.create({ email: 'ctrl2@example.com', password: 'OldPass1!', fullName: 'C2', organizationId: org.id })
+    await User.create({
+      email: 'ctrl2@example.com',
+      password: 'OldPass1!',
+      fullName: 'C2',
+      organizationId: org.id,
+    })
 
     const controller = new PasswordResetController(
       {
@@ -202,7 +216,9 @@ test.group('PasswordResetController (unit)', (group) => {
     assert.equal(calls[0], 'back')
   })
 
-  test('update flashes error when user disappears between verify and update', async ({ assert }) => {
+  test('update flashes error when user disappears between verify and update', async ({
+    assert,
+  }) => {
     const controller = new PasswordResetController(
       {
         verifyToken: async () => ({ email: 'gone@example.com' }),

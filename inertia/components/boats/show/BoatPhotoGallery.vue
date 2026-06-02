@@ -4,7 +4,7 @@ import { Form } from '@adonisjs/inertia/vue'
 import { useForm } from '@inertiajs/vue3'
 import { ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 import type { BoatShowDetail, MediaRow } from '~/types/boat_show'
 import { computed } from 'vue'
 

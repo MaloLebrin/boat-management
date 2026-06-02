@@ -4,7 +4,7 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 
 const { t } = useT()
 
@@ -79,7 +79,10 @@ function submit() {
           <BaseButton type="submit" :disabled="form.processing">
             {{ t('common.save') }}
           </BaseButton>
-          <a href="/ports" class="text-sm font-semibold text-fg-muted hover:text-fg hover:underline">
+          <a
+            href="/ports"
+            class="text-sm font-semibold text-fg-muted hover:text-fg hover:underline"
+          >
             {{ t('common.cancel') }}
           </a>
         </div>

@@ -40,10 +40,16 @@ export default class BoatMaintenanceSheetItemsController {
     const payload = await request.validateUsing(updateSheetItemValidator)
 
     try {
-      await this.sheetService.updateItem(user, boat, Number(params.sheetId), Number(params.itemId), {
-        isDone: payload.isDone,
-        notes: payload.notes ?? null,
-      })
+      await this.sheetService.updateItem(
+        user,
+        boat,
+        Number(params.sheetId),
+        Number(params.itemId),
+        {
+          isDone: payload.isDone,
+          notes: payload.notes ?? null,
+        }
+      )
     } catch (error) {
       if (
         error instanceof BoatMaintenanceSheetNotFoundError ||

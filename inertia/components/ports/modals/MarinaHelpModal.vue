@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import BaseModal from '~/components/base/BaseModal.vue'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 
 defineProps<{ open: boolean }>()
 defineEmits<{ 'update:open': [value: boolean] }>()

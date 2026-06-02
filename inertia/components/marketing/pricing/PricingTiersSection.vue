@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { CheckIcon } from '@heroicons/vue/24/solid'
 import BaseButton from '~/components/base/BaseButton.vue'
-import { useScrollReveal } from '~/composables/useScrollReveal'
+import { useScrollReveal } from '~/composables/use_scroll_reveal'
 
 interface Tier {
   name: string
@@ -86,24 +86,14 @@ const { el, isVisible } = useScrollReveal()
                 (billing === 'annual' && tier.priceAnnualPer) ||
                 (billing === 'monthly' && tier.pricePer)
               "
-              :class="[
-                'text-sm',
-                tier.featured ? 'text-white/60' : 'text-fg-muted',
-              ]"
+              :class="['text-sm', tier.featured ? 'text-white/60' : 'text-fg-muted']"
             >
-              {{
-                billing === 'annual' ? tier.priceAnnualPer : tier.pricePer
-              }}
+              {{ billing === 'annual' ? tier.priceAnnualPer : tier.pricePer }}
             </span>
           </div>
 
           <!-- Sub -->
-          <p
-            :class="[
-              'mt-2 text-sm',
-              tier.featured ? 'text-white/60' : 'text-fg-muted',
-            ]"
-          >
+          <p :class="['mt-2 text-sm', tier.featured ? 'text-white/60' : 'text-fg-muted']">
             {{ tier.sub }}
           </p>
 
@@ -127,11 +117,7 @@ const { el, isVisible } = useScrollReveal()
 
           <!-- Features -->
           <ul class="mt-8 space-y-3">
-            <li
-              v-for="[feat, sub] in tier.feats"
-              :key="feat"
-              class="flex items-start gap-3"
-            >
+            <li v-for="[feat, sub] in tier.feats" :key="feat" class="flex items-start gap-3">
               <CheckIcon
                 :class="[
                   'mt-0.5 h-5 w-5 shrink-0',
@@ -139,20 +125,12 @@ const { el, isVisible } = useScrollReveal()
                 ]"
               />
               <span>
-                <span
-                  :class="[
-                    'text-sm',
-                    tier.featured ? 'text-white' : 'text-fg',
-                  ]"
-                >
+                <span :class="['text-sm', tier.featured ? 'text-white' : 'text-fg']">
                   {{ feat }}
                 </span>
                 <span
                   v-if="sub"
-                  :class="[
-                    'block text-xs',
-                    tier.featured ? 'text-white/50' : 'text-fg-subtle',
-                  ]"
+                  :class="['block text-xs', tier.featured ? 'text-white/50' : 'text-fg-subtle']"
                 >
                   {{ sub }}
                 </span>
@@ -163,14 +141,8 @@ const { el, isVisible } = useScrollReveal()
       </div>
 
       <!-- Reassurance bar -->
-      <div
-        class="mt-12 flex flex-wrap items-center justify-center gap-6 text-sm text-fg-muted"
-      >
-        <span
-          v-for="item in reassurance"
-          :key="item.label"
-          class="flex items-center gap-2"
-        >
+      <div class="mt-12 flex flex-wrap items-center justify-center gap-6 text-sm text-fg-muted">
+        <span v-for="item in reassurance" :key="item.label" class="flex items-center gap-2">
           <span>{{ item.icon }}</span>
           <span>{{ item.label }}</span>
         </span>

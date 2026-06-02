@@ -6,7 +6,10 @@ export default { layout: DefaultLayout }
 <script setup lang="ts">
 import SettingsShell from '~/components/settings/SettingsShell.vue'
 import SettingsMembersTab from '~/components/settings/tabs/SettingsMembersTab.vue'
-import type { OrganizationMemberData, OrganizationInvitationData } from '../../../shared/types/organization'
+import type {
+  OrganizationMemberData,
+  OrganizationInvitationData,
+} from '../../../shared/types/organization'
 
 defineProps<{
   user: {

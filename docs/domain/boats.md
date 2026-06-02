@@ -92,4 +92,3 @@ Référence: `app/controllers/boat_equipment_controller.ts` et `app/services/boa
 Référence: `app/services/boat_service.ts`.
 
 - Si `propulsionType === 'sailboat'`, alors `mastHeightM` est requis (create + update).
-

@@ -96,9 +96,9 @@ const event = stripeService.constructWebhookEvent(request.raw(), signature)
 
 ### 4.3 Événements traités
 
-| Événement Stripe | Handler |
-|---|---|
-| `checkout.session.completed` | `SubscriptionService.syncFromCheckoutSession()` |
+| Événement Stripe                | Handler                                           |
+| ------------------------------- | ------------------------------------------------- |
+| `checkout.session.completed`    | `SubscriptionService.syncFromCheckoutSession()`   |
 | `customer.subscription.updated` | `SubscriptionService.syncFromSubscriptionEvent()` |
 | `customer.subscription.deleted` | `SubscriptionService.syncFromSubscriptionEvent()` |
 
@@ -127,8 +127,8 @@ C'est ici que le downgrade vers Starter s'opère automatiquement à l'annulation
 
 ```ts
 // Principe : on avance par intervalles depuis l'anchor jusqu'à encadrer "now"
-let periodStart = anchor               // ex: 2025-01-15
-let periodEnd = addInterval(anchor)    // ex: 2025-02-15
+let periodStart = anchor // ex: 2025-01-15
+let periodEnd = addInterval(anchor) // ex: 2025-02-15
 while (periodEnd < now) {
   periodStart = periodEnd
   periodEnd = addInterval(periodEnd)
@@ -147,12 +147,12 @@ while (periodEnd < now) {
 
 Quatre méthodes d'assertion ; toutes lèvent `QuotaExceededError` si dépassement :
 
-| Méthode | Type de vérification | Modèle compté |
-|---|---|---|
-| `assertCanAddBoat(org)` | COUNT vs `maxBoats` | `Boat` |
+| Méthode                   | Type de vérification  | Modèle compté            |
+| ------------------------- | --------------------- | ------------------------ |
+| `assertCanAddBoat(org)`   | COUNT vs `maxBoats`   | `Boat`                   |
 | `assertCanAddMember(org)` | COUNT vs `maxMembers` | `OrganizationMembership` |
-| `assertCanUseAI(org)` | booléen `canUseAI` | — |
-| `assertCanExport(org)` | booléen `canExport` | — |
+| `assertCanUseAI(org)`     | booléen `canUseAI`    | —                        |
+| `assertCanExport(org)`    | booléen `canExport`   | —                        |
 
 `canAddBoat(org)` est la version booléenne (non-throwing) utilisée pour afficher l'état du bouton côté UI.
 
@@ -205,17 +205,17 @@ La prop `quotaUsage` transmise au frontend :
 
 ## 7. Table `subscriptions`
 
-| Colonne | Type | Notes |
-|---|---|---|
-| `organization_id` | FK unique | 1 abonnement max par org |
-| `stripe_subscription_id` | string unique | ID Stripe `sub_xxx` |
-| `stripe_price_id` | string | ID du prix actif |
-| `plan_tier` | enum | starter / pro / enterprise |
-| `status` | enum | active, trialing, past_due, canceled, incomplete, incomplete_expired, unpaid, paused |
-| `billing_interval` | enum | month / year |
-| `current_period_start` | datetime | calculé par `getPeriodBounds()` |
-| `current_period_end` | datetime | date de prochain renouvellement |
-| `cancel_at_period_end` | boolean | annulation programmée |
+| Colonne                  | Type          | Notes                                                                                |
+| ------------------------ | ------------- | ------------------------------------------------------------------------------------ |
+| `organization_id`        | FK unique     | 1 abonnement max par org                                                             |
+| `stripe_subscription_id` | string unique | ID Stripe `sub_xxx`                                                                  |
+| `stripe_price_id`        | string        | ID du prix actif                                                                     |
+| `plan_tier`              | enum          | starter / pro / enterprise                                                           |
+| `status`                 | enum          | active, trialing, past_due, canceled, incomplete, incomplete_expired, unpaid, paused |
+| `billing_interval`       | enum          | month / year                                                                         |
+| `current_period_start`   | datetime      | calculé par `getPeriodBounds()`                                                      |
+| `current_period_end`     | datetime      | date de prochain renouvellement                                                      |
+| `cancel_at_period_end`   | boolean       | annulation programmée                                                                |
 
 `SubscriptionService.getActive()` interroge les statuts `active`, `trialing` et `past_due` — un abonnement `past_due` est encore considéré actif pour ne pas bloquer l'accès immédiatement.
 
@@ -225,16 +225,16 @@ La prop `quotaUsage` transmise au frontend :
 
 Toutes optionnelles (`Env.schema.string.optional()`) pour permettre les migrations sans credentials Stripe.
 
-| Variable | Rôle |
-|---|---|
-| `STRIPE_SECRET_KEY` | Clé secrète API Stripe (`sk_live_…` / `sk_test_…`) |
-| `STRIPE_WEBHOOK_SECRET` | Secret de signature webhook (`whsec_…`) |
-| `STRIPE_PUBLIC_KEY` | Clé publique (usage frontend si besoin) |
-| `STRIPE_CUSTOMER_PORTAL_ID` | ID de configuration du Customer Portal (`bpc_…`) |
-| `STRIPE_PRO_MONTHLY_PRICE_ID` | Prix Pro mensuel |
-| `STRIPE_PRO_ANNUAL_PRICE_ID` | Prix Pro annuel |
-| `STRIPE_ENTERPRISE_MONTHLY_PRICE_ID` | Prix Enterprise mensuel |
-| `STRIPE_ENTERPRISE_ANNUAL_PRICE_ID` | Prix Enterprise annuel |
+| Variable                             | Rôle                                               |
+| ------------------------------------ | -------------------------------------------------- |
+| `STRIPE_SECRET_KEY`                  | Clé secrète API Stripe (`sk_live_…` / `sk_test_…`) |
+| `STRIPE_WEBHOOK_SECRET`              | Secret de signature webhook (`whsec_…`)            |
+| `STRIPE_PUBLIC_KEY`                  | Clé publique (usage frontend si besoin)            |
+| `STRIPE_CUSTOMER_PORTAL_ID`          | ID de configuration du Customer Portal (`bpc_…`)   |
+| `STRIPE_PRO_MONTHLY_PRICE_ID`        | Prix Pro mensuel                                   |
+| `STRIPE_PRO_ANNUAL_PRICE_ID`         | Prix Pro annuel                                    |
+| `STRIPE_ENTERPRISE_MONTHLY_PRICE_ID` | Prix Enterprise mensuel                            |
+| `STRIPE_ENTERPRISE_ANNUAL_PRICE_ID`  | Prix Enterprise annuel                             |
 
 Si `STRIPE_SECRET_KEY` est absent, `StripeService` lève `StripeNotConfiguredError` → le controller flash un message d'erreur et redirige sans crasher.
 
@@ -281,26 +281,26 @@ Utilisateur                App                    Stripe
 
 ## 10. Fichiers de référence
 
-| Fichier | Rôle |
-|---|---|
-| [`shared/types/plan.ts`](../shared/types/plan.ts) | `PLAN_LIMITS`, `PlanTier`, `QuotaUsage` |
-| [`shared/types/billing.ts`](../shared/types/billing.ts) | `SubscriptionInfo`, `SubscriptionStatus`, `CheckoutPayload` |
-| [`app/services/quota_service.ts`](../app/services/quota_service.ts) | Assertions de quotas |
-| [`app/services/stripe_service.ts`](../app/services/stripe_service.ts) | Client Stripe, sessions |
-| [`app/services/subscription_service.ts`](../app/services/subscription_service.ts) | Sync webhooks, `getActive`, `toInfo` |
-| [`app/controllers/billing_controller.ts`](../app/controllers/billing_controller.ts) | Checkout, portal, webhook |
-| [`app/exceptions/quota_errors.ts`](../app/exceptions/quota_errors.ts) | `QuotaExceededError` |
-| [`app/exceptions/billing_errors.ts`](../app/exceptions/billing_errors.ts) | `StripeNotConfiguredError`, `StripeCustomerError` |
-| [`app/models/subscription.ts`](../app/models/subscription.ts) | Modèle Lucid |
-| [`app/models/organization.ts`](../app/models/organization.ts) | `plan`, `stripeCustomerId`, relation subscription |
-| [`start/routes/webhooks.ts`](../start/routes/webhooks.ts) | Route publique webhook |
-| [`start/routes/settings.ts`](../start/routes/settings.ts) | Routes billing (checkout, portal) |
+| Fichier                                                                             | Rôle                                                        |
+| ----------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| [`shared/types/plan.ts`](../shared/types/plan.ts)                                   | `PLAN_LIMITS`, `PlanTier`, `QuotaUsage`                     |
+| [`shared/types/billing.ts`](../shared/types/billing.ts)                             | `SubscriptionInfo`, `SubscriptionStatus`, `CheckoutPayload` |
+| [`app/services/quota_service.ts`](../app/services/quota_service.ts)                 | Assertions de quotas                                        |
+| [`app/services/stripe_service.ts`](../app/services/stripe_service.ts)               | Client Stripe, sessions                                     |
+| [`app/services/subscription_service.ts`](../app/services/subscription_service.ts)   | Sync webhooks, `getActive`, `toInfo`                        |
+| [`app/controllers/billing_controller.ts`](../app/controllers/billing_controller.ts) | Checkout, portal, webhook                                   |
+| [`app/exceptions/quota_errors.ts`](../app/exceptions/quota_errors.ts)               | `QuotaExceededError`                                        |
+| [`app/exceptions/billing_errors.ts`](../app/exceptions/billing_errors.ts)           | `StripeNotConfiguredError`, `StripeCustomerError`           |
+| [`app/models/subscription.ts`](../app/models/subscription.ts)                       | Modèle Lucid                                                |
+| [`app/models/organization.ts`](../app/models/organization.ts)                       | `plan`, `stripeCustomerId`, relation subscription           |
+| [`start/routes/webhooks.ts`](../start/routes/webhooks.ts)                           | Route publique webhook                                      |
+| [`start/routes/settings.ts`](../start/routes/settings.ts)                           | Routes billing (checkout, portal)                           |
 
 Les cartes de test Stripe standard :
 
-Numéro	Résultat
-4242 4242 4242 4242	Paiement réussi
-4000 0000 0000 0002	Carte refusée
-4000 0025 0000 3155	Authentification 3D Secure requise
-4000 0000 0000 9995	Fonds insuffisants
+Numéro Résultat
+4242 4242 4242 4242 Paiement réussi
+4000 0000 0000 0002 Carte refusée
+4000 0025 0000 3155 Authentification 3D Secure requise
+4000 0000 0000 9995 Fonds insuffisants
 Pour toutes : date d'expiration n'importe quelle date future, CVC n'importe quels 3 chiffres, code postal n'importe quoi.

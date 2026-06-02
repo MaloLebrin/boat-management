@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { ChevronDownIcon } from '@heroicons/vue/24/outline'
 import BaseButton from '~/components/base/BaseButton.vue'
-import { useScrollReveal } from '~/composables/useScrollReveal'
+import { useScrollReveal } from '~/composables/use_scroll_reveal'
 
 interface FaqItem {
   q: string
@@ -53,10 +53,7 @@ function toggle(idx: number) {
 
         <!-- Right: Accordion -->
         <div class="divide-y divide-bone rounded-2xl border border-bone bg-white overflow-hidden">
-          <div
-            v-for="(item, idx) in items"
-            :key="item.q"
-          >
+          <div v-for="(item, idx) in items" :key="item.q">
             <button
               type="button"
               class="flex w-full items-center justify-between gap-4 px-6 py-4 text-left transition-colors hover:bg-cream/50"
@@ -70,10 +67,7 @@ function toggle(idx: number) {
                 ]"
               />
             </button>
-            <div
-              v-show="openIndex === idx"
-              class="px-6 pb-4 text-sm leading-relaxed text-fg-muted"
-            >
+            <div v-show="openIndex === idx" class="px-6 pb-4 text-sm leading-relaxed text-fg-muted">
               {{ item.a }}
             </div>
           </div>

@@ -7,16 +7,16 @@
 
 ## Variables d'environnement
 
-| Variable | Obligatoire | Description |
-|---|---|---|
-| `STRIPE_SECRET_KEY` | Oui | Clé secrète API (`sk_live_...` en prod, `sk_test_...` en dev) |
-| `STRIPE_WEBHOOK_SECRET` | Oui | Secret de signature webhook (`whsec_...`) |
-| `STRIPE_PUBLIC_KEY` | Non | Clé publique (`pk_live_...` / `pk_test_...`) |
-| `STRIPE_PRO_MONTHLY_PRICE_ID` | Oui | Price ID mensuel plan Pro (`price_...`) |
-| `STRIPE_PRO_ANNUAL_PRICE_ID` | Oui | Price ID annuel plan Pro (`price_...`) |
-| `STRIPE_ENTERPRISE_MONTHLY_PRICE_ID` | Oui | Price ID mensuel plan Enterprise (`price_...`) |
-| `STRIPE_ENTERPRISE_ANNUAL_PRICE_ID` | Oui | Price ID annuel plan Enterprise (`price_...`) |
-| `STRIPE_CUSTOMER_PORTAL_ID` | Non | ID config Customer Portal (`bpc_...`) |
+| Variable                             | Obligatoire | Description                                                   |
+| ------------------------------------ | ----------- | ------------------------------------------------------------- |
+| `STRIPE_SECRET_KEY`                  | Oui         | Clé secrète API (`sk_live_...` en prod, `sk_test_...` en dev) |
+| `STRIPE_WEBHOOK_SECRET`              | Oui         | Secret de signature webhook (`whsec_...`)                     |
+| `STRIPE_PUBLIC_KEY`                  | Non         | Clé publique (`pk_live_...` / `pk_test_...`)                  |
+| `STRIPE_PRO_MONTHLY_PRICE_ID`        | Oui         | Price ID mensuel plan Pro (`price_...`)                       |
+| `STRIPE_PRO_ANNUAL_PRICE_ID`         | Oui         | Price ID annuel plan Pro (`price_...`)                        |
+| `STRIPE_ENTERPRISE_MONTHLY_PRICE_ID` | Oui         | Price ID mensuel plan Enterprise (`price_...`)                |
+| `STRIPE_ENTERPRISE_ANNUAL_PRICE_ID`  | Oui         | Price ID annuel plan Enterprise (`price_...`)                 |
+| `STRIPE_CUSTOMER_PORTAL_ID`          | Non         | ID config Customer Portal (`bpc_...`)                         |
 
 ⚠️ Les Price IDs commencent par `price_` — ne pas confondre avec les Product IDs (`prod_`).  
 Si `STRIPE_SECRET_KEY` est absent, l'app flash un message d'erreur et ne crashe pas.
@@ -28,6 +28,7 @@ Si `STRIPE_SECRET_KEY` est absent, l'app flash un message d'erreur et ne crashe 
 ### 1. Clés de test
 
 Dans le [dashboard Stripe](https://dashboard.stripe.com/test/apikeys) (mode **Test**), récupérer :
+
 - `sk_test_...` → `STRIPE_SECRET_KEY`
 - `pk_test_...` → `STRIPE_PUBLIC_KEY`
 
@@ -75,12 +76,12 @@ STRIPE_ENTERPRISE_ANNUAL_PRICE_ID=price_...
 
 ### 5. Cartes de test
 
-| Numéro | Résultat |
-|---|---|
-| `4242 4242 4242 4242` | Paiement réussi |
-| `4000 0000 0000 0002` | Carte refusée |
+| Numéro                | Résultat                           |
+| --------------------- | ---------------------------------- |
+| `4242 4242 4242 4242` | Paiement réussi                    |
+| `4000 0000 0000 0002` | Carte refusée                      |
 | `4000 0025 0000 3155` | Authentification 3D Secure requise |
-| `4000 0000 0000 9995` | Fonds insuffisants |
+| `4000 0000 0000 9995` | Fonds insuffisants                 |
 
 Date d'expiration : n'importe quelle date future. CVC : n'importe quels 3 chiffres.
 
@@ -106,6 +107,7 @@ await org.save()
 ### 1. Clés live
 
 Dans le [dashboard Stripe](https://dashboard.stripe.com/apikeys) (mode **Live**) :
+
 - `sk_live_...` → `STRIPE_SECRET_KEY`
 - `pk_live_...` → `STRIPE_PUBLIC_KEY`
 
@@ -150,11 +152,11 @@ STRIPE_CUSTOMER_PORTAL_ID=bpc_...        # optionnel
 
 ## Diagnostic
 
-| Symptôme | Cause probable | Solution |
-|---|---|---|
-| Flash "Le paiement n'est pas encore configuré" | `STRIPE_SECRET_KEY` absent ou `STRIPE_*_PRICE_ID` manquant | Vérifier les env vars |
-| Erreur Stripe "No such customer … test mode key" | Customer créé en live, clé test utilisée | Vider `stripeCustomerId` en base (voir §dev 6) |
-| Webhook `[400] Invalid signature` | `STRIPE_WEBHOOK_SECRET` absent ou mauvais | Copier le bon `whsec_` (CLI en dev, dashboard en prod) |
-| Webhook `[302]` | Route exclue du CSRF ? Redémarrage manquant ? | Vérifier `config/shield.ts → exceptRoutes: ['/webhooks/stripe']` + redémarrer |
-| Abonnement non mis à jour après paiement | Webhook non reçu | Vérifier `stripe listen` en dev ou la config webhook dashboard en prod |
-| CLI Stripe `Authorization failed, api_key_expired` | Clé CLI expirée | Relancer `stripe login` |
+| Symptôme                                           | Cause probable                                             | Solution                                                                      |
+| -------------------------------------------------- | ---------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| Flash "Le paiement n'est pas encore configuré"     | `STRIPE_SECRET_KEY` absent ou `STRIPE_*_PRICE_ID` manquant | Vérifier les env vars                                                         |
+| Erreur Stripe "No such customer … test mode key"   | Customer créé en live, clé test utilisée                   | Vider `stripeCustomerId` en base (voir §dev 6)                                |
+| Webhook `[400] Invalid signature`                  | `STRIPE_WEBHOOK_SECRET` absent ou mauvais                  | Copier le bon `whsec_` (CLI en dev, dashboard en prod)                        |
+| Webhook `[302]`                                    | Route exclue du CSRF ? Redémarrage manquant ?              | Vérifier `config/shield.ts → exceptRoutes: ['/webhooks/stripe']` + redémarrer |
+| Abonnement non mis à jour après paiement           | Webhook non reçu                                           | Vérifier `stripe listen` en dev ou la config webhook dashboard en prod        |
+| CLI Stripe `Authorization failed, api_key_expired` | Clé CLI expirée                                            | Relancer `stripe login`                                                       |

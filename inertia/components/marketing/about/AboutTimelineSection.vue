@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useScrollReveal } from '~/composables/useScrollReveal'
+import { useScrollReveal } from '~/composables/use_scroll_reveal'
 
 interface TimelineItem {
   d: string
@@ -53,11 +53,7 @@ function dotBorder(tone?: string) {
         <!-- Right: timeline -->
         <div class="relative">
           <div class="absolute bottom-0 left-4 top-2 w-px border-l border-dashed border-bone" />
-          <div
-            v-for="(item, idx) in items"
-            :key="idx"
-            class="relative pb-8 pl-12"
-          >
+          <div v-for="(item, idx) in items" :key="idx" class="relative pb-8 pl-12">
             <!-- Dot -->
             <div
               class="absolute left-[9px] top-1 h-[15px] w-[15px] rounded-full ring-1 ring-bone"

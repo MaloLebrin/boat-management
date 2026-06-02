@@ -10,10 +10,31 @@ import ContactFormSection from '~/components/marketing/contact/ContactFormSectio
 import ContactOfficesSection from '~/components/marketing/contact/ContactOfficesSection.vue'
 import ContactFaqSection from '~/components/marketing/contact/ContactFaqSection.vue'
 
-interface Channel { icon: string; title: string; desc: string; cta: string; tone?: string }
-interface SidebarContact { icon: string; label: string; sub: string }
-interface OfficeItem { city: string; role: string; addr: string; hours: string; team: string; hint: string; gradient: string }
-interface FaqItem { q: string; a: string }
+interface Channel {
+  icon: string
+  title: string
+  desc: string
+  cta: string
+  tone?: string
+}
+interface SidebarContact {
+  icon: string
+  label: string
+  sub: string
+}
+interface OfficeItem {
+  city: string
+  role: string
+  addr: string
+  hours: string
+  team: string
+  hint: string
+  gradient: string
+}
+interface FaqItem {
+  q: string
+  a: string
+}
 
 interface PageProps {
   t: {
@@ -21,8 +42,34 @@ interface PageProps {
     contact: {
       hero: { eyebrow: string; title: string; titleHighlight: string; subtitle: string }
       channels: Channel[]
-      form: { eyebrow: string; title: string; subjects: string[]; firstNameLabel: string; lastNameLabel: string; emailLabel: string; orgLabel: string; fleetSizeLabel: string; messageLabel: string; messagePlaceholder: string; privacyText: string; privacyLinkLabel: string; submitLabel: string; responseTime: string; otherMeansTitle: string; sidebarContacts: SidebarContact[]; ctaTitle: string; ctaSubtitle: string; ctaButton: string }
-      offices: { eyebrow: string; title: string; titleHighlight: string; subtitle: string; items: OfficeItem[] }
+      form: {
+        eyebrow: string
+        title: string
+        subjects: string[]
+        firstNameLabel: string
+        lastNameLabel: string
+        emailLabel: string
+        orgLabel: string
+        fleetSizeLabel: string
+        messageLabel: string
+        messagePlaceholder: string
+        privacyText: string
+        privacyLinkLabel: string
+        submitLabel: string
+        responseTime: string
+        otherMeansTitle: string
+        sidebarContacts: SidebarContact[]
+        ctaTitle: string
+        ctaSubtitle: string
+        ctaButton: string
+      }
+      offices: {
+        eyebrow: string
+        title: string
+        titleHighlight: string
+        subtitle: string
+        items: OfficeItem[]
+      }
       faq: { eyebrow: string; title: string; titleHighlight: string; items: FaqItem[] }
     }
   }

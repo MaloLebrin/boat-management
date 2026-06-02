@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useScrollReveal } from '~/composables/useScrollReveal'
+import { useScrollReveal } from '~/composables/use_scroll_reveal'
 
 defineProps<{
   eyebrow: string
@@ -27,10 +27,19 @@ const { el, isVisible } = useScrollReveal()
         >
           <svg viewBox="0 0 400 500" class="absolute inset-0 h-full w-full">
             <circle cx="320" cy="120" r="40" fill="#fbeacb" />
-            <path d="M0 360 Q100 340 200 360 T400 360 L400 500 L0 500 Z" fill="#1a3a55" opacity="0.85" />
+            <path
+              d="M0 360 Q100 340 200 360 T400 360 L400 500 L0 500 Z"
+              fill="#1a3a55"
+              opacity="0.85"
+            />
             <path d="M0 380 Q100 360 200 380 T400 380 L400 500 L0 500 Z" fill="#0b1d2e" />
             <g transform="translate(180 280)">
-              <path d="M-30 50 L30 50 L20 75 L-20 75 Z" fill="#faf6ee" stroke="#0b1d2e" stroke-width="2" />
+              <path
+                d="M-30 50 L30 50 L20 75 L-20 75 Z"
+                fill="#faf6ee"
+                stroke="#0b1d2e"
+                stroke-width="2"
+              />
               <path d="M0 -20 L0 50" stroke="#0b1d2e" stroke-width="2" />
               <path d="M0 -15 L25 45 L0 45 Z" fill="#e2674f" stroke="#0b1d2e" stroke-width="2" />
               <path d="M0 -15 L-20 35 L0 35 Z" fill="#faf6ee" stroke="#0b1d2e" stroke-width="2" />
@@ -38,7 +47,7 @@ const { el, isVisible } = useScrollReveal()
           </svg>
           <div
             class="absolute bottom-4 left-4 right-4 rounded-lg px-3 py-2 text-white"
-            style="background: rgba(11,29,46,0.85); backdrop-filter: blur(8px)"
+            style="background: rgba(11, 29, 46, 0.85); backdrop-filter: blur(8px)"
           >
             <p class="font-mono text-[10px] font-semibold uppercase tracking-widest text-coral-400">
               {{ captionDate }}

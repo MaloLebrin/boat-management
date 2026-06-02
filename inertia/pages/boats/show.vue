@@ -12,8 +12,14 @@ import BoatShowTabOverview from '~/components/boats/show/tabs/BoatShowTabOvervie
 import BoatShowTabSpecs from '~/components/boats/show/tabs/BoatShowTabSpecs.vue'
 import BoatShowTabSheets from '~/components/boats/show/tabs/BoatShowTabSheets.vue'
 import BoatShowTabTasks from '~/components/boats/show/tabs/BoatShowTabTasks.vue'
-import { useT } from '~/composables/useT'
-import type { AiSuggestion, BoatShowDetail, MaintenanceEventRow, MaintenanceSheetRow, MaintenanceTaskRow } from '~/types/boat_show'
+import { useT } from '~/composables/use_t'
+import type {
+  AiSuggestion,
+  BoatShowDetail,
+  MaintenanceEventRow,
+  MaintenanceSheetRow,
+  MaintenanceTaskRow,
+} from '~/types/boat_show'
 
 const { t } = useT()
 
@@ -60,8 +66,10 @@ const overdueTasks = computed(() =>
 )
 
 const statusBadge = computed(() => {
-  if (overdueTasks.value.length > 0) return { variant: 'warning' as const, label: t('boats.show.status.urgent') }
-  if (openTasks.value.length > 0) return { variant: 'info' as const, label: t('boats.show.status.upcoming') }
+  if (overdueTasks.value.length > 0)
+    return { variant: 'warning' as const, label: t('boats.show.status.urgent') }
+  if (openTasks.value.length > 0)
+    return { variant: 'info' as const, label: t('boats.show.status.upcoming') }
   return { variant: 'success' as const, label: t('boats.show.status.ok') }
 })
 
@@ -70,7 +78,11 @@ const tabs = computed(() => [
   { key: 'specs', label: t('boats.show.tabs.specs') },
   { key: 'equipment', label: t('boats.show.tabs.equipment') },
   { key: 'history', label: t('boats.show.tabs.history') },
-  { key: 'tasks', label: t('boats.show.tabs.tasks'), badge: openTasks.value.length > 0 ? String(openTasks.value.length) : undefined },
+  {
+    key: 'tasks',
+    label: t('boats.show.tabs.tasks'),
+    badge: openTasks.value.length > 0 ? String(openTasks.value.length) : undefined,
+  },
   { key: 'sheets', label: t('boats.show.tabs.sheets') },
   { key: 'documents', label: t('boats.show.tabs.documents') },
 ])
@@ -83,7 +95,12 @@ function goToTab(key: TabKey | string) {
 <template>
   <div class="w-full max-w-7xl px-6 py-10 sm:px-8">
     <BaseBreadcrumb
-      :items="[{ label: t('boats.show.breadcrumbFleet'), href: '/boats' }, { label: t('nav.boats') }, { label: boat.name }]" />
+      :items="[
+        { label: t('boats.show.breadcrumbFleet'), href: '/boats' },
+        { label: t('nav.boats') },
+        { label: boat.name },
+      ]"
+    />
 
     <!-- Header -->
     <header class="space-y-6">
@@ -99,7 +116,11 @@ function goToTab(key: TabKey | string) {
             <span v-if="boat.type">{{ boat.type }}</span>
             <span v-if="boat.type && boat.registrationNumber" class="text-fg-subtle">·</span>
             <span v-if="boat.registrationNumber">{{ boat.registrationNumber }}</span>
-            <span v-if="(boat.type || boat.registrationNumber) && boat.propulsionType" class="text-fg-subtle">·</span>
+            <span
+              v-if="(boat.type || boat.registrationNumber) && boat.propulsionType"
+              class="text-fg-subtle"
+              >·</span
+            >
             <span v-if="boat.propulsionType">{{ boat.propulsionType }}</span>
           </div>
         </div>
@@ -108,12 +129,22 @@ function goToTab(key: TabKey | string) {
           <a :href="`/boats/${boat.id}/edit`">
             <BaseButton variant="secondary" size="sm">{{ t('boats.show.editBoat') }}</BaseButton>
           </a>
-          <BaseButton v-if="canManageMaintenance" variant="secondary" size="sm" type="button"
-            @click="goToTab('history'); createEventNonce++">
+          <BaseButton
+            v-if="canManageMaintenance"
+            variant="secondary"
+            size="sm"
+            type="button"
+            @click="goToTab('history'); createEventNonce++"
+          >
             + {{ t('boats.show.addEntry') }}
           </BaseButton>
-          <BaseButton v-if="canManageMaintenance" variant="primary" size="sm" type="button"
-            @click="goToTab('tasks'); createTaskNonce++">
+          <BaseButton
+            v-if="canManageMaintenance"
+            variant="primary"
+            size="sm"
+            type="button"
+            @click="goToTab('tasks'); createTaskNonce++"
+          >
             + {{ t('boats.show.addTask') }}
           </BaseButton>
         </div>
@@ -125,22 +156,52 @@ function goToTab(key: TabKey | string) {
 
     <Transition name="tab" mode="out-in">
       <div :key="tab" class="mt-8">
-        <BoatShowTabOverview v-if="tab === 'overview'" :boat="boat" :maintenance-tasks="maintenanceTasks"
-          :maintenance-events="maintenanceEvents" :can-manage="canManageEquipment" :ai-suggestions="aiSuggestions" @go-to-tab="goToTab" />
+        <BoatShowTabOverview
+          v-if="tab === 'overview'"
+          :boat="boat"
+          :maintenance-tasks="maintenanceTasks"
+          :maintenance-events="maintenanceEvents"
+          :can-manage="canManageEquipment"
+          :ai-suggestions="aiSuggestions"
+          @go-to-tab="goToTab"
+        />
 
         <BoatShowTabSpecs v-else-if="tab === 'specs'" :boat="boat" />
 
-        <BoatShowTabEquipment v-else-if="tab === 'equipment'" :boat="boat" :can-manage-equipment="canManageEquipment" />
+        <BoatShowTabEquipment
+          v-else-if="tab === 'equipment'"
+          :boat="boat"
+          :can-manage-equipment="canManageEquipment"
+        />
 
-        <BoatShowTabHistory v-else-if="tab === 'history'" :boat="boat" :maintenance-events="maintenanceEvents"
-          :can-manage-maintenance="canManageMaintenance" :create-event-nonce="createEventNonce" />
+        <BoatShowTabHistory
+          v-else-if="tab === 'history'"
+          :boat="boat"
+          :maintenance-events="maintenanceEvents"
+          :can-manage-maintenance="canManageMaintenance"
+          :create-event-nonce="createEventNonce"
+        />
 
-        <BoatShowTabTasks v-else-if="tab === 'tasks'" :boat="boat" :maintenance-tasks="maintenanceTasks"
-          :can-manage-maintenance="canManageMaintenance" :create-task-nonce="createTaskNonce" />
+        <BoatShowTabTasks
+          v-else-if="tab === 'tasks'"
+          :boat="boat"
+          :maintenance-tasks="maintenanceTasks"
+          :can-manage-maintenance="canManageMaintenance"
+          :create-task-nonce="createTaskNonce"
+        />
 
-        <BoatShowTabSheets v-else-if="tab === 'sheets'" :boat="boat" :sheets="maintenanceSheets" :can-manage="canManageMaintenance" />
+        <BoatShowTabSheets
+          v-else-if="tab === 'sheets'"
+          :boat="boat"
+          :sheets="maintenanceSheets"
+          :can-manage="canManageMaintenance"
+        />
 
-        <BoatShowTabDocuments v-else-if="tab === 'documents'" :boat="boat" :can-manage="canManageEquipment" />
+        <BoatShowTabDocuments
+          v-else-if="tab === 'documents'"
+          :boat="boat"
+          :can-manage="canManageEquipment"
+        />
       </div>
     </Transition>
   </div>

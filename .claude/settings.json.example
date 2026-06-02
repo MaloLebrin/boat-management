@@ -10,18 +10,11 @@
     },
     "filesystem": {
       "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-filesystem",
-        "."
-      ]
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "."]
     },
     "playwright": {
       "command": "npx",
-      "args": [
-        "-y",
-        "@executeautomation/playwright-mcp-server"
-      ]
+      "args": ["-y", "@executeautomation/playwright-mcp-server"]
     }
   },
   "hooks": {
@@ -84,11 +77,7 @@
       "Bash(find *)",
       "Bash(grep *)"
     ],
-    "deny": [
-      "Bash(rm -rf /*)",
-      "Bash(* --force *)",
-      "Bash(git push --force)"
-    ]
+    "deny": ["Bash(rm -rf /*)", "Bash(* --force *)", "Bash(git push --force)"]
   },
   "env": {
     "CLAUDE_CODE_MAX_OUTPUT_TOKENS": "64000"

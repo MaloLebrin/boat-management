@@ -8,8 +8,11 @@ import BaseBadge from '~/components/base/BaseBadge.vue'
 import SettingsMembersInviteForm from '~/components/settings/tabs/SettingsMembersInviteForm.vue'
 import SettingsMembersPendingInvitations from '~/components/settings/tabs/SettingsMembersPendingInvitations.vue'
 import UpgradePlanModal from '~/components/base/UpgradePlanModal.vue'
-import { useT } from '~/composables/useT'
-import type { OrganizationMemberData, OrganizationInvitationData } from '../../../../shared/types/organization'
+import { useT } from '~/composables/use_t'
+import type {
+  OrganizationMemberData,
+  OrganizationInvitationData,
+} from '../../../../shared/types/organization'
 
 const props = defineProps<{
   user: {
@@ -84,16 +87,24 @@ function removeMember(memberId: number) {
       <table class="w-full">
         <thead>
           <tr class="border-b border-border">
-            <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-fg-muted">
+            <th
+              class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-fg-muted"
+            >
               {{ t('settings.members.columns.member') }}
             </th>
-            <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-fg-muted">
+            <th
+              class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-fg-muted"
+            >
               {{ t('settings.members.columns.role') }}
             </th>
-            <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-fg-muted">
+            <th
+              class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-fg-muted"
+            >
               {{ t('settings.members.columns.status') }}
             </th>
-            <th class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-fg-muted">
+            <th
+              class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-fg-muted"
+            >
               {{ t('settings.members.columns.actions') }}
             </th>
           </tr>
@@ -106,7 +117,9 @@ function removeMember(memberId: number) {
           >
             <td class="px-6 py-4">
               <div class="flex items-center gap-3">
-                <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand text-sm font-medium text-white">
+                <div
+                  class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand text-sm font-medium text-white"
+                >
                   {{ getInitials(member) }}
                 </div>
                 <div class="min-w-0">
@@ -145,11 +158,7 @@ function removeMember(memberId: number) {
                 <span class="text-xs text-fg-muted">{{ t('settings.members.you') }}</span>
               </template>
               <template v-else-if="canManageMembers">
-                <BaseButton
-                  variant="danger"
-                  size="sm"
-                  @click="removeMember(member.id)"
-                >
+                <BaseButton variant="danger" size="sm" @click="removeMember(member.id)">
                   {{ t('settings.members.remove') }}
                 </BaseButton>
               </template>

@@ -9,7 +9,7 @@ import MouillageFormModal from '~/components/ports/modals/MouillageFormModal.vue
 import PontoonCard from '~/components/ports/show/PontoonCard.vue'
 import PontoonFormModal from '~/components/ports/modals/PontoonFormModal.vue'
 import SpotsManager from '~/components/ports/show/SpotsManager.vue'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 import type { PortShowDetail, PontoonRow, MouillageRow } from '~/types/port'
 
 const props = defineProps<{

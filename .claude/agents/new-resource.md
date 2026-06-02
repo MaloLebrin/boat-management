@@ -43,7 +43,9 @@ Utilise l'agent @backend pour créer dans l'ordre :
    - Tests CRUD complets avec factory
 
 ## Résumé à fournir
+
 À la fin, donne un tableau récapitulatif des fichiers créés et les commandes à exécuter :
+
 ```bash
 node ace migration:run
 node ace test --files=RESOURCES

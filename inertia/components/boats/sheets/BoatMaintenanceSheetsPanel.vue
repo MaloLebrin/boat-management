@@ -8,7 +8,7 @@ import BaseModal from '~/components/base/BaseModal.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import BoatMaintenanceSheetCard from '~/components/boats/sheets/BoatMaintenanceSheetCard.vue'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 import type { BoatShowDetail, MaintenanceSheetRow } from '~/types/boat_show'
 
 type SheetType = 'entretien' | 'montage' | 'hivernage' | 'dehivernage' | 'atelier'
@@ -83,7 +83,13 @@ function openCreateModal() {
         <h2 class="text-lg font-semibold text-fg">{{ t('boats.sheets.title') }}</h2>
         <p class="text-sm text-fg-muted">{{ t('boats.sheets.subtitle') }}</p>
       </div>
-      <BaseButton v-if="canManage" variant="secondary" size="sm" type="button" @click="openCreateModal">
+      <BaseButton
+        v-if="canManage"
+        variant="secondary"
+        size="sm"
+        type="button"
+        @click="openCreateModal"
+      >
         <PlusIcon class="h-4 w-4" />
         {{ t('boats.sheets.addSheet') }}
       </BaseButton>
@@ -108,7 +114,10 @@ function openCreateModal() {
     </div>
 
     <!-- Sheets list -->
-    <div v-if="filteredSheets.length === 0" class="rounded-lg border border-dashed border-border bg-surface-muted/30 p-8 text-center">
+    <div
+      v-if="filteredSheets.length === 0"
+      class="rounded-lg border border-dashed border-border bg-surface-muted/30 p-8 text-center"
+    >
       <p class="text-fg-muted">{{ t('boats.sheets.empty') }}</p>
     </div>
     <div v-else class="space-y-4">
@@ -122,7 +131,11 @@ function openCreateModal() {
     </div>
 
     <!-- Create modal -->
-    <BaseModal v-model:open="isCreateOpen" :title="t('boats.sheets.modalTitle')" :close-label="t('common.close')">
+    <BaseModal
+      v-model:open="isCreateOpen"
+      :title="t('boats.sheets.modalTitle')"
+      :close-label="t('common.close')"
+    >
       <form class="space-y-4" @submit.prevent="handleSubmit">
         <BaseSelect
           id="sheet-type"

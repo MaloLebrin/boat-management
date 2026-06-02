@@ -13,7 +13,7 @@ import { computed, ref } from 'vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import AuthNavyPanel from '~/components/auth/AuthNavyPanel.vue'
 import PasswordStrength from '~/components/auth/PasswordStrength.vue'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 
 const { t } = useT()
 const page = usePage()
@@ -31,12 +31,10 @@ const confirmType = computed(() => (showConfirm.value ? 'text' : 'password'))
   <Head :title="t('auth.resetPassword.title')" />
 
   <div class="flex min-h-[calc(100vh-4rem)] overflow-hidden">
-
     <AuthNavyPanel mode="reset" />
 
     <!-- Right panel -->
     <div class="flex flex-1 flex-col bg-cream">
-
       <!-- Top-right helper -->
       <div class="flex items-center justify-end gap-3.5 px-8 py-6">
         <span class="text-xs text-fg-muted">{{ t('auth.login.needHelp') }}</span>
@@ -51,7 +49,6 @@ const confirmType = computed(() => (showConfirm.value ? 'text' : 'password'))
       <!-- Form, vertically centred -->
       <div class="flex flex-1 flex-col items-center justify-center px-8 pb-12 lg:px-16">
         <div class="w-full max-w-sm">
-
           <!-- Back link -->
           <a
             href="/login"
@@ -63,7 +60,10 @@ const confirmType = computed(() => (showConfirm.value ? 'text' : 'password'))
           <p class="text-[11px] font-semibold uppercase tracking-[0.12em] text-fg-muted">
             {{ t('auth.resetPassword.eyebrow') }}
           </p>
-          <h1 class="mt-3.5 font-display text-[36px] leading-[1.05] text-fg" style="letter-spacing:-0.02em">
+          <h1
+            class="mt-3.5 font-display text-[36px] leading-[1.05] text-fg"
+            style="letter-spacing: -0.02em"
+          >
             {{ t('auth.resetPassword.title') }}
           </h1>
           <p class="mt-1.5 text-sm text-fg-muted">
@@ -81,7 +81,6 @@ const confirmType = computed(() => (showConfirm.value ? 'text' : 'password'))
             <Form method="POST" action="/reset-password" #default="{ processing, errors }">
               <input type="hidden" name="token" :value="token" />
               <div class="flex flex-col gap-3.5">
-
                 <div>
                   <BaseInput
                     id="password"
@@ -100,7 +99,11 @@ const confirmType = computed(() => (showConfirm.value ? 'text' : 'password'))
                         class="px-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-fg-muted focus-visible:outline-none"
                         @click="showPassword = !showPassword"
                       >
-                        {{ showPassword ? t('auth.resetPassword.hidePassword') : t('auth.resetPassword.showPassword') }}
+                        {{
+                          showPassword
+                            ? t('auth.resetPassword.hidePassword')
+                            : t('auth.resetPassword.showPassword')
+                        }}
                       </button>
                     </template>
                   </BaseInput>
@@ -122,7 +125,11 @@ const confirmType = computed(() => (showConfirm.value ? 'text' : 'password'))
                       class="px-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-fg-muted focus-visible:outline-none"
                       @click="showConfirm = !showConfirm"
                     >
-                      {{ showConfirm ? t('auth.resetPassword.hidePassword') : t('auth.resetPassword.showPassword') }}
+                      {{
+                        showConfirm
+                          ? t('auth.resetPassword.hidePassword')
+                          : t('auth.resetPassword.showPassword')
+                      }}
                     </button>
                   </template>
                 </BaseInput>
@@ -131,19 +138,26 @@ const confirmType = computed(() => (showConfirm.value ? 'text' : 'password'))
                   type="submit"
                   :disabled="processing"
                   class="mt-1 flex w-full items-center justify-center gap-2 rounded-lg px-5 py-3.5 text-sm font-semibold text-white transition-all duration-150 disabled:opacity-60 hover:brightness-110"
-                  style="background:#0b1d2e"
+                  style="background: #0b1d2e"
                 >
                   {{ t('auth.resetPassword.submit') }}
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
-                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
                     <path d="M5 12h14M13 6l6 6-6 6" />
                   </svg>
                 </button>
-
               </div>
             </Form>
           </div>
-
         </div>
       </div>
     </div>

@@ -1,5 +1,4 @@
-<script setup lang="ts">
-</script>
+<script setup lang="ts"></script>
 
 <template>
   <div class="flex h-full w-full overflow-hidden rounded-lg bg-cream" style="font-size: 10px">
@@ -14,7 +13,9 @@
           <path d="M32 9 L37.5 32 L32 36.5 L26.5 32 Z" fill="#faf6ee" />
           <path d="M32 55 L37.5 32 L32 27.5 L26.5 32 Z" fill="#e2674f" />
         </svg>
-        <span class="font-display text-[11px] text-white">Fleet<em class="text-coral-500">Ai</em></span>
+        <span class="font-display text-[11px] text-white"
+          >Fleet<em class="text-coral-500">Ai</em></span
+        >
       </div>
       <nav class="mt-2 flex flex-col gap-0.5 px-2">
         <div class="flex items-center gap-1.5 px-2 py-1.5 text-white/50">
@@ -65,7 +66,9 @@
       <!-- Header -->
       <div class="border-b border-white/10 px-3 py-2">
         <div class="flex items-center gap-1.5">
-          <div class="flex h-5 w-5 items-center justify-center rounded bg-white/20 text-xs text-white">
+          <div
+            class="flex h-5 w-5 items-center justify-center rounded bg-white/20 text-xs text-white"
+          >
             <span>&#10024;</span>
           </div>
           <span class="font-medium text-white">Fleetide</span>
@@ -102,10 +105,14 @@
 
           <!-- Action buttons -->
           <div class="mt-2 flex flex-wrap gap-1">
-            <button class="rounded bg-violet-100 px-2 py-0.5 text-[9px] font-medium text-violet-700 hover:bg-violet-200">
+            <button
+              class="rounded bg-violet-100 px-2 py-0.5 text-[9px] font-medium text-violet-700 hover:bg-violet-200"
+            >
               Planifier Mistral II
             </button>
-            <button class="rounded bg-violet-100 px-2 py-0.5 text-[9px] font-medium text-violet-700 hover:bg-violet-200">
+            <button
+              class="rounded bg-violet-100 px-2 py-0.5 text-[9px] font-medium text-violet-700 hover:bg-violet-200"
+            >
               Voir details
             </button>
           </div>
@@ -119,7 +126,8 @@
         <!-- AI response -->
         <div class="rounded-lg rounded-bl-sm bg-white p-2">
           <p class="text-[10px] text-fg">
-            <span class="text-mint-600">&#10003;</span> Tache creee pour <strong>Mistral II</strong> :
+            <span class="text-mint-600">&#10003;</span> Tache creee pour
+            <strong>Mistral II</strong> :
           </p>
           <div class="mt-1.5 rounded border border-bone bg-paper p-1.5 text-[9px]">
             <p class="font-medium text-fg">Vidange moteur</p>
@@ -137,8 +145,16 @@
             class="flex-1 bg-transparent text-[10px] text-white placeholder-white/50 outline-none"
             disabled
           />
-          <button class="flex h-5 w-5 items-center justify-center rounded bg-white/20 text-white hover:bg-white/30">
-            <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <button
+            class="flex h-5 w-5 items-center justify-center rounded bg-white/20 text-white hover:bg-white/30"
+          >
+            <svg
+              class="h-3 w-3"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+            >
               <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
             </svg>
           </button>

@@ -21,7 +21,9 @@ const emit = defineEmits<{
       <p class="text-xs font-semibold uppercase tracking-widest text-fg-subtle">
         {{ eyebrowLabel }}
       </p>
-      <h1 class="mt-4 font-display text-5xl leading-tight tracking-tight text-fg lg:text-6xl xl:text-7xl">
+      <h1
+        class="mt-4 font-display text-5xl leading-tight tracking-tight text-fg lg:text-6xl xl:text-7xl"
+      >
         {{ title }}
         <em class="text-coral-500">{{ titleHighlight }}</em>
       </h1>
@@ -33,9 +35,7 @@ const emit = defineEmits<{
           type="button"
           :class="[
             'rounded-full px-5 py-2.5 text-sm font-medium transition-colors',
-            billing === 'monthly'
-              ? 'bg-navy-900 text-white'
-              : 'text-fg-muted hover:bg-bone',
+            billing === 'monthly' ? 'bg-navy-900 text-white' : 'text-fg-muted hover:bg-bone',
           ]"
           @click="emit('update:billing', 'monthly')"
         >
@@ -45,9 +45,7 @@ const emit = defineEmits<{
           type="button"
           :class="[
             'relative rounded-full px-5 py-2.5 text-sm font-medium transition-colors',
-            billing === 'annual'
-              ? 'bg-navy-900 text-white'
-              : 'text-fg-muted hover:bg-bone',
+            billing === 'annual' ? 'bg-navy-900 text-white' : 'text-fg-muted hover:bg-bone',
           ]"
           @click="emit('update:billing', 'annual')"
         >

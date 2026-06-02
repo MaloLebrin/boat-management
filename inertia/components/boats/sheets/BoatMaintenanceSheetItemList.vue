@@ -1,8 +1,12 @@
 <script setup lang="ts">
 import { router } from '@inertiajs/vue3'
 import { ref, watch } from 'vue'
-import { useT } from '~/composables/useT'
-import type { BoatShowDetail, MaintenanceSheetItemRow, MaintenanceSheetRow } from '~/types/boat_show'
+import { useT } from '~/composables/use_t'
+import type {
+  BoatShowDetail,
+  MaintenanceSheetItemRow,
+  MaintenanceSheetRow,
+} from '~/types/boat_show'
 
 const { t } = useT()
 
@@ -93,7 +97,12 @@ function handleNotesBlur(item: MaintenanceSheetItemRow) {
             stroke="currentColor"
             viewBox="0 0 24 24"
           >
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="3"
+              d="M5 13l4 4L19 7"
+            />
           </svg>
         </button>
         <div
@@ -110,17 +119,19 @@ function handleNotesBlur(item: MaintenanceSheetItemRow) {
             stroke="currentColor"
             viewBox="0 0 24 24"
           >
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="3"
+              d="M5 13l4 4L19 7"
+            />
           </svg>
         </div>
 
         <!-- Label and notes -->
         <div class="flex-1 min-w-0">
           <p
-            :class="[
-              'text-sm font-medium',
-              item.isDone ? 'text-fg-muted line-through' : 'text-fg',
-            ]"
+            :class="['text-sm font-medium', item.isDone ? 'text-fg-muted line-through' : 'text-fg']"
           >
             {{ item.label }}
           </p>

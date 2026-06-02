@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { CheckIcon, ChevronDownIcon, XMarkIcon } from '@heroicons/vue/24/outline'
 import BaseHeading from '~/components/base/BaseHeading.vue'
-import { useScrollReveal } from '~/composables/useScrollReveal'
+import { useScrollReveal } from '~/composables/use_scroll_reveal'
 
 defineProps<{
   industries: {
@@ -27,7 +27,7 @@ const { el: sectionEl, isVisible: sectionVisible } = useScrollReveal()
 
 <template>
   <section
-    :ref="(el) => sectionEl = el as HTMLElement"
+    :ref="(el) => (sectionEl = el as HTMLElement)"
     class="reveal mt-14 bg-white rounded-2xl py-14 px-8"
     :class="{ visible: sectionVisible }"
   >
@@ -69,7 +69,11 @@ const { el: sectionEl, isVisible: sectionVisible } = useScrollReveal()
             <div class="bg-coral-50 rounded-xl p-5">
               <p class="font-semibold text-coral-700 mb-3">{{ industries.painsLabel }}</p>
               <ul class="space-y-2">
-                <li v-for="pain in item.pains" :key="pain" class="flex items-center gap-2 text-sm text-fg-muted">
+                <li
+                  v-for="pain in item.pains"
+                  :key="pain"
+                  class="flex items-center gap-2 text-sm text-fg-muted"
+                >
                   <XMarkIcon class="h-4 w-4 shrink-0 text-coral-500" />
                   <span>{{ pain }}</span>
                 </li>
@@ -80,7 +84,11 @@ const { el: sectionEl, isVisible: sectionVisible } = useScrollReveal()
             <div class="bg-mint-50 rounded-xl p-5">
               <p class="font-semibold text-mint-700 mb-3">{{ industries.benefitsLabel }}</p>
               <ul class="space-y-2">
-                <li v-for="benefit in item.benefits" :key="benefit" class="flex items-center gap-2 text-sm text-fg-muted">
+                <li
+                  v-for="benefit in item.benefits"
+                  :key="benefit"
+                  class="flex items-center gap-2 text-sm text-fg-muted"
+                >
                   <CheckIcon class="h-4 w-4 shrink-0 text-mint-700" />
                   <span>{{ benefit }}</span>
                 </li>

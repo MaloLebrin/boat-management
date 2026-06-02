@@ -1,5 +1,5 @@
 <script lang="ts">
-import PublicLayout from '~/layouts/public.vue';
+import PublicLayout from '~/layouts/public.vue'
 
 export default {
   layout: PublicLayout,
@@ -7,8 +7,8 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
-import { computed, ref } from 'vue';
+import { Head, Link } from '@inertiajs/vue3'
+import { computed, ref } from 'vue'
 
 const props = defineProps<{ meta?: { title: string; description: string } }>()
 
@@ -57,10 +57,14 @@ const tableRows = computed(() => {
 </script>
 
 <template>
-
   <Head :title="props.meta?.title ?? 'Design System – FleetAi'">
-    <meta name="description"
-      :content="props.meta?.description ?? 'Foundations, components and patterns of the FleetAi design system.'" />
+    <meta
+      name="description"
+      :content="
+        props.meta?.description ??
+        'Foundations, components and patterns of the FleetAi design system.'
+      "
+    />
     <meta property="og:title" :content="props.meta?.title ?? 'Design System – FleetAi'" />
     <link rel="canonical" href="/design-system" />
   </Head>
@@ -72,28 +76,40 @@ const tableRows = computed(() => {
           <p class="text-sm font-semibold tracking-wider uppercase text-brand">
             Fleet OS · design system
           </p>
-          <BaseHeading level="display">
-            Un design premium, pastel
-          </BaseHeading>
+          <BaseHeading level="display"> Un design premium, pastel </BaseHeading>
           <div class="flex flex-wrap gap-3 items-center">
-            <Link route="home" class="inline-flex text-sm font-semibold text-brand hover:text-brand-hover">
+            <Link
+              route="home"
+              class="inline-flex text-sm font-semibold text-brand hover:text-brand-hover"
+            >
               ← Retour à l’accueil
             </Link>
-            <BaseBadge variant="info">
-              motion: subtle
-            </BaseBadge>
-            <BaseBadge variant="success">
-              tests: vitest
-            </BaseBadge>
+            <BaseBadge variant="info"> motion: subtle </BaseBadge>
+            <BaseBadge variant="success"> tests: vitest </BaseBadge>
           </div>
         </div>
 
         <div class="flex flex-col gap-3">
           <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <BaseStatCard label="Composants" value="17" delta="Base primitives + patterns" tone="info" />
-            <BaseStatCard label="États" value="A11y" delta="focus, disabled, invalid" tone="success" />
+            <BaseStatCard
+              label="Composants"
+              value="17"
+              delta="Base primitives + patterns"
+              tone="info"
+            />
+            <BaseStatCard
+              label="États"
+              value="A11y"
+              delta="focus, disabled, invalid"
+              tone="success"
+            />
             <BaseStatCard label="Motion" value="220ms" delta="ease premium" tone="neutral" />
-            <BaseStatCard label="Palette" value="Pastel" delta="lilac · peach · mint · sky" tone="warning" />
+            <BaseStatCard
+              label="Palette"
+              value="Pastel"
+              delta="lilac · peach · mint · sky"
+              tone="warning"
+            />
           </div>
           <div class="flex gap-2 justify-end items-center">
             <BaseButton variant="secondary" size="sm" type="button" @click="modalOpen = true">
@@ -107,18 +123,17 @@ const tableRows = computed(() => {
       </div>
 
       <div class="flex flex-wrap gap-4 justify-between items-center">
-        <BaseTabs v-model="tab" :tabs="[
-          { key: 'overview', label: 'Foundations', badge: 'tokens' },
-          { key: 'components', label: 'Components', badge: 'base' },
-          { key: 'patterns', label: 'Patterns', badge: 'examples' },
-        ]" />
+        <BaseTabs
+          v-model="tab"
+          :tabs="[
+            { key: 'overview', label: 'Foundations', badge: 'tokens' },
+            { key: 'components', label: 'Components', badge: 'base' },
+            { key: 'patterns', label: 'Patterns', badge: 'examples' },
+          ]"
+        />
         <div class="hidden gap-2 items-center sm:flex">
-          <BaseButton variant="ghost" size="sm" disabled>
-            Reduced motion
-          </BaseButton>
-          <BaseButton variant="ghost" size="sm">
-            Copy tokens
-          </BaseButton>
+          <BaseButton variant="ghost" size="sm" disabled> Reduced motion </BaseButton>
+          <BaseButton variant="ghost" size="sm"> Copy tokens </BaseButton>
         </div>
       </div>
     </header>
@@ -128,8 +143,11 @@ const tableRows = computed(() => {
         <template #header>
           <div class="flex items-center justify-between gap-4">
             <div class="flex items-center gap-3">
-              <img :src="brandIconUrl" alt="Fleet AI icon"
-                class="h-10 w-10 rounded-(--radius-control) shadow-(--shadow-xs)" />
+              <img
+                :src="brandIconUrl"
+                alt="Fleet AI icon"
+                class="h-10 w-10 rounded-(--radius-control) shadow-(--shadow-xs)"
+              />
               <div>
                 <p class="font-display text-sm font-semibold text-fg">Fleet AI</p>
                 <p class="text-xs font-semibold text-fg-subtle">Horizon · wave · AI spark</p>
@@ -142,20 +160,27 @@ const tableRows = computed(() => {
           </div>
         </template>
         <div class="grid gap-6 md:grid-cols-3">
-          <div class="rounded-(--radius-control) border border-border bg-surface-elevated p-4 shadow-(--shadow-xs)">
+          <div
+            class="rounded-(--radius-control) border border-border bg-surface-elevated p-4 shadow-(--shadow-xs)"
+          >
             <p class="text-xs font-semibold text-fg-muted">Usage</p>
             <p class="mt-2 text-sm text-fg-muted">
-              Utiliser l’icône seule pour favicon/app icon. Préférer le lockup “Fleet AI” dans le header.
+              Utiliser l’icône seule pour favicon/app icon. Préférer le lockup “Fleet AI” dans le
+              header.
             </p>
           </div>
-          <div class="rounded-(--radius-control) border border-border bg-surface-elevated p-4 shadow-(--shadow-xs)">
+          <div
+            class="rounded-(--radius-control) border border-border bg-surface-elevated p-4 shadow-(--shadow-xs)"
+          >
             <p class="text-xs font-semibold text-fg-muted">Do</p>
             <ul class="mt-2 space-y-1 text-sm text-fg-muted">
               <li>Fond clair/pastel, marges généreuses.</li>
               <li>Contraste net sur petits formats.</li>
             </ul>
           </div>
-          <div class="rounded-(--radius-control) border border-border bg-surface-elevated p-4 shadow-(--shadow-xs)">
+          <div
+            class="rounded-(--radius-control) border border-border bg-surface-elevated p-4 shadow-(--shadow-xs)"
+          >
             <p class="text-xs font-semibold text-fg-muted">Don’t</p>
             <ul class="mt-2 space-y-1 text-sm text-fg-muted">
               <li>Ne pas ajouter de bruit/texture.</li>
@@ -171,9 +196,16 @@ const tableRows = computed(() => {
             <h3 class="text-sm font-semibold font-display text-fg">Principes</h3>
           </template>
           <ul class="px-2 space-y-2 text-sm text-fg-muted">
-            <li><span class="font-semibold text-fg">Cohérence</span> : tokens sémantiques d’abord.</li>
-            <li><span class="font-semibold text-fg">Subtil</span> : motion courte, jamais tape-à-l’œil.</li>
-            <li><span class="font-semibold text-fg">A11y</span> : focus visible, états complets.</li>
+            <li>
+              <span class="font-semibold text-fg">Cohérence</span> : tokens sémantiques d’abord.
+            </li>
+            <li>
+              <span class="font-semibold text-fg">Subtil</span> : motion courte, jamais
+              tape-à-l’œil.
+            </li>
+            <li>
+              <span class="font-semibold text-fg">A11y</span> : focus visible, états complets.
+            </li>
           </ul>
         </BaseCard>
         <BaseCard padded>
@@ -182,19 +214,23 @@ const tableRows = computed(() => {
           </template>
           <div class="grid grid-cols-2 gap-3">
             <div
-              class="rounded-(--radius-control) border border-border bg-lilac-100 px-3 py-2 text-xs font-semibold text-lilac-800 ring-1 ring-lilac-200">
+              class="rounded-(--radius-control) border border-border bg-lilac-100 px-3 py-2 text-xs font-semibold text-lilac-800 ring-1 ring-lilac-200"
+            >
               lilac
             </div>
             <div
-              class="rounded-(--radius-control) border border-border bg-peach-100 px-3 py-2 text-xs font-semibold text-peach-800 ring-1 ring-peach-200">
+              class="rounded-(--radius-control) border border-border bg-peach-100 px-3 py-2 text-xs font-semibold text-peach-800 ring-1 ring-peach-200"
+            >
               peach
             </div>
             <div
-              class="rounded-(--radius-control) border border-border bg-mint-100 px-3 py-2 text-xs font-semibold text-mint-800 ring-1 ring-mint-200">
+              class="rounded-(--radius-control) border border-border bg-mint-100 px-3 py-2 text-xs font-semibold text-mint-800 ring-1 ring-mint-200"
+            >
               mint
             </div>
             <div
-              class="rounded-(--radius-control) border border-border bg-sky-100 px-3 py-2 text-xs font-semibold text-sky-800 ring-1 ring-sky-200">
+              class="rounded-(--radius-control) border border-border bg-sky-100 px-3 py-2 text-xs font-semibold text-sky-800 ring-1 ring-sky-200"
+            >
               sky
             </div>
           </div>
@@ -214,38 +250,27 @@ const tableRows = computed(() => {
         </BaseCard>
       </div>
 
-      <BaseHeading level="2">
-        Typographie
-      </BaseHeading>
+      <BaseHeading level="2"> Typographie </BaseHeading>
       <p class="max-w-2xl text-sm text-fg-muted">
         <span class="font-semibold font-display text-fg">Sora</span> pour les titres ;
         <span class="font-semibold text-fg">Source Sans 3</span> pour le corps et les formulaires.
       </p>
       <div
-        class="space-y-4 rounded-(--radius-card) border border-border bg-surface-elevated p-6 shadow-(--shadow-card)">
-        <BaseHeading level="display">
-          Display
-        </BaseHeading>
-        <BaseHeading level="1">
-          Titre niveau 1
-        </BaseHeading>
-        <BaseHeading level="2">
-          Titre niveau 2
-        </BaseHeading>
-        <BaseHeading level="3">
-          Titre niveau 3
-        </BaseHeading>
+        class="space-y-4 rounded-(--radius-card) border border-border bg-surface-elevated p-6 shadow-(--shadow-card)"
+      >
+        <BaseHeading level="display"> Display </BaseHeading>
+        <BaseHeading level="1"> Titre niveau 1 </BaseHeading>
+        <BaseHeading level="2"> Titre niveau 2 </BaseHeading>
+        <BaseHeading level="3"> Titre niveau 3 </BaseHeading>
         <p class="max-w-prose text-base text-fg-muted">
-          Texte courant pour paragraphes, listes et tableaux. Hauteur de ligne confortable pour
-          la lecture prolongée à bord ou au bureau.
+          Texte courant pour paragraphes, listes et tableaux. Hauteur de ligne confortable pour la
+          lecture prolongée à bord ou au bureau.
         </p>
       </div>
     </section>
 
     <section v-else-if="tab === 'components'" class="space-y-10">
-      <BaseHeading level="2">
-        Components
-      </BaseHeading>
+      <BaseHeading level="2"> Components </BaseHeading>
       <div class="grid gap-8 lg:grid-cols-2">
         <BaseCard padded>
           <template #header>
@@ -290,21 +315,48 @@ const tableRows = computed(() => {
             <p class="text-sm font-semibold font-display text-fg">Form controls</p>
           </template>
           <div class="grid gap-5">
-            <BaseInput v-model="shipName" id="shipName" label="Nom du navire" hint="Visible sur la flotte" />
-            <BaseSelect v-model="engineType" id="engineType" label="Type de propulsion" :options="[
-              { label: 'Sailboat', value: 'sail' },
-              { label: 'Motor', value: 'motor' },
-              { label: 'Catamaran', value: 'cat' },
-            ]" placeholder="Choisir…" />
-            <BaseTextarea v-model="notes" id="notes" label="Notes" placeholder="Ex. vérification annuelle…" />
-            <BaseRadio v-model="radioValue" label="Priorité" name="priority" :options="[
-              { label: 'Safe', value: 'safe' },
-              { label: 'Fast', value: 'fast' },
-            ]" hint="Démo d’un choix exclusif" />
+            <BaseInput
+              v-model="shipName"
+              id="shipName"
+              label="Nom du navire"
+              hint="Visible sur la flotte"
+            />
+            <BaseSelect
+              v-model="engineType"
+              id="engineType"
+              label="Type de propulsion"
+              :options="[
+                { label: 'Sailboat', value: 'sail' },
+                { label: 'Motor', value: 'motor' },
+                { label: 'Catamaran', value: 'cat' },
+              ]"
+              placeholder="Choisir…"
+            />
+            <BaseTextarea
+              v-model="notes"
+              id="notes"
+              label="Notes"
+              placeholder="Ex. vérification annuelle…"
+            />
+            <BaseRadio
+              v-model="radioValue"
+              label="Priorité"
+              name="priority"
+              :options="[
+                { label: 'Safe', value: 'safe' },
+                { label: 'Fast', value: 'fast' },
+              ]"
+              hint="Démo d’un choix exclusif"
+            />
             <BaseCheckbox v-model="agree" id="agree" label="Consentement">
               J’accepte les règles de sécurité
             </BaseCheckbox>
-            <BaseToggle v-model="enabled" id="enabled" label="Mode" hint="Désactive les notifications si off">
+            <BaseToggle
+              v-model="enabled"
+              id="enabled"
+              label="Mode"
+              hint="Désactive les notifications si off"
+            >
               Notifications
             </BaseToggle>
           </div>
@@ -315,10 +367,13 @@ const tableRows = computed(() => {
             <p class="text-sm font-semibold font-display text-fg">Navigation & feedback</p>
           </template>
           <div class="grid gap-5">
-            <BaseTabs v-model="radioValue" :tabs="[
-              { key: 'safe', label: 'Safe' },
-              { key: 'fast', label: 'Fast', badge: 'beta' },
-            ]" />
+            <BaseTabs
+              v-model="radioValue"
+              :tabs="[
+                { key: 'safe', label: 'Safe' },
+                { key: 'fast', label: 'Fast', badge: 'beta' },
+              ]"
+            />
             <BasePagination v-model:page="page" :page-count="5" />
             <BaseAlert variant="info" title="Info">
               Les actions principales restent en menthe, le reste en surfaces douces.
@@ -337,16 +392,32 @@ const tableRows = computed(() => {
             <p class="text-sm font-semibold font-display text-fg">BaseField (wrapper)</p>
           </template>
           <div class="grid gap-6">
-            <BaseField label="Champ custom" hint="Utilise un slot libre (input, select, etc.)" html-for="customField">
-              <input id="customField" type="text"
+            <BaseField
+              label="Champ custom"
+              hint="Utilise un slot libre (input, select, etc.)"
+              html-for="customField"
+            >
+              <input
+                id="customField"
+                type="text"
                 class="h-10 w-full rounded-(--radius-control) border border-border bg-surface-elevated px-3 text-sm text-fg shadow-sm placeholder:text-fg-subtle focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20 transition-shadow duration-(--motion-fast) ease-premium"
-                placeholder="Libre" />
+                placeholder="Libre"
+              />
             </BaseField>
 
-            <BaseField label="Champ invalide" error="Message d’erreur clair et lisible." html-for="invalidField">
-              <input id="invalidField" type="text" data-invalid="true" aria-invalid="true"
+            <BaseField
+              label="Champ invalide"
+              error="Message d’erreur clair et lisible."
+              html-for="invalidField"
+            >
+              <input
+                id="invalidField"
+                type="text"
+                data-invalid="true"
+                aria-invalid="true"
                 class="h-10 w-full rounded-(--radius-control) border border-border bg-surface-elevated px-3 text-sm text-fg shadow-sm placeholder:text-fg-subtle focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20 data-[invalid=true]:border-danger transition-shadow duration-(--motion-fast) ease-premium"
-                value="Oops" />
+                value="Oops"
+              />
             </BaseField>
           </div>
         </BaseCard>
@@ -356,7 +427,8 @@ const tableRows = computed(() => {
             <p class="text-sm font-semibold font-display text-fg">BaseCard (tilt subtil)</p>
           </template>
           <p class="text-sm text-fg-muted">
-            Survol = tilt + scale léger (désactivé si <span class="font-semibold text-fg">reduced motion</span>).
+            Survol = tilt + scale léger (désactivé si
+            <span class="font-semibold text-fg">reduced motion</span>).
           </p>
           <div class="grid gap-3 mt-4 sm:grid-cols-2">
             <BaseStatCard label="Uptime" value="99.9%" delta="mensuel" tone="success" />
@@ -376,18 +448,22 @@ const tableRows = computed(() => {
           </template>
           <div class="flex gap-3 items-center">
             <BaseDropdown>
-              <template #trigger>
-                Actions
-              </template>
+              <template #trigger> Actions </template>
               <template #default="{ close }">
-                <button type="button"
+                <button
+                  type="button"
                   class="w-full rounded-(--radius-control) px-3 py-2 text-left text-sm font-semibold text-fg-muted transition-colors duration-(--motion-fast) ease-premium hover:bg-surface-muted hover:text-fg"
-                  role="menuitem" @click="close()">
+                  role="menuitem"
+                  @click="close()"
+                >
                   Exporter CSV
                 </button>
-                <button type="button"
+                <button
+                  type="button"
                   class="w-full rounded-(--radius-control) px-3 py-2 text-left text-sm font-semibold text-fg-muted transition-colors duration-(--motion-fast) ease-premium hover:bg-surface-muted hover:text-fg"
-                  role="menuitem" @click="close()">
+                  role="menuitem"
+                  @click="close()"
+                >
                   Archiver
                 </button>
               </template>
@@ -398,8 +474,11 @@ const tableRows = computed(() => {
           </div>
         </BaseCard>
 
-        <BaseEmptyState title="Aucun bateau pour l’instant"
-          description="Créez votre premier navire et commencez le suivi technique." action-label="Créer un bateau" />
+        <BaseEmptyState
+          title="Aucun bateau pour l’instant"
+          description="Créez votre premier navire et commencez le suivi technique."
+          action-label="Créer un bateau"
+        />
       </div>
 
       <BaseCard padded>
@@ -419,8 +498,11 @@ const tableRows = computed(() => {
               </tr>
             </thead>
             <tbody class="divide-y divide-border bg-surface-elevated">
-              <tr v-for="row in tableRows" :key="row.name"
-                class="transition-colors duration-(--motion-fast) ease-premium hover:bg-lilac-50/60">
+              <tr
+                v-for="row in tableRows"
+                :key="row.name"
+                class="transition-colors duration-(--motion-fast) ease-premium hover:bg-lilac-50/60"
+              >
                 <td class="px-4 py-3 font-semibold text-fg">{{ row.name }}</td>
                 <td class="px-4 py-3 text-fg-muted">{{ row.type }}</td>
                 <td class="px-4 py-3">
@@ -437,16 +519,15 @@ const tableRows = computed(() => {
 
     <BaseModal v-model:open="modalOpen" title="Modal premium (subtil)">
       <p class="text-sm text-fg-muted">
-        Le fond utilise un voile + blur léger. Le contenu reste net, et l’action principale est évidente.
+        Le fond utilise un voile + blur léger. Le contenu reste net, et l’action principale est
+        évidente.
       </p>
       <template #footer>
         <div class="flex gap-2 justify-end items-center">
           <BaseButton variant="secondary" type="button" @click="modalOpen = false">
             Cancel
           </BaseButton>
-          <BaseButton type="button" @click="modalOpen = false">
-            Confirm
-          </BaseButton>
+          <BaseButton type="button" @click="modalOpen = false"> Confirm </BaseButton>
         </div>
       </template>
     </BaseModal>

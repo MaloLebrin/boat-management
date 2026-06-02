@@ -5,7 +5,7 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseModal from '~/components/base/BaseModal.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 import type { BoatShowEngine } from '~/types/boat_show'
 
 const props = defineProps<{
@@ -25,7 +25,8 @@ const performedAt = ref('')
 const entryTitle = ref('')
 const entryNotes = ref('')
 
-const engineLabel = [props.engine.brand, props.engine.model].filter(Boolean).join(' ') || props.engine.kind
+const engineLabel =
+  [props.engine.brand, props.engine.model].filter(Boolean).join(' ') || props.engine.kind
 
 function addPartRow() {
   partRows.value.push({ name: '', quantity: '', notes: '' })
@@ -48,7 +49,12 @@ function close() {
     size="xl"
     @update:open="close"
   >
-    <Form :action="{ url: `/boats/${boat.id}/maintenance`, method: 'post' }" @success="close" class="space-y-4" #default="{ processing, errors }">
+    <Form
+      :action="{ url: `/boats/${boat.id}/maintenance`, method: 'post' }"
+      @success="close"
+      class="space-y-4"
+      #default="{ processing, errors }"
+    >
       <input type="hidden" name="subject" value="engine" />
       <input type="hidden" name="boatEngineId" :value="String(engine.id)" />
 
@@ -94,13 +100,32 @@ function close() {
         <div v-else class="mt-4 space-y-3">
           <div v-for="(p, idx) in partRows" :key="idx" class="grid gap-3 sm:grid-cols-6">
             <div class="sm:col-span-3">
-              <BaseInput :id="`part-name-${idx}`" :name="`parts[${idx}][name]`" :label="t('boats.maintenance.events.partName')" v-model="p.name" />
+              <BaseInput
+                :id="`part-name-${idx}`"
+                :name="`parts[${idx}][name]`"
+                :label="t('boats.maintenance.events.partName')"
+                v-model="p.name"
+              />
             </div>
             <div class="sm:col-span-1">
-              <BaseInput :id="`part-qty-${idx}`" :name="`parts[${idx}][quantity]`" :label="t('boats.maintenance.events.partQty')" inputmode="numeric" type="number" min="1" step="1" v-model="p.quantity" />
+              <BaseInput
+                :id="`part-qty-${idx}`"
+                :name="`parts[${idx}][quantity]`"
+                :label="t('boats.maintenance.events.partQty')"
+                inputmode="numeric"
+                type="number"
+                min="1"
+                step="1"
+                v-model="p.quantity"
+              />
             </div>
             <div class="sm:col-span-2">
-              <BaseInput :id="`part-notes-${idx}`" :name="`parts[${idx}][notes]`" :label="t('boats.maintenance.events.partNotes')" v-model="p.notes" />
+              <BaseInput
+                :id="`part-notes-${idx}`"
+                :name="`parts[${idx}][notes]`"
+                :label="t('boats.maintenance.events.partNotes')"
+                v-model="p.notes"
+              />
             </div>
             <div class="sm:col-span-6 flex justify-end">
               <BaseButton variant="ghost" size="sm" type="button" @click="removePartRow(idx)">
@@ -111,7 +136,9 @@ function close() {
         </div>
       </div>
 
-      <p class="rounded-lg border border-border bg-surface-muted/30 px-3 py-2 text-xs text-fg-muted">
+      <p
+        class="rounded-lg border border-border bg-surface-muted/30 px-3 py-2 text-xs text-fg-muted"
+      >
         ⓘ {{ t('boats.maintenance.events.immutable') }}
       </p>
 

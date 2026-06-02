@@ -15,10 +15,7 @@ export default class extends BaseSchema {
         .enum('type', ['entretien', 'montage', 'hivernage', 'dehivernage', 'atelier'])
         .notNullable()
       table.string('title', 200).notNullable()
-      table
-        .enum('status', ['in_progress', 'completed'])
-        .notNullable()
-        .defaultTo('in_progress')
+      table.enum('status', ['in_progress', 'completed']).notNullable().defaultTo('in_progress')
       table.date('performed_at').notNullable()
       table.text('notes').nullable()
       table.timestamp('created_at').notNullable()

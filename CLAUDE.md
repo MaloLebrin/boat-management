@@ -1,6 +1,7 @@
 # CLAUDE.md — Contexte Global
 
 ## Stack principale
+
 - **Backend** : AdonisJS v7 (TypeScript strict)
 - **Frontend** : Vue 3 (Composition API) + Inertia.js (SSR)
 - **Base de données** : PostgreSQL via Lucid ORM (SQLite pour les tests)
@@ -15,6 +16,7 @@
 ## Dépendances système
 
 ### Ghostscript (compression PDF)
+
 Les PDFs uploadés sont compressés avant envoi sur Cloudinary via `app/services/pdf_service.ts` (`-dPDFSETTINGS=/ebook`).
 
 - **Local** : `brew install ghostscript`
@@ -24,12 +26,14 @@ Les PDFs uploadés sont compressés avant envoi sur Cloudinary via `app/services
 ## Conventions de code
 
 ### TypeScript
+
 - Strict mode activé (`"strict": true`)
 - Interfaces préférées aux types pour les objets
 - Pas de `any` — utiliser `unknown` si nécessaire
 - Nommage : `camelCase` pour variables/fonctions, `PascalCase` pour classes/interfaces
 
 ### AdonisJS
+
 - Controllers fins : logique métier dans les Services (`app/services/`)
 - Un fichier par ressource : `user_service`, `boat_service`, etc.
 - Validation via VineJS (validators dans `app/validators/`)
@@ -44,12 +48,14 @@ Les PDFs uploadés sont compressés avant envoi sur Cloudinary via `app/services
 - **Classes d'erreur dans `app/exceptions/`** : toute classe d'erreur métier doit vivre dans `app/exceptions/<domaine>_errors.ts` — jamais définie inline dans un controller ou service.
 
 ### Base de données
+
 - Migrations : toujours avec rollback (`down()` implémenté)
 - Nommage tables : snake_case pluriel (`user_profiles`, `refresh_tokens`)
 - Seeders pour les données de démo (`database/seeders/`)
 - Jamais de `SELECT *` en production — colonnes explicites
 
 ### Frontend (Vue 3 + Inertia)
+
 - `<script setup>` systématiquement
 - Pages dans `inertia/pages/` (organisées par domaine : auth, boats, marketing…)
 - Composants dans `inertia/components/`
@@ -60,14 +66,17 @@ Les PDFs uploadés sont compressés avant envoi sur Cloudinary via `app/services
 - Pages complexes à onglets : chaque onglet = un composant dans `components/<domaine>/show/tabs/`
 
 #### Mutations Inertia (obligatoire sur pages/composants Inertia)
+
 Sur tout écran rendu par Inertia (`inertia/pages/**`, `inertia/components/**`), **ne jamais** appeler `fetch` / `axios` avec `Content-Type: application/json` ni gérer le CSRF à la main (`X-XSRF-TOKEN`, lecture du cookie).
 
 **À la place :**
+
 - Formulaires : `<Form>` (`@adonisjs/inertia/vue`) ou `useForm` + `form.post` / `form.patch`…
 - Actions ponctuelles (drag, toggle, assignation canvas…) : `router.patch` / `router.post` / `router.put` / `router.delete` avec `preserveScroll: true` ; partial reload via `only: ['nomDeProp']` quand seule une prop change
 - CSRF : automatique via Shield + client Inertia (pas de helper `getCsrf()`)
 
 **Côté contrôleur** (routes utilisées par ces écrans) :
+
 - Répondre par **redirection Inertia** : `response.redirect().back()` ou `response.redirect('/chemin')` — **pas** `response.json({ ok: true })`
 - Validation VineJS + erreurs de session comme pour les autres formulaires Inertia
 
@@ -76,6 +85,7 @@ Sur tout écran rendu par Inertia (`inertia/pages/**`, `inertia/components/**`),
 Références : [Inertia — Link and Form](https://docs.adonisjs.com/guides/frontend/inertia#link-and-form-components), [Manual visits](https://inertiajs.com/manual-visits).
 
 ### Internationalisation
+
 - **Toute chaîne visible par l'utilisateur doit passer par `t()`** — jamais de texte en dur dans les templates
 - Pattern obligatoire : `import { useT } from '~/composables/useT'` → `const { t } = useT()` → `{{ t('clé') }}`
 - Clés organisées par domaine dans `resources/lang/{en,fr}/` — **un fichier par domaine** : `common.json`, `nav.json`, `auth.json`, `dashboard.json`, `planning.json`, `maintenance.json`, `settings.json`, `errors.json`, `equipment.json`, `boats.json`, `homePreview.json`, `public.json`, `ports.json` + namespaces backend-only : `flash.json`, `marketing.json`, `validator.json`
@@ -85,6 +95,7 @@ Références : [Inertia — Link and Form](https://docs.adonisjs.com/guides/fron
 - Toute PR qui ajoute un composant ou une page doit ajouter les clés correspondantes dans les **deux locales** (`en` et `fr`)
 
 ## Workflow agent
+
 1. **Toujours lire les fichiers existants** avant de modifier
 2. **Plan d'abord** : décrire ce qui va être fait avant de coder
 3. **Tests obligatoires** pour toute logique métier nouvelle
@@ -93,6 +104,7 @@ Références : [Inertia — Link and Form](https://docs.adonisjs.com/guides/fron
 6. **Documentation obligatoire** : toute nouvelle feature doit être ajoutée en haut de `docs/changelog.md` avec la date et une description en français (routes, champs, comportements notables)
 
 ## Structure projet
+
 ```
 app/
   controllers/     # HTTP Controllers (fins)
@@ -128,6 +140,7 @@ tests/
 ```
 
 ## Ne jamais faire
+
 - Modifier `start/kernel.ts` sans vérifier les effets de bord
 - Utiliser `Model.query()` dans un Controller (→ déléguer au Service)
 - Committer des secrets ou `.env`
@@ -137,5 +150,5 @@ tests/
 - **Définir des classes d'erreur inline dans un controller ou service** (→ `app/exceptions/<domaine>_errors.ts`)
 - **Écrire du texte visible en dur dans un template Vue** (→ utiliser `t('clé')`)
 - **Utiliser des ternaires `locale === 'fr' ? ... : ...`** (→ utiliser `t()` avec clé dans les deux JSON)
-- **`fetch` / `axios` + JSON + CSRF manuel dans `inertia/**`** pour des mutations déjà couvertes par une page Inertia (→ `router.patch` / `useForm` / `<Form>` + `response.redirect().back()` côté contrôleur)
+- **`fetch` / `axios` + JSON + CSRF manuel dans `inertia/**`** pour des mutations déjà couvertes par une page Inertia (→ `router.patch`/`useForm`/`<Form>`+`response.redirect().back()` côté contrôleur)
 - **`response.json({ ok: true })` sur des routes appelées depuis l’UI Inertia** (→ redirection ; réserver le JSON aux vraies routes API)

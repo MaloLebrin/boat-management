@@ -2,13 +2,19 @@ import { test } from '@japa/runner'
 import UserService from '#services/user_service'
 import OrganizationService from '#services/organization_service'
 import BoatService from '#services/boat_service'
+import BoatEquipmentService from '#services/boat_equipment_service'
+import BoatEngineService from '#services/boat_engine_service'
+import BoatSailService from '#services/boat_sail_service'
+import BoatRigService from '#services/boat_rig_service'
+import BoatEnginePartService from '#services/boat_engine_part_service'
+import BoatSafetyEquipmentService from '#services/boat_safety_equipment_service'
+import BoatPolicy from '#policies/boat_policy'
 import Organization from '#models/organization'
 import User from '#models/user'
 import Boat from '#models/boat'
 import BoatEngine from '#models/boat_engine'
 import BoatRig from '#models/boat_rig'
 import BoatSail from '#models/boat_sail'
-import * as abilities from '#abilities/main'
 
 test.group('MVP org/users/boats/permissions (unit)', (group) => {
   group.each.teardown(async () => {
@@ -79,6 +85,13 @@ test.group('MVP org/users/boats/permissions (unit)', (group) => {
     })
 
     const boatService = new BoatService()
+    const equipmentService = new BoatEquipmentService(
+      new BoatEngineService(),
+      new BoatSailService(),
+      new BoatRigService(),
+      new BoatEnginePartService(),
+      new BoatSafetyEquipmentService()
+    )
     const boat = await boatService.createForUser(user, {
       name: 'My Boat',
       manufacturedAt: '2020-01-10',
@@ -89,7 +102,7 @@ test.group('MVP org/users/boats/permissions (unit)', (group) => {
       hullMaterial: 'fiberglass',
     })
 
-    await boatService.createEngine(user, boat, {
+    await equipmentService.createEngine(user, boat, {
       kind: 'inboard',
       fuel: 'diesel',
       brand: 'Yanmar',
@@ -98,7 +111,7 @@ test.group('MVP org/users/boats/permissions (unit)', (group) => {
       powerHp: 28,
       hours: 1200,
     })
-    await boatService.createEngine(user, boat, {
+    await equipmentService.createEngine(user, boat, {
       kind: 'electric',
       fuel: 'electric',
       brand: 'Torqeedo',
@@ -107,14 +120,14 @@ test.group('MVP org/users/boats/permissions (unit)', (group) => {
       powerHp: 6.7,
       hours: 50,
     })
-    await boatService.createSail(user, boat, {
+    await equipmentService.createSail(user, boat, {
       sailType: 'main',
       manufacturedAt: '2020-02-02',
       areaM2: 35,
       material: 'dacron',
       reefPoints: 2,
     })
-    await boatService.upsertRig(user, boat, {
+    await equipmentService.upsertRig(user, boat, {
       rigType: 'sloop',
       manufacturedAt: '2020-03-03',
       mastCount: 1,
@@ -169,7 +182,8 @@ test.group('MVP org/users/boats/permissions (unit)', (group) => {
       type: null,
     })
 
-    const response = await abilities.boatView.execute(user, boat)
+    const policy = new BoatPolicy()
+    const response = policy.view(user, boat)
     assert.isFalse(response)
   })
 })

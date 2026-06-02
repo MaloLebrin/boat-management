@@ -32,4 +32,3 @@ withDefaults(
     </p>
   </div>
 </template>
-

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useScrollReveal } from '~/composables/useScrollReveal'
+import { useScrollReveal } from '~/composables/use_scroll_reveal'
 import HomeBrowserFrame from './HomeBrowserFrame.vue'
 import HomeMockBoatDetail from './HomeMockBoatDetail.vue'
 import HomeMockPlanning from './HomeMockPlanning.vue'
@@ -32,14 +32,16 @@ const mockComponents: Record<MockType, typeof HomeMockBoatDetail> = {
 
 <template>
   <section
-    :ref="(el) => sectionEl = el as HTMLElement"
+    :ref="(el) => (sectionEl = el as HTMLElement)"
     class="reveal px-6 py-20 lg:px-8 lg:py-24"
     :class="[bgClass || 'bg-cream', { visible: isVisible }]"
   >
     <div class="mx-auto max-w-7xl">
       <div
         class="grid items-center gap-12 lg:gap-16"
-        :class="reversed ? 'lg:grid-cols-[3fr_2fr] lg:grid-flow-col-dense' : 'lg:grid-cols-[2fr_3fr]'"
+        :class="
+          reversed ? 'lg:grid-cols-[3fr_2fr] lg:grid-flow-col-dense' : 'lg:grid-cols-[2fr_3fr]'
+        "
       >
         <!-- Text content -->
         <div :class="{ 'lg:col-start-2': reversed }">
@@ -50,7 +52,8 @@ const mockComponents: Record<MockType, typeof HomeMockBoatDetail> = {
             {{ eyebrow }}
           </p>
           <h2 class="mb-4 font-display text-3xl leading-tight text-fg lg:text-4xl">
-            {{ title }} <em :class="isAi ? 'text-violet-700' : 'text-coral-500'">{{ titleHighlight }}</em>
+            {{ title }}
+            <em :class="isAi ? 'text-violet-700' : 'text-coral-500'">{{ titleHighlight }}</em>
           </h2>
           <p class="mb-6 text-lg text-fg-muted">
             {{ body }}

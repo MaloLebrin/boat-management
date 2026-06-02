@@ -7,7 +7,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 
 const { t } = useT()
 </script>

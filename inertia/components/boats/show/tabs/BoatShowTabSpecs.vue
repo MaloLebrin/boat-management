@@ -2,7 +2,7 @@
 import { WrenchScrewdriverIcon } from '@heroicons/vue/24/outline'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 import type { BoatShowDetail } from '~/types/boat_show'
 
 defineProps<{
@@ -74,7 +74,9 @@ const { t } = useT()
           </div>
           <div>
             <dt class="text-fg-muted">{{ t('boats.hullFields.mastHeightM') }}</dt>
-            <dd class="font-semibold text-fg">{{ boat.mastHeightM ? `${boat.mastHeightM} m` : '—' }}</dd>
+            <dd class="font-semibold text-fg">
+              {{ boat.mastHeightM ? `${boat.mastHeightM} m` : '—' }}
+            </dd>
           </div>
         </dl>
       </BaseCard>

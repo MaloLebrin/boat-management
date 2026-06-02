@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
-import { useScrollReveal } from '~/composables/useScrollReveal'
+import { useScrollReveal } from '~/composables/use_scroll_reveal'
 
 type PersonaKey = 'loueurs' | 'ecoles' | 'marinas' | 'armateurs'
 
@@ -29,8 +29,8 @@ const emit = defineEmits<{
 
 const activeKey = ref<PersonaKey>('loueurs')
 
-const activeItem = computed(() =>
-  props.items.find((i) => i.key === activeKey.value) || props.items[0]
+const activeItem = computed(
+  () => props.items.find((i) => i.key === activeKey.value) || props.items[0]
 )
 
 function setActive(key: PersonaKey) {
@@ -43,7 +43,7 @@ const { el: sectionEl, isVisible } = useScrollReveal()
 
 <template>
   <section
-    :ref="(el) => sectionEl = el as HTMLElement"
+    :ref="(el) => (sectionEl = el as HTMLElement)"
     class="reveal bg-cream px-6 py-20 lg:px-8 lg:py-24"
     :class="{ visible: isVisible }"
   >
@@ -77,7 +77,9 @@ const { el: sectionEl, isVisible } = useScrollReveal()
         <div class="grid lg:grid-cols-2">
           <!-- Left: details -->
           <div class="p-8 lg:p-10">
-            <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-navy-100 text-2xl">
+            <div
+              class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-navy-100 text-2xl"
+            >
               {{ activeItem.icon }}
             </div>
             <h3 class="mb-2 text-xl font-semibold text-fg">{{ activeItem.title }}</h3>
@@ -89,7 +91,13 @@ const { el: sectionEl, isVisible } = useScrollReveal()
                 :key="idx"
                 class="flex items-start gap-3 text-sm text-fg-muted"
               >
-                <svg class="mt-0.5 h-5 w-5 shrink-0 text-mint-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <svg
+                  class="mt-0.5 h-5 w-5 shrink-0 text-mint-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
                   <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
                 <span>{{ bullet }}</span>

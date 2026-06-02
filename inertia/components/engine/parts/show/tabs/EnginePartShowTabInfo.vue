@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 import type { BoatShowEnginePart } from '~/types/boat_show'
 
 defineProps<{
@@ -22,7 +22,9 @@ function wearStateVariant(state: string): 'success' | 'info' | 'warning' | 'neut
 <template>
   <div class="space-y-4">
     <BaseCard>
-      <p class="text-sm font-semibold text-fg mb-4">{{ t('boats.engineShow.partShow.info.title') }}</p>
+      <p class="text-sm font-semibold text-fg mb-4">
+        {{ t('boats.engineShow.partShow.info.title') }}
+      </p>
       <dl class="grid grid-cols-2 gap-4 text-sm">
         <div>
           <dt class="text-fg-muted">{{ t('boats.engineShow.partShow.info.designation') }}</dt>
@@ -53,7 +55,9 @@ function wearStateVariant(state: string): 'success' | 'info' | 'warning' | 'neut
     </BaseCard>
 
     <BaseCard>
-      <p class="text-sm font-semibold text-fg mb-3">{{ t('boats.engineShow.partShow.info.notes') }}</p>
+      <p class="text-sm font-semibold text-fg mb-3">
+        {{ t('boats.engineShow.partShow.info.notes') }}
+      </p>
       <p v-if="part.notes" class="whitespace-pre-wrap text-sm text-fg">{{ part.notes }}</p>
       <p v-else class="text-sm text-fg-muted">{{ t('boats.engineShow.partShow.info.noNotes') }}</p>
     </BaseCard>

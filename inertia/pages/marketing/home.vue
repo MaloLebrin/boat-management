@@ -152,9 +152,9 @@ onMounted(() => {
   jsonLdEl.textContent = JSON.stringify({
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: 'FleetAi',
-    url: 'https://fleetai.app',
-    description: t.meta.description,
+    'name': 'FleetAi',
+    'url': 'https://fleetai.app',
+    'description': t.meta.description,
   })
   document.head.appendChild(jsonLdEl)
 })
@@ -253,10 +253,7 @@ onUnmounted(() => {
   />
 
   <!-- 8. Testimonials -->
-  <HomeTestimonialsSection
-    :title="t.home.testimonials.title"
-    :items="t.home.testimonials.items"
-  />
+  <HomeTestimonialsSection :title="t.home.testimonials.title" :items="t.home.testimonials.items" />
 
   <!-- 9. Security -->
   <HomeSecuritySection

@@ -2,7 +2,7 @@
 import { Link } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
-import { useScrollReveal } from '~/composables/useScrollReveal'
+import { useScrollReveal } from '~/composables/use_scroll_reveal'
 
 defineProps<{
   faq: { title: string; items: Array<{ q: string; a: string }> }
@@ -16,7 +16,7 @@ const { el: faqEl, isVisible: faqVisible } = useScrollReveal()
 <template>
   <!-- Section 11: FAQ accordion -->
   <section
-    :ref="(el) => faqEl = el as HTMLElement"
+    :ref="(el) => (faqEl = el as HTMLElement)"
     class="mt-14 reveal"
     :class="{ visible: faqVisible }"
   >
@@ -24,12 +24,7 @@ const { el: faqEl, isVisible: faqVisible } = useScrollReveal()
       <BaseHeading level="2">{{ faq.title }}</BaseHeading>
     </div>
     <div class="bg-white border border-bone rounded-xl overflow-hidden divide-y divide-bone">
-      <details
-        v-for="(qa, idx) in faq.items"
-        :key="qa.q"
-        :open="idx === 0"
-        class="group"
-      >
+      <details v-for="(qa, idx) in faq.items" :key="qa.q" :open="idx === 0" class="group">
         <summary class="flex items-center justify-between gap-4 px-5 py-4 font-semibold text-fg">
           {{ qa.q }}
           <svg
@@ -52,7 +47,9 @@ const { el: faqEl, isVisible: faqVisible } = useScrollReveal()
     <div class="rounded-2xl bg-navy-900 px-8 py-10 ring-1 ring-white/10">
       <div class="grid gap-6 lg:grid-cols-2 lg:items-center">
         <div class="space-y-2">
-          <h2 class="font-display text-3xl leading-tight italic text-white lg:text-4xl">{{ finalCta.title }}</h2>
+          <h2 class="font-display text-3xl leading-tight italic text-white lg:text-4xl">
+            {{ finalCta.title }}
+          </h2>
           <p class="text-pretty text-base text-white/65">{{ finalCta.subtitle }}</p>
         </div>
         <div class="flex flex-wrap items-center justify-start gap-3 lg:justify-end">
@@ -62,7 +59,11 @@ const { el: faqEl, isVisible: faqVisible } = useScrollReveal()
             </BaseButton>
           </a>
           <Link :href="`/${locale}/tarifs`">
-            <BaseButton size="lg" variant="ghost" class="border! border-white/25! text-white/70! hover:bg-white/10! hover:text-white!">
+            <BaseButton
+              size="lg"
+              variant="ghost"
+              class="border! border-white/25! text-white/70! hover:bg-white/10! hover:text-white!"
+            >
               {{ finalCta.secondary }}
             </BaseButton>
           </Link>

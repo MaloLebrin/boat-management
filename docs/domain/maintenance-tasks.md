@@ -81,4 +81,3 @@ La logique “urgent”:
   - ou si “engine-hours” avec `dueEngineHours - currentEngineHours <= urgentWithinEngineHours` (par défaut 10h)
 
 Référence: `app/services/dashboard_service.ts`.
-

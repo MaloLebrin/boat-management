@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 import type { BoatShowEngine, MaintenanceTaskRow } from '~/types/boat_show'
 
 const { t } = useT()
@@ -52,7 +52,9 @@ function formatYear(iso: string): string {
 
       <!-- Caracteristiques -->
       <BaseCard>
-        <p class="text-sm font-semibold text-fg mb-4">{{ t('boats.engineShow.specs.characteristics') }}</p>
+        <p class="text-sm font-semibold text-fg mb-4">
+          {{ t('boats.engineShow.specs.characteristics') }}
+        </p>
         <dl class="grid grid-cols-2 gap-4 text-sm">
           <div>
             <dt class="text-fg-muted">{{ t('boats.engineShow.specs.power') }}</dt>
@@ -68,25 +70,36 @@ function formatYear(iso: string): string {
           </div>
           <div v-if="engine.strokeType">
             <dt class="text-fg-muted">{{ t('boats.engineShow.specs.strokeType') }}</dt>
-            <dd class="font-medium text-fg">{{ t(`boats.options.strokeType.${engine.strokeType}`) }}</dd>
+            <dd class="font-medium text-fg">
+              {{ t(`boats.options.strokeType.${engine.strokeType}`) }}
+            </dd>
           </div>
         </dl>
       </BaseCard>
 
       <!-- Seuils de maintenance -->
       <BaseCard>
-        <p class="text-sm font-semibold text-fg mb-4">{{ t('boats.engineShow.specs.thresholds') }}</p>
-        <div v-if="openTasks.filter(t => t.recurrenceIntervalEngineHours).length === 0" class="text-sm text-fg-muted">
+        <p class="text-sm font-semibold text-fg mb-4">
+          {{ t('boats.engineShow.specs.thresholds') }}
+        </p>
+        <div
+          v-if="openTasks.filter((t) => t.recurrenceIntervalEngineHours).length === 0"
+          class="text-sm text-fg-muted"
+        >
           {{ t('boats.engineShow.specs.noThreshold') }}
         </div>
         <ul v-else class="space-y-3">
           <li
-            v-for="task in openTasks.filter(t => t.recurrenceIntervalEngineHours)"
+            v-for="task in openTasks.filter((t) => t.recurrenceIntervalEngineHours)"
             :key="task.id"
             class="flex items-center justify-between text-sm"
           >
             <span class="font-medium text-fg">{{ task.title }}</span>
-            <span class="text-fg-muted">{{ t('boats.engineShow.specs.every', { hours: String(task.recurrenceIntervalEngineHours) }) }}</span>
+            <span class="text-fg-muted">{{
+              t('boats.engineShow.specs.every', {
+                hours: String(task.recurrenceIntervalEngineHours),
+              })
+            }}</span>
           </li>
         </ul>
       </BaseCard>

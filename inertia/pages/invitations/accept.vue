@@ -10,7 +10,7 @@ import BaseCard from '~/components/base/BaseCard.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseAlert from '~/components/base/BaseAlert.vue'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 import type { OrgRole } from '../../../shared/types/organization'
 
 type InvitationError = 'not_found' | 'expired' | 'already_used' | null
@@ -92,17 +92,21 @@ function getRoleLabel(role: OrgRole): string {
 
         <p class="mb-6 text-fg-muted">
           <template v-if="invitation.invitedByName">
-            {{ t('invitations.accept.invited_by', {
-              name: invitation.invitedByName,
-              orgName: invitation.orgName,
-              role: getRoleLabel(invitation.role)
-            }) }}
+            {{
+              t('invitations.accept.invited_by', {
+                name: invitation.invitedByName,
+                orgName: invitation.orgName,
+                role: getRoleLabel(invitation.role),
+              })
+            }}
           </template>
           <template v-else>
-            {{ t('invitations.accept.invited_anonymous', {
-              orgName: invitation.orgName,
-              role: getRoleLabel(invitation.role)
-            }) }}
+            {{
+              t('invitations.accept.invited_anonymous', {
+                orgName: invitation.orgName,
+                role: getRoleLabel(invitation.role),
+              })
+            }}
           </template>
         </p>
 
@@ -121,12 +125,7 @@ function getRoleLabel(role: OrgRole): string {
         <!-- Authenticated: show accept form -->
         <template v-else>
           <form class="space-y-4" @submit.prevent="acceptInvitation">
-            <BaseButton
-              type="submit"
-              variant="primary"
-              class="w-full"
-              :disabled="form.processing"
-            >
+            <BaseButton type="submit" variant="primary" class="w-full" :disabled="form.processing">
               {{ t('invitations.accept.accept_btn') }}
             </BaseButton>
           </form>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useScrollReveal } from '~/composables/useScrollReveal'
+import { useScrollReveal } from '~/composables/use_scroll_reveal'
 
 interface StatItem {
   value: string
@@ -15,7 +15,7 @@ const { el: sectionEl, isVisible } = useScrollReveal()
 
 <template>
   <section
-    :ref="(el) => sectionEl = el as HTMLElement"
+    :ref="(el) => (sectionEl = el as HTMLElement)"
     class="reveal border-y border-bone bg-white px-6 py-12 lg:px-8 lg:py-16"
     :class="{ visible: isVisible }"
   >
@@ -28,7 +28,7 @@ const { el: sectionEl, isVisible } = useScrollReveal()
           :class="[
             `reveal-delay-${idx + 1}`,
             { visible: isVisible },
-            idx < stats.length - 1 ? 'md:border-r md:border-bone' : ''
+            idx < stats.length - 1 ? 'md:border-r md:border-bone' : '',
           ]"
         >
           <p class="font-display text-4xl text-fg lg:text-5xl">{{ stat.value }}</p>

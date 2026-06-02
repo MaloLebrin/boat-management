@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useScrollReveal } from '~/composables/useScrollReveal'
+import { useScrollReveal } from '~/composables/use_scroll_reveal'
 
 interface ComparisonRow {
   feature: string
@@ -26,14 +26,16 @@ function getCellClass(value: string): string {
 
 <template>
   <section
-    :ref="(el) => sectionEl = el as HTMLElement"
+    :ref="(el) => (sectionEl = el as HTMLElement)"
     class="reveal bg-navy-900 px-6 py-20 lg:px-8 lg:py-24"
     :class="{ visible: isVisible }"
   >
     <div class="mx-auto max-w-4xl">
       <!-- Header -->
       <div class="mb-10 text-center">
-        <p class="mb-2 text-xs font-semibold uppercase tracking-widest text-white/50">{{ subtitle }}</p>
+        <p class="mb-2 text-xs font-semibold uppercase tracking-widest text-white/50">
+          {{ subtitle }}
+        </p>
         <h2 class="font-display text-3xl text-white lg:text-4xl">{{ title }}</h2>
       </div>
 
@@ -45,7 +47,9 @@ function getCellClass(value: string): string {
               <th class="px-4 py-3 text-left">{{ cols.feature }}</th>
               <th class="px-4 py-3 text-center">{{ cols.excel }}</th>
               <th class="px-4 py-3 text-center">{{ cols.paper }}</th>
-              <th class="px-4 py-3 text-center bg-mint-600/20 text-mint-300 font-bold">{{ cols.fleetai }}</th>
+              <th class="px-4 py-3 text-center bg-mint-600/20 text-mint-300 font-bold">
+                {{ cols.fleetai }}
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -55,9 +59,15 @@ function getCellClass(value: string): string {
               :class="idx % 2 === 0 ? 'bg-white/[0.02]' : 'bg-white/[0.05]'"
             >
               <td class="px-4 py-3 font-medium text-white/80">{{ row.feature }}</td>
-              <td class="px-4 py-3 text-center text-white/40" :class="getCellClass(row.excel)">{{ row.excel }}</td>
-              <td class="px-4 py-3 text-center text-white/40" :class="getCellClass(row.paper)">{{ row.paper }}</td>
-              <td class="px-4 py-3 text-center bg-mint-600/10" :class="getCellClass(row.fleetai)">{{ row.fleetai }}</td>
+              <td class="px-4 py-3 text-center text-white/40" :class="getCellClass(row.excel)">
+                {{ row.excel }}
+              </td>
+              <td class="px-4 py-3 text-center text-white/40" :class="getCellClass(row.paper)">
+                {{ row.paper }}
+              </td>
+              <td class="px-4 py-3 text-center bg-mint-600/10" :class="getCellClass(row.fleetai)">
+                {{ row.fleetai }}
+              </td>
             </tr>
           </tbody>
         </table>

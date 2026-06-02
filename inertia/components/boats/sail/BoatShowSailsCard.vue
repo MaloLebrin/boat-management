@@ -8,7 +8,7 @@ import BaseCard from '~/components/base/BaseCard.vue'
 import BaseModal from '~/components/base/BaseModal.vue'
 import type { BoatShowSail } from '~/types/boat_show'
 import BoatEquipmentSailFields from './BoatEquipmentSailFields.vue'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 
 defineProps<{
   boatId: number
@@ -50,7 +50,9 @@ function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutra
         </BaseButton>
       </div>
     </template>
-    <div v-if="sails.length === 0" class="text-sm text-fg-muted">{{ t('boats.sails.noSails') }}</div>
+    <div v-if="sails.length === 0" class="text-sm text-fg-muted">
+      {{ t('boats.sails.noSails') }}
+    </div>
     <ul v-else class="space-y-3 text-sm">
       <li
         v-for="s in sails"
@@ -85,13 +87,20 @@ function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutra
             </div>
 
             <div class="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-fg-subtle">
-              <span v-if="performedDisplay(s.manufacturedAt)">{{ t('boats.sails.mfg') }} {{ performedDisplay(s.manufacturedAt) }}</span>
+              <span v-if="performedDisplay(s.manufacturedAt)"
+                >{{ t('boats.sails.mfg') }} {{ performedDisplay(s.manufacturedAt) }}</span
+              >
             </div>
           </div>
 
           <div v-if="canManage" class="flex flex-wrap items-center gap-2 md:justify-end">
             <a :href="`/boats/${boatId}/sails/${s.id}/edit`">
-              <BaseButton variant="secondary" size="sm" type="button" :aria-label="t('common.edit')">
+              <BaseButton
+                variant="secondary"
+                size="sm"
+                type="button"
+                :aria-label="t('common.edit')"
+              >
                 <PencilSquareIcon class="w-4 h-4" />
               </BaseButton>
             </a>
@@ -100,7 +109,13 @@ function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutra
               #default="{ processing }"
               class="inline"
             >
-              <BaseButton type="submit" variant="danger" size="sm" :disabled="processing" :aria-label="t('common.delete')">
+              <BaseButton
+                type="submit"
+                variant="danger"
+                size="sm"
+                :disabled="processing"
+                :aria-label="t('common.delete')"
+              >
                 <TrashIcon class="w-4 h-4 text-red-800" />
               </BaseButton>
             </Form>
@@ -109,7 +124,11 @@ function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutra
       </li>
     </ul>
 
-    <BaseModal v-model:open="isCreateOpen" :title="t('boats.sails.modal.title')" :close-label="t('common.close')">
+    <BaseModal
+      v-model:open="isCreateOpen"
+      :title="t('boats.sails.modal.title')"
+      :close-label="t('common.close')"
+    >
       <Form
         :action="{ url: `/boats/${boatId}/sails`, method: 'post' }"
         @success="isCreateOpen = false"
@@ -118,8 +137,12 @@ function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutra
       >
         <BoatEquipmentSailFields :errors="errors" />
         <div class="flex items-center justify-end gap-2 pt-2">
-          <BaseButton variant="ghost" type="button" @click="isCreateOpen = false">{{ t('boats.sails.modal.cancel') }}</BaseButton>
-          <BaseButton type="submit" :disabled="processing">{{ t('boats.sails.modal.submit') }}</BaseButton>
+          <BaseButton variant="ghost" type="button" @click="isCreateOpen = false">{{
+            t('boats.sails.modal.cancel')
+          }}</BaseButton>
+          <BaseButton type="submit" :disabled="processing">{{
+            t('boats.sails.modal.submit')
+          }}</BaseButton>
         </div>
       </Form>
     </BaseModal>

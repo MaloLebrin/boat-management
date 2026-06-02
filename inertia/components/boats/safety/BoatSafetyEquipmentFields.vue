@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
-import { useBoatOptions } from '~/composables/useBoatOptions'
-import { useT } from '~/composables/useT'
+import { useBoatOptions } from '~/composables/use_boat_options'
+import { useT } from '~/composables/use_t'
 
 defineProps<{
   errors: Record<string, string | string[] | undefined>

@@ -4,7 +4,7 @@ import { Form } from '@adonisjs/inertia/vue'
 import { computed, ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import EngineDocumentAddModal from '~/components/engine/show/modals/EngineDocumentAddModal.vue'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 import type { BoatShowEngine, MediaRow } from '~/types/boat_show'
 
 const props = defineProps<{
@@ -17,7 +17,9 @@ const { t } = useT()
 const isAddModalOpen = ref(false)
 
 const documents = computed<MediaRow[]>(() =>
-  props.engine.documents.filter((m) => m.kind === 'document').sort((a, b) => a.position - b.position)
+  props.engine.documents
+    .filter((m) => m.kind === 'document')
+    .sort((a, b) => a.position - b.position)
 )
 
 function formatBytes(bytes: number): string {
@@ -33,12 +35,7 @@ function formatBytes(bytes: number): string {
   <div class="space-y-6">
     <div class="flex items-center justify-between">
       <p class="text-sm text-fg-muted">{{ t('boats.show.mediaUpload.documents') }}</p>
-      <BaseButton
-        v-if="canManage"
-        variant="secondary"
-        size="sm"
-        @click="isAddModalOpen = true"
-      >
+      <BaseButton v-if="canManage" variant="secondary" size="sm" @click="isAddModalOpen = true">
         + {{ t('boats.show.mediaUpload.addDocument') }}
       </BaseButton>
     </div>
@@ -84,7 +81,10 @@ function formatBytes(bytes: number): string {
         </a>
         <Form
           v-if="canManage"
-          :action="{ url: `/boats/${boat.id}/engines/${engine.id}/media/${doc.id}`, method: 'delete' }"
+          :action="{
+            url: `/boats/${boat.id}/engines/${engine.id}/media/${doc.id}`,
+            method: 'delete',
+          }"
           #default="{ processing }"
         >
           <button

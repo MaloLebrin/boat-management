@@ -47,4 +47,3 @@ Pour créer des données de démo, le seeder `database/seeders/demo_seeder.ts` r
 
 Commande (référence dans le seeder):
 `node ace db:seed --files database/seeders/demo_seeder.ts`
-

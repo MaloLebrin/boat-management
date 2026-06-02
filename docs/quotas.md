@@ -5,7 +5,7 @@
 Source de vérité : `shared/types/plan.ts` — `PLAN_LIMITS`.
 
 | Feature       | Starter | Pro | Enterprise |
-|---------------|---------|-----|------------|
+| ------------- | ------- | --- | ---------- |
 | Bateaux max   | 2       | 25  | ∞          |
 | Membres max   | 1       | 5   | ∞          |
 | IA / Copilote | ✗       | ✓   | ✓          |
@@ -15,11 +15,11 @@ Source de vérité : `shared/types/plan.ts` — `PLAN_LIMITS`.
 
 ## Tarifs
 
-| Plan       | Mensuel      | Annuel (−20 %)       |
-|------------|--------------|----------------------|
-| Starter    | Gratuit      | Gratuit              |
-| Pro        | 20 € / mois  | 16 € / mois (192 €/an) |
-| Enterprise | Sur devis    | Sur devis            |
+| Plan       | Mensuel     | Annuel (−20 %)         |
+| ---------- | ----------- | ---------------------- |
+| Starter    | Gratuit     | Gratuit                |
+| Pro        | 20 € / mois | 16 € / mois (192 €/an) |
+| Enterprise | Sur devis   | Sur devis              |
 
 - Facturation par organisation, pas par utilisateur ni par bateau.
 - Réduction annuelle de 20 % appliquée automatiquement (badge `billing_annual_badge: "−20 %"`).
@@ -45,14 +45,14 @@ new QuotaExceededError(feature: QuotaFeature, limit: number | null, current: num
 
 ### `QuotaService`
 
-| Méthode | Signature | Comportement |
-|---------|-----------|--------------|
-| `canAddBoat(org)` | `Promise<boolean>` | Retourne `false` si quota atteint, sans throw. Pour l'UI. |
-| `canAddMember(org)` | `Promise<boolean>` | Retourne `false` si quota atteint, sans throw. Pour l'UI. |
-| `assertCanAddBoat(org)` | `Promise<void>` | Throw `QuotaExceededError` si `COUNT(boats) >= maxBoats`. |
-| `assertCanAddMember(org)` | `Promise<void>` | Throw si `COUNT(organization_memberships) >= maxMembers`. |
-| `assertCanUseAI(org)` | `void` (synchrone) | Throw si `!canUseAI`. |
-| `assertCanExport(org)` | `void` (synchrone) | Throw si `!canExport`. |
+| Méthode                   | Signature          | Comportement                                              |
+| ------------------------- | ------------------ | --------------------------------------------------------- |
+| `canAddBoat(org)`         | `Promise<boolean>` | Retourne `false` si quota atteint, sans throw. Pour l'UI. |
+| `canAddMember(org)`       | `Promise<boolean>` | Retourne `false` si quota atteint, sans throw. Pour l'UI. |
+| `assertCanAddBoat(org)`   | `Promise<void>`    | Throw `QuotaExceededError` si `COUNT(boats) >= maxBoats`. |
+| `assertCanAddMember(org)` | `Promise<void>`    | Throw si `COUNT(organization_memberships) >= maxMembers`. |
+| `assertCanUseAI(org)`     | `void` (synchrone) | Throw si `!canUseAI`.                                     |
+| `assertCanExport(org)`    | `void` (synchrone) | Throw si `!canExport`.                                    |
 
 ---
 
@@ -61,6 +61,7 @@ new QuotaExceededError(feature: QuotaFeature, limit: number | null, current: num
 **`inertia/components/base/UpgradePlanModal.vue`**
 
 Modale réutilisable affichée quand un quota est atteint côté frontend, avant tout appel réseau. Elle :
+
 - lit `currentPlan` via `usePage().props.currentPlan`
 - déduit le plan cible via `getUpgradeTier()` (`shared/types/plan.ts`)
 - affiche le prix mensuel/annuel avec toggle (−20 %)
@@ -86,6 +87,7 @@ Modale réutilisable affichée quand un quota est atteint côté frontend, avant
 **[1] — Frontend `inertia/pages/boats/index.vue`**
 
 Le controller `index()` passe `canAddBoat: boolean` (via `quotaService.canAddBoat()`). Le bouton "Nouveau bateau" reste toujours visible et cliquable.
+
 - Clic → `handleNewBoat()` : si `canAddBoat === false`, ouvre `UpgradePlanModal` (feature `boats`) ; sinon navigue vers `/boats/new`.
 
 **[2] — `BoatsController.create()` (GET /boats/new)**
@@ -96,6 +98,7 @@ if (!(await this.quotaService.canAddBoat(user.organization))) {
   return response.redirect('/boats')
 }
 ```
+
 Bloque l'accès direct par URL au formulaire de création.
 
 **[3] — `BoatsController.store()` (POST /boats)**
@@ -111,6 +114,7 @@ try {
   throw error
 }
 ```
+
 Guard final avant écriture en base.
 
 ---
@@ -125,6 +129,7 @@ Guard final avant écriture en base.
 **[1] — Frontend `inertia/components/settings/tabs/SettingsMembersTab.vue`**
 
 Le controller `members()` passe `canAddMember: boolean` (via `quotaService.canAddMember()`). Le bouton "Inviter" reste toujours visible.
+
 - Clic → `handleInvite()` : si `canAddMember === false`, ouvre `UpgradePlanModal` (feature `members`) ; sinon affiche le formulaire d'invitation.
 
 **[2] — `OrganizationInvitationsController.store()` (POST /organization/invitations)**
@@ -132,6 +137,7 @@ Le controller `members()` passe `canAddMember: boolean` (via `quotaService.canAd
 ```ts
 await this.quotaService.assertCanAddMember(user.organization)
 ```
+
 Appelé après `bouncer.authorize('manageMembers')` et validation VineJS, avant `invitationService.create()`.
 Flash : `flash.quota.membersExceeded`.
 
@@ -147,9 +153,11 @@ Flash : `flash.quota.membersExceeded`.
 **[1] — Frontend**
 
 `canUseAI` est calculé localement depuis `currentPlan` (shared prop, pas de prop controller dédiée) :
+
 ```ts
 const canUseAI = computed(() => PLAN_LIMITS[page.props.currentPlan ?? 'starter'].canUseAI)
 ```
+
 - `inertia/pages/dashboard.vue` → `analyzeFleet()` : si `!canUseAI`, ouvre `UpgradePlanModal` (feature `ai`).
 - `inertia/components/boats/show/tabs/BoatShowTabOverview.vue` → `refreshSuggestions()` : idem.
 
@@ -160,6 +168,7 @@ Les boutons restent toujours visibles et cliquables.
 ```ts
 this.quotaService.assertCanUseAI(user.organization) // synchrone
 ```
+
 En entrée de chaque méthode, avant toute opération IA.
 Flash : `flash.quota.aiExceeded`.
 

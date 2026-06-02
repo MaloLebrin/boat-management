@@ -16,7 +16,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  mousedown: [e: MouseEvent]
+  'mousedown': [e: MouseEvent]
   'spot-click': [info: { spotId: number; boat: { id: number; name: string } | null }]
   'zone-click': []
 }>()

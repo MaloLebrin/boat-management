@@ -11,6 +11,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 
 function buildContentDisposition(filename: string, format: string): string {
   const full = `${filename}.${format}`
+  // eslint-disable-next-line no-control-regex
   const ascii = full.replace(/[\x00-\x1f\x7f"\\]/g, '_')
   const encoded = encodeURIComponent(full)
   return `attachment; filename="${ascii}"; filename*=UTF-8''${encoded}`
@@ -202,14 +203,18 @@ export default class BoatEnginePartsController {
 
     const media = await this.mediaService.getForEntity(mediaId, 'boat_engine_part', partId)
     if (!media) {
-      return response.redirect(`/boats/${boat.id}/engines/${engineId}/parts/${partId}?tab=documents`)
+      return response.redirect(
+        `/boats/${boat.id}/engines/${engineId}/parts/${partId}?tab=documents`
+      )
     }
 
     try {
       await this.mediaService.deleteById(mediaId)
     } catch (error) {
       if (error instanceof MediaNotFoundError) {
-        return response.redirect(`/boats/${boat.id}/engines/${engineId}/parts/${partId}?tab=documents`)
+        return response.redirect(
+          `/boats/${boat.id}/engines/${engineId}/parts/${partId}?tab=documents`
+        )
       }
       throw error
     }
@@ -230,7 +235,9 @@ export default class BoatEnginePartsController {
 
     const media = await this.mediaService.getForEntity(mediaId, 'boat_engine_part', partId)
     if (!media) {
-      return response.redirect(`/boats/${boat.id}/engines/${engineId}/parts/${partId}?tab=documents`)
+      return response.redirect(
+        `/boats/${boat.id}/engines/${engineId}/parts/${partId}?tab=documents`
+      )
     }
 
     const resourceType = media.format === 'pdf' ? 'raw' : 'image'

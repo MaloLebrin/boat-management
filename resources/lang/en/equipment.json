@@ -17,5 +17,10 @@
     "worn": "Worn",
     "to_replace": "To replace",
     "damaged": "Damaged"
+  },
+  "stock": {
+    "minStockAlert": "Min stock alert",
+    "minStockAlertPlaceholder": "e.g. 2",
+    "lowStockWarning": "Low stock — replenishment advised"
   }
 }

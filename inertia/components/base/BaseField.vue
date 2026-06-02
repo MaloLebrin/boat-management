@@ -10,11 +10,7 @@ defineProps<{
 <template>
   <div class="flex flex-col gap-1.5">
     <div v-if="label || $slots['label-right']" class="flex items-baseline justify-between">
-      <label
-        v-if="label"
-        :for="htmlFor"
-        class="text-sm font-semibold text-fg"
-      >
+      <label v-if="label" :for="htmlFor" class="text-sm font-semibold text-fg">
         {{ label }}
       </label>
       <slot name="label-right" />

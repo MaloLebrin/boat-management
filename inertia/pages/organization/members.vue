@@ -8,7 +8,7 @@ import BaseInput from '~/components/base/BaseInput.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseAlert from '~/components/base/BaseAlert.vue'
-import { useT } from '~/composables/useT'
+import { useT } from '~/composables/use_t'
 
 interface OrganizationMemberData {
   id: number
@@ -76,7 +76,9 @@ function getInitials(member: OrganizationMemberData): string {
     <!-- Invite form -->
     <BaseCard v-if="canManageMembers" class="mb-8">
       <template #header>
-        <span class="text-sm font-semibold text-fg">{{ t('organization.members.invite.title') }}</span>
+        <span class="text-sm font-semibold text-fg">{{
+          t('organization.members.invite.title')
+        }}</span>
       </template>
       <form class="flex flex-col gap-4 sm:flex-row sm:items-end" @submit.prevent="submitInvite">
         <div class="flex-1">
@@ -99,11 +101,7 @@ function getInitials(member: OrganizationMemberData): string {
             :errors="inviteForm.errors"
           />
         </div>
-        <BaseButton
-          type="submit"
-          variant="primary"
-          :disabled="inviteForm.processing"
-        >
+        <BaseButton type="submit" variant="primary" :disabled="inviteForm.processing">
           {{ t('organization.members.invite.submit') }}
         </BaseButton>
       </form>
@@ -114,13 +112,20 @@ function getInitials(member: OrganizationMemberData): string {
       <table class="w-full">
         <thead>
           <tr class="border-b border-border">
-            <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-fg-muted">
+            <th
+              class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-fg-muted"
+            >
               {{ t('organization.members.table.member') }}
             </th>
-            <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-fg-muted">
+            <th
+              class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-fg-muted"
+            >
               {{ t('organization.members.table.role') }}
             </th>
-            <th v-if="canManageMembers" class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-fg-muted">
+            <th
+              v-if="canManageMembers"
+              class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-fg-muted"
+            >
               {{ t('organization.members.table.actions') }}
             </th>
           </tr>
@@ -133,7 +138,9 @@ function getInitials(member: OrganizationMemberData): string {
           >
             <td class="px-6 py-4">
               <div class="flex items-center gap-3">
-                <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand text-sm font-medium text-white">
+                <div
+                  class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand text-sm font-medium text-white"
+                >
                   {{ getInitials(member) }}
                 </div>
                 <div class="min-w-0">
@@ -162,11 +169,7 @@ function getInitials(member: OrganizationMemberData): string {
               </template>
             </td>
             <td v-if="canManageMembers" class="px-6 py-4 text-right">
-              <BaseButton
-                variant="danger"
-                size="sm"
-                @click="removeMember(member.id)"
-              >
+              <BaseButton variant="danger" size="sm" @click="removeMember(member.id)">
                 {{ t('organization.members.remove') }}
               </BaseButton>
             </td>

@@ -21,7 +21,12 @@ test.group('PasswordResetService (unit)', (group) => {
 
   test('createToken returns a token for an existing user', async ({ assert }) => {
     const org = await Organization.create({ name: 'O', slug: 'o-prs-1' })
-    await User.create({ email: 'reset1@example.com', password: 'Password123!', fullName: 'R1', organizationId: org.id })
+    await User.create({
+      email: 'reset1@example.com',
+      password: 'Password123!',
+      fullName: 'R1',
+      organizationId: org.id,
+    })
 
     const svc = new PasswordResetService()
     const token = await svc.createToken('reset1@example.com')
@@ -43,7 +48,12 @@ test.group('PasswordResetService (unit)', (group) => {
 
   test('createToken replaces a previous token for the same email', async ({ assert }) => {
     const org = await Organization.create({ name: 'O', slug: 'o-prs-2' })
-    await User.create({ email: 'reset2@example.com', password: 'Password123!', fullName: 'R2', organizationId: org.id })
+    await User.create({
+      email: 'reset2@example.com',
+      password: 'Password123!',
+      fullName: 'R2',
+      organizationId: org.id,
+    })
 
     const svc = new PasswordResetService()
     const first = await svc.createToken('reset2@example.com')
@@ -59,7 +69,12 @@ test.group('PasswordResetService (unit)', (group) => {
 
   test('verifyToken returns the record for a valid token', async ({ assert }) => {
     const org = await Organization.create({ name: 'O', slug: 'o-prs-3' })
-    await User.create({ email: 'reset3@example.com', password: 'Password123!', fullName: 'R3', organizationId: org.id })
+    await User.create({
+      email: 'reset3@example.com',
+      password: 'Password123!',
+      fullName: 'R3',
+      organizationId: org.id,
+    })
 
     const svc = new PasswordResetService()
     const token = await svc.createToken('reset3@example.com')
@@ -77,7 +92,12 @@ test.group('PasswordResetService (unit)', (group) => {
 
   test('verifyToken returns null for an expired token', async ({ assert }) => {
     const org = await Organization.create({ name: 'O', slug: 'o-prs-4' })
-    await User.create({ email: 'reset4@example.com', password: 'Password123!', fullName: 'R4', organizationId: org.id })
+    await User.create({
+      email: 'reset4@example.com',
+      password: 'Password123!',
+      fullName: 'R4',
+      organizationId: org.id,
+    })
 
     const rawToken = 'b'.repeat(128)
     await PasswordResetToken.create({
@@ -95,7 +115,12 @@ test.group('PasswordResetService (unit)', (group) => {
 
   test('invalidateTokensForEmail removes all tokens for an email', async ({ assert }) => {
     const org = await Organization.create({ name: 'O', slug: 'o-prs-5' })
-    await User.create({ email: 'reset5@example.com', password: 'Password123!', fullName: 'R5', organizationId: org.id })
+    await User.create({
+      email: 'reset5@example.com',
+      password: 'Password123!',
+      fullName: 'R5',
+      organizationId: org.id,
+    })
 
     const svc = new PasswordResetService()
     await svc.createToken('reset5@example.com')
