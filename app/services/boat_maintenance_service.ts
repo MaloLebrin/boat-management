@@ -4,6 +4,12 @@ import {
 } from '#exceptions/maintenance_errors'
 import type Boat from '#models/boat'
 import type { CreateMaintenancePayload } from '#shared/types/maintenance'
+import {
+  buildEngineCaption,
+  buildSailCaption,
+  computeTotalCost,
+  toDateTime,
+} from '#shared/helpers/maintenance'
 import BoatEngine from '#models/boat_engine'
 import BoatEnginePart from '#models/boat_engine_part'
 import BoatMaintenanceEvent from '#models/boat_maintenance_event'
@@ -13,43 +19,9 @@ import BoatSail from '#models/boat_sail'
 import type User from '#models/user'
 import { inject } from '@adonisjs/core'
 import db from '@adonisjs/lucid/services/db'
-import { DateTime } from 'luxon'
 
 export { BoatMaintenanceNotFoundError, BoatMaintenanceValidationError }
 export type { CreateMaintenancePayload }
-
-function toDateTime(value: Date | string | DateTime): DateTime {
-  if (DateTime.isDateTime(value)) return value
-  if (value instanceof Date) return DateTime.fromJSDate(value)
-  return DateTime.fromISO(String(value))
-}
-
-function buildEngineCaption(engine: BoatEngine): string {
-  const bits = [engine.brand, engine.model, engine.serialNumber].filter(Boolean)
-  const label = bits.join(' ').trim()
-  return label || engine.kind
-}
-
-function buildSailCaption(sail: BoatSail): string {
-  const bits = [
-    sail.sailType,
-    sail.material,
-    sail.areaM2 !== null ? `${sail.areaM2} m²` : null,
-  ].filter(Boolean)
-  return bits.join(' · ')
-}
-
-function computeTotalCost(parts: BoatMaintenancePart[]): number | null {
-  let total = 0
-  let hasPrice = false
-  for (const p of parts) {
-    if (p.unitPrice !== null && p.unitPrice !== undefined) {
-      hasPrice = true
-      total += p.unitPrice * (p.quantity ?? 1)
-    }
-  }
-  return hasPrice ? Math.round(total * 100) / 100 : null
-}
 
 @inject()
 export default class BoatMaintenanceService {
