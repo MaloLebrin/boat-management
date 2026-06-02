@@ -3,6 +3,12 @@ import BoatMaintenanceService, {
   BoatMaintenanceValidationError,
 } from '#services/boat_maintenance_service'
 import BoatService from '#services/boat_service'
+import BoatEquipmentService from '#services/boat_equipment_service'
+import BoatEngineService from '#services/boat_engine_service'
+import BoatSailService from '#services/boat_sail_service'
+import BoatRigService from '#services/boat_rig_service'
+import BoatEnginePartService from '#services/boat_engine_part_service'
+import BoatSafetyEquipmentService from '#services/boat_safety_equipment_service'
 import Organization from '#models/organization'
 import User from '#models/user'
 import Boat from '#models/boat'
@@ -120,13 +126,20 @@ test.group('BoatMaintenanceService (unit)', (group) => {
       organizationId: org.id,
     })
     const boatService = new BoatService()
+    const equipmentService = new BoatEquipmentService(
+      new BoatEngineService(),
+      new BoatSailService(),
+      new BoatRigService(),
+      new BoatEnginePartService(),
+      new BoatSafetyEquipmentService()
+    )
     const boat = await boatService.createForUser(user, {
       name: 'Sloop',
       propulsionType: 'sailboat',
       mastHeightM: 12,
     })
-    await boatService.createSail(user, boat, { sailType: 'main', areaM2: 28 })
-    await boatService.upsertRig(user, boat, { rigType: 'sloop', mastCount: 1 })
+    await equipmentService.createSail(user, boat, { sailType: 'main', areaM2: 28 })
+    await equipmentService.upsertRig(user, boat, { rigType: 'sloop', mastCount: 1 })
 
     await boat.load('sails')
     await boat.load('rig')

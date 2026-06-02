@@ -1,5 +1,10 @@
 import { test } from '@japa/runner'
-import BoatService, { BoatEquipmentNotFoundError } from '#services/boat_service'
+import BoatEquipmentService, { BoatEquipmentNotFoundError } from '#services/boat_equipment_service'
+import BoatEngineService from '#services/boat_engine_service'
+import BoatSailService from '#services/boat_sail_service'
+import BoatRigService from '#services/boat_rig_service'
+import BoatEnginePartService from '#services/boat_engine_part_service'
+import BoatSafetyEquipmentService from '#services/boat_safety_equipment_service'
 import Organization from '#models/organization'
 import User from '#models/user'
 import Boat from '#models/boat'
@@ -44,7 +49,13 @@ test.group('BoatService equipment (unit)', (group) => {
       hours: null,
     })
 
-    const svc = new BoatService()
+    const svc = new BoatEquipmentService(
+      new BoatEngineService(),
+      new BoatSailService(),
+      new BoatRigService(),
+      new BoatEnginePartService(),
+      new BoatSafetyEquipmentService()
+    )
     await assert.rejects(
       () =>
         svc.updateEngine(user, boatA, engineB.id, {

@@ -4,6 +4,7 @@ import User from '#models/user'
 import Boat from '#models/boat'
 import BoatMaintenanceTask from '#models/boat_maintenance_task'
 import BoatListService from '#services/boat_list_service'
+import BoatMaintenanceBadgeService from '#services/boat_maintenance_badge_service'
 import { DateTime } from 'luxon'
 
 test.group('BoatListService (unit)', (group) => {
@@ -64,7 +65,7 @@ test.group('BoatListService (unit)', (group) => {
       lastDoneEngineHours: null,
     })
 
-    const svc = new BoatListService()
+    const svc = new BoatListService(new BoatMaintenanceBadgeService())
     const res = await svc.listForUser(user, {
       q: 'REG-001',
       type: 'Sailboat',

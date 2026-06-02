@@ -1,4 +1,4 @@
-export function sortEnginesByStatus(engines: BoatShowEngine[]) {
+export function sortEnginesByStatus<T extends { status: string }>(engines: T[]): T[] {
   return engines.sort((a, b) => {
     if (a.status === 'operational') return -1
     if (b.status === 'operational') return 1
