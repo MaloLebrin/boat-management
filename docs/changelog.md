@@ -3,6 +3,88 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-06-06 — Page guide SEO coût d'entretien + simulateur flotte
+
+**Nouvelle fonctionnalité — SEO organique + simulateur authentifié**
+
+### Page guide "Coût d'entretien d'un bateau"
+
+Page de contenu SEO riche ciblant les requêtes organiques sur le coût d'entretien annuel d'un bateau. Alimente un tunnel vers le simulateur public.
+
+**Routes :**
+- `GET /fr/cout-entretien-bateau` → `marketing.fr.guide`
+- `GET /en/boat-maintenance-cost` → `marketing.en.guide`
+
+**Sections :** Hero + stats clés + catégories de coûts + tableau comparatif par type/longueur + FAQ accordion + CTA simulateur + contexte réglementaire Division 240.
+
+**SEO :** FAQPage JSON-LD (schema.org) embarqué dans `<Head>` pour rich results Google. Balises canonical + hreflang.
+
+**Navigation :** Lien "Guide entretien" / "Maintenance guide" ajouté dans le header public et le footer.
+
+**Fichiers créés :**
+- `inertia/pages/marketing/guide.vue` — page guide (174 lignes)
+- `inertia/components/marketing/guide/GuideCostTable.vue` — tableau coûts responsive
+- `inertia/components/marketing/guide/GuideFaqSection.vue` — accordion FAQ
+- `resources/lang/fr/marketing.json` — section `guide` (73 clés)
+- `resources/lang/en/marketing.json` — section `guide` (73 clés)
+
+**Simulateur enrichi :** Section "Comment ça marche" (3 étapes) ajoutée avant le formulaire sur la page simulateur public.
+
+### Simulateur de coût sur bateau existant (flotte authentifiée)
+
+Permet à un utilisateur connecté de relancer le simulateur de coût d'entretien sur un bateau déjà dans sa flotte, avec les données de base pré-remplies.
+
+**Routes :**
+- `GET /boats/:id/simulator` → `boats.simulator` (auth requis)
+
+**Comportement :** Type, longueur, année, catégorie CE pré-remplis depuis la fiche bateau. Seules les étapes d'usure (coque, moteur, sécurité, gréement) sont présentées. Calcul client-side sans persistance. Résultat avec bouton retour fiche bateau.
+
+**Accès :** Bouton "Estimer les coûts d'entretien" dans l'onglet Aperçu de la fiche bateau.
+
+**Fichiers créés :**
+- `app/controllers/boat_simulator_controller.ts` — contrôleur avec bouncer `BoatPolicy.view`
+- `inertia/pages/boats/simulator.vue` — page simulateur flotte (layout app)
+
+---
+
+## 2026-06-06 — Simulateur de coût d'entretien (acquisition publique)
+
+**Nouvelle fonctionnalité — outil public / stratégie d'acquisition**
+
+### Simulateur de coût annuel d'entretien
+
+Page publique (sans authentification) permettant à tout propriétaire de bateau d'estimer son budget annuel d'entretien en 2 minutes. Basé sur la réglementation Division 240 – Annexe 240-A.2.
+
+**Tunnel de conversion :**
+1. L'utilisateur remplit les données de son bateau (type, longueur, âge, catégorie CE) et l'état de ses équipements (coque, moteur, sécurité, gréement)
+2. Un coût estimé par catégorie (fourchette min/max) est calculé côté frontend sans appel serveur
+3. Un CTA incite l'utilisateur à créer un compte — les données du bateau sont stockées en session
+4. Après inscription, le bateau est automatiquement créé et l'utilisateur est redirigé vers la fiche de son bateau
+
+**Routes :**
+- `GET /fr/simulateur-cout-entretien` → `marketing.fr.simulator`
+- `GET /en/maintenance-cost-simulator` → `marketing.en.simulator`
+- `POST /simulator/session` → stockage en session + redirect signup
+
+**Fichiers créés :**
+- `shared/types/simulator.ts` — types `SimulatorBoatInput`, `SimulatorCostBreakdown`
+- `app/validators/simulator.ts` — validation VineJS des données du simulateur
+- `app/controllers/simulator_controller.ts` — `saveSession()`
+- `inertia/composables/use_simulator_costs.ts` — calcul des coûts par catégorie
+- `inertia/components/marketing/simulator/` — 7 composants (étapes + résultat + CTA)
+- `inertia/pages/marketing/simulator.vue` — page multi-étapes
+
+**Fichiers modifiés :**
+- `app/controllers/marketing_controller.ts` — méthode `simulator()`
+- `app/services/boat_hull_service.ts` — méthode `createFromSimulator(orgId, data)`
+- `app/controllers/new_account_controller.ts` — auto-création du bateau depuis la session post-inscription
+- `start/routes/marketing.ts` — routes simulateur
+- `resources/lang/{fr,en}/marketing.json` — clés `marketing.simulator.*`
+- `resources/lang/{fr,en}/public.json` — lien footer "Simulateur de coût"
+- `inertia/layouts/public.vue` — lien footer ajouté
+
+---
+
 ## 2026-06-01 — Gestion avancée des pièces et suivi des coûts de maintenance
 
 **Nouvelles fonctionnalités**

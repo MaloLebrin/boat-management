@@ -7,102 +7,6 @@ import type { InferInput, SimpleError } from '@vinejs/vine/types'
 export type ParamValue = string | number | bigint | boolean
 
 export interface Registry {
-  'root': {
-    methods: ["GET","HEAD"]
-    pattern: '/'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: unknown
-      errorResponse: unknown
-    }
-  }
-  'marketing.en.home': {
-    methods: ["GET","HEAD"]
-    pattern: '/en'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['home']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['home']>>>
-    }
-  }
-  'marketing.en.pricing': {
-    methods: ["GET","HEAD"]
-    pattern: '/en/tarifs'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['pricing']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['pricing']>>>
-    }
-  }
-  'marketing.fr.home': {
-    methods: ["GET","HEAD"]
-    pattern: '/fr'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['home']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['home']>>>
-    }
-  }
-  'marketing.fr.pricing': {
-    methods: ["GET","HEAD"]
-    pattern: '/fr/tarifs'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['pricing']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['pricing']>>>
-    }
-  }
-  'marketing.en.about': {
-    methods: ["GET","HEAD"]
-    pattern: '/en/about'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['about']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['about']>>>
-    }
-  }
-  'marketing.fr.about': {
-    methods: ["GET","HEAD"]
-    pattern: '/fr/a-propos'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['about']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['about']>>>
-    }
-  }
-  'marketing.contact': {
-    methods: ["GET","HEAD"]
-    pattern: '/contact'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['contact']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['contact']>>>
-    }
-  }
   'webhooks.stripe': {
     methods: ["POST"]
     pattern: '/webhooks/stripe'
@@ -727,6 +631,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_maintenance_sheet_items_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'boats.simulator': {
+    methods: ["GET","HEAD"]
+    pattern: '/boats/:id/simulator'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_simulator_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_simulator_controller').default['show']>>>
+    }
+  }
   'ports.index': {
     methods: ["GET","HEAD"]
     pattern: '/ports'
@@ -953,6 +869,174 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/spots_controller').default['destroy']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/spots_controller').default['destroy']>>>
+    }
+  }
+  'root': {
+    methods: ["GET","HEAD"]
+    pattern: '/'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'marketing.en.home': {
+    methods: ["GET","HEAD"]
+    pattern: '/en'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['home']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['home']>>>
+    }
+  }
+  'marketing.en.pricing': {
+    methods: ["GET","HEAD"]
+    pattern: '/en/tarifs'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['pricing']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['pricing']>>>
+    }
+  }
+  'marketing.en.simulator': {
+    methods: ["GET","HEAD"]
+    pattern: '/en/maintenance-cost-simulator'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['simulator']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['simulator']>>>
+    }
+  }
+  'marketing.en.guide': {
+    methods: ["GET","HEAD"]
+    pattern: '/en/boat-maintenance-cost'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['guide']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['guide']>>>
+    }
+  }
+  'marketing.fr.home': {
+    methods: ["GET","HEAD"]
+    pattern: '/fr'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['home']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['home']>>>
+    }
+  }
+  'marketing.fr.pricing': {
+    methods: ["GET","HEAD"]
+    pattern: '/fr/tarifs'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['pricing']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['pricing']>>>
+    }
+  }
+  'marketing.fr.simulator': {
+    methods: ["GET","HEAD"]
+    pattern: '/fr/simulateur-cout-entretien'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['simulator']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['simulator']>>>
+    }
+  }
+  'marketing.fr.guide': {
+    methods: ["GET","HEAD"]
+    pattern: '/fr/cout-entretien-bateau'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['guide']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['guide']>>>
+    }
+  }
+  'marketing.en.about': {
+    methods: ["GET","HEAD"]
+    pattern: '/en/about'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['about']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['about']>>>
+    }
+  }
+  'marketing.fr.about': {
+    methods: ["GET","HEAD"]
+    pattern: '/fr/a-propos'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['about']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['about']>>>
+    }
+  }
+  'marketing.contact': {
+    methods: ["GET","HEAD"]
+    pattern: '/contact'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['contact']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['contact']>>>
+    }
+  }
+  'simulator.session': {
+    methods: ["POST"]
+    pattern: '/simulator/session'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/simulator').simulatorValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/simulator').simulatorValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/simulator_controller').default['saveSession']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/simulator_controller').default['saveSession']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'simulator.create_boat': {
+    methods: ["POST"]
+    pattern: '/boats/from-simulator'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/simulator').simulatorValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/simulator').simulatorValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/simulator_controller').default['createBoat']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/simulator_controller').default['createBoat']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'planning.index': {

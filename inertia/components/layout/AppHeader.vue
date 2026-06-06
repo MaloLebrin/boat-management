@@ -17,6 +17,10 @@ const { t } = useT()
 const locale = computed<'en' | 'fr'>(() => page.props.locale ?? 'en')
 const isAuthed = computed(() => Boolean(page.props.user))
 
+const guideHref = computed(() =>
+  locale.value === 'fr' ? '/fr/cout-entretien-bateau' : '/en/boat-maintenance-cost'
+)
+
 const otherLocale = computed<AppLocale>(() => (locale.value === 'en' ? 'fr' : 'en'))
 
 const localeSwitchHref = computed(() =>
@@ -72,6 +76,12 @@ function switchLocale() {
           class="rounded-(--radius-control) px-3 py-2 text-sm font-medium text-fg-muted transition-colors duration-(--motion-fast) ease-premium hover:bg-paper hover:text-fg"
         >
           {{ t('public.nav.pricing') }}
+        </Link>
+        <Link
+          :href="guideHref"
+          class="rounded-(--radius-control) px-3 py-2 text-sm font-medium text-fg-muted transition-colors duration-(--motion-fast) ease-premium hover:bg-paper hover:text-fg"
+        >
+          {{ t('public.nav.guide') }}
         </Link>
         <Link
           href="/design-system"

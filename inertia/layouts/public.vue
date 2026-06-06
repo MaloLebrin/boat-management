@@ -14,6 +14,10 @@ const { t } = useT()
 
 const locale = computed<'en' | 'fr'>(() => page.props.locale ?? 'en')
 const copyrightYear = new Date().getFullYear()
+
+const guideHref = computed(() =>
+  locale.value === 'fr' ? '/fr/cout-entretien-bateau' : '/en/boat-maintenance-cost'
+)
 </script>
 
 <template>
@@ -43,6 +47,12 @@ const copyrightYear = new Date().getFullYear()
             }}</Link>
             <Link :href="`/${locale}/tarifs`" class="transition-colors hover:text-fg">{{
               t('public.footer.pricing')
+            }}</Link>
+            <Link :href="`/${locale}/simulateur`" class="transition-colors hover:text-fg">{{
+              t('public.footer.simulator')
+            }}</Link>
+            <Link :href="guideHref" class="transition-colors hover:text-fg">{{
+              t('public.footer.guide')
             }}</Link>
             <Link href="/design-system" class="transition-colors hover:text-fg">Design system</Link>
           </div>

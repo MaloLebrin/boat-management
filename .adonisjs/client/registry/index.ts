@@ -6,54 +6,6 @@ import type { ApiDefinition } from './tree.d.ts'
 const placeholder: any = {}
 
 const routes = {
-  'root': {
-    methods: ["GET","HEAD"],
-    pattern: '/',
-    tokens: [{"old":"/","type":0,"val":"/","end":""}],
-    types: placeholder as Registry['root']['types'],
-  },
-  'marketing.en.home': {
-    methods: ["GET","HEAD"],
-    pattern: '/en',
-    tokens: [{"old":"/en","type":0,"val":"en","end":""}],
-    types: placeholder as Registry['marketing.en.home']['types'],
-  },
-  'marketing.en.pricing': {
-    methods: ["GET","HEAD"],
-    pattern: '/en/tarifs',
-    tokens: [{"old":"/en/tarifs","type":0,"val":"en","end":""},{"old":"/en/tarifs","type":0,"val":"tarifs","end":""}],
-    types: placeholder as Registry['marketing.en.pricing']['types'],
-  },
-  'marketing.fr.home': {
-    methods: ["GET","HEAD"],
-    pattern: '/fr',
-    tokens: [{"old":"/fr","type":0,"val":"fr","end":""}],
-    types: placeholder as Registry['marketing.fr.home']['types'],
-  },
-  'marketing.fr.pricing': {
-    methods: ["GET","HEAD"],
-    pattern: '/fr/tarifs',
-    tokens: [{"old":"/fr/tarifs","type":0,"val":"fr","end":""},{"old":"/fr/tarifs","type":0,"val":"tarifs","end":""}],
-    types: placeholder as Registry['marketing.fr.pricing']['types'],
-  },
-  'marketing.en.about': {
-    methods: ["GET","HEAD"],
-    pattern: '/en/about',
-    tokens: [{"old":"/en/about","type":0,"val":"en","end":""},{"old":"/en/about","type":0,"val":"about","end":""}],
-    types: placeholder as Registry['marketing.en.about']['types'],
-  },
-  'marketing.fr.about': {
-    methods: ["GET","HEAD"],
-    pattern: '/fr/a-propos',
-    tokens: [{"old":"/fr/a-propos","type":0,"val":"fr","end":""},{"old":"/fr/a-propos","type":0,"val":"a-propos","end":""}],
-    types: placeholder as Registry['marketing.fr.about']['types'],
-  },
-  'marketing.contact': {
-    methods: ["GET","HEAD"],
-    pattern: '/contact',
-    tokens: [{"old":"/contact","type":0,"val":"contact","end":""}],
-    types: placeholder as Registry['marketing.contact']['types'],
-  },
   'webhooks.stripe': {
     methods: ["POST"],
     pattern: '/webhooks/stripe',
@@ -366,6 +318,12 @@ const routes = {
     tokens: [{"old":"/boats/:boatId/maintenance-sheets/:sheetId/items/:itemId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/maintenance-sheets/:sheetId/items/:itemId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/maintenance-sheets/:sheetId/items/:itemId","type":0,"val":"maintenance-sheets","end":""},{"old":"/boats/:boatId/maintenance-sheets/:sheetId/items/:itemId","type":1,"val":"sheetId","end":""},{"old":"/boats/:boatId/maintenance-sheets/:sheetId/items/:itemId","type":0,"val":"items","end":""},{"old":"/boats/:boatId/maintenance-sheets/:sheetId/items/:itemId","type":1,"val":"itemId","end":""}],
     types: placeholder as Registry['boats.maintenanceSheetItems.update']['types'],
   },
+  'boats.simulator': {
+    methods: ["GET","HEAD"],
+    pattern: '/boats/:id/simulator',
+    tokens: [{"old":"/boats/:id/simulator","type":0,"val":"boats","end":""},{"old":"/boats/:id/simulator","type":1,"val":"id","end":""},{"old":"/boats/:id/simulator","type":0,"val":"simulator","end":""}],
+    types: placeholder as Registry['boats.simulator']['types'],
+  },
   'ports.index': {
     methods: ["GET","HEAD"],
     pattern: '/ports',
@@ -479,6 +437,90 @@ const routes = {
     pattern: '/spots/:id',
     tokens: [{"old":"/spots/:id","type":0,"val":"spots","end":""},{"old":"/spots/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['spots.destroy']['types'],
+  },
+  'root': {
+    methods: ["GET","HEAD"],
+    pattern: '/',
+    tokens: [{"old":"/","type":0,"val":"/","end":""}],
+    types: placeholder as Registry['root']['types'],
+  },
+  'marketing.en.home': {
+    methods: ["GET","HEAD"],
+    pattern: '/en',
+    tokens: [{"old":"/en","type":0,"val":"en","end":""}],
+    types: placeholder as Registry['marketing.en.home']['types'],
+  },
+  'marketing.en.pricing': {
+    methods: ["GET","HEAD"],
+    pattern: '/en/tarifs',
+    tokens: [{"old":"/en/tarifs","type":0,"val":"en","end":""},{"old":"/en/tarifs","type":0,"val":"tarifs","end":""}],
+    types: placeholder as Registry['marketing.en.pricing']['types'],
+  },
+  'marketing.en.simulator': {
+    methods: ["GET","HEAD"],
+    pattern: '/en/maintenance-cost-simulator',
+    tokens: [{"old":"/en/maintenance-cost-simulator","type":0,"val":"en","end":""},{"old":"/en/maintenance-cost-simulator","type":0,"val":"maintenance-cost-simulator","end":""}],
+    types: placeholder as Registry['marketing.en.simulator']['types'],
+  },
+  'marketing.en.guide': {
+    methods: ["GET","HEAD"],
+    pattern: '/en/boat-maintenance-cost',
+    tokens: [{"old":"/en/boat-maintenance-cost","type":0,"val":"en","end":""},{"old":"/en/boat-maintenance-cost","type":0,"val":"boat-maintenance-cost","end":""}],
+    types: placeholder as Registry['marketing.en.guide']['types'],
+  },
+  'marketing.fr.home': {
+    methods: ["GET","HEAD"],
+    pattern: '/fr',
+    tokens: [{"old":"/fr","type":0,"val":"fr","end":""}],
+    types: placeholder as Registry['marketing.fr.home']['types'],
+  },
+  'marketing.fr.pricing': {
+    methods: ["GET","HEAD"],
+    pattern: '/fr/tarifs',
+    tokens: [{"old":"/fr/tarifs","type":0,"val":"fr","end":""},{"old":"/fr/tarifs","type":0,"val":"tarifs","end":""}],
+    types: placeholder as Registry['marketing.fr.pricing']['types'],
+  },
+  'marketing.fr.simulator': {
+    methods: ["GET","HEAD"],
+    pattern: '/fr/simulateur-cout-entretien',
+    tokens: [{"old":"/fr/simulateur-cout-entretien","type":0,"val":"fr","end":""},{"old":"/fr/simulateur-cout-entretien","type":0,"val":"simulateur-cout-entretien","end":""}],
+    types: placeholder as Registry['marketing.fr.simulator']['types'],
+  },
+  'marketing.fr.guide': {
+    methods: ["GET","HEAD"],
+    pattern: '/fr/cout-entretien-bateau',
+    tokens: [{"old":"/fr/cout-entretien-bateau","type":0,"val":"fr","end":""},{"old":"/fr/cout-entretien-bateau","type":0,"val":"cout-entretien-bateau","end":""}],
+    types: placeholder as Registry['marketing.fr.guide']['types'],
+  },
+  'marketing.en.about': {
+    methods: ["GET","HEAD"],
+    pattern: '/en/about',
+    tokens: [{"old":"/en/about","type":0,"val":"en","end":""},{"old":"/en/about","type":0,"val":"about","end":""}],
+    types: placeholder as Registry['marketing.en.about']['types'],
+  },
+  'marketing.fr.about': {
+    methods: ["GET","HEAD"],
+    pattern: '/fr/a-propos',
+    tokens: [{"old":"/fr/a-propos","type":0,"val":"fr","end":""},{"old":"/fr/a-propos","type":0,"val":"a-propos","end":""}],
+    types: placeholder as Registry['marketing.fr.about']['types'],
+  },
+  'marketing.contact': {
+    methods: ["GET","HEAD"],
+    pattern: '/contact',
+    tokens: [{"old":"/contact","type":0,"val":"contact","end":""}],
+    types: placeholder as Registry['marketing.contact']['types'],
+  },
+  'simulator.session': {
+    methods: ["POST"],
+    pattern: '/simulator/session',
+    tokens: [{"old":"/simulator/session","type":0,"val":"simulator","end":""},{"old":"/simulator/session","type":0,"val":"session","end":""}],
+    types: placeholder as Registry['simulator.session']['types'],
+  },
+  'simulator.create_boat': {
+    methods: ["POST"],
+    pattern: '/boats/from-simulator',
+    tokens: [{"old":"/boats/from-simulator","type":0,"val":"boats","end":""},{"old":"/boats/from-simulator","type":0,"val":"from-simulator","end":""}],
+    types: placeholder as Registry['simulator.create_boat']['types'],
   },
   'planning.index': {
     methods: ["GET","HEAD"],

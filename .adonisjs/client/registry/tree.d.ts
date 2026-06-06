@@ -2,20 +2,6 @@
 import type { routes } from './index.ts'
 
 export interface ApiDefinition {
-  root: typeof routes['root']
-  marketing: {
-    en: {
-      home: typeof routes['marketing.en.home']
-      pricing: typeof routes['marketing.en.pricing']
-      about: typeof routes['marketing.en.about']
-    }
-    fr: {
-      home: typeof routes['marketing.fr.home']
-      pricing: typeof routes['marketing.fr.pricing']
-      about: typeof routes['marketing.fr.about']
-    }
-    contact: typeof routes['marketing.contact']
-  }
   webhooks: {
     stripe: typeof routes['webhooks.stripe']
   }
@@ -50,6 +36,7 @@ export interface ApiDefinition {
     maintenanceSheetItems: {
       update: typeof routes['boats.maintenanceSheetItems.update']
     }
+    simulator: typeof routes['boats.simulator']
   }
   boatEquipment: {
     storeEngine: typeof routes['boat_equipment.store_engine']
@@ -122,6 +109,28 @@ export interface ApiDefinition {
   spots: {
     update: typeof routes['spots.update']
     destroy: typeof routes['spots.destroy']
+  }
+  root: typeof routes['root']
+  marketing: {
+    en: {
+      home: typeof routes['marketing.en.home']
+      pricing: typeof routes['marketing.en.pricing']
+      simulator: typeof routes['marketing.en.simulator']
+      guide: typeof routes['marketing.en.guide']
+      about: typeof routes['marketing.en.about']
+    }
+    fr: {
+      home: typeof routes['marketing.fr.home']
+      pricing: typeof routes['marketing.fr.pricing']
+      simulator: typeof routes['marketing.fr.simulator']
+      guide: typeof routes['marketing.fr.guide']
+      about: typeof routes['marketing.fr.about']
+    }
+    contact: typeof routes['marketing.contact']
+  }
+  simulator: {
+    session: typeof routes['simulator.session']
+    createBoat: typeof routes['simulator.create_boat']
   }
   planning: {
     index: typeof routes['planning.index']

@@ -1,7 +1,8 @@
 {
   "nav": {
     "features": "Fonctionnalités",
-    "pricing": "Tarifs"
+    "pricing": "Tarifs",
+    "guide": "Guide entretien"
   },
   "actions": {
     "login": "Connexion",
@@ -14,6 +15,8 @@
     "legal": "Légal",
     "features": "Fonctionnalités",
     "pricing": "Tarifs",
+    "simulator": "Simulateur de cout",
+    "guide": "Guide coût entretien",
     "contact": "Contact",
     "about": "À propos",
     "privacy": "Confidentialité",
