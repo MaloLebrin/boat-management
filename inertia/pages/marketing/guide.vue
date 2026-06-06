@@ -1,13 +1,16 @@
 <script lang="ts">
 import PublicLayout from '~/layouts/public.vue'
-export default { layout: PublicLayout }
-</script>
 
+export default {
+  layout: PublicLayout,
+}
+</script>
 <script setup lang="ts">
 import { Head, Link, usePage } from '@inertiajs/vue3'
 import { computed } from 'vue'
 import GuideCostTable from '~/components/marketing/guide/GuideCostTable.vue'
 import GuideFaqSection from '~/components/marketing/guide/GuideFaqSection.vue'
+import JsonLd from '~/components/JsonLd'
 
 interface FaqItem { q: string; a: string }
 interface CostRow { type: string; length: string; budget: string; note: string }
@@ -57,8 +60,7 @@ const faqSchema = computed(() => JSON.stringify({
     <link rel="canonical" :href="`/${locale}/cout-entretien-bateau`" />
     <link rel="alternate" hreflang="fr" href="/fr/cout-entretien-bateau" />
     <link rel="alternate" hreflang="en" href="/en/boat-maintenance-cost" />
-    <!-- eslint-disable-next-line vue/no-v-html -->
-    <script type="application/ld+json" v-html="faqSchema" />
+    <JsonLd :schema="faqSchema" />
   </Head>
 
   <!-- Hero -->
