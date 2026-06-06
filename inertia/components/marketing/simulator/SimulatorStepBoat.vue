@@ -20,10 +20,10 @@ const { t } = useT()
 const currentYear = new Date().getFullYear()
 
 const boatTypeOptions: { value: SimulatorBoatType; labelKey: string }[] = [
-  { value: 'motorboat', labelKey: 'marketing.simulator.boat_type_motorboat' },
-  { value: 'sailboat', labelKey: 'marketing.simulator.boat_type_sailboat' },
-  { value: 'catamaran', labelKey: 'marketing.simulator.boat_type_catamaran' },
-  { value: 'rib', labelKey: 'marketing.simulator.boat_type_rib' },
+  { value: 'motorboat', labelKey: 'simulator.boat_type_motorboat' },
+  { value: 'sailboat', labelKey: 'simulator.boat_type_sailboat' },
+  { value: 'catamaran', labelKey: 'simulator.boat_type_catamaran' },
+  { value: 'rib', labelKey: 'simulator.boat_type_rib' },
 ]
 
 const navCategories = ['A', 'B', 'C', 'D'] as const
@@ -56,7 +56,7 @@ const canProceed = computed(() => {
     <!-- Boat type -->
     <div>
       <label class="mb-3 block text-sm font-medium text-fg">
-        {{ t('marketing.simulator.boat_type_label') }}
+        {{ t('simulator.boat_type_label') }}
       </label>
       <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <button
@@ -79,7 +79,7 @@ const canProceed = computed(() => {
     <!-- Length -->
     <div>
       <label for="lengthM" class="mb-2 block text-sm font-medium text-fg">
-        {{ t('marketing.simulator.length_label') }}
+        {{ t('simulator.length_label') }}
       </label>
       <input
         id="lengthM"
@@ -96,7 +96,7 @@ const canProceed = computed(() => {
     <!-- Year built -->
     <div>
       <label for="yearBuilt" class="mb-2 block text-sm font-medium text-fg">
-        {{ t('marketing.simulator.year_built_label') }}
+        {{ t('simulator.year_built_label') }}
       </label>
       <input
         id="yearBuilt"
@@ -112,7 +112,7 @@ const canProceed = computed(() => {
     <!-- Navigation category -->
     <div>
       <label class="mb-3 block text-sm font-medium text-fg">
-        {{ t('marketing.simulator.nav_category_label') }}
+        {{ t('simulator.nav_category_label') }}
       </label>
       <div class="space-y-2">
         <button
@@ -128,7 +128,7 @@ const canProceed = computed(() => {
           @click="update('navigationCategory', cat)"
         >
           <span :class="modelValue.navigationCategory === cat ? 'text-coral-700' : 'text-fg'">
-            {{ t(`marketing.simulator.nav_category_${cat.toLowerCase()}`) }}
+            {{ t(`simulator.nav_category_${cat.toLowerCase()}`) }}
           </span>
         </button>
       </div>
@@ -144,7 +144,7 @@ const canProceed = computed(() => {
         @change="update('hasDedicatedEngine', ($event.target as HTMLInputElement).checked)"
       />
       <label for="hasDedicatedEngine" class="text-sm text-fg">
-        {{ t('marketing.simulator.has_engine_label') }}
+        {{ t('simulator.has_engine_label') }}
       </label>
     </div>
 
@@ -155,7 +155,7 @@ const canProceed = computed(() => {
       class="w-full rounded-xl bg-coral-500 px-6 py-4 text-base font-semibold text-white transition-colors hover:bg-coral-600 disabled:cursor-not-allowed disabled:opacity-50"
       @click="emit('next')"
     >
-      {{ t('marketing.simulator.next') }}
+      {{ t('simulator.next') }}
     </button>
   </div>
 </template>

@@ -18,10 +18,10 @@ const { t } = useT()
 const showUpgradeModal = ref(false)
 
 const boatTypeLabels: Record<string, string> = {
-  motorboat: 'marketing.simulator.boat_type_motorboat',
-  sailboat: 'marketing.simulator.boat_type_sailboat',
-  catamaran: 'marketing.simulator.boat_type_catamaran',
-  rib: 'marketing.simulator.boat_type_rib',
+  motorboat: 'simulator.boat_type_motorboat',
+  sailboat: 'simulator.boat_type_sailboat',
+  catamaran: 'simulator.boat_type_catamaran',
+  rib: 'simulator.boat_type_rib',
 }
 
 function submit() {
@@ -42,14 +42,14 @@ function submit() {
     <div class="text-center">
       <h3 class="font-display text-xl text-fg lg:text-2xl">
         <template v-if="isAuthenticated">
-          {{ t('marketing.simulator.cta_add_boat_title', { type: t(boatTypeLabels[input.boatType]), length: String(input.lengthM) }) }}
+          {{ t('simulator.cta_add_boat_title', { type: t(boatTypeLabels[input.boatType]), length: String(input.lengthM) }) }}
         </template>
         <template v-else>
-          {{ t('marketing.simulator.cta_title', { type: t(boatTypeLabels[input.boatType]), length: String(input.lengthM) }) }}
+          {{ t('simulator.cta_title', { type: t(boatTypeLabels[input.boatType]), length: String(input.lengthM) }) }}
         </template>
       </h3>
       <p class="mt-2 text-sm text-fg-muted">
-        {{ isAuthenticated ? t('marketing.simulator.cta_add_boat_subtitle') : t('marketing.simulator.cta_subtitle') }}
+        {{ isAuthenticated ? t('simulator.cta_add_boat_subtitle') : t('simulator.cta_subtitle') }}
       </p>
 
       <button
@@ -57,11 +57,11 @@ function submit() {
         class="mt-6 w-full rounded-xl bg-coral-500 px-6 py-4 text-base font-semibold text-white transition-colors hover:bg-coral-600"
         @click="submit"
       >
-        {{ isAuthenticated ? t('marketing.simulator.cta_add_boat_button') : t('marketing.simulator.cta_button') }}
+        {{ isAuthenticated ? t('simulator.cta_add_boat_button') : t('simulator.cta_button') }}
       </button>
 
       <p v-if="!isAuthenticated" class="mt-3 text-xs text-fg-subtle">
-        {{ t('marketing.simulator.cta_free_mention') }}
+        {{ t('simulator.cta_free_mention') }}
       </p>
     </div>
   </div>

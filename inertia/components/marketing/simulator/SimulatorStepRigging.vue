@@ -21,7 +21,7 @@ const { t } = useT()
 const wearOptions: { value: SimulatorWearLevel; labelKey: string }[] = SIMULATOR_WEAR_LEVELS.map(
   (level) => ({
     value: level,
-    labelKey: `marketing.simulator.wear_${level}`,
+    labelKey: `simulator.wear_${level}`,
   })
 )
 
@@ -36,7 +36,7 @@ const canProceed = computed(() => Boolean(props.modelValue.riggingWear))
   <div class="space-y-8">
     <div>
       <label class="mb-3 block text-sm font-medium text-fg">
-        {{ t('marketing.simulator.rigging_wear_label') }}
+        {{ t('simulator.rigging_wear_label') }}
       </label>
       <div class="space-y-3">
         <button
@@ -69,7 +69,7 @@ const canProceed = computed(() => Boolean(props.modelValue.riggingWear))
         class="flex-1 rounded-xl border-2 border-bone bg-paper px-6 py-4 text-base font-semibold text-fg transition-colors hover:border-fg-subtle"
         @click="emit('back')"
       >
-        {{ t('marketing.simulator.back') }}
+        {{ t('simulator.back') }}
       </button>
       <button
         type="button"
@@ -77,7 +77,7 @@ const canProceed = computed(() => Boolean(props.modelValue.riggingWear))
         class="flex-1 rounded-xl bg-coral-500 px-6 py-4 text-base font-semibold text-white transition-colors hover:bg-coral-600 disabled:cursor-not-allowed disabled:opacity-50"
         @click="emit('next')"
       >
-        {{ t('marketing.simulator.next') }}
+        {{ t('simulator.next') }}
       </button>
     </div>
   </div>

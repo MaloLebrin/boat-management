@@ -16,12 +16,12 @@ const emit = defineEmits<{
 const { t } = useT()
 
 const categoryLabels: Record<string, string> = {
-  hull: 'marketing.simulator.cat_hull',
-  engine: 'marketing.simulator.cat_engine',
-  safety: 'marketing.simulator.cat_safety',
-  electrical: 'marketing.simulator.cat_electrical',
-  mooring: 'marketing.simulator.cat_mooring',
-  rigging: 'marketing.simulator.cat_rigging',
+  hull: 'simulator.cat_hull',
+  engine: 'simulator.cat_engine',
+  safety: 'simulator.cat_safety',
+  electrical: 'simulator.cat_electrical',
+  mooring: 'simulator.cat_mooring',
+  rigging: 'simulator.cat_rigging',
 }
 
 function formatCurrency(amount: number): string {
@@ -38,10 +38,10 @@ function formatCurrency(amount: number): string {
   <div class="rounded-2xl border border-bone bg-paper p-6 shadow-sm lg:p-8">
     <div class="mb-6 text-center">
       <h3 class="font-display text-2xl text-fg">
-        {{ t('marketing.simulator.result_title') }}
+        {{ t('simulator.result_title') }}
       </h3>
       <p class="mt-1 text-sm text-fg-muted">
-        {{ t('marketing.simulator.result_subtitle') }}
+        {{ t('simulator.result_subtitle') }}
       </p>
     </div>
 
@@ -64,13 +64,13 @@ function formatCurrency(amount: number): string {
     <!-- Total -->
     <div class="rounded-xl bg-navy-900 p-5 text-center">
       <p class="text-sm font-medium text-white/70">
-        {{ t('marketing.simulator.result_total') }}
+        {{ t('simulator.result_total') }}
       </p>
       <p class="mt-1 font-display text-3xl text-white">
         {{ formatCurrency(breakdown.totalMin) }} - {{ formatCurrency(breakdown.totalMax) }}
       </p>
       <p class="mt-1 text-xs text-white/50">
-        {{ t('marketing.simulator.result_range', { min: formatCurrency(breakdown.totalMin), max: formatCurrency(breakdown.totalMax) }) }}
+        {{ t('simulator.result_range', { min: formatCurrency(breakdown.totalMin), max: formatCurrency(breakdown.totalMax) }) }}
       </p>
     </div>
 
@@ -80,7 +80,7 @@ function formatCurrency(amount: number): string {
       class="mt-6 w-full rounded-xl border-2 border-bone bg-paper px-6 py-4 text-base font-semibold text-fg transition-colors hover:border-fg-subtle"
       @click="emit('restart')"
     >
-      {{ t('marketing.simulator.recalculate') }}
+      {{ t('simulator.recalculate') }}
     </button>
   </div>
 </template>

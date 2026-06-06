@@ -565,5 +565,11 @@
     "confirmDelete": "Supprimer cette fiche ?",
     "noItems": "Aucune etape dans cette fiche.",
     "itemNotesPlaceholder": "Ajouter une note..."
+  },
+  "simulator": {
+    "pageTitle": "Simulateur de coût — {name}",
+    "subtitle": "Estimez les coûts d'entretien annuels selon l'état actuel des équipements",
+    "backButton": "Retour à la fiche bateau",
+    "openButton": "Estimer les coûts d'entretien"
   }
 }

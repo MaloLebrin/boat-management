@@ -318,6 +318,12 @@ const routes = {
     tokens: [{"old":"/boats/:boatId/maintenance-sheets/:sheetId/items/:itemId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/maintenance-sheets/:sheetId/items/:itemId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/maintenance-sheets/:sheetId/items/:itemId","type":0,"val":"maintenance-sheets","end":""},{"old":"/boats/:boatId/maintenance-sheets/:sheetId/items/:itemId","type":1,"val":"sheetId","end":""},{"old":"/boats/:boatId/maintenance-sheets/:sheetId/items/:itemId","type":0,"val":"items","end":""},{"old":"/boats/:boatId/maintenance-sheets/:sheetId/items/:itemId","type":1,"val":"itemId","end":""}],
     types: placeholder as Registry['boats.maintenanceSheetItems.update']['types'],
   },
+  'boats.simulator': {
+    methods: ["GET","HEAD"],
+    pattern: '/boats/:id/simulator',
+    tokens: [{"old":"/boats/:id/simulator","type":0,"val":"boats","end":""},{"old":"/boats/:id/simulator","type":1,"val":"id","end":""},{"old":"/boats/:id/simulator","type":0,"val":"simulator","end":""}],
+    types: placeholder as Registry['boats.simulator']['types'],
+  },
   'ports.index': {
     methods: ["GET","HEAD"],
     pattern: '/ports',

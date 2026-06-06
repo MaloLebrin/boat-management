@@ -133,5 +133,7 @@ router
         'update',
       ])
       .as('boats.maintenanceSheetItems.update')
+
+    router.get('boats/:id/simulator', [controllers.BoatSimulator, 'show']).as('boats.simulator')
   })
   .use(middleware.auth())

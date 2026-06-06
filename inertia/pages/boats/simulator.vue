@@ -1,41 +1,27 @@
-<script lang="ts">
-import PublicLayout from '~/layouts/public.vue'
-export default { layout: PublicLayout }
-</script>
-
 <script setup lang="ts">
-import { Head, usePage } from '@inertiajs/vue3'
 import { computed, ref } from 'vue'
+import { router } from '@inertiajs/vue3'
 import { useT } from '~/composables/use_t'
 import { computeSimulatorCosts } from '~/composables/use_simulator_costs'
-import SimulatorStepBoat from '~/components/marketing/simulator/SimulatorStepBoat.vue'
 import SimulatorStepHull from '~/components/marketing/simulator/SimulatorStepHull.vue'
 import SimulatorStepEngine from '~/components/marketing/simulator/SimulatorStepEngine.vue'
 import SimulatorStepSafety from '~/components/marketing/simulator/SimulatorStepSafety.vue'
 import SimulatorStepRigging from '~/components/marketing/simulator/SimulatorStepRigging.vue'
 import SimulatorResultCard from '~/components/marketing/simulator/SimulatorResultCard.vue'
-import SimulatorCtaCard from '~/components/marketing/simulator/SimulatorCtaCard.vue'
 import type { SimulatorBoatInput, SimulatorCostBreakdown } from '../../../shared/types/simulator'
 
-type SharedProps = { locale?: 'en' | 'fr'; isAuthenticated?: boolean; canAddBoat?: boolean }
-const page = usePage<SharedProps>()
-
-const isAuthenticated = computed(() => page.props.isAuthenticated ?? false)
-const canAddBoat = computed(() => page.props.canAddBoat ?? true)
+const props = defineProps<{
+  boat: { id: number; name: string }
+  partial: Partial<SimulatorBoatInput>
+}>()
 
 const { t } = useT()
 
-const locale = computed<'en' | 'fr'>(() => (page.props.locale ?? 'fr') as 'en' | 'fr')
-
 const currentStep = ref(0)
-const formData = ref<Partial<SimulatorBoatInput>>({
-  hasDedicatedEngine: true,
-})
-
+const formData = ref<Partial<SimulatorBoatInput>>({ ...props.partial })
 const showResult = ref(false)
 const costBreakdown = ref<SimulatorCostBreakdown | null>(null)
 
-// Determine which steps are needed based on boat type and engine
 const needsEngineStep = computed(() => {
   const bt = formData.value.boatType
   if (bt === 'motorboat' || bt === 'rib') return true
@@ -48,10 +34,8 @@ const needsRiggingStep = computed(() => {
   return bt === 'sailboat' || bt === 'catamaran'
 })
 
-// Build dynamic steps list
 const steps = computed(() => {
   const list: { key: string; labelKey: string }[] = [
-    { key: 'boat', labelKey: 'simulator.step_boat' },
     { key: 'hull', labelKey: 'simulator.step_hull' },
   ]
   if (needsEngineStep.value) {
@@ -64,7 +48,7 @@ const steps = computed(() => {
   return list
 })
 
-const currentStepKey = computed(() => steps.value[currentStep.value]?.key ?? 'boat')
+const currentStepKey = computed(() => steps.value[currentStep.value]?.key ?? 'hull')
 
 const progressPercent = computed(() => {
   if (showResult.value) return 100
@@ -75,14 +59,9 @@ function goNext() {
   if (currentStep.value < steps.value.length - 1) {
     currentStep.value++
   } else {
-    // Compute result
     const input = formData.value as SimulatorBoatInput
-    if (!needsEngineStep.value) {
-      input.engineWear = null
-    }
-    if (!needsRiggingStep.value) {
-      input.riggingWear = null
-    }
+    if (!needsEngineStep.value) input.engineWear = null
+    if (!needsRiggingStep.value) input.riggingWear = null
     costBreakdown.value = computeSimulatorCosts(input)
     showResult.value = true
   }
@@ -96,49 +75,39 @@ function goBack() {
 
 function restart() {
   currentStep.value = 0
-  formData.value = { hasDedicatedEngine: true }
+  formData.value = { ...props.partial }
   showResult.value = false
   costBreakdown.value = null
+}
+
+function goToBoat() {
+  router.visit(`/boats/${props.boat.id}`)
 }
 </script>
 
 <template>
-  <Head :title="t('simulator.meta_title')">
-    <meta name="description" :content="t('simulator.meta_description')" />
-    <meta property="og:title" :content="t('simulator.meta_title')" />
-    <meta property="og:description" :content="t('simulator.meta_description')" />
-    <link rel="canonical" :href="`/${locale}/simulateur`" />
-    <link rel="alternate" hreflang="en" href="/en/simulator" />
-    <link rel="alternate" hreflang="fr" href="/fr/simulateur" />
-  </Head>
-
-  <!-- Hero Section -->
-  <section class="bg-cream px-6 py-16 lg:px-8 lg:py-24">
-    <div class="mx-auto max-w-3xl text-center">
-      <p class="text-xs font-semibold uppercase tracking-widest text-fg-subtle">
-        {{ t('simulator.hero_eyebrow') }}
-      </p>
-      <h1
-        class="mt-4 font-display text-4xl leading-tight tracking-tight text-fg lg:text-5xl xl:text-6xl"
-      >
-        {{ t('simulator.hero_title') }}
-        <em class="text-coral-500">{{ t('simulator.hero_title_highlight') }}</em>
-      </h1>
-      <p class="mt-4 text-lg text-fg-muted">
-        {{ t('simulator.hero_subtitle') }}
-      </p>
-    </div>
-  </section>
-
-  <!-- Simulator Section -->
-  <section class="bg-paper px-6 py-12 lg:px-8 lg:py-16">
+  <div class="bg-paper px-6 py-12 lg:px-8 lg:py-16 min-h-screen">
     <div class="mx-auto max-w-xl">
+      <!-- Header -->
+      <div class="mb-8">
+        <button
+          type="button"
+          class="mb-4 flex items-center gap-1 text-sm text-fg-muted hover:text-fg"
+          @click="goToBoat"
+        >
+          <span>←</span>
+          <span>{{ t('boats.simulator.backButton') }}</span>
+        </button>
+        <h1 class="font-display text-2xl text-fg lg:text-3xl">
+          {{ t('boats.simulator.pageTitle', { name: boat.name }) }}
+        </h1>
+        <p class="mt-1 text-sm text-fg-muted">{{ t('boats.simulator.subtitle') }}</p>
+      </div>
+
       <!-- Progress bar -->
       <div v-if="!showResult" class="mb-8">
         <div class="mb-2 flex items-center justify-between text-sm text-fg-muted">
-          <span>
-            {{ t(steps[currentStep]?.labelKey || 'simulator.step_boat') }}
-          </span>
+          <span>{{ t(steps[currentStep]?.labelKey || 'simulator.step_hull') }}</span>
           <span>{{ currentStep + 1 }}/{{ steps.length }}</span>
         </div>
         <div class="h-2 overflow-hidden rounded-full bg-bone">
@@ -149,15 +118,10 @@ function restart() {
         </div>
       </div>
 
-      <!-- Step components -->
+      <!-- Steps -->
       <template v-if="!showResult">
-        <SimulatorStepBoat
-          v-if="currentStepKey === 'boat'"
-          v-model="formData"
-          @next="goNext"
-        />
         <SimulatorStepHull
-          v-else-if="currentStepKey === 'hull'"
+          v-if="currentStepKey === 'hull'"
           v-model="formData"
           @next="goNext"
           @back="goBack"
@@ -189,8 +153,16 @@ function restart() {
           :input="formData as SimulatorBoatInput"
           @restart="restart"
         />
-        <SimulatorCtaCard :input="formData as SimulatorBoatInput" :is-authenticated="isAuthenticated" :can-add-boat="canAddBoat" />
+        <div class="mt-6 text-center">
+          <button
+            type="button"
+            class="rounded-xl bg-coral-500 px-6 py-3 text-sm font-semibold text-white hover:bg-coral-600"
+            @click="goToBoat"
+          >
+            {{ t('boats.simulator.backButton') }}
+          </button>
+        </div>
       </template>
     </div>
-  </section>
+  </div>
 </template>

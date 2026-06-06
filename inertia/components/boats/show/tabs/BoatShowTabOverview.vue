@@ -9,6 +9,7 @@ import BaseSkeleton from '~/components/base/BaseSkeleton.vue'
 import UpgradePlanModal from '~/components/base/UpgradePlanModal.vue'
 import { subjectLabel } from '~/components/boats/maintenance/utils'
 import BoatPhotoGallery from '~/components/boats/show/BoatPhotoGallery.vue'
+import BoatSimulatorCard from '~/components/boats/show/BoatSimulatorCard.vue'
 import { useT } from '~/composables/use_t'
 import type { BoatShowDetail, MaintenanceEventRow, MaintenanceTaskRow } from '~/types/boat_show'
 import { PLAN_LIMITS } from '../../../../../shared/types/plan'
@@ -302,6 +303,9 @@ const currentPositionLabel = computed(() => {
           {{ currentPositionLabel ?? t('boats.show.overview.positionEmpty') }}
         </p>
       </BaseCard>
+
+      <!-- Cost simulator -->
+      <BoatSimulatorCard :boat-id="boat.id" />
     </div>
   </div>
 

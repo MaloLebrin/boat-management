@@ -546,5 +546,11 @@
     "confirmDelete": "Delete this sheet?",
     "noItems": "No steps in this sheet.",
     "itemNotesPlaceholder": "Add a note..."
+  },
+  "simulator": {
+    "pageTitle": "Cost simulator — {name}",
+    "subtitle": "Estimate annual maintenance costs based on your equipment's current condition",
+    "backButton": "Back to boat",
+    "openButton": "Estimate maintenance costs"
   }
 }

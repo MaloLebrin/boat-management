@@ -14,6 +14,7 @@ export const controllers = {
   BoatMaintenances: () => import('#controllers/boat_maintenances_controller'),
   BoatMedia: () => import('#controllers/boat_media_controller'),
   BoatSafetyEquipment: () => import('#controllers/boat_safety_equipment_controller'),
+  BoatSimulator: () => import('#controllers/boat_simulator_controller'),
   Boats: () => import('#controllers/boats_controller'),
   Home: () => import('#controllers/home_controller'),
   MaintenanceHistory: () => import('#controllers/maintenance_history_controller'),
@@ -28,6 +29,6 @@ export const controllers = {
   Ports: () => import('#controllers/ports_controller'),
   Session: () => import('#controllers/session_controller'),
   Settings: () => import('#controllers/settings_controller'),
-  Spots: () => import('#controllers/spots_controller'),
   Simulator: () => import('#controllers/simulator_controller'),
+  Spots: () => import('#controllers/spots_controller'),
 }

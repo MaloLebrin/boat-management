@@ -21,7 +21,7 @@ const { t } = useT()
 const wearOptions: { value: SimulatorWearLevel; labelKey: string }[] = SIMULATOR_WEAR_LEVELS.map(
   (level) => ({
     value: level,
-    labelKey: `marketing.simulator.wear_${level}`,
+    labelKey: `simulator.wear_${level}`,
   })
 )
 
@@ -36,11 +36,11 @@ const canProceed = computed(() => Boolean(props.modelValue.safetyWear))
   <div class="space-y-8">
     <div>
       <label class="mb-3 block text-sm font-medium text-fg">
-        {{ t('marketing.simulator.safety_wear_label') }}
+        {{ t('simulator.safety_wear_label') }}
       </label>
 
       <p class="mb-4 text-sm text-fg-muted">
-        {{ t('marketing.simulator.safety_mention') }}
+        {{ t('simulator.safety_mention') }}
       </p>
 
       <div class="space-y-3">
@@ -74,7 +74,7 @@ const canProceed = computed(() => Boolean(props.modelValue.safetyWear))
         class="flex-1 rounded-xl border-2 border-bone bg-paper px-6 py-4 text-base font-semibold text-fg transition-colors hover:border-fg-subtle"
         @click="emit('back')"
       >
-        {{ t('marketing.simulator.back') }}
+        {{ t('simulator.back') }}
       </button>
       <button
         type="button"
@@ -82,7 +82,7 @@ const canProceed = computed(() => Boolean(props.modelValue.safetyWear))
         class="flex-1 rounded-xl bg-coral-500 px-6 py-4 text-base font-semibold text-white transition-colors hover:bg-coral-600 disabled:cursor-not-allowed disabled:opacity-50"
         @click="emit('next')"
       >
-        {{ t('marketing.simulator.next') }}
+        {{ t('simulator.next') }}
       </button>
     </div>
   </div>

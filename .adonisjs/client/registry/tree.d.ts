@@ -36,6 +36,7 @@ export interface ApiDefinition {
     maintenanceSheetItems: {
       update: typeof routes['boats.maintenanceSheetItems.update']
     }
+    simulator: typeof routes['boats.simulator']
   }
   boatEquipment: {
     storeEngine: typeof routes['boat_equipment.store_engine']
