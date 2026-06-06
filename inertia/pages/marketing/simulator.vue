@@ -17,10 +17,11 @@ import SimulatorResultCard from '~/components/marketing/simulator/SimulatorResul
 import SimulatorCtaCard from '~/components/marketing/simulator/SimulatorCtaCard.vue'
 import type { SimulatorBoatInput, SimulatorCostBreakdown } from '../../../shared/types/simulator'
 
-type SharedProps = { locale?: 'en' | 'fr'; isAuthenticated?: boolean }
+type SharedProps = { locale?: 'en' | 'fr'; isAuthenticated?: boolean; canAddBoat?: boolean }
 const page = usePage<SharedProps>()
 
 const isAuthenticated = computed(() => page.props.isAuthenticated ?? false)
+const canAddBoat = computed(() => page.props.canAddBoat ?? true)
 
 const { t } = useT()
 
@@ -188,7 +189,7 @@ function restart() {
           :input="formData as SimulatorBoatInput"
           @restart="restart"
         />
-        <SimulatorCtaCard :input="formData as SimulatorBoatInput" :is-authenticated="isAuthenticated" />
+        <SimulatorCtaCard :input="formData as SimulatorBoatInput" :is-authenticated="isAuthenticated" :can-add-boat="canAddBoat" />
       </template>
     </div>
   </section>

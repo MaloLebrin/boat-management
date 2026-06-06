@@ -1,16 +1,21 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { router } from '@inertiajs/vue3'
 import { useT } from '~/composables/use_t'
+import UpgradePlanModal from '~/components/base/UpgradePlanModal.vue'
 import type { SimulatorBoatInput } from '../../../../shared/types/simulator'
 
 interface Props {
   input: SimulatorBoatInput
   isAuthenticated: boolean
+  canAddBoat: boolean
 }
 
 const props = defineProps<Props>()
 
 const { t } = useT()
+
+const showUpgradeModal = ref(false)
 
 const boatTypeLabels: Record<string, string> = {
   motorboat: 'marketing.simulator.boat_type_motorboat',
@@ -20,6 +25,10 @@ const boatTypeLabels: Record<string, string> = {
 }
 
 function submit() {
+  if (props.isAuthenticated && !props.canAddBoat) {
+    showUpgradeModal.value = true
+    return
+  }
   if (props.isAuthenticated) {
     router.post('/boats/from-simulator', props.input, { preserveScroll: false })
   } else {
@@ -56,4 +65,6 @@ function submit() {
       </p>
     </div>
   </div>
+
+  <UpgradePlanModal v-model:open="showUpgradeModal" feature="boats" />
 </template>
