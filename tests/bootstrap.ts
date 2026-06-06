@@ -5,6 +5,8 @@ import { pluginAdonisJS } from '@japa/plugin-adonisjs'
 import { dbAssertions } from '@adonisjs/lucid/plugins/db'
 import testUtils from '@adonisjs/core/services/test_utils'
 import { apiClient } from '@japa/api-client'
+import { authApiClient } from '@adonisjs/auth/plugins/api_client'
+import { sessionApiClient } from '@adonisjs/session/plugins/api_client'
 
 /**
  * This file is imported by the "bin/test.ts" entrypoint file
@@ -21,6 +23,8 @@ export const plugins: Config['plugins'] = [
   apiClient({
     baseURL: `http://${process.env.HOST || '127.0.0.1'}:${process.env.PORT || '3333'}`,
   }),
+  sessionApiClient(app),
+  authApiClient(app),
 ]
 
 /**
@@ -48,8 +52,11 @@ export const runnerHooks: Required<Pick<Config, 'setup' | 'teardown'>> = {
  * Learn more - https://japa.dev/docs/test-suites#lifecycle-hooks
  */
 export const configureSuite: Config['configureSuite'] = (suite) => {
-  suite.setup(() => testUtils.db().withGlobalTransaction())
   if (['browser', 'functional', 'e2e'].includes(suite.name)) {
-    return suite.setup(() => testUtils.httpServer().start())
+    // HTTP tests: the server runs in-process but handlers use separate DB connections,
+    // so global transactions are invisible to them — use truncate instead.
+    suite.setup(() => testUtils.httpServer().start())
+  } else {
+    suite.setup(() => testUtils.db().withGlobalTransaction())
   }
 }

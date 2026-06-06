@@ -4,7 +4,7 @@ export default class extends BaseSchema {
   async up() {
     await this.db.rawQuery(`
       INSERT INTO organization_memberships (user_id, organization_id, role, created_at, updated_at)
-      SELECT id, organization_id, 'admin', NOW(), NOW()
+      SELECT id, organization_id, 'admin', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
       FROM users
       WHERE organization_id IS NOT NULL
       ON CONFLICT (user_id, organization_id) DO NOTHING
