@@ -29,4 +29,5 @@ export const controllers = {
   Session: () => import('#controllers/session_controller'),
   Settings: () => import('#controllers/settings_controller'),
   Spots: () => import('#controllers/spots_controller'),
+  Simulator: () => import('#controllers/simulator_controller'),
 }

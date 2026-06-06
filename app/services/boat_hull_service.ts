@@ -6,6 +6,7 @@ import BoatRig from '#models/boat_rig'
 import BoatSail from '#models/boat_sail'
 import type User from '#models/user'
 import type { BoatHullPayload } from '#shared/types/boat'
+import type { SimulatorBoatInput } from '#shared/types/simulator'
 
 import BoatPositionHistory from '#models/boat_position_history'
 import { inject } from '@adonisjs/core'
@@ -211,5 +212,23 @@ export default class BoatHullService {
         endedAt: null,
       })
     }
+  }
+
+  /**
+   * Create a boat from simulator session data
+   */
+  async createFromSimulator(organizationId: number, data: SimulatorBoatInput): Promise<Boat> {
+    const propulsionType =
+      data.boatType === 'motorboat' || data.boatType === 'rib' ? 'motorboat' : data.boatType
+
+    return await Boat.create({
+      organizationId,
+      name: `Mon bateau ${data.boatType} ${data.lengthM}m`,
+      propulsionType,
+      lengthM: data.lengthM,
+      yearBuilt: data.yearBuilt,
+      navigationCategory: data.navigationCategory,
+      type: data.boatType,
+    })
   }
 }

@@ -44,6 +44,9 @@ const copyrightYear = new Date().getFullYear()
             <Link :href="`/${locale}/tarifs`" class="transition-colors hover:text-fg">{{
               t('public.footer.pricing')
             }}</Link>
+            <Link :href="`/${locale}/simulateur`" class="transition-colors hover:text-fg">{{
+              t('public.footer.simulator')
+            }}</Link>
             <Link href="/design-system" class="transition-colors hover:text-fg">Design system</Link>
           </div>
         </div>

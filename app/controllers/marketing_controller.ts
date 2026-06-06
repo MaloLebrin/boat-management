@@ -28,6 +28,11 @@ export default class MarketingController {
     })
   }
 
+  async simulator({ inertia, auth }: HttpContext) {
+    const isAuthenticated = await auth.check()
+    return inertia.render('marketing/simulator', { isAuthenticated })
+  }
+
   private buildHomePageData(i18n: { t: (key: string) => string }) {
     return {
       brand: {
