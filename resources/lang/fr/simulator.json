@@ -52,5 +52,13 @@
   "cta_add_boat_button": "Ajouter ce bateau a ma flotte",
   "next": "Suivant",
   "back": "Retour",
-  "recalculate": "Recommencer"
+  "recalculate": "Recommencer",
+  "how_eyebrow": "Comment ça marche",
+  "how_title": "3 étapes pour estimer votre budget",
+  "how_step_1_title": "Décrivez votre bateau",
+  "how_step_1_desc": "Type, longueur, année de construction et catégorie de navigation.",
+  "how_step_2_title": "Évaluez l'usure",
+  "how_step_2_desc": "Coque, moteur, sécurité, gréement : 4 questions rapides.",
+  "how_step_3_title": "Obtenez votre estimation",
+  "how_step_3_desc": "Budget annuel détaillé par poste, basé sur la Division 240."
 }

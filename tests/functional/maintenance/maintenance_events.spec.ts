@@ -12,14 +12,11 @@ test.group('Maintenance events (functional)', (group) => {
     const user = await createAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
 
-    await client
-      .post(`/boats/${boat.id}/maintenance`)
-      .loginAs(user)
-      .form({
-        subject: 'boat',
-        title: 'Antifouling',
-        performedAt: '2025-05-01',
-      })
+    await client.post(`/boats/${boat.id}/maintenance`).loginAs(user).form({
+      subject: 'boat',
+      title: 'Antifouling',
+      performedAt: '2025-05-01',
+    })
 
     const event = await BoatMaintenanceEvent.query()
       .where('boatId', boat.id)
@@ -36,33 +33,24 @@ test.group('Maintenance events (functional)', (group) => {
     const user = await createAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
 
-    await client
-      .post(`/boats/${boat.id}/maintenance`)
-      .loginAs(user)
-      .form({
-        subject: 'boat',
-        performedAt: '2025-05-01',
-      })
+    await client.post(`/boats/${boat.id}/maintenance`).loginAs(user).form({
+      subject: 'boat',
+      performedAt: '2025-05-01',
+    })
 
     const count = await BoatMaintenanceEvent.query().where('boatId', boat.id).count('* as total')
     assert.equal(Number(count[0].$extras.total), 0)
   })
 
-  test('DELETE /boats/:id/maintenance/:eventId deletes the event', async ({
-    client,
-    assert,
-  }) => {
+  test('DELETE /boats/:id/maintenance/:eventId deletes the event', async ({ client, assert }) => {
     const user = await createAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
 
-    await client
-      .post(`/boats/${boat.id}/maintenance`)
-      .loginAs(user)
-      .form({
-        subject: 'boat',
-        title: 'Antifouling to delete',
-        performedAt: '2025-05-01',
-      })
+    await client.post(`/boats/${boat.id}/maintenance`).loginAs(user).form({
+      subject: 'boat',
+      title: 'Antifouling to delete',
+      performedAt: '2025-05-01',
+    })
 
     const event = await BoatMaintenanceEvent.query().where('boatId', boat.id).firstOrFail()
 

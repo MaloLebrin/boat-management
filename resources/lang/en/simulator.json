@@ -52,5 +52,13 @@
   "cta_add_boat_button": "Add this boat to my fleet",
   "next": "Next",
   "back": "Back",
-  "recalculate": "Start over"
+  "recalculate": "Start over",
+  "how_eyebrow": "How it works",
+  "how_title": "3 steps to estimate your budget",
+  "how_step_1_title": "Describe your boat",
+  "how_step_1_desc": "Type, length, year of construction and navigation category.",
+  "how_step_2_title": "Assess wear",
+  "how_step_2_desc": "Hull, engine, safety, rigging: 4 quick questions.",
+  "how_step_3_title": "Get your estimate",
+  "how_step_3_desc": "Detailed annual budget by category, benchmarked against Division 240."
 }

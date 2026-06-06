@@ -462,6 +462,12 @@ const routes = {
     tokens: [{"old":"/en/maintenance-cost-simulator","type":0,"val":"en","end":""},{"old":"/en/maintenance-cost-simulator","type":0,"val":"maintenance-cost-simulator","end":""}],
     types: placeholder as Registry['marketing.en.simulator']['types'],
   },
+  'marketing.en.guide': {
+    methods: ["GET","HEAD"],
+    pattern: '/en/boat-maintenance-cost',
+    tokens: [{"old":"/en/boat-maintenance-cost","type":0,"val":"en","end":""},{"old":"/en/boat-maintenance-cost","type":0,"val":"boat-maintenance-cost","end":""}],
+    types: placeholder as Registry['marketing.en.guide']['types'],
+  },
   'marketing.fr.home': {
     methods: ["GET","HEAD"],
     pattern: '/fr',
@@ -479,6 +485,12 @@ const routes = {
     pattern: '/fr/simulateur-cout-entretien',
     tokens: [{"old":"/fr/simulateur-cout-entretien","type":0,"val":"fr","end":""},{"old":"/fr/simulateur-cout-entretien","type":0,"val":"simulateur-cout-entretien","end":""}],
     types: placeholder as Registry['marketing.fr.simulator']['types'],
+  },
+  'marketing.fr.guide': {
+    methods: ["GET","HEAD"],
+    pattern: '/fr/cout-entretien-bateau',
+    tokens: [{"old":"/fr/cout-entretien-bateau","type":0,"val":"fr","end":""},{"old":"/fr/cout-entretien-bateau","type":0,"val":"cout-entretien-bateau","end":""}],
+    types: placeholder as Registry['marketing.fr.guide']['types'],
   },
   'marketing.en.about': {
     methods: ["GET","HEAD"],

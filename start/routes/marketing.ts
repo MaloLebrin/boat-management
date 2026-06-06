@@ -13,6 +13,7 @@ router
     router
       .get('/maintenance-cost-simulator', [MarketingController, 'simulator'])
       .as('marketing.en.simulator')
+    router.get('/boat-maintenance-cost', [MarketingController, 'guide']).as('marketing.en.guide')
   })
   .prefix('en')
 
@@ -23,6 +24,7 @@ router
     router
       .get('/simulateur-cout-entretien', [MarketingController, 'simulator'])
       .as('marketing.fr.simulator')
+    router.get('/cout-entretien-bateau', [MarketingController, 'guide']).as('marketing.fr.guide')
   })
   .prefix('fr')
 

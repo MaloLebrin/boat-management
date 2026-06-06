@@ -130,6 +130,27 @@ function restart() {
     </div>
   </section>
 
+  <!-- How it works -->
+  <section class="bg-paper px-6 py-10 lg:px-8">
+    <div class="mx-auto max-w-4xl">
+      <p class="text-center text-xs font-semibold uppercase tracking-widest text-fg-subtle">
+        {{ t('simulator.how_eyebrow') }}
+      </p>
+      <h2 class="mt-2 text-center font-display text-xl text-fg lg:text-2xl">
+        {{ t('simulator.how_title') }}
+      </h2>
+      <div class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-3">
+        <div v-for="n in [1, 2, 3]" :key="n" class="flex items-start gap-4">
+          <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-coral-100 text-sm font-bold text-coral-600">{{ n }}</span>
+          <div>
+            <p class="font-semibold text-fg text-sm">{{ t(`simulator.how_step_${n}_title`) }}</p>
+            <p class="mt-1 text-xs text-fg-muted">{{ t(`simulator.how_step_${n}_desc`) }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- Simulator Section -->
   <section class="bg-paper px-6 py-12 lg:px-8 lg:py-16">
     <div class="mx-auto max-w-xl">

@@ -80,9 +80,11 @@ export type ScannedRoutes = {
     'marketing.en.home': { paramsTuple?: []; params?: {} }
     'marketing.en.pricing': { paramsTuple?: []; params?: {} }
     'marketing.en.simulator': { paramsTuple?: []; params?: {} }
+    'marketing.en.guide': { paramsTuple?: []; params?: {} }
     'marketing.fr.home': { paramsTuple?: []; params?: {} }
     'marketing.fr.pricing': { paramsTuple?: []; params?: {} }
     'marketing.fr.simulator': { paramsTuple?: []; params?: {} }
+    'marketing.fr.guide': { paramsTuple?: []; params?: {} }
     'marketing.en.about': { paramsTuple?: []; params?: {} }
     'marketing.fr.about': { paramsTuple?: []; params?: {} }
     'marketing.contact': { paramsTuple?: []; params?: {} }
@@ -182,9 +184,11 @@ export type ScannedRoutes = {
     'marketing.en.home': { paramsTuple?: []; params?: {} }
     'marketing.en.pricing': { paramsTuple?: []; params?: {} }
     'marketing.en.simulator': { paramsTuple?: []; params?: {} }
+    'marketing.en.guide': { paramsTuple?: []; params?: {} }
     'marketing.fr.home': { paramsTuple?: []; params?: {} }
     'marketing.fr.pricing': { paramsTuple?: []; params?: {} }
     'marketing.fr.simulator': { paramsTuple?: []; params?: {} }
+    'marketing.fr.guide': { paramsTuple?: []; params?: {} }
     'marketing.en.about': { paramsTuple?: []; params?: {} }
     'marketing.fr.about': { paramsTuple?: []; params?: {} }
     'marketing.contact': { paramsTuple?: []; params?: {} }
@@ -227,9 +231,11 @@ export type ScannedRoutes = {
     'marketing.en.home': { paramsTuple?: []; params?: {} }
     'marketing.en.pricing': { paramsTuple?: []; params?: {} }
     'marketing.en.simulator': { paramsTuple?: []; params?: {} }
+    'marketing.en.guide': { paramsTuple?: []; params?: {} }
     'marketing.fr.home': { paramsTuple?: []; params?: {} }
     'marketing.fr.pricing': { paramsTuple?: []; params?: {} }
     'marketing.fr.simulator': { paramsTuple?: []; params?: {} }
+    'marketing.fr.guide': { paramsTuple?: []; params?: {} }
     'marketing.en.about': { paramsTuple?: []; params?: {} }
     'marketing.fr.about': { paramsTuple?: []; params?: {} }
     'marketing.contact': { paramsTuple?: []; params?: {} }

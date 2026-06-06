@@ -116,12 +116,14 @@ export interface ApiDefinition {
       home: typeof routes['marketing.en.home']
       pricing: typeof routes['marketing.en.pricing']
       simulator: typeof routes['marketing.en.simulator']
+      guide: typeof routes['marketing.en.guide']
       about: typeof routes['marketing.en.about']
     }
     fr: {
       home: typeof routes['marketing.fr.home']
       pricing: typeof routes['marketing.fr.pricing']
       simulator: typeof routes['marketing.fr.simulator']
+      guide: typeof routes['marketing.fr.guide']
       about: typeof routes['marketing.fr.about']
     }
     contact: typeof routes['marketing.contact']

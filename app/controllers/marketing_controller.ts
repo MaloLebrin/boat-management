@@ -31,15 +31,17 @@ export default class MarketingController {
     })
   }
 
+  async guide({ inertia, i18n }: HttpContext) {
+    return inertia.render('marketing/guide', this.buildGuidePageData(i18n))
+  }
+
   async simulator({ inertia, auth }: HttpContext) {
     const isAuthenticated = await auth.check()
     let canAddBoat = true
     if (isAuthenticated) {
       const user = auth.getUserOrFail()
       await user.load('organization')
-      canAddBoat = user.organization
-        ? await this.quotaService.canAddBoat(user.organization)
-        : false
+      canAddBoat = user.organization ? await this.quotaService.canAddBoat(user.organization) : false
     }
     return inertia.render('marketing/simulator', { isAuthenticated, canAddBoat })
   }
@@ -980,6 +982,108 @@ export default class MarketingController {
               hint: t('office_card2_hint'),
               gradient: 'from-coral-500 to-coral-400',
             },
+          ],
+        },
+        finalCta: {
+          title: t('final_cta_title'),
+          titleHighlight: t('final_cta_highlight'),
+          subtitle: t('final_cta_subtitle'),
+          primaryCta: t('final_cta_primary'),
+          secondaryCta: t('final_cta_secondary'),
+        },
+      },
+    }
+  }
+
+  private buildGuidePageData(i18n: { t: (key: string) => string }) {
+    const t = (key: string) => i18n.t(`marketing.guide.${key}`)
+
+    return {
+      meta: {
+        title: t('meta_title'),
+        description: t('meta_description'),
+      },
+      guide: {
+        hero: {
+          eyebrow: t('hero_eyebrow'),
+          title: t('hero_title'),
+          titleHighlight: t('hero_title_highlight'),
+          subtitle: t('hero_subtitle'),
+          ctaLabel: t('hero_cta'),
+        },
+        stats: [
+          { value: t('stats_1_value'), label: t('stats_1_label') },
+          { value: t('stats_2_value'), label: t('stats_2_label') },
+          { value: t('stats_3_value'), label: t('stats_3_label') },
+        ],
+        costs: {
+          eyebrow: t('costs_eyebrow'),
+          title: t('costs_title'),
+          titleHighlight: t('costs_title_highlight'),
+          items: [
+            { title: t('cost_1_title'), desc: t('cost_1_desc') },
+            { title: t('cost_2_title'), desc: t('cost_2_desc') },
+            { title: t('cost_3_title'), desc: t('cost_3_desc') },
+            { title: t('cost_4_title'), desc: t('cost_4_desc') },
+          ],
+        },
+        table: {
+          eyebrow: t('table_eyebrow'),
+          title: t('table_title'),
+          colType: t('table_col_type'),
+          colLength: t('table_col_length'),
+          colBudget: t('table_col_budget'),
+          colNote: t('table_col_note'),
+          rows: [
+            {
+              type: t('table_row_1_type'),
+              length: t('table_row_1_length'),
+              budget: t('table_row_1_budget'),
+              note: t('table_row_1_note'),
+            },
+            {
+              type: t('table_row_2_type'),
+              length: t('table_row_2_length'),
+              budget: t('table_row_2_budget'),
+              note: t('table_row_2_note'),
+            },
+            {
+              type: t('table_row_3_type'),
+              length: t('table_row_3_length'),
+              budget: t('table_row_3_budget'),
+              note: t('table_row_3_note'),
+            },
+            {
+              type: t('table_row_4_type'),
+              length: t('table_row_4_length'),
+              budget: t('table_row_4_budget'),
+              note: t('table_row_4_note'),
+            },
+          ],
+          ctaLabel: t('cta_button'),
+        },
+        cta: {
+          eyebrow: t('cta_eyebrow'),
+          title: t('cta_title'),
+          subtitle: t('cta_subtitle'),
+          button: t('cta_button'),
+        },
+        regulation: {
+          eyebrow: t('regulation_eyebrow'),
+          title: t('regulation_title'),
+          body: t('regulation_body'),
+        },
+        faq: {
+          eyebrow: t('faq_eyebrow'),
+          title: t('faq_title'),
+          titleHighlight: t('faq_title_highlight'),
+          items: [
+            { q: t('faq_q1'), a: t('faq_a1') },
+            { q: t('faq_q2'), a: t('faq_a2') },
+            { q: t('faq_q3'), a: t('faq_a3') },
+            { q: t('faq_q4'), a: t('faq_a4') },
+            { q: t('faq_q5'), a: t('faq_a5') },
+            { q: t('faq_q6'), a: t('faq_a6') },
           ],
         },
         finalCta: {

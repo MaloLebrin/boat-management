@@ -919,6 +919,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['simulator']>>>
     }
   }
+  'marketing.en.guide': {
+    methods: ["GET","HEAD"]
+    pattern: '/en/boat-maintenance-cost'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['guide']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['guide']>>>
+    }
+  }
   'marketing.fr.home': {
     methods: ["GET","HEAD"]
     pattern: '/fr'
@@ -953,6 +965,18 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['simulator']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['simulator']>>>
+    }
+  }
+  'marketing.fr.guide': {
+    methods: ["GET","HEAD"]
+    pattern: '/fr/cout-entretien-bateau'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['guide']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['guide']>>>
     }
   }
   'marketing.en.about': {

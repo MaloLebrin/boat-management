@@ -49,10 +49,7 @@ test.group('Boats (functional)', (group) => {
     assert.isFalse(redirectedToNewBoat)
   })
 
-  test('DELETE /boats/:id deletes the boat and redirects to /boats', async ({
-    client,
-    assert,
-  }) => {
+  test('DELETE /boats/:id deletes the boat and redirects to /boats', async ({ client, assert }) => {
     const user = await createAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
 

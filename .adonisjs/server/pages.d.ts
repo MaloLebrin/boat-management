@@ -32,6 +32,7 @@ declare module '@adonisjs/inertia/types' {
     'maintenance/history': ExtractProps<(typeof import('../../inertia/pages/maintenance/history.vue'))['default']>
     'marketing/about': ExtractProps<(typeof import('../../inertia/pages/marketing/about.vue'))['default']>
     'marketing/contact': ExtractProps<(typeof import('../../inertia/pages/marketing/contact.vue'))['default']>
+    'marketing/guide': ExtractProps<(typeof import('../../inertia/pages/marketing/guide.vue'))['default']>
     'marketing/home': ExtractProps<(typeof import('../../inertia/pages/marketing/home.vue'))['default']>
     'marketing/pricing': ExtractProps<(typeof import('../../inertia/pages/marketing/pricing.vue'))['default']>
     'marketing/simulator': ExtractProps<(typeof import('../../inertia/pages/marketing/simulator.vue'))['default']>
