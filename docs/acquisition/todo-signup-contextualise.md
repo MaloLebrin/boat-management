@@ -1,4 +1,4 @@
-# TODO — Page signup contextualisée après simulateur
+# ✅ DONE (2026-06-09) — Page signup contextualisée après simulateur
 
 ## Contexte
 

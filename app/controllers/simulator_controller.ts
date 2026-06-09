@@ -15,7 +15,7 @@ export default class SimulatorController {
   async saveSession({ request, response, session }: HttpContext) {
     const payload = await request.validateUsing(simulatorValidator)
     session.put('simulatorBoat', payload)
-    return response.redirect('/signup')
+    return response.redirect('/signup?from=simulator')
   }
 
   async createBoat({ request, response, auth }: HttpContext) {

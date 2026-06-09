@@ -14,8 +14,9 @@ export default class NewAccountController {
     private boatHullService: BoatHullService
   ) {}
 
-  async create({ inertia }: HttpContext) {
-    return inertia.render('auth/signup', {})
+  async create({ inertia, request }: HttpContext) {
+    const fromSimulator = request.qs().from === 'simulator'
+    return inertia.render('auth/signup', { fromSimulator })
   }
 
   async store({ request, response, auth, session }: HttpContext) {

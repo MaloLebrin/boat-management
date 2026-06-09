@@ -1,4 +1,4 @@
-# TODO — Hiérarchie visuelle CTA simulateur
+# ✅ DONE (2026-06-09) — Hiérarchie visuelle CTA simulateur
 
 ## Contexte
 

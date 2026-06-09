@@ -18,6 +18,8 @@ import { useT } from '~/composables/use_t'
 
 const { t } = useT()
 
+defineProps<{ fromSimulator?: boolean }>()
+
 const showPassword = ref(false)
 const passwordValue = ref('')
 const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
@@ -66,6 +68,13 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
           <p class="mt-1.5 text-sm text-fg-muted">
             {{ t('auth.signup.marketing.subtitle') }}
           </p>
+
+          <div
+            v-if="fromSimulator"
+            class="mb-5 rounded-xl border border-coral-200 bg-coral-50 px-4 py-3 text-sm text-fg"
+          >
+            {{ t('auth.signup.fromSimulatorNotice') }}
+          </div>
 
           <Form route="new_account.store" class="mt-6" #default="{ processing, errors }">
             <div class="flex flex-col gap-3.5">

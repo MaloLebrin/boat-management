@@ -11,8 +11,8 @@ Deux vecteurs complémentaires :
 | SEO organique | Page guide + simulateur public indexés sur requêtes coût entretien bateau | ✅ en place |
 | Conversion visiteur | Tunnel simulateur → signup → bateau auto-créé | ✅ en place |
 | Lead magnet | Capture email visiteur non prêt à s'inscrire | ✅ implémenté (2026-06-09) |
-| CTA visuel | Réduire le poids du bouton "Recalculer" face à la CTA signup | ⬜ todo |
-| Signup contextualisé | Bandeau "votre bateau sera ajouté" sur la page signup | ⬜ todo |
+| CTA visuel | Réduire le poids du bouton "Recalculer" face à la CTA signup | ✅ implémenté (2026-06-09) |
+| Signup contextualisé | Bandeau "votre bateau sera ajouté" sur la page signup | ✅ implémenté (2026-06-09) |
 
 ---
 

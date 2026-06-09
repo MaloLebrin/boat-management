@@ -74,10 +74,10 @@ function formatCurrency(amount: number): string {
       </p>
     </div>
 
-    <!-- Restart button -->
+    <!-- Restart button — lien texte discret pour ne pas concurrencer le CTA signup -->
     <button
       type="button"
-      class="mt-6 w-full rounded-xl border-2 border-bone bg-paper px-6 py-4 text-base font-semibold text-fg transition-colors hover:border-fg-subtle"
+      class="mt-4 w-full text-sm text-fg-subtle underline underline-offset-2 transition-colors hover:text-fg"
       @click="emit('restart')"
     >
       {{ t('simulator.recalculate') }}
