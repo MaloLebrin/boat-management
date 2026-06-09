@@ -10,7 +10,7 @@ import { Head, Link, usePage } from '@inertiajs/vue3'
 import { computed } from 'vue'
 import GuideCostTable from '~/components/marketing/guide/GuideCostTable.vue'
 import GuideFaqSection from '~/components/marketing/guide/GuideFaqSection.vue'
-import JsonLd from '~/components/JsonLd'
+import JsonLd from '~/components/json_ld'
 
 interface FaqItem { q: string; a: string }
 interface CostRow { type: string; length: string; budget: string; note: string }
