@@ -1,7 +1,6 @@
 import { test } from '@japa/runner'
 import testUtils from '@adonisjs/core/services/test_utils'
 import BoatMaintenanceEvent from '#models/boat_maintenance_event'
-import { UserFactory } from '#database/factories/user_factory'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { createAdminUser } from '#tests/functional/helpers'
 

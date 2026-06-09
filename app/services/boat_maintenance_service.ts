@@ -150,7 +150,7 @@ export default class BoatMaintenanceService {
             quantity: p.quantity?.trim() ? Number.parseInt(p.quantity.trim(), 10) : null,
             notes: p.notes?.trim() ? p.notes.trim() : null,
             enginePartId: p.enginePartId ?? null,
-            unitPrice: p.unitPrice ? Number.parseFloat(p.unitPrice) : null,
+            unitPrice: p.unitPrice ?? null,
           }))
           .filter((p) => p.name.length > 0) ?? []
 
@@ -258,7 +258,18 @@ export default class BoatMaintenanceService {
       .orderBy('performedAt', 'desc')
 
     const events = rawEvents.map((ev) => {
-      const totalCost = computeTotalCost(ev.parts)
+      const mappedParts = ev.parts.map((p) => {
+        const price = p.unitPrice !== null ? Number.parseFloat(p.unitPrice) : null
+        return {
+          id: p.id,
+          name: p.name,
+          quantity: p.quantity,
+          unitPrice: price,
+          totalCost: price !== null ? Math.round(price * (p.quantity ?? 1) * 100) / 100 : null,
+          enginePartId: p.enginePartId,
+        }
+      })
+      const totalCost = computeTotalCost(mappedParts)
       return {
         id: ev.id,
         boatId: ev.boatId,
@@ -273,15 +284,7 @@ export default class BoatMaintenanceService {
         boatSailId: ev.boatSailId,
         boatRigId: ev.boatRigId,
         totalCost,
-        parts: ev.parts.map((p) => ({
-          id: p.id,
-          name: p.name,
-          quantity: p.quantity,
-          unitPrice: p.unitPrice,
-          totalCost:
-            p.unitPrice !== null ? Math.round(p.unitPrice * (p.quantity ?? 1) * 100) / 100 : null,
-          enginePartId: p.enginePartId,
-        })),
+        parts: mappedParts,
       }
     })
 
