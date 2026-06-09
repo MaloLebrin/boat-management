@@ -1039,6 +1039,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/simulator_controller').default['createBoat']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'simulator.lead': {
+    methods: ["POST"]
+    pattern: '/simulator/lead'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/simulator_lead').simulatorLeadValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/simulator_lead').simulatorLeadValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/simulator_lead_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/simulator_lead_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'planning.index': {
     methods: ["GET","HEAD"]
     pattern: '/planning'

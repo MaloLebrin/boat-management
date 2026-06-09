@@ -60,5 +60,11 @@
   "how_step_2_title": "Assess wear",
   "how_step_2_desc": "Hull, engine, safety, rigging: 4 quick questions.",
   "how_step_3_title": "Get your estimate",
-  "how_step_3_desc": "Detailed annual budget by category, benchmarked against Division 240."
+  "how_step_3_desc": "Detailed annual budget by category, benchmarked against Division 240.",
+  "cta_or_divider": "or",
+  "cta_email_title": "Receive this report by email",
+  "cta_email_placeholder": "your@email.com",
+  "cta_email_button": "Send",
+  "cta_email_success": "Your estimate has been sent!",
+  "cta_email_rgpd": "No spam. Unsubscribe at any time."
 }

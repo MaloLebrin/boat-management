@@ -60,5 +60,11 @@
   "how_step_2_title": "Évaluez l'usure",
   "how_step_2_desc": "Coque, moteur, sécurité, gréement : 4 questions rapides.",
   "how_step_3_title": "Obtenez votre estimation",
-  "how_step_3_desc": "Budget annuel détaillé par poste, basé sur la Division 240."
+  "how_step_3_desc": "Budget annuel détaillé par poste, basé sur la Division 240.",
+  "cta_or_divider": "ou",
+  "cta_email_title": "Recevoir ce rapport par email",
+  "cta_email_placeholder": "votre@email.com",
+  "cta_email_button": "Envoyer",
+  "cta_email_success": "Votre estimation a été envoyée !",
+  "cta_email_rgpd": "Pas de spam. Désinscription possible à tout moment."
 }

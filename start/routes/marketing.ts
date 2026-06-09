@@ -3,6 +3,7 @@ import { middleware } from '#start/kernel'
 
 const MarketingController = () => import('#controllers/marketing_controller')
 const SimulatorController = () => import('#controllers/simulator_controller')
+const SimulatorLeadController = () => import('#controllers/simulator_lead_controller')
 
 router.get('/', ({ response }) => response.redirect('/en')).as('root')
 
@@ -37,3 +38,5 @@ router
   .post('/boats/from-simulator', [SimulatorController, 'createBoat'])
   .as('simulator.create_boat')
   .use(middleware.auth())
+
+router.post('/simulator/lead', [SimulatorLeadController, 'store']).as('simulator.lead')

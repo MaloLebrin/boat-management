@@ -522,6 +522,12 @@ const routes = {
     tokens: [{"old":"/boats/from-simulator","type":0,"val":"boats","end":""},{"old":"/boats/from-simulator","type":0,"val":"from-simulator","end":""}],
     types: placeholder as Registry['simulator.create_boat']['types'],
   },
+  'simulator.lead': {
+    methods: ["POST"],
+    pattern: '/simulator/lead',
+    tokens: [{"old":"/simulator/lead","type":0,"val":"simulator","end":""},{"old":"/simulator/lead","type":0,"val":"lead","end":""}],
+    types: placeholder as Registry['simulator.lead']['types'],
+  },
   'planning.index': {
     methods: ["GET","HEAD"],
     pattern: '/planning',

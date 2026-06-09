@@ -131,6 +131,7 @@ export interface ApiDefinition {
   simulator: {
     session: typeof routes['simulator.session']
     createBoat: typeof routes['simulator.create_boat']
+    lead: typeof routes['simulator.lead']
   }
   planning: {
     index: typeof routes['planning.index']

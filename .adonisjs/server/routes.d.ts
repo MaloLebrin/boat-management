@@ -90,6 +90,7 @@ export type ScannedRoutes = {
     'marketing.contact': { paramsTuple?: []; params?: {} }
     'simulator.session': { paramsTuple?: []; params?: {} }
     'simulator.create_boat': { paramsTuple?: []; params?: {} }
+    'simulator.lead': { paramsTuple?: []; params?: {} }
     'planning.index': { paramsTuple?: []; params?: {} }
     'locale.set': { paramsTuple?: []; params?: {} }
     'settings.index': { paramsTuple?: []; params?: {} }
@@ -144,6 +145,7 @@ export type ScannedRoutes = {
     'ports.mouillages.spots.store': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'mouillageId': ParamValue} }
     'simulator.session': { paramsTuple?: []; params?: {} }
     'simulator.create_boat': { paramsTuple?: []; params?: {} }
+    'simulator.lead': { paramsTuple?: []; params?: {} }
     'locale.set': { paramsTuple?: []; params?: {} }
     'settings.billing.checkout': { paramsTuple?: []; params?: {} }
     'settings.billing.portal': { paramsTuple?: []; params?: {} }

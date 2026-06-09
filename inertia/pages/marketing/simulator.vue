@@ -210,7 +210,7 @@ function restart() {
           :input="formData as SimulatorBoatInput"
           @restart="restart"
         />
-        <SimulatorCtaCard :input="formData as SimulatorBoatInput" :is-authenticated="isAuthenticated" :can-add-boat="canAddBoat" />
+        <SimulatorCtaCard :input="formData as SimulatorBoatInput" :is-authenticated="isAuthenticated" :can-add-boat="canAddBoat" :breakdown="costBreakdown" />
       </template>
     </div>
   </section>
