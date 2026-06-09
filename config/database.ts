@@ -3,51 +3,9 @@ import { defineConfig } from '@adonisjs/lucid'
 import env from '#start/env'
 
 const dbConfig = defineConfig({
-  /**
-   * Default connection used for all queries.
-   */
-  connection: process.env.NODE_ENV === 'test' ? 'sqlite' : 'pg',
+  connection: 'pg',
 
   connections: {
-    /**
-     * SQLite connection (default).
-     */
-    sqlite: {
-      client: 'better-sqlite3',
-
-      connection: {
-        /**
-         * Database file location.
-         */
-        filename:
-          (process.env.DB_SQLITE_FILENAME && String(process.env.DB_SQLITE_FILENAME)) ||
-          (process.env.NODE_ENV === 'test'
-            ? app.tmpPath('db.test.sqlite3')
-            : app.tmpPath('db.sqlite3')),
-      },
-
-      /**
-       * Required by Knex for SQLite defaults.
-       */
-      useNullAsDefault: true,
-
-      migrations: {
-        /**
-         * Sort migration files naturally by filename.
-         */
-        naturalSort: true,
-
-        /**
-         * Paths containing migration files.
-         */
-        paths: ['database/migrations'],
-      },
-    },
-
-    /**
-     * PostgreSQL connection.
-     * Install package to switch: npm install pg
-     */
     pg: {
       client: 'pg',
       connection: {

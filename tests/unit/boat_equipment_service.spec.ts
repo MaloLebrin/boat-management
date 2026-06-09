@@ -5,49 +5,16 @@ import BoatSailService from '#services/boat_sail_service'
 import BoatRigService from '#services/boat_rig_service'
 import BoatEnginePartService from '#services/boat_engine_part_service'
 import BoatSafetyEquipmentService from '#services/boat_safety_equipment_service'
-import Organization from '#models/organization'
-import User from '#models/user'
-import Boat from '#models/boat'
-import BoatEngine from '#models/boat_engine'
+import { UserFactory } from '#database/factories/user_factory'
+import { BoatFactory } from '#database/factories/boat_factory'
+import { BoatEngineFactory } from '#database/factories/boat_engine_factory'
 
-test.group('BoatService equipment (unit)', (group) => {
-  group.each.teardown(async () => {
-    await BoatEngine.query().delete()
-    await Boat.query().delete()
-    await User.query().delete()
-    await Organization.query().delete()
-  })
-
+test.group('BoatService equipment (unit)', () => {
   test('updateEngine rejects engine id belonging to another boat', async ({ assert }) => {
-    const org = await Organization.create({ name: 'O', slug: 'o-eq-1' })
-    const user = await User.create({
-      email: 'eq1@example.com',
-      password: 'Password123!',
-      fullName: 'Eq1',
-      organizationId: org.id,
-    })
-    const boatA = await Boat.create({
-      organizationId: org.id,
-      name: 'A',
-      registrationNumber: null,
-      type: null,
-    })
-    const boatB = await Boat.create({
-      organizationId: org.id,
-      name: 'B',
-      registrationNumber: null,
-      type: null,
-    })
-    const engineB = await BoatEngine.create({
-      boatId: boatB.id,
-      kind: 'outboard',
-      fuel: 'essence',
-      brand: 'Yamaha',
-      model: 'F20',
-      serialNumber: null,
-      powerHp: 20,
-      hours: null,
-    })
+    const user = await UserFactory.with('organization').create()
+    const boatA = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const boatB = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const engineB = await BoatEngineFactory.merge({ boatId: boatB.id }).create()
 
     const svc = new BoatEquipmentService(
       new BoatEngineService(),

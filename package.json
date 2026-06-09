@@ -62,7 +62,6 @@
     "@vitejs/plugin-vue": "^6.0.4",
     "@vue/server-renderer": "^3.5.32",
     "@vue/test-utils": "^2.4.6",
-    "better-sqlite3": "^12.9.0",
     "eslint": "^10.2.0",
     "eslint-plugin-vue": "^10.9.1",
     "happy-dom": "^20.9.0",

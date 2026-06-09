@@ -37,10 +37,6 @@ export const plugins: Config['plugins'] = [
 export const runnerHooks: Required<Pick<Config, 'setup' | 'teardown'>> = {
   setup: [
     async () => {
-      /**
-       * Ensure we never run tests against the dev Postgres database.
-       * With `config/database.ts` selecting sqlite in test env, this will migrate an isolated SQLite DB.
-       */
       await testUtils.db().migrate()
     },
   ],

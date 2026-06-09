@@ -1,36 +1,16 @@
 import { test } from '@japa/runner'
 import DashboardService from '#services/dashboard_service'
 import PortService from '#services/port_service'
-import BoatEngine from '#models/boat_engine'
 import BoatMaintenanceTask from '#models/boat_maintenance_task'
-import Organization from '#models/organization'
-import User from '#models/user'
-import Boat from '#models/boat'
 import { DateTime } from 'luxon'
+import { UserFactory } from '#database/factories/user_factory'
+import { BoatFactory } from '#database/factories/boat_factory'
+import { BoatEngineFactory } from '#database/factories/boat_engine_factory'
 
-test.group('DashboardService (unit)', (group) => {
-  group.each.teardown(async () => {
-    await BoatMaintenanceTask.query().delete()
-    await BoatEngine.query().delete()
-    await Boat.query().delete()
-    await User.query().delete()
-    await Organization.query().delete()
-  })
-
+test.group('DashboardService (unit)', () => {
   test('urgent maintenance includes overdue and due-soon tasks by dueAt', async ({ assert }) => {
-    const org = await Organization.create({ name: 'O', slug: 'o-dash-1' })
-    const user = await User.create({
-      email: 'dash@example.com',
-      password: 'Password123!',
-      fullName: 'Dash',
-      organizationId: org.id,
-    })
-    const boat = await Boat.create({
-      organizationId: org.id,
-      name: 'B',
-      registrationNumber: null,
-      type: null,
-    })
+    const user = await UserFactory.with('organization').create()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
 
     const today = DateTime.now().startOf('day')
 
@@ -100,29 +80,9 @@ test.group('DashboardService (unit)', (group) => {
   test('urgent maintenance includes engine-hour tasks when within threshold', async ({
     assert,
   }) => {
-    const org = await Organization.create({ name: 'O', slug: 'o-dash-2' })
-    const user = await User.create({
-      email: 'dash2@example.com',
-      password: 'Password123!',
-      fullName: 'Dash2',
-      organizationId: org.id,
-    })
-    const boat = await Boat.create({
-      organizationId: org.id,
-      name: 'B',
-      registrationNumber: null,
-      type: null,
-    })
-    const engine = await BoatEngine.create({
-      boatId: boat.id,
-      kind: 'inboard',
-      fuel: 'diesel',
-      brand: null,
-      model: null,
-      serialNumber: null,
-      powerHp: null,
-      hours: 95,
-    })
+    const user = await UserFactory.with('organization').create()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const engine = await BoatEngineFactory.merge({ boatId: boat.id, hours: 95 }).create()
 
     await BoatMaintenanceTask.create({
       boatId: boat.id,

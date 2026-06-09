@@ -1,33 +1,12 @@
 import { test } from '@japa/runner'
 import PontoonService from '#services/pontoon_service'
-import Organization from '#models/organization'
-import Port from '#models/port'
-import Pontoon from '#models/pontoon'
+import { PortFactory } from '#database/factories/port_factory'
+import { PontoonFactory } from '#database/factories/pontoon_factory'
 
-test.group('PontoonService (unit)', (group) => {
-  group.each.teardown(async () => {
-    await Pontoon.query().delete()
-    await Port.query().delete()
-    await Organization.query().delete()
-  })
-
+test.group('PontoonService (unit)', () => {
   test('updatePosition persists x and y on pontoon', async ({ assert }) => {
-    const org = await Organization.create({ name: 'O', slug: 'o-pontoon-1' })
-    const port = await Port.create({
-      organizationId: org.id,
-      name: 'Harbor',
-      city: null,
-      country: null,
-      address: null,
-      notes: null,
-    })
-    const pontoon = await Pontoon.create({
-      portId: port.id,
-      name: 'A',
-      description: null,
-      positionX: 10,
-      positionY: 20,
-    })
+    const port = await PortFactory.with('organization').create()
+    const pontoon = await PontoonFactory.merge({ portId: port.id, positionX: 10, positionY: 20 }).create()
 
     const service = new PontoonService()
     await service.updatePosition(pontoon, { x: 100, y: 200 })

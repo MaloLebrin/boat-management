@@ -1,8 +1,6 @@
 import { test } from '@japa/runner'
 import PasswordResetController from '#controllers/password_reset_controller'
-import Organization from '#models/organization'
-import User from '#models/user'
-import PasswordResetToken from '#models/password_reset_token'
+import { UserFactory } from '#database/factories/user_factory'
 
 function makeI18n(key: string) {
   return key
@@ -35,13 +33,7 @@ function makeRedirect() {
   return { redirect: () => obj, calls }
 }
 
-test.group('PasswordResetController (unit)', (group) => {
-  group.each.teardown(async () => {
-    await PasswordResetToken.query().delete()
-    await User.query().delete()
-    await Organization.query().delete()
-  })
-
+test.group('PasswordResetController (unit)', () => {
   // ── create ───────────────────────────────────────────────────────────────
 
   test('create renders the forgot_password page', async ({ assert }) => {
@@ -58,13 +50,7 @@ test.group('PasswordResetController (unit)', (group) => {
   // ── store ────────────────────────────────────────────────────────────────
 
   test('store queues a reset email and flashes success for a known email', async ({ assert }) => {
-    const org = await Organization.create({ name: 'O', slug: 'o-prc-1' })
-    await User.create({
-      email: 'ctrl1@example.com',
-      password: 'Password123!',
-      fullName: 'C1',
-      organizationId: org.id,
-    })
+    const user = await UserFactory.with('organization').create()
 
     const emailsSent: string[] = []
     const controller = new PasswordResetController(
@@ -80,13 +66,13 @@ test.group('PasswordResetController (unit)', (group) => {
     const { redirect, calls } = makeRedirect()
 
     await controller.store({
-      request: { validateUsing: async () => ({ email: 'ctrl1@example.com' }) },
+      request: { validateUsing: async () => ({ email: user.email }) },
       response: { redirect },
       session,
       i18n: { t: makeI18n },
     } as any)
 
-    assert.equal(emailsSent[0], 'ctrl1@example.com')
+    assert.equal(emailsSent[0], user.email)
     assert.equal(session.flashes['success'], 'flash.auth.passwordResetSent')
     assert.equal(calls[0], '/forgot-password')
   })
@@ -161,17 +147,11 @@ test.group('PasswordResetController (unit)', (group) => {
   // ── update ───────────────────────────────────────────────────────────────
 
   test('update resets password and redirects to /login on valid token', async ({ assert }) => {
-    const org = await Organization.create({ name: 'O', slug: 'o-prc-2' })
-    await User.create({
-      email: 'ctrl2@example.com',
-      password: 'OldPass1!',
-      fullName: 'C2',
-      organizationId: org.id,
-    })
+    const user = await UserFactory.with('organization').create()
 
     const controller = new PasswordResetController(
       {
-        verifyToken: async () => ({ email: 'ctrl2@example.com' }),
+        verifyToken: async () => ({ email: user.email }),
         updatePassword: async () => true,
         invalidateTokensForEmail: async () => {},
       } as any,

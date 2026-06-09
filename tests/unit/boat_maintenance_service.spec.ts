@@ -9,51 +9,17 @@ import BoatSailService from '#services/boat_sail_service'
 import BoatRigService from '#services/boat_rig_service'
 import BoatEnginePartService from '#services/boat_engine_part_service'
 import BoatSafetyEquipmentService from '#services/boat_safety_equipment_service'
-import Organization from '#models/organization'
-import User from '#models/user'
-import Boat from '#models/boat'
-import BoatEngine from '#models/boat_engine'
-import BoatEnginePart from '#models/boat_engine_part'
 import BoatMaintenanceEvent from '#models/boat_maintenance_event'
-import BoatRig from '#models/boat_rig'
-import BoatSail from '#models/boat_sail'
+import { UserFactory } from '#database/factories/user_factory'
+import { BoatFactory } from '#database/factories/boat_factory'
+import { BoatEngineFactory } from '#database/factories/boat_engine_factory'
+import { BoatEnginePartFactory } from '#database/factories/boat_engine_part_factory'
 
-test.group('BoatMaintenanceService (unit)', (group) => {
-  group.each.teardown(async () => {
-    await BoatMaintenanceEvent.query().delete()
-    await BoatEnginePart.query().delete()
-    await BoatEngine.query().delete()
-    await BoatSail.query().delete()
-    await BoatRig.query().delete()
-    await Boat.query().delete()
-    await User.query().delete()
-    await Organization.query().delete()
-  })
-
+test.group('BoatMaintenanceService (unit)', () => {
   test('createForBoat stores event and parts for engine subject', async ({ assert }) => {
-    const org = await Organization.create({ name: 'O', slug: 'o-maint-1' })
-    const user = await User.create({
-      email: 'm1@example.com',
-      password: 'Password123!',
-      fullName: 'M1',
-      organizationId: org.id,
-    })
-    const boat = await Boat.create({
-      organizationId: org.id,
-      name: 'B',
-      registrationNumber: null,
-      type: null,
-    })
-    const engine = await BoatEngine.create({
-      boatId: boat.id,
-      kind: 'inboard',
-      fuel: 'diesel',
-      brand: 'Yanmar',
-      model: '3YM',
-      serialNumber: 'SN1',
-      powerHp: 30,
-      hours: 100,
-    })
+    const user = await UserFactory.with('organization').create()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const engine = await BoatEngineFactory.merge({ boatId: boat.id }).create()
 
     const svc = new BoatMaintenanceService()
     const event = await svc.createForBoat(user, boat, {
@@ -67,42 +33,17 @@ test.group('BoatMaintenanceService (unit)', (group) => {
     assert.equal(event.subject, 'engine')
     assert.equal(event.boatEngineId, engine.id)
     assert.isString(event.engineCaption)
-    assert.include(event.engineCaption!, 'Yanmar')
+    assert.include(event.engineCaption!, engine.brand!)
     await event.load('parts')
     assert.equal(event.parts.length, 1)
     assert.equal(event.parts[0]!.name, 'Oil filter')
   })
 
   test('createForBoat rejects engine from another boat', async ({ assert }) => {
-    const org = await Organization.create({ name: 'O', slug: 'o-maint-2' })
-    const user = await User.create({
-      email: 'm2@example.com',
-      password: 'Password123!',
-      fullName: 'M2',
-      organizationId: org.id,
-    })
-    const boatA = await Boat.create({
-      organizationId: org.id,
-      name: 'A',
-      registrationNumber: null,
-      type: null,
-    })
-    const boatB = await Boat.create({
-      organizationId: org.id,
-      name: 'B',
-      registrationNumber: null,
-      type: null,
-    })
-    const engineB = await BoatEngine.create({
-      boatId: boatB.id,
-      kind: 'outboard',
-      fuel: 'essence',
-      brand: 'Yamaha',
-      model: 'F20',
-      serialNumber: null,
-      powerHp: 20,
-      hours: null,
-    })
+    const user = await UserFactory.with('organization').create()
+    const boatA = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const boatB = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const engineB = await BoatEngineFactory.merge({ boatId: boatB.id }).create()
 
     const svc = new BoatMaintenanceService()
     await assert.rejects(
@@ -118,13 +59,7 @@ test.group('BoatMaintenanceService (unit)', (group) => {
   })
 
   test('createForBoat sail and rig subjects', async ({ assert }) => {
-    const org = await Organization.create({ name: 'O', slug: 'o-maint-3' })
-    const user = await User.create({
-      email: 'm3@example.com',
-      password: 'Password123!',
-      fullName: 'M3',
-      organizationId: org.id,
-    })
+    const user = await UserFactory.with('organization').create()
     const boatService = new BoatService()
     const equipmentService = new BoatEquipmentService(
       new BoatEngineService(),
@@ -168,19 +103,8 @@ test.group('BoatMaintenanceService (unit)', (group) => {
   })
 
   test('deleteForBoat removes event', async ({ assert }) => {
-    const org = await Organization.create({ name: 'O', slug: 'o-maint-4' })
-    const user = await User.create({
-      email: 'm4@example.com',
-      password: 'Password123!',
-      fullName: 'M4',
-      organizationId: org.id,
-    })
-    const boat = await Boat.create({
-      organizationId: org.id,
-      name: 'B',
-      registrationNumber: null,
-      type: null,
-    })
+    const user = await UserFactory.with('organization').create()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
 
     const svc = new BoatMaintenanceService()
     const ev = await svc.createForBoat(user, boat, {
@@ -197,35 +121,14 @@ test.group('BoatMaintenanceService (unit)', (group) => {
   test('createForBoat decrements engine part stock when enginePartId is provided', async ({
     assert,
   }) => {
-    const org = await Organization.create({ name: 'O', slug: 'o-maint-5' })
-    const user = await User.create({
-      email: 'm5@example.com',
-      password: 'Password123!',
-      fullName: 'M5',
-      organizationId: org.id,
-    })
-    const boat = await Boat.create({
-      organizationId: org.id,
-      name: 'B5',
-      registrationNumber: null,
-      type: null,
-    })
-    const engine = await BoatEngine.create({
-      boatId: boat.id,
-      kind: 'inboard',
-      fuel: 'diesel',
-      brand: 'Volvo',
-      model: 'D1',
-      serialNumber: null,
-      powerHp: 20,
-      hours: 50,
-    })
-    const catalogPart = await BoatEnginePart.create({
+    const user = await UserFactory.with('organization').create()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const engine = await BoatEngineFactory.merge({ boatId: boat.id }).create()
+    const catalogPart = await BoatEnginePartFactory.merge({
       boatEngineId: engine.id,
-      designation: 'Oil filter',
       stock: 5,
       wearState: 'good',
-    })
+    }).create()
 
     const svc = new BoatMaintenanceService()
     await svc.createForBoat(user, boat, {
@@ -243,35 +146,14 @@ test.group('BoatMaintenanceService (unit)', (group) => {
   test('createForBoat sets wearState to_replace when catalog part stock reaches zero', async ({
     assert,
   }) => {
-    const org = await Organization.create({ name: 'O', slug: 'o-maint-6' })
-    const user = await User.create({
-      email: 'm6@example.com',
-      password: 'Password123!',
-      fullName: 'M6',
-      organizationId: org.id,
-    })
-    const boat = await Boat.create({
-      organizationId: org.id,
-      name: 'B6',
-      registrationNumber: null,
-      type: null,
-    })
-    const engine = await BoatEngine.create({
-      boatId: boat.id,
-      kind: 'inboard',
-      fuel: 'diesel',
-      brand: 'Yanmar',
-      model: '2YM',
-      serialNumber: null,
-      powerHp: 15,
-      hours: 80,
-    })
-    const catalogPart = await BoatEnginePart.create({
+    const user = await UserFactory.with('organization').create()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const engine = await BoatEngineFactory.merge({ boatId: boat.id }).create()
+    const catalogPart = await BoatEnginePartFactory.merge({
       boatEngineId: engine.id,
-      designation: 'Impeller',
       stock: 1,
       wearState: 'good',
-    })
+    }).create()
 
     const svc = new BoatMaintenanceService()
     await svc.createForBoat(user, boat, {
@@ -290,19 +172,8 @@ test.group('BoatMaintenanceService (unit)', (group) => {
   test('createForBoat tracks unitPrice and getHistoryForOrg returns totalCost', async ({
     assert,
   }) => {
-    const org = await Organization.create({ name: 'O', slug: 'o-maint-7' })
-    const user = await User.create({
-      email: 'm7@example.com',
-      password: 'Password123!',
-      fullName: 'M7',
-      organizationId: org.id,
-    })
-    const boat = await Boat.create({
-      organizationId: org.id,
-      name: 'B7',
-      registrationNumber: null,
-      type: null,
-    })
+    const user = await UserFactory.with('organization').create()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
 
     const svc = new BoatMaintenanceService()
     await svc.createForBoat(user, boat, {

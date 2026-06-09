@@ -9,23 +9,11 @@ import BoatRigService from '#services/boat_rig_service'
 import BoatEnginePartService from '#services/boat_engine_part_service'
 import BoatSafetyEquipmentService from '#services/boat_safety_equipment_service'
 import BoatPolicy from '#policies/boat_policy'
-import Organization from '#models/organization'
-import User from '#models/user'
-import Boat from '#models/boat'
-import BoatEngine from '#models/boat_engine'
-import BoatRig from '#models/boat_rig'
-import BoatSail from '#models/boat_sail'
+import { UserFactory } from '#database/factories/user_factory'
+import { OrganizationFactory } from '#database/factories/organization_factory'
+import { BoatFactory } from '#database/factories/boat_factory'
 
-test.group('MVP org/users/boats/permissions (unit)', (group) => {
-  group.each.teardown(async () => {
-    await BoatEngine.query().delete()
-    await BoatSail.query().delete()
-    await BoatRig.query().delete()
-    await Boat.query().delete()
-    await User.query().delete()
-    await Organization.query().delete()
-  })
-
+test.group('MVP org/users/boats/permissions (unit)', () => {
   test('signupWithOrganization creates org and links user', async ({ assert }) => {
     const userService = new UserService(new OrganizationService())
 
@@ -42,28 +30,13 @@ test.group('MVP org/users/boats/permissions (unit)', (group) => {
   })
 
   test('BoatService.listForUser is scoped by organization', async ({ assert }) => {
-    const org1 = await Organization.create({ name: 'Org 1', slug: 'org-1-u' })
-    const org2 = await Organization.create({ name: 'Org 2', slug: 'org-2-u' })
+    const org1 = await OrganizationFactory.create()
+    const org2 = await OrganizationFactory.create()
 
-    const user1 = await User.create({
-      email: 'u1@example.com',
-      password: 'Password123!',
-      fullName: 'U1',
-      organizationId: org1.id,
-    })
+    const user1 = await UserFactory.merge({ organizationId: org1.id }).create()
 
-    await Boat.create({
-      organizationId: org1.id,
-      name: 'Org1 Boat',
-      registrationNumber: 'A1',
-      type: null,
-    })
-    await Boat.create({
-      organizationId: org2.id,
-      name: 'Org2 Boat',
-      registrationNumber: 'B1',
-      type: null,
-    })
+    await BoatFactory.merge({ organizationId: org1.id, name: 'Org1 Boat', registrationNumber: 'A1' }).create()
+    await BoatFactory.merge({ organizationId: org2.id, name: 'Org2 Boat', registrationNumber: 'B1' }).create()
 
     const boatService = new BoatService()
     const boats = await boatService.listForUser(user1)
@@ -76,13 +49,7 @@ test.group('MVP org/users/boats/permissions (unit)', (group) => {
   test('BoatService hull create then equipment methods add engines, sails, and rig', async ({
     assert,
   }) => {
-    const org = await Organization.create({ name: 'Org', slug: 'org-create' })
-    const user = await User.create({
-      email: 'builder@example.com',
-      password: 'Password123!',
-      fullName: 'Builder',
-      organizationId: org.id,
-    })
+    const user = await UserFactory.with('organization').create()
 
     const boatService = new BoatService()
     const equipmentService = new BoatEquipmentService(
@@ -144,13 +111,7 @@ test.group('MVP org/users/boats/permissions (unit)', (group) => {
   })
 
   test('sailboat requires mastHeightM', async ({ assert }) => {
-    const org = await Organization.create({ name: 'Org', slug: 'org-mast' })
-    const user = await User.create({
-      email: 'sailor@example.com',
-      password: 'Password123!',
-      fullName: 'Sailor',
-      organizationId: org.id,
-    })
+    const user = await UserFactory.with('organization').create()
 
     const boatService = new BoatService()
 
@@ -165,22 +126,11 @@ test.group('MVP org/users/boats/permissions (unit)', (group) => {
   })
 
   test('boat abilities deny cross-organization access', async ({ assert }) => {
-    const org1 = await Organization.create({ name: 'Org 1', slug: 'org-1-a' })
-    const org2 = await Organization.create({ name: 'Org 2', slug: 'org-2-a' })
+    const user = await UserFactory.makeStubbed()
+    const boat = await BoatFactory.makeStubbed()
 
-    const user = await User.create({
-      email: 'u@example.com',
-      password: 'Password123!',
-      fullName: 'U',
-      organizationId: org2.id,
-    })
-
-    const boat = await Boat.create({
-      organizationId: org1.id,
-      name: 'Secret Boat',
-      registrationNumber: null,
-      type: null,
-    })
+    user.organizationId = 2
+    boat.organizationId = 1
 
     const policy = new BoatPolicy()
     const response = policy.view(user, boat)

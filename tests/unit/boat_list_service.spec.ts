@@ -1,50 +1,36 @@
 import { test } from '@japa/runner'
-import Organization from '#models/organization'
-import User from '#models/user'
-import Boat from '#models/boat'
 import BoatMaintenanceTask from '#models/boat_maintenance_task'
 import BoatListService from '#services/boat_list_service'
 import BoatMaintenanceBadgeService from '#services/boat_maintenance_badge_service'
 import { DateTime } from 'luxon'
+import { UserFactory } from '#database/factories/user_factory'
+import { BoatFactory } from '#database/factories/boat_factory'
 
-test.group('BoatListService (unit)', (group) => {
-  group.each.teardown(async () => {
-    await BoatMaintenanceTask.query().delete()
-    await Boat.query().delete()
-    await User.query().delete()
-    await Organization.query().delete()
-  })
-
+test.group('BoatListService (unit)', () => {
   test('supports search, filters, sort, and pagination', async ({ assert }) => {
-    const org = await Organization.create({ name: 'O', slug: 'o-list-1' })
-    const user = await User.create({
-      email: 'list1@example.com',
-      password: 'Password123!',
-      fullName: 'List1',
-      organizationId: org.id,
-    })
+    const user = await UserFactory.with('organization').create()
 
-    const a = await Boat.create({
-      organizationId: org.id,
+    const a = await BoatFactory.merge({
+      organizationId: user.organizationId!,
       name: 'Alpha',
       registrationNumber: 'REG-001',
       type: 'Sailboat',
       propulsionType: 'sailboat',
-    })
-    await Boat.create({
-      organizationId: org.id,
+    }).create()
+    await BoatFactory.merge({
+      organizationId: user.organizationId!,
       name: 'Bravo',
       registrationNumber: 'REG-002',
       type: 'Motor',
       propulsionType: 'motorboat',
-    })
-    await Boat.create({
-      organizationId: org.id,
+    }).create()
+    await BoatFactory.merge({
+      organizationId: user.organizationId!,
       name: 'Charlie',
       registrationNumber: null,
       type: 'Sailboat',
       propulsionType: 'sailboat',
-    })
+    }).create()
 
     // One urgent task on Alpha (overdue)
     await BoatMaintenanceTask.create({

@@ -4,35 +4,15 @@ import BoatMaintenanceTaskService, {
   BoatMaintenanceTaskValidationError,
 } from '#services/boat_maintenance_task_service'
 import BoatMaintenanceTask from '#models/boat_maintenance_task'
-import BoatEngine from '#models/boat_engine'
-import Organization from '#models/organization'
-import User from '#models/user'
-import Boat from '#models/boat'
 import { DateTime } from 'luxon'
+import { UserFactory } from '#database/factories/user_factory'
+import { BoatFactory } from '#database/factories/boat_factory'
+import { BoatEngineFactory } from '#database/factories/boat_engine_factory'
 
-test.group('BoatMaintenanceTaskService (unit)', (group) => {
-  group.each.teardown(async () => {
-    await BoatMaintenanceTask.query().delete()
-    await BoatEngine.query().delete()
-    await Boat.query().delete()
-    await User.query().delete()
-    await Organization.query().delete()
-  })
-
+test.group('BoatMaintenanceTaskService (unit)', () => {
   test('createForBoat requires dueAt or dueEngineHours', async ({ assert }) => {
-    const org = await Organization.create({ name: 'O', slug: 'o-task-1' })
-    const user = await User.create({
-      email: 't1@example.com',
-      password: 'Password123!',
-      fullName: 'T1',
-      organizationId: org.id,
-    })
-    const boat = await Boat.create({
-      organizationId: org.id,
-      name: 'B',
-      registrationNumber: null,
-      type: null,
-    })
+    const user = await UserFactory.with('organization').create()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
 
     const svc = new BoatMaintenanceTaskService()
     await assert.rejects(
@@ -46,19 +26,8 @@ test.group('BoatMaintenanceTaskService (unit)', (group) => {
   })
 
   test('markDone creates next task by months recurrence', async ({ assert }) => {
-    const org = await Organization.create({ name: 'O', slug: 'o-task-2' })
-    const user = await User.create({
-      email: 't2@example.com',
-      password: 'Password123!',
-      fullName: 'T2',
-      organizationId: org.id,
-    })
-    const boat = await Boat.create({
-      organizationId: org.id,
-      name: 'B',
-      registrationNumber: null,
-      type: null,
-    })
+    const user = await UserFactory.with('organization').create()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
 
     const svc = new BoatMaintenanceTaskService()
     const task = await svc.createForBoat(user, boat, {
@@ -79,29 +48,9 @@ test.group('BoatMaintenanceTaskService (unit)', (group) => {
   })
 
   test('markDone creates next task by engine-hours recurrence', async ({ assert }) => {
-    const org = await Organization.create({ name: 'O', slug: 'o-task-3' })
-    const user = await User.create({
-      email: 't3@example.com',
-      password: 'Password123!',
-      fullName: 'T3',
-      organizationId: org.id,
-    })
-    const boat = await Boat.create({
-      organizationId: org.id,
-      name: 'B',
-      registrationNumber: null,
-      type: null,
-    })
-    const engine = await BoatEngine.create({
-      boatId: boat.id,
-      kind: 'inboard',
-      fuel: 'diesel',
-      brand: null,
-      model: null,
-      serialNumber: null,
-      powerHp: null,
-      hours: 100,
-    })
+    const user = await UserFactory.with('organization').create()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const engine = await BoatEngineFactory.merge({ boatId: boat.id, hours: 100 }).create()
 
     const svc = new BoatMaintenanceTaskService()
     const task = await svc.createForBoat(user, boat, {
@@ -124,32 +73,10 @@ test.group('BoatMaintenanceTaskService (unit)', (group) => {
   })
 
   test('cross-boat scope hides tasks', async ({ assert }) => {
-    const orgA = await Organization.create({ name: 'OA', slug: 'o-task-a' })
-    const orgB = await Organization.create({ name: 'OB', slug: 'o-task-b' })
-    const userA = await User.create({
-      email: 'ta@example.com',
-      password: 'Password123!',
-      fullName: 'TA',
-      organizationId: orgA.id,
-    })
-    const userB = await User.create({
-      email: 'tb@example.com',
-      password: 'Password123!',
-      fullName: 'TB',
-      organizationId: orgB.id,
-    })
-    const boatA = await Boat.create({
-      organizationId: orgA.id,
-      name: 'BA',
-      registrationNumber: null,
-      type: null,
-    })
-    const boatB = await Boat.create({
-      organizationId: orgB.id,
-      name: 'BB',
-      registrationNumber: null,
-      type: null,
-    })
+    const userA = await UserFactory.with('organization').create()
+    const userB = await UserFactory.with('organization').create()
+    const boatA = await BoatFactory.merge({ organizationId: userA.organizationId! }).create()
+    const boatB = await BoatFactory.merge({ organizationId: userB.organizationId! }).create()
 
     const svc = new BoatMaintenanceTaskService()
     const taskA = await svc.createForBoat(userA, boatA, {
