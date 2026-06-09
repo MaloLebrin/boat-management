@@ -24,6 +24,7 @@ export default class SimulatorLeadService {
     )
 
     await this.emailQueueService.sendSimulatorReport(lead)
+    await this.emailQueueService.sendSimulatorNurturing(lead)
 
     return lead
   }
