@@ -14,6 +14,7 @@ Deux vecteurs complémentaires :
 | CTA visuel | Réduire le poids du bouton "Recalculer" face à la CTA signup | ✅ implémenté (2026-06-09) |
 | Signup contextualisé | Bandeau "votre bateau sera ajouté" sur la page signup | ✅ implémenté (2026-06-09) |
 
+
 ---
 
 ## Funnel complet
@@ -29,8 +30,8 @@ GET /fr/simulateur-cout-entretien
             ├─ Visiteur prêt à s'inscrire
             │    └─ CTA "Créer mon compte"
             │         └─ POST /simulator/session  (sauvegarde en session)
-            │              └─ Redirect /signup?from=simulator  [⬜ TODO]
-            │                   └─ Bandeau contextuel "bateau sera ajouté"  [⬜ TODO]
+            │              └─ Redirect /signup?from=simulator  [✅]
+            │                   └─ Bandeau contextuel "bateau sera ajouté"  [✅]
             │                        └─ Inscription NewAccountController#store
             │                             └─ Bateau auto-créé depuis session
             │                                  └─ Redirect /boats/:id
@@ -131,82 +132,12 @@ Namespace `simulator.*` dans `resources/lang/{fr,en}/simulator.json` :
 
 ---
 
-## Todos restants
+## Toutes les features sont implémentées ✅
 
-### ⬜ CTA — Hiérarchie visuelle
+Le tunnel d'acquisition complet est en place. Prochaines étapes envisageables :
 
-Référence : [`todo-cta-visual-hierarchy.md`](todo-cta-visual-hierarchy.md)
-
-**Problème** : le bouton "Recalculer" dans `SimulatorResultCard.vue` a le même poids visuel que la CTA signup — concurrence indésirable.
-
-**Solution** : transformer le bouton "Recalculer" en lien texte discret.
-
-```vue
-<!-- avant -->
-<button class="... border-2 border-bone bg-paper px-6 py-4 ...">
-
-<!-- après -->
-<button class="mt-4 w-full text-sm text-fg-subtle underline underline-offset-2 hover:text-fg transition-colors">
-```
-
-**Fichier** : `inertia/components/marketing/simulator/SimulatorResultCard.vue`  
-**Impact** : CSS uniquement, aucun impact backend, aucune clé i18n.
-
----
-
-### ⬜ Signup contextualisé après simulateur
-
-Référence : [`todo-signup-contextualise.md`](todo-signup-contextualise.md)
-
-**Problème** : la page `/signup` est générique — rien ne rappelle au visiteur que son bateau sera ajouté automatiquement.
-
-**Solution** : passer `fromSimulator: boolean` depuis `SimulatorController#saveSession` via query param, lire la prop dans `signup.vue`, afficher un bandeau contextuel.
-
-**Backend** (`app/controllers/simulator_controller.ts`) :
-```ts
-// avant
-return response.redirect('/signup')
-
-// après
-return response.redirect('/signup?from=simulator')
-```
-
-**Backend** (`app/controllers/new_account_controller.ts`) :
-```ts
-async create({ inertia, request }: HttpContext) {
-  const fromSimulator = request.qs().from === 'simulator'
-  return inertia.render('auth/signup', { fromSimulator })
-}
-```
-
-**Frontend** (`inertia/pages/auth/signup.vue`) :
-```vue
-<div v-if="fromSimulator" class="mb-6 rounded-xl border border-coral-200 bg-coral-50 px-4 py-3 text-sm text-fg">
-  {{ t('auth.signup_from_simulator_notice') }}
-</div>
-```
-
-**i18n à ajouter** dans `resources/lang/{fr,en}/auth.json` :
-
-| Clé | FR | EN |
-|---|---|---|
-| `signup_from_simulator_notice` | ✓ Votre bateau sera ajouté automatiquement à votre compte dès votre inscription. | ✓ Your boat will be automatically added to your account upon registration. |
-
-**Fichiers impactés** :
-- `app/controllers/simulator_controller.ts`
-- `app/controllers/new_account_controller.ts`
-- `inertia/pages/auth/signup.vue`
-- `resources/lang/fr/auth.json`
-- `resources/lang/en/auth.json`
-
-**Note** : la logique de création du bateau depuis la session reste inchangée — elle repose uniquement sur la présence de `simulatorBoat` en session, pas sur le param `from`.
-
----
-
-## Ordre de priorité recommandé
-
-1. **Hiérarchie CTA** (30 min) — impact immédiat, pur CSS, risque zéro
-2. **Signup contextualisé** (2h) — réduit le drop-off sur la dernière étape du funnel
+- Séquence email nurturing sur les `simulator_leads`
+- Métriques de conversion (voir section ci-dessous)
 
 ---
 

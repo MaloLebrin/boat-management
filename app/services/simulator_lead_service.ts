@@ -1,9 +1,14 @@
 import SimulatorLead from '#models/simulator_lead'
+import EmailQueueService from '#services/email_queue_service'
 import type { SimulatorLeadPayload } from '#shared/types/simulator'
+import { inject } from '@adonisjs/core'
 
+@inject()
 export default class SimulatorLeadService {
+  constructor(private emailQueueService: EmailQueueService) {}
+
   async create(payload: SimulatorLeadPayload): Promise<SimulatorLead> {
-    return SimulatorLead.updateOrCreate(
+    const lead = await SimulatorLead.updateOrCreate(
       { email: payload.email },
       {
         boatType: payload.boatType,
@@ -17,5 +22,9 @@ export default class SimulatorLeadService {
         locale: payload.locale ?? 'fr',
       }
     )
+
+    await this.emailQueueService.sendSimulatorReport(lead)
+
+    return lead
   }
 }
