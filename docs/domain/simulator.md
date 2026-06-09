@@ -154,13 +154,17 @@ La liste des étapes est **calculée dynamiquement** côté frontend selon le ty
 
 | Fichier | Rôle |
 |---|---|
-| `shared/types/simulator.ts` | Types partagés backend ↔ frontend |
-| `app/validators/simulator.ts` | Validation VineJS |
+| `shared/types/simulator.ts` | Types partagés backend ↔ frontend (incl. `SimulatorLeadPayload`) |
+| `app/validators/simulator.ts` | Validation VineJS — `SimulatorBoatInput` |
+| `app/validators/simulator_lead.ts` | Validation VineJS — `SimulatorLeadPayload` |
 | `app/controllers/simulator_controller.ts` | `saveSession()` — stocke en session + redirect /signup |
+| `app/controllers/simulator_lead_controller.ts` | `store()` — capture email lead, upsert, redirect back |
 | `app/controllers/marketing_controller.ts` | Méthode `simulator()` — rendu Inertia |
+| `app/models/simulator_lead.ts` | Model Lucid — table `simulator_leads` |
+| `app/services/simulator_lead_service.ts` | `create()` — upsert sur email |
 | `app/services/boat_hull_service.ts` | `createFromSimulator()` — création bateau post-signup |
 | `app/controllers/new_account_controller.ts` | Détecte session `simulatorBoat` après inscription |
-| `start/routes/marketing.ts` | Routes GET (FR/EN) + POST /simulator/session |
+| `start/routes/marketing.ts` | Routes GET (FR/EN) + POST /simulator/session + POST /simulator/lead |
 
 ### Frontend
 
@@ -174,7 +178,7 @@ La liste des étapes est **calculée dynamiquement** côté frontend selon le ty
 | `inertia/components/marketing/simulator/SimulatorStepSafety.vue` | Étape 4 : état du matériel de sécurité |
 | `inertia/components/marketing/simulator/SimulatorStepRigging.vue` | Étape 5 : état du gréement (voiliers/cata) |
 | `inertia/components/marketing/simulator/SimulatorResultCard.vue` | Tableau coûts par catégorie + total |
-| `inertia/components/marketing/simulator/SimulatorCtaCard.vue` | CTA → `router.post('/simulator/session', input)` |
+| `inertia/components/marketing/simulator/SimulatorCtaCard.vue` | CTA signup + formulaire email capture (visiteurs non-auth) |
 
 ### i18n
 

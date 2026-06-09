@@ -1,4 +1,4 @@
-# TODO — Email capture simulateur (lead magnet)
+# ✅ DONE (2026-06-09) — Email capture simulateur (lead magnet)
 
 ## Contexte
 
