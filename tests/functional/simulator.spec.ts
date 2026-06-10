@@ -1,5 +1,6 @@
 import { test } from '@japa/runner'
 import testUtils from '@adonisjs/core/services/test_utils'
+import mail from '@adonisjs/mail/services/main'
 import SimulatorLead from '#models/simulator_lead'
 
 const validPayload = {
@@ -7,7 +8,6 @@ const validPayload = {
   boatType: 'sailboat',
   lengthM: 10,
   hullWear: 'good',
-  engineWear: null,
   safetyWear: 'good',
   riggingWear: 'worn',
   totalMin: 3000,
@@ -17,9 +17,11 @@ const validPayload = {
 
 test.group('Simulator lead (functional)', (group) => {
   group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => mail.fake())
+  group.each.teardown(() => mail.restore())
 
   test('POST /simulator/lead stores lead and redirects back', async ({ client, assert }) => {
-    const response = await client.post('/simulator/lead').form(validPayload)
+    const response = await client.post('/simulator/lead').form(validPayload).redirects(0)
 
     response.assertStatus(302)
 
@@ -30,8 +32,8 @@ test.group('Simulator lead (functional)', (group) => {
   })
 
   test('POST /simulator/lead upserts on same email', async ({ client, assert }) => {
-    await client.post('/simulator/lead').form(validPayload)
-    await client.post('/simulator/lead').form({ ...validPayload, totalMin: 4000, totalMax: 6000 })
+    await client.post('/simulator/lead').form(validPayload).redirects(0)
+    await client.post('/simulator/lead').form({ ...validPayload, totalMin: 4000, totalMax: 6000 }).redirects(0)
 
     const leads = await SimulatorLead.query().where('email', 'test@example.com')
     assert.lengthOf(leads, 1)

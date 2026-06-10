@@ -28,6 +28,9 @@ test.group('PontoonsController.updatePosition (unit)', () => {
         authenticate: async () => {},
         getUserOrFail: () => user,
       },
+      bouncer: {
+        with: () => ({ authorize: async () => {} }),
+      },
       response: {
         redirect: (url?: string) => {
           if (url !== undefined) return { url }
