@@ -1,4 +1,5 @@
 import { configApp } from '@adonisjs/eslint-config'
+import prettierConfig from 'eslint-config-prettier'
 import pluginVue from 'eslint-plugin-vue'
 
 const adonisConfig = configApp()
@@ -34,4 +35,5 @@ export default [
       ],
     },
   },
+  prettierConfig,
 ]
