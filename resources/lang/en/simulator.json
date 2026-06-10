@@ -66,5 +66,6 @@
   "cta_email_placeholder": "your@email.com",
   "cta_email_button": "Send",
   "cta_email_success": "Your estimate has been sent!",
-  "cta_email_rgpd": "No spam. Unsubscribe at any time."
+  "cta_email_rgpd": "No spam. Unsubscribe at any time.",
+  "benchmark_label": "Similar boats average ({count} estimates)"
 }

@@ -2,10 +2,14 @@ import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import { PLAN_PRICES } from '../../shared/types/plan.js'
 import QuotaService from '#services/quota_service'
+import SimulatorLeadService from '#services/simulator_lead_service'
 
 @inject()
 export default class MarketingController {
-  constructor(private quotaService: QuotaService) {}
+  constructor(
+    private quotaService: QuotaService,
+    private simulatorLeadService: SimulatorLeadService
+  ) {}
 
   async home({ inertia, i18n }: HttpContext) {
     return inertia.render('marketing/home', {
@@ -43,7 +47,8 @@ export default class MarketingController {
       await user.load('organization')
       canAddBoat = user.organization ? await this.quotaService.canAddBoat(user.organization) : false
     }
-    return inertia.render('marketing/simulator', { isAuthenticated, canAddBoat })
+    const benchmarks = await this.simulatorLeadService.getBenchmarks()
+    return inertia.render('marketing/simulator', { isAuthenticated, canAddBoat, benchmarks })
   }
 
   private buildHomePageData(i18n: { t: (key: string) => string }) {

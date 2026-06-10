@@ -6,7 +6,11 @@ import { PontoonFactory } from '#database/factories/pontoon_factory'
 test.group('PontoonService (unit)', () => {
   test('updatePosition persists x and y on pontoon', async ({ assert }) => {
     const port = await PortFactory.with('organization').create()
-    const pontoon = await PontoonFactory.merge({ portId: port.id, positionX: 10, positionY: 20 }).create()
+    const pontoon = await PontoonFactory.merge({
+      portId: port.id,
+      positionX: 10,
+      positionY: 20,
+    }).create()
 
     const service = new PontoonService()
     await service.updatePosition(pontoon, { x: 100, y: 200 })

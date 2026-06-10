@@ -35,8 +35,16 @@ test.group('MVP org/users/boats/permissions (unit)', () => {
 
     const user1 = await UserFactory.merge({ organizationId: org1.id }).create()
 
-    await BoatFactory.merge({ organizationId: org1.id, name: 'Org1 Boat', registrationNumber: 'A1' }).create()
-    await BoatFactory.merge({ organizationId: org2.id, name: 'Org2 Boat', registrationNumber: 'B1' }).create()
+    await BoatFactory.merge({
+      organizationId: org1.id,
+      name: 'Org1 Boat',
+      registrationNumber: 'A1',
+    }).create()
+    await BoatFactory.merge({
+      organizationId: org2.id,
+      name: 'Org2 Boat',
+      registrationNumber: 'B1',
+    }).create()
 
     const boatService = new BoatService()
     const boats = await boatService.listForUser(user1)

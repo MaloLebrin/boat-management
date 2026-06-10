@@ -1,13 +1,18 @@
 <script setup lang="ts">
 import { useT } from '~/composables/use_t'
-import type { SimulatorBoatInput, SimulatorCostBreakdown } from '../../../../shared/types/simulator'
+import type {
+  SimulatorBoatInput,
+  SimulatorCostBreakdown,
+  SimulatorBenchmarkEntry,
+} from '../../../../shared/types/simulator'
 
 interface Props {
   breakdown: SimulatorCostBreakdown
   input: SimulatorBoatInput
+  benchmark?: SimulatorBenchmarkEntry | null
 }
 
-defineProps<Props>()
+const props = defineProps<Props>()
 
 const emit = defineEmits<{
   restart: []
@@ -71,6 +76,16 @@ function formatCurrency(amount: number): string {
       </p>
       <p class="mt-1 text-xs text-white/50">
         {{ t('simulator.result_range', { min: formatCurrency(breakdown.totalMin), max: formatCurrency(breakdown.totalMax) }) }}
+      </p>
+    </div>
+
+    <!-- Benchmark -->
+    <div v-if="props.benchmark" class="mt-4 rounded-xl border border-bone bg-cream px-4 py-3 text-center">
+      <p class="text-xs text-fg-subtle">
+        {{ t('simulator.benchmark_label', { count: String(props.benchmark.count) }) }}
+      </p>
+      <p class="mt-1 text-sm font-medium text-fg">
+        {{ formatCurrency(props.benchmark.avgMin) }} – {{ formatCurrency(props.benchmark.avgMax) }}
       </p>
     </div>
 

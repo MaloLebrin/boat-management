@@ -40,3 +40,16 @@ export interface SimulatorLeadPayload {
   totalMax: number
   locale?: string
 }
+
+export interface SimulatorBenchmarkEntry {
+  avgMin: number
+  avgMax: number
+  count: number
+}
+
+/**
+ * Map des benchmarks par type de bateau et tranche de longueur.
+ * Clé : `${boatType}:${lengthBracket}` ex: "sailboat:9-12"
+ * Brackets : '<6', '6-9', '9-12', '12-15', '15+'
+ */
+export type SimulatorBenchmarkMap = Record<string, SimulatorBenchmarkEntry>

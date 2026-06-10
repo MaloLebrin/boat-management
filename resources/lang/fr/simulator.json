@@ -66,5 +66,6 @@
   "cta_email_placeholder": "votre@email.com",
   "cta_email_button": "Envoyer",
   "cta_email_success": "Votre estimation a été envoyée !",
-  "cta_email_rgpd": "Pas de spam. Désinscription possible à tout moment."
+  "cta_email_rgpd": "Pas de spam. Désinscription possible à tout moment.",
+  "benchmark_label": "Moyenne des bateaux similaires ({count} estimations)"
 }

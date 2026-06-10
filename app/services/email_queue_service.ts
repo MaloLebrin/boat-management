@@ -399,15 +399,15 @@ export default class EmailQueueService {
       ? [
           {
             title: 'Anticipez les petites reparations',
-            desc: 'Une reparation mineure negligee peut rapidement devenir une facture importante. Inspectez regulierement votre bateau pour detecter les problemes avant qu\'ils ne s\'aggravent.',
+            desc: "Une reparation mineure negligee peut rapidement devenir une facture importante. Inspectez regulierement votre bateau pour detecter les problemes avant qu'ils ne s'aggravent.",
           },
           {
             title: 'Comparez plusieurs devis',
-            desc: 'Ne vous contentez pas du premier devis. Demandez au moins 2 ou 3 estimations pour les travaux importants afin d\'obtenir le meilleur rapport qualite-prix.',
+            desc: "Ne vous contentez pas du premier devis. Demandez au moins 2 ou 3 estimations pour les travaux importants afin d'obtenir le meilleur rapport qualite-prix.",
           },
           {
             title: 'Hivernez votre bateau correctement',
-            desc: 'Un hivernage bien fait protege votre bateau du gel, de l\'humidite et de la corrosion. Investir dans un bon hivernage, c\'est economiser sur les reparations au printemps.',
+            desc: "Un hivernage bien fait protege votre bateau du gel, de l'humidite et de la corrosion. Investir dans un bon hivernage, c'est economiser sur les reparations au printemps.",
           },
         ]
       : [
@@ -417,7 +417,7 @@ export default class EmailQueueService {
           },
           {
             title: 'Compare multiple quotes',
-            desc: 'Don\'t settle for the first quote. Request at least 2 or 3 estimates for major work to get the best value for your money.',
+            desc: "Don't settle for the first quote. Request at least 2 or 3 estimates for major work to get the best value for your money.",
           },
           {
             title: 'Winter your boat properly',

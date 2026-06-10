@@ -10,7 +10,11 @@ test.group('PontoonsController.updatePosition (unit)', () => {
   test('redirects back after updating pontoon position', async ({ assert }) => {
     const user = await UserFactory.with('organization').create()
     const port = await PortFactory.merge({ organizationId: user.organizationId! }).create()
-    const pontoon = await PontoonFactory.merge({ portId: port.id, positionX: 0, positionY: 0 }).create()
+    const pontoon = await PontoonFactory.merge({
+      portId: port.id,
+      positionX: 0,
+      positionY: 0,
+    }).create()
 
     let redirectedBack = false
     const controller = new PontoonsController(new PontoonService(), new PortService())

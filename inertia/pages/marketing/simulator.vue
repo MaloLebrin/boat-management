@@ -15,9 +15,19 @@ import SimulatorStepSafety from '~/components/marketing/simulator/SimulatorStepS
 import SimulatorStepRigging from '~/components/marketing/simulator/SimulatorStepRigging.vue'
 import SimulatorResultCard from '~/components/marketing/simulator/SimulatorResultCard.vue'
 import SimulatorCtaCard from '~/components/marketing/simulator/SimulatorCtaCard.vue'
-import type { SimulatorBoatInput, SimulatorCostBreakdown } from '../../../shared/types/simulator'
+import type {
+  SimulatorBoatInput,
+  SimulatorCostBreakdown,
+  SimulatorBenchmarkEntry,
+  SimulatorBenchmarkMap,
+} from '../../../shared/types/simulator'
 
-type SharedProps = { locale?: 'en' | 'fr'; isAuthenticated?: boolean; canAddBoat?: boolean }
+type SharedProps = {
+  locale?: 'en' | 'fr'
+  isAuthenticated?: boolean
+  canAddBoat?: boolean
+  benchmarks?: SimulatorBenchmarkMap
+}
 const page = usePage<SharedProps>()
 
 const isAuthenticated = computed(() => page.props.isAuthenticated ?? false)
@@ -34,6 +44,20 @@ const formData = ref<Partial<SimulatorBoatInput>>({
 
 const showResult = ref(false)
 const costBreakdown = ref<SimulatorCostBreakdown | null>(null)
+
+function getLengthBracket(lengthM: number): string {
+  if (lengthM < 6) return '<6'
+  if (lengthM < 9) return '6-9'
+  if (lengthM < 12) return '9-12'
+  if (lengthM < 15) return '12-15'
+  return '15+'
+}
+
+const activeBenchmark = computed<SimulatorBenchmarkEntry | null>(() => {
+  if (!formData.value.boatType || !formData.value.lengthM) return null
+  const key = `${formData.value.boatType}:${getLengthBracket(formData.value.lengthM)}`
+  return page.props.benchmarks?.[key] ?? null
+})
 
 // Determine which steps are needed based on boat type and engine
 const needsEngineStep = computed(() => {
@@ -208,6 +232,7 @@ function restart() {
         <SimulatorResultCard
           :breakdown="costBreakdown"
           :input="formData as SimulatorBoatInput"
+          :benchmark="activeBenchmark"
           @restart="restart"
         />
         <SimulatorCtaCard :input="formData as SimulatorBoatInput" :is-authenticated="isAuthenticated" :can-add-boat="canAddBoat" :breakdown="costBreakdown" />
