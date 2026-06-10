@@ -17,7 +17,9 @@ const validPayload = {
 
 test.group('Simulator lead (functional)', (group) => {
   group.each.setup(() => testUtils.db().truncate())
-  group.each.setup(() => mail.fake())
+  group.each.setup(() => {
+    mail.fake()
+  })
   group.each.teardown(() => mail.restore())
 
   test('POST /simulator/lead stores lead and redirects back', async ({ client, assert }) => {

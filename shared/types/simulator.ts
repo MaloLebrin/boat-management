@@ -32,10 +32,10 @@ export interface SimulatorLeadPayload {
   email: string
   boatType: SimulatorBoatType
   lengthM: number
-  hullWear: SimulatorWearLevel | null
-  engineWear: SimulatorWearLevel | null
-  safetyWear: SimulatorWearLevel | null
-  riggingWear: SimulatorWearLevel | null
+  hullWear?: SimulatorWearLevel | null
+  engineWear?: SimulatorWearLevel | null
+  safetyWear?: SimulatorWearLevel | null
+  riggingWear?: SimulatorWearLevel | null
   totalMin: number
   totalMax: number
   locale?: string
