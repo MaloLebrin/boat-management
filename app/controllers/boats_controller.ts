@@ -182,11 +182,16 @@ export default class BoatsController {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
-    const boat = await this.boatService.getForUserOrFail(user, Number(params.id))
-    await bouncer.with(BoatPolicy).authorize('delete', boat)
+    try {
+      const boat = await this.boatService.getForUserOrFail(user, Number(params.id))
+      await bouncer.with(BoatPolicy).authorize('delete', boat)
 
-    await this.boatService.deleteForUser(user, boat)
-    response.redirect('/boats')
+      await this.boatService.deleteForUser(user, boat)
+      response.redirect('/boats')
+    } catch (error) {
+      if (error instanceof BoatNotFoundError) return response.redirect('/boats')
+      throw error
+    }
   }
 
   async assign({ request, params, auth, response }: HttpContext) {
