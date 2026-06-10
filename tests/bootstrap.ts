@@ -52,7 +52,8 @@ export const configureSuite: Config['configureSuite'] = (suite) => {
     // HTTP tests: the server runs in-process but handlers use separate DB connections,
     // so global transactions are invisible to them — use truncate instead.
     suite.setup(() => testUtils.httpServer().start())
-  } else {
+  } else if (suite.name === 'integration') {
     suite.setup(() => testUtils.db().withGlobalTransaction())
   }
+  // unit: no DB setup
 }

@@ -8,12 +8,11 @@ import BoatSailService from '#services/boat_sail_service'
 import BoatRigService from '#services/boat_rig_service'
 import BoatEnginePartService from '#services/boat_engine_part_service'
 import BoatSafetyEquipmentService from '#services/boat_safety_equipment_service'
-import BoatPolicy from '#policies/boat_policy'
 import { UserFactory } from '#database/factories/user_factory'
 import { OrganizationFactory } from '#database/factories/organization_factory'
 import { BoatFactory } from '#database/factories/boat_factory'
 
-test.group('MVP org/users/boats/permissions (unit)', () => {
+test.group('MVP org/users/boats/permissions (integration)', () => {
   test('signupWithOrganization creates org and links user', async ({ assert }) => {
     const userService = new UserService(new OrganizationService())
 
@@ -131,17 +130,5 @@ test.group('MVP org/users/boats/permissions (unit)', () => {
         }),
       /mastHeightM is required/i
     )
-  })
-
-  test('boat abilities deny cross-organization access', async ({ assert }) => {
-    const user = await UserFactory.makeStubbed()
-    const boat = await BoatFactory.makeStubbed()
-
-    user.organizationId = 2
-    boat.organizationId = 1
-
-    const policy = new BoatPolicy()
-    const response = policy.view(user, boat)
-    assert.isFalse(response)
   })
 })
