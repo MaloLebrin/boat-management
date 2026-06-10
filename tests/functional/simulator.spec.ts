@@ -1,7 +1,7 @@
-import { test } from '@japa/runner'
+import SimulatorLead from '#models/simulator_lead'
 import testUtils from '@adonisjs/core/services/test_utils'
 import mail from '@adonisjs/mail/services/main'
-import SimulatorLead from '#models/simulator_lead'
+import { test } from '@japa/runner'
 
 const validPayload = {
   email: 'test@example.com',
@@ -33,7 +33,10 @@ test.group('Simulator lead (functional)', (group) => {
 
   test('POST /simulator/lead upserts on same email', async ({ client, assert }) => {
     await client.post('/simulator/lead').form(validPayload).redirects(0)
-    await client.post('/simulator/lead').form({ ...validPayload, totalMin: 4000, totalMax: 6000 }).redirects(0)
+    await client
+      .post('/simulator/lead')
+      .form({ ...validPayload, totalMin: 4000, totalMax: 6000 })
+      .redirects(0)
 
     const leads = await SimulatorLead.query().where('email', 'test@example.com')
     assert.lengthOf(leads, 1)
