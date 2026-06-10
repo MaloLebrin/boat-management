@@ -53,7 +53,6 @@ jobs:
           APP_KEY: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
           APP_URL: http://localhost:3333
           LOG_LEVEL: error
-          SESSION_DRIVER: cookie
           QUEUE_DRIVER: sync
           DB_HOST: localhost
           DB_PORT: 5432

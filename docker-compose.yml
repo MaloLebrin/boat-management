@@ -17,5 +17,23 @@ services:
       retries: 20
     restart: unless-stopped
 
+  postgres_test:
+    profiles: [test]
+    image: postgres:18-alpine
+    container_name: 3d-website-postgres-test
+    environment:
+      POSTGRES_DB: test
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+    ports:
+      - '5432:5432'
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U test -d test']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
 volumes:
   3d-website_pg_data:

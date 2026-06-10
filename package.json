@@ -15,6 +15,8 @@
     "queue:work": "node ace queue:work",
     "queue:work:ai": "node ace queue:work --queue=ai",
     "test": "node ace test",
+    "test:db:up": "docker compose --profile test up -d postgres_test --wait",
+    "test:db:down": "docker compose --profile test down postgres_test",
     "lint": "eslint .",
     "format": "prettier --write .",
     "typecheck": "tsc -b && vue-tsc --noEmit --project inertia/tsconfig.json",
