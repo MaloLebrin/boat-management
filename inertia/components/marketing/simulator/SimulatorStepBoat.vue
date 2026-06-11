@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useT } from '~/composables/use_t'
+import BaseOptionCard from '~/components/base/BaseOptionCard.vue'
 import type { SimulatorBoatInput, SimulatorBoatType } from '../../../../shared/types/simulator'
 
 interface Props {
@@ -96,19 +97,18 @@ const canProceed = computed(() => {
         {{ t('simulator.boat_type_label') }}
       </label>
       <div class="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
-        <button
+        <BaseOptionCard
           v-for="opt in boatTypeOptions"
           :key="opt.value"
-          type="button"
-          :class="[
-            'flex flex-col items-center gap-2 rounded-xl border-2 px-3 py-4 text-xs font-semibold transition-all duration-150',
-            modelValue.boatType === opt.value ? opt.selected : opt.unselected,
-          ]"
+          :selected="modelValue.boatType === opt.value"
+          :selected-class="opt.selected"
+          :unselected-class="opt.unselected"
+          class="flex flex-col items-center gap-2 px-3 py-4 text-xs font-semibold"
           @click="update('boatType', opt.value)"
         >
           <span class="text-2xl leading-none">{{ opt.icon }}</span>
           <span class="text-center leading-tight">{{ t(opt.labelKey) }}</span>
-        </button>
+        </BaseOptionCard>
       </div>
     </div>
 
@@ -151,16 +151,13 @@ const canProceed = computed(() => {
         {{ t('simulator.nav_category_label') }}
       </label>
       <div class="grid grid-cols-2 gap-2">
-        <button
+        <BaseOptionCard
           v-for="cat in navCategories"
           :key="cat"
-          type="button"
-          :class="[
-            'rounded-xl border-2 p-3 text-left transition-all duration-150',
-            modelValue.navigationCategory === cat
-              ? 'border-navy-500 bg-navy-50'
-              : 'border-bone bg-white hover:border-navy-200 hover:bg-navy-50',
-          ]"
+          :selected="modelValue.navigationCategory === cat"
+          selected-class="border-navy-500 bg-navy-50"
+          unselected-class="border-bone bg-white hover:border-navy-200 hover:bg-navy-50"
+          class="p-3 text-left"
           @click="update('navigationCategory', cat)"
         >
           <span
@@ -170,10 +167,10 @@ const canProceed = computed(() => {
             ]"
             >{{ cat }}</span
           >
-          <span class="mt-0.5 block text-xs leading-tight text-fg-muted">
-            {{ navCategoryDesc(cat) }}
-          </span>
-        </button>
+          <span class="mt-0.5 block text-xs leading-tight text-fg-muted">{{
+            navCategoryDesc(cat)
+          }}</span>
+        </BaseOptionCard>
       </div>
     </div>
 

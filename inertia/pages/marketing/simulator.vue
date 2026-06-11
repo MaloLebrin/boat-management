@@ -9,10 +9,7 @@ import { computed, ref } from 'vue'
 import { useT } from '~/composables/use_t'
 import { computeSimulatorCosts } from '~/composables/use_simulator_costs'
 import SimulatorStepBoat from '~/components/marketing/simulator/SimulatorStepBoat.vue'
-import SimulatorStepHull from '~/components/marketing/simulator/SimulatorStepHull.vue'
-import SimulatorStepEngine from '~/components/marketing/simulator/SimulatorStepEngine.vue'
-import SimulatorStepSafety from '~/components/marketing/simulator/SimulatorStepSafety.vue'
-import SimulatorStepRigging from '~/components/marketing/simulator/SimulatorStepRigging.vue'
+import SimulatorStepWear from '~/components/marketing/simulator/SimulatorStepWear.vue'
 import SimulatorResultCard from '~/components/marketing/simulator/SimulatorResultCard.vue'
 import SimulatorCtaCard from '~/components/marketing/simulator/SimulatorCtaCard.vue'
 import type {
@@ -87,6 +84,24 @@ const steps = computed(() => {
 })
 
 const currentStepKey = computed(() => steps.value[currentStep.value]?.key ?? 'boat')
+
+const wearStepConfig: Record<
+  string,
+  {
+    wearField: 'hullWear' | 'engineWear' | 'safetyWear' | 'riggingWear'
+    labelKey: string
+    mention?: string
+  }
+> = {
+  hull: { wearField: 'hullWear', labelKey: 'simulator.hull_wear_label' },
+  engine: { wearField: 'engineWear', labelKey: 'simulator.engine_wear_label' },
+  safety: {
+    wearField: 'safetyWear',
+    labelKey: 'simulator.safety_wear_label',
+    mention: 'simulator.safety_mention',
+  },
+  rigging: { wearField: 'riggingWear', labelKey: 'simulator.rigging_wear_label' },
+}
 
 function goNext() {
   if (currentStep.value < steps.value.length - 1) {
@@ -219,27 +234,10 @@ function restart() {
                   v-model="formData"
                   @next="goNext"
                 />
-                <SimulatorStepHull
-                  v-else-if="currentStepKey === 'hull'"
+                <SimulatorStepWear
+                  v-else-if="currentStepKey in wearStepConfig"
                   v-model="formData"
-                  @next="goNext"
-                  @back="goBack"
-                />
-                <SimulatorStepEngine
-                  v-else-if="currentStepKey === 'engine'"
-                  v-model="formData"
-                  @next="goNext"
-                  @back="goBack"
-                />
-                <SimulatorStepSafety
-                  v-else-if="currentStepKey === 'safety'"
-                  v-model="formData"
-                  @next="goNext"
-                  @back="goBack"
-                />
-                <SimulatorStepRigging
-                  v-else-if="currentStepKey === 'rigging'"
-                  v-model="formData"
+                  v-bind="wearStepConfig[currentStepKey]"
                   @next="goNext"
                   @back="goBack"
                 />

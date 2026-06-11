@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import { useT } from '~/composables/use_t'
+import BaseOptionCard from '~/components/base/BaseOptionCard.vue'
 import type { SimulatorBoatInput, SimulatorWearLevel } from '../../../../shared/types/simulator'
 import { SIMULATOR_WEAR_LEVELS } from '../../../../shared/types/simulator'
 
 interface Props {
   modelValue: Partial<SimulatorBoatInput>
+  wearField: 'hullWear' | 'engineWear' | 'safetyWear' | 'riggingWear'
+  labelKey: string
+  mention?: string
 }
 
 const props = defineProps<Props>()
@@ -17,25 +21,17 @@ const emit = defineEmits<{
 
 const { t } = useT()
 
-interface WearOption {
-  value: SimulatorWearLevel
-  labelKey: string
-  descKey: string
-  colorSelected: string
-  colorDefault: string
-}
-
-const wearOptions: WearOption[] = SIMULATOR_WEAR_LEVELS.map((level) => ({
+const wearOptions = SIMULATOR_WEAR_LEVELS.map((level) => ({
   value: level,
   labelKey: `simulator.wear_${level}`,
   descKey: `simulator.wear_${level}_desc`,
-  colorSelected: {
+  selectedClass: {
     new: 'border-mint-300 bg-mint-50 text-mint-700',
     good: 'border-navy-500 bg-navy-50 text-navy-700',
     worn: 'border-amber-600 bg-amber-50 text-amber-700',
     to_replace: 'border-coral-500 bg-coral-50 text-coral-700',
   }[level],
-  colorDefault: {
+  unselectedClass: {
     new: 'border-bone bg-white text-fg hover:border-mint-200 hover:bg-mint-50',
     good: 'border-bone bg-white text-fg hover:border-navy-100 hover:bg-navy-50',
     worn: 'border-bone bg-white text-fg hover:border-amber-100 hover:bg-amber-50',
@@ -44,7 +40,7 @@ const wearOptions: WearOption[] = SIMULATOR_WEAR_LEVELS.map((level) => ({
 }))
 
 function selectWear(value: SimulatorWearLevel) {
-  emit('update:modelValue', { ...props.modelValue, engineWear: value })
+  emit('update:modelValue', { ...props.modelValue, [props.wearField]: value })
   setTimeout(() => emit('next'), 320)
 }
 </script>
@@ -53,17 +49,17 @@ function selectWear(value: SimulatorWearLevel) {
   <div class="space-y-5">
     <div>
       <label class="mb-4 block text-base font-semibold text-fg">
-        {{ t('simulator.engine_wear_label') }}
+        {{ t(labelKey) }}
       </label>
+      <p v-if="mention" class="mb-4 text-xs text-fg-muted">{{ t(mention as string) }}</p>
       <div class="space-y-2">
-        <button
+        <BaseOptionCard
           v-for="opt in wearOptions"
           :key="opt.value"
-          type="button"
-          :class="[
-            'w-full rounded-xl border-2 px-4 py-3.5 text-left transition-all duration-150',
-            modelValue.engineWear === opt.value ? opt.colorSelected : opt.colorDefault,
-          ]"
+          :selected="modelValue[wearField] === opt.value"
+          :selected-class="opt.selectedClass"
+          :unselected-class="opt.unselectedClass"
+          class="w-full px-4 py-3.5 text-left"
           @click="selectWear(opt.value)"
         >
           <div class="flex items-center justify-between">
@@ -72,7 +68,7 @@ function selectWear(value: SimulatorWearLevel) {
               <span class="mt-0.5 block text-xs opacity-70">{{ t(opt.descKey) }}</span>
             </div>
             <svg
-              v-if="modelValue.engineWear === opt.value"
+              v-if="modelValue[wearField] === opt.value"
               class="ml-3 h-5 w-5 shrink-0"
               viewBox="0 0 20 20"
               fill="currentColor"
@@ -84,7 +80,7 @@ function selectWear(value: SimulatorWearLevel) {
               />
             </svg>
           </div>
-        </button>
+        </BaseOptionCard>
       </div>
     </div>
 
