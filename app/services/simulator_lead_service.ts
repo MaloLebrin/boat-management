@@ -35,23 +35,23 @@ export default class SimulatorLeadService {
    * Seuls les groupes avec au moins 10 simulations sont inclus.
    */
   async getBenchmarks(): Promise<SimulatorBenchmarkMap> {
-    const lengthBracketCase = db.raw(`CASE
+    const bracketSql = `CASE
       WHEN length_m < 6 THEN '<6'
       WHEN length_m < 9 THEN '6-9'
       WHEN length_m < 12 THEN '9-12'
       WHEN length_m < 15 THEN '12-15'
       ELSE '15+'
-    END`)
+    END`
 
     const rows = await db
       .from(SimulatorLead.table)
       .select('boat_type')
-      .select(db.raw(`${lengthBracketCase} as length_bracket`))
+      .select(db.raw(`${bracketSql} as length_bracket`))
       .avg('total_min as avg_min')
       .avg('total_max as avg_max')
       .count('* as cnt')
       .groupBy('boat_type')
-      .groupByRaw(`${lengthBracketCase}`)
+      .groupByRaw(bracketSql)
       .havingRaw('COUNT(*) >= 10')
 
     const map: SimulatorBenchmarkMap = {}

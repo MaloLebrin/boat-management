@@ -155,7 +155,7 @@ function restart() {
 
   <!-- Simulator -->
   <section class="bg-cream px-6 py-12 lg:py-16">
-    <div class="mx-auto max-w-lg">
+    <div class="mx-auto max-w-2xl">
       <div class="overflow-hidden rounded-2xl border border-bone bg-white shadow-lg">
         <!-- Top accent bar -->
         <div class="h-1.5 bg-gradient-to-r from-coral-500 to-coral-400" />
@@ -192,7 +192,7 @@ function restart() {
                 </div>
                 <span
                   :class="[
-                    'mt-1.5 hidden max-w-[64px] text-center text-xs font-semibold leading-tight sm:block',
+                    'mt-1.5 hidden max-w-[80px] text-center text-xs font-semibold leading-tight sm:block',
                     idx === currentStep
                       ? 'text-navy-800'
                       : idx < currentStep

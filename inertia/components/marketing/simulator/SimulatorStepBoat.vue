@@ -112,37 +112,37 @@ const canProceed = computed(() => {
       </div>
     </div>
 
-    <!-- Length -->
-    <div>
-      <label for="lengthM" class="mb-2 block text-sm font-semibold text-fg">
-        {{ t('simulator.length_label') }}
-      </label>
-      <input
-        id="lengthM"
-        type="number"
-        min="2"
-        max="30"
-        step="0.1"
-        :value="modelValue.lengthM"
-        class="w-full rounded-lg border border-sand bg-white px-4 py-3 text-fg placeholder:text-fg-subtle focus:border-navy-500 focus:outline-none focus:ring-2 focus:ring-navy-500/15"
-        @input="update('lengthM', Number(($event.target as HTMLInputElement).value))"
-      />
-    </div>
-
-    <!-- Year built -->
-    <div>
-      <label for="yearBuilt" class="mb-2 block text-sm font-semibold text-fg">
-        {{ t('simulator.year_built_label') }}
-      </label>
-      <input
-        id="yearBuilt"
-        type="number"
-        :min="1950"
-        :max="currentYear"
-        :value="modelValue.yearBuilt"
-        class="w-full rounded-lg border border-sand bg-white px-4 py-3 text-fg placeholder:text-fg-subtle focus:border-navy-500 focus:outline-none focus:ring-2 focus:ring-navy-500/15"
-        @input="update('yearBuilt', Number(($event.target as HTMLInputElement).value))"
-      />
+    <!-- Length + Year side by side -->
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label for="lengthM" class="mb-2 block text-sm font-semibold text-fg">
+          {{ t('simulator.length_label') }}
+        </label>
+        <input
+          id="lengthM"
+          type="number"
+          min="2"
+          max="30"
+          step="0.1"
+          :value="modelValue.lengthM"
+          class="w-full rounded-lg border border-sand bg-white px-4 py-3 text-fg placeholder:text-fg-subtle focus:border-navy-500 focus:outline-none focus:ring-2 focus:ring-navy-500/15"
+          @input="update('lengthM', Number(($event.target as HTMLInputElement).value))"
+        />
+      </div>
+      <div>
+        <label for="yearBuilt" class="mb-2 block text-sm font-semibold text-fg">
+          {{ t('simulator.year_built_label') }}
+        </label>
+        <input
+          id="yearBuilt"
+          type="number"
+          :min="1950"
+          :max="currentYear"
+          :value="modelValue.yearBuilt"
+          class="w-full rounded-lg border border-sand bg-white px-4 py-3 text-fg placeholder:text-fg-subtle focus:border-navy-500 focus:outline-none focus:ring-2 focus:ring-navy-500/15"
+          @input="update('yearBuilt', Number(($event.target as HTMLInputElement).value))"
+        />
+      </div>
     </div>
 
     <!-- Navigation category -->
