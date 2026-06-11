@@ -1282,6 +1282,7 @@ export default class EmailQueueService {
 </html>`
   }
 
+
   previewTemplate(name: string): string | null {
     const fakeTasks = [
       { id: 1, title: 'Vidange moteur', boatName: 'Le Téméraire', dueAt: '2026-06-15' },
