@@ -414,6 +414,14 @@ body {
   transition-delay: 300ms;
 }
 
+/* Simulator step transitions */
+.step-enter-active {
+  animation: fadeUp 200ms var(--ease-premium) both;
+}
+.step-leave-active {
+  animation: fadeIn 120ms ease reverse both;
+}
+
 /* FAQ accordion */
 details summary {
   cursor: pointer;

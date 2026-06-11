@@ -59,7 +59,6 @@ const activeBenchmark = computed<SimulatorBenchmarkEntry | null>(() => {
   return page.props.benchmarks?.[key] ?? null
 })
 
-// Determine which steps are needed based on boat type and engine
 const needsEngineStep = computed(() => {
   const bt = formData.value.boatType
   if (bt === 'motorboat' || bt === 'rib') return true
@@ -72,7 +71,6 @@ const needsRiggingStep = computed(() => {
   return bt === 'sailboat' || bt === 'catamaran'
 })
 
-// Build dynamic steps list
 const steps = computed(() => {
   const list: { key: string; labelKey: string }[] = [
     { key: 'boat', labelKey: 'simulator.step_boat' },
@@ -90,32 +88,20 @@ const steps = computed(() => {
 
 const currentStepKey = computed(() => steps.value[currentStep.value]?.key ?? 'boat')
 
-const progressPercent = computed(() => {
-  if (showResult.value) return 100
-  return Math.round(((currentStep.value + 1) / steps.value.length) * 100)
-})
-
 function goNext() {
   if (currentStep.value < steps.value.length - 1) {
     currentStep.value++
   } else {
-    // Compute result
     const input = formData.value as SimulatorBoatInput
-    if (!needsEngineStep.value) {
-      input.engineWear = null
-    }
-    if (!needsRiggingStep.value) {
-      input.riggingWear = null
-    }
+    if (!needsEngineStep.value) input.engineWear = null
+    if (!needsRiggingStep.value) input.riggingWear = null
     costBreakdown.value = computeSimulatorCosts(input)
     showResult.value = true
   }
 }
 
 function goBack() {
-  if (currentStep.value > 0) {
-    currentStep.value--
-  }
+  if (currentStep.value > 0) currentStep.value--
 }
 
 function restart() {
@@ -136,107 +122,147 @@ function restart() {
     <link rel="alternate" hreflang="fr" href="/fr/simulateur" />
   </Head>
 
-  <!-- Hero Section -->
-  <section class="bg-cream px-6 py-16 lg:px-8 lg:py-24">
+  <!-- Hero dark -->
+  <section class="bg-navy-900 px-6 py-12 lg:py-20">
     <div class="mx-auto max-w-3xl text-center">
-      <p class="text-xs font-semibold uppercase tracking-widest text-fg-subtle">
+      <span
+        class="inline-block rounded-full border border-white/10 bg-white/5 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-white/50"
+      >
         {{ t('simulator.hero_eyebrow') }}
-      </p>
+      </span>
       <h1
-        class="mt-4 font-display text-4xl leading-tight tracking-tight text-fg lg:text-5xl xl:text-6xl"
+        class="mt-5 font-display text-4xl leading-tight tracking-tight text-white lg:text-5xl xl:text-6xl"
       >
         {{ t('simulator.hero_title') }}
-        <em class="text-coral-500">{{ t('simulator.hero_title_highlight') }}</em>
+        <em class="text-coral-400">{{ t('simulator.hero_title_highlight') }}</em>
       </h1>
-      <p class="mt-4 text-lg text-fg-muted">
-        {{ t('simulator.hero_subtitle') }}
-      </p>
-    </div>
-  </section>
-
-  <!-- How it works -->
-  <section class="bg-paper px-6 py-10 lg:px-8">
-    <div class="mx-auto max-w-4xl">
-      <p class="text-center text-xs font-semibold uppercase tracking-widest text-fg-subtle">
-        {{ t('simulator.how_eyebrow') }}
-      </p>
-      <h2 class="mt-2 text-center font-display text-xl text-fg lg:text-2xl">
-        {{ t('simulator.how_title') }}
-      </h2>
-      <div class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-3">
-        <div v-for="n in [1, 2, 3]" :key="n" class="flex items-start gap-4">
-          <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-coral-100 text-sm font-bold text-coral-600">{{ n }}</span>
-          <div>
-            <p class="font-semibold text-fg text-sm">{{ t(`simulator.how_step_${n}_title`) }}</p>
-            <p class="mt-1 text-xs text-fg-muted">{{ t(`simulator.how_step_${n}_desc`) }}</p>
-          </div>
-        </div>
+      <p class="mt-4 text-base text-white/60 lg:text-lg">{{ t('simulator.hero_subtitle') }}</p>
+      <div class="mt-6 flex flex-wrap justify-center gap-2">
+        <span
+          v-for="n in [1, 2, 3]"
+          :key="n"
+          class="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3.5 py-1.5 text-xs text-white/60"
+        >
+          <span
+            class="flex h-4 w-4 items-center justify-center rounded-full bg-coral-500/30 text-[9px] font-bold text-coral-300"
+            >{{ n }}</span
+          >
+          {{ t(`simulator.how_step_${n}_title`) }}
+        </span>
       </div>
     </div>
   </section>
 
-  <!-- Simulator Section -->
-  <section class="bg-paper px-6 py-12 lg:px-8 lg:py-16">
-    <div class="mx-auto max-w-xl">
-      <!-- Progress bar -->
-      <div v-if="!showResult" class="mb-8">
-        <div class="mb-2 flex items-center justify-between text-sm text-fg-muted">
-          <span>
-            {{ t(steps[currentStep]?.labelKey || 'simulator.step_boat') }}
-          </span>
-          <span>{{ currentStep + 1 }}/{{ steps.length }}</span>
-        </div>
-        <div class="h-2 overflow-hidden rounded-full bg-bone">
+  <!-- Simulator -->
+  <section class="bg-cream px-6 py-12 lg:py-16">
+    <div class="mx-auto max-w-lg">
+      <div class="overflow-hidden rounded-2xl border border-bone bg-white shadow-lg">
+        <!-- Top accent bar -->
+        <div class="h-1.5 bg-gradient-to-r from-coral-500 to-coral-400" />
+
+        <div class="p-6 lg:p-8">
+          <!-- Named stepper -->
           <div
-            class="h-full bg-coral-500 transition-all duration-300"
-            :style="{ width: `${progressPercent}%` }"
-          />
+            v-if="!showResult"
+            class="-mx-6 -mt-6 mb-8 flex items-start rounded-t-xl bg-navy-50/60 px-6 py-5 lg:-mx-8 lg:-mt-8 lg:px-8"
+          >
+            <template v-for="(step, idx) in steps" :key="step.key">
+              <div class="flex flex-col items-center">
+                <div
+                  :class="[
+                    'flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold transition-all duration-200',
+                    idx < currentStep
+                      ? 'bg-mint-600 text-white'
+                      : idx === currentStep
+                        ? 'bg-coral-500 text-white shadow-md ring-4 ring-coral-100'
+                        : 'bg-navy-50 text-navy-400 ring-1 ring-bone',
+                  ]"
+                >
+                  <svg
+                    v-if="idx < currentStep"
+                    class="h-4 w-4"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="3"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                  <template v-else>{{ idx + 1 }}</template>
+                </div>
+                <span
+                  :class="[
+                    'mt-1.5 hidden max-w-[64px] text-center text-xs font-semibold leading-tight sm:block',
+                    idx === currentStep
+                      ? 'text-navy-800'
+                      : idx < currentStep
+                        ? 'text-mint-600'
+                        : 'text-navy-400',
+                  ]"
+                  >{{ t(step.labelKey) }}</span
+                >
+              </div>
+              <div
+                v-if="idx < steps.length - 1"
+                class="mx-2 mt-4 h-px flex-1 transition-colors duration-300"
+                :class="idx < currentStep ? 'bg-mint-300' : 'bg-bone'"
+              />
+            </template>
+          </div>
+
+          <!-- Step transitions -->
+          <Transition name="step" mode="out-in">
+            <div :key="showResult ? 'result' : currentStepKey">
+              <template v-if="!showResult">
+                <SimulatorStepBoat
+                  v-if="currentStepKey === 'boat'"
+                  v-model="formData"
+                  @next="goNext"
+                />
+                <SimulatorStepHull
+                  v-else-if="currentStepKey === 'hull'"
+                  v-model="formData"
+                  @next="goNext"
+                  @back="goBack"
+                />
+                <SimulatorStepEngine
+                  v-else-if="currentStepKey === 'engine'"
+                  v-model="formData"
+                  @next="goNext"
+                  @back="goBack"
+                />
+                <SimulatorStepSafety
+                  v-else-if="currentStepKey === 'safety'"
+                  v-model="formData"
+                  @next="goNext"
+                  @back="goBack"
+                />
+                <SimulatorStepRigging
+                  v-else-if="currentStepKey === 'rigging'"
+                  v-model="formData"
+                  @next="goNext"
+                  @back="goBack"
+                />
+              </template>
+              <SimulatorResultCard
+                v-else-if="costBreakdown"
+                :breakdown="costBreakdown"
+                :input="formData as SimulatorBoatInput"
+                :benchmark="activeBenchmark"
+                @restart="restart"
+              />
+            </div>
+          </Transition>
         </div>
       </div>
 
-      <!-- Step components -->
-      <template v-if="!showResult">
-        <SimulatorStepBoat
-          v-if="currentStepKey === 'boat'"
-          v-model="formData"
-          @next="goNext"
-        />
-        <SimulatorStepHull
-          v-else-if="currentStepKey === 'hull'"
-          v-model="formData"
-          @next="goNext"
-          @back="goBack"
-        />
-        <SimulatorStepEngine
-          v-else-if="currentStepKey === 'engine'"
-          v-model="formData"
-          @next="goNext"
-          @back="goBack"
-        />
-        <SimulatorStepSafety
-          v-else-if="currentStepKey === 'safety'"
-          v-model="formData"
-          @next="goNext"
-          @back="goBack"
-        />
-        <SimulatorStepRigging
-          v-else-if="currentStepKey === 'rigging'"
-          v-model="formData"
-          @next="goNext"
-          @back="goBack"
-        />
-      </template>
-
-      <!-- Result -->
-      <template v-else-if="costBreakdown">
-        <SimulatorResultCard
-          :breakdown="costBreakdown"
-          :input="formData as SimulatorBoatInput"
-          :benchmark="activeBenchmark"
-          @restart="restart"
-        />
-        <SimulatorCtaCard :input="formData as SimulatorBoatInput" :is-authenticated="isAuthenticated" :can-add-boat="canAddBoat" :breakdown="costBreakdown" />
-      </template>
+      <SimulatorCtaCard
+        v-if="showResult && costBreakdown"
+        :input="formData as SimulatorBoatInput"
+        :is-authenticated="isAuthenticated"
+        :can-add-boat="canAddBoat"
+        :breakdown="costBreakdown"
+      />
     </div>
   </section>
 </template>

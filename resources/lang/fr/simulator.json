@@ -67,5 +67,9 @@
   "cta_email_button": "Envoyer",
   "cta_email_success": "Votre estimation a été envoyée !",
   "cta_email_rgpd": "Pas de spam. Désinscription possible à tout moment.",
-  "benchmark_label": "Moyenne des bateaux similaires ({count} estimations)"
+  "benchmark_label": "Moyenne des bateaux similaires ({count} estimations)",
+  "wear_new_desc": "Aucune usure visible, composant récent",
+  "wear_good_desc": "Bon état général, entretien courant",
+  "wear_worn_desc": "Signes d'usure, remplacement à planifier",
+  "wear_to_replace_desc": "Intervention urgente nécessaire"
 }

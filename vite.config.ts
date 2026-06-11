@@ -1,7 +1,7 @@
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
-import adonisjs from '@adonisjs/vite/client'
 import inertia from '@adonisjs/inertia/vite'
+import adonisjs from '@adonisjs/vite/client'
+import vue from '@vitejs/plugin-vue'
+import { defineConfig } from 'vite'
 
 export default defineConfig({
   plugins: [
@@ -18,6 +18,8 @@ export default defineConfig({
   },
 
   server: {
+    port: 5555,
+    strictPort: true,
     watch: {
       ignored: ['**/storage/**', '**/tmp/**'],
     },

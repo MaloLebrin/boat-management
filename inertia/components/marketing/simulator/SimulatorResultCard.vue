@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useT } from '~/composables/use_t'
 import type {
   SimulatorBoatInput,
@@ -37,59 +38,70 @@ function formatCurrency(amount: number): string {
     maximumFractionDigits: 0,
   }).format(amount)
 }
+
+const maxCategoryCost = computed(() =>
+  Math.max(...props.breakdown.categories.map((c) => c.maxCost))
+)
 </script>
 
 <template>
-  <div class="rounded-2xl border border-bone bg-paper p-6 shadow-sm lg:p-8">
-    <div class="mb-6 text-center">
-      <h3 class="font-display text-2xl text-fg">
-        {{ t('simulator.result_title') }}
-      </h3>
-      <p class="mt-1 text-sm text-fg-muted">
-        {{ t('simulator.result_subtitle') }}
-      </p>
+  <div>
+    <div class="mb-5 text-center">
+      <h3 class="font-display text-2xl text-fg">{{ t('simulator.result_title') }}</h3>
+      <p class="mt-1 text-xs text-fg-subtle">{{ t('simulator.result_subtitle') }}</p>
     </div>
 
-    <!-- Cost breakdown table -->
-    <div class="mb-6 overflow-hidden rounded-xl border border-bone">
-      <table class="w-full">
-        <tbody class="divide-y divide-bone">
-          <tr v-for="cat in breakdown.categories" :key="cat.key" class="bg-cream">
-            <td class="px-4 py-3 text-sm font-medium text-fg">
-              {{ t(categoryLabels[cat.key] || cat.key) }}
-            </td>
-            <td class="px-4 py-3 text-right text-sm text-fg-muted">
-              {{ formatCurrency(cat.minCost) }} - {{ formatCurrency(cat.maxCost) }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <!-- Category breakdown with proportional bars -->
+    <div class="space-y-3.5">
+      <div v-for="cat in breakdown.categories" :key="cat.key">
+        <div class="mb-1.5 flex items-baseline justify-between">
+          <span class="text-sm font-medium text-fg">{{
+            t(categoryLabels[cat.key] || cat.key)
+          }}</span>
+          <span class="text-xs text-fg-muted">
+            {{ formatCurrency(cat.minCost) }} – {{ formatCurrency(cat.maxCost) }}
+          </span>
+        </div>
+        <div class="h-1.5 overflow-hidden rounded-full bg-bone">
+          <div
+            class="h-full rounded-full bg-coral-400 transition-all duration-700"
+            :style="{ width: `${Math.round((cat.maxCost / maxCategoryCost) * 100)}%` }"
+          />
+        </div>
+      </div>
     </div>
 
     <!-- Total -->
-    <div class="rounded-xl bg-navy-900 p-5 text-center">
-      <p class="text-sm font-medium text-white/70">
+    <div class="mt-6 rounded-2xl bg-navy-900 px-5 py-6 text-center">
+      <p class="text-xs font-semibold uppercase tracking-wider text-white/50">
         {{ t('simulator.result_total') }}
       </p>
-      <p class="mt-1 font-display text-3xl text-white">
-        {{ formatCurrency(breakdown.totalMin) }} - {{ formatCurrency(breakdown.totalMax) }}
+      <p class="mt-2 font-display text-4xl text-white">
+        {{ formatCurrency(breakdown.totalMin) }}
       </p>
-      <p class="mt-1 text-xs text-white/50">
-        {{ t('simulator.result_range', { min: formatCurrency(breakdown.totalMin), max: formatCurrency(breakdown.totalMax) }) }}
+      <p class="mt-1 text-sm text-white/60">
+        {{
+          t('simulator.result_range', {
+            min: formatCurrency(breakdown.totalMin),
+            max: formatCurrency(breakdown.totalMax),
+          })
+        }}
       </p>
     </div>
 
     <!-- Benchmark -->
-    <div v-if="props.benchmark" class="mt-4 rounded-xl border border-bone bg-cream px-4 py-3 text-center">
+    <div
+      v-if="props.benchmark"
+      class="mt-3 rounded-xl border border-bone bg-cream px-4 py-3 text-center"
+    >
       <p class="text-xs text-fg-subtle">
         {{ t('simulator.benchmark_label', { count: String(props.benchmark.count) }) }}
       </p>
-      <p class="mt-1 text-sm font-medium text-fg">
+      <p class="mt-1 text-sm font-semibold text-fg">
         {{ formatCurrency(props.benchmark.avgMin) }} – {{ formatCurrency(props.benchmark.avgMax) }}
       </p>
     </div>
 
-    <!-- Restart button — lien texte discret pour ne pas concurrencer le CTA signup -->
     <button
       type="button"
       class="mt-4 w-full text-sm text-fg-subtle underline underline-offset-2 transition-colors hover:text-fg"
