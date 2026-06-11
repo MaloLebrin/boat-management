@@ -1053,6 +1053,7 @@ export class UserSchema extends BaseModel {
     'email',
     'fullName',
     'id',
+    'lastLoginAt',
     'organizationId',
     'password',
     'updatedAt',
@@ -1066,6 +1067,8 @@ export class UserSchema extends BaseModel {
   declare fullName: string | null
   @column({ isPrimary: true })
   declare id: number
+  @column.dateTime()
+  declare lastLoginAt: DateTime | null
   @column()
   declare organizationId: number | null
   @column({ serializeAs: null })
