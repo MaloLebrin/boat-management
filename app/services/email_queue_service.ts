@@ -1281,4 +1281,92 @@ export default class EmailQueueService {
 </body>
 </html>`
   }
+
+  previewTemplate(name: string): string | null {
+    const fakeTasks = [
+      { id: 1, title: 'Vidange moteur', boatName: 'Le Téméraire', dueAt: '2026-06-15' },
+      { id: 2, title: 'Contrôle extinction', boatName: 'Albatros II', dueAt: null },
+    ]
+    const fakeBoats = [
+      { id: 1, name: 'Le Téméraire' },
+      { id: 2, name: 'Albatros II' },
+    ]
+    const fakePorts = [
+      { id: 1, name: 'Port de La Rochelle' },
+      { id: 2, name: 'Port Vieux-Boucau' },
+    ]
+    const fakeBreakdown = {
+      categories: [
+        { key: 'hull', minCost: 900, maxCost: 1300 },
+        { key: 'engine', minCost: 700, maxCost: 900 },
+        { key: 'safety', minCost: 250, maxCost: 350 },
+        { key: 'electrical', minCost: 200, maxCost: 300 },
+        { key: 'mooring', minCost: 150, maxCost: 220 },
+      ],
+      totalMin: 2200,
+      totalMax: 3070,
+    }
+
+    switch (name) {
+      case 'welcome':
+        return this.#buildWelcomeHtml('Jean Dupont')
+      case 'password-reset':
+        return this.#buildPasswordResetHtml('https://app.fleetai.com/reset?token=preview')
+      case 'invitation':
+        return this.#buildInvitationHtml(
+          'Marie Martin',
+          'Yacht Club Bordeaux',
+          'https://app.fleetai.com/invite?token=preview'
+        )
+      case 'simulator-report-fr':
+        return this.#buildSimulatorReportHtml(fakeBreakdown, true)
+      case 'simulator-report-en':
+        return this.#buildSimulatorReportHtml(fakeBreakdown, false)
+      case 'nurturing-d3-fr':
+        return this.#buildNurturingD3Html(true)
+      case 'nurturing-d3-en':
+        return this.#buildNurturingD3Html(false)
+      case 'nurturing-d7-fr':
+        return this.#buildNurturingD7Html('2 200 €', '3 070 €', true)
+      case 'nurturing-d7-en':
+        return this.#buildNurturingD7Html('€2,200', '€3,070', false)
+      case 'reminder-inactive-account':
+        return this.#buildReminderInactiveAccountHtml('Jean Dupont', 'Yacht Club Bordeaux')
+      case 'reminder-incomplete-boats':
+        return this.#buildReminderIncompleteBoatsHtml('Jean Dupont', fakeBoats)
+      case 'reminder-incomplete-ports':
+        return this.#buildReminderIncompletePortsHtml('Jean Dupont', fakePorts)
+      case 'reminder-inactive-login':
+        return this.#buildReminderInactiveLoginHtml('Jean Dupont')
+      case 'reminder-overdue-tasks':
+        return this.#buildReminderOverdueTasksHtml('Jean Dupont', fakeTasks)
+      case 'reminder-engine-tasks':
+        return this.#buildReminderEngineTasksHtml('Jean Dupont', fakeTasks)
+      case 'reminder-boat-check-tasks':
+        return this.#buildReminderBoatCheckTasksHtml('Jean Dupont', fakeTasks)
+      default:
+        return null
+    }
+  }
+
+  listTemplates(): { name: string; label: string }[] {
+    return [
+      { name: 'welcome', label: 'Bienvenue' },
+      { name: 'password-reset', label: 'Réinitialisation mot de passe' },
+      { name: 'invitation', label: 'Invitation organisation' },
+      { name: 'simulator-report-fr', label: 'Rapport simulateur (FR)' },
+      { name: 'simulator-report-en', label: 'Rapport simulateur (EN)' },
+      { name: 'nurturing-d3-fr', label: 'Nurturing J+3 (FR)' },
+      { name: 'nurturing-d3-en', label: 'Nurturing J+3 (EN)' },
+      { name: 'nurturing-d7-fr', label: 'Nurturing J+7 (FR)' },
+      { name: 'nurturing-d7-en', label: 'Nurturing J+7 (EN)' },
+      { name: 'reminder-inactive-account', label: 'Relance — compte sans bateau' },
+      { name: 'reminder-incomplete-boats', label: 'Relance — bateaux incomplets' },
+      { name: 'reminder-incomplete-ports', label: 'Relance — ports incomplets' },
+      { name: 'reminder-inactive-login', label: 'Relance — inactivité connexion' },
+      { name: 'reminder-overdue-tasks', label: 'Relance — tâches en retard' },
+      { name: 'reminder-engine-tasks', label: 'Relance — échéances moteur' },
+      { name: 'reminder-boat-check-tasks', label: 'Relance — vérifications bateau' },
+    ]
+  }
 }

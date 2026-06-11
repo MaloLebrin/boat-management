@@ -7,18 +7,6 @@ import type { InferInput, SimpleError } from '@vinejs/vine/types'
 export type ParamValue = string | number | bigint | boolean
 
 export interface Registry {
-  'webhooks.stripe': {
-    methods: ["POST"]
-    pattern: '/webhooks/stripe'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/billing_controller').default['webhook']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/billing_controller').default['webhook']>>>
-    }
-  }
   'dashboard': {
     methods: ["GET","HEAD"]
     pattern: '/dashboard'
@@ -1289,6 +1277,42 @@ export interface Registry {
       query: ExtractQuery<InferInput<(typeof import('#validators/organization_member').acceptInvitationValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/organization_invitations_controller').default['accept']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/organization_invitations_controller').default['accept']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'webhooks.stripe': {
+    methods: ["POST"]
+    pattern: '/webhooks/stripe'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/billing_controller').default['webhook']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/billing_controller').default['webhook']>>>
+    }
+  }
+  'mail_previews.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/dev/mails'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/dev/mail_previews_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dev/mail_previews_controller').default['index']>>>
+    }
+  }
+  'mail_previews.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/dev/mails/:name'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { name: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/dev/mail_previews_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dev/mail_previews_controller').default['show']>>>
     }
   }
   'new_account.create': {

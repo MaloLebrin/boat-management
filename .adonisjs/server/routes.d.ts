@@ -4,7 +4,6 @@ type ParamValue = string | number | bigint | boolean
 
 export type ScannedRoutes = {
   ALL: {
-    'webhooks.stripe': { paramsTuple?: []; params?: {} }
     'dashboard': { paramsTuple?: []; params?: {} }
     'design_system': { paramsTuple?: []; params?: {} }
     'sitemap': { paramsTuple?: []; params?: {} }
@@ -111,6 +110,9 @@ export type ScannedRoutes = {
     'organization.invitations.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'invitations.show': { paramsTuple?: []; params?: {} }
     'invitations.accept': { paramsTuple?: []; params?: {} }
+    'webhooks.stripe': { paramsTuple?: []; params?: {} }
+    'mail_previews.index': { paramsTuple?: []; params?: {} }
+    'mail_previews.show': { paramsTuple: [ParamValue]; params: {'name': ParamValue} }
     'new_account.create': { paramsTuple?: []; params?: {} }
     'new_account.store': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }
@@ -118,43 +120,6 @@ export type ScannedRoutes = {
     'password.forgot': { paramsTuple?: []; params?: {} }
     'password_reset.store': { paramsTuple?: []; params?: {} }
     'password.reset': { paramsTuple?: []; params?: {} }
-    'password_reset.update': { paramsTuple?: []; params?: {} }
-    'session.destroy': { paramsTuple?: []; params?: {} }
-    'ai.chat': { paramsTuple?: []; params?: {} }
-    'ai.fleetAnalysis': { paramsTuple?: []; params?: {} }
-    'ai.boatSuggestions': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-  }
-  POST: {
-    'webhooks.stripe': { paramsTuple?: []; params?: {} }
-    'boats.store': { paramsTuple?: []; params?: {} }
-    'boat_equipment.store_engine': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
-    'boat_media.store_engine_document': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
-    'boat_engine_parts.store': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
-    'boat_engine_parts.store_document': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue,'partId': ParamValue} }
-    'boat_equipment.store_sail': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
-    'boat_maintenances.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
-    'boats.maintenanceTasks.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
-    'boat_media.store_photo': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
-    'boat_media.store_document': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
-    'boat_safety_equipment.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
-    'boats.maintenanceSheets.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
-    'ports.store': { paramsTuple?: []; params?: {} }
-    'ports.pontoons.store': { paramsTuple: [ParamValue]; params: {'portId': ParamValue} }
-    'ports.mouillages.store': { paramsTuple: [ParamValue]; params: {'portId': ParamValue} }
-    'ports.pontoons.spots.store': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'pontoonId': ParamValue} }
-    'ports.mouillages.spots.store': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'mouillageId': ParamValue} }
-    'simulator.session': { paramsTuple?: []; params?: {} }
-    'simulator.create_boat': { paramsTuple?: []; params?: {} }
-    'simulator.lead': { paramsTuple?: []; params?: {} }
-    'locale.set': { paramsTuple?: []; params?: {} }
-    'settings.billing.checkout': { paramsTuple?: []; params?: {} }
-    'settings.billing.portal': { paramsTuple?: []; params?: {} }
-    'organization.members.store': { paramsTuple?: []; params?: {} }
-    'organization.invitations.store': { paramsTuple?: []; params?: {} }
-    'invitations.accept': { paramsTuple?: []; params?: {} }
-    'new_account.store': { paramsTuple?: []; params?: {} }
-    'session.store': { paramsTuple?: []; params?: {} }
-    'password_reset.store': { paramsTuple?: []; params?: {} }
     'password_reset.update': { paramsTuple?: []; params?: {} }
     'session.destroy': { paramsTuple?: []; params?: {} }
     'ai.chat': { paramsTuple?: []; params?: {} }
@@ -203,6 +168,8 @@ export type ScannedRoutes = {
     'maintenance.history': { paramsTuple?: []; params?: {} }
     'organization.members.index': { paramsTuple?: []; params?: {} }
     'invitations.show': { paramsTuple?: []; params?: {} }
+    'mail_previews.index': { paramsTuple?: []; params?: {} }
+    'mail_previews.show': { paramsTuple: [ParamValue]; params: {'name': ParamValue} }
     'new_account.create': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }
     'password.forgot': { paramsTuple?: []; params?: {} }
@@ -250,10 +217,49 @@ export type ScannedRoutes = {
     'maintenance.history': { paramsTuple?: []; params?: {} }
     'organization.members.index': { paramsTuple?: []; params?: {} }
     'invitations.show': { paramsTuple?: []; params?: {} }
+    'mail_previews.index': { paramsTuple?: []; params?: {} }
+    'mail_previews.show': { paramsTuple: [ParamValue]; params: {'name': ParamValue} }
     'new_account.create': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }
     'password.forgot': { paramsTuple?: []; params?: {} }
     'password.reset': { paramsTuple?: []; params?: {} }
+  }
+  POST: {
+    'boats.store': { paramsTuple?: []; params?: {} }
+    'boat_equipment.store_engine': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
+    'boat_media.store_engine_document': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
+    'boat_engine_parts.store': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
+    'boat_engine_parts.store_document': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue,'partId': ParamValue} }
+    'boat_equipment.store_sail': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
+    'boat_maintenances.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
+    'boats.maintenanceTasks.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
+    'boat_media.store_photo': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
+    'boat_media.store_document': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
+    'boat_safety_equipment.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
+    'boats.maintenanceSheets.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
+    'ports.store': { paramsTuple?: []; params?: {} }
+    'ports.pontoons.store': { paramsTuple: [ParamValue]; params: {'portId': ParamValue} }
+    'ports.mouillages.store': { paramsTuple: [ParamValue]; params: {'portId': ParamValue} }
+    'ports.pontoons.spots.store': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'pontoonId': ParamValue} }
+    'ports.mouillages.spots.store': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'mouillageId': ParamValue} }
+    'simulator.session': { paramsTuple?: []; params?: {} }
+    'simulator.create_boat': { paramsTuple?: []; params?: {} }
+    'simulator.lead': { paramsTuple?: []; params?: {} }
+    'locale.set': { paramsTuple?: []; params?: {} }
+    'settings.billing.checkout': { paramsTuple?: []; params?: {} }
+    'settings.billing.portal': { paramsTuple?: []; params?: {} }
+    'organization.members.store': { paramsTuple?: []; params?: {} }
+    'organization.invitations.store': { paramsTuple?: []; params?: {} }
+    'invitations.accept': { paramsTuple?: []; params?: {} }
+    'webhooks.stripe': { paramsTuple?: []; params?: {} }
+    'new_account.store': { paramsTuple?: []; params?: {} }
+    'session.store': { paramsTuple?: []; params?: {} }
+    'password_reset.store': { paramsTuple?: []; params?: {} }
+    'password_reset.update': { paramsTuple?: []; params?: {} }
+    'session.destroy': { paramsTuple?: []; params?: {} }
+    'ai.chat': { paramsTuple?: []; params?: {} }
+    'ai.fleetAnalysis': { paramsTuple?: []; params?: {} }
+    'ai.boatSuggestions': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   PUT: {
     'boats.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
