@@ -1,6 +1,7 @@
 import SendEmail, { type SendEmailPayload } from '#jobs/send_email'
 import type SimulatorLead from '#models/simulator_lead'
 import QueueDedupService from '#services/queue_dedup_service'
+import type { ReminderBoatItem, ReminderPortItem } from '#shared/types/reminder'
 import type {
   SimulatorBoatInput,
   SimulatorBoatType,
@@ -530,6 +531,348 @@ export default class EmailQueueService {
     <tr>
       <td style="padding:20px 30px;text-align:center;background-color:#f4f4f7;color:#888888;font-size:12px;">
         <p style="margin:0 0 10px;">${gdprText}</p>
+        <p style="margin:0;">FleetAi - Boat Fleet Management</p>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`
+  }
+
+  async sendReminderInactiveAccount(params: { to: string; name: string | null; orgName: string }) {
+    const displayName = params.name ?? params.to
+    const subject = 'Ajoutez votre premier bateau — FleetAi / Add your first boat — FleetAi'
+    const text = `Bonjour ${displayName},\n\nVotre organisation ${params.orgName} n'a pas encore de bateau enregistre. Ajoutez votre flotte pour profiter de toutes les fonctionnalites.\n\nHello ${displayName},\n\nYour organisation ${params.orgName} has no boats yet. Add your fleet to unlock all features.\n\n${env.get('APP_URL')}/boats`
+
+    const html = this.#buildReminderInactiveAccountHtml(displayName, params.orgName)
+    const correlationId = `reminder-inactive-account:${params.to}:${params.orgName}`
+
+    const partialPayload: Omit<SendEmailPayload, 'dedupKey'> = {
+      to: params.to,
+      subject,
+      text,
+      html,
+      correlationId,
+    }
+
+    const key = SendEmail.dedupKey(partialPayload)
+    const payload: SendEmailPayload = { ...partialPayload, dedupKey: key }
+
+    await this.dedup.enqueueUnique({
+      key,
+      jobName: SendEmail.name,
+      queue: 'emails',
+      payload,
+      dispatch: async (p) => {
+        await SendEmail.dispatch(p)
+      },
+    })
+  }
+
+  async sendReminderIncompleteBoats(params: {
+    to: string
+    name: string | null
+    boats: ReminderBoatItem[]
+  }) {
+    const displayName = params.name ?? params.to
+    const subject =
+      'Des bateaux incomplets dans votre flotte — FleetAi / Incomplete boats in your fleet — FleetAi'
+    const boatNames = params.boats.map((b) => b.name).join(', ')
+    const text = `Bonjour ${displayName},\n\nLes bateaux suivants manquent d'informations importantes : ${boatNames}.\n\nHello ${displayName},\n\nThe following boats are missing key information: ${boatNames}.\n\n${env.get('APP_URL')}/boats`
+
+    const html = this.#buildReminderIncompleteBoatsHtml(displayName, params.boats)
+    const correlationId = `reminder-incomplete-boats:${params.to}:${params.boats.map((b) => b.id).join('-')}`
+
+    const partialPayload: Omit<SendEmailPayload, 'dedupKey'> = {
+      to: params.to,
+      subject,
+      text,
+      html,
+      correlationId,
+    }
+
+    const key = SendEmail.dedupKey(partialPayload)
+    const payload: SendEmailPayload = { ...partialPayload, dedupKey: key }
+
+    await this.dedup.enqueueUnique({
+      key,
+      jobName: SendEmail.name,
+      queue: 'emails',
+      payload,
+      dispatch: async (p) => {
+        await SendEmail.dispatch(p)
+      },
+    })
+  }
+
+  async sendReminderIncompletePorts(params: {
+    to: string
+    name: string | null
+    ports: ReminderPortItem[]
+  }) {
+    const displayName = params.name ?? params.to
+    const subject =
+      'Des ports incomplets dans votre compte — FleetAi / Incomplete ports in your account — FleetAi'
+    const portNames = params.ports.map((p) => p.name).join(', ')
+    const text = `Bonjour ${displayName},\n\nLes ports suivants manquent de ville ou de pays : ${portNames}.\n\nHello ${displayName},\n\nThe following ports are missing city or country: ${portNames}.\n\n${env.get('APP_URL')}/ports`
+
+    const html = this.#buildReminderIncompletePortsHtml(displayName, params.ports)
+    const correlationId = `reminder-incomplete-ports:${params.to}:${params.ports.map((p) => p.id).join('-')}`
+
+    const partialPayload: Omit<SendEmailPayload, 'dedupKey'> = {
+      to: params.to,
+      subject,
+      text,
+      html,
+      correlationId,
+    }
+
+    const key = SendEmail.dedupKey(partialPayload)
+    const payload: SendEmailPayload = { ...partialPayload, dedupKey: key }
+
+    await this.dedup.enqueueUnique({
+      key,
+      jobName: SendEmail.name,
+      queue: 'emails',
+      payload,
+      dispatch: async (p) => {
+        await SendEmail.dispatch(p)
+      },
+    })
+  }
+
+  async sendReminderInactiveLogin(params: {
+    to: string
+    name: string | null
+    lastLoginAt: string | null
+  }) {
+    const displayName = params.name ?? params.to
+    const subject = 'Votre flotte vous attend — FleetAi / Your fleet is waiting — FleetAi'
+    const text = `Bonjour ${displayName},\n\nVous ne vous etes pas connecte depuis plus de 30 jours. Revenez gerer votre flotte sur FleetAi.\n\nHello ${displayName},\n\nYou haven't logged in for over 30 days. Come back to manage your fleet on FleetAi.\n\n${env.get('APP_URL')}/dashboard`
+
+    const html = this.#buildReminderInactiveLoginHtml(displayName)
+    const correlationId = `reminder-inactive-login:${params.to}`
+
+    const partialPayload: Omit<SendEmailPayload, 'dedupKey'> = {
+      to: params.to,
+      subject,
+      text,
+      html,
+      correlationId,
+    }
+
+    const key = SendEmail.dedupKey(partialPayload)
+    const payload: SendEmailPayload = { ...partialPayload, dedupKey: key }
+
+    await this.dedup.enqueueUnique({
+      key,
+      jobName: SendEmail.name,
+      queue: 'emails',
+      payload,
+      dispatch: async (p) => {
+        await SendEmail.dispatch(p)
+      },
+    })
+  }
+
+  #buildReminderInactiveAccountHtml(displayName: string, orgName: string): string {
+    const appUrl = env.get('APP_URL')
+    return `<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ajoutez votre premier bateau</title>
+</head>
+<body style="margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;background-color:#f4f4f7;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:600px;margin:0 auto;background-color:#ffffff;">
+    <tr>
+      <td style="padding:40px 30px;text-align:center;background-color:#1e3a5f;">
+        <h1 style="margin:0;color:#ffffff;font-size:28px;">FleetAi</h1>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:40px 30px;">
+        <h2 style="margin:0 0 20px;color:#333333;font-size:22px;">Bonjour ${displayName},</h2>
+        <p style="margin:0 0 15px;color:#555555;font-size:16px;line-height:1.5;">
+          Votre organisation <strong>${orgName}</strong> n'a pas encore de bateau enregistre. Ajoutez votre flotte pour profiter de la gestion de maintenance, des plannings et des alertes.
+        </p>
+        <p style="margin:0 0 25px;color:#555555;font-size:16px;line-height:1.5;">
+          Your organisation <strong>${orgName}</strong> has no boats yet. Add your fleet to unlock maintenance tracking, scheduling, and alerts.
+        </p>
+        <table role="presentation" cellspacing="0" cellpadding="0" style="margin:0 auto;">
+          <tr>
+            <td style="border-radius:6px;background-color:#1e3a5f;">
+              <a href="${appUrl}/boats" style="display:inline-block;padding:14px 30px;color:#ffffff;text-decoration:none;font-size:16px;font-weight:bold;">
+                Ajouter un bateau / Add a boat
+              </a>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:20px 30px;text-align:center;background-color:#f4f4f7;color:#888888;font-size:12px;">
+        <p style="margin:0;">FleetAi - Boat Fleet Management</p>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`
+  }
+
+  #buildReminderIncompleteBoatsHtml(displayName: string, boats: ReminderBoatItem[]): string {
+    const appUrl = env.get('APP_URL')
+    const boatRows = boats
+      .map(
+        (b) => `<tr>
+          <td style="padding:10px 15px;border-bottom:1px solid #eeeeee;color:#333333;font-size:14px;">${b.name}</td>
+          <td style="padding:10px 15px;border-bottom:1px solid #eeeeee;text-align:right;">
+            <a href="${appUrl}/boats/${b.id}" style="color:#1e3a5f;font-size:14px;">Completer / Complete</a>
+          </td>
+        </tr>`
+      )
+      .join('')
+
+    return `<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bateaux incomplets</title>
+</head>
+<body style="margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;background-color:#f4f4f7;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:600px;margin:0 auto;background-color:#ffffff;">
+    <tr>
+      <td style="padding:40px 30px;text-align:center;background-color:#1e3a5f;">
+        <h1 style="margin:0;color:#ffffff;font-size:28px;">FleetAi</h1>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:40px 30px;">
+        <h2 style="margin:0 0 20px;color:#333333;font-size:22px;">Bonjour ${displayName},</h2>
+        <p style="margin:0 0 20px;color:#555555;font-size:16px;line-height:1.5;">
+          Les bateaux suivants manquent d'informations cles (type, dimensions, annee...). Completez-les pour profiter des estimations de couts et des alertes maintenance.
+        </p>
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:0 0 25px;border:1px solid #eeeeee;border-radius:6px;">
+          <tbody>${boatRows}</tbody>
+        </table>
+        <table role="presentation" cellspacing="0" cellpadding="0" style="margin:0 auto;">
+          <tr>
+            <td style="border-radius:6px;background-color:#1e3a5f;">
+              <a href="${appUrl}/boats" style="display:inline-block;padding:14px 30px;color:#ffffff;text-decoration:none;font-size:16px;font-weight:bold;">
+                Voir ma flotte / View my fleet
+              </a>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:20px 30px;text-align:center;background-color:#f4f4f7;color:#888888;font-size:12px;">
+        <p style="margin:0;">FleetAi - Boat Fleet Management</p>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`
+  }
+
+  #buildReminderIncompletePortsHtml(displayName: string, ports: ReminderPortItem[]): string {
+    const appUrl = env.get('APP_URL')
+    const portRows = ports
+      .map(
+        (p) => `<tr>
+          <td style="padding:10px 15px;border-bottom:1px solid #eeeeee;color:#333333;font-size:14px;">${p.name}</td>
+          <td style="padding:10px 15px;border-bottom:1px solid #eeeeee;text-align:right;">
+            <a href="${appUrl}/ports/${p.id}" style="color:#1e3a5f;font-size:14px;">Completer / Complete</a>
+          </td>
+        </tr>`
+      )
+      .join('')
+
+    return `<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ports incomplets</title>
+</head>
+<body style="margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;background-color:#f4f4f7;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:600px;margin:0 auto;background-color:#ffffff;">
+    <tr>
+      <td style="padding:40px 30px;text-align:center;background-color:#1e3a5f;">
+        <h1 style="margin:0;color:#ffffff;font-size:28px;">FleetAi</h1>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:40px 30px;">
+        <h2 style="margin:0 0 20px;color:#333333;font-size:22px;">Bonjour ${displayName},</h2>
+        <p style="margin:0 0 20px;color:#555555;font-size:16px;line-height:1.5;">
+          Les ports suivants sont incomplets (ville ou pays manquants). Completez-les pour faciliter la gestion de vos escales.
+        </p>
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:0 0 25px;border:1px solid #eeeeee;border-radius:6px;">
+          <tbody>${portRows}</tbody>
+        </table>
+        <table role="presentation" cellspacing="0" cellpadding="0" style="margin:0 auto;">
+          <tr>
+            <td style="border-radius:6px;background-color:#1e3a5f;">
+              <a href="${appUrl}/ports" style="display:inline-block;padding:14px 30px;color:#ffffff;text-decoration:none;font-size:16px;font-weight:bold;">
+                Voir mes ports / View my ports
+              </a>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:20px 30px;text-align:center;background-color:#f4f4f7;color:#888888;font-size:12px;">
+        <p style="margin:0;">FleetAi - Boat Fleet Management</p>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`
+  }
+
+  #buildReminderInactiveLoginHtml(displayName: string): string {
+    const appUrl = env.get('APP_URL')
+    return `<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Votre flotte vous attend</title>
+</head>
+<body style="margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;background-color:#f4f4f7;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:600px;margin:0 auto;background-color:#ffffff;">
+    <tr>
+      <td style="padding:40px 30px;text-align:center;background-color:#1e3a5f;">
+        <h1 style="margin:0;color:#ffffff;font-size:28px;">FleetAi</h1>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:40px 30px;">
+        <h2 style="margin:0 0 20px;color:#333333;font-size:22px;">Bonjour ${displayName},</h2>
+        <p style="margin:0 0 15px;color:#555555;font-size:16px;line-height:1.5;">
+          Vous ne vous etes pas connecte depuis plus de 30 jours. Des maintenances sont peut-etre a planifier ou en retard sur votre flotte.
+        </p>
+        <p style="margin:0 0 25px;color:#555555;font-size:16px;line-height:1.5;">
+          You haven't logged in for over 30 days. Some maintenance tasks on your fleet may need attention.
+        </p>
+        <table role="presentation" cellspacing="0" cellpadding="0" style="margin:0 auto;">
+          <tr>
+            <td style="border-radius:6px;background-color:#1e3a5f;">
+              <a href="${appUrl}/dashboard" style="display:inline-block;padding:14px 30px;color:#ffffff;text-decoration:none;font-size:16px;font-weight:bold;">
+                Revenir sur FleetAi / Back to FleetAi
+              </a>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:20px 30px;text-align:center;background-color:#f4f4f7;color:#888888;font-size:12px;">
         <p style="margin:0;">FleetAi - Boat Fleet Management</p>
       </td>
     </tr>

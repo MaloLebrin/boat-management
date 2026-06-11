@@ -9,7 +9,10 @@ import { belongsTo, hasMany } from '@adonisjs/lucid/orm'
 import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
 import type { OrgRole } from '#shared/types/organization'
 
-export default class User extends compose(UserSchema, withAuthFinder(hash)) {
+export default class User extends compose(
+  UserSchema,
+  withAuthFinder(() => hash.use())
+) {
   static rememberMeTokens = DbRememberMeTokensProvider.forModel(User)
 
   @belongsTo(() => Organization)
