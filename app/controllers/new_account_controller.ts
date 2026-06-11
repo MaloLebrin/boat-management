@@ -5,6 +5,7 @@ import BoatHullService from '#services/boat_hull_service'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import type { SimulatorBoatInput } from '#shared/types/simulator'
+import { DateTime } from 'luxon'
 
 @inject()
 export default class NewAccountController {
@@ -24,6 +25,8 @@ export default class NewAccountController {
     const { user } = await this.userService.signupWithOrganization(payload)
 
     await auth.use('web').login(user)
+    user.lastLoginAt = DateTime.now()
+    await user.save()
 
     await this.emailQueueService.sendWelcome({ to: user.email, name: user.fullName })
 

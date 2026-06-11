@@ -3,6 +3,23 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-06-11 — Infrastructure emails de relance (PR 1/3)
+
+**Nouvelle fonctionnalité — Rétention utilisateur**
+
+Pose les fondations pour les emails de relance automatiques envoyés quotidiennement.
+
+**Backend :**
+
+- Migration : `last_login_at` ajouté sur la table `users` (nullable)
+- Tracking : `lastLoginAt` mis à jour à chaque connexion (`SessionController.store`) et création de compte (`NewAccountController.store`)
+- `app/services/reminder_email_service.ts` : service orchestrateur avec 7 méthodes (squelettes) — `sendInactiveAccountReminders`, `sendIncompleteBoatReminders`, `sendIncompletePortReminders`, `sendInactiveLoginReminders`, `sendOverdueTaskReminders`, `sendEngineTaskReminders`, `sendBoatCheckReminders`
+- `app/jobs/send_reminder_emails.ts` : job queue `emails` qui exécute toutes les relances en séquence
+- `start/scheduler.ts` : planification cron quotidienne à 08h00 (Europe/Paris), id `daily-reminder-emails`
+- `shared/types/reminder.ts` : types partagés (`ReminderKind`, `ReminderTaskItem`, `ReminderBoatItem`, `ReminderPortItem`)
+
+---
+
 ## 2026-06-09 — Email capture simulateur (lead magnet)
 
 **Nouvelle fonctionnalité — Acquisition**
@@ -10,12 +27,14 @@ Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 Capture l'email des visiteurs qui ont vu leurs résultats de simulation mais ne sont pas prêts à créer un compte.
 
 **Backend :**
+
 - Table `simulator_leads` (UUID, email unique, données du simulateur, fourchette de coût, locale)
 - Model `SimulatorLead`, service `SimulatorLeadService` (upsert sur email), controller `SimulatorLeadController`
 - Validator VineJS `simulatorLeadValidator`
 - Route : `POST /simulator/lead` → `simulator.lead` (publique, sans auth)
 
 **Frontend :**
+
 - `SimulatorCtaCard.vue` : second CTA "Recevoir ce rapport par email" affiché sous le bouton principal (visiteurs non authentifiés uniquement), séparé par un divider "ou", avec message de confirmation inline après soumission
 - Prop `breakdown` ajoutée à `SimulatorCtaCard` pour passer `totalMin`/`totalMax`
 
@@ -32,6 +51,7 @@ Capture l'email des visiteurs qui ont vu leurs résultats de simulation mais ne 
 Page de contenu SEO riche ciblant les requêtes organiques sur le coût d'entretien annuel d'un bateau. Alimente un tunnel vers le simulateur public.
 
 **Routes :**
+
 - `GET /fr/cout-entretien-bateau` → `marketing.fr.guide`
 - `GET /en/boat-maintenance-cost` → `marketing.en.guide`
 
@@ -42,6 +62,7 @@ Page de contenu SEO riche ciblant les requêtes organiques sur le coût d'entret
 **Navigation :** Lien "Guide entretien" / "Maintenance guide" ajouté dans le header public et le footer.
 
 **Fichiers créés :**
+
 - `inertia/pages/marketing/guide.vue` — page guide (174 lignes)
 - `inertia/components/marketing/guide/GuideCostTable.vue` — tableau coûts responsive
 - `inertia/components/marketing/guide/GuideFaqSection.vue` — accordion FAQ
@@ -55,6 +76,7 @@ Page de contenu SEO riche ciblant les requêtes organiques sur le coût d'entret
 Permet à un utilisateur connecté de relancer le simulateur de coût d'entretien sur un bateau déjà dans sa flotte, avec les données de base pré-remplies.
 
 **Routes :**
+
 - `GET /boats/:id/simulator` → `boats.simulator` (auth requis)
 
 **Comportement :** Type, longueur, année, catégorie CE pré-remplis depuis la fiche bateau. Seules les étapes d'usure (coque, moteur, sécurité, gréement) sont présentées. Calcul client-side sans persistance. Résultat avec bouton retour fiche bateau.
@@ -62,6 +84,7 @@ Permet à un utilisateur connecté de relancer le simulateur de coût d'entretie
 **Accès :** Bouton "Estimer les coûts d'entretien" dans l'onglet Aperçu de la fiche bateau.
 
 **Fichiers créés :**
+
 - `app/controllers/boat_simulator_controller.ts` — contrôleur avec bouncer `BoatPolicy.view`
 - `inertia/pages/boats/simulator.vue` — page simulateur flotte (layout app)
 
@@ -76,17 +99,20 @@ Permet à un utilisateur connecté de relancer le simulateur de coût d'entretie
 Page publique (sans authentification) permettant à tout propriétaire de bateau d'estimer son budget annuel d'entretien en 2 minutes. Basé sur la réglementation Division 240 – Annexe 240-A.2.
 
 **Tunnel de conversion :**
+
 1. L'utilisateur remplit les données de son bateau (type, longueur, âge, catégorie CE) et l'état de ses équipements (coque, moteur, sécurité, gréement)
 2. Un coût estimé par catégorie (fourchette min/max) est calculé côté frontend sans appel serveur
 3. Un CTA incite l'utilisateur à créer un compte — les données du bateau sont stockées en session
 4. Après inscription, le bateau est automatiquement créé et l'utilisateur est redirigé vers la fiche de son bateau
 
 **Routes :**
+
 - `GET /fr/simulateur-cout-entretien` → `marketing.fr.simulator`
 - `GET /en/maintenance-cost-simulator` → `marketing.en.simulator`
 - `POST /simulator/session` → stockage en session + redirect signup
 
 **Fichiers créés :**
+
 - `shared/types/simulator.ts` — types `SimulatorBoatInput`, `SimulatorCostBreakdown`
 - `app/validators/simulator.ts` — validation VineJS des données du simulateur
 - `app/controllers/simulator_controller.ts` — `saveSession()`
@@ -95,6 +121,7 @@ Page publique (sans authentification) permettant à tout propriétaire de bateau
 - `inertia/pages/marketing/simulator.vue` — page multi-étapes
 
 **Fichiers modifiés :**
+
 - `app/controllers/marketing_controller.ts` — méthode `simulator()`
 - `app/services/boat_hull_service.ts` — méthode `createFromSimulator(orgId, data)`
 - `app/controllers/new_account_controller.ts` — auto-création du bateau depuis la session post-inscription
