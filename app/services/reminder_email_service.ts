@@ -1,10 +1,11 @@
 import Boat from '#models/boat'
+import BoatMaintenanceTask from '#models/boat_maintenance_task'
 import Organization from '#models/organization'
 import OrganizationMembership from '#models/organization_membership'
 import Port from '#models/port'
 import User from '#models/user'
 import EmailQueueService from '#services/email_queue_service'
-import type { ReminderBoatItem, ReminderPortItem } from '#shared/types/reminder'
+import type { ReminderBoatItem, ReminderPortItem, ReminderTaskItem } from '#shared/types/reminder'
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
 import { DateTime } from 'luxon'
@@ -160,14 +161,152 @@ export default class ReminderEmailService {
   }
 
   async sendOverdueTaskReminders(): Promise<void> {
-    logger.info('ReminderEmailService.sendOverdueTaskReminders: not yet implemented')
+    const today = DateTime.now().startOf('day')
+
+    const tasks = await BoatMaintenanceTask.query()
+      .where('status', 'open')
+      .whereNotNull('dueAt')
+      .where('dueAt', '<', today.toISO())
+      .select('id', 'title', 'due_at', 'boat_id')
+      .preload('boat', (q) => q.select('id', 'name', 'organization_id'))
+
+    if (tasks.length === 0) {
+      logger.info('ReminderEmailService.sendOverdueTaskReminders: no targets')
+      return
+    }
+
+    const tasksByOrg = new Map<number, ReminderTaskItem[]>()
+    for (const task of tasks) {
+      const orgId = task.boat.organizationId
+      const list = tasksByOrg.get(orgId) ?? []
+      list.push({
+        id: task.id,
+        title: task.title,
+        boatName: task.boat.name,
+        dueAt: task.dueAt?.toISO() ?? null,
+      })
+      tasksByOrg.set(orgId, list)
+    }
+
+    let sent = 0
+    for (const [orgId, orgTasks] of tasksByOrg) {
+      const admins = await OrganizationMembership.query()
+        .where('organizationId', orgId)
+        .where('role', 'admin')
+        .preload('user')
+
+      for (const membership of admins) {
+        await this.emailQueueService.sendReminderOverdueTasks({
+          to: membership.user.email,
+          name: membership.user.fullName,
+          tasks: orgTasks,
+        })
+        sent++
+      }
+    }
+
+    logger.info({ sent }, 'ReminderEmailService.sendOverdueTaskReminders: done')
   }
 
   async sendEngineTaskReminders(): Promise<void> {
-    logger.info('ReminderEmailService.sendEngineTaskReminders: not yet implemented')
+    const now = DateTime.now()
+    const in30Days = now.plus({ days: 30 })
+
+    const tasks = await BoatMaintenanceTask.query()
+      .where('status', 'open')
+      .where('subject', 'engine')
+      .whereNotNull('dueAt')
+      .where('dueAt', '>=', now.startOf('day').toISO())
+      .where('dueAt', '<=', in30Days.endOf('day').toISO())
+      .select('id', 'title', 'due_at', 'boat_id')
+      .preload('boat', (q) => q.select('id', 'name', 'organization_id'))
+
+    if (tasks.length === 0) {
+      logger.info('ReminderEmailService.sendEngineTaskReminders: no targets')
+      return
+    }
+
+    const tasksByOrg = new Map<number, ReminderTaskItem[]>()
+    for (const task of tasks) {
+      const orgId = task.boat.organizationId
+      const list = tasksByOrg.get(orgId) ?? []
+      list.push({
+        id: task.id,
+        title: task.title,
+        boatName: task.boat.name,
+        dueAt: task.dueAt?.toISO() ?? null,
+      })
+      tasksByOrg.set(orgId, list)
+    }
+
+    let sent = 0
+    for (const [orgId, orgTasks] of tasksByOrg) {
+      const admins = await OrganizationMembership.query()
+        .where('organizationId', orgId)
+        .where('role', 'admin')
+        .preload('user')
+
+      for (const membership of admins) {
+        await this.emailQueueService.sendReminderEngineTasks({
+          to: membership.user.email,
+          name: membership.user.fullName,
+          tasks: orgTasks,
+        })
+        sent++
+      }
+    }
+
+    logger.info({ sent }, 'ReminderEmailService.sendEngineTaskReminders: done')
   }
 
   async sendBoatCheckReminders(): Promise<void> {
-    logger.info('ReminderEmailService.sendBoatCheckReminders: not yet implemented')
+    const now = DateTime.now()
+    const in30Days = now.plus({ days: 30 })
+
+    const tasks = await BoatMaintenanceTask.query()
+      .where('status', 'open')
+      .where('subject', 'boat')
+      .whereNotNull('dueAt')
+      .where('dueAt', '>=', now.startOf('day').toISO())
+      .where('dueAt', '<=', in30Days.endOf('day').toISO())
+      .select('id', 'title', 'due_at', 'boat_id')
+      .preload('boat', (q) => q.select('id', 'name', 'organization_id'))
+
+    if (tasks.length === 0) {
+      logger.info('ReminderEmailService.sendBoatCheckReminders: no targets')
+      return
+    }
+
+    const tasksByOrg = new Map<number, ReminderTaskItem[]>()
+    for (const task of tasks) {
+      const orgId = task.boat.organizationId
+      const list = tasksByOrg.get(orgId) ?? []
+      list.push({
+        id: task.id,
+        title: task.title,
+        boatName: task.boat.name,
+        dueAt: task.dueAt?.toISO() ?? null,
+      })
+      tasksByOrg.set(orgId, list)
+    }
+
+    let sent = 0
+    for (const [orgId, orgTasks] of tasksByOrg) {
+      const admins = await OrganizationMembership.query()
+        .where('organizationId', orgId)
+        .where('role', 'admin')
+        .preload('user')
+
+      for (const membership of admins) {
+        await this.emailQueueService.sendReminderBoatCheckTasks({
+          to: membership.user.email,
+          name: membership.user.fullName,
+          tasks: orgTasks,
+        })
+        sent++
+      }
+    }
+
+    logger.info({ sent }, 'ReminderEmailService.sendBoatCheckReminders: done')
   }
 }
