@@ -16,6 +16,18 @@ vi.mock('@inertiajs/vue3', () => {
       props: {
         user: { initials: 'ML', fullName: 'Marie L.' },
         flash: {},
+        appT: {
+          'nav.dashboard': 'Dashboard',
+          'nav.myBoats': 'My boats',
+          'nav.planning': 'Planning',
+          'nav.history': 'History',
+          'nav.settings': 'Settings',
+          'nav.logout': 'Logout',
+          'nav.sections.fleet': 'FLEET',
+          'nav.sections.maintenance': 'MAINTENANCE',
+          'nav.sections.preferences': 'PREFERENCES',
+          'ports.nav': 'Ports',
+        },
       },
     }),
   }
@@ -27,7 +39,7 @@ test('shows sidebar links for authenticated user', () => {
   })
 
   expect(w.text()).toContain('Dashboard')
-  expect(w.text()).toContain('Boats')
-  expect(w.text()).toContain('Design system')
+  expect(w.text()).toContain('My boats')
+  expect(w.text()).toContain('Planning')
   expect(w.text()).toContain('Logout')
 })
