@@ -9,6 +9,7 @@ const props = withDefaults(
     disabled?: boolean
     type?: 'button' | 'submit' | 'reset'
     route?: string
+    params?: Record<string, string | number>
     href?: string
     target?: string
     rel?: string
@@ -80,6 +81,7 @@ function onClick(e: MouseEvent) {
     :type="componentTag === 'button' ? type : undefined"
     :disabled="componentTag === 'button' ? disabled : undefined"
     :route="isInertiaLink ? route : undefined"
+    :params="isInertiaLink ? params : undefined"
     :method="isInertiaLink ? method : undefined"
     :preserve-scroll="isInertiaLink ? preserveScroll : undefined"
     :preserve-state="isInertiaLink ? preserveState : undefined"
