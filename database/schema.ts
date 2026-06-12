@@ -947,6 +947,7 @@ export class SimulatorLeadSchema extends BaseModel {
     'safetyWear',
     'totalMax',
     'totalMin',
+    'winteringZone',
   ] as const
   $columns = SimulatorLeadSchema.$columns
   @column()
@@ -973,6 +974,25 @@ export class SimulatorLeadSchema extends BaseModel {
   declare totalMax: number
   @column()
   declare totalMin: number
+  @column()
+  declare winteringZone: string | null
+}
+
+export class SimulatorShareSchema extends BaseModel {
+  static $columns = ['breakdown', 'createdAt', 'id', 'input', 'locale', 'token'] as const
+  $columns = SimulatorShareSchema.$columns
+  @column()
+  declare breakdown: any
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare input: any
+  @column()
+  declare locale: string
+  @column()
+  declare token: string
 }
 
 export class SpotSchema extends BaseModel {

@@ -90,6 +90,9 @@ export type ScannedRoutes = {
     'simulator.session': { paramsTuple?: []; params?: {} }
     'simulator.create_boat': { paramsTuple?: []; params?: {} }
     'simulator.lead': { paramsTuple?: []; params?: {} }
+    'simulator.share.store': { paramsTuple?: []; params?: {} }
+    'simulator.share.show.fr': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'simulator.share.show.en': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'planning.index': { paramsTuple?: []; params?: {} }
     'locale.set': { paramsTuple?: []; params?: {} }
     'settings.index': { paramsTuple?: []; params?: {} }
@@ -159,6 +162,8 @@ export type ScannedRoutes = {
     'marketing.en.about': { paramsTuple?: []; params?: {} }
     'marketing.fr.about': { paramsTuple?: []; params?: {} }
     'marketing.contact': { paramsTuple?: []; params?: {} }
+    'simulator.share.show.fr': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'simulator.share.show.en': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'planning.index': { paramsTuple?: []; params?: {} }
     'settings.index': { paramsTuple?: []; params?: {} }
     'settings.me': { paramsTuple?: []; params?: {} }
@@ -208,6 +213,8 @@ export type ScannedRoutes = {
     'marketing.en.about': { paramsTuple?: []; params?: {} }
     'marketing.fr.about': { paramsTuple?: []; params?: {} }
     'marketing.contact': { paramsTuple?: []; params?: {} }
+    'simulator.share.show.fr': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'simulator.share.show.en': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'planning.index': { paramsTuple?: []; params?: {} }
     'settings.index': { paramsTuple?: []; params?: {} }
     'settings.me': { paramsTuple?: []; params?: {} }
@@ -245,6 +252,7 @@ export type ScannedRoutes = {
     'simulator.session': { paramsTuple?: []; params?: {} }
     'simulator.create_boat': { paramsTuple?: []; params?: {} }
     'simulator.lead': { paramsTuple?: []; params?: {} }
+    'simulator.share.store': { paramsTuple?: []; params?: {} }
     'locale.set': { paramsTuple?: []; params?: {} }
     'settings.billing.checkout': { paramsTuple?: []; params?: {} }
     'settings.billing.portal': { paramsTuple?: []; params?: {} }

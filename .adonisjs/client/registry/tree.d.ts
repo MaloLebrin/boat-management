@@ -129,6 +129,13 @@ export interface ApiDefinition {
     session: typeof routes['simulator.session']
     createBoat: typeof routes['simulator.create_boat']
     lead: typeof routes['simulator.lead']
+    share: {
+      store: typeof routes['simulator.share.store']
+      show: {
+        fr: typeof routes['simulator.share.show.fr']
+        en: typeof routes['simulator.share.show.en']
+      }
+    }
   }
   planning: {
     index: typeof routes['planning.index']

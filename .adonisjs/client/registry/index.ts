@@ -522,6 +522,24 @@ const routes = {
     tokens: [{"old":"/simulator/lead","type":0,"val":"simulator","end":""},{"old":"/simulator/lead","type":0,"val":"lead","end":""}],
     types: placeholder as Registry['simulator.lead']['types'],
   },
+  'simulator.share.store': {
+    methods: ["POST"],
+    pattern: '/simulator/share',
+    tokens: [{"old":"/simulator/share","type":0,"val":"simulator","end":""},{"old":"/simulator/share","type":0,"val":"share","end":""}],
+    types: placeholder as Registry['simulator.share.store']['types'],
+  },
+  'simulator.share.show.fr': {
+    methods: ["GET","HEAD"],
+    pattern: '/simulateur/r/:token',
+    tokens: [{"old":"/simulateur/r/:token","type":0,"val":"simulateur","end":""},{"old":"/simulateur/r/:token","type":0,"val":"r","end":""},{"old":"/simulateur/r/:token","type":1,"val":"token","end":""}],
+    types: placeholder as Registry['simulator.share.show.fr']['types'],
+  },
+  'simulator.share.show.en': {
+    methods: ["GET","HEAD"],
+    pattern: '/simulator/r/:token',
+    tokens: [{"old":"/simulator/r/:token","type":0,"val":"simulator","end":""},{"old":"/simulator/r/:token","type":0,"val":"r","end":""},{"old":"/simulator/r/:token","type":1,"val":"token","end":""}],
+    types: placeholder as Registry['simulator.share.show.en']['types'],
+  },
   'planning.index': {
     methods: ["GET","HEAD"],
     pattern: '/planning',

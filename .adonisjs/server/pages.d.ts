@@ -47,5 +47,6 @@ declare module '@adonisjs/inertia/types' {
     'settings/me': ExtractProps<(typeof import('../../inertia/pages/settings/me.vue'))['default']>
     'settings/members': ExtractProps<(typeof import('../../inertia/pages/settings/members.vue'))['default']>
     'settings/org': ExtractProps<(typeof import('../../inertia/pages/settings/org.vue'))['default']>
+    'marketing/simulator_share': ExtractProps<(typeof import('../../inertia/pages/marketing/simulator_share.vue'))['default']>
   }
 }

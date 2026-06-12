@@ -1039,6 +1039,42 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/simulator_lead_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'simulator.share.store': {
+    methods: ["POST"]
+    pattern: '/simulator/share'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/simulator_share').simulatorShareValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/simulator_share').simulatorShareValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/simulator_share_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/simulator_share_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'simulator.share.show.fr': {
+    methods: ["GET","HEAD"]
+    pattern: '/simulateur/r/:token'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { token: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/simulator_share_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/simulator_share_controller').default['show']>>>
+    }
+  }
+  'simulator.share.show.en': {
+    methods: ["GET","HEAD"]
+    pattern: '/simulator/r/:token'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { token: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/simulator_share_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/simulator_share_controller').default['show']>>>
+    }
+  }
   'planning.index': {
     methods: ["GET","HEAD"]
     pattern: '/planning'
