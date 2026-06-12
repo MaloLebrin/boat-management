@@ -16,6 +16,9 @@ export const controllers = {
   BoatSafetyEquipment: () => import('#controllers/boat_safety_equipment_controller'),
   BoatSimulator: () => import('#controllers/boat_simulator_controller'),
   Boats: () => import('#controllers/boats_controller'),
+  dev: {
+    MailPreviews: () => import('#controllers/dev/mail_previews_controller'),
+  },
   Home: () => import('#controllers/home_controller'),
   MaintenanceHistory: () => import('#controllers/maintenance_history_controller'),
   Marketing: () => import('#controllers/marketing_controller'),
@@ -32,7 +35,4 @@ export const controllers = {
   Simulator: () => import('#controllers/simulator_controller'),
   SimulatorLead: () => import('#controllers/simulator_lead_controller'),
   Spots: () => import('#controllers/spots_controller'),
-  dev: {
-    MailPreviews: () => import('#controllers/dev/mail_previews_controller'),
-  },
 }
