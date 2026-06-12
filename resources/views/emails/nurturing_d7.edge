@@ -1,0 +1,41 @@
+@layout('emails/_layout')
+
+  @section('content')
+    <h2 style="margin:0 0 20px;color:#333333;font-size:22px;">
+      @if(isFr)
+        Votre estimation d'entretien bateau — toujours disponible
+      @else
+        Your boat maintenance estimate — still available
+      @end
+    </h2>
+    <p style="margin:0 0 25px;color:#555555;font-size:16px;line-height:1.6;">
+      @if(isFr)
+        Votre bateau vous coutera entre <strong>{{ totalMin }}</strong>et <strong>{{ totalMax }}</strong>par an en entretien. FleetAi vous aide a planifier et anticiper ces depenses.
+      @else
+        Your boat will cost between <strong>{{ totalMin }}</strong>and <strong>{{ totalMax }}</strong>per year in maintenance. FleetAi helps you plan and anticipate these expenses.
+      @end
+    </p>
+    <table role="presentation" cellspacing="0" cellpadding="0" style="margin:0 auto;">
+      <tr>
+        <td style="border-radius:6px;background-color:#1e3a5f;">
+          <a
+            href="{{ appUrl }}/signup"
+            style="display:inline-block;padding:14px 30px;color:#ffffff;text-decoration:none;font-size:16px;font-weight:bold;"
+          >
+            @if(isFr)
+              Creer mon compte gratuitement
+            @else
+              Create my free account
+            @end
+          </a>
+        </td>
+      </tr>
+    </table>
+    <p style="margin:25px 0 0;text-align:center;color:#888888;font-size:12px;">
+      @if(isFr)
+        Vos donnees ne seront pas partagees.
+      @else
+        Your data will not be shared.
+      @end
+    </p>
+  @end

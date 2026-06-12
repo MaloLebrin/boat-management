@@ -1,0 +1,25 @@
+@layout('emails/_layout')
+
+  @section('content')
+    <h2 style="margin:0 0 20px;color:#333333;font-size:22px;">
+      Bonjour {{ displayName }},
+    </h2>
+    <p style="margin:0 0 15px;color:#555555;font-size:16px;line-height:1.5;">
+      Vous ne vous etes pas connecte depuis plus de 30 jours. Des maintenances sont peut-etre a planifier ou en retard sur votre flotte.
+    </p>
+    <p style="margin:0 0 25px;color:#555555;font-size:16px;line-height:1.5;">
+      You haven't logged in for over 30 days. Some maintenance tasks on your fleet may need attention.
+    </p>
+    <table role="presentation" cellspacing="0" cellpadding="0" style="margin:0 auto;">
+      <tr>
+        <td style="border-radius:6px;background-color:#1e3a5f;">
+          <a
+            href="{{ appUrl }}/dashboard"
+            style="display:inline-block;padding:14px 30px;color:#ffffff;text-decoration:none;font-size:16px;font-weight:bold;"
+          >
+            Revenir sur FleetAi / Back to FleetAi
+      </a>
+        </td>
+      </tr>
+    </table>
+  @end

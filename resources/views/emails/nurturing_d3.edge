@@ -1,0 +1,49 @@
+@layout('emails/_layout')
+
+  @section('content')
+    <h2 style="margin:0 0 25px;color:#333333;font-size:22px;">
+      @if(isFr)
+        3 conseils pour reduire les couts d'entretien de votre bateau
+      @else
+        3 tips to reduce your boat maintenance costs
+      @end
+    </h2>
+    <table
+      role="presentation"
+      width="100%"
+      cellspacing="0"
+      cellpadding="0"
+      style="margin:0 0 25px;border:1px solid #eeeeee;border-radius:6px;"
+    >
+      <tbody>
+        @each((tip, index) in tips)
+          <tr>
+            <td style="padding:15px 20px;border-bottom:1px solid #eeeeee;">
+              <p style="margin:0 0 5px;color:#1e3a5f;font-size:16px;font-weight:bold;">
+                {{ index + 1 }}. {{ tip.title }}
+              </p>
+              <p style="margin:0;color:#555555;font-size:14px;line-height:1.5;">
+                {{ tip.body }}
+              </p>
+            </td>
+          </tr>
+        @end
+      </tbody>
+    </table>
+    <table role="presentation" cellspacing="0" cellpadding="0" style="margin:0 auto;">
+      <tr>
+        <td style="border-radius:6px;background-color:#1e3a5f;">
+          <a
+            href="{{ appUrl }}/signup"
+            style="display:inline-block;padding:14px 30px;color:#ffffff;text-decoration:none;font-size:16px;font-weight:bold;"
+          >
+            @if(isFr)
+              Suivre mes depenses sur FleetAi
+            @else
+              Track my expenses on FleetAi
+            @end
+          </a>
+        </td>
+      </tr>
+    </table>
+  @end

@@ -1,17 +1,5 @@
+import edge from 'edge.js'
 import SendEmail, { type SendEmailPayload } from '#jobs/send_email'
-import { buildInvitationHtml } from '#mails/templates/invitation'
-import { buildNurturingD3Html } from '#mails/templates/nurturing_d3'
-import { buildNurturingD7Html } from '#mails/templates/nurturing_d7'
-import { buildPasswordResetHtml } from '#mails/templates/password_reset'
-import { buildReminderBoatCheckTasksHtml } from '#mails/templates/reminder_boat_check_tasks'
-import { buildReminderEngineTasksHtml } from '#mails/templates/reminder_engine_tasks'
-import { buildReminderInactiveAccountHtml } from '#mails/templates/reminder_inactive_account'
-import { buildReminderInactiveLoginHtml } from '#mails/templates/reminder_inactive_login'
-import { buildReminderIncompleteBoatsHtml } from '#mails/templates/reminder_incomplete_boats'
-import { buildReminderIncompletePortsHtml } from '#mails/templates/reminder_incomplete_ports'
-import { buildReminderOverdueTasksHtml } from '#mails/templates/reminder_overdue_tasks'
-import { buildSimulatorReportHtml } from '#mails/templates/simulator_report'
-import { buildWelcomeHtml } from '#mails/templates/welcome'
 import type SimulatorLead from '#models/simulator_lead'
 import QueueDedupService from '#services/queue_dedup_service'
 import type { ReminderBoatItem, ReminderPortItem, ReminderTaskItem } from '#shared/types/reminder'
@@ -33,7 +21,10 @@ export default class EmailQueueService {
     const subject = 'Bienvenue sur FleetAi / Welcome to FleetAi'
     const text = `Bonjour ${displayName},\n\nBienvenue sur FleetAi, votre plateforme de gestion de flotte.\n\nHello ${displayName},\n\nWelcome to FleetAi, your fleet management platform.\n\nAccess your dashboard: /dashboard`
 
-    const html = buildWelcomeHtml(displayName)
+    const html = await edge.render('emails/welcome', {
+      displayName,
+      appUrl: env.get('APP_URL'),
+    })
 
     const partialPayload: Omit<SendEmailPayload, 'dedupKey'> = {
       to: params.to,
@@ -61,7 +52,9 @@ export default class EmailQueueService {
     const subject = 'Reset your password / Reinitialisation de mot de passe'
     const text = `Click here to reset your password: ${params.resetUrl}\n\nCliquez ici pour reinitialiser votre mot de passe : ${params.resetUrl}`
 
-    const html = buildPasswordResetHtml(params.resetUrl)
+    const html = await edge.render('emails/password_reset', {
+      resetUrl: params.resetUrl,
+    })
 
     const partialPayload: Omit<SendEmailPayload, 'dedupKey'> = {
       to: params.to,
@@ -95,7 +88,11 @@ export default class EmailQueueService {
     const inviterDisplay = params.inviterName ?? 'A team member'
     const text = `${inviterDisplay} has invited you to join ${params.orgName} on FleetAi.\n\nClick here to accept: ${params.acceptUrl}\n\n${inviterDisplay} vous a invite a rejoindre ${params.orgName} sur FleetAi.\n\nCliquez ici pour accepter : ${params.acceptUrl}`
 
-    const html = buildInvitationHtml(params.inviterName, params.orgName, params.acceptUrl)
+    const html = await edge.render('emails/invitation', {
+      inviterName: params.inviterName,
+      orgName: params.orgName,
+      acceptUrl: params.acceptUrl,
+    })
 
     const partialPayload: Omit<SendEmailPayload, 'dedupKey'> = {
       to: params.to,
@@ -145,7 +142,35 @@ export default class EmailQueueService {
       ? `Votre rapport d'estimation de couts\n\nTotal: ${breakdown.totalMin} - ${breakdown.totalMax} EUR\n\nCreez votre compte: ${env.get('APP_URL')}/signup`
       : `Your cost estimation report\n\nTotal: ${breakdown.totalMin} - ${breakdown.totalMax} EUR\n\nCreate your account: ${env.get('APP_URL')}/signup`
 
-    const html = buildSimulatorReportHtml(breakdown, isFr)
+    const categoryLabels: Record<string, string> = {
+      hull: isFr ? 'Coque' : 'Hull',
+      engine: isFr ? 'Moteur' : 'Engine',
+      safety: isFr ? 'Securite' : 'Safety',
+      electrical: isFr ? 'Electrique' : 'Electrical',
+      mooring: isFr ? 'Mouillage' : 'Mooring',
+      rigging: isFr ? 'Greement' : 'Rigging',
+    }
+
+    const formatter = new Intl.NumberFormat(isFr ? 'fr-FR' : 'en-US', {
+      style: 'currency',
+      currency: 'EUR',
+      minimumFractionDigits: 0,
+    })
+
+    const categories = breakdown.categories.map((cat) => ({
+      key: cat.key,
+      label: categoryLabels[cat.key] ?? cat.key,
+      minFormatted: formatter.format(cat.minCost),
+      maxFormatted: formatter.format(cat.maxCost),
+    }))
+
+    const html = await edge.render('emails/simulator_report', {
+      isFr,
+      categories,
+      totalMinFormatted: formatter.format(breakdown.totalMin),
+      totalMaxFormatted: formatter.format(breakdown.totalMax),
+      appUrl: env.get('APP_URL'),
+    })
 
     const partialPayload: Omit<SendEmailPayload, 'dedupKey'> = {
       to: lead.email,
@@ -171,6 +196,7 @@ export default class EmailQueueService {
 
   async sendSimulatorNurturing(lead: SimulatorLead) {
     const isFr = lead.locale === 'fr'
+    const appUrl = env.get('APP_URL')
 
     // Email J+3 — 3 tips to reduce maintenance costs
     const subjectD3 = isFr
@@ -178,10 +204,44 @@ export default class EmailQueueService {
       : '3 tips to reduce your boat maintenance costs'
 
     const textD3 = isFr
-      ? `3 conseils pour reduire vos couts d'entretien bateau\n\nCreez votre compte: ${env.get('APP_URL')}/signup`
-      : `3 tips to reduce your boat maintenance costs\n\nCreate your account: ${env.get('APP_URL')}/signup`
+      ? `3 conseils pour reduire vos couts d'entretien bateau\n\nCreez votre compte: ${appUrl}/signup`
+      : `3 tips to reduce your boat maintenance costs\n\nCreate your account: ${appUrl}/signup`
 
-    const htmlD3 = buildNurturingD3Html(isFr)
+    const tips = isFr
+      ? [
+          {
+            title: 'Anticipez les petites reparations',
+            body: "Une reparation mineure negligee peut rapidement devenir une facture importante. Inspectez regulierement votre bateau pour detecter les problemes avant qu'ils ne s'aggravent.",
+          },
+          {
+            title: 'Comparez plusieurs devis',
+            body: "Ne vous contentez pas du premier devis. Demandez au moins 2 ou 3 estimations pour les travaux importants afin d'obtenir le meilleur rapport qualite-prix.",
+          },
+          {
+            title: 'Hivernez votre bateau correctement',
+            body: "Un hivernage bien fait protege votre bateau du gel, de l'humidite et de la corrosion. Investir dans un bon hivernage, c'est economiser sur les reparations au printemps.",
+          },
+        ]
+      : [
+          {
+            title: 'Anticipate small repairs',
+            body: 'A neglected minor repair can quickly become a major expense. Regularly inspect your boat to catch problems before they worsen.',
+          },
+          {
+            title: 'Compare multiple quotes',
+            body: "Don't settle for the first quote. Request at least 2 or 3 estimates for major work to get the best value for your money.",
+          },
+          {
+            title: 'Winter your boat properly',
+            body: 'Proper winterization protects your boat from frost, humidity, and corrosion. Investing in good winterization saves on spring repairs.',
+          },
+        ]
+
+    const htmlD3 = await edge.render('emails/nurturing_d3', {
+      isFr,
+      tips,
+      appUrl,
+    })
 
     const partialPayloadD3: Omit<SendEmailPayload, 'dedupKey'> = {
       to: lead.email,
@@ -219,10 +279,15 @@ export default class EmailQueueService {
       : 'Your boat maintenance estimate — still available'
 
     const textD7 = isFr
-      ? `Votre bateau vous coutera entre ${totalMinFormatted} et ${totalMaxFormatted} par an en entretien. FleetAi vous aide a planifier et anticiper ces depenses.\n\nCreez votre compte: ${env.get('APP_URL')}/signup`
-      : `Your boat will cost between ${totalMinFormatted} and ${totalMaxFormatted} per year in maintenance. FleetAi helps you plan and anticipate these expenses.\n\nCreate your account: ${env.get('APP_URL')}/signup`
+      ? `Votre bateau vous coutera entre ${totalMinFormatted} et ${totalMaxFormatted} par an en entretien. FleetAi vous aide a planifier et anticiper ces depenses.\n\nCreez votre compte: ${appUrl}/signup`
+      : `Your boat will cost between ${totalMinFormatted} and ${totalMaxFormatted} per year in maintenance. FleetAi helps you plan and anticipate these expenses.\n\nCreate your account: ${appUrl}/signup`
 
-    const htmlD7 = buildNurturingD7Html(totalMinFormatted, totalMaxFormatted, isFr)
+    const htmlD7 = await edge.render('emails/nurturing_d7', {
+      isFr,
+      totalMin: totalMinFormatted,
+      totalMax: totalMaxFormatted,
+      appUrl,
+    })
 
     const partialPayloadD7: Omit<SendEmailPayload, 'dedupKey'> = {
       to: lead.email,
@@ -251,7 +316,12 @@ export default class EmailQueueService {
     const subject = 'Ajoutez votre premier bateau — FleetAi / Add your first boat — FleetAi'
     const text = `Bonjour ${displayName},\n\nVotre organisation ${params.orgName} n'a pas encore de bateau enregistre. Ajoutez votre flotte pour profiter de toutes les fonctionnalites.\n\nHello ${displayName},\n\nYour organisation ${params.orgName} has no boats yet. Add your fleet to unlock all features.\n\n${env.get('APP_URL')}/boats`
 
-    const html = buildReminderInactiveAccountHtml(displayName, params.orgName)
+    const html = await edge.render('emails/reminder_inactive_account', {
+      displayName,
+      orgName: params.orgName,
+      appUrl: env.get('APP_URL'),
+    })
+
     const correlationId = `reminder-inactive-account:${params.to}:${params.orgName}`
 
     const partialPayload: Omit<SendEmailPayload, 'dedupKey'> = {
@@ -287,7 +357,12 @@ export default class EmailQueueService {
     const boatNames = params.boats.map((b) => b.name).join(', ')
     const text = `Bonjour ${displayName},\n\nLes bateaux suivants manquent d'informations importantes : ${boatNames}.\n\nHello ${displayName},\n\nThe following boats are missing key information: ${boatNames}.\n\n${env.get('APP_URL')}/boats`
 
-    const html = buildReminderIncompleteBoatsHtml(displayName, params.boats)
+    const html = await edge.render('emails/reminder_incomplete_boats', {
+      displayName,
+      boats: params.boats,
+      appUrl: env.get('APP_URL'),
+    })
+
     const correlationId = `reminder-incomplete-boats:${params.to}:${params.boats.map((b) => b.id).join('-')}`
 
     const partialPayload: Omit<SendEmailPayload, 'dedupKey'> = {
@@ -323,7 +398,12 @@ export default class EmailQueueService {
     const portNames = params.ports.map((p) => p.name).join(', ')
     const text = `Bonjour ${displayName},\n\nLes ports suivants manquent de ville ou de pays : ${portNames}.\n\nHello ${displayName},\n\nThe following ports are missing city or country: ${portNames}.\n\n${env.get('APP_URL')}/ports`
 
-    const html = buildReminderIncompletePortsHtml(displayName, params.ports)
+    const html = await edge.render('emails/reminder_incomplete_ports', {
+      displayName,
+      ports: params.ports,
+      appUrl: env.get('APP_URL'),
+    })
+
     const correlationId = `reminder-incomplete-ports:${params.to}:${params.ports.map((p) => p.id).join('-')}`
 
     const partialPayload: Omit<SendEmailPayload, 'dedupKey'> = {
@@ -357,7 +437,11 @@ export default class EmailQueueService {
     const subject = 'Votre flotte vous attend — FleetAi / Your fleet is waiting — FleetAi'
     const text = `Bonjour ${displayName},\n\nVous ne vous etes pas connecte depuis plus de 30 jours. Revenez gerer votre flotte sur FleetAi.\n\nHello ${displayName},\n\nYou haven't logged in for over 30 days. Come back to manage your fleet on FleetAi.\n\n${env.get('APP_URL')}/dashboard`
 
-    const html = buildReminderInactiveLoginHtml(displayName)
+    const html = await edge.render('emails/reminder_inactive_login', {
+      displayName,
+      appUrl: env.get('APP_URL'),
+    })
+
     const correlationId = `reminder-inactive-login:${params.to}`
 
     const partialPayload: Omit<SendEmailPayload, 'dedupKey'> = {
@@ -393,7 +477,12 @@ export default class EmailQueueService {
     const taskTitles = params.tasks.map((t) => `${t.title} (${t.boatName})`).join(', ')
     const text = `Bonjour ${displayName},\n\nLes taches suivantes sont en retard : ${taskTitles}.\n\nHello ${displayName},\n\nThe following tasks are overdue: ${taskTitles}.\n\n${env.get('APP_URL')}/maintenance`
 
-    const html = buildReminderOverdueTasksHtml(displayName, params.tasks)
+    const html = await edge.render('emails/reminder_overdue_tasks', {
+      displayName,
+      tasks: params.tasks,
+      appUrl: env.get('APP_URL'),
+    })
+
     const taskIds = params.tasks.map((t) => t.id).join('-')
     const correlationId = `reminder-overdue-tasks:${params.to}:${taskIds}`
 
@@ -429,7 +518,12 @@ export default class EmailQueueService {
     const taskTitles = params.tasks.map((t) => `${t.title} (${t.boatName})`).join(', ')
     const text = `Bonjour ${displayName},\n\nLes taches moteur suivantes arrivent a echeance dans 30 jours : ${taskTitles}.\n\nHello ${displayName},\n\nThe following engine tasks are due within 30 days: ${taskTitles}.\n\n${env.get('APP_URL')}/maintenance`
 
-    const html = buildReminderEngineTasksHtml(displayName, params.tasks)
+    const html = await edge.render('emails/reminder_engine_tasks', {
+      displayName,
+      tasks: params.tasks,
+      appUrl: env.get('APP_URL'),
+    })
+
     const taskIds = params.tasks.map((t) => t.id).join('-')
     const correlationId = `reminder-engine-tasks:${params.to}:${taskIds}`
 
@@ -465,7 +559,12 @@ export default class EmailQueueService {
     const taskTitles = params.tasks.map((t) => `${t.title} (${t.boatName})`).join(', ')
     const text = `Bonjour ${displayName},\n\nLes inspections suivantes arrivent a echeance dans 30 jours : ${taskTitles}.\n\nHello ${displayName},\n\nThe following boat inspections are due within 30 days: ${taskTitles}.\n\n${env.get('APP_URL')}/maintenance`
 
-    const html = buildReminderBoatCheckTasksHtml(displayName, params.tasks)
+    const html = await edge.render('emails/reminder_boat_check_tasks', {
+      displayName,
+      tasks: params.tasks,
+      appUrl: env.get('APP_URL'),
+    })
+
     const taskIds = params.tasks.map((t) => t.id).join('-')
     const correlationId = `reminder-boat-check-tasks:${params.to}:${taskIds}`
 
@@ -489,93 +588,5 @@ export default class EmailQueueService {
         await SendEmail.dispatch(p)
       },
     })
-  }
-
-  previewTemplate(name: string): string | null {
-    const fakeTasks = [
-      { id: 1, title: 'Vidange moteur', boatName: 'Le Téméraire', dueAt: '2026-06-15' },
-      { id: 2, title: 'Contrôle extinction', boatName: 'Albatros II', dueAt: null },
-    ]
-    const fakeBoats = [
-      { id: 1, name: 'Le Téméraire' },
-      { id: 2, name: 'Albatros II' },
-    ]
-    const fakePorts = [
-      { id: 1, name: 'Port de La Rochelle' },
-      { id: 2, name: 'Port Vieux-Boucau' },
-    ]
-    const fakeBreakdown = {
-      categories: [
-        { key: 'hull', minCost: 900, maxCost: 1300 },
-        { key: 'engine', minCost: 700, maxCost: 900 },
-        { key: 'safety', minCost: 250, maxCost: 350 },
-        { key: 'electrical', minCost: 200, maxCost: 300 },
-        { key: 'mooring', minCost: 150, maxCost: 220 },
-      ],
-      totalMin: 2200,
-      totalMax: 3070,
-    }
-
-    switch (name) {
-      case 'welcome':
-        return buildWelcomeHtml('Jean Dupont')
-      case 'password-reset':
-        return buildPasswordResetHtml('https://app.fleetai.com/reset?token=preview')
-      case 'invitation':
-        return buildInvitationHtml(
-          'Marie Martin',
-          'Yacht Club Bordeaux',
-          'https://app.fleetai.com/invite?token=preview'
-        )
-      case 'simulator-report-fr':
-        return buildSimulatorReportHtml(fakeBreakdown, true)
-      case 'simulator-report-en':
-        return buildSimulatorReportHtml(fakeBreakdown, false)
-      case 'nurturing-d3-fr':
-        return buildNurturingD3Html(true)
-      case 'nurturing-d3-en':
-        return buildNurturingD3Html(false)
-      case 'nurturing-d7-fr':
-        return buildNurturingD7Html('2 200 €', '3 070 €', true)
-      case 'nurturing-d7-en':
-        return buildNurturingD7Html('€2,200', '€3,070', false)
-      case 'reminder-inactive-account':
-        return buildReminderInactiveAccountHtml('Jean Dupont', 'Yacht Club Bordeaux')
-      case 'reminder-incomplete-boats':
-        return buildReminderIncompleteBoatsHtml('Jean Dupont', fakeBoats)
-      case 'reminder-incomplete-ports':
-        return buildReminderIncompletePortsHtml('Jean Dupont', fakePorts)
-      case 'reminder-inactive-login':
-        return buildReminderInactiveLoginHtml('Jean Dupont')
-      case 'reminder-overdue-tasks':
-        return buildReminderOverdueTasksHtml('Jean Dupont', fakeTasks)
-      case 'reminder-engine-tasks':
-        return buildReminderEngineTasksHtml('Jean Dupont', fakeTasks)
-      case 'reminder-boat-check-tasks':
-        return buildReminderBoatCheckTasksHtml('Jean Dupont', fakeTasks)
-      default:
-        return null
-    }
-  }
-
-  listTemplates(): { name: string; label: string }[] {
-    return [
-      { name: 'welcome', label: 'Bienvenue' },
-      { name: 'password-reset', label: 'Réinitialisation mot de passe' },
-      { name: 'invitation', label: 'Invitation organisation' },
-      { name: 'simulator-report-fr', label: 'Rapport simulateur (FR)' },
-      { name: 'simulator-report-en', label: 'Rapport simulateur (EN)' },
-      { name: 'nurturing-d3-fr', label: 'Nurturing J+3 (FR)' },
-      { name: 'nurturing-d3-en', label: 'Nurturing J+3 (EN)' },
-      { name: 'nurturing-d7-fr', label: 'Nurturing J+7 (FR)' },
-      { name: 'nurturing-d7-en', label: 'Nurturing J+7 (EN)' },
-      { name: 'reminder-inactive-account', label: 'Relance — compte sans bateau' },
-      { name: 'reminder-incomplete-boats', label: 'Relance — bateaux incomplets' },
-      { name: 'reminder-incomplete-ports', label: 'Relance — ports incomplets' },
-      { name: 'reminder-inactive-login', label: 'Relance — inactivité connexion' },
-      { name: 'reminder-overdue-tasks', label: 'Relance — tâches en retard' },
-      { name: 'reminder-engine-tasks', label: 'Relance — échéances moteur' },
-      { name: 'reminder-boat-check-tasks', label: 'Relance — vérifications bateau' },
-    ]
   }
 }

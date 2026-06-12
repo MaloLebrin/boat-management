@@ -1,0 +1,71 @@
+@layout('emails/_layout')
+
+  @section('content')
+    <h2 style="margin:0 0 20px;color:#333333;font-size:22px;">
+      Bonjour {{ displayName }},
+    </h2>
+    <p style="margin:0 0 20px;color:#555555;font-size:16px;line-height:1.5;">
+      Les taches de maintenance suivantes sont en retard. Planifiez-les des que possible pour preserver votre flotte.
+    </p>
+    <p style="margin:0 0 20px;color:#555555;font-size:16px;line-height:1.5;">
+      The following maintenance tasks are overdue. Schedule them as soon as possible to keep your fleet in good shape.
+    </p>
+    <table
+      role="presentation"
+      width="100%"
+      cellspacing="0"
+      cellpadding="0"
+      style="margin:0 0 25px;border:1px solid #eeeeee;border-radius:6px;"
+    >
+      <thead>
+        <tr>
+          <th
+            style="padding:10px 15px;text-align:left;background-color:#f4f4f7;color:#555555;font-size:12px;text-transform:uppercase;"
+          >
+            Tache / Task
+          </th>
+          <th
+            style="padding:10px 15px;text-align:left;background-color:#f4f4f7;color:#555555;font-size:12px;text-transform:uppercase;"
+          >
+            Bateau / Boat
+          </th>
+          <th
+            style="padding:10px 15px;text-align:left;background-color:#f4f4f7;color:#555555;font-size:12px;text-transform:uppercase;"
+          >
+            Echeance / Due
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        @each(task in tasks)
+          <tr>
+            <td style="padding:10px 15px;border-bottom:1px solid #eeeeee;color:#333333;font-size:14px;">
+              {{ task.title }}
+            </td>
+            <td style="padding:10px 15px;border-bottom:1px solid #eeeeee;color:#555555;font-size:14px;">
+              {{ task.boatName }}
+            </td>
+            <td style="padding:10px 15px;border-bottom:1px solid #eeeeee;color:#cc3300;font-size:14px;">
+              @if(task.dueAt)
+                {{ task.dueAt.slice(0, 10) }}
+              @else
+                —
+              @end
+            </td>
+          </tr>
+        @end
+      </tbody>
+    </table>
+    <table role="presentation" cellspacing="0" cellpadding="0" style="margin:0 auto;">
+      <tr>
+        <td style="border-radius:6px;background-color:#cc3300;">
+          <a
+            href="{{ appUrl }}/maintenance"
+            style="display:inline-block;padding:14px 30px;color:#ffffff;text-decoration:none;font-size:16px;font-weight:bold;"
+          >
+            Voir les taches / View tasks
+      </a>
+        </td>
+      </tr>
+    </table>
+  @end

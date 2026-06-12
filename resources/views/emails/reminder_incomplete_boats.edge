@@ -1,0 +1,42 @@
+@layout('emails/_layout')
+
+  @section('content')
+    <h2 style="margin:0 0 20px;color:#333333;font-size:22px;">
+      Bonjour {{ displayName }},
+    </h2>
+    <p style="margin:0 0 20px;color:#555555;font-size:16px;line-height:1.5;">
+      Les bateaux suivants manquent d'informations cles (type, dimensions, annee...). Completez-les pour profiter des estimations de couts et des alertes maintenance.
+    </p>
+    <table
+      role="presentation"
+      width="100%"
+      cellspacing="0"
+      cellpadding="0"
+      style="margin:0 0 25px;border:1px solid #eeeeee;border-radius:6px;"
+    >
+      <tbody>
+        @each(boat in boats)
+          <tr>
+            <td style="padding:10px 15px;border-bottom:1px solid #eeeeee;color:#333333;font-size:14px;">
+              {{ boat.name }}
+            </td>
+            <td style="padding:10px 15px;border-bottom:1px solid #eeeeee;text-align:right;">
+              <a href="{{ appUrl }}/boats/{{ boat.id }}" style="color:#1e3a5f;font-size:14px;">Completer / Complete</a>
+            </td>
+          </tr>
+        @end
+      </tbody>
+    </table>
+    <table role="presentation" cellspacing="0" cellpadding="0" style="margin:0 auto;">
+      <tr>
+        <td style="border-radius:6px;background-color:#1e3a5f;">
+          <a
+            href="{{ appUrl }}/boats"
+            style="display:inline-block;padding:14px 30px;color:#ffffff;text-decoration:none;font-size:16px;font-weight:bold;"
+          >
+            Voir ma flotte / View my fleet
+      </a>
+        </td>
+      </tr>
+    </table>
+  @end
