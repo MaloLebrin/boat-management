@@ -3,8 +3,10 @@
  * DO NOT EDIT manually
  */
 
+import OrganizationMemberJoined from '#events/organization_member_joined'
 import SimulatorLeadCreated from '#events/simulator_lead_created'
 
 export const events = {
+  OrganizationMemberJoined: OrganizationMemberJoined,
   SimulatorLeadCreated: SimulatorLeadCreated,
 }
