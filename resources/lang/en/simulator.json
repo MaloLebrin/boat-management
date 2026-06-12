@@ -71,5 +71,7 @@
   "wear_new_desc": "No visible wear, recent component",
   "wear_good_desc": "Good overall condition, routine maintenance",
   "wear_worn_desc": "Signs of wear, replacement to be scheduled",
-  "wear_to_replace_desc": "Urgent maintenance required"
+  "wear_to_replace_desc": "Urgent maintenance required",
+  "exit_intent_title": "Before you go...",
+  "exit_intent_subtitle": "Receive your estimate by email and come back whenever you want."
 }

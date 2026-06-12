@@ -15,6 +15,7 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+const emit = defineEmits<{ (e: 'email-submitted'): void }>()
 
 const { t } = useT()
 const page = usePage<{ locale?: string }>()
@@ -59,6 +60,7 @@ function submitLead() {
     preserveScroll: true,
     onSuccess: () => {
       emailSubmitted.value = true
+      emit('email-submitted')
     },
   })
 }
@@ -69,10 +71,20 @@ function submitLead() {
     <div class="text-center">
       <h3 class="font-display text-xl text-fg lg:text-2xl">
         <template v-if="isAuthenticated">
-          {{ t('simulator.cta_add_boat_title', { type: t(boatTypeLabels[input.boatType]), length: String(input.lengthM) }) }}
+          {{
+            t('simulator.cta_add_boat_title', {
+              type: t(boatTypeLabels[input.boatType]),
+              length: String(input.lengthM),
+            })
+          }}
         </template>
         <template v-else>
-          {{ t('simulator.cta_title', { type: t(boatTypeLabels[input.boatType]), length: String(input.lengthM) }) }}
+          {{
+            t('simulator.cta_title', {
+              type: t(boatTypeLabels[input.boatType]),
+              length: String(input.lengthM),
+            })
+          }}
         </template>
       </h3>
       <p class="mt-2 text-sm text-fg-muted">

@@ -7,11 +7,13 @@ export default { layout: PublicLayout }
 import { Head, usePage } from '@inertiajs/vue3'
 import { computed, ref } from 'vue'
 import { useT } from '~/composables/use_t'
+import { useExitIntent } from '~/composables/use_exit_intent'
 import { computeSimulatorCosts } from '~/composables/use_simulator_costs'
 import SimulatorStepBoat from '~/components/marketing/simulator/SimulatorStepBoat.vue'
 import SimulatorStepWear from '~/components/marketing/simulator/SimulatorStepWear.vue'
 import SimulatorResultCard from '~/components/marketing/simulator/SimulatorResultCard.vue'
 import SimulatorCtaCard from '~/components/marketing/simulator/SimulatorCtaCard.vue'
+import SimulatorExitIntentModal from '~/components/marketing/simulator/SimulatorExitIntentModal.vue'
 import type {
   SimulatorBoatInput,
   SimulatorCostBreakdown,
@@ -41,6 +43,9 @@ const formData = ref<Partial<SimulatorBoatInput>>({
 
 const showResult = ref(false)
 const costBreakdown = ref<SimulatorCostBreakdown | null>(null)
+const emailSubmitted = ref(false)
+
+const { triggered: exitIntentOpen } = useExitIntent(() => showResult.value && !emailSubmitted.value)
 
 function getLengthBracket(lengthM: number): string {
   if (lengthM < 6) return '<6'
@@ -260,7 +265,15 @@ function restart() {
         :is-authenticated="isAuthenticated"
         :can-add-boat="canAddBoat"
         :breakdown="costBreakdown"
+        @email-submitted="emailSubmitted = true"
       />
     </div>
   </section>
+
+  <SimulatorExitIntentModal
+    v-if="costBreakdown && !isAuthenticated"
+    v-model:open="exitIntentOpen"
+    :input="formData as SimulatorBoatInput"
+    :breakdown="costBreakdown"
+  />
 </template>

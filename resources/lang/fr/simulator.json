@@ -71,5 +71,7 @@
   "wear_new_desc": "Aucune usure visible, composant récent",
   "wear_good_desc": "Bon état général, entretien courant",
   "wear_worn_desc": "Signes d'usure, remplacement à planifier",
-  "wear_to_replace_desc": "Intervention urgente nécessaire"
+  "wear_to_replace_desc": "Intervention urgente nécessaire",
+  "exit_intent_title": "Avant de partir...",
+  "exit_intent_subtitle": "Recevez votre estimation par email et revenez quand vous voulez."
 }
