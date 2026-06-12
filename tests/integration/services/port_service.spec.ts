@@ -157,6 +157,7 @@ test.group('PortService (unit)', () => {
       mouillageId: null,
       name: 'A1',
       description: null,
+      organizationId: user.organizationId!,
     })
     await BoatFactory.merge({ organizationId: user.organizationId!, spotId: spot.id }).create()
 
@@ -201,6 +202,7 @@ test.group('PortService (unit)', () => {
       mouillageId: null,
       name: 'B1',
       description: null,
+      organizationId: user.organizationId!,
     })
     await BoatFactory.merge({ organizationId: user.organizationId!, spotId: spot.id }).create()
 
