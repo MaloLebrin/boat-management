@@ -11,12 +11,16 @@ interface Props {
   breakdown: SimulatorCostBreakdown
   input: SimulatorBoatInput
   benchmark?: SimulatorBenchmarkEntry | null
+  showShare?: boolean
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  showShare: false,
+})
 
 const emit = defineEmits<{
   restart: []
+  share: []
 }>()
 
 const { t } = useT()
@@ -108,6 +112,15 @@ const maxCategoryCost = computed(() =>
       @click="emit('restart')"
     >
       {{ t('simulator.recalculate') }}
+    </button>
+
+    <button
+      v-if="props.showShare"
+      type="button"
+      class="mt-2 w-full text-sm text-fg-subtle underline underline-offset-2 transition-colors hover:text-fg"
+      @click="emit('share')"
+    >
+      {{ t('simulator.share_button') }}
     </button>
   </div>
 </template>

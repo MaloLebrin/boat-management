@@ -4,7 +4,7 @@ export default { layout: PublicLayout }
 </script>
 
 <script setup lang="ts">
-import { Head, usePage } from '@inertiajs/vue3'
+import { Head, router, usePage } from '@inertiajs/vue3'
 import { computed, ref } from 'vue'
 import { useT } from '~/composables/use_t'
 import { useExitIntent } from '~/composables/use_exit_intent'
@@ -130,6 +130,15 @@ function restart() {
   showResult.value = false
   costBreakdown.value = null
 }
+
+function shareResults() {
+  if (!costBreakdown.value) return
+  router.post(
+    '/simulator/share',
+    { input: formData.value, breakdown: costBreakdown.value, locale: locale.value },
+    { preserveScroll: false }
+  )
+}
 </script>
 
 <template>
@@ -252,7 +261,9 @@ function restart() {
                 :breakdown="costBreakdown"
                 :input="formData as SimulatorBoatInput"
                 :benchmark="activeBenchmark"
+                :show-share="!isAuthenticated"
                 @restart="restart"
+                @share="shareResults"
               />
             </div>
           </Transition>

@@ -73,5 +73,10 @@
   "wear_worn_desc": "Signs of wear, replacement to be scheduled",
   "wear_to_replace_desc": "Urgent maintenance required",
   "exit_intent_title": "Before you go...",
-  "exit_intent_subtitle": "Receive your estimate by email and come back whenever you want."
+  "exit_intent_subtitle": "Receive your estimate by email and come back whenever you want.",
+  "share_button": "Share these results",
+  "share_page_title": "Shared simulation results",
+  "share_page_subtitle": "Maintenance estimate calculated with the FleetAi simulator",
+  "share_cta_title": "Estimate your own boat",
+  "share_cta_button": "Launch the free simulator"
 }

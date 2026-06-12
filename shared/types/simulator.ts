@@ -53,3 +53,9 @@ export interface SimulatorBenchmarkEntry {
  * Brackets : '<6', '6-9', '9-12', '12-15', '15+'
  */
 export type SimulatorBenchmarkMap = Record<string, SimulatorBenchmarkEntry>
+
+export interface SimulatorSharePayload {
+  input: SimulatorBoatInput
+  breakdown: SimulatorCostBreakdown
+  locale?: string
+}

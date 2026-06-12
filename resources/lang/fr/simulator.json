@@ -73,5 +73,10 @@
   "wear_worn_desc": "Signes d'usure, remplacement à planifier",
   "wear_to_replace_desc": "Intervention urgente nécessaire",
   "exit_intent_title": "Avant de partir...",
-  "exit_intent_subtitle": "Recevez votre estimation par email et revenez quand vous voulez."
+  "exit_intent_subtitle": "Recevez votre estimation par email et revenez quand vous voulez.",
+  "share_button": "Partager ces résultats",
+  "share_page_title": "Résultats de simulation partagés",
+  "share_page_subtitle": "Estimation d'entretien calculée avec le simulateur FleetAi",
+  "share_cta_title": "Estimez votre propre bateau",
+  "share_cta_button": "Lancer le simulateur gratuit"
 }

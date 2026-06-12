@@ -40,3 +40,9 @@ router
   .use(middleware.auth())
 
 router.post('/simulator/lead', [SimulatorLeadController, 'store']).as('simulator.lead')
+
+const SimulatorShareController = () => import('#controllers/simulator_share_controller')
+
+router.post('/simulator/share', [SimulatorShareController, 'store']).as('simulator.share.store')
+router.get('/simulateur/r/:token', [SimulatorShareController, 'show']).as('simulator.share.show.fr')
+router.get('/simulator/r/:token', [SimulatorShareController, 'show']).as('simulator.share.show.en')
