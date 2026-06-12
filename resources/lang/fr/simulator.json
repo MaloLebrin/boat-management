@@ -78,5 +78,13 @@
   "share_page_title": "Résultats de simulation partagés",
   "share_page_subtitle": "Estimation d'entretien calculée avec le simulateur FleetAi",
   "share_cta_title": "Estimez votre propre bateau",
-  "share_cta_button": "Lancer le simulateur gratuit"
+  "share_cta_button": "Lancer le simulateur gratuit",
+  "step_wintering": "Hivernage",
+  "wintering_zone_label": "Comment hivernez-vous votre bateau ?",
+  "wintering_zone_covered": "Sous abri",
+  "wintering_zone_covered_desc": "Hangar ou port couvert",
+  "wintering_zone_outdoor": "A l'exterieur",
+  "wintering_zone_outdoor_desc": "A sec en plein air",
+  "wintering_zone_sea": "A flot",
+  "wintering_zone_sea_desc": "Au mouillage ou au ponton"
 }

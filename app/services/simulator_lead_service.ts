@@ -18,6 +18,7 @@ export default class SimulatorLeadService {
         engineWear: payload.engineWear ?? null,
         safetyWear: payload.safetyWear ?? null,
         riggingWear: payload.riggingWear ?? null,
+        winteringZone: payload.winteringZone ?? null,
         totalMin: payload.totalMin,
         totalMax: payload.totalMax,
         locale: payload.locale ?? 'fr',

@@ -12,6 +12,7 @@ export const simulatorShareValidator = vine.compile(
       engineWear: vine.enum(['new', 'good', 'worn', 'to_replace']).nullable(),
       safetyWear: vine.enum(['new', 'good', 'worn', 'to_replace']),
       riggingWear: vine.enum(['new', 'good', 'worn', 'to_replace']).nullable(),
+      winteringZone: vine.enum(['covered', 'outdoor', 'sea']).nullable().optional(),
     }),
     breakdown: vine.object({
       categories: vine.array(

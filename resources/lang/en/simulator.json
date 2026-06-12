@@ -78,5 +78,13 @@
   "share_page_title": "Shared simulation results",
   "share_page_subtitle": "Maintenance estimate calculated with the FleetAi simulator",
   "share_cta_title": "Estimate your own boat",
-  "share_cta_button": "Launch the free simulator"
+  "share_cta_button": "Launch the free simulator",
+  "step_wintering": "Wintering",
+  "wintering_zone_label": "How do you winter your boat?",
+  "wintering_zone_covered": "Under cover",
+  "wintering_zone_covered_desc": "Shed or covered marina",
+  "wintering_zone_outdoor": "Outdoors",
+  "wintering_zone_outdoor_desc": "Dry dock in the open air",
+  "wintering_zone_sea": "In the water",
+  "wintering_zone_sea_desc": "On mooring or berth"
 }

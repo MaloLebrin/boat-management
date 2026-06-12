@@ -7,6 +7,7 @@ import type {
   SimulatorBoatInput,
   SimulatorBoatType,
   SimulatorWearLevel,
+  SimulatorWinteringZone,
 } from '#shared/types/simulator'
 import env from '#start/env'
 import { inject } from '@adonisjs/core'
@@ -130,6 +131,7 @@ export default class EmailQueueService {
       engineWear: lead.engineWear as SimulatorWearLevel | null,
       safetyWear: (lead.safetyWear as SimulatorWearLevel) ?? 'good',
       riggingWear: lead.riggingWear as SimulatorWearLevel | null,
+      winteringZone: (lead.winteringZone as SimulatorWinteringZone | null) ?? undefined,
     }
 
     const breakdown = computeSimulatorCosts(input)

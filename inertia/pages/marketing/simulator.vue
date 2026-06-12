@@ -10,6 +10,7 @@ import { useT } from '~/composables/use_t'
 import { useExitIntent } from '~/composables/use_exit_intent'
 import { computeSimulatorCosts } from '~/composables/use_simulator_costs'
 import SimulatorStepBoat from '~/components/marketing/simulator/SimulatorStepBoat.vue'
+import SimulatorStepWintering from '~/components/marketing/simulator/SimulatorStepWintering.vue'
 import SimulatorStepWear from '~/components/marketing/simulator/SimulatorStepWear.vue'
 import SimulatorResultCard from '~/components/marketing/simulator/SimulatorResultCard.vue'
 import SimulatorCtaCard from '~/components/marketing/simulator/SimulatorCtaCard.vue'
@@ -76,6 +77,7 @@ const needsRiggingStep = computed(() => {
 const steps = computed(() => {
   const list: { key: string; labelKey: string }[] = [
     { key: 'boat', labelKey: 'simulator.step_boat' },
+    { key: 'wintering', labelKey: 'simulator.step_wintering' },
     { key: 'hull', labelKey: 'simulator.step_hull' },
   ]
   if (needsEngineStep.value) {
@@ -247,6 +249,12 @@ function shareResults() {
                   v-if="currentStepKey === 'boat'"
                   v-model="formData"
                   @next="goNext"
+                />
+                <SimulatorStepWintering
+                  v-else-if="currentStepKey === 'wintering'"
+                  v-model="formData"
+                  @next="goNext"
+                  @back="goBack"
                 />
                 <SimulatorStepWear
                   v-else-if="currentStepKey in wearStepConfig"

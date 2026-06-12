@@ -86,6 +86,12 @@ const WEAR_MULTIPLIERS: Record<SimulatorWearLevel, number> = {
   to_replace: 2.5,
 }
 
+const WINTERING_ZONE_MULTIPLIERS: Record<string, number> = {
+  covered: 0.85,
+  outdoor: 1.0,
+  sea: 1.25,
+}
+
 function getCostsForLength(lengthM: number): LengthCosts {
   const entry = COSTS_BY_LENGTH.find((e) => lengthM < e.maxLength)
   return entry?.costs ?? COSTS_BY_LENGTH[COSTS_BY_LENGTH.length - 1].costs
@@ -107,13 +113,14 @@ function applyCostMultiplier(base: CostRange, wear: SimulatorWearLevel): CostRan
 export function computeSimulatorCosts(input: SimulatorBoatInput): SimulatorCostBreakdown {
   const baseCosts = getCostsForLength(input.lengthM)
   const categories: SimulatorCostCategory[] = []
+  const winteringMultiplier = WINTERING_ZONE_MULTIPLIERS[input.winteringZone ?? 'outdoor'] ?? 1.0
 
   // Hull
   const hullCost = applyCostMultiplier(baseCosts.hull, input.hullWear)
   categories.push({
     key: 'hull',
-    minCost: hullCost.min,
-    maxCost: hullCost.max,
+    minCost: Math.round(hullCost.min * winteringMultiplier),
+    maxCost: Math.round(hullCost.max * winteringMultiplier),
   })
 
   // Engine (only if hasDedicatedEngine or motorboat/rib)
@@ -149,8 +156,8 @@ export function computeSimulatorCosts(input: SimulatorBoatInput): SimulatorCostB
   const mooringCost = applyCostMultiplier(baseCosts.mooring, input.hullWear)
   categories.push({
     key: 'mooring',
-    minCost: mooringCost.min,
-    maxCost: mooringCost.max,
+    minCost: Math.round(mooringCost.min * winteringMultiplier),
+    maxCost: Math.round(mooringCost.max * winteringMultiplier),
   })
 
   // Rigging (only for sailboats and catamarans)

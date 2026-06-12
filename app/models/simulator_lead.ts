@@ -29,6 +29,9 @@ export default class SimulatorLead extends BaseModel {
   declare riggingWear: string | null
 
   @column()
+  declare winteringZone: string | null
+
+  @column()
   declare totalMin: number
 
   @column()

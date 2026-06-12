@@ -4,6 +4,9 @@ export type SimulatorBoatType = (typeof SIMULATOR_BOAT_TYPES)[number]
 export const SIMULATOR_WEAR_LEVELS = ['new', 'good', 'worn', 'to_replace'] as const
 export type SimulatorWearLevel = (typeof SIMULATOR_WEAR_LEVELS)[number]
 
+export const SIMULATOR_WINTERING_ZONES = ['covered', 'outdoor', 'sea'] as const
+export type SimulatorWinteringZone = (typeof SIMULATOR_WINTERING_ZONES)[number]
+
 export interface SimulatorBoatInput {
   boatType: SimulatorBoatType
   lengthM: number
@@ -14,6 +17,7 @@ export interface SimulatorBoatInput {
   engineWear: SimulatorWearLevel | null
   safetyWear: SimulatorWearLevel
   riggingWear: SimulatorWearLevel | null
+  winteringZone?: SimulatorWinteringZone
 }
 
 export interface SimulatorCostCategory {
@@ -36,6 +40,7 @@ export interface SimulatorLeadPayload {
   engineWear?: SimulatorWearLevel | null
   safetyWear?: SimulatorWearLevel | null
   riggingWear?: SimulatorWearLevel | null
+  winteringZone?: SimulatorWinteringZone | null
   totalMin: number
   totalMax: number
   locale?: string

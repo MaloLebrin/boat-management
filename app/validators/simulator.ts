@@ -1,5 +1,9 @@
 import vine from '@vinejs/vine'
-import { SIMULATOR_BOAT_TYPES, SIMULATOR_WEAR_LEVELS } from '#shared/types/simulator'
+import {
+  SIMULATOR_BOAT_TYPES,
+  SIMULATOR_WEAR_LEVELS,
+  SIMULATOR_WINTERING_ZONES,
+} from '#shared/types/simulator'
 
 const currentYear = new Date().getFullYear()
 
@@ -13,4 +17,5 @@ export const simulatorValidator = vine.create({
   engineWear: vine.enum(SIMULATOR_WEAR_LEVELS).nullable(),
   safetyWear: vine.enum(SIMULATOR_WEAR_LEVELS),
   riggingWear: vine.enum(SIMULATOR_WEAR_LEVELS).nullable(),
+  winteringZone: vine.enum(SIMULATOR_WINTERING_ZONES).optional(),
 })
