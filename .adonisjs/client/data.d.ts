@@ -6,24 +6,64 @@
 /// <reference path="./manifest.d.ts" />
 import type { InferData, InferVariants } from '@adonisjs/core/types/transformers'
 import type { InferSharedProps } from '@adonisjs/inertia/types'
+import type BoatEngineTransformer from '#transformers/boat_engine_transformer'
 import type BoatTransformer from '#transformers/boat_transformer'
+import type MaintenanceTransformer from '#transformers/maintenance_transformer'
 import type MediaTransformer from '#transformers/media_transformer'
+import type MouillageTransformer from '#transformers/mouillage_transformer'
+import type OrganizationTransformer from '#transformers/organization_transformer'
+import type PontoonTransformer from '#transformers/pontoon_transformer'
 import type PortTransformer from '#transformers/port_transformer'
+import type SimulatorTransformer from '#transformers/simulator_transformer'
+import type SpotTransformer from '#transformers/spot_transformer'
+import type SubscriptionTransformer from '#transformers/subscription_transformer'
 import type UserTransformer from '#transformers/user_transformer'
 import type InertiaMiddleware from '#middleware/inertia_middleware'
 
 export namespace Data {
+  export type BoatEngine = InferData<BoatEngineTransformer>
+  export namespace BoatEngine {
+    export type Variants = InferVariants<BoatEngineTransformer>
+  }
   export type Boat = InferData<BoatTransformer>
   export namespace Boat {
     export type Variants = InferVariants<BoatTransformer>
+  }
+  export type Maintenance = InferData<MaintenanceTransformer>
+  export namespace Maintenance {
+    export type Variants = InferVariants<MaintenanceTransformer>
   }
   export type Media = InferData<MediaTransformer>
   export namespace Media {
     export type Variants = InferVariants<MediaTransformer>
   }
+  export type Mouillage = InferData<MouillageTransformer>
+  export namespace Mouillage {
+    export type Variants = InferVariants<MouillageTransformer>
+  }
+  export type Organization = InferData<OrganizationTransformer>
+  export namespace Organization {
+    export type Variants = InferVariants<OrganizationTransformer>
+  }
+  export type Pontoon = InferData<PontoonTransformer>
+  export namespace Pontoon {
+    export type Variants = InferVariants<PontoonTransformer>
+  }
   export type Port = InferData<PortTransformer>
   export namespace Port {
     export type Variants = InferVariants<PortTransformer>
+  }
+  export type Simulator = InferData<SimulatorTransformer>
+  export namespace Simulator {
+    export type Variants = InferVariants<SimulatorTransformer>
+  }
+  export type Spot = InferData<SpotTransformer>
+  export namespace Spot {
+    export type Variants = InferVariants<SpotTransformer>
+  }
+  export type Subscription = InferData<SubscriptionTransformer>
+  export namespace Subscription {
+    export type Variants = InferVariants<SubscriptionTransformer>
   }
   export type User = InferData<UserTransformer>
   export namespace User {
