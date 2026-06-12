@@ -80,6 +80,7 @@ export default defineConfig({
   preloads: [
     () => import('#start/routes'),
     () => import('#start/kernel'),
+    () => import('#start/events'),
     () => import('#start/validator'),
     () => import('#start/limiter'),
     {

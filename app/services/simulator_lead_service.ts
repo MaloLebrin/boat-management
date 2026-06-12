@@ -1,13 +1,9 @@
 import SimulatorLead from '#models/simulator_lead'
-import EmailQueueService from '#services/email_queue_service'
+import SimulatorLeadCreated from '#events/simulator_lead_created'
 import type { SimulatorBenchmarkMap, SimulatorLeadPayload } from '#shared/types/simulator'
-import { inject } from '@adonisjs/core'
 import db from '@adonisjs/lucid/services/db'
 
-@inject()
 export default class SimulatorLeadService {
-  constructor(private emailQueueService: EmailQueueService) {}
-
   async create(payload: SimulatorLeadPayload): Promise<SimulatorLead> {
     const lead = await SimulatorLead.updateOrCreate(
       { email: payload.email },
@@ -25,8 +21,7 @@ export default class SimulatorLeadService {
       }
     )
 
-    await this.emailQueueService.sendSimulatorReport(lead)
-    await this.emailQueueService.sendSimulatorNurturing(lead)
+    await SimulatorLeadCreated.dispatch(lead)
 
     return lead
   }

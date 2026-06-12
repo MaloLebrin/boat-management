@@ -3,4 +3,6 @@
  * DO NOT EDIT manually
  */
 
-export const listeners = {}
+export const listeners = {
+  OnSimulatorLeadCreated: () => import('#listeners/on_simulator_lead_created'),
+}

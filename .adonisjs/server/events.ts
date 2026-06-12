@@ -3,4 +3,8 @@
  * DO NOT EDIT manually
  */
 
-export const events = {}
+import SimulatorLeadCreated from '#events/simulator_lead_created'
+
+export const events = {
+  SimulatorLeadCreated: SimulatorLeadCreated,
+}
