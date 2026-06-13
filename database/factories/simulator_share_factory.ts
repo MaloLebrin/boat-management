@@ -25,7 +25,7 @@ export const SimulatorShareFactory = Factory.define(
     }
 
     return {
-      token: faker.string.uuid(),
+      token: faker.string.alphanumeric(12),
       input,
       breakdown,
       locale: faker.helpers.arrayElement(['fr', 'en']),

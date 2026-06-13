@@ -43,6 +43,7 @@ test.group('Settings (functional)', (group) => {
       .put('/settings/profile')
       .loginAs(user)
       .form({ fullName: 'Jean Dupont' })
+      .redirects(0)
 
     response.assertStatus(302)
 
@@ -61,6 +62,7 @@ test.group('Settings (functional)', (group) => {
       .put('/settings/org')
       .loginAs(admin)
       .form({ name: 'Nouvelle Organisation' })
+      .redirects(0)
 
     response.assertStatus(302)
 

@@ -42,6 +42,7 @@ test.group('Organization members (functional)', (group) => {
       .post('/organization/members')
       .loginAs(admin)
       .form({ email: newMember.email, role: 'member' })
+      .redirects(0)
 
     const membership = await OrganizationMembership.query()
       .where('userId', newMember.id)
@@ -71,6 +72,7 @@ test.group('Organization members (functional)', (group) => {
       .post('/organization/members')
       .loginAs(user)
       .form({ email: newMember.email, role: 'member' })
+      .header('Accept', 'application/json')
       .redirects(0)
 
     response.assertStatus(403)
@@ -92,6 +94,7 @@ test.group('Organization members (functional)', (group) => {
       .put(`/organization/members/${membership.id}`)
       .loginAs(admin)
       .form({ role: 'admin' })
+      .redirects(0)
 
     response.assertStatus(302)
 
@@ -111,7 +114,10 @@ test.group('Organization members (functional)', (group) => {
       .with('user')
       .create()
 
-    const response = await client.delete(`/organization/members/${membership.id}`).loginAs(admin)
+    const response = await client
+      .delete(`/organization/members/${membership.id}`)
+      .loginAs(admin)
+      .redirects(0)
 
     response.assertStatus(302)
 
@@ -131,6 +137,7 @@ test.group('Organization members (functional)', (group) => {
     const response = await client
       .delete(`/organization/members/${membership.id}`)
       .loginAs(user)
+      .header('Accept', 'application/json')
       .redirects(0)
 
     response.assertStatus(403)

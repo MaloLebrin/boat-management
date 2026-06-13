@@ -7,7 +7,7 @@ export const SimulatorLeadFactory = Factory.define(
   ({ faker }: FactoryContextContract) => ({
     email: faker.internet.email({ provider: 'example.com' }),
     boatType: faker.helpers.arrayElement(['motorboat', 'sailboat', 'catamaran', 'rib']),
-    lengthM: faker.number.float({ min: 6, max: 20, fractionDigits: 1 }),
+    lengthM: faker.number.int({ min: 6, max: 20 }),
     hullWear: faker.helpers.arrayElement(['new', 'good', 'worn', 'to_replace']),
     engineWear:
       faker.helpers.maybe(() =>

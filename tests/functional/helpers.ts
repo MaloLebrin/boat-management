@@ -8,7 +8,9 @@ import { UserFactory } from '#database/factories/user_factory'
  * (BoatPolicy.delete, MaintenancePolicy.delete, etc.).
  */
 export async function createAdminUser(): Promise<User> {
-  const user = await UserFactory.with('organization').create()
+  const user = await UserFactory.with('organization', 1, (org) =>
+    org.merge({ plan: 'pro' })
+  ).create()
   if (user.organizationId) {
     await OrganizationMembership.create({
       userId: user.id,
