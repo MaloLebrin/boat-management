@@ -104,7 +104,7 @@ test.group('SimulatorLeadService (unit)', (group) => {
     // 10 leads identiques pour déclencher le seuil
     await SimulatorLeadFactory.merge({
       boatType: 'motorboat',
-      lengthM: 7.5, // bracket '6-9'
+      lengthM: 7, // bracket '6-9'
       totalMin: 1000,
       totalMax: 2000,
     }).createMany(10)
