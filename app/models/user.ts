@@ -5,7 +5,7 @@ import { DbRememberMeTokensProvider } from '@adonisjs/auth/session'
 import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
 import Organization from '#models/organization'
 import OrganizationMembership from '#models/organization_membership'
-import { belongsTo, hasMany } from '@adonisjs/lucid/orm'
+import { beforeSave, belongsTo, hasMany } from '@adonisjs/lucid/orm'
 import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
 import type { OrgRole } from '#shared/types/organization'
 
@@ -14,6 +14,13 @@ export default class User extends compose(
   withAuthFinder(() => hash.use())
 ) {
   static rememberMeTokens = DbRememberMeTokensProvider.forModel(User)
+
+  @beforeSave()
+  static normalizeEmail(user: User) {
+    if (user.$dirty.email) {
+      user.email = user.email.toLowerCase()
+    }
+  }
 
   @belongsTo(() => Organization)
   declare organization: BelongsTo<typeof Organization>

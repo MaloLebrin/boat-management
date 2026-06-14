@@ -18,7 +18,8 @@ const basePayload: SimulatorLeadPayload = {
 }
 
 test.group('SimulatorLeadService (unit)', (group) => {
-  group.each.setup(() => {
+  group.each.setup(async () => {
+    await SimulatorLead.query().delete()
     mail.fake()
   })
   group.each.teardown(() => mail.restore())
