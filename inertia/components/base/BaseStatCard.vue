@@ -10,19 +10,28 @@ withDefaults(
     value: string
     delta?: string
     tone?: 'neutral' | 'success' | 'info' | 'warning'
+    href?: string
   }>(),
-  { delta: undefined, tone: 'neutral' }
+  { delta: undefined, tone: 'neutral', href: undefined }
 )
 </script>
 
 <template>
-  <div
+  <component
+    :is="href ? 'a' : 'div'"
+    :href="href || undefined"
     class="rounded-(--radius-card) border border-border bg-surface-elevated p-5 shadow-(--shadow-xs) transition-[transform,box-shadow] duration-(--motion-fast) ease-premium hover:shadow-(--shadow-sm) hover:scale-[1.01]"
+    :class="href ? 'block cursor-pointer' : ''"
   >
     <div class="flex items-center justify-between gap-3">
-      <p class="text-sm font-semibold text-fg-muted">
-        {{ label }}
-      </p>
+      <div class="flex items-center gap-1.5 min-w-0">
+        <span v-if="$slots.icon" class="shrink-0 text-fg-muted">
+          <slot name="icon" />
+        </span>
+        <p class="text-sm font-semibold text-fg-muted truncate">
+          {{ label }}
+        </p>
+      </div>
       <BaseBadge :variant="tone">
         {{ t(`common.tone.${tone}`) }}
       </BaseBadge>
@@ -33,5 +42,5 @@ withDefaults(
     <p v-if="delta" class="mt-1 text-sm text-fg-subtle">
       {{ delta }}
     </p>
-  </div>
+  </component>
 </template>

@@ -17,7 +17,19 @@
     "engines": "Engines",
     "sails": "Sails",
     "rigs": "Rigs",
-    "urgentMaintenance": "Urgent maintenance"
+    "urgentMaintenance": "Urgent maintenance",
+    "delta": {
+      "boatsInAlert": "{count} in alert",
+      "boatsOk": "Fleet up to date",
+      "boatsWithEngine": "{count} motorised",
+      "boatsAllMotorless": "No engines",
+      "boatsWithSail": "{count} with sails",
+      "boatsAllSailless": "No sails",
+      "boatsWithRig": "{count} rigged",
+      "noRig": "No rigs",
+      "overdue": "{count} overdue",
+      "noOverdue": "No overdue"
+    }
   },
   "urgentMaintenance": {
     "title": "Urgent maintenance",

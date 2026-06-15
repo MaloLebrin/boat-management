@@ -10,6 +10,7 @@ import type {
   DashboardBoatSummary,
   DashboardPortItem,
   DashboardPortStats,
+  DashboardStatDeltas,
   DashboardStats,
   DashboardUrgentMaintenanceRow,
 } from '#shared/types/dashboard'
@@ -34,10 +35,24 @@ export default class DashboardService {
     portStats: DashboardPortStats
   }> {
     if (user.organizationId === null) {
+      const emptyDeltas: DashboardStatDeltas = {
+        boatsInAlert: 0,
+        boatsWithEngine: 0,
+        boatsWithSail: 0,
+        boatsWithRig: 0,
+        overdueCount: 0,
+      }
       return {
         boats: [],
         urgentMaintenance: [],
-        stats: { boats: 0, engines: 0, sails: 0, rigs: 0, urgentMaintenance: 0 },
+        stats: {
+          boats: 0,
+          engines: 0,
+          sails: 0,
+          rigs: 0,
+          urgentMaintenance: 0,
+          deltas: emptyDeltas,
+        },
         ports: [],
         portStats: { total: 0, totalBoats: 0, totalFreeSpots: 0 },
       }
@@ -69,6 +84,13 @@ export default class DashboardService {
       sails: boats.reduce((acc, b) => acc + b.sails.length, 0),
       rigs: boats.reduce((acc, b) => acc + (b.rig ? 1 : 0), 0),
       urgentMaintenance: 0,
+      deltas: {
+        boatsInAlert: 0,
+        boatsWithEngine: 0,
+        boatsWithSail: 0,
+        boatsWithRig: 0,
+        overdueCount: 0,
+      },
     }
 
     const thresholdDate = DateTime.now().startOf('day').plus({ days: urgentWithinDays })
@@ -171,6 +193,18 @@ export default class DashboardService {
     })
 
     stats.urgentMaintenance = urgentMaintenance.length
+
+    const today = DateTime.now().startOf('day').toISODate()!
+    const alertBoatIds = new Set(urgentMaintenance.map((t) => t.boatId))
+    stats.deltas = {
+      boatsInAlert: alertBoatIds.size,
+      boatsWithEngine: boats.filter((b) => b.engines.length > 0).length,
+      boatsWithSail: boats.filter((b) => b.sails.length > 0).length,
+      boatsWithRig: boats.filter((b) => b.rig !== null).length,
+      overdueCount: urgentMaintenance.filter(
+        (t) => t.kind === 'date' && t.dueAt !== null && t.dueAt < today
+      ).length,
+    }
 
     const allPorts = await this.portService.listForUser(user)
     const ports: DashboardPortItem[] = allPorts.map((p) => ({

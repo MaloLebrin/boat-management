@@ -35,10 +35,19 @@ export type DashboardUrgentMaintenanceRow = {
   currentEngineHours: number | null
 }
 
+export type DashboardStatDeltas = {
+  boatsInAlert: number
+  boatsWithEngine: number
+  boatsWithSail: number
+  boatsWithRig: number
+  overdueCount: number
+}
+
 export type DashboardStats = {
   boats: number
   engines: number
   sails: number
   rigs: number
   urgentMaintenance: number
+  deltas: DashboardStatDeltas
 }
