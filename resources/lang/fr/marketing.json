@@ -266,7 +266,7 @@
       "item7_q": "L'IA voit-elle les donnees des autres clients ?",
       "item7_a": "Non. Chaque organisation est cloisonnee. L'IA ne voit que tes donnees.",
       "item8_q": "Combien d'utilisateurs puis-je ajouter ?",
-      "item8_a": "Utilisateurs illimites sur tous les plans. Tu paies par organisation, pas par siege."
+      "item8_a": "Starter : 1 utilisateur. Pro : jusqu'à 5 utilisateurs. Enterprise : illimité. Tu paies par organisation, pas par siège."
     },
     "final_cta": {
       "title": "14 jours pour voir la difference.",
@@ -663,7 +663,7 @@
       "item5_q": "L'IA voit-elle les données des autres clients ?",
       "item5_a": "Non. Chaque organisation est cloisonnée.",
       "item6_q": "Combien d'utilisateurs peut-on ajouter par organisation ?",
-      "item6_a": "Utilisateurs illimités sur tous les plans. Vous payez par organisation, pas par siège.",
+      "item6_a": "Starter : 1 utilisateur. Pro : jusqu'à 5 utilisateurs. Enterprise : illimité. Vous payez par organisation, pas par siège.",
       "item7_q": "Puis-je importer mes données Excel existantes ?",
       "item7_a": "Oui. FleetAi importe CSV, Excel, Google Sheets. Pour les outils maritimes (BoatDeck, Sea-Trax), on a un importeur dédié. La plupart des équipes migrent en moins de 2 heures.",
       "item8_q": "Y a-t-il une API pour connecter mes autres outils ?",
@@ -837,10 +837,10 @@
     "tier_starter_feats_label": "INCLUS",
     "tier_pro_name": "Pro",
     "tier_pro_tag": "Le plus populaire",
-    "tier_pro_sub": "Jusqu'à 25 bateaux · utilisateurs illimités",
+    "tier_pro_sub": "Jusqu'à 25 bateaux · jusqu'à 5 utilisateurs",
     "tier_pro_cta": "Essayer 14 jours gratuits",
     "tier_pro_feat1": "Jusqu'à 25 bateaux",
-    "tier_pro_feat2": "Utilisateurs illimités",
+    "tier_pro_feat2": "Jusqu'à 5 utilisateurs",
     "tier_pro_feat2_sub": "mécanos, skippers, chantiers",
     "tier_pro_feat3": "Fleetide IA",
     "tier_pro_feat3_sub": "copilote Mistral",

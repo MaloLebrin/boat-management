@@ -266,7 +266,7 @@
       "item7_q": "Does the AI see other customers' data?",
       "item7_a": "No. Each organization is isolated. The AI only sees your data.",
       "item8_q": "How many users can I add?",
-      "item8_a": "Unlimited users on all plans. You pay per organization, not per seat."
+      "item8_a": "Starter: 1 user. Pro: up to 5 users. Enterprise: unlimited. You pay per organization, not per seat."
     },
     "final_cta": {
       "title": "14 days to see the difference.",
@@ -663,7 +663,7 @@
       "item5_q": "Does AI see other customers' data?",
       "item5_a": "No. Each organization is isolated.",
       "item6_q": "How many users can I add per organization?",
-      "item6_a": "Unlimited users on all plans. You pay per organization, not per seat.",
+      "item6_a": "Starter: 1 user. Pro: up to 5 users. Enterprise: unlimited. You pay per organization, not per seat.",
       "item7_q": "Can I import my existing Excel data?",
       "item7_a": "Yes. FleetAi imports CSV, Excel, Google Sheets. For specific maritime tools (BoatDeck, Sea-Trax), we have a dedicated importer. Most teams are fully migrated in under 2 hours.",
       "item8_q": "Is there an API to connect my other tools?",
@@ -837,10 +837,10 @@
     "tier_starter_feats_label": "INCLUDED",
     "tier_pro_name": "Pro",
     "tier_pro_tag": "Most popular",
-    "tier_pro_sub": "Up to 25 boats · unlimited users",
+    "tier_pro_sub": "Up to 25 boats · up to 5 users",
     "tier_pro_cta": "Try free for 14 days",
     "tier_pro_feat1": "Up to 25 boats",
-    "tier_pro_feat2": "Unlimited users",
+    "tier_pro_feat2": "Up to 5 users",
     "tier_pro_feat2_sub": "mechanics, skippers, yards",
     "tier_pro_feat3": "Fleetide AI",
     "tier_pro_feat3_sub": "Mistral copilot",
