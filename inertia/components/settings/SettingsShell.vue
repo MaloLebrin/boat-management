@@ -22,16 +22,18 @@ function isActive(key: SettingsSection) {
 </script>
 
 <template>
-  <div class="flex w-full max-w-7xl px-6 py-10 sm:px-8">
-    <div class="flex w-full gap-8">
-      <nav class="w-56 shrink-0">
-        <BaseHeading level="2" class="mb-6">{{ t('settings.title') }}</BaseHeading>
-        <ul class="space-y-1">
-          <li v-for="section in sections" :key="section.key">
+  <div class="flex w-full max-w-7xl px-4 py-6 sm:px-8 sm:py-10">
+    <div class="flex w-full flex-col gap-6 sm:flex-row sm:gap-8">
+      <nav class="w-full shrink-0 sm:w-56">
+        <BaseHeading level="2" class="mb-4 hidden sm:mb-6 sm:block">{{
+          t('settings.title')
+        }}</BaseHeading>
+        <ul class="flex gap-1 overflow-x-auto sm:block sm:space-y-1">
+          <li v-for="section in sections" :key="section.key" class="shrink-0">
             <Link
               :route="section.route"
               :class="[
-                'block w-full rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors',
+                'block rounded-lg px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors',
                 isActive(section.key)
                   ? 'bg-brand/10 text-brand'
                   : 'text-fg-muted hover:bg-surface-muted hover:text-fg',
@@ -43,7 +45,7 @@ function isActive(key: SettingsSection) {
         </ul>
       </nav>
 
-      <div class="flex-1">
+      <div class="min-w-0 flex-1">
         <slot />
       </div>
     </div>
