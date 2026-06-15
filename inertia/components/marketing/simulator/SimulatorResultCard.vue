@@ -46,6 +46,22 @@ function formatCurrency(amount: number): string {
 const maxCategoryCost = computed(() =>
   Math.max(...props.breakdown.categories.map((c) => c.maxCost))
 )
+
+const benchmarkComparison = computed(() => {
+  if (!props.benchmark) return null
+  const benchmarkAvg = (props.benchmark.avgMin + props.benchmark.avgMax) / 2
+  if (benchmarkAvg === 0) return null
+  const userAvg = (props.breakdown.totalMin + props.breakdown.totalMax) / 2
+  const percent = Math.round(((userAvg - benchmarkAvg) / benchmarkAvg) * 100)
+  const absPercent = Math.abs(percent)
+  const key =
+    percent > 5
+      ? 'simulator.benchmark_above'
+      : percent < -5
+        ? 'simulator.benchmark_below'
+        : 'simulator.benchmark_similar'
+  return { key, percent: absPercent, count: props.benchmark.count }
+})
 </script>
 
 <template>
@@ -95,14 +111,20 @@ const maxCategoryCost = computed(() =>
 
     <!-- Benchmark -->
     <div
-      v-if="props.benchmark"
+      v-if="benchmarkComparison"
       class="mt-3 rounded-xl border border-bone bg-cream px-4 py-3 text-center"
     >
-      <p class="text-xs text-fg-subtle">
-        {{ t('simulator.benchmark_label', { count: String(props.benchmark.count) }) }}
+      <p class="text-sm font-medium text-fg">
+        {{
+          t(benchmarkComparison.key, {
+            percent: String(benchmarkComparison.percent),
+            count: String(benchmarkComparison.count),
+          })
+        }}
       </p>
-      <p class="mt-1 text-sm font-semibold text-fg">
-        {{ formatCurrency(props.benchmark.avgMin) }} – {{ formatCurrency(props.benchmark.avgMax) }}
+      <p class="mt-1 text-xs text-fg-subtle">
+        {{ formatCurrency(props.benchmark!.avgMin) }} –
+        {{ formatCurrency(props.benchmark!.avgMax) }}
       </p>
     </div>
 

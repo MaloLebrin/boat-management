@@ -88,16 +88,52 @@ test('emits share when share button clicked', async () => {
   expect(w.emitted('share')).toBeTruthy()
 })
 
-test('renders benchmark block when benchmark prop is provided', () => {
+// breakdown userAvg = (900+2300)/2 = 1600, benchmarkAvg = (800+2000)/2 = 1400 → +14% → above
+test('renders benchmark_above when user costs exceed average by more than 5%', () => {
   const w = mount(SimulatorResultCard, {
     props: { breakdown, input, benchmark: { avgMin: 800, avgMax: 2000, count: 42 } },
   })
-  expect(w.text()).toContain('simulator.benchmark_label')
+  expect(w.text()).toContain('simulator.benchmark_above')
   expect(w.text()).toContain('800')
-  expect(w.text()).toContain('2')
+})
+
+// userAvg = (700+1300)/2 = 1000, benchmarkAvg = 1400 → -28% → below
+test('renders benchmark_below when user costs are below average by more than 5%', () => {
+  const cheapBreakdown: SimulatorCostBreakdown = {
+    categories: [{ key: 'hull', minCost: 400, maxCost: 900 }],
+    totalMin: 700,
+    totalMax: 1300,
+  }
+  const w = mount(SimulatorResultCard, {
+    props: {
+      breakdown: cheapBreakdown,
+      input,
+      benchmark: { avgMin: 800, avgMax: 2000, count: 15 },
+    },
+  })
+  expect(w.text()).toContain('simulator.benchmark_below')
+})
+
+// userAvg = (1200+1600)/2 = 1400, benchmarkAvg = 1400 → 0% → similar
+test('renders benchmark_similar when user costs are within 5% of average', () => {
+  const similarBreakdown: SimulatorCostBreakdown = {
+    categories: [{ key: 'hull', minCost: 800, maxCost: 1200 }],
+    totalMin: 1200,
+    totalMax: 1600,
+  }
+  const w = mount(SimulatorResultCard, {
+    props: {
+      breakdown: similarBreakdown,
+      input,
+      benchmark: { avgMin: 800, avgMax: 2000, count: 20 },
+    },
+  })
+  expect(w.text()).toContain('simulator.benchmark_similar')
 })
 
 test('does not render benchmark block when benchmark is absent', () => {
   const w = mount(SimulatorResultCard, { props: { breakdown, input } })
-  expect(w.text()).not.toContain('simulator.benchmark_label')
+  expect(w.text()).not.toContain('simulator.benchmark_above')
+  expect(w.text()).not.toContain('simulator.benchmark_below')
+  expect(w.text()).not.toContain('simulator.benchmark_similar')
 })
