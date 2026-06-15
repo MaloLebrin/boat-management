@@ -89,7 +89,7 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
                 <template #trailing>
                   <button
                     type="button"
-                    class="px-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-fg-muted focus-visible:outline-none"
+                    class="px-3 min-h-[44px] min-w-[44px] text-[11px] font-semibold uppercase tracking-[0.08em] text-fg-muted focus-visible:outline-none"
                     @click="showPassword = !showPassword"
                   >
                     {{ showPassword ? t('auth.login.hidePassword') : t('auth.login.showPassword') }}
