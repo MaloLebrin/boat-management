@@ -55,7 +55,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeyDown))
       <div v-if="open" class="fixed inset-0 z-51 flex items-center justify-center p-6">
         <div
           :class="[
-            'w-full rounded-(--radius-card) border border-border bg-surface-elevated shadow-(--shadow-lg)',
+            'flex max-h-[90dvh] w-full flex-col rounded-(--radius-card) border border-border bg-surface-elevated shadow-(--shadow-lg)',
             size === 'md'
               ? 'max-w-md'
               : size === 'xl'
@@ -81,7 +81,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeyDown))
               </BaseButton>
             </div>
           </div>
-          <div class="px-5 py-5">
+          <div class="overflow-y-auto px-5 py-5">
             <slot />
           </div>
           <div v-if="$slots.footer" class="border-t border-border px-5 py-4">
