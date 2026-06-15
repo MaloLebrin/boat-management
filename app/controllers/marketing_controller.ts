@@ -419,11 +419,6 @@ export default class MarketingController {
               title: i18n.t('marketing.home.security.item5_title'),
               description: i18n.t('marketing.home.security.item5_description'),
             },
-            {
-              icon: '🔐',
-              title: i18n.t('marketing.home.security.item6_title'),
-              description: i18n.t('marketing.home.security.item6_description'),
-            },
           ],
         },
         faq: {
@@ -484,7 +479,6 @@ export default class MarketingController {
               [t('tier_starter_feat1')],
               [t('tier_starter_feat2')],
               [t('tier_starter_feat3'), t('tier_starter_feat3_sub')],
-              [t('tier_starter_feat4')],
               [t('tier_starter_feat5')],
               [t('tier_starter_feat6'), t('tier_starter_feat6_sub')],
             ] as Array<[string, string?]>,
@@ -524,14 +518,11 @@ export default class MarketingController {
             sub: t('tier_enterprise_sub'),
             feats: [
               [t('tier_enterprise_feat1')],
-              [t('tier_enterprise_feat2')],
-              [t('tier_enterprise_feat3'), t('tier_enterprise_feat3_sub')],
               [t('tier_enterprise_feat4')],
               [t('tier_enterprise_feat5'), t('tier_enterprise_feat5_sub')],
               [t('tier_enterprise_feat6'), t('tier_enterprise_feat6_sub')],
               [t('tier_enterprise_feat7')],
               [t('tier_enterprise_feat8')],
-              [t('tier_enterprise_feat9')],
             ] as Array<[string, string?]>,
             cta: t('tier_enterprise_cta'),
             ctaVariant: 'secondary',
@@ -632,7 +623,6 @@ export default class MarketingController {
               rows: [
                 [t('table_g1_r1'), t('table_g1_r1_s'), t('table_g1_r1_p'), t('table_g1_r1_e')],
                 [t('table_g1_r2'), t('table_g1_r2_s'), t('table_g1_r2_p'), t('table_g1_r2_e')],
-                [t('table_g1_r3'), true, true, true],
                 [t('table_g1_r4'), true, true, true],
                 [t('table_g1_r5'), false, true, true],
                 [t('table_g1_r6'), false, false, true],
@@ -648,7 +638,6 @@ export default class MarketingController {
                 [t('table_g2_r5'), t('table_g2_r5_s'), t('table_g2_r5_pe'), t('table_g2_r5_pe')],
                 [t('table_g2_r6'), false, true, true],
                 [t('table_g2_r7'), false, true, true],
-                [t('table_g2_r8'), false, false, true],
               ] as Array<[string, boolean | string, boolean | string, boolean | string]>,
             },
             {
@@ -659,8 +648,6 @@ export default class MarketingController {
                 [t('table_g3_r3'), false, t('table_g3_r3_p'), t('table_g3_r3_e')],
                 [t('table_g3_r4'), false, true, true],
                 [t('table_g3_r5'), true, true, true],
-                [t('table_g3_r6'), false, true, true],
-                [t('table_g3_r7'), false, t('table_g3_r7_p'), t('table_g3_r7_e')],
               ] as Array<[string, boolean | string, boolean | string, boolean | string]>,
             },
             {
@@ -678,34 +665,8 @@ export default class MarketingController {
               title: t('table_g5'),
               rows: [
                 [t('table_g5_r1'), t('table_g5_r1_s'), t('table_g5_r1_p'), t('table_g5_r1_e')],
-                [t('table_g5_r2'), false, true, true],
                 [t('table_g5_r3'), false, true, true],
                 [t('table_g5_r4'), true, true, true],
-                [t('table_g5_r5'), false, false, t('table_g5_r5_e')],
-              ] as Array<[string, boolean | string, boolean | string, boolean | string]>,
-            },
-            {
-              title: t('table_g6'),
-              rows: [
-                [t('table_g6_r1'), true, true, true],
-                [t('table_g6_r2'), true, true, true],
-                [t('table_g6_r3'), true, true, true],
-                [t('table_g6_r4'), t('table_g6_r4_s'), t('table_g6_r4_p'), t('table_g6_r4_e')],
-                [t('table_g6_r5'), false, false, true],
-                [t('table_g6_r6'), false, false, true],
-                [t('table_g6_r7'), false, false, true],
-                [t('table_g6_r8'), false, false, true],
-              ] as Array<[string, boolean | string, boolean | string, boolean | string]>,
-            },
-            {
-              title: t('table_g7'),
-              rows: [
-                [t('table_g7_r1'), false, t('table_g7_r1_p'), t('table_g7_r1_e')],
-                [t('table_g7_r2'), false, t('table_g7_r2_p'), t('table_g7_r2_e')],
-                [t('table_g7_r3'), false, true, true],
-                [t('table_g7_r4'), false, false, true],
-                [t('table_g7_r5'), false, false, true],
-                [t('table_g7_r6'), false, true, true],
               ] as Array<[string, boolean | string, boolean | string, boolean | string]>,
             },
             {
@@ -716,7 +677,6 @@ export default class MarketingController {
                 [t('table_g8_r3'), false, false, true],
                 [t('table_g8_r4'), false, false, true],
                 [t('table_g8_r5'), false, t('table_g8_r5_p'), t('table_g8_r5_e')],
-                [t('table_g8_r6'), false, false, t('table_g8_r6_e')],
                 [t('table_g8_r7'), t('table_g8_r7_s'), t('table_g8_r7_p'), t('table_g8_r7_e')],
               ] as Array<[string, boolean | string, boolean | string, boolean | string]>,
             },
@@ -742,14 +702,6 @@ export default class MarketingController {
               price: t('extras_2_price'),
               priceSub: t('extras_2_price_sub'),
               tone: 'coral',
-            },
-            {
-              icon: '🎓',
-              title: t('extras_3_title'),
-              sub: t('extras_3_sub'),
-              price: t('extras_3_price'),
-              priceSub: t('extras_3_price_sub'),
-              tone: 'navy',
             },
             {
               icon: '🔗',

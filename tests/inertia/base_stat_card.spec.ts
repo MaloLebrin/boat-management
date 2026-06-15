@@ -1,6 +1,20 @@
 import { mount } from '@vue/test-utils'
-import { test, expect } from 'vitest'
+import { test, expect, vi } from 'vitest'
 import BaseStatCard from '../../inertia/components/base/BaseStatCard.vue'
+
+vi.mock('@inertiajs/vue3', () => ({
+  usePage: () => ({
+    props: {
+      appT: {
+        'common.tone.neutral': 'neutral',
+        'common.tone.success': 'success',
+        'common.tone.info': 'info',
+        'common.tone.warning': 'warning',
+      },
+      locale: 'en',
+    },
+  }),
+}))
 
 test('renders label and value', () => {
   const w = mount(BaseStatCard, { props: { label: 'Boats', value: '12', tone: 'info' } })
