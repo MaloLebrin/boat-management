@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { router, usePage } from '@inertiajs/vue3'
 import { Link } from '@adonisjs/inertia/vue'
-import { computed } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
+import AppHeaderMobileDrawer from '~/components/layout/AppHeaderMobileDrawer.vue'
 import { useT } from '~/composables/use_t'
 import { buildLocaleSwitchHref, type AppLocale } from '#shared/helpers/locale_path'
 
@@ -36,6 +37,38 @@ function switchLocale() {
   }
   router.post('/locale', { locale: otherLocale.value }, { preserveScroll: true })
 }
+
+const isMenuOpen = ref(false)
+
+function openMenu() {
+  isMenuOpen.value = true
+}
+
+function closeMenu() {
+  isMenuOpen.value = false
+}
+
+function onKeydown(e: KeyboardEvent) {
+  if (e.key === 'Escape') closeMenu()
+}
+
+watch(
+  () => page.url,
+  () => closeMenu()
+)
+
+watch(
+  () => isMenuOpen.value,
+  (open) => {
+    if (open) {
+      window.addEventListener('keydown', onKeydown)
+      return
+    }
+    window.removeEventListener('keydown', onKeydown)
+  }
+)
+
+onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
 </script>
 
 <template>
@@ -106,14 +139,48 @@ function switchLocale() {
           </Link>
         </template>
         <template v-else>
-          <Link href="/login">
+          <Link href="/login" class="hidden md:inline-flex">
             <BaseButton variant="ghost" size="sm">{{ t('public.actions.login') }}</BaseButton>
           </Link>
-          <Link href="/signup">
+          <Link href="/signup" class="hidden md:inline-flex">
             <BaseButton size="sm">{{ t('public.actions.tryFree') }}</BaseButton>
           </Link>
         </template>
+
+        <!-- Hamburger button (mobile only) -->
+        <button
+          type="button"
+          class="inline-flex md:hidden items-center justify-center w-10 h-10 rounded-(--radius-control) text-fg-muted transition-colors duration-(--motion-fast) hover:bg-paper hover:text-fg"
+          aria-controls="public-nav-drawer"
+          :aria-expanded="isMenuOpen ? 'true' : 'false'"
+          @click="openMenu"
+        >
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 6h16M4 12h16M4 18h16"
+            />
+          </svg>
+          <span class="sr-only">{{ t('nav.menu') }}</span>
+        </button>
       </div>
     </div>
   </header>
+
+  <AppHeaderMobileDrawer
+    :is-open="isMenuOpen"
+    :locale="locale"
+    :guide-href="guideHref"
+    :is-authed="isAuthed"
+    @close="closeMenu"
+    @switch-locale="switchLocale"
+  />
 </template>
