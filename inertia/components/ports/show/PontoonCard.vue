@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { Link, router } from '@inertiajs/vue3'
+import { router } from '@inertiajs/vue3'
+import { Link } from '@adonisjs/inertia/vue'
 import { PencilIcon, TrashIcon } from '@heroicons/vue/24/outline'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'

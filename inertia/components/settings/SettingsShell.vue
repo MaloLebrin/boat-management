@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { Link, usePage } from '@inertiajs/vue3'
+import { usePage } from '@inertiajs/vue3'
+import { Link } from '@adonisjs/inertia/vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import { useT } from '~/composables/use_t'
 

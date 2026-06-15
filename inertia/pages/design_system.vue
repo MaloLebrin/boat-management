@@ -7,7 +7,8 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3'
+import { Head } from '@inertiajs/vue3'
+import { Link } from '@adonisjs/inertia/vue'
 import { computed, ref } from 'vue'
 
 const props = defineProps<{ meta?: { title: string; description: string } }>()

@@ -4,7 +4,8 @@ export default { layout: PublicLayout }
 </script>
 
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3'
+import { Head } from '@inertiajs/vue3'
+import { Link } from '@adonisjs/inertia/vue'
 import { computed } from 'vue'
 import { useT } from '~/composables/use_t'
 import SimulatorResultCard from '~/components/marketing/simulator/SimulatorResultCard.vue'
