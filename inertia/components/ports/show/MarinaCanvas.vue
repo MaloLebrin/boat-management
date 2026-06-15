@@ -27,7 +27,7 @@ type DragState = { kind: 'pontoon' | 'mouillage'; id: number; offsetX: number; o
 const drag = ref<DragState | null>(null)
 const dragPos = ref<Record<number, { x: number; y: number }>>({})
 
-function svgCoords(e: MouseEvent) {
+function svgCoords(e: PointerEvent) {
   const rect = svgRef.value!.getBoundingClientRect()
   return { x: e.clientX - rect.left, y: e.clientY - rect.top }
 }
@@ -42,8 +42,9 @@ function onBgMouseDown() {
   emit('canvas-click')
 }
 
-function onSvgMouseMove(e: MouseEvent) {
+function onSvgPointerMove(e: PointerEvent) {
   if (!drag.value) return
+  e.preventDefault()
   const { x, y } = svgCoords(e)
   const key = drag.value.kind === 'pontoon' ? drag.value.id : drag.value.id + 100000
   dragPos.value[key] = {
@@ -52,7 +53,7 @@ function onSvgMouseMove(e: MouseEvent) {
   }
 }
 
-function onSvgMouseUp() {
+function onSvgPointerUp() {
   if (!drag.value) return
   const key = drag.value.kind === 'pontoon' ? drag.value.id : drag.value.id + 100000
   const pos = dragPos.value[key]
@@ -66,16 +67,18 @@ function onSvgMouseUp() {
   drag.value = null
 }
 
-function startPontoonDrag(e: MouseEvent, pontoon: { id: number; x: number; y: number }) {
+function startPontoonDrag(e: PointerEvent, pontoon: { id: number; x: number; y: number }) {
   if (!props.editMode) return
   e.stopPropagation()
+  svgRef.value?.setPointerCapture(e.pointerId)
   const { x, y } = svgCoords(e)
   drag.value = { kind: 'pontoon', id: pontoon.id, offsetX: x - pontoon.x, offsetY: y - pontoon.y }
 }
 
-function startMouillageDrag(e: MouseEvent, mouillage: { id: number; x: number; y: number }) {
+function startMouillageDrag(e: PointerEvent, mouillage: { id: number; x: number; y: number }) {
   if (!props.editMode) return
   e.stopPropagation()
+  svgRef.value?.setPointerCapture(e.pointerId)
   const { x, y } = svgCoords(e)
   drag.value = {
     kind: 'mouillage',
@@ -96,13 +99,13 @@ function handleSpotClick(info: { spotId: number; boat: { id: number; name: strin
     width="1400"
     height="900"
     viewBox="0 0 1400 900"
-    :style="{ cursor: drag ? 'grabbing' : editMode ? 'grab' : 'default' }"
-    @mousemove="onSvgMouseMove"
-    @mouseup="onSvgMouseUp"
-    @mouseleave="onSvgMouseUp"
+    :style="{ cursor: drag ? 'grabbing' : editMode ? 'grab' : 'default', touchAction: 'none' }"
+    @pointermove="onSvgPointerMove"
+    @pointerup="onSvgPointerUp"
+    @pointercancel="onSvgPointerUp"
   >
     <!-- Water background -->
-    <rect width="1400" height="900" fill="#D6EAF8" @mousedown="onBgMouseDown" />
+    <rect width="1400" height="900" fill="#D6EAF8" @pointerdown="onBgMouseDown" />
 
     <!-- Grid dots -->
     <defs>
@@ -121,8 +124,8 @@ function handleSpotClick(info: { spotId: number; boat: { id: number; name: strin
       :y="currentPos('mouillage', m).y"
       :edit-mode="editMode"
       :selected-boat-id="selectedBoatId"
-      @mousedown="
-        (e: MouseEvent) =>
+      @pointerdown="
+        (e: PointerEvent) =>
           startMouillageDrag(e, {
             id: m.id,
             x: currentPos('mouillage', m).x,
@@ -142,8 +145,8 @@ function handleSpotClick(info: { spotId: number; boat: { id: number; name: strin
       :y="currentPos('pontoon', pt).y"
       :edit-mode="editMode"
       :selected-boat-id="selectedBoatId"
-      @mousedown="
-        (e: MouseEvent) =>
+      @pointerdown="
+        (e: PointerEvent) =>
           startPontoonDrag(e, {
             id: pt.id,
             x: currentPos('pontoon', pt).x,

@@ -16,7 +16,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  'mousedown': [e: MouseEvent]
+  'pointerdown': [e: PointerEvent]
   'spot-click': [info: { spotId: number; boat: { id: number; name: string } | null }]
   'zone-click': []
 }>()
@@ -42,8 +42,8 @@ function getSpotStroke(spot: SpotRow): string {
   return 'white'
 }
 
-function handleMouseDown(e: MouseEvent) {
-  emit('mousedown', e)
+function handlePointerDown(e: PointerEvent) {
+  emit('pointerdown', e)
 }
 
 function handleZoneClick() {
@@ -59,7 +59,7 @@ function handleSpotClick(spot: SpotRow) {
   <g
     :transform="`translate(${x + RX}, ${y + RY})`"
     :style="{ cursor: editMode ? 'grab' : 'pointer' }"
-    @mousedown="handleMouseDown"
+    @pointerdown="handlePointerDown"
   >
     <!-- Zone ellipse -->
     <ellipse

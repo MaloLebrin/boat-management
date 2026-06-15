@@ -18,7 +18,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  'mousedown': [e: MouseEvent]
+  'pointerdown': [e: PointerEvent]
   'spot-click': [info: { spotId: number; boat: { id: number; name: string } | null }]
   'pier-click': []
 }>()
@@ -50,7 +50,7 @@ function handleSpotClick(spot: SpotRow) {
   <g
     :transform="`translate(${x}, ${y})`"
     :style="{ cursor: editMode ? 'grab' : 'pointer' }"
-    @mousedown="$emit('mousedown', $event)"
+    @pointerdown="$emit('pointerdown', $event)"
   >
     <!-- Pontoon body -->
     <rect
