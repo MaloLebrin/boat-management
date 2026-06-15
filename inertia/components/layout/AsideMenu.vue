@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { Form, Link } from '@adonisjs/inertia/vue'
+import { Form } from '@adonisjs/inertia/vue'
 import { usePage } from '@inertiajs/vue3'
 import { computed } from 'vue'
 import Logo from '~/components/Logo.vue'
 import LanguageSwitcher from '~/components/layout/LanguageSwitcher.vue'
-import NavIcon from '~/components/layout/NavIcon.vue'
+import NavItem from '~/components/layout/NavItem.vue'
 import { useNavSections } from '~/composables/use_nav_sections'
 import { useT } from '~/composables/use_t'
 
@@ -50,40 +50,13 @@ function isActive(path: string): boolean {
         </p>
         <ul class="space-y-1">
           <li v-for="item in section.items" :key="item.path">
-            <Link
-              v-if="item.route"
+            <NavItem
+              :name="item.name"
+              :path="item.path"
               :route="item.route"
-              class="relative flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors"
-              :class="
-                isActive(item.path)
-                  ? 'bg-navy-700 text-white'
-                  : 'text-navy-100 hover:bg-navy-700 hover:text-white'
-              "
-            >
-              <span
-                v-if="isActive(item.path)"
-                class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-navy-500 rounded-r"
-              />
-              <NavIcon :name="item.icon" />
-              <span>{{ item.name }}</span>
-            </Link>
-            <a
-              v-else
-              :href="item.path"
-              class="relative flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors"
-              :class="
-                isActive(item.path)
-                  ? 'bg-navy-700 text-white'
-                  : 'text-navy-100 hover:bg-navy-700 hover:text-white'
-              "
-            >
-              <span
-                v-if="isActive(item.path)"
-                class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-navy-500 rounded-r"
-              />
-              <NavIcon :name="item.icon" />
-              <span>{{ item.name }}</span>
-            </a>
+              :icon="item.icon"
+              :is-active="isActive(item.path)"
+            />
           </li>
         </ul>
       </div>

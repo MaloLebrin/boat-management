@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Form, Link } from '@adonisjs/inertia/vue'
+import { Form } from '@adonisjs/inertia/vue'
 import type { Data } from '@generated/data'
 import { usePage } from '@inertiajs/vue3'
 import { nextTick, onBeforeUnmount, ref, watch } from 'vue'
@@ -7,7 +7,7 @@ import { Toaster, toast } from 'vue-sonner'
 import brandIconUrl from '~/assets/brand/fleetai_compass.svg'
 import AsideMenu from '~/components/layout/AsideMenu.vue'
 import LanguageSwitcher from '~/components/layout/LanguageSwitcher.vue'
-import NavIcon from '~/components/layout/NavIcon.vue'
+import NavItem from '~/components/layout/NavItem.vue'
 import { useNavSections } from '~/composables/use_nav_sections'
 import { useT } from '~/composables/use_t'
 
@@ -171,24 +171,13 @@ onBeforeUnmount(() => {
             </p>
             <ul class="space-y-1">
               <li v-for="item in section.items" :key="item.path">
-                <Link
-                  v-if="item.route"
+                <NavItem
+                  :name="item.name"
+                  :path="item.path"
                   :route="item.route"
-                  class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-navy-100 hover:bg-navy-700 hover:text-white transition-colors"
+                  :icon="item.icon"
                   @click="closeSidebar"
-                >
-                  <NavIcon :name="item.icon" />
-                  <span>{{ item.name }}</span>
-                </Link>
-                <a
-                  v-else
-                  :href="item.path"
-                  class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-navy-100 hover:bg-navy-700 hover:text-white transition-colors"
-                  @click="closeSidebar"
-                >
-                  <NavIcon :name="item.icon" />
-                  <span>{{ item.name }}</span>
-                </a>
+                />
               </li>
             </ul>
           </div>
