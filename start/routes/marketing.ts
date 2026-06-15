@@ -5,7 +5,7 @@ const MarketingController = () => import('#controllers/marketing_controller')
 const SimulatorController = () => import('#controllers/simulator_controller')
 const SimulatorLeadController = () => import('#controllers/simulator_lead_controller')
 
-router.get('/', ({ response }) => response.redirect('/en')).as('root')
+router.get('/', ({ response }) => response.redirect('/en')).as('home')
 
 router
   .group(() => {

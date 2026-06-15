@@ -859,7 +859,7 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/spots_controller').default['destroy']>>>
     }
   }
-  'root': {
+  'home': {
     methods: ["GET","HEAD"]
     pattern: '/'
     types: {

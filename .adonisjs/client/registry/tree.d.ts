@@ -107,7 +107,7 @@ export interface ApiDefinition {
     update: typeof routes['spots.update']
     destroy: typeof routes['spots.destroy']
   }
-  root: typeof routes['root']
+  home: typeof routes['home']
   marketing: {
     en: {
       home: typeof routes['marketing.en.home']

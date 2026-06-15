@@ -75,7 +75,7 @@ export type ScannedRoutes = {
     'ports.mouillages.spots.store': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'mouillageId': ParamValue} }
     'spots.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'spots.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'root': { paramsTuple?: []; params?: {} }
+    'home': { paramsTuple?: []; params?: {} }
     'marketing.en.home': { paramsTuple?: []; params?: {} }
     'marketing.en.pricing': { paramsTuple?: []; params?: {} }
     'marketing.en.simulator': { paramsTuple?: []; params?: {} }
@@ -150,7 +150,7 @@ export type ScannedRoutes = {
     'ports.create': { paramsTuple?: []; params?: {} }
     'ports.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'ports.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'root': { paramsTuple?: []; params?: {} }
+    'home': { paramsTuple?: []; params?: {} }
     'marketing.en.home': { paramsTuple?: []; params?: {} }
     'marketing.en.pricing': { paramsTuple?: []; params?: {} }
     'marketing.en.simulator': { paramsTuple?: []; params?: {} }
@@ -201,7 +201,7 @@ export type ScannedRoutes = {
     'ports.create': { paramsTuple?: []; params?: {} }
     'ports.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'ports.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'root': { paramsTuple?: []; params?: {} }
+    'home': { paramsTuple?: []; params?: {} }
     'marketing.en.home': { paramsTuple?: []; params?: {} }
     'marketing.en.pricing': { paramsTuple?: []; params?: {} }
     'marketing.en.simulator': { paramsTuple?: []; params?: {} }

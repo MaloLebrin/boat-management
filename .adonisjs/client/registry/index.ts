@@ -432,11 +432,11 @@ const routes = {
     tokens: [{"old":"/spots/:id","type":0,"val":"spots","end":""},{"old":"/spots/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['spots.destroy']['types'],
   },
-  'root': {
+  'home': {
     methods: ["GET","HEAD"],
     pattern: '/',
     tokens: [{"old":"/","type":0,"val":"/","end":""}],
-    types: placeholder as Registry['root']['types'],
+    types: placeholder as Registry['home']['types'],
   },
   'marketing.en.home': {
     methods: ["GET","HEAD"],
