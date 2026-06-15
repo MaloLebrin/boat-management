@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { Link, router, usePage } from '@inertiajs/vue3'
+import { router, usePage } from '@inertiajs/vue3'
+import { Link } from '@adonisjs/inertia/vue'
 import { computed } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import { useT } from '~/composables/use_t'

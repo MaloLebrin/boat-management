@@ -27,11 +27,20 @@ export default [
     },
   },
   {
-    files: ['inertia/**/*.ts'],
+    files: ['inertia/**/*.ts', 'inertia/**/*.vue'],
     rules: {
       '@adonisjs/no-backend-import-in-frontend': [
         'error',
-        { allowed: ['../../shared/constants/**'] },
+        {
+          allowed: [
+            '#shared/**',
+            '../../shared/**',
+            '../../../shared/**',
+            '../../../../shared/**',
+            '../../../../../shared/**',
+            '../../../../../../shared/**',
+          ],
+        },
       ],
     },
   },
