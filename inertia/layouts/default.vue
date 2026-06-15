@@ -106,7 +106,7 @@ onBeforeUnmount(() => {
       </header>
 
       <!-- Scrollable content area -->
-      <main class="flex-1 overflow-y-auto bg-linear-to-br from-lilac-50 via-peach-50 to-mint-100">
+      <main class="flex-1 overflow-y-auto bg-cream">
         <Transition name="page" mode="out-in">
           <div :key="page.url">
             <slot />
