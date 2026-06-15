@@ -322,8 +322,8 @@ function dismissAlert() {
             </div>
           </template>
 
-          <div class="overflow-hidden rounded-(--radius-control) border border-border">
-            <table class="w-full text-left text-sm">
+          <div class="overflow-x-auto rounded-(--radius-control) border border-border">
+            <table class="w-full min-w-[520px] text-left text-sm">
               <thead class="bg-surface-muted text-fg-muted">
                 <tr>
                   <th class="px-4 py-3 font-semibold">
