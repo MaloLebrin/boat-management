@@ -3,6 +3,12 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-06-15 — Fix : redirections pour /maintenance et /organization (#32)
+
+**Correctif — Router**
+
+Les routes `/maintenance` et `/organization` renvoyaient une erreur 500 car elles n'étaient pas définies. Ajout de redirections permanentes : `/maintenance` → `/maintenance/history` et `/organization` → `/organization/members`.
+
 ## 2026-06-15 — Fix BaseStatCard : badge affiche le label i18n au lieu du nom de l'enum (#31)
 
 **Correctif — BaseStatCard**

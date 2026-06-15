@@ -4,6 +4,10 @@ import router from '@adonisjs/core/services/router'
 
 router
   .group(() => {
+    router.get('organization', ({ response }) =>
+      response.redirect().toPath('/organization/members')
+    )
+
     router
       .get('organization/members', [controllers.OrganizationMembers, 'index'])
       .as('organization.members.index')
