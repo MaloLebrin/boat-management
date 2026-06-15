@@ -73,12 +73,13 @@ const cards = [
       {{ bentoGrid.title }}
     </h2>
 
-    <div class="grid gap-3" style="grid-template-columns: 2fr 1fr 1fr; grid-auto-rows: 180px">
+    <div
+      class="grid gap-3 grid-cols-1 auto-rows-auto md:grid-cols-[2fr_1fr_1fr] md:auto-rows-[180px]"
+    >
       <!-- Card 0: Vue marina (featured, span 2 rows, navy-900) -->
       <div
-        class="relative overflow-hidden rounded-2xl p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+        class="relative overflow-hidden rounded-2xl p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl md:row-span-2"
         :class="cards[0].bg"
-        style="grid-row: span 2"
         :style="sectionVisible ? { transitionDelay: '0ms', opacity: 1 } : { opacity: 0 }"
       >
         <!-- Pontoon grid decoration -->
@@ -125,9 +126,8 @@ const cards = [
 
       <!-- Card 3: Documents & IA (wide, span 2 cols) -->
       <div
-        class="relative overflow-hidden rounded-2xl p-5 border border-bone transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
+        class="relative overflow-hidden rounded-2xl p-5 border border-bone transition-all duration-300 hover:-translate-y-1 hover:shadow-md md:col-span-2"
         :class="cards[3].bg"
-        style="grid-column: span 2"
         :style="sectionVisible ? { transitionDelay: '180ms' } : { opacity: 0 }"
       >
         <div class="mb-3 flex items-center gap-2">
