@@ -1,6 +1,5 @@
-@layout('emails/_layout')
-
-  @section('content')
+@component('emails/_layout')
+  @slot('content')
     <h2 style="margin:0 0 20px;color:#333333;font-size:22px;">
       You're Invited! / Vous etes invite !
     </h2>
@@ -34,3 +33,4 @@
       This invitation expires in 7 days. If you did not expect this, you can safely ignore this email.
     </p>
   @end
+@end

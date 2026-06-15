@@ -1,6 +1,5 @@
-@layout('emails/_layout')
-
-  @section('content')
+@component('emails/_layout')
+  @slot('content')
     <h2 style="margin:0 0 25px;color:#333333;font-size:22px;">
       @if(isFr)
         3 conseils pour reduire les couts d'entretien de votre bateau
@@ -47,3 +46,4 @@
       </tr>
     </table>
   @end
+@end
