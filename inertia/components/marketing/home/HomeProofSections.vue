@@ -55,7 +55,7 @@ function getComparisonVal(row: string, col: 'excel' | 'paper' | 'fleetai'): stri
 <template>
   <!-- Section 7: Stats KPIs -->
   <section
-    :ref="(el) => (statsEl = el as HTMLElement)"
+    :ref="statsEl"
     class="mt-14 reveal rounded-2xl bg-navy-900 px-8 py-12"
     :class="{ visible: statsVisible }"
   >
@@ -72,11 +72,7 @@ function getComparisonVal(row: string, col: 'excel' | 'paper' | 'fleetai'): stri
   </section>
 
   <!-- Section 8: Use cases -->
-  <section
-    :ref="(el) => (useCasesEl = el as HTMLElement)"
-    class="mt-14 reveal"
-    :class="{ visible: useCasesVisible }"
-  >
+  <section :ref="useCasesEl" class="mt-14 reveal" :class="{ visible: useCasesVisible }">
     <BaseCard padded>
       <template #header>
         <p class="font-display text-sm font-semibold text-fg">{{ useCases.title }}</p>
@@ -95,11 +91,7 @@ function getComparisonVal(row: string, col: 'excel' | 'paper' | 'fleetai'): stri
   </section>
 
   <!-- Section 9: Testimonials -->
-  <section
-    :ref="(el) => (testimonialsEl = el as HTMLElement)"
-    class="mt-14 reveal"
-    :class="{ visible: testimonialsVisible }"
-  >
+  <section :ref="testimonialsEl" class="mt-14 reveal" :class="{ visible: testimonialsVisible }">
     <div class="text-center mb-8">
       <BaseHeading level="2">{{ testimonials.title }}</BaseHeading>
     </div>
@@ -129,7 +121,7 @@ function getComparisonVal(row: string, col: 'excel' | 'paper' | 'fleetai'): stri
 
   <!-- Section: Comparison table -->
   <section
-    :ref="(el) => (comparisonEl = el as HTMLElement)"
+    :ref="comparisonEl"
     class="mt-14 reveal rounded-2xl bg-paper py-14 px-8"
     :class="{ visible: comparisonVisible }"
   >
@@ -178,11 +170,7 @@ function getComparisonVal(row: string, col: 'excel' | 'paper' | 'fleetai'): stri
   </section>
 
   <!-- Section 10: Security -->
-  <section
-    :ref="(el) => (securityEl = el as HTMLElement)"
-    class="mt-14 reveal"
-    :class="{ visible: securityVisible }"
-  >
+  <section :ref="securityEl" class="mt-14 reveal" :class="{ visible: securityVisible }">
     <BaseCard padded>
       <template #header>
         <p class="font-display text-sm font-semibold text-fg">{{ security.title }}</p>
@@ -207,7 +195,7 @@ function getComparisonVal(row: string, col: 'excel' | 'paper' | 'fleetai'): stri
 
   <!-- Section: Blog -->
   <section
-    :ref="(el) => (blogEl = el as HTMLElement)"
+    :ref="blogEl"
     class="mt-14 reveal rounded-2xl bg-paper py-14 px-8"
     :class="{ visible: blogVisible }"
   >

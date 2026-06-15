@@ -32,7 +32,7 @@ const mockComponents: Record<MockType, typeof HomeMockBoatDetail> = {
 
 <template>
   <section
-    :ref="(el) => (sectionEl = el as HTMLElement)"
+    :ref="sectionEl"
     class="reveal px-6 py-20 lg:px-8 lg:py-24"
     :class="[bgClass || 'bg-cream', { visible: isVisible }]"
   >

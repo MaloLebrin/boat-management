@@ -65,7 +65,7 @@ const cards = [
 
 <template>
   <section
-    :ref="(el) => (sectionEl = el as HTMLElement)"
+    :ref="sectionEl"
     class="mt-14 reveal rounded-2xl bg-paper py-14 px-8"
     :class="{ visible: sectionVisible }"
   >

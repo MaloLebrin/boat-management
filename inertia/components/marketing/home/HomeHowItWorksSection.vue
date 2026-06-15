@@ -28,7 +28,7 @@ const { el: previewEl, isVisible: previewVisible } = useScrollReveal()
 <template>
   <!-- Section 5: How it works -->
   <section
-    :ref="(el) => (howItWorksEl = el as HTMLElement)"
+    :ref="howItWorksEl"
     class="mt-14 reveal bg-cream rounded-xl py-12 px-8"
     :class="{ visible: howItWorksVisible }"
   >
@@ -91,7 +91,7 @@ const { el: previewEl, isVisible: previewVisible } = useScrollReveal()
 
   <!-- Section 6: Preview dashboard mockup -->
   <section
-    :ref="(el) => (previewEl = el as HTMLElement)"
+    :ref="previewEl"
     class="mt-14 reveal grid gap-6 lg:grid-cols-2 lg:items-center"
     :class="{ visible: previewVisible }"
   >

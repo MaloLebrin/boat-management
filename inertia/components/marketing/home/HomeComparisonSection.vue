@@ -26,7 +26,7 @@ function getCellClass(value: string): string {
 
 <template>
   <section
-    :ref="(el) => (sectionEl = el as HTMLElement)"
+    :ref="sectionEl"
     class="reveal bg-navy-900 px-6 py-20 lg:px-8 lg:py-24"
     :class="{ visible: isVisible }"
   >

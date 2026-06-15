@@ -26,7 +26,7 @@ const tabIcons = [ComputerDesktopIcon, DocumentTextIcon, ClipboardDocumentCheckI
 
 <template>
   <section
-    :ref="(el) => (sectionEl = el as HTMLElement)"
+    :ref="sectionEl"
     class="reveal bg-paper rounded-2xl py-14 px-8"
     :class="{ visible: sectionVisible }"
   >

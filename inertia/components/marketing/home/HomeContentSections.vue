@@ -32,11 +32,7 @@ const { el: personasEl, isVisible: personasVisible } = useScrollReveal()
 
 <template>
   <!-- Section: Three things -->
-  <section
-    :ref="(el) => (threeThingsEl = el as HTMLElement)"
-    class="mt-14 reveal py-16"
-    :class="{ visible: threeThingsVisible }"
-  >
+  <section :ref="threeThingsEl" class="mt-14 reveal py-16" :class="{ visible: threeThingsVisible }">
     <div class="mb-10 text-center">
       <p class="text-xs font-semibold uppercase tracking-widest text-fg-subtle">
         {{ tApp('homePreview.eyebrowHowItWorks') }}
@@ -57,11 +53,7 @@ const { el: personasEl, isVisible: personasVisible } = useScrollReveal()
   </section>
 
   <!-- Section 3: Problem -->
-  <section
-    :ref="(el) => (problemEl = el as HTMLElement)"
-    class="mt-14 reveal"
-    :class="{ visible: problemVisible }"
-  >
+  <section :ref="problemEl" class="mt-14 reveal" :class="{ visible: problemVisible }">
     <BaseCard padded>
       <template #header>
         <p class="font-display text-sm font-semibold text-fg">{{ problem.title }}</p>
@@ -82,7 +74,7 @@ const { el: personasEl, isVisible: personasVisible } = useScrollReveal()
   <!-- Section 4: Features -->
   <section
     id="features"
-    :ref="(el) => (featuresEl = el as HTMLElement)"
+    :ref="featuresEl"
     class="mt-14 reveal"
     :class="{ visible: featuresVisible }"
   >
@@ -126,11 +118,7 @@ const { el: personasEl, isVisible: personasVisible } = useScrollReveal()
   </section>
 
   <!-- Section: Personas -->
-  <section
-    :ref="(el) => (personasEl = el as HTMLElement)"
-    class="reveal py-14"
-    :class="{ visible: personasVisible }"
-  >
+  <section :ref="personasEl" class="reveal py-14" :class="{ visible: personasVisible }">
     <div class="mb-10 text-center">
       <p class="text-xs font-semibold uppercase tracking-widest text-fg-subtle">
         {{ tApp('homePreview.eyebrowForWho') }}
