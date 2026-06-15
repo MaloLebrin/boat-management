@@ -10,5 +10,11 @@
   "unknown": "Unknown",
   "loading": "Loading…",
   "none": "None",
-  "selectPlaceholder": "Select..."
+  "selectPlaceholder": "Select...",
+  "tone": {
+    "neutral": "Normal",
+    "success": "Good",
+    "info": "Info",
+    "warning": "Warning"
+  }
 }

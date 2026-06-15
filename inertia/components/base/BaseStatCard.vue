@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import BaseBadge from '~/components/base/BaseBadge.vue'
+import { useT } from '~/composables/use_t'
+
+const { t } = useT()
 
 withDefaults(
   defineProps<{
@@ -21,7 +24,7 @@ withDefaults(
         {{ label }}
       </p>
       <BaseBadge :variant="tone">
-        {{ tone }}
+        {{ t(`common.tone.${tone}`) }}
       </BaseBadge>
     </div>
     <p class="mt-3 font-display text-3xl font-bold tracking-tight text-fg">

@@ -10,5 +10,11 @@
   "unknown": "Inconnu",
   "loading": "Chargement…",
   "none": "Aucun",
-  "selectPlaceholder": "Sélectionner..."
+  "selectPlaceholder": "Sélectionner...",
+  "tone": {
+    "neutral": "Normal",
+    "success": "Bon",
+    "info": "Info",
+    "warning": "Attention"
+  }
 }
