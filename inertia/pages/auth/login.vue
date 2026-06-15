@@ -11,6 +11,7 @@ import { Form } from '@adonisjs/inertia/vue'
 import { Head } from '@inertiajs/vue3'
 import { computed, ref } from 'vue'
 import AuthNavyPanel from '~/components/auth/AuthNavyPanel.vue'
+import BaseButton from '~/components/base/BaseButton.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import { useT } from '~/composables/use_t'
 
@@ -32,12 +33,9 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
       <!-- Top-right helper -->
       <div class="flex items-center justify-end gap-3.5 px-8 py-6">
         <span class="text-xs text-fg-muted">{{ t('auth.login.needHelp') }}</span>
-        <a
-          href="mailto:support@fleetai.io"
-          class="rounded-md border border-bone bg-white px-2.5 py-1.5 text-xs font-semibold text-fg transition-colors hover:bg-paper"
-        >
+        <BaseButton href="mailto:support@fleetai.io" variant="secondary" size="sm">
           {{ t('auth.login.contactSupport') }}
-        </a>
+        </BaseButton>
       </div>
 
       <!-- Form, vertically centred -->
@@ -108,11 +106,12 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
                 <span class="text-[13px] text-fg-muted">{{ t('auth.login.rememberMe') }}</span>
               </label>
 
-              <button
+              <BaseButton
                 type="submit"
+                variant="primary"
+                size="lg"
                 :disabled="processing"
-                class="mt-1 flex w-full items-center justify-center gap-2 rounded-lg px-5 py-3.5 text-sm font-semibold text-white transition-all duration-150 disabled:opacity-60 hover:brightness-110"
-                style="background: #0b1d2e"
+                class="mt-1 w-full"
               >
                 {{ t('auth.login.submit') }}
                 <svg
@@ -128,7 +127,7 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
                 >
                   <path d="M5 12h14M13 6l6 6-6 6" />
                 </svg>
-              </button>
+              </BaseButton>
             </div>
           </Form>
 
