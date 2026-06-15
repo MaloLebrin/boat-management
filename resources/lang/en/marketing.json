@@ -944,7 +944,7 @@
     "table_g1_r1_e": "unlimited",
     "table_g1_r2": "Users",
     "table_g1_r2_s": "1",
-    "table_g1_r2_p": "unlimited",
+    "table_g1_r2_p": "up to 5",
     "table_g1_r2_e": "unlimited + SSO",
     "table_g1_r3": "Mobile companion (iOS & Android)",
     "table_g1_r4": "Immutable history",

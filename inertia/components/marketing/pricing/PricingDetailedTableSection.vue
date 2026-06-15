@@ -91,7 +91,7 @@ function collapseAllGroups() {
       <div class="overflow-x-auto rounded-2xl border border-bone bg-white">
         <table class="w-full min-w-[640px] text-sm">
           <!-- Sticky header -->
-          <thead class="sticky top-16 z-10 bg-white shadow-sm">
+          <thead class="bg-white shadow-sm">
             <tr>
               <th class="w-1/3 px-6 py-4 text-left font-medium text-fg-muted"></th>
               <th
