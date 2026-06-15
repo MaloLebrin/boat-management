@@ -32,11 +32,7 @@ function dotBorder(tone?: string) {
 </script>
 
 <template>
-  <section
-    :ref="(r) => (el = r as HTMLElement)"
-    class="reveal bg-cream px-6 py-20 lg:px-8"
-    :class="{ visible: isVisible }"
-  >
+  <section :ref="el" class="reveal bg-cream px-6 py-20 lg:px-8" :class="{ visible: isVisible }">
     <div class="mx-auto max-w-7xl">
       <div class="grid gap-12 lg:grid-cols-[1fr_2fr] lg:gap-20">
         <!-- Left: heading -->

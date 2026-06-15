@@ -58,11 +58,7 @@ function collapseAllGroups() {
 </script>
 
 <template>
-  <section
-    :ref="(r) => (el = r as HTMLElement)"
-    class="reveal bg-paper px-6 py-20 lg:px-8"
-    :class="{ visible: isVisible }"
-  >
+  <section :ref="el" class="reveal bg-paper px-6 py-20 lg:px-8" :class="{ visible: isVisible }">
     <div class="mx-auto max-w-7xl">
       <!-- Header -->
       <div class="mb-8 text-center">

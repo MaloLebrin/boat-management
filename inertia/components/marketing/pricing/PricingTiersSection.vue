@@ -32,11 +32,7 @@ const { el, isVisible } = useScrollReveal()
 </script>
 
 <template>
-  <section
-    :ref="(r) => (el = r as HTMLElement)"
-    class="reveal bg-cream px-6 pb-16 lg:px-8"
-    :class="{ visible: isVisible }"
-  >
+  <section :ref="el" class="reveal bg-cream px-6 pb-16 lg:px-8" :class="{ visible: isVisible }">
     <div class="mx-auto max-w-7xl">
       <!-- Tiers grid -->
       <div class="grid gap-6 lg:grid-cols-3">

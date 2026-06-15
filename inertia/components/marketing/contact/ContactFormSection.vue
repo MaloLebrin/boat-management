@@ -38,11 +38,7 @@ const fleetSizes = ['1-4', '5-20', '20+']
 </script>
 
 <template>
-  <section
-    :ref="(r) => (el = r as HTMLElement)"
-    class="reveal bg-paper px-6 py-20 lg:px-8"
-    :class="{ visible: isVisible }"
-  >
+  <section :ref="el" class="reveal bg-paper px-6 py-20 lg:px-8" :class="{ visible: isVisible }">
     <div class="mx-auto max-w-7xl">
       <div class="grid gap-12 lg:grid-cols-[1.4fr_1fr]">
         <!-- Form card -->
