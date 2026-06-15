@@ -41,39 +41,41 @@ function getCellClass(value: string): string {
 
       <!-- Table -->
       <div class="overflow-hidden rounded-xl border border-white/10">
-        <table class="w-full text-sm">
-          <thead class="bg-white/5 text-xs font-semibold uppercase tracking-wider text-white/50">
-            <tr>
-              <th class="px-4 py-3 text-left">{{ cols.feature }}</th>
-              <th class="px-4 py-3 text-center">{{ cols.excel }}</th>
-              <th class="px-4 py-3 text-center">{{ cols.paper }}</th>
-              <th class="px-4 py-3 text-center bg-mint-600/20 text-mint-300 font-bold">
-                {{ cols.fleetai }}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr
-              v-for="(row, idx) in rows"
-              :key="row.feature"
-              :class="idx % 2 === 0 ? 'bg-white/2' : 'bg-white/5'"
-            >
-              <td class="px-4 py-3 font-medium text-navy-50">{{ row.feature }}</td>
-              <td class="px-4 py-3 text-center text-navy-50" :class="getCellClass(row.excel)">
-                {{ row.excel }}
-              </td>
-              <td class="px-4 py-3 text-center text-navy-50" :class="getCellClass(row.paper)">
-                {{ row.paper }}
-              </td>
-              <td
-                class="px-4 py-3 text-center bg-mint-600/10 text-navy-50"
-                :class="getCellClass(row.fleetai)"
+        <div class="overflow-x-auto">
+          <table class="w-full min-w-[480px] text-sm">
+            <thead class="bg-white/5 text-xs font-semibold uppercase tracking-wider text-white/50">
+              <tr>
+                <th class="px-4 py-3 text-left">{{ cols.feature }}</th>
+                <th class="px-4 py-3 text-center">{{ cols.excel }}</th>
+                <th class="px-4 py-3 text-center">{{ cols.paper }}</th>
+                <th class="px-4 py-3 text-center bg-mint-600/20 text-mint-300 font-bold">
+                  {{ cols.fleetai }}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="(row, idx) in rows"
+                :key="row.feature"
+                :class="idx % 2 === 0 ? 'bg-white/2' : 'bg-white/5'"
               >
-                {{ row.fleetai }}
-              </td>
-            </tr>
-          </tbody>
-        </table>
+                <td class="px-4 py-3 font-medium text-navy-50">{{ row.feature }}</td>
+                <td class="px-4 py-3 text-center text-navy-50" :class="getCellClass(row.excel)">
+                  {{ row.excel }}
+                </td>
+                <td class="px-4 py-3 text-center text-navy-50" :class="getCellClass(row.paper)">
+                  {{ row.paper }}
+                </td>
+                <td
+                  class="px-4 py-3 text-center bg-mint-600/10 text-navy-50"
+                  :class="getCellClass(row.fleetai)"
+                >
+                  {{ row.fleetai }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </section>
