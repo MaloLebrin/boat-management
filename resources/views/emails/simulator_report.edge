@@ -1,6 +1,5 @@
-@layout('emails/_layout')
-
-  @section('content')
+@component('emails/_layout')
+  @slot('content')
     <h2 style="margin:0 0 20px;color:#333333;font-size:22px;">
       @if(isFr)
         Votre rapport d'estimation de couts
@@ -86,3 +85,4 @@
       @end
     </p>
   @end
+@end
