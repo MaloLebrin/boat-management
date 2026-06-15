@@ -15,11 +15,7 @@ import type {
 } from '../../../../shared/types/organization'
 
 const props = defineProps<{
-  user: {
-    id: number
-    email: string
-    fullName: string | null
-  }
+  currentUserId: number
   members: OrganizationMemberData[]
   pendingInvitations: OrganizationInvitationData[]
   canManageMembers: boolean
@@ -131,7 +127,7 @@ function removeMember(memberId: number) {
               </div>
             </td>
             <td class="px-6 py-4">
-              <template v-if="canManageMembers && member.userId !== user.id">
+              <template v-if="canManageMembers && member.userId !== props.currentUserId">
                 <select
                   :value="member.role"
                   class="rounded-md border border-border bg-surface px-2 py-1 text-sm text-fg focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
@@ -154,7 +150,7 @@ function removeMember(memberId: number) {
               </BaseBadge>
             </td>
             <td class="px-6 py-4 text-right">
-              <template v-if="member.userId === user.id">
+              <template v-if="member.userId === props.currentUserId">
                 <span class="text-xs text-fg-muted">{{ t('settings.members.you') }}</span>
               </template>
               <template v-else-if="canManageMembers">

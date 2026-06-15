@@ -12,11 +12,7 @@ import type {
 } from '../../../shared/types/organization'
 
 defineProps<{
-  user: {
-    id: number
-    email: string
-    fullName: string | null
-  }
+  currentUserId: number
   members: OrganizationMemberData[]
   pendingInvitations: OrganizationInvitationData[]
   canManageMembers: boolean
@@ -27,7 +23,7 @@ defineProps<{
 <template>
   <SettingsShell>
     <SettingsMembersTab
-      :user="user"
+      :current-user-id="currentUserId"
       :members="members"
       :pending-invitations="pendingInvitations"
       :can-manage-members="canManageMembers"

@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { Form } from '@adonisjs/inertia/vue'
+import { usePage } from '@inertiajs/vue3'
+import type { Data } from '@generated/data'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
@@ -7,14 +9,8 @@ import BaseInput from '~/components/base/BaseInput.vue'
 import { useT } from '~/composables/use_t'
 
 const { t } = useT()
-
-defineProps<{
-  user: {
-    id: number
-    email: string
-    fullName: string | null
-  }
-}>()
+const page = usePage<Data.SharedProps>()
+const user = page.props.user
 </script>
 
 <template>

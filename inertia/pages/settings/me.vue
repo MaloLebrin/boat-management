@@ -6,18 +6,10 @@ export default { layout: DefaultLayout }
 <script setup lang="ts">
 import SettingsShell from '~/components/settings/SettingsShell.vue'
 import SettingsMeTab from '~/components/settings/tabs/SettingsMeTab.vue'
-
-defineProps<{
-  user: {
-    id: number
-    email: string
-    fullName: string | null
-  }
-}>()
 </script>
 
 <template>
   <SettingsShell>
-    <SettingsMeTab :user="user" />
+    <SettingsMeTab />
   </SettingsShell>
 </template>

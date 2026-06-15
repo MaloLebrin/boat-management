@@ -33,7 +33,8 @@
     "maxPersons": "Max persons on board",
     "pontoon": "Pontoon",
     "mouillage": "Anchorage",
-    "spotIdentifier": "Berth number"
+    "spotIdentifier": "Berth number",
+    "selectPlaceholder": "Select…"
   },
   "engines": {
     "title": "Engines",

@@ -16,16 +16,8 @@ export default class SettingsController {
     private subscriptionService: SubscriptionService,
     private quotaService: QuotaService
   ) {}
-  async me({ inertia, auth }: HttpContext) {
-    const user = await auth.authenticate()
-
-    return inertia.render('settings/me', {
-      user: {
-        id: user.id,
-        email: user.email,
-        fullName: user.fullName,
-      },
-    })
+  async me({ inertia }: HttpContext) {
+    return inertia.render('settings/me', {})
   }
 
   async org({ inertia, auth }: HttpContext) {
@@ -52,11 +44,7 @@ export default class SettingsController {
     ])
 
     return inertia.render('settings/members', {
-      user: {
-        id: user.id,
-        email: user.email,
-        fullName: user.fullName,
-      },
+      currentUserId: user.id,
       members,
       pendingInvitations,
       canManageMembers,
