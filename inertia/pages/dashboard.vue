@@ -276,12 +276,12 @@ function dismissAlert() {
         </BaseCard>
       </div>
 
-      <div class="bg-navy-800 text-white rounded-xl p-5">
+      <div class="bg-surface-inverse text-fg-inverse rounded-xl p-5">
         <div class="flex items-center gap-2 mb-1">
-          <span class="text-navy-500">&#10022;</span>
+          <span class="text-info">&#10022;</span>
           <h3 class="text-base font-semibold">{{ t('dashboard.aiPanel.title') }}</h3>
         </div>
-        <p class="text-xs text-navy-200 mb-4">{{ t('dashboard.aiPanel.suggestions') }}</p>
+        <p class="text-xs text-fg-inverse/70 mb-4">{{ t('dashboard.aiPanel.suggestions') }}</p>
 
         <div v-if="isAnalyzing" class="space-y-3 mb-5">
           <BaseSkeleton height-class="h-14" rounded-class="rounded-lg" class="opacity-30" />
@@ -289,27 +289,22 @@ function dismissAlert() {
           <BaseSkeleton height-class="h-10" rounded-class="rounded-lg" class="opacity-10" />
         </div>
         <div v-else-if="!aiFleetAnalysis" class="mb-5">
-          <p class="text-sm text-navy-300">{{ t('dashboard.aiPanel.empty') }}</p>
+          <p class="text-sm text-fg-inverse/60">{{ t('dashboard.aiPanel.empty') }}</p>
         </div>
         <div v-else-if="aiFleetAnalysis.length === 0" class="mb-5">
-          <p class="text-sm text-navy-300">{{ t('dashboard.aiPanel.noSuggestions') }}</p>
+          <p class="text-sm text-fg-inverse/60">{{ t('dashboard.aiPanel.noSuggestions') }}</p>
         </div>
         <div v-else class="space-y-3 mb-5">
           <div
             v-for="(s, i) in aiFleetAnalysis"
             :key="i"
-            class="bg-navy-700/60 rounded-lg p-3 border border-navy-600"
+            class="bg-brand/60 rounded-lg p-3 border border-brand"
           >
-            <p class="text-sm text-navy-50">{{ s.text }}</p>
+            <p class="text-sm text-fg-inverse">{{ s.text }}</p>
           </div>
         </div>
 
-        <button
-          type="button"
-          :disabled="isAnalyzing"
-          class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-navy-500 hover:bg-navy-600 disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-medium transition-colors"
-          @click="analyzeFleet"
-        >
+        <BaseButton :disabled="isAnalyzing" class="w-full" @click="analyzeFleet">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               stroke-linecap="round"
@@ -321,7 +316,7 @@ function dismissAlert() {
           <span>{{
             isAnalyzing ? t('dashboard.aiPanel.analyzing') : t('dashboard.analyzeFleet')
           }}</span>
-        </button>
+        </BaseButton>
       </div>
     </div>
   </div>
