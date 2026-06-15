@@ -26,6 +26,7 @@
     "more": "+{count} more",
     "withoutDate": "Without a planned date",
     "schedule": "Schedule",
-    "hourTriggered": "Triggered by engine hours"
+    "hourTriggered": "Triggered by engine hours",
+    "agendaEmpty": "No tasks this month"
   }
 }

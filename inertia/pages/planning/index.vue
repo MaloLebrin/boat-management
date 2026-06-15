@@ -108,6 +108,15 @@ function taskPillClass(task: PlanningTask): string {
 }
 
 const allTasks = computed(() => [...props.tasks, ...props.doneTasks])
+
+const agendaDays = computed(() => calendarDays.value.filter((d) => d.tasks.length > 0))
+
+function agendaDayLabel(day: number): string {
+  return new Date(currentYear.value, currentMonth.value, day).toLocaleDateString(locale.value, {
+    weekday: 'short',
+    day: 'numeric',
+  })
+}
 </script>
 
 <template>
@@ -361,64 +370,113 @@ const allTasks = computed(() => [...props.tasks, ...props.doneTasks])
           </div>
         </template>
 
-        <!-- Day-of-week header -->
-        <div class="mb-1 grid grid-cols-7 text-center">
-          <div v-for="day in weekdays" :key="day" class="py-1 text-xs font-semibold text-fg-muted">
-            {{ day }}
+        <!-- Mobile: agenda list -->
+        <div class="sm:hidden">
+          <div v-if="agendaDays.length === 0" class="py-8 text-center text-sm text-fg-muted">
+            {{ t('planning.calendar.agendaEmpty') }}
+          </div>
+          <div v-else class="divide-y divide-border">
+            <div v-for="cell in agendaDays" :key="cell.day" class="flex gap-3 py-3">
+              <div class="w-12 shrink-0 text-center">
+                <span
+                  class="mx-auto flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold"
+                  :class="
+                    cell.day === today.getDate() &&
+                    currentMonth === today.getMonth() &&
+                    currentYear === today.getFullYear()
+                      ? 'bg-navy-500 text-white'
+                      : 'text-fg-muted'
+                  "
+                >
+                  {{ cell.day }}
+                </span>
+                <p class="mt-0.5 text-xs text-fg-muted capitalize">
+                  {{ agendaDayLabel(cell.day) }}
+                </p>
+              </div>
+              <div class="flex-1 space-y-1.5">
+                <div
+                  v-for="task in cell.tasks"
+                  :key="task.id"
+                  :class="[
+                    'flex items-center gap-2 rounded-md px-2 py-1.5 text-sm font-medium cursor-pointer hover:opacity-80',
+                    taskPillClass(task),
+                  ]"
+                  @click="router.visit(`/boats/${task.boatId}`)"
+                >
+                  <span class="truncate">{{ task.title }}</span>
+                  <span class="ml-auto shrink-0 text-xs opacity-75">{{ task.boatName }}</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <!-- Calendar grid -->
-        <div class="grid grid-cols-7 gap-px rounded-lg overflow-hidden border border-border">
-          <!-- Empty cells for offset -->
-          <div
-            v-for="n in firstWeekday"
-            :key="`empty-${n}`"
-            class="min-h-20 bg-surface-muted/40 p-1"
-          />
-          <!-- Day cells -->
-          <div
-            v-for="cell in calendarDays"
-            :key="cell.day"
-            class="min-h-20 bg-surface-elevated p-1.5"
-            :class="
-              cell.day === today.getDate() &&
-              currentMonth === today.getMonth() &&
-              currentYear === today.getFullYear()
-                ? 'ring-2 ring-inset ring-navy-500'
-                : ''
-            "
-          >
-            <span
-              class="mb-1 flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold"
+        <!-- Desktop: 7-column calendar grid -->
+        <div class="hidden sm:block">
+          <!-- Day-of-week header -->
+          <div class="mb-1 grid grid-cols-7 text-center">
+            <div
+              v-for="day in weekdays"
+              :key="day"
+              class="py-1 text-xs font-semibold text-fg-muted"
+            >
+              {{ day }}
+            </div>
+          </div>
+
+          <!-- Calendar grid -->
+          <div class="grid grid-cols-7 gap-px rounded-lg overflow-hidden border border-border">
+            <!-- Empty cells for offset -->
+            <div
+              v-for="n in firstWeekday"
+              :key="`empty-${n}`"
+              class="min-h-20 bg-surface-muted/40 p-1"
+            />
+            <!-- Day cells -->
+            <div
+              v-for="cell in calendarDays"
+              :key="cell.day"
+              class="min-h-20 bg-surface-elevated p-1.5"
               :class="
                 cell.day === today.getDate() &&
                 currentMonth === today.getMonth() &&
                 currentYear === today.getFullYear()
-                  ? 'bg-navy-500 text-white'
-                  : 'text-fg-muted'
+                  ? 'ring-2 ring-inset ring-navy-500'
+                  : ''
               "
             >
-              {{ cell.day }}
-            </span>
-            <div class="space-y-0.5">
-              <div
-                v-for="task in cell.tasks.slice(0, 3)"
-                :key="task.id"
-                :class="[
-                  'truncate rounded px-1 py-0.5 text-xs font-medium cursor-pointer hover:opacity-80',
-                  taskPillClass(task),
-                ]"
-                :title="task.boatName + ' · ' + task.title"
-                @click="router.visit(`/boats/${task.boatId}`)"
+              <span
+                class="mb-1 flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold"
+                :class="
+                  cell.day === today.getDate() &&
+                  currentMonth === today.getMonth() &&
+                  currentYear === today.getFullYear()
+                    ? 'bg-navy-500 text-white'
+                    : 'text-fg-muted'
+                "
               >
-                {{ task.title }}
-              </div>
-              <div
-                v-if="cell.tasks.length > 3"
-                class="rounded bg-surface-muted px-1 py-0.5 text-xs text-fg-muted"
-              >
-                {{ t('planning.calendar.more', { count: String(cell.tasks.length - 3) }) }}
+                {{ cell.day }}
+              </span>
+              <div class="space-y-0.5">
+                <div
+                  v-for="task in cell.tasks.slice(0, 3)"
+                  :key="task.id"
+                  :class="[
+                    'truncate rounded px-1 py-0.5 text-xs font-medium cursor-pointer hover:opacity-80',
+                    taskPillClass(task),
+                  ]"
+                  :title="task.boatName + ' · ' + task.title"
+                  @click="router.visit(`/boats/${task.boatId}`)"
+                >
+                  {{ task.title }}
+                </div>
+                <div
+                  v-if="cell.tasks.length > 3"
+                  class="rounded bg-surface-muted px-1 py-0.5 text-xs text-fg-muted"
+                >
+                  {{ t('planning.calendar.more', { count: String(cell.tasks.length - 3) }) }}
+                </div>
               </div>
             </div>
           </div>

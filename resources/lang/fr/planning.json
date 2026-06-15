@@ -26,6 +26,7 @@
     "more": "+{count} autres",
     "withoutDate": "Sans date planifiée",
     "schedule": "Planifier",
-    "hourTriggered": "Déclenchées par les heures moteur"
+    "hourTriggered": "Déclenchées par les heures moteur",
+    "agendaEmpty": "Aucune tâche ce mois-ci"
   }
 }
