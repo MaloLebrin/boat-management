@@ -13,11 +13,11 @@ const locale = computed<'en' | 'fr'>(() => props.locale ?? page.props.locale ?? 
 </script>
 
 <template>
-  <footer class="border-t border-abyss-800 bg-abyss-950">
+  <footer class="border-t border-navy-700 bg-navy-900">
     <div class="mx-auto grid max-w-7xl gap-10 px-6 py-12 md:grid-cols-4">
       <div class="space-y-3">
         <p class="font-display text-sm font-semibold text-white">Fleet AI</p>
-        <p class="text-sm text-abyss-300">
+        <p class="text-sm text-navy-200">
           {{
             locale === 'fr'
               ? 'Le suivi technique de flotte, avec la clarté de l’IA.'
@@ -27,8 +27,8 @@ const locale = computed<'en' | 'fr'>(() => props.locale ?? page.props.locale ?? 
       </div>
 
       <div class="space-y-3">
-        <p class="text-xs font-semibold uppercase tracking-wider text-abyss-400">Product</p>
-        <div class="grid gap-2 text-sm font-semibold text-abyss-300">
+        <p class="text-xs font-semibold uppercase tracking-wider text-navy-300">Product</p>
+        <div class="grid gap-2 text-sm font-semibold text-navy-200">
           <Link :href="`/${locale}#features`" class="hover:text-white">Features</Link>
           <Link :href="`/${locale}/tarifs`" class="hover:text-white">{{
             locale === 'fr' ? 'Tarifs' : 'Pricing'
@@ -37,8 +37,8 @@ const locale = computed<'en' | 'fr'>(() => props.locale ?? page.props.locale ?? 
       </div>
 
       <div class="space-y-3">
-        <p class="text-xs font-semibold uppercase tracking-wider text-abyss-400">Company</p>
-        <div class="grid gap-2 text-sm font-semibold text-abyss-300">
+        <p class="text-xs font-semibold uppercase tracking-wider text-navy-300">Company</p>
+        <div class="grid gap-2 text-sm font-semibold text-navy-200">
           <Link :href="`/${locale}/contact`" class="hover:text-white"
             >{{ locale === 'fr' ? 'Contact' : 'Contact' }}
           </Link>
@@ -50,8 +50,8 @@ const locale = computed<'en' | 'fr'>(() => props.locale ?? page.props.locale ?? 
       </div>
 
       <div class="space-y-3">
-        <p class="text-xs font-semibold uppercase tracking-wider text-abyss-400">Legal</p>
-        <div class="grid gap-2 text-sm font-semibold text-abyss-300">
+        <p class="text-xs font-semibold uppercase tracking-wider text-navy-300">Legal</p>
+        <div class="grid gap-2 text-sm font-semibold text-navy-200">
           <Link :href="`/${locale}/privacy`" class="hover:text-white">{{
             locale === 'fr' ? 'Confidentialité' : 'Privacy'
           }}</Link>
@@ -62,9 +62,9 @@ const locale = computed<'en' | 'fr'>(() => props.locale ?? page.props.locale ?? 
       </div>
     </div>
 
-    <div class="border-t border-abyss-800">
+    <div class="border-t border-navy-700">
       <div
-        class="mx-auto flex max-w-7xl items-center justify-between px-6 py-6 text-xs font-semibold text-abyss-400"
+        class="mx-auto flex max-w-7xl items-center justify-between px-6 py-6 text-xs font-semibold text-navy-300"
       >
         <span>© {{ new Date().getFullYear() }} Fleet AI</span>
         <span>{{ locale === 'fr' ? 'Bilingue FR / EN' : 'Bilingual EN / FR' }}</span>

@@ -17,21 +17,12 @@
   --color-navy-700: #1a3a55; /* primary interactive — boutons, accents */
   --color-navy-600: #2a527a;
   --color-navy-500: #3d6f9c; /* accent clair */
+  --color-navy-400: #56697d; /* muted mid-tone */
+  --color-navy-300: #8a9aab; /* textes secondaires sur fond sombre */
+  --color-navy-200: #b8c6d9; /* bordures subtiles */
   --color-navy-100: #dde7f0;
   --color-navy-50: #eef3f8;
-
-  /* Alias abyss → navy (rétrocompatibilité composants existants) */
-  --color-abyss-950: #0b1d2e;
-  --color-abyss-900: #102a40;
-  --color-abyss-800: #1a3a55;
-  --color-abyss-700: #2a527a;
-  --color-abyss-600: #3d6f9c;
-  --color-abyss-500: #56697d;
-  --color-abyss-400: #8a9aab;
-  --color-abyss-300: #b8c6d9;
-  --color-abyss-200: #dde7f0;
-  --color-abyss-100: #eef3f8;
-  --color-abyss-50: #f8fafb;
+  --color-navy-25: #f8fafb; /* quasi-blanc */
 
   /* ============================================================
      NEUTRALS CHAUDS — canvas, surfaces (inspiration Clay)
@@ -67,12 +58,6 @@
   --color-foam-100: #e0f2fe;
   --color-foam-200: #bae6fd;
   --color-foam-300: #93d4f8;
-
-  /* Lagoon → alias navy-500/600 */
-  --color-lagoon-400: #4d83b5;
-  --color-lagoon-500: #3d6f9c;
-  --color-lagoon-600: #2a527a;
-  --color-lagoon-700: #1a3a55;
 
   /* ============================================================
      CORAL — alertes vives, actions urgentes

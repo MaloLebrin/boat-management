@@ -74,7 +74,7 @@ function formatDate(iso: string): string {
           <div
             :class="[
               'h-full rounded-full transition-all',
-              isOverThreshold ? 'bg-coral-400' : 'bg-lagoon-500',
+              isOverThreshold ? 'bg-coral-400' : 'bg-navy-500',
             ]"
             :style="{ width: `${hoursProgress}%` }"
           />
@@ -109,7 +109,7 @@ function formatDate(iso: string): string {
     <!-- Right rail -->
     <div class="w-full lg:w-72 space-y-6">
       <!-- AI Panel -->
-      <div class="bg-abyss-900 text-white rounded-xl p-4">
+      <div class="bg-navy-800 text-white rounded-xl p-4">
         <p class="font-semibold flex items-center gap-2">
           <span class="text-brand">&#10022;</span> {{ t('boats.engineShow.overview.aiTitle') }}
         </p>

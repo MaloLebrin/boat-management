@@ -36,16 +36,16 @@ function isActive(path: string): boolean {
 </script>
 
 <template>
-  <aside class="hidden lg:flex flex-col w-64 h-full bg-abyss-950 text-white">
+  <aside class="hidden lg:flex flex-col w-64 h-full bg-navy-900 text-white">
     <!-- Logo -->
-    <div class="px-5 py-6 border-b border-abyss-800">
+    <div class="px-5 py-6 border-b border-navy-700">
       <Logo />
     </div>
 
     <!-- Navigation -->
     <nav class="flex-1 overflow-y-auto px-3 py-4">
       <div v-for="section in navSections" :key="section.label" class="mb-6">
-        <p class="px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-abyss-400">
+        <p class="px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-navy-300">
           {{ section.label }}
         </p>
         <ul class="space-y-1">
@@ -56,13 +56,13 @@ function isActive(path: string): boolean {
               class="relative flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors"
               :class="
                 isActive(item.path)
-                  ? 'bg-abyss-800 text-white'
-                  : 'text-abyss-200 hover:bg-abyss-800 hover:text-white'
+                  ? 'bg-navy-700 text-white'
+                  : 'text-navy-100 hover:bg-navy-700 hover:text-white'
               "
             >
               <span
                 v-if="isActive(item.path)"
-                class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-lagoon-500 rounded-r"
+                class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-navy-500 rounded-r"
               />
               <NavIcon :name="item.icon" />
               <span>{{ item.name }}</span>
@@ -73,13 +73,13 @@ function isActive(path: string): boolean {
               class="relative flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors"
               :class="
                 isActive(item.path)
-                  ? 'bg-abyss-800 text-white'
-                  : 'text-abyss-200 hover:bg-abyss-800 hover:text-white'
+                  ? 'bg-navy-700 text-white'
+                  : 'text-navy-100 hover:bg-navy-700 hover:text-white'
               "
             >
               <span
                 v-if="isActive(item.path)"
-                class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-lagoon-500 rounded-r"
+                class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-navy-500 rounded-r"
               />
               <NavIcon :name="item.icon" />
               <span>{{ item.name }}</span>
@@ -90,13 +90,13 @@ function isActive(path: string): boolean {
     </nav>
 
     <!-- User info + Logout -->
-    <div class="mt-auto border-t border-abyss-800 px-4 py-4">
+    <div class="mt-auto border-t border-navy-700 px-4 py-4">
       <div class="flex items-center justify-between mb-3 px-0">
         <LanguageSwitcher />
       </div>
       <div class="flex items-center gap-3 mb-3">
         <div
-          class="flex items-center justify-center w-10 h-10 rounded-full bg-lagoon-500 text-white font-semibold text-sm"
+          class="flex items-center justify-center w-10 h-10 rounded-full bg-navy-500 text-white font-semibold text-sm"
         >
           {{ user?.initials ?? '?' }}
         </div>
@@ -104,7 +104,7 @@ function isActive(path: string): boolean {
           <p class="text-sm font-medium text-white truncate">
             {{ user?.fullName ?? t('nav.unknownUser') }}
           </p>
-          <p class="text-xs text-abyss-300 truncate">
+          <p class="text-xs text-navy-200 truncate">
             {{ user?.email ?? '' }}
           </p>
         </div>
@@ -112,7 +112,7 @@ function isActive(path: string): boolean {
       <Form route="session.destroy">
         <button
           type="submit"
-          class="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm font-medium text-abyss-200 hover:bg-abyss-800 hover:text-white transition-colors"
+          class="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm font-medium text-navy-100 hover:bg-navy-700 hover:text-white transition-colors"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path

@@ -47,7 +47,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeyDown))
     <Transition name="modal-overlay">
       <div
         v-if="open"
-        class="fixed inset-0 z-50 bg-abyss-950/30 backdrop-blur-[2px]"
+        class="fixed inset-0 z-50 bg-navy-900/30 backdrop-blur-[2px]"
         @click="close"
       />
     </Transition>

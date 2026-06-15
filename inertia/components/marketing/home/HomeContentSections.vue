@@ -97,7 +97,7 @@ const { el: personasEl, isVisible: personasVisible } = useScrollReveal()
         <div
           v-for="(f, idx) in features.items"
           :key="f.title"
-          class="reveal rounded-(--radius-control) border border-border border-l-2 border-l-lagoon-500/40 bg-surface-elevated px-4 py-4 shadow-(--shadow-xs)"
+          class="reveal rounded-(--radius-control) border border-border border-l-2 border-l-navy-500/40 bg-surface-elevated px-4 py-4 shadow-(--shadow-xs)"
           :class="[`reveal-delay-${idx % 4}`, { visible: featuresVisible }]"
         >
           <p class="text-sm font-semibold text-fg">{{ f.title }}</p>

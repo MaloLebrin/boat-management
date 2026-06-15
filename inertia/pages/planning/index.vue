@@ -98,13 +98,13 @@ function formatDue(task: PlanningTask): string {
 
 function taskPillClass(task: PlanningTask): string {
   const dueDate = task.dueAt
-  if (!dueDate) return 'bg-abyss-700 text-white'
+  if (!dueDate) return 'bg-navy-600 text-white'
   const todayIso = today.toISOString().slice(0, 10)
   if (dueDate < todayIso) return 'bg-red-500 text-white'
   const soon = new Date(today)
   soon.setDate(soon.getDate() + 30)
   if (new Date(dueDate) <= soon) return 'bg-amber-500 text-white'
-  return 'bg-lagoon-600 text-white'
+  return 'bg-navy-600 text-white'
 }
 
 const allTasks = computed(() => [...props.tasks, ...props.doneTasks])
@@ -252,11 +252,11 @@ const allTasks = computed(() => [...props.tasks, ...props.doneTasks])
       <!-- Planifiées -->
       <div class="flex flex-col gap-3">
         <div
-          class="flex items-center gap-2 rounded-lg border-l-4 border-abyss-700 bg-abyss-50 px-3 py-2"
+          class="flex items-center gap-2 rounded-lg border-l-4 border-navy-600 bg-navy-25 px-3 py-2"
         >
-          <h2 class="text-sm font-semibold text-abyss-700">{{ t('planning.kanban.planned') }}</h2>
+          <h2 class="text-sm font-semibold text-navy-600">{{ t('planning.kanban.planned') }}</h2>
           <span
-            class="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-abyss-700 px-1.5 text-xs font-semibold text-white"
+            class="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-navy-600 px-1.5 text-xs font-semibold text-white"
           >
             {{ plannedTasks.length }}
           </span>
@@ -385,7 +385,7 @@ const allTasks = computed(() => [...props.tasks, ...props.doneTasks])
               cell.day === today.getDate() &&
               currentMonth === today.getMonth() &&
               currentYear === today.getFullYear()
-                ? 'ring-2 ring-inset ring-lagoon-500'
+                ? 'ring-2 ring-inset ring-navy-500'
                 : ''
             "
           >
@@ -395,7 +395,7 @@ const allTasks = computed(() => [...props.tasks, ...props.doneTasks])
                 cell.day === today.getDate() &&
                 currentMonth === today.getMonth() &&
                 currentYear === today.getFullYear()
-                  ? 'bg-lagoon-500 text-white'
+                  ? 'bg-navy-500 text-white'
                   : 'text-fg-muted'
               "
             >
@@ -476,7 +476,7 @@ const allTasks = computed(() => [...props.tasks, ...props.doneTasks])
                   :class="
                     (task.currentEngineHours ?? 0) >= (task.dueEngineHours ?? 1)
                       ? 'bg-red-500'
-                      : 'bg-lagoon-500'
+                      : 'bg-navy-500'
                   "
                   :style="{
                     width: `${Math.min(100, ((task.currentEngineHours ?? 0) / (task.dueEngineHours ?? 1)) * 100)}%`,

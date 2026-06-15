@@ -72,7 +72,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="h-screen overflow-hidden flex bg-abyss-950">
+  <div class="h-screen overflow-hidden flex bg-navy-900">
     <!-- Desktop Sidebar (always visible on lg+) -->
     <AsideMenu :user="page.props.user" />
 
@@ -80,7 +80,7 @@ onBeforeUnmount(() => {
     <div class="flex-1 flex flex-col overflow-hidden">
       <!-- Mobile header bar (hamburger + logo) - only on small screens -->
       <header
-        class="lg:hidden flex items-center justify-between px-4 py-3 bg-abyss-950 border-b border-abyss-800"
+        class="lg:hidden flex items-center justify-between px-4 py-3 bg-navy-900 border-b border-navy-700"
       >
         <a href="/dashboard" class="flex items-center gap-3">
           <img :src="brandIconUrl" alt="FleetAi" class="h-9 w-9 rounded-lg shadow-md" />
@@ -88,7 +88,7 @@ onBeforeUnmount(() => {
         </a>
         <button
           type="button"
-          class="inline-flex items-center justify-center w-10 h-10 rounded-lg text-abyss-200 hover:bg-abyss-800 hover:text-white transition-colors"
+          class="inline-flex items-center justify-center w-10 h-10 rounded-lg text-navy-100 hover:bg-navy-700 hover:text-white transition-colors"
           aria-controls="auth-sidebar-drawer"
           :aria-expanded="isSidebarOpen ? 'true' : 'false'"
           @click="openSidebar"
@@ -132,23 +132,23 @@ onBeforeUnmount(() => {
         role="dialog"
         aria-modal="true"
         :aria-labelledby="drawerTitleId"
-        class="fixed left-0 top-0 z-50 h-full w-64 bg-abyss-950 shadow-xl lg:hidden"
+        class="fixed left-0 top-0 z-50 h-full w-64 bg-navy-900 shadow-xl lg:hidden"
       >
         <!-- Drawer header -->
-        <div class="flex items-center justify-between px-5 py-4 border-b border-abyss-800">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-navy-700">
           <div class="flex items-center gap-3">
             <img :src="brandIconUrl" alt="FleetAi" class="h-10 w-10 rounded-lg shadow-md" />
             <div class="flex flex-col leading-tight">
               <span :id="drawerTitleId" class="font-display text-base font-semibold text-white"
                 >FleetAi</span
               >
-              <span class="text-xs font-medium text-abyss-300">Fleet intelligence</span>
+              <span class="text-xs font-medium text-navy-200">Fleet intelligence</span>
             </div>
           </div>
           <button
             ref="closeButtonEl"
             type="button"
-            class="inline-flex items-center justify-center w-9 h-9 rounded-lg text-abyss-200 hover:bg-abyss-800 hover:text-white transition-colors"
+            class="inline-flex items-center justify-center w-9 h-9 rounded-lg text-navy-100 hover:bg-navy-700 hover:text-white transition-colors"
             :aria-label="t('nav.closeMenu')"
             @click="closeSidebar"
           >
@@ -166,7 +166,7 @@ onBeforeUnmount(() => {
         <!-- Drawer navigation -->
         <nav class="flex-1 overflow-y-auto px-3 py-4">
           <div v-for="section in navSections" :key="section.label" class="mb-6">
-            <p class="px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-abyss-400">
+            <p class="px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-navy-300">
               {{ section.label }}
             </p>
             <ul class="space-y-1">
@@ -174,7 +174,7 @@ onBeforeUnmount(() => {
                 <Link
                   v-if="item.route"
                   :route="item.route"
-                  class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-abyss-200 hover:bg-abyss-800 hover:text-white transition-colors"
+                  class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-navy-100 hover:bg-navy-700 hover:text-white transition-colors"
                   @click="closeSidebar"
                 >
                   <NavIcon :name="item.icon" />
@@ -183,7 +183,7 @@ onBeforeUnmount(() => {
                 <a
                   v-else
                   :href="item.path"
-                  class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-abyss-200 hover:bg-abyss-800 hover:text-white transition-colors"
+                  class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-navy-100 hover:bg-navy-700 hover:text-white transition-colors"
                   @click="closeSidebar"
                 >
                   <NavIcon :name="item.icon" />
@@ -196,14 +196,14 @@ onBeforeUnmount(() => {
 
         <!-- Drawer footer with user info -->
         <div
-          class="absolute bottom-0 left-0 right-0 border-t border-abyss-800 px-4 py-4 bg-abyss-950"
+          class="absolute bottom-0 left-0 right-0 border-t border-navy-700 px-4 py-4 bg-navy-900"
         >
           <div class="mb-3">
             <LanguageSwitcher />
           </div>
           <div class="flex items-center gap-3 mb-3">
             <div
-              class="flex items-center justify-center w-10 h-10 rounded-full bg-lagoon-500 text-white font-semibold text-sm"
+              class="flex items-center justify-center w-10 h-10 rounded-full bg-navy-500 text-white font-semibold text-sm"
             >
               {{ page.props.user?.initials ?? '?' }}
             </div>
@@ -211,7 +211,7 @@ onBeforeUnmount(() => {
               <p class="text-sm font-medium text-white truncate">
                 {{ page.props.user?.fullName ?? t('nav.unknownUser') }}
               </p>
-              <p class="text-xs text-abyss-300 truncate">
+              <p class="text-xs text-navy-200 truncate">
                 {{ page.props.user?.email ?? '' }}
               </p>
             </div>
@@ -219,7 +219,7 @@ onBeforeUnmount(() => {
           <Form route="session.destroy" @submit="closeSidebar">
             <button
               type="submit"
-              class="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm font-medium text-abyss-200 hover:bg-abyss-800 hover:text-white transition-colors"
+              class="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm font-medium text-navy-100 hover:bg-navy-700 hover:text-white transition-colors"
             >
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path

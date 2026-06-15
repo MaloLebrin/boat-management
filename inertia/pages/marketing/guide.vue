@@ -202,13 +202,13 @@ const faqSchema = computed(() =>
   />
 
   <!-- Final CTA -->
-  <section class="bg-abyss-950 px-6 py-16 lg:px-8 lg:py-24">
+  <section class="bg-navy-900 px-6 py-16 lg:px-8 lg:py-24">
     <div class="mx-auto max-w-2xl text-center">
       <h2 class="font-display text-3xl text-white lg:text-4xl">
         {{ guide.finalCta.title }}
         <em class="text-coral-400 not-italic">{{ guide.finalCta.titleHighlight }}</em>
       </h2>
-      <p class="mt-4 text-abyss-300">{{ guide.finalCta.subtitle }}</p>
+      <p class="mt-4 text-navy-200">{{ guide.finalCta.subtitle }}</p>
       <div class="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
         <Link
           href="/signup"
@@ -218,7 +218,7 @@ const faqSchema = computed(() =>
         </Link>
         <Link
           :href="simulatorUrl"
-          class="rounded-xl bg-abyss-800 px-8 py-3 text-sm font-semibold text-abyss-200 hover:bg-abyss-700"
+          class="rounded-xl bg-navy-700 px-8 py-3 text-sm font-semibold text-navy-100 hover:bg-navy-600"
         >
           {{ guide.finalCta.secondaryCta }}
         </Link>

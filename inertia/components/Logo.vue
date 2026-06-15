@@ -5,7 +5,7 @@
     </div>
     <div class="flex flex-col leading-tight">
       <span class="font-display text-base font-semibold text-white">FleetAi</span>
-      <span class="text-xs font-medium text-abyss-300">Fleet intelligence</span>
+      <span class="text-xs font-medium text-navy-200">Fleet intelligence</span>
     </div>
   </Link>
 </template>

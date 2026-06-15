@@ -58,14 +58,17 @@ function getCellClass(value: string): string {
               :key="row.feature"
               :class="idx % 2 === 0 ? 'bg-white/2' : 'bg-white/5'"
             >
-              <td class="px-4 py-3 font-medium text-abyss-100">{{ row.feature }}</td>
-              <td class="px-4 py-3 text-center text-abyss-100" :class="getCellClass(row.excel)">
+              <td class="px-4 py-3 font-medium text-navy-50">{{ row.feature }}</td>
+              <td class="px-4 py-3 text-center text-navy-50" :class="getCellClass(row.excel)">
                 {{ row.excel }}
               </td>
-              <td class="px-4 py-3 text-center text-abyss-100" :class="getCellClass(row.paper)">
+              <td class="px-4 py-3 text-center text-navy-50" :class="getCellClass(row.paper)">
                 {{ row.paper }}
               </td>
-              <td class="px-4 py-3 text-center bg-mint-600/10 text-abyss-100" :class="getCellClass(row.fleetai)">
+              <td
+                class="px-4 py-3 text-center bg-mint-600/10 text-navy-50"
+                :class="getCellClass(row.fleetai)"
+              >
                 {{ row.fleetai }}
               </td>
             </tr>
