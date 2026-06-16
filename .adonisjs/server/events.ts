@@ -6,9 +6,11 @@
 import OrganizationMemberJoined from '#events/organization_member_joined'
 import OrganizationPlanDowngraded from '#events/organization_plan_downgraded'
 import SimulatorLeadCreated from '#events/simulator_lead_created'
+import StorageThresholdCrossed from '#events/storage_threshold_crossed'
 
 export const events = {
   OrganizationMemberJoined: OrganizationMemberJoined,
   OrganizationPlanDowngraded: OrganizationPlanDowngraded,
   SimulatorLeadCreated: SimulatorLeadCreated,
+  StorageThresholdCrossed: StorageThresholdCrossed,
 }
