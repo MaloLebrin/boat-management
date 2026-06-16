@@ -24,6 +24,30 @@ export class AiAnalysisSchema extends BaseModel {
   declare userId: number
 }
 
+export class AiTokenUsageSchema extends BaseModel {
+  static $columns = [
+    'createdAt',
+    'id',
+    'month',
+    'organizationId',
+    'tokensUsed',
+    'updatedAt',
+  ] as const
+  $columns = AiTokenUsageSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare month: string
+  @column()
+  declare organizationId: number
+  @column()
+  declare tokensUsed: bigint | number
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class AuditLogSchema extends BaseModel {
   static $columns = [
     'action',
@@ -47,7 +71,7 @@ export class AuditLogSchema extends BaseModel {
   @column({ isPrimary: true })
   declare id: number
   @column()
-  declare metadata: Record<string, unknown> | null
+  declare metadata: any | null
   @column()
   declare organizationId: number
   @column()

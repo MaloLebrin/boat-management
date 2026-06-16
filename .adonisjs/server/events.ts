@@ -3,16 +3,16 @@
  * DO NOT EDIT manually
  */
 
-import AiTokenThresholdCrossed from '#events/ai_token_threshold_crossed'
 import OrganizationMemberJoined from '#events/organization_member_joined'
-import OrganizationPlanDowngraded from '#events/organization_plan_downgraded'
 import SimulatorLeadCreated from '#events/simulator_lead_created'
+import OrganizationPlanDowngraded from '#events/organization_plan_downgraded'
 import StorageThresholdCrossed from '#events/storage_threshold_crossed'
+import AiTokenThresholdCrossed from '#events/ai_token_threshold_crossed'
 
 export const events = {
-  AiTokenThresholdCrossed: AiTokenThresholdCrossed,
   OrganizationMemberJoined: OrganizationMemberJoined,
-  OrganizationPlanDowngraded: OrganizationPlanDowngraded,
   SimulatorLeadCreated: SimulatorLeadCreated,
+  OrganizationPlanDowngraded: OrganizationPlanDowngraded,
   StorageThresholdCrossed: StorageThresholdCrossed,
+  AiTokenThresholdCrossed: AiTokenThresholdCrossed,
 }
