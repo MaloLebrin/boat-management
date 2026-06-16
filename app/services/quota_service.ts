@@ -4,14 +4,11 @@ import Organization from '#models/organization'
 import OrganizationMembership from '#models/organization_membership'
 import { PLAN_LIMITS, getUpgradeTier } from '#shared/types/plan'
 import { inject } from '@adonisjs/core'
-import EmailQueueService from '#services/email_queue_service'
+import StorageThresholdCrossed from '#events/storage_threshold_crossed'
 import db from '@adonisjs/lucid/services/db'
-import { DateTime } from 'luxon'
 
 @inject()
 export default class QuotaService {
-  constructor(private emailQueueService: EmailQueueService) {}
-
   async countBoats(org: Organization): Promise<number> {
     const rows = await Boat.query().where('organizationId', org.id).count('* as total')
     return Number(rows[0].$extras.total)
@@ -152,34 +149,11 @@ export default class QuotaService {
       const crossed100 = oldPercent < 100 && newPercent >= 100
 
       if (crossed80) {
-        await this.sendStorageQuotaNotification(org, 80)
+        StorageThresholdCrossed.dispatch(org, 80)
       }
       if (crossed100) {
-        await this.sendStorageQuotaNotification(org, 100)
+        StorageThresholdCrossed.dispatch(org, 100)
       }
-    }
-  }
-
-  private async sendStorageQuotaNotification(org: Organization, percent: number): Promise<void> {
-    // Load admin members to send notification
-    const adminMemberships = await OrganizationMembership.query()
-      .where('organizationId', org.id)
-      .where('role', 'admin')
-      .preload('user')
-
-    if (adminMemberships.length === 0) return
-
-    // Use year-month as correlation suffix for deduplication (one email per threshold per month)
-    const yearMonth = DateTime.now().toFormat('yyyy-MM')
-
-    for (const membership of adminMemberships) {
-      await this.emailQueueService.sendStorageQuotaWarning({
-        to: membership.user.email,
-        name: membership.user.fullName,
-        percent,
-        orgName: org.name,
-        correlationSuffix: `${org.id}:${percent}:${yearMonth}`,
-      })
     }
   }
 }
