@@ -74,7 +74,7 @@ export default class SettingsController {
       quotaUsage: {
         boats: { used: boatCount, limit: limits.maxBoats },
         members: { used: memberCount, limit: limits.maxMembers },
-        storage: { usedBytes: org.storageUsedBytes, limitBytes: storageLimit },
+        storage: { usedBytes: Number(org.storageUsedBytes), limitBytes: storageLimit },
         canUseAI: limits.canUseAI,
         canExport: limits.canExport,
       },
