@@ -97,6 +97,8 @@
     "boatsExceeded": "You have reached the boat limit for your plan. Upgrade to add more boats.",
     "membersExceeded": "You have reached the member limit for your plan. Upgrade to add more members.",
     "aiExceeded": "AI features are not available on your current plan. Upgrade to Pro or Enterprise.",
-    "exportExceeded": "Export is not available on your current plan. Upgrade to Pro or Enterprise."
+    "exportExceeded": "Export is not available on your current plan. Upgrade to Pro or Enterprise.",
+    "storageExceeded": "You have reached the storage limit of your plan. Upgrade to upload new files.",
+    "storageOverflow": "Your storage usage exceeds your current plan limit. Free up space or upgrade your plan."
   }
 }

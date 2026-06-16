@@ -108,7 +108,7 @@ test.group('Storage Quota (functional)', (group) => {
 
     response.assertStatus(200)
     response.assertInertiaComponent('settings/billing')
-    response.assertInertiaPropsContain({
+    response.assertInertiaPropsContains({
       quotaUsage: { storage: { usedBytes: 5 * 1024 * 1024 * 1024 } },
     })
   })

@@ -2,8 +2,10 @@ import edge from 'edge.js'
 import SendEmail, { type SendEmailPayload } from '#jobs/send_email'
 import QueueDedupService from '#services/queue_dedup_service'
 import type { ReminderBoatItem, ReminderPortItem, ReminderTaskItem } from '#shared/types/reminder'
+import type { PlanTier } from '#shared/types/plan'
 import env from '#start/env'
 import { inject } from '@adonisjs/core'
+import { DateTime } from 'luxon'
 
 @inject()
 export default class EmailQueueService {
@@ -414,6 +416,53 @@ export default class EmailQueueService {
     })
 
     const correlationId = `storage-quota-warning:${params.correlationSuffix}`
+
+    const partialPayload: Omit<SendEmailPayload, 'dedupKey'> = {
+      to: params.to,
+      subject,
+      text,
+      html,
+      correlationId,
+    }
+
+    const key = SendEmail.dedupKey(partialPayload)
+    const payload: SendEmailPayload = { ...partialPayload, dedupKey: key }
+
+    await this.dedup.enqueueUnique({
+      key,
+      jobName: SendEmail.name,
+      queue: 'emails',
+      payload,
+      dispatch: async (p) => {
+        await SendEmail.dispatch(p)
+      },
+    })
+  }
+
+  async sendPlanDowngradeNotification(params: {
+    to: string
+    name: string | null
+    orgName: string
+    orgId: number
+    fromPlan: PlanTier
+    toPlan: PlanTier
+  }) {
+    const displayName = params.name ?? params.to
+    const subject = `Changement de plan — ${params.orgName} / Plan changed — ${params.orgName}`
+    const text =
+      `Bonjour ${displayName},\n\nLe plan de votre organisation ${params.orgName} a été modifié de ${params.fromPlan} vers ${params.toPlan}. Si votre usage dépasse les limites du nouveau plan, les nouveaux uploads et ajouts seront bloqués jusqu'à ce que vous réduisiez votre usage.\n\n` +
+      `Hello ${displayName},\n\nYour organisation ${params.orgName} has been moved from ${params.fromPlan} to ${params.toPlan}. If your current usage exceeds the new plan limits, new uploads and additions will be blocked until you reduce your usage.\n\n${env.get('APP_URL')}/settings/billing`
+
+    const html = await edge.render('emails/plan_downgrade', {
+      displayName,
+      orgName: params.orgName,
+      fromPlan: params.fromPlan,
+      toPlan: params.toPlan,
+      appUrl: env.get('APP_URL'),
+    })
+
+    const yearMonth = DateTime.now().toFormat('yyyy-MM')
+    const correlationId = `plan-downgrade:${params.orgId}:${params.fromPlan}:${params.toPlan}:${yearMonth}`
 
     const partialPayload: Omit<SendEmailPayload, 'dedupKey'> = {
       to: params.to,

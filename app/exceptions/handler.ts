@@ -31,6 +31,14 @@ export default class HttpExceptionHandler extends ExceptionHandler {
    * response to the client
    */
   async handle(error: unknown, ctx: HttpContext) {
+    if (error instanceof QuotaExceededError) {
+      const key =
+        error.feature === 'storage' && error.alreadyOverLimit
+          ? 'flash.quota.storageOverflow'
+          : `flash.quota.${error.feature}Exceeded`
+      ctx.session.flash('error', ctx.i18n.t(key))
+      return ctx.response.redirect().back()
+    }
     return super.handle(error, ctx)
   }
 

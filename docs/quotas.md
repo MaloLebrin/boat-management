@@ -198,6 +198,35 @@ currentPlan: ctx.inertia.always(currentPlan) // PlanTier | null
 
 ---
 
+## Comportement au changement de plan
+
+### Upgrade
+
+Aucun impact. Les limites augmentent, tous les guards passent.
+
+### Downgrade (ex: Pro → Starter)
+
+Les données existantes ne sont **pas** touchées. Le changement de plan (via webhook Stripe dans `SubscriptionService.updateOrgPlan`) :
+
+1. Met à jour `org.plan` en BDD
+2. Émet l'event `OrganizationPlanDowngraded`
+3. Le listener `OnOrganizationPlanDowngraded` envoie un **email de notification** aux admins (bilingue FR/EN, déduplication 1 email par mois)
+
+**Guards post-downgrade** :
+
+| Feature                              | Comportement immédiat                                                                                                                   |
+| ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------- |
+| Stockage (`usedBytes > newLimit`)    | `assertCanUpload` throw `QuotaExceededError(alreadyOverLimit: true)` → flash `quota.storageOverflow` → banner rouge sur la page billing |
+| Stockage (nouvel upload dépasserait) | Flash `quota.storageExceeded`                                                                                                           |
+| Bateaux (COUNT > newLimit)           | `assertCanAddBoat` bloque tout ajout. Bateaux existants conservés.                                                                      |
+| Membres (COUNT > newLimit)           | `assertCanAddMember` bloque toute invitation. Membres existants conservés.                                                              |
+
+**Aucune purge automatique** des données. Aucune période de grâce : le guard s'applique à l'action suivante.
+
+**Catch global** : `app/exceptions/handler.ts` attrape `QuotaExceededError` non géré (cas des routes upload `boat_media_controller`) et applique le bon message flash.
+
+---
+
 ## Stockage — Guard et tracking
 
 ### Guard upload

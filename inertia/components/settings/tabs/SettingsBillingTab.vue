@@ -53,12 +53,23 @@ const statusVariant = computed((): 'success' | 'warning' | 'neutral' => {
   if (s === 'past_due' || s === 'incomplete' || s === 'unpaid') return 'warning'
   return 'neutral'
 })
+
+const storageOverflow = computed(() => {
+  const { usedBytes, limitBytes } = props.quotaUsage.storage
+  return limitBytes !== null && usedBytes > limitBytes
+})
 </script>
 
 <template>
   <div>
     <BaseHeading level="2" class="mb-6">{{ t('settings.billing.title') }}</BaseHeading>
     <div class="space-y-6">
+      <div
+        v-if="storageOverflow"
+        class="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800"
+      >
+        {{ t('settings.billing.storageOverflow') }}
+      </div>
       <BaseCard>
         <template #header>
           <div class="flex items-center justify-between">
