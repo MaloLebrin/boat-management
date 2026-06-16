@@ -1,20 +1,35 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import { Link } from '@adonisjs/inertia/vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import { useT } from '~/composables/use_t'
+import { PLAN_LIMITS } from '../../../shared/types/plan'
 
 const { t } = useT()
 const page = usePage()
 
-type SettingsSection = 'me' | 'org' | 'members' | 'billing'
+type SettingsSection = 'me' | 'org' | 'members' | 'billing' | 'ai'
 
-const sections: { key: SettingsSection; route: string; label: () => string }[] = [
+const baseSections: { key: SettingsSection; route: string; label: () => string }[] = [
   { key: 'me', route: 'settings.me', label: () => t('settings.sections.me') },
   { key: 'org', route: 'settings.org', label: () => t('settings.sections.org') },
   { key: 'members', route: 'settings.members', label: () => t('settings.sections.members') },
   { key: 'billing', route: 'settings.billing', label: () => t('settings.sections.billing') },
 ]
+
+const canCustomizeAI = computed(() => {
+  const plan = page.props.currentPlan
+  return plan ? PLAN_LIMITS[plan].canCustomizeAI : false
+})
+
+const sections = computed(() => {
+  if (!canCustomizeAI.value) return baseSections
+  return [
+    ...baseSections,
+    { key: 'ai' as SettingsSection, route: 'settings.ai', label: () => t('settings.sections.ai') },
+  ]
+})
 
 function isActive(key: SettingsSection) {
   return page.url.startsWith(`/settings/${key}`)

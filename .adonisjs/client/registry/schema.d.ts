@@ -1207,6 +1207,30 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateOrganization']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'settings.ai': {
+    methods: ["GET","HEAD"]
+    pattern: '/settings/ai'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['ai']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['ai']>>>
+    }
+  }
+  'settings.ai.update': {
+    methods: ["PUT"]
+    pattern: '/settings/ai'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/user').updateAiSettingsValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/user').updateAiSettingsValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateAiSettings']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateAiSettings']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'maintenance.history': {
     methods: ["GET","HEAD"]
     pattern: '/maintenance/history'

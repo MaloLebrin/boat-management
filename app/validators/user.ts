@@ -33,3 +33,15 @@ export const updateProfileValidator = vine.create({
 export const updateOrganizationValidator = vine.create({
   name: vine.string().minLength(1).maxLength(255),
 })
+
+export const AI_MODEL_OVERRIDES = [
+  'mistral-small-latest',
+  'mistral-medium-latest',
+  'mistral-large-latest',
+] as const
+export type AiModelOverride = (typeof AI_MODEL_OVERRIDES)[number]
+
+export const updateAiSettingsValidator = vine.create({
+  aiSystemPrompt: vine.string().maxLength(2000).nullable(),
+  aiModelOverride: vine.enum(AI_MODEL_OVERRIDES).nullable().optional(),
+})

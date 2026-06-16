@@ -108,11 +108,16 @@ export default class AiAnalysisService {
   /**
    * Generate fleet analysis suggestions using Mistral AI
    */
-  async generateFleetAnalysis(userId: number, input: FleetAnalysisInput): Promise<AiSuggestion[]> {
+  async generateFleetAnalysis(
+    userId: number,
+    input: FleetAnalysisInput,
+    orgSystemPrompt?: string | null
+  ): Promise<AiSuggestion[]> {
     const userMessage = this.#buildFleetUserMessage(input)
+    const systemContent = orgSystemPrompt ? `${orgSystemPrompt}\n\n${SYSTEM_PROMPT}` : SYSTEM_PROMPT
 
     const rawResponse = await this.aiService.chat([
-      { role: 'system', content: SYSTEM_PROMPT },
+      { role: 'system', content: systemContent },
       { role: 'user', content: userMessage },
     ])
 
@@ -135,12 +140,14 @@ export default class AiAnalysisService {
   async generateBoatSuggestions(
     userId: number,
     boatId: number,
-    input: BoatSuggestionsInput
+    input: BoatSuggestionsInput,
+    orgSystemPrompt?: string | null
   ): Promise<AiSuggestion[]> {
     const userMessage = this.#buildBoatUserMessage(input)
+    const systemContent = orgSystemPrompt ? `${orgSystemPrompt}\n\n${SYSTEM_PROMPT}` : SYSTEM_PROMPT
 
     const rawResponse = await this.aiService.chat([
-      { role: 'system', content: SYSTEM_PROMPT },
+      { role: 'system', content: systemContent },
       { role: 'user', content: userMessage },
     ])
 

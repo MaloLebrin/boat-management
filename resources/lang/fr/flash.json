@@ -57,7 +57,8 @@
   },
   "settings": {
     "profileUpdated": "Profil mis à jour.",
-    "orgUpdated": "Organisation mise à jour."
+    "orgUpdated": "Organisation mise à jour.",
+    "aiSettingsUpdated": "Paramètres IA mis à jour."
   },
   "enginePart": {
     "created": "Pièce ajoutée.",

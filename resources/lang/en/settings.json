@@ -4,7 +4,8 @@
     "org": "Organisation profile",
     "members": "Members & access",
     "billing": "Billing & plan",
-    "me": "My profile"
+    "me": "My profile",
+    "ai": "AI customisation"
   },
   "org": {
     "title": "Organisation profile",
@@ -110,5 +111,21 @@
     "emailLabel": "Email address",
     "emailHint": "Email address cannot be changed.",
     "save": "Save changes"
+  },
+  "ai": {
+    "title": "AI customisation",
+    "description": "Define a business context that will be injected into every AI exchange for your organisation.",
+    "systemPromptLabel": "Custom system prompt",
+    "systemPromptPlaceholder": "E.g. You are an expert in managing a racing sailboat fleet. Use precise technical terminology and tailor your suggestions to a racing context.",
+    "systemPromptHint": "Maximum 2,000 characters. This text is prepended to every AI request.",
+    "modelOverrideLabel": "AI model",
+    "modelOverridePlaceholder": "Default model",
+    "models": {
+      "mistral-small-latest": "Mistral Small (fast)",
+      "mistral-medium-latest": "Mistral Medium (balanced)",
+      "mistral-large-latest": "Mistral Large (powerful)"
+    },
+    "save": "Save",
+    "enterpriseOnly": "AI model customisation is available on the Enterprise plan only."
   }
 }

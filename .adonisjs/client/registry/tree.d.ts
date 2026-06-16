@@ -157,6 +157,9 @@ export interface ApiDefinition {
     profile: {
       update: typeof routes['settings.profile.update']
     }
+    ai: typeof routes['settings.ai'] & {
+      update: typeof routes['settings.ai.update']
+    }
   }
   maintenance: {
     history: typeof routes['maintenance.history']

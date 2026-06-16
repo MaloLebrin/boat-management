@@ -5,6 +5,7 @@ export interface PlanQuotas {
   maxMembers: number | null
   canUseAI: boolean
   canExport: boolean
+  canCustomizeAI: boolean
 }
 
 export interface QuotaUsage {
@@ -27,9 +28,15 @@ export const PLAN_PRICES: Record<PlanTier, PlanPrice> = {
 }
 
 export const PLAN_LIMITS: Record<PlanTier, PlanQuotas> = {
-  starter: { maxBoats: 2, maxMembers: 1, canUseAI: false, canExport: false },
-  pro: { maxBoats: 25, maxMembers: 5, canUseAI: true, canExport: true },
-  enterprise: { maxBoats: null, maxMembers: null, canUseAI: true, canExport: true },
+  starter: { maxBoats: 2, maxMembers: 1, canUseAI: false, canExport: false, canCustomizeAI: false },
+  pro: { maxBoats: 25, maxMembers: 5, canUseAI: true, canExport: true, canCustomizeAI: false },
+  enterprise: {
+    maxBoats: null,
+    maxMembers: null,
+    canUseAI: true,
+    canExport: true,
+    canCustomizeAI: true,
+  },
 }
 
 export function getUpgradeTier(current: PlanTier): PlanTier | null {

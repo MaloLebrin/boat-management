@@ -32,5 +32,7 @@ router
       .put('settings/profile', [SettingsController, 'updateProfile'])
       .as('settings.profile.update')
     router.put('settings/org', [SettingsController, 'updateOrganization']).as('settings.org.update')
+    router.get('settings/ai', [SettingsController, 'ai']).as('settings.ai')
+    router.put('settings/ai', [SettingsController, 'updateAiSettings']).as('settings.ai.update')
   })
   .use(middleware.auth())
