@@ -5,6 +5,7 @@ import { Link } from '@adonisjs/inertia/vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import { useT } from '~/composables/use_t'
 import { PLAN_LIMITS } from '../../../shared/types/plan'
+import type { PlanTier } from '../../../shared/types/plan'
 
 const { t } = useT()
 const page = usePage()
@@ -18,9 +19,12 @@ const baseSections: { key: SettingsSection; route: string; label: () => string }
   { key: 'billing', route: 'settings.billing', label: () => t('settings.sections.billing') },
 ]
 
+const VALID_PLANS = new Set<string>(['starter', 'pro', 'enterprise'])
+
 const canCustomizeAI = computed(() => {
   const plan = page.props.currentPlan
-  return plan ? PLAN_LIMITS[plan].canCustomizeAI : false
+  if (typeof plan !== 'string' || !VALID_PLANS.has(plan)) return false
+  return PLAN_LIMITS[plan as PlanTier].canCustomizeAI
 })
 
 const sections = computed(() => {
