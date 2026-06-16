@@ -130,9 +130,9 @@ export default class QuotaService {
       // GREATEST(0, …) ensures the column never goes below 0 — fully atomic, no read-then-write race
       await Organization.query()
         .where('id', org.id)
-        .update(
-          db.raw('storage_used_bytes = GREATEST(0, storage_used_bytes - ?)', [Math.abs(deltaBytes)])
-        )
+        .update({
+          storage_used_bytes: db.raw('GREATEST(0, storage_used_bytes - ?)', [Math.abs(deltaBytes)]),
+        })
     }
 
     // Refresh the organization in-place so the caller's reference reflects the new value.

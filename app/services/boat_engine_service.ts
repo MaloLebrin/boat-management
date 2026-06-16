@@ -16,6 +16,7 @@ export type { BoatEnginePayload }
 @inject()
 export default class BoatEngineService {
   constructor(private mediaService: MediaService) {}
+
   async create(user: User, boat: Boat, payload: BoatEnginePayload) {
     assertBoatInUserOrg(user, boat)
 

@@ -44,7 +44,8 @@ export default class MediaService {
     // assertCanUpload uses file.size (pre-upload) as an optimistic guard; the counter is updated
     // with uploaded.bytes (post-Cloudinary, after potential PDF compression). For compressed PDFs
     // the guard may be slightly conservative, but this avoids uploading a file that is certain to
-    // exceed the limit.
+    // exceed the limit. If file.size is 0 (unknown at parse time) the guard is skipped — the
+    // post-upload increment in updateStorageUsed still runs, so the quota counter stays correct.
     if (org && payload.entityType !== 'user' && file.size) {
       this.quotaService.assertCanUpload(org, file.size)
     }
@@ -156,8 +157,14 @@ export default class MediaService {
 
     try {
       await this.cloudinary.deleteFolder(folderPath)
-    } catch {
-      // folder may not exist if no files were ever uploaded
+    } catch (err) {
+      // Folder may not exist if no files were ever uploaded. Any other Cloudinary error (e.g.
+      // transient 5xx) is logged at warn level so it doesn't silently corrupt the quota counter —
+      // files would remain on Cloudinary while quota was already decremented above.
+      logger.warn(
+        { folderPath, err },
+        'MediaService.deleteAllForEntity: Cloudinary deleteFolder failed'
+      )
     }
 
     if (org !== null && totalBytes > 0) {

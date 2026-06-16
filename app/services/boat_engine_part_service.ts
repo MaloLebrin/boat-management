@@ -15,6 +15,7 @@ export type { BoatEnginePartPayload }
 @inject()
 export default class BoatEnginePartService {
   constructor(private mediaService: MediaService) {}
+
   async listForEngine(engineId: number) {
     return await BoatEnginePart.query().where('boatEngineId', engineId).orderBy('id', 'asc')
   }

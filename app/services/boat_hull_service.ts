@@ -190,6 +190,10 @@ export default class BoatHullService {
     assertBoatInUserOrg(user, boat)
 
     if (org) {
+      // Note: media cleanup runs before the DB delete. If any deleteAllForEntity call throws
+      // midway (e.g. DB error on the 2nd engine's parts), quota is already decremented for the
+      // entities cleaned so far but the boat record remains in DB — a partial-saga inconsistency.
+      // Risk is low (requires a mid-loop DB error); manual quota correction would be needed.
       const engines = await BoatEngine.query().where('boatId', boat.id).select('id')
       for (const engine of engines) {
         const parts = await BoatEnginePart.query().where('boatEngineId', engine.id).select('id')
