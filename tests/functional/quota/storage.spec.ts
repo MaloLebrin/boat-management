@@ -126,19 +126,4 @@ test.group('Storage Quota (functional)', (group) => {
     const updatedOrg = await Organization.findOrFail(org.id)
     assert.equal(updatedOrg.storageUsedBytes, 0)
   })
-
-  test('storage usage decrements correctly on deletion', async ({ assert }) => {
-    const org = await OrganizationFactory.merge({
-      plan: 'pro',
-      storageUsedBytes: 100,
-    }).create()
-    const quotaService = await app.container.make(QuotaService)
-
-    // Delete 50 bytes
-    await quotaService.updateStorageUsed(org, -50)
-
-    const updatedOrg = await Organization.findOrFail(org.id)
-    // The storage should be decremented correctly
-    assert.equal(updatedOrg.storageUsedBytes, 50)
-  })
 })

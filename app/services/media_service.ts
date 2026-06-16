@@ -3,6 +3,7 @@ import type { MultipartFile } from '@adonisjs/core/bodyparser'
 import type { MediaEntityType, MediaKind } from '#shared/constants/media'
 import type { UploadMediaPayload } from '#shared/types/media'
 import { inject } from '@adonisjs/core'
+import logger from '@adonisjs/core/services/logger'
 import db from '@adonisjs/lucid/services/db'
 import Media from '#models/media'
 import type Organization from '#models/organization'
@@ -32,7 +33,18 @@ export default class MediaService {
     payload: UploadMediaPayload,
     org?: Organization
   ): Promise<Media> {
-    // Check storage quota before upload (only for org-related entities)
+    // Guard: org absent for a non-user entity means a caller forgot to pass it — log a warning.
+    if (!org && payload.entityType !== 'user') {
+      logger.warn(
+        { entityType: payload.entityType, entityId: payload.entityId },
+        'MediaService.upload called without org for a non-user entity — storage quota not enforced'
+      )
+    }
+
+    // assertCanUpload uses file.size (pre-upload) as an optimistic guard; the counter is updated
+    // with uploaded.bytes (post-Cloudinary, after potential PDF compression). For compressed PDFs
+    // the guard may be slightly conservative, but this avoids uploading a file that is certain to
+    // exceed the limit.
     if (org && payload.entityType !== 'user' && file.size) {
       this.quotaService.assertCanUpload(org, file.size)
     }
@@ -113,14 +125,26 @@ export default class MediaService {
   async deleteAllForEntity(
     entityType: MediaEntityType,
     entityId: number,
-    folderPath: string
+    folderPath: string,
+    org?: Organization
   ): Promise<void> {
+    const medias = await Media.query()
+      .where('entityType', entityType)
+      .where('entityId', entityId)
+      .select('bytes')
+
+    const totalBytes = medias.reduce((sum, m) => sum + (m.bytes ?? 0), 0)
+
     await Media.query().where('entityType', entityType).where('entityId', entityId).delete()
 
     try {
       await this.cloudinary.deleteFolder(folderPath)
     } catch {
       // folder may not exist if no files were ever uploaded
+    }
+
+    if (org && totalBytes > 0) {
+      await this.quotaService.updateStorageUsed(org, -totalBytes)
     }
   }
 

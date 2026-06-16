@@ -74,6 +74,10 @@ export default class QuotaService {
     return gb === null ? null : gb * 1024 * 1024 * 1024
   }
 
+  // Note: two concurrent uploads can both read a stale org.storageUsedBytes and both pass this
+  // guard. The EmailQueueService correlationSuffix deduplication handles notification races; quota
+  // enforcement relies on DB-level atomicity in updateStorageUsed (increment/decrement) rather than
+  // this optimistic check.
   assertCanUpload(org: Organization, bytes: number): void {
     const limit = this.storageLimitBytes(org)
     if (limit === null) return
@@ -108,7 +112,7 @@ export default class QuotaService {
       await Organization.query().where('id', org.id).decrement('storage_used_bytes', safeDecrement)
     }
 
-    // Refresh the organization to get updated value
+    // Refresh the organization in-place so the caller's reference reflects the new value.
     await org.refresh()
 
     // Only check for threshold notifications if adding bytes (not deleting)
