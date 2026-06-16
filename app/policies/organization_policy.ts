@@ -20,4 +20,8 @@ export default class OrganizationPolicy extends BasePolicy {
   configureAI(_user: User): AuthorizerResponse {
     return false
   }
+
+  viewAuditLog(user: User): AuthorizerResponse {
+    return user.organizationId !== null
+  }
 }

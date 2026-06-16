@@ -160,6 +160,7 @@ export interface ApiDefinition {
     ai: typeof routes['settings.ai'] & {
       update: typeof routes['settings.ai.update']
     }
+    auditLog: typeof routes['settings.auditLog']
   }
   maintenance: {
     history: typeof routes['maintenance.history']

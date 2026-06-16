@@ -5,7 +5,8 @@
     "members": "Members & access",
     "billing": "Billing & plan",
     "me": "My profile",
-    "ai": "AI customisation"
+    "ai": "AI customisation",
+    "auditLog": "Activity log"
   },
   "org": {
     "title": "Organisation profile",
@@ -131,5 +132,36 @@
       "mistral-large-latest": "Mistral Large (powerful)"
     },
     "save": "Save"
+  },
+  "auditLog": {
+    "title": "Activity log",
+    "description": "History of significant actions performed in your organisation.",
+    "unknownUser": "Deleted user",
+    "columns": {
+      "date": "Date",
+      "user": "User",
+      "action": "Action",
+      "details": "Details"
+    },
+    "filters": {
+      "user": "User",
+      "allUsers": "All users",
+      "action": "Action",
+      "allActions": "All actions"
+    },
+    "actions": {
+      "login": "Login",
+      "logout": "Logout",
+      "boat_create": "Boat created",
+      "boat_update": "Boat updated",
+      "boat_delete": "Boat deleted",
+      "member_add": "Member added",
+      "member_remove": "Member removed",
+      "member_update_role": "Role updated"
+    },
+    "empty": {
+      "title": "No activity yet",
+      "description": "Actions performed in your organisation will appear here."
+    }
   }
 }

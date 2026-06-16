@@ -24,6 +24,36 @@ export class AiAnalysisSchema extends BaseModel {
   declare userId: number
 }
 
+export class AuditLogSchema extends BaseModel {
+  static $columns = [
+    'action',
+    'createdAt',
+    'entityId',
+    'entityType',
+    'id',
+    'metadata',
+    'organizationId',
+    'userId',
+  ] as const
+  $columns = AuditLogSchema.$columns
+  @column()
+  declare action: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare entityId: number | null
+  @column()
+  declare entityType: string | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare metadata: any | null
+  @column()
+  declare organizationId: number
+  @column()
+  declare userId: number | null
+}
+
 export class BoatEnginePartSchema extends BaseModel {
   static $columns = [
     'boatEngineId',
@@ -709,7 +739,7 @@ export class OrganizationSchema extends BaseModel {
   @column()
   declare slug: string
   @column()
-  declare storageUsedBytes: number
+  declare storageUsedBytes: bigint | number
   @column()
   declare stripeCustomerId: string | null
   @column.dateTime({ autoCreate: true, autoUpdate: true })

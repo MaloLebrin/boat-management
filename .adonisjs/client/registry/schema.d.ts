@@ -1231,6 +1231,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateAiSettings']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'settings.auditLog': {
+    methods: ["GET","HEAD"]
+    pattern: '/settings/audit-log'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/audit_logs_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/audit_logs_controller').default['index']>>>
+    }
+  }
   'maintenance.history': {
     methods: ["GET","HEAD"]
     pattern: '/maintenance/history'

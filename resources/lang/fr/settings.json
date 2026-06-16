@@ -5,7 +5,8 @@
     "members": "Membres et accès",
     "billing": "Facturation et plan",
     "me": "Mon profil",
-    "ai": "Personnalisation IA"
+    "ai": "Personnalisation IA",
+    "auditLog": "Journal d'activité"
   },
   "org": {
     "title": "Profil organisation",
@@ -131,5 +132,36 @@
       "mistral-large-latest": "Mistral Large (performant)"
     },
     "save": "Enregistrer"
+  },
+  "auditLog": {
+    "title": "Journal d'activité",
+    "description": "Historique des actions importantes réalisées dans votre organisation.",
+    "unknownUser": "Utilisateur supprimé",
+    "columns": {
+      "date": "Date",
+      "user": "Utilisateur",
+      "action": "Action",
+      "details": "Détails"
+    },
+    "filters": {
+      "user": "Utilisateur",
+      "allUsers": "Tous les utilisateurs",
+      "action": "Action",
+      "allActions": "Toutes les actions"
+    },
+    "actions": {
+      "login": "Connexion",
+      "logout": "Déconnexion",
+      "boat_create": "Bateau créé",
+      "boat_update": "Bateau modifié",
+      "boat_delete": "Bateau supprimé",
+      "member_add": "Membre ajouté",
+      "member_remove": "Membre supprimé",
+      "member_update_role": "Rôle modifié"
+    },
+    "empty": {
+      "title": "Aucune activité",
+      "description": "Les actions de votre organisation apparaîtront ici."
+    }
   }
 }

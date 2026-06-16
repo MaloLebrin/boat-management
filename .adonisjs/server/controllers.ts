@@ -5,6 +5,7 @@
 
 export const controllers = {
   Ai: () => import('#controllers/ai_controller'),
+  AuditLogs: () => import('#controllers/audit_logs_controller'),
   Billing: () => import('#controllers/billing_controller'),
   BoatEngineParts: () => import('#controllers/boat_engine_parts_controller'),
   BoatEquipment: () => import('#controllers/boat_equipment_controller'),

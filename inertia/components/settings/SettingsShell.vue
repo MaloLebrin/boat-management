@@ -10,7 +10,7 @@ import type { PlanTier } from '../../../shared/types/plan'
 const { t } = useT()
 const page = usePage()
 
-type SettingsSection = 'me' | 'org' | 'members' | 'billing' | 'ai'
+type SettingsSection = 'me' | 'org' | 'members' | 'billing' | 'ai' | 'audit-log'
 
 const baseSections: { key: SettingsSection; route: string; label: () => string }[] = [
   { key: 'me', route: 'settings.me', label: () => t('settings.sections.me') },
@@ -27,12 +27,29 @@ const canCustomizeAI = computed(() => {
   return PLAN_LIMITS[plan as PlanTier].canCustomizeAI
 })
 
+const canViewAuditLog = computed(() => {
+  const plan = page.props.currentPlan
+  if (typeof plan !== 'string' || !VALID_PLANS.has(plan)) return false
+  return PLAN_LIMITS[plan as PlanTier].auditLogRetentionDays !== 0
+})
+
 const sections = computed(() => {
-  if (!canCustomizeAI.value) return baseSections
-  return [
-    ...baseSections,
-    { key: 'ai' as SettingsSection, route: 'settings.ai', label: () => t('settings.sections.ai') },
-  ]
+  const result = [...baseSections]
+  if (canCustomizeAI.value) {
+    result.push({
+      key: 'ai' as SettingsSection,
+      route: 'settings.ai',
+      label: () => t('settings.sections.ai'),
+    })
+  }
+  if (canViewAuditLog.value) {
+    result.push({
+      key: 'audit-log' as SettingsSection,
+      route: 'settings.auditLog',
+      label: () => t('settings.sections.auditLog'),
+    })
+  }
+  return result
 })
 
 function isActive(key: SettingsSection) {

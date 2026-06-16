@@ -1,6 +1,7 @@
 import { SpotNotFoundError } from '#exceptions/port_errors'
 import { QuotaExceededError } from '#exceptions/quota_errors'
 import AiAnalysisService, { type AiSuggestion } from '#services/ai_analysis_service'
+import AuditLogService from '#services/audit_log_service'
 import BoatListService from '#services/boat_list_service'
 import { toEditForm, toShowProps } from '#transformers/boat_transformer'
 import { toPortFormOptions } from '#transformers/port_transformer'
@@ -32,7 +33,8 @@ export default class BoatsController {
     private portService: PortService,
     private spotService: SpotService,
     private quotaService: QuotaService,
-    private organizationService: OrganizationService
+    private organizationService: OrganizationService,
+    private auditLogService: AuditLogService
   ) {}
 
   async index({ inertia, auth, request }: HttpContext) {
@@ -88,6 +90,15 @@ export default class BoatsController {
 
     const payload = await request.validateUsing(createBoatValidator)
     const boat = await this.boatService.createForUser(user, payload)
+
+    await this.auditLogService.log({
+      organizationId: user.organizationId!,
+      userId: user.id,
+      action: 'boat.create',
+      entityType: 'boat',
+      entityId: boat.id,
+      metadata: { name: boat.name },
+    })
 
     response.redirect(`/boats/${boat.id}`)
   }
@@ -177,6 +188,15 @@ export default class BoatsController {
     const payload = await request.validateUsing(updateBoatValidator)
     await this.boatService.updateForUser(user, boat, payload)
 
+    await this.auditLogService.log({
+      organizationId: user.organizationId!,
+      userId: user.id,
+      action: 'boat.update',
+      entityType: 'boat',
+      entityId: boat.id,
+      metadata: { name: boat.name },
+    })
+
     response.redirect(`/boats/${boat.id}`)
   }
 
@@ -189,7 +209,19 @@ export default class BoatsController {
       await bouncer.with(BoatPolicy).authorize('delete', boat)
 
       const org = await this.organizationService.findOrFail(boat.organizationId)
+      const boatName = boat.name
+      const boatId = boat.id
       await this.boatService.deleteForUser(user, boat, org)
+
+      await this.auditLogService.log({
+        organizationId: user.organizationId!,
+        userId: user.id,
+        action: 'boat.delete',
+        entityType: 'boat',
+        entityId: boatId,
+        metadata: { name: boatName },
+      })
+
       response.redirect('/boats')
     } catch (error) {
       if (error instanceof BoatNotFoundError) return response.redirect('/boats')

@@ -618,6 +618,12 @@ const routes = {
     tokens: [{"old":"/settings/ai","type":0,"val":"settings","end":""},{"old":"/settings/ai","type":0,"val":"ai","end":""}],
     types: placeholder as Registry['settings.ai.update']['types'],
   },
+  'settings.auditLog': {
+    methods: ["GET","HEAD"],
+    pattern: '/settings/audit-log',
+    tokens: [{"old":"/settings/audit-log","type":0,"val":"settings","end":""},{"old":"/settings/audit-log","type":0,"val":"audit-log","end":""}],
+    types: placeholder as Registry['settings.auditLog']['types'],
+  },
   'maintenance.history': {
     methods: ["GET","HEAD"],
     pattern: '/maintenance/history',
