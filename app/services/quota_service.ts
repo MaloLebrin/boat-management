@@ -36,7 +36,11 @@ export default class QuotaService {
 
     const current = await this.countBoats(org)
     if (current >= limits.maxBoats) {
-      throw new QuotaExceededError('boats', limits.maxBoats, current, getUpgradeTier(org.plan))
+      throw new QuotaExceededError('boats', {
+        limit: limits.maxBoats,
+        current,
+        upgradeTo: getUpgradeTier(org.plan),
+      })
     }
   }
 
@@ -52,21 +56,33 @@ export default class QuotaService {
 
     const current = await this.countMembers(org)
     if (current >= limits.maxMembers) {
-      throw new QuotaExceededError('members', limits.maxMembers, current, getUpgradeTier(org.plan))
+      throw new QuotaExceededError('members', {
+        limit: limits.maxMembers,
+        current,
+        upgradeTo: getUpgradeTier(org.plan),
+      })
     }
   }
 
   assertCanUseAI(org: Organization): void {
     const limits = PLAN_LIMITS[org.plan]
     if (!limits.canUseAI) {
-      throw new QuotaExceededError('ai', null, 0, getUpgradeTier(org.plan))
+      throw new QuotaExceededError('ai', {
+        limit: null,
+        current: 0,
+        upgradeTo: getUpgradeTier(org.plan),
+      })
     }
   }
 
   assertCanExport(org: Organization): void {
     const limits = PLAN_LIMITS[org.plan]
     if (!limits.canExport) {
-      throw new QuotaExceededError('export', null, 0, getUpgradeTier(org.plan))
+      throw new QuotaExceededError('export', {
+        limit: null,
+        current: 0,
+        upgradeTo: getUpgradeTier(org.plan),
+      })
     }
   }
 
@@ -84,16 +100,19 @@ export default class QuotaService {
     if (limit === null) return
     if (org.storageUsedBytes > limit) {
       // Already over limit (post-downgrade): even a 0-byte upload is blocked
-      throw new QuotaExceededError(
-        'storage',
+      throw new QuotaExceededError('storage', {
         limit,
-        org.storageUsedBytes,
-        getUpgradeTier(org.plan),
-        true
-      )
+        current: org.storageUsedBytes,
+        upgradeTo: getUpgradeTier(org.plan),
+        alreadyOverLimit: true,
+      })
     }
     if (org.storageUsedBytes + bytes > limit) {
-      throw new QuotaExceededError('storage', limit, org.storageUsedBytes, getUpgradeTier(org.plan))
+      throw new QuotaExceededError('storage', {
+        limit,
+        current: org.storageUsedBytes,
+        upgradeTo: getUpgradeTier(org.plan),
+      })
     }
   }
 

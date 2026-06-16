@@ -104,11 +104,11 @@ export default class MediaService {
       .first()
   }
 
-  async deleteById(mediaId: number, org?: Organization): Promise<void> {
+  async deleteById(mediaId: number, org: Organization | null): Promise<void> {
     const media = await Media.find(mediaId)
     if (!media) throw new MediaNotFoundError()
 
-    if (!org && media.entityType !== 'user') {
+    if (org === null && media.entityType !== 'user') {
       logger.warn(
         { mediaId, entityType: media.entityType },
         'MediaService.deleteById called without org — storage quota not decremented'
@@ -123,7 +123,7 @@ export default class MediaService {
     )
     await media.delete()
 
-    if (org) {
+    if (org !== null) {
       await this.quotaService.updateStorageUsed(org, -bytes)
     }
   }
@@ -132,23 +132,27 @@ export default class MediaService {
     entityType: MediaEntityType,
     entityId: number,
     folderPath: string,
-    org?: Organization
+    org: Organization | null
   ): Promise<void> {
-    if (!org) {
+    if (org === null) {
       logger.warn(
         { entityType, entityId },
         'MediaService.deleteAllForEntity called without org — storage quota not decremented'
       )
     }
 
-    const medias = await Media.query()
-      .where('entityType', entityType)
-      .where('entityId', entityId)
-      .select('bytes')
-
-    const totalBytes = medias.reduce((sum, m) => sum + (m.bytes ?? 0), 0)
-
-    await Media.query().where('entityType', entityType).where('entityId', entityId).delete()
+    const totalBytes = await db.transaction(async (trx) => {
+      const medias = await Media.query({ client: trx })
+        .where('entityType', entityType)
+        .where('entityId', entityId)
+        .select('bytes')
+      const bytes = medias.reduce((sum, m) => sum + (m.bytes ?? 0), 0)
+      await Media.query({ client: trx })
+        .where('entityType', entityType)
+        .where('entityId', entityId)
+        .delete()
+      return bytes
+    })
 
     try {
       await this.cloudinary.deleteFolder(folderPath)
@@ -156,7 +160,7 @@ export default class MediaService {
       // folder may not exist if no files were ever uploaded
     }
 
-    if (org && totalBytes > 0) {
+    if (org !== null && totalBytes > 0) {
       await this.quotaService.updateStorageUsed(org, -totalBytes)
     }
   }
