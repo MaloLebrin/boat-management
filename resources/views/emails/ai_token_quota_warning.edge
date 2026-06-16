@@ -1,0 +1,55 @@
+@component('emails/_layout')
+  @slot('content')
+    <h2 style="margin:0 0 20px;color:#333333;font-size:22px;">AI Token Alert / Alerte tokens IA</h2>
+    <p style="margin:0 0 15px;color:#555555;font-size:16px;line-height:1.5;">
+      @if(percent >= 100)
+        Your organisation
+        <strong>{{ orgName }}</strong>
+        has reached its monthly AI token limit.
+      @else
+        Your organisation
+        <strong>{{ orgName }}</strong>
+        has used
+        {{ percent }}
+        % of its monthly AI token limit.
+      @end
+    </p>
+    <p style="margin:0 0 25px;color:#555555;font-size:16px;line-height:1.5;">
+      @if(percent >= 100)
+        Votre organisation
+        <strong>{{ orgName }}</strong>
+        a atteint sa limite mensuelle de tokens IA.
+      @else
+        Votre organisation
+        <strong>{{ orgName }}</strong>
+        a consommé
+        {{ percent }}
+        % de sa limite mensuelle de tokens IA.
+      @end
+    </p>
+    @if(percent >= 100)
+      <p style="margin:0 0 15px;color:#d9534f;font-size:14px;line-height:1.5;font-weight:bold;">
+        AI features are unavailable until the quota resets on the 1st of next month or you upgrade your plan.
+      </p>
+      <p style="margin:0 0 25px;color:#d9534f;font-size:14px;line-height:1.5;font-weight:bold;">
+        Les fonctionnalités IA sont indisponibles jusqu'à la réinitialisation du quota le 1er du mois ou la mise à niveau de votre abonnement.
+      </p>
+    @end
+
+    <table role="presentation" cellspacing="0" cellpadding="0" style="margin:0 auto;">
+      <tr>
+        <td style="border-radius:6px;background-color:#1e3a5f;">
+          <a
+            href="{{ appUrl }}/settings/billing"
+            style="display:inline-block;padding:14px 30px;color:#ffffff;text-decoration:none;font-size:16px;font-weight:bold;"
+          >
+            Manage subscription / Gérer l'abonnement
+          </a>
+        </td>
+      </tr>
+    </table>
+    <p style="margin:25px 0 0;color:#888888;font-size:14px;line-height:1.5;">
+      This is an automated notification. / Ceci est une notification automatique.
+    </p>
+  @end
+@end

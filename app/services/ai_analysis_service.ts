@@ -1,5 +1,7 @@
 import AiAnalysis from '#models/ai_analysis'
 import AiService from '#services/ai_service'
+import AiTokenQuotaService from '#services/ai_token_quota_service'
+import type Organization from '#models/organization'
 import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
 
@@ -80,7 +82,10 @@ Exemple: [{"text":"Vérifier l'antifouling — dernière application il y a 13 m
 
 @inject()
 export default class AiAnalysisService {
-  constructor(private aiService: AiService) {}
+  constructor(
+    private aiService: AiService,
+    private aiTokenQuotaService: AiTokenQuotaService
+  ) {}
   /**
    * Get the latest fleet analysis for a user
    */
@@ -105,25 +110,28 @@ export default class AiAnalysisService {
       .first()
   }
 
-  /**
-   * Generate fleet analysis suggestions using Mistral AI
-   */
   async generateFleetAnalysis(
     userId: number,
+    org: Organization,
     input: FleetAnalysisInput,
     orgSystemPrompt?: string | null,
     orgModelOverride?: string | null
   ): Promise<AiSuggestion[]> {
+    const currentUsage = await this.aiTokenQuotaService.getUsage(org.id)
+    this.aiTokenQuotaService.assertCanUseTokens(org, currentUsage)
+
     const userMessage = this.#buildFleetUserMessage(input)
     const systemContent = orgSystemPrompt ? `${orgSystemPrompt}\n\n${SYSTEM_PROMPT}` : SYSTEM_PROMPT
 
-    const rawResponse = await this.aiService.chat(
+    const { content: rawResponse, tokensUsed } = await this.aiService.chat(
       [
         { role: 'system', content: systemContent },
         { role: 'user', content: userMessage },
       ],
       orgModelOverride
     )
+
+    await this.aiTokenQuotaService.recordUsage(org, tokensUsed)
 
     const suggestions = this.#parseResponse(rawResponse)
 
@@ -138,26 +146,29 @@ export default class AiAnalysisService {
     return suggestions
   }
 
-  /**
-   * Generate boat-specific suggestions using Mistral AI
-   */
   async generateBoatSuggestions(
     userId: number,
     boatId: number,
+    org: Organization,
     input: BoatSuggestionsInput,
     orgSystemPrompt?: string | null,
     orgModelOverride?: string | null
   ): Promise<AiSuggestion[]> {
+    const currentUsage = await this.aiTokenQuotaService.getUsage(org.id)
+    this.aiTokenQuotaService.assertCanUseTokens(org, currentUsage)
+
     const userMessage = this.#buildBoatUserMessage(input)
     const systemContent = orgSystemPrompt ? `${orgSystemPrompt}\n\n${SYSTEM_PROMPT}` : SYSTEM_PROMPT
 
-    const rawResponse = await this.aiService.chat(
+    const { content: rawResponse, tokensUsed } = await this.aiService.chat(
       [
         { role: 'system', content: systemContent },
         { role: 'user', content: userMessage },
       ],
       orgModelOverride
     )
+
+    await this.aiTokenQuotaService.recordUsage(org, tokensUsed)
 
     const suggestions = this.#parseResponse(rawResponse)
 

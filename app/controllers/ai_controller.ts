@@ -40,7 +40,11 @@ export default class AiController {
 
     const { messages } = await request.validateUsing(aiChatValidator)
 
-    await this.aiQueueService.enqueueChat({ userId: user.id, messages })
+    await this.aiQueueService.enqueueChat({
+      userId: user.id,
+      organizationId: user.organization.id,
+      messages,
+    })
 
     session.flash('info', i18n.t('flash.ai.chatQueued'))
     return response.redirect().back()
@@ -65,12 +69,17 @@ export default class AiController {
       const data = await this.dashboardService.getForUser(user)
       await this.aiAnalysisService.generateFleetAnalysis(
         user.id,
+        user.organization,
         data,
         user.organization.aiSystemPrompt,
         user.organization.aiModelOverride
       )
-    } catch {
-      session.flash('error', i18n.t('flash.ai.analysisError'))
+    } catch (error) {
+      if (error instanceof QuotaExceededError) {
+        session.flash('error', i18n.t('flash.quota.aiTokensExceeded'))
+      } else {
+        session.flash('error', i18n.t('flash.ai.analysisError'))
+      }
     }
 
     return response.redirect('/')
@@ -98,12 +107,12 @@ export default class AiController {
       await boat.load('safetyEquipment')
 
       const maintenanceEvents = await this.boatMaintenanceService.listForBoat(user, boat)
-
       const maintenanceTasks = await this.boatMaintenanceTaskService.listForBoat(user, boat)
 
       await this.aiAnalysisService.generateBoatSuggestions(
         user.id,
         boat.id,
+        user.organization,
         {
           boat: {
             id: boat.id,
@@ -150,7 +159,11 @@ export default class AiController {
         user.organization.aiModelOverride
       )
     } catch (error) {
-      if (!(error instanceof BoatNotFoundError)) {
+      if (error instanceof BoatNotFoundError) {
+        // no flash — boat not found is handled silently
+      } else if (error instanceof QuotaExceededError) {
+        session.flash('error', i18n.t('flash.quota.aiTokensExceeded'))
+      } else {
         session.flash('error', i18n.t('flash.ai.analysisError'))
       }
     }

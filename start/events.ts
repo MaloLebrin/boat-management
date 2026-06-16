@@ -3,6 +3,7 @@ import SimulatorLeadCreated from '#events/simulator_lead_created'
 import OrganizationMemberJoined from '#events/organization_member_joined'
 import OrganizationPlanDowngraded from '#events/organization_plan_downgraded'
 import StorageThresholdCrossed from '#events/storage_threshold_crossed'
+import AiTokenThresholdCrossed from '#events/ai_token_threshold_crossed'
 
 emitter.listen(SimulatorLeadCreated, [() => import('#listeners/on_simulator_lead_created')])
 emitter.listen(OrganizationMemberJoined, [() => import('#listeners/on_organization_member_joined')])
@@ -11,4 +12,7 @@ emitter.listen(OrganizationPlanDowngraded, [
 ])
 emitter.listen(StorageThresholdCrossed, [
   () => import('#listeners/send_storage_quota_notification'),
+])
+emitter.listen(AiTokenThresholdCrossed, [
+  () => import('#listeners/send_ai_token_quota_notification'),
 ])

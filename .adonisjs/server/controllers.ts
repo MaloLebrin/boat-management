@@ -5,6 +5,7 @@
 
 export const controllers = {
   Ai: () => import('#controllers/ai_controller'),
+  AuditLogs: () => import('#controllers/audit_logs_controller'),
   Billing: () => import('#controllers/billing_controller'),
   BoatEngineParts: () => import('#controllers/boat_engine_parts_controller'),
   BoatEquipment: () => import('#controllers/boat_equipment_controller'),
@@ -36,5 +37,4 @@ export const controllers = {
   SimulatorLead: () => import('#controllers/simulator_lead_controller'),
   SimulatorShare: () => import('#controllers/simulator_share_controller'),
   Spots: () => import('#controllers/spots_controller'),
-  AuditLogs: () => import('#controllers/audit_logs_controller'),
 }

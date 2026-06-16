@@ -8,6 +8,7 @@ export default class AiQueueService {
 
   async enqueueChat(options: {
     userId: number
+    organizationId: number
     messages: RunAiChatPayload['messages']
     correlationId?: string
   }) {
@@ -15,6 +16,7 @@ export default class AiQueueService {
     const payload: RunAiChatPayload = {
       messages: options.messages,
       correlationId: options.correlationId,
+      organizationId: options.organizationId,
       dedupKey: key,
     }
 

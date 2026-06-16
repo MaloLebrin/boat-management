@@ -4,13 +4,14 @@
 
 Source de vérité : `shared/types/plan.ts` — `PLAN_LIMITS`.
 
-| Feature       | Starter | Pro   | Enterprise |
-| ------------- | ------- | ----- | ---------- |
-| Bateaux max   | 2       | 25    | ∞          |
-| Membres max   | 1       | 5     | ∞          |
-| Stockage      | 1 Go    | 20 Go | ∞          |
-| IA / Copilote | ✗       | ✓     | ✓          |
-| Export        | ✗       | ✓     | ✓          |
+| Feature          | Starter | Pro       | Enterprise |
+| ---------------- | ------- | --------- | ---------- |
+| Bateaux max      | 2       | 25        | ∞          |
+| Membres max      | 1       | 5         | ∞          |
+| Stockage         | 1 Go    | 20 Go     | ∞          |
+| IA / Copilote    | ✗       | ✓         | ✓          |
+| Tokens IA / mois | ✗       | 1 000 000 | ∞          |
+| Export           | ✗       | ✓         | ✓          |
 
 `null` = illimité. Le plan est assigné manuellement en BDD sur la table `organizations` (colonne `plan` enum `starter|pro|enterprise`, défaut `starter`). Pas de Stripe.
 
@@ -32,11 +33,15 @@ Source de vérité : `shared/types/plan.ts` — `PLAN_LIMITS`.
 ## Architecture
 
 ```
-shared/types/plan.ts           — PlanTier, PlanQuotas, QuotaUsage, PLAN_LIMITS, getUpgradeTier()
-app/exceptions/quota_errors.ts — QuotaExceededError
-app/services/quota_service.ts  — méthodes can*/assert*/storage
-app/services/media_service.ts  — upload/deleteById avec tracking quota
+shared/types/plan.ts                    — PlanTier, PlanQuotas, QuotaUsage, PLAN_LIMITS, getUpgradeTier()
+app/exceptions/quota_errors.ts          — QuotaExceededError
+app/services/quota_service.ts           — méthodes can*/assert*/storage
+app/services/media_service.ts           — upload/deleteById avec tracking quota
+app/services/ai_token_quota_service.ts  — getUsage/assertCanUseTokens/recordUsage/resetMonth
+app/jobs/reset_ai_token_usage.ts        — reset mensuel (cron 1er du mois 01h00)
 ```
+
+Voir [`docs/domain/ai-token-quota.md`](domain/ai-token-quota.md) pour la doc détaillée du quota tokens IA.
 
 ### `QuotaExceededError`
 
@@ -254,11 +259,18 @@ Rendue par `SettingsController.billing()`. Props passées :
 ```ts
 {
   plan: PlanTier,
-  quotaUsage: QuotaUsage // { boats: {used, limit}, members: {used, limit}, storage: {usedBytes, limitBytes}, canUseAI, canExport }
+  quotaUsage: QuotaUsage
+  // {
+  //   boats:    { used, limit },
+  //   members:  { used, limit },
+  //   storage:  { usedBytes, limitBytes },
+  //   aiTokens: { used, limit },   ← null = illimité (Enterprise)
+  //   canUseAI, canExport
+  // }
 }
 ```
 
-Les `used` / `usedBytes` sont calculés en temps réel (2 COUNT SQL + lecture du champ `storageUsedBytes`).  
+Les `used` / `usedBytes` sont calculés en temps réel (2 COUNT SQL + lecture de `storageUsedBytes` + `AiTokenQuotaService.getUsage()`).  
 `limit: null` / `limitBytes: null` = illimité → afficher "∞" côté frontend.
 
 Le composant `SettingsBillingUsageGauge` affiche les octets avec les unités localisées (`KB/MB/GB` en anglais, `Ko/Mo/Go` en français) via les clés i18n `settings.billing.usage.kb/mb/gb`.

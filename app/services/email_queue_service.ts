@@ -439,6 +439,55 @@ export default class EmailQueueService {
     })
   }
 
+  async sendAiTokenQuotaWarning(params: {
+    to: string
+    name: string | null
+    percent: number
+    orgName: string
+    correlationSuffix: string
+  }) {
+    const displayName = params.name ?? params.to
+    const subject =
+      params.percent >= 100
+        ? 'Limite tokens IA atteinte — FleetAi / AI token limit reached — FleetAi'
+        : `Tokens IA à ${params.percent}% — FleetAi / AI tokens at ${params.percent}% — FleetAi`
+
+    const text =
+      params.percent >= 100
+        ? `Bonjour ${displayName},\n\nVotre organisation ${params.orgName} a atteint sa limite mensuelle de tokens IA. Les fonctionnalités IA sont indisponibles jusqu'au 1er du mois prochain.\n\nHello ${displayName},\n\nYour organisation ${params.orgName} has reached its monthly AI token limit. AI features are unavailable until the 1st of next month.\n\n${env.get('APP_URL')}/settings/billing`
+        : `Bonjour ${displayName},\n\nVotre organisation ${params.orgName} a consommé ${params.percent}% de sa limite mensuelle de tokens IA.\n\nHello ${displayName},\n\nYour organisation ${params.orgName} has used ${params.percent}% of its monthly AI token limit.\n\n${env.get('APP_URL')}/settings/billing`
+
+    const html = await edge.render('emails/ai_token_quota_warning', {
+      displayName,
+      percent: params.percent,
+      orgName: params.orgName,
+      appUrl: env.get('APP_URL'),
+    })
+
+    const correlationId = `ai-token-quota-warning:${params.correlationSuffix}`
+
+    const partialPayload: Omit<SendEmailPayload, 'dedupKey'> = {
+      to: params.to,
+      subject,
+      text,
+      html,
+      correlationId,
+    }
+
+    const key = SendEmail.dedupKey(partialPayload)
+    const payload: SendEmailPayload = { ...partialPayload, dedupKey: key }
+
+    await this.dedup.enqueueUnique({
+      key,
+      jobName: SendEmail.name,
+      queue: 'emails',
+      payload,
+      dispatch: async (p) => {
+        await SendEmail.dispatch(p)
+      },
+    })
+  }
+
   async sendPlanDowngradeNotification(params: {
     to: string
     name: string | null
