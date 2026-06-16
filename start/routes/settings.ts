@@ -3,6 +3,7 @@ import router from '@adonisjs/core/services/router'
 
 const SettingsController = () => import('#controllers/settings_controller')
 const BillingController = () => import('#controllers/billing_controller')
+const AuditLogsController = () => import('#controllers/audit_logs_controller')
 
 router
   .post('/locale', ({ request, response }) => {
@@ -34,5 +35,6 @@ router
     router.put('settings/org', [SettingsController, 'updateOrganization']).as('settings.org.update')
     router.get('settings/ai', [SettingsController, 'ai']).as('settings.ai')
     router.put('settings/ai', [SettingsController, 'updateAiSettings']).as('settings.ai.update')
+    router.get('settings/audit-log', [AuditLogsController, 'index']).as('settings.auditLog')
   })
   .use(middleware.auth())

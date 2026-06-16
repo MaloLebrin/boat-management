@@ -36,4 +36,5 @@ export const controllers = {
   SimulatorLead: () => import('#controllers/simulator_lead_controller'),
   SimulatorShare: () => import('#controllers/simulator_share_controller'),
   Spots: () => import('#controllers/spots_controller'),
+  AuditLogs: () => import('#controllers/audit_logs_controller'),
 }
