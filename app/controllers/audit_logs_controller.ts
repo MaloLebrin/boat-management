@@ -1,7 +1,7 @@
 import AuditLogService from '#services/audit_log_service'
 import OrganizationMemberService from '#services/organization_member_service'
 import OrganizationPolicy from '#policies/organization_policy'
-import type { AuditLogFilters } from '#shared/types/audit_log'
+import { auditLogFiltersValidator } from '#validators/audit_log'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 
@@ -22,14 +22,7 @@ export default class AuditLogsController {
 
     await bouncer.with(OrganizationPolicy).authorize('viewAuditLog')
 
-    const qs = request.qs()
-    const filters: AuditLogFilters = {
-      userId: qs.userId ? Number(qs.userId) : undefined,
-      action: qs.action ?? undefined,
-      from: qs.from ?? undefined,
-      to: qs.to ?? undefined,
-      page: qs.page ? Number(qs.page) : 1,
-    }
+    const filters = await auditLogFiltersValidator.validate(request.qs())
 
     const [auditLog, members] = await Promise.all([
       this.auditLogService.list(user.organizationId!, filters),

@@ -47,7 +47,7 @@ export class AuditLogSchema extends BaseModel {
   @column({ isPrimary: true })
   declare id: number
   @column()
-  declare metadata: any | null
+  declare metadata: Record<string, unknown> | null
   @column()
   declare organizationId: number
   @column()

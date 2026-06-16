@@ -66,7 +66,7 @@ function onPageChange(page: number) {
 }
 
 function actionLabel(action: AuditAction): string {
-  const key = action.replace('.', '_')
+  const key = action.replaceAll('.', '_')
   return t(`settings.auditLog.actions.${key}`)
 }
 

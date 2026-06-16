@@ -41,11 +41,17 @@ export default class OrganizationMembersController {
     try {
       await this.quotaService.assertCanAddMember(user.organization)
       const payload = await request.validateUsing(inviteMemberValidator)
-      await this.memberService.addMember(user.organizationId!, payload.email, payload.role)
+      const membership = await this.memberService.addMember(
+        user.organizationId!,
+        payload.email,
+        payload.role
+      )
       await this.auditLogService.log({
         organizationId: user.organizationId!,
         userId: user.id,
         action: 'member.add',
+        entityType: 'membership',
+        entityId: membership.id,
         metadata: { email: payload.email, role: payload.role },
       })
     } catch (error) {
