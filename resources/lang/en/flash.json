@@ -57,7 +57,8 @@
   },
   "settings": {
     "profileUpdated": "Profile updated.",
-    "orgUpdated": "Organisation updated."
+    "orgUpdated": "Organisation updated.",
+    "aiSettingsUpdated": "AI settings updated."
   },
   "enginePart": {
     "created": "Part added.",

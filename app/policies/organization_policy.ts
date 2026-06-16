@@ -16,4 +16,8 @@ export default class OrganizationPolicy extends BasePolicy {
   manageMembers(_user: User): AuthorizerResponse {
     return false
   }
+
+  configureAI(_user: User): AuthorizerResponse {
+    return false
+  }
 }

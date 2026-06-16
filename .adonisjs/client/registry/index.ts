@@ -606,6 +606,18 @@ const routes = {
     tokens: [{"old":"/settings/org","type":0,"val":"settings","end":""},{"old":"/settings/org","type":0,"val":"org","end":""}],
     types: placeholder as Registry['settings.org.update']['types'],
   },
+  'settings.ai': {
+    methods: ["GET","HEAD"],
+    pattern: '/settings/ai',
+    tokens: [{"old":"/settings/ai","type":0,"val":"settings","end":""},{"old":"/settings/ai","type":0,"val":"ai","end":""}],
+    types: placeholder as Registry['settings.ai']['types'],
+  },
+  'settings.ai.update': {
+    methods: ["PUT"],
+    pattern: '/settings/ai',
+    tokens: [{"old":"/settings/ai","type":0,"val":"settings","end":""},{"old":"/settings/ai","type":0,"val":"ai","end":""}],
+    types: placeholder as Registry['settings.ai.update']['types'],
+  },
   'maintenance.history': {
     methods: ["GET","HEAD"],
     pattern: '/maintenance/history',

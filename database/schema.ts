@@ -682,6 +682,8 @@ export class OrganizationMembershipSchema extends BaseModel {
 
 export class OrganizationSchema extends BaseModel {
   static $columns = [
+    'aiModelOverride',
+    'aiSystemPrompt',
     'createdAt',
     'id',
     'name',
@@ -691,6 +693,10 @@ export class OrganizationSchema extends BaseModel {
     'updatedAt',
   ] as const
   $columns = OrganizationSchema.$columns
+  @column()
+  declare aiModelOverride: string | null
+  @column()
+  declare aiSystemPrompt: string | null
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
   @column({ isPrimary: true })

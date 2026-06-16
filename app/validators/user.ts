@@ -1,4 +1,5 @@
 import vine from '@vinejs/vine'
+import { AI_MODEL_OVERRIDES } from '#shared/types/ai'
 
 const email = () => vine.string().email().maxLength(254)
 const password = () => vine.string().minLength(8).maxLength(32)
@@ -32,4 +33,13 @@ export const updateProfileValidator = vine.create({
 
 export const updateOrganizationValidator = vine.create({
   name: vine.string().minLength(1).maxLength(255),
+})
+
+export const updateAiSettingsValidator = vine.create({
+  aiSystemPrompt: vine
+    .string()
+    .maxLength(2000)
+    .nullable()
+    .transform((v) => v || null),
+  aiModelOverride: vine.enum(AI_MODEL_OVERRIDES).nullable().optional(),
 })

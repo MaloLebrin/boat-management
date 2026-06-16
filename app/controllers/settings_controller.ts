@@ -3,7 +3,11 @@ import OrganizationInvitationService from '#services/organization_invitation_ser
 import SubscriptionService from '#services/subscription_service'
 import QuotaService from '#services/quota_service'
 import OrganizationPolicy from '#policies/organization_policy'
-import { updateOrganizationValidator, updateProfileValidator } from '#validators/user'
+import {
+  updateAiSettingsValidator,
+  updateOrganizationValidator,
+  updateProfileValidator,
+} from '#validators/user'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import { PLAN_LIMITS } from '#shared/types/plan'
@@ -97,6 +101,45 @@ export default class SettingsController {
     await user.organization.save()
 
     session.flash('success', i18n.t('flash.settings.orgUpdated'))
+    return response.redirect().back()
+  }
+
+  async ai({ inertia, auth, bouncer, response }: HttpContext) {
+    const user = await auth.authenticate()
+    await user.load('organization')
+    const org = user.organization
+
+    if (!PLAN_LIMITS[org.plan].canCustomizeAI) {
+      return response.redirect('/settings/billing')
+    }
+
+    await bouncer.with(OrganizationPolicy).authorize('configureAI')
+
+    return inertia.render('settings/ai', {
+      aiSystemPrompt: org.aiSystemPrompt,
+      aiModelOverride: org.aiModelOverride,
+    })
+  }
+
+  async updateAiSettings({ request, response, session, auth, bouncer, i18n }: HttpContext) {
+    const user = await auth.authenticate()
+    await user.load('organization')
+    const org = user.organization
+
+    if (!PLAN_LIMITS[org.plan].canCustomizeAI) {
+      return response.redirect('/settings/billing')
+    }
+
+    await bouncer.with(OrganizationPolicy).authorize('configureAI')
+
+    const { aiSystemPrompt, aiModelOverride } =
+      await request.validateUsing(updateAiSettingsValidator)
+
+    org.aiSystemPrompt = aiSystemPrompt ?? null
+    org.aiModelOverride = aiModelOverride ?? null
+    await org.save()
+
+    session.flash('success', i18n.t('flash.settings.aiSettingsUpdated'))
     return response.redirect().back()
   }
 }

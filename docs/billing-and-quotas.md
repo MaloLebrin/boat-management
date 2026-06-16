@@ -9,11 +9,11 @@
 Les trois plans sont définis dans [`shared/types/plan.ts`](../shared/types/plan.ts) et constituent la source de vérité unique pour l'ensemble du système de quotas.
 
 ```
-Plan        maxBoats   maxMembers   canUseAI   canExport
-──────────────────────────────────────────────────────
-starter         2           1         non         non
-pro            25           5         oui         oui
-enterprise    illimité    illimité    oui         oui
+Plan        maxBoats   maxMembers   canUseAI   canExport   canCustomizeAI
+──────────────────────────────────────────────────────────────────────────
+starter         2           1         non         non            non
+pro            25           5         oui         oui            non
+enterprise    illimité    illimité    oui         oui            oui
 ```
 
 `null` pour `maxBoats`/`maxMembers` signifie illimité — `QuotaService` court-circuite la requête COUNT si la valeur est `null`.
@@ -153,6 +153,8 @@ Quatre méthodes d'assertion ; toutes lèvent `QuotaExceededError` si dépasseme
 | `assertCanAddMember(org)` | COUNT vs `maxMembers` | `OrganizationMembership` |
 | `assertCanUseAI(org)`     | booléen `canUseAI`    | —                        |
 | `assertCanExport(org)`    | booléen `canExport`   | —                        |
+
+`canCustomizeAI` (Enterprise) n'a pas d'assertion `QuotaService` : la garde est faite directement dans `SettingsController` via `PLAN_LIMITS[org.plan].canCustomizeAI`. Voir [`docs/domain/ai-customization.md`](domain/ai-customization.md).
 
 `canAddBoat(org)` est la version booléenne (non-throwing) utilisée pour afficher l'état du bouton côté UI.
 

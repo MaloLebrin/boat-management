@@ -4,7 +4,8 @@
     "org": "Profil organisation",
     "members": "Membres et accès",
     "billing": "Facturation et plan",
-    "me": "Mon profil"
+    "me": "Mon profil",
+    "ai": "Personnalisation IA"
   },
   "org": {
     "title": "Profil organisation",
@@ -110,5 +111,20 @@
     "emailLabel": "Adresse email",
     "emailHint": "L'adresse email ne peut pas être modifiée.",
     "save": "Enregistrer les modifications"
+  },
+  "ai": {
+    "title": "Personnalisation IA",
+    "description": "Définissez un contexte métier qui sera injecté dans chaque échange IA de votre organisation.",
+    "systemPromptLabel": "Prompt système personnalisé",
+    "systemPromptPlaceholder": "Ex : Tu es un expert en gestion de flotte de voiliers de course. Utilise une terminologie technique précise et adapte tes suggestions au contexte régatier.",
+    "systemPromptHint": "Maximum 2 000 caractères. Ce texte est ajouté avant chaque requête IA.",
+    "modelOverrideLabel": "Modèle IA",
+    "modelOverridePlaceholder": "Modèle par défaut",
+    "models": {
+      "mistral-small-latest": "Mistral Small (rapide)",
+      "mistral-medium-latest": "Mistral Medium (équilibré)",
+      "mistral-large-latest": "Mistral Large (performant)"
+    },
+    "save": "Enregistrer"
   }
 }
