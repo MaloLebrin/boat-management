@@ -104,7 +104,7 @@ test.group('Storage Quota (functional)', (group) => {
       (org) => org.merge({ plan: 'pro', storageUsedBytes: 5 * 1024 * 1024 * 1024 }) // 5 GB used
     ).create()
 
-    const response = await client.get('/settings/billing').loginAs(user)
+    const response = await client.get('/settings/billing').loginAs(user).withInertia()
 
     response.assertStatus(200)
     response.assertInertiaComponent('settings/billing')
