@@ -125,7 +125,6 @@
       "mistral-medium-latest": "Mistral Medium (balanced)",
       "mistral-large-latest": "Mistral Large (powerful)"
     },
-    "save": "Save",
-    "enterpriseOnly": "AI model customisation is available on the Enterprise plan only."
+    "save": "Save"
   }
 }

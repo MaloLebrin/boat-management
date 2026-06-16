@@ -66,7 +66,8 @@ export default class AiController {
       await this.aiAnalysisService.generateFleetAnalysis(
         user.id,
         data,
-        user.organization.aiSystemPrompt
+        user.organization.aiSystemPrompt,
+        user.organization.aiModelOverride
       )
     } catch {
       session.flash('error', i18n.t('flash.ai.analysisError'))
@@ -145,7 +146,8 @@ export default class AiController {
             performedAt: ev.performedAt.toISODate()!,
           })),
         },
-        user.organization.aiSystemPrompt
+        user.organization.aiSystemPrompt,
+        user.organization.aiModelOverride
       )
     } catch (error) {
       if (!(error instanceof BoatNotFoundError)) {

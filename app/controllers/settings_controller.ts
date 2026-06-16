@@ -104,7 +104,7 @@ export default class SettingsController {
     return response.redirect().back()
   }
 
-  async ai({ inertia, auth, response }: HttpContext) {
+  async ai({ inertia, auth, bouncer, response }: HttpContext) {
     const user = await auth.authenticate()
     await user.load('organization')
     const org = user.organization
@@ -112,6 +112,8 @@ export default class SettingsController {
     if (!PLAN_LIMITS[org.plan].canCustomizeAI) {
       return response.redirect('/settings/billing')
     }
+
+    await bouncer.with(OrganizationPolicy).authorize('configureAI')
 
     return inertia.render('settings/ai', {
       aiSystemPrompt: org.aiSystemPrompt,
@@ -119,7 +121,7 @@ export default class SettingsController {
     })
   }
 
-  async updateAiSettings({ request, response, session, auth, i18n }: HttpContext) {
+  async updateAiSettings({ request, response, session, auth, bouncer, i18n }: HttpContext) {
     const user = await auth.authenticate()
     await user.load('organization')
     const org = user.organization
@@ -127,6 +129,8 @@ export default class SettingsController {
     if (!PLAN_LIMITS[org.plan].canCustomizeAI) {
       return response.redirect('/settings/billing')
     }
+
+    await bouncer.with(OrganizationPolicy).authorize('configureAI')
 
     const { aiSystemPrompt, aiModelOverride } =
       await request.validateUsing(updateAiSettingsValidator)

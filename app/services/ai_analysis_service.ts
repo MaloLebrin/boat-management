@@ -111,15 +111,19 @@ export default class AiAnalysisService {
   async generateFleetAnalysis(
     userId: number,
     input: FleetAnalysisInput,
-    orgSystemPrompt?: string | null
+    orgSystemPrompt?: string | null,
+    orgModelOverride?: string | null
   ): Promise<AiSuggestion[]> {
     const userMessage = this.#buildFleetUserMessage(input)
     const systemContent = orgSystemPrompt ? `${orgSystemPrompt}\n\n${SYSTEM_PROMPT}` : SYSTEM_PROMPT
 
-    const rawResponse = await this.aiService.chat([
-      { role: 'system', content: systemContent },
-      { role: 'user', content: userMessage },
-    ])
+    const rawResponse = await this.aiService.chat(
+      [
+        { role: 'system', content: systemContent },
+        { role: 'user', content: userMessage },
+      ],
+      orgModelOverride
+    )
 
     const suggestions = this.#parseResponse(rawResponse)
 
@@ -141,15 +145,19 @@ export default class AiAnalysisService {
     userId: number,
     boatId: number,
     input: BoatSuggestionsInput,
-    orgSystemPrompt?: string | null
+    orgSystemPrompt?: string | null,
+    orgModelOverride?: string | null
   ): Promise<AiSuggestion[]> {
     const userMessage = this.#buildBoatUserMessage(input)
     const systemContent = orgSystemPrompt ? `${orgSystemPrompt}\n\n${SYSTEM_PROMPT}` : SYSTEM_PROMPT
 
-    const rawResponse = await this.aiService.chat([
-      { role: 'system', content: systemContent },
-      { role: 'user', content: userMessage },
-    ])
+    const rawResponse = await this.aiService.chat(
+      [
+        { role: 'system', content: systemContent },
+        { role: 'user', content: userMessage },
+      ],
+      orgModelOverride
+    )
 
     const suggestions = this.#parseResponse(rawResponse)
 

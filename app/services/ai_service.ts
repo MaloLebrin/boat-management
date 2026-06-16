@@ -17,9 +17,10 @@ export default class AiService {
     this.#model = env.get('AI_MODEL', 'mistral-small-latest')
   }
 
-  async chat(messages: AiChatMessage[]) {
+  async chat(messages: AiChatMessage[], modelOverride?: string | null) {
+    const model = modelOverride ?? this.#model
     const response = await this.#client.chat.complete({
-      model: this.#model,
+      model,
       messages,
     })
 

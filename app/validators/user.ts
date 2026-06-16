@@ -42,6 +42,10 @@ export const AI_MODEL_OVERRIDES = [
 export type AiModelOverride = (typeof AI_MODEL_OVERRIDES)[number]
 
 export const updateAiSettingsValidator = vine.create({
-  aiSystemPrompt: vine.string().maxLength(2000).nullable(),
+  aiSystemPrompt: vine
+    .string()
+    .maxLength(2000)
+    .nullable()
+    .transform((v) => v || null),
   aiModelOverride: vine.enum(AI_MODEL_OVERRIDES).nullable().optional(),
 })

@@ -125,7 +125,6 @@
       "mistral-medium-latest": "Mistral Medium (équilibré)",
       "mistral-large-latest": "Mistral Large (performant)"
     },
-    "save": "Enregistrer",
-    "enterpriseOnly": "La personnalisation du modèle IA est réservée au plan Entreprise."
+    "save": "Enregistrer"
   }
 }
