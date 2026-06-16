@@ -9,7 +9,8 @@ export class QuotaExceededError extends Error {
     public readonly feature: QuotaFeature,
     public readonly limit: number | null,
     public readonly current: number,
-    public readonly upgradeTo: PlanTier | null
+    public readonly upgradeTo: PlanTier | null,
+    public readonly alreadyOverLimit = false
   ) {
     super(`Quota exceeded: ${feature}`)
   }

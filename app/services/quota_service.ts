@@ -77,6 +77,16 @@ export default class QuotaService {
   assertCanUpload(org: Organization, bytes: number): void {
     const limit = this.storageLimitBytes(org)
     if (limit === null) return
+    if (org.storageUsedBytes > limit) {
+      // Already over limit (post-downgrade): even a 0-byte upload is blocked
+      throw new QuotaExceededError(
+        'storage',
+        limit,
+        org.storageUsedBytes,
+        getUpgradeTier(org.plan),
+        true
+      )
+    }
     if (org.storageUsedBytes + bytes > limit) {
       throw new QuotaExceededError('storage', limit, org.storageUsedBytes, getUpgradeTier(org.plan))
     }
