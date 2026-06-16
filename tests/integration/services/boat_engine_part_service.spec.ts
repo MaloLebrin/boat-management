@@ -4,6 +4,7 @@ import BoatEnginePart from '#models/boat_engine_part'
 import { UserFactory } from '#database/factories/user_factory'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { BoatEngineFactory } from '#database/factories/boat_engine_factory'
+import app from '@adonisjs/core/services/app'
 
 test.group('BoatEnginePartService (unit)', () => {
   test('create stores part with minStockAlert', async ({ assert }) => {
@@ -14,7 +15,7 @@ test.group('BoatEnginePartService (unit)', () => {
     const engine = await BoatEngineFactory.merge({ boatId: boat.id }).create()
     await boat.load('engines')
 
-    const svc = new BoatEnginePartService()
+    const svc = await app.container.make(BoatEnginePartService)
 
     const part = await svc.create(user, boat, engine.id, {
       designation: 'Oil filter',
@@ -36,7 +37,7 @@ test.group('BoatEnginePartService (unit)', () => {
     const engine = await BoatEngineFactory.merge({ boatId: boat.id }).create()
     await boat.load('engines')
 
-    const svc = new BoatEnginePartService()
+    const svc = await app.container.make(BoatEnginePartService)
 
     await svc.create(user, boat, engine.id, { designation: 'Impeller', stock: 1, minStockAlert: 2 })
     await svc.create(user, boat, engine.id, { designation: 'Belt', stock: 5, minStockAlert: 2 })
@@ -62,7 +63,7 @@ test.group('BoatEnginePartService (unit)', () => {
     const engine = await BoatEngineFactory.merge({ boatId: boat.id }).create()
     await boat.load('engines')
 
-    const svc = new BoatEnginePartService()
+    const svc = await app.container.make(BoatEnginePartService)
 
     await svc.create(user, boat, engine.id, { designation: 'Oil', stock: 0 })
 
@@ -78,7 +79,7 @@ test.group('BoatEnginePartService (unit)', () => {
     const engine = await BoatEngineFactory.merge({ boatId: boat.id }).create()
     await boat.load('engines')
 
-    const svc = new BoatEnginePartService()
+    const svc = await app.container.make(BoatEnginePartService)
 
     const part = await svc.create(user, boat, engine.id, {
       designation: 'Gasket',

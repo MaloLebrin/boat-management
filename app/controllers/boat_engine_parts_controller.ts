@@ -140,12 +140,14 @@ export default class BoatEnginePartsController {
     if (!loaded) return
     const { user, boat } = loaded
     await bouncer.with(BoatPolicy).authorize('edit', boat)
+    const org = await this.organizationService.findOrFail(boat.organizationId)
     try {
       await this.equipmentService.deleteEnginePart(
         user,
         boat,
         Number(params.engineId),
-        Number(params.partId)
+        Number(params.partId),
+        org
       )
     } catch (error) {
       if (error instanceof BoatEquipmentNotFoundError) {

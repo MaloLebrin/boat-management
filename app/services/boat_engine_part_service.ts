@@ -1,7 +1,10 @@
 import { BoatEquipmentNotFoundError } from '#exceptions/boat_errors'
 import type Boat from '#models/boat'
 import BoatEnginePart from '#models/boat_engine_part'
+import type Organization from '#models/organization'
 import type User from '#models/user'
+import { CloudinaryFolders } from '#services/cloudinary_service'
+import MediaService from '#services/media_service'
 import type { BoatEnginePartPayload } from '#shared/types/boat'
 import { assertBoatInUserOrg } from '#utils/boat_utils'
 import { inject } from '@adonisjs/core'
@@ -11,6 +14,7 @@ export type { BoatEnginePartPayload }
 
 @inject()
 export default class BoatEnginePartService {
+  constructor(private mediaService: MediaService) {}
   async listForEngine(engineId: number) {
     return await BoatEnginePart.query().where('boatEngineId', engineId).orderBy('id', 'asc')
   }
@@ -79,7 +83,7 @@ export default class BoatEnginePartService {
     return part
   }
 
-  async delete(user: User, boat: Boat, engineId: number, partId: number) {
+  async delete(user: User, boat: Boat, engineId: number, partId: number, org?: Organization) {
     assertBoatInUserOrg(user, boat)
 
     const engine = boat.engines.find((e) => e.id === engineId)
@@ -90,6 +94,15 @@ export default class BoatEnginePartService {
       .where('boatEngineId', engineId)
       .first()
     if (!part) throw new BoatEquipmentNotFoundError()
+
+    if (org) {
+      await this.mediaService.deleteAllForEntity(
+        'boat_engine_part',
+        part.id,
+        CloudinaryFolders.boatEnginePartDocuments(org.slug, boat.id, engineId, part.id),
+        org
+      )
+    }
 
     await part.delete()
   }

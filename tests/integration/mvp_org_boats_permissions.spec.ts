@@ -3,14 +3,10 @@ import UserService from '#services/user_service'
 import OrganizationService from '#services/organization_service'
 import BoatService from '#services/boat_service'
 import BoatEquipmentService from '#services/boat_equipment_service'
-import BoatEngineService from '#services/boat_engine_service'
-import BoatSailService from '#services/boat_sail_service'
-import BoatRigService from '#services/boat_rig_service'
-import BoatEnginePartService from '#services/boat_engine_part_service'
-import BoatSafetyEquipmentService from '#services/boat_safety_equipment_service'
 import { UserFactory } from '#database/factories/user_factory'
 import { OrganizationFactory } from '#database/factories/organization_factory'
 import { BoatFactory } from '#database/factories/boat_factory'
+import app from '@adonisjs/core/services/app'
 
 test.group('MVP org/users/boats/permissions (integration)', () => {
   test('signupWithOrganization creates org and links user', async ({ assert }) => {
@@ -45,7 +41,7 @@ test.group('MVP org/users/boats/permissions (integration)', () => {
       registrationNumber: 'B1',
     }).create()
 
-    const boatService = new BoatService()
+    const boatService = await app.container.make(BoatService)
     const boats = await boatService.listForUser(user1)
 
     assert.equal(boats.length, 1)
@@ -58,14 +54,8 @@ test.group('MVP org/users/boats/permissions (integration)', () => {
   }) => {
     const user = await UserFactory.with('organization').create()
 
-    const boatService = new BoatService()
-    const equipmentService = new BoatEquipmentService(
-      new BoatEngineService(),
-      new BoatSailService(),
-      new BoatRigService(),
-      new BoatEnginePartService(),
-      new BoatSafetyEquipmentService()
-    )
+    const boatService = await app.container.make(BoatService)
+    const equipmentService = await app.container.make(BoatEquipmentService)
     const boat = await boatService.createForUser(user, {
       name: 'My Boat',
       manufacturedAt: '2020-01-10',
@@ -120,7 +110,7 @@ test.group('MVP org/users/boats/permissions (integration)', () => {
   test('sailboat requires mastHeightM', async ({ assert }) => {
     const user = await UserFactory.with('organization').create()
 
-    const boatService = new BoatService()
+    const boatService = await app.container.make(BoatService)
 
     await assert.rejects(
       () =>

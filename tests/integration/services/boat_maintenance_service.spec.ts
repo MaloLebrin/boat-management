@@ -4,16 +4,12 @@ import BoatMaintenanceService, {
 } from '#services/boat_maintenance_service'
 import BoatService from '#services/boat_service'
 import BoatEquipmentService from '#services/boat_equipment_service'
-import BoatEngineService from '#services/boat_engine_service'
-import BoatSailService from '#services/boat_sail_service'
-import BoatRigService from '#services/boat_rig_service'
-import BoatEnginePartService from '#services/boat_engine_part_service'
-import BoatSafetyEquipmentService from '#services/boat_safety_equipment_service'
 import BoatMaintenanceEvent from '#models/boat_maintenance_event'
 import { UserFactory } from '#database/factories/user_factory'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { BoatEngineFactory } from '#database/factories/boat_engine_factory'
 import { BoatEnginePartFactory } from '#database/factories/boat_engine_part_factory'
+import app from '@adonisjs/core/services/app'
 
 test.group('BoatMaintenanceService (unit)', () => {
   test('createForBoat stores event and parts for engine subject', async ({ assert }) => {
@@ -60,14 +56,8 @@ test.group('BoatMaintenanceService (unit)', () => {
 
   test('createForBoat sail and rig subjects', async ({ assert }) => {
     const user = await UserFactory.with('organization').create()
-    const boatService = new BoatService()
-    const equipmentService = new BoatEquipmentService(
-      new BoatEngineService(),
-      new BoatSailService(),
-      new BoatRigService(),
-      new BoatEnginePartService(),
-      new BoatSafetyEquipmentService()
-    )
+    const boatService = await app.container.make(BoatService)
+    const equipmentService = await app.container.make(BoatEquipmentService)
     const boat = await boatService.createForUser(user, {
       name: 'Sloop',
       propulsionType: 'sailboat',
