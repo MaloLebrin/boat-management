@@ -107,22 +107,24 @@ test.group('Storage Quota (functional)', (group) => {
     const response = await client.get('/settings/billing').loginAs(user)
 
     response.assertStatus(200)
-    // Inertia response contains the props - we verify the page renders successfully
-    // The actual props verification would require inspecting the Inertia response
+    response.assertInertiaComponent('settings/billing')
+    response.assertInertiaPropsContain({
+      quotaUsage: { storage: { usedBytes: 5 * 1024 * 1024 * 1024 } },
+    })
   })
 
-  test('storage quota is updated after file deletion', async ({ assert }) => {
+  test('updateStorageUsed does not decrement below zero', async ({ assert }) => {
     const org = await OrganizationFactory.merge({
       plan: 'pro',
-      storageUsedBytes: 5000,
+      storageUsedBytes: 100,
     }).create()
     const quotaService = await app.container.make(QuotaService)
 
-    // Simulate deletion of a 2000 byte file
-    await quotaService.updateStorageUsed(org, -2000)
+    // Delta larger than current value
+    await quotaService.updateStorageUsed(org, -500)
 
     const updatedOrg = await Organization.findOrFail(org.id)
-    assert.equal(updatedOrg.storageUsedBytes, 3000)
+    assert.equal(updatedOrg.storageUsedBytes, 0)
   })
 
   test('storage usage decrements correctly on deletion', async ({ assert }) => {

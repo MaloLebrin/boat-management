@@ -3,6 +3,28 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-06-16 — Correctifs code review : Quota de stockage (#72)
+
+**Backend**
+
+- `app/services/quota_service.ts` — Correctif : le décrément de `storage_used_bytes` est désormais plafonné à la valeur courante (`Math.min`) pour éviter un passage en négatif en cas d'incohérence de données. Commentaire ajouté sur la fenêtre de concurrence des notifications de seuil (déduplication assurée par `correlationSuffix` dans `EmailQueueService`). Ligne vide manquante après le constructeur.
+
+**Frontend**
+
+- `inertia/components/settings/SettingsBillingUsageGauge.vue` — Ko/Mo/Go remplacés par des clés i18n (`settings.billing.usage.kb/mb/gb`) afin d'afficher KB/MB/GB en anglais.
+- `resources/lang/fr/settings.json` — Ajout des clés `kb`, `mb`, `gb` (Ko/Mo/Go).
+- `resources/lang/en/settings.json` — Ajout des clés `kb`, `mb`, `gb` (KB/MB/GB).
+
+**Tests**
+
+- `tests/functional/quota/storage.spec.ts` — Test HTTP creux remplacé par des assertions Inertia réelles (`assertInertiaComponent` + `assertInertiaPropsContain`). Test dupliqué de décrément remplacé par un test couvrant le plancher à zéro (décrément supérieur à la valeur courante).
+
+**Docs**
+
+- `docs/changelog.md` — Correction des accents manquants sur les entrées du 2026-06-16.
+
+---
+
 ## 2026-06-16 — Feature : Quota de stockage (#72)
 
 **Backend**
@@ -11,9 +33,9 @@ Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 - Migration `1791000000000_add_storage_to_organizations.ts` — Colonne `storage_used_bytes` (bigint, default 0) sur la table `organizations`.
 - `database/schema.ts` — Ajout du champ `storageUsedBytes` dans `OrganizationSchema`.
 - `app/exceptions/quota_errors.ts` — Ajout de `'storage'` dans le type `QuotaFeature`.
-- `app/services/quota_service.ts` — Nouvelles methodes `storageLimitBytes()`, `assertCanUpload()`, `updateStorageUsed()`. Detection des seuils 80%/100% pour envoi d'email de notification aux admins.
-- `app/services/media_service.ts` — Modification de `upload()` et `deleteById()` pour accepter un parametre `org` optionnel. Verification du quota avant upload et mise a jour du compteur apres upload/suppression.
-- `app/services/email_queue_service.ts` — Nouvelle methode `sendStorageQuotaWarning()` pour notifier les admins.
+- `app/services/quota_service.ts` — Nouvelles méthodes `storageLimitBytes()`, `assertCanUpload()`, `updateStorageUsed()`. Détection des seuils 80%/100% pour envoi d'email de notification aux admins.
+- `app/services/media_service.ts` — Modification de `upload()` et `deleteById()` pour accepter un paramètre `org` optionnel. Vérification du quota avant upload et mise à jour du compteur après upload/suppression.
+- `app/services/email_queue_service.ts` — Nouvelle méthode `sendStorageQuotaWarning()` pour notifier les admins.
 - `app/controllers/boat_media_controller.ts` — Passage de l'organisation a `upload()` et `deleteById()` pour le tracking du stockage.
 - `app/controllers/boat_engine_parts_controller.ts` — Idem pour les documents de pieces moteur.
 - `app/controllers/settings_controller.ts` — Ajout de `storage` dans `quotaUsage` pour la page billing.

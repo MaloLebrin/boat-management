@@ -61,7 +61,10 @@
       "members": "Members",
       "storage": "Storage",
       "unlimited": "Unlimited",
-      "of": "of"
+      "of": "of",
+      "kb": "KB",
+      "mb": "MB",
+      "gb": "GB"
     },
     "features": {
       "ai": "AI / Copilot",

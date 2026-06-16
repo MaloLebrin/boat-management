@@ -61,7 +61,10 @@
       "members": "Membres",
       "storage": "Stockage",
       "unlimited": "Illimité",
-      "of": "sur"
+      "of": "sur",
+      "kb": "Ko",
+      "mb": "Mo",
+      "gb": "Go"
     },
     "features": {
       "ai": "IA / Copilote",

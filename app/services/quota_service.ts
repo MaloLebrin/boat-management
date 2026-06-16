@@ -10,6 +10,7 @@ import { DateTime } from 'luxon'
 @inject()
 export default class QuotaService {
   constructor(private emailQueueService: EmailQueueService) {}
+
   async countBoats(org: Organization): Promise<number> {
     const rows = await Boat.query().where('organizationId', org.id).count('* as total')
     return Number(rows[0].$extras.total)
@@ -92,15 +93,19 @@ export default class QuotaService {
     if (deltaBytes >= 0) {
       await Organization.query().where('id', org.id).increment('storage_used_bytes', deltaBytes)
     } else {
-      await Organization.query()
-        .where('id', org.id)
-        .decrement('storage_used_bytes', Math.abs(deltaBytes))
+      // Cap the decrement to the current value so the column never goes below 0
+      const safeDecrement = Math.min(Math.abs(deltaBytes), org.storageUsedBytes)
+      await Organization.query().where('id', org.id).decrement('storage_used_bytes', safeDecrement)
     }
 
     // Refresh the organization to get updated value
     await org.refresh()
 
     // Only check for threshold notifications if adding bytes (not deleting)
+    // Note: oldPercent/newPercent are derived from the pre-update in-memory value. Under concurrent
+    // uploads two requests could both see oldPercent < 80 and both trigger the 80% email. The
+    // correlationSuffix deduplication in EmailQueueService (one email per threshold per month)
+    // is the intended safety net for this race window.
     if (deltaBytes > 0 && limit !== null) {
       const oldPercent = (oldBytes / limit) * 100
       const newPercent = (newBytes / limit) * 100

@@ -12,9 +12,10 @@ const props = defineProps<{
 }>()
 
 function formatBytes(bytes: number): string {
-  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} Ko`
-  if (bytes < 1024 * 1024 * 1024) return `${Math.round(bytes / (1024 * 1024))} Mo`
-  return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} Go`
+  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} ${t('settings.billing.usage.kb')}`
+  if (bytes < 1024 * 1024 * 1024)
+    return `${Math.round(bytes / (1024 * 1024))} ${t('settings.billing.usage.mb')}`
+  return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} ${t('settings.billing.usage.gb')}`
 }
 
 const displayUsed = computed(() => {
