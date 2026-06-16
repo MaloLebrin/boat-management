@@ -40,24 +40,19 @@ export default class AiTokenQuotaService {
     const month = this.currentMonthKey()
     const limit = PLAN_LIMITS[org.plan].aiTokensPerMonth
 
-    const existing = await AiTokenUsage.query()
-      .where('organizationId', org.id)
-      .where('month', month)
-      .first()
-
-    const oldUsed = existing ? Number(existing.tokensUsed) : 0
-
-    if (existing) {
-      await AiTokenUsage.query()
-        .where('organizationId', org.id)
-        .where('month', month)
-        .update({ tokens_used: db.raw('tokens_used + ?', [tokensUsed]) })
-    } else {
-      await AiTokenUsage.create({ organizationId: org.id, month, tokensUsed })
-    }
+    const result = await db.rawQuery<{ rows: [{ tokens_used: string }] }>(
+      `INSERT INTO ai_token_usages (organization_id, month, tokens_used, created_at, updated_at)
+       VALUES (?, ?, ?, NOW(), NOW())
+       ON CONFLICT (organization_id, month)
+       DO UPDATE SET tokens_used = ai_token_usages.tokens_used + EXCLUDED.tokens_used,
+                    updated_at = NOW()
+       RETURNING tokens_used`,
+      [org.id, month, tokensUsed]
+    )
 
     if (limit !== null) {
-      const newUsed = oldUsed + tokensUsed
+      const newUsed = Number(result.rows[0].tokens_used)
+      const oldUsed = newUsed - tokensUsed
       const oldPercent = (oldUsed / limit) * 100
       const newPercent = (newUsed / limit) * 100
 

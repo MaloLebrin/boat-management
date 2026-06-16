@@ -5,6 +5,7 @@ import AiService, { type AiChatMessage } from '#services/ai_service'
 import AiTokenQuotaService from '#services/ai_token_quota_service'
 import QueueDedupService from '#services/queue_dedup_service'
 import Organization from '#models/organization'
+import { QuotaExceededError } from '#exceptions/quota_errors'
 import { createHash } from 'node:crypto'
 import { inject } from '@adonisjs/core'
 
@@ -41,7 +42,16 @@ export default class RunAiChat extends Job<RunAiChatPayload> {
 
     const org = await Organization.findOrFail(this.payload.organizationId)
     const currentUsage = await this.aiTokenQuotaService.getUsage(org.id)
-    this.aiTokenQuotaService.assertCanUseTokens(org, currentUsage)
+    try {
+      this.aiTokenQuotaService.assertCanUseTokens(org, currentUsage)
+    } catch (error) {
+      if (error instanceof QuotaExceededError) {
+        logger.warn({ orgId: org.id }, 'RunAiChat: AI token quota exceeded, skipping')
+        await this.dedupService.markFailed(this.payload.dedupKey, error)
+        return
+      }
+      throw error
+    }
 
     const { content, tokensUsed } = await this.aiService.chat(this.payload.messages)
 
