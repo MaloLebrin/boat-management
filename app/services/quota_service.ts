@@ -5,6 +5,7 @@ import OrganizationMembership from '#models/organization_membership'
 import { PLAN_LIMITS, getUpgradeTier } from '#shared/types/plan'
 import { inject } from '@adonisjs/core'
 import EmailQueueService from '#services/email_queue_service'
+import db from '@adonisjs/lucid/services/db'
 import { DateTime } from 'luxon'
 
 @inject()
@@ -103,13 +104,16 @@ export default class QuotaService {
     const oldBytes = org.storageUsedBytes
     const newBytes = Math.max(0, oldBytes + deltaBytes)
 
-    // Update storage atomically in DB (use snake_case column name; handle negative delta with decrement)
+    // Update storage atomically in DB (use snake_case column name)
     if (deltaBytes >= 0) {
       await Organization.query().where('id', org.id).increment('storage_used_bytes', deltaBytes)
     } else {
-      // Cap the decrement to the current value so the column never goes below 0
-      const safeDecrement = Math.min(Math.abs(deltaBytes), org.storageUsedBytes)
-      await Organization.query().where('id', org.id).decrement('storage_used_bytes', safeDecrement)
+      // GREATEST(0, …) ensures the column never goes below 0 — fully atomic, no read-then-write race
+      await Organization.query()
+        .where('id', org.id)
+        .update(
+          db.raw('storage_used_bytes = GREATEST(0, storage_used_bytes - ?)', [Math.abs(deltaBytes)])
+        )
     }
 
     // Refresh the organization in-place so the caller's reference reflects the new value.

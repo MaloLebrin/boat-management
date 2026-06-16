@@ -108,7 +108,14 @@ export default class MediaService {
     const media = await Media.find(mediaId)
     if (!media) throw new MediaNotFoundError()
 
-    const bytes = media.bytes
+    if (!org && media.entityType !== 'user') {
+      logger.warn(
+        { mediaId, entityType: media.entityType },
+        'MediaService.deleteById called without org — storage quota not decremented'
+      )
+    }
+
+    const bytes = media.bytes ?? 0
 
     await this.cloudinary.deleteFile(
       media.cloudinaryPublicId,
@@ -116,7 +123,6 @@ export default class MediaService {
     )
     await media.delete()
 
-    // Update storage usage after successful deletion
     if (org) {
       await this.quotaService.updateStorageUsed(org, -bytes)
     }
@@ -128,6 +134,13 @@ export default class MediaService {
     folderPath: string,
     org?: Organization
   ): Promise<void> {
+    if (!org) {
+      logger.warn(
+        { entityType, entityId },
+        'MediaService.deleteAllForEntity called without org — storage quota not decremented'
+      )
+    }
+
     const medias = await Media.query()
       .where('entityType', entityType)
       .where('entityId', entityId)

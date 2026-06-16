@@ -56,7 +56,7 @@ const statusVariant = computed((): 'success' | 'warning' | 'neutral' => {
 
 const storageOverflow = computed(() => {
   const { usedBytes, limitBytes } = props.quotaUsage.storage
-  return limitBytes !== null && usedBytes > limitBytes
+  return limitBytes !== null && usedBytes >= limitBytes
 })
 </script>
 
