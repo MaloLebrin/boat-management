@@ -208,6 +208,27 @@ export default class BoatHullService {
           org
         )
       }
+
+      const sails = await BoatSail.query().where('boatId', boat.id).select('id')
+      for (const sail of sails) {
+        await this.mediaService.deleteAllForEntity(
+          'boat_sail',
+          sail.id,
+          CloudinaryFolders.boatSail(org.slug, boat.id, sail.id),
+          org
+        )
+      }
+
+      const rig = await BoatRig.query().where('boatId', boat.id).first()
+      if (rig) {
+        await this.mediaService.deleteAllForEntity(
+          'boat_rig',
+          rig.id,
+          CloudinaryFolders.boatRig(org.slug, boat.id),
+          org
+        )
+      }
+
       await this.mediaService.deleteAllForEntity(
         'boat',
         boat.id,

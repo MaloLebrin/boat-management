@@ -132,9 +132,11 @@ export default class QuotaService {
       const crossed80 = oldPercent < 80 && newPercent >= 80
       const crossed100 = oldPercent < 100 && newPercent >= 100
 
-      if (crossed80 || crossed100) {
-        const percent = crossed100 ? 100 : 80
-        await this.sendStorageQuotaNotification(org, percent)
+      if (crossed80) {
+        await this.sendStorageQuotaNotification(org, 80)
+      }
+      if (crossed100) {
+        await this.sendStorageQuotaNotification(org, 100)
       }
     }
   }
