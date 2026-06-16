@@ -2,6 +2,7 @@ import OrganizationMemberService from '#services/organization_member_service'
 import OrganizationInvitationService from '#services/organization_invitation_service'
 import SubscriptionService from '#services/subscription_service'
 import QuotaService from '#services/quota_service'
+import AiTokenQuotaService from '#services/ai_token_quota_service'
 import OrganizationPolicy from '#policies/organization_policy'
 import {
   updateAiSettingsValidator,
@@ -18,7 +19,8 @@ export default class SettingsController {
     private memberService: OrganizationMemberService,
     private invitationService: OrganizationInvitationService,
     private subscriptionService: SubscriptionService,
-    private quotaService: QuotaService
+    private quotaService: QuotaService,
+    private aiTokenQuotaService: AiTokenQuotaService
   ) {}
   async me({ inertia }: HttpContext) {
     return inertia.render('settings/me', {})
@@ -63,10 +65,11 @@ export default class SettingsController {
     const limits = PLAN_LIMITS[org.plan]
     const storageLimit = this.quotaService.storageLimitBytes(org)
 
-    const [boatCount, memberCount, activeSub] = await Promise.all([
+    const [boatCount, memberCount, activeSub, aiTokensUsed] = await Promise.all([
       this.quotaService.countBoats(org),
       this.quotaService.countMembers(org),
       this.subscriptionService.getActive(org.id),
+      this.aiTokenQuotaService.getUsage(org.id),
     ])
 
     return inertia.render('settings/billing', {
@@ -75,6 +78,7 @@ export default class SettingsController {
         boats: { used: boatCount, limit: limits.maxBoats },
         members: { used: memberCount, limit: limits.maxMembers },
         storage: { usedBytes: org.storageUsedBytes, limitBytes: storageLimit },
+        aiTokens: { used: aiTokensUsed, limit: limits.aiTokensPerMonth },
         canUseAI: limits.canUseAI,
         canExport: limits.canExport,
       },

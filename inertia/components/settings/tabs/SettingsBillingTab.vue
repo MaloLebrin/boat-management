@@ -129,6 +129,14 @@ const storageOverflow = computed(() => {
             :is-bytes="true"
           />
 
+          <!-- AI tokens usage (Pro only) -->
+          <SettingsBillingUsageGauge
+            v-if="quotaUsage.canUseAI"
+            :label="t('settings.billing.usage.aiTokens')"
+            :used="quotaUsage.aiTokens.used"
+            :limit="quotaUsage.aiTokens.limit"
+          />
+
           <!-- Features -->
           <ul class="space-y-2 text-sm">
             <li

@@ -97,6 +97,7 @@
     "boatsExceeded": "Vous avez atteint la limite de bateaux de votre plan. Passez à un plan supérieur pour en ajouter.",
     "membersExceeded": "Vous avez atteint la limite de membres de votre plan. Passez à un plan supérieur pour en ajouter.",
     "aiExceeded": "Les fonctionnalités IA ne sont pas disponibles sur votre plan actuel. Passez au plan Pro ou Entreprise.",
+    "aiTokensExceeded": "Vous avez atteint votre limite mensuelle de tokens IA. Les fonctionnalités IA seront réinitialisées le 1er du mois prochain ou passez à Enterprise pour un usage illimité.",
     "exportExceeded": "L'export n'est pas disponible sur votre plan actuel. Passez au plan Pro ou Entreprise.",
     "storageExceeded": "Vous avez atteint la limite de stockage de votre plan. Passez à un plan supérieur pour uploader de nouveaux fichiers.",
     "storageOverflow": "Votre usage de stockage dépasse la limite de votre plan actuel. Libérez de l'espace ou passez à un plan supérieur."

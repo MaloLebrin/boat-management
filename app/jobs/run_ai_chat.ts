@@ -2,13 +2,16 @@ import logger from '@adonisjs/core/services/logger'
 import { Job } from '@adonisjs/queue'
 import type { JobOptions } from '@adonisjs/queue/types'
 import AiService, { type AiChatMessage } from '#services/ai_service'
+import AiTokenQuotaService from '#services/ai_token_quota_service'
 import QueueDedupService from '#services/queue_dedup_service'
+import Organization from '#models/organization'
 import { createHash } from 'node:crypto'
 import { inject } from '@adonisjs/core'
 
 export interface RunAiChatPayload {
   messages: AiChatMessage[]
   dedupKey: string
+  organizationId: number
   correlationId?: string
 }
 
@@ -21,7 +24,8 @@ export default class RunAiChat extends Job<RunAiChatPayload> {
 
   constructor(
     private dedupService: QueueDedupService,
-    private aiService: AiService
+    private aiService: AiService,
+    private aiTokenQuotaService: AiTokenQuotaService
   ) {
     super()
   }
@@ -35,12 +39,19 @@ export default class RunAiChat extends Job<RunAiChatPayload> {
   async execute() {
     await this.dedupService.markRunning(this.payload.dedupKey)
 
-    const content = await this.aiService.chat(this.payload.messages)
+    const org = await Organization.findOrFail(this.payload.organizationId)
+    const currentUsage = await this.aiTokenQuotaService.getUsage(org.id)
+    this.aiTokenQuotaService.assertCanUseTokens(org, currentUsage)
+
+    const { content, tokensUsed } = await this.aiService.chat(this.payload.messages)
+
+    await this.aiTokenQuotaService.recordUsage(org, tokensUsed)
 
     logger.info(
       {
         correlationId: this.payload.correlationId,
         outputLength: content.length,
+        tokensUsed,
       },
       'AI chat completed'
     )

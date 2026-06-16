@@ -15,11 +15,13 @@ test.group('RunAiChat (unit)', () => {
     const svc = new AiQueueService(new QueueDedupService())
     await svc.enqueueChat({
       userId: 1,
+      organizationId: 1,
       messages: [{ role: 'user', content: 'Hello' }],
       correlationId: 'test-corr',
     })
     await svc.enqueueChat({
       userId: 1,
+      organizationId: 1,
       messages: [{ role: 'user', content: 'Hello' }],
       correlationId: 'test-corr',
     })
@@ -50,6 +52,7 @@ test.group('RunAiChat (unit)', () => {
     const svc = new AiQueueService(new QueueDedupService())
     await svc.enqueueChat({
       userId: 1,
+      organizationId: 1,
       messages: [{ role: 'user', content: 'Hello' }],
       correlationId: 'payload-check',
     })

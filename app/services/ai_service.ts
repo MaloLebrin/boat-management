@@ -17,21 +17,29 @@ export default class AiService {
     this.#model = env.get('AI_MODEL', 'mistral-small-latest')
   }
 
-  async chat(messages: AiChatMessage[], modelOverride?: string | null) {
+  async chat(
+    messages: AiChatMessage[],
+    modelOverride?: string | null
+  ): Promise<{ content: string; tokensUsed: number }> {
     const model = modelOverride ?? this.#model
     const response = await this.#client.chat.complete({
       model,
       messages,
     })
 
-    const content = response.choices?.[0]?.message?.content
-    if (!content) return ''
+    const tokensUsed = response.usage?.totalTokens ?? 0
 
-    if (typeof content === 'string') return content
+    const raw = response.choices?.[0]?.message?.content
+    if (!raw) return { content: '', tokensUsed }
 
-    return content
-      .filter((chunk) => chunk.type === 'text')
-      .map((chunk) => chunk.text)
-      .join('')
+    const content =
+      typeof raw === 'string'
+        ? raw
+        : raw
+            .filter((chunk) => chunk.type === 'text')
+            .map((chunk) => chunk.text)
+            .join('')
+
+    return { content, tokensUsed }
   }
 }
