@@ -9,6 +9,7 @@ import BoatMaintenanceSheetService from '#services/boat_maintenance_sheet_servic
 import BoatMaintenanceTaskService from '#services/boat_maintenance_task_service'
 import BoatService, { BoatNotFoundError } from '#services/boat_service'
 import MediaService from '#services/media_service'
+import OrganizationService from '#services/organization_service'
 import PortService from '#services/port_service'
 import QuotaService from '#services/quota_service'
 import SpotService from '#services/spot_service'
@@ -30,7 +31,8 @@ export default class BoatsController {
     private boatListService: BoatListService,
     private portService: PortService,
     private spotService: SpotService,
-    private quotaService: QuotaService
+    private quotaService: QuotaService,
+    private organizationService: OrganizationService
   ) {}
 
   async index({ inertia, auth, request }: HttpContext) {
@@ -186,7 +188,8 @@ export default class BoatsController {
       const boat = await this.boatService.getForUserOrFail(user, Number(params.id))
       await bouncer.with(BoatPolicy).authorize('delete', boat)
 
-      await this.boatService.deleteForUser(user, boat)
+      const org = await this.organizationService.findOrFail(boat.organizationId)
+      await this.boatService.deleteForUser(user, boat, org)
       response.redirect('/boats')
     } catch (error) {
       if (error instanceof BoatNotFoundError) return response.redirect('/boats')

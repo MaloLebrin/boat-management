@@ -3,6 +3,7 @@ import BaseCard from '~/components/base/BaseCard.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
+import SettingsBillingUsageGauge from '~/components/settings/SettingsBillingUsageGauge.vue'
 import { useT } from '~/composables/use_t'
 import type { PlanTier, QuotaUsage } from '../../../../shared/types/plan'
 import type {
@@ -38,15 +39,6 @@ function openPortal() {
   portalForm.post('/settings/billing/portal')
 }
 
-function formatLimit(limit: number | null): string {
-  return limit === null ? t('settings.billing.usage.unlimited') : String(limit)
-}
-
-function usagePercent(used: number, limit: number | null): number {
-  if (limit === null) return 0
-  return Math.min(100, Math.round((used / limit) * 100))
-}
-
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString(undefined, {
     year: 'numeric',
@@ -61,12 +53,23 @@ const statusVariant = computed((): 'success' | 'warning' | 'neutral' => {
   if (s === 'past_due' || s === 'incomplete' || s === 'unpaid') return 'warning'
   return 'neutral'
 })
+
+const storageOverflow = computed(() => {
+  const { usedBytes, limitBytes } = props.quotaUsage.storage
+  return limitBytes !== null && usedBytes >= limitBytes
+})
 </script>
 
 <template>
   <div>
     <BaseHeading level="2" class="mb-6">{{ t('settings.billing.title') }}</BaseHeading>
     <div class="space-y-6">
+      <div
+        v-if="storageOverflow"
+        class="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800"
+      >
+        {{ t('settings.billing.storageOverflow') }}
+      </div>
       <BaseCard>
         <template #header>
           <div class="flex items-center justify-between">
@@ -105,57 +108,26 @@ const statusVariant = computed((): 'success' | 'warning' | 'neutral' => {
           </div>
 
           <!-- Boats usage -->
-          <div>
-            <div class="mb-1 flex items-center justify-between text-sm">
-              <span class="text-fg">{{ t('settings.billing.usage.boats') }}</span>
-              <span class="text-fg-muted">
-                {{ quotaUsage.boats.used }}
-                {{ t('settings.billing.usage.of') }}
-                {{ formatLimit(quotaUsage.boats.limit) }}
-              </span>
-            </div>
-            <div
-              v-if="quotaUsage.boats.limit !== null"
-              class="h-2 w-full overflow-hidden rounded-full bg-surface-2"
-            >
-              <div
-                class="h-full rounded-full bg-brand transition-all"
-                :class="{
-                  'bg-red-500': usagePercent(quotaUsage.boats.used, quotaUsage.boats.limit) >= 100,
-                }"
-                :style="{
-                  width: `${usagePercent(quotaUsage.boats.used, quotaUsage.boats.limit)}%`,
-                }"
-              />
-            </div>
-          </div>
+          <SettingsBillingUsageGauge
+            :label="t('settings.billing.usage.boats')"
+            :used="quotaUsage.boats.used"
+            :limit="quotaUsage.boats.limit"
+          />
 
           <!-- Members usage -->
-          <div>
-            <div class="mb-1 flex items-center justify-between text-sm">
-              <span class="text-fg">{{ t('settings.billing.usage.members') }}</span>
-              <span class="text-fg-muted">
-                {{ quotaUsage.members.used }}
-                {{ t('settings.billing.usage.of') }}
-                {{ formatLimit(quotaUsage.members.limit) }}
-              </span>
-            </div>
-            <div
-              v-if="quotaUsage.members.limit !== null"
-              class="h-2 w-full overflow-hidden rounded-full bg-surface-2"
-            >
-              <div
-                class="h-full rounded-full bg-brand transition-all"
-                :class="{
-                  'bg-red-500':
-                    usagePercent(quotaUsage.members.used, quotaUsage.members.limit) >= 100,
-                }"
-                :style="{
-                  width: `${usagePercent(quotaUsage.members.used, quotaUsage.members.limit)}%`,
-                }"
-              />
-            </div>
-          </div>
+          <SettingsBillingUsageGauge
+            :label="t('settings.billing.usage.members')"
+            :used="quotaUsage.members.used"
+            :limit="quotaUsage.members.limit"
+          />
+
+          <!-- Storage usage -->
+          <SettingsBillingUsageGauge
+            :label="t('settings.billing.usage.storage')"
+            :used="quotaUsage.storage.usedBytes"
+            :limit="quotaUsage.storage.limitBytes"
+            :is-bytes="true"
+          />
 
           <!-- Features -->
           <ul class="space-y-2 text-sm">

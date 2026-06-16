@@ -5,6 +5,7 @@ import { OrganizationFactory } from '#database/factories/organization_factory'
 import { UserFactory } from '#database/factories/user_factory'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { OrganizationMembershipFactory } from '#database/factories/organization_membership_factory'
+import app from '@adonisjs/core/services/app'
 
 test.group('QuotaService (unit)', () => {
   // ── canAddBoat ───────────────────────────────────────────────────────────
@@ -14,7 +15,7 @@ test.group('QuotaService (unit)', () => {
     // starter: maxBoats = 2, on crée 1 bateau → sous la limite
     await BoatFactory.merge({ organizationId: org.id }).create()
 
-    const svc = new QuotaService()
+    const svc = await app.container.make(QuotaService)
     const result = await svc.canAddBoat(org)
 
     assert.isTrue(result)
@@ -25,7 +26,7 @@ test.group('QuotaService (unit)', () => {
     // starter: maxBoats = 2, on crée 2 bateaux → limite atteinte
     await BoatFactory.merge({ organizationId: org.id }).createMany(2)
 
-    const svc = new QuotaService()
+    const svc = await app.container.make(QuotaService)
     const result = await svc.canAddBoat(org)
 
     assert.isFalse(result)
@@ -35,7 +36,7 @@ test.group('QuotaService (unit)', () => {
     const org = await OrganizationFactory.merge({ plan: 'enterprise' }).create()
     await BoatFactory.merge({ organizationId: org.id }).createMany(50)
 
-    const svc = new QuotaService()
+    const svc = await app.container.make(QuotaService)
     const result = await svc.canAddBoat(org)
 
     assert.isTrue(result)
@@ -46,7 +47,7 @@ test.group('QuotaService (unit)', () => {
   test('assertCanAddBoat ne throw pas quand sous la limite', async ({ assert }) => {
     const org = await OrganizationFactory.merge({ plan: 'starter' }).create()
 
-    const svc = new QuotaService()
+    const svc = await app.container.make(QuotaService)
     await assert.doesNotReject(() => svc.assertCanAddBoat(org))
   })
 
@@ -55,7 +56,7 @@ test.group('QuotaService (unit)', () => {
     // starter: maxBoats = 2
     await BoatFactory.merge({ organizationId: org.id }).createMany(2)
 
-    const svc = new QuotaService()
+    const svc = await app.container.make(QuotaService)
     await assert.rejects(() => svc.assertCanAddBoat(org), QuotaExceededError)
   })
 
@@ -65,7 +66,7 @@ test.group('QuotaService (unit)', () => {
     const org = await OrganizationFactory.merge({ plan: 'starter' }).create()
     await BoatFactory.merge({ organizationId: org.id }).createMany(2)
 
-    const svc = new QuotaService()
+    const svc = await app.container.make(QuotaService)
     let error: QuotaExceededError | undefined
     try {
       await svc.assertCanAddBoat(org)
@@ -84,7 +85,7 @@ test.group('QuotaService (unit)', () => {
     const org = await OrganizationFactory.merge({ plan: 'starter' }).create()
     // starter: maxMembers = 1, aucun membre → sous la limite
 
-    const svc = new QuotaService()
+    const svc = await app.container.make(QuotaService)
     const result = await svc.canAddMember(org)
 
     assert.isTrue(result)
@@ -99,7 +100,7 @@ test.group('QuotaService (unit)', () => {
       userId: user.id,
     }).create()
 
-    const svc = new QuotaService()
+    const svc = await app.container.make(QuotaService)
     const result = await svc.canAddMember(org)
 
     assert.isFalse(result)
@@ -110,7 +111,7 @@ test.group('QuotaService (unit)', () => {
   test('assertCanAddMember ne throw pas quand sous la limite', async ({ assert }) => {
     const org = await OrganizationFactory.merge({ plan: 'pro' }).create()
 
-    const svc = new QuotaService()
+    const svc = await app.container.make(QuotaService)
     await assert.doesNotReject(() => svc.assertCanAddMember(org))
   })
 
@@ -123,7 +124,7 @@ test.group('QuotaService (unit)', () => {
       userId: user.id,
     }).create()
 
-    const svc = new QuotaService()
+    const svc = await app.container.make(QuotaService)
     await assert.rejects(() => svc.assertCanAddMember(org), QuotaExceededError)
   })
 
@@ -135,7 +136,7 @@ test.group('QuotaService (unit)', () => {
       userId: user.id,
     }).create()
 
-    const svc = new QuotaService()
+    const svc = await app.container.make(QuotaService)
     let error: QuotaExceededError | undefined
     try {
       await svc.assertCanAddMember(org)
@@ -153,21 +154,21 @@ test.group('QuotaService (unit)', () => {
   test('assertCanUseAI throw pour le plan starter', async ({ assert }) => {
     const org = await OrganizationFactory.merge({ plan: 'starter' }).make()
 
-    const svc = new QuotaService()
+    const svc = await app.container.make(QuotaService)
     assert.throws(() => svc.assertCanUseAI(org), QuotaExceededError)
   })
 
   test('assertCanUseAI ne throw pas pour le plan pro', async ({ assert }) => {
     const org = await OrganizationFactory.merge({ plan: 'pro' }).make()
 
-    const svc = new QuotaService()
+    const svc = await app.container.make(QuotaService)
     assert.doesNotThrow(() => svc.assertCanUseAI(org))
   })
 
   test('assertCanUseAI ne throw pas pour le plan enterprise', async ({ assert }) => {
     const org = await OrganizationFactory.merge({ plan: 'enterprise' }).make()
 
-    const svc = new QuotaService()
+    const svc = await app.container.make(QuotaService)
     assert.doesNotThrow(() => svc.assertCanUseAI(org))
   })
 
@@ -176,21 +177,21 @@ test.group('QuotaService (unit)', () => {
   test('assertCanExport throw pour le plan starter', async ({ assert }) => {
     const org = await OrganizationFactory.merge({ plan: 'starter' }).make()
 
-    const svc = new QuotaService()
+    const svc = await app.container.make(QuotaService)
     assert.throws(() => svc.assertCanExport(org), QuotaExceededError)
   })
 
   test('assertCanExport ne throw pas pour le plan pro', async ({ assert }) => {
     const org = await OrganizationFactory.merge({ plan: 'pro' }).make()
 
-    const svc = new QuotaService()
+    const svc = await app.container.make(QuotaService)
     assert.doesNotThrow(() => svc.assertCanExport(org))
   })
 
   test('assertCanExport QuotaExceededError a la bonne feature', async ({ assert }) => {
     const org = await OrganizationFactory.merge({ plan: 'starter' }).make()
 
-    const svc = new QuotaService()
+    const svc = await app.container.make(QuotaService)
     let error: QuotaExceededError | undefined
     try {
       svc.assertCanExport(org)

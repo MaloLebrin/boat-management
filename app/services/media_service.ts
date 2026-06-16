@@ -3,10 +3,13 @@ import type { MultipartFile } from '@adonisjs/core/bodyparser'
 import type { MediaEntityType, MediaKind } from '#shared/constants/media'
 import type { UploadMediaPayload } from '#shared/types/media'
 import { inject } from '@adonisjs/core'
+import logger from '@adonisjs/core/services/logger'
 import db from '@adonisjs/lucid/services/db'
 import Media from '#models/media'
+import type Organization from '#models/organization'
 import type User from '#models/user'
 import { CloudinaryService } from '#services/cloudinary_service'
+import QuotaService from '#services/quota_service'
 
 export { MediaNotFoundError }
 export type { UploadMediaPayload }
@@ -19,9 +22,34 @@ function resourceTypeFromKind(kind: MediaKind, format?: string): 'image' | 'raw'
 
 @inject()
 export default class MediaService {
-  constructor(private cloudinary: CloudinaryService) {}
+  constructor(
+    private cloudinary: CloudinaryService,
+    private quotaService: QuotaService
+  ) {}
 
-  async upload(user: User, file: MultipartFile, payload: UploadMediaPayload): Promise<Media> {
+  async upload(
+    user: User,
+    file: MultipartFile,
+    payload: UploadMediaPayload,
+    org?: Organization
+  ): Promise<Media> {
+    // Guard: org absent for a non-user entity means a caller forgot to pass it — log a warning.
+    if (!org && payload.entityType !== 'user') {
+      logger.warn(
+        { entityType: payload.entityType, entityId: payload.entityId },
+        'MediaService.upload called without org for a non-user entity — storage quota not enforced'
+      )
+    }
+
+    // assertCanUpload uses file.size (pre-upload) as an optimistic guard; the counter is updated
+    // with uploaded.bytes (post-Cloudinary, after potential PDF compression). For compressed PDFs
+    // the guard may be slightly conservative, but this avoids uploading a file that is certain to
+    // exceed the limit. If file.size is 0 (unknown at parse time) the guard is skipped — the
+    // post-upload increment in updateStorageUsed still runs, so the quota counter stays correct.
+    if (org && payload.entityType !== 'user' && file.size) {
+      this.quotaService.assertCanUpload(org, file.size)
+    }
+
     const resourceType = resourceTypeFromKind(payload.kind)
 
     const uploaded =
@@ -31,7 +59,7 @@ export default class MediaService {
 
     const position = await this.nextPosition(payload.entityType, payload.entityId)
 
-    return await Media.create({
+    const media = await Media.create({
       entityType: payload.entityType,
       entityId: payload.entityId,
       kind: payload.kind,
@@ -46,6 +74,13 @@ export default class MediaService {
       caption: payload.caption?.trim() || null,
       uploadedById: user.id,
     })
+
+    // Update storage usage after successful upload
+    if (org && payload.entityType !== 'user') {
+      await this.quotaService.updateStorageUsed(org, uploaded.bytes)
+    }
+
+    return media
   }
 
   async listForEntity(entityType: MediaEntityType, entityId: number): Promise<Media[]> {
@@ -70,28 +105,70 @@ export default class MediaService {
       .first()
   }
 
-  async deleteById(mediaId: number): Promise<void> {
+  async deleteById(mediaId: number, org: Organization | null): Promise<void> {
     const media = await Media.find(mediaId)
     if (!media) throw new MediaNotFoundError()
+
+    if (org === null && media.entityType !== 'user') {
+      logger.warn(
+        { mediaId, entityType: media.entityType },
+        'MediaService.deleteById called without org — storage quota not decremented'
+      )
+    }
+
+    const bytes = media.bytes ?? 0
 
     await this.cloudinary.deleteFile(
       media.cloudinaryPublicId,
       resourceTypeFromKind(media.kind, media.format)
     )
     await media.delete()
+
+    if (org !== null) {
+      await this.quotaService.updateStorageUsed(org, -bytes)
+    }
   }
 
   async deleteAllForEntity(
     entityType: MediaEntityType,
     entityId: number,
-    folderPath: string
+    folderPath: string,
+    org: Organization | null
   ): Promise<void> {
-    await Media.query().where('entityType', entityType).where('entityId', entityId).delete()
+    if (org === null) {
+      logger.warn(
+        { entityType, entityId },
+        'MediaService.deleteAllForEntity called without org — storage quota not decremented'
+      )
+    }
+
+    const totalBytes = await db.transaction(async (trx) => {
+      const medias = await Media.query({ client: trx })
+        .where('entityType', entityType)
+        .where('entityId', entityId)
+        .select('bytes')
+      const bytes = medias.reduce((sum, m) => sum + (m.bytes ?? 0), 0)
+      await Media.query({ client: trx })
+        .where('entityType', entityType)
+        .where('entityId', entityId)
+        .delete()
+      return bytes
+    })
 
     try {
       await this.cloudinary.deleteFolder(folderPath)
-    } catch {
-      // folder may not exist if no files were ever uploaded
+    } catch (err) {
+      // Folder may not exist if no files were ever uploaded. Any other Cloudinary error (e.g.
+      // transient 5xx) is logged at warn level so it doesn't silently corrupt the quota counter —
+      // files would remain on Cloudinary while quota was already decremented above.
+      logger.warn(
+        { folderPath, err },
+        'MediaService.deleteAllForEntity: Cloudinary deleteFolder failed'
+      )
+    }
+
+    if (org !== null && totalBytes > 0) {
+      await this.quotaService.updateStorageUsed(org, -totalBytes)
     }
   }
 

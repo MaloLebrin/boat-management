@@ -5,5 +5,6 @@
 
 export const listeners = {
   OnOrganizationMemberJoined: () => import('#listeners/on_organization_member_joined'),
+  OnOrganizationPlanDowngraded: () => import('#listeners/on_organization_plan_downgraded'),
   OnSimulatorLeadCreated: () => import('#listeners/on_simulator_lead_created'),
 }

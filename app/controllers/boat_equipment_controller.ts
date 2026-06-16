@@ -5,6 +5,7 @@ import BoatHullService, { BoatNotFoundError } from '#services/boat_hull_service'
 import BoatMaintenanceService from '#services/boat_maintenance_service'
 import BoatMaintenanceTaskService from '#services/boat_maintenance_task_service'
 import MediaService from '#services/media_service'
+import OrganizationService from '#services/organization_service'
 import {
   type BoatEngineFormBody,
   type BoatRigFormBody,
@@ -31,7 +32,8 @@ export default class BoatEquipmentController {
     private maintenanceService: BoatMaintenanceService,
     private taskService: BoatMaintenanceTaskService,
     private mediaService: MediaService,
-    private enginePartService: BoatEnginePartService
+    private enginePartService: BoatEnginePartService,
+    private organizationService: OrganizationService
   ) {}
 
   private async loadBoatForEquipment(ctx: Pick<HttpContext, 'auth' | 'response' | 'params'>) {
@@ -135,8 +137,10 @@ export default class BoatEquipmentController {
     const { boat } = loaded
     await bouncer.with(BoatPolicy).authorize('edit', boat)
 
+    const org = await this.organizationService.findOrFail(boat.organizationId)
+
     try {
-      await this.equipmentService.deleteEngine(loaded.user, boat, Number(params.engineId))
+      await this.equipmentService.deleteEngine(loaded.user, boat, Number(params.engineId), org)
     } catch (error) {
       if (error instanceof BoatEquipmentNotFoundError) {
         session.flash('error', i18n.t('flash.engine.notFound'))

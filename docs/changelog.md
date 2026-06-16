@@ -3,6 +3,95 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-06-16 — Correctifs post-code-review quota stockage
+
+**Backend**
+
+- `app/services/media_service.ts` — `deleteAllForEntity` accepte désormais `org?: Organization` : somme les bytes des médias avant suppression groupée et appelle `updateStorageUsed(org, -totalBytes)` après (corrigeait une dérive silencieuse du compteur lors de la suppression d'un bateau/moteur/pièce).
+- `app/services/media_service.ts` — `logger.warn` si `org` est absent pour un `entityType !== 'user'` (détection en dev des oublis de passage d'organisation).
+- `app/services/media_service.ts` — Commentaire explicitant la différence `file.size` (guard pre-upload) vs `uploaded.bytes` (compteur post-Cloudinary, après compression PDF éventuelle).
+- `app/services/quota_service.ts` — Commentaire race condition sur `assertCanUpload` (symétrique avec le commentaire existant dans `updateStorageUsed`).
+- `app/services/quota_service.ts` — Commentaire side effect `org.refresh()` dans `updateStorageUsed`.
+
+**Email**
+
+- `resources/views/emails/storage_quota_warning.edge` — Correction des accents manquants (`libéré`, `mis à jour`, `Gérer`).
+
+**Tests**
+
+- `tests/functional/quota/storage.spec.ts` — Suppression du test en doublon (`storage usage decrements correctly on deletion`, identique à `updateStorageUsed decrements storage_used_bytes on deletion`).
+
+---
+
+## 2026-06-16 — Comportement downgrade de plan
+
+**Backend**
+
+- `app/exceptions/quota_errors.ts` — `QuotaExceededError` enrichi d'un champ `alreadyOverLimit: boolean` pour distinguer "déjà au-dessus de la limite" (post-downgrade) de "cet upload dépasserait la limite".
+- `app/services/quota_service.ts` — `assertCanUpload` vérifie d'abord `storageUsedBytes > limit` (pré-condition post-downgrade, throw avec `alreadyOverLimit: true`), puis `storageUsedBytes + bytes > limit` (cas normal).
+- `app/exceptions/handler.ts` — Catch global de `QuotaExceededError` : flash `quota.storageOverflow` si `alreadyOverLimit`, sinon `quota.<feature>Exceeded`, puis redirect back. Couvre les routes upload non catchées localement.
+- `app/services/subscription_service.ts` — `updateOrgPlan` détecte un downgrade (`PLAN_ORDER`) et émet l'event `OrganizationPlanDowngraded` après sauvegarde.
+- `app/events/organization_plan_downgraded.ts` — Nouvel event avec `organization`, `fromPlan`, `toPlan`.
+- `app/listeners/on_organization_plan_downgraded.ts` — Listener : envoie un email de notification à tous les admins de l'organisation via `EmailQueueService.sendPlanDowngradeNotification`.
+- `app/services/email_queue_service.ts` — Nouvelle méthode `sendPlanDowngradeNotification` (bilingue FR/EN, déduplication par `orgId:fromPlan:toPlan:yyyy-MM`).
+- `resources/views/emails/plan_downgrade.edge` — Template email de notification de downgrade.
+- `start/events.ts` — Enregistrement du listener `OnOrganizationPlanDowngraded`.
+- `resources/lang/{en,fr}/flash.json` — Clés `quota.storageExceeded` et `quota.storageOverflow` ajoutées.
+
+**Frontend**
+
+- `inertia/components/settings/tabs/SettingsBillingTab.vue` — Banner rouge si `storageUsedBytes > limitBytes` (post-downgrade).
+- `resources/lang/{en,fr}/settings.json` — Clé `settings.billing.storageOverflow` ajoutée.
+
+## 2026-06-16 — Correctifs code review : Quota de stockage (#72)
+
+**Backend**
+
+- `app/services/quota_service.ts` — Correctif : le décrément de `storage_used_bytes` est désormais plafonné à la valeur courante (`Math.min`) pour éviter un passage en négatif en cas d'incohérence de données. Commentaire ajouté sur la fenêtre de concurrence des notifications de seuil (déduplication assurée par `correlationSuffix` dans `EmailQueueService`). Ligne vide manquante après le constructeur.
+
+**Frontend**
+
+- `inertia/components/settings/SettingsBillingUsageGauge.vue` — Ko/Mo/Go remplacés par des clés i18n (`settings.billing.usage.kb/mb/gb`) afin d'afficher KB/MB/GB en anglais.
+- `resources/lang/fr/settings.json` — Ajout des clés `kb`, `mb`, `gb` (Ko/Mo/Go).
+- `resources/lang/en/settings.json` — Ajout des clés `kb`, `mb`, `gb` (KB/MB/GB).
+
+**Tests**
+
+- `tests/functional/quota/storage.spec.ts` — Test HTTP creux remplacé par des assertions Inertia réelles (`assertInertiaComponent` + `assertInertiaPropsContain`). Test dupliqué de décrément remplacé par un test couvrant le plancher à zéro (décrément supérieur à la valeur courante).
+
+**Docs**
+
+- `docs/changelog.md` — Correction des accents manquants sur les entrées du 2026-06-16.
+
+---
+
+## 2026-06-16 — Feature : Quota de stockage (#72)
+
+**Backend**
+
+- `shared/types/plan.ts` — Ajout de `storageGb: number | null` dans `PlanQuotas` (1 Go Starter, 20 Go Pro, null Enterprise). Ajout de `storage: { usedBytes: number; limitBytes: number | null }` dans `QuotaUsage`.
+- Migration `1791000000000_add_storage_to_organizations.ts` — Colonne `storage_used_bytes` (bigint, default 0) sur la table `organizations`.
+- `database/schema.ts` — Ajout du champ `storageUsedBytes` dans `OrganizationSchema`.
+- `app/exceptions/quota_errors.ts` — Ajout de `'storage'` dans le type `QuotaFeature`.
+- `app/services/quota_service.ts` — Nouvelles méthodes `storageLimitBytes()`, `assertCanUpload()`, `updateStorageUsed()`. Détection des seuils 80%/100% pour envoi d'email de notification aux admins.
+- `app/services/media_service.ts` — Modification de `upload()` et `deleteById()` pour accepter un paramètre `org` optionnel. Vérification du quota avant upload et mise à jour du compteur après upload/suppression.
+- `app/services/email_queue_service.ts` — Nouvelle méthode `sendStorageQuotaWarning()` pour notifier les admins.
+- `app/controllers/boat_media_controller.ts` — Passage de l'organisation a `upload()` et `deleteById()` pour le tracking du stockage.
+- `app/controllers/boat_engine_parts_controller.ts` — Idem pour les documents de pieces moteur.
+- `app/controllers/settings_controller.ts` — Ajout de `storage` dans `quotaUsage` pour la page billing.
+- `resources/views/emails/storage_quota_warning.edge` — Template email bilingue pour les alertes de quota.
+
+**Frontend**
+
+- `inertia/components/settings/SettingsBillingUsageGauge.vue` — Nouveau composant generique pour les jauges d'usage (boats, members, storage).
+- `inertia/components/settings/tabs/SettingsBillingTab.vue` — Utilisation du nouveau composant jauge et ajout de la jauge stockage avec formatage bytes (Ko/Mo/Go).
+
+**i18n** — Cle `settings.billing.usage.storage` ajoutee (FR + EN).
+
+**Tests** — `tests/functional/quota/storage.spec.ts` pour les tests du quota de stockage.
+
+---
+
 ## 2026-06-16 — Feature : Personnalisation du modèle IA pour Enterprise (#70)
 
 **Backend**

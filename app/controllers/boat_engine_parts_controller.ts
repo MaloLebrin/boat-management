@@ -140,12 +140,14 @@ export default class BoatEnginePartsController {
     if (!loaded) return
     const { user, boat } = loaded
     await bouncer.with(BoatPolicy).authorize('edit', boat)
+    const org = await this.organizationService.findOrFail(boat.organizationId)
     try {
       await this.equipmentService.deleteEnginePart(
         user,
         boat,
         Number(params.engineId),
-        Number(params.partId)
+        Number(params.partId),
+        org
       )
     } catch (error) {
       if (error instanceof BoatEquipmentNotFoundError) {
@@ -178,13 +180,18 @@ export default class BoatEnginePartsController {
     const payload = await request.validateUsing(storeBoatDocumentValidator)
     const org = await this.organizationService.findOrFail(boat.organizationId)
 
-    await this.mediaService.upload(user, payload.file, {
-      folder: CloudinaryFolders.boatEnginePartDocuments(org.slug, boat.id, engineId, partId),
-      entityType: 'boat_engine_part',
-      entityId: partId,
-      kind: 'document',
-      caption: payload.caption ?? null,
-    })
+    await this.mediaService.upload(
+      user,
+      payload.file,
+      {
+        folder: CloudinaryFolders.boatEnginePartDocuments(org.slug, boat.id, engineId, partId),
+        entityType: 'boat_engine_part',
+        entityId: partId,
+        kind: 'document',
+        caption: payload.caption ?? null,
+      },
+      org
+    )
 
     session.flash('success', i18n.t('flash.media.documentAdded'))
     response.redirect(`/boats/${boat.id}/engines/${engineId}/parts/${partId}?tab=documents`)
@@ -208,8 +215,10 @@ export default class BoatEnginePartsController {
       )
     }
 
+    const org = await this.organizationService.findOrFail(boat.organizationId)
+
     try {
-      await this.mediaService.deleteById(mediaId)
+      await this.mediaService.deleteById(mediaId, org)
     } catch (error) {
       if (error instanceof MediaNotFoundError) {
         return response.redirect(

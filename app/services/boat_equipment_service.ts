@@ -1,5 +1,6 @@
 import { BoatEquipmentNotFoundError, BoatNotFoundError } from '#exceptions/boat_errors'
 import type Boat from '#models/boat'
+import type Organization from '#models/organization'
 import type User from '#models/user'
 import type {
   BoatEnginePartPayload,
@@ -42,8 +43,8 @@ export default class BoatEquipmentService {
     return this.engineService.update(user, boat, engineId, payload)
   }
 
-  async deleteEngine(user: User, boat: Boat, engineId: number) {
-    return this.engineService.delete(user, boat, engineId)
+  async deleteEngine(user: User, boat: Boat, engineId: number, org?: Organization) {
+    return this.engineService.delete(user, boat, engineId, org)
   }
 
   async updateEngineStatus(user: User, boat: Boat, engineId: number, status: string) {
@@ -88,8 +89,14 @@ export default class BoatEquipmentService {
     return this.enginePartService.update(user, boat, engineId, partId, payload)
   }
 
-  async deleteEnginePart(user: User, boat: Boat, engineId: number, partId: number) {
-    return this.enginePartService.delete(user, boat, engineId, partId)
+  async deleteEnginePart(
+    user: User,
+    boat: Boat,
+    engineId: number,
+    partId: number,
+    org?: Organization
+  ) {
+    return this.enginePartService.delete(user, boat, engineId, partId, org)
   }
 
   async findEnginePart(engineId: number, partId: number) {

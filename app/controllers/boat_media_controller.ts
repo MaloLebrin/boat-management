@@ -50,13 +50,18 @@ export default class BoatMediaController {
     const payload = await request.validateUsing(storeBoatPhotoValidator)
     const org = await this.organizationService.findOrFail(boat.organizationId)
 
-    await this.mediaService.upload(user, payload.file, {
-      folder: CloudinaryFolders.boatPhotos(org.slug, boat.id),
-      entityType: 'boat',
-      entityId: boat.id,
-      kind: 'photo',
-      caption: payload.caption ?? null,
-    })
+    await this.mediaService.upload(
+      user,
+      payload.file,
+      {
+        folder: CloudinaryFolders.boatPhotos(org.slug, boat.id),
+        entityType: 'boat',
+        entityId: boat.id,
+        kind: 'photo',
+        caption: payload.caption ?? null,
+      },
+      org
+    )
 
     session.flash('success', i18n.t('flash.media.photoAdded'))
     response.redirect(`/boats/${boat.id}?tab=overview`)
@@ -73,13 +78,18 @@ export default class BoatMediaController {
     const payload = await request.validateUsing(storeBoatDocumentValidator)
     const org = await this.organizationService.findOrFail(boat.organizationId)
 
-    await this.mediaService.upload(user, payload.file, {
-      folder: CloudinaryFolders.boatDocuments(org.slug, boat.id),
-      entityType: 'boat',
-      entityId: boat.id,
-      kind: 'document',
-      caption: payload.caption ?? null,
-    })
+    await this.mediaService.upload(
+      user,
+      payload.file,
+      {
+        folder: CloudinaryFolders.boatDocuments(org.slug, boat.id),
+        entityType: 'boat',
+        entityId: boat.id,
+        kind: 'document',
+        caption: payload.caption ?? null,
+      },
+      org
+    )
 
     session.flash('success', i18n.t('flash.media.documentAdded'))
     response.redirect(`/boats/${boat.id}?tab=documents`)
@@ -93,8 +103,10 @@ export default class BoatMediaController {
     const { boat } = loaded
     await bouncer.with(BoatPolicy).authorize('edit', boat)
 
+    const org = await this.organizationService.findOrFail(boat.organizationId)
+
     try {
-      await this.mediaService.deleteById(Number(params.mediaId))
+      await this.mediaService.deleteById(Number(params.mediaId), org)
     } catch (error) {
       if (error instanceof MediaNotFoundError) {
         response.redirect(`/boats/${boat.id}`)
@@ -133,13 +145,18 @@ export default class BoatMediaController {
     const payload = await request.validateUsing(storeBoatDocumentValidator)
     const org = await this.organizationService.findOrFail(boat.organizationId)
 
-    await this.mediaService.upload(user, payload.file, {
-      folder: CloudinaryFolders.boatEngineDocuments(org.slug, boat.id, engineId),
-      entityType: 'boat_engine',
-      entityId: engineId,
-      kind: 'document',
-      caption: payload.caption ?? null,
-    })
+    await this.mediaService.upload(
+      user,
+      payload.file,
+      {
+        folder: CloudinaryFolders.boatEngineDocuments(org.slug, boat.id, engineId),
+        entityType: 'boat_engine',
+        entityId: engineId,
+        kind: 'document',
+        caption: payload.caption ?? null,
+      },
+      org
+    )
 
     session.flash('success', i18n.t('flash.media.documentAdded'))
     response.redirect(`/boats/${boat.id}/engines/${engineId}?tab=documents`)
@@ -168,8 +185,10 @@ export default class BoatMediaController {
       return
     }
 
+    const org = await this.organizationService.findOrFail(boat.organizationId)
+
     try {
-      await this.mediaService.deleteById(mediaId)
+      await this.mediaService.deleteById(mediaId, org)
     } catch (error) {
       if (error instanceof MediaNotFoundError) {
         response.redirect(`/boats/${boat.id}/engines/${engineId}?tab=documents`)

@@ -689,6 +689,7 @@ export class OrganizationSchema extends BaseModel {
     'name',
     'plan',
     'slug',
+    'storageUsedBytes',
     'stripeCustomerId',
     'updatedAt',
   ] as const
@@ -707,6 +708,8 @@ export class OrganizationSchema extends BaseModel {
   declare plan: string
   @column()
   declare slug: string
+  @column()
+  declare storageUsedBytes: number
   @column()
   declare stripeCustomerId: string | null
   @column.dateTime({ autoCreate: true, autoUpdate: true })

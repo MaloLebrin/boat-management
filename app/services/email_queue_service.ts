@@ -2,8 +2,10 @@ import edge from 'edge.js'
 import SendEmail, { type SendEmailPayload } from '#jobs/send_email'
 import QueueDedupService from '#services/queue_dedup_service'
 import type { ReminderBoatItem, ReminderPortItem, ReminderTaskItem } from '#shared/types/reminder'
+import type { PlanTier } from '#shared/types/plan'
 import env from '#start/env'
 import { inject } from '@adonisjs/core'
+import { DateTime } from 'luxon'
 
 @inject()
 export default class EmailQueueService {
@@ -365,6 +367,102 @@ export default class EmailQueueService {
 
     const taskIds = params.tasks.map((t) => t.id).join('-')
     const correlationId = `reminder-boat-check-tasks:${params.to}:${taskIds}`
+
+    const partialPayload: Omit<SendEmailPayload, 'dedupKey'> = {
+      to: params.to,
+      subject,
+      text,
+      html,
+      correlationId,
+    }
+
+    const key = SendEmail.dedupKey(partialPayload)
+    const payload: SendEmailPayload = { ...partialPayload, dedupKey: key }
+
+    await this.dedup.enqueueUnique({
+      key,
+      jobName: SendEmail.name,
+      queue: 'emails',
+      payload,
+      dispatch: async (p) => {
+        await SendEmail.dispatch(p)
+      },
+    })
+  }
+
+  async sendStorageQuotaWarning(params: {
+    to: string
+    name: string | null
+    percent: number
+    orgName: string
+    correlationSuffix: string
+  }) {
+    const displayName = params.name ?? params.to
+    const subject =
+      params.percent >= 100
+        ? 'Limite de stockage atteinte — FleetAi / Storage limit reached — FleetAi'
+        : `Stockage a ${params.percent}% — FleetAi / Storage at ${params.percent}% — FleetAi`
+
+    const text =
+      params.percent >= 100
+        ? `Bonjour ${displayName},\n\nVotre organisation ${params.orgName} a atteint sa limite de stockage. Vous ne pouvez plus ajouter de fichiers.\n\nHello ${displayName},\n\nYour organisation ${params.orgName} has reached its storage limit. You cannot upload new files.\n\n${env.get('APP_URL')}/settings/billing`
+        : `Bonjour ${displayName},\n\nVotre organisation ${params.orgName} a atteint ${params.percent}% de sa limite de stockage.\n\nHello ${displayName},\n\nYour organisation ${params.orgName} has reached ${params.percent}% of its storage limit.\n\n${env.get('APP_URL')}/settings/billing`
+
+    const html = await edge.render('emails/storage_quota_warning', {
+      displayName,
+      percent: params.percent,
+      orgName: params.orgName,
+      appUrl: env.get('APP_URL'),
+    })
+
+    const correlationId = `storage-quota-warning:${params.correlationSuffix}`
+
+    const partialPayload: Omit<SendEmailPayload, 'dedupKey'> = {
+      to: params.to,
+      subject,
+      text,
+      html,
+      correlationId,
+    }
+
+    const key = SendEmail.dedupKey(partialPayload)
+    const payload: SendEmailPayload = { ...partialPayload, dedupKey: key }
+
+    await this.dedup.enqueueUnique({
+      key,
+      jobName: SendEmail.name,
+      queue: 'emails',
+      payload,
+      dispatch: async (p) => {
+        await SendEmail.dispatch(p)
+      },
+    })
+  }
+
+  async sendPlanDowngradeNotification(params: {
+    to: string
+    name: string | null
+    orgName: string
+    orgId: number
+    fromPlan: PlanTier
+    toPlan: PlanTier
+  }) {
+    const displayName = params.name ?? params.to
+    const subject = `Changement de plan — ${params.orgName} / Plan changed — ${params.orgName}`
+    const text =
+      `Bonjour ${displayName},\n\nLe plan de votre organisation ${params.orgName} a été modifié de ${params.fromPlan} vers ${params.toPlan}. Si votre usage dépasse les limites du nouveau plan, les nouveaux uploads et ajouts seront bloqués jusqu'à ce que vous réduisiez votre usage.\n\n` +
+      `Hello ${displayName},\n\nYour organisation ${params.orgName} has been moved from ${params.fromPlan} to ${params.toPlan}. If your current usage exceeds the new plan limits, new uploads and additions will be blocked until you reduce your usage.\n\n${env.get('APP_URL')}/settings/billing`
+
+    const html = await edge.render('emails/plan_downgrade', {
+      displayName,
+      orgName: params.orgName,
+      fromPlan: params.fromPlan,
+      toPlan: params.toPlan,
+      appUrl: env.get('APP_URL'),
+    })
+
+    const yearMonth = DateTime.now().toFormat('yyyy-MM')
+    const correlationId = `plan-downgrade:${params.orgId}:${params.fromPlan}:${params.toPlan}:${yearMonth}`
 
     const partialPayload: Omit<SendEmailPayload, 'dedupKey'> = {
       to: params.to,

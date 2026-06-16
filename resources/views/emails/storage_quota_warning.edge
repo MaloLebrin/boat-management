@@ -1,0 +1,55 @@
+@component('emails/_layout')
+  @slot('content')
+    <h2 style="margin:0 0 20px;color:#333333;font-size:22px;">Storage Alert / Alerte stockage</h2>
+    <p style="margin:0 0 15px;color:#555555;font-size:16px;line-height:1.5;">
+      @if(percent >= 100)
+        Your organisation
+        <strong>{{ orgName }}</strong>
+        has reached its storage limit.
+      @else
+        Your organisation
+        <strong>{{ orgName }}</strong>
+        has reached
+        {{ percent }}
+        % of its storage limit.
+      @end
+    </p>
+    <p style="margin:0 0 25px;color:#555555;font-size:16px;line-height:1.5;">
+      @if(percent >= 100)
+        Votre organisation
+        <strong>{{ orgName }}</strong>
+        a atteint sa limite de stockage.
+      @else
+        Votre organisation
+        <strong>{{ orgName }}</strong>
+        a atteint
+        {{ percent }}
+        % de sa limite de stockage.
+      @end
+    </p>
+    @if(percent >= 100)
+      <p style="margin:0 0 15px;color:#d9534f;font-size:14px;line-height:1.5;font-weight:bold;">
+        You cannot upload new files until you free up space or upgrade your plan.
+      </p>
+      <p style="margin:0 0 25px;color:#d9534f;font-size:14px;line-height:1.5;font-weight:bold;">
+        Vous ne pouvez pas ajouter de nouveaux fichiers tant que vous n'avez pas libéré de l'espace ou mis à jour votre abonnement.
+      </p>
+    @end
+
+    <table role="presentation" cellspacing="0" cellpadding="0" style="margin:0 auto;">
+      <tr>
+        <td style="border-radius:6px;background-color:#1e3a5f;">
+          <a
+            href="{{ appUrl }}/settings/billing"
+            style="display:inline-block;padding:14px 30px;color:#ffffff;text-decoration:none;font-size:16px;font-weight:bold;"
+          >
+            Manage subscription / Gérer l'abonnement
+          </a>
+        </td>
+      </tr>
+    </table>
+    <p style="margin:25px 0 0;color:#888888;font-size:14px;line-height:1.5;">
+      This is an automated notification. / Ceci est une notification automatique.
+    </p>
+  @end
+@end

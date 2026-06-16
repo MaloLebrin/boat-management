@@ -4,9 +4,11 @@
  */
 
 import OrganizationMemberJoined from '#events/organization_member_joined'
+import OrganizationPlanDowngraded from '#events/organization_plan_downgraded'
 import SimulatorLeadCreated from '#events/simulator_lead_created'
 
 export const events = {
   OrganizationMemberJoined: OrganizationMemberJoined,
+  OrganizationPlanDowngraded: OrganizationPlanDowngraded,
   SimulatorLeadCreated: SimulatorLeadCreated,
 }

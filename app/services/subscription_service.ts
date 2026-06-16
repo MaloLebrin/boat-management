@@ -3,10 +3,13 @@ import Subscription from '#models/subscription'
 import type { BillingInterval, SubscriptionInfo, SubscriptionStatus } from '#shared/types/billing'
 import type { PlanTier } from '#shared/types/plan'
 import StripeService from '#services/stripe_service'
+import OrganizationPlanDowngraded from '#events/organization_plan_downgraded'
 import { inject } from '@adonisjs/core'
 import env from '#start/env'
 import { DateTime } from 'luxon'
 import type Stripe from 'stripe'
+
+const PLAN_ORDER: Record<PlanTier, number> = { starter: 0, pro: 1, enterprise: 2 }
 
 @inject()
 export default class SubscriptionService {
@@ -102,8 +105,13 @@ export default class SubscriptionService {
 
   private async updateOrgPlan(org: Organization, plan: PlanTier) {
     if (org.plan !== plan) {
+      const isDowngrade = PLAN_ORDER[plan] < PLAN_ORDER[org.plan]
+      const fromPlan = org.plan
       org.plan = plan
       await org.save()
+      if (isDowngrade) {
+        await OrganizationPlanDowngraded.dispatch(org, fromPlan, plan)
+      }
     }
   }
 

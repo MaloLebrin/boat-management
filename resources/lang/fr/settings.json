@@ -59,9 +59,14 @@
     "usage": {
       "boats": "Bateaux",
       "members": "Membres",
+      "storage": "Stockage",
       "unlimited": "Illimité",
-      "of": "sur"
+      "of": "sur",
+      "kb": "Ko",
+      "mb": "Mo",
+      "gb": "Go"
     },
+    "storageOverflow": "Votre usage de stockage dépasse la limite de votre plan actuel. Les nouveaux uploads sont bloqués. Libérez de l'espace ou passez à un plan supérieur.",
     "features": {
       "ai": "IA / Copilote",
       "export": "Export (PDF / CSV / JSON)",

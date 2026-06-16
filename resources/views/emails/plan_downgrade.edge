@@ -1,0 +1,43 @@
+@component('emails/_layout')
+  @slot('content')
+    <h2 style="margin:0 0 20px;color:#333333;font-size:22px;">Plan changed / Plan modifié</h2>
+    <p style="margin:0 0 15px;color:#555555;font-size:16px;line-height:1.5;">
+      Your organisation
+      <strong>{{ orgName }}</strong>
+      has been moved from
+      <strong>{{ fromPlan }}</strong>
+      to
+      <strong>{{ toPlan }}</strong>.
+    </p>
+    <p style="margin:0 0 25px;color:#555555;font-size:16px;line-height:1.5;">
+      Votre organisation
+      <strong>{{ orgName }}</strong>
+      est passée du plan
+      <strong>{{ fromPlan }}</strong>
+      au plan
+      <strong>{{ toPlan }}</strong>.
+    </p>
+    <p style="margin:0 0 15px;color:#d9534f;font-size:14px;line-height:1.5;font-weight:bold;">
+      If your current usage (storage, boats, members) exceeds the new plan limits, new uploads and additions will be blocked until you reduce your usage or upgrade your plan.
+    </p>
+    <p style="margin:0 0 25px;color:#d9534f;font-size:14px;line-height:1.5;font-weight:bold;">
+      Si votre usage actuel (stockage, bateaux, membres) dépasse les limites du nouveau plan, les nouveaux uploads et ajouts seront bloqués jusqu'à ce que vous réduisiez votre usage ou passiez à un plan supérieur.
+    </p>
+
+    <table role="presentation" cellspacing="0" cellpadding="0" style="margin:0 auto;">
+      <tr>
+        <td style="border-radius:6px;background-color:#1e3a5f;">
+          <a
+            href="{{ appUrl }}/settings/billing"
+            style="display:inline-block;padding:14px 30px;color:#ffffff;text-decoration:none;font-size:16px;font-weight:bold;"
+          >
+            Manage plan / Gérer le plan
+          </a>
+        </td>
+      </tr>
+    </table>
+    <p style="margin:25px 0 0;color:#888888;font-size:14px;line-height:1.5;">
+      This is an automated notification. / Ceci est une notification automatique.
+    </p>
+  @end
+@end

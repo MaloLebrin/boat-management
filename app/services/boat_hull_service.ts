@@ -2,9 +2,13 @@ import { BoatNotFoundError, InvalidBoatHullError } from '#exceptions/boat_errors
 import { UserNotInOrganizationError } from '#exceptions/organization_errors'
 import Boat from '#models/boat'
 import BoatEngine from '#models/boat_engine'
+import BoatEnginePart from '#models/boat_engine_part'
 import BoatRig from '#models/boat_rig'
 import BoatSail from '#models/boat_sail'
+import type Organization from '#models/organization'
 import type User from '#models/user'
+import { CloudinaryFolders } from '#services/cloudinary_service'
+import MediaService from '#services/media_service'
 import type { BoatHullPayload } from '#shared/types/boat'
 import type { SimulatorBoatInput } from '#shared/types/simulator'
 
@@ -18,6 +22,8 @@ export type { BoatHullPayload }
 
 @inject()
 export default class BoatHullService {
+  constructor(private mediaService: MediaService) {}
+
   async listForUser(user: User) {
     if (user.organizationId === null) return []
 
@@ -180,8 +186,60 @@ export default class BoatHullService {
     return boat
   }
 
-  async deleteForUser(user: User, boat: Boat) {
+  async deleteForUser(user: User, boat: Boat, org?: Organization) {
     assertBoatInUserOrg(user, boat)
+
+    if (org) {
+      // Note: media cleanup runs before the DB delete. If any deleteAllForEntity call throws
+      // midway (e.g. DB error on the 2nd engine's parts), quota is already decremented for the
+      // entities cleaned so far but the boat record remains in DB — a partial-saga inconsistency.
+      // Risk is low (requires a mid-loop DB error); manual quota correction would be needed.
+      const engines = await BoatEngine.query().where('boatId', boat.id).select('id')
+      for (const engine of engines) {
+        const parts = await BoatEnginePart.query().where('boatEngineId', engine.id).select('id')
+        for (const part of parts) {
+          await this.mediaService.deleteAllForEntity(
+            'boat_engine_part',
+            part.id,
+            CloudinaryFolders.boatEnginePartDocuments(org.slug, boat.id, engine.id, part.id),
+            org
+          )
+        }
+        await this.mediaService.deleteAllForEntity(
+          'boat_engine',
+          engine.id,
+          CloudinaryFolders.boatEngine(org.slug, boat.id, engine.id),
+          org
+        )
+      }
+
+      const sails = await BoatSail.query().where('boatId', boat.id).select('id')
+      for (const sail of sails) {
+        await this.mediaService.deleteAllForEntity(
+          'boat_sail',
+          sail.id,
+          CloudinaryFolders.boatSail(org.slug, boat.id, sail.id),
+          org
+        )
+      }
+
+      const rig = await BoatRig.query().where('boatId', boat.id).first()
+      if (rig) {
+        await this.mediaService.deleteAllForEntity(
+          'boat_rig',
+          rig.id,
+          CloudinaryFolders.boatRig(org.slug, boat.id),
+          org
+        )
+      }
+
+      await this.mediaService.deleteAllForEntity(
+        'boat',
+        boat.id,
+        CloudinaryFolders.boat(org.slug, boat.id),
+        org
+      )
+    }
 
     await BoatEngine.query().where('boatId', boat.id).delete()
     await BoatSail.query().where('boatId', boat.id).delete()

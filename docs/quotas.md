@@ -4,12 +4,13 @@
 
 Source de vérité : `shared/types/plan.ts` — `PLAN_LIMITS`.
 
-| Feature       | Starter | Pro | Enterprise |
-| ------------- | ------- | --- | ---------- |
-| Bateaux max   | 2       | 25  | ∞          |
-| Membres max   | 1       | 5   | ∞          |
-| IA / Copilote | ✗       | ✓   | ✓          |
-| Export        | ✗       | ✓   | ✓          |
+| Feature       | Starter | Pro   | Enterprise |
+| ------------- | ------- | ----- | ---------- |
+| Bateaux max   | 2       | 25    | ∞          |
+| Membres max   | 1       | 5     | ∞          |
+| Stockage      | 1 Go    | 20 Go | ∞          |
+| IA / Copilote | ✗       | ✓     | ✓          |
+| Export        | ✗       | ✓     | ✓          |
 
 `null` = illimité. Le plan est assigné manuellement en BDD sur la table `organizations` (colonne `plan` enum `starter|pro|enterprise`, défaut `starter`). Pas de Stripe.
 
@@ -31,28 +32,32 @@ Source de vérité : `shared/types/plan.ts` — `PLAN_LIMITS`.
 ## Architecture
 
 ```
-shared/types/plan.ts          — PlanTier, PlanQuotas, QuotaUsage, PLAN_LIMITS, getUpgradeTier()
+shared/types/plan.ts           — PlanTier, PlanQuotas, QuotaUsage, PLAN_LIMITS, getUpgradeTier()
 app/exceptions/quota_errors.ts — QuotaExceededError
-app/services/quota_service.ts  — méthodes can*/assert*
+app/services/quota_service.ts  — méthodes can*/assert*/storage
+app/services/media_service.ts  — upload/deleteById avec tracking quota
 ```
 
 ### `QuotaExceededError`
 
 ```ts
 new QuotaExceededError(feature: QuotaFeature, limit: number | null, current: number, upgradeTo: PlanTier | null)
-// QuotaFeature = 'boats' | 'members' | 'ai' | 'export'
+// QuotaFeature = 'boats' | 'members' | 'ai' | 'export' | 'storage'
 ```
 
 ### `QuotaService`
 
-| Méthode                   | Signature          | Comportement                                              |
-| ------------------------- | ------------------ | --------------------------------------------------------- |
-| `canAddBoat(org)`         | `Promise<boolean>` | Retourne `false` si quota atteint, sans throw. Pour l'UI. |
-| `canAddMember(org)`       | `Promise<boolean>` | Retourne `false` si quota atteint, sans throw. Pour l'UI. |
-| `assertCanAddBoat(org)`   | `Promise<void>`    | Throw `QuotaExceededError` si `COUNT(boats) >= maxBoats`. |
-| `assertCanAddMember(org)` | `Promise<void>`    | Throw si `COUNT(organization_memberships) >= maxMembers`. |
-| `assertCanUseAI(org)`     | `void` (synchrone) | Throw si `!canUseAI`.                                     |
-| `assertCanExport(org)`    | `void` (synchrone) | Throw si `!canExport`.                                    |
+| Méthode                         | Signature          | Comportement                                                                                                                                                                                                                                                                     |
+| ------------------------------- | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `canAddBoat(org)`               | `Promise<boolean>` | Retourne `false` si quota atteint, sans throw. Pour l'UI.                                                                                                                                                                                                                        |
+| `canAddMember(org)`             | `Promise<boolean>` | Retourne `false` si quota atteint, sans throw. Pour l'UI.                                                                                                                                                                                                                        |
+| `assertCanAddBoat(org)`         | `Promise<void>`    | Throw `QuotaExceededError` si `COUNT(boats) >= maxBoats`.                                                                                                                                                                                                                        |
+| `assertCanAddMember(org)`       | `Promise<void>`    | Throw si `COUNT(organization_memberships) >= maxMembers`.                                                                                                                                                                                                                        |
+| `assertCanUseAI(org)`           | `void` (synchrone) | Throw si `!canUseAI`.                                                                                                                                                                                                                                                            |
+| `assertCanExport(org)`          | `void` (synchrone) | Throw si `!canExport`.                                                                                                                                                                                                                                                           |
+| `storageLimitBytes(org)`        | `number \| null`   | Retourne la limite en octets selon le plan, `null` si illimité.                                                                                                                                                                                                                  |
+| `assertCanUpload(org, bytes)`   | `void` (synchrone) | Throw `QuotaExceededError` si `storageUsedBytes + bytes > limit`.                                                                                                                                                                                                                |
+| `updateStorageUsed(org, delta)` | `Promise<void>`    | Incrémente ou décrémente `storage_used_bytes` atomiquement en BDD. Déclenche une notification email si le seuil 80 % ou 100 % est franchi (déduplication : 1 email par seuil par mois via `correlationSuffix`). Le décrément est plafonné à 0 pour éviter les valeurs négatives. |
 
 ---
 
@@ -193,6 +198,55 @@ currentPlan: ctx.inertia.always(currentPlan) // PlanTier | null
 
 ---
 
+## Comportement au changement de plan
+
+### Upgrade
+
+Aucun impact. Les limites augmentent, tous les guards passent.
+
+### Downgrade (ex: Pro → Starter)
+
+Les données existantes ne sont **pas** touchées. Le changement de plan (via webhook Stripe dans `SubscriptionService.updateOrgPlan`) :
+
+1. Met à jour `org.plan` en BDD
+2. Émet l'event `OrganizationPlanDowngraded`
+3. Le listener `OnOrganizationPlanDowngraded` envoie un **email de notification** aux admins (bilingue FR/EN, déduplication 1 email par mois)
+
+**Guards post-downgrade** :
+
+| Feature                              | Comportement immédiat                                                                                                                   |
+| ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------- |
+| Stockage (`usedBytes > newLimit`)    | `assertCanUpload` throw `QuotaExceededError(alreadyOverLimit: true)` → flash `quota.storageOverflow` → banner rouge sur la page billing |
+| Stockage (nouvel upload dépasserait) | Flash `quota.storageExceeded`                                                                                                           |
+| Bateaux (COUNT > newLimit)           | `assertCanAddBoat` bloque tout ajout. Bateaux existants conservés.                                                                      |
+| Membres (COUNT > newLimit)           | `assertCanAddMember` bloque toute invitation. Membres existants conservés.                                                              |
+
+**Aucune purge automatique** des données. Aucune période de grâce : le guard s'applique à l'action suivante.
+
+**Catch global** : `app/exceptions/handler.ts` attrape `QuotaExceededError` non géré (cas des routes upload `boat_media_controller`) et applique le bon message flash.
+
+---
+
+## Stockage — Guard et tracking
+
+### Guard upload
+
+`MediaService.upload(user, file, payload, org?)` appelle `quotaService.assertCanUpload(org, file.size)` avant tout envoi Cloudinary. `org` est optionnel — si absent, le quota n'est pas vérifié (cas avatar utilisateur). Passer `org` explicitement pour tout document rattaché à une organisation.
+
+### Tracking après upload / suppression
+
+`MediaService` appelle `quotaService.updateStorageUsed(org, +bytes)` après un upload réussi et `updateStorageUsed(org, -bytes)` après une suppression. Le delta est le `bytes` retourné par Cloudinary.
+
+### Compteur en base
+
+Colonne `storage_used_bytes` (bigint, défaut 0) sur `organizations`. Mis à jour via `increment` / `decrement` atomique. Le décrément est plafonné à la valeur courante (jamais négatif).
+
+### Notification seuil
+
+Un email est envoyé aux admins de l'organisation quand l'upload fait franchir 80 % ou 100 % du quota. Déduplication : une seule notification par seuil par mois (`correlationSuffix: "<orgId>:<percent>:<yyyy-MM>"`).
+
+---
+
 ## Page billing (`GET /settings/billing`)
 
 Rendue par `SettingsController.billing()`. Props passées :
@@ -200,12 +254,14 @@ Rendue par `SettingsController.billing()`. Props passées :
 ```ts
 {
   plan: PlanTier,
-  quotaUsage: QuotaUsage // { boats: {used, limit}, members: {used, limit}, canUseAI, canExport }
+  quotaUsage: QuotaUsage // { boats: {used, limit}, members: {used, limit}, storage: {usedBytes, limitBytes}, canUseAI, canExport }
 }
 ```
 
-Les `used` sont des COUNT SQL en temps réel (2 requêtes parallèles).  
-`limit: null` = illimité → afficher "∞" côté frontend.
+Les `used` / `usedBytes` sont calculés en temps réel (2 COUNT SQL + lecture du champ `storageUsedBytes`).  
+`limit: null` / `limitBytes: null` = illimité → afficher "∞" côté frontend.
+
+Le composant `SettingsBillingUsageGauge` affiche les octets avec les unités localisées (`KB/MB/GB` en anglais, `Ko/Mo/Go` en français) via les clés i18n `settings.billing.usage.kb/mb/gb`.
 
 ---
 
@@ -217,3 +273,4 @@ Les `used` sont des COUNT SQL en temps réel (2 requêtes parallèles).
 4. Appeler dans le controller concerné (pattern : avant toute écriture, dans try/catch `QuotaExceededError`)
 5. Ajouter les clés i18n : `flash.quota.<feature>Exceeded` en EN et FR
 6. Mettre à jour `SettingsController.billing()` si usage visible sur la page billing
+7. Mettre à jour ce fichier (`docs/quotas.md`) et `docs/changelog.md`
