@@ -1,6 +1,6 @@
 import type { PlanTier } from '#shared/types/plan'
 
-export type QuotaFeature = 'boats' | 'members' | 'ai' | 'export'
+export type QuotaFeature = 'boats' | 'members' | 'ai' | 'export' | 'storage'
 
 export class QuotaExceededError extends Error {
   name = 'QuotaExceededError'

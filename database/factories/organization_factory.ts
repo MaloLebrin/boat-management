@@ -10,6 +10,7 @@ export const OrganizationFactory = Factory.define(
       name,
       slug: `${faker.helpers.slugify(name).toLowerCase().slice(0, 30)}-${faker.string.alphanumeric(6)}`,
       plan: 'starter' as const,
+      storageUsedBytes: 0,
     }
   }
 ).build()

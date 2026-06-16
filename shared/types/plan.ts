@@ -3,6 +3,7 @@ export type PlanTier = 'starter' | 'pro' | 'enterprise'
 export interface PlanQuotas {
   maxBoats: number | null
   maxMembers: number | null
+  storageGb: number | null
   canUseAI: boolean
   canExport: boolean
   canCustomizeAI: boolean
@@ -11,6 +12,7 @@ export interface PlanQuotas {
 export interface QuotaUsage {
   boats: { used: number; limit: number | null }
   members: { used: number; limit: number | null }
+  storage: { usedBytes: number; limitBytes: number | null }
   canUseAI: boolean
   canExport: boolean
 }
@@ -28,11 +30,26 @@ export const PLAN_PRICES: Record<PlanTier, PlanPrice> = {
 }
 
 export const PLAN_LIMITS: Record<PlanTier, PlanQuotas> = {
-  starter: { maxBoats: 2, maxMembers: 1, canUseAI: false, canExport: false, canCustomizeAI: false },
-  pro: { maxBoats: 25, maxMembers: 5, canUseAI: true, canExport: true, canCustomizeAI: false },
+  starter: {
+    maxBoats: 2,
+    maxMembers: 1,
+    storageGb: 1,
+    canUseAI: false,
+    canExport: false,
+    canCustomizeAI: false,
+  },
+  pro: {
+    maxBoats: 25,
+    maxMembers: 5,
+    storageGb: 20,
+    canUseAI: true,
+    canExport: true,
+    canCustomizeAI: false,
+  },
   enterprise: {
     maxBoats: null,
     maxMembers: null,
+    storageGb: null,
     canUseAI: true,
     canExport: true,
     canCustomizeAI: true,

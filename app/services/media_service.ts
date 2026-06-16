@@ -5,8 +5,10 @@ import type { UploadMediaPayload } from '#shared/types/media'
 import { inject } from '@adonisjs/core'
 import db from '@adonisjs/lucid/services/db'
 import Media from '#models/media'
+import type Organization from '#models/organization'
 import type User from '#models/user'
 import { CloudinaryService } from '#services/cloudinary_service'
+import QuotaService from '#services/quota_service'
 
 export { MediaNotFoundError }
 export type { UploadMediaPayload }
@@ -19,9 +21,22 @@ function resourceTypeFromKind(kind: MediaKind, format?: string): 'image' | 'raw'
 
 @inject()
 export default class MediaService {
-  constructor(private cloudinary: CloudinaryService) {}
+  constructor(
+    private cloudinary: CloudinaryService,
+    private quotaService: QuotaService
+  ) {}
 
-  async upload(user: User, file: MultipartFile, payload: UploadMediaPayload): Promise<Media> {
+  async upload(
+    user: User,
+    file: MultipartFile,
+    payload: UploadMediaPayload,
+    org?: Organization
+  ): Promise<Media> {
+    // Check storage quota before upload (only for org-related entities)
+    if (org && payload.entityType !== 'user' && file.size) {
+      this.quotaService.assertCanUpload(org, file.size)
+    }
+
     const resourceType = resourceTypeFromKind(payload.kind)
 
     const uploaded =
@@ -31,7 +46,7 @@ export default class MediaService {
 
     const position = await this.nextPosition(payload.entityType, payload.entityId)
 
-    return await Media.create({
+    const media = await Media.create({
       entityType: payload.entityType,
       entityId: payload.entityId,
       kind: payload.kind,
@@ -46,6 +61,13 @@ export default class MediaService {
       caption: payload.caption?.trim() || null,
       uploadedById: user.id,
     })
+
+    // Update storage usage after successful upload
+    if (org && payload.entityType !== 'user') {
+      await this.quotaService.updateStorageUsed(org, uploaded.bytes)
+    }
+
+    return media
   }
 
   async listForEntity(entityType: MediaEntityType, entityId: number): Promise<Media[]> {
@@ -70,15 +92,22 @@ export default class MediaService {
       .first()
   }
 
-  async deleteById(mediaId: number): Promise<void> {
+  async deleteById(mediaId: number, org?: Organization): Promise<void> {
     const media = await Media.find(mediaId)
     if (!media) throw new MediaNotFoundError()
+
+    const bytes = media.bytes
 
     await this.cloudinary.deleteFile(
       media.cloudinaryPublicId,
       resourceTypeFromKind(media.kind, media.format)
     )
     await media.delete()
+
+    // Update storage usage after successful deletion
+    if (org) {
+      await this.quotaService.updateStorageUsed(org, -bytes)
+    }
   }
 
   async deleteAllForEntity(

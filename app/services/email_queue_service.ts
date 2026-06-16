@@ -387,4 +387,53 @@ export default class EmailQueueService {
       },
     })
   }
+
+  async sendStorageQuotaWarning(params: {
+    to: string
+    name: string | null
+    percent: number
+    orgName: string
+    correlationSuffix: string
+  }) {
+    const displayName = params.name ?? params.to
+    const subject =
+      params.percent >= 100
+        ? 'Limite de stockage atteinte — FleetAi / Storage limit reached — FleetAi'
+        : `Stockage a ${params.percent}% — FleetAi / Storage at ${params.percent}% — FleetAi`
+
+    const text =
+      params.percent >= 100
+        ? `Bonjour ${displayName},\n\nVotre organisation ${params.orgName} a atteint sa limite de stockage. Vous ne pouvez plus ajouter de fichiers.\n\nHello ${displayName},\n\nYour organisation ${params.orgName} has reached its storage limit. You cannot upload new files.\n\n${env.get('APP_URL')}/settings/billing`
+        : `Bonjour ${displayName},\n\nVotre organisation ${params.orgName} a atteint ${params.percent}% de sa limite de stockage.\n\nHello ${displayName},\n\nYour organisation ${params.orgName} has reached ${params.percent}% of its storage limit.\n\n${env.get('APP_URL')}/settings/billing`
+
+    const html = await edge.render('emails/storage_quota_warning', {
+      displayName,
+      percent: params.percent,
+      orgName: params.orgName,
+      appUrl: env.get('APP_URL'),
+    })
+
+    const correlationId = `storage-quota-warning:${params.correlationSuffix}`
+
+    const partialPayload: Omit<SendEmailPayload, 'dedupKey'> = {
+      to: params.to,
+      subject,
+      text,
+      html,
+      correlationId,
+    }
+
+    const key = SendEmail.dedupKey(partialPayload)
+    const payload: SendEmailPayload = { ...partialPayload, dedupKey: key }
+
+    await this.dedup.enqueueUnique({
+      key,
+      jobName: SendEmail.name,
+      queue: 'emails',
+      payload,
+      dispatch: async (p) => {
+        await SendEmail.dispatch(p)
+      },
+    })
+  }
 }
