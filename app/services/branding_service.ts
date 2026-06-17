@@ -2,11 +2,21 @@ import { inject } from '@adonisjs/core'
 import type { MultipartFile } from '@adonisjs/core/bodyparser'
 import { CloudinaryService, CloudinaryFolders } from '#services/cloudinary_service'
 import type Organization from '#models/organization'
-import type { BrandingConfig } from '#shared/types/branding'
+import { PLAN_LIMITS } from '#shared/types/plan'
+import type { BrandingConfig, BrandingEmailParams } from '#shared/types/branding'
 
 @inject()
 export class BrandingService {
   constructor(private cloudinaryService: CloudinaryService) {}
+
+  toEmailParams(org: Organization): BrandingEmailParams | null {
+    if (!PLAN_LIMITS[org.plan].canWhiteLabel) return null
+    return {
+      appName: org.appName,
+      primaryColor: org.primaryColor,
+      logoUrl: org.logoUrl,
+    }
+  }
 
   toBrandingConfig(org: Organization): BrandingConfig {
     return {
