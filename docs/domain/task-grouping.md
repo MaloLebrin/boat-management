@@ -32,7 +32,7 @@ PlanningService
        │        taskGroupingService.group(tasks)
        │
        ▼
-TaskGroupingService.group(tasks): TaskGroup[]
+TaskGroupingService.group(plannedTasks): TaskGroup[]
        │
        │  filtre : kind === 'date', status === 'open', dueAt != null
        │  tri : boatId → subject → dueAt (ASC)
@@ -124,14 +124,14 @@ Le `id` est un identifiant composite déterministe — pas un UUID — pour perm
 ### Modifications apportées
 
 - Injection de `TaskGroupingService` (constructeur).
-- Chargement de `Organization.findOrFail(user.organizationId)` pour lire `org.plan`.
+- Chargement de `Organization.findOrFail(user.organizationId)` pour lire `org.plan` — **uniquement après avoir vérifié qu'il existe des bateaux** (évite une requête inutile pour les orgs sans bateau).
 - Calcul de `canGroupTasks = PLAN_LIMITS[org.plan].canGroupTasks`.
-- Appel conditionnel : `groups = canGroupTasks ? taskGroupingService.group(tasks) : []`.
-- Les deux retours anticipés (org nulle, aucun bateau) incluent `groups: [], canGroupTasks`.
+- Appel conditionnel : `groups = canGroupTasks ? taskGroupingService.group(plannedTasks) : []`.
+- Le retour anticipé "aucun bateau" inclut `groups: [], canGroupTasks: false`.
 
-### Précisions sur `tasks` passé au grouper
+### Pourquoi `plannedTasks` et non `tasks`
 
-Le grouper reçoit la liste `tasks` qui correspond aux tâches `open` uniquement — `doneTasks` est une liste séparée. Le filtre `status === 'open'` dans `TaskGroupingService` est donc redondant mais défensif.
+Le grouper reçoit **uniquement `plannedTasks`** (tâches futures, ni overdue ni soon). Passer `tasks` (toutes les tâches open) provoquerait un bug silencieux : les groupes composés entièrement de tâches overdue ou soon seraient calculés mais jamais affichés (le Kanban ne les affiche que dans la colonne "Planifiées"), faisant disparaître ces tâches de l'interface. Le regroupement n'a de sens que pour les tâches à venir.
 
 ---
 

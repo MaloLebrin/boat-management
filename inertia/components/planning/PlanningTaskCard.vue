@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { PlanningTask } from '#shared/types/planning'
-import { router } from '@inertiajs/vue3'
+import BaseButton from '~/components/base/BaseButton.vue'
 import { useT } from '~/composables/use_t'
 
 const props = defineProps<{
@@ -36,13 +36,9 @@ function formatDue(task: PlanningTask): string {
       >
         {{ formatDue(task) }}
       </span>
-      <button
-        type="button"
-        class="text-xs text-fg-subtle hover:text-fg"
-        @click="router.visit(`/boats/${task.boatId}`)"
-      >
+      <BaseButton variant="ghost" size="sm" :route="`/boats/${task.boatId}`">
         {{ t('planning.taskKind.' + task.kind) }}
-      </button>
+      </BaseButton>
     </div>
   </div>
 </template>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { TaskGroup } from '#shared/types/planning'
+import BaseButton from '~/components/base/BaseButton.vue'
 import PlanningTaskCard from '~/components/planning/PlanningTaskCard.vue'
 import { ref } from 'vue'
 import { useT } from '~/composables/use_t'
@@ -29,13 +30,9 @@ const expanded = ref(false)
         >
       </div>
       <div class="flex items-center gap-2">
-        <button
-          type="button"
-          class="text-xs text-fg-muted hover:text-fg"
-          @click.stop="emit('ungroup', group.id)"
-        >
+        <BaseButton variant="ghost" size="sm" @click.stop="emit('ungroup', group.id)">
           {{ t('planning.grouping.ungroup') }}
-        </button>
+        </BaseButton>
         <svg
           class="h-4 w-4 text-fg-muted transition-transform"
           :class="expanded ? 'rotate-90' : ''"

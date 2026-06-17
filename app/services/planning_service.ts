@@ -30,9 +30,6 @@ export default class PlanningService {
       }
     }
 
-    const org = await Organization.findOrFail(user.organizationId)
-    const canGroupTasks = PLAN_LIMITS[org.plan].canGroupTasks
-
     const boats = await Boat.query().where('organizationId', user.organizationId).preload('engines')
 
     const boatIds = boats.map((b) => b.id)
@@ -46,9 +43,12 @@ export default class PlanningService {
         plannedTasks: [],
         doneTasks: [],
         groups: [],
-        canGroupTasks,
+        canGroupTasks: false,
       }
     }
+
+    const org = await Organization.findOrFail(user.organizationId)
+    const canGroupTasks = PLAN_LIMITS[org.plan].canGroupTasks
 
     const rawTasks = await BoatMaintenanceTask.query()
       .whereIn('boatId', boatIds)
@@ -104,7 +104,7 @@ export default class PlanningService {
       }
     }
 
-    const groups = canGroupTasks ? this.taskGroupingService.group(tasks) : []
+    const groups = canGroupTasks ? this.taskGroupingService.group(plannedTasks) : []
 
     return { tasks, overdueTasks, soonTasks, plannedTasks, doneTasks, groups, canGroupTasks }
   }
