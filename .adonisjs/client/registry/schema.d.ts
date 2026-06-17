@@ -1243,6 +1243,54 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/audit_logs_controller').default['index']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'settings.branding': {
+    methods: ["GET","HEAD"]
+    pattern: '/settings/branding'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['branding']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['branding']>>>
+    }
+  }
+  'settings.branding.update': {
+    methods: ["PUT"]
+    pattern: '/settings/branding'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/branding').updateBrandingValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/branding').updateBrandingValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateBranding']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateBranding']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'settings.branding.logo.upload': {
+    methods: ["POST"]
+    pattern: '/settings/branding/logo'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/branding').uploadLogoValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/branding').uploadLogoValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['uploadLogo']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['uploadLogo']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'settings.branding.logo.delete': {
+    methods: ["DELETE"]
+    pattern: '/settings/branding/logo'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['deleteLogo']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['deleteLogo']>>>
+    }
+  }
   'maintenance.history': {
     methods: ["GET","HEAD"]
     pattern: '/maintenance/history'
