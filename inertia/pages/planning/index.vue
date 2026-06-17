@@ -1,23 +1,13 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import BaseCard from '~/components/base/BaseCard.vue'
+import type { PlanningTask, TaskGroup } from '#shared/types/planning'
+import BaseButton from '~/components/base/BaseButton.vue'
 import BaseEmptyState from '~/components/base/BaseEmptyState.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
+import PlanningCalendar from '~/components/planning/PlanningCalendar.vue'
+import PlanningKanban from '~/components/planning/PlanningKanban.vue'
+import { computed, ref } from 'vue'
 import { router } from '@inertiajs/vue3'
 import { useT } from '~/composables/use_t'
-
-interface PlanningTask {
-  id: number
-  boatId: number
-  boatName: string
-  title: string
-  subject: string
-  kind: 'date' | 'hours'
-  dueAt: string | null
-  dueEngineHours: number | null
-  currentEngineHours: number | null
-  status: 'open' | 'done'
-}
 
 const props = defineProps<{
   tasks: PlanningTask[]
@@ -25,97 +15,21 @@ const props = defineProps<{
   soonTasks: PlanningTask[]
   plannedTasks: PlanningTask[]
   doneTasks: PlanningTask[]
+  groups: TaskGroup[]
+  canGroupTasks: boolean
 }>()
 
-const { t, locale } = useT()
+const { t } = useT()
 
 type ViewMode = 'kanban' | 'calendar'
 const viewMode = ref<ViewMode>('kanban')
-
-const today = new Date()
-const currentYear = ref(today.getFullYear())
-const currentMonth = ref(today.getMonth())
-
-function prevMonth() {
-  if (currentMonth.value === 0) {
-    currentMonth.value = 11
-    currentYear.value--
-  } else {
-    currentMonth.value--
-  }
-}
-
-function nextMonth() {
-  if (currentMonth.value === 11) {
-    currentMonth.value = 0
-    currentYear.value++
-  } else {
-    currentMonth.value++
-  }
-}
-
-const monthLabel = computed(() =>
-  new Date(currentYear.value, currentMonth.value).toLocaleDateString(locale.value, {
-    month: 'long',
-    year: 'numeric',
-  })
-)
-
-const weekdays = computed(() => {
-  const formatter = new Intl.DateTimeFormat(locale.value, { weekday: 'short' })
-  return [1, 2, 3, 4, 5, 6, 0].map((day) => {
-    const date = new Date(2024, 0, day === 0 ? 7 : day)
-    const label = formatter.format(date)
-    return label.charAt(0).toUpperCase() + label.slice(1, 3)
-  })
-})
-
-const daysInMonth = computed(() => new Date(currentYear.value, currentMonth.value + 1, 0).getDate())
-const firstWeekday = computed(() => {
-  const d = new Date(currentYear.value, currentMonth.value, 1).getDay()
-  return d === 0 ? 6 : d - 1
-})
-
-const calendarDays = computed(() => {
-  const days: Array<{ day: number; tasks: PlanningTask[] }> = []
-  for (let d = 1; d <= daysInMonth.value; d++) {
-    const iso = `${currentYear.value}-${String(currentMonth.value + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`
-    days.push({
-      day: d,
-      tasks: props.tasks.filter((t) => t.dueAt === iso),
-    })
-  }
-  return days
-})
-
-const tasksWithoutDate = computed(() => props.tasks.filter((t) => !t.dueAt && t.kind === 'date'))
-
-function formatDue(task: PlanningTask): string {
-  if (task.kind === 'date' && task.dueAt) return task.dueAt
-  if (task.kind === 'hours' && task.dueEngineHours !== null) return `${task.dueEngineHours}h`
-  return '—'
-}
-
-function taskPillClass(task: PlanningTask): string {
-  const dueDate = task.dueAt
-  if (!dueDate) return 'bg-navy-600 text-white'
-  const todayIso = today.toISOString().slice(0, 10)
-  if (dueDate < todayIso) return 'bg-red-500 text-white'
-  const soon = new Date(today)
-  soon.setDate(soon.getDate() + 30)
-  if (new Date(dueDate) <= soon) return 'bg-amber-500 text-white'
-  return 'bg-navy-600 text-white'
-}
+const groupingEnabled = ref(true)
+const dismissedGroupIds = ref(new Set<string>())
 
 const allTasks = computed(() => [...props.tasks, ...props.doneTasks])
 
-const agendaDays = computed(() => calendarDays.value.filter((d) => d.tasks.length > 0))
-
-function agendaDayLabel(day: number): string {
-  return new Date(currentYear.value, currentMonth.value, day).toLocaleDateString(locale.value, {
-    weekday: 'short',
-    day: 'numeric',
-  })
+function handleUngroup(groupId: string) {
+  dismissedGroupIds.value = new Set([...dismissedGroupIds.value, groupId])
 }
 </script>
 
@@ -128,49 +42,94 @@ function agendaDayLabel(day: number): string {
         <p class="mt-1 text-sm text-fg-muted">{{ t('planning.subtitle') }}</p>
       </div>
 
-      <!-- View toggle -->
-      <div class="flex items-center gap-1 rounded-lg border border-border bg-surface-muted p-1">
-        <button
-          type="button"
+      <div class="flex items-center gap-3">
+        <!-- Grouping toggle (Pro+) -->
+        <BaseButton
+          v-if="canGroupTasks"
+          variant="ghost"
+          size="sm"
+          :title="t('planning.grouping.toggleTitle')"
           :class="[
-            'flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
-            viewMode === 'kanban'
-              ? 'bg-surface-elevated text-fg shadow-sm'
-              : 'text-fg-muted hover:text-fg',
+            'gap-1.5 border transition-colors',
+            groupingEnabled
+              ? 'border-navy-300 bg-navy-50 text-navy-700'
+              : 'border-border bg-surface text-fg-muted hover:text-fg',
           ]"
-          @click="viewMode = 'kanban'"
+          @click="groupingEnabled = !groupingEnabled"
         >
-          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
               stroke-width="2"
-              d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"
+              d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
             />
           </svg>
-          {{ t('planning.viewKanban') }}
-        </button>
-        <button
-          type="button"
-          :class="[
-            'flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
-            viewMode === 'calendar'
-              ? 'bg-surface-elevated text-fg shadow-sm'
-              : 'text-fg-muted hover:text-fg',
-          ]"
-          @click="viewMode = 'calendar'"
-        >
-          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-            />
-          </svg>
-          {{ t('planning.viewCalendar') }}
-        </button>
+          {{ t('planning.grouping.toggle') }}
+        </BaseButton>
+
+        <!-- View toggle -->
+        <div class="flex items-center gap-1 rounded-lg border border-border bg-surface-muted p-1">
+          <BaseButton
+            variant="ghost"
+            size="sm"
+            :class="[
+              'gap-2',
+              viewMode === 'kanban'
+                ? 'bg-surface-elevated text-fg shadow-sm'
+                : 'text-fg-muted hover:text-fg',
+            ]"
+            @click="viewMode = 'kanban'"
+          >
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"
+              />
+            </svg>
+            {{ t('planning.viewKanban') }}
+          </BaseButton>
+          <BaseButton
+            variant="ghost"
+            size="sm"
+            :class="[
+              'gap-2',
+              viewMode === 'calendar'
+                ? 'bg-surface-elevated text-fg shadow-sm'
+                : 'text-fg-muted hover:text-fg',
+            ]"
+            @click="viewMode = 'calendar'"
+          >
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
+            </svg>
+            {{ t('planning.viewCalendar') }}
+          </BaseButton>
+        </div>
       </div>
+    </div>
+
+    <!-- Pro teaser when starter plan -->
+    <div
+      v-if="!canGroupTasks && tasks.length > 0"
+      class="mb-4 flex items-center gap-3 rounded-lg border border-navy-200 bg-navy-50 px-4 py-3 text-sm text-navy-700"
+    >
+      <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M13 10V3L4 14h7v7l9-11h-7z"
+        />
+      </svg>
+      {{ t('planning.grouping.proTeaser') }}
     </div>
 
     <!-- Empty state -->
@@ -183,368 +142,18 @@ function agendaDayLabel(day: number): string {
       />
     </div>
 
-    <!-- ===== KANBAN VIEW ===== -->
-    <div
+    <PlanningKanban
       v-else-if="viewMode === 'kanban'"
-      class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4"
-    >
-      <!-- En retard -->
-      <div class="flex flex-col gap-3">
-        <div
-          class="flex items-center gap-2 rounded-lg border-l-4 border-red-500 bg-red-50 px-3 py-2"
-        >
-          <h2 class="text-sm font-semibold text-red-700">{{ t('planning.kanban.overdue') }}</h2>
-          <span
-            class="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-xs font-semibold text-white"
-          >
-            {{ overdueTasks.length }}
-          </span>
-        </div>
-        <div
-          v-if="overdueTasks.length === 0"
-          class="rounded-lg border border-dashed border-border px-4 py-6 text-center text-sm text-fg-muted"
-        >
-          {{ t('planning.kanban.overdueEmpty') }}
-        </div>
-        <BaseCard v-for="task in overdueTasks" :key="task.id" class="border-l-4 border-red-400">
-          <p class="text-xs font-medium text-fg-muted">{{ task.boatName }}</p>
-          <p class="mt-1 text-sm font-semibold text-fg">{{ task.title }}</p>
-          <p class="mt-1 text-xs text-fg-muted capitalize">{{ task.subject }}</p>
-          <div class="mt-2 flex items-center justify-between">
-            <span
-              class="inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700"
-            >
-              {{ formatDue(task) }}
-            </span>
-            <span class="text-xs text-fg-subtle">{{
-              task.kind === 'date' ? t('planning.taskKind.date') : t('planning.taskKind.hours')
-            }}</span>
-          </div>
-        </BaseCard>
-      </div>
+      :overdue-tasks="overdueTasks"
+      :soon-tasks="soonTasks"
+      :planned-tasks="plannedTasks"
+      :done-tasks="doneTasks"
+      :groups="groups"
+      :grouping-enabled="groupingEnabled"
+      :dismissed-group-ids="dismissedGroupIds"
+      @ungroup="handleUngroup"
+    />
 
-      <!-- À venir bientôt -->
-      <div class="flex flex-col gap-3">
-        <div
-          class="flex items-center gap-2 rounded-lg border-l-4 border-amber-400 bg-amber-50 px-3 py-2"
-        >
-          <h2 class="text-sm font-semibold text-amber-700">{{ t('planning.kanban.soon') }}</h2>
-          <span
-            class="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-amber-400 px-1.5 text-xs font-semibold text-white"
-          >
-            {{ soonTasks.length }}
-          </span>
-        </div>
-        <div
-          v-if="soonTasks.length === 0"
-          class="rounded-lg border border-dashed border-border px-4 py-6 text-center text-sm text-fg-muted"
-        >
-          {{ t('planning.kanban.soonEmpty') }}
-        </div>
-        <BaseCard v-for="task in soonTasks" :key="task.id" class="border-l-4 border-amber-300">
-          <p class="text-xs font-medium text-fg-muted">{{ task.boatName }}</p>
-          <p class="mt-1 text-sm font-semibold text-fg">{{ task.title }}</p>
-          <p class="mt-1 text-xs text-fg-muted capitalize">{{ task.subject }}</p>
-          <div class="mt-2 flex items-center justify-between">
-            <span
-              class="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700"
-            >
-              {{ formatDue(task) }}
-            </span>
-            <span class="text-xs text-fg-subtle">{{
-              task.kind === 'date' ? t('planning.taskKind.date') : t('planning.taskKind.hours')
-            }}</span>
-          </div>
-        </BaseCard>
-      </div>
-
-      <!-- Planifiées -->
-      <div class="flex flex-col gap-3">
-        <div
-          class="flex items-center gap-2 rounded-lg border-l-4 border-navy-600 bg-navy-25 px-3 py-2"
-        >
-          <h2 class="text-sm font-semibold text-navy-600">{{ t('planning.kanban.planned') }}</h2>
-          <span
-            class="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-navy-600 px-1.5 text-xs font-semibold text-white"
-          >
-            {{ plannedTasks.length }}
-          </span>
-        </div>
-        <div
-          v-if="plannedTasks.length === 0"
-          class="rounded-lg border border-dashed border-border px-4 py-6 text-center text-sm text-fg-muted"
-        >
-          {{ t('planning.kanban.plannedEmpty') }}
-        </div>
-        <BaseCard v-for="task in plannedTasks" :key="task.id">
-          <p class="text-xs font-medium text-fg-muted">{{ task.boatName }}</p>
-          <p class="mt-1 text-sm font-semibold text-fg">{{ task.title }}</p>
-          <p class="mt-1 text-xs text-fg-muted capitalize">{{ task.subject }}</p>
-          <div class="mt-2 flex items-center justify-between">
-            <span
-              class="inline-flex items-center rounded-full bg-surface-muted px-2 py-0.5 text-xs font-medium text-fg-muted"
-            >
-              {{ formatDue(task) }}
-            </span>
-            <span class="text-xs text-fg-subtle">{{
-              task.kind === 'date' ? t('planning.taskKind.date') : t('planning.taskKind.hours')
-            }}</span>
-          </div>
-        </BaseCard>
-      </div>
-
-      <!-- Complétées -->
-      <div class="flex flex-col gap-3">
-        <div
-          class="flex items-center gap-2 rounded-lg border-l-4 border-mint-600 bg-mint-50 px-3 py-2"
-        >
-          <h2 class="text-sm font-semibold text-mint-700">{{ t('planning.kanban.completed') }}</h2>
-          <span
-            class="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-mint-600 px-1.5 text-xs font-semibold text-white"
-          >
-            {{ doneTasks.length }}
-          </span>
-        </div>
-        <div
-          v-if="doneTasks.length === 0"
-          class="rounded-lg border border-dashed border-border px-4 py-6 text-center text-sm text-fg-muted"
-        >
-          {{ t('planning.kanban.completedEmpty') }}
-        </div>
-        <BaseCard
-          v-for="task in doneTasks"
-          :key="task.id"
-          class="border-l-4 border-mint-500 opacity-75"
-        >
-          <p class="text-xs font-medium text-fg-muted">{{ task.boatName }}</p>
-          <p class="mt-1 text-sm font-semibold text-fg line-through">{{ task.title }}</p>
-          <p class="mt-1 text-xs text-fg-muted capitalize">{{ task.subject }}</p>
-          <div class="mt-2 flex items-center justify-between">
-            <span
-              class="inline-flex items-center rounded-full bg-mint-100 px-2 py-0.5 text-xs font-medium text-mint-700"
-            >
-              {{ formatDue(task) }}
-            </span>
-            <span class="text-xs text-fg-subtle">{{
-              task.kind === 'date' ? t('planning.taskKind.date') : t('planning.taskKind.hours')
-            }}</span>
-          </div>
-        </BaseCard>
-      </div>
-    </div>
-
-    <!-- ===== CALENDAR VIEW ===== -->
-    <div v-else class="space-y-6">
-      <BaseCard>
-        <template #header>
-          <div class="flex items-center justify-between">
-            <button
-              type="button"
-              class="rounded-md p-1 text-fg-muted hover:bg-surface-muted hover:text-fg"
-              @click="prevMonth"
-            >
-              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M15 19l-7-7 7-7"
-                />
-              </svg>
-            </button>
-            <h2 class="text-sm font-semibold capitalize text-fg">{{ monthLabel }}</h2>
-            <button
-              type="button"
-              class="rounded-md p-1 text-fg-muted hover:bg-surface-muted hover:text-fg"
-              @click="nextMonth"
-            >
-              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-            </button>
-          </div>
-        </template>
-
-        <!-- Mobile: agenda list -->
-        <div class="sm:hidden">
-          <div v-if="agendaDays.length === 0" class="py-8 text-center text-sm text-fg-muted">
-            {{ t('planning.calendar.agendaEmpty') }}
-          </div>
-          <div v-else class="divide-y divide-border">
-            <div v-for="cell in agendaDays" :key="cell.day" class="flex gap-3 py-3">
-              <div class="w-12 shrink-0 text-center">
-                <span
-                  class="mx-auto flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold"
-                  :class="
-                    cell.day === today.getDate() &&
-                    currentMonth === today.getMonth() &&
-                    currentYear === today.getFullYear()
-                      ? 'bg-navy-500 text-white'
-                      : 'text-fg-muted'
-                  "
-                >
-                  {{ cell.day }}
-                </span>
-                <p class="mt-0.5 text-xs text-fg-muted capitalize">
-                  {{ agendaDayLabel(cell.day) }}
-                </p>
-              </div>
-              <div class="flex-1 space-y-1.5">
-                <div
-                  v-for="task in cell.tasks"
-                  :key="task.id"
-                  :class="[
-                    'flex items-center gap-2 rounded-md px-2 py-1.5 text-sm font-medium cursor-pointer hover:opacity-80',
-                    taskPillClass(task),
-                  ]"
-                  @click="router.visit(`/boats/${task.boatId}`)"
-                >
-                  <span class="truncate">{{ task.title }}</span>
-                  <span class="ml-auto shrink-0 text-xs opacity-75">{{ task.boatName }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Desktop: 7-column calendar grid -->
-        <div class="hidden sm:block">
-          <!-- Day-of-week header -->
-          <div class="mb-1 grid grid-cols-7 text-center">
-            <div
-              v-for="day in weekdays"
-              :key="day"
-              class="py-1 text-xs font-semibold text-fg-muted"
-            >
-              {{ day }}
-            </div>
-          </div>
-
-          <!-- Calendar grid -->
-          <div class="grid grid-cols-7 gap-px rounded-lg overflow-hidden border border-border">
-            <!-- Empty cells for offset -->
-            <div
-              v-for="n in firstWeekday"
-              :key="`empty-${n}`"
-              class="min-h-20 bg-surface-muted/40 p-1"
-            />
-            <!-- Day cells -->
-            <div
-              v-for="cell in calendarDays"
-              :key="cell.day"
-              class="min-h-20 bg-surface-elevated p-1.5"
-              :class="
-                cell.day === today.getDate() &&
-                currentMonth === today.getMonth() &&
-                currentYear === today.getFullYear()
-                  ? 'ring-2 ring-inset ring-navy-500'
-                  : ''
-              "
-            >
-              <span
-                class="mb-1 flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold"
-                :class="
-                  cell.day === today.getDate() &&
-                  currentMonth === today.getMonth() &&
-                  currentYear === today.getFullYear()
-                    ? 'bg-navy-500 text-white'
-                    : 'text-fg-muted'
-                "
-              >
-                {{ cell.day }}
-              </span>
-              <div class="space-y-0.5">
-                <div
-                  v-for="task in cell.tasks.slice(0, 3)"
-                  :key="task.id"
-                  :class="[
-                    'truncate rounded px-1 py-0.5 text-xs font-medium cursor-pointer hover:opacity-80',
-                    taskPillClass(task),
-                  ]"
-                  :title="task.boatName + ' · ' + task.title"
-                  @click="router.visit(`/boats/${task.boatId}`)"
-                >
-                  {{ task.title }}
-                </div>
-                <div
-                  v-if="cell.tasks.length > 3"
-                  class="rounded bg-surface-muted px-1 py-0.5 text-xs text-fg-muted"
-                >
-                  {{ t('planning.calendar.more', { count: String(cell.tasks.length - 3) }) }}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </BaseCard>
-
-      <!-- Tasks without date -->
-      <BaseCard v-if="tasksWithoutDate.length > 0">
-        <template #header>
-          <h2 class="text-sm font-semibold text-fg">{{ t('planning.calendar.withoutDate') }}</h2>
-        </template>
-        <div class="space-y-2">
-          <div
-            v-for="task in tasksWithoutDate"
-            :key="task.id"
-            class="flex items-center justify-between rounded-lg border border-border px-3 py-2"
-          >
-            <div>
-              <p class="text-sm font-medium text-fg">{{ task.title }}</p>
-              <p class="text-xs text-fg-muted">{{ task.boatName }} · {{ task.subject }}</p>
-            </div>
-            <button
-              type="button"
-              class="text-xs font-medium text-brand hover:underline"
-              @click="router.visit(`/boats/${task.boatId}`)"
-            >
-              {{ t('planning.calendar.schedule') }}
-            </button>
-          </div>
-        </div>
-      </BaseCard>
-
-      <!-- Tasks triggered by hours -->
-      <BaseCard v-if="tasks.filter((t) => t.kind === 'hours').length > 0">
-        <template #header>
-          <h2 class="text-sm font-semibold text-fg">{{ t('planning.calendar.hourTriggered') }}</h2>
-        </template>
-        <div class="space-y-2">
-          <div
-            v-for="task in tasks.filter((t) => t.kind === 'hours')"
-            :key="task.id"
-            class="flex items-center justify-between rounded-lg border border-border px-3 py-2"
-          >
-            <div>
-              <p class="text-sm font-medium text-fg">{{ task.title }}</p>
-              <p class="text-xs text-fg-muted">{{ task.boatName }} · {{ task.subject }}</p>
-            </div>
-            <div class="text-right">
-              <p class="text-sm font-semibold text-fg">
-                {{ task.currentEngineHours ?? 0 }}h / {{ task.dueEngineHours }}h
-              </p>
-              <div class="mt-1 h-1.5 w-24 overflow-hidden rounded-full bg-surface-muted">
-                <div
-                  class="h-full rounded-full transition-all"
-                  :class="
-                    (task.currentEngineHours ?? 0) >= (task.dueEngineHours ?? 1)
-                      ? 'bg-red-500'
-                      : 'bg-navy-500'
-                  "
-                  :style="{
-                    width: `${Math.min(100, ((task.currentEngineHours ?? 0) / (task.dueEngineHours ?? 1)) * 100)}%`,
-                  }"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </BaseCard>
-    </div>
+    <PlanningCalendar v-else :tasks="tasks" />
   </div>
 </template>

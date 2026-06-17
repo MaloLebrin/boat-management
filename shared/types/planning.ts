@@ -33,10 +33,22 @@ export interface MaintenanceHistoryStats {
   totalBoats: number
 }
 
+export interface TaskGroup {
+  id: string
+  subject: string
+  boatId: number
+  boatName: string
+  tasks: PlanningTask[]
+  earliestDueAt: string
+  latestDueAt: string
+}
+
 export interface PlanningResult {
   tasks: PlanningTask[]
   overdueTasks: PlanningTask[]
   soonTasks: PlanningTask[]
   plannedTasks: PlanningTask[]
   doneTasks: PlanningTask[]
+  groups: TaskGroup[]
+  canGroupTasks: boolean
 }

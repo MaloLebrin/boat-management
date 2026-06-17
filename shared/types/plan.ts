@@ -11,6 +11,7 @@ export interface PlanQuotas {
   auditLogRetentionDays: number | null
   /** Monthly AI token limit; null = unlimited */
   aiTokensPerMonth: number | null
+  canGroupTasks: boolean
 }
 
 export interface QuotaUsage {
@@ -44,6 +45,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanQuotas> = {
     canCustomizeAI: false,
     auditLogRetentionDays: 0,
     aiTokensPerMonth: null,
+    canGroupTasks: false,
   },
   pro: {
     maxBoats: 25,
@@ -54,6 +56,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanQuotas> = {
     canCustomizeAI: false,
     auditLogRetentionDays: 90,
     aiTokensPerMonth: 1_000_000,
+    canGroupTasks: true,
   },
   enterprise: {
     maxBoats: null,
@@ -64,6 +67,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanQuotas> = {
     canCustomizeAI: true,
     auditLogRetentionDays: null,
     aiTokensPerMonth: null,
+    canGroupTasks: true,
   },
 }
 

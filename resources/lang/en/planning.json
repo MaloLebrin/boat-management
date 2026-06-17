@@ -28,5 +28,11 @@
     "schedule": "Schedule",
     "hourTriggered": "Triggered by engine hours",
     "agendaEmpty": "No tasks this month"
+  },
+  "grouping": {
+    "toggle": "Grouping",
+    "toggleTitle": "Automatically group nearby tasks",
+    "ungroup": "Ungroup",
+    "proTeaser": "Upgrade to Pro to automatically group nearby maintenance tasks."
   }
 }

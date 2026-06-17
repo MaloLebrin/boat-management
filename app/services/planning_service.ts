@@ -1,7 +1,10 @@
 import Boat from '#models/boat'
 import BoatMaintenanceTask from '#models/boat_maintenance_task'
+import Organization from '#models/organization'
 import type User from '#models/user'
 import type { PlanningResult, PlanningTask } from '#shared/types/planning'
+import { PLAN_LIMITS } from '#shared/types/plan'
+import TaskGroupingService from '#services/task_grouping_service'
 import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
 
@@ -9,12 +12,22 @@ export type { PlanningResult }
 
 @inject()
 export default class PlanningService {
+  constructor(private taskGroupingService: TaskGroupingService) {}
+
   /**
    * Gets the planning data for all boats in an organization.
    */
   async getPlanningForOrg(user: User): Promise<PlanningResult> {
     if (user.organizationId === null) {
-      return { tasks: [], overdueTasks: [], soonTasks: [], plannedTasks: [], doneTasks: [] }
+      return {
+        tasks: [],
+        overdueTasks: [],
+        soonTasks: [],
+        plannedTasks: [],
+        doneTasks: [],
+        groups: [],
+        canGroupTasks: false,
+      }
     }
 
     const boats = await Boat.query().where('organizationId', user.organizationId).preload('engines')
@@ -23,20 +36,31 @@ export default class PlanningService {
     const boatMap = new Map(boats.map((b) => [b.id, b]))
 
     if (boatIds.length === 0) {
-      return { tasks: [], overdueTasks: [], soonTasks: [], plannedTasks: [], doneTasks: [] }
+      return {
+        tasks: [],
+        overdueTasks: [],
+        soonTasks: [],
+        plannedTasks: [],
+        doneTasks: [],
+        groups: [],
+        canGroupTasks: false,
+      }
     }
 
-    const rawTasks = await BoatMaintenanceTask.query()
-      .whereIn('boatId', boatIds)
-      .where('status', 'open')
-      .orderBy('dueAt', 'asc')
-      .orderBy('dueEngineHours', 'asc')
-
-    const rawDoneTasks = await BoatMaintenanceTask.query()
-      .whereIn('boatId', boatIds)
-      .where('status', 'done')
-      .orderBy('updatedAt', 'desc')
-      .limit(20)
+    const [org, rawTasks, rawDoneTasks] = await Promise.all([
+      Organization.findOrFail(user.organizationId),
+      BoatMaintenanceTask.query()
+        .whereIn('boatId', boatIds)
+        .where('status', 'open')
+        .orderBy('dueAt', 'asc')
+        .orderBy('dueEngineHours', 'asc'),
+      BoatMaintenanceTask.query()
+        .whereIn('boatId', boatIds)
+        .where('status', 'done')
+        .orderBy('updatedAt', 'desc')
+        .limit(20),
+    ])
+    const canGroupTasks = PLAN_LIMITS[org.plan].canGroupTasks
 
     const today = DateTime.now().startOf('day')
     const soonDateThreshold = today.plus({ days: 30 })
@@ -80,7 +104,9 @@ export default class PlanningService {
       }
     }
 
-    return { tasks, overdueTasks, soonTasks, plannedTasks, doneTasks }
+    const groups = canGroupTasks ? this.taskGroupingService.group(plannedTasks) : []
+
+    return { tasks, overdueTasks, soonTasks, plannedTasks, doneTasks, groups, canGroupTasks }
   }
 
   private isOverdue(task: PlanningTask, today: DateTime): boolean {
