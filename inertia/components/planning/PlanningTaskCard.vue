@@ -36,7 +36,7 @@ function formatDue(task: PlanningTask): string {
       >
         {{ formatDue(task) }}
       </span>
-      <BaseButton variant="ghost" size="sm" :route="`/boats/${task.boatId}`">
+      <BaseButton variant="ghost" size="sm" route="boats.show" :params="{ id: task.boatId }">
         {{ t('planning.taskKind.' + task.kind) }}
       </BaseButton>
     </div>

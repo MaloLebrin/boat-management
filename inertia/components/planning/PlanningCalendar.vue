@@ -230,7 +230,7 @@ function isToday(day: number): boolean {
             <p class="text-sm font-medium text-fg">{{ task.title }}</p>
             <p class="text-xs text-fg-muted">{{ task.boatName }} · {{ task.subject }}</p>
           </div>
-          <BaseButton variant="ghost" size="sm" :route="`/boats/${task.boatId}`">
+          <BaseButton variant="ghost" size="sm" route="boats.show" :params="{ id: task.boatId }">
             {{ t('planning.calendar.schedule') }}
           </BaseButton>
         </div>

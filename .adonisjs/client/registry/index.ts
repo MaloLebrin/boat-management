@@ -6,6 +6,24 @@ import type { ApiDefinition } from './tree.d.ts'
 const placeholder: any = {}
 
 const routes = {
+  'webhooks.stripe': {
+    methods: ["POST"],
+    pattern: '/webhooks/stripe',
+    tokens: [{"old":"/webhooks/stripe","type":0,"val":"webhooks","end":""},{"old":"/webhooks/stripe","type":0,"val":"stripe","end":""}],
+    types: placeholder as Registry['webhooks.stripe']['types'],
+  },
+  'mail_previews.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/dev/mails',
+    tokens: [{"old":"/dev/mails","type":0,"val":"dev","end":""},{"old":"/dev/mails","type":0,"val":"mails","end":""}],
+    types: placeholder as Registry['mail_previews.index']['types'],
+  },
+  'mail_previews.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/dev/mails/:name',
+    tokens: [{"old":"/dev/mails/:name","type":0,"val":"dev","end":""},{"old":"/dev/mails/:name","type":0,"val":"mails","end":""},{"old":"/dev/mails/:name","type":1,"val":"name","end":""}],
+    types: placeholder as Registry['mail_previews.show']['types'],
+  },
   'dashboard': {
     methods: ["GET","HEAD"],
     pattern: '/dashboard',
@@ -701,24 +719,6 @@ const routes = {
     pattern: '/invitations/accept',
     tokens: [{"old":"/invitations/accept","type":0,"val":"invitations","end":""},{"old":"/invitations/accept","type":0,"val":"accept","end":""}],
     types: placeholder as Registry['invitations.accept']['types'],
-  },
-  'webhooks.stripe': {
-    methods: ["POST"],
-    pattern: '/webhooks/stripe',
-    tokens: [{"old":"/webhooks/stripe","type":0,"val":"webhooks","end":""},{"old":"/webhooks/stripe","type":0,"val":"stripe","end":""}],
-    types: placeholder as Registry['webhooks.stripe']['types'],
-  },
-  'mail_previews.index': {
-    methods: ["GET","HEAD"],
-    pattern: '/dev/mails',
-    tokens: [{"old":"/dev/mails","type":0,"val":"dev","end":""},{"old":"/dev/mails","type":0,"val":"mails","end":""}],
-    types: placeholder as Registry['mail_previews.index']['types'],
-  },
-  'mail_previews.show': {
-    methods: ["GET","HEAD"],
-    pattern: '/dev/mails/:name',
-    tokens: [{"old":"/dev/mails/:name","type":0,"val":"dev","end":""},{"old":"/dev/mails/:name","type":0,"val":"mails","end":""},{"old":"/dev/mails/:name","type":1,"val":"name","end":""}],
-    types: placeholder as Registry['mail_previews.show']['types'],
   },
   'new_account.create': {
     methods: ["GET","HEAD"],
