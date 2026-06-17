@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import type { PlanningTask } from '#shared/types/planning'
+import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
+import PlanningCalendarHourTasks from '~/components/planning/PlanningCalendarHourTasks.vue'
 import { computed, ref } from 'vue'
-import { router } from '@inertiajs/vue3'
 import { useT } from '~/composables/use_t'
 
 const props = defineProps<{
@@ -105,11 +106,7 @@ function isToday(day: number): boolean {
     <BaseCard>
       <template #header>
         <div class="flex items-center justify-between">
-          <button
-            type="button"
-            class="rounded-md p-1 text-fg-muted hover:bg-surface-muted hover:text-fg"
-            @click="prevMonth"
-          >
+          <BaseButton variant="ghost" size="sm" @click="prevMonth">
             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 stroke-linecap="round"
@@ -118,13 +115,9 @@ function isToday(day: number): boolean {
                 d="M15 19l-7-7 7-7"
               />
             </svg>
-          </button>
+          </BaseButton>
           <h2 class="text-sm font-semibold capitalize text-fg">{{ monthLabel }}</h2>
-          <button
-            type="button"
-            class="rounded-md p-1 text-fg-muted hover:bg-surface-muted hover:text-fg"
-            @click="nextMonth"
-          >
+          <BaseButton variant="ghost" size="sm" @click="nextMonth">
             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 stroke-linecap="round"
@@ -133,7 +126,7 @@ function isToday(day: number): boolean {
                 d="M9 5l7 7-7 7"
               />
             </svg>
-          </button>
+          </BaseButton>
         </div>
       </template>
 
@@ -236,52 +229,13 @@ function isToday(day: number): boolean {
             <p class="text-sm font-medium text-fg">{{ task.title }}</p>
             <p class="text-xs text-fg-muted">{{ task.boatName }} · {{ task.subject }}</p>
           </div>
-          <button
-            type="button"
-            class="text-xs font-medium text-brand hover:underline"
-            @click="router.visit(`/boats/${task.boatId}`)"
-          >
+          <BaseButton variant="ghost" size="sm" :route="`/boats/${task.boatId}`">
             {{ t('planning.calendar.schedule') }}
-          </button>
+          </BaseButton>
         </div>
       </div>
     </BaseCard>
 
-    <!-- Tasks triggered by hours -->
-    <BaseCard v-if="hourTasks.length > 0">
-      <template #header>
-        <h2 class="text-sm font-semibold text-fg">{{ t('planning.calendar.hourTriggered') }}</h2>
-      </template>
-      <div class="space-y-2">
-        <div
-          v-for="task in hourTasks"
-          :key="task.id"
-          class="flex items-center justify-between rounded-lg border border-border px-3 py-2"
-        >
-          <div>
-            <p class="text-sm font-medium text-fg">{{ task.title }}</p>
-            <p class="text-xs text-fg-muted">{{ task.boatName }} · {{ task.subject }}</p>
-          </div>
-          <div class="text-right">
-            <p class="text-sm font-semibold text-fg">
-              {{ task.currentEngineHours ?? 0 }}h / {{ task.dueEngineHours }}h
-            </p>
-            <div class="mt-1 h-1.5 w-24 overflow-hidden rounded-full bg-surface-muted">
-              <div
-                class="h-full rounded-full transition-all"
-                :class="
-                  (task.currentEngineHours ?? 0) >= (task.dueEngineHours ?? 1)
-                    ? 'bg-red-500'
-                    : 'bg-navy-500'
-                "
-                :style="{
-                  width: `${Math.min(100, ((task.currentEngineHours ?? 0) / (task.dueEngineHours ?? 1)) * 100)}%`,
-                }"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    </BaseCard>
+    <PlanningCalendarHourTasks :tasks="hourTasks" />
   </div>
 </template>

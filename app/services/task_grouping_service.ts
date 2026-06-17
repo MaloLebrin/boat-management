@@ -1,17 +1,12 @@
 import type { PlanningTask, TaskGroup } from '#shared/types/planning'
-import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
 
 const PROXIMITY_DAYS = 7
 
-@inject()
 export default class TaskGroupingService {
   group(tasks: PlanningTask[]): TaskGroup[] {
-    const dateTasks = tasks.filter(
-      (t) => t.kind === 'date' && t.dueAt !== null && t.status === 'open'
-    )
+    const dateTasks = tasks.filter((t) => t.kind === 'date' && t.dueAt !== null)
 
-    // Sort by (boatId, subject, dueAt) for greedy sweep
     const sorted = [...dateTasks].sort((a, b) => {
       if (a.boatId !== b.boatId) return a.boatId - b.boatId
       if (a.subject !== b.subject) return a.subject.localeCompare(b.subject)
@@ -23,8 +18,8 @@ export default class TaskGroupingService {
 
     while (i < sorted.length) {
       const seed = sorted[i]!
+      const seedDate = DateTime.fromISO(seed.dueAt!)
       const bucket: PlanningTask[] = [seed]
-      let latestDate = DateTime.fromISO(seed.dueAt!)
 
       let j = i + 1
       while (j < sorted.length) {
@@ -32,10 +27,9 @@ export default class TaskGroupingService {
         if (candidate.boatId !== seed.boatId || candidate.subject !== seed.subject) break
 
         const candidateDate = DateTime.fromISO(candidate.dueAt!)
-        if (candidateDate.diff(latestDate, 'days').days > PROXIMITY_DAYS) break
+        if (candidateDate.diff(seedDate, 'days').days > PROXIMITY_DAYS) break
 
         bucket.push(candidate)
-        latestDate = candidateDate
         j++
       }
 

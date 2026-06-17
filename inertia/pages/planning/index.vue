@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { PlanningTask, TaskGroup } from '#shared/types/planning'
+import BaseButton from '~/components/base/BaseButton.vue'
 import BaseEmptyState from '~/components/base/BaseEmptyState.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import PlanningCalendar from '~/components/planning/PlanningCalendar.vue'
@@ -43,12 +44,13 @@ function handleUngroup(groupId: string) {
 
       <div class="flex items-center gap-3">
         <!-- Grouping toggle (Pro+) -->
-        <button
+        <BaseButton
           v-if="canGroupTasks"
-          type="button"
+          variant="ghost"
+          size="sm"
           :title="t('planning.grouping.toggleTitle')"
           :class="[
-            'flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors',
+            'gap-1.5 border transition-colors',
             groupingEnabled
               ? 'border-navy-300 bg-navy-50 text-navy-700'
               : 'border-border bg-surface text-fg-muted hover:text-fg',
@@ -64,14 +66,15 @@ function handleUngroup(groupId: string) {
             />
           </svg>
           {{ t('planning.grouping.toggle') }}
-        </button>
+        </BaseButton>
 
         <!-- View toggle -->
         <div class="flex items-center gap-1 rounded-lg border border-border bg-surface-muted p-1">
-          <button
-            type="button"
+          <BaseButton
+            variant="ghost"
+            size="sm"
             :class="[
-              'flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
+              'gap-2',
               viewMode === 'kanban'
                 ? 'bg-surface-elevated text-fg shadow-sm'
                 : 'text-fg-muted hover:text-fg',
@@ -87,11 +90,12 @@ function handleUngroup(groupId: string) {
               />
             </svg>
             {{ t('planning.viewKanban') }}
-          </button>
-          <button
-            type="button"
+          </BaseButton>
+          <BaseButton
+            variant="ghost"
+            size="sm"
             :class="[
-              'flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
+              'gap-2',
               viewMode === 'calendar'
                 ? 'bg-surface-elevated text-fg shadow-sm'
                 : 'text-fg-muted hover:text-fg',
@@ -107,7 +111,7 @@ function handleUngroup(groupId: string) {
               />
             </svg>
             {{ t('planning.viewCalendar') }}
-          </button>
+          </BaseButton>
         </div>
       </div>
     </div>

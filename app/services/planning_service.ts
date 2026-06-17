@@ -47,20 +47,20 @@ export default class PlanningService {
       }
     }
 
-    const org = await Organization.findOrFail(user.organizationId)
+    const [org, rawTasks, rawDoneTasks] = await Promise.all([
+      Organization.findOrFail(user.organizationId),
+      BoatMaintenanceTask.query()
+        .whereIn('boatId', boatIds)
+        .where('status', 'open')
+        .orderBy('dueAt', 'asc')
+        .orderBy('dueEngineHours', 'asc'),
+      BoatMaintenanceTask.query()
+        .whereIn('boatId', boatIds)
+        .where('status', 'done')
+        .orderBy('updatedAt', 'desc')
+        .limit(20),
+    ])
     const canGroupTasks = PLAN_LIMITS[org.plan].canGroupTasks
-
-    const rawTasks = await BoatMaintenanceTask.query()
-      .whereIn('boatId', boatIds)
-      .where('status', 'open')
-      .orderBy('dueAt', 'asc')
-      .orderBy('dueEngineHours', 'asc')
-
-    const rawDoneTasks = await BoatMaintenanceTask.query()
-      .whereIn('boatId', boatIds)
-      .where('status', 'done')
-      .orderBy('updatedAt', 'desc')
-      .limit(20)
 
     const today = DateTime.now().startOf('day')
     const soonDateThreshold = today.plus({ days: 30 })

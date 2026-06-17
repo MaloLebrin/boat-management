@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { PlanningTask, TaskGroup } from '#shared/types/planning'
-import BaseCard from '~/components/base/BaseCard.vue'
 import PlanningTaskCard from '~/components/planning/PlanningTaskCard.vue'
 import PlanningTaskGroup from '~/components/planning/PlanningTaskGroup.vue'
 import { computed } from 'vue'
@@ -22,21 +21,17 @@ const { t } = useT()
 
 const visibleGroups = computed(() => props.groups.filter((g) => !props.dismissedGroupIds.has(g.id)))
 
-const groupedTaskIds = computed(() => {
+// Groups only contain plannedTasks (computed server-side), so overdue/soon columns are never affected.
+const groupedPlannedIds = computed(() => {
   if (!props.groupingEnabled) return new Set<number>()
   return new Set(visibleGroups.value.flatMap((g) => g.tasks.map((task) => task.id)))
 })
 
-function ungroupedFor(tasks: PlanningTask[]) {
-  if (!props.groupingEnabled) return tasks
-  return tasks.filter((task) => !groupedTaskIds.value.has(task.id))
-}
-
-const plannedGroups = computed(() =>
-  visibleGroups.value.filter((g) =>
-    props.plannedTasks.some((t) => g.tasks.some((gt) => gt.id === t.id))
-  )
+const ungroupedPlannedTasks = computed(() =>
+  props.plannedTasks.filter((task) => !groupedPlannedIds.value.has(task.id))
 )
+
+const plannedGroups = computed(() => (props.groupingEnabled ? visibleGroups.value : []))
 </script>
 
 <template>
@@ -58,7 +53,7 @@ const plannedGroups = computed(() =>
         {{ t('planning.kanban.overdueEmpty') }}
       </div>
       <PlanningTaskCard
-        v-for="task in ungroupedFor(overdueTasks)"
+        v-for="task in overdueTasks"
         :key="task.id"
         :task="task"
         accent-class="border-red-400"
@@ -85,7 +80,7 @@ const plannedGroups = computed(() =>
         {{ t('planning.kanban.soonEmpty') }}
       </div>
       <PlanningTaskCard
-        v-for="task in ungroupedFor(soonTasks)"
+        v-for="task in soonTasks"
         :key="task.id"
         :task="task"
         accent-class="border-amber-300"
@@ -121,7 +116,7 @@ const plannedGroups = computed(() =>
         />
       </template>
       <PlanningTaskCard
-        v-for="task in ungroupedFor(plannedTasks)"
+        v-for="task in ungroupedPlannedTasks"
         :key="task.id"
         :task="task"
         badge-class="bg-surface-muted text-fg-muted"

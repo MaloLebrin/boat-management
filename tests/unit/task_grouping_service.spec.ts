@@ -76,13 +76,8 @@ test.group('TaskGroupingService', () => {
     assert.deepEqual(service.group(tasks), [])
   })
 
-  test('does not group done tasks', ({ assert }) => {
-    const tasks = [
-      makeTask({ id: 1, subject: 'engine', dueAt: '2026-07-01', status: 'done' }),
-      makeTask({ id: 2, subject: 'engine', dueAt: '2026-07-02', status: 'done' }),
-    ]
-    assert.deepEqual(service.group(tasks), [])
-  })
+  // No test for done tasks: the service does not filter by status.
+  // Callers (PlanningService) are responsible for passing only plannedTasks (open).
 
   test('groups exactly 7 days apart (boundary)', ({ assert }) => {
     const tasks = [
@@ -103,6 +98,21 @@ test.group('TaskGroupingService', () => {
     ]
     const groups = service.group(tasks)
     assert.equal(groups.length, 2)
+  })
+
+  test('does not transitively group A=j1 B=j5 C=j11 (C is 10 days from seed A)', ({ assert }) => {
+    // Fixed-seed semantics: each candidate is compared against the seed, not the previous task.
+    // A→B: 4 days ≤ 7 → ok. A→C: 10 days > 7 → C is excluded.
+    // A+B form a group; C starts a new sweep but has no partner → no second group.
+    const tasks = [
+      makeTask({ id: 1, subject: 'engine', dueAt: '2026-07-01' }),
+      makeTask({ id: 2, subject: 'engine', dueAt: '2026-07-05' }),
+      makeTask({ id: 3, subject: 'engine', dueAt: '2026-07-11' }),
+    ]
+    const groups = service.group(tasks)
+    assert.equal(groups.length, 1)
+    assert.equal(groups[0]!.tasks.length, 2)
+    assert.equal(groups[0]!.latestDueAt, '2026-07-05')
   })
 
   test('group id includes boatId, subject and earliest date', ({ assert }) => {
