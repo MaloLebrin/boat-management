@@ -161,6 +161,13 @@ export interface ApiDefinition {
       update: typeof routes['settings.ai.update']
     }
     auditLog: typeof routes['settings.auditLog']
+    branding: typeof routes['settings.branding'] & {
+      update: typeof routes['settings.branding.update']
+      logo: {
+        upload: typeof routes['settings.branding.logo.upload']
+        delete: typeof routes['settings.branding.logo.delete']
+      }
+    }
   }
   maintenance: {
     history: typeof routes['maintenance.history']

@@ -6,7 +6,8 @@
     "billing": "Facturation et plan",
     "me": "Mon profil",
     "ai": "Personnalisation IA",
-    "auditLog": "Journal d'activité"
+    "auditLog": "Journal d'activité",
+    "branding": "Marque blanche"
   },
   "org": {
     "title": "Profil organisation",
@@ -133,6 +134,22 @@
       "mistral-large-latest": "Mistral Large (performant)"
     },
     "save": "Enregistrer"
+  },
+  "branding": {
+    "title": "Marque blanche",
+    "description": "Personnalisez l'apparence de l'application pour votre organisation.",
+    "logoLabel": "Logo de l'organisation",
+    "logoHint": "Formats acceptés : JPG, PNG, SVG, WebP. Taille max : 2 Mo.",
+    "uploadLogo": "Téléverser un logo",
+    "deleteLogo": "Supprimer le logo",
+    "primaryColorLabel": "Couleur principale",
+    "secondaryColorLabel": "Couleur secondaire",
+    "appNameLabel": "Nom de l'application",
+    "appNamePlaceholder": "Fleetide",
+    "appNameHint": "Remplace le nom affiché dans l'interface.",
+    "preview": "Aperçu",
+    "save": "Enregistrer",
+    "resetColors": "Réinitialiser les couleurs"
   },
   "auditLog": {
     "title": "Journal d'activité",

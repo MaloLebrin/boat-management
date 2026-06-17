@@ -36,5 +36,15 @@ router
     router.get('settings/ai', [SettingsController, 'ai']).as('settings.ai')
     router.put('settings/ai', [SettingsController, 'updateAiSettings']).as('settings.ai.update')
     router.get('settings/audit-log', [AuditLogsController, 'index']).as('settings.auditLog')
+    router.get('settings/branding', [SettingsController, 'branding']).as('settings.branding')
+    router
+      .put('settings/branding', [SettingsController, 'updateBranding'])
+      .as('settings.branding.update')
+    router
+      .post('settings/branding/logo', [SettingsController, 'uploadLogo'])
+      .as('settings.branding.logo.upload')
+    router
+      .delete('settings/branding/logo', [SettingsController, 'deleteLogo'])
+      .as('settings.branding.logo.delete')
   })
   .use(middleware.auth())

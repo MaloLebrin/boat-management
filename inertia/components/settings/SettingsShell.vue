@@ -10,7 +10,7 @@ import type { PlanTier } from '../../../shared/types/plan'
 const { t } = useT()
 const page = usePage()
 
-type SettingsSection = 'me' | 'org' | 'members' | 'billing' | 'ai' | 'audit-log'
+type SettingsSection = 'me' | 'org' | 'members' | 'billing' | 'ai' | 'audit-log' | 'branding'
 
 const baseSections: { key: SettingsSection; route: string; label: () => string }[] = [
   { key: 'me', route: 'settings.me', label: () => t('settings.sections.me') },
@@ -33,6 +33,12 @@ const canViewAuditLog = computed(() => {
   return PLAN_LIMITS[plan as PlanTier].auditLogRetentionDays !== 0
 })
 
+const canWhiteLabel = computed(() => {
+  const plan = page.props.currentPlan
+  if (typeof plan !== 'string' || !VALID_PLANS.has(plan)) return false
+  return PLAN_LIMITS[plan as PlanTier].canWhiteLabel
+})
+
 const sections = computed(() => {
   const result = [...baseSections]
   if (canCustomizeAI.value) {
@@ -47,6 +53,13 @@ const sections = computed(() => {
       key: 'audit-log' as SettingsSection,
       route: 'settings.auditLog',
       label: () => t('settings.sections.auditLog'),
+    })
+  }
+  if (canWhiteLabel.value) {
+    result.push({
+      key: 'branding' as SettingsSection,
+      route: 'settings.branding',
+      label: () => t('settings.sections.branding'),
     })
   }
   return result

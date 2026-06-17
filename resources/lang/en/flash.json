@@ -58,7 +58,10 @@
   "settings": {
     "profileUpdated": "Profile updated.",
     "orgUpdated": "Organisation updated.",
-    "aiSettingsUpdated": "AI settings updated."
+    "aiSettingsUpdated": "AI settings updated.",
+    "brandingUpdated": "Appearance updated.",
+    "logoUpdated": "Logo updated.",
+    "logoDeleted": "Logo deleted."
   },
   "enginePart": {
     "created": "Part added.",

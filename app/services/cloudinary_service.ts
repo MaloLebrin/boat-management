@@ -74,6 +74,8 @@ export const CloudinaryFolders = {
 
   userAvatar: (orgSlug: string, userId: number) =>
     `${envPrefix()}/organizations/${orgSlug}/users/${userId}/avatar`,
+
+  orgLogo: (orgSlug: string) => `${envPrefix()}/organizations/${orgSlug}/logo`,
 }
 
 @inject()

@@ -3,12 +3,14 @@ import OrganizationInvitationService from '#services/organization_invitation_ser
 import SubscriptionService from '#services/subscription_service'
 import QuotaService from '#services/quota_service'
 import AiTokenQuotaService from '#services/ai_token_quota_service'
+import { BrandingService } from '#services/branding_service'
 import OrganizationPolicy from '#policies/organization_policy'
 import {
   updateAiSettingsValidator,
   updateOrganizationValidator,
   updateProfileValidator,
 } from '#validators/user'
+import { updateBrandingValidator, uploadLogoValidator } from '#validators/branding'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import { PLAN_LIMITS } from '#shared/types/plan'
@@ -20,7 +22,8 @@ export default class SettingsController {
     private invitationService: OrganizationInvitationService,
     private subscriptionService: SubscriptionService,
     private quotaService: QuotaService,
-    private aiTokenQuotaService: AiTokenQuotaService
+    private aiTokenQuotaService: AiTokenQuotaService,
+    private brandingService: BrandingService
   ) {}
   async me({ inertia }: HttpContext) {
     return inertia.render('settings/me', {})
@@ -146,6 +149,75 @@ export default class SettingsController {
     await org.save()
 
     session.flash('success', i18n.t('flash.settings.aiSettingsUpdated'))
+    return response.redirect().back()
+  }
+
+  async branding({ inertia, auth, bouncer, response }: HttpContext) {
+    const user = await auth.authenticate()
+    await user.load('organization')
+    const org = user.organization
+
+    if (!PLAN_LIMITS[org.plan].canWhiteLabel) {
+      return response.redirect('/settings/billing')
+    }
+
+    await bouncer.with(OrganizationPolicy).authorize('configureBranding')
+
+    return inertia.render('settings/branding', {
+      branding: this.brandingService.toBrandingConfig(org),
+    })
+  }
+
+  async updateBranding({ request, response, session, auth, bouncer, i18n }: HttpContext) {
+    const user = await auth.authenticate()
+    await user.load('organization')
+    const org = user.organization
+
+    if (!PLAN_LIMITS[org.plan].canWhiteLabel) {
+      return response.redirect('/settings/billing')
+    }
+
+    await bouncer.with(OrganizationPolicy).authorize('configureBranding')
+
+    const data = await request.validateUsing(updateBrandingValidator)
+    await this.brandingService.updateBranding(org, data)
+
+    session.flash('success', i18n.t('flash.settings.brandingUpdated'))
+    return response.redirect().back()
+  }
+
+  async uploadLogo({ request, response, session, auth, bouncer, i18n }: HttpContext) {
+    const user = await auth.authenticate()
+    await user.load('organization')
+    const org = user.organization
+
+    if (!PLAN_LIMITS[org.plan].canWhiteLabel) {
+      return response.redirect('/settings/billing')
+    }
+
+    await bouncer.with(OrganizationPolicy).authorize('configureBranding')
+
+    const { logo } = await request.validateUsing(uploadLogoValidator)
+    await this.brandingService.uploadLogo(org, logo)
+
+    session.flash('success', i18n.t('flash.settings.logoUpdated'))
+    return response.redirect().back()
+  }
+
+  async deleteLogo({ response, session, auth, bouncer, i18n }: HttpContext) {
+    const user = await auth.authenticate()
+    await user.load('organization')
+    const org = user.organization
+
+    if (!PLAN_LIMITS[org.plan].canWhiteLabel) {
+      return response.redirect('/settings/billing')
+    }
+
+    await bouncer.with(OrganizationPolicy).authorize('configureBranding')
+
+    await this.brandingService.deleteLogo(org)
+
+    session.flash('success', i18n.t('flash.settings.logoDeleted'))
     return response.redirect().back()
   }
 }

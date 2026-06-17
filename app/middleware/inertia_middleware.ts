@@ -2,7 +2,8 @@ import type { HttpContext } from '@adonisjs/core/http'
 import type { NextFn } from '@adonisjs/core/types/http'
 import UserTransformer from '#transformers/user_transformer'
 import BaseInertiaMiddleware from '@adonisjs/inertia/inertia_middleware'
-import type { PlanTier } from '#shared/types/plan'
+import { PLAN_LIMITS, type PlanTier } from '#shared/types/plan'
+import type { BrandingConfig } from '#shared/types/branding'
 import type User from '#models/user'
 
 export async function resolveSharedCurrentPlan(
@@ -11,6 +12,22 @@ export async function resolveSharedCurrentPlan(
   if (!user?.organizationId) return undefined
   await user.load('organization')
   return user.organization.plan
+}
+
+export async function resolveSharedBranding(
+  user: User | undefined
+): Promise<BrandingConfig | undefined> {
+  if (!user?.organizationId) return undefined
+  await user.load('organization')
+  const org = user.organization
+  if (!PLAN_LIMITS[org.plan].canWhiteLabel) return undefined
+  return {
+    logoUrl: org.logoUrl,
+    logoPublicId: org.logoPublicId,
+    primaryColor: org.primaryColor,
+    secondaryColor: org.secondaryColor,
+    appName: org.appName,
+  }
 }
 
 export default class InertiaMiddleware extends BaseInertiaMiddleware {
@@ -31,6 +48,7 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
     const BACKEND_NAMESPACES = new Set(['flash', 'marketing', 'validator'])
 
     const currentPlan = await resolveSharedCurrentPlan(auth?.user)
+    const branding = await resolveSharedBranding(auth?.user)
 
     return {
       errors: ctx.inertia.always(this.getValidationErrors(ctx)),
@@ -49,6 +67,7 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
       }),
       user: ctx.inertia.always(auth?.user ? UserTransformer.transform(auth.user) : undefined),
       currentPlan: ctx.inertia.always(currentPlan),
+      branding: ctx.inertia.always(branding as Record<string, string | null> | undefined),
     }
   }
 
