@@ -157,10 +157,7 @@ export default class SettingsController {
     await user.load('organization')
     const org = user.organization
 
-    if (!PLAN_LIMITS[org.plan].canWhiteLabel) {
-      return response.redirect('/settings/billing')
-    }
-
+    if (!this.guardWhiteLabel(org, response)) return
     await bouncer.with(OrganizationPolicy).authorize('configureBranding')
 
     return inertia.render('settings/branding', {
@@ -173,10 +170,7 @@ export default class SettingsController {
     await user.load('organization')
     const org = user.organization
 
-    if (!PLAN_LIMITS[org.plan].canWhiteLabel) {
-      return response.redirect('/settings/billing')
-    }
-
+    if (!this.guardWhiteLabel(org, response)) return
     await bouncer.with(OrganizationPolicy).authorize('configureBranding')
 
     const data = await request.validateUsing(updateBrandingValidator)
@@ -191,10 +185,7 @@ export default class SettingsController {
     await user.load('organization')
     const org = user.organization
 
-    if (!PLAN_LIMITS[org.plan].canWhiteLabel) {
-      return response.redirect('/settings/billing')
-    }
-
+    if (!this.guardWhiteLabel(org, response)) return
     await bouncer.with(OrganizationPolicy).authorize('configureBranding')
 
     const { logo } = await request.validateUsing(uploadLogoValidator)
@@ -209,15 +200,23 @@ export default class SettingsController {
     await user.load('organization')
     const org = user.organization
 
-    if (!PLAN_LIMITS[org.plan].canWhiteLabel) {
-      return response.redirect('/settings/billing')
-    }
-
+    if (!this.guardWhiteLabel(org, response)) return
     await bouncer.with(OrganizationPolicy).authorize('configureBranding')
 
     await this.brandingService.deleteLogo(org)
 
     session.flash('success', i18n.t('flash.settings.logoDeleted'))
     return response.redirect().back()
+  }
+
+  private guardWhiteLabel(
+    org: { plan: keyof typeof PLAN_LIMITS },
+    response: HttpContext['response']
+  ): boolean {
+    if (!PLAN_LIMITS[org.plan].canWhiteLabel) {
+      response.redirect('/settings/billing')
+      return false
+    }
+    return true
   }
 }

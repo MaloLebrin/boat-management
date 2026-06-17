@@ -1,4 +1,5 @@
 export interface BrandingSharedProps {
+  // required by Inertia's UnPackedPageProps index constraint
   [key: string]: string | null
   logoUrl: string | null
   primaryColor: string | null
@@ -8,12 +9,6 @@ export interface BrandingSharedProps {
 
 export interface BrandingConfig extends BrandingSharedProps {
   logoPublicId: string | null
-}
-
-export interface BrandingUpdatePayload {
-  primaryColor: string | null
-  secondaryColor: string | null
-  appName: string | null
 }
 
 export interface BrandingEmailParams {

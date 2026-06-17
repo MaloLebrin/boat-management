@@ -80,15 +80,17 @@ export default class ReminderEmailService {
       boatsByOrg.set(boat.organizationId, list)
     }
 
+    const orgIds = [...boatsByOrg.keys()]
+    const orgsForBoats = await Organization.query().whereIn('id', orgIds)
+    const orgMap = new Map(orgsForBoats.map((o) => [o.id, o]))
+
     let sent = 0
     for (const [orgId, orgBoats] of boatsByOrg) {
-      const [admins, org] = await Promise.all([
-        OrganizationMembership.query()
-          .where('organizationId', orgId)
-          .where('role', 'admin')
-          .preload('user'),
-        Organization.find(orgId),
-      ])
+      const org = orgMap.get(orgId)
+      const admins = await OrganizationMembership.query()
+        .where('organizationId', orgId)
+        .where('role', 'admin')
+        .preload('user')
       const branding = org ? this.brandingService.toEmailParams(org) : null
 
       for (const membership of admins) {
@@ -124,15 +126,17 @@ export default class ReminderEmailService {
       portsByOrg.set(port.organizationId, list)
     }
 
+    const orgIdsForPorts = [...portsByOrg.keys()]
+    const orgsForPorts = await Organization.query().whereIn('id', orgIdsForPorts)
+    const orgMapForPorts = new Map(orgsForPorts.map((o) => [o.id, o]))
+
     let sent = 0
     for (const [orgId, orgPorts] of portsByOrg) {
-      const [admins, org] = await Promise.all([
-        OrganizationMembership.query()
-          .where('organizationId', orgId)
-          .where('role', 'admin')
-          .preload('user'),
-        Organization.find(orgId),
-      ])
+      const org = orgMapForPorts.get(orgId)
+      const admins = await OrganizationMembership.query()
+        .where('organizationId', orgId)
+        .where('role', 'admin')
+        .preload('user')
       const branding = org ? this.brandingService.toEmailParams(org) : null
 
       for (const membership of admins) {
@@ -204,15 +208,17 @@ export default class ReminderEmailService {
       tasksByOrg.set(orgId, list)
     }
 
+    const orgIdsForOverdue = [...tasksByOrg.keys()]
+    const orgsForOverdue = await Organization.query().whereIn('id', orgIdsForOverdue)
+    const orgMapForOverdue = new Map(orgsForOverdue.map((o) => [o.id, o]))
+
     let sent = 0
     for (const [orgId, orgTasks] of tasksByOrg) {
-      const [admins, org] = await Promise.all([
-        OrganizationMembership.query()
-          .where('organizationId', orgId)
-          .where('role', 'admin')
-          .preload('user'),
-        Organization.find(orgId),
-      ])
+      const org = orgMapForOverdue.get(orgId)
+      const admins = await OrganizationMembership.query()
+        .where('organizationId', orgId)
+        .where('role', 'admin')
+        .preload('user')
       const branding = org ? this.brandingService.toEmailParams(org) : null
 
       for (const membership of admins) {
@@ -260,15 +266,17 @@ export default class ReminderEmailService {
       tasksByOrg.set(orgId, list)
     }
 
+    const orgIdsForEngine = [...tasksByOrg.keys()]
+    const orgsForEngine = await Organization.query().whereIn('id', orgIdsForEngine)
+    const orgMapForEngine = new Map(orgsForEngine.map((o) => [o.id, o]))
+
     let sent = 0
     for (const [orgId, orgTasks] of tasksByOrg) {
-      const [admins, org] = await Promise.all([
-        OrganizationMembership.query()
-          .where('organizationId', orgId)
-          .where('role', 'admin')
-          .preload('user'),
-        Organization.find(orgId),
-      ])
+      const org = orgMapForEngine.get(orgId)
+      const admins = await OrganizationMembership.query()
+        .where('organizationId', orgId)
+        .where('role', 'admin')
+        .preload('user')
       const branding = org ? this.brandingService.toEmailParams(org) : null
 
       for (const membership of admins) {
@@ -316,15 +324,17 @@ export default class ReminderEmailService {
       tasksByOrg.set(orgId, list)
     }
 
+    const orgIdsForBoatCheck = [...tasksByOrg.keys()]
+    const orgsForBoatCheck = await Organization.query().whereIn('id', orgIdsForBoatCheck)
+    const orgMapForBoatCheck = new Map(orgsForBoatCheck.map((o) => [o.id, o]))
+
     let sent = 0
     for (const [orgId, orgTasks] of tasksByOrg) {
-      const [admins, org] = await Promise.all([
-        OrganizationMembership.query()
-          .where('organizationId', orgId)
-          .where('role', 'admin')
-          .preload('user'),
-        Organization.find(orgId),
-      ])
+      const org = orgMapForBoatCheck.get(orgId)
+      const admins = await OrganizationMembership.query()
+        .where('organizationId', orgId)
+        .where('role', 'admin')
+        .preload('user')
       const branding = org ? this.brandingService.toEmailParams(org) : null
 
       for (const membership of admins) {

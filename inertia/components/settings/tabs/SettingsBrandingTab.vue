@@ -80,7 +80,7 @@ function deleteLogo() {
             <input
               ref="logoInput"
               type="file"
-              accept=".jpg,.jpeg,.png,.svg,.webp"
+              accept=".jpg,.jpeg,.png,.webp"
               class="hidden"
               @change="onLogoChange"
             />
@@ -104,7 +104,10 @@ function deleteLogo() {
     </BaseCard>
 
     <!-- Couleurs + app name -->
-    <Form :action="{ url: '/settings/branding', method: 'put' }" #default="{ processing, errors }">
+    <Form
+      :action="{ url: routes.branding.update(), method: 'put' }"
+      #default="{ processing, errors }"
+    >
       <BaseCard>
         <div class="space-y-6">
           <BaseInput
