@@ -4,6 +4,7 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import PlanningCalendarHourTasks from '~/components/planning/PlanningCalendarHourTasks.vue'
 import { computed, ref } from 'vue'
+import { router } from '@inertiajs/vue3'
 import { useT } from '~/composables/use_t'
 
 const props = defineProps<{
