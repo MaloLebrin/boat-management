@@ -20,8 +20,7 @@ export async function resolveSharedBranding(
   user: User | undefined,
   brandingService: Pick<BrandingService, 'toSharedProps'>
 ): Promise<BrandingSharedProps | undefined> {
-  if (!user?.organizationId) return undefined
-  await user.load('organization')
+  if (!user?.organization) return undefined
   const org = user.organization
   if (!PLAN_LIMITS[org.plan].canWhiteLabel) return undefined
   return brandingService.toSharedProps(org)
@@ -49,6 +48,9 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
 
     const BACKEND_NAMESPACES = new Set(['flash', 'marketing', 'validator'])
 
+    if (auth?.user?.organizationId) {
+      await auth.user.load('organization')
+    }
     const currentPlan = await resolveSharedCurrentPlan(auth?.user)
     const branding = await resolveSharedBranding(auth?.user, this.brandingService)
 
@@ -69,7 +71,7 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
       }),
       user: ctx.inertia.always(auth?.user ? UserTransformer.transform(auth.user) : undefined),
       currentPlan: ctx.inertia.always(currentPlan),
-      branding: ctx.inertia.always(branding as Record<string, string | null> | undefined),
+      branding: ctx.inertia.always(branding),
     }
   }
 

@@ -1,4 +1,5 @@
 export interface BrandingSharedProps {
+  [key: string]: string | null
   logoUrl: string | null
   primaryColor: string | null
   secondaryColor: string | null

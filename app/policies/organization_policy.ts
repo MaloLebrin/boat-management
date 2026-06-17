@@ -21,8 +21,8 @@ export default class OrganizationPolicy extends BasePolicy {
     return false
   }
 
-  configureBranding(_user: User): AuthorizerResponse {
-    return false
+  configureBranding(user: User): AuthorizerResponse {
+    return user.organizationId !== null
   }
 
   viewAuditLog(user: User): AuthorizerResponse {

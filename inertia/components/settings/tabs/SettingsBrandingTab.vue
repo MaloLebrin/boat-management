@@ -8,6 +8,7 @@ import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseField from '~/components/base/BaseField.vue'
 import { useT } from '~/composables/use_t'
+import { routes } from '~/utils/routes'
 import type { BrandingConfig } from '../../../../shared/types/branding'
 
 const { t } = useT()
@@ -19,8 +20,10 @@ const props = defineProps<{
 const logoInput = ref<HTMLInputElement | null>(null)
 const logoPreview = ref<string | null>(props.branding.logoUrl)
 
-const primaryColor = ref(props.branding.primaryColor ?? '#3b82f6')
-const secondaryColor = ref(props.branding.secondaryColor ?? '#6b7280')
+const primaryColorEnabled = ref(props.branding.primaryColor !== null)
+const secondaryColorEnabled = ref(props.branding.secondaryColor !== null)
+const primaryColor = ref<string>(props.branding.primaryColor ?? '#3b82f6')
+const secondaryColor = ref<string>(props.branding.secondaryColor ?? '#6b7280')
 
 function onLogoChange(event: Event) {
   const file = (event.target as HTMLInputElement).files?.[0]
@@ -32,12 +35,16 @@ function submitLogo() {
   if (!logoInput.value?.files?.[0]) return
   const form = new FormData()
   form.append('logo', logoInput.value.files[0])
-  router.post('/settings/branding/logo', form, { preserveScroll: true })
+  router.post(routes.branding.logoUpload(), form, { preserveScroll: true })
 }
 
 function deleteLogo() {
-  router.delete('/settings/branding/logo', { preserveScroll: true })
-  logoPreview.value = null
+  router.delete(routes.branding.logoDelete(), {
+    preserveScroll: true,
+    onSuccess: () => {
+      logoPreview.value = null
+    },
+  })
 }
 </script>
 
@@ -111,38 +118,68 @@ function deleteLogo() {
 
           <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
             <BaseField :label="t('settings.branding.primaryColorLabel')">
-              <div class="flex items-center gap-3">
-                <input
-                  type="color"
-                  name="primaryColor"
-                  :value="primaryColor"
-                  class="h-10 w-14 cursor-pointer rounded border border-border bg-transparent p-0.5"
-                  @input="primaryColor = ($event.target as HTMLInputElement).value"
-                />
-                <span class="text-sm text-fg-muted font-mono">{{ primaryColor }}</span>
-              </div>
+              <template v-if="primaryColorEnabled">
+                <input type="hidden" name="primaryColor" :value="primaryColor" />
+                <div class="flex items-center gap-3">
+                  <input
+                    type="color"
+                    :value="primaryColor"
+                    class="h-10 w-14 cursor-pointer rounded border border-border bg-transparent p-0.5"
+                    @input="primaryColor = ($event.target as HTMLInputElement).value"
+                  />
+                  <span class="text-sm text-fg-muted font-mono">{{ primaryColor }}</span>
+                  <BaseButton variant="ghost" size="sm" @click="primaryColorEnabled = false">{{
+                    t('settings.branding.resetColor')
+                  }}</BaseButton>
+                </div>
+              </template>
+              <template v-else>
+                <input type="hidden" name="primaryColor" value="" />
+                <BaseButton variant="secondary" size="sm" @click="primaryColorEnabled = true">
+                  {{ t('settings.branding.setCustomColor') }}
+                </BaseButton>
+              </template>
             </BaseField>
 
             <BaseField :label="t('settings.branding.secondaryColorLabel')">
-              <div class="flex items-center gap-3">
-                <input
-                  type="color"
-                  name="secondaryColor"
-                  :value="secondaryColor"
-                  class="h-10 w-14 cursor-pointer rounded border border-border bg-transparent p-0.5"
-                  @input="secondaryColor = ($event.target as HTMLInputElement).value"
-                />
-                <span class="text-sm text-fg-muted font-mono">{{ secondaryColor }}</span>
-              </div>
+              <template v-if="secondaryColorEnabled">
+                <input type="hidden" name="secondaryColor" :value="secondaryColor" />
+                <div class="flex items-center gap-3">
+                  <input
+                    type="color"
+                    :value="secondaryColor"
+                    class="h-10 w-14 cursor-pointer rounded border border-border bg-transparent p-0.5"
+                    @input="secondaryColor = ($event.target as HTMLInputElement).value"
+                  />
+                  <span class="text-sm text-fg-muted font-mono">{{ secondaryColor }}</span>
+                  <BaseButton variant="ghost" size="sm" @click="secondaryColorEnabled = false">{{
+                    t('settings.branding.resetColor')
+                  }}</BaseButton>
+                </div>
+              </template>
+              <template v-else>
+                <input type="hidden" name="secondaryColor" value="" />
+                <BaseButton variant="secondary" size="sm" @click="secondaryColorEnabled = true">
+                  {{ t('settings.branding.setCustomColor') }}
+                </BaseButton>
+              </template>
             </BaseField>
           </div>
 
           <!-- Preview bande de couleurs -->
-          <div>
+          <div v-if="primaryColorEnabled || secondaryColorEnabled">
             <p class="mb-2 text-sm font-medium text-fg">{{ t('settings.branding.preview') }}</p>
             <div class="flex h-8 overflow-hidden rounded-lg">
-              <div class="flex-1" :style="{ backgroundColor: primaryColor }" />
-              <div class="flex-1" :style="{ backgroundColor: secondaryColor }" />
+              <div
+                v-if="primaryColorEnabled"
+                class="flex-1"
+                :style="{ backgroundColor: primaryColor }"
+              />
+              <div
+                v-if="secondaryColorEnabled"
+                class="flex-1"
+                :style="{ backgroundColor: secondaryColor }"
+              />
             </div>
           </div>
         </div>

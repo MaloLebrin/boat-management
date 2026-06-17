@@ -149,7 +149,9 @@
     "appNameHint": "Replaces the name displayed in the interface.",
     "preview": "Preview",
     "save": "Save",
-    "resetColors": "Reset colours"
+    "resetColors": "Reset colours",
+    "resetColor": "Reset",
+    "setCustomColor": "Set custom colour"
   },
   "auditLog": {
     "title": "Activity log",
