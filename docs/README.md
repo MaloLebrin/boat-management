@@ -14,6 +14,7 @@ Cette documentation décrit **fonctionnellement** et **techniquement** le projet
   - `docs/domain/dashboard.md`
   - `docs/domain/auth-acl.md`
   - `docs/domain/ai-customization.md` — prompt système + modèle IA Enterprise
+  - `docs/domain/task-grouping.md` — regroupement automatique des tâches (Pro & Enterprise)
 - **Données**: `docs/data/schema.md`
 - **Frontend (Inertia/Vue)**:
   - `docs/frontend/ui-map.md`
