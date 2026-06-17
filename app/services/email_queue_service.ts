@@ -3,6 +3,7 @@ import SendEmail, { type SendEmailPayload } from '#jobs/send_email'
 import QueueDedupService from '#services/queue_dedup_service'
 import type { ReminderBoatItem, ReminderPortItem, ReminderTaskItem } from '#shared/types/reminder'
 import type { PlanTier } from '#shared/types/plan'
+import type { BrandingEmailParams } from '#shared/types/branding'
 import env from '#start/env'
 import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
@@ -78,6 +79,7 @@ export default class EmailQueueService {
     inviterName: string | null
     orgName: string
     acceptUrl: string
+    branding?: BrandingEmailParams | null
   }) {
     const subject = `You've been invited to join ${params.orgName} / Vous avez ete invite a rejoindre ${params.orgName}`
     const inviterDisplay = params.inviterName ?? 'A team member'
@@ -87,6 +89,7 @@ export default class EmailQueueService {
       inviterName: params.inviterName,
       orgName: params.orgName,
       acceptUrl: params.acceptUrl,
+      branding: params.branding ?? null,
     })
 
     const partialPayload: Omit<SendEmailPayload, 'dedupKey'> = {
@@ -111,7 +114,12 @@ export default class EmailQueueService {
     })
   }
 
-  async sendReminderInactiveAccount(params: { to: string; name: string | null; orgName: string }) {
+  async sendReminderInactiveAccount(params: {
+    to: string
+    name: string | null
+    orgName: string
+    branding?: BrandingEmailParams | null
+  }) {
     const displayName = params.name ?? params.to
     const subject = 'Ajoutez votre premier bateau — FleetAi / Add your first boat — FleetAi'
     const text = `Bonjour ${displayName},\n\nVotre organisation ${params.orgName} n'a pas encore de bateau enregistre. Ajoutez votre flotte pour profiter de toutes les fonctionnalites.\n\nHello ${displayName},\n\nYour organisation ${params.orgName} has no boats yet. Add your fleet to unlock all features.\n\n${env.get('APP_URL')}/boats`
@@ -120,6 +128,7 @@ export default class EmailQueueService {
       displayName,
       orgName: params.orgName,
       appUrl: env.get('APP_URL'),
+      branding: params.branding ?? null,
     })
 
     const correlationId = `reminder-inactive-account:${params.to}:${params.orgName}`
@@ -150,6 +159,7 @@ export default class EmailQueueService {
     to: string
     name: string | null
     boats: ReminderBoatItem[]
+    branding?: BrandingEmailParams | null
   }) {
     const displayName = params.name ?? params.to
     const subject =
@@ -161,6 +171,7 @@ export default class EmailQueueService {
       displayName,
       boats: params.boats,
       appUrl: env.get('APP_URL'),
+      branding: params.branding ?? null,
     })
 
     const correlationId = `reminder-incomplete-boats:${params.to}:${params.boats.map((b) => b.id).join('-')}`
@@ -191,6 +202,7 @@ export default class EmailQueueService {
     to: string
     name: string | null
     ports: ReminderPortItem[]
+    branding?: BrandingEmailParams | null
   }) {
     const displayName = params.name ?? params.to
     const subject =
@@ -202,6 +214,7 @@ export default class EmailQueueService {
       displayName,
       ports: params.ports,
       appUrl: env.get('APP_URL'),
+      branding: params.branding ?? null,
     })
 
     const correlationId = `reminder-incomplete-ports:${params.to}:${params.ports.map((p) => p.id).join('-')}`
@@ -232,6 +245,7 @@ export default class EmailQueueService {
     to: string
     name: string | null
     lastLoginAt: string | null
+    branding?: BrandingEmailParams | null
   }) {
     const displayName = params.name ?? params.to
     const subject = 'Votre flotte vous attend — FleetAi / Your fleet is waiting — FleetAi'
@@ -240,6 +254,7 @@ export default class EmailQueueService {
     const html = await edge.render('emails/reminder_inactive_login', {
       displayName,
       appUrl: env.get('APP_URL'),
+      branding: params.branding ?? null,
     })
 
     const correlationId = `reminder-inactive-login:${params.to}`
@@ -270,6 +285,7 @@ export default class EmailQueueService {
     to: string
     name: string | null
     tasks: ReminderTaskItem[]
+    branding?: BrandingEmailParams | null
   }) {
     const displayName = params.name ?? params.to
     const subject =
@@ -281,6 +297,7 @@ export default class EmailQueueService {
       displayName,
       tasks: params.tasks,
       appUrl: env.get('APP_URL'),
+      branding: params.branding ?? null,
     })
 
     const taskIds = params.tasks.map((t) => t.id).join('-')
@@ -312,6 +329,7 @@ export default class EmailQueueService {
     to: string
     name: string | null
     tasks: ReminderTaskItem[]
+    branding?: BrandingEmailParams | null
   }) {
     const displayName = params.name ?? params.to
     const subject = 'Maintenance moteur a venir — FleetAi / Upcoming engine maintenance — FleetAi'
@@ -322,6 +340,7 @@ export default class EmailQueueService {
       displayName,
       tasks: params.tasks,
       appUrl: env.get('APP_URL'),
+      branding: params.branding ?? null,
     })
 
     const taskIds = params.tasks.map((t) => t.id).join('-')
@@ -353,6 +372,7 @@ export default class EmailQueueService {
     to: string
     name: string | null
     tasks: ReminderTaskItem[]
+    branding?: BrandingEmailParams | null
   }) {
     const displayName = params.name ?? params.to
     const subject = 'Inspection bateau a venir — FleetAi / Upcoming boat inspection — FleetAi'
@@ -363,6 +383,7 @@ export default class EmailQueueService {
       displayName,
       tasks: params.tasks,
       appUrl: env.get('APP_URL'),
+      branding: params.branding ?? null,
     })
 
     const taskIds = params.tasks.map((t) => t.id).join('-')
@@ -396,6 +417,7 @@ export default class EmailQueueService {
     percent: number
     orgName: string
     correlationSuffix: string
+    branding?: BrandingEmailParams | null
   }) {
     const displayName = params.name ?? params.to
     const subject =
@@ -413,6 +435,7 @@ export default class EmailQueueService {
       percent: params.percent,
       orgName: params.orgName,
       appUrl: env.get('APP_URL'),
+      branding: params.branding ?? null,
     })
 
     const correlationId = `storage-quota-warning:${params.correlationSuffix}`
@@ -445,6 +468,7 @@ export default class EmailQueueService {
     percent: number
     orgName: string
     correlationSuffix: string
+    branding?: BrandingEmailParams | null
   }) {
     const displayName = params.name ?? params.to
     const subject =
@@ -462,6 +486,7 @@ export default class EmailQueueService {
       percent: params.percent,
       orgName: params.orgName,
       appUrl: env.get('APP_URL'),
+      branding: params.branding ?? null,
     })
 
     const correlationId = `ai-token-quota-warning:${params.correlationSuffix}`
@@ -495,6 +520,7 @@ export default class EmailQueueService {
     orgId: number
     fromPlan: PlanTier
     toPlan: PlanTier
+    branding?: BrandingEmailParams | null
   }) {
     const displayName = params.name ?? params.to
     const subject = `Changement de plan — ${params.orgName} / Plan changed — ${params.orgName}`
@@ -508,6 +534,7 @@ export default class EmailQueueService {
       fromPlan: params.fromPlan,
       toPlan: params.toPlan,
       appUrl: env.get('APP_URL'),
+      branding: params.branding ?? null,
     })
 
     const yearMonth = DateTime.now().toFormat('yyyy-MM')

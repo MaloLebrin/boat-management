@@ -1,11 +1,15 @@
 import type OrganizationPlanDowngraded from '#events/organization_plan_downgraded'
 import EmailQueueService from '#services/email_queue_service'
+import { BrandingService } from '#services/branding_service'
 import OrganizationMembership from '#models/organization_membership'
 import { inject } from '@adonisjs/core'
 
 @inject()
 export default class OnOrganizationPlanDowngraded {
-  constructor(private emailQueueService: EmailQueueService) {}
+  constructor(
+    private emailQueueService: EmailQueueService,
+    private brandingService: BrandingService
+  ) {}
 
   async handle(event: OrganizationPlanDowngraded) {
     const adminMemberships = await OrganizationMembership.query()
@@ -13,6 +17,7 @@ export default class OnOrganizationPlanDowngraded {
       .where('role', 'admin')
       .preload('user')
 
+    const branding = this.brandingService.toEmailParams(event.organization)
     for (const membership of adminMemberships) {
       await this.emailQueueService.sendPlanDowngradeNotification({
         to: membership.user.email,
@@ -21,6 +26,7 @@ export default class OnOrganizationPlanDowngraded {
         orgId: event.organization.id,
         fromPlan: event.fromPlan,
         toPlan: event.toPlan,
+        branding,
       })
     }
   }
