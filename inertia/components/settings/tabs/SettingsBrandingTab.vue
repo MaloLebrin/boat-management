@@ -18,7 +18,7 @@ const props = defineProps<{
 }>()
 
 const logoInput = ref<HTMLInputElement | null>(null)
-const logoPreview = ref<string | null>(props.branding.logoUrl)
+const logoPreview = ref<string | null>(null)
 
 const primaryColorEnabled = ref(props.branding.primaryColor !== null)
 const secondaryColorEnabled = ref(props.branding.secondaryColor !== null)
@@ -35,7 +35,13 @@ function submitLogo() {
   if (!logoInput.value?.files?.[0]) return
   const form = new FormData()
   form.append('logo', logoInput.value.files[0])
-  router.post(routes.branding.logoUpload(), form, { preserveScroll: true })
+  router.post(routes.branding.logoUpload(), form, {
+    preserveScroll: true,
+    onSuccess: () => {
+      logoPreview.value = null
+      if (logoInput.value) logoInput.value.value = ''
+    },
+  })
 }
 
 function deleteLogo() {
@@ -58,10 +64,14 @@ function deleteLogo() {
       <BaseField :label="t('settings.branding.logoLabel')" :hint="t('settings.branding.logoHint')">
         <div class="flex items-center gap-4">
           <div
-            v-if="logoPreview"
+            v-if="logoPreview || branding.logoUrl"
             class="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-surface-muted"
           >
-            <img :src="logoPreview" alt="" class="h-full w-full object-contain" />
+            <img
+              :src="(logoPreview ?? branding.logoUrl)!"
+              alt=""
+              class="h-full w-full object-contain"
+            />
           </div>
           <div
             v-else

@@ -80,9 +80,7 @@ export default class ReminderEmailService {
       boatsByOrg.set(boat.organizationId, list)
     }
 
-    const orgIds = [...boatsByOrg.keys()]
-    const orgsForBoats = await Organization.query().whereIn('id', orgIds)
-    const orgMap = new Map(orgsForBoats.map((o) => [o.id, o]))
+    const orgMap = await this.orgMapForIds([...boatsByOrg.keys()])
 
     let sent = 0
     for (const [orgId, orgBoats] of boatsByOrg) {
@@ -126,9 +124,7 @@ export default class ReminderEmailService {
       portsByOrg.set(port.organizationId, list)
     }
 
-    const orgIdsForPorts = [...portsByOrg.keys()]
-    const orgsForPorts = await Organization.query().whereIn('id', orgIdsForPorts)
-    const orgMapForPorts = new Map(orgsForPorts.map((o) => [o.id, o]))
+    const orgMapForPorts = await this.orgMapForIds([...portsByOrg.keys()])
 
     let sent = 0
     for (const [orgId, orgPorts] of portsByOrg) {
@@ -208,9 +204,7 @@ export default class ReminderEmailService {
       tasksByOrg.set(orgId, list)
     }
 
-    const orgIdsForOverdue = [...tasksByOrg.keys()]
-    const orgsForOverdue = await Organization.query().whereIn('id', orgIdsForOverdue)
-    const orgMapForOverdue = new Map(orgsForOverdue.map((o) => [o.id, o]))
+    const orgMapForOverdue = await this.orgMapForIds([...tasksByOrg.keys()])
 
     let sent = 0
     for (const [orgId, orgTasks] of tasksByOrg) {
@@ -266,9 +260,7 @@ export default class ReminderEmailService {
       tasksByOrg.set(orgId, list)
     }
 
-    const orgIdsForEngine = [...tasksByOrg.keys()]
-    const orgsForEngine = await Organization.query().whereIn('id', orgIdsForEngine)
-    const orgMapForEngine = new Map(orgsForEngine.map((o) => [o.id, o]))
+    const orgMapForEngine = await this.orgMapForIds([...tasksByOrg.keys()])
 
     let sent = 0
     for (const [orgId, orgTasks] of tasksByOrg) {
@@ -324,9 +316,7 @@ export default class ReminderEmailService {
       tasksByOrg.set(orgId, list)
     }
 
-    const orgIdsForBoatCheck = [...tasksByOrg.keys()]
-    const orgsForBoatCheck = await Organization.query().whereIn('id', orgIdsForBoatCheck)
-    const orgMapForBoatCheck = new Map(orgsForBoatCheck.map((o) => [o.id, o]))
+    const orgMapForBoatCheck = await this.orgMapForIds([...tasksByOrg.keys()])
 
     let sent = 0
     for (const [orgId, orgTasks] of tasksByOrg) {
@@ -349,5 +339,10 @@ export default class ReminderEmailService {
     }
 
     logger.info({ sent }, 'ReminderEmailService.sendBoatCheckReminders: done')
+  }
+
+  private async orgMapForIds(ids: number[]): Promise<Map<number, Organization>> {
+    const orgs = await Organization.query().whereIn('id', ids)
+    return new Map(orgs.map((o) => [o.id, o]))
   }
 }
