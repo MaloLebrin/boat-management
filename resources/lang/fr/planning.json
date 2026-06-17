@@ -28,5 +28,11 @@
     "schedule": "Planifier",
     "hourTriggered": "Déclenchées par les heures moteur",
     "agendaEmpty": "Aucune tâche ce mois-ci"
+  },
+  "grouping": {
+    "toggle": "Regroupement",
+    "toggleTitle": "Regrouper automatiquement les tâches proches",
+    "ungroup": "Dissocier",
+    "proTeaser": "Passez au plan Pro pour regrouper automatiquement les tâches de maintenance proches."
   }
 }
