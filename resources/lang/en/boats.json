@@ -553,5 +553,12 @@
     "subtitle": "Estimate annual maintenance costs based on your equipment's current condition",
     "backButton": "Back to boat",
     "openButton": "Estimate maintenance costs"
+  },
+  "maintenanceLog": {
+    "download": "Download maintenance log PDF",
+    "title": "Maintenance log",
+    "generatedOn": "Generated on {date}",
+    "noEvents": "No maintenance events recorded.",
+    "upgradeRequired": "PDF export is available from the Pro plan."
   }
 }

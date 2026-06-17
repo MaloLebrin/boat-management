@@ -30,6 +30,7 @@ const props = defineProps<{
   maintenanceSheets: MaintenanceSheetRow[]
   canManageMaintenance: boolean
   canManageEquipment: boolean
+  canExport: boolean
   aiSuggestions: AiSuggestion[] | null
 }>()
 
@@ -134,7 +135,10 @@ function goToTab(key: TabKey | string) {
             variant="secondary"
             size="sm"
             type="button"
-            @click="goToTab('history'); createEventNonce++"
+            @click="
+              goToTab('history')
+              createEventNonce++
+            "
           >
             + {{ t('boats.show.addEntry') }}
           </BaseButton>
@@ -143,10 +147,23 @@ function goToTab(key: TabKey | string) {
             variant="primary"
             size="sm"
             type="button"
-            @click="goToTab('tasks'); createTaskNonce++"
+            @click="
+              goToTab('tasks')
+              createTaskNonce++
+            "
           >
             + {{ t('boats.show.addTask') }}
           </BaseButton>
+          <a
+            v-if="canExport"
+            :href="`/boats/${boat.id}/maintenance-log.pdf`"
+            target="_blank"
+            rel="noopener"
+          >
+            <BaseButton variant="secondary" size="sm" type="button">
+              {{ t('boats.maintenanceLog.download') }}
+            </BaseButton>
+          </a>
         </div>
       </div>
 
