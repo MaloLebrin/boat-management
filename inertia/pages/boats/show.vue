@@ -91,6 +91,16 @@ const tabs = computed(() => [
 function goToTab(key: TabKey | string) {
   tab.value = key as TabKey
 }
+
+function openHistoryTab() {
+  goToTab('history')
+  createEventNonce.value++
+}
+
+function openTasksTab() {
+  goToTab('tasks')
+  createTaskNonce.value++
+}
 </script>
 
 <template>
@@ -135,10 +145,7 @@ function goToTab(key: TabKey | string) {
             variant="secondary"
             size="sm"
             type="button"
-            @click="
-              goToTab('history')
-              createEventNonce++
-            "
+            @click="openHistoryTab"
           >
             + {{ t('boats.show.addEntry') }}
           </BaseButton>
@@ -147,10 +154,7 @@ function goToTab(key: TabKey | string) {
             variant="primary"
             size="sm"
             type="button"
-            @click="
-              goToTab('tasks')
-              createTaskNonce++
-            "
+            @click="openTasksTab"
           >
             + {{ t('boats.show.addTask') }}
           </BaseButton>
