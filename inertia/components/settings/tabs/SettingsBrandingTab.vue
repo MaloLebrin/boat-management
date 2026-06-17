@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { router } from '@inertiajs/vue3'
 import { Form } from '@adonisjs/inertia/vue'
 import BaseCard from '~/components/base/BaseCard.vue'
@@ -19,8 +19,8 @@ const props = defineProps<{
 const logoInput = ref<HTMLInputElement | null>(null)
 const logoPreview = ref<string | null>(props.branding.logoUrl)
 
-const primaryColor = computed(() => props.branding.primaryColor ?? '#3b82f6')
-const secondaryColor = computed(() => props.branding.secondaryColor ?? '#6b7280')
+const primaryColor = ref(props.branding.primaryColor ?? '#3b82f6')
+const secondaryColor = ref(props.branding.secondaryColor ?? '#6b7280')
 
 function onLogoChange(event: Event) {
   const file = (event.target as HTMLInputElement).files?.[0]
@@ -117,6 +117,7 @@ function deleteLogo() {
                   name="primaryColor"
                   :value="primaryColor"
                   class="h-10 w-14 cursor-pointer rounded border border-border bg-transparent p-0.5"
+                  @input="primaryColor = ($event.target as HTMLInputElement).value"
                 />
                 <span class="text-sm text-fg-muted font-mono">{{ primaryColor }}</span>
               </div>
@@ -129,6 +130,7 @@ function deleteLogo() {
                   name="secondaryColor"
                   :value="secondaryColor"
                   class="h-10 w-14 cursor-pointer rounded border border-border bg-transparent p-0.5"
+                  @input="secondaryColor = ($event.target as HTMLInputElement).value"
                 />
                 <span class="text-sm text-fg-muted font-mono">{{ secondaryColor }}</span>
               </div>

@@ -3,7 +3,11 @@ import type { MultipartFile } from '@adonisjs/core/bodyparser'
 import { CloudinaryService, CloudinaryFolders } from '#services/cloudinary_service'
 import type Organization from '#models/organization'
 import { PLAN_LIMITS } from '#shared/types/plan'
-import type { BrandingConfig, BrandingEmailParams } from '#shared/types/branding'
+import type {
+  BrandingConfig,
+  BrandingEmailParams,
+  BrandingSharedProps,
+} from '#shared/types/branding'
 
 @inject()
 export class BrandingService {
@@ -22,6 +26,15 @@ export class BrandingService {
     return {
       logoUrl: org.logoUrl,
       logoPublicId: org.logoPublicId,
+      primaryColor: org.primaryColor,
+      secondaryColor: org.secondaryColor,
+      appName: org.appName,
+    }
+  }
+
+  toSharedProps(org: Organization): BrandingSharedProps {
+    return {
+      logoUrl: org.logoUrl,
       primaryColor: org.primaryColor,
       secondaryColor: org.secondaryColor,
       appName: org.appName,
@@ -55,9 +68,10 @@ export class BrandingService {
     org: Organization,
     data: { primaryColor?: string | null; secondaryColor?: string | null; appName?: string | null }
   ): Promise<void> {
-    org.primaryColor = data.primaryColor ?? org.primaryColor
-    org.secondaryColor = data.secondaryColor ?? org.secondaryColor
-    org.appName = data.appName ?? org.appName
+    org.primaryColor = data.primaryColor !== undefined ? data.primaryColor : org.primaryColor
+    org.secondaryColor =
+      data.secondaryColor !== undefined ? data.secondaryColor : org.secondaryColor
+    org.appName = data.appName !== undefined ? data.appName : org.appName
     await org.save()
   }
 }

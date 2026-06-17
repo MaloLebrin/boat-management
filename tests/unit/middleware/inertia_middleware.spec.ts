@@ -13,14 +13,26 @@ test.group('resolveSharedCurrentPlan', () => {
   })
 })
 
+const stubBrandingService = {
+  toSharedProps: (org: any) => ({
+    logoUrl: org.logoUrl,
+    primaryColor: org.primaryColor,
+    secondaryColor: org.secondaryColor,
+    appName: org.appName,
+  }),
+}
+
 test.group('resolveSharedBranding', () => {
   test('returns undefined when user is missing', async ({ assert }) => {
-    assert.isUndefined(await resolveSharedBranding(undefined))
+    assert.isUndefined(await resolveSharedBranding(undefined, stubBrandingService))
   })
 
   test('returns undefined when user has no organization', async ({ assert }) => {
     assert.isUndefined(
-      await resolveSharedBranding({ organizationId: null, load: async () => {} } as any)
+      await resolveSharedBranding(
+        { organizationId: null, load: async () => {} } as any,
+        stubBrandingService
+      )
     )
   })
 
@@ -30,10 +42,10 @@ test.group('resolveSharedBranding', () => {
       load: async () => {},
       organization: { plan: 'pro' },
     }
-    assert.isUndefined(await resolveSharedBranding(user as any))
+    assert.isUndefined(await resolveSharedBranding(user as any, stubBrandingService))
   })
 
-  test('returns branding config for Enterprise plan', async ({ assert }) => {
+  test('returns branding shared props for Enterprise plan', async ({ assert }) => {
     const user = {
       organizationId: 1,
       load: async () => {},
@@ -46,10 +58,9 @@ test.group('resolveSharedBranding', () => {
         appName: 'MyFleet',
       },
     }
-    const result = await resolveSharedBranding(user as any)
+    const result = await resolveSharedBranding(user as any, stubBrandingService)
     assert.deepEqual(result, {
       logoUrl: 'https://cdn.example.com/logo.png',
-      logoPublicId: 'orgs/logo',
       primaryColor: '#ff0000',
       secondaryColor: '#00ff00',
       appName: 'MyFleet',

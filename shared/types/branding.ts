@@ -1,9 +1,12 @@
-export interface BrandingConfig {
+export interface BrandingSharedProps {
   logoUrl: string | null
-  logoPublicId: string | null
   primaryColor: string | null
   secondaryColor: string | null
   appName: string | null
+}
+
+export interface BrandingConfig extends BrandingSharedProps {
+  logoPublicId: string | null
 }
 
 export interface BrandingUpdatePayload {
