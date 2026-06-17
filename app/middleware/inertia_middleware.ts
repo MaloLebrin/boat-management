@@ -16,11 +16,11 @@ export async function resolveSharedCurrentPlan(
 
 export async function resolveSharedBranding(
   user: User | undefined
-): Promise<BrandingConfig | null> {
-  if (!user?.organizationId) return null
+): Promise<BrandingConfig | undefined> {
+  if (!user?.organizationId) return undefined
   await user.load('organization')
   const org = user.organization
-  if (!PLAN_LIMITS[org.plan].canWhiteLabel) return null
+  if (!PLAN_LIMITS[org.plan].canWhiteLabel) return undefined
   return {
     logoUrl: org.logoUrl,
     logoPublicId: org.logoPublicId,
@@ -67,7 +67,7 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
       }),
       user: ctx.inertia.always(auth?.user ? UserTransformer.transform(auth.user) : undefined),
       currentPlan: ctx.inertia.always(currentPlan),
-      branding: ctx.inertia.always(branding as Record<string, string | null> | null),
+      branding: ctx.inertia.always(branding as Record<string, string | null> | undefined),
     }
   }
 
