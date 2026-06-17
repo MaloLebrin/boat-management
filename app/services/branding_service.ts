@@ -42,18 +42,20 @@ export class BrandingService {
   }
 
   async uploadLogo(org: Organization, file: MultipartFile): Promise<void> {
-    if (org.logoPublicId) {
-      await this.cloudinaryService.deleteFile(org.logoPublicId, 'image')
-    }
-
     const result = await this.cloudinaryService.uploadImage(
       file,
       CloudinaryFolders.orgLogo(org.slug)
     )
 
+    const oldPublicId = org.logoPublicId
+
     org.logoUrl = result.secureUrl
     org.logoPublicId = result.publicId
     await org.save()
+
+    if (oldPublicId) {
+      await this.cloudinaryService.deleteFile(oldPublicId, 'image')
+    }
   }
 
   async deleteLogo(org: Organization): Promise<void> {
@@ -71,7 +73,8 @@ export class BrandingService {
     org.primaryColor = data.primaryColor !== undefined ? data.primaryColor : org.primaryColor
     org.secondaryColor =
       data.secondaryColor !== undefined ? data.secondaryColor : org.secondaryColor
-    org.appName = data.appName !== undefined ? data.appName : org.appName
+    org.appName =
+      data.appName !== undefined ? (data.appName === '' ? null : data.appName) : org.appName
     await org.save()
   }
 }
