@@ -6,7 +6,8 @@
     "billing": "Billing & plan",
     "me": "My profile",
     "ai": "AI customisation",
-    "auditLog": "Activity log"
+    "auditLog": "Activity log",
+    "branding": "White label"
   },
   "org": {
     "title": "Organisation profile",
@@ -133,6 +134,23 @@
       "mistral-large-latest": "Mistral Large (powerful)"
     },
     "save": "Save"
+  },
+  "branding": {
+    "title": "White label",
+    "description": "Customise the application appearance for your organisation.",
+    "logoLabel": "Organisation logo",
+    "logoHint": "Accepted formats: JPG, PNG, SVG, WebP. Max size: 2 MB.",
+    "uploadLogo": "Upload logo",
+    "deleteLogo": "Delete logo",
+    "primaryColorLabel": "Primary colour",
+    "secondaryColorLabel": "Secondary colour",
+    "appNameLabel": "Application name",
+    "appNamePlaceholder": "Fleetide",
+    "appNameHint": "Replaces the name displayed in the interface.",
+    "preview": "Preview",
+    "save": "Save",
+    "resetColor": "Reset",
+    "setCustomColor": "Set custom colour"
   },
   "auditLog": {
     "title": "Activity log",

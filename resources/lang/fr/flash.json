@@ -58,7 +58,10 @@
   "settings": {
     "profileUpdated": "Profil mis à jour.",
     "orgUpdated": "Organisation mise à jour.",
-    "aiSettingsUpdated": "Paramètres IA mis à jour."
+    "aiSettingsUpdated": "Paramètres IA mis à jour.",
+    "brandingUpdated": "Apparence mise à jour.",
+    "logoUpdated": "Logo mis à jour.",
+    "logoDeleted": "Logo supprimé."
   },
   "enginePart": {
     "created": "Pièce ajoutée.",

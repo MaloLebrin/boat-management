@@ -1,12 +1,16 @@
 import type StorageThresholdCrossed from '#events/storage_threshold_crossed'
 import EmailQueueService from '#services/email_queue_service'
+import { BrandingService } from '#services/branding_service'
 import OrganizationMembership from '#models/organization_membership'
 import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
 
 @inject()
 export default class SendStorageQuotaNotification {
-  constructor(private emailQueueService: EmailQueueService) {}
+  constructor(
+    private emailQueueService: EmailQueueService,
+    private brandingService: BrandingService
+  ) {}
 
   async handle(event: StorageThresholdCrossed) {
     const { organization: org, percent } = event
@@ -20,6 +24,7 @@ export default class SendStorageQuotaNotification {
 
     const yearMonth = DateTime.now().toFormat('yyyy-MM')
 
+    const branding = this.brandingService.toEmailParams(org)
     for (const membership of adminMemberships) {
       await this.emailQueueService.sendStorageQuotaWarning({
         to: membership.user.email,
@@ -27,6 +32,7 @@ export default class SendStorageQuotaNotification {
         percent,
         orgName: org.name,
         correlationSuffix: `${org.id}:${percent}:${yearMonth}`,
+        branding,
       })
     }
   }

@@ -1,8 +1,11 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import type { NextFn } from '@adonisjs/core/types/http'
+import { inject } from '@adonisjs/core'
 import UserTransformer from '#transformers/user_transformer'
 import BaseInertiaMiddleware from '@adonisjs/inertia/inertia_middleware'
-import type { PlanTier } from '#shared/types/plan'
+import { PLAN_LIMITS, type PlanTier } from '#shared/types/plan'
+import type { BrandingSharedProps } from '#shared/types/branding'
+import { BrandingService } from '#services/branding_service'
 import type User from '#models/user'
 
 export async function resolveSharedCurrentPlan(
@@ -13,7 +16,22 @@ export async function resolveSharedCurrentPlan(
   return user.organization.plan
 }
 
+export async function resolveSharedBranding(
+  user: User | undefined,
+  brandingService: Pick<BrandingService, 'toSharedProps'>
+): Promise<BrandingSharedProps | undefined> {
+  if (!user?.organization) return undefined
+  const org = user.organization
+  if (!PLAN_LIMITS[org.plan].canWhiteLabel) return undefined
+  return brandingService.toSharedProps(org)
+}
+
+@inject()
 export default class InertiaMiddleware extends BaseInertiaMiddleware {
+  constructor(private brandingService: BrandingService) {
+    super()
+  }
+
   async share(ctx: HttpContext) {
     /**
      * The share method is called everytime an Inertia page is rendered. In
@@ -30,7 +48,11 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
 
     const BACKEND_NAMESPACES = new Set(['flash', 'marketing', 'validator'])
 
+    if (auth?.user?.organizationId) {
+      await auth.user.load('organization')
+    }
     const currentPlan = await resolveSharedCurrentPlan(auth?.user)
+    const branding = await resolveSharedBranding(auth?.user, this.brandingService)
 
     return {
       errors: ctx.inertia.always(this.getValidationErrors(ctx)),
@@ -49,6 +71,7 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
       }),
       user: ctx.inertia.always(auth?.user ? UserTransformer.transform(auth.user) : undefined),
       currentPlan: ctx.inertia.always(currentPlan),
+      branding: ctx.inertia.always(branding),
     }
   }
 

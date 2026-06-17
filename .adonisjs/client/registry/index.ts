@@ -624,6 +624,30 @@ const routes = {
     tokens: [{"old":"/settings/audit-log","type":0,"val":"settings","end":""},{"old":"/settings/audit-log","type":0,"val":"audit-log","end":""}],
     types: placeholder as Registry['settings.auditLog']['types'],
   },
+  'settings.branding': {
+    methods: ["GET","HEAD"],
+    pattern: '/settings/branding',
+    tokens: [{"old":"/settings/branding","type":0,"val":"settings","end":""},{"old":"/settings/branding","type":0,"val":"branding","end":""}],
+    types: placeholder as Registry['settings.branding']['types'],
+  },
+  'settings.branding.update': {
+    methods: ["PUT"],
+    pattern: '/settings/branding',
+    tokens: [{"old":"/settings/branding","type":0,"val":"settings","end":""},{"old":"/settings/branding","type":0,"val":"branding","end":""}],
+    types: placeholder as Registry['settings.branding.update']['types'],
+  },
+  'settings.branding.logo.upload': {
+    methods: ["POST"],
+    pattern: '/settings/branding/logo',
+    tokens: [{"old":"/settings/branding/logo","type":0,"val":"settings","end":""},{"old":"/settings/branding/logo","type":0,"val":"branding","end":""},{"old":"/settings/branding/logo","type":0,"val":"logo","end":""}],
+    types: placeholder as Registry['settings.branding.logo.upload']['types'],
+  },
+  'settings.branding.logo.delete': {
+    methods: ["DELETE"],
+    pattern: '/settings/branding/logo',
+    tokens: [{"old":"/settings/branding/logo","type":0,"val":"settings","end":""},{"old":"/settings/branding/logo","type":0,"val":"branding","end":""},{"old":"/settings/branding/logo","type":0,"val":"logo","end":""}],
+    types: placeholder as Registry['settings.branding.logo.delete']['types'],
+  },
   'maintenance.history': {
     methods: ["GET","HEAD"],
     pattern: '/maintenance/history',

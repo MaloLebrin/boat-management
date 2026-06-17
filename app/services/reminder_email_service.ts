@@ -5,6 +5,7 @@ import OrganizationMembership from '#models/organization_membership'
 import Port from '#models/port'
 import User from '#models/user'
 import EmailQueueService from '#services/email_queue_service'
+import { BrandingService } from '#services/branding_service'
 import type { ReminderBoatItem, ReminderPortItem, ReminderTaskItem } from '#shared/types/reminder'
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
@@ -12,7 +13,10 @@ import { DateTime } from 'luxon'
 
 @inject()
 export default class ReminderEmailService {
-  constructor(private emailQueueService: EmailQueueService) {}
+  constructor(
+    private emailQueueService: EmailQueueService,
+    private brandingService: BrandingService
+  ) {}
 
   async sendInactiveAccountReminders(): Promise<void> {
     const sevenDaysAgo = DateTime.now().minus({ days: 7 })
@@ -35,11 +39,13 @@ export default class ReminderEmailService {
         .where('role', 'admin')
         .preload('user')
 
+      const branding = this.brandingService.toEmailParams(org)
       for (const membership of admins) {
         await this.emailQueueService.sendReminderInactiveAccount({
           to: membership.user.email,
           name: membership.user.fullName,
           orgName: org.name,
+          branding,
         })
         sent++
       }
@@ -74,18 +80,23 @@ export default class ReminderEmailService {
       boatsByOrg.set(boat.organizationId, list)
     }
 
+    const orgMap = await this.orgMapForIds([...boatsByOrg.keys()])
+
     let sent = 0
     for (const [orgId, orgBoats] of boatsByOrg) {
+      const org = orgMap.get(orgId)
       const admins = await OrganizationMembership.query()
         .where('organizationId', orgId)
         .where('role', 'admin')
         .preload('user')
+      const branding = org ? this.brandingService.toEmailParams(org) : null
 
       for (const membership of admins) {
         await this.emailQueueService.sendReminderIncompleteBoats({
           to: membership.user.email,
           name: membership.user.fullName,
           boats: orgBoats,
+          branding,
         })
         sent++
       }
@@ -113,18 +124,23 @@ export default class ReminderEmailService {
       portsByOrg.set(port.organizationId, list)
     }
 
+    const orgMapForPorts = await this.orgMapForIds([...portsByOrg.keys()])
+
     let sent = 0
     for (const [orgId, orgPorts] of portsByOrg) {
+      const org = orgMapForPorts.get(orgId)
       const admins = await OrganizationMembership.query()
         .where('organizationId', orgId)
         .where('role', 'admin')
         .preload('user')
+      const branding = org ? this.brandingService.toEmailParams(org) : null
 
       for (const membership of admins) {
         await this.emailQueueService.sendReminderIncompletePorts({
           to: membership.user.email,
           name: membership.user.fullName,
           ports: orgPorts,
+          branding,
         })
         sent++
       }
@@ -188,18 +204,23 @@ export default class ReminderEmailService {
       tasksByOrg.set(orgId, list)
     }
 
+    const orgMapForOverdue = await this.orgMapForIds([...tasksByOrg.keys()])
+
     let sent = 0
     for (const [orgId, orgTasks] of tasksByOrg) {
+      const org = orgMapForOverdue.get(orgId)
       const admins = await OrganizationMembership.query()
         .where('organizationId', orgId)
         .where('role', 'admin')
         .preload('user')
+      const branding = org ? this.brandingService.toEmailParams(org) : null
 
       for (const membership of admins) {
         await this.emailQueueService.sendReminderOverdueTasks({
           to: membership.user.email,
           name: membership.user.fullName,
           tasks: orgTasks,
+          branding,
         })
         sent++
       }
@@ -239,18 +260,23 @@ export default class ReminderEmailService {
       tasksByOrg.set(orgId, list)
     }
 
+    const orgMapForEngine = await this.orgMapForIds([...tasksByOrg.keys()])
+
     let sent = 0
     for (const [orgId, orgTasks] of tasksByOrg) {
+      const org = orgMapForEngine.get(orgId)
       const admins = await OrganizationMembership.query()
         .where('organizationId', orgId)
         .where('role', 'admin')
         .preload('user')
+      const branding = org ? this.brandingService.toEmailParams(org) : null
 
       for (const membership of admins) {
         await this.emailQueueService.sendReminderEngineTasks({
           to: membership.user.email,
           name: membership.user.fullName,
           tasks: orgTasks,
+          branding,
         })
         sent++
       }
@@ -290,23 +316,33 @@ export default class ReminderEmailService {
       tasksByOrg.set(orgId, list)
     }
 
+    const orgMapForBoatCheck = await this.orgMapForIds([...tasksByOrg.keys()])
+
     let sent = 0
     for (const [orgId, orgTasks] of tasksByOrg) {
+      const org = orgMapForBoatCheck.get(orgId)
       const admins = await OrganizationMembership.query()
         .where('organizationId', orgId)
         .where('role', 'admin')
         .preload('user')
+      const branding = org ? this.brandingService.toEmailParams(org) : null
 
       for (const membership of admins) {
         await this.emailQueueService.sendReminderBoatCheckTasks({
           to: membership.user.email,
           name: membership.user.fullName,
           tasks: orgTasks,
+          branding,
         })
         sent++
       }
     }
 
     logger.info({ sent }, 'ReminderEmailService.sendBoatCheckReminders: done')
+  }
+
+  private async orgMapForIds(ids: number[]): Promise<Map<number, Organization>> {
+    const orgs = await Organization.query().whereIn('id', ids)
+    return new Map(orgs.map((o) => [o.id, o]))
   }
 }

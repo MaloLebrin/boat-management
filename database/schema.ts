@@ -738,10 +738,15 @@ export class OrganizationSchema extends BaseModel {
   static $columns = [
     'aiModelOverride',
     'aiSystemPrompt',
+    'appName',
     'createdAt',
     'id',
+    'logoPublicId',
+    'logoUrl',
     'name',
     'plan',
+    'primaryColor',
+    'secondaryColor',
     'slug',
     'storageUsedBytes',
     'stripeCustomerId',
@@ -752,14 +757,24 @@ export class OrganizationSchema extends BaseModel {
   declare aiModelOverride: string | null
   @column()
   declare aiSystemPrompt: string | null
+  @column()
+  declare appName: string | null
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
   @column({ isPrimary: true })
   declare id: number
   @column()
+  declare logoPublicId: string | null
+  @column()
+  declare logoUrl: string | null
+  @column()
   declare name: string
   @column()
   declare plan: string
+  @column()
+  declare primaryColor: string | null
+  @column()
+  declare secondaryColor: string | null
   @column()
   declare slug: string
   @column()

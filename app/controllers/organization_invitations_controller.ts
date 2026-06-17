@@ -1,6 +1,7 @@
 import OrganizationInvitationService from '#services/organization_invitation_service'
 import EmailQueueService from '#services/email_queue_service'
 import QuotaService from '#services/quota_service'
+import { BrandingService } from '#services/branding_service'
 import OrganizationPolicy from '#policies/organization_policy'
 import {
   AlreadyMemberError,
@@ -20,7 +21,8 @@ export default class OrganizationInvitationsController {
   constructor(
     private invitationService: OrganizationInvitationService,
     private emailQueueService: EmailQueueService,
-    private quotaService: QuotaService
+    private quotaService: QuotaService,
+    private brandingService: BrandingService
   ) {}
 
   async store({ request, response, auth, bouncer, session, i18n }: HttpContext) {
@@ -47,6 +49,7 @@ export default class OrganizationInvitationsController {
         inviterName: user.fullName,
         orgName: user.organization.name,
         acceptUrl,
+        branding: this.brandingService.toEmailParams(user.organization),
       })
 
       session.flash('success', i18n.t('flash.invitation.sent'))
