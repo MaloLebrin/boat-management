@@ -515,6 +515,7 @@
       "createEntry": "Créer l'entrée",
       "immutable": "Une fois enregistré, cet événement devient immuable.",
       "noRig": "Enregistrez un gréement sur ce bateau avant d'ajouter des entrées gréement.",
+      "noSafety": "Enregistrez des équipements de sécurité sur ce bateau avant d'ajouter des entrées sécurité.",
       "enginePlaceholder": "ex. Moteur diesel intérieur bâbord",
       "sailPlaceholder": "ex. Génois n°2",
       "selectPlaceholder": "— Sélectionner —",

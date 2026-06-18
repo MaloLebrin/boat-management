@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import { useT } from '~/composables/use_t'
@@ -19,22 +20,28 @@ const sailCaptionManual = defineModel<string>('sailCaptionManual', { default: ''
 
 const { t } = useT()
 
-const engineOptions = props.boat.engines.map((e) => ({
-  value: String(e.id),
-  label: `${e.kind} · ${e.brand ?? ''} ${e.model ?? ''}`.trim(),
-}))
+const engineOptions = computed(() =>
+  props.boat.engines.map((e) => ({
+    value: String(e.id),
+    label: `${e.kind} · ${e.brand ?? ''} ${e.model ?? ''}`.trim(),
+  }))
+)
 
-const sailOptions = props.boat.sails.map((s) => ({
-  value: String(s.id),
-  label: `${s.sailType}${s.areaM2 !== null ? ` · ${s.areaM2} m²` : ''}`,
-}))
+const sailOptions = computed(() =>
+  props.boat.sails.map((s) => ({
+    value: String(s.id),
+    label: `${s.sailType}${s.areaM2 !== null ? ` · ${s.areaM2} m²` : ''}`,
+  }))
+)
 
-const safetyOptions = props.boat.safetyEquipment.map((item) => ({
-  value: String(item.id),
-  label:
-    t(`boats.options.safetyEquipmentType.${item.equipmentType}`) +
-    (item.quantity !== null ? ` ×${item.quantity}` : ''),
-}))
+const safetyOptions = computed(() =>
+  props.boat.safetyEquipment.map((item) => ({
+    value: String(item.id),
+    label:
+      t(`boats.options.safetyEquipmentType.${item.equipmentType}`) +
+      (item.quantity !== null ? ` ×${item.quantity}` : ''),
+  }))
+)
 </script>
 
 <template>
@@ -92,8 +99,9 @@ const safetyOptions = props.boat.safetyEquipment.map((item) => ({
     </p>
   </template>
 
-  <template v-else-if="subject === 'safety' && safetyOptions.length">
+  <template v-else-if="subject === 'safety'">
     <BaseSelect
+      v-if="safetyOptions.length"
       id="maint-safety"
       name="boatSafetyEquipmentId"
       :label="t('boats.maintenance.events.safetyEquipment')"
@@ -103,5 +111,8 @@ const safetyOptions = props.boat.safetyEquipment.map((item) => ({
       v-model="boatSafetyEquipmentId"
       :errors="errors"
     />
+    <p v-else class="text-sm text-warning">
+      {{ t('boats.maintenance.events.noSafety') }}
+    </p>
   </template>
 </template>

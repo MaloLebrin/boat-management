@@ -614,6 +614,8 @@ export default class MaintenanceLogPdfService {
     const rig: BoatRig | null = (boat.rig as unknown as BoatRig) ?? null
     const safety = this.#castSafety(boat)
 
+    if (engines.length === 0 && sails.length === 0 && !rig && safety.length === 0) return
+
     if (doc.y > 700) doc.addPage()
     this.#sectionBand(doc, t('sectionInventory'))
 
@@ -710,10 +712,19 @@ export default class MaintenanceLogPdfService {
           ? 'statusOk'
           : item.status === 'to_check'
             ? 'statusToCheck'
-            : 'statusExpired'
+            : item.status === 'expired'
+              ? 'statusExpired'
+              : null
+      const statusLabel = statusKey ? t(statusKey) : '—'
       const statusColor =
-        item.status === 'ok' ? '#2e7d32' : item.status === 'to_check' ? '#e65100' : CORAL
-      rows.push([name, qty, t(statusKey), statusColor])
+        item.status === 'ok'
+          ? '#2e7d32'
+          : item.status === 'to_check'
+            ? '#e65100'
+            : item.status === 'expired'
+              ? CORAL
+              : GREY_M
+      rows.push([name, qty, statusLabel, statusColor])
     }
 
     for (const [name, type, status, dotColor] of rows) {

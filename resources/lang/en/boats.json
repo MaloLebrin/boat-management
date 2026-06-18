@@ -496,6 +496,7 @@
       "createEntry": "Create entry",
       "immutable": "Once saved, this event becomes immutable.",
       "noRig": "Save a rig on this boat before adding rig entries.",
+      "noSafety": "Save safety equipment on this boat before adding safety entries.",
       "enginePlaceholder": "e.g. Inboard diesel port",
       "sailPlaceholder": "e.g. Genoa #2",
       "selectPlaceholder": "— Select —",
