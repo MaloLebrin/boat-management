@@ -96,6 +96,9 @@
     "notConfigured": "Payment is not configured yet. Please contact support.",
     "noSubscription": "No active subscription found."
   },
+  "demo": {
+    "rateLimitError": "Too many attempts. Please try again in a minute."
+  },
   "quota": {
     "boatsExceeded": "You have reached the boat limit for your plan. Upgrade to add more boats.",
     "membersExceeded": "You have reached the member limit for your plan. Upgrade to add more members.",

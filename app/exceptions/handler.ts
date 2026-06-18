@@ -2,6 +2,7 @@ import app from '@adonisjs/core/services/app'
 import { type HttpContext, ExceptionHandler } from '@adonisjs/core/http'
 import type { StatusPageRange, StatusPageRenderer } from '@adonisjs/core/types/http'
 import { QuotaExceededError } from '#exceptions/quota_errors'
+import { errors as limiterErrors } from '@adonisjs/limiter'
 
 export default class HttpExceptionHandler extends ExceptionHandler {
   /**
@@ -31,6 +32,10 @@ export default class HttpExceptionHandler extends ExceptionHandler {
    * response to the client
    */
   async handle(error: unknown, ctx: HttpContext) {
+    if (error instanceof limiterErrors.E_TOO_MANY_REQUESTS) {
+      ctx.session.flash('error', ctx.i18n.t('flash.demo.rateLimitError'))
+      return ctx.response.redirect().back()
+    }
     if (error instanceof QuotaExceededError) {
       const key =
         error.feature === 'storage' && error.alreadyOverLimit

@@ -96,6 +96,9 @@
     "notConfigured": "Le paiement n'est pas encore configuré. Contactez le support.",
     "noSubscription": "Aucun abonnement actif trouvé."
   },
+  "demo": {
+    "rateLimitError": "Trop de tentatives. Veuillez réessayer dans une minute."
+  },
   "quota": {
     "boatsExceeded": "Vous avez atteint la limite de bateaux de votre plan. Passez à un plan supérieur pour en ajouter.",
     "membersExceeded": "Vous avez atteint la limite de membres de votre plan. Passez à un plan supérieur pour en ajouter.",

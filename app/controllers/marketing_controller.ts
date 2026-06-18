@@ -456,6 +456,7 @@ export default class MarketingController {
           noCommitment: i18n.t('marketing.home.demo.no_commitment'),
           tryDemoLabel: i18n.t('marketing.home.demo.try_demo_label'),
           tryDemoSubtitle: i18n.t('marketing.home.demo.try_demo_subtitle'),
+          demoLoginPath: '/demo',
         },
         finalCta: {
           title: i18n.t('marketing.home.final_cta.title'),

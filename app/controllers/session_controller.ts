@@ -1,4 +1,3 @@
-import ResetDemoData from '#jobs/reset_demo_data'
 import AuditLogService from '#services/audit_log_service'
 import DemoService from '#services/demo_service'
 import UserService from '#services/user_service'
@@ -52,7 +51,7 @@ export default class SessionController {
     await auth.use('web').logout()
 
     if (isDemo) {
-      await ResetDemoData.dispatch({})
+      await this.demoService.scheduleReset()
     }
 
     response.redirect().toRoute('session.create')

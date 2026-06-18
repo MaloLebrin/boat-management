@@ -131,6 +131,7 @@ interface PageProps {
         noCommitment: string
         tryDemoLabel: string
         tryDemoSubtitle: string
+        demoLoginPath: string
       }
       finalCta: {
         title: string
@@ -289,6 +290,7 @@ onUnmounted(() => {
     :no-commitment="t.home.demo.noCommitment"
     :try-demo-label="t.home.demo.tryDemoLabel"
     :try-demo-subtitle="t.home.demo.tryDemoSubtitle"
+    :demo-login-path="t.home.demo.demoLoginPath"
     :locale="locale"
   />
 
