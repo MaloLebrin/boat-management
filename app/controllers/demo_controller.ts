@@ -6,10 +6,9 @@ import type { HttpContext } from '@adonisjs/core/http'
 export default class DemoController {
   constructor(private demoService: DemoService) {}
 
-  async login({ auth, response, session }: HttpContext) {
+  async login({ auth, response }: HttpContext) {
     const user = await this.demoService.ensureExists()
     await auth.use('web').login(user, false)
-    session.flash('demo_mode', true)
     return response.redirect().toRoute('dashboard')
   }
 }

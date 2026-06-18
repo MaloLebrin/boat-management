@@ -811,7 +811,7 @@ const routes = {
     types: placeholder as Registry['ai.boatSuggestions']['types'],
   },
   'demo.login': {
-    methods: ["GET","HEAD"],
+    methods: ["POST"],
     pattern: '/demo',
     tokens: [{"old":"/demo","type":0,"val":"demo","end":""}],
     types: placeholder as Registry['demo.login']['types'],

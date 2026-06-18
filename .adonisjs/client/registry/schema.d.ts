@@ -1616,7 +1616,7 @@ export interface Registry {
     }
   }
   'demo.login': {
-    methods: ["GET","HEAD"]
+    methods: ["POST"]
     pattern: '/demo'
     types: {
       body: {}

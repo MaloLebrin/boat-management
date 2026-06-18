@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { CheckCircleIcon, CalendarDaysIcon, PlayCircleIcon } from '@heroicons/vue/24/outline'
+import { router } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
 import { useScrollReveal } from '~/composables/use_scroll_reveal'
 
@@ -58,11 +59,9 @@ const { el, isVisible } = useScrollReveal()
             <p class="font-display text-2xl text-fg">{{ tryDemoLabel }}</p>
             <p class="mt-2 text-sm text-fg-subtle">{{ tryDemoSubtitle }}</p>
             <div class="mt-6">
-              <a href="/demo">
-                <BaseButton size="lg" class="w-full justify-center">
-                  {{ tryDemoLabel }}
-                </BaseButton>
-              </a>
+              <BaseButton size="lg" class="w-full justify-center" @click="router.post('/demo')">
+                {{ tryDemoLabel }}
+              </BaseButton>
             </div>
           </div>
 

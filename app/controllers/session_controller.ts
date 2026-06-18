@@ -1,3 +1,4 @@
+import ResetDemoData from '#jobs/reset_demo_data'
 import AuditLogService from '#services/audit_log_service'
 import DemoService from '#services/demo_service'
 import UserService from '#services/user_service'
@@ -38,7 +39,7 @@ export default class SessionController {
 
   async destroy({ auth, response }: HttpContext) {
     const user = auth.user
-    const isDemo = user ? await this.demoService.isDemoUser(user.id) : false
+    const isDemo = user ? this.demoService.isDemoUser(user.email) : false
 
     if (user?.organizationId && !isDemo) {
       await this.auditLogService.log({
@@ -51,7 +52,7 @@ export default class SessionController {
     await auth.use('web').logout()
 
     if (isDemo) {
-      await this.demoService.reset()
+      await ResetDemoData.dispatch({})
     }
 
     response.redirect().toRoute('session.create')

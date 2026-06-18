@@ -6,14 +6,13 @@ import User from '#models/user'
 import BoatEquipmentService from '#services/boat_equipment_service'
 import BoatMaintenanceService from '#services/boat_maintenance_service'
 import BoatService from '#services/boat_hull_service'
+import { DEMO_EMAIL, DEMO_ORG_SLUG } from '#shared/constants/demo'
 import app from '@adonisjs/core/services/app'
 import { BaseSeeder } from '@adonisjs/lucid/seeders'
 import type { QueryClientContract } from '@adonisjs/lucid/types/database'
 import { DateTime } from 'luxon'
 
-const DEMO_EMAIL = process.env.DEMO_EMAIL ?? 'demo@fleetai.app'
 const DEMO_PASSWORD = process.env.DEMO_PASSWORD ?? 'demo1234'
-const DEMO_ORG_SLUG = 'marina-demo'
 
 export async function seedDemoData() {
   const today = DateTime.now().startOf('day')
