@@ -56,6 +56,7 @@ export default class BoatMaintenanceService {
       case 'safety': {
         if (payload.boatSafetyEquipmentId) {
           const item = await BoatSafetyEquipment.query()
+            .select('id')
             .where('id', payload.boatSafetyEquipmentId)
             .where('boatId', boat.id)
             .first()

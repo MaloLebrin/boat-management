@@ -6,10 +6,10 @@ import BaseInput from '~/components/base/BaseInput.vue'
 import BaseModal from '~/components/base/BaseModal.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
-import BoatMaintenanceMaintenanceTaskSubjectFields from './BoatMaintenanceMaintenanceTaskSubjectFields.vue'
+import BoatMaintenanceSubjectFields from './BoatMaintenanceSubjectFields.vue'
 import { useT } from '~/composables/use_t'
 import type { BoatShowDetail } from '~/types/boat_show'
-import type { MaintenanceTaskMaintenanceTaskSubject } from '../../../../shared/types/maintenance'
+import type { MaintenanceTaskSubject } from '../../../../shared/types/maintenance'
 
 const props = defineProps<{
   boat: BoatShowDetail
@@ -109,7 +109,7 @@ function close() {
         />
       </div>
 
-      <BoatMaintenanceMaintenanceTaskSubjectFields
+      <BoatMaintenanceSubjectFields
         :boat="boat"
         :subject="subject"
         :errors="errors"

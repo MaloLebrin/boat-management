@@ -59,8 +59,7 @@ export default class MaintenanceLogPdfService {
 
     const tOpt = (ns: string, key: string) => i18n.t(`boats.options.${ns}.${key}`)
 
-    const safety: BoatSafetyEquipment[] =
-      (boat.safetyEquipment as unknown as BoatSafetyEquipment[]) ?? []
+    const safety = this.#castSafety(boat)
     const safetyMap = new Map(safety.map((s) => [s.id, s]))
 
     const rows: EventRow[] = events.map((ev) => {
@@ -258,8 +257,7 @@ export default class MaintenanceLogPdfService {
     const engines: BoatEngine[] = (boat.engines as unknown as BoatEngine[]) ?? []
     const sails: BoatSail[] = (boat.sails as unknown as BoatSail[]) ?? []
     const rig: BoatRig | null = (boat.rig as unknown as BoatRig) ?? null
-    const safety: BoatSafetyEquipment[] =
-      (boat.safetyEquipment as unknown as BoatSafetyEquipment[]) ?? []
+    const safety = this.#castSafety(boat)
 
     if (engines.length === 0 && sails.length === 0 && !rig && safety.length === 0) return
 
@@ -412,19 +410,26 @@ export default class MaintenanceLogPdfService {
       const typeLabel = tOpt('safetyEquipmentType', item.equipmentType)
       const qty = item.quantity !== null ? String(item.quantity) : '—'
       const expiry = item.expiryDate ? item.expiryDate.toISODate()! : t('safetyFields.noExpiry')
-      const statusKey =
+      const statusLabel =
         item.status === 'ok'
-          ? 'statusOk'
+          ? t('statusOk')
           : item.status === 'to_check'
-            ? 'statusToCheck'
-            : 'statusExpired'
-      const statusLabel = t(statusKey)
+            ? t('statusToCheck')
+            : item.status === 'expired'
+              ? t('statusExpired')
+              : '—'
 
       drawRow(rowY, typeLabel, qty, expiry, statusLabel, false)
 
       // Status color dot
       const dotColor =
-        item.status === 'ok' ? '#2e7d32' : item.status === 'to_check' ? '#e65100' : CORAL
+        item.status === 'ok'
+          ? '#2e7d32'
+          : item.status === 'to_check'
+            ? '#e65100'
+            : item.status === 'expired'
+              ? CORAL
+              : GREY_D
       doc.circle(MARGIN + C_TYPE + C_QTY + C_EXPIRY - 10, rowY + 4, 3).fill(dotColor)
 
       doc.rect(MARGIN, rowY + 10, CONTENT_W, 0.5).fill(GREY_B)
@@ -463,8 +468,7 @@ export default class MaintenanceLogPdfService {
     const engines: BoatEngine[] = (boat.engines as unknown as BoatEngine[]) ?? []
     const sails: BoatSail[] = (boat.sails as unknown as BoatSail[]) ?? []
     const rig: BoatRig | null = (boat.rig as unknown as BoatRig) ?? null
-    const safety: BoatSafetyEquipment[] =
-      (boat.safetyEquipment as unknown as BoatSafetyEquipment[]) ?? []
+    const safety = this.#castSafety(boat)
 
     const engineEvents = rows.filter((r) => r.boatEngineId !== null)
     const sailEvents = rows.filter((r) => r.boatSailId !== null)
@@ -608,8 +612,7 @@ export default class MaintenanceLogPdfService {
     const engines: BoatEngine[] = (boat.engines as unknown as BoatEngine[]) ?? []
     const sails: BoatSail[] = (boat.sails as unknown as BoatSail[]) ?? []
     const rig: BoatRig | null = (boat.rig as unknown as BoatRig) ?? null
-    const safety: BoatSafetyEquipment[] =
-      (boat.safetyEquipment as unknown as BoatSafetyEquipment[]) ?? []
+    const safety = this.#castSafety(boat)
 
     if (doc.y > 700) doc.addPage()
     this.#sectionBand(doc, t('sectionInventory'))
@@ -783,14 +786,17 @@ export default class MaintenanceLogPdfService {
 
       if (alert) {
         doc.circle(MARGIN + C_NAME + C_REF - 6, rowY + 4, 3).fill(CORAL)
+        doc.fontSize(7.5).font('Helvetica').fillColor(stockColor)
+        doc.text(stockStr, MARGIN + C_NAME + C_REF, rowY, { width: C_STOCK - 4, lineBreak: false })
+        doc.fillColor('#000')
       }
-
-      doc.fontSize(7.5).font('Helvetica').fillColor(stockColor)
-      doc.text(stockStr, MARGIN + C_NAME + C_REF, rowY, { width: C_STOCK - 4, lineBreak: false })
-      doc.fillColor('#000')
 
       doc.rect(MARGIN, rowY + 10, CONTENT_W, 0.5).fill(GREY_B)
       doc.text('', MARGIN, rowY + 13)
     }
+  }
+
+  #castSafety(boat: Boat): BoatSafetyEquipment[] {
+    return (boat.safetyEquipment as unknown as BoatSafetyEquipment[]) ?? []
   }
 }
