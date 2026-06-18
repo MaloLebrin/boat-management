@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import BaseButton from '~/components/base/BaseButton.vue'
 import { useScrollReveal } from '~/composables/use_scroll_reveal'
 
 interface Member {
@@ -18,7 +17,6 @@ defineProps<{
   members: Member[]
   hiringTitle: string
   hiringSubtitle: string
-  hiringCta: string
 }>()
 
 const { el, isVisible } = useScrollReveal()
@@ -74,9 +72,6 @@ const { el, isVisible } = useScrollReveal()
             <p class="mt-0.5 text-sm text-white/60">{{ hiringSubtitle }}</p>
           </div>
         </div>
-        <BaseButton href="/careers" class="bg-white! text-navy-900! hover:bg-cream!">
-          {{ hiringCta }}
-        </BaseButton>
       </div>
     </div>
   </section>

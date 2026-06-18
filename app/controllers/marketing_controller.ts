@@ -846,7 +846,6 @@ export default class MarketingController {
           ],
           hiringTitle: t('team_hiring_title'),
           hiringSubtitle: t('team_hiring_subtitle'),
-          hiringCta: t('team_hiring_cta'),
         },
         numbers: {
           eyebrow: t('numbers_eyebrow'),
