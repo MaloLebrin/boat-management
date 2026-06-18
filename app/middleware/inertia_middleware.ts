@@ -6,6 +6,7 @@ import BaseInertiaMiddleware from '@adonisjs/inertia/inertia_middleware'
 import { PLAN_LIMITS, type PlanTier } from '#shared/types/plan'
 import type { BrandingSharedProps } from '#shared/types/branding'
 import { BrandingService } from '#services/branding_service'
+import { DEMO_SESSION_DURATION_MS } from '#shared/constants/demo'
 import type User from '#models/user'
 
 export async function resolveSharedCurrentPlan(
@@ -45,6 +46,9 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
 
     const error = session?.flashMessages.get('error') as string
     const success = session?.flashMessages.get('success') as string
+    const info = session?.flashMessages.get('info') as string
+
+    const demoSessionStartedAt = session?.get('demoSessionStartedAt') as number | undefined
 
     const BACKEND_NAMESPACES = new Set(['flash', 'marketing', 'validator'])
 
@@ -68,7 +72,12 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
       flash: ctx.inertia.always({
         error,
         success,
+        info,
       }),
+      demoSessionStartedAt: ctx.inertia.always(demoSessionStartedAt),
+      demoSessionDurationMs: ctx.inertia.always(
+        demoSessionStartedAt !== undefined ? DEMO_SESSION_DURATION_MS : undefined
+      ),
       user: ctx.inertia.always(auth?.user ? UserTransformer.transform(auth.user) : undefined),
       currentPlan: ctx.inertia.always(currentPlan),
       branding: ctx.inertia.always(branding),

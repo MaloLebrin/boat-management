@@ -42,6 +42,18 @@ export default [
           ],
         },
       ],
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['**/shared/constants/demo', '#shared/constants/demo'],
+              message:
+                'shared/constants/demo uses process.env — backend only, never import in inertia/',
+            },
+          ],
+        },
+      ],
     },
   },
   prettierConfig,

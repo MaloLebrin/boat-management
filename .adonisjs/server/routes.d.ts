@@ -138,6 +138,7 @@ export type ScannedRoutes = {
     'ai.chat': { paramsTuple?: []; params?: {} }
     'ai.fleetAnalysis': { paramsTuple?: []; params?: {} }
     'ai.boatSuggestions': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'demo.login': { paramsTuple?: []; params?: {} }
   }
   GET: {
     'dashboard': { paramsTuple?: []; params?: {} }
@@ -291,6 +292,7 @@ export type ScannedRoutes = {
     'ai.chat': { paramsTuple?: []; params?: {} }
     'ai.fleetAnalysis': { paramsTuple?: []; params?: {} }
     'ai.boatSuggestions': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'demo.login': { paramsTuple?: []; params?: {} }
   }
   PUT: {
     'boats.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }

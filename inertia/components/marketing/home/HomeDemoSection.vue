@@ -1,7 +1,12 @@
 <script setup lang="ts">
-import { CheckCircleIcon, CalendarDaysIcon } from '@heroicons/vue/24/outline'
+import { CheckCircleIcon, CalendarDaysIcon, PlayCircleIcon } from '@heroicons/vue/24/outline'
+import { useForm } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
+import { useFlash } from '~/composables/use_flash'
 import { useScrollReveal } from '~/composables/use_scroll_reveal'
+import { useT } from '~/composables/use_t'
+
+const demoForm = useForm({})
 
 defineProps<{
   eyebrow: string
@@ -13,8 +18,14 @@ defineProps<{
   ctaHref: string
   secondaryLabel: string
   noCommitment: string
+  tryDemoLabel: string
+  tryDemoSubtitle: string
+  demoLoginPath: string
   locale: 'en' | 'fr'
 }>()
+
+const { t } = useT()
+const { errorMessage: flashError } = useFlash()
 
 const { el, isVisible } = useScrollReveal()
 </script>
@@ -46,25 +57,48 @@ const { el, isVisible } = useScrollReveal()
           </ul>
         </div>
 
-        <!-- Right: CTA card -->
-        <div class="rounded-2xl border border-bone bg-white p-8 shadow-sm lg:p-10">
-          <div class="mb-6 flex h-14 w-14 items-center justify-center rounded-xl bg-navy-900">
-            <CalendarDaysIcon class="h-7 w-7 text-coral-400" />
+        <!-- Right: two CTA cards -->
+        <div class="flex flex-col gap-4">
+          <!-- Try live demo card -->
+          <div class="rounded-2xl border border-coral-200 bg-white p-8 shadow-sm lg:p-10">
+            <div class="mb-6 flex h-14 w-14 items-center justify-center rounded-xl bg-coral-500">
+              <PlayCircleIcon class="h-7 w-7 text-white" />
+            </div>
+            <p class="font-display text-2xl text-fg">{{ tryDemoLabel }}</p>
+            <p class="mt-2 text-sm text-fg-subtle">{{ tryDemoSubtitle }}</p>
+            <div class="mt-6">
+              <BaseButton
+                size="lg"
+                class="w-full justify-center"
+                :disabled="demoForm.processing"
+                @click="demoForm.post(demoLoginPath)"
+              >
+                {{ demoForm.processing ? t('loading') : tryDemoLabel }}
+              </BaseButton>
+              <p v-if="flashError" class="mt-2 text-sm text-red-600">{{ flashError }}</p>
+            </div>
           </div>
-          <p class="font-display text-2xl text-fg">{{ ctaLabel }}</p>
-          <p class="mt-2 text-sm text-fg-subtle">{{ noCommitment }}</p>
 
-          <div class="mt-8 flex flex-col gap-3">
-            <a :href="ctaHref">
-              <BaseButton size="lg" class="w-full justify-center">
-                {{ ctaLabel }}
-              </BaseButton>
-            </a>
-            <a :href="`/${locale}/tarifs`">
-              <BaseButton size="lg" variant="secondary" class="w-full justify-center">
-                {{ secondaryLabel }}
-              </BaseButton>
-            </a>
+          <!-- Book guided demo card -->
+          <div class="rounded-2xl border border-bone bg-white p-8 shadow-sm lg:p-10">
+            <div class="mb-6 flex h-14 w-14 items-center justify-center rounded-xl bg-navy-900">
+              <CalendarDaysIcon class="h-7 w-7 text-coral-400" />
+            </div>
+            <p class="font-display text-2xl text-fg">{{ ctaLabel }}</p>
+            <p class="mt-2 text-sm text-fg-subtle">{{ noCommitment }}</p>
+
+            <div class="mt-6 flex flex-col gap-3">
+              <a :href="ctaHref">
+                <BaseButton size="lg" variant="secondary" class="w-full justify-center">
+                  {{ ctaLabel }}
+                </BaseButton>
+              </a>
+              <a :href="`/${locale}/tarifs`">
+                <BaseButton size="lg" variant="ghost" class="w-full justify-center">
+                  {{ secondaryLabel }}
+                </BaseButton>
+              </a>
+            </div>
           </div>
         </div>
       </div>

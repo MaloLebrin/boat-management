@@ -1,6 +1,7 @@
 import SendReminderEmails from '#jobs/send_reminder_emails'
 import PurgeAuditLogs from '#jobs/purge_audit_logs'
 import ResetAiTokenUsage from '#jobs/reset_ai_token_usage'
+import ResetDemoData from '#jobs/reset_demo_data'
 
 await SendReminderEmails.schedule({})
   .cron('0 8 * * *')
@@ -18,4 +19,10 @@ await ResetAiTokenUsage.schedule({})
   .cron('0 1 1 * *')
   .timezone('Europe/Paris')
   .id('monthly-reset-ai-token-usage')
+  .run()
+
+await ResetDemoData.schedule({})
+  .cron('0 4 * * *')
+  .timezone('Europe/Paris')
+  .id('daily-reset-demo-data')
   .run()

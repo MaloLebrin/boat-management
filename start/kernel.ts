@@ -28,6 +28,7 @@ router.use([
   ...(app.inTest ? [] : [() => import('@adonisjs/shield/shield_middleware')]),
   () => import('@adonisjs/auth/initialize_auth_middleware'),
   () => import('#middleware/silent_auth_middleware'),
+  () => import('#middleware/check_demo_session_middleware'),
   () => import('#middleware/initialize_bouncer_middleware'),
   () => import('#middleware/detect_user_locale_middleware'),
 ])

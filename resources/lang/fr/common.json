@@ -11,6 +11,10 @@
   "loading": "Chargement…",
   "none": "Aucun",
   "selectPlaceholder": "Sélectionner...",
+  "demo": {
+    "banner": "Session démo — {time} restantes",
+    "exit": "Quitter la démo"
+  },
   "tone": {
     "neutral": "Normal",
     "success": "Bon",

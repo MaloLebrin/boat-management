@@ -17,6 +17,7 @@ export const controllers = {
   BoatSafetyEquipment: () => import('#controllers/boat_safety_equipment_controller'),
   BoatSimulator: () => import('#controllers/boat_simulator_controller'),
   Boats: () => import('#controllers/boats_controller'),
+  Demo: () => import('#controllers/demo_controller'),
   dev: {
     MailPreviews: () => import('#controllers/dev/mail_previews_controller'),
     PdfPreviews: () => import('#controllers/dev/pdf_previews_controller'),

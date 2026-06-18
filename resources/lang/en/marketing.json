@@ -608,7 +608,9 @@
       "cta_label": "Book a free demo",
       "cta_href": "/contact",
       "secondary_label": "See pricing",
-      "no_commitment": "No commitment · Reply within 24h"
+      "no_commitment": "No commitment · Reply within 24h",
+      "try_demo_label": "Try the demo",
+      "try_demo_subtitle": "Instant access · Data auto-reset · No sign-up required"
     }
   },
   "pricing": {

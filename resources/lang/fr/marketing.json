@@ -608,7 +608,9 @@
       "cta_label": "Reserver une demo gratuite",
       "cta_href": "/contact",
       "secondary_label": "Voir les tarifs",
-      "no_commitment": "Sans engagement · Reponse sous 24h"
+      "no_commitment": "Sans engagement · Reponse sous 24h",
+      "try_demo_label": "Essayer la démo",
+      "try_demo_subtitle": "Accès instantané · Données réinitialisées automatiquement · Sans inscription"
     }
   },
   "pricing": {
