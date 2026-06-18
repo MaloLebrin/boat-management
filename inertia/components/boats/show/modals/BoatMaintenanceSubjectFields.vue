@@ -3,22 +3,11 @@ import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import { useT } from '~/composables/use_t'
 import type { BoatShowDetail } from '~/types/boat_show'
-
-type Subject =
-  | 'boat'
-  | 'hull'
-  | 'engine'
-  | 'sail'
-  | 'rig'
-  | 'electrical'
-  | 'plumbing'
-  | 'safety'
-  | 'deck'
-  | 'other'
+import type { MaintenanceTaskSubject } from '../../../../shared/types/maintenance'
 
 const props = defineProps<{
   boat: BoatShowDetail
-  subject: Subject
+  subject: MaintenanceTaskSubject
   errors: Record<string, string>
 }>()
 
@@ -42,7 +31,9 @@ const sailOptions = props.boat.sails.map((s) => ({
 
 const safetyOptions = props.boat.safetyEquipment.map((item) => ({
   value: String(item.id),
-  label: item.equipmentType + (item.quantity !== null ? ` ×${item.quantity}` : ''),
+  label:
+    t(`boats.options.safetyEquipmentType.${item.equipmentType}`) +
+    (item.quantity !== null ? ` ×${item.quantity}` : ''),
 }))
 </script>
 

@@ -1,11 +1,11 @@
-import app from '@adonisjs/core/services/app'
 import type Boat from '#models/boat'
 import type BoatEngine from '#models/boat_engine'
 import type BoatEnginePart from '#models/boat_engine_part'
-import type BoatSail from '#models/boat_sail'
+import type BoatMaintenanceEvent from '#models/boat_maintenance_event'
 import type BoatRig from '#models/boat_rig'
 import type BoatSafetyEquipment from '#models/boat_safety_equipment'
-import type BoatMaintenanceEvent from '#models/boat_maintenance_event'
+import type BoatSail from '#models/boat_sail'
+import app from '@adonisjs/core/services/app'
 import type { I18n } from '@adonisjs/i18n'
 import PDFDocument from 'pdfkit'
 
@@ -240,7 +240,7 @@ export default class MaintenanceLogPdfService {
         ],
         [t('specs.homePort'), boat.homePort],
       ] as Array<[string, string | null | undefined]>
-    ).filter(([, v]) => v != null) as Array<[string, string]>
+    ).filter(([, v]) => v !== null) as Array<[string, string]>
 
     this.#specRows(doc, specs)
     this.#divider(doc)
@@ -283,7 +283,7 @@ export default class MaintenanceLogPdfService {
             ],
             [
               t('engineFields.hours'),
-              engine.hours != null
+              engine.hours !== null
                 ? t('engineFields.hoursUnit', { value: String(engine.hours) })
                 : null,
             ],
@@ -293,7 +293,7 @@ export default class MaintenanceLogPdfService {
               engine.manufacturedAt ? String(engine.manufacturedAt.year) : null,
             ],
           ] as Array<[string, string | null | undefined]>
-        ).filter(([, v]) => v != null) as Array<[string, string]>
+        ).filter(([, v]) => v !== null) as Array<[string, string]>
 
         this.#specRows(doc, specs)
         doc.moveDown(0.4)
@@ -313,11 +313,13 @@ export default class MaintenanceLogPdfService {
             [t('sailFields.material'), sail.material],
             [
               t('sailFields.area'),
-              sail.areaM2 != null ? t('sailFields.areaUnit', { value: String(sail.areaM2) }) : null,
+              sail.areaM2 !== null
+                ? t('sailFields.areaUnit', { value: String(sail.areaM2) })
+                : null,
             ],
-            [t('sailFields.reefPoints'), sail.reefPoints != null ? String(sail.reefPoints) : null],
+            [t('sailFields.reefPoints'), sail.reefPoints !== null ? String(sail.reefPoints) : null],
           ] as Array<[string, string | null | undefined]>
-        ).filter(([, v]) => v != null) as Array<[string, string]>
+        ).filter(([, v]) => v !== null) as Array<[string, string]>
 
         if (specs.length > 0) {
           this.#specRows(doc, specs)
@@ -335,11 +337,11 @@ export default class MaintenanceLogPdfService {
 
       const specs: Array<[string, string]> = (
         [
-          [t('rigFields.mastCount'), rig.mastCount != null ? String(rig.mastCount) : null],
-          [t('rigFields.spreaders'), rig.spreaders != null ? String(rig.spreaders) : null],
+          [t('rigFields.mastCount'), rig.mastCount !== null ? String(rig.mastCount) : null],
+          [t('rigFields.spreaders'), rig.spreaders !== null ? String(rig.spreaders) : null],
           [t('rigFields.type'), rig.manufacturedAt ? String(rig.manufacturedAt.year) : null],
         ] as Array<[string, string | null | undefined]>
-      ).filter(([, v]) => v != null) as Array<[string, string]>
+      ).filter(([, v]) => v !== null) as Array<[string, string]>
 
       if (specs.length > 0) {
         this.#specRows(doc, specs)
@@ -408,7 +410,7 @@ export default class MaintenanceLogPdfService {
       if (doc.y > 760) doc.addPage()
       const rowY = doc.y
       const typeLabel = tOpt('safetyEquipmentType', item.equipmentType)
-      const qty = item.quantity != null ? String(item.quantity) : '—'
+      const qty = item.quantity !== null ? String(item.quantity) : '—'
       const expiry = item.expiryDate ? item.expiryDate.toISODate()! : t('safetyFields.noExpiry')
       const statusKey =
         item.status === 'ok'
@@ -464,10 +466,10 @@ export default class MaintenanceLogPdfService {
     const safety: BoatSafetyEquipment[] =
       (boat.safetyEquipment as unknown as BoatSafetyEquipment[]) ?? []
 
-    const engineEvents = rows.filter((r) => r.boatEngineId != null)
-    const sailEvents = rows.filter((r) => r.boatSailId != null)
-    const rigEvents = rows.filter((r) => r.boatRigId != null)
-    const safetyEvents = rows.filter((r) => r.boatSafetyEquipmentId != null)
+    const engineEvents = rows.filter((r) => r.boatEngineId !== null)
+    const sailEvents = rows.filter((r) => r.boatSailId !== null)
+    const rigEvents = rows.filter((r) => r.boatRigId !== null)
+    const safetyEvents = rows.filter((r) => r.boatSafetyEquipmentId !== null)
 
     if (
       engineEvents.length === 0 &&
@@ -699,7 +701,7 @@ export default class MaintenanceLogPdfService {
 
     for (const item of safety) {
       const name = tOpt('safetyEquipmentType', item.equipmentType)
-      const qty = item.quantity != null ? `×${item.quantity}` : '—'
+      const qty = item.quantity !== null ? `×${item.quantity}` : '—'
       const statusKey =
         item.status === 'ok'
           ? 'statusOk'
@@ -772,9 +774,9 @@ export default class MaintenanceLogPdfService {
       if (doc.y > 760) doc.addPage()
       const rowY = doc.y
       const wearLabel = part.wearState ? tOpt('partWearState', part.wearState) : '—'
-      const stockStr = part.stock != null ? String(part.stock) : '—'
+      const stockStr = part.stock !== null ? String(part.stock) : '—'
       const alert =
-        part.minStockAlert != null && part.stock != null && part.stock <= part.minStockAlert
+        part.minStockAlert !== null && part.stock !== null && part.stock <= part.minStockAlert
       const stockColor = alert ? CORAL : GREY_D
 
       drawRow(rowY, part.designation, part.reference ?? '—', stockStr, wearLabel, false)

@@ -6,21 +6,10 @@ import BaseInput from '~/components/base/BaseInput.vue'
 import BaseModal from '~/components/base/BaseModal.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
-import BoatMaintenanceSubjectFields from './BoatMaintenanceSubjectFields.vue'
+import BoatMaintenanceMaintenanceTaskSubjectFields from './BoatMaintenanceMaintenanceTaskSubjectFields.vue'
 import { useT } from '~/composables/use_t'
 import type { BoatShowDetail } from '~/types/boat_show'
-
-type Subject =
-  | 'boat'
-  | 'hull'
-  | 'engine'
-  | 'sail'
-  | 'rig'
-  | 'electrical'
-  | 'plumbing'
-  | 'safety'
-  | 'deck'
-  | 'other'
+import type { MaintenanceTaskMaintenanceTaskSubject } from '../../../../shared/types/maintenance'
 
 const props = defineProps<{
   boat: BoatShowDetail
@@ -34,7 +23,7 @@ const emit = defineEmits<{
 
 const { t } = useT()
 
-const subject = ref<Subject>('boat')
+const subject = ref<MaintenanceTaskSubject>('boat')
 const boatEngineId = ref<string>('')
 const boatSailId = ref<string>('')
 const boatSafetyEquipmentId = ref<string>('')
@@ -45,18 +34,20 @@ const performedAt = ref('')
 const entryTitle = ref('')
 const entryNotes = ref('')
 
-const subjectOptions = computed<ReadonlyArray<{ label: string; value: Subject }>>(() => [
-  { label: t('boats.maintenance.events.wholeBoat'), value: 'boat' },
-  { label: t('boats.maintenance.events.hull'), value: 'hull' },
-  { label: t('boats.maintenance.events.engine'), value: 'engine' },
-  { label: t('boats.maintenance.events.sail'), value: 'sail' },
-  { label: t('boats.maintenance.events.rig'), value: 'rig' },
-  { label: t('boats.maintenance.events.electrical'), value: 'electrical' },
-  { label: t('boats.maintenance.events.plumbing'), value: 'plumbing' },
-  { label: t('boats.maintenance.events.safety'), value: 'safety' },
-  { label: t('boats.maintenance.events.deck'), value: 'deck' },
-  { label: t('boats.maintenance.events.other'), value: 'other' },
-])
+const subjectOptions = computed<ReadonlyArray<{ label: string; value: MaintenanceTaskSubject }>>(
+  () => [
+    { label: t('boats.maintenance.events.wholeBoat'), value: 'boat' },
+    { label: t('boats.maintenance.events.hull'), value: 'hull' },
+    { label: t('boats.maintenance.events.engine'), value: 'engine' },
+    { label: t('boats.maintenance.events.sail'), value: 'sail' },
+    { label: t('boats.maintenance.events.rig'), value: 'rig' },
+    { label: t('boats.maintenance.events.electrical'), value: 'electrical' },
+    { label: t('boats.maintenance.events.plumbing'), value: 'plumbing' },
+    { label: t('boats.maintenance.events.safety'), value: 'safety' },
+    { label: t('boats.maintenance.events.deck'), value: 'deck' },
+    { label: t('boats.maintenance.events.other'), value: 'other' },
+  ]
+)
 
 watch(subject, () => {
   boatEngineId.value = ''
@@ -118,7 +109,7 @@ function close() {
         />
       </div>
 
-      <BoatMaintenanceSubjectFields
+      <BoatMaintenanceMaintenanceTaskSubjectFields
         :boat="boat"
         :subject="subject"
         :errors="errors"
