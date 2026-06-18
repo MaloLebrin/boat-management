@@ -174,3 +174,7 @@ export type MaintenanceSheetRow = {
 }
 
 export type AiSuggestion = { text: string }
+
+export type MaintenanceLogPdfProps = {
+  canExport: boolean
+}

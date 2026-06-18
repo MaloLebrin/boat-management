@@ -6,24 +6,6 @@ import type { ApiDefinition } from './tree.d.ts'
 const placeholder: any = {}
 
 const routes = {
-  'webhooks.stripe': {
-    methods: ["POST"],
-    pattern: '/webhooks/stripe',
-    tokens: [{"old":"/webhooks/stripe","type":0,"val":"webhooks","end":""},{"old":"/webhooks/stripe","type":0,"val":"stripe","end":""}],
-    types: placeholder as Registry['webhooks.stripe']['types'],
-  },
-  'mail_previews.index': {
-    methods: ["GET","HEAD"],
-    pattern: '/dev/mails',
-    tokens: [{"old":"/dev/mails","type":0,"val":"dev","end":""},{"old":"/dev/mails","type":0,"val":"mails","end":""}],
-    types: placeholder as Registry['mail_previews.index']['types'],
-  },
-  'mail_previews.show': {
-    methods: ["GET","HEAD"],
-    pattern: '/dev/mails/:name',
-    tokens: [{"old":"/dev/mails/:name","type":0,"val":"dev","end":""},{"old":"/dev/mails/:name","type":0,"val":"mails","end":""},{"old":"/dev/mails/:name","type":1,"val":"name","end":""}],
-    types: placeholder as Registry['mail_previews.show']['types'],
-  },
   'dashboard': {
     methods: ["GET","HEAD"],
     pattern: '/dashboard',
@@ -65,6 +47,12 @@ const routes = {
     pattern: '/boats/:id',
     tokens: [{"old":"/boats/:id","type":0,"val":"boats","end":""},{"old":"/boats/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['boats.show']['types'],
+  },
+  'boats.maintenanceLog.download': {
+    methods: ["GET","HEAD"],
+    pattern: '/boats/:id/maintenance-log.pdf',
+    tokens: [{"old":"/boats/:id/maintenance-log.pdf","type":0,"val":"boats","end":""},{"old":"/boats/:id/maintenance-log.pdf","type":1,"val":"id","end":""},{"old":"/boats/:id/maintenance-log.pdf","type":0,"val":"maintenance-log.pdf","end":""}],
+    types: placeholder as Registry['boats.maintenanceLog.download']['types'],
   },
   'boats.edit': {
     methods: ["GET","HEAD"],
@@ -719,6 +707,24 @@ const routes = {
     pattern: '/invitations/accept',
     tokens: [{"old":"/invitations/accept","type":0,"val":"invitations","end":""},{"old":"/invitations/accept","type":0,"val":"accept","end":""}],
     types: placeholder as Registry['invitations.accept']['types'],
+  },
+  'webhooks.stripe': {
+    methods: ["POST"],
+    pattern: '/webhooks/stripe',
+    tokens: [{"old":"/webhooks/stripe","type":0,"val":"webhooks","end":""},{"old":"/webhooks/stripe","type":0,"val":"stripe","end":""}],
+    types: placeholder as Registry['webhooks.stripe']['types'],
+  },
+  'mail_previews.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/dev/mails',
+    tokens: [{"old":"/dev/mails","type":0,"val":"dev","end":""},{"old":"/dev/mails","type":0,"val":"mails","end":""}],
+    types: placeholder as Registry['mail_previews.index']['types'],
+  },
+  'mail_previews.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/dev/mails/:name',
+    tokens: [{"old":"/dev/mails/:name","type":0,"val":"dev","end":""},{"old":"/dev/mails/:name","type":0,"val":"mails","end":""},{"old":"/dev/mails/:name","type":1,"val":"name","end":""}],
+    types: placeholder as Registry['mail_previews.show']['types'],
   },
   'new_account.create': {
     methods: ["GET","HEAD"],

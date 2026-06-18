@@ -572,5 +572,12 @@
     "subtitle": "Estimez les coûts d'entretien annuels selon l'état actuel des équipements",
     "backButton": "Retour à la fiche bateau",
     "openButton": "Estimer les coûts d'entretien"
+  },
+  "maintenanceLog": {
+    "download": "Télécharger le carnet PDF",
+    "title": "Carnet d'entretien",
+    "generatedOn": "Généré le {date}",
+    "noEvents": "Aucune intervention enregistrée.",
+    "upgradeRequired": "L'export PDF est disponible à partir du plan Pro."
   }
 }

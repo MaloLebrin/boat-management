@@ -111,6 +111,8 @@ export default class BoatsController {
       const boat = await this.boatService.getFullDetailForUser(user, Number(params.id))
       await bouncer.with(BoatPolicy).authorize('view', boat)
 
+      await user.load('organization')
+
       const [
         maintenanceEvents,
         maintenanceTasks,
@@ -130,6 +132,7 @@ export default class BoatsController {
       ])
 
       const canManageEquipment = canManageMaintenance
+      const canExport = user.organization ? this.quotaService.canExport(user.organization) : false
       const aiSuggestions: AiSuggestion[] | null = latestSuggestions
         ? (JSON.parse(latestSuggestions.responseText) as AiSuggestion[])
         : null
@@ -144,6 +147,7 @@ export default class BoatsController {
           aiSuggestions,
           canManageMaintenance,
           canManageEquipment,
+          canExport,
         })
       )
     } catch (error) {

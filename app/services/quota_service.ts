@@ -72,6 +72,10 @@ export default class QuotaService {
     }
   }
 
+  canExport(org: Organization): boolean {
+    return PLAN_LIMITS[org.plan].canExport
+  }
+
   assertCanExport(org: Organization): void {
     const limits = PLAN_LIMITS[org.plan]
     if (!limits.canExport) {

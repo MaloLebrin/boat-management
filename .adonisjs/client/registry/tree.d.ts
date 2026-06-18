@@ -2,13 +2,6 @@
 import type { routes } from './index.ts'
 
 export interface ApiDefinition {
-  webhooks: {
-    stripe: typeof routes['webhooks.stripe']
-  }
-  mailPreviews: {
-    index: typeof routes['mail_previews.index']
-    show: typeof routes['mail_previews.show']
-  }
   dashboard: typeof routes['dashboard']
   designSystem: typeof routes['design_system']
   sitemap: typeof routes['sitemap']
@@ -17,6 +10,9 @@ export interface ApiDefinition {
     create: typeof routes['boats.create']
     store: typeof routes['boats.store']
     show: typeof routes['boats.show']
+    maintenanceLog: {
+      download: typeof routes['boats.maintenanceLog.download']
+    }
     edit: typeof routes['boats.edit']
     update: typeof routes['boats.update']
     destroy: typeof routes['boats.destroy']
@@ -194,6 +190,13 @@ export interface ApiDefinition {
   invitations: {
     show: typeof routes['invitations.show']
     accept: typeof routes['invitations.accept']
+  }
+  webhooks: {
+    stripe: typeof routes['webhooks.stripe']
+  }
+  mailPreviews: {
+    index: typeof routes['mail_previews.index']
+    show: typeof routes['mail_previews.show']
   }
   newAccount: {
     create: typeof routes['new_account.create']
