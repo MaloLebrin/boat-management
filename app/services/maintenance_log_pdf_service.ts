@@ -1,6 +1,7 @@
 import app from '@adonisjs/core/services/app'
 import type Boat from '#models/boat'
 import type BoatEngine from '#models/boat_engine'
+import type BoatEnginePart from '#models/boat_engine_part'
 import type BoatSail from '#models/boat_sail'
 import type BoatRig from '#models/boat_rig'
 import type BoatSafetyEquipment from '#models/boat_safety_equipment'
@@ -16,9 +17,11 @@ type EventRow = {
   notes: string | null
   engineCaption: string | null
   sailCaption: string | null
+  safetyCaption: string | null
   boatEngineId: number | null
   boatSailId: number | null
   boatRigId: number | null
+  boatSafetyEquipmentId: number | null
   parts: Array<{ name: string; quantity: number | null; notes: string | null }>
 }
 
@@ -33,6 +36,13 @@ const PAGE_W = 595.28
 const MARGIN = 48
 const CONTENT_W = PAGE_W - MARGIN * 2
 
+function equipmentStatusColor(status: string | null | undefined): string {
+  if (status === 'operational') return '#2e7d32'
+  if (status === 'in_maintenance') return '#e65100'
+  if (status === 'out_of_service' || status === 'retired') return CORAL
+  return GREY_M
+}
+
 export default class MaintenanceLogPdfService {
   async generate(
     boat: Boat,
@@ -44,34 +54,44 @@ export default class MaintenanceLogPdfService {
 
     doc.on('data', (chunk: Buffer) => chunks.push(chunk))
 
-    const rows: EventRow[] = events.map((ev) => ({
-      id: ev.id,
-      performedAt: ev.performedAt.toISODate()!,
-      subject: ev.subject,
-      title: ev.title,
-      notes: ev.notes,
-      engineCaption: ev.engineCaption,
-      sailCaption: ev.sailCaption,
-      boatEngineId: ev.boatEngineId,
-      boatSailId: ev.boatSailId,
-      boatRigId: ev.boatRigId,
-      parts: ev.parts.map((p) => ({
-        name: p.name,
-        quantity: p.quantity,
-        notes: p.notes,
-      })),
-    }))
-
     const t = (key: string, data?: Record<string, string>) =>
       i18n.t(`boats.maintenanceLog.${key}`, data)
 
     const tOpt = (ns: string, key: string) => i18n.t(`boats.options.${ns}.${key}`)
 
+    const safety: BoatSafetyEquipment[] =
+      (boat.safetyEquipment as unknown as BoatSafetyEquipment[]) ?? []
+    const safetyMap = new Map(safety.map((s) => [s.id, s]))
+
+    const rows: EventRow[] = events.map((ev) => {
+      const safetyItem = ev.boatSafetyEquipmentId ? safetyMap.get(ev.boatSafetyEquipmentId) : null
+      return {
+        id: ev.id,
+        performedAt: ev.performedAt.toISODate()!,
+        subject: ev.subject,
+        title: ev.title,
+        notes: ev.notes,
+        engineCaption: ev.engineCaption,
+        sailCaption: ev.sailCaption,
+        safetyCaption: safetyItem ? tOpt('safetyEquipmentType', safetyItem.equipmentType) : null,
+        boatEngineId: ev.boatEngineId,
+        boatSailId: ev.boatSailId,
+        boatRigId: ev.boatRigId,
+        boatSafetyEquipmentId: ev.boatSafetyEquipmentId,
+        parts: ev.parts.map((p) => ({
+          name: p.name,
+          quantity: p.quantity,
+          notes: p.notes,
+        })),
+      }
+    })
+
     this.#renderHeader(doc, boat, t)
     this.#renderBoatSpecs(doc, boat, t, tOpt)
     this.#renderEquipment(doc, boat, rows, t, tOpt)
+    this.#renderInventory(doc, boat, t, tOpt)
     this.#renderEvents(doc, rows, t)
-    this.#renderHistoryByEquipment(doc, boat, rows, t)
+    this.#renderHistoryByEquipment(doc, boat, rows, t, tOpt)
 
     doc.end()
 
@@ -435,17 +455,27 @@ export default class MaintenanceLogPdfService {
     doc: PDFKit.PDFDocument,
     boat: Boat,
     rows: EventRow[],
-    t: (key: string, data?: Record<string, string>) => string
+    t: (key: string, data?: Record<string, string>) => string,
+    tOpt: (ns: string, key: string) => string
   ): void {
     const engines: BoatEngine[] = (boat.engines as unknown as BoatEngine[]) ?? []
     const sails: BoatSail[] = (boat.sails as unknown as BoatSail[]) ?? []
     const rig: BoatRig | null = (boat.rig as unknown as BoatRig) ?? null
+    const safety: BoatSafetyEquipment[] =
+      (boat.safetyEquipment as unknown as BoatSafetyEquipment[]) ?? []
 
     const engineEvents = rows.filter((r) => r.boatEngineId != null)
     const sailEvents = rows.filter((r) => r.boatSailId != null)
     const rigEvents = rows.filter((r) => r.boatRigId != null)
+    const safetyEvents = rows.filter((r) => r.boatSafetyEquipmentId != null)
 
-    if (engineEvents.length === 0 && sailEvents.length === 0 && rigEvents.length === 0) return
+    if (
+      engineEvents.length === 0 &&
+      sailEvents.length === 0 &&
+      rigEvents.length === 0 &&
+      safetyEvents.length === 0
+    )
+      return
 
     if (doc.y > 700) doc.addPage()
     this.#sectionBand(doc, t('sectionHistoryByEquipment'))
@@ -463,15 +493,24 @@ export default class MaintenanceLogPdfService {
     for (const sail of sails) {
       const evs = rows.filter((r) => r.boatSailId === sail.id)
       if (evs.length === 0) continue
-      const label = sail.sailType
+      const label = tOpt('sailType', sail.sailType)
       this.#subSectionLabel(doc, t('historyFor', { name: label }))
       this.#eventList(doc, evs, t)
     }
 
     // Rig
     if (rig && rigEvents.length > 0) {
-      this.#subSectionLabel(doc, t('historyFor', { name: rig.rigType }))
+      this.#subSectionLabel(doc, t('historyFor', { name: tOpt('rigType', rig.rigType) }))
       this.#eventList(doc, rigEvents, t)
+    }
+
+    // Per safety equipment item
+    for (const item of safety) {
+      const evs = rows.filter((r) => r.boatSafetyEquipmentId === item.id)
+      if (evs.length === 0) continue
+      const label = tOpt('safetyEquipmentType', item.equipmentType)
+      this.#subSectionLabel(doc, t('historyFor', { name: label }))
+      this.#eventList(doc, evs, t)
     }
   }
 
@@ -548,10 +587,208 @@ export default class MaintenanceLogPdfService {
       translated.startsWith('translation missing:') ||
       translated.startsWith('boats.maintenanceLog.')
     ) {
-      return ev.engineCaption ?? ev.sailCaption ?? ev.subject
+      return ev.engineCaption ?? ev.sailCaption ?? ev.safetyCaption ?? ev.subject
     }
     if (ev.subject === 'engine' && ev.engineCaption) return ev.engineCaption
     if (ev.subject === 'sail' && ev.sailCaption) return ev.sailCaption
+    if (ev.subject === 'safety' && ev.safetyCaption) return ev.safetyCaption
     return translated
+  }
+
+  // ─── Inventory ─────────────────────────────────────────────────────────────
+
+  #renderInventory(
+    doc: PDFKit.PDFDocument,
+    boat: Boat,
+    t: (key: string, data?: Record<string, string>) => string,
+    tOpt: (ns: string, key: string) => string
+  ): void {
+    const engines: BoatEngine[] = (boat.engines as unknown as BoatEngine[]) ?? []
+    const sails: BoatSail[] = (boat.sails as unknown as BoatSail[]) ?? []
+    const rig: BoatRig | null = (boat.rig as unknown as BoatRig) ?? null
+    const safety: BoatSafetyEquipment[] =
+      (boat.safetyEquipment as unknown as BoatSafetyEquipment[]) ?? []
+
+    if (doc.y > 700) doc.addPage()
+    this.#sectionBand(doc, t('sectionInventory'))
+
+    // ── Status board (engines + sails + rig) ────────────────────────────────
+    const hasStatusItems =
+      engines.length > 0 || sails.length > 0 || rig !== null || safety.length > 0
+    if (hasStatusItems) {
+      this.#subSectionLabel(doc, t('inventoryStatus'))
+      this.#renderStatusBoard(doc, engines, sails, rig, safety, t, tOpt)
+      this.#divider(doc)
+    }
+
+    // ── Engine parts stock ─────────────────────────────────────────────────
+    const enginesWithParts = engines.filter(
+      (e) => ((e.parts as unknown as BoatEnginePart[]) ?? []).length > 0
+    )
+    if (enginesWithParts.length > 0) {
+      this.#subSectionLabel(doc, t('inventoryParts'))
+      for (const engine of enginesWithParts) {
+        const engineLabel =
+          [engine.brand, engine.model].filter(Boolean).join(' ') || `#${engine.id}`
+        const parts = (engine.parts as unknown as BoatEnginePart[]) ?? []
+        this.#renderEnginePartsTable(doc, engineLabel, parts, t, tOpt)
+        doc.moveDown(0.4)
+      }
+      this.#divider(doc)
+    }
+  }
+
+  #renderStatusBoard(
+    doc: PDFKit.PDFDocument,
+    engines: BoatEngine[],
+    sails: BoatSail[],
+    rig: BoatRig | null,
+    safety: BoatSafetyEquipment[],
+    t: (key: string, data?: Record<string, string>) => string,
+    tOpt: (ns: string, key: string) => string
+  ): void {
+    const C_NAME = 220
+    const C_TYPE = 140
+    const C_STATUS = CONTENT_W - C_NAME - C_TYPE
+
+    const drawRow = (y: number, name: string, type: string, status: string, isHeader: boolean) => {
+      const font = isHeader ? 'Helvetica-Bold' : 'Helvetica'
+      const color = isHeader ? WHITE : GREY_D
+      if (isHeader) {
+        doc.rect(MARGIN - 12, y - 3, CONTENT_W + 24, 18).fill('#1a2f42')
+      }
+      doc.fontSize(8).font(font).fillColor(color)
+      doc.text(name, MARGIN, y, { width: C_NAME - 4, lineBreak: false })
+      doc.text(type, MARGIN + C_NAME, y, { width: C_TYPE - 4, lineBreak: false })
+      doc.text(status, MARGIN + C_NAME + C_TYPE, y, { width: C_STATUS, lineBreak: false })
+      doc.fillColor('#000')
+    }
+
+    const headerY = doc.y
+    drawRow(
+      headerY,
+      t('inventoryFields.name'),
+      t('inventoryFields.type'),
+      t('inventoryFields.status'),
+      true
+    )
+    doc.text('', MARGIN, headerY + 18)
+
+    const rows: Array<[string, string, string, string]> = []
+
+    for (const engine of engines) {
+      const name = [engine.brand, engine.model].filter(Boolean).join(' ') || `#${engine.id}`
+      const type = engine.kind ? tOpt('engineKind', engine.kind) : t('inventoryFields.engine')
+      const status = engine.status ? tOpt('equipmentStatus', engine.status) : '—'
+      rows.push([name, type, status, equipmentStatusColor(engine.status)])
+    }
+
+    for (const sail of sails) {
+      const name = tOpt('sailType', sail.sailType)
+      const material = sail.material ?? '—'
+      const status = sail.status ? tOpt('equipmentStatus', sail.status) : '—'
+      rows.push([name, material, status, equipmentStatusColor(sail.status)])
+    }
+
+    if (rig) {
+      const name = tOpt('rigType', rig.rigType)
+      const type = t('sectionRig')
+      const status = rig.status ? tOpt('equipmentStatus', rig.status) : '—'
+      rows.push([name, type, status, equipmentStatusColor(rig.status)])
+    }
+
+    for (const item of safety) {
+      const name = tOpt('safetyEquipmentType', item.equipmentType)
+      const qty = item.quantity != null ? `×${item.quantity}` : '—'
+      const statusKey =
+        item.status === 'ok'
+          ? 'statusOk'
+          : item.status === 'to_check'
+            ? 'statusToCheck'
+            : 'statusExpired'
+      const statusColor =
+        item.status === 'ok' ? '#2e7d32' : item.status === 'to_check' ? '#e65100' : CORAL
+      rows.push([name, qty, t(statusKey), statusColor])
+    }
+
+    for (const [name, type, status, dotColor] of rows) {
+      if (doc.y > 760) doc.addPage()
+      const rowY = doc.y
+      drawRow(rowY, name, type, status, false)
+      doc.circle(MARGIN + C_NAME + C_TYPE - 10, rowY + 4, 3).fill(dotColor)
+      doc.rect(MARGIN, rowY + 10, CONTENT_W, 0.5).fill(GREY_B)
+      doc.text('', MARGIN, rowY + 13)
+    }
+  }
+
+  #renderEnginePartsTable(
+    doc: PDFKit.PDFDocument,
+    engineLabel: string,
+    parts: BoatEnginePart[],
+    t: (key: string, data?: Record<string, string>) => string,
+    tOpt: (ns: string, key: string) => string
+  ): void {
+    const C_NAME = 200
+    const C_REF = 110
+    const C_STOCK = 60
+    const C_WEAR = CONTENT_W - C_NAME - C_REF - C_STOCK
+
+    doc.fontSize(8).font('Helvetica-Bold').fillColor(NAVY).text(engineLabel, MARGIN, doc.y)
+    doc.text('', MARGIN, doc.y + 4)
+
+    const drawRow = (
+      y: number,
+      name: string,
+      ref: string,
+      stock: string,
+      wear: string,
+      isHeader: boolean
+    ) => {
+      const font = isHeader ? 'Helvetica-Bold' : 'Helvetica'
+      const color = isHeader ? WHITE : GREY_D
+      if (isHeader) {
+        doc.rect(MARGIN - 12, y - 3, CONTENT_W + 24, 18).fill('#1a2f42')
+      }
+      doc.fontSize(7.5).font(font).fillColor(color)
+      doc.text(name, MARGIN, y, { width: C_NAME - 4, lineBreak: false })
+      doc.text(ref, MARGIN + C_NAME, y, { width: C_REF - 4, lineBreak: false })
+      doc.text(stock, MARGIN + C_NAME + C_REF, y, { width: C_STOCK - 4, lineBreak: false })
+      doc.text(wear, MARGIN + C_NAME + C_REF + C_STOCK, y, { width: C_WEAR, lineBreak: false })
+      doc.fillColor('#000')
+    }
+
+    const headerY = doc.y
+    drawRow(
+      headerY,
+      t('partsFields.designation'),
+      t('partsFields.reference'),
+      t('partsFields.stock'),
+      t('partsFields.wear'),
+      true
+    )
+    doc.text('', MARGIN, headerY + 18)
+
+    for (const part of parts) {
+      if (doc.y > 760) doc.addPage()
+      const rowY = doc.y
+      const wearLabel = part.wearState ? tOpt('partWearState', part.wearState) : '—'
+      const stockStr = part.stock != null ? String(part.stock) : '—'
+      const alert =
+        part.minStockAlert != null && part.stock != null && part.stock <= part.minStockAlert
+      const stockColor = alert ? CORAL : GREY_D
+
+      drawRow(rowY, part.designation, part.reference ?? '—', stockStr, wearLabel, false)
+
+      if (alert) {
+        doc.circle(MARGIN + C_NAME + C_REF - 6, rowY + 4, 3).fill(CORAL)
+      }
+
+      doc.fontSize(7.5).font('Helvetica').fillColor(stockColor)
+      doc.text(stockStr, MARGIN + C_NAME + C_REF, rowY, { width: C_STOCK - 4, lineBreak: false })
+      doc.fillColor('#000')
+
+      doc.rect(MARGIN, rowY + 10, CONTENT_W, 0.5).fill(GREY_B)
+      doc.text('', MARGIN, rowY + 13)
+    }
   }
 }

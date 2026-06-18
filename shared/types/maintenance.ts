@@ -35,6 +35,7 @@ export type CreateMaintenancePayload = {
   boatEngineId?: number | null
   boatSailId?: number | null
   boatRigId?: number | null
+  boatSafetyEquipmentId?: number | null
   engineCaption?: string | null
   sailCaption?: string | null
   performedAt: Date | string | DateTime
@@ -65,6 +66,7 @@ export type MaintenanceEventRow = {
   boatEngineId: number | null
   boatSailId: number | null
   boatRigId: number | null
+  boatSafetyEquipmentId: number | null
   parts: MaintenanceEventPartRow[]
   totalCost: number | null
 }

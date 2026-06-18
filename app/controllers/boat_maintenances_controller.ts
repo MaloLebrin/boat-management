@@ -40,6 +40,7 @@ export default class BoatMaintenancesController {
         boatEngineId: payload.boatEngineId ?? null,
         boatSailId: payload.boatSailId ?? null,
         boatRigId: payload.boatRigId ?? null,
+        boatSafetyEquipmentId: payload.boatSafetyEquipmentId ?? null,
         engineCaption: payload.engineCaption ?? null,
         sailCaption: payload.sailCaption ?? null,
         performedAt: payload.performedAt,

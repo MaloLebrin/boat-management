@@ -176,6 +176,19 @@
       "ok": "OK",
       "to_check": "To check",
       "expired": "Expired"
+    },
+    "equipmentStatus": {
+      "operational": "Operational",
+      "in_maintenance": "In Maintenance",
+      "out_of_service": "Out of Service",
+      "retired": "Retired"
+    },
+    "partWearState": {
+      "new": "New",
+      "good": "Good",
+      "worn": "Worn",
+      "to_replace": "To Replace",
+      "damaged": "Damaged"
     }
   },
   "index": {
@@ -485,7 +498,8 @@
       "noRig": "Save a rig on this boat before adding rig entries.",
       "enginePlaceholder": "e.g. Inboard diesel port",
       "sailPlaceholder": "e.g. Genoa #2",
-      "selectPlaceholder": "— Select —"
+      "selectPlaceholder": "— Select —",
+      "safetyEquipment": "Safety equipment"
     },
     "tasks": {
       "title": "Planned maintenance",
@@ -629,6 +643,21 @@
     },
     "statusOk": "OK",
     "statusToCheck": "To check",
-    "statusExpired": "Expired"
+    "statusExpired": "Expired",
+    "sectionInventory": "Boat Inventory",
+    "inventoryStatus": "Equipment Status",
+    "inventoryParts": "Engine Parts Stock",
+    "inventoryFields": {
+      "name": "Equipment",
+      "type": "Type / Material",
+      "status": "Status",
+      "engine": "Engine"
+    },
+    "partsFields": {
+      "designation": "Designation",
+      "reference": "Reference",
+      "stock": "Stock",
+      "wear": "Wear"
+    }
   }
 }

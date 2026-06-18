@@ -45,6 +45,7 @@ export const createBoatMaintenanceValidator = vine.create(
     boatEngineId: optionalIdFromForm(),
     boatSailId: optionalIdFromForm(),
     boatRigId: optionalIdFromForm(),
+    boatSafetyEquipmentId: optionalIdFromForm(),
     engineCaption: vine.string().trim().maxLength(240).nullable().optional(),
     sailCaption: vine.string().trim().maxLength(240).nullable().optional(),
     performedAt: vine.date(),

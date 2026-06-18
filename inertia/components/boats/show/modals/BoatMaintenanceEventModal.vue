@@ -6,6 +6,7 @@ import BaseInput from '~/components/base/BaseInput.vue'
 import BaseModal from '~/components/base/BaseModal.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
+import BoatMaintenanceSubjectFields from './BoatMaintenanceSubjectFields.vue'
 import { useT } from '~/composables/use_t'
 import type { BoatShowDetail } from '~/types/boat_show'
 
@@ -36,6 +37,7 @@ const { t } = useT()
 const subject = ref<Subject>('boat')
 const boatEngineId = ref<string>('')
 const boatSailId = ref<string>('')
+const boatSafetyEquipmentId = ref<string>('')
 const engineCaptionManual = ref('')
 const sailCaptionManual = ref('')
 const partRows = ref<Array<{ name: string; quantity: string; notes: string }>>([])
@@ -56,23 +58,10 @@ const subjectOptions = computed<ReadonlyArray<{ label: string; value: Subject }>
   { label: t('boats.maintenance.events.other'), value: 'other' },
 ])
 
-const engineOptions = computed(() =>
-  props.boat.engines.map((e) => ({
-    value: String(e.id),
-    label: `${e.kind} · ${e.brand ?? ''} ${e.model ?? ''}`.trim(),
-  }))
-)
-
-const sailOptions = computed(() =>
-  props.boat.sails.map((s) => ({
-    value: String(s.id),
-    label: `${s.sailType}${s.areaM2 !== null ? ` · ${s.areaM2} m²` : ''}`,
-  }))
-)
-
 watch(subject, () => {
   boatEngineId.value = ''
   boatSailId.value = ''
+  boatSafetyEquipmentId.value = ''
   engineCaptionManual.value = ''
   sailCaptionManual.value = ''
   entryTitle.value = ''
@@ -129,59 +118,16 @@ function close() {
         />
       </div>
 
-      <template v-if="subject === 'engine'">
-        <BaseSelect
-          v-if="engineOptions.length"
-          id="maint-engine"
-          name="boatEngineId"
-          :label="t('boats.maintenance.events.engine')"
-          :placeholder="t('boats.maintenance.events.selectPlaceholder')"
-          :allow-empty="true"
-          :options="engineOptions"
-          v-model="boatEngineId"
-          :errors="errors"
-        />
-        <BaseInput
-          id="maint-engine-caption"
-          name="engineCaption"
-          :label="t('boats.maintenance.events.label')"
-          :placeholder="t('boats.maintenance.events.enginePlaceholder')"
-          v-model="engineCaptionManual"
-          :errors="errors"
-        />
-      </template>
-
-      <template v-if="subject === 'sail'">
-        <BaseSelect
-          v-if="sailOptions.length"
-          id="maint-sail"
-          name="boatSailId"
-          :label="t('boats.maintenance.events.sail')"
-          :placeholder="t('boats.maintenance.events.selectPlaceholder')"
-          :allow-empty="true"
-          :options="sailOptions"
-          v-model="boatSailId"
-          :errors="errors"
-        />
-        <BaseInput
-          id="maint-sail-caption"
-          name="sailCaption"
-          :label="t('boats.maintenance.events.label')"
-          :placeholder="t('boats.maintenance.events.sailPlaceholder')"
-          v-model="sailCaptionManual"
-          :errors="errors"
-        />
-      </template>
-
-      <template v-if="subject === 'rig'">
-        <input v-if="boat.rig" type="hidden" name="boatRigId" :value="boat.rig.id" />
-        <p v-if="!boat.rig" class="text-sm text-warning">
-          {{ t('boats.maintenance.events.noRig') }}
-        </p>
-        <p v-if="errors.boatRigId" class="mt-1 text-xs font-medium text-danger">
-          {{ errors.boatRigId }}
-        </p>
-      </template>
+      <BoatMaintenanceSubjectFields
+        :boat="boat"
+        :subject="subject"
+        :errors="errors"
+        v-model:boat-engine-id="boatEngineId"
+        v-model:boat-sail-id="boatSailId"
+        v-model:boat-safety-equipment-id="boatSafetyEquipmentId"
+        v-model:engine-caption-manual="engineCaptionManual"
+        v-model:sail-caption-manual="sailCaptionManual"
+      />
 
       <BaseInput
         id="maint-title"
