@@ -12,6 +12,8 @@ import HomeHeroSection from '~/components/marketing/home/HomeHeroSection.vue'
 import HomeProblemSection from '~/components/marketing/home/HomeProblemSection.vue'
 import HomePillarsSection from '~/components/marketing/home/HomePillarsSection.vue'
 import HomeFeatureSection from '~/components/marketing/home/HomeFeatureSection.vue'
+import HomeCaseStudySection from '~/components/marketing/home/HomeCaseStudySection.vue'
+import HomeHowItWorksSection from '~/components/marketing/home/HomeHowItWorksSection.vue'
 import HomePersonasSection from '~/components/marketing/home/HomePersonasSection.vue'
 import HomeStatsBandSection from '~/components/marketing/home/HomeStatsBandSection.vue'
 import HomeComparisonSection from '~/components/marketing/home/HomeComparisonSection.vue'
@@ -89,6 +91,27 @@ interface FaqItem {
   a: string
 }
 
+interface CaseStudyData {
+  title: string
+  subtitle: string
+  company: string
+  challengeLabel: string
+  challenge: string
+  solutionLabel: string
+  solution: string
+  resultsLabel: string
+  results: string[]
+  metrics: Array<{ value: string; label: string }>
+  cta: { text: string; href: string }
+}
+
+interface HowItWorksData {
+  title: string
+  subtitle: string
+  items: Array<{ step: string; title: string; description: string; detail: string }>
+  timeline: { title: string; items: Array<{ day: string; label: string }> }
+}
+
 interface PageProps {
   t: {
     brand: { name: string; tagline: string }
@@ -103,6 +126,9 @@ interface PageProps {
       problem: { title: string; titleHighlight: string; items: ProblemItem[] }
       pillars: { title: string; titleHighlight: string; items: PillarItem[] }
       features: FeatureData[]
+      caseStudy: CaseStudyData
+      howItWorks: HowItWorksData
+      preview: { title: string; subtitle: string }
       personas: { title: string; subtitle: string; ctaLabel: string; items: PersonaItem[] }
       statsBand: Array<{ value: string; label: string }>
       comparison: {
@@ -247,7 +273,18 @@ onUnmounted(() => {
     is-ai
   />
 
-  <!-- 5. Personas -->
+  <!-- 5. How it works -->
+  <HomeHowItWorksSection
+    :how-it-works="t.home.howItWorks"
+    :preview="t.home.preview"
+    :brand="t.brand"
+    :locale="locale"
+  />
+
+  <!-- 6. Case study -->
+  <HomeCaseStudySection :case-study="t.home.caseStudy" />
+
+  <!-- 7. Personas -->
   <HomePersonasSection
     :title="t.home.personas.title"
     :subtitle="t.home.personas.subtitle"
@@ -256,10 +293,10 @@ onUnmounted(() => {
     @persona-change="handlePersonaChange"
   />
 
-  <!-- 6. Stats band -->
+  <!-- 8. Stats band -->
   <HomeStatsBandSection :stats="t.home.statsBand" />
 
-  <!-- 7. Comparison table -->
+  <!-- 9. Comparison table -->
   <HomeComparisonSection
     :title="t.home.comparison.title"
     :subtitle="t.home.comparison.subtitle"

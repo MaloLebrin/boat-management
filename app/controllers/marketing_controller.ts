@@ -465,6 +465,84 @@ export default class MarketingController {
           primaryCta: i18n.t('marketing.home.final_cta.primary_cta'),
           secondaryCta: i18n.t('marketing.home.final_cta.secondary_cta'),
         },
+        caseStudy: {
+          title: i18n.t('marketing.home.case_study.title'),
+          subtitle: i18n.t('marketing.home.case_study.subtitle'),
+          company: i18n.t('marketing.home.case_study.company'),
+          challengeLabel: i18n.t('marketing.home.case_study.challenge_label'),
+          challenge: i18n.t('marketing.home.case_study.challenge'),
+          solutionLabel: i18n.t('marketing.home.case_study.solution_label'),
+          solution: i18n.t('marketing.home.case_study.solution'),
+          resultsLabel: i18n.t('marketing.home.case_study.results_label'),
+          results: [
+            i18n.t('marketing.home.case_study.result1'),
+            i18n.t('marketing.home.case_study.result2'),
+            i18n.t('marketing.home.case_study.result3'),
+          ],
+          metrics: [
+            {
+              value: i18n.t('marketing.home.case_study.metric1_value'),
+              label: i18n.t('marketing.home.case_study.metric1_label'),
+            },
+            {
+              value: i18n.t('marketing.home.case_study.metric2_value'),
+              label: i18n.t('marketing.home.case_study.metric2_label'),
+            },
+            {
+              value: i18n.t('marketing.home.case_study.metric3_value'),
+              label: i18n.t('marketing.home.case_study.metric3_label'),
+            },
+          ],
+          cta: {
+            text: i18n.t('marketing.home.case_study.cta_text'),
+            href: i18n.t('marketing.home.case_study.cta_href'),
+          },
+        },
+        howItWorks: {
+          title: i18n.t('marketing.home.how_it_works.title'),
+          subtitle: i18n.t('marketing.home.how_it_works.subtitle'),
+          items: [
+            {
+              step: i18n.t('marketing.home.how_it_works.item1_step'),
+              title: i18n.t('marketing.home.how_it_works.item1_title'),
+              description: i18n.t('marketing.home.how_it_works.item1_description'),
+              detail: i18n.t('marketing.home.how_it_works.item1_detail'),
+            },
+            {
+              step: i18n.t('marketing.home.how_it_works.item2_step'),
+              title: i18n.t('marketing.home.how_it_works.item2_title'),
+              description: i18n.t('marketing.home.how_it_works.item2_description'),
+              detail: i18n.t('marketing.home.how_it_works.item2_detail'),
+            },
+            {
+              step: i18n.t('marketing.home.how_it_works.item3_step'),
+              title: i18n.t('marketing.home.how_it_works.item3_title'),
+              description: i18n.t('marketing.home.how_it_works.item3_description'),
+              detail: i18n.t('marketing.home.how_it_works.item3_detail'),
+            },
+          ],
+          timeline: {
+            title: i18n.t('marketing.home.how_it_works.timeline_title'),
+            items: [
+              {
+                day: i18n.t('marketing.home.how_it_works.timeline_item1_day'),
+                label: i18n.t('marketing.home.how_it_works.timeline_item1_label'),
+              },
+              {
+                day: i18n.t('marketing.home.how_it_works.timeline_item2_day'),
+                label: i18n.t('marketing.home.how_it_works.timeline_item2_label'),
+              },
+              {
+                day: i18n.t('marketing.home.how_it_works.timeline_item3_day'),
+                label: i18n.t('marketing.home.how_it_works.timeline_item3_label'),
+              },
+            ],
+          },
+        },
+        preview: {
+          title: i18n.t('marketing.home.preview.title'),
+          subtitle: i18n.t('marketing.home.preview.subtitle'),
+        },
       },
     }
   }
