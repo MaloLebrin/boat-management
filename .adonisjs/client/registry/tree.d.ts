@@ -198,6 +198,10 @@ export interface ApiDefinition {
     index: typeof routes['mail_previews.index']
     show: typeof routes['mail_previews.show']
   }
+  pdfPreviews: {
+    index: typeof routes['pdf_previews.index']
+    show: typeof routes['pdf_previews.show']
+  }
   newAccount: {
     create: typeof routes['new_account.create']
     store: typeof routes['new_account.store']

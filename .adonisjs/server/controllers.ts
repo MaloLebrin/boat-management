@@ -19,6 +19,7 @@ export const controllers = {
   Boats: () => import('#controllers/boats_controller'),
   dev: {
     MailPreviews: () => import('#controllers/dev/mail_previews_controller'),
+    PdfPreviews: () => import('#controllers/dev/pdf_previews_controller'),
   },
   Home: () => import('#controllers/home_controller'),
   MaintenanceHistory: () => import('#controllers/maintenance_history_controller'),

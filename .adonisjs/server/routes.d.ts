@@ -124,6 +124,8 @@ export type ScannedRoutes = {
     'webhooks.stripe': { paramsTuple?: []; params?: {} }
     'mail_previews.index': { paramsTuple?: []; params?: {} }
     'mail_previews.show': { paramsTuple: [ParamValue]; params: {'name': ParamValue} }
+    'pdf_previews.index': { paramsTuple?: []; params?: {} }
+    'pdf_previews.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'new_account.create': { paramsTuple?: []; params?: {} }
     'new_account.store': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }
@@ -187,6 +189,8 @@ export type ScannedRoutes = {
     'invitations.show': { paramsTuple?: []; params?: {} }
     'mail_previews.index': { paramsTuple?: []; params?: {} }
     'mail_previews.show': { paramsTuple: [ParamValue]; params: {'name': ParamValue} }
+    'pdf_previews.index': { paramsTuple?: []; params?: {} }
+    'pdf_previews.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'new_account.create': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }
     'password.forgot': { paramsTuple?: []; params?: {} }
@@ -242,6 +246,8 @@ export type ScannedRoutes = {
     'invitations.show': { paramsTuple?: []; params?: {} }
     'mail_previews.index': { paramsTuple?: []; params?: {} }
     'mail_previews.show': { paramsTuple: [ParamValue]; params: {'name': ParamValue} }
+    'pdf_previews.index': { paramsTuple?: []; params?: {} }
+    'pdf_previews.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'new_account.create': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }
     'password.forgot': { paramsTuple?: []; params?: {} }

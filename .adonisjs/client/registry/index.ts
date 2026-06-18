@@ -726,6 +726,18 @@ const routes = {
     tokens: [{"old":"/dev/mails/:name","type":0,"val":"dev","end":""},{"old":"/dev/mails/:name","type":0,"val":"mails","end":""},{"old":"/dev/mails/:name","type":1,"val":"name","end":""}],
     types: placeholder as Registry['mail_previews.show']['types'],
   },
+  'pdf_previews.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/dev/pdfs',
+    tokens: [{"old":"/dev/pdfs","type":0,"val":"dev","end":""},{"old":"/dev/pdfs","type":0,"val":"pdfs","end":""}],
+    types: placeholder as Registry['pdf_previews.index']['types'],
+  },
+  'pdf_previews.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/dev/pdfs/:id',
+    tokens: [{"old":"/dev/pdfs/:id","type":0,"val":"dev","end":""},{"old":"/dev/pdfs/:id","type":0,"val":"pdfs","end":""},{"old":"/dev/pdfs/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['pdf_previews.show']['types'],
+  },
   'new_account.create': {
     methods: ["GET","HEAD"],
     pattern: '/signup',

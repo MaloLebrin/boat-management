@@ -1447,6 +1447,30 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dev/mail_previews_controller').default['show']>>>
     }
   }
+  'pdf_previews.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/dev/pdfs'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/dev/pdf_previews_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dev/pdf_previews_controller').default['index']>>>
+    }
+  }
+  'pdf_previews.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/dev/pdfs/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/dev/pdf_previews_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dev/pdf_previews_controller').default['show']>>>
+    }
+  }
   'new_account.create': {
     methods: ["GET","HEAD"]
     pattern: '/signup'

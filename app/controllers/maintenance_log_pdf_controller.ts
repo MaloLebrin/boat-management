@@ -15,7 +15,7 @@ export default class MaintenanceLogPdfController {
     private quotaService: QuotaService
   ) {}
 
-  async download({ response, auth, params, session, i18n }: HttpContext) {
+  async download({ request, response, auth, params, session, i18n }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
     await user.load('organization')
@@ -47,8 +47,12 @@ export default class MaintenanceLogPdfController {
 
     const { buffer, filename } = await this.pdfService.generate(boat, eventsAsc, i18n)
 
+    const inline = request.input('inline') === '1'
     response.header('Content-Type', 'application/pdf')
-    response.header('Content-Disposition', `attachment; filename="${filename}"`)
+    response.header(
+      'Content-Disposition',
+      inline ? `inline; filename="${filename}"` : `attachment; filename="${filename}"`
+    )
     response.header('Content-Length', String(buffer.length))
     return response.send(buffer)
   }
