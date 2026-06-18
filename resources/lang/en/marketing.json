@@ -595,6 +595,20 @@
         "cta_text": "See how it works for your fleet",
         "cta_href": "/en/pricing"
       }
+    },
+    "demo": {
+      "eyebrow": "PRODUCT DEMO",
+      "title": "30 minutes to see",
+      "title_highlight": "the difference.",
+      "subtitle": "An expert walks you through the app with your real data — no jargon, no PowerPoint.",
+      "item1": "Live fleet dashboard configured with your boats",
+      "item2": "Maintenance history and real-time alerts",
+      "item3": "Fleetide AI assistant on your specific use cases",
+      "item4": "Initial setup done in under 15 minutes",
+      "cta_label": "Book a free demo",
+      "cta_href": "/contact",
+      "secondary_label": "See pricing",
+      "no_commitment": "No commitment · Reply within 24h"
     }
   },
   "pricing": {

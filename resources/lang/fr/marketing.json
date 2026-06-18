@@ -595,6 +595,20 @@
         "cta_text": "Voir comment ça marche pour votre flotte",
         "cta_href": "/fr/pricing"
       }
+    },
+    "demo": {
+      "eyebrow": "DEMO PRODUIT",
+      "title": "30 minutes pour voir",
+      "title_highlight": "la difference.",
+      "subtitle": "Un expert vous montre l'app avec vos donnees reelles — sans jargon, sans presentation PowerPoint.",
+      "item1": "Dashboard flotte configure avec vos bateaux",
+      "item2": "Historique maintenance et alertes en temps reel",
+      "item3": "Assistant IA Fleetide sur vos cas concrets",
+      "item4": "Configuration initiale en moins de 15 minutes",
+      "cta_label": "Reserver une demo gratuite",
+      "cta_href": "/contact",
+      "secondary_label": "Voir les tarifs",
+      "no_commitment": "Sans engagement · Reponse sous 24h"
     }
   },
   "pricing": {

@@ -439,6 +439,22 @@ export default class MarketingController {
             { q: i18n.t('marketing.home.faq.item8_q'), a: i18n.t('marketing.home.faq.item8_a') },
           ],
         },
+        demo: {
+          eyebrow: i18n.t('marketing.home.demo.eyebrow'),
+          title: i18n.t('marketing.home.demo.title'),
+          titleHighlight: i18n.t('marketing.home.demo.title_highlight'),
+          subtitle: i18n.t('marketing.home.demo.subtitle'),
+          items: [
+            i18n.t('marketing.home.demo.item1'),
+            i18n.t('marketing.home.demo.item2'),
+            i18n.t('marketing.home.demo.item3'),
+            i18n.t('marketing.home.demo.item4'),
+          ],
+          ctaLabel: i18n.t('marketing.home.demo.cta_label'),
+          ctaHref: i18n.t('marketing.home.demo.cta_href'),
+          secondaryLabel: i18n.t('marketing.home.demo.secondary_label'),
+          noCommitment: i18n.t('marketing.home.demo.no_commitment'),
+        },
         finalCta: {
           title: i18n.t('marketing.home.final_cta.title'),
           titleHighlight: i18n.t('marketing.home.final_cta.title_highlight'),

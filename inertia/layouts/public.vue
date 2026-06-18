@@ -55,7 +55,6 @@ const guideHref = computed(() =>
             <Link :href="guideHref" class="transition-colors hover:text-fg">{{
               t('public.footer.guide')
             }}</Link>
-            <Link href="/design-system" class="transition-colors hover:text-fg">Design system</Link>
           </div>
         </div>
 

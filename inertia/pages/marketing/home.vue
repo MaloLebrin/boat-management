@@ -18,6 +18,7 @@ import HomeComparisonSection from '~/components/marketing/home/HomeComparisonSec
 import HomeTestimonialsSection from '~/components/marketing/home/HomeTestimonialsSection.vue'
 import HomeSecuritySection from '~/components/marketing/home/HomeSecuritySection.vue'
 import HomeFaqSection from '~/components/marketing/home/HomeFaqSection.vue'
+import HomeDemoSection from '~/components/marketing/home/HomeDemoSection.vue'
 import HomeFinalCtaSection from '~/components/marketing/home/HomeFinalCtaSection.vue'
 
 type Persona = 'loueurs' | 'ecoles' | 'marinas' | 'armateurs'
@@ -262,7 +263,21 @@ onUnmounted(() => {
     :items="t.home.security.items"
   />
 
-  <!-- 10. FAQ -->
+  <!-- 10. Demo -->
+  <HomeDemoSection
+    :eyebrow="t.home.demo.eyebrow"
+    :title="t.home.demo.title"
+    :title-highlight="t.home.demo.titleHighlight"
+    :subtitle="t.home.demo.subtitle"
+    :items="t.home.demo.items"
+    :cta-label="t.home.demo.ctaLabel"
+    :cta-href="t.home.demo.ctaHref"
+    :secondary-label="t.home.demo.secondaryLabel"
+    :no-commitment="t.home.demo.noCommitment"
+    :locale="locale"
+  />
+
+  <!-- 11. FAQ -->
   <HomeFaqSection
     :title="t.home.faq.title"
     :subtitle="t.home.faq.subtitle"
