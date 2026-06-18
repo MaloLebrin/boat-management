@@ -6,6 +6,7 @@ import { nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { Toaster, toast } from 'vue-sonner'
 import brandIconUrl from '~/assets/brand/fleetai_compass.svg'
 import AsideMenu from '~/components/layout/AsideMenu.vue'
+import DemoSessionBanner from '~/components/layout/DemoSessionBanner.vue'
 import LanguageSwitcher from '~/components/layout/LanguageSwitcher.vue'
 import NavItem from '~/components/layout/NavItem.vue'
 import { useNavSections } from '~/composables/use_nav_sections'
@@ -50,6 +51,9 @@ watch(
     }
     if (flashMessages.success) {
       toast.success(flashMessages.success)
+    }
+    if (flashMessages.info) {
+      toast.info(flashMessages.info)
     }
   },
   { immediate: true }
@@ -104,6 +108,9 @@ onBeforeUnmount(() => {
           <span class="sr-only">{{ t('nav.menu') }}</span>
         </button>
       </header>
+
+      <!-- Demo session countdown (demo users only) -->
+      <DemoSessionBanner />
 
       <!-- Scrollable content area -->
       <main class="flex-1 overflow-y-auto bg-cream">

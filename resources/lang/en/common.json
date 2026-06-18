@@ -11,6 +11,10 @@
   "loading": "Loading…",
   "none": "None",
   "selectPlaceholder": "Select...",
+  "demo": {
+    "banner": "Demo session — {time} remaining",
+    "exit": "Exit demo"
+  },
   "tone": {
     "neutral": "Normal",
     "success": "Good",
