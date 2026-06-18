@@ -32,7 +32,7 @@ export default class HttpExceptionHandler extends ExceptionHandler {
    * response to the client
    */
   async handle(error: unknown, ctx: HttpContext) {
-    if (error instanceof limiterErrors.E_TOO_MANY_REQUESTS) {
+    if (error instanceof limiterErrors.E_TOO_MANY_REQUESTS && ctx.route?.name === 'demo.login') {
       ctx.session.flash('error', ctx.i18n.t('flash.demo.rateLimitError'))
       return ctx.response.redirect().back()
     }

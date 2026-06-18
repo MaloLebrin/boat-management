@@ -3,6 +3,7 @@ import DemoService from '#services/demo_service'
 import UserService from '#services/user_service'
 import { loginValidator } from '#validators/user'
 import { inject } from '@adonisjs/core'
+import logger from '@adonisjs/core/services/logger'
 import type { HttpContext } from '@adonisjs/core/http'
 import { DateTime } from 'luxon'
 
@@ -51,7 +52,11 @@ export default class SessionController {
     await auth.use('web').logout()
 
     if (isDemo) {
-      await this.demoService.scheduleReset()
+      try {
+        await this.demoService.scheduleReset()
+      } catch (err) {
+        logger.warn({ err }, 'DemoService: failed to schedule reset after demo logout')
+      }
     }
 
     response.redirect().toRoute('session.create')
