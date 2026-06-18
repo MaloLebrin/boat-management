@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import { useT } from '~/composables/use_t'
+import { useBoatOptions } from '~/composables/use_boat_options'
 import type { BoatShowDetail } from '~/types/boat_show'
 import type { MaintenanceTaskSubject } from '../../../../shared/types/maintenance'
 
@@ -19,6 +20,7 @@ const engineCaptionManual = defineModel<string>('engineCaptionManual', { default
 const sailCaptionManual = defineModel<string>('sailCaptionManual', { default: '' })
 
 const { t } = useT()
+const { safetyEquipmentTypeOptions } = useBoatOptions()
 
 const engineOptions = computed(() =>
   props.boat.engines.map((e) => ({
@@ -38,8 +40,8 @@ const safetyOptions = computed(() =>
   props.boat.safetyEquipment.map((item) => ({
     value: String(item.id),
     label:
-      t(`boats.options.safetyEquipmentType.${item.equipmentType}`) +
-      (item.quantity !== null ? ` ×${item.quantity}` : ''),
+      (safetyEquipmentTypeOptions.value.find((o) => o.value === item.equipmentType)?.label ??
+        item.equipmentType) + (item.quantity !== null ? ` ×${item.quantity}` : ''),
   }))
 )
 </script>

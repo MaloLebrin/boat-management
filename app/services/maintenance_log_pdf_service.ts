@@ -620,13 +620,9 @@ export default class MaintenanceLogPdfService {
     this.#sectionBand(doc, t('sectionInventory'))
 
     // ── Status board (engines + sails + rig) ────────────────────────────────
-    const hasStatusItems =
-      engines.length > 0 || sails.length > 0 || rig !== null || safety.length > 0
-    if (hasStatusItems) {
-      this.#subSectionLabel(doc, t('inventoryStatus'))
-      this.#renderStatusBoard(doc, engines, sails, rig, safety, t, tOpt)
-      this.#divider(doc)
-    }
+    this.#subSectionLabel(doc, t('inventoryStatus'))
+    this.#renderStatusBoard(doc, engines, sails, rig, safety, t, tOpt)
+    this.#divider(doc)
 
     // ── Engine parts stock ─────────────────────────────────────────────────
     const enginesWithParts = engines.filter(
@@ -758,7 +754,8 @@ export default class MaintenanceLogPdfService {
       ref: string,
       stock: string,
       wear: string,
-      isHeader: boolean
+      isHeader: boolean,
+      stockColor?: string
     ) => {
       const font = isHeader ? 'Helvetica-Bold' : 'Helvetica'
       const color = isHeader ? WHITE : GREY_D
@@ -768,7 +765,9 @@ export default class MaintenanceLogPdfService {
       doc.fontSize(7.5).font(font).fillColor(color)
       doc.text(name, MARGIN, y, { width: C_NAME - 4, lineBreak: false })
       doc.text(ref, MARGIN + C_NAME, y, { width: C_REF - 4, lineBreak: false })
+      doc.fillColor(stockColor ?? color)
       doc.text(stock, MARGIN + C_NAME + C_REF, y, { width: C_STOCK - 4, lineBreak: false })
+      doc.fillColor(color)
       doc.text(wear, MARGIN + C_NAME + C_REF + C_STOCK, y, { width: C_WEAR, lineBreak: false })
       doc.fillColor('#000')
     }
@@ -791,16 +790,10 @@ export default class MaintenanceLogPdfService {
       const stockStr = part.stock !== null ? String(part.stock) : '—'
       const alert =
         part.minStockAlert !== null && part.stock !== null && part.stock <= part.minStockAlert
-      const stockColor = alert ? CORAL : GREY_D
+      const stockColor = alert ? CORAL : undefined
 
-      drawRow(rowY, part.designation, part.reference ?? '—', stockStr, wearLabel, false)
-
-      if (alert) {
-        doc.circle(MARGIN + C_NAME + C_REF - 6, rowY + 4, 3).fill(CORAL)
-        doc.fontSize(7.5).font('Helvetica').fillColor(stockColor)
-        doc.text(stockStr, MARGIN + C_NAME + C_REF, rowY, { width: C_STOCK - 4, lineBreak: false })
-        doc.fillColor('#000')
-      }
+      if (alert) doc.circle(MARGIN + C_NAME + C_REF - 6, rowY + 4, 3).fill(CORAL)
+      drawRow(rowY, part.designation, part.reference ?? '—', stockStr, wearLabel, false, stockColor)
 
       doc.rect(MARGIN, rowY + 10, CONTENT_W, 0.5).fill(GREY_B)
       doc.text('', MARGIN, rowY + 13)
