@@ -1,3 +1,4 @@
+import Boat from '#models/boat'
 import Organization from '#models/organization'
 import User from '#models/user'
 import { seedDemoData } from '#database/seeders/sandbox_seeder'
@@ -23,6 +24,8 @@ export default class DemoService {
 
     const org = await Organization.query().where('slug', DEMO_ORG_SLUG).first()
     if (org) {
+      // boats.organization_id has no ON DELETE CASCADE — delete explicitly before org
+      await Boat.query().where('organizationId', org.id).delete()
       await org.delete()
     }
 
@@ -34,7 +37,8 @@ export default class DemoService {
     let user = await this.getUser()
     if (!user) {
       await seedDemoData()
-      user = (await this.getUser())!
+      user = await this.getUser()
+      if (!user) throw new Error('Demo user not created by seedDemoData')
     }
     return user
   }

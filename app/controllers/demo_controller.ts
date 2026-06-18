@@ -7,6 +7,7 @@ export default class DemoController {
   constructor(private demoService: DemoService) {}
 
   async login({ auth, response }: HttpContext) {
+    if (auth.user) return response.redirect().toRoute('dashboard')
     const user = await this.demoService.ensureExists()
     await auth.use('web').login(user, false)
     return response.redirect().toRoute('dashboard')
