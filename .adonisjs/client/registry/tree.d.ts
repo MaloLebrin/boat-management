@@ -224,4 +224,7 @@ export interface ApiDefinition {
     fleetAnalysis: typeof routes['ai.fleetAnalysis']
     boatSuggestions: typeof routes['ai.boatSuggestions']
   }
+  demo: {
+    login: typeof routes['demo.login']
+  }
 }

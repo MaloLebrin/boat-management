@@ -138,6 +138,7 @@ export type ScannedRoutes = {
     'ai.chat': { paramsTuple?: []; params?: {} }
     'ai.fleetAnalysis': { paramsTuple?: []; params?: {} }
     'ai.boatSuggestions': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'demo.login': { paramsTuple?: []; params?: {} }
   }
   GET: {
     'dashboard': { paramsTuple?: []; params?: {} }
@@ -195,6 +196,7 @@ export type ScannedRoutes = {
     'session.create': { paramsTuple?: []; params?: {} }
     'password.forgot': { paramsTuple?: []; params?: {} }
     'password.reset': { paramsTuple?: []; params?: {} }
+    'demo.login': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
     'dashboard': { paramsTuple?: []; params?: {} }
@@ -252,6 +254,7 @@ export type ScannedRoutes = {
     'session.create': { paramsTuple?: []; params?: {} }
     'password.forgot': { paramsTuple?: []; params?: {} }
     'password.reset': { paramsTuple?: []; params?: {} }
+    'demo.login': { paramsTuple?: []; params?: {} }
   }
   POST: {
     'boats.store': { paramsTuple?: []; params?: {} }

@@ -1,4 +1,5 @@
 import AuditLogService from '#services/audit_log_service'
+import DemoService from '#services/demo_service'
 import UserService from '#services/user_service'
 import { loginValidator } from '#validators/user'
 import { inject } from '@adonisjs/core'
@@ -9,7 +10,8 @@ import { DateTime } from 'luxon'
 export default class SessionController {
   constructor(
     private userService: UserService,
-    private auditLogService: AuditLogService
+    private auditLogService: AuditLogService,
+    private demoService: DemoService
   ) {}
 
   async create({ inertia }: HttpContext) {
@@ -36,14 +38,22 @@ export default class SessionController {
 
   async destroy({ auth, response }: HttpContext) {
     const user = auth.user
-    if (user?.organizationId) {
+    const isDemo = user ? await this.demoService.isDemoUser(user.id) : false
+
+    if (user?.organizationId && !isDemo) {
       await this.auditLogService.log({
         organizationId: user.organizationId,
         userId: user.id,
         action: 'logout',
       })
     }
+
     await auth.use('web').logout()
+
+    if (isDemo) {
+      await this.demoService.reset()
+    }
+
     response.redirect().toRoute('session.create')
   }
 }

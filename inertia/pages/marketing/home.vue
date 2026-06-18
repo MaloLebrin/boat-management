@@ -119,6 +119,19 @@ interface PageProps {
         cta: { label: string; href: string }
         items: FaqItem[]
       }
+      demo: {
+        eyebrow: string
+        title: string
+        titleHighlight: string
+        subtitle: string
+        items: string[]
+        ctaLabel: string
+        ctaHref: string
+        secondaryLabel: string
+        noCommitment: string
+        tryDemoLabel: string
+        tryDemoSubtitle: string
+      }
       finalCta: {
         title: string
         titleHighlight: string
@@ -274,6 +287,8 @@ onUnmounted(() => {
     :cta-href="t.home.demo.ctaHref"
     :secondary-label="t.home.demo.secondaryLabel"
     :no-commitment="t.home.demo.noCommitment"
+    :try-demo-label="t.home.demo.tryDemoLabel"
+    :try-demo-subtitle="t.home.demo.tryDemoSubtitle"
     :locale="locale"
   />
 

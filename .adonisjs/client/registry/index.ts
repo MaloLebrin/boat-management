@@ -810,6 +810,12 @@ const routes = {
     tokens: [{"old":"/ai/boats/:id/suggestions","type":0,"val":"ai","end":""},{"old":"/ai/boats/:id/suggestions","type":0,"val":"boats","end":""},{"old":"/ai/boats/:id/suggestions","type":1,"val":"id","end":""},{"old":"/ai/boats/:id/suggestions","type":0,"val":"suggestions","end":""}],
     types: placeholder as Registry['ai.boatSuggestions']['types'],
   },
+  'demo.login': {
+    methods: ["GET","HEAD"],
+    pattern: '/demo',
+    tokens: [{"old":"/demo","type":0,"val":"demo","end":""}],
+    types: placeholder as Registry['demo.login']['types'],
+  },
 } as const satisfies Record<string, AdonisEndpoint>
 
 export { routes }

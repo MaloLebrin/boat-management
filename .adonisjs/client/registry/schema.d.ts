@@ -1615,4 +1615,16 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/ai_controller').default['boatSuggestions']>>>
     }
   }
+  'demo.login': {
+    methods: ["GET","HEAD"]
+    pattern: '/demo'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/demo_controller').default['login']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/demo_controller').default['login']>>>
+    }
+  }
 }
