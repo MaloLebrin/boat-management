@@ -17,12 +17,14 @@ export const controllers = {
   BoatSafetyEquipment: () => import('#controllers/boat_safety_equipment_controller'),
   BoatSimulator: () => import('#controllers/boat_simulator_controller'),
   Boats: () => import('#controllers/boats_controller'),
+  Demo: () => import('#controllers/demo_controller'),
   dev: {
     MailPreviews: () => import('#controllers/dev/mail_previews_controller'),
     PdfPreviews: () => import('#controllers/dev/pdf_previews_controller'),
   },
   Home: () => import('#controllers/home_controller'),
   MaintenanceHistory: () => import('#controllers/maintenance_history_controller'),
+  MaintenanceLogPdf: () => import('#controllers/maintenance_log_pdf_controller'),
   Marketing: () => import('#controllers/marketing_controller'),
   Mouillages: () => import('#controllers/mouillages_controller'),
   NewAccount: () => import('#controllers/new_account_controller'),
@@ -38,6 +40,4 @@ export const controllers = {
   SimulatorLead: () => import('#controllers/simulator_lead_controller'),
   SimulatorShare: () => import('#controllers/simulator_share_controller'),
   Spots: () => import('#controllers/spots_controller'),
-  MaintenanceLogPdf: () => import('#controllers/maintenance_log_pdf_controller'),
-  Demo: () => import('#controllers/demo_controller'),
 }
