@@ -15,6 +15,7 @@ import BoatEnginePart from '#models/boat_engine_part'
 import BoatMaintenanceEvent from '#models/boat_maintenance_event'
 import BoatMaintenancePart from '#models/boat_maintenance_part'
 import BoatRig from '#models/boat_rig'
+import BoatSafetyEquipment from '#models/boat_safety_equipment'
 import BoatSail from '#models/boat_sail'
 import type User from '#models/user'
 import { inject } from '@adonisjs/core'
@@ -40,6 +41,7 @@ export default class BoatMaintenanceService {
     let boatEngineId: number | null = null
     let boatSailId: number | null = null
     let boatRigId: number | null = null
+    let boatSafetyEquipmentId: number | null = null
     let engineCaption: string | null = null
     let sailCaption: string | null = null
 
@@ -48,10 +50,26 @@ export default class BoatMaintenanceService {
       case 'hull':
       case 'electrical':
       case 'plumbing':
-      case 'safety':
       case 'deck':
       case 'other':
         break
+      case 'safety': {
+        if (payload.boatSafetyEquipmentId) {
+          const item = await BoatSafetyEquipment.query()
+            .select('id')
+            .where('id', payload.boatSafetyEquipmentId)
+            .where('boatId', boat.id)
+            .first()
+          if (!item) {
+            throw new BoatMaintenanceValidationError(
+              'Safety equipment does not belong to this boat',
+              'safetyEquipmentNotBelongs'
+            )
+          }
+          boatSafetyEquipmentId = item.id
+        }
+        break
+      }
       case 'engine': {
         let caption = payload.engineCaption?.trim() || null
         if (payload.boatEngineId) {
@@ -134,6 +152,7 @@ export default class BoatMaintenanceService {
           boatEngineId,
           boatSailId,
           boatRigId,
+          boatSafetyEquipmentId,
           engineCaption,
           sailCaption,
           performedAt: toDateTime(payload.performedAt),
@@ -283,6 +302,7 @@ export default class BoatMaintenanceService {
         boatEngineId: ev.boatEngineId,
         boatSailId: ev.boatSailId,
         boatRigId: ev.boatRigId,
+        boatSafetyEquipmentId: ev.boatSafetyEquipmentId,
         totalCost,
         parts: mappedParts,
       }

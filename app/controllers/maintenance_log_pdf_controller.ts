@@ -40,10 +40,12 @@ export default class MaintenanceLogPdfController {
       throw error
     }
 
+    await boat.load('engines', (q) => q.preload('parts'))
+
     const events = await this.maintenanceService.listForBoat(user, boat)
     const eventsAsc = [...events].reverse()
 
-    const { buffer, filename } = await this.pdfService.generate(boat, eventsAsc)
+    const { buffer, filename } = await this.pdfService.generate(boat, eventsAsc, i18n)
 
     response.header('Content-Type', 'application/pdf')
     response.header('Content-Disposition', `attachment; filename="${filename}"`)

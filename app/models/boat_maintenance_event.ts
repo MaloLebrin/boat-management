@@ -3,6 +3,7 @@ import Boat from '#models/boat'
 import BoatEngine from '#models/boat_engine'
 import BoatMaintenancePart from '#models/boat_maintenance_part'
 import BoatRig from '#models/boat_rig'
+import BoatSafetyEquipment from '#models/boat_safety_equipment'
 import BoatSail from '#models/boat_sail'
 import { belongsTo, hasMany } from '@adonisjs/lucid/orm'
 import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
@@ -19,6 +20,9 @@ export default class BoatMaintenanceEvent extends BoatMaintenanceEventSchema {
 
   @belongsTo(() => BoatRig, { foreignKey: 'boatRigId' })
   declare rig: BelongsTo<typeof BoatRig>
+
+  @belongsTo(() => BoatSafetyEquipment, { foreignKey: 'boatSafetyEquipmentId' })
+  declare safetyEquipment: BelongsTo<typeof BoatSafetyEquipment>
 
   @hasMany(() => BoatMaintenancePart, { foreignKey: 'maintenanceEventId' })
   declare parts: HasMany<typeof BoatMaintenancePart>
