@@ -22,7 +22,6 @@ export const controllers = {
   },
   Home: () => import('#controllers/home_controller'),
   MaintenanceHistory: () => import('#controllers/maintenance_history_controller'),
-  MaintenanceLogPdf: () => import('#controllers/maintenance_log_pdf_controller'),
   Marketing: () => import('#controllers/marketing_controller'),
   Mouillages: () => import('#controllers/mouillages_controller'),
   NewAccount: () => import('#controllers/new_account_controller'),
@@ -38,4 +37,5 @@ export const controllers = {
   SimulatorLead: () => import('#controllers/simulator_lead_controller'),
   SimulatorShare: () => import('#controllers/simulator_share_controller'),
   Spots: () => import('#controllers/spots_controller'),
+  MaintenanceLogPdf: () => import('#controllers/maintenance_log_pdf_controller'),
 }

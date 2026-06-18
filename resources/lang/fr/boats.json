@@ -577,7 +577,77 @@
     "download": "Télécharger le carnet PDF",
     "title": "Carnet d'entretien",
     "generatedOn": "Généré le {date}",
+    "boatInfo": "Informations bateau",
+    "history": "Historique des interventions",
     "noEvents": "Aucune intervention enregistrée.",
-    "upgradeRequired": "L'export PDF est disponible à partir du plan Pro."
+    "parts": "Pièces :",
+    "subject": "Sujet : {label}",
+    "subjects": {
+      "boat": "Bateau entier",
+      "hull": "Coque",
+      "engine": "Moteur",
+      "sail": "Voile",
+      "rig": "Gréement",
+      "electrical": "Électricité",
+      "plumbing": "Plomberie",
+      "safety": "Sécurité",
+      "deck": "Pont / Accastillage",
+      "other": "Autre"
+    },
+    "specs": {
+      "registration": "Immatriculation",
+      "type": "Type",
+      "propulsion": "Propulsion",
+      "manufacturer": "Constructeur",
+      "model": "Modèle",
+      "length": "{value} m",
+      "lengthLabel": "Longueur",
+      "homePort": "Port d'attache"
+    },
+    "sectionEngines": "Moteurs embarqués",
+    "sectionSails": "Voilure",
+    "sectionRig": "Gréement",
+    "sectionSafety": "Armement de sécurité",
+    "sectionHistoryByEquipment": "Historique par équipement",
+    "historyFor": "Interventions — {name}",
+    "noEngines": "Aucun moteur enregistré.",
+    "noSails": "Aucune voile enregistrée.",
+    "noRig": "Aucun gréement enregistré.",
+    "noSafety": "Aucun équipement de sécurité enregistré.",
+    "noEventsForEquipment": "Aucune intervention enregistrée pour cet équipement.",
+    "engineFields": {
+      "kind": "Type",
+      "brand": "Marque",
+      "model": "Modèle",
+      "serial": "N° série",
+      "fuel": "Carburant",
+      "power": "Puissance",
+      "hours": "Heures moteur",
+      "hp": "{value} cv",
+      "hoursUnit": "{value} h",
+      "installYear": "Installé en"
+    },
+    "sailFields": {
+      "type": "Type",
+      "material": "Matériau",
+      "area": "Surface",
+      "areaUnit": "{value} m²",
+      "reefPoints": "Ris"
+    },
+    "rigFields": {
+      "type": "Type de gréement",
+      "mastCount": "Nombre de mâts",
+      "spreaders": "Barres de flèche"
+    },
+    "safetyFields": {
+      "type": "Équipement",
+      "quantity": "Qté",
+      "expiry": "Expiration",
+      "status": "État",
+      "noExpiry": "—"
+    },
+    "statusOk": "OK",
+    "statusToCheck": "À vérifier",
+    "statusExpired": "Périmé"
   }
 }

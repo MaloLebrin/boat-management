@@ -558,7 +558,77 @@
     "download": "Download maintenance log PDF",
     "title": "Maintenance log",
     "generatedOn": "Generated on {date}",
+    "boatInfo": "Boat information",
+    "history": "Maintenance history",
     "noEvents": "No maintenance events recorded.",
-    "upgradeRequired": "PDF export is available from the Pro plan."
+    "parts": "Parts:",
+    "subject": "Subject: {label}",
+    "subjects": {
+      "boat": "Whole boat",
+      "hull": "Hull",
+      "engine": "Engine",
+      "sail": "Sail",
+      "rig": "Rigging",
+      "electrical": "Electrical",
+      "plumbing": "Plumbing",
+      "safety": "Safety",
+      "deck": "Deck / Hardware",
+      "other": "Other"
+    },
+    "specs": {
+      "registration": "Registration",
+      "type": "Type",
+      "propulsion": "Propulsion",
+      "manufacturer": "Manufacturer",
+      "model": "Model",
+      "length": "{value} m",
+      "lengthLabel": "Length",
+      "homePort": "Home port"
+    },
+    "sectionEngines": "Installed engines",
+    "sectionSails": "Sails",
+    "sectionRig": "Rig",
+    "sectionSafety": "Safety equipment",
+    "sectionHistoryByEquipment": "History by equipment",
+    "historyFor": "Events — {name}",
+    "noEngines": "No engine registered.",
+    "noSails": "No sail registered.",
+    "noRig": "No rig registered.",
+    "noSafety": "No safety equipment registered.",
+    "noEventsForEquipment": "No events recorded for this equipment.",
+    "engineFields": {
+      "kind": "Type",
+      "brand": "Brand",
+      "model": "Model",
+      "serial": "Serial no.",
+      "fuel": "Fuel",
+      "power": "Power",
+      "hours": "Engine hours",
+      "hp": "{value} hp",
+      "hoursUnit": "{value} h",
+      "installYear": "Installed in"
+    },
+    "sailFields": {
+      "type": "Type",
+      "material": "Material",
+      "area": "Area",
+      "areaUnit": "{value} m²",
+      "reefPoints": "Reef points"
+    },
+    "rigFields": {
+      "type": "Rig type",
+      "mastCount": "Masts",
+      "spreaders": "Spreaders"
+    },
+    "safetyFields": {
+      "type": "Equipment",
+      "quantity": "Qty",
+      "expiry": "Expiry",
+      "status": "Status",
+      "noExpiry": "—"
+    },
+    "statusOk": "OK",
+    "statusToCheck": "To check",
+    "statusExpired": "Expired"
   }
 }
