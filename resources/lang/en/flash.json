@@ -97,7 +97,8 @@
     "noSubscription": "No active subscription found."
   },
   "demo": {
-    "rateLimitError": "Too many attempts. Please try again in a minute."
+    "rateLimitError": "Too many attempts. Please try again in a minute.",
+    "sessionExpired": "Your demo session has expired (15 min). Log in again to start over."
   },
   "quota": {
     "boatsExceeded": "You have reached the boat limit for your plan. Upgrade to add more boats.",

@@ -97,7 +97,8 @@
     "noSubscription": "Aucun abonnement actif trouvé."
   },
   "demo": {
-    "rateLimitError": "Trop de tentatives. Veuillez réessayer dans une minute."
+    "rateLimitError": "Trop de tentatives. Veuillez réessayer dans une minute.",
+    "sessionExpired": "Votre session de démonstration a expiré (15 min). Reconnectez-vous pour recommencer."
   },
   "quota": {
     "boatsExceeded": "Vous avez atteint la limite de bateaux de votre plan. Passez à un plan supérieur pour en ajouter.",
