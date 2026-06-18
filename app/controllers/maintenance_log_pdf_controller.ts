@@ -40,6 +40,8 @@ export default class MaintenanceLogPdfController {
       throw error
     }
 
+    await boat.load('engines', (q) => q.preload('parts'))
+
     const events = await this.maintenanceService.listForBoat(user, boat)
     const eventsAsc = [...events].reverse()
 

@@ -61,7 +61,7 @@ export default class BoatHullService {
     if (!boat) throw new BoatNotFoundError()
 
     await Promise.all([
-      boat.load('engines', (q) => q.preload('parts')),
+      boat.load('engines'),
       boat.load('sails'),
       boat.load('rig'),
       boat.load('safetyEquipment'),

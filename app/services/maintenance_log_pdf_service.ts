@@ -36,7 +36,7 @@ const PAGE_W = 595.28
 const MARGIN = 48
 const CONTENT_W = PAGE_W - MARGIN * 2
 
-function equipmentStatusColor(status: string | null | undefined): string {
+function mechanicalEquipmentStatusColor(status: string | null | undefined): string {
   if (status === 'operational') return '#2e7d32'
   if (status === 'in_maintenance') return '#e65100'
   if (status === 'out_of_service' || status === 'retired') return CORAL
@@ -683,35 +683,33 @@ export default class MaintenanceLogPdfService {
       const name = [engine.brand, engine.model].filter(Boolean).join(' ') || `#${engine.id}`
       const type = engine.kind ? tOpt('engineKind', engine.kind) : t('inventoryFields.engine')
       const status = engine.status ? tOpt('equipmentStatus', engine.status) : '—'
-      rows.push([name, type, status, equipmentStatusColor(engine.status)])
+      rows.push([name, type, status, mechanicalEquipmentStatusColor(engine.status)])
     }
 
     for (const sail of sails) {
       const name = tOpt('sailType', sail.sailType)
       const material = sail.material ?? '—'
       const status = sail.status ? tOpt('equipmentStatus', sail.status) : '—'
-      rows.push([name, material, status, equipmentStatusColor(sail.status)])
+      rows.push([name, material, status, mechanicalEquipmentStatusColor(sail.status)])
     }
 
     if (rig) {
       const name = tOpt('rigType', rig.rigType)
       const type = t('sectionRig')
       const status = rig.status ? tOpt('equipmentStatus', rig.status) : '—'
-      rows.push([name, type, status, equipmentStatusColor(rig.status)])
+      rows.push([name, type, status, mechanicalEquipmentStatusColor(rig.status)])
     }
 
     for (const item of safety) {
       const name = tOpt('safetyEquipmentType', item.equipmentType)
-      const qty = item.quantity !== null ? `×${item.quantity}` : '—'
-      const statusKey =
+      const statusLabel =
         item.status === 'ok'
-          ? 'statusOk'
+          ? t('statusOk')
           : item.status === 'to_check'
-            ? 'statusToCheck'
+            ? t('statusToCheck')
             : item.status === 'expired'
-              ? 'statusExpired'
-              : null
-      const statusLabel = statusKey ? t(statusKey) : '—'
+              ? t('statusExpired')
+              : '—'
       const statusColor =
         item.status === 'ok'
           ? '#2e7d32'
@@ -720,7 +718,7 @@ export default class MaintenanceLogPdfService {
             : item.status === 'expired'
               ? CORAL
               : GREY_M
-      rows.push([name, qty, statusLabel, statusColor])
+      rows.push([name, t('sectionSafety'), statusLabel, statusColor])
     }
 
     for (const [name, type, status, dotColor] of rows) {
