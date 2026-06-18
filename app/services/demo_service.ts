@@ -1,4 +1,7 @@
 import Boat from '#models/boat'
+import BoatEngine from '#models/boat_engine'
+import BoatRig from '#models/boat_rig'
+import BoatSail from '#models/boat_sail'
 import Organization from '#models/organization'
 import User from '#models/user'
 import { seedDemoData } from '#database/seeders/sandbox_seeder'
@@ -32,7 +35,15 @@ export default class DemoService {
 
       const org = await Organization.query({ client: trx }).where('slug', DEMO_ORG_SLUG).first()
       if (org) {
-        // boats.organization_id has no ON DELETE CASCADE — delete explicitly before org
+        const boats = await Boat.query({ client: trx }).where('organizationId', org.id).select('id')
+        if (boats.length > 0) {
+          const ids = boats.map((b) => b.id)
+          // boat_engines/sails/rigs have no FK CASCADE — must delete before boats
+          await BoatRig.query({ client: trx }).whereIn('boatId', ids).delete()
+          await BoatSail.query({ client: trx }).whereIn('boatId', ids).delete()
+          await BoatEngine.query({ client: trx }).whereIn('boatId', ids).delete()
+        }
+        // maintenance events/tasks/sheets cascade via FK
         await Boat.query({ client: trx }).where('organizationId', org.id).delete()
         await org.delete()
       }

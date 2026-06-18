@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { CheckCircleIcon, CalendarDaysIcon, PlayCircleIcon } from '@heroicons/vue/24/outline'
-import { useForm, usePage } from '@inertiajs/vue3'
-import { computed } from 'vue'
+import { useForm } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
+import { useFlash } from '~/composables/use_flash'
 import { useScrollReveal } from '~/composables/use_scroll_reveal'
+import { useT } from '~/composables/use_t'
 
 const demoForm = useForm({})
 
@@ -23,8 +24,8 @@ defineProps<{
   locale: 'en' | 'fr'
 }>()
 
-const page = usePage<{ flash?: { error?: string } }>()
-const flashError = computed(() => page.props.flash?.error ?? null)
+const { t } = useT()
+const { errorMessage: flashError } = useFlash()
 
 const { el, isVisible } = useScrollReveal()
 </script>
@@ -72,7 +73,7 @@ const { el, isVisible } = useScrollReveal()
                 :disabled="demoForm.processing"
                 @click="demoForm.post(demoLoginPath)"
               >
-                {{ tryDemoLabel }}
+                {{ demoForm.processing ? t('loading') : tryDemoLabel }}
               </BaseButton>
               <p v-if="flashError" class="mt-2 text-sm text-red-600">{{ flashError }}</p>
             </div>
