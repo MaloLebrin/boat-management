@@ -68,7 +68,6 @@ export interface AboutPageProps {
         members: AboutMember[]
         hiringTitle: string
         hiringSubtitle: string
-        hiringCta: string
       }
       numbers: {
         eyebrow: string
