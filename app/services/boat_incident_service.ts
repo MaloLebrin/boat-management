@@ -10,8 +10,6 @@ import { DateTime } from 'luxon'
 import type { CreateIncidentPayload, UpdateIncidentPayload } from '#shared/types/incident'
 import { toDateTime } from '#shared/helpers/maintenance'
 
-export { BoatIncidentNotFoundError, BoatIncidentValidationError }
-export type { CreateIncidentPayload, UpdateIncidentPayload }
 
 function assertBoatScope(user: User, boat: Boat) {
   if (user.organizationId === null || user.organizationId !== boat.organizationId) {
@@ -25,6 +23,11 @@ export default class BoatIncidentService {
     assertBoatScope(user, boat)
 
     return await BoatIncident.query()
+      .select([
+        'id', 'boatId', 'organizationId', 'occurredAt', 'type',
+        'location', 'description', 'insuranceClaimed', 'insuranceClaimRef',
+        'status', 'closedAt', 'createdAt', 'updatedAt',
+      ])
       .where('boatId', boat.id)
       .orderBy('occurredAt', 'desc')
       .orderBy('id', 'desc')
@@ -41,7 +44,7 @@ export default class BoatIncidentService {
     return await BoatIncident.create({
       boatId: boat.id,
       organizationId: boat.organizationId,
-      occurredAt: toDateTime(payload.occurredAt),
+      occurredAt: toDateTime(payload.occurredAt).plus({ minutes: payload.tzOffsetMinutes ?? 0 }),
       type: payload.type,
       location: payload.location?.trim() || null,
       description,
@@ -70,7 +73,7 @@ export default class BoatIncidentService {
     }
 
     if (payload.occurredAt !== undefined) {
-      incident.occurredAt = toDateTime(payload.occurredAt)
+      incident.occurredAt = toDateTime(payload.occurredAt).plus({ minutes: payload.tzOffsetMinutes ?? 0 })
     }
     if (payload.type !== undefined) incident.type = payload.type
     if (payload.location !== undefined) incident.location = payload.location?.trim() || null

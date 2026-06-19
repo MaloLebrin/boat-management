@@ -14,6 +14,8 @@ export type IncidentStatus = 'open' | 'in_progress' | 'closed'
 
 export type CreateIncidentPayload = {
   occurredAt: Date | string | DateTime
+  /** getTimezoneOffset() of the submitting browser — used to shift the naive local datetime to UTC */
+  tzOffsetMinutes?: number
   type: IncidentType
   location?: string | null
   description: string
@@ -23,6 +25,8 @@ export type CreateIncidentPayload = {
 
 export type UpdateIncidentPayload = {
   occurredAt?: Date | string | DateTime
+  /** getTimezoneOffset() of the submitting browser — used to shift the naive local datetime to UTC */
+  tzOffsetMinutes?: number
   type?: IncidentType
   location?: string | null
   description?: string

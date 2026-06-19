@@ -16,10 +16,12 @@ const incidentStatusChoices = ['open', 'in_progress', 'closed'] as const
 export const createBoatIncidentValidator = vine.create(
   vine.object({
     occurredAt: vine.date(),
+    // browser's getTimezoneOffset() — shifts the naive local datetime to UTC
+    tzOffsetMinutes: vine.number().withoutDecimals().optional(),
     type: vine.enum(incidentTypeChoices),
     location: vine.string().trim().optional(),
     description: vine.string().trim().minLength(1),
-    // unchecked checkboxes are not submitted — absent field → undefined; ?? false in controller coerces to false
+    // unchecked checkboxes are not submitted — absent field → undefined; ?? false coerces to false
     insuranceClaimed: vine.boolean().optional(),
     insuranceClaimRef: vine.string().trim().optional(),
   })
@@ -27,13 +29,15 @@ export const createBoatIncidentValidator = vine.create(
 
 export const updateBoatIncidentValidator = vine.create(
   vine.object({
-    occurredAt: vine.date(),
-    type: vine.enum(incidentTypeChoices),
+    occurredAt: vine.date().optional(),
+    // browser's getTimezoneOffset() — shifts the naive local datetime to UTC
+    tzOffsetMinutes: vine.number().withoutDecimals().optional(),
+    type: vine.enum(incidentTypeChoices).optional(),
     location: vine.string().trim().optional(),
-    description: vine.string().trim().minLength(1),
-    // unchecked checkboxes are not submitted — absent field → undefined; ?? false in controller coerces to false
+    description: vine.string().trim().minLength(1).optional(),
+    // unchecked checkboxes are not submitted — absent field → undefined; ?? false coerces to false
     insuranceClaimed: vine.boolean().optional(),
     insuranceClaimRef: vine.string().trim().optional(),
-    status: vine.enum(incidentStatusChoices),
+    status: vine.enum(incidentStatusChoices).optional(),
   })
 )

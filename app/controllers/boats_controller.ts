@@ -16,6 +16,7 @@ import PortService from '#services/port_service'
 import QuotaService from '#services/quota_service'
 import SpotService from '#services/spot_service'
 import BoatPolicy from '#policies/boat_policy'
+import IncidentPolicy from '#policies/incident_policy'
 import { createBoatValidator, updateBoatValidator } from '#validators/boat'
 import { assignBoatValidator } from '#validators/marina_layout'
 import { inject } from '@adonisjs/core'
@@ -124,6 +125,7 @@ export default class BoatsController {
         positionHistory,
         latestSuggestions,
         canManageMaintenance,
+        canDeleteIncidents,
       ] = await Promise.all([
         this.maintenanceService.listForBoat(user, boat),
         this.taskService.listForBoat(user, boat),
@@ -133,6 +135,7 @@ export default class BoatsController {
         this.boatService.getPositionHistory(boat.id),
         this.aiAnalysisService.getLatestBoatSuggestions(user.id, boat.id),
         bouncer.with(BoatPolicy).allows('edit', boat),
+        bouncer.with(IncidentPolicy).allows('delete', boat),
       ])
 
       const canManageEquipment = canManageMaintenance
@@ -153,6 +156,7 @@ export default class BoatsController {
           canManageMaintenance,
           canManageEquipment,
           canExport,
+          canDeleteIncidents,
         })
       )
     } catch (error) {

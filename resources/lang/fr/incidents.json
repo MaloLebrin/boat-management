@@ -1,7 +1,7 @@
 {
   "tab": "Incidents",
   "empty": "Aucun incident déclaré.",
-  "addIncident": "Déclarer un incident",
+  "addIncident": "+ Déclarer un incident",
   "count": "{count, plural, one {# incident} other {# incidents}}",
   "insuranceDeclared": "· Assurance déclarée",
   "status": {

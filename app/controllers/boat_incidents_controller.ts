@@ -1,7 +1,8 @@
-import BoatIncidentService, {
+import {
   BoatIncidentNotFoundError,
   BoatIncidentValidationError,
-} from '#services/boat_incident_service'
+} from '#exceptions/incident_errors'
+import BoatIncidentService from '#services/boat_incident_service'
 import BoatService, { BoatNotFoundError } from '#services/boat_service'
 import IncidentPolicy from '#policies/incident_policy'
 import {
@@ -40,6 +41,7 @@ export default class BoatIncidentsController {
     try {
       await this.boatIncidentService.createForBoat(user, boat, {
         occurredAt: payload.occurredAt,
+        tzOffsetMinutes: payload.tzOffsetMinutes,
         type: payload.type,
         location: payload.location ?? null,
         description: payload.description,
@@ -81,6 +83,7 @@ export default class BoatIncidentsController {
     try {
       await this.boatIncidentService.updateForBoat(user, boat, Number(params.incidentId), {
         occurredAt: payload.occurredAt,
+        tzOffsetMinutes: payload.tzOffsetMinutes,
         type: payload.type,
         location: payload.location ?? null,
         description: payload.description,

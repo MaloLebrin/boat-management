@@ -34,6 +34,7 @@ const props = defineProps<{
   canManageMaintenance: boolean
   canManageEquipment: boolean
   canExport: boolean
+  canDeleteIncidents: boolean
   aiSuggestions: AiSuggestion[] | null
 }>()
 
@@ -241,6 +242,7 @@ function openTasksTab() {
           :boat="boat"
           :incidents="incidents"
           :can-manage="canManageMaintenance"
+          :can-delete="canDeleteIncidents"
         />
       </div>
     </Transition>
