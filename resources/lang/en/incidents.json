@@ -1,0 +1,40 @@
+{
+  "tab": "Incidents",
+  "empty": "No incidents reported.",
+  "addIncident": "+ Report an incident",
+  "count": "{count, plural, one {# incident} other {# incidents}}",
+  "insuranceDeclared": "· Insurance claim filed",
+  "status": {
+    "open": "Open",
+    "in_progress": "In progress",
+    "closed": "Closed"
+  },
+  "type": {
+    "grounding": "Grounding",
+    "flooding": "Flooding",
+    "rigging_failure": "Rigging / sail failure",
+    "engine_failure": "Engine failure",
+    "collision": "Collision",
+    "fire": "Fire",
+    "theft_vandalism": "Theft / vandalism",
+    "other": "Other"
+  },
+  "fields": {
+    "occurredAt": "Date of incident",
+    "type": "Incident type",
+    "location": "Location (optional)",
+    "description": "Description",
+    "insuranceClaimed": "Insurance claim submitted",
+    "insuranceClaimRef": "Claim reference (optional)",
+    "status": "Status"
+  },
+  "form": {
+    "createTitle": "Report an incident",
+    "editTitle": "Edit incident",
+    "edit": "Edit",
+    "submit": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "confirmDelete": "Delete this incident?"
+  }
+}

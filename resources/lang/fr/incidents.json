@@ -1,0 +1,40 @@
+{
+  "tab": "Incidents",
+  "empty": "Aucun incident déclaré.",
+  "addIncident": "+ Déclarer un incident",
+  "count": "{count, plural, one {# incident} other {# incidents}}",
+  "insuranceDeclared": "· Assurance déclarée",
+  "status": {
+    "open": "Ouvert",
+    "in_progress": "En cours",
+    "closed": "Clôturé"
+  },
+  "type": {
+    "grounding": "Échouage",
+    "flooding": "Voie d'eau",
+    "rigging_failure": "Casse voilure/gréement",
+    "engine_failure": "Avarie moteur",
+    "collision": "Collision",
+    "fire": "Incendie",
+    "theft_vandalism": "Vol / vandalisme",
+    "other": "Autre"
+  },
+  "fields": {
+    "occurredAt": "Date de l'incident",
+    "type": "Type d'incident",
+    "location": "Lieu (optionnel)",
+    "description": "Description",
+    "insuranceClaimed": "Déclaration assurance transmise",
+    "insuranceClaimRef": "N° de sinistre (optionnel)",
+    "status": "Statut"
+  },
+  "form": {
+    "createTitle": "Déclarer un incident",
+    "editTitle": "Modifier l'incident",
+    "edit": "Modifier",
+    "submit": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "confirmDelete": "Supprimer cet incident ?"
+  }
+}

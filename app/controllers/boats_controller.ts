@@ -5,6 +5,7 @@ import AuditLogService from '#services/audit_log_service'
 import BoatListService from '#services/boat_list_service'
 import { toEditForm, toShowProps } from '#transformers/boat_transformer'
 import { toPortFormOptions } from '#transformers/port_transformer'
+import BoatIncidentService from '#services/boat_incident_service'
 import BoatMaintenanceService from '#services/boat_maintenance_service'
 import BoatMaintenanceSheetService from '#services/boat_maintenance_sheet_service'
 import BoatMaintenanceTaskService from '#services/boat_maintenance_task_service'
@@ -15,6 +16,7 @@ import PortService from '#services/port_service'
 import QuotaService from '#services/quota_service'
 import SpotService from '#services/spot_service'
 import BoatPolicy from '#policies/boat_policy'
+import IncidentPolicy from '#policies/incident_policy'
 import { createBoatValidator, updateBoatValidator } from '#validators/boat'
 import { assignBoatValidator } from '#validators/marina_layout'
 import { inject } from '@adonisjs/core'
@@ -27,6 +29,7 @@ export default class BoatsController {
     private maintenanceService: BoatMaintenanceService,
     private taskService: BoatMaintenanceTaskService,
     private sheetService: BoatMaintenanceSheetService,
+    private incidentService: BoatIncidentService,
     private mediaService: MediaService,
     private aiAnalysisService: AiAnalysisService,
     private boatListService: BoatListService,
@@ -117,18 +120,22 @@ export default class BoatsController {
         maintenanceEvents,
         maintenanceTasks,
         maintenanceSheets,
+        incidents,
         boatMedia,
         positionHistory,
         latestSuggestions,
         canManageMaintenance,
+        canDeleteIncidents,
       ] = await Promise.all([
         this.maintenanceService.listForBoat(user, boat),
         this.taskService.listForBoat(user, boat),
         this.sheetService.listForBoat(user, boat),
+        this.incidentService.listForBoat(user, boat),
         this.mediaService.listForEntity('boat', boat.id),
         this.boatService.getPositionHistory(boat.id),
         this.aiAnalysisService.getLatestBoatSuggestions(user.id, boat.id),
         bouncer.with(BoatPolicy).allows('edit', boat),
+        bouncer.with(IncidentPolicy).allows('delete', boat),
       ])
 
       const canManageEquipment = canManageMaintenance
@@ -144,10 +151,12 @@ export default class BoatsController {
           maintenanceEvents,
           maintenanceTasks,
           maintenanceSheets,
+          incidents,
           aiSuggestions,
           canManageMaintenance,
           canManageEquipment,
           canExport,
+          canDeleteIncidents,
         })
       )
     } catch (error) {

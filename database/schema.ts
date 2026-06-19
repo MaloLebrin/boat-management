@@ -174,6 +174,51 @@ export class BoatEngineSchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class BoatIncidentSchema extends BaseModel {
+  static $columns = [
+    'boatId',
+    'closedAt',
+    'createdAt',
+    'description',
+    'id',
+    'insuranceClaimed',
+    'insuranceClaimRef',
+    'location',
+    'occurredAt',
+    'organizationId',
+    'status',
+    'type',
+    'updatedAt',
+  ] as const
+  $columns = BoatIncidentSchema.$columns
+  @column()
+  declare boatId: number
+  @column.dateTime()
+  declare closedAt: DateTime | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare description: string
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare insuranceClaimed: boolean
+  @column()
+  declare insuranceClaimRef: string | null
+  @column()
+  declare location: string | null
+  @column.dateTime()
+  declare occurredAt: DateTime
+  @column()
+  declare organizationId: number
+  @column()
+  declare status: string
+  @column()
+  declare type: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class BoatMaintenanceEventSchema extends BaseModel {
   static $columns = [
     'boatEngineId',

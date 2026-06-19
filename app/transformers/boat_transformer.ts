@@ -1,10 +1,12 @@
 import type Boat from '#models/boat'
+import type BoatIncident from '#models/boat_incident'
 import type BoatMaintenanceEvent from '#models/boat_maintenance_event'
 import type BoatMaintenanceSheet from '#models/boat_maintenance_sheet'
 import type BoatMaintenanceTask from '#models/boat_maintenance_task'
 import type BoatPositionHistory from '#models/boat_position_history'
 import type Media from '#models/media'
 import type { AiSuggestion } from '#services/ai_analysis_service'
+import type { IncidentType, IncidentStatus } from '#shared/types/incident'
 
 export interface BoatShowContext {
   positionHistory: BoatPositionHistory[]
@@ -12,10 +14,12 @@ export interface BoatShowContext {
   maintenanceEvents: BoatMaintenanceEvent[]
   maintenanceTasks: BoatMaintenanceTask[]
   maintenanceSheets: BoatMaintenanceSheet[]
+  incidents: BoatIncident[]
   aiSuggestions: AiSuggestion[] | null
   canManageMaintenance: boolean
   canManageEquipment: boolean
   canExport: boolean
+  canDeleteIncidents: boolean
 }
 
 export function toEditForm(boat: Boat) {
@@ -50,9 +54,11 @@ export function toShowProps(boat: Boat, ctx: BoatShowContext) {
     maintenanceEvents: ctx.maintenanceEvents.map(toMaintenanceEvent),
     maintenanceTasks: ctx.maintenanceTasks.map(toMaintenanceTask),
     maintenanceSheets: ctx.maintenanceSheets.map(toMaintenanceSheet),
+    incidents: ctx.incidents.map(toIncident),
     canManageMaintenance: ctx.canManageMaintenance,
     canManageEquipment: ctx.canManageEquipment,
     canExport: ctx.canExport,
+    canDeleteIncidents: ctx.canDeleteIncidents,
     aiSuggestions: ctx.aiSuggestions,
   }
 }
@@ -213,6 +219,22 @@ function toMaintenanceTask(t: BoatMaintenanceTask) {
     boatRigId: t.boatRigId,
     recurrenceIntervalMonths: t.recurrenceIntervalMonths,
     recurrenceIntervalEngineHours: t.recurrenceIntervalEngineHours,
+  }
+}
+
+function toIncident(i: BoatIncident) {
+  return {
+    id: i.id,
+    boatId: i.boatId,
+    occurredAt: i.occurredAt.toISO()!,
+    type: i.type as IncidentType,
+    location: i.location,
+    description: i.description,
+    insuranceClaimed: i.insuranceClaimed,
+    insuranceClaimRef: i.insuranceClaimRef,
+    status: i.status as IncidentStatus,
+    closedAt: i.closedAt ? i.closedAt.toISO() : null,
+    createdAt: i.createdAt.toISO()!,
   }
 }
 

@@ -8,6 +8,7 @@ import BaseTabs from '~/components/base/BaseTabs.vue'
 import BoatShowTabDocuments from '~/components/boats/show/tabs/BoatShowTabDocuments.vue'
 import BoatShowTabEquipment from '~/components/boats/show/tabs/BoatShowTabEquipment.vue'
 import BoatShowTabHistory from '~/components/boats/show/tabs/BoatShowTabHistory.vue'
+import BoatShowTabIncidents from '~/components/boats/show/tabs/BoatShowTabIncidents.vue'
 import BoatShowTabOverview from '~/components/boats/show/tabs/BoatShowTabOverview.vue'
 import BoatShowTabSpecs from '~/components/boats/show/tabs/BoatShowTabSpecs.vue'
 import BoatShowTabSheets from '~/components/boats/show/tabs/BoatShowTabSheets.vue'
@@ -15,6 +16,7 @@ import BoatShowTabTasks from '~/components/boats/show/tabs/BoatShowTabTasks.vue'
 import { useT } from '~/composables/use_t'
 import type {
   AiSuggestion,
+  BoatIncidentRow,
   BoatShowDetail,
   MaintenanceEventRow,
   MaintenanceSheetRow,
@@ -28,13 +30,15 @@ const props = defineProps<{
   maintenanceEvents: MaintenanceEventRow[]
   maintenanceTasks: MaintenanceTaskRow[]
   maintenanceSheets: MaintenanceSheetRow[]
+  incidents: BoatIncidentRow[]
   canManageMaintenance: boolean
   canManageEquipment: boolean
   canExport: boolean
+  canDeleteIncidents: boolean
   aiSuggestions: AiSuggestion[] | null
 }>()
 
-type TabKey = 'overview' | 'specs' | 'equipment' | 'history' | 'tasks' | 'documents' | 'sheets'
+type TabKey = 'overview' | 'specs' | 'equipment' | 'history' | 'tasks' | 'documents' | 'sheets' | 'incidents'
 
 const tab = ref<TabKey>('overview')
 
@@ -74,6 +78,10 @@ const statusBadge = computed(() => {
   return { variant: 'success' as const, label: t('boats.show.status.ok') }
 })
 
+const openIncidents = computed(() =>
+  props.incidents.filter((i) => i.status === 'open' || i.status === 'in_progress')
+)
+
 const tabs = computed(() => [
   { key: 'overview', label: t('boats.show.tabs.overview') },
   { key: 'specs', label: t('boats.show.tabs.specs') },
@@ -86,6 +94,11 @@ const tabs = computed(() => [
   },
   { key: 'sheets', label: t('boats.show.tabs.sheets') },
   { key: 'documents', label: t('boats.show.tabs.documents') },
+  {
+    key: 'incidents',
+    label: t('incidents.tab'),
+    badge: openIncidents.value.length > 0 ? String(openIncidents.value.length) : undefined,
+  },
 ])
 
 function goToTab(key: TabKey | string) {
@@ -222,6 +235,14 @@ function openTasksTab() {
           v-else-if="tab === 'documents'"
           :boat="boat"
           :can-manage="canManageEquipment"
+        />
+
+        <BoatShowTabIncidents
+          v-else-if="tab === 'incidents'"
+          :boat="boat"
+          :incidents="incidents"
+          :can-manage="canManageMaintenance"
+          :can-delete="canDeleteIncidents"
         />
       </div>
     </Transition>

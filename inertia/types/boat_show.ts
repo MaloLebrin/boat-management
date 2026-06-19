@@ -173,6 +173,8 @@ export type MaintenanceSheetRow = {
   items: MaintenanceSheetItemRow[]
 }
 
+export type { IncidentType, IncidentStatus, BoatIncidentRow } from '../../shared/types/incident'
+
 export type AiSuggestion = { text: string }
 
 export type MaintenanceLogPdfProps = {

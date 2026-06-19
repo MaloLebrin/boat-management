@@ -137,6 +137,16 @@ router
       ])
       .as('boats.maintenanceSheetItems.update')
 
+    router
+      .post('boats/:boatId/incidents', [controllers.BoatIncidents, 'store'])
+      .as('boats.incidents.store')
+    router
+      .put('boats/:boatId/incidents/:incidentId', [controllers.BoatIncidents, 'update'])
+      .as('boats.incidents.update')
+    router
+      .delete('boats/:boatId/incidents/:incidentId', [controllers.BoatIncidents, 'destroy'])
+      .as('boats.incidents.destroy')
+
     router.get('boats/:id/simulator', [controllers.BoatSimulator, 'show']).as('boats.simulator')
   })
   .use(middleware.auth())
