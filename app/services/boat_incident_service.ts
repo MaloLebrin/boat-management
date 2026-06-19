@@ -1,7 +1,4 @@
-import {
-  BoatIncidentNotFoundError,
-  BoatIncidentValidationError,
-} from '#exceptions/incident_errors'
+import { BoatIncidentNotFoundError, BoatIncidentValidationError } from '#exceptions/incident_errors'
 import BoatIncident from '#models/boat_incident'
 import type Boat from '#models/boat'
 import type User from '#models/user'
@@ -9,7 +6,6 @@ import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
 import type { CreateIncidentPayload, UpdateIncidentPayload } from '#shared/types/incident'
 import { toDateTime } from '#shared/helpers/maintenance'
-
 
 function assertBoatScope(user: User, boat: Boat) {
   if (user.organizationId === null || user.organizationId !== boat.organizationId) {
@@ -24,9 +20,19 @@ export default class BoatIncidentService {
 
     return await BoatIncident.query()
       .select([
-        'id', 'boatId', 'organizationId', 'occurredAt', 'type',
-        'location', 'description', 'insuranceClaimed', 'insuranceClaimRef',
-        'status', 'closedAt', 'createdAt', 'updatedAt',
+        'id',
+        'boatId',
+        'organizationId',
+        'occurredAt',
+        'type',
+        'location',
+        'description',
+        'insuranceClaimed',
+        'insuranceClaimRef',
+        'status',
+        'closedAt',
+        'createdAt',
+        'updatedAt',
       ])
       .where('boatId', boat.id)
       .orderBy('occurredAt', 'desc')
@@ -73,7 +79,9 @@ export default class BoatIncidentService {
     }
 
     if (payload.occurredAt !== undefined) {
-      incident.occurredAt = toDateTime(payload.occurredAt).plus({ minutes: payload.tzOffsetMinutes ?? 0 })
+      incident.occurredAt = toDateTime(payload.occurredAt).plus({
+        minutes: payload.tzOffsetMinutes ?? 0,
+      })
     }
     if (payload.type !== undefined) incident.type = payload.type
     if (payload.location !== undefined) incident.location = payload.location?.trim() || null

@@ -1,14 +1,8 @@
-import {
-  BoatIncidentNotFoundError,
-  BoatIncidentValidationError,
-} from '#exceptions/incident_errors'
+import { BoatIncidentNotFoundError, BoatIncidentValidationError } from '#exceptions/incident_errors'
 import BoatIncidentService from '#services/boat_incident_service'
 import BoatService, { BoatNotFoundError } from '#services/boat_service'
 import IncidentPolicy from '#policies/incident_policy'
-import {
-  createBoatIncidentValidator,
-  updateBoatIncidentValidator,
-} from '#validators/boat_incident'
+import { createBoatIncidentValidator, updateBoatIncidentValidator } from '#validators/boat_incident'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 
