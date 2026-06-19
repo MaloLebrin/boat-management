@@ -72,10 +72,10 @@ function deleteFuelLog(logId: number) {
               <span class="text-sm font-medium text-brand"
                 >{{ log.quantityLiters.toFixed(1) }} L</span
               >
-              <span v-if="log.totalCost" class="text-sm text-fg-muted">
+              <span v-if="log.totalCost !== null" class="text-sm text-fg-muted">
                 {{ log.totalCost.toFixed(2) }} €
               </span>
-              <span v-else-if="log.pricePerLiter" class="text-sm text-fg-muted">
+              <span v-else-if="log.pricePerLiter !== null" class="text-sm text-fg-muted">
                 {{ log.pricePerLiter.toFixed(4) }} €/L
               </span>
             </div>
