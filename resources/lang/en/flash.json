@@ -100,6 +100,13 @@
     "rateLimitError": "Too many attempts. Please try again in a minute.",
     "sessionExpired": "Your demo session has expired (15 min). Log in again to start over."
   },
+  "incidents": {
+    "created": "Incident reported.",
+    "updated": "Incident updated.",
+    "deleted": "Incident deleted.",
+    "notFound": "Incident not found.",
+    "descriptionRequired": "A description is required."
+  },
   "quota": {
     "boatsExceeded": "You have reached the boat limit for your plan. Upgrade to add more boats.",
     "membersExceeded": "You have reached the member limit for your plan. Upgrade to add more members.",

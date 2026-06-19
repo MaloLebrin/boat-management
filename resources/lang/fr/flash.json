@@ -100,6 +100,13 @@
     "rateLimitError": "Trop de tentatives. Veuillez réessayer dans une minute.",
     "sessionExpired": "Votre session de démonstration a expiré (15 min). Reconnectez-vous pour recommencer."
   },
+  "incidents": {
+    "created": "Incident déclaré.",
+    "updated": "Incident mis à jour.",
+    "deleted": "Incident supprimé.",
+    "notFound": "Incident introuvable.",
+    "descriptionRequired": "Une description est requise."
+  },
   "quota": {
     "boatsExceeded": "Vous avez atteint la limite de bateaux de votre plan. Passez à un plan supérieur pour en ajouter.",
     "membersExceeded": "Vous avez atteint la limite de membres de votre plan. Passez à un plan supérieur pour en ajouter.",
