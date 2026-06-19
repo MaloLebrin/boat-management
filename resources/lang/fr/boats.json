@@ -218,7 +218,8 @@
       "history": "Historique",
       "tasks": "Tâches",
       "documents": "Documents",
-      "sheets": "Fiches"
+      "sheets": "Fiches",
+      "adminDocs": "Documents admin."
     },
     "breadcrumbFleet": "Flotte",
     "nextTasks": "Prochaines tâches",
@@ -678,6 +679,40 @@
       "reference": "Référence",
       "stock": "Stock",
       "wear": "Usure"
+    }
+  },
+  "adminDocs": {
+    "title": "Documents administratifs",
+    "addDocument": "Ajouter un document",
+    "noDocuments": "Aucun document administratif enregistré.",
+    "deleteDocument": "Supprimer le document",
+    "editDocument": "Modifier",
+    "status": {
+      "valid": "Valide",
+      "expiring_soon": "Expire bientôt",
+      "expired": "Expiré"
+    },
+    "types": {
+      "francisation": "Carte de circulation (francisation)",
+      "insurance": "Attestation d'assurance",
+      "navigation_permit": "Permis de navigation",
+      "radio_license": "Licence radio (VHF)",
+      "safety_inspection": "Certificat de visite de sécurité",
+      "tonnage": "Jauge (tonnage)",
+      "ce_certificate": "Certificat de conformité CE",
+      "crew_role": "Rôle d'équipage",
+      "other": "Autre"
+    },
+    "form": {
+      "type": "Type de document",
+      "customTypeLabel": "Libellé personnalisé",
+      "referenceNumber": "Numéro de référence",
+      "issuedAt": "Date d'émission",
+      "expiresAt": "Date d'expiration",
+      "issuer": "Organisme émetteur",
+      "notes": "Notes",
+      "submit": "Enregistrer",
+      "cancel": "Annuler"
     }
   }
 }

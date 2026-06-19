@@ -5,6 +5,7 @@ import BaseBreadcrumb from '~/components/base/BaseBreadcrumb.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseTabs from '~/components/base/BaseTabs.vue'
+import BoatShowTabAdminDocs from '~/components/boats/show/tabs/BoatShowTabAdminDocs.vue'
 import BoatShowTabDocuments from '~/components/boats/show/tabs/BoatShowTabDocuments.vue'
 import BoatShowTabEquipment from '~/components/boats/show/tabs/BoatShowTabEquipment.vue'
 import BoatShowTabHistory from '~/components/boats/show/tabs/BoatShowTabHistory.vue'
@@ -17,6 +18,7 @@ import { useT } from '~/composables/use_t'
 import type {
   AiSuggestion,
   BoatIncidentRow,
+  BoatDocumentRow,
   BoatShowDetail,
   MaintenanceEventRow,
   MaintenanceSheetRow,
@@ -31,6 +33,7 @@ const props = defineProps<{
   maintenanceTasks: MaintenanceTaskRow[]
   maintenanceSheets: MaintenanceSheetRow[]
   incidents: BoatIncidentRow[]
+  boatDocuments: BoatDocumentRow[]
   canManageMaintenance: boolean
   canManageEquipment: boolean
   canExport: boolean
@@ -38,7 +41,16 @@ const props = defineProps<{
   aiSuggestions: AiSuggestion[] | null
 }>()
 
-type TabKey = 'overview' | 'specs' | 'equipment' | 'history' | 'tasks' | 'documents' | 'sheets' | 'incidents'
+type TabKey =
+  | 'overview'
+  | 'specs'
+  | 'equipment'
+  | 'history'
+  | 'tasks'
+  | 'documents'
+  | 'sheets'
+  | 'incidents'
+  | 'admin-docs'
 
 const tab = ref<TabKey>('overview')
 
@@ -82,6 +94,11 @@ const openIncidents = computed(() =>
   props.incidents.filter((i) => i.status === 'open' || i.status === 'in_progress')
 )
 
+const expiringDocCount = computed(
+  () =>
+    props.boatDocuments.filter((d) => d.status === 'expiring_soon' || d.status === 'expired').length
+)
+
 const tabs = computed(() => [
   { key: 'overview', label: t('boats.show.tabs.overview') },
   { key: 'specs', label: t('boats.show.tabs.specs') },
@@ -98,6 +115,11 @@ const tabs = computed(() => [
     key: 'incidents',
     label: t('incidents.tab'),
     badge: openIncidents.value.length > 0 ? String(openIncidents.value.length) : undefined,
+  },
+  {
+    key: 'admin-docs',
+    label: t('boats.show.tabs.adminDocs'),
+    badge: expiringDocCount.value > 0 ? String(expiringDocCount.value) : undefined,
   },
 ])
 
@@ -243,6 +265,13 @@ function openTasksTab() {
           :incidents="incidents"
           :can-manage="canManageMaintenance"
           :can-delete="canDeleteIncidents"
+        />
+
+        <BoatShowTabAdminDocs
+          v-else-if="tab === 'admin-docs'"
+          :boat="boat"
+          :boat-documents="boatDocuments"
+          :can-manage="canManageEquipment"
         />
       </div>
     </Transition>

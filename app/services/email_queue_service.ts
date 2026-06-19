@@ -2,6 +2,7 @@ import edge from 'edge.js'
 import SendEmail, { type SendEmailPayload } from '#jobs/send_email'
 import QueueDedupService from '#services/queue_dedup_service'
 import type { ReminderBoatItem, ReminderPortItem, ReminderTaskItem } from '#shared/types/reminder'
+import type { ReminderDocumentItem } from '#shared/types/boat_document'
 import type { PlanTier } from '#shared/types/plan'
 import type { BrandingEmailParams } from '#shared/types/branding'
 import env from '#start/env'
@@ -490,6 +491,53 @@ export default class EmailQueueService {
     })
 
     const correlationId = `ai-token-quota-warning:${params.correlationSuffix}`
+
+    const partialPayload: Omit<SendEmailPayload, 'dedupKey'> = {
+      to: params.to,
+      subject,
+      text,
+      html,
+      correlationId,
+    }
+
+    const key = SendEmail.dedupKey(partialPayload)
+    const payload: SendEmailPayload = { ...partialPayload, dedupKey: key }
+
+    await this.dedup.enqueueUnique({
+      key,
+      jobName: SendEmail.name,
+      queue: 'emails',
+      payload,
+      dispatch: async (p) => {
+        await SendEmail.dispatch(p)
+      },
+    })
+  }
+
+  async sendReminderDocumentExpiry(params: {
+    to: string
+    name: string | null
+    documents: ReminderDocumentItem[]
+    daysLabel: '30' | '7'
+    branding?: BrandingEmailParams | null
+  }) {
+    const displayName = params.name ?? params.to
+    const subject =
+      params.daysLabel === '7'
+        ? 'Documents bateau urgents (7 j) / Boat documents expiring SOON (7 d)'
+        : 'Documents bateau arrivant à expiration (30 j) / Boat documents expiring soon (30 d)'
+
+    const text = `${displayName}, ${params.documents.length} document(s) expirent dans ${params.daysLabel} jours.`
+
+    const html = await edge.render('emails/reminder_document_expiry', {
+      displayName,
+      documents: params.documents,
+      daysLabel: params.daysLabel,
+      appUrl: env.get('APP_URL'),
+      branding: params.branding ?? null,
+    })
+
+    const correlationId = `doc-expiry:${params.to}:${params.daysLabel}:${DateTime.now().toISODate()}`
 
     const partialPayload: Omit<SendEmailPayload, 'dedupKey'> = {
       to: params.to,

@@ -643,6 +643,42 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_simulator_controller').default['show']>>>
     }
   }
+  'boats.adminDocuments.store': {
+    methods: ["POST"]
+    pattern: '/boats/:boatId/admin-documents'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/boat_document').createBoatDocumentValidator)>>
+      paramsTuple: [ParamValue]
+      params: { boatId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/boat_document').createBoatDocumentValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_documents_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_documents_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'boats.adminDocuments.update': {
+    methods: ["PUT"]
+    pattern: '/boats/:boatId/admin-documents/:documentId'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/boat_document').updateBoatDocumentValidator)>>
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; documentId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/boat_document').updateBoatDocumentValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_documents_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_documents_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'boats.adminDocuments.destroy': {
+    methods: ["DELETE"]
+    pattern: '/boats/:boatId/admin-documents/:documentId'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; documentId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_documents_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_documents_controller').default['destroy']>>>
+    }
+  }
   'ports.index': {
     methods: ["GET","HEAD"]
     pattern: '/ports'

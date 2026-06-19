@@ -1,4 +1,5 @@
 import Boat from '#models/boat'
+import BoatDocument from '#models/boat_document'
 import BoatMaintenanceTask from '#models/boat_maintenance_task'
 import Organization from '#models/organization'
 import OrganizationMembership from '#models/organization_membership'
@@ -7,6 +8,7 @@ import User from '#models/user'
 import EmailQueueService from '#services/email_queue_service'
 import { BrandingService } from '#services/branding_service'
 import type { ReminderBoatItem, ReminderPortItem, ReminderTaskItem } from '#shared/types/reminder'
+import type { ReminderDocumentItem } from '#shared/types/boat_document'
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
 import { DateTime } from 'luxon'
@@ -339,6 +341,67 @@ export default class ReminderEmailService {
     }
 
     logger.info({ sent }, 'ReminderEmailService.sendBoatCheckReminders: done')
+  }
+
+  async sendDocumentExpirationReminders(daysAhead: 30 | 7): Promise<void> {
+    const now = DateTime.now()
+    const limit = now.plus({ days: daysAhead })
+
+    const docs = await BoatDocument.query()
+      .whereNotNull('expires_at')
+      .where('expires_at', '>', now.toISODate()!)
+      .where('expires_at', '<=', limit.toISODate()!)
+      .preload('boat')
+
+    if (docs.length === 0) {
+      logger.info(`ReminderEmailService.sendDocumentExpirationReminders(${daysAhead}): no targets`)
+      return
+    }
+
+    const byOrg = new Map<number, typeof docs>()
+    for (const doc of docs) {
+      const orgId = doc.boat.organizationId
+      const list = byOrg.get(orgId) ?? []
+      list.push(doc)
+      byOrg.set(orgId, list)
+    }
+
+    const orgMap = await this.orgMapForIds([...byOrg.keys()])
+    let sent = 0
+
+    for (const [orgId, orgDocs] of byOrg) {
+      const org = orgMap.get(orgId)
+      const admins = await OrganizationMembership.query()
+        .where('organizationId', orgId)
+        .where('role', 'admin')
+        .preload('user')
+      const branding = org ? this.brandingService.toEmailParams(org) : null
+
+      const documents: ReminderDocumentItem[] = orgDocs.map((d) => ({
+        id: d.id,
+        boatName: d.boat.name,
+        documentType: d.type,
+        customTypeLabel: d.customTypeLabel,
+        expiresAt: d.expiresAt!.toISODate()!,
+        daysUntilExpiry: Math.ceil(d.expiresAt!.diff(now, 'days').days),
+      }))
+
+      for (const membership of admins) {
+        await this.emailQueueService.sendReminderDocumentExpiry({
+          to: membership.user.email,
+          name: membership.user.fullName,
+          documents,
+          daysLabel: String(daysAhead) as '30' | '7',
+          branding,
+        })
+        sent++
+      }
+    }
+
+    logger.info(
+      { sent },
+      `ReminderEmailService.sendDocumentExpirationReminders(${daysAhead}): done`
+    )
   }
 
   private async orgMapForIds(ids: number[]): Promise<Map<number, Organization>> {

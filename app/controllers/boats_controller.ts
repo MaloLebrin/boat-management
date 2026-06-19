@@ -2,6 +2,7 @@ import { SpotNotFoundError } from '#exceptions/port_errors'
 import { QuotaExceededError } from '#exceptions/quota_errors'
 import AiAnalysisService, { type AiSuggestion } from '#services/ai_analysis_service'
 import AuditLogService from '#services/audit_log_service'
+import BoatDocumentService from '#services/boat_document_service'
 import BoatListService from '#services/boat_list_service'
 import { toEditForm, toShowProps } from '#transformers/boat_transformer'
 import { toPortFormOptions } from '#transformers/port_transformer'
@@ -37,7 +38,8 @@ export default class BoatsController {
     private spotService: SpotService,
     private quotaService: QuotaService,
     private organizationService: OrganizationService,
-    private auditLogService: AuditLogService
+    private auditLogService: AuditLogService,
+    private documentService: BoatDocumentService
   ) {}
 
   async index({ inertia, auth, request }: HttpContext) {
@@ -126,6 +128,7 @@ export default class BoatsController {
         latestSuggestions,
         canManageMaintenance,
         canDeleteIncidents,
+        boatDocuments,
       ] = await Promise.all([
         this.maintenanceService.listForBoat(user, boat),
         this.taskService.listForBoat(user, boat),
@@ -136,6 +139,7 @@ export default class BoatsController {
         this.aiAnalysisService.getLatestBoatSuggestions(user.id, boat.id),
         bouncer.with(BoatPolicy).allows('edit', boat),
         bouncer.with(IncidentPolicy).allows('delete', boat),
+        this.documentService.listForBoat(user, boat),
       ])
 
       const canManageEquipment = canManageMaintenance
@@ -152,6 +156,7 @@ export default class BoatsController {
           maintenanceTasks,
           maintenanceSheets,
           incidents,
+          boatDocuments,
           aiSuggestions,
           canManageMaintenance,
           canManageEquipment,

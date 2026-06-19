@@ -107,6 +107,12 @@
     "notFound": "Incident not found.",
     "descriptionRequired": "A description is required."
   },
+  "boatDocument": {
+    "created": "Document created successfully.",
+    "updated": "Document updated.",
+    "deleted": "Document deleted.",
+    "notFound": "Document not found."
+  },
   "quota": {
     "boatsExceeded": "You have reached the boat limit for your plan. Upgrade to add more boats.",
     "membersExceeded": "You have reached the member limit for your plan. Upgrade to add more members.",

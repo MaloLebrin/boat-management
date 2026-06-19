@@ -57,6 +57,9 @@ export type ScannedRoutes = {
     'boats.maintenanceSheets.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'sheetId': ParamValue} }
     'boats.maintenanceSheetItems.update': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'sheetId': ParamValue,'itemId': ParamValue} }
     'boats.simulator': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'boats.adminDocuments.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
+    'boats.adminDocuments.update': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'documentId': ParamValue} }
+    'boats.adminDocuments.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'documentId': ParamValue} }
     'ports.index': { paramsTuple?: []; params?: {} }
     'ports.create': { paramsTuple?: []; params?: {} }
     'ports.store': { paramsTuple?: []; params?: {} }
@@ -267,6 +270,7 @@ export type ScannedRoutes = {
     'boat_media.store_document': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'boat_safety_equipment.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'boats.maintenanceSheets.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
+    'boats.adminDocuments.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'ports.store': { paramsTuple?: []; params?: {} }
     'ports.pontoons.store': { paramsTuple: [ParamValue]; params: {'portId': ParamValue} }
     'ports.mouillages.store': { paramsTuple: [ParamValue]; params: {'portId': ParamValue} }
@@ -304,6 +308,7 @@ export type ScannedRoutes = {
     'boat_safety_equipment.update': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'itemId': ParamValue} }
     'boats.maintenanceSheets.complete': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'sheetId': ParamValue} }
     'boats.maintenanceSheetItems.update': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'sheetId': ParamValue,'itemId': ParamValue} }
+    'boats.adminDocuments.update': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'documentId': ParamValue} }
     'ports.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'ports.pontoons.update': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'pontoonId': ParamValue} }
     'ports.mouillages.update': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'mouillageId': ParamValue} }
@@ -327,6 +332,7 @@ export type ScannedRoutes = {
     'boat_media.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'mediaId': ParamValue} }
     'boat_safety_equipment.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'itemId': ParamValue} }
     'boats.maintenanceSheets.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'sheetId': ParamValue} }
+    'boats.adminDocuments.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'documentId': ParamValue} }
     'ports.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'ports.pontoons.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'pontoonId': ParamValue} }
     'ports.mouillages.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'mouillageId': ParamValue} }

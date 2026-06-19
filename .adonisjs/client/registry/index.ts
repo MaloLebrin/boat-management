@@ -324,6 +324,24 @@ const routes = {
     tokens: [{"old":"/boats/:id/simulator","type":0,"val":"boats","end":""},{"old":"/boats/:id/simulator","type":1,"val":"id","end":""},{"old":"/boats/:id/simulator","type":0,"val":"simulator","end":""}],
     types: placeholder as Registry['boats.simulator']['types'],
   },
+  'boats.adminDocuments.store': {
+    methods: ["POST"],
+    pattern: '/boats/:boatId/admin-documents',
+    tokens: [{"old":"/boats/:boatId/admin-documents","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/admin-documents","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/admin-documents","type":0,"val":"admin-documents","end":""}],
+    types: placeholder as Registry['boats.adminDocuments.store']['types'],
+  },
+  'boats.adminDocuments.update': {
+    methods: ["PUT"],
+    pattern: '/boats/:boatId/admin-documents/:documentId',
+    tokens: [{"old":"/boats/:boatId/admin-documents/:documentId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/admin-documents/:documentId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/admin-documents/:documentId","type":0,"val":"admin-documents","end":""},{"old":"/boats/:boatId/admin-documents/:documentId","type":1,"val":"documentId","end":""}],
+    types: placeholder as Registry['boats.adminDocuments.update']['types'],
+  },
+  'boats.adminDocuments.destroy': {
+    methods: ["DELETE"],
+    pattern: '/boats/:boatId/admin-documents/:documentId',
+    tokens: [{"old":"/boats/:boatId/admin-documents/:documentId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/admin-documents/:documentId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/admin-documents/:documentId","type":0,"val":"admin-documents","end":""},{"old":"/boats/:boatId/admin-documents/:documentId","type":1,"val":"documentId","end":""}],
+    types: placeholder as Registry['boats.adminDocuments.destroy']['types'],
+  },
   'ports.index': {
     methods: ["GET","HEAD"],
     pattern: '/ports',

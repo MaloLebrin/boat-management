@@ -6,6 +6,8 @@ export type ReminderKind =
   | 'overdue_task'
   | 'engine_task_due'
   | 'boat_check_due'
+  | 'document_expiry_30'
+  | 'document_expiry_7'
 
 export interface ReminderTaskItem {
   id: number

@@ -1,5 +1,11 @@
 /** Inertia props shapes for boat detail / maintenance UI. */
 
+export type {
+  BoatDocumentRow,
+  BoatDocumentType,
+  BoatDocumentStatus,
+} from '../../shared/types/boat_document'
+
 export type BoatShowSafetyEquipment = {
   id: number
   equipmentType: string
