@@ -13,20 +13,14 @@ const incidentTypeChoices = [
 
 const incidentStatusChoices = ['open', 'in_progress', 'closed'] as const
 
-function optionalBoolFromForm() {
-  return vine
-    .string()
-    .optional()
-    .transform((v) => v === 'on' || v === '1' || v === 'true')
-}
-
 export const createBoatIncidentValidator = vine.create(
   vine.object({
     occurredAt: vine.date(),
     type: vine.enum(incidentTypeChoices),
     location: vine.string().trim().optional(),
     description: vine.string().trim().minLength(1),
-    insuranceClaimed: optionalBoolFromForm(),
+    // unchecked checkboxes are not submitted — absent field → undefined; ?? false in controller coerces to false
+    insuranceClaimed: vine.boolean().optional(),
     insuranceClaimRef: vine.string().trim().optional(),
   })
 )
@@ -37,7 +31,8 @@ export const updateBoatIncidentValidator = vine.create(
     type: vine.enum(incidentTypeChoices),
     location: vine.string().trim().optional(),
     description: vine.string().trim().minLength(1),
-    insuranceClaimed: optionalBoolFromForm(),
+    // unchecked checkboxes are not submitted — absent field → undefined; ?? false in controller coerces to false
+    insuranceClaimed: vine.boolean().optional(),
     insuranceClaimRef: vine.string().trim().optional(),
     status: vine.enum(incidentStatusChoices),
   })

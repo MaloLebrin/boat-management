@@ -22,7 +22,7 @@ export default class IncidentPolicy extends BasePolicy {
     return user.organizationId !== null && user.organizationId === boat.organizationId
   }
 
-  delete(user: User, boat: Boat): AuthorizerResponse {
-    return user.organizationId !== null && user.organizationId === boat.organizationId
+  delete(_user: User, _boat: Boat): AuthorizerResponse {
+    return false
   }
 }

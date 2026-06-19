@@ -8,6 +8,7 @@ import type User from '#models/user'
 import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
 import type { CreateIncidentPayload, UpdateIncidentPayload } from '#shared/types/incident'
+import { toDateTime } from '#shared/helpers/maintenance'
 
 export { BoatIncidentNotFoundError, BoatIncidentValidationError }
 export type { CreateIncidentPayload, UpdateIncidentPayload }
@@ -16,12 +17,6 @@ function assertBoatScope(user: User, boat: Boat) {
   if (user.organizationId === null || user.organizationId !== boat.organizationId) {
     throw new BoatIncidentNotFoundError()
   }
-}
-
-function toDateTime(value: Date | string | DateTime): DateTime {
-  if (value instanceof DateTime) return value
-  if (value instanceof Date) return DateTime.fromJSDate(value)
-  return DateTime.fromISO(value)
 }
 
 @inject()

@@ -2,6 +2,8 @@
   "tab": "Incidents",
   "empty": "No incidents reported.",
   "addIncident": "Report an incident",
+  "count": "{count, plural, one {# incident} other {# incidents}}",
+  "insuranceDeclared": "· Insurance claim filed",
   "status": {
     "open": "Open",
     "in_progress": "In progress",
@@ -29,6 +31,7 @@
   "form": {
     "createTitle": "Report an incident",
     "editTitle": "Edit incident",
+    "edit": "Edit",
     "submit": "Save",
     "cancel": "Cancel",
     "delete": "Delete",

@@ -16,6 +16,8 @@ const { t } = useT()
 
 const showForm = ref(false)
 const editingIncident = ref<BoatIncidentRow | null>(null)
+const formType = ref<IncidentType>('other')
+const formStatus = ref<IncidentStatus>('open')
 
 const STATUS_COLORS: Record<IncidentStatus, string> = {
   open: 'bg-coral-50 text-coral-700 border-coral-200',
@@ -35,11 +37,15 @@ function formatDate(iso: string): string {
 
 function openCreate() {
   editingIncident.value = null
+  formType.value = 'other'
+  formStatus.value = 'open'
   showForm.value = true
 }
 
 function openEdit(incident: BoatIncidentRow) {
   editingIncident.value = incident
+  formType.value = incident.type
+  formStatus.value = incident.status
   showForm.value = true
 }
 
@@ -72,8 +78,7 @@ const INCIDENT_STATUSES: IncidentStatus[] = ['open', 'in_progress', 'closed']
     <!-- Header -->
     <div class="flex items-center justify-between">
       <p class="text-sm text-fg-muted">
-        {{ incidents.length }}
-        {{ incidents.length === 1 ? 'incident' : 'incidents' }}
+        {{ t('incidents.count', { count: String(incidents.length) }) }}
       </p>
       <BaseButton v-if="canManage" variant="primary" size="sm" type="button" @click="openCreate">
         + {{ t('incidents.addIncident') }}
@@ -119,8 +124,8 @@ const INCIDENT_STATUSES: IncidentStatus[] = ['open', 'in_progress', 'closed']
               {{ t('incidents.fields.type') }}
             </label>
             <select
+              v-model="formType"
               name="type"
-              :value="editingIncident?.type ?? 'other'"
               required
               class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
             >
@@ -136,8 +141,8 @@ const INCIDENT_STATUSES: IncidentStatus[] = ['open', 'in_progress', 'closed']
               {{ t('incidents.fields.status') }}
             </label>
             <select
+              v-model="formStatus"
               name="status"
-              :value="editingIncident.status"
               class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
             >
               <option v-for="s in INCIDENT_STATUSES" :key="s" :value="s">
@@ -243,7 +248,7 @@ const INCIDENT_STATUSES: IncidentStatus[] = ['open', 'in_progress', 'closed']
                 {{ t(`incidents.status.${incident.status}`) }}
               </span>
               <span v-if="incident.insuranceClaimed" class="text-xs text-fg-muted">
-                · Assurance déclarée
+                {{ t('incidents.insuranceDeclared') }}
                 <span v-if="incident.insuranceClaimRef">#{{ incident.insuranceClaimRef }}</span>
               </span>
             </div>
@@ -266,7 +271,7 @@ const INCIDENT_STATUSES: IncidentStatus[] = ['open', 'in_progress', 'closed']
               size="sm"
               @click="openEdit(incident)"
             >
-              Modifier
+              {{ t('incidents.form.edit') }}
             </BaseButton>
             <BaseButton
               type="button"
