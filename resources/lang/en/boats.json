@@ -218,7 +218,8 @@
       "history": "History",
       "tasks": "Tasks",
       "documents": "Documents",
-      "sheets": "Sheets"
+      "sheets": "Sheets",
+      "adminDocs": "Admin docs"
     },
     "breadcrumbFleet": "Fleet",
     "nextTasks": "Next tasks",
@@ -659,6 +660,40 @@
       "reference": "Reference",
       "stock": "Stock",
       "wear": "Wear"
+    }
+  },
+  "adminDocs": {
+    "title": "Administrative documents",
+    "addDocument": "Add document",
+    "noDocuments": "No administrative documents recorded.",
+    "deleteDocument": "Delete document",
+    "editDocument": "Edit",
+    "status": {
+      "valid": "Valid",
+      "expiring_soon": "Expiring soon",
+      "expired": "Expired"
+    },
+    "types": {
+      "francisation": "Ship registration (francisation)",
+      "insurance": "Insurance certificate",
+      "navigation_permit": "Navigation permit",
+      "radio_license": "Radio license (VHF)",
+      "safety_inspection": "Safety inspection certificate",
+      "tonnage": "Tonnage certificate",
+      "ce_certificate": "CE conformity certificate",
+      "crew_role": "Crew list",
+      "other": "Other"
+    },
+    "form": {
+      "type": "Document type",
+      "customTypeLabel": "Custom label",
+      "referenceNumber": "Reference number",
+      "issuedAt": "Issue date",
+      "expiresAt": "Expiration date",
+      "issuer": "Issuing authority",
+      "notes": "Notes",
+      "submit": "Save",
+      "cancel": "Cancel"
     }
   }
 }

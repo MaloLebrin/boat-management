@@ -25,6 +25,8 @@ export default class SendReminderEmails extends Job<Record<string, never>> {
     await this.reminderEmailService.sendOverdueTaskReminders()
     await this.reminderEmailService.sendEngineTaskReminders()
     await this.reminderEmailService.sendBoatCheckReminders()
+    await this.reminderEmailService.sendDocumentExpirationReminders(8, 30)
+    await this.reminderEmailService.sendDocumentExpirationReminders(0, 7)
 
     logger.info('SendReminderEmails: daily reminder run complete')
   }

@@ -7,6 +7,7 @@ import type BoatPositionHistory from '#models/boat_position_history'
 import type Media from '#models/media'
 import type { AiSuggestion } from '#services/ai_analysis_service'
 import type { IncidentType, IncidentStatus } from '#shared/types/incident'
+import type { BoatDocumentRow } from '#shared/types/boat_document'
 
 export interface BoatShowContext {
   positionHistory: BoatPositionHistory[]
@@ -15,9 +16,11 @@ export interface BoatShowContext {
   maintenanceTasks: BoatMaintenanceTask[]
   maintenanceSheets: BoatMaintenanceSheet[]
   incidents: BoatIncident[]
+  boatDocuments: BoatDocumentRow[]
   aiSuggestions: AiSuggestion[] | null
   canManageMaintenance: boolean
   canManageEquipment: boolean
+  canManageDocuments: boolean
   canExport: boolean
   canDeleteIncidents: boolean
 }
@@ -55,8 +58,10 @@ export function toShowProps(boat: Boat, ctx: BoatShowContext) {
     maintenanceTasks: ctx.maintenanceTasks.map(toMaintenanceTask),
     maintenanceSheets: ctx.maintenanceSheets.map(toMaintenanceSheet),
     incidents: ctx.incidents.map(toIncident),
+    boatDocuments: ctx.boatDocuments,
     canManageMaintenance: ctx.canManageMaintenance,
     canManageEquipment: ctx.canManageEquipment,
+    canManageDocuments: ctx.canManageDocuments,
     canExport: ctx.canExport,
     canDeleteIncidents: ctx.canDeleteIncidents,
     aiSuggestions: ctx.aiSuggestions,

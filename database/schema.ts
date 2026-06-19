@@ -78,6 +78,51 @@ export class AuditLogSchema extends BaseModel {
   declare userId: number | null
 }
 
+export class BoatDocumentSchema extends BaseModel {
+  static $columns = [
+    'boatId',
+    'createdAt',
+    'customTypeLabel',
+    'expiresAt',
+    'id',
+    'issuedAt',
+    'issuer',
+    'mediaId',
+    'notes',
+    'organizationId',
+    'referenceNumber',
+    'type',
+    'updatedAt',
+  ] as const
+  $columns = BoatDocumentSchema.$columns
+  @column()
+  declare boatId: number
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare customTypeLabel: string | null
+  @column.date()
+  declare expiresAt: DateTime | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column.date()
+  declare issuedAt: DateTime | null
+  @column()
+  declare issuer: string | null
+  @column()
+  declare mediaId: number | null
+  @column()
+  declare notes: string | null
+  @column()
+  declare organizationId: number
+  @column()
+  declare referenceNumber: string | null
+  @column()
+  declare type: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
+}
+
 export class BoatEnginePartSchema extends BaseModel {
   static $columns = [
     'boatEngineId',

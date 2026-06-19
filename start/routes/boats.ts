@@ -148,5 +148,15 @@ router
       .as('boats.incidents.destroy')
 
     router.get('boats/:id/simulator', [controllers.BoatSimulator, 'show']).as('boats.simulator')
+
+    router
+      .post('boats/:boatId/admin-documents', [controllers.BoatDocuments, 'store'])
+      .as('boats.adminDocuments.store')
+    router
+      .put('boats/:boatId/admin-documents/:documentId', [controllers.BoatDocuments, 'update'])
+      .as('boats.adminDocuments.update')
+    router
+      .delete('boats/:boatId/admin-documents/:documentId', [controllers.BoatDocuments, 'destroy'])
+      .as('boats.adminDocuments.destroy')
   })
   .use(middleware.auth())

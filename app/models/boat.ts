@@ -1,4 +1,5 @@
 import Organization from '#models/organization'
+import BoatDocument from '#models/boat_document'
 import BoatEngine from '#models/boat_engine'
 import BoatMaintenanceEvent from '#models/boat_maintenance_event'
 import BoatPositionHistory from '#models/boat_position_history'
@@ -108,4 +109,7 @@ export default class Boat extends BaseModel {
 
   @hasMany(() => BoatPositionHistory)
   declare positionHistory: HasMany<typeof BoatPositionHistory>
+
+  @hasMany(() => BoatDocument)
+  declare documents: HasMany<typeof BoatDocument>
 }

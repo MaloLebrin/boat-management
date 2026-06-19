@@ -27,6 +27,52 @@ Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 - `inertia/components/boats/show/tabs/BoatShowTabIncidents.vue` — onglet incidents : liste avec code couleur par statut (open=coral, in_progress=amber, closed=gris), formulaire création/édition inline, suppression avec confirmation
 - `inertia/pages/boats/show.vue` — ajout de l'onglet "Incidents" avec badge comptant les incidents ouverts/en cours
 
+## 2026-06-19 — Correctifs documents administratifs bateau (#103 suite)
+
+**Correctifs bloquants**
+
+- `app/jobs/send_reminder_emails.ts` — fenêtres d'envoi exclusives : `(8, 30)` + `(0, 7)` — supprime le double envoi pour les documents expirant dans ≤7 jours
+- `app/services/boat_document_service.ts` — `toReminderItem` : guard null sur `expiresAt` avant l'assertion ; `getExpiringDocuments(fromDaysAhead, toDaysAhead)` : borne inférieure `>=` (documents expirant aujourd'hui inclus)
+- `inertia/components/boats/show/tabs/BoatShowTabAdminDocs.vue` — remplacement du `<button>` brut par `<BaseButton>` (convention projet)
+
+**Correctifs importants**
+
+- `database/migrations/1796000001000_add_index_boat_documents_expires_at.ts` — index sur `expires_at` (requête cron quotidienne)
+- `app/validators/boat_document.ts` — factory `boatDocumentFields()` partagée entre create et update
+- `app/services/reminder_email_service.ts` — injection de `BoatDocumentService` ; suppression de la requête et du mapping dupliqués ; utilisation de `getExpiringDocuments` + `toReminderItem`
+- `app/transformers/boat_transformer.ts` + `app/controllers/boats_controller.ts` + `inertia/pages/boats/show.vue` — `canManageDocuments` découplé de `canManageEquipment`
+
+**Suggestions appliquées**
+
+- `shared/constants/boats/boat_document_constants.ts` — constante `BOAT_DOCUMENT_EXPIRY_WARNING_DAYS = 30` partagée entre service et job
+- `inertia/components/base/BaseBadge.vue` — variante `danger` ajoutée ; `expired` → `'danger'` dans `statusVariant`
+- `resources/views/emails/reminder_document_expiry.edge` — suppression du `.slice(0, 10)` redondant sur `expiresAt`
+
+## 2026-06-19 — Documents administratifs bateau avec dates d'expiration et alertes #103
+
+**Backend**
+
+- `database/migrations/1796000000000_create_boat_documents_table.ts` — table `boat_documents` : `type` (enum), `custom_type_label`, `reference_number`, `issued_at`, `expires_at`, `issuer`, `media_id` (FK nullable → media), `notes`
+- `app/models/boat_document.ts` — modèle Lucid avec relations `boat` et `media`
+- `app/services/boat_document_service.ts` — CRUD + calcul du statut (valid / expiring_soon / expired) + `getExpiringDocuments(daysAhead)`
+- `app/controllers/boat_documents_controller.ts` — routes POST/PUT/DELETE `/boats/:boatId/admin-documents[/:documentId]`
+- `app/validators/boat_document.ts` — validation VineJS (type enum, dates nullable)
+- `app/exceptions/boat_document_errors.ts` — `BoatDocumentNotFoundError`
+- `shared/types/boat_document.ts` — types partagés : `BoatDocumentType`, `BoatDocumentRow`, `ReminderDocumentItem`
+- `shared/constants/media.ts` — ajout de `'boat_document'` dans `MEDIA_ENTITY_TYPES`
+- `app/services/reminder_email_service.ts` — `sendDocumentExpirationReminders(30|7)` : alertes email 30 j et 7 j avant expiration
+- `app/services/email_queue_service.ts` — `sendReminderDocumentExpiry()` + template `reminder_document_expiry.edge`
+- `app/jobs/send_reminder_emails.ts` — appel des deux nouvelles méthodes
+- Types disponibles : francisation, assurance, permis de navigation, licence radio VHF, certificat de sécurité, jauge, certificat CE, rôle d'équipage, autre
+
+**Frontend**
+
+- Onglet "Documents admin." ajouté à la fiche bateau (`show.vue`) avec badge si des documents expirent bientôt / sont expirés
+- `BoatShowTabAdminDocs.vue` — liste des documents avec statut coloré, actions modifier/supprimer
+- `BoatAdminDocumentFormModal.vue` — modal création / édition (type, référence, dates, organisme, notes)
+- Clés i18n ajoutées dans `fr/boats.json` et `en/boats.json` (namespace `adminDocs`)
+- Flash messages `boatDocument.*` dans `fr/flash.json` et `en/flash.json`
+
 ## 2026-06-18 — Compte démo sandbox accessible sans inscription #96
 
 **Backend**
