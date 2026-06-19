@@ -1,0 +1,25 @@
+{
+  "tab": "Carburant",
+  "empty": "Aucun avitaillement enregistré.",
+  "add": "+ Ajouter un avitaillement",
+  "count": "{count, plural, one {# avitaillement} other {# avitaillements}}",
+  "totalLiters": "Total : {liters} L",
+  "fields": {
+    "fueledAt": "Date",
+    "quantityLiters": "Quantité (L)",
+    "pricePerLiter": "Prix/L (€, optionnel)",
+    "totalCost": "Coût total (€, optionnel)",
+    "engineHoursAtFueling": "Heures moteur au plein (optionnel)",
+    "boatEngineId": "Moteur (optionnel)",
+    "supplier": "Fournisseur (optionnel)",
+    "notes": "Notes (optionnel)",
+    "noEngine": "Aucun / non précisé"
+  },
+  "form": {
+    "createTitle": "Enregistrer un avitaillement",
+    "submit": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "confirmDelete": "Supprimer cet avitaillement ?"
+  }
+}

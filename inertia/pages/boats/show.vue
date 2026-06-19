@@ -9,6 +9,7 @@ import BoatShowTabAdminDocs from '~/components/boats/show/tabs/BoatShowTabAdminD
 import BoatShowTabDocuments from '~/components/boats/show/tabs/BoatShowTabDocuments.vue'
 import BoatShowTabEquipment from '~/components/boats/show/tabs/BoatShowTabEquipment.vue'
 import BoatShowTabHistory from '~/components/boats/show/tabs/BoatShowTabHistory.vue'
+import BoatShowTabFuelLogs from '~/components/boats/show/tabs/BoatShowTabFuelLogs.vue'
 import BoatShowTabIncidents from '~/components/boats/show/tabs/BoatShowTabIncidents.vue'
 import BoatShowTabOverview from '~/components/boats/show/tabs/BoatShowTabOverview.vue'
 import BoatShowTabSpecs from '~/components/boats/show/tabs/BoatShowTabSpecs.vue'
@@ -20,6 +21,7 @@ import type {
   BoatIncidentRow,
   BoatDocumentRow,
   BoatShowDetail,
+  FuelLogRow,
   MaintenanceEventRow,
   MaintenanceSheetRow,
   MaintenanceTaskRow,
@@ -33,6 +35,7 @@ const props = defineProps<{
   maintenanceTasks: MaintenanceTaskRow[]
   maintenanceSheets: MaintenanceSheetRow[]
   incidents: BoatIncidentRow[]
+  fuelLogs: FuelLogRow[]
   boatDocuments: BoatDocumentRow[]
   canManageMaintenance: boolean
   canManageEquipment: boolean
@@ -51,6 +54,7 @@ type TabKey =
   | 'documents'
   | 'sheets'
   | 'incidents'
+  | 'fuel'
   | 'admin-docs'
 
 const tab = ref<TabKey>('overview')
@@ -117,6 +121,7 @@ const tabs = computed(() => [
     label: t('incidents.tab'),
     badge: openIncidents.value.length > 0 ? String(openIncidents.value.length) : undefined,
   },
+  { key: 'fuel', label: t('fuel_logs.tab') },
   {
     key: 'admin-docs',
     label: t('boats.show.tabs.adminDocs'),
@@ -266,6 +271,13 @@ function openTasksTab() {
           :incidents="incidents"
           :can-manage="canManageMaintenance"
           :can-delete="canDeleteIncidents"
+        />
+
+        <BoatShowTabFuelLogs
+          v-else-if="tab === 'fuel'"
+          :boat="boat"
+          :fuel-logs="fuelLogs"
+          :can-manage="canManageMaintenance"
         />
 
         <BoatShowTabAdminDocs

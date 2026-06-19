@@ -1,4 +1,5 @@
 import type Boat from '#models/boat'
+import type BoatFuelLog from '#models/boat_fuel_log'
 import type BoatIncident from '#models/boat_incident'
 import type BoatMaintenanceEvent from '#models/boat_maintenance_event'
 import type BoatMaintenanceSheet from '#models/boat_maintenance_sheet'
@@ -8,6 +9,7 @@ import type Media from '#models/media'
 import type { AiSuggestion } from '#services/ai_analysis_service'
 import type { IncidentType, IncidentStatus } from '#shared/types/incident'
 import type { BoatDocumentRow } from '#shared/types/boat_document'
+import type { FuelLogRow } from '#shared/types/fuel_log'
 
 export interface BoatShowContext {
   positionHistory: BoatPositionHistory[]
@@ -16,6 +18,7 @@ export interface BoatShowContext {
   maintenanceTasks: BoatMaintenanceTask[]
   maintenanceSheets: BoatMaintenanceSheet[]
   incidents: BoatIncident[]
+  fuelLogs: BoatFuelLog[]
   boatDocuments: BoatDocumentRow[]
   aiSuggestions: AiSuggestion[] | null
   canManageMaintenance: boolean
@@ -58,6 +61,7 @@ export function toShowProps(boat: Boat, ctx: BoatShowContext) {
     maintenanceTasks: ctx.maintenanceTasks.map(toMaintenanceTask),
     maintenanceSheets: ctx.maintenanceSheets.map(toMaintenanceSheet),
     incidents: ctx.incidents.map(toIncident),
+    fuelLogs: ctx.fuelLogs.map(toFuelLog),
     boatDocuments: ctx.boatDocuments,
     canManageMaintenance: ctx.canManageMaintenance,
     canManageEquipment: ctx.canManageEquipment,
@@ -65,6 +69,23 @@ export function toShowProps(boat: Boat, ctx: BoatShowContext) {
     canExport: ctx.canExport,
     canDeleteIncidents: ctx.canDeleteIncidents,
     aiSuggestions: ctx.aiSuggestions,
+  }
+}
+
+function toFuelLog(log: BoatFuelLog): FuelLogRow {
+  return {
+    id: log.id,
+    boatId: log.boatId,
+    boatEngineId: log.boatEngineId,
+    fueledAt: log.fueledAt.toISODate()!,
+    quantityLiters: Number.parseFloat(log.quantityLiters),
+    pricePerLiter: log.pricePerLiter !== null ? Number.parseFloat(log.pricePerLiter) : null,
+    totalCost: log.totalCost !== null ? Number.parseFloat(log.totalCost) : null,
+    engineHoursAtFueling:
+      log.engineHoursAtFueling !== null ? Number.parseFloat(log.engineHoursAtFueling) : null,
+    supplier: log.supplier,
+    notes: log.notes,
+    createdAt: log.createdAt.toISO()!,
   }
 }
 

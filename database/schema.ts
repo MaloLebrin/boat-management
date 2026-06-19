@@ -219,6 +219,51 @@ export class BoatEngineSchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class BoatFuelLogSchema extends BaseModel {
+  static $columns = [
+    'boatEngineId',
+    'boatId',
+    'createdAt',
+    'engineHoursAtFueling',
+    'fueledAt',
+    'id',
+    'notes',
+    'organizationId',
+    'pricePerLiter',
+    'quantityLiters',
+    'supplier',
+    'totalCost',
+    'updatedAt',
+  ] as const
+  $columns = BoatFuelLogSchema.$columns
+  @column()
+  declare boatEngineId: number | null
+  @column()
+  declare boatId: number
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare engineHoursAtFueling: string | null
+  @column.date()
+  declare fueledAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare notes: string | null
+  @column()
+  declare organizationId: number
+  @column()
+  declare pricePerLiter: string | null
+  @column()
+  declare quantityLiters: string
+  @column()
+  declare supplier: string | null
+  @column()
+  declare totalCost: string | null
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class BoatIncidentSchema extends BaseModel {
   static $columns = [
     'boatId',

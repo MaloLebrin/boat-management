@@ -107,6 +107,12 @@
     "notFound": "Incident not found.",
     "descriptionRequired": "A description is required."
   },
+  "fuelLog": {
+    "created": "Fuel log recorded.",
+    "deleted": "Fuel log deleted.",
+    "notFound": "Fuel log not found.",
+    "engineNotBelongs": "This engine does not belong to this boat."
+  },
   "boatDocument": {
     "created": "Document created successfully.",
     "updated": "Document updated.",
