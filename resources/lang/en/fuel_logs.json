@@ -4,6 +4,7 @@
   "add": "+ Add fuel log",
   "count": "{count, plural, one {# fill-up} other {# fill-ups}}",
   "totalLiters": "Total: {liters} L",
+  "engineHoursSuffix": "engine h",
   "fields": {
     "fueledAt": "Date",
     "quantityLiters": "Quantity (L)",

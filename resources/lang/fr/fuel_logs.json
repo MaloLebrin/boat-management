@@ -4,6 +4,7 @@
   "add": "+ Ajouter un avitaillement",
   "count": "{count, plural, one {# avitaillement} other {# avitaillements}}",
   "totalLiters": "Total : {liters} L",
+  "engineHoursSuffix": "h moteur",
   "fields": {
     "fueledAt": "Date",
     "quantityLiters": "Quantité (L)",

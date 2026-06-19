@@ -26,6 +26,7 @@ export interface BoatShowContext {
   canManageDocuments: boolean
   canExport: boolean
   canDeleteIncidents: boolean
+  canDeleteFuelLogs: boolean
 }
 
 export function toEditForm(boat: Boat) {
@@ -68,6 +69,7 @@ export function toShowProps(boat: Boat, ctx: BoatShowContext) {
     canManageDocuments: ctx.canManageDocuments,
     canExport: ctx.canExport,
     canDeleteIncidents: ctx.canDeleteIncidents,
+    canDeleteFuelLogs: ctx.canDeleteFuelLogs,
     aiSuggestions: ctx.aiSuggestions,
   }
 }

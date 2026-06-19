@@ -4,8 +4,8 @@ import BoatFuelLog from '#models/boat_fuel_log'
 import type Boat from '#models/boat'
 import type User from '#models/user'
 import type { CreateFuelLogPayload } from '#shared/types/fuel_log'
+import { toDateTime } from '#shared/helpers/maintenance'
 import { inject } from '@adonisjs/core'
-import { DateTime } from 'luxon'
 
 export { BoatFuelLogNotFoundError, BoatFuelLogValidationError }
 export type { CreateFuelLogPayload }
@@ -45,12 +45,7 @@ export default class BoatFuelLogService {
       }
     }
 
-    const fueledAt =
-      payload.fueledAt instanceof DateTime
-        ? payload.fueledAt
-        : payload.fueledAt instanceof Date
-          ? DateTime.fromJSDate(payload.fueledAt)
-          : DateTime.fromISO(String(payload.fueledAt))
+    const fueledAt = toDateTime(payload.fueledAt)
 
     return await BoatFuelLog.create({
       boatId: boat.id,

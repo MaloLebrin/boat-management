@@ -18,6 +18,7 @@ import PortService from '#services/port_service'
 import QuotaService from '#services/quota_service'
 import SpotService from '#services/spot_service'
 import BoatPolicy from '#policies/boat_policy'
+import FuelLogPolicy from '#policies/fuel_log_policy'
 import IncidentPolicy from '#policies/incident_policy'
 import { createBoatValidator, updateBoatValidator } from '#validators/boat'
 import { assignBoatValidator } from '#validators/marina_layout'
@@ -131,6 +132,7 @@ export default class BoatsController {
         latestSuggestions,
         canManageMaintenance,
         canDeleteIncidents,
+        canDeleteFuelLogs,
         boatDocuments,
       ] = await Promise.all([
         this.maintenanceService.listForBoat(user, boat),
@@ -143,6 +145,7 @@ export default class BoatsController {
         this.aiAnalysisService.getLatestBoatSuggestions(user.id, boat.id),
         bouncer.with(BoatPolicy).allows('edit', boat),
         bouncer.with(IncidentPolicy).allows('delete', boat),
+        bouncer.with(FuelLogPolicy).allows('delete', boat),
         this.documentService.listForBoat(user, boat),
       ])
 
@@ -169,6 +172,7 @@ export default class BoatsController {
           canManageDocuments,
           canExport,
           canDeleteIncidents,
+          canDeleteFuelLogs,
         })
       )
     } catch (error) {

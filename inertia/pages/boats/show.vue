@@ -42,6 +42,7 @@ const props = defineProps<{
   canManageDocuments: boolean
   canExport: boolean
   canDeleteIncidents: boolean
+  canDeleteFuelLogs: boolean
   aiSuggestions: AiSuggestion[] | null
 }>()
 
@@ -278,6 +279,7 @@ function openTasksTab() {
           :boat="boat"
           :fuel-logs="fuelLogs"
           :can-manage="canManageMaintenance"
+          :can-delete="canDeleteFuelLogs"
         />
 
         <BoatShowTabAdminDocs

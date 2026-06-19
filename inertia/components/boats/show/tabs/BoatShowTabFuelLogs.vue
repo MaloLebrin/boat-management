@@ -10,6 +10,7 @@ const props = defineProps<{
   boat: BoatShowDetail
   fuelLogs: FuelLogRow[]
   canManage: boolean
+  canDelete: boolean
 }>()
 
 const { t } = useT()
@@ -82,8 +83,8 @@ function deleteFuelLog(logId: number) {
             <!-- Engine + hours -->
             <div class="mt-1 flex flex-wrap items-center gap-3 text-xs text-fg-muted">
               <span v-if="log.boatEngineId">{{ engineLabel(log.boatEngineId) }}</span>
-              <span v-if="log.engineHoursAtFueling">
-                {{ log.engineHoursAtFueling.toFixed(1) }} h moteur
+              <span v-if="log.engineHoursAtFueling !== null">
+                {{ log.engineHoursAtFueling.toFixed(1) }} {{ t('fuel_logs.engineHoursSuffix') }}
               </span>
               <span v-if="log.supplier">{{ log.supplier }}</span>
             </div>
@@ -95,7 +96,7 @@ function deleteFuelLog(logId: number) {
           </div>
 
           <!-- Delete action -->
-          <div v-if="canManage" class="shrink-0">
+          <div v-if="canDelete" class="shrink-0">
             <BaseButton type="button" variant="ghost" size="sm" @click="deleteFuelLog(log.id)">
               {{ t('fuel_logs.form.delete') }}
             </BaseButton>
