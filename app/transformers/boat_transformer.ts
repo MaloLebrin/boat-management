@@ -20,6 +20,7 @@ export interface BoatShowContext {
   aiSuggestions: AiSuggestion[] | null
   canManageMaintenance: boolean
   canManageEquipment: boolean
+  canManageDocuments: boolean
   canExport: boolean
   canDeleteIncidents: boolean
 }
@@ -60,6 +61,7 @@ export function toShowProps(boat: Boat, ctx: BoatShowContext) {
     boatDocuments: ctx.boatDocuments,
     canManageMaintenance: ctx.canManageMaintenance,
     canManageEquipment: ctx.canManageEquipment,
+    canManageDocuments: ctx.canManageDocuments,
     canExport: ctx.canExport,
     canDeleteIncidents: ctx.canDeleteIncidents,
     aiSuggestions: ctx.aiSuggestions,

@@ -143,6 +143,7 @@ export default class BoatsController {
       ])
 
       const canManageEquipment = canManageMaintenance
+      const canManageDocuments = canManageMaintenance
       const canExport = user.organization ? this.quotaService.canExport(user.organization) : false
       const aiSuggestions: AiSuggestion[] | null = latestSuggestions
         ? (JSON.parse(latestSuggestions.responseText) as AiSuggestion[])
@@ -160,6 +161,7 @@ export default class BoatsController {
           aiSuggestions,
           canManageMaintenance,
           canManageEquipment,
+          canManageDocuments,
           canExport,
           canDeleteIncidents,
         })

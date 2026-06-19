@@ -29,10 +29,10 @@ function openEdit(doc: BoatDocumentRow) {
   isFormModalOpen.value = true
 }
 
-const statusVariant: Record<string, 'success' | 'warning' | 'neutral'> = {
+const statusVariant: Record<string, 'success' | 'warning' | 'neutral' | 'danger'> = {
   valid: 'success',
   expiring_soon: 'warning',
-  expired: 'neutral',
+  expired: 'danger',
 }
 </script>
 
@@ -95,14 +95,16 @@ const statusVariant: Record<string, 'success' | 'warning' | 'neutral'> = {
             :action="{ url: `/boats/${boat.id}/admin-documents/${doc.id}`, method: 'delete' }"
             #default="{ processing }"
           >
-            <button
+            <BaseButton
+              variant="ghost"
+              size="sm"
               type="submit"
               :disabled="processing"
-              class="rounded-lg p-1.5 text-fg-subtle hover:bg-danger/10 hover:text-danger transition-colors disabled:opacity-50"
               :title="t('boats.adminDocs.deleteDocument')"
+              class="hover:bg-danger/10 hover:text-danger"
             >
               <TrashIcon class="h-4 w-4" />
-            </button>
+            </BaseButton>
           </Form>
         </div>
       </li>

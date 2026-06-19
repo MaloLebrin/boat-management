@@ -9,6 +9,7 @@ import type {
   UpdateBoatDocumentPayload,
   ReminderDocumentItem,
 } from '#shared/types/boat_document'
+import { BOAT_DOCUMENT_EXPIRY_WARNING_DAYS } from '#shared/constants/boats/boat_document_constants'
 import { DateTime } from 'luxon'
 
 export default class BoatDocumentService {
@@ -16,7 +17,7 @@ export default class BoatDocumentService {
     if (!expiresAt) return 'valid'
     const daysUntil = expiresAt.diff(DateTime.now(), 'days').days
     if (daysUntil < 0) return 'expired'
-    if (daysUntil < 30) return 'expiring_soon'
+    if (daysUntil < BOAT_DOCUMENT_EXPIRY_WARNING_DAYS) return 'expiring_soon'
     return 'valid'
   }
 
@@ -106,26 +107,26 @@ export default class BoatDocumentService {
     await doc.delete()
   }
 
-  async getExpiringDocuments(
-    daysAhead: number
-  ): Promise<(BoatDocument & { boat: { id: number; name: string; organizationId: number } })[]> {
+  async getExpiringDocuments(fromDaysAhead: number, toDaysAhead: number): Promise<BoatDocument[]> {
     const now = DateTime.now()
-    const limit = now.plus({ days: daysAhead })
+    const from = now.plus({ days: fromDaysAhead })
+    const limit = now.plus({ days: toDaysAhead })
     return BoatDocument.query()
       .whereNotNull('expires_at')
-      .where('expires_at', '>', now.toISODate()!)
+      .where('expires_at', '>=', from.toISODate()!)
       .where('expires_at', '<=', limit.toISODate()!)
       .preload('boat')
   }
 
   toReminderItem(doc: BoatDocument): ReminderDocumentItem {
-    const daysUntilExpiry = Math.ceil(doc.expiresAt!.diff(DateTime.now(), 'days').days)
+    if (!doc.expiresAt) throw new Error(`Document ${doc.id} has no expiry date`)
+    const daysUntilExpiry = Math.ceil(doc.expiresAt.diff(DateTime.now(), 'days').days)
     return {
       id: doc.id,
       boatName: doc.boat.name,
       documentType: doc.type,
       customTypeLabel: doc.customTypeLabel,
-      expiresAt: doc.expiresAt!.toISODate()!,
+      expiresAt: doc.expiresAt.toISODate()!,
       daysUntilExpiry,
     }
   }

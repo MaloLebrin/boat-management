@@ -36,6 +36,7 @@ const props = defineProps<{
   boatDocuments: BoatDocumentRow[]
   canManageMaintenance: boolean
   canManageEquipment: boolean
+  canManageDocuments: boolean
   canExport: boolean
   canDeleteIncidents: boolean
   aiSuggestions: AiSuggestion[] | null
@@ -271,7 +272,7 @@ function openTasksTab() {
           v-else-if="tab === 'admin-docs'"
           :boat="boat"
           :boat-documents="boatDocuments"
-          :can-manage="canManageEquipment"
+          :can-manage="canManageDocuments"
         />
       </div>
     </Transition>

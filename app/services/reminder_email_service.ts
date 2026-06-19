@@ -1,5 +1,4 @@
 import Boat from '#models/boat'
-import BoatDocument from '#models/boat_document'
 import BoatMaintenanceTask from '#models/boat_maintenance_task'
 import Organization from '#models/organization'
 import OrganizationMembership from '#models/organization_membership'
@@ -7,6 +6,7 @@ import Port from '#models/port'
 import User from '#models/user'
 import EmailQueueService from '#services/email_queue_service'
 import { BrandingService } from '#services/branding_service'
+import BoatDocumentService from '#services/boat_document_service'
 import type { ReminderBoatItem, ReminderPortItem, ReminderTaskItem } from '#shared/types/reminder'
 import type { ReminderDocumentItem } from '#shared/types/boat_document'
 import { inject } from '@adonisjs/core'
@@ -17,7 +17,8 @@ import { DateTime } from 'luxon'
 export default class ReminderEmailService {
   constructor(
     private emailQueueService: EmailQueueService,
-    private brandingService: BrandingService
+    private brandingService: BrandingService,
+    private documentService: BoatDocumentService
   ) {}
 
   async sendInactiveAccountReminders(): Promise<void> {
@@ -343,18 +344,13 @@ export default class ReminderEmailService {
     logger.info({ sent }, 'ReminderEmailService.sendBoatCheckReminders: done')
   }
 
-  async sendDocumentExpirationReminders(daysAhead: 30 | 7): Promise<void> {
-    const now = DateTime.now()
-    const limit = now.plus({ days: daysAhead })
-
-    const docs = await BoatDocument.query()
-      .whereNotNull('expires_at')
-      .where('expires_at', '>', now.toISODate()!)
-      .where('expires_at', '<=', limit.toISODate()!)
-      .preload('boat')
+  async sendDocumentExpirationReminders(fromDaysAhead: number, toDaysAhead: 30 | 7): Promise<void> {
+    const docs = await this.documentService.getExpiringDocuments(fromDaysAhead, toDaysAhead)
 
     if (docs.length === 0) {
-      logger.info(`ReminderEmailService.sendDocumentExpirationReminders(${daysAhead}): no targets`)
+      logger.info(
+        `ReminderEmailService.sendDocumentExpirationReminders(${fromDaysAhead}–${toDaysAhead}): no targets`
+      )
       return
     }
 
@@ -377,21 +373,16 @@ export default class ReminderEmailService {
         .preload('user')
       const branding = org ? this.brandingService.toEmailParams(org) : null
 
-      const documents: ReminderDocumentItem[] = orgDocs.map((d) => ({
-        id: d.id,
-        boatName: d.boat.name,
-        documentType: d.type,
-        customTypeLabel: d.customTypeLabel,
-        expiresAt: d.expiresAt!.toISODate()!,
-        daysUntilExpiry: Math.ceil(d.expiresAt!.diff(now, 'days').days),
-      }))
+      const documents: ReminderDocumentItem[] = orgDocs.map((d) =>
+        this.documentService.toReminderItem(d)
+      )
 
       for (const membership of admins) {
         await this.emailQueueService.sendReminderDocumentExpiry({
           to: membership.user.email,
           name: membership.user.fullName,
           documents,
-          daysLabel: String(daysAhead) as '30' | '7',
+          daysLabel: String(toDaysAhead) as '30' | '7',
           branding,
         })
         sent++
@@ -400,7 +391,7 @@ export default class ReminderEmailService {
 
     logger.info(
       { sent },
-      `ReminderEmailService.sendDocumentExpirationReminders(${daysAhead}): done`
+      `ReminderEmailService.sendDocumentExpirationReminders(${fromDaysAhead}–${toDaysAhead}): done`
     )
   }
 
