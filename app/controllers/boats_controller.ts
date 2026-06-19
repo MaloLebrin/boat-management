@@ -132,6 +132,7 @@ export default class BoatsController {
         latestSuggestions,
         canManageMaintenance,
         canDeleteIncidents,
+        canCreateFuelLogs,
         canDeleteFuelLogs,
         boatDocuments,
       ] = await Promise.all([
@@ -145,6 +146,7 @@ export default class BoatsController {
         this.aiAnalysisService.getLatestBoatSuggestions(user.id, boat.id),
         bouncer.with(BoatPolicy).allows('edit', boat),
         bouncer.with(IncidentPolicy).allows('delete', boat),
+        bouncer.with(FuelLogPolicy).allows('create', boat),
         bouncer.with(FuelLogPolicy).allows('delete', boat),
         this.documentService.listForBoat(user, boat),
       ])
@@ -172,6 +174,7 @@ export default class BoatsController {
           canManageDocuments,
           canExport,
           canDeleteIncidents,
+          canCreateFuelLogs,
           canDeleteFuelLogs,
         })
       )

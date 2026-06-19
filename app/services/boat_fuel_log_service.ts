@@ -1,4 +1,8 @@
-import { BoatFuelLogNotFoundError, BoatFuelLogValidationError } from '#exceptions/fuel_log_errors'
+import {
+  BoatFuelLogForbiddenError,
+  BoatFuelLogNotFoundError,
+  BoatFuelLogValidationError,
+} from '#exceptions/fuel_log_errors'
 import BoatEngine from '#models/boat_engine'
 import BoatFuelLog from '#models/boat_fuel_log'
 import type Boat from '#models/boat'
@@ -7,12 +11,12 @@ import type { CreateFuelLogPayload } from '#shared/types/fuel_log'
 import { toDateTime } from '#shared/helpers/maintenance'
 import { inject } from '@adonisjs/core'
 
-export { BoatFuelLogNotFoundError, BoatFuelLogValidationError }
+export { BoatFuelLogForbiddenError, BoatFuelLogNotFoundError, BoatFuelLogValidationError }
 export type { CreateFuelLogPayload }
 
 function assertBoatScope(user: User, boat: Boat) {
   if (user.organizationId === null || user.organizationId !== boat.organizationId) {
-    throw new BoatFuelLogNotFoundError()
+    throw new BoatFuelLogForbiddenError()
   }
 }
 

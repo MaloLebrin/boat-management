@@ -56,7 +56,12 @@ export type ScannedRoutes = {
     'boats.maintenanceSheets.complete': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'sheetId': ParamValue} }
     'boats.maintenanceSheets.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'sheetId': ParamValue} }
     'boats.maintenanceSheetItems.update': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'sheetId': ParamValue,'itemId': ParamValue} }
+    'boats.incidents.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
+    'boats.incidents.update': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'incidentId': ParamValue} }
+    'boats.incidents.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'incidentId': ParamValue} }
     'boats.simulator': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'boats.fuelLogs.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
+    'boats.fuelLogs.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue} }
     'boats.adminDocuments.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'boats.adminDocuments.update': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'documentId': ParamValue} }
     'boats.adminDocuments.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'documentId': ParamValue} }
@@ -270,6 +275,8 @@ export type ScannedRoutes = {
     'boat_media.store_document': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'boat_safety_equipment.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'boats.maintenanceSheets.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
+    'boats.incidents.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
+    'boats.fuelLogs.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'boats.adminDocuments.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'ports.store': { paramsTuple?: []; params?: {} }
     'ports.pontoons.store': { paramsTuple: [ParamValue]; params: {'portId': ParamValue} }
@@ -308,6 +315,7 @@ export type ScannedRoutes = {
     'boat_safety_equipment.update': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'itemId': ParamValue} }
     'boats.maintenanceSheets.complete': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'sheetId': ParamValue} }
     'boats.maintenanceSheetItems.update': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'sheetId': ParamValue,'itemId': ParamValue} }
+    'boats.incidents.update': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'incidentId': ParamValue} }
     'boats.adminDocuments.update': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'documentId': ParamValue} }
     'ports.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'ports.pontoons.update': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'pontoonId': ParamValue} }
@@ -332,6 +340,8 @@ export type ScannedRoutes = {
     'boat_media.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'mediaId': ParamValue} }
     'boat_safety_equipment.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'itemId': ParamValue} }
     'boats.maintenanceSheets.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'sheetId': ParamValue} }
+    'boats.incidents.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'incidentId': ParamValue} }
+    'boats.fuelLogs.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue} }
     'boats.adminDocuments.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'documentId': ParamValue} }
     'ports.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'ports.pontoons.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'pontoonId': ParamValue} }

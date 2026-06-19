@@ -23,7 +23,7 @@ const today = new Date().toISOString().slice(0, 10)
 
     <Form
       :action="{ url: `/boats/${boat.id}/fuel-logs`, method: 'post' }"
-      #default="{ processing }"
+      #default="{ processing, errors }"
     >
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <!-- Date -->
@@ -38,6 +38,7 @@ const today = new Date().toISOString().slice(0, 10)
             required
             class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
           />
+          <p v-if="errors.fueledAt" class="mt-1 text-xs text-danger">{{ errors.fueledAt }}</p>
         </div>
 
         <!-- Quantity -->
@@ -53,6 +54,9 @@ const today = new Date().toISOString().slice(0, 10)
             required
             class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
           />
+          <p v-if="errors.quantityLiters" class="mt-1 text-xs text-danger">
+            {{ errors.quantityLiters }}
+          </p>
         </div>
 
         <!-- Price per liter -->
@@ -67,6 +71,9 @@ const today = new Date().toISOString().slice(0, 10)
             min="0"
             class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
           />
+          <p v-if="errors.pricePerLiter" class="mt-1 text-xs text-danger">
+            {{ errors.pricePerLiter }}
+          </p>
         </div>
 
         <!-- Total cost -->
@@ -81,6 +88,7 @@ const today = new Date().toISOString().slice(0, 10)
             min="0"
             class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
           />
+          <p v-if="errors.totalCost" class="mt-1 text-xs text-danger">{{ errors.totalCost }}</p>
         </div>
 
         <!-- Engine -->
@@ -98,6 +106,9 @@ const today = new Date().toISOString().slice(0, 10)
               {{ engine.model ? engine.model : '' }}
             </option>
           </select>
+          <p v-if="errors.boatEngineId" class="mt-1 text-xs text-danger">
+            {{ errors.boatEngineId }}
+          </p>
         </div>
 
         <!-- Engine hours -->
@@ -112,6 +123,9 @@ const today = new Date().toISOString().slice(0, 10)
             min="0"
             class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
           />
+          <p v-if="errors.engineHoursAtFueling" class="mt-1 text-xs text-danger">
+            {{ errors.engineHoursAtFueling }}
+          </p>
         </div>
 
         <!-- Supplier -->
@@ -124,6 +138,7 @@ const today = new Date().toISOString().slice(0, 10)
             name="supplier"
             class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
           />
+          <p v-if="errors.supplier" class="mt-1 text-xs text-danger">{{ errors.supplier }}</p>
         </div>
 
         <!-- Notes -->
@@ -136,6 +151,7 @@ const today = new Date().toISOString().slice(0, 10)
             rows="2"
             class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand resize-none"
           />
+          <p v-if="errors.notes" class="mt-1 text-xs text-danger">{{ errors.notes }}</p>
         </div>
       </div>
 

@@ -42,6 +42,7 @@ const props = defineProps<{
   canManageDocuments: boolean
   canExport: boolean
   canDeleteIncidents: boolean
+  canCreateFuelLogs: boolean
   canDeleteFuelLogs: boolean
   aiSuggestions: AiSuggestion[] | null
 }>()
@@ -278,7 +279,7 @@ function openTasksTab() {
           v-else-if="tab === 'fuel'"
           :boat="boat"
           :fuel-logs="fuelLogs"
-          :can-manage="canManageMaintenance"
+          :can-manage="canCreateFuelLogs"
           :can-delete="canDeleteFuelLogs"
         />
 

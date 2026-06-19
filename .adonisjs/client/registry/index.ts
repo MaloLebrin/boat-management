@@ -318,11 +318,41 @@ const routes = {
     tokens: [{"old":"/boats/:boatId/maintenance-sheets/:sheetId/items/:itemId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/maintenance-sheets/:sheetId/items/:itemId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/maintenance-sheets/:sheetId/items/:itemId","type":0,"val":"maintenance-sheets","end":""},{"old":"/boats/:boatId/maintenance-sheets/:sheetId/items/:itemId","type":1,"val":"sheetId","end":""},{"old":"/boats/:boatId/maintenance-sheets/:sheetId/items/:itemId","type":0,"val":"items","end":""},{"old":"/boats/:boatId/maintenance-sheets/:sheetId/items/:itemId","type":1,"val":"itemId","end":""}],
     types: placeholder as Registry['boats.maintenanceSheetItems.update']['types'],
   },
+  'boats.incidents.store': {
+    methods: ["POST"],
+    pattern: '/boats/:boatId/incidents',
+    tokens: [{"old":"/boats/:boatId/incidents","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/incidents","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/incidents","type":0,"val":"incidents","end":""}],
+    types: placeholder as Registry['boats.incidents.store']['types'],
+  },
+  'boats.incidents.update': {
+    methods: ["PUT"],
+    pattern: '/boats/:boatId/incidents/:incidentId',
+    tokens: [{"old":"/boats/:boatId/incidents/:incidentId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/incidents/:incidentId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/incidents/:incidentId","type":0,"val":"incidents","end":""},{"old":"/boats/:boatId/incidents/:incidentId","type":1,"val":"incidentId","end":""}],
+    types: placeholder as Registry['boats.incidents.update']['types'],
+  },
+  'boats.incidents.destroy': {
+    methods: ["DELETE"],
+    pattern: '/boats/:boatId/incidents/:incidentId',
+    tokens: [{"old":"/boats/:boatId/incidents/:incidentId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/incidents/:incidentId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/incidents/:incidentId","type":0,"val":"incidents","end":""},{"old":"/boats/:boatId/incidents/:incidentId","type":1,"val":"incidentId","end":""}],
+    types: placeholder as Registry['boats.incidents.destroy']['types'],
+  },
   'boats.simulator': {
     methods: ["GET","HEAD"],
     pattern: '/boats/:id/simulator',
     tokens: [{"old":"/boats/:id/simulator","type":0,"val":"boats","end":""},{"old":"/boats/:id/simulator","type":1,"val":"id","end":""},{"old":"/boats/:id/simulator","type":0,"val":"simulator","end":""}],
     types: placeholder as Registry['boats.simulator']['types'],
+  },
+  'boats.fuelLogs.store': {
+    methods: ["POST"],
+    pattern: '/boats/:boatId/fuel-logs',
+    tokens: [{"old":"/boats/:boatId/fuel-logs","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/fuel-logs","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/fuel-logs","type":0,"val":"fuel-logs","end":""}],
+    types: placeholder as Registry['boats.fuelLogs.store']['types'],
+  },
+  'boats.fuelLogs.destroy': {
+    methods: ["DELETE"],
+    pattern: '/boats/:boatId/fuel-logs/:logId',
+    tokens: [{"old":"/boats/:boatId/fuel-logs/:logId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/fuel-logs/:logId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/fuel-logs/:logId","type":0,"val":"fuel-logs","end":""},{"old":"/boats/:boatId/fuel-logs/:logId","type":1,"val":"logId","end":""}],
+    types: placeholder as Registry['boats.fuelLogs.destroy']['types'],
   },
   'boats.adminDocuments.store': {
     methods: ["POST"],

@@ -8,7 +8,7 @@ export const createBoatFuelLogValidator = vine.create(
     totalCost: vine.number().positive().optional(),
     engineHoursAtFueling: vine.number().min(0).optional(),
     boatEngineId: vine.number().withoutDecimals().positive().optional(),
-    supplier: vine.string().trim().optional(),
-    notes: vine.string().trim().optional(),
+    supplier: vine.string().trim().maxLength(500).optional(),
+    notes: vine.string().trim().maxLength(2000).optional(),
   })
 )
