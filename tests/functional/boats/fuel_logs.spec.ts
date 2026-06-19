@@ -74,11 +74,14 @@ test.group('Fuel logs (functional)', (group) => {
     const otherBoat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
     const foreignEngine = await BoatEngineFactory.merge({ boatId: otherBoat.id }).create()
 
-    await client.post(`/boats/${boat.id}/fuel-logs`).loginAs(user).form({
-      fueledAt: '2026-06-01',
-      quantityLiters: 50,
-      boatEngineId: foreignEngine.id,
-    })
+    const response = await client
+      .post(`/boats/${boat.id}/fuel-logs`)
+      .loginAs(user)
+      .form({ fueledAt: '2026-06-01', quantityLiters: 50, boatEngineId: foreignEngine.id })
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertHeader('location', `/boats/${boat.id}?tab=fuel`)
 
     const count = await BoatFuelLog.query().where('boatId', boat.id).count('* as total')
     assert.equal(Number(count[0].$extras.total), 0)
@@ -91,7 +94,13 @@ test.group('Fuel logs (functional)', (group) => {
     const user = await createAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
 
-    await client.post(`/boats/${boat.id}/fuel-logs`).loginAs(user).form({ fueledAt: '2026-06-01' })
+    const response = await client
+      .post(`/boats/${boat.id}/fuel-logs`)
+      .loginAs(user)
+      .form({ fueledAt: '2026-06-01' })
+      .redirects(0)
+
+    response.assertStatus(302)
 
     const count = await BoatFuelLog.query().where('boatId', boat.id).count('* as total')
     assert.equal(Number(count[0].$extras.total), 0)

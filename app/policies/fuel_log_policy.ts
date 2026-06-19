@@ -14,6 +14,7 @@ export default class FuelLogPolicy extends BasePolicy {
     return user.organizationId !== null && user.organizationId === boat.organizationId
   }
 
+  // Intentionally false: only admins may delete, handled by the before() hook above.
   delete(_user: User, _boat: Boat): AuthorizerResponse {
     return false
   }

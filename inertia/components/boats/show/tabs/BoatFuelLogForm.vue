@@ -14,7 +14,7 @@ const emit = defineEmits<{
 
 const { t } = useT()
 
-const today = new Date().toISOString().slice(0, 10)
+const today = new Date().toLocaleDateString('en-CA')
 </script>
 
 <template>

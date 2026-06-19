@@ -1,39 +1,23 @@
-import {
-  BoatFuelLogForbiddenError,
-  BoatFuelLogNotFoundError,
-  BoatFuelLogValidationError,
-} from '#exceptions/fuel_log_errors'
+import { BoatFuelLogNotFoundError, BoatFuelLogValidationError } from '#exceptions/fuel_log_errors'
 import BoatEngine from '#models/boat_engine'
 import BoatFuelLog from '#models/boat_fuel_log'
 import type Boat from '#models/boat'
 import type User from '#models/user'
 import type { CreateFuelLogPayload } from '#shared/types/fuel_log'
 import { toDateTime } from '#shared/helpers/maintenance'
-import { inject } from '@adonisjs/core'
 
-export { BoatFuelLogForbiddenError, BoatFuelLogNotFoundError, BoatFuelLogValidationError }
+export { BoatFuelLogNotFoundError, BoatFuelLogValidationError }
 export type { CreateFuelLogPayload }
 
-function assertBoatScope(user: User, boat: Boat) {
-  if (user.organizationId === null || user.organizationId !== boat.organizationId) {
-    throw new BoatFuelLogForbiddenError()
-  }
-}
-
-@inject()
 export default class BoatFuelLogService {
-  async listForBoat(user: User, boat: Boat) {
-    assertBoatScope(user, boat)
-
+  async listForBoat(_user: User, boat: Boat) {
     return await BoatFuelLog.query()
       .where('boatId', boat.id)
       .orderBy('fueledAt', 'desc')
       .orderBy('id', 'desc')
   }
 
-  async createForBoat(user: User, boat: Boat, payload: CreateFuelLogPayload) {
-    assertBoatScope(user, boat)
-
+  async createForBoat(_user: User, boat: Boat, payload: CreateFuelLogPayload) {
     if (payload.boatEngineId) {
       const engine = await BoatEngine.query()
         .select('id')
@@ -74,9 +58,7 @@ export default class BoatFuelLogService {
     })
   }
 
-  async deleteForBoat(user: User, boat: Boat, logId: number) {
-    assertBoatScope(user, boat)
-
+  async deleteForBoat(_user: User, boat: Boat, logId: number) {
     const log = await BoatFuelLog.query().where('id', logId).where('boatId', boat.id).first()
 
     if (!log) throw new BoatFuelLogNotFoundError()
