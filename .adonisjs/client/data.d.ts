@@ -11,6 +11,7 @@ import type BoatTransformer from '#transformers/boat_transformer'
 import type MaintenanceTransformer from '#transformers/maintenance_transformer'
 import type MediaTransformer from '#transformers/media_transformer'
 import type MouillageTransformer from '#transformers/mouillage_transformer'
+import type NotificationTransformer from '#transformers/notification_transformer'
 import type OrganizationTransformer from '#transformers/organization_transformer'
 import type PontoonTransformer from '#transformers/pontoon_transformer'
 import type PortTransformer from '#transformers/port_transformer'
@@ -40,6 +41,10 @@ export namespace Data {
   export type Mouillage = InferData<MouillageTransformer>
   export namespace Mouillage {
     export type Variants = InferVariants<MouillageTransformer>
+  }
+  export type Notification = InferData<NotificationTransformer>
+  export namespace Notification {
+    export type Variants = InferVariants<NotificationTransformer>
   }
   export type Organization = InferData<OrganizationTransformer>
   export namespace Organization {

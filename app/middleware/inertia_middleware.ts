@@ -1,11 +1,14 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import type { NextFn } from '@adonisjs/core/types/http'
+import type { JSONDataTypes } from '@adonisjs/core/types/transformers'
 import { inject } from '@adonisjs/core'
 import UserTransformer from '#transformers/user_transformer'
 import BaseInertiaMiddleware from '@adonisjs/inertia/inertia_middleware'
 import { PLAN_LIMITS, type PlanTier } from '#shared/types/plan'
 import type { BrandingSharedProps } from '#shared/types/branding'
+import type { NotificationsSharedProps } from '#shared/types/notification'
 import { BrandingService } from '#services/branding_service'
+import NotificationService from '#services/notification_service'
 import { DEMO_SESSION_DURATION_MS } from '#shared/constants/demo'
 import type User from '#models/user'
 
@@ -29,7 +32,10 @@ export async function resolveSharedBranding(
 
 @inject()
 export default class InertiaMiddleware extends BaseInertiaMiddleware {
-  constructor(private brandingService: BrandingService) {
+  constructor(
+    private brandingService: BrandingService,
+    private notificationService: NotificationService
+  ) {
     super()
   }
 
@@ -57,6 +63,9 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
     }
     const currentPlan = await resolveSharedCurrentPlan(auth?.user)
     const branding = await resolveSharedBranding(auth?.user, this.brandingService)
+    const notifications: NotificationsSharedProps = auth?.user
+      ? await this.notificationService.sharedProps(auth.user.id)
+      : { unreadCount: 0, recent: [] }
 
     return {
       errors: ctx.inertia.always(this.getValidationErrors(ctx)),
@@ -81,6 +90,7 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
       user: ctx.inertia.always(auth?.user ? UserTransformer.transform(auth.user) : undefined),
       currentPlan: ctx.inertia.always(currentPlan),
       branding: ctx.inertia.always(branding),
+      notifications: ctx.inertia.always(notifications as unknown as JSONDataTypes),
     }
   }
 

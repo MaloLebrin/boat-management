@@ -3,6 +3,48 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-06-21 — Notifications temps réel via Transmit
+
+**Backend**
+
+- `config/transmit.ts` — configuration de `@adonisjs/transmit` (transport in-process, no ping)
+- `start/transmit.ts` — preload : enregistrement des routes SSE (`/__transmit/events`, `/__transmit/subscribe`, `/__transmit/unsubscribe`) + autorisation de canal `notifications/:userId` (seul le propriétaire peut s'abonner)
+- `adonisrc.ts` — ajout du provider `@adonisjs/transmit/transmit_provider` et du preload `start/transmit`
+- `app/services/notification_service.ts` — après `Notification.create()`, diffusion SSE sur le canal `notifications/:userId` avec le payload `{ notification: NotificationForFront }`
+
+**Frontend**
+
+- `inertia/composables/use_notifications.ts` — état réactif au niveau module (singleton) + abonnement Transmit dans `onMounted` (connexion unique par session, guard par `subscribedUserId`) ; synchronisation avec les shared props Inertia à chaque navigation ; CSRF géré via `beforeSubscribe`/`beforeUnsubscribe` (ajout du header `X-XSRF-TOKEN` lu depuis le cookie `XSRF-TOKEN`) ; reset automatique de la souscription en cas de changement d'utilisateur (logout/login sans rechargement de page)
+
+**Comportement**
+
+- Connexion SSE établie automatiquement après le premier montage d'un composant authentifié utilisant `useNotifications()`
+- Le badge de la cloche se met à jour en temps réel sans rechargement de page
+- Le panneau de notifications ajoute la nouvelle notification en tête de liste (max 5 récentes)
+- Fallback gracieux : si la connexion Transmit échoue, les données restent synchronisées via les shared props Inertia à chaque navigation
+
+## 2026-06-21 — Notifications in-app #104
+
+**Backend**
+
+- `database/migrations/1798000000000_create_notifications_table.ts` — table `notifications` : `user_id` (FK CASCADE), `organization_id` (FK CASCADE), `type` (string 100), `severity` (string 20, default 'info'), `title` (string 500), `body` (text nullable), `action_url` (string 1000 nullable), `metadata` (json nullable), `read_at` (timestamp nullable), `created_at` (timestamp). Index sur `(user_id, read_at)` et `(organization_id, created_at)`
+- `app/models/notification.ts` — modèle Lucid avec relations `belongsTo(User)` et `belongsTo(Organization)`, getter `isRead`
+- `shared/types/notification.ts` — types `NotificationType` (extensible), `NotificationSeverity`, `NotificationForFront`, `NotificationsSharedProps`, `NotificationsPage`, `CreateNotificationParams`
+- `app/transformers/notification_transformer.ts` — fonction `toRow()` pour le frontend
+- `app/services/notification_service.ts` — `create`, `getUnreadCount`, `getRecentUnread`, `sharedProps`, `listForUser`, `markRead`, `markAllRead`, `destroy`
+- `app/controllers/notifications_controller.ts` — `index` (page paginée), `markAsRead`, `markAllAsRead`, `destroy` ; réponses par redirection
+- `start/routes/notifications.ts` — routes `GET /notifications`, `PATCH /notifications/:id/read`, `PATCH /notifications/read-all`, `DELETE /notifications/:id`
+- `app/middleware/inertia_middleware.ts` — injection de `NotificationService`, prop partagée `notifications` (unreadCount + recent) pour les utilisateurs authentifiés
+- `app/listeners/send_ai_token_quota_notification.ts` — création d'une notification in-app en plus de l'email
+- `app/listeners/send_storage_quota_notification.ts` — création d'une notification in-app en plus de l'email
+- `app/listeners/on_organization_member_joined.ts` — notification aux admins quand un membre rejoint l'organisation
+- `app/listeners/on_organization_plan_downgraded.ts` — notification aux admins en plus de l'email
+- `resources/lang/fr/notifications.json` et `resources/lang/en/notifications.json` — toutes les clés UI du module
+
+**Frontend**
+
+- `inertia/pages/notifications/index.vue` — page de liste des notifications avec pagination, actions mark as read / delete
+
 ## 2026-06-19 — Suivi carburant / avitaillement #102
 
 **Backend**
