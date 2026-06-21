@@ -14,7 +14,7 @@ Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
 **Frontend**
 
-- `inertia/composables/use_notifications.ts` — état réactif au niveau module (singleton) + abonnement Transmit dans `onMounted` (connexion unique par session, guard par `subscribedUserId`) ; synchronisation avec les shared props Inertia à chaque navigation ; CSRF géré via `beforeSubscribe`/`beforeUnsubscribe` qui lisent le cookie `XSRF-TOKEN`
+- `inertia/composables/use_notifications.ts` — état réactif au niveau module (singleton) + abonnement Transmit dans `onMounted` (connexion unique par session, guard par `subscribedUserId`) ; synchronisation avec les shared props Inertia à chaque navigation ; CSRF géré via `beforeSubscribe`/`beforeUnsubscribe` (ajout du header `X-XSRF-TOKEN` lu depuis le cookie `XSRF-TOKEN`) ; reset automatique de la souscription en cas de changement d'utilisateur (logout/login sans rechargement de page)
 
 **Comportement**
 

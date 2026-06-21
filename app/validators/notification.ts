@@ -5,3 +5,9 @@ export const notificationPageValidator = vine.compile(
     page: vine.number().withoutDecimals().min(1).optional(),
   })
 )
+
+export const notificationIdValidator = vine.compile(
+  vine.object({
+    id: vine.number().withoutDecimals().min(1),
+  })
+)

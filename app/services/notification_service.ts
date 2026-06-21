@@ -23,7 +23,7 @@ export default class NotificationService {
     try {
       transmit.broadcast(`notifications/${notification.userId}`, {
         notification: NotificationTransformer.toRow(notification),
-      } as unknown as Record<string, string>)
+      })
     } catch (error) {
       logger.warn({ err: error }, 'failed to broadcast notification via SSE')
     }
