@@ -1,5 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import type { NextFn } from '@adonisjs/core/types/http'
+import type { JSONDataTypes } from '@adonisjs/core/types/transformers'
 import { inject } from '@adonisjs/core'
 import UserTransformer from '#transformers/user_transformer'
 import BaseInertiaMiddleware from '@adonisjs/inertia/inertia_middleware'
@@ -62,9 +63,9 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
     }
     const currentPlan = await resolveSharedCurrentPlan(auth?.user)
     const branding = await resolveSharedBranding(auth?.user, this.brandingService)
-    const notifications: NotificationsSharedProps | undefined = auth?.user
+    const notifications: NotificationsSharedProps = auth?.user
       ? await this.notificationService.sharedProps(auth.user.id)
-      : undefined
+      : { unreadCount: 0, recent: [] }
 
     return {
       errors: ctx.inertia.always(this.getValidationErrors(ctx)),
@@ -89,8 +90,7 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
       user: ctx.inertia.always(auth?.user ? UserTransformer.transform(auth.user) : undefined),
       currentPlan: ctx.inertia.always(currentPlan),
       branding: ctx.inertia.always(branding),
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      notifications: ctx.inertia.always(notifications as any),
+      notifications: ctx.inertia.always(notifications as unknown as JSONDataTypes),
     }
   }
 

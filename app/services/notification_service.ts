@@ -68,7 +68,7 @@ export default class NotificationService {
     await Notification.query()
       .where('userId', userId)
       .whereNull('readAt')
-      .update({ readAt: DateTime.now().toSQL()! })
+      .update({ readAt: DateTime.now().toUTC().toISO()! })
   }
 
   async destroy(userId: number, notificationId: number): Promise<void> {

@@ -2,6 +2,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import { inject } from '@adonisjs/core'
 import NotificationService from '#services/notification_service'
 import * as NotificationTransformer from '#transformers/notification_transformer'
+import { notificationPageValidator } from '#validators/notification'
 
 @inject()
 export default class NotificationsController {
@@ -9,8 +10,8 @@ export default class NotificationsController {
 
   async index({ inertia, auth, request }: HttpContext) {
     const user = auth.getUserOrFail()
-    const page = Number(request.qs().page ?? 1)
-    const paginator = await this.notificationService.listForUser(user.id, page)
+    const { page } = await request.validateUsing(notificationPageValidator)
+    const paginator = await this.notificationService.listForUser(user.id, page ?? 1)
     const { meta } = paginator.toJSON()
     return inertia.render('notifications/index', {
       notifications: {
@@ -22,7 +23,9 @@ export default class NotificationsController {
 
   async markAsRead({ auth, params, response }: HttpContext) {
     const user = auth.getUserOrFail()
-    await this.notificationService.markRead(user.id, Number(params.id))
+    const id = Number(params.id)
+    if (!Number.isInteger(id) || id < 1) return response.redirect().back()
+    await this.notificationService.markRead(user.id, id)
     return response.redirect().back()
   }
 
@@ -34,7 +37,9 @@ export default class NotificationsController {
 
   async destroy({ auth, params, response }: HttpContext) {
     const user = auth.getUserOrFail()
-    await this.notificationService.destroy(user.id, Number(params.id))
+    const id = Number(params.id)
+    if (!Number.isInteger(id) || id < 1) return response.redirect().back()
+    await this.notificationService.destroy(user.id, id)
     return response.redirect().back()
   }
 }

@@ -1,4 +1,27 @@
 {
+  "messages": {
+    "quota": {
+      "ai_tokens": {
+        "title": "Quota IA à {percent}%",
+        "body": "L'organisation {orgName} a consommé {percent}% de son quota de tokens IA."
+      },
+      "storage": {
+        "title": "Stockage à {percent}%",
+        "body": "L'organisation {orgName} a utilisé {percent}% de son espace de stockage."
+      }
+    },
+    "member": {
+      "joined": {
+        "title": "{memberName} a rejoint l'organisation"
+      }
+    },
+    "plan": {
+      "downgraded": {
+        "title": "Plan rétrogradé vers {toPlan}",
+        "body": "Le plan de votre organisation est passé de {fromPlan} à {toPlan}."
+      }
+    }
+  },
   "title": "Notifications",
   "empty": "Aucune notification",
   "emptyDescription": "Vous êtes à jour !",

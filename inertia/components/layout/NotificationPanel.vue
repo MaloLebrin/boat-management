@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { router } from '@inertiajs/vue3'
 import { useNotifications } from '~/composables/use_notifications'
+import { useNotificationHelpers } from '~/composables/use_notification_helpers'
 import { useT } from '~/composables/use_t'
-import type { NotificationForFront, NotificationSeverity } from '#shared/types/notification'
+import type { NotificationForFront } from '#shared/types/notification'
 
 const emit = defineEmits<{
   close: []
@@ -10,23 +11,21 @@ const emit = defineEmits<{
 
 const { recentNotifications, hasUnread } = useNotifications()
 const { t } = useT()
-
-function formatRelativeTime(isoString: string): string {
-  const diffMs = Date.now() - new Date(isoString).getTime()
-  const diffMin = Math.floor(diffMs / 60000)
-  if (diffMin < 1) return t('notifications.time.justNow')
-  if (diffMin < 60) return t('notifications.time.minutesAgo', { count: String(diffMin) })
-  const diffH = Math.floor(diffMin / 60)
-  if (diffH < 24) return t('notifications.time.hoursAgo', { count: String(diffH) })
-  const diffD = Math.floor(diffH / 24)
-  return t('notifications.time.daysAgo', { count: String(diffD) })
-}
+const { formatRelativeTime, getSeverityClasses } = useNotificationHelpers()
 
 function handleItemClick(notif: NotificationForFront) {
   if (!notif.isRead) {
-    router.patch(`/notifications/${notif.id}/read`, {}, { preserveScroll: true })
-  }
-  if (notif.actionUrl) {
+    router.patch(
+      `/notifications/${notif.id}/read`,
+      {},
+      {
+        preserveScroll: true,
+        onSuccess: () => {
+          if (notif.actionUrl) router.visit(notif.actionUrl)
+        },
+      }
+    )
+  } else if (notif.actionUrl) {
     router.visit(notif.actionUrl)
   }
 }
@@ -38,21 +37,6 @@ function markAllRead() {
 function handleViewAll() {
   emit('close')
   router.visit('/notifications')
-}
-
-function getSeverityClasses(severity: NotificationSeverity): string {
-  switch (severity) {
-    case 'info':
-      return 'bg-blue-100 text-blue-600'
-    case 'success':
-      return 'bg-green-100 text-green-600'
-    case 'warning':
-      return 'bg-orange-100 text-orange-600'
-    case 'error':
-      return 'bg-red-100 text-red-600'
-    default:
-      return 'bg-gray-100 text-gray-600'
-  }
 }
 </script>
 
