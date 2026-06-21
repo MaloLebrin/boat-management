@@ -1,4 +1,5 @@
 import { inject } from '@adonisjs/core'
+import logger from '@adonisjs/core/services/logger'
 import { DateTime } from 'luxon'
 import Notification from '#models/notification'
 import type { CreateNotificationParams, NotificationsSharedProps } from '#shared/types/notification'
@@ -19,10 +20,13 @@ export default class NotificationService {
       metadata: params.metadata ?? null,
     })
 
-    // NotificationForFront is JSON-serializable; cast through unknown satisfies Broadcastable
-    transmit.broadcast(`notifications/${notification.userId}`, {
-      notification: NotificationTransformer.toRow(notification),
-    } as unknown as Record<string, string>)
+    try {
+      transmit.broadcast(`notifications/${notification.userId}`, {
+        notification: NotificationTransformer.toRow(notification),
+      } as unknown as Record<string, string>)
+    } catch (error) {
+      logger.warn({ err: error }, 'failed to broadcast notification via SSE')
+    }
 
     return notification
   }
@@ -76,7 +80,7 @@ export default class NotificationService {
     await Notification.query()
       .where('userId', userId)
       .whereNull('readAt')
-      .update({ readAt: DateTime.now().toSQL()! })
+      .update({ readAt: DateTime.now().toUTC().toISO()! })
   }
 
   async destroy(userId: number, notificationId: number): Promise<void> {

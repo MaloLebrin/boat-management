@@ -6,13 +6,8 @@ import type { NotificationForFront, NotificationsSharedProps } from '#shared/typ
 const storedUnreadCount = ref(0)
 const storedRecent = ref<NotificationForFront[]>([])
 
-// Single Transmit subscription guard
 let subscribedUserId: number | null = null
-
-function getCsrfToken(): string {
-  const entry = document.cookie.split('; ').find((row) => row.startsWith('XSRF-TOKEN='))
-  return entry ? decodeURIComponent(entry.split('=')[1]) : ''
-}
+let isSubscribing = false
 
 export function useNotifications() {
   const page = usePage()
@@ -39,23 +34,14 @@ export function useNotifications() {
 
   onMounted(async () => {
     const user = (page.props as Record<string, unknown>).user as { id: number } | undefined
-    if (!user?.id || subscribedUserId === user.id) return
+    if (!user?.id || subscribedUserId === user.id || isSubscribing) return
 
+    isSubscribing = true
     subscribedUserId = user.id
 
     try {
       const { Transmit } = await import('@adonisjs/transmit-client')
-      const transmitClient = new Transmit({
-        baseUrl: window.location.origin,
-        beforeSubscribe: (request) => {
-          const token = getCsrfToken()
-          if (token) request.headers.set('X-XSRF-TOKEN', token)
-        },
-        beforeUnsubscribe: (request) => {
-          const token = getCsrfToken()
-          if (token) request.headers.set('X-XSRF-TOKEN', token)
-        },
-      })
+      const transmitClient = new Transmit({ baseUrl: window.location.origin })
 
       const subscription = transmitClient.subscription(`notifications/${user.id}`)
       await subscription.create()
@@ -66,6 +52,8 @@ export function useNotifications() {
       })
     } catch {
       subscribedUserId = null
+    } finally {
+      isSubscribing = false
     }
   })
 
