@@ -21,9 +21,11 @@ export default class NotificationService {
     })
 
     try {
-      transmit.broadcast(`notifications/${notification.userId}`, {
+      // Named-property interfaces lack the index signature Broadcastable requires; cast is safe (all fields are JSON primitives).
+      const payload = {
         notification: NotificationTransformer.toRow(notification),
-      })
+      } as unknown as Parameters<typeof transmit.broadcast>[1]
+      transmit.broadcast(`notifications/${notification.userId}`, payload)
     } catch (error) {
       logger.warn({ err: error }, 'failed to broadcast notification via SSE')
     }
