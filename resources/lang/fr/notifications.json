@@ -1,0 +1,32 @@
+{
+  "title": "Notifications",
+  "empty": "Aucune notification",
+  "emptyDescription": "Vous êtes à jour !",
+  "markAllRead": "Tout marquer comme lu",
+  "markRead": "Marquer comme lu",
+  "delete": "Supprimer",
+  "viewAll": "Voir toutes les notifications",
+  "unreadCount": "{count} non lue(s)",
+  "time": {
+    "justNow": "A l'instant",
+    "minutesAgo": "Il y a {count} min",
+    "hoursAgo": "Il y a {count}h",
+    "daysAgo": "Il y a {count}j"
+  },
+  "types": {
+    "quota.ai_tokens": "Quota IA",
+    "quota.storage": "Quota stockage",
+    "member.joined": "Nouveau membre",
+    "member.removed": "Membre retiré",
+    "member.role_changed": "Rôle modifié",
+    "plan.downgraded": "Plan rétrogradé",
+    "plan.upgraded": "Plan amélioré",
+    "maintenance.overdue": "Maintenance en retard",
+    "maintenance.due_soon": "Maintenance à venir",
+    "document.expiring_soon": "Document expirant bientôt",
+    "document.expired": "Document expiré",
+    "safety_equipment.expiring_soon": "Équipement de sécurité expirant",
+    "safety_equipment.expired": "Équipement de sécurité expiré",
+    "invitation.accepted": "Invitation acceptée"
+  }
+}

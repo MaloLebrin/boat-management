@@ -1,0 +1,32 @@
+{
+  "title": "Notifications",
+  "empty": "No notifications",
+  "emptyDescription": "You're all caught up!",
+  "markAllRead": "Mark all as read",
+  "markRead": "Mark as read",
+  "delete": "Delete",
+  "viewAll": "View all notifications",
+  "unreadCount": "{count} unread",
+  "time": {
+    "justNow": "Just now",
+    "minutesAgo": "{count} min ago",
+    "hoursAgo": "{count}h ago",
+    "daysAgo": "{count}d ago"
+  },
+  "types": {
+    "quota.ai_tokens": "AI quota",
+    "quota.storage": "Storage quota",
+    "member.joined": "New member",
+    "member.removed": "Member removed",
+    "member.role_changed": "Role changed",
+    "plan.downgraded": "Plan downgraded",
+    "plan.upgraded": "Plan upgraded",
+    "maintenance.overdue": "Maintenance overdue",
+    "maintenance.due_soon": "Maintenance due soon",
+    "document.expiring_soon": "Document expiring soon",
+    "document.expired": "Document expired",
+    "safety_equipment.expiring_soon": "Safety equipment expiring",
+    "safety_equipment.expired": "Safety equipment expired",
+    "invitation.accepted": "Invitation accepted"
+  }
+}

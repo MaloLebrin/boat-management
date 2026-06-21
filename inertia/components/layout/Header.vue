@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import brandIconUrl from '~/assets/brand/fleetide_ai_icon_C.svg?url'
+import NotificationBell from '~/components/layout/NotificationBell.vue'
 import { useT } from '~/composables/use_t'
 
 type AuthUser = {
@@ -44,6 +45,8 @@ const { t } = useT()
           >
             {{ t('nav.menu') }}
           </button>
+
+          <NotificationBell />
 
           <span
             class="inline-flex justify-center items-center w-9 h-9 text-sm font-semibold rounded-full ring-1 bg-surface-muted text-fg-muted ring-border"
