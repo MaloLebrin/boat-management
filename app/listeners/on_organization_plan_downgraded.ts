@@ -1,5 +1,6 @@
 import type OrganizationPlanDowngraded from '#events/organization_plan_downgraded'
 import EmailQueueService from '#services/email_queue_service'
+import NotificationService from '#services/notification_service'
 import { BrandingService } from '#services/branding_service'
 import OrganizationMembership from '#models/organization_membership'
 import { inject } from '@adonisjs/core'
@@ -8,7 +9,8 @@ import { inject } from '@adonisjs/core'
 export default class OnOrganizationPlanDowngraded {
   constructor(
     private emailQueueService: EmailQueueService,
-    private brandingService: BrandingService
+    private brandingService: BrandingService,
+    private notificationService: NotificationService
   ) {}
 
   async handle(event: OrganizationPlanDowngraded) {
@@ -27,6 +29,17 @@ export default class OnOrganizationPlanDowngraded {
         fromPlan: event.fromPlan,
         toPlan: event.toPlan,
         branding,
+      })
+
+      await this.notificationService.create({
+        userId: membership.user.id,
+        organizationId: event.organization.id,
+        type: 'plan.downgraded',
+        severity: 'warning',
+        title: `Plan rétrogradé vers ${event.toPlan}`,
+        body: `Le plan de votre organisation est passé de ${event.fromPlan} à ${event.toPlan}.`,
+        actionUrl: '/settings/billing',
+        metadata: { fromPlan: event.fromPlan, toPlan: event.toPlan },
       })
     }
   }

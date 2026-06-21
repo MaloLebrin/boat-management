@@ -1,5 +1,6 @@
 import type AiTokenThresholdCrossed from '#events/ai_token_threshold_crossed'
 import EmailQueueService from '#services/email_queue_service'
+import NotificationService from '#services/notification_service'
 import { BrandingService } from '#services/branding_service'
 import OrganizationMembership from '#models/organization_membership'
 import { inject } from '@adonisjs/core'
@@ -9,7 +10,8 @@ import { DateTime } from 'luxon'
 export default class SendAiTokenQuotaNotification {
   constructor(
     private emailQueueService: EmailQueueService,
-    private brandingService: BrandingService
+    private brandingService: BrandingService,
+    private notificationService: NotificationService
   ) {}
 
   async handle(event: AiTokenThresholdCrossed) {
@@ -33,6 +35,17 @@ export default class SendAiTokenQuotaNotification {
         orgName: org.name,
         correlationSuffix: `${org.id}:${percent}:${yearMonth}`,
         branding,
+      })
+
+      await this.notificationService.create({
+        userId: membership.user.id,
+        organizationId: org.id,
+        type: 'quota.ai_tokens',
+        severity: percent >= 100 ? 'error' : 'warning',
+        title: `Quota IA à ${percent}%`,
+        body: `L'organisation ${org.name} a consommé ${percent}% de son quota de tokens IA.`,
+        actionUrl: '/settings/billing',
+        metadata: { percent, orgId: org.id },
       })
     }
   }
