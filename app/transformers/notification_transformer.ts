@@ -1,5 +1,5 @@
 import type Notification from '#models/notification'
-import type { NotificationForFront } from '#shared/types/notification'
+import type { JsonObject, NotificationForFront } from '#shared/types/notification'
 
 export function toRow(notification: Notification): NotificationForFront {
   return {
@@ -9,7 +9,7 @@ export function toRow(notification: Notification): NotificationForFront {
     title: notification.title,
     body: notification.body,
     actionUrl: notification.actionUrl,
-    metadata: notification.metadata,
+    metadata: notification.metadata as JsonObject | null,
     readAt: notification.readAt?.toISO() ?? null,
     isRead: notification.isRead,
     createdAt: notification.createdAt.toISO()!,

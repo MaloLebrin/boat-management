@@ -1,3 +1,8 @@
+export interface JsonObject {
+  [key: string]: JsonValue
+}
+export type JsonValue = string | number | boolean | null | JsonObject | JsonValue[]
+
 // Tous les types actuels ET futurs — extensible par design
 export type NotificationType =
   | 'quota.ai_tokens'
@@ -25,7 +30,7 @@ export interface NotificationForFront {
   title: string
   body: string | null
   actionUrl: string | null
-  metadata: Record<string, unknown> | null
+  metadata: JsonObject | null
   readAt: string | null
   isRead: boolean
   createdAt: string
