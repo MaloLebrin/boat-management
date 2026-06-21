@@ -3,6 +3,7 @@ import { QuotaExceededError } from '#exceptions/quota_errors'
 import AiAnalysisService, { type AiSuggestion } from '#services/ai_analysis_service'
 import AuditLogService from '#services/audit_log_service'
 import BoatDocumentService from '#services/boat_document_service'
+import BoatFuelLogService from '#services/boat_fuel_log_service'
 import BoatListService from '#services/boat_list_service'
 import { toEditForm, toShowProps } from '#transformers/boat_transformer'
 import { toPortFormOptions } from '#transformers/port_transformer'
@@ -17,6 +18,7 @@ import PortService from '#services/port_service'
 import QuotaService from '#services/quota_service'
 import SpotService from '#services/spot_service'
 import BoatPolicy from '#policies/boat_policy'
+import FuelLogPolicy from '#policies/fuel_log_policy'
 import IncidentPolicy from '#policies/incident_policy'
 import { createBoatValidator, updateBoatValidator } from '#validators/boat'
 import { assignBoatValidator } from '#validators/marina_layout'
@@ -31,6 +33,7 @@ export default class BoatsController {
     private taskService: BoatMaintenanceTaskService,
     private sheetService: BoatMaintenanceSheetService,
     private incidentService: BoatIncidentService,
+    private fuelLogService: BoatFuelLogService,
     private mediaService: MediaService,
     private aiAnalysisService: AiAnalysisService,
     private boatListService: BoatListService,
@@ -123,22 +126,28 @@ export default class BoatsController {
         maintenanceTasks,
         maintenanceSheets,
         incidents,
+        fuelLogs,
         boatMedia,
         positionHistory,
         latestSuggestions,
         canManageMaintenance,
         canDeleteIncidents,
+        canCreateFuelLogs,
+        canDeleteFuelLogs,
         boatDocuments,
       ] = await Promise.all([
         this.maintenanceService.listForBoat(user, boat),
         this.taskService.listForBoat(user, boat),
         this.sheetService.listForBoat(user, boat),
         this.incidentService.listForBoat(user, boat),
+        this.fuelLogService.listForBoat(user, boat),
         this.mediaService.listForEntity('boat', boat.id),
         this.boatService.getPositionHistory(boat.id),
         this.aiAnalysisService.getLatestBoatSuggestions(user.id, boat.id),
         bouncer.with(BoatPolicy).allows('edit', boat),
         bouncer.with(IncidentPolicy).allows('delete', boat),
+        bouncer.with(FuelLogPolicy).allows('create', boat),
+        bouncer.with(FuelLogPolicy).allows('delete', boat),
         this.documentService.listForBoat(user, boat),
       ])
 
@@ -157,6 +166,7 @@ export default class BoatsController {
           maintenanceTasks,
           maintenanceSheets,
           incidents,
+          fuelLogs,
           boatDocuments,
           aiSuggestions,
           canManageMaintenance,
@@ -164,6 +174,8 @@ export default class BoatsController {
           canManageDocuments,
           canExport,
           canDeleteIncidents,
+          canCreateFuelLogs,
+          canDeleteFuelLogs,
         })
       )
     } catch (error) {

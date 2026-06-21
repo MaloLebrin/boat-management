@@ -7,8 +7,10 @@ export const controllers = {
   Ai: () => import('#controllers/ai_controller'),
   AuditLogs: () => import('#controllers/audit_logs_controller'),
   Billing: () => import('#controllers/billing_controller'),
+  BoatDocuments: () => import('#controllers/boat_documents_controller'),
   BoatEngineParts: () => import('#controllers/boat_engine_parts_controller'),
   BoatEquipment: () => import('#controllers/boat_equipment_controller'),
+  BoatFuelLogs: () => import('#controllers/boat_fuel_logs_controller'),
   BoatIncidents: () => import('#controllers/boat_incidents_controller'),
   BoatMaintenanceSheetItems: () => import('#controllers/boat_maintenance_sheet_items_controller'),
   BoatMaintenanceSheets: () => import('#controllers/boat_maintenance_sheets_controller'),
@@ -41,5 +43,4 @@ export const controllers = {
   SimulatorLead: () => import('#controllers/simulator_lead_controller'),
   SimulatorShare: () => import('#controllers/simulator_share_controller'),
   Spots: () => import('#controllers/spots_controller'),
-  BoatDocuments: () => import('#controllers/boat_documents_controller'),
 }

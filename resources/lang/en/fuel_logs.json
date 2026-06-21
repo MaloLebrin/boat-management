@@ -1,0 +1,26 @@
+{
+  "tab": "Fuel",
+  "empty": "No fuel logs recorded.",
+  "add": "+ Add fuel log",
+  "count": "{count, plural, one {# fill-up} other {# fill-ups}}",
+  "totalLiters": "Total: {liters} L",
+  "engineHoursSuffix": "engine h",
+  "fields": {
+    "fueledAt": "Date",
+    "quantityLiters": "Quantity (L)",
+    "pricePerLiter": "Price/L (€, optional)",
+    "totalCost": "Total cost (€, optional)",
+    "engineHoursAtFueling": "Engine hours at fill-up (optional)",
+    "boatEngineId": "Engine (optional)",
+    "supplier": "Supplier (optional)",
+    "notes": "Notes (optional)",
+    "noEngine": "None / unspecified"
+  },
+  "form": {
+    "createTitle": "Record a fill-up",
+    "submit": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "confirmDelete": "Delete this fuel log?"
+  }
+}

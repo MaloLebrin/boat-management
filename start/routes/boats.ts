@@ -150,6 +150,13 @@ router
     router.get('boats/:id/simulator', [controllers.BoatSimulator, 'show']).as('boats.simulator')
 
     router
+      .post('boats/:boatId/fuel-logs', [controllers.BoatFuelLogs, 'store'])
+      .as('boats.fuelLogs.store')
+    router
+      .delete('boats/:boatId/fuel-logs/:logId', [controllers.BoatFuelLogs, 'destroy'])
+      .as('boats.fuelLogs.destroy')
+
+    router
       .post('boats/:boatId/admin-documents', [controllers.BoatDocuments, 'store'])
       .as('boats.adminDocuments.store')
     router

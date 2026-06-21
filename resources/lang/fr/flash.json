@@ -107,6 +107,12 @@
     "notFound": "Incident introuvable.",
     "descriptionRequired": "Une description est requise."
   },
+  "fuelLog": {
+    "created": "Avitaillement enregistré.",
+    "deleted": "Avitaillement supprimé.",
+    "notFound": "Avitaillement introuvable.",
+    "engineNotBelongs": "Ce moteur n'appartient pas à ce bateau."
+  },
   "boatDocument": {
     "created": "Document créé avec succès.",
     "updated": "Document mis à jour.",

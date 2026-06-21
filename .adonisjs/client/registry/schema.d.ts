@@ -631,6 +631,42 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_maintenance_sheet_items_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'boats.incidents.store': {
+    methods: ["POST"]
+    pattern: '/boats/:boatId/incidents'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/boat_incident').createBoatIncidentValidator)>>
+      paramsTuple: [ParamValue]
+      params: { boatId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/boat_incident').createBoatIncidentValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_incidents_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_incidents_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'boats.incidents.update': {
+    methods: ["PUT"]
+    pattern: '/boats/:boatId/incidents/:incidentId'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/boat_incident').updateBoatIncidentValidator)>>
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; incidentId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/boat_incident').updateBoatIncidentValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_incidents_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_incidents_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'boats.incidents.destroy': {
+    methods: ["DELETE"]
+    pattern: '/boats/:boatId/incidents/:incidentId'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; incidentId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_incidents_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_incidents_controller').default['destroy']>>>
+    }
+  }
   'boats.simulator': {
     methods: ["GET","HEAD"]
     pattern: '/boats/:id/simulator'
@@ -641,6 +677,30 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_simulator_controller').default['show']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_simulator_controller').default['show']>>>
+    }
+  }
+  'boats.fuelLogs.store': {
+    methods: ["POST"]
+    pattern: '/boats/:boatId/fuel-logs'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/boat_fuel_log').createBoatFuelLogValidator)>>
+      paramsTuple: [ParamValue]
+      params: { boatId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/boat_fuel_log').createBoatFuelLogValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_fuel_logs_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_fuel_logs_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'boats.fuelLogs.destroy': {
+    methods: ["DELETE"]
+    pattern: '/boats/:boatId/fuel-logs/:logId'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; logId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_fuel_logs_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_fuel_logs_controller').default['destroy']>>>
     }
   }
   'boats.adminDocuments.store': {
