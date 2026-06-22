@@ -2,7 +2,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import { inject } from '@adonisjs/core'
 import NotificationService from '#services/notification_service'
 import * as NotificationTransformer from '#transformers/notification_transformer'
-import { notificationIdValidator, notificationPageValidator } from '#validators/notification'
+import { notificationPageValidator } from '#validators/notification'
 
 @inject()
 export default class NotificationsController {
@@ -23,7 +23,8 @@ export default class NotificationsController {
 
   async markAsRead({ auth, params, response }: HttpContext) {
     const user = auth.getUserOrFail()
-    const { id } = await notificationIdValidator.validate(params)
+    const id = Number(params.id)
+    if (!Number.isInteger(id) || id < 1) return response.redirect().back()
     await this.notificationService.markRead(user.id, id)
     return response.redirect().back()
   }
@@ -36,7 +37,8 @@ export default class NotificationsController {
 
   async destroy({ auth, params, response }: HttpContext) {
     const user = auth.getUserOrFail()
-    const { id } = await notificationIdValidator.validate(params)
+    const id = Number(params.id)
+    if (!Number.isInteger(id) || id < 1) return response.redirect().back()
     await this.notificationService.destroy(user.id, id)
     return response.redirect().back()
   }

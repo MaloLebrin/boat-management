@@ -27,10 +27,10 @@ export default class SendStorageQuotaNotification {
 
     const yearMonth = DateTime.now().toFormat('yyyy-MM')
     const branding = this.brandingService.toEmailParams(org)
-    const locale = i18nManager.locale(i18nManager.defaultLocale)
 
     await Promise.all(
       adminMemberships.map(async (membership) => {
+        const locale = i18nManager.locale(i18nManager.defaultLocale)
         const params = { percent: String(percent), orgName: org.name }
 
         await this.emailQueueService.sendStorageQuotaWarning({
