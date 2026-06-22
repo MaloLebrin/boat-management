@@ -5,11 +5,13 @@ import type BoatMaintenanceEvent from '#models/boat_maintenance_event'
 import type BoatMaintenanceSheet from '#models/boat_maintenance_sheet'
 import type BoatMaintenanceTask from '#models/boat_maintenance_task'
 import type BoatPositionHistory from '#models/boat_position_history'
+import type NavigationLog from '#models/navigation_log'
 import type Media from '#models/media'
 import type { AiSuggestion } from '#services/ai_analysis_service'
 import type { IncidentType, IncidentStatus } from '#shared/types/incident'
 import type { BoatDocumentRow } from '#shared/types/boat_document'
 import type { FuelLogRow } from '#shared/types/fuel_log'
+import type { NavigationLogRow, NavigationLogPortOption } from '#shared/types/navigation_log'
 
 export interface BoatShowContext {
   positionHistory: BoatPositionHistory[]
@@ -19,6 +21,8 @@ export interface BoatShowContext {
   maintenanceSheets: BoatMaintenanceSheet[]
   incidents: BoatIncident[]
   fuelLogs: BoatFuelLog[]
+  navigationLogs: NavigationLog[]
+  portOptions: NavigationLogPortOption[]
   boatDocuments: BoatDocumentRow[]
   aiSuggestions: AiSuggestion[] | null
   canManageMaintenance: boolean
@@ -28,6 +32,8 @@ export interface BoatShowContext {
   canDeleteIncidents: boolean
   canCreateFuelLogs: boolean
   canDeleteFuelLogs: boolean
+  canCreateNavigationLogs: boolean
+  canDeleteNavigationLogs: boolean
 }
 
 export function toEditForm(boat: Boat) {
@@ -64,6 +70,8 @@ export function toShowProps(boat: Boat, ctx: BoatShowContext) {
     maintenanceSheets: ctx.maintenanceSheets.map(toMaintenanceSheet),
     incidents: ctx.incidents.map(toIncident),
     fuelLogs: ctx.fuelLogs.map(toFuelLog),
+    navigationLogs: ctx.navigationLogs.map(toNavigationLog),
+    portOptions: ctx.portOptions,
     boatDocuments: ctx.boatDocuments,
     canManageMaintenance: ctx.canManageMaintenance,
     canManageEquipment: ctx.canManageEquipment,
@@ -72,7 +80,34 @@ export function toShowProps(boat: Boat, ctx: BoatShowContext) {
     canDeleteIncidents: ctx.canDeleteIncidents,
     canCreateFuelLogs: ctx.canCreateFuelLogs,
     canDeleteFuelLogs: ctx.canDeleteFuelLogs,
+    canCreateNavigationLogs: ctx.canCreateNavigationLogs,
+    canDeleteNavigationLogs: ctx.canDeleteNavigationLogs,
     aiSuggestions: ctx.aiSuggestions,
+  }
+}
+
+function toNavigationLog(log: NavigationLog): NavigationLogRow {
+  return {
+    id: log.id,
+    boatId: log.boatId,
+    status: log.status,
+    departedAt: log.departedAt.toISO()!,
+    arrivedAt: log.arrivedAt ? log.arrivedAt.toISO()! : null,
+    departurePortId: log.departurePortId,
+    departurePortName: log.departurePortName,
+    arrivalPortId: log.arrivalPortId,
+    arrivalPortName: log.arrivalPortName,
+    distanceNm: log.distanceNm !== null ? Number.parseFloat(log.distanceNm) : null,
+    engineHoursStart:
+      log.engineHoursStart !== null ? Number.parseFloat(log.engineHoursStart) : null,
+    engineHoursEnd: log.engineHoursEnd !== null ? Number.parseFloat(log.engineHoursEnd) : null,
+    fuelConsumedLiters:
+      log.fuelConsumedLiters !== null ? Number.parseFloat(log.fuelConsumedLiters) : null,
+    windForceBeaufort: log.windForceBeaufort,
+    seaState: log.seaState,
+    crewCount: log.crewCount,
+    notes: log.notes,
+    createdAt: log.createdAt.toISO()!,
   }
 }
 

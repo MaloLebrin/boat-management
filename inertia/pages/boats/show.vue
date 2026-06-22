@@ -11,6 +11,7 @@ import BoatShowTabEquipment from '~/components/boats/show/tabs/BoatShowTabEquipm
 import BoatShowTabHistory from '~/components/boats/show/tabs/BoatShowTabHistory.vue'
 import BoatShowTabFuelLogs from '~/components/boats/show/tabs/BoatShowTabFuelLogs.vue'
 import BoatShowTabIncidents from '~/components/boats/show/tabs/BoatShowTabIncidents.vue'
+import BoatShowTabNavigationLogs from '~/components/boats/show/tabs/BoatShowTabNavigationLogs.vue'
 import BoatShowTabOverview from '~/components/boats/show/tabs/BoatShowTabOverview.vue'
 import BoatShowTabSpecs from '~/components/boats/show/tabs/BoatShowTabSpecs.vue'
 import BoatShowTabSheets from '~/components/boats/show/tabs/BoatShowTabSheets.vue'
@@ -25,6 +26,8 @@ import type {
   MaintenanceEventRow,
   MaintenanceSheetRow,
   MaintenanceTaskRow,
+  NavigationLogRow,
+  NavigationLogPortOption,
 } from '~/types/boat_show'
 
 const { t } = useT()
@@ -36,6 +39,8 @@ const props = defineProps<{
   maintenanceSheets: MaintenanceSheetRow[]
   incidents: BoatIncidentRow[]
   fuelLogs: FuelLogRow[]
+  navigationLogs: NavigationLogRow[]
+  portOptions: NavigationLogPortOption[]
   boatDocuments: BoatDocumentRow[]
   canManageMaintenance: boolean
   canManageEquipment: boolean
@@ -44,6 +49,8 @@ const props = defineProps<{
   canDeleteIncidents: boolean
   canCreateFuelLogs: boolean
   canDeleteFuelLogs: boolean
+  canCreateNavigationLogs: boolean
+  canDeleteNavigationLogs: boolean
   aiSuggestions: AiSuggestion[] | null
 }>()
 
@@ -57,6 +64,7 @@ type TabKey =
   | 'sheets'
   | 'incidents'
   | 'fuel'
+  | 'navigation-logs'
   | 'admin-docs'
 
 const tab = ref<TabKey>('overview')
@@ -124,6 +132,7 @@ const tabs = computed(() => [
     badge: openIncidents.value.length > 0 ? String(openIncidents.value.length) : undefined,
   },
   { key: 'fuel', label: t('fuel_logs.tab') },
+  { key: 'navigation-logs', label: t('navigation_logs.tab') },
   {
     key: 'admin-docs',
     label: t('boats.show.tabs.adminDocs'),
@@ -281,6 +290,15 @@ function openTasksTab() {
           :fuel-logs="fuelLogs"
           :can-manage="canCreateFuelLogs"
           :can-delete="canDeleteFuelLogs"
+        />
+
+        <BoatShowTabNavigationLogs
+          v-else-if="tab === 'navigation-logs'"
+          :boat="boat"
+          :navigation-logs="navigationLogs"
+          :port-options="portOptions"
+          :can-create="canCreateNavigationLogs"
+          :can-delete="canDeleteNavigationLogs"
         />
 
         <BoatShowTabAdminDocs

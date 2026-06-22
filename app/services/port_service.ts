@@ -140,6 +140,17 @@ export default class PortService {
       .orderBy('name', 'asc')
   }
 
+  async listNamesForOrg(user: User): Promise<{ id: number; name: string }[]> {
+    if (user.organizationId === null) return []
+
+    const ports = await Port.query()
+      .where('organizationId', user.organizationId)
+      .select('id', 'name')
+      .orderBy('name', 'asc')
+
+    return ports.map((p) => ({ id: p.id, name: p.name }))
+  }
+
   async getWithPontoonsAndMouillagesOrFail(user: User, portId: number) {
     if (user.organizationId === null) throw new PortNotFoundError()
 

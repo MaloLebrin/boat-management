@@ -5,6 +5,7 @@ import AuditLogService from '#services/audit_log_service'
 import BoatDocumentService from '#services/boat_document_service'
 import BoatFuelLogService from '#services/boat_fuel_log_service'
 import BoatListService from '#services/boat_list_service'
+import NavigationLogService from '#services/navigation_log_service'
 import { toEditForm, toShowProps } from '#transformers/boat_transformer'
 import { toPortFormOptions } from '#transformers/port_transformer'
 import BoatIncidentService from '#services/boat_incident_service'
@@ -20,6 +21,7 @@ import SpotService from '#services/spot_service'
 import BoatPolicy from '#policies/boat_policy'
 import FuelLogPolicy from '#policies/fuel_log_policy'
 import IncidentPolicy from '#policies/incident_policy'
+import NavigationLogPolicy from '#policies/navigation_log_policy'
 import { createBoatValidator, updateBoatValidator } from '#validators/boat'
 import { assignBoatValidator } from '#validators/marina_layout'
 import { inject } from '@adonisjs/core'
@@ -34,6 +36,7 @@ export default class BoatsController {
     private sheetService: BoatMaintenanceSheetService,
     private incidentService: BoatIncidentService,
     private fuelLogService: BoatFuelLogService,
+    private navigationLogService: NavigationLogService,
     private mediaService: MediaService,
     private aiAnalysisService: AiAnalysisService,
     private boatListService: BoatListService,
@@ -127,6 +130,8 @@ export default class BoatsController {
         maintenanceSheets,
         incidents,
         fuelLogs,
+        navigationLogs,
+        portOptions,
         boatMedia,
         positionHistory,
         latestSuggestions,
@@ -134,6 +139,8 @@ export default class BoatsController {
         canDeleteIncidents,
         canCreateFuelLogs,
         canDeleteFuelLogs,
+        canCreateNavigationLogs,
+        canDeleteNavigationLogs,
         boatDocuments,
       ] = await Promise.all([
         this.maintenanceService.listForBoat(user, boat),
@@ -141,6 +148,8 @@ export default class BoatsController {
         this.sheetService.listForBoat(user, boat),
         this.incidentService.listForBoat(user, boat),
         this.fuelLogService.listForBoat(user, boat),
+        this.navigationLogService.listForBoat(user, boat),
+        this.portService.listNamesForOrg(user),
         this.mediaService.listForEntity('boat', boat.id),
         this.boatService.getPositionHistory(boat.id),
         this.aiAnalysisService.getLatestBoatSuggestions(user.id, boat.id),
@@ -148,6 +157,8 @@ export default class BoatsController {
         bouncer.with(IncidentPolicy).allows('delete', boat),
         bouncer.with(FuelLogPolicy).allows('create', boat),
         bouncer.with(FuelLogPolicy).allows('delete', boat),
+        bouncer.with(NavigationLogPolicy).allows('create', boat),
+        bouncer.with(NavigationLogPolicy).allows('delete', boat),
         this.documentService.listForBoat(user, boat),
       ])
 
@@ -167,6 +178,8 @@ export default class BoatsController {
           maintenanceSheets,
           incidents,
           fuelLogs,
+          navigationLogs,
+          portOptions,
           boatDocuments,
           aiSuggestions,
           canManageMaintenance,
@@ -176,6 +189,8 @@ export default class BoatsController {
           canDeleteIncidents,
           canCreateFuelLogs,
           canDeleteFuelLogs,
+          canCreateNavigationLogs,
+          canDeleteNavigationLogs,
         })
       )
     } catch (error) {

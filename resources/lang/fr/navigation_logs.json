@@ -1,0 +1,49 @@
+{
+  "tab": "Journal de bord",
+  "empty": "Aucune sortie enregistrée.",
+  "add": "+ Nouvelle sortie",
+  "count": "{count, plural, one {# sortie} other {# sorties}}",
+  "inProgress": "En cours",
+  "completed": "Terminée",
+  "close": "Clôturer",
+  "deleteConfirm": "Supprimer cette sortie ?",
+  "distanceSuffix": "mn",
+  "engineHoursSuffix": "h moteur",
+  "beaufortSuffix": "Bf",
+  "crew": "{count, plural, one {# équipier} other {# équipiers}}",
+  "seaState": {
+    "calm": "Calme",
+    "slight": "Belle",
+    "moderate": "Peu agitée",
+    "rough": "Agitée",
+    "very_rough": "Très agitée"
+  },
+  "fields": {
+    "departedAt": "Départ",
+    "arrivedAt": "Arrivée",
+    "departurePort": "Port de départ",
+    "arrivalPort": "Port d'arrivée",
+    "departurePortId": "Port de départ (existant)",
+    "departurePortName": "Ou nom libre",
+    "arrivalPortId": "Port d'arrivée (existant)",
+    "arrivalPortName": "Ou nom libre",
+    "distanceNm": "Distance (milles nautiques, optionnel)",
+    "engineHoursStart": "Heures moteur au départ (optionnel)",
+    "engineHoursEnd": "Heures moteur à l'arrivée (optionnel)",
+    "fuelConsumedLiters": "Carburant consommé (L, optionnel)",
+    "windForceBeaufort": "Force du vent (Beaufort 0–12, optionnel)",
+    "seaState": "État de la mer (optionnel)",
+    "crewCount": "Nombre d'équipiers (optionnel)",
+    "notes": "Notes (optionnel)",
+    "noPort": "Aucun / non précisé",
+    "selectSeaState": "Sélectionner…"
+  },
+  "form": {
+    "createTitle": "Nouvelle sortie",
+    "closeTitle": "Clôturer la sortie",
+    "submit": "Enregistrer",
+    "submitClose": "Clôturer",
+    "cancel": "Annuler",
+    "delete": "Supprimer"
+  }
+}
