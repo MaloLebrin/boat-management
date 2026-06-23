@@ -15,6 +15,13 @@ export interface CreateNavigationLogPayload {
   notes?: string | null
 }
 
+export interface UpdateNavigationLogPayload {
+  windForceBeaufort?: number | null
+  seaState?: SeaState | null
+  crewCount?: number | null
+  notes?: string | null
+}
+
 export interface CloseNavigationLogPayload {
   arrivedAt: Date | string | DateTime
   arrivalPortId?: number | null

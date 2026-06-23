@@ -5,12 +5,15 @@ import BaseBreadcrumb from '~/components/base/BaseBreadcrumb.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseTabs from '~/components/base/BaseTabs.vue'
+import NavigationActiveCard from '~/components/boats/show/tabs/NavigationActiveCard.vue'
 import BoatShowTabFuelLogs from '~/components/boats/show/tabs/BoatShowTabFuelLogs.vue'
 import BoatShowTabIncidents from '~/components/boats/show/tabs/BoatShowTabIncidents.vue'
 import BoatShowTabNavigationLogs from '~/components/boats/show/tabs/BoatShowTabNavigationLogs.vue'
+import BoatShowTabPosition from '~/components/boats/show/tabs/BoatShowTabPosition.vue'
 import { useT } from '~/composables/use_t'
 import type {
   BoatIncidentRow,
+  BoatPositionHistoryRow,
   BoatShowDetail,
   FuelLogRow,
   NavigationLogPortOption,
@@ -27,6 +30,8 @@ const props = defineProps<{
   navigationLogs: NavigationLogRow[]
   portOptions: NavigationLogPortOption[]
   crewMemberOptions: CrewMemberOption[]
+  positionHistory: BoatPositionHistoryRow[]
+  latestGpsPosition: BoatPositionHistoryRow | null
   canManageMaintenance: boolean
   canDeleteIncidents: boolean
   canCreateFuelLogs: boolean
@@ -36,7 +41,7 @@ const props = defineProps<{
   canDeleteNavigationLogs: boolean
 }>()
 
-type TabKey = 'navigation-logs' | 'fuel' | 'incidents'
+type TabKey = 'navigation-logs' | 'fuel' | 'incidents' | 'position'
 
 const tab = ref<TabKey>('navigation-logs')
 
@@ -60,6 +65,10 @@ const openIncidents = computed(() =>
   props.incidents.filter((i) => i.status === 'open' || i.status === 'in_progress')
 )
 
+const activeLog = computed(
+  () => props.navigationLogs.find((l) => l.status === 'in_progress') ?? null
+)
+
 const tabs = computed(() => [
   { key: 'navigation-logs', label: t('navigation_logs.tab') },
   { key: 'fuel', label: t('fuel_logs.tab') },
@@ -68,6 +77,7 @@ const tabs = computed(() => [
     label: t('incidents.tab'),
     badge: openIncidents.value.length > 0 ? String(openIncidents.value.length) : undefined,
   },
+  { key: 'position', label: t('boats.show.position.tab') },
 ])
 </script>
 
@@ -111,6 +121,16 @@ const tabs = computed(() => [
         </div>
       </div>
 
+      <!-- Active navigation banner -->
+      <NavigationActiveCard
+        v-if="activeLog"
+        :boat="boat"
+        :log="activeLog"
+        :port-options="portOptions"
+        :can-update="canUpdateNavigationLogs"
+        :can-create-fuel-logs="canCreateFuelLogs"
+      />
+
       <BaseTabs v-model="tab" :tabs="tabs" />
     </header>
 
@@ -141,6 +161,14 @@ const tabs = computed(() => [
           :incidents="incidents"
           :can-manage="canManageMaintenance"
           :can-delete="canDeleteIncidents"
+        />
+
+        <BoatShowTabPosition
+          v-else-if="tab === 'position'"
+          :boat-id="boat.id"
+          :position-history="positionHistory"
+          :latest-gps-position="latestGpsPosition"
+          :can-manage="canManageMaintenance"
         />
       </div>
     </Transition>

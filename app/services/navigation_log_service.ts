@@ -8,12 +8,13 @@ import type Boat from '#models/boat'
 import type {
   CloseNavigationLogPayload,
   CreateNavigationLogPayload,
+  UpdateNavigationLogPayload,
 } from '#shared/types/navigation_log'
 import { toDateTime } from '#shared/helpers/maintenance'
 import db from '@adonisjs/lucid/services/db'
 
 export { NavigationLogNotFoundError, NavigationLogValidationError }
-export type { CreateNavigationLogPayload, CloseNavigationLogPayload }
+export type { CreateNavigationLogPayload, CloseNavigationLogPayload, UpdateNavigationLogPayload }
 
 export default class NavigationLogService {
   async listForBoat(boat: Boat) {
@@ -130,6 +131,24 @@ export default class NavigationLogService {
   async getForBoat(boat: Boat, logId: number) {
     const log = await NavigationLog.query().where('id', logId).where('boatId', boat.id).first()
     if (!log) throw new NavigationLogNotFoundError()
+    return log
+  }
+
+  async updateForBoat(boat: Boat, logId: number, payload: UpdateNavigationLogPayload) {
+    const log = await NavigationLog.query()
+      .where('id', logId)
+      .where('boatId', boat.id)
+      .where('status', 'in_progress')
+      .first()
+
+    if (!log) throw new NavigationLogNotFoundError()
+
+    if (payload.windForceBeaufort !== undefined) log.windForceBeaufort = payload.windForceBeaufort
+    if (payload.seaState !== undefined) log.seaState = payload.seaState
+    if (payload.crewCount !== undefined) log.crewCount = payload.crewCount
+    if (payload.notes !== undefined) log.notes = payload.notes?.trim() || null
+
+    await log.save()
     return log
   }
 

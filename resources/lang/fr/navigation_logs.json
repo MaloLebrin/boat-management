@@ -39,10 +39,20 @@
     "noPort": "Aucun / non précisé",
     "selectSeaState": "Sélectionner…"
   },
+  "active": {
+    "title": "En navigation",
+    "elapsed": "depuis {duration}",
+    "updateBtn": "Mettre à jour",
+    "fuelBtn": "Ravitailler",
+    "fuelTitle": "Avitaillement",
+    "closeBtn": "Clôturer"
+  },
   "form": {
     "createTitle": "Nouvelle sortie",
+    "updateTitle": "Mettre à jour la navigation",
     "closeTitle": "Clôturer la sortie",
     "submit": "Enregistrer",
+    "submitUpdate": "Enregistrer",
     "submitClose": "Clôturer",
     "cancel": "Annuler",
     "delete": "Supprimer"

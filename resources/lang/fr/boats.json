@@ -279,6 +279,7 @@
       "positionEmpty": "Aucun emplacement assigné"
     },
     "position": {
+      "tab": "Position",
       "title": "Emplacement actuel",
       "history": "Historique des positions",
       "arrivedOn": "Depuis le",

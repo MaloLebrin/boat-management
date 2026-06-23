@@ -279,6 +279,7 @@
       "positionEmpty": "No berth assigned"
     },
     "position": {
+      "tab": "Position",
       "title": "Current berth",
       "history": "Position history",
       "arrivedOn": "Since",

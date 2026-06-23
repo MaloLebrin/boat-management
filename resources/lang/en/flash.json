@@ -115,6 +115,7 @@
   },
   "navigationLog": {
     "created": "Trip recorded.",
+    "updated": "Trip updated.",
     "closed": "Trip closed. Engine hours updated.",
     "deleted": "Trip deleted.",
     "notFound": "Trip not found.",

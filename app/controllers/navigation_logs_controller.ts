@@ -8,6 +8,7 @@ import NavigationLogPolicy from '#policies/navigation_log_policy'
 import {
   createNavigationLogValidator,
   closeNavigationLogValidator,
+  updateNavigationLogValidator,
 } from '#validators/navigation_log'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
@@ -51,6 +52,45 @@ export default class NavigationLogsController {
 
     session.flash('success', i18n.t('flash.navigationLog.created'))
     response.redirect(`/boats/${boat.id}?tab=navigation-logs`)
+  }
+
+  async update({ request, response, auth, params, bouncer, session, i18n }: HttpContext) {
+    await auth.authenticate()
+    const user = auth.getUserOrFail()
+
+    let boat
+    try {
+      boat = await this.boatService.getForUserOrFail(user, Number(params.boatId))
+    } catch (error) {
+      if (error instanceof BoatNotFoundError) {
+        response.redirect('/boats')
+        return
+      }
+      throw error
+    }
+
+    await bouncer.with(NavigationLogPolicy).authorize('update', boat)
+
+    const payload = await request.validateUsing(updateNavigationLogValidator)
+
+    try {
+      await this.navigationLogService.updateForBoat(boat, Number(params.logId), {
+        windForceBeaufort: payload.windForceBeaufort ?? null,
+        seaState: payload.seaState ?? null,
+        crewCount: payload.crewCount ?? null,
+        notes: payload.notes ?? null,
+      })
+    } catch (error) {
+      if (error instanceof NavigationLogNotFoundError) {
+        session.flash('error', i18n.t('flash.navigationLog.notFound'))
+        response.redirect().back()
+        return
+      }
+      throw error
+    }
+
+    session.flash('success', i18n.t('flash.navigationLog.updated'))
+    response.redirect().back()
   }
 
   async close({ request, response, auth, params, bouncer, session, i18n }: HttpContext) {

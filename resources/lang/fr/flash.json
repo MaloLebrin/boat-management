@@ -115,6 +115,7 @@
   },
   "navigationLog": {
     "created": "Sortie enregistrée.",
+    "updated": "Sortie mise à jour.",
     "closed": "Sortie clôturée. Heures moteur mises à jour.",
     "deleted": "Sortie supprimée.",
     "notFound": "Sortie introuvable.",

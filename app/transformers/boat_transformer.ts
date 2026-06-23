@@ -89,6 +89,12 @@ export function toManageProps(boat: Boat, ctx: BoatManageContext) {
 }
 
 export function toNavigationProps(boat: Boat, ctx: BoatNavigationContext) {
+  const positionHistory = ctx.positionHistory.map(toPositionHistoryEntry)
+  const latestGpsPosition =
+    positionHistory.find((p) => p.latitude !== null && p.endedAt === null) ??
+    positionHistory.find((p) => p.latitude !== null) ??
+    null
+
   return {
     boat: toBoatDetail(boat, ctx),
     incidents: ctx.incidents.map(toIncident),
@@ -96,6 +102,8 @@ export function toNavigationProps(boat: Boat, ctx: BoatNavigationContext) {
     navigationLogs: ctx.navigationLogs.map(toNavigationLog),
     portOptions: ctx.portOptions,
     crewMemberOptions: ctx.crewMemberOptions,
+    positionHistory,
+    latestGpsPosition,
     canManageMaintenance: ctx.canManageMaintenance,
     canDeleteIncidents: ctx.canDeleteIncidents,
     canCreateFuelLogs: ctx.canCreateFuelLogs,

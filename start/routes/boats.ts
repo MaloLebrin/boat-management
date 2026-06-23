@@ -161,6 +161,9 @@ router
       .post('boats/:boatId/navigation-logs', [controllers.NavigationLogs, 'store'])
       .as('boats.navigationLogs.store')
     router
+      .patch('boats/:boatId/navigation-logs/:logId', [controllers.NavigationLogs, 'update'])
+      .as('boats.navigationLogs.update')
+    router
       .patch('boats/:boatId/navigation-logs/:logId/close', [controllers.NavigationLogs, 'close'])
       .as('boats.navigationLogs.close')
     router

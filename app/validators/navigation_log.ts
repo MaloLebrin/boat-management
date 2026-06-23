@@ -13,6 +13,15 @@ export const createNavigationLogValidator = vine.compile(
   })
 )
 
+export const updateNavigationLogValidator = vine.compile(
+  vine.object({
+    windForceBeaufort: vine.number().withoutDecimals().min(0).max(12).optional(),
+    seaState: vine.enum(['calm', 'slight', 'moderate', 'rough', 'very_rough'] as const).optional(),
+    crewCount: vine.number().withoutDecimals().min(0).optional(),
+    notes: vine.string().trim().maxLength(5000).optional(),
+  })
+)
+
 export const closeNavigationLogValidator = vine.compile(
   vine.object({
     arrivedAt: vine.date({ formats: ['YYYY-MM-DDTHH:mm', 'YYYY-MM-DDTHH:mm:ss'] }),

@@ -727,6 +727,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/navigation_logs_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'boats.navigationLogs.update': {
+    methods: ["PATCH"]
+    pattern: '/boats/:boatId/navigation-logs/:logId'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/navigation_log').updateNavigationLogValidator)>>
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; logId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/navigation_log').updateNavigationLogValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/navigation_logs_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/navigation_logs_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'boats.navigationLogs.close': {
     methods: ["PATCH"]
     pattern: '/boats/:boatId/navigation-logs/:logId/close'

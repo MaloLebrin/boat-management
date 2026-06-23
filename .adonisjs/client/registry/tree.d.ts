@@ -49,6 +49,7 @@ export interface ApiDefinition {
     }
     navigationLogs: {
       store: typeof routes['boats.navigationLogs.store']
+      update: typeof routes['boats.navigationLogs.update']
       close: typeof routes['boats.navigationLogs.close']
       destroy: typeof routes['boats.navigationLogs.destroy']
       crew: {

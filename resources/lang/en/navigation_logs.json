@@ -39,10 +39,20 @@
     "noPort": "None / unspecified",
     "selectSeaState": "Select…"
   },
+  "active": {
+    "title": "Underway",
+    "elapsed": "for {duration}",
+    "updateBtn": "Update",
+    "fuelBtn": "Refuel",
+    "fuelTitle": "Refueling",
+    "closeBtn": "Close trip"
+  },
   "form": {
     "createTitle": "New trip",
+    "updateTitle": "Update trip",
     "closeTitle": "Close trip",
     "submit": "Save",
+    "submitUpdate": "Save",
     "submitClose": "Close trip",
     "cancel": "Cancel",
     "delete": "Delete"

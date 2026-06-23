@@ -366,6 +366,12 @@ const routes = {
     tokens: [{"old":"/boats/:boatId/navigation-logs","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/navigation-logs","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/navigation-logs","type":0,"val":"navigation-logs","end":""}],
     types: placeholder as Registry['boats.navigationLogs.store']['types'],
   },
+  'boats.navigationLogs.update': {
+    methods: ["PATCH"],
+    pattern: '/boats/:boatId/navigation-logs/:logId',
+    tokens: [{"old":"/boats/:boatId/navigation-logs/:logId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/navigation-logs/:logId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/navigation-logs/:logId","type":0,"val":"navigation-logs","end":""},{"old":"/boats/:boatId/navigation-logs/:logId","type":1,"val":"logId","end":""}],
+    types: placeholder as Registry['boats.navigationLogs.update']['types'],
+  },
   'boats.navigationLogs.close': {
     methods: ["PATCH"],
     pattern: '/boats/:boatId/navigation-logs/:logId/close',
