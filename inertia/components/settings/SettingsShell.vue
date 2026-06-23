@@ -10,7 +10,15 @@ import type { PlanTier } from '../../../shared/types/plan'
 const { t } = useT()
 const page = usePage()
 
-type SettingsSection = 'me' | 'org' | 'members' | 'billing' | 'ai' | 'audit-log' | 'branding'
+type SettingsSection =
+  | 'me'
+  | 'org'
+  | 'members'
+  | 'billing'
+  | 'ai'
+  | 'audit-log'
+  | 'branding'
+  | 'import'
 
 const baseSections: { key: SettingsSection; route: string; label: () => string }[] = [
   { key: 'me', route: 'settings.me', label: () => t('settings.sections.me') },
@@ -20,6 +28,12 @@ const baseSections: { key: SettingsSection; route: string; label: () => string }
 ]
 
 const VALID_PLANS = new Set<string>(['starter', 'pro', 'enterprise'])
+
+const canExport = computed(() => {
+  const plan = page.props.currentPlan
+  if (typeof plan !== 'string' || !VALID_PLANS.has(plan)) return false
+  return PLAN_LIMITS[plan as PlanTier].canExport
+})
 
 const canCustomizeAI = computed(() => {
   const plan = page.props.currentPlan
@@ -41,6 +55,13 @@ const canWhiteLabel = computed(() => {
 
 const sections = computed(() => {
   const result = [...baseSections]
+  if (canExport.value) {
+    result.push({
+      key: 'import' as SettingsSection,
+      route: 'settings.import',
+      label: () => t('settings.sections.import'),
+    })
+  }
   if (canCustomizeAI.value) {
     result.push({
       key: 'ai' as SettingsSection,
@@ -66,6 +87,7 @@ const sections = computed(() => {
 })
 
 function isActive(key: SettingsSection) {
+  if (key === 'import') return page.url.startsWith('/settings/import')
   return page.url.startsWith(`/settings/${key}`)
 }
 </script>

@@ -7,7 +7,8 @@
     "me": "My profile",
     "ai": "AI customisation",
     "auditLog": "Activity log",
-    "branding": "White label"
+    "branding": "White label",
+    "import": "CSV Import"
   },
   "org": {
     "title": "Organisation profile",
@@ -151,6 +152,57 @@
     "save": "Save",
     "resetColor": "Reset",
     "setCustomColor": "Set custom colour"
+  },
+  "import": {
+    "title": "Import / Export CSV",
+    "importSection": "CSV Import",
+    "exportSection": "CSV Export",
+    "boatLabel": "Boat",
+    "boatPlaceholder": "Select a boat",
+    "typeLabel": "Data type",
+    "types": {
+      "maintenance": "Maintenance events"
+    },
+    "fileLabel": "CSV file",
+    "fileHint": "Format: UTF-8 or UTF-8 BOM, `;` separator. Max size: 5 MB.",
+    "previewButton": "Preview",
+    "confirmButton": "Import {count} row(s)",
+    "cancelButton": "Cancel",
+    "downloadTemplate": "Download CSV template",
+    "templateHint": "Expected headers: {headers}",
+    "previewTitle": "File preview",
+    "previewSummary": "{valid} valid row(s) out of {total}",
+    "previewErrors": "{count} error(s)",
+    "previewColumns": {
+      "line": "Line",
+      "date": "date",
+      "title": "title",
+      "subject": "subject",
+      "status": "Status",
+      "errors": "Errors"
+    },
+    "rowValid": "OK",
+    "rowInvalid": "Error",
+    "noBoats": "No boats available. Create a boat first.",
+    "exportBoatLabel": "Export boat data",
+    "exportMaintenance": "Maintenance (.csv)",
+    "exportFuelLogs": "Fuel logs (.csv)",
+    "exportNavigationLogs": "Navigation log (.csv)",
+    "help": {
+      "title": "How it works",
+      "openButton": "Help",
+      "stepsTitle": "CSV import flow",
+      "step1": "Select a boat and the data type (maintenance).",
+      "step2": "Upload your CSV file (UTF-8, ; separator, max 5 MB).",
+      "step3": "Review the preview: valid rows are highlighted, errors are flagged column by column.",
+      "step4": "Confirm to persist the valid rows to the database.",
+      "formatTitle": "Expected format (maintenance)",
+      "formatDesc": "Separator: ; (semicolon). Encoding: UTF-8 or UTF-8 BOM.",
+      "requiredColumns": "Required columns",
+      "optionalColumns": "Optional columns",
+      "exportTitle": "CSV export",
+      "exportDesc": "Select a boat and click the desired export link. The file is Excel-compatible (UTF-8 BOM encoding, ; separator)."
+    }
   },
   "auditLog": {
     "title": "Activity log",

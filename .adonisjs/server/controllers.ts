@@ -25,6 +25,8 @@ export const controllers = {
   CrewCertifications: () => import('#controllers/crew_certifications_controller'),
   CrewMembers: () => import('#controllers/crew_members_controller'),
   CrewRolePdf: () => import('#controllers/crew_role_pdf_controller'),
+  CsvExport: () => import('#controllers/csv_export_controller'),
+  CsvImport: () => import('#controllers/csv_import_controller'),
   Demo: () => import('#controllers/demo_controller'),
   dev: {
     MailPreviews: () => import('#controllers/dev/mail_previews_controller'),

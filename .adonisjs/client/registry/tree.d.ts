@@ -206,6 +206,11 @@ export interface ApiDefinition {
         delete: typeof routes['settings.branding.logo.delete']
       }
     }
+    import: typeof routes['settings.import'] & {
+      preview: typeof routes['settings.import.preview']
+      confirm: typeof routes['settings.import.confirm']
+      cancel: typeof routes['settings.import.cancel']
+    }
   }
   maintenance: {
     history: typeof routes['maintenance.history']

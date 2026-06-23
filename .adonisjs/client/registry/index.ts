@@ -768,6 +768,30 @@ const routes = {
     tokens: [{"old":"/settings/branding/logo","type":0,"val":"settings","end":""},{"old":"/settings/branding/logo","type":0,"val":"branding","end":""},{"old":"/settings/branding/logo","type":0,"val":"logo","end":""}],
     types: placeholder as Registry['settings.branding.logo.delete']['types'],
   },
+  'settings.import': {
+    methods: ["GET","HEAD"],
+    pattern: '/settings/import',
+    tokens: [{"old":"/settings/import","type":0,"val":"settings","end":""},{"old":"/settings/import","type":0,"val":"import","end":""}],
+    types: placeholder as Registry['settings.import']['types'],
+  },
+  'settings.import.preview': {
+    methods: ["POST"],
+    pattern: '/settings/import/preview',
+    tokens: [{"old":"/settings/import/preview","type":0,"val":"settings","end":""},{"old":"/settings/import/preview","type":0,"val":"import","end":""},{"old":"/settings/import/preview","type":0,"val":"preview","end":""}],
+    types: placeholder as Registry['settings.import.preview']['types'],
+  },
+  'settings.import.confirm': {
+    methods: ["POST"],
+    pattern: '/settings/import/confirm',
+    tokens: [{"old":"/settings/import/confirm","type":0,"val":"settings","end":""},{"old":"/settings/import/confirm","type":0,"val":"import","end":""},{"old":"/settings/import/confirm","type":0,"val":"confirm","end":""}],
+    types: placeholder as Registry['settings.import.confirm']['types'],
+  },
+  'settings.import.cancel': {
+    methods: ["POST"],
+    pattern: '/settings/import/cancel',
+    tokens: [{"old":"/settings/import/cancel","type":0,"val":"settings","end":""},{"old":"/settings/import/cancel","type":0,"val":"import","end":""},{"old":"/settings/import/cancel","type":0,"val":"cancel","end":""}],
+    types: placeholder as Registry['settings.import.cancel']['types'],
+  },
   'maintenance.history': {
     methods: ["GET","HEAD"],
     pattern: '/maintenance/history',
