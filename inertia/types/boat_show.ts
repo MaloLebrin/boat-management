@@ -83,6 +83,9 @@ export type BoatPositionHistoryRow = {
   pontoonName: string | null
   mouillageNom: string | null
   portName: string | null
+  latitude: number | null
+  longitude: number | null
+  source: 'manual' | 'ais' | 'gps'
   startedAt: string
   endedAt: string | null
 }
@@ -107,6 +110,8 @@ export type BoatShowDetail = {
   francisationNumber: string | null
   flagCountry: string | null
   maxPersons: number | null
+  mmsi: string | null
+  imoNumber: string | null
   spotId: number | null
   spot: {
     id: number

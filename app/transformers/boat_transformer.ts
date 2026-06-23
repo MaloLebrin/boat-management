@@ -61,6 +61,8 @@ export function toEditForm(boat: Boat) {
     francisationNumber: boat.francisationNumber,
     flagCountry: boat.flagCountry,
     maxPersons: boat.maxPersons,
+    mmsi: boat.mmsi,
+    imoNumber: boat.imoNumber,
     spotId: boat.spotId ?? null,
   }
 }
@@ -159,6 +161,8 @@ function toBoatDetail(boat: Boat, ctx: Pick<BoatShowContext, 'positionHistory' |
     francisationNumber: boat.francisationNumber,
     flagCountry: boat.flagCountry,
     maxPersons: boat.maxPersons,
+    mmsi: boat.mmsi,
+    imoNumber: boat.imoNumber,
     spotId: boat.spotId ?? null,
     spot: boat.spot ? toSpot(boat.spot) : null,
     positionHistory: ctx.positionHistory.map(toPositionHistoryEntry),
@@ -190,6 +194,9 @@ function toPositionHistoryEntry(h: BoatPositionHistory) {
     pontoonName: h.spot?.pontoon?.name ?? null,
     mouillageNom: h.spot?.mouillage?.name ?? null,
     portName: h.spot?.pontoon?.port?.name ?? h.spot?.mouillage?.port?.name ?? null,
+    latitude: h.latitude !== null && h.latitude !== undefined ? Number(h.latitude) : null,
+    longitude: h.longitude !== null && h.longitude !== undefined ? Number(h.longitude) : null,
+    source: h.source,
     startedAt: h.startedAt.toISODate()!,
     endedAt: h.endedAt ? h.endedAt.toISODate() : null,
   }

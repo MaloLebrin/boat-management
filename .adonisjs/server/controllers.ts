@@ -49,4 +49,5 @@ export const controllers = {
   CrewRolePdf: () => import('#controllers/crew_role_pdf_controller'),
   NavigationLogCrew: () => import('#controllers/navigation_log_crew_controller'),
   NavigationLogs: () => import('#controllers/navigation_logs_controller'),
+  BoatPosition: () => import('#controllers/boat_position_controller'),
 }

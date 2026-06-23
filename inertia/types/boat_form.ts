@@ -39,6 +39,8 @@ export type BoatEditPayload = {
   francisationNumber: string | null
   flagCountry: string | null
   maxPersons: number | null
+  mmsi: string | null
+  imoNumber: string | null
   spotId: number | null
 }
 

@@ -2,7 +2,9 @@
 import { ref, watch } from 'vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
+import BoatFormAisFields from '~/components/boats/hull/BoatFormAisFields.vue'
 import BoatFormDimensionsFields from '~/components/boats/hull/BoatFormDimensionsFields.vue'
+import BoatFormLegalFields from '~/components/boats/hull/BoatFormLegalFields.vue'
 import BoatFormPositionFields from '~/components/boats/hull/BoatFormPositionFields.vue'
 import { useBoatOptions } from '~/composables/use_boat_options'
 import { useT } from '~/composables/use_t'
@@ -39,6 +41,8 @@ const hullIdentificationNumber = ref('')
 const francisationNumber = ref('')
 const flagCountry = ref('')
 const maxPersons = ref('')
+const mmsi = ref('')
+const imoNumber = ref('')
 const spotId = ref<number | ''>('')
 const initialPortId = ref<number | undefined>(undefined)
 const initialPontoonId = ref<number | undefined>(undefined)
@@ -69,6 +73,8 @@ function syncFromBoat() {
   francisationNumber.value = b.francisationNumber ?? ''
   flagCountry.value = b.flagCountry ?? ''
   maxPersons.value = toStr(b.maxPersons)
+  mmsi.value = b.mmsi ?? ''
+  imoNumber.value = b.imoNumber ?? ''
   spotId.value = b.spotId ?? ''
   initialPortId.value = undefined
   initialPontoonId.value = undefined
@@ -194,52 +200,16 @@ watch(
       :errors="errors"
     />
 
-    <div class="grid grid-cols-2 gap-4">
-      <BaseSelect
-        id="navigationCategory"
-        name="navigationCategory"
-        :label="t('boats.hullFields.navigationCategory')"
-        :placeholder="t('boats.hullFields.selectPlaceholder')"
-        :allow-empty="true"
-        :options="navigationCategoryOptions"
-        v-model="navigationCategory"
-        :errors="errors"
-      />
-      <BaseInput
-        id="maxPersons"
-        name="maxPersons"
-        :label="t('boats.hullFields.maxPersons')"
-        type="number"
-        inputmode="numeric"
-        v-model="maxPersons"
-        :errors="errors"
-      />
-    </div>
-
-    <div class="grid grid-cols-2 gap-4">
-      <BaseInput
-        id="hullIdentificationNumber"
-        name="hullIdentificationNumber"
-        :label="t('boats.hullFields.hullIdentificationNumber')"
-        v-model="hullIdentificationNumber"
-        :errors="errors"
-      />
-      <BaseInput
-        id="francisationNumber"
-        name="francisationNumber"
-        :label="t('boats.hullFields.francisationNumber')"
-        v-model="francisationNumber"
-        :errors="errors"
-      />
-    </div>
-
-    <BaseInput
-      id="flagCountry"
-      name="flagCountry"
-      :label="t('boats.hullFields.flagCountry')"
-      v-model="flagCountry"
+    <BoatFormLegalFields
+      v-model:navigation-category="navigationCategory"
+      v-model:max-persons="maxPersons"
+      v-model:hull-identification-number="hullIdentificationNumber"
+      v-model:francisation-number="francisationNumber"
+      v-model:flag-country="flagCountry"
       :errors="errors"
     />
+
+    <BoatFormAisFields v-model:mmsi="mmsi" v-model:imo-number="imoNumber" :errors="errors" />
 
     <BoatFormPositionFields
       v-if="ports"

@@ -22,6 +22,7 @@ import SpotService from '#services/spot_service'
 import BoatPolicy from '#policies/boat_policy'
 import FuelLogPolicy from '#policies/fuel_log_policy'
 import IncidentPolicy from '#policies/incident_policy'
+import NavigationLogPolicy from '#policies/navigation_log_policy'
 import { createBoatValidator, updateBoatValidator } from '#validators/boat'
 import { assignBoatValidator } from '#validators/marina_layout'
 import { inject } from '@adonisjs/core'
@@ -45,7 +46,8 @@ export default class BoatsController {
     private organizationService: OrganizationService,
     private auditLogService: AuditLogService,
     private documentService: BoatDocumentService,
-    private crewService: CrewService
+    private crewService: CrewService,
+    private navigationLogService: NavigationLogService
   ) {}
 
   async index({ inertia, auth, request }: HttpContext) {
@@ -139,6 +141,11 @@ export default class BoatsController {
         canDeleteFuelLogs,
         boatDocuments,
         crewMemberOptions,
+        navigationLogs,
+        ports,
+        canCreateNavigationLogs,
+        canUpdateNavigationLogs,
+        canDeleteNavigationLogs,
       ] = await Promise.all([
         this.maintenanceService.listForBoat(user, boat),
         this.taskService.listForBoat(user, boat),
@@ -154,7 +161,14 @@ export default class BoatsController {
         bouncer.with(FuelLogPolicy).allows('delete', boat),
         this.documentService.listForBoat(user, boat),
         this.crewService.listOptionsForOrganization(user.organization),
+        this.navigationLogService.listForBoat(boat),
+        this.portService.listNamesForOrg(user),
+        bouncer.with(NavigationLogPolicy).allows('create', boat),
+        bouncer.with(NavigationLogPolicy).allows('update', boat),
+        bouncer.with(NavigationLogPolicy).allows('delete'),
       ])
+
+      const portOptions = ports.map((p) => ({ id: p.id, name: p.name }))
 
       const canManageEquipment = canManageMaintenance
       const canManageDocuments = canManageMaintenance
@@ -184,6 +198,9 @@ export default class BoatsController {
           canDeleteIncidents,
           canCreateFuelLogs,
           canDeleteFuelLogs,
+          canCreateNavigationLogs,
+          canUpdateNavigationLogs,
+          canDeleteNavigationLogs,
         })
       )
     } catch (error) {

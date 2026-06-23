@@ -1,5 +1,12 @@
 import type { DateTime } from 'luxon'
 
+export type BoatPositionSource = 'manual' | 'ais' | 'gps'
+
+export type BoatPositionPayload = {
+  latitude: number
+  longitude: number
+}
+
 export type BoatHullPayload = {
   name: string
   registrationNumber?: string | null
@@ -22,6 +29,9 @@ export type BoatHullPayload = {
   francisationNumber?: string | null
   flagCountry?: string | null
   maxPersons?: number | null
+
+  mmsi?: string | null
+  imoNumber?: string | null
 
   spotId?: number | null
 }

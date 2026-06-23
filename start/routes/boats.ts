@@ -184,5 +184,9 @@ router
     router
       .delete('boats/:boatId/admin-documents/:documentId', [controllers.BoatDocuments, 'destroy'])
       .as('boats.adminDocuments.destroy')
+
+    router
+      .post('boats/:boatId/position', [controllers.BoatPosition, 'store'])
+      .as('boats.position.store')
   })
   .use(middleware.auth())
