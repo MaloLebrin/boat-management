@@ -1531,6 +1531,54 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['deleteLogo']>>>
     }
   }
+  'settings.import': {
+    methods: ["GET","HEAD"]
+    pattern: '/settings/import'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/csv_import_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/csv_import_controller').default['show']>>>
+    }
+  }
+  'settings.import.preview': {
+    methods: ["POST"]
+    pattern: '/settings/import/preview'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/csv_import').csvPreviewValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/csv_import').csvPreviewValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/csv_import_controller').default['preview']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/csv_import_controller').default['preview']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'settings.import.confirm': {
+    methods: ["POST"]
+    pattern: '/settings/import/confirm'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/csv_import').csvConfirmValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/csv_import').csvConfirmValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/csv_import_controller').default['confirm']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/csv_import_controller').default['confirm']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'settings.import.cancel': {
+    methods: ["POST"]
+    pattern: '/settings/import/cancel'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/csv_import_controller').default['cancel']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/csv_import_controller').default['cancel']>>>
+    }
+  }
   'maintenance.history': {
     methods: ["GET","HEAD"]
     pattern: '/maintenance/history'
