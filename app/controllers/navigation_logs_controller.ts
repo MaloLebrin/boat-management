@@ -1,7 +1,8 @@
-import NavigationLogService, {
+import NavigationLogService from '#services/navigation_log_service'
+import {
   NavigationLogNotFoundError,
   NavigationLogValidationError,
-} from '#services/navigation_log_service'
+} from '#exceptions/navigation_log_errors'
 import BoatService, { BoatNotFoundError } from '#services/boat_service'
 import NavigationLogPolicy from '#policies/navigation_log_policy'
 import {
@@ -67,7 +68,7 @@ export default class NavigationLogsController {
       throw error
     }
 
-    await bouncer.with(NavigationLogPolicy).authorize('create', boat)
+    await bouncer.with(NavigationLogPolicy).authorize('update', boat)
 
     const payload = await request.validateUsing(closeNavigationLogValidator)
 

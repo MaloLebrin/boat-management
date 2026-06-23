@@ -9,6 +9,7 @@
   "deleteConfirm": "Supprimer cette sortie ?",
   "distanceSuffix": "mn",
   "engineHoursSuffix": "h moteur",
+  "engineHoursStartLabel": "h moteur :",
   "beaufortSuffix": "Bf",
   "crew": "{count, plural, one {# équipier} other {# équipiers}}",
   "seaState": {

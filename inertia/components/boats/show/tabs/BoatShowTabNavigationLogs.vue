@@ -127,7 +127,7 @@ function deleteLog(logId: number) {
                   {{ t('navigation_logs.engineHoursSuffix') }}
                 </span>
                 <span v-else-if="log.engineHoursStart !== null">
-                  {{ t('navigation_logs.engineHoursSuffix') }}:
+                  {{ t('navigation_logs.engineHoursStartLabel') }}
                   {{ log.engineHoursStart.toFixed(1) }}
                 </span>
                 <span v-if="log.fuelConsumedLiters !== null">

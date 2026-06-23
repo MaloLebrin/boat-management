@@ -69,6 +69,18 @@ export default class NavigationLogService {
       )
     }
 
+    if (
+      payload.engineHoursEnd !== null &&
+      payload.engineHoursEnd !== undefined &&
+      log.engineHoursStart !== null &&
+      payload.engineHoursEnd < Number(log.engineHoursStart)
+    ) {
+      throw new NavigationLogValidationError(
+        'Engine hours end must be >= engine hours start',
+        'engineHoursEndBeforeStart'
+      )
+    }
+
     await db.transaction(async (trx) => {
       log.useTransaction(trx)
 
@@ -79,7 +91,7 @@ export default class NavigationLogService {
       log.distanceNm =
         payload.distanceNm !== null && payload.distanceNm !== undefined
           ? String(payload.distanceNm)
-          : log.distanceNm
+          : null
       log.engineHoursEnd =
         payload.engineHoursEnd !== null && payload.engineHoursEnd !== undefined
           ? String(payload.engineHoursEnd)

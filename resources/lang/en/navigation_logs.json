@@ -9,6 +9,7 @@
   "deleteConfirm": "Delete this trip?",
   "distanceSuffix": "nm",
   "engineHoursSuffix": "engine h",
+  "engineHoursStartLabel": "engine h:",
   "beaufortSuffix": "Bf",
   "crew": "{count, plural, one {# crew} other {# crew}}",
   "seaState": {

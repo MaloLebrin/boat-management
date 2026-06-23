@@ -14,8 +14,12 @@ export default class NavigationLogPolicy extends BasePolicy {
     return user.organizationId !== null && user.organizationId === boat.organizationId
   }
 
+  update(user: User, boat: Boat): AuthorizerResponse {
+    return user.organizationId !== null && user.organizationId === boat.organizationId
+  }
+
   // Intentionally false: only admins may delete, handled by the before() hook above.
-  delete(_user: User, _boat: Boat): AuthorizerResponse {
+  delete(user: User, boat: Boat): AuthorizerResponse {
     return false
   }
 }
