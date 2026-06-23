@@ -122,8 +122,7 @@ export function parseMaintenanceCsv(content: string, _type: CsvImportType): CsvP
   const previewRows: CsvPreviewRow[] = []
   const validRows: MaintenanceImportRow[] = []
 
-  for (let i = 0; i < rows.length; i++) {
-    const cells = rows[i]
+  for (const [i, cells] of rows.entries()) {
     const raw: Record<string, string> = {}
     for (const [j, header] of headers.entries()) {
       raw[header] = cells[j] ?? ''
