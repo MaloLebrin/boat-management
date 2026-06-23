@@ -5,21 +5,17 @@ import BaseBreadcrumb from '~/components/base/BaseBreadcrumb.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseTabs from '~/components/base/BaseTabs.vue'
+import BoatModeSwitcher from '~/components/boats/show/BoatModeSwitcher.vue'
 import BoatShowTabContent from '~/components/boats/show/BoatShowTabContent.vue'
 import { useT } from '~/composables/use_t'
 import type {
   AiSuggestion,
-  BoatIncidentRow,
   BoatDocumentRow,
   BoatShowDetail,
-  FuelLogRow,
   MaintenanceEventRow,
   MaintenanceSheetRow,
   MaintenanceTaskRow,
-  NavigationLogRow,
-  NavigationLogPortOption,
 } from '~/types/boat_show'
-import type { CrewMemberOption } from '../../../shared/types/crew'
 
 const { t } = useT()
 
@@ -28,22 +24,11 @@ const props = defineProps<{
   maintenanceEvents: MaintenanceEventRow[]
   maintenanceTasks: MaintenanceTaskRow[]
   maintenanceSheets: MaintenanceSheetRow[]
-  incidents: BoatIncidentRow[]
-  fuelLogs: FuelLogRow[]
-  navigationLogs: NavigationLogRow[]
-  portOptions: NavigationLogPortOption[]
-  crewMemberOptions: CrewMemberOption[]
   boatDocuments: BoatDocumentRow[]
   canManageMaintenance: boolean
   canManageEquipment: boolean
   canManageDocuments: boolean
   canExport: boolean
-  canDeleteIncidents: boolean
-  canCreateFuelLogs: boolean
-  canDeleteFuelLogs: boolean
-  canCreateNavigationLogs: boolean
-  canUpdateNavigationLogs: boolean
-  canDeleteNavigationLogs: boolean
   aiSuggestions: AiSuggestion[] | null
 }>()
 
@@ -55,9 +40,6 @@ type TabKey =
   | 'tasks'
   | 'documents'
   | 'sheets'
-  | 'incidents'
-  | 'fuel'
-  | 'navigation-logs'
   | 'admin-docs'
 
 const tab = ref<TabKey>('overview')
@@ -98,10 +80,6 @@ const statusBadge = computed(() => {
   return { variant: 'success' as const, label: t('boats.show.status.ok') }
 })
 
-const openIncidents = computed(() =>
-  props.incidents.filter((i) => i.status === 'open' || i.status === 'in_progress')
-)
-
 const expiringDocCount = computed(
   () =>
     props.boatDocuments.filter((d) => d.status === 'expiring_soon' || d.status === 'expired').length
@@ -119,13 +97,6 @@ const tabs = computed(() => [
   },
   { key: 'sheets', label: t('boats.show.tabs.sheets') },
   { key: 'documents', label: t('boats.show.tabs.documents') },
-  {
-    key: 'incidents',
-    label: t('incidents.tab'),
-    badge: openIncidents.value.length > 0 ? String(openIncidents.value.length) : undefined,
-  },
-  { key: 'fuel', label: t('fuel_logs.tab') },
-  { key: 'navigation-logs', label: t('navigation_logs.tab') },
   {
     key: 'admin-docs',
     label: t('boats.show.tabs.adminDocs'),
@@ -216,8 +187,11 @@ function openTasksTab() {
         </div>
       </div>
 
-      <!-- Tab bar -->
-      <BaseTabs v-model="tab" :tabs="tabs" />
+      <!-- Mode switcher + Tab bar -->
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
+        <BoatModeSwitcher :boat-id="boat.id" mode="management" />
+        <BaseTabs v-model="tab" :tabs="tabs" />
+      </div>
     </header>
 
     <BoatShowTabContent

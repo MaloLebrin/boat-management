@@ -10,6 +10,7 @@ export interface ApiDefinition {
     create: typeof routes['boats.create']
     store: typeof routes['boats.store']
     show: typeof routes['boats.show']
+    navigation: typeof routes['boats.navigation']
     maintenanceLog: {
       download: typeof routes['boats.maintenanceLog.download']
     }

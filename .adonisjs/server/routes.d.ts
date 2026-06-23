@@ -11,6 +11,7 @@ export type ScannedRoutes = {
     'boats.create': { paramsTuple?: []; params?: {} }
     'boats.store': { paramsTuple?: []; params?: {} }
     'boats.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'boats.navigation': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.maintenanceLog.download': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -174,6 +175,7 @@ export type ScannedRoutes = {
     'boats.index': { paramsTuple?: []; params?: {} }
     'boats.create': { paramsTuple?: []; params?: {} }
     'boats.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'boats.navigation': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.maintenanceLog.download': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.engines.show': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
@@ -235,6 +237,7 @@ export type ScannedRoutes = {
     'boats.index': { paramsTuple?: []; params?: {} }
     'boats.create': { paramsTuple?: []; params?: {} }
     'boats.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'boats.navigation': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.maintenanceLog.download': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.engines.show': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }

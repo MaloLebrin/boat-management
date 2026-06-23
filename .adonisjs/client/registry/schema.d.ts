@@ -91,6 +91,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boats_controller').default['show']>>>
     }
   }
+  'boats.navigation': {
+    methods: ["GET","HEAD"]
+    pattern: '/boats/:id/navigation'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boats_controller').default['navigation']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boats_controller').default['navigation']>>>
+    }
+  }
   'boats.maintenanceLog.download': {
     methods: ["GET","HEAD"]
     pattern: '/boats/:id/maintenance-log.pdf'

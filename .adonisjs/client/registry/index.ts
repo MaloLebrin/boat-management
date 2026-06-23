@@ -48,6 +48,12 @@ const routes = {
     tokens: [{"old":"/boats/:id","type":0,"val":"boats","end":""},{"old":"/boats/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['boats.show']['types'],
   },
+  'boats.navigation': {
+    methods: ["GET","HEAD"],
+    pattern: '/boats/:id/navigation',
+    tokens: [{"old":"/boats/:id/navigation","type":0,"val":"boats","end":""},{"old":"/boats/:id/navigation","type":1,"val":"id","end":""},{"old":"/boats/:id/navigation","type":0,"val":"navigation","end":""}],
+    types: placeholder as Registry['boats.navigation']['types'],
+  },
   'boats.maintenanceLog.download': {
     methods: ["GET","HEAD"],
     pattern: '/boats/:id/maintenance-log.pdf',
