@@ -194,9 +194,9 @@ const SEA_STATES = ['calm', 'slight', 'moderate', 'rough', 'very_rough'] as cons
             name="notes"
             rows="2"
             maxlength="5000"
+            :value="log.notes"
             class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand resize-none"
-            >{{ log.notes }}</textarea
-          >
+          />
           <p v-if="errors.notes" class="mt-1 text-xs text-danger">{{ errors.notes }}</p>
         </div>
       </div>
