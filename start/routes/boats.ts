@@ -2,6 +2,8 @@ import { middleware } from '#start/kernel'
 import { controllers } from '#generated/controllers'
 import router from '@adonisjs/core/services/router'
 
+const CsvExportController = () => import('#controllers/csv_export_controller')
+
 router
   .group(() => {
     router.get('boats', [controllers.Boats, 'index']).as('boats.index')
@@ -12,6 +14,15 @@ router
     router
       .get('boats/:id/maintenance-log.pdf', [controllers.MaintenanceLogPdf, 'download'])
       .as('boats.maintenanceLog.download')
+    router
+      .get('boats/:id/export/maintenance.csv', [CsvExportController, 'maintenance'])
+      .as('boats.export.maintenance')
+    router
+      .get('boats/:id/export/fuel-logs.csv', [CsvExportController, 'fuelLogs'])
+      .as('boats.export.fuelLogs')
+    router
+      .get('boats/:id/export/navigation-logs.csv', [CsvExportController, 'navigationLogs'])
+      .as('boats.export.navigationLogs')
     router.get('boats/:id/edit', [controllers.Boats, 'edit']).as('boats.edit')
     router.put('boats/:id', [controllers.Boats, 'update']).as('boats.update')
     router.delete('boats/:id', [controllers.Boats, 'destroy']).as('boats.destroy')

@@ -7,7 +7,8 @@
     "me": "Mon profil",
     "ai": "Personnalisation IA",
     "auditLog": "Journal d'activité",
-    "branding": "Marque blanche"
+    "branding": "Marque blanche",
+    "import": "Import CSV"
   },
   "org": {
     "title": "Profil organisation",
@@ -151,6 +152,42 @@
     "save": "Enregistrer",
     "resetColor": "Réinitialiser",
     "setCustomColor": "Définir une couleur personnalisée"
+  },
+  "import": {
+    "title": "Import / Export CSV",
+    "importSection": "Import CSV",
+    "exportSection": "Export CSV",
+    "boatLabel": "Bateau",
+    "boatPlaceholder": "Sélectionner un bateau",
+    "typeLabel": "Type de données",
+    "types": {
+      "maintenance": "Événements de maintenance"
+    },
+    "fileLabel": "Fichier CSV",
+    "fileHint": "Format : UTF-8 ou UTF-8 BOM, séparateur `;`. Taille max : 5 Mo.",
+    "previewButton": "Prévisualiser",
+    "confirmButton": "Importer {count} ligne(s)",
+    "cancelButton": "Annuler",
+    "downloadTemplate": "Télécharger le modèle CSV",
+    "templateHint": "En-têtes attendues : {headers}",
+    "previewTitle": "Aperçu du fichier",
+    "previewSummary": "{valid} ligne(s) valide(s) sur {total}",
+    "previewErrors": "{count} erreur(s)",
+    "previewColumns": {
+      "line": "Ligne",
+      "date": "date",
+      "title": "title",
+      "subject": "subject",
+      "status": "Statut",
+      "errors": "Erreurs"
+    },
+    "rowValid": "OK",
+    "rowInvalid": "Erreur",
+    "noBoats": "Aucun bateau disponible. Créez d'abord un bateau.",
+    "exportBoatLabel": "Exporter les données du bateau",
+    "exportMaintenance": "Maintenance (.csv)",
+    "exportFuelLogs": "Avitaillements (.csv)",
+    "exportNavigationLogs": "Journal de bord (.csv)"
   },
   "auditLog": {
     "title": "Journal d'activité",

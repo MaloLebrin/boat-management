@@ -146,6 +146,12 @@
     "storageExceeded": "You have reached the storage limit of your plan. Upgrade to upload new files.",
     "storageOverflow": "Your storage usage exceeds your current plan limit. Free up space or upgrade your plan."
   },
+  "csv": {
+    "imported": "{count} row(s) imported successfully.",
+    "boatNotFound": "Boat not found.",
+    "previewExpired": "Preview has expired. Please re-upload the file.",
+    "missingHeaders": "Missing headers in CSV file: {headers}."
+  },
   "genericEquipment": {
     "created": "Equipment added.",
     "updated": "Equipment updated.",

@@ -4,6 +4,7 @@ import router from '@adonisjs/core/services/router'
 const SettingsController = () => import('#controllers/settings_controller')
 const BillingController = () => import('#controllers/billing_controller')
 const AuditLogsController = () => import('#controllers/audit_logs_controller')
+const CsvImportController = () => import('#controllers/csv_import_controller')
 
 router
   .post('/locale', ({ request, response }) => {
@@ -46,5 +47,15 @@ router
     router
       .delete('settings/branding/logo', [SettingsController, 'deleteLogo'])
       .as('settings.branding.logo.delete')
+    router.get('settings/import', [CsvImportController, 'show']).as('settings.import')
+    router
+      .post('settings/import/preview', [CsvImportController, 'preview'])
+      .as('settings.import.preview')
+    router
+      .post('settings/import/confirm', [CsvImportController, 'confirm'])
+      .as('settings.import.confirm')
+    router
+      .post('settings/import/cancel', [CsvImportController, 'cancel'])
+      .as('settings.import.cancel')
   })
   .use(middleware.auth())

@@ -146,6 +146,12 @@
     "storageExceeded": "Vous avez atteint la limite de stockage de votre plan. Passez à un plan supérieur pour uploader de nouveaux fichiers.",
     "storageOverflow": "Votre usage de stockage dépasse la limite de votre plan actuel. Libérez de l'espace ou passez à un plan supérieur."
   },
+  "csv": {
+    "imported": "{count} ligne(s) importée(s) avec succès.",
+    "boatNotFound": "Bateau introuvable.",
+    "previewExpired": "La prévisualisation a expiré. Veuillez réimporter le fichier.",
+    "missingHeaders": "En-têtes manquantes dans le fichier CSV : {headers}."
+  },
   "genericEquipment": {
     "created": "Équipement ajouté.",
     "updated": "Équipement mis à jour.",

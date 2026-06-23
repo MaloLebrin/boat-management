@@ -50,6 +50,7 @@ declare module '@adonisjs/inertia/types' {
     'ports/new': ExtractProps<(typeof import('../../inertia/pages/ports/new.vue'))['default']>
     'ports/show': ExtractProps<(typeof import('../../inertia/pages/ports/show.vue'))['default']>
     'settings/ai': ExtractProps<(typeof import('../../inertia/pages/settings/ai.vue'))['default']>
+    'settings/import': ExtractProps<(typeof import('../../inertia/pages/settings/import.vue'))['default']>
     'settings/audit_log': ExtractProps<(typeof import('../../inertia/pages/settings/audit_log.vue'))['default']>
     'settings/billing': ExtractProps<(typeof import('../../inertia/pages/settings/billing.vue'))['default']>
     'settings/branding': ExtractProps<(typeof import('../../inertia/pages/settings/branding.vue'))['default']>
