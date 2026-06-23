@@ -22,6 +22,19 @@ export function useNavSections() {
       ],
     },
     {
+      label: t('nav.sections.navigation'),
+      items: [
+        { name: t('nav.logbook'), path: '/navigation/logbook', route: null, icon: 'compass' },
+        { name: t('nav.fuel'), path: '/navigation/fuel', route: null, icon: 'fuel' },
+        {
+          name: t('nav.incidents'),
+          path: '/navigation/incidents',
+          route: null,
+          icon: 'alert-triangle',
+        },
+      ],
+    },
+    {
       label: t('nav.sections.preferences'),
       items: [{ name: t('nav.settings'), path: '/settings', route: null, icon: 'gear' }],
     },

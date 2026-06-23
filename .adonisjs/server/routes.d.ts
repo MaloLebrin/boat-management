@@ -151,6 +151,9 @@ export type ScannedRoutes = {
     'crew.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'crew.certifications.store': { paramsTuple: [ParamValue]; params: {'memberId': ParamValue} }
     'crew.certifications.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'memberId': ParamValue,'certId': ParamValue} }
+    'navigation.logbook': { paramsTuple?: []; params?: {} }
+    'navigation.fuel': { paramsTuple?: []; params?: {} }
+    'navigation.incidents': { paramsTuple?: []; params?: {} }
     'event_stream': { paramsTuple?: []; params?: {} }
     'subscribe': { paramsTuple?: []; params?: {} }
     'unsubscribe': { paramsTuple?: []; params?: {} }
@@ -224,6 +227,9 @@ export type ScannedRoutes = {
     'pdf_previews.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'notifications.index': { paramsTuple?: []; params?: {} }
     'crew.index': { paramsTuple?: []; params?: {} }
+    'navigation.logbook': { paramsTuple?: []; params?: {} }
+    'navigation.fuel': { paramsTuple?: []; params?: {} }
+    'navigation.incidents': { paramsTuple?: []; params?: {} }
     'event_stream': { paramsTuple?: []; params?: {} }
     'new_account.create': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }
@@ -286,6 +292,9 @@ export type ScannedRoutes = {
     'pdf_previews.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'notifications.index': { paramsTuple?: []; params?: {} }
     'crew.index': { paramsTuple?: []; params?: {} }
+    'navigation.logbook': { paramsTuple?: []; params?: {} }
+    'navigation.fuel': { paramsTuple?: []; params?: {} }
+    'navigation.incidents': { paramsTuple?: []; params?: {} }
     'event_stream': { paramsTuple?: []; params?: {} }
     'new_account.create': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }

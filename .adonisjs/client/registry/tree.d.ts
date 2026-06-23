@@ -247,6 +247,11 @@ export interface ApiDefinition {
       destroy: typeof routes['crew.certifications.destroy']
     }
   }
+  navigation: {
+    logbook: typeof routes['navigation.logbook']
+    fuel: typeof routes['navigation.fuel']
+    incidents: typeof routes['navigation.incidents']
+  }
   eventStream: typeof routes['event_stream']
   subscribe: typeof routes['subscribe']
   unsubscribe: typeof routes['unsubscribe']

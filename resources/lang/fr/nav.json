@@ -12,9 +12,13 @@
   "myBoats": "Mes bateaux",
   "unknownUser": "Utilisateur",
   "crew": "Équipiers",
+  "logbook": "Journal de bord",
+  "fuel": "Carburant",
+  "incidents": "Incidents",
   "sections": {
     "fleet": "FLOTTE",
     "maintenance": "MAINTENANCE",
+    "navigation": "NAVIGATION",
     "preferences": "PRÉFÉRENCES"
   }
 }

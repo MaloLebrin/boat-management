@@ -1771,6 +1771,42 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/crew_certifications_controller').default['destroy']>>>
     }
   }
+  'navigation.logbook': {
+    methods: ["GET","HEAD"]
+    pattern: '/navigation/logbook'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/navigation_controller').default['logbook']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/navigation_controller').default['logbook']>>>
+    }
+  }
+  'navigation.fuel': {
+    methods: ["GET","HEAD"]
+    pattern: '/navigation/fuel'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/navigation_controller').default['fuel']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/navigation_controller').default['fuel']>>>
+    }
+  }
+  'navigation.incidents': {
+    methods: ["GET","HEAD"]
+    pattern: '/navigation/incidents'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/navigation_controller').default['incidents']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/navigation_controller').default['incidents']>>>
+    }
+  }
   'event_stream': {
     methods: ["GET","HEAD"]
     pattern: '/__transmit/events'

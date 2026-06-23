@@ -18,6 +18,7 @@ declare module '@adonisjs/inertia/types' {
     'boats/engine_part_show': ExtractProps<(typeof import('../../inertia/pages/boats/engine_part_show.vue'))['default']>
     'boats/engine_show': ExtractProps<(typeof import('../../inertia/pages/boats/engine_show.vue'))['default']>
     'boats/index': ExtractProps<(typeof import('../../inertia/pages/boats/index.vue'))['default']>
+    'boats/navigation': ExtractProps<(typeof import('../../inertia/pages/boats/navigation.vue'))['default']>
     'boats/new': ExtractProps<(typeof import('../../inertia/pages/boats/new.vue'))['default']>
     'boats/rig_edit': ExtractProps<(typeof import('../../inertia/pages/boats/rig_edit.vue'))['default']>
     'boats/sail_edit': ExtractProps<(typeof import('../../inertia/pages/boats/sail_edit.vue'))['default']>
@@ -37,6 +38,9 @@ declare module '@adonisjs/inertia/types' {
     'marketing/pricing': ExtractProps<(typeof import('../../inertia/pages/marketing/pricing.vue'))['default']>
     'marketing/simulator_share': ExtractProps<(typeof import('../../inertia/pages/marketing/simulator_share.vue'))['default']>
     'marketing/simulator': ExtractProps<(typeof import('../../inertia/pages/marketing/simulator.vue'))['default']>
+    'navigation/fuel': ExtractProps<(typeof import('../../inertia/pages/navigation/fuel.vue'))['default']>
+    'navigation/incidents': ExtractProps<(typeof import('../../inertia/pages/navigation/incidents.vue'))['default']>
+    'navigation/logbook': ExtractProps<(typeof import('../../inertia/pages/navigation/logbook.vue'))['default']>
     'notifications/index': ExtractProps<(typeof import('../../inertia/pages/notifications/index.vue'))['default']>
     'organization/crew': ExtractProps<(typeof import('../../inertia/pages/organization/crew.vue'))['default']>
     'organization/members': ExtractProps<(typeof import('../../inertia/pages/organization/members.vue'))['default']>
@@ -53,6 +57,5 @@ declare module '@adonisjs/inertia/types' {
     'settings/me': ExtractProps<(typeof import('../../inertia/pages/settings/me.vue'))['default']>
     'settings/members': ExtractProps<(typeof import('../../inertia/pages/settings/members.vue'))['default']>
     'settings/org': ExtractProps<(typeof import('../../inertia/pages/settings/org.vue'))['default']>
-    'boats/navigation': ExtractProps<(typeof import('../../inertia/pages/boats/navigation.vue'))['default']>
   }
 }

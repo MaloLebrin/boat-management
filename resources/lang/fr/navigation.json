@@ -1,0 +1,76 @@
+{
+  "logbook": {
+    "title": "Journal de bord",
+    "subtitle": "Toutes les sorties en mer de votre flotte",
+    "stats": {
+      "trips": "Sorties",
+      "completed": "Terminées",
+      "totalDistance": "Distance totale",
+      "openCount": "En cours"
+    },
+    "columns": {
+      "status": "Statut",
+      "boat": "Bateau",
+      "departure": "Départ",
+      "arrival": "Arrivée",
+      "distance": "Distance",
+      "date": "Date"
+    },
+    "status": {
+      "in_progress": "En cours",
+      "completed": "Terminée"
+    },
+    "empty": {
+      "title": "Aucune sortie enregistrée",
+      "description": "Les sorties en mer apparaîtront ici une fois créées depuis la fiche d'un bateau.",
+      "action": "Voir mes bateaux"
+    },
+    "nm": "{count} nm"
+  },
+  "fuel": {
+    "title": "Carburant",
+    "subtitle": "Historique des avitaillements de votre flotte",
+    "stats": {
+      "totalLiters": "Litres avitaillés",
+      "totalCost": "Coût total"
+    },
+    "columns": {
+      "boat": "Bateau",
+      "date": "Date",
+      "quantity": "Quantité",
+      "cost": "Coût",
+      "supplier": "Fournisseur"
+    },
+    "liters": "{count} L",
+    "empty": {
+      "title": "Aucun avitaillement enregistré",
+      "description": "Les avitaillements apparaîtront ici une fois créés depuis la fiche d'un bateau.",
+      "action": "Voir mes bateaux"
+    }
+  },
+  "incidents": {
+    "title": "Incidents",
+    "subtitle": "Suivi des incidents de votre flotte",
+    "stats": {
+      "total": "Incidents",
+      "open": "Ouverts",
+      "closed": "Clôturés"
+    },
+    "columns": {
+      "status": "Statut",
+      "boat": "Bateau",
+      "type": "Type",
+      "date": "Date",
+      "location": "Lieu"
+    },
+    "empty": {
+      "title": "Aucun incident enregistré",
+      "description": "Les incidents apparaîtront ici une fois créés depuis la fiche d'un bateau.",
+      "action": "Voir mes bateaux"
+    }
+  },
+  "filter": {
+    "allBoats": "Tous les bateaux",
+    "filterByBoat": "Filtrer par bateau"
+  }
+}

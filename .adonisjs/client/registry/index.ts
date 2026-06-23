@@ -888,6 +888,24 @@ const routes = {
     tokens: [{"old":"/crew/:memberId/certifications/:certId","type":0,"val":"crew","end":""},{"old":"/crew/:memberId/certifications/:certId","type":1,"val":"memberId","end":""},{"old":"/crew/:memberId/certifications/:certId","type":0,"val":"certifications","end":""},{"old":"/crew/:memberId/certifications/:certId","type":1,"val":"certId","end":""}],
     types: placeholder as Registry['crew.certifications.destroy']['types'],
   },
+  'navigation.logbook': {
+    methods: ["GET","HEAD"],
+    pattern: '/navigation/logbook',
+    tokens: [{"old":"/navigation/logbook","type":0,"val":"navigation","end":""},{"old":"/navigation/logbook","type":0,"val":"logbook","end":""}],
+    types: placeholder as Registry['navigation.logbook']['types'],
+  },
+  'navigation.fuel': {
+    methods: ["GET","HEAD"],
+    pattern: '/navigation/fuel',
+    tokens: [{"old":"/navigation/fuel","type":0,"val":"navigation","end":""},{"old":"/navigation/fuel","type":0,"val":"fuel","end":""}],
+    types: placeholder as Registry['navigation.fuel']['types'],
+  },
+  'navigation.incidents': {
+    methods: ["GET","HEAD"],
+    pattern: '/navigation/incidents',
+    tokens: [{"old":"/navigation/incidents","type":0,"val":"navigation","end":""},{"old":"/navigation/incidents","type":0,"val":"incidents","end":""}],
+    types: placeholder as Registry['navigation.incidents']['types'],
+  },
   'event_stream': {
     methods: ["GET","HEAD"],
     pattern: '/__transmit/events',

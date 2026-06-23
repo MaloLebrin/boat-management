@@ -1,0 +1,76 @@
+{
+  "logbook": {
+    "title": "Logbook",
+    "subtitle": "All passages logged for your fleet",
+    "stats": {
+      "trips": "Passages",
+      "completed": "Completed",
+      "totalDistance": "Total distance",
+      "openCount": "In progress"
+    },
+    "columns": {
+      "status": "Status",
+      "boat": "Boat",
+      "departure": "Departure",
+      "arrival": "Arrival",
+      "distance": "Distance",
+      "date": "Date"
+    },
+    "status": {
+      "in_progress": "In progress",
+      "completed": "Completed"
+    },
+    "empty": {
+      "title": "No passages logged yet",
+      "description": "Passages will appear here once created from a boat's navigation page.",
+      "action": "View my boats"
+    },
+    "nm": "{count} nm"
+  },
+  "fuel": {
+    "title": "Fuel",
+    "subtitle": "Fueling history for your fleet",
+    "stats": {
+      "totalLiters": "Total liters",
+      "totalCost": "Total cost"
+    },
+    "columns": {
+      "boat": "Boat",
+      "date": "Date",
+      "quantity": "Quantity",
+      "cost": "Cost",
+      "supplier": "Supplier"
+    },
+    "liters": "{count} L",
+    "empty": {
+      "title": "No fueling records yet",
+      "description": "Fueling records will appear here once created from a boat's navigation page.",
+      "action": "View my boats"
+    }
+  },
+  "incidents": {
+    "title": "Incidents",
+    "subtitle": "Incident tracker for your fleet",
+    "stats": {
+      "total": "Incidents",
+      "open": "Open",
+      "closed": "Closed"
+    },
+    "columns": {
+      "status": "Status",
+      "boat": "Boat",
+      "type": "Type",
+      "date": "Date",
+      "location": "Location"
+    },
+    "empty": {
+      "title": "No incidents reported",
+      "description": "Incidents will appear here once reported from a boat's navigation page.",
+      "action": "View my boats"
+    }
+  },
+  "filter": {
+    "allBoats": "All boats",
+    "filterByBoat": "Filter by boat"
+  }
+}

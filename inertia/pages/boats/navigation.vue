@@ -5,7 +5,6 @@ import BaseBreadcrumb from '~/components/base/BaseBreadcrumb.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseTabs from '~/components/base/BaseTabs.vue'
-import BoatModeSwitcher from '~/components/boats/show/BoatModeSwitcher.vue'
 import BoatShowTabFuelLogs from '~/components/boats/show/tabs/BoatShowTabFuelLogs.vue'
 import BoatShowTabIncidents from '~/components/boats/show/tabs/BoatShowTabIncidents.vue'
 import BoatShowTabNavigationLogs from '~/components/boats/show/tabs/BoatShowTabNavigationLogs.vue'
@@ -112,11 +111,7 @@ const tabs = computed(() => [
         </div>
       </div>
 
-      <!-- Mode switcher + Tab bar -->
-      <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
-        <BoatModeSwitcher :boat-id="boat.id" mode="navigation" />
-        <BaseTabs v-model="tab" :tabs="tabs" />
-      </div>
+      <BaseTabs v-model="tab" :tabs="tabs" />
     </header>
 
     <Transition name="tab" mode="out-in">
