@@ -799,6 +799,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_documents_controller').default['destroy']>>>
     }
   }
+  'boats.position.store': {
+    methods: ["POST"]
+    pattern: '/boats/:boatId/position'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/boat').updateBoatPositionValidator)>>
+      paramsTuple: [ParamValue]
+      params: { boatId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/boat').updateBoatPositionValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_position_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_position_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'ports.index': {
     methods: ["GET","HEAD"]
     pattern: '/ports'

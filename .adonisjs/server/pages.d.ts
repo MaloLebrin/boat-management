@@ -38,6 +38,7 @@ declare module '@adonisjs/inertia/types' {
     'marketing/simulator_share': ExtractProps<(typeof import('../../inertia/pages/marketing/simulator_share.vue'))['default']>
     'marketing/simulator': ExtractProps<(typeof import('../../inertia/pages/marketing/simulator.vue'))['default']>
     'notifications/index': ExtractProps<(typeof import('../../inertia/pages/notifications/index.vue'))['default']>
+    'organization/crew': ExtractProps<(typeof import('../../inertia/pages/organization/crew.vue'))['default']>
     'organization/members': ExtractProps<(typeof import('../../inertia/pages/organization/members.vue'))['default']>
     'planning/index': ExtractProps<(typeof import('../../inertia/pages/planning/index.vue'))['default']>
     'ports/edit': ExtractProps<(typeof import('../../inertia/pages/ports/edit.vue'))['default']>
@@ -52,6 +53,5 @@ declare module '@adonisjs/inertia/types' {
     'settings/me': ExtractProps<(typeof import('../../inertia/pages/settings/me.vue'))['default']>
     'settings/members': ExtractProps<(typeof import('../../inertia/pages/settings/members.vue'))['default']>
     'settings/org': ExtractProps<(typeof import('../../inertia/pages/settings/org.vue'))['default']>
-    'organization/crew': ExtractProps<(typeof import('../../inertia/pages/organization/crew.vue'))['default']>
   }
 }
