@@ -11,6 +11,7 @@
   "logout": "Déconnexion",
   "myBoats": "Mes bateaux",
   "unknownUser": "Utilisateur",
+  "crew": "Équipiers",
   "sections": {
     "fleet": "FLOTTE",
     "maintenance": "MAINTENANCE",

@@ -30,7 +30,6 @@ export const controllers = {
   MaintenanceLogPdf: () => import('#controllers/maintenance_log_pdf_controller'),
   Marketing: () => import('#controllers/marketing_controller'),
   Mouillages: () => import('#controllers/mouillages_controller'),
-  NavigationLogs: () => import('#controllers/navigation_logs_controller'),
   NewAccount: () => import('#controllers/new_account_controller'),
   Notifications: () => import('#controllers/notifications_controller'),
   OrganizationInvitations: () => import('#controllers/organization_invitations_controller'),
@@ -45,4 +44,9 @@ export const controllers = {
   SimulatorLead: () => import('#controllers/simulator_lead_controller'),
   SimulatorShare: () => import('#controllers/simulator_share_controller'),
   Spots: () => import('#controllers/spots_controller'),
+  CrewCertifications: () => import('#controllers/crew_certifications_controller'),
+  CrewMembers: () => import('#controllers/crew_members_controller'),
+  CrewRolePdf: () => import('#controllers/crew_role_pdf_controller'),
+  NavigationLogCrew: () => import('#controllers/navigation_log_crew_controller'),
+  NavigationLogs: () => import('#controllers/navigation_logs_controller'),
 }

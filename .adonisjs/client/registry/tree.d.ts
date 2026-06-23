@@ -50,6 +50,12 @@ export interface ApiDefinition {
       store: typeof routes['boats.navigationLogs.store']
       close: typeof routes['boats.navigationLogs.close']
       destroy: typeof routes['boats.navigationLogs.destroy']
+      crew: {
+        sync: typeof routes['boats.navigationLogs.crew.sync']
+      }
+      crewRole: {
+        download: typeof routes['boats.navigationLogs.crewRole.download']
+      }
     }
     adminDocuments: {
       store: typeof routes['boats.adminDocuments.store']
@@ -226,6 +232,16 @@ export interface ApiDefinition {
     markAllAsRead: typeof routes['notifications.markAllAsRead']
     markAsRead: typeof routes['notifications.markAsRead']
     destroy: typeof routes['notifications.destroy']
+  }
+  crew: {
+    index: typeof routes['crew.index']
+    store: typeof routes['crew.store']
+    update: typeof routes['crew.update']
+    destroy: typeof routes['crew.destroy']
+    certifications: {
+      store: typeof routes['crew.certifications.store']
+      destroy: typeof routes['crew.certifications.destroy']
+    }
   }
   eventStream: typeof routes['event_stream']
   subscribe: typeof routes['subscribe']

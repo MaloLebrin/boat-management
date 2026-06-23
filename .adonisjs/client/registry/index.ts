@@ -372,6 +372,18 @@ const routes = {
     tokens: [{"old":"/boats/:boatId/navigation-logs/:logId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/navigation-logs/:logId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/navigation-logs/:logId","type":0,"val":"navigation-logs","end":""},{"old":"/boats/:boatId/navigation-logs/:logId","type":1,"val":"logId","end":""}],
     types: placeholder as Registry['boats.navigationLogs.destroy']['types'],
   },
+  'boats.navigationLogs.crew.sync': {
+    methods: ["PATCH"],
+    pattern: '/boats/:boatId/navigation-logs/:logId/crew',
+    tokens: [{"old":"/boats/:boatId/navigation-logs/:logId/crew","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/navigation-logs/:logId/crew","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/navigation-logs/:logId/crew","type":0,"val":"navigation-logs","end":""},{"old":"/boats/:boatId/navigation-logs/:logId/crew","type":1,"val":"logId","end":""},{"old":"/boats/:boatId/navigation-logs/:logId/crew","type":0,"val":"crew","end":""}],
+    types: placeholder as Registry['boats.navigationLogs.crew.sync']['types'],
+  },
+  'boats.navigationLogs.crewRole.download': {
+    methods: ["GET","HEAD"],
+    pattern: '/boats/:boatId/navigation-logs/:logId/crew-role.pdf',
+    tokens: [{"old":"/boats/:boatId/navigation-logs/:logId/crew-role.pdf","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/navigation-logs/:logId/crew-role.pdf","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/navigation-logs/:logId/crew-role.pdf","type":0,"val":"navigation-logs","end":""},{"old":"/boats/:boatId/navigation-logs/:logId/crew-role.pdf","type":1,"val":"logId","end":""},{"old":"/boats/:boatId/navigation-logs/:logId/crew-role.pdf","type":0,"val":"crew-role.pdf","end":""}],
+    types: placeholder as Registry['boats.navigationLogs.crewRole.download']['types'],
+  },
   'boats.adminDocuments.store': {
     methods: ["POST"],
     pattern: '/boats/:boatId/admin-documents',
@@ -827,6 +839,42 @@ const routes = {
     pattern: '/notifications/:id',
     tokens: [{"old":"/notifications/:id","type":0,"val":"notifications","end":""},{"old":"/notifications/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['notifications.destroy']['types'],
+  },
+  'crew.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/crew',
+    tokens: [{"old":"/crew","type":0,"val":"crew","end":""}],
+    types: placeholder as Registry['crew.index']['types'],
+  },
+  'crew.store': {
+    methods: ["POST"],
+    pattern: '/crew',
+    tokens: [{"old":"/crew","type":0,"val":"crew","end":""}],
+    types: placeholder as Registry['crew.store']['types'],
+  },
+  'crew.update': {
+    methods: ["PUT"],
+    pattern: '/crew/:id',
+    tokens: [{"old":"/crew/:id","type":0,"val":"crew","end":""},{"old":"/crew/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['crew.update']['types'],
+  },
+  'crew.destroy': {
+    methods: ["DELETE"],
+    pattern: '/crew/:id',
+    tokens: [{"old":"/crew/:id","type":0,"val":"crew","end":""},{"old":"/crew/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['crew.destroy']['types'],
+  },
+  'crew.certifications.store': {
+    methods: ["POST"],
+    pattern: '/crew/:memberId/certifications',
+    tokens: [{"old":"/crew/:memberId/certifications","type":0,"val":"crew","end":""},{"old":"/crew/:memberId/certifications","type":1,"val":"memberId","end":""},{"old":"/crew/:memberId/certifications","type":0,"val":"certifications","end":""}],
+    types: placeholder as Registry['crew.certifications.store']['types'],
+  },
+  'crew.certifications.destroy': {
+    methods: ["DELETE"],
+    pattern: '/crew/:memberId/certifications/:certId',
+    tokens: [{"old":"/crew/:memberId/certifications/:certId","type":0,"val":"crew","end":""},{"old":"/crew/:memberId/certifications/:certId","type":1,"val":"memberId","end":""},{"old":"/crew/:memberId/certifications/:certId","type":0,"val":"certifications","end":""},{"old":"/crew/:memberId/certifications/:certId","type":1,"val":"certId","end":""}],
+    types: placeholder as Registry['crew.certifications.destroy']['types'],
   },
   'event_stream': {
     methods: ["GET","HEAD"],

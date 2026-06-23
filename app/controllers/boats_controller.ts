@@ -6,6 +6,7 @@ import BoatDocumentService from '#services/boat_document_service'
 import BoatFuelLogService from '#services/boat_fuel_log_service'
 import BoatListService from '#services/boat_list_service'
 import NavigationLogService from '#services/navigation_log_service'
+import CrewService from '#services/crew_service'
 import { toEditForm, toShowProps } from '#transformers/boat_transformer'
 import { toPortFormOptions } from '#transformers/port_transformer'
 import BoatIncidentService from '#services/boat_incident_service'
@@ -21,7 +22,6 @@ import SpotService from '#services/spot_service'
 import BoatPolicy from '#policies/boat_policy'
 import FuelLogPolicy from '#policies/fuel_log_policy'
 import IncidentPolicy from '#policies/incident_policy'
-import NavigationLogPolicy from '#policies/navigation_log_policy'
 import { createBoatValidator, updateBoatValidator } from '#validators/boat'
 import { assignBoatValidator } from '#validators/marina_layout'
 import { inject } from '@adonisjs/core'
@@ -36,7 +36,6 @@ export default class BoatsController {
     private sheetService: BoatMaintenanceSheetService,
     private incidentService: BoatIncidentService,
     private fuelLogService: BoatFuelLogService,
-    private navigationLogService: NavigationLogService,
     private mediaService: MediaService,
     private aiAnalysisService: AiAnalysisService,
     private boatListService: BoatListService,
@@ -45,7 +44,8 @@ export default class BoatsController {
     private quotaService: QuotaService,
     private organizationService: OrganizationService,
     private auditLogService: AuditLogService,
-    private documentService: BoatDocumentService
+    private documentService: BoatDocumentService,
+    private crewService: CrewService
   ) {}
 
   async index({ inertia, auth, request }: HttpContext) {
@@ -130,8 +130,6 @@ export default class BoatsController {
         maintenanceSheets,
         incidents,
         fuelLogs,
-        navigationLogs,
-        portOptions,
         boatMedia,
         positionHistory,
         latestSuggestions,
@@ -139,18 +137,14 @@ export default class BoatsController {
         canDeleteIncidents,
         canCreateFuelLogs,
         canDeleteFuelLogs,
-        canCreateNavigationLogs,
-        canUpdateNavigationLogs,
-        canDeleteNavigationLogs,
         boatDocuments,
+        crewMemberOptions,
       ] = await Promise.all([
         this.maintenanceService.listForBoat(user, boat),
         this.taskService.listForBoat(user, boat),
         this.sheetService.listForBoat(user, boat),
         this.incidentService.listForBoat(user, boat),
         this.fuelLogService.listForBoat(user, boat),
-        this.navigationLogService.listForBoat(boat),
-        this.portService.listNamesForOrg(user),
         this.mediaService.listForEntity('boat', boat.id),
         this.boatService.getPositionHistory(boat.id),
         this.aiAnalysisService.getLatestBoatSuggestions(user.id, boat.id),
@@ -158,10 +152,8 @@ export default class BoatsController {
         bouncer.with(IncidentPolicy).allows('delete', boat),
         bouncer.with(FuelLogPolicy).allows('create', boat),
         bouncer.with(FuelLogPolicy).allows('delete', boat),
-        bouncer.with(NavigationLogPolicy).allows('create', boat),
-        bouncer.with(NavigationLogPolicy).allows('update', boat),
-        bouncer.with(NavigationLogPolicy).allows('delete'),
         this.documentService.listForBoat(user, boat),
+        this.crewService.listOptionsForOrganization(user.organization),
       ])
 
       const canManageEquipment = canManageMaintenance
@@ -182,6 +174,7 @@ export default class BoatsController {
           fuelLogs,
           navigationLogs,
           portOptions,
+          crewMemberOptions,
           boatDocuments,
           aiSuggestions,
           canManageMaintenance,
@@ -191,9 +184,6 @@ export default class BoatsController {
           canDeleteIncidents,
           canCreateFuelLogs,
           canDeleteFuelLogs,
-          canCreateNavigationLogs,
-          canUpdateNavigationLogs,
-          canDeleteNavigationLogs,
         })
       )
     } catch (error) {

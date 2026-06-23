@@ -127,6 +127,15 @@
     "deleted": "Document deleted.",
     "notFound": "Document not found."
   },
+  "crew": {
+    "created": "Crew member added successfully.",
+    "updated": "Crew member updated.",
+    "deleted": "Crew member deleted.",
+    "notFound": "Crew member not found.",
+    "certificationAdded": "Certification added.",
+    "certificationDeleted": "Certification deleted.",
+    "logCrewUpdated": "Trip crew updated."
+  },
   "quota": {
     "boatsExceeded": "You have reached the boat limit for your plan. Upgrade to add more boats.",
     "membersExceeded": "You have reached the member limit for your plan. Upgrade to add more members.",

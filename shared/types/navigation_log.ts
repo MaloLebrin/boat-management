@@ -1,4 +1,5 @@
 import type { DateTime } from 'luxon'
+import type { NavigationLogCrewRow } from './crew.js'
 
 export type NavigationLogStatus = 'in_progress' | 'completed'
 export type SeaState = 'calm' | 'slight' | 'moderate' | 'rough' | 'very_rough'
@@ -46,6 +47,7 @@ export interface NavigationLogRow {
   crewCount: number | null
   notes: string | null
   createdAt: string
+  crew: NavigationLogCrewRow[]
 }
 
 export interface NavigationLogPortOption {

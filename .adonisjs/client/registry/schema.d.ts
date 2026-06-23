@@ -739,6 +739,30 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/navigation_logs_controller').default['destroy']>>>
     }
   }
+  'boats.navigationLogs.crew.sync': {
+    methods: ["PATCH"]
+    pattern: '/boats/:boatId/navigation-logs/:logId/crew'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/crew').syncNavigationLogCrewValidator)>>
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; logId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/crew').syncNavigationLogCrewValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/navigation_log_crew_controller').default['sync']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/navigation_log_crew_controller').default['sync']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'boats.navigationLogs.crewRole.download': {
+    methods: ["GET","HEAD"]
+    pattern: '/boats/:boatId/navigation-logs/:logId/crew-role.pdf'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; logId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/crew_role_pdf_controller').default['download']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/crew_role_pdf_controller').default['download']>>>
+    }
+  }
   'boats.adminDocuments.store': {
     methods: ["POST"]
     pattern: '/boats/:boatId/admin-documents'
@@ -1649,6 +1673,78 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/notifications_controller').default['destroy']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/notifications_controller').default['destroy']>>>
+    }
+  }
+  'crew.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/crew'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/crew_members_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/crew_members_controller').default['index']>>>
+    }
+  }
+  'crew.store': {
+    methods: ["POST"]
+    pattern: '/crew'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/crew').createCrewMemberValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/crew').createCrewMemberValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/crew_members_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/crew_members_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'crew.update': {
+    methods: ["PUT"]
+    pattern: '/crew/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/crew').updateCrewMemberValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/crew').updateCrewMemberValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/crew_members_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/crew_members_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'crew.destroy': {
+    methods: ["DELETE"]
+    pattern: '/crew/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/crew_members_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/crew_members_controller').default['destroy']>>>
+    }
+  }
+  'crew.certifications.store': {
+    methods: ["POST"]
+    pattern: '/crew/:memberId/certifications'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/crew').createCrewCertificationValidator)>>
+      paramsTuple: [ParamValue]
+      params: { memberId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/crew').createCrewCertificationValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/crew_certifications_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/crew_certifications_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'crew.certifications.destroy': {
+    methods: ["DELETE"]
+    pattern: '/crew/:memberId/certifications/:certId'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { memberId: ParamValue; certId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/crew_certifications_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/crew_certifications_controller').default['destroy']>>>
     }
   }
   'event_stream': {

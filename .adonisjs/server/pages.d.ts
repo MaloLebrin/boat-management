@@ -52,5 +52,6 @@ declare module '@adonisjs/inertia/types' {
     'settings/me': ExtractProps<(typeof import('../../inertia/pages/settings/me.vue'))['default']>
     'settings/members': ExtractProps<(typeof import('../../inertia/pages/settings/members.vue'))['default']>
     'settings/org': ExtractProps<(typeof import('../../inertia/pages/settings/org.vue'))['default']>
+    'organization/crew': ExtractProps<(typeof import('../../inertia/pages/organization/crew.vue'))['default']>
   }
 }

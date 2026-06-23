@@ -22,6 +22,7 @@ import type {
   NavigationLogPortOption,
   NavigationLogRow,
 } from '~/types/boat_show'
+import type { CrewMemberOption } from '../../../../shared/types/crew'
 
 type TabKey =
   | 'overview'
@@ -46,6 +47,7 @@ defineProps<{
   fuelLogs: FuelLogRow[]
   navigationLogs: NavigationLogRow[]
   portOptions: NavigationLogPortOption[]
+  crewMemberOptions: CrewMemberOption[]
   boatDocuments: BoatDocumentRow[]
   canManageMaintenance: boolean
   canManageEquipment: boolean
@@ -136,6 +138,7 @@ defineEmits<{ goToTab: [key: string] }>()
         :boat="boat"
         :navigation-logs="navigationLogs"
         :port-options="portOptions"
+        :crew-member-options="crewMemberOptions"
         :can-create="canCreateNavigationLogs"
         :can-update="canUpdateNavigationLogs"
         :can-delete="canDeleteNavigationLogs"

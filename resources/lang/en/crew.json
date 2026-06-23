@@ -1,0 +1,69 @@
+{
+  "nav": "Crew members",
+  "title": "Crew management",
+  "empty": "No crew members registered.",
+  "add": "+ Add a crew member",
+  "count": "{count, plural, one {# crew member} other {# crew members}}",
+  "deleteConfirm": "Delete this crew member?",
+  "certificationDeleteConfirm": "Delete this certification?",
+  "fields": {
+    "firstName": "First name",
+    "lastName": "Last name",
+    "email": "Email (optional)",
+    "phone": "Phone (optional)",
+    "notes": "Notes (optional)",
+    "certType": "Certification type",
+    "referenceNumber": "Reference number (optional)",
+    "expiresAt": "Expiry date (optional)"
+  },
+  "roles": {
+    "skipper": "Skipper",
+    "crew": "Crew",
+    "passenger": "Passenger"
+  },
+  "certTypes": {
+    "coastal_permit": "Coastal permit",
+    "offshore_permit": "Offshore permit",
+    "vhf": "VHF / SRC",
+    "stcw_basic": "STCW basic",
+    "stcw_proficiency": "STCW proficiency",
+    "other": "Other"
+  },
+  "certStatus": {
+    "valid": "Valid",
+    "expired": "Expired",
+    "expiresSoon": "Expires in {days} d"
+  },
+  "form": {
+    "createTitle": "Add a crew member",
+    "editTitle": "Edit crew member",
+    "certTitle": "Add a certification",
+    "submit": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete"
+  },
+  "logCrew": {
+    "title": "Trip crew",
+    "add": "Add a member",
+    "empty": "No crew members registered for this trip.",
+    "role": "Role",
+    "member": "Crew member",
+    "downloadPdf": "Crew list (PDF)"
+  },
+  "pdf": {
+    "title": "Crew list",
+    "departedAt": "Departure",
+    "arrivedAt": "Arrival",
+    "route": "Route",
+    "colName": "Name",
+    "colRole": "Role",
+    "colEmail": "Email",
+    "noCrewMembers": "No crew members",
+    "footer": "Automatically generated document — to be validated by the captain",
+    "roles": {
+      "skipper": "Skipper",
+      "crew": "Crew",
+      "passenger": "Passenger"
+    }
+  }
+}

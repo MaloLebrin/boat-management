@@ -12,6 +12,7 @@ import type { IncidentType, IncidentStatus } from '#shared/types/incident'
 import type { BoatDocumentRow } from '#shared/types/boat_document'
 import type { FuelLogRow } from '#shared/types/fuel_log'
 import type { NavigationLogRow, NavigationLogPortOption } from '#shared/types/navigation_log'
+import type { CrewMemberOption } from '#shared/types/crew'
 
 export interface BoatShowContext {
   positionHistory: BoatPositionHistory[]
@@ -23,6 +24,7 @@ export interface BoatShowContext {
   fuelLogs: BoatFuelLog[]
   navigationLogs: NavigationLog[]
   portOptions: NavigationLogPortOption[]
+  crewMemberOptions: CrewMemberOption[]
   boatDocuments: BoatDocumentRow[]
   aiSuggestions: AiSuggestion[] | null
   canManageMaintenance: boolean
@@ -73,6 +75,7 @@ export function toShowProps(boat: Boat, ctx: BoatShowContext) {
     fuelLogs: ctx.fuelLogs.map(toFuelLog),
     navigationLogs: ctx.navigationLogs.map(toNavigationLog),
     portOptions: ctx.portOptions,
+    crewMemberOptions: ctx.crewMemberOptions,
     boatDocuments: ctx.boatDocuments,
     canManageMaintenance: ctx.canManageMaintenance,
     canManageEquipment: ctx.canManageEquipment,
@@ -110,6 +113,11 @@ function toNavigationLog(log: NavigationLog): NavigationLogRow {
     crewCount: log.crewCount,
     notes: log.notes,
     createdAt: log.createdAt.toISO()!,
+    crew: (log.$preloaded.crew ? log.crew : []).map((m) => ({
+      crewMemberId: m.id,
+      fullName: m.fullName,
+      role: m.$extras.pivot_role,
+    })),
   }
 }
 

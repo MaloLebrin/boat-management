@@ -1,0 +1,69 @@
+{
+  "nav": "Équipiers",
+  "title": "Gestion des équipiers",
+  "empty": "Aucun équipier enregistré.",
+  "add": "+ Ajouter un équipier",
+  "count": "{count, plural, one {# équipier} other {# équipiers}}",
+  "deleteConfirm": "Supprimer cet équipier ?",
+  "certificationDeleteConfirm": "Supprimer cette certification ?",
+  "fields": {
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "email": "Email (optionnel)",
+    "phone": "Téléphone (optionnel)",
+    "notes": "Notes (optionnel)",
+    "certType": "Type de certification",
+    "referenceNumber": "Numéro de référence (optionnel)",
+    "expiresAt": "Date d'expiration (optionnel)"
+  },
+  "roles": {
+    "skipper": "Skipper",
+    "crew": "Équipier",
+    "passenger": "Passager"
+  },
+  "certTypes": {
+    "coastal_permit": "Permis côtier",
+    "offshore_permit": "Permis hauturier",
+    "vhf": "VHF / CRR",
+    "stcw_basic": "STCW de base",
+    "stcw_proficiency": "STCW avancé",
+    "other": "Autre"
+  },
+  "certStatus": {
+    "valid": "Valide",
+    "expired": "Expirée",
+    "expiresSoon": "Expire dans {days} j"
+  },
+  "form": {
+    "createTitle": "Ajouter un équipier",
+    "editTitle": "Modifier l'équipier",
+    "certTitle": "Ajouter une certification",
+    "submit": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer"
+  },
+  "logCrew": {
+    "title": "Équipage de la sortie",
+    "add": "Ajouter un membre",
+    "empty": "Aucun équipier enregistré pour cette sortie.",
+    "role": "Rôle",
+    "member": "Équipier",
+    "downloadPdf": "Rôle d'équipage (PDF)"
+  },
+  "pdf": {
+    "title": "Rôle d'équipage",
+    "departedAt": "Départ",
+    "arrivedAt": "Arrivée",
+    "route": "Trajet",
+    "colName": "Nom",
+    "colRole": "Rôle",
+    "colEmail": "Email",
+    "noCrewMembers": "Aucun équipier",
+    "footer": "Document généré automatiquement — à valider par le capitaine",
+    "roles": {
+      "skipper": "Skipper",
+      "crew": "Équipier",
+      "passenger": "Passager"
+    }
+  }
+}

@@ -5,13 +5,16 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import NavigationLogForm from '~/components/boats/show/tabs/NavigationLogForm.vue'
 import NavigationLogCloseForm from '~/components/boats/show/tabs/NavigationLogCloseForm.vue'
+import NavigationLogCrewPanel from '~/components/boats/show/tabs/NavigationLogCrewPanel.vue'
 import { useT } from '~/composables/use_t'
 import type { BoatShowDetail, NavigationLogRow, NavigationLogPortOption } from '~/types/boat_show'
+import type { CrewMemberOption } from '../../../../../shared/types/crew'
 
 const props = defineProps<{
   boat: BoatShowDetail
   navigationLogs: NavigationLogRow[]
   portOptions: NavigationLogPortOption[]
+  crewMemberOptions: CrewMemberOption[]
   canCreate: boolean
   canUpdate: boolean
   canDelete: boolean
@@ -149,6 +152,15 @@ function deleteLog(logId: number) {
               <p v-if="log.notes" class="text-sm text-fg-muted whitespace-pre-wrap">
                 {{ log.notes }}
               </p>
+
+              <!-- Crew -->
+              <NavigationLogCrewPanel
+                :boat-id="boat.id"
+                :log-id="log.id"
+                :crew="log.crew"
+                :crew-member-options="crewMemberOptions"
+                :can-update="canUpdate"
+              />
             </div>
 
             <!-- Actions -->

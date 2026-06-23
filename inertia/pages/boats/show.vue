@@ -19,6 +19,7 @@ import type {
   NavigationLogRow,
   NavigationLogPortOption,
 } from '~/types/boat_show'
+import type { CrewMemberOption } from '../../../shared/types/crew'
 
 const { t } = useT()
 
@@ -31,6 +32,7 @@ const props = defineProps<{
   fuelLogs: FuelLogRow[]
   navigationLogs: NavigationLogRow[]
   portOptions: NavigationLogPortOption[]
+  crewMemberOptions: CrewMemberOption[]
   boatDocuments: BoatDocumentRow[]
   canManageMaintenance: boolean
   canManageEquipment: boolean

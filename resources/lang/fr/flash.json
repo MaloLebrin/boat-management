@@ -127,6 +127,15 @@
     "deleted": "Document supprimé.",
     "notFound": "Document introuvable."
   },
+  "crew": {
+    "created": "Équipier ajouté avec succès.",
+    "updated": "Équipier mis à jour.",
+    "deleted": "Équipier supprimé.",
+    "notFound": "Équipier introuvable.",
+    "certificationAdded": "Certification ajoutée.",
+    "certificationDeleted": "Certification supprimée.",
+    "logCrewUpdated": "Équipage de la sortie mis à jour."
+  },
   "quota": {
     "boatsExceeded": "Vous avez atteint la limite de bateaux de votre plan. Passez à un plan supérieur pour en ajouter.",
     "membersExceeded": "Vous avez atteint la limite de membres de votre plan. Passez à un plan supérieur pour en ajouter.",

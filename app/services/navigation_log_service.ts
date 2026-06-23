@@ -19,6 +19,7 @@ export default class NavigationLogService {
   async listForBoat(boat: Boat) {
     return await NavigationLog.query()
       .where('boatId', boat.id)
+      .preload('crew')
       .orderBy('departedAt', 'desc')
       .orderBy('id', 'desc')
   }
@@ -126,9 +127,14 @@ export default class NavigationLogService {
     return log
   }
 
-  async deleteForBoat(boat: Boat, logId: number) {
+  async getForBoat(boat: Boat, logId: number) {
     const log = await NavigationLog.query().where('id', logId).where('boatId', boat.id).first()
     if (!log) throw new NavigationLogNotFoundError()
+    return log
+  }
+
+  async deleteForBoat(boat: Boat, logId: number) {
+    const log = await this.getForBoat(boat, logId)
     await log.delete()
   }
 }

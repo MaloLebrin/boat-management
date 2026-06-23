@@ -165,6 +165,15 @@ router
     router
       .delete('boats/:boatId/navigation-logs/:logId', [controllers.NavigationLogs, 'destroy'])
       .as('boats.navigationLogs.destroy')
+    router
+      .patch('boats/:boatId/navigation-logs/:logId/crew', [controllers.NavigationLogCrew, 'sync'])
+      .as('boats.navigationLogs.crew.sync')
+    router
+      .get('boats/:boatId/navigation-logs/:logId/crew-role.pdf', [
+        controllers.CrewRolePdf,
+        'download',
+      ])
+      .as('boats.navigationLogs.crewRole.download')
 
     router
       .post('boats/:boatId/admin-documents', [controllers.BoatDocuments, 'store'])
