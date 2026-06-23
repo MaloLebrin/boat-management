@@ -192,6 +192,11 @@
       "worn": "Usé",
       "to_replace": "À remplacer",
       "damaged": "Endommagé"
+    },
+    "genericEquipmentStatus": {
+      "ok": "OK",
+      "to_check": "À vérifier",
+      "to_replace": "À remplacer"
     }
   },
   "index": {
@@ -331,11 +336,16 @@
       "engine": "Moteur",
       "sail": "Voile",
       "rig": "Gréement",
-      "other": "Autre"
+      "other": "Autre",
+      "safety": "Sécurité",
+      "navigation": "Navigation électronique",
+      "electrical": "Électricité / Énergie",
+      "anchoring": "Mouillage",
+      "deck": "Pont / Accastillage"
     },
     "comingSoon": {
       "title": "Catégorie bientôt disponible",
-      "description": "Sélectionnez Moteur, Voile ou Gréement pour ajouter un équipement.",
+      "description": "Cette catégorie n'est pas encore disponible.",
       "badge": "bientôt"
     },
     "rigNotice": "ⓘ Ce bateau a déjà un gréement — l'enregistrement mettra à jour les informations existantes.",
@@ -727,6 +737,34 @@
       "notes": "Notes",
       "submit": "Enregistrer",
       "cancel": "Annuler"
+    }
+  },
+  "genericEquipment": {
+    "title": "Équipements",
+    "filterLabel": "Équipements",
+    "add": "Ajouter un équipement",
+    "noItems": "Aucun équipement enregistré.",
+    "name": {
+      "label": "Désignation",
+      "placeholder": "ex : Sondeur, Panneaux solaires…"
+    },
+    "brand": {
+      "label": "Marque",
+      "placeholder": "ex : Garmin, Victron…"
+    },
+    "model": {
+      "label": "Modèle",
+      "placeholder": "ex : EchoMap 93sv…"
+    },
+    "quantity": "Quantité",
+    "status": "État",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "modal": {
+      "title": "Ajouter un équipement",
+      "editTitle": "Modifier l'équipement",
+      "cancel": "Annuler",
+      "submit": "Enregistrer"
     }
   }
 }

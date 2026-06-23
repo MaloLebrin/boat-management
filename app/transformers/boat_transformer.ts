@@ -195,6 +195,7 @@ function toBoatDetail(
     rig: boat.rig ? toRig(boat.rig) : null,
     media: ctx.boatMedia.map(toMedia),
     safetyEquipment: boat.safetyEquipment.map(toSafetyEquipmentItem),
+    genericEquipment: boat.genericEquipment.map(toGenericEquipmentItem),
   }
 }
 
@@ -285,6 +286,19 @@ function toSafetyEquipmentItem(item: Boat['safetyEquipment'][number]) {
     equipmentType: item.equipmentType,
     quantity: item.quantity,
     expiryDate: item.expiryDate ? item.expiryDate.toISODate() : null,
+    status: item.status,
+    notes: item.notes,
+  }
+}
+
+function toGenericEquipmentItem(item: Boat['genericEquipment'][number]) {
+  return {
+    id: item.id,
+    category: item.category,
+    name: item.name,
+    brand: item.brand,
+    model: item.model,
+    quantity: item.quantity,
     status: item.status,
     notes: item.notes,
   }

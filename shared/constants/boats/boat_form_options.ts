@@ -88,3 +88,9 @@ export const SAFETY_EQUIPMENT_STATUS_OPTIONS = [
   { value: 'to_check', label: 'To check' },
   { value: 'expired', label: 'Expired' },
 ] as const
+
+export const GENERIC_EQUIPMENT_STATUS_OPTIONS = [
+  { value: 'ok', label: 'OK' },
+  { value: 'to_check', label: 'To check' },
+  { value: 'to_replace', label: 'To replace' },
+] as const

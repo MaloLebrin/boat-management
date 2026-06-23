@@ -65,6 +65,7 @@ export default class BoatHullService {
       boat.load('sails'),
       boat.load('rig'),
       boat.load('safetyEquipment'),
+      boat.load('genericEquipment'),
       boat.load('spot', (q) =>
         q
           .preload('pontoon', (pq) => pq.preload('port'))

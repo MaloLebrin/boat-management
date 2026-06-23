@@ -53,6 +53,9 @@ export type ScannedRoutes = {
     'boat_safety_equipment.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'boat_safety_equipment.update': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'itemId': ParamValue} }
     'boat_safety_equipment.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'itemId': ParamValue} }
+    'boat_generic_equipment.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
+    'boat_generic_equipment.update': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'itemId': ParamValue} }
+    'boat_generic_equipment.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'itemId': ParamValue} }
     'boats.maintenanceSheets.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'boats.maintenanceSheets.complete': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'sheetId': ParamValue} }
     'boats.maintenanceSheets.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'sheetId': ParamValue} }
@@ -314,6 +317,7 @@ export type ScannedRoutes = {
     'boat_media.store_photo': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'boat_media.store_document': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'boat_safety_equipment.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
+    'boat_generic_equipment.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'boats.maintenanceSheets.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'boats.incidents.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'boats.fuelLogs.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
@@ -359,6 +363,7 @@ export type ScannedRoutes = {
     'boat_equipment.upsert_rig': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'boats.maintenanceTasks.done': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'taskId': ParamValue} }
     'boat_safety_equipment.update': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'itemId': ParamValue} }
+    'boat_generic_equipment.update': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'itemId': ParamValue} }
     'boats.maintenanceSheets.complete': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'sheetId': ParamValue} }
     'boats.maintenanceSheetItems.update': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'sheetId': ParamValue,'itemId': ParamValue} }
     'boats.incidents.update': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'incidentId': ParamValue} }
@@ -386,6 +391,7 @@ export type ScannedRoutes = {
     'boats.maintenanceTasks.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'taskId': ParamValue} }
     'boat_media.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'mediaId': ParamValue} }
     'boat_safety_equipment.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'itemId': ParamValue} }
+    'boat_generic_equipment.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'itemId': ParamValue} }
     'boats.maintenanceSheets.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'sheetId': ParamValue} }
     'boats.incidents.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'incidentId': ParamValue} }
     'boats.fuelLogs.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue} }

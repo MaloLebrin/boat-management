@@ -4,12 +4,15 @@ import { computed, ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseModal from '~/components/base/BaseModal.vue'
 import BoatEquipmentEngineFields from '~/components/boats/engine/BoatEquipmentEngineFields.vue'
+import BoatGenericEquipmentFields from '~/components/boats/equipment/BoatGenericEquipmentFields.vue'
 import BoatEquipmentRigFields from '~/components/boats/rig/BoatEquipmentRigFields.vue'
+import BoatSafetyEquipmentFields from '~/components/boats/safety/BoatSafetyEquipmentFields.vue'
 import BoatEquipmentSailFields from '~/components/boats/sail/BoatEquipmentSailFields.vue'
 import { useT } from '~/composables/use_t'
 import type { BoatShowDetail } from '~/types/boat_show'
 
-type Category = 'engine' | 'sail' | 'rig' | 'other'
+type GenericCategory = 'navigation' | 'electrical' | 'anchoring' | 'deck'
+type Category = 'engine' | 'sail' | 'rig' | 'safety' | GenericCategory | 'other'
 
 const props = defineProps<{
   boat: BoatShowDetail
@@ -35,12 +38,48 @@ const categories = computed(() => [
   { key: 'sail', label: t('boats.equipmentAddModal.categories.sail'), icon: '⛵', supported: true },
   { key: 'rig', label: t('boats.equipmentAddModal.categories.rig'), icon: '⚓', supported: true },
   {
+    key: 'safety',
+    label: t('boats.equipmentAddModal.categories.safety'),
+    icon: '🦺',
+    supported: true,
+  },
+  {
+    key: 'navigation',
+    label: t('boats.equipmentAddModal.categories.navigation'),
+    icon: '🧭',
+    supported: true,
+  },
+  {
+    key: 'electrical',
+    label: t('boats.equipmentAddModal.categories.electrical'),
+    icon: '⚡',
+    supported: true,
+  },
+  {
+    key: 'anchoring',
+    label: t('boats.equipmentAddModal.categories.anchoring'),
+    icon: '⚓',
+    supported: true,
+  },
+  {
+    key: 'deck',
+    label: t('boats.equipmentAddModal.categories.deck'),
+    icon: '🔩',
+    supported: true,
+  },
+  {
     key: 'other',
     label: t('boats.equipmentAddModal.categories.other'),
     icon: '📦',
     supported: false,
   },
 ])
+
+const isGenericCategory = computed(() =>
+  (['navigation', 'electrical', 'anchoring', 'deck'] as const).includes(
+    selectedCategory.value as GenericCategory
+  )
+)
 
 const actionByCategory: Record<
   Exclude<Category, 'other'>,
@@ -49,6 +88,11 @@ const actionByCategory: Record<
   engine: { url: `/boats/${props.boat.id}/engines`, method: 'post' },
   sail: { url: `/boats/${props.boat.id}/sails`, method: 'post' },
   rig: { url: `/boats/${props.boat.id}/rig`, method: 'put' },
+  safety: { url: `/boats/${props.boat.id}/safety-equipment`, method: 'post' },
+  navigation: { url: `/boats/${props.boat.id}/generic-equipment`, method: 'post' },
+  electrical: { url: `/boats/${props.boat.id}/generic-equipment`, method: 'post' },
+  anchoring: { url: `/boats/${props.boat.id}/generic-equipment`, method: 'post' },
+  deck: { url: `/boats/${props.boat.id}/generic-equipment`, method: 'post' },
 }
 
 function close() {
@@ -84,7 +128,7 @@ function close() {
                 ? 'bg-surface-muted text-fg-muted hover:bg-surface-elevated hover:text-fg'
                 : 'cursor-not-allowed bg-surface-muted/50 text-fg-subtle',
           ]"
-          @click="selectedCategory = cat.key"
+          @click="selectedCategory = cat.key as Category"
         >
           <span>{{ cat.icon }}</span>
           {{ cat.label }}
@@ -119,6 +163,11 @@ function close() {
           :errors="errors"
           :rig="boat.rig"
         />
+        <BoatSafetyEquipmentFields v-else-if="selectedCategory === 'safety'" :errors="errors" />
+        <template v-else-if="isGenericCategory">
+          <input type="hidden" name="category" :value="selectedCategory" />
+          <BoatGenericEquipmentFields :errors="errors" />
+        </template>
 
         <p v-if="selectedCategory === 'rig' && boat.rig" class="text-xs text-fg-muted">
           {{ t('boats.equipmentAddModal.rigNotice') }}

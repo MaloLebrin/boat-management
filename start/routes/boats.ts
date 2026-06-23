@@ -116,6 +116,16 @@ router
       'destroy',
     ])
 
+    router.post('boats/:boatId/generic-equipment', [controllers.BoatGenericEquipment, 'store'])
+    router.put('boats/:boatId/generic-equipment/:itemId', [
+      controllers.BoatGenericEquipment,
+      'update',
+    ])
+    router.delete('boats/:boatId/generic-equipment/:itemId', [
+      controllers.BoatGenericEquipment,
+      'destroy',
+    ])
+
     router
       .post('boats/:boatId/maintenance-sheets', [controllers.BoatMaintenanceSheets, 'store'])
       .as('boats.maintenanceSheets.store')

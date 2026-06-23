@@ -192,6 +192,11 @@
       "worn": "Worn",
       "to_replace": "To Replace",
       "damaged": "Damaged"
+    },
+    "genericEquipmentStatus": {
+      "ok": "OK",
+      "to_check": "To check",
+      "to_replace": "To replace"
     }
   },
   "index": {
@@ -708,6 +713,58 @@
       "notes": "Notes",
       "submit": "Save",
       "cancel": "Cancel"
+    }
+  },
+  "equipmentAddModal": {
+    "title": "New equipment",
+    "subtitle": "On {name} · the equipment will be trackable for maintenance",
+    "category": "Category",
+    "categories": {
+      "engine": "Engine",
+      "sail": "Sail",
+      "rig": "Rigging",
+      "other": "Other",
+      "safety": "Safety",
+      "navigation": "Electronics & Navigation",
+      "electrical": "Electrical & Energy",
+      "anchoring": "Anchoring",
+      "deck": "Deck & Hardware"
+    },
+    "comingSoon": {
+      "title": "Category coming soon",
+      "description": "This category is not yet available.",
+      "badge": "soon"
+    },
+    "rigNotice": "ⓘ This boat already has a rig — saving will update the existing information.",
+    "submit": "Create equipment",
+    "cancel": "Cancel"
+  },
+  "genericEquipment": {
+    "title": "Equipment",
+    "filterLabel": "Equipment",
+    "add": "Add equipment",
+    "noItems": "No equipment recorded.",
+    "name": {
+      "label": "Name",
+      "placeholder": "e.g. Depth sounder, Solar panels…"
+    },
+    "brand": {
+      "label": "Brand",
+      "placeholder": "e.g. Garmin, Victron…"
+    },
+    "model": {
+      "label": "Model",
+      "placeholder": "e.g. EchoMap 93sv…"
+    },
+    "quantity": "Quantity",
+    "status": "Status",
+    "edit": "Edit",
+    "delete": "Delete",
+    "modal": {
+      "title": "Add equipment",
+      "editTitle": "Edit equipment",
+      "cancel": "Cancel",
+      "submit": "Save"
     }
   }
 }

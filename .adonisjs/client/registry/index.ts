@@ -300,6 +300,24 @@ const routes = {
     tokens: [{"old":"/boats/:boatId/safety-equipment/:itemId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/safety-equipment/:itemId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/safety-equipment/:itemId","type":0,"val":"safety-equipment","end":""},{"old":"/boats/:boatId/safety-equipment/:itemId","type":1,"val":"itemId","end":""}],
     types: placeholder as Registry['boat_safety_equipment.destroy']['types'],
   },
+  'boat_generic_equipment.store': {
+    methods: ["POST"],
+    pattern: '/boats/:boatId/generic-equipment',
+    tokens: [{"old":"/boats/:boatId/generic-equipment","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/generic-equipment","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/generic-equipment","type":0,"val":"generic-equipment","end":""}],
+    types: placeholder as Registry['boat_generic_equipment.store']['types'],
+  },
+  'boat_generic_equipment.update': {
+    methods: ["PUT"],
+    pattern: '/boats/:boatId/generic-equipment/:itemId',
+    tokens: [{"old":"/boats/:boatId/generic-equipment/:itemId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/generic-equipment/:itemId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/generic-equipment/:itemId","type":0,"val":"generic-equipment","end":""},{"old":"/boats/:boatId/generic-equipment/:itemId","type":1,"val":"itemId","end":""}],
+    types: placeholder as Registry['boat_generic_equipment.update']['types'],
+  },
+  'boat_generic_equipment.destroy': {
+    methods: ["DELETE"],
+    pattern: '/boats/:boatId/generic-equipment/:itemId',
+    tokens: [{"old":"/boats/:boatId/generic-equipment/:itemId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/generic-equipment/:itemId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/generic-equipment/:itemId","type":0,"val":"generic-equipment","end":""},{"old":"/boats/:boatId/generic-equipment/:itemId","type":1,"val":"itemId","end":""}],
+    types: placeholder as Registry['boat_generic_equipment.destroy']['types'],
+  },
   'boats.maintenanceSheets.store': {
     methods: ["POST"],
     pattern: '/boats/:boatId/maintenance-sheets',

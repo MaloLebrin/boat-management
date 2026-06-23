@@ -595,6 +595,42 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_safety_equipment_controller').default['destroy']>>>
     }
   }
+  'boat_generic_equipment.store': {
+    methods: ["POST"]
+    pattern: '/boats/:boatId/generic-equipment'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/boat_generic_equipment').createGenericEquipmentValidator)>>
+      paramsTuple: [ParamValue]
+      params: { boatId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/boat_generic_equipment').createGenericEquipmentValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_generic_equipment_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_generic_equipment_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'boat_generic_equipment.update': {
+    methods: ["PUT"]
+    pattern: '/boats/:boatId/generic-equipment/:itemId'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/boat_generic_equipment').updateGenericEquipmentValidator)>>
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; itemId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/boat_generic_equipment').updateGenericEquipmentValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_generic_equipment_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_generic_equipment_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'boat_generic_equipment.destroy': {
+    methods: ["DELETE"]
+    pattern: '/boats/:boatId/generic-equipment/:itemId'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; itemId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_generic_equipment_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_generic_equipment_controller').default['destroy']>>>
+    }
+  }
   'boats.maintenanceSheets.store': {
     methods: ["POST"]
     pattern: '/boats/:boatId/maintenance-sheets'

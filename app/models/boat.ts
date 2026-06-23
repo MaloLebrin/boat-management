@@ -2,6 +2,7 @@ import Organization from '#models/organization'
 import BoatDocument from '#models/boat_document'
 import BoatEngine from '#models/boat_engine'
 import BoatFuelLog from '#models/boat_fuel_log'
+import BoatGenericEquipment from '#models/boat_generic_equipment'
 import BoatMaintenanceEvent from '#models/boat_maintenance_event'
 import BoatPositionHistory from '#models/boat_position_history'
 import BoatRig from '#models/boat_rig'
@@ -111,6 +112,9 @@ export default class Boat extends BaseModel {
 
   @hasMany(() => BoatSafetyEquipment)
   declare safetyEquipment: HasMany<typeof BoatSafetyEquipment>
+
+  @hasMany(() => BoatGenericEquipment)
+  declare genericEquipment: HasMany<typeof BoatGenericEquipment>
 
   @belongsTo(() => Spot)
   declare spot: BelongsTo<typeof Spot>

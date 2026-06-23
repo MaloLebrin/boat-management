@@ -109,6 +109,11 @@ export interface ApiDefinition {
     update: typeof routes['boat_safety_equipment.update']
     destroy: typeof routes['boat_safety_equipment.destroy']
   }
+  boatGenericEquipment: {
+    store: typeof routes['boat_generic_equipment.store']
+    update: typeof routes['boat_generic_equipment.update']
+    destroy: typeof routes['boat_generic_equipment.destroy']
+  }
   ports: {
     index: typeof routes['ports.index']
     create: typeof routes['ports.create']

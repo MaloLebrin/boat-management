@@ -15,6 +15,17 @@ export type BoatShowSafetyEquipment = {
   notes: string | null
 }
 
+export type BoatShowGenericEquipment = {
+  id: number
+  category: 'navigation' | 'electrical' | 'anchoring' | 'deck'
+  name: string
+  brand: string | null
+  model: string | null
+  quantity: number | null
+  status: 'ok' | 'to_check' | 'to_replace'
+  notes: string | null
+}
+
 export type MediaRow = {
   id: number
   kind: 'photo' | 'document'
@@ -128,6 +139,7 @@ export type BoatShowDetail = {
   rig: BoatShowRig | null
   media: MediaRow[]
   safetyEquipment: BoatShowSafetyEquipment[]
+  genericEquipment: BoatShowGenericEquipment[]
 }
 
 export type MaintenancePartRow = {

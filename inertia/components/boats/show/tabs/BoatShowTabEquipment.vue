@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { sortEnginesByStatus } from '#shared/helpers/engine'
 import { ref } from 'vue'
+import BoatGenericEquipmentCard from '~/components/boats/equipment/BoatGenericEquipmentCard.vue'
 import BoatShowEnginesCard from '~/components/boats/engine/BoatShowEnginesCard.vue'
 import BoatShowRigCard from '~/components/boats/rig/BoatShowRigCard.vue'
 import BoatSafetyEquipmentCard from '~/components/boats/safety/BoatSafetyEquipmentCard.vue'
@@ -16,7 +17,7 @@ const props = defineProps<{
 
 const { t } = useT()
 
-const equipmentFilter = ref<'all' | 'engine' | 'sail' | 'rig' | 'safety'>('all')
+const equipmentFilter = ref<'all' | 'engine' | 'sail' | 'rig' | 'safety' | 'generic'>('all')
 const isAddModalOpen = ref(false)
 </script>
 
@@ -38,6 +39,7 @@ const isAddModalOpen = ref(false)
             { key: 'sail', label: t('boats.equipmentAddModal.categories.sail') },
             { key: 'rig', label: t('boats.equipmentAddModal.categories.rig') },
             { key: 'safety', label: t('boats.safetyEquipment.title') },
+            { key: 'generic', label: t('boats.genericEquipment.filterLabel') },
           ]"
           :key="filter.key"
           type="button"
@@ -86,6 +88,15 @@ const isAddModalOpen = ref(false)
       <BoatSafetyEquipmentCard
         :boat-id="boat.id"
         :items="boat.safetyEquipment"
+        :can-manage="canManageEquipment"
+      />
+    </div>
+
+    <!-- Generic equipment card -->
+    <div v-if="equipmentFilter === 'all' || equipmentFilter === 'generic'">
+      <BoatGenericEquipmentCard
+        :boat-id="boat.id"
+        :items="boat.genericEquipment"
         :can-manage="canManageEquipment"
       />
     </div>

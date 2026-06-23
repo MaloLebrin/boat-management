@@ -100,6 +100,24 @@ export type BoatSafetyEquipmentPayload = {
   notes?: string | null
 }
 
+export const GENERIC_EQUIPMENT_CATEGORIES = [
+  'navigation',
+  'electrical',
+  'anchoring',
+  'deck',
+] as const
+export type GenericEquipmentCategory = (typeof GENERIC_EQUIPMENT_CATEGORIES)[number]
+
+export type BoatGenericEquipmentPayload = {
+  category: GenericEquipmentCategory
+  name: string
+  brand?: string | null
+  model?: string | null
+  quantity?: number | null
+  status?: string | null
+  notes?: string | null
+}
+
 export type BoatSerializedRow = {
   id: number | string
   name: string
