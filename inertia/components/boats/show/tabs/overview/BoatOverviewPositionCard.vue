@@ -138,7 +138,7 @@ function savePosition() {
           />
         </div>
         <BaseButton size="sm" :disabled="saving" @click="savePosition">
-          {{ saving ? t('common.save') : t('boats.show.position.saveGps') }}
+          {{ saving ? t('common.saving') : t('boats.show.position.saveGps') }}
         </BaseButton>
       </div>
     </div>

@@ -1,25 +1,13 @@
-import { BoatNotFoundError } from '#exceptions/boat_errors'
-import Boat from '#models/boat'
 import BoatPositionHistory from '#models/boat_position_history'
-import type User from '#models/user'
+import type Boat from '#models/boat'
 import type { BoatPositionPayload } from '#shared/types/boat'
 import { DateTime } from 'luxon'
 
 export default class BoatPositionService {
-  async storeManualPosition(user: User, boatId: number, payload: BoatPositionPayload) {
-    if (user.organizationId === null) throw new BoatNotFoundError()
-
-    const boat = await Boat.query()
-      .where('id', boatId)
-      .where('organizationId', user.organizationId)
-      .first()
-
-    if (!boat) throw new BoatNotFoundError()
-
+  async storeManualPosition(boat: Boat, payload: BoatPositionPayload) {
     await BoatPositionHistory.query()
       .where('boatId', boat.id)
       .whereNull('endedAt')
-      .whereNull('spotId')
       .update({ endedAt: DateTime.now().toSQL() })
 
     await BoatPositionHistory.create({
