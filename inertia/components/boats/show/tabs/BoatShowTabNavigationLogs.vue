@@ -13,6 +13,7 @@ const props = defineProps<{
   navigationLogs: NavigationLogRow[]
   portOptions: NavigationLogPortOption[]
   canCreate: boolean
+  canUpdate: boolean
   canDelete: boolean
 }>()
 
@@ -153,7 +154,7 @@ function deleteLog(logId: number) {
             <!-- Actions -->
             <div class="flex shrink-0 items-center gap-2">
               <BaseButton
-                v-if="canCreate && log.status === 'in_progress'"
+                v-if="canUpdate && log.status === 'in_progress'"
                 type="button"
                 variant="secondary"
                 size="sm"

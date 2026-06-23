@@ -140,6 +140,7 @@ export default class BoatsController {
         canCreateFuelLogs,
         canDeleteFuelLogs,
         canCreateNavigationLogs,
+        canUpdateNavigationLogs,
         canDeleteNavigationLogs,
         boatDocuments,
       ] = await Promise.all([
@@ -148,7 +149,7 @@ export default class BoatsController {
         this.sheetService.listForBoat(user, boat),
         this.incidentService.listForBoat(user, boat),
         this.fuelLogService.listForBoat(user, boat),
-        this.navigationLogService.listForBoat(user, boat),
+        this.navigationLogService.listForBoat(boat),
         this.portService.listNamesForOrg(user),
         this.mediaService.listForEntity('boat', boat.id),
         this.boatService.getPositionHistory(boat.id),
@@ -158,6 +159,7 @@ export default class BoatsController {
         bouncer.with(FuelLogPolicy).allows('create', boat),
         bouncer.with(FuelLogPolicy).allows('delete', boat),
         bouncer.with(NavigationLogPolicy).allows('create', boat),
+        bouncer.with(NavigationLogPolicy).allows('update', boat),
         bouncer.with(NavigationLogPolicy).allows('delete'),
         this.documentService.listForBoat(user, boat),
       ])
@@ -190,6 +192,7 @@ export default class BoatsController {
           canCreateFuelLogs,
           canDeleteFuelLogs,
           canCreateNavigationLogs,
+          canUpdateNavigationLogs,
           canDeleteNavigationLogs,
         })
       )

@@ -38,7 +38,7 @@ export default class NavigationLogsController {
 
     const payload = await request.validateUsing(createNavigationLogValidator)
 
-    await this.navigationLogService.createForBoat(user, boat, {
+    await this.navigationLogService.createForBoat(boat, {
       departedAt: payload.departedAt,
       departurePortId: payload.departurePortId ?? null,
       departurePortName: payload.departurePortName ?? null,
@@ -73,7 +73,7 @@ export default class NavigationLogsController {
     const payload = await request.validateUsing(closeNavigationLogValidator)
 
     try {
-      await this.navigationLogService.closeTrip(user, boat, Number(params.logId), {
+      await this.navigationLogService.closeTrip(boat, Number(params.logId), {
         arrivedAt: payload.arrivedAt,
         arrivalPortId: payload.arrivalPortId ?? null,
         arrivalPortName: payload.arrivalPortName ?? null,
@@ -121,7 +121,7 @@ export default class NavigationLogsController {
     await bouncer.with(NavigationLogPolicy).authorize('delete')
 
     try {
-      await this.navigationLogService.deleteForBoat(user, boat, Number(params.logId))
+      await this.navigationLogService.deleteForBoat(boat, Number(params.logId))
     } catch (error) {
       if (error instanceof NavigationLogNotFoundError) {
         session.flash('error', i18n.t('flash.navigationLog.notFound'))

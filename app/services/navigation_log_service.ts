@@ -5,7 +5,6 @@ import {
 import BoatEngine from '#models/boat_engine'
 import NavigationLog from '#models/navigation_log'
 import type Boat from '#models/boat'
-import type User from '#models/user'
 import type {
   CloseNavigationLogPayload,
   CreateNavigationLogPayload,
@@ -17,14 +16,14 @@ export { NavigationLogNotFoundError, NavigationLogValidationError }
 export type { CreateNavigationLogPayload, CloseNavigationLogPayload }
 
 export default class NavigationLogService {
-  async listForBoat(_user: User, boat: Boat) {
+  async listForBoat(boat: Boat) {
     return await NavigationLog.query()
       .where('boatId', boat.id)
       .orderBy('departedAt', 'desc')
       .orderBy('id', 'desc')
   }
 
-  async createForBoat(_user: User, boat: Boat, payload: CreateNavigationLogPayload) {
+  async createForBoat(boat: Boat, payload: CreateNavigationLogPayload) {
     const departedAt = toDateTime(payload.departedAt)
 
     return await NavigationLog.create({
@@ -51,7 +50,7 @@ export default class NavigationLogService {
     })
   }
 
-  async closeTrip(_user: User, boat: Boat, logId: number, payload: CloseNavigationLogPayload) {
+  async closeTrip(boat: Boat, logId: number, payload: CloseNavigationLogPayload) {
     const log = await NavigationLog.query()
       .where('id', logId)
       .where('boatId', boat.id)
@@ -127,7 +126,7 @@ export default class NavigationLogService {
     return log
   }
 
-  async deleteForBoat(_user: User, boat: Boat, logId: number) {
+  async deleteForBoat(boat: Boat, logId: number) {
     const log = await NavigationLog.query().where('id', logId).where('boatId', boat.id).first()
     if (!log) throw new NavigationLogNotFoundError()
     await log.delete()

@@ -33,6 +33,7 @@ export interface BoatShowContext {
   canCreateFuelLogs: boolean
   canDeleteFuelLogs: boolean
   canCreateNavigationLogs: boolean
+  canUpdateNavigationLogs: boolean
   canDeleteNavigationLogs: boolean
 }
 
@@ -81,6 +82,7 @@ export function toShowProps(boat: Boat, ctx: BoatShowContext) {
     canCreateFuelLogs: ctx.canCreateFuelLogs,
     canDeleteFuelLogs: ctx.canDeleteFuelLogs,
     canCreateNavigationLogs: ctx.canCreateNavigationLogs,
+    canUpdateNavigationLogs: ctx.canUpdateNavigationLogs,
     canDeleteNavigationLogs: ctx.canDeleteNavigationLogs,
     aiSuggestions: ctx.aiSuggestions,
   }
