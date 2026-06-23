@@ -34,6 +34,7 @@ export const controllers = {
   MaintenanceLogPdf: () => import('#controllers/maintenance_log_pdf_controller'),
   Marketing: () => import('#controllers/marketing_controller'),
   Mouillages: () => import('#controllers/mouillages_controller'),
+  Navigation: () => import('#controllers/navigation_controller'),
   NavigationLogCrew: () => import('#controllers/navigation_log_crew_controller'),
   NavigationLogs: () => import('#controllers/navigation_logs_controller'),
   NewAccount: () => import('#controllers/new_account_controller'),

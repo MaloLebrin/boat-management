@@ -11,6 +11,7 @@ export type ScannedRoutes = {
     'boats.create': { paramsTuple?: []; params?: {} }
     'boats.store': { paramsTuple?: []; params?: {} }
     'boats.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'boats.navigation': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.maintenanceLog.download': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -150,6 +151,9 @@ export type ScannedRoutes = {
     'crew.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'crew.certifications.store': { paramsTuple: [ParamValue]; params: {'memberId': ParamValue} }
     'crew.certifications.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'memberId': ParamValue,'certId': ParamValue} }
+    'navigation.logbook': { paramsTuple?: []; params?: {} }
+    'navigation.fuel': { paramsTuple?: []; params?: {} }
+    'navigation.incidents': { paramsTuple?: []; params?: {} }
     'event_stream': { paramsTuple?: []; params?: {} }
     'subscribe': { paramsTuple?: []; params?: {} }
     'unsubscribe': { paramsTuple?: []; params?: {} }
@@ -174,6 +178,7 @@ export type ScannedRoutes = {
     'boats.index': { paramsTuple?: []; params?: {} }
     'boats.create': { paramsTuple?: []; params?: {} }
     'boats.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'boats.navigation': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.maintenanceLog.download': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.engines.show': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
@@ -222,6 +227,9 @@ export type ScannedRoutes = {
     'pdf_previews.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'notifications.index': { paramsTuple?: []; params?: {} }
     'crew.index': { paramsTuple?: []; params?: {} }
+    'navigation.logbook': { paramsTuple?: []; params?: {} }
+    'navigation.fuel': { paramsTuple?: []; params?: {} }
+    'navigation.incidents': { paramsTuple?: []; params?: {} }
     'event_stream': { paramsTuple?: []; params?: {} }
     'new_account.create': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }
@@ -235,6 +243,7 @@ export type ScannedRoutes = {
     'boats.index': { paramsTuple?: []; params?: {} }
     'boats.create': { paramsTuple?: []; params?: {} }
     'boats.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'boats.navigation': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.maintenanceLog.download': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.engines.show': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
@@ -283,6 +292,9 @@ export type ScannedRoutes = {
     'pdf_previews.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'notifications.index': { paramsTuple?: []; params?: {} }
     'crew.index': { paramsTuple?: []; params?: {} }
+    'navigation.logbook': { paramsTuple?: []; params?: {} }
+    'navigation.fuel': { paramsTuple?: []; params?: {} }
+    'navigation.incidents': { paramsTuple?: []; params?: {} }
     'event_stream': { paramsTuple?: []; params?: {} }
     'new_account.create': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }

@@ -290,6 +290,10 @@
       "latitude": "Latitude",
       "longitude": "Longitude",
       "saveGps": "Save position"
+    },
+    "modeSwitch": {
+      "management": "Management",
+      "navigation": "Navigation"
     }
   },
   "specs": {

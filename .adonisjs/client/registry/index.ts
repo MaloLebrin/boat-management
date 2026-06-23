@@ -48,6 +48,12 @@ const routes = {
     tokens: [{"old":"/boats/:id","type":0,"val":"boats","end":""},{"old":"/boats/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['boats.show']['types'],
   },
+  'boats.navigation': {
+    methods: ["GET","HEAD"],
+    pattern: '/boats/:id/navigation',
+    tokens: [{"old":"/boats/:id/navigation","type":0,"val":"boats","end":""},{"old":"/boats/:id/navigation","type":1,"val":"id","end":""},{"old":"/boats/:id/navigation","type":0,"val":"navigation","end":""}],
+    types: placeholder as Registry['boats.navigation']['types'],
+  },
   'boats.maintenanceLog.download': {
     methods: ["GET","HEAD"],
     pattern: '/boats/:id/maintenance-log.pdf',
@@ -881,6 +887,24 @@ const routes = {
     pattern: '/crew/:memberId/certifications/:certId',
     tokens: [{"old":"/crew/:memberId/certifications/:certId","type":0,"val":"crew","end":""},{"old":"/crew/:memberId/certifications/:certId","type":1,"val":"memberId","end":""},{"old":"/crew/:memberId/certifications/:certId","type":0,"val":"certifications","end":""},{"old":"/crew/:memberId/certifications/:certId","type":1,"val":"certId","end":""}],
     types: placeholder as Registry['crew.certifications.destroy']['types'],
+  },
+  'navigation.logbook': {
+    methods: ["GET","HEAD"],
+    pattern: '/navigation/logbook',
+    tokens: [{"old":"/navigation/logbook","type":0,"val":"navigation","end":""},{"old":"/navigation/logbook","type":0,"val":"logbook","end":""}],
+    types: placeholder as Registry['navigation.logbook']['types'],
+  },
+  'navigation.fuel': {
+    methods: ["GET","HEAD"],
+    pattern: '/navigation/fuel',
+    tokens: [{"old":"/navigation/fuel","type":0,"val":"navigation","end":""},{"old":"/navigation/fuel","type":0,"val":"fuel","end":""}],
+    types: placeholder as Registry['navigation.fuel']['types'],
+  },
+  'navigation.incidents': {
+    methods: ["GET","HEAD"],
+    pattern: '/navigation/incidents',
+    tokens: [{"old":"/navigation/incidents","type":0,"val":"navigation","end":""},{"old":"/navigation/incidents","type":0,"val":"incidents","end":""}],
+    types: placeholder as Registry['navigation.incidents']['types'],
   },
   'event_stream': {
     methods: ["GET","HEAD"],

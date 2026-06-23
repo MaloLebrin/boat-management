@@ -14,23 +14,29 @@ import type { FuelLogRow } from '#shared/types/fuel_log'
 import type { NavigationLogRow, NavigationLogPortOption } from '#shared/types/navigation_log'
 import type { CrewMemberOption } from '#shared/types/crew'
 
-export interface BoatShowContext {
+export interface BoatManageContext {
   positionHistory: BoatPositionHistory[]
   boatMedia: Media[]
   maintenanceEvents: BoatMaintenanceEvent[]
   maintenanceTasks: BoatMaintenanceTask[]
   maintenanceSheets: BoatMaintenanceSheet[]
-  incidents: BoatIncident[]
-  fuelLogs: BoatFuelLog[]
-  navigationLogs: NavigationLog[]
-  portOptions: NavigationLogPortOption[]
-  crewMemberOptions: CrewMemberOption[]
   boatDocuments: BoatDocumentRow[]
   aiSuggestions: AiSuggestion[] | null
   canManageMaintenance: boolean
   canManageEquipment: boolean
   canManageDocuments: boolean
   canExport: boolean
+}
+
+export interface BoatNavigationContext {
+  positionHistory: BoatPositionHistory[]
+  boatMedia: Media[]
+  incidents: BoatIncident[]
+  fuelLogs: BoatFuelLog[]
+  navigationLogs: NavigationLog[]
+  portOptions: NavigationLogPortOption[]
+  crewMemberOptions: CrewMemberOption[]
+  canManageMaintenance: boolean
   canDeleteIncidents: boolean
   canCreateFuelLogs: boolean
   canDeleteFuelLogs: boolean
@@ -67,29 +73,36 @@ export function toEditForm(boat: Boat) {
   }
 }
 
-export function toShowProps(boat: Boat, ctx: BoatShowContext) {
+export function toManageProps(boat: Boat, ctx: BoatManageContext) {
   return {
     boat: toBoatDetail(boat, ctx),
     maintenanceEvents: ctx.maintenanceEvents.map(toMaintenanceEvent),
     maintenanceTasks: ctx.maintenanceTasks.map(toMaintenanceTask),
     maintenanceSheets: ctx.maintenanceSheets.map(toMaintenanceSheet),
-    incidents: ctx.incidents.map(toIncident),
-    fuelLogs: ctx.fuelLogs.map(toFuelLog),
-    navigationLogs: ctx.navigationLogs.map(toNavigationLog),
-    portOptions: ctx.portOptions,
-    crewMemberOptions: ctx.crewMemberOptions,
     boatDocuments: ctx.boatDocuments,
     canManageMaintenance: ctx.canManageMaintenance,
     canManageEquipment: ctx.canManageEquipment,
     canManageDocuments: ctx.canManageDocuments,
     canExport: ctx.canExport,
+    aiSuggestions: ctx.aiSuggestions,
+  }
+}
+
+export function toNavigationProps(boat: Boat, ctx: BoatNavigationContext) {
+  return {
+    boat: toBoatDetail(boat, ctx),
+    incidents: ctx.incidents.map(toIncident),
+    fuelLogs: ctx.fuelLogs.map(toFuelLog),
+    navigationLogs: ctx.navigationLogs.map(toNavigationLog),
+    portOptions: ctx.portOptions,
+    crewMemberOptions: ctx.crewMemberOptions,
+    canManageMaintenance: ctx.canManageMaintenance,
     canDeleteIncidents: ctx.canDeleteIncidents,
     canCreateFuelLogs: ctx.canCreateFuelLogs,
     canDeleteFuelLogs: ctx.canDeleteFuelLogs,
     canCreateNavigationLogs: ctx.canCreateNavigationLogs,
     canUpdateNavigationLogs: ctx.canUpdateNavigationLogs,
     canDeleteNavigationLogs: ctx.canDeleteNavigationLogs,
-    aiSuggestions: ctx.aiSuggestions,
   }
 }
 
@@ -140,7 +153,10 @@ function toFuelLog(log: BoatFuelLog): FuelLogRow {
   }
 }
 
-function toBoatDetail(boat: Boat, ctx: Pick<BoatShowContext, 'positionHistory' | 'boatMedia'>) {
+function toBoatDetail(
+  boat: Boat,
+  ctx: Pick<BoatManageContext | BoatNavigationContext, 'positionHistory' | 'boatMedia'>
+) {
   return {
     id: boat.id,
     name: boat.name,

@@ -12,9 +12,13 @@
   "myBoats": "My boats",
   "unknownUser": "User",
   "crew": "Crew members",
+  "logbook": "Logbook",
+  "fuel": "Fuel",
+  "incidents": "Incidents",
   "sections": {
     "fleet": "FLEET",
     "maintenance": "MAINTENANCE",
+    "navigation": "NAVIGATION",
     "preferences": "PREFERENCES"
   }
 }

@@ -7,7 +7,7 @@ import BoatFuelLogService from '#services/boat_fuel_log_service'
 import BoatListService from '#services/boat_list_service'
 import NavigationLogService from '#services/navigation_log_service'
 import CrewService from '#services/crew_service'
-import { toEditForm, toShowProps } from '#transformers/boat_transformer'
+import { toEditForm, toManageProps, toNavigationProps } from '#transformers/boat_transformer'
 import { toPortFormOptions } from '#transformers/port_transformer'
 import BoatIncidentService from '#services/boat_incident_service'
 import BoatMaintenanceService from '#services/boat_maintenance_service'
@@ -130,16 +130,73 @@ export default class BoatsController {
         maintenanceEvents,
         maintenanceTasks,
         maintenanceSheets,
-        incidents,
-        fuelLogs,
         boatMedia,
         positionHistory,
         latestSuggestions,
         canManageMaintenance,
+        boatDocuments,
+      ] = await Promise.all([
+        this.maintenanceService.listForBoat(user, boat),
+        this.taskService.listForBoat(user, boat),
+        this.sheetService.listForBoat(user, boat),
+        this.mediaService.listForEntity('boat', boat.id),
+        this.boatService.getPositionHistory(boat.id),
+        this.aiAnalysisService.getLatestBoatSuggestions(user.id, boat.id),
+        bouncer.with(BoatPolicy).allows('edit', boat),
+        this.documentService.listForBoat(user, boat),
+      ])
+
+      const canManageEquipment = canManageMaintenance
+      const canManageDocuments = canManageMaintenance
+      const canExport = user.organization ? this.quotaService.canExport(user.organization) : false
+      const aiSuggestions: AiSuggestion[] | null = latestSuggestions
+        ? (JSON.parse(latestSuggestions.responseText) as AiSuggestion[])
+        : null
+
+      return inertia.render(
+        'boats/show',
+        toManageProps(boat, {
+          positionHistory,
+          boatMedia,
+          maintenanceEvents,
+          maintenanceTasks,
+          maintenanceSheets,
+          boatDocuments,
+          aiSuggestions,
+          canManageMaintenance,
+          canManageEquipment,
+          canManageDocuments,
+          canExport,
+        })
+      )
+    } catch (error) {
+      if (error instanceof BoatNotFoundError) {
+        response.redirect('/boats')
+        return
+      }
+      throw error
+    }
+  }
+
+  async navigation({ inertia, params, auth, response, bouncer }: HttpContext) {
+    await auth.authenticate()
+    const user = auth.getUserOrFail()
+
+    try {
+      const boat = await this.boatService.getFullDetailForUser(user, Number(params.id))
+      await bouncer.with(BoatPolicy).authorize('view', boat)
+
+      await user.load('organization')
+
+      const [
+        incidents,
+        fuelLogs,
+        boatMedia,
+        positionHistory,
+        canManageMaintenance,
         canDeleteIncidents,
         canCreateFuelLogs,
         canDeleteFuelLogs,
-        boatDocuments,
         crewMemberOptions,
         navigationLogs,
         ports,
@@ -147,19 +204,14 @@ export default class BoatsController {
         canUpdateNavigationLogs,
         canDeleteNavigationLogs,
       ] = await Promise.all([
-        this.maintenanceService.listForBoat(user, boat),
-        this.taskService.listForBoat(user, boat),
-        this.sheetService.listForBoat(user, boat),
         this.incidentService.listForBoat(user, boat),
         this.fuelLogService.listForBoat(user, boat),
         this.mediaService.listForEntity('boat', boat.id),
         this.boatService.getPositionHistory(boat.id),
-        this.aiAnalysisService.getLatestBoatSuggestions(user.id, boat.id),
         bouncer.with(BoatPolicy).allows('edit', boat),
         bouncer.with(IncidentPolicy).allows('delete', boat),
         bouncer.with(FuelLogPolicy).allows('create', boat),
         bouncer.with(FuelLogPolicy).allows('delete', boat),
-        this.documentService.listForBoat(user, boat),
         this.crewService.listOptionsForOrganization(user.organization),
         this.navigationLogService.listForBoat(boat),
         this.portService.listNamesForOrg(user),
@@ -170,31 +222,17 @@ export default class BoatsController {
 
       const portOptions = ports.map((p) => ({ id: p.id, name: p.name }))
 
-      const canManageEquipment = canManageMaintenance
-      const canManageDocuments = canManageMaintenance
-      const canExport = user.organization ? this.quotaService.canExport(user.organization) : false
-      const aiSuggestions: AiSuggestion[] | null = latestSuggestions
-        ? (JSON.parse(latestSuggestions.responseText) as AiSuggestion[])
-        : null
       return inertia.render(
-        'boats/show',
-        toShowProps(boat, {
+        'boats/navigation',
+        toNavigationProps(boat, {
           positionHistory,
           boatMedia,
-          maintenanceEvents,
-          maintenanceTasks,
-          maintenanceSheets,
           incidents,
           fuelLogs,
           navigationLogs,
           portOptions,
           crewMemberOptions,
-          boatDocuments,
-          aiSuggestions,
           canManageMaintenance,
-          canManageEquipment,
-          canManageDocuments,
-          canExport,
           canDeleteIncidents,
           canCreateFuelLogs,
           canDeleteFuelLogs,
