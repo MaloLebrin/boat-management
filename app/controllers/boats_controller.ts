@@ -158,7 +158,7 @@ export default class BoatsController {
         bouncer.with(FuelLogPolicy).allows('create', boat),
         bouncer.with(FuelLogPolicy).allows('delete', boat),
         bouncer.with(NavigationLogPolicy).allows('create', boat),
-        bouncer.with(NavigationLogPolicy).allows('delete', boat),
+        bouncer.with(NavigationLogPolicy).allows('delete'),
         this.documentService.listForBoat(user, boat),
       ])
 

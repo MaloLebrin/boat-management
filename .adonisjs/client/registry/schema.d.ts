@@ -703,6 +703,42 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_fuel_logs_controller').default['destroy']>>>
     }
   }
+  'boats.navigationLogs.store': {
+    methods: ["POST"]
+    pattern: '/boats/:boatId/navigation-logs'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/navigation_log').createNavigationLogValidator)>>
+      paramsTuple: [ParamValue]
+      params: { boatId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/navigation_log').createNavigationLogValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/navigation_logs_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/navigation_logs_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'boats.navigationLogs.close': {
+    methods: ["PATCH"]
+    pattern: '/boats/:boatId/navigation-logs/:logId/close'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/navigation_log').closeNavigationLogValidator)>>
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; logId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/navigation_log').closeNavigationLogValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/navigation_logs_controller').default['close']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/navigation_logs_controller').default['close']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'boats.navigationLogs.destroy': {
+    methods: ["DELETE"]
+    pattern: '/boats/:boatId/navigation-logs/:logId'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; logId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/navigation_logs_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/navigation_logs_controller').default['destroy']>>>
+    }
+  }
   'boats.adminDocuments.store': {
     methods: ["POST"]
     pattern: '/boats/:boatId/admin-documents'
@@ -1565,6 +1601,90 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/dev/pdf_previews_controller').default['show']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dev/pdf_previews_controller').default['show']>>>
+    }
+  }
+  'notifications.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/notifications'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: ExtractQueryForGet<InferInput<(typeof import('#validators/notification').notificationPageValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/notifications_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/notifications_controller').default['index']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'notifications.markAllAsRead': {
+    methods: ["PATCH"]
+    pattern: '/notifications/read-all'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/notifications_controller').default['markAllAsRead']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/notifications_controller').default['markAllAsRead']>>>
+    }
+  }
+  'notifications.markAsRead': {
+    methods: ["PATCH"]
+    pattern: '/notifications/:id/read'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/notifications_controller').default['markAsRead']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/notifications_controller').default['markAsRead']>>>
+    }
+  }
+  'notifications.destroy': {
+    methods: ["DELETE"]
+    pattern: '/notifications/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/notifications_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/notifications_controller').default['destroy']>>>
+    }
+  }
+  'event_stream': {
+    methods: ["GET","HEAD"]
+    pattern: '/__transmit/events'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'subscribe': {
+    methods: ["POST"]
+    pattern: '/__transmit/subscribe'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'unsubscribe': {
+    methods: ["POST"]
+    pattern: '/__transmit/unsubscribe'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
     }
   }
   'new_account.create': {

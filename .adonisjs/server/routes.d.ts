@@ -62,6 +62,9 @@ export type ScannedRoutes = {
     'boats.simulator': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.fuelLogs.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'boats.fuelLogs.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue} }
+    'boats.navigationLogs.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
+    'boats.navigationLogs.close': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue} }
+    'boats.navigationLogs.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue} }
     'boats.adminDocuments.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'boats.adminDocuments.update': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'documentId': ParamValue} }
     'boats.adminDocuments.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'documentId': ParamValue} }
@@ -134,6 +137,13 @@ export type ScannedRoutes = {
     'mail_previews.show': { paramsTuple: [ParamValue]; params: {'name': ParamValue} }
     'pdf_previews.index': { paramsTuple?: []; params?: {} }
     'pdf_previews.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'notifications.index': { paramsTuple?: []; params?: {} }
+    'notifications.markAllAsRead': { paramsTuple?: []; params?: {} }
+    'notifications.markAsRead': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'notifications.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'event_stream': { paramsTuple?: []; params?: {} }
+    'subscribe': { paramsTuple?: []; params?: {} }
+    'unsubscribe': { paramsTuple?: []; params?: {} }
     'new_account.create': { paramsTuple?: []; params?: {} }
     'new_account.store': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }
@@ -200,6 +210,8 @@ export type ScannedRoutes = {
     'mail_previews.show': { paramsTuple: [ParamValue]; params: {'name': ParamValue} }
     'pdf_previews.index': { paramsTuple?: []; params?: {} }
     'pdf_previews.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'notifications.index': { paramsTuple?: []; params?: {} }
+    'event_stream': { paramsTuple?: []; params?: {} }
     'new_account.create': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }
     'password.forgot': { paramsTuple?: []; params?: {} }
@@ -257,6 +269,8 @@ export type ScannedRoutes = {
     'mail_previews.show': { paramsTuple: [ParamValue]; params: {'name': ParamValue} }
     'pdf_previews.index': { paramsTuple?: []; params?: {} }
     'pdf_previews.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'notifications.index': { paramsTuple?: []; params?: {} }
+    'event_stream': { paramsTuple?: []; params?: {} }
     'new_account.create': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }
     'password.forgot': { paramsTuple?: []; params?: {} }
@@ -277,6 +291,7 @@ export type ScannedRoutes = {
     'boats.maintenanceSheets.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'boats.incidents.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'boats.fuelLogs.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
+    'boats.navigationLogs.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'boats.adminDocuments.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'ports.store': { paramsTuple?: []; params?: {} }
     'ports.pontoons.store': { paramsTuple: [ParamValue]; params: {'portId': ParamValue} }
@@ -295,6 +310,8 @@ export type ScannedRoutes = {
     'organization.invitations.store': { paramsTuple?: []; params?: {} }
     'invitations.accept': { paramsTuple?: []; params?: {} }
     'webhooks.stripe': { paramsTuple?: []; params?: {} }
+    'subscribe': { paramsTuple?: []; params?: {} }
+    'unsubscribe': { paramsTuple?: []; params?: {} }
     'new_account.store': { paramsTuple?: []; params?: {} }
     'session.store': { paramsTuple?: []; params?: {} }
     'password_reset.store': { paramsTuple?: []; params?: {} }
@@ -342,6 +359,7 @@ export type ScannedRoutes = {
     'boats.maintenanceSheets.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'sheetId': ParamValue} }
     'boats.incidents.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'incidentId': ParamValue} }
     'boats.fuelLogs.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue} }
+    'boats.navigationLogs.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue} }
     'boats.adminDocuments.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'documentId': ParamValue} }
     'ports.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'ports.pontoons.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'pontoonId': ParamValue} }
@@ -350,13 +368,17 @@ export type ScannedRoutes = {
     'settings.branding.logo.delete': { paramsTuple?: []; params?: {} }
     'organization.members.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'organization.invitations.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'notifications.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   PATCH: {
     'boats.assign': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boat_equipment.update_engine_status': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
     'boat_equipment.update_engine_notes': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
+    'boats.navigationLogs.close': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue} }
     'ports.pontoons.updatePosition': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'pontoonId': ParamValue} }
     'ports.mouillages.updatePosition': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'mouillageId': ParamValue} }
+    'notifications.markAllAsRead': { paramsTuple?: []; params?: {} }
+    'notifications.markAsRead': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
 }
 declare module '@adonisjs/core/types/http' {

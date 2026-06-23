@@ -118,7 +118,7 @@ export default class NavigationLogsController {
       throw error
     }
 
-    await bouncer.with(NavigationLogPolicy).authorize('delete', boat)
+    await bouncer.with(NavigationLogPolicy).authorize('delete')
 
     try {
       await this.navigationLogService.deleteForBoat(user, boat, Number(params.logId))
