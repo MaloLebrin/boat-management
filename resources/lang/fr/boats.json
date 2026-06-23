@@ -34,7 +34,10 @@
     "pontoon": "Ponton",
     "mouillage": "Mouillage",
     "spotIdentifier": "N° d'emplacement",
-    "selectPlaceholder": "Sélectionner…"
+    "selectPlaceholder": "Sélectionner…",
+    "aisSection": "Identification AIS",
+    "mmsi": "MMSI (9 chiffres)",
+    "imoNumber": "N° IMO"
   },
   "engines": {
     "title": "Moteurs",
@@ -280,7 +283,13 @@
       "history": "Historique des positions",
       "arrivedOn": "Depuis le",
       "leftOn": "Jusqu'au",
-      "noHistory": "Aucun historique de position."
+      "noHistory": "Aucun historique de position.",
+      "setGps": "Définir position GPS",
+      "gpsCoords": "Coordonnées GPS :",
+      "manualTitle": "Saisir une position manuelle",
+      "latitude": "Latitude",
+      "longitude": "Longitude",
+      "saveGps": "Enregistrer la position"
     }
   },
   "specs": {

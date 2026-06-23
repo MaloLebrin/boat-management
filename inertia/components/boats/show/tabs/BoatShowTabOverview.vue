@@ -72,6 +72,13 @@ const currentPositionLabel = computed(() => {
   }
   return props.boat.homePort ?? null
 })
+
+const latestGpsPosition = computed(() => {
+  const entry = props.boat.positionHistory.find(
+    (h) => h.latitude !== null && h.longitude !== null && h.endedAt === null
+  )
+  return entry ?? null
+})
 </script>
 
 <template>
@@ -95,7 +102,12 @@ const currentPositionLabel = computed(() => {
 
     <div class="w-full space-y-6 lg:w-72">
       <BoatOverviewAiPanel :boat-id="boat.id" :ai-suggestions="aiSuggestions" />
-      <BoatOverviewPositionCard :position-label="currentPositionLabel" />
+      <BoatOverviewPositionCard
+        :position-label="currentPositionLabel"
+        :boat-id="boat.id"
+        :can-manage="canManage"
+        :latest-gps-position="latestGpsPosition"
+      />
       <BoatSimulatorCard :boat-id="boat.id" />
     </div>
   </div>

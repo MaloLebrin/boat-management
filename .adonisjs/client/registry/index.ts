@@ -402,6 +402,12 @@ const routes = {
     tokens: [{"old":"/boats/:boatId/admin-documents/:documentId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/admin-documents/:documentId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/admin-documents/:documentId","type":0,"val":"admin-documents","end":""},{"old":"/boats/:boatId/admin-documents/:documentId","type":1,"val":"documentId","end":""}],
     types: placeholder as Registry['boats.adminDocuments.destroy']['types'],
   },
+  'boats.position.store': {
+    methods: ["POST"],
+    pattern: '/boats/:boatId/position',
+    tokens: [{"old":"/boats/:boatId/position","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/position","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/position","type":0,"val":"position","end":""}],
+    types: placeholder as Registry['boats.position.store']['types'],
+  },
   'ports.index': {
     methods: ["GET","HEAD"],
     pattern: '/ports',

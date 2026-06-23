@@ -123,6 +123,9 @@ export default class BoatHullService {
       flagCountry: payload.flagCountry ?? null,
       maxPersons: payload.maxPersons ?? null,
 
+      mmsi: payload.mmsi ?? null,
+      imoNumber: payload.imoNumber ?? null,
+
       spotId: payload.spotId ?? null,
     })
 
@@ -167,6 +170,9 @@ export default class BoatHullService {
     boat.francisationNumber = payload.francisationNumber ?? null
     boat.flagCountry = payload.flagCountry ?? null
     boat.maxPersons = payload.maxPersons ?? null
+
+    if (payload.mmsi !== undefined) boat.mmsi = payload.mmsi ?? null
+    if (payload.imoNumber !== undefined) boat.imoNumber = payload.imoNumber ?? null
 
     if (payload.spotId !== undefined) {
       const newSpotId = payload.spotId ?? null

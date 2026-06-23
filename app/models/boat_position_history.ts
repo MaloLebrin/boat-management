@@ -16,6 +16,21 @@ export default class BoatPositionHistory extends BaseModel {
   @column()
   declare spotId: number | null
 
+  @column()
+  declare latitude: number | null
+
+  @column()
+  declare longitude: number | null
+
+  @column()
+  declare speedKnots: number | null
+
+  @column()
+  declare headingDegrees: number | null
+
+  @column()
+  declare source: 'manual' | 'ais' | 'gps'
+
   @column.dateTime()
   declare startedAt: DateTime
 

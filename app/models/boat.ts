@@ -80,6 +80,12 @@ export default class Boat extends BaseModel {
   declare maxPersons: number | null
 
   @column()
+  declare mmsi: string | null
+
+  @column()
+  declare imoNumber: string | null
+
+  @column()
   declare spotId: number | null
 
   @column.dateTime({ autoCreate: true })

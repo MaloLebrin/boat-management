@@ -34,7 +34,10 @@
     "pontoon": "Pontoon",
     "mouillage": "Anchorage",
     "spotIdentifier": "Berth number",
-    "selectPlaceholder": "Select…"
+    "selectPlaceholder": "Select…",
+    "aisSection": "AIS Identification",
+    "mmsi": "MMSI (9 digits)",
+    "imoNumber": "IMO number"
   },
   "engines": {
     "title": "Engines",
@@ -280,7 +283,13 @@
       "history": "Position history",
       "arrivedOn": "Since",
       "leftOn": "Until",
-      "noHistory": "No position history yet."
+      "noHistory": "No position history yet.",
+      "setGps": "Set GPS position",
+      "gpsCoords": "GPS coordinates:",
+      "manualTitle": "Enter a manual position",
+      "latitude": "Latitude",
+      "longitude": "Longitude",
+      "saveGps": "Save position"
     }
   },
   "specs": {

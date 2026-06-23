@@ -71,6 +71,14 @@ export const createBoatValidator = vine.create({
   flagCountry: vine.string().trim().maxLength(8).nullable().optional(),
   maxPersons: vine.number().withoutDecimals().positive().nullable().optional(),
 
+  mmsi: vine
+    .string()
+    .trim()
+    .regex(/^\d{9}$/)
+    .nullable()
+    .optional(),
+  imoNumber: vine.string().trim().maxLength(20).nullable().optional(),
+
   spotId: vine.number().withoutDecimals().positive().nullable().optional(),
 })
 
@@ -101,6 +109,19 @@ export const updateBoatValidator = vine.create(
     flagCountry: vine.string().trim().maxLength(8).nullable().optional(),
     maxPersons: vine.number().withoutDecimals().positive().nullable().optional(),
 
+    mmsi: vine
+      .string()
+      .trim()
+      .regex(/^\d{9}$/)
+      .nullable()
+      .optional(),
+    imoNumber: vine.string().trim().maxLength(20).nullable().optional(),
+
     spotId: vine.number().withoutDecimals().positive().nullable().optional(),
   })
 )
+
+export const updateBoatPositionValidator = vine.create({
+  latitude: vine.number().range([-90, 90]),
+  longitude: vine.number().range([-180, 180]),
+})

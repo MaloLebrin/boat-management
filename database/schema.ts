@@ -271,8 +271,8 @@ export class BoatIncidentSchema extends BaseModel {
     'createdAt',
     'description',
     'id',
-    'insuranceClaimed',
     'insuranceClaimRef',
+    'insuranceClaimed',
     'location',
     'occurredAt',
     'organizationId',
@@ -292,9 +292,9 @@ export class BoatIncidentSchema extends BaseModel {
   @column({ isPrimary: true })
   declare id: number
   @column()
-  declare insuranceClaimed: boolean
-  @column()
   declare insuranceClaimRef: string | null
+  @column()
+  declare insuranceClaimed: boolean
   @column()
   declare location: string | null
   @column.dateTime()
@@ -521,8 +521,13 @@ export class BoatPositionHistorySchema extends BaseModel {
     'boatId',
     'createdAt',
     'endedAt',
+    'headingDegrees',
     'id',
+    'latitude',
+    'longitude',
     'notes',
+    'source',
+    'speedKnots',
     'spotId',
     'startedAt',
     'updatedAt',
@@ -534,10 +539,20 @@ export class BoatPositionHistorySchema extends BaseModel {
   declare createdAt: DateTime
   @column.dateTime()
   declare endedAt: DateTime | null
+  @column()
+  declare headingDegrees: number | null
   @column({ isPrimary: true })
   declare id: number
   @column()
+  declare latitude: string | null
+  @column()
+  declare longitude: string | null
+  @column()
   declare notes: string | null
+  @column()
+  declare source: string
+  @column()
+  declare speedKnots: string | null
   @column()
   declare spotId: number | null
   @column.dateTime()
@@ -665,11 +680,13 @@ export class BoatSchema extends BaseModel {
     'hullIdentificationNumber',
     'hullMaterial',
     'id',
+    'imoNumber',
     'lengthM',
     'manufacturedAt',
     'manufacturer',
     'mastHeightM',
     'maxPersons',
+    'mmsi',
     'model',
     'name',
     'navigationCategory',
@@ -701,6 +718,8 @@ export class BoatSchema extends BaseModel {
   @column({ isPrimary: true })
   declare id: number
   @column()
+  declare imoNumber: string | null
+  @column()
   declare lengthM: number | null
   @column.date()
   declare manufacturedAt: DateTime | null
@@ -710,6 +729,8 @@ export class BoatSchema extends BaseModel {
   declare mastHeightM: number | null
   @column()
   declare maxPersons: number | null
+  @column()
+  declare mmsi: string | null
   @column()
   declare model: string | null
   @column()
@@ -730,6 +751,66 @@ export class BoatSchema extends BaseModel {
   declare updatedAt: DateTime | null
   @column()
   declare yearBuilt: number | null
+}
+
+export class CrewCertificationSchema extends BaseModel {
+  static $columns = [
+    'createdAt',
+    'crewMemberId',
+    'expiresAt',
+    'id',
+    'referenceNumber',
+    'type',
+    'updatedAt',
+  ] as const
+  $columns = CrewCertificationSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare crewMemberId: number
+  @column.date()
+  declare expiresAt: DateTime | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare referenceNumber: string | null
+  @column()
+  declare type: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class CrewMemberSchema extends BaseModel {
+  static $columns = [
+    'createdAt',
+    'email',
+    'firstName',
+    'id',
+    'lastName',
+    'notes',
+    'organizationId',
+    'phone',
+    'updatedAt',
+  ] as const
+  $columns = CrewMemberSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare email: string | null
+  @column()
+  declare firstName: string
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare lastName: string
+  @column()
+  declare notes: string | null
+  @column()
+  declare organizationId: number
+  @column()
+  declare phone: string | null
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
 }
 
 export class MediaSchema extends BaseModel {
@@ -814,6 +895,124 @@ export class MouillageSchema extends BaseModel {
   declare positionY: number | null
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
+}
+
+export class NavigationLogCrewSchema extends BaseModel {
+  static $columns = ['crewMemberId', 'id', 'navigationLogId', 'role'] as const
+  $columns = NavigationLogCrewSchema.$columns
+  @column()
+  declare crewMemberId: number
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare navigationLogId: number
+  @column()
+  declare role: string
+}
+
+export class NavigationLogSchema extends BaseModel {
+  static $columns = [
+    'arrivalPortId',
+    'arrivalPortName',
+    'arrivedAt',
+    'boatId',
+    'createdAt',
+    'crewCount',
+    'departedAt',
+    'departurePortId',
+    'departurePortName',
+    'distanceNm',
+    'engineHoursEnd',
+    'engineHoursStart',
+    'fuelConsumedLiters',
+    'id',
+    'notes',
+    'organizationId',
+    'seaState',
+    'status',
+    'updatedAt',
+    'windForceBeaufort',
+  ] as const
+  $columns = NavigationLogSchema.$columns
+  @column()
+  declare arrivalPortId: number | null
+  @column()
+  declare arrivalPortName: string | null
+  @column.dateTime()
+  declare arrivedAt: DateTime | null
+  @column()
+  declare boatId: number
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare crewCount: number | null
+  @column.dateTime()
+  declare departedAt: DateTime
+  @column()
+  declare departurePortId: number | null
+  @column()
+  declare departurePortName: string | null
+  @column()
+  declare distanceNm: string | null
+  @column()
+  declare engineHoursEnd: string | null
+  @column()
+  declare engineHoursStart: string | null
+  @column()
+  declare fuelConsumedLiters: string | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare notes: string | null
+  @column()
+  declare organizationId: number
+  @column()
+  declare seaState: string | null
+  @column()
+  declare status: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare windForceBeaufort: number | null
+}
+
+export class NotificationSchema extends BaseModel {
+  static $columns = [
+    'actionUrl',
+    'body',
+    'createdAt',
+    'id',
+    'metadata',
+    'organizationId',
+    'readAt',
+    'severity',
+    'title',
+    'type',
+    'userId',
+  ] as const
+  $columns = NotificationSchema.$columns
+  @column()
+  declare actionUrl: string | null
+  @column()
+  declare body: string | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare metadata: any | null
+  @column()
+  declare organizationId: number
+  @column.dateTime()
+  declare readAt: DateTime | null
+  @column()
+  declare severity: string
+  @column()
+  declare title: string
+  @column()
+  declare type: string
+  @column()
+  declare userId: number
 }
 
 export class OrganizationInvitationSchema extends BaseModel {
