@@ -19,7 +19,7 @@ export default class NavigationLogPolicy extends BasePolicy {
   }
 
   // Intentionally false: only admins may delete, handled by the before() hook above.
-  delete(user: User, boat: Boat): AuthorizerResponse {
+  delete(): AuthorizerResponse {
     return false
   }
 }
