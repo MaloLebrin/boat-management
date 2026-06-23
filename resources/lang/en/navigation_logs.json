@@ -1,0 +1,50 @@
+{
+  "tab": "Logbook",
+  "empty": "No trips recorded.",
+  "add": "+ New trip",
+  "count": "{count, plural, one {# trip} other {# trips}}",
+  "inProgress": "In progress",
+  "completed": "Completed",
+  "close": "Close trip",
+  "deleteConfirm": "Delete this trip?",
+  "distanceSuffix": "nm",
+  "engineHoursSuffix": "engine h",
+  "engineHoursStartLabel": "engine h:",
+  "beaufortSuffix": "Bf",
+  "crew": "{count, plural, one {# crew} other {# crew}}",
+  "seaState": {
+    "calm": "Calm",
+    "slight": "Slight",
+    "moderate": "Moderate",
+    "rough": "Rough",
+    "very_rough": "Very rough"
+  },
+  "fields": {
+    "departedAt": "Departure",
+    "arrivedAt": "Arrival",
+    "departurePort": "Departure port",
+    "arrivalPort": "Arrival port",
+    "departurePortId": "Departure port (existing)",
+    "departurePortName": "Or free text name",
+    "arrivalPortId": "Arrival port (existing)",
+    "arrivalPortName": "Or free text name",
+    "distanceNm": "Distance (nautical miles, optional)",
+    "engineHoursStart": "Engine hours at departure (optional)",
+    "engineHoursEnd": "Engine hours at arrival (optional)",
+    "fuelConsumedLiters": "Fuel consumed (L, optional)",
+    "windForceBeaufort": "Wind force (Beaufort 0–12, optional)",
+    "seaState": "Sea state (optional)",
+    "crewCount": "Crew count (optional)",
+    "notes": "Notes (optional)",
+    "noPort": "None / unspecified",
+    "selectSeaState": "Select…"
+  },
+  "form": {
+    "createTitle": "New trip",
+    "closeTitle": "Close trip",
+    "submit": "Save",
+    "submitClose": "Close trip",
+    "cancel": "Cancel",
+    "delete": "Delete"
+  }
+}

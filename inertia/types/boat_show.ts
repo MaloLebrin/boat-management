@@ -181,6 +181,12 @@ export type MaintenanceSheetRow = {
 
 export type { IncidentType, IncidentStatus, BoatIncidentRow } from '../../shared/types/incident'
 export type { FuelLogRow } from '../../shared/types/fuel_log'
+export type {
+  NavigationLogRow,
+  NavigationLogStatus,
+  SeaState,
+  NavigationLogPortOption,
+} from '../../shared/types/navigation_log'
 
 export type AiSuggestion = { text: string }
 

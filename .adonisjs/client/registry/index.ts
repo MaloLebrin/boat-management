@@ -354,6 +354,24 @@ const routes = {
     tokens: [{"old":"/boats/:boatId/fuel-logs/:logId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/fuel-logs/:logId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/fuel-logs/:logId","type":0,"val":"fuel-logs","end":""},{"old":"/boats/:boatId/fuel-logs/:logId","type":1,"val":"logId","end":""}],
     types: placeholder as Registry['boats.fuelLogs.destroy']['types'],
   },
+  'boats.navigationLogs.store': {
+    methods: ["POST"],
+    pattern: '/boats/:boatId/navigation-logs',
+    tokens: [{"old":"/boats/:boatId/navigation-logs","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/navigation-logs","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/navigation-logs","type":0,"val":"navigation-logs","end":""}],
+    types: placeholder as Registry['boats.navigationLogs.store']['types'],
+  },
+  'boats.navigationLogs.close': {
+    methods: ["PATCH"],
+    pattern: '/boats/:boatId/navigation-logs/:logId/close',
+    tokens: [{"old":"/boats/:boatId/navigation-logs/:logId/close","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/navigation-logs/:logId/close","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/navigation-logs/:logId/close","type":0,"val":"navigation-logs","end":""},{"old":"/boats/:boatId/navigation-logs/:logId/close","type":1,"val":"logId","end":""},{"old":"/boats/:boatId/navigation-logs/:logId/close","type":0,"val":"close","end":""}],
+    types: placeholder as Registry['boats.navigationLogs.close']['types'],
+  },
+  'boats.navigationLogs.destroy': {
+    methods: ["DELETE"],
+    pattern: '/boats/:boatId/navigation-logs/:logId',
+    tokens: [{"old":"/boats/:boatId/navigation-logs/:logId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/navigation-logs/:logId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/navigation-logs/:logId","type":0,"val":"navigation-logs","end":""},{"old":"/boats/:boatId/navigation-logs/:logId","type":1,"val":"logId","end":""}],
+    types: placeholder as Registry['boats.navigationLogs.destroy']['types'],
+  },
   'boats.adminDocuments.store': {
     methods: ["POST"],
     pattern: '/boats/:boatId/admin-documents',
@@ -785,6 +803,48 @@ const routes = {
     pattern: '/dev/pdfs/:id',
     tokens: [{"old":"/dev/pdfs/:id","type":0,"val":"dev","end":""},{"old":"/dev/pdfs/:id","type":0,"val":"pdfs","end":""},{"old":"/dev/pdfs/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['pdf_previews.show']['types'],
+  },
+  'notifications.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/notifications',
+    tokens: [{"old":"/notifications","type":0,"val":"notifications","end":""}],
+    types: placeholder as Registry['notifications.index']['types'],
+  },
+  'notifications.markAllAsRead': {
+    methods: ["PATCH"],
+    pattern: '/notifications/read-all',
+    tokens: [{"old":"/notifications/read-all","type":0,"val":"notifications","end":""},{"old":"/notifications/read-all","type":0,"val":"read-all","end":""}],
+    types: placeholder as Registry['notifications.markAllAsRead']['types'],
+  },
+  'notifications.markAsRead': {
+    methods: ["PATCH"],
+    pattern: '/notifications/:id/read',
+    tokens: [{"old":"/notifications/:id/read","type":0,"val":"notifications","end":""},{"old":"/notifications/:id/read","type":1,"val":"id","end":""},{"old":"/notifications/:id/read","type":0,"val":"read","end":""}],
+    types: placeholder as Registry['notifications.markAsRead']['types'],
+  },
+  'notifications.destroy': {
+    methods: ["DELETE"],
+    pattern: '/notifications/:id',
+    tokens: [{"old":"/notifications/:id","type":0,"val":"notifications","end":""},{"old":"/notifications/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['notifications.destroy']['types'],
+  },
+  'event_stream': {
+    methods: ["GET","HEAD"],
+    pattern: '/__transmit/events',
+    tokens: [{"old":"/__transmit/events","type":0,"val":"__transmit","end":""},{"old":"/__transmit/events","type":0,"val":"events","end":""}],
+    types: placeholder as Registry['event_stream']['types'],
+  },
+  'subscribe': {
+    methods: ["POST"],
+    pattern: '/__transmit/subscribe',
+    tokens: [{"old":"/__transmit/subscribe","type":0,"val":"__transmit","end":""},{"old":"/__transmit/subscribe","type":0,"val":"subscribe","end":""}],
+    types: placeholder as Registry['subscribe']['types'],
+  },
+  'unsubscribe': {
+    methods: ["POST"],
+    pattern: '/__transmit/unsubscribe',
+    tokens: [{"old":"/__transmit/unsubscribe","type":0,"val":"__transmit","end":""},{"old":"/__transmit/unsubscribe","type":0,"val":"unsubscribe","end":""}],
+    types: placeholder as Registry['unsubscribe']['types'],
   },
   'new_account.create': {
     methods: ["GET","HEAD"],

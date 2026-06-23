@@ -30,6 +30,7 @@ export const controllers = {
   MaintenanceLogPdf: () => import('#controllers/maintenance_log_pdf_controller'),
   Marketing: () => import('#controllers/marketing_controller'),
   Mouillages: () => import('#controllers/mouillages_controller'),
+  NavigationLogs: () => import('#controllers/navigation_logs_controller'),
   NewAccount: () => import('#controllers/new_account_controller'),
   Notifications: () => import('#controllers/notifications_controller'),
   OrganizationInvitations: () => import('#controllers/organization_invitations_controller'),

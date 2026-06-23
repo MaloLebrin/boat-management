@@ -5,16 +5,7 @@ import BaseBreadcrumb from '~/components/base/BaseBreadcrumb.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseTabs from '~/components/base/BaseTabs.vue'
-import BoatShowTabAdminDocs from '~/components/boats/show/tabs/BoatShowTabAdminDocs.vue'
-import BoatShowTabDocuments from '~/components/boats/show/tabs/BoatShowTabDocuments.vue'
-import BoatShowTabEquipment from '~/components/boats/show/tabs/BoatShowTabEquipment.vue'
-import BoatShowTabHistory from '~/components/boats/show/tabs/BoatShowTabHistory.vue'
-import BoatShowTabFuelLogs from '~/components/boats/show/tabs/BoatShowTabFuelLogs.vue'
-import BoatShowTabIncidents from '~/components/boats/show/tabs/BoatShowTabIncidents.vue'
-import BoatShowTabOverview from '~/components/boats/show/tabs/BoatShowTabOverview.vue'
-import BoatShowTabSpecs from '~/components/boats/show/tabs/BoatShowTabSpecs.vue'
-import BoatShowTabSheets from '~/components/boats/show/tabs/BoatShowTabSheets.vue'
-import BoatShowTabTasks from '~/components/boats/show/tabs/BoatShowTabTasks.vue'
+import BoatShowTabContent from '~/components/boats/show/BoatShowTabContent.vue'
 import { useT } from '~/composables/use_t'
 import type {
   AiSuggestion,
@@ -25,6 +16,8 @@ import type {
   MaintenanceEventRow,
   MaintenanceSheetRow,
   MaintenanceTaskRow,
+  NavigationLogRow,
+  NavigationLogPortOption,
 } from '~/types/boat_show'
 
 const { t } = useT()
@@ -36,6 +29,8 @@ const props = defineProps<{
   maintenanceSheets: MaintenanceSheetRow[]
   incidents: BoatIncidentRow[]
   fuelLogs: FuelLogRow[]
+  navigationLogs: NavigationLogRow[]
+  portOptions: NavigationLogPortOption[]
   boatDocuments: BoatDocumentRow[]
   canManageMaintenance: boolean
   canManageEquipment: boolean
@@ -44,6 +39,9 @@ const props = defineProps<{
   canDeleteIncidents: boolean
   canCreateFuelLogs: boolean
   canDeleteFuelLogs: boolean
+  canCreateNavigationLogs: boolean
+  canUpdateNavigationLogs: boolean
+  canDeleteNavigationLogs: boolean
   aiSuggestions: AiSuggestion[] | null
 }>()
 
@@ -57,6 +55,7 @@ type TabKey =
   | 'sheets'
   | 'incidents'
   | 'fuel'
+  | 'navigation-logs'
   | 'admin-docs'
 
 const tab = ref<TabKey>('overview')
@@ -124,6 +123,7 @@ const tabs = computed(() => [
     badge: openIncidents.value.length > 0 ? String(openIncidents.value.length) : undefined,
   },
   { key: 'fuel', label: t('fuel_logs.tab') },
+  { key: 'navigation-logs', label: t('navigation_logs.tab') },
   {
     key: 'admin-docs',
     label: t('boats.show.tabs.adminDocs'),
@@ -218,78 +218,12 @@ function openTasksTab() {
       <BaseTabs v-model="tab" :tabs="tabs" />
     </header>
 
-    <Transition name="tab" mode="out-in">
-      <div :key="tab" class="mt-8">
-        <BoatShowTabOverview
-          v-if="tab === 'overview'"
-          :boat="boat"
-          :maintenance-tasks="maintenanceTasks"
-          :maintenance-events="maintenanceEvents"
-          :can-manage="canManageEquipment"
-          :ai-suggestions="aiSuggestions"
-          @go-to-tab="goToTab"
-        />
-
-        <BoatShowTabSpecs v-else-if="tab === 'specs'" :boat="boat" />
-
-        <BoatShowTabEquipment
-          v-else-if="tab === 'equipment'"
-          :boat="boat"
-          :can-manage-equipment="canManageEquipment"
-        />
-
-        <BoatShowTabHistory
-          v-else-if="tab === 'history'"
-          :boat="boat"
-          :maintenance-events="maintenanceEvents"
-          :can-manage-maintenance="canManageMaintenance"
-          :create-event-nonce="createEventNonce"
-        />
-
-        <BoatShowTabTasks
-          v-else-if="tab === 'tasks'"
-          :boat="boat"
-          :maintenance-tasks="maintenanceTasks"
-          :can-manage-maintenance="canManageMaintenance"
-          :create-task-nonce="createTaskNonce"
-        />
-
-        <BoatShowTabSheets
-          v-else-if="tab === 'sheets'"
-          :boat="boat"
-          :sheets="maintenanceSheets"
-          :can-manage="canManageMaintenance"
-        />
-
-        <BoatShowTabDocuments
-          v-else-if="tab === 'documents'"
-          :boat="boat"
-          :can-manage="canManageEquipment"
-        />
-
-        <BoatShowTabIncidents
-          v-else-if="tab === 'incidents'"
-          :boat="boat"
-          :incidents="incidents"
-          :can-manage="canManageMaintenance"
-          :can-delete="canDeleteIncidents"
-        />
-
-        <BoatShowTabFuelLogs
-          v-else-if="tab === 'fuel'"
-          :boat="boat"
-          :fuel-logs="fuelLogs"
-          :can-manage="canCreateFuelLogs"
-          :can-delete="canDeleteFuelLogs"
-        />
-
-        <BoatShowTabAdminDocs
-          v-else-if="tab === 'admin-docs'"
-          :boat="boat"
-          :boat-documents="boatDocuments"
-          :can-manage="canManageDocuments"
-        />
-      </div>
-    </Transition>
+    <BoatShowTabContent
+      :tab="tab"
+      v-bind="props"
+      :create-event-nonce="createEventNonce"
+      :create-task-nonce="createTaskNonce"
+      @go-to-tab="goToTab"
+    />
   </div>
 </template>

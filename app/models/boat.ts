@@ -7,6 +7,7 @@ import BoatPositionHistory from '#models/boat_position_history'
 import BoatRig from '#models/boat_rig'
 import BoatSail from '#models/boat_sail'
 import BoatSafetyEquipment from '#models/boat_safety_equipment'
+import NavigationLog from '#models/navigation_log'
 import Spot from '#models/spot'
 import { BaseModel, belongsTo, column, hasMany, hasOne } from '@adonisjs/lucid/orm'
 import type { BelongsTo, HasMany, HasOne } from '@adonisjs/lucid/types/relations'
@@ -116,4 +117,7 @@ export default class Boat extends BaseModel {
 
   @hasMany(() => BoatFuelLog)
   declare fuelLogs: HasMany<typeof BoatFuelLog>
+
+  @hasMany(() => NavigationLog)
+  declare navigationLogs: HasMany<typeof NavigationLog>
 }

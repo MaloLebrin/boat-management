@@ -113,6 +113,14 @@
     "notFound": "Avitaillement introuvable.",
     "engineNotBelongs": "Ce moteur n'appartient pas à ce bateau."
   },
+  "navigationLog": {
+    "created": "Sortie enregistrée.",
+    "closed": "Sortie clôturée. Heures moteur mises à jour.",
+    "deleted": "Sortie supprimée.",
+    "notFound": "Sortie introuvable.",
+    "arrivedAtBeforeDeparture": "L'heure d'arrivée doit être postérieure à l'heure de départ.",
+    "engineHoursEndBeforeStart": "Les heures moteur à l'arrivée doivent être supérieures ou égales à celles au départ."
+  },
   "boatDocument": {
     "created": "Document créé avec succès.",
     "updated": "Document mis à jour.",
