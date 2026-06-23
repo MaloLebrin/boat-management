@@ -4,6 +4,7 @@ import { router } from '@inertiajs/vue3'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
+import CsvHelpModal from '~/components/settings/CsvHelpModal.vue'
 import { useT } from '~/composables/use_t'
 import { routes } from '~/utils/routes'
 import { MAINTENANCE_CSV_HEADERS } from '../../../../shared/types/csv'
@@ -21,6 +22,17 @@ const selectedBoatId = ref<number | ''>('')
 const selectedType = ref<'maintenance'>('maintenance')
 const fileInput = ref<HTMLInputElement | null>(null)
 const isSubmitting = ref(false)
+const showHelpModal = ref(false)
+
+function getExportHref(key: string) {
+  if (!selectedBoatId.value) return undefined
+  const id = Number(selectedBoatId.value)
+  return key === 'maintenance'
+    ? routes.csv.exportMaintenance(id)
+    : key === 'fuelLogs'
+      ? routes.csv.exportFuelLogs(id)
+      : routes.csv.exportNavigationLogs(id)
+}
 
 const templateHeaders = MAINTENANCE_CSV_HEADERS.join(';')
 
@@ -58,7 +70,16 @@ function handleCancel() {
 
 <template>
   <div class="space-y-8">
-    <BaseHeading level="2">{{ t('settings.import.title') }}</BaseHeading>
+    <div class="flex items-center justify-between">
+      <BaseHeading level="2">{{ t('settings.import.title') }}</BaseHeading>
+      <button
+        type="button"
+        class="rounded-full border border-border px-2.5 py-0.5 text-xs text-fg-muted hover:bg-surface-muted hover:text-fg"
+        @click="showHelpModal = true"
+      >
+        {{ t('settings.import.help.openButton') }}
+      </button>
+    </div>
 
     <!-- Export section -->
     <BaseCard>
@@ -88,15 +109,7 @@ function handleCancel() {
             { key: 'navigationLogs', label: t('settings.import.exportNavigationLogs') },
           ]"
           :key="key"
-          :href="
-            selectedBoatId && key === 'maintenance'
-              ? routes.csv.exportMaintenance(Number(selectedBoatId))
-              : selectedBoatId && key === 'fuelLogs'
-                ? routes.csv.exportFuelLogs(Number(selectedBoatId))
-                : selectedBoatId
-                  ? routes.csv.exportNavigationLogs(Number(selectedBoatId))
-                  : undefined
-          "
+          :href="getExportHref(key)"
           :class="[
             'inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium transition-colors',
             selectedBoatId ? 'text-fg hover:bg-surface-muted' : 'pointer-events-none opacity-40',
@@ -245,5 +258,7 @@ function handleCancel() {
         </div>
       </div>
     </BaseCard>
+
+    <CsvHelpModal v-model:open="showHelpModal" />
   </div>
 </template>
