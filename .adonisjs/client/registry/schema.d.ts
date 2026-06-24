@@ -158,9 +158,9 @@ export interface Registry {
       body: {}
       paramsTuple: [ParamValue]
       params: { id: ParamValue }
-      query: {}
+      query: ExtractQueryForGet<InferInput<(typeof import('#validators/budget_validator').budgetYearValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/csv_export_controller').default['budget']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/csv_export_controller').default['budget']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/csv_export_controller').default['budget']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'boats.budget': {
@@ -170,9 +170,9 @@ export interface Registry {
       body: {}
       paramsTuple: [ParamValue]
       params: { id: ParamValue }
-      query: {}
+      query: ExtractQueryForGet<InferInput<(typeof import('#validators/budget_validator').budgetYearValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/budget_controller').default['show']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/budget_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/budget_controller').default['show']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'boats.edit': {

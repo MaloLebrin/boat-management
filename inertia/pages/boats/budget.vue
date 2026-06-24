@@ -83,7 +83,7 @@ const categories = computed(() => [
         >
           {{ t('budget.exportCsv') }}
         </BaseButton>
-        <BaseButton variant="secondary" size="sm" :route="`/boats/${boat.id}`">
+        <BaseButton variant="secondary" size="sm" route="boats.show" :params="{ id: boat.id }">
           ← {{ boat.name }}
         </BaseButton>
       </div>

@@ -34,7 +34,7 @@ export default class BudgetService {
       .whereRaw('EXTRACT(YEAR FROM me.performed_at) = ?', [year])
       .whereNotNull('p.unit_price')
       .select(db.raw('EXTRACT(MONTH FROM me.performed_at)::int as month'))
-      .sum(db.raw('p.unit_price * COALESCE(p.quantity, 1) as total'))
+      .select(db.raw('SUM(p.unit_price * COALESCE(p.quantity, 1)) as total'))
       .groupByRaw('EXTRACT(MONTH FROM me.performed_at)')
   }
 
