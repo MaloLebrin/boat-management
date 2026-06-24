@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { Bar } from 'vue-chartjs'
 import {
   BarElement,
@@ -11,7 +11,7 @@ import {
   Tooltip,
 } from 'chart.js'
 import { useT } from '~/composables/use_t'
-import type { BudgetMonthlyData } from '../../../types/budget'
+import type { BudgetMonthlyData } from '~/types/budget'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
@@ -22,13 +22,18 @@ const props = defineProps<{
 const { t } = useT()
 
 const isDark = ref(false)
+let darkObserver: MutationObserver | null = null
 
 onMounted(() => {
   isDark.value = document.documentElement.classList.contains('dark')
-  const observer = new MutationObserver(() => {
+  darkObserver = new MutationObserver(() => {
     isDark.value = document.documentElement.classList.contains('dark')
   })
-  observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
+  darkObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
+})
+
+onUnmounted(() => {
+  darkObserver?.disconnect()
 })
 
 const labels = computed(() => props.monthly.map((m) => t(`budget.months.${String(m.month)}`)))

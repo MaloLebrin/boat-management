@@ -1,4 +1,5 @@
 import BoatService, { BoatNotFoundError } from '#services/boat_service'
+import BoatPolicy from '#policies/boat_policy'
 import BoatMaintenanceService from '#services/boat_maintenance_service'
 import BoatFuelLogService from '#services/boat_fuel_log_service'
 import NavigationLogService from '#services/navigation_log_service'
@@ -194,7 +195,7 @@ export default class CsvExportController {
     return response.send(buffer)
   }
 
-  async budget({ response, auth, params, request, session, i18n }: HttpContext) {
+  async budget({ response, auth, bouncer, params, request, session, i18n }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
     await user.load('organization')
@@ -217,34 +218,27 @@ export default class CsvExportController {
       throw error
     }
 
+    await bouncer.with(BoatPolicy).authorize('view', boat)
+
     const year = Number(request.qs().year) || new Date().getFullYear()
     const budget = await this.budgetService.getForBoat(boat, year)
 
-    const MONTH_NAMES = [
-      'Janvier',
-      'Février',
-      'Mars',
-      'Avril',
-      'Mai',
-      'Juin',
-      'Juillet',
-      'Août',
-      'Septembre',
-      'Octobre',
-      'Novembre',
-      'Décembre',
+    const headers = [
+      i18n.t('budget.csv.headers.month'),
+      i18n.t('budget.csv.headers.maintenance'),
+      i18n.t('budget.csv.headers.fuel'),
+      i18n.t('budget.csv.headers.documents'),
+      i18n.t('budget.csv.headers.total'),
     ]
-
-    const headers = ['mois', 'maintenance', 'carburant', 'documents', 'total']
     const rows = budget.monthly.map((m) => [
-      MONTH_NAMES[m.month - 1],
+      i18n.t(`budget.csv.monthNames.${String(m.month)}`),
       m.maintenance.toFixed(2),
       m.fuel.toFixed(2),
       m.documents.toFixed(2),
       m.total.toFixed(2),
     ])
     rows.push([
-      'TOTAL',
+      i18n.t('budget.csv.headers.totalRow'),
       budget.totals.maintenance.toFixed(2),
       budget.totals.fuel.toFixed(2),
       budget.totals.documents.toFixed(2),
