@@ -6,6 +6,7 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import BudgetBarChart from '~/components/boats/budget/BudgetBarChart.vue'
 import BudgetCategoryCard from '~/components/boats/budget/BudgetCategoryCard.vue'
+import { useCurrencyFormat } from '~/composables/use_currency_format'
 import { useT } from '~/composables/use_t'
 import type { BudgetData } from '~/types/budget'
 
@@ -16,6 +17,7 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
+const { formatCurrency } = useCurrencyFormat()
 
 const selectedYear = ref(props.year)
 const currentYear = new Date().getFullYear()
@@ -25,9 +27,6 @@ function changeYear(y: number) {
   selectedYear.value = y
   router.get(`/boats/${props.boat.id}/budget`, { year: String(y) }, { preserveScroll: true })
 }
-
-const formatCurrency = (v: number) =>
-  new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(v)
 
 const categories = computed(() => [
   {
@@ -101,13 +100,13 @@ const categories = computed(() => [
           :previous-amount="cat.previousAmount"
           :previous-year="budget.previousYearTotals ? year - 1 : null"
         />
-        <div
-          class="rounded-(--radius-card) border border-border bg-surface-elevated p-5 shadow-(--shadow-xs) opacity-50"
-        >
-          <p class="text-sm font-semibold text-fg-muted">{{ t('budget.categories.port') }}</p>
-          <p class="mt-3 font-display text-2xl font-bold tracking-tight text-fg-subtle">—</p>
-          <p class="mt-1 text-xs text-fg-subtle italic">{{ t('budget.portUnavailable') }}</p>
-        </div>
+        <BudgetCategoryCard
+          category="port"
+          :amount="0"
+          :previous-amount="null"
+          :previous-year="null"
+          :unavailable="true"
+        />
       </div>
 
       <!-- Total card -->

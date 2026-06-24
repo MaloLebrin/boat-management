@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useCurrencyFormat } from '~/composables/use_currency_format'
 import { useT } from '~/composables/use_t'
 
 const props = defineProps<{
-  category: 'maintenance' | 'fuel' | 'documents' | 'total'
+  category: 'maintenance' | 'fuel' | 'documents' | 'port' | 'total'
   amount: number
   previousAmount: number | null
   previousYear: number | null
@@ -11,12 +12,9 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
+const { formatCurrency } = useCurrencyFormat()
 
-const formatted = computed(() =>
-  props.unavailable
-    ? '—'
-    : new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(props.amount)
-)
+const formatted = computed(() => (props.unavailable ? '—' : formatCurrency(props.amount)))
 
 const delta = computed(() => {
   if (props.unavailable || props.previousAmount === null || props.previousYear === null) return null
@@ -38,6 +36,7 @@ const COLORS: Record<string, string> = {
   maintenance: 'text-amber-600 dark:text-amber-400',
   fuel: 'text-blue-600 dark:text-blue-400',
   documents: 'text-purple-600 dark:text-purple-400',
+  port: 'text-fg-subtle',
   total: 'text-fg',
 }
 </script>

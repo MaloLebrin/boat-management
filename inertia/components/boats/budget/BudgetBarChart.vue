@@ -10,6 +10,7 @@ import {
   Title,
   Tooltip,
 } from 'chart.js'
+import { useCurrencyFormat } from '~/composables/use_currency_format'
 import { useT } from '~/composables/use_t'
 import type { BudgetMonthlyData } from '~/types/budget'
 
@@ -20,6 +21,7 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
+const { formatCurrency, formatCurrencyNoDecimals } = useCurrencyFormat()
 
 const isDark = ref(false)
 let darkObserver: MutationObserver | null = null
@@ -72,7 +74,7 @@ const chartOptions = computed(() => ({
     tooltip: {
       callbacks: {
         label: (ctx: { dataset: { label?: string }; parsed: { y: number } }) =>
-          `${ctx.dataset.label}: ${new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(ctx.parsed.y)}`,
+          `${ctx.dataset.label}: ${formatCurrency(ctx.parsed.y)}`,
       },
     },
   },
@@ -81,12 +83,7 @@ const chartOptions = computed(() => ({
     y: {
       stacked: true,
       ticks: {
-        callback: (value: number | string) =>
-          new Intl.NumberFormat('fr-FR', {
-            style: 'currency',
-            currency: 'EUR',
-            maximumFractionDigits: 0,
-          }).format(Number(value)),
+        callback: (value: number | string) => formatCurrencyNoDecimals(Number(value)),
       },
     },
   },

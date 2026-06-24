@@ -7,6 +7,7 @@ import BudgetService from '#services/budget_service'
 import QuotaService from '#services/quota_service'
 import { QuotaExceededError } from '#exceptions/quota_errors'
 import { buildCsv, csvFilename } from '#services/csv_export_service'
+import { budgetYearValidator } from '#validators/budget_validator'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 
@@ -220,7 +221,8 @@ export default class CsvExportController {
 
     await bouncer.with(BoatPolicy).authorize('view', boat)
 
-    const year = Number(request.qs().year) || new Date().getFullYear()
+    const { year: rawYear } = await request.validateUsing(budgetYearValidator)
+    const year = rawYear ?? new Date().getFullYear()
     const budget = await this.budgetService.getForBoat(boat, year)
 
     const headers = [

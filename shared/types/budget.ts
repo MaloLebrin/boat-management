@@ -20,10 +20,7 @@ export interface BudgetData {
   previousYearTotals: BudgetYearSummary | null
 }
 
-export interface BudgetCsvRow {
-  month: string
-  maintenance: number
-  fuel: number
-  documents: number
-  total: number
+export interface MonthRow {
+  month: number
+  total: string | null
 }
