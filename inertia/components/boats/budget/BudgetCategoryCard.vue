@@ -18,7 +18,8 @@ const formatted = computed(() => (props.unavailable ? '—' : formatCurrency(pro
 
 const delta = computed(() => {
   if (props.unavailable || props.previousAmount === null || props.previousYear === null) return null
-  if (props.previousAmount === 0) return null
+  if (props.previousAmount === 0)
+    return props.amount > 0 ? { label: t('budget.cards.newThisYear'), positive: true } : null
   const pct = ((props.amount - props.previousAmount) / props.previousAmount) * 100
   const rounded = Math.abs(Math.round(pct))
   if (pct > 0)
@@ -52,7 +53,7 @@ const COLORS: Record<string, string> = {
     <p v-if="unavailable" class="mt-1 text-xs text-fg-subtle italic">
       {{ t('budget.portUnavailable') }}
     </p>
-    <template v-else-if="previousAmount !== null">
+    <template v-else-if="previousAmount !== null && previousYear !== null">
       <p class="mt-1 text-xs text-fg-subtle">
         {{ vsLabel }}
         <span

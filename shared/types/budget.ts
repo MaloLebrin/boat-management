@@ -19,8 +19,3 @@ export interface BudgetData {
   totals: BudgetYearSummary
   previousYearTotals: BudgetYearSummary | null
 }
-
-export interface MonthRow {
-  month: number
-  total: string | null
-}

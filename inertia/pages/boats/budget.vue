@@ -21,7 +21,7 @@ const { formatCurrency } = useCurrencyFormat()
 
 const selectedYear = ref(props.year)
 const currentYear = new Date().getFullYear()
-const yearOptions = computed(() => Array.from({ length: 5 }, (_, i) => currentYear - i))
+const yearOptions = computed(() => Array.from({ length: 10 }, (_, i) => currentYear - i))
 
 function changeYear(y: number) {
   selectedYear.value = y

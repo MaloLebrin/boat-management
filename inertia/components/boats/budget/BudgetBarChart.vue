@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { Bar } from 'vue-chartjs'
 import {
   BarElement,
@@ -88,12 +88,6 @@ const chartOptions = computed(() => ({
     },
   },
 }))
-
-// Trick to force chart re-render on dark mode toggle
-const chartKey = ref(0)
-watch(isDark, () => {
-  chartKey.value++
-})
 </script>
 
 <template>
@@ -102,7 +96,7 @@ watch(isDark, () => {
   >
     <p class="text-sm font-semibold text-fg-muted mb-4">{{ t('budget.chart.title') }}</p>
     <div v-if="hasData" class="h-72">
-      <Bar :key="chartKey" :data="chartData" :options="chartOptions" />
+      <Bar :data="chartData" :options="chartOptions" />
     </div>
     <p v-else class="text-sm text-fg-subtle text-center py-10">{{ t('budget.chart.noData') }}</p>
   </div>

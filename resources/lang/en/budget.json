@@ -19,7 +19,8 @@
     "vsLastYear": "vs {year}",
     "increase": "+{pct}%",
     "decrease": "-{pct}%",
-    "noComparison": "No prior-year data"
+    "noComparison": "No prior-year data",
+    "newThisYear": "New this year"
   },
   "portUnavailable": "Port data coming soon",
   "csv": {

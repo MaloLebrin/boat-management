@@ -1,10 +1,10 @@
 import type Boat from '#models/boat'
-import type {
-  BudgetData,
-  BudgetMonthlyData,
-  BudgetYearSummary,
-  MonthRow,
-} from '#shared/types/budget'
+import type { BudgetData, BudgetMonthlyData, BudgetYearSummary } from '#shared/types/budget'
+
+interface MonthRow {
+  month: number
+  total: string | null
+}
 import db from '@adonisjs/lucid/services/db'
 
 export default class BudgetService {

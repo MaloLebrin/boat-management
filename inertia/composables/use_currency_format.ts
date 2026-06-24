@@ -1,3 +1,4 @@
+// Hardcoded to fr-FR / EUR — single-currency app assumption
 const formatter = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' })
 const formatterNoDecimals = new Intl.NumberFormat('fr-FR', {
   style: 'currency',
