@@ -21,5 +21,9 @@
     "success": "Bon",
     "info": "Info",
     "warning": "Attention"
-  }
+  },
+  "offline.savedQueue": "Enregistré hors-ligne — sera synchronisé à la reconnexion",
+  "offline.syncing": "Synchronisation en cours…",
+  "offline.syncSuccess": "{count} entrée(s) synchronisée(s)",
+  "offline.syncError": "Erreur de synchronisation — réessayez"
 }

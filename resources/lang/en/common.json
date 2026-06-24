@@ -21,5 +21,9 @@
     "success": "Good",
     "info": "Info",
     "warning": "Warning"
-  }
+  },
+  "offline.savedQueue": "Saved offline — will sync when reconnected",
+  "offline.syncing": "Syncing…",
+  "offline.syncSuccess": "{count} entry(ies) synced",
+  "offline.syncError": "Sync error — please try again"
 }

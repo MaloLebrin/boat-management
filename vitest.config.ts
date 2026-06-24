@@ -7,6 +7,7 @@ export default defineConfig({
   test: {
     environment: 'happy-dom',
     include: ['tests/inertia/**/*.spec.ts'],
+    setupFiles: ['tests/inertia/setup.ts'],
   },
   resolve: {
     alias: {

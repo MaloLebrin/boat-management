@@ -10,6 +10,8 @@ import DemoSessionBanner from '~/components/layout/DemoSessionBanner.vue'
 import LanguageSwitcher from '~/components/layout/LanguageSwitcher.vue'
 import NavItem from '~/components/layout/NavItem.vue'
 import { useNavSections } from '~/composables/use_nav_sections'
+import { useNetworkStatus } from '~/composables/use_network_status'
+import { useOfflineQueue } from '~/composables/use_offline_queue'
 import { useT } from '~/composables/use_t'
 
 const page = usePage<Data.SharedProps>()
@@ -19,6 +21,12 @@ const drawerTitleId = 'auth-sidebar-title'
 
 const { t } = useT()
 const { navSections } = useNavSections()
+const { isOnline } = useNetworkStatus()
+const { drainQueue } = useOfflineQueue()
+
+watch(isOnline, (online) => {
+  if (online) drainQueue()
+})
 
 function closeSidebar() {
   isSidebarOpen.value = false
