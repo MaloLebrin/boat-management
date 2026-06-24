@@ -1,0 +1,39 @@
+{
+  "title": "Budget",
+  "subtitle": "Dépenses annuelles par poste",
+  "yearSelector": "Année",
+  "exportCsv": "Exporter CSV",
+  "categories": {
+    "maintenance": "Maintenance",
+    "fuel": "Carburant",
+    "documents": "Documents / Assurance",
+    "port": "Port / Mouillage",
+    "total": "Total"
+  },
+  "chart": {
+    "title": "Dépenses mensuelles",
+    "noData": "Aucune dépense enregistrée pour cette année."
+  },
+  "cards": {
+    "total": "Total annuel",
+    "vsLastYear": "vs {year}",
+    "increase": "+{pct}%",
+    "decrease": "-{pct}%",
+    "noComparison": "Pas de données N-1"
+  },
+  "portUnavailable": "Données port à venir",
+  "months": {
+    "1": "Jan",
+    "2": "Fév",
+    "3": "Mar",
+    "4": "Avr",
+    "5": "Mai",
+    "6": "Jun",
+    "7": "Jul",
+    "8": "Aoû",
+    "9": "Sep",
+    "10": "Oct",
+    "11": "Nov",
+    "12": "Déc"
+  }
+}

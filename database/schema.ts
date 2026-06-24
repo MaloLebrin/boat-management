@@ -81,6 +81,7 @@ export class AuditLogSchema extends BaseModel {
 export class BoatDocumentSchema extends BaseModel {
   static $columns = [
     'boatId',
+    'cost',
     'createdAt',
     'customTypeLabel',
     'expiresAt',
@@ -97,6 +98,8 @@ export class BoatDocumentSchema extends BaseModel {
   $columns = BoatDocumentSchema.$columns
   @column()
   declare boatId: number
+  @column()
+  declare cost: string | null
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
   @column()

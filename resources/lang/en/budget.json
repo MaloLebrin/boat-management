@@ -1,0 +1,39 @@
+{
+  "title": "Budget",
+  "subtitle": "Annual expenses by category",
+  "yearSelector": "Year",
+  "exportCsv": "Export CSV",
+  "categories": {
+    "maintenance": "Maintenance",
+    "fuel": "Fuel",
+    "documents": "Documents / Insurance",
+    "port": "Port / Mooring",
+    "total": "Total"
+  },
+  "chart": {
+    "title": "Monthly expenses",
+    "noData": "No expenses recorded for this year."
+  },
+  "cards": {
+    "total": "Annual total",
+    "vsLastYear": "vs {year}",
+    "increase": "+{pct}%",
+    "decrease": "-{pct}%",
+    "noComparison": "No prior-year data"
+  },
+  "portUnavailable": "Port data coming soon",
+  "months": {
+    "1": "Jan",
+    "2": "Feb",
+    "3": "Mar",
+    "4": "Apr",
+    "5": "May",
+    "6": "Jun",
+    "7": "Jul",
+    "8": "Aug",
+    "9": "Sep",
+    "10": "Oct",
+    "11": "Nov",
+    "12": "Dec"
+  }
+}

@@ -13,6 +13,11 @@ export type ScannedRoutes = {
     'boats.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.navigation': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.maintenanceLog.download': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'boats.export.maintenance': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'boats.export.fuelLogs': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'boats.export.navigationLogs': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'boats.export.budget': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'boats.budget': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -131,6 +136,10 @@ export type ScannedRoutes = {
     'settings.branding.update': { paramsTuple?: []; params?: {} }
     'settings.branding.logo.upload': { paramsTuple?: []; params?: {} }
     'settings.branding.logo.delete': { paramsTuple?: []; params?: {} }
+    'settings.import': { paramsTuple?: []; params?: {} }
+    'settings.import.preview': { paramsTuple?: []; params?: {} }
+    'settings.import.confirm': { paramsTuple?: []; params?: {} }
+    'settings.import.cancel': { paramsTuple?: []; params?: {} }
     'maintenance.history': { paramsTuple?: []; params?: {} }
     'organization.members.index': { paramsTuple?: []; params?: {} }
     'organization.members.store': { paramsTuple?: []; params?: {} }
@@ -184,6 +193,11 @@ export type ScannedRoutes = {
     'boats.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.navigation': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.maintenanceLog.download': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'boats.export.maintenance': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'boats.export.fuelLogs': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'boats.export.navigationLogs': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'boats.export.budget': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'boats.budget': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.engines.show': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
     'boat_equipment.edit_engine': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
@@ -222,6 +236,7 @@ export type ScannedRoutes = {
     'settings.ai': { paramsTuple?: []; params?: {} }
     'settings.auditLog': { paramsTuple?: []; params?: {} }
     'settings.branding': { paramsTuple?: []; params?: {} }
+    'settings.import': { paramsTuple?: []; params?: {} }
     'maintenance.history': { paramsTuple?: []; params?: {} }
     'organization.members.index': { paramsTuple?: []; params?: {} }
     'invitations.show': { paramsTuple?: []; params?: {} }
@@ -249,6 +264,11 @@ export type ScannedRoutes = {
     'boats.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.navigation': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.maintenanceLog.download': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'boats.export.maintenance': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'boats.export.fuelLogs': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'boats.export.navigationLogs': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'boats.export.budget': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'boats.budget': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.engines.show': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
     'boat_equipment.edit_engine': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
@@ -287,6 +307,7 @@ export type ScannedRoutes = {
     'settings.ai': { paramsTuple?: []; params?: {} }
     'settings.auditLog': { paramsTuple?: []; params?: {} }
     'settings.branding': { paramsTuple?: []; params?: {} }
+    'settings.import': { paramsTuple?: []; params?: {} }
     'maintenance.history': { paramsTuple?: []; params?: {} }
     'organization.members.index': { paramsTuple?: []; params?: {} }
     'invitations.show': { paramsTuple?: []; params?: {} }
@@ -337,6 +358,9 @@ export type ScannedRoutes = {
     'settings.billing.checkout': { paramsTuple?: []; params?: {} }
     'settings.billing.portal': { paramsTuple?: []; params?: {} }
     'settings.branding.logo.upload': { paramsTuple?: []; params?: {} }
+    'settings.import.preview': { paramsTuple?: []; params?: {} }
+    'settings.import.confirm': { paramsTuple?: []; params?: {} }
+    'settings.import.cancel': { paramsTuple?: []; params?: {} }
     'organization.members.store': { paramsTuple?: []; params?: {} }
     'organization.invitations.store': { paramsTuple?: []; params?: {} }
     'invitations.accept': { paramsTuple?: []; params?: {} }

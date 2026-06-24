@@ -26,6 +26,7 @@ export interface BoatDocumentRow {
   expiresAt: string | null
   issuer: string | null
   notes: string | null
+  cost: number | null
   mediaId: number | null
   mediaSecureUrl: string | null
   mediaFilename: string | null
@@ -41,6 +42,7 @@ export interface CreateBoatDocumentPayload {
   expiresAt?: Date | string | DateTime | null
   issuer?: string | null
   notes?: string | null
+  cost?: number | null
 }
 
 export type UpdateBoatDocumentPayload = CreateBoatDocumentPayload

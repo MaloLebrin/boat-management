@@ -2,6 +2,7 @@ import BoatService, { BoatNotFoundError } from '#services/boat_service'
 import BoatMaintenanceService from '#services/boat_maintenance_service'
 import BoatFuelLogService from '#services/boat_fuel_log_service'
 import NavigationLogService from '#services/navigation_log_service'
+import BudgetService from '#services/budget_service'
 import QuotaService from '#services/quota_service'
 import { QuotaExceededError } from '#exceptions/quota_errors'
 import { buildCsv, csvFilename } from '#services/csv_export_service'
@@ -15,6 +16,7 @@ export default class CsvExportController {
     private maintenanceService: BoatMaintenanceService,
     private fuelLogService: BoatFuelLogService,
     private navigationLogService: NavigationLogService,
+    private budgetService: BudgetService,
     private quotaService: QuotaService
   ) {}
 
@@ -186,6 +188,71 @@ export default class CsvExportController {
 
     const buffer = buildCsv(headers, rows)
     const filename = csvFilename('journal_de_bord', boat.name)
+    response.header('Content-Type', 'text/csv; charset=utf-8')
+    response.header('Content-Disposition', `attachment; filename="${filename}"`)
+    response.header('Content-Length', String(buffer.length))
+    return response.send(buffer)
+  }
+
+  async budget({ response, auth, params, request, session, i18n }: HttpContext) {
+    await auth.authenticate()
+    const user = auth.getUserOrFail()
+    await user.load('organization')
+
+    try {
+      this.quotaService.assertCanExport(user.organization)
+    } catch (error) {
+      if (error instanceof QuotaExceededError) {
+        session.flash('error', i18n.t('flash.quota.exportExceeded'))
+        return response.redirect().back()
+      }
+      throw error
+    }
+
+    let boat
+    try {
+      boat = await this.boatService.getForUserOrFail(user, Number(params.id))
+    } catch (error) {
+      if (error instanceof BoatNotFoundError) return response.redirect('/boats')
+      throw error
+    }
+
+    const year = Number(request.qs().year) || new Date().getFullYear()
+    const budget = await this.budgetService.getForBoat(boat, year)
+
+    const MONTH_NAMES = [
+      'Janvier',
+      'Février',
+      'Mars',
+      'Avril',
+      'Mai',
+      'Juin',
+      'Juillet',
+      'Août',
+      'Septembre',
+      'Octobre',
+      'Novembre',
+      'Décembre',
+    ]
+
+    const headers = ['mois', 'maintenance', 'carburant', 'documents', 'total']
+    const rows = budget.monthly.map((m) => [
+      MONTH_NAMES[m.month - 1],
+      m.maintenance.toFixed(2),
+      m.fuel.toFixed(2),
+      m.documents.toFixed(2),
+      m.total.toFixed(2),
+    ])
+    rows.push([
+      'TOTAL',
+      budget.totals.maintenance.toFixed(2),
+      budget.totals.fuel.toFixed(2),
+      budget.totals.documents.toFixed(2),
+      budget.totals.total.toFixed(2),
+    ])
+
+    const buffer = buildCsv(headers, rows)
+    const filename = csvFilename(`budget_${year}`, boat.name)
     response.header('Content-Type', 'text/csv; charset=utf-8')
     response.header('Content-Disposition', `attachment; filename="${filename}"`)
     response.header('Content-Length', String(buffer.length))

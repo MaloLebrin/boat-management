@@ -60,6 +60,36 @@ const routes = {
     tokens: [{"old":"/boats/:id/maintenance-log.pdf","type":0,"val":"boats","end":""},{"old":"/boats/:id/maintenance-log.pdf","type":1,"val":"id","end":""},{"old":"/boats/:id/maintenance-log.pdf","type":0,"val":"maintenance-log.pdf","end":""}],
     types: placeholder as Registry['boats.maintenanceLog.download']['types'],
   },
+  'boats.export.maintenance': {
+    methods: ["GET","HEAD"],
+    pattern: '/boats/:id/export/maintenance.csv',
+    tokens: [{"old":"/boats/:id/export/maintenance.csv","type":0,"val":"boats","end":""},{"old":"/boats/:id/export/maintenance.csv","type":1,"val":"id","end":""},{"old":"/boats/:id/export/maintenance.csv","type":0,"val":"export","end":""},{"old":"/boats/:id/export/maintenance.csv","type":0,"val":"maintenance.csv","end":""}],
+    types: placeholder as Registry['boats.export.maintenance']['types'],
+  },
+  'boats.export.fuelLogs': {
+    methods: ["GET","HEAD"],
+    pattern: '/boats/:id/export/fuel-logs.csv',
+    tokens: [{"old":"/boats/:id/export/fuel-logs.csv","type":0,"val":"boats","end":""},{"old":"/boats/:id/export/fuel-logs.csv","type":1,"val":"id","end":""},{"old":"/boats/:id/export/fuel-logs.csv","type":0,"val":"export","end":""},{"old":"/boats/:id/export/fuel-logs.csv","type":0,"val":"fuel-logs.csv","end":""}],
+    types: placeholder as Registry['boats.export.fuelLogs']['types'],
+  },
+  'boats.export.navigationLogs': {
+    methods: ["GET","HEAD"],
+    pattern: '/boats/:id/export/navigation-logs.csv',
+    tokens: [{"old":"/boats/:id/export/navigation-logs.csv","type":0,"val":"boats","end":""},{"old":"/boats/:id/export/navigation-logs.csv","type":1,"val":"id","end":""},{"old":"/boats/:id/export/navigation-logs.csv","type":0,"val":"export","end":""},{"old":"/boats/:id/export/navigation-logs.csv","type":0,"val":"navigation-logs.csv","end":""}],
+    types: placeholder as Registry['boats.export.navigationLogs']['types'],
+  },
+  'boats.export.budget': {
+    methods: ["GET","HEAD"],
+    pattern: '/boats/:id/export/budget.csv',
+    tokens: [{"old":"/boats/:id/export/budget.csv","type":0,"val":"boats","end":""},{"old":"/boats/:id/export/budget.csv","type":1,"val":"id","end":""},{"old":"/boats/:id/export/budget.csv","type":0,"val":"export","end":""},{"old":"/boats/:id/export/budget.csv","type":0,"val":"budget.csv","end":""}],
+    types: placeholder as Registry['boats.export.budget']['types'],
+  },
+  'boats.budget': {
+    methods: ["GET","HEAD"],
+    pattern: '/boats/:id/budget',
+    tokens: [{"old":"/boats/:id/budget","type":0,"val":"boats","end":""},{"old":"/boats/:id/budget","type":1,"val":"id","end":""},{"old":"/boats/:id/budget","type":0,"val":"budget","end":""}],
+    types: placeholder as Registry['boats.budget']['types'],
+  },
   'boats.edit': {
     methods: ["GET","HEAD"],
     pattern: '/boats/:id/edit',

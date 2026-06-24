@@ -10,6 +10,7 @@ function boatDocumentFields() {
     expiresAt: vine.date().nullable().optional(),
     issuer: vine.string().trim().nullable().optional(),
     notes: vine.string().trim().nullable().optional(),
+    cost: vine.number().min(0).nullable().optional(),
   }
 }
 
