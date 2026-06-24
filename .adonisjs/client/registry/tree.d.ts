@@ -14,6 +14,13 @@ export interface ApiDefinition {
     maintenanceLog: {
       download: typeof routes['boats.maintenanceLog.download']
     }
+    export: {
+      maintenance: typeof routes['boats.export.maintenance']
+      fuelLogs: typeof routes['boats.export.fuelLogs']
+      navigationLogs: typeof routes['boats.export.navigationLogs']
+      budget: typeof routes['boats.export.budget']
+    }
+    budget: typeof routes['boats.budget']
     edit: typeof routes['boats.edit']
     update: typeof routes['boats.update']
     destroy: typeof routes['boats.destroy']

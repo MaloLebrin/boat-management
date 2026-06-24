@@ -41,6 +41,9 @@ export default class BoatDocument extends BaseModel {
   @column()
   declare notes: string | null
 
+  @column()
+  declare cost: string | null
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 

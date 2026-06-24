@@ -33,6 +33,7 @@ export default class BoatDocumentService {
       expiresAt: doc.expiresAt?.toISODate() ?? null,
       issuer: doc.issuer,
       notes: doc.notes,
+      cost: doc.cost !== null ? Number.parseFloat(doc.cost) : null,
       mediaId: doc.mediaId,
       mediaSecureUrl: media?.secureUrl ?? null,
       mediaFilename: media?.originalFilename ?? null,
@@ -71,6 +72,7 @@ export default class BoatDocumentService {
       expiresAt: this.toDateTime(payload.expiresAt),
       issuer: payload.issuer ?? null,
       notes: payload.notes ?? null,
+      cost: payload.cost !== null && payload.cost !== undefined ? String(payload.cost) : null,
     })
     return this.toRow(doc)
   }
@@ -96,6 +98,7 @@ export default class BoatDocumentService {
       expiresAt: this.toDateTime(payload.expiresAt),
       issuer: payload.issuer ?? null,
       notes: payload.notes ?? null,
+      cost: payload.cost !== null && payload.cost !== undefined ? String(payload.cost) : null,
     })
     await doc.save()
     return this.toRow(doc)

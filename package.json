@@ -109,6 +109,7 @@
     "@types/leaflet": "^1.9.21",
     "@vinejs/vine": "^4.4.0",
     "@vueuse/core": "^14.3.0",
+    "chart.js": "^4.5.1",
     "cloudinary": "^2.10.0",
     "edge.js": "^6.5.1",
     "leaflet": "^1.9.4",
@@ -118,6 +119,7 @@
     "reflect-metadata": "^0.2.2",
     "stripe": "^22.2.1",
     "vue": "^3.5.38",
+    "vue-chartjs": "^5.3.3",
     "vue-sonner": "^2.0.9"
   },
   "hotHook": {

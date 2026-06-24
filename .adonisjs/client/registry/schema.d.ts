@@ -115,6 +115,66 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/maintenance_log_pdf_controller').default['download']>>>
     }
   }
+  'boats.export.maintenance': {
+    methods: ["GET","HEAD"]
+    pattern: '/boats/:id/export/maintenance.csv'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/csv_export_controller').default['maintenance']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/csv_export_controller').default['maintenance']>>>
+    }
+  }
+  'boats.export.fuelLogs': {
+    methods: ["GET","HEAD"]
+    pattern: '/boats/:id/export/fuel-logs.csv'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/csv_export_controller').default['fuelLogs']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/csv_export_controller').default['fuelLogs']>>>
+    }
+  }
+  'boats.export.navigationLogs': {
+    methods: ["GET","HEAD"]
+    pattern: '/boats/:id/export/navigation-logs.csv'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/csv_export_controller').default['navigationLogs']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/csv_export_controller').default['navigationLogs']>>>
+    }
+  }
+  'boats.export.budget': {
+    methods: ["GET","HEAD"]
+    pattern: '/boats/:id/export/budget.csv'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/csv_export_controller').default['budget']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/csv_export_controller').default['budget']>>>
+    }
+  }
+  'boats.budget': {
+    methods: ["GET","HEAD"]
+    pattern: '/boats/:id/budget'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/budget_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/budget_controller').default['show']>>>
+    }
+  }
   'boats.edit': {
     methods: ["GET","HEAD"]
     pattern: '/boats/:id/edit'
