@@ -3,7 +3,13 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
-## 2026-06-25 — Depenses libres (budget entries)
+## 2026-06-25 — Aide contextuelle budget (tooltips sources de données)
+
+Ajout de tooltips sur chaque carte de catégorie du tableau de bord budget pour expliquer d'où viennent les chiffres.
+
+- Prop `helpText` ajoutée sur `BudgetCategoryCard.vue` : affiche une icône `?` avec tooltip au survol
+- Page `budget.vue` : chaque `BudgetCategoryCard` reçoit la clé i18n `budget.help.<categorie>` en `helpText`
+- i18n : clés `budget.help.maintenance`, `.fuel`, `.documents`, `.port`, `.equipment`, `.entries`, `.total` en FR et EN
 
 Ajout de la possibilite de saisir des depenses libres (taxe de francisation, cotisation club, etc.) dans le module budget.
 
