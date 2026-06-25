@@ -22,8 +22,9 @@
     "info": "Info",
     "warning": "Attention"
   },
+  "offline.banner": "Vous êtes hors-ligne — les modifications seront synchronisées à la reconnexion",
   "offline.savedQueue": "Enregistré hors-ligne — sera synchronisé à la reconnexion",
   "offline.syncing": "Synchronisation en cours…",
   "offline.syncSuccess": "{count} entrée(s) synchronisée(s)",
-  "offline.syncError": "Erreur de synchronisation — réessayez"
+  "offline.syncError": "Erreur de synchronisation — action ignorée"
 }

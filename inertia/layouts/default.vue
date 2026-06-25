@@ -120,6 +120,14 @@ onBeforeUnmount(() => {
       <!-- Demo session countdown (demo users only) -->
       <DemoSessionBanner />
 
+      <!-- Offline indicator -->
+      <div
+        v-if="!isOnline"
+        class="bg-amber-500 text-white text-sm font-medium text-center py-1.5 px-4 shrink-0"
+      >
+        {{ t('offline.banner') }}
+      </div>
+
       <!-- Scrollable content area -->
       <main class="flex-1 overflow-y-auto bg-cream">
         <Transition name="page" mode="out-in">

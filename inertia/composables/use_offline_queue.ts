@@ -34,16 +34,18 @@ async function getDb() {
   })
 }
 
+// Module-level shared state — all composable instances share the same refs
+const pendingCount = ref(0)
+const isSyncing = ref(false)
+
+async function refreshCount() {
+  if (!isIndexedDbAvailable()) return
+  const db = await getDb()
+  pendingCount.value = await db.count(STORE_NAME)
+}
+
 export function useOfflineQueue() {
   const { t } = useT()
-  const pendingCount = ref(0)
-  const isSyncing = ref(false)
-
-  async function refreshCount() {
-    if (!isIndexedDbAvailable()) return
-    const db = await getDb()
-    pendingCount.value = await db.count(STORE_NAME)
-  }
 
   async function enqueue(action: Omit<QueuedAction, 'id' | 'createdAt'>) {
     if (!isIndexedDbAvailable()) return
@@ -55,13 +57,17 @@ export function useOfflineQueue() {
 
   async function drainQueue() {
     if (isSyncing.value || !isIndexedDbAvailable()) return
+    isSyncing.value = true
     const db = await getDb()
     const actions = (await db.getAll(STORE_NAME)) as QueuedAction[]
-    if (!actions.length) return
+    if (!actions.length) {
+      isSyncing.value = false
+      return
+    }
 
     const totalCount = actions.length
     const action = actions[0]
-    isSyncing.value = true
+    toast.info(t('offline.syncing'))
 
     const callbacks = {
       preserveScroll: true as const,
@@ -76,7 +82,12 @@ export function useOfflineQueue() {
           await drainQueue()
         }
       },
-      onError: () => {
+      // On server rejection the action is discarded to unblock the queue.
+      // A persistent error here would block all subsequent entries indefinitely.
+      onError: async () => {
+        await db.delete(STORE_NAME, action.id)
+        const remaining = await db.count(STORE_NAME)
+        pendingCount.value = remaining
         isSyncing.value = false
         toast.error(t('offline.syncError'))
       },

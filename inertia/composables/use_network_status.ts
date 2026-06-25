@@ -8,13 +8,13 @@ export function useNetworkStatus() {
   }
 
   onMounted(() => {
-    addEventListener('online', updateStatus)
-    addEventListener('offline', updateStatus)
+    window.addEventListener('online', updateStatus)
+    window.addEventListener('offline', updateStatus)
   })
 
   onUnmounted(() => {
-    removeEventListener('online', updateStatus)
-    removeEventListener('offline', updateStatus)
+    window.removeEventListener('online', updateStatus)
+    window.removeEventListener('offline', updateStatus)
   })
 
   return { isOnline }
