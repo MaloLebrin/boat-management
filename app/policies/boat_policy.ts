@@ -25,4 +25,8 @@ export default class BoatPolicy extends BasePolicy {
   delete(_user: User, _boat: Boat): AuthorizerResponse {
     return false
   }
+
+  manage(user: User, boat: Boat): AuthorizerResponse {
+    return user.organizationId !== null && user.organizationId === boat.organizationId
+  }
 }

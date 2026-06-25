@@ -23,12 +23,25 @@
     "newThisYear": "New this year"
   },
   "portUnavailable": "Port data coming soon",
+  "portStay": {
+    "formTitle": "Add a port stay",
+    "listTitle": "Port stays",
+    "portName": "Port name",
+    "startedAt": "Arrival date",
+    "endedAt": "Departure date (optional)",
+    "cost": "Cost (EUR)",
+    "notes": "Notes",
+    "noStays": "No stays recorded",
+    "submit": "Add",
+    "deleteConfirm": "Delete this stay?"
+  },
   "csv": {
     "headers": {
       "month": "month",
       "maintenance": "maintenance",
       "fuel": "fuel",
       "documents": "documents",
+      "port": "port",
       "total": "total",
       "totalRow": "TOTAL"
     },

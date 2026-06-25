@@ -18,6 +18,7 @@ export const controllers = {
   BoatMaintenanceTasks: () => import('#controllers/boat_maintenance_tasks_controller'),
   BoatMaintenances: () => import('#controllers/boat_maintenances_controller'),
   BoatMedia: () => import('#controllers/boat_media_controller'),
+  BoatPortStay: () => import('#controllers/boat_port_stay_controller'),
   BoatPosition: () => import('#controllers/boat_position_controller'),
   BoatSafetyEquipment: () => import('#controllers/boat_safety_equipment_controller'),
   BoatSimulator: () => import('#controllers/boat_simulator_controller'),

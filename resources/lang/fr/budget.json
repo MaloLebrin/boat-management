@@ -23,12 +23,25 @@
     "newThisYear": "Nouveau cette année"
   },
   "portUnavailable": "Données port à venir",
+  "portStay": {
+    "formTitle": "Ajouter un séjour au port",
+    "listTitle": "Séjours au port",
+    "portName": "Nom du port",
+    "startedAt": "Date d'arrivée",
+    "endedAt": "Date de départ (optionnel)",
+    "cost": "Coût (EUR)",
+    "notes": "Notes",
+    "noStays": "Aucun séjour enregistré",
+    "submit": "Ajouter",
+    "deleteConfirm": "Supprimer ce séjour ?"
+  },
   "csv": {
     "headers": {
       "month": "mois",
       "maintenance": "maintenance",
       "fuel": "carburant",
       "documents": "documents",
+      "port": "port",
       "total": "total",
       "totalRow": "TOTAL"
     },

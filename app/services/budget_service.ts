@@ -14,6 +14,7 @@ export default class BudgetService {
       maintenance: 0,
       fuel: 0,
       documents: 0,
+      port: 0,
       total: 0,
     }))
   }
@@ -60,11 +61,23 @@ export default class BudgetService {
       .groupByRaw('EXTRACT(MONTH FROM issued_at)')
   }
 
+  private async fetchPortByMonth(boatId: number, year: number): Promise<MonthRow[]> {
+    return db
+      .from('boat_port_stays')
+      .where('boat_id', boatId)
+      .whereRaw('EXTRACT(YEAR FROM started_at) = ?', [year])
+      .whereNotNull('cost')
+      .select(db.raw('EXTRACT(MONTH FROM started_at)::int as month'))
+      .sum('cost as total')
+      .groupByRaw('EXTRACT(MONTH FROM started_at)')
+  }
+
   private async computeYearSummary(boatId: number, year: number): Promise<BudgetYearSummary> {
-    const [maintenanceRows, fuelRows, documentRows] = await Promise.all([
+    const [maintenanceRows, fuelRows, documentRows, portRows] = await Promise.all([
       this.fetchMaintenanceByMonth(boatId, year),
       this.fetchFuelByMonth(boatId, year),
       this.fetchDocumentsByMonth(boatId, year),
+      this.fetchPortByMonth(boatId, year),
     ])
 
     const sumRows = (rows: MonthRow[]) =>
@@ -73,27 +86,39 @@ export default class BudgetService {
     const maintenance = sumRows(maintenanceRows)
     const fuel = sumRows(fuelRows)
     const documents = sumRows(documentRows)
+    const port = sumRows(portRows)
 
-    return { maintenance, fuel, documents, total: maintenance + fuel + documents }
+    return { maintenance, fuel, documents, port, total: maintenance + fuel + documents + port }
   }
 
   async getForBoat(boat: Boat, year: number): Promise<BudgetData> {
-    const [maintenanceRows, fuelRows, documentRows, previousYearTotals] = await Promise.all([
-      this.fetchMaintenanceByMonth(boat.id, year),
-      this.fetchFuelByMonth(boat.id, year),
-      this.fetchDocumentsByMonth(boat.id, year),
-      this.computeYearSummary(boat.id, year - 1),
-    ])
+    const [maintenanceRows, fuelRows, documentRows, portRows, previousYearTotals] =
+      await Promise.all([
+        this.fetchMaintenanceByMonth(boat.id, year),
+        this.fetchFuelByMonth(boat.id, year),
+        this.fetchDocumentsByMonth(boat.id, year),
+        this.fetchPortByMonth(boat.id, year),
+        this.computeYearSummary(boat.id, year - 1),
+      ])
 
     const maintenanceByMonth = this.indexByMonth(maintenanceRows)
     const fuelByMonth = this.indexByMonth(fuelRows)
     const documentsByMonth = this.indexByMonth(documentRows)
+    const portByMonth = this.indexByMonth(portRows)
 
     const monthly = this.buildEmptyMonthly().map((row) => {
       const maintenance = maintenanceByMonth.get(row.month) ?? 0
       const fuel = fuelByMonth.get(row.month) ?? 0
       const documents = documentsByMonth.get(row.month) ?? 0
-      return { ...row, maintenance, fuel, documents, total: maintenance + fuel + documents }
+      const port = portByMonth.get(row.month) ?? 0
+      return {
+        ...row,
+        maintenance,
+        fuel,
+        documents,
+        port,
+        total: maintenance + fuel + documents + port,
+      }
     })
 
     const totals = monthly.reduce(
@@ -101,9 +126,10 @@ export default class BudgetService {
         maintenance: acc.maintenance + m.maintenance,
         fuel: acc.fuel + m.fuel,
         documents: acc.documents + m.documents,
+        port: acc.port + m.port,
         total: acc.total + m.total,
       }),
-      { maintenance: 0, fuel: 0, documents: 0, total: 0 }
+      { maintenance: 0, fuel: 0, documents: 0, port: 0, total: 0 }
     )
 
     const hasPreviousData = previousYearTotals.total > 0
