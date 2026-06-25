@@ -158,5 +158,9 @@
     "updated": "Equipment updated.",
     "deleted": "Equipment deleted.",
     "notFound": "Equipment not found."
+  },
+  "portStay": {
+    "created": "Port stay recorded.",
+    "deleted": "Port stay deleted."
   }
 }

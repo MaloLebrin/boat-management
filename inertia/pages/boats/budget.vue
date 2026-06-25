@@ -6,14 +6,18 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import BudgetBarChart from '~/components/boats/budget/BudgetBarChart.vue'
 import BudgetCategoryCard from '~/components/boats/budget/BudgetCategoryCard.vue'
+import BudgetPortStayForm from '~/components/boats/budget/BudgetPortStayForm.vue'
+import BudgetPortStayList from '~/components/boats/budget/BudgetPortStayList.vue'
 import { useCurrencyFormat } from '~/composables/use_currency_format'
 import { useT } from '~/composables/use_t'
-import type { BudgetData } from '~/types/budget'
+import type { BudgetData, BoatPortStayItem } from '~/types/budget'
 
 const props = defineProps<{
   boat: { id: number; name: string }
   budget: BudgetData
   year: number
+  portStays: BoatPortStayItem[]
+  canManage: boolean
 }>()
 
 const { t } = useT()
@@ -43,6 +47,11 @@ const categories = computed(() => [
     key: 'documents' as const,
     amount: props.budget.totals.documents,
     previousAmount: props.budget.previousYearTotals?.documents ?? null,
+  },
+  {
+    key: 'port' as const,
+    amount: props.budget.totals.port,
+    previousAmount: props.budget.previousYearTotals?.port ?? null,
   },
 ])
 </script>
@@ -100,13 +109,6 @@ const categories = computed(() => [
           :previous-amount="cat.previousAmount"
           :previous-year="budget.previousYearTotals ? year - 1 : null"
         />
-        <BudgetCategoryCard
-          category="port"
-          :amount="0"
-          :previous-amount="null"
-          :previous-year="null"
-          :unavailable="true"
-        />
       </div>
 
       <!-- Total card -->
@@ -129,6 +131,12 @@ const categories = computed(() => [
 
       <!-- Monthly chart -->
       <BudgetBarChart :monthly="budget.monthly" />
+
+      <!-- Port stays section -->
+      <div class="space-y-4">
+        <BudgetPortStayForm v-if="canManage" :boat-id="boat.id" />
+        <BudgetPortStayList :boat-id="boat.id" :stays="portStays" :can-manage="canManage" />
+      </div>
     </div>
   </div>
 </template>

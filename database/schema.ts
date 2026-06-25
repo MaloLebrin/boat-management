@@ -558,6 +558,39 @@ export class BoatMaintenanceTaskSchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class BoatPortStaySchema extends BaseModel {
+  static $columns = [
+    'boatId',
+    'cost',
+    'createdAt',
+    'endedAt',
+    'id',
+    'notes',
+    'portName',
+    'startedAt',
+    'updatedAt',
+  ] as const
+  $columns = BoatPortStaySchema.$columns
+  @column()
+  declare boatId: number
+  @column()
+  declare cost: string | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime | null
+  @column.date()
+  declare endedAt: DateTime | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare notes: string | null
+  @column()
+  declare portName: string
+  @column.date()
+  declare startedAt: DateTime
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class BoatPositionHistorySchema extends BaseModel {
   static $columns = [
     'boatId',

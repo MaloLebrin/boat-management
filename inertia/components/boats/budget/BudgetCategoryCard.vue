@@ -37,7 +37,7 @@ const COLORS: Record<string, string> = {
   maintenance: 'text-amber-600 dark:text-amber-400',
   fuel: 'text-blue-600 dark:text-blue-400',
   documents: 'text-purple-600 dark:text-purple-400',
-  port: 'text-fg-subtle',
+  port: 'text-teal-600 dark:text-teal-400',
   total: 'text-fg',
 }
 </script>
