@@ -20,6 +20,8 @@ export type ScannedRoutes = {
     'boats.budget': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.portStays.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.portStays.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'stayId': ParamValue} }
+    'boats.budget.entries.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'boats.budget.entries.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'entryId': ParamValue} }
     'boats.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -331,6 +333,7 @@ export type ScannedRoutes = {
   POST: {
     'boats.store': { paramsTuple?: []; params?: {} }
     'boats.portStays.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'boats.budget.entries.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boat_equipment.store_engine': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'boat_media.store_engine_document': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
     'boat_engine_parts.store': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
@@ -384,6 +387,7 @@ export type ScannedRoutes = {
   }
   DELETE: {
     'boats.portStays.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'stayId': ParamValue} }
+    'boats.budget.entries.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'entryId': ParamValue} }
     'boats.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boat_equipment.destroy_engine': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
     'boat_media.destroy_engine_media': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue,'mediaId': ParamValue} }
