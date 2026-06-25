@@ -4,6 +4,9 @@ import { beforeEach, describe, expect, test, vi } from 'vitest'
 import DefaultLayout from '../../inertia/layouts/default.vue'
 
 const mockDrainQueue = vi.hoisted(() => vi.fn())
+const mockPromptInstall = vi.hoisted(() => vi.fn())
+const mockUsePwaUpdate = vi.hoisted(() => vi.fn())
+const mockUsePwaInstall = vi.hoisted(() => vi.fn())
 
 vi.mock('@adonisjs/inertia/vue', () => ({
   Link: { template: '<a><slot /></a>' },
@@ -28,6 +31,7 @@ vi.mock('@inertiajs/vue3', () => ({
         'nav.sections.preferences': 'PREFERENCES',
         'ports.nav': 'Ports',
         'offline.banner': 'You are offline',
+        'pwa.install': 'Install app',
       },
     },
   }),
@@ -46,8 +50,21 @@ vi.mock('~/composables/use_offline_queue', () => ({
   }),
 }))
 
+vi.mock('~/composables/use_pwa_update', () => ({
+  usePwaUpdate: mockUsePwaUpdate,
+}))
+
+vi.mock('~/composables/use_pwa_install', () => ({
+  usePwaInstall: mockUsePwaInstall,
+}))
+
 // Import after vi.mock so we get the mocked version
 import { useNetworkStatus } from '../../inertia/composables/use_network_status'
+
+// Default install mock — canInstall false unless overridden per test
+beforeEach(() => {
+  mockUsePwaInstall.mockReturnValue({ canInstall: ref(false), promptInstall: mockPromptInstall })
+})
 
 describe('DefaultLayout — sidebar', () => {
   test('shows sidebar links for authenticated user', () => {
@@ -91,5 +108,39 @@ describe('DefaultLayout — offline mode', () => {
     vi.mocked(useNetworkStatus).mockReturnValue({ isOnline: ref(true) })
     mount(DefaultLayout, { slots: { default: '<div>Content</div>' } })
     expect(mockDrainQueue).not.toHaveBeenCalled()
+  })
+})
+
+describe('DefaultLayout — PWA update', () => {
+  test('usePwaUpdate is called on mount', () => {
+    mount(DefaultLayout, { slots: { default: '<div>Content</div>' } })
+    expect(mockUsePwaUpdate).toHaveBeenCalled()
+  })
+})
+
+describe('DefaultLayout — PWA install button', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockUsePwaInstall.mockReturnValue({ canInstall: ref(false), promptInstall: mockPromptInstall })
+  })
+
+  test('install button is hidden when canInstall is false', () => {
+    const w = mount(DefaultLayout, { slots: { default: '<div>Content</div>' } })
+    expect(w.text()).not.toContain('Install app')
+  })
+
+  test('install button is shown when canInstall is true', () => {
+    mockUsePwaInstall.mockReturnValue({ canInstall: ref(true), promptInstall: mockPromptInstall })
+    const w = mount(DefaultLayout, { slots: { default: '<div>Content</div>' } })
+    expect(w.text()).toContain('Install app')
+  })
+
+  test('clicking install button calls promptInstall', async () => {
+    mockUsePwaInstall.mockReturnValue({ canInstall: ref(true), promptInstall: mockPromptInstall })
+    const w = mount(DefaultLayout, { slots: { default: '<div>Content</div>' } })
+    const btn = w.findAll('button').find((b) => b.text().includes('Install app'))
+    expect(btn).toBeDefined()
+    await btn!.trigger('click')
+    expect(mockPromptInstall).toHaveBeenCalledOnce()
   })
 })

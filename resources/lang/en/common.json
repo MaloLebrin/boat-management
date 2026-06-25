@@ -26,5 +26,7 @@
   "offline.savedQueue": "Saved offline — will sync when reconnected",
   "offline.syncing": "Syncing…",
   "offline.syncSuccess": "{count} entry(ies) synced",
-  "offline.syncError": "Sync error — action discarded"
+  "offline.syncError": "Sync error — action discarded",
+  "pwa.offlineReady": "App is ready for offline use",
+  "pwa.install": "Install app"
 }

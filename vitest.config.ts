@@ -13,6 +13,9 @@ export default defineConfig({
     alias: {
       '~': fileURLToPath(new URL('./inertia', import.meta.url)),
       '@generated': fileURLToPath(new URL('./.adonisjs/client', import.meta.url)),
+      'virtual:pwa-register/vue': fileURLToPath(
+        new URL('./tests/inertia/__mocks__/virtual_pwa_register.ts', import.meta.url)
+      ),
     },
   },
 })

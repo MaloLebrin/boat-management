@@ -12,6 +12,7 @@ import NavItem from '~/components/layout/NavItem.vue'
 import { useNavSections } from '~/composables/use_nav_sections'
 import { useNetworkStatus } from '~/composables/use_network_status'
 import { useOfflineQueue } from '~/composables/use_offline_queue'
+import { usePwaUpdate } from '~/composables/use_pwa_update'
 import { useT } from '~/composables/use_t'
 
 const page = usePage<Data.SharedProps>()
@@ -23,6 +24,7 @@ const { t } = useT()
 const { navSections } = useNavSections()
 const { isOnline } = useNetworkStatus()
 const { drainQueue } = useOfflineQueue()
+usePwaUpdate()
 
 watch(isOnline, (online) => {
   if (online) drainQueue()

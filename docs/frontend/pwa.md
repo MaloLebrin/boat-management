@@ -23,7 +23,9 @@ IndexedDB (via `idb`)
 
 Composables
   ├── useNetworkStatus   — réactivité navigator.onLine
-  └── useOfflineQueue    — enqueue / drainQueue / pendingCount
+  ├── useOfflineQueue    — enqueue / drainQueue / pendingCount
+  ├── usePwaUpdate       — notification "prête hors-ligne" + vérification périodique des mises à jour SW
+  └── usePwaInstall      — prompt d'installation PWA (beforeinstallprompt)
 ```
 
 ---
@@ -110,6 +112,34 @@ interface QueuedAction {
 - En cas d'erreur serveur : **l'action est ignorée** (supprimée sans retry) pour ne pas bloquer la file. Un toast error est affiché.
 - `isSyncing` empêche les appels concurrents.
 
+### `usePwaUpdate`
+
+`inertia/composables/use_pwa_update.ts`
+
+Utilise `useRegisterSW` de `virtual:pwa-register/vue` (vite-plugin-pwa) pour :
+
+- Afficher un toast `success` quand le SW s'active pour la première fois et que le précache est complet (`offlineReady`).
+- Planifier une vérification des mises à jour SW toutes les heures via `registration.update()`.
+
+```ts
+usePwaUpdate() // appelé dans default.vue, aucune valeur retournée
+```
+
+### `usePwaInstall`
+
+`inertia/composables/use_pwa_install.ts`
+
+Gère l'événement `beforeinstallprompt` pour exposer un bouton d'installation natif.
+
+État partagé au niveau module (un seul listener, `canInstall` global).
+
+| Export          | Type           | Description                              |
+| --------------- | -------------- | ---------------------------------------- |
+| `canInstall`    | `Ref<boolean>` | `true` si le navigateur permet l'install |
+| `promptInstall` | `async`        | Ouvre le prompt d'installation natif     |
+
+Le bouton d'installation s'affiche dans `AsideMenu.vue` au-dessus du bouton « Déconnexion » quand `canInstall` est vrai.
+
 ---
 
 ## Intégration dans le layout
@@ -119,6 +149,7 @@ interface QueuedAction {
 ```ts
 const { isOnline } = useNetworkStatus()
 const { drainQueue } = useOfflineQueue()
+usePwaUpdate() // notification offlineReady + vérification horaire des mises à jour
 
 watch(isOnline, (online) => {
   if (online) drainQueue()
@@ -179,22 +210,38 @@ Clés dans `resources/lang/{fr,en}/common.json` :
 | `offline.syncing`     | Synchronisation en cours…                                                      | Syncing…                                                           |
 | `offline.syncSuccess` | {count} entrée(s) synchronisée(s)                                              | {count} entry(ies) synced                                          |
 | `offline.syncError`   | Erreur de synchronisation — action ignorée                                     | Sync error — action discarded                                      |
+| `pwa.offlineReady`    | Application prête pour une utilisation hors-ligne                              | App is ready for offline use                                       |
+| `pwa.install`         | Installer l'application                                                        | Install app                                                        |
 
 ---
 
 ## Tests
 
-`tests/inertia/use_offline_queue.spec.ts`
+### `use_offline_queue.spec.ts`
 
 Tests Vitest avec `fake-indexeddb` (IDB réinitialisé entre chaque test) et mocks `vue-sonner` + `@inertiajs/vue3`.
 
-Cas couverts :
+Cas couverts : `enqueue`, `drainQueue`, gestion de `pendingCount`, succès et erreur serveur.
 
-- `enqueue` ajoute en IDB et affiche un toast info
-- `enqueue` incrémente `pendingCount` correctement
-- `drainQueue` appelle `router.post` / `router.patch` selon la méthode
-- `drainQueue` supprime l'entrée IDB et réinitialise `pendingCount` en cas de succès
-- `drainQueue` ne fait rien si la file est vide
+### `use_pwa_install.spec.ts`
+
+Mock de `beforeinstallprompt` + `appinstalled`. Cas couverts :
+
+- `canInstall` false par défaut, true après l'événement
+- `promptInstall()` appelle `prompt()` sur l'événement différé
+- `canInstall` repasse à false sur `accepted`, reste true sur `dismissed`
+- `promptInstall()` sans prompt différé ne lève pas d'erreur
+- Réinitialisation sur `appinstalled`
+
+### `use_pwa_update.spec.ts`
+
+Mock de `virtual:pwa-register/vue` via alias Vitest + mock de `vue-sonner`. Cas couverts :
+
+- `useRegisterSW` appelé avec `immediate: true`
+- Toast `success` affiché quand `offlineReady` passe à `true`
+- Pas de toast si `offlineReady` reste `false`
+- `registration.update()` appelé toutes les heures via `onRegisteredSW`
+- `onRegisteredSW` avec `undefined` ne lève pas d'erreur
 
 ---
 
