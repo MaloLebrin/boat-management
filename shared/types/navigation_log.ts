@@ -64,3 +64,18 @@ export interface NavigationLogPortOption {
   id: number
   name: string
 }
+
+export interface ConflictLogSnapshot {
+  id: number
+  updatedAt: string
+  windForceBeaufort: number | null
+  seaState: string | null
+  crewCount: number | null
+  notes: string | null
+  arrivedAt: string | null
+  arrivalPortId: number | null
+  arrivalPortName: string | null
+  distanceNm: number | null
+  engineHoursEnd: number | null
+  fuelConsumedLiters: number | null
+}

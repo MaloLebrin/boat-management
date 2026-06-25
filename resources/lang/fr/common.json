@@ -28,5 +28,22 @@
   "offline.syncSuccess": "{count} entrée(s) synchronisée(s)",
   "offline.syncError": "Erreur de synchronisation — action ignorée",
   "pwa.offlineReady": "Application prête pour une utilisation hors-ligne",
-  "pwa.install": "Installer l'application"
+  "pwa.install": "Installer l'application",
+  "offline.conflict.title": "Conflit détecté",
+  "offline.conflict.description": "Cette sortie a été modifiée depuis votre mise hors-ligne. Choisissez la version à conserver :",
+  "offline.conflict.localVersion": "Vos modifications",
+  "offline.conflict.serverVersion": "Version serveur",
+  "offline.conflict.keepLocal": "Garder mes modifications",
+  "offline.conflict.keepServer": "Utiliser la version serveur",
+  "offline.conflict.kept": "Vos modifications seront renvoyées au serveur",
+  "offline.conflict.discarded": "Modifications locales abandonnées",
+  "navigationLog.field.windForceBeaufort": "Force du vent (Beaufort)",
+  "navigationLog.field.seaState": "État de la mer",
+  "navigationLog.field.crewCount": "Personnes à bord",
+  "navigationLog.field.notes": "Notes",
+  "navigationLog.field.arrivedAt": "Heure d'arrivée",
+  "navigationLog.field.arrivalPortName": "Port d'arrivée",
+  "navigationLog.field.distanceNm": "Distance (nm)",
+  "navigationLog.field.engineHoursEnd": "Heures moteur (fin)",
+  "navigationLog.field.fuelConsumedLiters": "Carburant consommé (L)"
 }

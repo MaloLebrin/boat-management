@@ -90,7 +90,8 @@ export default class NavigationLogsController {
         return
       }
       if (error instanceof NavigationLogConflictError) {
-        session.flash('error', i18n.t('flash.navigationLog.conflict'))
+        session.flash('conflictData', JSON.stringify(error.currentLog))
+        session.flash('conflictType', 'update-navigation-log')
         response.redirect().back()
         return
       }
@@ -142,7 +143,8 @@ export default class NavigationLogsController {
         return
       }
       if (error instanceof NavigationLogConflictError) {
-        session.flash('error', i18n.t('flash.navigationLog.conflict'))
+        session.flash('conflictData', JSON.stringify(error.currentLog))
+        session.flash('conflictType', 'close-navigation-log')
         response.redirect(`/boats/${boat.id}?tab=navigation-logs`)
         return
       }

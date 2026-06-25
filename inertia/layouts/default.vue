@@ -11,6 +11,7 @@ import LanguageSwitcher from '~/components/layout/LanguageSwitcher.vue'
 import NavItem from '~/components/layout/NavItem.vue'
 import { useNavSections } from '~/composables/use_nav_sections'
 import { useNetworkStatus } from '~/composables/use_network_status'
+import ConflictResolutionModal from '~/components/ConflictResolutionModal.vue'
 import { useOfflineQueue } from '~/composables/use_offline_queue'
 import { usePwaUpdate } from '~/composables/use_pwa_update'
 import { useT } from '~/composables/use_t'
@@ -23,7 +24,7 @@ const drawerTitleId = 'auth-sidebar-title'
 const { t } = useT()
 const { navSections } = useNavSections()
 const { isOnline } = useNetworkStatus()
-const { drainQueue } = useOfflineQueue()
+const { drainQueue, conflictedAction, resolveConflict } = useOfflineQueue()
 usePwaUpdate()
 
 watch(isOnline, (online) => {
@@ -251,5 +252,11 @@ onBeforeUnmount(() => {
     </Transition>
 
     <Toaster position="top-center" rich-colors />
+
+    <ConflictResolutionModal
+      v-if="conflictedAction"
+      :conflict="conflictedAction"
+      @resolve="resolveConflict"
+    />
   </div>
 </template>

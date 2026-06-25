@@ -11,21 +11,24 @@ vi.mock('vue-sonner', () => ({
   },
 }))
 
+const mockPageProps = vi.hoisted(() => ({
+  appT: {
+    'offline.savedQueue': 'Enregistré hors-ligne',
+    'offline.syncing': 'Synchronisation en cours…',
+    'offline.syncSuccess': '{count} entrée(s) synchronisée(s)',
+    'offline.syncError': 'Erreur de synchronisation',
+    'offline.conflict.kept': 'Vos modifications seront renvoyées',
+    'offline.conflict.discarded': 'Modifications locales abandonnées',
+  },
+  locale: 'fr',
+  flash: {} as Record<string, unknown>,
+}))
+
 vi.mock('@inertiajs/vue3', async () => {
   const actual = await vi.importActual<typeof import('@inertiajs/vue3')>('@inertiajs/vue3')
   return {
     ...actual,
-    usePage: vi.fn(() => ({
-      props: {
-        appT: {
-          'offline.savedQueue': 'Enregistré hors-ligne',
-          'offline.syncing': 'Synchronisation en cours…',
-          'offline.syncSuccess': '{count} entrée(s) synchronisée(s)',
-          'offline.syncError': 'Erreur de synchronisation',
-        },
-        locale: 'fr',
-      },
-    })),
+    usePage: vi.fn(() => ({ props: mockPageProps })),
     router: {
       post: vi.fn(),
       patch: vi.fn(),
@@ -36,7 +39,7 @@ vi.mock('@inertiajs/vue3', async () => {
 
 import { router } from '@inertiajs/vue3'
 import { toast } from 'vue-sonner'
-import { useOfflineQueue } from '../../inertia/composables/use_offline_queue'
+import { conflictedAction, useOfflineQueue } from '../../inertia/composables/use_offline_queue'
 
 function mountComposable() {
   let result: ReturnType<typeof useOfflineQueue> | undefined
@@ -99,10 +102,25 @@ function makeRouterCallOnSuccess() {
   })
 }
 
+function makeRouterCallOnSuccessWithConflict(
+  conflictType: string,
+  serverData: Record<string, unknown>
+) {
+  const impl = (_url: string, _data: unknown, options: any) => {
+    mockPageProps.flash = { conflictData: JSON.stringify(serverData), conflictType }
+    options?.onSuccess?.()
+    return undefined as any
+  }
+  vi.mocked(router.post).mockImplementation(impl)
+  vi.mocked(router.patch).mockImplementation(impl)
+  vi.mocked(router.put).mockImplementation(impl)
+}
+
 describe('useOfflineQueue', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    // Fresh IDB per test — no cross-test state
+    mockPageProps.flash = {}
+    conflictedAction.value = null
     global.indexedDB = new IDBFactory()
   })
 
@@ -304,5 +322,93 @@ describe('useOfflineQueue', () => {
 
     // Reset module-level state so it doesn't leak to other tests
     isSyncing.value = false
+  })
+
+  test('drainQueue sets conflictedAction and pauses queue on conflict response', async () => {
+    const serverData = { id: 5, updatedAt: '2026-06-25T12:00:00.000Z', notes: 'Serveur' }
+    makeRouterCallOnSuccessWithConflict('update-navigation-log', serverData)
+    const { enqueue, drainQueue, pendingCount } = mountComposable()
+
+    await enqueue({
+      type: 'update-navigation-log',
+      url: '/boats/1/navigation-logs/5',
+      method: 'patch',
+      payload: { notes: 'Local', _expectedUpdatedAt: '2026-06-25T10:00:00.000Z' },
+    })
+    expect(pendingCount.value).toBe(1)
+
+    await drainQueue()
+    await flushPromises()
+
+    // Action stays in queue (not deleted)
+    expect(pendingCount.value).toBe(1)
+    // isSyncing is reset so the modal can resolve
+    expect(conflictedAction.value).not.toBeNull()
+    expect(conflictedAction.value?.action.type).toBe('update-navigation-log')
+    expect(conflictedAction.value?.serverData).toEqual(serverData)
+    // No error toast
+    expect(toast.error).not.toHaveBeenCalled()
+  })
+
+  test('resolveConflict("server") discards action and decrements pendingCount', async () => {
+    const serverData = { id: 5, updatedAt: '2026-06-25T12:00:00.000Z', notes: 'Serveur' }
+    makeRouterCallOnSuccessWithConflict('update-navigation-log', serverData)
+    const { enqueue, drainQueue, pendingCount, resolveConflict } = mountComposable()
+
+    await enqueue({
+      type: 'update-navigation-log',
+      url: '/boats/1/navigation-logs/5',
+      method: 'patch',
+      payload: { notes: 'Local', _expectedUpdatedAt: '2026-06-25T10:00:00.000Z' },
+    })
+    await drainQueue()
+    await flushPromises()
+    expect(conflictedAction.value).not.toBeNull()
+
+    await resolveConflict('server')
+    await flushPromises()
+
+    expect(pendingCount.value).toBe(0)
+    expect(conflictedAction.value).toBeNull()
+    expect(toast.info).toHaveBeenCalledWith('Modifications locales abandonnées')
+  })
+
+  test('resolveConflict("local") re-enqueues with server updatedAt as new _expectedUpdatedAt', async () => {
+    const serverData = {
+      id: 5,
+      updatedAt: '2026-06-25T12:00:00.000Z',
+      notes: 'Serveur',
+    }
+    makeRouterCallOnSuccessWithConflict('update-navigation-log', serverData)
+    const { enqueue, drainQueue, pendingCount, resolveConflict } = mountComposable()
+
+    await enqueue({
+      type: 'update-navigation-log',
+      url: '/boats/1/navigation-logs/5',
+      method: 'patch',
+      payload: { notes: 'Local', _expectedUpdatedAt: '2026-06-25T10:00:00.000Z' },
+    })
+    await drainQueue()
+    await flushPromises()
+    expect(conflictedAction.value).not.toBeNull()
+
+    // Switch to normal success for the re-drain after resolving
+    makeRouterCallOnSuccess()
+    mockPageProps.flash = {}
+
+    await resolveConflict('local')
+    await flushPromises()
+
+    // pendingCount should be 0 after re-drain succeeded
+    await vi.waitFor(() => expect(pendingCount.value).toBe(0), { timeout: 1000 })
+    expect(conflictedAction.value).toBeNull()
+    expect(toast.info).toHaveBeenCalledWith('Vos modifications seront renvoyées')
+
+    // Re-submitted with server's updatedAt as the new expected value
+    expect(vi.mocked(router.patch)).toHaveBeenCalledWith(
+      '/boats/1/navigation-logs/5',
+      expect.objectContaining({ _expectedUpdatedAt: '2026-06-25T12:00:00.000Z' }),
+      expect.any(Object)
+    )
   })
 })
