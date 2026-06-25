@@ -9,6 +9,7 @@
     "documents": "Documents / Insurance",
     "port": "Port / Mooring",
     "equipment": "Equipment",
+    "entries": "Other expenses",
     "total": "Total"
   },
   "chart": {
@@ -36,6 +37,26 @@
     "submit": "Add",
     "deleteConfirm": "Delete this stay?"
   },
+  "entries": {
+    "formTitle": "Add an expense",
+    "listTitle": "Other expenses",
+    "label": "Label",
+    "amount": "Amount (EUR)",
+    "date": "Date",
+    "category": "Category",
+    "description": "Description",
+    "noEntries": "No other expenses recorded",
+    "submit": "Add",
+    "deleteConfirm": "Delete this expense?",
+    "categories": {
+      "maintenance": "Maintenance",
+      "fuel": "Fuel",
+      "documents": "Documents / Insurance",
+      "port": "Port / Mooring",
+      "equipment": "Equipment",
+      "other": "Other"
+    }
+  },
   "csv": {
     "headers": {
       "month": "month",
@@ -44,6 +65,7 @@
       "documents": "documents",
       "port": "port",
       "equipment": "equipment",
+      "entries": "other_expenses",
       "total": "total",
       "totalRow": "TOTAL"
     },

@@ -8,15 +8,18 @@ import BudgetBarChart from '~/components/boats/budget/BudgetBarChart.vue'
 import BudgetCategoryCard from '~/components/boats/budget/BudgetCategoryCard.vue'
 import BudgetPortStayForm from '~/components/boats/budget/BudgetPortStayForm.vue'
 import BudgetPortStayList from '~/components/boats/budget/BudgetPortStayList.vue'
+import BudgetEntryForm from '~/components/boats/budget/BudgetEntryForm.vue'
+import BudgetEntryList from '~/components/boats/budget/BudgetEntryList.vue'
 import { useCurrencyFormat } from '~/composables/use_currency_format'
 import { useT } from '~/composables/use_t'
-import type { BudgetData, BoatPortStayItem } from '~/types/budget'
+import type { BudgetData, BoatPortStayItem, BoatBudgetEntryItem } from '~/types/budget'
 
 const props = defineProps<{
   boat: { id: number; name: string }
   budget: BudgetData
   year: number
   portStays: BoatPortStayItem[]
+  entries: BoatBudgetEntryItem[]
   canManage: boolean
 }>()
 
@@ -57,6 +60,11 @@ const categories = computed(() => [
     key: 'equipment' as const,
     amount: props.budget.totals.equipment,
     previousAmount: props.budget.previousYearTotals?.equipment ?? null,
+  },
+  {
+    key: 'entries' as const,
+    amount: props.budget.totals.entries,
+    previousAmount: props.budget.previousYearTotals?.entries ?? null,
   },
 ])
 </script>
@@ -105,7 +113,7 @@ const categories = computed(() => [
 
     <div class="mt-8 space-y-8">
       <!-- Summary cards -->
-      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         <BudgetCategoryCard
           v-for="cat in categories"
           :key="cat.key"
@@ -141,6 +149,12 @@ const categories = computed(() => [
       <div class="space-y-4">
         <BudgetPortStayForm v-if="canManage" :boat-id="boat.id" />
         <BudgetPortStayList :boat-id="boat.id" :stays="portStays" :can-manage="canManage" />
+      </div>
+
+      <!-- Budget entries section -->
+      <div class="space-y-4">
+        <BudgetEntryForm v-if="canManage" :boat-id="boat.id" />
+        <BudgetEntryList :boat-id="boat.id" :entries="entries" :can-manage="canManage" />
       </div>
     </div>
   </div>

@@ -199,6 +199,30 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_port_stay_controller').default['destroy']>>>
     }
   }
+  'boats.budget.entries.store': {
+    methods: ["POST"]
+    pattern: '/boats/:id/budget/entries'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/budget_entry_validator').budgetEntryValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/budget_entry_validator').budgetEntryValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_budget_entry_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_budget_entry_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'boats.budget.entries.destroy': {
+    methods: ["DELETE"]
+    pattern: '/boats/:id/budget/entries/:entryId'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { id: ParamValue; entryId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_budget_entry_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_budget_entry_controller').default['destroy']>>>
+    }
+  }
   'boats.edit': {
     methods: ["GET","HEAD"]
     pattern: '/boats/:id/edit'

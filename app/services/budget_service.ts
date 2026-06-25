@@ -16,6 +16,7 @@ export default class BudgetService {
       documents: 0,
       port: 0,
       equipment: 0,
+      entries: 0,
       total: 0,
     }))
   }
@@ -128,14 +129,26 @@ export default class BudgetService {
     }))
   }
 
+  private async fetchEntriesByMonth(boatId: number, year: number): Promise<MonthRow[]> {
+    return db
+      .from('boat_budget_entries')
+      .where('boat_id', boatId)
+      .whereRaw('EXTRACT(YEAR FROM date) = ?', [year])
+      .select(db.raw('EXTRACT(MONTH FROM date)::int as month'))
+      .sum('amount as total')
+      .groupByRaw('EXTRACT(MONTH FROM date)')
+  }
+
   private async computeYearSummary(boatId: number, year: number): Promise<BudgetYearSummary> {
-    const [maintenanceRows, fuelRows, documentRows, portRows, equipmentRows] = await Promise.all([
-      this.fetchMaintenanceByMonth(boatId, year),
-      this.fetchFuelByMonth(boatId, year),
-      this.fetchDocumentsByMonth(boatId, year),
-      this.fetchPortByMonth(boatId, year),
-      this.fetchEquipmentByMonth(boatId, year),
-    ])
+    const [maintenanceRows, fuelRows, documentRows, portRows, equipmentRows, entriesRows] =
+      await Promise.all([
+        this.fetchMaintenanceByMonth(boatId, year),
+        this.fetchFuelByMonth(boatId, year),
+        this.fetchDocumentsByMonth(boatId, year),
+        this.fetchPortByMonth(boatId, year),
+        this.fetchEquipmentByMonth(boatId, year),
+        this.fetchEntriesByMonth(boatId, year),
+      ])
 
     const sumRows = (rows: MonthRow[]) =>
       rows.reduce((acc, r) => acc + (r.total ? Number.parseFloat(r.total) : 0), 0)
@@ -145,6 +158,7 @@ export default class BudgetService {
     const documents = sumRows(documentRows)
     const port = sumRows(portRows)
     const equipment = sumRows(equipmentRows)
+    const entries = sumRows(entriesRows)
 
     return {
       maintenance,
@@ -152,26 +166,36 @@ export default class BudgetService {
       documents,
       port,
       equipment,
-      total: maintenance + fuel + documents + port + equipment,
+      entries,
+      total: maintenance + fuel + documents + port + equipment + entries,
     }
   }
 
   async getForBoat(boat: Boat, year: number): Promise<BudgetData> {
-    const [maintenanceRows, fuelRows, documentRows, portRows, equipmentRows, previousYearTotals] =
-      await Promise.all([
-        this.fetchMaintenanceByMonth(boat.id, year),
-        this.fetchFuelByMonth(boat.id, year),
-        this.fetchDocumentsByMonth(boat.id, year),
-        this.fetchPortByMonth(boat.id, year),
-        this.fetchEquipmentByMonth(boat.id, year),
-        this.computeYearSummary(boat.id, year - 1),
-      ])
+    const [
+      maintenanceRows,
+      fuelRows,
+      documentRows,
+      portRows,
+      equipmentRows,
+      entriesRows,
+      previousYearTotals,
+    ] = await Promise.all([
+      this.fetchMaintenanceByMonth(boat.id, year),
+      this.fetchFuelByMonth(boat.id, year),
+      this.fetchDocumentsByMonth(boat.id, year),
+      this.fetchPortByMonth(boat.id, year),
+      this.fetchEquipmentByMonth(boat.id, year),
+      this.fetchEntriesByMonth(boat.id, year),
+      this.computeYearSummary(boat.id, year - 1),
+    ])
 
     const maintenanceByMonth = this.indexByMonth(maintenanceRows)
     const fuelByMonth = this.indexByMonth(fuelRows)
     const documentsByMonth = this.indexByMonth(documentRows)
     const portByMonth = this.indexByMonth(portRows)
     const equipmentByMonth = this.indexByMonth(equipmentRows)
+    const entriesByMonth = this.indexByMonth(entriesRows)
 
     const monthly = this.buildEmptyMonthly().map((row) => {
       const maintenance = maintenanceByMonth.get(row.month) ?? 0
@@ -179,6 +203,7 @@ export default class BudgetService {
       const documents = documentsByMonth.get(row.month) ?? 0
       const port = portByMonth.get(row.month) ?? 0
       const equipment = equipmentByMonth.get(row.month) ?? 0
+      const entries = entriesByMonth.get(row.month) ?? 0
       return {
         ...row,
         maintenance,
@@ -186,7 +211,8 @@ export default class BudgetService {
         documents,
         port,
         equipment,
-        total: maintenance + fuel + documents + port + equipment,
+        entries,
+        total: maintenance + fuel + documents + port + equipment + entries,
       }
     })
 
@@ -197,9 +223,10 @@ export default class BudgetService {
         documents: acc.documents + m.documents,
         port: acc.port + m.port,
         equipment: acc.equipment + m.equipment,
+        entries: acc.entries + m.entries,
         total: acc.total + m.total,
       }),
-      { maintenance: 0, fuel: 0, documents: 0, port: 0, equipment: 0, total: 0 }
+      { maintenance: 0, fuel: 0, documents: 0, port: 0, equipment: 0, entries: 0, total: 0 }
     )
 
     const hasPreviousData = previousYearTotals.total > 0

@@ -24,7 +24,7 @@ export default class BoatPortStayService {
       portName: data.portName,
       startedAt: data.startedAt,
       endedAt: data.endedAt ?? null,
-      cost: data.cost != null ? String(data.cost) : null,
+      cost: data.cost !== null && data.cost !== undefined ? String(data.cost) : null,
       notes: data.notes ?? null,
     })
   }

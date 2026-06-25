@@ -1,0 +1,210 @@
+import { test } from '@japa/runner'
+import testUtils from '@adonisjs/core/services/test_utils'
+import { DateTime } from 'luxon'
+import { BoatFactory } from '#database/factories/boat_factory'
+import { UserFactory } from '#database/factories/user_factory'
+import { createAdminUser } from '#tests/functional/helpers'
+import BoatBudgetEntry from '#models/boat_budget_entry'
+
+test.group('Budget Entries (functional)', (group) => {
+  group.each.setup(() => testUtils.db().truncate())
+
+  test('POST /boats/:id/budget/entries creates an entry for authorized user', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    const response = await client
+      .post(`/boats/${boat.id}/budget/entries`)
+      .form({
+        label: 'Taxe de francisation',
+        amount: '1250.00',
+        date: '2024-03-15',
+        category: 'documents',
+        description: 'Taxe annuelle',
+      })
+      .loginAs(user)
+      .redirects(0)
+
+    response.assertStatus(302)
+
+    const entries = await BoatBudgetEntry.query().where('boat_id', boat.id)
+    assert.lengthOf(entries, 1)
+    assert.equal(entries[0].label, 'Taxe de francisation')
+    assert.equal(entries[0].amount, '1250.00')
+    assert.equal(entries[0].category, 'documents')
+  })
+
+  test('POST /boats/:id/budget/entries defaults category to other', async ({ client, assert }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    const response = await client
+      .post(`/boats/${boat.id}/budget/entries`)
+      .form({
+        label: 'Cotisation club',
+        amount: '350.00',
+        date: '2024-01-01',
+      })
+      .loginAs(user)
+      .redirects(0)
+
+    response.assertStatus(302)
+
+    const entries = await BoatBudgetEntry.query().where('boat_id', boat.id)
+    assert.lengthOf(entries, 1)
+    assert.equal(entries[0].category, 'other')
+  })
+
+  test('POST /boats/:id/budget/entries redirects to /login when unauthenticated', async ({
+    client,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    const response = await client
+      .post(`/boats/${boat.id}/budget/entries`)
+      .form({
+        label: 'Test',
+        amount: '100.00',
+        date: '2024-01-01',
+      })
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertHeader('location', '/login')
+  })
+
+  test('POST /boats/:id/budget/entries redirects to /boats when boat not found', async ({
+    client,
+  }) => {
+    const user = await createAdminUser()
+
+    const response = await client
+      .post('/boats/999999/budget/entries')
+      .form({
+        label: 'Test',
+        amount: '100.00',
+        date: '2024-01-01',
+      })
+      .loginAs(user)
+
+    response.assertRedirectsTo('/boats')
+  })
+
+  test('POST /boats/:id/budget/entries redirects when boat belongs to another org', async ({
+    client,
+    assert,
+  }) => {
+    const owner = await createAdminUser()
+    const other = await UserFactory.with('organization').create()
+    const boat = await BoatFactory.merge({ organizationId: owner.organizationId! }).create()
+
+    const response = await client
+      .post(`/boats/${boat.id}/budget/entries`)
+      .form({
+        label: 'Test',
+        amount: '100.00',
+        date: '2024-01-01',
+      })
+      .loginAs(other)
+
+    response.assertRedirectsTo('/boats')
+
+    const entries = await BoatBudgetEntry.query().where('boat_id', boat.id)
+    assert.lengthOf(entries, 0)
+  })
+
+  test('POST /boats/:id/budget/entries validates required fields', async ({ client, assert }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    const response = await client
+      .post(`/boats/${boat.id}/budget/entries`)
+      .form({
+        label: '',
+        amount: '',
+        date: '',
+      })
+      .loginAs(user)
+      .redirects(0)
+
+    response.assertStatus(302)
+
+    const entries = await BoatBudgetEntry.query().where('boat_id', boat.id)
+    assert.lengthOf(entries, 0)
+  })
+
+  test('DELETE /boats/:id/budget/entries/:entryId deletes the entry', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const entry = await BoatBudgetEntry.create({
+      boatId: boat.id,
+      label: 'Test expense',
+      amount: '500.00',
+      date: DateTime.fromISO('2024-06-01'),
+      category: 'other',
+    })
+
+    const response = await client
+      .delete(`/boats/${boat.id}/budget/entries/${entry.id}`)
+      .loginAs(user)
+      .redirects(0)
+
+    response.assertStatus(302)
+
+    const deleted = await BoatBudgetEntry.find(entry.id)
+    assert.isNull(deleted)
+  })
+
+  test('DELETE /boats/:id/budget/entries/:entryId redirects to /login when unauthenticated', async ({
+    client,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const entry = await BoatBudgetEntry.create({
+      boatId: boat.id,
+      label: 'Test expense',
+      amount: '500.00',
+      date: DateTime.fromISO('2024-06-01'),
+      category: 'other',
+    })
+
+    const response = await client
+      .delete(`/boats/${boat.id}/budget/entries/${entry.id}`)
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertHeader('location', '/login')
+  })
+
+  test('DELETE /boats/:id/budget/entries/:entryId redirects when boat belongs to another org', async ({
+    client,
+    assert,
+  }) => {
+    const owner = await createAdminUser()
+    const other = await UserFactory.with('organization').create()
+    const boat = await BoatFactory.merge({ organizationId: owner.organizationId! }).create()
+    const entry = await BoatBudgetEntry.create({
+      boatId: boat.id,
+      label: 'Test expense',
+      amount: '500.00',
+      date: DateTime.fromISO('2024-06-01'),
+      category: 'other',
+    })
+
+    const response = await client
+      .delete(`/boats/${boat.id}/budget/entries/${entry.id}`)
+      .loginAs(other)
+
+    response.assertRedirectsTo('/boats')
+
+    const existing = await BoatBudgetEntry.find(entry.id)
+    assert.isNotNull(existing)
+  })
+})

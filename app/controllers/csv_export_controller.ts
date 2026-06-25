@@ -232,6 +232,7 @@ export default class CsvExportController {
       i18n.t('budget.csv.headers.documents'),
       i18n.t('budget.csv.headers.port'),
       i18n.t('budget.csv.headers.equipment'),
+      i18n.t('budget.csv.headers.entries'),
       i18n.t('budget.csv.headers.total'),
     ]
     const rows = budget.monthly.map((m) => [
@@ -241,6 +242,7 @@ export default class CsvExportController {
       m.documents.toFixed(2),
       m.port.toFixed(2),
       m.equipment.toFixed(2),
+      m.entries.toFixed(2),
       m.total.toFixed(2),
     ])
     rows.push([
@@ -250,6 +252,7 @@ export default class CsvExportController {
       budget.totals.documents.toFixed(2),
       budget.totals.port.toFixed(2),
       budget.totals.equipment.toFixed(2),
+      budget.totals.entries.toFixed(2),
       budget.totals.total.toFixed(2),
     ])
 

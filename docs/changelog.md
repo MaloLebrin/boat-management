@@ -3,6 +3,23 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-06-25 — Depenses libres (budget entries)
+
+Ajout de la possibilite de saisir des depenses libres (taxe de francisation, cotisation club, etc.) dans le module budget.
+
+- Table `boat_budget_entries` : `amount`, `date`, `label`, `category` (maintenance/fuel/documents/port/equipment/other), `description`
+- Modele `BoatBudgetEntry` avec relation `belongsTo` vers `Boat`
+- Service `BoatBudgetEntryService` : `listForBoat`, `create`, `delete`
+- Controller `BoatBudgetEntryController` : `store`, `destroy`
+- Routes : `POST /boats/:id/budget/entries`, `DELETE /boats/:id/budget/entries/:entryId`
+- `BudgetService` : nouvelle methode `fetchEntriesByMonth` ; `entries` ajoute a `BudgetMonthlyData` et `BudgetYearSummary`
+- Export CSV budget : colonne `entries` (depenses_libres) ajoutee
+- Frontend : `BudgetEntryForm.vue` (formulaire avec selection de categorie), `BudgetEntryList.vue` (liste avec badges couleur par categorie)
+- Page budget : categorie Depenses libres active en orange, grille 6 colonnes
+- Graphique mensuel : dataset Depenses libres en orange
+- i18n : cles `budget.entries.*`, `budget.categories.entries`, `budget.csv.headers.entries` et `flash.budgetEntry.*` en FR et EN
+- Tests : `budget_entries.spec.ts` (creation, suppression, validation, securite)
+
 ## 2026-06-25 — Prix d'achat equipements et categorie budget
 
 Ajout des champs `purchase_price` et `purchased_at` sur les 4 modeles d'equipements, avec integration dans le tableau de bord budget annuel.

@@ -4,7 +4,7 @@ import { useCurrencyFormat } from '~/composables/use_currency_format'
 import { useT } from '~/composables/use_t'
 
 const props = defineProps<{
-  category: 'maintenance' | 'fuel' | 'documents' | 'port' | 'equipment' | 'total'
+  category: 'maintenance' | 'fuel' | 'documents' | 'port' | 'equipment' | 'entries' | 'total'
   amount: number
   previousAmount: number | null
   previousYear: number | null
@@ -39,6 +39,7 @@ const COLORS: Record<string, string> = {
   documents: 'text-purple-600 dark:text-purple-400',
   port: 'text-teal-600 dark:text-teal-400',
   equipment: 'text-green-600 dark:text-green-400',
+  entries: 'text-orange-600 dark:text-orange-400',
   total: 'text-fg',
 }
 </script>

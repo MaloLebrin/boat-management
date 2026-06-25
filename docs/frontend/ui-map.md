@@ -48,6 +48,20 @@ Référence: `inertia/app.ts`.
 - sails: `inertia/pages/boats/sail_edit.vue` (PUT `/boats/:boatId/sails/:sailId`)
 - rig: `inertia/pages/boats/rig_edit.vue` (PUT `/boats/:boatId/rig`)
 
+### Budget
+
+- Page: `inertia/pages/boats/budget.vue` (GET `/boats/:id/budget?year=`)
+- Composants:
+  - `inertia/components/boats/budget/BudgetBarChart.vue` — graphique mensuel par catégorie
+  - `inertia/components/boats/budget/BudgetCategoryCard.vue` — carte totaux par catégorie
+  - `inertia/components/boats/budget/BudgetPortStayForm.vue` — formulaire ajout séjour port
+  - `inertia/components/boats/budget/BudgetPortStayList.vue` — liste séjours port avec suppression
+  - `inertia/components/boats/budget/BudgetEntryForm.vue` — formulaire dépense libre (catégorie, montant, date)
+  - `inertia/components/boats/budget/BudgetEntryList.vue` — liste dépenses libres avec badges catégorie
+- Props: `boat`, `budget`, `year`, `portStays`, `entries`, `canManage`
+- Types frontend: `inertia/types/budget.ts`
+- Source backend: `BudgetController.show`
+
 ## Patterns UI (forms)
 
 Le projet utilise le composant `<Form>` fourni par `@adonisjs/inertia/vue`.

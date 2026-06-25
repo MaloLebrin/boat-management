@@ -102,6 +102,18 @@ const routes = {
     tokens: [{"old":"/boats/:id/port-stays/:stayId","type":0,"val":"boats","end":""},{"old":"/boats/:id/port-stays/:stayId","type":1,"val":"id","end":""},{"old":"/boats/:id/port-stays/:stayId","type":0,"val":"port-stays","end":""},{"old":"/boats/:id/port-stays/:stayId","type":1,"val":"stayId","end":""}],
     types: placeholder as Registry['boats.portStays.destroy']['types'],
   },
+  'boats.budget.entries.store': {
+    methods: ["POST"],
+    pattern: '/boats/:id/budget/entries',
+    tokens: [{"old":"/boats/:id/budget/entries","type":0,"val":"boats","end":""},{"old":"/boats/:id/budget/entries","type":1,"val":"id","end":""},{"old":"/boats/:id/budget/entries","type":0,"val":"budget","end":""},{"old":"/boats/:id/budget/entries","type":0,"val":"entries","end":""}],
+    types: placeholder as Registry['boats.budget.entries.store']['types'],
+  },
+  'boats.budget.entries.destroy': {
+    methods: ["DELETE"],
+    pattern: '/boats/:id/budget/entries/:entryId',
+    tokens: [{"old":"/boats/:id/budget/entries/:entryId","type":0,"val":"boats","end":""},{"old":"/boats/:id/budget/entries/:entryId","type":1,"val":"id","end":""},{"old":"/boats/:id/budget/entries/:entryId","type":0,"val":"budget","end":""},{"old":"/boats/:id/budget/entries/:entryId","type":0,"val":"entries","end":""},{"old":"/boats/:id/budget/entries/:entryId","type":1,"val":"entryId","end":""}],
+    types: placeholder as Registry['boats.budget.entries.destroy']['types'],
+  },
   'boats.edit': {
     methods: ["GET","HEAD"],
     pattern: '/boats/:id/edit',
