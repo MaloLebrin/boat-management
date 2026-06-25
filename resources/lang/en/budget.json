@@ -8,6 +8,8 @@
     "fuel": "Fuel",
     "documents": "Documents / Insurance",
     "port": "Port / Mooring",
+    "equipment": "Equipment",
+    "entries": "Other expenses",
     "total": "Total"
   },
   "chart": {
@@ -23,12 +25,55 @@
     "newThisYear": "New this year"
   },
   "portUnavailable": "Port data coming soon",
+  "categoryHelp": {
+    "maintenance": "Sum of part prices (unit price × quantity) on maintenance events",
+    "fuel": "Sum of the \"Total cost\" field on fuel fill-ups",
+    "documents": "Sum of the \"Cost\" field on boat documents",
+    "port": "Sum of the \"Cost\" field on recorded port stays",
+    "equipment": "Sum of the \"Purchase price\" field on equipment items",
+    "entries": "Expenses entered manually on this page"
+  },
+  "portStay": {
+    "formTitle": "Add a port stay",
+    "listTitle": "Port stays",
+    "portName": "Port name",
+    "startedAt": "Arrival date",
+    "endedAt": "Departure date (optional)",
+    "cost": "Cost (EUR)",
+    "notes": "Notes",
+    "noStays": "No stays recorded",
+    "submit": "Add",
+    "deleteConfirm": "Delete this stay?"
+  },
+  "entries": {
+    "formTitle": "Add an expense",
+    "listTitle": "Other expenses",
+    "label": "Label",
+    "amount": "Amount (EUR)",
+    "date": "Date",
+    "category": "Category",
+    "description": "Description",
+    "noEntries": "No other expenses recorded",
+    "submit": "Add",
+    "deleteConfirm": "Delete this expense?",
+    "categories": {
+      "maintenance": "Maintenance",
+      "fuel": "Fuel",
+      "documents": "Documents / Insurance",
+      "port": "Port / Mooring",
+      "equipment": "Equipment",
+      "other": "Other"
+    }
+  },
   "csv": {
     "headers": {
       "month": "month",
       "maintenance": "maintenance",
       "fuel": "fuel",
       "documents": "documents",
+      "port": "port",
+      "equipment": "equipment",
+      "entries": "other_expenses",
       "total": "total",
       "totalRow": "TOTAL"
     },

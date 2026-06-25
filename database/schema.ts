@@ -78,6 +78,39 @@ export class AuditLogSchema extends BaseModel {
   declare userId: number | null
 }
 
+export class BoatBudgetEntrySchema extends BaseModel {
+  static $columns = [
+    'amount',
+    'boatId',
+    'category',
+    'createdAt',
+    'date',
+    'description',
+    'id',
+    'label',
+    'updatedAt',
+  ] as const
+  $columns = BoatBudgetEntrySchema.$columns
+  @column()
+  declare amount: string
+  @column()
+  declare boatId: number
+  @column()
+  declare category: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column.date()
+  declare date: DateTime
+  @column()
+  declare description: string | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare label: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
+}
+
 export class BoatDocumentSchema extends BaseModel {
   static $columns = [
     'boatId',
@@ -134,6 +167,8 @@ export class BoatEnginePartSchema extends BaseModel {
     'id',
     'minStockAlert',
     'notes',
+    'purchasePrice',
+    'purchasedAt',
     'reference',
     'stock',
     'supplier',
@@ -153,6 +188,10 @@ export class BoatEnginePartSchema extends BaseModel {
   declare minStockAlert: number | null
   @column()
   declare notes: string | null
+  @column()
+  declare purchasePrice: string | null
+  @column.date()
+  declare purchasedAt: DateTime | null
   @column()
   declare reference: string | null
   @column()
@@ -277,6 +316,8 @@ export class BoatGenericEquipmentSchema extends BaseModel {
     'model',
     'name',
     'notes',
+    'purchasePrice',
+    'purchasedAt',
     'quantity',
     'status',
     'updatedAt',
@@ -298,6 +339,10 @@ export class BoatGenericEquipmentSchema extends BaseModel {
   declare name: string
   @column()
   declare notes: string | null
+  @column()
+  declare purchasePrice: string | null
+  @column.date()
+  declare purchasedAt: DateTime | null
   @column()
   declare quantity: number | null
   @column()
@@ -558,6 +603,39 @@ export class BoatMaintenanceTaskSchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class BoatPortStaySchema extends BaseModel {
+  static $columns = [
+    'boatId',
+    'cost',
+    'createdAt',
+    'endedAt',
+    'id',
+    'notes',
+    'portName',
+    'startedAt',
+    'updatedAt',
+  ] as const
+  $columns = BoatPortStaySchema.$columns
+  @column()
+  declare boatId: number
+  @column()
+  declare cost: string | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime | null
+  @column.date()
+  declare endedAt: DateTime | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare notes: string | null
+  @column()
+  declare portName: string
+  @column.date()
+  declare startedAt: DateTime
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class BoatPositionHistorySchema extends BaseModel {
   static $columns = [
     'boatId',
@@ -647,6 +725,8 @@ export class BoatSafetyEquipmentSchema extends BaseModel {
     'expiryDate',
     'id',
     'notes',
+    'purchasePrice',
+    'purchasedAt',
     'quantity',
     'status',
     'updatedAt',
@@ -665,6 +745,10 @@ export class BoatSafetyEquipmentSchema extends BaseModel {
   @column()
   declare notes: string | null
   @column()
+  declare purchasePrice: string | null
+  @column.date()
+  declare purchasedAt: DateTime | null
+  @column()
   declare quantity: number | null
   @column()
   declare status: string
@@ -681,6 +765,8 @@ export class BoatSailSchema extends BaseModel {
     'manufacturedAt',
     'material',
     'notes',
+    'purchasePrice',
+    'purchasedAt',
     'reefPoints',
     'sailType',
     'status',
@@ -701,6 +787,10 @@ export class BoatSailSchema extends BaseModel {
   declare material: string | null
   @column()
   declare notes: string | null
+  @column()
+  declare purchasePrice: string | null
+  @column.date()
+  declare purchasedAt: DateTime | null
   @column()
   declare reefPoints: number | null
   @column()

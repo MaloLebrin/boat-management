@@ -3,7 +3,7 @@ import type Boat from '#models/boat'
 import BoatGenericEquipment from '#models/boat_generic_equipment'
 import type User from '#models/user'
 import type { BoatGenericEquipmentPayload } from '#shared/types/boat'
-import { assertBoatInUserOrg } from '#utils/boat_utils'
+import { assertBoatInUserOrg, toDateOrNull } from '#utils/boat_utils'
 import { inject } from '@adonisjs/core'
 
 export { BoatEquipmentNotFoundError }
@@ -23,6 +23,8 @@ export default class BoatGenericEquipmentService {
       quantity: payload.quantity ?? null,
       status: (payload.status as 'ok' | 'to_check' | 'to_replace') ?? 'ok',
       notes: payload.notes ?? null,
+      purchasePrice: payload.purchasePrice ?? null,
+      purchasedAt: toDateOrNull(payload.purchasedAt),
     })
   }
 
@@ -42,6 +44,8 @@ export default class BoatGenericEquipmentService {
     item.quantity = payload.quantity ?? null
     item.status = (payload.status as 'ok' | 'to_check' | 'to_replace') ?? item.status
     item.notes = payload.notes ?? null
+    item.purchasePrice = payload.purchasePrice ?? null
+    item.purchasedAt = toDateOrNull(payload.purchasedAt)
 
     await item.save()
     return item

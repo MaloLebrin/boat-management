@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { QuestionMarkCircleIcon } from '@heroicons/vue/24/outline'
 import { useCurrencyFormat } from '~/composables/use_currency_format'
 import { useT } from '~/composables/use_t'
 
 const props = defineProps<{
-  category: 'maintenance' | 'fuel' | 'documents' | 'port' | 'total'
+  category: 'maintenance' | 'fuel' | 'documents' | 'port' | 'equipment' | 'entries' | 'total'
   amount: number
   previousAmount: number | null
   previousYear: number | null
   unavailable?: boolean
+  helpText?: string
 }>()
 
 const { t } = useT()
@@ -37,7 +39,9 @@ const COLORS: Record<string, string> = {
   maintenance: 'text-amber-600 dark:text-amber-400',
   fuel: 'text-blue-600 dark:text-blue-400',
   documents: 'text-purple-600 dark:text-purple-400',
-  port: 'text-fg-subtle',
+  port: 'text-teal-600 dark:text-teal-400',
+  equipment: 'text-green-600 dark:text-green-400',
+  entries: 'text-orange-600 dark:text-orange-400',
   total: 'text-fg',
 }
 </script>
@@ -46,7 +50,18 @@ const COLORS: Record<string, string> = {
   <div
     class="rounded-(--radius-card) border border-border bg-surface-elevated p-5 shadow-(--shadow-xs)"
   >
-    <p class="text-sm font-semibold text-fg-muted">{{ t(`budget.categories.${category}`) }}</p>
+    <div class="flex items-center justify-between gap-1">
+      <p class="text-sm font-semibold text-fg-muted">{{ t(`budget.categories.${category}`) }}</p>
+      <button
+        v-if="helpText"
+        type="button"
+        :title="helpText"
+        :aria-label="helpText"
+        class="shrink-0 text-fg-subtle hover:text-fg-muted transition-colors"
+      >
+        <QuestionMarkCircleIcon class="h-4 w-4" />
+      </button>
+    </div>
     <p class="mt-3 font-display text-2xl font-bold tracking-tight" :class="COLORS[category]">
       {{ formatted }}
     </p>

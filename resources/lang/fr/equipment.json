@@ -1,14 +1,20 @@
 {
   "status": {
-    "label": "État",
-    "operational": "Opérationnel",
+    "label": "Etat",
+    "operational": "Operationnel",
     "in_maintenance": "En maintenance",
     "out_of_service": "Hors service",
-    "retired": "Retiré"
+    "retired": "Retire"
   },
   "notes": {
     "label": "Notes libres",
     "placeholder": "Observations, remarques, historique..."
+  },
+  "purchasePrice": {
+    "label": "Prix d'achat (EUR)"
+  },
+  "purchasedAt": {
+    "label": "Date d'achat"
   },
   "wearState": {
     "label": "État d'usure",

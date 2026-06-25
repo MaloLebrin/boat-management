@@ -6,14 +6,21 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import BudgetBarChart from '~/components/boats/budget/BudgetBarChart.vue'
 import BudgetCategoryCard from '~/components/boats/budget/BudgetCategoryCard.vue'
+import BudgetPortStayForm from '~/components/boats/budget/BudgetPortStayForm.vue'
+import BudgetPortStayList from '~/components/boats/budget/BudgetPortStayList.vue'
+import BudgetEntryForm from '~/components/boats/budget/BudgetEntryForm.vue'
+import BudgetEntryList from '~/components/boats/budget/BudgetEntryList.vue'
 import { useCurrencyFormat } from '~/composables/use_currency_format'
 import { useT } from '~/composables/use_t'
-import type { BudgetData } from '~/types/budget'
+import type { BudgetData, BoatPortStayItem, BoatBudgetEntryItem } from '~/types/budget'
 
 const props = defineProps<{
   boat: { id: number; name: string }
   budget: BudgetData
   year: number
+  portStays: BoatPortStayItem[]
+  entries: BoatBudgetEntryItem[]
+  canManage: boolean
 }>()
 
 const { t } = useT()
@@ -33,16 +40,42 @@ const categories = computed(() => [
     key: 'maintenance' as const,
     amount: props.budget.totals.maintenance,
     previousAmount: props.budget.previousYearTotals?.maintenance ?? null,
+    helpText: t('budget.categoryHelp.maintenance'),
   },
   {
     key: 'fuel' as const,
     amount: props.budget.totals.fuel,
     previousAmount: props.budget.previousYearTotals?.fuel ?? null,
+    helpText: t('budget.categoryHelp.fuel'),
   },
   {
     key: 'documents' as const,
     amount: props.budget.totals.documents,
     previousAmount: props.budget.previousYearTotals?.documents ?? null,
+    helpText: t('budget.categoryHelp.documents'),
+  },
+  {
+    key: 'port' as const,
+    amount: props.budget.totals.port,
+    previousAmount: props.budget.previousYearTotals?.port ?? null,
+    helpText: t('budget.categoryHelp.port'),
+  },
+  {
+    key: 'equipment' as const,
+    amount: props.budget.totals.equipment,
+    previousAmount: props.budget.previousYearTotals?.equipment ?? null,
+    helpText: t('budget.categoryHelp.equipment'),
+  },
+  {
+    key: 'entries' as const,
+    amount: props.budget.totals.entries,
+    previousAmount: props.budget.previousYearTotals?.entries ?? null,
+    helpText: t('budget.categoryHelp.entries'),
+  },
+  {
+    key: 'entries' as const,
+    amount: props.budget.totals.entries,
+    previousAmount: props.budget.previousYearTotals?.entries ?? null,
   },
 ])
 </script>
@@ -91,7 +124,7 @@ const categories = computed(() => [
 
     <div class="mt-8 space-y-8">
       <!-- Summary cards -->
-      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         <BudgetCategoryCard
           v-for="cat in categories"
           :key="cat.key"
@@ -99,13 +132,7 @@ const categories = computed(() => [
           :amount="cat.amount"
           :previous-amount="cat.previousAmount"
           :previous-year="budget.previousYearTotals ? year - 1 : null"
-        />
-        <BudgetCategoryCard
-          category="port"
-          :amount="0"
-          :previous-amount="null"
-          :previous-year="null"
-          :unavailable="true"
+          :help-text="cat.helpText"
         />
       </div>
 
@@ -129,6 +156,18 @@ const categories = computed(() => [
 
       <!-- Monthly chart -->
       <BudgetBarChart :monthly="budget.monthly" />
+
+      <!-- Port stays section -->
+      <div class="space-y-4">
+        <BudgetPortStayForm v-if="canManage" :boat-id="boat.id" />
+        <BudgetPortStayList :boat-id="boat.id" :stays="portStays" :can-manage="canManage" />
+      </div>
+
+      <!-- Budget entries section -->
+      <div class="space-y-4">
+        <BudgetEntryForm v-if="canManage" :boat-id="boat.id" />
+        <BudgetEntryList :boat-id="boat.id" :entries="entries" :can-manage="canManage" />
+      </div>
     </div>
   </div>
 </template>

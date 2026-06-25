@@ -3,6 +3,63 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-06-25 — Aide contextuelle budget (tooltips sources de données)
+
+Ajout de tooltips sur chaque carte de catégorie du tableau de bord budget pour expliquer d'où viennent les chiffres.
+
+- Prop `helpText` ajoutée sur `BudgetCategoryCard.vue` : affiche une icône `?` avec tooltip au survol
+- Page `budget.vue` : chaque `BudgetCategoryCard` reçoit la clé i18n `budget.help.<categorie>` en `helpText`
+- i18n : clés `budget.help.maintenance`, `.fuel`, `.documents`, `.port`, `.equipment`, `.entries`, `.total` en FR et EN
+
+Ajout de la possibilite de saisir des depenses libres (taxe de francisation, cotisation club, etc.) dans le module budget.
+
+- Table `boat_budget_entries` : `amount`, `date`, `label`, `category` (maintenance/fuel/documents/port/equipment/other), `description`
+- Modele `BoatBudgetEntry` avec relation `belongsTo` vers `Boat`
+- Service `BoatBudgetEntryService` : `listForBoat`, `create`, `delete`
+- Controller `BoatBudgetEntryController` : `store`, `destroy`
+- Routes : `POST /boats/:id/budget/entries`, `DELETE /boats/:id/budget/entries/:entryId`
+- `BudgetService` : nouvelle methode `fetchEntriesByMonth` ; `entries` ajoute a `BudgetMonthlyData` et `BudgetYearSummary`
+- Export CSV budget : colonne `entries` (depenses_libres) ajoutee
+- Frontend : `BudgetEntryForm.vue` (formulaire avec selection de categorie), `BudgetEntryList.vue` (liste avec badges couleur par categorie)
+- Page budget : categorie Depenses libres active en orange, grille 6 colonnes
+- Graphique mensuel : dataset Depenses libres en orange
+- i18n : cles `budget.entries.*`, `budget.categories.entries`, `budget.csv.headers.entries` et `flash.budgetEntry.*` en FR et EN
+- Tests : `budget_entries.spec.ts` (creation, suppression, validation, securite)
+
+## 2026-06-25 — Prix d'achat equipements et categorie budget
+
+Ajout des champs `purchase_price` et `purchased_at` sur les 4 modeles d'equipements, avec integration dans le tableau de bord budget annuel.
+
+- 4 migrations : alter `boat_generic_equipment`, `boat_safety_equipment`, `boat_sails`, `boat_engine_parts` pour ajouter `purchase_price` (decimal 10,2) et `purchased_at` (date)
+- Validators : champs ajoutes dans `createGenericEquipmentValidator`, `updateGenericEquipmentValidator`, `createSafetyEquipmentValidator`, `updateSafetyEquipmentValidator`, `sailPayload`, `partFields`
+- Services : mapping des nouveaux champs dans `BoatGenericEquipmentService`, `BoatSafetyEquipmentService`, `BoatSailService`, `BoatEnginePartService`
+- Types : `purchasePrice` et `purchasedAt` ajoutes dans `BoatGenericEquipmentPayload`, `BoatSafetyEquipmentPayload`, `BoatSailPayload`, `BoatEnginePartPayload` (`shared/types/boat.ts`)
+- `BudgetMonthlyData` et `BudgetYearSummary` : nouveau champ `equipment`
+- `BudgetService.fetchEquipmentByMonth` : agregation sur les 4 tables (avec jointure `boat_engines` pour `boat_engine_parts`)
+- Export CSV budget : colonne `equipment` ajoutee
+- Frontend : champs prix/date dans `BoatGenericEquipmentFields.vue`, `BoatSafetyEquipmentFields.vue`, `BoatEquipmentSailFields.vue`, `EnginePartModal.vue`
+- Page budget : categorie Equipements en couleur verte, grille 5 colonnes
+- Graphique mensuel : dataset Equipment en vert
+- i18n : `budget.categories.equipment`, `budget.csv.headers.equipment`, `equipment.purchasePrice.label`, `equipment.purchasedAt.label` en FR et EN
+- Tests : `budget_equipment.spec.ts` (integration equipements dans budget)
+
+## 2026-06-25 — Sejours au port et integration budget
+
+Ajout de la gestion des sejours au port avec cout, integree dans le tableau de bord budget annuel.
+
+- Table `boat_port_stays` : `port_name`, `started_at`, `ended_at`, `cost`, `notes`
+- Modele `BoatPortStay` avec relation `belongsTo` vers `Boat`
+- Service `BoatPortStayService` : `listForBoat`, `create`, `delete`
+- Controller `BoatPortStayController` : `store`, `destroy`
+- Routes : `POST /boats/:id/port-stays`, `DELETE /boats/:id/port-stays/:stayId`
+- `BudgetService` : nouvelle methode `fetchPortByMonth` ; `port` ajoute a `BudgetMonthlyData` et `BudgetYearSummary`
+- Export CSV budget : colonne `port` ajoutee
+- Frontend : `BudgetPortStayForm.vue` (formulaire useForm), `BudgetPortStayList.vue` (liste avec suppression)
+- Page budget : categorie Port active avec total et comparaison N-1
+- Graphique mensuel : dataset Port en couleur teal
+- i18n : cles `budget.portStay.*` et `flash.portStay.*` en FR et EN
+- Policy `BoatPolicy.manage` pour controler les droits de gestion
+
 ## 2026-06-25 — PWA : interface de résolution de conflits
 
 Quand une action PATCH offline entre en conflit avec une version plus récente du serveur, une modale s'affiche pour laisser l'utilisateur choisir la version à conserver.

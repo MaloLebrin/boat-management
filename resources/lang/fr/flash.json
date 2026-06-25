@@ -158,5 +158,13 @@
     "updated": "Équipement mis à jour.",
     "deleted": "Équipement supprimé.",
     "notFound": "Équipement introuvable."
+  },
+  "portStay": {
+    "created": "Séjour au port enregistré.",
+    "deleted": "Séjour au port supprimé."
+  },
+  "budgetEntry": {
+    "created": "Dépense enregistrée.",
+    "deleted": "Dépense supprimée."
   }
 }

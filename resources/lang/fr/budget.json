@@ -8,6 +8,8 @@
     "fuel": "Carburant",
     "documents": "Documents / Assurance",
     "port": "Port / Mouillage",
+    "equipment": "Equipements",
+    "entries": "Depenses libres",
     "total": "Total"
   },
   "chart": {
@@ -23,12 +25,55 @@
     "newThisYear": "Nouveau cette année"
   },
   "portUnavailable": "Données port à venir",
+  "categoryHelp": {
+    "maintenance": "Somme des prix de pièces (prix unitaire × quantité) sur les événements de maintenance",
+    "fuel": "Somme du champ « Coût total » sur les pleins de carburant",
+    "documents": "Somme du champ « Coût » sur les documents du bateau",
+    "port": "Somme du champ « Coût » sur les escales enregistrées",
+    "equipment": "Somme du champ « Prix d'achat » sur les équipements",
+    "entries": "Dépenses saisies manuellement depuis cette page"
+  },
+  "portStay": {
+    "formTitle": "Ajouter un séjour au port",
+    "listTitle": "Séjours au port",
+    "portName": "Nom du port",
+    "startedAt": "Date d'arrivée",
+    "endedAt": "Date de départ (optionnel)",
+    "cost": "Coût (EUR)",
+    "notes": "Notes",
+    "noStays": "Aucun séjour enregistré",
+    "submit": "Ajouter",
+    "deleteConfirm": "Supprimer ce séjour ?"
+  },
+  "entries": {
+    "formTitle": "Ajouter une depense",
+    "listTitle": "Depenses libres",
+    "label": "Libelle",
+    "amount": "Montant (EUR)",
+    "date": "Date",
+    "category": "Categorie",
+    "description": "Description",
+    "noEntries": "Aucune depense libre enregistree",
+    "submit": "Ajouter",
+    "deleteConfirm": "Supprimer cette depense ?",
+    "categories": {
+      "maintenance": "Maintenance",
+      "fuel": "Carburant",
+      "documents": "Documents / Assurance",
+      "port": "Port / Mouillage",
+      "equipment": "Equipements",
+      "other": "Autre"
+    }
+  },
   "csv": {
     "headers": {
       "month": "mois",
       "maintenance": "maintenance",
       "fuel": "carburant",
       "documents": "documents",
+      "port": "port",
+      "equipment": "equipements",
+      "entries": "depenses_libres",
       "total": "total",
       "totalRow": "TOTAL"
     },

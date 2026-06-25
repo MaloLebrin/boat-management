@@ -18,6 +18,10 @@ export type ScannedRoutes = {
     'boats.export.navigationLogs': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.export.budget': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.budget': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'boats.portStays.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'boats.portStays.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'stayId': ParamValue} }
+    'boats.budget.entries.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'boats.budget.entries.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'entryId': ParamValue} }
     'boats.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -328,6 +332,8 @@ export type ScannedRoutes = {
   }
   POST: {
     'boats.store': { paramsTuple?: []; params?: {} }
+    'boats.portStays.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'boats.budget.entries.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boat_equipment.store_engine': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'boat_media.store_engine_document': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
     'boat_engine_parts.store': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
@@ -379,31 +385,9 @@ export type ScannedRoutes = {
     'ai.boatSuggestions': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'demo.login': { paramsTuple?: []; params?: {} }
   }
-  PUT: {
-    'boats.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'boat_equipment.update_engine': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
-    'boat_engine_parts.update': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue,'partId': ParamValue} }
-    'boat_equipment.update_sail': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'sailId': ParamValue} }
-    'boat_equipment.upsert_rig': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
-    'boats.maintenanceTasks.done': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'taskId': ParamValue} }
-    'boat_safety_equipment.update': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'itemId': ParamValue} }
-    'boat_generic_equipment.update': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'itemId': ParamValue} }
-    'boats.maintenanceSheets.complete': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'sheetId': ParamValue} }
-    'boats.maintenanceSheetItems.update': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'sheetId': ParamValue,'itemId': ParamValue} }
-    'boats.incidents.update': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'incidentId': ParamValue} }
-    'boats.adminDocuments.update': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'documentId': ParamValue} }
-    'ports.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'ports.pontoons.update': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'pontoonId': ParamValue} }
-    'ports.mouillages.update': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'mouillageId': ParamValue} }
-    'spots.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'settings.profile.update': { paramsTuple?: []; params?: {} }
-    'settings.org.update': { paramsTuple?: []; params?: {} }
-    'settings.ai.update': { paramsTuple?: []; params?: {} }
-    'settings.branding.update': { paramsTuple?: []; params?: {} }
-    'organization.members.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'crew.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-  }
   DELETE: {
+    'boats.portStays.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'stayId': ParamValue} }
+    'boats.budget.entries.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'entryId': ParamValue} }
     'boats.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boat_equipment.destroy_engine': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
     'boat_media.destroy_engine_media': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue,'mediaId': ParamValue} }
@@ -431,6 +415,30 @@ export type ScannedRoutes = {
     'notifications.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'crew.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'crew.certifications.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'memberId': ParamValue,'certId': ParamValue} }
+  }
+  PUT: {
+    'boats.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'boat_equipment.update_engine': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
+    'boat_engine_parts.update': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue,'partId': ParamValue} }
+    'boat_equipment.update_sail': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'sailId': ParamValue} }
+    'boat_equipment.upsert_rig': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
+    'boats.maintenanceTasks.done': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'taskId': ParamValue} }
+    'boat_safety_equipment.update': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'itemId': ParamValue} }
+    'boat_generic_equipment.update': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'itemId': ParamValue} }
+    'boats.maintenanceSheets.complete': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'sheetId': ParamValue} }
+    'boats.maintenanceSheetItems.update': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'sheetId': ParamValue,'itemId': ParamValue} }
+    'boats.incidents.update': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'incidentId': ParamValue} }
+    'boats.adminDocuments.update': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'documentId': ParamValue} }
+    'ports.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'ports.pontoons.update': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'pontoonId': ParamValue} }
+    'ports.mouillages.update': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'mouillageId': ParamValue} }
+    'spots.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'settings.profile.update': { paramsTuple?: []; params?: {} }
+    'settings.org.update': { paramsTuple?: []; params?: {} }
+    'settings.ai.update': { paramsTuple?: []; params?: {} }
+    'settings.branding.update': { paramsTuple?: []; params?: {} }
+    'organization.members.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'crew.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   PATCH: {
     'boats.assign': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
