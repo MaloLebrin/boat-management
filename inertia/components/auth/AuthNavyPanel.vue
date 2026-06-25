@@ -107,7 +107,7 @@ const modeKey = {
           {{ t(`auth.${modeKey[mode]}.marketing.subtitle`) }}
         </p>
 
-        <!-- FleetIde AI preview card (login + register only) -->
+        <!-- FleetAI preview card (login + register only) -->
         <div
           v-if="mode === 'login' || mode === 'register'"
           class="mt-9 rounded-xl p-3.5"
@@ -133,7 +133,7 @@ const modeKey = {
               <path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8L12 3z" />
             </svg>
             <span class="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#bcb1e0]"
-              >FLEETIDE</span
+              >FLEETAI</span
             >
           </div>
           <p class="text-[13px] leading-relaxed" style="color: rgba(250, 246, 238, 0.9)">
