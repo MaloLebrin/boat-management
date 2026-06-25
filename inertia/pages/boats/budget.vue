@@ -40,26 +40,37 @@ const categories = computed(() => [
     key: 'maintenance' as const,
     amount: props.budget.totals.maintenance,
     previousAmount: props.budget.previousYearTotals?.maintenance ?? null,
+    helpText: t('budget.categoryHelp.maintenance'),
   },
   {
     key: 'fuel' as const,
     amount: props.budget.totals.fuel,
     previousAmount: props.budget.previousYearTotals?.fuel ?? null,
+    helpText: t('budget.categoryHelp.fuel'),
   },
   {
     key: 'documents' as const,
     amount: props.budget.totals.documents,
     previousAmount: props.budget.previousYearTotals?.documents ?? null,
+    helpText: t('budget.categoryHelp.documents'),
   },
   {
     key: 'port' as const,
     amount: props.budget.totals.port,
     previousAmount: props.budget.previousYearTotals?.port ?? null,
+    helpText: t('budget.categoryHelp.port'),
   },
   {
     key: 'equipment' as const,
     amount: props.budget.totals.equipment,
     previousAmount: props.budget.previousYearTotals?.equipment ?? null,
+    helpText: t('budget.categoryHelp.equipment'),
+  },
+  {
+    key: 'entries' as const,
+    amount: props.budget.totals.entries,
+    previousAmount: props.budget.previousYearTotals?.entries ?? null,
+    helpText: t('budget.categoryHelp.entries'),
   },
   {
     key: 'entries' as const,
@@ -121,6 +132,7 @@ const categories = computed(() => [
           :amount="cat.amount"
           :previous-amount="cat.previousAmount"
           :previous-year="budget.previousYearTotals ? year - 1 : null"
+          :help-text="cat.helpText"
         />
       </div>
 

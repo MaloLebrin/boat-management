@@ -146,7 +146,7 @@
     "primaryColorLabel": "Primary colour",
     "secondaryColorLabel": "Secondary colour",
     "appNameLabel": "Application name",
-    "appNamePlaceholder": "Fleetide",
+    "appNamePlaceholder": "FleetAI",
     "appNameHint": "Replaces the name displayed in the interface.",
     "preview": "Preview",
     "save": "Save",
