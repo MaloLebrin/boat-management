@@ -19,6 +19,7 @@ vi.mock('@inertiajs/vue3', async () => {
       props: {
         appT: {
           'offline.savedQueue': 'Enregistré hors-ligne',
+          'offline.syncing': 'Synchronisation en cours…',
           'offline.syncSuccess': '{count} entrée(s) synchronisée(s)',
           'offline.syncError': 'Erreur de synchronisation',
         },
@@ -51,6 +52,21 @@ function mountComposable() {
   )
 
   return result!
+}
+
+function makeRouterCallOnError() {
+  vi.mocked(router.post).mockImplementation((_url, _data, options: any) => {
+    options?.onError?.()
+    return undefined as any
+  })
+  vi.mocked(router.patch).mockImplementation((_url, _data, options: any) => {
+    options?.onError?.()
+    return undefined as any
+  })
+  vi.mocked(router.put).mockImplementation((_url, _data, options: any) => {
+    options?.onError?.()
+    return undefined as any
+  })
 }
 
 function makeRouterCallOnSuccess() {
@@ -177,5 +193,78 @@ describe('useOfflineQueue', () => {
 
     expect(vi.mocked(router.post)).not.toHaveBeenCalled()
     expect(vi.mocked(router.patch)).not.toHaveBeenCalled()
+  })
+
+  test('drainQueue calls router.put for put method action', async () => {
+    makeRouterCallOnSuccess()
+    const { enqueue, drainQueue, pendingCount } = mountComposable()
+
+    await enqueue({
+      type: 'update-fuel-log',
+      url: '/boats/1/fuel-logs/3',
+      method: 'put',
+      payload: { quantityLiters: '60' },
+    })
+
+    await drainQueue()
+    await vi.waitFor(() => expect(pendingCount.value).toBe(0), { timeout: 1000 })
+
+    expect(vi.mocked(router.put)).toHaveBeenCalledWith(
+      '/boats/1/fuel-logs/3',
+      { quantityLiters: '60' },
+      expect.objectContaining({ preserveScroll: true })
+    )
+  })
+
+  test('drainQueue shows error toast and discards action on server error', async () => {
+    makeRouterCallOnError()
+    const { enqueue, drainQueue, pendingCount } = mountComposable()
+
+    await enqueue({
+      type: 'create-navigation-log',
+      url: '/boats/1/navigation-logs',
+      method: 'post',
+      payload: { departedAt: '2026-06-24T10:00' },
+    })
+    expect(pendingCount.value).toBe(1)
+
+    await drainQueue()
+    await vi.waitFor(() => expect(pendingCount.value).toBe(0), { timeout: 1000 })
+
+    expect(toast.error).toHaveBeenCalledOnce()
+    expect(toast.success).not.toHaveBeenCalled()
+  })
+
+  test('drainQueue shows syncing toast when starting drain', async () => {
+    makeRouterCallOnSuccess()
+    const { enqueue, drainQueue, pendingCount } = mountComposable()
+
+    await enqueue({
+      type: 'create-navigation-log',
+      url: '/boats/1/navigation-logs',
+      method: 'post',
+      payload: { departedAt: '2026-06-24T10:00' },
+    })
+
+    await drainQueue()
+    await vi.waitFor(() => expect(pendingCount.value).toBe(0), { timeout: 1000 })
+
+    expect(toast.info).toHaveBeenCalledWith('Synchronisation en cours…')
+  })
+
+  test('drainQueue prevents concurrent calls when already syncing', async () => {
+    const { drainQueue, isSyncing } = mountComposable()
+
+    // Directly set the module-level guard as if a drain is in progress
+    isSyncing.value = true
+
+    await drainQueue()
+
+    expect(vi.mocked(router.post)).not.toHaveBeenCalled()
+    expect(vi.mocked(router.patch)).not.toHaveBeenCalled()
+    expect(vi.mocked(router.put)).not.toHaveBeenCalled()
+
+    // Reset module-level state so it doesn't leak to other tests
+    isSyncing.value = false
   })
 })
