@@ -69,9 +69,13 @@ export function useOfflineQueue() {
     const action = actions[0]
     toast.info(t('offline.syncing'))
 
+    // Track whether onSuccess or onError ran so onFinish can detect 5xx/network errors.
+    let settled = false
+
     const callbacks = {
       preserveScroll: true as const,
       onSuccess: async () => {
+        settled = true
         await db.delete(STORE_NAME, action.id)
         const remaining = await db.count(STORE_NAME)
         pendingCount.value = remaining
@@ -82,14 +86,21 @@ export function useOfflineQueue() {
           await drainQueue()
         }
       },
-      // On server rejection the action is discarded to unblock the queue.
-      // A persistent error here would block all subsequent entries indefinitely.
+      // On validation rejection (4xx) the action is discarded to unblock the queue.
       onError: async () => {
+        settled = true
         await db.delete(STORE_NAME, action.id)
         const remaining = await db.count(STORE_NAME)
         pendingCount.value = remaining
         isSyncing.value = false
         toast.error(t('offline.syncError'))
+      },
+      // On 5xx or unexpected network error, onSuccess/onError are not called.
+      // Keep the action in the queue and reset the guard so the next reconnect can retry.
+      onFinish: () => {
+        if (!settled) {
+          isSyncing.value = false
+        }
       },
     }
 

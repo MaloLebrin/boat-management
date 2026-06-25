@@ -14,8 +14,9 @@ export default defineConfig({
       injectRegister: false,
       manifest: false,
       workbox: {
-        globPatterns: ['**/*.{js,css,ico,png,svg,woff2}'],
-        navigateFallback: null,
+        globPatterns: ['**/*.{js,css,ico,png,svg,woff2}', 'offline.html'],
+        navigateFallback: '/offline.html',
+        navigateFallbackDenylist: [/^\/api\//, /^\/up\b/, /^\/_inertia/],
         runtimeCaching: [
           {
             urlPattern: /^\/(boats|navigation|planning)(\/.*)?$/,

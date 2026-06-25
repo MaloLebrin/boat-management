@@ -1,4 +1,5 @@
 import {
+  NavigationLogConflictError,
   NavigationLogNotFoundError,
   NavigationLogValidationError,
 } from '#exceptions/navigation_log_errors'
@@ -13,7 +14,7 @@ import type {
 import { toDateTime } from '#shared/helpers/maintenance'
 import db from '@adonisjs/lucid/services/db'
 
-export { NavigationLogNotFoundError, NavigationLogValidationError }
+export { NavigationLogConflictError, NavigationLogNotFoundError, NavigationLogValidationError }
 export type { CreateNavigationLogPayload, CloseNavigationLogPayload, UpdateNavigationLogPayload }
 
 export default class NavigationLogService {
@@ -60,6 +61,12 @@ export default class NavigationLogService {
       .first()
 
     if (!log) throw new NavigationLogNotFoundError()
+
+    if (payload.expectedUpdatedAt !== undefined && log.updatedAt) {
+      if (log.updatedAt.toISO() !== payload.expectedUpdatedAt) {
+        throw new NavigationLogConflictError()
+      }
+    }
 
     const arrivedAt = toDateTime(payload.arrivedAt)
 
@@ -142,6 +149,12 @@ export default class NavigationLogService {
       .first()
 
     if (!log) throw new NavigationLogNotFoundError()
+
+    if (payload.expectedUpdatedAt !== undefined && log.updatedAt) {
+      if (log.updatedAt.toISO() !== payload.expectedUpdatedAt) {
+        throw new NavigationLogConflictError()
+      }
+    }
 
     if (payload.windForceBeaufort !== undefined) log.windForceBeaufort = payload.windForceBeaufort
     if (payload.seaState !== undefined) log.seaState = payload.seaState

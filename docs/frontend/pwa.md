@@ -192,10 +192,12 @@ function handleSubmit() {
 
 ### Formulaires supportés
 
-| Composant               | Type action             | URL                               |
-| ----------------------- | ----------------------- | --------------------------------- |
-| `NavigationLogForm.vue` | `create-navigation-log` | `POST /boats/:id/navigation-logs` |
-| `BoatFuelLogForm.vue`   | `create-fuel-log`       | `POST /boats/:id/fuel-logs`       |
+| Composant                     | Type action             | URL                                             | Méthode |
+| ----------------------------- | ----------------------- | ----------------------------------------------- | ------- |
+| `NavigationLogForm.vue`       | `create-navigation-log` | `POST /boats/:id/navigation-logs`               | post    |
+| `BoatFuelLogForm.vue`         | `create-fuel-log`       | `POST /boats/:id/fuel-logs`                     | post    |
+| `NavigationLogUpdateForm.vue` | `update-navigation-log` | `PATCH /boats/:id/navigation-logs/:logId`       | patch   |
+| `NavigationLogCloseForm.vue`  | `close-navigation-log`  | `PATCH /boats/:id/navigation-logs/:logId/close` | patch   |
 
 ---
 
@@ -245,14 +247,15 @@ Mock de `virtual:pwa-register/vue` via alias Vitest + mock de `vue-sonner`. Cas 
 
 ---
 
-## Limites connues (V1)
+## Comportements et limites
 
-| Limite                              | Note                                                                               |
-| ----------------------------------- | ---------------------------------------------------------------------------------- |
-| **Last-write-wins**                 | Pas de détection de conflit — la dernière sync écrase.                             |
-| **Pages non visitées**              | Inaccessibles hors-ligne (pas d'app-shell). Prévu en V2.                           |
-| **Erreur serveur = discard**        | Une action rejetée par le serveur est supprimée sans retry pour débloquer la file. |
-| **Modifications offline seulement** | Les formulaires de mise à jour (edit) ne sont pas encore offline-aware.            |
+| Comportement                    | Note                                                                                                                            |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| **Pages non visitées**          | Servies par `public/offline.html` via `navigateFallback` Workbox — message bilingue + bouton "réessayer".                       |
+| **Erreur 5xx / réseau**         | L'action reste en file et `isSyncing` est réinitialisé via `onFinish`. Elle sera rejouée à la prochaine reconnexion.            |
+| **Erreur 4xx (validation)**     | L'action est supprimée pour débloquer la file — les données invalides ne peuvent pas être corrigées offline.                    |
+| **Détection de conflit**        | Les actions PATCH incluent `_expectedUpdatedAt`. Le backend rejette (flash `conflict`) si la sortie a été modifiée entre-temps. |
+| **Last-write-wins (créations)** | Les créations (POST) n'ont pas de conflit — chaque enregistrement est nouveau.                                                  |
 
 ---
 

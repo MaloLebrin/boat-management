@@ -69,6 +69,21 @@ function makeRouterCallOnError() {
   })
 }
 
+function makeRouterCallOnFinishOnly() {
+  vi.mocked(router.post).mockImplementation((_url, _data, options: any) => {
+    options?.onFinish?.()
+    return undefined as any
+  })
+  vi.mocked(router.patch).mockImplementation((_url, _data, options: any) => {
+    options?.onFinish?.()
+    return undefined as any
+  })
+  vi.mocked(router.put).mockImplementation((_url, _data, options: any) => {
+    options?.onFinish?.()
+    return undefined as any
+  })
+}
+
 function makeRouterCallOnSuccess() {
   vi.mocked(router.post).mockImplementation((_url, _data, options: any) => {
     options?.onSuccess?.()
@@ -250,6 +265,29 @@ describe('useOfflineQueue', () => {
     await vi.waitFor(() => expect(pendingCount.value).toBe(0), { timeout: 1000 })
 
     expect(toast.info).toHaveBeenCalledWith('Synchronisation en cours…')
+  })
+
+  test('drainQueue keeps action in queue and resets isSyncing on 5xx / network error', async () => {
+    makeRouterCallOnFinishOnly()
+    const { enqueue, drainQueue, pendingCount, isSyncing } = mountComposable()
+
+    await enqueue({
+      type: 'create-navigation-log',
+      url: '/boats/1/navigation-logs',
+      method: 'post',
+      payload: { departedAt: '2026-06-24T10:00' },
+    })
+    expect(pendingCount.value).toBe(1)
+
+    await drainQueue()
+    await flushPromises()
+
+    // Action stays in queue for the next retry
+    expect(pendingCount.value).toBe(1)
+    // isSyncing is reset so future drainQueue calls are not blocked
+    expect(isSyncing.value).toBe(false)
+    // No discard toast — the error is transient
+    expect(toast.error).not.toHaveBeenCalled()
   })
 
   test('drainQueue prevents concurrent calls when already syncing', async () => {

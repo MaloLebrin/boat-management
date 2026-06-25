@@ -136,6 +136,7 @@ function toNavigationLog(log: NavigationLog): NavigationLogRow {
     crewCount: log.crewCount,
     notes: log.notes,
     createdAt: log.createdAt.toISO()!,
+    updatedAt: (log.updatedAt ?? log.createdAt).toISO()!,
     crew: (log.$preloaded.crew ? log.crew : []).map((m) => ({
       crewMemberId: m.id,
       fullName: m.fullName,

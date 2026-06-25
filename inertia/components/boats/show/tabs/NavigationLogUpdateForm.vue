@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { Form } from '@adonisjs/inertia/vue'
+import { useForm } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
+import { useNetworkStatus } from '~/composables/use_network_status'
+import { useOfflineQueue } from '~/composables/use_offline_queue'
 import { useT } from '~/composables/use_t'
 import type { NavigationLogRow } from '~/types/boat_show'
 
@@ -14,18 +16,45 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useT()
+const { isOnline } = useNetworkStatus()
+const { enqueue } = useOfflineQueue()
 
 const SEA_STATES = ['calm', 'slight', 'moderate', 'rough', 'very_rough'] as const
+
+const form = useForm({
+  windForceBeaufort: props.log.windForceBeaufort ?? ('' as string | number),
+  seaState: props.log.seaState ?? '',
+  crewCount: props.log.crewCount ?? ('' as string | number),
+  notes: props.log.notes ?? '',
+})
+
+function handleSubmit() {
+  if (!isOnline.value) {
+    enqueue({
+      type: 'update-navigation-log',
+      url: `/boats/${props.boatId}/navigation-logs/${props.log.id}`,
+      method: 'patch',
+      payload: {
+        ...form.data(),
+        _expectedUpdatedAt: props.log.updatedAt,
+      } as Record<string, unknown>,
+    })
+    emit('close')
+    return
+  }
+
+  form.patch(`/boats/${props.boatId}/navigation-logs/${props.log.id}`, {
+    preserveScroll: true,
+    onSuccess: () => emit('close'),
+  })
+}
 </script>
 
 <template>
   <div class="rounded-lg border border-border bg-surface-elevated p-6 space-y-4">
     <h3 class="font-semibold text-fg">{{ t('navigation_logs.form.updateTitle') }}</h3>
 
-    <Form
-      :action="{ url: `/boats/${boatId}/navigation-logs/${log.id}`, method: 'patch' }"
-      #default="{ processing, errors }"
-    >
+    <form @submit.prevent="handleSubmit">
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <!-- Wind force -->
         <div>
@@ -33,16 +62,16 @@ const SEA_STATES = ['calm', 'slight', 'moderate', 'rough', 'very_rough'] as cons
             {{ t('navigation_logs.fields.windForceBeaufort') }}
           </label>
           <input
+            v-model="form.windForceBeaufort"
             type="number"
             name="windForceBeaufort"
             step="1"
             min="0"
             max="12"
-            :value="log.windForceBeaufort ?? ''"
             class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
           />
-          <p v-if="errors.windForceBeaufort" class="mt-1 text-xs text-danger">
-            {{ errors.windForceBeaufort }}
+          <p v-if="form.errors.windForceBeaufort" class="mt-1 text-xs text-danger">
+            {{ form.errors.windForceBeaufort }}
           </p>
         </div>
 
@@ -52,16 +81,12 @@ const SEA_STATES = ['calm', 'slight', 'moderate', 'rough', 'very_rough'] as cons
             {{ t('navigation_logs.fields.seaState') }}
           </label>
           <select
+            v-model="form.seaState"
             name="seaState"
             class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
           >
             <option value="">{{ t('navigation_logs.fields.selectSeaState') }}</option>
-            <option
-              v-for="state in SEA_STATES"
-              :key="state"
-              :value="state"
-              :selected="log.seaState === state"
-            >
+            <option v-for="state in SEA_STATES" :key="state" :value="state">
               {{ t(`navigation_logs.seaState.${state}`) }}
             </option>
           </select>
@@ -73,14 +98,16 @@ const SEA_STATES = ['calm', 'slight', 'moderate', 'rough', 'very_rough'] as cons
             {{ t('navigation_logs.fields.crewCount') }}
           </label>
           <input
+            v-model="form.crewCount"
             type="number"
             name="crewCount"
             step="1"
             min="0"
-            :value="log.crewCount ?? ''"
             class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
           />
-          <p v-if="errors.crewCount" class="mt-1 text-xs text-danger">{{ errors.crewCount }}</p>
+          <p v-if="form.errors.crewCount" class="mt-1 text-xs text-danger">
+            {{ form.errors.crewCount }}
+          </p>
         </div>
 
         <!-- Notes -->
@@ -89,13 +116,13 @@ const SEA_STATES = ['calm', 'slight', 'moderate', 'rough', 'very_rough'] as cons
             {{ t('navigation_logs.fields.notes') }}
           </label>
           <textarea
+            v-model="form.notes"
             name="notes"
             rows="3"
             maxlength="5000"
-            :value="log.notes ?? ''"
             class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand resize-none"
           />
-          <p v-if="errors.notes" class="mt-1 text-xs text-danger">{{ errors.notes }}</p>
+          <p v-if="form.errors.notes" class="mt-1 text-xs text-danger">{{ form.errors.notes }}</p>
         </div>
       </div>
 
@@ -103,10 +130,10 @@ const SEA_STATES = ['calm', 'slight', 'moderate', 'rough', 'very_rough'] as cons
         <BaseButton type="button" variant="ghost" size="sm" @click="emit('close')">
           {{ t('navigation_logs.form.cancel') }}
         </BaseButton>
-        <BaseButton type="submit" variant="primary" size="sm" :disabled="processing">
+        <BaseButton type="submit" variant="primary" size="sm" :disabled="form.processing">
           {{ t('navigation_logs.form.submitUpdate') }}
         </BaseButton>
       </div>
-    </Form>
+    </form>
   </div>
 </template>

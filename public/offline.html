@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Offline — Fleetide</title>
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: system-ui, -apple-system, sans-serif;
+        background: #f8fafc;
+        color: #1e293b;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100dvh;
+        padding: 1.5rem;
+      }
+      .card {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.75rem;
+        padding: 2.5rem 2rem;
+        max-width: 26rem;
+        width: 100%;
+        text-align: center;
+      }
+      .icon {
+        font-size: 3rem;
+        margin-bottom: 1.25rem;
+      }
+      h1 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+      }
+      p {
+        color: #64748b;
+        font-size: 0.9375rem;
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+      }
+      button {
+        background: #0066cc;
+        color: #fff;
+        border: none;
+        border-radius: 0.5rem;
+        padding: 0.625rem 1.25rem;
+        font-size: 0.9375rem;
+        font-weight: 500;
+        cursor: pointer;
+      }
+      button:hover {
+        background: #0052a3;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="icon">📡</div>
+      <h1>You're offline / Hors-ligne</h1>
+      <p>
+        This page hasn't been cached yet. Connect to the internet and visit the page first to make
+        it available offline.<br /><br />
+        Cette page n'est pas encore en cache. Connectez-vous et visitez-la une première fois pour
+        qu'elle soit disponible hors-ligne.
+      </p>
+      <button onclick="window.location.reload()">Try again / Réessayer</button>
+    </div>
+  </body>
+</html>

@@ -20,6 +20,7 @@ export interface UpdateNavigationLogPayload {
   seaState?: SeaState | null
   crewCount?: number | null
   notes?: string | null
+  expectedUpdatedAt?: string
 }
 
 export interface CloseNavigationLogPayload {
@@ -33,6 +34,7 @@ export interface CloseNavigationLogPayload {
   seaState?: SeaState | null
   crewCount?: number | null
   notes?: string | null
+  expectedUpdatedAt?: string
 }
 
 export interface NavigationLogRow {
@@ -54,6 +56,7 @@ export interface NavigationLogRow {
   crewCount: number | null
   notes: string | null
   createdAt: string
+  updatedAt: string
   crew: NavigationLogCrewRow[]
 }
 
