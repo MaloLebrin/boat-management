@@ -3,6 +3,81 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-06-25 — PWA : interface de résolution de conflits
+
+Quand une action PATCH offline entre en conflit avec une version plus récente du serveur, une modale s'affiche pour laisser l'utilisateur choisir la version à conserver.
+
+- `ConflictResolutionModal.vue` : modale avec tableau comparatif (vos modifications / version serveur), boutons « Garder mes modifications » / « Utiliser la version serveur »
+- `use_offline_queue.ts` : `conflictedAction` (ref module) détectée dans `onSuccess` via `flash.conflictData` ; `resolveConflict('local'|'server')` re-enqueue avec le `updatedAt` serveur ou supprime l'action
+- `NavigationLogConflictError` porte désormais un `ConflictLogSnapshot` (champs lisibles, sans modèle Lucid)
+- Backend : flash `conflictData` (JSON) + `conflictType` au lieu d'un flash `error`, pour que la modale intercepte sans déclencher le toast générique
+- `default.vue` : `<ConflictResolutionModal>` câblé ; `conflictedAction` et `resolveConflict` exposés
+- i18n `offline.conflict.*` + `navigationLog.field.*` en FR et EN
+- Tests : 3 nouveaux cas composable + 5 cas composant modal (175/175)
+
+## 2026-06-25 — PWA : résolution des limites connues V1
+
+Résolution des 4 limites documentées dans `docs/frontend/pwa.md`.
+
+**Limit 2 — Page hors-ligne pour les pages non visitées :**
+
+- `public/offline.html` : page statique servie par le Service Worker quand une navigation échoue (page jamais mise en cache)
+- `vite.config.ts` : `navigateFallback: '/offline.html'` + `navigateFallbackDenylist` pour exclure `/api/`, `/up`, `/_inertia`
+- `offline.html` ajouté aux `globPatterns` pour garantir sa mise en cache
+
+**Limit 3 — Erreur 5xx ne bloque plus la file :**
+
+- `use_offline_queue.ts` : ajout d'un flag `settled` + `onFinish` safety-net — si ni `onSuccess` ni `onError` ne s'est déclenché (cas 5xx / réseau), `isSyncing` est réinitialisé et l'action reste en file pour le prochain retry
+- Tests : cas 5xx couvert dans `use_offline_queue.spec.ts`
+
+**Limit 4 — Formulaires d'édition offline-aware :**
+
+- `NavigationLogUpdateForm.vue` : converti de `<Form>` en `useForm` + `form.patch` + chemin offline (enqueue avec `method: 'patch'`)
+- `NavigationLogCloseForm.vue` : même conversion, champ `arrivedAt` contrôlé via `v-model`
+- Tests : `navigation_log_update_form.spec.ts` + `navigation_log_close_form.spec.ts`
+
+**Limit 1 — Détection de conflit (last-write-wins) :**
+
+- `shared/types/navigation_log.ts` : `updatedAt` ajouté à `NavigationLogRow` ; `expectedUpdatedAt?` ajouté à `UpdateNavigationLogPayload` et `CloseNavigationLogPayload`
+- `app/transformers/boat_transformer.ts` : `updatedAt` exposé dans `toNavigationLog()`
+- `app/exceptions/navigation_log_errors.ts` : `NavigationLogConflictError`
+- `app/services/navigation_log_service.ts` : vérification `expectedUpdatedAt` dans `updateForBoat()` et `closeTrip()`
+- `app/controllers/navigation_logs_controller.ts` : lecture de `_expectedUpdatedAt` (champ brut, hors validation VineJS) + gestion `NavigationLogConflictError`
+- Flash i18n `flash.navigationLog.conflict` en FR et EN
+- Les formulaires d'édition incluent `_expectedUpdatedAt: log.updatedAt` dans le payload offline
+
+## 2026-06-25 — PWA : notifications cycle de vie SW + prompt d'installation
+
+Compléments aux recommandations vite-plugin-pwa non couverts en V1.
+
+**Fonctionnalités :**
+
+- **`usePwaUpdate`** : utilise `useRegisterSW` (`virtual:pwa-register/vue`) pour afficher un toast « Application prête pour une utilisation hors-ligne » au premier précache complet, et planifie une vérification horaire des mises à jour SW (`registration.update()`).
+- **`usePwaInstall`** : capture l'événement `beforeinstallprompt` (état partagé au niveau module) et expose `canInstall` + `promptInstall()`. Le bouton d'installation s'affiche dans la sidebar (`AsideMenu.vue`) quand le navigateur autorise l'install, puis disparaît après `appinstalled`.
+- **Alias Vitest** : `virtual:pwa-register/vue` résolu vers un stub de test pour isoler `usePwaUpdate` dans les tests unitaires.
+- **i18n** : clés `pwa.offlineReady` et `pwa.install` ajoutées en FR et EN.
+- **Types** : `/// <reference types="vite-plugin-pwa/client" />` ajouté dans `inertia/shims.ts`.
+
+**Routes concernées :** aucune.
+
+---
+
+## 2026-06-24 — PWA / mode offline (journal de bord et carburant)
+
+Support hors-ligne pour les pages de navigation, permettant de consulter et saisir des données sans connexion.
+
+**Fonctionnalités :**
+
+- **Service Worker** généré par `vite-plugin-pwa` (Workbox) : précache des assets statiques (JS/CSS/images), cache NetworkFirst pour les pages `/boats/*`, `/navigation/*`, `/planning/*`
+- **Manifest PWA** mis à jour (nom Fleetide, thème #0066cc, display standalone) — app installable sur mobile
+- **Saisie offline** : les formulaires de création journal de bord (`NavigationLogForm`) et avitaillement (`BoatFuelLogForm`) détectent la connexion et enregistrent en IndexedDB si hors-ligne (toast informatif)
+- **Sync automatique** au retour de connexion : le layout déclenchent `drainQueue()` qui rejoue les actions via `router.post/patch` et affiche un toast de succès/erreur
+- **Composables** : `useNetworkStatus` (réactivité `navigator.onLine`) et `useOfflineQueue` (IndexedDB via `idb`)
+
+**Routes concernées :** aucune nouvelle route — le SW cache les pages existantes.
+
+**Notes :** En V1, last-write-wins pour les conflits. La navigation Inertia entre pages non-visitées reste bloquée offline (app-shell prévu en V2).
+
 ## 2026-06-24 — Tableau de bord budget (dépenses annuelles par poste)
 
 Nouvelle page **Budget** accessible depuis la fiche de chaque bateau (bouton « Budget »).

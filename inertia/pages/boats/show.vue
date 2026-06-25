@@ -152,7 +152,7 @@ function openTasksTab() {
         </div>
 
         <div class="flex flex-wrap items-center gap-2 justify-end">
-          <BaseButton variant="secondary" size="sm" :route="`/boats/${boat.id}/budget`">
+          <BaseButton variant="secondary" size="sm" route="boats.budget" :params="{ id: boat.id }">
             {{ t('boats.show.budget') }}
           </BaseButton>
           <a :href="`/boats/${boat.id}/edit`">

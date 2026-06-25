@@ -2,10 +2,12 @@
 import { Form } from '@adonisjs/inertia/vue'
 import { usePage } from '@inertiajs/vue3'
 import { computed } from 'vue'
+import BaseButton from '~/components/base/BaseButton.vue'
 import Logo from '~/components/Logo.vue'
 import LanguageSwitcher from '~/components/layout/LanguageSwitcher.vue'
 import NavItem from '~/components/layout/NavItem.vue'
 import { useNavSections } from '~/composables/use_nav_sections'
+import { usePwaInstall } from '~/composables/use_pwa_install'
 import { useT } from '~/composables/use_t'
 
 type AuthUser = {
@@ -23,6 +25,7 @@ const props = defineProps<{
 const page = usePage()
 const { t } = useT()
 const { navSections } = useNavSections()
+const { canInstall, promptInstall } = usePwaInstall()
 
 const currentPath = computed(() => props.currentRoute ?? page.url)
 
@@ -82,6 +85,22 @@ function isActive(path: string): boolean {
           </p>
         </div>
       </div>
+      <BaseButton
+        v-if="canInstall"
+        type="button"
+        class="flex items-center gap-2 w-full px-3 py-2 mb-1 rounded-lg text-sm font-medium text-navy-100 hover:bg-navy-700 hover:text-white transition-colors"
+        @click="promptInstall"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+          />
+        </svg>
+        <span>{{ t('pwa.install') }}</span>
+      </BaseButton>
       <Form route="session.destroy">
         <button
           type="submit"

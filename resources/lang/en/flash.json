@@ -120,7 +120,8 @@
     "deleted": "Trip deleted.",
     "notFound": "Trip not found.",
     "arrivedAtBeforeDeparture": "Arrival time must be after departure time.",
-    "engineHoursEndBeforeStart": "Engine hours at arrival must be greater than or equal to hours at departure."
+    "engineHoursEndBeforeStart": "Engine hours at arrival must be greater than or equal to hours at departure.",
+    "conflict": "This trip was modified in the meantime — sync skipped."
   },
   "boatDocument": {
     "created": "Document created successfully.",

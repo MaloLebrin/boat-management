@@ -1,5 +1,14 @@
+import type { ConflictLogSnapshot } from '#shared/types/navigation_log'
+
 export class NavigationLogNotFoundError extends Error {
   name = 'NavigationLogNotFoundError'
+}
+
+export class NavigationLogConflictError extends Error {
+  name = 'NavigationLogConflictError'
+  constructor(public readonly currentLog: ConflictLogSnapshot) {
+    super('Conflict detected')
+  }
 }
 
 export class NavigationLogValidationError extends Error {

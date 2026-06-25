@@ -1,5 +1,6 @@
 import NavigationLogService from '#services/navigation_log_service'
 import {
+  NavigationLogConflictError,
   NavigationLogNotFoundError,
   NavigationLogValidationError,
 } from '#exceptions/navigation_log_errors'
@@ -71,6 +72,7 @@ export default class NavigationLogsController {
 
     await bouncer.with(NavigationLogPolicy).authorize('update', boat)
 
+    const expectedUpdatedAt = request.input('_expectedUpdatedAt') as string | undefined
     const payload = await request.validateUsing(updateNavigationLogValidator)
 
     try {
@@ -79,10 +81,17 @@ export default class NavigationLogsController {
         seaState: payload.seaState ?? null,
         crewCount: payload.crewCount ?? null,
         notes: payload.notes ?? null,
+        expectedUpdatedAt,
       })
     } catch (error) {
       if (error instanceof NavigationLogNotFoundError) {
         session.flash('error', i18n.t('flash.navigationLog.notFound'))
+        response.redirect().back()
+        return
+      }
+      if (error instanceof NavigationLogConflictError) {
+        session.flash('conflictData', JSON.stringify(error.currentLog))
+        session.flash('conflictType', 'update-navigation-log')
         response.redirect().back()
         return
       }
@@ -110,6 +119,7 @@ export default class NavigationLogsController {
 
     await bouncer.with(NavigationLogPolicy).authorize('update', boat)
 
+    const expectedUpdatedAt = request.input('_expectedUpdatedAt') as string | undefined
     const payload = await request.validateUsing(closeNavigationLogValidator)
 
     try {
@@ -124,10 +134,17 @@ export default class NavigationLogsController {
         seaState: payload.seaState ?? null,
         crewCount: payload.crewCount ?? null,
         notes: payload.notes ?? null,
+        expectedUpdatedAt,
       })
     } catch (error) {
       if (error instanceof NavigationLogNotFoundError) {
         session.flash('error', i18n.t('flash.navigationLog.notFound'))
+        response.redirect(`/boats/${boat.id}?tab=navigation-logs`)
+        return
+      }
+      if (error instanceof NavigationLogConflictError) {
+        session.flash('conflictData', JSON.stringify(error.currentLog))
+        session.flash('conflictType', 'close-navigation-log')
         response.redirect(`/boats/${boat.id}?tab=navigation-logs`)
         return
       }

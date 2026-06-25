@@ -10,6 +10,10 @@ import DemoSessionBanner from '~/components/layout/DemoSessionBanner.vue'
 import LanguageSwitcher from '~/components/layout/LanguageSwitcher.vue'
 import NavItem from '~/components/layout/NavItem.vue'
 import { useNavSections } from '~/composables/use_nav_sections'
+import { useNetworkStatus } from '~/composables/use_network_status'
+import ConflictResolutionModal from '~/components/ConflictResolutionModal.vue'
+import { useOfflineQueue } from '~/composables/use_offline_queue'
+import { usePwaUpdate } from '~/composables/use_pwa_update'
 import { useT } from '~/composables/use_t'
 
 const page = usePage<Data.SharedProps>()
@@ -19,6 +23,13 @@ const drawerTitleId = 'auth-sidebar-title'
 
 const { t } = useT()
 const { navSections } = useNavSections()
+const { isOnline } = useNetworkStatus()
+const { drainQueue, conflictedAction, resolveConflict } = useOfflineQueue()
+usePwaUpdate()
+
+watch(isOnline, (online) => {
+  if (online) drainQueue()
+})
 
 function closeSidebar() {
   isSidebarOpen.value = false
@@ -111,6 +122,14 @@ onBeforeUnmount(() => {
 
       <!-- Demo session countdown (demo users only) -->
       <DemoSessionBanner />
+
+      <!-- Offline indicator -->
+      <div
+        v-if="!isOnline"
+        class="bg-amber-500 text-white text-sm font-medium text-center py-1.5 px-4 shrink-0"
+      >
+        {{ t('offline.banner') }}
+      </div>
 
       <!-- Scrollable content area -->
       <main class="flex-1 overflow-y-auto bg-cream">
@@ -233,5 +252,11 @@ onBeforeUnmount(() => {
     </Transition>
 
     <Toaster position="top-center" rich-colors />
+
+    <ConflictResolutionModal
+      v-if="conflictedAction"
+      :conflict="conflictedAction"
+      @resolve="resolveConflict"
+    />
   </div>
 </template>

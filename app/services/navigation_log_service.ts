@@ -1,4 +1,5 @@
 import {
+  NavigationLogConflictError,
   NavigationLogNotFoundError,
   NavigationLogValidationError,
 } from '#exceptions/navigation_log_errors'
@@ -7,14 +8,33 @@ import NavigationLog from '#models/navigation_log'
 import type Boat from '#models/boat'
 import type {
   CloseNavigationLogPayload,
+  ConflictLogSnapshot,
   CreateNavigationLogPayload,
   UpdateNavigationLogPayload,
 } from '#shared/types/navigation_log'
 import { toDateTime } from '#shared/helpers/maintenance'
 import db from '@adonisjs/lucid/services/db'
 
-export { NavigationLogNotFoundError, NavigationLogValidationError }
+export { NavigationLogConflictError, NavigationLogNotFoundError, NavigationLogValidationError }
 export type { CreateNavigationLogPayload, CloseNavigationLogPayload, UpdateNavigationLogPayload }
+
+function buildConflictSnapshot(log: NavigationLog): ConflictLogSnapshot {
+  return {
+    id: log.id,
+    updatedAt: (log.updatedAt ?? log.createdAt).toISO()!,
+    windForceBeaufort: log.windForceBeaufort,
+    seaState: log.seaState,
+    crewCount: log.crewCount,
+    notes: log.notes,
+    arrivedAt: log.arrivedAt?.toISO() ?? null,
+    arrivalPortId: log.arrivalPortId,
+    arrivalPortName: log.arrivalPortName,
+    distanceNm: log.distanceNm !== null ? Number.parseFloat(log.distanceNm) : null,
+    engineHoursEnd: log.engineHoursEnd !== null ? Number.parseFloat(log.engineHoursEnd) : null,
+    fuelConsumedLiters:
+      log.fuelConsumedLiters !== null ? Number.parseFloat(log.fuelConsumedLiters) : null,
+  }
+}
 
 export default class NavigationLogService {
   async listForBoat(boat: Boat) {
@@ -60,6 +80,12 @@ export default class NavigationLogService {
       .first()
 
     if (!log) throw new NavigationLogNotFoundError()
+
+    if (payload.expectedUpdatedAt !== undefined && log.updatedAt) {
+      if (log.updatedAt.toISO() !== payload.expectedUpdatedAt) {
+        throw new NavigationLogConflictError(buildConflictSnapshot(log))
+      }
+    }
 
     const arrivedAt = toDateTime(payload.arrivedAt)
 
@@ -142,6 +168,12 @@ export default class NavigationLogService {
       .first()
 
     if (!log) throw new NavigationLogNotFoundError()
+
+    if (payload.expectedUpdatedAt !== undefined && log.updatedAt) {
+      if (log.updatedAt.toISO() !== payload.expectedUpdatedAt) {
+        throw new NavigationLogConflictError(buildConflictSnapshot(log))
+      }
+    }
 
     if (payload.windForceBeaufort !== undefined) log.windForceBeaufort = payload.windForceBeaufort
     if (payload.seaState !== undefined) log.seaState = payload.seaState

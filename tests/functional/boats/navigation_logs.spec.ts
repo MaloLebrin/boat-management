@@ -1,13 +1,13 @@
-import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
-import NavigationLog from '#models/navigation_log'
-import { BoatFactory } from '#database/factories/boat_factory'
 import { BoatEngineFactory } from '#database/factories/boat_engine_factory'
+import { BoatFactory } from '#database/factories/boat_factory'
 import { NavigationLogFactory } from '#database/factories/navigation_log_factory'
 import { UserFactory } from '#database/factories/user_factory'
-import OrganizationMembership from '#models/organization_membership'
 import BoatEngine from '#models/boat_engine'
+import NavigationLog from '#models/navigation_log'
+import OrganizationMembership from '#models/organization_membership'
 import { createAdminUser } from '#tests/functional/helpers'
+import testUtils from '@adonisjs/core/services/test_utils'
+import { test } from '@japa/runner'
 import { DateTime } from 'luxon'
 
 test.group('Navigation logs (functional)', (group) => {
@@ -221,6 +221,118 @@ test.group('Navigation logs (functional)', (group) => {
     response.assertStatus(302)
     response.assertHeader('location', `/boats/${boat.id}?tab=navigation-logs`)
 
+    const unchanged = await NavigationLog.findOrFail(log.id)
+    assert.equal(unchanged.status, 'in_progress')
+  })
+
+  // ─── update ──────────────────────────────────────────────────────────────
+
+  test('PATCH update persists fields on the log', async ({ client, assert }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const log = await NavigationLogFactory.merge({
+      boatId: boat.id,
+      organizationId: user.organizationId!,
+    }).create()
+
+    await client
+      .patch(`/boats/${boat.id}/navigation-logs/${log.id}`)
+      .loginAs(user)
+      .form({ windForceBeaufort: 4, seaState: 'moderate', crewCount: 2, notes: 'Test update' })
+
+    const updated = await NavigationLog.findOrFail(log.id)
+    assert.equal(updated.windForceBeaufort, 4)
+    assert.equal(updated.seaState, 'moderate')
+    assert.equal(updated.crewCount, 2)
+    assert.equal(updated.notes, 'Test update')
+  })
+
+  test('PATCH update with matching _expectedUpdatedAt succeeds', async ({ client, assert }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const log = await NavigationLogFactory.merge({
+      boatId: boat.id,
+      organizationId: user.organizationId!,
+      windForceBeaufort: 1,
+    }).create()
+
+    const response = await client
+      .patch(`/boats/${boat.id}/navigation-logs/${log.id}`)
+      .loginAs(user)
+      .form({ windForceBeaufort: 3, _expectedUpdatedAt: log.updatedAt?.toISO() })
+      .redirects(0)
+
+    response.assertStatus(302)
+    const updated = await NavigationLog.findOrFail(log.id)
+    assert.equal(updated.windForceBeaufort, 3)
+  })
+
+  test('PATCH update with stale _expectedUpdatedAt redirects back without updating', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const log = await NavigationLogFactory.merge({
+      boatId: boat.id,
+      organizationId: user.organizationId!,
+      windForceBeaufort: 1,
+    }).create()
+
+    const response = await client
+      .patch(`/boats/${boat.id}/navigation-logs/${log.id}`)
+      .loginAs(user)
+      .form({ windForceBeaufort: 7, _expectedUpdatedAt: '2000-01-01T00:00:00.000+00:00' })
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertFlashMessage('conflictType', 'update-navigation-log')
+    response.assertFlashMessage('conflictData')
+    const unchanged = await NavigationLog.findOrFail(log.id)
+    assert.equal(unchanged.windForceBeaufort, 1)
+  })
+
+  test('PATCH close with matching _expectedUpdatedAt succeeds', async ({ client, assert }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const log = await NavigationLogFactory.merge({
+      boatId: boat.id,
+      organizationId: user.organizationId!,
+      departedAt: DateTime.fromISO('2024-01-01T08:00:00'),
+    }).create()
+
+    const response = await client
+      .patch(`/boats/${boat.id}/navigation-logs/${log.id}/close`)
+      .loginAs(user)
+      .form({ arrivedAt: '2024-01-01T14:00', _expectedUpdatedAt: log.updatedAt?.toISO() })
+      .redirects(0)
+
+    response.assertStatus(302)
+    const updated = await NavigationLog.findOrFail(log.id)
+    assert.equal(updated.status, 'completed')
+  })
+
+  test('PATCH close with stale _expectedUpdatedAt redirects back without closing', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const log = await NavigationLogFactory.merge({
+      boatId: boat.id,
+      organizationId: user.organizationId!,
+      departedAt: DateTime.fromISO('2024-01-01T08:00:00'),
+    }).create()
+
+    const response = await client
+      .patch(`/boats/${boat.id}/navigation-logs/${log.id}/close`)
+      .loginAs(user)
+      .form({ arrivedAt: '2024-01-01T14:00', _expectedUpdatedAt: '2000-01-01T00:00:00.000+00:00' })
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertFlashMessage('conflictType', 'close-navigation-log')
+    response.assertFlashMessage('conflictData')
     const unchanged = await NavigationLog.findOrFail(log.id)
     assert.equal(unchanged.status, 'in_progress')
   })

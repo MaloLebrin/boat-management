@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { Form } from '@adonisjs/inertia/vue'
+import { useForm } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
+import { useNetworkStatus } from '~/composables/use_network_status'
+import { useOfflineQueue } from '~/composables/use_offline_queue'
 import { useT } from '~/composables/use_t'
 import type { BoatShowDetail } from '~/types/boat_show'
 
@@ -13,18 +15,44 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useT()
+const { isOnline } = useNetworkStatus()
+const { enqueue } = useOfflineQueue()
 
-const today = new Date().toLocaleDateString('en-CA')
+const form = useForm({
+  fueledAt: new Date().toLocaleDateString('en-CA'),
+  quantityLiters: '' as string | number,
+  pricePerLiter: '' as string | number,
+  totalCost: '' as string | number,
+  boatEngineId: '' as string | number,
+  engineHoursAtFueling: '' as string | number,
+  supplier: '',
+  notes: '',
+})
+
+function handleSubmit() {
+  if (!isOnline.value) {
+    enqueue({
+      type: 'create-fuel-log',
+      url: `/boats/${props.boat.id}/fuel-logs`,
+      method: 'post',
+      payload: form.data() as Record<string, unknown>,
+    })
+    emit('close')
+    return
+  }
+
+  form.post(`/boats/${props.boat.id}/fuel-logs`, {
+    preserveScroll: true,
+    onSuccess: () => emit('close'),
+  })
+}
 </script>
 
 <template>
   <div class="rounded-lg border border-border bg-surface-elevated p-6 space-y-4">
     <h3 class="font-semibold text-fg">{{ t('fuel_logs.form.createTitle') }}</h3>
 
-    <Form
-      :action="{ url: `/boats/${boat.id}/fuel-logs`, method: 'post' }"
-      #default="{ processing, errors }"
-    >
+    <form @submit.prevent="handleSubmit">
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <!-- Date -->
         <div>
@@ -32,13 +60,15 @@ const today = new Date().toLocaleDateString('en-CA')
             {{ t('fuel_logs.fields.fueledAt') }}
           </label>
           <input
+            v-model="form.fueledAt"
             type="date"
             name="fueledAt"
-            :value="today"
             required
             class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
           />
-          <p v-if="errors.fueledAt" class="mt-1 text-xs text-danger">{{ errors.fueledAt }}</p>
+          <p v-if="form.errors.fueledAt" class="mt-1 text-xs text-danger">
+            {{ form.errors.fueledAt }}
+          </p>
         </div>
 
         <!-- Quantity -->
@@ -47,6 +77,7 @@ const today = new Date().toLocaleDateString('en-CA')
             {{ t('fuel_logs.fields.quantityLiters') }}
           </label>
           <input
+            v-model="form.quantityLiters"
             type="number"
             name="quantityLiters"
             step="0.001"
@@ -54,8 +85,8 @@ const today = new Date().toLocaleDateString('en-CA')
             required
             class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
           />
-          <p v-if="errors.quantityLiters" class="mt-1 text-xs text-danger">
-            {{ errors.quantityLiters }}
+          <p v-if="form.errors.quantityLiters" class="mt-1 text-xs text-danger">
+            {{ form.errors.quantityLiters }}
           </p>
         </div>
 
@@ -65,14 +96,15 @@ const today = new Date().toLocaleDateString('en-CA')
             {{ t('fuel_logs.fields.pricePerLiter') }}
           </label>
           <input
+            v-model="form.pricePerLiter"
             type="number"
             name="pricePerLiter"
             step="0.0001"
             min="0"
             class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
           />
-          <p v-if="errors.pricePerLiter" class="mt-1 text-xs text-danger">
-            {{ errors.pricePerLiter }}
+          <p v-if="form.errors.pricePerLiter" class="mt-1 text-xs text-danger">
+            {{ form.errors.pricePerLiter }}
           </p>
         </div>
 
@@ -82,13 +114,16 @@ const today = new Date().toLocaleDateString('en-CA')
             {{ t('fuel_logs.fields.totalCost') }}
           </label>
           <input
+            v-model="form.totalCost"
             type="number"
             name="totalCost"
             step="0.01"
             min="0"
             class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
           />
-          <p v-if="errors.totalCost" class="mt-1 text-xs text-danger">{{ errors.totalCost }}</p>
+          <p v-if="form.errors.totalCost" class="mt-1 text-xs text-danger">
+            {{ form.errors.totalCost }}
+          </p>
         </div>
 
         <!-- Engine -->
@@ -97,6 +132,7 @@ const today = new Date().toLocaleDateString('en-CA')
             {{ t('fuel_logs.fields.boatEngineId') }}
           </label>
           <select
+            v-model="form.boatEngineId"
             name="boatEngineId"
             class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
           >
@@ -106,8 +142,8 @@ const today = new Date().toLocaleDateString('en-CA')
               {{ engine.model ? engine.model : '' }}
             </option>
           </select>
-          <p v-if="errors.boatEngineId" class="mt-1 text-xs text-danger">
-            {{ errors.boatEngineId }}
+          <p v-if="form.errors.boatEngineId" class="mt-1 text-xs text-danger">
+            {{ form.errors.boatEngineId }}
           </p>
         </div>
 
@@ -117,14 +153,15 @@ const today = new Date().toLocaleDateString('en-CA')
             {{ t('fuel_logs.fields.engineHoursAtFueling') }}
           </label>
           <input
+            v-model="form.engineHoursAtFueling"
             type="number"
             name="engineHoursAtFueling"
             step="0.1"
             min="0"
             class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
           />
-          <p v-if="errors.engineHoursAtFueling" class="mt-1 text-xs text-danger">
-            {{ errors.engineHoursAtFueling }}
+          <p v-if="form.errors.engineHoursAtFueling" class="mt-1 text-xs text-danger">
+            {{ form.errors.engineHoursAtFueling }}
           </p>
         </div>
 
@@ -134,12 +171,15 @@ const today = new Date().toLocaleDateString('en-CA')
             {{ t('fuel_logs.fields.supplier') }}
           </label>
           <input
+            v-model="form.supplier"
             type="text"
             name="supplier"
             maxlength="500"
             class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
           />
-          <p v-if="errors.supplier" class="mt-1 text-xs text-danger">{{ errors.supplier }}</p>
+          <p v-if="form.errors.supplier" class="mt-1 text-xs text-danger">
+            {{ form.errors.supplier }}
+          </p>
         </div>
 
         <!-- Notes -->
@@ -148,12 +188,13 @@ const today = new Date().toLocaleDateString('en-CA')
             {{ t('fuel_logs.fields.notes') }}
           </label>
           <textarea
+            v-model="form.notes"
             name="notes"
             rows="2"
             maxlength="2000"
             class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand resize-none"
           />
-          <p v-if="errors.notes" class="mt-1 text-xs text-danger">{{ errors.notes }}</p>
+          <p v-if="form.errors.notes" class="mt-1 text-xs text-danger">{{ form.errors.notes }}</p>
         </div>
       </div>
 
@@ -161,10 +202,10 @@ const today = new Date().toLocaleDateString('en-CA')
         <BaseButton type="button" variant="ghost" size="sm" @click="emit('close')">
           {{ t('fuel_logs.form.cancel') }}
         </BaseButton>
-        <BaseButton type="submit" variant="primary" size="sm" :disabled="processing">
+        <BaseButton type="submit" variant="primary" size="sm" :disabled="form.processing">
           {{ t('fuel_logs.form.submit') }}
         </BaseButton>
       </div>
-    </Form>
+    </form>
   </div>
 </template>
