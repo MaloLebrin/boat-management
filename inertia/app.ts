@@ -9,10 +9,6 @@ import './css/app.css'
 
 const appName = import.meta.env.VITE_APP_NAME || 'Fleet AI'
 
-if ('serviceWorker' in navigator && import.meta.env.PROD) {
-  navigator.serviceWorker.register('/sw.js', { scope: '/' })
-}
-
 createInertiaApp({
   title: (title) => (title ? `${title} - ${appName}` : appName),
   resolve: (name) => {

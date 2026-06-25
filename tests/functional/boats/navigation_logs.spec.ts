@@ -286,6 +286,8 @@ test.group('Navigation logs (functional)', (group) => {
       .redirects(0)
 
     response.assertStatus(302)
+    response.assertFlashMessage('conflictType', 'update-navigation-log')
+    response.assertFlashMessage('conflictData')
     const unchanged = await NavigationLog.findOrFail(log.id)
     assert.equal(unchanged.windForceBeaufort, 1)
   })
@@ -329,6 +331,8 @@ test.group('Navigation logs (functional)', (group) => {
       .redirects(0)
 
     response.assertStatus(302)
+    response.assertFlashMessage('conflictType', 'close-navigation-log')
+    response.assertFlashMessage('conflictData')
     const unchanged = await NavigationLog.findOrFail(log.id)
     assert.equal(unchanged.status, 'in_progress')
   })

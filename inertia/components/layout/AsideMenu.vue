@@ -2,6 +2,7 @@
 import { Form } from '@adonisjs/inertia/vue'
 import { usePage } from '@inertiajs/vue3'
 import { computed } from 'vue'
+import BaseButton from '~/components/base/BaseButton.vue'
 import Logo from '~/components/Logo.vue'
 import LanguageSwitcher from '~/components/layout/LanguageSwitcher.vue'
 import NavItem from '~/components/layout/NavItem.vue'
@@ -84,7 +85,7 @@ function isActive(path: string): boolean {
           </p>
         </div>
       </div>
-      <button
+      <BaseButton
         v-if="canInstall"
         type="button"
         class="flex items-center gap-2 w-full px-3 py-2 mb-1 rounded-lg text-sm font-medium text-navy-100 hover:bg-navy-700 hover:text-white transition-colors"
@@ -99,7 +100,7 @@ function isActive(path: string): boolean {
           />
         </svg>
         <span>{{ t('pwa.install') }}</span>
-      </button>
+      </BaseButton>
       <Form route="session.destroy">
         <button
           type="submit"

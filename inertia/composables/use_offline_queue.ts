@@ -43,6 +43,7 @@ async function getDb() {
 const pendingCount = ref(0)
 const isSyncing = ref(false)
 export const conflictedAction = ref<ConflictState | null>(null)
+let countInitialized = false
 
 async function refreshCount() {
   if (!isIndexedDbAvailable()) return
@@ -158,7 +159,10 @@ export function useOfflineQueue() {
     }
   }
 
-  refreshCount()
+  if (!countInitialized) {
+    countInitialized = true
+    refreshCount()
+  }
 
   return { pendingCount, isSyncing, conflictedAction, enqueue, drainQueue, resolveConflict }
 }
