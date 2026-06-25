@@ -8,6 +8,7 @@
     "fuel": "Fuel",
     "documents": "Documents / Insurance",
     "port": "Port / Mooring",
+    "equipment": "Equipment",
     "total": "Total"
   },
   "chart": {
@@ -42,6 +43,7 @@
       "fuel": "fuel",
       "documents": "documents",
       "port": "port",
+      "equipment": "equipment",
       "total": "total",
       "totalRow": "TOTAL"
     },

@@ -21,6 +21,8 @@ export default class BoatSafetyEquipmentService {
       expiryDate: toDateOrNull(payload.expiryDate),
       status: (payload.status as 'ok' | 'to_check' | 'expired') ?? 'ok',
       notes: payload.notes ?? null,
+      purchasePrice: payload.purchasePrice ?? null,
+      purchasedAt: toDateOrNull(payload.purchasedAt),
     })
   }
 
@@ -38,6 +40,8 @@ export default class BoatSafetyEquipmentService {
     item.expiryDate = toDateOrNull(payload.expiryDate)
     item.status = (payload.status as 'ok' | 'to_check' | 'expired') ?? item.status
     item.notes = payload.notes ?? null
+    item.purchasePrice = payload.purchasePrice ?? null
+    item.purchasedAt = toDateOrNull(payload.purchasedAt)
 
     await item.save()
     return item

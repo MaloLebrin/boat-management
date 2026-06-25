@@ -48,6 +48,8 @@ export type BoatShowEnginePart = {
   notes: string | null
   wearState: 'new' | 'good' | 'worn' | 'to_replace' | 'damaged' | null
   documents: MediaRow[]
+  purchasePrice: number | null
+  purchasedAt: string | null
 }
 
 export type BoatShowEngine = {

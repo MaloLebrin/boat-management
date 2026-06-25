@@ -12,6 +12,8 @@ defineProps<{
   quantity?: string
   status?: string
   notes?: string
+  purchasePrice?: string
+  purchasedAt?: string
 }>()
 
 const { t } = useT()
@@ -74,5 +76,25 @@ const { genericEquipmentStatusOptions } = useBoatOptions()
       :model-value="notes"
       :errors="errors"
     />
+    <div class="grid grid-cols-2 gap-4">
+      <BaseInput
+        id="purchasePrice"
+        name="purchasePrice"
+        :label="t('equipment.purchasePrice.label')"
+        type="number"
+        step="0.01"
+        min="0"
+        :model-value="purchasePrice"
+        :errors="errors"
+      />
+      <BaseInput
+        id="purchasedAt"
+        name="purchasedAt"
+        :label="t('equipment.purchasedAt.label')"
+        type="date"
+        :model-value="purchasedAt"
+        :errors="errors"
+      />
+    </div>
   </div>
 </template>

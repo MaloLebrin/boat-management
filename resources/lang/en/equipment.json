@@ -10,6 +10,12 @@
     "label": "Free notes",
     "placeholder": "Observations, remarks, history..."
   },
+  "purchasePrice": {
+    "label": "Purchase price (EUR)"
+  },
+  "purchasedAt": {
+    "label": "Purchase date"
+  },
   "wearState": {
     "label": "Wear state",
     "new": "New",

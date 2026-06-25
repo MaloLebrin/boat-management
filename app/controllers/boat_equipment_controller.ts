@@ -364,6 +364,8 @@ export default class BoatEquipmentController {
           notes: p.notes,
           wearState: p.wearState,
           documents: [],
+          purchasePrice: p.purchasePrice ? Number.parseFloat(p.purchasePrice) : null,
+          purchasedAt: p.purchasedAt ? p.purchasedAt.toISODate() : null,
         })),
       },
       maintenanceEvents: maintenanceEvents.map((ev) => ({

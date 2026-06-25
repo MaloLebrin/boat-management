@@ -69,6 +69,8 @@ export default class BoatEnginePartsController {
         supplier: part.supplier,
         notes: part.notes,
         wearState: part.wearState,
+        purchasePrice: part.purchasePrice ? Number.parseFloat(part.purchasePrice) : null,
+        purchasedAt: part.purchasedAt ? part.purchasedAt.toISODate() : null,
         documents: documents.map((m) => ({
           id: m.id,
           kind: m.kind,

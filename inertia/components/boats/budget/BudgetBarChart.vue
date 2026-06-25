@@ -69,6 +69,12 @@ const chartData = computed(() => ({
       backgroundColor: isDark.value ? 'rgba(45,212,191,0.8)' : 'rgba(20,184,166,0.8)',
       borderRadius: 3,
     },
+    {
+      label: t('budget.categories.equipment'),
+      data: props.monthly.map((m) => m.equipment),
+      backgroundColor: isDark.value ? 'rgba(74,222,128,0.8)' : 'rgba(34,197,94,0.8)',
+      borderRadius: 3,
+    },
   ],
 }))
 
