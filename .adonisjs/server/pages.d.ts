@@ -13,6 +13,7 @@ declare module '@adonisjs/inertia/types' {
     'auth/login': ExtractProps<(typeof import('../../inertia/pages/auth/login.vue'))['default']>
     'auth/reset_password': ExtractProps<(typeof import('../../inertia/pages/auth/reset_password.vue'))['default']>
     'auth/signup': ExtractProps<(typeof import('../../inertia/pages/auth/signup.vue'))['default']>
+    'boats/budget': ExtractProps<(typeof import('../../inertia/pages/boats/budget.vue'))['default']>
     'boats/edit': ExtractProps<(typeof import('../../inertia/pages/boats/edit.vue'))['default']>
     'boats/engine_edit': ExtractProps<(typeof import('../../inertia/pages/boats/engine_edit.vue'))['default']>
     'boats/engine_part_show': ExtractProps<(typeof import('../../inertia/pages/boats/engine_part_show.vue'))['default']>
@@ -58,6 +59,5 @@ declare module '@adonisjs/inertia/types' {
     'settings/me': ExtractProps<(typeof import('../../inertia/pages/settings/me.vue'))['default']>
     'settings/members': ExtractProps<(typeof import('../../inertia/pages/settings/members.vue'))['default']>
     'settings/org': ExtractProps<(typeof import('../../inertia/pages/settings/org.vue'))['default']>
-    'boats/budget': ExtractProps<(typeof import('../../inertia/pages/boats/budget.vue'))['default']>
   }
 }
