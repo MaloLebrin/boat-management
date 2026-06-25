@@ -122,6 +122,9 @@ importers:
       vue-sonner:
         specifier: ^2.0.9
         version: 2.0.9
+      workbox-window:
+        specifier: ^7.4.1
+        version: 7.4.1
     devDependencies:
       '@adonisjs/assembler':
         specifier: ^8.4.0
