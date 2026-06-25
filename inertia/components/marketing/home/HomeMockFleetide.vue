@@ -38,7 +38,7 @@
       <div class="mt-auto border-t border-white/10 px-2 py-2">
         <div class="flex items-center gap-1.5 rounded bg-violet-600/30 px-2 py-1 text-violet-100">
           <div class="h-3 w-3 rounded bg-violet-400" />
-          <span class="font-medium">Fleetide</span>
+          <span class="font-medium">FleetAI</span>
         </div>
       </div>
     </div>
@@ -58,7 +58,7 @@
       </div>
     </div>
 
-    <!-- Fleetide panel -->
+    <!-- FleetAI panel -->
     <div
       class="flex w-[200px] shrink-0 flex-col border-l border-violet-600/20"
       style="background: linear-gradient(180deg, #5a4a8a 0%, #4a3a7a 100%)"
@@ -71,7 +71,7 @@
           >
             <span>&#10024;</span>
           </div>
-          <span class="font-medium text-white">Fleetide</span>
+          <span class="font-medium text-white">FleetAI</span>
         </div>
         <p class="mt-0.5 text-[9px] text-white/60">Copilote IA pour ta flotte</p>
       </div>
