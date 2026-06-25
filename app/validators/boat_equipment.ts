@@ -57,6 +57,8 @@ const sailPayload = vine.object({
   reefPoints: vine.string().trim().optional(),
   status: vine.enum(equipmentStatuses).optional(),
   notes: vine.string().trim().maxLength(5000).optional(),
+  purchasePrice: vine.string().trim().optional(),
+  purchasedAt: vine.string().trim().optional(),
 })
 
 export const storeBoatSailValidator = vine.create(sailPayload)
@@ -71,6 +73,8 @@ export type BoatSailFormBody = {
   reefPoints?: string
   status?: string
   notes?: string
+  purchasePrice?: string
+  purchasedAt?: string
 }
 
 const rigPayload = vine.object({
@@ -154,6 +158,8 @@ export function equipmentBodyToSailPayload(body: BoatSailFormBody): BoatSailPayl
     reefPoints: parseOptionalNonNegativeInt(body.reefPoints),
     status: (body.status ?? 'operational') as EquipmentStatus,
     notes: emptyToNull(body.notes),
+    purchasePrice: emptyToNull(body.purchasePrice),
+    purchasedAt: emptyToNull(body.purchasedAt),
   }
 }
 

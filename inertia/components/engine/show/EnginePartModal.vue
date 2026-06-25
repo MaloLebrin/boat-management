@@ -28,6 +28,8 @@ const stock = ref('')
 const supplier = ref('')
 const notes = ref('')
 const wearState = ref('')
+const purchasePrice = ref('')
+const purchasedAt = ref('')
 
 const isEditing = computed(() => props.editingPart !== null)
 
@@ -64,6 +66,13 @@ watch(
       supplier.value = props.editingPart.supplier ?? ''
       notes.value = props.editingPart.notes ?? ''
       wearState.value = props.editingPart.wearState ?? ''
+      purchasePrice.value =
+        props.editingPart.purchasePrice !== null && props.editingPart.purchasePrice !== undefined
+          ? String(props.editingPart.purchasePrice)
+          : ''
+      purchasedAt.value = props.editingPart.purchasedAt
+        ? props.editingPart.purchasedAt.slice(0, 10)
+        : ''
     } else if (isOpen) {
       designation.value = ''
       reference.value = ''
@@ -71,6 +80,8 @@ watch(
       supplier.value = ''
       notes.value = ''
       wearState.value = ''
+      purchasePrice.value = ''
+      purchasedAt.value = ''
     }
   }
 )
@@ -139,6 +150,28 @@ function close() {
         v-model="notes"
         :errors="errors"
       />
+
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <BaseInput
+          id="part-purchase-price"
+          name="purchasePrice"
+          :label="t('equipment.purchasePrice.label')"
+          type="number"
+          step="0.01"
+          min="0"
+          v-model="purchasePrice"
+          :errors="errors"
+        />
+
+        <BaseInput
+          id="part-purchased-at"
+          name="purchasedAt"
+          :label="t('equipment.purchasedAt.label')"
+          type="date"
+          v-model="purchasedAt"
+          :errors="errors"
+        />
+      </div>
 
       <div class="flex items-center justify-end gap-2 pt-2">
         <BaseButton variant="ghost" type="button" @click="close">

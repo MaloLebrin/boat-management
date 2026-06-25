@@ -4,6 +4,7 @@ export interface BudgetMonthlyData {
   fuel: number
   documents: number
   port: number
+  equipment: number
   total: number
 }
 
@@ -12,6 +13,7 @@ export interface BudgetYearSummary {
   fuel: number
   documents: number
   port: number
+  equipment: number
   total: number
 }
 

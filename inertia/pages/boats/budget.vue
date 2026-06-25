@@ -53,6 +53,11 @@ const categories = computed(() => [
     amount: props.budget.totals.port,
     previousAmount: props.budget.previousYearTotals?.port ?? null,
   },
+  {
+    key: 'equipment' as const,
+    amount: props.budget.totals.equipment,
+    previousAmount: props.budget.previousYearTotals?.equipment ?? null,
+  },
 ])
 </script>
 
@@ -100,7 +105,7 @@ const categories = computed(() => [
 
     <div class="mt-8 space-y-8">
       <!-- Summary cards -->
-      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <BudgetCategoryCard
           v-for="cat in categories"
           :key="cat.key"

@@ -8,6 +8,7 @@
     "fuel": "Carburant",
     "documents": "Documents / Assurance",
     "port": "Port / Mouillage",
+    "equipment": "Equipements",
     "total": "Total"
   },
   "chart": {
@@ -42,6 +43,7 @@
       "fuel": "carburant",
       "documents": "documents",
       "port": "port",
+      "equipment": "equipements",
       "total": "total",
       "totalRow": "TOTAL"
     },

@@ -58,6 +58,8 @@ export type BoatSailPayload = {
   reefPoints?: number | null
   status?: string | null
   notes?: string | null
+  purchasePrice?: string | null
+  purchasedAt?: Date | string | DateTime | null
 }
 
 export type BoatRigPayload = {
@@ -80,6 +82,8 @@ export type BoatEnginePartPayload = {
   supplier?: string | null
   notes?: string | null
   wearState?: PartWearState | null
+  purchasePrice?: string | null
+  purchasedAt?: Date | string | DateTime | null
 }
 
 export type LowStockPartRow = {
@@ -98,6 +102,8 @@ export type BoatSafetyEquipmentPayload = {
   expiryDate?: Date | string | DateTime | null
   status?: string | null
   notes?: string | null
+  purchasePrice?: string | null
+  purchasedAt?: Date | string | DateTime | null
 }
 
 export const GENERIC_EQUIPMENT_CATEGORIES = [
@@ -116,6 +122,8 @@ export type BoatGenericEquipmentPayload = {
   quantity?: number | null
   status?: string | null
   notes?: string | null
+  purchasePrice?: string | null
+  purchasedAt?: Date | string | DateTime | null
 }
 
 export type BoatSerializedRow = {

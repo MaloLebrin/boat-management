@@ -16,6 +16,8 @@ export type BoatEquipmentSailFieldsModel = {
   reefPoints: number | null
   status: 'operational' | 'in_maintenance' | 'out_of_service' | 'retired'
   notes: string | null
+  purchasePrice: number | null
+  purchasedAt: string | null
 }
 
 const props = defineProps<{
@@ -40,6 +42,8 @@ const material = ref('')
 const reefPoints = ref('')
 const status = ref('')
 const notes = ref('')
+const purchasePrice = ref('')
+const purchasedAt = ref('')
 
 function syncFromProps() {
   const s = props.sail
@@ -51,6 +55,9 @@ function syncFromProps() {
     s?.reefPoints === null || s?.reefPoints === undefined ? '' : String(s.reefPoints)
   status.value = s?.status ?? 'operational'
   notes.value = s?.notes ?? ''
+  purchasePrice.value =
+    s?.purchasePrice === null || s?.purchasePrice === undefined ? '' : String(s.purchasePrice)
+  purchasedAt.value = s?.purchasedAt ? s.purchasedAt.slice(0, 10) : ''
 }
 
 watch(
@@ -123,5 +130,25 @@ watch(
         :errors="errors"
       />
     </div>
+
+    <BaseInput
+      id="purchasePrice"
+      name="purchasePrice"
+      :label="t('equipment.purchasePrice.label')"
+      type="number"
+      step="0.01"
+      min="0"
+      v-model="purchasePrice"
+      :errors="errors"
+    />
+
+    <BaseInput
+      id="purchasedAt"
+      name="purchasedAt"
+      :label="t('equipment.purchasedAt.label')"
+      type="date"
+      v-model="purchasedAt"
+      :errors="errors"
+    />
   </div>
 </template>
