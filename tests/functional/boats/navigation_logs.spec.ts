@@ -1,13 +1,13 @@
-import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
-import NavigationLog from '#models/navigation_log'
-import { BoatFactory } from '#database/factories/boat_factory'
 import { BoatEngineFactory } from '#database/factories/boat_engine_factory'
+import { BoatFactory } from '#database/factories/boat_factory'
 import { NavigationLogFactory } from '#database/factories/navigation_log_factory'
 import { UserFactory } from '#database/factories/user_factory'
-import OrganizationMembership from '#models/organization_membership'
 import BoatEngine from '#models/boat_engine'
+import NavigationLog from '#models/navigation_log'
+import OrganizationMembership from '#models/organization_membership'
 import { createAdminUser } from '#tests/functional/helpers'
+import testUtils from '@adonisjs/core/services/test_utils'
+import { test } from '@japa/runner'
 import { DateTime } from 'luxon'
 
 test.group('Navigation logs (functional)', (group) => {
@@ -259,7 +259,7 @@ test.group('Navigation logs (functional)', (group) => {
     const response = await client
       .patch(`/boats/${boat.id}/navigation-logs/${log.id}`)
       .loginAs(user)
-      .form({ windForceBeaufort: 3, _expectedUpdatedAt: log.updatedAt.toISO() })
+      .form({ windForceBeaufort: 3, _expectedUpdatedAt: log.updatedAt?.toISO() })
       .redirects(0)
 
     response.assertStatus(302)
@@ -304,7 +304,7 @@ test.group('Navigation logs (functional)', (group) => {
     const response = await client
       .patch(`/boats/${boat.id}/navigation-logs/${log.id}/close`)
       .loginAs(user)
-      .form({ arrivedAt: '2024-01-01T14:00', _expectedUpdatedAt: log.updatedAt.toISO() })
+      .form({ arrivedAt: '2024-01-01T14:00', _expectedUpdatedAt: log.updatedAt?.toISO() })
       .redirects(0)
 
     response.assertStatus(302)
