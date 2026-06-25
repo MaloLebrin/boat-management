@@ -69,3 +69,14 @@ test('shows vsLastYear label with previous year', () => {
   const w = mountCard({ amount: 100, previousAmount: 80, previousYear: 2023 })
   expect(w.text()).toContain('budget.cards.vsLastYear')
 })
+
+test('renders help icon with title when helpText is provided', () => {
+  const w = mountCard({ helpText: 'Source: maintenance events' })
+  const btn = w.find('button[title="Source: maintenance events"]')
+  expect(btn.exists()).toBe(true)
+})
+
+test('does not render help icon when helpText is absent', () => {
+  const w = mountCard({})
+  expect(w.find('button[title]').exists()).toBe(false)
+})

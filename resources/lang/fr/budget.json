@@ -25,6 +25,14 @@
     "newThisYear": "Nouveau cette année"
   },
   "portUnavailable": "Données port à venir",
+  "categoryHelp": {
+    "maintenance": "Somme des prix de pièces (prix unitaire × quantité) sur les événements de maintenance",
+    "fuel": "Somme du champ « Coût total » sur les pleins de carburant",
+    "documents": "Somme du champ « Coût » sur les documents du bateau",
+    "port": "Somme du champ « Coût » sur les escales enregistrées",
+    "equipment": "Somme du champ « Prix d'achat » sur les équipements",
+    "entries": "Dépenses saisies manuellement depuis cette page"
+  },
   "portStay": {
     "formTitle": "Ajouter un séjour au port",
     "listTitle": "Séjours au port",

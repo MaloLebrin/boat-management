@@ -25,6 +25,14 @@
     "newThisYear": "New this year"
   },
   "portUnavailable": "Port data coming soon",
+  "categoryHelp": {
+    "maintenance": "Sum of part prices (unit price × quantity) on maintenance events",
+    "fuel": "Sum of the \"Total cost\" field on fuel fill-ups",
+    "documents": "Sum of the \"Cost\" field on boat documents",
+    "port": "Sum of the \"Cost\" field on recorded port stays",
+    "equipment": "Sum of the \"Purchase price\" field on equipment items",
+    "entries": "Expenses entered manually on this page"
+  },
   "portStay": {
     "formTitle": "Add a port stay",
     "listTitle": "Port stays",
