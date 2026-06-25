@@ -78,6 +78,39 @@ export class AuditLogSchema extends BaseModel {
   declare userId: number | null
 }
 
+export class BoatBudgetEntrySchema extends BaseModel {
+  static $columns = [
+    'amount',
+    'boatId',
+    'category',
+    'createdAt',
+    'date',
+    'description',
+    'id',
+    'label',
+    'updatedAt',
+  ] as const
+  $columns = BoatBudgetEntrySchema.$columns
+  @column()
+  declare amount: string
+  @column()
+  declare boatId: number
+  @column()
+  declare category: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column.date()
+  declare date: DateTime
+  @column()
+  declare description: string | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare label: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
+}
+
 export class BoatDocumentSchema extends BaseModel {
   static $columns = [
     'boatId',

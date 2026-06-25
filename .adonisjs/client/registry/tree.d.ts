@@ -20,7 +20,12 @@ export interface ApiDefinition {
       navigationLogs: typeof routes['boats.export.navigationLogs']
       budget: typeof routes['boats.export.budget']
     }
-    budget: typeof routes['boats.budget']
+    budget: typeof routes['boats.budget'] & {
+      entries: {
+        store: typeof routes['boats.budget.entries.store']
+        destroy: typeof routes['boats.budget.entries.destroy']
+      }
+    }
     portStays: {
       store: typeof routes['boats.portStays.store']
       destroy: typeof routes['boats.portStays.destroy']

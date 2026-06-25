@@ -87,6 +87,37 @@ Référence: `app/controllers/boat_equipment_controller.ts` et `app/services/boa
   - `DELETE /boats/:boatId/rig` → `destroyRig`
     - Service: `BoatService.deleteRig`
 
+### Budget
+
+Référence: `app/controllers/budget_controller.ts`, `app/services/budget_service.ts`.
+
+- `GET /boats/:id/budget` (`boats.budget.show`)
+  - Controller: `BudgetController.show` (validator `budgetYearValidator` pour `?year=`)
+  - Services: `BudgetService.getForBoat`, `BoatPortStayService.listForBoat`, `BoatBudgetEntryService.listForBoat`
+  - Page: `inertia/pages/boats/budget.vue`
+  - Props: `boat`, `budget` (totaux + mensuel), `year`, `portStays`, `entries`, `canManage`
+
+### Port stays
+
+Référence: `app/controllers/boat_port_stay_controller.ts`, `app/services/boat_port_stay_service.ts`.
+
+- `POST /boats/:id/port-stays` → `BoatPortStayController.store`
+  - Validator: `boatPortStayValidator`
+  - Service: `BoatPortStayService.create`
+- `DELETE /boats/:id/port-stays/:stayId` → `BoatPortStayController.destroy`
+  - Service: `BoatPortStayService.delete`
+
+### Budget entries (dépenses libres)
+
+Référence: `app/controllers/boat_budget_entry_controller.ts`, `app/services/boat_budget_entry_service.ts`.
+
+- `POST /boats/:id/budget/entries` → `BoatBudgetEntryController.store`
+  - Validator: `budgetEntryValidator`
+  - Service: `BoatBudgetEntryService.create`
+  - Catégories: `maintenance | fuel | documents | port | equipment | other`
+- `DELETE /boats/:id/budget/entries/:entryId` → `BoatBudgetEntryController.destroy`
+  - Service: `BoatBudgetEntryService.delete`
+
 ## Règles métier notables
 
 Référence: `app/services/boat_service.ts`.

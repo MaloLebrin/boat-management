@@ -11,8 +11,6 @@ Ajout de tooltips sur chaque carte de catégorie du tableau de bord budget pour 
 - Page `budget.vue` : chaque `BudgetCategoryCard` reçoit la clé i18n `budget.help.<categorie>` en `helpText`
 - i18n : clés `budget.help.maintenance`, `.fuel`, `.documents`, `.port`, `.equipment`, `.entries`, `.total` en FR et EN
 
-## 2026-06-25 — Depenses libres (budget entries)
-
 Ajout de la possibilite de saisir des depenses libres (taxe de francisation, cotisation club, etc.) dans le module budget.
 
 - Table `boat_budget_entries` : `amount`, `date`, `label`, `category` (maintenance/fuel/documents/port/equipment/other), `description`

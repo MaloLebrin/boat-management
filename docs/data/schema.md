@@ -85,6 +85,23 @@ Source: `database/schema.ts` (généré automatiquement via migrations).
   - `recurrenceIntervalMonths`
   - `recurrenceIntervalEngineHours`
 
+### boat_port_stays
+
+- `id`, `boatId`
+- `portName`
+- `startedAt` (date), `endedAt` (date, nullable)
+- `cost` (decimal 10,2, nullable)
+- `notes` (nullable)
+
+### boat_budget_entries
+
+- `id`, `boatId`
+- `amount` (decimal 10,2)
+- `date` (date)
+- `label`
+- `category` : `maintenance | fuel | documents | port | equipment | other`
+- `description` (nullable)
+
 ## Relations (résumé)
 
 - `Organization 1..n User` via `users.organizationId`
@@ -92,6 +109,8 @@ Source: `database/schema.ts` (généré automatiquement via migrations).
 - `Boat 1..n BoatEngine/BoatSail/BoatMaintenanceEvent/BoatMaintenanceTask`
 - `Boat 0..1 BoatRig`
 - `BoatMaintenanceEvent 1..n BoatMaintenancePart`
+- `Boat 1..n BoatPortStay`
+- `Boat 1..n BoatBudgetEntry`
 
 ## Seed (données démo)
 

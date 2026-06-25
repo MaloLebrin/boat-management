@@ -72,6 +72,11 @@ const categories = computed(() => [
     previousAmount: props.budget.previousYearTotals?.entries ?? null,
     helpText: t('budget.categoryHelp.entries'),
   },
+  {
+    key: 'entries' as const,
+    amount: props.budget.totals.entries,
+    previousAmount: props.budget.previousYearTotals?.entries ?? null,
+  },
 ])
 </script>
 
