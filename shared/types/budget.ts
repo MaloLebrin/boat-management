@@ -5,6 +5,7 @@ export interface BudgetMonthlyData {
   documents: number
   port: number
   equipment: number
+  entries: number
   total: number
 }
 
@@ -14,6 +15,7 @@ export interface BudgetYearSummary {
   documents: number
   port: number
   equipment: number
+  entries: number
   total: number
 }
 
@@ -31,4 +33,13 @@ export interface BoatPortStayItem {
   endedAt: string | null
   cost: string | null
   notes: string | null
+}
+
+export interface BoatBudgetEntryItem {
+  id: number
+  amount: string
+  date: string
+  label: string
+  category: string
+  description: string | null
 }

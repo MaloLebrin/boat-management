@@ -1,4 +1,5 @@
 export type {
+  BoatBudgetEntryItem,
   BoatPortStayItem,
   BudgetData,
   BudgetMonthlyData,

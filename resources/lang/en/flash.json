@@ -162,5 +162,9 @@
   "portStay": {
     "created": "Port stay recorded.",
     "deleted": "Port stay deleted."
+  },
+  "budgetEntry": {
+    "created": "Expense recorded.",
+    "deleted": "Expense deleted."
   }
 }

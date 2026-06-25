@@ -5,6 +5,7 @@ import router from '@adonisjs/core/services/router'
 const CsvExportController = () => import('#controllers/csv_export_controller')
 const BudgetController = () => import('#controllers/budget_controller')
 const BoatPortStayController = () => import('#controllers/boat_port_stay_controller')
+const BoatBudgetEntryController = () => import('#controllers/boat_budget_entry_controller')
 
 router
   .group(() => {
@@ -35,6 +36,12 @@ router
     router
       .delete('boats/:id/port-stays/:stayId', [BoatPortStayController, 'destroy'])
       .as('boats.portStays.destroy')
+    router
+      .post('boats/:id/budget/entries', [BoatBudgetEntryController, 'store'])
+      .as('boats.budget.entries.store')
+    router
+      .delete('boats/:id/budget/entries/:entryId', [BoatBudgetEntryController, 'destroy'])
+      .as('boats.budget.entries.destroy')
     router.get('boats/:id/edit', [controllers.Boats, 'edit']).as('boats.edit')
     router.put('boats/:id', [controllers.Boats, 'update']).as('boats.update')
     router.delete('boats/:id', [controllers.Boats, 'destroy']).as('boats.destroy')
