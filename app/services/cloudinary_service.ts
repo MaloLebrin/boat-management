@@ -1,14 +1,14 @@
+import cloudinary from '#config/cloudinary'
+import { CloudinaryDownloadError, MissingTmpPathError } from '#exceptions/media_errors'
+import { PdfService } from '#services/pdf_service'
+import type { CloudinaryUploadOptions } from '#shared/types/media'
 import { inject } from '@adonisjs/core'
+import type { MultipartFile } from '@adonisjs/core/bodyparser'
 import app from '@adonisjs/core/services/app'
 import logger from '@adonisjs/core/services/logger'
-import type { MultipartFile } from '@adonisjs/core/bodyparser'
-import cloudinary from '#config/cloudinary'
-import { PdfService } from '#services/pdf_service'
-import { CloudinaryDownloadError, MissingTmpPathError } from '#exceptions/media_errors'
-import type { CloudinaryUploadOptions } from '#shared/types/media'
 
 function envPrefix(): string {
-  return app.inProduction ? 'production' : 'dev'
+  return app.inProduction ? 'fleetai/production' : 'fleetai/dev'
 }
 
 export interface CloudinaryUploadResult {
