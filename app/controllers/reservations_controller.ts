@@ -1,12 +1,8 @@
 import BoatReservationService from '#services/boat_reservation_service'
-import Boat from '#models/boat'
+import { toBoatReservationRow } from '#transformers/boat_reservation_transformer'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
-import type {
-  BoatReservationRow,
-  FleetBoatCalendarEntry,
-  FleetBoatOption,
-} from '#shared/types/reservation'
+import type { FleetBoatCalendarEntry } from '#shared/types/reservation'
 
 @inject()
 export default class ReservationsController {
@@ -20,32 +16,11 @@ export default class ReservationsController {
     const selectedBoatId = rawBoatId ? Number(rawBoatId) : null
 
     const [boats, reservations] = await Promise.all([
-      user.organizationId
-        ? Boat.query()
-            .select(['id', 'name'])
-            .where('organizationId', user.organizationId)
-            .orderBy('name')
-        : Promise.resolve([]),
+      this.reservationService.listBoatsForOrg(user),
       this.reservationService.listForOrg(user, selectedBoatId),
     ])
 
-    const boatOptions: FleetBoatOption[] = boats.map((b) => ({ id: b.id, name: b.name }))
-
-    const rows: BoatReservationRow[] = reservations.map((r) => ({
-      id: r.id,
-      boatId: r.boatId,
-      boatName: r.boat?.name ?? '',
-      organizationId: r.organizationId,
-      status: r.status,
-      startsAt: r.startsAt.toISO()!,
-      endsAt: r.endsAt.toISO()!,
-      clientName: r.clientName,
-      clientEmail: r.clientEmail,
-      clientPhone: r.clientPhone,
-      notes: r.notes,
-      totalPrice: r.totalPrice,
-      createdAt: r.createdAt.toISO()!,
-    }))
+    const rows = reservations.map((r) => toBoatReservationRow(r, r.boat?.name ?? ''))
 
     const calendarEntriesMap = new Map<number, FleetBoatCalendarEntry>()
     for (const row of rows) {
@@ -58,12 +33,11 @@ export default class ReservationsController {
       }
       calendarEntriesMap.get(row.boatId)!.reservations.push(row)
     }
-    const calendarEntries = Array.from(calendarEntriesMap.values())
 
     return inertia.render('reservations/index', {
       reservations: rows,
-      calendarEntries,
-      boats: boatOptions,
+      calendarEntries: Array.from(calendarEntriesMap.values()),
+      boats,
       selectedBoatId,
     })
   }

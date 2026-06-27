@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import ReservationTimelineRow from '~/components/reservations/ReservationTimelineRow.vue'
+import { useMonthNav } from '~/composables/use_month_nav'
 import { useT } from '~/composables/use_t'
 import type { FleetBoatCalendarEntry } from '~/types/reservation'
 
@@ -10,34 +11,9 @@ const props = defineProps<{
   calendarEntries: FleetBoatCalendarEntry[]
 }>()
 
-const { t, locale } = useT()
-
-const today = new Date()
-const currentYear = ref(today.getFullYear())
-const currentMonth = ref(today.getMonth())
-
-function prevMonth() {
-  if (currentMonth.value === 0) {
-    currentMonth.value = 11
-    currentYear.value--
-  } else currentMonth.value--
-}
-
-function nextMonth() {
-  if (currentMonth.value === 11) {
-    currentMonth.value = 0
-    currentYear.value++
-  } else currentMonth.value++
-}
-
-const monthLabel = computed(() =>
-  new Date(currentYear.value, currentMonth.value).toLocaleDateString(locale.value, {
-    month: 'long',
-    year: 'numeric',
-  })
-)
-
-const daysInMonth = computed(() => new Date(currentYear.value, currentMonth.value + 1, 0).getDate())
+const { t } = useT()
+const { currentYear, currentMonth, prevMonth, nextMonth, monthLabel, daysInMonth, isToday } =
+  useMonthNav()
 
 const days = computed(() => Array.from({ length: daysInMonth.value }, (_, i) => i + 1))
 
@@ -87,12 +63,7 @@ const monthEnd = computed(
             v-for="day in days"
             :key="day"
             class="w-8 shrink-0 text-center text-xs text-fg-muted"
-            :class="{
-              'font-bold text-navy-600':
-                day === today.getDate() &&
-                currentMonth === today.getMonth() &&
-                currentYear === today.getFullYear(),
-            }"
+            :class="{ 'font-bold text-navy-600': isToday(day) }"
           >
             {{ day }}
           </div>

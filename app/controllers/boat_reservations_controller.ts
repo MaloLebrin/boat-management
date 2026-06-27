@@ -3,16 +3,19 @@ import {
   ReservationNotFoundError,
   ReservationValidationError,
 } from '#exceptions/reservation_errors'
+import { BoatNotFoundError } from '#exceptions/boat_errors'
 import BoatReservationService from '#services/boat_reservation_service'
-import BoatService, { BoatNotFoundError } from '#services/boat_service'
+import BoatService from '#services/boat_service'
 import BoatPolicy from '#policies/boat_policy'
 import {
   createBoatReservationValidator,
   updateBoatReservationValidator,
 } from '#validators/boat_reservation_validator'
+import { toBoatReservationRow } from '#transformers/boat_reservation_transformer'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
-import type { BoatReservationRow } from '#shared/types/reservation'
+import type Boat from '#models/boat'
+import type User from '#models/user'
 
 @inject()
 export default class BoatReservationsController {
@@ -21,17 +24,28 @@ export default class BoatReservationsController {
     private reservationService: BoatReservationService
   ) {}
 
+  private async resolveBoat(
+    user: User,
+    boatId: number,
+    response: HttpContext['response']
+  ): Promise<Boat | null> {
+    try {
+      return await this.boatService.getForUserOrFail(user, boatId)
+    } catch (error) {
+      if (error instanceof BoatNotFoundError) {
+        response.redirect('/boats')
+        return null
+      }
+      throw error
+    }
+  }
+
   async index({ inertia, params, auth, bouncer, response }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
-    let boat
-    try {
-      boat = await this.boatService.getForUserOrFail(user, Number(params.boatId))
-    } catch (error) {
-      if (error instanceof BoatNotFoundError) return response.redirect('/boats')
-      throw error
-    }
+    const boat = await this.resolveBoat(user, Number(params.boatId), response)
+    if (!boat) return
 
     await bouncer.with(BoatPolicy).authorize('view', boat)
 
@@ -40,25 +54,9 @@ export default class BoatReservationsController {
       bouncer.with(BoatPolicy).allows('manage', boat),
     ])
 
-    const rows: BoatReservationRow[] = reservations.map((r) => ({
-      id: r.id,
-      boatId: r.boatId,
-      boatName: boat.name,
-      organizationId: r.organizationId,
-      status: r.status,
-      startsAt: r.startsAt.toISO()!,
-      endsAt: r.endsAt.toISO()!,
-      clientName: r.clientName,
-      clientEmail: r.clientEmail,
-      clientPhone: r.clientPhone,
-      notes: r.notes,
-      totalPrice: r.totalPrice,
-      createdAt: r.createdAt.toISO()!,
-    }))
-
     return inertia.render('boats/reservations', {
       boat: { id: boat.id, name: boat.name },
-      reservations: rows,
+      reservations: reservations.map((r) => toBoatReservationRow(r, boat.name)),
       canManage,
     })
   }
@@ -67,13 +65,8 @@ export default class BoatReservationsController {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
-    let boat
-    try {
-      boat = await this.boatService.getForUserOrFail(user, Number(params.boatId))
-    } catch (error) {
-      if (error instanceof BoatNotFoundError) return response.redirect('/boats')
-      throw error
-    }
+    const boat = await this.resolveBoat(user, Number(params.boatId), response)
+    if (!boat) return
 
     await bouncer.with(BoatPolicy).authorize('manage', boat)
 
@@ -110,13 +103,8 @@ export default class BoatReservationsController {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
-    let boat
-    try {
-      boat = await this.boatService.getForUserOrFail(user, Number(params.boatId))
-    } catch (error) {
-      if (error instanceof BoatNotFoundError) return response.redirect('/boats')
-      throw error
-    }
+    const boat = await this.resolveBoat(user, Number(params.boatId), response)
+    if (!boat) return
 
     await bouncer.with(BoatPolicy).authorize('manage', boat)
 
@@ -157,13 +145,8 @@ export default class BoatReservationsController {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
-    let boat
-    try {
-      boat = await this.boatService.getForUserOrFail(user, Number(params.boatId))
-    } catch (error) {
-      if (error instanceof BoatNotFoundError) return response.redirect('/boats')
-      throw error
-    }
+    const boat = await this.resolveBoat(user, Number(params.boatId), response)
+    if (!boat) return
 
     await bouncer.with(BoatPolicy).authorize('manage', boat)
 

@@ -384,4 +384,38 @@ test.group('Boat Reservations (functional)', (group) => {
     const props = response.inertiaProps as { reservations: unknown[] }
     assert.lengthOf(props.reservations, 2)
   })
+
+  test('GET /reservations?boatId= filters by boat', async ({ client, assert }) => {
+    const user = await createAdminUser()
+    const boat1 = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const boat2 = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    await BoatReservation.create({
+      boatId: boat1.id,
+      organizationId: user.organizationId!,
+      status: 'confirmed',
+      startsAt: DateTime.fromISO('2026-01-01T10:00:00'),
+      endsAt: DateTime.fromISO('2026-01-07T10:00:00'),
+      clientName: 'Boat1 Client',
+    })
+
+    await BoatReservation.create({
+      boatId: boat2.id,
+      organizationId: user.organizationId!,
+      status: 'option',
+      startsAt: DateTime.fromISO('2026-01-10T10:00:00'),
+      endsAt: DateTime.fromISO('2026-01-15T10:00:00'),
+      clientName: 'Boat2 Client',
+    })
+
+    const response = await client
+      .get(`/reservations?boatId=${boat1.id}`)
+      .loginAs(user)
+      .withInertia()
+
+    response.assertStatus(200)
+    const props = response.inertiaProps as { reservations: { boatId: number }[] }
+    assert.lengthOf(props.reservations, 1)
+    assert.equal(props.reservations[0].boatId, boat1.id)
+  })
 })

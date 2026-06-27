@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
-import ReservationStatusBadge from '~/components/reservations/ReservationStatusBadge.vue'
+import { useMonthNav } from '~/composables/use_month_nav'
 import { useT } from '~/composables/use_t'
 import type { BoatReservationRow, ReservationStatus } from '~/types/reservation'
 
@@ -10,47 +10,18 @@ const props = defineProps<{
   reservations: BoatReservationRow[]
 }>()
 
-const { t, locale } = useT()
-
-const today = new Date()
-const currentYear = ref(today.getFullYear())
-const currentMonth = ref(today.getMonth())
-
-function prevMonth() {
-  if (currentMonth.value === 0) {
-    currentMonth.value = 11
-    currentYear.value--
-  } else currentMonth.value--
-}
-
-function nextMonth() {
-  if (currentMonth.value === 11) {
-    currentMonth.value = 0
-    currentYear.value++
-  } else currentMonth.value++
-}
-
-const monthLabel = computed(() =>
-  new Date(currentYear.value, currentMonth.value).toLocaleDateString(locale.value, {
-    month: 'long',
-    year: 'numeric',
-  })
-)
-
-const weekdays = computed(() => {
-  const formatter = new Intl.DateTimeFormat(locale.value, { weekday: 'short' })
-  return [1, 2, 3, 4, 5, 6, 0].map((day) => {
-    const date = new Date(2024, 0, day === 0 ? 7 : day)
-    const label = formatter.format(date)
-    return label.charAt(0).toUpperCase() + label.slice(1, 3)
-  })
-})
-
-const daysInMonth = computed(() => new Date(currentYear.value, currentMonth.value + 1, 0).getDate())
-const firstWeekday = computed(() => {
-  const d = new Date(currentYear.value, currentMonth.value, 1).getDay()
-  return d === 0 ? 6 : d - 1
-})
+const { t } = useT()
+const {
+  currentYear,
+  currentMonth,
+  prevMonth,
+  nextMonth,
+  monthLabel,
+  daysInMonth,
+  firstWeekday,
+  isToday,
+  weekdays,
+} = useMonthNav()
 
 function reservationsForDay(day: number): BoatReservationRow[] {
   const iso = `${currentYear.value}-${String(currentMonth.value + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
@@ -67,14 +38,6 @@ const calendarDays = computed(() =>
     reservations: reservationsForDay(i + 1),
   }))
 )
-
-function isToday(day: number): boolean {
-  return (
-    day === today.getDate() &&
-    currentMonth.value === today.getMonth() &&
-    currentYear.value === today.getFullYear()
-  )
-}
 
 const pillClass: Record<ReservationStatus, string> = {
   option: 'bg-peach-100 text-peach-800',

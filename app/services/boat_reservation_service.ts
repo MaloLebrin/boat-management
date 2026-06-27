@@ -4,8 +4,10 @@ import {
   ReservationValidationError,
 } from '#exceptions/reservation_errors'
 import BoatReservation from '#models/boat_reservation'
+import BoatModel from '#models/boat'
 import type Boat from '#models/boat'
 import type User from '#models/user'
+import type { FleetBoatOption } from '#shared/types/reservation'
 import type { CreateReservationPayload, UpdateReservationPayload } from '#shared/types/reservation'
 import { toDateTime } from '#shared/helpers/maintenance'
 import { inject } from '@adonisjs/core'
@@ -23,6 +25,15 @@ export default class BoatReservationService {
     assertBoatScope(user, boat)
 
     return BoatReservation.query().where('boatId', boat.id).orderBy('starts_at', 'asc')
+  }
+
+  async listBoatsForOrg(user: User): Promise<FleetBoatOption[]> {
+    if (user.organizationId === null) return []
+    const boats = await BoatModel.query()
+      .select(['id', 'name'])
+      .where('organizationId', user.organizationId)
+      .orderBy('name')
+    return boats.map((b) => ({ id: b.id, name: b.name }))
   }
 
   async listForOrg(user: User, boatIdFilter?: number | null): Promise<BoatReservation[]> {
