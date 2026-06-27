@@ -9,7 +9,7 @@ import type Boat from '#models/boat'
 import type User from '#models/user'
 import type { FleetBoatOption } from '#shared/types/reservation'
 import type { CreateReservationPayload, UpdateReservationPayload } from '#shared/types/reservation'
-import { toDateTime } from '#shared/helpers/maintenance'
+import { toDateTime } from '#shared/helpers/date'
 import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
 

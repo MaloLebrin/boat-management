@@ -4,9 +4,9 @@ import { useT } from '~/composables/use_t'
 export function useMonthNav() {
   const { locale } = useT()
 
-  const today = new Date()
-  const currentYear = ref(today.getFullYear())
-  const currentMonth = ref(today.getMonth())
+  const initDate = new Date()
+  const currentYear = ref(initDate.getFullYear())
+  const currentMonth = ref(initDate.getMonth())
 
   function prevMonth() {
     if (currentMonth.value === 0) {
@@ -43,10 +43,11 @@ export function useMonthNav() {
   })
 
   function isToday(day: number): boolean {
+    const now = new Date()
     return (
-      day === today.getDate() &&
-      currentMonth.value === today.getMonth() &&
-      currentYear.value === today.getFullYear()
+      day === now.getDate() &&
+      currentMonth.value === now.getMonth() &&
+      currentYear.value === now.getFullYear()
     )
   }
 
@@ -60,7 +61,6 @@ export function useMonthNav() {
   })
 
   return {
-    today,
     currentYear,
     currentMonth,
     prevMonth,

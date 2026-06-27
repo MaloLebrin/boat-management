@@ -48,21 +48,25 @@ const coveredByDay = computed(() => {
             :class="[
               'absolute inset-y-0.5 left-0 right-0',
               pillClass[coveredByDay.get(day)!.status],
-              day === days[0] || coveredByDay.get(day)!.startsAt.slice(0, 10) === isoForDay(day)
+              day === days[0] || coveredByDay.get(day)?.startsAt.slice(0, 10) === isoForDay(day)
                 ? 'rounded-l'
+                : '',
+              day === days[days.length - 1] ||
+              coveredByDay.get(day)?.endsAt.slice(0, 10) === isoForDay(day)
+                ? 'rounded-r'
                 : '',
             ]"
             :title="
-              coveredByDay.get(day)!.startsAt.slice(0, 10) === isoForDay(day)
-                ? coveredByDay.get(day)!.clientName
+              coveredByDay.get(day)?.startsAt.slice(0, 10) === isoForDay(day)
+                ? coveredByDay.get(day)?.clientName
                 : ''
             "
           >
             <span
-              v-if="coveredByDay.get(day)!.startsAt.slice(0, 10) === isoForDay(day)"
+              v-if="coveredByDay.get(day)?.startsAt.slice(0, 10) === isoForDay(day)"
               class="absolute inset-0 flex items-center truncate px-1 text-xs"
             >
-              {{ coveredByDay.get(day)!.clientName }}
+              {{ coveredByDay.get(day)?.clientName }}
             </span>
           </div>
         </template>

@@ -23,19 +23,32 @@ const {
   weekdays,
 } = useMonthNav()
 
-function reservationsForDay(day: number): BoatReservationRow[] {
-  const iso = `${currentYear.value}-${String(currentMonth.value + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
-  return props.reservations.filter((r) => {
-    const start = r.startsAt.slice(0, 10)
-    const end = r.endsAt.slice(0, 10)
-    return start <= iso && iso <= end
-  })
-}
+const reservationsByDay = computed(() => {
+  const map = new Map<number, BoatReservationRow[]>()
+  const year = currentYear.value
+  const month = String(currentMonth.value + 1).padStart(2, '0')
+  const total = daysInMonth.value
+
+  for (const r of props.reservations) {
+    const rStart = r.startsAt.slice(0, 10)
+    const rEnd = r.endsAt.slice(0, 10)
+    for (let d = 1; d <= total; d++) {
+      const iso = `${year}-${month}-${String(d).padStart(2, '0')}`
+      if (rStart <= iso && iso <= rEnd) {
+        const list = map.get(d) ?? []
+        list.push(r)
+        map.set(d, list)
+      }
+    }
+  }
+
+  return map
+})
 
 const calendarDays = computed(() =>
   Array.from({ length: daysInMonth.value }, (_, i) => ({
     day: i + 1,
-    reservations: reservationsForDay(i + 1),
+    reservations: reservationsByDay.value.get(i + 1) ?? [],
   }))
 )
 

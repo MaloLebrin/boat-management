@@ -4,7 +4,7 @@ import BoatFuelLog from '#models/boat_fuel_log'
 import type Boat from '#models/boat'
 import type User from '#models/user'
 import type { CreateFuelLogPayload } from '#shared/types/fuel_log'
-import { toDateTime } from '#shared/helpers/maintenance'
+import { toDateTime } from '#shared/helpers/date'
 
 export { BoatFuelLogNotFoundError, BoatFuelLogValidationError }
 export type { CreateFuelLogPayload }

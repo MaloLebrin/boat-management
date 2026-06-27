@@ -5,7 +5,7 @@ import type User from '#models/user'
 import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
 import type { CreateIncidentPayload, UpdateIncidentPayload } from '#shared/types/incident'
-import { toDateTime } from '#shared/helpers/maintenance'
+import { toDateTime } from '#shared/helpers/date'
 
 function assertBoatScope(user: User, boat: Boat) {
   if (user.organizationId === null || user.organizationId !== boat.organizationId) {

@@ -38,6 +38,7 @@ export default class BoatReservation extends BaseModel {
   @column()
   declare notes: string | null
 
+  // pg driver returns DECIMAL columns as strings; kept as string to preserve precision
   @column()
   declare totalPrice: string | null
 

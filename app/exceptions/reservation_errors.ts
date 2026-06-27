@@ -4,8 +4,6 @@ export class ReservationNotFoundError extends Error {
 
 export class ReservationConflictError extends Error {
   name = 'ReservationConflictError'
-  status = 409
-  code = 'E_RESERVATION_CONFLICT'
 
   constructor(readonly conflictingId: number) {
     super('Reservation period overlaps with an existing reservation')

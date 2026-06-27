@@ -195,6 +195,30 @@ test.group('Boat Reservations (functional)', (group) => {
     assert.lengthOf(reservations, 2)
   })
 
+  test('POST /boats/:boatId/reservations flashes error when end is before start', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    const response = await client
+      .post(`/boats/${boat.id}/reservations`)
+      .form({
+        startsAt: '2025-08-10T10:00',
+        endsAt: '2025-08-01T10:00',
+        clientName: 'Bad Dates Client',
+        status: 'option',
+      })
+      .loginAs(user)
+      .redirects(0)
+
+    response.assertStatus(302)
+
+    const reservations = await BoatReservation.query().where('boatId', boat.id)
+    assert.lengthOf(reservations, 0)
+  })
+
   // --- update ---
 
   test('PATCH /boats/:boatId/reservations/:id updates status to confirmed', async ({
@@ -223,6 +247,49 @@ test.group('Boat Reservations (functional)', (group) => {
 
     await reservation.refresh()
     assert.equal(reservation.status, 'confirmed')
+  })
+
+  test('PATCH /boats/:boatId/reservations/:id rejects cross-org attempt', async ({
+    client,
+    assert,
+  }) => {
+    const owner = await createAdminUser()
+    const other = await UserFactory.with('organization').create()
+    const boat = await BoatFactory.merge({ organizationId: owner.organizationId! }).create()
+
+    const reservation = await BoatReservation.create({
+      boatId: boat.id,
+      organizationId: boat.organizationId,
+      status: 'option',
+      startsAt: DateTime.fromISO('2025-09-01T10:00:00'),
+      endsAt: DateTime.fromISO('2025-09-07T10:00:00'),
+      clientName: 'Cross Org Update Client',
+    })
+
+    const response = await client
+      .patch(`/boats/${boat.id}/reservations/${reservation.id}`)
+      .form({ status: 'confirmed' })
+      .loginAs(other)
+
+    response.assertRedirectsTo('/boats')
+
+    await reservation.refresh()
+    assert.equal(reservation.status, 'option')
+  })
+
+  test('PATCH /boats/:boatId/reservations/:id returns 302 when reservation not found', async ({
+    client,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    const response = await client
+      .patch(`/boats/${boat.id}/reservations/999999`)
+      .form({ status: 'confirmed' })
+      .loginAs(user)
+      .redirects(0)
+
+    response.assertStatus(302)
   })
 
   test('PATCH /boats/:boatId/reservations/:id detects conflict on reschedule', async ({
@@ -345,6 +412,13 @@ test.group('Boat Reservations (functional)', (group) => {
   })
 
   // --- fleet index ---
+
+  test('GET /reservations redirects to /login when unauthenticated', async ({ client }) => {
+    const response = await client.get('/reservations').redirects(0)
+
+    response.assertStatus(302)
+    response.assertHeader('location', '/login')
+  })
 
   test('GET /reservations renders fleet reservations page', async ({ client }) => {
     const user = await createAdminUser()
