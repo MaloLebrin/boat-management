@@ -12,6 +12,7 @@ import NavItem from '~/components/layout/NavItem.vue'
 import { useNavSections } from '~/composables/use_nav_sections'
 import { useNetworkStatus } from '~/composables/use_network_status'
 import ConflictResolutionModal from '~/components/ConflictResolutionModal.vue'
+import OfflinePendingQueue from '~/components/OfflinePendingQueue.vue'
 import { useOfflineQueue } from '~/composables/use_offline_queue'
 import { usePwaUpdate } from '~/composables/use_pwa_update'
 import { useT } from '~/composables/use_t'
@@ -133,6 +134,9 @@ onBeforeUnmount(() => {
 
       <!-- Scrollable content area -->
       <main class="flex-1 overflow-y-auto bg-cream">
+        <div class="px-6 pt-4">
+          <OfflinePendingQueue />
+        </div>
         <Transition name="page" mode="out-in">
           <div :key="page.url">
             <slot />
