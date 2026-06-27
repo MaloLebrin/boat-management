@@ -41,6 +41,7 @@ async function getDb() {
 
 // Module-level shared state — all composable instances share the same refs
 const pendingCount = ref(0)
+const pendingActions = ref<QueuedAction[]>([])
 const isSyncing = ref(false)
 export const conflictedAction = ref<ConflictState | null>(null)
 let countInitialized = false
@@ -48,7 +49,9 @@ let countInitialized = false
 async function refreshCount() {
   if (!isIndexedDbAvailable()) return
   const db = await getDb()
-  pendingCount.value = await db.count(STORE_NAME)
+  const actions = (await db.getAll(STORE_NAME)) as QueuedAction[]
+  pendingCount.value = actions.length
+  pendingActions.value = actions
 }
 
 export function useOfflineQueue() {
@@ -94,10 +97,9 @@ export function useOfflineQueue() {
           return
         }
         await db.delete(STORE_NAME, action.id)
-        const remaining = await db.count(STORE_NAME)
-        pendingCount.value = remaining
+        await refreshCount()
         isSyncing.value = false
-        if (remaining === 0) {
+        if (pendingCount.value === 0) {
           toast.success(t('offline.syncSuccess', { count: String(totalCount) }))
         } else {
           await drainQueue()
@@ -107,8 +109,7 @@ export function useOfflineQueue() {
       onError: async () => {
         settled = true
         await db.delete(STORE_NAME, action.id)
-        const remaining = await db.count(STORE_NAME)
-        pendingCount.value = remaining
+        await refreshCount()
         isSyncing.value = false
         toast.error(t('offline.syncError'))
       },
@@ -136,7 +137,6 @@ export function useOfflineQueue() {
     const db = await getDb()
 
     await db.delete(STORE_NAME, action.id!)
-    pendingCount.value--
 
     if (choice === 'local') {
       const serverUpdatedAt = serverData.updatedAt as string
@@ -147,16 +147,24 @@ export function useOfflineQueue() {
         payload: { ...action.payload, _expectedUpdatedAt: serverUpdatedAt },
         createdAt: action.createdAt,
       })
-      pendingCount.value++
       toast.info(t('offline.conflict.kept'))
     } else {
       toast.info(t('offline.conflict.discarded'))
     }
 
+    await refreshCount()
     conflictedAction.value = null
     if (pendingCount.value > 0) {
       await drainQueue()
     }
+  }
+
+  async function cancelAction(id: number) {
+    if (!isIndexedDbAvailable()) return
+    const db = await getDb()
+    await db.delete(STORE_NAME, id)
+    await refreshCount()
+    toast.info(t('offline.queue.cancelled'))
   }
 
   if (!countInitialized) {
@@ -164,5 +172,14 @@ export function useOfflineQueue() {
     refreshCount()
   }
 
-  return { pendingCount, isSyncing, conflictedAction, enqueue, drainQueue, resolveConflict }
+  return {
+    pendingCount,
+    pendingActions,
+    isSyncing,
+    conflictedAction,
+    enqueue,
+    drainQueue,
+    resolveConflict,
+    cancelAction,
+  }
 }

@@ -19,6 +19,7 @@ const mockPageProps = vi.hoisted(() => ({
     'offline.syncError': 'Erreur de synchronisation',
     'offline.conflict.kept': 'Vos modifications seront renvoyées',
     'offline.conflict.discarded': 'Modifications locales abandonnées',
+    'offline.queue.cancelled': 'Action annulée',
   },
   locale: 'fr',
   flash: {} as Record<string, unknown>,
@@ -410,5 +411,85 @@ describe('useOfflineQueue', () => {
       expect.objectContaining({ _expectedUpdatedAt: '2026-06-25T12:00:00.000Z' }),
       expect.any(Object)
     )
+  })
+
+  test('enqueue populates pendingActions with the queued item', async () => {
+    const { enqueue, pendingActions } = mountComposable()
+
+    await enqueue({
+      type: 'create-navigation-log',
+      url: '/boats/1/navigation-logs',
+      method: 'post',
+      payload: { departedAt: '2026-06-24T10:00' },
+    })
+
+    expect(pendingActions.value).toHaveLength(1)
+    expect(pendingActions.value[0].type).toBe('create-navigation-log')
+    expect(pendingActions.value[0].url).toBe('/boats/1/navigation-logs')
+  })
+
+  test('enqueue appends to pendingActions for each item', async () => {
+    const { enqueue, pendingActions } = mountComposable()
+
+    await enqueue({
+      type: 'create-navigation-log',
+      url: '/boats/1/navigation-logs',
+      method: 'post',
+      payload: { departedAt: '2026-06-24T10:00' },
+    })
+    await enqueue({
+      type: 'create-fuel-log',
+      url: '/boats/1/fuel-logs',
+      method: 'post',
+      payload: { quantityLiters: '50' },
+    })
+
+    expect(pendingActions.value).toHaveLength(2)
+    expect(pendingActions.value.map((a) => a.type)).toEqual([
+      'create-navigation-log',
+      'create-fuel-log',
+    ])
+  })
+
+  test('cancelAction removes item from queue and shows info toast', async () => {
+    const { enqueue, cancelAction, pendingCount, pendingActions } = mountComposable()
+
+    await enqueue({
+      type: 'create-navigation-log',
+      url: '/boats/1/navigation-logs',
+      method: 'post',
+      payload: { departedAt: '2026-06-24T10:00' },
+    })
+    expect(pendingCount.value).toBe(1)
+    const id = pendingActions.value[0].id!
+
+    await cancelAction(id)
+
+    expect(pendingCount.value).toBe(0)
+    expect(pendingActions.value).toHaveLength(0)
+    expect(toast.info).toHaveBeenLastCalledWith('Action annulée')
+  })
+
+  test('cancelAction removes only the targeted item when multiple are queued', async () => {
+    const { enqueue, cancelAction, pendingCount, pendingActions } = mountComposable()
+
+    await enqueue({
+      type: 'create-navigation-log',
+      url: '/boats/1/navigation-logs',
+      method: 'post',
+      payload: { departedAt: '2026-06-24T10:00' },
+    })
+    await enqueue({
+      type: 'create-fuel-log',
+      url: '/boats/1/fuel-logs',
+      method: 'post',
+      payload: { quantityLiters: '50' },
+    })
+    const firstId = pendingActions.value[0].id!
+
+    await cancelAction(firstId)
+
+    expect(pendingCount.value).toBe(1)
+    expect(pendingActions.value[0].type).toBe('create-fuel-log')
   })
 })

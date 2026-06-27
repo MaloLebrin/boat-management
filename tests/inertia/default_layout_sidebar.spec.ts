@@ -45,8 +45,12 @@ vi.mock('~/composables/use_offline_queue', () => ({
   useOfflineQueue: () => ({
     drainQueue: mockDrainQueue,
     pendingCount: ref(0),
+    pendingActions: ref([]),
     isSyncing: ref(false),
     enqueue: vi.fn(),
+    cancelAction: vi.fn(),
+    conflictedAction: ref(null),
+    resolveConflict: vi.fn(),
   }),
 }))
 
