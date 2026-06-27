@@ -492,6 +492,30 @@ const routes = {
     tokens: [{"old":"/boats/:boatId/position","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/position","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/position","type":0,"val":"position","end":""}],
     types: placeholder as Registry['boats.position.store']['types'],
   },
+  'boats.reservations.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/boats/:boatId/reservations',
+    tokens: [{"old":"/boats/:boatId/reservations","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/reservations","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/reservations","type":0,"val":"reservations","end":""}],
+    types: placeholder as Registry['boats.reservations.index']['types'],
+  },
+  'boats.reservations.store': {
+    methods: ["POST"],
+    pattern: '/boats/:boatId/reservations',
+    tokens: [{"old":"/boats/:boatId/reservations","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/reservations","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/reservations","type":0,"val":"reservations","end":""}],
+    types: placeholder as Registry['boats.reservations.store']['types'],
+  },
+  'boats.reservations.update': {
+    methods: ["PATCH"],
+    pattern: '/boats/:boatId/reservations/:reservationId',
+    tokens: [{"old":"/boats/:boatId/reservations/:reservationId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/reservations/:reservationId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/reservations/:reservationId","type":0,"val":"reservations","end":""},{"old":"/boats/:boatId/reservations/:reservationId","type":1,"val":"reservationId","end":""}],
+    types: placeholder as Registry['boats.reservations.update']['types'],
+  },
+  'boats.reservations.destroy': {
+    methods: ["DELETE"],
+    pattern: '/boats/:boatId/reservations/:reservationId',
+    tokens: [{"old":"/boats/:boatId/reservations/:reservationId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/reservations/:reservationId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/reservations/:reservationId","type":0,"val":"reservations","end":""},{"old":"/boats/:boatId/reservations/:reservationId","type":1,"val":"reservationId","end":""}],
+    types: placeholder as Registry['boats.reservations.destroy']['types'],
+  },
   'ports.index': {
     methods: ["GET","HEAD"],
     pattern: '/ports',
@@ -1007,6 +1031,12 @@ const routes = {
     pattern: '/navigation/incidents',
     tokens: [{"old":"/navigation/incidents","type":0,"val":"navigation","end":""},{"old":"/navigation/incidents","type":0,"val":"incidents","end":""}],
     types: placeholder as Registry['navigation.incidents']['types'],
+  },
+  'reservations.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/reservations',
+    tokens: [{"old":"/reservations","type":0,"val":"reservations","end":""}],
+    types: placeholder as Registry['reservations.index']['types'],
   },
   'event_stream': {
     methods: ["GET","HEAD"],

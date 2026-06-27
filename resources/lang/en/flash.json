@@ -166,5 +166,13 @@
   "budgetEntry": {
     "created": "Expense recorded.",
     "deleted": "Expense deleted."
+  },
+  "reservation": {
+    "created": "Reservation saved.",
+    "updated": "Reservation updated.",
+    "deleted": "Reservation deleted.",
+    "notFound": "Reservation not found.",
+    "conflict": "This boat is already booked for this period.",
+    "endBeforeStart": "End date must be after start date."
   }
 }

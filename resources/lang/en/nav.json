@@ -15,6 +15,7 @@
   "logbook": "Logbook",
   "fuel": "Fuel",
   "incidents": "Incidents",
+  "reservations": "Reservations",
   "sections": {
     "fleet": "FLEET",
     "maintenance": "MAINTENANCE",

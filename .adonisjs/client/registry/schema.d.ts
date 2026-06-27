@@ -979,6 +979,54 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_position_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'boats.reservations.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/boats/:boatId/reservations'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { boatId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_reservations_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_reservations_controller').default['index']>>>
+    }
+  }
+  'boats.reservations.store': {
+    methods: ["POST"]
+    pattern: '/boats/:boatId/reservations'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/boat_reservation_validator').createBoatReservationValidator)>>
+      paramsTuple: [ParamValue]
+      params: { boatId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/boat_reservation_validator').createBoatReservationValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_reservations_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_reservations_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'boats.reservations.update': {
+    methods: ["PATCH"]
+    pattern: '/boats/:boatId/reservations/:reservationId'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/boat_reservation_validator').updateBoatReservationValidator)>>
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; reservationId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/boat_reservation_validator').updateBoatReservationValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_reservations_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_reservations_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'boats.reservations.destroy': {
+    methods: ["DELETE"]
+    pattern: '/boats/:boatId/reservations/:reservationId'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; reservationId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_reservations_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_reservations_controller').default['destroy']>>>
+    }
+  }
   'ports.index': {
     methods: ["GET","HEAD"]
     pattern: '/ports'
@@ -2009,6 +2057,18 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/navigation_controller').default['incidents']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/navigation_controller').default['incidents']>>>
+    }
+  }
+  'reservations.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/reservations'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/reservations_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/reservations_controller').default['index']>>>
     }
   }
   'event_stream': {

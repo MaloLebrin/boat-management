@@ -83,6 +83,12 @@ export interface ApiDefinition {
     position: {
       store: typeof routes['boats.position.store']
     }
+    reservations: {
+      index: typeof routes['boats.reservations.index']
+      store: typeof routes['boats.reservations.store']
+      update: typeof routes['boats.reservations.update']
+      destroy: typeof routes['boats.reservations.destroy']
+    }
   }
   boatEquipment: {
     storeEngine: typeof routes['boat_equipment.store_engine']
@@ -278,6 +284,9 @@ export interface ApiDefinition {
     logbook: typeof routes['navigation.logbook']
     fuel: typeof routes['navigation.fuel']
     incidents: typeof routes['navigation.incidents']
+  }
+  reservations: {
+    index: typeof routes['reservations.index']
   }
   eventStream: typeof routes['event_stream']
   subscribe: typeof routes['subscribe']

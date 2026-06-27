@@ -10,6 +10,7 @@ export function useNavSections() {
       items: [
         { name: t('nav.dashboard'), path: '/dashboard', route: 'dashboard', icon: 'house' },
         { name: t('nav.myBoats'), path: '/boats', route: null, icon: 'boat' },
+        { name: t('nav.reservations'), path: '/reservations', route: null, icon: 'calendar-check' },
         { name: t('ports.nav'), path: '/ports', route: null, icon: 'anchor' },
         { name: t('nav.crew'), path: '/crew', route: null, icon: 'people' },
       ],

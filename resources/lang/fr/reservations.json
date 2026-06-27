@@ -1,0 +1,55 @@
+{
+  "title": "Réservations",
+  "subtitle": "Gérez les réservations de votre flotte",
+  "fleet": {
+    "title": "Calendrier des réservations",
+    "subtitle": "Vue multi-bateaux de toutes les réservations"
+  },
+  "status": {
+    "option": "Option",
+    "confirmed": "Confirmée",
+    "cancelled": "Annulée"
+  },
+  "stats": {
+    "total": "Total",
+    "option": "En option",
+    "confirmed": "Confirmées"
+  },
+  "form": {
+    "createTitle": "Nouvelle réservation",
+    "editTitle": "Modifier la réservation",
+    "startsAt": "Début",
+    "endsAt": "Fin",
+    "clientName": "Nom du client",
+    "clientEmail": "Email (optionnel)",
+    "clientPhone": "Téléphone (optionnel)",
+    "status": "Statut",
+    "notes": "Notes (optionnel)",
+    "totalPrice": "Prix total (optionnel)",
+    "submit": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "confirmDelete": "Supprimer cette réservation ?"
+  },
+  "calendar": {
+    "noReservations": "Aucune réservation ce mois-ci",
+    "allBoats": "Tous les bateaux",
+    "more": "+ {count} de plus"
+  },
+  "empty": {
+    "title": "Aucune réservation",
+    "description": "Créez votre première réservation pour ce bateau.",
+    "fleetDescription": "Aucune réservation dans votre flotte."
+  },
+  "view": {
+    "list": "Liste",
+    "timeline": "Calendrier flotte"
+  },
+  "columns": {
+    "boat": "Bateau",
+    "period": "Période",
+    "client": "Client",
+    "status": "Statut",
+    "price": "Prix"
+  }
+}

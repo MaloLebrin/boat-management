@@ -6,6 +6,7 @@ const CsvExportController = () => import('#controllers/csv_export_controller')
 const BudgetController = () => import('#controllers/budget_controller')
 const BoatPortStayController = () => import('#controllers/boat_port_stay_controller')
 const BoatBudgetEntryController = () => import('#controllers/boat_budget_entry_controller')
+const BoatReservationsController = () => import('#controllers/boat_reservations_controller')
 
 router
   .group(() => {
@@ -232,5 +233,18 @@ router
     router
       .post('boats/:boatId/position', [controllers.BoatPosition, 'store'])
       .as('boats.position.store')
+
+    router
+      .get('boats/:boatId/reservations', [BoatReservationsController, 'index'])
+      .as('boats.reservations.index')
+    router
+      .post('boats/:boatId/reservations', [BoatReservationsController, 'store'])
+      .as('boats.reservations.store')
+    router
+      .patch('boats/:boatId/reservations/:reservationId', [BoatReservationsController, 'update'])
+      .as('boats.reservations.update')
+    router
+      .delete('boats/:boatId/reservations/:reservationId', [BoatReservationsController, 'destroy'])
+      .as('boats.reservations.destroy')
   })
   .use(middleware.auth())
