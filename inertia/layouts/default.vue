@@ -134,9 +134,7 @@ onBeforeUnmount(() => {
 
       <!-- Scrollable content area -->
       <main class="flex-1 overflow-y-auto bg-cream">
-        <div class="px-6 pt-4">
-          <OfflinePendingQueue />
-        </div>
+        <OfflinePendingQueue />
         <Transition name="page" mode="out-in">
           <div :key="page.url">
             <slot />

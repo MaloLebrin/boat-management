@@ -1,12 +1,13 @@
 <script setup lang="ts">
+import BaseButton from '~/components/base/BaseButton.vue'
 import { useOfflineQueue } from '~/composables/use_offline_queue'
 import { useT } from '~/composables/use_t'
 
-const { t } = useT()
+const { t, locale } = useT()
 const { pendingActions, isSyncing, cancelAction, drainQueue } = useOfflineQueue()
 
 function formatDate(iso: string): string {
-  return new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  return new Date(iso).toLocaleTimeString(locale.value, { hour: '2-digit', minute: '2-digit' })
 }
 
 function labelForType(type: string): string {
@@ -19,20 +20,15 @@ function labelForType(type: string): string {
 <template>
   <div
     v-if="pendingActions.length > 0"
-    class="border border-amber-300 rounded-lg bg-amber-50 p-4 space-y-3"
+    class="mx-6 mt-4 border border-amber-300 rounded-lg bg-amber-50 p-4 space-y-3"
   >
     <div class="flex items-center justify-between gap-3">
       <h3 class="text-sm font-semibold text-amber-900">
         {{ t('offline.queue.title', { count: String(pendingActions.length) }) }}
       </h3>
-      <button
-        type="button"
-        :disabled="isSyncing"
-        class="text-xs font-medium text-amber-700 hover:text-amber-900 underline disabled:opacity-50"
-        @click="drainQueue"
-      >
+      <BaseButton variant="ghost" size="sm" :disabled="isSyncing" @click="drainQueue">
         {{ isSyncing ? t('offline.syncing') : t('offline.queue.syncNow') }}
-      </button>
+      </BaseButton>
     </div>
 
     <ul class="space-y-2">
@@ -45,15 +41,15 @@ function labelForType(type: string): string {
           <p class="font-medium text-fg truncate">{{ labelForType(action.type) }}</p>
           <p class="text-xs text-fg-muted">{{ formatDate(action.createdAt) }}</p>
         </div>
-        <button
-          type="button"
+        <BaseButton
+          variant="danger"
+          size="sm"
           :disabled="isSyncing"
-          class="shrink-0 text-xs text-danger hover:text-danger/80 font-medium disabled:opacity-40"
           :aria-label="t('offline.queue.cancelAriaLabel', { type: labelForType(action.type) })"
           @click="cancelAction(action.id!)"
         >
           {{ t('offline.queue.cancel') }}
-        </button>
+        </BaseButton>
       </li>
     </ul>
   </div>
