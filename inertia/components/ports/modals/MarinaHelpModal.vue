@@ -21,14 +21,6 @@ const { t } = useT()
         <span class="text-sm text-fg-muted">{{ t('ports.plan.help.select') }}</span>
       </li>
       <li class="flex items-start gap-3">
-        <span class="text-xl leading-none mt-0.5">📍</span>
-        <span class="text-sm text-fg-muted">{{ t('ports.plan.help.assign') }}</span>
-      </li>
-      <li class="flex items-start gap-3">
-        <span class="text-xl leading-none mt-0.5">🖱️</span>
-        <span class="text-sm text-fg-muted">{{ t('ports.plan.help.deselect') }}</span>
-      </li>
-      <li class="flex items-start gap-3">
         <span class="text-xl leading-none mt-0.5">✋</span>
         <span class="text-sm text-fg-muted">{{ t('ports.plan.help.move') }}</span>
       </li>

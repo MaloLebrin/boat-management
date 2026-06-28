@@ -2,6 +2,9 @@ export const routes = {
   spots: {
     destroy: (id: number) => `/spots/${id}`,
   },
+  boats: {
+    assignment: (id: number) => `/boats/${id}/assignment`,
+  },
   branding: {
     update: () => '/settings/branding',
     logoUpload: () => '/settings/branding/logo',

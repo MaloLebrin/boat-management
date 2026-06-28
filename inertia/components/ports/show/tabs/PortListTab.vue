@@ -10,10 +10,11 @@ import PontoonCard from '~/components/ports/show/PontoonCard.vue'
 import PontoonFormModal from '~/components/ports/modals/PontoonFormModal.vue'
 import SpotsManager from '~/components/ports/show/SpotsManager.vue'
 import { useT } from '~/composables/use_t'
-import type { PortShowDetail, PontoonRow, MouillageRow } from '~/types/port'
+import type { BoatOption, PortShowDetail, PontoonRow, MouillageRow } from '~/types/port'
 
 const props = defineProps<{
   port: PortShowDetail
+  boats: BoatOption[]
 }>()
 
 const { t } = useT()
@@ -163,6 +164,7 @@ function closeMouillageSpotsModal(open: boolean) {
       :port-id="port.id"
       :pontoon-id="managingSpotsPontoon.id"
       :spots="managingSpotsPontoon.spots"
+      :boats="boats"
     />
   </BaseModal>
 
@@ -177,6 +179,7 @@ function closeMouillageSpotsModal(open: boolean) {
       :port-id="port.id"
       :mouillage-id="managingSpotsMouillage.id"
       :spots="managingSpotsMouillage.spots"
+      :boats="boats"
     />
   </BaseModal>
 </template>

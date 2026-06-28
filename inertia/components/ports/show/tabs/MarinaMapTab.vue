@@ -3,6 +3,7 @@ import { ref, watch, onMounted, computed } from 'vue'
 import { PlusIcon, QuestionMarkCircleIcon } from '@heroicons/vue/24/outline'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
+import BoatAssignModal from '~/components/ports/modals/BoatAssignModal.vue'
 import MarinaCanvas from '~/components/ports/show/MarinaCanvas.vue'
 import MarinaHelpModal from '~/components/ports/modals/MarinaHelpModal.vue'
 import MouillageFormModal from '~/components/ports/modals/MouillageFormModal.vue'
@@ -13,10 +14,11 @@ import {
   type LocalMouillage,
 } from '~/composables/use_marina_interactions'
 import { useT } from '~/composables/use_t'
-import type { PortShowDetail } from '~/types/port'
+import type { BoatOption, PortShowDetail } from '~/types/port'
 
 const props = defineProps<{
   port: PortShowDetail
+  boats: BoatOption[]
 }>()
 
 const { t } = useT()
@@ -30,11 +32,13 @@ const showHelp = ref(false)
 
 const portId = computed(() => props.port.id)
 const {
-  selectedBoat,
+  selectedSpot,
+  showAssignModal,
   handlePontoonDragEnd,
   handleMouillageDragEnd,
   handleCanvasClick,
   handleSpotClick,
+  handleAssignConfirm,
 } = useMarinaInteractions(portId, localPontoons, localMouillages)
 
 onMounted(() => {
@@ -129,7 +133,6 @@ watch(
 
     <MarinaHelpModal :open="showHelp" @update:open="showHelp = $event" />
 
-    <!-- Add modals -->
     <PontoonFormModal
       :open="showPontoonForm"
       :port-id="port.id"
@@ -141,11 +144,15 @@ watch(
       @update:open="showMouillageForm = $event"
     />
 
-    <!-- Hint / selected boat indicator -->
-    <p v-if="selectedBoat" class="text-sm text-brand font-medium">
-      {{ t('ports.plan.boatSelected', { name: selectedBoat.name }) }}
-    </p>
-    <p v-else class="text-sm text-fg-muted">{{ t('ports.plan.hint') }}</p>
+    <BoatAssignModal
+      :open="showAssignModal"
+      :spot="selectedSpot"
+      :boats="boats"
+      @update:open="showAssignModal = $event"
+      @confirm="handleAssignConfirm"
+    />
+
+    <p class="text-sm text-fg-muted">{{ t('ports.plan.hint') }}</p>
 
     <!-- Empty state -->
     <BaseCard v-if="localPontoons.length === 0 && localMouillages.length === 0" padded>
@@ -158,7 +165,7 @@ watch(
         :pontoons="localPontoons"
         :mouillages="localMouillages"
         :edit-mode="editMode"
-        :selected-boat-id="selectedBoat?.id ?? null"
+        :selected-boat-id="null"
         @pontoon-drag-end="handlePontoonDragEnd"
         @mouillage-drag-end="handleMouillageDragEnd"
         @spot-click="handleSpotClick"

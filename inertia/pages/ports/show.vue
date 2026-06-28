@@ -9,10 +9,11 @@ import BaseTabs from '~/components/base/BaseTabs.vue'
 import MarinaMapTab from '~/components/ports/show/tabs/MarinaMapTab.vue'
 import PortListTab from '~/components/ports/show/tabs/PortListTab.vue'
 import { useT } from '~/composables/use_t'
-import type { PortShowDetail } from '~/types/port'
+import type { BoatOption, PortShowDetail } from '~/types/port'
 
 const props = defineProps<{
   port: PortShowDetail
+  boats: BoatOption[]
 }>()
 
 const { t } = useT()
@@ -83,8 +84,8 @@ function handleDeletePort() {
 
     <!-- Tab content -->
     <div class="mt-6">
-      <PortListTab v-if="activeTab === 'list'" :port="port" />
-      <MarinaMapTab v-if="activeTab === 'plan'" :port="port" />
+      <PortListTab v-if="activeTab === 'list'" :port="port" :boats="boats" />
+      <MarinaMapTab v-if="activeTab === 'plan'" :port="port" :boats="boats" />
     </div>
   </div>
 </template>

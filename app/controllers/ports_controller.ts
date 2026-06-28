@@ -1,4 +1,5 @@
 import PortService from '#services/port_service'
+import BoatListService from '#services/boat_list_service'
 import { PortHasBoatsError, PortNotFoundError } from '#exceptions/port_errors'
 import PortPolicy from '#policies/port_policy'
 import { createPortValidator, updatePortValidator } from '#validators/port'
@@ -7,7 +8,10 @@ import type { HttpContext } from '@adonisjs/core/http'
 
 @inject()
 export default class PortsController {
-  constructor(private portService: PortService) {}
+  constructor(
+    private portService: PortService,
+    private boatListService: BoatListService
+  ) {}
 
   async index({ inertia, auth }: HttpContext) {
     await auth.authenticate()
@@ -40,11 +44,11 @@ export default class PortsController {
     const user = auth.getUserOrFail()
 
     try {
-      const port = await this.portService.getWithPontoonsAndMouillagesOrFail(
-        user,
-        Number(params.id)
-      )
-      return inertia.render('ports/show', { port })
+      const [port, boats] = await Promise.all([
+        this.portService.getWithPontoonsAndMouillagesOrFail(user, Number(params.id)),
+        this.boatListService.listNamesForOrg(user),
+      ])
+      return inertia.render('ports/show', { port, boats })
     } catch (error) {
       if (error instanceof PortNotFoundError) return response.redirect('/ports')
       throw error

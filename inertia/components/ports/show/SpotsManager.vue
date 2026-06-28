@@ -1,19 +1,21 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { router } from '@inertiajs/vue3'
-import { PencilIcon, PlusIcon, TrashIcon } from '@heroicons/vue/24/outline'
+import { LinkIcon, PencilIcon, PlusIcon, TrashIcon } from '@heroicons/vue/24/outline'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseConfirmModal from '~/components/base/BaseConfirmModal.vue'
+import BoatAssignModal from '~/components/ports/modals/BoatAssignModal.vue'
 import SpotFormModal from '~/components/ports/modals/SpotFormModal.vue'
 import { useT } from '~/composables/use_t'
 import { routes } from '~/utils/routes'
-import type { SpotRow } from '~/types/port'
+import type { BoatOption, SpotRow } from '~/types/port'
 
 const props = defineProps<{
   portId: number
   pontoonId?: number | null
   mouillageId?: number | null
   spots: SpotRow[]
+  boats: BoatOption[]
 }>()
 
 const { t } = useT()
@@ -22,6 +24,8 @@ const showSpotModal = ref(false)
 const editingSpot = ref<{ id: number; name: string; description: string | null } | null>(null)
 const showDeleteConfirm = ref(false)
 const spotToDelete = ref<SpotRow | null>(null)
+const assigningSpot = ref<SpotRow | null>(null)
+const showAssignModal = ref(false)
 
 function handleAddSpot() {
   editingSpot.value = null
@@ -47,6 +51,41 @@ function confirmDeleteSpot() {
 function handleModalClose(open: boolean) {
   showSpotModal.value = open
   if (!open) editingSpot.value = null
+}
+
+function handleAssignSpot(spot: SpotRow) {
+  assigningSpot.value = spot
+  showAssignModal.value = true
+}
+
+function handleAssignConfirm({ spotId, boatId }: { spotId: number; boatId: number | null }) {
+  showAssignModal.value = false
+  const currentBoat = assigningSpot.value?.boat ?? null
+  assigningSpot.value = null
+
+  const patchOpts = { preserveScroll: true, only: ['port'] as const }
+
+  if (boatId === null) {
+    if (currentBoat) {
+      router.patch(routes.boats.assignment(currentBoat.id), { spotId: null }, patchOpts)
+    }
+    return
+  }
+
+  if (currentBoat && currentBoat.id !== boatId) {
+    router.patch(
+      routes.boats.assignment(currentBoat.id),
+      { spotId: null },
+      {
+        ...patchOpts,
+        onSuccess: () => {
+          router.patch(routes.boats.assignment(boatId), { spotId }, patchOpts)
+        },
+      }
+    )
+  } else {
+    router.patch(routes.boats.assignment(boatId), { spotId }, patchOpts)
+  }
 }
 </script>
 
@@ -74,6 +113,10 @@ function handleModalClose(open: boolean) {
           <p v-else class="text-xs text-fg-subtle">{{ t('ports.spots.free') }}</p>
         </div>
         <div class="flex items-center gap-1 ml-2">
+          <BaseButton variant="ghost" size="sm" @click="handleAssignSpot(spot)">
+            <LinkIcon class="h-4 w-4" />
+            <span class="sr-only">{{ t('ports.spots.assign') }}</span>
+          </BaseButton>
           <BaseButton variant="ghost" size="sm" @click="handleEditSpot(spot)">
             <PencilIcon class="h-4 w-4" />
             <span class="sr-only">{{ t('common.edit') }}</span>
@@ -100,6 +143,14 @@ function handleModalClose(open: boolean) {
       :title="t('ports.spots.deleteConfirm')"
       @update:open="showDeleteConfirm = $event"
       @confirm="confirmDeleteSpot"
+    />
+
+    <BoatAssignModal
+      :open="showAssignModal"
+      :spot="assigningSpot"
+      :boats="boats"
+      @update:open="showAssignModal = $event"
+      @confirm="handleAssignConfirm"
     />
   </div>
 </template>

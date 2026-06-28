@@ -1,3 +1,5 @@
+export type BoatOption = { id: number; name: string }
+
 export type PortListItem = {
   id: number
   name: string

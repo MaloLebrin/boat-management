@@ -9,22 +9,11 @@
     "editLayout": "Modifier le plan",
     "viewOnly": "Vue seule",
     "empty": "Ajoutez des pontons ou mouillages pour visualiser le plan",
-    "hint": "Cliquez sur un spot libre pour y affecter le bateau sélectionné.",
-    "boatSelected": "Bateau sélectionné : {name} — cliquez sur un spot libre pour l'affecter",
-    "boat": {
-      "assign": {
-        "title": "Affecter {name}",
-        "spot": "Identifiant de place",
-        "spotPlaceholder": "ex: A1",
-        "confirm": "Affecter"
-      }
-    },
+    "hint": "Cliquez sur une place pour lui attribuer un bateau.",
     "help": {
       "toggle": "Aide",
       "title": "Comment utiliser le plan marina",
-      "select": "Cliquez sur un spot occupé pour sélectionner le bateau",
-      "assign": "Cliquez sur un spot vide pour y affecter le bateau sélectionné",
-      "deselect": "Cliquez sur le fond du plan pour désélectionner",
+      "select": "Cliquez sur une place pour ouvrir la fenêtre d'affectation",
       "move": "En mode \"Modifier le plan\", glissez-déposez un ponton ou mouillage pour le repositionner"
     }
   },
@@ -37,6 +26,14 @@
     "occupied": "Occupé",
     "free": "Libre",
     "occupiedBy": "Occupé par {name}",
+    "assign": "Affecter un bateau",
+    "assignTitle": "Affecter un bateau — Place {name}",
+    "assignButton": "Affecter",
+    "searchBoat": "Rechercher un bateau",
+    "searchPlaceholder": "Nom du bateau…",
+    "noBoat": "Aucun bateau (libérer la place)",
+    "noResults": "Aucun résultat",
+    "current": "Actuel",
     "fields": {
       "name": "Nom de la place",
       "description": "Description"

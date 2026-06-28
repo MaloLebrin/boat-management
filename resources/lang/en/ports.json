@@ -9,22 +9,11 @@
     "editLayout": "Edit layout",
     "viewOnly": "View only",
     "empty": "Add pontoons or anchorages to visualize the plan",
-    "hint": "Click an empty spot to assign the selected boat.",
-    "boatSelected": "Selected boat: {name} — click an empty spot to assign it",
-    "boat": {
-      "assign": {
-        "title": "Assign {name}",
-        "spot": "Spot identifier",
-        "spotPlaceholder": "e.g. A1",
-        "confirm": "Assign"
-      }
-    },
+    "hint": "Click a berth to assign a boat to it.",
     "help": {
       "toggle": "Help",
       "title": "How to use the marina plan",
-      "select": "Click an occupied spot to select the boat",
-      "assign": "Click an empty spot to assign the selected boat there",
-      "deselect": "Click on the canvas background to deselect",
+      "select": "Click a berth to open the assignment dialog",
       "move": "In \"Edit layout\" mode, drag a pontoon or anchorage to reposition it"
     }
   },
@@ -37,6 +26,14 @@
     "occupied": "Occupied",
     "free": "Free",
     "occupiedBy": "Occupied by {name}",
+    "assign": "Assign a boat",
+    "assignTitle": "Assign a boat — Berth {name}",
+    "assignButton": "Assign",
+    "searchBoat": "Search a boat",
+    "searchPlaceholder": "Boat name…",
+    "noBoat": "No boat (free this berth)",
+    "noResults": "No results",
+    "current": "Current",
     "fields": {
       "name": "Spot name",
       "description": "Description"

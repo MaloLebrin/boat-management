@@ -55,6 +55,15 @@ export default class BoatListService {
     return { q, type, propulsionType, sort, direction, page, perPage }
   }
 
+  async listNamesForOrg(user: User): Promise<{ id: number; name: string }[]> {
+    if (user.organizationId === null) return []
+    const boats = await Boat.query()
+      .where('organizationId', user.organizationId)
+      .select(['id', 'name'])
+      .orderBy('name', 'asc')
+    return boats.map((b) => ({ id: b.id, name: b.name }))
+  }
+
   async listForUser(user: User, rawQuery: Record<string, unknown>) {
     if (user.organizationId === null) {
       return {
