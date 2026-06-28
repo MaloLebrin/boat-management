@@ -34,7 +34,7 @@ const reservationsByDay = computed(() => {
     const rEnd = r.endsAt.slice(0, 10)
     for (let d = 1; d <= total; d++) {
       const iso = `${year}-${month}-${String(d).padStart(2, '0')}`
-      if (rStart <= iso && iso <= rEnd) {
+      if (rStart <= iso && iso < rEnd) {
         const list = map.get(d) ?? []
         list.push(r)
         map.set(d, list)

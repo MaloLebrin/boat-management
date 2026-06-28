@@ -7,6 +7,7 @@ import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import { useT } from '~/composables/use_t'
+import type { ReservationStatus } from '~/types/reservation'
 
 const props = defineProps<{
   boatId: number
@@ -20,7 +21,7 @@ const form = useForm({
   clientName: '',
   clientEmail: '',
   clientPhone: '',
-  status: 'option' as 'option' | 'confirmed' | 'cancelled',
+  status: 'option' as ReservationStatus,
   notes: '',
   totalPrice: '',
 })

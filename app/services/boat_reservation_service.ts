@@ -7,8 +7,11 @@ import BoatReservation from '#models/boat_reservation'
 import BoatModel from '#models/boat'
 import type Boat from '#models/boat'
 import type User from '#models/user'
-import type { FleetBoatOption } from '#shared/types/reservation'
-import type { CreateReservationPayload, UpdateReservationPayload } from '#shared/types/reservation'
+import type {
+  CreateReservationPayload,
+  FleetBoatOption,
+  UpdateReservationPayload,
+} from '#shared/types/reservation'
 import { toDateTime } from '#shared/helpers/date'
 import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'

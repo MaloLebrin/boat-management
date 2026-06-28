@@ -214,9 +214,30 @@ test.group('Boat Reservations (functional)', (group) => {
       .redirects(0)
 
     response.assertStatus(302)
+    response.assertFlashMessage('error', 'End date must be after start date.')
 
     const reservations = await BoatReservation.query().where('boatId', boat.id)
     assert.lengthOf(reservations, 0)
+  })
+
+  test('POST /boats/:boatId/reservations allows non-admin same-org member to store', async ({
+    client,
+    assert,
+  }) => {
+    const admin = await createAdminUser()
+    const member = await UserFactory.merge({ organizationId: admin.organizationId! }).create()
+    const boat = await BoatFactory.merge({ organizationId: admin.organizationId! }).create()
+
+    const response = await client
+      .post(`/boats/${boat.id}/reservations`)
+      .form(VALID_RESERVATION)
+      .loginAs(member)
+      .redirects(0)
+
+    response.assertStatus(302)
+
+    const reservations = await BoatReservation.query().where('boatId', boat.id)
+    assert.lengthOf(reservations, 1)
   })
 
   // --- update ---
@@ -523,6 +544,56 @@ test.group('Boat Reservations (functional)', (group) => {
     const props = response.inertiaProps as { reservations: { clientName: string }[] }
     assert.lengthOf(props.reservations, 1)
     assert.equal(props.reservations[0].clientName, 'Other Org Client')
+  })
+
+  test('GET /reservations groups calendarEntries per boat', async ({ client, assert }) => {
+    const user = await createAdminUser()
+    const boat1 = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const boat2 = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    await BoatReservation.create({
+      boatId: boat1.id,
+      organizationId: user.organizationId!,
+      status: 'confirmed',
+      startsAt: DateTime.fromISO('2026-03-01T10:00:00'),
+      endsAt: DateTime.fromISO('2026-03-07T10:00:00'),
+      clientName: 'Calendar Client 1',
+    })
+
+    await BoatReservation.create({
+      boatId: boat1.id,
+      organizationId: user.organizationId!,
+      status: 'option',
+      startsAt: DateTime.fromISO('2026-03-10T10:00:00'),
+      endsAt: DateTime.fromISO('2026-03-15T10:00:00'),
+      clientName: 'Calendar Client 2',
+    })
+
+    await BoatReservation.create({
+      boatId: boat2.id,
+      organizationId: user.organizationId!,
+      status: 'confirmed',
+      startsAt: DateTime.fromISO('2026-03-05T10:00:00'),
+      endsAt: DateTime.fromISO('2026-03-12T10:00:00'),
+      clientName: 'Calendar Client 3',
+    })
+
+    const response = await client.get('/reservations').loginAs(user).withInertia()
+
+    response.assertStatus(200)
+
+    type CalendarEntry = { boatId: number; boatName: string; reservations: unknown[] }
+    const props = response.inertiaProps as { calendarEntries: CalendarEntry[] }
+
+    assert.lengthOf(props.calendarEntries, 2)
+
+    const entry1 = props.calendarEntries.find((e) => e.boatId === boat1.id)
+    const entry2 = props.calendarEntries.find((e) => e.boatId === boat2.id)
+
+    assert.isDefined(entry1)
+    assert.isDefined(entry2)
+    assert.lengthOf(entry1!.reservations, 2)
+    assert.lengthOf(entry2!.reservations, 1)
   })
 
   test('GET /reservations?boatId= filters by boat', async ({ client, assert }) => {
