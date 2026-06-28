@@ -18,11 +18,13 @@ const props = withDefaults(
     disabled?: boolean
     maxlength?: number
     required?: boolean
+    compact?: boolean
   }>(),
   {
     rows: 4,
     modelValue: '',
     disabled: false,
+    compact: false,
   }
 )
 
@@ -50,7 +52,10 @@ const resolvedError = computed(() => {
       :value="modelValue"
       :data-invalid="resolvedError ? 'true' : undefined"
       :aria-invalid="resolvedError ? 'true' : undefined"
-      class="w-full rounded-(--radius-control) border border-border bg-surface-elevated px-3 py-2 text-sm text-fg shadow-sm placeholder:text-fg-subtle focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20 data-[invalid=true]:border-danger transition-shadow duration-(--motion-fast) ease-premium"
+      :class="[
+        'w-full resize-none rounded-(--radius-control) border border-border text-sm text-fg shadow-sm placeholder:text-fg-subtle focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20 data-[invalid=true]:border-danger transition-shadow duration-(--motion-fast) ease-premium',
+        compact ? 'bg-surface px-2 py-1.5' : 'bg-surface-elevated px-3 py-2',
+      ]"
       @input="$emit('update:modelValue', ($event.target as HTMLTextAreaElement).value)"
     />
   </BaseField>

@@ -143,6 +143,7 @@ function handleNotesBlur(item: MaintenanceSheetItemRow) {
             :model-value="editingNotes[item.id] ?? ''"
             :placeholder="t('boats.sheets.itemNotesPlaceholder')"
             :rows="2"
+            compact
             class="mt-2"
             @update:model-value="updateItemNotes(item, $event)"
             @focusout="handleNotesBlur(item)"
