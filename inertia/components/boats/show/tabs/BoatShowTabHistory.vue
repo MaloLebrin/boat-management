@@ -4,8 +4,10 @@ import { computed, ref, watch } from 'vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
+import BaseSegmentedControl from '~/components/base/BaseSegmentedControl.vue'
 import { subjectLabel, targetDescription } from '~/components/boats/maintenance/utils'
 import BoatMaintenanceEventModal from '~/components/boats/show/modals/BoatMaintenanceEventModal.vue'
+import { useT } from '~/composables/use_t'
 import type { BoatShowDetail, MaintenanceEventRow } from '~/types/boat_show'
 
 const props = defineProps<{
@@ -14,6 +16,8 @@ const props = defineProps<{
   canManageMaintenance: boolean
   createEventNonce?: number
 }>()
+
+const { t } = useT()
 
 const isEventModalOpen = ref(false)
 
@@ -29,6 +33,14 @@ watch(
 const historyFilter = ref<'all' | 'engine' | 'sail' | 'rig' | 'boat'>('all')
 const historySearch = ref('')
 const expandedEventId = ref<number | null>(null)
+
+const filterOptions = computed(() => [
+  { value: 'all', label: t('boats.show.historyTab.filterAll') },
+  { value: 'engine', label: t('boats.show.historyTab.filterEngine') },
+  { value: 'sail', label: t('boats.show.historyTab.filterSail') },
+  { value: 'rig', label: t('boats.show.historyTab.filterRig') },
+  { value: 'boat', label: t('boats.show.historyTab.filterHull') },
+])
 
 const filteredEvents = computed(() => {
   let events = props.maintenanceEvents
@@ -95,7 +107,7 @@ function getSubjectLink(ev: MaintenanceEventRow): string {
       <!-- Header with action button -->
       <div v-if="canManageMaintenance" class="flex items-center justify-end">
         <BaseButton variant="secondary" size="sm" type="button" @click="isEventModalOpen = true">
-          + Ajouter un événement
+          {{ t('boats.show.historyTab.addEvent') }}
         </BaseButton>
       </div>
 
@@ -104,36 +116,15 @@ function getSubjectLink(ev: MaintenanceEventRow): string {
         <input
           v-model="historySearch"
           type="text"
-          placeholder="Rechercher..."
+          :placeholder="t('boats.show.historyTab.search')"
           class="rounded-lg border border-border bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand/30"
         />
-        <div class="flex flex-wrap gap-2">
-          <button
-            v-for="filter in [
-              { key: 'all', label: 'Tous' },
-              { key: 'engine', label: 'Moteur' },
-              { key: 'sail', label: 'Voile' },
-              { key: 'rig', label: 'Greement' },
-              { key: 'boat', label: 'Coque' },
-            ]"
-            :key="filter.key"
-            type="button"
-            :class="[
-              'rounded-full px-3 py-1.5 text-sm font-medium transition-colors',
-              historyFilter === filter.key
-                ? 'bg-brand text-white'
-                : 'bg-surface-muted text-fg-muted hover:bg-surface-elevated hover:text-fg',
-            ]"
-            @click="historyFilter = filter.key as typeof historyFilter"
-          >
-            {{ filter.label }}
-          </button>
-        </div>
+        <BaseSegmentedControl v-model="historyFilter" :options="filterOptions" />
       </div>
 
       <!-- Events grouped by month -->
       <div v-if="Object.keys(filteredEventsByMonth).length === 0" class="text-sm text-fg-muted">
-        Aucun evenement trouve.
+        {{ t('boats.show.historyTab.noEvents') }}
       </div>
       <div v-else class="space-y-8">
         <div v-for="(events, monthKey) in filteredEventsByMonth" :key="monthKey">
@@ -167,13 +158,19 @@ function getSubjectLink(ev: MaintenanceEventRow): string {
                       </a>
                     </p>
                     <div v-if="ev.parts.length > 0" class="mt-2 flex items-center gap-2">
-                      <BaseBadge variant="neutral">{{ ev.parts.length }} piece(s)</BaseBadge>
+                      <BaseBadge variant="neutral">
+                        {{ t('boats.show.historyTab.pieces', { count: String(ev.parts.length) }) }}
+                      </BaseBadge>
                       <button
                         type="button"
                         class="text-xs font-semibold text-brand hover:underline"
                         @click="toggleEventDetails(ev.id)"
                       >
-                        {{ expandedEventId === ev.id ? 'Masquer' : 'Detail' }}
+                        {{
+                          expandedEventId === ev.id
+                            ? t('boats.show.historyTab.toggleHide')
+                            : t('boats.show.historyTab.toggleShow')
+                        }}
                       </button>
                     </div>
                     <!-- Expanded parts list -->
@@ -202,14 +199,14 @@ function getSubjectLink(ev: MaintenanceEventRow): string {
     <!-- Right sidebar (w-56) -->
     <div class="w-full lg:w-56 space-y-6">
       <BaseCard padded>
-        <p class="text-sm font-semibold text-fg">12 derniers mois</p>
+        <p class="text-sm font-semibold text-fg">{{ t('boats.show.historyTab.sidebarTitle') }}</p>
         <dl class="mt-3 space-y-2 text-sm">
           <div class="flex items-center justify-between">
-            <dt class="text-fg-muted">Evenements</dt>
+            <dt class="text-fg-muted">{{ t('boats.show.historyTab.sidebarEvents') }}</dt>
             <dd class="font-semibold text-fg">{{ historyStats.eventCount }}</dd>
           </div>
           <div class="flex items-center justify-between">
-            <dt class="text-fg-muted">Pieces</dt>
+            <dt class="text-fg-muted">{{ t('boats.show.historyTab.sidebarParts') }}</dt>
             <dd class="font-semibold text-fg">{{ historyStats.partCount }}</dd>
           </div>
         </dl>
@@ -217,7 +214,7 @@ function getSubjectLink(ev: MaintenanceEventRow): string {
       <!-- TODO: implement PDF export for maintenance history (e.g. GET /boats/:id/maintenance/history.pdf) -->
       <BaseButton variant="secondary" size="sm" class="w-full" disabled>
         <DocumentTextIcon class="h-4 w-4 mr-2" />
-        Exporter PDF
+        {{ t('boats.show.historyTab.exportPdf') }}
       </BaseButton>
     </div>
   </div>

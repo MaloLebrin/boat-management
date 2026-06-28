@@ -3,6 +3,12 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-06-28 — Composant BaseSegmentedControl + i18n BoatShowTabHistory (issue #144)
+
+- Nouveau composant `inertia/components/base/BaseSegmentedControl.vue` : groupe de boutons jointifs avec `v-model` (`string | number`)
+- Tests Vitest complets dans `tests/inertia/base_segmented_control.spec.ts` (rendu, option active, émission, valeurs numériques)
+- `BoatShowTabHistory.vue` : remplacement des `<button>` bruts par `<BaseSegmentedControl>` ; toutes les chaînes (filtres, recherche, sidebar, toggle Masquer/Détail, export PDF) passent désormais par `t()` avec les clés `boats.show.historyTab.*` en FR et EN
+
 ## 2026-06-28 — Correctifs post-review réservations (issue #107)
 
 - Ajout d'un index composé `(organization_id, starts_at)` via une nouvelle migration pour accélérer `listForOrg`
