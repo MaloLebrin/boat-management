@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { router } from '@inertiajs/vue3'
 import { ref, watch } from 'vue'
+import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import { useT } from '~/composables/use_t'
 import type {
   BoatShowDetail,
@@ -137,16 +138,15 @@ function handleNotesBlur(item: MaintenanceSheetItemRow) {
           </p>
 
           <!-- Notes input -->
-          <div v-if="canManage" class="mt-2">
-            <textarea
-              :value="editingNotes[item.id] ?? ''"
-              :placeholder="t('boats.sheets.itemNotesPlaceholder')"
-              rows="2"
-              class="w-full rounded border border-border bg-surface px-2 py-1.5 text-sm text-fg placeholder:text-fg-subtle focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand/30"
-              @input="updateItemNotes(item, ($event.target as HTMLTextAreaElement).value)"
-              @blur="handleNotesBlur(item)"
-            />
-          </div>
+          <BaseTextarea
+            v-if="canManage"
+            :model-value="editingNotes[item.id] ?? ''"
+            :placeholder="t('boats.sheets.itemNotesPlaceholder')"
+            :rows="2"
+            class="mt-2"
+            @update:model-value="updateItemNotes(item, $event)"
+            @focusout="handleNotesBlur(item)"
+          />
           <p v-else-if="item.notes" class="mt-1 text-sm text-fg-muted">{{ item.notes }}</p>
         </div>
       </div>
