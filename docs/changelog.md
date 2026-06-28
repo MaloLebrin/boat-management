@@ -3,6 +3,34 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-06-28 — Correctifs post-review réservations (issue #107)
+
+- Ajout d'un index composé `(organization_id, starts_at)` via une nouvelle migration pour accélérer `listForOrg`
+- Interface d'édition : composant `ReservationEditModal` + bouton « Modifier » dans `ReservationList` — le PATCH est désormais accessible depuis l'UI
+- Timeline flotte : fin de réservation exclusive (`<` au lieu de `<=`) ; `rounded-r` corrigé en conséquence pour que la pilule s'arrête au bon jour
+- `ReservationConflictError.conflictingId` supprimé (propriété morte, jamais utilisée dans les controllers)
+- `formatDate` extrait en composable `use_reservation_format.ts` (était dupliqué dans `ReservationList` et `FleetReservationList`)
+- `boatOptions` dans `reservations/index.vue` encapsulé dans `computed()` pour rester réactif aux rechargements partiels
+- Tests : couverture du cas PATCH `endBeforeStart` et isolation inter-org sur `GET /reservations`
+- i18n : clé `reservations.form.edit` ajoutée (EN + FR)
+
+## 2026-06-27 — Système de réservation par bateau (issue #107)
+
+Module complet de réservation de bateaux pour les entreprises (charter, club, école de voile).
+
+- Table `boat_reservations` : `boat_id` (FK CASCADE), `organization_id` (FK CASCADE), `status` (option/confirmed/cancelled), `starts_at`/`ends_at` (datetime), `client_name`, `client_email`, `client_phone`, `notes`, `total_price` ; index composé `(boat_id, starts_at, ends_at, status)` pour la détection de conflits
+- Modèle `BoatReservation` avec relations `belongsTo` Boat et Organization ; `hasMany` ajouté sur Boat
+- Service `BoatReservationService` : `listForBoat`, `listForOrg`, `create`, `update`, `delete` ; détection de chevauchement (`starts_at < endsAt AND ends_at > startsAt`, status != cancelled) avec `ReservationConflictError`
+- Exceptions `reservation_errors.ts` : `ReservationNotFoundError`, `ReservationConflictError` (porte conflictingId), `ReservationValidationError`
+- Validators VineJS : `createBoatReservationValidator` / `updateBoatReservationValidator` (datetime-local + date)
+- Controller `BoatReservationsController` : GET/POST/PATCH/DELETE `/boats/:boatId/reservations` ; flash sur conflit
+- Controller `ReservationsController` : GET `/reservations` (vue flotte multi-bateaux avec `FleetBoatCalendarEntry`)
+- Pages : `boats/reservations.vue` (calendrier mono-bateau + formulaire + liste) et `reservations/index.vue` (timeline flotte + filtre bateau)
+- Composants : `ReservationForm`, `ReservationList`, `ReservationStatusBadge`, `ReservationCalendar`, `ReservationTimeline`, `ReservationTimelineRow`, `FleetReservationList`
+- i18n : `resources/lang/{fr,en}/reservations.json` + clés `flash.reservation.*` + `nav.reservations` ; lien nav ajouté dans la section FLOTTE
+- Note : `client_id` FK CRM reporté — champs inline `client_name/email/phone` utilisés en attendant (voir issue CRM)
+- Tests : `tests/functional/boats/reservations.spec.ts` (15 cas : index, store, update, destroy, fleet)
+
 ## 2026-06-27 — File d'attente offline : liste et annulation des mutations en attente
 
 Complète l'issue #120 en ajoutant la visibilité et la gestion des actions hors-ligne en attente de synchronisation.

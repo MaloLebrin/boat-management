@@ -166,5 +166,13 @@
   "budgetEntry": {
     "created": "Dépense enregistrée.",
     "deleted": "Dépense supprimée."
+  },
+  "reservation": {
+    "created": "Réservation enregistrée.",
+    "updated": "Réservation mise à jour.",
+    "deleted": "Réservation supprimée.",
+    "notFound": "Réservation introuvable.",
+    "conflict": "Ce bateau est déjà réservé sur cette période.",
+    "endBeforeStart": "La date de fin doit être postérieure à la date de début."
   }
 }

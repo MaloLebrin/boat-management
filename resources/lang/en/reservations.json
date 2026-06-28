@@ -1,0 +1,56 @@
+{
+  "title": "Reservations",
+  "subtitle": "Manage your fleet's reservations",
+  "fleet": {
+    "title": "Reservation calendar",
+    "subtitle": "Multi-boat view of all reservations"
+  },
+  "status": {
+    "option": "Option",
+    "confirmed": "Confirmed",
+    "cancelled": "Cancelled"
+  },
+  "stats": {
+    "total": "Total",
+    "option": "Options",
+    "confirmed": "Confirmed"
+  },
+  "form": {
+    "createTitle": "New reservation",
+    "editTitle": "Edit reservation",
+    "startsAt": "Start date",
+    "endsAt": "End date",
+    "clientName": "Client name",
+    "clientEmail": "Email (optional)",
+    "clientPhone": "Phone (optional)",
+    "status": "Status",
+    "notes": "Notes (optional)",
+    "totalPrice": "Total price (optional)",
+    "submit": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "confirmDelete": "Delete this reservation?"
+  },
+  "calendar": {
+    "noReservations": "No reservations this month",
+    "allBoats": "All boats",
+    "more": "+ {count} more"
+  },
+  "empty": {
+    "title": "No reservations",
+    "description": "Create your first reservation for this boat.",
+    "fleetDescription": "No reservations in your fleet."
+  },
+  "view": {
+    "list": "List",
+    "timeline": "Fleet calendar"
+  },
+  "columns": {
+    "boat": "Boat",
+    "period": "Period",
+    "client": "Client",
+    "status": "Status",
+    "price": "Price"
+  }
+}

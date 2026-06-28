@@ -12,7 +12,7 @@ import type {
   CreateNavigationLogPayload,
   UpdateNavigationLogPayload,
 } from '#shared/types/navigation_log'
-import { toDateTime } from '#shared/helpers/maintenance'
+import { toDateTime } from '#shared/helpers/date'
 import db from '@adonisjs/lucid/services/db'
 
 export { NavigationLogConflictError, NavigationLogNotFoundError, NavigationLogValidationError }

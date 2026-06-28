@@ -681,6 +681,51 @@ export class BoatPositionHistorySchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class BoatReservationSchema extends BaseModel {
+  static $columns = [
+    'boatId',
+    'clientEmail',
+    'clientName',
+    'clientPhone',
+    'createdAt',
+    'endsAt',
+    'id',
+    'notes',
+    'organizationId',
+    'startsAt',
+    'status',
+    'totalPrice',
+    'updatedAt',
+  ] as const
+  $columns = BoatReservationSchema.$columns
+  @column()
+  declare boatId: number
+  @column()
+  declare clientEmail: string | null
+  @column()
+  declare clientName: string
+  @column()
+  declare clientPhone: string | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column.dateTime()
+  declare endsAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare notes: string | null
+  @column()
+  declare organizationId: number
+  @column.dateTime()
+  declare startsAt: DateTime
+  @column()
+  declare status: string
+  @column()
+  declare totalPrice: string | null
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
+}
+
 export class BoatRigSchema extends BaseModel {
   static $columns = [
     'boatId',

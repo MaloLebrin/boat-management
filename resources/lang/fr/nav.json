@@ -15,6 +15,7 @@
   "logbook": "Journal de bord",
   "fuel": "Carburant",
   "incidents": "Incidents",
+  "reservations": "Réservations",
   "sections": {
     "fleet": "FLOTTE",
     "maintenance": "MAINTENANCE",
