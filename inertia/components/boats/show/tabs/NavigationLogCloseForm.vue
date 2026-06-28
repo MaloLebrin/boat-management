@@ -34,10 +34,12 @@ const arrivalPortOptions = computed(() =>
   props.portOptions.map((p) => ({ value: String(p.id), label: p.name }))
 )
 
-const seaStateOptions = SEA_STATES.map((s) => ({
-  value: s,
-  label: t(`navigation_logs.seaState.${s}`),
-}))
+const seaStateOptions = computed(() =>
+  SEA_STATES.map((s) => ({
+    value: s,
+    label: t(`navigation_logs.seaState.${s}`),
+  }))
+)
 
 const form = useForm({
   arrivedAt: defaultArrivedAt,

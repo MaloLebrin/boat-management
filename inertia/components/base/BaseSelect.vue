@@ -17,6 +17,7 @@ const props = withDefaults(
     name?: string
     modelValue?: OptionValue | ''
     disabled?: boolean
+    required?: boolean
     placeholder?: string
     allowEmpty?: boolean
     options: ReadonlyArray<{ label: string; value: OptionValue }>
@@ -47,6 +48,7 @@ const resolvedError = computed(() => {
         :id="id"
         :name="name"
         :disabled="disabled"
+        :required="required"
         :value="modelValue"
         :data-invalid="resolvedError ? 'true' : undefined"
         :aria-invalid="resolvedError ? 'true' : undefined"

@@ -105,6 +105,7 @@ function toLocalDatetime(utcIso: string): string {
           :label="t('incidents.fields.type')"
           :options="incidentTypeOptions"
           :error="errors.type"
+          required
         />
 
         <!-- Status (edit only) -->

@@ -16,6 +16,13 @@ const boatOptions = computed(() => props.boats.map((b) => ({ value: String(b.id)
 
 const currentBoatId = ref(props.selectedBoatId ? String(props.selectedBoatId) : '')
 
+watch(
+  () => props.selectedBoatId,
+  (val) => {
+    currentBoatId.value = val ? String(val) : ''
+  }
+)
+
 watch(currentBoatId, (val) => {
   router.get(props.basePath, val ? { boatId: val } : {}, { preserveScroll: true, replace: true })
 })

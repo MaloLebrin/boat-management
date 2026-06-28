@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useForm } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
@@ -24,10 +25,12 @@ const { enqueue } = useOfflineQueue()
 
 const SEA_STATES = ['calm', 'slight', 'moderate', 'rough', 'very_rough'] as const
 
-const seaStateOptions = SEA_STATES.map((s) => ({
-  value: s,
-  label: t(`navigation_logs.seaState.${s}`),
-}))
+const seaStateOptions = computed(() =>
+  SEA_STATES.map((s) => ({
+    value: s,
+    label: t(`navigation_logs.seaState.${s}`),
+  }))
+)
 
 const form = useForm({
   windForceBeaufort: props.log.windForceBeaufort,
