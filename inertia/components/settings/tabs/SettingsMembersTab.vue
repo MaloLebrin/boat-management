@@ -5,6 +5,7 @@ import BaseCard from '~/components/base/BaseCard.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
+import BaseSelect from '~/components/base/BaseSelect.vue'
 import SettingsMembersInviteForm from '~/components/settings/tabs/SettingsMembersInviteForm.vue'
 import SettingsMembersPendingInvitations from '~/components/settings/tabs/SettingsMembersPendingInvitations.vue'
 import UpgradePlanModal from '~/components/base/UpgradePlanModal.vue'
@@ -128,15 +129,11 @@ function removeMember(memberId: number) {
             </td>
             <td class="px-6 py-4">
               <template v-if="canManageMembers && member.userId !== props.currentUserId">
-                <select
-                  :value="member.role"
-                  class="rounded-md border border-border bg-surface px-2 py-1 text-sm text-fg focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
-                  @change="changeRole(member.id, ($event.target as HTMLSelectElement).value)"
-                >
-                  <option v-for="opt in roleOptions" :key="opt.value" :value="opt.value">
-                    {{ opt.label }}
-                  </option>
-                </select>
+                <BaseSelect
+                  :model-value="member.role"
+                  :options="roleOptions"
+                  @update:model-value="changeRole(member.id, String($event))"
+                />
               </template>
               <template v-else>
                 <BaseBadge :variant="member.role === 'admin' ? 'info' : 'neutral'">

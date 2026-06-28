@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useForm } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
+import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import { useNetworkStatus } from '~/composables/use_network_status'
 import { useOfflineQueue } from '~/composables/use_offline_queue'
@@ -19,6 +21,13 @@ const emit = defineEmits<{
 const { t } = useT()
 const { isOnline } = useNetworkStatus()
 const { enqueue } = useOfflineQueue()
+
+const engineOptions = computed(() =>
+  props.boat.engines.map((e) => ({
+    value: String(e.id),
+    label: `${e.kind}${e.brand ? ` — ${e.brand}` : ''}${e.model ? ` ${e.model}` : ''}`,
+  }))
+)
 
 const form = useForm({
   fueledAt: new Date().toLocaleDateString('en-CA'),
@@ -104,25 +113,16 @@ function handleSubmit() {
         />
 
         <!-- Engine -->
-        <div v-if="boat.engines.length > 0">
-          <label class="block text-sm font-medium text-fg mb-1">
-            {{ t('fuel_logs.fields.boatEngineId') }}
-          </label>
-          <select
-            v-model="form.boatEngineId"
-            name="boatEngineId"
-            class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
-          >
-            <option value="">{{ t('fuel_logs.fields.noEngine') }}</option>
-            <option v-for="engine in boat.engines" :key="engine.id" :value="engine.id">
-              {{ engine.kind }}{{ engine.brand ? ` — ${engine.brand}` : '' }}
-              {{ engine.model ? engine.model : '' }}
-            </option>
-          </select>
-          <p v-if="form.errors.boatEngineId" class="mt-1 text-xs text-danger">
-            {{ form.errors.boatEngineId }}
-          </p>
-        </div>
+        <BaseSelect
+          v-if="boat.engines.length > 0"
+          v-model="form.boatEngineId"
+          name="boatEngineId"
+          :label="t('fuel_logs.fields.boatEngineId')"
+          :options="engineOptions"
+          :error="form.errors.boatEngineId"
+          allow-empty
+          :placeholder="t('fuel_logs.fields.noEngine')"
+        />
 
         <BaseInput
           :model-value="form.engineHoursAtFueling != null ? String(form.engineHoursAtFueling) : ''"

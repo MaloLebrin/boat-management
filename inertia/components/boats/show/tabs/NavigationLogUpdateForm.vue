@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useForm } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
+import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import { useNetworkStatus } from '~/composables/use_network_status'
 import { useOfflineQueue } from '~/composables/use_offline_queue'
@@ -22,6 +24,13 @@ const { isOnline } = useNetworkStatus()
 const { enqueue } = useOfflineQueue()
 
 const SEA_STATES = ['calm', 'slight', 'moderate', 'rough', 'very_rough'] as const
+
+const seaStateOptions = computed(() =>
+  SEA_STATES.map((s) => ({
+    value: s,
+    label: t(`navigation_logs.seaState.${s}`),
+  }))
+)
 
 const form = useForm({
   windForceBeaufort: props.log.windForceBeaufort,
@@ -72,21 +81,15 @@ function handleSubmit() {
         />
 
         <!-- Sea state -->
-        <div>
-          <label class="block text-sm font-medium text-fg mb-1">
-            {{ t('navigation_logs.fields.seaState') }}
-          </label>
-          <select
-            v-model="form.seaState"
-            name="seaState"
-            class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
-          >
-            <option value="">{{ t('navigation_logs.fields.selectSeaState') }}</option>
-            <option v-for="state in SEA_STATES" :key="state" :value="state">
-              {{ t(`navigation_logs.seaState.${state}`) }}
-            </option>
-          </select>
-        </div>
+        <BaseSelect
+          v-model="form.seaState"
+          name="seaState"
+          :label="t('navigation_logs.fields.seaState')"
+          :options="seaStateOptions"
+          :error="form.errors.seaState"
+          allow-empty
+          :placeholder="t('navigation_logs.fields.selectSeaState')"
+        />
 
         <BaseInput
           :model-value="form.crewCount != null ? String(form.crewCount) : ''"

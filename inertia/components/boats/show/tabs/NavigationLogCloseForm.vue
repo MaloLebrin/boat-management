@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useForm } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
+import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import { useNetworkStatus } from '~/composables/use_network_status'
 import { useOfflineQueue } from '~/composables/use_offline_queue'
@@ -27,6 +29,17 @@ const pad = (n: number) => String(n).padStart(2, '0')
 const defaultArrivedAt = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`
 
 const SEA_STATES = ['calm', 'slight', 'moderate', 'rough', 'very_rough'] as const
+
+const arrivalPortOptions = computed(() =>
+  props.portOptions.map((p) => ({ value: String(p.id), label: p.name }))
+)
+
+const seaStateOptions = computed(() =>
+  SEA_STATES.map((s) => ({
+    value: s,
+    label: t(`navigation_logs.seaState.${s}`),
+  }))
+)
 
 const form = useForm({
   arrivedAt: defaultArrivedAt,
@@ -81,21 +94,16 @@ function handleSubmit() {
         />
 
         <!-- Arrival port select -->
-        <div v-if="portOptions.length > 0">
-          <label class="block text-sm font-medium text-fg mb-1">
-            {{ t('navigation_logs.fields.arrivalPortId') }}
-          </label>
-          <select
-            v-model="form.arrivalPortId"
-            name="arrivalPortId"
-            class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
-          >
-            <option value="">{{ t('navigation_logs.fields.noPort') }}</option>
-            <option v-for="port in portOptions" :key="port.id" :value="port.id">
-              {{ port.name }}
-            </option>
-          </select>
-        </div>
+        <BaseSelect
+          v-if="portOptions.length > 0"
+          v-model="form.arrivalPortId"
+          name="arrivalPortId"
+          :label="t('navigation_logs.fields.arrivalPortId')"
+          :options="arrivalPortOptions"
+          :error="form.errors.arrivalPortId"
+          allow-empty
+          :placeholder="t('navigation_logs.fields.noPort')"
+        />
 
         <BaseInput
           v-model="form.arrivalPortName"
@@ -160,21 +168,15 @@ function handleSubmit() {
         />
 
         <!-- Sea state -->
-        <div>
-          <label class="block text-sm font-medium text-fg mb-1">
-            {{ t('navigation_logs.fields.seaState') }}
-          </label>
-          <select
-            v-model="form.seaState"
-            name="seaState"
-            class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
-          >
-            <option value="">{{ t('navigation_logs.fields.selectSeaState') }}</option>
-            <option v-for="state in SEA_STATES" :key="state" :value="state">
-              {{ t(`navigation_logs.seaState.${state}`) }}
-            </option>
-          </select>
-        </div>
+        <BaseSelect
+          v-model="form.seaState"
+          name="seaState"
+          :label="t('navigation_logs.fields.seaState')"
+          :options="seaStateOptions"
+          :error="form.errors.seaState"
+          allow-empty
+          :placeholder="t('navigation_logs.fields.selectSeaState')"
+        />
 
         <BaseInput
           :model-value="form.crewCount != null ? String(form.crewCount) : ''"

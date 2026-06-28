@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import { computed, ref, watch } from 'vue'
 import { router } from '@inertiajs/vue3'
+import BaseSelect from '~/components/base/BaseSelect.vue'
 import { useT } from '~/composables/use_t'
 
 const { t } = useT()
@@ -10,26 +12,35 @@ const props = defineProps<{
   basePath: string
 }>()
 
-function onChange(e: Event) {
-  const val = (e.target as HTMLSelectElement).value
+const boatOptions = computed(() => props.boats.map((b) => ({ value: String(b.id), label: b.name })))
+
+const currentBoatId = ref(props.selectedBoatId ? String(props.selectedBoatId) : '')
+
+watch(
+  () => props.selectedBoatId,
+  (val) => {
+    currentBoatId.value = val ? String(val) : ''
+  }
+)
+
+function onSelectChange(val: string | number | '') {
+  currentBoatId.value = String(val)
   router.get(props.basePath, val ? { boatId: val } : {}, { preserveScroll: true, replace: true })
 }
 </script>
 
 <template>
   <div class="flex items-center gap-3">
-    <label class="text-sm text-fg-muted shrink-0">
+    <label for="boat-filter" class="text-sm text-fg-muted shrink-0">
       {{ t('navigation.filter.filterByBoat') }}
     </label>
-    <select
-      :value="selectedBoatId ?? ''"
-      class="rounded-lg border border-border bg-surface-elevated px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand/30 min-w-40"
-      @change="onChange"
-    >
-      <option value="">{{ t('navigation.filter.allBoats') }}</option>
-      <option v-for="boat in boats" :key="boat.id" :value="boat.id">
-        {{ boat.name }}
-      </option>
-    </select>
+    <BaseSelect
+      id="boat-filter"
+      :model-value="currentBoatId"
+      :options="boatOptions"
+      allow-empty
+      :placeholder="t('navigation.filter.allBoats')"
+      @update:model-value="onSelectChange"
+    />
   </div>
 </template>
