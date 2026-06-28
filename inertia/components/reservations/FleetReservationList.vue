@@ -2,6 +2,7 @@
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseEmptyState from '~/components/base/BaseEmptyState.vue'
 import ReservationStatusBadge from '~/components/reservations/ReservationStatusBadge.vue'
+import { useReservationFormat } from '~/composables/use_reservation_format'
 import { useT } from '~/composables/use_t'
 import type { BoatReservationRow } from '~/types/reservation'
 
@@ -10,14 +11,7 @@ defineProps<{
 }>()
 
 const { t } = useT()
-
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString(undefined, {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  })
-}
+const { formatDate } = useReservationFormat()
 </script>
 
 <template>

@@ -28,6 +28,7 @@
     "totalPrice": "Prix total (optionnel)",
     "submit": "Enregistrer",
     "cancel": "Annuler",
+    "edit": "Modifier",
     "delete": "Supprimer",
     "confirmDelete": "Supprimer cette réservation ?"
   },

@@ -5,7 +5,7 @@ export class ReservationNotFoundError extends Error {
 export class ReservationConflictError extends Error {
   name = 'ReservationConflictError'
 
-  constructor(readonly conflictingId: number) {
+  constructor() {
     super('Reservation period overlaps with an existing reservation')
   }
 }

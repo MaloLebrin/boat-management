@@ -156,7 +156,7 @@ export default class BoatReservationService {
 
     const conflict = await query.first()
     if (conflict) {
-      throw new ReservationConflictError(conflict.id)
+      throw new ReservationConflictError()
     }
   }
 }

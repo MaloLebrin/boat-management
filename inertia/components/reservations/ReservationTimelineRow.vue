@@ -28,7 +28,7 @@ const coveredByDay = computed(() => {
       const iso = isoForDay(day)
       const res =
         props.entry.reservations.find((r) => {
-          return r.startsAt.slice(0, 10) <= iso && iso <= r.endsAt.slice(0, 10)
+          return r.startsAt.slice(0, 10) <= iso && iso < r.endsAt.slice(0, 10)
         }) ?? null
       return [day, res] as const
     })
@@ -52,7 +52,7 @@ const coveredByDay = computed(() => {
                 ? 'rounded-l'
                 : '',
               day === days[days.length - 1] ||
-              coveredByDay.get(day)?.endsAt.slice(0, 10) === isoForDay(day)
+              coveredByDay.get(day)?.endsAt.slice(0, 10) === isoForDay(day + 1)
                 ? 'rounded-r'
                 : '',
             ]"

@@ -292,6 +292,37 @@ test.group('Boat Reservations (functional)', (group) => {
     response.assertStatus(302)
   })
 
+  test('PATCH /boats/:boatId/reservations/:id flashes error when end is before start', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    const reservation = await BoatReservation.create({
+      boatId: boat.id,
+      organizationId: boat.organizationId,
+      status: 'option',
+      startsAt: DateTime.fromISO('2025-09-01T10:00:00'),
+      endsAt: DateTime.fromISO('2025-09-07T10:00:00'),
+      clientName: 'Date Order Client',
+    })
+
+    const response = await client
+      .patch(`/boats/${boat.id}/reservations/${reservation.id}`)
+      .form({
+        startsAt: '2025-09-10T10:00',
+        endsAt: '2025-09-05T10:00',
+      })
+      .loginAs(user)
+      .redirects(0)
+
+    response.assertStatus(302)
+
+    await reservation.refresh()
+    assert.equal(reservation.startsAt.toISODate(), '2025-09-01')
+  })
+
   test('PATCH /boats/:boatId/reservations/:id detects conflict on reschedule', async ({
     client,
     assert,
@@ -457,6 +488,41 @@ test.group('Boat Reservations (functional)', (group) => {
     response.assertStatus(200)
     const props = response.inertiaProps as { reservations: unknown[] }
     assert.lengthOf(props.reservations, 2)
+  })
+
+  test('GET /reservations does not return reservations from another org', async ({
+    client,
+    assert,
+  }) => {
+    const owner = await createAdminUser()
+    const other = await UserFactory.with('organization').create()
+    const ownerBoat = await BoatFactory.merge({ organizationId: owner.organizationId! }).create()
+    const otherBoat = await BoatFactory.merge({ organizationId: other.organizationId! }).create()
+
+    await BoatReservation.create({
+      boatId: ownerBoat.id,
+      organizationId: owner.organizationId!,
+      status: 'confirmed',
+      startsAt: DateTime.fromISO('2026-02-01T10:00:00'),
+      endsAt: DateTime.fromISO('2026-02-07T10:00:00'),
+      clientName: 'Owner Client',
+    })
+
+    await BoatReservation.create({
+      boatId: otherBoat.id,
+      organizationId: other.organizationId!,
+      status: 'confirmed',
+      startsAt: DateTime.fromISO('2026-02-10T10:00:00'),
+      endsAt: DateTime.fromISO('2026-02-15T10:00:00'),
+      clientName: 'Other Org Client',
+    })
+
+    const response = await client.get('/reservations').loginAs(other).withInertia()
+
+    response.assertStatus(200)
+    const props = response.inertiaProps as { reservations: { clientName: string }[] }
+    assert.lengthOf(props.reservations, 1)
+    assert.equal(props.reservations[0].clientName, 'Other Org Client')
   })
 
   test('GET /reservations?boatId= filters by boat', async ({ client, assert }) => {

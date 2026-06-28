@@ -1,9 +1,12 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { router } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseEmptyState from '~/components/base/BaseEmptyState.vue'
+import ReservationEditModal from '~/components/reservations/ReservationEditModal.vue'
 import ReservationStatusBadge from '~/components/reservations/ReservationStatusBadge.vue'
+import { useReservationFormat } from '~/composables/use_reservation_format'
 import { useT } from '~/composables/use_t'
 import type { BoatReservationRow } from '~/types/reservation'
 
@@ -14,13 +17,14 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
+const { formatDate } = useReservationFormat()
 
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString(undefined, {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  })
+const editingReservation = ref<BoatReservationRow | null>(null)
+const editModalOpen = ref(false)
+
+function openEdit(row: BoatReservationRow) {
+  editingReservation.value = row
+  editModalOpen.value = true
 }
 
 function deleteReservation(id: number) {
@@ -67,6 +71,9 @@ function deleteReservation(id: number) {
               {{ row.totalPrice ? `${row.totalPrice} €` : '—' }}
             </td>
             <td v-if="canManage" class="py-2 text-right">
+              <BaseButton variant="ghost" size="sm" @click="openEdit(row)">
+                {{ t('reservations.form.edit') }}
+              </BaseButton>
               <BaseButton variant="ghost" size="sm" @click="deleteReservation(row.id)">
                 {{ t('reservations.form.delete') }}
               </BaseButton>
@@ -76,4 +83,10 @@ function deleteReservation(id: number) {
       </table>
     </div>
   </BaseCard>
+
+  <ReservationEditModal
+    v-model:open="editModalOpen"
+    :boat-id="boatId"
+    :reservation="editingReservation"
+  />
 </template>

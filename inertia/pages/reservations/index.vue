@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { router } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
@@ -25,10 +25,10 @@ const { t } = useT()
 type ViewMode = 'list' | 'timeline'
 const viewMode = ref<ViewMode>('timeline')
 
-const boatOptions = [
+const boatOptions = computed(() => [
   { value: '', label: t('reservations.calendar.allBoats') },
   ...props.boats.map((b) => ({ value: String(b.id), label: b.name })),
-]
+])
 
 function filterByBoat(boatId: string) {
   const query = boatId ? { boatId } : {}
