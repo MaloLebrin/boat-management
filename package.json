@@ -7,7 +7,7 @@
   "engines": {
     "node": ">=24.0.0"
   },
-  "packageManager": "pnpm@11.6.0",
+  "packageManager": "pnpm@11.9.0",
   "scripts": {
     "start": "node bin/server.js",
     "build": "node ace build",
