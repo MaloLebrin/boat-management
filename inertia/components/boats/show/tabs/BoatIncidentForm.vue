@@ -115,6 +115,7 @@ function toLocalDatetime(utcIso: string): string {
           name="status"
           :label="t('incidents.fields.status')"
           :options="incidentStatusOptions"
+          :error="errors.status"
         />
 
         <BaseInput

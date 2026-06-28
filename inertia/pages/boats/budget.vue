@@ -110,7 +110,7 @@ const categories = computed(() => [
             id="year-select"
             :model-value="String(selectedYear)"
             :options="yearOptions"
-            @update:model-value="changeYear(Number($event))"
+            @update:model-value="(val) => val !== '' && changeYear(Number(val))"
           />
         </div>
         <BaseButton
