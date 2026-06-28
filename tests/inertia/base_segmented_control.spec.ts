@@ -24,6 +24,14 @@ test('active option has brand style', () => {
   expect(buttons[0].classes()).not.toContain('bg-brand')
 })
 
+test('aria-pressed reflects active option', () => {
+  const w = mount(BaseSegmentedControl, { props: { modelValue: 'engine', options } })
+  const buttons = w.findAll('button')
+  expect(buttons[1].attributes('aria-pressed')).toBe('true')
+  expect(buttons[0].attributes('aria-pressed')).toBe('false')
+  expect(buttons[2].attributes('aria-pressed')).toBe('false')
+})
+
 test('emits update:modelValue on click', async () => {
   const w = mount(BaseSegmentedControl, { props: { modelValue: 'all', options } })
   await w.findAll('button')[2].trigger('click')

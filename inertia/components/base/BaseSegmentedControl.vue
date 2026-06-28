@@ -10,11 +10,13 @@ defineEmits<{
 </script>
 
 <template>
-  <div class="flex flex-wrap gap-2">
+  <div class="flex flex-wrap gap-2" role="group">
+    <!-- raw <button> intentional: ce composant gère lui-même les classes actif/inactif, BaseButton impose un variant qui entrerait en conflit (cf. BaseTabs) -->
     <button
       v-for="option in options"
       :key="option.value"
       type="button"
+      :aria-pressed="modelValue === option.value"
       :class="[
         'rounded-full px-3 py-1.5 text-sm font-medium transition-colors',
         modelValue === option.value
