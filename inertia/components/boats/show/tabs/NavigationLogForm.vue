@@ -30,10 +30,10 @@ const form = useForm({
   departedAt: defaultDepartedAt,
   departurePortId: '' as string | number,
   departurePortName: '',
-  engineHoursStart: '' as string | number,
-  windForceBeaufort: '' as string | number,
+  engineHoursStart: null as number | null,
+  windForceBeaufort: null as number | null,
   seaState: '',
-  crewCount: '' as string | number,
+  crewCount: null as number | null,
   notes: '',
 })
 
@@ -112,7 +112,7 @@ function handleSubmit() {
           min="0"
           :label="t('navigation_logs.fields.engineHoursStart')"
           :error="form.errors.engineHoursStart"
-          @update:model-value="form.engineHoursStart = Number($event) || 0"
+          @update:model-value="form.engineHoursStart = $event !== '' ? Number($event) : null"
         />
 
         <BaseInput
@@ -125,7 +125,7 @@ function handleSubmit() {
           max="12"
           :label="t('navigation_logs.fields.windForceBeaufort')"
           :error="form.errors.windForceBeaufort"
-          @update:model-value="form.windForceBeaufort = Number($event) || 0"
+          @update:model-value="form.windForceBeaufort = $event !== '' ? Number($event) : null"
         />
 
         <!-- Sea state -->
@@ -154,7 +154,7 @@ function handleSubmit() {
           min="0"
           :label="t('navigation_logs.fields.crewCount')"
           :error="form.errors.crewCount"
-          @update:model-value="form.crewCount = Number($event) || 0"
+          @update:model-value="form.crewCount = $event !== '' ? Number($event) : null"
         />
 
         <!-- Notes -->

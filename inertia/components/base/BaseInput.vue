@@ -53,12 +53,11 @@ const resolvedError = computed(() => {
   return getFieldError(props.errors, key)
 })
 
-// Pass-through attrs: class/style go to the wrapper, everything else to the inner <input>.
 const wrapperClass = computed(() => attrs.class)
-const inputAttrs = computed(() => {
-  const { class: _c, style: _s, ...rest } = attrs
-  return rest
-})
+const wrapperStyle = computed(() => attrs.style)
+const inputAttrs = computed(() =>
+  Object.fromEntries(Object.entries(attrs).filter(([k]) => k !== 'class' && k !== 'style'))
+)
 </script>
 
 <template>
@@ -68,6 +67,7 @@ const inputAttrs = computed(() => {
     :error="resolvedError"
     :html-for="id"
     :class="wrapperClass"
+    :style="wrapperStyle"
   >
     <template v-if="$slots['label-right']" #label-right>
       <slot name="label-right" />

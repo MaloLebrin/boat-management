@@ -22,10 +22,10 @@ const { enqueue } = useOfflineQueue()
 const form = useForm({
   fueledAt: new Date().toLocaleDateString('en-CA'),
   quantityLiters: '' as string | number,
-  pricePerLiter: '' as string | number,
-  totalCost: '' as string | number,
+  pricePerLiter: null as number | null,
+  totalCost: null as number | null,
   boatEngineId: '' as string | number,
-  engineHoursAtFueling: '' as string | number,
+  engineHoursAtFueling: null as number | null,
   supplier: '',
   notes: '',
 })
@@ -87,7 +87,7 @@ function handleSubmit() {
           min="0"
           :label="t('fuel_logs.fields.pricePerLiter')"
           :error="form.errors.pricePerLiter"
-          @update:model-value="form.pricePerLiter = Number($event) || 0"
+          @update:model-value="form.pricePerLiter = $event !== '' ? Number($event) : null"
         />
 
         <BaseInput
@@ -99,7 +99,7 @@ function handleSubmit() {
           min="0"
           :label="t('fuel_logs.fields.totalCost')"
           :error="form.errors.totalCost"
-          @update:model-value="form.totalCost = Number($event) || 0"
+          @update:model-value="form.totalCost = $event !== '' ? Number($event) : null"
         />
 
         <!-- Engine -->
@@ -132,7 +132,7 @@ function handleSubmit() {
           min="0"
           :label="t('fuel_logs.fields.engineHoursAtFueling')"
           :error="form.errors.engineHoursAtFueling"
-          @update:model-value="form.engineHoursAtFueling = Number($event) || 0"
+          @update:model-value="form.engineHoursAtFueling = $event !== '' ? Number($event) : null"
         />
 
         <BaseInput

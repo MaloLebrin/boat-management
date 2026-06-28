@@ -23,9 +23,9 @@ const { enqueue } = useOfflineQueue()
 const SEA_STATES = ['calm', 'slight', 'moderate', 'rough', 'very_rough'] as const
 
 const form = useForm({
-  windForceBeaufort: props.log.windForceBeaufort ?? ('' as string | number),
+  windForceBeaufort: props.log.windForceBeaufort,
   seaState: props.log.seaState ?? '',
-  crewCount: props.log.crewCount ?? ('' as string | number),
+  crewCount: props.log.crewCount,
   notes: props.log.notes ?? '',
 })
 
@@ -67,7 +67,7 @@ function handleSubmit() {
           max="12"
           :label="t('navigation_logs.fields.windForceBeaufort')"
           :error="form.errors.windForceBeaufort"
-          @update:model-value="form.windForceBeaufort = Number($event) || 0"
+          @update:model-value="form.windForceBeaufort = $event !== '' ? Number($event) : null"
         />
 
         <!-- Sea state -->
@@ -96,7 +96,7 @@ function handleSubmit() {
           min="0"
           :label="t('navigation_logs.fields.crewCount')"
           :error="form.errors.crewCount"
-          @update:model-value="form.crewCount = Number($event) || 0"
+          @update:model-value="form.crewCount = $event !== '' ? Number($event) : null"
         />
 
         <!-- Notes -->

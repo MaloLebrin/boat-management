@@ -31,12 +31,12 @@ const form = useForm({
   arrivedAt: defaultArrivedAt,
   arrivalPortId: '' as string | number,
   arrivalPortName: '',
-  distanceNm: '' as string | number,
-  engineHoursEnd: '' as string | number,
-  fuelConsumedLiters: '' as string | number,
-  windForceBeaufort: props.log.windForceBeaufort ?? ('' as string | number),
+  distanceNm: null as number | null,
+  engineHoursEnd: null as number | null,
+  fuelConsumedLiters: null as number | null,
+  windForceBeaufort: props.log.windForceBeaufort,
   seaState: props.log.seaState ?? '',
-  crewCount: props.log.crewCount ?? ('' as string | number),
+  crewCount: props.log.crewCount,
   notes: props.log.notes ?? '',
 })
 
@@ -118,7 +118,7 @@ function handleSubmit() {
           min="0"
           :label="t('navigation_logs.fields.distanceNm')"
           :error="form.errors.distanceNm"
-          @update:model-value="form.distanceNm = Number($event) || 0"
+          @update:model-value="form.distanceNm = $event !== '' ? Number($event) : null"
         />
 
         <BaseInput
@@ -130,7 +130,7 @@ function handleSubmit() {
           min="0"
           :label="t('navigation_logs.fields.engineHoursEnd')"
           :error="form.errors.engineHoursEnd"
-          @update:model-value="form.engineHoursEnd = Number($event) || 0"
+          @update:model-value="form.engineHoursEnd = $event !== '' ? Number($event) : null"
         />
 
         <BaseInput
@@ -142,7 +142,7 @@ function handleSubmit() {
           min="0"
           :label="t('navigation_logs.fields.fuelConsumedLiters')"
           :error="form.errors.fuelConsumedLiters"
-          @update:model-value="form.fuelConsumedLiters = Number($event) || 0"
+          @update:model-value="form.fuelConsumedLiters = $event !== '' ? Number($event) : null"
         />
 
         <BaseInput
@@ -155,7 +155,7 @@ function handleSubmit() {
           max="12"
           :label="t('navigation_logs.fields.windForceBeaufort')"
           :error="form.errors.windForceBeaufort"
-          @update:model-value="form.windForceBeaufort = Number($event) || 0"
+          @update:model-value="form.windForceBeaufort = $event !== '' ? Number($event) : null"
         />
 
         <!-- Sea state -->
@@ -184,7 +184,7 @@ function handleSubmit() {
           min="0"
           :label="t('navigation_logs.fields.crewCount')"
           :error="form.errors.crewCount"
-          @update:model-value="form.crewCount = Number($event) || 0"
+          @update:model-value="form.crewCount = $event !== '' ? Number($event) : null"
         />
 
         <!-- Notes -->
