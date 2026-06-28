@@ -21,6 +21,7 @@ declare module '@adonisjs/inertia/types' {
     'boats/index': ExtractProps<(typeof import('../../inertia/pages/boats/index.vue'))['default']>
     'boats/navigation': ExtractProps<(typeof import('../../inertia/pages/boats/navigation.vue'))['default']>
     'boats/new': ExtractProps<(typeof import('../../inertia/pages/boats/new.vue'))['default']>
+    'boats/reservations': ExtractProps<(typeof import('../../inertia/pages/boats/reservations.vue'))['default']>
     'boats/rig_edit': ExtractProps<(typeof import('../../inertia/pages/boats/rig_edit.vue'))['default']>
     'boats/sail_edit': ExtractProps<(typeof import('../../inertia/pages/boats/sail_edit.vue'))['default']>
     'boats/show': ExtractProps<(typeof import('../../inertia/pages/boats/show.vue'))['default']>
@@ -50,6 +51,7 @@ declare module '@adonisjs/inertia/types' {
     'ports/index': ExtractProps<(typeof import('../../inertia/pages/ports/index.vue'))['default']>
     'ports/new': ExtractProps<(typeof import('../../inertia/pages/ports/new.vue'))['default']>
     'ports/show': ExtractProps<(typeof import('../../inertia/pages/ports/show.vue'))['default']>
+    'reservations/index': ExtractProps<(typeof import('../../inertia/pages/reservations/index.vue'))['default']>
     'settings/ai': ExtractProps<(typeof import('../../inertia/pages/settings/ai.vue'))['default']>
     'settings/audit_log': ExtractProps<(typeof import('../../inertia/pages/settings/audit_log.vue'))['default']>
     'settings/billing': ExtractProps<(typeof import('../../inertia/pages/settings/billing.vue'))['default']>
@@ -59,7 +61,5 @@ declare module '@adonisjs/inertia/types' {
     'settings/me': ExtractProps<(typeof import('../../inertia/pages/settings/me.vue'))['default']>
     'settings/members': ExtractProps<(typeof import('../../inertia/pages/settings/members.vue'))['default']>
     'settings/org': ExtractProps<(typeof import('../../inertia/pages/settings/org.vue'))['default']>
-    'boats/reservations': ExtractProps<(typeof import('../../inertia/pages/boats/reservations.vue'))['default']>
-    'reservations/index': ExtractProps<(typeof import('../../inertia/pages/reservations/index.vue'))['default']>
   }
 }

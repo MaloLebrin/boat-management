@@ -3,6 +3,7 @@ import testUtils from '@adonisjs/core/services/test_utils'
 import { DateTime } from 'luxon'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { UserFactory } from '#database/factories/user_factory'
+import { BoatReservationFactory } from '#database/factories/boat_reservation_factory'
 import { createAdminUser } from '#tests/functional/helpers'
 import BoatReservation from '#models/boat_reservation'
 
@@ -628,5 +629,259 @@ test.group('Boat Reservations (functional)', (group) => {
     const props = response.inertiaProps as { reservations: { boatId: number }[] }
     assert.lengthOf(props.reservations, 1)
     assert.equal(props.reservations[0].boatId, boat1.id)
+  })
+
+  // --- C1: permissions membres non-admin ---
+
+  test('PATCH /boats/:boatId/reservations/:id allows non-admin same-org member to update', async ({
+    client,
+    assert,
+  }) => {
+    const admin = await createAdminUser()
+    const member = await UserFactory.merge({ organizationId: admin.organizationId! }).create()
+    const boat = await BoatFactory.merge({ organizationId: admin.organizationId! }).create()
+
+    const reservation = await BoatReservationFactory.merge({
+      boatId: boat.id,
+      organizationId: boat.organizationId,
+      status: 'option',
+      startsAt: DateTime.fromISO('2025-09-01T10:00:00'),
+      endsAt: DateTime.fromISO('2025-09-07T10:00:00'),
+    }).create()
+
+    const response = await client
+      .patch(`/boats/${boat.id}/reservations/${reservation.id}`)
+      .form({ status: 'confirmed' })
+      .loginAs(member)
+      .redirects(0)
+
+    response.assertStatus(302)
+
+    await reservation.refresh()
+    assert.equal(reservation.status, 'confirmed')
+  })
+
+  test('DELETE /boats/:boatId/reservations/:id allows non-admin same-org member to delete', async ({
+    client,
+    assert,
+  }) => {
+    const admin = await createAdminUser()
+    const member = await UserFactory.merge({ organizationId: admin.organizationId! }).create()
+    const boat = await BoatFactory.merge({ organizationId: admin.organizationId! }).create()
+
+    const reservation = await BoatReservationFactory.merge({
+      boatId: boat.id,
+      organizationId: boat.organizationId,
+      status: 'option',
+      startsAt: DateTime.fromISO('2025-11-01T10:00:00'),
+      endsAt: DateTime.fromISO('2025-11-07T10:00:00'),
+    }).create()
+
+    const response = await client
+      .delete(`/boats/${boat.id}/reservations/${reservation.id}`)
+      .loginAs(member)
+      .redirects(0)
+
+    response.assertStatus(302)
+
+    const deleted = await BoatReservation.find(reservation.id)
+    assert.isNull(deleted)
+  })
+
+  // --- C2: validations de format ---
+
+  test('POST /boats/:boatId/reservations rejects invalid email format', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    const response = await client
+      .post(`/boats/${boat.id}/reservations`)
+      .form({ ...VALID_RESERVATION, clientEmail: 'not-an-email' })
+      .loginAs(user)
+      .redirects(0)
+
+    response.assertStatus(302)
+
+    const reservations = await BoatReservation.query().where('boatId', boat.id)
+    assert.lengthOf(reservations, 0)
+  })
+
+  test('POST /boats/:boatId/reservations rejects negative totalPrice', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    const response = await client
+      .post(`/boats/${boat.id}/reservations`)
+      .form({ ...VALID_RESERVATION, totalPrice: -100 })
+      .loginAs(user)
+      .redirects(0)
+
+    response.assertStatus(302)
+
+    const reservations = await BoatReservation.query().where('boatId', boat.id)
+    assert.lengthOf(reservations, 0)
+  })
+
+  test('POST /boats/:boatId/reservations rejects clientPhone longer than 50 chars', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    const response = await client
+      .post(`/boats/${boat.id}/reservations`)
+      .form({ ...VALID_RESERVATION, clientPhone: 'a'.repeat(51) })
+      .loginAs(user)
+      .redirects(0)
+
+    response.assertStatus(302)
+
+    const reservations = await BoatReservation.query().where('boatId', boat.id)
+    assert.lengthOf(reservations, 0)
+  })
+
+  test('POST /boats/:boatId/reservations rejects invalid status value', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    const response = await client
+      .post(`/boats/${boat.id}/reservations`)
+      .form({ ...VALID_RESERVATION, status: 'pending' })
+      .loginAs(user)
+      .redirects(0)
+
+    response.assertStatus(302)
+
+    const reservations = await BoatReservation.query().where('boatId', boat.id)
+    assert.lengthOf(reservations, 0)
+  })
+
+  test('POST /boats/:boatId/reservations flashes error when overlap with existing option reservation', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    await BoatReservation.create({
+      boatId: boat.id,
+      organizationId: boat.organizationId,
+      status: 'option',
+      startsAt: DateTime.fromISO('2025-08-01T10:00:00'),
+      endsAt: DateTime.fromISO('2025-08-10T10:00:00'),
+      clientName: 'Existing Option Client',
+    })
+
+    const response = await client
+      .post(`/boats/${boat.id}/reservations`)
+      .form({
+        startsAt: '2025-08-05T10:00',
+        endsAt: '2025-08-15T10:00',
+        clientName: 'Conflicting Client',
+        status: 'option',
+      })
+      .loginAs(user)
+      .redirects(0)
+
+    response.assertStatus(302)
+
+    const reservations = await BoatReservation.query().where('boatId', boat.id)
+    assert.lengthOf(reservations, 1)
+  })
+
+  // --- C3: transitions de statut ---
+
+  test('PATCH /boats/:boatId/reservations/:id transitions status from option to cancelled', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    const reservation = await BoatReservation.create({
+      boatId: boat.id,
+      organizationId: boat.organizationId,
+      status: 'option',
+      startsAt: DateTime.fromISO('2025-09-01T10:00:00'),
+      endsAt: DateTime.fromISO('2025-09-07T10:00:00'),
+      clientName: 'Cancel Option Client',
+    })
+
+    const response = await client
+      .patch(`/boats/${boat.id}/reservations/${reservation.id}`)
+      .form({ status: 'cancelled' })
+      .loginAs(user)
+      .redirects(0)
+
+    response.assertStatus(302)
+
+    await reservation.refresh()
+    assert.equal(reservation.status, 'cancelled')
+  })
+
+  test('PATCH /boats/:boatId/reservations/:id transitions status from confirmed to cancelled', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    const reservation = await BoatReservation.create({
+      boatId: boat.id,
+      organizationId: boat.organizationId,
+      status: 'confirmed',
+      startsAt: DateTime.fromISO('2025-09-01T10:00:00'),
+      endsAt: DateTime.fromISO('2025-09-07T10:00:00'),
+      clientName: 'Cancel Confirmed Client',
+    })
+
+    const response = await client
+      .patch(`/boats/${boat.id}/reservations/${reservation.id}`)
+      .form({ status: 'cancelled' })
+      .loginAs(user)
+      .redirects(0)
+
+    response.assertStatus(302)
+
+    await reservation.refresh()
+    assert.equal(reservation.status, 'cancelled')
+  })
+
+  test('PATCH /boats/:boatId/reservations/:id transitions status from confirmed to option', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    const reservation = await BoatReservation.create({
+      boatId: boat.id,
+      organizationId: boat.organizationId,
+      status: 'confirmed',
+      startsAt: DateTime.fromISO('2025-09-01T10:00:00'),
+      endsAt: DateTime.fromISO('2025-09-07T10:00:00'),
+      clientName: 'Downgrade Client',
+    })
+
+    const response = await client
+      .patch(`/boats/${boat.id}/reservations/${reservation.id}`)
+      .form({ status: 'option' })
+      .loginAs(user)
+      .redirects(0)
+
+    response.assertStatus(302)
+
+    await reservation.refresh()
+    assert.equal(reservation.status, 'option')
   })
 })
