@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
+import BaseInput from '~/components/base/BaseInput.vue'
 import { useNetworkStatus } from '~/composables/use_network_status'
 import { useOfflineQueue } from '~/composables/use_offline_queue'
 import { useT } from '~/composables/use_t'
@@ -30,12 +31,12 @@ const form = useForm({
   arrivedAt: defaultArrivedAt,
   arrivalPortId: '' as string | number,
   arrivalPortName: '',
-  distanceNm: '' as string | number,
-  engineHoursEnd: '' as string | number,
-  fuelConsumedLiters: '' as string | number,
-  windForceBeaufort: props.log.windForceBeaufort ?? ('' as string | number),
+  distanceNm: null as number | null,
+  engineHoursEnd: null as number | null,
+  fuelConsumedLiters: null as number | null,
+  windForceBeaufort: props.log.windForceBeaufort,
   seaState: props.log.seaState ?? '',
-  crewCount: props.log.crewCount ?? ('' as string | number),
+  crewCount: props.log.crewCount,
   notes: props.log.notes ?? '',
 })
 
@@ -67,22 +68,16 @@ function handleSubmit() {
 
     <form @submit.prevent="handleSubmit">
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <!-- Arrival datetime -->
-        <div class="sm:col-span-2">
-          <label class="block text-sm font-medium text-fg mb-1">
-            {{ t('navigation_logs.fields.arrivedAt') }}
-          </label>
-          <input
-            v-model="form.arrivedAt"
-            type="datetime-local"
-            name="arrivedAt"
-            required
-            class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
-          />
-          <p v-if="form.errors.arrivedAt" class="mt-1 text-xs text-danger">
-            {{ form.errors.arrivedAt }}
-          </p>
-        </div>
+        <BaseInput
+          v-model="form.arrivedAt"
+          type="datetime-local"
+          id="arrivedAt"
+          name="arrivedAt"
+          class="sm:col-span-2"
+          :label="t('navigation_logs.fields.arrivedAt')"
+          :error="form.errors.arrivedAt"
+          required
+        />
 
         <!-- Arrival port select -->
         <div v-if="portOptions.length > 0">
@@ -101,96 +96,67 @@ function handleSubmit() {
           </select>
         </div>
 
-        <!-- Arrival port free text -->
-        <div>
-          <label class="block text-sm font-medium text-fg mb-1">
-            {{
-              portOptions.length > 0
-                ? t('navigation_logs.fields.arrivalPortName')
-                : t('navigation_logs.fields.arrivalPort')
-            }}
-          </label>
-          <input
-            v-model="form.arrivalPortName"
-            type="text"
-            name="arrivalPortName"
-            maxlength="255"
-            class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
-          />
-        </div>
+        <BaseInput
+          v-model="form.arrivalPortName"
+          type="text"
+          id="arrivalPortName"
+          name="arrivalPortName"
+          maxlength="255"
+          :label="
+            portOptions.length > 0
+              ? t('navigation_logs.fields.arrivalPortName')
+              : t('navigation_logs.fields.arrivalPort')
+          "
+        />
 
-        <!-- Distance -->
-        <div>
-          <label class="block text-sm font-medium text-fg mb-1">
-            {{ t('navigation_logs.fields.distanceNm') }}
-          </label>
-          <input
-            v-model="form.distanceNm"
-            type="number"
-            name="distanceNm"
-            step="0.1"
-            min="0"
-            class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
-          />
-          <p v-if="form.errors.distanceNm" class="mt-1 text-xs text-danger">
-            {{ form.errors.distanceNm }}
-          </p>
-        </div>
+        <BaseInput
+          :model-value="form.distanceNm != null ? String(form.distanceNm) : ''"
+          type="number"
+          id="distanceNm"
+          name="distanceNm"
+          step="0.1"
+          min="0"
+          :label="t('navigation_logs.fields.distanceNm')"
+          :error="form.errors.distanceNm"
+          @update:model-value="form.distanceNm = $event !== '' ? Number($event) : null"
+        />
 
-        <!-- Engine hours end -->
-        <div>
-          <label class="block text-sm font-medium text-fg mb-1">
-            {{ t('navigation_logs.fields.engineHoursEnd') }}
-          </label>
-          <input
-            v-model="form.engineHoursEnd"
-            type="number"
-            name="engineHoursEnd"
-            step="0.1"
-            min="0"
-            class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
-          />
-          <p v-if="form.errors.engineHoursEnd" class="mt-1 text-xs text-danger">
-            {{ form.errors.engineHoursEnd }}
-          </p>
-        </div>
+        <BaseInput
+          :model-value="form.engineHoursEnd != null ? String(form.engineHoursEnd) : ''"
+          type="number"
+          id="engineHoursEnd"
+          name="engineHoursEnd"
+          step="0.1"
+          min="0"
+          :label="t('navigation_logs.fields.engineHoursEnd')"
+          :error="form.errors.engineHoursEnd"
+          @update:model-value="form.engineHoursEnd = $event !== '' ? Number($event) : null"
+        />
 
-        <!-- Fuel consumed -->
-        <div>
-          <label class="block text-sm font-medium text-fg mb-1">
-            {{ t('navigation_logs.fields.fuelConsumedLiters') }}
-          </label>
-          <input
-            v-model="form.fuelConsumedLiters"
-            type="number"
-            name="fuelConsumedLiters"
-            step="0.001"
-            min="0"
-            class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
-          />
-          <p v-if="form.errors.fuelConsumedLiters" class="mt-1 text-xs text-danger">
-            {{ form.errors.fuelConsumedLiters }}
-          </p>
-        </div>
+        <BaseInput
+          :model-value="form.fuelConsumedLiters != null ? String(form.fuelConsumedLiters) : ''"
+          type="number"
+          id="fuelConsumedLiters"
+          name="fuelConsumedLiters"
+          step="0.001"
+          min="0"
+          :label="t('navigation_logs.fields.fuelConsumedLiters')"
+          :error="form.errors.fuelConsumedLiters"
+          @update:model-value="form.fuelConsumedLiters = $event !== '' ? Number($event) : null"
+        />
 
-        <!-- Wind force -->
-        <div>
-          <label class="block text-sm font-medium text-fg mb-1">
-            {{ t('navigation_logs.fields.windForceBeaufort') }}
-          </label>
-          <input
-            v-model="form.windForceBeaufort"
-            type="number"
-            name="windForceBeaufort"
-            step="1"
-            min="0"
-            max="12"
-            class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
-          />
-          <p v-if="form.errors.windForceBeaufort" class="mt-1 text-xs text-danger">
-            {{ form.errors.windForceBeaufort }}
-          </p>
-        </div>
+        <BaseInput
+          :model-value="form.windForceBeaufort != null ? String(form.windForceBeaufort) : ''"
+          type="number"
+          id="windForceBeaufort"
+          name="windForceBeaufort"
+          step="1"
+          min="0"
+          max="12"
+          :label="t('navigation_logs.fields.windForceBeaufort')"
+          :error="form.errors.windForceBeaufort"
+          @update:model-value="form.windForceBeaufort = $event !== '' ? Number($event) : null"
+        />
 
         <!-- Sea state -->
         <div>
@@ -209,23 +175,17 @@ function handleSubmit() {
           </select>
         </div>
 
-        <!-- Crew count -->
-        <div>
-          <label class="block text-sm font-medium text-fg mb-1">
-            {{ t('navigation_logs.fields.crewCount') }}
-          </label>
-          <input
-            v-model="form.crewCount"
-            type="number"
-            name="crewCount"
-            step="1"
-            min="0"
-            class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
-          />
-          <p v-if="form.errors.crewCount" class="mt-1 text-xs text-danger">
-            {{ form.errors.crewCount }}
-          </p>
-        </div>
+        <BaseInput
+          :model-value="form.crewCount != null ? String(form.crewCount) : ''"
+          type="number"
+          id="crewCount"
+          name="crewCount"
+          step="1"
+          min="0"
+          :label="t('navigation_logs.fields.crewCount')"
+          :error="form.errors.crewCount"
+          @update:model-value="form.crewCount = $event !== '' ? Number($event) : null"
+        />
 
         <!-- Notes -->
         <div class="sm:col-span-2">

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
+import BaseInput from '~/components/base/BaseInput.vue'
 import { useNetworkStatus } from '~/composables/use_network_status'
 import { useOfflineQueue } from '~/composables/use_offline_queue'
 import { useT } from '~/composables/use_t'
@@ -22,9 +23,9 @@ const { enqueue } = useOfflineQueue()
 const SEA_STATES = ['calm', 'slight', 'moderate', 'rough', 'very_rough'] as const
 
 const form = useForm({
-  windForceBeaufort: props.log.windForceBeaufort ?? ('' as string | number),
+  windForceBeaufort: props.log.windForceBeaufort,
   seaState: props.log.seaState ?? '',
-  crewCount: props.log.crewCount ?? ('' as string | number),
+  crewCount: props.log.crewCount,
   notes: props.log.notes ?? '',
 })
 
@@ -56,24 +57,18 @@ function handleSubmit() {
 
     <form @submit.prevent="handleSubmit">
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <!-- Wind force -->
-        <div>
-          <label class="block text-sm font-medium text-fg mb-1">
-            {{ t('navigation_logs.fields.windForceBeaufort') }}
-          </label>
-          <input
-            v-model="form.windForceBeaufort"
-            type="number"
-            name="windForceBeaufort"
-            step="1"
-            min="0"
-            max="12"
-            class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
-          />
-          <p v-if="form.errors.windForceBeaufort" class="mt-1 text-xs text-danger">
-            {{ form.errors.windForceBeaufort }}
-          </p>
-        </div>
+        <BaseInput
+          :model-value="form.windForceBeaufort != null ? String(form.windForceBeaufort) : ''"
+          type="number"
+          id="windForceBeaufort"
+          name="windForceBeaufort"
+          step="1"
+          min="0"
+          max="12"
+          :label="t('navigation_logs.fields.windForceBeaufort')"
+          :error="form.errors.windForceBeaufort"
+          @update:model-value="form.windForceBeaufort = $event !== '' ? Number($event) : null"
+        />
 
         <!-- Sea state -->
         <div>
@@ -92,23 +87,17 @@ function handleSubmit() {
           </select>
         </div>
 
-        <!-- Crew count -->
-        <div>
-          <label class="block text-sm font-medium text-fg mb-1">
-            {{ t('navigation_logs.fields.crewCount') }}
-          </label>
-          <input
-            v-model="form.crewCount"
-            type="number"
-            name="crewCount"
-            step="1"
-            min="0"
-            class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
-          />
-          <p v-if="form.errors.crewCount" class="mt-1 text-xs text-danger">
-            {{ form.errors.crewCount }}
-          </p>
-        </div>
+        <BaseInput
+          :model-value="form.crewCount != null ? String(form.crewCount) : ''"
+          type="number"
+          id="crewCount"
+          name="crewCount"
+          step="1"
+          min="0"
+          :label="t('navigation_logs.fields.crewCount')"
+          :error="form.errors.crewCount"
+          @update:model-value="form.crewCount = $event !== '' ? Number($event) : null"
+        />
 
         <!-- Notes -->
         <div class="sm:col-span-2">

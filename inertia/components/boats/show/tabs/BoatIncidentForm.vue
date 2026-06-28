@@ -2,8 +2,14 @@
 import { ref, watch } from 'vue'
 import { Form } from '@adonisjs/inertia/vue'
 import BaseButton from '~/components/base/BaseButton.vue'
+import BaseInput from '~/components/base/BaseInput.vue'
 import { useT } from '~/composables/use_t'
-import type { BoatIncidentRow, BoatShowDetail, IncidentStatus, IncidentType } from '~/types/boat_show'
+import type {
+  BoatIncidentRow,
+  BoatShowDetail,
+  IncidentStatus,
+  IncidentType,
+} from '~/types/boat_show'
 
 const props = defineProps<{
   boat: BoatShowDetail
@@ -18,12 +24,20 @@ const { t } = useT()
 
 const formType = ref<IncidentType>(props.editingIncident?.type ?? 'other')
 const formStatus = ref<IncidentStatus>(props.editingIncident?.status ?? 'open')
+const occurredAt = ref(
+  props.editingIncident ? toLocalDatetime(props.editingIncident.occurredAt) : ''
+)
+const location = ref(props.editingIncident?.location ?? '')
+const insuranceClaimRef = ref(props.editingIncident?.insuranceClaimRef ?? '')
 
 watch(
   () => props.editingIncident,
   (incident) => {
     formType.value = incident?.type ?? 'other'
     formStatus.value = incident?.status ?? 'open'
+    occurredAt.value = incident ? toLocalDatetime(incident.occurredAt) : ''
+    location.value = incident?.location ?? ''
+    insuranceClaimRef.value = incident?.insuranceClaimRef ?? ''
   }
 )
 
@@ -59,24 +73,20 @@ function toLocalDatetime(utcIso: string): string {
           : `/boats/${boat.id}/incidents`,
         method: editingIncident ? 'put' : 'post',
       }"
-      #default="{ processing }"
+      #default="{ processing, errors }"
     >
       <input type="hidden" name="tzOffsetMinutes" :value="String(new Date().getTimezoneOffset())" />
 
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <!-- Date -->
-        <div>
-          <label class="block text-sm font-medium text-fg mb-1">
-            {{ t('incidents.fields.occurredAt') }}
-          </label>
-          <input
-            type="datetime-local"
-            name="occurredAt"
-            :value="editingIncident ? toLocalDatetime(editingIncident.occurredAt) : ''"
-            required
-            class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
-          />
-        </div>
+        <BaseInput
+          v-model="occurredAt"
+          type="datetime-local"
+          id="occurredAt"
+          name="occurredAt"
+          :label="t('incidents.fields.occurredAt')"
+          :error="errors.occurredAt"
+          required
+        />
 
         <!-- Type -->
         <div>
@@ -111,18 +121,15 @@ function toLocalDatetime(utcIso: string): string {
           </select>
         </div>
 
-        <!-- Location -->
-        <div :class="editingIncident ? '' : 'sm:col-span-2'">
-          <label class="block text-sm font-medium text-fg mb-1">
-            {{ t('incidents.fields.location') }}
-          </label>
-          <input
-            type="text"
-            name="location"
-            :value="editingIncident?.location ?? ''"
-            class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
-          />
-        </div>
+        <BaseInput
+          v-model="location"
+          type="text"
+          id="location"
+          name="location"
+          :class="editingIncident ? '' : 'sm:col-span-2'"
+          :label="t('incidents.fields.location')"
+          :error="errors.location"
+        />
 
         <!-- Description -->
         <div class="sm:col-span-2">
@@ -152,18 +159,15 @@ function toLocalDatetime(utcIso: string): string {
           </label>
         </div>
 
-        <!-- Insurance ref -->
-        <div class="sm:col-span-2">
-          <label class="block text-sm font-medium text-fg mb-1">
-            {{ t('incidents.fields.insuranceClaimRef') }}
-          </label>
-          <input
-            type="text"
-            name="insuranceClaimRef"
-            :value="editingIncident?.insuranceClaimRef ?? ''"
-            class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
-          />
-        </div>
+        <BaseInput
+          v-model="insuranceClaimRef"
+          type="text"
+          id="insuranceClaimRef"
+          name="insuranceClaimRef"
+          class="sm:col-span-2"
+          :label="t('incidents.fields.insuranceClaimRef')"
+          :error="errors.insuranceClaimRef"
+        />
       </div>
 
       <div class="mt-4 flex items-center justify-end gap-3">
