@@ -66,7 +66,7 @@ function handleSubmit() {
         />
 
         <BaseInput
-          :model-value="String(form.quantityLiters)"
+          :model-value="form.quantityLiters != null ? String(form.quantityLiters) : ''"
           type="number"
           id="quantityLiters"
           name="quantityLiters"
@@ -75,11 +75,11 @@ function handleSubmit() {
           :label="t('fuel_logs.fields.quantityLiters')"
           :error="form.errors.quantityLiters"
           required
-          @update:model-value="form.quantityLiters = $event"
+          @update:model-value="form.quantityLiters = Number($event) || 0"
         />
 
         <BaseInput
-          :model-value="String(form.pricePerLiter)"
+          :model-value="form.pricePerLiter != null ? String(form.pricePerLiter) : ''"
           type="number"
           id="pricePerLiter"
           name="pricePerLiter"
@@ -87,11 +87,11 @@ function handleSubmit() {
           min="0"
           :label="t('fuel_logs.fields.pricePerLiter')"
           :error="form.errors.pricePerLiter"
-          @update:model-value="form.pricePerLiter = $event"
+          @update:model-value="form.pricePerLiter = Number($event) || 0"
         />
 
         <BaseInput
-          :model-value="String(form.totalCost)"
+          :model-value="form.totalCost != null ? String(form.totalCost) : ''"
           type="number"
           id="totalCost"
           name="totalCost"
@@ -99,7 +99,7 @@ function handleSubmit() {
           min="0"
           :label="t('fuel_logs.fields.totalCost')"
           :error="form.errors.totalCost"
-          @update:model-value="form.totalCost = $event"
+          @update:model-value="form.totalCost = Number($event) || 0"
         />
 
         <!-- Engine -->
@@ -124,7 +124,7 @@ function handleSubmit() {
         </div>
 
         <BaseInput
-          :model-value="String(form.engineHoursAtFueling)"
+          :model-value="form.engineHoursAtFueling != null ? String(form.engineHoursAtFueling) : ''"
           type="number"
           id="engineHoursAtFueling"
           name="engineHoursAtFueling"
@@ -132,7 +132,7 @@ function handleSubmit() {
           min="0"
           :label="t('fuel_logs.fields.engineHoursAtFueling')"
           :error="form.errors.engineHoursAtFueling"
-          @update:model-value="form.engineHoursAtFueling = $event"
+          @update:model-value="form.engineHoursAtFueling = Number($event) || 0"
         />
 
         <BaseInput
@@ -140,6 +140,7 @@ function handleSubmit() {
           type="text"
           id="supplier"
           name="supplier"
+          maxlength="500"
           :class="boat.engines.length > 0 ? '' : 'sm:col-span-2'"
           :label="t('fuel_logs.fields.supplier')"
           :error="form.errors.supplier"

@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { computed, useSlots } from 'vue'
+import { computed, useAttrs, useSlots } from 'vue'
 import BaseField from '~/components/base/BaseField.vue'
 import { getFieldError, nameToErrorKey, type FormErrors } from '~/utils/form_errors'
 import { inputClass } from '~/utils/form_styles'
 
 type InputMode = 'none' | 'text' | 'tel' | 'url' | 'email' | 'numeric' | 'decimal' | 'search'
+
+defineOptions({ inheritAttrs: false })
 
 const props = withDefaults(
   defineProps<{
@@ -40,6 +42,7 @@ defineEmits<{
   (e: 'update:modelValue', value: string): void
 }>()
 
+const attrs = useAttrs()
 const slots = useSlots()
 const hasTrailing = computed(() => Boolean(slots.trailing))
 const inputPaddingClass = computed(() => (hasTrailing.value ? 'pr-24' : ''))
@@ -49,15 +52,32 @@ const resolvedError = computed(() => {
   const key = props.errorKey ?? nameToErrorKey(props.name ?? '')
   return getFieldError(props.errors, key)
 })
+
+// Pass-through attrs: class/style go to the wrapper, everything else to the inner <input>.
+const wrapperClass = computed(() => attrs.class)
+const inputAttrs = computed(() => {
+  const { class: _c, style: _s, ...rest } = attrs
+  return rest
+})
 </script>
 
 <template>
-  <BaseField :label="label" :hint="hint" :error="resolvedError" :html-for="id">
+  <BaseField
+    :label="label"
+    :hint="hint"
+    :error="resolvedError"
+    :html-for="id"
+    :class="wrapperClass"
+  >
     <template v-if="$slots['label-right']" #label-right>
       <slot name="label-right" />
     </template>
     <div class="relative">
       <input
+        v-bind="{
+          ...(modelValue !== undefined ? { value: modelValue } : {}),
+          ...inputAttrs,
+        }"
         :id="id"
         :name="name"
         :type="props.type"
@@ -71,7 +91,6 @@ const resolvedError = computed(() => {
         :autocomplete="autocomplete"
         :placeholder="placeholder"
         :disabled="disabled"
-        v-bind="modelValue !== undefined ? { value: modelValue } : {}"
         :data-invalid="resolvedError ? 'true' : undefined"
         :aria-invalid="resolvedError ? 'true' : undefined"
         :class="[

@@ -101,6 +101,7 @@ function handleSubmit() {
           type="text"
           id="arrivalPortName"
           name="arrivalPortName"
+          maxlength="255"
           :label="
             portOptions.length > 0
               ? t('navigation_logs.fields.arrivalPortName')
@@ -109,7 +110,7 @@ function handleSubmit() {
         />
 
         <BaseInput
-          :model-value="String(form.distanceNm)"
+          :model-value="form.distanceNm != null ? String(form.distanceNm) : ''"
           type="number"
           id="distanceNm"
           name="distanceNm"
@@ -117,11 +118,11 @@ function handleSubmit() {
           min="0"
           :label="t('navigation_logs.fields.distanceNm')"
           :error="form.errors.distanceNm"
-          @update:model-value="form.distanceNm = $event"
+          @update:model-value="form.distanceNm = Number($event) || 0"
         />
 
         <BaseInput
-          :model-value="String(form.engineHoursEnd)"
+          :model-value="form.engineHoursEnd != null ? String(form.engineHoursEnd) : ''"
           type="number"
           id="engineHoursEnd"
           name="engineHoursEnd"
@@ -129,11 +130,11 @@ function handleSubmit() {
           min="0"
           :label="t('navigation_logs.fields.engineHoursEnd')"
           :error="form.errors.engineHoursEnd"
-          @update:model-value="form.engineHoursEnd = $event"
+          @update:model-value="form.engineHoursEnd = Number($event) || 0"
         />
 
         <BaseInput
-          :model-value="String(form.fuelConsumedLiters)"
+          :model-value="form.fuelConsumedLiters != null ? String(form.fuelConsumedLiters) : ''"
           type="number"
           id="fuelConsumedLiters"
           name="fuelConsumedLiters"
@@ -141,11 +142,11 @@ function handleSubmit() {
           min="0"
           :label="t('navigation_logs.fields.fuelConsumedLiters')"
           :error="form.errors.fuelConsumedLiters"
-          @update:model-value="form.fuelConsumedLiters = $event"
+          @update:model-value="form.fuelConsumedLiters = Number($event) || 0"
         />
 
         <BaseInput
-          :model-value="String(form.windForceBeaufort)"
+          :model-value="form.windForceBeaufort != null ? String(form.windForceBeaufort) : ''"
           type="number"
           id="windForceBeaufort"
           name="windForceBeaufort"
@@ -154,7 +155,7 @@ function handleSubmit() {
           max="12"
           :label="t('navigation_logs.fields.windForceBeaufort')"
           :error="form.errors.windForceBeaufort"
-          @update:model-value="form.windForceBeaufort = $event"
+          @update:model-value="form.windForceBeaufort = Number($event) || 0"
         />
 
         <!-- Sea state -->
@@ -175,7 +176,7 @@ function handleSubmit() {
         </div>
 
         <BaseInput
-          :model-value="String(form.crewCount)"
+          :model-value="form.crewCount != null ? String(form.crewCount) : ''"
           type="number"
           id="crewCount"
           name="crewCount"
@@ -183,7 +184,7 @@ function handleSubmit() {
           min="0"
           :label="t('navigation_logs.fields.crewCount')"
           :error="form.errors.crewCount"
-          @update:model-value="form.crewCount = $event"
+          @update:model-value="form.crewCount = Number($event) || 0"
         />
 
         <!-- Notes -->

@@ -58,7 +58,7 @@ function handleSubmit() {
     <form @submit.prevent="handleSubmit">
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <BaseInput
-          :model-value="String(form.windForceBeaufort)"
+          :model-value="form.windForceBeaufort != null ? String(form.windForceBeaufort) : ''"
           type="number"
           id="windForceBeaufort"
           name="windForceBeaufort"
@@ -67,7 +67,7 @@ function handleSubmit() {
           max="12"
           :label="t('navigation_logs.fields.windForceBeaufort')"
           :error="form.errors.windForceBeaufort"
-          @update:model-value="form.windForceBeaufort = $event"
+          @update:model-value="form.windForceBeaufort = Number($event) || 0"
         />
 
         <!-- Sea state -->
@@ -88,7 +88,7 @@ function handleSubmit() {
         </div>
 
         <BaseInput
-          :model-value="String(form.crewCount)"
+          :model-value="form.crewCount != null ? String(form.crewCount) : ''"
           type="number"
           id="crewCount"
           name="crewCount"
@@ -96,7 +96,7 @@ function handleSubmit() {
           min="0"
           :label="t('navigation_logs.fields.crewCount')"
           :error="form.errors.crewCount"
-          @update:model-value="form.crewCount = $event"
+          @update:model-value="form.crewCount = Number($event) || 0"
         />
 
         <!-- Notes -->

@@ -95,6 +95,7 @@ function handleSubmit() {
           type="text"
           id="departurePortName"
           name="departurePortName"
+          maxlength="255"
           :label="
             portOptions.length > 0
               ? t('navigation_logs.fields.departurePortName')
@@ -103,7 +104,7 @@ function handleSubmit() {
         />
 
         <BaseInput
-          :model-value="String(form.engineHoursStart)"
+          :model-value="form.engineHoursStart != null ? String(form.engineHoursStart) : ''"
           type="number"
           id="engineHoursStart"
           name="engineHoursStart"
@@ -111,11 +112,11 @@ function handleSubmit() {
           min="0"
           :label="t('navigation_logs.fields.engineHoursStart')"
           :error="form.errors.engineHoursStart"
-          @update:model-value="form.engineHoursStart = $event"
+          @update:model-value="form.engineHoursStart = Number($event) || 0"
         />
 
         <BaseInput
-          :model-value="String(form.windForceBeaufort)"
+          :model-value="form.windForceBeaufort != null ? String(form.windForceBeaufort) : ''"
           type="number"
           id="windForceBeaufort"
           name="windForceBeaufort"
@@ -124,7 +125,7 @@ function handleSubmit() {
           max="12"
           :label="t('navigation_logs.fields.windForceBeaufort')"
           :error="form.errors.windForceBeaufort"
-          @update:model-value="form.windForceBeaufort = $event"
+          @update:model-value="form.windForceBeaufort = Number($event) || 0"
         />
 
         <!-- Sea state -->
@@ -145,7 +146,7 @@ function handleSubmit() {
         </div>
 
         <BaseInput
-          :model-value="String(form.crewCount)"
+          :model-value="form.crewCount != null ? String(form.crewCount) : ''"
           type="number"
           id="crewCount"
           name="crewCount"
@@ -153,7 +154,7 @@ function handleSubmit() {
           min="0"
           :label="t('navigation_logs.fields.crewCount')"
           :error="form.errors.crewCount"
-          @update:model-value="form.crewCount = $event"
+          @update:model-value="form.crewCount = Number($event) || 0"
         />
 
         <!-- Notes -->
