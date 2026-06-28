@@ -13,6 +13,23 @@ test('emits update:modelValue on input', async () => {
   expect(w.emitted('update:modelValue')?.[0]).toEqual(['Hi'])
 })
 
+test('forwards maxlength to textarea', () => {
+  const w = mount(BaseTextarea, { props: { id: 't', label: 'N', maxlength: 500 } })
+  expect(w.find('textarea').attributes('maxlength')).toBe('500')
+})
+
+test('forwards required to textarea', () => {
+  const w = mount(BaseTextarea, { props: { id: 't', label: 'N', required: true } })
+  expect(w.find('textarea').attributes('required')).toBeDefined()
+})
+
+test('compact applies bg-surface and tight padding', () => {
+  const w = mount(BaseTextarea, { props: { id: 't', label: 'N', compact: true } })
+  const classes = w.find('textarea').classes()
+  expect(classes).toContain('bg-surface')
+  expect(classes).toContain('px-2')
+})
+
 test('renders error from errors object using name', () => {
   const w = mount(BaseTextarea, {
     props: {

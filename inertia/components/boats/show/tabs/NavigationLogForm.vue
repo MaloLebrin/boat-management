@@ -2,6 +2,7 @@
 import { useForm } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
+import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import { useNetworkStatus } from '~/composables/use_network_status'
 import { useOfflineQueue } from '~/composables/use_offline_queue'
 import { useT } from '~/composables/use_t'
@@ -157,20 +158,16 @@ function handleSubmit() {
           @update:model-value="form.crewCount = $event !== '' ? Number($event) : null"
         />
 
-        <!-- Notes -->
-        <div class="sm:col-span-2">
-          <label class="block text-sm font-medium text-fg mb-1">
-            {{ t('navigation_logs.fields.notes') }}
-          </label>
-          <textarea
-            v-model="form.notes"
-            name="notes"
-            rows="2"
-            maxlength="5000"
-            class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand resize-none"
-          />
-          <p v-if="form.errors.notes" class="mt-1 text-xs text-danger">{{ form.errors.notes }}</p>
-        </div>
+        <BaseTextarea
+          v-model="form.notes"
+          name="notes"
+          :label="t('navigation_logs.fields.notes')"
+          :error="form.errors.notes"
+          :rows="2"
+          :maxlength="5000"
+          compact
+          class="sm:col-span-2"
+        />
       </div>
 
       <div class="mt-4 flex items-center justify-end gap-3">

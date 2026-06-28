@@ -3,6 +3,7 @@ import { ref, watch } from 'vue'
 import { Form } from '@adonisjs/inertia/vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
+import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import { useT } from '~/composables/use_t'
 import type {
   BoatIncidentRow,
@@ -131,19 +132,15 @@ function toLocalDatetime(utcIso: string): string {
           :error="errors.location"
         />
 
-        <!-- Description -->
-        <div class="sm:col-span-2">
-          <label class="block text-sm font-medium text-fg mb-1">
-            {{ t('incidents.fields.description') }}
-          </label>
-          <textarea
-            name="description"
-            :value="editingIncident?.description ?? ''"
-            rows="3"
-            required
-            class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand resize-none"
-          />
-        </div>
+        <BaseTextarea
+          name="description"
+          :model-value="editingIncident?.description ?? ''"
+          :label="t('incidents.fields.description')"
+          :errors="errors"
+          :rows="3"
+          required
+          class="sm:col-span-2"
+        />
 
         <!-- Insurance -->
         <div class="sm:col-span-2 flex items-center gap-3">
