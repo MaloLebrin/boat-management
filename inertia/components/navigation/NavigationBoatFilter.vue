@@ -23,21 +23,24 @@ watch(
   }
 )
 
-watch(currentBoatId, (val) => {
+function onSelectChange(val: string | number | '') {
+  currentBoatId.value = String(val)
   router.get(props.basePath, val ? { boatId: val } : {}, { preserveScroll: true, replace: true })
-})
+}
 </script>
 
 <template>
   <div class="flex items-center gap-3">
-    <label class="text-sm text-fg-muted shrink-0">
+    <label for="boat-filter" class="text-sm text-fg-muted shrink-0">
       {{ t('navigation.filter.filterByBoat') }}
     </label>
     <BaseSelect
-      v-model="currentBoatId"
+      id="boat-filter"
+      :model-value="currentBoatId"
       :options="boatOptions"
       allow-empty
       :placeholder="t('navigation.filter.allBoats')"
+      @update:model-value="onSelectChange"
     />
   </div>
 </template>

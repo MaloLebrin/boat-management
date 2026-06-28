@@ -20,7 +20,7 @@ const props = defineProps<{
 }>()
 
 const selectedBoatId = ref<string | ''>('')
-const selectedType = ref<string>('maintenance')
+const selectedType = ref<'maintenance'>('maintenance')
 const fileInput = ref<HTMLInputElement | null>(null)
 const isSubmitting = ref(false)
 const showHelpModal = ref(false)
