@@ -4,6 +4,7 @@ import { router } from '@inertiajs/vue3'
 import BaseBreadcrumb from '~/components/base/BaseBreadcrumb.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
+import BaseSelect from '~/components/base/BaseSelect.vue'
 import BudgetBarChart from '~/components/boats/budget/BudgetBarChart.vue'
 import BudgetCategoryCard from '~/components/boats/budget/BudgetCategoryCard.vue'
 import BudgetPortStayForm from '~/components/boats/budget/BudgetPortStayForm.vue'
@@ -28,7 +29,12 @@ const { formatCurrency } = useCurrencyFormat()
 
 const selectedYear = ref(props.year)
 const currentYear = new Date().getFullYear()
-const yearOptions = computed(() => Array.from({ length: 10 }, (_, i) => currentYear - i))
+const yearOptions = computed(() =>
+  Array.from({ length: 10 }, (_, i) => currentYear - i).map((y) => ({
+    value: String(y),
+    label: String(y),
+  }))
+)
 
 function changeYear(y: number) {
   selectedYear.value = y
@@ -100,14 +106,12 @@ const categories = computed(() => [
           <label for="year-select" class="text-sm font-medium text-fg-muted">
             {{ t('budget.yearSelector') }}
           </label>
-          <select
+          <BaseSelect
             id="year-select"
-            :value="selectedYear"
-            class="rounded-(--radius-input) border border-border bg-surface px-3 py-1.5 text-sm text-fg"
-            @change="changeYear(Number(($event.target as HTMLSelectElement).value))"
-          >
-            <option v-for="y in yearOptions" :key="y" :value="y">{{ y }}</option>
-          </select>
+            :model-value="String(selectedYear)"
+            :options="yearOptions"
+            @update:model-value="changeYear(Number($event))"
+          />
         </div>
         <BaseButton
           variant="secondary"

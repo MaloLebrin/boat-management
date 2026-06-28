@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { router } from '@inertiajs/vue3'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
+import BaseSelect from '~/components/base/BaseSelect.vue'
 import CsvHelpModal from '~/components/settings/CsvHelpModal.vue'
 import { useT } from '~/composables/use_t'
 import { routes } from '~/utils/routes'
@@ -18,8 +19,8 @@ const props = defineProps<{
   hasPendingImport: boolean
 }>()
 
-const selectedBoatId = ref<number | ''>('')
-const selectedType = ref<'maintenance'>('maintenance')
+const selectedBoatId = ref<string | ''>('')
+const selectedType = ref<string>('maintenance')
 const fileInput = ref<HTMLInputElement | null>(null)
 const isSubmitting = ref(false)
 const showHelpModal = ref(false)
@@ -35,6 +36,12 @@ function getExportHref(key: string) {
 }
 
 const templateHeaders = MAINTENANCE_CSV_HEADERS.join(';')
+
+const boatOptions = computed(() => props.boats.map((b) => ({ value: String(b.id), label: b.name })))
+
+const typeOptions = computed(() => [
+  { value: 'maintenance', label: t('settings.import.types.maintenance') },
+])
 
 function handlePreview() {
   if (!selectedBoatId.value || !fileInput.value?.files?.[0]) return
@@ -85,18 +92,13 @@ function handleCancel() {
     <BaseCard>
       <BaseHeading level="3" class="mb-4">{{ t('settings.import.exportSection') }}</BaseHeading>
       <div class="mb-4">
-        <label class="mb-1 block text-sm font-medium text-fg">
-          {{ t('settings.import.exportBoatLabel') }}
-        </label>
-        <select
+        <BaseSelect
           v-model="selectedBoatId"
-          class="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
-        >
-          <option value="">{{ t('settings.import.boatPlaceholder') }}</option>
-          <option v-for="boat in boats" :key="boat.id" :value="boat.id">
-            {{ boat.name }}
-          </option>
-        </select>
+          :label="t('settings.import.exportBoatLabel')"
+          :options="boatOptions"
+          allow-empty
+          :placeholder="t('settings.import.boatPlaceholder')"
+        />
         <p v-if="boats.length === 0" class="mt-2 text-sm text-fg-muted">
           {{ t('settings.import.noBoats') }}
         </p>
@@ -125,32 +127,19 @@ function handleCancel() {
       <BaseHeading level="3" class="mb-4">{{ t('settings.import.importSection') }}</BaseHeading>
 
       <div v-if="!preview" class="space-y-4">
-        <div>
-          <label class="mb-1 block text-sm font-medium text-fg">
-            {{ t('settings.import.boatLabel') }}
-          </label>
-          <select
-            v-model="selectedBoatId"
-            class="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
-          >
-            <option value="">{{ t('settings.import.boatPlaceholder') }}</option>
-            <option v-for="boat in boats" :key="boat.id" :value="boat.id">
-              {{ boat.name }}
-            </option>
-          </select>
-        </div>
+        <BaseSelect
+          v-model="selectedBoatId"
+          :label="t('settings.import.boatLabel')"
+          :options="boatOptions"
+          allow-empty
+          :placeholder="t('settings.import.boatPlaceholder')"
+        />
 
-        <div>
-          <label class="mb-1 block text-sm font-medium text-fg">
-            {{ t('settings.import.typeLabel') }}
-          </label>
-          <select
-            v-model="selectedType"
-            class="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
-          >
-            <option value="maintenance">{{ t('settings.import.types.maintenance') }}</option>
-          </select>
-        </div>
+        <BaseSelect
+          v-model="selectedType"
+          :label="t('settings.import.typeLabel')"
+          :options="typeOptions"
+        />
 
         <div>
           <label class="mb-1 block text-sm font-medium text-fg">

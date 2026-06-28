@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { Form } from '@adonisjs/inertia/vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
+import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import { useT } from '~/composables/use_t'
 import type {
@@ -55,6 +56,14 @@ const INCIDENT_TYPES: IncidentType[] = [
 
 const INCIDENT_STATUSES: IncidentStatus[] = ['open', 'in_progress', 'closed']
 
+const incidentTypeOptions = computed(() =>
+  INCIDENT_TYPES.map((type) => ({ value: type, label: t(`incidents.type.${type}`) }))
+)
+
+const incidentStatusOptions = computed(() =>
+  INCIDENT_STATUSES.map((s) => ({ value: s, label: t(`incidents.status.${s}`) }))
+)
+
 function toLocalDatetime(utcIso: string): string {
   const d = new Date(utcIso)
   return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16)
@@ -90,37 +99,22 @@ function toLocalDatetime(utcIso: string): string {
         />
 
         <!-- Type -->
-        <div>
-          <label class="block text-sm font-medium text-fg mb-1">
-            {{ t('incidents.fields.type') }}
-          </label>
-          <select
-            v-model="formType"
-            name="type"
-            required
-            class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
-          >
-            <option v-for="incType in INCIDENT_TYPES" :key="incType" :value="incType">
-              {{ t(`incidents.type.${incType}`) }}
-            </option>
-          </select>
-        </div>
+        <BaseSelect
+          v-model="formType"
+          name="type"
+          :label="t('incidents.fields.type')"
+          :options="incidentTypeOptions"
+          :error="errors.type"
+        />
 
         <!-- Status (edit only) -->
-        <div v-if="editingIncident">
-          <label class="block text-sm font-medium text-fg mb-1">
-            {{ t('incidents.fields.status') }}
-          </label>
-          <select
-            v-model="formStatus"
-            name="status"
-            class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
-          >
-            <option v-for="s in INCIDENT_STATUSES" :key="s" :value="s">
-              {{ t(`incidents.status.${s}`) }}
-            </option>
-          </select>
-        </div>
+        <BaseSelect
+          v-if="editingIncident"
+          v-model="formStatus"
+          name="status"
+          :label="t('incidents.fields.status')"
+          :options="incidentStatusOptions"
+        />
 
         <BaseInput
           v-model="location"

@@ -153,14 +153,11 @@ function getInitials(member: OrganizationMemberData): string {
             </td>
             <td class="px-6 py-4">
               <template v-if="canManageMembers">
-                <select
-                  :value="member.role"
-                  class="rounded-md border border-border bg-surface px-2 py-1 text-sm text-fg focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
-                  @change="changeRole(member.id, ($event.target as HTMLSelectElement).value)"
-                >
-                  <option value="admin">{{ t('organization.members.roles.admin') }}</option>
-                  <option value="member">{{ t('organization.members.roles.member') }}</option>
-                </select>
+                <BaseSelect
+                  :model-value="member.role"
+                  :options="roleOptions"
+                  @update:model-value="changeRole(member.id, String($event))"
+                />
               </template>
               <template v-else>
                 <BaseBadge :variant="member.role === 'admin' ? 'info' : 'neutral'">
