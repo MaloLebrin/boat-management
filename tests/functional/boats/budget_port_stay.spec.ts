@@ -2,6 +2,7 @@ import { test } from '@japa/runner'
 import testUtils from '@adonisjs/core/services/test_utils'
 import { DateTime } from 'luxon'
 import { BoatFactory } from '#database/factories/boat_factory'
+import { BoatPortStayFactory } from '#database/factories/boat_port_stay_factory'
 import { UserFactory } from '#database/factories/user_factory'
 import { createAdminUser } from '#tests/functional/helpers'
 import BoatPortStay from '#models/boat_port_stay'
@@ -166,5 +167,62 @@ test.group('Budget Port Stay (functional)', (group) => {
 
     const existing = await BoatPortStay.find(stay.id)
     assert.isNotNull(existing)
+  })
+
+  test('PATCH /boats/:id/port-stays/:stayId updates the port stay', async ({ client, assert }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const stay = await BoatPortStayFactory.merge({ boatId: boat.id }).create()
+
+    const response = await client
+      .patch(`/boats/${boat.id}/port-stays/${stay.id}`)
+      .form({
+        portName: 'Port de Monaco',
+        startedAt: '2024-09-01',
+        cost: '750.00',
+      })
+      .loginAs(user)
+      .redirects(0)
+
+    response.assertStatus(302)
+
+    const updated = await BoatPortStay.findOrFail(stay.id)
+    assert.equal(updated.portName, 'Port de Monaco')
+    assert.equal(updated.cost, '750.00')
+  })
+
+  test('PATCH /boats/:id/port-stays/:stayId redirects to /login when unauthenticated', async ({
+    client,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const stay = await BoatPortStayFactory.merge({ boatId: boat.id }).create()
+
+    const response = await client
+      .patch(`/boats/${boat.id}/port-stays/${stay.id}`)
+      .form({ portName: 'X', startedAt: '2024-01-01' })
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertHeader('location', '/login')
+  })
+
+  test('PATCH /boats/:id/port-stays/:stayId redirects when boat belongs to another org', async ({
+    client,
+    assert,
+  }) => {
+    const owner = await createAdminUser()
+    const other = await UserFactory.with('organization').create()
+    const boat = await BoatFactory.merge({ organizationId: owner.organizationId! }).create()
+    const stay = await BoatPortStayFactory.merge({ boatId: boat.id }).create()
+    const originalPortName = stay.portName
+
+    await client
+      .patch(`/boats/${boat.id}/port-stays/${stay.id}`)
+      .form({ portName: 'Hacked', startedAt: '2024-01-01' })
+      .loginAs(other)
+
+    const unchanged = await BoatPortStay.findOrFail(stay.id)
+    assert.equal(unchanged.portName, originalPortName)
   })
 })

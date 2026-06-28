@@ -24,7 +24,6 @@
     "noComparison": "Pas de données N-1",
     "newThisYear": "Nouveau cette année"
   },
-  "portUnavailable": "Données port à venir",
   "categoryHelp": {
     "maintenance": "Somme des prix de pièces (prix unitaire × quantité) sur les événements de maintenance",
     "fuel": "Somme du champ « Coût total » sur les pleins de carburant",
@@ -43,6 +42,8 @@
     "notes": "Notes",
     "noStays": "Aucun séjour enregistré",
     "submit": "Ajouter",
+    "editTitle": "Modifier le séjour",
+    "updateSubmit": "Mettre à jour",
     "deleteConfirm": "Supprimer ce séjour ?"
   },
   "entries": {
@@ -55,6 +56,8 @@
     "description": "Description",
     "noEntries": "Aucune depense libre enregistree",
     "submit": "Ajouter",
+    "editTitle": "Modifier la depense",
+    "updateSubmit": "Mettre à jour",
     "deleteConfirm": "Supprimer cette depense ?",
     "categories": {
       "maintenance": "Maintenance",

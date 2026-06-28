@@ -2,7 +2,7 @@ import { inject } from '@adonisjs/core'
 import type { DateTime } from 'luxon'
 import BoatBudgetEntry from '#models/boat_budget_entry'
 import type Boat from '#models/boat'
-import type { BudgetEntryCategory } from '#validators/budget_entry_validator'
+import type { BudgetEntryCategory } from '#shared/types/budget'
 
 @inject()
 export default class BoatBudgetEntryService {
@@ -32,6 +32,29 @@ export default class BoatBudgetEntryService {
       category: data.category ?? 'other',
       description: data.description ?? null,
     })
+  }
+
+  async update(
+    boat: Boat,
+    entryId: number,
+    data: {
+      amount: number
+      date: DateTime
+      label: string
+      category?: BudgetEntryCategory | null
+      description?: string | null
+    }
+  ): Promise<void> {
+    await BoatBudgetEntry.query()
+      .where('id', entryId)
+      .where('boat_id', boat.id)
+      .update({
+        amount: String(data.amount),
+        date: data.date.toSQLDate()!,
+        label: data.label,
+        category: data.category ?? 'other',
+        description: data.description ?? null,
+      })
   }
 
   async delete(boat: Boat, entryId: number): Promise<void> {

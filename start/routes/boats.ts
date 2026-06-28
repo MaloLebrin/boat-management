@@ -35,11 +35,17 @@ router
       .post('boats/:id/port-stays', [BoatPortStayController, 'store'])
       .as('boats.portStays.store')
     router
+      .patch('boats/:id/port-stays/:stayId', [BoatPortStayController, 'update'])
+      .as('boats.portStays.update')
+    router
       .delete('boats/:id/port-stays/:stayId', [BoatPortStayController, 'destroy'])
       .as('boats.portStays.destroy')
     router
       .post('boats/:id/budget/entries', [BoatBudgetEntryController, 'store'])
       .as('boats.budget.entries.store')
+    router
+      .patch('boats/:id/budget/entries/:entryId', [BoatBudgetEntryController, 'update'])
+      .as('boats.budget.entries.update')
     router
       .delete('boats/:id/budget/entries/:entryId', [BoatBudgetEntryController, 'destroy'])
       .as('boats.budget.entries.destroy')

@@ -24,7 +24,6 @@
     "noComparison": "No prior-year data",
     "newThisYear": "New this year"
   },
-  "portUnavailable": "Port data coming soon",
   "categoryHelp": {
     "maintenance": "Sum of part prices (unit price × quantity) on maintenance events",
     "fuel": "Sum of the \"Total cost\" field on fuel fill-ups",
@@ -43,6 +42,8 @@
     "notes": "Notes",
     "noStays": "No stays recorded",
     "submit": "Add",
+    "editTitle": "Edit port stay",
+    "updateSubmit": "Update",
     "deleteConfirm": "Delete this stay?"
   },
   "entries": {
@@ -55,6 +56,8 @@
     "description": "Description",
     "noEntries": "No other expenses recorded",
     "submit": "Add",
+    "editTitle": "Edit expense",
+    "updateSubmit": "Update",
     "deleteConfirm": "Delete this expense?",
     "categories": {
       "maintenance": "Maintenance",
