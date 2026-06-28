@@ -23,6 +23,13 @@ test('forwards required to textarea', () => {
   expect(w.find('textarea').attributes('required')).toBeDefined()
 })
 
+test('compact applies bg-surface and tight padding', () => {
+  const w = mount(BaseTextarea, { props: { id: 't', label: 'N', compact: true } })
+  const classes = w.find('textarea').classes()
+  expect(classes).toContain('bg-surface')
+  expect(classes).toContain('px-2')
+})
+
 test('renders error from errors object using name', () => {
   const w = mount(BaseTextarea, {
     props: {

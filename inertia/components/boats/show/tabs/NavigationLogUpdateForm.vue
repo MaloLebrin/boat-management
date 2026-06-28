@@ -107,6 +107,7 @@ function handleSubmit() {
           :error="form.errors.notes"
           :rows="3"
           :maxlength="5000"
+          compact
           class="sm:col-span-2"
         />
       </div>
