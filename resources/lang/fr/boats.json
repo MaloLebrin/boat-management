@@ -301,6 +301,23 @@
     "modeSwitch": {
       "management": "Gestion",
       "navigation": "Navigation"
+    },
+    "historyTab": {
+      "addEvent": "Ajouter un événement",
+      "search": "Rechercher…",
+      "noEvents": "Aucun événement trouvé.",
+      "filterAll": "Tous",
+      "filterEngine": "Moteur",
+      "filterSail": "Voile",
+      "filterRig": "Gréement",
+      "filterHull": "Coque",
+      "toggleHide": "Masquer",
+      "toggleShow": "Détail",
+      "pieces": "{count} pièce(s)",
+      "sidebarTitle": "12 derniers mois",
+      "sidebarEvents": "Événements",
+      "sidebarParts": "Pièces",
+      "exportPdf": "Exporter PDF"
     }
   },
   "specs": {

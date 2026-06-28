@@ -301,6 +301,23 @@
     "modeSwitch": {
       "management": "Management",
       "navigation": "Navigation"
+    },
+    "historyTab": {
+      "addEvent": "Add event",
+      "search": "Search…",
+      "noEvents": "No events found.",
+      "filterAll": "All",
+      "filterEngine": "Engine",
+      "filterSail": "Sail",
+      "filterRig": "Rigging",
+      "filterHull": "Hull",
+      "toggleHide": "Hide",
+      "toggleShow": "Details",
+      "pieces": "{count} part(s)",
+      "sidebarTitle": "Last 12 months",
+      "sidebarEvents": "Events",
+      "sidebarParts": "Parts",
+      "exportPdf": "Export PDF"
     }
   },
   "specs": {
