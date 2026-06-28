@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
+import BaseInput from '~/components/base/BaseInput.vue'
 import { useNetworkStatus } from '~/composables/use_network_status'
 import { useOfflineQueue } from '~/composables/use_offline_queue'
 import { useT } from '~/composables/use_t'
@@ -61,22 +62,16 @@ function handleSubmit() {
 
     <form @submit.prevent="handleSubmit">
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <!-- Departure datetime -->
-        <div class="sm:col-span-2">
-          <label class="block text-sm font-medium text-fg mb-1">
-            {{ t('navigation_logs.fields.departedAt') }}
-          </label>
-          <input
-            v-model="form.departedAt"
-            type="datetime-local"
-            name="departedAt"
-            required
-            class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
-          />
-          <p v-if="form.errors.departedAt" class="mt-1 text-xs text-danger">
-            {{ form.errors.departedAt }}
-          </p>
-        </div>
+        <BaseInput
+          v-model="form.departedAt"
+          type="datetime-local"
+          id="departedAt"
+          name="departedAt"
+          class="sm:col-span-2"
+          :label="t('navigation_logs.fields.departedAt')"
+          :error="form.errors.departedAt"
+          required
+        />
 
         <!-- Departure port select -->
         <div v-if="portOptions.length > 0">
@@ -95,60 +90,42 @@ function handleSubmit() {
           </select>
         </div>
 
-        <!-- Departure port free text -->
-        <div>
-          <label class="block text-sm font-medium text-fg mb-1">
-            {{
-              portOptions.length > 0
-                ? t('navigation_logs.fields.departurePortName')
-                : t('navigation_logs.fields.departurePort')
-            }}
-          </label>
-          <input
-            v-model="form.departurePortName"
-            type="text"
-            name="departurePortName"
-            maxlength="255"
-            class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
-          />
-        </div>
+        <BaseInput
+          v-model="form.departurePortName"
+          type="text"
+          id="departurePortName"
+          name="departurePortName"
+          :label="
+            portOptions.length > 0
+              ? t('navigation_logs.fields.departurePortName')
+              : t('navigation_logs.fields.departurePort')
+          "
+        />
 
-        <!-- Engine hours start -->
-        <div>
-          <label class="block text-sm font-medium text-fg mb-1">
-            {{ t('navigation_logs.fields.engineHoursStart') }}
-          </label>
-          <input
-            v-model="form.engineHoursStart"
-            type="number"
-            name="engineHoursStart"
-            step="0.1"
-            min="0"
-            class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
-          />
-          <p v-if="form.errors.engineHoursStart" class="mt-1 text-xs text-danger">
-            {{ form.errors.engineHoursStart }}
-          </p>
-        </div>
+        <BaseInput
+          :model-value="String(form.engineHoursStart)"
+          type="number"
+          id="engineHoursStart"
+          name="engineHoursStart"
+          step="0.1"
+          min="0"
+          :label="t('navigation_logs.fields.engineHoursStart')"
+          :error="form.errors.engineHoursStart"
+          @update:model-value="form.engineHoursStart = $event"
+        />
 
-        <!-- Wind force -->
-        <div>
-          <label class="block text-sm font-medium text-fg mb-1">
-            {{ t('navigation_logs.fields.windForceBeaufort') }}
-          </label>
-          <input
-            v-model="form.windForceBeaufort"
-            type="number"
-            name="windForceBeaufort"
-            step="1"
-            min="0"
-            max="12"
-            class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
-          />
-          <p v-if="form.errors.windForceBeaufort" class="mt-1 text-xs text-danger">
-            {{ form.errors.windForceBeaufort }}
-          </p>
-        </div>
+        <BaseInput
+          :model-value="String(form.windForceBeaufort)"
+          type="number"
+          id="windForceBeaufort"
+          name="windForceBeaufort"
+          step="1"
+          min="0"
+          max="12"
+          :label="t('navigation_logs.fields.windForceBeaufort')"
+          :error="form.errors.windForceBeaufort"
+          @update:model-value="form.windForceBeaufort = $event"
+        />
 
         <!-- Sea state -->
         <div>
@@ -167,23 +144,17 @@ function handleSubmit() {
           </select>
         </div>
 
-        <!-- Crew count -->
-        <div>
-          <label class="block text-sm font-medium text-fg mb-1">
-            {{ t('navigation_logs.fields.crewCount') }}
-          </label>
-          <input
-            v-model="form.crewCount"
-            type="number"
-            name="crewCount"
-            step="1"
-            min="0"
-            class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
-          />
-          <p v-if="form.errors.crewCount" class="mt-1 text-xs text-danger">
-            {{ form.errors.crewCount }}
-          </p>
-        </div>
+        <BaseInput
+          :model-value="String(form.crewCount)"
+          type="number"
+          id="crewCount"
+          name="crewCount"
+          step="1"
+          min="0"
+          :label="t('navigation_logs.fields.crewCount')"
+          :error="form.errors.crewCount"
+          @update:model-value="form.crewCount = $event"
+        />
 
         <!-- Notes -->
         <div class="sm:col-span-2">

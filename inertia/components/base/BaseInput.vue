@@ -15,7 +15,7 @@ const props = withDefaults(
     errorKey?: string
     id?: string
     name?: string
-    type?: InputMode | 'password'
+    type?: InputMode | 'password' | 'number' | 'date' | 'datetime-local'
     autocomplete?: string
     placeholder?: string
     modelValue?: string

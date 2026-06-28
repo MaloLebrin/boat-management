@@ -3,6 +3,7 @@ import { computed, ref } from 'vue'
 import { Form } from '@adonisjs/inertia/vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
+import BaseInput from '~/components/base/BaseInput.vue'
 import NavigationLogUpdateForm from '~/components/boats/show/tabs/NavigationLogUpdateForm.vue'
 import NavigationLogCloseForm from '~/components/boats/show/tabs/NavigationLogCloseForm.vue'
 import { useT } from '~/composables/use_t'
@@ -23,6 +24,7 @@ const showFuelForm = ref(false)
 const showCloseForm = ref(false)
 
 const today = new Date().toLocaleDateString('en-CA')
+const fuelFueledAt = ref(today)
 
 const elapsed = computed(() => {
   const departed = new Date(props.log.departedAt)
@@ -161,61 +163,42 @@ function toggleClose() {
         #default="{ processing, errors }"
       >
         <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <div>
-            <label class="block text-xs font-medium text-fg mb-1">
-              {{ t('fuel_logs.fields.fueledAt') }}
-            </label>
-            <input
-              type="date"
-              name="fueledAt"
-              :value="today"
-              required
-              class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
-            />
-            <p v-if="errors.fueledAt" class="mt-1 text-xs text-danger">{{ errors.fueledAt }}</p>
-          </div>
+          <BaseInput
+            v-model="fuelFueledAt"
+            type="date"
+            id="fueledAt"
+            name="fueledAt"
+            :label="t('fuel_logs.fields.fueledAt')"
+            :error="errors.fueledAt"
+            required
+          />
 
-          <div>
-            <label class="block text-xs font-medium text-fg mb-1">
-              {{ t('fuel_logs.fields.quantityLiters') }}
-            </label>
-            <input
-              type="number"
-              name="quantityLiters"
-              step="0.001"
-              min="0.001"
-              required
-              class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
-            />
-            <p v-if="errors.quantityLiters" class="mt-1 text-xs text-danger">
-              {{ errors.quantityLiters }}
-            </p>
-          </div>
+          <BaseInput
+            type="number"
+            id="quantityLiters"
+            name="quantityLiters"
+            step="0.001"
+            min="0.001"
+            :label="t('fuel_logs.fields.quantityLiters')"
+            :error="errors.quantityLiters"
+            required
+          />
 
-          <div>
-            <label class="block text-xs font-medium text-fg mb-1">
-              {{ t('fuel_logs.fields.pricePerLiter') }}
-            </label>
-            <input
-              type="number"
-              name="pricePerLiter"
-              step="0.0001"
-              min="0"
-              class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
-            />
-          </div>
+          <BaseInput
+            type="number"
+            id="pricePerLiter"
+            name="pricePerLiter"
+            step="0.0001"
+            min="0"
+            :label="t('fuel_logs.fields.pricePerLiter')"
+          />
 
-          <div>
-            <label class="block text-xs font-medium text-fg mb-1">
-              {{ t('fuel_logs.fields.supplier') }}
-            </label>
-            <input
-              type="text"
-              name="supplier"
-              maxlength="500"
-              class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
-            />
-          </div>
+          <BaseInput
+            type="text"
+            id="supplier"
+            name="supplier"
+            :label="t('fuel_logs.fields.supplier')"
+          />
         </div>
 
         <div class="mt-4 flex items-center justify-end gap-3">

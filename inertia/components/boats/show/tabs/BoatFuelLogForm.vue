@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
+import BaseInput from '~/components/base/BaseInput.vue'
 import { useNetworkStatus } from '~/composables/use_network_status'
 import { useOfflineQueue } from '~/composables/use_offline_queue'
 import { useT } from '~/composables/use_t'
@@ -54,77 +55,52 @@ function handleSubmit() {
 
     <form @submit.prevent="handleSubmit">
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <!-- Date -->
-        <div>
-          <label class="block text-sm font-medium text-fg mb-1">
-            {{ t('fuel_logs.fields.fueledAt') }}
-          </label>
-          <input
-            v-model="form.fueledAt"
-            type="date"
-            name="fueledAt"
-            required
-            class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
-          />
-          <p v-if="form.errors.fueledAt" class="mt-1 text-xs text-danger">
-            {{ form.errors.fueledAt }}
-          </p>
-        </div>
+        <BaseInput
+          v-model="form.fueledAt"
+          type="date"
+          id="fueledAt"
+          name="fueledAt"
+          :label="t('fuel_logs.fields.fueledAt')"
+          :error="form.errors.fueledAt"
+          required
+        />
 
-        <!-- Quantity -->
-        <div>
-          <label class="block text-sm font-medium text-fg mb-1">
-            {{ t('fuel_logs.fields.quantityLiters') }}
-          </label>
-          <input
-            v-model="form.quantityLiters"
-            type="number"
-            name="quantityLiters"
-            step="0.001"
-            min="0.001"
-            required
-            class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
-          />
-          <p v-if="form.errors.quantityLiters" class="mt-1 text-xs text-danger">
-            {{ form.errors.quantityLiters }}
-          </p>
-        </div>
+        <BaseInput
+          :model-value="String(form.quantityLiters)"
+          type="number"
+          id="quantityLiters"
+          name="quantityLiters"
+          step="0.001"
+          min="0.001"
+          :label="t('fuel_logs.fields.quantityLiters')"
+          :error="form.errors.quantityLiters"
+          required
+          @update:model-value="form.quantityLiters = $event"
+        />
 
-        <!-- Price per liter -->
-        <div>
-          <label class="block text-sm font-medium text-fg mb-1">
-            {{ t('fuel_logs.fields.pricePerLiter') }}
-          </label>
-          <input
-            v-model="form.pricePerLiter"
-            type="number"
-            name="pricePerLiter"
-            step="0.0001"
-            min="0"
-            class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
-          />
-          <p v-if="form.errors.pricePerLiter" class="mt-1 text-xs text-danger">
-            {{ form.errors.pricePerLiter }}
-          </p>
-        </div>
+        <BaseInput
+          :model-value="String(form.pricePerLiter)"
+          type="number"
+          id="pricePerLiter"
+          name="pricePerLiter"
+          step="0.0001"
+          min="0"
+          :label="t('fuel_logs.fields.pricePerLiter')"
+          :error="form.errors.pricePerLiter"
+          @update:model-value="form.pricePerLiter = $event"
+        />
 
-        <!-- Total cost -->
-        <div>
-          <label class="block text-sm font-medium text-fg mb-1">
-            {{ t('fuel_logs.fields.totalCost') }}
-          </label>
-          <input
-            v-model="form.totalCost"
-            type="number"
-            name="totalCost"
-            step="0.01"
-            min="0"
-            class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
-          />
-          <p v-if="form.errors.totalCost" class="mt-1 text-xs text-danger">
-            {{ form.errors.totalCost }}
-          </p>
-        </div>
+        <BaseInput
+          :model-value="String(form.totalCost)"
+          type="number"
+          id="totalCost"
+          name="totalCost"
+          step="0.01"
+          min="0"
+          :label="t('fuel_logs.fields.totalCost')"
+          :error="form.errors.totalCost"
+          @update:model-value="form.totalCost = $event"
+        />
 
         <!-- Engine -->
         <div v-if="boat.engines.length > 0">
@@ -147,40 +123,27 @@ function handleSubmit() {
           </p>
         </div>
 
-        <!-- Engine hours -->
-        <div>
-          <label class="block text-sm font-medium text-fg mb-1">
-            {{ t('fuel_logs.fields.engineHoursAtFueling') }}
-          </label>
-          <input
-            v-model="form.engineHoursAtFueling"
-            type="number"
-            name="engineHoursAtFueling"
-            step="0.1"
-            min="0"
-            class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
-          />
-          <p v-if="form.errors.engineHoursAtFueling" class="mt-1 text-xs text-danger">
-            {{ form.errors.engineHoursAtFueling }}
-          </p>
-        </div>
+        <BaseInput
+          :model-value="String(form.engineHoursAtFueling)"
+          type="number"
+          id="engineHoursAtFueling"
+          name="engineHoursAtFueling"
+          step="0.1"
+          min="0"
+          :label="t('fuel_logs.fields.engineHoursAtFueling')"
+          :error="form.errors.engineHoursAtFueling"
+          @update:model-value="form.engineHoursAtFueling = $event"
+        />
 
-        <!-- Supplier -->
-        <div :class="boat.engines.length > 0 ? '' : 'sm:col-span-2'">
-          <label class="block text-sm font-medium text-fg mb-1">
-            {{ t('fuel_logs.fields.supplier') }}
-          </label>
-          <input
-            v-model="form.supplier"
-            type="text"
-            name="supplier"
-            maxlength="500"
-            class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand"
-          />
-          <p v-if="form.errors.supplier" class="mt-1 text-xs text-danger">
-            {{ form.errors.supplier }}
-          </p>
-        </div>
+        <BaseInput
+          v-model="form.supplier"
+          type="text"
+          id="supplier"
+          name="supplier"
+          :class="boat.engines.length > 0 ? '' : 'sm:col-span-2'"
+          :label="t('fuel_logs.fields.supplier')"
+          :error="form.errors.supplier"
+        />
 
         <!-- Notes -->
         <div class="sm:col-span-2">

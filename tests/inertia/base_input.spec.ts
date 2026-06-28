@@ -34,3 +34,27 @@ test('renders error from errors object using name', () => {
   })
   expect(w.get('[role="alert"]').text()).toBe('Invalid email')
 })
+
+test('renders input with type number', () => {
+  const w = mount(BaseInput, {
+    props: { id: 'qty', label: 'Qty', type: 'number', modelValue: '10', step: '0.1', min: '0' },
+  })
+  const input = w.find('input')
+  expect(input.attributes('type')).toBe('number')
+  expect(input.attributes('step')).toBe('0.1')
+  expect(input.attributes('min')).toBe('0')
+})
+
+test('renders input with type date', () => {
+  const w = mount(BaseInput, {
+    props: { id: 'dt', label: 'Date', type: 'date', modelValue: '2024-01-01' },
+  })
+  expect(w.find('input').attributes('type')).toBe('date')
+})
+
+test('renders input with type datetime-local', () => {
+  const w = mount(BaseInput, {
+    props: { id: 'dlt', label: 'Datetime', type: 'datetime-local', modelValue: '2024-01-01T10:00' },
+  })
+  expect(w.find('input').attributes('type')).toBe('datetime-local')
+})
