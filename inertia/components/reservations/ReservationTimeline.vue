@@ -29,43 +29,67 @@ const monthEnd = computed(
 <template>
   <BaseCard>
     <template #header>
-      <div class="flex items-center justify-between">
-        <BaseButton variant="ghost" size="sm" @click="prevMonth">
-          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
-        </BaseButton>
-        <h2 class="text-sm font-semibold capitalize text-fg">{{ monthLabel }}</h2>
-        <BaseButton variant="ghost" size="sm" @click="nextMonth">
-          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 5l7 7-7 7"
-            />
-          </svg>
-        </BaseButton>
+      <div class="flex items-center justify-between gap-4">
+        <div class="flex items-center gap-2">
+          <BaseButton variant="ghost" size="sm" @click="prevMonth">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+          </BaseButton>
+          <h2 class="min-w-32 text-center text-sm font-semibold capitalize text-fg">
+            {{ monthLabel }}
+          </h2>
+          <BaseButton variant="ghost" size="sm" @click="nextMonth">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </BaseButton>
+        </div>
+
+        <!-- Legend -->
+        <div class="flex items-center gap-4 text-xs text-fg-muted">
+          <span class="flex items-center gap-1.5">
+            <span class="h-2.5 w-5 rounded-sm bg-peach-300" />
+            {{ t('reservations.status.option') }}
+          </span>
+          <span class="flex items-center gap-1.5">
+            <span class="h-2.5 w-5 rounded-sm bg-mint-300" />
+            {{ t('reservations.status.confirmed') }}
+          </span>
+          <span class="flex items-center gap-1.5">
+            <span class="h-2.5 w-5 rounded-sm bg-lilac-200 opacity-60" />
+            {{ t('reservations.status.cancelled') }}
+          </span>
+        </div>
       </div>
     </template>
 
     <div class="overflow-x-auto">
       <div class="min-w-max">
         <!-- Day headers -->
-        <div class="flex border-b border-border pb-1">
-          <div class="w-32 shrink-0" />
+        <div class="flex border-b border-border pb-2">
+          <div class="w-36 shrink-0" />
           <div
             v-for="day in days"
             :key="day"
             class="w-8 shrink-0 text-center text-xs text-fg-muted"
-            :class="{ 'font-bold text-navy-600': isToday(day) }"
+            :class="isToday(day) ? 'font-bold text-navy-600' : ''"
           >
             {{ day }}
+            <span
+              v-if="isToday(day)"
+              class="mx-auto mt-0.5 block h-1 w-1 rounded-full bg-navy-500"
+            />
           </div>
         </div>
 

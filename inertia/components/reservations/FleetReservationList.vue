@@ -25,28 +25,47 @@ const { formatDate } = useReservationFormat()
       <table class="w-full text-sm">
         <thead>
           <tr
-            class="border-b border-border text-left text-xs font-semibold uppercase text-fg-muted"
+            class="border-b border-border text-left text-xs font-semibold uppercase tracking-wide text-fg-muted"
           >
-            <th class="pb-2 pr-4">{{ t('reservations.columns.boat') }}</th>
-            <th class="pb-2 pr-4">{{ t('reservations.columns.period') }}</th>
-            <th class="pb-2 pr-4">{{ t('reservations.columns.client') }}</th>
-            <th class="pb-2 pr-4">{{ t('reservations.columns.status') }}</th>
-            <th class="pb-2">{{ t('reservations.columns.price') }}</th>
+            <th class="px-4 pb-3 first:pl-0">{{ t('reservations.columns.boat') }}</th>
+            <th class="px-4 pb-3">{{ t('reservations.columns.period') }}</th>
+            <th class="px-4 pb-3">{{ t('reservations.columns.client') }}</th>
+            <th class="px-4 pb-3">{{ t('reservations.columns.status') }}</th>
+            <th class="px-4 pb-3 text-right last:pr-0">{{ t('reservations.columns.price') }}</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-border">
-          <tr v-for="row in reservations" :key="row.id">
-            <td class="py-2 pr-4 font-medium text-fg">{{ row.boatName }}</td>
-            <td class="py-2 pr-4 text-fg-muted">
-              {{ formatDate(row.startsAt) }} → {{ formatDate(row.endsAt) }}
+          <tr
+            v-for="row in reservations"
+            :key="row.id"
+            class="group transition-colors hover:bg-surface-muted/50"
+          >
+            <td class="px-4 py-3 first:pl-0 font-semibold text-fg">{{ row.boatName }}</td>
+            <td class="px-4 py-3">
+              <span class="inline-flex items-center gap-1.5 text-fg-muted">
+                <svg
+                  class="h-3.5 w-3.5 shrink-0"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
+                </svg>
+                {{ formatDate(row.startsAt) }}
+                <span class="text-fg-subtle">→</span>
+                {{ formatDate(row.endsAt) }}
+              </span>
             </td>
-            <td class="py-2 pr-4">
-              <span class="text-fg">{{ row.clientName }}</span>
-            </td>
-            <td class="py-2 pr-4">
+            <td class="px-4 py-3 text-fg">{{ row.clientName }}</td>
+            <td class="px-4 py-3">
               <ReservationStatusBadge :status="row.status" />
             </td>
-            <td class="py-2 text-fg">
+            <td class="px-4 py-3 last:pr-0 text-right font-medium text-fg">
               {{ row.totalPrice ? `${row.totalPrice} €` : '—' }}
             </td>
           </tr>

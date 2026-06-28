@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { Head } from '@inertiajs/vue3'
 import BaseBreadcrumb from '~/components/base/BaseBreadcrumb.vue'
-import BaseHeading from '~/components/base/BaseHeading.vue'
+import BaseButton from '~/components/base/BaseButton.vue'
 import ReservationCalendar from '~/components/reservations/ReservationCalendar.vue'
 import ReservationForm from '~/components/reservations/ReservationForm.vue'
 import ReservationList from '~/components/reservations/ReservationList.vue'
@@ -27,36 +28,84 @@ const breadcrumbs = computed(() => [
   { label: props.boat.name, href: `/boats/${props.boat.id}` },
   { label: t('reservations.title') },
 ])
+
+function scrollToForm() {
+  document.getElementById('reservation-form')?.scrollIntoView({ behavior: 'smooth' })
+}
 </script>
 
 <template>
-  <div class="space-y-6">
+  <Head :title="t('reservations.title')" />
+
+  <div class="w-full max-w-7xl px-6 py-10 sm:px-8">
     <BaseBreadcrumb :items="breadcrumbs" />
 
-    <div class="flex items-center justify-between">
-      <BaseHeading level="1">{{ t('reservations.title') }}</BaseHeading>
+    <div class="mt-6 flex flex-wrap items-start justify-between gap-4">
+      <div>
+        <h1 class="text-3xl font-semibold tracking-tight text-fg">{{ t('reservations.title') }}</h1>
+        <p class="mt-2 text-base text-fg-muted">{{ boat.name }}</p>
+      </div>
+      <BaseButton v-if="canManage" @click="scrollToForm">
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 4v16m8-8H4"
+          />
+        </svg>
+        {{ t('reservations.form.createTitle') }}
+      </BaseButton>
     </div>
 
     <!-- Stats -->
-    <div class="grid grid-cols-3 gap-4">
-      <div class="rounded-lg border border-border bg-surface-elevated p-4 text-center">
-        <p class="text-2xl font-bold text-fg">{{ stats.total }}</p>
-        <p class="text-xs text-fg-muted">{{ t('reservations.stats.total') }}</p>
+    <div class="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div
+        class="rounded-(--radius-card) border border-border bg-surface-elevated p-5 shadow-(--shadow-xs)"
+      >
+        <p class="text-xs font-semibold uppercase tracking-wide text-fg-muted">
+          {{ t('reservations.stats.total') }}
+        </p>
+        <p class="mt-2 font-display text-3xl font-bold tracking-tight text-fg">{{ stats.total }}</p>
       </div>
-      <div class="rounded-lg border border-border bg-surface-elevated p-4 text-center">
-        <p class="text-2xl font-bold text-peach-600">{{ stats.option }}</p>
-        <p class="text-xs text-fg-muted">{{ t('reservations.stats.option') }}</p>
+      <div
+        class="rounded-(--radius-card) border border-border bg-surface-elevated p-5 shadow-(--shadow-xs)"
+      >
+        <div class="flex items-center gap-2">
+          <span class="h-2 w-2 rounded-full bg-peach-400" />
+          <p class="text-xs font-semibold uppercase tracking-wide text-fg-muted">
+            {{ t('reservations.stats.option') }}
+          </p>
+        </div>
+        <p class="mt-2 font-display text-3xl font-bold tracking-tight text-peach-600">
+          {{ stats.option }}
+        </p>
       </div>
-      <div class="rounded-lg border border-border bg-surface-elevated p-4 text-center">
-        <p class="text-2xl font-bold text-mint-600">{{ stats.confirmed }}</p>
-        <p class="text-xs text-fg-muted">{{ t('reservations.stats.confirmed') }}</p>
+      <div
+        class="rounded-(--radius-card) border border-border bg-surface-elevated p-5 shadow-(--shadow-xs)"
+      >
+        <div class="flex items-center gap-2">
+          <span class="h-2 w-2 rounded-full bg-mint-500" />
+          <p class="text-xs font-semibold uppercase tracking-wide text-fg-muted">
+            {{ t('reservations.stats.confirmed') }}
+          </p>
+        </div>
+        <p class="mt-2 font-display text-3xl font-bold tracking-tight text-mint-600">
+          {{ stats.confirmed }}
+        </p>
       </div>
     </div>
 
-    <ReservationCalendar :reservations="reservations" />
+    <div class="mt-6">
+      <ReservationCalendar :reservations="reservations" />
+    </div>
 
-    <ReservationForm v-if="canManage" :boat-id="boat.id" />
+    <div id="reservation-form" class="mt-6">
+      <ReservationForm v-if="canManage" :boat-id="boat.id" />
+    </div>
 
-    <ReservationList :boat-id="boat.id" :reservations="reservations" :can-manage="canManage" />
+    <div class="mt-6">
+      <ReservationList :boat-id="boat.id" :reservations="reservations" :can-manage="canManage" />
+    </div>
   </div>
 </template>

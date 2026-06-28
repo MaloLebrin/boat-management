@@ -43,7 +43,17 @@ function submit() {
 <template>
   <BaseCard>
     <template #header>
-      <h2 class="text-sm font-semibold text-fg">{{ t('reservations.form.createTitle') }}</h2>
+      <div class="flex items-center gap-2">
+        <svg class="h-4 w-4 text-fg-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 4v16m8-8H4"
+          />
+        </svg>
+        <h2 class="text-sm font-semibold text-fg">{{ t('reservations.form.createTitle') }}</h2>
+      </div>
     </template>
 
     <form class="space-y-4" @submit.prevent="submit">

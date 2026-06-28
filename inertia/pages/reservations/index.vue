@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { router } from '@inertiajs/vue3'
+import { Head, router } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
-import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import FleetReservationList from '~/components/reservations/FleetReservationList.vue'
 import ReservationTimeline from '~/components/reservations/ReservationTimeline.vue'
@@ -37,40 +36,81 @@ function filterByBoat(boatId: string) {
 </script>
 
 <template>
-  <div class="space-y-6">
-    <div class="flex items-start justify-between gap-4">
+  <Head :title="t('reservations.fleet.title')" />
+
+  <div class="w-full max-w-7xl px-6 py-10 sm:px-8">
+    <div class="flex flex-wrap items-start justify-between gap-4">
       <div>
-        <BaseHeading level="1">{{ t('reservations.fleet.title') }}</BaseHeading>
-        <p class="mt-1 text-sm text-fg-muted">{{ t('reservations.fleet.subtitle') }}</p>
+        <h1 class="text-3xl font-semibold tracking-tight text-fg">
+          {{ t('reservations.fleet.title') }}
+        </h1>
+        <p class="mt-2 text-base text-fg-muted">{{ t('reservations.fleet.subtitle') }}</p>
       </div>
-      <div class="flex items-center gap-2 shrink-0">
+
+      <!-- Segmented view toggle -->
+      <div
+        class="flex shrink-0 items-center rounded-(--radius-control) bg-surface-muted p-1 ring-1 ring-border"
+      >
         <BaseButton
-          :variant="viewMode === 'timeline' ? 'primary' : 'ghost'"
+          :variant="viewMode === 'timeline' ? 'secondary' : 'ghost'"
           size="sm"
           @click="viewMode = 'timeline'"
         >
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+            />
+          </svg>
           {{ t('reservations.view.timeline') }}
         </BaseButton>
         <BaseButton
-          :variant="viewMode === 'list' ? 'primary' : 'ghost'"
+          :variant="viewMode === 'list' ? 'secondary' : 'ghost'"
           size="sm"
           @click="viewMode = 'list'"
         >
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 6h16M4 10h16M4 14h16M4 18h16"
+            />
+          </svg>
           {{ t('reservations.view.list') }}
         </BaseButton>
       </div>
     </div>
 
     <!-- Boat filter -->
-    <div class="max-w-xs">
-      <BaseSelect
-        :model-value="selectedBoatId ? String(selectedBoatId) : ''"
-        :options="boatOptions"
-        @update:model-value="filterByBoat"
-      />
+    <div class="mt-6 flex items-center gap-3">
+      <svg
+        class="h-4 w-4 shrink-0 text-fg-muted"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"
+        />
+      </svg>
+      <div class="w-56">
+        <BaseSelect
+          :model-value="selectedBoatId ? String(selectedBoatId) : ''"
+          :options="boatOptions"
+          @update:model-value="filterByBoat"
+        />
+      </div>
     </div>
 
-    <ReservationTimeline v-if="viewMode === 'timeline'" :calendar-entries="calendarEntries" />
-    <FleetReservationList v-else :reservations="reservations" />
+    <div class="mt-6">
+      <ReservationTimeline v-if="viewMode === 'timeline'" :calendar-entries="calendarEntries" />
+      <FleetReservationList v-else :reservations="reservations" />
+    </div>
   </div>
 </template>

@@ -37,23 +37,23 @@ const coveredByDay = computed(() => {
 </script>
 
 <template>
-  <div class="flex items-center border-b border-border py-1">
-    <div class="w-32 shrink-0 truncate pr-2 text-sm font-medium text-fg">
+  <div class="flex items-center border-b border-border py-1.5">
+    <div class="w-36 shrink-0 truncate pr-3 text-sm font-semibold text-fg">
       {{ entry.boatName }}
     </div>
     <div class="flex">
-      <div v-for="day in days" :key="day" class="relative w-8 shrink-0">
+      <div v-for="day in days" :key="day" class="relative h-7 w-8 shrink-0">
         <template v-if="coveredByDay.get(day)">
           <div
             :class="[
               'absolute inset-y-0.5 left-0 right-0',
               pillClass[coveredByDay.get(day)!.status],
               day === days[0] || coveredByDay.get(day)?.startsAt.slice(0, 10) === isoForDay(day)
-                ? 'rounded-l'
+                ? 'rounded-l-sm'
                 : '',
               day === days[days.length - 1] ||
               coveredByDay.get(day)?.endsAt.slice(0, 10) === isoForDay(day + 1)
-                ? 'rounded-r'
+                ? 'rounded-r-sm'
                 : '',
             ]"
             :title="
@@ -64,7 +64,7 @@ const coveredByDay = computed(() => {
           >
             <span
               v-if="coveredByDay.get(day)?.startsAt.slice(0, 10) === isoForDay(day)"
-              class="absolute inset-0 flex items-center truncate px-1 text-xs"
+              class="absolute inset-0 flex items-center truncate px-1.5 text-xs font-medium"
             >
               {{ coveredByDay.get(day)?.clientName }}
             </span>
