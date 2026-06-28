@@ -138,6 +138,7 @@ function toLocalDatetime(utcIso: string): string {
           :label="t('incidents.fields.description')"
           :errors="errors"
           :rows="3"
+          required
           class="sm:col-span-2"
         />
 

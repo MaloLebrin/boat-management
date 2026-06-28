@@ -153,6 +153,7 @@ function handleSubmit() {
           :label="t('fuel_logs.fields.notes')"
           :error="form.errors.notes"
           :rows="2"
+          :maxlength="2000"
           class="sm:col-span-2"
         />
       </div>

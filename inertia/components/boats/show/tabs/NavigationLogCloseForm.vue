@@ -194,6 +194,7 @@ function handleSubmit() {
           :label="t('navigation_logs.fields.notes')"
           :error="form.errors.notes"
           :rows="2"
+          :maxlength="5000"
           class="sm:col-span-2"
         />
       </div>

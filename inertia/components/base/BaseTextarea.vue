@@ -16,6 +16,8 @@ const props = withDefaults(
     placeholder?: string
     modelValue?: string
     disabled?: boolean
+    maxlength?: number
+    required?: boolean
   }>(),
   {
     rows: 4,
@@ -43,6 +45,8 @@ const resolvedError = computed(() => {
       :rows="rows"
       :placeholder="placeholder"
       :disabled="disabled"
+      :maxlength="maxlength"
+      :required="required"
       :value="modelValue"
       :data-invalid="resolvedError ? 'true' : undefined"
       :aria-invalid="resolvedError ? 'true' : undefined"
