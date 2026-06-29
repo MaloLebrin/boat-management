@@ -1,4 +1,4 @@
-import { SpotNotFoundError } from '#exceptions/port_errors'
+import { SpotAlreadyOccupiedError, SpotNotFoundError } from '#exceptions/port_errors'
 import { QuotaExceededError } from '#exceptions/quota_errors'
 import AiAnalysisService, { type AiSuggestion } from '#services/ai_analysis_service'
 import AuditLogService from '#services/audit_log_service'
@@ -341,6 +341,7 @@ export default class BoatsController {
     } catch (error) {
       if (error instanceof BoatNotFoundError) return response.redirect('/boats')
       if (error instanceof SpotNotFoundError) return response.redirect().back()
+      if (error instanceof SpotAlreadyOccupiedError) return response.redirect().back()
       throw error
     }
   }

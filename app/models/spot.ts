@@ -1,5 +1,5 @@
-import { BaseModel, belongsTo, column, hasMany } from '@adonisjs/lucid/orm'
-import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
+import { BaseModel, belongsTo, column, hasOne } from '@adonisjs/lucid/orm'
+import type { BelongsTo, HasOne } from '@adonisjs/lucid/types/relations'
 import { DateTime } from 'luxon'
 import Boat from '#models/boat'
 import Mouillage from '#models/mouillage'
@@ -42,6 +42,6 @@ export default class Spot extends BaseModel {
   @belongsTo(() => Organization)
   declare organization: BelongsTo<typeof Organization>
 
-  @hasMany(() => Boat)
-  declare boats: HasMany<typeof Boat>
+  @hasOne(() => Boat)
+  declare boat: HasOne<typeof Boat>
 }

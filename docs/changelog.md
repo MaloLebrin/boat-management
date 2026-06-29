@@ -3,6 +3,17 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-06-29 — [G-02] Contrainte UNIQUE sur spot_id dans boats
+
+**Bug corrigé**
+
+- Migration `1805000001000` : ajout de la contrainte `UNIQUE (spot_id)` sur la table `boats` — PostgreSQL ignore les NULL, plusieurs bateaux sans spot restent valides
+- `app/models/spot.ts` : relation `hasMany(() => Boat)` → `hasOne(() => Boat)` pour refléter la cardinalité réelle
+- `app/services/boat_hull_service.ts` : vérification d'unicité du spot avant toute assignation (`createForUser`, `updateForUser`, `updateAssignment`)
+- `app/exceptions/port_errors.ts` : nouvelle classe `SpotAlreadyOccupiedError`
+- `app/controllers/boats_controller.ts` : gestion de `SpotAlreadyOccupiedError` avec redirection back
+- Tests : 4 tests fonctionnels couvrant assignation libre, refus si spot occupé, réassignation sur le spot courant, désassignation
+
 ## 2026-06-28 — Audit & complétion feature Budget
 
 **Bugs corrigés**

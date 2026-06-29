@@ -1,4 +1,5 @@
 import { BoatNotFoundError, InvalidBoatHullError } from '#exceptions/boat_errors'
+import { SpotAlreadyOccupiedError } from '#exceptions/port_errors'
 import { UserNotInOrganizationError } from '#exceptions/organization_errors'
 import Boat from '#models/boat'
 import BoatEngine from '#models/boat_engine'
@@ -100,6 +101,8 @@ export default class BoatHullService {
       throw new InvalidBoatHullError('mastHeightM is required when propulsionType is sailboat')
     }
 
+    if (payload.spotId) await this._assertSpotFree(payload.spotId)
+
     const boat = await Boat.create({
       organizationId: user.organizationId,
       name: payload.name,
@@ -179,6 +182,7 @@ export default class BoatHullService {
       const newSpotId = payload.spotId ?? null
 
       if (newSpotId !== boat.spotId) {
+        if (newSpotId !== null) await this._assertSpotFree(newSpotId, boat.id)
         await this._logBerthChange(boat, newSpotId)
       }
 
@@ -255,12 +259,20 @@ export default class BoatHullService {
   }
 
   async updateAssignment(boat: Boat, payload: { spotId: number | null }) {
+    if (payload.spotId !== null) await this._assertSpotFree(payload.spotId, boat.id)
     boat.spotId = payload.spotId
     await boat.save()
 
     await this._logBerthChange(boat, payload.spotId)
 
     return boat
+  }
+
+  private async _assertSpotFree(spotId: number, excludeBoatId?: number) {
+    const query = Boat.query().where('spotId', spotId)
+    if (excludeBoatId !== undefined) query.whereNot('id', excludeBoatId)
+    const existing = await query.first()
+    if (existing) throw new SpotAlreadyOccupiedError()
   }
 
   private async _logBerthChange(boat: Boat, newSpotId: number | null) {
