@@ -1,7 +1,9 @@
 import BoatDocument from '#models/boat_document'
+import Organization from '#models/organization'
 import type Boat from '#models/boat'
 import type User from '#models/user'
 import { BoatDocumentNotFoundError } from '#exceptions/boat_document_errors'
+import MediaService from '#services/media_service'
 import type {
   BoatDocumentRow,
   BoatDocumentStatus,
@@ -10,9 +12,12 @@ import type {
   ReminderDocumentItem,
 } from '#shared/types/boat_document'
 import { BOAT_DOCUMENT_EXPIRY_WARNING_DAYS } from '#shared/constants/boats/boat_document_constants'
+import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
 
+@inject()
 export default class BoatDocumentService {
+  constructor(private mediaService: MediaService) {}
   private computeStatus(expiresAt: DateTime | null): BoatDocumentStatus {
     if (!expiresAt) return 'valid'
     const daysUntil = expiresAt.diff(DateTime.now(), 'days').days
@@ -107,6 +112,10 @@ export default class BoatDocumentService {
   async delete(_user: User, boat: Boat, documentId: number): Promise<void> {
     const doc = await BoatDocument.query().where('id', documentId).where('boatId', boat.id).first()
     if (!doc) throw new BoatDocumentNotFoundError(documentId)
+    if (doc.mediaId !== null) {
+      const org = await Organization.findOrFail(doc.organizationId)
+      await this.mediaService.deleteById(doc.mediaId, org)
+    }
     await doc.delete()
   }
 
