@@ -21,7 +21,6 @@ import type SimulatorTransformer from '#transformers/simulator_transformer'
 import type SpotTransformer from '#transformers/spot_transformer'
 import type SubscriptionTransformer from '#transformers/subscription_transformer'
 import type UserTransformer from '#transformers/user_transformer'
-import type BudgetTransformer from '#transformers/budget_transformer'
 import type InertiaMiddleware from '#middleware/inertia_middleware'
 
 export namespace Data {
@@ -84,10 +83,6 @@ export namespace Data {
   export type User = InferData<UserTransformer>
   export namespace User {
     export type Variants = InferVariants<UserTransformer>
-  }
-  export type Budget = InferData<BudgetTransformer>
-  export namespace Budget {
-    export type Variants = InferVariants<BudgetTransformer>
   }
   export type SharedProps = InferSharedProps<InertiaMiddleware>
 }
