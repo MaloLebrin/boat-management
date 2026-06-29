@@ -9,6 +9,7 @@ import type Organization from '#models/organization'
 import type User from '#models/user'
 import { CloudinaryFolders } from '#services/cloudinary_service'
 import MediaService from '#services/media_service'
+import SpotService from '#services/spot_service'
 import type { BoatHullPayload } from '#shared/types/boat'
 import type { SimulatorBoatInput } from '#shared/types/simulator'
 
@@ -24,7 +25,10 @@ export type { BoatHullPayload }
 
 @inject()
 export default class BoatHullService {
-  constructor(private mediaService: MediaService) {}
+  constructor(
+    private mediaService: MediaService,
+    private spotService: SpotService
+  ) {}
 
   async listForUser(user: User) {
     if (user.organizationId === null) return []
@@ -102,6 +106,10 @@ export default class BoatHullService {
       (payload.mastHeightM === null || payload.mastHeightM === undefined)
     ) {
       throw new InvalidBoatHullError('mastHeightM is required when propulsionType is sailboat')
+    }
+
+    if (payload.spotId !== null && payload.spotId !== undefined) {
+      await this._assertSpotInUserOrg(user, payload.spotId)
     }
 
     const boat = await db.transaction(async (trx) => {
@@ -190,6 +198,10 @@ export default class BoatHullService {
 
     if (payload.spotId !== undefined) {
       const newSpotId = payload.spotId ?? null
+
+      if (newSpotId !== null) {
+        await this._assertSpotInUserOrg(user, newSpotId)
+      }
 
       if (newSpotId !== boat.spotId) {
         await db.transaction(async (trx) => {
@@ -340,5 +352,9 @@ export default class BoatHullService {
       navigationCategory: data.navigationCategory,
       type: data.boatType,
     })
+  }
+
+  private async _assertSpotInUserOrg(user: User, spotId: number) {
+    await this.spotService.getForUserOrFail(user, spotId)
   }
 }
