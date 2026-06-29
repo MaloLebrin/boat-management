@@ -110,6 +110,77 @@ test.group('Budget Port Stay (functional)', (group) => {
     assert.lengthOf(stays, 0)
   })
 
+  test('POST /boats/:id/port-stays rejects endedAt before startedAt', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    const response = await client
+      .post(`/boats/${boat.id}/port-stays`)
+      .form({
+        portName: 'Port de Marseille',
+        startedAt: '2024-06-15',
+        endedAt: '2024-06-01',
+      })
+      .loginAs(user)
+      .redirects(0)
+
+    response.assertStatus(302)
+
+    const stays = await BoatPortStay.query().where('boat_id', boat.id)
+    assert.lengthOf(stays, 0)
+  })
+
+  test('POST /boats/:id/port-stays accepts endedAt same as startedAt', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    const response = await client
+      .post(`/boats/${boat.id}/port-stays`)
+      .form({
+        portName: 'Port de Marseille',
+        startedAt: '2024-06-01',
+        endedAt: '2024-06-01',
+      })
+      .loginAs(user)
+      .redirects(0)
+
+    response.assertStatus(302)
+
+    const stays = await BoatPortStay.query().where('boat_id', boat.id)
+    assert.lengthOf(stays, 1)
+  })
+
+  test('PATCH /boats/:id/port-stays/:stayId rejects endedAt before startedAt', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const stay = await BoatPortStayFactory.merge({ boatId: boat.id }).create()
+    const originalPortName = stay.portName
+
+    const response = await client
+      .patch(`/boats/${boat.id}/port-stays/${stay.id}`)
+      .form({
+        portName: 'Port de Monaco',
+        startedAt: '2024-09-15',
+        endedAt: '2024-09-01',
+      })
+      .loginAs(user)
+      .redirects(0)
+
+    response.assertStatus(302)
+
+    const unchanged = await BoatPortStay.findOrFail(stay.id)
+    assert.equal(unchanged.portName, originalPortName)
+  })
+
   test('DELETE /boats/:id/port-stays/:stayId deletes the port stay', async ({ client, assert }) => {
     const user = await createAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
