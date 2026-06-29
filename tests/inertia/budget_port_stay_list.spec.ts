@@ -43,7 +43,7 @@ const stayWithEndDate: BoatPortStayItem = {
   portName: 'Port de Marseille',
   startedAt: '2024-06-01',
   endedAt: '2024-06-15',
-  cost: '250.50',
+  cost: 250.5,
   notes: null,
 }
 
