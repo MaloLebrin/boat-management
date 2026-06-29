@@ -169,6 +169,9 @@
     "updated": "Expense updated.",
     "deleted": "Expense deleted."
   },
+  "spot": {
+    "notInOrg": "This spot does not belong to your organisation."
+  },
   "reservation": {
     "created": "Reservation saved.",
     "updated": "Reservation updated.",

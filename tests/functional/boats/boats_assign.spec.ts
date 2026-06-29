@@ -147,11 +147,13 @@ test.group('Boats assign (functional)', (group) => {
 
   test('PUT /boats/:id rejects cross-org spotId on update', async ({ client, assert }) => {
     const user = await createAdminUser()
+    const ownSpot = await makeSpot(user.organizationId!)
     const otherUser = await UserFactory.with('organization').create()
     const foreignSpot = await makeSpot(otherUser.organizationId!)
     const boat = await BoatFactory.merge({
       organizationId: user.organizationId!,
       name: 'Pirate',
+      spotId: ownSpot.id,
     }).create()
 
     const response = await client
@@ -163,6 +165,6 @@ test.group('Boats assign (functional)', (group) => {
     response.assertStatus(302)
 
     const updated = await Boat.findOrFail(boat.id)
-    assert.isNull(updated.spotId)
+    assert.equal(updated.spotId, ownSpot.id)
   })
 })

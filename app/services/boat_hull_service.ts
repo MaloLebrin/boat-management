@@ -113,7 +113,8 @@ export default class BoatHullService {
     }
 
     const boat = await db.transaction(async (trx) => {
-      if (payload.spotId) await this._evictSpotOccupant(payload.spotId, undefined, trx)
+      if (payload.spotId !== null && payload.spotId !== undefined)
+        await this._evictSpotOccupant(payload.spotId, undefined, trx)
 
       const created = await Boat.create(
         {
