@@ -95,7 +95,7 @@ test.group('Notifications — markAllRead datetime consistency', (group) => {
 
     const updated = await Notification.findOrFail(notif.id)
     assert.isNotNull(updated.readAt)
-    assert.instanceOf(updated.readAt, DateTime)
+    assert.isTrue(DateTime.isDateTime(updated.readAt), 'readAt should be a Luxon DateTime')
   })
 
   test('PATCH /notifications/read-all requires authentication', async ({ client }) => {
