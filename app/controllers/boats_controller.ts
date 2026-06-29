@@ -102,18 +102,27 @@ export default class BoatsController {
     }
 
     const payload = await request.validateUsing(createBoatValidator)
-    const boat = await this.boatService.createForUser(user, payload)
 
-    await this.auditLogService.log({
-      organizationId: user.organizationId!,
-      userId: user.id,
-      action: 'boat.create',
-      entityType: 'boat',
-      entityId: boat.id,
-      metadata: { name: boat.name },
-    })
+    try {
+      const boat = await this.boatService.createForUser(user, payload)
 
-    response.redirect(`/boats/${boat.id}`)
+      await this.auditLogService.log({
+        organizationId: user.organizationId!,
+        userId: user.id,
+        action: 'boat.create',
+        entityType: 'boat',
+        entityId: boat.id,
+        metadata: { name: boat.name },
+      })
+
+      response.redirect(`/boats/${boat.id}`)
+    } catch (error) {
+      if (error instanceof SpotNotFoundError) {
+        session.flash('error', i18n.t('flash.spot.notInOrg'))
+        return response.redirect().back()
+      }
+      throw error
+    }
   }
 
   async show({ inertia, params, auth, response, bouncer }: HttpContext) {
@@ -273,7 +282,7 @@ export default class BoatsController {
     }
   }
 
-  async update({ request, params, auth, response, bouncer }: HttpContext) {
+  async update({ request, params, auth, response, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
@@ -281,18 +290,27 @@ export default class BoatsController {
     await bouncer.with(BoatPolicy).authorize('edit', boat)
 
     const payload = await request.validateUsing(updateBoatValidator)
-    await this.boatService.updateForUser(user, boat, payload)
 
-    await this.auditLogService.log({
-      organizationId: user.organizationId!,
-      userId: user.id,
-      action: 'boat.update',
-      entityType: 'boat',
-      entityId: boat.id,
-      metadata: { name: boat.name },
-    })
+    try {
+      await this.boatService.updateForUser(user, boat, payload)
 
-    response.redirect(`/boats/${boat.id}`)
+      await this.auditLogService.log({
+        organizationId: user.organizationId!,
+        userId: user.id,
+        action: 'boat.update',
+        entityType: 'boat',
+        entityId: boat.id,
+        metadata: { name: boat.name },
+      })
+
+      response.redirect(`/boats/${boat.id}`)
+    } catch (error) {
+      if (error instanceof SpotNotFoundError) {
+        session.flash('error', i18n.t('flash.spot.notInOrg'))
+        return response.redirect().back()
+      }
+      throw error
+    }
   }
 
   async destroy({ params, auth, response, bouncer }: HttpContext) {

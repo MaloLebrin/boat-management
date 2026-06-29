@@ -4,6 +4,7 @@ import Boat from '#models/boat'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { PontoonFactory } from '#database/factories/pontoon_factory'
 import { SpotFactory } from '#database/factories/spot_factory'
+import { UserFactory } from '#database/factories/user_factory'
 import { createAdminUser } from '#tests/functional/helpers'
 
 async function makeSpot(organizationId: number) {
@@ -125,5 +126,45 @@ test.group('Boats assign (functional)', (group) => {
 
     const updated = await Boat.findOrFail(boat.id)
     assert.isNull(updated.spotId)
+  })
+
+  test('POST /boats rejects cross-org spotId on creation', async ({ client, assert }) => {
+    const user = await createAdminUser()
+    const otherUser = await UserFactory.with('organization').create()
+    const foreignSpot = await makeSpot(otherUser.organizationId!)
+
+    const response = await client
+      .post('/boats')
+      .loginAs(user)
+      .form({ name: 'Pirate', propulsionType: 'motorboat', spotId: foreignSpot.id })
+      .redirects(0)
+
+    response.assertStatus(302)
+
+    const boat = await Boat.findBy('name', 'Pirate')
+    assert.isNull(boat)
+  })
+
+  test('PUT /boats/:id rejects cross-org spotId on update', async ({ client, assert }) => {
+    const user = await createAdminUser()
+    const ownSpot = await makeSpot(user.organizationId!)
+    const otherUser = await UserFactory.with('organization').create()
+    const foreignSpot = await makeSpot(otherUser.organizationId!)
+    const boat = await BoatFactory.merge({
+      organizationId: user.organizationId!,
+      name: 'Pirate',
+      spotId: ownSpot.id,
+    }).create()
+
+    const response = await client
+      .put(`/boats/${boat.id}`)
+      .loginAs(user)
+      .form({ name: 'Pirate', propulsionType: 'motorboat', spotId: foreignSpot.id })
+      .redirects(0)
+
+    response.assertStatus(302)
+
+    const updated = await Boat.findOrFail(boat.id)
+    assert.equal(updated.spotId, ownSpot.id)
   })
 })

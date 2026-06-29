@@ -169,6 +169,9 @@
     "updated": "Dépense mise à jour.",
     "deleted": "Dépense supprimée."
   },
+  "spot": {
+    "notInOrg": "Ce spot n'appartient pas à votre organisation."
+  },
   "reservation": {
     "created": "Réservation enregistrée.",
     "updated": "Réservation mise à jour.",
