@@ -9,7 +9,7 @@
     "documents": "Documents / Assurance",
     "port": "Port / Mouillage",
     "equipment": "Equipements",
-    "entries": "Depenses libres",
+    "entries": "Dépenses libres",
     "total": "Total"
   },
   "chart": {
@@ -47,18 +47,18 @@
     "deleteConfirm": "Supprimer ce séjour ?"
   },
   "entries": {
-    "formTitle": "Ajouter une depense",
-    "listTitle": "Depenses libres",
-    "label": "Libelle",
+    "formTitle": "Ajouter une dépense",
+    "listTitle": "Dépenses libres",
+    "label": "Libellé",
     "amount": "Montant (EUR)",
     "date": "Date",
-    "category": "Categorie",
+    "category": "Catégorie",
     "description": "Description",
-    "noEntries": "Aucune depense libre enregistree",
+    "noEntries": "Aucune dépense libre enregistrée",
     "submit": "Ajouter",
-    "editTitle": "Modifier la depense",
+    "editTitle": "Modifier la dépense",
     "updateSubmit": "Mettre à jour",
-    "deleteConfirm": "Supprimer cette depense ?",
+    "deleteConfirm": "Supprimer cette dépense ?",
     "categories": {
       "maintenance": "Maintenance",
       "fuel": "Carburant",

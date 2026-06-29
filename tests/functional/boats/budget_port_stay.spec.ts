@@ -217,10 +217,12 @@ test.group('Budget Port Stay (functional)', (group) => {
     const stay = await BoatPortStayFactory.merge({ boatId: boat.id }).create()
     const originalPortName = stay.portName
 
-    await client
+    const response = await client
       .patch(`/boats/${boat.id}/port-stays/${stay.id}`)
       .form({ portName: 'Hacked', startedAt: '2024-01-01' })
       .loginAs(other)
+
+    response.assertRedirectsTo('/boats')
 
     const unchanged = await BoatPortStay.findOrFail(stay.id)
     assert.equal(unchanged.portName, originalPortName)

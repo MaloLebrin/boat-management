@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useForm, router } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
@@ -26,7 +26,7 @@ const editForm = useForm({
   description: '',
 })
 
-const categoryOptions = [
+const categoryOptions = computed(() => [
   { value: '', label: '' },
   { value: 'maintenance', label: t('budget.entries.categories.maintenance') },
   { value: 'fuel', label: t('budget.entries.categories.fuel') },
@@ -34,7 +34,7 @@ const categoryOptions = [
   { value: 'port', label: t('budget.entries.categories.port') },
   { value: 'equipment', label: t('budget.entries.categories.equipment') },
   { value: 'other', label: t('budget.entries.categories.other') },
-]
+])
 
 function startEdit(entry: BoatBudgetEntryItem) {
   editingId.value = entry.id

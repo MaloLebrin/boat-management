@@ -259,10 +259,12 @@ test.group('Budget Entries (functional)', (group) => {
     const entry = await BoatBudgetEntryFactory.merge({ boatId: boat.id }).create()
     const originalLabel = entry.label
 
-    await client
+    const response = await client
       .patch(`/boats/${boat.id}/budget/entries/${entry.id}`)
       .form({ label: 'Hacked', amount: '1', date: '2024-01-01' })
       .loginAs(other)
+
+    response.assertRedirectsTo('/boats')
 
     const unchanged = await BoatBudgetEntry.findOrFail(entry.id)
     assert.equal(unchanged.label, originalLabel)

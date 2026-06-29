@@ -55,11 +55,11 @@ const COLORS: Record<string, string> = {
       <BaseButton
         v-if="helpText"
         variant="ghost"
-        size="sm"
+        size="icon"
         type="button"
         :title="helpText"
         :aria-label="helpText"
-        class="shrink-0 !p-1 !h-auto text-fg-subtle"
+        class="shrink-0 text-fg-subtle"
       >
         <QuestionMarkCircleIcon class="h-4 w-4" />
       </BaseButton>

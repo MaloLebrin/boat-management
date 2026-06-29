@@ -41,7 +41,7 @@ export interface BoatPortStayItem {
   portName: string
   startedAt: string
   endedAt: string | null
-  cost: string | null
+  cost: number | null
   notes: string | null
 }
 

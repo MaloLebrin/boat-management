@@ -45,16 +45,19 @@ export default class BoatBudgetEntryService {
       description?: string | null
     }
   ): Promise<void> {
-    await BoatBudgetEntry.query()
+    const entry = await BoatBudgetEntry.query()
       .where('id', entryId)
       .where('boat_id', boat.id)
-      .update({
-        amount: String(data.amount),
-        date: data.date.toSQLDate()!,
-        label: data.label,
-        category: data.category ?? 'other',
-        description: data.description ?? null,
-      })
+      .firstOrFail()
+
+    entry.merge({
+      amount: String(data.amount),
+      date: data.date,
+      label: data.label,
+      category: data.category ?? 'other',
+      description: data.description ?? null,
+    })
+    await entry.save()
   }
 
   async delete(boat: Boat, entryId: number): Promise<void> {

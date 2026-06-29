@@ -19,7 +19,7 @@ export function toPortStayItem(stay: BoatPortStay): BoatPortStayItem {
     portName: stay.portName,
     startedAt: stay.startedAt.toISODate()!,
     endedAt: stay.endedAt?.toISODate() ?? null,
-    cost: stay.cost,
+    cost: stay.cost !== null ? Number.parseFloat(stay.cost) : null,
     notes: stay.notes,
   }
 }

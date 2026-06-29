@@ -30,7 +30,7 @@ function startEdit(stay: BoatPortStayItem) {
   editForm.portName = stay.portName
   editForm.startedAt = stay.startedAt
   editForm.endedAt = stay.endedAt ?? ''
-  editForm.cost = stay.cost ?? ''
+  editForm.cost = stay.cost !== null ? String(stay.cost) : ''
   editForm.notes = stay.notes ?? ''
 }
 
@@ -133,7 +133,7 @@ function formatDate(dateStr: string | null): string {
             </div>
             <div class="flex items-center gap-4">
               <span v-if="stay.cost" class="font-semibold text-teal-600 dark:text-teal-400">
-                {{ formatCurrency(Number(stay.cost)) }}
+                {{ formatCurrency(stay.cost) }}
               </span>
               <span v-else class="text-fg-subtle">—</span>
               <template v-if="canManage">
