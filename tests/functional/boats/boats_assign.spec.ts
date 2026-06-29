@@ -31,7 +31,7 @@ test.group('Boats assign (functional)', (group) => {
     assert.equal(updated.spotId, spot.id)
   })
 
-  test('PATCH /boats/:id/assignment rejects spot already occupied by another boat', async ({
+  test('PATCH /boats/:id/assignment evicts previous occupant when spot is taken', async ({
     client,
     assert,
   }) => {
@@ -41,21 +41,21 @@ test.group('Boats assign (functional)', (group) => {
       organizationId: user.organizationId!,
       spotId: spot.id,
     }).create()
-    const intruder = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const newBoat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
 
     const response = await client
-      .patch(`/boats/${intruder.id}/assignment`)
+      .patch(`/boats/${newBoat.id}/assignment`)
       .loginAs(user)
       .form({ spotId: spot.id })
       .redirects(0)
 
     response.assertStatus(302)
 
-    const updated = await Boat.findOrFail(intruder.id)
-    assert.isNull(updated.spotId)
+    const updated = await Boat.findOrFail(newBoat.id)
+    assert.equal(updated.spotId, spot.id)
 
-    const occupantStillThere = await Boat.findOrFail(occupant.id)
-    assert.equal(occupantStillThere.spotId, spot.id)
+    const evicted = await Boat.findOrFail(occupant.id)
+    assert.isNull(evicted.spotId)
   })
 
   test('PATCH /boats/:id/assignment allows reassigning boat to its current spot', async ({

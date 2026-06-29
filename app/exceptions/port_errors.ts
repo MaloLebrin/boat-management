@@ -25,7 +25,3 @@ export class MouillageHasBoatsError extends Error {
 export class SpotNotFoundError extends Error {
   name = 'SpotNotFoundError'
 }
-
-export class SpotAlreadyOccupiedError extends Error {
-  name = 'SpotAlreadyOccupiedError'
-}
