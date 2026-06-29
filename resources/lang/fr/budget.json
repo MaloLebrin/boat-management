@@ -9,7 +9,7 @@
     "documents": "Documents / Assurance",
     "port": "Port / Mouillage",
     "equipment": "Equipements",
-    "entries": "Depenses libres",
+    "entries": "Dépenses libres",
     "total": "Total"
   },
   "chart": {
@@ -24,7 +24,6 @@
     "noComparison": "Pas de données N-1",
     "newThisYear": "Nouveau cette année"
   },
-  "portUnavailable": "Données port à venir",
   "categoryHelp": {
     "maintenance": "Somme des prix de pièces (prix unitaire × quantité) sur les événements de maintenance",
     "fuel": "Somme du champ « Coût total » sur les pleins de carburant",
@@ -43,19 +42,23 @@
     "notes": "Notes",
     "noStays": "Aucun séjour enregistré",
     "submit": "Ajouter",
+    "editTitle": "Modifier le séjour",
+    "updateSubmit": "Mettre à jour",
     "deleteConfirm": "Supprimer ce séjour ?"
   },
   "entries": {
-    "formTitle": "Ajouter une depense",
-    "listTitle": "Depenses libres",
-    "label": "Libelle",
+    "formTitle": "Ajouter une dépense",
+    "listTitle": "Dépenses libres",
+    "label": "Libellé",
     "amount": "Montant (EUR)",
     "date": "Date",
-    "category": "Categorie",
+    "category": "Catégorie",
     "description": "Description",
-    "noEntries": "Aucune depense libre enregistree",
+    "noEntries": "Aucune dépense libre enregistrée",
     "submit": "Ajouter",
-    "deleteConfirm": "Supprimer cette depense ?",
+    "editTitle": "Modifier la dépense",
+    "updateSubmit": "Mettre à jour",
+    "deleteConfirm": "Supprimer cette dépense ?",
     "categories": {
       "maintenance": "Maintenance",
       "fuel": "Carburant",

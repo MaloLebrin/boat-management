@@ -40,6 +40,33 @@ export default class BoatPortStayController {
     return response.redirect().back()
   }
 
+  async update({ params, request, response, auth, bouncer, session, i18n }: HttpContext) {
+    await auth.authenticate()
+    const user = auth.getUserOrFail()
+
+    let boat
+    try {
+      boat = await this.boatService.getForUserOrFail(user, Number(params.id))
+    } catch (error) {
+      if (error instanceof BoatNotFoundError) return response.redirect('/boats')
+      throw error
+    }
+
+    await bouncer.with(BoatPolicy).authorize('manage', boat)
+
+    const data = await request.validateUsing(boatPortStayValidator)
+    await this.portStayService.update(boat, Number(params.stayId), {
+      portName: data.portName,
+      startedAt: data.startedAt,
+      endedAt: data.endedAt ?? null,
+      cost: data.cost ?? null,
+      notes: data.notes ?? null,
+    })
+
+    session.flash('success', i18n.t('flash.portStay.updated'))
+    return response.redirect().back()
+  }
+
   async destroy({ params, response, auth, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()

@@ -23,11 +23,13 @@ export interface ApiDefinition {
     budget: typeof routes['boats.budget'] & {
       entries: {
         store: typeof routes['boats.budget.entries.store']
+        update: typeof routes['boats.budget.entries.update']
         destroy: typeof routes['boats.budget.entries.destroy']
       }
     }
     portStays: {
       store: typeof routes['boats.portStays.store']
+      update: typeof routes['boats.portStays.update']
       destroy: typeof routes['boats.portStays.destroy']
     }
     edit: typeof routes['boats.edit']

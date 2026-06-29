@@ -161,10 +161,12 @@
   },
   "portStay": {
     "created": "Port stay recorded.",
+    "updated": "Port stay updated.",
     "deleted": "Port stay deleted."
   },
   "budgetEntry": {
     "created": "Expense recorded.",
+    "updated": "Expense updated.",
     "deleted": "Expense deleted."
   },
   "reservation": {

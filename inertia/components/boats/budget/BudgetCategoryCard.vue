@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { QuestionMarkCircleIcon } from '@heroicons/vue/24/outline'
+import BaseButton from '~/components/base/BaseButton.vue'
 import { useCurrencyFormat } from '~/composables/use_currency_format'
 import { useT } from '~/composables/use_t'
 
@@ -9,17 +10,16 @@ const props = defineProps<{
   amount: number
   previousAmount: number | null
   previousYear: number | null
-  unavailable?: boolean
   helpText?: string
 }>()
 
 const { t } = useT()
 const { formatCurrency } = useCurrencyFormat()
 
-const formatted = computed(() => (props.unavailable ? '—' : formatCurrency(props.amount)))
+const formatted = computed(() => formatCurrency(props.amount))
 
 const delta = computed(() => {
-  if (props.unavailable || props.previousAmount === null || props.previousYear === null) return null
+  if (props.previousAmount === null || props.previousYear === null) return null
   if (props.previousAmount === 0)
     return props.amount > 0 ? { label: t('budget.cards.newThisYear'), positive: true } : null
   const pct = ((props.amount - props.previousAmount) / props.previousAmount) * 100
@@ -52,23 +52,22 @@ const COLORS: Record<string, string> = {
   >
     <div class="flex items-center justify-between gap-1">
       <p class="text-sm font-semibold text-fg-muted">{{ t(`budget.categories.${category}`) }}</p>
-      <button
+      <BaseButton
         v-if="helpText"
+        variant="ghost"
+        size="icon"
         type="button"
         :title="helpText"
         :aria-label="helpText"
-        class="shrink-0 text-fg-subtle hover:text-fg-muted transition-colors"
+        class="shrink-0 text-fg-subtle"
       >
         <QuestionMarkCircleIcon class="h-4 w-4" />
-      </button>
+      </BaseButton>
     </div>
     <p class="mt-3 font-display text-2xl font-bold tracking-tight" :class="COLORS[category]">
       {{ formatted }}
     </p>
-    <p v-if="unavailable" class="mt-1 text-xs text-fg-subtle italic">
-      {{ t('budget.portUnavailable') }}
-    </p>
-    <template v-else-if="previousAmount !== null && previousYear !== null">
+    <template v-if="previousAmount !== null && previousYear !== null">
       <p class="mt-1 text-xs text-fg-subtle">
         {{ vsLabel }}
         <span

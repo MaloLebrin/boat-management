@@ -1,14 +1,7 @@
 import vine from '@vinejs/vine'
+import { BUDGET_ENTRY_CATEGORIES } from '#shared/types/budget'
 
-export const BUDGET_ENTRY_CATEGORIES = [
-  'maintenance',
-  'fuel',
-  'documents',
-  'port',
-  'equipment',
-  'other',
-] as const
-export type BudgetEntryCategory = (typeof BUDGET_ENTRY_CATEGORIES)[number]
+export type { BudgetEntryCategory } from '#shared/types/budget'
 
 export const budgetEntryValidator = vine.create(
   vine.object({

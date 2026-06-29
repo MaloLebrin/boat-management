@@ -2,6 +2,7 @@ import { test } from '@japa/runner'
 import testUtils from '@adonisjs/core/services/test_utils'
 import { DateTime } from 'luxon'
 import { BoatFactory } from '#database/factories/boat_factory'
+import { BoatBudgetEntryFactory } from '#database/factories/boat_budget_entry_factory'
 import { UserFactory } from '#database/factories/user_factory'
 import { createAdminUser } from '#tests/functional/helpers'
 import BoatBudgetEntry from '#models/boat_budget_entry'
@@ -206,5 +207,66 @@ test.group('Budget Entries (functional)', (group) => {
 
     const existing = await BoatBudgetEntry.find(entry.id)
     assert.isNotNull(existing)
+  })
+
+  test('PATCH /boats/:id/budget/entries/:entryId updates the entry', async ({ client, assert }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const entry = await BoatBudgetEntryFactory.merge({ boatId: boat.id }).create()
+
+    const response = await client
+      .patch(`/boats/${boat.id}/budget/entries/${entry.id}`)
+      .form({
+        label: 'Updated label',
+        amount: '999.50',
+        date: '2024-07-01',
+        category: 'fuel',
+      })
+      .loginAs(user)
+      .redirects(0)
+
+    response.assertStatus(302)
+
+    const updated = await BoatBudgetEntry.findOrFail(entry.id)
+    assert.equal(updated.label, 'Updated label')
+    assert.equal(Number.parseFloat(updated.amount), 999.5)
+    assert.equal(updated.category, 'fuel')
+  })
+
+  test('PATCH /boats/:id/budget/entries/:entryId redirects to /login when unauthenticated', async ({
+    client,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const entry = await BoatBudgetEntryFactory.merge({ boatId: boat.id }).create()
+
+    const response = await client
+      .patch(`/boats/${boat.id}/budget/entries/${entry.id}`)
+      .form({ label: 'X', amount: '10', date: '2024-01-01' })
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertHeader('location', '/login')
+  })
+
+  test('PATCH /boats/:id/budget/entries/:entryId redirects when boat belongs to another org', async ({
+    client,
+    assert,
+  }) => {
+    const owner = await createAdminUser()
+    const other = await UserFactory.with('organization').create()
+    const boat = await BoatFactory.merge({ organizationId: owner.organizationId! }).create()
+    const entry = await BoatBudgetEntryFactory.merge({ boatId: boat.id }).create()
+    const originalLabel = entry.label
+
+    const response = await client
+      .patch(`/boats/${boat.id}/budget/entries/${entry.id}`)
+      .form({ label: 'Hacked', amount: '1', date: '2024-01-01' })
+      .loginAs(other)
+
+    response.assertRedirectsTo('/boats')
+
+    const unchanged = await BoatBudgetEntry.findOrFail(entry.id)
+    assert.equal(unchanged.label, originalLabel)
   })
 })

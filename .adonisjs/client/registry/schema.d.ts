@@ -187,6 +187,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_port_stay_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'boats.portStays.update': {
+    methods: ["PATCH"]
+    pattern: '/boats/:id/port-stays/:stayId'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/boat_port_stay_validator').boatPortStayValidator)>>
+      paramsTuple: [ParamValue, ParamValue]
+      params: { id: ParamValue; stayId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/boat_port_stay_validator').boatPortStayValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_port_stay_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_port_stay_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'boats.portStays.destroy': {
     methods: ["DELETE"]
     pattern: '/boats/:id/port-stays/:stayId'
@@ -209,6 +221,18 @@ export interface Registry {
       query: ExtractQuery<InferInput<(typeof import('#validators/budget_entry_validator').budgetEntryValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_budget_entry_controller').default['store']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_budget_entry_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'boats.budget.entries.update': {
+    methods: ["PATCH"]
+    pattern: '/boats/:id/budget/entries/:entryId'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/budget_entry_validator').budgetEntryValidator)>>
+      paramsTuple: [ParamValue, ParamValue]
+      params: { id: ParamValue; entryId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/budget_entry_validator').budgetEntryValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_budget_entry_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_budget_entry_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'boats.budget.entries.destroy': {

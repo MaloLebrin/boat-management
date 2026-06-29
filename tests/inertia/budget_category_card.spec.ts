@@ -32,12 +32,6 @@ test('renders the formatted amount', () => {
   expect(w.text()).toContain('1500.00 €')
 })
 
-test('renders "—" and portUnavailable message when unavailable', () => {
-  const w = mountCard({ amount: 0, unavailable: true })
-  expect(w.text()).toContain('—')
-  expect(w.text()).toContain('budget.portUnavailable')
-})
-
 test('shows noComparison when previousAmount is null', () => {
   const w = mountCard({ amount: 100, previousAmount: null, previousYear: null })
   expect(w.text()).toContain('budget.cards.noComparison')

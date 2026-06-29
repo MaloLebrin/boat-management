@@ -19,8 +19,10 @@ export type ScannedRoutes = {
     'boats.export.budget': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.budget': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.portStays.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'boats.portStays.update': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'stayId': ParamValue} }
     'boats.portStays.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'stayId': ParamValue} }
     'boats.budget.entries.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'boats.budget.entries.update': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'entryId': ParamValue} }
     'boats.budget.entries.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'entryId': ParamValue} }
     'boats.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -395,6 +397,21 @@ export type ScannedRoutes = {
     'ai.boatSuggestions': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'demo.login': { paramsTuple?: []; params?: {} }
   }
+  PATCH: {
+    'boats.portStays.update': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'stayId': ParamValue} }
+    'boats.budget.entries.update': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'entryId': ParamValue} }
+    'boats.assign': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'boat_equipment.update_engine_status': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
+    'boat_equipment.update_engine_notes': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
+    'boats.navigationLogs.update': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue} }
+    'boats.navigationLogs.close': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue} }
+    'boats.navigationLogs.crew.sync': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue} }
+    'boats.reservations.update': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
+    'ports.pontoons.updatePosition': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'pontoonId': ParamValue} }
+    'ports.mouillages.updatePosition': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'mouillageId': ParamValue} }
+    'notifications.markAllAsRead': { paramsTuple?: []; params?: {} }
+    'notifications.markAsRead': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+  }
   DELETE: {
     'boats.portStays.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'stayId': ParamValue} }
     'boats.budget.entries.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'entryId': ParamValue} }
@@ -450,19 +467,6 @@ export type ScannedRoutes = {
     'settings.branding.update': { paramsTuple?: []; params?: {} }
     'organization.members.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'crew.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-  }
-  PATCH: {
-    'boats.assign': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'boat_equipment.update_engine_status': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
-    'boat_equipment.update_engine_notes': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
-    'boats.navigationLogs.update': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue} }
-    'boats.navigationLogs.close': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue} }
-    'boats.navigationLogs.crew.sync': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue} }
-    'boats.reservations.update': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
-    'ports.pontoons.updatePosition': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'pontoonId': ParamValue} }
-    'ports.mouillages.updatePosition': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'mouillageId': ParamValue} }
-    'notifications.markAllAsRead': { paramsTuple?: []; params?: {} }
-    'notifications.markAsRead': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
 }
 declare module '@adonisjs/core/types/http' {

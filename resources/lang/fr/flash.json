@@ -161,10 +161,12 @@
   },
   "portStay": {
     "created": "Séjour au port enregistré.",
+    "updated": "Séjour au port mis à jour.",
     "deleted": "Séjour au port supprimé."
   },
   "budgetEntry": {
     "created": "Dépense enregistrée.",
+    "updated": "Dépense mise à jour.",
     "deleted": "Dépense supprimée."
   },
   "reservation": {

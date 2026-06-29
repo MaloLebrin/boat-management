@@ -39,6 +39,33 @@ export default class BoatBudgetEntryController {
     return response.redirect().back()
   }
 
+  async update({ params, request, response, auth, bouncer, session, i18n }: HttpContext) {
+    await auth.authenticate()
+    const user = auth.getUserOrFail()
+
+    let boat
+    try {
+      boat = await this.boatService.getForUserOrFail(user, Number(params.id))
+    } catch (error) {
+      if (error instanceof BoatNotFoundError) return response.redirect('/boats')
+      throw error
+    }
+
+    await bouncer.with(BoatPolicy).authorize('manage', boat)
+
+    const body = await request.validateUsing(budgetEntryValidator)
+    await this.entryService.update(boat, Number(params.entryId), {
+      amount: body.amount,
+      date: body.date,
+      label: body.label,
+      category: body.category ?? null,
+      description: body.description ?? null,
+    })
+
+    session.flash('success', i18n.t('flash.budgetEntry.updated'))
+    return response.redirect().back()
+  }
+
   async destroy({ params, response, auth, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()

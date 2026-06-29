@@ -2,7 +2,7 @@ import { inject } from '@adonisjs/core'
 import type { DateTime } from 'luxon'
 import BoatBudgetEntry from '#models/boat_budget_entry'
 import type Boat from '#models/boat'
-import type { BudgetEntryCategory } from '#validators/budget_entry_validator'
+import type { BudgetEntryCategory } from '#shared/types/budget'
 
 @inject()
 export default class BoatBudgetEntryService {
@@ -32,6 +32,32 @@ export default class BoatBudgetEntryService {
       category: data.category ?? 'other',
       description: data.description ?? null,
     })
+  }
+
+  async update(
+    boat: Boat,
+    entryId: number,
+    data: {
+      amount: number
+      date: DateTime
+      label: string
+      category?: BudgetEntryCategory | null
+      description?: string | null
+    }
+  ): Promise<void> {
+    const entry = await BoatBudgetEntry.query()
+      .where('id', entryId)
+      .where('boat_id', boat.id)
+      .firstOrFail()
+
+    entry.merge({
+      amount: String(data.amount),
+      date: data.date,
+      label: data.label,
+      category: data.category ?? 'other',
+      description: data.description ?? null,
+    })
+    await entry.save()
   }
 
   async delete(boat: Boat, entryId: number): Promise<void> {

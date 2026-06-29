@@ -5,7 +5,7 @@ import { computed } from 'vue'
 const props = withDefaults(
   defineProps<{
     variant?: 'primary' | 'secondary' | 'ghost' | 'danger'
-    size?: 'sm' | 'md' | 'lg'
+    size?: 'sm' | 'md' | 'lg' | 'icon'
     disabled?: boolean
     type?: 'button' | 'submit' | 'reset'
     route?: string
@@ -50,6 +50,7 @@ const sizeClass: Record<NonNullable<typeof props.size>, string> = {
   sm: 'h-8 rounded-[var(--radius-control)] px-3 text-xs font-semibold',
   md: 'h-10 rounded-[var(--radius-control)] px-4 text-sm font-semibold',
   lg: 'h-11 rounded-[var(--radius-control)] px-5 text-base font-semibold',
+  icon: 'h-8 w-8 rounded-[var(--radius-control)] p-0',
 }
 
 const baseClass = computed(() => {
