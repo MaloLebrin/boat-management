@@ -9,10 +9,8 @@ Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
 - Migration `1805000001000` : ajout de la contrainte `UNIQUE (spot_id)` sur la table `boats` — PostgreSQL ignore les NULL, plusieurs bateaux sans spot restent valides
 - `app/models/spot.ts` : relation `hasMany(() => Boat)` → `hasOne(() => Boat)` pour refléter la cardinalité réelle
-- `app/services/boat_hull_service.ts` : vérification d'unicité du spot avant toute assignation (`createForUser`, `updateForUser`, `updateAssignment`)
-- `app/exceptions/port_errors.ts` : nouvelle classe `SpotAlreadyOccupiedError`
-- `app/controllers/boats_controller.ts` : gestion de `SpotAlreadyOccupiedError` avec redirection back
-- Tests : 4 tests fonctionnels couvrant assignation libre, refus si spot occupé, réassignation sur le spot courant, désassignation
+- `app/services/boat_hull_service.ts` : éviction silencieuse de l'occupant précédent avant toute assignation (`createForUser`, `updateForUser`, `updateAssignment`) — chaque opération wrapped dans `db.transaction()` + `FOR UPDATE` pour éviter les race conditions
+- Tests : 5 tests fonctionnels couvrant assignation libre, éviction lors d'un PATCH, éviction lors d'un POST /boats, réassignation sur le spot courant, désassignation
 
 ## 2026-06-28 — Audit & complétion feature Budget
 

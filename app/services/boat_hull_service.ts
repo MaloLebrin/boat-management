@@ -14,6 +14,8 @@ import type { SimulatorBoatInput } from '#shared/types/simulator'
 
 import BoatPositionHistory from '#models/boat_position_history'
 import { inject } from '@adonisjs/core'
+import db from '@adonisjs/lucid/services/db'
+import type { TransactionClientContract } from '@adonisjs/lucid/types/database'
 import { DateTime } from 'luxon'
 import { assertBoatInUserOrg, toDateOrNull } from '#utils/boat_utils'
 
@@ -93,6 +95,8 @@ export default class BoatHullService {
       throw new UserNotInOrganizationError()
     }
 
+    const organizationId = user.organizationId
+
     if (
       payload.propulsionType === 'sailboat' &&
       (payload.mastHeightM === null || payload.mastHeightM === undefined)
@@ -100,41 +104,48 @@ export default class BoatHullService {
       throw new InvalidBoatHullError('mastHeightM is required when propulsionType is sailboat')
     }
 
-    if (payload.spotId) await this._evictSpotOccupant(payload.spotId)
+    const boat = await db.transaction(async (trx) => {
+      if (payload.spotId) await this._evictSpotOccupant(payload.spotId, undefined, trx)
 
-    const boat = await Boat.create({
-      organizationId: user.organizationId,
-      name: payload.name,
-      registrationNumber: payload.registrationNumber ?? null,
-      type: payload.type ?? null,
-      manufacturedAt: toDateOrNull(payload.manufacturedAt),
+      const created = await Boat.create(
+        {
+          organizationId,
+          name: payload.name,
+          registrationNumber: payload.registrationNumber ?? null,
+          type: payload.type ?? null,
+          manufacturedAt: toDateOrNull(payload.manufacturedAt),
 
-      propulsionType: payload.propulsionType ?? null,
-      lengthM: payload.lengthM ?? null,
-      beamM: payload.beamM ?? null,
-      draftM: payload.draftM ?? null,
-      mastHeightM: payload.mastHeightM ?? null,
-      hullMaterial: payload.hullMaterial ?? null,
-      yearBuilt: payload.yearBuilt ?? null,
-      manufacturer: payload.manufacturer ?? null,
-      model: payload.model ?? null,
+          propulsionType: payload.propulsionType ?? null,
+          lengthM: payload.lengthM ?? null,
+          beamM: payload.beamM ?? null,
+          draftM: payload.draftM ?? null,
+          mastHeightM: payload.mastHeightM ?? null,
+          hullMaterial: payload.hullMaterial ?? null,
+          yearBuilt: payload.yearBuilt ?? null,
+          manufacturer: payload.manufacturer ?? null,
+          model: payload.model ?? null,
 
-      homePort: payload.homePort ?? null,
-      navigationCategory: payload.navigationCategory ?? null,
-      hullIdentificationNumber: payload.hullIdentificationNumber ?? null,
-      francisationNumber: payload.francisationNumber ?? null,
-      flagCountry: payload.flagCountry ?? null,
-      maxPersons: payload.maxPersons ?? null,
+          homePort: payload.homePort ?? null,
+          navigationCategory: payload.navigationCategory ?? null,
+          hullIdentificationNumber: payload.hullIdentificationNumber ?? null,
+          francisationNumber: payload.francisationNumber ?? null,
+          flagCountry: payload.flagCountry ?? null,
+          maxPersons: payload.maxPersons ?? null,
 
-      mmsi: payload.mmsi ?? null,
-      imoNumber: payload.imoNumber ?? null,
+          mmsi: payload.mmsi ?? null,
+          imoNumber: payload.imoNumber ?? null,
 
-      spotId: payload.spotId ?? null,
+          spotId: payload.spotId ?? null,
+        },
+        { client: trx }
+      )
+
+      if (created.spotId !== null) {
+        await this._logBerthChange(created, created.spotId, trx)
+      }
+
+      return created
     })
-
-    if (boat.spotId !== null) {
-      await this._logBerthChange(boat, boat.spotId)
-    }
 
     await boat.load('engines')
     await boat.load('sails')
@@ -181,14 +192,19 @@ export default class BoatHullService {
       const newSpotId = payload.spotId ?? null
 
       if (newSpotId !== boat.spotId) {
-        if (newSpotId !== null) await this._evictSpotOccupant(newSpotId, boat.id)
-        await this._logBerthChange(boat, newSpotId)
+        await db.transaction(async (trx) => {
+          if (newSpotId !== null) await this._evictSpotOccupant(newSpotId, boat.id, trx)
+          await this._logBerthChange(boat, newSpotId, trx)
+          boat.useTransaction(trx)
+          boat.spotId = newSpotId
+          await boat.save()
+        })
+      } else {
+        await boat.save()
       }
-
-      boat.spotId = newSpotId
+    } else {
+      await boat.save()
     }
-
-    await boat.save()
 
     await boat.load('engines')
     await boat.load('sails')
@@ -258,39 +274,53 @@ export default class BoatHullService {
   }
 
   async updateAssignment(boat: Boat, payload: { spotId: number | null }) {
-    if (payload.spotId !== null) await this._evictSpotOccupant(payload.spotId, boat.id)
-    boat.spotId = payload.spotId
-    await boat.save()
-
-    await this._logBerthChange(boat, payload.spotId)
+    await db.transaction(async (trx) => {
+      if (payload.spotId !== null) await this._evictSpotOccupant(payload.spotId, boat.id, trx)
+      boat.useTransaction(trx)
+      boat.spotId = payload.spotId
+      await boat.save()
+      await this._logBerthChange(boat, payload.spotId, trx)
+    })
 
     return boat
   }
 
-  private async _evictSpotOccupant(spotId: number, excludeBoatId?: number) {
-    const query = Boat.query().where('spotId', spotId)
+  private async _evictSpotOccupant(
+    spotId: number,
+    excludeBoatId?: number,
+    trx?: TransactionClientContract
+  ) {
+    const query = Boat.query({ client: trx }).where('spotId', spotId).forUpdate()
     if (excludeBoatId !== undefined) query.whereNot('id', excludeBoatId)
     const occupant = await query.first()
     if (occupant) {
-      await this._logBerthChange(occupant, null)
+      await this._logBerthChange(occupant, null, trx)
+      occupant.useTransaction(trx!)
       occupant.spotId = null
       await occupant.save()
     }
   }
 
-  private async _logBerthChange(boat: Boat, newSpotId: number | null) {
-    await BoatPositionHistory.query()
+  private async _logBerthChange(
+    boat: Boat,
+    newSpotId: number | null,
+    trx?: TransactionClientContract
+  ) {
+    await BoatPositionHistory.query({ client: trx })
       .where('boatId', boat.id)
       .whereNull('endedAt')
       .update({ endedAt: DateTime.now().toSQL() })
 
     if (newSpotId !== null) {
-      await BoatPositionHistory.create({
-        boatId: boat.id,
-        spotId: newSpotId,
-        startedAt: DateTime.now(),
-        endedAt: null,
-      })
+      await BoatPositionHistory.create(
+        {
+          boatId: boat.id,
+          spotId: newSpotId,
+          startedAt: DateTime.now(),
+          endedAt: null,
+        },
+        { client: trx }
+      )
     }
   }
 

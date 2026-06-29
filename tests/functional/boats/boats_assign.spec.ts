@@ -81,6 +81,29 @@ test.group('Boats assign (functional)', (group) => {
     assert.equal(updated.spotId, spot.id)
   })
 
+  test('POST /boats evicts previous occupant when creating a boat on an occupied spot', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const spot = await makeSpot(user.organizationId!)
+    const occupant = await BoatFactory.merge({
+      organizationId: user.organizationId!,
+      spotId: spot.id,
+    }).create()
+
+    const response = await client
+      .post('/boats')
+      .loginAs(user)
+      .form({ name: 'Nouveau bateau', spotId: spot.id })
+      .redirects(0)
+
+    response.assertStatus(302)
+
+    const evicted = await Boat.findOrFail(occupant.id)
+    assert.isNull(evicted.spotId)
+  })
+
   test('PATCH /boats/:id/assignment unassigns spot when spotId is null', async ({
     client,
     assert,
