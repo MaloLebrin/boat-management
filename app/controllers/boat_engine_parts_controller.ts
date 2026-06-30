@@ -220,7 +220,7 @@ export default class BoatEnginePartsController {
     const org = await this.organizationService.findOrFail(boat.organizationId)
 
     try {
-      await this.mediaService.deleteById(mediaId, org)
+      await this.mediaService.deleteForEntity(mediaId, 'boat_engine_part', partId, org)
     } catch (error) {
       if (error instanceof MediaNotFoundError) {
         return response.redirect(
