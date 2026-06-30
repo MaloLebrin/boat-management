@@ -48,6 +48,41 @@ test.group('Organization invitations — accept (functional)', (group) => {
     assert.isNotNull(membership)
   })
 
+  test('POST /invitations/accept updates user.organizationId to the new org', async ({
+    client,
+    assert,
+  }) => {
+    const admin = await createAdminUser()
+    const plainToken = 'valid-plain-token-rescope-001'
+
+    await OrganizationInvitationFactory.merge({
+      email: 'rescoped@example.com',
+      organizationId: admin.organizationId!,
+      token: sha256(plainToken),
+      status: 'pending',
+      expiresAt: DateTime.now().plus({ days: 7 }),
+    }).create()
+
+    const invitedUser = await UserFactory.with('organization', 1)
+      .merge({ email: 'rescoped@example.com' })
+      .create()
+
+    const originalOrgId = invitedUser.organizationId
+
+    const response = await client
+      .post('/invitations/accept')
+      .loginAs(invitedUser)
+      .form({ token: plainToken })
+      .redirects(0)
+
+    response.assertStatus(302)
+
+    await invitedUser.refresh()
+
+    assert.equal(invitedUser.organizationId, admin.organizationId)
+    assert.notEqual(invitedUser.organizationId, originalOrgId)
+  })
+
   test('POST /invitations/accept rejects when user email does not match invitation', async ({
     client,
     assert,
