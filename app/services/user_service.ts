@@ -1,5 +1,6 @@
 import OrganizationService from '#services/organization_service'
 import User from '#models/user'
+import OrganizationMembership from '#models/organization_membership'
 import { inject } from '@adonisjs/core'
 import db from '@adonisjs/lucid/services/db'
 
@@ -36,6 +37,11 @@ export default class UserService {
           fullName: payload.fullName ?? null,
           organizationId: organization.id,
         },
+        { client: trx }
+      )
+
+      await OrganizationMembership.create(
+        { userId: user.id, organizationId: organization.id, role: 'admin' },
         { client: trx }
       )
 

@@ -1,6 +1,7 @@
 import { test } from '@japa/runner'
 import testUtils from '@adonisjs/core/services/test_utils'
 import User from '#models/user'
+import OrganizationMembership from '#models/organization_membership'
 
 test.group('Auth signup (functional)', (group) => {
   group.each.setup(() => testUtils.db().truncate())
@@ -18,6 +19,24 @@ test.group('Auth signup (functional)', (group) => {
     const user = await User.findBy('email', 'marie@example.com')
     assert.isNotNull(user)
     assert.equal(user!.fullName, 'Marie Curie')
+  })
+
+  test('creates an admin membership for the new user', async ({ client, assert }) => {
+    await client.post('/signup').form({
+      fullName: 'Jean Valjean',
+      email: 'jean@example.com',
+      password: 'Password123!',
+      passwordConfirmation: 'Password123!',
+    })
+
+    const user = await User.findByOrFail('email', 'jean@example.com')
+    const membership = await OrganizationMembership.query()
+      .where('userId', user.id)
+      .where('organizationId', user.organizationId!)
+      .first()
+
+    assert.isNotNull(membership)
+    assert.equal(membership!.role, 'admin')
   })
 
   test('does not create account when email is already taken', async ({ client, assert }) => {
