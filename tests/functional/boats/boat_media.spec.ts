@@ -117,6 +117,49 @@ test.group('Boat Media — DELETE (functional)', (group) => {
     response.assertHeader('location', '/login')
   })
 
+  test('DELETE /boats/:boatId/media/:mediaId — PDF supprimé avec resourceType raw', async ({
+    client,
+    assert,
+  }) => {
+    const deletedCalls: { publicId: string; resourceType: string }[] = []
+    app.container.swap(
+      CloudinaryService,
+      () =>
+        ({
+          deleteFile: async (publicId: string, resourceType: 'image' | 'raw' = 'image') => {
+            deletedCalls.push({ publicId, resourceType })
+          },
+        }) as unknown as CloudinaryService
+    )
+
+    try {
+      const user = await createAdminUser()
+      const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+      const media = await MediaFactory.merge({
+        entityType: 'boat',
+        entityId: boat.id,
+        uploadedById: user.id,
+        kind: 'document',
+        format: 'pdf',
+      }).create()
+
+      const response = await client
+        .delete(`/boats/${boat.id}/media/${media.id}`)
+        .loginAs(user)
+        .redirects(0)
+
+      response.assertStatus(302)
+
+      const found = await Media.find(media.id)
+      assert.isNull(found)
+      assert.lengthOf(deletedCalls, 1)
+      assert.equal(deletedCalls[0].publicId, media.cloudinaryPublicId)
+      assert.equal(deletedCalls[0].resourceType, 'raw')
+    } finally {
+      app.container.restore(CloudinaryService)
+    }
+  })
+
   test('DELETE /boats/:boatId/media/:mediaId retourne 302 sur media inexistant', async ({
     client,
     assert,
