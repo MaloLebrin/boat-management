@@ -10,6 +10,7 @@ import {
 } from '#exceptions/organization_errors'
 import type { OrganizationInvitationData, OrgRole } from '#shared/types/organization'
 import { inject } from '@adonisjs/core'
+import db from '@adonisjs/lucid/services/db'
 import { DateTime } from 'luxon'
 import { createHash, randomBytes } from 'node:crypto'
 
@@ -185,17 +186,23 @@ export default class OrganizationInvitationService {
       throw new AlreadyMemberError()
     }
 
-    // Create membership
-    await OrganizationMembership.create({
-      userId,
-      organizationId: invitation.organizationId,
-      role: invitation.role,
-    })
+    await db.transaction(async (trx) => {
+      await OrganizationMembership.create(
+        {
+          userId,
+          organizationId: invitation.organizationId,
+          role: invitation.role,
+        },
+        { client: trx }
+      )
 
-    // Update invitation
-    invitation.status = 'accepted'
-    invitation.acceptedAt = DateTime.now()
-    await invitation.save()
+      user.organizationId = invitation.organizationId
+      await user.useTransaction(trx).save()
+
+      invitation.status = 'accepted'
+      invitation.acceptedAt = DateTime.now()
+      await invitation.useTransaction(trx).save()
+    })
 
     return invitation
   }
