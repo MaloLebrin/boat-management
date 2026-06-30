@@ -115,11 +115,11 @@ export default class BoatReservationsController {
         startsAt: payload.startsAt,
         endsAt: payload.endsAt,
         clientName: payload.clientName,
-        clientEmail: payload.clientEmail ?? null,
-        clientPhone: payload.clientPhone ?? null,
+        clientEmail: payload.clientEmail,
+        clientPhone: payload.clientPhone,
         status: payload.status,
-        notes: payload.notes ?? null,
-        totalPrice: payload.totalPrice ?? null,
+        notes: payload.notes,
+        totalPrice: payload.totalPrice,
       })
     } catch (error) {
       if (error instanceof ReservationNotFoundError) {

@@ -799,6 +799,44 @@ test.group('Boat Reservations (functional)', (group) => {
     assert.lengthOf(reservations, 1)
   })
 
+  // --- C-01: PATCH partiel ne doit pas effacer les champs optionnels ---
+
+  test('PATCH /boats/:boatId/reservations/:id preserves optional fields on partial update', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    const reservation = await BoatReservation.create({
+      boatId: boat.id,
+      organizationId: boat.organizationId,
+      status: 'option',
+      startsAt: DateTime.fromISO('2025-09-01T10:00:00'),
+      endsAt: DateTime.fromISO('2025-09-07T10:00:00'),
+      clientName: 'Partial Update Client',
+      clientEmail: 'partial@example.com',
+      clientPhone: '+33600000000',
+      notes: 'Initial notes',
+      totalPrice: '1500.00',
+    })
+
+    const response = await client
+      .patch(`/boats/${boat.id}/reservations/${reservation.id}`)
+      .form({ status: 'confirmed' })
+      .loginAs(user)
+      .redirects(0)
+
+    response.assertStatus(302)
+
+    await reservation.refresh()
+    assert.equal(reservation.status, 'confirmed')
+    assert.equal(reservation.clientEmail, 'partial@example.com')
+    assert.equal(reservation.clientPhone, '+33600000000')
+    assert.equal(reservation.notes, 'Initial notes')
+    assert.equal(reservation.totalPrice, '1500.00')
+  })
+
   // --- C3: transitions de statut ---
 
   test('PATCH /boats/:boatId/reservations/:id transitions status from option to cancelled', async ({
