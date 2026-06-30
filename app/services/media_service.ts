@@ -16,7 +16,7 @@ export type { UploadMediaPayload }
 
 function resourceTypeFromKind(kind: MediaKind, format?: string): 'image' | 'raw' {
   if (kind === 'photo') return 'image'
-  if (format === 'pdf') return 'image'
+  if (format === 'pdf') return 'raw'
   return 'raw'
 }
 
