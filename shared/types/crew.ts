@@ -1,3 +1,5 @@
+import type { DateTime } from 'luxon'
+
 export type CrewCertificationType =
   | 'coastal_permit'
   | 'offshore_permit'
@@ -27,7 +29,7 @@ export interface UpdateCrewMemberPayload {
 export interface CreateCrewCertificationPayload {
   type: CrewCertificationType
   referenceNumber?: string | null
-  expiresAt?: string | null
+  expiresAt?: Date | string | DateTime | null
 }
 
 export interface SyncNavigationLogCrewPayload {
