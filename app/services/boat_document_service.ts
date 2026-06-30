@@ -20,7 +20,9 @@ export default class BoatDocumentService {
   constructor(private mediaService: MediaService) {}
   private computeStatus(expiresAt: DateTime | null): BoatDocumentStatus {
     if (!expiresAt) return 'valid'
-    const daysUntil = expiresAt.diff(DateTime.now(), 'days').days
+    const daysUntil = Math.floor(
+      expiresAt.startOf('day').diff(DateTime.now().startOf('day'), 'days').days
+    )
     if (daysUntil < 0) return 'expired'
     if (daysUntil < BOAT_DOCUMENT_EXPIRY_WARNING_DAYS) return 'expiring_soon'
     return 'valid'
