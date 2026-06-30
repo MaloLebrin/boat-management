@@ -116,7 +116,7 @@ export default class BoatDocumentService {
     if (!doc) throw new BoatDocumentNotFoundError(documentId)
     if (doc.mediaId !== null) {
       const org = await Organization.findOrFail(doc.organizationId)
-      await this.mediaService.deleteById(doc.mediaId, org)
+      await this.mediaService.deleteForEntity(doc.mediaId, 'boat', doc.boatId, org)
     }
     await doc.delete()
   }

@@ -105,14 +105,23 @@ export default class MediaService {
       .first()
   }
 
-  async deleteById(mediaId: number, org: Organization | null): Promise<void> {
-    const media = await Media.find(mediaId)
+  async deleteForEntity(
+    mediaId: number,
+    entityType: MediaEntityType,
+    entityId: number,
+    org: Organization | null
+  ): Promise<void> {
+    const media = await Media.query()
+      .where('id', mediaId)
+      .where('entityType', entityType)
+      .where('entityId', entityId)
+      .first()
     if (!media) throw new MediaNotFoundError()
 
     if (org === null && media.entityType !== 'user') {
       logger.warn(
         { mediaId, entityType: media.entityType },
-        'MediaService.deleteById called without org — storage quota not decremented'
+        'MediaService.deleteForEntity called without org — storage quota not decremented'
       )
     }
 

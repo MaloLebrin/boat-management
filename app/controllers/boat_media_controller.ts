@@ -106,7 +106,7 @@ export default class BoatMediaController {
     const org = await this.organizationService.findOrFail(boat.organizationId)
 
     try {
-      await this.mediaService.deleteById(Number(params.mediaId), org)
+      await this.mediaService.deleteForEntity(Number(params.mediaId), 'boat', boat.id, org)
     } catch (error) {
       if (error instanceof MediaNotFoundError) {
         response.redirect(`/boats/${boat.id}`)
@@ -188,7 +188,7 @@ export default class BoatMediaController {
     const org = await this.organizationService.findOrFail(boat.organizationId)
 
     try {
-      await this.mediaService.deleteById(mediaId, org)
+      await this.mediaService.deleteForEntity(mediaId, 'boat_engine', engineId, org)
     } catch (error) {
       if (error instanceof MediaNotFoundError) {
         response.redirect(`/boats/${boat.id}/engines/${engineId}?tab=documents`)
