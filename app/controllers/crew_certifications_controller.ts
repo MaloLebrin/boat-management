@@ -26,7 +26,7 @@ export default class CrewCertificationsController {
       await this.crewService.addCertification(member, {
         type: payload.type,
         referenceNumber: payload.referenceNumber ?? null,
-        expiresAt: payload.expiresAt ? String(payload.expiresAt) : null,
+        expiresAt: payload.expiresAt ?? null,
       })
     } catch (error) {
       if (error instanceof CrewMemberNotFoundError) {

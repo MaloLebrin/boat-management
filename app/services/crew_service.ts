@@ -13,6 +13,7 @@ import type {
   CrewMemberOption,
 } from '#shared/types/crew'
 import type Organization from '#models/organization'
+import { toDateTime } from '#shared/helpers/date'
 
 export { CrewMemberNotFoundError, CrewCertificationNotFoundError }
 
@@ -81,7 +82,7 @@ export default class CrewService {
       crewMemberId: member.id,
       type: payload.type,
       referenceNumber: payload.referenceNumber?.trim() || null,
-      expiresAt: payload.expiresAt ? (payload.expiresAt as unknown as any) : null,
+      expiresAt: payload.expiresAt ? toDateTime(payload.expiresAt) : null,
     })
   }
 
