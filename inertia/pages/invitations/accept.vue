@@ -36,8 +36,16 @@ const form = useForm({
   token: props.token ?? '',
 })
 
+const declineForm = useForm({
+  token: props.token ?? '',
+})
+
 function acceptInvitation() {
   form.post('/invitations/accept', { preserveScroll: true })
+}
+
+function declineInvitation() {
+  declineForm.post('/invitations/decline')
 }
 
 function getRoleLabel(role: OrgRole): string {
@@ -130,11 +138,16 @@ function getRoleLabel(role: OrgRole): string {
             </BaseButton>
           </form>
           <div class="mt-4">
-            <Link href="/">
-              <BaseButton variant="secondary" class="w-full">
+            <form @submit.prevent="declineInvitation">
+              <BaseButton
+                type="submit"
+                variant="secondary"
+                class="w-full"
+                :disabled="declineForm.processing"
+              >
                 {{ t('invitations.accept.decline_btn') }}
               </BaseButton>
-            </Link>
+            </form>
           </div>
         </template>
       </BaseCard>

@@ -130,3 +130,109 @@ test.group('Organization invitations — accept (functional)', (group) => {
     response.assertHeader('location', '/login')
   })
 })
+
+test.group('Organization invitations — decline (functional)', (group) => {
+  group.each.setup(() => testUtils.db().truncate())
+
+  test('POST /invitations/decline cancels the invitation', async ({ client, assert }) => {
+    const admin = await createAdminUser()
+    const plainToken = 'decline-plain-token-aaa'
+
+    await OrganizationInvitationFactory.merge({
+      email: 'alice@example.com',
+      organizationId: admin.organizationId!,
+      token: sha256(plainToken),
+      status: 'pending',
+      expiresAt: DateTime.now().plus({ days: 7 }),
+    }).create()
+
+    const response = await client
+      .post('/invitations/decline')
+      .form({ token: plainToken })
+      .redirects(0)
+
+    response.assertStatus(302)
+
+    const invitation = await OrganizationInvitation.query()
+      .where('token', sha256(plainToken))
+      .firstOrFail()
+
+    assert.equal(invitation.status, 'cancelled')
+  })
+
+  test('POST /invitations/decline does not require authentication', async ({ client, assert }) => {
+    const admin = await createAdminUser()
+    const plainToken = 'decline-plain-token-bbb'
+
+    await OrganizationInvitationFactory.merge({
+      email: 'alice@example.com',
+      organizationId: admin.organizationId!,
+      token: sha256(plainToken),
+      status: 'pending',
+      expiresAt: DateTime.now().plus({ days: 7 }),
+    }).create()
+
+    const response = await client
+      .post('/invitations/decline')
+      .form({ token: plainToken })
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertHeader('location', '/')
+
+    const invitation = await OrganizationInvitation.query()
+      .where('token', sha256(plainToken))
+      .firstOrFail()
+
+    assert.equal(invitation.status, 'cancelled')
+  })
+
+  test('POST /invitations/decline redirects back on invalid token', async ({ client }) => {
+    const response = await client
+      .post('/invitations/decline')
+      .form({ token: 'invalid-token' })
+      .redirects(0)
+
+    response.assertStatus(302)
+  })
+})
+
+test.group('Organization invitations — re-invite (functional)', (group) => {
+  group.each.setup(() => testUtils.db().truncate())
+
+  test('POST /organization/invitations replaces existing pending invitation', async ({
+    client,
+    assert,
+  }) => {
+    const admin = await createAdminUser()
+    const firstToken = 'first-plain-token-ccc'
+
+    const firstInvitation = await OrganizationInvitationFactory.merge({
+      email: 'alice@example.com',
+      organizationId: admin.organizationId!,
+      token: sha256(firstToken),
+      status: 'pending',
+      expiresAt: DateTime.now().plus({ days: 7 }),
+    }).create()
+
+    const response = await client
+      .post('/organization/invitations')
+      .loginAs(admin)
+      .form({ email: 'alice@example.com', role: 'member' })
+      .redirects(0)
+
+    response.assertStatus(302)
+
+    await firstInvitation.refresh()
+    assert.equal(firstInvitation.status, 'cancelled')
+
+    const newInvitation = await OrganizationInvitation.query()
+      .where('organizationId', admin.organizationId!)
+      .where('email', 'alice@example.com')
+      .where('status', 'pending')
+      .first()
+
+    assert.isNotNull(newInvitation)
+    assert.notEqual(newInvitation!.id, firstInvitation.id)
+  })
+})

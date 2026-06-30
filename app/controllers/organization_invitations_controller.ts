@@ -6,13 +6,16 @@ import OrganizationPolicy from '#policies/organization_policy'
 import {
   AlreadyMemberError,
   InvitationAlreadyAcceptedError,
-  InvitationAlreadyExistsError,
   InvitationEmailMismatchError,
   InvitationExpiredError,
   InvitationNotFoundError,
 } from '#exceptions/organization_errors'
 import { QuotaExceededError } from '#exceptions/quota_errors'
-import { acceptInvitationValidator, inviteMemberValidator } from '#validators/organization_member'
+import {
+  acceptInvitationValidator,
+  declineInvitationValidator,
+  inviteMemberValidator,
+} from '#validators/organization_member'
 import env from '#start/env'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
@@ -55,10 +58,6 @@ export default class OrganizationInvitationsController {
 
       session.flash('success', i18n.t('flash.invitation.sent'))
     } catch (error) {
-      if (error instanceof InvitationAlreadyExistsError) {
-        session.flash('error', i18n.t('flash.invitation.alreadyPending'))
-        return response.redirect().back()
-      }
       if (error instanceof AlreadyMemberError) {
         session.flash('error', i18n.t('flash.invitation.alreadyMember'))
         return response.redirect().back()
@@ -180,6 +179,30 @@ export default class OrganizationInvitationsController {
       }
       if (error instanceof InvitationEmailMismatchError) {
         session.flash('error', i18n.t('flash.invitation.emailMismatch'))
+        return response.redirect().back()
+      }
+      throw error
+    }
+  }
+
+  async decline({ request, response, session, i18n }: HttpContext) {
+    try {
+      const { token } = await request.validateUsing(declineInvitationValidator)
+      await this.invitationService.decline(token)
+
+      session.flash('info', i18n.t('flash.invitation.declined'))
+      return response.redirect().toPath('/')
+    } catch (error) {
+      if (error instanceof InvitationNotFoundError) {
+        session.flash('error', i18n.t('flash.invitation.notFound'))
+        return response.redirect().back()
+      }
+      if (error instanceof InvitationExpiredError) {
+        session.flash('error', i18n.t('flash.invitation.expired'))
+        return response.redirect().back()
+      }
+      if (error instanceof InvitationAlreadyAcceptedError) {
+        session.flash('error', i18n.t('flash.invitation.alreadyUsed'))
         return response.redirect().back()
       }
       throw error

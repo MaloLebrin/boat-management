@@ -18,3 +18,9 @@ export const acceptInvitationValidator = vine.compile(
     token: vine.string().trim(),
   })
 )
+
+export const declineInvitationValidator = vine.compile(
+  vine.object({
+    token: vine.string().trim(),
+  })
+)

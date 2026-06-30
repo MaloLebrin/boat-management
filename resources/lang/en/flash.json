@@ -91,7 +91,8 @@
     "alreadyUsed": "This invitation has already been accepted.",
     "alreadyMember": "You are already a member of this organisation.",
     "alreadyPending": "An invitation is already pending for this email.",
-    "emailMismatch": "This invitation was sent to a different email address."
+    "emailMismatch": "This invitation was sent to a different email address.",
+    "declined": "You have declined the invitation."
   },
   "billing": {
     "notConfigured": "Payment is not configured yet. Please contact support.",

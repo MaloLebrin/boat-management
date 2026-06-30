@@ -12,3 +12,8 @@ router
   .post('invitations/accept', [controllers.OrganizationInvitations, 'accept'])
   .as('invitations.accept')
   .use(middleware.auth())
+
+// Public route - decline invitation (token-based, no auth required)
+router
+  .post('invitations/decline', [controllers.OrganizationInvitations, 'decline'])
+  .as('invitations.decline')

@@ -4,7 +4,6 @@ import User from '#models/user'
 import {
   AlreadyMemberError,
   InvitationAlreadyAcceptedError,
-  InvitationAlreadyExistsError,
   InvitationEmailMismatchError,
   InvitationExpiredError,
   InvitationNotFoundError,
@@ -44,7 +43,8 @@ export default class OrganizationInvitationService {
 
   /**
    * Creates a new invitation.
-   * Throws InvitationAlreadyExistsError if a pending invitation already exists for this email in this org.
+   * Cancels any existing pending invitation for the same email/org before creating a new one.
+   * Throws AlreadyMemberError if the email is already a member.
    * Returns the invitation data and the plain token (to be sent via email).
    */
   async create(
@@ -65,17 +65,12 @@ export default class OrganizationInvitationService {
       throw new AlreadyMemberError()
     }
 
-    // Check for existing pending invitation
-    const existingInvitation = await OrganizationInvitation.query()
+    // Cancel any existing pending invitation for this email before creating a new one
+    await OrganizationInvitation.query()
       .where('organizationId', orgId)
       .where('email', email)
       .where('status', 'pending')
-      .where('expiresAt', '>', DateTime.now().toSQL())
-      .first()
-
-    if (existingInvitation) {
-      throw new InvitationAlreadyExistsError()
-    }
+      .update({ status: 'cancelled' })
 
     const plainToken = randomBytes(64).toString('hex')
     const tokenHash = sha256(plainToken)
@@ -120,6 +115,18 @@ export default class OrganizationInvitationService {
       throw new InvitationNotFoundError()
     }
 
+    invitation.status = 'cancelled'
+    await invitation.save()
+  }
+
+  /**
+   * Declines an invitation by token (sets status to 'cancelled').
+   * Throws InvitationNotFoundError if not found.
+   * Throws InvitationAlreadyAcceptedError if already accepted or cancelled.
+   * Throws InvitationExpiredError if expired.
+   */
+  async decline(plainToken: string): Promise<void> {
+    const invitation = await this.verifyToken(plainToken)
     invitation.status = 'cancelled'
     await invitation.save()
   }
