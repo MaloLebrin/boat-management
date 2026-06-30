@@ -210,6 +210,12 @@ export default class BoatEnginePartsController {
     const partId = Number(params.partId)
     const mediaId = Number(params.mediaId)
 
+    const engine = boat.engines.find((e) => e.id === engineId)
+    if (!engine) return response.redirect(`/boats/${boat.id}`)
+
+    const part = await this.equipmentService.findEnginePart(engineId, partId)
+    if (!part) return response.redirect(`/boats/${boat.id}/engines/${engineId}?tab=parts`)
+
     const media = await this.mediaService.getForEntity(mediaId, 'boat_engine_part', partId)
     if (!media) {
       return response.redirect(
@@ -243,6 +249,12 @@ export default class BoatEnginePartsController {
     const engineId = Number(params.engineId)
     const partId = Number(params.partId)
     const mediaId = Number(params.mediaId)
+
+    const engine = boat.engines.find((e) => e.id === engineId)
+    if (!engine) return response.redirect(`/boats/${boat.id}`)
+
+    const part = await this.equipmentService.findEnginePart(engineId, partId)
+    if (!part) return response.redirect(`/boats/${boat.id}/engines/${engineId}?tab=parts`)
 
     const media = await this.mediaService.getForEntity(mediaId, 'boat_engine_part', partId)
     if (!media) {
