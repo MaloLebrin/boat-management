@@ -111,9 +111,25 @@ export default class CrewService {
     log: NavigationLog,
     payload: SyncNavigationLogCrewPayload
   ): Promise<void> {
+    const requestedIds = payload.crew.map((e) => e.crewMemberId)
+
+    if (requestedIds.length === 0) {
+      await log.related('crew').sync({})
+      return
+    }
+
+    const validMembers = await CrewMember.query()
+      .whereIn('id', requestedIds)
+      .where('organizationId', log.organizationId)
+      .select('id')
+
+    const validIds = new Set(validMembers.map((m) => m.id))
+
     const pivotData: Record<number, { role: string }> = {}
     for (const entry of payload.crew) {
-      pivotData[entry.crewMemberId] = { role: entry.role }
+      if (validIds.has(entry.crewMemberId)) {
+        pivotData[entry.crewMemberId] = { role: entry.role }
+      }
     }
     await log.related('crew').sync(pivotData)
   }
