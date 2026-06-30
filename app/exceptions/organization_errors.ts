@@ -60,3 +60,10 @@ export class InvitationAlreadyExistsError extends Error {
     this.name = 'InvitationAlreadyExistsError'
   }
 }
+
+export class InvitationEmailMismatchError extends Error {
+  constructor() {
+    super('This invitation was sent to a different email address')
+    this.name = 'InvitationEmailMismatchError'
+  }
+}

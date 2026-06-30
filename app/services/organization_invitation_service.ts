@@ -1,9 +1,11 @@
 import OrganizationInvitation from '#models/organization_invitation'
 import OrganizationMembership from '#models/organization_membership'
+import User from '#models/user'
 import {
   AlreadyMemberError,
   InvitationAlreadyAcceptedError,
   InvitationAlreadyExistsError,
+  InvitationEmailMismatchError,
   InvitationExpiredError,
   InvitationNotFoundError,
 } from '#exceptions/organization_errors'
@@ -159,6 +161,12 @@ export default class OrganizationInvitationService {
    */
   async accept(plainToken: string, userId: number): Promise<OrganizationInvitation> {
     const invitation = await this.verifyToken(plainToken)
+
+    const user = await User.findOrFail(userId)
+
+    if (user.email.toLowerCase() !== invitation.email.toLowerCase()) {
+      throw new InvitationEmailMismatchError()
+    }
 
     // Check if user is already a member
     const existingMembership = await OrganizationMembership.query()

@@ -7,6 +7,7 @@ import {
   AlreadyMemberError,
   InvitationAlreadyAcceptedError,
   InvitationAlreadyExistsError,
+  InvitationEmailMismatchError,
   InvitationExpiredError,
   InvitationNotFoundError,
 } from '#exceptions/organization_errors'
@@ -175,6 +176,10 @@ export default class OrganizationInvitationsController {
       }
       if (error instanceof AlreadyMemberError) {
         session.flash('error', i18n.t('flash.invitation.alreadyMember'))
+        return response.redirect().back()
+      }
+      if (error instanceof InvitationEmailMismatchError) {
+        session.flash('error', i18n.t('flash.invitation.emailMismatch'))
         return response.redirect().back()
       }
       throw error
