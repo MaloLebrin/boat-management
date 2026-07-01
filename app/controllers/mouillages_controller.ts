@@ -39,7 +39,8 @@ export default class MouillagesController {
     const user = auth.getUserOrFail()
 
     try {
-      await bouncer.with(PortPolicy).authorize('create')
+      const port = await this.portService.getForUserOrFail(user, Number(params.portId))
+      await bouncer.with(PortPolicy).authorize('edit', port)
       const mouillage = await this.mouillageService.getForUserOrFail(
         user,
         Number(params.portId),
@@ -49,6 +50,7 @@ export default class MouillagesController {
       await this.mouillageService.updateForPort(mouillage, payload)
       return response.redirect(`/ports/${params.portId}`)
     } catch (error) {
+      if (error instanceof PortNotFoundError) return response.redirect('/ports')
       if (error instanceof MouillageNotFoundError)
         return response.redirect(`/ports/${params.portId}`)
       throw error
@@ -60,7 +62,8 @@ export default class MouillagesController {
     const user = auth.getUserOrFail()
 
     try {
-      await bouncer.with(PortPolicy).authorize('create')
+      const port = await this.portService.getForUserOrFail(user, Number(params.portId))
+      await bouncer.with(PortPolicy).authorize('delete', port)
       const mouillage = await this.mouillageService.getForUserOrFail(
         user,
         Number(params.portId),
@@ -69,6 +72,7 @@ export default class MouillagesController {
       await this.mouillageService.deleteForPort(mouillage)
       return response.redirect(`/ports/${params.portId}`)
     } catch (error) {
+      if (error instanceof PortNotFoundError) return response.redirect('/ports')
       if (error instanceof MouillageNotFoundError)
         return response.redirect(`/ports/${params.portId}`)
       if (error instanceof MouillageHasBoatsError) {
@@ -84,7 +88,8 @@ export default class MouillagesController {
     const user = auth.getUserOrFail()
 
     try {
-      await bouncer.with(PortPolicy).authorize('create')
+      const port = await this.portService.getForUserOrFail(user, Number(params.portId))
+      await bouncer.with(PortPolicy).authorize('edit', port)
       const mouillage = await this.mouillageService.getForUserOrFail(
         user,
         Number(params.portId),
@@ -94,6 +99,7 @@ export default class MouillagesController {
       await this.mouillageService.updatePosition(mouillage, payload)
       return response.redirect().back()
     } catch (error) {
+      if (error instanceof PortNotFoundError) return response.redirect('/ports')
       if (error instanceof MouillageNotFoundError)
         return response.redirect(`/ports/${params.portId}`)
       throw error
