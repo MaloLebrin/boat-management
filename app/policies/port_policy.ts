@@ -18,11 +18,11 @@ export default class PortPolicy extends BasePolicy {
     return false
   }
 
-  edit(_user: User, _port: Port): AuthorizerResponse {
+  edit(_user: User, _port?: Port): AuthorizerResponse {
     return false
   }
 
-  delete(_user: User, _port: Port): AuthorizerResponse {
+  delete(_user: User, _port?: Port): AuthorizerResponse {
     return false
   }
 }

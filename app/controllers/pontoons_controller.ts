@@ -39,7 +39,8 @@ export default class PontoonsController {
     const user = auth.getUserOrFail()
 
     try {
-      await bouncer.with(PortPolicy).authorize('create')
+      const port = await this.portService.getForUserOrFail(user, Number(params.portId))
+      await bouncer.with(PortPolicy).authorize('edit', port)
       const pontoon = await this.pontoonService.getForUserOrFail(
         user,
         Number(params.portId),
@@ -49,6 +50,7 @@ export default class PontoonsController {
       await this.pontoonService.updateForPort(pontoon, payload)
       return response.redirect(`/ports/${params.portId}`)
     } catch (error) {
+      if (error instanceof PortNotFoundError) return response.redirect('/ports')
       if (error instanceof PontoonNotFoundError) return response.redirect(`/ports/${params.portId}`)
       throw error
     }
@@ -59,7 +61,8 @@ export default class PontoonsController {
     const user = auth.getUserOrFail()
 
     try {
-      await bouncer.with(PortPolicy).authorize('create')
+      const port = await this.portService.getForUserOrFail(user, Number(params.portId))
+      await bouncer.with(PortPolicy).authorize('delete', port)
       const pontoon = await this.pontoonService.getForUserOrFail(
         user,
         Number(params.portId),
@@ -68,6 +71,7 @@ export default class PontoonsController {
       await this.pontoonService.deleteForPort(pontoon)
       return response.redirect(`/ports/${params.portId}`)
     } catch (error) {
+      if (error instanceof PortNotFoundError) return response.redirect('/ports')
       if (error instanceof PontoonNotFoundError) return response.redirect(`/ports/${params.portId}`)
       if (error instanceof PontoonHasBoatsError) {
         session.flash('error', 'pontoon_has_boats')
@@ -82,7 +86,8 @@ export default class PontoonsController {
     const user = auth.getUserOrFail()
 
     try {
-      await bouncer.with(PortPolicy).authorize('create')
+      const port = await this.portService.getForUserOrFail(user, Number(params.portId))
+      await bouncer.with(PortPolicy).authorize('edit', port)
       const pontoon = await this.pontoonService.getForUserOrFail(
         user,
         Number(params.portId),
@@ -92,6 +97,7 @@ export default class PontoonsController {
       await this.pontoonService.updatePosition(pontoon, payload)
       return response.redirect().back()
     } catch (error) {
+      if (error instanceof PortNotFoundError) return response.redirect('/ports')
       if (error instanceof PontoonNotFoundError) return response.redirect(`/ports/${params.portId}`)
       throw error
     }

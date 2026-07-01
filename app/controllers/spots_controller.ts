@@ -67,7 +67,7 @@ export default class SpotsController {
     const user = auth.getUserOrFail()
 
     try {
-      await bouncer.with(PortPolicy).authorize('create')
+      await bouncer.with(PortPolicy).authorize('edit')
       const spot = await this.spotService.getForUserOrFail(user, Number(params.id))
       const payload = await request.validateUsing(updateSpotValidator)
       await this.spotService.update(spot, payload)
@@ -83,7 +83,7 @@ export default class SpotsController {
     const user = auth.getUserOrFail()
 
     try {
-      await bouncer.with(PortPolicy).authorize('create')
+      await bouncer.with(PortPolicy).authorize('delete')
       const spot = await this.spotService.getForUserOrFail(user, Number(params.id))
       await this.spotService.delete(spot)
       return response.redirect().back()
