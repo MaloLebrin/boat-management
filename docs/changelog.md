@@ -3,6 +3,13 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-07-01 — [#188] Escales portuaires : autoriser cost = 0 (mouillages gratuits)
+
+**Correction du validateur qui rejetait les escales gratuites (cost = 0)**
+
+- `app/validators/boat_port_stay_validator.ts` : remplacement de `.positive()` par `.min(0)` sur `cost` — cohérent avec `boat_document.ts` qui utilise déjà `.min(0)`.
+- Permet d'enregistrer les mouillages gratuits, ports partenaires et invitations sans coût.
+
 ## 2026-07-01 — [#189] Budget : inclure les documents sans date d'émission (issued_at = null)
 
 **Correction du calcul mensuel du budget qui ignorait silencieusement les documents sans date d'émission**
