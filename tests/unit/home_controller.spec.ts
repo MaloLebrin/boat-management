@@ -10,7 +10,7 @@ test.group('HomeController (unit)', () => {
         },
       } as any,
       {
-        getLatestFleetAnalysis: async () => null,
+        getLatestFleetAnalysis: async (_userId: number, _orgId: number) => null,
       } as any
     )
 
@@ -42,7 +42,7 @@ test.group('HomeController (unit)', () => {
         }),
       } as any,
       {
-        getLatestFleetAnalysis: async () => null,
+        getLatestFleetAnalysis: async (_userId: number, _orgId: number) => null,
       } as any
     )
 
@@ -58,7 +58,7 @@ test.group('HomeController (unit)', () => {
       auth: {
         isAuthenticated: true,
         check: async () => {},
-        getUserOrFail: () => ({ organizationId: 1 }),
+        getUserOrFail: () => ({ id: 1, organizationId: 42 }),
       },
     } as any)
 
