@@ -5,6 +5,7 @@ import type Port from '#models/port'
 import type User from '#models/user'
 import { PontoonHasBoatsError, PontoonNotFoundError } from '#exceptions/port_errors'
 import { inject } from '@adonisjs/core'
+import db from '@adonisjs/lucid/services/db'
 
 export type PontoonPayload = {
   name: string
@@ -54,16 +55,25 @@ export default class PontoonService {
   }
 
   async deleteForPort(pontoon: Pontoon) {
-    const spots = await Spot.query().where('pontoonId', pontoon.id).select('id')
-    const spotIds = spots.map((s) => s.id)
+    await db.transaction(async (trx) => {
+      const spots = await Spot.query()
+        .useTransaction(trx)
+        .where('pontoonId', pontoon.id)
+        .select('id')
+      const spotIds = spots.map((s) => s.id)
 
-    if (spotIds.length > 0) {
-      const result = await Boat.query().whereIn('spotId', spotIds).count('id as count').first()
+      if (spotIds.length > 0) {
+        const result = await Boat.query()
+          .useTransaction(trx)
+          .whereIn('spotId', spotIds)
+          .count('id as count')
+          .first()
 
-      if (Number(result?.$extras['count'] ?? 0) > 0) throw new PontoonHasBoatsError()
-    }
+        if (Number(result?.$extras['count'] ?? 0) > 0) throw new PontoonHasBoatsError()
+      }
 
-    await pontoon.delete()
+      await pontoon.useTransaction(trx).delete()
+    })
   }
 
   async updatePosition(pontoon: Pontoon, payload: { x: number; y: number }) {
