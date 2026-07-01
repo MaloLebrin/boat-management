@@ -8,7 +8,7 @@ export const boatPortStayValidator = vine.create(
       .date({ formats: ['YYYY-MM-DD'] })
       .afterOrSameAs('startedAt')
       .optional(),
-    cost: vine.number().positive().optional(),
+    cost: vine.number().min(0).optional(),
     notes: vine.string().trim().maxLength(2000).optional(),
   })
 )
