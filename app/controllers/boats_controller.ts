@@ -150,7 +150,9 @@ export default class BoatsController {
         this.sheetService.listForBoat(user, boat),
         this.mediaService.listForEntity('boat', boat.id),
         this.boatService.getPositionHistory(boat.id),
-        this.aiAnalysisService.getLatestBoatSuggestions(user.id, boat.id, user.organization.id),
+        user.organizationId
+          ? this.aiAnalysisService.getLatestBoatSuggestions(user.id, boat.id, user.organizationId)
+          : Promise.resolve(null),
         bouncer.with(BoatPolicy).allows('edit', boat),
         this.documentService.listForBoat(user, boat),
       ])
