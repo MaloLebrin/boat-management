@@ -35,6 +35,27 @@ test.group('BoatMaintenanceService (unit)', () => {
     assert.equal(event.parts[0]!.name, 'Oil filter')
   })
 
+  test('createForBoat throws engineCaptionRequired when engine subject has no caption', async ({
+    assert,
+  }) => {
+    const user = await UserFactory.with('organization').create()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    const svc = new BoatMaintenanceService()
+    let caught: unknown
+    try {
+      await svc.createForBoat(user, boat, {
+        subject: 'engine',
+        performedAt: '2024-06-01',
+        title: 'Missing caption',
+      })
+    } catch (err) {
+      caught = err
+    }
+    assert.instanceOf(caught, BoatMaintenanceValidationError)
+    assert.equal((caught as BoatMaintenanceValidationError).errorCode, 'engineCaptionRequired')
+  })
+
   test('createForBoat rejects engine from another boat', async ({ assert }) => {
     const user = await UserFactory.with('organization').create()
     const boatA = await BoatFactory.merge({ organizationId: user.organizationId! }).create()

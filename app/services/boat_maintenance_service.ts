@@ -89,7 +89,7 @@ export default class BoatMaintenanceService {
         if (!caption) {
           throw new BoatMaintenanceValidationError(
             'engineCaption is required for engine maintenance',
-            'sailCaptionRequired'
+            'engineCaptionRequired'
           )
         }
         engineCaption = caption
