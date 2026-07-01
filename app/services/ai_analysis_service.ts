@@ -123,34 +123,38 @@ export default class AiAnalysisService {
     orgSystemPrompt?: string | null,
     orgModelOverride?: string | null
   ): Promise<AiSuggestion[]> {
-    const currentUsage = await this.aiTokenQuotaService.getUsage(org.id)
-    this.aiTokenQuotaService.assertCanUseTokens(org, currentUsage)
+    return this.aiTokenQuotaService.withOrgLock(org.id, async () => {
+      const currentUsage = await this.aiTokenQuotaService.getUsage(org.id)
+      this.aiTokenQuotaService.assertCanUseTokens(org, currentUsage)
 
-    const userMessage = this.#buildFleetUserMessage(input)
-    const systemContent = orgSystemPrompt ? `${orgSystemPrompt}\n\n${SYSTEM_PROMPT}` : SYSTEM_PROMPT
+      const userMessage = this.#buildFleetUserMessage(input)
+      const systemContent = orgSystemPrompt
+        ? `${orgSystemPrompt}\n\n${SYSTEM_PROMPT}`
+        : SYSTEM_PROMPT
 
-    const { content: rawResponse, tokensUsed } = await this.aiService.chat(
-      [
-        { role: 'system', content: systemContent },
-        { role: 'user', content: userMessage },
-      ],
-      orgModelOverride
-    )
+      const { content: rawResponse, tokensUsed } = await this.aiService.chat(
+        [
+          { role: 'system', content: systemContent },
+          { role: 'user', content: userMessage },
+        ],
+        orgModelOverride
+      )
 
-    await this.aiTokenQuotaService.recordUsage(org, tokensUsed)
+      await this.aiTokenQuotaService.recordUsage(org, tokensUsed)
 
-    const suggestions = this.#parseResponse(rawResponse)
+      const suggestions = this.#parseResponse(rawResponse)
 
-    await AiAnalysis.create({
-      userId,
-      organizationId: org.id,
-      boatId: null,
-      kind: 'fleet_analysis',
-      responseText: JSON.stringify(suggestions),
-      createdAt: DateTime.now(),
+      await AiAnalysis.create({
+        userId,
+        organizationId: org.id,
+        boatId: null,
+        kind: 'fleet_analysis',
+        responseText: JSON.stringify(suggestions),
+        createdAt: DateTime.now(),
+      })
+
+      return suggestions
     })
-
-    return suggestions
   }
 
   async generateBoatSuggestions(
@@ -161,34 +165,38 @@ export default class AiAnalysisService {
     orgSystemPrompt?: string | null,
     orgModelOverride?: string | null
   ): Promise<AiSuggestion[]> {
-    const currentUsage = await this.aiTokenQuotaService.getUsage(org.id)
-    this.aiTokenQuotaService.assertCanUseTokens(org, currentUsage)
+    return this.aiTokenQuotaService.withOrgLock(org.id, async () => {
+      const currentUsage = await this.aiTokenQuotaService.getUsage(org.id)
+      this.aiTokenQuotaService.assertCanUseTokens(org, currentUsage)
 
-    const userMessage = this.#buildBoatUserMessage(input)
-    const systemContent = orgSystemPrompt ? `${orgSystemPrompt}\n\n${SYSTEM_PROMPT}` : SYSTEM_PROMPT
+      const userMessage = this.#buildBoatUserMessage(input)
+      const systemContent = orgSystemPrompt
+        ? `${orgSystemPrompt}\n\n${SYSTEM_PROMPT}`
+        : SYSTEM_PROMPT
 
-    const { content: rawResponse, tokensUsed } = await this.aiService.chat(
-      [
-        { role: 'system', content: systemContent },
-        { role: 'user', content: userMessage },
-      ],
-      orgModelOverride
-    )
+      const { content: rawResponse, tokensUsed } = await this.aiService.chat(
+        [
+          { role: 'system', content: systemContent },
+          { role: 'user', content: userMessage },
+        ],
+        orgModelOverride
+      )
 
-    await this.aiTokenQuotaService.recordUsage(org, tokensUsed)
+      await this.aiTokenQuotaService.recordUsage(org, tokensUsed)
 
-    const suggestions = this.#parseResponse(rawResponse)
+      const suggestions = this.#parseResponse(rawResponse)
 
-    await AiAnalysis.create({
-      userId,
-      organizationId: org.id,
-      boatId,
-      kind: 'boat_suggestions',
-      responseText: JSON.stringify(suggestions),
-      createdAt: DateTime.now(),
+      await AiAnalysis.create({
+        userId,
+        organizationId: org.id,
+        boatId,
+        kind: 'boat_suggestions',
+        responseText: JSON.stringify(suggestions),
+        createdAt: DateTime.now(),
+      })
+
+      return suggestions
     })
-
-    return suggestions
   }
 
   #buildFleetUserMessage(input: FleetAnalysisInput): string {

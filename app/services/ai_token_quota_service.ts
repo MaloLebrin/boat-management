@@ -9,6 +9,30 @@ import { DateTime } from 'luxon'
 
 @inject()
 export default class AiTokenQuotaService {
+  // Promise-chain mutex: serialises concurrent AI calls per org to prevent TOCTOU on quota.
+  // Each orgId maps to the tail of the pending chain; new callers append to it.
+  // Works for a single Node.js process; replace with a distributed lock (e.g. Redis)
+  // if the app is ever scaled horizontally.
+  readonly #orgLocks = new Map<number, Promise<void>>()
+
+  async withOrgLock<T>(orgId: number, fn: () => Promise<T>): Promise<T> {
+    const prev = this.#orgLocks.get(orgId) ?? Promise.resolve()
+    let release!: () => void
+    const current = new Promise<void>((res) => {
+      release = res
+    })
+    this.#orgLocks.set(
+      orgId,
+      prev.then(() => current)
+    )
+    await prev
+    try {
+      return await fn()
+    } finally {
+      release()
+    }
+  }
+
   currentMonthKey(): string {
     return DateTime.now().toFormat('yyyy-MM')
   }
