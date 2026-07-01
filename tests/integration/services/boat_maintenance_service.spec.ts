@@ -180,6 +180,82 @@ test.group('BoatMaintenanceService (unit)', () => {
     assert.equal(catalogPart.wearState, 'to_replace')
   })
 
+  test('createForBoat clamps stock to 0 when quantity exceeds available stock', async ({
+    assert,
+  }) => {
+    const user = await UserFactory.with('organization').create()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const engine = await BoatEngineFactory.merge({ boatId: boat.id }).create()
+    const catalogPart = await BoatEnginePartFactory.merge({
+      boatEngineId: engine.id,
+      stock: 1,
+      wearState: 'good',
+    }).create()
+
+    const svc = new BoatMaintenanceService()
+    await svc.createForBoat(user, boat, {
+      subject: 'engine',
+      boatEngineId: engine.id,
+      performedAt: '2024-10-15',
+      title: 'Overconsumption test',
+      parts: [{ name: 'Part', quantity: '5', enginePartId: catalogPart.id }],
+    })
+
+    await catalogPart.refresh()
+    assert.equal(catalogPart.stock, 0)
+    assert.equal(catalogPart.wearState, 'to_replace')
+  })
+
+  test('createForBoat does not overwrite damaged wearState when stock reaches zero', async ({
+    assert,
+  }) => {
+    const user = await UserFactory.with('organization').create()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const engine = await BoatEngineFactory.merge({ boatId: boat.id }).create()
+    const catalogPart = await BoatEnginePartFactory.merge({
+      boatEngineId: engine.id,
+      stock: 1,
+      wearState: 'damaged',
+    }).create()
+
+    const svc = new BoatMaintenanceService()
+    await svc.createForBoat(user, boat, {
+      subject: 'engine',
+      boatEngineId: engine.id,
+      performedAt: '2024-10-20',
+      title: 'Damaged part usage',
+      parts: [{ name: 'Part', quantity: '1', enginePartId: catalogPart.id }],
+    })
+
+    await catalogPart.refresh()
+    assert.equal(catalogPart.stock, 0)
+    assert.equal(catalogPart.wearState, 'damaged')
+  })
+
+  test('createForBoat preserves null stock when stock is not tracked', async ({ assert }) => {
+    const user = await UserFactory.with('organization').create()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const engine = await BoatEngineFactory.merge({ boatId: boat.id }).create()
+    const catalogPart = await BoatEnginePartFactory.merge({
+      boatEngineId: engine.id,
+      stock: null,
+      wearState: 'good',
+    }).create()
+
+    const svc = new BoatMaintenanceService()
+    await svc.createForBoat(user, boat, {
+      subject: 'engine',
+      boatEngineId: engine.id,
+      performedAt: '2024-10-25',
+      title: 'Null stock usage',
+      parts: [{ name: 'Part', quantity: '2', enginePartId: catalogPart.id }],
+    })
+
+    await catalogPart.refresh()
+    assert.isNull(catalogPart.stock)
+    assert.equal(catalogPart.wearState, 'good')
+  })
+
   test('createForBoat tracks unitPrice and getHistoryForOrg returns totalCost', async ({
     assert,
   }) => {

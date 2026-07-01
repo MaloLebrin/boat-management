@@ -195,24 +195,22 @@ export default class BoatMaintenanceService {
           { client: trx }
         )
 
-        // Decrement stock for catalog parts and auto-update wear state when depleted
+        // Decrement stock atomically to avoid read-modify-write race conditions
         const catalogParts = cleanParts.filter((p) => p.enginePartId !== null)
         for (const p of catalogParts) {
-          const enginePart = await BoatEnginePart.query({ client: trx })
-            .where('id', p.enginePartId!)
-            .first()
-
-          if (!enginePart) continue
-
           const used = p.quantity ?? 1
-          const newStock = enginePart.stock !== null ? Math.max(0, enginePart.stock - used) : null
-          enginePart.stock = newStock
-
-          if (newStock === 0 && enginePart.wearState !== 'damaged') {
-            enginePart.wearState = 'to_replace'
-          }
-
-          await enginePart.save()
+          await BoatEnginePart.query({ client: trx })
+            .where('id', p.enginePartId!)
+            .update({
+              stock: db.raw(
+                'CASE WHEN stock IS NOT NULL THEN CASE WHEN stock < ? THEN 0 ELSE stock - ? END ELSE NULL END',
+                [used, used]
+              ),
+              wearState: db.raw(
+                `CASE WHEN stock IS NOT NULL AND stock <= ? AND wear_state != 'damaged' THEN 'to_replace' ELSE wear_state END`,
+                [used]
+              ),
+            })
         }
       }
 
