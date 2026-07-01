@@ -240,6 +240,51 @@ test.group('Budget Port Stay (functional)', (group) => {
     assert.isNotNull(existing)
   })
 
+  test('POST /boats/:id/port-stays accepts cost = 0 (free stay)', async ({ client, assert }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    const response = await client
+      .post(`/boats/${boat.id}/port-stays`)
+      .form({
+        portName: 'Mouillage gratuit',
+        startedAt: '2024-06-01',
+        cost: '0',
+      })
+      .loginAs(user)
+      .redirects(0)
+
+    response.assertStatus(302)
+
+    const stays = await BoatPortStay.query().where('boat_id', boat.id)
+    assert.lengthOf(stays, 1)
+    assert.equal(Number(stays[0].cost), 0)
+  })
+
+  test('PATCH /boats/:id/port-stays/:stayId accepts cost = 0 (free stay)', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const stay = await BoatPortStayFactory.merge({ boatId: boat.id }).create()
+
+    const response = await client
+      .patch(`/boats/${boat.id}/port-stays/${stay.id}`)
+      .form({
+        portName: 'Port partenaire',
+        startedAt: '2024-09-01',
+        cost: '0',
+      })
+      .loginAs(user)
+      .redirects(0)
+
+    response.assertStatus(302)
+
+    const updated = await BoatPortStay.findOrFail(stay.id)
+    assert.equal(Number(updated.cost), 0)
+  })
+
   test('PATCH /boats/:id/port-stays/:stayId updates the port stay', async ({ client, assert }) => {
     const user = await createAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
