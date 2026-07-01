@@ -118,6 +118,56 @@ test.group('Budget Entries (functional)', (group) => {
     assert.lengthOf(entries, 0)
   })
 
+  test('POST /boats/:id/budget/entries accepts negative amounts (avoir/remboursement)', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    const response = await client
+      .post(`/boats/${boat.id}/budget/entries`)
+      .form({
+        label: 'Remboursement assurance',
+        amount: '-350.00',
+        date: '2024-06-01',
+        category: 'other',
+      })
+      .loginAs(user)
+      .redirects(0)
+
+    response.assertStatus(302)
+
+    const entries = await BoatBudgetEntry.query().where('boat_id', boat.id)
+    assert.lengthOf(entries, 1)
+    assert.equal(Number.parseFloat(entries[0].amount), -350)
+  })
+
+  test('PATCH /boats/:id/budget/entries/:entryId accepts negative amounts', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const entry = await BoatBudgetEntryFactory.merge({ boatId: boat.id }).create()
+
+    const response = await client
+      .patch(`/boats/${boat.id}/budget/entries/${entry.id}`)
+      .form({
+        label: 'Avoir carburant',
+        amount: '-75.50',
+        date: '2024-06-15',
+        category: 'fuel',
+      })
+      .loginAs(user)
+      .redirects(0)
+
+    response.assertStatus(302)
+
+    const updated = await BoatBudgetEntry.findOrFail(entry.id)
+    assert.equal(Number.parseFloat(updated.amount), -75.5)
+  })
+
   test('POST /boats/:id/budget/entries validates required fields', async ({ client, assert }) => {
     const user = await createAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()

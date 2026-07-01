@@ -54,7 +54,6 @@ function submit() {
         v-model="form.amount"
         type="number"
         step="0.01"
-        min="0"
         :label="t('budget.entries.amount')"
         :error="form.errors.amount"
         required
