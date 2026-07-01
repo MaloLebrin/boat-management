@@ -80,7 +80,8 @@
     "completed": "Fiche marquée comme terminée.",
     "removed": "Fiche supprimée.",
     "notFound": "Fiche introuvable.",
-    "itemUpdated": "Item mis à jour."
+    "itemUpdated": "Item mis à jour.",
+    "sheetAlreadyCompleted": "Cette fiche est terminée et ne peut plus être modifiée."
   },
   "invitation": {
     "sent": "Invitation envoyée.",

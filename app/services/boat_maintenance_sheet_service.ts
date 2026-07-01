@@ -1,6 +1,7 @@
 import {
   BoatMaintenanceSheetItemNotFoundError,
   BoatMaintenanceSheetNotFoundError,
+  BoatMaintenanceSheetValidationError,
 } from '#exceptions/maintenance_errors'
 import BoatMaintenanceSheet from '#models/boat_maintenance_sheet'
 import BoatMaintenanceSheetItem from '#models/boat_maintenance_sheet_item'
@@ -11,7 +12,11 @@ import type User from '#models/user'
 import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
 
-export { BoatMaintenanceSheetItemNotFoundError, BoatMaintenanceSheetNotFoundError }
+export {
+  BoatMaintenanceSheetItemNotFoundError,
+  BoatMaintenanceSheetNotFoundError,
+  BoatMaintenanceSheetValidationError,
+}
 export type { CreateSheetPayload, SheetType, UpdateItemPayload }
 
 function toDateTime(value: Date | DateTime): DateTime {
@@ -140,6 +145,10 @@ export default class BoatMaintenanceSheetService {
 
     if (!sheet) {
       throw new BoatMaintenanceSheetNotFoundError()
+    }
+
+    if (sheet.status === 'completed') {
+      throw new BoatMaintenanceSheetValidationError('sheet is completed', 'sheetAlreadyCompleted')
     }
 
     const item = await BoatMaintenanceSheetItem.query()
