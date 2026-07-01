@@ -57,7 +57,7 @@ export default class MouillagesController {
     }
   }
 
-  async destroy({ params, auth, response, session, bouncer }: HttpContext) {
+  async destroy({ params, auth, response, session, bouncer, i18n }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
@@ -76,7 +76,7 @@ export default class MouillagesController {
       if (error instanceof MouillageNotFoundError)
         return response.redirect(`/ports/${params.portId}`)
       if (error instanceof MouillageHasBoatsError) {
-        session.flash('error', 'mouillage_has_boats')
+        session.flash('error', i18n.t('flash.mouillages.hasBoats'))
         return response.redirect(`/ports/${params.portId}`)
       }
       throw error

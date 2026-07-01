@@ -181,5 +181,14 @@
     "notFound": "Reservation not found.",
     "conflict": "This boat is already booked for this period.",
     "endBeforeStart": "End date must be after start date."
+  },
+  "ports": {
+    "hasBoats": "Cannot delete this port: boats are assigned to it."
+  },
+  "pontoons": {
+    "hasBoats": "Cannot delete this pontoon: boats are assigned to it."
+  },
+  "mouillages": {
+    "hasBoats": "Cannot delete this mooring: boats are assigned to it."
   }
 }
