@@ -56,7 +56,7 @@ export default class PontoonsController {
     }
   }
 
-  async destroy({ params, auth, response, session, bouncer }: HttpContext) {
+  async destroy({ params, auth, response, session, bouncer, i18n }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
@@ -74,7 +74,7 @@ export default class PontoonsController {
       if (error instanceof PortNotFoundError) return response.redirect('/ports')
       if (error instanceof PontoonNotFoundError) return response.redirect(`/ports/${params.portId}`)
       if (error instanceof PontoonHasBoatsError) {
-        session.flash('error', 'pontoon_has_boats')
+        session.flash('error', i18n.t('flash.pontoons.hasBoats'))
         return response.redirect(`/ports/${params.portId}`)
       }
       throw error

@@ -89,7 +89,7 @@ export default class PortsController {
     }
   }
 
-  async destroy({ params, auth, response, session, bouncer }: HttpContext) {
+  async destroy({ params, auth, response, session, bouncer, i18n }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
@@ -100,7 +100,7 @@ export default class PortsController {
       return response.redirect('/ports')
     } catch (error) {
       if (error instanceof PortHasBoatsError) {
-        session.flash('error', 'port_has_boats')
+        session.flash('error', i18n.t('flash.ports.hasBoats'))
         return response.redirect(`/ports/${params.id}`)
       }
       if (error instanceof PortNotFoundError) return response.redirect('/ports')

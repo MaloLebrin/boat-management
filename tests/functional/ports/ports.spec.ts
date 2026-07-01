@@ -2,7 +2,10 @@ import { test } from '@japa/runner'
 import testUtils from '@adonisjs/core/services/test_utils'
 import Port from '#models/port'
 import { UserFactory } from '#database/factories/user_factory'
+import { BoatFactory } from '#database/factories/boat_factory'
 import { PortFactory } from '#database/factories/port_factory'
+import { PontoonFactory } from '#database/factories/pontoon_factory'
+import { SpotFactory } from '#database/factories/spot_factory'
 import { createAdminUser } from '#tests/functional/helpers'
 
 test.group('Ports (functional)', (group) => {
@@ -101,6 +104,27 @@ test.group('Ports (functional)', (group) => {
 
     await client.delete(`/ports/${port.id}`).loginAs(otherUser)
 
+    const found = await Port.find(port.id)
+    assert.isNotNull(found)
+  })
+
+  test('DELETE /ports/:id redirects back with flash error when port has boats', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const port = await PortFactory.merge({ organizationId: user.organizationId! }).create()
+    const pontoon = await PontoonFactory.merge({ portId: port.id }).create()
+    const spot = await SpotFactory.merge({
+      pontoonId: pontoon.id,
+      organizationId: user.organizationId!,
+    }).create()
+    await BoatFactory.merge({ organizationId: user.organizationId!, spotId: spot.id }).create()
+
+    const response = await client.delete(`/ports/${port.id}`).loginAs(user).redirects(0)
+
+    response.assertStatus(302)
+    response.assertHeader('location', `/ports/${port.id}`)
     const found = await Port.find(port.id)
     assert.isNotNull(found)
   })

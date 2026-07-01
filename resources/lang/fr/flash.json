@@ -181,5 +181,14 @@
     "notFound": "Réservation introuvable.",
     "conflict": "Ce bateau est déjà réservé sur cette période.",
     "endBeforeStart": "La date de fin doit être postérieure à la date de début."
+  },
+  "ports": {
+    "hasBoats": "Impossible de supprimer ce port : des bateaux y sont assignés."
+  },
+  "pontoons": {
+    "hasBoats": "Impossible de supprimer ce ponton : des bateaux y sont assignés."
+  },
+  "mouillages": {
+    "hasBoats": "Impossible de supprimer ce mouillage : des bateaux y sont assignés."
   }
 }
