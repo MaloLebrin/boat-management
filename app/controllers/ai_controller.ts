@@ -8,6 +8,7 @@ import DashboardService from '#services/dashboard_service'
 import QuotaService from '#services/quota_service'
 import { QuotaExceededError } from '#exceptions/quota_errors'
 import { aiChatValidator } from '#validators/ai'
+import { errors as bouncerErrors } from '@adonisjs/bouncer'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 
@@ -163,6 +164,8 @@ export default class AiController {
         // no flash — boat not found is handled silently
       } else if (error instanceof QuotaExceededError) {
         session.flash('error', i18n.t('flash.quota.aiTokensExceeded'))
+      } else if (error instanceof bouncerErrors.E_AUTHORIZATION_FAILURE) {
+        throw error
       } else {
         session.flash('error', i18n.t('flash.ai.analysisError'))
       }
