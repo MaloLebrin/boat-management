@@ -1,5 +1,4 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
 import AiAnalysis from '#models/ai_analysis'
 import { AiAnalysisFactory } from '#database/factories/ai_analysis_factory'
 import { BoatFactory } from '#database/factories/boat_factory'
@@ -9,9 +8,7 @@ import app from '@adonisjs/core/services/app'
 import AiAnalysisService from '#services/ai_analysis_service'
 import { DateTime } from 'luxon'
 
-test.group('AiAnalysisService — organization scoping', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
-
+test.group('AiAnalysisService — organization scoping', () => {
   test('getLatestFleetAnalysis returns null when org has no analyses', async ({ assert }) => {
     const orgA = await OrganizationFactory.create()
     const orgB = await OrganizationFactory.create()
