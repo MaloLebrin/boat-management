@@ -1,6 +1,7 @@
 import BoatMaintenanceSheetService, {
   BoatMaintenanceSheetItemNotFoundError,
   BoatMaintenanceSheetNotFoundError,
+  BoatMaintenanceSheetValidationError,
 } from '#services/boat_maintenance_sheet_service'
 import BoatHullService, { BoatNotFoundError } from '#services/boat_hull_service'
 import MaintenancePolicy from '#policies/maintenance_policy'
@@ -56,6 +57,11 @@ export default class BoatMaintenanceSheetItemsController {
         error instanceof BoatMaintenanceSheetItemNotFoundError
       ) {
         session.flash('error', i18n.t('flash.maintenanceSheets.notFound'))
+        response.redirect(`/boats/${boat.id}?tab=sheets`)
+        return
+      }
+      if (error instanceof BoatMaintenanceSheetValidationError) {
+        session.flash('error', i18n.t(`flash.maintenanceSheets.${error.errorCode}`))
         response.redirect(`/boats/${boat.id}?tab=sheets`)
         return
       }

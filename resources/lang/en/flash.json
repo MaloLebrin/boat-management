@@ -80,7 +80,8 @@
     "completed": "Sheet marked as complete.",
     "removed": "Sheet deleted.",
     "notFound": "Sheet not found.",
-    "itemUpdated": "Item updated."
+    "itemUpdated": "Item updated.",
+    "sheetAlreadyCompleted": "This sheet is completed and can no longer be modified."
   },
   "invitation": {
     "sent": "Invitation sent.",

@@ -33,3 +33,13 @@ export class BoatMaintenanceSheetNotFoundError extends Error {
 export class BoatMaintenanceSheetItemNotFoundError extends Error {
   name = 'BoatMaintenanceSheetItemNotFoundError'
 }
+
+export class BoatMaintenanceSheetValidationError extends Error {
+  name = 'BoatMaintenanceSheetValidationError'
+  constructor(
+    message: string,
+    readonly errorCode: string
+  ) {
+    super(message)
+  }
+}
