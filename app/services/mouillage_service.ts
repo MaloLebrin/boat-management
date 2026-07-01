@@ -5,6 +5,7 @@ import type Port from '#models/port'
 import type User from '#models/user'
 import { MouillageHasBoatsError, MouillageNotFoundError } from '#exceptions/port_errors'
 import { inject } from '@adonisjs/core'
+import db from '@adonisjs/lucid/services/db'
 
 export type MouillagePayload = {
   name: string
@@ -57,16 +58,25 @@ export default class MouillageService {
   }
 
   async deleteForPort(mouillage: Mouillage) {
-    const spots = await Spot.query().where('mouillageId', mouillage.id).select('id')
-    const spotIds = spots.map((s) => s.id)
+    await db.transaction(async (trx) => {
+      const spots = await Spot.query()
+        .useTransaction(trx)
+        .where('mouillageId', mouillage.id)
+        .select('id')
+      const spotIds = spots.map((s) => s.id)
 
-    if (spotIds.length > 0) {
-      const result = await Boat.query().whereIn('spotId', spotIds).count('id as count').first()
+      if (spotIds.length > 0) {
+        const result = await Boat.query()
+          .useTransaction(trx)
+          .whereIn('spotId', spotIds)
+          .count('id as count')
+          .first()
 
-      if (Number(result?.$extras['count'] ?? 0) > 0) throw new MouillageHasBoatsError()
-    }
+        if (Number(result?.$extras['count'] ?? 0) > 0) throw new MouillageHasBoatsError()
+      }
 
-    await mouillage.delete()
+      await mouillage.useTransaction(trx).delete()
+    })
   }
 
   async updatePosition(mouillage: Mouillage, payload: { x: number; y: number }) {
