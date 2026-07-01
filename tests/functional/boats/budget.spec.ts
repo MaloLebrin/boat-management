@@ -1,6 +1,7 @@
 import { test } from '@japa/runner'
 import testUtils from '@adonisjs/core/services/test_utils'
 import { BoatFactory } from '#database/factories/boat_factory'
+import { BoatDocumentFactory } from '#database/factories/boat_document_factory'
 import { UserFactory } from '#database/factories/user_factory'
 import { createAdminUser } from '#tests/functional/helpers'
 
@@ -73,6 +74,32 @@ test.group('Budget (functional)', (group) => {
     response.assertStatus(200)
     const props = response.inertiaProps
     assert.equal(props.year, new Date().getFullYear())
+  })
+
+  test('GET /boats/:id/budget includes documents with null issued_at using created_at fallback', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    await BoatDocumentFactory.merge({
+      boatId: boat.id,
+      organizationId: user.organizationId!,
+      cost: '150',
+      issuedAt: null,
+    }).create()
+
+    const year = new Date().getFullYear()
+    const response = await client
+      .get(`/boats/${boat.id}/budget`)
+      .qs({ year })
+      .loginAs(user)
+      .withInertia()
+
+    response.assertStatus(200)
+    const props = response.inertiaProps
+    const budget = props.budget as { totals: { documents: number } }
+    assert.isAbove(budget.totals.documents, 0)
   })
 
   test('GET /boats/:id/budget returns empty monthly totals for a boat with no data', async ({

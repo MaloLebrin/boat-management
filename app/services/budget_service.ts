@@ -56,11 +56,11 @@ export default class BudgetService {
     return db
       .from('boat_documents')
       .where('boat_id', boatId)
-      .whereRaw('EXTRACT(YEAR FROM issued_at) = ?', [year])
+      .whereRaw('EXTRACT(YEAR FROM COALESCE(issued_at, created_at)) = ?', [year])
       .whereNotNull('cost')
-      .select(db.raw('EXTRACT(MONTH FROM issued_at)::int as month'))
+      .select(db.raw('EXTRACT(MONTH FROM COALESCE(issued_at, created_at))::int as month'))
       .sum('cost as total')
-      .groupByRaw('EXTRACT(MONTH FROM issued_at)')
+      .groupByRaw('EXTRACT(MONTH FROM COALESCE(issued_at, created_at))')
   }
 
   private async fetchPortByMonth(boatId: number, year: number): Promise<MonthRow[]> {
