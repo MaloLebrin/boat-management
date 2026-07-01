@@ -20,7 +20,9 @@ export default class HomeController {
     const user = auth.getUserOrFail()
     const data = await this.dashboardService.getForUser(user)
 
-    const latestAnalysis = await this.aiService.getLatestFleetAnalysis(user.id)
+    const latestAnalysis = user.organizationId
+      ? await this.aiService.getLatestFleetAnalysis(user.id, user.organizationId)
+      : null
     const aiFleetAnalysis: AiSuggestion[] | null = latestAnalysis
       ? (JSON.parse(latestAnalysis.responseText) as AiSuggestion[])
       : null

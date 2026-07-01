@@ -8,7 +8,15 @@ import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
 export class AiAnalysisSchema extends BaseModel {
-  static $columns = ['boatId', 'createdAt', 'id', 'kind', 'responseText', 'userId'] as const
+  static $columns = [
+    'boatId',
+    'createdAt',
+    'id',
+    'kind',
+    'organizationId',
+    'responseText',
+    'userId',
+  ] as const
   $columns = AiAnalysisSchema.$columns
   @column()
   declare boatId: number | null
@@ -18,6 +26,8 @@ export class AiAnalysisSchema extends BaseModel {
   declare id: number
   @column()
   declare kind: string
+  @column()
+  declare organizationId: number | null
   @column()
   declare responseText: string
   @column()

@@ -89,9 +89,10 @@ export default class AiAnalysisService {
   /**
    * Get the latest fleet analysis for a user
    */
-  async getLatestFleetAnalysis(userId: number): Promise<AiAnalysis | null> {
+  async getLatestFleetAnalysis(userId: number, orgId: number): Promise<AiAnalysis | null> {
     return AiAnalysis.query()
       .where('userId', userId)
+      .where('organizationId', orgId)
       .where('kind', 'fleet_analysis')
       .whereNull('boatId')
       .orderBy('createdAt', 'desc')
@@ -101,9 +102,14 @@ export default class AiAnalysisService {
   /**
    * Get the latest boat suggestions for a user and boat
    */
-  async getLatestBoatSuggestions(userId: number, boatId: number): Promise<AiAnalysis | null> {
+  async getLatestBoatSuggestions(
+    userId: number,
+    boatId: number,
+    orgId: number
+  ): Promise<AiAnalysis | null> {
     return AiAnalysis.query()
       .where('userId', userId)
+      .where('organizationId', orgId)
       .where('kind', 'boat_suggestions')
       .where('boatId', boatId)
       .orderBy('createdAt', 'desc')
@@ -137,6 +143,7 @@ export default class AiAnalysisService {
 
     await AiAnalysis.create({
       userId,
+      organizationId: org.id,
       boatId: null,
       kind: 'fleet_analysis',
       responseText: JSON.stringify(suggestions),
@@ -174,6 +181,7 @@ export default class AiAnalysisService {
 
     await AiAnalysis.create({
       userId,
+      organizationId: org.id,
       boatId,
       kind: 'boat_suggestions',
       responseText: JSON.stringify(suggestions),
