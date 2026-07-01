@@ -1,6 +1,4 @@
 import BoatService, { BoatNotFoundError } from '#services/boat_service'
-import QuotaService from '#services/quota_service'
-import { QuotaExceededError } from '#exceptions/quota_errors'
 import { parseMaintenanceCsv, importMaintenanceRows } from '#services/csv_import_service'
 import { csvPreviewValidator, csvConfirmValidator } from '#validators/csv_import'
 import type { CsvImportPreviewData, MaintenanceImportRow } from '#shared/types/csv'
@@ -16,10 +14,7 @@ interface PendingImport {
 
 @inject()
 export default class CsvImportController {
-  constructor(
-    private boatService: BoatService,
-    private quotaService: QuotaService
-  ) {}
+  constructor(private boatService: BoatService) {}
 
   async show({ inertia, session, auth }: HttpContext) {
     await auth.authenticate()
@@ -38,17 +33,6 @@ export default class CsvImportController {
   async preview({ request, response, session, auth, i18n }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
-    await user.load('organization')
-
-    try {
-      this.quotaService.assertCanExport(user.organization)
-    } catch (error) {
-      if (error instanceof QuotaExceededError) {
-        session.flash('error', i18n.t('flash.quota.exportExceeded'))
-        return response.redirect('/settings/import')
-      }
-      throw error
-    }
 
     const payload = await request.validateUsing(csvPreviewValidator)
 
