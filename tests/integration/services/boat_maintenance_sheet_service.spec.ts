@@ -1,13 +1,12 @@
-import { test } from '@japa/runner'
+import { BoatFactory } from '#database/factories/boat_factory'
+import { BoatMaintenanceSheetFactory } from '#database/factories/boat_maintenance_sheet_factory'
+import { UserFactory } from '#database/factories/user_factory'
+import BoatMaintenanceSheetItem from '#models/boat_maintenance_sheet_item'
 import BoatMaintenanceSheetService, {
   BoatMaintenanceSheetNotFoundError,
   BoatMaintenanceSheetValidationError,
 } from '#services/boat_maintenance_sheet_service'
-import BoatMaintenanceSheet from '#models/boat_maintenance_sheet'
-import BoatMaintenanceSheetItem from '#models/boat_maintenance_sheet_item'
-import { UserFactory } from '#database/factories/user_factory'
-import { BoatFactory } from '#database/factories/boat_factory'
-import { BoatMaintenanceSheetFactory } from '#database/factories/boat_maintenance_sheet_factory'
+import { test } from '@japa/runner'
 
 test.group('BoatMaintenanceSheetService.updateItem', () => {
   test('throws BoatMaintenanceSheetValidationError when sheet is completed', async ({ assert }) => {

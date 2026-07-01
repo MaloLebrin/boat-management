@@ -10,6 +10,7 @@
     "build/**",
     "bower_components/**",
     "jspm_packages/**",
-    "tests/inertia/**"
+    "tests/inertia/**",
+    "tests/integration/**"
   ]
 }
