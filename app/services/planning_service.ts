@@ -6,6 +6,8 @@ import type { PlanningResult, PlanningTask } from '#shared/types/planning'
 import { PLAN_LIMITS } from '#shared/types/plan'
 import type { PlanTier } from '#shared/types/plan'
 import TaskGroupingService from '#services/task_grouping_service'
+import { PLAN_LIMITS } from '#shared/types/plan'
+import type { PlanningResult, PlanningTask } from '#shared/types/planning'
 import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
 
@@ -27,6 +29,7 @@ export default class PlanningService {
         plannedTasks: [],
         undatedTasks: [],
         doneTasks: [],
+        doneTasksTotal: 0,
         groups: [],
         canGroupTasks: false,
       }
@@ -45,12 +48,13 @@ export default class PlanningService {
         plannedTasks: [],
         undatedTasks: [],
         doneTasks: [],
+        doneTasksTotal: 0,
         groups: [],
         canGroupTasks: false,
       }
     }
 
-    const [org, rawTasks, rawDoneTasks] = await Promise.all([
+    const [org, rawTasks, rawDoneTasks, doneTasksTotalRow] = await Promise.all([
       Organization.findOrFail(user.organizationId),
       BoatMaintenanceTask.query()
         .whereIn('boatId', boatIds)
@@ -62,8 +66,15 @@ export default class PlanningService {
         .where('status', 'done')
         .orderBy('updatedAt', 'desc')
         .limit(20),
+      BoatMaintenanceTask.query()
+        .whereIn('boatId', boatIds)
+        .where('status', 'done')
+        .count('* as total'),
     ])
+
     const canGroupTasks = PLAN_LIMITS[org.plan as PlanTier].canGroupTasks
+
+    const doneTasksTotal = Number(doneTasksTotalRow[0].$extras.total)
 
     const today = DateTime.now().startOf('day')
     const soonDateThreshold = today.plus({ days: 30 })
@@ -116,7 +127,7 @@ export default class PlanningService {
 
     const groups = canGroupTasks ? this.taskGroupingService.group(plannedTasks) : []
 
-    return { tasks, overdueTasks, soonTasks, plannedTasks, undatedTasks, doneTasks, groups, canGroupTasks }
+    return { tasks, overdueTasks, soonTasks, plannedTasks, undatedTasks, doneTasks, doneTasksTotal, groups, canGroupTasks }
   }
 
   private isOverdue(task: PlanningTask, today: DateTime): boolean {

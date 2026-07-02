@@ -18,7 +18,8 @@
     "planned": "Planned",
     "plannedEmpty": "No planned tasks",
     "completed": "Completed",
-    "completedEmpty": "Completed tasks appear here"
+    "completedEmpty": "Completed tasks appear here",
+    "completedWithCount": "{displayed} / {total} completed"
   },
   "taskKind": {
     "date": "date",
