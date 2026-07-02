@@ -112,7 +112,16 @@ export default class PlanningService {
 
     const groups = canGroupTasks ? this.taskGroupingService.group(plannedTasks) : []
 
-    return { tasks, overdueTasks, soonTasks, plannedTasks, doneTasks, doneTasksTotal, groups, canGroupTasks }
+    return {
+      tasks,
+      overdueTasks,
+      soonTasks,
+      plannedTasks,
+      doneTasks,
+      doneTasksTotal,
+      groups,
+      canGroupTasks,
+    }
   }
 
   private isOverdue(task: PlanningTask, today: DateTime): boolean {
