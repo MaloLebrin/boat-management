@@ -10,6 +10,7 @@ const props = defineProps<{
   soonTasks: PlanningTask[]
   plannedTasks: PlanningTask[]
   doneTasks: PlanningTask[]
+  doneTasksTotal: number
   groups: TaskGroup[]
   groupingEnabled: boolean
   dismissedGroupIds: Set<string>
@@ -32,6 +33,13 @@ const ungroupedPlannedTasks = computed(() =>
 )
 
 const plannedGroups = computed(() => (props.groupingEnabled ? visibleGroups.value : []))
+
+const doneTasksLabel = computed(() => {
+  const displayed = props.doneTasks.length
+  const total = props.doneTasksTotal
+  if (total === 0) return t('planning.kanban.completed')
+  return total > 20 ? t('planning.kanban.completedWithCount', { displayed, total }) : t('planning.kanban.completed')
+})
 </script>
 
 <template>
@@ -128,7 +136,7 @@ const plannedGroups = computed(() => (props.groupingEnabled ? visibleGroups.valu
       <div
         class="flex items-center gap-2 rounded-lg border-l-4 border-mint-600 bg-mint-50 px-3 py-2"
       >
-        <h2 class="text-sm font-semibold text-mint-700">{{ t('planning.kanban.completed') }}</h2>
+        <h2 class="text-sm font-semibold text-mint-700">{{ doneTasksLabel }}</h2>
         <span
           class="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-mint-600 px-1.5 text-xs font-semibold text-white"
         >

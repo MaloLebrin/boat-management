@@ -16,7 +16,8 @@
     "planned": "Planifiées",
     "plannedEmpty": "Aucune tâche planifiée",
     "completed": "Complétées",
-    "completedEmpty": "Les tâches complétées apparaissent ici"
+    "completedEmpty": "Les tâches complétées apparaissent ici",
+    "completedWithCount": "{displayed} / {total} complétées"
   },
   "taskKind": {
     "date": "date",
