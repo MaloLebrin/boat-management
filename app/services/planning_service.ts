@@ -4,6 +4,7 @@ import Organization from '#models/organization'
 import type User from '#models/user'
 import type { PlanningResult, PlanningTask } from '#shared/types/planning'
 import { PLAN_LIMITS } from '#shared/types/plan'
+import type { PlanTier } from '#shared/types/plan'
 import TaskGroupingService from '#services/task_grouping_service'
 import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
@@ -60,7 +61,7 @@ export default class PlanningService {
         .orderBy('updatedAt', 'desc')
         .limit(20),
     ])
-    const canGroupTasks = PLAN_LIMITS[org.plan].canGroupTasks
+    const canGroupTasks = PLAN_LIMITS[org.plan as PlanTier].canGroupTasks
 
     const today = DateTime.now().startOf('day')
     const soonDateThreshold = today.plus({ days: 30 })

@@ -6,6 +6,7 @@ import type { HasMany, HasOne } from '@adonisjs/lucid/types/relations'
 import type { PlanTier } from '#shared/types/plan'
 
 export default class Organization extends OrganizationSchema {
+  @column()
   declare plan: PlanTier
 
   // PostgreSQL returns bigInteger columns as strings; cast to number on read
