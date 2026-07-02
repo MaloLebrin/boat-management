@@ -49,9 +49,15 @@ export class BrandingService {
 
     const oldPublicId = org.logoPublicId
 
-    org.logoUrl = result.secureUrl
-    org.logoPublicId = result.publicId
-    await org.save()
+    try {
+      org.logoUrl = result.secureUrl
+      org.logoPublicId = result.publicId
+      await org.save()
+    } catch (error) {
+      // Nettoyer l'upload Cloudinary si la sauvegarde en DB échoue
+      await this.cloudinaryService.deleteFile(result.publicId, 'image')
+      throw error
+    }
 
     if (oldPublicId) {
       await this.cloudinaryService.deleteFile(oldPublicId, 'image')
