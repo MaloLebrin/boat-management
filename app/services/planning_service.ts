@@ -25,6 +25,7 @@ export default class PlanningService {
         overdueTasks: [],
         soonTasks: [],
         plannedTasks: [],
+        undatedTasks: [],
         doneTasks: [],
         groups: [],
         canGroupTasks: false,
@@ -42,6 +43,7 @@ export default class PlanningService {
         overdueTasks: [],
         soonTasks: [],
         plannedTasks: [],
+        undatedTasks: [],
         doneTasks: [],
         groups: [],
         canGroupTasks: false,
@@ -91,8 +93,15 @@ export default class PlanningService {
     const overdueTasks: PlanningTask[] = []
     const soonTasks: PlanningTask[] = []
     const plannedTasks: PlanningTask[] = []
+    const undatedTasks: PlanningTask[] = []
 
     for (const task of tasks) {
+      // Tasks without dueAt or dueEngineHours go to undatedTasks
+      if (task.dueAt === null && task.dueEngineHours === null) {
+        undatedTasks.push(task)
+        continue
+      }
+
       const isOverdue = this.isOverdue(task, today)
       const isSoon = this.isSoon(task, today, soonDateThreshold, soonHoursThreshold)
 
@@ -107,7 +116,7 @@ export default class PlanningService {
 
     const groups = canGroupTasks ? this.taskGroupingService.group(plannedTasks) : []
 
-    return { tasks, overdueTasks, soonTasks, plannedTasks, doneTasks, groups, canGroupTasks }
+    return { tasks, overdueTasks, soonTasks, plannedTasks, undatedTasks, doneTasks, groups, canGroupTasks }
   }
 
   private isOverdue(task: PlanningTask, today: DateTime): boolean {

@@ -6,6 +6,7 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BoatMaintenanceTasksPanel from '~/components/boats/maintenance/BoatMaintenanceTasksPanel.vue'
 import { subjectLabel } from '~/components/boats/maintenance/utils'
 import type { BoatShowDetail, MaintenanceTaskRow } from '~/types/boat_show'
+import { useT } from '~/composables/use_t'
 
 const props = defineProps<{
   boat: BoatShowDetail
@@ -14,7 +15,9 @@ const props = defineProps<{
   createTaskNonce: number
 }>()
 
-const tasksFilter = ref<'all' | 'overdue' | 'soon' | 'planned'>('all')
+const { t } = useT()
+
+const tasksFilter = ref<'all' | 'overdue' | 'soon' | 'planned' | 'undated'>('all')
 
 const todayIso = computed(() => new Date().toISOString().slice(0, 10))
 
@@ -37,7 +40,13 @@ const plannedTasks = computed(() => {
   const thirtyDaysFromNow = new Date()
   thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30)
   const soonIso = thirtyDaysFromNow.toISOString().slice(0, 10)
-  return openTasks.value.filter((t) => !t.dueAt || String(t.dueAt) > soonIso)
+  return openTasks.value.filter(
+    (t) => t.dueAt && String(t.dueAt) > soonIso
+  )
+})
+
+const undatedTasks = computed(() => {
+  return openTasks.value.filter((t) => !t.dueAt)
 })
 
 const filteredTasks = computed(() => {
@@ -48,13 +57,15 @@ const filteredTasks = computed(() => {
       return soonTasks.value
     case 'planned':
       return plannedTasks.value
+    case 'undated':
+      return undatedTasks.value
     default:
       return openTasks.value
   }
 })
 
 function formatDate(iso: string | null): string {
-  if (!iso) return '—'
+  if (!iso) return '\u2014'
   return iso.slice(0, 10)
 }
 
@@ -79,10 +90,11 @@ function getTaskComponentLabel(task: MaintenanceTaskRow): string {
       <div class="flex flex-wrap gap-2">
         <button
           v-for="filter in [
-            { key: 'all', label: 'Toutes' },
-            { key: 'overdue', label: 'En retard', count: overdueTasks.length },
-            { key: 'soon', label: 'Bientot', count: soonTasks.length },
-            { key: 'planned', label: 'Planifiees', count: plannedTasks.length },
+            { key: 'all', label: t('boats.show.tasksFilter.all') },
+            { key: 'overdue', label: t('boats.show.tasksFilter.overdue'), count: overdueTasks.length },
+            { key: 'soon', label: t('boats.show.tasksFilter.soon'), count: soonTasks.length },
+            { key: 'planned', label: t('boats.show.tasksFilter.planned'), count: plannedTasks.length },
+            { key: 'undated', label: t('boats.show.tasksFilter.undated'), count: undatedTasks.length },
           ]"
           :key="filter.key"
           type="button"
@@ -115,7 +127,7 @@ function getTaskComponentLabel(task: MaintenanceTaskRow): string {
     >
       <h3 class="flex items-center gap-2 text-sm font-semibold text-coral-700">
         <ExclamationTriangleIcon class="h-4 w-4" />
-        En retard
+        {{ t('boats.show.status.urgent') }}
       </h3>
       <div class="space-y-3 border-l-4 border-coral-400 pl-4">
         <div
@@ -198,7 +210,7 @@ function getTaskComponentLabel(task: MaintenanceTaskRow): string {
       v-if="(tasksFilter === 'all' || tasksFilter === 'planned') && plannedTasks.length > 0"
       class="space-y-3"
     >
-      <h3 class="text-sm font-semibold text-fg-muted">Planifiees</h3>
+      <h3 class="text-sm font-semibold text-fg-muted">{{ t('boats.show.tasksFilter.planned') }}</h3>
       <div class="space-y-2">
         <div
           v-for="task in plannedTasks"
@@ -214,6 +226,43 @@ function getTaskComponentLabel(task: MaintenanceTaskRow): string {
               formatDate(task.dueAt)
             }}</span>
             <span v-else-if="task.dueEngineHours !== null" class="text-sm text-fg-subtle">
+              {{ task.dueEngineHours }}h
+            </span>
+            <Form
+              v-if="canManageMaintenance"
+              :action="{
+                url: `/boats/${boat.id}/maintenance-tasks/${task.id}/done`,
+                method: 'put',
+              }"
+              #default="{ processing }"
+            >
+              <BaseButton type="submit" variant="ghost" size="sm" :disabled="processing">
+                Fait
+              </BaseButton>
+            </Form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Undated section -->
+    <div
+      v-if="(tasksFilter === 'all' || tasksFilter === 'undated') && undatedTasks.length > 0"
+      class="space-y-3"
+    >
+      <h3 class="text-sm font-semibold text-fg-muted">{{ t('boats.show.tasksFilter.undated') }}</h3>
+      <div class="space-y-2">
+        <div
+          v-for="task in undatedTasks"
+          :key="task.id"
+          class="flex items-center justify-between rounded-lg border border-border bg-surface-elevated px-4 py-3"
+        >
+          <div>
+            <p class="font-semibold text-fg">{{ task.title }}</p>
+            <p class="text-sm text-fg-muted">{{ getTaskComponentLabel(task) }}</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <span v-if="task.dueEngineHours !== null" class="text-sm text-fg-subtle">
               {{ task.dueEngineHours }}h
             </span>
             <Form

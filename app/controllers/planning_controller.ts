@@ -10,7 +10,7 @@ export default class PlanningController {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
-    const { tasks, overdueTasks, soonTasks, plannedTasks, doneTasks, groups, canGroupTasks } =
+    const { tasks, overdueTasks, soonTasks, plannedTasks, undatedTasks, doneTasks, groups, canGroupTasks } =
       await this.planningService.getPlanningForOrg(user)
 
     return inertia.render('planning/index', {
@@ -18,6 +18,7 @@ export default class PlanningController {
       overdueTasks,
       soonTasks,
       plannedTasks,
+      undatedTasks,
       doneTasks,
       groups,
       canGroupTasks,
