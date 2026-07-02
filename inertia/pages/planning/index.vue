@@ -15,6 +15,7 @@ const props = defineProps<{
   soonTasks: PlanningTask[]
   plannedTasks: PlanningTask[]
   doneTasks: PlanningTask[]
+  doneTasksTotal: number
   groups: TaskGroup[]
   canGroupTasks: boolean
 }>()
@@ -148,6 +149,7 @@ function handleUngroup(groupId: string) {
       :soon-tasks="soonTasks"
       :planned-tasks="plannedTasks"
       :done-tasks="doneTasks"
+      :done-tasks-total="doneTasksTotal"
       :groups="groups"
       :grouping-enabled="groupingEnabled"
       :dismissed-group-ids="dismissedGroupIds"

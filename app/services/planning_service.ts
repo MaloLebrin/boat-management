@@ -25,6 +25,7 @@ export default class PlanningService {
         soonTasks: [],
         plannedTasks: [],
         doneTasks: [],
+        doneTasksTotal: 0,
         groups: [],
         canGroupTasks: false,
       }
@@ -42,12 +43,13 @@ export default class PlanningService {
         soonTasks: [],
         plannedTasks: [],
         doneTasks: [],
+        doneTasksTotal: 0,
         groups: [],
         canGroupTasks: false,
       }
     }
 
-    const [org, rawTasks, rawDoneTasks] = await Promise.all([
+    const [org, rawTasks, rawDoneTasks, doneTasksTotal] = await Promise.all([
       Organization.findOrFail(user.organizationId),
       BoatMaintenanceTask.query()
         .whereIn('boatId', boatIds)
@@ -59,6 +61,10 @@ export default class PlanningService {
         .where('status', 'done')
         .orderBy('updatedAt', 'desc')
         .limit(20),
+      BoatMaintenanceTask.query()
+        .whereIn('boatId', boatIds)
+        .where('status', 'done')
+        .getCount('total'),
     ])
     const canGroupTasks = PLAN_LIMITS[org.plan].canGroupTasks
 
@@ -106,7 +112,7 @@ export default class PlanningService {
 
     const groups = canGroupTasks ? this.taskGroupingService.group(plannedTasks) : []
 
-    return { tasks, overdueTasks, soonTasks, plannedTasks, doneTasks, groups, canGroupTasks }
+    return { tasks, overdueTasks, soonTasks, plannedTasks, doneTasks, doneTasksTotal, groups, canGroupTasks }
   }
 
   private isOverdue(task: PlanningTask, today: DateTime): boolean {

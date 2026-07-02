@@ -49,6 +49,7 @@ export interface PlanningResult {
   soonTasks: PlanningTask[]
   plannedTasks: PlanningTask[]
   doneTasks: PlanningTask[]
+  doneTasksTotal: number
   groups: TaskGroup[]
   canGroupTasks: boolean
 }
