@@ -2,9 +2,9 @@ import Boat from '#models/boat'
 import BoatMaintenanceTask from '#models/boat_maintenance_task'
 import Organization from '#models/organization'
 import type User from '#models/user'
-import type { PlanningResult, PlanningTask } from '#shared/types/planning'
-import { PLAN_LIMITS } from '#shared/types/plan'
 import TaskGroupingService from '#services/task_grouping_service'
+import { PLAN_LIMITS } from '#shared/types/plan'
+import type { PlanningResult, PlanningTask } from '#shared/types/planning'
 import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
 
@@ -49,7 +49,7 @@ export default class PlanningService {
       }
     }
 
-    const [org, rawTasks, rawDoneTasks, doneTasksTotal] = await Promise.all([
+    const [org, rawTasks, rawDoneTasks, doneTasksTotalRow] = await Promise.all([
       Organization.findOrFail(user.organizationId),
       BoatMaintenanceTask.query()
         .whereIn('boatId', boatIds)
@@ -64,8 +64,10 @@ export default class PlanningService {
       BoatMaintenanceTask.query()
         .whereIn('boatId', boatIds)
         .where('status', 'done')
-        .getCount('total'),
+        .count('* as total'),
     ])
+
+    const doneTasksTotal = Number(doneTasksTotalRow[0].$extras.total)
     const canGroupTasks = PLAN_LIMITS[org.plan].canGroupTasks
 
     const today = DateTime.now().startOf('day')
