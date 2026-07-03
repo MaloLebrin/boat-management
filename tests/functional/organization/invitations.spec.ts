@@ -270,4 +270,39 @@ test.group('Organization invitations — re-invite (functional)', (group) => {
     assert.isNotNull(newInvitation)
     assert.notEqual(newInvitation!.id, firstInvitation.id)
   })
+
+  test('POST /organization/invitations rejects a user already attached to the org without a membership row', async ({
+    client,
+    assert,
+  }) => {
+    const admin = await createAdminUser()
+
+    // A user belonging to the org via `organizationId` but WITHOUT a membership
+    // row (the org owner / A-03 drift scenario) must not be invitable.
+    const orgUser = await UserFactory.merge({
+      email: 'owner-no-membership@example.com',
+      organizationId: admin.organizationId!,
+    }).create()
+
+    const membershipBefore = await OrganizationMembership.query()
+      .where('userId', orgUser.id)
+      .where('organizationId', admin.organizationId!)
+      .first()
+    assert.isNull(membershipBefore)
+
+    const response = await client
+      .post('/organization/invitations')
+      .loginAs(admin)
+      .form({ email: 'owner-no-membership@example.com', role: 'member' })
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertFlashMessage('error', 'You are already a member of this organisation.')
+
+    const invitation = await OrganizationInvitation.query()
+      .where('organizationId', admin.organizationId!)
+      .where('email', 'owner-no-membership@example.com')
+      .first()
+    assert.isNull(invitation)
+  })
 })

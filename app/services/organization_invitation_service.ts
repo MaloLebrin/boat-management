@@ -54,7 +54,11 @@ export default class OrganizationInvitationService {
     email: string,
     role: OrgRole
   ): Promise<{ invitation: OrganizationInvitationData; plainToken: string }> {
-    // Check if already a member
+    // Check if already a member — either via a membership row, or via a user
+    // already attached to the organisation that may not have a membership row
+    // (e.g. the org owner, cf. A-03/A-04). Both signals are checked because a
+    // membership can exist without `users.organizationId` pointing here
+    // (multi-org), and a user can belong to the org without a membership row.
     const existingMembership = await OrganizationMembership.query()
       .where('organizationId', orgId)
       .whereHas('user', (query) => {
@@ -62,7 +66,12 @@ export default class OrganizationInvitationService {
       })
       .first()
 
-    if (existingMembership) {
+    const existingOrgUser = await User.query()
+      .where('email', email)
+      .where('organizationId', orgId)
+      .first()
+
+    if (existingMembership || existingOrgUser) {
       throw new AlreadyMemberError()
     }
 
