@@ -1,0 +1,192 @@
+<script setup lang="ts">
+import type { PlanningTask, TaskGroup } from '#shared/types/planning'
+import PlanningTaskCard from '~/components/planning/PlanningTaskCard.vue'
+import PlanningTaskGroup from '~/components/planning/PlanningTaskGroup.vue'
+import { computed } from 'vue'
+import { useT } from '~/composables/use_t'
+
+const props = defineProps<{
+  overdueTasks: PlanningTask[]
+  soonTasks: PlanningTask[]
+  plannedTasks: PlanningTask[]
+  undatedTasks: PlanningTask[]
+  doneTasks: PlanningTask[]
+  doneTasksTotal: number
+  groups: TaskGroup[]
+  groupingEnabled: boolean
+  dismissedGroupIds: Set<string>
+}>()
+
+const emit = defineEmits<{ ungroup: [groupId: string] }>()
+
+const { t } = useT()
+
+const visibleGroups = computed(() => props.groups.filter((g) => !props.dismissedGroupIds.has(g.id)))
+
+// Groups only contain plannedTasks (computed server-side), so overdue/soon/undated columns are never affected.
+const groupedPlannedIds = computed(() => {
+  if (!props.groupingEnabled) return new Set<number>()
+  return new Set(visibleGroups.value.flatMap((g) => g.tasks.map((task) => task.id)))
+})
+
+const ungroupedPlannedTasks = computed(() =>
+  props.plannedTasks.filter((task) => !groupedPlannedIds.value.has(task.id))
+)
+
+const plannedGroups = computed(() => (props.groupingEnabled ? visibleGroups.value : []))
+
+const doneTasksLabel = computed(() => {
+  const displayed = props.doneTasks.length
+  const total = props.doneTasksTotal
+  if (total === 0) return t('planning.kanban.completed')
+  return total > 20
+    ? t('planning.kanban.completedWithCount', { displayed, total })
+    : t('planning.kanban.completed')
+})
+</script>
+
+<template>
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
+    <!-- En retard -->
+    <div class="flex flex-col gap-3">
+      <div class="flex items-center gap-2 rounded-lg border-l-4 border-red-500 bg-red-50 px-3 py-2">
+        <h2 class="text-sm font-semibold text-red-700">{{ t('planning.kanban.overdue') }}</h2>
+        <span
+          class="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-xs font-semibold text-white"
+        >
+          {{ overdueTasks.length }}
+        </span>
+      </div>
+      <div
+        v-if="overdueTasks.length === 0"
+        class="rounded-lg border border-dashed border-border px-4 py-6 text-center text-sm text-fg-muted"
+      >
+        {{ t('planning.kanban.overdueEmpty') }}
+      </div>
+      <PlanningTaskCard
+        v-for="task in overdueTasks"
+        :key="task.id"
+        :task="task"
+        accent-class="border-red-400"
+        badge-class="bg-red-100 text-red-700"
+      />
+    </div>
+
+    <!-- À venir bientôt -->
+    <div class="flex flex-col gap-3">
+      <div
+        class="flex items-center gap-2 rounded-lg border-l-4 border-amber-400 bg-amber-50 px-3 py-2"
+      >
+        <h2 class="text-sm font-semibold text-amber-700">{{ t('planning.kanban.soon') }}</h2>
+        <span
+          class="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-amber-400 px-1.5 text-xs font-semibold text-white"
+        >
+          {{ soonTasks.length }}
+        </span>
+      </div>
+      <div
+        v-if="soonTasks.length === 0"
+        class="rounded-lg border border-dashed border-border px-4 py-6 text-center text-sm text-fg-muted"
+      >
+        {{ t('planning.kanban.soonEmpty') }}
+      </div>
+      <PlanningTaskCard
+        v-for="task in soonTasks"
+        :key="task.id"
+        :task="task"
+        accent-class="border-amber-300"
+        badge-class="bg-amber-100 text-amber-700"
+      />
+    </div>
+
+    <!-- Non datées -->
+    <div class="flex flex-col gap-3">
+      <div
+        class="flex items-center gap-2 rounded-lg border-l-4 border-slate-400 bg-slate-50 px-3 py-2"
+      >
+        <h2 class="text-sm font-semibold text-slate-700">{{ t('planning.kanban.undated') }}</h2>
+        <span
+          class="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-slate-400 px-1.5 text-xs font-semibold text-white"
+        >
+          {{ undatedTasks.length }}
+        </span>
+      </div>
+      <div
+        v-if="undatedTasks.length === 0"
+        class="rounded-lg border border-dashed border-border px-4 py-6 text-center text-sm text-fg-muted"
+      >
+        {{ t('planning.kanban.undatedEmpty') }}
+      </div>
+      <PlanningTaskCard
+        v-for="task in undatedTasks"
+        :key="task.id"
+        :task="task"
+        accent-class="border-slate-400"
+        badge-class="bg-slate-100 text-slate-700"
+      />
+    </div>
+
+    <!-- Planifiées -->
+    <div class="flex flex-col gap-3">
+      <div
+        class="flex items-center gap-2 rounded-lg border-l-4 border-navy-600 bg-navy-25 px-3 py-2"
+      >
+        <h2 class="text-sm font-semibold text-navy-600">{{ t('planning.kanban.planned') }}</h2>
+        <span
+          class="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-navy-600 px-1.5 text-xs font-semibold text-white"
+        >
+          {{ plannedTasks.length }}
+        </span>
+      </div>
+      <div
+        v-if="plannedTasks.length === 0"
+        class="rounded-lg border border-dashed border-border px-4 py-6 text-center text-sm text-fg-muted"
+      >
+        {{ t('planning.kanban.plannedEmpty') }}
+      </div>
+      <!-- Groupes actifs dans la colonne planifiées -->
+      <template v-if="groupingEnabled">
+        <PlanningTaskGroup
+          v-for="group in plannedGroups"
+          :key="group.id"
+          :group="group"
+          @ungroup="emit('ungroup', $event)"
+        />
+      </template>
+      <PlanningTaskCard
+        v-for="task in ungroupedPlannedTasks"
+        :key="task.id"
+        :task="task"
+        badge-class="bg-surface-muted text-fg-muted"
+      />
+    </div>
+
+    <!-- Complétées -->
+    <div class="flex flex-col gap-3">
+      <div
+        class="flex items-center gap-2 rounded-lg border-l-4 border-mint-600 bg-mint-50 px-3 py-2"
+      >
+        <h2 class="text-sm font-semibold text-mint-700">{{ doneTasksLabel }}</h2>
+        <span
+          class="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-mint-600 px-1.5 text-xs font-semibold text-white"
+        >
+          {{ doneTasks.length }}
+        </span>
+      </div>
+      <div
+        v-if="doneTasks.length === 0"
+        class="rounded-lg border border-dashed border-border px-4 py-6 text-center text-sm text-fg-muted"
+      >
+        {{ t('planning.kanban.completedEmpty') }}
+      </div>
+      <PlanningTaskCard
+        v-for="task in doneTasks"
+        :key="task.id"
+        :task="task"
+        accent-class="border-mint-500 opacity-75"
+        badge-class="bg-mint-100 text-mint-700"
+        :done="true"
+      />
+    </div>
+  </div>
+</template>

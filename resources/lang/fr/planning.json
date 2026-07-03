@@ -1,0 +1,41 @@
+{
+  "title": "Planning de maintenance",
+  "subtitle": "Vue d'ensemble des tâches pour tous vos bateaux",
+  "viewKanban": "Kanban",
+  "viewCalendar": "Calendrier",
+  "empty": {
+    "title": "Aucune tâche de maintenance",
+    "description": "Créez des tâches de maintenance depuis la fiche d'un bateau.",
+    "action": "Voir mes bateaux"
+  },
+  "kanban": {
+    "overdue": "En retard",
+    "overdueEmpty": "Aucune tâche en retard",
+    "soon": "À venir bientôt",
+    "soonEmpty": "Aucune tâche imminente",
+    "undated": "Non datées",
+    "undatedEmpty": "Aucune tâche non datée",
+    "planned": "Planifiées",
+    "plannedEmpty": "Aucune tâche planifiée",
+    "completed": "Complétées",
+    "completedEmpty": "Les tâches complétées apparaissent ici",
+    "completedWithCount": "{displayed} / {total} complétées"
+  },
+  "taskKind": {
+    "date": "date",
+    "hours": "heures"
+  },
+  "calendar": {
+    "more": "+{count} autres",
+    "withoutDate": "Sans date planifiée",
+    "schedule": "Planifier",
+    "hourTriggered": "Déclenchées par les heures moteur",
+    "agendaEmpty": "Aucune tâche ce mois-ci"
+  },
+  "grouping": {
+    "toggle": "Regroupement",
+    "toggleTitle": "Regrouper automatiquement les tâches proches",
+    "ungroup": "Dissocier",
+    "proTeaser": "Passez au plan Pro pour regrouper automatiquement les tâches de maintenance proches."
+  }
+}
