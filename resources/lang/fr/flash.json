@@ -202,7 +202,8 @@
     "notFound": "Réservation introuvable.",
     "conflict": "Ce bateau est déjà réservé sur cette période.",
     "endBeforeStart": "La date de fin doit être postérieure à la date de début.",
-    "optionsOverridden": "Réservation confirmée. {count} option(s) en chevauchement annulée(s)."
+    "optionsOverridden": "Réservation confirmée. {count} option(s) en chevauchement annulée(s).",
+    "invalidTransition": "Ce changement de statut n'est pas autorisé."
   },
   "ports": {
     "hasBoats": "Impossible de supprimer ce port : des bateaux y sont assignés."

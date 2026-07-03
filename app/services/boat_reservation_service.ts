@@ -25,6 +25,18 @@ function assertBoatScope(user: User, boat: Boat) {
   }
 }
 
+/**
+ * Allowed status transitions for a reservation. A firm booking can only be
+ * cancelled (no downgrade back to option); a cancellation is terminal (create a
+ * new reservation instead of reactivating). Staying on the same status is a
+ * no-op and always allowed.
+ */
+const ALLOWED_RESERVATION_TRANSITIONS: Record<ReservationStatus, ReservationStatus[]> = {
+  option: ['confirmed', 'cancelled'],
+  confirmed: ['cancelled'],
+  cancelled: [],
+}
+
 @inject()
 export default class BoatReservationService {
   async listForBoat(user: User, boat: Boat): Promise<BoatReservation[]> {
@@ -128,6 +140,15 @@ export default class BoatReservationService {
     }
 
     const effectiveStatus = payload.status ?? reservation.status
+
+    if (payload.status !== undefined && payload.status !== reservation.status) {
+      if (!ALLOWED_RESERVATION_TRANSITIONS[reservation.status].includes(payload.status)) {
+        throw new ReservationValidationError(
+          `invalid status transition from ${reservation.status} to ${payload.status}`,
+          'invalidTransition'
+        )
+      }
+    }
 
     return db.transaction(async (trx) => {
       await this.checkConflict(boat.id, startsAt, endsAt, reservationId, effectiveStatus, trx)
