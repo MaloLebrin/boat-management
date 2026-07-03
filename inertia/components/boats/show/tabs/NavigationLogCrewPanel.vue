@@ -58,6 +58,12 @@ function removeCrewMember(crewMemberId: number) {
     .filter((c) => c.crewMemberId !== crewMemberId)
     .map((c) => ({ crewMemberId: c.crewMemberId, role: c.role }))
 
+  // Removing the last crew member sends an empty list, which clears the whole
+  // trip crew. Confirm first so it can't happen by an accidental click.
+  if (newCrew.length === 0 && !window.confirm(t('crew.logCrew.removeLastConfirm'))) {
+    return
+  }
+
   useForm({ crew: newCrew }).patch(`/boats/${props.boatId}/navigation-logs/${props.logId}/crew`, {
     preserveScroll: true,
   })

@@ -48,7 +48,8 @@
     "empty": "Aucun équipier enregistré pour cette sortie.",
     "role": "Rôle",
     "member": "Équipier",
-    "downloadPdf": "Rôle d'équipage (PDF)"
+    "downloadPdf": "Rôle d'équipage (PDF)",
+    "removeLastConfirm": "C'est le dernier équipier de la sortie. Le retirer et laisser la sortie sans aucun équipage ?"
   },
   "pdf": {
     "title": "Rôle d'équipage",

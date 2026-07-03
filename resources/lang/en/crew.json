@@ -48,7 +48,8 @@
     "empty": "No crew members registered for this trip.",
     "role": "Role",
     "member": "Crew member",
-    "downloadPdf": "Crew list (PDF)"
+    "downloadPdf": "Crew list (PDF)",
+    "removeLastConfirm": "This is the last crew member of the trip. Remove them and leave the trip without any crew?"
   },
   "pdf": {
     "title": "Crew list",

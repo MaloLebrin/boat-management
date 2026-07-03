@@ -114,6 +114,11 @@ export default class CrewService {
   ): Promise<void> {
     const requestedIds = payload.crew.map((e) => e.crewMemberId)
 
+    // An empty list intentionally clears the trip crew (e.g. removing the last
+    // member). This is a deliberate action gated by a confirmation in the UI —
+    // do NOT forbid it with a validator `.minLength(1)`, that would make the last
+    // crew member un-removable. The `crew` field itself is required, so a
+    // malformed request that omits it is already rejected before reaching here.
     if (requestedIds.length === 0) {
       await log.related('crew').sync({})
       return
