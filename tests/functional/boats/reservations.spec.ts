@@ -812,6 +812,22 @@ test.group('Boat Reservations (functional)', (group) => {
     assert.lengthOf(reservations, 0)
   })
 
+  test('POST /boats/:boatId/reservations accepts totalPrice of 0', async ({ client, assert }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    const response = await client
+      .post(`/boats/${boat.id}/reservations`)
+      .form({ ...VALID_RESERVATION, totalPrice: 0 })
+      .loginAs(user)
+      .redirects(0)
+
+    response.assertStatus(302)
+
+    const reservation = await BoatReservation.query().where('boatId', boat.id).firstOrFail()
+    assert.equal(reservation.totalPrice, '0.00')
+  })
+
   test('POST /boats/:boatId/reservations rejects clientPhone longer than 50 chars', async ({
     client,
     assert,

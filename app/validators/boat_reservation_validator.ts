@@ -10,7 +10,7 @@ export const createBoatReservationValidator = vine.compile(
     clientPhone: vine.string().trim().maxLength(50).optional().nullable(),
     status: vine.enum(RESERVATION_STATUSES).optional(),
     notes: vine.string().trim().maxLength(2000).optional().nullable(),
-    totalPrice: vine.number().positive().decimal([0, 2]).optional().nullable(),
+    totalPrice: vine.number().min(0).decimal([0, 2]).optional().nullable(),
   })
 )
 
@@ -23,6 +23,6 @@ export const updateBoatReservationValidator = vine.compile(
     clientPhone: vine.string().trim().maxLength(50).optional().nullable(),
     status: vine.enum(RESERVATION_STATUSES).optional(),
     notes: vine.string().trim().maxLength(2000).optional().nullable(),
-    totalPrice: vine.number().positive().decimal([0, 2]).optional().nullable(),
+    totalPrice: vine.number().min(0).decimal([0, 2]).optional().nullable(),
   })
 )
