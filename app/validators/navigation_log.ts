@@ -16,10 +16,15 @@ export const createNavigationLogValidator = vine.create(
 export const updateNavigationLogValidator = vine.create(
   vine.object({
     _expectedUpdatedAt: vine.string().optional(),
-    windForceBeaufort: vine.number().withoutDecimals().min(0).max(12).optional(),
-    seaState: vine.enum(['calm', 'slight', 'moderate', 'rough', 'very_rough'] as const).optional(),
-    crewCount: vine.number().withoutDecimals().min(0).optional(),
-    notes: vine.string().trim().maxLength(5000).optional(),
+    // nullable + optional: an absent field is left untouched (preserve), while an
+    // explicit null (an emptied form field) clears the value. See #180.
+    windForceBeaufort: vine.number().withoutDecimals().min(0).max(12).nullable().optional(),
+    seaState: vine
+      .enum(['calm', 'slight', 'moderate', 'rough', 'very_rough'] as const)
+      .nullable()
+      .optional(),
+    crewCount: vine.number().withoutDecimals().min(0).nullable().optional(),
+    notes: vine.string().trim().maxLength(5000).nullable().optional(),
   })
 )
 

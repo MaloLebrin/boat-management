@@ -77,10 +77,14 @@ export default class NavigationLogsController {
 
     try {
       await this.navigationLogService.updateForBoat(boat, Number(params.logId), {
-        windForceBeaufort: payload.windForceBeaufort ?? null,
-        seaState: payload.seaState ?? null,
-        crewCount: payload.crewCount ?? null,
-        notes: payload.notes ?? null,
+        // Pass values through as-is (no `?? null`): the service preserves fields
+        // that are `undefined` and only writes those explicitly provided (a null
+        // clears the value). Coercing undefined → null erased untouched fields on
+        // every partial update. See #180.
+        windForceBeaufort: payload.windForceBeaufort,
+        seaState: payload.seaState,
+        crewCount: payload.crewCount,
+        notes: payload.notes,
         expectedUpdatedAt,
       })
     } catch (error) {
