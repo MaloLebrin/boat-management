@@ -83,24 +83,15 @@ export default class SubscriptionService {
   }
 
   private getPeriodBounds(stripeSub: Stripe.Subscription): { start: DateTime; end: DateTime } {
-    const anchor = DateTime.fromSeconds(stripeSub.billing_cycle_anchor)
+    // Stripe's current_period bounds are authoritative: they already account for
+    // trials, pauses and mid-cycle adjustments, which a recomputation from
+    // `billing_cycle_anchor` would get wrong. In the API version shipped with this
+    // SDK these fields live on the subscription item, not the subscription itself.
     const item = stripeSub.items.data[0]
-    const interval = item.price.recurring?.interval ?? 'month'
-    const count = item.price.recurring?.interval_count ?? 1
-    const now = DateTime.now()
-
-    const addInterval = (dt: DateTime): DateTime =>
-      interval === 'year' ? dt.plus({ years: count }) : dt.plus({ months: count })
-
-    let periodStart = anchor
-    let periodEnd = addInterval(anchor)
-
-    while (periodEnd < now) {
-      periodStart = periodEnd
-      periodEnd = addInterval(periodEnd)
+    return {
+      start: DateTime.fromSeconds(item.current_period_start),
+      end: DateTime.fromSeconds(item.current_period_end),
     }
-
-    return { start: periodStart, end: periodEnd }
   }
 
   private async updateOrgPlan(org: Organization, plan: PlanTier) {
