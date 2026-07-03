@@ -353,12 +353,13 @@ export default class BoatsController {
     }
   }
 
-  async assign({ request, params, auth, response }: HttpContext) {
+  async assign({ request, params, auth, response, bouncer }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
     try {
       const boat = await this.boatService.getForUserOrFail(user, Number(params.id))
+      await bouncer.with(BoatPolicy).authorize('edit', boat)
       const payload = await request.validateUsing(assignBoatValidator)
 
       if (payload.spotId !== null) {
