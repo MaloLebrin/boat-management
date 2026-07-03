@@ -2,6 +2,10 @@
 import { ref } from 'vue'
 import MarinaPontoon from '~/components/ports/show/MarinaPontoon.vue'
 import MarinaMouillage from '~/components/ports/show/MarinaMouillage.vue'
+import {
+  MARINA_CANVAS_HEIGHT,
+  MARINA_CANVAS_WIDTH,
+} from '../../../../shared/constants/marina_layout'
 import type { PontoonRow, MouillageRow } from '~/types/port'
 
 type PontoonWithPos = PontoonRow & { x: number; y: number }
@@ -48,8 +52,8 @@ function onSvgPointerMove(e: PointerEvent) {
   const { x, y } = svgCoords(e)
   const key = drag.value.kind === 'pontoon' ? drag.value.id : drag.value.id + 100000
   dragPos.value[key] = {
-    x: Math.max(0, x - drag.value.offsetX),
-    y: Math.max(0, y - drag.value.offsetY),
+    x: Math.min(Math.max(0, x - drag.value.offsetX), MARINA_CANVAS_WIDTH),
+    y: Math.min(Math.max(0, y - drag.value.offsetY), MARINA_CANVAS_HEIGHT),
   }
 }
 
@@ -96,16 +100,21 @@ function handleSpotClick(info: { spotId: number; boat: { id: number; name: strin
 <template>
   <svg
     ref="svgRef"
-    width="1400"
-    height="900"
-    viewBox="0 0 1400 900"
+    :width="MARINA_CANVAS_WIDTH"
+    :height="MARINA_CANVAS_HEIGHT"
+    :viewBox="`0 0 ${MARINA_CANVAS_WIDTH} ${MARINA_CANVAS_HEIGHT}`"
     :style="{ cursor: drag ? 'grabbing' : editMode ? 'grab' : 'default', touchAction: 'none' }"
     @pointermove="onSvgPointerMove"
     @pointerup="onSvgPointerUp"
     @pointercancel="onSvgPointerUp"
   >
     <!-- Water background -->
-    <rect width="1400" height="900" fill="#D6EAF8" @pointerdown="onBgMouseDown" />
+    <rect
+      :width="MARINA_CANVAS_WIDTH"
+      :height="MARINA_CANVAS_HEIGHT"
+      fill="#D6EAF8"
+      @pointerdown="onBgMouseDown"
+    />
 
     <!-- Grid dots -->
     <defs>
@@ -113,7 +122,12 @@ function handleSpotClick(info: { spotId: number; boat: { id: number; name: strin
         <circle cx="20" cy="20" r="1" fill="#B0C9DD" />
       </pattern>
     </defs>
-    <rect width="1400" height="900" fill="url(#grid)" pointer-events="none" />
+    <rect
+      :width="MARINA_CANVAS_WIDTH"
+      :height="MARINA_CANVAS_HEIGHT"
+      fill="url(#grid)"
+      pointer-events="none"
+    />
 
     <!-- Mouillages (behind pontoons) -->
     <MarinaMouillage
