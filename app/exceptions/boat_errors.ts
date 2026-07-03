@@ -10,6 +10,10 @@ export class RegistrationNumberTakenError extends Error {
   name = 'RegistrationNumberTakenError'
 }
 
+export class EngineHoursRegressionError extends Error {
+  name = 'EngineHoursRegressionError'
+}
+
 export class InvalidBoatHullError extends Error {
   constructor(message: string) {
     super(message)
