@@ -82,6 +82,32 @@ test.group('Auth signup (functional)', (group) => {
     assert.isNull(user)
   })
 
+  test('stores fullName as null when only whitespace is provided', async ({ client, assert }) => {
+    const response = await client.post('/signup').form({
+      fullName: '   ',
+      email: 'whitespace@example.com',
+      password: 'Password123!',
+      passwordConfirmation: 'Password123!',
+    })
+
+    response.assertRedirectsTo('/dashboard')
+
+    const user = await User.findByOrFail('email', 'whitespace@example.com')
+    assert.isNull(user.fullName)
+  })
+
+  test('trims fullName before storing it', async ({ client, assert }) => {
+    await client.post('/signup').form({
+      fullName: '  Ada Lovelace  ',
+      email: 'ada@example.com',
+      password: 'Password123!',
+      passwordConfirmation: 'Password123!',
+    })
+
+    const user = await User.findByOrFail('email', 'ada@example.com')
+    assert.equal(user.fullName, 'Ada Lovelace')
+  })
+
   test('GET /signup is accessible to guests', async ({ client }) => {
     const response = await client.get('/signup')
 

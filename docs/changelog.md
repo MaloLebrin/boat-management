@@ -3,6 +3,13 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-07-03 — [#197] Auth : fullName trimmé et vidé en null si vide
+
+**Corrige A-11 : `fullName` n'était pas trimmé au signup ni à la mise à jour du profil — une valeur composée uniquement d'espaces (`"   "`) passait la validation et rendait le getter `initials` vide (`charAt` sur une chaîne vide)**
+
+- `app/validators/user.ts` : `fullName` (`signupValidator` et `updateProfileValidator`) utilise désormais `vine.string().trim().maxLength(255).nullable().transform((v) => v || null)` — les espaces sont retirés puis la chaîne vide résultante est convertie en `null`
+- Tests ajoutés : `tests/functional/auth/signup.spec.ts` et `tests/functional/settings/settings.spec.ts` (valeur uniquement composée d'espaces stockée comme `null`, valeur avec espaces superflus trimée avant stockage)
+
 ## 2026-07-03 — [#198] Équipements : purchasePrice validé comme nombre décimal positif
 
 **Corrige B-07 : `purchasePrice` était déclaré `vine.string().trim()` dans trois validators alors que la colonne DB est `decimal(10, 2)` — les valeurs `"-500"`, `"abc"` ou `"3.14.15"` passaient la validation et pouvaient corrompre la base**
