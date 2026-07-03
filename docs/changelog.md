@@ -3,6 +3,13 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-07-03 — [#199] Pièces moteur : stock non renseigné n'est plus traité comme épuisé
+
+**Corrige B-08 : `listLowStock()` incluait `stock IS NULL OR stock <= min_stock_alert`, déclenchant une fausse alerte low-stock dès qu'une pièce avait un `minStockAlert` défini mais un `stock` non renseigné (tracking désactivé)**
+
+- `app/services/boat_engine_part_service.ts` : `listLowStock()` retire la branche `stock IS NULL` — les comparaisons SQL `<=` excluent déjà nativement les valeurs NULL
+- Test ajouté : `tests/integration/services/boat_engine_part_service.spec.ts` (`listLowStock ignores parts with untracked (null) stock`)
+
 ## 2026-07-03 — [#200] Réservations : totalPrice à 0 accepté (prestation offerte)
 
 **Corrige C-04 : `vine.number().positive()` excluait 0, rendant impossible la création d'une réservation gratuite (invitation, test, prestation offerte)**
