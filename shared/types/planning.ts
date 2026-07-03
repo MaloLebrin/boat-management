@@ -48,6 +48,7 @@ export interface PlanningResult {
   overdueTasks: PlanningTask[]
   soonTasks: PlanningTask[]
   plannedTasks: PlanningTask[]
+  undatedTasks: PlanningTask[]
   doneTasks: PlanningTask[]
   doneTasksTotal: number
   groups: TaskGroup[]

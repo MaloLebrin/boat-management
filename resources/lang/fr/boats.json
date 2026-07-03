@@ -318,6 +318,13 @@
       "sidebarEvents": "Événements",
       "sidebarParts": "Pièces",
       "exportPdf": "Exporter PDF"
+    },
+    "tasksFilter": {
+      "all": "Toutes",
+      "overdue": "En retard",
+      "soon": "Bientôt",
+      "planned": "Planifiées",
+      "undated": "Non datées"
     }
   },
   "specs": {

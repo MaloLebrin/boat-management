@@ -13,6 +13,8 @@
     "overdueEmpty": "No overdue tasks",
     "soon": "Coming soon",
     "soonEmpty": "No imminent tasks",
+    "undated": "Undated",
+    "undatedEmpty": "No undated tasks",
     "planned": "Planned",
     "plannedEmpty": "No planned tasks",
     "completed": "Completed",

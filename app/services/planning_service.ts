@@ -4,6 +4,7 @@ import Organization from '#models/organization'
 import type User from '#models/user'
 import TaskGroupingService from '#services/task_grouping_service'
 import { PLAN_LIMITS } from '#shared/types/plan'
+import type { PlanTier } from '#shared/types/plan'
 import type { PlanningResult, PlanningTask } from '#shared/types/planning'
 import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
@@ -24,6 +25,7 @@ export default class PlanningService {
         overdueTasks: [],
         soonTasks: [],
         plannedTasks: [],
+        undatedTasks: [],
         doneTasks: [],
         doneTasksTotal: 0,
         groups: [],
@@ -42,6 +44,7 @@ export default class PlanningService {
         overdueTasks: [],
         soonTasks: [],
         plannedTasks: [],
+        undatedTasks: [],
         doneTasks: [],
         doneTasksTotal: 0,
         groups: [],
@@ -67,8 +70,9 @@ export default class PlanningService {
         .count('* as total'),
     ])
 
+    const canGroupTasks = PLAN_LIMITS[org.plan as PlanTier].canGroupTasks
+
     const doneTasksTotal = Number(doneTasksTotalRow[0].$extras.total)
-    const canGroupTasks = PLAN_LIMITS[org.plan].canGroupTasks
 
     const today = DateTime.now().startOf('day')
     const soonDateThreshold = today.plus({ days: 30 })
@@ -98,8 +102,15 @@ export default class PlanningService {
     const overdueTasks: PlanningTask[] = []
     const soonTasks: PlanningTask[] = []
     const plannedTasks: PlanningTask[] = []
+    const undatedTasks: PlanningTask[] = []
 
     for (const task of tasks) {
+      // Tasks without dueAt or dueEngineHours go to undatedTasks
+      if (task.dueAt === null && task.dueEngineHours === null) {
+        undatedTasks.push(task)
+        continue
+      }
+
       const isOverdue = this.isOverdue(task, today)
       const isSoon = this.isSoon(task, today, soonDateThreshold, soonHoursThreshold)
 
@@ -119,6 +130,7 @@ export default class PlanningService {
       overdueTasks,
       soonTasks,
       plannedTasks,
+      undatedTasks,
       doneTasks,
       doneTasksTotal,
       groups,

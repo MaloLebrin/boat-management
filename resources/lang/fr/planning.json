@@ -13,6 +13,8 @@
     "overdueEmpty": "Aucune tâche en retard",
     "soon": "À venir bientôt",
     "soonEmpty": "Aucune tâche imminente",
+    "undated": "Non datées",
+    "undatedEmpty": "Aucune tâche non datée",
     "planned": "Planifiées",
     "plannedEmpty": "Aucune tâche planifiée",
     "completed": "Complétées",

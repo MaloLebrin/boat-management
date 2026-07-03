@@ -9,6 +9,7 @@ const props = defineProps<{
   overdueTasks: PlanningTask[]
   soonTasks: PlanningTask[]
   plannedTasks: PlanningTask[]
+  undatedTasks: PlanningTask[]
   doneTasks: PlanningTask[]
   doneTasksTotal: number
   groups: TaskGroup[]
@@ -22,7 +23,7 @@ const { t } = useT()
 
 const visibleGroups = computed(() => props.groups.filter((g) => !props.dismissedGroupIds.has(g.id)))
 
-// Groups only contain plannedTasks (computed server-side), so overdue/soon columns are never affected.
+// Groups only contain plannedTasks (computed server-side), so overdue/soon/undated columns are never affected.
 const groupedPlannedIds = computed(() => {
   if (!props.groupingEnabled) return new Set<number>()
   return new Set(visibleGroups.value.flatMap((g) => g.tasks.map((task) => task.id)))
@@ -38,12 +39,14 @@ const doneTasksLabel = computed(() => {
   const displayed = props.doneTasks.length
   const total = props.doneTasksTotal
   if (total === 0) return t('planning.kanban.completed')
-  return total > 20 ? t('planning.kanban.completedWithCount', { displayed, total }) : t('planning.kanban.completed')
+  return total > 20
+    ? t('planning.kanban.completedWithCount', { displayed, total })
+    : t('planning.kanban.completed')
 })
 </script>
 
 <template>
-  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
     <!-- En retard -->
     <div class="flex flex-col gap-3">
       <div class="flex items-center gap-2 rounded-lg border-l-4 border-red-500 bg-red-50 px-3 py-2">
@@ -93,6 +96,33 @@ const doneTasksLabel = computed(() => {
         :task="task"
         accent-class="border-amber-300"
         badge-class="bg-amber-100 text-amber-700"
+      />
+    </div>
+
+    <!-- Non datées -->
+    <div class="flex flex-col gap-3">
+      <div
+        class="flex items-center gap-2 rounded-lg border-l-4 border-slate-400 bg-slate-50 px-3 py-2"
+      >
+        <h2 class="text-sm font-semibold text-slate-700">{{ t('planning.kanban.undated') }}</h2>
+        <span
+          class="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-slate-400 px-1.5 text-xs font-semibold text-white"
+        >
+          {{ undatedTasks.length }}
+        </span>
+      </div>
+      <div
+        v-if="undatedTasks.length === 0"
+        class="rounded-lg border border-dashed border-border px-4 py-6 text-center text-sm text-fg-muted"
+      >
+        {{ t('planning.kanban.undatedEmpty') }}
+      </div>
+      <PlanningTaskCard
+        v-for="task in undatedTasks"
+        :key="task.id"
+        :task="task"
+        accent-class="border-slate-400"
+        badge-class="bg-slate-100 text-slate-700"
       />
     </div>
 
