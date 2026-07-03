@@ -6,7 +6,9 @@ import StripeService from '#services/stripe_service'
 import OrganizationPlanDowngraded from '#events/organization_plan_downgraded'
 import { inject } from '@adonisjs/core'
 import env from '#start/env'
+import db from '@adonisjs/lucid/services/db'
 import { DateTime } from 'luxon'
+import type { TransactionClientContract } from '@adonisjs/lucid/types/database'
 import type Stripe from 'stripe'
 
 const PLAN_ORDER: Record<PlanTier, number> = { starter: 0, pro: 1, enterprise: 2 }
@@ -42,8 +44,16 @@ export default class SubscriptionService {
     if (!org) return
 
     const stripeSub = await this.stripeService.retrieveSubscription(String(session.subscription))
-    await this.upsertSubscription(org.id, stripeSub)
-    await this.updateOrgPlan(org, this.planFromPriceId(stripeSub.items.data[0].price.id))
+    const plan = this.planFromPriceId(stripeSub.items.data[0].price.id)
+
+    const downgrade = await db.transaction(async (trx) => {
+      await this.upsertSubscription(org.id, stripeSub, trx)
+      return this.applyOrgPlan(org, plan, trx)
+    })
+
+    if (downgrade) {
+      await OrganizationPlanDowngraded.dispatch(org, downgrade.fromPlan, plan)
+    }
   }
 
   async syncFromSubscriptionEvent(stripeSub: Stripe.Subscription): Promise<void> {
@@ -53,17 +63,26 @@ export default class SubscriptionService {
 
     if (!org) return
 
-    await this.upsertSubscription(org.id, stripeSub)
-
     const newPlan =
       stripeSub.status === 'canceled'
         ? 'starter'
         : this.planFromPriceId(stripeSub.items.data[0].price.id)
 
-    await this.updateOrgPlan(org, newPlan)
+    const downgrade = await db.transaction(async (trx) => {
+      await this.upsertSubscription(org.id, stripeSub, trx)
+      return this.applyOrgPlan(org, newPlan, trx)
+    })
+
+    if (downgrade) {
+      await OrganizationPlanDowngraded.dispatch(org, downgrade.fromPlan, newPlan)
+    }
   }
 
-  private async upsertSubscription(organizationId: number, stripeSub: Stripe.Subscription) {
+  private async upsertSubscription(
+    organizationId: number,
+    stripeSub: Stripe.Subscription,
+    trx: TransactionClientContract
+  ) {
     const priceId = stripeSub.items.data[0].price.id
     const { start, end } = this.getPeriodBounds(stripeSub)
 
@@ -78,7 +97,8 @@ export default class SubscriptionService {
         currentPeriodStart: start,
         currentPeriodEnd: end,
         cancelAtPeriodEnd: stripeSub.cancel_at_period_end,
-      }
+      },
+      { client: trx }
     )
   }
 
@@ -94,16 +114,26 @@ export default class SubscriptionService {
     }
   }
 
-  private async updateOrgPlan(org: Organization, plan: PlanTier) {
-    if (org.plan !== plan) {
-      const isDowngrade = PLAN_ORDER[plan] < PLAN_ORDER[org.plan]
-      const fromPlan = org.plan
-      org.plan = plan
-      await org.save()
-      if (isDowngrade) {
-        await OrganizationPlanDowngraded.dispatch(org, fromPlan, plan)
-      }
-    }
+  /**
+   * Applies the plan change to the organization within the given transaction.
+   * Returns `{ fromPlan }` when the change is a downgrade so the caller can
+   * dispatch OrganizationPlanDowngraded AFTER the transaction commits — the
+   * listener sends emails and writes notifications, so it must never act on a
+   * change that could still roll back. Returns null when there is no downgrade.
+   */
+  private async applyOrgPlan(
+    org: Organization,
+    plan: PlanTier,
+    trx: TransactionClientContract
+  ): Promise<{ fromPlan: PlanTier } | null> {
+    if (org.plan === plan) return null
+
+    const isDowngrade = PLAN_ORDER[plan] < PLAN_ORDER[org.plan]
+    const fromPlan = org.plan
+    org.plan = plan
+    await org.useTransaction(trx).save()
+
+    return isDowngrade ? { fromPlan } : null
   }
 
   private planFromPriceId(priceId: string): PlanTier {
