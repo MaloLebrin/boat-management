@@ -114,7 +114,8 @@
     "created": "Avitaillement enregistré.",
     "deleted": "Avitaillement supprimé.",
     "notFound": "Avitaillement introuvable.",
-    "engineNotBelongs": "Ce moteur n'appartient pas à ce bateau."
+    "engineNotBelongs": "Ce moteur n'appartient pas à ce bateau.",
+    "inconsistentCost": "Le coût total ne correspond pas à la quantité multipliée par le prix au litre."
   },
   "navigationLog": {
     "created": "Sortie enregistrée.",

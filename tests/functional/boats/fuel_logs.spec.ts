@@ -47,6 +47,49 @@ test.group('Fuel logs (functional)', (group) => {
     assert.equal(log.notes, 'Plein complet')
   })
 
+  test('POST /boats/:boatId/fuel-logs with inconsistent totalCost does not create log', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    const response = await client
+      .post(`/boats/${boat.id}/fuel-logs`)
+      .loginAs(user)
+      .form({
+        fueledAt: '2026-06-01',
+        quantityLiters: 10,
+        pricePerLiter: 2,
+        totalCost: 100,
+      })
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertHeader('location', `/boats/${boat.id}?tab=fuel`)
+
+    const count = await BoatFuelLog.query().where('boatId', boat.id).count('* as total')
+    assert.equal(Number(count[0].$extras.total), 0)
+  })
+
+  test('POST /boats/:boatId/fuel-logs with totalCost within rounding tolerance creates log', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    await client.post(`/boats/${boat.id}/fuel-logs`).loginAs(user).form({
+      fueledAt: '2026-06-01',
+      quantityLiters: 10,
+      pricePerLiter: 2.0049,
+      totalCost: 20.05,
+    })
+
+    const log = await BoatFuelLog.query().where('boatId', boat.id).firstOrFail()
+    assert.equal(Number.parseFloat(log.totalCost!), 20.05)
+  })
+
   test('POST /boats/:boatId/fuel-logs with engine from same boat persists engineId', async ({
     client,
     assert,
