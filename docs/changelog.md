@@ -3,6 +3,14 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-07-03 — [#196] Membres : flash message sur MemberNotFoundError
+
+**Corrige A-10 : `MemberNotFoundError` levée dans `update()` et `destroy()` de `OrganizationMembersController` provoquait une redirection silencieuse, sans indiquer à l'utilisateur ce qui s'était passé**
+
+- `app/controllers/organization_members_controller.ts` (`update()` ligne 93, `destroy()` ligne 119) : ajout de `session.flash('error', i18n.t('flash.members.notFound'))` avant le redirect
+- `resources/lang/en/flash.json` et `resources/lang/fr/flash.json` : nouvelle clé `members.notFound`
+- Tests ajoutés : `tests/functional/organization/members.spec.ts` (flash d'erreur vérifié sur `PUT` et `DELETE` avec un id de membre inexistant)
+
 ## 2026-07-03 — [#197] Auth : fullName trimmé et vidé en null si vide
 
 **Corrige A-11 : `fullName` n'était pas trimmé au signup ni à la mise à jour du profil — une valeur composée uniquement d'espaces (`"   "`) passait la validation et rendait le getter `initials` vide (`charAt` sur une chaîne vide)**

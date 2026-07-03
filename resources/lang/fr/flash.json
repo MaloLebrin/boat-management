@@ -133,6 +133,9 @@
     "deleted": "Document supprimé.",
     "notFound": "Document introuvable."
   },
+  "members": {
+    "notFound": "Membre introuvable."
+  },
   "crew": {
     "created": "Équipier ajouté avec succès.",
     "updated": "Équipier mis à jour.",

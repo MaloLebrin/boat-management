@@ -133,6 +133,9 @@
     "deleted": "Document deleted.",
     "notFound": "Document not found."
   },
+  "members": {
+    "notFound": "Member not found."
+  },
   "crew": {
     "created": "Crew member added successfully.",
     "updated": "Crew member updated.",
