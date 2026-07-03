@@ -201,7 +201,8 @@
     "deleted": "Réservation supprimée.",
     "notFound": "Réservation introuvable.",
     "conflict": "Ce bateau est déjà réservé sur cette période.",
-    "endBeforeStart": "La date de fin doit être postérieure à la date de début."
+    "endBeforeStart": "La date de fin doit être postérieure à la date de début.",
+    "optionsOverridden": "Réservation confirmée. {count} option(s) en chevauchement annulée(s)."
   },
   "ports": {
     "hasBoats": "Impossible de supprimer ce port : des bateaux y sont assignés."
