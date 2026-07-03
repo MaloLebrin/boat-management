@@ -1,4 +1,8 @@
-import { BoatNotFoundError, InvalidBoatHullError } from '#exceptions/boat_errors'
+import {
+  BoatNotFoundError,
+  InvalidBoatHullError,
+  RegistrationNumberTakenError,
+} from '#exceptions/boat_errors'
 import { UserNotInOrganizationError } from '#exceptions/organization_errors'
 import Boat from '#models/boat'
 import BoatEngine from '#models/boat_engine'
@@ -22,6 +26,21 @@ import { assertBoatInUserOrg, toDateOrNull } from '#utils/boat_utils'
 
 export { BoatNotFoundError }
 export type { BoatHullPayload }
+
+/**
+ * Detects the PostgreSQL unique-violation (23505) raised by the
+ * (organization_id, registration_number) index, so a duplicate registration
+ * number surfaces as a business error instead of a raw 500.
+ */
+function isRegistrationNumberConflict(error: unknown): boolean {
+  if (typeof error !== 'object' || error === null) return false
+  const err = error as { code?: unknown; constraint?: unknown }
+  return (
+    err.code === '23505' &&
+    typeof err.constraint === 'string' &&
+    err.constraint.includes('registration_number')
+  )
+}
 
 @inject()
 export default class BoatHullService {
@@ -112,49 +131,55 @@ export default class BoatHullService {
       await this._assertSpotInUserOrg(user, payload.spotId)
     }
 
-    const boat = await db.transaction(async (trx) => {
-      if (payload.spotId !== null && payload.spotId !== undefined)
-        await this._evictSpotOccupant(payload.spotId, undefined, trx)
+    let boat: Boat
+    try {
+      boat = await db.transaction(async (trx) => {
+        if (payload.spotId !== null && payload.spotId !== undefined)
+          await this._evictSpotOccupant(payload.spotId, undefined, trx)
 
-      const created = await Boat.create(
-        {
-          organizationId,
-          name: payload.name,
-          registrationNumber: payload.registrationNumber ?? null,
-          type: payload.type ?? null,
-          manufacturedAt: toDateOrNull(payload.manufacturedAt),
+        const created = await Boat.create(
+          {
+            organizationId,
+            name: payload.name,
+            registrationNumber: payload.registrationNumber ?? null,
+            type: payload.type ?? null,
+            manufacturedAt: toDateOrNull(payload.manufacturedAt),
 
-          propulsionType: payload.propulsionType ?? null,
-          lengthM: payload.lengthM ?? null,
-          beamM: payload.beamM ?? null,
-          draftM: payload.draftM ?? null,
-          mastHeightM: payload.mastHeightM ?? null,
-          hullMaterial: payload.hullMaterial ?? null,
-          yearBuilt: payload.yearBuilt ?? null,
-          manufacturer: payload.manufacturer ?? null,
-          model: payload.model ?? null,
+            propulsionType: payload.propulsionType ?? null,
+            lengthM: payload.lengthM ?? null,
+            beamM: payload.beamM ?? null,
+            draftM: payload.draftM ?? null,
+            mastHeightM: payload.mastHeightM ?? null,
+            hullMaterial: payload.hullMaterial ?? null,
+            yearBuilt: payload.yearBuilt ?? null,
+            manufacturer: payload.manufacturer ?? null,
+            model: payload.model ?? null,
 
-          homePort: payload.homePort ?? null,
-          navigationCategory: payload.navigationCategory ?? null,
-          hullIdentificationNumber: payload.hullIdentificationNumber ?? null,
-          francisationNumber: payload.francisationNumber ?? null,
-          flagCountry: payload.flagCountry ?? null,
-          maxPersons: payload.maxPersons ?? null,
+            homePort: payload.homePort ?? null,
+            navigationCategory: payload.navigationCategory ?? null,
+            hullIdentificationNumber: payload.hullIdentificationNumber ?? null,
+            francisationNumber: payload.francisationNumber ?? null,
+            flagCountry: payload.flagCountry ?? null,
+            maxPersons: payload.maxPersons ?? null,
 
-          mmsi: payload.mmsi ?? null,
-          imoNumber: payload.imoNumber ?? null,
+            mmsi: payload.mmsi ?? null,
+            imoNumber: payload.imoNumber ?? null,
 
-          spotId: payload.spotId ?? null,
-        },
-        { client: trx }
-      )
+            spotId: payload.spotId ?? null,
+          },
+          { client: trx }
+        )
 
-      if (created.spotId !== null) {
-        await this._logBerthChange(created, created.spotId, trx)
-      }
+        if (created.spotId !== null) {
+          await this._logBerthChange(created, created.spotId, trx)
+        }
 
-      return created
-    })
+        return created
+      })
+    } catch (error) {
+      if (isRegistrationNumberConflict(error)) throw new RegistrationNumberTakenError()
+      throw error
+    }
 
     await boat.load('engines')
     await boat.load('sails')
@@ -197,26 +222,31 @@ export default class BoatHullService {
     if (payload.mmsi !== undefined) boat.mmsi = payload.mmsi ?? null
     if (payload.imoNumber !== undefined) boat.imoNumber = payload.imoNumber ?? null
 
-    if (payload.spotId !== undefined) {
-      const newSpotId = payload.spotId ?? null
+    try {
+      if (payload.spotId !== undefined) {
+        const newSpotId = payload.spotId ?? null
 
-      if (newSpotId !== null) {
-        await this._assertSpotInUserOrg(user, newSpotId)
-      }
+        if (newSpotId !== null) {
+          await this._assertSpotInUserOrg(user, newSpotId)
+        }
 
-      if (newSpotId !== boat.spotId) {
-        await db.transaction(async (trx) => {
-          if (newSpotId !== null) await this._evictSpotOccupant(newSpotId, boat.id, trx)
-          await this._logBerthChange(boat, newSpotId, trx)
-          boat.useTransaction(trx)
-          boat.spotId = newSpotId
+        if (newSpotId !== boat.spotId) {
+          await db.transaction(async (trx) => {
+            if (newSpotId !== null) await this._evictSpotOccupant(newSpotId, boat.id, trx)
+            await this._logBerthChange(boat, newSpotId, trx)
+            boat.useTransaction(trx)
+            boat.spotId = newSpotId
+            await boat.save()
+          })
+        } else {
           await boat.save()
-        })
+        }
       } else {
         await boat.save()
       }
-    } else {
-      await boat.save()
+    } catch (error) {
+      if (isRegistrationNumberConflict(error)) throw new RegistrationNumberTakenError()
+      throw error
     }
 
     await boat.load('engines')

@@ -127,6 +127,9 @@
     "engineHoursEndBeforeStart": "Engine hours at arrival must be greater than or equal to hours at departure.",
     "conflict": "This trip was modified in the meantime — sync skipped."
   },
+  "boat": {
+    "registrationTaken": "A boat with this registration number already exists in your organisation."
+  },
   "boatDocument": {
     "created": "Document created successfully.",
     "updated": "Document updated.",

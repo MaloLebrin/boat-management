@@ -49,6 +49,84 @@ test.group('Boats (functional)', (group) => {
     assert.isFalse(redirectedToNewBoat)
   })
 
+  test('POST /boats with a duplicate registration number flashes an error instead of 500', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    await BoatFactory.merge({
+      organizationId: user.organizationId!,
+      registrationNumber: 'FR-DUP-001',
+    }).create()
+
+    const response = await client
+      .post('/boats')
+      .loginAs(user)
+      .form({ name: 'Duplicate', propulsionType: 'motorboat', registrationNumber: 'FR-DUP-001' })
+      .redirects(0)
+
+    // Redirected back with a friendly error, not a raw 500.
+    response.assertStatus(302)
+    response.assertFlashMessage(
+      'error',
+      'A boat with this registration number already exists in your organisation.'
+    )
+
+    // No second boat with that registration number was created.
+    const boats = await Boat.query()
+      .where('organizationId', user.organizationId!)
+      .where('registrationNumber', 'FR-DUP-001')
+    assert.lengthOf(boats, 1)
+  })
+
+  test('PUT /boats/:id with a duplicate registration number flashes an error instead of 500', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    await BoatFactory.merge({
+      organizationId: user.organizationId!,
+      registrationNumber: 'FR-TAKEN-001',
+    }).create()
+    const target = await BoatFactory.merge({
+      organizationId: user.organizationId!,
+      registrationNumber: 'FR-FREE-002',
+    }).create()
+
+    const response = await client
+      .put(`/boats/${target.id}`)
+      .loginAs(user)
+      .form({ name: target.name, registrationNumber: 'FR-TAKEN-001' })
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertFlashMessage(
+      'error',
+      'A boat with this registration number already exists in your organisation.'
+    )
+
+    // The target boat keeps its own registration number (update rolled back).
+    await target.refresh()
+    assert.equal(target.registrationNumber, 'FR-FREE-002')
+  })
+
+  test('POST /boats allows duplicate null registration numbers', async ({ client, assert }) => {
+    const user = await createAdminUser()
+    await BoatFactory.merge({
+      organizationId: user.organizationId!,
+      registrationNumber: null,
+    }).create()
+
+    const response = await client
+      .post('/boats')
+      .loginAs(user)
+      .form({ name: 'No Registration', propulsionType: 'motorboat' })
+
+    const boat = await Boat.findBy('name', 'No Registration')
+    assert.isNotNull(boat)
+    response.assertRedirectsTo(`/boats/${boat!.id}`)
+  })
+
   test('DELETE /boats/:id deletes the boat and redirects to /boats', async ({ client, assert }) => {
     const user = await createAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()

@@ -127,6 +127,9 @@
     "engineHoursEndBeforeStart": "Les heures moteur à l'arrivée doivent être supérieures ou égales à celles au départ.",
     "conflict": "Cette sortie a été modifiée entre-temps — synchronisation annulée."
   },
+  "boat": {
+    "registrationTaken": "Un bateau avec ce numéro d'immatriculation existe déjà dans votre organisation."
+  },
   "boatDocument": {
     "created": "Document créé avec succès.",
     "updated": "Document mis à jour.",
