@@ -51,6 +51,39 @@ test.group('Settings (functional)', (group) => {
     assert.equal(user.fullName, 'Jean Dupont')
   })
 
+  test('PUT /settings/profile stores fullName as null when only whitespace is provided', async ({
+    client,
+    assert,
+  }) => {
+    const user = await UserFactory.with('organization').create()
+
+    const response = await client
+      .put('/settings/profile')
+      .loginAs(user)
+      .form({ fullName: '   ' })
+      .redirects(0)
+
+    response.assertStatus(302)
+
+    await user.refresh()
+    assert.isNull(user.fullName)
+  })
+
+  test('PUT /settings/profile trims fullName before storing it', async ({ client, assert }) => {
+    const user = await UserFactory.with('organization').create()
+
+    const response = await client
+      .put('/settings/profile')
+      .loginAs(user)
+      .form({ fullName: '  Jean Dupont  ' })
+      .redirects(0)
+
+    response.assertStatus(302)
+
+    await user.refresh()
+    assert.equal(user.fullName, 'Jean Dupont')
+  })
+
   test('PUT /settings/org updates organization name and redirects back', async ({
     client,
     assert,

@@ -11,7 +11,12 @@ export const loginValidator = vine.create({
 })
 
 export const signupValidator = vine.create({
-  fullName: vine.string().maxLength(255).nullable(),
+  fullName: vine
+    .string()
+    .trim()
+    .maxLength(255)
+    .nullable()
+    .transform((v) => v || null),
   email: email().unique({ table: 'users', column: 'email' }),
   password: password().confirmed({
     confirmationField: 'passwordConfirmation',
@@ -28,7 +33,12 @@ export const resetPasswordValidator = vine.create({
 })
 
 export const updateProfileValidator = vine.create({
-  fullName: vine.string().maxLength(255).nullable(),
+  fullName: vine
+    .string()
+    .trim()
+    .maxLength(255)
+    .nullable()
+    .transform((v) => v || null),
 })
 
 export const updateOrganizationValidator = vine.create({
