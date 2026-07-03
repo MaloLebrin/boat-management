@@ -154,7 +154,16 @@
     "imported": "{count} row(s) imported successfully.",
     "boatNotFound": "Boat not found.",
     "previewExpired": "Preview has expired. Please re-upload the file.",
-    "missingHeaders": "Missing headers in CSV file: {headers}."
+    "missingHeaders": "Missing headers in CSV file: {headers}.",
+    "rowErrors": {
+      "dateInvalidFormat": "Invalid date (expected format: YYYY-MM-DD)",
+      "dateInvalid": "Invalid date",
+      "titleRequired": "Title is required",
+      "subjectInvalid": "Invalid subject. Accepted values: {values}",
+      "engineCaptionRequired": "Engine caption is required for subject \"engine\"",
+      "sailCaptionRequired": "Sail caption is required for subject \"sail\"",
+      "costInvalid": "Invalid cost (expected a number)"
+    }
   },
   "genericEquipment": {
     "created": "Equipment added.",

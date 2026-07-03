@@ -15,10 +15,22 @@ export interface CsvRowError {
   message: string
 }
 
+export interface CsvRowErrorKey {
+  column: string
+  key: string
+  params?: Record<string, string>
+}
+
 export interface CsvPreviewRow {
   line: number
   raw: Record<string, string>
   errors: CsvRowError[]
+}
+
+export interface CsvPreviewRowKeys {
+  line: number
+  raw: Record<string, string>
+  errors: CsvRowErrorKey[]
 }
 
 export interface CsvImportPreviewData {

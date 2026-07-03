@@ -1,7 +1,7 @@
 import type {
   CsvImportType,
-  CsvPreviewRow,
-  CsvRowError,
+  CsvPreviewRowKeys,
+  CsvRowErrorKey,
   MaintenanceImportRow,
 } from '#shared/types/csv'
 import { MAINTENANCE_CSV_HEADERS } from '#shared/types/csv'
@@ -59,53 +59,48 @@ function parseCsvContent(content: string): { headers: string[]; rows: string[][]
   return { headers, rows }
 }
 
-function validateMaintenanceRow(raw: Record<string, string>): CsvRowError[] {
-  const errors: CsvRowError[] = []
+function validateMaintenanceRow(raw: Record<string, string>): CsvRowErrorKey[] {
+  const errors: CsvRowErrorKey[] = []
 
   if (!raw['date'] || !/^\d{4}-\d{2}-\d{2}$/.test(raw['date'])) {
-    errors.push({ column: 'date', message: 'Date invalide (format attendu : YYYY-MM-DD)' })
+    errors.push({ column: 'date', key: 'flash.csv.rowErrors.dateInvalidFormat' })
   } else {
     const dt = DateTime.fromISO(raw['date'])
     if (!dt.isValid) {
-      errors.push({ column: 'date', message: 'Date invalide' })
+      errors.push({ column: 'date', key: 'flash.csv.rowErrors.dateInvalid' })
     }
   }
 
   if (!raw['title']?.trim()) {
-    errors.push({ column: 'title', message: 'Le titre est obligatoire' })
+    errors.push({ column: 'title', key: 'flash.csv.rowErrors.titleRequired' })
   }
 
   const subject = raw['subject']?.trim()
   if (!subject || !(VALID_SUBJECTS as readonly string[]).includes(subject)) {
     errors.push({
       column: 'subject',
-      message: `Sujet invalide. Valeurs acceptées : ${VALID_SUBJECTS.join(', ')}`,
+      key: 'flash.csv.rowErrors.subjectInvalid',
+      params: { values: VALID_SUBJECTS.join(', ') },
     })
   } else {
     if (subject === 'engine' && !raw['engine_caption']?.trim()) {
-      errors.push({
-        column: 'engine_caption',
-        message: 'Légende moteur obligatoire pour le sujet "engine"',
-      })
+      errors.push({ column: 'engine_caption', key: 'flash.csv.rowErrors.engineCaptionRequired' })
     }
     if (subject === 'sail' && !raw['sail_caption']?.trim()) {
-      errors.push({
-        column: 'sail_caption',
-        message: 'Légende voile obligatoire pour le sujet "sail"',
-      })
+      errors.push({ column: 'sail_caption', key: 'flash.csv.rowErrors.sailCaptionRequired' })
     }
   }
 
   const cost = raw['cost']?.trim()
   if (cost && Number.isNaN(Number.parseFloat(cost.replace(',', '.')))) {
-    errors.push({ column: 'cost', message: 'Coût invalide (nombre attendu)' })
+    errors.push({ column: 'cost', key: 'flash.csv.rowErrors.costInvalid' })
   }
 
   return errors
 }
 
 export interface CsvParseResult {
-  previewRows: CsvPreviewRow[]
+  previewRows: CsvPreviewRowKeys[]
   validRows: MaintenanceImportRow[]
   totalRows: number
   missingHeaders: string[]
@@ -119,7 +114,7 @@ export function parseMaintenanceCsv(content: string, _type: CsvImportType): CsvP
   )
   const missingHeaders = requiredHeaders.filter((h) => !headers.includes(h))
 
-  const previewRows: CsvPreviewRow[] = []
+  const previewRows: CsvPreviewRowKeys[] = []
   const validRows: MaintenanceImportRow[] = []
 
   for (const [i, cells] of rows.entries()) {
