@@ -1,4 +1,4 @@
-import { BoatEquipmentNotFoundError } from '#exceptions/boat_errors'
+import { BoatEquipmentNotFoundError, EngineHoursRegressionError } from '#exceptions/boat_errors'
 import type Boat from '#models/boat'
 import BoatEngine from '#models/boat_engine'
 import BoatEnginePart from '#models/boat_engine_part'
@@ -40,6 +40,16 @@ export default class BoatEngineService {
 
     const engine = await BoatEngine.query().where('id', engineId).where('boatId', boat.id).first()
     if (!engine) throw new BoatEquipmentNotFoundError()
+
+    // Engine hours are a monotonic counter: reject a new value below the current
+    // one to prevent tampering that would skew preventive maintenance and AI
+    // analyses. Clearing the value (null) or setting it on an engine with no
+    // recorded hours remains allowed.
+    if (payload.hours !== null && payload.hours !== undefined && engine.hours !== null) {
+      if (payload.hours < engine.hours) {
+        throw new EngineHoursRegressionError()
+      }
+    }
 
     engine.kind = payload.kind
     engine.fuel = payload.fuel ?? null
