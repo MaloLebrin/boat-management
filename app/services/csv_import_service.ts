@@ -8,6 +8,7 @@ import { MAINTENANCE_CSV_HEADERS } from '#shared/types/csv'
 import BoatMaintenanceEvent from '#models/boat_maintenance_event'
 import BoatMaintenancePart from '#models/boat_maintenance_part'
 import db from '@adonisjs/lucid/services/db'
+import type { I18n } from '@adonisjs/i18n'
 import { DateTime } from 'luxon'
 
 const VALID_SUBJECTS = [
@@ -143,7 +144,13 @@ export function parseMaintenanceCsv(content: string, _type: CsvImportType): CsvP
   return { previewRows, validRows, totalRows: rows.length, missingHeaders }
 }
 
-export async function importMaintenanceRows(boatId: number, rows: MaintenanceImportRow[]) {
+export async function importMaintenanceRows(
+  boatId: number,
+  rows: MaintenanceImportRow[],
+  i18n: I18n
+) {
+  const totalCostLabel = i18n.t('maintenance.history.timeline.totalCost')
+
   return await db.transaction(async (trx) => {
     for (const row of rows) {
       const event = await BoatMaintenanceEvent.create(
@@ -167,7 +174,7 @@ export async function importMaintenanceRows(boatId: number, rows: MaintenanceImp
         await BoatMaintenancePart.create(
           {
             maintenanceEventId: event.id,
-            name: 'Coût total',
+            name: totalCostLabel,
             quantity: 1,
             unitPrice: String(row.cost),
             notes: null,

@@ -112,7 +112,7 @@ export default class CsvImportController {
     }
 
     if (pending.type === 'maintenance') {
-      await importMaintenanceRows(boat.id, pending.validRows)
+      await importMaintenanceRows(boat.id, pending.validRows, i18n)
     }
 
     session.forget('pendingImport')
