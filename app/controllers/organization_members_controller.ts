@@ -60,11 +60,11 @@ export default class OrganizationMembersController {
         return response.redirect().back()
       }
       if (error instanceof UserNotFoundError) {
-        session.flash('error', 'member_user_not_found')
+        session.flash('error', i18n.t('flash.members.userNotFound'))
         return response.redirect().back()
       }
       if (error instanceof AlreadyMemberError) {
-        session.flash('error', 'member_already_member')
+        session.flash('error', i18n.t('flash.members.alreadyMember'))
         return response.redirect().back()
       }
       throw error
@@ -95,7 +95,7 @@ export default class OrganizationMembersController {
         return response.redirect().back()
       }
       if (error instanceof LastAdminError) {
-        session.flash('error', 'member_last_admin')
+        session.flash('error', i18n.t('flash.members.lastAdmin'))
         return response.redirect().back()
       }
       throw error
@@ -124,7 +124,7 @@ export default class OrganizationMembersController {
         return response.redirect().back()
       }
       if (error instanceof LastAdminError) {
-        session.flash('error', 'member_last_admin')
+        session.flash('error', i18n.t('flash.members.lastAdmin'))
         return response.redirect().back()
       }
       throw error

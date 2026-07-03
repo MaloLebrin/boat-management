@@ -134,7 +134,10 @@
     "notFound": "Document not found."
   },
   "members": {
-    "notFound": "Member not found."
+    "notFound": "Member not found.",
+    "userNotFound": "No account is associated with this email address.",
+    "alreadyMember": "This user is already a member of the organisation.",
+    "lastAdmin": "You cannot remove or demote the last administrator of the organisation."
   },
   "crew": {
     "created": "Crew member added successfully.",

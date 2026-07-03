@@ -134,7 +134,10 @@
     "notFound": "Document introuvable."
   },
   "members": {
-    "notFound": "Membre introuvable."
+    "notFound": "Membre introuvable.",
+    "userNotFound": "Aucun compte n'est associé à cette adresse email.",
+    "alreadyMember": "Cet utilisateur est déjà membre de l'organisation.",
+    "lastAdmin": "Vous ne pouvez pas retirer ou rétrograder le dernier administrateur de l'organisation."
   },
   "crew": {
     "created": "Équipier ajouté avec succès.",

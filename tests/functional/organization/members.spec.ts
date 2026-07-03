@@ -83,7 +83,9 @@ test.group('Organization members (functional)', (group) => {
     response.assertStatus(302)
   })
 
-  test('POST /organization/members redirects back when user not found', async ({ client }) => {
+  test('POST /organization/members flashes an i18n error when user not found', async ({
+    client,
+  }) => {
     const admin = await createAdminUser()
 
     const response = await client
@@ -93,6 +95,71 @@ test.group('Organization members (functional)', (group) => {
       .redirects(0)
 
     response.assertStatus(302)
+    response.assertFlashMessage('error', 'No account is associated with this email address.')
+  })
+
+  test('POST /organization/members flashes an i18n error when already a member', async ({
+    client,
+  }) => {
+    const admin = await createAdminUser()
+    const existing = await UserFactory.create()
+    await OrganizationMembership.create({
+      userId: existing.id,
+      organizationId: admin.organizationId!,
+      role: 'member',
+    })
+
+    const response = await client
+      .post('/organization/members')
+      .loginAs(admin)
+      .form({ email: existing.email, role: 'member' })
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertFlashMessage('error', 'This user is already a member of the organisation.')
+  })
+
+  test('PUT /organization/members/:id flashes an i18n error when demoting the last admin', async ({
+    client,
+  }) => {
+    const admin = await createAdminUser()
+    const membership = await OrganizationMembership.query()
+      .where('userId', admin.id)
+      .where('organizationId', admin.organizationId!)
+      .firstOrFail()
+
+    const response = await client
+      .put(`/organization/members/${membership.id}`)
+      .loginAs(admin)
+      .form({ role: 'member' })
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertFlashMessage(
+      'error',
+      'You cannot remove or demote the last administrator of the organisation.'
+    )
+  })
+
+  test('DELETE /organization/members/:id flashes an i18n error when removing the last admin', async ({
+    client,
+  }) => {
+    const admin = await createAdminUser()
+    const membership = await OrganizationMembership.query()
+      .where('userId', admin.id)
+      .where('organizationId', admin.organizationId!)
+      .firstOrFail()
+
+    const response = await client
+      .delete(`/organization/members/${membership.id}`)
+      .loginAs(admin)
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertFlashMessage(
+      'error',
+      'You cannot remove or demote the last administrator of the organisation.'
+    )
   })
 
   test('POST /organization/members is forbidden for non-admin', async ({ client }) => {
