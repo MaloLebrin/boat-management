@@ -10,6 +10,11 @@ export function toDateOrNull(value: Date | string | DateTime | null | undefined)
   return DateTime.fromISO(String(value))
 }
 
+export function toDecimalStringOrNull(value: number | null | undefined): string | null {
+  if (value === null || value === undefined) return null
+  return value.toFixed(2)
+}
+
 export function assertBoatInUserOrg(user: User, boat: Boat): void {
   if (user.organizationId === null || user.organizationId !== boat.organizationId) {
     throw new BoatNotFoundError()

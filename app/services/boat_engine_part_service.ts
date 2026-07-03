@@ -6,7 +6,7 @@ import type User from '#models/user'
 import { CloudinaryFolders } from '#services/cloudinary_service'
 import MediaService from '#services/media_service'
 import type { BoatEnginePartPayload } from '#shared/types/boat'
-import { assertBoatInUserOrg, toDateOrNull } from '#utils/boat_utils'
+import { assertBoatInUserOrg, toDateOrNull, toDecimalStringOrNull } from '#utils/boat_utils'
 import { inject } from '@adonisjs/core'
 
 export { BoatEquipmentNotFoundError }
@@ -51,7 +51,7 @@ export default class BoatEnginePartService {
       supplier: payload.supplier ?? null,
       notes: payload.notes ?? null,
       wearState: payload.wearState ?? null,
-      purchasePrice: payload.purchasePrice ?? null,
+      purchasePrice: toDecimalStringOrNull(payload.purchasePrice),
       purchasedAt: toDateOrNull(payload.purchasedAt),
     })
   }
@@ -81,7 +81,7 @@ export default class BoatEnginePartService {
     part.supplier = payload.supplier ?? null
     part.notes = payload.notes ?? null
     part.wearState = payload.wearState ?? null
-    part.purchasePrice = payload.purchasePrice ?? null
+    part.purchasePrice = toDecimalStringOrNull(payload.purchasePrice)
     part.purchasedAt = toDateOrNull(payload.purchasedAt)
 
     await part.save()

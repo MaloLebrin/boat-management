@@ -3,7 +3,7 @@ import type Boat from '#models/boat'
 import BoatSafetyEquipment from '#models/boat_safety_equipment'
 import type User from '#models/user'
 import type { BoatSafetyEquipmentPayload } from '#shared/types/boat'
-import { assertBoatInUserOrg, toDateOrNull } from '#utils/boat_utils'
+import { assertBoatInUserOrg, toDateOrNull, toDecimalStringOrNull } from '#utils/boat_utils'
 import { inject } from '@adonisjs/core'
 
 export { BoatEquipmentNotFoundError }
@@ -21,7 +21,7 @@ export default class BoatSafetyEquipmentService {
       expiryDate: toDateOrNull(payload.expiryDate),
       status: (payload.status as 'ok' | 'to_check' | 'expired') ?? 'ok',
       notes: payload.notes ?? null,
-      purchasePrice: payload.purchasePrice ?? null,
+      purchasePrice: toDecimalStringOrNull(payload.purchasePrice),
       purchasedAt: toDateOrNull(payload.purchasedAt),
     })
   }
@@ -40,7 +40,7 @@ export default class BoatSafetyEquipmentService {
     item.expiryDate = toDateOrNull(payload.expiryDate)
     item.status = (payload.status as 'ok' | 'to_check' | 'expired') ?? item.status
     item.notes = payload.notes ?? null
-    item.purchasePrice = payload.purchasePrice ?? null
+    item.purchasePrice = toDecimalStringOrNull(payload.purchasePrice)
     item.purchasedAt = toDateOrNull(payload.purchasedAt)
 
     await item.save()

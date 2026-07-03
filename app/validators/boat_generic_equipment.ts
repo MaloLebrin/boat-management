@@ -10,7 +10,7 @@ export const createGenericEquipmentValidator = vine.create(
     quantity: vine.number().withoutDecimals().positive().nullable().optional(),
     status: vine.enum(['ok', 'to_check', 'to_replace']).optional(),
     notes: vine.string().trim().nullable().optional(),
-    purchasePrice: vine.string().trim().nullable().optional(),
+    purchasePrice: vine.number().positive().decimal([0, 2]).nullable().optional(),
     purchasedAt: vine.string().trim().optional(),
   })
 )
@@ -24,7 +24,7 @@ export const updateGenericEquipmentValidator = vine.create(
     quantity: vine.number().withoutDecimals().positive().nullable().optional(),
     status: vine.enum(['ok', 'to_check', 'to_replace']).optional(),
     notes: vine.string().trim().nullable().optional(),
-    purchasePrice: vine.string().trim().nullable().optional(),
+    purchasePrice: vine.number().positive().decimal([0, 2]).nullable().optional(),
     purchasedAt: vine.string().trim().optional(),
   })
 )
