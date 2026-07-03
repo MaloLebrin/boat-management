@@ -3,6 +3,14 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-07-03 — [#180] Navigation : l'update partiel n'efface plus les champs optionnels
+
+**Corrige D-05 : le contrôleur convertissait `undefined → null` (`?? null`) pour `windForceBeaufort`, `seaState`, `crewCount`, `notes`. Le service protège ces champs via `!== undefined`, mais `null !== undefined` est vrai — donc chaque update partiel écrasait à `null` les champs non fournis**
+
+- `app/controllers/navigation_logs_controller.ts` (`update()`) : passe désormais `payload.windForceBeaufort` (etc.) directement, sans `?? null`. Un champ absent (`undefined`) est préservé par le service ; un champ explicitement vidé (`null`) est effacé
+- `app/validators/navigation_log.ts` : `updateNavigationLogValidator` — les 4 champs deviennent `.nullable().optional()`, de sorte qu'un champ vidé côté formulaire (`''` → `null` via `convertEmptyStringsToNull`) est une valeur de « vidage » valide et non une erreur de validation
+- Tests ajoutés : `tests/functional/boats/navigation_logs.spec.ts` (update partiel préserve les champs non fournis ; un champ vidé est bien mis à `null`)
+
 ## 2026-07-03 — [#178] Équipage : confirmation avant de vider l'équipage d'une sortie
 
 **Corrige D-03 : un payload `crew` vide vide tout l'équipage d'un log via `sync({})`. Le vidage est en réalité un geste légitime (retirer le dernier équipier), donc plutôt que de l'interdire (`.minLength(1)` aurait rendu le dernier équipier non-retirable), on le protège d'un clic accidentel par une confirmation**

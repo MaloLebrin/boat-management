@@ -247,6 +247,61 @@ test.group('Navigation logs (functional)', (group) => {
     assert.equal(updated.notes, 'Test update')
   })
 
+  test('PATCH update leaves omitted optional fields untouched (#180)', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const log = await NavigationLogFactory.merge({
+      boatId: boat.id,
+      organizationId: user.organizationId!,
+      windForceBeaufort: 5,
+      seaState: 'rough',
+      crewCount: 4,
+      notes: 'Keep me',
+    }).create()
+
+    // Partial update: only `notes` is sent. The other fields must be preserved.
+    await client
+      .patch(`/boats/${boat.id}/navigation-logs/${log.id}`)
+      .loginAs(user)
+      .form({ notes: 'Updated notes' })
+
+    const updated = await NavigationLog.findOrFail(log.id)
+    assert.equal(updated.notes, 'Updated notes')
+    assert.equal(updated.windForceBeaufort, 5)
+    assert.equal(updated.seaState, 'rough')
+    assert.equal(updated.crewCount, 4)
+  })
+
+  test('PATCH update clears a field when an emptied value is sent (#180)', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const log = await NavigationLogFactory.merge({
+      boatId: boat.id,
+      organizationId: user.organizationId!,
+      windForceBeaufort: 5,
+      seaState: 'rough',
+      crewCount: 4,
+    }).create()
+
+    // An emptied form field is sent as '' → converted to null → clears the value,
+    // while the untouched fields are preserved.
+    await client
+      .patch(`/boats/${boat.id}/navigation-logs/${log.id}`)
+      .loginAs(user)
+      .form({ seaState: '' })
+
+    const updated = await NavigationLog.findOrFail(log.id)
+    assert.isNull(updated.seaState)
+    assert.equal(updated.windForceBeaufort, 5)
+    assert.equal(updated.crewCount, 4)
+  })
+
   test('PATCH update with matching _expectedUpdatedAt succeeds', async ({ client, assert }) => {
     const user = await createAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
