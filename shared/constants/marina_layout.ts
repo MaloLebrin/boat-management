@@ -1,0 +1,2 @@
+export const MARINA_CANVAS_WIDTH = 1400
+export const MARINA_CANVAS_HEIGHT = 900
