@@ -3,6 +3,16 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-07-03 — [#169, #179, #184] Validators : `vine.compile()` remplacé par `vine.create()`
+
+**Corrige A-06, D-04 et E-03 : `vine.compile()` est interdit par les règles du projet (déprécié). Il subsistait dans plusieurs validators des domaines auth, navigation/équipage et CSV**
+
+- `app/validators/organization_member.ts` : les 4 validators (`inviteMemberValidator`, `updateMemberRoleValidator`, `acceptInvitationValidator`, `declineInvitationValidator`) utilisent désormais `vine.create()`
+- `app/validators/navigation_log.ts` : les 3 validators (`createNavigationLogValidator`, `updateNavigationLogValidator`, `closeNavigationLogValidator`) utilisent désormais `vine.create()`
+- `app/validators/crew.ts` : les 4 validators (`createCrewMemberValidator`, `updateCrewMemberValidator`, `createCrewCertificationValidator`, `syncNavigationLogCrewValidator`) utilisent désormais `vine.create()`
+- `app/validators/csv_import.ts` : les 2 validators (`csvPreviewValidator`, `csvConfirmValidator`) utilisent désormais `vine.create()`
+- Remplacement mécanique sans changement de comportement (même API, `vine.create` est le remplaçant direct de `vine.compile`)
+
 ## 2026-07-03 — [#196] Membres : flash message sur MemberNotFoundError
 
 **Corrige A-10 : `MemberNotFoundError` levée dans `update()` et `destroy()` de `OrganizationMembersController` provoquait une redirection silencieuse, sans indiquer à l'utilisateur ce qui s'était passé**

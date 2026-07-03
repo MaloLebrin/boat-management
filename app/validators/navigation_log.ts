@@ -1,6 +1,6 @@
 import vine from '@vinejs/vine'
 
-export const createNavigationLogValidator = vine.compile(
+export const createNavigationLogValidator = vine.create(
   vine.object({
     departedAt: vine.date({ formats: ['YYYY-MM-DDTHH:mm', 'YYYY-MM-DDTHH:mm:ss'] }),
     departurePortId: vine.number().withoutDecimals().positive().optional(),
@@ -13,7 +13,7 @@ export const createNavigationLogValidator = vine.compile(
   })
 )
 
-export const updateNavigationLogValidator = vine.compile(
+export const updateNavigationLogValidator = vine.create(
   vine.object({
     _expectedUpdatedAt: vine.string().optional(),
     windForceBeaufort: vine.number().withoutDecimals().min(0).max(12).optional(),
@@ -23,7 +23,7 @@ export const updateNavigationLogValidator = vine.compile(
   })
 )
 
-export const closeNavigationLogValidator = vine.compile(
+export const closeNavigationLogValidator = vine.create(
   vine.object({
     _expectedUpdatedAt: vine.string().optional(),
     arrivedAt: vine.date({ formats: ['YYYY-MM-DDTHH:mm', 'YYYY-MM-DDTHH:mm:ss'] }),

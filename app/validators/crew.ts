@@ -1,6 +1,6 @@
 import vine from '@vinejs/vine'
 
-export const createCrewMemberValidator = vine.compile(
+export const createCrewMemberValidator = vine.create(
   vine.object({
     firstName: vine.string().trim().minLength(1).maxLength(100),
     lastName: vine.string().trim().minLength(1).maxLength(100),
@@ -10,7 +10,7 @@ export const createCrewMemberValidator = vine.compile(
   })
 )
 
-export const updateCrewMemberValidator = vine.compile(
+export const updateCrewMemberValidator = vine.create(
   vine.object({
     firstName: vine.string().trim().minLength(1).maxLength(100),
     lastName: vine.string().trim().minLength(1).maxLength(100),
@@ -20,7 +20,7 @@ export const updateCrewMemberValidator = vine.compile(
   })
 )
 
-export const createCrewCertificationValidator = vine.compile(
+export const createCrewCertificationValidator = vine.create(
   vine.object({
     type: vine.enum([
       'coastal_permit',
@@ -35,7 +35,7 @@ export const createCrewCertificationValidator = vine.compile(
   })
 )
 
-export const syncNavigationLogCrewValidator = vine.compile(
+export const syncNavigationLogCrewValidator = vine.create(
   vine.object({
     crew: vine.array(
       vine.object({
