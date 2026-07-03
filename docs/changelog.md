@@ -3,6 +3,13 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-07-03 — [#172] Invitations : l'appartenance à l'org est détectée même sans membership
+
+**Corrige A-09 : la vérification « déjà membre » dans `OrganizationInvitationService.create()` ne consultait que `organization_memberships`. Un user rattaché à l'org sans ligne membership (owner, drift A-03) pouvait recevoir une invitation à sa propre organisation**
+
+- `app/services/organization_invitation_service.ts` : `create()` vérifie désormais aussi `users WHERE email = ? AND organizationId = orgId`, en plus de la check membership. Les deux signaux sont conservés car une membership peut exister sans que `users.organizationId` pointe ici (multi-org), et un user peut appartenir à l'org sans membership
+- Test ajouté : `tests/functional/organization/invitations.spec.ts` (un user rattaché à l'org sans membership ne peut pas être invité — `AlreadyMemberError`, aucune invitation créée)
+
 ## 2026-07-03 — [#171] Facturation : synchronisation d'abonnement atomique
 
 **Corrige A-08 : `syncFromCheckoutSession()` et `syncFromSubscriptionEvent()` appelaient `upsertSubscription()` puis la mise à jour du plan de l'org de façon séquentielle et non transactionnelle. En cas d'échec de la seconde écriture, la souscription était enregistrée mais le plan de l'org restait incohérent (ex : souscription `active` mais org encore sur `starter`)**
