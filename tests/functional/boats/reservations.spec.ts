@@ -425,6 +425,135 @@ test.group('Boat Reservations (functional)', (group) => {
     assert.equal(reservation.status, 'confirmed')
   })
 
+  test('PATCH transition option -> cancelled is allowed', async ({ client, assert }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const reservation = await BoatReservation.create({
+      boatId: boat.id,
+      organizationId: boat.organizationId,
+      status: 'option',
+      startsAt: DateTime.fromISO('2025-09-01T10:00:00'),
+      endsAt: DateTime.fromISO('2025-09-07T10:00:00'),
+      clientName: 'Transition Client',
+    })
+
+    const response = await client
+      .patch(`/boats/${boat.id}/reservations/${reservation.id}`)
+      .form({ status: 'cancelled' })
+      .loginAs(user)
+      .redirects(0)
+
+    response.assertStatus(302)
+    await reservation.refresh()
+    assert.equal(reservation.status, 'cancelled')
+  })
+
+  test('PATCH transition confirmed -> cancelled is allowed', async ({ client, assert }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const reservation = await BoatReservation.create({
+      boatId: boat.id,
+      organizationId: boat.organizationId,
+      status: 'confirmed',
+      startsAt: DateTime.fromISO('2025-09-01T10:00:00'),
+      endsAt: DateTime.fromISO('2025-09-07T10:00:00'),
+      clientName: 'Transition Client',
+    })
+
+    const response = await client
+      .patch(`/boats/${boat.id}/reservations/${reservation.id}`)
+      .form({ status: 'cancelled' })
+      .loginAs(user)
+      .redirects(0)
+
+    response.assertStatus(302)
+    await reservation.refresh()
+    assert.equal(reservation.status, 'cancelled')
+  })
+
+  test('PATCH transition confirmed -> option is rejected (no downgrade)', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const reservation = await BoatReservation.create({
+      boatId: boat.id,
+      organizationId: boat.organizationId,
+      status: 'confirmed',
+      startsAt: DateTime.fromISO('2025-09-01T10:00:00'),
+      endsAt: DateTime.fromISO('2025-09-07T10:00:00'),
+      clientName: 'Transition Client',
+    })
+
+    const response = await client
+      .patch(`/boats/${boat.id}/reservations/${reservation.id}`)
+      .form({ status: 'option' })
+      .loginAs(user)
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertFlashMessage('error', 'This status change is not allowed.')
+
+    await reservation.refresh()
+    assert.equal(reservation.status, 'confirmed')
+  })
+
+  test('PATCH transition cancelled -> confirmed is rejected (terminal)', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const reservation = await BoatReservation.create({
+      boatId: boat.id,
+      organizationId: boat.organizationId,
+      status: 'cancelled',
+      startsAt: DateTime.fromISO('2025-09-01T10:00:00'),
+      endsAt: DateTime.fromISO('2025-09-07T10:00:00'),
+      clientName: 'Transition Client',
+    })
+
+    const response = await client
+      .patch(`/boats/${boat.id}/reservations/${reservation.id}`)
+      .form({ status: 'confirmed' })
+      .loginAs(user)
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertFlashMessage('error', 'This status change is not allowed.')
+
+    await reservation.refresh()
+    assert.equal(reservation.status, 'cancelled')
+  })
+
+  test('PATCH updating other fields without a status change is allowed on a confirmed', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const reservation = await BoatReservation.create({
+      boatId: boat.id,
+      organizationId: boat.organizationId,
+      status: 'confirmed',
+      startsAt: DateTime.fromISO('2025-09-01T10:00:00'),
+      endsAt: DateTime.fromISO('2025-09-07T10:00:00'),
+      clientName: 'Original Name',
+    })
+
+    const response = await client
+      .patch(`/boats/${boat.id}/reservations/${reservation.id}`)
+      .form({ clientName: 'Renamed Client' })
+      .loginAs(user)
+      .redirects(0)
+
+    response.assertStatus(302)
+    await reservation.refresh()
+    assert.equal(reservation.clientName, 'Renamed Client')
+    assert.equal(reservation.status, 'confirmed')
+  })
+
   test('PATCH /boats/:boatId/reservations/:id rejects cross-org attempt', async ({
     client,
     assert,
@@ -1146,33 +1275,5 @@ test.group('Boat Reservations (functional)', (group) => {
 
     await reservation.refresh()
     assert.equal(reservation.status, 'cancelled')
-  })
-
-  test('PATCH /boats/:boatId/reservations/:id transitions status from confirmed to option', async ({
-    client,
-    assert,
-  }) => {
-    const user = await createAdminUser()
-    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
-
-    const reservation = await BoatReservation.create({
-      boatId: boat.id,
-      organizationId: boat.organizationId,
-      status: 'confirmed',
-      startsAt: DateTime.fromISO('2025-09-01T10:00:00'),
-      endsAt: DateTime.fromISO('2025-09-07T10:00:00'),
-      clientName: 'Downgrade Client',
-    })
-
-    const response = await client
-      .patch(`/boats/${boat.id}/reservations/${reservation.id}`)
-      .form({ status: 'option' })
-      .loginAs(user)
-      .redirects(0)
-
-    response.assertStatus(302)
-
-    await reservation.refresh()
-    assert.equal(reservation.status, 'option')
   })
 })
