@@ -1,6 +1,6 @@
 import vine from '@vinejs/vine'
 
-export const csvPreviewValidator = vine.compile(
+export const csvPreviewValidator = vine.create(
   vine.object({
     type: vine.enum(['maintenance'] as const),
     boatId: vine.number().positive(),
@@ -11,7 +11,7 @@ export const csvPreviewValidator = vine.compile(
   })
 )
 
-export const csvConfirmValidator = vine.compile(
+export const csvConfirmValidator = vine.create(
   vine.object({
     type: vine.enum(['maintenance'] as const),
     boatId: vine.number().positive(),
