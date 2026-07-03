@@ -73,7 +73,7 @@ export default class OrganizationMembersController {
     return response.redirect().back()
   }
 
-  async update({ request, params, response, auth, bouncer, session }: HttpContext) {
+  async update({ request, params, response, auth, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
     await bouncer.with(OrganizationPolicy).authorize('manageMembers')
@@ -90,7 +90,10 @@ export default class OrganizationMembersController {
         metadata: { role: payload.role },
       })
     } catch (error) {
-      if (error instanceof MemberNotFoundError) return response.redirect().back()
+      if (error instanceof MemberNotFoundError) {
+        session.flash('error', i18n.t('flash.members.notFound'))
+        return response.redirect().back()
+      }
       if (error instanceof LastAdminError) {
         session.flash('error', 'member_last_admin')
         return response.redirect().back()
@@ -101,7 +104,7 @@ export default class OrganizationMembersController {
     return response.redirect().back()
   }
 
-  async destroy({ params, response, auth, bouncer, session }: HttpContext) {
+  async destroy({ params, response, auth, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
     await bouncer.with(OrganizationPolicy).authorize('manageMembers')
@@ -116,7 +119,10 @@ export default class OrganizationMembersController {
         entityId: Number(params.id),
       })
     } catch (error) {
-      if (error instanceof MemberNotFoundError) return response.redirect().back()
+      if (error instanceof MemberNotFoundError) {
+        session.flash('error', i18n.t('flash.members.notFound'))
+        return response.redirect().back()
+      }
       if (error instanceof LastAdminError) {
         session.flash('error', 'member_last_admin')
         return response.redirect().back()

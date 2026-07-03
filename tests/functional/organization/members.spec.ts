@@ -125,6 +125,32 @@ test.group('Organization members (functional)', (group) => {
     assert.isNull(found)
   })
 
+  test('PUT /organization/members/:id flashes an error when member is not found', async ({
+    client,
+  }) => {
+    const admin = await createAdminUser()
+
+    const response = await client
+      .put(`/organization/members/999999`)
+      .loginAs(admin)
+      .form({ role: 'admin' })
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertFlashMessage('error', 'Member not found.')
+  })
+
+  test('DELETE /organization/members/:id flashes an error when member is not found', async ({
+    client,
+  }) => {
+    const admin = await createAdminUser()
+
+    const response = await client.delete(`/organization/members/999999`).loginAs(admin).redirects(0)
+
+    response.assertStatus(302)
+    response.assertFlashMessage('error', 'Member not found.')
+  })
+
   test('DELETE /organization/members/:id is forbidden for non-admin', async ({ client }) => {
     const user = await UserFactory.with('organization').create()
     const membership = await OrganizationMembershipFactory.merge({
