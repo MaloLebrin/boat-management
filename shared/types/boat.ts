@@ -82,7 +82,7 @@ export type BoatEnginePartPayload = {
   supplier?: string | null
   notes?: string | null
   wearState?: PartWearState | null
-  purchasePrice?: string | null
+  purchasePrice?: number | null
   purchasedAt?: Date | string | DateTime | null
 }
 
@@ -102,7 +102,7 @@ export type BoatSafetyEquipmentPayload = {
   expiryDate?: Date | string | DateTime | null
   status?: string | null
   notes?: string | null
-  purchasePrice?: string | null
+  purchasePrice?: number | null
   purchasedAt?: Date | string | DateTime | null
 }
 
@@ -122,7 +122,7 @@ export type BoatGenericEquipmentPayload = {
   quantity?: number | null
   status?: string | null
   notes?: string | null
-  purchasePrice?: string | null
+  purchasePrice?: number | null
   purchasedAt?: Date | string | DateTime | null
 }
 

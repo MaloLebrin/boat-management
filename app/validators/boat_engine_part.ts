@@ -22,7 +22,7 @@ const partFields = {
   supplier: vine.string().trim().maxLength(200).nullable().optional(),
   notes: vine.string().trim().maxLength(2000).nullable().optional(),
   wearState: vine.enum(PART_WEAR_STATES).optional(),
-  purchasePrice: vine.string().trim().optional(),
+  purchasePrice: vine.number().positive().decimal([0, 2]).nullable().optional(),
   purchasedAt: vine.string().trim().optional(),
 }
 

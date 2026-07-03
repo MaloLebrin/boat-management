@@ -8,7 +8,7 @@ export const createSafetyEquipmentValidator = vine.create(
     expiryDate: vine.date().nullable().optional(),
     status: vine.enum(safetyEquipmentStatuses).optional(),
     notes: vine.string().trim().nullable().optional(),
-    purchasePrice: vine.string().trim().nullable().optional(),
+    purchasePrice: vine.number().positive().decimal([0, 2]).nullable().optional(),
     purchasedAt: vine.string().trim().optional(),
   })
 )
@@ -20,7 +20,7 @@ export const updateSafetyEquipmentValidator = vine.create(
     expiryDate: vine.date().nullable().optional(),
     status: vine.enum(safetyEquipmentStatuses).optional(),
     notes: vine.string().trim().nullable().optional(),
-    purchasePrice: vine.string().trim().nullable().optional(),
+    purchasePrice: vine.number().positive().decimal([0, 2]).nullable().optional(),
     purchasedAt: vine.string().trim().optional(),
   })
 )
