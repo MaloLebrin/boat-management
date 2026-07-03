@@ -1,7 +1,7 @@
 import BoatService, { BoatNotFoundError } from '#services/boat_service'
 import { parseMaintenanceCsv, importMaintenanceRows } from '#services/csv_import_service'
 import { csvPreviewValidator, csvConfirmValidator } from '#validators/csv_import'
-import type { CsvImportPreviewData, MaintenanceImportRow } from '#shared/types/csv'
+import type { CsvImportPreviewData, CsvPreviewRow, MaintenanceImportRow } from '#shared/types/csv'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import { promises as fs } from 'node:fs'
@@ -61,6 +61,15 @@ export default class CsvImportController {
       return response.redirect('/settings/import')
     }
 
+    const rows: CsvPreviewRow[] = previewRows.slice(0, 50).map((row) => ({
+      line: row.line,
+      raw: row.raw,
+      errors: row.errors.map((error) => ({
+        column: error.column,
+        message: i18n.t(error.key, error.params),
+      })),
+    }))
+
     const previewData: CsvImportPreviewData = {
       type: payload.type,
       boatId: boat.id,
@@ -68,7 +77,7 @@ export default class CsvImportController {
       totalRows,
       validRows: validRows.length,
       invalidRows: totalRows - validRows.length,
-      rows: previewRows.slice(0, 50),
+      rows,
     }
 
     const pending: PendingImport = { type: payload.type, boatId: boat.id, validRows }

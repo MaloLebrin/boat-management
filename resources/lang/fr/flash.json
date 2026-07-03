@@ -154,7 +154,16 @@
     "imported": "{count} ligne(s) importée(s) avec succès.",
     "boatNotFound": "Bateau introuvable.",
     "previewExpired": "La prévisualisation a expiré. Veuillez réimporter le fichier.",
-    "missingHeaders": "En-têtes manquantes dans le fichier CSV : {headers}."
+    "missingHeaders": "En-têtes manquantes dans le fichier CSV : {headers}.",
+    "rowErrors": {
+      "dateInvalidFormat": "Date invalide (format attendu : YYYY-MM-DD)",
+      "dateInvalid": "Date invalide",
+      "titleRequired": "Le titre est obligatoire",
+      "subjectInvalid": "Sujet invalide. Valeurs acceptées : {values}",
+      "engineCaptionRequired": "Légende moteur obligatoire pour le sujet \"engine\"",
+      "sailCaptionRequired": "Légende voile obligatoire pour le sujet \"sail\"",
+      "costInvalid": "Coût invalide (nombre attendu)"
+    }
   },
   "genericEquipment": {
     "created": "Équipement ajouté.",
