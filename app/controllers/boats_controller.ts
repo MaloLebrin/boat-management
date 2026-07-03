@@ -14,6 +14,7 @@ import BoatMaintenanceService from '#services/boat_maintenance_service'
 import BoatMaintenanceSheetService from '#services/boat_maintenance_sheet_service'
 import BoatMaintenanceTaskService from '#services/boat_maintenance_task_service'
 import BoatService, { BoatNotFoundError } from '#services/boat_service'
+import { RegistrationNumberTakenError } from '#exceptions/boat_errors'
 import MediaService from '#services/media_service'
 import OrganizationService from '#services/organization_service'
 import PortService from '#services/port_service'
@@ -119,6 +120,10 @@ export default class BoatsController {
     } catch (error) {
       if (error instanceof SpotNotFoundError) {
         session.flash('error', i18n.t('flash.spot.notInOrg'))
+        return response.redirect().back()
+      }
+      if (error instanceof RegistrationNumberTakenError) {
+        session.flash('error', i18n.t('flash.boat.registrationTaken'))
         return response.redirect().back()
       }
       throw error
@@ -309,6 +314,10 @@ export default class BoatsController {
     } catch (error) {
       if (error instanceof SpotNotFoundError) {
         session.flash('error', i18n.t('flash.spot.notInOrg'))
+        return response.redirect().back()
+      }
+      if (error instanceof RegistrationNumberTakenError) {
+        session.flash('error', i18n.t('flash.boat.registrationTaken'))
         return response.redirect().back()
       }
       throw error
