@@ -24,6 +24,37 @@ test.group('Organization members (functional)', (group) => {
     response.assertStatus(200)
   })
 
+  test('GET /organization/members includes an org user that has no membership row', async ({
+    client,
+    assert,
+  }) => {
+    // A user attached to an org but without a membership row (data drift / owner
+    // created before the membership backfill) must still appear in the list.
+    const user = await UserFactory.with('organization').create()
+
+    const before = await OrganizationMembership.query()
+      .where('userId', user.id)
+      .where('organizationId', user.organizationId!)
+      .first()
+    assert.isNull(before)
+
+    const response = await client.get('/organization/members').loginAs(user).withInertia()
+
+    response.assertStatus(200)
+    const props = response.inertiaProps as { members: { userId: number; role: string }[] }
+    const listed = props.members.find((m) => m.userId === user.id)
+    assert.isDefined(listed)
+    assert.equal(listed!.role, 'admin')
+
+    // The missing membership is self-healed so role/removal actions work afterwards.
+    const after = await OrganizationMembership.query()
+      .where('userId', user.id)
+      .where('organizationId', user.organizationId!)
+      .first()
+    assert.isNotNull(after)
+    assert.equal(after!.role, 'admin')
+  })
+
   test('GET /organization/members redirects to /login when unauthenticated', async ({ client }) => {
     const response = await client.get('/organization/members').redirects(0)
 

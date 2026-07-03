@@ -10,6 +10,8 @@ import type { OrgRole, OrganizationMemberData } from '#shared/types/organization
 
 export default class OrganizationMemberService {
   async listMembers(orgId: number): Promise<OrganizationMemberData[]> {
+    await this.ensureMembershipsForOrgUsers(orgId)
+
     const memberships = await OrganizationMembership.query()
       .where('organizationId', orgId)
       .preload('user')
@@ -22,6 +24,30 @@ export default class OrganizationMemberService {
       email: m.user.email,
       role: m.role,
     }))
+  }
+
+  /**
+   * Ensures every user attached to the organization has a membership row.
+   * The organization owner (and any user with `organizationId` set) must appear
+   * in the members list, but the list is built from `organization_memberships`.
+   * A user without a membership row — data drift, or an org owner created before
+   * the membership backfill — would otherwise be invisible. This self-heals that
+   * drift by creating the missing membership as 'admin'. Idempotent: the unique
+   * (user_id, organization_id) constraint makes re-runs no-ops.
+   */
+  private async ensureMembershipsForOrgUsers(orgId: number): Promise<void> {
+    const usersWithoutMembership = await User.query()
+      .where('organizationId', orgId)
+      .whereDoesntHave('memberships', (query) => {
+        query.where('organizationId', orgId)
+      })
+
+    for (const user of usersWithoutMembership) {
+      await OrganizationMembership.firstOrCreate(
+        { userId: user.id, organizationId: orgId },
+        { userId: user.id, organizationId: orgId, role: 'admin' }
+      )
+    }
   }
 
   async addMember(orgId: number, email: string, role: OrgRole): Promise<OrganizationMembership> {
