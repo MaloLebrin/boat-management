@@ -36,6 +36,7 @@ export const closeNavigationLogValidator = vine.create(
     arrivalPortName: vine.string().trim().maxLength(255).optional(),
     distanceNm: vine.number().min(0).optional(),
     engineHoursEnd: vine.number().min(0).optional(),
+    boatEngineId: vine.number().withoutDecimals().positive().nullable().optional(),
     fuelConsumedLiters: vine.number().min(0).optional(),
     windForceBeaufort: vine.number().withoutDecimals().min(0).max(12).optional(),
     seaState: vine.enum(['calm', 'slight', 'moderate', 'rough', 'very_rough'] as const).optional(),

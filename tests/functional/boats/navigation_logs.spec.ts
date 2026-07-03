@@ -177,6 +177,56 @@ test.group('Navigation logs (functional)', (group) => {
     assert.equal(engine.hours, 500)
   })
 
+  test('PATCH close does not touch any engine on a multi-engine boat without boatEngineId (#181)', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const engineA = await BoatEngineFactory.merge({ boatId: boat.id, hours: 100 }).create()
+    const engineB = await BoatEngineFactory.merge({ boatId: boat.id, hours: 200 }).create()
+    const log = await NavigationLogFactory.merge({
+      boatId: boat.id,
+      organizationId: user.organizationId!,
+      departedAt: DateTime.fromISO('2024-01-01T08:00:00'),
+    }).create()
+
+    await client
+      .patch(`/boats/${boat.id}/navigation-logs/${log.id}/close`)
+      .loginAs(user)
+      .form({ arrivedAt: '2024-01-01T14:00', engineHoursEnd: 300 })
+
+    await engineA.refresh()
+    await engineB.refresh()
+    assert.equal(engineA.hours, 100, 'no engine should be guessed on a multi-engine boat')
+    assert.equal(engineB.hours, 200)
+  })
+
+  test('PATCH close updates only the targeted engine on a multi-engine boat (#181)', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const engineA = await BoatEngineFactory.merge({ boatId: boat.id, hours: 100 }).create()
+    const engineB = await BoatEngineFactory.merge({ boatId: boat.id, hours: 200 }).create()
+    const log = await NavigationLogFactory.merge({
+      boatId: boat.id,
+      organizationId: user.organizationId!,
+      departedAt: DateTime.fromISO('2024-01-01T08:00:00'),
+    }).create()
+
+    await client
+      .patch(`/boats/${boat.id}/navigation-logs/${log.id}/close`)
+      .loginAs(user)
+      .form({ arrivedAt: '2024-01-01T14:00', engineHoursEnd: 300, boatEngineId: engineB.id })
+
+    await engineA.refresh()
+    await engineB.refresh()
+    assert.equal(engineA.hours, 100, 'the non-targeted engine is untouched')
+    assert.equal(engineB.hours, 300, 'the targeted engine is updated')
+  })
+
   test('PATCH close rejects arrivedAt before departedAt', async ({ client, assert }) => {
     const user = await createAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()

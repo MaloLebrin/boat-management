@@ -31,6 +31,8 @@
     "distanceNm": "Distance (nautical miles, optional)",
     "engineHoursStart": "Engine hours at departure (optional)",
     "engineHoursEnd": "Engine hours at arrival (optional)",
+    "boatEngine": "Engine these hours apply to",
+    "selectEngine": "Select an engine…",
     "fuelConsumedLiters": "Fuel consumed (L, optional)",
     "windForceBeaufort": "Wind force (Beaufort 0–12, optional)",
     "seaState": "Sea state (optional)",

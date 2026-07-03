@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { router } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import NavigationLogForm from '~/components/boats/show/tabs/NavigationLogForm.vue'
 import NavigationLogCloseForm from '~/components/boats/show/tabs/NavigationLogCloseForm.vue'
 import NavigationLogCrewPanel from '~/components/boats/show/tabs/NavigationLogCrewPanel.vue'
+import { toNavigationEngineOptions } from '~/utils/navigation_engine_options'
 import { useT } from '~/composables/use_t'
 import type { BoatShowDetail, NavigationLogRow, NavigationLogPortOption } from '~/types/boat_show'
 import type { CrewMemberOption } from '../../../../../shared/types/crew'
@@ -21,6 +22,8 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
+
+const engineOptions = computed(() => toNavigationEngineOptions(props.boat.engines))
 
 const showCreateForm = ref(false)
 const closingLogId = ref<number | null>(null)
@@ -88,6 +91,7 @@ function deleteLog(logId: number) {
           :boat-id="boat.id"
           :log="log"
           :port-options="portOptions"
+          :engine-options="engineOptions"
           @close="closingLogId = null"
         />
 

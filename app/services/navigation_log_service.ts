@@ -137,15 +137,30 @@ export default class NavigationLogService {
       await log.save()
 
       if (payload.engineHoursEnd !== null && payload.engineHoursEnd !== undefined) {
-        const engine = await BoatEngine.query()
-          .useTransaction(trx)
-          .where('boatId', boat.id)
-          .whereNotIn('status', ['retired', 'out_of_service'])
-          .orderBy('id', 'asc')
-          .first()
+        const hoursEnd = payload.engineHoursEnd
+        let engine: BoatEngine | null = null
 
-        if (engine && (engine.hours === null || engine.hours < payload.engineHoursEnd)) {
-          engine.hours = payload.engineHoursEnd
+        if (payload.boatEngineId !== null && payload.boatEngineId !== undefined) {
+          // Targeted engine: must belong to this boat and be active.
+          engine = await BoatEngine.query()
+            .useTransaction(trx)
+            .where('boatId', boat.id)
+            .where('id', payload.boatEngineId)
+            .whereNotIn('status', ['retired', 'out_of_service'])
+            .first()
+        } else {
+          // No engine specified: only auto-apply the hours when the boat has
+          // exactly one active engine. On multi-engine boats we don't guess —
+          // writing to an arbitrary engine would corrupt its hour counter.
+          const activeEngines = await BoatEngine.query()
+            .useTransaction(trx)
+            .where('boatId', boat.id)
+            .whereNotIn('status', ['retired', 'out_of_service'])
+          engine = activeEngines.length === 1 ? activeEngines[0] : null
+        }
+
+        if (engine && (engine.hours === null || engine.hours < hoursEnd)) {
+          engine.hours = hoursEnd
           await engine.save()
         }
       }

@@ -6,6 +6,7 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import NavigationLogUpdateForm from '~/components/boats/show/tabs/NavigationLogUpdateForm.vue'
 import NavigationLogCloseForm from '~/components/boats/show/tabs/NavigationLogCloseForm.vue'
+import { toNavigationEngineOptions } from '~/utils/navigation_engine_options'
 import { useT } from '~/composables/use_t'
 import type { BoatShowDetail, NavigationLogPortOption, NavigationLogRow } from '~/types/boat_show'
 
@@ -18,6 +19,8 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
+
+const engineOptions = computed(() => toNavigationEngineOptions(props.boat.engines))
 
 const showUpdateForm = ref(false)
 const showFuelForm = ref(false)
@@ -149,6 +152,7 @@ function toggleClose() {
       :boat-id="boat.id"
       :log="log"
       :port-options="portOptions"
+      :engine-options="engineOptions"
       @close="showCloseForm = false"
     />
 

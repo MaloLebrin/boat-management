@@ -133,6 +133,7 @@ export default class NavigationLogsController {
         arrivalPortName: payload.arrivalPortName ?? null,
         distanceNm: payload.distanceNm ?? null,
         engineHoursEnd: payload.engineHoursEnd ?? null,
+        boatEngineId: payload.boatEngineId ?? null,
         fuelConsumedLiters: payload.fuelConsumedLiters ?? null,
         windForceBeaufort: payload.windForceBeaufort ?? null,
         seaState: payload.seaState ?? null,

@@ -117,4 +117,36 @@ describe('NavigationLogCloseForm', () => {
     await wrapper.find('button[type="button"]').trigger('click')
     expect(wrapper.emitted('close')).toBeTruthy()
   })
+
+  test('shows the engine selector on a multi-engine boat (#181)', () => {
+    const wrapper = mount(NavigationLogCloseForm, {
+      props: {
+        boatId: 7,
+        log,
+        portOptions,
+        engineOptions: [
+          { id: 1, label: 'Yanmar 1' },
+          { id: 2, label: 'Yanmar 2' },
+        ],
+      },
+    })
+    expect(wrapper.html()).toContain('navigation_logs.fields.boatEngine')
+  })
+
+  test('hides the engine selector when the boat has a single engine (#181)', () => {
+    const wrapper = mount(NavigationLogCloseForm, {
+      props: {
+        boatId: 7,
+        log,
+        portOptions,
+        engineOptions: [{ id: 1, label: 'Yanmar 1' }],
+      },
+    })
+    expect(wrapper.html()).not.toContain('navigation_logs.fields.boatEngine')
+  })
+
+  test('hides the engine selector when no engine options are provided (#181)', () => {
+    const wrapper = mount(NavigationLogCloseForm, { props: { boatId: 7, log, portOptions } })
+    expect(wrapper.html()).not.toContain('navigation_logs.fields.boatEngine')
+  })
 })

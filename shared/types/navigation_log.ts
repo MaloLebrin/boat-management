@@ -29,6 +29,8 @@ export interface CloseNavigationLogPayload {
   arrivalPortName?: string | null
   distanceNm?: number | null
   engineHoursEnd?: number | null
+  /** Which engine `engineHoursEnd` applies to (multi-engine boats). */
+  boatEngineId?: number | null
   fuelConsumedLiters?: number | null
   windForceBeaufort?: number | null
   seaState?: SeaState | null
@@ -63,6 +65,11 @@ export interface NavigationLogRow {
 export interface NavigationLogPortOption {
   id: number
   name: string
+}
+
+export interface NavigationLogEngineOption {
+  id: number
+  label: string
 }
 
 export interface ConflictLogSnapshot {
