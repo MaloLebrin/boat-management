@@ -6,6 +6,7 @@ import { UserFactory } from '#database/factories/user_factory'
 import { BoatReservationFactory } from '#database/factories/boat_reservation_factory'
 import { createAdminUser } from '#tests/functional/helpers'
 import BoatReservation from '#models/boat_reservation'
+import OrganizationMembership from '#models/organization_membership'
 
 const VALID_RESERVATION = {
   startsAt: '2025-08-01T10:00',
@@ -462,6 +463,89 @@ test.group('Boat Reservations (functional)', (group) => {
 
     const existing = await BoatReservation.find(reservation.id)
     assert.isNotNull(existing)
+  })
+
+  test('DELETE /boats/:boatId/reservations/:id is rejected for non-admin member when confirmed', async ({
+    client,
+    assert,
+  }) => {
+    const admin = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: admin.organizationId! }).create()
+    const reservation = await BoatReservationFactory.merge({
+      boatId: boat.id,
+      organizationId: boat.organizationId,
+      status: 'confirmed',
+    }).create()
+
+    const member = await UserFactory.merge({ organizationId: admin.organizationId! }).create()
+    await OrganizationMembership.create({
+      userId: member.id,
+      organizationId: admin.organizationId!,
+      role: 'member',
+    })
+
+    const response = await client
+      .delete(`/boats/${boat.id}/reservations/${reservation.id}`)
+      .loginAs(member)
+      .redirects(0)
+
+    response.assertStatus(302)
+
+    const existing = await BoatReservation.find(reservation.id)
+    assert.isNotNull(existing)
+  })
+
+  test('DELETE /boats/:boatId/reservations/:id allows non-admin member when not confirmed', async ({
+    client,
+    assert,
+  }) => {
+    const admin = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: admin.organizationId! }).create()
+    const reservation = await BoatReservationFactory.merge({
+      boatId: boat.id,
+      organizationId: boat.organizationId,
+      status: 'option',
+    }).create()
+
+    const member = await UserFactory.merge({ organizationId: admin.organizationId! }).create()
+    await OrganizationMembership.create({
+      userId: member.id,
+      organizationId: admin.organizationId!,
+      role: 'member',
+    })
+
+    const response = await client
+      .delete(`/boats/${boat.id}/reservations/${reservation.id}`)
+      .loginAs(member)
+      .redirects(0)
+
+    response.assertStatus(302)
+
+    const existing = await BoatReservation.find(reservation.id)
+    assert.isNull(existing)
+  })
+
+  test('DELETE /boats/:boatId/reservations/:id allows admin to delete confirmed reservation', async ({
+    client,
+    assert,
+  }) => {
+    const admin = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: admin.organizationId! }).create()
+    const reservation = await BoatReservationFactory.merge({
+      boatId: boat.id,
+      organizationId: boat.organizationId,
+      status: 'confirmed',
+    }).create()
+
+    const response = await client
+      .delete(`/boats/${boat.id}/reservations/${reservation.id}`)
+      .loginAs(admin)
+      .redirects(0)
+
+    response.assertStatus(302)
+
+    const existing = await BoatReservation.find(reservation.id)
+    assert.isNull(existing)
   })
 
   // --- fleet index ---
