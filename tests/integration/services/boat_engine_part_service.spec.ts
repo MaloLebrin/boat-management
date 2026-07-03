@@ -55,6 +55,26 @@ test.group('BoatEnginePartService (unit)', () => {
     assert.deepEqual(names, ['Fuel filter', 'Impeller'])
   })
 
+  test('listLowStock ignores parts with untracked (null) stock', async ({ assert }) => {
+    const user = await UserFactory.with('organization').create()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    boat.$extras = {}
+    await boat.load('engines')
+    const engine = await BoatEngineFactory.merge({ boatId: boat.id }).create()
+    await boat.load('engines')
+
+    const svc = await app.container.make(BoatEnginePartService)
+
+    await svc.create(user, boat, engine.id, {
+      designation: 'Untracked gasket',
+      stock: null,
+      minStockAlert: 2,
+    })
+
+    const lowStock = await svc.listLowStock(engine.id)
+    assert.equal(lowStock.length, 0)
+  })
+
   test('listLowStock ignores parts without minStockAlert', async ({ assert }) => {
     const user = await UserFactory.with('organization').create()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()

@@ -32,7 +32,7 @@ export default class BoatEnginePartService {
     return await BoatEnginePart.query()
       .where('boatEngineId', engineId)
       .whereNotNull('minStockAlert')
-      .whereRaw('(stock IS NULL OR stock <= min_stock_alert)')
+      .whereRaw('stock <= min_stock_alert')
       .orderBy('designation', 'asc')
   }
 
