@@ -72,8 +72,9 @@ export default class BoatReservationsController {
 
     const payload = await request.validateUsing(createBoatReservationValidator)
 
+    let cancelledOptions = 0
     try {
-      await this.reservationService.create(user, boat, {
+      ;({ cancelledOptions } = await this.reservationService.create(user, boat, {
         startsAt: payload.startsAt,
         endsAt: payload.endsAt,
         clientName: payload.clientName,
@@ -82,7 +83,7 @@ export default class BoatReservationsController {
         status: payload.status,
         notes: payload.notes ?? null,
         totalPrice: payload.totalPrice ?? null,
-      })
+      }))
     } catch (error) {
       if (error instanceof ReservationConflictError) {
         session.flash('error', i18n.t('flash.reservation.conflict'))
@@ -95,7 +96,12 @@ export default class BoatReservationsController {
       throw error
     }
 
-    session.flash('success', i18n.t('flash.reservation.created'))
+    session.flash(
+      'success',
+      cancelledOptions > 0
+        ? i18n.t('flash.reservation.optionsOverridden', { count: String(cancelledOptions) })
+        : i18n.t('flash.reservation.created')
+    )
     return response.redirect().back()
   }
 
@@ -110,17 +116,23 @@ export default class BoatReservationsController {
 
     const payload = await request.validateUsing(updateBoatReservationValidator)
 
+    let cancelledOptions = 0
     try {
-      await this.reservationService.update(user, boat, Number(params.reservationId), {
-        startsAt: payload.startsAt,
-        endsAt: payload.endsAt,
-        clientName: payload.clientName,
-        clientEmail: payload.clientEmail,
-        clientPhone: payload.clientPhone,
-        status: payload.status,
-        notes: payload.notes,
-        totalPrice: payload.totalPrice,
-      })
+      ;({ cancelledOptions } = await this.reservationService.update(
+        user,
+        boat,
+        Number(params.reservationId),
+        {
+          startsAt: payload.startsAt,
+          endsAt: payload.endsAt,
+          clientName: payload.clientName,
+          clientEmail: payload.clientEmail,
+          clientPhone: payload.clientPhone,
+          status: payload.status,
+          notes: payload.notes,
+          totalPrice: payload.totalPrice,
+        }
+      ))
     } catch (error) {
       if (error instanceof ReservationNotFoundError) {
         session.flash('error', i18n.t('flash.reservation.notFound'))
@@ -137,7 +149,12 @@ export default class BoatReservationsController {
       throw error
     }
 
-    session.flash('success', i18n.t('flash.reservation.updated'))
+    session.flash(
+      'success',
+      cancelledOptions > 0
+        ? i18n.t('flash.reservation.optionsOverridden', { count: String(cancelledOptions) })
+        : i18n.t('flash.reservation.updated')
+    )
     return response.redirect().back()
   }
 

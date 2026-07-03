@@ -201,7 +201,8 @@
     "deleted": "Reservation deleted.",
     "notFound": "Reservation not found.",
     "conflict": "This boat is already booked for this period.",
-    "endBeforeStart": "End date must be after start date."
+    "endBeforeStart": "End date must be after start date.",
+    "optionsOverridden": "Reservation confirmed. {count} overlapping option(s) cancelled."
   },
   "ports": {
     "hasBoats": "Cannot delete this port: boats are assigned to it."

@@ -242,7 +242,160 @@ test.group('Boat Reservations (functional)', (group) => {
     assert.lengthOf(reservations, 1)
   })
 
+  test('POST confirmed overrides an overlapping option and cancels it', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    const option = await BoatReservation.create({
+      boatId: boat.id,
+      organizationId: boat.organizationId,
+      status: 'option',
+      startsAt: DateTime.fromISO('2025-08-01T10:00:00'),
+      endsAt: DateTime.fromISO('2025-08-10T10:00:00'),
+      clientName: 'Option Holder',
+    })
+
+    const response = await client
+      .post(`/boats/${boat.id}/reservations`)
+      .form({
+        startsAt: '2025-08-05T10:00',
+        endsAt: '2025-08-15T10:00',
+        clientName: 'Firm Client',
+        status: 'confirmed',
+      })
+      .loginAs(user)
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertFlashMessage(
+      'success',
+      'Reservation confirmed. 1 overlapping option(s) cancelled.'
+    )
+
+    await option.refresh()
+    assert.equal(option.status, 'cancelled')
+
+    const confirmed = await BoatReservation.query()
+      .where('boatId', boat.id)
+      .where('status', 'confirmed')
+      .firstOrFail()
+    assert.equal(confirmed.clientName, 'Firm Client')
+  })
+
+  test('POST confirmed is still blocked by an overlapping confirmed', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    await BoatReservation.create({
+      boatId: boat.id,
+      organizationId: boat.organizationId,
+      status: 'confirmed',
+      startsAt: DateTime.fromISO('2025-08-01T10:00:00'),
+      endsAt: DateTime.fromISO('2025-08-10T10:00:00'),
+      clientName: 'First Firm',
+    })
+
+    const response = await client
+      .post(`/boats/${boat.id}/reservations`)
+      .form({
+        startsAt: '2025-08-05T10:00',
+        endsAt: '2025-08-15T10:00',
+        clientName: 'Second Firm',
+        status: 'confirmed',
+      })
+      .loginAs(user)
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertFlashMessage('error', 'This boat is already booked for this period.')
+
+    const confirmed = await BoatReservation.query()
+      .where('boatId', boat.id)
+      .where('status', 'confirmed')
+    assert.lengthOf(confirmed, 1)
+  })
+
+  test('POST option is blocked by an overlapping option (one hold per slot)', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    await BoatReservation.create({
+      boatId: boat.id,
+      organizationId: boat.organizationId,
+      status: 'option',
+      startsAt: DateTime.fromISO('2025-08-01T10:00:00'),
+      endsAt: DateTime.fromISO('2025-08-10T10:00:00'),
+      clientName: 'First Hold',
+    })
+
+    const response = await client
+      .post(`/boats/${boat.id}/reservations`)
+      .form({
+        startsAt: '2025-08-05T10:00',
+        endsAt: '2025-08-15T10:00',
+        clientName: 'Second Hold',
+        status: 'option',
+      })
+      .loginAs(user)
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertFlashMessage('error', 'This boat is already booked for this period.')
+
+    const all = await BoatReservation.query().where('boatId', boat.id)
+    assert.lengthOf(all, 1)
+  })
+
   // --- update ---
+
+  test('PATCH moving a confirmed onto an option cancels that option', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    const option = await BoatReservation.create({
+      boatId: boat.id,
+      organizationId: boat.organizationId,
+      status: 'option',
+      startsAt: DateTime.fromISO('2025-08-01T10:00:00'),
+      endsAt: DateTime.fromISO('2025-08-10T10:00:00'),
+      clientName: 'Option Holder',
+    })
+
+    const confirmed = await BoatReservation.create({
+      boatId: boat.id,
+      organizationId: boat.organizationId,
+      status: 'confirmed',
+      startsAt: DateTime.fromISO('2025-09-01T10:00:00'),
+      endsAt: DateTime.fromISO('2025-09-10T10:00:00'),
+      clientName: 'Firm Client',
+    })
+
+    const response = await client
+      .patch(`/boats/${boat.id}/reservations/${confirmed.id}`)
+      .form({ startsAt: '2025-08-05T10:00', endsAt: '2025-08-15T10:00' })
+      .loginAs(user)
+      .redirects(0)
+
+    response.assertStatus(302)
+
+    await option.refresh()
+    assert.equal(option.status, 'cancelled')
+
+    await confirmed.refresh()
+    assert.equal(confirmed.startsAt.toISODate(), '2025-08-05')
+  })
 
   test('PATCH /boats/:boatId/reservations/:id updates status to confirmed', async ({
     client,
