@@ -129,13 +129,18 @@ export default class BoatReservationService {
     return reservation
   }
 
-  async delete(user: User, boat: Boat, reservationId: number): Promise<void> {
+  async findForBoat(
+    user: User,
+    boat: Boat,
+    reservationId: number
+  ): Promise<BoatReservation | null> {
     assertBoatScope(user, boat)
 
-    const reservation = await BoatReservation.query()
-      .where('id', reservationId)
-      .where('boatId', boat.id)
-      .first()
+    return BoatReservation.query().where('id', reservationId).where('boatId', boat.id).first()
+  }
+
+  async delete(user: User, boat: Boat, reservationId: number): Promise<void> {
+    const reservation = await this.findForBoat(user, boat, reservationId)
 
     if (!reservation) throw new ReservationNotFoundError()
     await reservation.delete()

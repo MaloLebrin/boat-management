@@ -148,10 +148,21 @@ export default class BoatReservationsController {
     const boat = await this.resolveBoat(user, Number(params.boatId), response)
     if (!boat) return
 
-    await bouncer.with(BoatPolicy).authorize('manage', boat)
+    const reservation = await this.reservationService.findForBoat(
+      user,
+      boat,
+      Number(params.reservationId)
+    )
+
+    if (!reservation) {
+      session.flash('error', i18n.t('flash.reservation.notFound'))
+      return response.redirect().back()
+    }
+
+    await bouncer.with(BoatPolicy).authorize('deleteReservation', boat, reservation)
 
     try {
-      await this.reservationService.delete(user, boat, Number(params.reservationId))
+      await this.reservationService.delete(user, boat, reservation.id)
     } catch (error) {
       if (error instanceof ReservationNotFoundError) {
         session.flash('error', i18n.t('flash.reservation.notFound'))
