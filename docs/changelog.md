@@ -12,7 +12,7 @@ Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 - `app/controllers/csv_import_controller.ts` : résolution des clés via `i18n.t()` avant d'envoyer les lignes de prévisualisation au frontend
 - `resources/lang/{en,fr}/flash.json` : nouvelle section `csv.rowErrors` (date invalide, titre requis, sujet invalide, légendes moteur/voile requises, coût invalide)
 - Tests ajoutés : `tests/unit/services/csv_import_service.spec.ts` (clés i18n + params retournés par le service) et `tests/functional/settings/csv_import.spec.ts` (messages traduits en anglais par défaut, en français via `Accept-Language`, interpolation du message de sujet invalide)
-
+ main
 ## 2026-07-03 — [#207] Plan de mouillage : validation des coordonnées de position sur le canvas
 
 **Corrige G-07 : les positions des pontons/mouillages n'étaient pas bornées aux dimensions du canvas**
