@@ -82,6 +82,52 @@ test.group('Boats assign (functional)', (group) => {
     assert.equal(updated.spotId, spot.id)
   })
 
+  test('PATCH /boats/:id/assignment goes through the BoatPolicy — a same-org member is allowed', async ({
+    client,
+    assert,
+  }) => {
+    // assign() now authorizes via BoatPolicy.edit like the other mutations.
+    // A non-admin member of the same org is permitted (same rule as update),
+    // so legitimate access must keep working after the authorize call was added.
+    const admin = await createAdminUser()
+    const member = await UserFactory.merge({ organizationId: admin.organizationId! }).create()
+    const boat = await BoatFactory.merge({ organizationId: admin.organizationId! }).create()
+    const spot = await makeSpot(admin.organizationId!)
+
+    const response = await client
+      .patch(`/boats/${boat.id}/assignment`)
+      .loginAs(member)
+      .form({ spotId: spot.id })
+      .redirects(0)
+
+    response.assertStatus(302)
+
+    const updated = await Boat.findOrFail(boat.id)
+    assert.equal(updated.spotId, spot.id)
+  })
+
+  test('PATCH /boats/:id/assignment does not touch a boat from another org', async ({
+    client,
+    assert,
+  }) => {
+    const owner = await createAdminUser()
+    const outsider = await UserFactory.with('organization').create()
+    const boat = await BoatFactory.merge({ organizationId: owner.organizationId! }).create()
+    const spot = await makeSpot(outsider.organizationId!)
+
+    const response = await client
+      .patch(`/boats/${boat.id}/assignment`)
+      .loginAs(outsider)
+      .form({ spotId: spot.id })
+      .redirects(0)
+
+    response.assertStatus(302)
+
+    // The boat belongs to another org — its assignment is left untouched.
+    const untouched = await Boat.findOrFail(boat.id)
+    assert.isNull(untouched.spotId)
+  })
+
   test('POST /boats evicts previous occupant when creating a boat on an occupied spot', async ({
     client,
     assert,

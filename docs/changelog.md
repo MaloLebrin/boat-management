@@ -3,6 +3,14 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-07-03 — [#175] Bateaux : `assign()` passe par la policy Bouncer
+
+**Corrige B-06 : l'action `assign()` (affectation de spot) ne passait par aucune policy Bouncer, contrairement à `update`/`destroy`/`create`. Elle est désormais routée par `BoatPolicy.edit`**
+
+- `app/controllers/boats_controller.ts` : `assign()` appelle `await bouncer.with(BoatPolicy).authorize('edit', boat)` après la récupération du bateau
+- Défense en profondeur : le cross-org était déjà bloqué par `getForUserOrFail` (fetch scopé à l'org), et `BoatPolicy.edit` autorise les membres de l'org (même règle que `update`) — pas de changement de comportement immédiat, mais l'action respecte maintenant la policy et suivra automatiquement tout durcissement futur de `edit`
+- Tests ajoutés : `tests/functional/boats/boats_assign.spec.ts` (un membre non-admin de l'org reste autorisé ; un bateau d'une autre org n'est pas modifié)
+
 ## 2026-07-03 — [#174] Moteurs : les heures ne peuvent plus régresser
 
 **Corrige B-05 : la mise à jour d'un moteur acceptait n'importe quelle valeur d'heures ≥ 0, sans vérifier qu'elle ne descend pas sous la valeur actuelle. Le compteur (monotone) pouvait donc régresser — manipulation frauduleuse, erreurs de maintenance préventive, biais des analyses IA**
