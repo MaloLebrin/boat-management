@@ -114,7 +114,8 @@
     "created": "Fuel log recorded.",
     "deleted": "Fuel log deleted.",
     "notFound": "Fuel log not found.",
-    "engineNotBelongs": "This engine does not belong to this boat."
+    "engineNotBelongs": "This engine does not belong to this boat.",
+    "inconsistentCost": "Total cost does not match quantity multiplied by price per liter."
   },
   "navigationLog": {
     "created": "Trip recorded.",

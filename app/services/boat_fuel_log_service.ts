@@ -33,6 +33,21 @@ export default class BoatFuelLogService {
       }
     }
 
+    if (
+      payload.pricePerLiter !== null &&
+      payload.pricePerLiter !== undefined &&
+      payload.totalCost !== null &&
+      payload.totalCost !== undefined
+    ) {
+      const expectedTotalCost = payload.quantityLiters * payload.pricePerLiter
+      if (Math.abs(payload.totalCost - expectedTotalCost) >= 0.01) {
+        throw new BoatFuelLogValidationError(
+          'Total cost is inconsistent with quantity and price per liter',
+          'inconsistentCost'
+        )
+      }
+    }
+
     const fueledAt = toDateTime(payload.fueledAt)
 
     return await BoatFuelLog.create({
