@@ -1,7 +1,9 @@
 import { test } from '@japa/runner'
 import testUtils from '@adonisjs/core/services/test_utils'
+import emitter from '@adonisjs/core/services/emitter'
 import Subscription from '#models/subscription'
 import SubscriptionService from '#services/subscription_service'
+import OrganizationPlanDowngraded from '#events/organization_plan_downgraded'
 import { OrganizationFactory } from '#database/factories/organization_factory'
 
 /**
@@ -10,12 +12,12 @@ import { OrganizationFactory } from '#database/factories/organization_factory'
  */
 function fakeStripeSubscription(
   customerId: string,
-  opts: { anchor: number; periodStart: number; periodEnd: number }
+  opts: { anchor: number; periodStart: number; periodEnd: number; status?: string }
 ) {
   return {
     id: 'sub_test_123',
     customer: customerId,
-    status: 'active',
+    status: opts.status ?? 'active',
     cancel_at_period_end: false,
     billing_cycle_anchor: opts.anchor,
     items: {
@@ -28,6 +30,12 @@ function fakeStripeSubscription(
       ],
     },
   }
+}
+
+const PERIOD = {
+  anchor: Math.floor(Date.UTC(2020, 0, 1) / 1000),
+  periodStart: Math.floor(Date.UTC(2030, 0, 10) / 1000),
+  periodEnd: Math.floor(Date.UTC(2030, 1, 10) / 1000),
 }
 
 test.group('SubscriptionService period bounds (functional)', (group) => {
@@ -54,5 +62,71 @@ test.group('SubscriptionService period bounds (functional)', (group) => {
     const sub = await Subscription.query().where('organizationId', org.id).firstOrFail()
     assert.equal(sub.currentPeriodStart.toUTC().toISODate(), '2030-01-10')
     assert.equal(sub.currentPeriodEnd.toUTC().toISODate(), '2030-02-10')
+  })
+})
+
+test.group('SubscriptionService sync atomicity (functional)', (group) => {
+  group.each.setup(() => testUtils.db().truncate())
+
+  test('subscription upsert and org plan update commit together, event dispatched after commit', async ({
+    assert,
+    cleanup,
+  }) => {
+    const events = emitter.fake()
+    cleanup(() => emitter.restore())
+
+    const org = await OrganizationFactory.merge({
+      stripeCustomerId: 'cus_downgrade',
+      plan: 'enterprise',
+    }).create()
+
+    const service = new SubscriptionService({} as any)
+    await service.syncFromSubscriptionEvent(
+      fakeStripeSubscription('cus_downgrade', { ...PERIOD, status: 'canceled' }) as any
+    )
+
+    // Both writes committed: org plan downgraded to starter AND subscription row saved.
+    await org.refresh()
+    assert.equal(org.plan, 'starter')
+    const sub = await Subscription.query().where('organizationId', org.id).firstOrFail()
+    assert.equal(sub.status, 'canceled')
+
+    // The downgrade event is dispatched once, after the transaction commits.
+    events.assertEmitted(OrganizationPlanDowngraded)
+  })
+
+  test('rolls back the subscription upsert when the plan update fails', async ({
+    assert,
+    cleanup,
+  }) => {
+    const events = emitter.fake()
+    cleanup(() => emitter.restore())
+
+    const org = await OrganizationFactory.merge({
+      stripeCustomerId: 'cus_rollback',
+      plan: 'enterprise',
+    }).create()
+
+    const service = new SubscriptionService({} as any)
+    // Force the second write (plan update) to fail after the subscription upsert
+    // has already run inside the transaction.
+    ;(service as any).applyOrgPlan = async () => {
+      throw new Error('plan update failed')
+    }
+
+    await assert.rejects(() =>
+      service.syncFromSubscriptionEvent(
+        fakeStripeSubscription('cus_rollback', { ...PERIOD, status: 'canceled' }) as any
+      )
+    )
+
+    // The subscription upsert is rolled back with the failed plan update…
+    const sub = await Subscription.query().where('organizationId', org.id).first()
+    assert.isNull(sub)
+
+    // …and the org plan is left untouched. No event is dispatched.
+    await org.refresh()
+    assert.equal(org.plan, 'enterprise')
+    events.assertNoneEmitted()
   })
 })
