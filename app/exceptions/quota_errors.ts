@@ -8,6 +8,7 @@ export type QuotaFeature =
   | 'export'
   | 'storage'
   | 'clients'
+  | 'pricing'
 
 interface QuotaExceededOptions {
   limit: number | null

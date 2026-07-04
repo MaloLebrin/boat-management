@@ -10,6 +10,7 @@ import type Media from '#models/media'
 import type { AiSuggestion } from '#services/ai_analysis_service'
 import type { IncidentType, IncidentStatus } from '#shared/types/incident'
 import type { BoatDocumentRow } from '#shared/types/boat_document'
+import type { BoatPricingRow } from '#shared/types/boat_pricing'
 import type { FuelLogRow } from '#shared/types/fuel_log'
 import type { NavigationLogRow, NavigationLogPortOption } from '#shared/types/navigation_log'
 import type { CrewMemberOption } from '#shared/types/crew'
@@ -26,6 +27,9 @@ export interface BoatManageContext {
   canManageEquipment: boolean
   canManageDocuments: boolean
   canExport: boolean
+  pricing: BoatPricingRow | null
+  pricingEnabled: boolean
+  canManagePricing: boolean
 }
 
 export interface BoatNavigationContext {
@@ -85,6 +89,9 @@ export function toManageProps(boat: Boat, ctx: BoatManageContext) {
     canManageDocuments: ctx.canManageDocuments,
     canExport: ctx.canExport,
     aiSuggestions: ctx.aiSuggestions,
+    pricing: ctx.pricing,
+    pricingEnabled: ctx.pricingEnabled,
+    canManagePricing: ctx.canManagePricing,
   }
 }
 

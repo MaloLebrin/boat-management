@@ -21,6 +21,7 @@ export const controllers = {
   BoatMedia: () => import('#controllers/boat_media_controller'),
   BoatPortStay: () => import('#controllers/boat_port_stay_controller'),
   BoatPosition: () => import('#controllers/boat_position_controller'),
+  BoatPricing: () => import('#controllers/boat_pricing_controller'),
   BoatReservations: () => import('#controllers/boat_reservations_controller'),
   BoatSafetyEquipment: () => import('#controllers/boat_safety_equipment_controller'),
   BoatSimulator: () => import('#controllers/boat_simulator_controller'),

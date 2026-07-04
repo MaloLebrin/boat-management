@@ -224,6 +224,7 @@
       "overview": "Overview",
       "equipment": "Equipment",
       "specs": "Specifications",
+      "pricing": "Pricing",
       "history": "History",
       "tasks": "Tasks",
       "documents": "Documents",
@@ -334,6 +335,21 @@
     "registration": "Registration & flag",
     "equipmentOnBoard": "Equipment on board",
     "editHint": "Specifications can be edited on the boat's edit page."
+  },
+  "pricing": {
+    "title": "Base pricing",
+    "baseDailyPrice": "Daily rate",
+    "baseWeeklyPrice": "Weekly rate",
+    "depositAmount": "Security deposit",
+    "minDays": "Minimum days",
+    "maxDays": "Maximum days",
+    "currency": "Currency",
+    "perDay": "/ day",
+    "perWeek": "/ week",
+    "noPricing": "No pricing defined for this boat.",
+    "save": "Save",
+    "editHint": "Set the base rental rates for this boat. Weekly rate, deposit, and duration constraints are optional.",
+    "readOnlyHint": "Pricing can only be edited by administrators."
   },
   "safetyEquipment": {
     "title": "Safety equipment",

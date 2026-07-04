@@ -15,6 +15,7 @@ import type {
   MaintenanceSheetRow,
   MaintenanceTaskRow,
 } from '~/types/boat_show'
+import type { BoatPricingRow } from '../../../shared/types/boat_pricing'
 
 const { t } = useT()
 
@@ -29,11 +30,15 @@ const props = defineProps<{
   canManageDocuments: boolean
   canExport: boolean
   aiSuggestions: AiSuggestion[] | null
+  pricing: BoatPricingRow | null
+  pricingEnabled: boolean
+  canManagePricing: boolean
 }>()
 
 type TabKey =
   | 'overview'
   | 'specs'
+  | 'pricing'
   | 'equipment'
   | 'history'
   | 'tasks'
@@ -87,6 +92,7 @@ const expiringDocCount = computed(
 const tabs = computed(() => [
   { key: 'overview', label: t('boats.show.tabs.overview') },
   { key: 'specs', label: t('boats.show.tabs.specs') },
+  ...(props.pricingEnabled ? [{ key: 'pricing', label: t('boats.show.tabs.pricing') }] : []),
   { key: 'equipment', label: t('boats.show.tabs.equipment') },
   { key: 'history', label: t('boats.show.tabs.history') },
   {

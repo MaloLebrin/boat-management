@@ -5,9 +5,11 @@ import AuditLogService from '#services/audit_log_service'
 import BoatDocumentService from '#services/boat_document_service'
 import BoatFuelLogService from '#services/boat_fuel_log_service'
 import BoatListService from '#services/boat_list_service'
+import BoatPricingService from '#services/boat_pricing_service'
 import NavigationLogService from '#services/navigation_log_service'
 import CrewService from '#services/crew_service'
 import { toEditForm, toManageProps, toNavigationProps } from '#transformers/boat_transformer'
+import { toBoatPricingRow } from '#transformers/boat_pricing_transformer'
 import { toPortFormOptions } from '#transformers/port_transformer'
 import BoatIncidentService from '#services/boat_incident_service'
 import BoatMaintenanceService from '#services/boat_maintenance_service'
@@ -48,7 +50,8 @@ export default class BoatsController {
     private auditLogService: AuditLogService,
     private documentService: BoatDocumentService,
     private crewService: CrewService,
-    private navigationLogService: NavigationLogService
+    private navigationLogService: NavigationLogService,
+    private pricingService: BoatPricingService
   ) {}
 
   async index({ inertia, auth, request }: HttpContext) {
@@ -149,6 +152,7 @@ export default class BoatsController {
         latestSuggestions,
         canManageMaintenance,
         boatDocuments,
+        pricingRow,
       ] = await Promise.all([
         this.maintenanceService.listForBoat(user, boat),
         this.taskService.listForBoat(user, boat),
@@ -160,11 +164,17 @@ export default class BoatsController {
           : Promise.resolve(null),
         bouncer.with(BoatPolicy).allows('edit', boat),
         this.documentService.listForBoat(user, boat),
+        this.pricingService.getForBoat(boat),
       ])
 
       const canManageEquipment = canManageMaintenance
       const canManageDocuments = canManageMaintenance
       const canExport = user.organization ? this.quotaService.canExport(user.organization) : false
+      const pricingEnabled = user.organization
+        ? this.quotaService.canManagePricing(user.organization)
+        : false
+      const canManagePricing = pricingEnabled && canManageMaintenance
+      const pricing = pricingRow ? toBoatPricingRow(pricingRow) : null
       const aiSuggestions: AiSuggestion[] | null = latestSuggestions
         ? (JSON.parse(latestSuggestions.responseText) as AiSuggestion[])
         : null
@@ -183,6 +193,9 @@ export default class BoatsController {
           canManageEquipment,
           canManageDocuments,
           canExport,
+          pricing,
+          pricingEnabled,
+          canManagePricing,
         })
       )
     } catch (error) {

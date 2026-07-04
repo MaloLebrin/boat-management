@@ -5,6 +5,7 @@ import BoatFuelLog from '#models/boat_fuel_log'
 import BoatGenericEquipment from '#models/boat_generic_equipment'
 import BoatMaintenanceEvent from '#models/boat_maintenance_event'
 import BoatPositionHistory from '#models/boat_position_history'
+import BoatPricing from '#models/boat_pricing'
 import BoatReservation from '#models/boat_reservation'
 import BoatRig from '#models/boat_rig'
 import BoatSail from '#models/boat_sail'
@@ -134,4 +135,7 @@ export default class Boat extends BaseModel {
 
   @hasMany(() => BoatReservation)
   declare reservations: HasMany<typeof BoatReservation>
+
+  @hasOne(() => BoatPricing)
+  declare pricing: HasOne<typeof BoatPricing>
 }

@@ -98,6 +98,21 @@ export default class QuotaService {
     }
   }
 
+  canManagePricing(org: Organization): boolean {
+    return PLAN_LIMITS[org.plan].canManagePricing
+  }
+
+  assertCanManagePricing(org: Organization): void {
+    const limits = PLAN_LIMITS[org.plan]
+    if (!limits.canManagePricing) {
+      throw new QuotaExceededError('pricing', {
+        limit: null,
+        current: 0,
+        upgradeTo: getUpgradeTier(org.plan),
+      })
+    }
+  }
+
   storageLimitBytes(org: Organization): number | null {
     const gb = PLAN_LIMITS[org.plan].storageGb
     return gb === null ? null : gb * 1024 * 1024 * 1024
