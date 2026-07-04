@@ -29,6 +29,59 @@ test.group('Navigation logs (functional)', (group) => {
     assert.equal(log!.status, 'in_progress')
   })
 
+  test('POST store rejects a second in-progress trip for the same boat (#182)', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    await NavigationLogFactory.merge({
+      boatId: boat.id,
+      organizationId: user.organizationId!,
+      status: 'in_progress',
+    }).create()
+
+    const response = await client
+      .post(`/boats/${boat.id}/navigation-logs`)
+      .loginAs(user)
+      .form({ departedAt: '2024-02-01T10:00' })
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertFlashMessage(
+      'error',
+      'This boat already has a trip in progress. Close it before starting a new one.'
+    )
+
+    const inProgress = await NavigationLog.query()
+      .where('boatId', boat.id)
+      .where('status', 'in_progress')
+    assert.lengthOf(inProgress, 1)
+  })
+
+  test('POST store allows a new trip once the previous one is closed (#182)', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    await NavigationLogFactory.merge({
+      boatId: boat.id,
+      organizationId: user.organizationId!,
+      status: 'completed',
+    }).create()
+
+    await client
+      .post(`/boats/${boat.id}/navigation-logs`)
+      .loginAs(user)
+      .form({ departedAt: '2024-02-01T10:00' })
+
+    const inProgress = await NavigationLog.query()
+      .where('boatId', boat.id)
+      .where('status', 'in_progress')
+    assert.lengthOf(inProgress, 1)
+  })
+
   test('POST store persists optional fields', async ({ client, assert }) => {
     const user = await createAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()

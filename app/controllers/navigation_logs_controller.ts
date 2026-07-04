@@ -1,6 +1,7 @@
 import NavigationLogService from '#services/navigation_log_service'
 import {
   NavigationLogConflictError,
+  NavigationLogInProgressError,
   NavigationLogNotFoundError,
   NavigationLogValidationError,
 } from '#exceptions/navigation_log_errors'
@@ -40,16 +41,25 @@ export default class NavigationLogsController {
 
     const payload = await request.validateUsing(createNavigationLogValidator)
 
-    await this.navigationLogService.createForBoat(boat, {
-      departedAt: payload.departedAt,
-      departurePortId: payload.departurePortId ?? null,
-      departurePortName: payload.departurePortName ?? null,
-      engineHoursStart: payload.engineHoursStart ?? null,
-      windForceBeaufort: payload.windForceBeaufort ?? null,
-      seaState: payload.seaState ?? null,
-      crewCount: payload.crewCount ?? null,
-      notes: payload.notes ?? null,
-    })
+    try {
+      await this.navigationLogService.createForBoat(boat, {
+        departedAt: payload.departedAt,
+        departurePortId: payload.departurePortId ?? null,
+        departurePortName: payload.departurePortName ?? null,
+        engineHoursStart: payload.engineHoursStart ?? null,
+        windForceBeaufort: payload.windForceBeaufort ?? null,
+        seaState: payload.seaState ?? null,
+        crewCount: payload.crewCount ?? null,
+        notes: payload.notes ?? null,
+      })
+    } catch (error) {
+      if (error instanceof NavigationLogInProgressError) {
+        session.flash('error', i18n.t('flash.navigationLog.alreadyInProgress'))
+        response.redirect(`/boats/${boat.id}?tab=navigation-logs`)
+        return
+      }
+      throw error
+    }
 
     session.flash('success', i18n.t('flash.navigationLog.created'))
     response.redirect(`/boats/${boat.id}?tab=navigation-logs`)

@@ -126,7 +126,8 @@
     "notFound": "Trip not found.",
     "arrivedAtBeforeDeparture": "Arrival time must be after departure time.",
     "engineHoursEndBeforeStart": "Engine hours at arrival must be greater than or equal to hours at departure.",
-    "conflict": "This trip was modified in the meantime — sync skipped."
+    "conflict": "This trip was modified in the meantime — sync skipped.",
+    "alreadyInProgress": "This boat already has a trip in progress. Close it before starting a new one."
   },
   "boat": {
     "registrationTaken": "A boat with this registration number already exists in your organisation."
