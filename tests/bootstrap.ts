@@ -8,6 +8,19 @@ import { apiClient } from '@japa/api-client'
 import { authApiClient } from '@adonisjs/auth/plugins/api_client'
 import { sessionApiClient } from '@adonisjs/session/plugins/api_client'
 import { inertiaApiClient } from '@adonisjs/inertia/plugins/api_client'
+import { browserClient } from '@japa/browser-client'
+import { authBrowserClient } from '@adonisjs/auth/plugins/browser_client'
+import { sessionBrowserClient } from '@adonisjs/session/plugins/browser_client'
+import { chromium } from 'playwright'
+
+/**
+ * Escape hatch for environments where the Playwright-managed Chromium download
+ * is unavailable (e.g. a preinstalled system Chromium). When set,
+ * PLAYWRIGHT_CHROMIUM_EXECUTABLE points the browser launcher at that binary.
+ * Left unset in CI, where `playwright install chromium` fetches the matching
+ * browser.
+ */
+const chromiumExecutable = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE
 
 /**
  * This file is imported by the "bin/test.ts" entrypoint file
@@ -27,6 +40,21 @@ export const plugins: Config['plugins'] = [
   sessionApiClient(app),
   authApiClient(app),
   inertiaApiClient(app),
+  // Browser (e2e) client — only launches Playwright for the "browser" suite.
+  // sessionBrowserClient + authBrowserClient expose context.loginAs(user) so
+  // e2e tests can authenticate programmatically (web session) instead of
+  // replaying the login form on every test.
+  browserClient({
+    runInSuites: ['browser'],
+    ...(chromiumExecutable
+      ? {
+          launcher: (options) =>
+            chromium.launch({ ...options, executablePath: chromiumExecutable }),
+        }
+      : {}),
+  }),
+  sessionBrowserClient(app),
+  authBrowserClient(app),
 ]
 
 /**

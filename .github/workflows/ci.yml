@@ -102,3 +102,60 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Frontend tests (Vitest)
         run: pnpm test:inertia
+
+  test-e2e:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.9.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+      - name: E2E tests (Playwright + Japa browser client)
+        run: pnpm test:e2e
+        env:
+          NODE_ENV: test
+          TZ: UTC
+          PORT: 3333
+          HOST: localhost
+          APP_NAME: fleetai
+          APP_KEY: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+          APP_URL: http://localhost:3333
+          LOG_LEVEL: error
+          QUEUE_DRIVER: sync
+          SESSION_DRIVER: memory
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USER: test
+          DB_PASSWORD: test
+          DB_DATABASE: test
+          AI_PROVIDER: mistral
+          MISTRAL_API_KEY: test
+          CLOUDINARY_CLOUD_NAME: test
+          CLOUDINARY_API_KEY: test
+          CLOUDINARY_API_SECRET: test
+          SMTP_HOST: localhost
+          SMTP_PORT: 1025
+          SMTP_SECURE: false
+          MAIL_FROM_ADDRESS: noreply@fleetai.app
+          MAIL_FROM_NAME: FleetAi
