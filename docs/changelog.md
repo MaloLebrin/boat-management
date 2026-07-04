@@ -3,6 +3,17 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-07-04 — Tests e2e navigateur (Japa browser client + Playwright)
+
+**Introduit une suite de tests end-to-end qui exerce l'application dans un vrai navigateur (rendu Inertia + interactions), jusqu'ici absente (seuls des tests unitaires, d'intégration, fonctionnels et de composants existaient).**
+
+- **Outillage** : dépendance dev `playwright`, branchement des plugins `browserClient` / `sessionBrowserClient` / `authBrowserClient` dans `tests/bootstrap.ts` (la suite `browser` et `@japa/browser-client` étaient déjà déclarés). Authentification programmatique via `browserContext.loginAs(user)` (session web), données préparées par les factories existantes, isolation par `truncate()` par test.
+- **Parcours critiques** (`tests/browser/`) : `auth.spec.ts` (login réel via formulaire, mauvais mot de passe, redirection `/boats` → `/login` si non authentifié, logout), `boats.spec.ts` (création → fiche → édition → suppression), `maintenance.spec.ts` (événement de maintenance visible dans l'historique, redirection `/maintenance` → `/maintenance/history`)
+- **Smoke navigable** : `smoke_authenticated.spec.ts` charge tous les écrans authentifiés principaux (dashboard, boats, planning, maintenance, navigation, réservations, ports, crew, clients, notifications, settings…) avec un admin Enterprise et vérifie le statut HTTP + l'URL ; `smoke_public.spec.ts` couvre les pages publiques/marketing (EN/FR) et la page de login
+- **Scripts** : `pnpm test:e2e` (= `node ace test browser`) ; `pnpm test` / `pnpm test:coverage` ciblent désormais explicitement `unit integration functional` (la suite navigateur, qui requiert un navigateur, reste opt-in via `test:e2e`)
+- **CI** : nouveau job `test-e2e` dans `.github/workflows/ci.yml` (service PostgreSQL + `playwright install --with-deps chromium` + `pnpm test:e2e`)
+- **Note environnement** : la variable `PLAYWRIGHT_CHROMIUM_EXECUTABLE` (optionnelle) permet de pointer vers un Chromium système quand le téléchargement Playwright n'est pas disponible ; en CI le navigateur est installé et cette variable reste vide
+
 ## 2026-07-04 — [#292] Tarification : tarif de base par bateau (plan Enterprise)
 
 **Socle de la tarification (epic Tarification #284, lot 1/3)** : nouvelle ressource `boat_pricing` en 1:1 par bateau, org-scopée, réservée au plan Enterprise. Expose un onglet « Tarif » sur la fiche bateau.
