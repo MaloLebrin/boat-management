@@ -1,0 +1,55 @@
+{
+  "title": "Clients",
+  "subtitle": "Gerez vos relations clients",
+  "add": "+ Ajouter un client",
+  "empty": {
+    "title": "Aucun client",
+    "description": "Ajoutez votre premier client pour commencer votre CRM."
+  },
+  "count": "{count, plural, one {# client} other {# clients}}",
+  "searchPlaceholder": "Rechercher des clients...",
+  "columns": {
+    "name": "Nom",
+    "email": "Email",
+    "phone": "Telephone",
+    "permit": "Permis",
+    "status": "Statut",
+    "actions": "Actions"
+  },
+  "fields": {
+    "firstName": "Prenom",
+    "lastName": "Nom",
+    "email": "Email (optionnel)",
+    "phone": "Telephone (optionnel)",
+    "address": "Adresse (optionnel)",
+    "navigationPermitNumber": "Numero de permis (optionnel)",
+    "navigationPermitType": "Type de permis (optionnel)",
+    "status": "Statut",
+    "notes": "Notes (optionnel)"
+  },
+  "permitTypes": {
+    "coastal": "Cotier",
+    "offshore": "Hauturier",
+    "inland": "Fluvial",
+    "other": "Autre"
+  },
+  "status": {
+    "active": "Actif",
+    "inactive": "Inactif",
+    "blacklisted": "Liste noire"
+  },
+  "statusFilter": "Statut",
+  "allStatuses": "Tous les statuts",
+  "form": {
+    "submit": "Enregistrer",
+    "cancel": "Annuler",
+    "createTitle": "Ajouter un client",
+    "editTitle": "Modifier le client"
+  },
+  "deleteConfirm": {
+    "title": "Supprimer le client",
+    "message": "Etes-vous sur de vouloir supprimer ce client ? Cette action est irreversible."
+  },
+  "edit": "Modifier",
+  "delete": "Supprimer"
+}

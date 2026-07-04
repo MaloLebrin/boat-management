@@ -13,6 +13,8 @@ export interface PlanQuotas {
   aiTokensPerMonth: number | null
   canGroupTasks: boolean
   canWhiteLabel: boolean
+  /** Client CRM (clients management) — Enterprise only. */
+  canManageClients: boolean
 }
 
 export interface QuotaUsage {
@@ -48,6 +50,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanQuotas> = {
     aiTokensPerMonth: null,
     canGroupTasks: false,
     canWhiteLabel: false,
+    canManageClients: false,
   },
   pro: {
     maxBoats: 25,
@@ -60,6 +63,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanQuotas> = {
     aiTokensPerMonth: 1_000_000,
     canGroupTasks: true,
     canWhiteLabel: false,
+    canManageClients: false,
   },
   enterprise: {
     maxBoats: null,
@@ -72,6 +76,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanQuotas> = {
     aiTokensPerMonth: null,
     canGroupTasks: true,
     canWhiteLabel: true,
+    canManageClients: true,
   },
 }
 

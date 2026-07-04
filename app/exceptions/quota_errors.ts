@@ -1,6 +1,13 @@
 import type { PlanTier } from '#shared/types/plan'
 
-export type QuotaFeature = 'boats' | 'members' | 'ai' | 'ai_tokens' | 'export' | 'storage'
+export type QuotaFeature =
+  | 'boats'
+  | 'members'
+  | 'ai'
+  | 'ai_tokens'
+  | 'export'
+  | 'storage'
+  | 'clients'
 
 interface QuotaExceededOptions {
   limit: number | null

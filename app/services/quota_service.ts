@@ -87,6 +87,17 @@ export default class QuotaService {
     }
   }
 
+  assertCanManageClients(org: Organization): void {
+    const limits = PLAN_LIMITS[org.plan]
+    if (!limits.canManageClients) {
+      throw new QuotaExceededError('clients', {
+        limit: null,
+        current: 0,
+        upgradeTo: getUpgradeTier(org.plan),
+      })
+    }
+  }
+
   storageLimitBytes(org: Organization): number | null {
     const gb = PLAN_LIMITS[org.plan].storageGb
     return gb === null ? null : gb * 1024 * 1024 * 1024

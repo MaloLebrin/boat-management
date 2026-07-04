@@ -1,5 +1,6 @@
 export const policies = {
   BoatPolicy: () => import('#policies/boat_policy'),
+  ClientPolicy: () => import('#policies/client_policy'),
   CrewMemberPolicy: () => import('#policies/crew_member_policy'),
   FuelLogPolicy: () => import('#policies/fuel_log_policy'),
   IncidentPolicy: () => import('#policies/incident_policy'),
