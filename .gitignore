@@ -31,3 +31,6 @@ yarn-error.log
 # cursor
 .cursor/debug*.log
 
+
+# Test coverage reports
+coverage/
