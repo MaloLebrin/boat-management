@@ -1,0 +1,55 @@
+{
+  "title": "Pricing seasons",
+  "subtitle": "Manage seasonal pricing periods",
+  "add": "+ New season",
+  "empty": {
+    "title": "No pricing seasons",
+    "description": "Create your first seasonal pricing period to adjust rates throughout the year."
+  },
+  "count": "{count, plural, one {# season} other {# seasons}}",
+  "columns": {
+    "name": "Name",
+    "scope": "Scope",
+    "period": "Period",
+    "pricing": "Pricing",
+    "priority": "Priority",
+    "actions": "Actions"
+  },
+  "scope": {
+    "global": "Global",
+    "allBoats": "All boats"
+  },
+  "filter": {
+    "boat": "Boat",
+    "allBoats": "All boats"
+  },
+  "fields": {
+    "boatId": "Boat (optional, leave empty for global)",
+    "name": "Season name",
+    "startsOn": "Start date",
+    "endsOn": "End date",
+    "dailyPrice": "Daily price",
+    "multiplier": "Multiplier",
+    "priority": "Priority",
+    "priorityHint": "Higher priority seasons override lower ones for overlapping dates"
+  },
+  "pricingType": {
+    "label": "Pricing type",
+    "fixedPrice": "Fixed daily price",
+    "multiplier": "Multiplier"
+  },
+  "pricingHint": "Set either a fixed daily price OR a multiplier (e.g. 1.5 for +50%)",
+  "form": {
+    "submit": "Save",
+    "cancel": "Cancel",
+    "createTitle": "Create pricing season",
+    "editTitle": "Edit pricing season"
+  },
+  "deleteConfirm": {
+    "title": "Delete pricing season",
+    "message": "Are you sure you want to delete this season? This action cannot be undone."
+  },
+  "edit": "Edit",
+  "delete": "Delete",
+  "multiplierFormat": "x{value}"
+}

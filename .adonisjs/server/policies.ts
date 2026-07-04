@@ -10,6 +10,7 @@ export const policies = {
   OrganizationInvitationPolicy: () => import('#policies/organization_invitation_policy'),
   OrganizationPolicy: () => import('#policies/organization_policy'),
   PortPolicy: () => import('#policies/port_policy'),
+  PricingSeasonPolicy: () => import('#policies/pricing_season_policy'),
   SimulatorPolicy: () => import('#policies/simulator_policy'),
   SpotPolicy: () => import('#policies/spot_policy'),
   SubscriptionPolicy: () => import('#policies/subscription_policy'),

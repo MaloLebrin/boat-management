@@ -1,0 +1,55 @@
+{
+  "title": "Périodes tarifaires",
+  "subtitle": "Gérez vos périodes de tarification saisonnière",
+  "add": "+ Nouvelle période",
+  "empty": {
+    "title": "Aucune période tarifaire",
+    "description": "Créez votre première période saisonnière pour ajuster vos tarifs tout au long de l'année."
+  },
+  "count": "{count, plural, one {# période} other {# périodes}}",
+  "columns": {
+    "name": "Nom",
+    "scope": "Périmètre",
+    "period": "Période",
+    "pricing": "Tarification",
+    "priority": "Priorité",
+    "actions": "Actions"
+  },
+  "scope": {
+    "global": "Global",
+    "allBoats": "Tous les bateaux"
+  },
+  "filter": {
+    "boat": "Bateau",
+    "allBoats": "Tous les bateaux"
+  },
+  "fields": {
+    "boatId": "Bateau (optionnel, laisser vide pour global)",
+    "name": "Nom de la période",
+    "startsOn": "Date de début",
+    "endsOn": "Date de fin",
+    "dailyPrice": "Tarif journalier",
+    "multiplier": "Multiplicateur",
+    "priority": "Priorité",
+    "priorityHint": "Les périodes de priorité supérieure priment sur les autres en cas de chevauchement"
+  },
+  "pricingType": {
+    "label": "Type de tarification",
+    "fixedPrice": "Tarif journalier fixe",
+    "multiplier": "Multiplicateur"
+  },
+  "pricingHint": "Définissez soit un tarif journalier fixe SOIT un multiplicateur (ex : 1.5 pour +50%)",
+  "form": {
+    "submit": "Enregistrer",
+    "cancel": "Annuler",
+    "createTitle": "Créer une période tarifaire",
+    "editTitle": "Modifier la période tarifaire"
+  },
+  "deleteConfirm": {
+    "title": "Supprimer la période tarifaire",
+    "message": "Êtes-vous sûr de vouloir supprimer cette période ? Cette action est irréversible."
+  },
+  "edit": "Modifier",
+  "delete": "Supprimer",
+  "multiplierFormat": "×{value}"
+}
