@@ -126,7 +126,8 @@
     "notFound": "Sortie introuvable.",
     "arrivedAtBeforeDeparture": "L'heure d'arrivée doit être postérieure à l'heure de départ.",
     "engineHoursEndBeforeStart": "Les heures moteur à l'arrivée doivent être supérieures ou égales à celles au départ.",
-    "conflict": "Cette sortie a été modifiée entre-temps — synchronisation annulée."
+    "conflict": "Cette sortie a été modifiée entre-temps — synchronisation annulée.",
+    "alreadyInProgress": "Ce bateau a déjà une sortie en cours. Clôturez-la avant d'en démarrer une nouvelle."
   },
   "boat": {
     "registrationTaken": "Un bateau avec ce numéro d'immatriculation existe déjà dans votre organisation."

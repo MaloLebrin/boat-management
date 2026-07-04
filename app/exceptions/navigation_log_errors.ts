@@ -4,6 +4,10 @@ export class NavigationLogNotFoundError extends Error {
   name = 'NavigationLogNotFoundError'
 }
 
+export class NavigationLogInProgressError extends Error {
+  name = 'NavigationLogInProgressError'
+}
+
 export class NavigationLogConflictError extends Error {
   name = 'NavigationLogConflictError'
   constructor(public readonly currentLog: ConflictLogSnapshot) {

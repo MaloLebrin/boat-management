@@ -1,5 +1,6 @@
 import {
   NavigationLogConflictError,
+  NavigationLogInProgressError,
   NavigationLogNotFoundError,
   NavigationLogValidationError,
 } from '#exceptions/navigation_log_errors'
@@ -15,8 +16,27 @@ import type {
 import { toDateTime } from '#shared/helpers/date'
 import db from '@adonisjs/lucid/services/db'
 
-export { NavigationLogConflictError, NavigationLogNotFoundError, NavigationLogValidationError }
+export {
+  NavigationLogConflictError,
+  NavigationLogInProgressError,
+  NavigationLogNotFoundError,
+  NavigationLogValidationError,
+}
 export type { CreateNavigationLogPayload, CloseNavigationLogPayload, UpdateNavigationLogPayload }
+
+/**
+ * Detects the PostgreSQL unique-violation raised by the partial unique index
+ * guaranteeing a single in-progress trip per boat.
+ */
+function isInProgressUniqueViolation(error: unknown): boolean {
+  if (typeof error !== 'object' || error === null) return false
+  const err = error as { code?: unknown; constraint?: unknown }
+  return (
+    err.code === '23505' &&
+    typeof err.constraint === 'string' &&
+    err.constraint.includes('one_in_progress_per_boat')
+  )
+}
 
 function buildConflictSnapshot(log: NavigationLog): ConflictLogSnapshot {
   return {
@@ -48,28 +68,44 @@ export default class NavigationLogService {
   async createForBoat(boat: Boat, payload: CreateNavigationLogPayload) {
     const departedAt = toDateTime(payload.departedAt)
 
-    return await NavigationLog.create({
-      boatId: boat.id,
-      organizationId: boat.organizationId,
-      status: 'in_progress',
-      departedAt,
-      arrivedAt: null,
-      departurePortId: payload.departurePortId ?? null,
-      departurePortName: payload.departurePortName?.trim() || null,
-      arrivalPortId: null,
-      arrivalPortName: null,
-      distanceNm: null,
-      engineHoursStart:
-        payload.engineHoursStart !== null && payload.engineHoursStart !== undefined
-          ? String(payload.engineHoursStart)
-          : null,
-      engineHoursEnd: null,
-      fuelConsumedLiters: null,
-      windForceBeaufort: payload.windForceBeaufort ?? null,
-      seaState: payload.seaState ?? null,
-      crewCount: payload.crewCount ?? null,
-      notes: payload.notes?.trim() || null,
-    })
+    // A boat may only have one in-progress trip at a time. Two would make the
+    // "active trip" ambiguous and corrupt engine hours on the two closeTrip
+    // calls. The partial unique index enforces this at the DB level (race-safe);
+    // this check surfaces a friendly error for the common case.
+    const existing = await NavigationLog.query()
+      .where('boatId', boat.id)
+      .where('status', 'in_progress')
+      .first()
+    if (existing) throw new NavigationLogInProgressError()
+
+    try {
+      return await NavigationLog.create({
+        boatId: boat.id,
+        organizationId: boat.organizationId,
+        status: 'in_progress',
+        departedAt,
+        arrivedAt: null,
+        departurePortId: payload.departurePortId ?? null,
+        departurePortName: payload.departurePortName?.trim() || null,
+        arrivalPortId: null,
+        arrivalPortName: null,
+        distanceNm: null,
+        engineHoursStart:
+          payload.engineHoursStart !== null && payload.engineHoursStart !== undefined
+            ? String(payload.engineHoursStart)
+            : null,
+        engineHoursEnd: null,
+        fuelConsumedLiters: null,
+        windForceBeaufort: payload.windForceBeaufort ?? null,
+        seaState: payload.seaState ?? null,
+        crewCount: payload.crewCount ?? null,
+        notes: payload.notes?.trim() || null,
+      })
+    } catch (error) {
+      // Concurrent request slipped past the check above: the unique index rejects it.
+      if (isInProgressUniqueViolation(error)) throw new NavigationLogInProgressError()
+      throw error
+    }
   }
 
   async closeTrip(boat: Boat, logId: number, payload: CloseNavigationLogPayload) {
