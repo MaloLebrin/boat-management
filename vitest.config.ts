@@ -8,6 +8,13 @@ export default defineConfig({
     environment: 'happy-dom',
     include: ['tests/inertia/**/*.spec.ts'],
     setupFiles: ['tests/inertia/setup.ts'],
+    coverage: {
+      provider: 'v8',
+      reportsDirectory: 'coverage/frontend',
+      reporter: ['text', 'html'],
+      include: ['inertia/**/*.{ts,vue}'],
+      exclude: ['inertia/**/*.d.ts', '**/*.spec.ts'],
+    },
   },
   resolve: {
     alias: {

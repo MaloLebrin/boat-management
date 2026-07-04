@@ -1,0 +1,10 @@
+{
+  "all": true,
+  "src": ["./app", "./shared"],
+  "include": ["app/**/*.ts", "shared/**/*.ts"],
+  "exclude": ["**/*.spec.ts", "tests/**", "build/**", ".adonisjs/**", "**/*.d.ts"],
+  "extension": [".ts"],
+  "reporter": ["text", "html"],
+  "reports-dir": "coverage/backend",
+  "clean": true
+}
