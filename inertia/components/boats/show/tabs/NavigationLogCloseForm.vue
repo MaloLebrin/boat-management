@@ -8,12 +8,17 @@ import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import { useNetworkStatus } from '~/composables/use_network_status'
 import { useOfflineQueue } from '~/composables/use_offline_queue'
 import { useT } from '~/composables/use_t'
-import type { NavigationLogPortOption, NavigationLogRow } from '~/types/boat_show'
+import type {
+  NavigationLogEngineOption,
+  NavigationLogPortOption,
+  NavigationLogRow,
+} from '~/types/boat_show'
 
 const props = defineProps<{
   boatId: number
   log: NavigationLogRow
   portOptions: NavigationLogPortOption[]
+  engineOptions?: NavigationLogEngineOption[]
 }>()
 
 const emit = defineEmits<{
@@ -41,12 +46,19 @@ const seaStateOptions = computed(() =>
   }))
 )
 
+const engineOptions = computed(() => props.engineOptions ?? [])
+const showEngineSelect = computed(() => engineOptions.value.length > 1)
+const engineSelectOptions = computed(() =>
+  engineOptions.value.map((e) => ({ value: String(e.id), label: e.label }))
+)
+
 const form = useForm({
   arrivedAt: defaultArrivedAt,
   arrivalPortId: '' as string | number,
   arrivalPortName: '',
   distanceNm: null as number | null,
   engineHoursEnd: null as number | null,
+  boatEngineId: '' as string | number,
   fuelConsumedLiters: null as number | null,
   windForceBeaufort: props.log.windForceBeaufort,
   seaState: props.log.seaState ?? '',
@@ -140,6 +152,18 @@ function handleSubmit() {
           :label="t('navigation_logs.fields.engineHoursEnd')"
           :error="form.errors.engineHoursEnd"
           @update:model-value="form.engineHoursEnd = $event !== '' ? Number($event) : null"
+        />
+
+        <!-- Multi-engine boats: pick which engine the arrival hours apply to. -->
+        <BaseSelect
+          v-if="showEngineSelect"
+          v-model="form.boatEngineId"
+          name="boatEngineId"
+          :label="t('navigation_logs.fields.boatEngine')"
+          :options="engineSelectOptions"
+          :error="form.errors.boatEngineId"
+          allow-empty
+          :placeholder="t('navigation_logs.fields.selectEngine')"
         />
 
         <BaseInput
