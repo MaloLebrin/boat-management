@@ -82,7 +82,8 @@
     "removed": "Sheet deleted.",
     "notFound": "Sheet not found.",
     "itemUpdated": "Item updated.",
-    "sheetAlreadyCompleted": "This sheet is completed and can no longer be modified."
+    "sheetAlreadyCompleted": "This sheet is completed and can no longer be modified.",
+    "itemsNotDone": "All items must be checked off before completing the sheet."
   },
   "invitation": {
     "sent": "Invitation sent.",

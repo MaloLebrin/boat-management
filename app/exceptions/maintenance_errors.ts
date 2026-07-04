@@ -34,6 +34,10 @@ export class BoatMaintenanceSheetItemNotFoundError extends Error {
   name = 'BoatMaintenanceSheetItemNotFoundError'
 }
 
+export class BoatMaintenanceSheetIncompleteError extends Error {
+  name = 'BoatMaintenanceSheetIncompleteError'
+}
+
 export class BoatMaintenanceSheetValidationError extends Error {
   name = 'BoatMaintenanceSheetValidationError'
   constructor(
