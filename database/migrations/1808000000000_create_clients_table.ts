@@ -31,7 +31,9 @@ export default class extends BaseSchema {
       table.timestamp('created_at').notNullable()
       table.timestamp('updated_at').nullable()
 
+      // Search by email, and the default list sort (last_name) within an org.
       table.index(['organization_id', 'email'])
+      table.index(['organization_id', 'last_name'])
     })
   }
 

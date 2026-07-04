@@ -151,17 +151,22 @@ export default class ClientService {
   }
 
   async update(client: Client, payload: UpdateClientPayload): Promise<Client> {
+    // Preserve-if-absent: only fields present in the payload are written, so a
+    // partial update never wipes a value the caller didn't touch (an explicit
+    // null clears it). Consistent with the navigation-log fix (#180).
     client.firstName = payload.firstName.trim()
     client.lastName = payload.lastName.trim()
-    client.email = payload.email?.trim() || null
-    client.phone = payload.phone?.trim() || null
-    client.address = payload.address?.trim() || null
-    client.navigationPermitNumber = payload.navigationPermitNumber?.trim() || null
-    client.navigationPermitType = payload.navigationPermitType ?? null
-    if (payload.status !== undefined) {
-      client.status = payload.status
+    if (payload.email !== undefined) client.email = payload.email?.trim() || null
+    if (payload.phone !== undefined) client.phone = payload.phone?.trim() || null
+    if (payload.address !== undefined) client.address = payload.address?.trim() || null
+    if (payload.navigationPermitNumber !== undefined) {
+      client.navigationPermitNumber = payload.navigationPermitNumber?.trim() || null
     }
-    client.notes = payload.notes?.trim() || null
+    if (payload.navigationPermitType !== undefined) {
+      client.navigationPermitType = payload.navigationPermitType ?? null
+    }
+    if (payload.status !== undefined) client.status = payload.status
+    if (payload.notes !== undefined) client.notes = payload.notes?.trim() || null
     await client.save()
     return client
   }

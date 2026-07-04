@@ -15,8 +15,7 @@ const { t } = useT()
 
 const qDraft = ref(props.filters.q ?? '')
 
-const statusOptions: Array<{ label: string; value: ClientStatus | '' }> = [
-  { label: t('clients.allStatuses'), value: '' },
+const statusOptions: Array<{ label: string; value: ClientStatus }> = [
   { label: t('clients.status.active'), value: 'active' },
   { label: t('clients.status.inactive'), value: 'inactive' },
   { label: t('clients.status.blacklisted'), value: 'blacklisted' },
@@ -91,6 +90,7 @@ function onStatusChange(value: string) {
         :model-value="filters.status"
         :options="statusOptions"
         allow-empty
+        :placeholder="t('clients.allStatuses')"
         @update:model-value="onStatusChange"
       />
     </div>

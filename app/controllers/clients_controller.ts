@@ -19,7 +19,7 @@ export default class ClientsController {
     session,
     response,
     i18n,
-  }: HttpContext): Promise<Organization | null> {
+  }: Pick<HttpContext, 'auth' | 'session' | 'response' | 'i18n'>): Promise<Organization | null> {
     const user = auth.getUserOrFail()
     await user.load('organization')
 
@@ -39,12 +39,7 @@ export default class ClientsController {
 
   async index({ inertia, auth, bouncer, request, session, response, i18n }: HttpContext) {
     await auth.authenticate()
-    const org = await this.loadOrgAndAssertEnterprise({
-      auth,
-      session,
-      response,
-      i18n,
-    } as HttpContext)
+    const org = await this.loadOrgAndAssertEnterprise({ auth, session, response, i18n })
     if (!org) return
 
     await bouncer.with(ClientPolicy).authorize('create')
@@ -58,12 +53,7 @@ export default class ClientsController {
 
   async store({ request, response, auth, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const org = await this.loadOrgAndAssertEnterprise({
-      auth,
-      session,
-      response,
-      i18n,
-    } as HttpContext)
+    const org = await this.loadOrgAndAssertEnterprise({ auth, session, response, i18n })
     if (!org) return
 
     await bouncer.with(ClientPolicy).authorize('create')
@@ -77,12 +67,7 @@ export default class ClientsController {
 
   async update({ request, response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const org = await this.loadOrgAndAssertEnterprise({
-      auth,
-      session,
-      response,
-      i18n,
-    } as HttpContext)
+    const org = await this.loadOrgAndAssertEnterprise({ auth, session, response, i18n })
     if (!org) return
 
     await bouncer.with(ClientPolicy).authorize('update')
@@ -106,12 +91,7 @@ export default class ClientsController {
 
   async destroy({ response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const org = await this.loadOrgAndAssertEnterprise({
-      auth,
-      session,
-      response,
-      i18n,
-    } as HttpContext)
+    const org = await this.loadOrgAndAssertEnterprise({ auth, session, response, i18n })
     if (!org) return
 
     await bouncer.with(ClientPolicy).authorize('delete')
