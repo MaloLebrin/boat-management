@@ -50,7 +50,8 @@ export const DEFAULT_PASSWORD = 'Password123!'
  * that user once authenticated.
  */
 export function createBoatForUser(user: User, overrides: Partial<Boat> = {}): Promise<Boat> {
-  return BoatFactory.merge({ organizationId: user.organizationId, ...overrides }).create()
+  // createAdminUser / createEnterpriseAdminUser always attach an organization.
+  return BoatFactory.merge({ organizationId: user.organizationId!, ...overrides }).create()
 }
 
 /**
@@ -58,7 +59,7 @@ export function createBoatForUser(user: User, overrides: Partial<Boat> = {}): Pr
  */
 export function createPortForUser(user: User, name?: string) {
   return PortFactory.merge({
-    organizationId: user.organizationId,
+    organizationId: user.organizationId!,
     ...(name ? { name } : {}),
   }).create()
 }
