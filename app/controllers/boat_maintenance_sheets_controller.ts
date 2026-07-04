@@ -1,4 +1,5 @@
 import BoatMaintenanceSheetService, {
+  BoatMaintenanceSheetIncompleteError,
   BoatMaintenanceSheetNotFoundError,
 } from '#services/boat_maintenance_sheet_service'
 import BoatService, { BoatNotFoundError } from '#services/boat_service'
@@ -63,6 +64,11 @@ export default class BoatMaintenanceSheetsController {
     } catch (error) {
       if (error instanceof BoatMaintenanceSheetNotFoundError) {
         session.flash('error', i18n.t('flash.maintenanceSheets.notFound'))
+        response.redirect(`/boats/${boat.id}?tab=sheets`)
+        return
+      }
+      if (error instanceof BoatMaintenanceSheetIncompleteError) {
+        session.flash('error', i18n.t('flash.maintenanceSheets.itemsNotDone'))
         response.redirect(`/boats/${boat.id}?tab=sheets`)
         return
       }

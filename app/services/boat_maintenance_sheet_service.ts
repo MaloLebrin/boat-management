@@ -1,4 +1,5 @@
 import {
+  BoatMaintenanceSheetIncompleteError,
   BoatMaintenanceSheetItemNotFoundError,
   BoatMaintenanceSheetNotFoundError,
   BoatMaintenanceSheetValidationError,
@@ -13,6 +14,7 @@ import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
 
 export {
+  BoatMaintenanceSheetIncompleteError,
   BoatMaintenanceSheetItemNotFoundError,
   BoatMaintenanceSheetNotFoundError,
   BoatMaintenanceSheetValidationError,
@@ -102,6 +104,13 @@ export default class BoatMaintenanceSheetService {
 
     if (!sheet) {
       throw new BoatMaintenanceSheetNotFoundError()
+    }
+
+    // A sheet can only be completed once every item is checked off — otherwise
+    // the "completed" status would misrepresent the actual maintenance state.
+    await sheet.load('items')
+    if (sheet.items.some((item) => !item.isDone)) {
+      throw new BoatMaintenanceSheetIncompleteError()
     }
 
     sheet.status = 'completed'

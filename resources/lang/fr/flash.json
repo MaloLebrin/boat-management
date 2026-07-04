@@ -82,7 +82,8 @@
     "removed": "Fiche supprimée.",
     "notFound": "Fiche introuvable.",
     "itemUpdated": "Item mis à jour.",
-    "sheetAlreadyCompleted": "Cette fiche est terminée et ne peut plus être modifiée."
+    "sheetAlreadyCompleted": "Cette fiche est terminée et ne peut plus être modifiée.",
+    "itemsNotDone": "Tous les items doivent être cochés avant de terminer la fiche."
   },
   "invitation": {
     "sent": "Invitation envoyée.",
