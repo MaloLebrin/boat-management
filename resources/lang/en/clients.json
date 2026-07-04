@@ -1,0 +1,55 @@
+{
+  "title": "Clients",
+  "subtitle": "Manage your client relationships",
+  "add": "+ Add a client",
+  "empty": {
+    "title": "No clients yet",
+    "description": "Add your first client to get started with your CRM."
+  },
+  "count": "{count, plural, one {# client} other {# clients}}",
+  "searchPlaceholder": "Search clients...",
+  "columns": {
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "permit": "Permit",
+    "status": "Status",
+    "actions": "Actions"
+  },
+  "fields": {
+    "firstName": "First name",
+    "lastName": "Last name",
+    "email": "Email (optional)",
+    "phone": "Phone (optional)",
+    "address": "Address (optional)",
+    "navigationPermitNumber": "Permit number (optional)",
+    "navigationPermitType": "Permit type (optional)",
+    "status": "Status",
+    "notes": "Notes (optional)"
+  },
+  "permitTypes": {
+    "coastal": "Coastal",
+    "offshore": "Offshore",
+    "inland": "Inland",
+    "other": "Other"
+  },
+  "status": {
+    "active": "Active",
+    "inactive": "Inactive",
+    "blacklisted": "Blacklisted"
+  },
+  "statusFilter": "Status",
+  "allStatuses": "All statuses",
+  "form": {
+    "submit": "Save",
+    "cancel": "Cancel",
+    "createTitle": "Add a client",
+    "editTitle": "Edit client"
+  },
+  "deleteConfirm": {
+    "title": "Delete client",
+    "message": "Are you sure you want to delete this client? This action cannot be undone."
+  },
+  "edit": "Edit",
+  "delete": "Delete"
+}

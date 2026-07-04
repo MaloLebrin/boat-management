@@ -16,6 +16,7 @@
   "fuel": "Carburant",
   "incidents": "Incidents",
   "reservations": "Réservations",
+  "clients": "Clients",
   "sections": {
     "fleet": "FLOTTE",
     "maintenance": "MAINTENANCE",
