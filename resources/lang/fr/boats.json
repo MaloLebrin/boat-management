@@ -224,6 +224,7 @@
       "overview": "Aperçu",
       "equipment": "Équipement",
       "specs": "Spécifications",
+      "pricing": "Tarif",
       "history": "Historique",
       "tasks": "Tâches",
       "documents": "Documents",
@@ -334,6 +335,21 @@
     "registration": "Immatriculation & pavillon",
     "equipmentOnBoard": "Équipements à bord",
     "editHint": "Les spécifications peuvent être modifiées dans la page d'édition du bateau."
+  },
+  "pricing": {
+    "title": "Tarif de base",
+    "baseDailyPrice": "Tarif journalier",
+    "baseWeeklyPrice": "Tarif hebdomadaire",
+    "depositAmount": "Caution",
+    "minDays": "Durée minimum (jours)",
+    "maxDays": "Durée maximum (jours)",
+    "currency": "Devise",
+    "perDay": "/ jour",
+    "perWeek": "/ semaine",
+    "noPricing": "Aucun tarif défini pour ce bateau.",
+    "save": "Enregistrer",
+    "editHint": "Définissez les tarifs de location de base pour ce bateau. Le tarif hebdomadaire, la caution et les contraintes de durée sont optionnels.",
+    "readOnlyHint": "Les tarifs ne peuvent être modifiés que par les administrateurs."
   },
   "safetyEquipment": {
     "title": "Armement de sécurité",

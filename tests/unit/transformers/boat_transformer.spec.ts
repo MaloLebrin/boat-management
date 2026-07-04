@@ -287,6 +287,9 @@ function makeManageContext(overrides: Partial<BoatManageContext> = {}): BoatMana
     canManageEquipment: false,
     canManageDocuments: true,
     canExport: false,
+    pricing: null,
+    pricingEnabled: false,
+    canManagePricing: false,
     ...overrides,
   }
 }

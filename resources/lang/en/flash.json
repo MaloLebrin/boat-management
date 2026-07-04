@@ -167,8 +167,13 @@
     "aiTokensExceeded": "You have reached your monthly AI token limit. AI features will reset on the 1st of next month, or upgrade to Enterprise for unlimited usage.",
     "exportExceeded": "Export is not available on your current plan. Upgrade to Pro or Enterprise.",
     "clientsExceeded": "This feature requires the Enterprise plan.",
+    "pricingExceeded": "This feature requires the Enterprise plan.",
     "storageExceeded": "You have reached the storage limit of your plan. Upgrade to upload new files.",
     "storageOverflow": "Your storage usage exceeds your current plan limit. Free up space or upgrade your plan."
+  },
+  "pricing": {
+    "saved": "Pricing saved.",
+    "invalidRange": "The maximum duration must be greater than or equal to the minimum duration."
   },
   "csv": {
     "imported": "{count} row(s) imported successfully.",

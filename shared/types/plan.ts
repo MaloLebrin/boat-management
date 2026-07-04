@@ -15,6 +15,8 @@ export interface PlanQuotas {
   canWhiteLabel: boolean
   /** Client CRM (clients management) — Enterprise only. */
   canManageClients: boolean
+  /** Tarification par bateau — Enterprise only. */
+  canManagePricing: boolean
 }
 
 export interface QuotaUsage {
@@ -51,6 +53,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanQuotas> = {
     canGroupTasks: false,
     canWhiteLabel: false,
     canManageClients: false,
+    canManagePricing: false,
   },
   pro: {
     maxBoats: 25,
@@ -64,6 +67,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanQuotas> = {
     canGroupTasks: true,
     canWhiteLabel: false,
     canManageClients: false,
+    canManagePricing: false,
   },
   enterprise: {
     maxBoats: null,
@@ -77,6 +81,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanQuotas> = {
     canGroupTasks: true,
     canWhiteLabel: true,
     canManageClients: true,
+    canManagePricing: true,
   },
 }
 
