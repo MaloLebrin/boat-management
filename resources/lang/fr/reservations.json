@@ -1,5 +1,20 @@
 {
   "title": "Réservations",
+  "quote": {
+    "title": "Estimation du prix",
+    "nights": "{count} nuit(s)",
+    "base": "Tarif de base",
+    "week": "Tarif hebdomadaire",
+    "perNight": "par nuit",
+    "perWeek": "par semaine",
+    "deposit": "Caution requise",
+    "total": "Total",
+    "apply": "Appliquer ce prix",
+    "noPricing": "Aucun tarif configuré pour ce bateau.",
+    "selectDates": "Sélectionnez les dates pour voir l'estimation.",
+    "belowMin": "Le séjour minimum est de {min} nuit(s).",
+    "aboveMax": "Le séjour maximum est de {max} nuit(s)."
+  },
   "subtitle": "Gérez les réservations de votre flotte",
   "fleet": {
     "title": "Calendrier des réservations",

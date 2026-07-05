@@ -1,16 +1,23 @@
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3'
+import { watch } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
+import BaseCard from '~/components/base/BaseCard.vue'
 import BaseField from '~/components/base/BaseField.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
-import BaseCard from '~/components/base/BaseCard.vue'
+import ReservationQuoteCard from '~/components/reservations/ReservationQuoteCard.vue'
 import { useT } from '~/composables/use_t'
+import { computeReservationQuote } from '#shared/helpers/reservation_quote'
+import type { BoatPricingRow } from '#shared/types/boat_pricing'
+import type { PricingSeasonRow } from '#shared/types/pricing_season'
 import type { ReservationStatus } from '~/types/reservation'
 
 const props = defineProps<{
   boatId: number
+  boatPricing: BoatPricingRow | null
+  pricingSeasons: PricingSeasonRow[]
 }>()
 
 const { t } = useT()
@@ -31,6 +38,15 @@ const statusOptions = [
   { value: 'confirmed', label: t('reservations.status.confirmed') },
   { value: 'cancelled', label: t('reservations.status.cancelled') },
 ]
+
+// Auto-fill totalPrice when dates change (only if totalPrice is empty)
+watch([() => form.startsAt, () => form.endsAt], ([startsAt, endsAt]) => {
+  if (!startsAt || !endsAt || form.totalPrice !== '') return
+  const quote = computeReservationQuote(props.boatPricing, props.pricingSeasons, startsAt, endsAt)
+  if (quote.hasPricing && quote.total > 0) {
+    form.totalPrice = String(quote.total)
+  }
+})
 
 function submit() {
   form.post(`/boats/${props.boatId}/reservations`, {
@@ -84,10 +100,19 @@ function submit() {
         </BaseField>
       </div>
 
-      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <BaseField :label="t('reservations.form.totalPrice')" :error="form.errors.totalPrice">
-          <BaseInput v-model="form.totalPrice" type="number" min="0" step="0.01" />
-        </BaseField>
+      <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <div>
+          <BaseField :label="t('reservations.form.totalPrice')" :error="form.errors.totalPrice">
+            <BaseInput v-model="form.totalPrice" type="number" min="0" step="0.01" />
+          </BaseField>
+        </div>
+        <ReservationQuoteCard
+          :pricing="boatPricing"
+          :seasons="pricingSeasons"
+          :starts-at="form.startsAt"
+          :ends-at="form.endsAt"
+          @apply="form.totalPrice = String($event)"
+        />
       </div>
 
       <BaseField :label="t('reservations.form.notes')" :error="form.errors.notes">

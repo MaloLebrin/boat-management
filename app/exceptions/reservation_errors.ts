@@ -20,3 +20,11 @@ export class ReservationValidationError extends Error {
     super(message)
   }
 }
+
+export class ReservationDurationError extends Error {
+  name = 'ReservationDurationError'
+
+  constructor(readonly reason: 'below_min' | 'above_max') {
+    super(`reservation duration ${reason}`)
+  }
+}

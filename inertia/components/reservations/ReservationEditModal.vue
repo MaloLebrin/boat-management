@@ -7,13 +7,18 @@ import BaseInput from '~/components/base/BaseInput.vue'
 import BaseModal from '~/components/base/BaseModal.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
+import ReservationQuoteCard from '~/components/reservations/ReservationQuoteCard.vue'
 import { useT } from '~/composables/use_t'
+import type { BoatPricingRow } from '#shared/types/boat_pricing'
+import type { PricingSeasonRow } from '#shared/types/pricing_season'
 import type { BoatReservationRow, ReservationStatus } from '~/types/reservation'
 
 const props = defineProps<{
   open: boolean
   boatId: number
   reservation: BoatReservationRow | null
+  boatPricing: BoatPricingRow | null
+  pricingSeasons: PricingSeasonRow[]
 }>()
 
 const emit = defineEmits<{
@@ -98,10 +103,19 @@ function submit() {
         </BaseField>
       </div>
 
-      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <BaseField :label="t('reservations.form.totalPrice')" :error="form.errors.totalPrice">
-          <BaseInput v-model="form.totalPrice" type="number" min="0" step="0.01" />
-        </BaseField>
+      <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <div>
+          <BaseField :label="t('reservations.form.totalPrice')" :error="form.errors.totalPrice">
+            <BaseInput v-model="form.totalPrice" type="number" min="0" step="0.01" />
+          </BaseField>
+        </div>
+        <ReservationQuoteCard
+          :pricing="boatPricing"
+          :seasons="pricingSeasons"
+          :starts-at="form.startsAt"
+          :ends-at="form.endsAt"
+          @apply="form.totalPrice = String($event)"
+        />
       </div>
 
       <BaseField :label="t('reservations.form.notes')" :error="form.errors.notes">

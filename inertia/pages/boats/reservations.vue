@@ -7,12 +7,16 @@ import ReservationCalendar from '~/components/reservations/ReservationCalendar.v
 import ReservationForm from '~/components/reservations/ReservationForm.vue'
 import ReservationList from '~/components/reservations/ReservationList.vue'
 import { useT } from '~/composables/use_t'
+import type { BoatPricingRow } from '#shared/types/boat_pricing'
+import type { PricingSeasonRow } from '#shared/types/pricing_season'
 import type { BoatReservationRow } from '~/types/reservation'
 
 const props = defineProps<{
   boat: { id: number; name: string }
   reservations: BoatReservationRow[]
   canManage: boolean
+  boatPricing: BoatPricingRow | null
+  pricingSeasons: PricingSeasonRow[]
 }>()
 
 const { t } = useT()
@@ -101,11 +105,22 @@ function scrollToForm() {
     </div>
 
     <div id="reservation-form" class="mt-6">
-      <ReservationForm v-if="canManage" :boat-id="boat.id" />
+      <ReservationForm
+        v-if="canManage"
+        :boat-id="boat.id"
+        :boat-pricing="boatPricing"
+        :pricing-seasons="pricingSeasons"
+      />
     </div>
 
     <div class="mt-6">
-      <ReservationList :boat-id="boat.id" :reservations="reservations" :can-manage="canManage" />
+      <ReservationList
+        :boat-id="boat.id"
+        :reservations="reservations"
+        :can-manage="canManage"
+        :boat-pricing="boatPricing"
+        :pricing-seasons="pricingSeasons"
+      />
     </div>
   </div>
 </template>
