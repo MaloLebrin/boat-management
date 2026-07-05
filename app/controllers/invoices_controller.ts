@@ -1,4 +1,6 @@
 import InvoiceService, { InvoiceNotFoundError } from '#services/invoice_service'
+import InvoicePdfService from '#services/invoice_pdf_service'
+import EmailQueueService from '#services/email_queue_service'
 import QuotaService from '#services/quota_service'
 import { QuotaExceededError } from '#exceptions/quota_errors'
 import InvoicePolicy from '#policies/invoice_policy'
@@ -12,6 +14,8 @@ import type Organization from '#models/organization'
 export default class InvoicesController {
   constructor(
     private invoiceService: InvoiceService,
+    private pdfService: InvoicePdfService,
+    private emailQueueService: EmailQueueService,
     private quotaService: QuotaService
   ) {}
 
@@ -168,5 +172,77 @@ export default class InvoicesController {
 
     session.flash('success', i18n.t('flash.invoices.deleted'))
     response.redirect('/invoices')
+  }
+
+  async downloadPdf({ request, response, auth, bouncer, params, session, i18n }: HttpContext) {
+    await auth.authenticate()
+    const org = await this.loadOrgAndAssertEnterprise({ auth, session, response, i18n })
+    if (!org) return
+
+    await bouncer.with(InvoicePolicy).authorize('create')
+
+    let invoice
+    try {
+      invoice = await this.invoiceService.getForOrganizationOrFail(org, Number(params.id))
+    } catch (error) {
+      if (error instanceof InvoiceNotFoundError) {
+        session.flash('error', i18n.t('flash.invoices.notFound'))
+        return response.redirect('/invoices')
+      }
+      throw error
+    }
+
+    const { buffer, filename } = await this.pdfService.generate(invoice, org, i18n)
+
+    const inline = request.input('inline') === '1'
+    response.header('Content-Type', 'application/pdf')
+    response.header(
+      'Content-Disposition',
+      inline ? `inline; filename="${filename}"` : `attachment; filename="${filename}"`
+    )
+    response.header('Content-Length', String(buffer.length))
+    return response.send(buffer)
+  }
+
+  async send({ response, auth, bouncer, params, session, i18n }: HttpContext) {
+    await auth.authenticate()
+    const org = await this.loadOrgAndAssertEnterprise({ auth, session, response, i18n })
+    if (!org) return
+
+    await bouncer.with(InvoicePolicy).authorize('update')
+
+    let invoice
+    try {
+      invoice = await this.invoiceService.getForOrganizationOrFail(org, Number(params.id))
+    } catch (error) {
+      if (error instanceof InvoiceNotFoundError) {
+        session.flash('error', i18n.t('flash.invoices.notFound'))
+        return response.redirect('/invoices')
+      }
+      throw error
+    }
+
+    // Client must have an email
+    if (!invoice.client?.email) {
+      session.flash('error', i18n.t('flash.invoices.noClientEmail'))
+      return response.redirect().back()
+    }
+
+    // Enqueue the email
+    await this.emailQueueService.sendInvoice({
+      invoiceId: invoice.id,
+      organizationId: org.id,
+      to: invoice.client.email,
+      locale: i18n.locale,
+    })
+
+    // Transition draft -> sent
+    if (invoice.status === 'draft') {
+      invoice.status = 'sent'
+      await invoice.save()
+    }
+
+    session.flash('success', i18n.t('flash.invoices.sent'))
+    return response.redirect().back()
   }
 }

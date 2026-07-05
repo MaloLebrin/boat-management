@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { router } from '@inertiajs/vue3'
+import { computed, ref } from 'vue'
+import { router, usePage } from '@inertiajs/vue3'
 import { Link } from '@adonisjs/inertia/vue'
+import BaseAlert from '~/components/base/BaseAlert.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseConfirmModal from '~/components/base/BaseConfirmModal.vue'
@@ -16,8 +17,28 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
+const page = usePage()
+
+const flash = computed(() => page.props.flash as { error?: string; success?: string } | undefined)
 
 const showDeleteModal = ref(false)
+const sendingEmail = ref(false)
+
+function sendByEmail() {
+  router.post(
+    `/invoices/${props.invoice.id}/send`,
+    {},
+    {
+      preserveScroll: true,
+      onStart: () => {
+        sendingEmail.value = true
+      },
+      onFinish: () => {
+        sendingEmail.value = false
+      },
+    }
+  )
+}
 
 function formatAmount(amount: number): string {
   return new Intl.NumberFormat(undefined, {
@@ -49,6 +70,14 @@ function executeDelete() {
       <span class="font-medium text-fg">{{ invoice.number }}</span>
     </nav>
 
+    <!-- Flash messages -->
+    <BaseAlert v-if="flash?.success" variant="success" class="mb-6" dismissible>
+      {{ flash.success }}
+    </BaseAlert>
+    <BaseAlert v-if="flash?.error" variant="danger" class="mb-6" dismissible>
+      {{ flash.error }}
+    </BaseAlert>
+
     <!-- Header -->
     <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
       <div>
@@ -58,7 +87,21 @@ function executeDelete() {
         </div>
         <p class="mt-1 text-fg-muted">{{ t(`invoices.kind.${invoice.kind}`) }}</p>
       </div>
-      <div class="flex items-center gap-2">
+      <div class="flex flex-wrap items-center gap-2">
+        <a :href="`/invoices/${invoice.id}/pdf`" target="_blank" rel="noopener">
+          <BaseButton variant="secondary" size="sm" type="button">
+            {{ t('invoices.actions.downloadPdf') }}
+          </BaseButton>
+        </a>
+        <BaseButton
+          variant="secondary"
+          size="sm"
+          type="button"
+          :disabled="sendingEmail"
+          @click="sendByEmail"
+        >
+          {{ t('invoices.actions.sendEmail') }}
+        </BaseButton>
         <Link :href="`/invoices/${invoice.id}/edit`">
           <BaseButton variant="secondary" size="sm" type="button">
             {{ t('invoices.edit') }}

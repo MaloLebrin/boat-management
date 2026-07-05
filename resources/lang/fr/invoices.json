@@ -1,6 +1,33 @@
 {
   "title": "Factures",
   "subtitle": "Gérez vos devis et factures",
+  "pdf": {
+    "titleQuote": "Devis",
+    "titleInvoice": "Facture",
+    "generatedOn": "Généré le {date}",
+    "issuedAt": "Date d'émission",
+    "dueAt": "Date d'échéance",
+    "status": "Statut",
+    "client": "Client",
+    "noClient": "Aucun client",
+    "statuses": {
+      "draft": "Brouillon",
+      "sent": "Envoyé",
+      "paid": "Payé",
+      "overdue": "En retard",
+      "cancelled": "Annulé"
+    },
+    "colDescription": "Description",
+    "colQuantity": "Quantité",
+    "colUnitPrice": "Prix unitaire",
+    "colAmount": "Montant",
+    "subtotal": "Sous-total",
+    "tax": "TVA ({rate}%)",
+    "total": "Total",
+    "notes": "Notes",
+    "legalMentions": "Ce document a été généré électroniquement. Veuillez le conserver pour vos archives.",
+    "footer": "Page {page} sur {total} - {org}"
+  },
   "add": "+ Nouvelle facture",
   "addQuote": "+ Nouveau devis",
   "empty": {
@@ -87,5 +114,9 @@
     "client": "Client",
     "reservation": "Réservation",
     "notes": "Notes"
+  },
+  "actions": {
+    "downloadPdf": "Télécharger le PDF",
+    "sendEmail": "Envoyer par email"
   }
 }
