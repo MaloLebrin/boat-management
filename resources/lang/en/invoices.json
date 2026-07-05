@@ -1,6 +1,33 @@
 {
   "title": "Invoices",
   "subtitle": "Manage your quotes and invoices",
+  "pdf": {
+    "titleQuote": "Quote",
+    "titleInvoice": "Invoice",
+    "generatedOn": "Generated on {date}",
+    "issuedAt": "Issue date",
+    "dueAt": "Due date",
+    "status": "Status",
+    "client": "Client",
+    "noClient": "No client",
+    "statuses": {
+      "draft": "Draft",
+      "sent": "Sent",
+      "paid": "Paid",
+      "overdue": "Overdue",
+      "cancelled": "Cancelled"
+    },
+    "colDescription": "Description",
+    "colQuantity": "Quantity",
+    "colUnitPrice": "Unit Price",
+    "colAmount": "Amount",
+    "subtotal": "Subtotal",
+    "tax": "Tax ({rate}%)",
+    "total": "Total",
+    "notes": "Notes",
+    "legalMentions": "This document was generated electronically. Please retain it for your records.",
+    "footer": "Page {page} of {total} - {org}"
+  },
   "add": "+ New invoice",
   "addQuote": "+ New quote",
   "empty": {
@@ -87,5 +114,9 @@
     "client": "Client",
     "reservation": "Reservation",
     "notes": "Notes"
+  },
+  "actions": {
+    "downloadPdf": "Download PDF",
+    "sendEmail": "Send by email"
   }
 }

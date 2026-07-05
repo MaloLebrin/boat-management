@@ -609,4 +609,34 @@ export default class EmailQueueService {
       },
     })
   }
+
+  async sendInvoice(params: {
+    invoiceId: number
+    organizationId: number
+    to: string
+    locale: string
+  }) {
+    // Use a unique key per send to allow resends (includes timestamp component)
+    const dedupKey = `invoice:${params.organizationId}:${params.invoiceId}:${Date.now()}`
+
+    const payload = {
+      invoiceId: params.invoiceId,
+      organizationId: params.organizationId,
+      to: params.to,
+      locale: params.locale,
+      dedupKey,
+    }
+
+    const { default: SendInvoiceEmail } = await import('#jobs/send_invoice_email')
+
+    await this.dedup.enqueueUnique({
+      key: dedupKey,
+      jobName: SendInvoiceEmail.name,
+      queue: 'emails',
+      payload,
+      dispatch: async (p) => {
+        await SendInvoiceEmail.dispatch(p)
+      },
+    })
+  }
 }

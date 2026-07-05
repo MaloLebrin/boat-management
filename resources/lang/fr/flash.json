@@ -164,7 +164,9 @@
     "created": "Facture créée.",
     "updated": "Facture mise à jour.",
     "deleted": "Facture supprimée.",
-    "notFound": "Facture introuvable."
+    "notFound": "Facture introuvable.",
+    "sent": "Document envoyé par email.",
+    "noClientEmail": "Ce client n'a pas d'adresse email."
   },
   "quota": {
     "boatsExceeded": "Vous avez atteint la limite de bateaux de votre plan. Passez à un plan supérieur pour en ajouter.",

@@ -164,7 +164,9 @@
     "created": "Invoice created.",
     "updated": "Invoice updated.",
     "deleted": "Invoice deleted.",
-    "notFound": "Invoice not found."
+    "notFound": "Invoice not found.",
+    "sent": "Document sent by email.",
+    "noClientEmail": "This client does not have an email address."
   },
   "quota": {
     "boatsExceeded": "You have reached the boat limit for your plan. Upgrade to add more boats.",
