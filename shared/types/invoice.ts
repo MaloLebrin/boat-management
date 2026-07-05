@@ -27,6 +27,8 @@ export interface InvoiceRow {
   reservationId: number | null
   issuedAt: string | null
   dueAt: string | null
+  paidAt: string | null
+  sourceQuoteId: number | null
   subtotal: number
   taxRate: number
   taxAmount: number
@@ -34,9 +36,18 @@ export interface InvoiceRow {
   currency: string
   createdAt: string | null
 }
+
+/** Lightweight reference to a linked document (origin quote / converted invoice). */
+export interface InvoiceLink {
+  id: number
+  number: string
+}
+
 export interface InvoiceDetail extends InvoiceRow {
   notes: string | null
   lines: InvoiceLineRow[]
+  sourceQuote: InvoiceLink | null
+  convertedInvoice: InvoiceLink | null
 }
 
 export interface CreateInvoicePayload {

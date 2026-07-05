@@ -40,6 +40,12 @@ export default class Invoice extends BaseModel {
   @column.date()
   declare dueAt: DateTime | null
 
+  @column.date()
+  declare paidAt: DateTime | null
+
+  @column()
+  declare sourceQuoteId: number | null
+
   @column()
   declare subtotal: string
 

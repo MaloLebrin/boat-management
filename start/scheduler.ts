@@ -2,6 +2,7 @@ import SendReminderEmails from '#jobs/send_reminder_emails'
 import PurgeAuditLogs from '#jobs/purge_audit_logs'
 import ResetAiTokenUsage from '#jobs/reset_ai_token_usage'
 import ResetDemoData from '#jobs/reset_demo_data'
+import MarkOverdueInvoices from '#jobs/mark_overdue_invoices'
 
 await SendReminderEmails.schedule({})
   .cron('0 8 * * *')
@@ -25,4 +26,10 @@ await ResetDemoData.schedule({})
   .cron('0 4 * * *')
   .timezone('Europe/Paris')
   .id('daily-reset-demo-data')
+  .run()
+
+await MarkOverdueInvoices.schedule({})
+  .cron('0 6 * * *')
+  .timezone('Europe/Paris')
+  .id('daily-mark-overdue-invoices')
   .run()

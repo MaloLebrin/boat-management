@@ -111,12 +111,17 @@
     "details": "Détails",
     "issuedOn": "Émis le",
     "dueOn": "Échéance le",
+    "paidOn": "Payé le",
     "client": "Client",
     "reservation": "Réservation",
-    "notes": "Notes"
+    "notes": "Notes",
+    "convertedFrom": "Créé depuis le devis {number}",
+    "convertedTo": "Converti en facture {number}"
   },
   "actions": {
     "downloadPdf": "Télécharger le PDF",
-    "sendEmail": "Envoyer par email"
+    "sendEmail": "Envoyer par email",
+    "convert": "Convertir en facture",
+    "markPaid": "Marquer comme payée"
   }
 }

@@ -111,12 +111,17 @@
     "details": "Details",
     "issuedOn": "Issued on",
     "dueOn": "Due on",
+    "paidOn": "Paid on",
     "client": "Client",
     "reservation": "Reservation",
-    "notes": "Notes"
+    "notes": "Notes",
+    "convertedFrom": "Created from quote {number}",
+    "convertedTo": "Converted to invoice {number}"
   },
   "actions": {
     "downloadPdf": "Download PDF",
-    "sendEmail": "Send by email"
+    "sendEmail": "Send by email",
+    "convert": "Convert to invoice",
+    "markPaid": "Mark as paid"
   }
 }

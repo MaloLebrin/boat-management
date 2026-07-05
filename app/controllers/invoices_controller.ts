@@ -1,4 +1,9 @@
-import InvoiceService, { InvoiceNotFoundError } from '#services/invoice_service'
+import InvoiceService, {
+  InvoiceNotFoundError,
+  NotAQuoteError,
+  QuoteAlreadyConvertedError,
+  CannotMarkPaidError,
+} from '#services/invoice_service'
 import InvoicePdfService from '#services/invoice_pdf_service'
 import EmailQueueService from '#services/email_queue_service'
 import QuotaService from '#services/quota_service'
@@ -66,8 +71,12 @@ export default class InvoicesController {
 
     try {
       const invoice = await this.invoiceService.getForOrganizationOrFail(org, Number(params.id))
+      const links = await this.invoiceService.getLinks(invoice)
       const canDelete = await bouncer.with(InvoicePolicy).allows('delete')
-      return inertia.render('invoices/show', { invoice: toInvoiceDetail(invoice), canDelete })
+      return inertia.render('invoices/show', {
+        invoice: toInvoiceDetail(invoice, links),
+        canDelete,
+      })
     } catch (error) {
       if (error instanceof InvoiceNotFoundError) {
         session.flash('error', i18n.t('flash.invoices.notFound'))
@@ -243,6 +252,73 @@ export default class InvoicesController {
     }
 
     session.flash('success', i18n.t('flash.invoices.sent'))
+    return response.redirect().back()
+  }
+
+  async convert({ response, auth, bouncer, params, session, i18n }: HttpContext) {
+    await auth.authenticate()
+    const org = await this.loadOrgAndAssertEnterprise({ auth, session, response, i18n })
+    if (!org) return
+
+    await bouncer.with(InvoicePolicy).authorize('update')
+
+    let quote
+    try {
+      quote = await this.invoiceService.getForOrganizationOrFail(org, Number(params.id))
+    } catch (error) {
+      if (error instanceof InvoiceNotFoundError) {
+        session.flash('error', i18n.t('flash.invoices.notFound'))
+        return response.redirect('/invoices')
+      }
+      throw error
+    }
+
+    try {
+      const invoice = await this.invoiceService.convertToInvoice(quote)
+      session.flash('success', i18n.t('flash.invoices.converted'))
+      return response.redirect(`/invoices/${invoice.id}`)
+    } catch (error) {
+      if (error instanceof NotAQuoteError) {
+        session.flash('error', i18n.t('flash.invoices.notAQuote'))
+        return response.redirect().back()
+      }
+      if (error instanceof QuoteAlreadyConvertedError) {
+        session.flash('error', i18n.t('flash.invoices.alreadyConverted'))
+        return response.redirect().back()
+      }
+      throw error
+    }
+  }
+
+  async markPaid({ response, auth, bouncer, params, session, i18n }: HttpContext) {
+    await auth.authenticate()
+    const org = await this.loadOrgAndAssertEnterprise({ auth, session, response, i18n })
+    if (!org) return
+
+    await bouncer.with(InvoicePolicy).authorize('update')
+
+    let invoice
+    try {
+      invoice = await this.invoiceService.getForOrganizationOrFail(org, Number(params.id))
+    } catch (error) {
+      if (error instanceof InvoiceNotFoundError) {
+        session.flash('error', i18n.t('flash.invoices.notFound'))
+        return response.redirect('/invoices')
+      }
+      throw error
+    }
+
+    try {
+      await this.invoiceService.markAsPaid(invoice)
+    } catch (error) {
+      if (error instanceof CannotMarkPaidError) {
+        session.flash('error', i18n.t('flash.invoices.cannotMarkPaid'))
+        return response.redirect().back()
+      }
+      throw error
+    }
+
+    session.flash('success', i18n.t('flash.invoices.paid'))
     return response.redirect().back()
   }
 }
