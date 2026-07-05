@@ -54,6 +54,7 @@ export const controllers = {
   Planning: () => import('#controllers/planning_controller'),
   Pontoons: () => import('#controllers/pontoons_controller'),
   Ports: () => import('#controllers/ports_controller'),
+  PricingSeasons: () => import('#controllers/pricing_seasons_controller'),
   Reservations: () => import('#controllers/reservations_controller'),
   Session: () => import('#controllers/session_controller'),
   Settings: () => import('#controllers/settings_controller'),

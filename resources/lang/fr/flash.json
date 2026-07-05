@@ -175,6 +175,16 @@
     "saved": "Tarif enregistré.",
     "invalidRange": "La durée maximale doit être supérieure ou égale à la durée minimale."
   },
+  "pricingSeason": {
+    "created": "Période saisonnière créée.",
+    "updated": "Période saisonnière mise à jour.",
+    "deleted": "Période saisonnière supprimée.",
+    "notFound": "Période saisonnière introuvable.",
+    "overlap": "Cette période chevauche une autre période du même périmètre.",
+    "invalidRange": "La date de fin doit être postérieure ou égale à la date de début.",
+    "invalidPrice": "Renseignez soit un tarif journalier, soit un multiplicateur (exactement l'un des deux).",
+    "boatNotFound": "Ce bateau n'appartient pas à votre organisation."
+  },
   "csv": {
     "imported": "{count} ligne(s) importée(s) avec succès.",
     "boatNotFound": "Bateau introuvable.",

@@ -3,6 +3,20 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-07-04 — [#293] Tarification : périodes saisonnières + validation de chevauchement
+
+**Lot 2/3 de l'epic Tarification (#284)** : nouvelle ressource `pricing_seasons` org-scopée, réservée au plan Enterprise. Permet de définir des périodes tarifaires saisonnières (globales ou par bateau) avec validation de chevauchement par périmètre.
+
+- **Base de données** : table `pricing_seasons` (`organization_id`, `boat_id` nullable — `null` = période globale, `name`, `starts_on`, `ends_on`, `daily_price` decimal nullable, `multiplier` decimal nullable, `priority` défaut 0, timestamps) + index composite `(organization_id, boat_id)`
+- **Backend** : `app/models/pricing_season.ts` (dates `@column.date()`, décimaux en `string | null`), `app/services/pricing_season_service.ts` (CRUD org-scopé, `normalizeFilters`, `list` avec preload du bateau, `listBoatOptions`, validation métier : ordre des dates, XOR prix/multiplicateur, chevauchement par scope, appartenance du bateau à l'org), `app/validators/pricing_season.ts`, `app/policies/pricing_season_policy.ts` (suppression admin-only), `app/exceptions/pricing_season_errors.ts` (`PricingSeasonNotFoundError`, `SeasonOverlapError`, `InvalidSeasonDateRangeError`, `InvalidSeasonPriceError`, `SeasonBoatNotFoundError`), `app/controllers/pricing_seasons_controller.ts`
+- **Règle de chevauchement** : deux périodes du même périmètre (même `boat_id`, `null`=global traité comme un scope propre) ne peuvent se chevaucher ; les périmètres différents (global vs bateau, ou deux bateaux) peuvent coexister — la `priority` les départagera en 3/3
+- **Gating Enterprise** : réutilise `canManagePricing` de #292 (`quotaService.assertCanManagePricing`) ; accès refusé (flash + redirect `/`) hors Enterprise
+- **Routes** : `start/routes/pricing.ts` (`GET /pricing/seasons`, `POST`, `PUT /:id`, `DELETE /:id`) importé dans `start/routes.ts`
+- **Types partagés** : `shared/types/pricing_season.ts` (`PricingSeasonRow`, `BoatOption`, `CreatePricingSeasonPayload`, `UpdatePricingSeasonPayload`, `PricingSeasonListFilters`)
+- **Frontend** : page `/pricing/seasons` (liste + filtre par bateau, création/édition via formulaire Inertia `useForm`, suppression confirmée), item de menu « Périodes tarifaires » visible uniquement en Enterprise
+- **i18n** : namespace `pricingSeasons.*` + `nav.pricingSeasons` + `flash.pricingSeason.*` (created, updated, deleted, notFound, overlap, invalidRange, invalidPrice, boatNotFound) en + fr
+- **Tests** : 15 fonctionnels (CRUD, org-scoping, chevauchement même scope rejeté / scopes différents autorisés, ordre des dates, XOR prix, bateau hors org, tri par priorité, gating Enterprise, IDOR, non authentifié) + 4 Vitest (formulaire create/edit, cancel)
+
 ## 2026-07-04 — Tests e2e navigateur (Japa browser client + Playwright)
 
 **Introduit une suite de tests end-to-end qui exerce l'application dans un vrai navigateur (rendu Inertia + interactions), jusqu'ici absente (seuls des tests unitaires, d'intégration, fonctionnels et de composants existaient).**

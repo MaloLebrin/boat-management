@@ -175,6 +175,16 @@
     "saved": "Pricing saved.",
     "invalidRange": "The maximum duration must be greater than or equal to the minimum duration."
   },
+  "pricingSeason": {
+    "created": "Seasonal period created.",
+    "updated": "Seasonal period updated.",
+    "deleted": "Seasonal period deleted.",
+    "notFound": "Seasonal period not found.",
+    "overlap": "This period overlaps with another period in the same scope.",
+    "invalidRange": "End date must be after or equal to start date.",
+    "invalidPrice": "Provide either a daily price or a multiplier (exactly one of the two).",
+    "boatNotFound": "This boat does not belong to your organisation."
+  },
   "csv": {
     "imported": "{count} row(s) imported successfully.",
     "boatNotFound": "Boat not found.",
