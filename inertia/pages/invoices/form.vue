@@ -37,6 +37,7 @@ function todayISO(): string {
 
 const kind = ref<InvoiceKind>(props.invoice?.kind ?? 'quote')
 const clientId = ref<number | null>(props.invoice?.clientId ?? null)
+const reservationId = ref<number | null>(props.invoice?.reservationId ?? null)
 const status = ref<InvoiceStatus>(props.invoice?.status ?? 'draft')
 const issuedAt = ref(props.invoice?.issuedAt?.slice(0, 10) ?? todayISO())
 const dueAt = ref(props.invoice?.dueAt?.slice(0, 10) ?? '')
@@ -58,7 +59,7 @@ function submit() {
   const payload = {
     kind: kind.value,
     clientId: clientId.value,
-    reservationId: null,
+    reservationId: reservationId.value,
     status: status.value,
     issuedAt: issuedAt.value,
     dueAt: dueAt.value || null,

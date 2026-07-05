@@ -1,11 +1,14 @@
 import { test } from '@japa/runner'
 import testUtils from '@adonisjs/core/services/test_utils'
 import { UserFactory } from '#database/factories/user_factory'
+import { BoatFactory } from '#database/factories/boat_factory'
 import OrganizationMembership from '#models/organization_membership'
+import BoatReservation from '#models/boat_reservation'
 import Client from '#models/client'
 import Invoice from '#models/invoice'
 import InvoiceLine from '#models/invoice_line'
 import { createAdminUser } from '#tests/functional/helpers'
+import { DateTime } from 'luxon'
 
 async function createEnterpriseAdminUser() {
   const user = await UserFactory.with('organization', 1, (org) =>
@@ -85,6 +88,43 @@ test.group('Invoices (functional)', (group) => {
       .firstOrFail()
     assert.equal(invoice.clientId, c.id)
     assert.equal(invoice.clientName, 'Alice Martin')
+  })
+
+  test('ignores a client and reservation from another organization', async ({ client, assert }) => {
+    const user = await createEnterpriseAdminUser()
+
+    // Foreign org resources
+    const other = await createEnterpriseAdminUser()
+    const foreignClient = await Client.create({
+      organizationId: other.organizationId!,
+      firstName: 'Foreign',
+      lastName: 'Client',
+      status: 'active',
+    })
+    const foreignBoat = await BoatFactory.merge({
+      organizationId: other.organizationId!,
+    }).create()
+    const foreignReservation = await BoatReservation.create({
+      boatId: foreignBoat.id,
+      organizationId: other.organizationId!,
+      status: 'option',
+      startsAt: DateTime.fromISO('2026-07-01T10:00'),
+      endsAt: DateTime.fromISO('2026-07-04T10:00'),
+      clientName: 'Foreign',
+    })
+
+    await client
+      .post('/invoices')
+      .loginAs(user)
+      .form(invoiceForm({ clientId: foreignClient.id, reservationId: foreignReservation.id }))
+      .redirects(0)
+
+    const invoice = await Invoice.query()
+      .where('organizationId', user.organizationId!)
+      .firstOrFail()
+    assert.isNull(invoice.clientId)
+    assert.isNull(invoice.clientName)
+    assert.isNull(invoice.reservationId)
   })
 
   test('numbers are sequential per kind and independent', async ({ client, assert }) => {

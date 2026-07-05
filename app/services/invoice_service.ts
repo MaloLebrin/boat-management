@@ -1,4 +1,5 @@
 import { InvoiceNotFoundError } from '#exceptions/invoice_errors'
+import BoatReservation from '#models/boat_reservation'
 import Client from '#models/client'
 import Invoice from '#models/invoice'
 import InvoiceCounter from '#models/invoice_counter'
@@ -206,23 +207,16 @@ export default class InvoiceService {
       // Compute totals
       const totals = computeInvoiceTotals(payload.lines, payload.taxRate)
 
-      // Snapshot client name if clientId provided
-      let clientName: string | null = null
-      if (payload.clientId) {
-        const client = await Client.query({ client: trx })
-          .where('id', payload.clientId)
-          .where('organizationId', org.id)
-          .first()
-        if (client) {
-          clientName = client.fullName
-        }
-      }
+      // Resolve client/reservation against the org (ignore any cross-org id) and
+      // snapshot the client name.
+      const { clientId, clientName } = await this.#resolveClient(trx, org.id, payload.clientId)
+      const reservationId = await this.#resolveReservationId(trx, org.id, payload.reservationId)
 
       const invoice = await Invoice.create(
         {
           organizationId: org.id,
-          clientId: payload.clientId ?? null,
-          reservationId: payload.reservationId ?? null,
+          clientId,
+          reservationId,
           kind: payload.kind,
           number,
           clientName,
@@ -263,24 +257,23 @@ export default class InvoiceService {
       // Compute totals
       const totals = computeInvoiceTotals(payload.lines, payload.taxRate)
 
-      // Re-snapshot client name if clientId changed
-      let clientName: string | null = invoice.clientName
-      if (payload.clientId !== invoice.clientId) {
-        if (payload.clientId) {
-          const client = await Client.query({ client: trx })
-            .where('id', payload.clientId)
-            .where('organizationId', invoice.organizationId)
-            .first()
-          clientName = client ? client.fullName : null
-        } else {
-          clientName = null
-        }
-      }
+      // Resolve client/reservation against the org (ignore any cross-org id) and
+      // re-snapshot the client name.
+      const { clientId, clientName } = await this.#resolveClient(
+        trx,
+        invoice.organizationId,
+        payload.clientId
+      )
+      const reservationId = await this.#resolveReservationId(
+        trx,
+        invoice.organizationId,
+        payload.reservationId
+      )
 
       // Update invoice (NEVER reassign number or kind)
       invoice.useTransaction(trx)
-      invoice.clientId = payload.clientId ?? null
-      invoice.reservationId = payload.reservationId ?? null
+      invoice.clientId = clientId
+      invoice.reservationId = reservationId
       invoice.clientName = clientName
       invoice.status = payload.status ?? invoice.status
       invoice.issuedAt = toDateTime(payload.issuedAt)
@@ -317,6 +310,47 @@ export default class InvoiceService {
 
   async delete(invoice: Invoice): Promise<void> {
     await invoice.delete()
+  }
+
+  /**
+   * Resolves a client id against the organization: returns the id + snapshot name
+   * only when the client belongs to the org, otherwise `{ clientId: null }`.
+   * Prevents attaching an invoice to another organization's client.
+   */
+  async #resolveClient(
+    trx: TransactionClientContract,
+    organizationId: number,
+    clientId: number | null | undefined
+  ): Promise<{ clientId: number | null; clientName: string | null }> {
+    if (!clientId) return { clientId: null, clientName: null }
+
+    const client = await Client.query({ client: trx })
+      .where('id', clientId)
+      .where('organizationId', organizationId)
+      .first()
+
+    return client
+      ? { clientId: client.id, clientName: client.fullName }
+      : { clientId: null, clientName: null }
+  }
+
+  /**
+   * Resolves a reservation id against the organization: returns it only when the
+   * reservation belongs to the org, otherwise `null`.
+   */
+  async #resolveReservationId(
+    trx: TransactionClientContract,
+    organizationId: number,
+    reservationId: number | null | undefined
+  ): Promise<number | null> {
+    if (!reservationId) return null
+
+    const reservation = await BoatReservation.query({ client: trx })
+      .where('id', reservationId)
+      .where('organizationId', organizationId)
+      .first()
+
+    return reservation ? reservation.id : null
   }
 
   async #allocateNumber(
