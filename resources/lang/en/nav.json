@@ -18,6 +18,7 @@
   "reservations": "Reservations",
   "clients": "Clients",
   "pricingSeasons": "Pricing seasons",
+  "invoices": "Invoices",
   "sections": {
     "fleet": "FLEET",
     "maintenance": "MAINTENANCE",

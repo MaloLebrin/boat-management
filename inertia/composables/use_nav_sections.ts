@@ -22,6 +22,12 @@ export function useNavSections() {
     return PLAN_LIMITS[plan as PlanTier].canManagePricing
   })
 
+  const canManageInvoices = computed(() => {
+    const plan = page.props.currentPlan
+    if (typeof plan !== 'string' || !VALID_PLANS.has(plan)) return false
+    return PLAN_LIMITS[plan as PlanTier].canManageInvoices
+  })
+
   const navSections = computed(() => {
     const fleetItems = [
       { name: t('nav.dashboard'), path: '/dashboard', route: 'dashboard', icon: 'house' },
@@ -33,6 +39,10 @@ export function useNavSections() {
 
     if (canManageClients.value) {
       fleetItems.push({ name: t('nav.clients'), path: '/clients', route: null, icon: 'people' })
+    }
+
+    if (canManageInvoices.value) {
+      fleetItems.push({ name: t('nav.invoices'), path: '/invoices', route: null, icon: 'receipt' })
     }
 
     if (canManagePricing.value) {

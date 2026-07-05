@@ -1,0 +1,91 @@
+{
+  "title": "Invoices",
+  "subtitle": "Manage your quotes and invoices",
+  "add": "+ New invoice",
+  "addQuote": "+ New quote",
+  "empty": {
+    "title": "No invoices yet",
+    "description": "Create your first quote or invoice to get started."
+  },
+  "count": "{count, plural, one {# document} other {# documents}}",
+  "searchPlaceholder": "Search invoices...",
+  "columns": {
+    "number": "Number",
+    "status": "Status",
+    "type": "Type",
+    "client": "Client",
+    "total": "Total",
+    "issuedAt": "Issued",
+    "dueAt": "Due",
+    "actions": "Actions"
+  },
+  "kind": {
+    "quote": "Quote",
+    "invoice": "Invoice"
+  },
+  "status": {
+    "draft": "Draft",
+    "sent": "Sent",
+    "paid": "Paid",
+    "overdue": "Overdue",
+    "cancelled": "Cancelled"
+  },
+  "filters": {
+    "status": "Status",
+    "allStatuses": "All statuses",
+    "kind": "Type",
+    "allKinds": "All types",
+    "client": "Client",
+    "allClients": "All clients",
+    "issuedFrom": "From",
+    "issuedTo": "To"
+  },
+  "fields": {
+    "kind": "Document type",
+    "clientId": "Client",
+    "reservationId": "Reservation",
+    "status": "Status",
+    "issuedAt": "Issue date",
+    "dueAt": "Due date",
+    "taxRate": "Tax rate (%)",
+    "currency": "Currency",
+    "notes": "Notes (optional)"
+  },
+  "form": {
+    "createTitle": "New document",
+    "editTitle": "Edit document",
+    "submit": "Save",
+    "cancel": "Cancel"
+  },
+  "lines": {
+    "title": "Lines",
+    "label": "Description",
+    "quantity": "Qty",
+    "unitPrice": "Unit price",
+    "amount": "Amount",
+    "add": "+ Add a line",
+    "remove": "Remove"
+  },
+  "totals": {
+    "subtotal": "Subtotal",
+    "tax": "Tax ({rate}%)",
+    "total": "Total"
+  },
+  "view": "View",
+  "edit": "Edit",
+  "delete": "Delete",
+  "deleteConfirm": {
+    "title": "Delete document",
+    "message": "Are you sure you want to delete this document? This action cannot be undone."
+  },
+  "noClient": "No client",
+  "noReservation": "No reservation",
+  "show": {
+    "details": "Details",
+    "issuedOn": "Issued on",
+    "dueOn": "Due on",
+    "client": "Client",
+    "reservation": "Reservation",
+    "notes": "Notes"
+  }
+}

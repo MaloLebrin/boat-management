@@ -17,6 +17,8 @@ export interface PlanQuotas {
   canManageClients: boolean
   /** Tarification par bateau — Enterprise only. */
   canManagePricing: boolean
+  /** Devis/factures — Enterprise only. */
+  canManageInvoices: boolean
 }
 
 export interface QuotaUsage {
@@ -54,6 +56,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanQuotas> = {
     canWhiteLabel: false,
     canManageClients: false,
     canManagePricing: false,
+    canManageInvoices: false,
   },
   pro: {
     maxBoats: 25,
@@ -68,6 +71,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanQuotas> = {
     canWhiteLabel: false,
     canManageClients: false,
     canManagePricing: false,
+    canManageInvoices: false,
   },
   enterprise: {
     maxBoats: null,
@@ -82,6 +86,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanQuotas> = {
     canWhiteLabel: true,
     canManageClients: true,
     canManagePricing: true,
+    canManageInvoices: true,
   },
 }
 
