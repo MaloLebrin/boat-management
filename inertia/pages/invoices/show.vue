@@ -8,6 +8,7 @@ import BaseCard from '~/components/base/BaseCard.vue'
 import BaseConfirmModal from '~/components/base/BaseConfirmModal.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import InvoiceStatusBadge from '~/components/invoices/InvoiceStatusBadge.vue'
+import InvoiceLinesCard from '~/components/invoices/InvoiceLinesCard.vue'
 import { useT } from '~/composables/use_t'
 import type { InvoiceDetail } from '../../../shared/types/invoice'
 
@@ -23,6 +24,19 @@ const flash = computed(() => page.props.flash as { error?: string; success?: str
 
 const showDeleteModal = ref(false)
 const sendingEmail = ref(false)
+const busy = ref(false)
+
+// A quote that has not been converted yet can be turned into an invoice.
+const canConvert = computed(
+  () => props.invoice.kind === 'quote' && props.invoice.convertedInvoice === null
+)
+// A real invoice that is neither paid nor cancelled can be marked as paid.
+const canMarkPaid = computed(
+  () =>
+    props.invoice.kind === 'invoice' &&
+    props.invoice.status !== 'paid' &&
+    props.invoice.status !== 'cancelled'
+)
 
 function sendByEmail() {
   router.post(
@@ -40,11 +54,36 @@ function sendByEmail() {
   )
 }
 
-function formatAmount(amount: number): string {
-  return new Intl.NumberFormat(undefined, {
-    style: 'currency',
-    currency: props.invoice.currency,
-  }).format(amount)
+function convertToInvoice() {
+  router.post(
+    `/invoices/${props.invoice.id}/convert`,
+    {},
+    {
+      preserveScroll: true,
+      onStart: () => {
+        busy.value = true
+      },
+      onFinish: () => {
+        busy.value = false
+      },
+    }
+  )
+}
+
+function markPaid() {
+  router.post(
+    `/invoices/${props.invoice.id}/pay`,
+    {},
+    {
+      preserveScroll: true,
+      onStart: () => {
+        busy.value = true
+      },
+      onFinish: () => {
+        busy.value = false
+      },
+    }
+  )
 }
 
 function formatDate(dateStr: string | null): string {
@@ -86,6 +125,16 @@ function executeDelete() {
           <InvoiceStatusBadge :status="invoice.status" />
         </div>
         <p class="mt-1 text-fg-muted">{{ t(`invoices.kind.${invoice.kind}`) }}</p>
+        <p v-if="invoice.sourceQuote" class="mt-1 text-sm text-fg-muted">
+          <Link :href="`/invoices/${invoice.sourceQuote.id}`" class="underline hover:text-fg">
+            {{ t('invoices.show.convertedFrom', { number: invoice.sourceQuote.number }) }}
+          </Link>
+        </p>
+        <p v-if="invoice.convertedInvoice" class="mt-1 text-sm text-fg-muted">
+          <Link :href="`/invoices/${invoice.convertedInvoice.id}`" class="underline hover:text-fg">
+            {{ t('invoices.show.convertedTo', { number: invoice.convertedInvoice.number }) }}
+          </Link>
+        </p>
       </div>
       <div class="flex flex-wrap items-center gap-2">
         <a :href="`/invoices/${invoice.id}/pdf`" target="_blank" rel="noopener">
@@ -101,6 +150,26 @@ function executeDelete() {
           @click="sendByEmail"
         >
           {{ t('invoices.actions.sendEmail') }}
+        </BaseButton>
+        <BaseButton
+          v-if="canConvert"
+          variant="primary"
+          size="sm"
+          type="button"
+          :disabled="busy"
+          @click="convertToInvoice"
+        >
+          {{ t('invoices.actions.convert') }}
+        </BaseButton>
+        <BaseButton
+          v-if="canMarkPaid"
+          variant="primary"
+          size="sm"
+          type="button"
+          :disabled="busy"
+          @click="markPaid"
+        >
+          {{ t('invoices.actions.markPaid') }}
         </BaseButton>
         <Link :href="`/invoices/${invoice.id}/edit`">
           <BaseButton variant="secondary" size="sm" type="button">
@@ -131,6 +200,10 @@ function executeDelete() {
           <dt class="text-fg-muted">{{ t('invoices.show.dueOn') }}</dt>
           <dd class="font-medium text-fg">{{ formatDate(invoice.dueAt) }}</dd>
         </div>
+        <div v-if="invoice.paidAt">
+          <dt class="text-fg-muted">{{ t('invoices.show.paidOn') }}</dt>
+          <dd class="font-medium text-fg">{{ formatDate(invoice.paidAt) }}</dd>
+        </div>
         <div>
           <dt class="text-fg-muted">{{ t('invoices.show.client') }}</dt>
           <dd class="font-medium text-fg">{{ invoice.clientName ?? t('invoices.noClient') }}</dd>
@@ -144,48 +217,8 @@ function executeDelete() {
       </dl>
     </BaseCard>
 
-    <!-- Lines -->
-    <BaseCard class="mt-4">
-      <p class="mb-4 text-sm font-semibold text-fg">{{ t('invoices.lines.title') }}</p>
-      <div class="overflow-x-auto">
-        <table class="w-full text-sm">
-          <thead>
-            <tr class="border-b border-border text-left text-fg-muted">
-              <th class="pb-2 pr-4 font-medium">{{ t('invoices.lines.label') }}</th>
-              <th class="pb-2 pr-4 text-right font-medium">{{ t('invoices.lines.quantity') }}</th>
-              <th class="pb-2 pr-4 text-right font-medium">{{ t('invoices.lines.unitPrice') }}</th>
-              <th class="pb-2 text-right font-medium">{{ t('invoices.lines.amount') }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="line in invoice.lines" :key="line.id" class="border-b border-border">
-              <td class="py-2 pr-4 text-fg">{{ line.label }}</td>
-              <td class="py-2 pr-4 text-right text-fg-muted">{{ line.quantity }}</td>
-              <td class="py-2 pr-4 text-right text-fg-muted">{{ formatAmount(line.unitPrice) }}</td>
-              <td class="py-2 text-right font-medium text-fg">{{ formatAmount(line.amount) }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Totals -->
-      <div class="mt-4 flex flex-col items-end border-t border-border pt-4">
-        <div class="flex w-48 justify-between text-sm">
-          <span class="text-fg-muted">{{ t('invoices.totals.subtotal') }}</span>
-          <span class="font-medium text-fg">{{ formatAmount(invoice.subtotal) }}</span>
-        </div>
-        <div class="mt-1 flex w-48 justify-between text-sm">
-          <span class="text-fg-muted">
-            {{ t('invoices.totals.tax', { rate: String(invoice.taxRate) }) }}
-          </span>
-          <span class="font-medium text-fg">{{ formatAmount(invoice.taxAmount) }}</span>
-        </div>
-        <div class="mt-2 flex w-48 justify-between border-t border-border pt-2 text-base">
-          <span class="font-semibold text-fg">{{ t('invoices.totals.total') }}</span>
-          <span class="font-bold text-fg">{{ formatAmount(invoice.total) }}</span>
-        </div>
-      </div>
-    </BaseCard>
+    <!-- Lines + totals -->
+    <InvoiceLinesCard :invoice="invoice" class="mt-4" />
 
     <!-- Notes -->
     <BaseCard v-if="invoice.notes" class="mt-4">

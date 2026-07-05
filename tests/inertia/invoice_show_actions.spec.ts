@@ -38,30 +38,40 @@ vi.mock('~/components/base/BaseHeading.vue', () => ({
 vi.mock('~/components/invoices/InvoiceStatusBadge.vue', () => ({
   default: { template: '<span />', props: ['status'] },
 }))
+vi.mock('~/components/invoices/InvoiceLinesCard.vue', () => ({
+  default: { template: '<div />', props: ['invoice'] },
+}))
 
 import InvoiceShow from '../../inertia/pages/invoices/show.vue'
 
-const invoice: InvoiceDetail = {
-  id: 42,
-  kind: 'quote',
-  number: 'DEV-000001',
-  status: 'draft',
-  clientId: null,
-  clientName: 'Alice Martin',
-  reservationId: null,
-  issuedAt: '2026-07-05',
-  dueAt: null,
-  subtotal: 100,
-  taxRate: 20,
-  taxAmount: 20,
-  total: 120,
-  currency: 'EUR',
-  createdAt: null,
-  notes: null,
-  lines: [{ id: 1, label: 'Location', quantity: 1, unitPrice: 100, amount: 100, position: 0 }],
+function makeInvoice(overrides: Partial<InvoiceDetail> = {}): InvoiceDetail {
+  return {
+    id: 42,
+    kind: 'quote',
+    number: 'DEV-000001',
+    status: 'draft',
+    clientId: null,
+    clientName: 'Alice Martin',
+    reservationId: null,
+    issuedAt: '2026-07-05',
+    dueAt: null,
+    paidAt: null,
+    sourceQuoteId: null,
+    subtotal: 100,
+    taxRate: 20,
+    taxAmount: 20,
+    total: 120,
+    currency: 'EUR',
+    createdAt: null,
+    notes: null,
+    lines: [{ id: 1, label: 'Location', quantity: 1, unitPrice: 100, amount: 100, position: 0 }],
+    sourceQuote: null,
+    convertedInvoice: null,
+    ...overrides,
+  }
 }
 
-function mountShow() {
+function mountShow(invoice: InvoiceDetail = makeInvoice()) {
   return mount(InvoiceShow, { props: { invoice, canDelete: false } })
 }
 
@@ -87,5 +97,51 @@ describe('invoices/show.vue actions', () => {
       {},
       expect.objectContaining({ preserveScroll: true })
     )
+  })
+
+  test('a not-yet-converted quote shows a convert button that posts to /convert', async () => {
+    const wrapper = mountShow(makeInvoice({ kind: 'quote', convertedInvoice: null }))
+    const btn = wrapper.findAll('button').find((b) => b.text().includes('invoices.actions.convert'))
+    expect(btn).toBeDefined()
+    await btn!.trigger('click')
+    expect(mockPost).toHaveBeenCalledWith(
+      '/invoices/42/convert',
+      {},
+      expect.objectContaining({ preserveScroll: true })
+    )
+  })
+
+  test('an already-converted quote hides the convert button', () => {
+    const wrapper = mountShow(
+      makeInvoice({ kind: 'quote', convertedInvoice: { id: 7, number: 'FAC-000001' } })
+    )
+    const btn = wrapper.findAll('button').find((b) => b.text().includes('invoices.actions.convert'))
+    expect(btn).toBeUndefined()
+  })
+
+  test('an unpaid invoice shows a "mark paid" button that posts to /pay', async () => {
+    const wrapper = mountShow(
+      makeInvoice({ kind: 'invoice', number: 'FAC-000001', status: 'sent' })
+    )
+    const btn = wrapper
+      .findAll('button')
+      .find((b) => b.text().includes('invoices.actions.markPaid'))
+    expect(btn).toBeDefined()
+    await btn!.trigger('click')
+    expect(mockPost).toHaveBeenCalledWith(
+      '/invoices/42/pay',
+      {},
+      expect.objectContaining({ preserveScroll: true })
+    )
+  })
+
+  test('a paid invoice hides the "mark paid" button', () => {
+    const wrapper = mountShow(
+      makeInvoice({ kind: 'invoice', number: 'FAC-000001', status: 'paid' })
+    )
+    const btn = wrapper
+      .findAll('button')
+      .find((b) => b.text().includes('invoices.actions.markPaid'))
+    expect(btn).toBeUndefined()
   })
 })

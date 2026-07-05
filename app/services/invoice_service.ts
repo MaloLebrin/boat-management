@@ -1,4 +1,9 @@
-import { InvoiceNotFoundError } from '#exceptions/invoice_errors'
+import {
+  InvoiceNotFoundError,
+  NotAQuoteError,
+  QuoteAlreadyConvertedError,
+  CannotMarkPaidError,
+} from '#exceptions/invoice_errors'
 import BoatReservation from '#models/boat_reservation'
 import Client from '#models/client'
 import Invoice from '#models/invoice'
@@ -23,7 +28,7 @@ import db from '@adonisjs/lucid/services/db'
 import type { TransactionClientContract } from '@adonisjs/lucid/types/database'
 import { DateTime } from 'luxon'
 
-export { InvoiceNotFoundError }
+export { InvoiceNotFoundError, NotAQuoteError, QuoteAlreadyConvertedError, CannotMarkPaidError }
 
 /**
  * Internal payload types that accept DateTime from VineJS validators.
@@ -189,6 +194,31 @@ export default class InvoiceService {
     return invoice
   }
 
+  /**
+   * Resolves the linked documents for an invoice: its origin quote (when the
+   * invoice was converted from one) and the invoice it was converted into (when
+   * this document is a quote). `invoices` is self-referential via `sourceQuoteId`
+   * but Lucid can't type a self-relation for `preload`, so these are fetched
+   * explicitly, org-scoped.
+   */
+  async getLinks(
+    invoice: Invoice
+  ): Promise<{ sourceQuote: Invoice | null; convertedInvoice: Invoice | null }> {
+    const sourceQuote = invoice.sourceQuoteId
+      ? await Invoice.query()
+          .where('id', invoice.sourceQuoteId)
+          .where('organizationId', invoice.organizationId)
+          .first()
+      : null
+
+    const convertedInvoice = await Invoice.query()
+      .where('sourceQuoteId', invoice.id)
+      .where('organizationId', invoice.organizationId)
+      .first()
+
+    return { sourceQuote, convertedInvoice }
+  }
+
   async listClientOptions(org: Organization): Promise<ClientOption[]> {
     const clients = await Client.query()
       .where('organizationId', org.id)
@@ -202,7 +232,7 @@ export default class InvoiceService {
   async create(org: Organization, payload: ServiceCreateInvoicePayload): Promise<Invoice> {
     return db.transaction(async (trx) => {
       // Allocate gap-free number
-      const number = await this.#allocateNumber(trx, org, payload.kind)
+      const number = await this.#allocateNumber(trx, org.id, payload.kind)
 
       // Compute totals
       const totals = computeInvoiceTotals(payload.lines, payload.taxRate)
@@ -313,6 +343,106 @@ export default class InvoiceService {
   }
 
   /**
+   * Converts an accepted quote into a brand-new invoice: a fresh `FAC-` number,
+   * the quote's client snapshot / reservation / lines / tax rate copied over,
+   * `sourceQuoteId` linking back to the origin quote, status reset to `draft`.
+   *
+   * A quote can only be converted once. Guards against converting a document that
+   * is not a quote, or one that already has a converted invoice.
+   */
+  async convertToInvoice(quote: Invoice): Promise<Invoice> {
+    if (quote.kind !== 'quote') throw new NotAQuoteError()
+
+    const existing = await Invoice.query()
+      .where('sourceQuoteId', quote.id)
+      .where('organizationId', quote.organizationId)
+      .first()
+    if (existing) throw new QuoteAlreadyConvertedError()
+
+    await quote.load('lines', (q) => q.orderBy('position'))
+
+    return db.transaction(async (trx) => {
+      const number = await this.#allocateNumber(trx, quote.organizationId, 'invoice')
+
+      const invoice = await Invoice.create(
+        {
+          organizationId: quote.organizationId,
+          clientId: quote.clientId,
+          reservationId: quote.reservationId,
+          sourceQuoteId: quote.id,
+          kind: 'invoice',
+          number,
+          clientName: quote.clientName,
+          status: 'draft',
+          issuedAt: DateTime.now(),
+          dueAt: null,
+          paidAt: null,
+          subtotal: quote.subtotal,
+          taxRate: quote.taxRate,
+          taxAmount: quote.taxAmount,
+          total: quote.total,
+          currency: quote.currency,
+          notes: quote.notes,
+        },
+        { client: trx }
+      )
+
+      await InvoiceLine.createMany(
+        quote.lines.map((line, index) => ({
+          invoiceId: invoice.id,
+          label: line.label,
+          quantity: line.quantity,
+          unitPrice: line.unitPrice,
+          amount: line.amount,
+          position: index,
+        })),
+        { client: trx }
+      )
+
+      await invoice.load('lines')
+      await invoice.load('client')
+
+      return invoice
+    })
+  }
+
+  /**
+   * Marks an invoice as paid, stamping `paidAt`. Only real invoices that are not
+   * cancelled can be marked paid.
+   */
+  async markAsPaid(invoice: Invoice, paidAt?: DateTime): Promise<Invoice> {
+    if (invoice.kind !== 'invoice' || invoice.status === 'cancelled') {
+      throw new CannotMarkPaidError()
+    }
+
+    invoice.status = 'paid'
+    invoice.paidAt = paidAt ?? DateTime.now()
+    await invoice.save()
+    return invoice
+  }
+
+  /**
+   * Flips every `sent` invoice whose due date has passed and that is still unpaid
+   * to the `overdue` status. Returns the number of invoices updated. Idempotent —
+   * safe to run daily from the scheduler.
+   */
+  async markOverdueInvoices(now: DateTime = DateTime.now()): Promise<number> {
+    const today = now.toISODate()
+    if (!today) return 0
+
+    const rows = await Invoice.query()
+      .where('kind', 'invoice')
+      .where('status', 'sent')
+      .whereNull('paidAt')
+      .whereNotNull('dueAt')
+      .where('dueAt', '<', today)
+      .update({ status: 'overdue' })
+
+    // Lucid's update() returns the affected-row count in an array-ish shape.
+    return Array.isArray(rows) ? Number(rows[0] ?? 0) : Number(rows ?? 0)
+  }
+
+  /**
    * Resolves a client id against the organization: returns the id + snapshot name
    * only when the client belongs to the org, otherwise `{ clientId: null }`.
    * Prevents attaching an invoice to another organization's client.
@@ -355,7 +485,7 @@ export default class InvoiceService {
 
   async #allocateNumber(
     trx: TransactionClientContract,
-    org: Organization,
+    organizationId: number,
     kind: InvoiceKind
   ): Promise<string> {
     // Ensure counter row exists (INSERT ... ON CONFLICT IGNORE)
@@ -363,7 +493,7 @@ export default class InvoiceService {
       .table('invoice_counters')
       .useTransaction(trx)
       .insert({
-        organization_id: org.id,
+        organization_id: organizationId,
         kind,
         last_number: 0,
         created_at: new Date(),
@@ -374,7 +504,7 @@ export default class InvoiceService {
 
     // Lock and increment
     const counter = await InvoiceCounter.query({ client: trx })
-      .where('organizationId', org.id)
+      .where('organizationId', organizationId)
       .where('kind', kind)
       .forUpdate()
       .firstOrFail()
