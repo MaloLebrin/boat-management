@@ -1,8 +1,15 @@
 import { mount } from '@vue/test-utils'
-import { describe, expect, test, vi } from 'vitest'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
+
+const mockPost = vi.hoisted(() => vi.fn())
 
 vi.mock('@inertiajs/vue3', () => ({
   usePage: () => ({ props: { appT: {}, locale: 'en' } }),
+  router: { post: mockPost },
+}))
+
+vi.mock('@adonisjs/inertia/vue', () => ({
+  Link: { template: '<a :href="href"><slot /></a>', props: ['href'] },
 }))
 
 vi.mock('~/composables/use_reservation_format', () => ({
@@ -33,6 +40,7 @@ const row: BoatReservationRow = {
   notes: null,
   totalPrice: '900',
   createdAt: '2026-05-01T00:00:00.000Z',
+  linkedInvoices: [],
 }
 
 describe('FleetReservationList', () => {
@@ -80,5 +88,47 @@ describe('FleetReservationList', () => {
     const wrapper = mount(FleetReservationList, { props: { reservations: [row, row2] } })
     expect(wrapper.findAll('tbody tr')).toHaveLength(2)
     expect(wrapper.text()).toContain('Bora Bora')
+  })
+
+  describe('create quote from reservation', () => {
+    beforeEach(() => vi.clearAllMocks())
+
+    test('shows the create-quote button and posts to the reservation route', async () => {
+      const wrapper = mount(FleetReservationList, {
+        props: { reservations: [row], canCreateQuote: true },
+      })
+      const btn = wrapper
+        .findAll('button')
+        .find((b) => b.text().includes('reservations.actions.createQuote'))
+      expect(btn).toBeDefined()
+      await btn!.trigger('click')
+      expect(mockPost).toHaveBeenCalledWith(
+        '/invoices/from-reservation/1',
+        {},
+        expect.objectContaining({ preserveScroll: true })
+      )
+    })
+
+    test('hides the create-quote button when not enterprise', () => {
+      const wrapper = mount(FleetReservationList, {
+        props: { reservations: [row], canCreateQuote: false },
+      })
+      const btn = wrapper
+        .findAll('button')
+        .find((b) => b.text().includes('reservations.actions.createQuote'))
+      expect(btn).toBeUndefined()
+    })
+
+    test('renders links to the linked documents', () => {
+      const wrapper = mount(FleetReservationList, {
+        props: {
+          reservations: [{ ...row, linkedInvoices: [{ id: 42, number: 'DEV-000001' }] }],
+          canCreateQuote: true,
+        },
+      })
+      const link = wrapper.find('a[href="/invoices/42"]')
+      expect(link.exists()).toBe(true)
+      expect(link.text()).toBe('DEV-000001')
+    })
   })
 })

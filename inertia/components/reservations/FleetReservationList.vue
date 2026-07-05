@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { router } from '@inertiajs/vue3'
+import { Link } from '@adonisjs/inertia/vue'
+import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseEmptyState from '~/components/base/BaseEmptyState.vue'
 import ReservationStatusBadge from '~/components/reservations/ReservationStatusBadge.vue'
@@ -8,10 +11,15 @@ import type { BoatReservationRow } from '~/types/reservation'
 
 defineProps<{
   reservations: BoatReservationRow[]
+  canCreateQuote?: boolean
 }>()
 
 const { t } = useT()
 const { formatDate } = useReservationFormat()
+
+function createQuote(reservationId: number) {
+  router.post(`/invoices/from-reservation/${reservationId}`, {}, { preserveScroll: true })
+}
 </script>
 
 <template>
@@ -31,7 +39,10 @@ const { formatDate } = useReservationFormat()
             <th class="px-4 pb-3">{{ t('reservations.columns.period') }}</th>
             <th class="px-4 pb-3">{{ t('reservations.columns.client') }}</th>
             <th class="px-4 pb-3">{{ t('reservations.columns.status') }}</th>
-            <th class="px-4 pb-3 text-right last:pr-0">{{ t('reservations.columns.price') }}</th>
+            <th class="px-4 pb-3 text-right">{{ t('reservations.columns.price') }}</th>
+            <th class="px-4 pb-3 text-right last:pr-0">
+              {{ t('reservations.columns.documents') }}
+            </th>
           </tr>
         </thead>
         <tbody class="divide-y divide-border">
@@ -65,8 +76,28 @@ const { formatDate } = useReservationFormat()
             <td class="px-4 py-3">
               <ReservationStatusBadge :status="row.status" />
             </td>
-            <td class="px-4 py-3 last:pr-0 text-right font-medium text-fg">
+            <td class="px-4 py-3 text-right font-medium text-fg">
               {{ row.totalPrice ? `${row.totalPrice} €` : '—' }}
+            </td>
+            <td class="px-4 py-3 last:pr-0 text-right">
+              <div class="flex flex-wrap items-center justify-end gap-2">
+                <Link
+                  v-for="doc in row.linkedInvoices"
+                  :key="doc.id"
+                  :href="`/invoices/${doc.id}`"
+                  class="text-sm font-medium text-primary underline"
+                >
+                  {{ doc.number }}
+                </Link>
+                <BaseButton
+                  v-if="canCreateQuote"
+                  variant="secondary"
+                  size="sm"
+                  @click="createQuote(row.id)"
+                >
+                  {{ t('reservations.actions.createQuote') }}
+                </BaseButton>
+              </div>
             </td>
           </tr>
         </tbody>

@@ -66,6 +66,10 @@
     "period": "Période",
     "client": "Client",
     "status": "Statut",
-    "price": "Prix"
+    "price": "Prix",
+    "documents": "Documents"
+  },
+  "actions": {
+    "createQuote": "Créer un devis"
   }
 }

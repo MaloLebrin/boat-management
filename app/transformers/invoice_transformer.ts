@@ -51,5 +51,6 @@ export function toInvoiceDetail(invoice: Invoice, links: InvoiceLinks = {}): Inv
     lines,
     sourceQuote: toInvoiceLink(links.sourceQuote),
     convertedInvoice: toInvoiceLink(links.convertedInvoice),
+    reservationBoatId: invoice.reservation?.boatId ?? null,
   }
 }

@@ -233,6 +233,22 @@ export default class BoatReservationService {
     return BoatReservation.query().where('id', reservationId).where('boatId', boat.id).first()
   }
 
+  /**
+   * Finds a reservation by id within an organization (across all its boats),
+   * with the boat preloaded. Returns null when it doesn't exist or belongs to
+   * another organization.
+   */
+  async findForOrganization(
+    organizationId: number,
+    reservationId: number
+  ): Promise<BoatReservation | null> {
+    return BoatReservation.query()
+      .where('id', reservationId)
+      .where('organizationId', organizationId)
+      .preload('boat', (q) => q.select(['id', 'name']))
+      .first()
+  }
+
   async delete(user: User, boat: Boat, reservationId: number): Promise<void> {
     const reservation = await this.findForBoat(user, boat, reservationId)
 

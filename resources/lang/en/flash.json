@@ -171,7 +171,8 @@
     "notAQuote": "Only quotes can be converted to an invoice.",
     "alreadyConverted": "This quote has already been converted to an invoice.",
     "paid": "Invoice marked as paid.",
-    "cannotMarkPaid": "This document cannot be marked as paid."
+    "cannotMarkPaid": "This document cannot be marked as paid.",
+    "quoteFromReservation": "Quote created from the reservation."
   },
   "quota": {
     "boatsExceeded": "You have reached the boat limit for your plan. Upgrade to add more boats.",

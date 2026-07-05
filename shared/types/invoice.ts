@@ -48,6 +48,8 @@ export interface InvoiceDetail extends InvoiceRow {
   lines: InvoiceLineRow[]
   sourceQuote: InvoiceLink | null
   convertedInvoice: InvoiceLink | null
+  // Boat id of the linked reservation, so the UI can deep-link to it.
+  reservationBoatId: number | null
 }
 
 export interface CreateInvoicePayload {

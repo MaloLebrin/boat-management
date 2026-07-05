@@ -116,12 +116,16 @@
     "reservation": "Reservation",
     "notes": "Notes",
     "convertedFrom": "Created from quote {number}",
-    "convertedTo": "Converted to invoice {number}"
+    "convertedTo": "Converted to invoice {number}",
+    "viewReservation": "View reservation"
   },
   "actions": {
     "downloadPdf": "Download PDF",
     "sendEmail": "Send by email",
     "convert": "Convert to invoice",
     "markPaid": "Mark as paid"
+  },
+  "fromReservation": {
+    "line": "Rental {boat} ({start} → {end})"
   }
 }

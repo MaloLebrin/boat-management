@@ -17,6 +17,7 @@ const props = defineProps<{
   calendarEntries: FleetBoatCalendarEntry[]
   boats: FleetBoatOption[]
   selectedBoatId: number | null
+  canCreateQuote: boolean
 }>()
 
 const { t } = useT()
@@ -110,7 +111,11 @@ function filterByBoat(boatId: string) {
 
     <div class="mt-6">
       <ReservationTimeline v-if="viewMode === 'timeline'" :calendar-entries="calendarEntries" />
-      <FleetReservationList v-else :reservations="reservations" />
+      <FleetReservationList
+        v-else
+        :reservations="reservations"
+        :can-create-quote="canCreateQuote"
+      />
     </div>
   </div>
 </template>
