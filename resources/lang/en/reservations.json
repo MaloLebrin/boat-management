@@ -66,6 +66,10 @@
     "period": "Period",
     "client": "Client",
     "status": "Status",
-    "price": "Price"
+    "price": "Price",
+    "documents": "Documents"
+  },
+  "actions": {
+    "createQuote": "Create a quote"
   }
 }

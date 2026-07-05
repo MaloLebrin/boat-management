@@ -6,6 +6,7 @@ import InvoiceService, {
 } from '#services/invoice_service'
 import InvoicePdfService from '#services/invoice_pdf_service'
 import EmailQueueService from '#services/email_queue_service'
+import BoatReservationService from '#services/boat_reservation_service'
 import QuotaService from '#services/quota_service'
 import { QuotaExceededError } from '#exceptions/quota_errors'
 import InvoicePolicy from '#policies/invoice_policy'
@@ -21,6 +22,7 @@ export default class InvoicesController {
     private invoiceService: InvoiceService,
     private pdfService: InvoicePdfService,
     private emailQueueService: EmailQueueService,
+    private reservationService: BoatReservationService,
     private quotaService: QuotaService
   ) {}
 
@@ -320,5 +322,35 @@ export default class InvoicesController {
 
     session.flash('success', i18n.t('flash.invoices.paid'))
     return response.redirect().back()
+  }
+
+  async createFromReservation({ response, auth, bouncer, params, session, i18n }: HttpContext) {
+    await auth.authenticate()
+    const org = await this.loadOrgAndAssertEnterprise({ auth, session, response, i18n })
+    if (!org) return
+
+    await bouncer.with(InvoicePolicy).authorize('create')
+
+    const reservation = await this.reservationService.findForOrganization(
+      org.id,
+      Number(params.reservationId)
+    )
+    if (!reservation) {
+      session.flash('error', i18n.t('flash.reservation.notFound'))
+      return response.redirect('/reservations')
+    }
+
+    const lineLabel = i18n.t('invoices.fromReservation.line', {
+      boat: reservation.boat?.name ?? '',
+      start: reservation.startsAt.toISODate() ?? '',
+      end: reservation.endsAt.toISODate() ?? '',
+    })
+
+    const invoice = await this.invoiceService.createQuoteFromReservation(org, reservation, {
+      lineLabel,
+    })
+
+    session.flash('success', i18n.t('flash.invoices.quoteFromReservation'))
+    return response.redirect(`/invoices/${invoice.id}`)
   }
 }

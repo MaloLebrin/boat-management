@@ -211,7 +211,14 @@ function executeDelete() {
         <div>
           <dt class="text-fg-muted">{{ t('invoices.show.reservation') }}</dt>
           <dd class="font-medium text-fg">
-            {{ invoice.reservationId ?? t('invoices.noReservation') }}
+            <Link
+              v-if="invoice.reservationId && invoice.reservationBoatId"
+              :href="`/boats/${invoice.reservationBoatId}/reservations`"
+              class="text-primary underline"
+            >
+              {{ t('invoices.show.viewReservation') }}
+            </Link>
+            <span v-else>{{ invoice.reservationId ?? t('invoices.noReservation') }}</span>
           </dd>
         </div>
       </dl>

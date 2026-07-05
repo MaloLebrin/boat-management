@@ -1,4 +1,5 @@
 import type { DateTime } from 'luxon'
+import type { InvoiceLink } from './invoice.js'
 
 export const RESERVATION_STATUSES = ['option', 'confirmed', 'cancelled'] as const
 export type ReservationStatus = (typeof RESERVATION_STATUSES)[number]
@@ -17,6 +18,8 @@ export interface BoatReservationRow {
   notes: string | null
   totalPrice: string | null
   createdAt: string
+  // Quotes/invoices generated from this reservation (empty when none).
+  linkedInvoices: InvoiceLink[]
 }
 
 export interface FleetBoatCalendarEntry {

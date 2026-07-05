@@ -67,6 +67,7 @@ function makeInvoice(overrides: Partial<InvoiceDetail> = {}): InvoiceDetail {
     lines: [{ id: 1, label: 'Location', quantity: 1, unitPrice: 100, amount: 100, position: 0 }],
     sourceQuote: null,
     convertedInvoice: null,
+    reservationBoatId: null,
     ...overrides,
   }
 }

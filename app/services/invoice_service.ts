@@ -20,6 +20,7 @@ import type {
   InvoiceSortDirection,
   InvoicesPaginated,
   InvoiceLineInput,
+  InvoiceLink,
 } from '#shared/types/invoice'
 import type { ClientOption } from '#shared/types/client'
 import { toInvoiceRow } from '#transformers/invoice_transformer'
@@ -188,10 +189,37 @@ export default class InvoiceService {
       .where('organizationId', org.id)
       .preload('lines', (q) => q.orderBy('position'))
       .preload('client')
+      .preload('reservation')
       .first()
 
     if (!invoice) throw new InvoiceNotFoundError()
     return invoice
+  }
+
+  /**
+   * Returns the quotes/invoices linked to each reservation id, grouped by
+   * reservation id. Used to surface the reservation ↔ document link on the
+   * reservations list. Org-scoped.
+   */
+  async listLinksByReservationIds(
+    organizationId: number,
+    reservationIds: number[]
+  ): Promise<Map<number, InvoiceLink[]>> {
+    const map = new Map<number, InvoiceLink[]>()
+    if (reservationIds.length === 0) return map
+
+    const invoices = await Invoice.query()
+      .where('organizationId', organizationId)
+      .whereIn('reservationId', reservationIds)
+      .orderBy('id', 'asc')
+
+    for (const invoice of invoices) {
+      if (invoice.reservationId === null) continue
+      const list = map.get(invoice.reservationId) ?? []
+      list.push({ id: invoice.id, number: invoice.number })
+      map.set(invoice.reservationId, list)
+    }
+    return map
   }
 
   /**
@@ -394,6 +422,82 @@ export default class InvoiceService {
           quantity: line.quantity,
           unitPrice: line.unitPrice,
           amount: line.amount,
+          position: index,
+        })),
+        { client: trx }
+      )
+
+      await invoice.load('lines')
+      await invoice.load('client')
+
+      return invoice
+    })
+  }
+
+  /**
+   * Builds a draft quote pre-filled from a reservation: links `reservationId`,
+   * resolves the client by the reservation's snapshot email (falling back to the
+   * free-text `clientName` when no client record matches), and adds a single line
+   * priced from the reservation total. The line label is supplied by the caller
+   * (built with i18n). The reservation total already reflects pricing (#284) when
+   * available, otherwise the manually entered `totalPrice`.
+   */
+  async createQuoteFromReservation(
+    org: Organization,
+    reservation: BoatReservation,
+    opts: { lineLabel: string }
+  ): Promise<Invoice> {
+    return db.transaction(async (trx) => {
+      const number = await this.#allocateNumber(trx, org.id, 'quote')
+
+      // Resolve the client by the reservation's snapshot email; keep the
+      // free-text name as the invoice snapshot when no record matches.
+      let clientId: number | null = null
+      let clientName: string | null = reservation.clientName || null
+      if (reservation.clientEmail) {
+        const client = await Client.query({ client: trx })
+          .where('organizationId', org.id)
+          .where('email', reservation.clientEmail)
+          .first()
+        if (client) {
+          clientId = client.id
+          clientName = client.fullName
+        }
+      }
+
+      const unitPrice = reservation.totalPrice ? Number.parseFloat(reservation.totalPrice) : 0
+      const lines: InvoiceLineInput[] = [{ label: opts.lineLabel, quantity: 1, unitPrice }]
+      const totals = computeInvoiceTotals(lines, 0)
+
+      const invoice = await Invoice.create(
+        {
+          organizationId: org.id,
+          clientId,
+          reservationId: reservation.id,
+          kind: 'quote',
+          number,
+          clientName,
+          status: 'draft',
+          issuedAt: DateTime.now(),
+          dueAt: null,
+          paidAt: null,
+          subtotal: String(totals.subtotal),
+          taxRate: '0',
+          taxAmount: String(totals.taxAmount),
+          total: String(totals.total),
+          currency: 'EUR',
+          notes: null,
+        },
+        { client: trx }
+      )
+
+      await InvoiceLine.createMany(
+        lines.map((line, index) => ({
+          invoiceId: invoice.id,
+          label: line.label,
+          quantity: String(line.quantity),
+          unitPrice: String(line.unitPrice),
+          amount: String(totals.lines[index].amount),
           position: index,
         })),
         { client: trx }

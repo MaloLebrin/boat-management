@@ -171,7 +171,8 @@
     "notAQuote": "Seuls les devis peuvent être convertis en facture.",
     "alreadyConverted": "Ce devis a déjà été converti en facture.",
     "paid": "Facture marquée comme payée.",
-    "cannotMarkPaid": "Ce document ne peut pas être marqué comme payé."
+    "cannotMarkPaid": "Ce document ne peut pas être marqué comme payé.",
+    "quoteFromReservation": "Devis créé depuis la réservation."
   },
   "quota": {
     "boatsExceeded": "Vous avez atteint la limite de bateaux de votre plan. Passez à un plan supérieur pour en ajouter.",

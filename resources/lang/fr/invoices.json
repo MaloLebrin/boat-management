@@ -116,12 +116,16 @@
     "reservation": "Réservation",
     "notes": "Notes",
     "convertedFrom": "Créé depuis le devis {number}",
-    "convertedTo": "Converti en facture {number}"
+    "convertedTo": "Converti en facture {number}",
+    "viewReservation": "Voir la réservation"
   },
   "actions": {
     "downloadPdf": "Télécharger le PDF",
     "sendEmail": "Envoyer par email",
     "convert": "Convertir en facture",
     "markPaid": "Marquer comme payée"
+  },
+  "fromReservation": {
+    "line": "Location {boat} ({start} → {end})"
   }
 }
