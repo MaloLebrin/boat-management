@@ -39,6 +39,7 @@ export const controllers = {
     PdfPreviews: () => import('#controllers/dev/pdf_previews_controller'),
   },
   Home: () => import('#controllers/home_controller'),
+  Invoices: () => import('#controllers/invoices_controller'),
   MaintenanceHistory: () => import('#controllers/maintenance_history_controller'),
   MaintenanceLogPdf: () => import('#controllers/maintenance_log_pdf_controller'),
   Marketing: () => import('#controllers/marketing_controller'),

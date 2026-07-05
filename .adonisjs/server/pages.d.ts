@@ -33,6 +33,9 @@ declare module '@adonisjs/inertia/types' {
     'errors/server_error': ExtractProps<(typeof import('../../inertia/pages/errors/server_error.vue'))['default']>
     'home': ExtractProps<(typeof import('../../inertia/pages/home.vue'))['default']>
     'invitations/accept': ExtractProps<(typeof import('../../inertia/pages/invitations/accept.vue'))['default']>
+    'invoices/form': ExtractProps<(typeof import('../../inertia/pages/invoices/form.vue'))['default']>
+    'invoices/index': ExtractProps<(typeof import('../../inertia/pages/invoices/index.vue'))['default']>
+    'invoices/show': ExtractProps<(typeof import('../../inertia/pages/invoices/show.vue'))['default']>
     'maintenance/history': ExtractProps<(typeof import('../../inertia/pages/maintenance/history.vue'))['default']>
     'marketing/about': ExtractProps<(typeof import('../../inertia/pages/marketing/about.vue'))['default']>
     'marketing/contact': ExtractProps<(typeof import('../../inertia/pages/marketing/contact.vue'))['default']>

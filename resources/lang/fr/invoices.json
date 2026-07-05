@@ -1,0 +1,91 @@
+{
+  "title": "Factures",
+  "subtitle": "Gérez vos devis et factures",
+  "add": "+ Nouvelle facture",
+  "addQuote": "+ Nouveau devis",
+  "empty": {
+    "title": "Aucune facture",
+    "description": "Créez votre premier devis ou facture pour commencer."
+  },
+  "count": "{count, plural, one {# document} other {# documents}}",
+  "searchPlaceholder": "Rechercher des factures...",
+  "columns": {
+    "number": "Numéro",
+    "status": "Statut",
+    "type": "Type",
+    "client": "Client",
+    "total": "Total",
+    "issuedAt": "Émission",
+    "dueAt": "Échéance",
+    "actions": "Actions"
+  },
+  "kind": {
+    "quote": "Devis",
+    "invoice": "Facture"
+  },
+  "status": {
+    "draft": "Brouillon",
+    "sent": "Envoyé",
+    "paid": "Payé",
+    "overdue": "En retard",
+    "cancelled": "Annulé"
+  },
+  "filters": {
+    "status": "Statut",
+    "allStatuses": "Tous les statuts",
+    "kind": "Type",
+    "allKinds": "Tous les types",
+    "client": "Client",
+    "allClients": "Tous les clients",
+    "issuedFrom": "Du",
+    "issuedTo": "Au"
+  },
+  "fields": {
+    "kind": "Type de document",
+    "clientId": "Client",
+    "reservationId": "Réservation",
+    "status": "Statut",
+    "issuedAt": "Date d'émission",
+    "dueAt": "Date d'échéance",
+    "taxRate": "Taux de TVA (%)",
+    "currency": "Devise",
+    "notes": "Notes (optionnel)"
+  },
+  "form": {
+    "createTitle": "Nouveau document",
+    "editTitle": "Modifier le document",
+    "submit": "Enregistrer",
+    "cancel": "Annuler"
+  },
+  "lines": {
+    "title": "Lignes",
+    "label": "Description",
+    "quantity": "Qté",
+    "unitPrice": "Prix unitaire",
+    "amount": "Montant",
+    "add": "+ Ajouter une ligne",
+    "remove": "Supprimer"
+  },
+  "totals": {
+    "subtotal": "Sous-total",
+    "tax": "TVA ({rate}%)",
+    "total": "Total"
+  },
+  "view": "Voir",
+  "edit": "Modifier",
+  "delete": "Supprimer",
+  "deleteConfirm": {
+    "title": "Supprimer le document",
+    "message": "Êtes-vous sûr de vouloir supprimer ce document ? Cette action est irréversible."
+  },
+  "noClient": "Aucun client",
+  "noReservation": "Aucune réservation",
+  "show": {
+    "details": "Détails",
+    "issuedOn": "Émis le",
+    "dueOn": "Échéance le",
+    "client": "Client",
+    "reservation": "Réservation",
+    "notes": "Notes"
+  }
+}

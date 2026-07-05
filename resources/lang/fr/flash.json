@@ -160,6 +160,12 @@
     "deleted": "Client supprimé.",
     "notFound": "Client introuvable."
   },
+  "invoices": {
+    "created": "Facture créée.",
+    "updated": "Facture mise à jour.",
+    "deleted": "Facture supprimée.",
+    "notFound": "Facture introuvable."
+  },
   "quota": {
     "boatsExceeded": "Vous avez atteint la limite de bateaux de votre plan. Passez à un plan supérieur pour en ajouter.",
     "membersExceeded": "Vous avez atteint la limite de membres de votre plan. Passez à un plan supérieur pour en ajouter.",
@@ -168,6 +174,7 @@
     "exportExceeded": "L'export n'est pas disponible sur votre plan actuel. Passez au plan Pro ou Entreprise.",
     "clientsExceeded": "Cette fonctionnalité nécessite le plan Enterprise.",
     "pricingExceeded": "Cette fonctionnalité nécessite le plan Enterprise.",
+    "invoicesExceeded": "Cette fonctionnalité nécessite le plan Enterprise.",
     "storageExceeded": "Vous avez atteint la limite de stockage de votre plan. Passez à un plan supérieur pour uploader de nouveaux fichiers.",
     "storageOverflow": "Votre usage de stockage dépasse la limite de votre plan actuel. Libérez de l'espace ou passez à un plan supérieur."
   },

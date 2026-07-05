@@ -113,6 +113,21 @@ export default class QuotaService {
     }
   }
 
+  canManageInvoices(org: Organization): boolean {
+    return PLAN_LIMITS[org.plan].canManageInvoices
+  }
+
+  assertCanManageInvoices(org: Organization): void {
+    const limits = PLAN_LIMITS[org.plan]
+    if (!limits.canManageInvoices) {
+      throw new QuotaExceededError('invoices', {
+        limit: null,
+        current: 0,
+        upgradeTo: getUpgradeTier(org.plan),
+      })
+    }
+  }
+
   storageLimitBytes(org: Organization): number | null {
     const gb = PLAN_LIMITS[org.plan].storageGb
     return gb === null ? null : gb * 1024 * 1024 * 1024
