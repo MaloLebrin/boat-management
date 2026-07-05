@@ -2,10 +2,14 @@ import {
   ReservationConflictError,
   ReservationNotFoundError,
   ReservationValidationError,
+  ReservationDurationError,
 } from '#exceptions/reservation_errors'
 import { BoatNotFoundError } from '#exceptions/boat_errors'
 import BoatReservationService from '#services/boat_reservation_service'
 import BoatService from '#services/boat_service'
+import BoatPricingService from '#services/boat_pricing_service'
+import PricingSeasonService from '#services/pricing_season_service'
+import { toBoatPricingRow } from '#transformers/boat_pricing_transformer'
 import BoatPolicy from '#policies/boat_policy'
 import {
   createBoatReservationValidator,
@@ -21,7 +25,9 @@ import type User from '#models/user'
 export default class BoatReservationsController {
   constructor(
     private boatService: BoatService,
-    private reservationService: BoatReservationService
+    private reservationService: BoatReservationService,
+    private boatPricingService: BoatPricingService,
+    private pricingSeasonService: PricingSeasonService
   ) {}
 
   private async resolveBoat(
@@ -49,15 +55,21 @@ export default class BoatReservationsController {
 
     await bouncer.with(BoatPolicy).authorize('view', boat)
 
-    const [reservations, canManage] = await Promise.all([
+    const [reservations, canManage, pricingModel, pricingSeasons] = await Promise.all([
       this.reservationService.listForBoat(user, boat),
       bouncer.with(BoatPolicy).allows('manage', boat),
+      this.boatPricingService.getForBoat(boat),
+      this.pricingSeasonService.listForBoatScope(boat.organizationId, boat.id),
     ])
+
+    const boatPricing = pricingModel ? toBoatPricingRow(pricingModel) : null
 
     return inertia.render('boats/reservations', {
       boat: { id: boat.id, name: boat.name },
       reservations: reservations.map((r) => toBoatReservationRow(r, boat.name)),
       canManage,
+      boatPricing,
+      pricingSeasons,
     })
   }
 
@@ -91,6 +103,17 @@ export default class BoatReservationsController {
       }
       if (error instanceof ReservationValidationError) {
         session.flash('error', i18n.t(`flash.reservation.${error.errorCode}`))
+        return response.redirect().back()
+      }
+      if (error instanceof ReservationDurationError) {
+        session.flash(
+          'error',
+          i18n.t(
+            error.reason === 'below_min'
+              ? 'flash.reservation.belowMinDays'
+              : 'flash.reservation.aboveMaxDays'
+          )
+        )
         return response.redirect().back()
       }
       throw error
@@ -144,6 +167,17 @@ export default class BoatReservationsController {
       }
       if (error instanceof ReservationValidationError) {
         session.flash('error', i18n.t(`flash.reservation.${error.errorCode}`))
+        return response.redirect().back()
+      }
+      if (error instanceof ReservationDurationError) {
+        session.flash(
+          'error',
+          i18n.t(
+            error.reason === 'below_min'
+              ? 'flash.reservation.belowMinDays'
+              : 'flash.reservation.aboveMaxDays'
+          )
+        )
         return response.redirect().back()
       }
       throw error

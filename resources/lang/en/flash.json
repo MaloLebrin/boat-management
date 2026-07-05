@@ -227,7 +227,9 @@
     "conflict": "This boat is already booked for this period.",
     "endBeforeStart": "End date must be after start date.",
     "optionsOverridden": "Reservation confirmed. {count} overlapping option(s) cancelled.",
-    "invalidTransition": "This status change is not allowed."
+    "invalidTransition": "This status change is not allowed.",
+    "belowMinDays": "The reservation duration is below the minimum allowed for this boat.",
+    "aboveMaxDays": "The reservation duration exceeds the maximum allowed for this boat."
   },
   "ports": {
     "hasBoats": "Cannot delete this port: boats are assigned to it."

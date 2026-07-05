@@ -8,12 +8,16 @@ import ReservationEditModal from '~/components/reservations/ReservationEditModal
 import ReservationStatusBadge from '~/components/reservations/ReservationStatusBadge.vue'
 import { useReservationFormat } from '~/composables/use_reservation_format'
 import { useT } from '~/composables/use_t'
+import type { BoatPricingRow } from '#shared/types/boat_pricing'
+import type { PricingSeasonRow } from '#shared/types/pricing_season'
 import type { BoatReservationRow } from '~/types/reservation'
 
 const props = defineProps<{
   boatId: number
   reservations: BoatReservationRow[]
   canManage: boolean
+  boatPricing: BoatPricingRow | null
+  pricingSeasons: PricingSeasonRow[]
 }>()
 
 const { t } = useT()
@@ -137,5 +141,7 @@ function deleteReservation(id: number) {
     v-model:open="editModalOpen"
     :boat-id="boatId"
     :reservation="editingReservation"
+    :boat-pricing="boatPricing"
+    :pricing-seasons="pricingSeasons"
   />
 </template>

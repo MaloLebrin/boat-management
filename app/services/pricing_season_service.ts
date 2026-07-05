@@ -232,6 +232,24 @@ export default class PricingSeasonService {
     }
   }
 
+  /**
+   * Returns all pricing seasons applicable to a specific boat:
+   * - Seasons scoped to this boat (boatId = boat.id)
+   * - Global seasons (boatId = null) from the same organization
+   *
+   * Sorted by priority (desc), then by starts_on (asc).
+   */
+  async listForBoatScope(organizationId: number, boatId: number): Promise<PricingSeasonRow[]> {
+    const seasons = await PricingSeason.query()
+      .where('organizationId', organizationId)
+      .where((q) => q.where('boatId', boatId).orWhereNull('boatId'))
+      .preload('boat')
+      .orderBy('priority', 'desc')
+      .orderBy('starts_on', 'asc')
+
+    return seasons.map((season) => this.#toRow(season))
+  }
+
   #toRow(season: PricingSeason): PricingSeasonRow {
     return {
       id: season.id,

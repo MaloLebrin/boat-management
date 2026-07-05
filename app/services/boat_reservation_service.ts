@@ -2,6 +2,7 @@ import {
   ReservationConflictError,
   ReservationNotFoundError,
   ReservationValidationError,
+  ReservationDurationError,
 } from '#exceptions/reservation_errors'
 import BoatReservation from '#models/boat_reservation'
 import BoatModel from '#models/boat'
@@ -14,6 +15,9 @@ import type {
   UpdateReservationPayload,
 } from '#shared/types/reservation'
 import { toDateTime } from '#shared/helpers/date'
+import { countBilledNights } from '#shared/helpers/reservation_quote'
+import BoatPricingService from '#services/boat_pricing_service'
+import ReservationQuoteService from '#services/reservation_quote_service'
 import { inject } from '@adonisjs/core'
 import db from '@adonisjs/lucid/services/db'
 import type { TransactionClientContract } from '@adonisjs/lucid/types/database'
@@ -39,6 +43,11 @@ const ALLOWED_RESERVATION_TRANSITIONS: Record<ReservationStatus, ReservationStat
 
 @inject()
 export default class BoatReservationService {
+  constructor(
+    private pricingService: BoatPricingService,
+    private quoteService: ReservationQuoteService
+  ) {}
+
   async listForBoat(user: User, boat: Boat): Promise<BoatReservation[]> {
     assertBoatScope(user, boat)
 
@@ -83,6 +92,31 @@ export default class BoatReservationService {
       throw new ReservationValidationError('endsAt must be after startsAt', 'endBeforeStart')
     }
 
+    // Duration bounds check (before transaction)
+    const pricing = await this.pricingService.getForBoat(boat)
+    if (pricing) {
+      const nights = countBilledNights(startsAt.toISO()!, endsAt.toISO()!)
+      if (nights > 0) {
+        if (pricing.minDays !== null && nights < pricing.minDays) {
+          throw new ReservationDurationError('below_min')
+        }
+        if (pricing.maxDays !== null && nights > pricing.maxDays) {
+          throw new ReservationDurationError('above_max')
+        }
+      }
+    }
+
+    // Auto-fill totalPrice if not provided
+    let totalPrice: string | null = null
+    if (payload.totalPrice !== undefined && payload.totalPrice !== null) {
+      totalPrice = String(payload.totalPrice)
+    } else {
+      const quote = await this.quoteService.quoteForBoat(boat, startsAt.toISO()!, endsAt.toISO()!)
+      if (quote.hasPricing) {
+        totalPrice = String(quote.total)
+      }
+    }
+
     const status = payload.status ?? 'option'
 
     return db.transaction(async (trx) => {
@@ -104,10 +138,7 @@ export default class BoatReservationService {
           clientEmail: payload.clientEmail?.trim() || null,
           clientPhone: payload.clientPhone?.trim() || null,
           notes: payload.notes?.trim() || null,
-          totalPrice:
-            payload.totalPrice !== undefined && payload.totalPrice !== null
-              ? String(payload.totalPrice)
-              : null,
+          totalPrice,
         },
         { client: trx }
       )
@@ -137,6 +168,20 @@ export default class BoatReservationService {
 
     if (endsAt <= startsAt) {
       throw new ReservationValidationError('endsAt must be after startsAt', 'endBeforeStart')
+    }
+
+    // Duration bounds check (before transaction)
+    const pricing = await this.pricingService.getForBoat(boat)
+    if (pricing) {
+      const nights = countBilledNights(startsAt.toISO()!, endsAt.toISO()!)
+      if (nights > 0) {
+        if (pricing.minDays !== null && nights < pricing.minDays) {
+          throw new ReservationDurationError('below_min')
+        }
+        if (pricing.maxDays !== null && nights > pricing.maxDays) {
+          throw new ReservationDurationError('above_max')
+        }
+      }
     }
 
     const effectiveStatus = payload.status ?? reservation.status
