@@ -1,7 +1,13 @@
 import { ClientNotFoundError } from '#exceptions/client_errors'
 import Client from '#models/client'
 import { toClientRow } from '#transformers/client_transformer'
-import { escapeLike } from '#shared/helpers/query'
+import {
+  clampInt,
+  escapeLike,
+  normalizeEnum,
+  toIntegerOrUndefined,
+  toTrimmedStringOrUndefined,
+} from '#shared/helpers/query'
 import type Organization from '#models/organization'
 import type {
   ClientListFilters,
@@ -21,44 +27,6 @@ const VALID_STATUSES: ClientStatus[] = ['active', 'inactive', 'blacklisted']
 const VALID_SORT_FIELDS: ClientSortField[] = ['lastName', 'createdAt', 'status']
 const VALID_DIRECTIONS: ClientSortDirection[] = ['asc', 'desc']
 
-function toTrimmedStringOrUndefined(value: unknown): string | undefined {
-  if (typeof value !== 'string') return undefined
-  const trimmed = value.trim()
-  return trimmed ? trimmed : undefined
-}
-
-function toIntegerOrUndefined(value: unknown): number | undefined {
-  if (typeof value === 'number' && Number.isInteger(value)) return value
-  if (typeof value !== 'string') return undefined
-  const parsed = Number.parseInt(value, 10)
-  return Number.isFinite(parsed) ? parsed : undefined
-}
-
-function clampInt(value: number, min: number, max: number): number {
-  return Math.max(min, Math.min(max, value))
-}
-
-function normalizeStatus(value: unknown): ClientStatus | '' {
-  if (typeof value === 'string' && VALID_STATUSES.includes(value as ClientStatus)) {
-    return value as ClientStatus
-  }
-  return ''
-}
-
-function normalizeSort(value: unknown): ClientSortField {
-  if (typeof value === 'string' && VALID_SORT_FIELDS.includes(value as ClientSortField)) {
-    return value as ClientSortField
-  }
-  return 'lastName'
-}
-
-function normalizeDirection(value: unknown): ClientSortDirection {
-  if (typeof value === 'string' && VALID_DIRECTIONS.includes(value as ClientSortDirection)) {
-    return value as ClientSortDirection
-  }
-  return 'asc'
-}
-
 function mapSortColumn(sort: ClientSortField): string {
   switch (sort) {
     case 'lastName':
@@ -73,9 +41,9 @@ function mapSortColumn(sort: ClientSortField): string {
 export default class ClientService {
   normalizeFilters(qs: Record<string, unknown>): ClientListFilters {
     const q = toTrimmedStringOrUndefined(qs.q) ?? ''
-    const status = normalizeStatus(qs.status)
-    const sort = normalizeSort(qs.sort)
-    const direction = normalizeDirection(qs.direction)
+    const status = normalizeEnum(qs.status, VALID_STATUSES, '' as const)
+    const sort = normalizeEnum(qs.sort, VALID_SORT_FIELDS, 'lastName' as const)
+    const direction = normalizeEnum(qs.direction, VALID_DIRECTIONS, 'asc' as const)
     const page = clampInt(toIntegerOrUndefined(qs.page) ?? 1, 1, 10_000)
     const perPage = clampInt(toIntegerOrUndefined(qs.perPage) ?? 20, 1, 100)
 
