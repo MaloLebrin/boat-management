@@ -1,4 +1,5 @@
 import { QuotaExceededError } from '#exceptions/quota_errors'
+import { UserNotInOrganizationError } from '#exceptions/organization_errors'
 import Boat from '#models/boat'
 import Organization from '#models/organization'
 import OrganizationMembership from '#models/organization_membership'
@@ -9,25 +10,43 @@ import db from '@adonisjs/lucid/services/db'
 
 @inject()
 export default class QuotaService {
-  async countBoats(org: Organization): Promise<number> {
+  /**
+   * Garde contre un utilisateur sans organisation (issue #279). Les contrôleurs
+   * chargent `user.organization` (typé non-null par la relation) puis appellent
+   * `assertCan*(user.organization)` ; si `organizationId` est `null` (course à
+   * l'onboarding, org supprimée, fixture), `org` vaut `null` à l'exécution et
+   * `PLAN_LIMITS[org.plan]` lève une `TypeError` → 500 non géré. On lève ici une
+   * erreur métier dédiée, traitée en flash + redirection par le handler global.
+   */
+  #assertOrganization(org: Organization | null): asserts org is Organization {
+    if (org === null) {
+      throw new UserNotInOrganizationError()
+    }
+  }
+
+  async countBoats(org: Organization | null): Promise<number> {
+    this.#assertOrganization(org)
     const rows = await Boat.query().where('organizationId', org.id).count('* as total')
     return Number(rows[0].$extras.total)
   }
 
-  async countMembers(org: Organization): Promise<number> {
+  async countMembers(org: Organization | null): Promise<number> {
+    this.#assertOrganization(org)
     const rows = await OrganizationMembership.query()
       .where('organizationId', org.id)
       .count('* as total')
     return Number(rows[0].$extras.total)
   }
 
-  async canAddBoat(org: Organization): Promise<boolean> {
+  async canAddBoat(org: Organization | null): Promise<boolean> {
+    this.#assertOrganization(org)
     const limits = PLAN_LIMITS[org.plan]
     if (limits.maxBoats === null) return true
     return (await this.countBoats(org)) < limits.maxBoats
   }
 
-  async assertCanAddBoat(org: Organization): Promise<void> {
+  async assertCanAddBoat(org: Organization | null): Promise<void> {
+    this.#assertOrganization(org)
     const limits = PLAN_LIMITS[org.plan]
     if (limits.maxBoats === null) return
 
@@ -41,13 +60,15 @@ export default class QuotaService {
     }
   }
 
-  async canAddMember(org: Organization): Promise<boolean> {
+  async canAddMember(org: Organization | null): Promise<boolean> {
+    this.#assertOrganization(org)
     const limits = PLAN_LIMITS[org.plan]
     if (limits.maxMembers === null) return true
     return (await this.countMembers(org)) < limits.maxMembers
   }
 
-  async assertCanAddMember(org: Organization): Promise<void> {
+  async assertCanAddMember(org: Organization | null): Promise<void> {
+    this.#assertOrganization(org)
     const limits = PLAN_LIMITS[org.plan]
     if (limits.maxMembers === null) return
 
@@ -61,7 +82,8 @@ export default class QuotaService {
     }
   }
 
-  assertCanUseAI(org: Organization): void {
+  assertCanUseAI(org: Organization | null): void {
+    this.#assertOrganization(org)
     const limits = PLAN_LIMITS[org.plan]
     if (!limits.canUseAI) {
       throw new QuotaExceededError('ai', {
@@ -72,11 +94,13 @@ export default class QuotaService {
     }
   }
 
-  canExport(org: Organization): boolean {
+  canExport(org: Organization | null): boolean {
+    this.#assertOrganization(org)
     return PLAN_LIMITS[org.plan].canExport
   }
 
-  assertCanExport(org: Organization): void {
+  assertCanExport(org: Organization | null): void {
+    this.#assertOrganization(org)
     const limits = PLAN_LIMITS[org.plan]
     if (!limits.canExport) {
       throw new QuotaExceededError('export', {
@@ -87,7 +111,8 @@ export default class QuotaService {
     }
   }
 
-  assertCanManageClients(org: Organization): void {
+  assertCanManageClients(org: Organization | null): void {
+    this.#assertOrganization(org)
     const limits = PLAN_LIMITS[org.plan]
     if (!limits.canManageClients) {
       throw new QuotaExceededError('clients', {
@@ -98,11 +123,13 @@ export default class QuotaService {
     }
   }
 
-  canManagePricing(org: Organization): boolean {
+  canManagePricing(org: Organization | null): boolean {
+    this.#assertOrganization(org)
     return PLAN_LIMITS[org.plan].canManagePricing
   }
 
-  assertCanManagePricing(org: Organization): void {
+  assertCanManagePricing(org: Organization | null): void {
+    this.#assertOrganization(org)
     const limits = PLAN_LIMITS[org.plan]
     if (!limits.canManagePricing) {
       throw new QuotaExceededError('pricing', {
@@ -113,11 +140,13 @@ export default class QuotaService {
     }
   }
 
-  canManageInvoices(org: Organization): boolean {
+  canManageInvoices(org: Organization | null): boolean {
+    this.#assertOrganization(org)
     return PLAN_LIMITS[org.plan].canManageInvoices
   }
 
-  assertCanManageInvoices(org: Organization): void {
+  assertCanManageInvoices(org: Organization | null): void {
+    this.#assertOrganization(org)
     const limits = PLAN_LIMITS[org.plan]
     if (!limits.canManageInvoices) {
       throw new QuotaExceededError('invoices', {
@@ -128,7 +157,8 @@ export default class QuotaService {
     }
   }
 
-  storageLimitBytes(org: Organization): number | null {
+  storageLimitBytes(org: Organization | null): number | null {
+    this.#assertOrganization(org)
     const gb = PLAN_LIMITS[org.plan].storageGb
     return gb === null ? null : gb * 1024 * 1024 * 1024
   }
@@ -137,7 +167,8 @@ export default class QuotaService {
   // guard. The EmailQueueService correlationSuffix deduplication handles notification races; quota
   // enforcement relies on DB-level atomicity in updateStorageUsed (increment/decrement) rather than
   // this optimistic check.
-  assertCanUpload(org: Organization, bytes: number): void {
+  assertCanUpload(org: Organization | null, bytes: number): void {
+    this.#assertOrganization(org)
     const limit = this.storageLimitBytes(org)
     if (limit === null) return
     if (org.storageUsedBytes > limit) {
@@ -158,7 +189,8 @@ export default class QuotaService {
     }
   }
 
-  async updateStorageUsed(org: Organization, deltaBytes: number): Promise<void> {
+  async updateStorageUsed(org: Organization | null, deltaBytes: number): Promise<void> {
+    this.#assertOrganization(org)
     const limit = this.storageLimitBytes(org)
 
     // Calculate percentages before and after the update

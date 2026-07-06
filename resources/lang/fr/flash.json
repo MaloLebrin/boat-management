@@ -203,6 +203,9 @@
     "storageExceeded": "Vous avez atteint la limite de stockage de votre plan. Passez à un plan supérieur pour uploader de nouveaux fichiers.",
     "storageOverflow": "Votre usage de stockage dépasse la limite de votre plan actuel. Libérez de l'espace ou passez à un plan supérieur."
   },
+  "organization": {
+    "required": "Vous devez appartenir à une organisation pour effectuer cette action."
+  },
   "pricing": {
     "saved": "Tarif enregistré.",
     "invalidRange": "La durée maximale doit être supérieure ou égale à la durée minimale."

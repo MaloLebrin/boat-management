@@ -2,6 +2,7 @@ import app from '@adonisjs/core/services/app'
 import { type HttpContext, ExceptionHandler } from '@adonisjs/core/http'
 import type { StatusPageRange, StatusPageRenderer } from '@adonisjs/core/types/http'
 import { QuotaExceededError } from '#exceptions/quota_errors'
+import { UserNotInOrganizationError } from '#exceptions/organization_errors'
 import { errors as limiterErrors } from '@adonisjs/limiter'
 
 export default class HttpExceptionHandler extends ExceptionHandler {
@@ -44,6 +45,12 @@ export default class HttpExceptionHandler extends ExceptionHandler {
       ctx.session.flash('error', ctx.i18n.t(key))
       return ctx.response.redirect().back()
     }
+    // Utilisateur authentifié sans organisation sur une route gatée (#279) :
+    // redirection propre vers l'accueil plutôt qu'un 500 (TypeError sur PLAN_LIMITS).
+    if (error instanceof UserNotInOrganizationError) {
+      ctx.session.flash('error', ctx.i18n.t('flash.organization.required'))
+      return ctx.response.redirect('/')
+    }
     return super.handle(error, ctx)
   }
 
@@ -54,6 +61,11 @@ export default class HttpExceptionHandler extends ExceptionHandler {
    * @note You should not attempt to send a response from this method.
    */
   async report(error: unknown, ctx: HttpContext) {
+    // Flux métier géré (redirection dans handle()) — ne pas le journaliser comme
+    // une erreur serveur 500 (évite le bruit et les fausses alertes). Cf. #279.
+    if (error instanceof UserNotInOrganizationError) {
+      return
+    }
     return super.report(error, ctx)
   }
 }

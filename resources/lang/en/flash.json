@@ -203,6 +203,9 @@
     "storageExceeded": "You have reached the storage limit of your plan. Upgrade to upload new files.",
     "storageOverflow": "Your storage usage exceeds your current plan limit. Free up space or upgrade your plan."
   },
+  "organization": {
+    "required": "You must belong to an organization to perform this action."
+  },
   "pricing": {
     "saved": "Pricing saved.",
     "invalidRange": "The maximum duration must be greater than or equal to the minimum duration."
