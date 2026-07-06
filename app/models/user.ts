@@ -8,6 +8,8 @@ import OrganizationMembership from '#models/organization_membership'
 import { beforeSave, belongsTo, hasMany } from '@adonisjs/lucid/orm'
 import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
 import type { OrgRole } from '#shared/types/organization'
+import type { Capability } from '#shared/types/permissions'
+import { ROLE_PERMISSIONS } from '#shared/types/permissions'
 
 export default class User extends compose(
   UserSchema,
@@ -48,5 +50,17 @@ export default class User extends compose(
   async isAdminOf(orgId: number): Promise<boolean> {
     const role = await this.getRoleInOrg(orgId)
     return role === 'admin'
+  }
+
+  async hasPermission(orgId: number, capability: Capability): Promise<boolean> {
+    const role = await this.getRoleInOrg(orgId)
+    if (role) return ROLE_PERMISSIONS[role].has(capability)
+    // Legacy data: a user linked to this org via the organizationId FK but
+    // missing an explicit membership row defaults to 'member' capabilities,
+    // matching the pre-capability behavior (any org-linked user could act as
+    // a member) until the self-heal (ensureMembershipsForOrgUsers) backfills
+    // the row.
+    if (this.organizationId === orgId) return ROLE_PERMISSIONS.member.has(capability)
+    return false
   }
 }

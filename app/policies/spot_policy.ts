@@ -1,28 +1,22 @@
 import type User from '#models/user'
 import type Spot from '#models/spot'
-import { BasePolicy } from '@adonisjs/bouncer'
 import type { AuthorizerResponse } from '@adonisjs/bouncer/types'
+import OrgScopedPolicy from '#utils/org_scoped_policy'
 
-export default class SpotPolicy extends BasePolicy {
-  async before(user: User) {
-    if (user.organizationId && (await user.isAdminOf(user.organizationId))) {
-      return true
-    }
+export default class SpotPolicy extends OrgScopedPolicy {
+  async view(user: User, spot: Spot): Promise<AuthorizerResponse> {
+    return this.sameOrg(user, spot) && (await this.can(user, 'spots.view'))
   }
 
-  view(user: User, spot: Spot): AuthorizerResponse {
-    return user.organizationId !== null && user.organizationId === spot.organizationId
+  async create(user: User): Promise<AuthorizerResponse> {
+    return this.can(user, 'spots.create')
   }
 
-  create(user: User): AuthorizerResponse {
-    return user.organizationId !== null
+  async edit(user: User, spot: Spot): Promise<AuthorizerResponse> {
+    return this.sameOrg(user, spot) && (await this.can(user, 'spots.edit'))
   }
 
-  edit(user: User, spot: Spot): AuthorizerResponse {
-    return user.organizationId !== null && user.organizationId === spot.organizationId
-  }
-
-  delete(_user: User, _spot: Spot): AuthorizerResponse {
-    return false
+  async delete(user: User, spot: Spot): Promise<AuthorizerResponse> {
+    return this.sameOrg(user, spot) && (await this.can(user, 'spots.delete'))
   }
 }

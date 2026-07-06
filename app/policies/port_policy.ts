@@ -1,28 +1,22 @@
 import type User from '#models/user'
 import type Port from '#models/port'
-import { BasePolicy } from '@adonisjs/bouncer'
 import type { AuthorizerResponse } from '@adonisjs/bouncer/types'
+import OrgScopedPolicy from '#utils/org_scoped_policy'
 
-export default class PortPolicy extends BasePolicy {
-  async before(user: User) {
-    if (user.organizationId && (await user.isAdminOf(user.organizationId))) {
-      return true
-    }
+export default class PortPolicy extends OrgScopedPolicy {
+  async view(user: User, port: Port): Promise<AuthorizerResponse> {
+    return this.sameOrg(user, port) && (await this.can(user, 'ports.view'))
   }
 
-  view(user: User, port: Port): AuthorizerResponse {
-    return user.organizationId !== null && user.organizationId === port.organizationId
+  async create(user: User): Promise<AuthorizerResponse> {
+    return this.can(user, 'ports.create')
   }
 
-  create(_user: User): AuthorizerResponse {
-    return false
+  async edit(user: User, _port?: Port): Promise<AuthorizerResponse> {
+    return this.can(user, 'ports.edit')
   }
 
-  edit(_user: User, _port?: Port): AuthorizerResponse {
-    return false
-  }
-
-  delete(_user: User, _port?: Port): AuthorizerResponse {
-    return false
+  async delete(user: User, _port?: Port): Promise<AuthorizerResponse> {
+    return this.can(user, 'ports.delete')
   }
 }

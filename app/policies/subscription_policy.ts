@@ -1,20 +1,14 @@
 import type User from '#models/user'
 import type Subscription from '#models/subscription'
-import { BasePolicy } from '@adonisjs/bouncer'
 import type { AuthorizerResponse } from '@adonisjs/bouncer/types'
+import OrgScopedPolicy from '#utils/org_scoped_policy'
 
-export default class SubscriptionPolicy extends BasePolicy {
-  async before(user: User) {
-    if (user.organizationId && (await user.isAdminOf(user.organizationId))) {
-      return true
-    }
+export default class SubscriptionPolicy extends OrgScopedPolicy {
+  async view(user: User, subscription: Subscription): Promise<AuthorizerResponse> {
+    return this.sameOrg(user, subscription) && (await this.can(user, 'subscription.view'))
   }
 
-  view(user: User, subscription: Subscription): AuthorizerResponse {
-    return user.organizationId !== null && user.organizationId === subscription.organizationId
-  }
-
-  manage(_user: User, _subscription: Subscription): AuthorizerResponse {
-    return false
+  async manage(user: User, subscription: Subscription): Promise<AuthorizerResponse> {
+    return this.sameOrg(user, subscription) && (await this.can(user, 'subscription.manage'))
   }
 }
