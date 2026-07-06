@@ -1,5 +1,6 @@
 import Boat from '#models/boat'
 import BoatMaintenanceBadgeService from '#services/boat_maintenance_badge_service'
+import { escapeLike } from '#shared/helpers/query'
 import type {
   BoatListDirection,
   BoatListItem,
@@ -82,7 +83,7 @@ export default class BoatListService {
       .select(['id', 'name', 'registrationNumber', 'type', 'propulsionType', 'updatedAt'])
 
     if (filters.q) {
-      const needle = `%${filters.q}%`
+      const needle = `%${escapeLike(filters.q)}%`
       query.where((sub) => {
         sub.whereILike('name', needle).orWhereILike('registrationNumber', needle)
       })

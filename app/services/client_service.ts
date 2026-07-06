@@ -1,6 +1,7 @@
 import { ClientNotFoundError } from '#exceptions/client_errors'
 import Client from '#models/client'
 import { toClientRow } from '#transformers/client_transformer'
+import { escapeLike } from '#shared/helpers/query'
 import type Organization from '#models/organization'
 import type {
   ClientListFilters,
@@ -102,7 +103,7 @@ export default class ClientService {
       ])
 
     if (filters.q) {
-      const needle = `%${filters.q}%`
+      const needle = `%${escapeLike(filters.q)}%`
       query.where((sub) => {
         sub
           .whereILike('first_name', needle)
