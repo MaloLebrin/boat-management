@@ -73,6 +73,7 @@
   },
   "actions": {
     "createQuote": "Create a quote",
-    "inspection": "Inspection"
+    "inspection": "Inspection",
+    "contract": "Rental contract"
   }
 }

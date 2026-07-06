@@ -292,5 +292,42 @@ router
         [controllers.BoatMedia, 'destroyInspectionMedia']
       )
       .as('boats.reservations.inspections.photos.destroy')
+
+    router
+      .get('boats/:boatId/reservations/:reservationId/contract', [
+        controllers.RentalContracts,
+        'show',
+      ])
+      .as('boats.reservations.contract.show')
+    router
+      .post('boats/:boatId/reservations/:reservationId/contract', [
+        controllers.RentalContracts,
+        'store',
+      ])
+      .as('boats.reservations.contract.store')
+    router
+      .get('boats/:boatId/reservations/:reservationId/contract/pdf', [
+        controllers.RentalContracts,
+        'downloadPdf',
+      ])
+      .as('boats.reservations.contract.pdf')
+    router
+      .post('boats/:boatId/reservations/:reservationId/contract/send', [
+        controllers.RentalContracts,
+        'send',
+      ])
+      .as('boats.reservations.contract.send')
+    router
+      .post('boats/:boatId/reservations/:reservationId/contract/sign', [
+        controllers.RentalContracts,
+        'sign',
+      ])
+      .as('boats.reservations.contract.sign')
+    router
+      .delete('boats/:boatId/reservations/:reservationId/contract', [
+        controllers.RentalContracts,
+        'destroy',
+      ])
+      .as('boats.reservations.contract.destroy')
   })
   .use(middleware.auth())

@@ -588,6 +588,42 @@ const routes = {
     tokens: [{"old":"/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/photos/:mediaId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/photos/:mediaId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/photos/:mediaId","type":0,"val":"reservations","end":""},{"old":"/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/photos/:mediaId","type":1,"val":"reservationId","end":""},{"old":"/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/photos/:mediaId","type":0,"val":"inspections","end":""},{"old":"/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/photos/:mediaId","type":1,"val":"inspectionId","end":""},{"old":"/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/photos/:mediaId","type":0,"val":"photos","end":""},{"old":"/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/photos/:mediaId","type":1,"val":"mediaId","end":""}],
     types: placeholder as Registry['boats.reservations.inspections.photos.destroy']['types'],
   },
+  'boats.reservations.contract.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/boats/:boatId/reservations/:reservationId/contract',
+    tokens: [{"old":"/boats/:boatId/reservations/:reservationId/contract","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/reservations/:reservationId/contract","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/reservations/:reservationId/contract","type":0,"val":"reservations","end":""},{"old":"/boats/:boatId/reservations/:reservationId/contract","type":1,"val":"reservationId","end":""},{"old":"/boats/:boatId/reservations/:reservationId/contract","type":0,"val":"contract","end":""}],
+    types: placeholder as Registry['boats.reservations.contract.show']['types'],
+  },
+  'boats.reservations.contract.store': {
+    methods: ["POST"],
+    pattern: '/boats/:boatId/reservations/:reservationId/contract',
+    tokens: [{"old":"/boats/:boatId/reservations/:reservationId/contract","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/reservations/:reservationId/contract","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/reservations/:reservationId/contract","type":0,"val":"reservations","end":""},{"old":"/boats/:boatId/reservations/:reservationId/contract","type":1,"val":"reservationId","end":""},{"old":"/boats/:boatId/reservations/:reservationId/contract","type":0,"val":"contract","end":""}],
+    types: placeholder as Registry['boats.reservations.contract.store']['types'],
+  },
+  'boats.reservations.contract.pdf': {
+    methods: ["GET","HEAD"],
+    pattern: '/boats/:boatId/reservations/:reservationId/contract/pdf',
+    tokens: [{"old":"/boats/:boatId/reservations/:reservationId/contract/pdf","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/reservations/:reservationId/contract/pdf","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/reservations/:reservationId/contract/pdf","type":0,"val":"reservations","end":""},{"old":"/boats/:boatId/reservations/:reservationId/contract/pdf","type":1,"val":"reservationId","end":""},{"old":"/boats/:boatId/reservations/:reservationId/contract/pdf","type":0,"val":"contract","end":""},{"old":"/boats/:boatId/reservations/:reservationId/contract/pdf","type":0,"val":"pdf","end":""}],
+    types: placeholder as Registry['boats.reservations.contract.pdf']['types'],
+  },
+  'boats.reservations.contract.send': {
+    methods: ["POST"],
+    pattern: '/boats/:boatId/reservations/:reservationId/contract/send',
+    tokens: [{"old":"/boats/:boatId/reservations/:reservationId/contract/send","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/reservations/:reservationId/contract/send","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/reservations/:reservationId/contract/send","type":0,"val":"reservations","end":""},{"old":"/boats/:boatId/reservations/:reservationId/contract/send","type":1,"val":"reservationId","end":""},{"old":"/boats/:boatId/reservations/:reservationId/contract/send","type":0,"val":"contract","end":""},{"old":"/boats/:boatId/reservations/:reservationId/contract/send","type":0,"val":"send","end":""}],
+    types: placeholder as Registry['boats.reservations.contract.send']['types'],
+  },
+  'boats.reservations.contract.sign': {
+    methods: ["POST"],
+    pattern: '/boats/:boatId/reservations/:reservationId/contract/sign',
+    tokens: [{"old":"/boats/:boatId/reservations/:reservationId/contract/sign","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/reservations/:reservationId/contract/sign","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/reservations/:reservationId/contract/sign","type":0,"val":"reservations","end":""},{"old":"/boats/:boatId/reservations/:reservationId/contract/sign","type":1,"val":"reservationId","end":""},{"old":"/boats/:boatId/reservations/:reservationId/contract/sign","type":0,"val":"contract","end":""},{"old":"/boats/:boatId/reservations/:reservationId/contract/sign","type":0,"val":"sign","end":""}],
+    types: placeholder as Registry['boats.reservations.contract.sign']['types'],
+  },
+  'boats.reservations.contract.destroy': {
+    methods: ["DELETE"],
+    pattern: '/boats/:boatId/reservations/:reservationId/contract',
+    tokens: [{"old":"/boats/:boatId/reservations/:reservationId/contract","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/reservations/:reservationId/contract","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/reservations/:reservationId/contract","type":0,"val":"reservations","end":""},{"old":"/boats/:boatId/reservations/:reservationId/contract","type":1,"val":"reservationId","end":""},{"old":"/boats/:boatId/reservations/:reservationId/contract","type":0,"val":"contract","end":""}],
+    types: placeholder as Registry['boats.reservations.contract.destroy']['types'],
+  },
   'ports.index': {
     methods: ["GET","HEAD"],
     pattern: '/ports',

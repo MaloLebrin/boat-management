@@ -1171,6 +1171,78 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_media_controller').default['destroyInspectionMedia']>>>
     }
   }
+  'boats.reservations.contract.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/boats/:boatId/reservations/:reservationId/contract'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; reservationId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/rental_contracts_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/rental_contracts_controller').default['show']>>>
+    }
+  }
+  'boats.reservations.contract.store': {
+    methods: ["POST"]
+    pattern: '/boats/:boatId/reservations/:reservationId/contract'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; reservationId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/rental_contracts_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/rental_contracts_controller').default['store']>>>
+    }
+  }
+  'boats.reservations.contract.pdf': {
+    methods: ["GET","HEAD"]
+    pattern: '/boats/:boatId/reservations/:reservationId/contract/pdf'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; reservationId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/rental_contracts_controller').default['downloadPdf']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/rental_contracts_controller').default['downloadPdf']>>>
+    }
+  }
+  'boats.reservations.contract.send': {
+    methods: ["POST"]
+    pattern: '/boats/:boatId/reservations/:reservationId/contract/send'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; reservationId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/rental_contracts_controller').default['send']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/rental_contracts_controller').default['send']>>>
+    }
+  }
+  'boats.reservations.contract.sign': {
+    methods: ["POST"]
+    pattern: '/boats/:boatId/reservations/:reservationId/contract/sign'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; reservationId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/rental_contracts_controller').default['sign']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/rental_contracts_controller').default['sign']>>>
+    }
+  }
+  'boats.reservations.contract.destroy': {
+    methods: ["DELETE"]
+    pattern: '/boats/:boatId/reservations/:reservationId/contract'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; reservationId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/rental_contracts_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/rental_contracts_controller').default['destroy']>>>
+    }
+  }
   'ports.index': {
     methods: ["GET","HEAD"]
     pattern: '/ports'

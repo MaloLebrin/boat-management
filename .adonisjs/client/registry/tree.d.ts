@@ -108,6 +108,14 @@ export interface ApiDefinition {
           destroy: typeof routes['boats.reservations.inspections.photos.destroy']
         }
       }
+      contract: {
+        show: typeof routes['boats.reservations.contract.show']
+        store: typeof routes['boats.reservations.contract.store']
+        pdf: typeof routes['boats.reservations.contract.pdf']
+        send: typeof routes['boats.reservations.contract.send']
+        sign: typeof routes['boats.reservations.contract.sign']
+        destroy: typeof routes['boats.reservations.contract.destroy']
+      }
     }
   }
   boatEquipment: {

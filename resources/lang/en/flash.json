@@ -181,6 +181,16 @@
     "cannotMarkPaid": "This document cannot be marked as paid.",
     "quoteFromReservation": "Quote created from the reservation."
   },
+  "rentalContracts": {
+    "created": "Rental contract created.",
+    "alreadyExists": "A contract already exists for this reservation.",
+    "notFound": "Contract not found.",
+    "noClientEmail": "This client does not have an email address.",
+    "sent": "Contract sent by email.",
+    "signed": "Contract marked as signed.",
+    "deleted": "Contract deleted.",
+    "invalidTransition": "This status change is not allowed."
+  },
   "quota": {
     "boatsExceeded": "You have reached the boat limit for your plan. Upgrade to add more boats.",
     "membersExceeded": "You have reached the member limit for your plan. Upgrade to add more members.",

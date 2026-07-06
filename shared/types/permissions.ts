@@ -51,6 +51,10 @@ export type Capability =
   | 'pricing_seasons.create'
   | 'pricing_seasons.update'
   | 'pricing_seasons.delete'
+  | 'rentalContracts.view'
+  | 'rentalContracts.create'
+  | 'rentalContracts.edit'
+  | 'rentalContracts.delete'
   | 'simulator.manage_leads'
   | 'spots.view'
   | 'spots.create'
@@ -80,6 +84,7 @@ const ADMIN_ONLY_CAPABILITIES: Capability[] = [
   'ports.edit',
   'ports.delete',
   'pricing_seasons.delete',
+  'rentalContracts.delete',
   'simulator.manage_leads',
   'spots.delete',
   'subscription.manage',
@@ -116,6 +121,9 @@ const MEMBER_CAPABILITIES: Capability[] = [
   'ports.view',
   'pricing_seasons.create',
   'pricing_seasons.update',
+  'rentalContracts.view',
+  'rentalContracts.create',
+  'rentalContracts.edit',
   'spots.view',
   'spots.create',
   'spots.edit',

@@ -1,0 +1,36 @@
+{
+  "title": "Contrat de location",
+  "statuses": {
+    "draft": "Brouillon",
+    "sent": "Envoyé",
+    "signed": "Signé"
+  },
+  "empty": "Aucun contrat pour cette réservation.",
+  "actions": {
+    "generate": "Générer le contrat",
+    "download": "Télécharger le PDF",
+    "send": "Envoyer au client",
+    "sign": "Marquer comme signé",
+    "delete": "Supprimer",
+    "confirmDelete": "Supprimer ce contrat ?"
+  },
+  "signedAt": "Signé le {date}",
+  "createdAt": "Créé le {date}",
+  "pdf": {
+    "title": "Contrat de location",
+    "generatedOn": "Généré le {date}",
+    "status": "Statut",
+    "client": "Client",
+    "boat": "Bateau",
+    "period": "Période de location",
+    "periodRange": "Du {start} au {end}",
+    "conditions": "Conditions générales",
+    "conditionsText": "Le locataire s'engage à restituer le bateau dans l'état constaté lors de l'état des lieux de départ, à respecter les règles de navigation et de sécurité en vigueur, et à signaler tout incident survenu pendant la période de location. Toute avarie ou dommage constaté lors de l'état des lieux de retour pourra faire l'objet d'une facturation complémentaire. Le présent contrat engage les deux parties pour la durée de la réservation mentionnée ci-dessus.",
+    "statuses": {
+      "draft": "Brouillon",
+      "sent": "Envoyé",
+      "signed": "Signé"
+    },
+    "footer": "Page {page} sur {total} - {org}"
+  }
+}

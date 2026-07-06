@@ -1,0 +1,36 @@
+{
+  "title": "Rental contract",
+  "statuses": {
+    "draft": "Draft",
+    "sent": "Sent",
+    "signed": "Signed"
+  },
+  "empty": "No contract for this reservation yet.",
+  "actions": {
+    "generate": "Generate contract",
+    "download": "Download PDF",
+    "send": "Send to client",
+    "sign": "Mark as signed",
+    "delete": "Delete",
+    "confirmDelete": "Delete this contract?"
+  },
+  "signedAt": "Signed on {date}",
+  "createdAt": "Created on {date}",
+  "pdf": {
+    "title": "Rental contract",
+    "generatedOn": "Generated on {date}",
+    "status": "Status",
+    "client": "Client",
+    "boat": "Boat",
+    "period": "Rental period",
+    "periodRange": "From {start} to {end}",
+    "conditions": "General terms",
+    "conditionsText": "The renter agrees to return the boat in the condition recorded during the checkout inspection, to comply with applicable navigation and safety rules, and to report any incident occurring during the rental period. Any damage found during the checkin inspection may result in an additional charge. This contract binds both parties for the duration of the reservation mentioned above.",
+    "statuses": {
+      "draft": "Draft",
+      "sent": "Sent",
+      "signed": "Signed"
+    },
+    "footer": "Page {page} of {total} - {org}"
+  }
+}

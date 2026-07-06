@@ -1823,6 +1823,39 @@ export class RememberMeTokenSchema extends BaseModel {
   declare updatedAt: DateTime
 }
 
+export class RentalContractSchema extends BaseModel {
+  static $columns = [
+    'clientId',
+    'createdAt',
+    'id',
+    'mediaId',
+    'organizationId',
+    'reservationId',
+    'signedAt',
+    'status',
+    'updatedAt',
+  ] as const
+  $columns = RentalContractSchema.$columns
+  @column()
+  declare clientId: number | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare mediaId: number | null
+  @column()
+  declare organizationId: number
+  @column()
+  declare reservationId: number
+  @column.dateTime()
+  declare signedAt: DateTime | null
+  @column()
+  declare status: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class SimulatorLeadSchema extends BaseModel {
   static $columns = [
     'boatType',
