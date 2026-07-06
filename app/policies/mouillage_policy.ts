@@ -1,16 +1,10 @@
 import type User from '#models/user'
 import type Mouillage from '#models/mouillage'
-import { BasePolicy } from '@adonisjs/bouncer'
 import type { AuthorizerResponse } from '@adonisjs/bouncer/types'
+import OrgScopedPolicy from '#utils/org_scoped_policy'
 
-export default class MouillagePolicy extends BasePolicy {
-  async before(user: User) {
-    if (user.organizationId && (await user.isAdminOf(user.organizationId))) {
-      return true
-    }
-  }
-
-  view(user: User, mouillage: Mouillage): AuthorizerResponse {
+export default class MouillagePolicy extends OrgScopedPolicy {
+  private sameOrgViaPort(user: User, mouillage: Mouillage): boolean {
     return (
       user.organizationId !== null &&
       mouillage.port !== undefined &&
@@ -18,15 +12,19 @@ export default class MouillagePolicy extends BasePolicy {
     )
   }
 
-  create(_user: User): AuthorizerResponse {
-    return false
+  async view(user: User, mouillage: Mouillage): Promise<AuthorizerResponse> {
+    return this.sameOrgViaPort(user, mouillage) && (await this.can(user, 'mouillages.view'))
   }
 
-  edit(_user: User, _mouillage: Mouillage): AuthorizerResponse {
-    return false
+  async create(user: User): Promise<AuthorizerResponse> {
+    return this.can(user, 'mouillages.create')
   }
 
-  delete(_user: User, _mouillage: Mouillage): AuthorizerResponse {
-    return false
+  async edit(user: User, mouillage: Mouillage): Promise<AuthorizerResponse> {
+    return this.sameOrgViaPort(user, mouillage) && (await this.can(user, 'mouillages.edit'))
+  }
+
+  async delete(user: User, mouillage: Mouillage): Promise<AuthorizerResponse> {
+    return this.sameOrgViaPort(user, mouillage) && (await this.can(user, 'mouillages.delete'))
   }
 }

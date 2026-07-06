@@ -1,39 +1,37 @@
 import type User from '#models/user'
 import type Boat from '#models/boat'
 import type BoatReservation from '#models/boat_reservation'
-import { BasePolicy } from '@adonisjs/bouncer'
 import type { AuthorizerResponse } from '@adonisjs/bouncer/types'
+import OrgScopedPolicy from '#utils/org_scoped_policy'
 
-export default class BoatPolicy extends BasePolicy {
-  async before(user: User) {
-    if (user.organizationId && (await user.isAdminOf(user.organizationId))) {
-      return true
-    }
+export default class BoatPolicy extends OrgScopedPolicy {
+  async view(user: User, boat: Boat): Promise<AuthorizerResponse> {
+    return this.sameOrg(user, boat) && (await this.can(user, 'boats.view'))
   }
 
-  view(user: User, boat: Boat): AuthorizerResponse {
-    return user.organizationId !== null && user.organizationId === boat.organizationId
+  async create(user: User): Promise<AuthorizerResponse> {
+    return this.can(user, 'boats.create')
   }
 
-  create(user: User): AuthorizerResponse {
-    return user.organizationId !== null
+  async edit(user: User, boat: Boat): Promise<AuthorizerResponse> {
+    return this.sameOrg(user, boat) && (await this.can(user, 'boats.edit'))
   }
 
-  edit(user: User, boat: Boat): AuthorizerResponse {
-    return user.organizationId !== null && user.organizationId === boat.organizationId
+  async delete(user: User, boat: Boat): Promise<AuthorizerResponse> {
+    return this.sameOrg(user, boat) && (await this.can(user, 'boats.delete'))
   }
 
-  delete(_user: User, _boat: Boat): AuthorizerResponse {
-    return false
+  async manage(user: User, boat: Boat): Promise<AuthorizerResponse> {
+    return this.sameOrg(user, boat) && (await this.can(user, 'boats.manage'))
   }
 
-  manage(user: User, boat: Boat): AuthorizerResponse {
-    return user.organizationId !== null && user.organizationId === boat.organizationId
-  }
-
-  // Non-admins may only delete reservations that are not yet confirmed; admins bypass via before().
-  deleteReservation(user: User, boat: Boat, reservation: BoatReservation): AuthorizerResponse {
-    if (user.organizationId === null || user.organizationId !== boat.organizationId) return false
+  async deleteReservation(
+    user: User,
+    boat: Boat,
+    reservation: BoatReservation
+  ): Promise<AuthorizerResponse> {
+    if (!this.sameOrg(user, boat)) return false
+    if (!(await this.can(user, 'boats.reservations.delete'))) return false
     return reservation.status !== 'confirmed'
   }
 }

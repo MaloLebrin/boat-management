@@ -7,8 +7,10 @@ import BaseInertiaMiddleware from '@adonisjs/inertia/inertia_middleware'
 import { PLAN_LIMITS, type PlanTier } from '#shared/types/plan'
 import type { BrandingSharedProps } from '#shared/types/branding'
 import type { NotificationsSharedProps } from '#shared/types/notification'
+import type { PermissionsSharedProps } from '#shared/types/permissions'
 import { BrandingService } from '#services/branding_service'
 import NotificationService from '#services/notification_service'
+import PermissionService from '#services/permission_service'
 import { DEMO_SESSION_DURATION_MS } from '#shared/constants/demo'
 import type User from '#models/user'
 
@@ -17,7 +19,10 @@ export async function resolveSharedCurrentPlan(
 ): Promise<PlanTier | undefined> {
   if (!user?.organizationId) return undefined
   await user.load('organization')
-  return user.organization.plan
+  // A loaded belongsTo can still be null (e.g. the organization row no longer
+  // exists) — mirror the same guard resolveSharedBranding already has below,
+  // instead of assuming the relation always resolved.
+  return user.organization?.plan
 }
 
 export async function resolveSharedBranding(
@@ -34,7 +39,8 @@ export async function resolveSharedBranding(
 export default class InertiaMiddleware extends BaseInertiaMiddleware {
   constructor(
     private brandingService: BrandingService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private permissionService: PermissionService
   ) {
     super()
   }
@@ -66,6 +72,7 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
     const notifications: NotificationsSharedProps = auth?.user
       ? await this.notificationService.sharedProps(auth.user.id)
       : { unreadCount: 0, recent: [] }
+    const permissions: PermissionsSharedProps = await this.permissionService.sharedProps(auth?.user)
 
     return {
       errors: ctx.inertia.always(this.getValidationErrors(ctx)),
@@ -91,6 +98,7 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
       currentPlan: ctx.inertia.always(currentPlan),
       branding: ctx.inertia.always(branding),
       notifications: ctx.inertia.always(notifications as unknown as JSONDataTypes),
+      permissions: ctx.inertia.always(permissions as unknown as JSONDataTypes),
     }
   }
 

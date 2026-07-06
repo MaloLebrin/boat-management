@@ -11,6 +11,13 @@ test.group('resolveSharedCurrentPlan', () => {
       await resolveSharedCurrentPlan({ organizationId: null, load: async () => {} } as any)
     )
   })
+
+  test('returns undefined when organizationId is set but the relation fails to load (e.g. a deleted org)', async ({
+    assert,
+  }) => {
+    const user = { organizationId: 1, load: async () => {}, organization: null }
+    assert.isUndefined(await resolveSharedCurrentPlan(user as any))
+  })
 })
 
 const stubBrandingService = {

@@ -8,6 +8,8 @@ import OrganizationMembership from '#models/organization_membership'
 import { beforeSave, belongsTo, hasMany } from '@adonisjs/lucid/orm'
 import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
 import type { OrgRole } from '#shared/types/organization'
+import type { Capability } from '#shared/types/permissions'
+import { ROLE_PERMISSIONS } from '#shared/types/permissions'
 
 export default class User extends compose(
   UserSchema,
@@ -48,5 +50,28 @@ export default class User extends compose(
   async isAdminOf(orgId: number): Promise<boolean> {
     const role = await this.getRoleInOrg(orgId)
     return role === 'admin'
+  }
+
+  /**
+   * Resolves the role to use for authorization purposes, including the
+   * legacy fallback: a user linked to this org via the organizationId FK but
+   * missing an explicit membership row defaults to 'member', matching the
+   * pre-capability behavior (any org-linked user could act as a member)
+   * until the self-heal (ensureMembershipsForOrgUsers) backfills the row.
+   *
+   * Both hasPermission() and PermissionService.sharedProps() must go through
+   * this single method so the backend authorization result and the
+   * frontend-visible capabilities never drift apart.
+   */
+  async getEffectiveRoleInOrg(orgId: number): Promise<OrgRole | null> {
+    const role = await this.getRoleInOrg(orgId)
+    if (role) return role
+    return this.organizationId === orgId ? 'member' : null
+  }
+
+  async hasPermission(orgId: number, capability: Capability): Promise<boolean> {
+    const role = await this.getEffectiveRoleInOrg(orgId)
+    if (!role) return false
+    return ROLE_PERMISSIONS[role].has(capability)
   }
 }

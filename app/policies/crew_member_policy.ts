@@ -1,24 +1,17 @@
 import type User from '#models/user'
-import { BasePolicy } from '@adonisjs/bouncer'
 import type { AuthorizerResponse } from '@adonisjs/bouncer/types'
+import OrgScopedPolicy from '#utils/org_scoped_policy'
 
-export default class CrewMemberPolicy extends BasePolicy {
-  async before(user: User) {
-    if (user.organizationId && (await user.isAdminOf(user.organizationId))) {
-      return true
-    }
+export default class CrewMemberPolicy extends OrgScopedPolicy {
+  async create(user: User): Promise<AuthorizerResponse> {
+    return this.can(user, 'crew.create')
   }
 
-  create(user: User): AuthorizerResponse {
-    return user.organizationId !== null
+  async update(user: User): Promise<AuthorizerResponse> {
+    return this.can(user, 'crew.update')
   }
 
-  update(user: User): AuthorizerResponse {
-    return user.organizationId !== null
-  }
-
-  // Intentionally false: only admins may delete, handled by the before() hook above.
-  delete(): AuthorizerResponse {
-    return false
+  async delete(user: User): Promise<AuthorizerResponse> {
+    return this.can(user, 'crew.delete')
   }
 }

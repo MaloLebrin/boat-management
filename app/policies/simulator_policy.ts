@@ -9,6 +9,7 @@ export default class SimulatorPolicy extends BasePolicy {
   }
 
   async manageLeads(user: User): Promise<AuthorizerResponse> {
-    return user.organizationId !== null && (await user.isAdminOf(user.organizationId))
+    if (!user.organizationId) return false
+    return user.hasPermission(user.organizationId, 'simulator.manage_leads')
   }
 }

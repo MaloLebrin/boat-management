@@ -1,31 +1,25 @@
 import type User from '#models/user'
-import { BasePolicy } from '@adonisjs/bouncer'
 import type { AuthorizerResponse } from '@adonisjs/bouncer/types'
+import OrgScopedPolicy from '#utils/org_scoped_policy'
 
-export default class OrganizationPolicy extends BasePolicy {
-  async before(user: User) {
-    if (user.organizationId && (await user.isAdminOf(user.organizationId))) {
-      return true
-    }
+export default class OrganizationPolicy extends OrgScopedPolicy {
+  async viewMembers(user: User): Promise<AuthorizerResponse> {
+    return this.can(user, 'members.view')
   }
 
-  viewMembers(user: User): AuthorizerResponse {
-    return user.organizationId !== null
+  async manageMembers(user: User): Promise<AuthorizerResponse> {
+    return this.can(user, 'members.manage')
   }
 
-  manageMembers(_user: User): AuthorizerResponse {
-    return false
+  async configureAI(user: User): Promise<AuthorizerResponse> {
+    return this.can(user, 'ai.configure')
   }
 
-  configureAI(_user: User): AuthorizerResponse {
-    return false
+  async configureBranding(user: User): Promise<AuthorizerResponse> {
+    return this.can(user, 'branding.configure')
   }
 
-  configureBranding(_user: User): AuthorizerResponse {
-    return false
-  }
-
-  viewAuditLog(user: User): AuthorizerResponse {
-    return user.organizationId !== null
+  async viewAuditLog(user: User): Promise<AuthorizerResponse> {
+    return this.can(user, 'audit_log.view')
   }
 }

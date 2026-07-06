@@ -1,25 +1,18 @@
 import type Boat from '#models/boat'
 import type User from '#models/user'
-import { BasePolicy } from '@adonisjs/bouncer'
 import type { AuthorizerResponse } from '@adonisjs/bouncer/types'
+import OrgScopedPolicy from '#utils/org_scoped_policy'
 
-export default class NavigationLogPolicy extends BasePolicy {
-  async before(user: User) {
-    if (user.organizationId && (await user.isAdminOf(user.organizationId))) {
-      return true
-    }
+export default class NavigationLogPolicy extends OrgScopedPolicy {
+  async create(user: User, boat: Boat): Promise<AuthorizerResponse> {
+    return this.sameOrg(user, boat) && (await this.can(user, 'navigation_logs.create'))
   }
 
-  create(user: User, boat: Boat): AuthorizerResponse {
-    return user.organizationId !== null && user.organizationId === boat.organizationId
+  async update(user: User, boat: Boat): Promise<AuthorizerResponse> {
+    return this.sameOrg(user, boat) && (await this.can(user, 'navigation_logs.update'))
   }
 
-  update(user: User, boat: Boat): AuthorizerResponse {
-    return user.organizationId !== null && user.organizationId === boat.organizationId
-  }
-
-  // Intentionally false: only admins may delete, handled by the before() hook above.
-  delete(): AuthorizerResponse {
-    return false
+  async delete(user: User): Promise<AuthorizerResponse> {
+    return this.can(user, 'navigation_logs.delete')
   }
 }
