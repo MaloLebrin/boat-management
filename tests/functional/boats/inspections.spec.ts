@@ -350,6 +350,104 @@ test.group('Boat Inspections (functional)', (group) => {
     assert.isNull(existing)
   })
 
+  test('DELETE .../inspections/:id deletes its associated photos', async ({ client, assert }) => {
+    const deletedFolders: string[] = []
+    app.container.swap(
+      CloudinaryService,
+      () =>
+        ({
+          deleteFolder: async (folderPath: string) => {
+            deletedFolders.push(folderPath)
+          },
+        }) as unknown as CloudinaryService
+    )
+
+    try {
+      const admin = await createAdminUser()
+      const boat = await BoatFactory.merge({ organizationId: admin.organizationId! }).create()
+      const reservation = await BoatReservationFactory.merge({
+        boatId: boat.id,
+        organizationId: boat.organizationId,
+      }).create()
+
+      await client
+        .post(`/boats/${boat.id}/reservations/${reservation.id}/inspections`)
+        .form(VALID_INSPECTION)
+        .loginAs(admin)
+
+      const inspection = await BoatInspection.query()
+        .where('reservationId', reservation.id)
+        .firstOrFail()
+
+      const media = await MediaFactory.merge({
+        entityType: 'inspection',
+        entityId: inspection.id,
+      }).create()
+
+      const response = await client
+        .delete(`/boats/${boat.id}/reservations/${reservation.id}/inspections/${inspection.id}`)
+        .loginAs(admin)
+        .redirects(0)
+
+      response.assertStatus(302)
+
+      const existingInspection = await BoatInspection.find(inspection.id)
+      assert.isNull(existingInspection)
+
+      const existingMedia = await Media.find(media.id)
+      assert.isNull(existingMedia)
+      assert.lengthOf(deletedFolders, 1)
+      assert.include(deletedFolders[0], `reservations/${reservation.id}/inspections/checkout`)
+    } finally {
+      app.container.restore(CloudinaryService)
+    }
+  })
+
+  // --- validators ---
+
+  test('POST .../inspections rejects a non-integer fuelLevel', async ({ client, assert }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const reservation = await BoatReservationFactory.merge({
+      boatId: boat.id,
+      organizationId: boat.organizationId,
+    }).create()
+
+    const response = await client
+      .post(`/boats/${boat.id}/reservations/${reservation.id}/inspections`)
+      .form({ ...VALID_INSPECTION, fuelLevel: 55.5 })
+      .loginAs(user)
+      .redirects(0)
+
+    response.assertStatus(302)
+
+    const inspections = await BoatInspection.query().where('reservationId', reservation.id)
+    assert.lengthOf(inspections, 0)
+  })
+
+  test('POST .../inspections rejects engineHours above the decimal(6,2) bound', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const reservation = await BoatReservationFactory.merge({
+      boatId: boat.id,
+      organizationId: boat.organizationId,
+    }).create()
+
+    const response = await client
+      .post(`/boats/${boat.id}/reservations/${reservation.id}/inspections`)
+      .form({ ...VALID_INSPECTION, engineHours: 100000 })
+      .loginAs(user)
+      .redirects(0)
+
+    response.assertStatus(302)
+
+    const inspections = await BoatInspection.query().where('reservationId', reservation.id)
+    assert.lengthOf(inspections, 0)
+  })
+
   // --- photos ---
 
   test('DELETE .../inspections/:id/photos/:mediaId is rejected for non-admin member', async ({

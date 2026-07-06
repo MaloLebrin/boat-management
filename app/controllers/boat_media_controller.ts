@@ -227,6 +227,7 @@ export default class BoatMediaController {
       Number(params.reservationId)
     )
     if (!reservation) {
+      session.flash('error', i18n.t('flash.reservation.notFound'))
       response.redirect(`/boats/${boat.id}/reservations`)
       return
     }
@@ -239,6 +240,7 @@ export default class BoatMediaController {
       inspection = await this.inspectionService.findForReservation(user, reservation, inspectionId)
     } catch (error) {
       if (error instanceof BoatInspectionNotFoundError) {
+        session.flash('error', i18n.t('flash.inspections.notFound'))
         response.redirect(`/boats/${boat.id}/reservations/${reservation.id}/inspection`)
         return
       }
@@ -282,6 +284,7 @@ export default class BoatMediaController {
       Number(params.reservationId)
     )
     if (!reservation) {
+      session.flash('error', i18n.t('flash.reservation.notFound'))
       response.redirect(`/boats/${boat.id}/reservations`)
       return
     }
@@ -293,6 +296,7 @@ export default class BoatMediaController {
       await this.inspectionService.findForReservation(user, reservation, inspectionId)
     } catch (error) {
       if (error instanceof BoatInspectionNotFoundError) {
+        session.flash('error', i18n.t('flash.inspections.notFound'))
         response.redirect(`/boats/${boat.id}/reservations/${reservation.id}/inspection`)
         return
       }

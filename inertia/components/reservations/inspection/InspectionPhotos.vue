@@ -10,7 +10,8 @@ const props = defineProps<{
   uploadUrl: string
   deleteUrlFor: (mediaId: number) => string
   photos: MediaRow[]
-  canManage: boolean
+  canUpload: boolean
+  canDelete: boolean
 }>()
 
 const { t } = useT()
@@ -47,7 +48,7 @@ function deletePhoto(mediaId: number) {
         {{ t('inspections.photos.title') }}
       </p>
       <BaseButton
-        v-if="canManage"
+        v-if="canUpload"
         variant="secondary"
         size="sm"
         type="button"
@@ -60,7 +61,7 @@ function deletePhoto(mediaId: number) {
     </div>
 
     <input
-      v-if="canManage"
+      v-if="canUpload"
       ref="fileInput"
       type="file"
       accept="image/jpeg,image/png,image/webp,image/gif,.heic,.heif"
@@ -85,7 +86,7 @@ function deletePhoto(mediaId: number) {
           loading="lazy"
         />
         <div
-          v-if="canManage"
+          v-if="canDelete"
           class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity"
         >
           <BaseButton variant="danger" size="sm" type="button" @click="deletePhoto(photo.id)">
@@ -96,7 +97,7 @@ function deletePhoto(mediaId: number) {
     </div>
 
     <div
-      v-if="canManage && photos.length === 0"
+      v-if="canUpload && photos.length === 0"
       class="mt-2 rounded-lg border-2 border-dashed border-border bg-surface-muted/30 p-6 text-center cursor-pointer hover:border-brand/50 transition-colors"
       @click="fileInput?.click()"
     >

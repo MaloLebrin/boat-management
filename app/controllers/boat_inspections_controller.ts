@@ -7,6 +7,7 @@ import BoatService from '#services/boat_service'
 import BoatReservationService from '#services/boat_reservation_service'
 import BoatInspectionService from '#services/boat_inspection_service'
 import MediaService from '#services/media_service'
+import OrganizationService from '#services/organization_service'
 import InspectionPolicy from '#policies/inspection_policy'
 import {
   createBoatInspectionValidator,
@@ -26,7 +27,8 @@ export default class BoatInspectionsController {
     private boatService: BoatService,
     private reservationService: BoatReservationService,
     private inspectionService: BoatInspectionService,
-    private mediaService: MediaService
+    private mediaService: MediaService,
+    private organizationService: OrganizationService
   ) {}
 
   private async resolve(
@@ -71,8 +73,18 @@ export default class BoatInspectionsController {
 
     await bouncer.with(InspectionPolicy).authorize('view', reservation)
 
-    const [inspections, canEdit, canDelete] = await Promise.all([
-      this.inspectionService.listForReservation(user, reservation),
+    let inspections
+    try {
+      inspections = await this.inspectionService.listForReservation(user, reservation)
+    } catch (error) {
+      if (error instanceof BoatInspectionNotFoundError) {
+        response.redirect(`/boats/${boat.id}/reservations`)
+        return
+      }
+      throw error
+    }
+
+    const [canEdit, canDelete] = await Promise.all([
       bouncer.with(InspectionPolicy).allows('edit', reservation),
       bouncer.with(InspectionPolicy).allows('delete', reservation),
     ])
@@ -120,6 +132,10 @@ export default class BoatInspectionsController {
         notes: payload.notes ?? null,
       })
     } catch (error) {
+      if (error instanceof BoatInspectionNotFoundError) {
+        session.flash('error', i18n.t('flash.inspections.notFound'))
+        return response.redirect().back()
+      }
       if (error instanceof BoatInspectionValidationError) {
         session.flash('error', i18n.t(`flash.inspections.${error.errorCode}`))
         return response.redirect().back()
@@ -188,11 +204,14 @@ export default class BoatInspectionsController {
     const { boat, reservation } = loaded
     await bouncer.with(InspectionPolicy).authorize('delete', reservation)
 
+    const org = await this.organizationService.findOrFail(boat.organizationId)
+
     try {
       await this.inspectionService.deleteForReservation(
         user,
         reservation,
-        Number(params.inspectionId)
+        Number(params.inspectionId),
+        org
       )
     } catch (error) {
       if (error instanceof BoatInspectionNotFoundError) {

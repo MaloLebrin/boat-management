@@ -97,8 +97,8 @@ function deleteInspection() {
           :error="errors.engineHours"
         />
         <BaseTextarea
+          v-model="notes"
           name="notes"
-          :model-value="notes"
           :label="t('inspections.fields.notes')"
           :errors="errors"
           :rows="2"
@@ -124,7 +124,8 @@ function deleteInspection() {
         (mediaId: number) => `${basePath}/inspections/${inspection!.id}/photos/${mediaId}`
       "
       :photos="inspection.photos"
-      :can-manage="canEdit"
+      :can-upload="canEdit"
+      :can-delete="canDelete"
     />
   </BaseCard>
 </template>
