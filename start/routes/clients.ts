@@ -20,5 +20,9 @@ router
     router
       .get('clients/:id/media/:mediaId/download', [controllers.ClientMedia, 'downloadMedia'])
       .as('clients.media.download')
+
+    // RGPD (CRM 4/4 — #276)
+    router.post('clients/:id/anonymize', [controllers.Clients, 'anonymize']).as('clients.anonymize')
+    router.get('clients/:id/export', [controllers.Clients, 'exportData']).as('clients.export')
   })
   .use(middleware.auth())

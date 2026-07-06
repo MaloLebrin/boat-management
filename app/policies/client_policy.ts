@@ -14,4 +14,8 @@ export default class ClientPolicy extends OrgScopedPolicy {
   async delete(user: User): Promise<AuthorizerResponse> {
     return this.can(user, 'clients.delete')
   }
+
+  async anonymize(user: User): Promise<AuthorizerResponse> {
+    return this.can(user, 'clients.anonymize')
+  }
 }

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
+import BaseCheckbox from '~/components/base/BaseCheckbox.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
@@ -29,6 +30,7 @@ const form = useForm({
   navigationPermitType: (props.client?.navigationPermitType ?? '') as ClientPermitType | '',
   status: (props.client?.status ?? 'active') as ClientStatus,
   notes: props.client?.notes ?? '',
+  gdprConsent: props.client?.gdprConsentAt != null,
 })
 
 const permitTypeOptions: Array<{ label: string; value: ClientPermitType }> = [
@@ -151,6 +153,13 @@ function submit() {
       error-key="notes"
       name="notes"
       :rows="2"
+    />
+
+    <BaseCheckbox
+      v-model="form.gdprConsent"
+      :label="t('clients.gdpr.consentLabel')"
+      :hint="t('clients.gdpr.consentHint')"
+      name="gdprConsent"
     />
 
     <div class="flex justify-end gap-2">

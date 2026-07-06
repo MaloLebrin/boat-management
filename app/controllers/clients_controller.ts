@@ -1,4 +1,7 @@
-import ClientService, { ClientNotFoundError } from '#services/client_service'
+import ClientService, {
+  ClientAlreadyAnonymizedError,
+  ClientNotFoundError,
+} from '#services/client_service'
 import BoatReservationService from '#services/boat_reservation_service'
 import QuotaService from '#services/quota_service'
 import { QuotaExceededError } from '#exceptions/quota_errors'
@@ -66,6 +69,7 @@ export default class ClientsController {
     await bouncer.with(ClientPolicy).authorize('create')
 
     const canManage = await bouncer.with(ClientPolicy).allows('update')
+    const canAnonymize = await bouncer.with(ClientPolicy).allows('anonymize')
 
     try {
       const client = await this.clientService.getForOrganizationOrFail(org, Number(params.id))
@@ -76,6 +80,7 @@ export default class ClientsController {
         reservations: reservations.map((r) => toBoatReservationRow(r, r.boat?.name ?? '')),
         documents: documents.map(toMediaRow),
         canManage,
+        canAnonymize,
       })
     } catch (error) {
       if (error instanceof ClientNotFoundError) {
@@ -118,6 +123,11 @@ export default class ClientsController {
         response.redirect('/clients')
         return
       }
+      if (error instanceof ClientAlreadyAnonymizedError) {
+        session.flash('error', i18n.t('flash.clients.alreadyAnonymized'))
+        response.redirect('/clients')
+        return
+      }
       throw error
     }
 
@@ -146,5 +156,53 @@ export default class ClientsController {
 
     session.flash('success', i18n.t('flash.clients.deleted'))
     response.redirect('/clients')
+  }
+
+  async anonymize({ response, auth, params, bouncer, session, i18n }: HttpContext) {
+    await auth.authenticate()
+    const org = await this.loadOrgAndAssertEnterprise({ auth, session, response, i18n })
+    if (!org) return
+
+    await bouncer.with(ClientPolicy).authorize('anonymize')
+
+    try {
+      const client = await this.clientService.getForOrganizationOrFail(org, Number(params.id))
+      await this.clientService.anonymize(org, client)
+    } catch (error) {
+      if (error instanceof ClientNotFoundError) {
+        session.flash('error', i18n.t('flash.clients.notFound'))
+        response.redirect('/clients')
+        return
+      }
+      throw error
+    }
+
+    session.flash('success', i18n.t('flash.clients.anonymized'))
+    response.redirect('/clients')
+  }
+
+  async exportData({ response, auth, params, bouncer, session, i18n }: HttpContext) {
+    await auth.authenticate()
+    const org = await this.loadOrgAndAssertEnterprise({ auth, session, response, i18n })
+    if (!org) return
+
+    await bouncer.with(ClientPolicy).authorize('update')
+
+    let client
+    try {
+      client = await this.clientService.getForOrganizationOrFail(org, Number(params.id))
+    } catch (error) {
+      if (error instanceof ClientNotFoundError) {
+        session.flash('error', i18n.t('flash.clients.notFound'))
+        response.redirect('/clients')
+        return
+      }
+      throw error
+    }
+
+    const data = await this.clientService.exportData(org, client)
+    response.header('Content-Type', 'application/json')
+    response.header('Content-Disposition', `attachment; filename="client-${client.id}.json"`)
+    return response.send(JSON.stringify(data, null, 2))
   }
 }

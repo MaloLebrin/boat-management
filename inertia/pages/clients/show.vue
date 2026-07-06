@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { Link } from '@adonisjs/inertia/vue'
+import { router } from '@inertiajs/vue3'
+import { ref } from 'vue'
+import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
+import BaseConfirmModal from '~/components/base/BaseConfirmModal.vue'
 import BaseEmptyState from '~/components/base/BaseEmptyState.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import ClientDocuments from '~/components/clients/ClientDocuments.vue'
@@ -17,10 +21,18 @@ const props = defineProps<{
   reservations: BoatReservationRow[]
   documents: MediaRow[]
   canManage: boolean
+  canAnonymize: boolean
 }>()
 
 const { t } = useT()
 const { formatDate } = useReservationFormat()
+
+const isAnonymizeModalOpen = ref(false)
+
+function anonymize() {
+  router.post(`/clients/${props.client.id}/anonymize`, {}, { preserveScroll: true })
+  isAnonymizeModalOpen.value = false
+}
 </script>
 
 <template>
@@ -36,6 +48,12 @@ const { formatDate } = useReservationFormat()
     <div class="flex items-center gap-3">
       <BaseHeading level="1">{{ client.fullName }}</BaseHeading>
       <ClientStatusBadge :status="client.status" />
+      <span
+        v-if="client.anonymizedAt"
+        class="inline-flex items-center rounded-full bg-surface-muted px-2.5 py-0.5 text-xs font-medium text-fg-muted"
+      >
+        {{ t('clients.gdpr.anonymized') }}
+      </span>
     </div>
 
     <!-- Info -->
@@ -71,6 +89,50 @@ const { formatDate } = useReservationFormat()
       :documents="documents"
       :can-manage="canManage"
     />
+
+    <!-- GDPR -->
+    <BaseCard class="mt-4">
+      <BaseConfirmModal
+        :open="isAnonymizeModalOpen"
+        :title="t('clients.gdpr.anonymizeConfirm.title')"
+        :message="t('clients.gdpr.anonymizeConfirm.message')"
+        :confirm-label="t('clients.gdpr.anonymize')"
+        @update:open="isAnonymizeModalOpen = false"
+        @confirm="anonymize"
+      />
+
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <p class="text-sm font-semibold text-fg">{{ t('clients.gdpr.consentTitle') }}</p>
+          <p class="mt-1 text-sm text-fg-muted">
+            <template v-if="client.gdprConsentAt">
+              {{ t('clients.gdpr.consentGiven', { date: formatDate(client.gdprConsentAt) }) }}
+            </template>
+            <template v-else>{{ t('clients.gdpr.consentNotGiven') }}</template>
+          </p>
+          <p v-if="client.anonymizedAt" class="mt-1 text-sm text-fg-muted">
+            {{ t('clients.gdpr.anonymizedOn', { date: formatDate(client.anonymizedAt) }) }}
+          </p>
+        </div>
+        <div class="flex items-center gap-2">
+          <a
+            v-if="canManage"
+            :href="`/clients/${client.id}/export`"
+            class="text-sm font-medium text-brand hover:underline"
+          >
+            {{ t('clients.gdpr.export') }}
+          </a>
+          <BaseButton
+            v-if="canAnonymize && !client.anonymizedAt"
+            variant="danger"
+            size="sm"
+            @click="isAnonymizeModalOpen = true"
+          >
+            {{ t('clients.gdpr.anonymize') }}
+          </BaseButton>
+        </div>
+      </div>
+    </BaseCard>
 
     <!-- Reservation history -->
     <BaseCard class="mt-4">

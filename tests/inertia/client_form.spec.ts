@@ -16,6 +16,7 @@ vi.mock('@inertiajs/vue3', () => ({
     navigationPermitType: '',
     status: 'active',
     notes: '',
+    gdprConsent: false,
     errors: {},
     processing: false,
     post: mockFormPost,
@@ -23,6 +24,13 @@ vi.mock('@inertiajs/vue3', () => ({
     reset: mockFormReset,
   }),
   usePage: () => ({ props: { appT: {}, locale: 'en' } }),
+}))
+
+vi.mock('~/components/base/BaseCheckbox.vue', () => ({
+  default: {
+    template: '<label>{{ label }}<input type="checkbox" :name="name" /></label>',
+    props: ['label', 'hint', 'error', 'id', 'name', 'modelValue', 'disabled'],
+  },
 }))
 
 vi.mock('~/components/base/BaseButton.vue', () => ({
@@ -108,6 +116,12 @@ describe('ClientForm', () => {
   test('displays create title when no client prop', () => {
     const wrapper = mount(ClientForm)
     expect(wrapper.text()).toContain('clients.form.createTitle')
+  })
+
+  test('renders the GDPR consent checkbox', () => {
+    const wrapper = mount(ClientForm)
+    expect(wrapper.text()).toContain('clients.gdpr.consentLabel')
+    expect(wrapper.find('input[name="gdprConsent"]').exists()).toBe(true)
   })
 
   test('displays edit title when client prop provided', () => {

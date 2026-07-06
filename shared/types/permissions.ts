@@ -17,6 +17,7 @@ export type Capability =
   | 'clients.create'
   | 'clients.update'
   | 'clients.delete'
+  | 'clients.anonymize'
   | 'crew.create'
   | 'crew.update'
   | 'crew.delete'
@@ -70,6 +71,7 @@ const ADMIN_ONLY_CAPABILITIES: Capability[] = [
   'branding.configure',
   'boats.delete',
   'clients.delete',
+  'clients.anonymize',
   'crew.delete',
   'fuel_logs.delete',
   'incidents.delete',
