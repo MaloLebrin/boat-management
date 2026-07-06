@@ -10,12 +10,43 @@ import { createAdminUser } from '#tests/functional/helpers'
 import RentalContract from '#models/rental_contract'
 import Organization from '#models/organization'
 import RentalContractPdfService from '#services/rental_contract_pdf_service'
+import { CloudinaryService } from '#services/cloudinary_service'
+import Media from '#models/media'
 import OrganizationMembership from '#models/organization_membership'
 
 async function createMemberUser(organizationId: number) {
   const member = await UserFactory.merge({ organizationId }).create()
   await OrganizationMembership.create({ userId: member.id, organizationId, role: 'member' })
   return member
+}
+
+function swapFakeCloudinaryUpload() {
+  const uploadedPublicIds: string[] = []
+  const deletedPublicIds: string[] = []
+  app.container.swap(
+    CloudinaryService,
+    () =>
+      ({
+        uploadDocument: async () => {
+          const publicId = `fake-public-id-${uploadedPublicIds.length}`
+          uploadedPublicIds.push(publicId)
+          return {
+            publicId,
+            url: `http://res.cloudinary.com/${publicId}.pdf`,
+            secureUrl: `https://res.cloudinary.com/${publicId}.pdf`,
+            format: 'pdf',
+            resourceType: 'raw',
+            bytes: 1234,
+            originalFilename: 'signed-contract',
+          }
+        },
+        deleteFile: async (publicId: string) => {
+          deletedPublicIds.push(publicId)
+        },
+        deleteFolder: async () => {},
+      }) as unknown as CloudinaryService
+  )
+  return { uploadedPublicIds, deletedPublicIds }
 }
 
 test.group('Rental contracts (functional)', (group) => {
@@ -272,59 +303,139 @@ test.group('Rental contracts (functional)', (group) => {
     assert.equal(contract.status, 'draft')
   })
 
-  // --- sign ---
+  // --- sign (signed document upload) ---
 
   test('POST .../contract/sign refuses to sign a draft contract', async ({ client, assert }) => {
-    const user = await createAdminUser()
-    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
-    const reservation = await BoatReservationFactory.merge({
-      boatId: boat.id,
-      organizationId: boat.organizationId,
-    }).create()
+    swapFakeCloudinaryUpload()
+    try {
+      const user = await createAdminUser()
+      const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+      const reservation = await BoatReservationFactory.merge({
+        boatId: boat.id,
+        organizationId: boat.organizationId,
+      }).create()
 
-    await client.post(`/boats/${boat.id}/reservations/${reservation.id}/contract`).loginAs(user)
+      await client.post(`/boats/${boat.id}/reservations/${reservation.id}/contract`).loginAs(user)
 
-    const response = await client
-      .post(`/boats/${boat.id}/reservations/${reservation.id}/contract/sign`)
-      .loginAs(user)
-      .redirects(0)
+      const response = await client
+        .post(`/boats/${boat.id}/reservations/${reservation.id}/contract/sign`)
+        .loginAs(user)
+        .file('file', Buffer.from('%PDF-1.4 fake'), {
+          filename: 'signed.pdf',
+          contentType: 'application/pdf',
+        })
+        .redirects(0)
 
-    response.assertStatus(302)
-    response.assertFlashMessage('error', 'This status change is not allowed.')
+      response.assertStatus(302)
+      response.assertFlashMessage('error', 'This status change is not allowed.')
 
-    const contract = await RentalContract.query()
-      .where('reservationId', reservation.id)
-      .firstOrFail()
-    assert.equal(contract.status, 'draft')
+      const contract = await RentalContract.query()
+        .where('reservationId', reservation.id)
+        .firstOrFail()
+      assert.equal(contract.status, 'draft')
+      assert.isNull(contract.mediaId)
+    } finally {
+      app.container.restore(CloudinaryService)
+    }
   })
 
-  test('POST .../contract/sign marks a sent contract as signed', async ({ client, assert }) => {
-    const user = await createAdminUser()
-    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
-    const reservation = await BoatReservationFactory.merge({
-      boatId: boat.id,
-      organizationId: boat.organizationId,
-      clientEmail: 'client@example.com',
-    }).create()
+  test('POST .../contract/sign uploads the signed document and marks the contract as signed', async ({
+    client,
+    assert,
+  }) => {
+    swapFakeCloudinaryUpload()
+    try {
+      const user = await createAdminUser()
+      const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+      const reservation = await BoatReservationFactory.merge({
+        boatId: boat.id,
+        organizationId: boat.organizationId,
+        clientEmail: 'client@example.com',
+      }).create()
 
-    await client.post(`/boats/${boat.id}/reservations/${reservation.id}/contract`).loginAs(user)
-    await client
-      .post(`/boats/${boat.id}/reservations/${reservation.id}/contract/send`)
-      .loginAs(user)
+      await client.post(`/boats/${boat.id}/reservations/${reservation.id}/contract`).loginAs(user)
+      await client
+        .post(`/boats/${boat.id}/reservations/${reservation.id}/contract/send`)
+        .loginAs(user)
 
-    const response = await client
-      .post(`/boats/${boat.id}/reservations/${reservation.id}/contract/sign`)
-      .loginAs(user)
-      .redirects(0)
+      const response = await client
+        .post(`/boats/${boat.id}/reservations/${reservation.id}/contract/sign`)
+        .loginAs(user)
+        .file('file', Buffer.from('%PDF-1.4 fake'), {
+          filename: 'signed.pdf',
+          contentType: 'application/pdf',
+        })
+        .redirects(0)
 
-    response.assertStatus(302)
-    response.assertFlashMessage('success', 'Contract marked as signed.')
+      response.assertStatus(302)
+      response.assertFlashMessage('success', 'Contract marked as signed.')
 
-    const contract = await RentalContract.query()
-      .where('reservationId', reservation.id)
-      .firstOrFail()
-    assert.equal(contract.status, 'signed')
-    assert.isNotNull(contract.signedAt)
+      const contract = await RentalContract.query()
+        .where('reservationId', reservation.id)
+        .firstOrFail()
+      assert.equal(contract.status, 'signed')
+      assert.isNotNull(contract.signedAt)
+      assert.isNotNull(contract.mediaId)
+
+      const media = await Media.findOrFail(contract.mediaId!)
+      assert.equal(media.entityType, 'rentalContract')
+      assert.equal(media.entityId, contract.id)
+    } finally {
+      app.container.restore(CloudinaryService)
+    }
+  })
+
+  test('POST .../contract/sign replaces a previously uploaded signed document', async ({
+    client,
+    assert,
+  }) => {
+    const { deletedPublicIds } = swapFakeCloudinaryUpload()
+    try {
+      const user = await createAdminUser()
+      const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+      const reservation = await BoatReservationFactory.merge({
+        boatId: boat.id,
+        organizationId: boat.organizationId,
+        clientEmail: 'client@example.com',
+      }).create()
+
+      await client.post(`/boats/${boat.id}/reservations/${reservation.id}/contract`).loginAs(user)
+      await client
+        .post(`/boats/${boat.id}/reservations/${reservation.id}/contract/send`)
+        .loginAs(user)
+      await client
+        .post(`/boats/${boat.id}/reservations/${reservation.id}/contract/sign`)
+        .loginAs(user)
+        .file('file', Buffer.from('%PDF-1.4 first'), {
+          filename: 'signed-1.pdf',
+          contentType: 'application/pdf',
+        })
+
+      const firstContract = await RentalContract.query()
+        .where('reservationId', reservation.id)
+        .firstOrFail()
+      const firstMediaId = firstContract.mediaId
+
+      const response = await client
+        .post(`/boats/${boat.id}/reservations/${reservation.id}/contract/sign`)
+        .loginAs(user)
+        .file('file', Buffer.from('%PDF-1.4 second'), {
+          filename: 'signed-2.pdf',
+          contentType: 'application/pdf',
+        })
+        .redirects(0)
+
+      response.assertStatus(302)
+
+      const contract = await RentalContract.query()
+        .where('reservationId', reservation.id)
+        .firstOrFail()
+      assert.notEqual(contract.mediaId, firstMediaId)
+      assert.isNull(await Media.find(firstMediaId!))
+      assert.lengthOf(deletedPublicIds, 1)
+    } finally {
+      app.container.restore(CloudinaryService)
+    }
   })
 
   // --- destroy ---
@@ -370,5 +481,49 @@ test.group('Rental contracts (functional)', (group) => {
 
     const existing = await RentalContract.query().where('reservationId', reservation.id).first()
     assert.isNull(existing)
+  })
+
+  test('DELETE .../contract also deletes the uploaded signed document', async ({
+    client,
+    assert,
+  }) => {
+    const { deletedPublicIds } = swapFakeCloudinaryUpload()
+    try {
+      const admin = await createAdminUser()
+      const boat = await BoatFactory.merge({ organizationId: admin.organizationId! }).create()
+      const reservation = await BoatReservationFactory.merge({
+        boatId: boat.id,
+        organizationId: boat.organizationId,
+        clientEmail: 'client@example.com',
+      }).create()
+
+      await client.post(`/boats/${boat.id}/reservations/${reservation.id}/contract`).loginAs(admin)
+      await client
+        .post(`/boats/${boat.id}/reservations/${reservation.id}/contract/send`)
+        .loginAs(admin)
+      await client
+        .post(`/boats/${boat.id}/reservations/${reservation.id}/contract/sign`)
+        .loginAs(admin)
+        .file('file', Buffer.from('%PDF-1.4 fake'), {
+          filename: 'signed.pdf',
+          contentType: 'application/pdf',
+        })
+
+      const contract = await RentalContract.query()
+        .where('reservationId', reservation.id)
+        .firstOrFail()
+      const mediaId = contract.mediaId!
+
+      const response = await client
+        .delete(`/boats/${boat.id}/reservations/${reservation.id}/contract`)
+        .loginAs(admin)
+        .redirects(0)
+
+      response.assertStatus(302)
+      assert.isNull(await Media.find(mediaId))
+      assert.lengthOf(deletedPublicIds, 1)
+    } finally {
+      app.container.restore(CloudinaryService)
+    }
   })
 })

@@ -1223,12 +1223,12 @@ export interface Registry {
     methods: ["POST"]
     pattern: '/boats/:boatId/reservations/:reservationId/contract/sign'
     types: {
-      body: {}
+      body: ExtractBody<InferInput<(typeof import('#validators/rental_contract').storeSignedRentalContractValidator)>>
       paramsTuple: [ParamValue, ParamValue]
       params: { boatId: ParamValue; reservationId: ParamValue }
-      query: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/rental_contract').storeSignedRentalContractValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/rental_contracts_controller').default['sign']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/rental_contracts_controller').default['sign']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/rental_contracts_controller').default['sign']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'boats.reservations.contract.destroy': {

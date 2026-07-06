@@ -18,5 +18,7 @@ export function toRentalContractRow(contract: RentalContract, boat: Boat): Renta
     clientEmail: contract.client?.email ?? reservation.clientEmail,
     reservationStart: reservation.startsAt.toISO()!,
     reservationEnd: reservation.endsAt.toISO()!,
+    mediaSecureUrl: contract.media?.secureUrl ?? null,
+    mediaFilename: contract.media?.originalFilename ?? null,
   }
 }

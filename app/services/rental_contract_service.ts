@@ -6,7 +6,9 @@ import {
 import RentalContract from '#models/rental_contract'
 import Client from '#models/client'
 import type BoatReservation from '#models/boat_reservation'
+import type Organization from '#models/organization'
 import type User from '#models/user'
+import MediaService from '#services/media_service'
 import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
 
@@ -29,6 +31,8 @@ function isReservationConflict(error: unknown): boolean {
 
 @inject()
 export default class RentalContractService {
+  constructor(private mediaService: MediaService) {}
+
   async findForReservation(
     user: User,
     reservation: BoatReservation
@@ -39,6 +43,7 @@ export default class RentalContractService {
       .where('reservationId', reservation.id)
       .preload('reservation', (q) => q.preload('boat'))
       .preload('client')
+      .preload('media')
       .first()
   }
 
@@ -90,21 +95,35 @@ export default class RentalContractService {
     return contract
   }
 
-  async markSigned(contract: RentalContract): Promise<RentalContract> {
-    if (contract.status !== 'sent') {
+  /**
+   * Attaches the uploaded signed contract document and marks the contract as
+   * signed. Allowed once the contract has been sent; re-uploading while
+   * already signed replaces the document without resetting `signedAt`.
+   */
+  async attachSignedDocument(contract: RentalContract, mediaId: number): Promise<RentalContract> {
+    if (contract.status === 'draft') {
       throw new RentalContractInvalidTransitionError()
     }
+    contract.mediaId = mediaId
     contract.status = 'signed'
-    contract.signedAt = DateTime.now()
+    contract.signedAt ??= DateTime.now()
     await contract.save()
     return contract
   }
 
-  async deleteForReservation(user: User, reservation: BoatReservation): Promise<void> {
+  async deleteForReservation(
+    user: User,
+    reservation: BoatReservation,
+    org?: Organization
+  ): Promise<void> {
     assertReservationScope(user, reservation)
 
     const contract = await RentalContract.query().where('reservationId', reservation.id).first()
     if (!contract) throw new RentalContractNotFoundError()
+
+    if (org && contract.mediaId) {
+      await this.mediaService.deleteForEntity(contract.mediaId, 'rentalContract', contract.id, org)
+    }
 
     await contract.delete()
   }

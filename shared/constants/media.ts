@@ -7,6 +7,7 @@ export const MEDIA_ENTITY_TYPES = [
   'boat_maintenance_event',
   'boat_document',
   'inspection',
+  'rentalContract',
   'user',
 ] as const
 

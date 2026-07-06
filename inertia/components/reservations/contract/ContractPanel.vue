@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { router } from '@inertiajs/vue3'
+import { router, useForm } from '@inertiajs/vue3'
+import { ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import ContractStatusBadge from '~/components/reservations/contract/ContractStatusBadge.vue'
@@ -20,6 +21,9 @@ const { formatDate } = useReservationFormat()
 
 const basePath = `/boats/${props.boatId}/reservations/${props.reservationId}/contract`
 
+const fileInput = ref<HTMLInputElement>()
+const signForm = useForm({ file: null as File | null })
+
 function generate() {
   router.post(basePath, {}, { preserveScroll: true })
 }
@@ -28,8 +32,21 @@ function send() {
   router.post(`${basePath}/send`, {}, { preserveScroll: true })
 }
 
-function sign() {
-  router.post(`${basePath}/sign`, {}, { preserveScroll: true })
+function onSignedFileChange(e: Event) {
+  const input = e.target as HTMLInputElement
+  signForm.file = input.files?.[0] ?? null
+  if (signForm.file) submitSignedDocument()
+}
+
+function submitSignedDocument() {
+  signForm.post(`${basePath}/sign`, {
+    forceFormData: true,
+    preserveScroll: true,
+    onSuccess: () => {
+      signForm.reset()
+      if (fileInput.value) fileInput.value.value = ''
+    },
+  })
 }
 
 function destroy() {
@@ -71,6 +88,17 @@ function destroy() {
       </BaseButton>
 
       <BaseButton
+        v-if="contract && contract.mediaSecureUrl"
+        variant="secondary"
+        size="sm"
+        :href="contract.mediaSecureUrl"
+        target="_blank"
+        rel="noopener"
+      >
+        {{ t('rentalContracts.actions.viewSigned') }}
+      </BaseButton>
+
+      <BaseButton
         v-if="contract && contract.status === 'draft' && canEdit"
         variant="primary"
         size="sm"
@@ -79,14 +107,30 @@ function destroy() {
         {{ t('rentalContracts.actions.send') }}
       </BaseButton>
 
-      <BaseButton
-        v-if="contract && contract.status === 'sent' && canEdit"
-        variant="primary"
-        size="sm"
-        @click="sign"
+      <template
+        v-if="contract && (contract.status === 'sent' || contract.status === 'signed') && canEdit"
       >
-        {{ t('rentalContracts.actions.sign') }}
-      </BaseButton>
+        <input
+          ref="fileInput"
+          type="file"
+          accept="application/pdf,.pdf"
+          class="hidden"
+          @change="onSignedFileChange"
+        />
+        <BaseButton
+          variant="primary"
+          size="sm"
+          type="button"
+          :disabled="signForm.processing"
+          @click="fileInput?.click()"
+        >
+          {{
+            contract.status === 'signed'
+              ? t('rentalContracts.actions.replaceSigned')
+              : t('rentalContracts.actions.uploadSigned')
+          }}
+        </BaseButton>
+      </template>
 
       <BaseButton v-if="contract && canDelete" variant="danger" size="sm" @click="destroy">
         {{ t('rentalContracts.actions.delete') }}

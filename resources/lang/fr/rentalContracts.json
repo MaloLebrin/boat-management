@@ -10,7 +10,9 @@
     "generate": "Générer le contrat",
     "download": "Télécharger le PDF",
     "send": "Envoyer au client",
-    "sign": "Marquer comme signé",
+    "uploadSigned": "Envoyer le contrat signé",
+    "replaceSigned": "Remplacer le contrat signé",
+    "viewSigned": "Voir le contrat signé",
     "delete": "Supprimer",
     "confirmDelete": "Supprimer ce contrat ?"
   },

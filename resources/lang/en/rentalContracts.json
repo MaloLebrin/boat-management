@@ -10,7 +10,9 @@
     "generate": "Generate contract",
     "download": "Download PDF",
     "send": "Send to client",
-    "sign": "Mark as signed",
+    "uploadSigned": "Upload signed contract",
+    "replaceSigned": "Replace signed contract",
+    "viewSigned": "View signed contract",
     "delete": "Delete",
     "confirmDelete": "Delete this contract?"
   },

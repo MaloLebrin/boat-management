@@ -10,7 +10,10 @@ import RentalContractService from '#services/rental_contract_service'
 import RentalContractPdfService from '#services/rental_contract_pdf_service'
 import EmailQueueService from '#services/email_queue_service'
 import OrganizationService from '#services/organization_service'
+import MediaService from '#services/media_service'
+import { CloudinaryFolders } from '#services/cloudinary_service'
 import RentalContractPolicy from '#policies/rental_contract_policy'
+import { storeSignedRentalContractValidator } from '#validators/rental_contract'
 import { toRentalContractRow } from '#transformers/rental_contract_transformer'
 import { toBoatReservationRow } from '#transformers/boat_reservation_transformer'
 import { inject } from '@adonisjs/core'
@@ -27,7 +30,8 @@ export default class RentalContractsController {
     private contractService: RentalContractService,
     private pdfService: RentalContractPdfService,
     private emailQueueService: EmailQueueService,
-    private organizationService: OrganizationService
+    private organizationService: OrganizationService,
+    private mediaService: MediaService
   ) {}
 
   private async resolve(
@@ -199,7 +203,7 @@ export default class RentalContractsController {
     return response.redirect().back()
   }
 
-  async sign({ response, auth, params, bouncer, session, i18n }: HttpContext) {
+  async sign({ request, response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
@@ -220,8 +224,28 @@ export default class RentalContractsController {
       return response.redirect(`/boats/${boat.id}/reservations/${reservation.id}/contract`)
     }
 
+    const payload = await request.validateUsing(storeSignedRentalContractValidator)
+    const org = await this.organizationService.findOrFail(boat.organizationId)
+
+    // Replace the previously uploaded document, if any, so re-signing keeps a single file.
+    if (contract.mediaId) {
+      await this.mediaService.deleteForEntity(contract.mediaId, 'rentalContract', contract.id, org)
+    }
+
+    const media = await this.mediaService.upload(
+      user,
+      payload.file,
+      {
+        folder: CloudinaryFolders.rentalContractSignedDocument(org.slug, boat.id, reservation.id),
+        entityType: 'rentalContract',
+        entityId: contract.id,
+        kind: 'document',
+      },
+      org
+    )
+
     try {
-      await this.contractService.markSigned(contract)
+      await this.contractService.attachSignedDocument(contract, media.id)
     } catch (error) {
       if (error instanceof RentalContractInvalidTransitionError) {
         session.flash('error', i18n.t('flash.rentalContracts.invalidTransition'))
@@ -249,8 +273,10 @@ export default class RentalContractsController {
     const { boat, reservation } = loaded
     await bouncer.with(RentalContractPolicy).authorize('delete', reservation)
 
+    const org = await this.organizationService.findOrFail(boat.organizationId)
+
     try {
-      await this.contractService.deleteForReservation(user, reservation)
+      await this.contractService.deleteForReservation(user, reservation, org)
     } catch (error) {
       if (error instanceof RentalContractNotFoundError) {
         session.flash('error', i18n.t('flash.rentalContracts.notFound'))

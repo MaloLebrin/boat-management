@@ -13,4 +13,6 @@ export interface RentalContractRow {
   clientEmail: string | null
   reservationStart: string
   reservationEnd: string
+  mediaSecureUrl: string | null
+  mediaFilename: string | null
 }
