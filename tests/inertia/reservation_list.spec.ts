@@ -120,18 +120,19 @@ describe('ReservationList', () => {
     expect(wrapper.findAll('button')).toHaveLength(0)
   })
 
-  test('shows edit and delete buttons when canManage is true', () => {
+  test('shows action buttons (inspection, contract, edit, delete) when canManage is true', () => {
     const wrapper = mount(ReservationList, {
       props: { boatId: 5, reservations: [row], canManage: true },
     })
-    expect(wrapper.findAll('button')).toHaveLength(2)
+    expect(wrapper.findAll('button')).toHaveLength(4)
   })
 
   test('delete calls router.delete with correct URL after confirm', async () => {
     const wrapper = mount(ReservationList, {
       props: { boatId: 5, reservations: [row], canManage: true },
     })
-    await wrapper.findAll('button')[1].trigger('click')
+    const buttons = wrapper.findAll('button')
+    await buttons[buttons.length - 1].trigger('click')
     expect(mockRouterDelete).toHaveBeenCalledWith('/boats/5/reservations/1', {
       preserveScroll: true,
     })
@@ -142,7 +143,8 @@ describe('ReservationList', () => {
     const wrapper = mount(ReservationList, {
       props: { boatId: 5, reservations: [row], canManage: true },
     })
-    await wrapper.findAll('button')[1].trigger('click')
+    const buttons = wrapper.findAll('button')
+    await buttons[buttons.length - 1].trigger('click')
     expect(mockRouterDelete).not.toHaveBeenCalled()
   })
 })
