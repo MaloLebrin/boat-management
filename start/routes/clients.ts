@@ -9,5 +9,16 @@ router
     router.post('clients', [controllers.Clients, 'store']).as('clients.store')
     router.put('clients/:id', [controllers.Clients, 'update']).as('clients.update')
     router.delete('clients/:id', [controllers.Clients, 'destroy']).as('clients.destroy')
+
+    // Documents (CRM 2/4 — #274)
+    router
+      .post('clients/:id/documents', [controllers.ClientMedia, 'storeDocument'])
+      .as('clients.documents.store')
+    router
+      .delete('clients/:id/media/:mediaId', [controllers.ClientMedia, 'destroy'])
+      .as('clients.media.destroy')
+    router
+      .get('clients/:id/media/:mediaId/download', [controllers.ClientMedia, 'downloadMedia'])
+      .as('clients.media.download')
   })
   .use(middleware.auth())

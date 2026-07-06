@@ -165,7 +165,11 @@
     "created": "Client créé.",
     "updated": "Client mis à jour.",
     "deleted": "Client supprimé.",
-    "notFound": "Client introuvable."
+    "notFound": "Client introuvable.",
+    "documentAdded": "Document ajouté.",
+    "documentDeleted": "Document supprimé.",
+    "anonymized": "Client anonymisé.",
+    "alreadyAnonymized": "Ce client est déjà anonymisé."
   },
   "invoices": {
     "created": "Facture créée.",

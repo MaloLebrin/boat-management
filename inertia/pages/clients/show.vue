@@ -3,16 +3,20 @@ import { Link } from '@adonisjs/inertia/vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseEmptyState from '~/components/base/BaseEmptyState.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
+import ClientDocuments from '~/components/clients/ClientDocuments.vue'
 import ClientStatusBadge from '~/components/clients/ClientStatusBadge.vue'
 import ReservationStatusBadge from '~/components/reservations/ReservationStatusBadge.vue'
 import { useReservationFormat } from '~/composables/use_reservation_format'
 import { useT } from '~/composables/use_t'
 import type { ClientRow } from '../../../shared/types/client'
 import type { BoatReservationRow } from '../../../shared/types/reservation'
+import type { MediaRow } from '~/types/boat_show'
 
-defineProps<{
+const props = defineProps<{
   client: ClientRow
   reservations: BoatReservationRow[]
+  documents: MediaRow[]
+  canManage: boolean
 }>()
 
 const { t } = useT()
@@ -59,6 +63,14 @@ const { formatDate } = useReservationFormat()
         {{ client.notes }}
       </p>
     </BaseCard>
+
+    <!-- Documents -->
+    <ClientDocuments
+      :client-id="client.id"
+      :client-name="client.fullName"
+      :documents="documents"
+      :can-manage="canManage"
+    />
 
     <!-- Reservation history -->
     <BaseCard class="mt-4">

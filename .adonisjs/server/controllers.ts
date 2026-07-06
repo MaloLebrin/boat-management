@@ -28,6 +28,7 @@ export const controllers = {
   BoatSimulator: () => import('#controllers/boat_simulator_controller'),
   Boats: () => import('#controllers/boats_controller'),
   Budget: () => import('#controllers/budget_controller'),
+  ClientMedia: () => import('#controllers/client_media_controller'),
   Clients: () => import('#controllers/clients_controller'),
   CrewCertifications: () => import('#controllers/crew_certifications_controller'),
   CrewMembers: () => import('#controllers/crew_members_controller'),

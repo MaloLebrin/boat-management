@@ -1,6 +1,8 @@
 import { ClientNotFoundError } from '#exceptions/client_errors'
 import Client from '#models/client'
 import { toClientRow } from '#transformers/client_transformer'
+import MediaService from '#services/media_service'
+import { CloudinaryFolders } from '#services/cloudinary_service'
 import {
   clampInt,
   escapeLike,
@@ -8,6 +10,7 @@ import {
   toIntegerOrUndefined,
   toTrimmedStringOrUndefined,
 } from '#shared/helpers/query'
+import { inject } from '@adonisjs/core'
 import type Organization from '#models/organization'
 import type {
   ClientListFilters,
@@ -38,7 +41,10 @@ function mapSortColumn(sort: ClientSortField): string {
   }
 }
 
+@inject()
 export default class ClientService {
+  constructor(private mediaService: MediaService) {}
+
   normalizeFilters(qs: Record<string, unknown>): ClientListFilters {
     const q = toTrimmedStringOrUndefined(qs.q) ?? ''
     const status = normalizeEnum(qs.status, VALID_STATUSES, '' as const)
@@ -156,7 +162,14 @@ export default class ClientService {
     return client
   }
 
-  async delete(client: Client): Promise<void> {
+  async delete(org: Organization, client: Client): Promise<void> {
+    // Cleanup attached documents (Cloudinary + storage quota) before deleting the row.
+    await this.mediaService.deleteAllForEntity(
+      'client',
+      client.id,
+      CloudinaryFolders.clientDocuments(org.slug, client.id),
+      org
+    )
     await client.delete()
   }
 
