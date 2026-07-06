@@ -3,6 +3,13 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-07-06 — [#280] Corrige le 500 sur un paramètre de route `:id` non numérique
+
+Un paramètre de route d'identifiant non numérique (`PUT /clients/not-a-number`, `GET /boats/abc`…) produisait un **500** au lieu d'un **404** : les contrôleurs font `Number(params.id)`, `Number('not-a-number') = NaN` était transmis à `where('id', NaN)` → PostgreSQL levait `invalid input syntax for type integer: NaN`, exception non attrapée (pas un `NotFoundError`).
+
+- **Routing** : nouveau module `start/routes/_matchers.ts` (importé en premier dans `start/routes.ts`) enregistre un **matcher numérique global** (`router.where(param, router.matchers.number())`) pour tous les paramètres de route d'identifiant en base (`id`, `boatId`, `reservationId`, `engineId`, `portId`, `mediaId`, `partId`, `logId`, `itemId`, `pontoonId`, `mouillageId`, `inspectionId`, `sheetId`, `sailId`, `taskId`, `stayId`, `memberId`, `incidentId`, `entryId`, `documentId`, `eventId`, `certId`). Un segment non numérique ne matche plus la route → **404 natif**. Les paramètres non numériques (`:token` partage simulateur, `:name` preview d'email) sont volontairement exclus.
+- **Tests** : `tests/functional/routing/numeric_id_matcher.spec.ts` — `:id`/`:boatId` non numérique → 404 sur les ressources principales (boats, clients, crew), et un `:id` numérique valide continue de matcher la route (pas de sur-blocage).
+
 ## 2026-07-06 — [#291] Corrige les retours de code review sur la signature du contrat de location
 
 Corrige trois problèmes relevés en review sur #291 :

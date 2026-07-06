@@ -8,6 +8,7 @@
 |
 */
 
+import './routes/_matchers.js'
 import './routes/home.js'
 import './routes/boats.js'
 import './routes/ports.js'
