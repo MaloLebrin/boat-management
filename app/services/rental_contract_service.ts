@@ -96,14 +96,24 @@ export default class RentalContractService {
   }
 
   /**
+   * Throws if the contract cannot receive a signed document yet. Callers should
+   * check this before uploading a replacement file, so an invalid transition
+   * is rejected without deleting the existing document or leaving an orphaned
+   * upload behind.
+   */
+  assertCanAttachSignedDocument(contract: RentalContract): void {
+    if (contract.status === 'draft') {
+      throw new RentalContractInvalidTransitionError()
+    }
+  }
+
+  /**
    * Attaches the uploaded signed contract document and marks the contract as
    * signed. Allowed once the contract has been sent; re-uploading while
    * already signed replaces the document without resetting `signedAt`.
    */
   async attachSignedDocument(contract: RentalContract, mediaId: number): Promise<RentalContract> {
-    if (contract.status === 'draft') {
-      throw new RentalContractInvalidTransitionError()
-    }
+    this.assertCanAttachSignedDocument(contract)
     contract.mediaId = mediaId
     contract.status = 'signed'
     contract.signedAt ??= DateTime.now()

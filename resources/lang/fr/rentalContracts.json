@@ -18,6 +18,12 @@
   },
   "signedAt": "Signé le {date}",
   "createdAt": "Créé le {date}",
+  "email": {
+    "subject": "Contrat de location — {boatName} — {orgName}",
+    "greeting": "Bonjour,",
+    "body": "Veuillez trouver ci-joint le contrat de location pour {boatName}.",
+    "signature": "Cordialement,\n{orgName}"
+  },
   "pdf": {
     "title": "Contrat de location",
     "generatedOn": "Généré le {date}",

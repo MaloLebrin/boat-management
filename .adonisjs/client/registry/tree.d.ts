@@ -112,6 +112,7 @@ export interface ApiDefinition {
         show: typeof routes['boats.reservations.contract.show']
         store: typeof routes['boats.reservations.contract.store']
         pdf: typeof routes['boats.reservations.contract.pdf']
+        signedDocument: typeof routes['boats.reservations.contract.signedDocument']
         send: typeof routes['boats.reservations.contract.send']
         sign: typeof routes['boats.reservations.contract.sign']
         destroy: typeof routes['boats.reservations.contract.destroy']

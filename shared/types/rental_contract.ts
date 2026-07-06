@@ -13,6 +13,6 @@ export interface RentalContractRow {
   clientEmail: string | null
   reservationStart: string
   reservationEnd: string
-  mediaSecureUrl: string | null
+  hasSignedDocument: boolean
   mediaFilename: string | null
 }

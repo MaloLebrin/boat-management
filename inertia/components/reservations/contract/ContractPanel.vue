@@ -88,10 +88,10 @@ function destroy() {
       </BaseButton>
 
       <BaseButton
-        v-if="contract && contract.mediaSecureUrl"
+        v-if="contract && contract.hasSignedDocument"
         variant="secondary"
         size="sm"
-        :href="contract.mediaSecureUrl"
+        :href="`${basePath}/signed-document`"
         target="_blank"
         rel="noopener"
       >

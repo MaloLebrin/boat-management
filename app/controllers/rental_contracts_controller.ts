@@ -11,7 +11,7 @@ import RentalContractPdfService from '#services/rental_contract_pdf_service'
 import EmailQueueService from '#services/email_queue_service'
 import OrganizationService from '#services/organization_service'
 import MediaService from '#services/media_service'
-import { CloudinaryFolders } from '#services/cloudinary_service'
+import { CloudinaryFolders, CloudinaryService } from '#services/cloudinary_service'
 import RentalContractPolicy from '#policies/rental_contract_policy'
 import { storeSignedRentalContractValidator } from '#validators/rental_contract'
 import { toRentalContractRow } from '#transformers/rental_contract_transformer'
@@ -22,6 +22,15 @@ import type Boat from '#models/boat'
 import type BoatReservation from '#models/boat_reservation'
 import type User from '#models/user'
 
+function buildContentDisposition(filename: string, format: string): string {
+  const full = `${filename}.${format}`
+  // Strip control characters (CR, LF, NUL, etc.) and quotes to prevent header splitting
+  // eslint-disable-next-line no-control-regex
+  const ascii = full.replace(/[\x00-\x1f\x7f"\\]/g, '_')
+  const encoded = encodeURIComponent(full)
+  return `attachment; filename="${ascii}"; filename*=UTF-8''${encoded}`
+}
+
 @inject()
 export default class RentalContractsController {
   constructor(
@@ -31,7 +40,8 @@ export default class RentalContractsController {
     private pdfService: RentalContractPdfService,
     private emailQueueService: EmailQueueService,
     private organizationService: OrganizationService,
-    private mediaService: MediaService
+    private mediaService: MediaService,
+    private cloudinaryService: CloudinaryService
   ) {}
 
   private async resolve(
@@ -155,6 +165,43 @@ export default class RentalContractsController {
     return response.send(buffer)
   }
 
+  async downloadSignedDocument({ response, auth, params, bouncer, session, i18n }: HttpContext) {
+    await auth.authenticate()
+    const user = auth.getUserOrFail()
+
+    const loaded = await this.resolve(
+      user,
+      Number(params.boatId),
+      Number(params.reservationId),
+      response
+    )
+    if (!loaded) return
+
+    const { boat, reservation } = loaded
+    await bouncer.with(RentalContractPolicy).authorize('view', reservation)
+
+    const contract = await this.contractService.findForReservation(user, reservation)
+    const media = contract?.media
+    if (!media) {
+      session.flash('error', i18n.t('flash.rentalContracts.notFound'))
+      return response.redirect(`/boats/${boat.id}/reservations/${reservation.id}/contract`)
+    }
+
+    const resourceType = media.format === 'pdf' ? 'raw' : 'image'
+    const { buffer, contentType } = await this.cloudinaryService.downloadAsBuffer(
+      media.cloudinaryPublicId,
+      resourceType,
+      media.format
+    )
+
+    response.header('Content-Type', contentType)
+    response.header(
+      'Content-Disposition',
+      buildContentDisposition(media.originalFilename, media.format)
+    )
+    return response.send(buffer)
+  }
+
   async send({ response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
@@ -182,13 +229,6 @@ export default class RentalContractsController {
       return response.redirect().back()
     }
 
-    await this.emailQueueService.sendRentalContract({
-      contractId: contract.id,
-      organizationId: boat.organizationId,
-      to: clientEmail,
-      locale: i18n.locale,
-    })
-
     try {
       await this.contractService.markSent(contract)
     } catch (error) {
@@ -198,6 +238,13 @@ export default class RentalContractsController {
       }
       throw error
     }
+
+    await this.emailQueueService.sendRentalContract({
+      contractId: contract.id,
+      organizationId: boat.organizationId,
+      to: clientEmail,
+      locale: i18n.locale,
+    })
 
     session.flash('success', i18n.t('flash.rentalContracts.sent'))
     return response.redirect().back()
@@ -222,6 +269,16 @@ export default class RentalContractsController {
     if (!contract) {
       session.flash('error', i18n.t('flash.rentalContracts.notFound'))
       return response.redirect(`/boats/${boat.id}/reservations/${reservation.id}/contract`)
+    }
+
+    try {
+      this.contractService.assertCanAttachSignedDocument(contract)
+    } catch (error) {
+      if (error instanceof RentalContractInvalidTransitionError) {
+        session.flash('error', i18n.t('flash.rentalContracts.invalidTransition'))
+        return response.redirect().back()
+      }
+      throw error
     }
 
     const payload = await request.validateUsing(storeSignedRentalContractValidator)

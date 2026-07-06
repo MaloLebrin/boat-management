@@ -312,6 +312,12 @@ router
       ])
       .as('boats.reservations.contract.pdf')
     router
+      .get('boats/:boatId/reservations/:reservationId/contract/signed-document', [
+        controllers.RentalContracts,
+        'downloadSignedDocument',
+      ])
+      .as('boats.reservations.contract.signedDocument')
+    router
       .post('boats/:boatId/reservations/:reservationId/contract/send', [
         controllers.RentalContracts,
         'send',

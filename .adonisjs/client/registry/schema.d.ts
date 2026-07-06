@@ -1207,6 +1207,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/rental_contracts_controller').default['downloadPdf']>>>
     }
   }
+  'boats.reservations.contract.signedDocument': {
+    methods: ["GET","HEAD"]
+    pattern: '/boats/:boatId/reservations/:reservationId/contract/signed-document'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; reservationId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/rental_contracts_controller').default['downloadSignedDocument']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/rental_contracts_controller').default['downloadSignedDocument']>>>
+    }
+  }
   'boats.reservations.contract.send': {
     methods: ["POST"]
     pattern: '/boats/:boatId/reservations/:reservationId/contract/send'

@@ -606,6 +606,12 @@ const routes = {
     tokens: [{"old":"/boats/:boatId/reservations/:reservationId/contract/pdf","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/reservations/:reservationId/contract/pdf","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/reservations/:reservationId/contract/pdf","type":0,"val":"reservations","end":""},{"old":"/boats/:boatId/reservations/:reservationId/contract/pdf","type":1,"val":"reservationId","end":""},{"old":"/boats/:boatId/reservations/:reservationId/contract/pdf","type":0,"val":"contract","end":""},{"old":"/boats/:boatId/reservations/:reservationId/contract/pdf","type":0,"val":"pdf","end":""}],
     types: placeholder as Registry['boats.reservations.contract.pdf']['types'],
   },
+  'boats.reservations.contract.signedDocument': {
+    methods: ["GET","HEAD"],
+    pattern: '/boats/:boatId/reservations/:reservationId/contract/signed-document',
+    tokens: [{"old":"/boats/:boatId/reservations/:reservationId/contract/signed-document","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/reservations/:reservationId/contract/signed-document","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/reservations/:reservationId/contract/signed-document","type":0,"val":"reservations","end":""},{"old":"/boats/:boatId/reservations/:reservationId/contract/signed-document","type":1,"val":"reservationId","end":""},{"old":"/boats/:boatId/reservations/:reservationId/contract/signed-document","type":0,"val":"contract","end":""},{"old":"/boats/:boatId/reservations/:reservationId/contract/signed-document","type":0,"val":"signed-document","end":""}],
+    types: placeholder as Registry['boats.reservations.contract.signedDocument']['types'],
+  },
   'boats.reservations.contract.send': {
     methods: ["POST"],
     pattern: '/boats/:boatId/reservations/:reservationId/contract/send',

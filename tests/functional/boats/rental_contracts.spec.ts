@@ -44,6 +44,10 @@ function swapFakeCloudinaryUpload() {
           deletedPublicIds.push(publicId)
         },
         deleteFolder: async () => {},
+        downloadAsBuffer: async () => ({
+          buffer: Buffer.from('%PDF-1.4 fake'),
+          contentType: 'application/pdf',
+        }),
       }) as unknown as CloudinaryService
   )
   return { uploadedPublicIds, deletedPublicIds }
@@ -275,6 +279,42 @@ test.group('Rental contracts (functional)', (group) => {
     assert.equal(contract.status, 'sent')
   })
 
+  test('POST .../contract/send does not send a second email on an invalid transition', async ({
+    client,
+    assert,
+  }) => {
+    const { messages } = mail.fake()
+
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const reservation = await BoatReservationFactory.merge({
+      boatId: boat.id,
+      organizationId: boat.organizationId,
+      clientEmail: 'client@example.com',
+    }).create()
+
+    await client.post(`/boats/${boat.id}/reservations/${reservation.id}/contract`).loginAs(user)
+    await client
+      .post(`/boats/${boat.id}/reservations/${reservation.id}/contract/send`)
+      .loginAs(user)
+
+    messages.assertSentCount(1)
+
+    const response = await client
+      .post(`/boats/${boat.id}/reservations/${reservation.id}/contract/send`)
+      .loginAs(user)
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertFlashMessage('error', 'This status change is not allowed.')
+
+    const contract = await RentalContract.query()
+      .where('reservationId', reservation.id)
+      .firstOrFail()
+    assert.equal(contract.status, 'sent')
+    messages.assertSentCount(1)
+  })
+
   test('POST .../contract/send refuses when the client has no email', async ({
     client,
     assert,
@@ -383,6 +423,67 @@ test.group('Rental contracts (functional)', (group) => {
     } finally {
       app.container.restore(CloudinaryService)
     }
+  })
+
+  // --- signed document download ---
+
+  test('GET .../contract/signed-document streams the signed file once uploaded', async ({
+    client,
+    assert,
+  }) => {
+    swapFakeCloudinaryUpload()
+    try {
+      const user = await createAdminUser()
+      const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+      const reservation = await BoatReservationFactory.merge({
+        boatId: boat.id,
+        organizationId: boat.organizationId,
+        clientEmail: 'client@example.com',
+      }).create()
+
+      await client.post(`/boats/${boat.id}/reservations/${reservation.id}/contract`).loginAs(user)
+      await client
+        .post(`/boats/${boat.id}/reservations/${reservation.id}/contract/send`)
+        .loginAs(user)
+      await client
+        .post(`/boats/${boat.id}/reservations/${reservation.id}/contract/sign`)
+        .loginAs(user)
+        .file('file', Buffer.from('%PDF-1.4 fake'), {
+          filename: 'signed.pdf',
+          contentType: 'application/pdf',
+        })
+
+      const response = await client
+        .get(`/boats/${boat.id}/reservations/${reservation.id}/contract/signed-document`)
+        .loginAs(user)
+
+      response.assertStatus(200)
+      response.assertHeader('content-type', 'application/pdf')
+      assert.include(response.header('content-disposition'), 'attachment')
+    } finally {
+      app.container.restore(CloudinaryService)
+    }
+  })
+
+  test('GET .../contract/signed-document redirects with a flash when no signed document exists', async ({
+    client,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const reservation = await BoatReservationFactory.merge({
+      boatId: boat.id,
+      organizationId: boat.organizationId,
+    }).create()
+
+    await client.post(`/boats/${boat.id}/reservations/${reservation.id}/contract`).loginAs(user)
+
+    const response = await client
+      .get(`/boats/${boat.id}/reservations/${reservation.id}/contract/signed-document`)
+      .loginAs(user)
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertFlashMessage('error', 'Contract not found.')
   })
 
   test('POST .../contract/sign replaces a previously uploaded signed document', async ({

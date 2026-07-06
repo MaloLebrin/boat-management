@@ -48,22 +48,20 @@ export default class SendRentalContractEmail extends Job<SendRentalContractEmail
     const pdfService = await app.container.make(RentalContractPdfService)
     const { buffer, filename } = await pdfService.generate(contract, org, i18n)
 
-    const isFr = this.payload.locale === 'fr'
     const boatName = contract.reservation.boat.name
 
     const fromAddress = env.get('MAIL_FROM_ADDRESS')
     const fromName = env.get('MAIL_FROM_NAME')
 
-    const subject = isFr
-      ? `Contrat de location — ${boatName} — ${org.name}`
-      : `Rental contract — ${boatName} — ${org.name}`
-
-    const text = isFr
-      ? `Bonjour,\n\nVeuillez trouver ci-joint le contrat de location pour ${boatName}.\n\nCordialement,\n${org.name}`
-      : `Hello,\n\nPlease find attached the rental contract for ${boatName}.\n\nBest regards,\n${org.name}`
+    const subject = i18n.t('rentalContracts.email.subject', { boatName, orgName: org.name })
+    const text = [
+      i18n.t('rentalContracts.email.greeting'),
+      i18n.t('rentalContracts.email.body', { boatName }),
+      i18n.t('rentalContracts.email.signature', { orgName: org.name }),
+    ].join('\n\n')
 
     const html = await edge.render('emails/rental_contract', {
-      isFr,
+      isFr: this.payload.locale === 'fr',
       boatName,
       orgName: org.name,
       appUrl: env.get('APP_URL'),
