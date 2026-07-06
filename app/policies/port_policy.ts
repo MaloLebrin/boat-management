@@ -12,11 +12,13 @@ export default class PortPolicy extends OrgScopedPolicy {
     return this.can(user, 'ports.create')
   }
 
-  async edit(user: User, _port?: Port): Promise<AuthorizerResponse> {
+  async edit(user: User, port?: Port): Promise<AuthorizerResponse> {
+    if (port && !this.sameOrg(user, port)) return false
     return this.can(user, 'ports.edit')
   }
 
-  async delete(user: User, _port?: Port): Promise<AuthorizerResponse> {
+  async delete(user: User, port?: Port): Promise<AuthorizerResponse> {
+    if (port && !this.sameOrg(user, port)) return false
     return this.can(user, 'ports.delete')
   }
 }

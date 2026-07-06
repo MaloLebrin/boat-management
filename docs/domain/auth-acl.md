@@ -89,7 +89,7 @@ Chaque action sensible d'une ressource est identifiée par une **capacité** nom
 
 `*` `boats.reservations.delete` porte en plus une règle métier propre à la ressource : un member ne peut supprimer que les réservations **non confirmées** (`reservation.status !== 'confirmed'`), vérifiée après la capacité dans `BoatPolicy.deleteReservation`.
 
-`⚠` Ports et Mouillages sont **admin-only sur create/edit/delete** (contrairement à toutes les autres ressources, où member peut créer/éditer et seul delete est admin-only). C'est un choix hérité, préservé tel quel lors de l'introduction des capacités — pas encore tranché s'il s'agit d'une règle métier voulue ou d'un oubli historique.
+`⚠` Ports et Mouillages sont **admin-only sur create/edit/delete** (contrairement à toutes les autres ressources, où member peut créer/éditer et seul delete est admin-only). C'est un choix hérité, préservé tel quel lors de l'introduction des capacités — pas encore tranché s'il s'agit d'une règle métier voulue ou d'un oubli historique. `PortPolicy.edit/delete` et `MouillagePolicy.edit/delete` vérifient malgré tout `sameOrg` (comme `view`) en plus de la capacité, par défense en profondeur : le jour où `ports.edit`/`mouillages.edit` seraient déplacées vers les capacités partagées, l'isolation multi-tenant reste garantie sans action supplémentaire.
 
 ### Mécanisme (comment une Policy vérifie une capacité)
 

@@ -52,15 +52,26 @@ export default class User extends compose(
     return role === 'admin'
   }
 
-  async hasPermission(orgId: number, capability: Capability): Promise<boolean> {
+  /**
+   * Resolves the role to use for authorization purposes, including the
+   * legacy fallback: a user linked to this org via the organizationId FK but
+   * missing an explicit membership row defaults to 'member', matching the
+   * pre-capability behavior (any org-linked user could act as a member)
+   * until the self-heal (ensureMembershipsForOrgUsers) backfills the row.
+   *
+   * Both hasPermission() and PermissionService.sharedProps() must go through
+   * this single method so the backend authorization result and the
+   * frontend-visible capabilities never drift apart.
+   */
+  async getEffectiveRoleInOrg(orgId: number): Promise<OrgRole | null> {
     const role = await this.getRoleInOrg(orgId)
-    if (role) return ROLE_PERMISSIONS[role].has(capability)
-    // Legacy data: a user linked to this org via the organizationId FK but
-    // missing an explicit membership row defaults to 'member' capabilities,
-    // matching the pre-capability behavior (any org-linked user could act as
-    // a member) until the self-heal (ensureMembershipsForOrgUsers) backfills
-    // the row.
-    if (this.organizationId === orgId) return ROLE_PERMISSIONS.member.has(capability)
-    return false
+    if (role) return role
+    return this.organizationId === orgId ? 'member' : null
+  }
+
+  async hasPermission(orgId: number, capability: Capability): Promise<boolean> {
+    const role = await this.getEffectiveRoleInOrg(orgId)
+    if (!role) return false
+    return ROLE_PERMISSIONS[role].has(capability)
   }
 }

@@ -5,6 +5,7 @@ import ClientPolicy from '#policies/client_policy'
 import InvoicePolicy from '#policies/invoice_policy'
 import MouillagePolicy from '#policies/mouillage_policy'
 import OrganizationPolicy from '#policies/organization_policy'
+import PortPolicy from '#policies/port_policy'
 import SubscriptionPolicy from '#policies/subscription_policy'
 import OrganizationMembership from '#models/organization_membership'
 import { UserFactory } from '#database/factories/user_factory'
@@ -97,11 +98,46 @@ test.group('Policies — admin-only capability checks (integration)', () => {
     const org = await OrganizationFactory.create()
     const admin = await userWithRole(org.id, 'admin')
     const member = await userWithRole(org.id, 'member')
+    const mouillage = { port: { organizationId: org.id } } as any
 
     const policy = new MouillagePolicy()
     assert.isTrue(await policy.create(admin))
     assert.isFalse(await policy.create(member))
-    assert.isTrue(await policy.edit(admin))
-    assert.isFalse(await policy.edit(member))
+    assert.isTrue(await policy.edit(admin, mouillage))
+    assert.isFalse(await policy.edit(member, mouillage))
+  })
+
+  test('MouillagePolicy.edit/delete deny an admin from another org (sameOrg via port)', async ({
+    assert,
+  }) => {
+    const org = await OrganizationFactory.create()
+    const otherOrg = await OrganizationFactory.create()
+    const outsiderAdmin = await userWithRole(otherOrg.id, 'admin')
+    const mouillage = { port: { organizationId: org.id } } as any
+
+    const policy = new MouillagePolicy()
+    assert.isFalse(await policy.edit(outsiderAdmin, mouillage))
+    assert.isFalse(await policy.delete(outsiderAdmin, mouillage))
+  })
+
+  test('PortPolicy.edit/delete deny an admin from another org (sameOrg)', async ({ assert }) => {
+    const org = await OrganizationFactory.create()
+    const otherOrg = await OrganizationFactory.create()
+    const outsiderAdmin = await userWithRole(otherOrg.id, 'admin')
+    const port = { organizationId: org.id } as any
+
+    const policy = new PortPolicy()
+    assert.isFalse(await policy.edit(outsiderAdmin, port))
+    assert.isFalse(await policy.delete(outsiderAdmin, port))
+  })
+
+  test('PortPolicy.edit/delete allow an admin of the same org', async ({ assert }) => {
+    const org = await OrganizationFactory.create()
+    const admin = await userWithRole(org.id, 'admin')
+    const port = { organizationId: org.id } as any
+
+    const policy = new PortPolicy()
+    assert.isTrue(await policy.edit(admin, port))
+    assert.isTrue(await policy.delete(admin, port))
   })
 })

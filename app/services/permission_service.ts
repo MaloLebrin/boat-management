@@ -8,7 +8,7 @@ export default class PermissionService {
       return { role: null, capabilities: [] }
     }
 
-    const role = await user.getRoleInOrg(user.organizationId)
+    const role = await user.getEffectiveRoleInOrg(user.organizationId)
     if (!role) {
       return { role: null, capabilities: [] }
     }

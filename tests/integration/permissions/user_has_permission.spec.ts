@@ -43,6 +43,24 @@ test.group('User#hasPermission (integration)', () => {
     assert.isFalse(await user.hasPermission(org.id, 'boats.view'))
   })
 
+  test('legacy org-linked user without a membership row defaults to member capabilities', async ({
+    assert,
+  }) => {
+    const org = await OrganizationFactory.create()
+    const user = await UserFactory.merge({ organizationId: org.id }).create()
+
+    assert.isTrue(await user.hasPermission(org.id, 'boats.view'))
+    assert.isFalse(await user.hasPermission(org.id, 'boats.delete'))
+  })
+
+  test('legacy org-linked user has no permission for a different org', async ({ assert }) => {
+    const org = await OrganizationFactory.create()
+    const otherOrg = await OrganizationFactory.create()
+    const user = await UserFactory.merge({ organizationId: org.id }).create()
+
+    assert.isFalse(await user.hasPermission(otherOrg.id, 'boats.view'))
+  })
+
   test('changing the membership role flips the result', async ({ assert }) => {
     const org = await OrganizationFactory.create()
     const user = await UserFactory.merge({ organizationId: org.id }).create()
