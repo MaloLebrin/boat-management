@@ -12,6 +12,7 @@ export function toBoatReservationRow(
     boatId: reservation.boatId,
     boatName,
     organizationId: reservation.organizationId,
+    clientId: reservation.clientId,
     status: reservation.status,
     startsAt: reservation.startsAt.toISO()!,
     endsAt: reservation.endsAt.toISO()!,

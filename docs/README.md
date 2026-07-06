@@ -17,6 +17,7 @@ Cette documentation décrit **fonctionnellement** et **techniquement** le projet
   - `docs/domain/task-grouping.md` — regroupement automatique des tâches (Pro & Enterprise)
   - `docs/domain/reservations-and-pricing.md` — réservations + tarification (tarif de base, saisons, calcul auto du total)
   - `docs/domain/invoicing.md` — facturation (devis & factures, numérotation, PDF/email, statuts, devis depuis réservation — Enterprise)
+  - `docs/domain/clients.md` — CRM clients + lien réservation ↔ client (historique, blocage blacklist — Enterprise)
 - **Données**: `docs/data/schema.md`
 - **Frontend (Inertia/Vue)**:
   - `docs/frontend/ui-map.md`

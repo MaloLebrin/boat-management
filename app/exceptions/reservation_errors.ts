@@ -28,3 +28,14 @@ export class ReservationDurationError extends Error {
     super(`reservation duration ${reason}`)
   }
 }
+
+/**
+ * Raised when creating/updating a reservation linked to a blacklisted client (#275).
+ */
+export class ReservationBlacklistedClientError extends Error {
+  name = 'ReservationBlacklistedClientError'
+
+  constructor() {
+    super('Cannot book for a blacklisted client')
+  }
+}

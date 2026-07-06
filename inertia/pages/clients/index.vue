@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { router, usePage } from '@inertiajs/vue3'
+import { Link } from '@adonisjs/inertia/vue'
 import BaseAlert from '~/components/base/BaseAlert.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
@@ -114,6 +115,11 @@ function getPermitLabel(client: ClientRow): string {
             </div>
 
             <div class="flex shrink-0 gap-2">
+              <Link :href="`/clients/${client.id}`">
+                <BaseButton type="button" variant="secondary" size="sm">
+                  {{ t('clients.view') }}
+                </BaseButton>
+              </Link>
               <BaseButton
                 type="button"
                 variant="secondary"

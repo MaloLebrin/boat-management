@@ -51,5 +51,12 @@
     "message": "Etes-vous sur de vouloir supprimer ce client ? Cette action est irreversible."
   },
   "edit": "Modifier",
-  "delete": "Supprimer"
+  "delete": "Supprimer",
+  "view": "Voir",
+  "show": {
+    "back": "Retour aux clients",
+    "info": "Informations",
+    "reservationHistory": "Historique des réservations",
+    "noReservations": "Aucune réservation pour ce client."
+  }
 }

@@ -17,6 +17,12 @@ export default class BoatReservation extends BaseModel {
   @column()
   declare organizationId: number
 
+  // Optional link to a CRM client (#275). The free-text client fields below are
+  // kept as a denormalized snapshot so the reservation stays readable even if the
+  // client is later unlinked or deleted (FK is SET NULL).
+  @column()
+  declare clientId: number | null
+
   @column()
   declare status: ReservationStatus
 

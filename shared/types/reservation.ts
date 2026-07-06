@@ -9,6 +9,7 @@ export interface BoatReservationRow {
   boatId: number
   boatName: string
   organizationId: number
+  clientId: number | null
   status: ReservationStatus
   startsAt: string
   endsAt: string
@@ -36,6 +37,7 @@ export interface FleetBoatOption {
 export interface CreateReservationPayload {
   startsAt: Date | string | DateTime
   endsAt: Date | string | DateTime
+  clientId?: number | null
   clientName: string
   clientEmail?: string | null
   clientPhone?: string | null
@@ -47,6 +49,7 @@ export interface CreateReservationPayload {
 export interface UpdateReservationPayload {
   startsAt?: Date | string | DateTime
   endsAt?: Date | string | DateTime
+  clientId?: number | null
   clientName?: string
   clientEmail?: string | null
   clientPhone?: string | null

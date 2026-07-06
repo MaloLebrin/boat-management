@@ -244,7 +244,8 @@
     "optionsOverridden": "Réservation confirmée. {count} option(s) en chevauchement annulée(s).",
     "invalidTransition": "Ce changement de statut n'est pas autorisé.",
     "belowMinDays": "La durée de la réservation est inférieure à la durée minimale autorisée pour ce bateau.",
-    "aboveMaxDays": "La durée de la réservation dépasse la durée maximale autorisée pour ce bateau."
+    "aboveMaxDays": "La durée de la réservation dépasse la durée maximale autorisée pour ce bateau.",
+    "blacklistedClient": "Ce client est blacklisté : réservation impossible."
   },
   "ports": {
     "hasBoats": "Impossible de supprimer ce port : des bateaux y sont assignés."

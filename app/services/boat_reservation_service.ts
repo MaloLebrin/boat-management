@@ -3,9 +3,11 @@ import {
   ReservationNotFoundError,
   ReservationValidationError,
   ReservationDurationError,
+  ReservationBlacklistedClientError,
 } from '#exceptions/reservation_errors'
 import BoatReservation from '#models/boat_reservation'
 import BoatModel from '#models/boat'
+import Client from '#models/client'
 import type Boat from '#models/boat'
 import type User from '#models/user'
 import type {
@@ -119,6 +121,9 @@ export default class BoatReservationService {
 
     const status = payload.status ?? 'option'
 
+    // Resolve the optional CRM client (org-scoped) and block blacklisted ones.
+    const clientId = await this.#resolveClientId(boat.organizationId, payload.clientId)
+
     return db.transaction(async (trx) => {
       await this.checkConflict(boat.id, startsAt, endsAt, null, status, trx)
 
@@ -134,6 +139,7 @@ export default class BoatReservationService {
           status,
           startsAt,
           endsAt,
+          clientId,
           clientName: payload.clientName.trim(),
           clientEmail: payload.clientEmail?.trim() || null,
           clientPhone: payload.clientPhone?.trim() || null,
@@ -186,6 +192,13 @@ export default class BoatReservationService {
 
     const effectiveStatus = payload.status ?? reservation.status
 
+    // Resolve the optional CRM client (org-scoped) and block blacklisted ones,
+    // only when the client is part of this update.
+    let resolvedClientId: number | null | undefined
+    if (payload.clientId !== undefined) {
+      resolvedClientId = await this.#resolveClientId(boat.organizationId, payload.clientId)
+    }
+
     if (payload.status !== undefined && payload.status !== reservation.status) {
       if (!ALLOWED_RESERVATION_TRANSITIONS[reservation.status].includes(payload.status)) {
         throw new ReservationValidationError(
@@ -205,6 +218,7 @@ export default class BoatReservationService {
 
       if (payload.startsAt !== undefined) reservation.startsAt = startsAt
       if (payload.endsAt !== undefined) reservation.endsAt = endsAt
+      if (resolvedClientId !== undefined) reservation.clientId = resolvedClientId
       if (payload.clientName !== undefined) reservation.clientName = payload.clientName.trim()
       if (payload.clientEmail !== undefined)
         reservation.clientEmail = payload.clientEmail?.trim() || null
@@ -231,6 +245,40 @@ export default class BoatReservationService {
     assertBoatScope(user, boat)
 
     return BoatReservation.query().where('id', reservationId).where('boatId', boat.id).first()
+  }
+
+  /**
+   * Resolves an optional CRM client id against the organization (#275):
+   * - returns `null` when no client is provided or the id doesn't belong to the org
+   *   (cross-org ids are silently ignored, like invoices);
+   * - throws `ReservationBlacklistedClientError` when the client is blacklisted.
+   */
+  async #resolveClientId(
+    organizationId: number,
+    clientId: number | null | undefined
+  ): Promise<number | null> {
+    if (!clientId) return null
+
+    const client = await Client.query()
+      .where('id', clientId)
+      .where('organizationId', organizationId)
+      .first()
+
+    if (!client) return null
+    if (client.status === 'blacklisted') throw new ReservationBlacklistedClientError()
+    return client.id
+  }
+
+  /**
+   * Reservation history for a client (#275): all reservations linked to the client
+   * within the organization, most recent first, with the boat preloaded.
+   */
+  async listForClient(organizationId: number, clientId: number): Promise<BoatReservation[]> {
+    return BoatReservation.query()
+      .where('organizationId', organizationId)
+      .where('clientId', clientId)
+      .preload('boat', (q) => q.select(['id', 'name']))
+      .orderBy('starts_at', 'desc')
   }
 
   /**

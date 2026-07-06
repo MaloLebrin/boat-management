@@ -1,9 +1,11 @@
 import { ClientNotFoundError } from '#exceptions/client_errors'
 import Client from '#models/client'
+import { toClientRow } from '#transformers/client_transformer'
 import type Organization from '#models/organization'
 import type {
   ClientListFilters,
   ClientRow,
+  ClientOption,
   ClientsPaginated,
   ClientStatus,
   ClientSortField,
@@ -135,6 +137,20 @@ export default class ClientService {
     return client
   }
 
+  /**
+   * Lightweight client options for a selector (id + full name + status), sorted
+   * by name. Used by the reservation form (#275).
+   */
+  async listOptions(organizationId: number): Promise<ClientOption[]> {
+    const clients = await Client.query()
+      .where('organizationId', organizationId)
+      .orderBy('last_name', 'asc')
+      .orderBy('first_name', 'asc')
+      .select('id', 'first_name', 'last_name', 'status')
+
+    return clients.map((c) => ({ id: c.id, fullName: c.fullName, status: c.status }))
+  }
+
   async create(org: Organization, payload: CreateClientPayload): Promise<Client> {
     return await Client.create({
       organizationId: org.id,
@@ -176,21 +192,6 @@ export default class ClientService {
   }
 
   #toRow(client: Client): ClientRow {
-    return {
-      id: client.id,
-      firstName: client.firstName,
-      lastName: client.lastName,
-      fullName: client.fullName,
-      email: client.email,
-      phone: client.phone,
-      address: client.address,
-      navigationPermitNumber: client.navigationPermitNumber,
-      navigationPermitType: client.navigationPermitType,
-      status: client.status,
-      notes: client.notes,
-      gdprConsentAt: client.gdprConsentAt?.toISO() ?? null,
-      createdAt: client.createdAt?.toISO() ?? null,
-      updatedAt: client.updatedAt?.toISO() ?? null,
-    }
+    return toClientRow(client)
   }
 }
