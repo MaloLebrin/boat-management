@@ -19,7 +19,10 @@ export async function resolveSharedCurrentPlan(
 ): Promise<PlanTier | undefined> {
   if (!user?.organizationId) return undefined
   await user.load('organization')
-  return user.organization.plan
+  // A loaded belongsTo can still be null (e.g. the organization row no longer
+  // exists) — mirror the same guard resolveSharedBranding already has below,
+  // instead of assuming the relation always resolved.
+  return user.organization?.plan
 }
 
 export async function resolveSharedBranding(
