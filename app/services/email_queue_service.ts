@@ -639,4 +639,34 @@ export default class EmailQueueService {
       },
     })
   }
+
+  async sendRentalContract(params: {
+    contractId: number
+    organizationId: number
+    to: string
+    locale: string
+  }) {
+    // Use a unique key per send to allow resends (includes timestamp component)
+    const dedupKey = `rental-contract:${params.organizationId}:${params.contractId}:${Date.now()}`
+
+    const payload = {
+      contractId: params.contractId,
+      organizationId: params.organizationId,
+      to: params.to,
+      locale: params.locale,
+      dedupKey,
+    }
+
+    const { default: SendRentalContractEmail } = await import('#jobs/send_rental_contract_email')
+
+    await this.dedup.enqueueUnique({
+      key: dedupKey,
+      jobName: SendRentalContractEmail.name,
+      queue: 'emails',
+      payload,
+      dispatch: async (p) => {
+        await SendRentalContractEmail.dispatch(p)
+      },
+    })
+  }
 }

@@ -1,0 +1,33 @@
+@component('emails/_layout')
+  @slot('content')
+    <h2 style="margin:0 0 20px;color:#333333;font-size:22px;">
+      @if(isFr)
+        Contrat de location —
+        {{ boatName }}
+      @else
+        Rental contract —
+        {{ boatName }}
+      @end
+    </h2>
+    <p style="margin:0 0 15px;color:#555555;font-size:16px;line-height:1.5;">
+      @if(isFr)
+        Veuillez trouver ci-joint le contrat de location pour
+        {{ boatName }}
+        .
+      @else
+        Please find attached the rental contract for
+        {{ boatName }}
+        .
+      @end
+    </p>
+    <p style="margin:0 0 15px;color:#888888;font-size:14px;line-height:1.5;">
+      @if(isFr)
+        Le document PDF est joint a cet email.
+      @else
+        The PDF document is attached to this email.
+      @end
+    </p>
+    <hr style="border:none;border-top:1px solid #e0e0e0;margin:25px 0;" />
+    <p style="margin:0;color:#888888;font-size:12px;">{{ orgName }}</p>
+  @end
+@end

@@ -112,6 +112,13 @@
     "notFound": "Incident introuvable.",
     "descriptionRequired": "Une description est requise."
   },
+  "inspections": {
+    "created": "État des lieux enregistré.",
+    "updated": "État des lieux mis à jour.",
+    "deleted": "État des lieux supprimé.",
+    "notFound": "État des lieux introuvable.",
+    "kindAlreadyExists": "Un état des lieux existe déjà pour ce type (départ/retour)."
+  },
   "fuelLog": {
     "created": "Avitaillement enregistré.",
     "deleted": "Avitaillement supprimé.",
@@ -173,6 +180,16 @@
     "paid": "Facture marquée comme payée.",
     "cannotMarkPaid": "Ce document ne peut pas être marqué comme payé.",
     "quoteFromReservation": "Devis créé depuis la réservation."
+  },
+  "rentalContracts": {
+    "created": "Contrat de location créé.",
+    "alreadyExists": "Un contrat existe déjà pour cette réservation.",
+    "notFound": "Contrat introuvable.",
+    "noClientEmail": "Ce client n'a pas d'adresse email.",
+    "sent": "Contrat envoyé par email.",
+    "signed": "Contrat marqué comme signé.",
+    "deleted": "Contrat supprimé.",
+    "invalidTransition": "Ce changement de statut n'est pas autorisé."
   },
   "quota": {
     "boatsExceeded": "Vous avez atteint la limite de bateaux de votre plan. Passez à un plan supérieur pour en ajouter.",

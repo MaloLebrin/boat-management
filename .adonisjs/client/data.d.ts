@@ -7,6 +7,7 @@
 import type { InferData, InferVariants } from '@adonisjs/core/types/transformers'
 import type { InferSharedProps } from '@adonisjs/inertia/types'
 import type BoatEngineTransformer from '#transformers/boat_engine_transformer'
+import type BoatInspectionTransformer from '#transformers/boat_inspection_transformer'
 import type BoatPricingTransformer from '#transformers/boat_pricing_transformer'
 import type BoatReservationTransformer from '#transformers/boat_reservation_transformer'
 import type BoatTransformer from '#transformers/boat_transformer'
@@ -20,6 +21,7 @@ import type NotificationTransformer from '#transformers/notification_transformer
 import type OrganizationTransformer from '#transformers/organization_transformer'
 import type PontoonTransformer from '#transformers/pontoon_transformer'
 import type PortTransformer from '#transformers/port_transformer'
+import type RentalContractTransformer from '#transformers/rental_contract_transformer'
 import type SimulatorTransformer from '#transformers/simulator_transformer'
 import type SpotTransformer from '#transformers/spot_transformer'
 import type SubscriptionTransformer from '#transformers/subscription_transformer'
@@ -30,6 +32,10 @@ export namespace Data {
   export type BoatEngine = InferData<BoatEngineTransformer>
   export namespace BoatEngine {
     export type Variants = InferVariants<BoatEngineTransformer>
+  }
+  export type BoatInspection = InferData<BoatInspectionTransformer>
+  export namespace BoatInspection {
+    export type Variants = InferVariants<BoatInspectionTransformer>
   }
   export type BoatPricing = InferData<BoatPricingTransformer>
   export namespace BoatPricing {
@@ -82,6 +88,10 @@ export namespace Data {
   export type Port = InferData<PortTransformer>
   export namespace Port {
     export type Variants = InferVariants<PortTransformer>
+  }
+  export type RentalContract = InferData<RentalContractTransformer>
+  export namespace RentalContract {
+    export type Variants = InferVariants<RentalContractTransformer>
   }
   export type Simulator = InferData<SimulatorTransformer>
   export namespace Simulator {

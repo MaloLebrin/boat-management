@@ -2,6 +2,9 @@
 import type { routes } from './index.ts'
 
 export interface ApiDefinition {
+  eventStream: typeof routes['event_stream']
+  subscribe: typeof routes['subscribe']
+  unsubscribe: typeof routes['unsubscribe']
   dashboard: typeof routes['dashboard']
   designSystem: typeof routes['design_system']
   sitemap: typeof routes['sitemap']
@@ -35,6 +38,9 @@ export interface ApiDefinition {
     edit: typeof routes['boats.edit']
     update: typeof routes['boats.update']
     destroy: typeof routes['boats.destroy']
+    pricing: {
+      update: typeof routes['boats.pricing.update']
+    }
     assign: typeof routes['boats.assign']
     engines: {
       show: typeof routes['boats.engines.show']
@@ -90,6 +96,27 @@ export interface ApiDefinition {
       store: typeof routes['boats.reservations.store']
       update: typeof routes['boats.reservations.update']
       destroy: typeof routes['boats.reservations.destroy']
+      inspection: {
+        show: typeof routes['boats.reservations.inspection.show']
+      }
+      inspections: {
+        store: typeof routes['boats.reservations.inspections.store']
+        update: typeof routes['boats.reservations.inspections.update']
+        destroy: typeof routes['boats.reservations.inspections.destroy']
+        photos: {
+          store: typeof routes['boats.reservations.inspections.photos.store']
+          destroy: typeof routes['boats.reservations.inspections.photos.destroy']
+        }
+      }
+      contract: {
+        show: typeof routes['boats.reservations.contract.show']
+        store: typeof routes['boats.reservations.contract.store']
+        pdf: typeof routes['boats.reservations.contract.pdf']
+        signedDocument: typeof routes['boats.reservations.contract.signedDocument']
+        send: typeof routes['boats.reservations.contract.send']
+        sign: typeof routes['boats.reservations.contract.sign']
+        destroy: typeof routes['boats.reservations.contract.destroy']
+      }
     }
   }
   boatEquipment: {
@@ -254,6 +281,7 @@ export interface ApiDefinition {
   invitations: {
     show: typeof routes['invitations.show']
     accept: typeof routes['invitations.accept']
+    decline: typeof routes['invitations.decline']
   }
   webhooks: {
     stripe: typeof routes['webhooks.stripe']
@@ -290,9 +318,33 @@ export interface ApiDefinition {
   reservations: {
     index: typeof routes['reservations.index']
   }
-  eventStream: typeof routes['event_stream']
-  subscribe: typeof routes['subscribe']
-  unsubscribe: typeof routes['unsubscribe']
+  clients: {
+    index: typeof routes['clients.index']
+    show: typeof routes['clients.show']
+    store: typeof routes['clients.store']
+    update: typeof routes['clients.update']
+    destroy: typeof routes['clients.destroy']
+  }
+  pricingSeasons: {
+    index: typeof routes['pricingSeasons.index']
+    store: typeof routes['pricingSeasons.store']
+    update: typeof routes['pricingSeasons.update']
+    destroy: typeof routes['pricingSeasons.destroy']
+  }
+  invoices: {
+    index: typeof routes['invoices.index']
+    create: typeof routes['invoices.create']
+    store: typeof routes['invoices.store']
+    fromReservation: typeof routes['invoices.fromReservation']
+    show: typeof routes['invoices.show']
+    edit: typeof routes['invoices.edit']
+    pdf: typeof routes['invoices.pdf']
+    send: typeof routes['invoices.send']
+    convert: typeof routes['invoices.convert']
+    pay: typeof routes['invoices.pay']
+    update: typeof routes['invoices.update']
+    destroy: typeof routes['invoices.destroy']
+  }
   newAccount: {
     create: typeof routes['new_account.create']
     store: typeof routes['new_account.store']

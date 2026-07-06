@@ -72,6 +72,8 @@
     "documents": "Documents"
   },
   "actions": {
-    "createQuote": "Create a quote"
+    "createQuote": "Create a quote",
+    "inspection": "Inspection",
+    "contract": "Rental contract"
   }
 }

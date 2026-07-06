@@ -26,6 +26,10 @@ export type Capability =
   | 'incidents.create'
   | 'incidents.edit'
   | 'incidents.delete'
+  | 'inspections.view'
+  | 'inspections.create'
+  | 'inspections.edit'
+  | 'inspections.delete'
   | 'invoices.create'
   | 'invoices.update'
   | 'invoices.delete'
@@ -47,6 +51,10 @@ export type Capability =
   | 'pricing_seasons.create'
   | 'pricing_seasons.update'
   | 'pricing_seasons.delete'
+  | 'rentalContracts.view'
+  | 'rentalContracts.create'
+  | 'rentalContracts.edit'
+  | 'rentalContracts.delete'
   | 'simulator.manage_leads'
   | 'spots.view'
   | 'spots.create'
@@ -65,6 +73,7 @@ const ADMIN_ONLY_CAPABILITIES: Capability[] = [
   'crew.delete',
   'fuel_logs.delete',
   'incidents.delete',
+  'inspections.delete',
   'invoices.delete',
   'maintenance.delete',
   'mouillages.create',
@@ -75,6 +84,7 @@ const ADMIN_ONLY_CAPABILITIES: Capability[] = [
   'ports.edit',
   'ports.delete',
   'pricing_seasons.delete',
+  'rentalContracts.delete',
   'simulator.manage_leads',
   'spots.delete',
   'subscription.manage',
@@ -97,6 +107,9 @@ const MEMBER_CAPABILITIES: Capability[] = [
   'incidents.view',
   'incidents.create',
   'incidents.edit',
+  'inspections.view',
+  'inspections.create',
+  'inspections.edit',
   'invoices.create',
   'invoices.update',
   'maintenance.view',
@@ -108,6 +121,9 @@ const MEMBER_CAPABILITIES: Capability[] = [
   'ports.view',
   'pricing_seasons.create',
   'pricing_seasons.update',
+  'rentalContracts.view',
+  'rentalContracts.create',
+  'rentalContracts.edit',
   'spots.view',
   'spots.create',
   'spots.edit',

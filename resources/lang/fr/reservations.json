@@ -72,6 +72,8 @@
     "documents": "Documents"
   },
   "actions": {
-    "createQuote": "Créer un devis"
+    "createQuote": "Créer un devis",
+    "inspection": "État des lieux",
+    "contract": "Contrat de location"
   }
 }

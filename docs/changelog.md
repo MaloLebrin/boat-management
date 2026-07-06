@@ -3,6 +3,61 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-07-06 — [#291] Corrige les retours de code review sur la signature du contrat de location
+
+Corrige trois problèmes relevés en review sur #291 :
+
+- `rental_contracts_controller.ts#send` : `markSent()` (validation de la transition `draft → sent`) s'exécute désormais **avant** l'envoi de l'email — évite d'envoyer un email si la transition est invalide
+- `rental_contracts_controller.ts#sign` : `RentalContractService.assertCanAttachSignedDocument()` (nouvelle méthode) valide la transition **avant** de supprimer l'ancien document Cloudinary et d'uploader le nouveau — évite un `Media` orphelin (DB + Cloudinary) si le contrat est encore `draft`
+- Le contrat signé n'est plus exposé via l'URL Cloudinary publique brute (`mediaSecureUrl`) : nouvelle route authentifiée `GET .../contract/signed-document` (`downloadSignedDocument`, calquée sur `downloadPdf`/`BoatMediaController#downloadMedia`) qui télécharge le fichier via `private_download_url` ; le transformer expose `hasSignedDocument: boolean` à la place
+- `send_rental_contract_email.ts` : remplace le ternaire `locale === 'fr' ? ... : ...` par `i18n.t('rentalContracts.email.*')` (clés ajoutées en/fr) pour le sujet et le corps du texte de l'email
+
+- **Tests** : `tests/functional/boats/rental_contracts.spec.ts` — non-envoi d'un second email sur transition invalide, téléchargement du document signé authentifié, redirection si aucun document signé
+
+## 2026-07-06 — [#291] Location 3/3 : signature du contrat de location (upload du PDF signé)
+
+**Troisième et dernière PR de l'epic #283 (Contrats de location & états des lieux)**, après #290. Finalise le cycle de vie du contrat : upload du contrat signé (scanné/PDF), rattaché à `rental_contracts.media_id` (colonne réservée par #290), avec passage automatique au statut `signed` + `signed_at`. La signature électronique intégrée reste hors périmètre (mentionnée comme optionnelle dans l'issue).
+
+- **Backend** :
+  - `shared/constants/media.ts` : nouveau type d'entité média `'rentalContract'` ; `CloudinaryFolders.rentalContractSignedDocument` (`app/services/cloudinary_service.ts`)
+  - `app/models/rental_contract.ts` : relation `belongsTo(Media)`
+  - `app/services/rental_contract_service.ts` : `attachSignedDocument()` remplace l'ancien `markSigned()` sans preuve — attache le `media_id` uploadé, statut `sent → signed` (ou remplacement du document si déjà `signed`, sans réinitialiser `signed_at`) ; `deleteForReservation()` nettoie désormais le document signé (Cloudinary + quota) à la suppression du contrat
+  - `app/validators/rental_contract.ts` (nouveau) : `storeSignedRentalContractValidator` (PDF, 20 Mo max)
+  - `app/controllers/rental_contracts_controller.ts#sign` : accepte désormais un upload multipart (remplace l'ancien document si un nouveau est envoyé), délègue à `MediaService`
+  - `shared/types/rental_contract.ts` / `app/transformers/rental_contract_transformer.ts` : `mediaSecureUrl`/`mediaFilename` exposés au frontend
+- **Frontend** : `ContractPanel.vue` — le bouton « Marquer comme signé » est remplacé par un envoi de fichier (upload/remplacement du contrat signé) ; lien « Voir le contrat signé » une fois disponible
+- **i18n** : clés `rentalContracts.actions.{uploadSigned,replaceSigned,viewSigned}` (en/fr)
+- **Tests** : `tests/functional/boats/rental_contracts.spec.ts` — upload multipart (mock Cloudinary), refus si contrat encore `draft`, remplacement d'un document déjà signé, nettoyage du média à la suppression du contrat
+
+## 2026-07-06 — [#290] Location 2/3 : contrat de location (génération PDF + statuts + envoi email)
+
+**Deuxième PR de l'epic #283 (Contrats de location & états des lieux)**, après #289. Génère un contrat de location PDF à partir d'une réservation (bateau, client, période, conditions générales), avec un cycle de statuts `draft → sent → signed` et un envoi par email au client.
+
+- **Base de données** : migration `1814000000000_create_rental_contracts_table.ts` — table `rental_contracts` (`organization_id`, `reservation_id` FK `boat_reservations` cascade unique — un seul contrat par réservation, `client_id` FK `clients` nullable `SET NULL`, `status` check `draft`/`sent`/`signed`, `signed_at`, `media_id` FK `media` nullable — **réservé pour #291** signature/upload du PDF signé, non exploité dans ce lot)
+- **Backend** :
+  - `app/models/rental_contract.ts`, `app/services/rental_contract_service.ts` (création depuis une réservation avec résolution du client CRM comme pour les devis, transitions `draft→sent`/`sent→signed`, suppression), `app/services/rental_contract_pdf_service.ts` (génération PDF avec branding org, calquée sur `invoice_pdf_service.ts`)
+  - `app/exceptions/rental_contract_errors.ts`, `app/transformers/rental_contract_transformer.ts`
+  - `shared/types/permissions.ts` : nouvelles capacités `rentalContracts.view/create/edit` (member) et `rentalContracts.delete` (admin-only) ; `app/policies/rental_contract_policy.ts`
+  - Envoi email : `app/services/email_queue_service.ts#sendRentalContract`, `app/jobs/send_rental_contract_email.ts` (régénère le PDF dans le worker, pièce jointe), template `resources/views/emails/rental_contract.edge`
+  - Routes : `GET/POST boats/:boatId/reservations/:reservationId/contract`, `GET .../contract/pdf`, `POST .../contract/send`, `POST .../contract/sign`, `DELETE .../contract`
+- **Frontend** : page `boats/reservation_contract`, composants `ContractPanel`/`ContractStatusBadge`, bouton d'accès depuis `ReservationList`
+- **i18n** : nouveau domaine `rentalContracts.json` (en/fr, incluant les textes du PDF), clés `flash.rentalContracts.*`, `reservations.actions.contract`
+- **Tests** : `tests/functional/boats/rental_contracts.spec.ts` (CRUD, policy admin/member, unicité par réservation, transitions de statut, scoping org, téléchargement PDF), `tests/functional/boats/send_rental_contract_email_job.spec.ts` (génération PDF + envoi email avec pièce jointe)
+
+## 2026-07-06 — [#289] Location 1/3 : états des lieux départ/retour (relevés + photos)
+
+**Première PR de l'epic #283 (Contrats de location & états des lieux)**. Ajoute l'état des lieux de départ (`checkout`) et de retour (`checkin`) rattaché à une réservation, avec relevés (niveau carburant, heures moteur, notes) et photos.
+
+- **Base de données** : migration `1813000000000_create_boat_inspections_table.ts` — table `boat_inspections` (`organization_id`, `reservation_id` FK `boat_reservations` cascade, `kind` check `checkout`/`checkin`, `performed_at`, `fuel_level`, `engine_hours`, `notes`), unique `(reservation_id, kind)` — un seul checkout et un seul checkin par réservation
+- **Backend** :
+  - `app/models/boat_inspection.ts`, `app/services/boat_inspection_service.ts` (CRUD org-scopé via la réservation), `app/validators/boat_inspection.ts`, `app/exceptions/inspection_errors.ts`, `app/transformers/boat_inspection_transformer.ts`
+  - `shared/types/permissions.ts` : nouvelles capacités `inspections.view/create/edit` (member) et `inspections.delete` (admin-only) ; `app/policies/inspection_policy.ts`
+  - `shared/constants/media.ts` : nouveau type d'entité média `'inspection'` ; `CloudinaryFolders.inspectionPhotos` ; actions `storeInspectionPhoto`/`destroyInspectionMedia` sur `boat_media_controller.ts`
+  - Routes : `GET/POST/PUT/DELETE boats/:boatId/reservations/:reservationId/inspection(s)` + sous-routes photos
+- **Frontend** : page `boats/reservation_inspection`, composants `InspectionPanel`/`InspectionPhotos`/`InspectionComparison`, bouton d'accès depuis `ReservationList`
+- **i18n** : nouveau domaine `inspections.json` (en/fr), clés `flash.inspections.*`, `reservations.actions.inspection`
+- **Tests** : `tests/functional/boats/inspections.spec.ts` (CRUD, policy admin/member, unicité par type, scoping org, suppression photo)
+
 ## 2026-07-06 — Permissions granulaires par capacité (admin/member)
 
 Refactor de l'autorisation Bouncer : les 16 policies codaient en dur `before()` (bypass admin) puis `return false`/checks bruts pour chaque action. Introduction d'une taxonomie de capacités explicite (`shared/types/permissions.ts` : type `Capability`, `ROLE_PERMISSIONS: Record<OrgRole, Set<Capability>>`), sans changement de comportement (refactor pur) ni migration de base de données — le rôle reste `'admin' | 'member'` en base.

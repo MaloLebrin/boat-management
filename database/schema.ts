@@ -406,6 +406,42 @@ export class BoatIncidentSchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class BoatInspectionSchema extends BaseModel {
+  static $columns = [
+    'createdAt',
+    'engineHours',
+    'fuelLevel',
+    'id',
+    'kind',
+    'notes',
+    'organizationId',
+    'performedAt',
+    'reservationId',
+    'updatedAt',
+  ] as const
+  $columns = BoatInspectionSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare engineHours: string | null
+  @column()
+  declare fuelLevel: number | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare kind: string
+  @column()
+  declare notes: string | null
+  @column()
+  declare organizationId: number
+  @column.dateTime()
+  declare performedAt: DateTime
+  @column()
+  declare reservationId: number
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class BoatMaintenanceEventSchema extends BaseModel {
   static $columns = [
     'boatEngineId',
@@ -691,10 +727,50 @@ export class BoatPositionHistorySchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class BoatPricingSchema extends BaseModel {
+  static $columns = [
+    'baseDailyPrice',
+    'baseWeeklyPrice',
+    'boatId',
+    'createdAt',
+    'currency',
+    'depositAmount',
+    'id',
+    'maxDays',
+    'minDays',
+    'organizationId',
+    'updatedAt',
+  ] as const
+  $columns = BoatPricingSchema.$columns
+  @column()
+  declare baseDailyPrice: string
+  @column()
+  declare baseWeeklyPrice: string | null
+  @column()
+  declare boatId: number
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare currency: string
+  @column()
+  declare depositAmount: string | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare maxDays: number | null
+  @column()
+  declare minDays: number | null
+  @column()
+  declare organizationId: number
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class BoatReservationSchema extends BaseModel {
   static $columns = [
     'boatId',
     'clientEmail',
+    'clientId',
     'clientName',
     'clientPhone',
     'createdAt',
@@ -712,6 +788,8 @@ export class BoatReservationSchema extends BaseModel {
   declare boatId: number
   @column()
   declare clientEmail: string | null
+  @column()
+  declare clientId: number | null
   @column()
   declare clientName: string
   @column()
@@ -940,6 +1018,54 @@ export class BoatSchema extends BaseModel {
   declare yearBuilt: number | null
 }
 
+export class ClientSchema extends BaseModel {
+  static $columns = [
+    'address',
+    'createdAt',
+    'email',
+    'firstName',
+    'gdprConsentAt',
+    'id',
+    'lastName',
+    'navigationPermitNumber',
+    'navigationPermitType',
+    'notes',
+    'organizationId',
+    'phone',
+    'status',
+    'updatedAt',
+  ] as const
+  $columns = ClientSchema.$columns
+  @column()
+  declare address: string | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare email: string | null
+  @column()
+  declare firstName: string
+  @column.dateTime()
+  declare gdprConsentAt: DateTime | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare lastName: string
+  @column()
+  declare navigationPermitNumber: string | null
+  @column()
+  declare navigationPermitType: string | null
+  @column()
+  declare notes: string | null
+  @column()
+  declare organizationId: number
+  @column()
+  declare phone: string | null
+  @column()
+  declare status: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class CrewCertificationSchema extends BaseModel {
   static $columns = [
     'createdAt',
@@ -996,6 +1122,129 @@ export class CrewMemberSchema extends BaseModel {
   declare organizationId: number
   @column()
   declare phone: string | null
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class InvoiceCounterSchema extends BaseModel {
+  static $columns = [
+    'createdAt',
+    'id',
+    'kind',
+    'lastNumber',
+    'organizationId',
+    'updatedAt',
+  ] as const
+  $columns = InvoiceCounterSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare kind: string
+  @column()
+  declare lastNumber: number
+  @column()
+  declare organizationId: number
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class InvoiceLineSchema extends BaseModel {
+  static $columns = [
+    'amount',
+    'createdAt',
+    'id',
+    'invoiceId',
+    'label',
+    'position',
+    'quantity',
+    'unitPrice',
+    'updatedAt',
+  ] as const
+  $columns = InvoiceLineSchema.$columns
+  @column()
+  declare amount: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare invoiceId: number
+  @column()
+  declare label: string
+  @column()
+  declare position: number
+  @column()
+  declare quantity: string
+  @column()
+  declare unitPrice: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class InvoiceSchema extends BaseModel {
+  static $columns = [
+    'clientId',
+    'clientName',
+    'createdAt',
+    'currency',
+    'dueAt',
+    'id',
+    'issuedAt',
+    'kind',
+    'notes',
+    'number',
+    'organizationId',
+    'paidAt',
+    'reservationId',
+    'sourceQuoteId',
+    'status',
+    'subtotal',
+    'taxAmount',
+    'taxRate',
+    'total',
+    'updatedAt',
+  ] as const
+  $columns = InvoiceSchema.$columns
+  @column()
+  declare clientId: number | null
+  @column()
+  declare clientName: string | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare currency: string
+  @column.date()
+  declare dueAt: DateTime | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column.date()
+  declare issuedAt: DateTime
+  @column()
+  declare kind: string
+  @column()
+  declare notes: string | null
+  @column()
+  declare number: string
+  @column()
+  declare organizationId: number
+  @column.date()
+  declare paidAt: DateTime | null
+  @column()
+  declare reservationId: number | null
+  @column()
+  declare sourceQuoteId: number | null
+  @column()
+  declare status: string
+  @column()
+  declare subtotal: string
+  @column()
+  declare taxAmount: string
+  @column()
+  declare taxRate: string
+  @column()
+  declare total: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
 }
@@ -1387,6 +1636,45 @@ export class PortSchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class PricingSeasonSchema extends BaseModel {
+  static $columns = [
+    'boatId',
+    'createdAt',
+    'dailyPrice',
+    'endsOn',
+    'id',
+    'multiplier',
+    'name',
+    'organizationId',
+    'priority',
+    'startsOn',
+    'updatedAt',
+  ] as const
+  $columns = PricingSeasonSchema.$columns
+  @column()
+  declare boatId: number | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare dailyPrice: string | null
+  @column.date()
+  declare endsOn: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare multiplier: string | null
+  @column()
+  declare name: string
+  @column()
+  declare organizationId: number
+  @column()
+  declare priority: number
+  @column.date()
+  declare startsOn: DateTime
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class QueueDedupKeySchema extends BaseModel {
   static $columns = [
     'completedAt',
@@ -1533,6 +1821,39 @@ export class RememberMeTokenSchema extends BaseModel {
   declare tokenableId: number | null
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime
+}
+
+export class RentalContractSchema extends BaseModel {
+  static $columns = [
+    'clientId',
+    'createdAt',
+    'id',
+    'mediaId',
+    'organizationId',
+    'reservationId',
+    'signedAt',
+    'status',
+    'updatedAt',
+  ] as const
+  $columns = RentalContractSchema.$columns
+  @column()
+  declare clientId: number | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare mediaId: number | null
+  @column()
+  declare organizationId: number
+  @column()
+  declare reservationId: number
+  @column.dateTime()
+  declare signedAt: DateTime | null
+  @column()
+  declare status: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
 }
 
 export class SimulatorLeadSchema extends BaseModel {

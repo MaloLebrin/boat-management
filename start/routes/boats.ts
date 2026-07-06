@@ -255,5 +255,85 @@ router
     router
       .delete('boats/:boatId/reservations/:reservationId', [BoatReservationsController, 'destroy'])
       .as('boats.reservations.destroy')
+
+    router
+      .get('boats/:boatId/reservations/:reservationId/inspection', [
+        controllers.BoatInspections,
+        'show',
+      ])
+      .as('boats.reservations.inspection.show')
+    router
+      .post('boats/:boatId/reservations/:reservationId/inspections', [
+        controllers.BoatInspections,
+        'store',
+      ])
+      .as('boats.reservations.inspections.store')
+    router
+      .put('boats/:boatId/reservations/:reservationId/inspections/:inspectionId', [
+        controllers.BoatInspections,
+        'update',
+      ])
+      .as('boats.reservations.inspections.update')
+    router
+      .delete('boats/:boatId/reservations/:reservationId/inspections/:inspectionId', [
+        controllers.BoatInspections,
+        'destroy',
+      ])
+      .as('boats.reservations.inspections.destroy')
+    router
+      .post('boats/:boatId/reservations/:reservationId/inspections/:inspectionId/photos', [
+        controllers.BoatMedia,
+        'storeInspectionPhoto',
+      ])
+      .as('boats.reservations.inspections.photos.store')
+    router
+      .delete(
+        'boats/:boatId/reservations/:reservationId/inspections/:inspectionId/photos/:mediaId',
+        [controllers.BoatMedia, 'destroyInspectionMedia']
+      )
+      .as('boats.reservations.inspections.photos.destroy')
+
+    router
+      .get('boats/:boatId/reservations/:reservationId/contract', [
+        controllers.RentalContracts,
+        'show',
+      ])
+      .as('boats.reservations.contract.show')
+    router
+      .post('boats/:boatId/reservations/:reservationId/contract', [
+        controllers.RentalContracts,
+        'store',
+      ])
+      .as('boats.reservations.contract.store')
+    router
+      .get('boats/:boatId/reservations/:reservationId/contract/pdf', [
+        controllers.RentalContracts,
+        'downloadPdf',
+      ])
+      .as('boats.reservations.contract.pdf')
+    router
+      .get('boats/:boatId/reservations/:reservationId/contract/signed-document', [
+        controllers.RentalContracts,
+        'downloadSignedDocument',
+      ])
+      .as('boats.reservations.contract.signedDocument')
+    router
+      .post('boats/:boatId/reservations/:reservationId/contract/send', [
+        controllers.RentalContracts,
+        'send',
+      ])
+      .as('boats.reservations.contract.send')
+    router
+      .post('boats/:boatId/reservations/:reservationId/contract/sign', [
+        controllers.RentalContracts,
+        'sign',
+      ])
+      .as('boats.reservations.contract.sign')
+    router
+      .delete('boats/:boatId/reservations/:reservationId/contract', [
+        controllers.RentalContracts,
+        'destroy',
+      ])
+      .as('boats.reservations.contract.destroy')
   })
   .use(middleware.auth())

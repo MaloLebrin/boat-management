@@ -4,6 +4,9 @@ type ParamValue = string | number | bigint | boolean
 
 export type ScannedRoutes = {
   ALL: {
+    'event_stream': { paramsTuple?: []; params?: {} }
+    'subscribe': { paramsTuple?: []; params?: {} }
+    'unsubscribe': { paramsTuple?: []; params?: {} }
     'dashboard': { paramsTuple?: []; params?: {} }
     'design_system': { paramsTuple?: []; params?: {} }
     'sitemap': { paramsTuple?: []; params?: {} }
@@ -27,6 +30,7 @@ export type ScannedRoutes = {
     'boats.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'boats.pricing.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.assign': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boat_equipment.store_engine': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'boats.engines.show': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
@@ -91,6 +95,19 @@ export type ScannedRoutes = {
     'boats.reservations.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'boats.reservations.update': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
     'boats.reservations.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
+    'boats.reservations.inspection.show': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
+    'boats.reservations.inspections.store': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
+    'boats.reservations.inspections.update': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue,'inspectionId': ParamValue} }
+    'boats.reservations.inspections.destroy': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue,'inspectionId': ParamValue} }
+    'boats.reservations.inspections.photos.store': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue,'inspectionId': ParamValue} }
+    'boats.reservations.inspections.photos.destroy': { paramsTuple: [ParamValue,ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue,'inspectionId': ParamValue,'mediaId': ParamValue} }
+    'boats.reservations.contract.show': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
+    'boats.reservations.contract.store': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
+    'boats.reservations.contract.pdf': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
+    'boats.reservations.contract.signedDocument': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
+    'boats.reservations.contract.send': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
+    'boats.reservations.contract.sign': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
+    'boats.reservations.contract.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
     'ports.index': { paramsTuple?: []; params?: {} }
     'ports.create': { paramsTuple?: []; params?: {} }
     'ports.store': { paramsTuple?: []; params?: {} }
@@ -159,6 +176,7 @@ export type ScannedRoutes = {
     'organization.invitations.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'invitations.show': { paramsTuple?: []; params?: {} }
     'invitations.accept': { paramsTuple?: []; params?: {} }
+    'invitations.decline': { paramsTuple?: []; params?: {} }
     'webhooks.stripe': { paramsTuple?: []; params?: {} }
     'mail_previews.index': { paramsTuple?: []; params?: {} }
     'mail_previews.show': { paramsTuple: [ParamValue]; params: {'name': ParamValue} }
@@ -178,9 +196,27 @@ export type ScannedRoutes = {
     'navigation.fuel': { paramsTuple?: []; params?: {} }
     'navigation.incidents': { paramsTuple?: []; params?: {} }
     'reservations.index': { paramsTuple?: []; params?: {} }
-    'event_stream': { paramsTuple?: []; params?: {} }
-    'subscribe': { paramsTuple?: []; params?: {} }
-    'unsubscribe': { paramsTuple?: []; params?: {} }
+    'clients.index': { paramsTuple?: []; params?: {} }
+    'clients.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'clients.store': { paramsTuple?: []; params?: {} }
+    'clients.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'clients.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'pricingSeasons.index': { paramsTuple?: []; params?: {} }
+    'pricingSeasons.store': { paramsTuple?: []; params?: {} }
+    'pricingSeasons.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'pricingSeasons.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'invoices.index': { paramsTuple?: []; params?: {} }
+    'invoices.create': { paramsTuple?: []; params?: {} }
+    'invoices.store': { paramsTuple?: []; params?: {} }
+    'invoices.fromReservation': { paramsTuple: [ParamValue]; params: {'reservationId': ParamValue} }
+    'invoices.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'invoices.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'invoices.pdf': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'invoices.send': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'invoices.convert': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'invoices.pay': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'invoices.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'invoices.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'new_account.create': { paramsTuple?: []; params?: {} }
     'new_account.store': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }
@@ -196,6 +232,7 @@ export type ScannedRoutes = {
     'demo.login': { paramsTuple?: []; params?: {} }
   }
   GET: {
+    'event_stream': { paramsTuple?: []; params?: {} }
     'dashboard': { paramsTuple?: []; params?: {} }
     'design_system': { paramsTuple?: []; params?: {} }
     'sitemap': { paramsTuple?: []; params?: {} }
@@ -221,6 +258,10 @@ export type ScannedRoutes = {
     'boats.simulator': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.navigationLogs.crewRole.download': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue} }
     'boats.reservations.index': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
+    'boats.reservations.inspection.show': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
+    'boats.reservations.contract.show': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
+    'boats.reservations.contract.pdf': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
+    'boats.reservations.contract.signedDocument': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
     'ports.index': { paramsTuple?: []; params?: {} }
     'ports.create': { paramsTuple?: []; params?: {} }
     'ports.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -262,13 +303,21 @@ export type ScannedRoutes = {
     'navigation.fuel': { paramsTuple?: []; params?: {} }
     'navigation.incidents': { paramsTuple?: []; params?: {} }
     'reservations.index': { paramsTuple?: []; params?: {} }
-    'event_stream': { paramsTuple?: []; params?: {} }
+    'clients.index': { paramsTuple?: []; params?: {} }
+    'clients.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'pricingSeasons.index': { paramsTuple?: []; params?: {} }
+    'invoices.index': { paramsTuple?: []; params?: {} }
+    'invoices.create': { paramsTuple?: []; params?: {} }
+    'invoices.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'invoices.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'invoices.pdf': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'new_account.create': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }
     'password.forgot': { paramsTuple?: []; params?: {} }
     'password.reset': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
+    'event_stream': { paramsTuple?: []; params?: {} }
     'dashboard': { paramsTuple?: []; params?: {} }
     'design_system': { paramsTuple?: []; params?: {} }
     'sitemap': { paramsTuple?: []; params?: {} }
@@ -294,6 +343,10 @@ export type ScannedRoutes = {
     'boats.simulator': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.navigationLogs.crewRole.download': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue} }
     'boats.reservations.index': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
+    'boats.reservations.inspection.show': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
+    'boats.reservations.contract.show': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
+    'boats.reservations.contract.pdf': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
+    'boats.reservations.contract.signedDocument': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
     'ports.index': { paramsTuple?: []; params?: {} }
     'ports.create': { paramsTuple?: []; params?: {} }
     'ports.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -335,13 +388,22 @@ export type ScannedRoutes = {
     'navigation.fuel': { paramsTuple?: []; params?: {} }
     'navigation.incidents': { paramsTuple?: []; params?: {} }
     'reservations.index': { paramsTuple?: []; params?: {} }
-    'event_stream': { paramsTuple?: []; params?: {} }
+    'clients.index': { paramsTuple?: []; params?: {} }
+    'clients.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'pricingSeasons.index': { paramsTuple?: []; params?: {} }
+    'invoices.index': { paramsTuple?: []; params?: {} }
+    'invoices.create': { paramsTuple?: []; params?: {} }
+    'invoices.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'invoices.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'invoices.pdf': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'new_account.create': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }
     'password.forgot': { paramsTuple?: []; params?: {} }
     'password.reset': { paramsTuple?: []; params?: {} }
   }
   POST: {
+    'subscribe': { paramsTuple?: []; params?: {} }
+    'unsubscribe': { paramsTuple?: []; params?: {} }
     'boats.store': { paramsTuple?: []; params?: {} }
     'boats.portStays.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.budget.entries.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -363,6 +425,11 @@ export type ScannedRoutes = {
     'boats.adminDocuments.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'boats.position.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'boats.reservations.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
+    'boats.reservations.inspections.store': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
+    'boats.reservations.inspections.photos.store': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue,'inspectionId': ParamValue} }
+    'boats.reservations.contract.store': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
+    'boats.reservations.contract.send': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
+    'boats.reservations.contract.sign': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
     'ports.store': { paramsTuple?: []; params?: {} }
     'ports.pontoons.store': { paramsTuple: [ParamValue]; params: {'portId': ParamValue} }
     'ports.mouillages.store': { paramsTuple: [ParamValue]; params: {'portId': ParamValue} }
@@ -382,11 +449,17 @@ export type ScannedRoutes = {
     'organization.members.store': { paramsTuple?: []; params?: {} }
     'organization.invitations.store': { paramsTuple?: []; params?: {} }
     'invitations.accept': { paramsTuple?: []; params?: {} }
+    'invitations.decline': { paramsTuple?: []; params?: {} }
     'webhooks.stripe': { paramsTuple?: []; params?: {} }
     'crew.store': { paramsTuple?: []; params?: {} }
     'crew.certifications.store': { paramsTuple: [ParamValue]; params: {'memberId': ParamValue} }
-    'subscribe': { paramsTuple?: []; params?: {} }
-    'unsubscribe': { paramsTuple?: []; params?: {} }
+    'clients.store': { paramsTuple?: []; params?: {} }
+    'pricingSeasons.store': { paramsTuple?: []; params?: {} }
+    'invoices.store': { paramsTuple?: []; params?: {} }
+    'invoices.fromReservation': { paramsTuple: [ParamValue]; params: {'reservationId': ParamValue} }
+    'invoices.send': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'invoices.convert': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'invoices.pay': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'new_account.store': { paramsTuple?: []; params?: {} }
     'session.store': { paramsTuple?: []; params?: {} }
     'password_reset.store': { paramsTuple?: []; params?: {} }
@@ -433,6 +506,9 @@ export type ScannedRoutes = {
     'boats.navigationLogs.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue} }
     'boats.adminDocuments.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'documentId': ParamValue} }
     'boats.reservations.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
+    'boats.reservations.inspections.destroy': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue,'inspectionId': ParamValue} }
+    'boats.reservations.inspections.photos.destroy': { paramsTuple: [ParamValue,ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue,'inspectionId': ParamValue,'mediaId': ParamValue} }
+    'boats.reservations.contract.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
     'ports.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'ports.pontoons.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'pontoonId': ParamValue} }
     'ports.mouillages.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'mouillageId': ParamValue} }
@@ -443,9 +519,13 @@ export type ScannedRoutes = {
     'notifications.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'crew.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'crew.certifications.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'memberId': ParamValue,'certId': ParamValue} }
+    'clients.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'pricingSeasons.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'invoices.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   PUT: {
     'boats.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'boats.pricing.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boat_equipment.update_engine': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
     'boat_engine_parts.update': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue,'partId': ParamValue} }
     'boat_equipment.update_sail': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'sailId': ParamValue} }
@@ -457,6 +537,7 @@ export type ScannedRoutes = {
     'boats.maintenanceSheetItems.update': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'sheetId': ParamValue,'itemId': ParamValue} }
     'boats.incidents.update': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'incidentId': ParamValue} }
     'boats.adminDocuments.update': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'documentId': ParamValue} }
+    'boats.reservations.inspections.update': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue,'inspectionId': ParamValue} }
     'ports.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'ports.pontoons.update': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'pontoonId': ParamValue} }
     'ports.mouillages.update': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'mouillageId': ParamValue} }
@@ -467,6 +548,9 @@ export type ScannedRoutes = {
     'settings.branding.update': { paramsTuple?: []; params?: {} }
     'organization.members.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'crew.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'clients.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'pricingSeasons.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'invoices.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
 }
 declare module '@adonisjs/core/types/http' {
