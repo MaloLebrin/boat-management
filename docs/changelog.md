@@ -19,6 +19,7 @@ Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
   - Sélecteur de client (optionnel) dans `ReservationForm.vue` et `ReservationEditModal.vue` (remplit le nom snapshot à la sélection) ; `clientOptions` propagé via `boats/reservations.vue` → `ReservationList`
   - Nouvelle fiche client `inertia/pages/clients/show.vue` (informations + historique des réservations) ; lien « Voir » depuis la liste des clients
 - **i18n** en + fr : `reservations.form.client`/`noClientOption`, `clients.view`, `clients.show.*`, `flash.reservation.blacklistedClient`
+- **Documentation** : nouveau `docs/domain/clients.md` (module CRM clients + lien réservation ↔ client : résolution org-scopée, blocage blacklist, historique, synergie #288), référencé dans `docs/README.md` et croisé depuis `docs/domain/reservations-and-pricing.md`
 - **Tests** :
   - 6 fonctionnels (`tests/functional/boats/reservation_client_link.spec.ts`) : lien à la création, refus blacklist (création + mise à jour), `client_id` cross-org ignoré, suppression client → `client_id` NULL (snapshot conservé), historique sur la fiche client
   - Front (Vitest) : sélecteur de client dans le formulaire de réservation ; mocks `useForm` mis à jour pour `transform()`

@@ -4,6 +4,10 @@
 > **système de tarification** (tarif de base, périodes saisonnières, calcul
 > automatique du total). Couvre les epics #107 (réservations) et #284
 > (tarification & saisonnalité — lots #292, #293, #294).
+>
+> Le **rattachement d'une réservation à une fiche client** (lien, historique,
+> blocage blacklist — #275) est documenté dans
+> [`clients.md`](./clients.md).
 
 ---
 
