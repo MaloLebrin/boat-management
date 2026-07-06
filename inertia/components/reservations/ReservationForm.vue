@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3'
-import { watch } from 'vue'
+import { computed, watch } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseField from '~/components/base/BaseField.vue'
@@ -12,12 +12,14 @@ import { useT } from '~/composables/use_t'
 import { computeReservationQuote } from '#shared/helpers/reservation_quote'
 import type { BoatPricingRow } from '#shared/types/boat_pricing'
 import type { PricingSeasonRow } from '#shared/types/pricing_season'
+import type { ClientOption } from '#shared/types/client'
 import type { ReservationStatus } from '~/types/reservation'
 
 const props = defineProps<{
   boatId: number
   boatPricing: BoatPricingRow | null
   pricingSeasons: PricingSeasonRow[]
+  clientOptions?: ClientOption[]
 }>()
 
 const { t } = useT()
@@ -25,6 +27,7 @@ const { t } = useT()
 const form = useForm({
   startsAt: '',
   endsAt: '',
+  clientId: '',
   clientName: '',
   clientEmail: '',
   clientPhone: '',
@@ -39,6 +42,21 @@ const statusOptions = [
   { value: 'cancelled', label: t('reservations.status.cancelled') },
 ]
 
+const clientSelectOptions = computed(() => [
+  { value: '', label: t('reservations.form.noClientOption') },
+  ...(props.clientOptions ?? []).map((c) => ({ value: String(c.id), label: c.fullName })),
+])
+
+// Selecting a client conveniently fills the free-text name snapshot.
+watch(
+  () => form.clientId,
+  (clientId) => {
+    if (!clientId) return
+    const selected = (props.clientOptions ?? []).find((c) => String(c.id) === clientId)
+    if (selected) form.clientName = selected.fullName
+  }
+)
+
 // Auto-fill totalPrice when dates change (only if totalPrice is empty)
 watch([() => form.startsAt, () => form.endsAt], ([startsAt, endsAt]) => {
   if (!startsAt || !endsAt || form.totalPrice !== '') return
@@ -49,10 +67,12 @@ watch([() => form.startsAt, () => form.endsAt], ([startsAt, endsAt]) => {
 })
 
 function submit() {
-  form.post(`/boats/${props.boatId}/reservations`, {
-    preserveScroll: true,
-    onSuccess: () => form.reset(),
-  })
+  form
+    .transform((data) => ({ ...data, clientId: data.clientId ? Number(data.clientId) : null }))
+    .post(`/boats/${props.boatId}/reservations`, {
+      preserveScroll: true,
+      onSuccess: () => form.reset(),
+    })
 }
 </script>
 
@@ -83,9 +103,15 @@ function submit() {
       </div>
 
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <BaseField :label="t('reservations.form.client')" :error="form.errors.clientId">
+          <BaseSelect v-model="form.clientId" :options="clientSelectOptions" />
+        </BaseField>
         <BaseField :label="t('reservations.form.clientName')" :error="form.errors.clientName">
           <BaseInput v-model="form.clientName" required />
         </BaseField>
+      </div>
+
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <BaseField :label="t('reservations.form.status')" :error="form.errors.status">
           <BaseSelect v-model="form.status" :options="statusOptions" />
         </BaseField>

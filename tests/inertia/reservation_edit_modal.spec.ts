@@ -3,10 +3,11 @@ import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 const mockFormPatch = vi.hoisted(() => vi.fn())
 
-vi.mock('@inertiajs/vue3', () => ({
-  useForm: () => ({
+vi.mock('@inertiajs/vue3', () => {
+  const form: Record<string, unknown> = {
     startsAt: '',
     endsAt: '',
+    clientId: '',
     clientName: '',
     clientEmail: '',
     clientPhone: '',
@@ -16,9 +17,13 @@ vi.mock('@inertiajs/vue3', () => ({
     errors: {},
     processing: false,
     patch: mockFormPatch,
-  }),
-  usePage: () => ({ props: { appT: {}, locale: 'en' } }),
-}))
+    transform: vi.fn(() => form),
+  }
+  return {
+    useForm: () => form,
+    usePage: () => ({ props: { appT: {}, locale: 'en' } }),
+  }
+})
 
 vi.mock('~/components/base/BaseButton.vue', () => ({
   default: {

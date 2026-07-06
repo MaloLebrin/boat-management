@@ -27,6 +27,7 @@ declare module '@adonisjs/inertia/types' {
     'boats/show': ExtractProps<(typeof import('../../inertia/pages/boats/show.vue'))['default']>
     'boats/simulator': ExtractProps<(typeof import('../../inertia/pages/boats/simulator.vue'))['default']>
     'clients/index': ExtractProps<(typeof import('../../inertia/pages/clients/index.vue'))['default']>
+    'clients/show': ExtractProps<(typeof import('../../inertia/pages/clients/show.vue'))['default']>
     'dashboard': ExtractProps<(typeof import('../../inertia/pages/dashboard.vue'))['default']>
     'design_system': ExtractProps<(typeof import('../../inertia/pages/design_system.vue'))['default']>
     'errors/not_found': ExtractProps<(typeof import('../../inertia/pages/errors/not_found.vue'))['default']>

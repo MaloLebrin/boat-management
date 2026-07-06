@@ -35,6 +35,8 @@
     "editTitle": "Edit reservation",
     "startsAt": "Start date",
     "endsAt": "End date",
+    "client": "Existing client (optional)",
+    "noClientOption": "None — free text",
     "clientName": "Client name",
     "clientEmail": "Email (optional)",
     "clientPhone": "Phone (optional)",

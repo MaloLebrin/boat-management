@@ -450,19 +450,27 @@ export default class InvoiceService {
     return db.transaction(async (trx) => {
       const number = await this.#allocateNumber(trx, org.id, 'quote')
 
-      // Resolve the client by the reservation's snapshot email; keep the
-      // free-text name as the invoice snapshot when no record matches.
+      // Resolve the client: prefer the reservation's linked client FK (#275),
+      // fall back to matching the snapshot email (#288). Keep the free-text name
+      // as the invoice snapshot when no client record matches.
       let clientId: number | null = null
       let clientName: string | null = reservation.clientName || null
-      if (reservation.clientEmail) {
-        const client = await Client.query({ client: trx })
+      let client: Client | null = null
+      if (reservation.clientId) {
+        client = await Client.query({ client: trx })
+          .where('id', reservation.clientId)
+          .where('organizationId', org.id)
+          .first()
+      }
+      if (!client && reservation.clientEmail) {
+        client = await Client.query({ client: trx })
           .where('organizationId', org.id)
           .where('email', reservation.clientEmail)
           .first()
-        if (client) {
-          clientId = client.id
-          clientName = client.fullName
-        }
+      }
+      if (client) {
+        clientId = client.id
+        clientName = client.fullName
       }
 
       const unitPrice = reservation.totalPrice ? Number.parseFloat(reservation.totalPrice) : 0

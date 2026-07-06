@@ -9,6 +9,7 @@ import ReservationList from '~/components/reservations/ReservationList.vue'
 import { useT } from '~/composables/use_t'
 import type { BoatPricingRow } from '#shared/types/boat_pricing'
 import type { PricingSeasonRow } from '#shared/types/pricing_season'
+import type { ClientOption } from '#shared/types/client'
 import type { BoatReservationRow } from '~/types/reservation'
 
 const props = defineProps<{
@@ -17,6 +18,7 @@ const props = defineProps<{
   canManage: boolean
   boatPricing: BoatPricingRow | null
   pricingSeasons: PricingSeasonRow[]
+  clientOptions: ClientOption[]
 }>()
 
 const { t } = useT()
@@ -110,6 +112,7 @@ function scrollToForm() {
         :boat-id="boat.id"
         :boat-pricing="boatPricing"
         :pricing-seasons="pricingSeasons"
+        :client-options="clientOptions"
       />
     </div>
 
@@ -120,6 +123,7 @@ function scrollToForm() {
         :can-manage="canManage"
         :boat-pricing="boatPricing"
         :pricing-seasons="pricingSeasons"
+        :client-options="clientOptions"
       />
     </div>
   </div>

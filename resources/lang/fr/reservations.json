@@ -35,6 +35,8 @@
     "editTitle": "Modifier la réservation",
     "startsAt": "Début",
     "endsAt": "Fin",
+    "client": "Client existant (optionnel)",
+    "noClientOption": "Aucun — saisie libre",
     "clientName": "Nom du client",
     "clientEmail": "Email (optionnel)",
     "clientPhone": "Téléphone (optionnel)",

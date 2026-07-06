@@ -3,12 +3,14 @@ import {
   ReservationNotFoundError,
   ReservationValidationError,
   ReservationDurationError,
+  ReservationBlacklistedClientError,
 } from '#exceptions/reservation_errors'
 import { BoatNotFoundError } from '#exceptions/boat_errors'
 import BoatReservationService from '#services/boat_reservation_service'
 import BoatService from '#services/boat_service'
 import BoatPricingService from '#services/boat_pricing_service'
 import PricingSeasonService from '#services/pricing_season_service'
+import ClientService from '#services/client_service'
 import { toBoatPricingRow } from '#transformers/boat_pricing_transformer'
 import BoatPolicy from '#policies/boat_policy'
 import {
@@ -27,7 +29,8 @@ export default class BoatReservationsController {
     private boatService: BoatService,
     private reservationService: BoatReservationService,
     private boatPricingService: BoatPricingService,
-    private pricingSeasonService: PricingSeasonService
+    private pricingSeasonService: PricingSeasonService,
+    private clientService: ClientService
   ) {}
 
   private async resolveBoat(
@@ -55,12 +58,14 @@ export default class BoatReservationsController {
 
     await bouncer.with(BoatPolicy).authorize('view', boat)
 
-    const [reservations, canManage, pricingModel, pricingSeasons] = await Promise.all([
-      this.reservationService.listForBoat(user, boat),
-      bouncer.with(BoatPolicy).allows('manage', boat),
-      this.boatPricingService.getForBoat(boat),
-      this.pricingSeasonService.listForBoatScope(boat.organizationId, boat.id),
-    ])
+    const [reservations, canManage, pricingModel, pricingSeasons, clientOptions] =
+      await Promise.all([
+        this.reservationService.listForBoat(user, boat),
+        bouncer.with(BoatPolicy).allows('manage', boat),
+        this.boatPricingService.getForBoat(boat),
+        this.pricingSeasonService.listForBoatScope(boat.organizationId, boat.id),
+        this.clientService.listOptions(boat.organizationId),
+      ])
 
     const boatPricing = pricingModel ? toBoatPricingRow(pricingModel) : null
 
@@ -70,6 +75,7 @@ export default class BoatReservationsController {
       canManage,
       boatPricing,
       pricingSeasons,
+      clientOptions,
     })
   }
 
@@ -89,6 +95,7 @@ export default class BoatReservationsController {
       ;({ cancelledOptions } = await this.reservationService.create(user, boat, {
         startsAt: payload.startsAt,
         endsAt: payload.endsAt,
+        clientId: payload.clientId ?? null,
         clientName: payload.clientName,
         clientEmail: payload.clientEmail ?? null,
         clientPhone: payload.clientPhone ?? null,
@@ -99,6 +106,10 @@ export default class BoatReservationsController {
     } catch (error) {
       if (error instanceof ReservationConflictError) {
         session.flash('error', i18n.t('flash.reservation.conflict'))
+        return response.redirect().back()
+      }
+      if (error instanceof ReservationBlacklistedClientError) {
+        session.flash('error', i18n.t('flash.reservation.blacklistedClient'))
         return response.redirect().back()
       }
       if (error instanceof ReservationValidationError) {
@@ -148,6 +159,7 @@ export default class BoatReservationsController {
         {
           startsAt: payload.startsAt,
           endsAt: payload.endsAt,
+          clientId: payload.clientId,
           clientName: payload.clientName,
           clientEmail: payload.clientEmail,
           clientPhone: payload.clientPhone,
@@ -163,6 +175,10 @@ export default class BoatReservationsController {
       }
       if (error instanceof ReservationConflictError) {
         session.flash('error', i18n.t('flash.reservation.conflict'))
+        return response.redirect().back()
+      }
+      if (error instanceof ReservationBlacklistedClientError) {
+        session.flash('error', i18n.t('flash.reservation.blacklistedClient'))
         return response.redirect().back()
       }
       if (error instanceof ReservationValidationError) {

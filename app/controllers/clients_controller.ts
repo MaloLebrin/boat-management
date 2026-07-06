@@ -1,8 +1,11 @@
 import ClientService, { ClientNotFoundError } from '#services/client_service'
+import BoatReservationService from '#services/boat_reservation_service'
 import QuotaService from '#services/quota_service'
 import { QuotaExceededError } from '#exceptions/quota_errors'
 import ClientPolicy from '#policies/client_policy'
 import { createClientValidator, updateClientValidator } from '#validators/client'
+import { toClientRow } from '#transformers/client_transformer'
+import { toBoatReservationRow } from '#transformers/boat_reservation_transformer'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import type Organization from '#models/organization'
@@ -11,6 +14,7 @@ import type Organization from '#models/organization'
 export default class ClientsController {
   constructor(
     private clientService: ClientService,
+    private reservationService: BoatReservationService,
     private quotaService: QuotaService
   ) {}
 
@@ -49,6 +53,30 @@ export default class ClientsController {
     const canDelete = await bouncer.with(ClientPolicy).allows('delete')
 
     return inertia.render('clients/index', { clients, filters, canDelete })
+  }
+
+  async show({ inertia, auth, bouncer, params, session, response, i18n }: HttpContext) {
+    await auth.authenticate()
+    const org = await this.loadOrgAndAssertEnterprise({ auth, session, response, i18n })
+    if (!org) return
+
+    await bouncer.with(ClientPolicy).authorize('create')
+
+    try {
+      const client = await this.clientService.getForOrganizationOrFail(org, Number(params.id))
+      const reservations = await this.reservationService.listForClient(org.id, client.id)
+      return inertia.render('clients/show', {
+        client: toClientRow(client),
+        reservations: reservations.map((r) => toBoatReservationRow(r, r.boat?.name ?? '')),
+      })
+    } catch (error) {
+      if (error instanceof ClientNotFoundError) {
+        session.flash('error', i18n.t('flash.clients.notFound'))
+        response.redirect('/clients')
+        return
+      }
+      throw error
+    }
   }
 
   async store({ request, response, auth, bouncer, session, i18n }: HttpContext) {

@@ -4,10 +4,11 @@ import { beforeEach, describe, expect, test, vi } from 'vitest'
 const mockFormPost = vi.hoisted(() => vi.fn())
 const mockFormReset = vi.hoisted(() => vi.fn())
 
-vi.mock('@inertiajs/vue3', () => ({
-  useForm: () => ({
+vi.mock('@inertiajs/vue3', () => {
+  const form: Record<string, unknown> = {
     startsAt: '',
     endsAt: '',
+    clientId: '',
     clientName: '',
     clientEmail: '',
     clientPhone: '',
@@ -18,9 +19,13 @@ vi.mock('@inertiajs/vue3', () => ({
     processing: false,
     post: mockFormPost,
     reset: mockFormReset,
-  }),
-  usePage: () => ({ props: { appT: {}, locale: 'en' } }),
-}))
+    transform: vi.fn(() => form),
+  }
+  return {
+    useForm: () => form,
+    usePage: () => ({ props: { appT: {}, locale: 'en' } }),
+  }
+})
 
 vi.mock('~/components/base/BaseButton.vue', () => ({
   default: {
@@ -53,5 +58,19 @@ describe('ReservationForm', () => {
     const wrapper = mount(ReservationForm, { props: { boatId: 1 } })
     const btn = wrapper.find('button[type="submit"]')
     expect(btn.attributes('disabled')).toBeUndefined()
+  })
+
+  test('renders a client selector from the client options', () => {
+    const wrapper = mount(ReservationForm, {
+      props: {
+        boatId: 1,
+        clientOptions: [
+          { id: 3, fullName: 'Alice Martin', status: 'active' },
+          { id: 4, fullName: 'Bob Blake', status: 'blacklisted' },
+        ],
+      },
+    })
+    expect(wrapper.text()).toContain('Alice Martin')
+    expect(wrapper.text()).toContain('Bob Blake')
   })
 })
