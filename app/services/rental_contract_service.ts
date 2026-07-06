@@ -1,6 +1,7 @@
 import {
   RentalContractAlreadyExistsError,
   RentalContractInvalidTransitionError,
+  RentalContractNoClientEmailError,
   RentalContractNotFoundError,
 } from '#exceptions/rental_contract_errors'
 import RentalContract from '#models/rental_contract'
@@ -84,6 +85,18 @@ export default class RentalContractService {
       }
       throw error
     }
+  }
+
+  /**
+   * Resolves the client email to notify: prefers the CRM client linked to the
+   * contract, falls back to the reservation's snapshot email.
+   */
+  resolveClientEmail(contract: RentalContract): string {
+    const email = contract.client?.email ?? contract.reservation.clientEmail
+    if (!email) {
+      throw new RentalContractNoClientEmailError()
+    }
+    return email
   }
 
   async markSent(contract: RentalContract): Promise<RentalContract> {

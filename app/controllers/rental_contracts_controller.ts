@@ -2,6 +2,7 @@ import { BoatNotFoundError } from '#exceptions/boat_errors'
 import {
   RentalContractAlreadyExistsError,
   RentalContractInvalidTransitionError,
+  RentalContractNoClientEmailError,
   RentalContractNotFoundError,
 } from '#exceptions/rental_contract_errors'
 import BoatService from '#services/boat_service'
@@ -223,10 +224,15 @@ export default class RentalContractsController {
       return response.redirect(`/boats/${boat.id}/reservations/${reservation.id}/contract`)
     }
 
-    const clientEmail = contract.client?.email ?? reservation.clientEmail
-    if (!clientEmail) {
-      session.flash('error', i18n.t('flash.rentalContracts.noClientEmail'))
-      return response.redirect().back()
+    let clientEmail: string
+    try {
+      clientEmail = this.contractService.resolveClientEmail(contract)
+    } catch (error) {
+      if (error instanceof RentalContractNoClientEmailError) {
+        session.flash('error', i18n.t('flash.rentalContracts.noClientEmail'))
+        return response.redirect().back()
+      }
+      throw error
     }
 
     try {
