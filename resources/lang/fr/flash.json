@@ -112,6 +112,13 @@
     "notFound": "Incident introuvable.",
     "descriptionRequired": "Une description est requise."
   },
+  "inspections": {
+    "created": "État des lieux enregistré.",
+    "updated": "État des lieux mis à jour.",
+    "deleted": "État des lieux supprimé.",
+    "notFound": "État des lieux introuvable.",
+    "kindAlreadyExists": "Un état des lieux existe déjà pour ce type (départ/retour)."
+  },
   "fuelLog": {
     "created": "Avitaillement enregistré.",
     "deleted": "Avitaillement supprimé.",

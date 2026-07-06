@@ -1,0 +1,39 @@
+{
+  "title": "Inspection",
+  "kind": {
+    "checkout": "Checkout",
+    "checkin": "Checkin"
+  },
+  "empty": {
+    "checkout": "No checkout inspection yet.",
+    "checkin": "No checkin inspection yet."
+  },
+  "fields": {
+    "performedAt": "Recorded at",
+    "fuelLevel": "Fuel level (%)",
+    "engineHours": "Engine hours",
+    "notes": "Notes (optional)"
+  },
+  "form": {
+    "createTitle": "Save inspection",
+    "editTitle": "Edit inspection",
+    "submit": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "confirmDelete": "Delete this inspection?"
+  },
+  "photos": {
+    "title": "Photos",
+    "add": "+ Add a photo",
+    "empty": "No photos.",
+    "delete": "Delete",
+    "confirmDelete": "Delete this photo?"
+  },
+  "comparison": {
+    "title": "Checkout / checkin comparison",
+    "fuelLevel": "Fuel level",
+    "engineHours": "Engine hours",
+    "unavailable": "Fill in both inspections to see the comparison."
+  }
+}

@@ -112,6 +112,13 @@
     "notFound": "Incident not found.",
     "descriptionRequired": "A description is required."
   },
+  "inspections": {
+    "created": "Inspection saved.",
+    "updated": "Inspection updated.",
+    "deleted": "Inspection deleted.",
+    "notFound": "Inspection not found.",
+    "kindAlreadyExists": "An inspection already exists for this type (checkout/checkin)."
+  },
   "fuelLog": {
     "created": "Fuel log recorded.",
     "deleted": "Fuel log deleted.",

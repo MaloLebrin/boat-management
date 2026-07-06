@@ -255,5 +255,42 @@ router
     router
       .delete('boats/:boatId/reservations/:reservationId', [BoatReservationsController, 'destroy'])
       .as('boats.reservations.destroy')
+
+    router
+      .get('boats/:boatId/reservations/:reservationId/inspection', [
+        controllers.BoatInspections,
+        'show',
+      ])
+      .as('boats.reservations.inspection.show')
+    router
+      .post('boats/:boatId/reservations/:reservationId/inspections', [
+        controllers.BoatInspections,
+        'store',
+      ])
+      .as('boats.reservations.inspections.store')
+    router
+      .put('boats/:boatId/reservations/:reservationId/inspections/:inspectionId', [
+        controllers.BoatInspections,
+        'update',
+      ])
+      .as('boats.reservations.inspections.update')
+    router
+      .delete('boats/:boatId/reservations/:reservationId/inspections/:inspectionId', [
+        controllers.BoatInspections,
+        'destroy',
+      ])
+      .as('boats.reservations.inspections.destroy')
+    router
+      .post('boats/:boatId/reservations/:reservationId/inspections/:inspectionId/photos', [
+        controllers.BoatMedia,
+        'storeInspectionPhoto',
+      ])
+      .as('boats.reservations.inspections.photos.store')
+    router
+      .delete(
+        'boats/:boatId/reservations/:reservationId/inspections/:inspectionId/photos/:mediaId',
+        [controllers.BoatMedia, 'destroyInspectionMedia']
+      )
+      .as('boats.reservations.inspections.photos.destroy')
   })
   .use(middleware.auth())

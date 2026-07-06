@@ -26,6 +26,10 @@ export type Capability =
   | 'incidents.create'
   | 'incidents.edit'
   | 'incidents.delete'
+  | 'inspections.view'
+  | 'inspections.create'
+  | 'inspections.edit'
+  | 'inspections.delete'
   | 'invoices.create'
   | 'invoices.update'
   | 'invoices.delete'
@@ -65,6 +69,7 @@ const ADMIN_ONLY_CAPABILITIES: Capability[] = [
   'crew.delete',
   'fuel_logs.delete',
   'incidents.delete',
+  'inspections.delete',
   'invoices.delete',
   'maintenance.delete',
   'mouillages.create',
@@ -97,6 +102,9 @@ const MEMBER_CAPABILITIES: Capability[] = [
   'incidents.view',
   'incidents.create',
   'incidents.edit',
+  'inspections.view',
+  'inspections.create',
+  'inspections.edit',
   'invoices.create',
   'invoices.update',
   'maintenance.view',

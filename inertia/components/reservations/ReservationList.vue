@@ -104,6 +104,22 @@ function deleteReservation(id: number) {
                 <BaseButton
                   variant="ghost"
                   size="sm"
+                  :title="t('reservations.actions.inspection')"
+                  route="boats.reservations.inspection.show"
+                  :params="{ boatId, reservationId: row.id }"
+                >
+                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </BaseButton>
+                <BaseButton
+                  variant="ghost"
+                  size="sm"
                   :title="t('reservations.form.edit')"
                   @click="openEdit(row)"
                 >

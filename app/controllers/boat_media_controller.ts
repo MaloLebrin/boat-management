@@ -1,5 +1,9 @@
 import BoatPolicy from '#policies/boat_policy'
+import InspectionPolicy from '#policies/inspection_policy'
 import BoatService, { BoatNotFoundError } from '#services/boat_service'
+import BoatReservationService from '#services/boat_reservation_service'
+import BoatInspectionService from '#services/boat_inspection_service'
+import { BoatInspectionNotFoundError } from '#exceptions/inspection_errors'
 import MediaService, { MediaNotFoundError } from '#services/media_service'
 import OrganizationService from '#services/organization_service'
 import { CloudinaryFolders, CloudinaryService } from '#services/cloudinary_service'
@@ -22,7 +26,9 @@ export default class BoatMediaController {
     private boatService: BoatService,
     private mediaService: MediaService,
     private cloudinaryService: CloudinaryService,
-    private organizationService: OrganizationService
+    private organizationService: OrganizationService,
+    private reservationService: BoatReservationService,
+    private inspectionService: BoatInspectionService
   ) {}
 
   private async loadBoat(ctx: Pick<HttpContext, 'auth' | 'response' | 'params'>) {
@@ -199,6 +205,119 @@ export default class BoatMediaController {
 
     session.flash('success', i18n.t('flash.media.deleted'))
     response.redirect(`/boats/${boat.id}/engines/${engineId}?tab=documents`)
+  }
+
+  async storeInspectionPhoto({
+    request,
+    response,
+    auth,
+    params,
+    bouncer,
+    session,
+    i18n,
+  }: HttpContext) {
+    await auth.authenticate()
+    const loaded = await this.loadBoat({ auth, response, params })
+    if (!loaded) return
+
+    const { boat, user } = loaded
+    const reservation = await this.reservationService.findForBoat(
+      user,
+      boat,
+      Number(params.reservationId)
+    )
+    if (!reservation) {
+      response.redirect(`/boats/${boat.id}/reservations`)
+      return
+    }
+
+    await bouncer.with(InspectionPolicy).authorize('edit', reservation)
+
+    const inspectionId = Number(params.inspectionId)
+    let inspection
+    try {
+      inspection = await this.inspectionService.findForReservation(user, reservation, inspectionId)
+    } catch (error) {
+      if (error instanceof BoatInspectionNotFoundError) {
+        response.redirect(`/boats/${boat.id}/reservations/${reservation.id}/inspection`)
+        return
+      }
+      throw error
+    }
+
+    const payload = await request.validateUsing(storeBoatPhotoValidator)
+    const org = await this.organizationService.findOrFail(boat.organizationId)
+
+    await this.mediaService.upload(
+      user,
+      payload.file,
+      {
+        folder: CloudinaryFolders.inspectionPhotos(
+          org.slug,
+          boat.id,
+          reservation.id,
+          inspection.kind
+        ),
+        entityType: 'inspection',
+        entityId: inspection.id,
+        kind: 'photo',
+        caption: payload.caption ?? null,
+      },
+      org
+    )
+
+    session.flash('success', i18n.t('flash.media.photoAdded'))
+    response.redirect(`/boats/${boat.id}/reservations/${reservation.id}/inspection`)
+  }
+
+  async destroyInspectionMedia({ response, auth, params, bouncer, session, i18n }: HttpContext) {
+    await auth.authenticate()
+    const loaded = await this.loadBoat({ auth, response, params })
+    if (!loaded) return
+
+    const { boat, user } = loaded
+    const reservation = await this.reservationService.findForBoat(
+      user,
+      boat,
+      Number(params.reservationId)
+    )
+    if (!reservation) {
+      response.redirect(`/boats/${boat.id}/reservations`)
+      return
+    }
+
+    await bouncer.with(InspectionPolicy).authorize('delete', reservation)
+
+    const inspectionId = Number(params.inspectionId)
+    try {
+      await this.inspectionService.findForReservation(user, reservation, inspectionId)
+    } catch (error) {
+      if (error instanceof BoatInspectionNotFoundError) {
+        response.redirect(`/boats/${boat.id}/reservations/${reservation.id}/inspection`)
+        return
+      }
+      throw error
+    }
+
+    const org = await this.organizationService.findOrFail(boat.organizationId)
+
+    try {
+      await this.mediaService.deleteForEntity(
+        Number(params.mediaId),
+        'inspection',
+        inspectionId,
+        org
+      )
+    } catch (error) {
+      if (error instanceof MediaNotFoundError) {
+        response.redirect(`/boats/${boat.id}/reservations/${reservation.id}/inspection`)
+        return
+      }
+      throw error
+    }
+
+    session.flash('success', i18n.t('flash.media.deleted'))
+    response.redirect(`/boats/${boat.id}/reservations/${reservation.id}/inspection`)
   }
 
   async downloadMedia({ response, auth, params }: HttpContext) {

@@ -1,0 +1,39 @@
+{
+  "title": "État des lieux",
+  "kind": {
+    "checkout": "Départ",
+    "checkin": "Retour"
+  },
+  "empty": {
+    "checkout": "Aucun état des lieux de départ pour l'instant.",
+    "checkin": "Aucun état des lieux de retour pour l'instant."
+  },
+  "fields": {
+    "performedAt": "Date du relevé",
+    "fuelLevel": "Niveau carburant (%)",
+    "engineHours": "Heures moteur",
+    "notes": "Notes (optionnel)"
+  },
+  "form": {
+    "createTitle": "Enregistrer l'état des lieux",
+    "editTitle": "Modifier l'état des lieux",
+    "submit": "Enregistrer",
+    "cancel": "Annuler",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "confirmDelete": "Supprimer cet état des lieux ?"
+  },
+  "photos": {
+    "title": "Photos",
+    "add": "+ Ajouter une photo",
+    "empty": "Aucune photo.",
+    "delete": "Supprimer",
+    "confirmDelete": "Supprimer cette photo ?"
+  },
+  "comparison": {
+    "title": "Comparaison départ / retour",
+    "fuelLevel": "Niveau carburant",
+    "engineHours": "Heures moteur",
+    "unavailable": "Renseignez les deux états des lieux pour voir la comparaison."
+  }
+}

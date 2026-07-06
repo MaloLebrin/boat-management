@@ -7,6 +7,7 @@
 import type { InferData, InferVariants } from '@adonisjs/core/types/transformers'
 import type { InferSharedProps } from '@adonisjs/inertia/types'
 import type BoatEngineTransformer from '#transformers/boat_engine_transformer'
+import type BoatInspectionTransformer from '#transformers/boat_inspection_transformer'
 import type BoatPricingTransformer from '#transformers/boat_pricing_transformer'
 import type BoatReservationTransformer from '#transformers/boat_reservation_transformer'
 import type BoatTransformer from '#transformers/boat_transformer'
@@ -30,6 +31,10 @@ export namespace Data {
   export type BoatEngine = InferData<BoatEngineTransformer>
   export namespace BoatEngine {
     export type Variants = InferVariants<BoatEngineTransformer>
+  }
+  export type BoatInspection = InferData<BoatInspectionTransformer>
+  export namespace BoatInspection {
+    export type Variants = InferVariants<BoatInspectionTransformer>
   }
   export type BoatPricing = InferData<BoatPricingTransformer>
   export namespace BoatPricing {

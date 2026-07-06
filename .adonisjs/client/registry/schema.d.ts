@@ -7,6 +7,42 @@ import type { InferInput, SimpleError } from '@vinejs/vine/types'
 export type ParamValue = string | number | bigint | boolean
 
 export interface Registry {
+  'event_stream': {
+    methods: ["GET","HEAD"]
+    pattern: '/__transmit/events'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'subscribe': {
+    methods: ["POST"]
+    pattern: '/__transmit/subscribe'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'unsubscribe': {
+    methods: ["POST"]
+    pattern: '/__transmit/unsubscribe'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
   'dashboard': {
     methods: ["GET","HEAD"]
     pattern: '/dashboard'
@@ -281,6 +317,18 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/boats_controller').default['destroy']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boats_controller').default['destroy']>>>
+    }
+  }
+  'boats.pricing.update': {
+    methods: ["PUT"]
+    pattern: '/boats/:id/pricing'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/boat_pricing').upsertBoatPricingValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/boat_pricing').upsertBoatPricingValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_pricing_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_pricing_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'boats.assign': {
@@ -1049,6 +1097,78 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_reservations_controller').default['destroy']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_reservations_controller').default['destroy']>>>
+    }
+  }
+  'boats.reservations.inspection.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/boats/:boatId/reservations/:reservationId/inspection'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; reservationId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_inspections_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_inspections_controller').default['show']>>>
+    }
+  }
+  'boats.reservations.inspections.store': {
+    methods: ["POST"]
+    pattern: '/boats/:boatId/reservations/:reservationId/inspections'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/boat_inspection').createBoatInspectionValidator)>>
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; reservationId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/boat_inspection').createBoatInspectionValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_inspections_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_inspections_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'boats.reservations.inspections.update': {
+    methods: ["PUT"]
+    pattern: '/boats/:boatId/reservations/:reservationId/inspections/:inspectionId'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/boat_inspection').updateBoatInspectionValidator)>>
+      paramsTuple: [ParamValue, ParamValue, ParamValue]
+      params: { boatId: ParamValue; reservationId: ParamValue; inspectionId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/boat_inspection').updateBoatInspectionValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_inspections_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_inspections_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'boats.reservations.inspections.destroy': {
+    methods: ["DELETE"]
+    pattern: '/boats/:boatId/reservations/:reservationId/inspections/:inspectionId'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue, ParamValue]
+      params: { boatId: ParamValue; reservationId: ParamValue; inspectionId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_inspections_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_inspections_controller').default['destroy']>>>
+    }
+  }
+  'boats.reservations.inspections.photos.store': {
+    methods: ["POST"]
+    pattern: '/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/photos'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/media').storeBoatPhotoValidator)>>
+      paramsTuple: [ParamValue, ParamValue, ParamValue]
+      params: { boatId: ParamValue; reservationId: ParamValue; inspectionId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/media').storeBoatPhotoValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_media_controller').default['storeInspectionPhoto']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_media_controller').default['storeInspectionPhoto']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'boats.reservations.inspections.photos.destroy': {
+    methods: ["DELETE"]
+    pattern: '/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/photos/:mediaId'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue, ParamValue, ParamValue]
+      params: { boatId: ParamValue; reservationId: ParamValue; inspectionId: ParamValue; mediaId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_media_controller').default['destroyInspectionMedia']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_media_controller').default['destroyInspectionMedia']>>>
     }
   }
   'ports.index': {
@@ -1867,6 +1987,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/organization_invitations_controller').default['accept']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'invitations.decline': {
+    methods: ["POST"]
+    pattern: '/invitations/decline'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/organization_member').declineInvitationValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/organization_member').declineInvitationValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/organization_invitations_controller').default['decline']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/organization_invitations_controller').default['decline']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'webhooks.stripe': {
     methods: ["POST"]
     pattern: '/webhooks/stripe'
@@ -2095,40 +2227,256 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/reservations_controller').default['index']>>>
     }
   }
-  'event_stream': {
+  'clients.index': {
     methods: ["GET","HEAD"]
-    pattern: '/__transmit/events'
+    pattern: '/clients'
     types: {
       body: {}
       paramsTuple: []
       params: {}
       query: {}
-      response: unknown
-      errorResponse: unknown
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/clients_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/clients_controller').default['index']>>>
     }
   }
-  'subscribe': {
-    methods: ["POST"]
-    pattern: '/__transmit/subscribe'
+  'clients.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/clients/:id'
     types: {
       body: {}
-      paramsTuple: []
-      params: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
       query: {}
-      response: unknown
-      errorResponse: unknown
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/clients_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/clients_controller').default['show']>>>
     }
   }
-  'unsubscribe': {
+  'clients.store': {
     methods: ["POST"]
-    pattern: '/__transmit/unsubscribe'
+    pattern: '/clients'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/client').createClientValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/client').createClientValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/clients_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/clients_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'clients.update': {
+    methods: ["PUT"]
+    pattern: '/clients/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/client').updateClientValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/client').updateClientValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/clients_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/clients_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'clients.destroy': {
+    methods: ["DELETE"]
+    pattern: '/clients/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/clients_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/clients_controller').default['destroy']>>>
+    }
+  }
+  'pricingSeasons.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/pricing/seasons'
     types: {
       body: {}
       paramsTuple: []
       params: {}
       query: {}
-      response: unknown
-      errorResponse: unknown
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/pricing_seasons_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/pricing_seasons_controller').default['index']>>>
+    }
+  }
+  'pricingSeasons.store': {
+    methods: ["POST"]
+    pattern: '/pricing/seasons'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/pricing_season').createPricingSeasonValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/pricing_season').createPricingSeasonValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/pricing_seasons_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/pricing_seasons_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'pricingSeasons.update': {
+    methods: ["PUT"]
+    pattern: '/pricing/seasons/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/pricing_season').updatePricingSeasonValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/pricing_season').updatePricingSeasonValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/pricing_seasons_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/pricing_seasons_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'pricingSeasons.destroy': {
+    methods: ["DELETE"]
+    pattern: '/pricing/seasons/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/pricing_seasons_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/pricing_seasons_controller').default['destroy']>>>
+    }
+  }
+  'invoices.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/invoices'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/invoices_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/invoices_controller').default['index']>>>
+    }
+  }
+  'invoices.create': {
+    methods: ["GET","HEAD"]
+    pattern: '/invoices/new'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/invoices_controller').default['create']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/invoices_controller').default['create']>>>
+    }
+  }
+  'invoices.store': {
+    methods: ["POST"]
+    pattern: '/invoices'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/invoice').createInvoiceValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/invoice').createInvoiceValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/invoices_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/invoices_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'invoices.fromReservation': {
+    methods: ["POST"]
+    pattern: '/invoices/from-reservation/:reservationId'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { reservationId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/invoices_controller').default['createFromReservation']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/invoices_controller').default['createFromReservation']>>>
+    }
+  }
+  'invoices.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/invoices/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/invoices_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/invoices_controller').default['show']>>>
+    }
+  }
+  'invoices.edit': {
+    methods: ["GET","HEAD"]
+    pattern: '/invoices/:id/edit'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/invoices_controller').default['edit']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/invoices_controller').default['edit']>>>
+    }
+  }
+  'invoices.pdf': {
+    methods: ["GET","HEAD"]
+    pattern: '/invoices/:id/pdf'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/invoices_controller').default['downloadPdf']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/invoices_controller').default['downloadPdf']>>>
+    }
+  }
+  'invoices.send': {
+    methods: ["POST"]
+    pattern: '/invoices/:id/send'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/invoices_controller').default['send']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/invoices_controller').default['send']>>>
+    }
+  }
+  'invoices.convert': {
+    methods: ["POST"]
+    pattern: '/invoices/:id/convert'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/invoices_controller').default['convert']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/invoices_controller').default['convert']>>>
+    }
+  }
+  'invoices.pay': {
+    methods: ["POST"]
+    pattern: '/invoices/:id/pay'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/invoices_controller').default['markPaid']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/invoices_controller').default['markPaid']>>>
+    }
+  }
+  'invoices.update': {
+    methods: ["PUT"]
+    pattern: '/invoices/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/invoice').updateInvoiceValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/invoice').updateInvoiceValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/invoices_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/invoices_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'invoices.destroy': {
+    methods: ["DELETE"]
+    pattern: '/invoices/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/invoices_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/invoices_controller').default['destroy']>>>
     }
   }
   'new_account.create': {
