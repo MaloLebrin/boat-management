@@ -1,0 +1,42 @@
+{
+  "tab": "Actions",
+  "empty": "Aucune action sur les équipements.",
+  "addAction": "+ Ajouter une action",
+  "count": "{count, plural, one {# action} other {# actions}}",
+  "status": {
+    "pending": "En attente",
+    "ordered": "Commandé",
+    "done": "Terminé",
+    "cancelled": "Annulé"
+  },
+  "actionType": {
+    "to_buy": "À acheter",
+    "to_replace": "À remplacer",
+    "to_repair": "À réparer"
+  },
+  "equipmentType": {
+    "generic": "Équipement générique",
+    "safety": "Sécurité",
+    "engine": "Moteur",
+    "sail": "Voile",
+    "rig": "Gréement"
+  },
+  "fields": {
+    "label": "Libellé",
+    "actionType": "Type d'action",
+    "notes": "Notes (optionnel)",
+    "estimatedCost": "Coût estimé (optionnel)",
+    "actualCost": "Coût réel (optionnel)",
+    "equipmentType": "Type d'équipement (optionnel)",
+    "status": "Statut"
+  },
+  "form": {
+    "createTitle": "Ajouter une action",
+    "editTitle": "Modifier l'action",
+    "edit": "Modifier",
+    "submit": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "confirmDelete": "Supprimer cette action ?"
+  }
+}

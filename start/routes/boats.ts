@@ -4,6 +4,8 @@ import router from '@adonisjs/core/services/router'
 
 const CsvExportController = () => import('#controllers/csv_export_controller')
 const BudgetController = () => import('#controllers/budget_controller')
+const BoatEquipmentActionsController = () =>
+  import('#controllers/boat_equipment_actions_controller')
 const BoatPortStayController = () => import('#controllers/boat_port_stay_controller')
 const BoatBudgetEntryController = () => import('#controllers/boat_budget_entry_controller')
 const BoatReservationsController = () => import('#controllers/boat_reservations_controller')
@@ -197,6 +199,19 @@ router
     router
       .delete('boats/:boatId/incidents/:incidentId', [controllers.BoatIncidents, 'destroy'])
       .as('boats.incidents.destroy')
+
+    router
+      .post('boats/:boatId/equipment-actions', [BoatEquipmentActionsController, 'store'])
+      .as('boats.equipmentActions.store')
+    router
+      .put('boats/:boatId/equipment-actions/:actionId', [BoatEquipmentActionsController, 'update'])
+      .as('boats.equipmentActions.update')
+    router
+      .delete('boats/:boatId/equipment-actions/:actionId', [
+        BoatEquipmentActionsController,
+        'destroy',
+      ])
+      .as('boats.equipmentActions.destroy')
 
     router.get('boats/:id/simulator', [controllers.BoatSimulator, 'show']).as('boats.simulator')
 

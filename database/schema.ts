@@ -271,6 +271,60 @@ export class BoatEngineSchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class BoatEquipmentActionSchema extends BaseModel {
+  static $columns = [
+    'actionType',
+    'actualCost',
+    'boatId',
+    'createdAt',
+    'createdBy',
+    'equipmentId',
+    'equipmentType',
+    'estimatedCost',
+    'id',
+    'inspectionId',
+    'label',
+    'notes',
+    'organizationId',
+    'resolvedAt',
+    'status',
+    'updatedAt',
+  ] as const
+  $columns = BoatEquipmentActionSchema.$columns
+  @column()
+  declare actionType: string
+  @column()
+  declare actualCost: string | null
+  @column()
+  declare boatId: number
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare createdBy: number
+  @column()
+  declare equipmentId: number | null
+  @column()
+  declare equipmentType: string | null
+  @column()
+  declare estimatedCost: string | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare inspectionId: number | null
+  @column()
+  declare label: string
+  @column()
+  declare notes: string | null
+  @column()
+  declare organizationId: number
+  @column.dateTime()
+  declare resolvedAt: DateTime | null
+  @column()
+  declare status: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class BoatFuelLogSchema extends BaseModel {
   static $columns = [
     'boatEngineId',

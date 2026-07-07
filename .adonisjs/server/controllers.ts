@@ -10,6 +10,7 @@ export const controllers = {
   BoatBudgetEntry: () => import('#controllers/boat_budget_entry_controller'),
   BoatDocuments: () => import('#controllers/boat_documents_controller'),
   BoatEngineParts: () => import('#controllers/boat_engine_parts_controller'),
+  BoatEquipmentActions: () => import('#controllers/boat_equipment_actions_controller'),
   BoatEquipment: () => import('#controllers/boat_equipment_controller'),
   BoatFuelLogs: () => import('#controllers/boat_fuel_logs_controller'),
   BoatGenericEquipment: () => import('#controllers/boat_generic_equipment_controller'),
