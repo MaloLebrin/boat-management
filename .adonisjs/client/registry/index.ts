@@ -450,6 +450,24 @@ const routes = {
     tokens: [{"old":"/boats/:boatId/incidents/:incidentId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/incidents/:incidentId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/incidents/:incidentId","type":0,"val":"incidents","end":""},{"old":"/boats/:boatId/incidents/:incidentId","type":1,"val":"incidentId","end":""}],
     types: placeholder as Registry['boats.incidents.destroy']['types'],
   },
+  'boats.equipmentActions.store': {
+    methods: ["POST"],
+    pattern: '/boats/:boatId/equipment-actions',
+    tokens: [{"old":"/boats/:boatId/equipment-actions","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/equipment-actions","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/equipment-actions","type":0,"val":"equipment-actions","end":""}],
+    types: placeholder as Registry['boats.equipmentActions.store']['types'],
+  },
+  'boats.equipmentActions.update': {
+    methods: ["PUT"],
+    pattern: '/boats/:boatId/equipment-actions/:actionId',
+    tokens: [{"old":"/boats/:boatId/equipment-actions/:actionId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/equipment-actions/:actionId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/equipment-actions/:actionId","type":0,"val":"equipment-actions","end":""},{"old":"/boats/:boatId/equipment-actions/:actionId","type":1,"val":"actionId","end":""}],
+    types: placeholder as Registry['boats.equipmentActions.update']['types'],
+  },
+  'boats.equipmentActions.destroy': {
+    methods: ["DELETE"],
+    pattern: '/boats/:boatId/equipment-actions/:actionId',
+    tokens: [{"old":"/boats/:boatId/equipment-actions/:actionId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/equipment-actions/:actionId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/equipment-actions/:actionId","type":0,"val":"equipment-actions","end":""},{"old":"/boats/:boatId/equipment-actions/:actionId","type":1,"val":"actionId","end":""}],
+    types: placeholder as Registry['boats.equipmentActions.destroy']['types'],
+  },
   'boats.simulator': {
     methods: ["GET","HEAD"],
     pattern: '/boats/:id/simulator',
@@ -1187,6 +1205,36 @@ const routes = {
     pattern: '/clients/:id',
     tokens: [{"old":"/clients/:id","type":0,"val":"clients","end":""},{"old":"/clients/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['clients.destroy']['types'],
+  },
+  'clients.documents.store': {
+    methods: ["POST"],
+    pattern: '/clients/:id/documents',
+    tokens: [{"old":"/clients/:id/documents","type":0,"val":"clients","end":""},{"old":"/clients/:id/documents","type":1,"val":"id","end":""},{"old":"/clients/:id/documents","type":0,"val":"documents","end":""}],
+    types: placeholder as Registry['clients.documents.store']['types'],
+  },
+  'clients.media.destroy': {
+    methods: ["DELETE"],
+    pattern: '/clients/:id/media/:mediaId',
+    tokens: [{"old":"/clients/:id/media/:mediaId","type":0,"val":"clients","end":""},{"old":"/clients/:id/media/:mediaId","type":1,"val":"id","end":""},{"old":"/clients/:id/media/:mediaId","type":0,"val":"media","end":""},{"old":"/clients/:id/media/:mediaId","type":1,"val":"mediaId","end":""}],
+    types: placeholder as Registry['clients.media.destroy']['types'],
+  },
+  'clients.media.download': {
+    methods: ["GET","HEAD"],
+    pattern: '/clients/:id/media/:mediaId/download',
+    tokens: [{"old":"/clients/:id/media/:mediaId/download","type":0,"val":"clients","end":""},{"old":"/clients/:id/media/:mediaId/download","type":1,"val":"id","end":""},{"old":"/clients/:id/media/:mediaId/download","type":0,"val":"media","end":""},{"old":"/clients/:id/media/:mediaId/download","type":1,"val":"mediaId","end":""},{"old":"/clients/:id/media/:mediaId/download","type":0,"val":"download","end":""}],
+    types: placeholder as Registry['clients.media.download']['types'],
+  },
+  'clients.anonymize': {
+    methods: ["POST"],
+    pattern: '/clients/:id/anonymize',
+    tokens: [{"old":"/clients/:id/anonymize","type":0,"val":"clients","end":""},{"old":"/clients/:id/anonymize","type":1,"val":"id","end":""},{"old":"/clients/:id/anonymize","type":0,"val":"anonymize","end":""}],
+    types: placeholder as Registry['clients.anonymize']['types'],
+  },
+  'clients.export': {
+    methods: ["GET","HEAD"],
+    pattern: '/clients/:id/export',
+    tokens: [{"old":"/clients/:id/export","type":0,"val":"clients","end":""},{"old":"/clients/:id/export","type":1,"val":"id","end":""},{"old":"/clients/:id/export","type":0,"val":"export","end":""}],
+    types: placeholder as Registry['clients.export']['types'],
   },
   'pricingSeasons.index': {
     methods: ["GET","HEAD"],

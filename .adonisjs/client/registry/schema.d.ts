@@ -895,6 +895,42 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_incidents_controller').default['destroy']>>>
     }
   }
+  'boats.equipmentActions.store': {
+    methods: ["POST"]
+    pattern: '/boats/:boatId/equipment-actions'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/boat_equipment_action').createBoatEquipmentActionValidator)>>
+      paramsTuple: [ParamValue]
+      params: { boatId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/boat_equipment_action').createBoatEquipmentActionValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_equipment_actions_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_equipment_actions_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'boats.equipmentActions.update': {
+    methods: ["PUT"]
+    pattern: '/boats/:boatId/equipment-actions/:actionId'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/boat_equipment_action').updateBoatEquipmentActionValidator)>>
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; actionId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/boat_equipment_action').updateBoatEquipmentActionValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_equipment_actions_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_equipment_actions_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'boats.equipmentActions.destroy': {
+    methods: ["DELETE"]
+    pattern: '/boats/:boatId/equipment-actions/:actionId'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; actionId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_equipment_actions_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_equipment_actions_controller').default['destroy']>>>
+    }
+  }
   'boats.simulator': {
     methods: ["GET","HEAD"]
     pattern: '/boats/:id/simulator'
@@ -2369,6 +2405,66 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/clients_controller').default['destroy']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/clients_controller').default['destroy']>>>
+    }
+  }
+  'clients.documents.store': {
+    methods: ["POST"]
+    pattern: '/clients/:id/documents'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/media').storeBoatDocumentValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/media').storeBoatDocumentValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/client_media_controller').default['storeDocument']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/client_media_controller').default['storeDocument']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'clients.media.destroy': {
+    methods: ["DELETE"]
+    pattern: '/clients/:id/media/:mediaId'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { id: ParamValue; mediaId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/client_media_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/client_media_controller').default['destroy']>>>
+    }
+  }
+  'clients.media.download': {
+    methods: ["GET","HEAD"]
+    pattern: '/clients/:id/media/:mediaId/download'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { id: ParamValue; mediaId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/client_media_controller').default['downloadMedia']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/client_media_controller').default['downloadMedia']>>>
+    }
+  }
+  'clients.anonymize': {
+    methods: ["POST"]
+    pattern: '/clients/:id/anonymize'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/clients_controller').default['anonymize']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/clients_controller').default['anonymize']>>>
+    }
+  }
+  'clients.export': {
+    methods: ["GET","HEAD"]
+    pattern: '/clients/:id/export'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/clients_controller').default['exportData']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/clients_controller').default['exportData']>>>
     }
   }
   'pricingSeasons.index': {

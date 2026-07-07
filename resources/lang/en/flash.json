@@ -105,6 +105,14 @@
     "rateLimitError": "Too many attempts. Please try again in a minute.",
     "sessionExpired": "Your demo session has expired (15 min). Log in again to start over."
   },
+  "equipmentActions": {
+    "created": "Action added.",
+    "updated": "Action updated.",
+    "deleted": "Action deleted.",
+    "notFound": "Action not found.",
+    "labelRequired": "A label is required.",
+    "actualCostRequired": "Actual cost is required when marking as done."
+  },
   "incidents": {
     "created": "Incident reported.",
     "updated": "Incident updated.",

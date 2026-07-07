@@ -1,0 +1,42 @@
+{
+  "tab": "Actions",
+  "empty": "No equipment actions.",
+  "addAction": "+ Add an action",
+  "count": "{count, plural, one {# action} other {# actions}}",
+  "status": {
+    "pending": "Pending",
+    "ordered": "Ordered",
+    "done": "Done",
+    "cancelled": "Cancelled"
+  },
+  "actionType": {
+    "to_buy": "To buy",
+    "to_replace": "To replace",
+    "to_repair": "To repair"
+  },
+  "equipmentType": {
+    "generic": "Generic equipment",
+    "safety": "Safety",
+    "engine": "Engine",
+    "sail": "Sail",
+    "rig": "Rig"
+  },
+  "fields": {
+    "label": "Label",
+    "actionType": "Action type",
+    "notes": "Notes (optional)",
+    "estimatedCost": "Estimated cost (optional)",
+    "actualCost": "Actual cost (optional)",
+    "equipmentType": "Equipment type (optional)",
+    "status": "Status"
+  },
+  "form": {
+    "createTitle": "Add an action",
+    "editTitle": "Edit action",
+    "edit": "Edit",
+    "submit": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "confirmDelete": "Delete this action?"
+  }
+}

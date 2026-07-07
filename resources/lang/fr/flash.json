@@ -105,6 +105,14 @@
     "rateLimitError": "Trop de tentatives. Veuillez réessayer dans une minute.",
     "sessionExpired": "Votre session de démonstration a expiré (15 min). Reconnectez-vous pour recommencer."
   },
+  "equipmentActions": {
+    "created": "Action ajoutée.",
+    "updated": "Action mise à jour.",
+    "deleted": "Action supprimée.",
+    "notFound": "Action introuvable.",
+    "labelRequired": "Un libellé est requis.",
+    "actualCostRequired": "Le coût réel est requis pour marquer comme terminé."
+  },
   "incidents": {
     "created": "Incident déclaré.",
     "updated": "Incident mis à jour.",

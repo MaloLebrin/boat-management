@@ -85,6 +85,19 @@ Source: `database/schema.ts` (généré automatiquement via migrations).
   - `recurrenceIntervalMonths`
   - `recurrenceIntervalEngineHours`
 
+### boat_equipment_actions
+
+- `id`, `boatId`, `organizationId`
+- `actionType`: `to_buy | to_replace | to_repair`
+- `status`: `pending | ordered | done | cancelled`
+- `label` (requis)
+- `notes` (nullable)
+- `estimatedCost`, `actualCost` (decimal 10,2, nullable)
+- référence polymorphe: `equipmentType` (`generic | safety | engine | sail | rig`), `equipmentId`
+- `inspectionId` (FK nullable, réservé usage futur)
+- `createdBy` (FK users)
+- `resolvedAt` (timestamp nullable, auto-positionné au passage à `done`)
+
 ### boat_port_stays
 
 - `id`, `boatId`

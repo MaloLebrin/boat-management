@@ -2,6 +2,7 @@ export const policies = {
   BoatPolicy: () => import('#policies/boat_policy'),
   ClientPolicy: () => import('#policies/client_policy'),
   CrewMemberPolicy: () => import('#policies/crew_member_policy'),
+  EquipmentActionPolicy: () => import('#policies/equipment_action_policy'),
   FuelLogPolicy: () => import('#policies/fuel_log_policy'),
   IncidentPolicy: () => import('#policies/incident_policy'),
   InspectionPolicy: () => import('#policies/inspection_policy'),

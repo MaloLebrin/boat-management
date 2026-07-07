@@ -66,6 +66,11 @@ export interface ApiDefinition {
       update: typeof routes['boats.incidents.update']
       destroy: typeof routes['boats.incidents.destroy']
     }
+    equipmentActions: {
+      store: typeof routes['boats.equipmentActions.store']
+      update: typeof routes['boats.equipmentActions.update']
+      destroy: typeof routes['boats.equipmentActions.destroy']
+    }
     simulator: typeof routes['boats.simulator']
     fuelLogs: {
       store: typeof routes['boats.fuelLogs.store']
@@ -324,6 +329,15 @@ export interface ApiDefinition {
     store: typeof routes['clients.store']
     update: typeof routes['clients.update']
     destroy: typeof routes['clients.destroy']
+    documents: {
+      store: typeof routes['clients.documents.store']
+    }
+    media: {
+      destroy: typeof routes['clients.media.destroy']
+      download: typeof routes['clients.media.download']
+    }
+    anonymize: typeof routes['clients.anonymize']
+    export: typeof routes['clients.export']
   }
   pricingSeasons: {
     index: typeof routes['pricingSeasons.index']
