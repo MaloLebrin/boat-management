@@ -1,4 +1,5 @@
 import type Boat from '#models/boat'
+import type BoatEquipmentAction from '#models/boat_equipment_action'
 import type BoatFuelLog from '#models/boat_fuel_log'
 import type BoatIncident from '#models/boat_incident'
 import type BoatMaintenanceEvent from '#models/boat_maintenance_event'
@@ -14,6 +15,7 @@ import type { BoatPricingRow } from '#shared/types/boat_pricing'
 import type { FuelLogRow } from '#shared/types/fuel_log'
 import type { NavigationLogRow, NavigationLogPortOption } from '#shared/types/navigation_log'
 import type { CrewMemberOption } from '#shared/types/crew'
+import { toBoatEquipmentActionRow } from '#transformers/boat_equipment_action_transformer'
 
 export interface BoatManageContext {
   positionHistory: BoatPositionHistory[]
@@ -30,6 +32,9 @@ export interface BoatManageContext {
   pricing: BoatPricingRow | null
   pricingEnabled: boolean
   canManagePricing: boolean
+  equipmentActions: BoatEquipmentAction[]
+  canManageEquipmentActions: boolean
+  canDeleteEquipmentActions: boolean
 }
 
 export interface BoatNavigationContext {
@@ -92,6 +97,9 @@ export function toManageProps(boat: Boat, ctx: BoatManageContext) {
     pricing: ctx.pricing,
     pricingEnabled: ctx.pricingEnabled,
     canManagePricing: ctx.canManagePricing,
+    equipmentActions: ctx.equipmentActions.map(toBoatEquipmentActionRow),
+    canManageEquipmentActions: ctx.canManageEquipmentActions,
+    canDeleteEquipmentActions: ctx.canDeleteEquipmentActions,
   }
 }
 

@@ -10,6 +10,7 @@ import { useT } from '~/composables/use_t'
 import type {
   AiSuggestion,
   BoatDocumentRow,
+  BoatEquipmentActionRow,
   BoatShowDetail,
   MaintenanceEventRow,
   MaintenanceSheetRow,
@@ -25,9 +26,12 @@ const props = defineProps<{
   maintenanceTasks: MaintenanceTaskRow[]
   maintenanceSheets: MaintenanceSheetRow[]
   boatDocuments: BoatDocumentRow[]
+  equipmentActions: BoatEquipmentActionRow[]
   canManageMaintenance: boolean
   canManageEquipment: boolean
   canManageDocuments: boolean
+  canManageEquipmentActions: boolean
+  canDeleteEquipmentActions: boolean
   canExport: boolean
   aiSuggestions: AiSuggestion[] | null
   pricing: BoatPricingRow | null
@@ -40,6 +44,7 @@ type TabKey =
   | 'specs'
   | 'pricing'
   | 'equipment'
+  | 'equipmentActions'
   | 'history'
   | 'tasks'
   | 'documents'
@@ -94,6 +99,7 @@ const tabs = computed(() => [
   { key: 'specs', label: t('boats.show.tabs.specs') },
   ...(props.pricingEnabled ? [{ key: 'pricing', label: t('boats.show.tabs.pricing') }] : []),
   { key: 'equipment', label: t('boats.show.tabs.equipment') },
+  { key: 'equipmentActions', label: t('boats.show.tabs.equipmentActions') },
   { key: 'history', label: t('boats.show.tabs.history') },
   {
     key: 'tasks',

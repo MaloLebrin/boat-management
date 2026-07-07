@@ -39,6 +39,10 @@ Référence: `inertia/app.ts`.
   - sails: `inertia/components/boats/sail/BoatShowSailsCard.vue`
   - rig: `inertia/components/boats/rig/BoatShowRigCard.vue`
   - maintenance: `inertia/components/boats/maintenance/BoatShowMaintenanceSection.vue`
+  - equipment-actions (onglet "Achats/réparations"):
+    - `inertia/components/boats/equipment-actions/BoatEquipmentActionCard.vue` — carte individuelle action
+    - `inertia/components/boats/equipment-actions/BoatEquipmentActionModal.vue` — modal création/édition
+    - `inertia/components/boats/show/tabs/BoatShowTabEquipmentActions.vue` — onglet liste avec filtres
 - Props (types): `inertia/types/boat_show.ts`
 - Source backend: `BoatsController.show`
 

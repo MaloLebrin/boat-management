@@ -3,6 +3,10 @@
   "empty": "No equipment actions.",
   "addAction": "+ Add an action",
   "count": "{count, plural, one {# action} other {# actions}}",
+  "filters": {
+    "allStatuses": "All statuses",
+    "allTypes": "All types"
+  },
   "status": {
     "pending": "Pending",
     "ordered": "Ordered",
