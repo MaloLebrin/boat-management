@@ -58,5 +58,41 @@
     "info": "Details",
     "reservationHistory": "Reservation history",
     "noReservations": "No reservations for this client."
+  },
+  "documents": {
+    "title": "Documents",
+    "subtitle": "Permit copy, ID document…",
+    "add": "+ Add a document",
+    "empty": "No documents for this client.",
+    "formats": "PDF, DOCX, XLSX, CSV — 20 MB max.",
+    "download": "Download",
+    "delete": "Delete document",
+    "deleteConfirm": {
+      "title": "Delete document",
+      "message": "Are you sure you want to delete this document? This action cannot be undone."
+    },
+    "modalTitle": "Add a document",
+    "modalSubtitle": "Document attached to {name}",
+    "dropzone": "Drop a file here",
+    "browse": "Browse",
+    "selectedFile": "Selected file",
+    "caption": "Label (optional)",
+    "upload": "Upload",
+    "uploading": "Uploading…"
+  },
+  "gdpr": {
+    "consentLabel": "GDPR consent obtained",
+    "consentHint": "Tick if the client consented to the processing of their personal data.",
+    "consentTitle": "GDPR consent",
+    "consentGiven": "Obtained on {date}",
+    "consentNotGiven": "Not obtained",
+    "anonymize": "Anonymize",
+    "anonymized": "Anonymized",
+    "anonymizedOn": "Anonymized on {date}",
+    "anonymizeConfirm": {
+      "title": "Anonymize client",
+      "message": "This permanently neutralizes personal data (name, email, phone, address, permit) and deletes documents. Past reservations are kept but anonymized. Irreversible."
+    },
+    "export": "Export data"
   }
 }

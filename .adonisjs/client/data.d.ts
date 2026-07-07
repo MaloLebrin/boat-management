@@ -15,6 +15,7 @@ import type BudgetTransformer from '#transformers/budget_transformer'
 import type ClientTransformer from '#transformers/client_transformer'
 import type InvoiceTransformer from '#transformers/invoice_transformer'
 import type MaintenanceTransformer from '#transformers/maintenance_transformer'
+import type MediaRowTransformer from '#transformers/media_row_transformer'
 import type MediaTransformer from '#transformers/media_transformer'
 import type MouillageTransformer from '#transformers/mouillage_transformer'
 import type NotificationTransformer from '#transformers/notification_transformer'
@@ -64,6 +65,10 @@ export namespace Data {
   export type Maintenance = InferData<MaintenanceTransformer>
   export namespace Maintenance {
     export type Variants = InferVariants<MaintenanceTransformer>
+  }
+  export type MediaRow = InferData<MediaRowTransformer>
+  export namespace MediaRow {
+    export type Variants = InferVariants<MediaRowTransformer>
   }
   export type Media = InferData<MediaTransformer>
   export namespace Media {

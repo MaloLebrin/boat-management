@@ -14,6 +14,7 @@ export const createClientValidator = vine.create(
       .optional(),
     status: vine.enum(['active', 'inactive', 'blacklisted'] as const).optional(),
     notes: vine.string().trim().maxLength(5000).nullable().optional(),
+    gdprConsent: vine.boolean().optional(),
   })
 )
 
@@ -31,5 +32,6 @@ export const updateClientValidator = vine.create(
       .optional(),
     status: vine.enum(['active', 'inactive', 'blacklisted'] as const).optional(),
     notes: vine.string().trim().maxLength(5000).nullable().optional(),
+    gdprConsent: vine.boolean().optional(),
   })
 )

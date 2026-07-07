@@ -1021,6 +1021,7 @@ export class BoatSchema extends BaseModel {
 export class ClientSchema extends BaseModel {
   static $columns = [
     'address',
+    'anonymizedAt',
     'createdAt',
     'email',
     'firstName',
@@ -1038,6 +1039,8 @@ export class ClientSchema extends BaseModel {
   $columns = ClientSchema.$columns
   @column()
   declare address: string | null
+  @column.dateTime()
+  declare anonymizedAt: DateTime | null
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
   @column()

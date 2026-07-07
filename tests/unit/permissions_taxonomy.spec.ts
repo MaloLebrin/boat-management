@@ -9,6 +9,7 @@ const ADMIN_ONLY: Capability[] = [
   'branding.configure',
   'boats.delete',
   'clients.delete',
+  'clients.anonymize',
   'crew.delete',
   'fuel_logs.delete',
   'incidents.delete',

@@ -15,6 +15,7 @@ export function toClientRow(client: Client): ClientRow {
     status: client.status,
     notes: client.notes,
     gdprConsentAt: client.gdprConsentAt?.toISO() ?? null,
+    anonymizedAt: client.anonymizedAt?.toISO() ?? null,
     createdAt: client.createdAt?.toISO() ?? null,
     updatedAt: client.updatedAt?.toISO() ?? null,
   }

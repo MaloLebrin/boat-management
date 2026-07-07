@@ -12,6 +12,8 @@ export interface CreateClientPayload {
   navigationPermitType?: ClientPermitType | null
   status?: ClientStatus
   notes?: string | null
+  /** When true, stamps `gdprConsentAt`; when false, clears it (#276). */
+  gdprConsent?: boolean
 }
 
 export interface UpdateClientPayload {
@@ -24,6 +26,8 @@ export interface UpdateClientPayload {
   navigationPermitType?: ClientPermitType | null
   status?: ClientStatus
   notes?: string | null
+  /** When true, stamps `gdprConsentAt`; when false, clears it (#276). */
+  gdprConsent?: boolean
 }
 
 /** DTO returned to the frontend (dates serialized to ISO strings). */
@@ -39,8 +43,10 @@ export interface ClientRow {
   navigationPermitType: ClientPermitType | null
   status: ClientStatus
   notes: string | null
-  /** GDPR consent timestamp — captured in a later lot (#276), display-only here. */
+  /** GDPR consent timestamp (#276). */
   gdprConsentAt: string | null
+  /** Set once the client has been anonymized (#276) — locks further edits. */
+  anonymizedAt: string | null
   createdAt: string | null
   updatedAt: string | null
 }
@@ -75,4 +81,25 @@ export interface ClientOption {
   id: number
   fullName: string
   status: ClientStatus
+}
+
+/** GDPR data-portability export payload for a single client (#276). */
+export interface ClientDataExport {
+  client: ClientRow
+  reservations: Array<{
+    id: number
+    boatName: string
+    startsAt: string | null
+    endsAt: string | null
+    status: string
+    totalPrice: string | null
+  }>
+  documents: Array<{
+    id: number
+    originalFilename: string
+    format: string
+    bytes: number
+    caption: string | null
+  }>
+  exportedAt: string
 }

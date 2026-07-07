@@ -31,18 +31,19 @@ organisation ; le rattachement à un client est un **plus** optionnel.
 
 ### `clients`
 
-| Colonne                    | Type                                       | Notes                      |
-| -------------------------- | ------------------------------------------ | -------------------------- |
-| `organization_id`          | FK organisations, `CASCADE`                | Scope obligatoire          |
-| `first_name` / `last_name` | string                                     | `fullName` = concaténation |
-| `email`                    | string, nullable                           |                            |
-| `phone`                    | string, nullable                           |                            |
-| `address`                  | string, nullable                           |                            |
-| `navigation_permit_number` | string, nullable                           |                            |
-| `navigation_permit_type`   | enum, nullable                             |                            |
-| `status`                   | enum `active` / `inactive` / `blacklisted` | Défaut `active`            |
-| `notes`                    | text, nullable                             |                            |
-| `gdpr_consent_at`          | datetime, nullable                         | Consentement RGPD          |
+| Colonne                    | Type                                       | Notes                        |
+| -------------------------- | ------------------------------------------ | ---------------------------- |
+| `organization_id`          | FK organisations, `CASCADE`                | Scope obligatoire            |
+| `first_name` / `last_name` | string                                     | `fullName` = concaténation   |
+| `email`                    | string, nullable                           |                              |
+| `phone`                    | string, nullable                           |                              |
+| `address`                  | string, nullable                           |                              |
+| `navigation_permit_number` | string, nullable                           |                              |
+| `navigation_permit_type`   | enum, nullable                             |                              |
+| `status`                   | enum `active` / `inactive` / `blacklisted` | Défaut `active`              |
+| `notes`                    | text, nullable                             |                              |
+| `gdpr_consent_at`          | datetime, nullable                         | Consentement RGPD (#276)     |
+| `anonymized_at`            | datetime, nullable                         | Anonymisé si non-null (#276) |
 
 ### Lien sur `boat_reservations` (#275)
 
@@ -104,7 +105,57 @@ livré ici remplace donc la dépendance email notée en #288.
 
 ---
 
-## 4. Frontend
+## 4. Documents clients (#274)
+
+Réutilise le sous-système média polymorphe (`entity_type='client'`).
+
+- **Upload / suppression / téléchargement** via `ClientMediaController`
+  (`storeDocument` / `destroy` / `downloadMedia`), org-scopé et gaté Enterprise,
+  ACL `ClientPolicy.update`. Réutilise `MediaService` et
+  `storeBoatDocumentValidator` (PDF/DOCX/XLSX/CSV, 20 Mo).
+- **Dossier Cloudinary** : `CloudinaryFolders.clientDocuments(orgSlug, clientId)`.
+- **Cleanup** : `ClientService.delete(org, client)` supprime les médias
+  (`deleteAllForEntity`, décrément quota) avant la suppression de la ligne.
+- **Fiche client** : section « Documents » (`ClientDocuments.vue` +
+  `ClientDocumentAddModal.vue`), documents exposés par `show()` via `toMediaRow`.
+
+---
+
+## 5. Conformité RGPD (#276)
+
+### Consentement
+
+Champ `gdprConsent` (booléen) dans les payloads/validators create & update.
+`ClientService` pose `gdpr_consent_at = now()` la **première fois** que le
+consentement est donné (conservé si déjà présent), et l'efface sur `false`. Case
+à cocher dans `ClientForm.vue`, état affiché sur la fiche.
+
+### Anonymisation (droit à l'effacement)
+
+`ClientService.anonymize(org, client)` — **idempotente** (no-op si déjà
+anonymisé), transactionnelle :
+
+```
+anonymize ─┬─ PII → « Client anonymisé » / null, gdpr_consent_at → null
+           ├─ documents supprimés (Cloudinary + quota)
+           ├─ réservations liées : client_id CONSERVÉ, snapshot texte anonymisé
+           └─ anonymized_at = now()  ⇒ verrouille la ré-édition
+```
+
+Un client anonymisé est **gelé** : `ClientService.update` lève
+`ClientAlreadyAnonymizedError` (flash `flash.clients.alreadyAnonymized`), et la
+fiche masque l'édition/anonymisation + affiche un badge « Anonymisé ».
+Capacité `clients.anonymize` **admin-only** (`ClientPolicy.anonymize`).
+
+### Export (portabilité)
+
+`GET /clients/:id/export` → `ClientService.exportData` renvoie un JSON en pièce
+jointe (`client-<id>.json`) : client + historique réservations + métadonnées
+documents. ACL `ClientPolicy.update`, gaté Enterprise.
+
+---
+
+## 6. Frontend
 
 - **Sélecteur de client** (optionnel) dans `ReservationForm.vue` et
   `ReservationEditModal.vue` : `clientOptions` (via
@@ -118,24 +169,29 @@ livré ici remplace donc la dépendance email notée en #288.
 
 ---
 
-## 5. Routes
+## 7. Routes
 
 Sous `middleware.auth()` (voir `start/routes/clients.ts`) :
 
-| Méthode & chemin      | Action    | Rôle                                                    |
-| --------------------- | --------- | ------------------------------------------------------- |
-| `GET /clients`        | `index`   | Liste filtrable/paginée                                 |
-| `GET /clients/:id`    | `show`    | Fiche client + historique réservations (#275)           |
-| `POST /clients`       | `store`   | Créer un client                                         |
-| `PUT /clients/:id`    | `update`  | Modifier un client                                      |
-| `DELETE /clients/:id` | `destroy` | Supprimer (admin) → délie les réservations (`SET NULL`) |
+| Méthode & chemin                           | Action                      | Rôle                                                    |
+| ------------------------------------------ | --------------------------- | ------------------------------------------------------- |
+| `GET /clients`                             | `index`                     | Liste filtrable/paginée                                 |
+| `GET /clients/:id`                         | `show`                      | Fiche client + historique réservations (#275)           |
+| `POST /clients`                            | `store`                     | Créer un client                                         |
+| `PUT /clients/:id`                         | `update`                    | Modifier un client                                      |
+| `DELETE /clients/:id`                      | `destroy`                   | Supprimer (admin) → délie les réservations (`SET NULL`) |
+| `POST /clients/:id/documents`              | `ClientMedia.storeDocument` | Upload document (#274)                                  |
+| `DELETE /clients/:id/media/:mediaId`       | `ClientMedia.destroy`       | Supprimer un document (#274)                            |
+| `GET /clients/:id/media/:mediaId/download` | `ClientMedia.downloadMedia` | Télécharger (#274)                                      |
+| `POST /clients/:id/anonymize`              | `anonymize`                 | Anonymiser (admin, #276)                                |
+| `GET /clients/:id/export`                  | `exportData`                | Export RGPD JSON (#276)                                 |
 
 Réservations concernées : `POST` / `PATCH /boats/:boatId/reservations` acceptent
 désormais un `clientId` optionnel.
 
 ---
 
-## 6. Sécurité & gating
+## 8. Sécurité & gating
 
 - **Gating Enterprise** : `QuotaService.assertCanManageClients` /
   `canManageClients` (via `PLAN_LIMITS[plan].canManageClients`). Le module clients
@@ -147,7 +203,7 @@ désormais un `clientId` optionnel.
 
 ---
 
-## 7. i18n
+## 9. i18n
 
 - Namespace **`clients`** : `columns.*`, `fields.*`, `status.*`, `form.*`,
   `view`, `show.{back,info,reservationHistory,noReservations}`.
@@ -158,7 +214,7 @@ désormais un `clientId` optionnel.
 
 ---
 
-## 8. Fichiers clés
+## 10. Fichiers clés
 
 | Rôle                 | Fichier                                                                                                                                |
 | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
@@ -173,7 +229,7 @@ désormais un `clientId` optionnel.
 
 ---
 
-## 9. Tests
+## 11. Tests
 
 - **Fonctionnels** `tests/functional/boats/reservation_client_link.spec.ts` :
   lien à la création ; refus blacklist (création + mise à jour) ; `client_id`
@@ -184,7 +240,7 @@ désormais un `clientId` optionnel.
 
 ---
 
-## 10. Hors périmètre / évolutions
+## 12. Hors périmètre / évolutions
 
 - Autres lots CRM de l'epic #108 (import/export CSV, etc.).
 - Documentation exhaustive du CRUD clients de base (#273) — cette page se

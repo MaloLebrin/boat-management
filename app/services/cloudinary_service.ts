@@ -78,6 +78,9 @@ export const CloudinaryFolders = {
   rentalContractSignedDocument: (orgSlug: string, boatId: number, reservationId: number) =>
     `${envPrefix()}/organizations/${orgSlug}/boats/${boatId}/reservations/${reservationId}/contract/signed`,
 
+  clientDocuments: (orgSlug: string, clientId: number) =>
+    `${envPrefix()}/organizations/${orgSlug}/clients/${clientId}/documents`,
+
   userAvatar: (orgSlug: string, userId: number) =>
     `${envPrefix()}/organizations/${orgSlug}/users/${userId}/avatar`,
 

@@ -46,6 +46,9 @@ export default class Client extends BaseModel {
   @column.dateTime()
   declare gdprConsentAt: DateTime | null
 
+  @column.dateTime()
+  declare anonymizedAt: DateTime | null
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 
