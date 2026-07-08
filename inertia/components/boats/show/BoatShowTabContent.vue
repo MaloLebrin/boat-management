@@ -83,6 +83,7 @@ defineEmits<{ goToTab: [key: string] }>()
         v-else-if="tab === 'equipment'"
         :boat="boat"
         :can-manage-equipment="canManageEquipment"
+        :can-manage-actions="canManageEquipmentActions"
       />
 
       <BoatShowTabEquipmentActions

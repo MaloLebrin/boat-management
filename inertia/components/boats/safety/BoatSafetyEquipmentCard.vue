@@ -7,15 +7,30 @@ import BaseCard from '~/components/base/BaseCard.vue'
 import BaseModal from '~/components/base/BaseModal.vue'
 import BoatSafetyEquipmentFields from './BoatSafetyEquipmentFields.vue'
 import { useT } from '~/composables/use_t'
-import type { BoatShowSafetyEquipment } from '~/types/boat_show'
+import { suggestEquipmentActionType } from '#shared/helpers/equipment_action'
+import type { BoatShowSafetyEquipment, EquipmentActionPrefill } from '~/types/boat_show'
 
 defineProps<{
   boatId: number
   items: BoatShowSafetyEquipment[]
   canManage: boolean
+  canManageActions: boolean
+}>()
+
+const emit = defineEmits<{
+  (e: 'addToActions', payload: EquipmentActionPrefill): void
 }>()
 
 const { t } = useT()
+
+function emitAddToActions(item: BoatShowSafetyEquipment) {
+  emit('addToActions', {
+    equipmentType: 'safety',
+    equipmentId: item.id,
+    label: t(`boats.options.safetyEquipmentType.${item.equipmentType}`),
+    actionType: suggestEquipmentActionType(item.status),
+  })
+}
 
 const isCreateOpen = ref(false)
 const editingItem = ref<BoatShowSafetyEquipment | null>(null)
@@ -97,31 +112,42 @@ function closeEdit() {
             <p v-if="item.notes" class="mt-2 text-xs text-fg-muted">{{ item.notes }}</p>
           </div>
 
-          <div v-if="canManage" class="flex flex-wrap items-center gap-2 md:justify-end">
+          <div class="flex flex-wrap items-center gap-2 md:justify-end">
             <BaseButton
-              variant="ghost"
+              v-if="canManageActions && item.status !== 'ok'"
+              variant="secondary"
               size="sm"
               type="button"
-              :aria-label="t('boats.safetyEquipment.edit')"
-              @click="openEdit(item)"
+              @click="emitAddToActions(item)"
             >
-              {{ t('boats.safetyEquipment.edit') }}
+              {{ t('equipmentActions.prefill.addButton') }}
             </BaseButton>
-            <Form
-              :action="{ url: `/boats/${boatId}/safety-equipment/${item.id}`, method: 'delete' }"
-              #default="{ processing }"
-              class="inline"
-            >
+            <template v-if="canManage">
               <BaseButton
-                type="submit"
-                variant="danger"
+                variant="ghost"
                 size="sm"
-                :disabled="processing"
-                :aria-label="t('boats.safetyEquipment.delete')"
+                type="button"
+                :aria-label="t('boats.safetyEquipment.edit')"
+                @click="openEdit(item)"
               >
-                {{ t('boats.safetyEquipment.delete') }}
+                {{ t('boats.safetyEquipment.edit') }}
               </BaseButton>
-            </Form>
+              <Form
+                :action="{ url: `/boats/${boatId}/safety-equipment/${item.id}`, method: 'delete' }"
+                #default="{ processing }"
+                class="inline"
+              >
+                <BaseButton
+                  type="submit"
+                  variant="danger"
+                  size="sm"
+                  :disabled="processing"
+                  :aria-label="t('boats.safetyEquipment.delete')"
+                >
+                  {{ t('boats.safetyEquipment.delete') }}
+                </BaseButton>
+              </Form>
+            </template>
           </div>
         </div>
       </li>

@@ -110,6 +110,26 @@ défauts constatés (« Défauts constatés » sur l'écran d'inspection). La co
   confirmée) et `InspectionDefectModal.vue` (création), montés dans `InspectionPanel.vue`.
   L'édition et le passage `done` restent gérés dans l'onglet équipement du bateau (#312).
 
+## Origine équipement (#313)
+
+Depuis une carte d'équipement **dégradé** (statut ≠ `ok`) sur l'onglet Équipement, un bouton
+contextuel « Ajouter à la liste » propose de créer une action **pré-remplie** — jamais de création
+silencieuse : le modal pré-rempli sert de confirmation.
+
+- **Statuts sources** : générique `to_check | to_replace`, sécurité `to_check | expired`.
+- **Type d'action suggéré** : `shared/helpers/equipment_action.ts` →
+  `suggestEquipmentActionType(status)` : `to_replace`/`expired → 'to_replace'`, `to_check →
+'to_repair'`.
+- **Pré-remplissage** : la carte émet `addToActions({ equipmentType: 'generic'|'safety', equipmentId,
+label, actionType })` → `BoatShowTabEquipment.vue` (hôte) ouvre un unique `BoatEquipmentActionModal`
+  avec la prop `prefill`. Le modal soumet le lien via inputs cachés `equipmentType`/`equipmentId`
+  (déjà acceptés par `createBoatEquipmentActionValidator`), ce qui rattache l'action à l'équipement
+  d'origine (affiché en lecture seule sur la carte d'action).
+- **Fichiers** : `BoatGenericEquipmentCard.vue`, `BoatSafetyEquipmentCard.vue` (bouton + emit),
+  `BoatShowTabEquipment.vue` (hôte du modal), `BoatEquipmentActionModal.vue` (prop `prefill`),
+  `BoatShowTabContent.vue` (passe `canManageEquipmentActions`). Gating : bouton visible si
+  `equipmentActions.create` (membre). i18n `equipmentActions.prefill.addButton`.
+
 ## Capacités Bouncer
 
 | Capacité                  | Admin | Member |

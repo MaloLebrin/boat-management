@@ -12,14 +12,24 @@ import {
   EQUIPMENT_ACTION_TYPES,
   type EquipmentActionStatus,
   type EquipmentActionType,
+  type EquipmentReferenceType,
 } from '#shared/constants/equipment_action'
-import type { BoatEquipmentActionRow, BoatShowDetail } from '~/types/boat_show'
+import type {
+  BoatEquipmentActionRow,
+  BoatShowDetail,
+  EquipmentActionPrefill,
+} from '~/types/boat_show'
 
-const props = defineProps<{
-  boat: BoatShowDetail
-  open: boolean
-  editingAction: BoatEquipmentActionRow | null
-}>()
+const props = withDefaults(
+  defineProps<{
+    boat: BoatShowDetail
+    open: boolean
+    editingAction: BoatEquipmentActionRow | null
+    /** Seed for a new action raised from an equipment card (#313). */
+    prefill?: EquipmentActionPrefill | null
+  }>(),
+  { prefill: null }
+)
 
 const emit = defineEmits<{
   (e: 'update:open', value: boolean): void
@@ -36,40 +46,39 @@ const notes = ref('')
 const estimatedCost = ref<string>('')
 const actualCost = ref<string>('')
 const status = ref<EquipmentActionStatus>('pending')
+const equipmentType = ref<EquipmentReferenceType | null>(null)
+const equipmentId = ref<number | null>(null)
 
-watch(
-  () => props.editingAction,
-  (action) => {
-    if (action) {
-      label.value = action.label
-      actionType.value = action.actionType
-      notes.value = action.notes ?? ''
-      estimatedCost.value = action.estimatedCost !== null ? String(action.estimatedCost) : ''
-      actualCost.value = action.actualCost !== null ? String(action.actualCost) : ''
-      status.value = action.status
-    } else {
-      label.value = ''
-      actionType.value = 'to_buy'
-      notes.value = ''
-      estimatedCost.value = ''
-      actualCost.value = ''
-      status.value = 'pending'
-    }
-  },
-  { immediate: true }
-)
+function resetForm(action: BoatEquipmentActionRow | null) {
+  if (action) {
+    label.value = action.label
+    actionType.value = action.actionType
+    notes.value = action.notes ?? ''
+    estimatedCost.value = action.estimatedCost !== null ? String(action.estimatedCost) : ''
+    actualCost.value = action.actualCost !== null ? String(action.actualCost) : ''
+    status.value = action.status
+    equipmentType.value = action.equipmentType
+    equipmentId.value = action.equipmentId
+  } else {
+    // Create: seed from the prefill (#313) when present, otherwise blank defaults.
+    label.value = props.prefill?.label ?? ''
+    actionType.value = props.prefill?.actionType ?? 'to_buy'
+    notes.value = ''
+    estimatedCost.value = ''
+    actualCost.value = ''
+    status.value = 'pending'
+    equipmentType.value = props.prefill?.equipmentType ?? null
+    equipmentId.value = props.prefill?.equipmentId ?? null
+  }
+}
 
+watch(() => props.editingAction, resetForm, { immediate: true })
+
+// Re-seed each time the modal opens so a fresh prefill (or a blank create) applies.
 watch(
   () => props.open,
   (isOpen) => {
-    if (!isOpen && !props.editingAction) {
-      label.value = ''
-      actionType.value = 'to_buy'
-      notes.value = ''
-      estimatedCost.value = ''
-      actualCost.value = ''
-      status.value = 'pending'
-    }
+    if (isOpen) resetForm(props.editingAction)
   }
 )
 
@@ -108,6 +117,12 @@ function close() {
 <template>
   <BaseModal :open="open" :title="modalTitle" :subtitle="boat.name" size="lg" @update:open="close">
     <Form :action="formAction" @success="close" class="space-y-4" #default="{ processing, errors }">
+      <!-- Link back to the source equipment when raised from a card (#313) -->
+      <template v-if="!editingAction && equipmentId !== null">
+        <input type="hidden" name="equipmentType" :value="equipmentType" />
+        <input type="hidden" name="equipmentId" :value="equipmentId" />
+      </template>
+
       <BaseInput
         id="action-label"
         v-model="label"

@@ -41,8 +41,9 @@ Référence: `inertia/app.ts`.
   - maintenance: `inertia/components/boats/maintenance/BoatShowMaintenanceSection.vue`
   - equipment-actions (onglet "Achats/réparations"):
     - `inertia/components/boats/equipment-actions/BoatEquipmentActionCard.vue` — carte individuelle action
-    - `inertia/components/boats/equipment-actions/BoatEquipmentActionModal.vue` — modal création/édition
+    - `inertia/components/boats/equipment-actions/BoatEquipmentActionModal.vue` — modal création/édition (prop `prefill` pour l'ajout depuis un équipement, #313)
     - `inertia/components/boats/show/tabs/BoatShowTabEquipmentActions.vue` — onglet liste avec filtres
+  - onglet Équipement : `BoatShowTabEquipment.vue` héberge le modal d'action ; `BoatGenericEquipmentCard.vue` / `BoatSafetyEquipmentCard.vue` exposent un bouton « Ajouter à la liste » sur les items dégradés (#313)
 - Props (types): `inertia/types/boat_show.ts`
 - Source backend: `BoatsController.show`
 

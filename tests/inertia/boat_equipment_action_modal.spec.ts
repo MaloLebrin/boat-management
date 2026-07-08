@@ -176,3 +176,33 @@ test('has submit and cancel buttons', () => {
   expect(w.text()).toContain('equipmentActions.form.submit')
   expect(w.text()).toContain('equipmentActions.form.cancel')
 })
+
+test('pre-fills a new action from the prefill prop and submits the equipment link (#313)', () => {
+  const w = mount(BoatEquipmentActionModal, {
+    props: {
+      boat: minimalBoat,
+      open: true,
+      editingAction: null,
+      prefill: {
+        label: 'Winch tribord',
+        actionType: 'to_replace' as const,
+        equipmentType: 'generic' as const,
+        equipmentId: 7,
+      },
+    },
+  })
+  const inputs = w.findAll('input')
+  expect(inputs.find((i) => i.attributes('name') === 'label')?.attributes('value')).toBe(
+    'Winch tribord'
+  )
+  expect(inputs.find((i) => i.attributes('name') === 'equipmentType')?.attributes('value')).toBe(
+    'generic'
+  )
+  expect(inputs.find((i) => i.attributes('name') === 'equipmentId')?.attributes('value')).toBe('7')
+})
+
+test('does not render equipment hidden inputs without a prefill', () => {
+  const inputs = mountModal(null).findAll('input')
+  expect(inputs.find((i) => i.attributes('name') === 'equipmentType')).toBeFalsy()
+  expect(inputs.find((i) => i.attributes('name') === 'equipmentId')).toBeFalsy()
+})

@@ -13,6 +13,19 @@ export type {
   EquipmentReferenceType,
 } from '../../shared/types/equipment_action'
 
+import type {
+  EquipmentActionType as EquipmentActionTypeValue,
+  EquipmentReferenceType as EquipmentReferenceTypeValue,
+} from '../../shared/types/equipment_action'
+
+/** Seed data to open the equipment-action modal pre-filled from a card (#313). */
+export type EquipmentActionPrefill = {
+  label: string
+  actionType: EquipmentActionTypeValue
+  equipmentType: EquipmentReferenceTypeValue
+  equipmentId: number
+}
+
 export type BoatShowSafetyEquipment = {
   id: number
   equipmentType: string
