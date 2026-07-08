@@ -7,12 +7,13 @@ import BaseModal from '~/components/base/BaseModal.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import { useT } from '~/composables/use_t'
-import type {
-  BoatEquipmentActionRow,
-  BoatShowDetail,
-  EquipmentActionStatus,
-  EquipmentActionType,
-} from '~/types/boat_show'
+import {
+  EQUIPMENT_ACTION_STATUSES,
+  EQUIPMENT_ACTION_TYPES,
+  type EquipmentActionStatus,
+  type EquipmentActionType,
+} from '#shared/constants/equipment_action'
+import type { BoatEquipmentActionRow, BoatShowDetail } from '~/types/boat_show'
 
 const props = defineProps<{
   boat: BoatShowDetail
@@ -26,8 +27,8 @@ const emit = defineEmits<{
 
 const { t } = useT()
 
-const ACTION_TYPES: EquipmentActionType[] = ['to_buy', 'to_replace', 'to_repair']
-const STATUSES: EquipmentActionStatus[] = ['pending', 'ordered', 'done', 'cancelled']
+const ACTION_TYPES = EQUIPMENT_ACTION_TYPES
+const STATUSES = EQUIPMENT_ACTION_STATUSES
 
 const label = ref('')
 const actionType = ref<EquipmentActionType>('to_buy')

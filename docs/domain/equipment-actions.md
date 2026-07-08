@@ -83,6 +83,33 @@ Références :
   - ACL : `equipmentActions.delete` (admin only)
   - Service : `BoatEquipmentActionService.deleteForBoat`
 
+## Origine inspection (#311)
+
+Une action peut être **rattachée à une inspection de location** (checkout/checkin) pour tracer les
+défauts constatés (« Défauts constatés » sur l'écran d'inspection). La colonne `inspection_id`
+(nullable, `SET NULL`) prévue dès #310 est exploitée ici.
+
+- **Déduction du bateau** : le `boat_id` (et l'org) sont **déduits** de la réservation liée à
+  l'inspection, jamais saisis. La cohérence bateau ↔ réservation ↔ inspection est garantie par la
+  chaîne de résolution imbriquée (`boatService.getForUserOrFail` → `reservationService.findForBoat`
+  → `inspectionService.findForReservation`) : un id incohérent (autre bateau/autre org) ne matche
+  pas et ne crée rien.
+- **Routes** (imbriquées sous l'inspection, redirigent vers l'écran d'inspection) :
+  - `POST   /boats/:boatId/reservations/:reservationId/inspections/:inspectionId/equipment-actions`
+    (`boats.reservations.inspections.equipmentActions.store`) →
+    `BoatInspectionsController.storeEquipmentAction` → `BoatEquipmentActionService.createFromInspection`
+  - `DELETE …/inspections/:inspectionId/equipment-actions/:actionId`
+    (`boats.reservations.inspections.equipmentActions.destroy`) →
+    `BoatInspectionsController.destroyEquipmentAction` → `deleteForBoat`
+- **ACL** : `EquipmentActionPolicy.create` (membre) pour l'ajout, `…delete` (admin) pour la
+  suppression ; l'accès à l'écran suppose aussi `InspectionPolicy.view`.
+- **Listing** : `BoatEquipmentActionService.listForInspection(user, boat, inspection)` (filtré par
+  `inspectionId`, scopé au bateau) ; les actions sont attachées à chaque inspection dans
+  `BoatInspectionsController.show` et exposées via `BoatEquipmentActionRow.inspectionId`.
+- **UI** : `inertia/components/reservations/inspection/InspectionDefects.vue` (liste + suppression
+  confirmée) et `InspectionDefectModal.vue` (création), montés dans `InspectionPanel.vue`.
+  L'édition et le passage `done` restent gérés dans l'onglet équipement du bateau (#312).
+
 ## Capacités Bouncer
 
 | Capacité                  | Admin | Member |

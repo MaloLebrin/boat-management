@@ -1,10 +1,9 @@
 import vine from '@vinejs/vine'
-
-const actionTypeChoices = ['to_buy', 'to_replace', 'to_repair'] as const
-
-const statusChoices = ['pending', 'ordered', 'done', 'cancelled'] as const
-
-const equipmentTypeChoices = ['generic', 'safety', 'engine', 'sail', 'rig'] as const
+import {
+  EQUIPMENT_ACTION_STATUSES as statusChoices,
+  EQUIPMENT_ACTION_TYPES as actionTypeChoices,
+  EQUIPMENT_REFERENCE_TYPES as equipmentTypeChoices,
+} from '#shared/constants/equipment_action'
 
 export const createBoatEquipmentActionValidator = vine.create(
   vine.object({

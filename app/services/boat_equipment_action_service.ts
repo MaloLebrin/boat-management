@@ -4,6 +4,7 @@ import {
 } from '#exceptions/equipment_action_errors'
 import BoatEquipmentAction from '#models/boat_equipment_action'
 import type Boat from '#models/boat'
+import type BoatInspection from '#models/boat_inspection'
 import type User from '#models/user'
 import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
@@ -11,6 +12,25 @@ import type {
   CreateEquipmentActionPayload,
   UpdateEquipmentActionPayload,
 } from '#shared/types/equipment_action'
+
+const ACTION_COLUMNS: string[] = [
+  'id',
+  'boatId',
+  'organizationId',
+  'actionType',
+  'status',
+  'label',
+  'notes',
+  'estimatedCost',
+  'actualCost',
+  'equipmentType',
+  'equipmentId',
+  'inspectionId',
+  'createdBy',
+  'resolvedAt',
+  'createdAt',
+  'updatedAt',
+]
 
 function assertBoatScope(user: User, boat: Boat) {
   if (user.organizationId === null || user.organizationId !== boat.organizationId) {
@@ -24,24 +44,23 @@ export default class BoatEquipmentActionService {
     assertBoatScope(user, boat)
 
     return await BoatEquipmentAction.query()
-      .select([
-        'id',
-        'boatId',
-        'organizationId',
-        'actionType',
-        'status',
-        'label',
-        'notes',
-        'estimatedCost',
-        'actualCost',
-        'equipmentType',
-        'equipmentId',
-        'createdBy',
-        'resolvedAt',
-        'createdAt',
-        'updatedAt',
-      ])
+      .select(ACTION_COLUMNS)
       .where('boatId', boat.id)
+      .orderBy('createdAt', 'desc')
+      .orderBy('id', 'desc')
+  }
+
+  /**
+   * Equipment actions raised from a specific rental inspection (#311). Scoped
+   * to the boat so an inspection id from another boat surfaces nothing.
+   */
+  async listForInspection(user: User, boat: Boat, inspection: BoatInspection) {
+    assertBoatScope(user, boat)
+
+    return await BoatEquipmentAction.query()
+      .select(ACTION_COLUMNS)
+      .where('boatId', boat.id)
+      .where('inspectionId', inspection.id)
       .orderBy('createdAt', 'desc')
       .orderBy('id', 'desc')
   }
@@ -65,6 +84,40 @@ export default class BoatEquipmentActionService {
       actualCost: null,
       equipmentType: payload.equipmentType ?? null,
       equipmentId: payload.equipmentId ?? null,
+      createdBy: user.id,
+    })
+  }
+
+  /**
+   * Creates an equipment action attached to a rental inspection (#311). The
+   * boat/org are taken from the resolved boat (deduced from the inspection's
+   * reservation upstream), never from the payload.
+   */
+  async createFromInspection(
+    user: User,
+    boat: Boat,
+    inspection: BoatInspection,
+    payload: CreateEquipmentActionPayload
+  ) {
+    assertBoatScope(user, boat)
+
+    const label = payload.label.trim()
+    if (!label) {
+      throw new BoatEquipmentActionValidationError('label is required', 'labelRequired')
+    }
+
+    return await BoatEquipmentAction.create({
+      boatId: boat.id,
+      organizationId: boat.organizationId,
+      actionType: payload.actionType,
+      status: 'pending',
+      label,
+      notes: payload.notes?.trim() || null,
+      estimatedCost: payload.estimatedCost?.toString() ?? null,
+      actualCost: null,
+      equipmentType: payload.equipmentType ?? null,
+      equipmentId: payload.equipmentId ?? null,
+      inspectionId: inspection.id,
       createdBy: user.id,
     })
   }
