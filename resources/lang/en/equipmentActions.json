@@ -42,5 +42,12 @@
     "cancel": "Cancel",
     "delete": "Delete",
     "confirmDelete": "Delete this action?"
+  },
+  "defects": {
+    "title": "Recorded defects",
+    "empty": "No recorded defects.",
+    "add": "+ Report a defect",
+    "addTitle": "Report a defect",
+    "deleteTitle": "Delete defect"
   }
 }

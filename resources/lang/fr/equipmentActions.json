@@ -42,5 +42,12 @@
     "cancel": "Annuler",
     "delete": "Supprimer",
     "confirmDelete": "Supprimer cette action ?"
+  },
+  "defects": {
+    "title": "Défauts constatés",
+    "empty": "Aucun défaut constaté.",
+    "add": "+ Signaler un défaut",
+    "addTitle": "Signaler un défaut",
+    "deleteTitle": "Supprimer le défaut"
   }
 }

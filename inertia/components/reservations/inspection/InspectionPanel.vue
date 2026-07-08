@@ -7,6 +7,7 @@ import BaseCard from '~/components/base/BaseCard.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import InspectionPhotos from '~/components/reservations/inspection/InspectionPhotos.vue'
+import InspectionDefects from '~/components/reservations/inspection/InspectionDefects.vue'
 import { useT } from '~/composables/use_t'
 import type { InspectionKind, InspectionWithPhotos } from '~/types/inspection'
 
@@ -17,6 +18,8 @@ const props = defineProps<{
   inspection: InspectionWithPhotos | null
   canEdit: boolean
   canDelete: boolean
+  canManageActions: boolean
+  canDeleteActions: boolean
 }>()
 
 const { t } = useT()
@@ -126,6 +129,16 @@ function deleteInspection() {
       :photos="inspection.photos"
       :can-upload="canEdit"
       :can-delete="canDelete"
+    />
+
+    <InspectionDefects
+      v-if="inspection"
+      :boat-id="boatId"
+      :reservation-id="reservationId"
+      :inspection-id="inspection.id"
+      :actions="inspection.actions"
+      :can-manage="canManageActions"
+      :can-delete="canDeleteActions"
     />
   </BaseCard>
 </template>

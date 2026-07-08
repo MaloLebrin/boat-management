@@ -35,6 +35,8 @@ export type BoatEquipmentActionRow = {
   actualCost: number | null
   equipmentType: EquipmentReferenceType | null
   equipmentId: number | null
+  /** Set when the action was raised from a rental inspection (#311). */
+  inspectionId: number | null
   resolvedAt: string | null
   createdAt: string
   createdBy: number

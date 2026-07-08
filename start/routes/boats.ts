@@ -295,6 +295,19 @@ router
         'destroy',
       ])
       .as('boats.reservations.inspections.destroy')
+    // Défauts constatés → actions équipement liées à l'inspection (#311)
+    router
+      .post(
+        'boats/:boatId/reservations/:reservationId/inspections/:inspectionId/equipment-actions',
+        [controllers.BoatInspections, 'storeEquipmentAction']
+      )
+      .as('boats.reservations.inspections.equipmentActions.store')
+    router
+      .delete(
+        'boats/:boatId/reservations/:reservationId/inspections/:inspectionId/equipment-actions/:actionId',
+        [controllers.BoatInspections, 'destroyEquipmentAction']
+      )
+      .as('boats.reservations.inspections.equipmentActions.destroy')
     router
       .post('boats/:boatId/reservations/:reservationId/inspections/:inspectionId/photos', [
         controllers.BoatMedia,
