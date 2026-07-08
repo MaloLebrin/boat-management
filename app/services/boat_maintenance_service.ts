@@ -3,13 +3,27 @@ import {
   BoatMaintenanceValidationError,
 } from '#exceptions/maintenance_errors'
 import type Boat from '#models/boat'
-import type { CreateMaintenancePayload } from '#shared/types/maintenance'
+import type {
+  CreateMaintenancePayload,
+  MaintenanceBoatOption,
+  MaintenanceEventRow,
+  MaintenanceHistoryFilters,
+  MaintenanceHistorySort,
+  MaintenanceTaskSubject,
+} from '#shared/types/maintenance'
 import {
   buildEngineCaption,
   buildSailCaption,
   computeTotalCost,
   toDateTime,
 } from '#shared/helpers/maintenance'
+import {
+  clampInt,
+  escapeLike,
+  normalizeEnum,
+  toIntegerOrUndefined,
+  toTrimmedStringOrUndefined,
+} from '#shared/helpers/query'
 import BoatEngine from '#models/boat_engine'
 import BoatEnginePart from '#models/boat_engine_part'
 import BoatMaintenanceEvent from '#models/boat_maintenance_event'
@@ -23,6 +37,27 @@ import db from '@adonisjs/lucid/services/db'
 
 export { BoatMaintenanceNotFoundError, BoatMaintenanceValidationError }
 export type { CreateMaintenancePayload }
+
+const VALID_HISTORY_SUBJECTS: readonly MaintenanceTaskSubject[] = [
+  'boat',
+  'hull',
+  'engine',
+  'sail',
+  'rig',
+  'electrical',
+  'plumbing',
+  'safety',
+  'deck',
+  'other',
+]
+const VALID_HISTORY_SORTS: readonly MaintenanceHistorySort[] = ['recent', 'oldest']
+const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/
+
+/** Renvoie la date `yyyy-MM-dd` telle quelle si valide, sinon `''`. */
+function normalizeIsoDate(value: unknown): string {
+  const trimmed = toTrimmedStringOrUndefined(value)
+  return trimmed && ISO_DATE_RE.test(trimmed) ? trimmed : ''
+}
 
 @inject()
 export default class BoatMaintenanceService {
@@ -246,87 +281,155 @@ export default class BoatMaintenanceService {
   }
 
   /**
-   * Gets maintenance history for all boats in an organization.
+   * Normalise les paramètres de query de l'historique (recherche / filtres /
+   * tri / pagination) via les helpers partagés — voir `shared/helpers/query.ts`.
    */
-  async getHistoryForOrg(user: User) {
-    if (!user.organizationId) {
-      return {
-        events: [],
-        stats: { totalEvents: 0, totalParts: 0, totalBoats: 0, totalCost: null },
-      }
+  normalizeHistoryQuery(raw: Record<string, unknown>): MaintenanceHistoryFilters {
+    const q = toTrimmedStringOrUndefined(raw.q) ?? ''
+    const subject = normalizeEnum(raw.subject, VALID_HISTORY_SUBJECTS, '' as const)
+    const boatId = toIntegerOrUndefined(raw.boatId)
+    const sort = normalizeEnum(raw.sort, VALID_HISTORY_SORTS, 'recent' as const)
+    const page = clampInt(toIntegerOrUndefined(raw.page) ?? 1, 1, 10_000)
+    const perPage = clampInt(toIntegerOrUndefined(raw.perPage) ?? 20, 5, 100)
+
+    return {
+      q,
+      subject,
+      boatId: boatId !== undefined && boatId > 0 ? boatId : null,
+      dateFrom: normalizeIsoDate(raw.dateFrom),
+      dateTo: normalizeIsoDate(raw.dateTo),
+      sort,
+      page,
+      perPage,
     }
+  }
+
+  /** Mappe un événement (parts préchargées) vers la ligne envoyée au frontend. */
+  #toEventRow(ev: BoatMaintenanceEvent, boatName: string): MaintenanceEventRow {
+    const parts = ev.parts.map((p) => {
+      const price = p.unitPrice !== null ? Number.parseFloat(p.unitPrice) : null
+      return {
+        id: p.id,
+        name: p.name,
+        quantity: p.quantity,
+        unitPrice: price,
+        totalCost: price !== null ? Math.round(price * (p.quantity ?? 1) * 100) / 100 : null,
+        enginePartId: p.enginePartId,
+      }
+    })
+    return {
+      id: ev.id,
+      boatId: ev.boatId,
+      boatName,
+      subject: ev.subject,
+      title: ev.title,
+      notes: ev.notes,
+      performedAt: ev.performedAt.toISODate()!,
+      engineCaption: ev.engineCaption,
+      sailCaption: ev.sailCaption,
+      boatEngineId: ev.boatEngineId,
+      boatSailId: ev.boatSailId,
+      boatRigId: ev.boatRigId,
+      boatSafetyEquipmentId: ev.boatSafetyEquipmentId,
+      parts,
+      totalCost: computeTotalCost(parts),
+    }
+  }
+
+  /**
+   * Historique de maintenance filtré et paginé pour toute l'organisation.
+   * Les stats sont calculées sur l'ensemble filtré complet (pas seulement la
+   * page courante).
+   */
+  async getHistoryForOrg(user: User, rawQuery: Record<string, unknown> = {}) {
+    const filters = this.normalizeHistoryQuery(rawQuery)
+
+    const emptyResult = {
+      events: {
+        data: [] as MaintenanceEventRow[],
+        meta: { total: 0, perPage: filters.perPage, currentPage: filters.page, lastPage: 1 },
+      },
+      stats: { totalEvents: 0, totalParts: 0, totalBoats: 0, totalCost: null as number | null },
+      filters,
+      boatOptions: [] as MaintenanceBoatOption[],
+    }
+
+    if (!user.organizationId) return emptyResult
 
     const boatModule = await import('#models/boat')
     const Boat = boatModule.default
-    const boats = await Boat.query().where('organizationId', user.organizationId)
+    const boats = await Boat.query()
+      .select('id', 'name')
+      .where('organizationId', user.organizationId)
+      .orderBy('name', 'asc')
     const boatIds = boats.map((b) => b.id)
     const boatMap = new Map(boats.map((b) => [b.id, b.name]))
+    const boatOptions: MaintenanceBoatOption[] = boats.map((b) => ({ id: b.id, name: b.name }))
 
-    if (boatIds.length === 0) {
-      return {
-        events: [],
-        stats: { totalEvents: 0, totalParts: 0, totalBoats: 0, totalCost: null },
-      }
+    if (boatIds.length === 0) return { ...emptyResult, boatOptions }
+
+    // Requête filtrée (sans tri/pagination) réutilisée pour les stats via clone.
+    const filtered = BoatMaintenanceEvent.query().whereIn('boatId', boatIds)
+
+    if (filters.subject) filtered.where('subject', filters.subject)
+    if (filters.boatId !== null && boatMap.has(filters.boatId)) {
+      filtered.where('boatId', filters.boatId)
     }
-
-    const rawEvents = await BoatMaintenanceEvent.query()
-      .whereIn('boatId', boatIds)
-      .preload('parts')
-      .orderBy('performedAt', 'desc')
-
-    const events = rawEvents.map((ev) => {
-      const mappedParts = ev.parts.map((p) => {
-        const price = p.unitPrice !== null ? Number.parseFloat(p.unitPrice) : null
-        return {
-          id: p.id,
-          name: p.name,
-          quantity: p.quantity,
-          unitPrice: price,
-          totalCost: price !== null ? Math.round(price * (p.quantity ?? 1) * 100) / 100 : null,
-          enginePartId: p.enginePartId,
-        }
+    if (filters.dateFrom) filtered.where('performedAt', '>=', filters.dateFrom)
+    if (filters.dateTo) filtered.where('performedAt', '<=', filters.dateTo)
+    if (filters.q) {
+      const needle = `%${escapeLike(filters.q)}%`
+      const lowered = filters.q.toLowerCase()
+      const matchIds = boats.filter((b) => b.name.toLowerCase().includes(lowered)).map((b) => b.id)
+      filtered.where((sub) => {
+        sub.whereILike('title', needle)
+        if (matchIds.length) sub.orWhereIn('boatId', matchIds)
       })
-      const totalCost = computeTotalCost(mappedParts)
-      return {
-        id: ev.id,
-        boatId: ev.boatId,
-        boatName: boatMap.get(ev.boatId) ?? '',
-        subject: ev.subject,
-        title: ev.title,
-        notes: ev.notes,
-        performedAt: ev.performedAt.toISODate()!,
-        engineCaption: ev.engineCaption,
-        sailCaption: ev.sailCaption,
-        boatEngineId: ev.boatEngineId,
-        boatSailId: ev.boatSailId,
-        boatRigId: ev.boatRigId,
-        boatSafetyEquipmentId: ev.boatSafetyEquipmentId,
-        totalCost,
-        parts: mappedParts,
-      }
-    })
-
-    const distinctBoatIds = new Set(events.map((e) => e.boatId))
-    const totalParts = events.reduce((acc, ev) => acc + ev.parts.length, 0)
-
-    let totalCost: number | null = null
-    for (const ev of events) {
-      if (ev.totalCost !== null) {
-        totalCost = (totalCost ?? 0) + ev.totalCost
-      }
     }
-    if (totalCost !== null) {
-      totalCost = Math.round(totalCost * 100) / 100
-    }
+
+    // Stats sur l'ensemble filtré complet.
+    const [eventsCountRow] = await filtered.clone().count('* as total').pojo<{ total: number }>()
+    const [boatsCountRow] = await filtered
+      .clone()
+      .countDistinct('boat_id as total')
+      .pojo<{ total: number }>()
+    const filteredParts = await BoatMaintenancePart.query().whereIn(
+      'maintenanceEventId',
+      filtered.clone().select('id')
+    )
+    const totalCost = computeTotalCost(
+      filteredParts.map((p) => ({
+        unitPrice: p.unitPrice !== null ? Number.parseFloat(p.unitPrice) : null,
+        quantity: p.quantity,
+      }))
+    )
+
+    const paginator = await filtered
+      .preload('parts')
+      .orderBy('performedAt', filters.sort === 'recent' ? 'desc' : 'asc')
+      .orderBy('id', 'desc')
+      .paginate(filters.page, filters.perPage)
+
+    const data = paginator.all().map((ev) => this.#toEventRow(ev, boatMap.get(ev.boatId) ?? ''))
 
     return {
-      events,
+      events: {
+        data,
+        meta: {
+          total: paginator.total,
+          perPage: paginator.perPage,
+          currentPage: paginator.currentPage,
+          lastPage: paginator.lastPage,
+        },
+      },
       stats: {
-        totalEvents: events.length,
-        totalParts,
-        totalBoats: distinctBoatIds.size,
+        totalEvents: Number(eventsCountRow?.total ?? 0),
+        totalParts: filteredParts.length,
+        totalBoats: Number(boatsCountRow?.total ?? 0),
         totalCost,
       },
+      filters,
+      boatOptions,
     }
   }
 }

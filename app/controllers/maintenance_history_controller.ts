@@ -6,12 +6,15 @@ import type { HttpContext } from '@adonisjs/core/http'
 export default class MaintenanceHistoryController {
   constructor(private maintenanceService: BoatMaintenanceService) {}
 
-  async index({ inertia, auth }: HttpContext) {
+  async index({ inertia, auth, request }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
-    const { events, stats } = await this.maintenanceService.getHistoryForOrg(user)
+    const { events, stats, filters, boatOptions } = await this.maintenanceService.getHistoryForOrg(
+      user,
+      request.qs()
+    )
 
-    return inertia.render('maintenance/history', { events, stats })
+    return inertia.render('maintenance/history', { events, stats, filters, boatOptions })
   }
 }
