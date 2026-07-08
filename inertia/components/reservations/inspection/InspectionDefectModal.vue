@@ -7,7 +7,12 @@ import BaseModal from '~/components/base/BaseModal.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import { useT } from '~/composables/use_t'
-import type { EquipmentActionType, EquipmentReferenceType } from '~/types/boat_show'
+import {
+  EQUIPMENT_ACTION_TYPES,
+  EQUIPMENT_REFERENCE_TYPES,
+  type EquipmentActionType,
+  type EquipmentReferenceType,
+} from '#shared/constants/equipment_action'
 
 const props = defineProps<{
   boatId: number
@@ -22,9 +27,6 @@ const emit = defineEmits<{
 
 const { t } = useT()
 
-const ACTION_TYPES: EquipmentActionType[] = ['to_buy', 'to_replace', 'to_repair']
-const EQUIPMENT_TYPES: EquipmentReferenceType[] = ['generic', 'safety', 'engine', 'sail', 'rig']
-
 const label = ref('')
 const actionType = ref<EquipmentActionType>('to_repair')
 const notes = ref('')
@@ -37,11 +39,14 @@ const actionUrl = computed(
 )
 
 const actionTypeOptions = computed(() =>
-  ACTION_TYPES.map((type) => ({ value: type, label: t(`equipmentActions.actionType.${type}`) }))
+  EQUIPMENT_ACTION_TYPES.map((type) => ({
+    value: type,
+    label: t(`equipmentActions.actionType.${type}`),
+  }))
 )
 
 const equipmentTypeOptions = computed(() =>
-  EQUIPMENT_TYPES.map((type) => ({
+  EQUIPMENT_REFERENCE_TYPES.map((type) => ({
     value: type,
     label: t(`equipmentActions.equipmentType.${type}`),
   }))

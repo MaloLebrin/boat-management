@@ -20,3 +20,13 @@ export async function createAdminUser(): Promise<User> {
   }
   return user
 }
+
+/**
+ * Creates a user with a plain `member` membership in the given organization.
+ * Used to assert admin-only policies reject non-admin members.
+ */
+export async function createMemberUser(organizationId: number): Promise<User> {
+  const member = await UserFactory.merge({ organizationId }).create()
+  await OrganizationMembership.create({ userId: member.id, organizationId, role: 'member' })
+  return member
+}
