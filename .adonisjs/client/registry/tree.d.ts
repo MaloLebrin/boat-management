@@ -108,6 +108,10 @@ export interface ApiDefinition {
         store: typeof routes['boats.reservations.inspections.store']
         update: typeof routes['boats.reservations.inspections.update']
         destroy: typeof routes['boats.reservations.inspections.destroy']
+        equipmentActions: {
+          store: typeof routes['boats.reservations.inspections.equipmentActions.store']
+          destroy: typeof routes['boats.reservations.inspections.equipmentActions.destroy']
+        }
         photos: {
           store: typeof routes['boats.reservations.inspections.photos.store']
           destroy: typeof routes['boats.reservations.inspections.photos.destroy']

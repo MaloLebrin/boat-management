@@ -1183,6 +1183,30 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_inspections_controller').default['destroy']>>>
     }
   }
+  'boats.reservations.inspections.equipmentActions.store': {
+    methods: ["POST"]
+    pattern: '/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/equipment-actions'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/boat_equipment_action').createBoatEquipmentActionValidator)>>
+      paramsTuple: [ParamValue, ParamValue, ParamValue]
+      params: { boatId: ParamValue; reservationId: ParamValue; inspectionId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/boat_equipment_action').createBoatEquipmentActionValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_inspections_controller').default['storeEquipmentAction']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_inspections_controller').default['storeEquipmentAction']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'boats.reservations.inspections.equipmentActions.destroy': {
+    methods: ["DELETE"]
+    pattern: '/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/equipment-actions/:actionId'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue, ParamValue, ParamValue]
+      params: { boatId: ParamValue; reservationId: ParamValue; inspectionId: ParamValue; actionId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_inspections_controller').default['destroyEquipmentAction']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_inspections_controller').default['destroyEquipmentAction']>>>
+    }
+  }
   'boats.reservations.inspections.photos.store': {
     methods: ["POST"]
     pattern: '/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/photos'

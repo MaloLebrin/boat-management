@@ -102,6 +102,8 @@ export type ScannedRoutes = {
     'boats.reservations.inspections.store': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
     'boats.reservations.inspections.update': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue,'inspectionId': ParamValue} }
     'boats.reservations.inspections.destroy': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue,'inspectionId': ParamValue} }
+    'boats.reservations.inspections.equipmentActions.store': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue,'inspectionId': ParamValue} }
+    'boats.reservations.inspections.equipmentActions.destroy': { paramsTuple: [ParamValue,ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue,'inspectionId': ParamValue,'actionId': ParamValue} }
     'boats.reservations.inspections.photos.store': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue,'inspectionId': ParamValue} }
     'boats.reservations.inspections.photos.destroy': { paramsTuple: [ParamValue,ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue,'inspectionId': ParamValue,'mediaId': ParamValue} }
     'boats.reservations.contract.show': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
@@ -439,6 +441,7 @@ export type ScannedRoutes = {
     'boats.position.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'boats.reservations.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'boats.reservations.inspections.store': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
+    'boats.reservations.inspections.equipmentActions.store': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue,'inspectionId': ParamValue} }
     'boats.reservations.inspections.photos.store': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue,'inspectionId': ParamValue} }
     'boats.reservations.contract.store': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
     'boats.reservations.contract.send': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
@@ -523,6 +526,7 @@ export type ScannedRoutes = {
     'boats.adminDocuments.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'documentId': ParamValue} }
     'boats.reservations.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
     'boats.reservations.inspections.destroy': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue,'inspectionId': ParamValue} }
+    'boats.reservations.inspections.equipmentActions.destroy': { paramsTuple: [ParamValue,ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue,'inspectionId': ParamValue,'actionId': ParamValue} }
     'boats.reservations.inspections.photos.destroy': { paramsTuple: [ParamValue,ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue,'inspectionId': ParamValue,'mediaId': ParamValue} }
     'boats.reservations.contract.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
     'ports.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
