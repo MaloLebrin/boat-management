@@ -3,6 +3,10 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-07-08 — Analyse : proposition d'offre modulaire (socles + add-ons)
+
+Ajout de `docs/offre-modulaire.md` : catalogue des fonctionnalités découpées en modules (socle commun, Location, CRM Clients, Facturation, IA, Marina, Navigation & Bord, Marque blanche, Data & Conformité), comparaison de trois scénarios commerciaux (tiers redécoupés / hybride socles + add-ons / 100 % à la carte) et recommandation : lancer une V1 hybride avec deux modules déjà gatés (**Location** 15 €/mois et **CRM & Facturation** 15 €/mois) sur le socle Pro, Enterprise conservé en bundle tout inclus. Document d'analyse uniquement — aucun changement de code ni de gating.
+
 ## 2026-07-08 — [#323] Historique de maintenance avec des filtres
 
 Refonte de la page `/maintenance/history` : le filtrage et la pagination passent **côté serveur** (pattern org-scopé de `boats`/`clients`), et de nouveaux filtres sont ajoutés.
