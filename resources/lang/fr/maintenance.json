@@ -44,12 +44,25 @@
       "noDetails": "Aucun détail supplémentaire",
       "totalCost": "Coût total",
       "unitPrice": "Prix unitaire",
-      "fromCatalog": "Pièce catalogue"
+      "fromCatalog": "Pièce catalogue",
+      "notes": "Notes"
     },
     "empty": {
       "title": "Aucun événement de maintenance",
       "description": "Commencez par ajouter un bateau et enregistrer vos interventions.",
       "action": "Voir les bateaux"
+    },
+    "filterBar": {
+      "boatLabel": "Bateau",
+      "allBoats": "Tous les bateaux",
+      "subjectLabel": "Sujet",
+      "dateFrom": "Du",
+      "dateTo": "Au",
+      "reset": "Réinitialiser",
+      "sortLabel": "Tri",
+      "sortRecent": "Plus récent",
+      "sortOldest": "Plus ancien",
+      "results": "{count} résultat(s)"
     }
   }
 }

@@ -71,6 +71,33 @@ export type MaintenanceEventRow = {
   totalCost: number | null
 }
 
+export type MaintenanceHistorySort = 'recent' | 'oldest'
+
+export type MaintenanceHistoryFilters = {
+  q: string
+  subject: MaintenanceTaskSubject | ''
+  boatId: number | null
+  dateFrom: string
+  dateTo: string
+  sort: MaintenanceHistorySort
+  page: number
+  perPage: number
+}
+
+export type MaintenanceHistoryStats = {
+  totalEvents: number
+  totalParts: number
+  totalBoats: number
+  totalCost: number | null
+}
+
+export type MaintenanceBoatOption = { id: number; name: string }
+
+export type MaintenanceHistoryPaginated = {
+  data: MaintenanceEventRow[]
+  meta: { total: number; perPage: number; currentPage: number; lastPage: number }
+}
+
 export type CreateMaintenanceTaskPayload = {
   subject: MaintenanceTaskSubject
   title: string

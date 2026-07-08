@@ -44,12 +44,25 @@
       "noDetails": "No additional details",
       "totalCost": "Total cost",
       "unitPrice": "Unit price",
-      "fromCatalog": "Catalog part"
+      "fromCatalog": "Catalog part",
+      "notes": "Notes"
     },
     "empty": {
       "title": "No maintenance events",
       "description": "Start by adding a boat and recording your interventions.",
       "action": "View boats"
+    },
+    "filterBar": {
+      "boatLabel": "Boat",
+      "allBoats": "All boats",
+      "subjectLabel": "Subject",
+      "dateFrom": "From",
+      "dateTo": "To",
+      "reset": "Reset",
+      "sortLabel": "Sort",
+      "sortRecent": "Most recent",
+      "sortOldest": "Oldest",
+      "results": "{count} result(s)"
     }
   }
 }
