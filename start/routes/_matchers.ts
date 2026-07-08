@@ -47,6 +47,7 @@ const numericIdParams = [
   'documentId',
   'eventId',
   'certId',
+  'actionId',
 ]
 
 for (const param of numericIdParams) {

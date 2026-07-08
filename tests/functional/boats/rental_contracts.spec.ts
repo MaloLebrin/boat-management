@@ -6,19 +6,12 @@ import i18nManager from '@adonisjs/i18n/services/main'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { BoatReservationFactory } from '#database/factories/boat_reservation_factory'
 import { UserFactory } from '#database/factories/user_factory'
-import { createAdminUser } from '#tests/functional/helpers'
+import { createAdminUser, createMemberUser } from '#tests/functional/helpers'
 import RentalContract from '#models/rental_contract'
 import Organization from '#models/organization'
 import RentalContractPdfService from '#services/rental_contract_pdf_service'
 import { CloudinaryService } from '#services/cloudinary_service'
 import Media from '#models/media'
-import OrganizationMembership from '#models/organization_membership'
-
-async function createMemberUser(organizationId: number) {
-  const member = await UserFactory.merge({ organizationId }).create()
-  await OrganizationMembership.create({ userId: member.id, organizationId, role: 'member' })
-  return member
-}
 
 function swapFakeCloudinaryUpload() {
   const uploadedPublicIds: string[] = []

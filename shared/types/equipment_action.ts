@@ -1,8 +1,10 @@
-export type EquipmentActionType = 'to_buy' | 'to_replace' | 'to_repair'
+import type {
+  EquipmentActionType,
+  EquipmentActionStatus,
+  EquipmentReferenceType,
+} from '#shared/constants/equipment_action'
 
-export type EquipmentActionStatus = 'pending' | 'ordered' | 'done' | 'cancelled'
-
-export type EquipmentReferenceType = 'generic' | 'safety' | 'engine' | 'sail' | 'rig'
+export type { EquipmentActionType, EquipmentActionStatus, EquipmentReferenceType }
 
 export type CreateEquipmentActionPayload = {
   label: string
@@ -35,6 +37,8 @@ export type BoatEquipmentActionRow = {
   actualCost: number | null
   equipmentType: EquipmentReferenceType | null
   equipmentId: number | null
+  /** Set when the action was raised from a rental inspection (#311). */
+  inspectionId: number | null
   resolvedAt: string | null
   createdAt: string
   createdBy: number

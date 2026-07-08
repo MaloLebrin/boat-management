@@ -2,6 +2,7 @@
 import BoatShowTabAdminDocs from '~/components/boats/show/tabs/BoatShowTabAdminDocs.vue'
 import BoatShowTabDocuments from '~/components/boats/show/tabs/BoatShowTabDocuments.vue'
 import BoatShowTabEquipment from '~/components/boats/show/tabs/BoatShowTabEquipment.vue'
+import BoatShowTabEquipmentActions from '~/components/boats/show/tabs/BoatShowTabEquipmentActions.vue'
 import BoatShowTabHistory from '~/components/boats/show/tabs/BoatShowTabHistory.vue'
 import BoatShowTabOverview from '~/components/boats/show/tabs/BoatShowTabOverview.vue'
 import BoatShowTabPricing from '~/components/boats/show/tabs/BoatShowTabPricing.vue'
@@ -11,6 +12,7 @@ import BoatShowTabTasks from '~/components/boats/show/tabs/BoatShowTabTasks.vue'
 import type {
   AiSuggestion,
   BoatDocumentRow,
+  BoatEquipmentActionRow,
   BoatShowDetail,
   MaintenanceEventRow,
   MaintenanceSheetRow,
@@ -23,6 +25,7 @@ type TabKey =
   | 'specs'
   | 'pricing'
   | 'equipment'
+  | 'equipmentActions'
   | 'history'
   | 'tasks'
   | 'documents'
@@ -36,9 +39,12 @@ defineProps<{
   maintenanceTasks: MaintenanceTaskRow[]
   maintenanceSheets: MaintenanceSheetRow[]
   boatDocuments: BoatDocumentRow[]
+  equipmentActions: BoatEquipmentActionRow[]
   canManageMaintenance: boolean
   canManageEquipment: boolean
   canManageDocuments: boolean
+  canManageEquipmentActions: boolean
+  canDeleteEquipmentActions: boolean
   canExport: boolean
   aiSuggestions: AiSuggestion[] | null
   createEventNonce: number
@@ -77,6 +83,15 @@ defineEmits<{ goToTab: [key: string] }>()
         v-else-if="tab === 'equipment'"
         :boat="boat"
         :can-manage-equipment="canManageEquipment"
+        :can-manage-actions="canManageEquipmentActions"
+      />
+
+      <BoatShowTabEquipmentActions
+        v-else-if="tab === 'equipmentActions'"
+        :boat="boat"
+        :equipment-actions="equipmentActions"
+        :can-manage="canManageEquipmentActions"
+        :can-delete="canDeleteEquipmentActions"
       />
 
       <BoatShowTabHistory

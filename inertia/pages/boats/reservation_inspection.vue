@@ -15,6 +15,8 @@ const props = defineProps<{
   inspections: InspectionWithPhotos[]
   canEdit: boolean
   canDelete: boolean
+  canManageActions: boolean
+  canDeleteActions: boolean
 }>()
 
 const { t } = useT()
@@ -54,6 +56,8 @@ const breadcrumbs = computed(() => [
         :inspection="checkout"
         :can-edit="canEdit"
         :can-delete="canDelete"
+        :can-manage-actions="canManageActions"
+        :can-delete-actions="canDeleteActions"
       />
       <InspectionPanel
         :boat-id="boat.id"
@@ -62,6 +66,8 @@ const breadcrumbs = computed(() => [
         :inspection="checkin"
         :can-edit="canEdit"
         :can-delete="canDelete"
+        :can-manage-actions="canManageActions"
+        :can-delete-actions="canDeleteActions"
       />
     </div>
 

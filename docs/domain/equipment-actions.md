@@ -83,6 +83,53 @@ Références :
   - ACL : `equipmentActions.delete` (admin only)
   - Service : `BoatEquipmentActionService.deleteForBoat`
 
+## Origine inspection (#311)
+
+Une action peut être **rattachée à une inspection de location** (checkout/checkin) pour tracer les
+défauts constatés (« Défauts constatés » sur l'écran d'inspection). La colonne `inspection_id`
+(nullable, `SET NULL`) prévue dès #310 est exploitée ici.
+
+- **Déduction du bateau** : le `boat_id` (et l'org) sont **déduits** de la réservation liée à
+  l'inspection, jamais saisis. La cohérence bateau ↔ réservation ↔ inspection est garantie par la
+  chaîne de résolution imbriquée (`boatService.getForUserOrFail` → `reservationService.findForBoat`
+  → `inspectionService.findForReservation`) : un id incohérent (autre bateau/autre org) ne matche
+  pas et ne crée rien.
+- **Routes** (imbriquées sous l'inspection, redirigent vers l'écran d'inspection) :
+  - `POST   /boats/:boatId/reservations/:reservationId/inspections/:inspectionId/equipment-actions`
+    (`boats.reservations.inspections.equipmentActions.store`) →
+    `BoatInspectionsController.storeEquipmentAction` → `BoatEquipmentActionService.createFromInspection`
+  - `DELETE …/inspections/:inspectionId/equipment-actions/:actionId`
+    (`boats.reservations.inspections.equipmentActions.destroy`) →
+    `BoatInspectionsController.destroyEquipmentAction` → `deleteForBoat`
+- **ACL** : `EquipmentActionPolicy.create` (membre) pour l'ajout, `…delete` (admin) pour la
+  suppression ; l'accès à l'écran suppose aussi `InspectionPolicy.view`.
+- **Listing** : `BoatEquipmentActionService.listForInspection(user, boat, inspection)` (filtré par
+  `inspectionId`, scopé au bateau) ; les actions sont attachées à chaque inspection dans
+  `BoatInspectionsController.show` et exposées via `BoatEquipmentActionRow.inspectionId`.
+- **UI** : `inertia/components/reservations/inspection/InspectionDefects.vue` (liste + suppression
+  confirmée) et `InspectionDefectModal.vue` (création), montés dans `InspectionPanel.vue`.
+  L'édition et le passage `done` restent gérés dans l'onglet équipement du bateau (#312).
+
+## Origine équipement (#313)
+
+Depuis une carte d'équipement **dégradé** (statut ≠ `ok`) sur l'onglet Équipement, un bouton
+contextuel « Ajouter à la liste » propose de créer une action **pré-remplie** — jamais de création
+silencieuse : le modal pré-rempli sert de confirmation.
+
+- **Statuts sources** : générique `to_check | to_replace`, sécurité `to_check | expired`.
+- **Type d'action suggéré** : `shared/helpers/equipment_action.ts` →
+  `suggestEquipmentActionType(status)` : `to_replace`/`expired → 'to_replace'`, `to_check →
+'to_repair'`.
+- **Pré-remplissage** : la carte émet `addToActions({ equipmentType: 'generic'|'safety', equipmentId,
+label, actionType })` → `BoatShowTabEquipment.vue` (hôte) ouvre un unique `BoatEquipmentActionModal`
+  avec la prop `prefill`. Le modal soumet le lien via inputs cachés `equipmentType`/`equipmentId`
+  (déjà acceptés par `createBoatEquipmentActionValidator`), ce qui rattache l'action à l'équipement
+  d'origine (affiché en lecture seule sur la carte d'action).
+- **Fichiers** : `BoatGenericEquipmentCard.vue`, `BoatSafetyEquipmentCard.vue` (bouton + emit),
+  `BoatShowTabEquipment.vue` (hôte du modal), `BoatEquipmentActionModal.vue` (prop `prefill`),
+  `BoatShowTabContent.vue` (passe `canManageEquipmentActions`). Gating : bouton visible si
+  `equipmentActions.create` (membre). i18n `equipmentActions.prefill.addButton`.
+
 ## Capacités Bouncer
 
 | Capacité                  | Admin | Member |

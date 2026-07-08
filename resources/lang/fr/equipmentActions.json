@@ -3,6 +3,10 @@
   "empty": "Aucune action sur les équipements.",
   "addAction": "+ Ajouter une action",
   "count": "{count, plural, one {# action} other {# actions}}",
+  "filters": {
+    "allStatuses": "Tous les statuts",
+    "allTypes": "Tous les types"
+  },
   "status": {
     "pending": "En attente",
     "ordered": "Commandé",
@@ -38,5 +42,15 @@
     "cancel": "Annuler",
     "delete": "Supprimer",
     "confirmDelete": "Supprimer cette action ?"
+  },
+  "defects": {
+    "title": "Défauts constatés",
+    "empty": "Aucun défaut constaté.",
+    "add": "+ Signaler un défaut",
+    "addTitle": "Signaler un défaut",
+    "deleteTitle": "Supprimer le défaut"
+  },
+  "prefill": {
+    "addButton": "Ajouter à la liste"
   }
 }

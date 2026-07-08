@@ -7,18 +7,29 @@ import BoatShowRigCard from '~/components/boats/rig/BoatShowRigCard.vue'
 import BoatSafetyEquipmentCard from '~/components/boats/safety/BoatSafetyEquipmentCard.vue'
 import BoatShowSailsCard from '~/components/boats/sail/BoatShowSailsCard.vue'
 import BoatEquipmentAddModal from '~/components/boats/show/modals/BoatEquipmentAddModal.vue'
+import BoatEquipmentActionModal from '~/components/boats/equipment-actions/BoatEquipmentActionModal.vue'
 import { useT } from '~/composables/use_t'
-import type { BoatShowDetail } from '~/types/boat_show'
+import type { BoatShowDetail, EquipmentActionPrefill } from '~/types/boat_show'
 
 const props = defineProps<{
   boat: BoatShowDetail
   canManageEquipment: boolean
+  canManageActions: boolean
 }>()
 
 const { t } = useT()
 
 const equipmentFilter = ref<'all' | 'engine' | 'sail' | 'rig' | 'safety' | 'generic'>('all')
 const isAddModalOpen = ref(false)
+
+// Equipment-action modal raised from a degraded equipment card (#313)
+const isActionModalOpen = ref(false)
+const actionPrefill = ref<EquipmentActionPrefill | null>(null)
+
+function openActionModal(payload: EquipmentActionPrefill) {
+  actionPrefill.value = payload
+  isActionModalOpen.value = true
+}
 </script>
 
 <template>
@@ -26,6 +37,13 @@ const isAddModalOpen = ref(false)
     v-model:open="isAddModalOpen"
     :boat="boat"
     :can-manage-equipment="canManageEquipment"
+  />
+
+  <BoatEquipmentActionModal
+    v-model:open="isActionModalOpen"
+    :boat="boat"
+    :editing-action="null"
+    :prefill="actionPrefill"
   />
 
   <div class="space-y-6">
@@ -89,6 +107,8 @@ const isAddModalOpen = ref(false)
         :boat-id="boat.id"
         :items="boat.safetyEquipment"
         :can-manage="canManageEquipment"
+        :can-manage-actions="canManageActions"
+        @add-to-actions="openActionModal"
       />
     </div>
 
@@ -98,6 +118,8 @@ const isAddModalOpen = ref(false)
         :boat-id="boat.id"
         :items="boat.genericEquipment"
         :can-manage="canManageEquipment"
+        :can-manage-actions="canManageActions"
+        @add-to-actions="openActionModal"
       />
     </div>
   </div>

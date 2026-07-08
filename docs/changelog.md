@@ -14,6 +14,44 @@ Refonte de la page `/maintenance/history` : le filtrage et la pagination passent
 - **Frontend** : `inertia/pages/maintenance/history.vue` (orchestrateur) + nouveaux composants `MaintenanceHistoryToolbar.vue` (barre de filtres, recherche debounced) et `MaintenanceHistoryTimeline.vue` (timeline groupée par mois), navigation via `router.get`.
 - **i18n** : bloc `maintenance.history.filterBar.*` (en + fr).
 
+## 2026-07-08 — [#313] Proposer l'ajout à la liste d'achats/réparations depuis un équipement dégradé
+
+Dernier lot de l'épic « Actions équipement » (#310/#311/#312 déjà livrés). Sur l'onglet Équipement, une carte d'équipement en statut ≠ `ok` propose un bouton « Ajouter à la liste » qui ouvre le modal d'action **pré-rempli** (type/id d'équipement, libellé, `actionType` suggéré). Aucune création silencieuse : le modal sert de confirmation. Aucune migration, aucun nouvel endpoint.
+
+- **Helper partagé** : `shared/helpers/equipment_action.ts` → `suggestEquipmentActionType(status)` (`to_replace`/`expired → 'to_replace'`, `to_check → 'to_repair'`).
+- **Modal** : `BoatEquipmentActionModal.vue` gagne une prop optionnelle `prefill` (rétro-compatible) et soumet le lien via inputs cachés `equipmentType`/`equipmentId` (déjà acceptés par le validator #310).
+- **Cartes** : `BoatGenericEquipmentCard.vue` / `BoatSafetyEquipmentCard.vue` — bouton contextuel sur les items dégradés (gaté `canManageActions`) + emit `addToActions`. `BoatShowTabEquipment.vue` héberge le modal ; `BoatShowTabContent.vue` propage `canManageEquipmentActions`.
+- **Type** `EquipmentActionPrefill` (`inertia/types/boat_show.ts`). i18n `equipmentActions.prefill.addButton` (fr + en).
+- **Tests** : Vitest (cartes : visibilité selon statut + payload émis ; modal : seed + inputs cachés ; helper). La persistance du lien est déjà couverte par `boat_equipment_actions.spec.ts` (« POST with equipment reference »).
+- **Doc** : `docs/domain/equipment-actions.md` § « Origine équipement ».
+
+## 2026-07-08 — [#311] Actions équipement depuis une inspection de location (« Défauts constatés »)
+
+Permet, sur l'écran d'inspection (checkout/checkin), de tracer les défauts constatés en créant des `BoatEquipmentAction` liées à l'inspection. Exploite la colonne `inspection_id` posée en #310 (aucune migration).
+
+- **Service** (`app/services/boat_equipment_action_service.ts`) : `createFromInspection(user, boat, inspection, payload)` (boat/org **déduits**, `inspection_id` positionné, statut `pending`) et `listForInspection(user, boat, inspection)`. Le `inspection_id` est désormais exposé (`BoatEquipmentActionRow` + transformer + colonnes de `select`).
+- **Controller** (`BoatInspectionsController`) : `storeEquipmentAction` / `destroyEquipmentAction`, redirigeant vers l'écran d'inspection. La cohérence bateau ↔ réservation ↔ inspection est garantie par la chaîne de résolution imbriquée (un id d'un autre bateau/org ne crée rien).
+- **Routes** : `POST`/`DELETE /boats/:boatId/reservations/:reservationId/inspections/:inspectionId/equipment-actions(/:actionId)`. Ajout du matcher numérique `actionId` (`start/routes/_matchers.ts`) — corrige aussi un 500 latent sur les routes équipement de #312.
+- **ACL** : ajout via `EquipmentActionPolicy.create` (membre), suppression `…delete` (admin).
+- **Frontend** : section « Défauts constatés » (`InspectionDefects.vue` + `InspectionDefectModal.vue`) montée dans `InspectionPanel.vue` ; l'édition/statut restent dans l'onglet équipement du bateau (#312). i18n `equipmentActions.defects.*` (fr + en).
+- **Tests** : fonctionnels `tests/functional/boats/inspection_equipment_actions.spec.ts` (création + boat_id déduit, IDOR bateau/org, listing, suppression admin, refus membre) ; Vitest `tests/inertia/inspection_defects.spec.ts`.
+- **Doc** : `docs/domain/equipment-actions.md` § « Origine inspection ».
+
+## 2026-07-07 — [#312] Interface des actions sur équipements (achats/réparations)
+
+Ajout de l'interface utilisateur pour visualiser et gérer les actions sur équipements depuis la fiche bateau, en tant que nouvel onglet "Achats/réparations".
+
+- **Backend** : branchement de `BoatEquipmentActionService.listForBoat()` dans `BoatsController.show()` avec les permissions `canManageEquipmentActions` et `canDeleteEquipmentActions` via `EquipmentActionPolicy`.
+- **Transformer** : ajout de `equipmentActions`, `canManageEquipmentActions`, `canDeleteEquipmentActions` dans `BoatManageContext` et `toManageProps()`.
+- **Page** : nouvel onglet `equipmentActions` dans `inertia/pages/boats/show.vue` avec clé de tab correspondante pour le paramètre URL `?tab=equipmentActions`.
+- **Composants** :
+  - `inertia/components/boats/equipment-actions/BoatEquipmentActionCard.vue` — carte affichant une action avec badges type/statut, coûts, boutons édition/suppression.
+  - `inertia/components/boats/equipment-actions/BoatEquipmentActionModal.vue` — modal création/édition avec champs label, actionType, notes, estimatedCost (+ actualCost et status en édition).
+  - `inertia/components/boats/show/tabs/BoatShowTabEquipmentActions.vue` — onglet avec filtres par statut et type, liste des actions, empty state.
+- **Types frontend** : ré-export des types depuis `shared/types/equipment_action.ts` dans `inertia/types/boat_show.ts`.
+- **i18n** : clé `boats.show.tabs.equipmentActions` (FR: "Achats/réparations", EN: "Purchases/repairs"), clés filtres `equipmentActions.filters.*`.
+- **Tests Vitest** : `boat_equipment_action_card.spec.ts`, `boat_equipment_action_modal.spec.ts`, `boat_show_tab_equipment_actions.spec.ts`.
+
 ## 2026-07-07 — [#310] Actions sur équipements (pièces à acheter/remplacer/réparer)
 
 Nouvelle entité `BoatEquipmentAction` pour tracer les actions à mener sur les équipements d'un bateau (acheter, remplacer, réparer) avec suivi de statut et coûts.

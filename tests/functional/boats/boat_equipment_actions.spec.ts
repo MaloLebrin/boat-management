@@ -2,16 +2,9 @@ import { test } from '@japa/runner'
 import testUtils from '@adonisjs/core/services/test_utils'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { UserFactory } from '#database/factories/user_factory'
-import { createAdminUser } from '#tests/functional/helpers'
+import { createAdminUser, createMemberUser } from '#tests/functional/helpers'
 import BoatEquipmentAction from '#models/boat_equipment_action'
-import OrganizationMembership from '#models/organization_membership'
 import Boat from '#models/boat'
-
-async function createMemberUser(organizationId: number) {
-  const member = await UserFactory.merge({ organizationId }).create()
-  await OrganizationMembership.create({ userId: member.id, organizationId, role: 'member' })
-  return member
-}
 
 const VALID_ACTION = {
   label: 'Acheter une ancre neuve',

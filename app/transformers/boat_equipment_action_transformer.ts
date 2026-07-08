@@ -18,6 +18,7 @@ export function toBoatEquipmentActionRow(action: BoatEquipmentAction): BoatEquip
     actualCost: action.actualCost ? Number.parseFloat(action.actualCost) : null,
     equipmentType: action.equipmentType as EquipmentReferenceType | null,
     equipmentId: action.equipmentId,
+    inspectionId: action.inspectionId,
     resolvedAt: action.resolvedAt ? action.resolvedAt.toISO()! : null,
     createdAt: action.createdAt.toISO()!,
     createdBy: action.createdBy,
