@@ -6,6 +6,13 @@ export type {
   BoatDocumentStatus,
 } from '../../shared/types/boat_document'
 
+export type {
+  BoatEquipmentActionRow,
+  EquipmentActionType,
+  EquipmentActionStatus,
+  EquipmentReferenceType,
+} from '../../shared/types/equipment_action'
+
 export type BoatShowSafetyEquipment = {
   id: number
   equipmentType: string

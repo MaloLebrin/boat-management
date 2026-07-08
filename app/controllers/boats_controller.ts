@@ -3,6 +3,7 @@ import { QuotaExceededError } from '#exceptions/quota_errors'
 import AiAnalysisService, { type AiSuggestion } from '#services/ai_analysis_service'
 import AuditLogService from '#services/audit_log_service'
 import BoatDocumentService from '#services/boat_document_service'
+import BoatEquipmentActionService from '#services/boat_equipment_action_service'
 import BoatFuelLogService from '#services/boat_fuel_log_service'
 import BoatListService from '#services/boat_list_service'
 import BoatPricingService from '#services/boat_pricing_service'
@@ -23,6 +24,7 @@ import PortService from '#services/port_service'
 import QuotaService from '#services/quota_service'
 import SpotService from '#services/spot_service'
 import BoatPolicy from '#policies/boat_policy'
+import EquipmentActionPolicy from '#policies/equipment_action_policy'
 import FuelLogPolicy from '#policies/fuel_log_policy'
 import IncidentPolicy from '#policies/incident_policy'
 import NavigationLogPolicy from '#policies/navigation_log_policy'
@@ -51,7 +53,8 @@ export default class BoatsController {
     private documentService: BoatDocumentService,
     private crewService: CrewService,
     private navigationLogService: NavigationLogService,
-    private pricingService: BoatPricingService
+    private pricingService: BoatPricingService,
+    private equipmentActionService: BoatEquipmentActionService
   ) {}
 
   async index({ inertia, auth, request }: HttpContext) {
@@ -153,6 +156,9 @@ export default class BoatsController {
         canManageMaintenance,
         boatDocuments,
         pricingRow,
+        equipmentActions,
+        canManageEquipmentActions,
+        canDeleteEquipmentActions,
       ] = await Promise.all([
         this.maintenanceService.listForBoat(user, boat),
         this.taskService.listForBoat(user, boat),
@@ -165,6 +171,9 @@ export default class BoatsController {
         bouncer.with(BoatPolicy).allows('edit', boat),
         this.documentService.listForBoat(user, boat),
         this.pricingService.getForBoat(boat),
+        this.equipmentActionService.listForBoat(user, boat),
+        bouncer.with(EquipmentActionPolicy).allows('create', boat),
+        bouncer.with(EquipmentActionPolicy).allows('delete', boat),
       ])
 
       const canManageEquipment = canManageMaintenance
@@ -196,6 +205,9 @@ export default class BoatsController {
           pricing,
           pricingEnabled,
           canManagePricing,
+          equipmentActions,
+          canManageEquipmentActions,
+          canDeleteEquipmentActions,
         })
       )
     } catch (error) {

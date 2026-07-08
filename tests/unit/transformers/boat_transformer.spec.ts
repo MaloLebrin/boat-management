@@ -290,6 +290,9 @@ function makeManageContext(overrides: Partial<BoatManageContext> = {}): BoatMana
     pricing: null,
     pricingEnabled: false,
     canManagePricing: false,
+    equipmentActions: [],
+    canManageEquipmentActions: false,
+    canDeleteEquipmentActions: false,
     ...overrides,
   }
 }
