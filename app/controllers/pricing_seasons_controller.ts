@@ -33,7 +33,7 @@ export default class PricingSeasonsController {
     await user.load('organization')
 
     try {
-      this.quotaService.assertCanManagePricing(user.organization)
+      await this.quotaService.assertCanManagePricing(user.organization)
     } catch (error) {
       if (error instanceof QuotaExceededError) {
         session.flash('error', i18n.t('flash.quota.pricingExceeded'))

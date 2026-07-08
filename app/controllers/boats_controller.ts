@@ -180,7 +180,7 @@ export default class BoatsController {
       const canManageDocuments = canManageMaintenance
       const canExport = user.organization ? this.quotaService.canExport(user.organization) : false
       const pricingEnabled = user.organization
-        ? this.quotaService.canManagePricing(user.organization)
+        ? await this.quotaService.canManagePricing(user.organization)
         : false
       const canManagePricing = pricingEnabled && canManageMaintenance
       const pricing = pricingRow ? toBoatPricingRow(pricingRow) : null
