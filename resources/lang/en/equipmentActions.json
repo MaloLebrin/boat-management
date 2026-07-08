@@ -49,5 +49,8 @@
     "add": "+ Report a defect",
     "addTitle": "Report a defect",
     "deleteTitle": "Delete defect"
+  },
+  "prefill": {
+    "addButton": "Add to list"
   }
 }

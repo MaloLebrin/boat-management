@@ -49,5 +49,8 @@
     "add": "+ Signaler un défaut",
     "addTitle": "Signaler un défaut",
     "deleteTitle": "Supprimer le défaut"
+  },
+  "prefill": {
+    "addButton": "Ajouter à la liste"
   }
 }
