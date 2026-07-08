@@ -26,17 +26,22 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # Les noms de dépôt OCI doivent être en minuscules ; `github.repository`
+      # conserve la casse de l'owner (ex. MaloLebrin) → on minuscule le nom d'image.
+      - name: Compute lowercase image name
+        run: echo "IMAGE=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_ENV"
+
       - uses: docker/build-push-action@v6
         with:
           context: .
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}:latest
-            ghcr.io/${{ github.repository }}:${{ github.sha }}
+            ${{ env.IMAGE }}:latest
+            ${{ env.IMAGE }}:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
       # Ajouter ici l'étape de déploiement selon la plateforme cible :
-      # Fly.io  → flyctl deploy --image ghcr.io/${{ github.repository }}:${{ github.sha }}
+      # Fly.io  → flyctl deploy --image ${{ env.IMAGE }}:${{ github.sha }}
       # Railway → railway deploy
-      # K8s     → kubectl set image deployment/app app=ghcr.io/...
+      # K8s     → kubectl set image deployment/app app=${{ env.IMAGE }}:...
