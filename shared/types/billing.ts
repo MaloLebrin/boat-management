@@ -1,4 +1,4 @@
-import type { PlanTier } from './plan.js'
+import type { PlanModule, PlanTier } from './plan.js'
 
 export type SubscriptionStatus =
   | 'active'
@@ -24,4 +24,6 @@ export interface SubscriptionInfo {
 export interface CheckoutPayload {
   planTier: 'pro' | 'enterprise'
   interval: BillingInterval
+  /** Modules add-ons souscrits à la souscription — Pro uniquement (épic #327). */
+  modules?: PlanModule[]
 }
