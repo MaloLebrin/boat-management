@@ -135,21 +135,20 @@ Couche d'animation des pages **home** et **tarifs** (refonte 2026-07-09). Toutes
 
 ### Composables — `inertia/composables/`
 
-| Composable            | Effet                                                                                                                                | Utilisé par                                          |
-| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------- |
-| `use_count_up.ts`     | Incrémente `0 → target` (easeOutCubic) au premier passage dans le viewport (`IntersectionObserver`). Gère préfixe/suffixe/décimales. | `HomeStatValue` (stats band, métriques case study)   |
-| `use_tilt.ts`         | Inclinaison 3D (`rotateX/rotateY`) selon la souris + parallaxe verticale au scroll. Retourne `{ el, transform }`.                    | `HomeHeroSection`, `HomeFeatureSection` (mockups)    |
-| `use_tween_number.ts` | Anime (easeOutCubic) un nombre à **chaque changement** d'une source réactive (le total « roule » au lieu de sauter).                 | `PricingConfigurator` (total + économie annuelle)    |
-| `use_pointer_glow.ts` | Suit le pointeur au-dessus d'un élément → variables CSS `--card-mouse-x/y` (liseré `.glow-border` qui s'illumine sous le curseur).   | Socle offre modulaire, récap configurateur, tier Pro |
+| Composable            | Effet                                                                                                                                | Utilisé par                                        |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------- |
+| `use_count_up.ts`     | Incrémente `0 → target` (easeOutCubic) au premier passage dans le viewport (`IntersectionObserver`). Gère préfixe/suffixe/décimales. | `HomeStatValue` (stats band, métriques case study) |
+| `use_tilt.ts`         | Inclinaison 3D (`rotateX/rotateY`) selon la souris + parallaxe verticale au scroll. Retourne `{ el, transform }`.                    | `HomeHeroSection`, `HomeFeatureSection` (mockups)  |
+| `use_tween_number.ts` | Anime (easeOutCubic) un nombre à **chaque changement** d'une source réactive (le total « roule » au lieu de sauter).                 | `PricingConfigurator` (total + économie annuelle)  |
 
 ### Utilitaires CSS (`app.css`)
 
-| Classe                    | Effet                                                                                                                                            | Keyframe                        | Utilisé par                                                |
-| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------- | ---------------------------------------------------------- |
-| `.text-gradient-animated` | Texte à dégradé coral→violet→sky qui défile en boucle (`background-clip: text`).                                                                 | `gradientShift`                 | Highlights `<em>` des titres hero & configurateur          |
-| `.glow-border`            | Liseré dégradé (coral→violet) masqué en anneau, dont une lueur **suit le curseur** au survol (façon carte bento Stripe, via `--card-mouse-x/y`). | _(transition, pas de keyframe)_ | Carte récap configurateur, socle offre modulaire, tier Pro |
-| `.float-slow`             | Flottement vertical lent et continu.                                                                                                             | `floaty`                        | Mockup hero (couche externe, sous le tilt)                 |
-| `.stagger` + `.visible`   | Entrée en cascade des enfants directs au scroll-reveal (délais `nth-child`).                                                                     | `revealUp`                      | Colonnes de cartes (configurateur, offre modulaire)        |
+| Classe                    | Effet                                                                                                                                                                                                                                         | Keyframe        | Utilisé par                                                |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------- | ---------------------------------------------------------- |
+| `.text-gradient-animated` | Texte à dégradé coral→violet→sky qui défile en boucle (`background-clip: text`).                                                                                                                                                              | `gradientShift` | Highlights `<em>` des titres hero & configurateur          |
+| `.glow-border`            | Anneau dégradé de base + un **faisceau lumineux (coral→violet) qui tourne en continu** autour du bord (« border beam »). Angle animé via `@property --beam-angle` (aucune rotation de l'élément → pas de coin qui dépasse), masqué en anneau. | `beamRotate`    | Carte récap configurateur, socle offre modulaire, tier Pro |
+| `.float-slow`             | Flottement vertical lent et continu.                                                                                                                                                                                                          | `floaty`        | Mockup hero (couche externe, sous le tilt)                 |
+| `.stagger` + `.visible`   | Entrée en cascade des enfants directs au scroll-reveal (délais `nth-child`).                                                                                                                                                                  | `revealUp`      | Colonnes de cartes (configurateur, offre modulaire)        |
 
 Toutes ces animations infinies décoratives sont **explicitement coupées** (`animation: none`) sous `prefers-reduced-motion` — sinon la règle globale `animation-duration: 1ms` les ferait clignoter.
 

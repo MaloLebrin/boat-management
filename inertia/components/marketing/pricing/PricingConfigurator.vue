@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
-import { usePointerGlow } from '~/composables/use_pointer_glow'
 import { useScrollReveal } from '~/composables/use_scroll_reveal'
 import { useTweenNumber } from '~/composables/use_tween_number'
 import PricingConfiguratorModuleCard from './PricingConfiguratorModuleCard.vue'
@@ -92,7 +91,6 @@ const totalDisplay = useTweenNumber(total)
 const savingDisplay = useTweenNumber(annualSaving)
 
 const { el, isVisible } = useScrollReveal()
-const { el: glowEl } = usePointerGlow()
 </script>
 
 <template>
@@ -142,12 +140,9 @@ const { el: glowEl } = usePointerGlow()
           />
         </div>
 
-        <!-- Colonne récap (sticky) — liseré lumineux qui suit le curseur -->
+        <!-- Colonne récap (sticky) — liseré lumineux animé -->
         <aside class="lg:sticky lg:top-24 lg:self-start">
-          <div
-            :ref="glowEl"
-            class="glow-border rounded-2xl border border-bone bg-white p-6 shadow-sm"
-          >
+          <div class="glow-border rounded-2xl border border-bone bg-white p-6 shadow-sm">
             <p class="text-sm text-fg-muted">{{ totalLabel }}</p>
             <div class="mt-1 flex items-baseline gap-1">
               <span class="font-display text-5xl text-fg tabular-nums">

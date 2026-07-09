@@ -301,15 +301,25 @@ body {
   animation: gradientShift 6s linear infinite;
 }
 
-/* Cartes mises en avant : liseré dégradé (coral → violet) qui s'illumine à
-   l'endroit du curseur, façon carte bento Stripe. La position du pointeur est
-   fournie par `usePointerGlow` via `--card-mouse-x` / `--card-mouse-y`.
-   Technique : dégradé masqué en anneau (padding + mask-composite). */
+/* Cartes mises en avant : anneau dégradé de base + un faisceau lumineux
+   (coral → violet) qui tourne en continu autour du bord (façon « border beam »).
+   L'angle du conic-gradient est animé via `@property` (pas de rotation de
+   l'élément → aucun coin qui dépasse) et le tout est masqué en anneau. */
+@property --beam-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+@keyframes beamRotate {
+  to {
+    --beam-angle: 360deg;
+  }
+}
 .glow-border {
   position: relative;
   isolation: isolate;
 }
-/* Liseré de base, toujours visible (anneau dégradé coral → violet). */
+/* Anneau de base subtil, toujours présent. */
 .glow-border::before {
   content: '';
   position: absolute;
@@ -318,7 +328,7 @@ body {
   padding: 2px;
   border-radius: inherit;
   background: linear-gradient(135deg, #e2674f, #5a4a8a);
-  opacity: 0.65;
+  opacity: 0.35;
   pointer-events: none;
   -webkit-mask:
     linear-gradient(#000 0 0) content-box,
@@ -326,8 +336,7 @@ body {
   -webkit-mask-composite: xor;
   mask-composite: exclude;
 }
-/* Spotlight vif qui suit le curseur (s'intensifie au survol). Le dégradé
-   atteint tous les bords même curseur au centre (transparent à 100 %). */
+/* Faisceau vif qui parcourt le bord en boucle. */
 .glow-border::after {
   content: '';
   position: absolute;
@@ -335,26 +344,23 @@ body {
   z-index: 1;
   padding: 2px;
   border-radius: inherit;
-  background: radial-gradient(
-    22rem circle at var(--card-mouse-x, 50%) var(--card-mouse-y, 50%),
-    #f5836b,
-    #e2674f 28%,
-    #6a5a9e 62%,
-    transparent 100%
+  background: conic-gradient(
+    from var(--beam-angle),
+    transparent 0deg,
+    #e2674f 40deg,
+    #f5836b 65deg,
+    #6a5a9e 110deg,
+    transparent 150deg,
+    transparent 360deg
   );
-  opacity: 0;
   pointer-events: none;
-  transition: opacity 0.35s var(--ease-premium);
-  /* Halo flou → l'anneau « brille » au lieu d'être un simple trait. */
-  filter: drop-shadow(0 0 6px rgba(226, 103, 79, 0.35));
+  filter: drop-shadow(0 0 6px rgba(226, 103, 79, 0.45));
+  animation: beamRotate 4s linear infinite;
   -webkit-mask:
     linear-gradient(#000 0 0) content-box,
     linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
-}
-.glow-border:hover::after {
-  opacity: 1;
 }
 
 /* Entrée staggerée d'éléments enfants au scroll-reveal.
@@ -386,6 +392,7 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .float-slow,
   .text-gradient-animated,
+  .glow-border::after,
   .stagger.visible > * {
     animation: none !important;
   }
