@@ -22,10 +22,6 @@ interface ReassuranceItem {
   icon: string
   label: string
 }
-interface TierFeat {
-  0: string
-  1?: string
-}
 interface Tier {
   name: string
   tag: string
@@ -35,7 +31,7 @@ interface Tier {
   priceAnnualPer?: string
   sub: string
   featured?: boolean
-  feats: TierFeat[]
+  feats: Array<[string, string?]>
   cta: string
   ctaVariant: string
 }

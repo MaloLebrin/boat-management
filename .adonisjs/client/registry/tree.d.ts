@@ -2,9 +2,6 @@
 import type { routes } from './index.ts'
 
 export interface ApiDefinition {
-  eventStream: typeof routes['event_stream']
-  subscribe: typeof routes['subscribe']
-  unsubscribe: typeof routes['unsubscribe']
   dashboard: typeof routes['dashboard']
   designSystem: typeof routes['design_system']
   sitemap: typeof routes['sitemap']
@@ -251,6 +248,10 @@ export interface ApiDefinition {
     billing: typeof routes['settings.billing'] & {
       checkout: typeof routes['settings.billing.checkout']
       portal: typeof routes['settings.billing.portal']
+      module: {
+        add: typeof routes['settings.billing.module.add']
+        remove: typeof routes['settings.billing.module.remove']
+      }
     }
     profile: {
       update: typeof routes['settings.profile.update']
@@ -363,6 +364,9 @@ export interface ApiDefinition {
     update: typeof routes['invoices.update']
     destroy: typeof routes['invoices.destroy']
   }
+  eventStream: typeof routes['event_stream']
+  subscribe: typeof routes['subscribe']
+  unsubscribe: typeof routes['unsubscribe']
   newAccount: {
     create: typeof routes['new_account.create']
     store: typeof routes['new_account.store']
