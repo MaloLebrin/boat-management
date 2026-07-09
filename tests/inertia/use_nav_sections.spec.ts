@@ -17,9 +17,9 @@ vi.mock('@inertiajs/vue3', async () => {
 import { usePage } from '@inertiajs/vue3'
 import { useNavSections } from '../../inertia/composables/use_nav_sections'
 
-function mountWithPlan(currentPlan: unknown) {
+function mountWithPlan(currentPlan: unknown, activeModules: unknown = []) {
   vi.mocked(usePage).mockReturnValue({
-    props: { currentPlan },
+    props: { currentPlan, activeModules },
   } as ReturnType<typeof usePage>)
 
   let result: ReturnType<typeof useNavSections> | undefined
@@ -85,6 +85,48 @@ test('unknown plan string does NOT include nav.clients item', () => {
   const fleetSection = navSections.value[0]
   const names = fleetSection.items.map((i) => i.name)
   expect(names).not.toContain('nav.clients')
+})
+
+// modules add-ons (épic #327)
+
+test('pro plan with crm_invoicing module includes clients and invoices items', () => {
+  const { navSections } = mountWithPlan('pro', ['crm_invoicing'])
+  const fleetSection = navSections.value[0]
+  const names = fleetSection.items.map((i) => i.name)
+  expect(names).toContain('nav.clients')
+  expect(names).toContain('nav.invoices')
+  expect(names).not.toContain('nav.pricingSeasons')
+})
+
+test('pro plan with charter module includes pricing seasons item only', () => {
+  const { navSections } = mountWithPlan('pro', ['charter'])
+  const fleetSection = navSections.value[0]
+  const names = fleetSection.items.map((i) => i.name)
+  expect(names).toContain('nav.pricingSeasons')
+  expect(names).not.toContain('nav.clients')
+  expect(names).not.toContain('nav.invoices')
+})
+
+test('starter plan with a module still resolves the granted flags', () => {
+  const { navSections } = mountWithPlan('starter', ['crm_invoicing'])
+  const fleetSection = navSections.value[0]
+  const names = fleetSection.items.map((i) => i.name)
+  expect(names).toContain('nav.clients')
+})
+
+test('invalid activeModules values are ignored', () => {
+  const { navSections } = mountWithPlan('pro', ['marina', 42, null])
+  const fleetSection = navSections.value[0]
+  const names = fleetSection.items.map((i) => i.name)
+  expect(names).not.toContain('nav.clients')
+  expect(names).not.toContain('nav.pricingSeasons')
+})
+
+test('missing activeModules prop falls back to tier flags only', () => {
+  const { navSections } = mountWithPlan('enterprise', undefined)
+  const fleetSection = navSections.value[0]
+  const names = fleetSection.items.map((i) => i.name)
+  expect(names).toContain('nav.clients')
 })
 
 // 4 sections are always present

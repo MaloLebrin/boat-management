@@ -36,7 +36,7 @@ export default class InvoicesController {
     await user.load('organization')
 
     try {
-      this.quotaService.assertCanManageInvoices(user.organization)
+      await this.quotaService.assertCanManageInvoices(user.organization)
     } catch (error) {
       if (error instanceof QuotaExceededError) {
         session.flash('error', i18n.t('flash.quota.invoicesExceeded'))

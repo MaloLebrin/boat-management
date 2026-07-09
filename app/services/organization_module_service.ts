@@ -1,5 +1,7 @@
 import OrganizationModule from '#models/organization_module'
-import type { ModuleSource, PlanModule } from '#shared/types/plan'
+import type Organization from '#models/organization'
+import { resolveEffectiveQuotas } from '#shared/helpers/plan'
+import type { ModuleSource, PlanModule, PlanQuotas } from '#shared/types/plan'
 import { inject } from '@adonisjs/core'
 
 /**
@@ -14,6 +16,15 @@ export default class OrganizationModuleService {
       .where('organizationId', organizationId)
       .select('module')
     return rows.map((row) => row.module)
+  }
+
+  /**
+   * Quotas effectifs de l'organisation : ceux de son tier fusionnés avec les
+   * flags de ses modules actifs (helper pur `resolveEffectiveQuotas`).
+   */
+  async getEffectiveQuotas(org: Organization): Promise<PlanQuotas> {
+    const modules = await this.getActiveModules(org.id)
+    return resolveEffectiveQuotas(org.plan, modules)
   }
 
   async hasModule(organizationId: number, module: PlanModule): Promise<boolean> {

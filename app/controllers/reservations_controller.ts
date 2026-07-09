@@ -31,7 +31,7 @@ export default class ReservationsController {
     // Surface the reservation ↔ document link (org-scoped batch lookup) and
     // whether the org may generate quotes (Enterprise gating).
     const canCreateQuote =
-      user.organization !== null && this.quotaService.canManageInvoices(user.organization)
+      user.organization !== null && (await this.quotaService.canManageInvoices(user.organization))
     const linksByReservation =
       user.organizationId !== null
         ? await this.invoiceService.listLinksByReservationIds(

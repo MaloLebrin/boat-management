@@ -34,7 +34,7 @@ export default class ClientsController {
     await user.load('organization')
 
     try {
-      this.quotaService.assertCanManageClients(user.organization)
+      await this.quotaService.assertCanManageClients(user.organization)
     } catch (error) {
       if (error instanceof QuotaExceededError) {
         session.flash('error', i18n.t('flash.quota.clientsExceeded'))
