@@ -15,8 +15,15 @@ export default class extends BaseSchema {
         .inTable('organizations')
         .onDelete('CASCADE')
 
+      // Module add-on actif (`charter` | `crm_invoicing`, contraint plus bas).
       table.string('module').notNullable()
+      // Origine du module : `subscription` (item Stripe payant) ou `granted`
+      // (offert manuellement — grandfathering des comptes existants, geste
+      // commercial). Détermine si la sync Stripe (#330) peut le retirer.
       table.string('source').notNullable().defaultTo('subscription')
+      // ID de l'item d'abonnement Stripe qui porte ce module. Nullable :
+      // renseigné uniquement pour `source = 'subscription'` par la sync
+      // webhook multi-items (#330) ; toujours null pour un module `granted`.
       table.string('stripe_subscription_item_id').nullable()
 
       table.timestamp('created_at').notNullable()
