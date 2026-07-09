@@ -31,6 +31,12 @@ router
       .post('settings/billing/portal', [BillingController, 'portal'])
       .as('settings.billing.portal')
     router
+      .post('settings/billing/module', [BillingController, 'addModule'])
+      .as('settings.billing.module.add')
+    router
+      .delete('settings/billing/module', [BillingController, 'removeModule'])
+      .as('settings.billing.module.remove')
+    router
       .put('settings/profile', [SettingsController, 'updateProfile'])
       .as('settings.profile.update')
     router.put('settings/org', [SettingsController, 'updateOrganization']).as('settings.org.update')

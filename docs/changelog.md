@@ -3,6 +3,16 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-07-09 — [#331] Offre modulaire 4/5 : UI page pricing + réglages facturation
+
+Exposition des modules add-ons à l'utilisateur : grille publique et gestion in-app.
+
+- **Page pricing publique** : nouvelle section `PricingModulesSection.vue` (2 modules, prix lus depuis `MODULE_PRICES`, « disponibles sur Pro / inclus dans Entreprise »), alimentée par `buildPricingPageData` (clés `marketing.pricing2.modules_*`).
+- **Réglages > Facturation** : nouveau composant `SettingsBillingModules.vue` (extrait pour garder l'onglet < 250 lignes) — liste les modules avec badge d'état (`Offert` pour `granted`, `Actif` pour `subscription`, `Inclus` en Entreprise) ; un abonné Pro peut **activer/résilier** un module. La page passe `activeModules` (module + source).
+- **Backend** : endpoints `POST`/`DELETE /settings/billing/module` (`BillingController.addModule`/`removeModule`, validator `moduleActionValidator`) ; guards « Pro + abonnement actif » ; `StripeService.addSubscriptionItem`/`removeSubscriptionItem` (item ajouté/retiré → le webhook #330 réconcilie la base). `OrganizationModuleService.listWithSource`/`findSubscriptionModule`.
+- **i18n** : `settings.billing.modules.*` et `marketing.pricing2.modules_*` (en + fr), messages flash `moduleAdded`/`moduleRemoved`/`moduleNotFound`.
+- **Tests** : fonctionnels (prop `activeModules`, guards add/remove, frontière Stripe non configuré), Vitest (`SettingsBillingModules` selon plan/abonnement/source, `PricingModulesSection`).
+
 ## 2026-07-09 — [#330] Offre modulaire 3/5 : abonnements Stripe multi-items (socle + add-ons)
 
 Le billing Stripe gère désormais des abonnements **multi-items** : un item de base (tier Pro/Enterprise) + un item par module add-on. Aucun changement visible tant qu'aucun module n'est vendu ; brique consommée par l'UI (#331).
