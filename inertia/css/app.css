@@ -309,16 +309,16 @@ body {
   position: relative;
   isolation: isolate;
 }
-/* Liseré de base, discret, toujours visible. */
+/* Liseré de base, toujours visible (anneau dégradé coral → violet). */
 .glow-border::before {
   content: '';
   position: absolute;
   inset: 0;
   z-index: 1;
-  padding: 1.5px;
+  padding: 2px;
   border-radius: inherit;
   background: linear-gradient(135deg, #e2674f, #5a4a8a);
-  opacity: 0.4;
+  opacity: 0.65;
   pointer-events: none;
   -webkit-mask:
     linear-gradient(#000 0 0) content-box,
@@ -326,23 +326,27 @@ body {
   -webkit-mask-composite: xor;
   mask-composite: exclude;
 }
-/* Spotlight qui suit le curseur (s'intensifie au survol). */
+/* Spotlight vif qui suit le curseur (s'intensifie au survol). Le dégradé
+   atteint tous les bords même curseur au centre (transparent à 100 %). */
 .glow-border::after {
   content: '';
   position: absolute;
   inset: 0;
   z-index: 1;
-  padding: 1.5px;
+  padding: 2px;
   border-radius: inherit;
   background: radial-gradient(
-    16rem circle at var(--card-mouse-x, 50%) var(--card-mouse-y, -20%),
-    #e2674f,
-    #5a4a8a 35%,
-    transparent 62%
+    22rem circle at var(--card-mouse-x, 50%) var(--card-mouse-y, 50%),
+    #f5836b,
+    #e2674f 28%,
+    #6a5a9e 62%,
+    transparent 100%
   );
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.4s var(--ease-premium);
+  transition: opacity 0.35s var(--ease-premium);
+  /* Halo flou → l'anneau « brille » au lieu d'être un simple trait. */
+  filter: drop-shadow(0 0 6px rgba(226, 103, 79, 0.35));
   -webkit-mask:
     linear-gradient(#000 0 0) content-box,
     linear-gradient(#000 0 0);
