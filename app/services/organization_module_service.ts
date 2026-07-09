@@ -115,16 +115,18 @@ export default class OrganizationModuleService {
     organizationId: number,
     desired: DesiredSubscriptionModule[],
     trx: TransactionClientContract
-  ): Promise<void> {
+  ): Promise<{ removed: PlanModule[] }> {
     const existing = await OrganizationModule.query({ client: trx })
       .where('organizationId', organizationId)
       .where('source', 'subscription')
 
     const desiredModules = new Set(desired.map((d) => d.module))
 
+    const removed: PlanModule[] = []
     for (const row of existing) {
       if (!desiredModules.has(row.module)) {
         await row.useTransaction(trx).delete()
+        removed.push(row.module)
       }
     }
 
@@ -142,5 +144,7 @@ export default class OrganizationModuleService {
         { client: trx }
       )
     }
+
+    return { removed }
   }
 }

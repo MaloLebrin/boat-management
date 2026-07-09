@@ -1,0 +1,41 @@
+@component('emails/_layout')
+  @slot('content')
+    <h2 style="margin:0 0 20px;color:#333333;font-size:22px;">
+      Module deactivated / Module désactivé
+    </h2>
+    <p style="margin:0 0 15px;color:#555555;font-size:16px;line-height:1.5;">
+      The
+      <strong>{{ moduleName }}</strong>
+      module has been removed from
+      <strong>{{ orgName }}</strong>'s subscription.
+    </p>
+    <p style="margin:0 0 25px;color:#555555;font-size:16px;line-height:1.5;">
+      Le module
+      <strong>{{ moduleName }}</strong>
+      a été retiré de l'abonnement de
+      <strong>{{ orgName }}</strong>.
+    </p>
+    <p style="margin:0 0 15px;color:#555555;font-size:14px;line-height:1.5;">
+      Your existing data stays available in read-only mode; creating and editing are now disabled until the module is reactivated.
+    </p>
+    <p style="margin:0 0 25px;color:#555555;font-size:14px;line-height:1.5;">
+      Vos données existantes restent consultables en lecture seule ; la création et l'édition sont désactivées jusqu'à la réactivation du module.
+    </p>
+
+    <table role="presentation" cellspacing="0" cellpadding="0" style="margin:0 auto;">
+      <tr>
+        <td style="border-radius:6px;background-color:#1e3a5f;">
+          <a
+            href="{{ appUrl }}/settings/billing"
+            style="display:inline-block;padding:14px 30px;color:#ffffff;text-decoration:none;font-size:16px;font-weight:bold;"
+          >
+            Manage modules / Gérer les modules
+          </a>
+        </td>
+      </tr>
+    </table>
+    <p style="margin:25px 0 0;color:#888888;font-size:14px;line-height:1.5;">
+      This is an automated notification. / Ceci est une notification automatique.
+    </p>
+  @end
+@end

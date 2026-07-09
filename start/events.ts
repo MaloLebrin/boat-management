@@ -2,6 +2,7 @@ import emitter from '@adonisjs/core/services/emitter'
 import SimulatorLeadCreated from '#events/simulator_lead_created'
 import OrganizationMemberJoined from '#events/organization_member_joined'
 import OrganizationPlanDowngraded from '#events/organization_plan_downgraded'
+import OrganizationModuleDeactivated from '#events/organization_module_deactivated'
 import StorageThresholdCrossed from '#events/storage_threshold_crossed'
 import AiTokenThresholdCrossed from '#events/ai_token_threshold_crossed'
 
@@ -9,6 +10,9 @@ emitter.listen(SimulatorLeadCreated, [() => import('#listeners/on_simulator_lead
 emitter.listen(OrganizationMemberJoined, [() => import('#listeners/on_organization_member_joined')])
 emitter.listen(OrganizationPlanDowngraded, [
   () => import('#listeners/on_organization_plan_downgraded'),
+])
+emitter.listen(OrganizationModuleDeactivated, [
+  () => import('#listeners/on_organization_module_deactivated'),
 ])
 emitter.listen(StorageThresholdCrossed, [
   () => import('#listeners/send_storage_quota_notification'),
