@@ -3,6 +3,7 @@ import { UserNotInOrganizationError } from '#exceptions/organization_errors'
 import Boat from '#models/boat'
 import Organization from '#models/organization'
 import OrganizationMembership from '#models/organization_membership'
+import OrganizationModuleService from '#services/organization_module_service'
 import { PLAN_LIMITS, getUpgradeTier } from '#shared/types/plan'
 import { inject } from '@adonisjs/core'
 import StorageThresholdCrossed from '#events/storage_threshold_crossed'
@@ -10,6 +11,7 @@ import db from '@adonisjs/lucid/services/db'
 
 @inject()
 export default class QuotaService {
+  constructor(private organizationModuleService: OrganizationModuleService) {}
   /**
    * Garde contre un utilisateur sans organisation (issue #279). Les contrôleurs
    * chargent `user.organization` (typé non-null par la relation) puis appellent
@@ -111,9 +113,18 @@ export default class QuotaService {
     }
   }
 
-  assertCanManageClients(org: Organization | null): void {
+  // Les capacités clients/pricing/invoices peuvent venir du tier OU d'un
+  // module add-on (épic #327) : elles passent par les quotas effectifs.
+  // Les autres checks restent tier-only tant qu'aucun module ne les accorde.
+  async canManageClients(org: Organization | null): Promise<boolean> {
     this.#assertOrganization(org)
-    const limits = PLAN_LIMITS[org.plan]
+    const limits = await this.organizationModuleService.getEffectiveQuotas(org)
+    return limits.canManageClients
+  }
+
+  async assertCanManageClients(org: Organization | null): Promise<void> {
+    this.#assertOrganization(org)
+    const limits = await this.organizationModuleService.getEffectiveQuotas(org)
     if (!limits.canManageClients) {
       throw new QuotaExceededError('clients', {
         limit: null,
@@ -123,14 +134,15 @@ export default class QuotaService {
     }
   }
 
-  canManagePricing(org: Organization | null): boolean {
+  async canManagePricing(org: Organization | null): Promise<boolean> {
     this.#assertOrganization(org)
-    return PLAN_LIMITS[org.plan].canManagePricing
+    const limits = await this.organizationModuleService.getEffectiveQuotas(org)
+    return limits.canManagePricing
   }
 
-  assertCanManagePricing(org: Organization | null): void {
+  async assertCanManagePricing(org: Organization | null): Promise<void> {
     this.#assertOrganization(org)
-    const limits = PLAN_LIMITS[org.plan]
+    const limits = await this.organizationModuleService.getEffectiveQuotas(org)
     if (!limits.canManagePricing) {
       throw new QuotaExceededError('pricing', {
         limit: null,
@@ -140,14 +152,15 @@ export default class QuotaService {
     }
   }
 
-  canManageInvoices(org: Organization | null): boolean {
+  async canManageInvoices(org: Organization | null): Promise<boolean> {
     this.#assertOrganization(org)
-    return PLAN_LIMITS[org.plan].canManageInvoices
+    const limits = await this.organizationModuleService.getEffectiveQuotas(org)
+    return limits.canManageInvoices
   }
 
-  assertCanManageInvoices(org: Organization | null): void {
+  async assertCanManageInvoices(org: Organization | null): Promise<void> {
     this.#assertOrganization(org)
-    const limits = PLAN_LIMITS[org.plan]
+    const limits = await this.organizationModuleService.getEffectiveQuotas(org)
     if (!limits.canManageInvoices) {
       throw new QuotaExceededError('invoices', {
         limit: null,

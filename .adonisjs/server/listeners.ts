@@ -5,6 +5,7 @@
 
 export const listeners = {
   OnOrganizationMemberJoined: () => import('#listeners/on_organization_member_joined'),
+  OnOrganizationModuleDeactivated: () => import('#listeners/on_organization_module_deactivated'),
   OnOrganizationPlanDowngraded: () => import('#listeners/on_organization_plan_downgraded'),
   OnSimulatorLeadCreated: () => import('#listeners/on_simulator_lead_created'),
   SendAiTokenQuotaNotification: () => import('#listeners/send_ai_token_quota_notification'),

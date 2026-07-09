@@ -22,6 +22,31 @@ La progression de plan suit toujours : `starter → pro → enterprise`. La fonc
 
 Le plan courant est stocké directement sur `organizations.plan` (colonne string). C'est ce champ qui pilote les quotas — pas la table `subscriptions`.
 
+### 1.1 Modules add-ons (épic #327)
+
+En plus du tier, une organisation **Pro** peut souscrire des **modules add-ons** activables à la carte, stockés dans la table `organization_modules` :
+
+| Module          | Prix (mensuel / annuel) | Flags accordés (`MODULE_FLAGS`)         |
+| --------------- | ----------------------- | --------------------------------------- |
+| `charter`       | 15 € / 144 €            | `canManagePricing`                      |
+| `crm_invoicing` | 15 € / 144 €            | `canManageClients`, `canManageInvoices` |
+
+- **Source de vérité** : `OrganizationModuleService` (jamais le modèle en direct). Colonne `source` = `subscription` (item Stripe) ou `granted` (offert / grandfathering — insensible à la sync Stripe).
+- **Quotas effectifs** : `resolveEffectiveQuotas(tier, modules)` ([`shared/helpers/plan.ts`](../shared/helpers/plan.ts)) fusionne les flags du tier avec ceux des modules actifs. Helper pur partagé backend (policies, `QuotaService`) / frontend (`use_plan.ts`, navigation) — jamais recombiné ailleurs.
+- **Règle commerciale** : modules vendables uniquement sur Pro. Starter n'y a pas droit ; Enterprise les inclut déjà tous (`PLAN_LIMITS.enterprise`).
+- **Résiliation** : le retrait d'un item Stripe émet `OrganizationModuleDeactivated` (notification + email) ; les données du module restent en **lecture seule** (factures/devis consultables + PDF/export, clients consultables). Écriture rétablie à la réactivation.
+- **Idempotence** : `addSubscriptionItem` passe une clé d'idempotence Stripe (`add-module:{subscriptionId}:{priceId}`) — deux ajouts concurrents ne créent qu'un item. Le garde applicatif `hasModule` couvre en amont le double-clic.
+
+### Rollout grandfathering (une fois au déploiement)
+
+Après migration, exécuter la commande Ace pour qu'aucune organisation Enterprise existante ne perde de fonctionnalité :
+
+```bash
+node ace modules:grant-enterprise
+```
+
+Elle accorde tous les modules en `source = 'granted'` à chaque org Enterprise. **Idempotente** : relançable sans effet de bord (ne recrée ni ne requalifie les lignes existantes).
+
 ---
 
 ## 2. Architecture générale
@@ -105,19 +130,26 @@ const event = stripeService.constructWebhookEvent(request.raw(), signature)
 ### 4.4 `syncFromCheckoutSession(session)`
 
 1. Trouve l'organisation via `stripe_customer_id`
-2. Appelle `upsertSubscription(org.id, stripeSub)` (voir §4.6)
-3. Met à jour `org.plan` via `updateOrgPlan()`
+2. Résout l'**item du tier** (voir §4.5 bis) et calcule les modules désirés
+3. Dans une transaction : `upsertSubscription` + `reconcileSubscriptionModules` + `applyOrgPlan`
 
 ### 4.5 `syncFromSubscriptionEvent(stripeSub)`
 
 1. Trouve l'organisation via `stripe_customer_id`
-2. Appelle `upsertSubscription(org.id, stripeSub)`
-3. Détermine le nouveau plan :
+2. Résout l'item du tier et détermine le nouveau plan :
    - Si `stripeSub.status === 'canceled'` → `'starter'`
-   - Sinon → plan déduit du `priceId` (via mapping env vars)
-4. Met à jour `org.plan`
+   - Sinon → plan déduit du `priceId` de l'item du tier (mapping env vars)
+3. Dans une transaction : `upsertSubscription` + `reconcileSubscriptionModules` + `applyOrgPlan`
 
 C'est ici que le downgrade vers Starter s'opère automatiquement à l'annulation.
+
+### 4.5 bis Abonnements multi-items (épic #327)
+
+Avec les modules add-ons, un abonnement Stripe porte **plusieurs items** : un item de base (le tier Pro/Enterprise) + un item par module. La sync gère cela ainsi :
+
+- **`resolveTierItem(stripeSub)`** : retient le premier item dont le prix mappe un tier (via `planFromPriceId`). L'item du tier n'est plus forcément à l'index 0 — c'est lui qui fixe le plan, les bornes de période et l'intervalle de facturation.
+- **`desiredModulesFrom(stripeSub, plan)`** : mappe chaque item de module via `StripeService.moduleForPriceId(priceId)`. Un abonnement annulé (plan `starter`) ne conserve aucun module.
+- **`OrganizationModuleService.reconcileSubscriptionModules(orgId, desired, trx)`** : dans la même transaction que l'upsert, retire les modules `subscription` absents des items, ajoute/actualise les désirés (avec leur `stripe_subscription_item_id`), et **ne touche jamais un module `granted`**.
 
 ### 4.6 `upsertSubscription(organizationId, stripeSub)`
 
@@ -227,18 +259,24 @@ La prop `quotaUsage` transmise au frontend :
 
 Toutes optionnelles (`Env.schema.string.optional()`) pour permettre les migrations sans credentials Stripe.
 
-| Variable                             | Rôle                                               |
-| ------------------------------------ | -------------------------------------------------- |
-| `STRIPE_SECRET_KEY`                  | Clé secrète API Stripe (`sk_live_…` / `sk_test_…`) |
-| `STRIPE_WEBHOOK_SECRET`              | Secret de signature webhook (`whsec_…`)            |
-| `STRIPE_PUBLIC_KEY`                  | Clé publique (usage frontend si besoin)            |
-| `STRIPE_CUSTOMER_PORTAL_ID`          | ID de configuration du Customer Portal (`bpc_…`)   |
-| `STRIPE_PRO_MONTHLY_PRICE_ID`        | Prix Pro mensuel                                   |
-| `STRIPE_PRO_ANNUAL_PRICE_ID`         | Prix Pro annuel                                    |
-| `STRIPE_ENTERPRISE_MONTHLY_PRICE_ID` | Prix Enterprise mensuel                            |
-| `STRIPE_ENTERPRISE_ANNUAL_PRICE_ID`  | Prix Enterprise annuel                             |
+| Variable                                       | Rôle                                               |
+| ---------------------------------------------- | -------------------------------------------------- |
+| `STRIPE_SECRET_KEY`                            | Clé secrète API Stripe (`sk_live_…` / `sk_test_…`) |
+| `STRIPE_WEBHOOK_SECRET`                        | Secret de signature webhook (`whsec_…`)            |
+| `STRIPE_PUBLIC_KEY`                            | Clé publique (usage frontend si besoin)            |
+| `STRIPE_CUSTOMER_PORTAL_ID`                    | ID de configuration du Customer Portal (`bpc_…`)   |
+| `STRIPE_PRO_MONTHLY_PRICE_ID`                  | Prix Pro mensuel                                   |
+| `STRIPE_PRO_ANNUAL_PRICE_ID`                   | Prix Pro annuel                                    |
+| `STRIPE_ENTERPRISE_MONTHLY_PRICE_ID`           | Prix Enterprise mensuel                            |
+| `STRIPE_ENTERPRISE_ANNUAL_PRICE_ID`            | Prix Enterprise annuel                             |
+| `STRIPE_MODULE_CHARTER_MONTHLY_PRICE_ID`       | Prix module Location mensuel (15 €)                |
+| `STRIPE_MODULE_CHARTER_ANNUAL_PRICE_ID`        | Prix module Location annuel (144 €)                |
+| `STRIPE_MODULE_CRM_INVOICING_MONTHLY_PRICE_ID` | Prix module CRM & Facturation mensuel              |
+| `STRIPE_MODULE_CRM_INVOICING_ANNUAL_PRICE_ID`  | Prix module CRM & Facturation annuel               |
 
 Si `STRIPE_SECRET_KEY` est absent, `StripeService` lève `StripeNotConfiguredError` → le controller flash un message d'erreur et redirige sans crasher.
+
+> **Note tests** : `.env.test` fixe `STRIPE_SECRET_KEY=` (vide) pour empêcher tout appel réseau réel, et des IDs de prix factices (`price_test_*`) pour un mapping priceId↔tier/module déterministe.
 
 ---
 

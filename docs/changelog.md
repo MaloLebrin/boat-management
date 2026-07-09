@@ -3,6 +3,80 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-07-09 — [#332] Offre modulaire 5c : grandfathering + idempotence Stripe
+
+Dernier lot du cycle de vie (#332), qui clôt l'épic #327.
+
+- **Commande Ace** `modules:grant-enterprise` (`commands/grant_enterprise_modules.ts`) : accorde tous les modules add-ons en `source = 'granted'` aux organisations Enterprise existantes (grandfathering — aucune ne perd de fonctionnalité). Logique dans `OrganizationModuleService.grantModulesToEnterpriseOrgs` (idempotente, ne requalifie pas une ligne `subscription` existante). À lancer une fois au déploiement.
+- **Idempotence Stripe de bout en bout** : `StripeService.addSubscriptionItem` passe une clé d'idempotence (`add-module:{subscriptionId}:{priceId}`, extraite dans `moduleIdempotencyKey`) — ferme la fenêtre de concurrence résiduelle que le garde applicatif `hasModule` (#331) ne couvre pas. Deux ajouts simultanés du même module ne créent qu'un item facturé.
+- **Doc** : `docs/billing-and-quotas.md` §1.1 (résiliation, idempotence, procédure de rollout).
+- **Tests** : commande/service (modules accordés aux Enterprise uniquement, idempotence, préservation d'une ligne `subscription`), clé d'idempotence déterministe (unit).
+
+## 2026-07-09 — [#332] Offre modulaire 5b : accès résiduel en lecture seule
+
+Après résiliation du module CRM & Facturation, les données existantes restent **consultables en lecture seule** (obligation légale pour les factures émises) mais la création/édition est bloquée.
+
+- **Séparation lecture/écriture** dans `ClientsController` et `InvoicesController` : `loadOrgForWrite` (exige le module actif → `store`/`update`/`destroy`/`send`/`convert`/…) et `loadOrgForRead` (autorise si module actif **ou** données existantes → `index`/`show`/`downloadPdf`/`exportData`). Le PDF d'une facture émise et l'export RGPD d'un client restent accessibles.
+- **`QuotaService.canManageClients`** (booléen, symétrie avec `canManageInvoices`) ; **`ClientService.hasAnyForOrg`** / **`InvoiceService.hasAnyForOrg`**.
+- **Frontend** : prop `readOnly` sur `clients/index`, `clients/show`, `invoices/index`, `invoices/show` ; masque les boutons Ajouter/Éditer et affiche un bandeau « lecture seule ». i18n `clients.readOnlyNotice` / `invoices.readOnlyNotice` (en + fr).
+- **Changement de comportement assumé** : une org sans le module mais avec des factures peut désormais télécharger leurs PDF (accès résiduel) — test `invoice_pdf_email` mis à jour en conséquence.
+- **Tests** : lecture autorisée avec données / refusée sans données ni module ; écriture bloquée malgré des données ; retour au plein contrôle si le module est (ré)accordé.
+
+## 2026-07-09 — [#332] Offre modulaire 5a : notifications de résiliation de module
+
+Premier lot du cycle de vie (#332). Quand un module add-on souscrit disparaît de l'abonnement (résiliation, downgrade, annulation), les admins de l'organisation sont notifiés.
+
+- **Event** `OrganizationModuleDeactivated` (`app/events/`, sur le modèle de `OrganizationPlanDowngraded`), dispatché **après commit** par `SubscriptionService` pour chaque module retiré. `OrganizationModuleService.reconcileSubscriptionModules` renvoie désormais `{ removed: PlanModule[] }`.
+- **Listener** `on_organization_module_deactivated` : notification in-app (`module.deactivated`) + email transactionnel (dédupliqué) à chaque admin. Enregistré dans `start/events.ts`.
+- **Email** : template `resources/views/emails/module_deactivated.edge` + `EmailQueueService.sendModuleDeactivatedNotification`.
+- **i18n** : `notifications.messages.module.{names,deactivated}` (en + fr) ; type `module.deactivated` ajouté à `NotificationType`.
+- **Tests** : event dispatché quand un module est retiré (pas sinon) ; listener notifie chaque admin (pas les membres) et enqueue l'email avec le bon module.
+
+## 2026-07-09 — [#331] Offre modulaire 4/5 : UI page pricing + réglages facturation
+
+Exposition des modules add-ons à l'utilisateur : grille publique et gestion in-app.
+
+- **Page pricing publique** : nouvelle section `PricingModulesSection.vue` (2 modules, prix lus depuis `MODULE_PRICES`, « disponibles sur Pro / inclus dans Entreprise »), alimentée par `buildPricingPageData` (clés `marketing.pricing2.modules_*`).
+- **Réglages > Facturation** : nouveau composant `SettingsBillingModules.vue` (extrait pour garder l'onglet < 250 lignes) — liste les modules avec badge d'état (`Offert` pour `granted`, `Actif` pour `subscription`, `Inclus` en Entreprise) ; un abonné Pro peut **activer/résilier** un module. La page passe `activeModules` (module + source).
+- **Backend** : endpoints `POST`/`DELETE /settings/billing/module` (`BillingController.addModule`/`removeModule`, validator `moduleActionValidator`) ; guards « Pro + abonnement actif » ; `StripeService.addSubscriptionItem`/`removeSubscriptionItem` (item ajouté/retiré → le webhook #330 réconcilie la base). `OrganizationModuleService.listWithSource`/`findSubscriptionModule`.
+- **Garde d'idempotence** : `addModule` court-circuite (`hasModule`) si le module est déjà actif — évite qu'un double-clic ne crée un second item Stripe non résiliable depuis l'UI (flash `moduleAlreadyActive`).
+- **i18n** : `settings.billing.modules.*` et `marketing.pricing2.modules_*` (en + fr), messages flash `moduleAdded`/`moduleRemoved`/`moduleNotFound`/`moduleAlreadyActive`.
+- **Tests** : fonctionnels (prop `activeModules`, guards add/remove, idempotence, frontière Stripe non configuré), Vitest (`SettingsBillingModules` selon plan/abonnement/source, `PricingModulesSection`).
+
+## 2026-07-09 — [#330] Offre modulaire 3/5 : abonnements Stripe multi-items (socle + add-ons)
+
+Le billing Stripe gère désormais des abonnements **multi-items** : un item de base (tier Pro/Enterprise) + un item par module add-on. Aucun changement visible tant qu'aucun module n'est vendu ; brique consommée par l'UI (#331).
+
+- **Env** : 4 variables `STRIPE_MODULE_{CHARTER,CRM_INVOICING}_{MONTHLY,ANNUAL}_PRICE_ID` (`start/env.ts`, `.env.example`). `.env.test` fixe `STRIPE_SECRET_KEY=` (vide, aucun appel réseau) + des IDs `price_test_*`.
+- **`StripeService`** : `priceIdForModule(module, interval)` et `moduleForPriceId(priceId)` (mapping inverse) ; `createCheckoutSession` accepte désormais `priceIds: string[]` (line items multiples).
+- **`BillingController.checkout`** : payload `CheckoutPayload.modules?` (validator `vine.array` + guard `ModulesRequireProPlanError` — modules vendables uniquement sur Pro), construit `[prix du tier, ...prix des modules]`.
+- **`SubscriptionService`** : `resolveTierItem` (l'item du tier n'est plus forcément à l'index 0) fixe plan/bornes/intervalle ; `desiredModulesFrom` mappe les items de module ; réconciliation via `OrganizationModuleService.reconcileSubscriptionModules` dans la transaction de sync (retire les modules `subscription` absents, ajoute les désirés, **ne touche jamais un module `granted`**). Un abonnement annulé retire tous les modules `subscription`.
+- **Doc** : `docs/billing-and-quotas.md` §1.1, §4.5 bis, §8. **Tests** : mapping (unit), réconciliation multi-items — activation/retrait/annulation/ordre des items/module offert préservé (fonctionnels), guard checkout (fonctionnels).
+
+## 2026-07-08 — [#329] Offre modulaire 2/5 : résolution des quotas effectifs (tier + modules)
+
+Les capacités clients/pricing/invoices peuvent désormais venir du tier **ou** d'un module add-on actif. Aucun changement visible tant qu'aucun module n'est souscrit.
+
+- **Helper pur partagé** `shared/helpers/plan.ts` : `resolveEffectiveQuotas(tier, modules)` — quotas du tier fusionnés avec les `MODULE_FLAGS` des modules actifs ; seule source de vérité back/front.
+- **Backend** : `OrganizationModuleService.getEffectiveQuotas(org)` ; les 5 checks `QuotaService` concernés (`assertCanManageClients`, `canManagePricing`, `assertCanManagePricing`, `canManageInvoices`, `assertCanManageInvoices`) deviennent **async** et passent par les quotas effectifs (7 sites d'appel mis à jour). Les autres checks restent tier-only tant qu'aucun module ne les accorde.
+- **Props Inertia** : nouvelle prop partagée `activeModules: PlanModule[]` (middleware Inertia), à côté de `currentPlan`.
+- **Frontend** : nouveau composable `use_plan.ts` (`currentPlan`, `activeModules`, `effectiveQuotas` — mêmes règles de validation que le backend) ; `use_nav_sections.ts` consomme les quotas effectifs au lieu de lire `PLAN_LIMITS` directement.
+- **Tests** : unit (résolution pure, non-mutation de `PLAN_LIMITS`), fonctionnels (gating Pro sans module → redirection ; Pro + module → accès ; module `granted` équivalent ; prop `activeModules` exposée), Vitest nav (modules → entrées Clients/Factures/Périodes tarifaires).
+
+## 2026-07-08 — [#328] Offre modulaire 1/5 : modèle de données des modules
+
+Socle du système de modules add-ons (épic #327). Aucun changement de comportement utilisateur : cette brique est consommée par les lots suivants (résolution des quotas effectifs #329, sync Stripe #330).
+
+- **Types partagés** (`shared/types/plan.ts`) : `PlanModule` (`charter` | `crm_invoicing`), `ModuleSource` (`subscription` | `granted`), `PLAN_MODULES`, `MODULE_PRICES` (15 €/mois, 12 €/mois en annuel), `MODULE_FLAGS` (mapping module → flags de `PlanQuotas` accordés : `charter` → `canManagePricing` ; `crm_invoicing` → `canManageClients` + `canManageInvoices`), garde `isPlanModule`.
+- **Migration** `create_organization_modules_table` : `organization_id` (FK cascade), `module`, `source` (défaut `subscription` ; `granted` = offert/grandfathering), `stripe_subscription_item_id` nullable, contrainte unique (`organization_id`, `module`), CHECK sur `module` et `source`.
+- **Modèle** `OrganizationModule` + relation `Organization.modules` (hasMany).
+- **Service** `OrganizationModuleService` : `getActiveModules`, `hasModule`, `grantModule` (idempotent, ne requalifie jamais la `source` d'une ligne existante), `revokeModule` (ne retire que les modules `subscription` par défaut — un module offert survit à la sync Stripe).
+- **Tests** : taxonomie des modules (unit), service + contraintes DB + cascade (fonctionnels).
+
+## 2026-07-08 — Analyse : proposition d'offre modulaire (socles + add-ons)
+
+Ajout de `docs/offre-modulaire.md` : catalogue des fonctionnalités découpées en modules (socle commun, Location, CRM Clients, Facturation, IA, Marina, Navigation & Bord, Marque blanche, Data & Conformité), comparaison de trois scénarios commerciaux (tiers redécoupés / hybride socles + add-ons / 100 % à la carte) et recommandation : lancer une V1 hybride avec deux modules déjà gatés (**Location** 15 €/mois et **CRM & Facturation** 15 €/mois) sur le socle Pro, Enterprise conservé en bundle tout inclus. Document d'analyse uniquement — aucun changement de code ni de gating.
+
 ## 2026-07-08 — [#323] Historique de maintenance avec des filtres
 
 Refonte de la page `/maintenance/history` : le filtrage et la pagination passent **côté serveur** (pattern org-scopé de `boats`/`clients`), et de nouveaux filtres sont ajoutés.

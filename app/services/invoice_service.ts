@@ -183,6 +183,16 @@ export default class InvoiceService {
     }
   }
 
+  /**
+   * Vrai si l'organisation a au moins un devis/facture. Autorise l'accès en
+   * lecture seule après résiliation du module Facturation (#332, lot 5b) — les
+   * documents émis restent consultables/exportables (obligation légale).
+   */
+  async hasAnyForOrg(organizationId: number): Promise<boolean> {
+    const row = await Invoice.query().where('organizationId', organizationId).select('id').first()
+    return row !== null
+  }
+
   async getForOrganizationOrFail(org: Organization, id: number): Promise<Invoice> {
     const invoice = await Invoice.query()
       .where('id', id)

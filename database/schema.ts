@@ -1564,6 +1564,33 @@ export class OrganizationMembershipSchema extends BaseModel {
   declare userId: number
 }
 
+export class OrganizationModuleSchema extends BaseModel {
+  static $columns = [
+    'createdAt',
+    'id',
+    'module',
+    'organizationId',
+    'source',
+    'stripeSubscriptionItemId',
+    'updatedAt',
+  ] as const
+  $columns = OrganizationModuleSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare module: string
+  @column()
+  declare organizationId: number
+  @column()
+  declare source: string
+  @column()
+  declare stripeSubscriptionItemId: string | null
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class OrganizationSchema extends BaseModel {
   static $columns = [
     'aiModelOverride',

@@ -4,12 +4,13 @@ import type { JSONDataTypes } from '@adonisjs/core/types/transformers'
 import { inject } from '@adonisjs/core'
 import UserTransformer from '#transformers/user_transformer'
 import BaseInertiaMiddleware from '@adonisjs/inertia/inertia_middleware'
-import { PLAN_LIMITS, type PlanTier } from '#shared/types/plan'
+import { PLAN_LIMITS, type PlanModule, type PlanTier } from '#shared/types/plan'
 import type { BrandingSharedProps } from '#shared/types/branding'
 import type { NotificationsSharedProps } from '#shared/types/notification'
 import type { PermissionsSharedProps } from '#shared/types/permissions'
 import { BrandingService } from '#services/branding_service'
 import NotificationService from '#services/notification_service'
+import OrganizationModuleService from '#services/organization_module_service'
 import PermissionService from '#services/permission_service'
 import { DEMO_SESSION_DURATION_MS } from '#shared/constants/demo'
 import type User from '#models/user'
@@ -40,6 +41,7 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
   constructor(
     private brandingService: BrandingService,
     private notificationService: NotificationService,
+    private organizationModuleService: OrganizationModuleService,
     private permissionService: PermissionService
   ) {
     super()
@@ -68,6 +70,11 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
       await auth.user.load('organization')
     }
     const currentPlan = await resolveSharedCurrentPlan(auth?.user)
+    // Modules add-ons actifs (épic #327) : partagés avec `currentPlan` pour que
+    // le front résolve les quotas effectifs via le même helper que le backend.
+    const activeModules: PlanModule[] = auth?.user?.organizationId
+      ? await this.organizationModuleService.getActiveModules(auth.user.organizationId)
+      : []
     const branding = await resolveSharedBranding(auth?.user, this.brandingService)
     const notifications: NotificationsSharedProps = auth?.user
       ? await this.notificationService.sharedProps(auth.user.id)
@@ -96,6 +103,7 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
       ),
       user: ctx.inertia.always(auth?.user ? UserTransformer.transform(auth.user) : undefined),
       currentPlan: ctx.inertia.always(currentPlan),
+      activeModules: ctx.inertia.always(activeModules),
       branding: ctx.inertia.always(branding),
       notifications: ctx.inertia.always(notifications as unknown as JSONDataTypes),
       permissions: ctx.inertia.always(permissions as unknown as JSONDataTypes),

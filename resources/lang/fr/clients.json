@@ -94,5 +94,6 @@
       "message": "Cette action neutralise définitivement les données personnelles (nom, email, téléphone, adresse, permis) et supprime les documents. Les réservations passées sont conservées mais anonymisées. Irréversible."
     },
     "export": "Exporter les données"
-  }
+  },
+  "readOnlyNotice": "Lecture seule : le module CRM est inactif. Vos clients existants restent visibles ; l'ajout et l'édition sont désactivés."
 }

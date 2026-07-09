@@ -40,7 +40,7 @@ export default class ClientMediaController {
     await user.load('organization')
 
     try {
-      this.quotaService.assertCanManageClients(user.organization)
+      await this.quotaService.assertCanManageClients(user.organization)
     } catch (error) {
       if (error instanceof QuotaExceededError) {
         ctx.session.flash('error', ctx.i18n.t('flash.quota.clientsExceeded'))

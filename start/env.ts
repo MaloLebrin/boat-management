@@ -53,6 +53,11 @@ export default await Env.create(new URL('../', import.meta.url), {
   STRIPE_PRO_ANNUAL_PRICE_ID: Env.schema.string.optional(),
   STRIPE_ENTERPRISE_MONTHLY_PRICE_ID: Env.schema.string.optional(),
   STRIPE_ENTERPRISE_ANNUAL_PRICE_ID: Env.schema.string.optional(),
+  // Modules add-ons (épic #327) — items d'abonnement additionnels sur le socle Pro
+  STRIPE_MODULE_CHARTER_MONTHLY_PRICE_ID: Env.schema.string.optional(),
+  STRIPE_MODULE_CHARTER_ANNUAL_PRICE_ID: Env.schema.string.optional(),
+  STRIPE_MODULE_CRM_INVOICING_MONTHLY_PRICE_ID: Env.schema.string.optional(),
+  STRIPE_MODULE_CRM_INVOICING_ANNUAL_PRICE_ID: Env.schema.string.optional(),
   STRIPE_PUBLIC_KEY: Env.schema.string.optional(),
   STRIPE_CUSTOMER_PORTAL_ID: Env.schema.string.optional(),
 

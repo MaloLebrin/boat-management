@@ -24,7 +24,11 @@ export default class ClientsController {
     private mediaService: MediaService
   ) {}
 
-  private async loadOrgAndAssertEnterprise({
+  /**
+   * Écriture : exige le module CRM actif (tier ou add-on #327). Bloque toute
+   * création/édition/suppression dès que le module est résilié.
+   */
+  private async loadOrgForWrite({
     auth,
     session,
     response,
@@ -34,7 +38,7 @@ export default class ClientsController {
     await user.load('organization')
 
     try {
-      this.quotaService.assertCanManageClients(user.organization)
+      await this.quotaService.assertCanManageClients(user.organization)
     } catch (error) {
       if (error instanceof QuotaExceededError) {
         session.flash('error', i18n.t('flash.quota.clientsExceeded'))
@@ -47,29 +51,66 @@ export default class ClientsController {
     return user.organization
   }
 
+  /**
+   * Lecture : autorisée si le module est actif OU si l'organisation possède déjà
+   * des fiches clients — accès résiduel en lecture seule après résiliation
+   * (#332, lot 5b). Renvoie aussi `canManage` pour piloter l'UI (mode read-only).
+   */
+  private async loadOrgForRead({
+    auth,
+    session,
+    response,
+    i18n,
+  }: Pick<HttpContext, 'auth' | 'session' | 'response' | 'i18n'>): Promise<{
+    org: Organization
+    canManage: boolean
+  } | null> {
+    const user = auth.getUserOrFail()
+    await user.load('organization')
+    const org = user.organization
+
+    if (org === null) {
+      session.flash('error', i18n.t('flash.quota.clientsExceeded'))
+      response.redirect('/')
+      return null
+    }
+
+    const canManage = await this.quotaService.canManageClients(org)
+    if (!canManage && !(await this.clientService.hasAnyForOrg(org.id))) {
+      session.flash('error', i18n.t('flash.quota.clientsExceeded'))
+      response.redirect('/')
+      return null
+    }
+
+    return { org, canManage }
+  }
+
   async index({ inertia, auth, bouncer, request, session, response, i18n }: HttpContext) {
     await auth.authenticate()
-    const org = await this.loadOrgAndAssertEnterprise({ auth, session, response, i18n })
-    if (!org) return
+    const loaded = await this.loadOrgForRead({ auth, session, response, i18n })
+    if (!loaded) return
+    const { org, canManage: moduleActive } = loaded
 
     await bouncer.with(ClientPolicy).authorize('create')
 
     const filters = this.clientService.normalizeFilters(request.qs())
     const clients = await this.clientService.search(org, filters)
-    const canDelete = await bouncer.with(ClientPolicy).allows('delete')
+    const canDelete = moduleActive && (await bouncer.with(ClientPolicy).allows('delete'))
 
-    return inertia.render('clients/index', { clients, filters, canDelete })
+    return inertia.render('clients/index', { clients, filters, canDelete, readOnly: !moduleActive })
   }
 
   async show({ inertia, auth, bouncer, params, session, response, i18n }: HttpContext) {
     await auth.authenticate()
-    const org = await this.loadOrgAndAssertEnterprise({ auth, session, response, i18n })
-    if (!org) return
+    const loaded = await this.loadOrgForRead({ auth, session, response, i18n })
+    if (!loaded) return
+    const { org, canManage: moduleActive } = loaded
 
     await bouncer.with(ClientPolicy).authorize('create')
 
-    const canManage = await bouncer.with(ClientPolicy).allows('update')
-    const canAnonymize = await bouncer.with(ClientPolicy).allows('anonymize')
+    // Le module résilié force la lecture seule, même pour un admin.
+    const canManage = moduleActive && (await bouncer.with(ClientPolicy).allows('update'))
+    const canAnonymize = moduleActive && (await bouncer.with(ClientPolicy).allows('anonymize'))
 
     try {
       const client = await this.clientService.getForOrganizationOrFail(org, Number(params.id))
@@ -81,6 +122,7 @@ export default class ClientsController {
         documents: documents.map(toMediaRow),
         canManage,
         canAnonymize,
+        readOnly: !moduleActive,
       })
     } catch (error) {
       if (error instanceof ClientNotFoundError) {
@@ -94,7 +136,7 @@ export default class ClientsController {
 
   async store({ request, response, auth, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const org = await this.loadOrgAndAssertEnterprise({ auth, session, response, i18n })
+    const org = await this.loadOrgForWrite({ auth, session, response, i18n })
     if (!org) return
 
     await bouncer.with(ClientPolicy).authorize('create')
@@ -108,7 +150,7 @@ export default class ClientsController {
 
   async update({ request, response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const org = await this.loadOrgAndAssertEnterprise({ auth, session, response, i18n })
+    const org = await this.loadOrgForWrite({ auth, session, response, i18n })
     if (!org) return
 
     await bouncer.with(ClientPolicy).authorize('update')
@@ -137,7 +179,7 @@ export default class ClientsController {
 
   async destroy({ response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const org = await this.loadOrgAndAssertEnterprise({ auth, session, response, i18n })
+    const org = await this.loadOrgForWrite({ auth, session, response, i18n })
     if (!org) return
 
     await bouncer.with(ClientPolicy).authorize('delete')
@@ -160,7 +202,7 @@ export default class ClientsController {
 
   async anonymize({ response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const org = await this.loadOrgAndAssertEnterprise({ auth, session, response, i18n })
+    const org = await this.loadOrgForWrite({ auth, session, response, i18n })
     if (!org) return
 
     await bouncer.with(ClientPolicy).authorize('anonymize')
@@ -183,8 +225,10 @@ export default class ClientsController {
 
   async exportData({ response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const org = await this.loadOrgAndAssertEnterprise({ auth, session, response, i18n })
-    if (!org) return
+    // Export RGPD des données existantes : autorisé en lecture seule (droit légal).
+    const loaded = await this.loadOrgForRead({ auth, session, response, i18n })
+    if (!loaded) return
+    const { org } = loaded
 
     await bouncer.with(ClientPolicy).authorize('update')
 

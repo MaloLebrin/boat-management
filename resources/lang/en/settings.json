@@ -102,6 +102,26 @@
         "year": "Annual"
       },
       "annualDiscount": "-20%"
+    },
+    "modules": {
+      "title": "Add-on modules",
+      "subtitle": "Extend your Pro plan with modules billed separately.",
+      "pricePerMonth": "€{amount}/mo",
+      "active": "Active",
+      "granted": "Included",
+      "grantedHint": "Included in your plan",
+      "included": "Included",
+      "activate": "Activate",
+      "deactivate": "Cancel",
+      "proRequired": "Requires an active Pro plan",
+      "charter": {
+        "name": "Charter",
+        "desc": "Per-boat pricing and seasonal rates"
+      },
+      "crm_invoicing": {
+        "name": "CRM & Invoicing",
+        "desc": "Clients, GDPR, quotes and invoices"
+      }
     }
   },
   "upgrade": {

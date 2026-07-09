@@ -3,7 +3,7 @@ import SendEmail, { type SendEmailPayload } from '#jobs/send_email'
 import QueueDedupService from '#services/queue_dedup_service'
 import type { ReminderBoatItem, ReminderPortItem, ReminderTaskItem } from '#shared/types/reminder'
 import type { ReminderDocumentItem } from '#shared/types/boat_document'
-import type { PlanTier } from '#shared/types/plan'
+import type { PlanModule, PlanTier } from '#shared/types/plan'
 import type { BrandingEmailParams } from '#shared/types/branding'
 import env from '#start/env'
 import { inject } from '@adonisjs/core'
@@ -587,6 +587,54 @@ export default class EmailQueueService {
 
     const yearMonth = DateTime.now().toFormat('yyyy-MM')
     const correlationId = `plan-downgrade:${params.orgId}:${params.fromPlan}:${params.toPlan}:${yearMonth}`
+
+    const partialPayload: Omit<SendEmailPayload, 'dedupKey'> = {
+      to: params.to,
+      subject,
+      text,
+      html,
+      correlationId,
+    }
+
+    const key = SendEmail.dedupKey(partialPayload)
+    const payload: SendEmailPayload = { ...partialPayload, dedupKey: key }
+
+    await this.dedup.enqueueUnique({
+      key,
+      jobName: SendEmail.name,
+      queue: 'emails',
+      payload,
+      dispatch: async (p) => {
+        await SendEmail.dispatch(p)
+      },
+    })
+  }
+
+  async sendModuleDeactivatedNotification(params: {
+    to: string
+    name: string | null
+    orgName: string
+    orgId: number
+    module: PlanModule
+    moduleName: string
+    branding?: BrandingEmailParams | null
+  }) {
+    const displayName = params.name ?? params.to
+    const subject = `Module désactivé — ${params.moduleName} / Module deactivated — ${params.moduleName}`
+    const text =
+      `Bonjour ${displayName},\n\nLe module ${params.moduleName} a été retiré de l'abonnement de ${params.orgName}. Vos données restent consultables en lecture seule ; la création et l'édition sont désormais bloquées.\n\n` +
+      `Hello ${displayName},\n\nThe ${params.moduleName} module has been removed from ${params.orgName}'s subscription. Your data stays available in read-only mode; creating and editing are now disabled.\n\n${env.get('APP_URL')}/settings/billing`
+
+    const html = await edge.render('emails/module_deactivated', {
+      displayName,
+      orgName: params.orgName,
+      moduleName: params.moduleName,
+      appUrl: env.get('APP_URL'),
+      branding: params.branding ?? null,
+    })
+
+    const yearMonth = DateTime.now().toFormat('yyyy-MM')
+    const correlationId = `module-deactivated:${params.orgId}:${params.module}:${yearMonth}`
 
     const partialPayload: Omit<SendEmailPayload, 'dedupKey'> = {
       to: params.to,

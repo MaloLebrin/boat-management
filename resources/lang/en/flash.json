@@ -99,7 +99,12 @@
   },
   "billing": {
     "notConfigured": "Payment is not configured yet. Please contact support.",
-    "noSubscription": "No active subscription found."
+    "noSubscription": "No active subscription found.",
+    "modulesRequirePro": "Add-on modules are only available on the Pro plan.",
+    "moduleAdded": "Module activated. It will appear once the payment is confirmed.",
+    "moduleRemoved": "Module cancelled. It will be removed once confirmed.",
+    "moduleNotFound": "This module is not active on your subscription.",
+    "moduleAlreadyActive": "This module is already active on your subscription."
   },
   "demo": {
     "rateLimitError": "Too many attempts. Please try again in a minute.",

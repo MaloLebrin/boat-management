@@ -94,5 +94,6 @@
       "message": "This permanently neutralizes personal data (name, email, phone, address, permit) and deletes documents. Past reservations are kept but anonymized. Irreversible."
     },
     "export": "Export data"
-  }
+  },
+  "readOnlyNotice": "Read-only: the CRM module is inactive. Your existing clients stay visible; adding and editing are disabled."
 }

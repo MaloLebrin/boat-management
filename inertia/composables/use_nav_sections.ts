@@ -1,32 +1,14 @@
 import { computed } from 'vue'
-import { usePage } from '@inertiajs/vue3'
 import { useT } from '~/composables/use_t'
-import { PLAN_LIMITS } from '../../shared/types/plan'
-import type { PlanTier } from '../../shared/types/plan'
-
-const VALID_PLANS = new Set<string>(['starter', 'pro', 'enterprise'])
+import { usePlan } from '~/composables/use_plan'
 
 export function useNavSections() {
   const { t } = useT()
-  const page = usePage()
+  const { effectiveQuotas } = usePlan()
 
-  const canManageClients = computed(() => {
-    const plan = page.props.currentPlan
-    if (typeof plan !== 'string' || !VALID_PLANS.has(plan)) return false
-    return PLAN_LIMITS[plan as PlanTier].canManageClients
-  })
-
-  const canManagePricing = computed(() => {
-    const plan = page.props.currentPlan
-    if (typeof plan !== 'string' || !VALID_PLANS.has(plan)) return false
-    return PLAN_LIMITS[plan as PlanTier].canManagePricing
-  })
-
-  const canManageInvoices = computed(() => {
-    const plan = page.props.currentPlan
-    if (typeof plan !== 'string' || !VALID_PLANS.has(plan)) return false
-    return PLAN_LIMITS[plan as PlanTier].canManageInvoices
-  })
+  const canManageClients = computed(() => effectiveQuotas.value?.canManageClients === true)
+  const canManagePricing = computed(() => effectiveQuotas.value?.canManagePricing === true)
+  const canManageInvoices = computed(() => effectiveQuotas.value?.canManageInvoices === true)
 
   const navSections = computed(() => {
     const fleetItems = [

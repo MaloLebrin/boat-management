@@ -4,8 +4,9 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import SettingsBillingUsageGauge from '~/components/settings/SettingsBillingUsageGauge.vue'
+import SettingsBillingModules from '~/components/settings/SettingsBillingModules.vue'
 import { useT } from '~/composables/use_t'
-import type { PlanTier, QuotaUsage } from '../../../../shared/types/plan'
+import type { ActiveModuleInfo, PlanTier, QuotaUsage } from '../../../../shared/types/plan'
 import type {
   BillingInterval,
   SubscriptionInfo,
@@ -21,6 +22,7 @@ const props = defineProps<{
   plan: PlanTier
   quotaUsage: QuotaUsage
   subscription: SubscriptionInfo | null
+  activeModules: ActiveModuleInfo[]
 }>()
 
 const interval = ref<BillingInterval>('month')
@@ -218,6 +220,12 @@ const storageOverflow = computed(() => {
           </div>
         </template>
       </BaseCard>
+
+      <SettingsBillingModules
+        :plan="plan"
+        :subscription="subscription"
+        :active-modules="activeModules"
+      />
     </div>
   </div>
 </template>

@@ -1,6 +1,6 @@
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
-import { PLAN_PRICES } from '../../shared/types/plan.js'
+import { MODULE_PRICES, PLAN_PRICES } from '../../shared/types/plan.js'
 import QuotaService from '#services/quota_service'
 import SimulatorLeadService from '#services/simulator_lead_service'
 
@@ -807,6 +807,28 @@ export default class MarketingController {
               price: t('extras_4_price'),
               priceSub: t('extras_4_price_sub'),
               tone: 'bone',
+            },
+          ],
+        },
+        modules: {
+          eyebrow: t('modules_eyebrow'),
+          title: t('modules_title'),
+          subtitle: t('modules_subtitle'),
+          note: t('modules_note'),
+          pricePer: t('modules_price_per'),
+          includedLabel: t('modules_included'),
+          items: [
+            {
+              icon: '📅',
+              name: t('modules_charter_name'),
+              desc: t('modules_charter_desc'),
+              price: MODULE_PRICES.charter.monthly,
+            },
+            {
+              icon: '🧾',
+              name: t('modules_crm_name'),
+              desc: t('modules_crm_desc'),
+              price: MODULE_PRICES.crm_invoicing.monthly,
             },
           ],
         },

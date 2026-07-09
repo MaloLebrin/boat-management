@@ -24,6 +24,7 @@ const props = defineProps<{
   filters: InvoiceListFilters
   clientOptions: ClientOption[]
   canDelete: boolean
+  readOnly?: boolean
 }>()
 
 const { t } = useT()
@@ -88,12 +89,16 @@ function formatDate(dateStr: string | null): string {
           {{ t('invoices.count', { count: String(invoices.meta.total) }) }}
         </p>
       </div>
-      <Link href="/invoices/new">
+      <Link v-if="!readOnly" href="/invoices/new">
         <BaseButton variant="primary" size="sm" type="button">
           {{ t('invoices.add') }}
         </BaseButton>
       </Link>
     </div>
+
+    <BaseAlert v-if="readOnly" variant="warning" class="mb-6">
+      {{ t('invoices.readOnlyNotice') }}
+    </BaseAlert>
 
     <BaseAlert v-if="flash?.success" variant="success" class="mb-6" dismissible>
       {{ flash.success }}
@@ -126,7 +131,7 @@ function formatDate(dateStr: string | null): string {
                 {{ t('invoices.view') }}
               </BaseButton>
             </Link>
-            <Link :href="`/invoices/${invoice.id}/edit`">
+            <Link v-if="!readOnly" :href="`/invoices/${invoice.id}/edit`">
               <BaseButton type="button" variant="secondary" size="sm">
                 {{ t('invoices.edit') }}
               </BaseButton>

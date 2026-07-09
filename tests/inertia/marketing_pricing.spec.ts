@@ -127,6 +127,15 @@ test('renders pricing title (fr)', () => {
               },
             ],
           },
+          modules: {
+            eyebrow: 'Modules',
+            title: 'Modules add-ons',
+            subtitle: 'Sub',
+            note: 'Disponibles sur Pro.',
+            pricePer: '/mois',
+            includedLabel: 'Inclus dans Entreprise.',
+            items: [{ icon: '📅', name: 'Location', desc: 'Desc', price: 15 }],
+          },
           faq: {
             eyebrow: 'FAQ',
             title: 'Questions',

@@ -90,6 +90,45 @@ export const PLAN_LIMITS: Record<PlanTier, PlanQuotas> = {
   },
 }
 
+/**
+ * Modules add-ons souscriptibles à la carte sur le socle Pro (épic #327).
+ * Enterprise les inclut tous ; Starter n'y a pas accès.
+ */
+export type PlanModule = 'charter' | 'crm_invoicing'
+
+export const PLAN_MODULES: readonly PlanModule[] = ['charter', 'crm_invoicing'] as const
+
+/**
+ * Origine d'un module actif : souscrit via Stripe, ou offert manuellement
+ * (grandfathering des comptes existants, geste commercial).
+ */
+export type ModuleSource = 'subscription' | 'granted'
+
+/** Module actif d'une organisation avec son origine, pour l'affichage in-app. */
+export interface ActiveModuleInfo {
+  module: PlanModule
+  source: ModuleSource
+}
+
+export const MODULE_PRICES: Record<PlanModule, PlanPrice> = {
+  charter: { monthly: 15, annualMonthly: 12, annualTotal: 144 },
+  crm_invoicing: { monthly: 15, annualMonthly: 12, annualTotal: 144 },
+}
+
+/**
+ * Flags de `PlanQuotas` accordés par chaque module, fusionnés avec ceux du
+ * tier par la résolution des quotas effectifs (#329). Un module ne peut
+ * qu'accorder des capacités, jamais en retirer.
+ */
+export const MODULE_FLAGS: Record<PlanModule, Partial<PlanQuotas>> = {
+  charter: { canManagePricing: true },
+  crm_invoicing: { canManageClients: true, canManageInvoices: true },
+}
+
+export function isPlanModule(value: string): value is PlanModule {
+  return (PLAN_MODULES as readonly string[]).includes(value)
+}
+
 export function getUpgradeTier(current: PlanTier): PlanTier | null {
   if (current === 'starter') return 'pro'
   if (current === 'pro') return 'enterprise'
