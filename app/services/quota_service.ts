@@ -116,6 +116,12 @@ export default class QuotaService {
   // Les capacités clients/pricing/invoices peuvent venir du tier OU d'un
   // module add-on (épic #327) : elles passent par les quotas effectifs.
   // Les autres checks restent tier-only tant qu'aucun module ne les accorde.
+  async canManageClients(org: Organization | null): Promise<boolean> {
+    this.#assertOrganization(org)
+    const limits = await this.organizationModuleService.getEffectiveQuotas(org)
+    return limits.canManageClients
+  }
+
   async assertCanManageClients(org: Organization | null): Promise<void> {
     this.#assertOrganization(org)
     const limits = await this.organizationModuleService.getEffectiveQuotas(org)
