@@ -22,7 +22,7 @@ const props = defineProps<{
   plan: PlanTier
   quotaUsage: QuotaUsage
   subscription: SubscriptionInfo | null
-  activeModules: ActiveModuleInfo[]
+  orgModules: ActiveModuleInfo[]
 }>()
 
 const interval = ref<BillingInterval>('month')
@@ -224,7 +224,7 @@ const storageOverflow = computed(() => {
       <SettingsBillingModules
         :plan="plan"
         :subscription="subscription"
-        :active-modules="activeModules"
+        :active-modules="orgModules"
       />
     </div>
   </div>

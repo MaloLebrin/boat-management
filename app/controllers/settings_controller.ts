@@ -70,7 +70,7 @@ export default class SettingsController {
     const limits = PLAN_LIMITS[org.plan]
     const storageLimit = this.quotaService.storageLimitBytes(org)
 
-    const [boatCount, memberCount, activeSub, aiTokensUsed, activeModules] = await Promise.all([
+    const [boatCount, memberCount, activeSub, aiTokensUsed, orgModules] = await Promise.all([
       this.quotaService.countBoats(org),
       this.quotaService.countMembers(org),
       this.subscriptionService.getActive(org.id),
@@ -89,7 +89,11 @@ export default class SettingsController {
         canExport: limits.canExport,
       },
       subscription: activeSub ? this.subscriptionService.toInfo(activeSub) : null,
-      activeModules,
+      // Nommé `orgModules` (et non `activeModules`) pour NE PAS écraser la prop
+      // Inertia partagée `activeModules: PlanModule[]` (chaînes) posée par le
+      // middleware et consommée par `usePlan()`/la nav — la fusion Inertia
+      // {...shared, ...pageProps} ferait sinon tomber les quotas à tier-only ici.
+      orgModules,
     })
   }
 

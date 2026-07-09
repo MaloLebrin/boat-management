@@ -104,7 +104,8 @@
     "moduleAdded": "Module activé. Il apparaîtra une fois le paiement confirmé.",
     "moduleRemoved": "Module résilié. Il sera retiré une fois la confirmation reçue.",
     "moduleNotFound": "Ce module n'est pas actif sur votre abonnement.",
-    "moduleAlreadyActive": "Ce module est déjà actif sur votre abonnement."
+    "moduleAlreadyActive": "Ce module est déjà actif sur votre abonnement.",
+    "moduleActionFailed": "Le module n'a pas pu être mis à jour. Veuillez réessayer."
   },
   "demo": {
     "rateLimitError": "Trop de tentatives. Veuillez réessayer dans une minute.",
