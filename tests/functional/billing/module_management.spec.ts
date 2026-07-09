@@ -93,6 +93,43 @@ test.group('Billing module management (functional)', (group) => {
     response.assertFlashMessage('error', 'Payment is not configured yet. Please contact support.')
   })
 
+  test('adding an already-active module is a no-op (idempotency guard)', async ({ client }) => {
+    const user = await createAdminUser()
+    await seedActiveSubscription(user.organizationId!)
+    await new OrganizationModuleService().grantModule(user.organizationId!, 'charter', {
+      source: 'subscription',
+      stripeSubscriptionItemId: 'si_charter_existing',
+    })
+
+    // Must short-circuit BEFORE the Stripe call: no second subscription item is
+    // created (which would otherwise be billed with no way to cancel it).
+    const response = await client
+      .post('/settings/billing/module')
+      .loginAs(user)
+      .form({ module: 'charter' })
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertFlashMessage('info', 'This module is already active on your subscription.')
+  })
+
+  test('the idempotency guard also blocks re-adding a granted module', async ({ client }) => {
+    const user = await createAdminUser()
+    await seedActiveSubscription(user.organizationId!)
+    await new OrganizationModuleService().grantModule(user.organizationId!, 'crm_invoicing', {
+      source: 'granted',
+    })
+
+    const response = await client
+      .post('/settings/billing/module')
+      .loginAs(user)
+      .form({ module: 'crm_invoicing' })
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertFlashMessage('info', 'This module is already active on your subscription.')
+  })
+
   test('removing a module that is not active is rejected', async ({ client }) => {
     const user = await createAdminUser()
     await seedActiveSubscription(user.organizationId!)

@@ -100,6 +100,15 @@ export default class BillingController {
         return response.redirect().back()
       }
 
+      // Idempotence : sans ce garde, un double-clic / retry crée un second item
+      // Stripe pour le même module. La contrainte unique (organization_id, module)
+      // ne réconcilie qu'un seul item — l'autre resterait facturé sans moyen de le
+      // résilier depuis l'UI. On court-circuite si le module est déjà actif.
+      if (await this.organizationModuleService.hasModule(org.id, module)) {
+        session.flash('info', i18n.t('flash.billing.moduleAlreadyActive'))
+        return response.redirect().back()
+      }
+
       const priceId = this.stripeService.priceIdForModule(module, sub.billingInterval)
       await this.stripeService.addSubscriptionItem(sub.stripeSubscriptionId, priceId)
 
