@@ -127,5 +127,6 @@
   },
   "fromReservation": {
     "line": "Location {boat} ({start} → {end})"
-  }
+  },
+  "readOnlyNotice": "Lecture seule : le module Facturation est inactif. Vos documents existants restent consultables ; la création et l'édition sont désactivées."
 }

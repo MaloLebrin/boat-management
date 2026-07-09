@@ -117,6 +117,16 @@ export default class ClientService {
   }
 
   /**
+   * Vrai si l'organisation a au moins une fiche client. Sert à autoriser l'accès
+   * en lecture seule après résiliation du module CRM (#332, lot 5b) : les
+   * données existantes restent consultables, la création/édition est bloquée.
+   */
+  async hasAnyForOrg(organizationId: number): Promise<boolean> {
+    const row = await Client.query().where('organizationId', organizationId).select('id').first()
+    return row !== null
+  }
+
+  /**
    * Lightweight client options for a selector (id + full name + status), sorted
    * by name. Used by the reservation form (#275).
    */

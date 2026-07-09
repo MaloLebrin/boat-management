@@ -97,11 +97,29 @@ test.group('Invoice PDF & email (functional)', (group) => {
     response.assertHeader('location', '/invoices')
   })
 
-  test('pdf download is blocked for non-enterprise', async ({ client }) => {
-    const user = await createAdminUser() // pro
+  test('pdf download stays available (read-only) when the org has existing invoices', async ({
+    client,
+  }) => {
+    // Accès résiduel (#332, lot 5b) : une org sans le module Facturation actif
+    // mais qui possède déjà des documents peut toujours télécharger leurs PDF —
+    // les documents émis restent consultables (obligation légale).
+    const user = await createAdminUser() // pro, pas de module invoices
     const invoice = await createInvoice(user.organizationId!)
 
-    const response = await client.get(`/invoices/${invoice.id}/pdf`).loginAs(user).redirects(0)
+    const response = await client.get(`/invoices/${invoice.id}/pdf`).loginAs(user)
+
+    response.assertStatus(200)
+    response.assertHeader('content-type', 'application/pdf')
+  })
+
+  test('pdf download is blocked for an org without invoices nor the module', async ({ client }) => {
+    // Sans aucune donnée ni module, aucun accès résiduel : redirection avant
+    // même de charger le document (l'org de l'utilisateur n'a aucune facture).
+    const user = await createAdminUser() // pro, aucune facture
+    const other = await createEnterpriseAdminUser()
+    const foreign = await createInvoice(other.organizationId!)
+
+    const response = await client.get(`/invoices/${foreign.id}/pdf`).loginAs(user).redirects(0)
 
     response.assertStatus(302)
     response.assertHeader('location', '/')

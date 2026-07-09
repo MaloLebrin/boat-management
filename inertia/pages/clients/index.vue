@@ -19,6 +19,7 @@ const props = defineProps<{
   clients: ClientsPaginated
   filters: ClientListFilters
   canDelete: boolean
+  readOnly?: boolean
 }>()
 
 const { t } = useT()
@@ -75,10 +76,20 @@ function getPermitLabel(client: ClientRow): string {
           {{ t('clients.count', { count: String(clients.meta.total) }) }}
         </p>
       </div>
-      <BaseButton variant="primary" size="sm" type="button" @click="showCreateForm = true">
+      <BaseButton
+        v-if="!readOnly"
+        variant="primary"
+        size="sm"
+        type="button"
+        @click="showCreateForm = true"
+      >
         {{ t('clients.add') }}
       </BaseButton>
     </div>
+
+    <BaseAlert v-if="readOnly" variant="warning" class="mb-6">
+      {{ t('clients.readOnlyNotice') }}
+    </BaseAlert>
 
     <BaseAlert v-if="flash?.success" variant="success" class="mb-6" dismissible>
       {{ flash.success }}
@@ -121,6 +132,7 @@ function getPermitLabel(client: ClientRow): string {
                 </BaseButton>
               </Link>
               <BaseButton
+                v-if="!readOnly"
                 type="button"
                 variant="secondary"
                 size="sm"
