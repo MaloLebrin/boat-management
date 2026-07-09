@@ -34,6 +34,18 @@ En plus du tier, une organisation **Pro** peut souscrire des **modules add-ons**
 - **Source de vérité** : `OrganizationModuleService` (jamais le modèle en direct). Colonne `source` = `subscription` (item Stripe) ou `granted` (offert / grandfathering — insensible à la sync Stripe).
 - **Quotas effectifs** : `resolveEffectiveQuotas(tier, modules)` ([`shared/helpers/plan.ts`](../shared/helpers/plan.ts)) fusionne les flags du tier avec ceux des modules actifs. Helper pur partagé backend (policies, `QuotaService`) / frontend (`use_plan.ts`, navigation) — jamais recombiné ailleurs.
 - **Règle commerciale** : modules vendables uniquement sur Pro. Starter n'y a pas droit ; Enterprise les inclut déjà tous (`PLAN_LIMITS.enterprise`).
+- **Résiliation** : le retrait d'un item Stripe émet `OrganizationModuleDeactivated` (notification + email) ; les données du module restent en **lecture seule** (factures/devis consultables + PDF/export, clients consultables). Écriture rétablie à la réactivation.
+- **Idempotence** : `addSubscriptionItem` passe une clé d'idempotence Stripe (`add-module:{subscriptionId}:{priceId}`) — deux ajouts concurrents ne créent qu'un item. Le garde applicatif `hasModule` couvre en amont le double-clic.
+
+### Rollout grandfathering (une fois au déploiement)
+
+Après migration, exécuter la commande Ace pour qu'aucune organisation Enterprise existante ne perde de fonctionnalité :
+
+```bash
+node ace modules:grant-enterprise
+```
+
+Elle accorde tous les modules en `source = 'granted'` à chaque org Enterprise. **Idempotente** : relançable sans effet de bord (ne recrée ni ne requalifie les lignes existantes).
 
 ---
 

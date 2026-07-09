@@ -67,13 +67,26 @@ export default class StripeService {
    * Ajoute un item (module add-on) à un abonnement existant (#327). Stripe
    * proratise par défaut ; le webhook `customer.subscription.updated` déclenche
    * ensuite la réconciliation en base.
+   *
+   * Une **clé d'idempotence** (dérivée de l'abonnement + du prix) garantit que
+   * deux requêtes concurrentes — que le garde applicatif `hasModule` ne peut pas
+   * intercepter avant l'écriture du webhook — ne créent qu'un seul item facturé
+   * (durcissement #332, lot 5c).
    */
   async addSubscriptionItem(subscriptionId: string, priceId: string): Promise<void> {
-    await this.stripe.subscriptionItems.create({
-      subscription: subscriptionId,
-      price: priceId,
-      quantity: 1,
-    })
+    await this.stripe.subscriptionItems.create(
+      {
+        subscription: subscriptionId,
+        price: priceId,
+        quantity: 1,
+      },
+      { idempotencyKey: this.moduleIdempotencyKey(subscriptionId, priceId) }
+    )
+  }
+
+  /** Clé d'idempotence Stripe pour l'ajout d'un item de module (#332, lot 5c). */
+  moduleIdempotencyKey(subscriptionId: string, priceId: string): string {
+    return `add-module:${subscriptionId}:${priceId}`
   }
 
   /** Retire un item d'abonnement (module résilié). Le webhook réconcilie ensuite. */

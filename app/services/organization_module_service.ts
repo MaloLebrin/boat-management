@@ -1,6 +1,7 @@
 import OrganizationModule from '#models/organization_module'
-import type Organization from '#models/organization'
+import Organization from '#models/organization'
 import { resolveEffectiveQuotas } from '#shared/helpers/plan'
+import { PLAN_MODULES } from '#shared/types/plan'
 import type { ModuleSource, PlanModule, PlanQuotas } from '#shared/types/plan'
 import { inject } from '@adonisjs/core'
 import type { TransactionClientContract } from '@adonisjs/lucid/types/database'
@@ -146,5 +147,27 @@ export default class OrganizationModuleService {
     }
 
     return { removed }
+  }
+
+  /**
+   * Grandfathering (#332, lot 5c) : accorde tous les modules en `granted` aux
+   * organisations Enterprise existantes, afin qu'aucune ne perde de
+   * fonctionnalité au passage à l'offre modulaire. Idempotent (`grantModule`
+   * n'écrase pas une ligne existante). Renvoie le nombre de modules réellement
+   * ajoutés (les déjà-présents ne sont pas comptés).
+   */
+  async grantModulesToEnterpriseOrgs(): Promise<{ organizations: number; modulesGranted: number }> {
+    const enterpriseOrgs = await Organization.query().where('plan', 'enterprise').select('id')
+
+    let modulesGranted = 0
+    for (const org of enterpriseOrgs) {
+      for (const module of PLAN_MODULES) {
+        const alreadyActive = await this.hasModule(org.id, module)
+        await this.grantModule(org.id, module, { source: 'granted' })
+        if (!alreadyActive) modulesGranted += 1
+      }
+    }
+
+    return { organizations: enterpriseOrgs.length, modulesGranted }
   }
 }
