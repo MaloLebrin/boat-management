@@ -31,6 +31,8 @@ defineProps<{
   collapseAll: string
   groups: Group[]
   planHeaders: PlanHeader[]
+  /** Libellé du badge affiché quand une cellule vaut le sentinel `'addon'`. */
+  addonLabel: string
 }>()
 
 const { el, isVisible } = useScrollReveal()
@@ -153,6 +155,12 @@ function collapseAllGroups() {
                       :class="['mx-auto h-5 w-5', cIdx === 1 ? 'text-coral-500' : 'text-mint-600']"
                     />
                     <span v-else-if="val === false" class="text-fg-subtle"> — </span>
+                    <span
+                      v-else-if="val === 'addon'"
+                      class="inline-flex items-center rounded-full bg-coral-100 px-2 py-0.5 text-[11px] font-semibold text-coral-700"
+                    >
+                      {{ addonLabel }}
+                    </span>
                     <span v-else class="text-xs text-fg-muted">{{ val }}</span>
                   </td>
                 </tr>

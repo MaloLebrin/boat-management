@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useScrollReveal } from '~/composables/use_scroll_reveal'
+import HomeStatValue from './HomeStatValue.vue'
 
 interface StatItem {
   value: string
@@ -31,7 +32,9 @@ const { el: sectionEl, isVisible } = useScrollReveal()
             idx < stats.length - 1 ? 'md:border-r md:border-bone' : '',
           ]"
         >
-          <p class="font-display text-4xl text-fg lg:text-5xl">{{ stat.value }}</p>
+          <p class="font-display text-4xl text-fg lg:text-5xl">
+            <HomeStatValue :value="stat.value" />
+          </p>
           <p class="mt-2 text-sm text-fg-muted">{{ stat.label }}</p>
         </div>
       </div>

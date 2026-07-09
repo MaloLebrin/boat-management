@@ -51,7 +51,8 @@ export default class MarketingController {
     return inertia.render('marketing/simulator', { isAuthenticated, canAddBoat, benchmarks })
   }
 
-  private buildHomePageData(i18n: { t: (key: string) => string }) {
+  private buildHomePageData(i18n: { t: (key: string) => string; locale: string }) {
+    const locale = i18n.locale === 'fr' ? 'fr' : 'en'
     return {
       brand: {
         name: i18n.t('marketing.brand.name'),
@@ -148,6 +149,34 @@ export default class MarketingController {
               title: i18n.t('marketing.home.pillars.item3_title'),
               description: i18n.t('marketing.home.pillars.item3_description'),
               isAi: true,
+            },
+          ],
+        },
+        modularOffer: {
+          eyebrow: i18n.t('marketing.home.modularOffer.eyebrow'),
+          title: i18n.t('marketing.home.modularOffer.title'),
+          titleHighlight: i18n.t('marketing.home.modularOffer.title_highlight'),
+          subtitle: i18n.t('marketing.home.modularOffer.subtitle'),
+          baseName: i18n.t('marketing.home.modularOffer.base_name'),
+          baseDesc: i18n.t('marketing.home.modularOffer.base_desc'),
+          basePrice: PLAN_PRICES.pro.monthly,
+          pricePer: i18n.t('marketing.home.modularOffer.price_per'),
+          modulesLabel: i18n.t('marketing.home.modularOffer.modules_label'),
+          note: i18n.t('marketing.home.modularOffer.note'),
+          ctaLabel: i18n.t('marketing.home.modularOffer.cta'),
+          ctaHref: `/${locale}/tarifs`,
+          modules: [
+            {
+              icon: '📅',
+              name: i18n.t('marketing.home.modularOffer.charter_name'),
+              desc: i18n.t('marketing.home.modularOffer.charter_desc'),
+              price: MODULE_PRICES.charter.monthly,
+            },
+            {
+              icon: '🧾',
+              name: i18n.t('marketing.home.modularOffer.crm_name'),
+              desc: i18n.t('marketing.home.modularOffer.crm_desc'),
+              price: MODULE_PRICES.crm_invoicing.monthly,
             },
           ],
         },
@@ -690,6 +719,51 @@ export default class MarketingController {
             },
           ],
         },
+        configurator: {
+          eyebrow: t('config_eyebrow'),
+          title: t('config_title'),
+          titleHighlight: t('config_title_highlight'),
+          subtitle: t('config_subtitle'),
+          baseName: t('config_base_name'),
+          baseDesc: t('config_base_desc'),
+          basePriceMonthly: PLAN_PRICES.pro.monthly,
+          basePriceAnnual: PLAN_PRICES.pro.annualMonthly,
+          modulesLabel: t('config_modules_label'),
+          perMonth: t('config_per_month'),
+          perYear: t('config_per_year'),
+          totalLabel: t('config_total_label'),
+          annualSaveLabel: t('config_annual_save'),
+          billedAnnuallyNote: t('config_billed_annually'),
+          ctaLabel: t('config_cta'),
+          ctaHref: '/signup',
+          modules: [
+            {
+              key: 'charter',
+              icon: '📅',
+              name: t('modules_charter_name'),
+              desc: t('modules_charter_desc'),
+              priceMonthly: MODULE_PRICES.charter.monthly,
+              priceAnnual: MODULE_PRICES.charter.annualMonthly,
+              features: [t('config_charter_feat1'), t('config_charter_feat2')],
+            },
+            {
+              key: 'crm_invoicing',
+              icon: '🧾',
+              name: t('modules_crm_name'),
+              desc: t('modules_crm_desc'),
+              priceMonthly: MODULE_PRICES.crm_invoicing.monthly,
+              priceAnnual: MODULE_PRICES.crm_invoicing.annualMonthly,
+              features: [t('config_crm_feat1'), t('config_crm_feat2')],
+            },
+          ],
+          enterprise: {
+            name: t('config_enterprise_name'),
+            priceMonthly: PLAN_PRICES.enterprise.monthly,
+            priceAnnual: PLAN_PRICES.enterprise.annualMonthly,
+            note: t('config_enterprise_note'),
+            ctaLabel: t('config_enterprise_cta'),
+          },
+        },
         detailedTable: {
           eyebrow: t('table_eyebrow'),
           title: t('table_title'),
@@ -697,6 +771,7 @@ export default class MarketingController {
           subtitle: t('table_subtitle'),
           expandAll: t('table_expand_all'),
           collapseAll: t('table_collapse_all'),
+          addonLabel: t('table_addon_badge'),
           planHeaders: [
             {
               name: t('table_plan_starter'),
@@ -775,6 +850,14 @@ export default class MarketingController {
                 [t('table_g8_r4'), false, false, true],
                 [t('table_g8_r5'), false, t('table_g8_r5_p'), t('table_g8_r5_e')],
                 [t('table_g8_r7'), t('table_g8_r7_s'), t('table_g8_r7_p'), t('table_g8_r7_e')],
+              ] as Array<[string, boolean | string, boolean | string, boolean | string]>,
+            },
+            {
+              title: t('table_modules_group'),
+              rows: [
+                [t('table_modules_pricing'), false, 'addon', true],
+                [t('table_modules_clients'), false, 'addon', true],
+                [t('table_modules_invoices'), false, 'addon', true],
               ] as Array<[string, boolean | string, boolean | string, boolean | string]>,
             },
           ],

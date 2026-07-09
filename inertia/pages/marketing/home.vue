@@ -11,6 +11,7 @@ import { computed, onMounted, onUnmounted, ref } from 'vue'
 import HomeHeroSection from '~/components/marketing/home/HomeHeroSection.vue'
 import HomeProblemSection from '~/components/marketing/home/HomeProblemSection.vue'
 import HomePillarsSection from '~/components/marketing/home/HomePillarsSection.vue'
+import HomeModularOfferSection from '~/components/marketing/home/HomeModularOfferSection.vue'
 import HomeFeatureSection from '~/components/marketing/home/HomeFeatureSection.vue'
 import HomeCaseStudySection from '~/components/marketing/home/HomeCaseStudySection.vue'
 import HomeHowItWorksSection from '~/components/marketing/home/HomeHowItWorksSection.vue'
@@ -45,6 +46,29 @@ interface PillarItem {
   title: string
   description: string
   isAi?: boolean
+}
+
+interface OfferModule {
+  icon: string
+  name: string
+  desc: string
+  price: number
+}
+
+interface ModularOffer {
+  eyebrow: string
+  title: string
+  titleHighlight: string
+  subtitle: string
+  baseName: string
+  baseDesc: string
+  basePrice: number
+  pricePer: string
+  modulesLabel: string
+  note: string
+  ctaLabel: string
+  ctaHref: string
+  modules: OfferModule[]
 }
 
 interface FeatureData {
@@ -125,6 +149,7 @@ interface PageProps {
       socialProof: { eyebrow: string; logos: string[] }
       problem: { title: string; titleHighlight: string; items: ProblemItem[] }
       pillars: { title: string; titleHighlight: string; items: PillarItem[] }
+      modularOffer: ModularOffer
       features: FeatureData[]
       caseStudy: CaseStudyData
       howItWorks: HowItWorksData
@@ -241,6 +266,9 @@ onUnmounted(() => {
     :title-highlight="t.home.pillars.titleHighlight"
     :items="t.home.pillars.items"
   />
+
+  <!-- 3bis. Offre modulaire (socle + modules add-ons) -->
+  <HomeModularOfferSection v-bind="t.home.modularOffer" />
 
   <!-- 4. Feature deep-dives -->
   <HomeFeatureSection

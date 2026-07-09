@@ -4,7 +4,7 @@
   <div class="flex h-full w-full overflow-hidden rounded-lg bg-cream" style="font-size: 10px">
     <!-- Sidebar -->
     <div
-      class="flex w-[140px] shrink-0 flex-col"
+      class="hidden md:flex w-[140px] shrink-0 flex-col"
       style="background: linear-gradient(180deg, #0b1d2e 0%, #102a40 100%)"
     >
       <div class="flex items-center gap-1.5 px-3 py-3">

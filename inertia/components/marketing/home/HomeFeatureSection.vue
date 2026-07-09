@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useScrollReveal } from '~/composables/use_scroll_reveal'
+import { useTilt } from '~/composables/use_tilt'
 import HomeBrowserFrame from './HomeBrowserFrame.vue'
 import HomeMockBoatDetail from './HomeMockBoatDetail.vue'
 import HomeMockPlanning from './HomeMockPlanning.vue'
@@ -22,6 +23,7 @@ interface FeatureData {
 const props = defineProps<FeatureData>()
 
 const { el: sectionEl, isVisible } = useScrollReveal()
+const { el: tiltEl, transform: tiltTransform } = useTilt({ max: 7 })
 
 const mockComponents: Record<MockType, typeof HomeMockBoatDetail> = {
   boatDetail: HomeMockBoatDetail,
@@ -79,8 +81,13 @@ const mockComponents: Record<MockType, typeof HomeMockBoatDetail> = {
           </ul>
         </div>
 
-        <!-- Mock -->
-        <div :class="{ 'lg:col-start-1': reversed }">
+        <!-- Mock — carte 3D inclinable au survol -->
+        <div
+          :ref="tiltEl"
+          class="will-change-transform"
+          :class="{ 'lg:col-start-1': reversed }"
+          :style="{ transform: tiltTransform }"
+        >
           <HomeBrowserFrame>
             <component :is="mockComponents[mockType]" />
           </HomeBrowserFrame>

@@ -118,4 +118,40 @@ Les 5 `BaseStatCard` du dashboard (`inertia/pages/dashboard.vue`) ont un `animat
 - Card 4 : 180ms
 - Card 5 : 240ms
 
-Effet : les cartes apparaissent en cascade à chaque navigation vers `/dashboard`.
+---
+
+## Canvas & animations marketing (« Stripe-like »)
+
+Couche d'animation des pages **home** et **tarifs** (refonte 2026-07-09). Toutes les briques sont **SSR-safe** (accès `window`/canvas uniquement dans `onMounted`) et honorent `prefers-reduced-motion` (rendu statique, aucune boucle `requestAnimationFrame`).
+
+### Composants canvas — `inertia/components/marketing/canvas/`
+
+| Composant                   | Effet                                                                                                                                  | Utilisé par                             |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
+| `GradientMeshCanvas.vue`    | Dégradé multicolore (4–5 blobs radiaux) qui dérive lentement en fond de hero. Props `variant` (`navy`/`sunset`/`ocean`) + `intensity`. | `HomeHeroSection`, `PricingHeroSection` |
+| `ParticleNetworkCanvas.vue` | Nœuds flottants reliés par des segments, réactifs à la souris (attraction douce). Props `color` + `density`.                           | `HomeFinalCtaSection`                   |
+
+**Garde-fous communs** : `IntersectionObserver` (pause hors écran) + `visibilitychange` (pause onglet caché), `devicePixelRatio` plafonné à 2, `getContext` en `try/catch` (fallback si canvas indisponible, ex. jsdom), nettoyage complet des listeners/rAF en `onUnmounted`.
+
+### Composables — `inertia/composables/`
+
+| Composable            | Effet                                                                                                                                | Utilisé par                                        |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------- |
+| `use_count_up.ts`     | Incrémente `0 → target` (easeOutCubic) au premier passage dans le viewport (`IntersectionObserver`). Gère préfixe/suffixe/décimales. | `HomeStatValue` (stats band, métriques case study) |
+| `use_tilt.ts`         | Inclinaison 3D (`rotateX/rotateY`) selon la souris + parallaxe verticale au scroll. Retourne `{ el, transform }`.                    | `HomeHeroSection`, `HomeFeatureSection` (mockups)  |
+| `use_tween_number.ts` | Anime (easeOutCubic) un nombre à **chaque changement** d'une source réactive (le total « roule » au lieu de sauter).                 | `PricingConfigurator` (total + économie annuelle)  |
+
+### Utilitaires CSS (`app.css`)
+
+| Classe                    | Effet                                                                                                                                                                                                                                         | Keyframe        | Utilisé par                                                |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------- | ---------------------------------------------------------- |
+| `.text-gradient-animated` | Texte à dégradé coral→violet→sky qui défile en boucle (`background-clip: text`).                                                                                                                                                              | `gradientShift` | Highlights `<em>` des titres hero & configurateur          |
+| `.glow-border`            | Anneau dégradé de base + un **faisceau lumineux (coral→violet) qui tourne en continu** autour du bord (« border beam »). Angle animé via `@property --beam-angle` (aucune rotation de l'élément → pas de coin qui dépasse), masqué en anneau. | `beamRotate`    | Carte récap configurateur, socle offre modulaire, tier Pro |
+| `.float-slow`             | Flottement vertical lent et continu.                                                                                                                                                                                                          | `floaty`        | Mockup hero (couche externe, sous le tilt)                 |
+| `.stagger` + `.visible`   | Entrée en cascade des enfants directs au scroll-reveal (délais `nth-child`).                                                                                                                                                                  | `revealUp`      | Colonnes de cartes (configurateur, offre modulaire)        |
+
+Toutes ces animations infinies décoratives sont **explicitement coupées** (`animation: none`) sous `prefers-reduced-motion` — sinon la règle globale `animation-duration: 1ms` les ferait clignoter.
+
+### Configurateur tarifs
+
+`PricingConfigurator.vue` recalcule le total en direct (socle Pro + modules activés) à partir de `PLAN_PRICES`/`MODULE_PRICES` ; le total et l'économie annuelle « roulent » à chaque changement via `use_tween_number`, la carte récap porte un `.glow-border`.

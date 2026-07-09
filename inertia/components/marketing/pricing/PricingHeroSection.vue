@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import GradientMeshCanvas from '~/components/marketing/canvas/GradientMeshCanvas.vue'
+
 defineProps<{
   eyebrowLabel: string
   title: string
@@ -16,26 +18,30 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <section class="bg-cream px-6 py-20 lg:px-8 lg:py-28">
-    <div class="mx-auto max-w-3xl text-center">
-      <p class="text-xs font-semibold uppercase tracking-widest text-fg-subtle">
+  <section class="relative overflow-hidden bg-navy-900 px-6 py-20 lg:px-8 lg:py-28">
+    <GradientMeshCanvas variant="sunset" :intensity="0.5" />
+    <!-- Voile pour lisibilité du texte -->
+    <div class="pointer-events-none absolute inset-0 bg-navy-900/30" aria-hidden="true" />
+
+    <div class="relative mx-auto max-w-3xl text-center">
+      <p class="text-xs font-semibold uppercase tracking-widest text-white/50">
         {{ eyebrowLabel }}
       </p>
       <h1
-        class="mt-4 font-display text-5xl leading-tight tracking-tight text-fg lg:text-6xl xl:text-7xl"
+        class="mt-4 font-display text-5xl leading-tight tracking-tight text-white lg:text-6xl xl:text-7xl"
       >
         {{ title }}
-        <em class="text-coral-500">{{ titleHighlight }}</em>
+        <em class="text-gradient-animated not-italic">{{ titleHighlight }}</em>
       </h1>
-      <p class="mt-4 text-lg text-fg-muted">{{ subtitle }}</p>
+      <p class="mt-4 text-lg text-white/70">{{ subtitle }}</p>
 
       <!-- Billing toggle -->
-      <div class="mt-10 inline-flex items-center gap-1 rounded-full bg-paper p-1">
+      <div class="mt-10 inline-flex items-center gap-1 rounded-full bg-white/10 p-1 backdrop-blur">
         <button
           type="button"
           :class="[
             'rounded-full px-5 py-2.5 text-sm font-medium transition-colors',
-            billing === 'monthly' ? 'bg-navy-900 text-white' : 'text-fg-muted hover:bg-bone',
+            billing === 'monthly' ? 'bg-white text-navy-900' : 'text-white/70 hover:bg-white/10',
           ]"
           @click="emit('update:billing', 'monthly')"
         >
@@ -45,7 +51,7 @@ const emit = defineEmits<{
           type="button"
           :class="[
             'relative rounded-full px-5 py-2.5 text-sm font-medium transition-colors',
-            billing === 'annual' ? 'bg-navy-900 text-white' : 'text-fg-muted hover:bg-bone',
+            billing === 'annual' ? 'bg-white text-navy-900' : 'text-white/70 hover:bg-white/10',
           ]"
           @click="emit('update:billing', 'annual')"
         >
