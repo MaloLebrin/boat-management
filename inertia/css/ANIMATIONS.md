@@ -143,12 +143,12 @@ Couche d'animation des pages **home** et **tarifs** (refonte 2026-07-09). Toutes
 
 ### Utilitaires CSS (`app.css`)
 
-| Classe                    | Effet                                                                                                                                                 | Keyframe        | Utilisé par                                                |
-| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | --------------- | ---------------------------------------------------------- |
-| `.text-gradient-animated` | Texte à dégradé coral→violet→sky qui défile en boucle (`background-clip: text`).                                                                      | `gradientShift` | Highlights `<em>` des titres hero & configurateur          |
-| `.glow-border`            | Liseré lumineux : dégradé conique dont **l'angle** s'anime (`@property --glow-angle`) — le pseudo-élément ne tourne pas (pas de coins qui débordent). | `spinBorder`    | Carte récap configurateur, socle offre modulaire, tier Pro |
-| `.float-slow`             | Flottement vertical lent et continu.                                                                                                                  | `floaty`        | Mockup hero (couche externe, sous le tilt)                 |
-| `.stagger` + `.visible`   | Entrée en cascade des enfants directs au scroll-reveal (délais `nth-child`).                                                                          | `revealUp`      | Colonnes de cartes (configurateur, offre modulaire)        |
+| Classe                    | Effet                                                                                                      | Keyframe        | Utilisé par                                                |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------- | --------------- | ---------------------------------------------------------- |
+| `.text-gradient-animated` | Texte à dégradé coral→violet→sky qui défile en boucle (`background-clip: text`).                           | `gradientShift` | Highlights `<em>` des titres hero & configurateur          |
+| `.glow-border`            | Liseré dégradé statique (coral→violet→sky) + halo flou qui « respire » (pulse d'opacité, pas de rotation). | `glowPulse`     | Carte récap configurateur, socle offre modulaire, tier Pro |
+| `.float-slow`             | Flottement vertical lent et continu.                                                                       | `floaty`        | Mockup hero (couche externe, sous le tilt)                 |
+| `.stagger` + `.visible`   | Entrée en cascade des enfants directs au scroll-reveal (délais `nth-child`).                               | `revealUp`      | Colonnes de cartes (configurateur, offre modulaire)        |
 
 Toutes ces animations infinies décoratives sont **explicitement coupées** (`animation: none`) sous `prefers-reduced-motion` — sinon la règle globale `animation-duration: 1ms` les ferait clignoter.
 
