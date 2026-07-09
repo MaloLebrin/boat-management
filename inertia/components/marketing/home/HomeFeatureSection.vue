@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useScrollReveal } from '~/composables/use_scroll_reveal'
+import { fadeLeft, fadeRight } from '~/composables/use_motion_presets'
 import { useTilt } from '~/composables/use_tilt'
 import HomeBrowserFrame from './HomeBrowserFrame.vue'
 import HomeMockBoatDetail from './HomeMockBoatDetail.vue'
@@ -22,8 +22,12 @@ interface FeatureData {
 
 const props = defineProps<FeatureData>()
 
-const { el: sectionEl, isVisible } = useScrollReveal()
 const { el: tiltEl, transform: tiltTransform } = useTilt({ max: 7 })
+
+// Reveals directionnels : le texte et le mock entrent depuis des côtés opposés,
+// inversés quand la section est en `reversed` pour suivre la mise en page.
+const textMotion = props.reversed ? fadeRight() : fadeLeft()
+const mockMotion = props.reversed ? fadeLeft(120) : fadeRight(120)
 
 const mockComponents: Record<MockType, typeof HomeMockBoatDetail> = {
   boatDetail: HomeMockBoatDetail,
@@ -33,11 +37,7 @@ const mockComponents: Record<MockType, typeof HomeMockBoatDetail> = {
 </script>
 
 <template>
-  <section
-    :ref="sectionEl"
-    class="reveal px-6 py-20 lg:px-8 lg:py-24"
-    :class="[bgClass || 'bg-cream', { visible: isVisible }]"
-  >
+  <section class="px-6 py-20 lg:px-8 lg:py-24" :class="bgClass || 'bg-cream'">
     <div class="mx-auto max-w-7xl">
       <div
         class="grid items-center gap-12 lg:gap-16"
@@ -46,7 +46,7 @@ const mockComponents: Record<MockType, typeof HomeMockBoatDetail> = {
         "
       >
         <!-- Text content -->
-        <div :class="{ 'lg:col-start-2': reversed }">
+        <div v-motion="textMotion" :class="{ 'lg:col-start-2': reversed }">
           <p
             class="mb-4 font-mono text-xs font-semibold uppercase tracking-widest"
             :class="isAi ? 'text-violet-700' : 'text-coral-600'"
@@ -81,16 +81,14 @@ const mockComponents: Record<MockType, typeof HomeMockBoatDetail> = {
           </ul>
         </div>
 
-        <!-- Mock — carte 3D inclinable au survol -->
-        <div
-          :ref="tiltEl"
-          class="will-change-transform"
-          :class="{ 'lg:col-start-1': reversed }"
-          :style="{ transform: tiltTransform }"
-        >
-          <HomeBrowserFrame>
-            <component :is="mockComponents[mockType]" />
-          </HomeBrowserFrame>
+        <!-- Mock — reveal directionnel (wrapper) → tilt 3D (inner). Séparés pour
+             que le transform d'entrée n'écrase pas celui du tilt. -->
+        <div v-motion="mockMotion" :class="{ 'lg:col-start-1': reversed }">
+          <div :ref="tiltEl" class="will-change-transform" :style="{ transform: tiltTransform }">
+            <HomeBrowserFrame>
+              <component :is="mockComponents[mockType]" />
+            </HomeBrowserFrame>
+          </div>
         </div>
       </div>
     </div>

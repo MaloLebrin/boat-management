@@ -3,6 +3,22 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-07-09 — Marketing : refonte animation « Stripe-level » de la home
+
+Nouvelle couche de mouvement sur la page d'accueil pour dépasser le simple fade-in au scroll et s'approcher du registre de stripe.com (profondeur, mouvement continu, mocks vivants). Ajout de la dépendance **`@vueuse/motion`** (directive `v-motion`), enregistrée dans les deux entrées Inertia (`inertia/app.ts`, `inertia/ssr.ts`).
+
+- **Nouveaux primitives (composables)** :
+  - `use_scroll_progress.ts` — progression `[0,1]` d'un élément dans le viewport pour des effets « scroll-linked » (parallax, scale continu). IntersectionObserver + `rAF`, SSR-safe, no-op sous `prefers-reduced-motion` (figé à 0.5).
+  - `use_motion_presets.ts` — presets `v-motion` directionnels (`fadeUp`, `fadeLeft`, `fadeRight`, `scaleIn`, `blurIn`) avec délai paramétrable ; easing calé sur `--ease-premium`. Garde reduced-motion intégrée (renvoie un état déjà visible).
+  - `use_magnetic.ts` — effet « bouton magnétique » (le CTA suit légèrement le curseur). No-op SSR + reduced-motion.
+- **Hero** : le mock produit grandit et s'éloigne au scroll (`use_scroll_progress`, scale 1 → 1.045) ; copy en reveals `v-motion` staggerés ; CTA primaire magnétique.
+- **Feature sections (×3)** : texte et mock entrent depuis des côtés opposés (`fadeLeft`/`fadeRight`), inversés en mode `reversed`.
+- **Mocks vivants** : les 4 KPI du dashboard montent en count-up à l'entrée viewport ; panneau « À venir » extrait en `HomeMockUpcomingTasks.vue` (défilement vertical en boucle continue).
+- **Pillars / Testimonials** : cartes en `scaleIn`/`blurIn` staggerés au lieu du reveal vertical uniforme.
+- **Fond de carte animé (canvas)** : nouveau `CardGlowCanvas.vue` (dégradé « aurora » de taches radiales qui dérivent, façon stripe.com) appliqué aux cartes de `HomePillarsSection` — coral, violet pour le pilier IA. Même garde-fous que les autres canvas (SSR-safe, reduced-motion, pause hors écran).
+- **Final CTA** : entrée `v-motion` (titre `scaleIn`, sous-titre/CTA `fadeUp`) + CTA magnétique.
+- **Correctif** : `.reveal-delay-4` valait `300ms` (identique à `-3`) → passé à `400ms`.
+
 ## 2026-07-09 — Marketing : ajustements design (glow-border, layout, case study, particules)
 
 Correctifs visuels sur la home suite à la refonte :

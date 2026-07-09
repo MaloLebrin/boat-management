@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ChatBubbleLeftRightIcon } from '@heroicons/vue/24/outline'
-import { useScrollReveal } from '~/composables/use_scroll_reveal'
+import { blurIn, fadeUp } from '~/composables/use_motion_presets'
 
 interface TestimonialItem {
   quote: string
@@ -15,26 +15,26 @@ defineProps<{
   items: TestimonialItem[]
 }>()
 
-const { el: sectionEl, isVisible } = useScrollReveal()
+const titleMotion = fadeUp(0)
+const featuredMotion = blurIn(80)
+const cardMotion = (idx: number) => fadeUp(160 + idx * 100)
 </script>
 
 <template>
-  <section
-    :ref="sectionEl"
-    class="reveal bg-paper px-6 py-20 lg:px-8 lg:py-24"
-    :class="{ visible: isVisible }"
-  >
+  <section class="bg-paper px-6 py-20 lg:px-8 lg:py-24">
     <div class="mx-auto max-w-7xl">
       <!-- Header -->
       <div class="mb-10 text-center">
-        <h2 class="font-display text-3xl text-fg lg:text-4xl">{{ title }}</h2>
+        <h2 v-motion="titleMotion" class="font-display text-3xl text-fg lg:text-4xl">
+          {{ title }}
+        </h2>
       </div>
 
       <!-- Featured testimonial -->
       <div
         v-if="items[0]?.featured"
-        class="reveal mb-8 rounded-xl border border-bone bg-white p-8 shadow-sm lg:p-10"
-        :class="{ visible: isVisible }"
+        v-motion="featuredMotion"
+        class="mb-8 rounded-xl border border-bone bg-white p-8 shadow-sm lg:p-10"
       >
         <ChatBubbleLeftRightIcon class="mb-4 h-8 w-8 text-coral-400" />
         <blockquote class="font-display text-2xl italic leading-relaxed text-fg lg:text-3xl">
@@ -51,8 +51,8 @@ const { el: sectionEl, isVisible } = useScrollReveal()
         <div
           v-for="(item, idx) in items.slice(1)"
           :key="item.author"
-          class="reveal rounded-xl border border-bone bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
-          :class="[`reveal-delay-${idx + 1}`, { visible: isVisible }]"
+          v-motion="cardMotion(idx)"
+          class="rounded-xl border border-bone bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
         >
           <ChatBubbleLeftRightIcon class="mb-3 h-6 w-6 text-coral-300" />
           <p class="text-sm italic text-fg-muted">"{{ item.quote }}"</p>

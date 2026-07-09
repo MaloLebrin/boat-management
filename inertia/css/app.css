@@ -291,6 +291,23 @@ body {
   animation: floaty 6s ease-in-out infinite;
 }
 
+/* Défilement vertical continu des tâches « À venir » (mockup hero).
+   Le track duplique la liste → boucle sans couture (translate -50%). */
+@keyframes taskScroll {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-50%);
+  }
+}
+.task-scroll {
+  animation: taskScroll 4.5s linear infinite;
+}
+.task-scroll:hover {
+  animation-play-state: paused;
+}
+
 /* Texte à dégradé animé (coral → violet → sky) */
 .text-gradient-animated {
   background: linear-gradient(90deg, #e2674f, #5a4a8a, #3d6f9c, #e2674f);
@@ -393,6 +410,7 @@ body {
   .float-slow,
   .text-gradient-animated,
   .glow-border::after,
+  .task-scroll,
   .stagger.visible > * {
     animation: none !important;
   }
@@ -543,7 +561,7 @@ body {
   transition-delay: 300ms;
 }
 .reveal-delay-4 {
-  transition-delay: 300ms;
+  transition-delay: 400ms;
 }
 
 /* Simulator step transitions */

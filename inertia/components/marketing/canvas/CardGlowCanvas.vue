@@ -1,32 +1,33 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref, watch } from 'vue'
 
-type MeshVariant = 'navy' | 'sunset' | 'ocean'
-
+/**
+ * Fond de carte animé (« aurora ») façon stripe.com : quelques taches de couleur
+ * douces qui dérivent lentement en boucle derrière le contenu d'une carte.
+ * Pensé pour un fond clair (source-over + faible alpha → teinte subtile, pas de
+ * sur-brillance). SSR-safe, coupé sous `prefers-reduced-motion`, en pause quand
+ * la carte n'est pas visible (IntersectionObserver + visibilitychange).
+ */
 const props = withDefaults(
   defineProps<{
-    variant?: MeshVariant
-    /** Intensité globale (opacité des blobs), 0–1. */
+    /** Couleur dominante des taches (hex). */
+    color?: string
+    /** Couleur secondaire (hex). */
+    color2?: string
+    /** Opacité maximale des taches (0–1). */
     intensity?: number
   }>(),
-  { variant: 'navy', intensity: 0.55 }
+  { color: '#e2674f', color2: '#5a4a8a', intensity: 0.16 }
 )
 
 interface Blob {
   x: number
   y: number
   r: number
-  color: string
   dx: number
   dy: number
+  color: string
   phase: number
-}
-
-// Palettes calées sur les tokens `app.css` (navy hull, coral, violet IA, sky).
-const PALETTES: Record<MeshVariant, string[]> = {
-  navy: ['#2a527a', '#3d6f9c', '#5a4a8a', '#e2674f', '#1a3a55'],
-  sunset: ['#e2674f', '#ea7f6a', '#5a4a8a', '#3d6f9c', '#c84a3a'],
-  ocean: ['#3d6f9c', '#56697d', '#5a4a8a', '#2a527a', '#7dd3fc'],
 }
 
 const canvas = ref<HTMLCanvasElement | null>(null)
@@ -37,8 +38,8 @@ let width = 0
 let height = 0
 let dpr = 1
 let running = false
-let observer: IntersectionObserver | null = null
 let visible = true
+let observer: IntersectionObserver | null = null
 let onVisibility: (() => void) | null = null
 let onResize: (() => void) | null = null
 
@@ -51,15 +52,14 @@ function reducedMotion() {
 }
 
 function seedBlobs() {
-  const colors = PALETTES[props.variant]
-  const count = width < 640 ? 4 : 5
-  blobs = Array.from({ length: count }, (_, i) => ({
+  const palette = [props.color, props.color2, props.color]
+  blobs = Array.from({ length: 3 }, (_, i) => ({
     x: Math.random() * width,
     y: Math.random() * height,
-    r: Math.max(width, height) * (0.28 + Math.random() * 0.22),
-    color: colors[i % colors.length],
-    dx: (Math.random() - 0.5) * 0.5,
-    dy: (Math.random() - 0.5) * 0.5,
+    r: Math.max(width, height) * (0.5 + Math.random() * 0.3),
+    dx: (Math.random() - 0.5) * 0.25,
+    dy: (Math.random() - 0.5) * 0.25,
+    color: palette[i % palette.length],
     phase: Math.random() * Math.PI * 2,
   }))
 }
@@ -77,14 +77,20 @@ function resize() {
   seedBlobs()
 }
 
+function hexToRgba(hex: string, alpha: number) {
+  const v = hex.replace('#', '')
+  const r = Number.parseInt(v.slice(0, 2), 16)
+  const g = Number.parseInt(v.slice(2, 4), 16)
+  const b = Number.parseInt(v.slice(4, 6), 16)
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`
+}
+
 function draw(t: number) {
   if (!ctx) return
   ctx.clearRect(0, 0, width, height)
-  ctx.globalCompositeOperation = 'lighter'
   for (const b of blobs) {
-    const wobble = Math.sin(t * 0.0007 + b.phase) * 40
-    const cx = b.x + wobble
-    const cy = b.y + Math.cos(t * 0.0005 + b.phase) * 40
+    const cx = b.x + Math.sin(t * 0.0005 + b.phase) * 24
+    const cy = b.y + Math.cos(t * 0.0004 + b.phase) * 24
     const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, b.r)
     grad.addColorStop(0, hexToRgba(b.color, props.intensity))
     grad.addColorStop(1, hexToRgba(b.color, 0))
@@ -93,7 +99,6 @@ function draw(t: number) {
     ctx.arc(cx, cy, b.r, 0, Math.PI * 2)
     ctx.fill()
   }
-  ctx.globalCompositeOperation = 'source-over'
 }
 
 function step(t: number) {
@@ -101,8 +106,8 @@ function step(t: number) {
   for (const b of blobs) {
     b.x += b.dx
     b.y += b.dy
-    if (b.x < -b.r * 0.5 || b.x > width + b.r * 0.5) b.dx *= -1
-    if (b.y < -b.r * 0.5 || b.y > height + b.r * 0.5) b.dy *= -1
+    if (b.x < -b.r * 0.4 || b.x > width + b.r * 0.4) b.dx *= -1
+    if (b.y < -b.r * 0.4 || b.y > height + b.r * 0.4) b.dy *= -1
   }
   draw(t)
   rafId = requestAnimationFrame(step)
@@ -122,14 +127,6 @@ function stop() {
   }
 }
 
-function hexToRgba(hex: string, alpha: number) {
-  const v = hex.replace('#', '')
-  const r = Number.parseInt(v.slice(0, 2), 16)
-  const g = Number.parseInt(v.slice(2, 4), 16)
-  const b = Number.parseInt(v.slice(4, 6), 16)
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`
-}
-
 onMounted(() => {
   const el = canvas.value
   if (!el) return
@@ -138,7 +135,7 @@ onMounted(() => {
   } catch {
     ctx = null
   }
-  if (!ctx) return // jsdom / navigateur sans canvas → fond CSS de secours
+  if (!ctx) return
   resize()
   draw(0) // frame statique immédiate (couvre reduced-motion)
 
@@ -166,6 +163,14 @@ onMounted(() => {
     start()
   }
 })
+
+// Re-seed si la couleur change (ex. tab persona).
+watch(
+  () => [props.color, props.color2],
+  () => {
+    if (ctx) seedBlobs()
+  }
+)
 
 onUnmounted(() => {
   stop()

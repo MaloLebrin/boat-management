@@ -126,20 +126,29 @@ Couche d'animation des pages **home** et **tarifs** (refonte 2026-07-09). Toutes
 
 ### Composants canvas — `inertia/components/marketing/canvas/`
 
-| Composant                   | Effet                                                                                                                                  | Utilisé par                             |
-| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
-| `GradientMeshCanvas.vue`    | Dégradé multicolore (4–5 blobs radiaux) qui dérive lentement en fond de hero. Props `variant` (`navy`/`sunset`/`ocean`) + `intensity`. | `HomeHeroSection`, `PricingHeroSection` |
-| `ParticleNetworkCanvas.vue` | Nœuds flottants reliés par des segments, réactifs à la souris (attraction douce). Props `color` + `density`.                           | `HomeFinalCtaSection`                   |
+| Composant                   | Effet                                                                                                                                                                                                           | Utilisé par                                           |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| `GradientMeshCanvas.vue`    | Dégradé multicolore (4–5 blobs radiaux) qui dérive lentement en fond de hero. Props `variant` (`navy`/`sunset`/`ocean`) + `intensity`.                                                                          | `HomeHeroSection`, `PricingHeroSection`               |
+| `ParticleNetworkCanvas.vue` | Nœuds flottants reliés par des segments, réactifs à la souris (attraction douce). Props `color` + `density`.                                                                                                    | `HomeFinalCtaSection`                                 |
+| `CardGlowCanvas.vue`        | Fond de carte animé « aurora » (3 taches radiales douces qui dérivent) pour fond clair. Props `color` + `color2` + `intensity`. À placer dans une carte `relative overflow-hidden`, contenu en `relative z-10`. | Cartes `HomePillarsSection` (coral, violet pour l'IA) |
 
 **Garde-fous communs** : `IntersectionObserver` (pause hors écran) + `visibilitychange` (pause onglet caché), `devicePixelRatio` plafonné à 2, `getContext` en `try/catch` (fallback si canvas indisponible, ex. jsdom), nettoyage complet des listeners/rAF en `onUnmounted`.
 
 ### Composables — `inertia/composables/`
 
-| Composable            | Effet                                                                                                                                | Utilisé par                                        |
-| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------- |
-| `use_count_up.ts`     | Incrémente `0 → target` (easeOutCubic) au premier passage dans le viewport (`IntersectionObserver`). Gère préfixe/suffixe/décimales. | `HomeStatValue` (stats band, métriques case study) |
-| `use_tilt.ts`         | Inclinaison 3D (`rotateX/rotateY`) selon la souris + parallaxe verticale au scroll. Retourne `{ el, transform }`.                    | `HomeHeroSection`, `HomeFeatureSection` (mockups)  |
-| `use_tween_number.ts` | Anime (easeOutCubic) un nombre à **chaque changement** d'une source réactive (le total « roule » au lieu de sauter).                 | `PricingConfigurator` (total + économie annuelle)  |
+| Composable               | Effet                                                                                                                                                                         | Utilisé par                                            |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| `use_count_up.ts`        | Incrémente `0 → target` (easeOutCubic) au premier passage dans le viewport (`IntersectionObserver`). Gère préfixe/suffixe/décimales.                                          | `HomeStatValue` (stats band, métriques case study)     |
+| `use_tilt.ts`            | Inclinaison 3D (`rotateX/rotateY`) selon la souris + parallaxe verticale au scroll. Retourne `{ el, transform }`.                                                             | `HomeHeroSection`, `HomeFeatureSection` (mockups)      |
+| `use_tween_number.ts`    | Anime (easeOutCubic) un nombre à **chaque changement** d'une source réactive (le total « roule » au lieu de sauter).                                                          | `PricingConfigurator` (total + économie annuelle)      |
+| `use_scroll_progress.ts` | Progression `[0,1]` d'un élément dans le viewport pour des effets « scroll-linked » (parallax, scale continu). Retourne `{ el, progress }`. Neutre à 0.5 sous reduced-motion. | `HomeHeroSection` (mock qui grandit au scroll)         |
+| `use_magnetic.ts`        | Effet « bouton magnétique » : l'élément suit légèrement le curseur au survol. Retourne `{ el, transform }`.                                                                   | CTA primaires `HomeHeroSection`, `HomeFinalCtaSection` |
+
+### Directive `v-motion` (@vueuse/motion)
+
+Plugin `MotionPlugin` enregistré dans `inertia/app.ts` **et** `inertia/ssr.ts`. Les reveals directionnels au scroll passent par des **presets** (`inertia/composables/use_motion_presets.ts`) : `fadeUp`, `fadeLeft`, `fadeRight`, `scaleIn`, `blurIn`, chacun acceptant un délai (stagger). On les bind via `v-motion="preset(delay)"` (`{ initial, visibleOnce }`). Alterner les directions selon la mise en page (ex. texte depuis la gauche + mock depuis la droite dans `HomeFeatureSection`, inversé en `reversed`).
+
+**Reduced-motion** : les presets détectent `prefers-reduced-motion` au runtime (client + hydratation) et renvoient un état déjà visible, sans transform ni transition — pas besoin de règle CSS dédiée. Quand un preset et un `useTilt`/`useScrollProgress` s'appliquent au même visuel, les empiler dans des `div` wrappers distincts pour ne pas écraser les `transform`.
 
 ### Utilitaires CSS (`app.css`)
 

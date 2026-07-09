@@ -2,6 +2,9 @@
 import { computed } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import GradientMeshCanvas from '~/components/marketing/canvas/GradientMeshCanvas.vue'
+import { useMagnetic } from '~/composables/use_magnetic'
+import { fadeUp, scaleIn } from '~/composables/use_motion_presets'
+import { useScrollProgress } from '~/composables/use_scroll_progress'
 import { useTilt } from '~/composables/use_tilt'
 import HomeBrowserFrame from './HomeBrowserFrame.vue'
 import HomeMockDashboard from './HomeMockDashboard.vue'
@@ -27,6 +30,25 @@ const currentHero = computed(() => props.heroContent[props.activePersona])
 const duplicatedLogos = computed(() => [...props.socialProof.logos, ...props.socialProof.logos])
 
 const { el: tiltEl, transform: tiltTransform } = useTilt({ max: 6, parallax: 0.6 })
+
+// Entrée staggerée du copy (remplace les `animation: fadeUp` inline).
+const titleMotion = fadeUp(0)
+const subtitleMotion = fadeUp(100)
+const ctaMotion = fadeUp(200)
+const captionMotion = fadeUp(300)
+const mockMotion = scaleIn(300)
+
+// Profondeur « scroll-linked » : le mock grandit et s'éloigne légèrement au scroll.
+const { el: progressEl, progress } = useScrollProgress()
+const mockScrollStyle = computed(() => {
+  const p = progress.value
+  const scale = 1 + p * 0.045
+  const ty = (p - 0.5) * -26
+  return { transform: `scale(${scale.toFixed(3)}) translateY(${ty.toFixed(1)}px)` }
+})
+
+// CTA primaire magnétique.
+const { el: magneticEl, transform: magneticTransform } = useMagnetic()
 </script>
 
 <template>
@@ -37,27 +59,19 @@ const { el: tiltEl, transform: tiltTransform } = useTilt({ max: 6, parallax: 0.6
 
     <div class="relative mx-auto max-w-5xl">
       <!-- Copy: centré -->
-      <div
-        class="mx-auto mb-12 max-w-2xl space-y-6 text-center"
-        style="animation: fadeUp 700ms var(--ease-premium) both"
-      >
+      <div class="mx-auto mb-12 max-w-2xl space-y-6 text-center">
         <h1
+          v-motion="titleMotion"
           class="font-display text-5xl leading-tight tracking-tight text-white lg:text-6xl xl:text-7xl"
         >
           {{ currentHero.title }}
           <em class="text-gradient-animated not-italic">{{ currentHero.titleHighlight }}</em>
         </h1>
-        <p
-          class="text-pretty text-lg text-white/70"
-          style="animation: fadeUp 700ms var(--ease-premium) both; animation-delay: 100ms"
-        >
+        <p v-motion="subtitleMotion" class="text-pretty text-lg text-white/70">
           {{ currentHero.subtitle }}
         </p>
-        <div
-          class="flex flex-wrap items-center justify-center gap-3 pt-2"
-          style="animation: fadeUp 700ms var(--ease-premium) both; animation-delay: 200ms"
-        >
-          <a href="/signup">
+        <div v-motion="ctaMotion" class="flex flex-wrap items-center justify-center gap-3 pt-2">
+          <a :ref="magneticEl" href="/signup" :style="{ transform: magneticTransform }">
             <BaseButton size="lg" class="shadow-lg">
               {{ cta.primary }}
             </BaseButton>
@@ -72,22 +86,22 @@ const { el: tiltEl, transform: tiltTransform } = useTilt({ max: 6, parallax: 0.6
             </BaseButton>
           </a>
         </div>
-        <p
-          class="text-sm text-white/50"
-          style="animation: fadeUp 700ms var(--ease-premium) both; animation-delay: 300ms"
-        >
+        <p v-motion="captionMotion" class="text-sm text-white/50">
           {{ caption }}
         </p>
       </div>
 
-      <!-- Browser mock : entrée (fadeUp) → flottement (float-slow) → tilt 3D.
-           Divs séparés pour que l'animation d'entrée n'écrase pas le transform du tilt. -->
-      <div style="animation: fadeUp 700ms var(--ease-premium) both; animation-delay: 300ms">
-        <div class="float-slow">
-          <div :ref="tiltEl" class="will-change-transform" :style="{ transform: tiltTransform }">
-            <HomeBrowserFrame>
-              <HomeMockDashboard :persona="activePersona" />
-            </HomeBrowserFrame>
+      <!-- Browser mock : scroll-linked (scale) → entrée (scaleIn) → flottement
+           (float-slow) → tilt 3D. Divs séparés pour empiler les transforms sans
+           qu'une couche n'écrase la suivante. -->
+      <div :ref="progressEl" class="will-change-transform" :style="mockScrollStyle">
+        <div v-motion="mockMotion">
+          <div class="float-slow">
+            <div :ref="tiltEl" class="will-change-transform" :style="{ transform: tiltTransform }">
+              <HomeBrowserFrame>
+                <HomeMockDashboard :persona="activePersona" />
+              </HomeBrowserFrame>
+            </div>
           </div>
         </div>
       </div>

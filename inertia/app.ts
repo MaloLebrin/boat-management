@@ -1,6 +1,7 @@
 import { resolvePageComponent } from '@adonisjs/inertia/helpers'
 import { TuyauProvider } from '@adonisjs/inertia/vue'
 import { createInertiaApp } from '@inertiajs/vue3'
+import { MotionPlugin } from '@vueuse/motion'
 import { createApp, h, type DefineComponent } from 'vue'
 import 'vue-sonner/style.css'
 import { client } from '~/client'
@@ -21,6 +22,7 @@ createInertiaApp({
   setup({ el, App, props, plugin }) {
     createApp({ render: () => h(TuyauProvider, { client }, { default: () => h(App, props) }) })
       .use(plugin)
+      .use(MotionPlugin)
       .mount(el)
   },
   progress: {

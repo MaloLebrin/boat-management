@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import BaseButton from '~/components/base/BaseButton.vue'
 import ParticleNetworkCanvas from '~/components/marketing/canvas/ParticleNetworkCanvas.vue'
+import { useMagnetic } from '~/composables/use_magnetic'
+import { fadeUp, scaleIn } from '~/composables/use_motion_presets'
 
 defineProps<{
   title: string
@@ -9,6 +11,11 @@ defineProps<{
   primaryCta: string
   secondaryCta: string
 }>()
+
+const titleMotion = scaleIn(0)
+const subtitleMotion = fadeUp(120)
+const ctaMotion = fadeUp(220)
+const { el: magneticEl, transform: magneticTransform } = useMagnetic()
 </script>
 
 <template>
@@ -31,12 +38,15 @@ defineProps<{
     </svg>
 
     <div class="relative mx-auto max-w-3xl text-center">
-      <h2 class="font-display text-3xl leading-tight text-white lg:text-4xl xl:text-5xl">
+      <h2
+        v-motion="titleMotion"
+        class="font-display text-3xl leading-tight text-white lg:text-4xl xl:text-5xl"
+      >
         {{ title }} <em class="text-coral-400">{{ titleHighlight }}</em>
       </h2>
-      <p class="mt-4 text-lg text-white/60">{{ subtitle }}</p>
-      <div class="mt-8 flex flex-wrap items-center justify-center gap-4">
-        <a href="/signup">
+      <p v-motion="subtitleMotion" class="mt-4 text-lg text-white/60">{{ subtitle }}</p>
+      <div v-motion="ctaMotion" class="mt-8 flex flex-wrap items-center justify-center gap-4">
+        <a :ref="magneticEl" href="/signup" :style="{ transform: magneticTransform }">
           <BaseButton size="lg" class="bg-cream! text-navy-900! hover:bg-cream/90!">
             {{ primaryCta }}
           </BaseButton>
