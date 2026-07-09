@@ -10,3 +10,9 @@ export const checkoutValidator = vine.create(
     modules: vine.array(vine.enum(PLAN_MODULES)).optional(),
   })
 )
+
+export const moduleActionValidator = vine.create(
+  vine.object({
+    module: vine.enum(PLAN_MODULES),
+  })
+)

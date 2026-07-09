@@ -63,6 +63,24 @@ export default class StripeService {
     })
   }
 
+  /**
+   * Ajoute un item (module add-on) à un abonnement existant (#327). Stripe
+   * proratise par défaut ; le webhook `customer.subscription.updated` déclenche
+   * ensuite la réconciliation en base.
+   */
+  async addSubscriptionItem(subscriptionId: string, priceId: string): Promise<void> {
+    await this.stripe.subscriptionItems.create({
+      subscription: subscriptionId,
+      price: priceId,
+      quantity: 1,
+    })
+  }
+
+  /** Retire un item d'abonnement (module résilié). Le webhook réconcilie ensuite. */
+  async removeSubscriptionItem(subscriptionItemId: string): Promise<void> {
+    await this.stripe.subscriptionItems.del(subscriptionItemId)
+  }
+
   constructWebhookEvent(rawBody: string, signature: string): Stripe.Event {
     const secret = env.get('STRIPE_WEBHOOK_SECRET')
     if (!secret) throw new StripeNotConfiguredError()

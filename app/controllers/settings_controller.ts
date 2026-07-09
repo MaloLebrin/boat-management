@@ -3,6 +3,7 @@ import OrganizationInvitationService from '#services/organization_invitation_ser
 import SubscriptionService from '#services/subscription_service'
 import QuotaService from '#services/quota_service'
 import AiTokenQuotaService from '#services/ai_token_quota_service'
+import OrganizationModuleService from '#services/organization_module_service'
 import { BrandingService } from '#services/branding_service'
 import OrganizationPolicy from '#policies/organization_policy'
 import {
@@ -23,6 +24,7 @@ export default class SettingsController {
     private subscriptionService: SubscriptionService,
     private quotaService: QuotaService,
     private aiTokenQuotaService: AiTokenQuotaService,
+    private organizationModuleService: OrganizationModuleService,
     private brandingService: BrandingService
   ) {}
   async me({ inertia }: HttpContext) {
@@ -68,11 +70,12 @@ export default class SettingsController {
     const limits = PLAN_LIMITS[org.plan]
     const storageLimit = this.quotaService.storageLimitBytes(org)
 
-    const [boatCount, memberCount, activeSub, aiTokensUsed] = await Promise.all([
+    const [boatCount, memberCount, activeSub, aiTokensUsed, activeModules] = await Promise.all([
       this.quotaService.countBoats(org),
       this.quotaService.countMembers(org),
       this.subscriptionService.getActive(org.id),
       this.aiTokenQuotaService.getUsage(org.id),
+      this.organizationModuleService.listWithSource(org.id),
     ])
 
     return inertia.render('settings/billing', {
@@ -86,6 +89,7 @@ export default class SettingsController {
         canExport: limits.canExport,
       },
       subscription: activeSub ? this.subscriptionService.toInfo(activeSub) : null,
+      activeModules,
     })
   }
 

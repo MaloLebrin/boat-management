@@ -11,6 +11,7 @@ import PricingROISection from '~/components/marketing/pricing/PricingROISection.
 import PricingTestimonialsSection from '~/components/marketing/pricing/PricingTestimonialsSection.vue'
 import PricingDetailedTableSection from '~/components/marketing/pricing/PricingDetailedTableSection.vue'
 import PricingExtrasSection from '~/components/marketing/pricing/PricingExtrasSection.vue'
+import PricingModulesSection from '~/components/marketing/pricing/PricingModulesSection.vue'
 import PricingFaqSection from '~/components/marketing/pricing/PricingFaqSection.vue'
 import HomeFinalCtaSection from '~/components/marketing/home/HomeFinalCtaSection.vue'
 
@@ -127,6 +128,15 @@ interface PageProps {
         planHeaders: PlanHeader[]
       }
       extras: { eyebrow: string; title: string; subtitle: string; items: ExtraItem[] }
+      modules: {
+        eyebrow: string
+        title: string
+        subtitle: string
+        note: string
+        pricePer: string
+        includedLabel: string
+        items: Array<{ icon: string; name: string; desc: string; price: number }>
+      }
       faq: {
         eyebrow: string
         title: string
@@ -177,6 +187,7 @@ const hreflangFr = '/fr/tarifs'
   <PricingROISection v-bind="t.pricing.roi" />
   <PricingTestimonialsSection v-bind="t.pricing.testimonials" />
   <PricingDetailedTableSection v-bind="t.pricing.detailedTable" />
+  <PricingModulesSection v-bind="t.pricing.modules" />
   <PricingExtrasSection v-bind="t.pricing.extras" />
   <PricingFaqSection v-bind="t.pricing.faq" />
   <HomeFinalCtaSection v-bind="t.pricing.finalCta" />

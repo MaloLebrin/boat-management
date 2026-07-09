@@ -104,6 +104,12 @@ export const PLAN_MODULES: readonly PlanModule[] = ['charter', 'crm_invoicing'] 
  */
 export type ModuleSource = 'subscription' | 'granted'
 
+/** Module actif d'une organisation avec son origine, pour l'affichage in-app. */
+export interface ActiveModuleInfo {
+  module: PlanModule
+  source: ModuleSource
+}
+
 export const MODULE_PRICES: Record<PlanModule, PlanPrice> = {
   charter: { monthly: 15, annualMonthly: 12, annualTotal: 144 },
   crm_invoicing: { monthly: 15, annualMonthly: 12, annualTotal: 144 },

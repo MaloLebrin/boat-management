@@ -100,7 +100,11 @@
   "billing": {
     "notConfigured": "Le paiement n'est pas encore configuré. Contactez le support.",
     "noSubscription": "Aucun abonnement actif trouvé.",
-    "modulesRequirePro": "Les modules add-ons ne sont disponibles que sur le plan Pro."
+    "modulesRequirePro": "Les modules add-ons ne sont disponibles que sur le plan Pro.",
+    "moduleAdded": "Module activé. Il apparaîtra une fois le paiement confirmé.",
+    "moduleRemoved": "Module résilié. Il sera retiré une fois la confirmation reçue.",
+    "moduleNotFound": "Ce module n'est pas actif sur votre abonnement.",
+    "moduleAlreadyActive": "Ce module est déjà actif sur votre abonnement."
   },
   "demo": {
     "rateLimitError": "Trop de tentatives. Veuillez réessayer dans une minute.",

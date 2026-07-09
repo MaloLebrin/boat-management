@@ -25,6 +25,28 @@ export default class OrganizationModuleService {
     return rows.map((row) => row.module)
   }
 
+  /** Modules actifs avec leur origine, pour l'affichage in-app (badge « offert »). */
+  async listWithSource(
+    organizationId: number
+  ): Promise<Array<{ module: PlanModule; source: ModuleSource }>> {
+    const rows = await OrganizationModule.query()
+      .where('organizationId', organizationId)
+      .orderBy('module')
+    return rows.map((row) => ({ module: row.module, source: row.source }))
+  }
+
+  /** Ligne d'un module souscrit (source `subscription`), pour résilier son item Stripe. */
+  async findSubscriptionModule(
+    organizationId: number,
+    module: PlanModule
+  ): Promise<OrganizationModule | null> {
+    return OrganizationModule.query()
+      .where('organizationId', organizationId)
+      .where('module', module)
+      .where('source', 'subscription')
+      .first()
+  }
+
   /**
    * Quotas effectifs de l'organisation : ceux de son tier fusionnés avec les
    * flags de ses modules actifs (helper pur `resolveEffectiveQuotas`).

@@ -102,6 +102,26 @@
         "year": "Annuel"
       },
       "annualDiscount": "-20%"
+    },
+    "modules": {
+      "title": "Modules add-ons",
+      "subtitle": "Complétez votre plan Pro avec des modules facturés séparément.",
+      "pricePerMonth": "{amount} €/mois",
+      "active": "Actif",
+      "granted": "Offert",
+      "grantedHint": "Inclus dans votre offre",
+      "included": "Inclus",
+      "activate": "Activer",
+      "deactivate": "Résilier",
+      "proRequired": "Nécessite un plan Pro actif",
+      "charter": {
+        "name": "Location",
+        "desc": "Tarif par bateau et périodes saisonnières"
+      },
+      "crm_invoicing": {
+        "name": "CRM & Facturation",
+        "desc": "Clients, RGPD, devis et factures"
+      }
     }
   },
   "upgrade": {
