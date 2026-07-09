@@ -118,4 +118,30 @@ Les 5 `BaseStatCard` du dashboard (`inertia/pages/dashboard.vue`) ont un `animat
 - Card 4 : 180ms
 - Card 5 : 240ms
 
+---
+
+## Canvas & animations marketing (« Stripe-like »)
+
+Couche d'animation des pages **home** et **tarifs** (refonte 2026-07-09). Toutes les briques sont **SSR-safe** (accès `window`/canvas uniquement dans `onMounted`) et honorent `prefers-reduced-motion` (rendu statique, aucune boucle `requestAnimationFrame`).
+
+### Composants canvas — `inertia/components/marketing/canvas/`
+
+| Composant                   | Effet                                                                                                                                  | Utilisé par                             |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
+| `GradientMeshCanvas.vue`    | Dégradé multicolore (4–5 blobs radiaux) qui dérive lentement en fond de hero. Props `variant` (`navy`/`sunset`/`ocean`) + `intensity`. | `HomeHeroSection`, `PricingHeroSection` |
+| `ParticleNetworkCanvas.vue` | Nœuds flottants reliés par des segments, réactifs à la souris (attraction douce). Props `color` + `density`.                           | `HomeFinalCtaSection`                   |
+
+**Garde-fous communs** : `IntersectionObserver` (pause hors écran) + `visibilitychange` (pause onglet caché), `devicePixelRatio` plafonné à 2, `getContext` en `try/catch` (fallback si canvas indisponible, ex. jsdom), nettoyage complet des listeners/rAF en `onUnmounted`.
+
+### Composables — `inertia/composables/`
+
+| Composable        | Effet                                                                                                                                | Utilisé par                                        |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------- |
+| `use_count_up.ts` | Incrémente `0 → target` (easeOutCubic) au premier passage dans le viewport (`IntersectionObserver`). Gère préfixe/suffixe/décimales. | `HomeStatValue` (stats band, métriques case study) |
+| `use_tilt.ts`     | Inclinaison 3D (`rotateX/rotateY`) selon la souris + parallaxe verticale au scroll. Retourne `{ el, transform }`.                    | `HomeHeroSection`, `HomeFeatureSection` (mockups)  |
+
+### Configurateur tarifs
+
+`PricingConfigurator.vue` recalcule le total en direct (socle Pro + modules activés) à partir de `PLAN_PRICES`/`MODULE_PRICES` ; le total est ré-animé à chaque changement via un `fadeUp` clé sur la valeur (`:key="total"`).
+
 Effet : les cartes apparaissent en cascade à chaque navigation vers `/dashboard`.

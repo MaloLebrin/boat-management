@@ -10,8 +10,8 @@ import PricingTiersSection from '~/components/marketing/pricing/PricingTiersSect
 import PricingROISection from '~/components/marketing/pricing/PricingROISection.vue'
 import PricingTestimonialsSection from '~/components/marketing/pricing/PricingTestimonialsSection.vue'
 import PricingDetailedTableSection from '~/components/marketing/pricing/PricingDetailedTableSection.vue'
+import PricingConfigurator from '~/components/marketing/pricing/PricingConfigurator.vue'
 import PricingExtrasSection from '~/components/marketing/pricing/PricingExtrasSection.vue'
-import PricingModulesSection from '~/components/marketing/pricing/PricingModulesSection.vue'
 import PricingFaqSection from '~/components/marketing/pricing/PricingFaqSection.vue'
 import HomeFinalCtaSection from '~/components/marketing/home/HomeFinalCtaSection.vue'
 
@@ -48,6 +48,41 @@ interface GroupRow {
 interface Group {
   title: string
   rows: GroupRow[]
+}
+interface ConfiguratorModule {
+  key: string
+  icon: string
+  name: string
+  desc: string
+  priceMonthly: number
+  priceAnnual: number
+  features: string[]
+}
+interface Configurator {
+  eyebrow: string
+  title: string
+  titleHighlight: string
+  subtitle: string
+  baseName: string
+  baseDesc: string
+  basePriceMonthly: number
+  basePriceAnnual: number
+  modulesLabel: string
+  perMonth: string
+  perYear: string
+  totalLabel: string
+  annualSaveLabel: string
+  billedAnnuallyNote: string
+  ctaLabel: string
+  ctaHref: string
+  modules: ConfiguratorModule[]
+  enterprise: {
+    name: string
+    priceMonthly: number
+    priceAnnual: number
+    note: string
+    ctaLabel: string
+  }
 }
 interface PlanHeader {
   name: string
@@ -117,6 +152,7 @@ interface PageProps {
         titleHighlight: string
         items: TestimonialItem[]
       }
+      configurator: Configurator
       detailedTable: {
         eyebrow: string
         title: string
@@ -124,6 +160,7 @@ interface PageProps {
         subtitle: string
         expandAll: string
         collapseAll: string
+        addonLabel: string
         groups: Group[]
         planHeaders: PlanHeader[]
       }
@@ -184,10 +221,10 @@ const hreflangFr = '/fr/tarifs'
     :billing="billing"
     :reassurance="t.pricing.reassurance"
   />
+  <PricingConfigurator v-bind="t.pricing.configurator" :billing="billing" />
   <PricingROISection v-bind="t.pricing.roi" />
   <PricingTestimonialsSection v-bind="t.pricing.testimonials" />
   <PricingDetailedTableSection v-bind="t.pricing.detailedTable" />
-  <PricingModulesSection v-bind="t.pricing.modules" />
   <PricingExtrasSection v-bind="t.pricing.extras" />
   <PricingFaqSection v-bind="t.pricing.faq" />
   <HomeFinalCtaSection v-bind="t.pricing.finalCta" />

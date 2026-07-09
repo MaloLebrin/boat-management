@@ -4,6 +4,7 @@ import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import { useScrollReveal } from '~/composables/use_scroll_reveal'
+import HomeStatValue from './HomeStatValue.vue'
 
 defineProps<{
   caseStudy: {
@@ -44,7 +45,9 @@ const { el: sectionEl, isVisible: sectionVisible } = useScrollReveal()
         :key="metric.label"
         class="text-center hover:-translate-y-1 hover:shadow-lg transition-all duration-300"
       >
-        <p class="font-display text-4xl italic text-navy-900">{{ metric.value }}</p>
+        <p class="font-display text-4xl italic text-navy-900">
+          <HomeStatValue :value="metric.value" />
+        </p>
         <p class="mt-1 text-sm text-fg-muted">{{ metric.label }}</p>
       </div>
     </div>

@@ -4,7 +4,7 @@ import { computed } from 'vue'
 
 const props = withDefaults(
   defineProps<{
-    variant?: 'primary' | 'secondary' | 'ghost' | 'danger'
+    variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger'
     size?: 'sm' | 'md' | 'lg' | 'icon'
     disabled?: boolean
     type?: 'button' | 'submit' | 'reset'
@@ -40,6 +40,8 @@ const variantClass: Record<NonNullable<typeof props.variant>, string> = {
     'bg-brand text-white shadow-sm hover:bg-brand-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 focus-visible:ring-offset-2 focus-visible:ring-offset-surface',
   secondary:
     'border border-border-strong bg-surface-elevated text-fg shadow-sm hover:bg-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30 focus-visible:ring-offset-2 focus-visible:ring-offset-surface',
+  outline:
+    'border border-border-strong bg-transparent text-fg hover:bg-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30 focus-visible:ring-offset-2 focus-visible:ring-offset-surface',
   ghost:
     'text-fg-muted hover:bg-surface-muted hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30 focus-visible:ring-offset-2 focus-visible:ring-offset-surface',
   danger:

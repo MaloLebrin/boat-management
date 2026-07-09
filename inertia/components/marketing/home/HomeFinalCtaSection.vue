@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import BaseButton from '~/components/base/BaseButton.vue'
+import ParticleNetworkCanvas from '~/components/marketing/canvas/ParticleNetworkCanvas.vue'
 
 defineProps<{
   title: string
@@ -14,6 +15,9 @@ defineProps<{
   <section
     class="relative overflow-hidden bg-gradient-to-b from-navy-900 to-navy-800 px-6 py-20 lg:px-8 lg:py-24"
   >
+    <!-- Réseau de particules (évoque une flotte connectée) -->
+    <ParticleNetworkCanvas color="#8a9aab" :density="0.7" />
+
     <!-- Decorative compass needle SVG -->
     <svg
       class="pointer-events-none absolute right-0 top-1/2 h-96 w-96 -translate-y-1/2 translate-x-1/4 opacity-10"
