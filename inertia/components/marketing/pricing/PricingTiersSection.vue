@@ -40,7 +40,11 @@ function setGlowRef(node: unknown, featured?: boolean) {
 </script>
 
 <template>
-  <section :ref="el" class="reveal bg-cream px-6 pb-16 lg:px-8" :class="{ visible: isVisible }">
+  <section
+    :ref="el"
+    class="reveal bg-cream px-6 pb-16 pt-20 lg:px-8 lg:pt-28"
+    :class="{ visible: isVisible }"
+  >
     <div class="mx-auto max-w-7xl">
       <!-- Tiers grid -->
       <div class="grid gap-6 lg:grid-cols-3">
