@@ -3,6 +3,13 @@ import type Organization from '#models/organization'
 import { resolveEffectiveQuotas } from '#shared/helpers/plan'
 import type { ModuleSource, PlanModule, PlanQuotas } from '#shared/types/plan'
 import { inject } from '@adonisjs/core'
+import type { TransactionClientContract } from '@adonisjs/lucid/types/database'
+
+/** Item de module désiré, tel que dérivé des items d'un abonnement Stripe. */
+export interface DesiredSubscriptionModule {
+  module: PlanModule
+  stripeSubscriptionItemId: string
+}
 
 /**
  * Modules add-ons actifs par organisation (épic #327). Source de vérité de la
@@ -70,5 +77,48 @@ export default class OrganizationModuleService {
       .where('module', module)
       .where('source', options.source ?? 'subscription')
       .delete()
+  }
+
+  /**
+   * Réconcilie les modules issus d'un abonnement Stripe (source `subscription`)
+   * avec l'état désiré dérivé des items de l'abonnement (#330). Opère dans la
+   * transaction de la sync pour rester atomique avec l'upsert d'abonnement.
+   *
+   * - retire les modules `subscription` absents de l'état désiré (item Stripe supprimé) ;
+   * - ajoute/actualise les modules désirés (avec leur `stripe_subscription_item_id`) ;
+   * - ne touche JAMAIS un module `granted` : s'il couvre déjà le module, on le
+   *   laisse tel quel plutôt que de le requalifier en `subscription`.
+   */
+  async reconcileSubscriptionModules(
+    organizationId: number,
+    desired: DesiredSubscriptionModule[],
+    trx: TransactionClientContract
+  ): Promise<void> {
+    const existing = await OrganizationModule.query({ client: trx })
+      .where('organizationId', organizationId)
+      .where('source', 'subscription')
+
+    const desiredModules = new Set(desired.map((d) => d.module))
+
+    for (const row of existing) {
+      if (!desiredModules.has(row.module)) {
+        await row.useTransaction(trx).delete()
+      }
+    }
+
+    for (const item of desired) {
+      const granted = await OrganizationModule.query({ client: trx })
+        .where('organizationId', organizationId)
+        .where('module', item.module)
+        .where('source', 'granted')
+        .first()
+      if (granted) continue
+
+      await OrganizationModule.updateOrCreate(
+        { organizationId, module: item.module },
+        { source: 'subscription', stripeSubscriptionItemId: item.stripeSubscriptionItemId },
+        { client: trx }
+      )
+    }
   }
 }

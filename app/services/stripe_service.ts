@@ -1,5 +1,7 @@
 import { StripeNotConfiguredError } from '#exceptions/billing_errors'
 import Organization from '#models/organization'
+import type { BillingInterval } from '#shared/types/billing'
+import type { PlanModule } from '#shared/types/plan'
 import { inject } from '@adonisjs/core'
 import env from '#start/env'
 import Stripe from 'stripe'
@@ -28,13 +30,13 @@ export default class StripeService {
 
   async createCheckoutSession(opts: {
     customerId: string
-    priceId: string
+    priceIds: string[]
     successUrl: string
     cancelUrl: string
   }): Promise<string> {
     const session = await this.stripe.checkout.sessions.create({
       customer: opts.customerId,
-      line_items: [{ price: opts.priceId, quantity: 1 }],
+      line_items: opts.priceIds.map((price) => ({ price, quantity: 1 })),
       mode: 'subscription',
       success_url: opts.successUrl,
       cancel_url: opts.cancelUrl,
@@ -79,5 +81,38 @@ export default class StripeService {
     if (!priceId) throw new StripeNotConfiguredError()
 
     return priceId
+  }
+
+  /** Prix Stripe d'un module add-on (épic #327) pour un intervalle donné. */
+  priceIdForModule(module: PlanModule, interval: BillingInterval): string {
+    const map: Record<string, string | undefined> = {
+      charter_month: env.get('STRIPE_MODULE_CHARTER_MONTHLY_PRICE_ID'),
+      charter_year: env.get('STRIPE_MODULE_CHARTER_ANNUAL_PRICE_ID'),
+      crm_invoicing_month: env.get('STRIPE_MODULE_CRM_INVOICING_MONTHLY_PRICE_ID'),
+      crm_invoicing_year: env.get('STRIPE_MODULE_CRM_INVOICING_ANNUAL_PRICE_ID'),
+    }
+
+    const priceId = map[`${module}_${interval}`]
+    if (!priceId) throw new StripeNotConfiguredError()
+
+    return priceId
+  }
+
+  /**
+   * Module add-on correspondant à un priceId Stripe, ou `null` si le prix est
+   * un tier ou un prix inconnu. Utilisé par la sync webhook multi-items pour
+   * réconcilier les items d'abonnement vers `organization_modules`.
+   */
+  moduleForPriceId(priceId: string): PlanModule | null {
+    const map: Record<string, PlanModule | undefined> = {
+      [env.get('STRIPE_MODULE_CHARTER_MONTHLY_PRICE_ID') ?? '']: 'charter',
+      [env.get('STRIPE_MODULE_CHARTER_ANNUAL_PRICE_ID') ?? '']: 'charter',
+      [env.get('STRIPE_MODULE_CRM_INVOICING_MONTHLY_PRICE_ID') ?? '']: 'crm_invoicing',
+      [env.get('STRIPE_MODULE_CRM_INVOICING_ANNUAL_PRICE_ID') ?? '']: 'crm_invoicing',
+    }
+
+    // Un priceId vide/inconnu ne doit jamais matcher la clé '' du fallback.
+    if (!priceId) return null
+    return map[priceId] ?? null
   }
 }

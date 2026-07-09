@@ -13,3 +13,15 @@ export class StripeCustomerError extends Error {
     super(message)
   }
 }
+
+/**
+ * Un checkout demande des modules add-ons sur un socle qui ne les accepte pas
+ * (épic #327) : les modules ne sont vendables que sur le socle Pro — Starter n'y
+ * a pas droit et Enterprise les inclut déjà.
+ */
+export class ModulesRequireProPlanError extends Error {
+  name = 'ModulesRequireProPlanError'
+  constructor() {
+    super('Add-on modules can only be subscribed on the Pro plan.')
+  }
+}

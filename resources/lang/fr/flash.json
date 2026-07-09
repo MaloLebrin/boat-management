@@ -99,7 +99,8 @@
   },
   "billing": {
     "notConfigured": "Le paiement n'est pas encore configuré. Contactez le support.",
-    "noSubscription": "Aucun abonnement actif trouvé."
+    "noSubscription": "Aucun abonnement actif trouvé.",
+    "modulesRequirePro": "Les modules add-ons ne sont disponibles que sur le plan Pro."
   },
   "demo": {
     "rateLimitError": "Trop de tentatives. Veuillez réessayer dans une minute.",

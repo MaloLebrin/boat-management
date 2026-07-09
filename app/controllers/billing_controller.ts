@@ -1,4 +1,4 @@
-import { StripeNotConfiguredError } from '#exceptions/billing_errors'
+import { ModulesRequireProPlanError, StripeNotConfiguredError } from '#exceptions/billing_errors'
 import StripeService from '#services/stripe_service'
 import SubscriptionService from '#services/subscription_service'
 import { checkoutValidator } from '#validators/billing'
@@ -19,13 +19,22 @@ export default class BillingController {
       const user = await auth.authenticate()
       await user.load('organization')
 
-      const { planTier, interval } = await request.validateUsing(checkoutValidator)
-      const priceId = this.stripeService.priceIdFor(planTier, interval)
+      const { planTier, interval, modules } = await request.validateUsing(checkoutValidator)
+
+      // Les modules add-ons ne sont vendables que sur le socle Pro (#327).
+      if (modules && modules.length > 0 && planTier !== 'pro') {
+        throw new ModulesRequireProPlanError()
+      }
+
+      const priceIds = [
+        this.stripeService.priceIdFor(planTier, interval),
+        ...(modules ?? []).map((module) => this.stripeService.priceIdForModule(module, interval)),
+      ]
       const customerId = await this.stripeService.getOrCreateCustomer(user.organization, user.email)
 
       const url = await this.stripeService.createCheckoutSession({
         customerId,
-        priceId,
+        priceIds,
         successUrl: `${env.get('APP_URL')}/settings/billing?checkout=success`,
         cancelUrl: `${env.get('APP_URL')}/settings/billing`,
       })
@@ -34,6 +43,10 @@ export default class BillingController {
     } catch (error) {
       if (error instanceof StripeNotConfiguredError) {
         session.flash('error', i18n.t('flash.billing.notConfigured'))
+        return response.redirect().back()
+      }
+      if (error instanceof ModulesRequireProPlanError) {
+        session.flash('error', i18n.t('flash.billing.modulesRequirePro'))
         return response.redirect().back()
       }
       throw error

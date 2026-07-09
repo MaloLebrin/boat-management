@@ -3,6 +3,7 @@ import testUtils from '@adonisjs/core/services/test_utils'
 import emitter from '@adonisjs/core/services/emitter'
 import Subscription from '#models/subscription'
 import SubscriptionService from '#services/subscription_service'
+import OrganizationModuleService from '#services/organization_module_service'
 import OrganizationPlanDowngraded from '#events/organization_plan_downgraded'
 import { OrganizationFactory } from '#database/factories/organization_factory'
 
@@ -54,7 +55,7 @@ test.group('SubscriptionService period bounds (functional)', (group) => {
     const periodEnd = Math.floor(Date.UTC(2030, 1, 10) / 1000)
     const anchor = Math.floor(Date.UTC(2020, 0, 1) / 1000)
 
-    const service = new SubscriptionService({} as any)
+    const service = new SubscriptionService({} as any, new OrganizationModuleService())
     await service.syncFromSubscriptionEvent(
       fakeStripeSubscription('cus_period_test', { anchor, periodStart, periodEnd }) as any
     )
@@ -80,7 +81,7 @@ test.group('SubscriptionService sync atomicity (functional)', (group) => {
       plan: 'enterprise',
     }).create()
 
-    const service = new SubscriptionService({} as any)
+    const service = new SubscriptionService({} as any, new OrganizationModuleService())
     await service.syncFromSubscriptionEvent(
       fakeStripeSubscription('cus_downgrade', { ...PERIOD, status: 'canceled' }) as any
     )
@@ -107,7 +108,7 @@ test.group('SubscriptionService sync atomicity (functional)', (group) => {
       plan: 'enterprise',
     }).create()
 
-    const service = new SubscriptionService({} as any)
+    const service = new SubscriptionService({} as any, new OrganizationModuleService())
     // Force the second write (plan update) to fail after the subscription upsert
     // has already run inside the transaction.
     ;(service as any).applyOrgPlan = async () => {
