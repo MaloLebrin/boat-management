@@ -45,4 +45,15 @@ test.group('StripeService module pricing', () => {
       }
     }
   })
+
+  test('moduleIdempotencyKey is deterministic per subscription + price', ({ assert }) => {
+    const service = new StripeService()
+
+    const key = service.moduleIdempotencyKey('sub_123', 'price_test_charter_month')
+    assert.equal(key, 'add-module:sub_123:price_test_charter_month')
+    // Same inputs → same key (a retry reuses it, Stripe dedupes the item).
+    assert.equal(key, service.moduleIdempotencyKey('sub_123', 'price_test_charter_month'))
+    // Different price → different key.
+    assert.notEqual(key, service.moduleIdempotencyKey('sub_123', 'price_test_crm_month'))
+  })
 })
