@@ -1,4 +1,5 @@
 import { OrganizationSchema } from '#database/schema'
+import OrganizationModule from '#models/organization_module'
 import Port from '#models/port'
 import Subscription from '#models/subscription'
 import { column, hasMany, hasOne } from '@adonisjs/lucid/orm'
@@ -18,4 +19,7 @@ export default class Organization extends OrganizationSchema {
 
   @hasOne(() => Subscription)
   declare subscription: HasOne<typeof Subscription>
+
+  @hasMany(() => OrganizationModule)
+  declare modules: HasMany<typeof OrganizationModule>
 }
