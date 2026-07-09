@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { PlusIcon } from '@heroicons/vue/24/solid'
 import BaseButton from '~/components/base/BaseButton.vue'
+import { usePointerGlow } from '~/composables/use_pointer_glow'
 import { useScrollReveal } from '~/composables/use_scroll_reveal'
 
 interface OfferModule {
@@ -27,6 +28,7 @@ defineProps<{
 }>()
 
 const { el, isVisible } = useScrollReveal()
+const { el: glowEl } = usePointerGlow()
 </script>
 
 <template>
@@ -43,8 +45,11 @@ const { el, isVisible } = useScrollReveal()
 
       <!-- Socle + modules -->
       <div class="flex flex-col items-stretch gap-6 lg:flex-row lg:items-center">
-        <!-- Socle — bordure lumineuse rotative -->
-        <div class="glow-border flex-1 rounded-2xl bg-navy-900 p-6 text-white shadow-xl">
+        <!-- Socle — liseré lumineux qui suit le curseur -->
+        <div
+          :ref="glowEl"
+          class="glow-border flex-1 rounded-2xl bg-navy-900 p-6 text-white shadow-xl"
+        >
           <p class="text-xs font-semibold uppercase tracking-widest text-white/50">
             {{ modulesLabel }}
           </p>

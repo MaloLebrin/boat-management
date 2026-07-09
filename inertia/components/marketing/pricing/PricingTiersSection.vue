@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { CheckIcon } from '@heroicons/vue/24/solid'
 import BaseButton from '~/components/base/BaseButton.vue'
+import { usePointerGlow } from '~/composables/use_pointer_glow'
 import { useScrollReveal } from '~/composables/use_scroll_reveal'
 
 interface Tier {
@@ -29,6 +30,13 @@ defineProps<{
 }>()
 
 const { el, isVisible } = useScrollReveal()
+const { el: glowEl } = usePointerGlow()
+
+// Le liseré lumineux ne s'applique qu'au tier « featured » (Pro) ; comme il est
+// rendu dans un v-for, on assigne le ref via une fonction plutôt qu'un ref-objet.
+function setGlowRef(node: unknown, featured?: boolean) {
+  if (featured) glowEl.value = (node as HTMLElement | null) ?? null
+}
 </script>
 
 <template>
@@ -39,6 +47,7 @@ const { el, isVisible } = useScrollReveal()
         <div
           v-for="(tier, idx) in tiers"
           :key="tier.name"
+          :ref="(node) => setGlowRef(node, tier.featured)"
           :class="[
             'relative rounded-2xl p-8 transition-all duration-300',
             tier.featured

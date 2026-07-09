@@ -7,7 +7,7 @@ Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
 Correctifs visuels sur la home suite à la refonte :
 
-- **`.glow-border`** : abandon de l'effet rotatif (jugé « chelou »). Désormais un liseré dégradé statique (coral→violet→sky) doublé d'un halo flou qui « respire » (pulse d'opacité, keyframe `glowPulse`) — mêmes couleurs, plus calme, aucun coin qui tourne. Impacte socle offre modulaire, tier Pro et récap configurateur.
+- **`.glow-border`** : le liseré des cartes mises en avant adopte l'effet « carte bento » de stripe.com — un dégradé **coral → violet** masqué en anneau dont une lueur **suit le curseur** au survol (nouveau composable `use_pointer_glow` → variables CSS `--card-mouse-x/y`). Abandon des itérations précédentes (rotation, puis halo pulsant). Impacte socle offre modulaire, tier Pro et récap configurateur.
 - **`HomeHowItWorksSection`** : sections « comment ça marche », timeline J1/J7/J30 et preview n'avaient pas de conteneur `max-w` → contenu étalé bord à bord. Ajout des conteneurs centrés (`max-w-6xl` / `max-w-4xl`) ; timeline redessinée en carte navy centrée avec ligne de liaison horizontale.
 - **`HomeCaseStudySection`** : largeur contrainte (`max-w-5xl`), mise en carte (bandeau métriques avec séparateurs, colonnes défi/solution/résultats en cartes à liseré coloré, CTA en pied).
 - **CTA final** : réseau de particules plus dense et plus visible (densité 0.7 → 1.3, points plus grands/clairs).
