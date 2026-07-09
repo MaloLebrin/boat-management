@@ -104,7 +104,8 @@
     "moduleAdded": "Module activated. It will appear once the payment is confirmed.",
     "moduleRemoved": "Module cancelled. It will be removed once confirmed.",
     "moduleNotFound": "This module is not active on your subscription.",
-    "moduleAlreadyActive": "This module is already active on your subscription."
+    "moduleAlreadyActive": "This module is already active on your subscription.",
+    "moduleActionFailed": "The module could not be updated. Please try again."
   },
   "demo": {
     "rateLimitError": "Too many attempts. Please try again in a minute.",

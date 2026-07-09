@@ -1,8 +1,11 @@
 import { test } from '@japa/runner'
 import testUtils from '@adonisjs/core/services/test_utils'
+import app from '@adonisjs/core/services/app'
+import Stripe from 'stripe'
 import { DateTime } from 'luxon'
 import Subscription from '#models/subscription'
 import OrganizationModuleService from '#services/organization_module_service'
+import StripeService from '#services/stripe_service'
 import { UserFactory } from '#database/factories/user_factory'
 import OrganizationMembership from '#models/organization_membership'
 import { createAdminUser } from '#tests/functional/helpers'
@@ -45,9 +48,12 @@ test.group('Billing module management (functional)', (group) => {
     const response = await client.get('/settings/billing').loginAs(user).withInertia()
 
     response.assertStatus(200)
+    // Prop de page : objets {module, source}, nommée `orgModules`…
     response.assertInertiaPropsContains({
-      activeModules: [{ module: 'charter', source: 'granted' }],
+      orgModules: [{ module: 'charter', source: 'granted' }],
     })
+    // …et la prop partagée `activeModules` (chaînes, pour la nav) n'est PAS écrasée.
+    response.assertInertiaPropsContains({ activeModules: ['charter'] })
   })
 
   test('adding a module is rejected outside the Pro plan', async ({ client }) => {
@@ -179,5 +185,44 @@ test.group('Billing module management (functional)', (group) => {
 
     response.assertStatus(302)
     response.assertFlashMessage('error', 'Payment is not configured yet. Please contact support.')
+  })
+
+  test('a Stripe error while removing a module is surfaced as a flash, not a 500', async ({
+    client,
+    cleanup,
+  }) => {
+    // Une requête concurrente peut retirer l'item avant la réconciliation du
+    // webhook ; le second `del` lève un `resource_missing` côté Stripe. Sans
+    // gestion, ce serait un 500 non géré (asymétrie avec l'ajout idempotent).
+    app.container.swap(
+      StripeService,
+      () =>
+        ({
+          removeSubscriptionItem: async () => {
+            throw Stripe.errors.StripeError.generate({
+              type: 'invalid_request_error',
+              code: 'resource_missing',
+              message: 'No such subscription item',
+            } as never)
+          },
+        }) as unknown as StripeService
+    )
+    cleanup(() => app.container.restore(StripeService))
+
+    const user = await createAdminUser()
+    await seedActiveSubscription(user.organizationId!)
+    await new OrganizationModuleService().grantModule(user.organizationId!, 'charter', {
+      source: 'subscription',
+      stripeSubscriptionItemId: 'si_charter_gone',
+    })
+
+    const response = await client
+      .delete('/settings/billing/module')
+      .loginAs(user)
+      .form({ module: 'charter' })
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertFlashMessage('error', 'The module could not be updated. Please try again.')
   })
 })

@@ -13,7 +13,7 @@ defineProps<{
   plan: PlanTier
   quotaUsage: QuotaUsage
   subscription: SubscriptionInfo | null
-  activeModules: ActiveModuleInfo[]
+  orgModules: ActiveModuleInfo[]
 }>()
 </script>
 
@@ -23,7 +23,7 @@ defineProps<{
       :plan="plan"
       :quota-usage="quotaUsage"
       :subscription="subscription"
-      :active-modules="activeModules"
+      :org-modules="orgModules"
     />
   </SettingsShell>
 </template>

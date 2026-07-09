@@ -6,7 +6,7 @@ import { checkoutValidator, moduleActionValidator } from '#validators/billing'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import env from '#start/env'
-import type Stripe from 'stripe'
+import Stripe from 'stripe'
 
 @inject()
 export default class BillingController {
@@ -152,6 +152,15 @@ export default class BillingController {
     }
     if (error instanceof ModulesRequireProPlanError) {
       session.flash('error', i18n.t('flash.billing.modulesRequirePro'))
+      return response.redirect().back()
+    }
+    // Toute erreur renvoyée par l'API Stripe (ex. `resource_missing` quand une
+    // requête concurrente a déjà retiré l'item avant la réconciliation du
+    // webhook) est traitée en flash plutôt qu'en 500 non géré. Contrairement à
+    // l'ajout — protégé par une clé d'idempotence —, un retrait dupliqué ne peut
+    // pas réussir deux fois côté Stripe ; on l'absorbe donc proprement ici.
+    if (error instanceof Stripe.errors.StripeError) {
+      session.flash('error', i18n.t('flash.billing.moduleActionFailed'))
       return response.redirect().back()
     }
     throw error
