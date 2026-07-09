@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import { usePage } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
 import { useScrollReveal } from '~/composables/use_scroll_reveal'
 
@@ -30,6 +31,11 @@ defineProps<{
   ctaSubtitle: string
   ctaButton: string
 }>()
+
+const page = usePage<{ locale?: 'en' | 'fr' }>()
+const privacyHref = computed(() =>
+  (page.props.locale ?? 'en') === 'fr' ? '/fr/confidentialite' : '/en/privacy'
+)
 
 const { el, isVisible } = useScrollReveal()
 const selectedSubject = ref('Demo')
@@ -172,7 +178,7 @@ const fleetSizes = ['1-4', '5-20', '20+']
               <input type="checkbox" class="mt-0.5 accent-navy-900" checked />
               <span>
                 {{ privacyText }}
-                <a href="/privacy" class="text-navy-900 underline">{{ privacyLinkLabel }}</a
+                <a :href="privacyHref" class="text-navy-900 underline">{{ privacyLinkLabel }}</a
                 >.
               </span>
             </label>
