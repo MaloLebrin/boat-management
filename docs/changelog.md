@@ -3,6 +3,18 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-07-09 — Marketing : dégradé WebGL façon stripe.com, carte des ports animée, bandes diagonales
+
+Deuxième couche d'animations canvas inspirées de stripe.com sur les pages marketing (aucune dépendance npm ajoutée, tout est fait main comme la couche existante).
+
+- **Dégradé de hero en WebGL authentique** : `GradientMeshCanvas.vue` devient un hôte fin avec chaîne de repli **WebGL → canvas 2D (blobs existants) → fond CSS**. Le nouveau moteur (`mesh_gradient_webgl.ts`) reproduit la vraie technique du hero stripe.com : bruit simplex 2D (Ashima) empilé en Fractal Brownian Motion + « domain warping » (le champ de bruit se replie sur lui-même) + pré-warp sinusoïdal décalé dans le temps, sur un seul triangle plein écran. API inchangée (`variant`, `intensity`) → heros home/tarifs non modifiés ; nouvelle variante claire **`dawn`** (pastels sur cream). Gestion `webglcontextlost/restored`, dpr plafonné à 1.5 en WebGL (2 en 2D).
+- **Carte du monde pointillée + arcs de routes maritimes** (`PortsMapCanvas.vue`, inspirée du globe Stripe, à plat et nautique) : continents en grille hexagonale de points (précalculée dans un canvas offscreen à chaque resize — le dessin par frame se réduit à un `drawImage` + arcs), « comètes » qui parcourent des Bézier quadratiques entre ~10 ports (La Rochelle, Marseille, Miami…), ports pulsants. Variantes `dark`/`light`. Données géo décoratives embarquées (`world_map_data.ts`), aucune requête réseau.
+- **Bandes diagonales « Stripe »** : utilitaires `.section-skew` / `.section-skew-content` (`app.css`) — seul un calque de fond absolu est incliné (`skewY(-6deg)`), le canvas y est contre-skewé, le texte reste droit. Appliqué à **`HomeStatsBandSection`** (bande blanche → bande navy diagonale avec carte des ports en fond, textes passés en blanc — seul redesign visuel délibéré) et à l'arête supérieure du **CTA final** (particules + compas déplacés dans le calque incliné).
+- **Heros About & Contact** habillés : About → mesh gradient `dawn` ; Contact → carte des ports `light`.
+- **Composable `use_canvas_lifecycle.ts`** : mutualise le cycle de vie des canvas décoratifs (frame statique immédiate couvrant `prefers-reduced-motion`, pause hors écran via `IntersectionObserver` + onglet caché via `visibilitychange`, resize, cleanup complet) — utilisé par le mesh gradient et la carte ; `ParticleNetworkCanvas` inchangé.
+- **Tests** : ordre de repli WebGL → 2D du mesh, montage `PortsMapCanvas` (2 variantes) et variante `dawn`, fonctions pures de la carte (`pointInPolygon`, `projectLonLat`, `buildDots`, validité ports/routes), helpers couleur et moteur blobs stubé.
+- **Doc** : `inertia/css/ANIMATIONS.md` (nouvelles briques) et `docs/frontend/ui-map.md` (section Marketing ajoutée).
+
 ## 2026-07-09 — Marketing : correction des liens morts (404) + page de confidentialité
 
 Audit et correction des liens 404 sur les pages publiques (issue #345) :

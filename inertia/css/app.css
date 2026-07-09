@@ -387,6 +387,23 @@ body {
   animation-delay: 0.45s;
 }
 
+/* ── Bandes diagonales « Stripe » ─────────────────────────────── */
+/* Pattern : section `relative overflow-hidden` avec padding vertical
+   généreux ; un calque de fond absolu (insetté verticalement pour garder
+   les pointes dans la section) porte `.section-skew` — le fond de page
+   apparaît dans les triangles → arêtes diagonales. Le canvas/motif à
+   l'intérieur du calque porte `.section-skew-content` (contre-skew +
+   surcouverture) pour rester horizontal. Le contenu texte est un frère
+   non transformé : on ne skew jamais le texte. Transforms statiques →
+   rien à couper sous reduced-motion. */
+.section-skew {
+  transform: skewY(-6deg);
+}
+.section-skew-content {
+  transform: skewY(6deg) scale(1.15);
+  transform-origin: center;
+}
+
 /* Les animations décoratives infinies ne doivent pas « clignoter » à 1ms
    sous reduced-motion : on les coupe explicitement. */
 @media (prefers-reduced-motion: reduce) {

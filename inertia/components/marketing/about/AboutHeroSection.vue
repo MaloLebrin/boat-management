@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import GradientMeshCanvas from '../canvas/GradientMeshCanvas.vue'
+
 defineProps<{
   line1: string
   line1Highlight: string
@@ -9,8 +11,9 @@ defineProps<{
 </script>
 
 <template>
-  <section class="bg-cream px-6 pb-16 pt-20 lg:px-8 lg:pb-20 lg:pt-28">
-    <div class="mx-auto max-w-4xl text-center">
+  <section class="relative overflow-hidden bg-cream px-6 pb-16 pt-20 lg:px-8 lg:pb-20 lg:pt-28">
+    <GradientMeshCanvas variant="dawn" :intensity="0.5" />
+    <div class="relative mx-auto max-w-4xl text-center">
       <p class="font-mono text-xs font-semibold uppercase tracking-widest text-coral-500">
         À PROPOS · NOTRE MISSION
       </p>
