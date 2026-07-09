@@ -20,6 +20,16 @@
         "title": "Plan downgraded to {toPlan}",
         "body": "Your organisation's plan changed from {fromPlan} to {toPlan}."
       }
+    },
+    "module": {
+      "names": {
+        "charter": "Charter",
+        "crm_invoicing": "CRM & Invoicing"
+      },
+      "deactivated": {
+        "title": "{module} module deactivated",
+        "body": "The {module} module was removed from your subscription. Your data stays available in read-only mode."
+      }
     }
   },
   "title": "Notifications",

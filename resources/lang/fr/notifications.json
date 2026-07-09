@@ -20,6 +20,16 @@
         "title": "Plan rétrogradé vers {toPlan}",
         "body": "Le plan de votre organisation est passé de {fromPlan} à {toPlan}."
       }
+    },
+    "module": {
+      "names": {
+        "charter": "Location",
+        "crm_invoicing": "CRM & Facturation"
+      },
+      "deactivated": {
+        "title": "Module {module} désactivé",
+        "body": "Le module {module} a été retiré de votre abonnement. Vos données restent consultables en lecture seule."
+      }
     }
   },
   "title": "Notifications",

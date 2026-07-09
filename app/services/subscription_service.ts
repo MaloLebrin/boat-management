@@ -1,11 +1,12 @@
 import Organization from '#models/organization'
 import Subscription from '#models/subscription'
 import type { BillingInterval, SubscriptionInfo, SubscriptionStatus } from '#shared/types/billing'
-import type { PlanTier } from '#shared/types/plan'
+import type { PlanModule, PlanTier } from '#shared/types/plan'
 import StripeService from '#services/stripe_service'
 import OrganizationModuleService from '#services/organization_module_service'
 import type { DesiredSubscriptionModule } from '#services/organization_module_service'
 import OrganizationPlanDowngraded from '#events/organization_plan_downgraded'
+import OrganizationModuleDeactivated from '#events/organization_module_deactivated'
 import { inject } from '@adonisjs/core'
 import env from '#start/env'
 import db from '@adonisjs/lucid/services/db'
@@ -53,15 +54,20 @@ export default class SubscriptionService {
     const plan = this.planFromPriceId(tierItem.price.id)
     const desiredModules = this.desiredModulesFrom(stripeSub, plan)
 
-    const downgrade = await db.transaction(async (trx) => {
+    const { downgrade, removed } = await db.transaction(async (trx) => {
       await this.upsertSubscription(org.id, stripeSub, tierItem, trx)
-      await this.organizationModuleService.reconcileSubscriptionModules(org.id, desiredModules, trx)
-      return this.applyOrgPlan(org, plan, trx)
+      const reconciled = await this.organizationModuleService.reconcileSubscriptionModules(
+        org.id,
+        desiredModules,
+        trx
+      )
+      return { downgrade: await this.applyOrgPlan(org, plan, trx), removed: reconciled.removed }
     })
 
     if (downgrade) {
       await OrganizationPlanDowngraded.dispatch(org, downgrade.fromPlan, plan)
     }
+    await this.dispatchModuleDeactivations(org, removed)
   }
 
   async syncFromSubscriptionEvent(stripeSub: Stripe.Subscription): Promise<void> {
@@ -76,14 +82,33 @@ export default class SubscriptionService {
       stripeSub.status === 'canceled' ? 'starter' : this.planFromPriceId(tierItem.price.id)
     const desiredModules = this.desiredModulesFrom(stripeSub, newPlan)
 
-    const downgrade = await db.transaction(async (trx) => {
+    const { downgrade, removed } = await db.transaction(async (trx) => {
       await this.upsertSubscription(org.id, stripeSub, tierItem, trx)
-      await this.organizationModuleService.reconcileSubscriptionModules(org.id, desiredModules, trx)
-      return this.applyOrgPlan(org, newPlan, trx)
+      const reconciled = await this.organizationModuleService.reconcileSubscriptionModules(
+        org.id,
+        desiredModules,
+        trx
+      )
+      return { downgrade: await this.applyOrgPlan(org, newPlan, trx), removed: reconciled.removed }
     })
 
     if (downgrade) {
       await OrganizationPlanDowngraded.dispatch(org, downgrade.fromPlan, newPlan)
+    }
+    await this.dispatchModuleDeactivations(org, removed)
+  }
+
+  /**
+   * Notifie la désactivation des modules retirés de l'abonnement — APRÈS commit
+   * (comme `OrganizationPlanDowngraded`), le listener envoyant emails et
+   * notifications qui ne doivent jamais s'appuyer sur une transaction annulable.
+   */
+  private async dispatchModuleDeactivations(
+    org: Organization,
+    removed: PlanModule[]
+  ): Promise<void> {
+    for (const module of removed) {
+      await OrganizationModuleDeactivated.dispatch(org, module)
     }
   }
 

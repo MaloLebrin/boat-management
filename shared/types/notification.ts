@@ -12,6 +12,7 @@ export type NotificationType =
   | 'member.role_changed'
   | 'plan.downgraded'
   | 'plan.upgraded'
+  | 'module.deactivated'
   | 'maintenance.overdue'
   | 'maintenance.due_soon'
   | 'document.expiring_soon'
