@@ -1,6 +1,6 @@
 <script setup lang="ts">
 defineProps<{
-  persona?: 'loueurs' | 'ecoles' | 'marinas'
+  persona?: 'loueurs' | 'ecoles' | 'marinas' | 'armateurs'
 }>()
 </script>
 

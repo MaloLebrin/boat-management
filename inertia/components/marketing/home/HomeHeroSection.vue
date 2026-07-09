@@ -4,7 +4,7 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import HomeBrowserFrame from './HomeBrowserFrame.vue'
 import HomeMockDashboard from './HomeMockDashboard.vue'
 
-type Persona = 'loueurs' | 'ecoles' | 'marinas'
+type Persona = 'loueurs' | 'ecoles' | 'marinas' | 'armateurs'
 
 interface HeroContent {
   title: string
@@ -21,7 +21,11 @@ const props = defineProps<{
   locale: 'en' | 'fr'
 }>()
 
-const currentHero = computed(() => props.heroContent[props.activePersona])
+// `armateurs` n'a pas de contenu hero dédié → repli sur `loueurs` (évite un
+// rendu `undefined` quand l'onglet persona correspondant est sélectionné).
+const currentHero = computed(
+  () => props.heroContent[props.activePersona] ?? props.heroContent.loueurs
+)
 const duplicatedLogos = computed(() => [...props.socialProof.logos, ...props.socialProof.logos])
 </script>
 
