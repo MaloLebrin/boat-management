@@ -135,13 +135,23 @@ Couche d'animation des pages **home** et **tarifs** (refonte 2026-07-09). Toutes
 
 ### Composables — `inertia/composables/`
 
-| Composable        | Effet                                                                                                                                | Utilisé par                                        |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------- |
-| `use_count_up.ts` | Incrémente `0 → target` (easeOutCubic) au premier passage dans le viewport (`IntersectionObserver`). Gère préfixe/suffixe/décimales. | `HomeStatValue` (stats band, métriques case study) |
-| `use_tilt.ts`     | Inclinaison 3D (`rotateX/rotateY`) selon la souris + parallaxe verticale au scroll. Retourne `{ el, transform }`.                    | `HomeHeroSection`, `HomeFeatureSection` (mockups)  |
+| Composable            | Effet                                                                                                                                | Utilisé par                                        |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------- |
+| `use_count_up.ts`     | Incrémente `0 → target` (easeOutCubic) au premier passage dans le viewport (`IntersectionObserver`). Gère préfixe/suffixe/décimales. | `HomeStatValue` (stats band, métriques case study) |
+| `use_tilt.ts`         | Inclinaison 3D (`rotateX/rotateY`) selon la souris + parallaxe verticale au scroll. Retourne `{ el, transform }`.                    | `HomeHeroSection`, `HomeFeatureSection` (mockups)  |
+| `use_tween_number.ts` | Anime (easeOutCubic) un nombre à **chaque changement** d'une source réactive (le total « roule » au lieu de sauter).                 | `PricingConfigurator` (total + économie annuelle)  |
+
+### Utilitaires CSS (`app.css`)
+
+| Classe                    | Effet                                                                                         | Keyframe        | Utilisé par                                                |
+| ------------------------- | --------------------------------------------------------------------------------------------- | --------------- | ---------------------------------------------------------- |
+| `.text-gradient-animated` | Texte à dégradé coral→violet→sky qui défile en boucle (`background-clip: text`).              | `gradientShift` | Highlights `<em>` des titres hero & configurateur          |
+| `.glow-border`            | Bordure lumineuse conique en rotation autour d'une carte (via `::before` masqué par le fond). | `spinBorder`    | Carte récap configurateur, socle offre modulaire, tier Pro |
+| `.float-slow`             | Flottement vertical lent et continu.                                                          | `floaty`        | Mockup hero (couche externe, sous le tilt)                 |
+| `.stagger` + `.visible`   | Entrée en cascade des enfants directs au scroll-reveal (délais `nth-child`).                  | `revealUp`      | Colonnes de cartes (configurateur, offre modulaire)        |
+
+Toutes ces animations infinies décoratives sont **explicitement coupées** (`animation: none`) sous `prefers-reduced-motion` — sinon la règle globale `animation-duration: 1ms` les ferait clignoter.
 
 ### Configurateur tarifs
 
-`PricingConfigurator.vue` recalcule le total en direct (socle Pro + modules activés) à partir de `PLAN_PRICES`/`MODULE_PRICES` ; le total est ré-animé à chaque changement via un `fadeUp` clé sur la valeur (`:key="total"`).
-
-Effet : les cartes apparaissent en cascade à chaque navigation vers `/dashboard`.
+`PricingConfigurator.vue` recalcule le total en direct (socle Pro + modules activés) à partir de `PLAN_PRICES`/`MODULE_PRICES` ; le total et l'économie annuelle « roulent » à chaque changement via `use_tween_number`, la carte récap porte un `.glow-border`.

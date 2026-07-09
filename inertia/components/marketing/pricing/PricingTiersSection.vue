@@ -42,7 +42,7 @@ const { el, isVisible } = useScrollReveal()
           :class="[
             'relative rounded-2xl p-8 transition-all duration-300',
             tier.featured
-              ? 'z-10 -translate-y-3 bg-navy-900 text-white ring-4 ring-coral-500/30 shadow-xl'
+              ? 'glow-border z-10 -translate-y-3 bg-navy-900 text-white shadow-xl'
               : 'bg-paper text-fg hover:-translate-y-1 hover:shadow-md',
           ]"
           :style="{ transitionDelay: `${idx * 100}ms` }"

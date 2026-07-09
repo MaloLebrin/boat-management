@@ -31,7 +31,7 @@ const emit = defineEmits<{
         class="mt-4 font-display text-5xl leading-tight tracking-tight text-white lg:text-6xl xl:text-7xl"
       >
         {{ title }}
-        <em class="text-coral-400">{{ titleHighlight }}</em>
+        <em class="text-gradient-animated not-italic">{{ titleHighlight }}</em>
       </h1>
       <p class="mt-4 text-lg text-white/70">{{ subtitle }}</p>
 

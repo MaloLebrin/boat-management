@@ -45,7 +45,7 @@ const { el: tiltEl, transform: tiltTransform } = useTilt({ max: 6, parallax: 0.6
           class="font-display text-5xl leading-tight tracking-tight text-white lg:text-6xl xl:text-7xl"
         >
           {{ currentHero.title }}
-          <em class="text-coral-400">{{ currentHero.titleHighlight }}</em>
+          <em class="text-gradient-animated not-italic">{{ currentHero.titleHighlight }}</em>
         </h1>
         <p
           class="text-pretty text-lg text-white/70"
@@ -80,19 +80,16 @@ const { el: tiltEl, transform: tiltTransform } = useTilt({ max: 6, parallax: 0.6
         </p>
       </div>
 
-      <!-- Browser mock: carte 3D inclinable au survol + parallaxe scroll -->
-      <div
-        ref="tiltEl"
-        class="will-change-transform"
-        :style="{
-          transform: tiltTransform,
-          animation: 'fadeUp 700ms var(--ease-premium) both',
-          animationDelay: '300ms',
-        }"
-      >
-        <HomeBrowserFrame>
-          <HomeMockDashboard :persona="activePersona" />
-        </HomeBrowserFrame>
+      <!-- Browser mock : entrée (fadeUp) → flottement (float-slow) → tilt 3D.
+           Divs séparés pour que l'animation d'entrée n'écrase pas le transform du tilt. -->
+      <div style="animation: fadeUp 700ms var(--ease-premium) both; animation-delay: 300ms">
+        <div class="float-slow">
+          <div :ref="tiltEl" class="will-change-transform" :style="{ transform: tiltTransform }">
+            <HomeBrowserFrame>
+              <HomeMockDashboard :persona="activePersona" />
+            </HomeBrowserFrame>
+          </div>
+        </div>
       </div>
     </div>
   </section>

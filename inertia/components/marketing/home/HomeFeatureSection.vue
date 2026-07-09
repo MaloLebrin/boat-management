@@ -83,7 +83,7 @@ const mockComponents: Record<MockType, typeof HomeMockBoatDetail> = {
 
         <!-- Mock — carte 3D inclinable au survol -->
         <div
-          ref="tiltEl"
+          :ref="tiltEl"
           class="will-change-transform"
           :class="{ 'lg:col-start-1': reversed }"
           :style="{ transform: tiltTransform }"

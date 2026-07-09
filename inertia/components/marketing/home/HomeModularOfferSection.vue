@@ -36,15 +36,15 @@ const { el, isVisible } = useScrollReveal()
       <div class="mb-12 text-center">
         <p class="text-xs font-semibold uppercase tracking-widest text-fg-subtle">{{ eyebrow }}</p>
         <h2 class="mt-2 font-display text-3xl text-fg lg:text-4xl">
-          {{ title }} <em class="text-coral-500">{{ titleHighlight }}</em>
+          {{ title }} <em class="text-gradient-animated not-italic">{{ titleHighlight }}</em>
         </h2>
         <p class="mx-auto mt-3 max-w-2xl text-pretty text-fg-muted">{{ subtitle }}</p>
       </div>
 
       <!-- Socle + modules -->
       <div class="flex flex-col items-stretch gap-6 lg:flex-row lg:items-center">
-        <!-- Socle -->
-        <div class="flex-1 rounded-2xl bg-navy-900 p-6 text-white shadow-xl">
+        <!-- Socle — bordure lumineuse rotative -->
+        <div class="glow-border flex-1 rounded-2xl bg-navy-900 p-6 text-white shadow-xl">
           <p class="text-xs font-semibold uppercase tracking-widest text-white/50">
             {{ modulesLabel }}
           </p>
@@ -56,20 +56,21 @@ const { el, isVisible } = useScrollReveal()
           </div>
         </div>
 
-        <!-- Séparateur + -->
+        <!-- Séparateur + (pulse) -->
         <div class="flex items-center justify-center">
-          <span class="flex h-10 w-10 items-center justify-center rounded-full bg-coral-100">
+          <span
+            class="flex h-10 w-10 items-center justify-center rounded-full bg-coral-100 animate-pulse"
+          >
             <PlusIcon class="h-5 w-5 text-coral-600" />
           </span>
         </div>
 
-        <!-- Modules -->
-        <div class="flex-1 space-y-4">
+        <!-- Modules (entrée staggerée) -->
+        <div class="flex-1 space-y-4 stagger" :class="{ visible: isVisible }">
           <div
-            v-for="(m, idx) in modules"
+            v-for="m in modules"
             :key="m.name"
             class="rounded-2xl border border-bone bg-white p-5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md"
-            :style="{ transitionDelay: `${idx * 80}ms` }"
           >
             <div class="flex items-center justify-between gap-3">
               <div class="flex items-center gap-3">

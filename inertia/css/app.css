@@ -257,6 +257,118 @@ body {
   }
 }
 
+/* ── Marketing motion (« Stripe-like ») ───────────────────────── */
+@keyframes floaty {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+@keyframes spinBorder {
+  to {
+    transform: rotate(1turn);
+  }
+}
+@keyframes revealUp {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Flottement lent (mockups hero) */
+.float-slow {
+  animation: floaty 6s ease-in-out infinite;
+}
+
+/* Texte à dégradé animé (coral → violet → sky) */
+.text-gradient-animated {
+  background: linear-gradient(90deg, #e2674f, #5a4a8a, #3d6f9c, #e2674f);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: gradientShift 6s linear infinite;
+}
+
+/* Bordure lumineuse rotative (conic) — cartes mises en avant */
+.glow-border {
+  position: relative;
+  isolation: isolate;
+}
+.glow-border::before {
+  content: '';
+  position: absolute;
+  inset: -1.5px;
+  z-index: -1;
+  border-radius: inherit;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0%,
+    #e2674f 12%,
+    #5a4a8a 25%,
+    transparent 40%,
+    transparent 100%
+  );
+  animation: spinBorder 5s linear infinite;
+}
+
+/* Entrée staggerée d'éléments enfants au scroll-reveal.
+   Le parent porte `.stagger` + `.visible` (via useScrollReveal). */
+.stagger > * {
+  opacity: 0;
+}
+.stagger.visible > * {
+  animation: revealUp 0.6s var(--ease-premium) both;
+}
+.stagger.visible > *:nth-child(1) {
+  animation-delay: 0.05s;
+}
+.stagger.visible > *:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.stagger.visible > *:nth-child(3) {
+  animation-delay: 0.25s;
+}
+.stagger.visible > *:nth-child(4) {
+  animation-delay: 0.35s;
+}
+.stagger.visible > *:nth-child(5) {
+  animation-delay: 0.45s;
+}
+
+/* Les animations décoratives infinies ne doivent pas « clignoter » à 1ms
+   sous reduced-motion : on les coupe explicitement. */
+@media (prefers-reduced-motion: reduce) {
+  .float-slow,
+  .text-gradient-animated,
+  .glow-border::before,
+  .stagger.visible > * {
+    animation: none !important;
+  }
+  .text-gradient-animated {
+    background-position: 0 0;
+  }
+  .stagger > * {
+    opacity: 1;
+  }
+}
+
 /* ── App-wide motion primitives ───────────────────────────────── */
 @keyframes slideDown {
   from {

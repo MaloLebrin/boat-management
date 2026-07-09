@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import { useScrollReveal } from '~/composables/use_scroll_reveal'
+import { useTweenNumber } from '~/composables/use_tween_number'
 import PricingConfiguratorModuleCard from './PricingConfiguratorModuleCard.vue'
 
 interface ConfiguratorModule {
@@ -85,6 +86,10 @@ const enterprisePrice = computed(() =>
 
 defineExpose({ total, annualSaving, selected })
 
+// Total et économie qui « roulent » à chaque changement de sélection/intervalle.
+const totalDisplay = useTweenNumber(total)
+const savingDisplay = useTweenNumber(annualSaving)
+
 const { el, isVisible } = useScrollReveal()
 </script>
 
@@ -95,14 +100,14 @@ const { el, isVisible } = useScrollReveal()
       <div class="mb-10 text-center">
         <p class="text-xs font-semibold uppercase tracking-widest text-fg-subtle">{{ eyebrow }}</p>
         <h2 class="mt-2 font-display text-3xl text-fg lg:text-4xl">
-          {{ title }} <em class="text-coral-500">{{ titleHighlight }}</em>
+          {{ title }} <em class="text-gradient-animated not-italic">{{ titleHighlight }}</em>
         </h2>
         <p class="mt-2 text-fg-muted">{{ subtitle }}</p>
       </div>
 
       <div class="grid gap-6 lg:grid-cols-[1fr_20rem]">
-        <!-- Colonne configuration -->
-        <div class="space-y-5">
+        <!-- Colonne configuration (entrée staggerée) -->
+        <div class="space-y-5 stagger" :class="{ visible: isVisible }">
           <!-- Socle Pro (toujours inclus) -->
           <div class="rounded-2xl border border-navy-900 bg-navy-900 p-5 text-white">
             <div class="flex items-center justify-between gap-3">
@@ -135,21 +140,18 @@ const { el, isVisible } = useScrollReveal()
           />
         </div>
 
-        <!-- Colonne récap (sticky) -->
+        <!-- Colonne récap (sticky) — bordure lumineuse rotative -->
         <aside class="lg:sticky lg:top-24 lg:self-start">
-          <div class="rounded-2xl border border-bone bg-white p-6 shadow-sm">
+          <div class="glow-border rounded-2xl border border-bone bg-white p-6 shadow-sm">
             <p class="text-sm text-fg-muted">{{ totalLabel }}</p>
             <div class="mt-1 flex items-baseline gap-1">
-              <span
-                :key="total"
-                class="animate-[fadeUp_220ms_var(--ease-premium)] font-display text-5xl text-fg"
-              >
-                {{ total }} €
+              <span class="font-display text-5xl text-fg tabular-nums">
+                {{ Math.round(totalDisplay) }} €
               </span>
               <span class="text-sm text-fg-muted">{{ perMonth }}</span>
             </div>
             <p v-if="isAnnual && annualSaving > 0" class="mt-2 text-sm font-medium text-mint-700">
-              {{ annualSaveLabel }} {{ annualSaving }} €
+              {{ annualSaveLabel }} {{ Math.round(savingDisplay) }} €
             </p>
             <p v-if="isAnnual" class="mt-1 text-xs text-fg-subtle">{{ billedAnnuallyNote }}</p>
 
