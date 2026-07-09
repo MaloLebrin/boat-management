@@ -37,6 +37,10 @@ const { t } = useT()
 
 const locale = computed<'en' | 'fr'>(() => (page.props.locale ?? 'fr') as 'en' | 'fr')
 
+const canonicalHref = computed(() =>
+  locale.value === 'fr' ? '/fr/simulateur-cout-entretien' : '/en/maintenance-cost-simulator'
+)
+
 const currentStep = ref(0)
 const formData = ref<Partial<SimulatorBoatInput>>({
   hasDedicatedEngine: true,
@@ -148,9 +152,9 @@ function shareResults() {
     <meta name="description" :content="t('simulator.meta_description')" />
     <meta property="og:title" :content="t('simulator.meta_title')" />
     <meta property="og:description" :content="t('simulator.meta_description')" />
-    <link rel="canonical" :href="`/${locale}/simulateur`" />
-    <link rel="alternate" hreflang="en" href="/en/simulator" />
-    <link rel="alternate" hreflang="fr" href="/fr/simulateur" />
+    <link rel="canonical" :href="canonicalHref" />
+    <link rel="alternate" hreflang="en" href="/en/maintenance-cost-simulator" />
+    <link rel="alternate" hreflang="fr" href="/fr/simulateur-cout-entretien" />
   </Head>
 
   <!-- Hero dark -->

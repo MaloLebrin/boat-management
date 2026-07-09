@@ -39,6 +39,10 @@ export default class MarketingController {
     return inertia.render('marketing/guide', this.buildGuidePageData(i18n))
   }
 
+  async privacy({ inertia, i18n }: HttpContext) {
+    return inertia.render('marketing/privacy', this.buildPrivacyPageData(i18n))
+  }
+
   async simulator({ inertia, auth }: HttpContext) {
     const isAuthenticated = await auth.check()
     let canAddBoat = true
@@ -1250,6 +1254,60 @@ export default class MarketingController {
           subtitle: t('final_cta_subtitle'),
           primaryCta: t('final_cta_primary'),
           secondaryCta: t('final_cta_secondary'),
+        },
+      },
+    }
+  }
+
+  private buildPrivacyPageData(i18n: { t: (key: string) => string }) {
+    const t = (key: string) => i18n.t(`marketing.privacy.${key}`)
+
+    return {
+      meta: {
+        title: t('meta_title'),
+        description: t('meta_description'),
+      },
+      privacy: {
+        hero: {
+          eyebrow: t('hero_eyebrow'),
+          title: t('hero_title'),
+          titleHighlight: t('hero_title_highlight'),
+          subtitle: t('hero_subtitle'),
+          updatedLabel: t('updated_label'),
+          updatedDate: t('updated_date'),
+        },
+        sections: [
+          { title: t('s1_title'), body: t('s1_body') },
+          {
+            title: t('s2_title'),
+            body: t('s2_body'),
+            bullets: [t('s2_b1'), t('s2_b2'), t('s2_b3'), t('s2_b4')],
+          },
+          {
+            title: t('s3_title'),
+            body: t('s3_body'),
+            bullets: [t('s3_b1'), t('s3_b2'), t('s3_b3'), t('s3_b4')],
+          },
+          { title: t('s4_title'), body: t('s4_body') },
+          {
+            title: t('s5_title'),
+            body: t('s5_body'),
+            bullets: [t('s5_b1'), t('s5_b2'), t('s5_b3'), t('s5_b4')],
+          },
+          { title: t('s6_title'), body: t('s6_body') },
+          { title: t('s7_title'), body: t('s7_body') },
+          {
+            title: t('s8_title'),
+            body: t('s8_body'),
+            bullets: [t('s8_b1'), t('s8_b2'), t('s8_b3'), t('s8_b4'), t('s8_b5')],
+          },
+          { title: t('s9_title'), body: t('s9_body') },
+          { title: t('s10_title'), body: t('s10_body') },
+        ],
+        contact: {
+          title: t('contact_title'),
+          body: t('contact_body'),
+          email: t('contact_email'),
         },
       },
     }

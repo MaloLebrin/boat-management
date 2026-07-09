@@ -19,6 +19,12 @@ const copyrightYear = new Date().getFullYear()
 const guideHref = computed(() =>
   locale.value === 'fr' ? '/fr/cout-entretien-bateau' : '/en/boat-maintenance-cost'
 )
+
+const simulatorHref = computed(() =>
+  locale.value === 'fr' ? '/fr/simulateur-cout-entretien' : '/en/maintenance-cost-simulator'
+)
+
+const privacyHref = computed(() => (locale.value === 'fr' ? '/fr/confidentialite' : '/en/privacy'))
 </script>
 
 <template>
@@ -49,7 +55,7 @@ const guideHref = computed(() =>
             <Link :href="`/${locale}/tarifs`" class="transition-colors hover:text-fg">{{
               t('public.footer.pricing')
             }}</Link>
-            <Link :href="`/${locale}/simulateur`" class="transition-colors hover:text-fg">{{
+            <Link :href="simulatorHref" class="transition-colors hover:text-fg">{{
               t('public.footer.simulator')
             }}</Link>
             <Link :href="guideHref" class="transition-colors hover:text-fg">{{
@@ -73,7 +79,9 @@ const guideHref = computed(() =>
             {{ t('public.footer.legal') }}
           </p>
           <div class="grid gap-2 text-sm font-medium text-fg-muted">
-            <a class="transition-colors hover:text-fg" href="#">{{ t('public.footer.privacy') }}</a>
+            <Link :href="privacyHref" class="transition-colors hover:text-fg">{{
+              t('public.footer.privacy')
+            }}</Link>
             <a class="transition-colors hover:text-fg" href="#">{{ t('public.footer.terms') }}</a>
           </div>
         </div>

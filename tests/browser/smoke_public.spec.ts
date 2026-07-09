@@ -19,6 +19,8 @@ test.group('E2E · Public screens smoke', (group) => {
       '/en/about',
       '/fr/a-propos',
       '/contact',
+      '/en/privacy',
+      '/fr/confidentialite',
     ]
 
     const page = await visit('/en')

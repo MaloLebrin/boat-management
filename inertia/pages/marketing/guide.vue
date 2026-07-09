@@ -77,6 +77,10 @@ const simulatorUrl = computed(() =>
   locale.value === 'fr' ? '/fr/simulateur-cout-entretien' : '/en/maintenance-cost-simulator'
 )
 
+const canonicalHref = computed(() =>
+  locale.value === 'fr' ? '/fr/cout-entretien-bateau' : '/en/boat-maintenance-cost'
+)
+
 const faqSchema = computed(() =>
   JSON.stringify({
     '@context': 'https://schema.org',
@@ -95,7 +99,7 @@ const faqSchema = computed(() =>
     <meta name="description" :content="meta.description" />
     <meta property="og:title" :content="meta.title" />
     <meta property="og:description" :content="meta.description" />
-    <link rel="canonical" :href="`/${locale}/cout-entretien-bateau`" />
+    <link rel="canonical" :href="canonicalHref" />
     <link rel="alternate" hreflang="fr" href="/fr/cout-entretien-bateau" />
     <link rel="alternate" hreflang="en" href="/en/boat-maintenance-cost" />
     <JsonLd :schema="faqSchema" />
