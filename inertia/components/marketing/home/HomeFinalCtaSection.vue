@@ -16,7 +16,7 @@ defineProps<{
     class="relative overflow-hidden bg-gradient-to-b from-navy-900 to-navy-800 px-6 py-20 lg:px-8 lg:py-24"
   >
     <!-- Réseau de particules (évoque une flotte connectée) -->
-    <ParticleNetworkCanvas color="#8a9aab" :density="0.7" />
+    <ParticleNetworkCanvas color="#b7c3d2" :density="1.3" />
 
     <!-- Decorative compass needle SVG -->
     <svg

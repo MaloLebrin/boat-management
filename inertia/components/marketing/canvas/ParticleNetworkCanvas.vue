@@ -45,7 +45,7 @@ function reducedMotion() {
 
 function seedNodes() {
   const area = width * height
-  const count = Math.min(Math.round((area / 100_000) * props.density), 90)
+  const count = Math.min(Math.round((area / 100_000) * props.density), 130)
   nodes = Array.from({ length: count }, () => ({
     x: Math.random() * width,
     y: Math.random() * height,
@@ -78,7 +78,7 @@ function draw() {
       const dy = a.y - b.y
       const dist = Math.hypot(dx, dy)
       if (dist < LINK_DIST) {
-        ctx.strokeStyle = hexToRgba(props.color, (1 - dist / LINK_DIST) * 0.35)
+        ctx.strokeStyle = hexToRgba(props.color, (1 - dist / LINK_DIST) * 0.45)
         ctx.lineWidth = 1
         ctx.beginPath()
         ctx.moveTo(a.x, a.y)
@@ -86,9 +86,9 @@ function draw() {
         ctx.stroke()
       }
     }
-    ctx.fillStyle = hexToRgba(props.color, 0.85)
+    ctx.fillStyle = hexToRgba(props.color, 0.95)
     ctx.beginPath()
-    ctx.arc(a.x, a.y, 1.8, 0, Math.PI * 2)
+    ctx.arc(a.x, a.y, 2.2, 0, Math.PI * 2)
     ctx.fill()
   }
 }

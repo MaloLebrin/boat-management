@@ -275,9 +275,16 @@ body {
     background-position: 200% 50%;
   }
 }
+/* Angle animable pour la bordure lumineuse (évite de faire tourner
+   physiquement le pseudo-élément, dont les coins dépasseraient de la carte). */
+@property --glow-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
 @keyframes spinBorder {
   to {
-    transform: rotate(1turn);
+    --glow-angle: 360deg;
   }
 }
 @keyframes revealUp {
@@ -318,14 +325,14 @@ body {
   z-index: -1;
   border-radius: inherit;
   background: conic-gradient(
-    from 0deg,
-    transparent 0%,
-    #e2674f 12%,
-    #5a4a8a 25%,
-    transparent 40%,
-    transparent 100%
+    from var(--glow-angle),
+    transparent 0deg,
+    #e2674f 40deg,
+    #5a4a8a 95deg,
+    transparent 150deg,
+    transparent 360deg
   );
-  animation: spinBorder 5s linear infinite;
+  animation: spinBorder 6s linear infinite;
 }
 
 /* Entrée staggerée d'éléments enfants au scroll-reveal.
