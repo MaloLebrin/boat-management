@@ -1567,6 +1567,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['guide']>>>
     }
   }
+  'marketing.en.privacy': {
+    methods: ["GET","HEAD"]
+    pattern: '/en/privacy'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['privacy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['privacy']>>>
+    }
+  }
   'marketing.fr.home': {
     methods: ["GET","HEAD"]
     pattern: '/fr'
@@ -1613,6 +1625,18 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['guide']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['guide']>>>
+    }
+  }
+  'marketing.fr.privacy': {
+    methods: ["GET","HEAD"]
+    pattern: '/fr/confidentialite'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['privacy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['privacy']>>>
     }
   }
   'marketing.en.about': {

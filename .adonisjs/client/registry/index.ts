@@ -786,6 +786,12 @@ const routes = {
     tokens: [{"old":"/en/boat-maintenance-cost","type":0,"val":"en","end":""},{"old":"/en/boat-maintenance-cost","type":0,"val":"boat-maintenance-cost","end":""}],
     types: placeholder as Registry['marketing.en.guide']['types'],
   },
+  'marketing.en.privacy': {
+    methods: ["GET","HEAD"],
+    pattern: '/en/privacy',
+    tokens: [{"old":"/en/privacy","type":0,"val":"en","end":""},{"old":"/en/privacy","type":0,"val":"privacy","end":""}],
+    types: placeholder as Registry['marketing.en.privacy']['types'],
+  },
   'marketing.fr.home': {
     methods: ["GET","HEAD"],
     pattern: '/fr',
@@ -809,6 +815,12 @@ const routes = {
     pattern: '/fr/cout-entretien-bateau',
     tokens: [{"old":"/fr/cout-entretien-bateau","type":0,"val":"fr","end":""},{"old":"/fr/cout-entretien-bateau","type":0,"val":"cout-entretien-bateau","end":""}],
     types: placeholder as Registry['marketing.fr.guide']['types'],
+  },
+  'marketing.fr.privacy': {
+    methods: ["GET","HEAD"],
+    pattern: '/fr/confidentialite',
+    tokens: [{"old":"/fr/confidentialite","type":0,"val":"fr","end":""},{"old":"/fr/confidentialite","type":0,"val":"confidentialite","end":""}],
+    types: placeholder as Registry['marketing.fr.privacy']['types'],
   },
   'marketing.en.about': {
     methods: ["GET","HEAD"],

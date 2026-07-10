@@ -209,6 +209,7 @@ export interface ApiDefinition {
       pricing: typeof routes['marketing.en.pricing']
       simulator: typeof routes['marketing.en.simulator']
       guide: typeof routes['marketing.en.guide']
+      privacy: typeof routes['marketing.en.privacy']
       about: typeof routes['marketing.en.about']
     }
     fr: {
@@ -216,6 +217,7 @@ export interface ApiDefinition {
       pricing: typeof routes['marketing.fr.pricing']
       simulator: typeof routes['marketing.fr.simulator']
       guide: typeof routes['marketing.fr.guide']
+      privacy: typeof routes['marketing.fr.privacy']
       about: typeof routes['marketing.fr.about']
     }
     contact: typeof routes['marketing.contact']
