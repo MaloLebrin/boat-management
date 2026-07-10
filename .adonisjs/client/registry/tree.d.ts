@@ -44,14 +44,50 @@ export interface ApiDefinition {
     assign: typeof routes['boats.assign']
     engines: {
       show: typeof routes['boats.engines.show']
+      photos: {
+        store: typeof routes['boats.engines.photos.store']
+        destroy: typeof routes['boats.engines.photos.destroy']
+      }
       parts: {
         show: typeof routes['boats.engines.parts.show']
+        photos: {
+          store: typeof routes['boats.engines.parts.photos.store']
+          destroy: typeof routes['boats.engines.parts.photos.destroy']
+        }
+      }
+    }
+    sails: {
+      show: typeof routes['boats.sails.show']
+      photos: {
+        store: typeof routes['boats.sails.photos.store']
+        destroy: typeof routes['boats.sails.photos.destroy']
+      }
+    }
+    rig: {
+      show: typeof routes['boats.rig.show']
+      photos: {
+        store: typeof routes['boats.rig.photos.store']
+        destroy: typeof routes['boats.rig.photos.destroy']
       }
     }
     maintenanceTasks: {
       store: typeof routes['boats.maintenanceTasks.store']
       done: typeof routes['boats.maintenanceTasks.done']
       destroy: typeof routes['boats.maintenanceTasks.destroy']
+    }
+    safetyEquipment: {
+      show: typeof routes['boats.safetyEquipment.show']
+      photos: {
+        store: typeof routes['boats.safetyEquipment.photos.store']
+        destroy: typeof routes['boats.safetyEquipment.photos.destroy']
+      }
+    }
+    genericEquipment: {
+      show: typeof routes['boats.genericEquipment.show']
+      photos: {
+        store: typeof routes['boats.genericEquipment.photos.store']
+        destroy: typeof routes['boats.genericEquipment.photos.destroy']
+      }
     }
     maintenanceSheets: {
       store: typeof routes['boats.maintenanceSheets.store']

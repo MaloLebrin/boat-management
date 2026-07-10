@@ -18,6 +18,7 @@ declare module '@adonisjs/inertia/types' {
     'boats/engine_edit': ExtractProps<(typeof import('../../inertia/pages/boats/engine_edit.vue'))['default']>
     'boats/engine_part_show': ExtractProps<(typeof import('../../inertia/pages/boats/engine_part_show.vue'))['default']>
     'boats/engine_show': ExtractProps<(typeof import('../../inertia/pages/boats/engine_show.vue'))['default']>
+    'boats/generic_equipment_show': ExtractProps<(typeof import('../../inertia/pages/boats/generic_equipment_show.vue'))['default']>
     'boats/index': ExtractProps<(typeof import('../../inertia/pages/boats/index.vue'))['default']>
     'boats/navigation': ExtractProps<(typeof import('../../inertia/pages/boats/navigation.vue'))['default']>
     'boats/new': ExtractProps<(typeof import('../../inertia/pages/boats/new.vue'))['default']>
@@ -25,7 +26,10 @@ declare module '@adonisjs/inertia/types' {
     'boats/reservation_inspection': ExtractProps<(typeof import('../../inertia/pages/boats/reservation_inspection.vue'))['default']>
     'boats/reservations': ExtractProps<(typeof import('../../inertia/pages/boats/reservations.vue'))['default']>
     'boats/rig_edit': ExtractProps<(typeof import('../../inertia/pages/boats/rig_edit.vue'))['default']>
+    'boats/rig_show': ExtractProps<(typeof import('../../inertia/pages/boats/rig_show.vue'))['default']>
+    'boats/safety_equipment_show': ExtractProps<(typeof import('../../inertia/pages/boats/safety_equipment_show.vue'))['default']>
     'boats/sail_edit': ExtractProps<(typeof import('../../inertia/pages/boats/sail_edit.vue'))['default']>
+    'boats/sail_show': ExtractProps<(typeof import('../../inertia/pages/boats/sail_show.vue'))['default']>
     'boats/show': ExtractProps<(typeof import('../../inertia/pages/boats/show.vue'))['default']>
     'boats/simulator': ExtractProps<(typeof import('../../inertia/pages/boats/simulator.vue'))['default']>
     'clients/index': ExtractProps<(typeof import('../../inertia/pages/clients/index.vue'))['default']>

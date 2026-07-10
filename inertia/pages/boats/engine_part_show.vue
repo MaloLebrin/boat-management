@@ -8,6 +8,7 @@ import BaseTabs from '~/components/base/BaseTabs.vue'
 import EnginePartModal from '~/components/engine/show/EnginePartModal.vue'
 import EnginePartShowTabDocuments from '~/components/engine/parts/show/tabs/EnginePartShowTabDocuments.vue'
 import EnginePartShowTabInfo from '~/components/engine/parts/show/tabs/EnginePartShowTabInfo.vue'
+import EnginePartShowTabPhotos from '~/components/engine/parts/show/tabs/EnginePartShowTabPhotos.vue'
 import { useT } from '~/composables/use_t'
 import type { BoatShowEnginePart } from '~/types/boat_show'
 
@@ -20,13 +21,14 @@ const props = defineProps<{
   canManage: boolean
 }>()
 
-type TabKey = 'info' | 'documents'
+type TabKey = 'info' | 'photos' | 'documents'
+const VALID_TABS: TabKey[] = ['info', 'photos', 'documents']
 const tab = ref<TabKey>('info')
 const isEditOpen = ref(false)
 
 onMounted(() => {
   const fromUrl = new URLSearchParams(window.location.search).get('tab') as TabKey | null
-  if (fromUrl && (fromUrl === 'info' || fromUrl === 'documents')) tab.value = fromUrl
+  if (fromUrl && VALID_TABS.includes(fromUrl)) tab.value = fromUrl
 })
 
 watch(tab, (newTab) => {
@@ -104,6 +106,11 @@ function wearStateVariant(state: string): 'success' | 'info' | 'warning' | 'neut
         :tabs="[
           { key: 'info', label: t('boats.engineShow.partShow.tabs.info') },
           {
+            key: 'photos',
+            label: t('boats.engineShow.partShow.tabs.photos'),
+            badge: String(part.photos.length || ''),
+          },
+          {
             key: 'documents',
             label: t('boats.engineShow.partShow.tabs.documents'),
             badge: String(part.documents.length || ''),
@@ -115,6 +122,13 @@ function wearStateVariant(state: string): 'success' | 'info' | 'warning' | 'neut
     <Transition name="tab" mode="out-in">
       <div :key="tab" class="mt-8">
         <EnginePartShowTabInfo v-if="tab === 'info'" :part="part" />
+        <EnginePartShowTabPhotos
+          v-else-if="tab === 'photos'"
+          :boat="boat"
+          :engine="engine"
+          :part="part"
+          :can-manage="canManage"
+        />
         <EnginePartShowTabDocuments
           v-else-if="tab === 'documents'"
           :boat="boat"

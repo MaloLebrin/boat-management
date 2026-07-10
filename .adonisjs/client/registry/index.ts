@@ -228,6 +228,18 @@ const routes = {
     tokens: [{"old":"/boats/:boatId/engines/:engineId/media/:mediaId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/engines/:engineId/media/:mediaId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/engines/:engineId/media/:mediaId","type":0,"val":"engines","end":""},{"old":"/boats/:boatId/engines/:engineId/media/:mediaId","type":1,"val":"engineId","end":""},{"old":"/boats/:boatId/engines/:engineId/media/:mediaId","type":0,"val":"media","end":""},{"old":"/boats/:boatId/engines/:engineId/media/:mediaId","type":1,"val":"mediaId","end":""}],
     types: placeholder as Registry['boat_media.destroy_engine_media']['types'],
   },
+  'boats.engines.photos.store': {
+    methods: ["POST"],
+    pattern: '/boats/:boatId/engines/:engineId/photos',
+    tokens: [{"old":"/boats/:boatId/engines/:engineId/photos","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/engines/:engineId/photos","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/engines/:engineId/photos","type":0,"val":"engines","end":""},{"old":"/boats/:boatId/engines/:engineId/photos","type":1,"val":"engineId","end":""},{"old":"/boats/:boatId/engines/:engineId/photos","type":0,"val":"photos","end":""}],
+    types: placeholder as Registry['boats.engines.photos.store']['types'],
+  },
+  'boats.engines.photos.destroy': {
+    methods: ["DELETE"],
+    pattern: '/boats/:boatId/engines/:engineId/photos/:mediaId',
+    tokens: [{"old":"/boats/:boatId/engines/:engineId/photos/:mediaId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/engines/:engineId/photos/:mediaId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/engines/:engineId/photos/:mediaId","type":0,"val":"engines","end":""},{"old":"/boats/:boatId/engines/:engineId/photos/:mediaId","type":1,"val":"engineId","end":""},{"old":"/boats/:boatId/engines/:engineId/photos/:mediaId","type":0,"val":"photos","end":""},{"old":"/boats/:boatId/engines/:engineId/photos/:mediaId","type":1,"val":"mediaId","end":""}],
+    types: placeholder as Registry['boats.engines.photos.destroy']['types'],
+  },
   'boat_engine_parts.store': {
     methods: ["POST"],
     pattern: '/boats/:boatId/engines/:engineId/parts',
@@ -270,6 +282,18 @@ const routes = {
     tokens: [{"old":"/boats/:boatId/engines/:engineId/parts/:partId/media/:mediaId/download","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/engines/:engineId/parts/:partId/media/:mediaId/download","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/engines/:engineId/parts/:partId/media/:mediaId/download","type":0,"val":"engines","end":""},{"old":"/boats/:boatId/engines/:engineId/parts/:partId/media/:mediaId/download","type":1,"val":"engineId","end":""},{"old":"/boats/:boatId/engines/:engineId/parts/:partId/media/:mediaId/download","type":0,"val":"parts","end":""},{"old":"/boats/:boatId/engines/:engineId/parts/:partId/media/:mediaId/download","type":1,"val":"partId","end":""},{"old":"/boats/:boatId/engines/:engineId/parts/:partId/media/:mediaId/download","type":0,"val":"media","end":""},{"old":"/boats/:boatId/engines/:engineId/parts/:partId/media/:mediaId/download","type":1,"val":"mediaId","end":""},{"old":"/boats/:boatId/engines/:engineId/parts/:partId/media/:mediaId/download","type":0,"val":"download","end":""}],
     types: placeholder as Registry['boat_engine_parts.download_media']['types'],
   },
+  'boats.engines.parts.photos.store': {
+    methods: ["POST"],
+    pattern: '/boats/:boatId/engines/:engineId/parts/:partId/photos',
+    tokens: [{"old":"/boats/:boatId/engines/:engineId/parts/:partId/photos","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/engines/:engineId/parts/:partId/photos","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/engines/:engineId/parts/:partId/photos","type":0,"val":"engines","end":""},{"old":"/boats/:boatId/engines/:engineId/parts/:partId/photos","type":1,"val":"engineId","end":""},{"old":"/boats/:boatId/engines/:engineId/parts/:partId/photos","type":0,"val":"parts","end":""},{"old":"/boats/:boatId/engines/:engineId/parts/:partId/photos","type":1,"val":"partId","end":""},{"old":"/boats/:boatId/engines/:engineId/parts/:partId/photos","type":0,"val":"photos","end":""}],
+    types: placeholder as Registry['boats.engines.parts.photos.store']['types'],
+  },
+  'boats.engines.parts.photos.destroy': {
+    methods: ["DELETE"],
+    pattern: '/boats/:boatId/engines/:engineId/parts/:partId/photos/:mediaId',
+    tokens: [{"old":"/boats/:boatId/engines/:engineId/parts/:partId/photos/:mediaId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/engines/:engineId/parts/:partId/photos/:mediaId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/engines/:engineId/parts/:partId/photos/:mediaId","type":0,"val":"engines","end":""},{"old":"/boats/:boatId/engines/:engineId/parts/:partId/photos/:mediaId","type":1,"val":"engineId","end":""},{"old":"/boats/:boatId/engines/:engineId/parts/:partId/photos/:mediaId","type":0,"val":"parts","end":""},{"old":"/boats/:boatId/engines/:engineId/parts/:partId/photos/:mediaId","type":1,"val":"partId","end":""},{"old":"/boats/:boatId/engines/:engineId/parts/:partId/photos/:mediaId","type":0,"val":"photos","end":""},{"old":"/boats/:boatId/engines/:engineId/parts/:partId/photos/:mediaId","type":1,"val":"mediaId","end":""}],
+    types: placeholder as Registry['boats.engines.parts.photos.destroy']['types'],
+  },
   'boat_media.download_media': {
     methods: ["GET","HEAD"],
     pattern: '/boats/:boatId/media/:mediaId/download',
@@ -294,6 +318,12 @@ const routes = {
     tokens: [{"old":"/boats/:boatId/sails/:sailId/edit","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/sails/:sailId/edit","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/sails/:sailId/edit","type":0,"val":"sails","end":""},{"old":"/boats/:boatId/sails/:sailId/edit","type":1,"val":"sailId","end":""},{"old":"/boats/:boatId/sails/:sailId/edit","type":0,"val":"edit","end":""}],
     types: placeholder as Registry['boat_equipment.edit_sail']['types'],
   },
+  'boats.sails.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/boats/:boatId/sails/:sailId',
+    tokens: [{"old":"/boats/:boatId/sails/:sailId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/sails/:sailId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/sails/:sailId","type":0,"val":"sails","end":""},{"old":"/boats/:boatId/sails/:sailId","type":1,"val":"sailId","end":""}],
+    types: placeholder as Registry['boats.sails.show']['types'],
+  },
   'boat_equipment.update_sail': {
     methods: ["PUT"],
     pattern: '/boats/:boatId/sails/:sailId',
@@ -306,11 +336,29 @@ const routes = {
     tokens: [{"old":"/boats/:boatId/sails/:sailId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/sails/:sailId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/sails/:sailId","type":0,"val":"sails","end":""},{"old":"/boats/:boatId/sails/:sailId","type":1,"val":"sailId","end":""}],
     types: placeholder as Registry['boat_equipment.destroy_sail']['types'],
   },
+  'boats.sails.photos.store': {
+    methods: ["POST"],
+    pattern: '/boats/:boatId/sails/:sailId/photos',
+    tokens: [{"old":"/boats/:boatId/sails/:sailId/photos","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/sails/:sailId/photos","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/sails/:sailId/photos","type":0,"val":"sails","end":""},{"old":"/boats/:boatId/sails/:sailId/photos","type":1,"val":"sailId","end":""},{"old":"/boats/:boatId/sails/:sailId/photos","type":0,"val":"photos","end":""}],
+    types: placeholder as Registry['boats.sails.photos.store']['types'],
+  },
+  'boats.sails.photos.destroy': {
+    methods: ["DELETE"],
+    pattern: '/boats/:boatId/sails/:sailId/photos/:mediaId',
+    tokens: [{"old":"/boats/:boatId/sails/:sailId/photos/:mediaId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/sails/:sailId/photos/:mediaId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/sails/:sailId/photos/:mediaId","type":0,"val":"sails","end":""},{"old":"/boats/:boatId/sails/:sailId/photos/:mediaId","type":1,"val":"sailId","end":""},{"old":"/boats/:boatId/sails/:sailId/photos/:mediaId","type":0,"val":"photos","end":""},{"old":"/boats/:boatId/sails/:sailId/photos/:mediaId","type":1,"val":"mediaId","end":""}],
+    types: placeholder as Registry['boats.sails.photos.destroy']['types'],
+  },
   'boat_equipment.edit_rig': {
     methods: ["GET","HEAD"],
     pattern: '/boats/:boatId/rig/edit',
     tokens: [{"old":"/boats/:boatId/rig/edit","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/rig/edit","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/rig/edit","type":0,"val":"rig","end":""},{"old":"/boats/:boatId/rig/edit","type":0,"val":"edit","end":""}],
     types: placeholder as Registry['boat_equipment.edit_rig']['types'],
+  },
+  'boats.rig.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/boats/:boatId/rig',
+    tokens: [{"old":"/boats/:boatId/rig","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/rig","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/rig","type":0,"val":"rig","end":""}],
+    types: placeholder as Registry['boats.rig.show']['types'],
   },
   'boat_equipment.upsert_rig': {
     methods: ["PUT"],
@@ -323,6 +371,18 @@ const routes = {
     pattern: '/boats/:boatId/rig',
     tokens: [{"old":"/boats/:boatId/rig","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/rig","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/rig","type":0,"val":"rig","end":""}],
     types: placeholder as Registry['boat_equipment.destroy_rig']['types'],
+  },
+  'boats.rig.photos.store': {
+    methods: ["POST"],
+    pattern: '/boats/:boatId/rig/photos',
+    tokens: [{"old":"/boats/:boatId/rig/photos","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/rig/photos","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/rig/photos","type":0,"val":"rig","end":""},{"old":"/boats/:boatId/rig/photos","type":0,"val":"photos","end":""}],
+    types: placeholder as Registry['boats.rig.photos.store']['types'],
+  },
+  'boats.rig.photos.destroy': {
+    methods: ["DELETE"],
+    pattern: '/boats/:boatId/rig/photos/:mediaId',
+    tokens: [{"old":"/boats/:boatId/rig/photos/:mediaId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/rig/photos/:mediaId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/rig/photos/:mediaId","type":0,"val":"rig","end":""},{"old":"/boats/:boatId/rig/photos/:mediaId","type":0,"val":"photos","end":""},{"old":"/boats/:boatId/rig/photos/:mediaId","type":1,"val":"mediaId","end":""}],
+    types: placeholder as Registry['boats.rig.photos.destroy']['types'],
   },
   'boat_maintenances.store': {
     methods: ["POST"],
@@ -378,6 +438,12 @@ const routes = {
     tokens: [{"old":"/boats/:boatId/safety-equipment","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/safety-equipment","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/safety-equipment","type":0,"val":"safety-equipment","end":""}],
     types: placeholder as Registry['boat_safety_equipment.store']['types'],
   },
+  'boats.safetyEquipment.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/boats/:boatId/safety-equipment/:itemId',
+    tokens: [{"old":"/boats/:boatId/safety-equipment/:itemId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/safety-equipment/:itemId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/safety-equipment/:itemId","type":0,"val":"safety-equipment","end":""},{"old":"/boats/:boatId/safety-equipment/:itemId","type":1,"val":"itemId","end":""}],
+    types: placeholder as Registry['boats.safetyEquipment.show']['types'],
+  },
   'boat_safety_equipment.update': {
     methods: ["PUT"],
     pattern: '/boats/:boatId/safety-equipment/:itemId',
@@ -390,11 +456,29 @@ const routes = {
     tokens: [{"old":"/boats/:boatId/safety-equipment/:itemId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/safety-equipment/:itemId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/safety-equipment/:itemId","type":0,"val":"safety-equipment","end":""},{"old":"/boats/:boatId/safety-equipment/:itemId","type":1,"val":"itemId","end":""}],
     types: placeholder as Registry['boat_safety_equipment.destroy']['types'],
   },
+  'boats.safetyEquipment.photos.store': {
+    methods: ["POST"],
+    pattern: '/boats/:boatId/safety-equipment/:safetyId/photos',
+    tokens: [{"old":"/boats/:boatId/safety-equipment/:safetyId/photos","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/safety-equipment/:safetyId/photos","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/safety-equipment/:safetyId/photos","type":0,"val":"safety-equipment","end":""},{"old":"/boats/:boatId/safety-equipment/:safetyId/photos","type":1,"val":"safetyId","end":""},{"old":"/boats/:boatId/safety-equipment/:safetyId/photos","type":0,"val":"photos","end":""}],
+    types: placeholder as Registry['boats.safetyEquipment.photos.store']['types'],
+  },
+  'boats.safetyEquipment.photos.destroy': {
+    methods: ["DELETE"],
+    pattern: '/boats/:boatId/safety-equipment/:safetyId/photos/:mediaId',
+    tokens: [{"old":"/boats/:boatId/safety-equipment/:safetyId/photos/:mediaId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/safety-equipment/:safetyId/photos/:mediaId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/safety-equipment/:safetyId/photos/:mediaId","type":0,"val":"safety-equipment","end":""},{"old":"/boats/:boatId/safety-equipment/:safetyId/photos/:mediaId","type":1,"val":"safetyId","end":""},{"old":"/boats/:boatId/safety-equipment/:safetyId/photos/:mediaId","type":0,"val":"photos","end":""},{"old":"/boats/:boatId/safety-equipment/:safetyId/photos/:mediaId","type":1,"val":"mediaId","end":""}],
+    types: placeholder as Registry['boats.safetyEquipment.photos.destroy']['types'],
+  },
   'boat_generic_equipment.store': {
     methods: ["POST"],
     pattern: '/boats/:boatId/generic-equipment',
     tokens: [{"old":"/boats/:boatId/generic-equipment","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/generic-equipment","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/generic-equipment","type":0,"val":"generic-equipment","end":""}],
     types: placeholder as Registry['boat_generic_equipment.store']['types'],
+  },
+  'boats.genericEquipment.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/boats/:boatId/generic-equipment/:itemId',
+    tokens: [{"old":"/boats/:boatId/generic-equipment/:itemId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/generic-equipment/:itemId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/generic-equipment/:itemId","type":0,"val":"generic-equipment","end":""},{"old":"/boats/:boatId/generic-equipment/:itemId","type":1,"val":"itemId","end":""}],
+    types: placeholder as Registry['boats.genericEquipment.show']['types'],
   },
   'boat_generic_equipment.update': {
     methods: ["PUT"],
@@ -407,6 +491,18 @@ const routes = {
     pattern: '/boats/:boatId/generic-equipment/:itemId',
     tokens: [{"old":"/boats/:boatId/generic-equipment/:itemId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/generic-equipment/:itemId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/generic-equipment/:itemId","type":0,"val":"generic-equipment","end":""},{"old":"/boats/:boatId/generic-equipment/:itemId","type":1,"val":"itemId","end":""}],
     types: placeholder as Registry['boat_generic_equipment.destroy']['types'],
+  },
+  'boats.genericEquipment.photos.store': {
+    methods: ["POST"],
+    pattern: '/boats/:boatId/generic-equipment/:genericId/photos',
+    tokens: [{"old":"/boats/:boatId/generic-equipment/:genericId/photos","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/generic-equipment/:genericId/photos","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/generic-equipment/:genericId/photos","type":0,"val":"generic-equipment","end":""},{"old":"/boats/:boatId/generic-equipment/:genericId/photos","type":1,"val":"genericId","end":""},{"old":"/boats/:boatId/generic-equipment/:genericId/photos","type":0,"val":"photos","end":""}],
+    types: placeholder as Registry['boats.genericEquipment.photos.store']['types'],
+  },
+  'boats.genericEquipment.photos.destroy': {
+    methods: ["DELETE"],
+    pattern: '/boats/:boatId/generic-equipment/:genericId/photos/:mediaId',
+    tokens: [{"old":"/boats/:boatId/generic-equipment/:genericId/photos/:mediaId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/generic-equipment/:genericId/photos/:mediaId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/generic-equipment/:genericId/photos/:mediaId","type":0,"val":"generic-equipment","end":""},{"old":"/boats/:boatId/generic-equipment/:genericId/photos/:mediaId","type":1,"val":"genericId","end":""},{"old":"/boats/:boatId/generic-equipment/:genericId/photos/:mediaId","type":0,"val":"photos","end":""},{"old":"/boats/:boatId/generic-equipment/:genericId/photos/:mediaId","type":1,"val":"mediaId","end":""}],
+    types: placeholder as Registry['boats.genericEquipment.photos.destroy']['types'],
   },
   'boats.maintenanceSheets.store': {
     methods: ["POST"],

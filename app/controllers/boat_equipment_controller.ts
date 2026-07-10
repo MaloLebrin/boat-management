@@ -1,4 +1,5 @@
 import BoatPolicy from '#policies/boat_policy'
+import { toMediaRow } from '#transformers/media_row_transformer'
 import BoatEquipmentService, { BoatEquipmentNotFoundError } from '#services/boat_equipment_service'
 import { EngineHoursRegressionError } from '#exceptions/boat_errors'
 import BoatEnginePartService from '#services/boat_engine_part_service'
@@ -205,6 +206,71 @@ export default class BoatEquipmentController {
     })
   }
 
+  async showSail({ inertia, response, auth, params, bouncer, session, i18n }: HttpContext) {
+    await auth.authenticate()
+    const loaded = await this.loadBoatForEquipment({ auth, response, params })
+    if (!loaded) return
+
+    const { boat } = loaded
+    const sail = boat.sails.find((s) => s.id === Number(params.sailId))
+    if (!sail) {
+      session.flash('error', i18n.t('flash.sail.notFound'))
+      response.redirect(`/boats/${boat.id}`)
+      return
+    }
+
+    const canManage = await bouncer.with(BoatPolicy).allows('edit', boat)
+    const media = await this.mediaService.listForEntity('boat_sail', sail.id)
+
+    return inertia.render('boats/sail_show', {
+      boat: { id: boat.id, name: boat.name },
+      sail: {
+        id: sail.id,
+        sailType: sail.sailType,
+        manufacturedAt: sail.manufacturedAt ? sail.manufacturedAt.toISODate() : null,
+        areaM2: sail.areaM2,
+        material: sail.material,
+        reefPoints: sail.reefPoints,
+        status: sail.status,
+        notes: sail.notes,
+        photos: media.filter((m) => m.kind === 'photo').map(toMediaRow),
+      },
+      canManage,
+    })
+  }
+
+  async showRig({ inertia, response, auth, params, bouncer, session, i18n }: HttpContext) {
+    await auth.authenticate()
+    const loaded = await this.loadBoatForEquipment({ auth, response, params })
+    if (!loaded) return
+
+    const { boat } = loaded
+    const rig = boat.rig
+    if (!rig) {
+      session.flash('error', i18n.t('flash.rig.notFound'))
+      response.redirect(`/boats/${boat.id}`)
+      return
+    }
+
+    const canManage = await bouncer.with(BoatPolicy).allows('edit', boat)
+    const media = await this.mediaService.listForEntity('boat_rig', rig.id)
+
+    return inertia.render('boats/rig_show', {
+      boat: { id: boat.id, name: boat.name },
+      rig: {
+        id: rig.id,
+        rigType: rig.rigType,
+        manufacturedAt: rig.manufacturedAt ? rig.manufacturedAt.toISODate() : null,
+        mastCount: rig.mastCount,
+        spreaders: rig.spreaders,
+        status: rig.status,
+        notes: rig.notes,
+        photos: media.filter((m) => m.kind === 'photo').map(toMediaRow),
+      },
+      canManage,
+    })
+  }
+
   async updateSail({ request, response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
     const loaded = await this.loadBoatForEquipment({ auth, response, params })
@@ -243,8 +309,10 @@ export default class BoatEquipmentController {
     const { boat } = loaded
     await bouncer.with(BoatPolicy).authorize('edit', boat)
 
+    const org = await this.organizationService.findOrFail(boat.organizationId)
+
     try {
-      await this.equipmentService.deleteSail(loaded.user, boat, Number(params.sailId))
+      await this.equipmentService.deleteSail(loaded.user, boat, Number(params.sailId), org)
     } catch (error) {
       if (error instanceof BoatEquipmentNotFoundError) {
         session.flash('error', i18n.t('flash.sail.notFound'))
@@ -305,7 +373,8 @@ export default class BoatEquipmentController {
     const { boat } = loaded
     await bouncer.with(BoatPolicy).authorize('edit', boat)
 
-    await this.equipmentService.deleteRig(loaded.user, boat)
+    const org = await this.organizationService.findOrFail(boat.organizationId)
+    await this.equipmentService.deleteRig(loaded.user, boat, org)
 
     session.flash('success', i18n.t('flash.rig.removed'))
     response.redirect(`/boats/${boat.id}`)
@@ -326,7 +395,7 @@ export default class BoatEquipmentController {
 
     const canManage = await bouncer.with(BoatPolicy).allows('edit', boat)
 
-    const [maintenanceEvents, maintenanceTasks, engineDocuments, engineParts] = await Promise.all([
+    const [maintenanceEvents, maintenanceTasks, engineMedia, engineParts] = await Promise.all([
       this.maintenanceService.listEventsForEngine(boat.id, engineId),
       this.taskService.listForEngine(boat.id, engineId),
       this.mediaService.listForEntity('boat_engine', engineId),
@@ -349,18 +418,8 @@ export default class BoatEquipmentController {
         installHours: engine.installHours,
         status: engine.status,
         notes: engine.notes,
-        documents: engineDocuments.map((m) => ({
-          id: m.id,
-          kind: m.kind,
-          secureUrl: m.secureUrl,
-          originalFilename: m.originalFilename,
-          format: m.format,
-          bytes: m.bytes,
-          width: m.width,
-          height: m.height,
-          position: m.position,
-          caption: m.caption,
-        })),
+        documents: engineMedia.filter((m) => m.kind === 'document').map(toMediaRow),
+        photos: engineMedia.filter((m) => m.kind === 'photo').map(toMediaRow),
         parts: engineParts.map((p) => ({
           id: p.id,
           designation: p.designation,
@@ -370,6 +429,7 @@ export default class BoatEquipmentController {
           notes: p.notes,
           wearState: p.wearState,
           documents: [],
+          photos: [],
           purchasePrice: p.purchasePrice ? Number.parseFloat(p.purchasePrice) : null,
           purchasedAt: p.purchasedAt ? p.purchasedAt.toISODate() : null,
         })),

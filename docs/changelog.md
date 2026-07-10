@@ -3,6 +3,17 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-07-10 — Photos sur les six types d'équipement
+
+Seuls les bateaux et les inspections avaient des photos. Les équipements n'avaient que des documents (PDF), et uniquement les moteurs et les pièces moteur.
+
+- **Routes** : `POST`/`DELETE` `/boats/:boatId/engines/:engineId/photos[/:mediaId]`, `.../parts/:partId/photos`, `/sails/:sailId/photos`, `/rig/photos`, `/generic-equipment/:genericId/photos`, `/safety-equipment/:safetyId/photos`. Nouvelles pages détail : `GET /boats/:boatId/sails/:sailId`, `/rig`, `/generic-equipment/:itemId`, `/safety-equipment/:itemId`.
+- **Résolveur** (`app/services/equipment_media_service.ts`) : plutôt que 12 méthodes de contrôleur quasi identiques, toute la connaissance par-entité (type d'entité, dossier Cloudinary, vérification de propriété, URL de redirection) vit dans un service, consommé par un `BoatEquipmentMediaController` fin à deux méthodes (`store`, `destroy`). Le slug est inféré des params de route, jamais de l'entrée utilisateur. Types dans `shared/types/equipment_media.ts`.
+- **Sécurité** : chaque branche du résolveur reproduit la vérification de propriété org → bateau → équipement ; `getForEntity` sert de seconde couche IDOR à la suppression. Couvert par 27 tests fonctionnels (upload, suppression, IDOR par entité, non authentifié).
+- **Frontend** : pages `sail_show`, `rig_show`, `generic_equipment_show`, `safety_equipment_show` (onglets `info | photos`), onglet « Photos » ajouté à `engine_show` et `engine_part_show`, liens « voir le détail » sur les cartes. Tous réutilisent `MediaPhotoGallery.vue`.
+- **Fuite Cloudinary corrigée** : `deleteAllForEntity` sur une pièce moteur ne purgeait que le sous-dossier `documents/` — bascule sur le dossier parent `parts/:partId` (3 appelants : `boat_engine_part_service`, `boat_engine_service`, `boat_hull_service`). Ajout du nettoyage média manquant sur la suppression d'une voile, du gréement, d'un équipement générique ou de sécurité, ainsi que sur la suppression d'un bateau (générique + sécurité).
+- **i18n** : `boats.json` (`sailShow`, `rigShow`, `genericEquipmentShow`, `safetyEquipmentShow`, `viewDetail`, onglets `photos`) et `flash.rig.notFound`, en FR et EN.
+
 ## 2026-07-10 — Marketing : correctifs animations (ticker hero, scroll-reveal)
 
 Deux correctifs sur la couche d'animations « Stripe-like » de la home :

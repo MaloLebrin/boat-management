@@ -52,10 +52,13 @@ function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutra
 
     <div v-if="!rig" class="text-sm text-fg-muted">{{ t('boats.rig.noRig') }}</div>
     <template v-else>
-      <div class="mb-3">
+      <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
         <BaseBadge :variant="statusVariant(rig.status)">
           {{ t(`equipment.status.${rig.status}`) }}
         </BaseBadge>
+        <BaseButton variant="ghost" size="sm" route="boats.rig.show" :params="{ boatId }">
+          {{ t('boats.rig.viewDetail') }}
+        </BaseButton>
       </div>
       <dl class="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
         <div>

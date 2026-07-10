@@ -86,7 +86,8 @@
       "title": "Add sail",
       "cancel": "Cancel",
       "submit": "Add sail"
-    }
+    },
+    "viewDetail": "View details"
   },
   "rig": {
     "title": "Rig",
@@ -98,7 +99,8 @@
       "mastCount": "Mast count",
       "spreaders": "Spreaders",
       "manufacturedAt": "Manufacturing date"
-    }
+    },
+    "viewDetail": "View details"
   },
   "options": {
     "propulsion": {
@@ -368,7 +370,8 @@
       "cancel": "Cancel",
       "submit": "Save"
     },
-    "confirmDelete": "Delete this item?"
+    "confirmDelete": "Delete this item?",
+    "viewDetail": "View details"
   },
   "list": {
     "search": "Search",
@@ -414,7 +417,8 @@
       "maintenance": "Maintenance",
       "notes": "Notes",
       "parts": "Parts",
-      "documents": "Documents"
+      "documents": "Documents",
+      "photos": "Photos"
     },
     "actions": {
       "edit": "Edit",
@@ -505,7 +509,8 @@
     "partShow": {
       "tabs": {
         "info": "Information",
-        "documents": "Documents"
+        "documents": "Documents",
+        "photos": "Photos"
       },
       "info": {
         "designation": "Designation",
@@ -807,6 +812,61 @@
       "editTitle": "Edit equipment",
       "cancel": "Cancel",
       "submit": "Save"
+    },
+    "viewDetail": "View details"
+  },
+  "sailShow": {
+    "title": "Sail",
+    "back": "Equipment",
+    "edit": "Edit",
+    "tabs": {
+      "info": "Information",
+      "photos": "Photos"
+    },
+    "fields": {
+      "sailType": "Sail type",
+      "areaM2": "Area (m²)",
+      "material": "Material",
+      "reefPoints": "Reef points",
+      "manufacturedAt": "Manufactured on"
+    }
+  },
+  "rigShow": {
+    "title": "Rig",
+    "back": "Equipment",
+    "edit": "Edit",
+    "tabs": {
+      "info": "Information",
+      "photos": "Photos"
+    },
+    "fields": {
+      "rigType": "Rig type",
+      "mastCount": "Mast count",
+      "spreaders": "Spreaders",
+      "manufacturedAt": "Manufactured on"
+    }
+  },
+  "genericEquipmentShow": {
+    "back": "Equipment",
+    "tabs": {
+      "info": "Information",
+      "photos": "Photos"
+    },
+    "fields": {
+      "category": "Category",
+      "brand": "Brand",
+      "model": "Model"
+    }
+  },
+  "safetyEquipmentShow": {
+    "back": "Safety",
+    "tabs": {
+      "info": "Information",
+      "photos": "Photos"
+    },
+    "fields": {
+      "equipmentType": "Equipment type",
+      "expiryDate": "Expiry date"
     }
   }
 }

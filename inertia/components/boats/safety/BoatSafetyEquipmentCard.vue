@@ -114,6 +114,14 @@ function closeEdit() {
 
           <div class="flex flex-wrap items-center gap-2 md:justify-end">
             <BaseButton
+              variant="ghost"
+              size="sm"
+              route="boats.safetyEquipment.show"
+              :params="{ boatId, itemId: item.id }"
+            >
+              {{ t('boats.safetyEquipment.viewDetail') }}
+            </BaseButton>
+            <BaseButton
               v-if="canManageActions && item.status !== 'ok'"
               variant="secondary"
               size="sm"

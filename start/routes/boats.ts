@@ -10,6 +10,7 @@ const BoatPortStayController = () => import('#controllers/boat_port_stay_control
 const BoatBudgetEntryController = () => import('#controllers/boat_budget_entry_controller')
 const BoatReservationsController = () => import('#controllers/boat_reservations_controller')
 const BoatPricingController = () => import('#controllers/boat_pricing_controller')
+const BoatEquipmentMediaController = () => import('#controllers/boat_equipment_media_controller')
 
 router
   .group(() => {
@@ -85,6 +86,16 @@ router
       'destroyEngineMedia',
     ])
 
+    router
+      .post('boats/:boatId/engines/:engineId/photos', [BoatEquipmentMediaController, 'store'])
+      .as('boats.engines.photos.store')
+    router
+      .delete('boats/:boatId/engines/:engineId/photos/:mediaId', [
+        BoatEquipmentMediaController,
+        'destroy',
+      ])
+      .as('boats.engines.photos.destroy')
+
     router.post('boats/:boatId/engines/:engineId/parts', [controllers.BoatEngineParts, 'store'])
     router
       .get('boats/:boatId/engines/:engineId/parts/:partId', [controllers.BoatEngineParts, 'show'])
@@ -110,6 +121,19 @@ router
       'downloadMedia',
     ])
 
+    router
+      .post('boats/:boatId/engines/:engineId/parts/:partId/photos', [
+        BoatEquipmentMediaController,
+        'store',
+      ])
+      .as('boats.engines.parts.photos.store')
+    router
+      .delete('boats/:boatId/engines/:engineId/parts/:partId/photos/:mediaId', [
+        BoatEquipmentMediaController,
+        'destroy',
+      ])
+      .as('boats.engines.parts.photos.destroy')
+
     router.get('boats/:boatId/media/:mediaId/download', [controllers.BoatMedia, 'downloadMedia'])
     router.get('boats/:boatId/engines/:engineId/media/:mediaId/download', [
       controllers.BoatMedia,
@@ -118,12 +142,33 @@ router
 
     router.post('boats/:boatId/sails', [controllers.BoatEquipment, 'storeSail'])
     router.get('boats/:boatId/sails/:sailId/edit', [controllers.BoatEquipment, 'editSail'])
+    router
+      .get('boats/:boatId/sails/:sailId', [controllers.BoatEquipment, 'showSail'])
+      .as('boats.sails.show')
     router.put('boats/:boatId/sails/:sailId', [controllers.BoatEquipment, 'updateSail'])
     router.delete('boats/:boatId/sails/:sailId', [controllers.BoatEquipment, 'destroySail'])
 
+    router
+      .post('boats/:boatId/sails/:sailId/photos', [BoatEquipmentMediaController, 'store'])
+      .as('boats.sails.photos.store')
+    router
+      .delete('boats/:boatId/sails/:sailId/photos/:mediaId', [
+        BoatEquipmentMediaController,
+        'destroy',
+      ])
+      .as('boats.sails.photos.destroy')
+
     router.get('boats/:boatId/rig/edit', [controllers.BoatEquipment, 'editRig'])
+    router.get('boats/:boatId/rig', [controllers.BoatEquipment, 'showRig']).as('boats.rig.show')
     router.put('boats/:boatId/rig', [controllers.BoatEquipment, 'upsertRig'])
     router.delete('boats/:boatId/rig', [controllers.BoatEquipment, 'destroyRig'])
+
+    router
+      .post('boats/:boatId/rig/photos', [BoatEquipmentMediaController, 'store'])
+      .as('boats.rig.photos.store')
+    router
+      .delete('boats/:boatId/rig/photos/:mediaId', [BoatEquipmentMediaController, 'destroy'])
+      .as('boats.rig.photos.destroy')
 
     router.post('boats/:boatId/maintenance', [controllers.BoatMaintenances, 'store'])
     router.delete('boats/:boatId/maintenance/:eventId', [controllers.BoatMaintenances, 'destroy'])
@@ -149,6 +194,9 @@ router
     router.delete('boats/:boatId/media/:mediaId', [controllers.BoatMedia, 'destroy'])
 
     router.post('boats/:boatId/safety-equipment', [controllers.BoatSafetyEquipment, 'store'])
+    router
+      .get('boats/:boatId/safety-equipment/:itemId', [controllers.BoatSafetyEquipment, 'show'])
+      .as('boats.safetyEquipment.show')
     router.put('boats/:boatId/safety-equipment/:itemId', [
       controllers.BoatSafetyEquipment,
       'update',
@@ -158,7 +206,23 @@ router
       'destroy',
     ])
 
+    router
+      .post('boats/:boatId/safety-equipment/:safetyId/photos', [
+        BoatEquipmentMediaController,
+        'store',
+      ])
+      .as('boats.safetyEquipment.photos.store')
+    router
+      .delete('boats/:boatId/safety-equipment/:safetyId/photos/:mediaId', [
+        BoatEquipmentMediaController,
+        'destroy',
+      ])
+      .as('boats.safetyEquipment.photos.destroy')
+
     router.post('boats/:boatId/generic-equipment', [controllers.BoatGenericEquipment, 'store'])
+    router
+      .get('boats/:boatId/generic-equipment/:itemId', [controllers.BoatGenericEquipment, 'show'])
+      .as('boats.genericEquipment.show')
     router.put('boats/:boatId/generic-equipment/:itemId', [
       controllers.BoatGenericEquipment,
       'update',
@@ -167,6 +231,19 @@ router
       controllers.BoatGenericEquipment,
       'destroy',
     ])
+
+    router
+      .post('boats/:boatId/generic-equipment/:genericId/photos', [
+        BoatEquipmentMediaController,
+        'store',
+      ])
+      .as('boats.genericEquipment.photos.store')
+    router
+      .delete('boats/:boatId/generic-equipment/:genericId/photos/:mediaId', [
+        BoatEquipmentMediaController,
+        'destroy',
+      ])
+      .as('boats.genericEquipment.photos.destroy')
 
     router
       .post('boats/:boatId/maintenance-sheets', [controllers.BoatMaintenanceSheets, 'store'])

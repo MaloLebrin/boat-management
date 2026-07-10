@@ -53,6 +53,20 @@ Référence: `inertia/app.ts`.
 - sails: `inertia/pages/boats/sail_edit.vue` (PUT `/boats/:boatId/sails/:sailId`)
 - rig: `inertia/pages/boats/rig_edit.vue` (PUT `/boats/:boatId/rig`)
 
+### Equipment detail pages (onglets `info | photos`)
+
+Chaque page charge ses photos via `mediaService.listForEntity(<entityType>, id)` et rend
+`MediaPhotoGallery` dans l'onglet `photos` (`?tab=photos` synchronisé dans l'URL).
+
+- engines: `inertia/pages/boats/engine_show.vue` (onglets `overview | specs | maintenance | notes | parts | photos | documents`)
+- engine parts: `inertia/pages/boats/engine_part_show.vue` (`info | photos | documents`)
+- sails: `inertia/pages/boats/sail_show.vue` (GET `/boats/:boatId/sails/:sailId`)
+- rig: `inertia/pages/boats/rig_show.vue` (GET `/boats/:boatId/rig`, singleton)
+- generic: `inertia/pages/boats/generic_equipment_show.vue` (GET `/boats/:boatId/generic-equipment/:itemId`)
+- safety: `inertia/pages/boats/safety_equipment_show.vue` (GET `/boats/:boatId/safety-equipment/:itemId`)
+
+Les cartes de l'onglet Équipement exposent un lien « voir le détail » vers ces pages.
+
 ### Budget
 
 - Page: `inertia/pages/boats/budget.vue` (GET `/boats/:id/budget?year=`)
@@ -84,7 +98,9 @@ Référence: `inertia/app.ts`.
 (`uploadUrl`, `deleteUrlFor`, `photos`, `canUpload`, `canDelete`). Upload via `useForm` +
 `form.post(..., { forceFormData: true })`, suppression via `router.delete`. i18n : `media.photos.*`.
 
-Consommateurs : `InspectionPhotos.vue` (wrapper fin).
+Consommateurs : `InspectionPhotos.vue` (wrapper fin), et les onglets « Photos » des six équipements —
+`EngineShowTabPhotos`, `EnginePartShowTabPhotos`, `SailShowTabPhotos`, `RigShowTabPhotos`,
+`GenericShowTabPhotos`, `SafetyShowTabPhotos`.
 
 ## Patterns UI (forms)
 

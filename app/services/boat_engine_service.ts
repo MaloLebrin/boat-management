@@ -78,7 +78,7 @@ export default class BoatEngineService {
         await this.mediaService.deleteAllForEntity(
           'boat_engine_part',
           part.id,
-          CloudinaryFolders.boatEnginePartDocuments(org.slug, boat.id, engineId, part.id),
+          CloudinaryFolders.boatEnginePart(org.slug, boat.id, engineId, part.id),
           org
         )
       }
