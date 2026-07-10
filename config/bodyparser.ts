@@ -65,8 +65,9 @@ const bodyParserConfig: ReturnType<typeof defineConfig> = defineConfig({
 
     /**
      * Maximum accepted payload size for multipart requests.
+     * Worst case is a document batch: up to 20 files x 20mb each.
      */
-    limit: '20mb',
+    limit: '400mb',
 
     /**
      * Content types handled by the multipart parser.

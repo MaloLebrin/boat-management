@@ -125,13 +125,15 @@ function submit() {
             class="flex items-center justify-between gap-2 text-fg-muted"
           >
             <span class="truncate">{{ file.name }} · {{ formatBytes(file.size) }}</span>
-            <button
+            <BaseButton
               type="button"
+              variant="ghost"
+              size="icon"
               class="text-fg-subtle hover:text-danger"
               @click="removeFile(index)"
             >
               <XMarkIcon class="h-4 w-4" />
-            </button>
+            </BaseButton>
           </li>
         </ul>
       </div>
