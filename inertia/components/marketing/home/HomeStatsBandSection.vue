@@ -21,10 +21,7 @@ const { el: sectionEl, isVisible } = useScrollReveal()
     class="reveal relative overflow-hidden px-6 py-16 lg:px-8 lg:py-20"
     :class="{ visible: isVisible }"
   >
-    <!-- Bande diagonale « Stripe » : clip-path découpe la zone visible du
-         calque de fond, la carte à l'intérieur reste dans son flux normal
-         (aucun contre-transform, aucune couverture à deviner). -->
-    <div class="section-diagonal-band absolute inset-0 bg-navy-900" aria-hidden="true">
+    <div class="absolute inset-0 bg-navy-900" aria-hidden="true">
       <PortsMapCanvas variant="dark" :intensity="0.55" />
     </div>
     <div class="relative mx-auto max-w-7xl">

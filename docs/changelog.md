@@ -3,6 +3,10 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-07-10 — Marketing : sections navy droites (retrait de l'effet diagonal)
+
+À la demande, l'effet diagonal (`clip-path`) est retiré de `HomeStatsBandSection` et `HomeFinalCtaSection` — ces deux sections redeviennent des rectangles nets (fond navy plein, arêtes droites). Les classes `.section-diagonal-band` / `.section-diagonal-top` sont supprimées de `app.css` (plus aucun consommateur). Le fond navy, le contenu (stats, CTA) et les canvas (`PortsMapCanvas`, `ParticleNetworkCanvas`) restent inchangés.
+
 ## 2026-07-10 — Marketing : correctifs animations (ticker hero, scroll-reveal, bandes diagonales)
 
 Trois correctifs sur la couche d'animations « Stripe-like » de la home :

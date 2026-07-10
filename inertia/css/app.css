@@ -387,26 +387,6 @@ body {
   animation-delay: 0.45s;
 }
 
-/* ── Bandes diagonales « Stripe » ─────────────────────────────── */
-/* Pattern : section `relative overflow-hidden` ; un calque de fond absolu
-   `inset-0` porte `.section-diagonal-band` (ou `-top`) qui découpe une
-   zone diagonale via `clip-path` — le fond de page apparaît hors du
-   polygone → arêtes diagonales nettes. Le canvas/contenu à l'intérieur du
-   calque n'a besoin d'AUCUN contre-transform (contrairement à un skewY
-   imbriqué + scale de compensation, dont le facteur nécessaire dépend du
-   ratio largeur/hauteur et ne peut pas être fixé une fois pour toutes) :
-   il reste dans son flux normal, simplement rogné par le clip-path. Le
-   contenu texte est un frère non transformé, en dehors du calque.
-   `.section-diagonal-band` : diagonale en haut ET en bas (bande insérée
-   entre deux sections claires). `.section-diagonal-top` : diagonale en
-   haut seulement, bas plat (section qui se termine sur le footer). */
-.section-diagonal-band {
-  clip-path: polygon(0 0, 100% 6vw, 100% 100%, 0 calc(100% - 6vw));
-}
-.section-diagonal-top {
-  clip-path: polygon(0 6vw, 100% 0, 100% 100%, 0 100%);
-}
-
 /* Défilement vertical continu du panneau « À venir » du mock hero. */
 @keyframes taskScroll {
   from {

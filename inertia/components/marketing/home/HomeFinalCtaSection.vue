@@ -13,12 +13,7 @@ defineProps<{
 
 <template>
   <section class="relative overflow-hidden px-6 pb-20 pt-20 lg:px-8 lg:pb-24 lg:pt-24">
-    <!-- Arête diagonale « Stripe » en haut ; clip-path découpe la zone
-         visible, le contenu (canvas, SVG) reste dans son flux normal. -->
-    <div
-      class="section-diagonal-top absolute inset-0 bg-gradient-to-b from-navy-900 to-navy-800"
-      aria-hidden="true"
-    >
+    <div class="absolute inset-0 bg-gradient-to-b from-navy-900 to-navy-800" aria-hidden="true">
       <!-- Réseau de particules (évoque une flotte connectée) -->
       <ParticleNetworkCanvas color="#b7c3d2" :density="1.3" />
 
