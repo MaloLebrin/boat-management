@@ -93,32 +93,42 @@ function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutra
             </div>
           </div>
 
-          <div v-if="canManage" class="flex flex-wrap items-center gap-2 md:justify-end">
-            <a :href="`/boats/${boatId}/sails/${s.id}/edit`">
-              <BaseButton
-                variant="secondary"
-                size="sm"
-                type="button"
-                :aria-label="t('common.edit')"
-              >
-                <PencilSquareIcon class="w-4 h-4" />
-              </BaseButton>
-            </a>
-            <Form
-              :action="{ url: `/boats/${boatId}/sails/${s.id}`, method: 'delete' }"
-              #default="{ processing }"
-              class="inline"
+          <div class="flex flex-wrap items-center gap-2 md:justify-end">
+            <BaseButton
+              variant="ghost"
+              size="sm"
+              route="boats.sails.show"
+              :params="{ boatId, sailId: s.id }"
             >
-              <BaseButton
-                type="submit"
-                variant="danger"
-                size="sm"
-                :disabled="processing"
-                :aria-label="t('common.delete')"
+              {{ t('boats.sails.viewDetail') }}
+            </BaseButton>
+            <template v-if="canManage">
+              <a :href="`/boats/${boatId}/sails/${s.id}/edit`">
+                <BaseButton
+                  variant="secondary"
+                  size="sm"
+                  type="button"
+                  :aria-label="t('common.edit')"
+                >
+                  <PencilSquareIcon class="w-4 h-4" />
+                </BaseButton>
+              </a>
+              <Form
+                :action="{ url: `/boats/${boatId}/sails/${s.id}`, method: 'delete' }"
+                #default="{ processing }"
+                class="inline"
               >
-                <TrashIcon class="w-4 h-4 text-red-800" />
-              </BaseButton>
-            </Form>
+                <BaseButton
+                  type="submit"
+                  variant="danger"
+                  size="sm"
+                  :disabled="processing"
+                  :aria-label="t('common.delete')"
+                >
+                  <TrashIcon class="w-4 h-4 text-red-800" />
+                </BaseButton>
+              </Form>
+            </template>
           </div>
         </div>
       </li>

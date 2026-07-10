@@ -1,4 +1,5 @@
 import BoatPolicy from '#policies/boat_policy'
+import { toMediaRow } from '#transformers/media_row_transformer'
 import BoatEquipmentService, { BoatEquipmentNotFoundError } from '#services/boat_equipment_service'
 import BoatHullService, { BoatNotFoundError } from '#services/boat_hull_service'
 import MediaService, { MediaNotFoundError } from '#services/media_service'
@@ -56,7 +57,7 @@ export default class BoatEnginePartsController {
     if (!part) return response.redirect(`/boats/${boat.id}/engines/${engineId}?tab=parts`)
 
     const canManage = await bouncer.with(BoatPolicy).allows('edit', boat)
-    const documents = await this.mediaService.listForEntity('boat_engine_part', partId)
+    const media = await this.mediaService.listForEntity('boat_engine_part', partId)
 
     return inertia.render('boats/engine_part_show', {
       boat: { id: boat.id, name: boat.name },
@@ -71,18 +72,8 @@ export default class BoatEnginePartsController {
         wearState: part.wearState,
         purchasePrice: part.purchasePrice ? Number.parseFloat(part.purchasePrice) : null,
         purchasedAt: part.purchasedAt ? part.purchasedAt.toISODate() : null,
-        documents: documents.map((m) => ({
-          id: m.id,
-          kind: m.kind,
-          secureUrl: m.secureUrl,
-          originalFilename: m.originalFilename,
-          format: m.format,
-          bytes: m.bytes,
-          width: m.width,
-          height: m.height,
-          position: m.position,
-          caption: m.caption,
-        })),
+        documents: media.filter((m) => m.kind === 'document').map(toMediaRow),
+        photos: media.filter((m) => m.kind === 'photo').map(toMediaRow),
       },
       canManage,
     })

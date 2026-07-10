@@ -14,7 +14,8 @@
   },
   "rig": {
     "saved": "Rig saved.",
-    "removed": "Rig removed."
+    "removed": "Rig removed.",
+    "notFound": "Rig not found."
   },
   "maintenance": {
     "recorded": "Maintenance recorded.",

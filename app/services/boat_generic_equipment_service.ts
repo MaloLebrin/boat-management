@@ -1,7 +1,10 @@
 import { BoatEquipmentNotFoundError } from '#exceptions/boat_errors'
 import type Boat from '#models/boat'
 import BoatGenericEquipment from '#models/boat_generic_equipment'
+import type Organization from '#models/organization'
 import type User from '#models/user'
+import { CloudinaryFolders } from '#services/cloudinary_service'
+import MediaService from '#services/media_service'
 import type { BoatGenericEquipmentPayload } from '#shared/types/boat'
 import { assertBoatInUserOrg, toDateOrNull, toDecimalStringOrNull } from '#utils/boat_utils'
 import { inject } from '@adonisjs/core'
@@ -11,6 +14,12 @@ export type { BoatGenericEquipmentPayload }
 
 @inject()
 export default class BoatGenericEquipmentService {
+  constructor(private mediaService: MediaService) {}
+
+  async findForBoat(boatId: number, itemId: number) {
+    return await BoatGenericEquipment.query().where('id', itemId).where('boatId', boatId).first()
+  }
+
   async create(user: User, boat: Boat, payload: BoatGenericEquipmentPayload) {
     assertBoatInUserOrg(user, boat)
 
@@ -51,7 +60,7 @@ export default class BoatGenericEquipmentService {
     return item
   }
 
-  async delete(user: User, boat: Boat, itemId: number) {
+  async delete(user: User, boat: Boat, itemId: number, org?: Organization) {
     assertBoatInUserOrg(user, boat)
 
     const item = await BoatGenericEquipment.query()
@@ -59,6 +68,15 @@ export default class BoatGenericEquipmentService {
       .where('boatId', boat.id)
       .first()
     if (!item) throw new BoatEquipmentNotFoundError()
+
+    if (org) {
+      await this.mediaService.deleteAllForEntity(
+        'boat_generic_equipment',
+        item.id,
+        CloudinaryFolders.boatGenericEquipment(org.slug, boat.id, item.id),
+        org
+      )
+    }
 
     await item.delete()
   }

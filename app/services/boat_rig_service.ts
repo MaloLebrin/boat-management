@@ -1,7 +1,10 @@
 import { BoatEquipmentNotFoundError } from '#exceptions/boat_errors'
 import type Boat from '#models/boat'
 import BoatRig from '#models/boat_rig'
+import type Organization from '#models/organization'
 import type User from '#models/user'
+import { CloudinaryFolders } from '#services/cloudinary_service'
+import MediaService from '#services/media_service'
 import type { BoatRigPayload } from '#shared/types/boat'
 import { assertBoatInUserOrg, toDateOrNull } from '#utils/boat_utils'
 import { inject } from '@adonisjs/core'
@@ -11,6 +14,12 @@ export type { BoatRigPayload }
 
 @inject()
 export default class BoatRigService {
+  constructor(private mediaService: MediaService) {}
+
+  async findForBoat(boatId: number) {
+    return await BoatRig.query().where('boatId', boatId).first()
+  }
+
   async upsert(user: User, boat: Boat, payload: BoatRigPayload) {
     assertBoatInUserOrg(user, boat)
 
@@ -37,9 +46,21 @@ export default class BoatRigService {
     return rig
   }
 
-  async delete(user: User, boat: Boat) {
+  async delete(user: User, boat: Boat, org?: Organization) {
     assertBoatInUserOrg(user, boat)
 
-    await BoatRig.query().where('boatId', boat.id).delete()
+    const rig = await BoatRig.query().where('boatId', boat.id).first()
+    if (!rig) return
+
+    if (org) {
+      await this.mediaService.deleteAllForEntity(
+        'boat_rig',
+        rig.id,
+        CloudinaryFolders.boatRig(org.slug, boat.id),
+        org
+      )
+    }
+
+    await rig.delete()
   }
 }

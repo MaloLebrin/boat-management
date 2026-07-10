@@ -13,6 +13,7 @@ import EngineShowTabMaintenance from '~/components/engine/show/tabs/EngineShowTa
 import EngineShowTabNotes from '~/components/engine/show/tabs/EngineShowTabNotes.vue'
 import EngineShowTabOverview from '~/components/engine/show/tabs/EngineShowTabOverview.vue'
 import EngineShowTabParts from '~/components/engine/show/tabs/EngineShowTabParts.vue'
+import EngineShowTabPhotos from '~/components/engine/show/tabs/EngineShowTabPhotos.vue'
 import EngineShowTabSpecs from '~/components/engine/show/tabs/EngineShowTabSpecs.vue'
 import { useT } from '~/composables/use_t'
 import type { BoatShowEngine, MaintenanceEventRow, MaintenanceTaskRow } from '~/types/boat_show'
@@ -27,11 +28,19 @@ const props = defineProps<{
   canManage: boolean
 }>()
 
-type TabKey = 'overview' | 'specs' | 'maintenance' | 'notes' | 'parts' | 'documents'
+type TabKey = 'overview' | 'specs' | 'maintenance' | 'notes' | 'parts' | 'photos' | 'documents'
 const tab = ref<TabKey>('overview')
 const addEventOpen = ref(false)
 
-const VALID_TABS: TabKey[] = ['overview', 'specs', 'maintenance', 'notes', 'parts', 'documents']
+const VALID_TABS: TabKey[] = [
+  'overview',
+  'specs',
+  'maintenance',
+  'notes',
+  'parts',
+  'photos',
+  'documents',
+]
 
 onMounted(() => {
   const fromUrl = new URLSearchParams(window.location.search).get('tab') as TabKey | null
@@ -237,6 +246,11 @@ function formatYear(iso: string): string {
           },
           { key: 'notes', label: t('boats.engineShow.tabs.notes') },
           { key: 'parts', label: t('boats.engineShow.tabs.parts') },
+          {
+            key: 'photos',
+            label: t('boats.engineShow.tabs.photos'),
+            badge: String(engine.photos.length || ''),
+          },
           { key: 'documents', label: t('boats.engineShow.tabs.documents') },
         ]"
       />
@@ -284,6 +298,12 @@ function formatYear(iso: string): string {
           :parts="engine.parts"
           :boat-id="boat.id"
           :engine-id="engine.id"
+          :can-manage="canManage"
+        />
+        <EngineShowTabPhotos
+          v-else-if="tab === 'photos'"
+          :boat="boat"
+          :engine="engine"
           :can-manage="canManage"
         />
         <EngineShowTabDocuments

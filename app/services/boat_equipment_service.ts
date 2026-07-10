@@ -63,16 +63,16 @@ export default class BoatEquipmentService {
     return this.sailService.update(user, boat, sailId, payload)
   }
 
-  async deleteSail(user: User, boat: Boat, sailId: number) {
-    return this.sailService.delete(user, boat, sailId)
+  async deleteSail(user: User, boat: Boat, sailId: number, org?: Organization) {
+    return this.sailService.delete(user, boat, sailId, org)
   }
 
   async upsertRig(user: User, boat: Boat, payload: BoatRigPayload) {
     return this.rigService.upsert(user, boat, payload)
   }
 
-  async deleteRig(user: User, boat: Boat) {
-    return this.rigService.delete(user, boat)
+  async deleteRig(user: User, boat: Boat, org?: Organization) {
+    return this.rigService.delete(user, boat, org)
   }
 
   async createEnginePart(user: User, boat: Boat, engineId: number, payload: BoatEnginePartPayload) {
@@ -103,6 +103,10 @@ export default class BoatEquipmentService {
     return this.enginePartService.findForEngine(engineId, partId)
   }
 
+  async findSafetyEquipment(boatId: number, itemId: number) {
+    return this.safetyEquipmentService.findForBoat(boatId, itemId)
+  }
+
   async createSafetyEquipment(user: User, boat: Boat, payload: BoatSafetyEquipmentPayload) {
     return this.safetyEquipmentService.create(user, boat, payload)
   }
@@ -116,7 +120,7 @@ export default class BoatEquipmentService {
     return this.safetyEquipmentService.update(user, boat, itemId, payload)
   }
 
-  async deleteSafetyEquipment(user: User, boat: Boat, itemId: number) {
-    return this.safetyEquipmentService.delete(user, boat, itemId)
+  async deleteSafetyEquipment(user: User, boat: Boat, itemId: number, org?: Organization) {
+    return this.safetyEquipmentService.delete(user, boat, itemId, org)
   }
 }

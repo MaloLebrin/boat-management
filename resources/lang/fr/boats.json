@@ -86,7 +86,8 @@
       "title": "Ajouter une voile",
       "cancel": "Annuler",
       "submit": "Ajouter la voile"
-    }
+    },
+    "viewDetail": "Voir le détail"
   },
   "rig": {
     "title": "Gréement",
@@ -98,7 +99,8 @@
       "mastCount": "Nombre de mâts",
       "spreaders": "Barres de flèche",
       "manufacturedAt": "Date de fabrication"
-    }
+    },
+    "viewDetail": "Voir le détail"
   },
   "options": {
     "propulsion": {
@@ -368,7 +370,8 @@
       "cancel": "Annuler",
       "submit": "Enregistrer"
     },
-    "confirmDelete": "Supprimer cet équipement ?"
+    "confirmDelete": "Supprimer cet équipement ?",
+    "viewDetail": "Voir le détail"
   },
   "equipmentAddModal": {
     "title": "Nouvel équipement",
@@ -438,7 +441,8 @@
       "maintenance": "Maintenance",
       "notes": "Notes",
       "parts": "Pièces",
-      "documents": "Documents"
+      "documents": "Documents",
+      "photos": "Photos"
     },
     "actions": {
       "edit": "Modifier",
@@ -529,7 +533,8 @@
     "partShow": {
       "tabs": {
         "info": "Informations",
-        "documents": "Documents"
+        "documents": "Documents",
+        "photos": "Photos"
       },
       "info": {
         "designation": "Désignation",
@@ -807,6 +812,61 @@
       "editTitle": "Modifier l'équipement",
       "cancel": "Annuler",
       "submit": "Enregistrer"
+    },
+    "viewDetail": "Voir le détail"
+  },
+  "sailShow": {
+    "title": "Voile",
+    "back": "Équipement",
+    "edit": "Modifier",
+    "tabs": {
+      "info": "Informations",
+      "photos": "Photos"
+    },
+    "fields": {
+      "sailType": "Type de voile",
+      "areaM2": "Surface (m²)",
+      "material": "Matériau",
+      "reefPoints": "Points de ris",
+      "manufacturedAt": "Date de fabrication"
+    }
+  },
+  "rigShow": {
+    "title": "Gréement",
+    "back": "Équipement",
+    "edit": "Modifier",
+    "tabs": {
+      "info": "Informations",
+      "photos": "Photos"
+    },
+    "fields": {
+      "rigType": "Type de gréement",
+      "mastCount": "Nombre de mâts",
+      "spreaders": "Barres de flèche",
+      "manufacturedAt": "Date de fabrication"
+    }
+  },
+  "genericEquipmentShow": {
+    "back": "Équipement",
+    "tabs": {
+      "info": "Informations",
+      "photos": "Photos"
+    },
+    "fields": {
+      "category": "Catégorie",
+      "brand": "Marque",
+      "model": "Modèle"
+    }
+  },
+  "safetyEquipmentShow": {
+    "back": "Sécurité",
+    "tabs": {
+      "info": "Informations",
+      "photos": "Photos"
+    },
+    "fields": {
+      "equipmentType": "Type d'équipement",
+      "expiryDate": "Date d'expiration"
     }
   }
 }

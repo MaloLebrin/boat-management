@@ -1,7 +1,10 @@
 import { BoatEquipmentNotFoundError } from '#exceptions/boat_errors'
 import type Boat from '#models/boat'
 import BoatSail from '#models/boat_sail'
+import type Organization from '#models/organization'
 import type User from '#models/user'
+import { CloudinaryFolders } from '#services/cloudinary_service'
+import MediaService from '#services/media_service'
 import type { BoatSailPayload } from '#shared/types/boat'
 import { assertBoatInUserOrg, toDateOrNull } from '#utils/boat_utils'
 import { inject } from '@adonisjs/core'
@@ -11,6 +14,8 @@ export type { BoatSailPayload }
 
 @inject()
 export default class BoatSailService {
+  constructor(private mediaService: MediaService) {}
+
   async create(user: User, boat: Boat, payload: BoatSailPayload) {
     assertBoatInUserOrg(user, boat)
 
@@ -45,11 +50,20 @@ export default class BoatSailService {
     return sail
   }
 
-  async delete(user: User, boat: Boat, sailId: number) {
+  async delete(user: User, boat: Boat, sailId: number, org?: Organization) {
     assertBoatInUserOrg(user, boat)
 
     const sail = await BoatSail.query().where('id', sailId).where('boatId', boat.id).first()
     if (!sail) throw new BoatEquipmentNotFoundError()
+
+    if (org) {
+      await this.mediaService.deleteAllForEntity(
+        'boat_sail',
+        sail.id,
+        CloudinaryFolders.boatSail(org.slug, boat.id, sail.id),
+        org
+      )
+    }
 
     await sail.delete()
   }

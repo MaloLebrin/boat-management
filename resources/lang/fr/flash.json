@@ -14,7 +14,8 @@
   },
   "rig": {
     "saved": "Gréement enregistré.",
-    "removed": "Gréement supprimé."
+    "removed": "Gréement supprimé.",
+    "notFound": "Gréement introuvable."
   },
   "maintenance": {
     "recorded": "Maintenance enregistrée.",

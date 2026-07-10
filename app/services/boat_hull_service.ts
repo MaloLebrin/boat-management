@@ -7,7 +7,9 @@ import { UserNotInOrganizationError } from '#exceptions/organization_errors'
 import Boat from '#models/boat'
 import BoatEngine from '#models/boat_engine'
 import BoatEnginePart from '#models/boat_engine_part'
+import BoatGenericEquipment from '#models/boat_generic_equipment'
 import BoatRig from '#models/boat_rig'
+import BoatSafetyEquipment from '#models/boat_safety_equipment'
 import BoatSail from '#models/boat_sail'
 import type Organization from '#models/organization'
 import type User from '#models/user'
@@ -270,7 +272,7 @@ export default class BoatHullService {
           await this.mediaService.deleteAllForEntity(
             'boat_engine_part',
             part.id,
-            CloudinaryFolders.boatEnginePartDocuments(org.slug, boat.id, engine.id, part.id),
+            CloudinaryFolders.boatEnginePart(org.slug, boat.id, engine.id, part.id),
             org
           )
         }
@@ -298,6 +300,30 @@ export default class BoatHullService {
           'boat_rig',
           rig.id,
           CloudinaryFolders.boatRig(org.slug, boat.id),
+          org
+        )
+      }
+
+      const genericEquipment = await BoatGenericEquipment.query()
+        .where('boatId', boat.id)
+        .select('id')
+      for (const item of genericEquipment) {
+        await this.mediaService.deleteAllForEntity(
+          'boat_generic_equipment',
+          item.id,
+          CloudinaryFolders.boatGenericEquipment(org.slug, boat.id, item.id),
+          org
+        )
+      }
+
+      const safetyEquipment = await BoatSafetyEquipment.query()
+        .where('boatId', boat.id)
+        .select('id')
+      for (const item of safetyEquipment) {
+        await this.mediaService.deleteAllForEntity(
+          'boat_safety_equipment',
+          item.id,
+          CloudinaryFolders.boatSafetyEquipment(org.slug, boat.id, item.id),
           org
         )
       }

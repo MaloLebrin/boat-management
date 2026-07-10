@@ -63,6 +63,14 @@ function statusVariant(status: string): 'success' | 'warning' | 'danger' {
 
       <div class="flex flex-wrap items-center gap-2 md:justify-end">
         <BaseButton
+          variant="ghost"
+          size="sm"
+          route="boats.genericEquipment.show"
+          :params="{ boatId, itemId: item.id }"
+        >
+          {{ t('boats.genericEquipment.viewDetail') }}
+        </BaseButton>
+        <BaseButton
           v-if="canManageActions && item.status !== 'ok'"
           variant="secondary"
           size="sm"

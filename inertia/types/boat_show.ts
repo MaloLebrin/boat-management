@@ -68,6 +68,7 @@ export type BoatShowEnginePart = {
   notes: string | null
   wearState: 'new' | 'good' | 'worn' | 'to_replace' | 'damaged' | null
   documents: MediaRow[]
+  photos: MediaRow[]
   purchasePrice: number | null
   purchasedAt: string | null
 }
@@ -87,6 +88,7 @@ export type BoatShowEngine = {
   status: 'operational' | 'in_maintenance' | 'out_of_service' | 'retired'
   notes: string | null
   documents: MediaRow[]
+  photos: MediaRow[]
   parts: BoatShowEnginePart[]
 }
 
@@ -107,6 +109,29 @@ export type BoatShowRig = {
   mastCount: number | null
   spreaders: number | null
   status: 'operational' | 'in_maintenance' | 'out_of_service' | 'retired'
+}
+
+/** Props of the equipment detail pages (`*_show.vue`), which expose a photo gallery. */
+export type BoatSailDetail = BoatShowSail & {
+  notes: string | null
+  photos: MediaRow[]
+}
+
+export type BoatRigDetail = BoatShowRig & {
+  notes: string | null
+  photos: MediaRow[]
+}
+
+export type BoatGenericEquipmentDetail = BoatShowGenericEquipment & {
+  purchasePrice: number | null
+  purchasedAt: string | null
+  photos: MediaRow[]
+}
+
+export type BoatSafetyEquipmentDetail = BoatShowSafetyEquipment & {
+  purchasePrice: number | null
+  purchasedAt: string | null
+  photos: MediaRow[]
 }
 
 export type BoatPositionHistoryRow = {
