@@ -242,11 +242,11 @@
       "ok": "OK"
     },
     "mediaUpload": {
-      "addPhoto": "Add a photo",
-      "addDocument": "Add a document",
-      "dropzone": "Drop a file here or click to browse",
+      "addPhoto": "Add photos",
+      "addDocument": "Add documents",
+      "dropzone": "Drop files here or click to browse",
       "browse": "Browse…",
-      "selectedFile": "Selected file",
+      "selectedFiles": "Selected files",
       "noFile": "No file selected",
       "caption": "Caption (optional)",
       "upload": "Upload",

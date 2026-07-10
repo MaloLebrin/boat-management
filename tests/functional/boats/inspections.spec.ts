@@ -533,4 +533,79 @@ test.group('Boat Inspections (functional)', (group) => {
       app.container.restore(CloudinaryService)
     }
   })
+
+  test('POST .../inspections/:id/photos attaches multiple photos in one request', async ({
+    client,
+    assert,
+  }) => {
+    const uploaded: string[] = []
+    app.container.swap(
+      CloudinaryService,
+      () =>
+        ({
+          uploadImage: async () => {
+            const publicId = `fake-inspection-photo-${uploaded.length}`
+            uploaded.push(publicId)
+            return {
+              publicId,
+              url: `http://res.cloudinary.com/${publicId}.jpg`,
+              secureUrl: `https://res.cloudinary.com/${publicId}.jpg`,
+              format: 'jpg',
+              resourceType: 'image',
+              bytes: 1024,
+              originalFilename: 'photo',
+              width: 800,
+              height: 600,
+            }
+          },
+        }) as unknown as CloudinaryService
+    )
+
+    try {
+      const admin = await createAdminUser()
+      const boat = await BoatFactory.merge({ organizationId: admin.organizationId! }).create()
+      const reservation = await BoatReservationFactory.merge({
+        boatId: boat.id,
+        organizationId: boat.organizationId,
+      }).create()
+      const inspection = await BoatInspection.create({
+        reservationId: reservation.id,
+        organizationId: boat.organizationId,
+        kind: 'checkout',
+        performedAt: reservation.startsAt,
+        fuelLevel: 80,
+        engineHours: null,
+        notes: null,
+      })
+
+      const response = await client
+        .post(
+          `/boats/${boat.id}/reservations/${reservation.id}/inspections/${inspection.id}/photos`
+        )
+        .loginAs(admin)
+        .file('files[]', Buffer.from('\xff\xd8\xff\xe0 fake jpeg 1', 'binary'), {
+          filename: 'photo-1.jpg',
+          contentType: 'image/jpeg',
+        })
+        .file('files[]', Buffer.from('\xff\xd8\xff\xe0 fake jpeg 2', 'binary'), {
+          filename: 'photo-2.jpg',
+          contentType: 'image/jpeg',
+        })
+        .redirects(0)
+
+      response.assertStatus(302)
+      response.assertHeader(
+        'location',
+        `/boats/${boat.id}/reservations/${reservation.id}/inspection`
+      )
+
+      const medias = await Media.query()
+        .where('entityType', 'inspection')
+        .where('entityId', inspection.id)
+      assert.lengthOf(medias, 2)
+      assert.lengthOf(uploaded, 2)
+    } finally {
+      app.container.restore(CloudinaryService)
+    }
+  })
 })

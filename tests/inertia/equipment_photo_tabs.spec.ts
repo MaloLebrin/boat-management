@@ -8,7 +8,7 @@ import SafetyShowTabPhotos from '../../inertia/components/boats/safety/show/tabs
 import SailShowTabPhotos from '../../inertia/components/boats/sail/show/tabs/SailShowTabPhotos.vue'
 
 vi.mock('@inertiajs/vue3', () => ({
-  useForm: () => ({ file: null, processing: false, post: vi.fn(), reset: vi.fn() }),
+  useForm: () => ({ files: [], processing: false, post: vi.fn(), reset: vi.fn() }),
   router: { delete: vi.fn() },
   usePage: () => ({ props: { appT: {}, locale: 'en' } }),
 }))

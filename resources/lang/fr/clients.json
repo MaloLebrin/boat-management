@@ -62,7 +62,7 @@
   "documents": {
     "title": "Documents",
     "subtitle": "Copie du permis, pièce d'identité…",
-    "add": "+ Ajouter un document",
+    "add": "+ Ajouter des documents",
     "empty": "Aucun document pour ce client.",
     "formats": "PDF, DOCX, XLSX, CSV — 20 Mo max.",
     "download": "Télécharger",
@@ -73,9 +73,9 @@
     },
     "modalTitle": "Ajouter un document",
     "modalSubtitle": "Document rattaché à {name}",
-    "dropzone": "Glissez un fichier ici",
+    "dropzone": "Glissez des fichiers ici",
     "browse": "Parcourir",
-    "selectedFile": "Fichier sélectionné",
+    "selectedFiles": "Fichiers sélectionnés",
     "caption": "Libellé (optionnel)",
     "upload": "Téléverser",
     "uploading": "Téléversement…"

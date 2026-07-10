@@ -1,5 +1,35 @@
 import { defineConfig } from '@adonisjs/core/bodyparser'
 
+/**
+ * Payload size limit applied only to the batch upload routes below.
+ * Worst case is a document batch: up to 20 files x 20mb each.
+ */
+export const LARGE_UPLOAD_LIMIT = '400mb'
+
+/**
+ * Routes handling batch file uploads (multiple photos / documents in one request).
+ * They are excluded from the default auto-processing (kept at the base 20mb limit)
+ * and re-processed with `LARGE_UPLOAD_LIMIT` by the LargeMultipartUploadMiddleware.
+ *
+ * Patterns must match `ctx.route.pattern` exactly (leading slash, no trailing slash).
+ * Non-batch multipart routes (branding logo, CSV imports, signed contract) stay on
+ * the base 20mb limit and must NOT be listed here.
+ */
+export const LARGE_UPLOAD_ROUTES: string[] = [
+  '/boats/:boatId/photos',
+  '/boats/:boatId/documents',
+  '/boats/:boatId/engines/:engineId/photos',
+  '/boats/:boatId/engines/:engineId/documents',
+  '/boats/:boatId/engines/:engineId/parts/:partId/photos',
+  '/boats/:boatId/engines/:engineId/parts/:partId/documents',
+  '/boats/:boatId/sails/:sailId/photos',
+  '/boats/:boatId/rig/photos',
+  '/boats/:boatId/safety-equipment/:safetyId/photos',
+  '/boats/:boatId/generic-equipment/:genericId/photos',
+  '/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/photos',
+  '/clients/:id/documents',
+]
+
 const bodyParserConfig: ReturnType<typeof defineConfig> = defineConfig({
   /**
    * Parse request bodies for these HTTP methods.
@@ -59,12 +89,15 @@ const bodyParserConfig: ReturnType<typeof defineConfig> = defineConfig({
     convertEmptyStringsToNull: true,
 
     /**
-     * Routes where multipart processing is handled manually.
+     * Batch upload routes opt out of auto-processing so the
+     * LargeMultipartUploadMiddleware can process them with `LARGE_UPLOAD_LIMIT`.
+     * Every other multipart route keeps the base `limit` below.
      */
-    processManually: [],
+    processManually: LARGE_UPLOAD_ROUTES,
 
     /**
-     * Maximum accepted payload size for multipart requests.
+     * Base payload size limit for all other multipart requests
+     * (branding logo, CSV imports, signed contract…).
      */
     limit: '20mb',
 

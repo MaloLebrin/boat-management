@@ -5,7 +5,7 @@ import MediaPhotoGallery from '../../inertia/components/media/MediaPhotoGallery.
 const mockFormPost = vi.hoisted(() => vi.fn())
 const mockRouterDelete = vi.hoisted(() => vi.fn())
 const mockForm = vi.hoisted(() => ({
-  file: null as File | null,
+  files: [] as File[],
   processing: false,
   post: mockFormPost,
   reset: vi.fn(),
@@ -52,7 +52,7 @@ describe('MediaPhotoGallery', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     vi.unstubAllGlobals()
-    mockForm.file = null
+    mockForm.files = []
     mockForm.processing = false
   })
 
@@ -87,7 +87,25 @@ describe('MediaPhotoGallery', () => {
       '/boats/1/engines/2/photos',
       expect.objectContaining({ forceFormData: true, preserveScroll: true })
     )
-    expect(mockForm.file).toBe(file)
+    expect(mockForm.files).toEqual([file])
+  })
+
+  test('posts all selected files in a single request when several are chosen at once', async () => {
+    const wrapper = mount(MediaPhotoGallery, { props: baseProps })
+    const files = [
+      new File(['x'], 'engine-1.jpg', { type: 'image/jpeg' }),
+      new File(['y'], 'engine-2.jpg', { type: 'image/jpeg' }),
+      new File(['z'], 'engine-3.jpg', { type: 'image/jpeg' }),
+    ]
+    const input = wrapper.find('input[type="file"]')
+
+    expect(input.attributes('multiple')).toBeDefined()
+
+    Object.defineProperty(input.element, 'files', { value: files })
+    await input.trigger('change')
+
+    expect(mockFormPost).toHaveBeenCalledTimes(1)
+    expect(mockForm.files).toEqual(files)
   })
 
   test('does not post when the file input is cleared', async () => {

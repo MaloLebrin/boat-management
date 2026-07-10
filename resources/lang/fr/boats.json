@@ -242,11 +242,11 @@
       "ok": "OK"
     },
     "mediaUpload": {
-      "addPhoto": "Ajouter une photo",
-      "addDocument": "Ajouter un document",
-      "dropzone": "Glissez un fichier ici ou cliquez pour parcourir",
+      "addPhoto": "Ajouter des photos",
+      "addDocument": "Ajouter des documents",
+      "dropzone": "Glissez des fichiers ici ou cliquez pour parcourir",
       "browse": "Parcourir…",
-      "selectedFile": "Fichier sélectionné",
+      "selectedFiles": "Fichiers sélectionnés",
       "noFile": "Aucun fichier sélectionné",
       "caption": "Légende (optionnel)",
       "upload": "Téléverser",

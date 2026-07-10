@@ -76,7 +76,7 @@ test.group('Client documents (functional)', (group) => {
       const response = await client
         .post(`/clients/${record.id}/documents`)
         .loginAs(user)
-        .file('file', Buffer.from('%PDF-1.4 fake'), {
+        .file('files[]', Buffer.from('%PDF-1.4 fake'), {
           filename: 'permit.pdf',
           contentType: 'application/pdf',
         })
@@ -91,6 +91,44 @@ test.group('Client documents (functional)', (group) => {
         .firstOrFail()
       assert.equal(media.kind, 'document')
       assert.lengthOf(fake.uploaded, 1)
+    } finally {
+      app.container.restore(CloudinaryService)
+    }
+  })
+
+  test('uploads multiple documents attached to the client in one request', async ({
+    client,
+    assert,
+  }) => {
+    const fake = swapFakeCloudinary()
+    try {
+      const user = await createEnterpriseAdminUser()
+      const record = await Client.create({
+        organizationId: user.organizationId!,
+        firstName: 'Alice',
+        lastName: 'Martin',
+        status: 'active',
+      })
+
+      const response = await client
+        .post(`/clients/${record.id}/documents`)
+        .loginAs(user)
+        .file('files[]', Buffer.from('%PDF-1.4 first'), {
+          filename: 'permit.pdf',
+          contentType: 'application/pdf',
+        })
+        .file('files[]', Buffer.from('%PDF-1.4 second'), {
+          filename: 'id-card.pdf',
+          contentType: 'application/pdf',
+        })
+        .redirects(0)
+
+      response.assertStatus(302)
+      response.assertHeader('location', `/clients/${record.id}`)
+
+      const medias = await Media.query().where('entityType', 'client').where('entityId', record.id)
+      assert.lengthOf(medias, 2)
+      assert.lengthOf(fake.uploaded, 2)
     } finally {
       app.container.restore(CloudinaryService)
     }
@@ -226,7 +264,7 @@ test.group('Client documents (functional)', (group) => {
       const response = await client
         .post('/clients/1/documents')
         .loginAs(user)
-        .file('file', Buffer.from('%PDF-1.4 fake'), {
+        .file('files[]', Buffer.from('%PDF-1.4 fake'), {
           filename: 'permit.pdf',
           contentType: 'application/pdf',
         })

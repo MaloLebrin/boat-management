@@ -6,7 +6,7 @@ import MediaService, { MediaNotFoundError } from '#services/media_service'
 import OrganizationService from '#services/organization_service'
 import { CloudinaryFolders, CloudinaryService } from '#services/cloudinary_service'
 import { createEnginePartValidator, updateEnginePartValidator } from '#validators/boat_engine_part'
-import { storeBoatDocumentValidator } from '#validators/media'
+import { storeBoatDocumentsValidator } from '#validators/media'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 
@@ -170,12 +170,12 @@ export default class BoatEnginePartsController {
     const part = await this.equipmentService.findEnginePart(engineId, partId)
     if (!part) return response.redirect(`/boats/${boat.id}/engines/${engineId}?tab=parts`)
 
-    const payload = await request.validateUsing(storeBoatDocumentValidator)
+    const payload = await request.validateUsing(storeBoatDocumentsValidator)
     const org = await this.organizationService.findOrFail(boat.organizationId)
 
-    await this.mediaService.upload(
+    const { uploaded, failed } = await this.mediaService.uploadMany(
       user,
-      payload.file,
+      payload.files,
       {
         folder: CloudinaryFolders.boatEnginePartDocuments(org.slug, boat.id, engineId, partId),
         entityType: 'boat_engine_part',
@@ -186,7 +186,22 @@ export default class BoatEnginePartsController {
       org
     )
 
-    session.flash('success', i18n.t('flash.media.documentAdded'))
+    if (failed.length === 0) {
+      session.flash(
+        'success',
+        i18n.t('flash.media.documentsAdded', { count: String(uploaded.length) })
+      )
+    } else if (uploaded.length > 0) {
+      session.flash(
+        'success',
+        i18n.t('flash.media.documentsAddedPartial', {
+          succeeded: String(uploaded.length),
+          failed: String(failed.length),
+        })
+      )
+    } else {
+      session.flash('error', i18n.t('flash.media.documentsAddFailed'))
+    }
     response.redirect(`/boats/${boat.id}/engines/${engineId}/parts/${partId}?tab=documents`)
   }
 

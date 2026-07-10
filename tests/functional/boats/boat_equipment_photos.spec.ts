@@ -70,6 +70,11 @@ function photoBuffer() {
   return Buffer.from('\xff\xd8\xff\xe0 fake jpeg', 'binary')
 }
 
+/** A valid-magic JPEG buffer padded to roughly `mb` megabytes. */
+function largePhotoBuffer(mb: number) {
+  return Buffer.concat([photoBuffer(), Buffer.alloc(mb * 1024 * 1024)])
+}
+
 /** Builds a boat owned by `user` with one of every equipment kind attached. */
 async function seedEquipment(user: User) {
   const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
@@ -158,7 +163,7 @@ test.group('Equipment photos — upload (functional)', (group) => {
         const response = await client
           .post(c.uploadUrl(seed))
           .loginAs(user)
-          .file('file', photoBuffer(), { filename: 'photo.jpg', contentType: 'image/jpeg' })
+          .file('files[]', photoBuffer(), { filename: 'photo.jpg', contentType: 'image/jpeg' })
           .redirects(0)
 
         response.assertStatus(302)
@@ -177,7 +182,126 @@ test.group('Equipment photos — upload (functional)', (group) => {
         app.container.restore(CloudinaryService)
       }
     })
+
+    test(`POST attaches multiple photos to the ${c.name} in one request`, async ({
+      client,
+      assert,
+    }) => {
+      const fake = swapFakeCloudinary()
+      try {
+        const user = await createEnterpriseAdminUser()
+        const seed = await seedEquipment(user)
+
+        const response = await client
+          .post(c.uploadUrl(seed))
+          .loginAs(user)
+          .file('files[]', photoBuffer(), { filename: 'photo-1.jpg', contentType: 'image/jpeg' })
+          .file('files[]', photoBuffer(), { filename: 'photo-2.jpg', contentType: 'image/jpeg' })
+          .file('files[]', photoBuffer(), { filename: 'photo-3.jpg', contentType: 'image/jpeg' })
+          .redirects(0)
+
+        response.assertStatus(302)
+        response.assertHeader('location', c.photosUrl(seed))
+
+        const medias = await Media.query()
+          .where('entityType', c.entityType)
+          .where('entityId', c.entityId(seed))
+          .orderBy('position', 'asc')
+
+        assert.lengthOf(medias, 3)
+        assert.deepEqual(
+          medias.map((m) => m.position),
+          [0, 1, 2]
+        )
+        assert.lengthOf(fake.uploaded, 3)
+      } finally {
+        app.container.restore(CloudinaryService)
+      }
+    })
   }
+
+  test('POST accepts a batch whose total size exceeds the base multipart limit', async ({
+    client,
+  }) => {
+    // Three ~8mb photos = ~24mb total, above the base 20mb multipart limit but well
+    // under LARGE_UPLOAD_LIMIT (400mb). This only succeeds because the batch route is
+    // scoped out of the base limit (processManually + LargeMultipartUploadMiddleware);
+    // otherwise the request would abort with 413 during streaming.
+    const c = CASES[0]
+    swapFakeCloudinary()
+    try {
+      const user = await createEnterpriseAdminUser()
+      const seed = await seedEquipment(user)
+
+      const response = await client
+        .post(c.uploadUrl(seed))
+        .loginAs(user)
+        .file('files[]', largePhotoBuffer(8), { filename: 'big-1.jpg', contentType: 'image/jpeg' })
+        .file('files[]', largePhotoBuffer(8), { filename: 'big-2.jpg', contentType: 'image/jpeg' })
+        .file('files[]', largePhotoBuffer(8), { filename: 'big-3.jpg', contentType: 'image/jpeg' })
+        .redirects(0)
+
+      response.assertStatus(302)
+      response.assertHeader('location', c.photosUrl(seed))
+    } finally {
+      app.container.restore(CloudinaryService)
+    }
+  })
+
+  test('POST keeps successful uploads when one file in the batch fails', async ({
+    client,
+    assert,
+  }) => {
+    const c = CASES[0]
+    let callCount = 0
+    app.container.swap(
+      CloudinaryService,
+      () =>
+        ({
+          uploadImage: async (_file: unknown, folder: string) => {
+            callCount += 1
+            if (callCount === 2) throw new Error('Cloudinary upload failed')
+            return {
+              publicId: `fake-photo-${callCount}`,
+              url: `http://res.cloudinary.com/fake-photo-${callCount}.jpg`,
+              secureUrl: `https://res.cloudinary.com/fake-photo-${callCount}.jpg`,
+              format: 'jpg',
+              resourceType: 'image',
+              bytes: 1024,
+              originalFilename: 'photo',
+              width: 800,
+              height: 600,
+              folder,
+            }
+          },
+          deleteFile: async () => {},
+          deleteFolder: async () => {},
+        }) as unknown as CloudinaryService
+    )
+
+    try {
+      const user = await createEnterpriseAdminUser()
+      const seed = await seedEquipment(user)
+
+      const response = await client
+        .post(c.uploadUrl(seed))
+        .loginAs(user)
+        .file('files[]', photoBuffer(), { filename: 'photo-1.jpg', contentType: 'image/jpeg' })
+        .file('files[]', photoBuffer(), { filename: 'photo-2.jpg', contentType: 'image/jpeg' })
+        .redirects(0)
+
+      response.assertStatus(302)
+      response.assertHeader('location', c.photosUrl(seed))
+
+      const medias = await Media.query()
+        .where('entityType', c.entityType)
+        .where('entityId', c.entityId(seed))
+
+      assert.lengthOf(medias, 1)
+    } finally {
+      app.container.restore(CloudinaryService)
+    }
+  })
 
   test('POST redirects to /login when unauthenticated', async ({ client }) => {
     const user = await createEnterpriseAdminUser()
@@ -185,7 +309,7 @@ test.group('Equipment photos — upload (functional)', (group) => {
 
     const response = await client
       .post(CASES[0].uploadUrl(seed))
-      .file('file', photoBuffer(), { filename: 'photo.jpg', contentType: 'image/jpeg' })
+      .file('files[]', photoBuffer(), { filename: 'photo.jpg', contentType: 'image/jpeg' })
       .redirects(0)
 
     response.assertStatus(302)
@@ -435,7 +559,7 @@ test.group('Equipment photos — IDOR (functional)', (group) => {
       const response = await client
         .post(`/boats/${attackerSeed.boat.id}/engines/${victimSeed.engine.id}/photos`)
         .loginAs(attacker)
-        .file('file', photoBuffer(), { filename: 'photo.jpg', contentType: 'image/jpeg' })
+        .file('files[]', photoBuffer(), { filename: 'photo.jpg', contentType: 'image/jpeg' })
         .redirects(0)
 
       response.assertStatus(302)
