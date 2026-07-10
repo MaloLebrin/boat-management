@@ -4,7 +4,7 @@ import EquipmentMediaService from '#services/equipment_media_service'
 import MediaService, { MediaNotFoundError } from '#services/media_service'
 import OrganizationService from '#services/organization_service'
 import type { EquipmentMediaSlug } from '#shared/types/equipment_media'
-import { storeBoatPhotoValidator } from '#validators/media'
+import { storeBoatPhotosValidator } from '#validators/media'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 
@@ -83,11 +83,11 @@ export default class BoatEquipmentMediaController {
     if (!authorized) return
 
     const { user, org, resolved } = authorized
-    const payload = await ctx.request.validateUsing(storeBoatPhotoValidator)
+    const payload = await ctx.request.validateUsing(storeBoatPhotosValidator)
 
-    await this.mediaService.upload(
+    const { uploaded, failed } = await this.mediaService.uploadMany(
       user,
-      payload.file,
+      payload.files,
       {
         folder: resolved.photoFolder,
         entityType: resolved.entityType,
@@ -98,7 +98,22 @@ export default class BoatEquipmentMediaController {
       org
     )
 
-    ctx.session.flash('success', ctx.i18n.t('flash.media.photoAdded'))
+    if (failed.length === 0) {
+      ctx.session.flash(
+        'success',
+        ctx.i18n.t('flash.media.photosAdded', { count: String(uploaded.length) })
+      )
+    } else if (uploaded.length > 0) {
+      ctx.session.flash(
+        'success',
+        ctx.i18n.t('flash.media.photosAddedPartial', {
+          succeeded: String(uploaded.length),
+          failed: String(failed.length),
+        })
+      )
+    } else {
+      ctx.session.flash('error', ctx.i18n.t('flash.media.photosAddFailed'))
+    }
     ctx.response.redirect(resolved.photosUrl)
   }
 

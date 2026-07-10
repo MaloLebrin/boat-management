@@ -15,7 +15,7 @@ const props = defineProps<{
 
 const { t } = useT()
 const fileInput = ref<HTMLInputElement>()
-const form = useForm({ file: null as File | null, caption: '' })
+const form = useForm({ files: [] as File[] })
 
 const photos = computed<MediaRow[]>(() =>
   props.boat.media.filter((m) => m.kind === 'photo').sort((a, b) => a.position - b.position)
@@ -23,13 +23,14 @@ const photos = computed<MediaRow[]>(() =>
 
 function onFileChange(e: Event) {
   const input = e.target as HTMLInputElement
-  form.file = input.files?.[0] ?? null
-  if (form.file) submitPhoto()
+  form.files = input.files ? Array.from(input.files) : []
+  if (form.files.length > 0) submitPhotos()
 }
 
-function submitPhoto() {
+function submitPhotos() {
   form.post(`/boats/${props.boat.id}/photos`, {
     forceFormData: true,
+    preserveScroll: true,
     onSuccess: () => {
       form.reset()
       if (fileInput.value) fileInput.value.value = ''
@@ -51,7 +52,11 @@ function submitPhoto() {
         @click="fileInput?.click()"
       >
         <PlusIcon class="h-4 w-4 mr-1" />
-        {{ t('boats.show.mediaUpload.addPhoto') }}
+        {{
+          form.processing
+            ? t('boats.show.mediaUpload.uploading')
+            : t('boats.show.mediaUpload.addPhoto')
+        }}
       </BaseButton>
     </div>
 
@@ -59,6 +64,7 @@ function submitPhoto() {
       v-if="canManage"
       ref="fileInput"
       type="file"
+      multiple
       accept="image/jpeg,image/png,image/webp,image/gif,.heic,.heif"
       class="hidden"
       @change="onFileChange"
@@ -125,7 +131,11 @@ function submitPhoto() {
         @click="fileInput?.click()"
       >
         <PlusIcon class="h-6 w-6 text-fg-subtle" />
-        <span class="text-xs text-fg-muted">{{ t('boats.show.mediaUpload.addPhoto') }}</span>
+        <span class="text-xs text-fg-muted">{{
+          form.processing
+            ? t('boats.show.mediaUpload.uploading')
+            : t('boats.show.mediaUpload.addPhoto')
+        }}</span>
       </button>
     </div>
   </div>

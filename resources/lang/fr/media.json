@@ -1,7 +1,8 @@
 {
   "photos": {
     "title": "Photos",
-    "add": "+ Ajouter une photo",
+    "add": "+ Ajouter des photos",
+    "uploading": "Envoi en cours…",
     "empty": "Aucune photo.",
     "delete": "Supprimer",
     "confirmDelete": "Supprimer cette photo ?"

@@ -7,7 +7,7 @@ import { BoatInspectionNotFoundError } from '#exceptions/inspection_errors'
 import MediaService, { MediaNotFoundError } from '#services/media_service'
 import OrganizationService from '#services/organization_service'
 import { CloudinaryFolders, CloudinaryService } from '#services/cloudinary_service'
-import { storeBoatPhotoValidator, storeBoatDocumentValidator } from '#validators/media'
+import { storeBoatPhotosValidator, storeBoatDocumentsValidator } from '#validators/media'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 
@@ -53,12 +53,12 @@ export default class BoatMediaController {
     const { boat, user } = loaded
     await bouncer.with(BoatPolicy).authorize('edit', boat)
 
-    const payload = await request.validateUsing(storeBoatPhotoValidator)
+    const payload = await request.validateUsing(storeBoatPhotosValidator)
     const org = await this.organizationService.findOrFail(boat.organizationId)
 
-    await this.mediaService.upload(
+    const { uploaded, failed } = await this.mediaService.uploadMany(
       user,
-      payload.file,
+      payload.files,
       {
         folder: CloudinaryFolders.boatPhotos(org.slug, boat.id),
         entityType: 'boat',
@@ -69,7 +69,22 @@ export default class BoatMediaController {
       org
     )
 
-    session.flash('success', i18n.t('flash.media.photoAdded'))
+    if (failed.length === 0) {
+      session.flash(
+        'success',
+        i18n.t('flash.media.photosAdded', { count: String(uploaded.length) })
+      )
+    } else if (uploaded.length > 0) {
+      session.flash(
+        'success',
+        i18n.t('flash.media.photosAddedPartial', {
+          succeeded: String(uploaded.length),
+          failed: String(failed.length),
+        })
+      )
+    } else {
+      session.flash('error', i18n.t('flash.media.photosAddFailed'))
+    }
     response.redirect(`/boats/${boat.id}?tab=overview`)
   }
 
@@ -81,12 +96,12 @@ export default class BoatMediaController {
     const { boat, user } = loaded
     await bouncer.with(BoatPolicy).authorize('edit', boat)
 
-    const payload = await request.validateUsing(storeBoatDocumentValidator)
+    const payload = await request.validateUsing(storeBoatDocumentsValidator)
     const org = await this.organizationService.findOrFail(boat.organizationId)
 
-    await this.mediaService.upload(
+    const { uploaded, failed } = await this.mediaService.uploadMany(
       user,
-      payload.file,
+      payload.files,
       {
         folder: CloudinaryFolders.boatDocuments(org.slug, boat.id),
         entityType: 'boat',
@@ -97,7 +112,22 @@ export default class BoatMediaController {
       org
     )
 
-    session.flash('success', i18n.t('flash.media.documentAdded'))
+    if (failed.length === 0) {
+      session.flash(
+        'success',
+        i18n.t('flash.media.documentsAdded', { count: String(uploaded.length) })
+      )
+    } else if (uploaded.length > 0) {
+      session.flash(
+        'success',
+        i18n.t('flash.media.documentsAddedPartial', {
+          succeeded: String(uploaded.length),
+          failed: String(failed.length),
+        })
+      )
+    } else {
+      session.flash('error', i18n.t('flash.media.documentsAddFailed'))
+    }
     response.redirect(`/boats/${boat.id}?tab=documents`)
   }
 
@@ -148,12 +178,12 @@ export default class BoatMediaController {
       return
     }
 
-    const payload = await request.validateUsing(storeBoatDocumentValidator)
+    const payload = await request.validateUsing(storeBoatDocumentsValidator)
     const org = await this.organizationService.findOrFail(boat.organizationId)
 
-    await this.mediaService.upload(
+    const { uploaded, failed } = await this.mediaService.uploadMany(
       user,
-      payload.file,
+      payload.files,
       {
         folder: CloudinaryFolders.boatEngineDocuments(org.slug, boat.id, engineId),
         entityType: 'boat_engine',
@@ -164,7 +194,22 @@ export default class BoatMediaController {
       org
     )
 
-    session.flash('success', i18n.t('flash.media.documentAdded'))
+    if (failed.length === 0) {
+      session.flash(
+        'success',
+        i18n.t('flash.media.documentsAdded', { count: String(uploaded.length) })
+      )
+    } else if (uploaded.length > 0) {
+      session.flash(
+        'success',
+        i18n.t('flash.media.documentsAddedPartial', {
+          succeeded: String(uploaded.length),
+          failed: String(failed.length),
+        })
+      )
+    } else {
+      session.flash('error', i18n.t('flash.media.documentsAddFailed'))
+    }
     response.redirect(`/boats/${boat.id}/engines/${engineId}?tab=documents`)
   }
 
@@ -247,12 +292,12 @@ export default class BoatMediaController {
       throw error
     }
 
-    const payload = await request.validateUsing(storeBoatPhotoValidator)
+    const payload = await request.validateUsing(storeBoatPhotosValidator)
     const org = await this.organizationService.findOrFail(boat.organizationId)
 
-    await this.mediaService.upload(
+    const { uploaded, failed } = await this.mediaService.uploadMany(
       user,
-      payload.file,
+      payload.files,
       {
         folder: CloudinaryFolders.inspectionPhotos(
           org.slug,
@@ -268,7 +313,22 @@ export default class BoatMediaController {
       org
     )
 
-    session.flash('success', i18n.t('flash.media.photoAdded'))
+    if (failed.length === 0) {
+      session.flash(
+        'success',
+        i18n.t('flash.media.photosAdded', { count: String(uploaded.length) })
+      )
+    } else if (uploaded.length > 0) {
+      session.flash(
+        'success',
+        i18n.t('flash.media.photosAddedPartial', {
+          succeeded: String(uploaded.length),
+          failed: String(failed.length),
+        })
+      )
+    } else {
+      session.flash('error', i18n.t('flash.media.photosAddFailed'))
+    }
     response.redirect(`/boats/${boat.id}/reservations/${reservation.id}/inspection`)
   }
 

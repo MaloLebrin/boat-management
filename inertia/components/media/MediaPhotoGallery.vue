@@ -16,15 +16,15 @@ const props = defineProps<{
 
 const { t } = useT()
 const fileInput = ref<HTMLInputElement>()
-const form = useForm({ file: null as File | null })
+const form = useForm({ files: [] as File[] })
 
 function onFileChange(e: Event) {
   const input = e.target as HTMLInputElement
-  form.file = input.files?.[0] ?? null
-  if (form.file) submitPhoto()
+  form.files = input.files ? Array.from(input.files) : []
+  if (form.files.length > 0) submitPhotos()
 }
 
-function submitPhoto() {
+function submitPhotos() {
   form.post(props.uploadUrl, {
     forceFormData: true,
     preserveScroll: true,
@@ -56,7 +56,7 @@ function deletePhoto(mediaId: number) {
         @click="fileInput?.click()"
       >
         <PlusIcon class="h-4 w-4 mr-1" />
-        {{ t('media.photos.add') }}
+        {{ form.processing ? t('media.photos.uploading') : t('media.photos.add') }}
       </BaseButton>
     </div>
 
@@ -64,6 +64,7 @@ function deletePhoto(mediaId: number) {
       v-if="canUpload"
       ref="fileInput"
       type="file"
+      multiple
       accept="image/jpeg,image/png,image/webp,image/gif,.heic,.heif"
       class="hidden"
       @change="onFileChange"

@@ -83,6 +83,36 @@ export default class MediaService {
     return media
   }
 
+  /**
+   * Uploads files one at a time so a failure partway through (quota exceeded,
+   * a single corrupt file) doesn't discard files that already succeeded.
+   * Sequential, not parallel: `updateStorageUsed` refreshes `org` in place
+   * after each upload, so the next iteration's quota check sees the up-to-date
+   * usage instead of a stale snapshot.
+   */
+  async uploadMany(
+    user: User,
+    files: MultipartFile[],
+    payload: UploadMediaPayload,
+    org?: Organization
+  ): Promise<{ uploaded: Media[]; failed: Array<{ filename: string; reason: string }> }> {
+    const uploaded: Media[] = []
+    const failed: Array<{ filename: string; reason: string }> = []
+
+    for (const file of files) {
+      try {
+        uploaded.push(await this.upload(user, file, payload, org))
+      } catch (error) {
+        failed.push({
+          filename: file.clientName,
+          reason: error instanceof Error ? error.message : 'Unknown error',
+        })
+      }
+    }
+
+    return { uploaded, failed }
+  }
+
   async listForEntity(entityType: MediaEntityType, entityId: number): Promise<Media[]> {
     return await Media.query()
       .where('entityType', entityType)
@@ -232,7 +262,7 @@ export default class MediaService {
       .max('position as maxPosition')
       .first()
 
-    const max = (result as unknown as { maxPosition: number | null })?.maxPosition
-    return max === null || max === undefined ? 0 : max + 1
+    const max = result?.$extras.maxPosition as number | string | null | undefined
+    return max === null || max === undefined ? 0 : Number(max) + 1
   }
 }

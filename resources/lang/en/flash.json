@@ -48,8 +48,12 @@
     "analysisError": "An error occurred while generating the analysis. Please try again."
   },
   "media": {
-    "photoAdded": "Photo added.",
-    "documentAdded": "Document added.",
+    "photosAdded": "{count, plural, one {# photo added.} other {# photos added.}}",
+    "photosAddedPartial": "{succeeded} photo(s) added, {failed} failed.",
+    "photosAddFailed": "No photo could be added.",
+    "documentsAdded": "{count, plural, one {# document added.} other {# documents added.}}",
+    "documentsAddedPartial": "{succeeded} document(s) added, {failed} failed.",
+    "documentsAddFailed": "No document could be added.",
     "deleted": "File deleted."
   },
   "auth": {
@@ -181,7 +185,9 @@
     "updated": "Client updated.",
     "deleted": "Client deleted.",
     "notFound": "Client not found.",
-    "documentAdded": "Document added.",
+    "documentsAdded": "{count, plural, one {# document added.} other {# documents added.}}",
+    "documentsAddedPartial": "{succeeded} document(s) added, {failed} failed.",
+    "documentsAddFailed": "No document could be added.",
     "documentDeleted": "Document deleted.",
     "anonymized": "Client anonymized.",
     "alreadyAnonymized": "This client is already anonymized."

@@ -62,7 +62,7 @@
   "documents": {
     "title": "Documents",
     "subtitle": "Permit copy, ID document…",
-    "add": "+ Add a document",
+    "add": "+ Add documents",
     "empty": "No documents for this client.",
     "formats": "PDF, DOCX, XLSX, CSV — 20 MB max.",
     "download": "Download",
@@ -73,9 +73,9 @@
     },
     "modalTitle": "Add a document",
     "modalSubtitle": "Document attached to {name}",
-    "dropzone": "Drop a file here",
+    "dropzone": "Drop files here",
     "browse": "Browse",
-    "selectedFile": "Selected file",
+    "selectedFiles": "Selected files",
     "caption": "Label (optional)",
     "upload": "Upload",
     "uploading": "Uploading…"

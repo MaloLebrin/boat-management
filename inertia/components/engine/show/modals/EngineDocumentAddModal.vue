@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { DocumentArrowUpIcon } from '@heroicons/vue/24/outline'
+import { DocumentArrowUpIcon, XMarkIcon } from '@heroicons/vue/24/outline'
 import { useForm } from '@inertiajs/vue3'
 import { computed, ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
@@ -21,7 +21,7 @@ const { t } = useT()
 const fileInput = ref<HTMLInputElement>()
 const isDragging = ref(false)
 
-const form = useForm({ file: null as File | null, caption: '' })
+const form = useForm({ files: [] as File[], caption: '' })
 
 const engineTitle = computed(() => {
   if (props.engine.brand && props.engine.model) {
@@ -40,7 +40,7 @@ function formatBytes(bytes: number): string {
 
 function onFileChange(e: Event) {
   const input = e.target as HTMLInputElement
-  form.file = input.files?.[0] ?? null
+  form.files = input.files ? Array.from(input.files) : []
 }
 
 function onDragOver(e: DragEvent) {
@@ -55,7 +55,11 @@ function onDragLeave() {
 function onDrop(e: DragEvent) {
   e.preventDefault()
   isDragging.value = false
-  form.file = e.dataTransfer?.files?.[0] ?? null
+  form.files = e.dataTransfer?.files ? Array.from(e.dataTransfer.files) : []
+}
+
+function removeFile(index: number) {
+  form.files = form.files.filter((_, i) => i !== index)
 }
 
 function close() {
@@ -64,7 +68,7 @@ function close() {
 }
 
 function submit() {
-  if (!form.file) return
+  if (form.files.length === 0) return
   form.post(`/boats/${props.boat.id}/engines/${props.engine.id}/documents`, {
     forceFormData: true,
     onSuccess: () => close(),
@@ -85,6 +89,7 @@ function submit() {
       <input
         ref="fileInput"
         type="file"
+        multiple
         accept=".pdf,.csv,.xlsx,.docx,.doc"
         class="hidden"
         @change="onFileChange"
@@ -117,13 +122,28 @@ function submit() {
       </div>
 
       <div
-        v-if="form.file"
+        v-if="form.files.length > 0"
         class="rounded-lg border border-border bg-surface-elevated px-4 py-3 text-sm"
       >
-        <p class="font-semibold text-fg">{{ t('boats.show.mediaUpload.selectedFile') }}</p>
-        <p class="mt-1 text-fg-muted">{{ form.file.name }} · {{ formatBytes(form.file.size) }}</p>
+        <p class="font-semibold text-fg">{{ t('boats.show.mediaUpload.selectedFiles') }}</p>
+        <ul class="mt-1 space-y-1">
+          <li
+            v-for="(file, index) in form.files"
+            :key="`${file.name}-${index}`"
+            class="flex items-center justify-between gap-2 text-fg-muted"
+          >
+            <span class="truncate">{{ file.name }} · {{ formatBytes(file.size) }}</span>
+            <button
+              type="button"
+              class="text-fg-subtle hover:text-danger"
+              @click="removeFile(index)"
+            >
+              <XMarkIcon class="h-4 w-4" />
+            </button>
+          </li>
+        </ul>
       </div>
-      <p v-if="form.errors.file" class="text-sm text-danger">{{ form.errors.file }}</p>
+      <p v-if="form.errors.files" class="text-sm text-danger">{{ form.errors.files }}</p>
 
       <div>
         <label class="block text-sm font-semibold text-fg mb-1">
@@ -141,7 +161,7 @@ function submit() {
         <BaseButton variant="ghost" type="button" @click="close">
           {{ t('common.cancel') }}
         </BaseButton>
-        <BaseButton type="button" :disabled="!form.file || form.processing" @click="submit">
+        <BaseButton type="button" :disabled="!form.files.length || form.processing" @click="submit">
           {{
             form.processing
               ? t('boats.show.mediaUpload.uploading')
