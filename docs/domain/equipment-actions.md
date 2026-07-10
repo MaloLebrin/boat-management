@@ -125,7 +125,7 @@ label, actionType })` → `BoatShowTabEquipment.vue` (hôte) ouvre un unique `Bo
   avec la prop `prefill`. Le modal soumet le lien via inputs cachés `equipmentType`/`equipmentId`
   (déjà acceptés par `createBoatEquipmentActionValidator`), ce qui rattache l'action à l'équipement
   d'origine (affiché en lecture seule sur la carte d'action).
-- **Fichiers** : `BoatGenericEquipmentCard.vue`, `BoatSafetyEquipmentCard.vue` (bouton + emit),
+- **Fichiers** : `BoatGenericEquipmentRow.vue`, `BoatSafetyEquipmentCard.vue` (bouton + emit),
   `BoatShowTabEquipment.vue` (hôte du modal), `BoatEquipmentActionModal.vue` (prop `prefill`),
   `BoatShowTabContent.vue` (passe `canManageEquipmentActions`). Gating : bouton visible si
   `equipmentActions.create` (membre). i18n `equipmentActions.prefill.addButton`.

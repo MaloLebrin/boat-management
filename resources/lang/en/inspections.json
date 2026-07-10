@@ -23,13 +23,6 @@
     "delete": "Delete",
     "confirmDelete": "Delete this inspection?"
   },
-  "photos": {
-    "title": "Photos",
-    "add": "+ Add a photo",
-    "empty": "No photos.",
-    "delete": "Delete",
-    "confirmDelete": "Delete this photo?"
-  },
   "comparison": {
     "title": "Checkout / checkin comparison",
     "fuelLevel": "Fuel level",

@@ -43,7 +43,7 @@ Référence: `inertia/app.ts`.
     - `inertia/components/boats/equipment-actions/BoatEquipmentActionCard.vue` — carte individuelle action
     - `inertia/components/boats/equipment-actions/BoatEquipmentActionModal.vue` — modal création/édition (prop `prefill` pour l'ajout depuis un équipement, #313)
     - `inertia/components/boats/show/tabs/BoatShowTabEquipmentActions.vue` — onglet liste avec filtres
-  - onglet Équipement : `BoatShowTabEquipment.vue` héberge le modal d'action ; `BoatGenericEquipmentCard.vue` / `BoatSafetyEquipmentCard.vue` exposent un bouton « Ajouter à la liste » sur les items dégradés (#313)
+  - onglet Équipement : `BoatShowTabEquipment.vue` héberge le modal d'action ; `BoatGenericEquipmentRow.vue` (extrait de `BoatGenericEquipmentCard.vue`) / `BoatSafetyEquipmentCard.vue` exposent un bouton « Ajouter à la liste » sur les items dégradés (#313)
 - Props (types): `inertia/types/boat_show.ts`
 - Source backend: `BoatsController.show`
 
@@ -77,6 +77,14 @@ Référence: `inertia/app.ts`.
   - `PortsMapCanvas.vue` — carte pointillée + arcs : `HomeStatsBandSection` (`dark`, bande navy), hero contact (`light`)
   - `ParticleNetworkCanvas.vue` — particules réactives souris : `HomeFinalCtaSection`
 - Détail des animations : `inertia/css/ANIMATIONS.md`
+
+## Galerie photo partagée
+
+`inertia/components/media/MediaPhotoGallery.vue` — galerie réutilisable pilotée par props
+(`uploadUrl`, `deleteUrlFor`, `photos`, `canUpload`, `canDelete`). Upload via `useForm` +
+`form.post(..., { forceFormData: true })`, suppression via `router.delete`. i18n : `media.photos.*`.
+
+Consommateurs : `InspectionPhotos.vue` (wrapper fin).
 
 ## Patterns UI (forms)
 
