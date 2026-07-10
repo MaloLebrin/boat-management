@@ -89,8 +89,10 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
           aria-hidden="true"
         >
           <circle cx="32" cy="32" r="28" stroke="#0b1d2e" stroke-width="2.6" />
-          <path d="M32 9 L37.5 32 L32 36.5 L26.5 32 Z" fill="#0b1d2e" />
-          <path d="M32 55 L37.5 32 L32 27.5 L26.5 32 Z" fill="#e2674f" />
+          <g class="compass-needle">
+            <path d="M32 9 L37.5 32 L32 36.5 L26.5 32 Z" fill="#0b1d2e" />
+            <path d="M32 55 L37.5 32 L32 27.5 L26.5 32 Z" fill="#e2674f" />
+          </g>
           <circle cx="32" cy="32" r="2.4" fill="#faf6ee" stroke="#0b1d2e" stroke-width="1.4" />
         </svg>
         <span class="font-display text-lg leading-none text-fg" style="letter-spacing: -0.025em">
@@ -184,3 +186,26 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
     @switch-locale="switchLocale"
   />
 </template>
+
+<style scoped>
+.compass-needle {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: compass-spin 8s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .compass-needle {
+    animation: none;
+  }
+}
+
+@keyframes compass-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+</style>

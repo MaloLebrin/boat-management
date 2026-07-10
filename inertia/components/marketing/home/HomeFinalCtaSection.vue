@@ -24,8 +24,10 @@ defineProps<{
         fill="none"
       >
         <circle cx="100" cy="100" r="90" stroke="#faf6ee" stroke-width="2" />
-        <path d="M100 20 L108 100 L100 108 L92 100 Z" fill="#faf6ee" />
-        <path d="M100 180 L108 100 L100 92 L92 100 Z" fill="#e2674f" />
+        <g class="compass-needle">
+          <path d="M100 20 L108 100 L100 108 L92 100 Z" fill="#faf6ee" />
+          <path d="M100 180 L108 100 L100 92 L92 100 Z" fill="#e2674f" />
+        </g>
         <circle cx="100" cy="100" r="6" fill="#faf6ee" />
       </svg>
     </div>
@@ -54,3 +56,26 @@ defineProps<{
     </div>
   </section>
 </template>
+
+<style scoped>
+.compass-needle {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: compass-spin 8s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .compass-needle {
+    animation: none;
+  }
+}
+
+@keyframes compass-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+</style>
