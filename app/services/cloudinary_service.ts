@@ -60,8 +60,26 @@ export const CloudinaryFolders = {
   boatRigDocuments: (orgSlug: string, boatId: number) =>
     `${envPrefix()}/organizations/${orgSlug}/boats/${boatId}/rig/documents`,
 
+  boatEnginePart: (orgSlug: string, boatId: number, engineId: number, partId: number) =>
+    `${envPrefix()}/organizations/${orgSlug}/boats/${boatId}/engines/${engineId}/parts/${partId}`,
+
+  boatEnginePartPhotos: (orgSlug: string, boatId: number, engineId: number, partId: number) =>
+    `${envPrefix()}/organizations/${orgSlug}/boats/${boatId}/engines/${engineId}/parts/${partId}/photos`,
+
   boatEnginePartDocuments: (orgSlug: string, boatId: number, engineId: number, partId: number) =>
     `${envPrefix()}/organizations/${orgSlug}/boats/${boatId}/engines/${engineId}/parts/${partId}/documents`,
+
+  boatGenericEquipment: (orgSlug: string, boatId: number, itemId: number) =>
+    `${envPrefix()}/organizations/${orgSlug}/boats/${boatId}/generic-equipment/${itemId}`,
+
+  boatGenericEquipmentPhotos: (orgSlug: string, boatId: number, itemId: number) =>
+    `${envPrefix()}/organizations/${orgSlug}/boats/${boatId}/generic-equipment/${itemId}/photos`,
+
+  boatSafetyEquipment: (orgSlug: string, boatId: number, itemId: number) =>
+    `${envPrefix()}/organizations/${orgSlug}/boats/${boatId}/safety-equipment/${itemId}`,
+
+  boatSafetyEquipmentPhotos: (orgSlug: string, boatId: number, itemId: number) =>
+    `${envPrefix()}/organizations/${orgSlug}/boats/${boatId}/safety-equipment/${itemId}/photos`,
 
   maintenance: (orgSlug: string, boatId: number, eventId: number) =>
     `${envPrefix()}/organizations/${orgSlug}/boats/${boatId}/maintenance/${eventId}`,

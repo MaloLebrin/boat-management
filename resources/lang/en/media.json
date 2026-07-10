@@ -1,0 +1,9 @@
+{
+  "photos": {
+    "title": "Photos",
+    "add": "+ Add a photo",
+    "empty": "No photos.",
+    "delete": "Delete",
+    "confirmDelete": "Delete this photo?"
+  }
+}
