@@ -24,6 +24,7 @@ server.use([
 
 router.use([
   () => import('@adonisjs/core/bodyparser_middleware'),
+  () => import('#middleware/large_multipart_upload_middleware'),
   () => import('@adonisjs/session/session_middleware'),
   ...(app.inTest ? [] : [() => import('@adonisjs/shield/shield_middleware')]),
   () => import('@adonisjs/auth/initialize_auth_middleware'),

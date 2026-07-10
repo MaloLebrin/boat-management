@@ -70,6 +70,11 @@ function photoBuffer() {
   return Buffer.from('\xff\xd8\xff\xe0 fake jpeg', 'binary')
 }
 
+/** A valid-magic JPEG buffer padded to roughly `mb` megabytes. */
+function largePhotoBuffer(mb: number) {
+  return Buffer.concat([photoBuffer(), Buffer.alloc(mb * 1024 * 1024)])
+}
+
 /** Builds a boat owned by `user` with one of every equipment kind attached. */
 async function seedEquipment(user: User) {
   const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
@@ -214,6 +219,34 @@ test.group('Equipment photos — upload (functional)', (group) => {
       }
     })
   }
+
+  test('POST accepts a batch whose total size exceeds the base multipart limit', async ({
+    client,
+  }) => {
+    // Three ~8mb photos = ~24mb total, above the base 20mb multipart limit but well
+    // under LARGE_UPLOAD_LIMIT (400mb). This only succeeds because the batch route is
+    // scoped out of the base limit (processManually + LargeMultipartUploadMiddleware);
+    // otherwise the request would abort with 413 during streaming.
+    const c = CASES[0]
+    const fake = swapFakeCloudinary()
+    try {
+      const user = await createEnterpriseAdminUser()
+      const seed = await seedEquipment(user)
+
+      const response = await client
+        .post(c.uploadUrl(seed))
+        .loginAs(user)
+        .file('files[]', largePhotoBuffer(8), { filename: 'big-1.jpg', contentType: 'image/jpeg' })
+        .file('files[]', largePhotoBuffer(8), { filename: 'big-2.jpg', contentType: 'image/jpeg' })
+        .file('files[]', largePhotoBuffer(8), { filename: 'big-3.jpg', contentType: 'image/jpeg' })
+        .redirects(0)
+
+      response.assertStatus(302)
+      response.assertHeader('location', c.photosUrl(seed))
+    } finally {
+      app.container.restore(CloudinaryService)
+    }
+  })
 
   test('POST keeps successful uploads when one file in the batch fails', async ({
     client,
