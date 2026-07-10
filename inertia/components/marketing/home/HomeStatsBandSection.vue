@@ -18,19 +18,14 @@ const { el: sectionEl, isVisible } = useScrollReveal()
 <template>
   <section
     :ref="sectionEl"
-    class="reveal relative overflow-hidden px-6 py-24 lg:px-8 lg:py-32"
+    class="reveal relative overflow-hidden px-6 py-16 lg:px-8 lg:py-20"
     :class="{ visible: isVisible }"
   >
-    <!-- Bande diagonale « Stripe » : seul ce calque de fond est skewé,
-         la carte à l'intérieur est contre-skewée, le texte reste droit.
-         Insets en vw : l'excursion verticale du skew vaut 50vw·tan(6°) ≈ 5.25vw. -->
-    <div
-      class="section-skew absolute inset-x-0 bottom-[6vw] top-[6vw] overflow-hidden bg-navy-900"
-      aria-hidden="true"
-    >
-      <div class="section-skew-content absolute inset-0">
-        <PortsMapCanvas variant="dark" :intensity="0.55" />
-      </div>
+    <!-- Bande diagonale « Stripe » : clip-path découpe la zone visible du
+         calque de fond, la carte à l'intérieur reste dans son flux normal
+         (aucun contre-transform, aucune couverture à deviner). -->
+    <div class="section-diagonal-band absolute inset-0 bg-navy-900" aria-hidden="true">
+      <PortsMapCanvas variant="dark" :intensity="0.55" />
     </div>
     <div class="relative mx-auto max-w-7xl">
       <div class="grid grid-cols-2 gap-8 md:grid-cols-4">

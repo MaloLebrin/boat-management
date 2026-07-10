@@ -22,6 +22,7 @@ defineProps<{
 const { t: tApp } = useT()
 
 const { el: howItWorksEl, isVisible: howItWorksVisible } = useScrollReveal()
+const { el: timelineEl, isVisible: timelineVisible } = useScrollReveal()
 const { el: previewEl, isVisible: previewVisible } = useScrollReveal()
 </script>
 
@@ -60,7 +61,11 @@ const { el: previewEl, isVisible: previewVisible } = useScrollReveal()
   </section>
 
   <!-- Timeline J1/J7/J30 -->
-  <section class="mt-10 px-6 lg:px-8">
+  <section
+    :ref="timelineEl"
+    class="mt-10 reveal px-6 lg:px-8"
+    :class="{ visible: timelineVisible }"
+  >
     <div class="mx-auto max-w-4xl rounded-2xl bg-navy-900 px-6 py-10 shadow-xl sm:px-12">
       <p class="mb-8 text-center text-xs font-semibold uppercase tracking-widest text-white/50">
         {{ howItWorks.timeline.title }}

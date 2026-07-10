@@ -28,6 +28,7 @@ const { el: problemEl, isVisible: problemVisible } = useScrollReveal()
 const { el: featuresEl, isVisible: featuresVisible } = useScrollReveal()
 
 const { el: personasEl, isVisible: personasVisible } = useScrollReveal()
+const { el: pullQuoteEl, isVisible: pullQuoteVisible } = useScrollReveal()
 </script>
 
 <template>
@@ -103,7 +104,11 @@ const { el: personasEl, isVisible: personasVisible } = useScrollReveal()
   <HomeBentoGridSection :bento-grid="bentoGrid" />
 
   <!-- Section: Pull quote -->
-  <section class="py-14 text-center">
+  <section
+    :ref="pullQuoteEl"
+    class="reveal py-14 text-center"
+    :class="{ visible: pullQuoteVisible }"
+  >
     <div class="mx-auto max-w-2xl">
       <div
         class="mb-4 h-10 w-10 mx-auto rounded-full bg-bone flex items-center justify-center text-sm text-fg-muted"

@@ -12,29 +12,27 @@ defineProps<{
 </script>
 
 <template>
-  <section class="relative overflow-hidden px-6 pb-20 pt-24 lg:px-8 lg:pb-24 lg:pt-32">
-    <!-- Arête diagonale « Stripe » en haut ; le bas déborde de la section
-         (clippé) pour rester horizontal contre le footer. -->
+  <section class="relative overflow-hidden px-6 pb-20 pt-20 lg:px-8 lg:pb-24 lg:pt-24">
+    <!-- Arête diagonale « Stripe » en haut ; clip-path découpe la zone
+         visible, le contenu (canvas, SVG) reste dans son flux normal. -->
     <div
-      class="section-skew absolute inset-x-0 -bottom-[6vw] top-[6vw] overflow-hidden bg-gradient-to-b from-navy-900 to-navy-800"
+      class="section-diagonal-top absolute inset-0 bg-gradient-to-b from-navy-900 to-navy-800"
       aria-hidden="true"
     >
-      <div class="section-skew-content absolute inset-0">
-        <!-- Réseau de particules (évoque une flotte connectée) -->
-        <ParticleNetworkCanvas color="#b7c3d2" :density="1.3" />
+      <!-- Réseau de particules (évoque une flotte connectée) -->
+      <ParticleNetworkCanvas color="#b7c3d2" :density="1.3" />
 
-        <!-- Decorative compass needle SVG -->
-        <svg
-          class="pointer-events-none absolute right-0 top-1/2 h-96 w-96 -translate-y-1/2 translate-x-1/4 opacity-10"
-          viewBox="0 0 200 200"
-          fill="none"
-        >
-          <circle cx="100" cy="100" r="90" stroke="#faf6ee" stroke-width="2" />
-          <path d="M100 20 L108 100 L100 108 L92 100 Z" fill="#faf6ee" />
-          <path d="M100 180 L108 100 L100 92 L92 100 Z" fill="#e2674f" />
-          <circle cx="100" cy="100" r="6" fill="#faf6ee" />
-        </svg>
-      </div>
+      <!-- Decorative compass needle SVG -->
+      <svg
+        class="pointer-events-none absolute right-0 top-1/2 h-96 w-96 -translate-y-1/2 translate-x-1/4 opacity-10"
+        viewBox="0 0 200 200"
+        fill="none"
+      >
+        <circle cx="100" cy="100" r="90" stroke="#faf6ee" stroke-width="2" />
+        <path d="M100 20 L108 100 L100 108 L92 100 Z" fill="#faf6ee" />
+        <path d="M100 180 L108 100 L100 92 L92 100 Z" fill="#e2674f" />
+        <circle cx="100" cy="100" r="6" fill="#faf6ee" />
+      </svg>
     </div>
 
     <div class="relative mx-auto max-w-3xl text-center">

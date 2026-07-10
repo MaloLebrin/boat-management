@@ -388,20 +388,39 @@ body {
 }
 
 /* ── Bandes diagonales « Stripe » ─────────────────────────────── */
-/* Pattern : section `relative overflow-hidden` avec padding vertical
-   généreux ; un calque de fond absolu (insetté verticalement pour garder
-   les pointes dans la section) porte `.section-skew` — le fond de page
-   apparaît dans les triangles → arêtes diagonales. Le canvas/motif à
-   l'intérieur du calque porte `.section-skew-content` (contre-skew +
-   surcouverture) pour rester horizontal. Le contenu texte est un frère
-   non transformé : on ne skew jamais le texte. Transforms statiques →
-   rien à couper sous reduced-motion. */
-.section-skew {
-  transform: skewY(-6deg);
+/* Pattern : section `relative overflow-hidden` ; un calque de fond absolu
+   `inset-0` porte `.section-diagonal-band` (ou `-top`) qui découpe une
+   zone diagonale via `clip-path` — le fond de page apparaît hors du
+   polygone → arêtes diagonales nettes. Le canvas/contenu à l'intérieur du
+   calque n'a besoin d'AUCUN contre-transform (contrairement à un skewY
+   imbriqué + scale de compensation, dont le facteur nécessaire dépend du
+   ratio largeur/hauteur et ne peut pas être fixé une fois pour toutes) :
+   il reste dans son flux normal, simplement rogné par le clip-path. Le
+   contenu texte est un frère non transformé, en dehors du calque.
+   `.section-diagonal-band` : diagonale en haut ET en bas (bande insérée
+   entre deux sections claires). `.section-diagonal-top` : diagonale en
+   haut seulement, bas plat (section qui se termine sur le footer). */
+.section-diagonal-band {
+  clip-path: polygon(0 0, 100% 6vw, 100% 100%, 0 calc(100% - 6vw));
 }
-.section-skew-content {
-  transform: skewY(6deg) scale(1.15);
-  transform-origin: center;
+.section-diagonal-top {
+  clip-path: polygon(0 6vw, 100% 0, 100% 100%, 0 100%);
+}
+
+/* Défilement vertical continu du panneau « À venir » du mock hero. */
+@keyframes taskScroll {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-50%);
+  }
+}
+.task-scroll {
+  animation: taskScroll 4.5s linear infinite;
+}
+.task-scroll:hover {
+  animation-play-state: paused;
 }
 
 /* Les animations décoratives infinies ne doivent pas « clignoter » à 1ms
@@ -410,6 +429,7 @@ body {
   .float-slow,
   .text-gradient-animated,
   .glow-border::after,
+  .task-scroll,
   .stagger.visible > * {
     animation: none !important;
   }

@@ -3,6 +3,15 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-07-10 — Marketing : correctifs animations (ticker hero, scroll-reveal, bandes diagonales)
+
+Trois correctifs sur la couche d'animations « Stripe-like » de la home :
+
+- **Mockup du hero** : le panneau « À venir » (`HomeMockDashboard`) affichait une liste statique. Ajout de `HomeMockUpcomingTasks.vue` (8 bateaux, liste dupliquée pour une boucle sans couture, fondu haut/bas via `mask-image`) et de la classe `.task-scroll` (`app.css`, keyframe `taskScroll`, boucle verticale 4.5s, pause au survol, coupée sous `prefers-reduced-motion`).
+- **Éléments jamais révélés au scroll** : le bloc timeline J1/J7/J30 (`HomeHowItWorksSection`) et le pull-quote (`HomeContentSections`) n'étaient jamais câblés à `useScrollReveal` — ils s'affichaient dès le chargement au lieu d'attendre le scroll, contrairement aux sections voisines. Câblage du pattern standard (`useScrollReveal()` + `:ref` + `class="reveal"` + `:class="{ visible }"`) sur les deux blocs.
+- **Bandes diagonales tronquées** : l'implémentation `skewY` imbriqué (parent skewé + enfant contre-skewé + `scale(1.15)`) laissait apparaître des pans de fond crème dans les coins de `HomeStatsBandSection` et `HomeFinalCtaSection` — la marge de sécurité entre l'excursion géométrique du skew (~5.25vw) et l'inset choisi (6vw) était de ~0.75vw, et le `scale` fixe ne pouvait pas couvrir tous les ratios largeur/hauteur de section. Remplacé par `clip-path: polygon(...)` (nouvelles classes `.section-diagonal-band` / `.section-diagonal-top`) : le contenu (canvas) reste dans son flux normal sans contre-transform, aucune zone non couverte possible quel que soit le ratio de la section.
+- **Doc** : `inertia/css/ANIMATIONS.md` mis à jour (ticker, clip-path).
+
 ## 2026-07-09 — Marketing : dégradé WebGL façon stripe.com, carte des ports animée, bandes diagonales
 
 Deuxième couche d'animations canvas inspirées de stripe.com sur les pages marketing (aucune dépendance npm ajoutée, tout est fait main comme la couche existante).
