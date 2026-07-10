@@ -324,7 +324,10 @@ onUnmounted(() => {
   <!-- 8. Stats band -->
   <HomeStatsBandSection :stats="t.home.statsBand" />
 
-  <!-- 9. Comparison table -->
+  <!-- 9. Testimonials -->
+  <HomeTestimonialsSection :title="t.home.testimonials.title" :items="t.home.testimonials.items" />
+
+  <!-- 10. Comparison table -->
   <HomeComparisonSection
     :title="t.home.comparison.title"
     :subtitle="t.home.comparison.subtitle"
@@ -332,17 +335,14 @@ onUnmounted(() => {
     :rows="t.home.comparison.rows"
   />
 
-  <!-- 8. Testimonials -->
-  <HomeTestimonialsSection :title="t.home.testimonials.title" :items="t.home.testimonials.items" />
-
-  <!-- 9. Security -->
+  <!-- 11. Security -->
   <HomeSecuritySection
     :title="t.home.security.title"
     :subtitle="t.home.security.subtitle"
     :items="t.home.security.items"
   />
 
-  <!-- 10. Demo -->
+  <!-- 12. Demo -->
   <HomeDemoSection
     :eyebrow="t.home.demo.eyebrow"
     :title="t.home.demo.title"
@@ -359,7 +359,7 @@ onUnmounted(() => {
     :locale="locale"
   />
 
-  <!-- 11. FAQ -->
+  <!-- 13. FAQ -->
   <HomeFaqSection
     :title="t.home.faq.title"
     :subtitle="t.home.faq.subtitle"
@@ -367,7 +367,7 @@ onUnmounted(() => {
     :items="t.home.faq.items"
   />
 
-  <!-- 11. Final CTA -->
+  <!-- 14. Final CTA -->
   <HomeFinalCtaSection
     :title="t.home.finalCta.title"
     :title-highlight="t.home.finalCta.titleHighlight"

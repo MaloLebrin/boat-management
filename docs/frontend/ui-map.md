@@ -67,6 +67,17 @@ Référence: `inertia/app.ts`.
 - Types frontend: `inertia/types/budget.ts`
 - Source backend: `BudgetController.show`
 
+### Marketing (pages publiques)
+
+- Pages : `inertia/pages/marketing/{home,pricing,about,contact,guide,simulator,simulator_share}.vue` — rendues par `MarketingController` (routes locale-préfixées `/en`, `/fr`, voir `start/routes/marketing.ts`), layout `inertia/layouts/public.vue`
+- i18n : textes construits côté serveur depuis `resources/lang/{en,fr}/marketing.json` et passés en prop `t` (namespace exclu de `appT`)
+- Composants par page dans `inertia/components/marketing/{home,pricing,about,contact,simulator,guide}/`
+- Canvas décoratifs (`inertia/components/marketing/canvas/`, tous `aria-hidden`, cycle de vie via `use_canvas_lifecycle.ts`) :
+  - `GradientMeshCanvas.vue` — dégradé WebGL (repli 2D) : heros home (`navy`), tarifs (`sunset`), about (`dawn`)
+  - `PortsMapCanvas.vue` — carte pointillée + arcs : `HomeStatsBandSection` (`dark`, bande navy), hero contact (`light`)
+  - `ParticleNetworkCanvas.vue` — particules réactives souris : `HomeFinalCtaSection`
+- Détail des animations : `inertia/css/ANIMATIONS.md`
+
 ## Patterns UI (forms)
 
 Le projet utilise le composant `<Form>` fourni par `@adonisjs/inertia/vue`.

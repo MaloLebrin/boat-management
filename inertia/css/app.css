@@ -387,12 +387,29 @@ body {
   animation-delay: 0.45s;
 }
 
+/* Défilement vertical continu du panneau « À venir » du mock hero. */
+@keyframes taskScroll {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-50%);
+  }
+}
+.task-scroll {
+  animation: taskScroll 4.5s linear infinite;
+}
+.task-scroll:hover {
+  animation-play-state: paused;
+}
+
 /* Les animations décoratives infinies ne doivent pas « clignoter » à 1ms
    sous reduced-motion : on les coupe explicitement. */
 @media (prefers-reduced-motion: reduce) {
   .float-slow,
   .text-gradient-animated,
   .glow-border::after,
+  .task-scroll,
   .stagger.visible > * {
     animation: none !important;
   }

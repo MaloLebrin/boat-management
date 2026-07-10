@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import HomeMockUpcomingTasks from './HomeMockUpcomingTasks.vue'
+
 defineProps<{
   persona?: 'loueurs' | 'ecoles' | 'marinas' | 'armateurs'
 }>()
@@ -190,9 +192,11 @@ defineProps<{
         </div>
 
         <!-- Right panel -->
-        <div class="w-[160px] shrink-0 border-l border-bone bg-paper/50 p-3">
+        <div
+          class="flex w-[160px] shrink-0 flex-col overflow-hidden border-l border-bone bg-paper/50 p-3"
+        >
           <!-- AI panel -->
-          <div class="mb-3 rounded-lg bg-violet-700 p-2 text-white">
+          <div class="mb-3 shrink-0 rounded-lg bg-violet-700 p-2 text-white">
             <div class="mb-1 flex items-center gap-1">
               <div class="h-3 w-3 rounded bg-white/30" />
               <span class="font-medium">FleetAI</span>
@@ -205,20 +209,8 @@ defineProps<{
             </button>
           </div>
 
-          <!-- Upcoming tasks -->
-          <div>
-            <p class="mb-2 text-[9px] font-medium uppercase text-fg-muted">A venir</p>
-            <div class="space-y-1.5">
-              <div class="rounded border border-bone bg-white p-1.5">
-                <p class="font-medium text-fg">Azur</p>
-                <p class="text-[9px] text-fg-muted">Antifouling - 12 mai</p>
-              </div>
-              <div class="rounded border border-bone bg-white p-1.5">
-                <p class="font-medium text-fg">Tramontane</p>
-                <p class="text-[9px] text-fg-muted">Greement - 18 mai</p>
-              </div>
-            </div>
-          </div>
+          <!-- Upcoming tasks — défilement vertical continu (sous-composant) -->
+          <HomeMockUpcomingTasks />
         </div>
       </div>
     </div>

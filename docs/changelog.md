@@ -3,6 +3,25 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-07-10 — Marketing : correctifs animations (ticker hero, scroll-reveal)
+
+Deux correctifs sur la couche d'animations « Stripe-like » de la home :
+
+- **Mockup du hero** : le panneau « À venir » (`HomeMockDashboard`) affichait une liste statique. Ajout de `HomeMockUpcomingTasks.vue` (8 bateaux, liste dupliquée pour une boucle sans couture, fondu haut/bas via `mask-image`) et de la classe `.task-scroll` (`app.css`, keyframe `taskScroll`, boucle verticale 4.5s, pause au survol, coupée sous `prefers-reduced-motion`).
+- **Éléments jamais révélés au scroll** : le bloc timeline J1/J7/J30 (`HomeHowItWorksSection`) et le pull-quote (`HomeContentSections`) n'étaient jamais câblés à `useScrollReveal` — ils s'affichaient dès le chargement au lieu d'attendre le scroll, contrairement aux sections voisines. Câblage du pattern standard (`useScrollReveal()` + `:ref` + `class="reveal"` + `:class="{ visible }"`) sur les deux blocs.
+- **Doc** : `inertia/css/ANIMATIONS.md` mis à jour (ticker).
+
+## 2026-07-09 — Marketing : dégradé WebGL façon stripe.com, carte des ports animée
+
+Deuxième couche d'animations canvas inspirées de stripe.com sur les pages marketing (aucune dépendance npm ajoutée, tout est fait main comme la couche existante).
+
+- **Dégradé de hero en WebGL authentique** : `GradientMeshCanvas.vue` devient un hôte fin avec chaîne de repli **WebGL → canvas 2D (blobs existants) → fond CSS**. Le nouveau moteur (`mesh_gradient_webgl.ts`) reproduit la vraie technique du hero stripe.com : bruit simplex 2D (Ashima) empilé en Fractal Brownian Motion + « domain warping » (le champ de bruit se replie sur lui-même) + pré-warp sinusoïdal décalé dans le temps, sur un seul triangle plein écran. API inchangée (`variant`, `intensity`) → heros home/tarifs non modifiés ; nouvelle variante claire **`dawn`** (pastels sur cream). Gestion `webglcontextlost/restored`, dpr plafonné à 1.5 en WebGL (2 en 2D).
+- **Carte du monde pointillée + arcs de routes maritimes** (`PortsMapCanvas.vue`, inspirée du globe Stripe, à plat et nautique) : continents en grille hexagonale de points (précalculée dans un canvas offscreen à chaque resize — le dessin par frame se réduit à un `drawImage` + arcs), « comètes » qui parcourent des Bézier quadratiques entre ~10 ports (La Rochelle, Marseille, Miami…), ports pulsants. Variantes `dark`/`light`. Données géo décoratives embarquées (`world_map_data.ts`), aucune requête réseau. Utilisée en fond plein (`HomeStatsBandSection`, contact) et dans le CTA final (`ParticleNetworkCanvas`).
+- **Heros About & Contact** habillés : About → mesh gradient `dawn` ; Contact → carte des ports `light`.
+- **Composable `use_canvas_lifecycle.ts`** : mutualise le cycle de vie des canvas décoratifs (frame statique immédiate couvrant `prefers-reduced-motion`, pause hors écran via `IntersectionObserver` + onglet caché via `visibilitychange`, resize, cleanup complet) — utilisé par le mesh gradient et la carte ; `ParticleNetworkCanvas` inchangé.
+- **Tests** : ordre de repli WebGL → 2D du mesh, montage `PortsMapCanvas` (2 variantes) et variante `dawn`, fonctions pures de la carte (`pointInPolygon`, `projectLonLat`, `buildDots`, validité ports/routes), helpers couleur et moteur blobs stubé.
+- **Doc** : `inertia/css/ANIMATIONS.md` (nouvelles briques) et `docs/frontend/ui-map.md` (section Marketing ajoutée).
+
 ## 2026-07-09 — Marketing : correction des liens morts (404) + page de confidentialité
 
 Audit et correction des liens 404 sur les pages publiques (issue #345) :

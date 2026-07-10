@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useScrollReveal } from '~/composables/use_scroll_reveal'
+import PortsMapCanvas from '../canvas/PortsMapCanvas.vue'
 import HomeStatValue from './HomeStatValue.vue'
 
 interface StatItem {
@@ -17,10 +18,13 @@ const { el: sectionEl, isVisible } = useScrollReveal()
 <template>
   <section
     :ref="sectionEl"
-    class="reveal border-y border-bone bg-white px-6 py-12 lg:px-8 lg:py-16"
+    class="reveal relative overflow-hidden px-6 py-16 lg:px-8 lg:py-20"
     :class="{ visible: isVisible }"
   >
-    <div class="mx-auto max-w-7xl">
+    <div class="absolute inset-0 bg-navy-900" aria-hidden="true">
+      <PortsMapCanvas variant="dark" :intensity="0.55" />
+    </div>
+    <div class="relative mx-auto max-w-7xl">
       <div class="grid grid-cols-2 gap-8 md:grid-cols-4">
         <div
           v-for="(stat, idx) in stats"
@@ -29,13 +33,13 @@ const { el: sectionEl, isVisible } = useScrollReveal()
           :class="[
             `reveal-delay-${idx + 1}`,
             { visible: isVisible },
-            idx < stats.length - 1 ? 'md:border-r md:border-bone' : '',
+            idx < stats.length - 1 ? 'md:border-r md:border-white/10' : '',
           ]"
         >
-          <p class="font-display text-4xl text-fg lg:text-5xl">
+          <p class="font-display text-4xl text-white lg:text-5xl">
             <HomeStatValue :value="stat.value" />
           </p>
-          <p class="mt-2 text-sm text-fg-muted">{{ stat.label }}</p>
+          <p class="mt-2 text-sm text-white/60">{{ stat.label }}</p>
         </div>
       </div>
     </div>

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import PortsMapCanvas from '../canvas/PortsMapCanvas.vue'
+
 defineProps<{
   eyebrow: string
   title: string
@@ -8,8 +10,9 @@ defineProps<{
 </script>
 
 <template>
-  <section class="bg-cream px-6 pb-12 pt-20 lg:px-8 lg:pt-28">
-    <div class="mx-auto max-w-3xl text-center">
+  <section class="relative overflow-hidden bg-cream px-6 pb-12 pt-20 lg:px-8 lg:pt-28">
+    <PortsMapCanvas variant="light" :intensity="0.5" />
+    <div class="relative mx-auto max-w-3xl text-center">
       <p
         class="font-mono text-xs font-semibold uppercase tracking-widest text-coral-500"
         style="animation: fadeUp 700ms var(--ease-premium) both"
