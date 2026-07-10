@@ -228,7 +228,7 @@ test.group('Equipment photos — upload (functional)', (group) => {
     // scoped out of the base limit (processManually + LargeMultipartUploadMiddleware);
     // otherwise the request would abort with 413 during streaming.
     const c = CASES[0]
-    const fake = swapFakeCloudinary()
+    swapFakeCloudinary()
     try {
       const user = await createEnterpriseAdminUser()
       const seed = await seedEquipment(user)
