@@ -1,15 +1,26 @@
 import OrganizationModule from '#models/organization_module'
 import Organization from '#models/organization'
 import { resolveEffectiveQuotas } from '#shared/helpers/plan'
-import { PLAN_MODULES } from '#shared/types/plan'
-import type { ModuleSource, PlanModule, PlanQuotas } from '#shared/types/plan'
+import { isPlanAddon, isPlanModule, PLAN_MODULES } from '#shared/types/plan'
+import type {
+  ActiveAddonInfo,
+  ModuleSource,
+  PlanAddon,
+  PlanModule,
+  PlanQuotas,
+} from '#shared/types/plan'
 import { inject } from '@adonisjs/core'
 import type { TransactionClientContract } from '@adonisjs/lucid/types/database'
 
-/** Item de module désiré, tel que dérivé des items d'un abonnement Stripe. */
+/**
+ * Item désiré dérivé d'un item d'abonnement Stripe. Couvre modules booléens
+ * (`quantity` = 1, ignorée) et add-ons quantitatifs (`quantity` = nombre
+ * d'unités de l'item Stripe).
+ */
 export interface DesiredSubscriptionModule {
-  module: PlanModule
+  module: PlanModule | PlanAddon
   stripeSubscriptionItemId: string
+  quantity: number
 }
 
 /**
@@ -19,27 +30,50 @@ export interface DesiredSubscriptionModule {
  */
 @inject()
 export default class OrganizationModuleService {
+  /** Modules booléens actifs (exclut les lignes d'add-on quantitatif). */
   async getActiveModules(organizationId: number): Promise<PlanModule[]> {
     const rows = await OrganizationModule.query()
       .where('organizationId', organizationId)
       .select('module')
-    return rows.map((row) => row.module)
+    return rows.map((row) => row.module).filter((m): m is PlanModule => isPlanModule(m))
   }
 
-  /** Modules actifs avec leur origine, pour l'affichage in-app (badge « offert »). */
+  /** Add-ons quantitatifs actifs avec leur quantité et origine (ex. `extra_boats`). */
+  async getActiveAddons(organizationId: number): Promise<ActiveAddonInfo[]> {
+    const rows = await OrganizationModule.query()
+      .where('organizationId', organizationId)
+      .orderBy('module')
+    return rows
+      .filter((row) => isPlanAddon(row.module))
+      .map((row) => ({
+        addon: row.module as PlanAddon,
+        quantity: row.quantity,
+        source: row.source,
+      }))
+  }
+
+  /**
+   * Modules booléens actifs avec leur origine, pour l'affichage in-app (badge
+   * « offert »). Exclut les add-ons quantitatifs (exposés via `getActiveAddons`).
+   */
   async listWithSource(
     organizationId: number
   ): Promise<Array<{ module: PlanModule; source: ModuleSource }>> {
     const rows = await OrganizationModule.query()
       .where('organizationId', organizationId)
       .orderBy('module')
-    return rows.map((row) => ({ module: row.module, source: row.source }))
+    return rows
+      .filter((row) => isPlanModule(row.module))
+      .map((row) => ({ module: row.module as PlanModule, source: row.source }))
   }
 
-  /** Ligne d'un module souscrit (source `subscription`), pour résilier son item Stripe. */
+  /**
+   * Ligne souscrite (source `subscription`) d'un module ou add-on, pour
+   * résilier / mettre à jour son item Stripe.
+   */
   async findSubscriptionModule(
     organizationId: number,
-    module: PlanModule
+    module: PlanModule | PlanAddon
   ): Promise<OrganizationModule | null> {
     return OrganizationModule.query()
       .where('organizationId', organizationId)
@@ -49,12 +83,17 @@ export default class OrganizationModuleService {
   }
 
   /**
-   * Quotas effectifs de l'organisation : ceux de son tier fusionnés avec les
-   * flags de ses modules actifs (helper pur `resolveEffectiveQuotas`).
+   * Quotas effectifs de l'organisation : ceux de son tier, fusionnés avec les
+   * flags de ses modules actifs, puis augmentés par ses add-ons quantitatifs
+   * (helper pur `resolveEffectiveQuotas`).
    */
   async getEffectiveQuotas(org: Organization): Promise<PlanQuotas> {
-    const modules = await this.getActiveModules(org.id)
-    return resolveEffectiveQuotas(org.plan, modules)
+    const rows = await OrganizationModule.query().where('organizationId', org.id)
+    const modules = rows.map((row) => row.module).filter((m): m is PlanModule => isPlanModule(m))
+    const addons = rows
+      .filter((row) => isPlanAddon(row.module))
+      .map((row) => ({ addon: row.module as PlanAddon, quantity: row.quantity }))
+    return resolveEffectiveQuotas(org.plan, modules, addons)
   }
 
   async hasModule(organizationId: number, module: PlanModule): Promise<boolean> {
@@ -103,6 +142,32 @@ export default class OrganizationModuleService {
   }
 
   /**
+   * Fixe la quantité d'un add-on quantitatif (ex. `extra_boats`). `quantity <= 0`
+   * retire la ligne. Utilisé pour un don manuel / les tests ; la sync Stripe
+   * passe par `reconcileSubscriptionModules`.
+   */
+  async setAddonQuantity(
+    organizationId: number,
+    addon: PlanAddon,
+    quantity: number,
+    options: { source?: ModuleSource; stripeSubscriptionItemId?: string | null } = {}
+  ): Promise<void> {
+    const source = options.source ?? 'granted'
+    if (quantity <= 0) {
+      await OrganizationModule.query()
+        .where('organizationId', organizationId)
+        .where('module', addon)
+        .where('source', source)
+        .delete()
+      return
+    }
+    await OrganizationModule.updateOrCreate(
+      { organizationId, module: addon },
+      { source, quantity, stripeSubscriptionItemId: options.stripeSubscriptionItemId ?? null }
+    )
+  }
+
+  /**
    * Réconcilie les modules issus d'un abonnement Stripe (source `subscription`)
    * avec l'état désiré dérivé des items de l'abonnement (#330). Opère dans la
    * transaction de la sync pour rester atomique avec l'upsert d'abonnement.
@@ -116,14 +181,14 @@ export default class OrganizationModuleService {
     organizationId: number,
     desired: DesiredSubscriptionModule[],
     trx: TransactionClientContract
-  ): Promise<{ removed: PlanModule[] }> {
+  ): Promise<{ removed: Array<PlanModule | PlanAddon> }> {
     const existing = await OrganizationModule.query({ client: trx })
       .where('organizationId', organizationId)
       .where('source', 'subscription')
 
     const desiredModules = new Set(desired.map((d) => d.module))
 
-    const removed: PlanModule[] = []
+    const removed: Array<PlanModule | PlanAddon> = []
     for (const row of existing) {
       if (!desiredModules.has(row.module)) {
         await row.useTransaction(trx).delete()
@@ -141,7 +206,11 @@ export default class OrganizationModuleService {
 
       await OrganizationModule.updateOrCreate(
         { organizationId, module: item.module },
-        { source: 'subscription', stripeSubscriptionItemId: item.stripeSubscriptionItemId },
+        {
+          source: 'subscription',
+          stripeSubscriptionItemId: item.stripeSubscriptionItemId,
+          quantity: item.quantity,
+        },
         { client: trx }
       )
     }

@@ -91,3 +91,31 @@ test('a module never lifts numeric quotas of the tier', () => {
   // Pro reste plafonné à 8 bateaux même avec un module actif
   expect(effectiveQuotas.value?.maxBoats).toBe(8)
 })
+
+// activeAddons
+
+test('activeAddons keeps only valid addon entries', () => {
+  const { activeAddons } = mountWithProps({
+    currentPlan: 'pro',
+    activeAddons: [
+      { addon: 'extra_boats', quantity: 3, source: 'subscription' },
+      { addon: 'unknown', quantity: 1, source: 'subscription' },
+      { addon: 'extra_boats', quantity: 'x', source: 'subscription' },
+      42,
+      null,
+    ],
+  })
+  expect(activeAddons.value).toEqual([
+    { addon: 'extra_boats', quantity: 3, source: 'subscription' },
+  ])
+})
+
+test('an extra_boats add-on lifts maxBoats by its quantity', () => {
+  const { effectiveQuotas } = mountWithProps({
+    currentPlan: 'pro',
+    activeModules: [],
+    activeAddons: [{ addon: 'extra_boats', quantity: 3, source: 'subscription' }],
+  })
+  // Pro (8) + 3 bateaux supplémentaires
+  expect(effectiveQuotas.value?.maxBoats).toBe(11)
+})

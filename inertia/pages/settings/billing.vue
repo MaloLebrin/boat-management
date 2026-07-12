@@ -6,7 +6,12 @@ export default { layout: DefaultLayout }
 <script setup lang="ts">
 import SettingsShell from '~/components/settings/SettingsShell.vue'
 import SettingsBillingTab from '~/components/settings/tabs/SettingsBillingTab.vue'
-import type { ActiveModuleInfo, PlanTier, QuotaUsage } from '../../../shared/types/plan'
+import type {
+  ActiveAddonInfo,
+  ActiveModuleInfo,
+  PlanTier,
+  QuotaUsage,
+} from '../../../shared/types/plan'
 import type { SubscriptionInfo } from '../../../shared/types/billing'
 
 defineProps<{
@@ -14,6 +19,7 @@ defineProps<{
   quotaUsage: QuotaUsage
   subscription: SubscriptionInfo | null
   orgModules: ActiveModuleInfo[]
+  orgAddons: ActiveAddonInfo[]
 }>()
 </script>
 
@@ -24,6 +30,7 @@ defineProps<{
       :quota-usage="quotaUsage"
       :subscription="subscription"
       :org-modules="orgModules"
+      :org-addons="orgAddons"
     />
   </SettingsShell>
 </template>

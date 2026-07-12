@@ -1,7 +1,7 @@
 import { StripeNotConfiguredError } from '#exceptions/billing_errors'
 import Organization from '#models/organization'
 import type { BillingInterval } from '#shared/types/billing'
-import type { PlanModule } from '#shared/types/plan'
+import type { PlanAddon, PlanModule } from '#shared/types/plan'
 import { inject } from '@adonisjs/core'
 import env from '#start/env'
 import Stripe from 'stripe'
@@ -73,15 +73,31 @@ export default class StripeService {
    * intercepter avant l'écriture du webhook — ne créent qu'un seul item facturé
    * (durcissement #332, lot 5c).
    */
-  async addSubscriptionItem(subscriptionId: string, priceId: string): Promise<void> {
+  async addSubscriptionItem(
+    subscriptionId: string,
+    priceId: string,
+    quantity: number = 1
+  ): Promise<void> {
     await this.stripe.subscriptionItems.create(
       {
         subscription: subscriptionId,
         price: priceId,
-        quantity: 1,
+        quantity,
       },
       { idempotencyKey: this.moduleIdempotencyKey(subscriptionId, priceId) }
     )
+  }
+
+  /**
+   * Met à jour la quantité d'un item d'abonnement existant (add-on quantitatif,
+   * #333). Stripe proratise ; le webhook `customer.subscription.updated`
+   * réconcilie ensuite la quantité en base.
+   */
+  async updateSubscriptionItemQuantity(
+    subscriptionItemId: string,
+    quantity: number
+  ): Promise<void> {
+    await this.stripe.subscriptionItems.update(subscriptionItemId, { quantity })
   }
 
   /** Clé d'idempotence Stripe pour l'ajout d'un item de module (#332, lot 5c). */
@@ -143,6 +159,34 @@ export default class StripeService {
     }
 
     // Un priceId vide/inconnu ne doit jamais matcher la clé '' du fallback.
+    if (!priceId) return null
+    return map[priceId] ?? null
+  }
+
+  /** Prix Stripe d'un add-on quantitatif (épic #333) pour un intervalle donné. */
+  priceIdForAddon(addon: PlanAddon, interval: BillingInterval): string {
+    const map: Record<string, string | undefined> = {
+      extra_boats_month: env.get('STRIPE_ADDON_EXTRA_BOATS_MONTHLY_PRICE_ID'),
+      extra_boats_year: env.get('STRIPE_ADDON_EXTRA_BOATS_ANNUAL_PRICE_ID'),
+    }
+
+    const priceId = map[`${addon}_${interval}`]
+    if (!priceId) throw new StripeNotConfiguredError()
+
+    return priceId
+  }
+
+  /**
+   * Add-on quantitatif correspondant à un priceId Stripe, ou `null` si le prix
+   * est un tier, un module ou un prix inconnu. Utilisé par la sync webhook
+   * multi-items pour réconcilier les items d'abonnement vers `organization_modules`.
+   */
+  addonForPriceId(priceId: string): PlanAddon | null {
+    const map: Record<string, PlanAddon | undefined> = {
+      [env.get('STRIPE_ADDON_EXTRA_BOATS_MONTHLY_PRICE_ID') ?? '']: 'extra_boats',
+      [env.get('STRIPE_ADDON_EXTRA_BOATS_ANNUAL_PRICE_ID') ?? '']: 'extra_boats',
+    }
+
     if (!priceId) return null
     return map[priceId] ?? null
   }

@@ -122,6 +122,18 @@
         "name": "CRM & Facturation",
         "desc": "Clients, RGPD, devis et factures"
       }
+    },
+    "extraBoats": {
+      "title": "Bateaux supplémentaires",
+      "subtitle": "Dépassez la limite de votre plan Pro en ajoutant des bateaux à la carte.",
+      "name": "Bateaux supplémentaires",
+      "desc": "Chaque bateau ajouté relève votre quota au-delà de votre plan.",
+      "pricePerBoat": "{amount} €/bateau/mois",
+      "totalPerMonth": "{amount} €/mois",
+      "apply": "Mettre à jour",
+      "grantedHint": "{count} bateau(x) offert(s)",
+      "unlimited": "Bateaux illimités",
+      "proRequired": "Nécessite un plan Pro actif"
     }
   },
   "upgrade": {

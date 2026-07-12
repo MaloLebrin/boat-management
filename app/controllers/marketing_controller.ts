@@ -1,6 +1,6 @@
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
-import { MODULE_PRICES, PLAN_PRICES } from '../../shared/types/plan.js'
+import { ADDON_PRICES, MODULE_PRICES, PLAN_PRICES } from '../../shared/types/plan.js'
 import QuotaService from '#services/quota_service'
 import SimulatorLeadService from '#services/simulator_lead_service'
 
@@ -766,6 +766,13 @@ export default class MarketingController {
             priceAnnual: PLAN_PRICES.enterprise.annualMonthly,
             note: t('config_enterprise_note'),
             ctaLabel: t('config_enterprise_cta'),
+          },
+          extraBoats: {
+            name: t('config_extra_boats_name'),
+            desc: t('config_extra_boats_desc'),
+            priceMonthly: ADDON_PRICES.extra_boats.monthly,
+            priceAnnual: ADDON_PRICES.extra_boats.annualMonthly,
+            perBoatLabel: t('config_per_boat'),
           },
         },
         detailedTable: {

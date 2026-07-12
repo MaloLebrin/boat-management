@@ -49,4 +49,31 @@ test.group('resolveEffectiveQuotas', () => {
     resolveEffectiveQuotas('pro', ['charter', 'crm_invoicing'])
     assert.deepEqual(PLAN_LIMITS.pro, before)
   })
+
+  test('extra_boats add-on raises maxBoats by its quantity', ({ assert }) => {
+    const quotas = resolveEffectiveQuotas('pro', [], [{ addon: 'extra_boats', quantity: 3 }])
+    assert.equal(quotas.maxBoats, (PLAN_LIMITS.pro.maxBoats as number) + 3)
+    // Les autres quotas numériques restent inchangés.
+    assert.equal(quotas.maxMembers, PLAN_LIMITS.pro.maxMembers)
+  })
+
+  test('extra_boats combines with modules (flags + numeric raise)', ({ assert }) => {
+    const quotas = resolveEffectiveQuotas(
+      'pro',
+      ['charter'],
+      [{ addon: 'extra_boats', quantity: 5 }]
+    )
+    assert.isTrue(quotas.canManagePricing)
+    assert.equal(quotas.maxBoats, (PLAN_LIMITS.pro.maxBoats as number) + 5)
+  })
+
+  test('extra_boats with quantity 0 leaves the tier quota unchanged', ({ assert }) => {
+    const quotas = resolveEffectiveQuotas('pro', [], [{ addon: 'extra_boats', quantity: 0 }])
+    assert.equal(quotas.maxBoats, PLAN_LIMITS.pro.maxBoats)
+  })
+
+  test('extra_boats never degrades an unlimited (null) quota', ({ assert }) => {
+    const quotas = resolveEffectiveQuotas('enterprise', [], [{ addon: 'extra_boats', quantity: 4 }])
+    assert.isNull(quotas.maxBoats)
+  })
 })

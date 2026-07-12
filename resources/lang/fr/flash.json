@@ -110,7 +110,10 @@
     "moduleRemoved": "Module résilié. Il sera retiré une fois la confirmation reçue.",
     "moduleNotFound": "Ce module n'est pas actif sur votre abonnement.",
     "moduleAlreadyActive": "Ce module est déjà actif sur votre abonnement.",
-    "moduleActionFailed": "Le module n'a pas pu être mis à jour. Veuillez réessayer."
+    "moduleActionFailed": "Le module n'a pas pu être mis à jour. Veuillez réessayer.",
+    "addonUpdated": "Add-on mis à jour. Le changement s'appliquera une fois le paiement confirmé.",
+    "addonRemoved": "Add-on retiré. Il sera retiré une fois la confirmation reçue.",
+    "addonNotActive": "Cet add-on n'est pas actif sur votre abonnement."
   },
   "demo": {
     "rateLimitError": "Trop de tentatives. Veuillez réessayer dans une minute.",

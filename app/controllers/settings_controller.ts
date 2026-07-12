@@ -70,18 +70,22 @@ export default class SettingsController {
     const limits = PLAN_LIMITS[org.plan]
     const storageLimit = this.quotaService.storageLimitBytes(org)
 
-    const [boatCount, memberCount, activeSub, aiTokensUsed, orgModules] = await Promise.all([
-      this.quotaService.countBoats(org),
-      this.quotaService.countMembers(org),
-      this.subscriptionService.getActive(org.id),
-      this.aiTokenQuotaService.getUsage(org.id),
-      this.organizationModuleService.listWithSource(org.id),
-    ])
+    const [boatCount, memberCount, activeSub, aiTokensUsed, orgModules, orgAddons, effective] =
+      await Promise.all([
+        this.quotaService.countBoats(org),
+        this.quotaService.countMembers(org),
+        this.subscriptionService.getActive(org.id),
+        this.aiTokenQuotaService.getUsage(org.id),
+        this.organizationModuleService.listWithSource(org.id),
+        this.organizationModuleService.getActiveAddons(org.id),
+        this.organizationModuleService.getEffectiveQuotas(org),
+      ])
 
     return inertia.render('settings/billing', {
       plan: org.plan,
       quotaUsage: {
-        boats: { used: boatCount, limit: limits.maxBoats },
+        // Limite bateaux = quota effectif (inclut l'add-on `extra_boats`, #333).
+        boats: { used: boatCount, limit: effective.maxBoats },
         members: { used: memberCount, limit: limits.maxMembers },
         storage: { usedBytes: org.storageUsedBytes, limitBytes: storageLimit },
         aiTokens: { used: aiTokensUsed, limit: limits.aiTokensPerMonth },
@@ -94,6 +98,8 @@ export default class SettingsController {
       // middleware et consommée par `usePlan()`/la nav — la fusion Inertia
       // {...shared, ...pageProps} ferait sinon tomber les quotas à tier-only ici.
       orgModules,
+      // Add-ons quantitatifs actifs (ex. `extra_boats`) avec quantité + origine.
+      orgAddons,
     })
   }
 

@@ -58,6 +58,9 @@ export default await Env.create(new URL('../', import.meta.url), {
   STRIPE_MODULE_CHARTER_ANNUAL_PRICE_ID: Env.schema.string.optional(),
   STRIPE_MODULE_CRM_INVOICING_MONTHLY_PRICE_ID: Env.schema.string.optional(),
   STRIPE_MODULE_CRM_INVOICING_ANNUAL_PRICE_ID: Env.schema.string.optional(),
+  // Add-ons quantitatifs (épic #333) — item d'abonnement facturé à la quantité
+  STRIPE_ADDON_EXTRA_BOATS_MONTHLY_PRICE_ID: Env.schema.string.optional(),
+  STRIPE_ADDON_EXTRA_BOATS_ANNUAL_PRICE_ID: Env.schema.string.optional(),
   STRIPE_PUBLIC_KEY: Env.schema.string.optional(),
   STRIPE_CUSTOMER_PORTAL_ID: Env.schema.string.optional(),
 

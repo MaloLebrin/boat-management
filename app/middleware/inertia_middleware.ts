@@ -4,7 +4,12 @@ import type { JSONDataTypes } from '@adonisjs/core/types/transformers'
 import { inject } from '@adonisjs/core'
 import UserTransformer from '#transformers/user_transformer'
 import BaseInertiaMiddleware from '@adonisjs/inertia/inertia_middleware'
-import { PLAN_LIMITS, type PlanModule, type PlanTier } from '#shared/types/plan'
+import {
+  PLAN_LIMITS,
+  type ActiveAddonInfo,
+  type PlanModule,
+  type PlanTier,
+} from '#shared/types/plan'
 import type { BrandingSharedProps } from '#shared/types/branding'
 import type { NotificationsSharedProps } from '#shared/types/notification'
 import type { PermissionsSharedProps } from '#shared/types/permissions'
@@ -75,6 +80,11 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
     const activeModules: PlanModule[] = auth?.user?.organizationId
       ? await this.organizationModuleService.getActiveModules(auth.user.organizationId)
       : []
+    // Add-ons quantitatifs actifs (épic #333) : partagés pour que le front
+    // résolve `maxBoats` effectif via le même helper que le backend.
+    const activeAddons: ActiveAddonInfo[] = auth?.user?.organizationId
+      ? await this.organizationModuleService.getActiveAddons(auth.user.organizationId)
+      : []
     const branding = await resolveSharedBranding(auth?.user, this.brandingService)
     const notifications: NotificationsSharedProps = auth?.user
       ? await this.notificationService.sharedProps(auth.user.id)
@@ -104,6 +114,7 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
       user: ctx.inertia.always(auth?.user ? UserTransformer.transform(auth.user) : undefined),
       currentPlan: ctx.inertia.always(currentPlan),
       activeModules: ctx.inertia.always(activeModules),
+      activeAddons: ctx.inertia.always(activeAddons as unknown as JSONDataTypes),
       branding: ctx.inertia.always(branding),
       notifications: ctx.inertia.always(notifications as unknown as JSONDataTypes),
       permissions: ctx.inertia.always(permissions as unknown as JSONDataTypes),

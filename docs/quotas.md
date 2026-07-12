@@ -15,6 +15,15 @@ Source de vérité : `shared/types/plan.ts` — `PLAN_LIMITS`.
 
 `null` = illimité. Le plan est assigné manuellement en BDD sur la table `organizations` (colonne `plan` enum `starter|pro|enterprise`, défaut `starter`). Pas de Stripe.
 
+### Add-ons quantitatifs (épic #333)
+
+En plus du plan, une organisation **Pro** peut souscrire des **add-ons quantitatifs** qui relèvent un quota numérique. Aujourd'hui : `extra_boats` (bateaux supplémentaires, **4 €/bateau/mois**), qui ajoute `quantity` au `maxBoats` du plan. Contrairement aux modules booléens (`charter`, `crm_invoicing`), un add-on porte une **quantité** et agit sur les nombres.
+
+- Source de vérité : `PLAN_ADDONS`, `ADDON_PRICES`, `ADDON_QUOTA_INCREMENTS` (`shared/types/plan.ts`).
+- Stockage : table `organization_modules` (colonne `quantity`, ligne `module = 'extra_boats'`).
+- Quotas effectifs : `resolveEffectiveQuotas(tier, modules, addons)` additionne `perUnit × quantity` (jamais sur un quota illimité `null`). `QuotaService.canAddBoat` / `assertCanAddBoat` lisent ces quotas effectifs, pas `PLAN_LIMITS` brut.
+- Gestion : `POST /settings/billing/addon` (`quantity` 0–100 ; `0` retire l'add-on).
+
 ## Tarifs
 
 | Plan       | Mensuel     | Annuel (−20 %)         |
@@ -56,7 +65,7 @@ new QuotaExceededError(feature: QuotaFeature, limit: number | null, current: num
 | ------------------------------- | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `canAddBoat(org)`               | `Promise<boolean>` | Retourne `false` si quota atteint, sans throw. Pour l'UI.                                                                                                                                                                                                                        |
 | `canAddMember(org)`             | `Promise<boolean>` | Retourne `false` si quota atteint, sans throw. Pour l'UI.                                                                                                                                                                                                                        |
-| `assertCanAddBoat(org)`         | `Promise<void>`    | Throw `QuotaExceededError` si `COUNT(boats) >= maxBoats`.                                                                                                                                                                                                                        |
+| `assertCanAddBoat(org)`         | `Promise<void>`    | Throw `QuotaExceededError` si `COUNT(boats) >= maxBoats` **effectif** (quota du plan + add-on `extra_boats`).                                                                                                                                                                    |
 | `assertCanAddMember(org)`       | `Promise<void>`    | Throw si `COUNT(organization_memberships) >= maxMembers`.                                                                                                                                                                                                                        |
 | `assertCanUseAI(org)`           | `void` (synchrone) | Throw si `!canUseAI`.                                                                                                                                                                                                                                                            |
 | `assertCanExport(org)`          | `void` (synchrone) | Throw si `!canExport`.                                                                                                                                                                                                                                                           |

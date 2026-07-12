@@ -2,7 +2,7 @@ import { ModulesRequireProPlanError, StripeNotConfiguredError } from '#exception
 import StripeService from '#services/stripe_service'
 import SubscriptionService from '#services/subscription_service'
 import OrganizationModuleService from '#services/organization_module_service'
-import { checkoutValidator, moduleActionValidator } from '#validators/billing'
+import { addonActionValidator, checkoutValidator, moduleActionValidator } from '#validators/billing'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import env from '#start/env'
@@ -136,6 +136,56 @@ export default class BillingController {
       await this.stripeService.removeSubscriptionItem(row.stripeSubscriptionItemId)
 
       session.flash('success', i18n.t('flash.billing.moduleRemoved'))
+      return response.redirect().back()
+    } catch (error) {
+      return this.handleModuleError(error, { session, response, i18n })
+    }
+  }
+
+  /**
+   * Règle la quantité d'un add-on quantitatif (ex. `extra_boats`, #333) sur
+   * l'abonnement Pro actif. `quantity = 0` retire l'item ; sinon on crée l'item
+   * (première souscription) ou on met à jour sa quantité. Le webhook réconcilie
+   * ensuite `organization_modules`.
+   */
+  async setAddon({ request, auth, response, session, i18n }: HttpContext) {
+    try {
+      const user = await auth.authenticate()
+      await user.load('organization')
+      const org = user.organization
+      const { addon, quantity } = await request.validateUsing(addonActionValidator)
+
+      if (org.plan !== 'pro') throw new ModulesRequireProPlanError()
+
+      const sub = await this.subscriptionService.getActive(org.id)
+      if (!sub?.stripeSubscriptionId) {
+        session.flash('error', i18n.t('flash.billing.noSubscription'))
+        return response.redirect().back()
+      }
+
+      const existing = await this.organizationModuleService.findSubscriptionModule(org.id, addon)
+
+      if (quantity === 0) {
+        if (!existing?.stripeSubscriptionItemId) {
+          session.flash('info', i18n.t('flash.billing.addonNotActive'))
+          return response.redirect().back()
+        }
+        await this.stripeService.removeSubscriptionItem(existing.stripeSubscriptionItemId)
+        session.flash('success', i18n.t('flash.billing.addonRemoved'))
+        return response.redirect().back()
+      }
+
+      if (existing?.stripeSubscriptionItemId) {
+        await this.stripeService.updateSubscriptionItemQuantity(
+          existing.stripeSubscriptionItemId,
+          quantity
+        )
+      } else {
+        const priceId = this.stripeService.priceIdForAddon(addon, sub.billingInterval)
+        await this.stripeService.addSubscriptionItem(sub.stripeSubscriptionId, priceId, quantity)
+      }
+
+      session.flash('success', i18n.t('flash.billing.addonUpdated'))
       return response.redirect().back()
     } catch (error) {
       return this.handleModuleError(error, { session, response, i18n })
