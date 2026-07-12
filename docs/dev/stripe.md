@@ -7,16 +7,24 @@
 
 ## Variables d'environnement
 
-| Variable                             | Obligatoire | Description                                                   |
-| ------------------------------------ | ----------- | ------------------------------------------------------------- |
-| `STRIPE_SECRET_KEY`                  | Oui         | Clé secrète API (`sk_live_...` en prod, `sk_test_...` en dev) |
-| `STRIPE_WEBHOOK_SECRET`              | Oui         | Secret de signature webhook (`whsec_...`)                     |
-| `STRIPE_PUBLIC_KEY`                  | Non         | Clé publique (`pk_live_...` / `pk_test_...`)                  |
-| `STRIPE_PRO_MONTHLY_PRICE_ID`        | Oui         | Price ID mensuel plan Pro (`price_...`)                       |
-| `STRIPE_PRO_ANNUAL_PRICE_ID`         | Oui         | Price ID annuel plan Pro (`price_...`)                        |
-| `STRIPE_ENTERPRISE_MONTHLY_PRICE_ID` | Oui         | Price ID mensuel plan Enterprise (`price_...`)                |
-| `STRIPE_ENTERPRISE_ANNUAL_PRICE_ID`  | Oui         | Price ID annuel plan Enterprise (`price_...`)                 |
-| `STRIPE_CUSTOMER_PORTAL_ID`          | Non         | ID config Customer Portal (`bpc_...`)                         |
+| Variable                                       | Obligatoire | Description                                                                             |
+| ---------------------------------------------- | ----------- | --------------------------------------------------------------------------------------- |
+| `STRIPE_SECRET_KEY`                            | Oui         | Clé secrète API (`sk_live_...` en prod, `sk_test_...` en dev)                           |
+| `STRIPE_WEBHOOK_SECRET`                        | Oui         | Secret de signature webhook (`whsec_...`)                                               |
+| `STRIPE_PUBLIC_KEY`                            | Non         | Clé publique (`pk_live_...` / `pk_test_...`)                                            |
+| `STRIPE_PRO_MONTHLY_PRICE_ID`                  | Oui         | Price ID mensuel plan Pro (`price_...`)                                                 |
+| `STRIPE_PRO_ANNUAL_PRICE_ID`                   | Oui         | Price ID annuel plan Pro (`price_...`)                                                  |
+| `STRIPE_ENTERPRISE_MONTHLY_PRICE_ID`           | Oui         | Price ID mensuel plan Enterprise (`price_...`)                                          |
+| `STRIPE_ENTERPRISE_ANNUAL_PRICE_ID`            | Oui         | Price ID annuel plan Enterprise (`price_...`)                                           |
+| `STRIPE_MODULE_CHARTER_MONTHLY_PRICE_ID`       | Modules     | Price ID mensuel module Location (`price_...`)                                          |
+| `STRIPE_MODULE_CHARTER_ANNUAL_PRICE_ID`        | Modules     | Price ID annuel module Location (`price_...`)                                           |
+| `STRIPE_MODULE_CRM_INVOICING_MONTHLY_PRICE_ID` | Modules     | Price ID mensuel module CRM & Facturation (`price_...`)                                 |
+| `STRIPE_MODULE_CRM_INVOICING_ANNUAL_PRICE_ID`  | Modules     | Price ID annuel module CRM & Facturation (`price_...`)                                  |
+| `STRIPE_ADDON_EXTRA_BOATS_MONTHLY_PRICE_ID`    | Add-on      | Price ID mensuel add-on bateaux supplémentaires — **licensed, à l'unité** (`price_...`) |
+| `STRIPE_ADDON_EXTRA_BOATS_ANNUAL_PRICE_ID`     | Add-on      | Price ID annuel add-on bateaux supplémentaires — **licensed, à l'unité** (`price_...`)  |
+| `STRIPE_CUSTOMER_PORTAL_ID`                    | Non         | ID config Customer Portal (`bpc_...`)                                                   |
+
+> **Obligatoire** = pour souscrire un plan. **Modules** = requis seulement si tu vends les modules add-ons (`charter`, `crm_invoicing`). **Add-on** = requis seulement pour l'add-on quantitatif « bateaux supplémentaires ». Absents, ces flux flashent « paiement non configuré » sans crash.
 
 ⚠️ Les Price IDs commencent par `price_` — ne pas confondre avec les Product IDs (`prod_`).  
 Si `STRIPE_SECRET_KEY` est absent, l'app flash un message d'erreur et ne crashe pas.
@@ -72,6 +80,9 @@ STRIPE_PRO_MONTHLY_PRICE_ID=price_...
 STRIPE_PRO_ANNUAL_PRICE_ID=price_...
 STRIPE_ENTERPRISE_MONTHLY_PRICE_ID=price_...
 STRIPE_ENTERPRISE_ANNUAL_PRICE_ID=price_...
+# Add-on quantitatif « bateaux supplémentaires » (optionnel, cf. section dédiée)
+STRIPE_ADDON_EXTRA_BOATS_MONTHLY_PRICE_ID=price_...
+STRIPE_ADDON_EXTRA_BOATS_ANNUAL_PRICE_ID=price_...
 ```
 
 ### 5. Cartes de test
@@ -145,8 +156,50 @@ STRIPE_PRO_MONTHLY_PRICE_ID=price_...
 STRIPE_PRO_ANNUAL_PRICE_ID=price_...
 STRIPE_ENTERPRISE_MONTHLY_PRICE_ID=price_...
 STRIPE_ENTERPRISE_ANNUAL_PRICE_ID=price_...
+STRIPE_ADDON_EXTRA_BOATS_MONTHLY_PRICE_ID=price_...   # si add-on activé
+STRIPE_ADDON_EXTRA_BOATS_ANNUAL_PRICE_ID=price_...    # si add-on activé
 STRIPE_CUSTOMER_PORTAL_ID=bpc_...        # optionnel
 ```
+
+---
+
+## Add-ons quantitatifs — « bateaux supplémentaires » (épic #333)
+
+L'add-on `extra_boats` est facturé **à la quantité** : le code place `quantity` sur l'item d'abonnement (checkout / `addSubscriptionItem` / `updateSubscriptionItemQuantity`) et Stripe multiplie `unit_amount × quantity`. Le Price doit donc être **récurrent et `licensed`** (à l'unité) — surtout **pas `metered`**, qui imposerait des usage records et casserait la sync déclarative.
+
+Montants (EUR, cf. `ADDON_PRICES.extra_boats` dans `shared/types/plan.ts`) :
+
+- **Mensuel** : `interval = month`, `unit_amount = 400` (4,00 €/bateau/mois)
+- **Annuel** : `interval = year`, `unit_amount = 3600` (36,00 €/bateau/an, soit 3 €/mois)
+
+Création via Stripe CLI (mode Test puis Live) :
+
+```bash
+# 1. Produit
+stripe products create --name="Bateaux supplémentaires"
+# → note le prod_...
+
+# 2. Prix mensuel à l'unité (licensed)
+stripe prices create \
+  --product=prod_XXX --currency=eur --unit-amount=400 \
+  -d "recurring[interval]=month" -d "recurring[usage_type]=licensed"
+
+# 3. Prix annuel à l'unité (licensed)
+stripe prices create \
+  --product=prod_XXX --currency=eur --unit-amount=3600 \
+  -d "recurring[interval]=year" -d "recurring[usage_type]=licensed"
+```
+
+Copier les deux `price_...` retournés dans :
+
+```env
+STRIPE_ADDON_EXTRA_BOATS_MONTHLY_PRICE_ID=price_...
+STRIPE_ADDON_EXTRA_BOATS_ANNUAL_PRICE_ID=price_...
+```
+
+Aucun nouvel event webhook à configurer : l'ajout / le changement de quantité / le retrait de l'item déclenchent `customer.subscription.updated`, déjà écouté.
+
+Les prix des **modules** (`charter`, `crm_invoicing`) suivent le même schéma `licensed` (quantité 1), variables `STRIPE_MODULE_*`.
 
 ---
 
