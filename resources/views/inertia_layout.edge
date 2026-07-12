@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html>
+<html lang="{{ page?.props?.locale ?? 'en' }}">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title inertia>
-      AdonisJS
+      Fleet AI
     </title>
 
     <meta
@@ -13,14 +13,18 @@
     />
     <link rel="manifest" href="/site.webmanifest" />
     <meta name="theme-color" content="#0066cc" />
+    <link rel="icon" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta property="og:site_name" content="Fleet AI" />
     <meta property="og:type" content="website" />
+    {{-- Fallback social preview — les pages qui définissent leurs propres tags (home, simulator_share) surchargent ces valeurs. --}}
+    <meta property="og:image" content="https://fleetai.app/og-image.png" />
+    <meta name="twitter:card" content="summary_large_image" />
     <script type="application/ld+json" nonce="{{ cspNonce }}">
     {
       "@context": "https://schema.org",
       "@type": "Organization",
-      "name": "FleetAi",
+      "name": "Fleet AI",
       "url": "https://fleetai.app",
       "logo": "https://fleetai.app/favicon.svg",
       "description": "Fleet maintenance platform for maritime teams",

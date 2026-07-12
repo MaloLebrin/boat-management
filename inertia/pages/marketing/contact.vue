@@ -84,6 +84,7 @@ const t = props.t
     <meta name="description" :content="t.meta.description" />
     <meta property="og:title" :content="t.meta.title" />
     <meta property="og:description" :content="t.meta.description" />
+    <link rel="canonical" href="/contact" />
   </Head>
 
   <ContactHeroSection v-bind="t.contact.hero" />
