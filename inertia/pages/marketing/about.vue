@@ -3,7 +3,8 @@ import PublicLayout from '~/layouts/public.vue'
 export default { layout: PublicLayout }
 </script>
 <script setup lang="ts">
-import { Head } from '@inertiajs/vue3'
+import { computed } from 'vue'
+import { Head, usePage } from '@inertiajs/vue3'
 import AboutHeroSection from '~/components/marketing/about/AboutHeroSection.vue'
 import AboutOriginSection from '~/components/marketing/about/AboutOriginSection.vue'
 import AboutValuesSection from '~/components/marketing/about/AboutValuesSection.vue'
@@ -16,6 +17,12 @@ import type { AboutPageProps } from '../../../shared/types/marketing'
 
 const props = defineProps<AboutPageProps>()
 const t = props.t
+
+const page = usePage<{ locale?: 'en' | 'fr' }>()
+const locale = computed<'en' | 'fr'>(() => (page.props.locale ?? 'en') as 'en' | 'fr')
+const aboutEn = '/en/about'
+const aboutFr = '/fr/a-propos'
+const canonicalHref = computed(() => (locale.value === 'fr' ? aboutFr : aboutEn))
 </script>
 
 <template>
@@ -23,6 +30,10 @@ const t = props.t
     <meta name="description" :content="t.meta.description" />
     <meta property="og:title" :content="t.meta.title" />
     <meta property="og:description" :content="t.meta.description" />
+    <link rel="canonical" :href="canonicalHref" />
+    <link rel="alternate" hreflang="en" :href="aboutEn" />
+    <link rel="alternate" hreflang="fr" :href="aboutFr" />
+    <link rel="alternate" hreflang="x-default" :href="aboutEn" />
   </Head>
 
   <AboutHeroSection v-bind="t.about.hero" />

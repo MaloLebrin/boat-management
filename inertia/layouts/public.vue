@@ -25,6 +25,8 @@ const simulatorHref = computed(() =>
 )
 
 const privacyHref = computed(() => (locale.value === 'fr' ? '/fr/confidentialite' : '/en/privacy'))
+
+const aboutHref = computed(() => (locale.value === 'fr' ? '/fr/a-propos' : '/en/about'))
 </script>
 
 <template>
@@ -69,8 +71,12 @@ const privacyHref = computed(() => (locale.value === 'fr' ? '/fr/confidentialite
             {{ t('public.footer.company') }}
           </p>
           <div class="grid gap-2 text-sm font-medium text-fg-muted">
-            <a class="transition-colors hover:text-fg" href="#">{{ t('public.footer.contact') }}</a>
-            <a class="transition-colors hover:text-fg" href="#">{{ t('public.footer.about') }}</a>
+            <Link href="/contact" class="transition-colors hover:text-fg">{{
+              t('public.footer.contact')
+            }}</Link>
+            <Link :href="aboutHref" class="transition-colors hover:text-fg">{{
+              t('public.footer.about')
+            }}</Link>
           </div>
         </div>
 

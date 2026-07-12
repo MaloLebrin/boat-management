@@ -7,7 +7,8 @@ export default {
 </script>
 <script setup lang="ts">
 import { Head, usePage } from '@inertiajs/vue3'
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, ref } from 'vue'
+import JsonLd from '~/components/json_ld'
 import HomeHeroSection from '~/components/marketing/home/HomeHeroSection.vue'
 import HomeProblemSection from '~/components/marketing/home/HomeProblemSection.vue'
 import HomePillarsSection from '~/components/marketing/home/HomePillarsSection.vue'
@@ -211,22 +212,17 @@ function handlePersonaChange(persona: Persona) {
 const hreflangEn = '/en'
 const hreflangFr = '/fr'
 
-let jsonLdEl: HTMLScriptElement | null = null
-onMounted(() => {
-  jsonLdEl = document.createElement('script')
-  jsonLdEl.type = 'application/ld+json'
-  jsonLdEl.textContent = JSON.stringify({
+// Schéma JSON-LD WebSite rendu dans <Head> (donc présent dans le HTML SSR lu
+// par les crawlers), au lieu d'une injection client-side via onMounted.
+const websiteSchema = computed(() =>
+  JSON.stringify({
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    'name': 'FleetAi',
+    'name': 'Fleet AI',
     'url': 'https://fleetai.app',
     'description': t.meta.description,
   })
-  document.head.appendChild(jsonLdEl)
-})
-onUnmounted(() => {
-  jsonLdEl?.remove()
-})
+)
 </script>
 
 <template>
@@ -241,6 +237,8 @@ onUnmounted(() => {
     <link rel="canonical" :href="`/${locale}`" />
     <link rel="alternate" hreflang="en" :href="hreflangEn" />
     <link rel="alternate" hreflang="fr" :href="hreflangFr" />
+    <link rel="alternate" hreflang="x-default" :href="hreflangEn" />
+    <JsonLd :schema="websiteSchema" />
   </Head>
 
   <!-- 1. Hero -->
