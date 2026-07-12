@@ -12,7 +12,7 @@ Les trois plans sont définis dans [`shared/types/plan.ts`](../shared/types/plan
 Plan        maxBoats   maxMembers   canUseAI   aiTokensPerMonth   canExport   canCustomizeAI
 ─────────────────────────────────────────────────────────────────────────────────────────────
 starter         2           1         non           —                non            non
-pro            25           5         oui       1 000 000           oui            non
+pro             8           5         oui       1 000 000           oui            non
 enterprise    illimité    illimité    oui         illimité           oui            oui
 ```
 

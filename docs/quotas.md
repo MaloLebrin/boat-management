@@ -6,7 +6,7 @@ Source de vérité : `shared/types/plan.ts` — `PLAN_LIMITS`.
 
 | Feature          | Starter | Pro       | Enterprise |
 | ---------------- | ------- | --------- | ---------- |
-| Bateaux max      | 2       | 25        | ∞          |
+| Bateaux max      | 2       | 8         | ∞          |
 | Membres max      | 1       | 5         | ∞          |
 | Stockage         | 1 Go    | 20 Go     | ∞          |
 | IA / Copilote    | ✗       | ✓         | ✓          |

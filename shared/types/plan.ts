@@ -59,7 +59,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanQuotas> = {
     canManageInvoices: false,
   },
   pro: {
-    maxBoats: 25,
+    maxBoats: 8,
     maxMembers: 5,
     storageGb: 20,
     canUseAI: true,

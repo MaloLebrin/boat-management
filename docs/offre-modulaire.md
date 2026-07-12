@@ -11,7 +11,7 @@ FleetAi vend aujourd'hui **3 paliers** définis dans `shared/types/plan.ts` (`PL
 |                                          | Starter      | Pro                 | Enterprise                 |
 | ---------------------------------------- | ------------ | ------------------- | -------------------------- |
 | Prix mensuel                             | 0 €          | 20 € (16 € annuel)  | 99 € (79 € annuel)         |
-| Bateaux / Membres / Stockage             | 2 / 1 / 1 Go | 25 / 5 / 20 Go      | Illimité                   |
+| Bateaux / Membres / Stockage             | 2 / 1 / 1 Go | 8 / 5 / 20 Go       | Illimité                   |
 | IA (`canUseAI`)                          | ✗            | ✓ (1 M tokens/mois) | ✓ + modèle personnalisable |
 | Export CSV (`canExport`)                 | ✗            | ✓                   | ✓                          |
 | Regroupement de tâches (`canGroupTasks`) | ✗            | ✓                   | ✓                          |
@@ -70,14 +70,14 @@ Garder Starter/Pro/Enterprise, mais descendre certaines briques d'Enterprise ver
 
 **2 socles** portant les quotas + **modules activables** (sur Pro uniquement) + **Enterprise conservé comme bundle « tout inclus »**.
 
-|                                         | Starter                   | Pro                          | Enterprise              |
-| --------------------------------------- | ------------------------- | ---------------------------- | ----------------------- |
-| Prix                                    | 0 €                       | 20 €/mois (16 € annuel)      | 99 €/mois (79 € annuel) |
-| Quotas                                  | 2 bateaux, 1 membre, 1 Go | 25 bateaux, 5 membres, 20 Go | Illimité                |
-| Socle commun                            | ✓                         | ✓                            | ✓                       |
-| Data & Conformité                       | ✗                         | ✓ (audit 90 j)               | ✓ (audit illimité)      |
-| Modules add-ons                         | —                         | à la carte ⬇                 | **tous inclus**         |
-| IA personnalisable, support prioritaire | ✗                         | ✗                            | ✓                       |
+|                                         | Starter                   | Pro                         | Enterprise              |
+| --------------------------------------- | ------------------------- | --------------------------- | ----------------------- |
+| Prix                                    | 0 €                       | 20 €/mois (16 € annuel)     | 99 €/mois (79 € annuel) |
+| Quotas                                  | 2 bateaux, 1 membre, 1 Go | 8 bateaux, 5 membres, 20 Go | Illimité                |
+| Socle commun                            | ✓                         | ✓                           | ✓                       |
+| Data & Conformité                       | ✗                         | ✓ (audit 90 j)              | ✓ (audit illimité)      |
+| Modules add-ons                         | —                         | à la carte ⬇                | **tous inclus**         |
+| IA personnalisable, support prioritaire | ✗                         | ✗                           | ✓                       |
 
 Modules souscriptibles sur le socle Pro :
 

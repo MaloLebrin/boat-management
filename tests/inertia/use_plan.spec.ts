@@ -88,6 +88,6 @@ test('a module never lifts numeric quotas of the tier', () => {
     currentPlan: 'pro',
     activeModules: ['crm_invoicing'],
   })
-  // Pro reste plafonné à 25 bateaux même avec un module actif
-  expect(effectiveQuotas.value?.maxBoats).toBe(25)
+  // Pro reste plafonné à 8 bateaux même avec un module actif
+  expect(effectiveQuotas.value?.maxBoats).toBe(8)
 })
