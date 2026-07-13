@@ -7,42 +7,6 @@ import type { InferInput, SimpleError } from '@vinejs/vine/types'
 export type ParamValue = string | number | bigint | boolean
 
 export interface Registry {
-  'event_stream': {
-    methods: ["GET","HEAD"]
-    pattern: '/__transmit/events'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: unknown
-      errorResponse: unknown
-    }
-  }
-  'subscribe': {
-    methods: ["POST"]
-    pattern: '/__transmit/subscribe'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: unknown
-      errorResponse: unknown
-    }
-  }
-  'unsubscribe': {
-    methods: ["POST"]
-    pattern: '/__transmit/unsubscribe'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: unknown
-      errorResponse: unknown
-    }
-  }
   'dashboard': {
     methods: ["GET","HEAD"]
     pattern: '/dashboard'
@@ -415,6 +379,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_equipment_controller').default['updateEngineNotes']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'boat_equipment.increment_engine_hours': {
+    methods: ["PATCH"]
+    pattern: '/boats/:boatId/engines/:engineId/hours'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/boat_equipment').incrementEngineHoursValidator)>>
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; engineId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/boat_equipment').incrementEngineHoursValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_equipment_controller').default['incrementEngineHours']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_equipment_controller').default['incrementEngineHours']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'boat_equipment.destroy_engine': {
     methods: ["DELETE"]
     pattern: '/boats/:boatId/engines/:engineId'
@@ -431,10 +407,10 @@ export interface Registry {
     methods: ["POST"]
     pattern: '/boats/:boatId/engines/:engineId/documents'
     types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/media').storeBoatDocumentValidator)>>
+      body: ExtractBody<InferInput<(typeof import('#validators/media').storeBoatDocumentsValidator)>>
       paramsTuple: [ParamValue, ParamValue]
       params: { boatId: ParamValue; engineId: ParamValue }
-      query: ExtractQuery<InferInput<(typeof import('#validators/media').storeBoatDocumentValidator)>>
+      query: ExtractQuery<InferInput<(typeof import('#validators/media').storeBoatDocumentsValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_media_controller').default['storeEngineDocument']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_media_controller').default['storeEngineDocument']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
@@ -455,10 +431,10 @@ export interface Registry {
     methods: ["POST"]
     pattern: '/boats/:boatId/engines/:engineId/photos'
     types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/media').storeBoatPhotoValidator)>>
+      body: ExtractBody<InferInput<(typeof import('#validators/media').storeBoatPhotosValidator)>>
       paramsTuple: [ParamValue, ParamValue]
       params: { boatId: ParamValue; engineId: ParamValue }
-      query: ExtractQuery<InferInput<(typeof import('#validators/media').storeBoatPhotoValidator)>>
+      query: ExtractQuery<InferInput<(typeof import('#validators/media').storeBoatPhotosValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_equipment_media_controller').default['store']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_equipment_media_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
@@ -527,10 +503,10 @@ export interface Registry {
     methods: ["POST"]
     pattern: '/boats/:boatId/engines/:engineId/parts/:partId/documents'
     types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/media').storeBoatDocumentValidator)>>
+      body: ExtractBody<InferInput<(typeof import('#validators/media').storeBoatDocumentsValidator)>>
       paramsTuple: [ParamValue, ParamValue, ParamValue]
       params: { boatId: ParamValue; engineId: ParamValue; partId: ParamValue }
-      query: ExtractQuery<InferInput<(typeof import('#validators/media').storeBoatDocumentValidator)>>
+      query: ExtractQuery<InferInput<(typeof import('#validators/media').storeBoatDocumentsValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_engine_parts_controller').default['storeDocument']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_engine_parts_controller').default['storeDocument']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
@@ -563,10 +539,10 @@ export interface Registry {
     methods: ["POST"]
     pattern: '/boats/:boatId/engines/:engineId/parts/:partId/photos'
     types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/media').storeBoatPhotoValidator)>>
+      body: ExtractBody<InferInput<(typeof import('#validators/media').storeBoatPhotosValidator)>>
       paramsTuple: [ParamValue, ParamValue, ParamValue]
       params: { boatId: ParamValue; engineId: ParamValue; partId: ParamValue }
-      query: ExtractQuery<InferInput<(typeof import('#validators/media').storeBoatPhotoValidator)>>
+      query: ExtractQuery<InferInput<(typeof import('#validators/media').storeBoatPhotosValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_equipment_media_controller').default['store']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_equipment_media_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
@@ -671,10 +647,10 @@ export interface Registry {
     methods: ["POST"]
     pattern: '/boats/:boatId/sails/:sailId/photos'
     types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/media').storeBoatPhotoValidator)>>
+      body: ExtractBody<InferInput<(typeof import('#validators/media').storeBoatPhotosValidator)>>
       paramsTuple: [ParamValue, ParamValue]
       params: { boatId: ParamValue; sailId: ParamValue }
-      query: ExtractQuery<InferInput<(typeof import('#validators/media').storeBoatPhotoValidator)>>
+      query: ExtractQuery<InferInput<(typeof import('#validators/media').storeBoatPhotosValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_equipment_media_controller').default['store']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_equipment_media_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
@@ -743,10 +719,10 @@ export interface Registry {
     methods: ["POST"]
     pattern: '/boats/:boatId/rig/photos'
     types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/media').storeBoatPhotoValidator)>>
+      body: ExtractBody<InferInput<(typeof import('#validators/media').storeBoatPhotosValidator)>>
       paramsTuple: [ParamValue]
       params: { boatId: ParamValue }
-      query: ExtractQuery<InferInput<(typeof import('#validators/media').storeBoatPhotoValidator)>>
+      query: ExtractQuery<InferInput<(typeof import('#validators/media').storeBoatPhotosValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_equipment_media_controller').default['store']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_equipment_media_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
@@ -827,10 +803,10 @@ export interface Registry {
     methods: ["POST"]
     pattern: '/boats/:boatId/photos'
     types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/media').storeBoatPhotoValidator)>>
+      body: ExtractBody<InferInput<(typeof import('#validators/media').storeBoatPhotosValidator)>>
       paramsTuple: [ParamValue]
       params: { boatId: ParamValue }
-      query: ExtractQuery<InferInput<(typeof import('#validators/media').storeBoatPhotoValidator)>>
+      query: ExtractQuery<InferInput<(typeof import('#validators/media').storeBoatPhotosValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_media_controller').default['storePhoto']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_media_controller').default['storePhoto']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
@@ -839,10 +815,10 @@ export interface Registry {
     methods: ["POST"]
     pattern: '/boats/:boatId/documents'
     types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/media').storeBoatDocumentValidator)>>
+      body: ExtractBody<InferInput<(typeof import('#validators/media').storeBoatDocumentsValidator)>>
       paramsTuple: [ParamValue]
       params: { boatId: ParamValue }
-      query: ExtractQuery<InferInput<(typeof import('#validators/media').storeBoatDocumentValidator)>>
+      query: ExtractQuery<InferInput<(typeof import('#validators/media').storeBoatDocumentsValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_media_controller').default['storeDocument']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_media_controller').default['storeDocument']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
@@ -911,10 +887,10 @@ export interface Registry {
     methods: ["POST"]
     pattern: '/boats/:boatId/safety-equipment/:safetyId/photos'
     types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/media').storeBoatPhotoValidator)>>
+      body: ExtractBody<InferInput<(typeof import('#validators/media').storeBoatPhotosValidator)>>
       paramsTuple: [ParamValue, ParamValue]
       params: { boatId: ParamValue; safetyId: ParamValue }
-      query: ExtractQuery<InferInput<(typeof import('#validators/media').storeBoatPhotoValidator)>>
+      query: ExtractQuery<InferInput<(typeof import('#validators/media').storeBoatPhotosValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_equipment_media_controller').default['store']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_equipment_media_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
@@ -983,10 +959,10 @@ export interface Registry {
     methods: ["POST"]
     pattern: '/boats/:boatId/generic-equipment/:genericId/photos'
     types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/media').storeBoatPhotoValidator)>>
+      body: ExtractBody<InferInput<(typeof import('#validators/media').storeBoatPhotosValidator)>>
       paramsTuple: [ParamValue, ParamValue]
       params: { boatId: ParamValue; genericId: ParamValue }
-      query: ExtractQuery<InferInput<(typeof import('#validators/media').storeBoatPhotoValidator)>>
+      query: ExtractQuery<InferInput<(typeof import('#validators/media').storeBoatPhotosValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_equipment_media_controller').default['store']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_equipment_media_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
@@ -1403,10 +1379,10 @@ export interface Registry {
     methods: ["POST"]
     pattern: '/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/photos'
     types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/media').storeBoatPhotoValidator)>>
+      body: ExtractBody<InferInput<(typeof import('#validators/media').storeBoatPhotosValidator)>>
       paramsTuple: [ParamValue, ParamValue, ParamValue]
       params: { boatId: ParamValue; reservationId: ParamValue; inspectionId: ParamValue }
-      query: ExtractQuery<InferInput<(typeof import('#validators/media').storeBoatPhotoValidator)>>
+      query: ExtractQuery<InferInput<(typeof import('#validators/media').storeBoatPhotosValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_media_controller').default['storeInspectionPhoto']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_media_controller').default['storeInspectionPhoto']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
@@ -2107,6 +2083,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/billing_controller').default['removeModule']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'settings.billing.addon.set': {
+    methods: ["POST"]
+    pattern: '/settings/billing/addon'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/billing').addonActionValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/billing').addonActionValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/billing_controller').default['setAddon']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/billing_controller').default['setAddon']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'settings.profile.update': {
     methods: ["PUT"]
     pattern: '/settings/profile'
@@ -2675,10 +2663,10 @@ export interface Registry {
     methods: ["POST"]
     pattern: '/clients/:id/documents'
     types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/media').storeBoatDocumentValidator)>>
+      body: ExtractBody<InferInput<(typeof import('#validators/media').storeBoatDocumentsValidator)>>
       paramsTuple: [ParamValue]
       params: { id: ParamValue }
-      query: ExtractQuery<InferInput<(typeof import('#validators/media').storeBoatDocumentValidator)>>
+      query: ExtractQuery<InferInput<(typeof import('#validators/media').storeBoatDocumentsValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/client_media_controller').default['storeDocument']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/client_media_controller').default['storeDocument']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
@@ -2921,6 +2909,42 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/invoices_controller').default['destroy']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/invoices_controller').default['destroy']>>>
+    }
+  }
+  'event_stream': {
+    methods: ["GET","HEAD"]
+    pattern: '/__transmit/events'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'subscribe': {
+    methods: ["POST"]
+    pattern: '/__transmit/subscribe'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'unsubscribe': {
+    methods: ["POST"]
+    pattern: '/__transmit/unsubscribe'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
     }
   }
   'new_account.create': {

@@ -2,9 +2,6 @@
 import type { routes } from './index.ts'
 
 export interface ApiDefinition {
-  eventStream: typeof routes['event_stream']
-  subscribe: typeof routes['subscribe']
-  unsubscribe: typeof routes['unsubscribe']
   dashboard: typeof routes['dashboard']
   designSystem: typeof routes['design_system']
   sitemap: typeof routes['sitemap']
@@ -170,6 +167,7 @@ export interface ApiDefinition {
     updateEngine: typeof routes['boat_equipment.update_engine']
     updateEngineStatus: typeof routes['boat_equipment.update_engine_status']
     updateEngineNotes: typeof routes['boat_equipment.update_engine_notes']
+    incrementEngineHours: typeof routes['boat_equipment.increment_engine_hours']
     destroyEngine: typeof routes['boat_equipment.destroy_engine']
     storeSail: typeof routes['boat_equipment.store_sail']
     editSail: typeof routes['boat_equipment.edit_sail']
@@ -293,6 +291,9 @@ export interface ApiDefinition {
         add: typeof routes['settings.billing.module.add']
         remove: typeof routes['settings.billing.module.remove']
       }
+      addon: {
+        set: typeof routes['settings.billing.addon.set']
+      }
     }
     profile: {
       update: typeof routes['settings.profile.update']
@@ -405,6 +406,9 @@ export interface ApiDefinition {
     update: typeof routes['invoices.update']
     destroy: typeof routes['invoices.destroy']
   }
+  eventStream: typeof routes['event_stream']
+  subscribe: typeof routes['subscribe']
+  unsubscribe: typeof routes['unsubscribe']
   newAccount: {
     create: typeof routes['new_account.create']
     store: typeof routes['new_account.store']

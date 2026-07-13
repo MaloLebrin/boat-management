@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import BaseCard from '~/components/base/BaseCard.vue'
+import EngineHoursQuickAddForm from '~/components/boats/engine/EngineHoursQuickAddForm.vue'
 import { useT } from '~/composables/use_t'
 import type { BoatShowEngine, MaintenanceEventRow, MaintenanceTaskRow } from '~/types/boat_show'
 
 const { t } = useT()
 
 defineProps<{
+  boatId: number
   engine: BoatShowEngine
   overdueTask: MaintenanceTaskRow | undefined
   recentEvents: MaintenanceEventRow[]
@@ -14,6 +16,7 @@ defineProps<{
   hoursProgress: number
   isOverThreshold: boolean
   sortedOpenTasks: MaintenanceTaskRow[]
+  canManage: boolean
 }>()
 
 function formatDate(iso: string): string {
@@ -44,9 +47,12 @@ function formatDate(iso: string): string {
       <!-- KPI row -->
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <BaseCard>
-          <p class="text-sm font-semibold text-fg-muted">
-            {{ t('boats.engineShow.overview.totalHours') }}
-          </p>
+          <div class="flex items-start justify-between gap-2">
+            <p class="text-sm font-semibold text-fg-muted">
+              {{ t('boats.engineShow.overview.totalHours') }}
+            </p>
+            <EngineHoursQuickAddForm v-if="canManage" :boat-id="boatId" :engine-id="engine.id" />
+          </div>
           <p class="mt-2 font-display text-3xl font-bold tracking-tight text-fg">
             {{ engine.hours ?? '-' }}
           </p>

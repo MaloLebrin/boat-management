@@ -73,7 +73,10 @@
       "title": "Add engine",
       "cancel": "Cancel",
       "submit": "Add engine"
-    }
+    },
+    "addHours": "+ hours",
+    "addHoursPlaceholder": "Number of hours",
+    "addHoursSubmit": "Add"
   },
   "sails": {
     "title": "Sails",

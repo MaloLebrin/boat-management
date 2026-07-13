@@ -2,6 +2,7 @@
   "tab": "Logbook",
   "empty": "No trips recorded.",
   "add": "+ New trip",
+  "activeLogBlocksCreate": "A trip is already in progress for this boat. Close it before starting a new one.",
   "count": "{count, plural, one {# trip} other {# trips}}",
   "inProgress": "In progress",
   "completed": "Completed",

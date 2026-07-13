@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Form } from '@adonisjs/inertia/vue'
 import BoatEquipmentEngineFields from './BoatEquipmentEngineFields.vue'
+import EngineHoursQuickAddForm from './EngineHoursQuickAddForm.vue'
 import type { BoatShowEngine } from '~/types/boat_show'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
@@ -88,6 +89,7 @@ function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutra
               >
                 {{ e.hours }} h
               </span>
+              <EngineHoursQuickAddForm v-if="canManage" :boat-id="boatId" :engine-id="e.id" />
             </div>
 
             <div class="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-fg-subtle">

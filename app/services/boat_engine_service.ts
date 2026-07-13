@@ -112,4 +112,15 @@ export default class BoatEngineService {
     engine.notes = notes
     await engine.save()
   }
+
+  async incrementHours(user: User, boat: Boat, engineId: number, incrementBy: number) {
+    assertBoatInUserOrg(user, boat)
+
+    const engine = await BoatEngine.query().where('id', engineId).where('boatId', boat.id).first()
+    if (!engine) throw new BoatEquipmentNotFoundError()
+
+    engine.hours = (engine.hours ?? 0) + Math.round(incrementBy)
+    await engine.save()
+    return engine
+  }
 }

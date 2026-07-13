@@ -3,6 +3,13 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-07-13 — Heures moteur incrémentables + garde-fou sur le bouton « + Nouvelle sortie »
+
+Deux correctifs d'ergonomie remontés à l'usage sur les fiches bateau.
+
+- **Heures moteur** : ajout d'une action rapide « + heures » (à côté du badge heures sur la fiche bateau et de la KPI « Heures total » sur la fiche moteur) permettant d'**incrémenter** le compteur `hours` d'un moteur d'un nombre d'heures donné, sans repasser par tout le formulaire d'édition. Nouvelle route `PATCH /boats/:boatId/engines/:engineId/hours` (`BoatEquipmentController.incrementEngineHours`, validator `incrementEngineHoursValidator`, `BoatEngineService.incrementHours`) — incrément strictement positif, ajouté à la valeur courante (0 si non renseignée). Nouveau composant `EngineHoursQuickAddForm.vue`.
+- **Journal de bord** : le bouton « + Nouvelle sortie » (`BoatShowTabNavigationLogs.vue`) restait actif même lorsqu'une sortie était déjà en cours pour le bateau (règle métier : un seul trajet `in_progress` par bateau), menant à un échec silencieux (flash + redirection) à la soumission. Le bouton est désormais masqué et remplacé par un message explicatif tant qu'une sortie est en cours.
+
 ## 2026-07-12 — Add-on « bateaux supplémentaires » (quota quantitatif payant)
 
 Premier add-on **quantitatif** de l'offre : un abonné **Pro** peut acheter des **bateaux supplémentaires à 4 €/bateau/mois** (3 € en annuel) qui relèvent son quota `maxBoats` au-delà du plafond du plan, sans passer à Enterprise. Contrairement aux modules booléens (`charter`, `crm_invoicing`), un add-on porte une **quantité** et augmente un quota numérique. L'invariant « un module ne touche jamais aux quotas numériques » est **préservé** : les add-ons sont un axe distinct.

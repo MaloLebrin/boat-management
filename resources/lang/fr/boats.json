@@ -73,7 +73,10 @@
       "title": "Ajouter un moteur",
       "cancel": "Annuler",
       "submit": "Ajouter le moteur"
-    }
+    },
+    "addHours": "+ heures",
+    "addHoursPlaceholder": "Nombre d'heures",
+    "addHoursSubmit": "Ajouter"
   },
   "sails": {
     "title": "Voiles",

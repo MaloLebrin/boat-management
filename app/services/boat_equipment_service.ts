@@ -55,6 +55,10 @@ export default class BoatEquipmentService {
     return this.engineService.updateNotes(user, boat, engineId, notes)
   }
 
+  async incrementEngineHours(user: User, boat: Boat, engineId: number, incrementBy: number) {
+    return this.engineService.incrementHours(user, boat, engineId, incrementBy)
+  }
+
   async createSail(user: User, boat: Boat, payload: BoatSailPayload) {
     return this.sailService.create(user, boat, payload)
   }

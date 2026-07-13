@@ -260,6 +260,7 @@ function formatYear(iso: string): string {
       <div :key="tab" class="mt-8">
         <EngineShowTabOverview
           v-if="tab === 'overview'"
+          :boat-id="boat.id"
           :engine="engine"
           :overdue-task="overdueTask"
           :recent-events="recentEvents"
@@ -268,6 +269,7 @@ function formatYear(iso: string): string {
           :hours-progress="hoursProgress"
           :is-over-threshold="isOverThreshold"
           :sorted-open-tasks="sortedOpenTasks"
+          :can-manage="canManage"
         />
         <EngineShowTabSpecs
           v-else-if="tab === 'specs'"

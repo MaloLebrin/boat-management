@@ -15,6 +15,7 @@ import {
   equipmentBodyToEnginePayload,
   equipmentBodyToRigPayload,
   equipmentBodyToSailPayload,
+  incrementEngineHoursValidator,
   storeBoatEngineValidator,
   storeBoatSailValidator,
   updateBoatEngineValidator,
@@ -524,6 +525,43 @@ export default class BoatEquipmentController {
         boat,
         Number(params.engineId),
         notes ?? null
+      )
+    } catch (error) {
+      if (error instanceof BoatEquipmentNotFoundError) {
+        session.flash('error', i18n.t('flash.engine.notFound'))
+        response.redirect(`/boats/${boat.id}`)
+        return
+      }
+      throw error
+    }
+
+    response.redirect().back()
+  }
+
+  async incrementEngineHours({
+    request,
+    response,
+    auth,
+    params,
+    bouncer,
+    session,
+    i18n,
+  }: HttpContext) {
+    await auth.authenticate()
+    const loaded = await this.loadBoatForEquipment({ auth, response, params })
+    if (!loaded) return
+
+    const { boat } = loaded
+    await bouncer.with(BoatPolicy).authorize('edit', boat)
+
+    const { hoursIncrement } = await request.validateUsing(incrementEngineHoursValidator)
+
+    try {
+      await this.equipmentService.incrementEngineHours(
+        loaded.user,
+        boat,
+        Number(params.engineId),
+        hoursIncrement
       )
     } catch (error) {
       if (error instanceof BoatEquipmentNotFoundError) {

@@ -96,6 +96,10 @@ export const updateEquipmentNotesValidator = vine.create(
   vine.object({ notes: vine.string().trim().maxLength(5000).optional().nullable() })
 )
 
+export const incrementEngineHoursValidator = vine.create(
+  vine.object({ hoursIncrement: vine.number().positive() })
+)
+
 export type BoatRigFormBody = {
   rigType: string
   manufacturedAt?: string

@@ -2,6 +2,7 @@
   "tab": "Journal de bord",
   "empty": "Aucune sortie enregistrée.",
   "add": "+ Nouvelle sortie",
+  "activeLogBlocksCreate": "Une sortie est déjà en cours pour ce bateau. Clôturez-la avant d'en démarrer une nouvelle.",
   "count": "{count, plural, one {# sortie} other {# sorties}}",
   "inProgress": "En cours",
   "completed": "Terminée",

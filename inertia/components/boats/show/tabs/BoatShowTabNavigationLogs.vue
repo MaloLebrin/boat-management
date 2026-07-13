@@ -28,6 +28,10 @@ const engineOptions = computed(() => toNavigationEngineOptions(props.boat.engine
 const showCreateForm = ref(false)
 const closingLogId = ref<number | null>(null)
 
+const hasActiveLog = computed(() =>
+  props.navigationLogs.some((log) => log.status === 'in_progress')
+)
+
 function formatDateTime(iso: string): string {
   return new Date(iso).toLocaleString(undefined, {
     year: 'numeric',
@@ -60,7 +64,7 @@ function deleteLog(logId: number) {
         {{ t('navigation_logs.count', { count: String(navigationLogs.length) }) }}
       </p>
       <BaseButton
-        v-if="canCreate"
+        v-if="canCreate && !hasActiveLog"
         variant="primary"
         size="sm"
         type="button"
@@ -68,6 +72,9 @@ function deleteLog(logId: number) {
       >
         {{ t('navigation_logs.add') }}
       </BaseButton>
+      <p v-else-if="canCreate && hasActiveLog" class="text-sm text-fg-muted">
+        {{ t('navigation_logs.activeLogBlocksCreate') }}
+      </p>
     </div>
 
     <!-- Create form -->
