@@ -143,3 +143,37 @@ test.group('Engine hours increment (functional)', (group) => {
     response.assertRedirectsTo(`/boats/${boat.id}`)
   })
 })
+
+test.group('Engine hours DB-level monotonic trigger (functional)', (group) => {
+  group.each.setup(() => testUtils.db().truncate())
+
+  test('a direct SQL decrease bypassing the app layer is rejected', async ({ assert }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const engine = await BoatEngineFactory.merge({
+      boatId: boat.id,
+      kind: 'inboard',
+      hours: 100,
+    }).create()
+
+    await assert.rejects(() => BoatEngine.query().where('id', engine.id).update({ hours: 50 }))
+
+    await engine.refresh()
+    assert.equal(engine.hours, 100)
+  })
+
+  test('a direct SQL increase bypassing the app layer is allowed', async ({ assert }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const engine = await BoatEngineFactory.merge({
+      boatId: boat.id,
+      kind: 'inboard',
+      hours: 100,
+    }).create()
+
+    await BoatEngine.query().where('id', engine.id).update({ hours: 150 })
+
+    await engine.refresh()
+    assert.equal(engine.hours, 150)
+  })
+})

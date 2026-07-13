@@ -64,6 +64,7 @@ Les PDFs uploadés sont compressés avant envoi sur Cloudinary via `app/services
 - Code partagé backend/frontend dans `shared/` (types, helpers, constants)
 - **Taille max des composants Vue : 250 lignes** (enforced par ESLint `max-lines`) — au-delà, extraire en sous-composants
 - Pages complexes à onglets : chaque onglet = un composant dans `components/<domaine>/show/tabs/`
+- **Navigation interne : toujours `<Link>` (`@adonisjs/inertia/vue`)**, jamais une ancre `<a href="...">` brute — préserve le routing SPA Inertia (pas de full page reload). Ancre `<a>` réservée aux liens externes ou `mailto:`/`tel:`.
 
 #### Mutations Inertia (obligatoire sur pages/composants Inertia)
 
@@ -152,3 +153,4 @@ tests/
 - **Utiliser des ternaires `locale === 'fr' ? ... : ...`** (→ utiliser `t()` avec clé dans les deux JSON)
 - **`fetch` / `axios` + JSON + CSRF manuel dans `inertia/**`** pour des mutations déjà couvertes par une page Inertia (→ `router.patch`/`useForm`/`<Form>`+`response.redirect().back()` côté contrôleur)
 - **`response.json({ ok: true })` sur des routes appelées depuis l’UI Inertia** (→ redirection ; réserver le JSON aux vraies routes API)
+- **Ancre `<a href="...">` pour une navigation interne** (→ `<Link>` d'Inertia ; `<a>` seulement pour liens externes/`mailto:`/`tel:`)
