@@ -176,7 +176,7 @@ function formatYear(iso: string): string {
         { label: boat.name, href: `/boats/${boat.id}` },
         {
           label: t('boats.engineShow.breadcrumb.equipment'),
-          href: `/boats/${boat.id}/engine?tab=equipment`,
+          href: `/boats/${boat.id}?tab=equipment`,
         },
         { label: engineTitle },
       ]"
