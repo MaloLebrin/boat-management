@@ -3,11 +3,13 @@ import { ref } from 'vue'
 import { router } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
+import BaseModal from '~/components/base/BaseModal.vue'
 import { useT } from '~/composables/use_t'
 
 const props = defineProps<{
   boatId: number
   engineId: number
+  currentHours: number | null
 }>()
 
 const { t } = useT()
@@ -36,11 +38,20 @@ function submit() {
 </script>
 
 <template>
-  <div class="inline-flex items-center gap-2">
-    <BaseButton v-if="!isOpen" variant="ghost" size="sm" type="button" @click="isOpen = true">
-      {{ t('boats.engines.addHours') }}
-    </BaseButton>
-    <form v-else class="flex items-center gap-2" @submit.prevent="submit">
+  <BaseButton variant="ghost" size="sm" type="button" @click="isOpen = true">
+    {{ t('boats.engines.addHours') }}
+  </BaseButton>
+
+  <BaseModal
+    v-model:open="isOpen"
+    :title="t('boats.engines.addHoursModalTitle')"
+    :close-label="t('common.close')"
+    size="md"
+  >
+    <form class="space-y-4" @submit.prevent="submit">
+      <p v-if="currentHours !== null" class="text-sm text-fg-muted">
+        {{ t('boats.engines.addHoursCurrent', { hours: String(currentHours) }) }}
+      </p>
       <BaseInput
         id="hoursIncrement"
         name="hoursIncrement"
@@ -48,16 +59,17 @@ function submit() {
         inputmode="numeric"
         min="1"
         step="1"
-        :placeholder="t('boats.engines.addHoursPlaceholder')"
+        :label="t('boats.engines.addHoursPlaceholder')"
         v-model="hoursIncrement"
-        class="w-28"
       />
-      <BaseButton type="submit" size="sm" :disabled="processing">
-        {{ t('boats.engines.addHoursSubmit') }}
-      </BaseButton>
-      <BaseButton variant="ghost" size="sm" type="button" @click="isOpen = false">
-        {{ t('common.close') }}
-      </BaseButton>
+      <div class="flex items-center justify-end gap-2 pt-2">
+        <BaseButton variant="ghost" type="button" @click="isOpen = false">
+          {{ t('boats.engines.modal.cancel') }}
+        </BaseButton>
+        <BaseButton type="submit" :disabled="processing">
+          {{ t('boats.engines.addHoursSubmit') }}
+        </BaseButton>
+      </div>
     </form>
-  </div>
+  </BaseModal>
 </template>

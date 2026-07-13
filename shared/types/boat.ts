@@ -45,7 +45,6 @@ export type BoatEnginePayload = {
   serialNumber?: string | null
   manufacturedAt?: Date | string | DateTime | null
   powerHp?: number | null
-  hours?: number | null
   installHours?: number | null
   status?: string | null
 }

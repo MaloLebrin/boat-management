@@ -75,7 +75,9 @@
       "submit": "Ajouter le moteur"
     },
     "addHours": "+ heures",
-    "addHoursPlaceholder": "Nombre d'heures",
+    "addHoursModalTitle": "Ajouter des heures moteur",
+    "addHoursCurrent": "Heures actuelles : {hours} h",
+    "addHoursPlaceholder": "Nombre d'heures à ajouter",
     "addHoursSubmit": "Ajouter"
   },
   "sails": {

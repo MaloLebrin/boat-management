@@ -1,4 +1,4 @@
-import { BoatEquipmentNotFoundError, EngineHoursRegressionError } from '#exceptions/boat_errors'
+import { BoatEquipmentNotFoundError } from '#exceptions/boat_errors'
 import type Boat from '#models/boat'
 import BoatEngine from '#models/boat_engine'
 import BoatEnginePart from '#models/boat_engine_part'
@@ -30,7 +30,10 @@ export default class BoatEngineService {
       serialNumber: payload.serialNumber ?? null,
       manufacturedAt: toDateOrNull(payload.manufacturedAt),
       powerHp: payload.powerHp ?? null,
-      hours: payload.hours ?? null,
+      // `hours` (live running total) starts equal to `installHours` (fixed
+      // baseline captured at creation) — afterward it only moves via
+      // incrementHours() and navigation log closures, never via update().
+      hours: payload.installHours ?? null,
       installHours: payload.installHours ?? null,
     })
   }
@@ -41,16 +44,9 @@ export default class BoatEngineService {
     const engine = await BoatEngine.query().where('id', engineId).where('boatId', boat.id).first()
     if (!engine) throw new BoatEquipmentNotFoundError()
 
-    // Engine hours are a monotonic counter: reject a new value below the current
-    // one to prevent tampering that would skew preventive maintenance and AI
-    // analyses. Clearing the value (null) or setting it on an engine with no
-    // recorded hours remains allowed.
-    if (payload.hours !== null && payload.hours !== undefined && engine.hours !== null) {
-      if (payload.hours < engine.hours) {
-        throw new EngineHoursRegressionError()
-      }
-    }
-
+    // `hours` and `installHours` are intentionally not editable here: the
+    // install baseline is fixed once at creation, and the running total only
+    // moves via incrementHours() or a navigation log closure.
     engine.kind = payload.kind
     engine.fuel = payload.fuel ?? null
     engine.strokeType = payload.strokeType ?? null
@@ -59,8 +55,6 @@ export default class BoatEngineService {
     engine.serialNumber = payload.serialNumber ?? null
     engine.manufacturedAt = toDateOrNull(payload.manufacturedAt)
     engine.powerHp = payload.powerHp ?? null
-    engine.hours = payload.hours ?? null
-    engine.installHours = payload.installHours ?? null
 
     await engine.save()
     return engine

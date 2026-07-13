@@ -80,7 +80,7 @@ export default class extends BaseSeeder {
         brand: 'Yamaha',
         model: '8HP',
         powerHp: 8,
-        hours: 120,
+        installHours: 120,
         manufacturedAt: '2018-04-01',
       })
     }

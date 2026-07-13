@@ -3,8 +3,7 @@
     "added": "Engine added.",
     "updated": "Engine updated.",
     "removed": "Engine removed.",
-    "notFound": "Engine not found.",
-    "hoursRegression": "Engine hours cannot be lower than the current value."
+    "notFound": "Engine not found."
   },
   "sail": {
     "added": "Sail added.",

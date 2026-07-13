@@ -122,7 +122,7 @@ export async function seedDemoData() {
           brand: 'Volvo',
           model: 'D1-20',
           powerHp: 20,
-          hours: Math.floor(Math.random() * 600) + 100,
+          installHours: Math.floor(Math.random() * 600) + 100,
           manufacturedAt: `${def.yearBuilt + 1}-06-01`,
         })
       }
@@ -158,7 +158,7 @@ export async function seedDemoData() {
           brand: 'Mercury',
           model: '60 EFI',
           powerHp: 60,
-          hours: Math.floor(Math.random() * 300) + 50,
+          installHours: Math.floor(Math.random() * 300) + 50,
           manufacturedAt: `${def.yearBuilt}-03-01`,
         })
       }

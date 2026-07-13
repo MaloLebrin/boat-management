@@ -75,7 +75,9 @@
       "submit": "Add engine"
     },
     "addHours": "+ hours",
-    "addHoursPlaceholder": "Number of hours",
+    "addHoursModalTitle": "Add engine hours",
+    "addHoursCurrent": "Current hours: {hours} h",
+    "addHoursPlaceholder": "Number of hours to add",
     "addHoursSubmit": "Add"
   },
   "sails": {

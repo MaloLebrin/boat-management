@@ -7,10 +7,10 @@ import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseModal from '~/components/base/BaseModal.vue'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useT } from '~/composables/use_t'
 
-defineProps<{
+const props = defineProps<{
   boatId: number
   engines: BoatShowEngine[]
   canManage: boolean
@@ -18,6 +18,12 @@ defineProps<{
 
 const { t } = useT()
 const isCreateOpen = ref(false)
+
+const totalEngineHours = computed(() => {
+  const enginesWithHours = props.engines.filter((e) => e.hours !== null)
+  if (enginesWithHours.length === 0) return null
+  return enginesWithHours.reduce((sum, e) => sum + (e.hours ?? 0), 0)
+})
 
 function performedDisplay(iso: string | null) {
   if (!iso) return null
@@ -37,7 +43,12 @@ function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutra
   <BaseCard padded>
     <template #header>
       <div class="flex items-center justify-between gap-3">
-        <p class="text-sm font-semibold text-fg">{{ t('boats.engines.title') }}</p>
+        <div class="flex items-center gap-3">
+          <p class="text-sm font-semibold text-fg">{{ t('boats.engines.title') }}</p>
+          <p v-if="totalEngineHours !== null" class="text-xs text-fg-muted">
+            {{ t('boats.show.overview.engineHours') }} : {{ totalEngineHours }} h
+          </p>
+        </div>
         <BaseButton
           v-if="canManage"
           variant="secondary"
@@ -89,7 +100,6 @@ function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutra
               >
                 {{ e.hours }} h
               </span>
-              <EngineHoursQuickAddForm v-if="canManage" :boat-id="boatId" :engine-id="e.id" />
             </div>
 
             <div class="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-fg-subtle">
@@ -101,6 +111,12 @@ function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutra
           </div>
 
           <div class="flex flex-wrap items-center gap-2 md:justify-end">
+            <EngineHoursQuickAddForm
+              v-if="canManage"
+              :boat-id="boatId"
+              :engine-id="e.id"
+              :current-hours="e.hours"
+            />
             <a :href="`/boats/${boatId}/engines/${e.id}`">
               <BaseButton variant="secondary" size="sm" type="button">
                 {{ t('boats.engines.viewDetail') }}

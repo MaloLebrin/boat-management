@@ -26,6 +26,8 @@ const props = defineProps<{
   engine?: BoatEquipmentEngineFieldsModel | null
 }>()
 
+const isEditMode = computed(() => Boolean(props.engine))
+
 const { t } = useT()
 const { engineKindOptions, engineFuelOptions, engineStrokeTypeOptions } = useBoatOptions()
 
@@ -45,7 +47,6 @@ const model = ref('')
 const serialNumber = ref('')
 const manufacturedAt = ref('')
 const powerHp = ref('')
-const hours = ref('')
 const status = ref('')
 
 function syncFromProps() {
@@ -60,7 +61,6 @@ function syncFromProps() {
   serialNumber.value = e?.serialNumber ?? ''
   manufacturedAt.value = e?.manufacturedAt ? e.manufacturedAt.slice(0, 10) : ''
   powerHp.value = e?.powerHp === null || e?.powerHp === undefined ? '' : String(e.powerHp)
-  hours.value = e?.hours === null || e?.hours === undefined ? '' : String(e.hours)
   status.value = e?.status ?? 'operational'
 }
 
@@ -144,15 +144,7 @@ watch(
       :errors="errors"
     />
     <BaseInput
-      id="hours"
-      name="hours"
-      :label="t('boats.engines.fields.hours')"
-      type="number"
-      inputmode="numeric"
-      v-model="hours"
-      :errors="errors"
-    />
-    <BaseInput
+      v-if="!isEditMode"
       id="installHours"
       name="installHours"
       :label="t('boats.engines.fields.installHours')"
@@ -170,5 +162,15 @@ watch(
       v-model="status"
       :errors="errors"
     />
+
+    <div
+      v-if="isEditMode"
+      class="col-span-2 flex flex-wrap gap-x-6 gap-y-1 rounded-(--radius-control) bg-surface-muted/40 p-3 text-sm text-fg-muted"
+    >
+      <span>{{ t('boats.engines.fields.hours') }} : {{ engine?.hours ?? '—' }} h</span>
+      <span
+        >{{ t('boats.engines.fields.installHours') }} : {{ engine?.installHours ?? '—' }} h</span
+      >
+    </div>
   </div>
 </template>

@@ -51,7 +51,12 @@ function formatDate(iso: string): string {
             <p class="text-sm font-semibold text-fg-muted">
               {{ t('boats.engineShow.overview.totalHours') }}
             </p>
-            <EngineHoursQuickAddForm v-if="canManage" :boat-id="boatId" :engine-id="engine.id" />
+            <EngineHoursQuickAddForm
+              v-if="canManage"
+              :boat-id="boatId"
+              :engine-id="engine.id"
+              :current-hours="engine.hours"
+            />
           </div>
           <p class="mt-2 font-display text-3xl font-bold tracking-tight text-fg">
             {{ engine.hours ?? '-' }}

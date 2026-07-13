@@ -26,7 +26,6 @@ const enginePayload = vine.object({
   serialNumber: vine.string().trim().maxLength(120).optional(),
   manufacturedAt: vine.string().trim().optional(),
   powerHp: vine.string().trim().optional(),
-  hours: vine.string().trim().optional(),
   installHours: vine.string().trim().optional(),
   status: vine.enum(equipmentStatuses).optional(),
 })
@@ -44,7 +43,6 @@ export type BoatEngineFormBody = {
   serialNumber?: string
   manufacturedAt?: string
   powerHp?: string
-  hours?: string
   installHours?: string
   status?: string
 }
@@ -147,7 +145,6 @@ export function equipmentBodyToEnginePayload(body: BoatEngineFormBody): BoatEngi
     serialNumber: emptyToNull(body.serialNumber),
     manufacturedAt: emptyToNull(body.manufacturedAt),
     powerHp: parseOptionalPositiveFloat(body.powerHp),
-    hours: parseOptionalNonNegativeInt(body.hours),
     installHours: parseOptionalNonNegativeInt(body.installHours),
     status: (body.status ?? 'operational') as EquipmentStatus,
   }

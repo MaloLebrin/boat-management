@@ -3,8 +3,7 @@
     "added": "Moteur ajouté.",
     "updated": "Moteur mis à jour.",
     "removed": "Moteur supprimé.",
-    "notFound": "Moteur introuvable.",
-    "hoursRegression": "Les heures moteur ne peuvent pas être inférieures à la valeur actuelle."
+    "notFound": "Moteur introuvable."
   },
   "sail": {
     "added": "Voile ajoutée.",

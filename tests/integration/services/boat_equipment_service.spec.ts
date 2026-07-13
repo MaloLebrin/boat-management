@@ -23,7 +23,6 @@ test.group('BoatService equipment (unit)', () => {
           serialNumber: null,
           manufacturedAt: null,
           powerHp: 20,
-          hours: null,
         }),
       BoatEquipmentNotFoundError
     )

@@ -1,7 +1,6 @@
 import BoatPolicy from '#policies/boat_policy'
 import { toMediaRow } from '#transformers/media_row_transformer'
 import BoatEquipmentService, { BoatEquipmentNotFoundError } from '#services/boat_equipment_service'
-import { EngineHoursRegressionError } from '#exceptions/boat_errors'
 import BoatEnginePartService from '#services/boat_engine_part_service'
 import BoatHullService, { BoatNotFoundError } from '#services/boat_hull_service'
 import BoatMaintenanceService from '#services/boat_maintenance_service'
@@ -122,11 +121,6 @@ export default class BoatEquipmentController {
     } catch (error) {
       if (error instanceof BoatEquipmentNotFoundError) {
         session.flash('error', i18n.t('flash.engine.notFound'))
-        response.redirect(`/boats/${boat.id}`)
-        return
-      }
-      if (error instanceof EngineHoursRegressionError) {
-        session.flash('error', i18n.t('flash.engine.hoursRegression'))
         response.redirect(`/boats/${boat.id}`)
         return
       }

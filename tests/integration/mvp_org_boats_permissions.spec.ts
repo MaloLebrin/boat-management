@@ -73,7 +73,7 @@ test.group('MVP org/users/boats/permissions (integration)', () => {
       model: '3YM',
       manufacturedAt: '2019-05-01',
       powerHp: 28,
-      hours: 1200,
+      installHours: 1200,
     })
     await equipmentService.createEngine(user, boat, {
       kind: 'electric',
@@ -82,7 +82,7 @@ test.group('MVP org/users/boats/permissions (integration)', () => {
       model: 'Cruise',
       manufacturedAt: '2021-09-15',
       powerHp: 6.7,
-      hours: 50,
+      installHours: 50,
     })
     await equipmentService.createSail(user, boat, {
       sailType: 'main',
