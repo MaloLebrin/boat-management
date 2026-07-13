@@ -1,5 +1,6 @@
 import { test } from '@japa/runner'
 import QuotaService from '#services/quota_service'
+import OrganizationModuleService from '#services/organization_module_service'
 import { QuotaExceededError } from '#exceptions/quota_errors'
 import { OrganizationFactory } from '#database/factories/organization_factory'
 import { UserFactory } from '#database/factories/user_factory'
@@ -77,6 +78,22 @@ test.group('QuotaService (unit)', () => {
     assert.instanceOf(error, QuotaExceededError)
     assert.equal(error!.feature, 'boats')
     assert.equal(error!.upgradeTo, 'pro')
+  })
+
+  test('extra_boats add-on lifts the boat quota beyond the Pro plan', async ({ assert }) => {
+    const org = await OrganizationFactory.merge({ plan: 'pro' }).create()
+    // Pro = 8 bateaux ; on en crée 8 → limite du plan atteinte.
+    await BoatFactory.merge({ organizationId: org.id }).createMany(8)
+
+    const svc = await app.container.make(QuotaService)
+    assert.isFalse(await svc.canAddBoat(org))
+
+    // Ajout de 2 bateaux supplémentaires (add-on) → quota effectif = 10.
+    const moduleSvc = await app.container.make(OrganizationModuleService)
+    await moduleSvc.setAddonQuantity(org.id, 'extra_boats', 2, { source: 'granted' })
+
+    assert.isTrue(await svc.canAddBoat(org))
+    await assert.doesNotReject(() => svc.assertCanAddBoat(org))
   })
 
   // ── canAddMember ─────────────────────────────────────────────────────────

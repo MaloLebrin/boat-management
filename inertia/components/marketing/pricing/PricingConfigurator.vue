@@ -23,6 +23,14 @@ interface EnterpriseInfo {
   ctaLabel: string
 }
 
+interface ExtraBoatsInfo {
+  name: string
+  desc: string
+  priceMonthly: number
+  priceAnnual: number
+  perBoatLabel: string
+}
+
 const props = defineProps<{
   eyebrow: string
   title: string
@@ -42,10 +50,19 @@ const props = defineProps<{
   ctaHref: string
   modules: ConfiguratorModule[]
   enterprise: EnterpriseInfo
+  extraBoats?: ExtraBoatsInfo
   billing: 'monthly' | 'annual'
 }>()
 
 const selected = ref<Set<string>>(new Set())
+const extraBoatsQty = ref(0)
+
+function decrementBoats() {
+  if (extraBoatsQty.value > 0) extraBoatsQty.value -= 1
+}
+function incrementBoats() {
+  extraBoatsQty.value += 1
+}
 
 function toggle(key: string) {
   const next = new Set(selected.value)
@@ -61,22 +78,32 @@ function unitPrice(m: ConfiguratorModule) {
   return isAnnual.value ? m.priceAnnual : m.priceMonthly
 }
 
+const extraBoatUnit = computed(() => {
+  if (!props.extraBoats) return 0
+  return isAnnual.value ? props.extraBoats.priceAnnual : props.extraBoats.priceMonthly
+})
+
 const total = computed(() => {
   let sum = basePrice.value
   for (const m of props.modules) {
     if (selected.value.has(m.key)) sum += unitPrice(m)
   }
+  sum += extraBoatUnit.value * extraBoatsQty.value
   return sum
 })
 
 // Économie annuelle : (total aux prix mensuels − total aux prix annuels) × 12.
 const annualSaving = computed(() => {
+  const boatsMonthly = (props.extraBoats?.priceMonthly ?? 0) * extraBoatsQty.value
+  const boatsAnnual = (props.extraBoats?.priceAnnual ?? 0) * extraBoatsQty.value
   const monthly =
     props.basePriceMonthly +
-    props.modules.reduce((s, m) => (selected.value.has(m.key) ? s + m.priceMonthly : s), 0)
+    props.modules.reduce((s, m) => (selected.value.has(m.key) ? s + m.priceMonthly : s), 0) +
+    boatsMonthly
   const annual =
     props.basePriceAnnual +
-    props.modules.reduce((s, m) => (selected.value.has(m.key) ? s + m.priceAnnual : s), 0)
+    props.modules.reduce((s, m) => (selected.value.has(m.key) ? s + m.priceAnnual : s), 0) +
+    boatsAnnual
   return (monthly - annual) * 12
 })
 
@@ -84,7 +111,7 @@ const enterprisePrice = computed(() =>
   isAnnual.value ? props.enterprise.priceAnnual : props.enterprise.priceMonthly
 )
 
-defineExpose({ total, annualSaving, selected })
+defineExpose({ total, annualSaving, selected, extraBoatsQty })
 
 // Total et économie qui « roulent » à chaque changement de sélection/intervalle.
 const totalDisplay = useTweenNumber(total)
@@ -138,6 +165,45 @@ const { el, isVisible } = useScrollReveal()
             :selected="selected.has(m.key)"
             @toggle="toggle(m.key)"
           />
+
+          <!-- Add-on quantitatif : bateaux supplémentaires -->
+          <div
+            v-if="extraBoats"
+            class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-bone bg-white p-5"
+          >
+            <div class="min-w-0">
+              <h3 class="font-medium text-fg">{{ extraBoats.name }}</h3>
+              <p class="mt-0.5 text-sm text-fg-muted">{{ extraBoats.desc }}</p>
+              <p class="mt-1 text-sm font-semibold text-fg">
+                {{ extraBoatUnit }} € {{ extraBoats.perBoatLabel }}
+              </p>
+            </div>
+            <div class="flex items-center gap-2">
+              <BaseButton
+                variant="outline"
+                size="sm"
+                :disabled="extraBoatsQty <= 0"
+                aria-label="decrement"
+                @click="decrementBoats"
+              >
+                −
+              </BaseButton>
+              <span
+                class="w-8 text-center font-semibold text-fg tabular-nums"
+                data-testid="configurator-extra-boats"
+              >
+                {{ extraBoatsQty }}
+              </span>
+              <BaseButton
+                variant="outline"
+                size="sm"
+                aria-label="increment"
+                @click="incrementBoats"
+              >
+                +
+              </BaseButton>
+            </div>
+          </div>
         </div>
 
         <!-- Colonne récap (sticky) — liseré lumineux animé -->

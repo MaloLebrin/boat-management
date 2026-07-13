@@ -34,3 +34,4 @@ yarn-error.log
 
 # Test coverage reports
 coverage/
+.env.*.local

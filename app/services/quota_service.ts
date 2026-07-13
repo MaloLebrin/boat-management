@@ -42,20 +42,22 @@ export default class QuotaService {
 
   async canAddBoat(org: Organization | null): Promise<boolean> {
     this.#assertOrganization(org)
-    const limits = PLAN_LIMITS[org.plan]
-    if (limits.maxBoats === null) return true
-    return (await this.countBoats(org)) < limits.maxBoats
+    // Quotas effectifs (tier + add-on `extra_boats`), pas le tier brut : l'add-on
+    // quantitatif relève `maxBoats` au-delà du plafond du plan (épic #333).
+    const { maxBoats } = await this.organizationModuleService.getEffectiveQuotas(org)
+    if (maxBoats === null) return true
+    return (await this.countBoats(org)) < maxBoats
   }
 
   async assertCanAddBoat(org: Organization | null): Promise<void> {
     this.#assertOrganization(org)
-    const limits = PLAN_LIMITS[org.plan]
-    if (limits.maxBoats === null) return
+    const { maxBoats } = await this.organizationModuleService.getEffectiveQuotas(org)
+    if (maxBoats === null) return
 
     const current = await this.countBoats(org)
-    if (current >= limits.maxBoats) {
+    if (current >= maxBoats) {
       throw new QuotaExceededError('boats', {
-        limit: limits.maxBoats,
+        limit: maxBoats,
         current,
         upgradeTo: getUpgradeTier(org.plan),
       })

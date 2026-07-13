@@ -1570,6 +1570,7 @@ export class OrganizationModuleSchema extends BaseModel {
     'id',
     'module',
     'organizationId',
+    'quantity',
     'source',
     'stripeSubscriptionItemId',
     'updatedAt',
@@ -1583,6 +1584,8 @@ export class OrganizationModuleSchema extends BaseModel {
   declare module: string
   @column()
   declare organizationId: number
+  @column()
+  declare quantity: number
   @column()
   declare source: string
   @column()

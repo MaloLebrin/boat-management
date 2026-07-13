@@ -79,6 +79,13 @@ interface Configurator {
     note: string
     ctaLabel: string
   }
+  extraBoats: {
+    name: string
+    desc: string
+    priceMonthly: number
+    priceAnnual: number
+    perBoatLabel: string
+  }
 }
 interface PlanHeader {
   name: string

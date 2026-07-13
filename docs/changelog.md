@@ -3,6 +3,27 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-07-12 — Add-on « bateaux supplémentaires » (quota quantitatif payant)
+
+Premier add-on **quantitatif** de l'offre : un abonné **Pro** peut acheter des **bateaux supplémentaires à 4 €/bateau/mois** (3 € en annuel) qui relèvent son quota `maxBoats` au-delà du plafond du plan, sans passer à Enterprise. Contrairement aux modules booléens (`charter`, `crm_invoicing`), un add-on porte une **quantité** et augmente un quota numérique. L'invariant « un module ne touche jamais aux quotas numériques » est **préservé** : les add-ons sont un axe distinct.
+
+- **Types partagés** (`shared/types/plan.ts`) : `PlanAddon = 'extra_boats'`, `PLAN_ADDONS`, `isPlanAddon`, `ADDON_PRICES` (4 €/mois, 3 € annuel), `ADDON_QUOTA_INCREMENTS` (`extra_boats` → `maxBoats`, +1/unité), `ActiveAddonInfo`, `NumericQuotaKey`.
+- **Résolution des quotas** (`shared/helpers/plan.ts`) : `resolveEffectiveQuotas(tier, modules, addons = [])` additionne `perUnit × quantity` aux quotas numériques (jamais sur un quota illimité `null`). Rétro-compatible (param add-ons optionnel).
+- **Base de données** : migration `add_quantity_and_extra_boats_to_organization_modules` — colonne `quantity` (défaut 1) sur `organization_modules` + `CHECK module IN (…, 'extra_boats')`. Contrainte `unique(organization_id, module)` conservée.
+- **Quota** (`app/services/quota_service.ts`) : `canAddBoat` / `assertCanAddBoat` lisent désormais `getEffectiveQuotas(org).maxBoats` (comme `canManage*`), donc l'add-on est pris en compte.
+- **Stripe** (`app/services/stripe_service.ts`) : `priceIdForAddon` / `addonForPriceId`, quantité paramétrable sur checkout / `addSubscriptionItem`, nouveau `updateSubscriptionItemQuantity`. Env `STRIPE_ADDON_EXTRA_BOATS_MONTHLY_PRICE_ID` / `_ANNUAL_`.
+- **Sync abonnement** (`app/services/subscription_service.ts`) : les items d'add-on sont réconciliés vers `organization_modules` avec leur `item.quantity` ; changement de quantité et retrait gérés.
+- **Route** : `POST /settings/billing/addon` (`BillingController.setAddon`, `addonActionValidator` : `quantity` 0–100) — `0` retire l'add-on, une valeur positive crée/ajuste l'item Stripe. Réponse par redirection Inertia.
+- **UI** : Réglages > Facturation — nouveau composant `SettingsBillingExtraBoats.vue` (stepper de quantité + prix live) ; page pricing publique — stepper « bateaux supplémentaires » dans `PricingConfigurator` intégré au total. Props Inertia partagées : `activeAddons`. i18n FR + EN (`settings.billing.extraBoats.*`, `pricing2.config_extra_boats_*`, flash `billing.addon*`).
+
+## 2026-07-12 — Plan Pro : limite de bateaux abaissée de 25 à 8
+
+Ajustement tarifaire : le plan **Pro** plafonne désormais à **8 bateaux** (contre 25). L'écart avec Starter (2) était trop large et Pro captait sans surcoût des flottes relevant d'Enterprise ; 8 recentre Pro sur les petites flottes et clarifie le passage à Enterprise.
+
+- **`shared/types/plan.ts`** : `PLAN_LIMITS.pro.maxBoats` passe de `25` à `8` (source unique du quota, appliquée par `QuotaService.assertCanAddBoat`). Aucun autre quota Pro modifié (membres, stockage, IA inchangés).
+- **Vitrine** (`resources/lang/{fr,en}/marketing.json`) : sous-titre et feature du plan Pro, meta-description, tableau comparatif, sous-titre Enterprise (« au-delà de 8 bateaux ») et FAQ mis à jour.
+- **Docs** : `docs/quotas.md`, `docs/billing-and-quotas.md` et `docs/offre-modulaire.md` alignés sur la nouvelle valeur.
+
 ## 2026-07-12 — Marketing : audit SEO et correctifs techniques
 
 Audit SEO des pages marketing (rapport : `docs/seo-audit-marketing.md`) et correction des défauts à fort impact / faible risque.

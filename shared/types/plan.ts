@@ -59,7 +59,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanQuotas> = {
     canManageInvoices: false,
   },
   pro: {
-    maxBoats: 25,
+    maxBoats: 8,
     maxMembers: 5,
     storageGb: 20,
     canUseAI: true,
@@ -127,6 +127,51 @@ export const MODULE_FLAGS: Record<PlanModule, Partial<PlanQuotas>> = {
 
 export function isPlanModule(value: string): value is PlanModule {
   return (PLAN_MODULES as readonly string[]).includes(value)
+}
+
+/**
+ * Add-ons **quantitatifs** souscriptibles sur le socle Pro (épic #333). À la
+ * différence des modules (`PlanModule`) qui sont des flags booléens de
+ * capacité, un add-on porte une **quantité** et **augmente un quota numérique**
+ * (ex. `extra_boats` relève `maxBoats` de `perUnit × quantity`). Enterprise
+ * ayant des quotas illimités (`null`), les add-ons y sont sans objet.
+ */
+export type PlanAddon = 'extra_boats'
+
+export const PLAN_ADDONS: readonly PlanAddon[] = ['extra_boats'] as const
+
+/** Prix unitaire d'un add-on (par unité de quantité, ex. par bateau). */
+export const ADDON_PRICES: Record<PlanAddon, PlanPrice> = {
+  extra_boats: { monthly: 4, annualMonthly: 3, annualTotal: 36 },
+}
+
+/** Clés de `PlanQuotas` dont la valeur est numérique (`number | null`). */
+export type NumericQuotaKey = {
+  [K in keyof PlanQuotas]: PlanQuotas[K] extends number | null ? K : never
+}[keyof PlanQuotas]
+
+/**
+ * Incrément de quota accordé par **une unité** d'add-on : le champ numérique de
+ * `PlanQuotas` visé et le nombre ajouté par unité. La résolution des quotas
+ * effectifs additionne `perUnit × quantity` au quota du tier (jamais sur un
+ * quota illimité `null`).
+ */
+export const ADDON_QUOTA_INCREMENTS: Record<
+  PlanAddon,
+  { field: NumericQuotaKey; perUnit: number }
+> = {
+  extra_boats: { field: 'maxBoats', perUnit: 1 },
+}
+
+/** Add-on actif d'une organisation avec sa quantité et son origine, pour l'affichage in-app. */
+export interface ActiveAddonInfo {
+  addon: PlanAddon
+  quantity: number
+  source: ModuleSource
+}
+
+export function isPlanAddon(value: string): value is PlanAddon {
+  return (PLAN_ADDONS as readonly string[]).includes(value)
 }
 
 export function getUpgradeTier(current: PlanTier): PlanTier | null {

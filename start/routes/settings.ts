@@ -37,6 +37,9 @@ router
       .delete('settings/billing/module', [BillingController, 'removeModule'])
       .as('settings.billing.module.remove')
     router
+      .post('settings/billing/addon', [BillingController, 'setAddon'])
+      .as('settings.billing.addon.set')
+    router
       .put('settings/profile', [SettingsController, 'updateProfile'])
       .as('settings.profile.update')
     router.put('settings/org', [SettingsController, 'updateOrganization']).as('settings.org.update')

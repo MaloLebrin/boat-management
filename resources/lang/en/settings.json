@@ -122,6 +122,18 @@
         "name": "CRM & Invoicing",
         "desc": "Clients, GDPR, quotes and invoices"
       }
+    },
+    "extraBoats": {
+      "title": "Extra boats",
+      "subtitle": "Go beyond your Pro plan limit by adding boats on demand.",
+      "name": "Extra boats",
+      "desc": "Each added boat raises your quota above your plan.",
+      "pricePerBoat": "{amount} €/boat/month",
+      "totalPerMonth": "{amount} €/month",
+      "apply": "Update",
+      "grantedHint": "{count} complimentary boat(s)",
+      "unlimited": "Unlimited boats",
+      "proRequired": "Requires an active Pro plan"
     }
   },
   "upgrade": {

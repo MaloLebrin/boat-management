@@ -1,7 +1,8 @@
 import Organization from '#models/organization'
 import Subscription from '#models/subscription'
 import type { BillingInterval, SubscriptionInfo, SubscriptionStatus } from '#shared/types/billing'
-import type { PlanModule, PlanTier } from '#shared/types/plan'
+import { isPlanModule } from '#shared/types/plan'
+import type { PlanAddon, PlanModule, PlanTier } from '#shared/types/plan'
 import StripeService from '#services/stripe_service'
 import OrganizationModuleService from '#services/organization_module_service'
 import type { DesiredSubscriptionModule } from '#services/organization_module_service'
@@ -105,10 +106,12 @@ export default class SubscriptionService {
    */
   private async dispatchModuleDeactivations(
     org: Organization,
-    removed: PlanModule[]
+    removed: Array<PlanModule | PlanAddon>
   ): Promise<void> {
+    // Seuls les modules booléens déclenchent l'event de désactivation (emails /
+    // notifications) ; le retrait d'un add-on quantitatif n'en émet pas.
     for (const module of removed) {
-      await OrganizationModuleDeactivated.dispatch(org, module)
+      if (isPlanModule(module)) await OrganizationModuleDeactivated.dispatch(org, module)
     }
   }
 
@@ -126,9 +129,10 @@ export default class SubscriptionService {
   }
 
   /**
-   * Modules désirés dérivés des items d'add-on de l'abonnement. Un abonnement
-   * annulé (`plan = 'starter'`) ne conserve aucun module : la réconciliation
-   * retirera alors tous les modules `subscription`.
+   * Modules et add-ons désirés, dérivés des items de l'abonnement. Chaque item
+   * d'add-on porte sa quantité Stripe (`item.quantity`), les modules booléens
+   * restent à 1. Un abonnement annulé (`plan = 'starter'`) ne conserve rien : la
+   * réconciliation retirera alors tous les modules/add-ons `subscription`.
    */
   private desiredModulesFrom(
     stripeSub: Stripe.Subscription,
@@ -139,7 +143,18 @@ export default class SubscriptionService {
     const desired: DesiredSubscriptionModule[] = []
     for (const item of stripeSub.items.data) {
       const module = this.stripeService.moduleForPriceId(item.price.id)
-      if (module) desired.push({ module, stripeSubscriptionItemId: item.id })
+      if (module) {
+        desired.push({ module, stripeSubscriptionItemId: item.id, quantity: 1 })
+        continue
+      }
+      const addon = this.stripeService.addonForPriceId(item.price.id)
+      if (addon) {
+        desired.push({
+          module: addon,
+          stripeSubscriptionItemId: item.id,
+          quantity: item.quantity ?? 1,
+        })
+      }
     }
     return desired
   }
