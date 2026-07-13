@@ -80,7 +80,7 @@ ${alternatesFor(p.en, p.fr)}
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
 ${[...localizedUrls, ...standaloneUrls].join('\n')}
 </urlset>`
-    response.header('Content-Type', 'application/xml')
+    response.header('Content-Type', 'application/xml; charset=utf-8')
     return response.send(xml)
   })
   .as('sitemap')
