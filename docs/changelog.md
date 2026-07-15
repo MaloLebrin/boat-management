@@ -3,6 +3,15 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-07-15 — Préparation montée de version TypeScript 6 → 7 (#373)
+
+Première étape de la migration vers TypeScript 7 : audit des dépréciations et mise en place d'un garde-fou CI, sans encore basculer la version épinglée (`~6.0.3` conservé). Conformément à la procédure recommandée (« utiliser la 6 comme pont vers la 7, ne pas sauter de la 5 à la 7 »), la 6 sert de version-pont pour révéler les incompatibilités avant le passage à la 7.
+
+- **Audit des dépréciations** : le projet backend (`tsc -b`) type-check **proprement sous TS 6 comme sous TS 7** — aucun warning de dépréciation à corriger, aucune option dépréciée dans `tsconfig.json` ni dans `@adonisjs/tsconfig`. Le backend est donc déjà prêt pour TS 7.
+- **Bloqueur identifié — frontend** : `vue-tsc@3.3.5` **plante sous TS 7** (`ERR_PACKAGE_PATH_NOT_EXPORTED: './lib/tsc'` — sous-chemin supprimé par TS 7). La bascule complète vers TS 7 est donc bloquée tant que la chaîne d'outils front (`vue-tsc`) ne supporte pas TS 7. À suivre dans #373.
+- **Garde CI `typecheck-backend`** (`.github/workflows/ci.yml`) : nouveau job qui type-check le backend **avec les deux versions** — TS 6 (courante, via `pnpm exec tsc -b`) et TS 7 (aperçu, via `npx typescript@7.0.2 tsc -b`). Il échoue dès qu'une évolution du backend casse la compatibilité TS 7, matérialisant l'étape « faire tourner les deux en CI jusqu'à ce que les sorties correspondent ». Comble aussi un manque : aucun type-check ne tournait jusqu'ici en CI.
+- **Note** : `pnpm typecheck` (script complet backend + `vue-tsc`) échoue actuellement sur des erreurs de types front **préexistantes** (non liées à la version de TS) ; leur correction et le type-check front en CI sont hors périmètre de cette première étape.
+
 ## 2026-07-15 — Cartes du tableau de bord : liens filtrés cohérents
 
 Les cartes de stats en haut du tableau de bord (`dashboard.vue`) pointaient toutes vers la même liste `/boats`, sans rapport avec leur contenu (Moteurs, Voiles, Gréements menaient au même endroit que Bateaux).
