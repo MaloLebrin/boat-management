@@ -33,6 +33,32 @@ export default class NotificationService {
     return notification
   }
 
+  /**
+   * Crée une notification sauf s'il en existe déjà une récente du même `type`
+   * pour le même utilisateur et la même entité (identifiée par une clé de
+   * `metadata`, ex: `boatId`). Anti-doublon des notifications planifiées : un
+   * scan quotidien sur une condition persistante (maintenance en retard,
+   * document expiré…) ne re-notifie pas chaque jour. Portable Postgres/SQLite
+   * (le filtrage sur `metadata` se fait en mémoire). Retourne `null` si un
+   * doublon récent existe.
+   */
+  async createIfNotRecent(
+    params: CreateNotificationParams,
+    dedupe: { metadataKey: string; withinDays: number }
+  ): Promise<Notification | null> {
+    const since = DateTime.now().minus({ days: dedupe.withinDays })
+    const recent = await Notification.query()
+      .where('userId', params.userId)
+      .where('type', params.type)
+      .where('createdAt', '>=', since.toSQL()!)
+
+    const value = params.metadata?.[dedupe.metadataKey]
+    const hasDuplicate = recent.some((n) => n.metadata?.[dedupe.metadataKey] === value)
+    if (hasDuplicate) return null
+
+    return this.create(params)
+  }
+
   async getUnreadCount(userId: number): Promise<number> {
     const result = await Notification.query()
       .where('userId', userId)

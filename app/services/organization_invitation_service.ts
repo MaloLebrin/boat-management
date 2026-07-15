@@ -1,6 +1,9 @@
+import Organization from '#models/organization'
 import OrganizationInvitation from '#models/organization_invitation'
 import OrganizationMembership from '#models/organization_membership'
 import User from '#models/user'
+import OrganizationInvitationAccepted from '#events/organization_invitation_accepted'
+import OrganizationMemberJoined from '#events/organization_member_joined'
 import {
   AlreadyMemberError,
   InvitationAlreadyAcceptedError,
@@ -195,8 +198,8 @@ export default class OrganizationInvitationService {
       throw new AlreadyMemberError()
     }
 
-    await db.transaction(async (trx) => {
-      await OrganizationMembership.create(
+    const membership = await db.transaction(async (trx) => {
+      const created = await OrganizationMembership.create(
         {
           userId,
           organizationId: invitation.organizationId,
@@ -211,7 +214,17 @@ export default class OrganizationInvitationService {
       invitation.status = 'accepted'
       invitation.acceptedAt = DateTime.now()
       await invitation.useTransaction(trx).save()
+
+      return created
     })
+
+    // Dispatch après commit : les listeners écrivent des notifications et
+    // envoient des emails, ils ne doivent jamais s'appuyer sur une transaction
+    // encore annulable.
+    const organization = await Organization.findOrFail(invitation.organizationId)
+    const memberName = user.fullName ?? user.email
+    await OrganizationMemberJoined.dispatch(membership, organization)
+    await OrganizationInvitationAccepted.dispatch(organization, invitation.invitedById, memberName)
 
     return invitation
   }

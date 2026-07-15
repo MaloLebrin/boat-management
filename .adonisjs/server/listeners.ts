@@ -4,9 +4,13 @@
  */
 
 export const listeners = {
+  OnOrganizationInvitationAccepted: () => import('#listeners/on_organization_invitation_accepted'),
   OnOrganizationMemberJoined: () => import('#listeners/on_organization_member_joined'),
+  OnOrganizationMemberRemoved: () => import('#listeners/on_organization_member_removed'),
+  OnOrganizationMemberRoleChanged: () => import('#listeners/on_organization_member_role_changed'),
   OnOrganizationModuleDeactivated: () => import('#listeners/on_organization_module_deactivated'),
   OnOrganizationPlanDowngraded: () => import('#listeners/on_organization_plan_downgraded'),
+  OnOrganizationPlanUpgraded: () => import('#listeners/on_organization_plan_upgraded'),
   OnSimulatorLeadCreated: () => import('#listeners/on_simulator_lead_created'),
   SendAiTokenQuotaNotification: () => import('#listeners/send_ai_token_quota_notification'),
   SendStorageQuotaNotification: () => import('#listeners/send_storage_quota_notification'),

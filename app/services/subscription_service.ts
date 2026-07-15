@@ -7,6 +7,7 @@ import StripeService from '#services/stripe_service'
 import OrganizationModuleService from '#services/organization_module_service'
 import type { DesiredSubscriptionModule } from '#services/organization_module_service'
 import OrganizationPlanDowngraded from '#events/organization_plan_downgraded'
+import OrganizationPlanUpgraded from '#events/organization_plan_upgraded'
 import OrganizationModuleDeactivated from '#events/organization_module_deactivated'
 import { inject } from '@adonisjs/core'
 import env from '#start/env'
@@ -55,19 +56,17 @@ export default class SubscriptionService {
     const plan = this.planFromPriceId(tierItem.price.id)
     const desiredModules = this.desiredModulesFrom(stripeSub, plan)
 
-    const { downgrade, removed } = await db.transaction(async (trx) => {
+    const { planChange, removed } = await db.transaction(async (trx) => {
       await this.upsertSubscription(org.id, stripeSub, tierItem, trx)
       const reconciled = await this.organizationModuleService.reconcileSubscriptionModules(
         org.id,
         desiredModules,
         trx
       )
-      return { downgrade: await this.applyOrgPlan(org, plan, trx), removed: reconciled.removed }
+      return { planChange: await this.applyOrgPlan(org, plan, trx), removed: reconciled.removed }
     })
 
-    if (downgrade) {
-      await OrganizationPlanDowngraded.dispatch(org, downgrade.fromPlan, plan)
-    }
+    await this.dispatchPlanChange(org, planChange, plan)
     await this.dispatchModuleDeactivations(org, removed)
   }
 
@@ -83,19 +82,17 @@ export default class SubscriptionService {
       stripeSub.status === 'canceled' ? 'starter' : this.planFromPriceId(tierItem.price.id)
     const desiredModules = this.desiredModulesFrom(stripeSub, newPlan)
 
-    const { downgrade, removed } = await db.transaction(async (trx) => {
+    const { planChange, removed } = await db.transaction(async (trx) => {
       await this.upsertSubscription(org.id, stripeSub, tierItem, trx)
       const reconciled = await this.organizationModuleService.reconcileSubscriptionModules(
         org.id,
         desiredModules,
         trx
       )
-      return { downgrade: await this.applyOrgPlan(org, newPlan, trx), removed: reconciled.removed }
+      return { planChange: await this.applyOrgPlan(org, newPlan, trx), removed: reconciled.removed }
     })
 
-    if (downgrade) {
-      await OrganizationPlanDowngraded.dispatch(org, downgrade.fromPlan, newPlan)
-    }
+    await this.dispatchPlanChange(org, planChange, newPlan)
     await this.dispatchModuleDeactivations(org, removed)
   }
 
@@ -198,24 +195,42 @@ export default class SubscriptionService {
 
   /**
    * Applies the plan change to the organization within the given transaction.
-   * Returns `{ fromPlan }` when the change is a downgrade so the caller can
-   * dispatch OrganizationPlanDowngraded AFTER the transaction commits — the
-   * listener sends emails and writes notifications, so it must never act on a
-   * change that could still roll back. Returns null when there is no downgrade.
+   * Returns `{ fromPlan, direction }` when the plan actually changes so the
+   * caller can dispatch OrganizationPlanDowngraded / OrganizationPlanUpgraded
+   * AFTER the transaction commits — the listeners send emails and write
+   * notifications, so they must never act on a change that could still roll
+   * back. Returns null when the plan is unchanged.
    */
   private async applyOrgPlan(
     org: Organization,
     plan: PlanTier,
     trx: TransactionClientContract
-  ): Promise<{ fromPlan: PlanTier } | null> {
+  ): Promise<{ fromPlan: PlanTier; direction: 'up' | 'down' } | null> {
     if (org.plan === plan) return null
 
-    const isDowngrade = PLAN_ORDER[plan] < PLAN_ORDER[org.plan]
+    const direction = PLAN_ORDER[plan] < PLAN_ORDER[org.plan] ? 'down' : 'up'
     const fromPlan = org.plan
     org.plan = plan
     await org.useTransaction(trx).save()
 
-    return isDowngrade ? { fromPlan } : null
+    return { fromPlan, direction }
+  }
+
+  /**
+   * Dispatche l'event de changement de plan APRÈS commit (downgrade ou upgrade).
+   * No-op quand le plan est inchangé (`planChange === null`).
+   */
+  private async dispatchPlanChange(
+    org: Organization,
+    planChange: { fromPlan: PlanTier; direction: 'up' | 'down' } | null,
+    toPlan: PlanTier
+  ): Promise<void> {
+    if (!planChange) return
+    if (planChange.direction === 'down') {
+      await OrganizationPlanDowngraded.dispatch(org, planChange.fromPlan, toPlan)
+    } else {
+      await OrganizationPlanUpgraded.dispatch(org, planChange.fromPlan, toPlan)
+    }
   }
 
   private planFromPriceId(priceId: string): PlanTier {
