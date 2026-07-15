@@ -25,13 +25,13 @@ test('renders both mode links using Inertia Link (no raw anchors)', () => {
 test('highlights the management link when mode is management', () => {
   const w = mount(BoatModeSwitcher, { props: { boatId: 5, mode: 'management' } })
   const [management, navigation] = w.findAll('a[data-link]')
-  expect(management.classes().join(' ')).toContain('bg-bg-default')
-  expect(navigation.classes().join(' ')).not.toContain('bg-bg-default')
+  expect(management.classes().join(' ')).toContain('bg-brand')
+  expect(navigation.classes().join(' ')).not.toContain('bg-brand')
 })
 
 test('highlights the navigation link when mode is navigation', () => {
   const w = mount(BoatModeSwitcher, { props: { boatId: 5, mode: 'navigation' } })
   const [management, navigation] = w.findAll('a[data-link]')
-  expect(navigation.classes().join(' ')).toContain('bg-bg-default')
-  expect(management.classes().join(' ')).not.toContain('bg-bg-default')
+  expect(navigation.classes().join(' ')).toContain('bg-brand')
+  expect(management.classes().join(' ')).not.toContain('bg-brand')
 })

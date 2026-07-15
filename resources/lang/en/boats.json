@@ -309,7 +309,8 @@
     },
     "modeSwitch": {
       "management": "Management",
-      "navigation": "Navigation"
+      "navigation": "Navigation",
+      "aria": "Boat view mode"
     },
     "historyTab": {
       "addEvent": "Add event",
