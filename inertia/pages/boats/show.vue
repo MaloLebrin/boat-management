@@ -133,13 +133,16 @@ function openTasksTab() {
 
 <template>
   <div class="w-full max-w-7xl px-6 py-10 sm:px-8">
-    <BaseBreadcrumb
-      :items="[
-        { label: t('boats.show.breadcrumbFleet'), href: '/boats' },
-        { label: t('nav.boats') },
-        { label: boat.name },
-      ]"
-    />
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <BaseBreadcrumb
+        :items="[
+          { label: t('boats.show.breadcrumbFleet'), href: '/boats' },
+          { label: t('nav.boats') },
+          { label: boat.name },
+        ]"
+      />
+      <BoatModeSwitcher :boat-id="boat.id" mode="management" />
+    </div>
 
     <!-- Header -->
     <header class="space-y-6">
@@ -201,8 +204,6 @@ function openTasksTab() {
           </a>
         </div>
       </div>
-
-      <BoatModeSwitcher :boat-id="boat.id" mode="management" />
 
       <BaseTabs v-model="tab" :tabs="tabs" />
     </header>

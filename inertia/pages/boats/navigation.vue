@@ -84,13 +84,16 @@ const tabs = computed(() => [
 
 <template>
   <div class="w-full max-w-7xl px-6 py-10 sm:px-8">
-    <BaseBreadcrumb
-      :items="[
-        { label: t('boats.show.breadcrumbFleet'), href: '/boats' },
-        { label: t('nav.boats') },
-        { label: boat.name },
-      ]"
-    />
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <BaseBreadcrumb
+        :items="[
+          { label: t('boats.show.breadcrumbFleet'), href: '/boats' },
+          { label: t('nav.boats') },
+          { label: boat.name },
+        ]"
+      />
+      <BoatModeSwitcher :boat-id="boat.id" mode="navigation" />
+    </div>
 
     <!-- Header -->
     <header class="space-y-6">
@@ -121,8 +124,6 @@ const tabs = computed(() => [
           </a>
         </div>
       </div>
-
-      <BoatModeSwitcher :boat-id="boat.id" mode="navigation" />
 
       <!-- Active navigation banner -->
       <NavigationActiveCard
