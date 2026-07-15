@@ -105,9 +105,8 @@ Référence : `app/middleware/inertia_middleware.ts` (`share()`).
 À chaque rendu Inertia, si un utilisateur est authentifié, le middleware ajoute la prop partagée :
 
 ```ts
-notifications: {
-  ;(unreadCount, recent)
-} // via NotificationService.sharedProps(user.id)
+// prop partagée `notifications`, via NotificationService.sharedProps(user.id)
+const notifications = { unreadCount, recent }
 ```
 
 (sinon `{ unreadCount: 0, recent: [] }`). C'est la **source de vérité au chargement** ; le composable `use_notifications.ts` la synchronise dans son état réactif à chaque navigation.
