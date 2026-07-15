@@ -84,8 +84,9 @@ const tabs = computed(() => [
 
 <template>
   <div class="w-full max-w-7xl px-6 py-10 sm:px-8">
-    <div class="flex flex-wrap items-center justify-between gap-3">
+    <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
       <BaseBreadcrumb
+        class="mb-0!"
         :items="[
           { label: t('boats.show.breadcrumbFleet'), href: '/boats' },
           { label: t('nav.boats') },
