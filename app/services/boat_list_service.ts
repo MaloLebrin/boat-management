@@ -4,6 +4,7 @@ import {
   clampInt,
   escapeLike,
   normalizeEnum,
+  toBooleanFlag,
   toIntegerOrUndefined,
   toTrimmedStringOrUndefined,
 } from '#shared/helpers/query'
@@ -31,6 +32,10 @@ export default class BoatListService {
     const type = toTrimmedStringOrUndefined(raw.type) ?? ''
     const propulsionType = toTrimmedStringOrUndefined(raw.propulsionType) ?? ''
 
+    const hasEngine = toBooleanFlag(raw.hasEngine)
+    const hasSails = toBooleanFlag(raw.hasSails)
+    const hasRig = toBooleanFlag(raw.hasRig)
+
     const sort = normalizeEnum(raw.sort, VALID_SORTS, 'recent' as const)
     const direction = normalizeEnum(
       raw.direction,
@@ -41,7 +46,7 @@ export default class BoatListService {
     const page = clampInt(toIntegerOrUndefined(raw.page) ?? 1, 1, 10_000)
     const perPage = clampInt(toIntegerOrUndefined(raw.perPage) ?? 20, 5, 100)
 
-    return { q, type, propulsionType, sort, direction, page, perPage }
+    return { q, type, propulsionType, hasEngine, hasSails, hasRig, sort, direction, page, perPage }
   }
 
   async listNamesForOrg(user: User): Promise<{ id: number; name: string }[]> {
@@ -79,6 +84,12 @@ export default class BoatListService {
 
     if (filters.type) query.where('type', filters.type)
     if (filters.propulsionType) query.where('propulsionType', filters.propulsionType)
+
+    // Filtres de présence d'équipement (cartes du tableau de bord) : on cible
+    // les bateaux qui possèdent réellement l'équipement, pas un type de propulsion.
+    if (filters.hasEngine) query.has('engines')
+    if (filters.hasSails) query.has('sails')
+    if (filters.hasRig) query.has('rig')
 
     if (filters.sort === 'name') {
       query.orderBy('name', filters.direction).orderBy('id', 'desc')

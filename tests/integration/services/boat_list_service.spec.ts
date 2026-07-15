@@ -5,6 +5,9 @@ import BoatMaintenanceBadgeService from '#services/boat_maintenance_badge_servic
 import { DateTime } from 'luxon'
 import { UserFactory } from '#database/factories/user_factory'
 import { BoatFactory } from '#database/factories/boat_factory'
+import { BoatEngineFactory } from '#database/factories/boat_engine_factory'
+import { BoatSailFactory } from '#database/factories/boat_sail_factory'
+import { BoatRigFactory } from '#database/factories/boat_rig_factory'
 
 test.group('BoatListService (unit)', () => {
   test('supports search, filters, sort, and pagination', async ({ assert }) => {
@@ -67,5 +70,54 @@ test.group('BoatListService (unit)', () => {
     assert.equal(res.boats.meta.perPage, 5)
     assert.equal(res.filters.sort, 'name')
     assert.equal(res.boats.data[0]!.maintenance.urgentCount, 1)
+  })
+
+  test('filters boats by equipment presence (hasEngine / hasSails / hasRig)', async ({
+    assert,
+  }) => {
+    const user = await UserFactory.with('organization').create()
+    const orgId = user.organizationId!
+
+    const withEngine = await BoatFactory.merge({
+      organizationId: orgId,
+      name: 'Motorized',
+    }).create()
+    await BoatEngineFactory.merge({ boatId: withEngine.id }).create()
+
+    const withSails = await BoatFactory.merge({ organizationId: orgId, name: 'Sailed' }).create()
+    await BoatSailFactory.merge({ boatId: withSails.id }).create()
+
+    const withRig = await BoatFactory.merge({ organizationId: orgId, name: 'Rigged' }).create()
+    await BoatRigFactory.merge({ boatId: withRig.id }).create()
+
+    // Bateau nu, sans aucun équipement : ne doit remonter dans aucun filtre.
+    await BoatFactory.merge({ organizationId: orgId, name: 'Bare' }).create()
+
+    const svc = new BoatListService(new BoatMaintenanceBadgeService())
+
+    const engines = await svc.listForUser(user, { hasEngine: 'true' })
+    assert.deepEqual(
+      engines.boats.data.map((b) => b.name),
+      ['Motorized']
+    )
+
+    const sails = await svc.listForUser(user, { hasSails: 'true' })
+    assert.deepEqual(
+      sails.boats.data.map((b) => b.name),
+      ['Sailed']
+    )
+
+    const rig = await svc.listForUser(user, { hasRig: 'true' })
+    assert.deepEqual(
+      rig.boats.data.map((b) => b.name),
+      ['Rigged']
+    )
+
+    // Sans filtre : les 4 bateaux sont présents.
+    const all = await svc.listForUser(user, {})
+    assert.equal(all.boats.data.length, 4)
+    assert.isFalse(all.filters.hasEngine)
+    assert.isFalse(all.filters.hasSails)
+    assert.isFalse(all.filters.hasRig)
   })
 })
