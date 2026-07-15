@@ -12,6 +12,20 @@ Le mode « navigation » d'un bateau (`/boats/:id/navigation`) n'était joignabl
 
 Aucun changement backend (routes, contrôleurs et props déjà en place).
 
+## 2026-07-15 — Cartes du tableau de bord : liens filtrés cohérents
+
+Les cartes de stats en haut du tableau de bord (`dashboard.vue`) pointaient toutes vers la même liste `/boats`, sans rapport avec leur contenu (Moteurs, Voiles, Gréements menaient au même endroit que Bateaux).
+
+- **Destinations filtrées** : chaque carte renvoie désormais vers une liste `/boats` filtrée cohérente — Moteurs → `/boats?hasEngine=true`, Voiles → `/boats?hasSails=true`, Gréements → `/boats?hasRig=true`. Les cartes Bateaux (`/boats`) et Maintenance urgente (`/planning`) sont inchangées.
+- **Nouveaux filtres de présence d'équipement** (`BoatListService`) : `hasEngine`, `hasSails`, `hasRig` filtrent sur la présence réelle de l'équipement (`query.has('engines' | 'sails' | 'rig')`), et non sur `propulsionType` (dont les valeurs `sailboat/motorboat/…` ne correspondent pas à « possède un moteur » — un voilier peut avoir un moteur d'appoint). Type `BoatListQuery` étendu (`shared/types/boat.ts`), nouveau helper `toBooleanFlag` (`shared/helpers/query.ts`). Les filtres existants (`q`, `type`, `propulsionType`, tri, pagination) sont inchangés.
+
+## 2026-07-13 — Création de sortie plus rapide + entrées de journal multiples
+
+Simplification de l'ajout d'un trajet et enrichissement du journal de bord.
+
+- **Accès rapide à la création d'une sortie** : un bouton « + Nouvelle sortie » (modale, sur le modèle de l'ajout rapide d'heures moteur) est désormais disponible directement dans l'en-tête de la fiche bateau (`boats/show.vue`), sans passer par la bascule vers le mode « Navigation ». Nouveau composant `NavigationLogQuickCreateAction.vue`, réutilisé aussi dans l'onglet Journal de bord (`BoatShowTabNavigationLogs.vue`) pour une seule façon de créer une sortie dans toute l'app ; affiche un lien vers la sortie en cours si le bateau en a déjà une. `NavigationLogForm.vue` a été allégé de son cadre visuel propre pour être réutilisable nu dans une modale. Backend : `BoatsController#show` précharge désormais `portOptions`, `canCreateNavigationLogs` et `hasActiveNavigationLog` (mêmes données que l'action `navigation()`).
+- **Entrées de journal multiples pendant une sortie en cours** : une sortie ne se limitait qu'à un départ et une arrivée (plus un champ `notes` unique, réécrit à chaque mise à jour). Nouvelle sous-ressource `NavigationLogEntry` (table `navigation_log_entries`, horodatage automatique + note libre), ajoutable/supprimable uniquement tant que le trajet est `in_progress` — même règle que les autres champs vivants du journal. Nouvelles routes `POST`/`DELETE /boats/:boatId/navigation-logs/:logId/entries[/:entryId]` (`NavigationLogsController.storeEntry`/`destroyEntry`, `NavigationLogService.addEntry`/`deleteEntry`). Nouveau composant `NavigationLogEntriesPanel.vue` (liste chronologique + ajout/suppression), affiché dans la bannière « En navigation » (`NavigationActiveCard.vue`, l'endroit le plus visible pendant une sortie) et dans l'historique complet (`BoatShowTabNavigationLogs.vue`, lecture seule une fois le trajet clôturé).
+
 ## 2026-07-13 — Heures moteur incrémentables + garde-fou sur le bouton « + Nouvelle sortie »
 
 Deux correctifs d'ergonomie remontés à l'usage sur les fiches bateau.

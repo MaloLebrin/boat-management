@@ -156,7 +156,7 @@ function dismissAlert() {
         :value="String(stats.engines)"
         :delta="statDeltas.engines"
         tone="neutral"
-        href="/boats"
+        href="/boats?hasEngine=true"
         :style="{
           animation: 'fadeUp var(--motion-normal) var(--ease-premium) both',
           animationDelay: '60ms',
@@ -179,7 +179,7 @@ function dismissAlert() {
         :value="String(stats.sails)"
         :delta="statDeltas.sails"
         tone="neutral"
-        href="/boats"
+        href="/boats?hasSails=true"
         :style="{
           animation: 'fadeUp var(--motion-normal) var(--ease-premium) both',
           animationDelay: '120ms',
@@ -201,7 +201,7 @@ function dismissAlert() {
         :value="String(stats.rigs)"
         :delta="statDeltas.rigs"
         tone="neutral"
-        href="/boats"
+        href="/boats?hasRig=true"
         :style="{
           animation: 'fadeUp var(--motion-normal) var(--ease-premium) both',
           animationDelay: '180ms',
