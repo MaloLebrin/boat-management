@@ -54,6 +54,19 @@ export function clampInt(value: number, min: number, max: number): number {
 }
 
 /**
+ * Parse un flag booléen depuis une query string. Considère `true`, `1`, `yes`
+ * et `on` (insensibles à la casse) comme `true` ; tout le reste (y compris
+ * `undefined`) comme `false`. Utile pour les filtres de présence (`hasEngine`…)
+ * exposés via l'URL, où seule la valeur « vraie » restreint la liste.
+ */
+export function toBooleanFlag(value: unknown): boolean {
+  if (typeof value === 'boolean') return value
+  if (typeof value !== 'string') return false
+  const normalized = value.trim().toLowerCase()
+  return normalized === 'true' || normalized === '1' || normalized === 'yes' || normalized === 'on'
+}
+
+/**
  * Valide une valeur contre une liste d'options autorisées et renvoie le
  * `fallback` sinon. Généralise la validation d'énumération de tri / direction /
  * statut. Le type de retour `T | F` préserve les fallbacks hors-liste (ex. `''`

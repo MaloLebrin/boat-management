@@ -141,6 +141,9 @@ export type BoatListQuery = {
   q?: string
   type?: string
   propulsionType?: string
+  hasEngine?: boolean
+  hasSails?: boolean
+  hasRig?: boolean
   sort?: BoatListSort
   direction?: BoatListDirection
   page?: number
