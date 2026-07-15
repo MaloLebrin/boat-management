@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { router } from '@inertiajs/vue3'
 import BaseEmptyState from '~/components/base/BaseEmptyState.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import LogbookRow from '~/components/navigation/LogbookRow.vue'
@@ -17,6 +18,16 @@ const props = defineProps<{
 
 const totalCompleted = computed(() => props.logs.filter((l) => l.status === 'completed').length)
 const totalDistanceNm = computed(() => props.logs.reduce((acc, l) => acc + (l.distanceNm ?? 0), 0))
+
+const emptyActionLabel = computed(() =>
+  props.selectedBoatId
+    ? t('navigation.logbook.empty.actionBoat')
+    : t('navigation.logbook.empty.action')
+)
+
+function onEmptyAction() {
+  router.visit(props.selectedBoatId ? `/boats/${props.selectedBoatId}/navigation` : '/boats')
+}
 </script>
 
 <template>
@@ -55,8 +66,8 @@ const totalDistanceNm = computed(() => props.logs.reduce((acc, l) => acc + (l.di
         v-if="logs.length === 0"
         :title="t('navigation.logbook.empty.title')"
         :description="t('navigation.logbook.empty.description')"
-        :action-label="t('navigation.logbook.empty.action')"
-        @action="$inertia.visit('/boats')"
+        :action-label="emptyActionLabel"
+        @action="onEmptyAction"
       />
 
       <div v-else class="overflow-x-auto rounded-lg border border-border">

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { router } from '@inertiajs/vue3'
 import BaseEmptyState from '~/components/base/BaseEmptyState.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import FuelLogRow from '~/components/navigation/FuelLogRow.vue'
@@ -14,6 +15,14 @@ const props = defineProps<{
   boats: FleetBoatOption[]
   selectedBoatId: number | null
 }>()
+
+const emptyActionLabel = computed(() =>
+  props.selectedBoatId ? t('navigation.fuel.empty.actionBoat') : t('navigation.fuel.empty.action')
+)
+
+function onEmptyAction() {
+  router.visit(props.selectedBoatId ? `/boats/${props.selectedBoatId}/navigation` : '/boats')
+}
 
 const totalLiters = computed(() =>
   props.logs.reduce((acc, l) => acc + l.quantityLiters, 0).toFixed(1)
@@ -57,8 +66,8 @@ const totalCost = computed(() => {
         v-if="logs.length === 0"
         :title="t('navigation.fuel.empty.title')"
         :description="t('navigation.fuel.empty.description')"
-        :action-label="t('navigation.fuel.empty.action')"
-        @action="$inertia.visit('/boats')"
+        :action-label="emptyActionLabel"
+        @action="onEmptyAction"
       />
 
       <div v-else class="overflow-x-auto rounded-lg border border-border">

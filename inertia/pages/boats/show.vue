@@ -5,6 +5,7 @@ import BaseBreadcrumb from '~/components/base/BaseBreadcrumb.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseTabs from '~/components/base/BaseTabs.vue'
+import BoatModeSwitcher from '~/components/boats/show/BoatModeSwitcher.vue'
 import BoatShowTabContent from '~/components/boats/show/BoatShowTabContent.vue'
 import { useT } from '~/composables/use_t'
 import type {
@@ -200,6 +201,8 @@ function openTasksTab() {
           </a>
         </div>
       </div>
+
+      <BoatModeSwitcher :boat-id="boat.id" mode="management" />
 
       <BaseTabs v-model="tab" :tabs="tabs" />
     </header>
