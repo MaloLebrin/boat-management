@@ -1,11 +1,28 @@
 <script setup lang="ts">
-import { ref, watch, onBeforeUnmount } from 'vue'
+import { computed, ref, watch, onBeforeUnmount } from 'vue'
 import { useNotifications } from '~/composables/use_notifications'
 import { useT } from '~/composables/use_t'
 import NotificationPanel from '~/components/layout/NotificationPanel.vue'
 
+const props = withDefaults(
+  defineProps<{
+    align?: 'left' | 'right'
+    tone?: 'default' | 'onDark'
+  }>(),
+  {
+    align: 'right',
+    tone: 'default',
+  }
+)
+
 const { unreadCount, hasUnread } = useNotifications()
 const { t } = useT()
+
+const buttonToneClasses = computed(() =>
+  props.tone === 'onDark'
+    ? 'text-navy-100 hover:bg-navy-700 hover:text-white'
+    : 'text-fg-muted hover:bg-surface-muted hover:text-fg'
+)
 
 const isOpen = ref(false)
 const bellRef = ref<HTMLElement | null>(null)
@@ -48,7 +65,8 @@ onBeforeUnmount(() => {
   <div ref="bellRef" class="relative">
     <button
       type="button"
-      class="relative inline-flex h-9 w-9 items-center justify-center rounded-(--radius-control) text-fg-muted transition-colors hover:bg-surface-muted hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30"
+      class="relative inline-flex h-9 w-9 items-center justify-center rounded-(--radius-control) transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30"
+      :class="buttonToneClasses"
       :aria-label="t('notifications.title')"
       :aria-expanded="isOpen"
       @click="toggle"
@@ -70,6 +88,6 @@ onBeforeUnmount(() => {
       </span>
     </button>
 
-    <NotificationPanel v-if="isOpen" @close="close" />
+    <NotificationPanel v-if="isOpen" :align="props.align" @close="close" />
   </div>
 </template>
