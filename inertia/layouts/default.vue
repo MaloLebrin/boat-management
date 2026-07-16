@@ -9,6 +9,7 @@ import AsideMenu from '~/components/layout/AsideMenu.vue'
 import DemoSessionBanner from '~/components/layout/DemoSessionBanner.vue'
 import LanguageSwitcher from '~/components/layout/LanguageSwitcher.vue'
 import NavItem from '~/components/layout/NavItem.vue'
+import NotificationBell from '~/components/layout/NotificationBell.vue'
 import { useNavSections } from '~/composables/use_nav_sections'
 import { useNetworkStatus } from '~/composables/use_network_status'
 import ConflictResolutionModal from '~/components/ConflictResolutionModal.vue'
@@ -102,23 +103,26 @@ onBeforeUnmount(() => {
           <img :src="brandIconUrl" alt="FleetAi" class="h-9 w-9 rounded-lg shadow-md" />
           <span class="font-display text-sm font-semibold text-white">FleetAi</span>
         </a>
-        <button
-          type="button"
-          class="inline-flex items-center justify-center w-10 h-10 rounded-lg text-navy-100 hover:bg-navy-700 hover:text-white transition-colors"
-          aria-controls="auth-sidebar-drawer"
-          :aria-expanded="isSidebarOpen ? 'true' : 'false'"
-          @click="openSidebar"
-        >
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M4 6h16M4 12h16M4 18h16"
-            />
-          </svg>
-          <span class="sr-only">{{ t('nav.menu') }}</span>
-        </button>
+        <div class="flex items-center gap-1">
+          <NotificationBell tone="onDark" />
+          <button
+            type="button"
+            class="inline-flex items-center justify-center w-10 h-10 rounded-lg text-navy-100 hover:bg-navy-700 hover:text-white transition-colors"
+            aria-controls="auth-sidebar-drawer"
+            :aria-expanded="isSidebarOpen ? 'true' : 'false'"
+            @click="openSidebar"
+          >
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            </svg>
+            <span class="sr-only">{{ t('nav.menu') }}</span>
+          </button>
+        </div>
       </header>
 
       <!-- Demo session countdown (demo users only) -->

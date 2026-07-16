@@ -6,6 +6,7 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import Logo from '~/components/Logo.vue'
 import LanguageSwitcher from '~/components/layout/LanguageSwitcher.vue'
 import NavItem from '~/components/layout/NavItem.vue'
+import NotificationBell from '~/components/layout/NotificationBell.vue'
 import { useNavSections } from '~/composables/use_nav_sections'
 import { usePwaInstall } from '~/composables/use_pwa_install'
 import { useT } from '~/composables/use_t'
@@ -41,8 +42,9 @@ function isActive(path: string): boolean {
 <template>
   <aside class="hidden lg:flex flex-col w-64 h-full bg-navy-900 text-white">
     <!-- Logo -->
-    <div class="px-5 py-6 border-b border-navy-700">
+    <div class="flex items-center justify-between gap-2 px-5 py-6 border-b border-navy-700">
       <Logo />
+      <NotificationBell align="left" tone="onDark" />
     </div>
 
     <!-- Navigation -->
