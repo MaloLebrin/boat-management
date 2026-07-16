@@ -92,6 +92,13 @@ Les cartes de l'onglet Équipement exposent un lien « voir le détail » vers c
   - `ParticleNetworkCanvas.vue` — particules réactives souris : `HomeFinalCtaSection`
 - Détail des animations : `inertia/css/ANIMATIONS.md`
 
+## Layout authentifié — navigation & notifications
+
+- Layout `inertia/layouts/default.vue` : sidebar desktop `AsideMenu.vue` (`hidden lg:flex`) + barre header mobile (`lg:hidden`, hamburger). Sections de nav construites par `use_nav_sections.ts`.
+- Cloche de notifications : `NotificationBell.vue`, montée **dans la sidebar** (`AsideMenu.vue`, à côté du logo, `align="left"`) **et dans le header mobile** (`default.vue`, à côté du hamburger). Props `align` (`left`/`right`, sens d'ouverture du panneau) et `tone` (`default`/`onDark`, contraste sur fond navy).
+  - Badge de non-lus + panneau déroulant `NotificationPanel.vue` (5 dernières notifs, lien « Voir toutes » → `/notifications`). État temps réel via `use_notifications.ts` (singleton + abonnement Transmit `notifications/:userId`).
+  - Page complète : `inertia/pages/notifications/index.vue`.
+
 ## Galerie photo partagée
 
 `inertia/components/media/MediaPhotoGallery.vue` — galerie réutilisable pilotée par props

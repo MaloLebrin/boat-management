@@ -5,6 +5,7 @@ import BaseBreadcrumb from '~/components/base/BaseBreadcrumb.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseTabs from '~/components/base/BaseTabs.vue'
+import BoatModeSwitcher from '~/components/boats/show/BoatModeSwitcher.vue'
 import BoatShowTabContent from '~/components/boats/show/BoatShowTabContent.vue'
 import { useT } from '~/composables/use_t'
 import type {
@@ -138,13 +139,17 @@ function onCreateIntentConsumed() {
 
 <template>
   <div class="w-full max-w-7xl px-6 py-10 sm:px-8">
-    <BaseBreadcrumb
-      :items="[
-        { label: t('boats.show.breadcrumbFleet'), href: '/boats' },
-        { label: t('nav.boats') },
-        { label: boat.name },
-      ]"
-    />
+    <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+      <BaseBreadcrumb
+        class="mb-0!"
+        :items="[
+          { label: t('boats.show.breadcrumbFleet'), href: '/boats' },
+          { label: t('nav.boats') },
+          { label: boat.name },
+        ]"
+      />
+      <BoatModeSwitcher :boat-id="boat.id" mode="management" />
+    </div>
 
     <!-- Header -->
     <header class="space-y-6">

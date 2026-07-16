@@ -11,6 +11,60 @@ Sur la fiche bateau (`/boats/:id`), les boutons d'en-tête « + Ajouter une entr
 - **Correctif** : remplacement des deux compteurs par un état explicite `createIntent: 'event' | 'task' | null` (type `BoatCreateIntent` dans `inertia/types/boat_show.ts`), passé en prop le long de la chaîne `show.vue` → `BoatShowTabContent` → `BoatShowTabHistory` / `BoatShowTabTasks` → `BoatMaintenanceTasksPanel`. Le panneau **consomme l'intention à son `onMounted`** (et via un `watch` s'il est déjà affiché), ouvre la modale, puis émet `createIntentConsumed` pour que `show.vue` remette l'état à `null` — ce qui rend l'action rejouable indéfiniment.
 - **`BaseModal`** : une modale démontée alors qu'elle était encore ouverte (changement d'onglet, navigation) laissait `document.body.style.overflow = 'hidden'` en place, bloquant définitivement le scroll de la page. Le style est désormais restauré dans `onBeforeUnmount`.
 
+## 2026-07-15 — Notifications de démonstration dans le seeder
+
+Le compte de démo (« Marina Démo ») affichait une cloche vide. Le seeder `database/seeders/sandbox_seeder.ts` crée désormais 6 notifications de démonstration pour le compte démo (`seedDemoNotifications`), afin que la cloche affiche un badge et un panneau peuplés.
+
+- **Jeu de démo** : mélange lu/non-lu (3 non-lues → badge « 3 ») et sévérités variées — `maintenance.overdue` (error), `document.expiring_soon` (warning), `safety_equipment.expired` (error), `member.joined` (info, lu), `plan.upgraded` (success, lu), `quota.storage` (warning, lu). `actionUrl` réels (`/planning`, `/boats/:id`, `/settings/members`, `/settings/billing`) et `createdAt` échelonnés.
+- **Idempotent** : garde par `userId` + `title` (aucune contrainte d'unicité en base), donc re-seeder ne crée pas de doublon. Titres/corps en dur en français (convention des seeders).
+
+## 2026-07-15 — Notifications enfin accessibles (cloche dans la sidebar et le header mobile)
+
+La fonctionnalité notifications était entièrement inaccessible : la cloche (`NotificationBell.vue`) n'était utilisée que par `Header.vue`, un composant monté dans aucun layout. La page `/notifications` fonctionnait mais aucun lien n'y menait (aucune cloche, aucun badge de non-lus).
+
+- **Cloche montée dans le layout authentifié** : `NotificationBell` est désormais affichée dans la barre latérale desktop (`AsideMenu.vue`, à côté du logo) et dans le header mobile (`layouts/default.vue`, à côté du hamburger). Le badge de non-lus et le panneau déroulant (`NotificationPanel.vue`, lien « Voir toutes les notifications » → `/notifications`) sont donc accessibles partout dans l'app.
+- **Nouvelles props d'adaptation** : `NotificationBell` accepte `align` (`left`/`right`, transmise au panneau qui s'ouvre `left-0`/`right-0` — évite le débordement hors-écran depuis la sidebar étroite) et `tone` (`default`/`onDark`, pour un contraste correct sur le fond navy de la sidebar et du header mobile).
+- **Nettoyage** : suppression du code mort `Header.vue` (plus référencé nulle part).
+
+## 2026-07-15 — Mode navigation accessible depuis l'UI (journal de bord, carburant, incidents, position)
+
+Le mode « navigation » d'un bateau (`/boats/:id/navigation`) n'était joignable par **aucun lien** dans l'application : le composant `BoatModeSwitcher` existait mais n'était monté nulle part, et les pages flotte renvoyaient en boucle vers la fiche bateau sans jamais exposer la navigation (cul-de-sac).
+
+- **Sélecteur Gestion ↔ Navigation** : `BoatModeSwitcher.vue` (ancres brutes remplacées par `<Link>` Inertia) est désormais monté dans l'en-tête de la fiche bateau (`inertia/pages/boats/show.vue`, mode `management`) **et** de la page navigation (`inertia/pages/boats/navigation.vue`, mode `navigation`). La bascule est bidirectionnelle en 1 clic, sans full reload.
+- **Empty states flotte contextuels** : sur `/navigation/logbook`, `/navigation/fuel` et `/navigation/incidents`, lorsqu'un bateau est filtré via `NavigationBoatFilter`, le CTA de l'empty state redirige désormais directement vers `/boats/:id/navigation` (libellé « Ouvrir la navigation ») au lieu de renvoyer vers la liste des bateaux — la boucle sans issue est cassée. Sans filtre, le comportement « Voir mes bateaux » est conservé. Nouvelle clé i18n `navigation.<page>.empty.actionBoat` (FR + EN).
+
+Aucun changement backend (routes, contrôleurs et props déjà en place).
+## 2026-07-15 — Notifications manquantes branchées (événements membres/plan/invitation + scan planifié)
+
+Le système de notifications déclarait de nombreux `NotificationType` sans producteur : seuls 5 étaient réellement émis. Cette évolution branche tous les types manquants. `member.joined` n'était d'ailleurs jamais dispatché (event + listener existants mais aucun `.dispatch()`) — c'est désormais corrigé.
+
+- **Notifications événementielles** (destinataires : admins de l'org **+** membre concerné le cas échéant) :
+  - `member.removed` — retrait d'un membre : notifie les admins restants et l'utilisateur retiré. Nouvel event `OrganizationMemberRemoved`, dispatché dans `OrganizationMemberService.removeMember` (identité capturée avant suppression de la ligne).
+  - `member.role_changed` — changement de rôle : notifie le membre concerné (message à la 2ᵉ personne) et les admins. Nouvel event `OrganizationMemberRoleChanged` (porte `fromRole`/`toRole`), dispatché dans `OrganizationMemberService.updateRole` (uniquement si le rôle change réellement).
+  - `plan.upgraded` — montée de plan : notifie les admins. Nouvel event `OrganizationPlanUpgraded`, pendant de `OrganizationPlanDowngraded` ; `SubscriptionService.applyOrgPlan` renvoie désormais la direction (`up`/`down`) et dispatche l'event correspondant après commit.
+  - `invitation.accepted` — acceptation d'invitation : notifie l'invitant. Nouvel event `OrganizationInvitationAccepted`, dispatché dans `OrganizationInvitationService.accept` (avec `OrganizationMemberJoined`) après commit.
+- **Notifications planifiées** (destinataires : admins de l'org) : nouveau job cron `ScanFleetNotifications` (07:00, `start/scheduler.ts`) déléguant à `NotificationScanService` (`app/services/notification_scan_service.ts`). Il scanne la flotte et agrège **par bateau** :
+  - `maintenance.overdue` / `maintenance.due_soon` (tâches `open` par `dueAt`, fenêtre 30 j) ;
+  - `document.expired` / `document.expiring_soon` (documents bateau par `expiresAt`) ;
+  - `safety_equipment.expired` / `safety_equipment.expiring_soon` (équipements de sécurité par `expiryDate`).
+  - **Anti-doublon** : nouveau `NotificationService.createIfNotRecent()` — pas de re-notification d'une même entité (clé `metadata`) avant 30 jours, pour éviter le spam d'un scan quotidien. _Les documents **clients** sont hors périmètre (aucun champ d'expiration en base)._
+- **i18n FR + EN** : ajout des messages `notifications.messages.*` pour les 10 nouveaux types, et correction de l'écart `notifications.types.module.deactivated` (libellé manquant).
+- **Aucun changement frontend** : cloche, panneau et page consomment génériquement `NotificationForFront`.
+
+## 2026-07-15 — Cartes du tableau de bord : liens filtrés cohérents
+
+Les cartes de stats en haut du tableau de bord (`dashboard.vue`) pointaient toutes vers la même liste `/boats`, sans rapport avec leur contenu (Moteurs, Voiles, Gréements menaient au même endroit que Bateaux).
+
+- **Destinations filtrées** : chaque carte renvoie désormais vers une liste `/boats` filtrée cohérente — Moteurs → `/boats?hasEngine=true`, Voiles → `/boats?hasSails=true`, Gréements → `/boats?hasRig=true`. Les cartes Bateaux (`/boats`) et Maintenance urgente (`/planning`) sont inchangées.
+- **Nouveaux filtres de présence d'équipement** (`BoatListService`) : `hasEngine`, `hasSails`, `hasRig` filtrent sur la présence réelle de l'équipement (`query.has('engines' | 'sails' | 'rig')`), et non sur `propulsionType` (dont les valeurs `sailboat/motorboat/…` ne correspondent pas à « possède un moteur » — un voilier peut avoir un moteur d'appoint). Type `BoatListQuery` étendu (`shared/types/boat.ts`), nouveau helper `toBooleanFlag` (`shared/helpers/query.ts`). Les filtres existants (`q`, `type`, `propulsionType`, tri, pagination) sont inchangés.
+
+## 2026-07-13 — Création de sortie plus rapide + entrées de journal multiples
+
+Simplification de l'ajout d'un trajet et enrichissement du journal de bord.
+
+- **Accès rapide à la création d'une sortie** : un bouton « + Nouvelle sortie » (modale, sur le modèle de l'ajout rapide d'heures moteur) est désormais disponible directement dans l'en-tête de la fiche bateau (`boats/show.vue`), sans passer par la bascule vers le mode « Navigation ». Nouveau composant `NavigationLogQuickCreateAction.vue`, réutilisé aussi dans l'onglet Journal de bord (`BoatShowTabNavigationLogs.vue`) pour une seule façon de créer une sortie dans toute l'app ; affiche un lien vers la sortie en cours si le bateau en a déjà une. `NavigationLogForm.vue` a été allégé de son cadre visuel propre pour être réutilisable nu dans une modale. Backend : `BoatsController#show` précharge désormais `portOptions`, `canCreateNavigationLogs` et `hasActiveNavigationLog` (mêmes données que l'action `navigation()`).
+- **Entrées de journal multiples pendant une sortie en cours** : une sortie ne se limitait qu'à un départ et une arrivée (plus un champ `notes` unique, réécrit à chaque mise à jour). Nouvelle sous-ressource `NavigationLogEntry` (table `navigation_log_entries`, horodatage automatique + note libre), ajoutable/supprimable uniquement tant que le trajet est `in_progress` — même règle que les autres champs vivants du journal. Nouvelles routes `POST`/`DELETE /boats/:boatId/navigation-logs/:logId/entries[/:entryId]` (`NavigationLogsController.storeEntry`/`destroyEntry`, `NavigationLogService.addEntry`/`deleteEntry`). Nouveau composant `NavigationLogEntriesPanel.vue` (liste chronologique + ajout/suppression), affiché dans la bannière « En navigation » (`NavigationActiveCard.vue`, l'endroit le plus visible pendant une sortie) et dans l'historique complet (`BoatShowTabNavigationLogs.vue`, lecture seule une fois le trajet clôturé).
+
 ## 2026-07-13 — Heures moteur incrémentables + garde-fou sur le bouton « + Nouvelle sortie »
 
 Deux correctifs d'ergonomie remontés à l'usage sur les fiches bateau.

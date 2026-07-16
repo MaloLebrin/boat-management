@@ -11,13 +11,31 @@
       }
     },
     "member": {
+      "roles": {
+        "admin": "admin",
+        "member": "member"
+      },
       "joined": {
         "title": "{memberName} joined the organisation"
+      },
+      "removed": {
+        "title": "{memberName} was removed from the organisation",
+        "titleSelf": "You were removed from the organisation {orgName}"
+      },
+      "role_changed": {
+        "title": "{memberName}'s role changed",
+        "body": "{memberName} is now {toRole} (previously {fromRole}).",
+        "titleSelf": "Your role changed",
+        "bodySelf": "You are now {toRole} (previously {fromRole})."
       }
     },
     "plan": {
       "downgraded": {
         "title": "Plan downgraded to {toPlan}",
+        "body": "Your organisation's plan changed from {fromPlan} to {toPlan}."
+      },
+      "upgraded": {
+        "title": "Plan upgraded to {toPlan}",
         "body": "Your organisation's plan changed from {fromPlan} to {toPlan}."
       }
     },
@@ -29,6 +47,41 @@
       "deactivated": {
         "title": "{module} module deactivated",
         "body": "The {module} module was removed from your subscription. Your data stays available in read-only mode."
+      }
+    },
+    "invitation": {
+      "accepted": {
+        "title": "{memberName} accepted your invitation"
+      }
+    },
+    "maintenance": {
+      "overdue": {
+        "title": "Overdue maintenance on {boatName}",
+        "body": "{count} maintenance task(s) are overdue on {boatName}."
+      },
+      "due_soon": {
+        "title": "Upcoming maintenance on {boatName}",
+        "body": "{count} maintenance task(s) are due soon on {boatName}."
+      }
+    },
+    "document": {
+      "expiring_soon": {
+        "title": "Documents to renew on {boatName}",
+        "body": "{count} document(s) on {boatName} are expiring soon."
+      },
+      "expired": {
+        "title": "Expired documents on {boatName}",
+        "body": "{count} document(s) on {boatName} have expired."
+      }
+    },
+    "safety_equipment": {
+      "expiring_soon": {
+        "title": "Safety equipment to check on {boatName}",
+        "body": "{count} safety equipment item(s) on {boatName} are expiring soon."
+      },
+      "expired": {
+        "title": "Expired safety equipment on {boatName}",
+        "body": "{count} safety equipment item(s) on {boatName} have expired."
       }
     }
   },
@@ -48,6 +101,7 @@
   },
   "types": {
     "quota.ai_tokens": "AI quota",
+    "module.deactivated": "Module deactivated",
     "quota.storage": "Storage quota",
     "member.joined": "New member",
     "member.removed": "Member removed",
