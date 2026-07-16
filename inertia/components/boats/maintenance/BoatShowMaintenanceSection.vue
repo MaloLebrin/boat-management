@@ -4,16 +4,26 @@ import BaseCard from '~/components/base/BaseCard.vue'
 import BaseTabs from '~/components/base/BaseTabs.vue'
 import BoatMaintenanceEventsPanel from './BoatMaintenanceEventsPanel.vue'
 import BoatMaintenanceTasksPanel from './BoatMaintenanceTasksPanel.vue'
-import type { BoatShowDetail, MaintenanceEventRow, MaintenanceTaskRow } from '~/types/boat_show'
+import type {
+  BoatCreateIntent,
+  BoatShowDetail,
+  MaintenanceEventRow,
+  MaintenanceTaskRow,
+} from '~/types/boat_show'
 import { subjectLabel } from './utils'
 
-const props = defineProps<{
-  boat: BoatShowDetail
-  maintenanceEvents: MaintenanceEventRow[]
-  maintenanceTasks: MaintenanceTaskRow[]
-  canManageMaintenance: boolean
-  createTaskNonce?: number
-}>()
+const props = withDefaults(
+  defineProps<{
+    boat: BoatShowDetail
+    maintenanceEvents: MaintenanceEventRow[]
+    maintenanceTasks: MaintenanceTaskRow[]
+    canManageMaintenance: boolean
+    createIntent?: BoatCreateIntent
+  }>(),
+  { createIntent: null }
+)
+
+defineEmits<{ createIntentConsumed: [] }>()
 
 const panel = ref<'tasks' | 'events'>('tasks')
 const openTasks = computed(() => props.maintenanceTasks.filter((t) => t.status === 'open'))
@@ -46,7 +56,8 @@ const openTasks = computed(() => props.maintenanceTasks.filter((t) => t.status =
         :boat="boat"
         :tasks="maintenanceTasks"
         :can-manage-maintenance="canManageMaintenance"
-        :create-task-nonce="createTaskNonce"
+        :create-intent="createIntent"
+        @create-intent-consumed="$emit('createIntentConsumed')"
       />
       <BoatMaintenanceEventsPanel
         v-else

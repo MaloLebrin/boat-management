@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { Form } from '@adonisjs/inertia/vue'
 import { TrashIcon } from '@heroicons/vue/24/outline'
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseModal from '~/components/base/BaseModal.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
-import type { BoatShowDetail, MaintenanceTaskRow } from '~/types/boat_show'
+import type { BoatCreateIntent, BoatShowDetail, MaintenanceTaskRow } from '~/types/boat_show'
 import { subjectLabel } from './utils'
 import { useT } from '~/composables/use_t'
 
@@ -16,12 +16,17 @@ const { t } = useT()
 
 type Subject = 'boat' | 'engine' | 'sail' | 'rig'
 
-const props = defineProps<{
-  boat: BoatShowDetail
-  tasks: MaintenanceTaskRow[]
-  canManageMaintenance: boolean
-  createTaskNonce?: number
-}>()
+const props = withDefaults(
+  defineProps<{
+    boat: BoatShowDetail
+    tasks: MaintenanceTaskRow[]
+    canManageMaintenance: boolean
+    createIntent?: BoatCreateIntent
+  }>(),
+  { createIntent: null }
+)
+
+const emit = defineEmits<{ createIntentConsumed: [] }>()
 
 const todayIso = computed(() => new Date().toISOString().slice(0, 10))
 
@@ -86,14 +91,16 @@ watch(taskSubject, () => {
   taskNotes.value = ''
 })
 
-watch(
-  () => props.createTaskNonce,
-  (v) => {
-    if (!v) return
-    if (!props.canManageMaintenance) return
-    isCreateOpen.value = true
-  }
-)
+// Le panneau est monté après la demande d'ouverture venant de l'en-tête : on
+// consomme l'intention au montage plutôt que sur un simple watch (#358).
+function consumeCreateIntent() {
+  if (props.createIntent !== 'task') return
+  if (props.canManageMaintenance) isCreateOpen.value = true
+  emit('createIntentConsumed')
+}
+
+onMounted(consumeCreateIntent)
+watch(() => props.createIntent, consumeCreateIntent)
 </script>
 
 <template>

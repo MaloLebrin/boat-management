@@ -5,15 +5,20 @@ import { computed, ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BoatMaintenanceTasksPanel from '~/components/boats/maintenance/BoatMaintenanceTasksPanel.vue'
 import { subjectLabel } from '~/components/boats/maintenance/utils'
-import type { BoatShowDetail, MaintenanceTaskRow } from '~/types/boat_show'
+import type { BoatCreateIntent, BoatShowDetail, MaintenanceTaskRow } from '~/types/boat_show'
 import { useT } from '~/composables/use_t'
 
-const props = defineProps<{
-  boat: BoatShowDetail
-  maintenanceTasks: MaintenanceTaskRow[]
-  canManageMaintenance: boolean
-  createTaskNonce: number
-}>()
+const props = withDefaults(
+  defineProps<{
+    boat: BoatShowDetail
+    maintenanceTasks: MaintenanceTaskRow[]
+    canManageMaintenance: boolean
+    createIntent?: BoatCreateIntent
+  }>(),
+  { createIntent: null }
+)
+
+defineEmits<{ createIntentConsumed: [] }>()
 
 const { t } = useT()
 
@@ -40,9 +45,7 @@ const plannedTasks = computed(() => {
   const thirtyDaysFromNow = new Date()
   thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30)
   const soonIso = thirtyDaysFromNow.toISOString().slice(0, 10)
-  return openTasks.value.filter(
-    (t) => t.dueAt && String(t.dueAt) > soonIso
-  )
+  return openTasks.value.filter((t) => t.dueAt && String(t.dueAt) > soonIso)
 })
 
 const undatedTasks = computed(() => {
@@ -91,10 +94,22 @@ function getTaskComponentLabel(task: MaintenanceTaskRow): string {
         <button
           v-for="filter in [
             { key: 'all', label: t('boats.show.tasksFilter.all') },
-            { key: 'overdue', label: t('boats.show.tasksFilter.overdue'), count: overdueTasks.length },
+            {
+              key: 'overdue',
+              label: t('boats.show.tasksFilter.overdue'),
+              count: overdueTasks.length,
+            },
             { key: 'soon', label: t('boats.show.tasksFilter.soon'), count: soonTasks.length },
-            { key: 'planned', label: t('boats.show.tasksFilter.planned'), count: plannedTasks.length },
-            { key: 'undated', label: t('boats.show.tasksFilter.undated'), count: undatedTasks.length },
+            {
+              key: 'planned',
+              label: t('boats.show.tasksFilter.planned'),
+              count: plannedTasks.length,
+            },
+            {
+              key: 'undated',
+              label: t('boats.show.tasksFilter.undated'),
+              count: undatedTasks.length,
+            },
           ]"
           :key="filter.key"
           type="button"
@@ -296,7 +311,8 @@ function getTaskComponentLabel(task: MaintenanceTaskRow): string {
         :boat="boat"
         :tasks="maintenanceTasks"
         :can-manage-maintenance="canManageMaintenance"
-        :create-task-nonce="createTaskNonce"
+        :create-intent="createIntent"
+        @create-intent-consumed="$emit('createIntentConsumed')"
       />
     </div>
   </div>

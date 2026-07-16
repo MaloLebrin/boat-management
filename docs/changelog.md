@@ -3,6 +3,14 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-07-16 — Correctif : les boutons « + Ajouter une entrée / tâche » de la fiche bateau ouvrent bien la modale (#358)
+
+Sur la fiche bateau (`/boats/:id`), les boutons d'en-tête « + Ajouter une entrée » et « + Ajouter une tâche » basculaient bien sur l'onglet History/Tasks mais **n'ouvraient pas la modale de création** : l'utilisateur devait recliquer sur « Add event » / « Add task » dans l'onglet.
+
+- **Cause** : le mécanisme reposait sur un compteur (`createEventNonce` / `createTaskNonce`) incrémenté au clic, et sur un `watch` de ce compteur côté panneau. L'onglet cible n'étant monté qu'**après** le rendu différé (`<Transition mode="out-in">`), le panneau se montait avec le compteur **déjà** incrémenté : le `watch` ne voyait aucun changement et ne se déclenchait jamais. Seul un second clic (panneau déjà monté) fonctionnait.
+- **Correctif** : remplacement des deux compteurs par un état explicite `createIntent: 'event' | 'task' | null` (type `BoatCreateIntent` dans `inertia/types/boat_show.ts`), passé en prop le long de la chaîne `show.vue` → `BoatShowTabContent` → `BoatShowTabHistory` / `BoatShowTabTasks` → `BoatMaintenanceTasksPanel`. Le panneau **consomme l'intention à son `onMounted`** (et via un `watch` s'il est déjà affiché), ouvre la modale, puis émet `createIntentConsumed` pour que `show.vue` remette l'état à `null` — ce qui rend l'action rejouable indéfiniment.
+- **`BaseModal`** : une modale démontée alors qu'elle était encore ouverte (changement d'onglet, navigation) laissait `document.body.style.overflow = 'hidden'` en place, bloquant définitivement le scroll de la page. Le style est désormais restauré dans `onBeforeUnmount`.
+
 ## 2026-07-13 — Heures moteur incrémentables + garde-fou sur le bouton « + Nouvelle sortie »
 
 Deux correctifs d'ergonomie remontés à l'usage sur les fiches bateau.

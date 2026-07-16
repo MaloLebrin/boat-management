@@ -9,6 +9,7 @@ import BoatShowTabContent from '~/components/boats/show/BoatShowTabContent.vue'
 import { useT } from '~/composables/use_t'
 import type {
   AiSuggestion,
+  BoatCreateIntent,
   BoatDocumentRow,
   BoatEquipmentActionRow,
   BoatShowDetail,
@@ -70,8 +71,9 @@ watch(tab, (newTab) => {
   window.history.replaceState(window.history.state, '', url.pathname + url.search)
 })
 
-const createTaskNonce = ref(0)
-const createEventNonce = ref(0)
+// L'onglet cible n'est monté qu'après le rendu différé : on expose une intention
+// explicite que le panneau consomme à son montage, puis remet à null (#358).
+const createIntent = ref<BoatCreateIntent>(null)
 
 const todayIso = computed(() => new Date().toISOString().slice(0, 10))
 
@@ -121,12 +123,16 @@ function goToTab(key: TabKey | string) {
 
 function openHistoryTab() {
   goToTab('history')
-  createEventNonce.value++
+  createIntent.value = 'event'
 }
 
 function openTasksTab() {
   goToTab('tasks')
-  createTaskNonce.value++
+  createIntent.value = 'task'
+}
+
+function onCreateIntentConsumed() {
+  createIntent.value = null
 }
 </script>
 
@@ -207,9 +213,9 @@ function openTasksTab() {
     <BoatShowTabContent
       :tab="tab"
       v-bind="props"
-      :create-event-nonce="createEventNonce"
-      :create-task-nonce="createTaskNonce"
+      :create-intent="createIntent"
       @go-to-tab="goToTab"
+      @create-intent-consumed="onCreateIntentConsumed"
     />
   </div>
 </template>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { DocumentTextIcon } from '@heroicons/vue/24/outline'
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
@@ -8,27 +8,34 @@ import BaseSegmentedControl from '~/components/base/BaseSegmentedControl.vue'
 import { subjectLabel, targetDescription } from '~/components/boats/maintenance/utils'
 import BoatMaintenanceEventModal from '~/components/boats/show/modals/BoatMaintenanceEventModal.vue'
 import { useT } from '~/composables/use_t'
-import type { BoatShowDetail, MaintenanceEventRow } from '~/types/boat_show'
+import type { BoatCreateIntent, BoatShowDetail, MaintenanceEventRow } from '~/types/boat_show'
 
-const props = defineProps<{
-  boat: BoatShowDetail
-  maintenanceEvents: MaintenanceEventRow[]
-  canManageMaintenance: boolean
-  createEventNonce?: number
-}>()
+const props = withDefaults(
+  defineProps<{
+    boat: BoatShowDetail
+    maintenanceEvents: MaintenanceEventRow[]
+    canManageMaintenance: boolean
+    createIntent?: BoatCreateIntent
+  }>(),
+  { createIntent: null }
+)
+
+const emit = defineEmits<{ createIntentConsumed: [] }>()
 
 const { t } = useT()
 
 const isEventModalOpen = ref(false)
 
-watch(
-  () => props.createEventNonce,
-  (v) => {
-    if (!v) return
-    if (!props.canManageMaintenance) return
-    isEventModalOpen.value = true
-  }
-)
+// L'onglet est monté après la demande d'ouverture : on consomme l'intention au
+// montage (et si elle change alors que l'onglet est déjà affiché) — #358.
+function consumeCreateIntent() {
+  if (props.createIntent !== 'event') return
+  if (props.canManageMaintenance) isEventModalOpen.value = true
+  emit('createIntentConsumed')
+}
+
+onMounted(consumeCreateIntent)
+watch(() => props.createIntent, consumeCreateIntent)
 
 const historyFilter = ref<'all' | 'engine' | 'sail' | 'rig' | 'boat'>('all')
 const historySearch = ref('')

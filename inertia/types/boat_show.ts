@@ -18,6 +18,12 @@ import type {
   EquipmentReferenceType as EquipmentReferenceTypeValue,
 } from '../../shared/types/equipment_action'
 
+/**
+ * Intention de création demandée depuis l'en-tête de la fiche bateau (#358).
+ * Consommée au montage de l'onglet cible, puis remise à `null`.
+ */
+export type BoatCreateIntent = 'event' | 'task' | null
+
 /** Seed data to open the equipment-action modal pre-filled from a card (#313). */
 export type EquipmentActionPrefill = {
   label: string
