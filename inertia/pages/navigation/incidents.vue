@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { router } from '@inertiajs/vue3'
 import BaseEmptyState from '~/components/base/BaseEmptyState.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import IncidentRow from '~/components/navigation/IncidentRow.vue'
@@ -17,6 +18,16 @@ const props = defineProps<{
 
 const openCount = computed(() => props.incidents.filter((i) => i.status === 'open').length)
 const closedCount = computed(() => props.incidents.filter((i) => i.status === 'closed').length)
+
+const emptyActionLabel = computed(() =>
+  props.selectedBoatId
+    ? t('navigation.incidents.empty.actionBoat')
+    : t('navigation.incidents.empty.action')
+)
+
+function onEmptyAction() {
+  router.visit(props.selectedBoatId ? `/boats/${props.selectedBoatId}/navigation` : '/boats')
+}
 </script>
 
 <template>
@@ -55,8 +66,8 @@ const closedCount = computed(() => props.incidents.filter((i) => i.status === 'c
         v-if="incidents.length === 0"
         :title="t('navigation.incidents.empty.title')"
         :description="t('navigation.incidents.empty.description')"
-        :action-label="t('navigation.incidents.empty.action')"
-        @action="$inertia.visit('/boats')"
+        :action-label="emptyActionLabel"
+        @action="onEmptyAction"
       />
 
       <div v-else class="overflow-x-auto rounded-lg border border-border">
