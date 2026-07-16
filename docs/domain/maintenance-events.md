@@ -32,7 +32,7 @@ Références:
 - routes: `start/routes/boats.ts`
 - controller: `app/controllers/boat_maintenances_controller.ts`
 - service: `app/services/boat_maintenance_service.ts`
-- UI: `inertia/components/boats/maintenance/BoatShowMaintenanceSection.vue` (section “Maintenance history”)
+- UI: `inertia/components/boats/show/tabs/BoatShowTabHistory.vue` (onglet « Historique »)
 
 ### Créer une entrée
 
@@ -64,7 +64,7 @@ Règles côté service (résumé, source: `BoatMaintenanceService.createForBoat`
 
 ## UI (boat show)
 
-La page `inertia/pages/boats/show.vue` passe à `BoatShowMaintenanceSection`:
+La page `inertia/pages/boats/show.vue` passe à `BoatShowTabHistory` (via `BoatShowTabContent`):
 
 - `maintenanceEvents`: array `MaintenanceEventRow`
 - `canManageMaintenance`: active les formulaires (create/delete)

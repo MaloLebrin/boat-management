@@ -27,7 +27,7 @@ Références:
 - routes: `start/routes/boats.ts`
 - controller: `app/controllers/boat_maintenance_tasks_controller.ts`
 - service: `app/services/boat_maintenance_task_service.ts`
-- UI: `inertia/components/boats/maintenance/BoatShowMaintenanceSection.vue` (section “Planned maintenance”)
+- UI: `inertia/components/boats/show/tabs/BoatShowTabTasks.vue` (onglet « Tâches »), qui rend `inertia/components/boats/maintenance/BoatMaintenanceTasksPanel.vue`
 
 ### Créer une task
 

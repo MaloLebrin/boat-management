@@ -38,7 +38,7 @@ Référence: `inertia/app.ts`.
   - engines: `inertia/components/boats/engine/BoatShowEnginesCard.vue`
   - sails: `inertia/components/boats/sail/BoatShowSailsCard.vue`
   - rig: `inertia/components/boats/rig/BoatShowRigCard.vue`
-  - maintenance: `inertia/components/boats/maintenance/BoatShowMaintenanceSection.vue`
+  - maintenance: `inertia/components/boats/show/tabs/BoatShowTabTasks.vue` (onglet « Tâches ») et `inertia/components/boats/show/tabs/BoatShowTabHistory.vue` (onglet « Historique »)
   - equipment-actions (onglet "Achats/réparations"):
     - `inertia/components/boats/equipment-actions/BoatEquipmentActionCard.vue` — carte individuelle action
     - `inertia/components/boats/equipment-actions/BoatEquipmentActionModal.vue` — modal création/édition (prop `prefill` pour l'ajout depuis un équipement, #313)
@@ -113,7 +113,7 @@ Consommateurs : `InspectionPhotos.vue` (wrapper fin), et les onglets « Photos �
 
 Le projet utilise le composant `<Form>` fourni par `@adonisjs/inertia/vue`.
 
-Exemple: `BoatShowMaintenanceSection.vue` contient:
+Exemple: `BoatShowTabTasks.vue` / `BoatShowTabHistory.vue` contiennent:
 
 - create task/event
 - mark done
