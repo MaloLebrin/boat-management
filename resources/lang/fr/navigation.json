@@ -23,7 +23,8 @@
     "empty": {
       "title": "Aucune sortie enregistrée",
       "description": "Les sorties en mer apparaîtront ici une fois créées depuis la fiche d'un bateau.",
-      "action": "Voir mes bateaux"
+      "action": "Voir mes bateaux",
+      "actionBoat": "Ouvrir la navigation"
     },
     "nm": "{count} nm"
   },
@@ -45,7 +46,8 @@
     "empty": {
       "title": "Aucun avitaillement enregistré",
       "description": "Les avitaillements apparaîtront ici une fois créés depuis la fiche d'un bateau.",
-      "action": "Voir mes bateaux"
+      "action": "Voir mes bateaux",
+      "actionBoat": "Ouvrir la navigation"
     }
   },
   "incidents": {
@@ -66,7 +68,8 @@
     "empty": {
       "title": "Aucun incident enregistré",
       "description": "Les incidents apparaîtront ici une fois créés depuis la fiche d'un bateau.",
-      "action": "Voir mes bateaux"
+      "action": "Voir mes bateaux",
+      "actionBoat": "Ouvrir la navigation"
     }
   },
   "filter": {

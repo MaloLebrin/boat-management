@@ -23,7 +23,8 @@
     "empty": {
       "title": "No passages logged yet",
       "description": "Passages will appear here once created from a boat's navigation page.",
-      "action": "View my boats"
+      "action": "View my boats",
+      "actionBoat": "Open navigation"
     },
     "nm": "{count} nm"
   },
@@ -45,7 +46,8 @@
     "empty": {
       "title": "No fueling records yet",
       "description": "Fueling records will appear here once created from a boat's navigation page.",
-      "action": "View my boats"
+      "action": "View my boats",
+      "actionBoat": "Open navigation"
     }
   },
   "incidents": {
@@ -66,7 +68,8 @@
     "empty": {
       "title": "No incidents reported",
       "description": "Incidents will appear here once reported from a boat's navigation page.",
-      "action": "View my boats"
+      "action": "View my boats",
+      "actionBoat": "Open navigation"
     }
   },
   "filter": {
