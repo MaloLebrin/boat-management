@@ -11,6 +11,7 @@ import BoatShowTabSpecs from '~/components/boats/show/tabs/BoatShowTabSpecs.vue'
 import BoatShowTabTasks from '~/components/boats/show/tabs/BoatShowTabTasks.vue'
 import type {
   AiSuggestion,
+  BoatCreateIntent,
   BoatDocumentRow,
   BoatEquipmentActionRow,
   BoatShowDetail,
@@ -47,14 +48,13 @@ defineProps<{
   canDeleteEquipmentActions: boolean
   canExport: boolean
   aiSuggestions: AiSuggestion[] | null
-  createEventNonce: number
-  createTaskNonce: number
+  createIntent: BoatCreateIntent
   pricing: BoatPricingRow | null
   pricingEnabled: boolean
   canManagePricing: boolean
 }>()
 
-defineEmits<{ goToTab: [key: string] }>()
+defineEmits<{ goToTab: [key: string]; createIntentConsumed: [] }>()
 </script>
 
 <template>
@@ -99,7 +99,8 @@ defineEmits<{ goToTab: [key: string] }>()
         :boat="boat"
         :maintenance-events="maintenanceEvents"
         :can-manage-maintenance="canManageMaintenance"
-        :create-event-nonce="createEventNonce"
+        :create-intent="createIntent"
+        @create-intent-consumed="$emit('createIntentConsumed')"
       />
 
       <BoatShowTabTasks
@@ -107,7 +108,8 @@ defineEmits<{ goToTab: [key: string] }>()
         :boat="boat"
         :maintenance-tasks="maintenanceTasks"
         :can-manage-maintenance="canManageMaintenance"
-        :create-task-nonce="createTaskNonce"
+        :create-intent="createIntent"
+        @create-intent-consumed="$emit('createIntentConsumed')"
       />
 
       <BoatShowTabSheets

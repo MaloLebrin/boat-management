@@ -39,7 +39,12 @@ watch(
 )
 
 onMounted(() => window.addEventListener('keydown', onKeyDown))
-onBeforeUnmount(() => window.removeEventListener('keydown', onKeyDown))
+onBeforeUnmount(() => {
+  window.removeEventListener('keydown', onKeyDown)
+  // Une modale démontée alors qu'elle est ouverte (changement d'onglet…) laissait
+  // sinon le scroll du body bloqué définitivement (#358).
+  if (typeof document !== 'undefined') document.body.style.overflow = ''
+})
 </script>
 
 <template>
