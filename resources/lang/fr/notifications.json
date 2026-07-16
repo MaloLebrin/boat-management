@@ -11,13 +11,31 @@
       }
     },
     "member": {
+      "roles": {
+        "admin": "administrateur",
+        "member": "membre"
+      },
       "joined": {
         "title": "{memberName} a rejoint l'organisation"
+      },
+      "removed": {
+        "title": "{memberName} a été retiré de l'organisation",
+        "titleSelf": "Vous avez été retiré de l'organisation {orgName}"
+      },
+      "role_changed": {
+        "title": "Rôle de {memberName} modifié",
+        "body": "{memberName} est désormais {toRole} (précédemment {fromRole}).",
+        "titleSelf": "Votre rôle a changé",
+        "bodySelf": "Vous êtes désormais {toRole} (précédemment {fromRole})."
       }
     },
     "plan": {
       "downgraded": {
         "title": "Plan rétrogradé vers {toPlan}",
+        "body": "Le plan de votre organisation est passé de {fromPlan} à {toPlan}."
+      },
+      "upgraded": {
+        "title": "Plan mis à niveau vers {toPlan}",
         "body": "Le plan de votre organisation est passé de {fromPlan} à {toPlan}."
       }
     },
@@ -29,6 +47,41 @@
       "deactivated": {
         "title": "Module {module} désactivé",
         "body": "Le module {module} a été retiré de votre abonnement. Vos données restent consultables en lecture seule."
+      }
+    },
+    "invitation": {
+      "accepted": {
+        "title": "{memberName} a accepté votre invitation"
+      }
+    },
+    "maintenance": {
+      "overdue": {
+        "title": "Maintenance en retard sur {boatName}",
+        "body": "{count} tâche(s) de maintenance sont en retard sur {boatName}."
+      },
+      "due_soon": {
+        "title": "Maintenance à venir sur {boatName}",
+        "body": "{count} tâche(s) de maintenance arrivent à échéance sur {boatName}."
+      }
+    },
+    "document": {
+      "expiring_soon": {
+        "title": "Documents à renouveler sur {boatName}",
+        "body": "{count} document(s) du bateau {boatName} expirent bientôt."
+      },
+      "expired": {
+        "title": "Documents expirés sur {boatName}",
+        "body": "{count} document(s) du bateau {boatName} ont expiré."
+      }
+    },
+    "safety_equipment": {
+      "expiring_soon": {
+        "title": "Équipements de sécurité à vérifier sur {boatName}",
+        "body": "{count} équipement(s) de sécurité du bateau {boatName} expirent bientôt."
+      },
+      "expired": {
+        "title": "Équipements de sécurité expirés sur {boatName}",
+        "body": "{count} équipement(s) de sécurité du bateau {boatName} ont expiré."
       }
     }
   },
@@ -48,6 +101,7 @@
   },
   "types": {
     "quota.ai_tokens": "Quota IA",
+    "module.deactivated": "Module désactivé",
     "quota.storage": "Quota stockage",
     "member.joined": "Nouveau membre",
     "member.removed": "Membre retiré",

@@ -1,8 +1,10 @@
 import Boat from '#models/boat'
 import BoatMaintenanceEvent from '#models/boat_maintenance_event'
 import BoatMaintenanceTask from '#models/boat_maintenance_task'
+import Notification from '#models/notification'
 import Organization from '#models/organization'
 import User from '#models/user'
+import type { NotificationSeverity, NotificationType } from '#shared/types/notification'
 import BoatEquipmentService from '#services/boat_equipment_service'
 import BoatMaintenanceService from '#services/boat_maintenance_service'
 import BoatService from '#services/boat_hull_service'
@@ -279,6 +281,112 @@ export async function seedDemoData() {
         }
       }
     }
+  }
+
+  await seedDemoNotifications(user, org)
+}
+
+/**
+ * Notifications de démonstration pour le compte démo, afin que la cloche
+ * affiche un badge de non-lus et un panneau peuplé. Mélange lu/non-lu et
+ * sévérités variées, avec des `actionUrl` pointant vers de vraies pages.
+ * Idempotent : garde par `userId` + `title` (pas de contrainte d'unicité en base).
+ */
+async function seedDemoNotifications(user: User, org: Organization) {
+  const now = DateTime.now()
+
+  const boats = await Boat.query().where('organizationId', org.id)
+  const boatUrl = (name: string): string => {
+    const boat = boats.find((b) => b.name === name)
+    return boat ? `/boats/${boat.id}` : '/boats'
+  }
+
+  const defs: Array<{
+    type: NotificationType
+    severity: NotificationSeverity
+    title: string
+    body: string | null
+    actionUrl: string | null
+    read: boolean
+    ageHours: number
+    metadata?: Record<string, unknown> | null
+  }> = [
+    {
+      type: 'maintenance.overdue',
+      severity: 'error',
+      title: 'Maintenance en retard sur Albatros',
+      body: 'La révision moteur est en retard de plusieurs jours.',
+      actionUrl: '/planning',
+      read: false,
+      ageHours: 2,
+    },
+    {
+      type: 'document.expiring_soon',
+      severity: 'warning',
+      title: 'Assurance à renouveler sur Marin du Vent',
+      body: "Le document d'assurance expire dans 12 jours.",
+      actionUrl: boatUrl('Marin du Vent'),
+      read: false,
+      ageHours: 20,
+    },
+    {
+      type: 'safety_equipment.expired',
+      severity: 'error',
+      title: 'Équipement de sécurité expiré sur Cap Mistral',
+      body: 'Un extincteur a dépassé sa date de validité.',
+      actionUrl: boatUrl('Cap Mistral'),
+      read: false,
+      ageHours: 30,
+    },
+    {
+      type: 'member.joined',
+      severity: 'info',
+      title: "Camille Laurent a rejoint l'organisation",
+      body: null,
+      actionUrl: '/settings/members',
+      read: true,
+      ageHours: 52,
+    },
+    {
+      type: 'plan.upgraded',
+      severity: 'success',
+      title: 'Plan mis à niveau vers Pro',
+      body: 'Votre organisation est passée de Starter à Pro.',
+      actionUrl: '/settings/billing',
+      read: true,
+      ageHours: 96,
+    },
+    {
+      type: 'quota.storage',
+      severity: 'warning',
+      title: 'Stockage à 80 %',
+      body: 'La Marina Démo a utilisé 80 % de son espace de stockage.',
+      actionUrl: '/settings/billing',
+      read: true,
+      ageHours: 140,
+    },
+  ]
+
+  for (const def of defs) {
+    const exists = await Notification.query()
+      .where('userId', user.id)
+      .where('title', def.title)
+      .first()
+    if (exists) continue
+
+    const createdAt = now.minus({ hours: def.ageHours })
+    await Notification.create({
+      userId: user.id,
+      organizationId: org.id,
+      type: def.type,
+      severity: def.severity,
+      title: def.title,
+      body: def.body,
+      actionUrl: def.actionUrl,
+      metadata: def.metadata ?? null,
+      readAt: def.read ? createdAt.plus({ minutes: 30 }) : null,
+      createdAt,
+    })
   }
 }
 
