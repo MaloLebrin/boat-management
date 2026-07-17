@@ -40,7 +40,7 @@ vi.mock('~/components/base/BaseButton.vue', () => ({
   },
 }))
 
-const boat = { id: 7, name: 'Mistral', engines: [] } as any
+const boatId = 7
 const portOptions: never[] = []
 
 describe('NavigationLogForm', () => {
@@ -50,7 +50,7 @@ describe('NavigationLogForm', () => {
   })
 
   test('online: submit calls form.post with the correct URL', async () => {
-    const wrapper = mount(NavigationLogForm, { props: { boat, portOptions } })
+    const wrapper = mount(NavigationLogForm, { props: { boatId, portOptions } })
     await wrapper.find('form').trigger('submit')
     expect(mockFormPost).toHaveBeenCalledWith(
       '/boats/7/navigation-logs',
@@ -61,7 +61,7 @@ describe('NavigationLogForm', () => {
 
   test('offline: submit calls enqueue with correct payload and emits close', async () => {
     mockIsOnline.value = false
-    const wrapper = mount(NavigationLogForm, { props: { boat, portOptions } })
+    const wrapper = mount(NavigationLogForm, { props: { boatId, portOptions } })
     await wrapper.find('form').trigger('submit')
     expect(mockEnqueue).toHaveBeenCalledWith({
       type: 'create-navigation-log',
@@ -75,13 +75,13 @@ describe('NavigationLogForm', () => {
 
   test('offline: does not submit to server after enqueue', async () => {
     mockIsOnline.value = false
-    const wrapper = mount(NavigationLogForm, { props: { boat, portOptions } })
+    const wrapper = mount(NavigationLogForm, { props: { boatId, portOptions } })
     await wrapper.find('form').trigger('submit')
     expect(mockFormPost).not.toHaveBeenCalled()
   })
 
   test('cancel button emits close', async () => {
-    const wrapper = mount(NavigationLogForm, { props: { boat, portOptions } })
+    const wrapper = mount(NavigationLogForm, { props: { boatId, portOptions } })
     await wrapper.find('button[type="button"]').trigger('click')
     expect(wrapper.emitted('close')).toBeTruthy()
   })

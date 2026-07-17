@@ -8,10 +8,10 @@ import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import { useNetworkStatus } from '~/composables/use_network_status'
 import { useOfflineQueue } from '~/composables/use_offline_queue'
 import { useT } from '~/composables/use_t'
-import type { BoatShowDetail, NavigationLogPortOption } from '~/types/boat_show'
+import type { NavigationLogPortOption } from '~/types/boat_show'
 
 const props = defineProps<{
-  boat: BoatShowDetail
+  boatId: number
   portOptions: NavigationLogPortOption[]
 }>()
 
@@ -55,7 +55,7 @@ function handleSubmit() {
   if (!isOnline.value) {
     enqueue({
       type: 'create-navigation-log',
-      url: `/boats/${props.boat.id}/navigation-logs`,
+      url: `/boats/${props.boatId}/navigation-logs`,
       method: 'post',
       payload: form.data() as Record<string, unknown>,
     })
@@ -63,7 +63,7 @@ function handleSubmit() {
     return
   }
 
-  form.post(`/boats/${props.boat.id}/navigation-logs`, {
+  form.post(`/boats/${props.boatId}/navigation-logs`, {
     preserveScroll: true,
     onSuccess: () => emit('close'),
   })

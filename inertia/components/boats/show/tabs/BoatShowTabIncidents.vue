@@ -70,7 +70,7 @@ function deleteIncident(incidentId: number) {
     <!-- Create / Edit form -->
     <BoatIncidentForm
       v-if="showForm"
-      :boat="boat"
+      :boat-id="boat.id"
       :editing-incident="editingIncident"
       @close="closeForm"
     />

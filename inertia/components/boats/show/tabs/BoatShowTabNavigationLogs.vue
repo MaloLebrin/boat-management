@@ -80,7 +80,7 @@ function deleteLog(logId: number) {
     <!-- Create form -->
     <NavigationLogForm
       v-if="showCreateForm"
-      :boat="boat"
+      :boat-id="boat.id"
       :port-options="portOptions"
       @close="showCreateForm = false"
     />

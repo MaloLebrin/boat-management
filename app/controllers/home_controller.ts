@@ -1,5 +1,6 @@
 import AiAnalysisService, { type AiSuggestion } from '#services/ai_analysis_service'
 import DashboardService from '#services/dashboard_service'
+import PortService from '#services/port_service'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 
@@ -7,7 +8,8 @@ import type { HttpContext } from '@adonisjs/core/http'
 export default class HomeController {
   constructor(
     private dashboardService: DashboardService,
-    private aiService: AiAnalysisService
+    private aiService: AiAnalysisService,
+    private portService: PortService
   ) {}
 
   async index({ inertia, auth }: HttpContext) {
@@ -27,6 +29,20 @@ export default class HomeController {
       ? (JSON.parse(latestAnalysis.responseText) as AiSuggestion[])
       : null
 
-    return inertia.render('dashboard', { ...data, aiFleetAnalysis })
+    const portOptions = await this.portService.listNamesForOrg(user)
+    const canCreateNavigationLogs = user.organizationId
+      ? await user.hasPermission(user.organizationId, 'navigation_logs.create')
+      : false
+    const canCreateIncidents = user.organizationId
+      ? await user.hasPermission(user.organizationId, 'incidents.create')
+      : false
+
+    return inertia.render('dashboard', {
+      ...data,
+      aiFleetAnalysis,
+      portOptions,
+      canCreateNavigationLogs,
+      canCreateIncidents,
+    })
   }
 }

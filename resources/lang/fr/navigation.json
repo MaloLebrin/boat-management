@@ -2,6 +2,12 @@
   "logbook": {
     "title": "Journal de bord",
     "subtitle": "Toutes les sorties en mer de votre flotte",
+    "quickAdd": "+ Ajouter",
+    "quickAddModal": {
+      "title": "Nouvelle sortie",
+      "selectBoat": "Bateau",
+      "selectBoatPlaceholder": "Choisir un bateau…"
+    },
     "stats": {
       "trips": "Sorties",
       "completed": "Terminées",
@@ -22,7 +28,7 @@
     },
     "empty": {
       "title": "Aucune sortie enregistrée",
-      "description": "Les sorties en mer apparaîtront ici une fois créées depuis la fiche d'un bateau.",
+      "description": "Créez une sortie depuis le bouton « Ajouter » ci-dessus, ou depuis la fiche d'un bateau.",
       "action": "Voir mes bateaux",
       "actionBoat": "Ouvrir la navigation"
     },
@@ -53,6 +59,12 @@
   "incidents": {
     "title": "Incidents",
     "subtitle": "Suivi des incidents de votre flotte",
+    "quickAdd": "+ Ajouter",
+    "quickAddModal": {
+      "title": "Signaler un incident",
+      "selectBoat": "Bateau",
+      "selectBoatPlaceholder": "Choisir un bateau…"
+    },
     "stats": {
       "total": "Incidents",
       "open": "Ouverts",
@@ -67,7 +79,7 @@
     },
     "empty": {
       "title": "Aucun incident enregistré",
-      "description": "Les incidents apparaîtront ici une fois créés depuis la fiche d'un bateau.",
+      "description": "Signalez un incident depuis le bouton « Ajouter » ci-dessus, ou depuis la fiche d'un bateau.",
       "action": "Voir mes bateaux",
       "actionBoat": "Ouvrir la navigation"
     }
