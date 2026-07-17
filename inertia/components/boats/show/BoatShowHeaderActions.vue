@@ -38,10 +38,7 @@ const menuItemClass =
         type="button"
         role="menuitem"
         :class="menuItemClass"
-        @click="
-          emit('addEntry')
-          close()
-        "
+        @click="(emit('addEntry'), close())"
       >
         {{ t('boats.show.addMenu.entry') }}
       </button>
@@ -50,10 +47,7 @@ const menuItemClass =
         type="button"
         role="menuitem"
         :class="menuItemClass"
-        @click="
-          emit('addTask')
-          close()
-        "
+        @click="(emit('addTask'), close())"
       >
         {{ t('boats.show.addMenu.task') }}
       </button>
@@ -62,10 +56,7 @@ const menuItemClass =
         type="button"
         role="menuitem"
         :class="menuItemClass"
-        @click="
-          emit('addEquipment')
-          close()
-        "
+        @click="(emit('addEquipment'), close())"
       >
         {{ t('boats.show.addMenu.equipment') }}
       </button>
@@ -74,10 +65,7 @@ const menuItemClass =
         type="button"
         role="menuitem"
         :class="menuItemClass"
-        @click="
-          emit('addNavigationLog')
-          close()
-        "
+        @click="(emit('addNavigationLog'), close())"
       >
         {{ t('boats.show.addMenu.navigationLog') }}
       </button>
