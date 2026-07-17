@@ -57,12 +57,12 @@
     },
     "empty": "No boats yet."
   },
-  "marina": {
-    "title": "Marinas",
+  "port": {
+    "title": "Ports",
     "viewAll": "View all",
-    "addMarina": "Add a marina",
-    "empty": "No marina registered yet.",
-    "totalMarinas": "{count} marina(s)",
+    "addPort": "Add a port",
+    "empty": "No port registered yet.",
+    "totalPorts": "{count} port(s)",
     "totalBoats": "{count} moored boat(s)",
     "totalFreeSpots": "{count} free spot(s)",
     "freeSpots": "{free} free / {total}",

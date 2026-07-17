@@ -37,7 +37,7 @@ describe('BoatShowHeaderActions — regroupement des actions d’en-tête (#365)
     expect(wrapper.text()).not.toContain('boats.show.addMenu.label')
   })
 
-  test('emits addEntry and addTask only when canManageMaintenance is true', async () => {
+  test('emits addEvent and addTask only when canManageMaintenance is true', async () => {
     const wrapper = mount(BoatShowHeaderActions, { props: baseProps })
     await openAddMenu(wrapper)
 
@@ -45,7 +45,7 @@ describe('BoatShowHeaderActions — regroupement des actions d’en-tête (#365)
     expect(items).toHaveLength(4)
 
     await items[0]!.trigger('click')
-    expect(wrapper.emitted('addEntry')).toHaveLength(1)
+    expect(wrapper.emitted('addEvent')).toHaveLength(1)
 
     await openAddMenu(wrapper)
     await wrapper.findAll('button[role="menuitem"]')[1]!.trigger('click')
@@ -59,7 +59,7 @@ describe('BoatShowHeaderActions — regroupement des actions d’en-tête (#365)
     await openAddMenu(wrapper)
 
     const labels = wrapper.findAll('button[role="menuitem"]').map((el) => el.text())
-    expect(labels).not.toContain('boats.show.addMenu.entry')
+    expect(labels).not.toContain('boats.show.addMenu.event')
     expect(labels).not.toContain('boats.show.addMenu.task')
   })
 

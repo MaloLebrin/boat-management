@@ -44,7 +44,7 @@ function close() {
 <template>
   <BaseModal
     :open="open"
-    :title="t('boats.maintenance.events.addEntry')"
+    :title="t('boats.maintenance.events.addEvent')"
     :subtitle="`${boat.name} · ${engineLabel}`"
     size="xl"
     @update:open="close"
@@ -147,7 +147,7 @@ function close() {
           {{ t('boats.maintenance.tasks.cancel') }}
         </BaseButton>
         <BaseButton type="submit" :disabled="processing">
-          {{ t('boats.maintenance.events.createEntry') }}
+          {{ t('boats.maintenance.events.createEvent') }}
         </BaseButton>
       </div>
     </Form>

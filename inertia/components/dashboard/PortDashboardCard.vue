@@ -33,28 +33,28 @@ function locationLabel(port: DashboardPortItem): string {
   <BaseCard>
     <template #header>
       <div class="flex items-center justify-between">
-        <h2 class="text-sm font-semibold text-fg">{{ t('dashboard.marina.title') }}</h2>
+        <h2 class="text-sm font-semibold text-fg">{{ t('dashboard.port.title') }}</h2>
         <a href="/ports" class="text-sm font-semibold text-brand hover:underline">
-          {{ t('dashboard.marina.viewAll') }}
+          {{ t('dashboard.port.viewAll') }}
         </a>
       </div>
     </template>
 
     <div v-if="ports.length === 0" class="flex flex-col items-center gap-3 py-6 text-center">
-      <p class="text-sm text-fg-muted">{{ t('dashboard.marina.empty') }}</p>
+      <p class="text-sm text-fg-muted">{{ t('dashboard.port.empty') }}</p>
       <a href="/ports/new" class="text-sm font-semibold text-brand hover:underline">
-        {{ t('dashboard.marina.addMarina') }}
+        {{ t('dashboard.port.addPort') }}
       </a>
     </div>
 
     <template v-else>
       <div class="mb-4 flex flex-wrap gap-4 text-xs text-fg-muted">
-        <span>{{ t('dashboard.marina.totalMarinas', { count: String(portStats.total) }) }}</span>
+        <span>{{ t('dashboard.port.totalPorts', { count: String(portStats.total) }) }}</span>
         <span>·</span>
-        <span>{{ t('dashboard.marina.totalBoats', { count: String(portStats.totalBoats) }) }}</span>
+        <span>{{ t('dashboard.port.totalBoats', { count: String(portStats.totalBoats) }) }}</span>
         <span>·</span>
         <span>{{
-          t('dashboard.marina.totalFreeSpots', { count: String(portStats.totalFreeSpots) })
+          t('dashboard.port.totalFreeSpots', { count: String(portStats.totalFreeSpots) })
         }}</span>
       </div>
 
@@ -86,20 +86,20 @@ function locationLabel(port: DashboardPortItem): string {
               "
             >
               {{
-                t('dashboard.marina.freeSpots', {
+                t('dashboard.port.freeSpots', {
                   free: String(port.freeSpots),
                   total: String(port.totalSpots),
                 })
               }}
             </span>
             <span v-else class="shrink-0 text-xs text-fg-subtle">
-              {{ t('dashboard.marina.noSpots') }}
+              {{ t('dashboard.port.noSpots') }}
             </span>
           </div>
 
           <div v-if="port.totalSpots > 0" class="mt-2">
             <div class="flex items-center justify-between text-xs text-fg-muted">
-              <span>{{ t('dashboard.marina.fillRate', { rate: String(fillRate(port)) }) }}</span>
+              <span>{{ t('dashboard.port.fillRate', { rate: String(fillRate(port)) }) }}</span>
             </div>
             <div class="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-border">
               <div
