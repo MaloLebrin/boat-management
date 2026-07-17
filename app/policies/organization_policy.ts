@@ -22,4 +22,8 @@ export default class OrganizationPolicy extends OrgScopedPolicy {
   async viewAuditLog(user: User): Promise<AuthorizerResponse> {
     return this.can(user, 'audit_log.view')
   }
+
+  async manageBilling(user: User): Promise<AuthorizerResponse> {
+    return this.can(user, 'subscription.manage')
+  }
 }

@@ -110,6 +110,9 @@
     "moduleNotFound": "Ce module n'est pas actif sur votre abonnement.",
     "moduleAlreadyActive": "Ce module est déjà actif sur votre abonnement.",
     "moduleActionFailed": "Le module n'a pas pu être mis à jour. Veuillez réessayer.",
+    "moduleActivated": "Module activé.",
+    "moduleDeactivated": "Module désactivé.",
+    "modulesRequireEnterprise": "Cette action n'est disponible que sur le plan Enterprise.",
     "addonUpdated": "Add-on mis à jour. Le changement s'appliquera une fois le paiement confirmé.",
     "addonRemoved": "Add-on retiré. Il sera retiré une fois la confirmation reçue.",
     "addonNotActive": "Cet add-on n'est pas actif sur votre abonnement."

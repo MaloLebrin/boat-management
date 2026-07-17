@@ -110,6 +110,9 @@
     "moduleNotFound": "This module is not active on your subscription.",
     "moduleAlreadyActive": "This module is already active on your subscription.",
     "moduleActionFailed": "The module could not be updated. Please try again.",
+    "moduleActivated": "Module activated.",
+    "moduleDeactivated": "Module deactivated.",
+    "modulesRequireEnterprise": "This action is only available on the Enterprise plan.",
     "addonUpdated": "Add-on updated. The change will apply once the payment is confirmed.",
     "addonRemoved": "Add-on removed. It will be removed once confirmed.",
     "addonNotActive": "This add-on is not active on your subscription."
