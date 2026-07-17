@@ -37,30 +37,33 @@ function mountWithPlan(currentPlan: unknown, activeModules: unknown = []) {
   return result!
 }
 
+// business section index (fleet=0, activity=1, maintenance=2, business=3)
+const BUSINESS_SECTION_INDEX = 3
+
 // enterprise plan allows clients
 
-test('enterprise plan includes nav.clients item in fleet section', () => {
+test('enterprise plan includes nav.clients item in business section', () => {
   const { navSections } = mountWithPlan('enterprise')
-  const fleetSection = navSections.value[0]
-  const names = fleetSection.items.map((i) => i.name)
+  const businessSection = navSections.value[BUSINESS_SECTION_INDEX]
+  const names = businessSection.items.map((i) => i.name)
   expect(names).toContain('nav.clients')
 })
 
 // pro plan does NOT allow clients
 
-test('pro plan does NOT include nav.clients item in fleet section', () => {
+test('pro plan does NOT include nav.clients item in business section', () => {
   const { navSections } = mountWithPlan('pro')
-  const fleetSection = navSections.value[0]
-  const names = fleetSection.items.map((i) => i.name)
+  const businessSection = navSections.value[BUSINESS_SECTION_INDEX]
+  const names = businessSection.items.map((i) => i.name)
   expect(names).not.toContain('nav.clients')
 })
 
 // starter plan does NOT allow clients
 
-test('starter plan does NOT include nav.clients item in fleet section', () => {
+test('starter plan does NOT include nav.clients item in business section', () => {
   const { navSections } = mountWithPlan('starter')
-  const fleetSection = navSections.value[0]
-  const names = fleetSection.items.map((i) => i.name)
+  const businessSection = navSections.value[BUSINESS_SECTION_INDEX]
+  const names = businessSection.items.map((i) => i.name)
   expect(names).not.toContain('nav.clients')
 })
 
@@ -68,22 +71,22 @@ test('starter plan does NOT include nav.clients item in fleet section', () => {
 
 test('null plan does NOT include nav.clients item', () => {
   const { navSections } = mountWithPlan(null)
-  const fleetSection = navSections.value[0]
-  const names = fleetSection.items.map((i) => i.name)
+  const businessSection = navSections.value[BUSINESS_SECTION_INDEX]
+  const names = businessSection.items.map((i) => i.name)
   expect(names).not.toContain('nav.clients')
 })
 
 test('undefined plan does NOT include nav.clients item', () => {
   const { navSections } = mountWithPlan(undefined)
-  const fleetSection = navSections.value[0]
-  const names = fleetSection.items.map((i) => i.name)
+  const businessSection = navSections.value[BUSINESS_SECTION_INDEX]
+  const names = businessSection.items.map((i) => i.name)
   expect(names).not.toContain('nav.clients')
 })
 
 test('unknown plan string does NOT include nav.clients item', () => {
   const { navSections } = mountWithPlan('unknown_plan')
-  const fleetSection = navSections.value[0]
-  const names = fleetSection.items.map((i) => i.name)
+  const businessSection = navSections.value[BUSINESS_SECTION_INDEX]
+  const names = businessSection.items.map((i) => i.name)
   expect(names).not.toContain('nav.clients')
 })
 
@@ -91,8 +94,8 @@ test('unknown plan string does NOT include nav.clients item', () => {
 
 test('pro plan with crm_invoicing module includes clients and invoices items', () => {
   const { navSections } = mountWithPlan('pro', ['crm_invoicing'])
-  const fleetSection = navSections.value[0]
-  const names = fleetSection.items.map((i) => i.name)
+  const businessSection = navSections.value[BUSINESS_SECTION_INDEX]
+  const names = businessSection.items.map((i) => i.name)
   expect(names).toContain('nav.clients')
   expect(names).toContain('nav.invoices')
   expect(names).not.toContain('nav.pricingSeasons')
@@ -100,8 +103,8 @@ test('pro plan with crm_invoicing module includes clients and invoices items', (
 
 test('pro plan with charter module includes pricing seasons item only', () => {
   const { navSections } = mountWithPlan('pro', ['charter'])
-  const fleetSection = navSections.value[0]
-  const names = fleetSection.items.map((i) => i.name)
+  const businessSection = navSections.value[BUSINESS_SECTION_INDEX]
+  const names = businessSection.items.map((i) => i.name)
   expect(names).toContain('nav.pricingSeasons')
   expect(names).not.toContain('nav.clients')
   expect(names).not.toContain('nav.invoices')
@@ -109,23 +112,23 @@ test('pro plan with charter module includes pricing seasons item only', () => {
 
 test('starter plan with a module still resolves the granted flags', () => {
   const { navSections } = mountWithPlan('starter', ['crm_invoicing'])
-  const fleetSection = navSections.value[0]
-  const names = fleetSection.items.map((i) => i.name)
+  const businessSection = navSections.value[BUSINESS_SECTION_INDEX]
+  const names = businessSection.items.map((i) => i.name)
   expect(names).toContain('nav.clients')
 })
 
 test('invalid activeModules values are ignored', () => {
   const { navSections } = mountWithPlan('pro', ['marina', 42, null])
-  const fleetSection = navSections.value[0]
-  const names = fleetSection.items.map((i) => i.name)
+  const businessSection = navSections.value[BUSINESS_SECTION_INDEX]
+  const names = businessSection.items.map((i) => i.name)
   expect(names).not.toContain('nav.clients')
   expect(names).not.toContain('nav.pricingSeasons')
 })
 
 test('missing activeModules prop falls back to tier flags only', () => {
   const { navSections } = mountWithPlan('enterprise', undefined)
-  const fleetSection = navSections.value[0]
-  const names = fleetSection.items.map((i) => i.name)
+  const businessSection = navSections.value[BUSINESS_SECTION_INDEX]
+  const names = businessSection.items.map((i) => i.name)
   expect(names).toContain('nav.clients')
 })
 
@@ -140,30 +143,61 @@ test('section labels are the expected i18n keys', () => {
   const { navSections } = mountWithPlan('starter')
   const labels = navSections.value.map((s) => s.label)
   expect(labels).toContain('nav.sections.fleet')
+  expect(labels).toContain('nav.sections.activity')
   expect(labels).toContain('nav.sections.maintenance')
-  expect(labels).toContain('nav.sections.navigation')
-  expect(labels).toContain('nav.sections.preferences')
+  expect(labels).toContain('nav.sections.business')
 })
 
 // fleet section base items
 
-test('fleet section contains dashboard, boats, reservations, ports, crew', () => {
+test('fleet section contains dashboard, boats, ports, crew', () => {
   const { navSections } = mountWithPlan('starter')
   const fleetSection = navSections.value[0]
   const names = fleetSection.items.map((i) => i.name)
   expect(names).toContain('nav.dashboard')
   expect(names).toContain('nav.myBoats')
-  expect(names).toContain('nav.reservations')
   expect(names).toContain('ports.nav')
   expect(names).toContain('nav.crew')
+})
+
+// activity section items
+
+test('activity section contains logbook, fuel and incidents items', () => {
+  const { navSections } = mountWithPlan('starter')
+  const activitySection = navSections.value[1]
+  const names = activitySection.items.map((i) => i.name)
+  expect(names).toContain('nav.logbook')
+  expect(names).toContain('nav.fuel')
+  expect(names).toContain('nav.incidents')
 })
 
 // maintenance section items
 
 test('maintenance section contains planning and history items', () => {
   const { navSections } = mountWithPlan('starter')
-  const maintenanceSection = navSections.value[1]
+  const maintenanceSection = navSections.value[2]
   const names = maintenanceSection.items.map((i) => i.name)
   expect(names).toContain('nav.planning')
   expect(names).toContain('nav.history')
+})
+
+// business section base items
+
+test('business section always contains reservations', () => {
+  const { navSections } = mountWithPlan('starter')
+  const businessSection = navSections.value[BUSINESS_SECTION_INDEX]
+  const names = businessSection.items.map((i) => i.name)
+  expect(names).toContain('nav.reservations')
+})
+
+// settings item pinned outside navSections
+
+test('settingsItem exposes the settings link', () => {
+  const { settingsItem } = mountWithPlan('starter')
+  expect(settingsItem.value).toEqual({
+    name: 'nav.settings',
+    path: '/settings',
+    route: null,
+    icon: 'gear',
+  })
 })

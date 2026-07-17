@@ -21,8 +21,8 @@
   "invoices": "Factures",
   "sections": {
     "fleet": "FLOTTE",
+    "activity": "ACTIVITÉ",
     "maintenance": "MAINTENANCE",
-    "navigation": "NAVIGATION",
-    "preferences": "PRÉFÉRENCES"
+    "business": "GESTION"
   }
 }

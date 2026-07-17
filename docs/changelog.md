@@ -3,6 +3,17 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-07-17 — Refonte du menu latéral par groupes + correction du débordement (#363)
+
+Le menu latéral (desktop) débordait de la zone visible (692px de contenu pour 466px disponibles sur un écran 1280×720), rendant Carburant, Incidents et Paramètres inaccessibles sans un scroll interne peu perceptible ; sur mobile, le lien Paramètres était recouvert par le footer du drawer (positionné en `absolute`) et totalement inaccessible.
+
+- **Cause du débordement desktop** : `<nav class="flex-1 overflow-y-auto">` dans un parent flex-column sans `min-h-0` — dans ce cas, un flex item garde `min-height: auto` (= hauteur de son contenu) et ignore l'`overflow-y-auto`, qui ne prenait donc jamais effet. Ajout de `min-h-0` sur la nav de `AsideMenu.vue` (desktop) et du drawer mobile.
+- **Cause du recouvrement mobile** : le footer du drawer était en `absolute bottom-0`, superposé au contenu de la nav plutôt qu'empilé après elle. Le drawer (`inertia/layouts/default.vue`) est désormais un vrai flex-column (`flex flex-col`) avec header/nav/footer en `shrink-0`/`flex-1 min-h-0`, éliminant tout recouvrement.
+- **Réorganisation des groupes** (`use_nav_sections.ts`) : **Flotte** (Dashboard, Bateaux, Ports, Équipiers) · **Activité** (Journal de bord, Carburant, Incidents) · **Maintenance** (Planning, Historique) · **Gestion** (Réservations, Clients, Factures, Tarifs — selon plan). **Paramètres** est sorti des sections scrollables et épinglé dans le footer (desktop et mobile), donc toujours visible quel que soit le viewport.
+- Extraction du drawer mobile dans un nouveau composant dédié `inertia/components/layout/MobileSidebarDrawer.vue` (réduisait la taille de `default.vue` sous la limite de 250 lignes/composant).
+- Nouvelles clés i18n `nav.sections.activity` / `nav.sections.business` (EN + FR), suppression de `nav.sections.navigation` / `nav.sections.preferences` (ambiguës).
+- **Tests** : `tests/inertia/use_nav_sections.spec.ts` et `tests/inertia/default_layout_sidebar.spec.ts` mis à jour pour la nouvelle structure de sections et le `settingsItem` épinglé.
+
 ## 2026-07-17 — Correctif : skeleton de chargement au changement d'onglet sur la fiche bateau (#361)
 
 Sur `/boats/:id`, chaque clic sur un onglet (History, Equipment, Tasks…) laissait la zone de contenu totalement vide pendant que Vue démontait/remontait le contenu (souvent volumineux) du nouvel onglet — perçu comme un plantage, surtout en dev.

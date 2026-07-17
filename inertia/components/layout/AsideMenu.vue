@@ -25,7 +25,7 @@ const props = defineProps<{
 
 const page = usePage()
 const { t } = useT()
-const { navSections } = useNavSections()
+const { navSections, settingsItem } = useNavSections()
 const { canInstall, promptInstall } = usePwaInstall()
 
 const currentPath = computed(() => props.currentRoute ?? page.url)
@@ -48,7 +48,7 @@ function isActive(path: string): boolean {
     </div>
 
     <!-- Navigation -->
-    <nav class="flex-1 overflow-y-auto px-3 py-4">
+    <nav class="flex-1 min-h-0 overflow-y-auto px-3 py-4">
       <div v-for="section in navSections" :key="section.label" class="mb-6">
         <p class="px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-navy-300">
           {{ section.label }}
@@ -67,8 +67,17 @@ function isActive(path: string): boolean {
       </div>
     </nav>
 
-    <!-- User info + Logout -->
-    <div class="mt-auto border-t border-navy-700 px-4 py-4">
+    <!-- Settings (pinned) + User info + Logout -->
+    <div class="mt-auto shrink-0 border-t border-navy-700 px-4 py-4">
+      <div class="mb-3">
+        <NavItem
+          :name="settingsItem.name"
+          :path="settingsItem.path"
+          :route="settingsItem.route"
+          :icon="settingsItem.icon"
+          :is-active="isActive(settingsItem.path)"
+        />
+      </div>
       <div class="flex items-center justify-between mb-3 px-0">
         <LanguageSwitcher />
       </div>
