@@ -597,6 +597,7 @@
       "title": "Planned maintenance",
       "subtitle": "Open tasks (date-based and engine-hour based).",
       "empty": "No planned tasks.",
+      "emptyFiltered": "No matching tasks.",
       "addTask": "Add task",
       "modalTitle": "Add task",
       "done": "Done",

@@ -12,6 +12,7 @@ import BoatTable from '~/components/boats/list/BoatTable.vue'
 import UpgradePlanModal from '~/components/base/UpgradePlanModal.vue'
 import type { BoatListFilters, BoatsPaginated } from '~/components/boats/list/types'
 import { useT } from '~/composables/use_t'
+import { propulsionLabel } from '~/utils/boat_propulsion_label'
 
 const { t } = useT()
 
@@ -52,7 +53,7 @@ const propulsionOptions = computed(() => {
   for (const b of boatsData.value) if (b.propulsionType) set.add(b.propulsionType)
   return Array.from(set)
     .sort((a, b) => a.localeCompare(b))
-    .map((v) => ({ label: v, value: v }))
+    .map((v) => ({ label: propulsionLabel(t, v) ?? v, value: v }))
 })
 
 function navigate(next: BoatListFilters) {

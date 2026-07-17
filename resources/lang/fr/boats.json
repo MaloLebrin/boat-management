@@ -621,6 +621,7 @@
       "title": "Maintenance planifiée",
       "subtitle": "Tâches ouvertes (par date et par heures moteur).",
       "empty": "Aucune tâche planifiée.",
+      "emptyFiltered": "Aucune tâche correspondante.",
       "addTask": "Ajouter une tâche",
       "modalTitle": "Ajouter une tâche",
       "done": "Terminé",

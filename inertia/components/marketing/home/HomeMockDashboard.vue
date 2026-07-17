@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import HomeMockUpcomingTasks from './HomeMockUpcomingTasks.vue'
+import { useT } from '~/composables/use_t'
 
 defineProps<{
   persona?: 'loueurs' | 'ecoles' | 'marinas' | 'armateurs'
 }>()
+
+const { t } = useT()
 </script>
 
 <template>
@@ -55,7 +58,7 @@ defineProps<{
       <div class="flex items-center justify-between border-b border-bone bg-white px-4 py-2">
         <div>
           <p class="font-semibold text-fg">Marina Bleue</p>
-          <p class="text-[9px] text-fg-muted">22 bateaux</p>
+          <p class="text-[9px] text-fg-muted">{{ t('homePreview.fleetCount') }}</p>
         </div>
         <div class="flex items-center gap-2">
           <div class="h-5 w-5 rounded-full bg-bone" />

@@ -78,7 +78,7 @@ function close() {
     :open="open"
     :title="t('boats.maintenance.events.addEvent')"
     :subtitle="`${boat.name} · ${t('boats.maintenance.events.subtitle') || 'Enregistrement immuable une fois sauvegardé'}`"
-    close-label="Annuler"
+    :close-label="t('common.close')"
     size="xl"
     @update:open="close"
   >

@@ -17,6 +17,7 @@ import type {
   DashboardUrgentMaintenanceRow,
 } from '#shared/types/dashboard'
 import { useT } from '~/composables/use_t'
+import { propulsionLabel } from '~/utils/boat_propulsion_label'
 import type { AiSuggestion, NavigationLogPortOption } from '~/types/boat_show'
 import { PLAN_LIMITS } from '../../shared/types/plan'
 import type { PlanTier } from '../../shared/types/plan'
@@ -368,7 +369,9 @@ function dismissAlert() {
                       {{ b.name }}
                     </a>
                   </td>
-                  <td class="px-4 py-3 text-fg-muted">{{ b.propulsionType ?? '-' }}</td>
+                  <td class="px-4 py-3 text-fg-muted">
+                    {{ propulsionLabel(t, b.propulsionType) ?? '-' }}
+                  </td>
                   <td class="px-4 py-3 text-fg-muted">{{ b.enginesCount }}</td>
                   <td class="px-4 py-3 text-fg-muted">{{ b.sailsCount }}</td>
                   <td class="px-4 py-3 text-fg-muted">

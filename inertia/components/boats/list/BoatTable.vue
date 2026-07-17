@@ -2,6 +2,7 @@
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import type { BoatListItem } from './types'
 import { useT } from '~/composables/use_t'
+import { propulsionLabel } from '~/utils/boat_propulsion_label'
 
 const { t } = useT()
 
@@ -51,7 +52,9 @@ function maintenanceLabel(b: BoatListItem) {
           </td>
           <td class="px-4 py-3 text-fg-muted">{{ boat.registrationNumber ?? '—' }}</td>
           <td class="px-4 py-3 text-fg-muted">{{ boat.type ?? '—' }}</td>
-          <td class="px-4 py-3 text-fg-muted">{{ boat.propulsionType ?? '—' }}</td>
+          <td class="px-4 py-3 text-fg-muted">
+            {{ propulsionLabel(t, boat.propulsionType) ?? '—' }}
+          </td>
           <td class="px-4 py-3">
             <BaseBadge :variant="maintenanceVariant(boat)">
               {{ maintenanceLabel(boat) }}

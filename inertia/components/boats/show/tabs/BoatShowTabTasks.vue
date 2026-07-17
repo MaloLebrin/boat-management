@@ -252,7 +252,7 @@ function getTaskComponentLabel(task: MaintenanceTaskRow): string {
               #default="{ processing }"
             >
               <BaseButton type="submit" variant="ghost" size="sm" :disabled="processing">
-                Fait
+                {{ t('boats.maintenance.tasks.done') }}
               </BaseButton>
             </Form>
           </div>
@@ -289,7 +289,7 @@ function getTaskComponentLabel(task: MaintenanceTaskRow): string {
               #default="{ processing }"
             >
               <BaseButton type="submit" variant="ghost" size="sm" :disabled="processing">
-                Fait
+                {{ t('boats.maintenance.tasks.done') }}
               </BaseButton>
             </Form>
           </div>
@@ -302,7 +302,7 @@ function getTaskComponentLabel(task: MaintenanceTaskRow): string {
       v-if="filteredTasks.length === 0"
       class="rounded-lg border border-dashed border-border bg-surface-muted/30 p-8 text-center"
     >
-      <p class="text-fg-muted">Aucune tache correspondante.</p>
+      <p class="text-fg-muted">{{ t('boats.maintenance.tasks.emptyFiltered') }}</p>
     </div>
 
     <!-- Tasks panel for creation -->
