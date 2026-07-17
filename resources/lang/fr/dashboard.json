@@ -2,6 +2,10 @@
   "title": "Tableau de bord",
   "subtitle": "Vue d'ensemble de votre flotte et de la maintenance à venir.",
   "newBoat": "Nouveau bateau",
+  "quickAdd": {
+    "logbook": "+ Entrée journal",
+    "incident": "+ Incident"
+  },
   "overdueAlert": "{count} tâche(s) en retard",
   "viewPlanning": "Voir le planning",
   "analyzeFleet": "Analyser la flotte",

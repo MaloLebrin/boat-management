@@ -8,6 +8,7 @@ import BaseSkeleton from '~/components/base/BaseSkeleton.vue'
 import BaseStatCard from '~/components/base/BaseStatCard.vue'
 import MarinaDashboardCard from '~/components/dashboard/MarinaDashboardCard.vue'
 import UpgradePlanModal from '~/components/base/UpgradePlanModal.vue'
+import DashboardQuickAddActions from '~/components/dashboard/DashboardQuickAddActions.vue'
 import type {
   DashboardBoatSummary,
   DashboardPortItem,
@@ -16,7 +17,7 @@ import type {
   DashboardUrgentMaintenanceRow,
 } from '#shared/types/dashboard'
 import { useT } from '~/composables/use_t'
-import type { AiSuggestion } from '~/types/boat_show'
+import type { AiSuggestion, NavigationLogPortOption } from '~/types/boat_show'
 import { PLAN_LIMITS } from '../../shared/types/plan'
 import type { PlanTier } from '../../shared/types/plan'
 
@@ -56,6 +57,9 @@ const props = defineProps<{
   aiFleetAnalysis: AiSuggestion[] | null
   ports: DashboardPortItem[]
   portStats: DashboardPortStats
+  portOptions: NavigationLogPortOption[]
+  canCreateNavigationLogs: boolean
+  canCreateIncidents: boolean
 }>()
 
 const canUseAI = computed(() => {
@@ -118,7 +122,13 @@ function dismissAlert() {
         <h1 class="text-3xl font-semibold tracking-tight text-fg">{{ t('dashboard.title') }}</h1>
         <p class="mt-2 text-base text-fg-muted">{{ t('dashboard.subtitle') }}</p>
       </div>
-      <div class="flex items-center gap-2">
+      <div class="flex flex-wrap items-center gap-2">
+        <DashboardQuickAddActions
+          :boats="boats"
+          :port-options="portOptions"
+          :can-create-navigation-logs="canCreateNavigationLogs"
+          :can-create-incidents="canCreateIncidents"
+        />
         <a href="/boats">
           <BaseButton variant="secondary">{{ t('nav.boats') }}</BaseButton>
         </a>

@@ -3,6 +3,17 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-07-17 — Ajout rapide de trajets et d'incidents depuis les pages flotte et le dashboard (#364)
+
+Créer un trajet (journal de bord) ou signaler un incident imposait de naviguer jusqu'à la fiche d'un bateau puis dans le bon onglet — 3+ navigations pour un besoin fréquent.
+
+- Nouveau bouton « + Ajouter » sur `/navigation/logbook` et `/navigation/incidents`, ainsi que deux boutons « + Entrée journal » / « + Incident » sur le dashboard : ouvrent une modale avec un sélecteur de bateau puis le formulaire de création existant, sans changer de page au préalable.
+- `NavigationLogForm.vue` et `BoatIncidentForm.vue` (jusqu'ici couplés à un `boat: BoatShowDetail` complet) acceptent désormais un simple `boatId: number` — ils ne dépendaient que de l'id, ce qui permet de les réutiliser tels quels depuis un contexte flotte n'ayant pas chargé le détail complet des bateaux.
+- Nouveaux composants `inertia/components/navigation/QuickAddNavigationLogModal.vue` et `QuickAddIncidentModal.vue`.
+- `NavigationController` (logbook/incidents) et `HomeController` (dashboard) exposent désormais `portOptions`, `canCreateNavigationLogs` et `canCreateIncidents` (calculés via `user.hasPermission`, sans requête `Boat` supplémentaire) pour piloter l'affichage des boutons ; l'autorisation réelle à la création reste inchangée côté `NavigationLogsController`/`BoatIncidentsController`.
+- Périmètre volontairement limité au Journal de bord et aux Incidents dans cette PR : Tâches, Événements de maintenance et Carburant ont besoin des moteurs/voiles/gréement du bateau (non chargés au niveau flotte) et sont reportés à une PR de suivi ; le sous-point autocomplete sur le champ « Departure port » n'a pas été traité (le select référentiel existant fonctionne déjà, aucun composant autocomplete n'existe dans l'app).
+- **Tests** : `tests/inertia/navigation_log_form.spec.ts` (prop `boatId`), `tests/inertia/boat_incident_form.spec.ts`, `tests/inertia/quick_add_navigation_log_modal.spec.ts`, `tests/inertia/quick_add_incident_modal.spec.ts`, `tests/functional/navigation/quick_add_props.spec.ts`.
+
 ## 2026-07-17 — Refonte du menu latéral par groupes + correction du débordement (#363)
 
 Le menu latéral (desktop) débordait de la zone visible (692px de contenu pour 466px disponibles sur un écran 1280×720), rendant Carburant, Incidents et Paramètres inaccessibles sans un scroll interne peu perceptible ; sur mobile, le lien Paramètres était recouvert par le footer du drawer (positionné en `absolute`) et totalement inaccessible.

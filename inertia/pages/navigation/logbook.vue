@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { router } from '@inertiajs/vue3'
+import BaseButton from '~/components/base/BaseButton.vue'
 import BaseEmptyState from '~/components/base/BaseEmptyState.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import LogbookRow from '~/components/navigation/LogbookRow.vue'
 import NavigationBoatFilter from '~/components/navigation/NavigationBoatFilter.vue'
+import QuickAddNavigationLogModal from '~/components/navigation/QuickAddNavigationLogModal.vue'
 import { useT } from '~/composables/use_t'
+import type { NavigationLogPortOption } from '~/types/boat_show'
 import type { FleetBoatOption, FleetLogbookRow } from '../../../shared/types/navigation'
 
 const { t } = useT()
@@ -14,7 +17,11 @@ const props = defineProps<{
   logs: FleetLogbookRow[]
   boats: FleetBoatOption[]
   selectedBoatId: number | null
+  portOptions: NavigationLogPortOption[]
+  canCreateNavigationLogs: boolean
 }>()
+
+const showQuickAdd = ref(false)
 
 const totalCompleted = computed(() => props.logs.filter((l) => l.status === 'completed').length)
 const totalDistanceNm = computed(() => props.logs.reduce((acc, l) => acc + (l.distanceNm ?? 0), 0))
@@ -37,12 +44,30 @@ function onEmptyAction() {
         <BaseHeading level="1">{{ t('navigation.logbook.title') }}</BaseHeading>
         <p class="mt-2 text-fg-muted">{{ t('navigation.logbook.subtitle') }}</p>
       </div>
-      <NavigationBoatFilter
-        :boats="boats"
-        :selected-boat-id="selectedBoatId"
-        base-path="/navigation/logbook"
-      />
+      <div class="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+        <NavigationBoatFilter
+          :boats="boats"
+          :selected-boat-id="selectedBoatId"
+          base-path="/navigation/logbook"
+        />
+        <BaseButton
+          v-if="canCreateNavigationLogs && boats.length > 0"
+          variant="primary"
+          size="sm"
+          type="button"
+          @click="showQuickAdd = true"
+        >
+          {{ t('navigation.logbook.quickAdd') }}
+        </BaseButton>
+      </div>
     </header>
+
+    <QuickAddNavigationLogModal
+      v-model:open="showQuickAdd"
+      :boats="boats"
+      :port-options="portOptions"
+      :default-boat-id="selectedBoatId"
+    />
 
     <!-- Stats -->
     <div class="mt-8 grid grid-cols-3 gap-4">

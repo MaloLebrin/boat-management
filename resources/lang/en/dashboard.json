@@ -2,6 +2,10 @@
   "title": "Dashboard",
   "subtitle": "Overview of your fleet and upcoming maintenance.",
   "newBoat": "New boat",
+  "quickAdd": {
+    "logbook": "+ Logbook entry",
+    "incident": "+ Incident"
+  },
   "overdueAlert": "{count} overdue task(s)",
   "viewPlanning": "View planning",
   "analyzeFleet": "Analyze fleet",

@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { router } from '@inertiajs/vue3'
+import BaseButton from '~/components/base/BaseButton.vue'
 import BaseEmptyState from '~/components/base/BaseEmptyState.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import IncidentRow from '~/components/navigation/IncidentRow.vue'
 import NavigationBoatFilter from '~/components/navigation/NavigationBoatFilter.vue'
+import QuickAddIncidentModal from '~/components/navigation/QuickAddIncidentModal.vue'
 import { useT } from '~/composables/use_t'
 import type { FleetBoatOption, FleetIncidentRow } from '../../../shared/types/navigation'
 
@@ -14,7 +16,10 @@ const props = defineProps<{
   incidents: FleetIncidentRow[]
   boats: FleetBoatOption[]
   selectedBoatId: number | null
+  canCreateIncidents: boolean
 }>()
+
+const showQuickAdd = ref(false)
 
 const openCount = computed(() => props.incidents.filter((i) => i.status === 'open').length)
 const closedCount = computed(() => props.incidents.filter((i) => i.status === 'closed').length)
@@ -37,12 +42,29 @@ function onEmptyAction() {
         <BaseHeading level="1">{{ t('navigation.incidents.title') }}</BaseHeading>
         <p class="mt-2 text-fg-muted">{{ t('navigation.incidents.subtitle') }}</p>
       </div>
-      <NavigationBoatFilter
-        :boats="boats"
-        :selected-boat-id="selectedBoatId"
-        base-path="/navigation/incidents"
-      />
+      <div class="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+        <NavigationBoatFilter
+          :boats="boats"
+          :selected-boat-id="selectedBoatId"
+          base-path="/navigation/incidents"
+        />
+        <BaseButton
+          v-if="canCreateIncidents && boats.length > 0"
+          variant="primary"
+          size="sm"
+          type="button"
+          @click="showQuickAdd = true"
+        >
+          {{ t('navigation.incidents.quickAdd') }}
+        </BaseButton>
+      </div>
     </header>
+
+    <QuickAddIncidentModal
+      v-model:open="showQuickAdd"
+      :boats="boats"
+      :default-boat-id="selectedBoatId"
+    />
 
     <!-- Stats -->
     <div class="mt-8 grid grid-cols-3 gap-4">

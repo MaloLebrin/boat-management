@@ -6,15 +6,10 @@ import BaseInput from '~/components/base/BaseInput.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import { useT } from '~/composables/use_t'
-import type {
-  BoatIncidentRow,
-  BoatShowDetail,
-  IncidentStatus,
-  IncidentType,
-} from '~/types/boat_show'
+import type { BoatIncidentRow, IncidentStatus, IncidentType } from '~/types/boat_show'
 
 const props = defineProps<{
-  boat: BoatShowDetail
+  boatId: number
   editingIncident: BoatIncidentRow | null
 }>()
 
@@ -79,8 +74,8 @@ function toLocalDatetime(utcIso: string): string {
     <Form
       :action="{
         url: editingIncident
-          ? `/boats/${boat.id}/incidents/${editingIncident.id}`
-          : `/boats/${boat.id}/incidents`,
+          ? `/boats/${boatId}/incidents/${editingIncident.id}`
+          : `/boats/${boatId}/incidents`,
         method: editingIncident ? 'put' : 'post',
       }"
       #default="{ processing, errors }"
