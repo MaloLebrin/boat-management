@@ -18,7 +18,9 @@
   "subtitle": "Gérez les réservations de votre flotte",
   "fleet": {
     "title": "Calendrier des réservations",
-    "subtitle": "Vue multi-bateaux de toutes les réservations"
+    "subtitle": "Vue multi-bateaux de toutes les réservations",
+    "filterLabel": "Bateau",
+    "chooseBoat": "Choisir un bateau"
   },
   "status": {
     "option": "Option",
@@ -52,7 +54,8 @@
   "calendar": {
     "noReservations": "Aucune réservation ce mois-ci",
     "allBoats": "Tous les bateaux",
-    "more": "+ {count} de plus"
+    "more": "+ {count} de plus",
+    "scrollHint": "Faites défiler pour voir tout le mois"
   },
   "empty": {
     "title": "Aucune réservation",

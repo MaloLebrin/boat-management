@@ -32,10 +32,12 @@ defineEmits<{
         <p v-if="description" class="mt-1 text-sm text-fg-muted">
           {{ description }}
         </p>
-        <div v-if="actionLabel" class="mt-4">
-          <BaseButton size="sm" type="button" @click="$emit('action')">
-            {{ actionLabel }}
-          </BaseButton>
+        <div v-if="actionLabel || $slots.action" class="mt-4">
+          <slot name="action">
+            <BaseButton size="sm" type="button" @click="$emit('action')">
+              {{ actionLabel }}
+            </BaseButton>
+          </slot>
         </div>
       </div>
     </div>

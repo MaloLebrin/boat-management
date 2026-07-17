@@ -43,49 +43,83 @@ const row: BoatReservationRow = {
   linkedInvoices: [],
 }
 
+const boats = [
+  { id: 5, name: 'Mistral' },
+  { id: 6, name: 'Bora Bora' },
+]
+
 describe('FleetReservationList', () => {
   test('hides table when reservations list is empty', () => {
-    const wrapper = mount(FleetReservationList, { props: { reservations: [] } })
+    const wrapper = mount(FleetReservationList, {
+      props: { reservations: [], boats, selectedBoatId: null },
+    })
     expect(wrapper.find('table').exists()).toBe(false)
   })
 
+  test('shows a create-reservation action in the empty state', () => {
+    const wrapper = mount(FleetReservationList, {
+      props: { reservations: [], boats, selectedBoatId: null },
+    })
+    expect(wrapper.text()).toContain('reservations.form.createTitle')
+  })
+
+  test('links directly to the selected boat when a filter is active', () => {
+    const wrapper = mount(FleetReservationList, {
+      props: { reservations: [], boats, selectedBoatId: 6 },
+    })
+    const link = wrapper.find('a[href="/boats/6/reservations#reservation-form"]')
+    expect(link.exists()).toBe(true)
+  })
+
   test('renders one row per reservation', () => {
-    const wrapper = mount(FleetReservationList, { props: { reservations: [row] } })
+    const wrapper = mount(FleetReservationList, {
+      props: { reservations: [row], boats, selectedBoatId: null },
+    })
     expect(wrapper.findAll('tbody tr')).toHaveLength(1)
   })
 
   test('shows boat name and client name', () => {
-    const wrapper = mount(FleetReservationList, { props: { reservations: [row] } })
+    const wrapper = mount(FleetReservationList, {
+      props: { reservations: [row], boats, selectedBoatId: null },
+    })
     expect(wrapper.text()).toContain('Mistral')
     expect(wrapper.text()).toContain('Alice Martin')
   })
 
   test('shows formatted dates', () => {
-    const wrapper = mount(FleetReservationList, { props: { reservations: [row] } })
+    const wrapper = mount(FleetReservationList, {
+      props: { reservations: [row], boats, selectedBoatId: null },
+    })
     expect(wrapper.text()).toContain('2026-06-01')
     expect(wrapper.text()).toContain('2026-06-07')
   })
 
   test('shows price with euro sign', () => {
-    const wrapper = mount(FleetReservationList, { props: { reservations: [row] } })
+    const wrapper = mount(FleetReservationList, {
+      props: { reservations: [row], boats, selectedBoatId: null },
+    })
     expect(wrapper.text()).toContain('900 €')
   })
 
   test('shows dash when price is null', () => {
     const wrapper = mount(FleetReservationList, {
-      props: { reservations: [{ ...row, totalPrice: null }] },
+      props: { reservations: [{ ...row, totalPrice: null }], boats, selectedBoatId: null },
     })
     expect(wrapper.text()).toContain('—')
   })
 
   test('status badge receives correct status prop', () => {
-    const wrapper = mount(FleetReservationList, { props: { reservations: [row] } })
+    const wrapper = mount(FleetReservationList, {
+      props: { reservations: [row], boats, selectedBoatId: null },
+    })
     expect(wrapper.find('[data-status="confirmed"]').exists()).toBe(true)
   })
 
   test('renders multiple rows', () => {
     const row2: BoatReservationRow = { ...row, id: 2, boatName: 'Bora Bora', clientName: 'Bob' }
-    const wrapper = mount(FleetReservationList, { props: { reservations: [row, row2] } })
+    const wrapper = mount(FleetReservationList, {
+      props: { reservations: [row, row2], boats, selectedBoatId: null },
+    })
     expect(wrapper.findAll('tbody tr')).toHaveLength(2)
     expect(wrapper.text()).toContain('Bora Bora')
   })
@@ -95,7 +129,7 @@ describe('FleetReservationList', () => {
 
     test('shows the create-quote button and posts to the reservation route', async () => {
       const wrapper = mount(FleetReservationList, {
-        props: { reservations: [row], canCreateQuote: true },
+        props: { reservations: [row], boats, selectedBoatId: null, canCreateQuote: true },
       })
       const btn = wrapper
         .findAll('button')
@@ -111,7 +145,7 @@ describe('FleetReservationList', () => {
 
     test('hides the create-quote button when not enterprise', () => {
       const wrapper = mount(FleetReservationList, {
-        props: { reservations: [row], canCreateQuote: false },
+        props: { reservations: [row], boats, selectedBoatId: null, canCreateQuote: false },
       })
       const btn = wrapper
         .findAll('button')
@@ -123,6 +157,8 @@ describe('FleetReservationList', () => {
       const wrapper = mount(FleetReservationList, {
         props: {
           reservations: [{ ...row, linkedInvoices: [{ id: 42, number: 'DEV-000001' }] }],
+          boats,
+          selectedBoatId: null,
           canCreateQuote: true,
         },
       })

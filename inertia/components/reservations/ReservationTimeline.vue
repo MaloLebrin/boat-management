@@ -1,14 +1,18 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
+import BaseEmptyState from '~/components/base/BaseEmptyState.vue'
+import ReservationCreateButton from '~/components/reservations/ReservationCreateButton.vue'
 import ReservationTimelineRow from '~/components/reservations/ReservationTimelineRow.vue'
 import { useMonthNav } from '~/composables/use_month_nav'
 import { useT } from '~/composables/use_t'
-import type { FleetBoatCalendarEntry } from '~/types/reservation'
+import type { FleetBoatCalendarEntry, FleetBoatOption } from '~/types/reservation'
 
 const props = defineProps<{
   calendarEntries: FleetBoatCalendarEntry[]
+  boats: FleetBoatOption[]
+  selectedBoatId: number | null
 }>()
 
 const { t } = useT()
@@ -16,6 +20,28 @@ const { currentYear, currentMonth, prevMonth, nextMonth, monthLabel, daysInMonth
   useMonthNav()
 
 const days = computed(() => Array.from({ length: daysInMonth.value }, (_, i) => i + 1))
+
+const scrollEl = ref<HTMLElement | null>(null)
+const isScrollable = ref(false)
+
+function checkScrollable() {
+  const el = scrollEl.value
+  isScrollable.value = !!el && el.scrollWidth > el.clientWidth + 1
+}
+
+let resizeObserver: ResizeObserver | null = null
+
+onMounted(() => {
+  checkScrollable()
+  resizeObserver = new ResizeObserver(checkScrollable)
+  if (scrollEl.value) resizeObserver.observe(scrollEl.value)
+})
+
+onBeforeUnmount(() => {
+  resizeObserver?.disconnect()
+})
+
+watch(days, () => nextTick(checkScrollable))
 
 const monthStart = computed(
   () => `${currentYear.value}-${String(currentMonth.value + 1).padStart(2, '0')}-01`
@@ -74,39 +100,63 @@ const monthEnd = computed(
       </div>
     </template>
 
-    <div class="overflow-x-auto">
-      <div class="min-w-max">
-        <!-- Day headers -->
-        <div class="flex border-b border-border pb-2">
-          <div class="w-36 shrink-0" />
-          <div
-            v-for="day in days"
-            :key="day"
-            class="w-8 shrink-0 text-center text-xs text-fg-muted"
-            :class="isToday(day) ? 'font-bold text-navy-600' : ''"
-          >
-            {{ day }}
-            <span
-              v-if="isToday(day)"
-              class="mx-auto mt-0.5 block h-1 w-1 rounded-full bg-navy-500"
-            />
+    <BaseEmptyState
+      v-if="calendarEntries.length === 0"
+      :title="t('reservations.empty.title')"
+      :description="t('reservations.empty.fleetDescription')"
+    >
+      <template #action>
+        <ReservationCreateButton :boats="boats" :selected-boat-id="selectedBoatId" />
+      </template>
+    </BaseEmptyState>
+
+    <template v-else>
+      <p
+        v-if="isScrollable"
+        class="mb-2 flex items-center gap-1.5 text-xs text-fg-muted"
+        aria-hidden="true"
+      >
+        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M13 5l7 7-7 7M5 12h15"
+          />
+        </svg>
+        {{ t('reservations.calendar.scrollHint') }}
+      </p>
+
+      <div ref="scrollEl" class="overflow-x-auto">
+        <div class="min-w-max">
+          <!-- Day headers -->
+          <div class="flex border-b border-border pb-2">
+            <div class="w-36 shrink-0" />
+            <div
+              v-for="day in days"
+              :key="day"
+              class="w-8 shrink-0 text-center text-xs text-fg-muted"
+              :class="isToday(day) ? 'font-bold text-navy-600' : ''"
+            >
+              {{ day }}
+              <span
+                v-if="isToday(day)"
+                class="mx-auto mt-0.5 block h-1 w-1 rounded-full bg-navy-500"
+              />
+            </div>
           </div>
-        </div>
 
-        <!-- Boat rows -->
-        <ReservationTimelineRow
-          v-for="entry in calendarEntries"
-          :key="entry.boatId"
-          :entry="entry"
-          :days="days"
-          :month-start="monthStart"
-          :month-end="monthEnd"
-        />
-
-        <div v-if="calendarEntries.length === 0" class="py-8 text-center text-sm text-fg-muted">
-          {{ t('reservations.empty.fleetDescription') }}
+          <!-- Boat rows -->
+          <ReservationTimelineRow
+            v-for="entry in calendarEntries"
+            :key="entry.boatId"
+            :entry="entry"
+            :days="days"
+            :month-start="monthStart"
+            :month-end="monthEnd"
+          />
         </div>
       </div>
-    </div>
+    </template>
   </BaseCard>
 </template>
