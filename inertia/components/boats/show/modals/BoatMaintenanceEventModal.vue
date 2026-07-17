@@ -76,7 +76,7 @@ function close() {
 <template>
   <BaseModal
     :open="open"
-    :title="t('boats.maintenance.events.addEntry')"
+    :title="t('boats.maintenance.events.addEvent')"
     :subtitle="`${boat.name} · ${t('boats.maintenance.events.subtitle') || 'Enregistrement immuable une fois sauvegardé'}`"
     close-label="Annuler"
     size="xl"
@@ -204,7 +204,7 @@ function close() {
           {{ t('boats.maintenance.tasks.cancel') }}
         </BaseButton>
         <BaseButton type="submit" :disabled="processing || (subject === 'rig' && !boat.rig)">
-          {{ t('boats.maintenance.events.createEntry') }}
+          {{ t('boats.maintenance.events.createEvent') }}
         </BaseButton>
       </div>
     </Form>

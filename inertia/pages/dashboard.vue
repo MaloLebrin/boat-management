@@ -6,7 +6,7 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseSkeleton from '~/components/base/BaseSkeleton.vue'
 import BaseStatCard from '~/components/base/BaseStatCard.vue'
-import MarinaDashboardCard from '~/components/dashboard/MarinaDashboardCard.vue'
+import PortDashboardCard from '~/components/dashboard/PortDashboardCard.vue'
 import UpgradePlanModal from '~/components/base/UpgradePlanModal.vue'
 import DashboardQuickAddActions from '~/components/dashboard/DashboardQuickAddActions.vue'
 import type {
@@ -261,7 +261,7 @@ function dismissAlert() {
     </div>
 
     <div class="mt-8">
-      <MarinaDashboardCard :ports="ports" :port-stats="portStats" />
+      <PortDashboardCard :ports="ports" :port-stats="portStats" />
     </div>
 
     <div class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_16rem]">

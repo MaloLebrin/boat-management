@@ -128,11 +128,7 @@ const activeNavigationLog = computed(
   <div class="w-full max-w-7xl px-6 py-10 sm:px-8">
     <BaseBreadcrumb
       class="mb-4"
-      :items="[
-        { label: t('boats.show.breadcrumbFleet'), href: '/boats' },
-        { label: t('nav.boats') },
-        { label: boat.name },
-      ]"
+      :items="[{ label: t('boats.show.breadcrumbFleet'), href: '/boats' }, { label: boat.name }]"
     />
 
     <!-- Header -->
@@ -165,7 +161,7 @@ const activeNavigationLog = computed(
             :can-manage-equipment="canManageEquipment"
             :can-create-navigation-logs="canCreateNavigationLogs"
             :can-export="canExport"
-            @add-entry="openHistoryTab"
+            @add-event="openHistoryTab"
             @add-task="openTasksTab"
             @add-equipment="openEquipmentTab"
             @add-navigation-log="openNavigationLogTab"

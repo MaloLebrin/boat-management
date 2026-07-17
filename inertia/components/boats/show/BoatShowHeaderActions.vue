@@ -13,7 +13,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  addEntry: []
+  addEvent: []
   addTask: []
   addEquipment: []
   addNavigationLog: []
@@ -38,9 +38,9 @@ const menuItemClass =
         type="button"
         role="menuitem"
         :class="menuItemClass"
-        @click="(emit('addEntry'), close())"
+        @click="(emit('addEvent'), close())"
       >
-        {{ t('boats.show.addMenu.entry') }}
+        {{ t('boats.show.addMenu.event') }}
       </button>
       <button
         v-if="canManageMaintenance"
