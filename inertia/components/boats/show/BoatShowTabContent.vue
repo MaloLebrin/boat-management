@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import BaseSkeleton from '~/components/base/BaseSkeleton.vue'
 import BoatShowTabAdminDocs from '~/components/boats/show/tabs/BoatShowTabAdminDocs.vue'
 import BoatShowTabDocuments from '~/components/boats/show/tabs/BoatShowTabDocuments.vue'
 import BoatShowTabEquipment from '~/components/boats/show/tabs/BoatShowTabEquipment.vue'
@@ -35,6 +36,7 @@ type TabKey =
 
 defineProps<{
   tab: TabKey
+  isLoading: boolean
   boat: BoatShowDetail
   maintenanceEvents: MaintenanceEventRow[]
   maintenanceTasks: MaintenanceTaskRow[]
@@ -59,7 +61,14 @@ defineEmits<{ goToTab: [key: string]; createIntentConsumed: [] }>()
 
 <template>
   <Transition name="tab" mode="out-in">
-    <div :key="tab" class="mt-8">
+    <div v-if="isLoading" key="loading" class="mt-8 space-y-4" data-testid="tab-content-skeleton">
+      <BaseSkeleton height-class="h-8" width-class="w-48" />
+      <BaseSkeleton height-class="h-32" />
+      <BaseSkeleton height-class="h-32" />
+      <BaseSkeleton height-class="h-32" />
+    </div>
+
+    <div v-else :key="tab" class="mt-8">
       <BoatShowTabOverview
         v-if="tab === 'overview'"
         :boat="boat"

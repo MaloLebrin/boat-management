@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseBreadcrumb from '~/components/base/BaseBreadcrumb.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
@@ -131,8 +131,23 @@ const tabs = computed(() => [
   },
 ])
 
-function goToTab(key: TabKey | string) {
-  tab.value = key as TabKey
+// Un skeleton s'affiche immédiatement au clic, le temps que le navigateur peigne
+// la frame avant de monter le contenu (souvent lourd) du nouvel onglet (#361).
+const isTabLoading = ref(false)
+
+function nextFrame(): Promise<void> {
+  return new Promise((resolve) => requestAnimationFrame(() => resolve()))
+}
+
+async function goToTab(key: TabKey | string) {
+  const nextTab = key as TabKey
+  if (nextTab === tab.value) return
+  isTabLoading.value = true
+  await nextTick()
+  await nextFrame()
+  tab.value = nextTab
+  await nextTick()
+  isTabLoading.value = false
 }
 
 function openHistoryTab() {
@@ -225,12 +240,13 @@ function onCreateIntentConsumed() {
         </div>
       </div>
 
-      <BaseTabs v-model="tab" :tabs="tabs" />
+      <BaseTabs :model-value="tab" :tabs="tabs" @update:model-value="goToTab" />
     </header>
 
     <BoatShowTabContent
       :tab="tab"
       v-bind="props"
+      :is-loading="isTabLoading"
       :create-intent="createIntent"
       @go-to-tab="goToTab"
       @create-intent-consumed="onCreateIntentConsumed"
