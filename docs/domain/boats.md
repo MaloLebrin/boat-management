@@ -47,7 +47,8 @@ Référence routes: `start/routes/boats.ts`.
     - `inertia/components/boats/engine/BoatShowEnginesCard.vue`
     - `inertia/components/boats/sail/BoatShowSailsCard.vue`
     - `inertia/components/boats/rig/BoatShowRigCard.vue`
-    - `inertia/components/boats/maintenance/BoatShowMaintenanceSection.vue`
+    - `inertia/components/boats/show/tabs/BoatShowTabTasks.vue`
+    - `inertia/components/boats/show/tabs/BoatShowTabHistory.vue`
 - `GET /boats/:id/edit` (`boats.edit`)
   - Controller: `BoatsController.edit`
   - Page: `inertia/pages/boats/edit.vue`
