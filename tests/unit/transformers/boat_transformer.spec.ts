@@ -1,12 +1,6 @@
 import { test } from '@japa/runner'
 import { DateTime } from 'luxon'
-import {
-  toEditForm,
-  toManageProps,
-  toNavigationProps,
-  type BoatManageContext,
-  type BoatNavigationContext,
-} from '#transformers/boat_transformer'
+import { toEditForm, toShowProps, type BoatShowContext } from '#transformers/boat_transformer'
 import type Boat from '#models/boat'
 import type BoatPositionHistory from '#models/boat_position_history'
 import type BoatEngine from '#models/boat_engine'
@@ -274,7 +268,7 @@ function makeNavigationLog(
   } as unknown as NavigationLog
 }
 
-function makeManageContext(overrides: Partial<BoatManageContext> = {}): BoatManageContext {
+function makeShowContext(overrides: Partial<BoatShowContext> = {}): BoatShowContext {
   return {
     positionHistory: [],
     boatMedia: [],
@@ -293,22 +287,11 @@ function makeManageContext(overrides: Partial<BoatManageContext> = {}): BoatMana
     equipmentActions: [],
     canManageEquipmentActions: false,
     canDeleteEquipmentActions: false,
-    ...overrides,
-  }
-}
-
-function makeNavigationContext(
-  overrides: Partial<BoatNavigationContext> = {}
-): BoatNavigationContext {
-  return {
-    positionHistory: [],
-    boatMedia: [],
     incidents: [],
     fuelLogs: [],
     navigationLogs: [],
     portOptions: [],
     crewMemberOptions: [],
-    canManageMaintenance: true,
     canDeleteIncidents: false,
     canCreateFuelLogs: true,
     canDeleteFuelLogs: false,
@@ -370,13 +353,13 @@ test.group('toEditForm', () => {
   })
 })
 
-// ---- toManageProps ----
+// ---- toShowProps (maintenance/equipment) ----
 
-test.group('toManageProps', () => {
+test.group('toShowProps — maintenance/equipment fields', () => {
   test('returns the expected top-level keys', ({ assert }) => {
     const boat = makeBoat()
-    const ctx = makeManageContext()
-    const result = toManageProps(boat, ctx)
+    const ctx = makeShowContext()
+    const result = toShowProps(boat, ctx)
 
     assert.property(result, 'boat')
     assert.property(result, 'maintenanceEvents')
@@ -392,8 +375,8 @@ test.group('toManageProps', () => {
 
   test('empty arrays map to empty arrays', ({ assert }) => {
     const boat = makeBoat()
-    const ctx = makeManageContext()
-    const result = toManageProps(boat, ctx)
+    const ctx = makeShowContext()
+    const result = toShowProps(boat, ctx)
 
     assert.lengthOf(result.maintenanceEvents, 0)
     assert.lengthOf(result.maintenanceTasks, 0)
@@ -402,37 +385,37 @@ test.group('toManageProps', () => {
 
   test('canManageMaintenance is passed through', ({ assert }) => {
     const boat = makeBoat()
-    const ctx = makeManageContext({ canManageMaintenance: false })
-    const result = toManageProps(boat, ctx)
+    const ctx = makeShowContext({ canManageMaintenance: false })
+    const result = toShowProps(boat, ctx)
     assert.isFalse(result.canManageMaintenance)
   })
 
   test('aiSuggestions null stays null', ({ assert }) => {
     const boat = makeBoat()
-    const ctx = makeManageContext({ aiSuggestions: null })
-    const result = toManageProps(boat, ctx)
+    const ctx = makeShowContext({ aiSuggestions: null })
+    const result = toShowProps(boat, ctx)
     assert.isNull(result.aiSuggestions)
   })
 
   test('boat.spot null maps to null in boat detail', ({ assert }) => {
     const boat = makeBoat({ spot: null as unknown as Boat['spot'] })
-    const ctx = makeManageContext()
-    const result = toManageProps(boat, ctx)
+    const ctx = makeShowContext()
+    const result = toShowProps(boat, ctx)
     assert.isNull(result.boat.spot)
   })
 
   test('boat.rig null maps to null in boat detail', ({ assert }) => {
     const boat = makeBoat({ rig: null as unknown as Boat['rig'] })
-    const ctx = makeManageContext()
-    const result = toManageProps(boat, ctx)
+    const ctx = makeShowContext()
+    const result = toShowProps(boat, ctx)
     assert.isNull(result.boat.rig)
   })
 
   test('engines are mapped with correct keys', ({ assert }) => {
     const engine = makeEngine()
     const boat = makeBoat({ engines: [engine] as unknown as Boat['engines'] })
-    const ctx = makeManageContext()
-    const result = toManageProps(boat, ctx)
+    const ctx = makeShowContext()
+    const result = toShowProps(boat, ctx)
 
     assert.lengthOf(result.boat.engines, 1)
     assert.equal(result.boat.engines[0]!.id, 1)
@@ -443,16 +426,16 @@ test.group('toManageProps', () => {
   test('engine with null manufacturedAt maps to null', ({ assert }) => {
     const engine = makeEngine({ manufacturedAt: null })
     const boat = makeBoat({ engines: [engine] as unknown as Boat['engines'] })
-    const ctx = makeManageContext()
-    const result = toManageProps(boat, ctx)
+    const ctx = makeShowContext()
+    const result = toShowProps(boat, ctx)
     assert.isNull(result.boat.engines[0]!.manufacturedAt)
   })
 
   test('sails are mapped with correct keys', ({ assert }) => {
     const sail = makeSail()
     const boat = makeBoat({ sails: [sail] as unknown as Boat['sails'] })
-    const ctx = makeManageContext()
-    const result = toManageProps(boat, ctx)
+    const ctx = makeShowContext()
+    const result = toShowProps(boat, ctx)
 
     assert.lengthOf(result.boat.sails, 1)
     assert.equal(result.boat.sails[0]!.id, 1)
@@ -462,8 +445,8 @@ test.group('toManageProps', () => {
   test('rig present maps rigType', ({ assert }) => {
     const rig = makeRig()
     const boat = makeBoat({ rig: rig as unknown as Boat['rig'] })
-    const ctx = makeManageContext()
-    const result = toManageProps(boat, ctx)
+    const ctx = makeShowContext()
+    const result = toShowProps(boat, ctx)
 
     assert.isNotNull(result.boat.rig)
     assert.equal(result.boat.rig!.rigType, 'sloop')
@@ -473,16 +456,16 @@ test.group('toManageProps', () => {
   test('rig with null manufacturedAt maps to null', ({ assert }) => {
     const rig = makeRig({ manufacturedAt: null })
     const boat = makeBoat({ rig: rig as unknown as Boat['rig'] })
-    const ctx = makeManageContext()
-    const result = toManageProps(boat, ctx)
+    const ctx = makeShowContext()
+    const result = toShowProps(boat, ctx)
     assert.isNull(result.boat.rig!.manufacturedAt)
   })
 
   test('safetyEquipment is mapped correctly', ({ assert }) => {
     const item = makeSafetyItem()
     const boat = makeBoat({ safetyEquipment: [item] as unknown as Boat['safetyEquipment'] })
-    const ctx = makeManageContext()
-    const result = toManageProps(boat, ctx)
+    const ctx = makeShowContext()
+    const result = toShowProps(boat, ctx)
 
     assert.lengthOf(result.boat.safetyEquipment, 1)
     assert.equal(result.boat.safetyEquipment[0]!.id, 1)
@@ -493,16 +476,16 @@ test.group('toManageProps', () => {
   test('safetyEquipment expiryDate null maps to null', ({ assert }) => {
     const item = makeSafetyItem({ expiryDate: null })
     const boat = makeBoat({ safetyEquipment: [item] as unknown as Boat['safetyEquipment'] })
-    const ctx = makeManageContext()
-    const result = toManageProps(boat, ctx)
+    const ctx = makeShowContext()
+    const result = toShowProps(boat, ctx)
     assert.isNull(result.boat.safetyEquipment[0]!.expiryDate)
   })
 
   test('genericEquipment is mapped correctly', ({ assert }) => {
     const item = makeGenericItem()
     const boat = makeBoat({ genericEquipment: [item] as unknown as Boat['genericEquipment'] })
-    const ctx = makeManageContext()
-    const result = toManageProps(boat, ctx)
+    const ctx = makeShowContext()
+    const result = toShowProps(boat, ctx)
 
     assert.lengthOf(result.boat.genericEquipment, 1)
     assert.equal(result.boat.genericEquipment[0]!.name, 'VHF Radio')
@@ -510,10 +493,10 @@ test.group('toManageProps', () => {
 
   test('maintenance events are mapped', ({ assert }) => {
     const event = makeMaintenanceEvent()
-    const ctx = makeManageContext({
-      maintenanceEvents: [event] as unknown as BoatManageContext['maintenanceEvents'],
+    const ctx = makeShowContext({
+      maintenanceEvents: [event] as unknown as BoatShowContext['maintenanceEvents'],
     })
-    const result = toManageProps(makeBoat(), ctx)
+    const result = toShowProps(makeBoat(), ctx)
 
     assert.lengthOf(result.maintenanceEvents, 1)
     assert.equal(result.maintenanceEvents[0]!.id, 1)
@@ -523,10 +506,10 @@ test.group('toManageProps', () => {
 
   test('maintenance tasks are mapped', ({ assert }) => {
     const task = makeMaintenanceTask()
-    const ctx = makeManageContext({
-      maintenanceTasks: [task] as unknown as BoatManageContext['maintenanceTasks'],
+    const ctx = makeShowContext({
+      maintenanceTasks: [task] as unknown as BoatShowContext['maintenanceTasks'],
     })
-    const result = toManageProps(makeBoat(), ctx)
+    const result = toShowProps(makeBoat(), ctx)
 
     assert.lengthOf(result.maintenanceTasks, 1)
     assert.equal(result.maintenanceTasks[0]!.dueAt, '2026-12-01')
@@ -534,10 +517,10 @@ test.group('toManageProps', () => {
 
   test('maintenance sheets are mapped', ({ assert }) => {
     const sheet = makeMaintenanceSheet()
-    const ctx = makeManageContext({
-      maintenanceSheets: [sheet] as unknown as BoatManageContext['maintenanceSheets'],
+    const ctx = makeShowContext({
+      maintenanceSheets: [sheet] as unknown as BoatShowContext['maintenanceSheets'],
     })
-    const result = toManageProps(makeBoat(), ctx)
+    const result = toShowProps(makeBoat(), ctx)
 
     assert.lengthOf(result.maintenanceSheets, 1)
     assert.equal(result.maintenanceSheets[0]!.type, 'entretien')
@@ -545,21 +528,21 @@ test.group('toManageProps', () => {
 
   test('media from context is included in boat.media', ({ assert }) => {
     const media = makeMedia()
-    const ctx = makeManageContext({ boatMedia: [media] as unknown as Media[] })
-    const result = toManageProps(makeBoat(), ctx)
+    const ctx = makeShowContext({ boatMedia: [media] as unknown as Media[] })
+    const result = toShowProps(makeBoat(), ctx)
 
     assert.lengthOf(result.boat.media, 1)
     assert.equal(result.boat.media[0]!.id, 1)
   })
 })
 
-// ---- toNavigationProps ----
+// ---- toShowProps (navigation) ----
 
-test.group('toNavigationProps', () => {
+test.group('toShowProps — navigation fields', () => {
   test('returns the expected top-level keys', ({ assert }) => {
     const boat = makeBoat()
-    const ctx = makeNavigationContext()
-    const result = toNavigationProps(boat, ctx)
+    const ctx = makeShowContext()
+    const result = toShowProps(boat, ctx)
 
     assert.property(result, 'boat')
     assert.property(result, 'incidents')
@@ -573,8 +556,8 @@ test.group('toNavigationProps', () => {
 
   test('latestGpsPosition is null when positionHistory is empty', ({ assert }) => {
     const boat = makeBoat()
-    const ctx = makeNavigationContext({ positionHistory: [] })
-    const result = toNavigationProps(boat, ctx)
+    const ctx = makeShowContext({ positionHistory: [] })
+    const result = toShowProps(boat, ctx)
     assert.isNull(result.latestGpsPosition)
   })
 
@@ -589,10 +572,10 @@ test.group('toNavigationProps', () => {
       latitude: 43.5,
       endedAt: DateTime.fromISO('2026-06-30'),
     })
-    const ctx = makeNavigationContext({
+    const ctx = makeShowContext({
       positionHistory: [closed, active] as unknown as BoatPositionHistory[],
     })
-    const result = toNavigationProps(makeBoat(), ctx)
+    const result = toShowProps(makeBoat(), ctx)
     assert.isNotNull(result.latestGpsPosition)
     assert.equal(result.latestGpsPosition!.id, 2)
   })
@@ -610,29 +593,29 @@ test.group('toNavigationProps', () => {
       latitude: 43.6,
       endedAt: DateTime.fromISO('2026-06-15'),
     })
-    const ctx = makeNavigationContext({
+    const ctx = makeShowContext({
       positionHistory: [old1, old2] as unknown as BoatPositionHistory[],
     })
-    const result = toNavigationProps(makeBoat(), ctx)
+    const result = toShowProps(makeBoat(), ctx)
     assert.isNotNull(result.latestGpsPosition)
     assert.equal(result.latestGpsPosition!.id, 1)
   })
 
   test('latestGpsPosition is null when all entries have null latitude', ({ assert }) => {
     const noLat = makePositionHistory({ latitude: null })
-    const ctx = makeNavigationContext({
+    const ctx = makeShowContext({
       positionHistory: [noLat] as unknown as BoatPositionHistory[],
     })
-    const result = toNavigationProps(makeBoat(), ctx)
+    const result = toShowProps(makeBoat(), ctx)
     assert.isNull(result.latestGpsPosition)
   })
 
   test('fuelLogs numeric-string fields are parsed as floats', ({ assert }) => {
     const fuelLog = makeFuelLog()
-    const ctx = makeNavigationContext({
+    const ctx = makeShowContext({
       fuelLogs: [fuelLog] as unknown as BoatFuelLog[],
     })
-    const result = toNavigationProps(makeBoat(), ctx)
+    const result = toShowProps(makeBoat(), ctx)
 
     assert.lengthOf(result.fuelLogs, 1)
     assert.equal(result.fuelLogs[0]!.quantityLiters, 50)
@@ -647,10 +630,10 @@ test.group('toNavigationProps', () => {
       totalCost: null,
       engineHoursAtFueling: null,
     })
-    const ctx = makeNavigationContext({
+    const ctx = makeShowContext({
       fuelLogs: [fuelLog] as unknown as BoatFuelLog[],
     })
-    const result = toNavigationProps(makeBoat(), ctx)
+    const result = toShowProps(makeBoat(), ctx)
     assert.isNull(result.fuelLogs[0]!.pricePerLiter)
     assert.isNull(result.fuelLogs[0]!.totalCost)
     assert.isNull(result.fuelLogs[0]!.engineHoursAtFueling)
@@ -658,10 +641,10 @@ test.group('toNavigationProps', () => {
 
   test('navigationLog with preloaded crew false maps crew to empty array', ({ assert }) => {
     const log = makeNavigationLog({ $preloaded: { crew: false }, crew: [] })
-    const ctx = makeNavigationContext({
+    const ctx = makeShowContext({
       navigationLogs: [log] as unknown as NavigationLog[],
     })
-    const result = toNavigationProps(makeBoat(), ctx)
+    const result = toShowProps(makeBoat(), ctx)
 
     assert.lengthOf(result.navigationLogs, 1)
     assert.lengthOf(result.navigationLogs[0]!.crew, 0)
@@ -672,10 +655,10 @@ test.group('toNavigationProps', () => {
       $preloaded: { crew: false },
       crew: [{ id: 1, fullName: 'Bob' } as unknown as NavigationLog['crew'][number]],
     })
-    const ctx = makeNavigationContext({
+    const ctx = makeShowContext({
       navigationLogs: [log] as unknown as NavigationLog[],
     })
-    const result = toNavigationProps(makeBoat(), ctx)
+    const result = toShowProps(makeBoat(), ctx)
     assert.lengthOf(result.navigationLogs[0]!.crew, 0)
   })
 
@@ -690,10 +673,10 @@ test.group('toNavigationProps', () => {
       $preloaded: { crew: true },
       crew: [crewMember],
     })
-    const ctx = makeNavigationContext({
+    const ctx = makeShowContext({
       navigationLogs: [log] as unknown as NavigationLog[],
     })
-    const result = toNavigationProps(makeBoat(), ctx)
+    const result = toShowProps(makeBoat(), ctx)
 
     assert.lengthOf(result.navigationLogs[0]!.crew, 1)
     assert.equal(result.navigationLogs[0]!.crew[0]!.crewMemberId, 5)
@@ -709,10 +692,10 @@ test.group('toNavigationProps', () => {
       fuelConsumedLiters: null,
       arrivedAt: null,
     })
-    const ctx = makeNavigationContext({
+    const ctx = makeShowContext({
       navigationLogs: [log] as unknown as NavigationLog[],
     })
-    const result = toNavigationProps(makeBoat(), ctx)
+    const result = toShowProps(makeBoat(), ctx)
 
     assert.isNull(result.navigationLogs[0]!.distanceNm)
     assert.isNull(result.navigationLogs[0]!.engineHoursStart)
@@ -728,10 +711,10 @@ test.group('toNavigationProps', () => {
       engineHoursEnd: '102.5',
       fuelConsumedLiters: '5.0',
     })
-    const ctx = makeNavigationContext({
+    const ctx = makeShowContext({
       navigationLogs: [log] as unknown as NavigationLog[],
     })
-    const result = toNavigationProps(makeBoat(), ctx)
+    const result = toShowProps(makeBoat(), ctx)
 
     assert.equal(result.navigationLogs[0]!.distanceNm, 20.5)
     assert.equal(result.navigationLogs[0]!.engineHoursStart, 100)
@@ -741,10 +724,10 @@ test.group('toNavigationProps', () => {
 
   test('incidents are mapped correctly', ({ assert }) => {
     const incident = makeIncident()
-    const ctx = makeNavigationContext({
+    const ctx = makeShowContext({
       incidents: [incident] as unknown as BoatIncident[],
     })
-    const result = toNavigationProps(makeBoat(), ctx)
+    const result = toShowProps(makeBoat(), ctx)
 
     assert.lengthOf(result.incidents, 1)
     assert.equal(result.incidents[0]!.id, 1)
@@ -754,19 +737,19 @@ test.group('toNavigationProps', () => {
 
   test('incident closedAt present returns ISO string', ({ assert }) => {
     const incident = makeIncident({ closedAt: DateTime.fromISO('2026-07-01T00:00:00.000Z') })
-    const ctx = makeNavigationContext({
+    const ctx = makeShowContext({
       incidents: [incident] as unknown as BoatIncident[],
     })
-    const result = toNavigationProps(makeBoat(), ctx)
+    const result = toShowProps(makeBoat(), ctx)
     assert.isString(result.incidents[0]!.closedAt)
   })
 
   test('positionHistory entries have latitude/longitude as numbers', ({ assert }) => {
     const pos = makePositionHistory({ latitude: 43.7, longitude: 7.25 })
-    const ctx = makeNavigationContext({
+    const ctx = makeShowContext({
       positionHistory: [pos] as unknown as BoatPositionHistory[],
     })
-    const result = toNavigationProps(makeBoat(), ctx)
+    const result = toShowProps(makeBoat(), ctx)
 
     assert.equal(result.positionHistory[0]!.latitude, 43.7)
     assert.equal(result.positionHistory[0]!.longitude, 7.25)
@@ -774,20 +757,20 @@ test.group('toNavigationProps', () => {
 
   test('positionHistory latitude null maps to null', ({ assert }) => {
     const pos = makePositionHistory({ latitude: null, longitude: null })
-    const ctx = makeNavigationContext({
+    const ctx = makeShowContext({
       positionHistory: [pos] as unknown as BoatPositionHistory[],
     })
-    const result = toNavigationProps(makeBoat(), ctx)
+    const result = toShowProps(makeBoat(), ctx)
     assert.isNull(result.positionHistory[0]!.latitude)
     assert.isNull(result.positionHistory[0]!.longitude)
   })
 
   test('positionHistory endedAt null maps to null', ({ assert }) => {
     const pos = makePositionHistory({ endedAt: null })
-    const ctx = makeNavigationContext({
+    const ctx = makeShowContext({
       positionHistory: [pos] as unknown as BoatPositionHistory[],
     })
-    const result = toNavigationProps(makeBoat(), ctx)
+    const result = toShowProps(makeBoat(), ctx)
     assert.isNull(result.positionHistory[0]!.endedAt)
   })
 })

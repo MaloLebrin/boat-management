@@ -4,8 +4,12 @@ import BoatShowTabAdminDocs from '~/components/boats/show/tabs/BoatShowTabAdminD
 import BoatShowTabDocuments from '~/components/boats/show/tabs/BoatShowTabDocuments.vue'
 import BoatShowTabEquipment from '~/components/boats/show/tabs/BoatShowTabEquipment.vue'
 import BoatShowTabEquipmentActions from '~/components/boats/show/tabs/BoatShowTabEquipmentActions.vue'
+import BoatShowTabFuelLogs from '~/components/boats/show/tabs/BoatShowTabFuelLogs.vue'
 import BoatShowTabHistory from '~/components/boats/show/tabs/BoatShowTabHistory.vue'
+import BoatShowTabIncidents from '~/components/boats/show/tabs/BoatShowTabIncidents.vue'
+import BoatShowTabNavigationLogs from '~/components/boats/show/tabs/BoatShowTabNavigationLogs.vue'
 import BoatShowTabOverview from '~/components/boats/show/tabs/BoatShowTabOverview.vue'
+import BoatShowTabPosition from '~/components/boats/show/tabs/BoatShowTabPosition.vue'
 import BoatShowTabPricing from '~/components/boats/show/tabs/BoatShowTabPricing.vue'
 import BoatShowTabSheets from '~/components/boats/show/tabs/BoatShowTabSheets.vue'
 import BoatShowTabSpecs from '~/components/boats/show/tabs/BoatShowTabSpecs.vue'
@@ -15,12 +19,18 @@ import type {
   BoatCreateIntent,
   BoatDocumentRow,
   BoatEquipmentActionRow,
+  BoatIncidentRow,
+  BoatPositionHistoryRow,
   BoatShowDetail,
+  FuelLogRow,
   MaintenanceEventRow,
   MaintenanceSheetRow,
   MaintenanceTaskRow,
+  NavigationLogPortOption,
+  NavigationLogRow,
 } from '~/types/boat_show'
 import type { BoatPricingRow } from '../../../../shared/types/boat_pricing'
+import type { CrewMemberOption } from '../../../../shared/types/crew'
 
 type TabKey =
   | 'overview'
@@ -33,6 +43,10 @@ type TabKey =
   | 'documents'
   | 'sheets'
   | 'admin-docs'
+  | 'navigation-logs'
+  | 'fuel'
+  | 'incidents'
+  | 'position'
 
 defineProps<{
   tab: TabKey
@@ -43,11 +57,24 @@ defineProps<{
   maintenanceSheets: MaintenanceSheetRow[]
   boatDocuments: BoatDocumentRow[]
   equipmentActions: BoatEquipmentActionRow[]
+  incidents: BoatIncidentRow[]
+  fuelLogs: FuelLogRow[]
+  navigationLogs: NavigationLogRow[]
+  portOptions: NavigationLogPortOption[]
+  crewMemberOptions: CrewMemberOption[]
+  positionHistory: BoatPositionHistoryRow[]
+  latestGpsPosition: BoatPositionHistoryRow | null
   canManageMaintenance: boolean
   canManageEquipment: boolean
   canManageDocuments: boolean
   canManageEquipmentActions: boolean
   canDeleteEquipmentActions: boolean
+  canDeleteIncidents: boolean
+  canCreateFuelLogs: boolean
+  canDeleteFuelLogs: boolean
+  canCreateNavigationLogs: boolean
+  canUpdateNavigationLogs: boolean
+  canDeleteNavigationLogs: boolean
   canExport: boolean
   aiSuggestions: AiSuggestion[] | null
   createIntent: BoatCreateIntent
@@ -93,6 +120,8 @@ defineEmits<{ goToTab: [key: string]; createIntentConsumed: [] }>()
         :boat="boat"
         :can-manage-equipment="canManageEquipment"
         :can-manage-actions="canManageEquipmentActions"
+        :create-intent="createIntent"
+        @create-intent-consumed="$emit('createIntentConsumed')"
       />
 
       <BoatShowTabEquipmentActions
@@ -140,6 +169,43 @@ defineEmits<{ goToTab: [key: string]; createIntentConsumed: [] }>()
         :boat="boat"
         :boat-documents="boatDocuments"
         :can-manage="canManageDocuments"
+      />
+
+      <BoatShowTabNavigationLogs
+        v-else-if="tab === 'navigation-logs'"
+        :boat="boat"
+        :navigation-logs="navigationLogs"
+        :port-options="portOptions"
+        :crew-member-options="crewMemberOptions"
+        :can-create="canCreateNavigationLogs"
+        :can-update="canUpdateNavigationLogs"
+        :can-delete="canDeleteNavigationLogs"
+        :create-intent="createIntent"
+        @create-intent-consumed="$emit('createIntentConsumed')"
+      />
+
+      <BoatShowTabFuelLogs
+        v-else-if="tab === 'fuel'"
+        :boat="boat"
+        :fuel-logs="fuelLogs"
+        :can-manage="canCreateFuelLogs"
+        :can-delete="canDeleteFuelLogs"
+      />
+
+      <BoatShowTabIncidents
+        v-else-if="tab === 'incidents'"
+        :boat="boat"
+        :incidents="incidents"
+        :can-manage="canManageMaintenance"
+        :can-delete="canDeleteIncidents"
+      />
+
+      <BoatShowTabPosition
+        v-else-if="tab === 'position'"
+        :boat-id="boat.id"
+        :position-history="positionHistory"
+        :latest-gps-position="latestGpsPosition"
+        :can-manage="canManageMaintenance"
       />
     </div>
   </Transition>

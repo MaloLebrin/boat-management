@@ -33,6 +33,19 @@ const baseProps = {
   pricing: null,
   pricingEnabled: false,
   canManagePricing: false,
+  incidents: [],
+  fuelLogs: [],
+  navigationLogs: [],
+  portOptions: [],
+  crewMemberOptions: [],
+  positionHistory: [],
+  latestGpsPosition: null,
+  canDeleteIncidents: true,
+  canCreateFuelLogs: true,
+  canDeleteFuelLogs: true,
+  canCreateNavigationLogs: true,
+  canUpdateNavigationLogs: true,
+  canDeleteNavigationLogs: true,
 } as never
 
 describe('boats/show — deep-link ?tab= (#359)', () => {

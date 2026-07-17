@@ -3,6 +3,18 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-07-17 — Regroupement des onglets de la fiche bateau + fusion de la page Navigation (#365)
+
+La fiche bateau cumulait 9 onglets + 5 boutons d'en-tête, et le mode « navigation » (Journal de bord, Carburant, Incidents, Position) vivait sur une page séparée (`/boats/:id/navigation`), rendue inaccessible par le menu latéral — surcharge cognitive et onglets tronqués sur mobile.
+
+- **5 groupes d'onglets** au lieu de 9 : **Aperçu** (inchangé) · **Équipement** (Équipement + Spécifications + Tarif si activé) · **Maintenance** (Historique + Tâches + Fiches + Achats/réparations) · **Navigation** (Journal de bord + Carburant + Incidents + Position — désormais dans la fiche bateau) · **Documents** (Documents + Documents admin., badge d'expiration conservé). Une seconde barre d'onglets apparaît sous la barre de groupes quand le groupe en compte plusieurs.
+- `/boats/:id/navigation` redirige désormais vers `/boats/:id?tab=navigation-logs` (compat anciens signets) ; `BoatsController#show` charge en une seule requête les données auparavant séparées entre `show()` et `navigation()` (fusion de `toManageProps`/`toNavigationProps` en `toShowProps`). `BoatModeSwitcher.vue` est supprimé (plus qu'une seule page).
+- **En-tête allégé** : une action primaire « + Ajouter » (`BoatShowHeaderActions.vue`, menu : entrée, tâche, équipement, trajet — chaque item pose une `BoatCreateIntent` et bascule sur le bon groupe/onglet) et les actions secondaires (Budget, Modifier, Export PDF) regroupées dans un menu « ⋯ ». `BoatCreateIntent` gagne les valeurs `'equipment'` et `'navigationLog'` ; `BoatShowTabEquipment.vue` et `BoatShowTabNavigationLogs.vue` savent désormais consommer ces intentions (ouverture de la modale/du formulaire de création).
+- Le paramètre `?tab=` continue de référencer l'onglet feuille (ex: `tab=tasks`), le groupe actif étant déduit — aucun lien profond existant n'est cassé.
+- Logique de regroupement extraite dans le composable `inertia/composables/use_boat_show_tabs.ts` (pour rester sous la limite de 250 lignes/composant Vue).
+- `BaseDropdown.vue` gagne une prop `variant?: 'default' | 'primary'` pour le bouton déclencheur.
+- **Tests** : `tests/unit/transformers/boat_transformer.spec.ts` (fusion `toShowProps`), `tests/functional/boats/boats.spec.ts` (fiche fusionnée + redirection `/navigation`), `tests/inertia/use_boat_show_tabs.spec.ts`, `tests/inertia/boat_show_header_actions.spec.ts`, `tests/inertia/boat_show_create_intent.spec.ts` (nouveaux cas équipement/trajet), `tests/inertia/boat_show_tab_deep_link.spec.ts`, `tests/inertia/boat_show_tab_loading.spec.ts`, `tests/inertia/base_dropdown.spec.ts` ; suppression de `tests/inertia/boat_mode_switcher.spec.ts` (composant retiré).
+
 ## 2026-07-17 — Ajout rapide de trajets et d'incidents depuis les pages flotte et le dashboard (#364)
 
 Créer un trajet (journal de bord) ou signaler un incident imposait de naviguer jusqu'à la fiche d'un bateau puis dans le bon onglet — 3+ navigations pour un besoin fréquent.

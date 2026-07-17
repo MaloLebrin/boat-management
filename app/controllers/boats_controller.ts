@@ -9,7 +9,7 @@ import BoatListService from '#services/boat_list_service'
 import BoatPricingService from '#services/boat_pricing_service'
 import NavigationLogService from '#services/navigation_log_service'
 import CrewService from '#services/crew_service'
-import { toEditForm, toManageProps, toNavigationProps } from '#transformers/boat_transformer'
+import { toEditForm, toShowProps } from '#transformers/boat_transformer'
 import { toBoatPricingRow } from '#transformers/boat_pricing_transformer'
 import { toPortFormOptions } from '#transformers/port_transformer'
 import BoatIncidentService from '#services/boat_incident_service'
@@ -159,6 +159,17 @@ export default class BoatsController {
         equipmentActions,
         canManageEquipmentActions,
         canDeleteEquipmentActions,
+        incidents,
+        fuelLogs,
+        canDeleteIncidents,
+        canCreateFuelLogs,
+        canDeleteFuelLogs,
+        crewMemberOptions,
+        navigationLogs,
+        ports,
+        canCreateNavigationLogs,
+        canUpdateNavigationLogs,
+        canDeleteNavigationLogs,
       ] = await Promise.all([
         this.maintenanceService.listForBoat(user, boat),
         this.taskService.listForBoat(user, boat),
@@ -174,6 +185,17 @@ export default class BoatsController {
         this.equipmentActionService.listForBoat(user, boat),
         bouncer.with(EquipmentActionPolicy).allows('create', boat),
         bouncer.with(EquipmentActionPolicy).allows('delete', boat),
+        this.incidentService.listForBoat(user, boat),
+        this.fuelLogService.listForBoat(user, boat),
+        bouncer.with(IncidentPolicy).allows('delete', boat),
+        bouncer.with(FuelLogPolicy).allows('create', boat),
+        bouncer.with(FuelLogPolicy).allows('delete', boat),
+        this.crewService.listOptionsForOrganization(user.organization),
+        this.navigationLogService.listForBoat(boat),
+        this.portService.listNamesForOrg(user),
+        bouncer.with(NavigationLogPolicy).allows('create', boat),
+        bouncer.with(NavigationLogPolicy).allows('update', boat),
+        bouncer.with(NavigationLogPolicy).allows('delete'),
       ])
 
       const canManageEquipment = canManageMaintenance
@@ -187,10 +209,11 @@ export default class BoatsController {
       const aiSuggestions: AiSuggestion[] | null = latestSuggestions
         ? (JSON.parse(latestSuggestions.responseText) as AiSuggestion[])
         : null
+      const portOptions = ports.map((p) => ({ id: p.id, name: p.name }))
 
       return inertia.render(
         'boats/show',
-        toManageProps(boat, {
+        toShowProps(boat, {
           positionHistory,
           boatMedia,
           maintenanceEvents,
@@ -208,72 +231,11 @@ export default class BoatsController {
           equipmentActions,
           canManageEquipmentActions,
           canDeleteEquipmentActions,
-        })
-      )
-    } catch (error) {
-      if (error instanceof BoatNotFoundError) {
-        response.redirect('/boats')
-        return
-      }
-      throw error
-    }
-  }
-
-  async navigation({ inertia, params, auth, response, bouncer }: HttpContext) {
-    await auth.authenticate()
-    const user = auth.getUserOrFail()
-
-    try {
-      const boat = await this.boatService.getFullDetailForUser(user, Number(params.id))
-      await bouncer.with(BoatPolicy).authorize('view', boat)
-
-      await user.load('organization')
-
-      const [
-        incidents,
-        fuelLogs,
-        boatMedia,
-        positionHistory,
-        canManageMaintenance,
-        canDeleteIncidents,
-        canCreateFuelLogs,
-        canDeleteFuelLogs,
-        crewMemberOptions,
-        navigationLogs,
-        ports,
-        canCreateNavigationLogs,
-        canUpdateNavigationLogs,
-        canDeleteNavigationLogs,
-      ] = await Promise.all([
-        this.incidentService.listForBoat(user, boat),
-        this.fuelLogService.listForBoat(user, boat),
-        this.mediaService.listForEntity('boat', boat.id),
-        this.boatService.getPositionHistory(boat.id),
-        bouncer.with(BoatPolicy).allows('edit', boat),
-        bouncer.with(IncidentPolicy).allows('delete', boat),
-        bouncer.with(FuelLogPolicy).allows('create', boat),
-        bouncer.with(FuelLogPolicy).allows('delete', boat),
-        this.crewService.listOptionsForOrganization(user.organization),
-        this.navigationLogService.listForBoat(boat),
-        this.portService.listNamesForOrg(user),
-        bouncer.with(NavigationLogPolicy).allows('create', boat),
-        bouncer.with(NavigationLogPolicy).allows('update', boat),
-        bouncer.with(NavigationLogPolicy).allows('delete'),
-      ])
-
-      const portOptions = ports.map((p) => ({ id: p.id, name: p.name }))
-
-      return inertia.render(
-        'boats/navigation',
-        toNavigationProps(boat, {
-          positionHistory,
-          boatMedia,
           incidents,
           fuelLogs,
           navigationLogs,
           portOptions,
           crewMemberOptions,
-          canManageMaintenance,
           canDeleteIncidents,
           canCreateFuelLogs,
           canDeleteFuelLogs,

@@ -20,7 +20,6 @@ declare module '@adonisjs/inertia/types' {
     'boats/engine_show': ExtractProps<(typeof import('../../inertia/pages/boats/engine_show.vue'))['default']>
     'boats/generic_equipment_show': ExtractProps<(typeof import('../../inertia/pages/boats/generic_equipment_show.vue'))['default']>
     'boats/index': ExtractProps<(typeof import('../../inertia/pages/boats/index.vue'))['default']>
-    'boats/navigation': ExtractProps<(typeof import('../../inertia/pages/boats/navigation.vue'))['default']>
     'boats/new': ExtractProps<(typeof import('../../inertia/pages/boats/new.vue'))['default']>
     'boats/reservation_contract': ExtractProps<(typeof import('../../inertia/pages/boats/reservation_contract.vue'))['default']>
     'boats/reservation_inspection': ExtractProps<(typeof import('../../inertia/pages/boats/reservation_inspection.vue'))['default']>

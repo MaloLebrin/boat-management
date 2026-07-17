@@ -335,6 +335,24 @@
       "soon": "Bientôt",
       "planned": "Planifiées",
       "undated": "Non datées"
+    },
+    "groups": {
+      "equipment": "Équipement",
+      "maintenance": "Maintenance",
+      "navigation": "Navigation",
+      "documents": "Documents"
+    },
+    "addMenu": {
+      "label": "+ Ajouter",
+      "aria": "Ajouter…",
+      "entry": "Une entrée d'historique",
+      "task": "Une tâche",
+      "navigationLog": "Un trajet",
+      "equipment": "Un équipement"
+    },
+    "moreMenu": {
+      "label": "⋯",
+      "aria": "Autres actions"
     }
   },
   "specs": {
