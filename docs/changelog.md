@@ -3,6 +3,13 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-07-17 — Correctif : `t()` frontend supporte le pluriel ICU (#360)
+
+`inertia/composables/use_t.ts` ne faisait qu'une interpolation `{clé}` simple par regex — les clés au format ICU plural (`{count, plural, one {…} other {…}}`) s'affichaient brutes à l'écran (ex. onglet Logbook de la fiche bateau, clé `navigation_logs.count`).
+
+- **Correctif** : `use_t.ts` détecte désormais les blocs `{var, plural, one {…} other {…}}`, sélectionne la branche via `Intl.PluralRules(locale).select(count)` (mêmes catégories que le backend) et remplace `#` par la valeur du compteur, avant l'interpolation classique des autres `{clé}`.
+- **Tests** : `tests/inertia/use_t.spec.ts` couvre le singulier/pluriel en EN et FR, y compris le cas `count = 0` (catégorie CLDR `one` en français).
+
 ## 2026-07-17 — Correctif : le deep-link `?tab=` de la fiche bateau est respecté au chargement (#359)
 
 Charger directement `/boats/:id?tab=tasks` (nouvel onglet, F5) affichait toujours l'onglet Aperçu, alors que l'URL conservait bien `?tab=tasks`.
