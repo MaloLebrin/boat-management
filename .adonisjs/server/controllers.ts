@@ -45,6 +45,7 @@ export const controllers = {
   Home: () => import('#controllers/home_controller'),
   Invoices: () => import('#controllers/invoices_controller'),
   MaintenanceHistory: () => import('#controllers/maintenance_history_controller'),
+  MaintenanceHistoryPdf: () => import('#controllers/maintenance_history_pdf_controller'),
   MaintenanceLogPdf: () => import('#controllers/maintenance_log_pdf_controller'),
   Marketing: () => import('#controllers/marketing_controller'),
   Mouillages: () => import('#controllers/mouillages_controller'),

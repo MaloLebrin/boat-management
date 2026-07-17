@@ -20,6 +20,7 @@ const props = defineProps<{
   stats: MaintenanceHistoryStats
   filters: MaintenanceHistoryFilters
   boatOptions: MaintenanceBoatOption[]
+  canExport: boolean
 }>()
 
 const { t } = useT()
@@ -28,6 +29,18 @@ const page = usePage()
 const isLoading = computed(() => page.props?.processing === true)
 
 const eventRows = computed(() => props.events.data)
+
+const pdfHref = computed(() => {
+  const params = new URLSearchParams()
+  if (props.filters.q) params.set('q', props.filters.q)
+  if (props.filters.subject) params.set('subject', props.filters.subject)
+  if (props.filters.boatId) params.set('boatId', String(props.filters.boatId))
+  if (props.filters.dateFrom) params.set('dateFrom', props.filters.dateFrom)
+  if (props.filters.dateTo) params.set('dateTo', props.filters.dateTo)
+  params.set('sort', props.filters.sort)
+  const qs = params.toString()
+  return `/maintenance/history.pdf${qs ? `?${qs}` : ''}`
+})
 
 function navigate(next: MaintenanceHistoryFilters) {
   router.get(
@@ -69,10 +82,11 @@ function reset() {
           <BaseHeading level="1">{{ t('maintenance.history.title') }}</BaseHeading>
           <p class="mt-2 text-fg-muted">{{ t('maintenance.history.subtitle') }}</p>
         </div>
-        <!-- TODO: implement PDF export for full maintenance history — GET /maintenance/history.pdf with current filters as query params -->
-        <BaseButton variant="secondary" size="sm" disabled>
-          {{ t('maintenance.history.exportPdf') }}
-        </BaseButton>
+        <a v-if="canExport" :href="pdfHref" target="_blank" rel="noopener">
+          <BaseButton variant="secondary" size="sm" type="button">
+            {{ t('maintenance.history.exportPdf') }}
+          </BaseButton>
+        </a>
       </div>
     </header>
 

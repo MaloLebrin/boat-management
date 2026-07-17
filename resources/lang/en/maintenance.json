@@ -63,6 +63,25 @@
       "sortRecent": "Most recent",
       "sortOldest": "Oldest",
       "results": "{count} result(s)"
+    },
+    "pdf": {
+      "title": "Maintenance history",
+      "generatedOn": "Generated on {date}",
+      "filtersNone": "No filters applied",
+      "filterBoat": "Boat: {name}",
+      "filterSubject": "Subject: {label}",
+      "filterDateFrom": "From {date}",
+      "filterDateTo": "To {date}",
+      "filterSearch": "Search: \"{query}\"",
+      "columns": {
+        "date": "Date",
+        "boat": "Boat",
+        "subject": "Subject",
+        "title": "Intervention"
+      },
+      "partsCount": "{count} part(s) replaced",
+      "noEvents": "No events match the selected filters.",
+      "totalEvents": "{count} event(s)"
     }
   }
 }

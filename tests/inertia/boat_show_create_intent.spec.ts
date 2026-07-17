@@ -53,6 +53,7 @@ describe('BoatShowTabHistory — createIntent', () => {
         boat,
         maintenanceEvents: [],
         canManageMaintenance: true,
+        canExport: true,
         createIntent: 'event',
       },
       ...globalStubs,
@@ -66,7 +67,13 @@ describe('BoatShowTabHistory — createIntent', () => {
 
   test('stays closed without intent', async () => {
     const wrapper = mount(BoatShowTabHistory, {
-      props: { boat, maintenanceEvents: [], canManageMaintenance: true, createIntent: null },
+      props: {
+        boat,
+        maintenanceEvents: [],
+        canManageMaintenance: true,
+        canExport: true,
+        createIntent: null,
+      },
       ...globalStubs,
     })
     await nextTick()
@@ -77,7 +84,13 @@ describe('BoatShowTabHistory — createIntent', () => {
 
   test("ignores the 'task' intent, which belongs to another tab", async () => {
     const wrapper = mount(BoatShowTabHistory, {
-      props: { boat, maintenanceEvents: [], canManageMaintenance: true, createIntent: 'task' },
+      props: {
+        boat,
+        maintenanceEvents: [],
+        canManageMaintenance: true,
+        canExport: true,
+        createIntent: 'task',
+      },
       ...globalStubs,
     })
     await nextTick()
@@ -88,7 +101,13 @@ describe('BoatShowTabHistory — createIntent', () => {
 
   test('consumes the intent without opening when the user cannot manage maintenance', async () => {
     const wrapper = mount(BoatShowTabHistory, {
-      props: { boat, maintenanceEvents: [], canManageMaintenance: false, createIntent: 'event' },
+      props: {
+        boat,
+        maintenanceEvents: [],
+        canManageMaintenance: false,
+        canExport: true,
+        createIntent: 'event',
+      },
       ...globalStubs,
     })
     await nextTick()
@@ -99,7 +118,13 @@ describe('BoatShowTabHistory — createIntent', () => {
 
   test('opens the modal when the intent arrives while the tab is already mounted', async () => {
     const wrapper = mount(BoatShowTabHistory, {
-      props: { boat, maintenanceEvents: [], canManageMaintenance: true, createIntent: null },
+      props: {
+        boat,
+        maintenanceEvents: [],
+        canManageMaintenance: true,
+        canExport: true,
+        createIntent: null,
+      },
       ...globalStubs,
     })
     await wrapper.setProps({ createIntent: 'event' })
