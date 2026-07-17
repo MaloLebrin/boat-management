@@ -24,6 +24,14 @@ import type { PlanTier } from '../../shared/types/plan'
 const { t } = useT()
 const page = usePage()
 
+type StatTone = 'neutral' | 'empty'
+
+const statTones = computed<Record<'engines' | 'sails' | 'rigs', StatTone>>(() => ({
+  engines: props.stats.engines > 0 ? 'neutral' : 'empty',
+  sails: props.stats.sails > 0 ? 'neutral' : 'empty',
+  rigs: props.stats.rigs > 0 ? 'neutral' : 'empty',
+}))
+
 const statDeltas = computed(() => {
   const d = props.stats.deltas
   return {
@@ -165,7 +173,7 @@ function dismissAlert() {
         :label="t('dashboard.stats.engines')"
         :value="String(stats.engines)"
         :delta="statDeltas.engines"
-        tone="neutral"
+        :tone="statTones.engines"
         href="/boats?hasEngine=true"
         :style="{
           animation: 'fadeUp var(--motion-normal) var(--ease-premium) both',
@@ -188,7 +196,7 @@ function dismissAlert() {
         :label="t('dashboard.stats.sails')"
         :value="String(stats.sails)"
         :delta="statDeltas.sails"
-        tone="neutral"
+        :tone="statTones.sails"
         href="/boats?hasSails=true"
         :style="{
           animation: 'fadeUp var(--motion-normal) var(--ease-premium) both',
@@ -210,7 +218,7 @@ function dismissAlert() {
         :label="t('dashboard.stats.rigs')"
         :value="String(stats.rigs)"
         :delta="statDeltas.rigs"
-        tone="neutral"
+        :tone="statTones.rigs"
         href="/boats?hasRig=true"
         :style="{
           animation: 'fadeUp var(--motion-normal) var(--ease-premium) both',
@@ -256,15 +264,15 @@ function dismissAlert() {
       <MarinaDashboardCard :ports="ports" :port-stats="portStats" />
     </div>
 
-    <div class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_16rem]">
-      <div class="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_2fr]">
+    <div class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_16rem]">
+      <div class="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
         <BaseCard>
           <template #header>
-            <div class="flex items-center justify-between">
+            <div class="flex flex-wrap items-baseline justify-between gap-x-2 gap-y-1">
               <h2 class="text-sm font-semibold text-fg">
                 {{ t('dashboard.urgentMaintenance.title') }}
               </h2>
-              <span class="text-xs font-medium text-fg-muted">{{
+              <span class="shrink-0 text-xs font-medium whitespace-nowrap text-fg-muted">{{
                 t('dashboard.urgentMaintenance.period')
               }}</span>
             </div>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const props = withDefaults(
   defineProps<{
-    variant?: 'neutral' | 'info' | 'success' | 'warning' | 'danger'
+    variant?: 'neutral' | 'info' | 'success' | 'warning' | 'danger' | 'empty'
   }>(),
   { variant: 'neutral' }
 )
@@ -12,6 +12,7 @@ const variantClass: Record<NonNullable<typeof props.variant>, string> = {
   success: 'bg-mint-100 text-mint-800 ring-1 ring-mint-200',
   warning: 'bg-peach-100 text-peach-800 ring-1 ring-peach-200',
   danger: 'bg-red-100 text-red-800 ring-1 ring-red-200',
+  empty: 'bg-surface-muted text-fg-muted ring-1 ring-border',
 }
 </script>
 
