@@ -4,13 +4,16 @@ import { Link } from '@adonisjs/inertia/vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseEmptyState from '~/components/base/BaseEmptyState.vue'
+import ReservationCreateButton from '~/components/reservations/ReservationCreateButton.vue'
 import ReservationStatusBadge from '~/components/reservations/ReservationStatusBadge.vue'
 import { useReservationFormat } from '~/composables/use_reservation_format'
 import { useT } from '~/composables/use_t'
-import type { BoatReservationRow } from '~/types/reservation'
+import type { BoatReservationRow, FleetBoatOption } from '~/types/reservation'
 
 defineProps<{
   reservations: BoatReservationRow[]
+  boats: FleetBoatOption[]
+  selectedBoatId: number | null
   canCreateQuote?: boolean
 }>()
 
@@ -28,7 +31,11 @@ function createQuote(reservationId: number) {
       v-if="reservations.length === 0"
       :title="t('reservations.empty.title')"
       :description="t('reservations.empty.fleetDescription')"
-    />
+    >
+      <template #action>
+        <ReservationCreateButton :boats="boats" :selected-boat-id="selectedBoatId" />
+      </template>
+    </BaseEmptyState>
     <div v-else class="overflow-x-auto">
       <table class="w-full text-sm">
         <thead>

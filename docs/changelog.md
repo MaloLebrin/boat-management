@@ -3,6 +3,16 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-07-17 — Réservations flotte : CTA de création, filtre labellisé, indicateur de scroll du calendrier (#367)
+
+Sur `/reservations` (vue calendrier flotte) : aucun moyen de créer une réservation depuis la page (ni en-tête ni empty state), un filtre bateau sans label affichant « Select… » au lieu de « Tous les bateaux », et un calendrier mensuel scrollable sans indication visuelle.
+
+- **CTA « Nouvelle réservation »** (`ReservationCreateButton.vue`, nouveau) en en-tête de `/reservations` et dans les deux empty states (vue liste et vue calendrier) : lien direct vers `/boats/:id/reservations#reservation-form` si un seul bateau ou un bateau déjà filtré, sinon menu déroulant de sélection (`BaseDropdown`). `boats/reservations.vue` scrolle désormais automatiquement vers le formulaire au chargement si l'URL cible `#reservation-form`.
+- **Filtre bateau** (`reservations/index.vue`) : bug corrigé — le composant `BaseSelect` avait à la fois une option placeholder disabled (« Select… ») et une option `''` « Tous les bateaux » ajoutée manuellement, valeur dupliquée `""` qui faisait afficher le placeholder au lieu du libellé. Le placeholder du `BaseSelect` porte maintenant directement le texte « Tous les bateaux »/« All boats » (`allow-empty`), et un `<label>` explicite (« Bateau »/« Boat ») est ajouté via `BaseField`.
+- **Calendrier flotte** (`ReservationTimeline.vue`) : indicateur « Faites défiler pour voir tout le mois » affiché uniquement quand la grille dépasse la largeur visible (détection via `ResizeObserver`) ; la vue `/reservations` bascule par défaut sur la vue liste (au lieu du calendrier) sur les viewports étroits (< 768px).
+- `BaseEmptyState.vue` gagne un slot `action` (en plus de `actionLabel`/`@action`) pour projeter un contenu d'action personnalisé (ex: menu déroulant) dans l'empty state.
+- **Tests** : `tests/inertia/reservation_create_button.spec.ts` (nouveau), `tests/inertia/reservations_index.spec.ts` (nouveau), `tests/inertia/boat_reservations_page_scroll.spec.ts` (nouveau), `tests/inertia/base_empty_state.spec.ts` (slot `action`), `tests/inertia/fleet_reservation_list.spec.ts` et `tests/inertia/reservation_timeline.spec.ts` (empty state + CTA).
+
 ## 2026-07-17 — Correctifs visuels du dashboard : KPI tronqués, chevauchement, débordement (#366)
 
 Trois défauts visuels sur `/dashboard` à 1280×720 : les labels des cartes KPI (« Engines », « Urgent maintenance ») étaient tronqués faute d'espace face au badge de statut ; dans le widget « Urgent maintenance », le titre et « Next 14 days » se chevauchaient ; le panneau « AI Assistant » débordait du viewport (scrollbar horizontale sur toute la page).

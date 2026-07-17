@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { Head } from '@inertiajs/vue3'
 import BaseBreadcrumb from '~/components/base/BaseBreadcrumb.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
@@ -38,6 +38,10 @@ const breadcrumbs = computed(() => [
 function scrollToForm() {
   document.getElementById('reservation-form')?.scrollIntoView({ behavior: 'smooth' })
 }
+
+onMounted(() => {
+  if (window.location.hash === '#reservation-form') scrollToForm()
+})
 </script>
 
 <template>
