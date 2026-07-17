@@ -20,7 +20,8 @@
     "neutral": "Normal",
     "success": "Bon",
     "info": "Info",
-    "warning": "Attention"
+    "warning": "Attention",
+    "empty": "Aucune donnée"
   },
   "offline.banner": "Vous êtes hors-ligne — les modifications seront synchronisées à la reconnexion",
   "offline.savedQueue": "Enregistré hors-ligne — sera synchronisé à la reconnexion",

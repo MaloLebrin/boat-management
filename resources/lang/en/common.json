@@ -20,7 +20,8 @@
     "neutral": "Normal",
     "success": "Good",
     "info": "Info",
-    "warning": "Warning"
+    "warning": "Warning",
+    "empty": "No data"
   },
   "offline.banner": "You're offline — changes will be saved and synced when reconnected",
   "offline.savedQueue": "Saved offline — will sync when reconnected",
