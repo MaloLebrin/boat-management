@@ -47,6 +47,37 @@ test('can emit empty value when allowEmpty is true', async () => {
   expect(w.emitted('update:modelValue')?.[0]).toEqual([''])
 })
 
+test('hides placeholder option when a real value is already selected and allowEmpty is false', () => {
+  const w = mount(BaseSelect, {
+    props: {
+      id: 's4',
+      label: 'Sort',
+      options: [
+        { label: 'Recent', value: 'recent' },
+        { label: 'Name', value: 'name' },
+      ],
+      modelValue: 'recent',
+    },
+  })
+  expect(w.findAll('option').length).toBe(2)
+  expect(w.text()).not.toContain('Select…')
+})
+
+test('keeps placeholder option visible when allowEmpty is true even with a value selected', () => {
+  const w = mount(BaseSelect, {
+    props: {
+      id: 's5',
+      label: 'Type',
+      allowEmpty: true,
+      placeholder: 'All',
+      options: [{ label: 'One', value: '1' }],
+      modelValue: '1',
+    },
+  })
+  expect(w.findAll('option').length).toBe(2)
+  expect(w.text()).toContain('All')
+})
+
 test('renders error from errors object using name', () => {
   const w = mount(BaseSelect, {
     props: {

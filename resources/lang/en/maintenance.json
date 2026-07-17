@@ -53,6 +53,7 @@
       "action": "View boats"
     },
     "filterBar": {
+      "searchLabel": "Search",
       "boatLabel": "Boat",
       "allBoats": "All boats",
       "subjectLabel": "Subject",

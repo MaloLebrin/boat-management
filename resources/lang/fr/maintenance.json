@@ -53,6 +53,7 @@
       "action": "Voir les bateaux"
     },
     "filterBar": {
+      "searchLabel": "Recherche",
       "boatLabel": "Bateau",
       "allBoats": "Tous les bateaux",
       "subjectLabel": "Sujet",

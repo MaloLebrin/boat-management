@@ -31,10 +31,12 @@ function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutra
         <div v-if="canManage" class="flex flex-wrap items-center gap-2">
           <a
             :href="`/boats/${boatId}/rig/edit`"
-            class="text-sm font-semibold text-fg-muted hover:text-fg hover:underline"
+            :aria-label="rig ? t('boats.rig.editTitle') : t('boats.rig.addTitle')"
+            class="flex items-center gap-1.5 text-sm font-semibold text-fg-muted hover:text-fg hover:underline"
           >
             <PencilSquareIcon v-if="rig" class="w-4 h-4" />
             <PlusCircleIcon v-else class="w-4 h-4" />
+            {{ rig ? t('boats.rig.editTitle') : t('boats.rig.addTitle') }}
           </a>
           <Form
             v-if="rig"
