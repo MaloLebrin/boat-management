@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     align?: 'left' | 'right'
+    variant?: 'default' | 'primary'
   }>(),
-  { align: 'left' }
+  { align: 'left', variant: 'default' }
 )
 
 const open = ref(false)
@@ -44,13 +45,18 @@ onBeforeUnmount(() => {
   <div ref="rootEl" class="relative inline-flex">
     <button
       type="button"
-      class="inline-flex items-center gap-2 rounded-(--radius-control) border border-border bg-surface-elevated px-3 py-2 text-sm font-semibold text-fg shadow-(--shadow-xs) transition-[transform,box-shadow] duration-(--motion-fast) ease-premium hover:shadow-(--shadow-sm) focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/30"
+      :class="[
+        'inline-flex items-center gap-2 rounded-(--radius-control) px-3 py-2 text-sm font-semibold shadow-(--shadow-xs) transition-[transform,box-shadow] duration-(--motion-fast) ease-premium hover:shadow-(--shadow-sm) focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/30',
+        variant === 'primary'
+          ? 'bg-brand text-white hover:bg-brand-hover'
+          : 'border border-border bg-surface-elevated text-fg',
+      ]"
       :aria-expanded="open ? 'true' : 'false'"
       @click="open = !open"
     >
       <slot name="trigger"> Menu </slot>
       <svg
-        class="h-4 w-4 text-fg-subtle"
+        :class="['h-4 w-4', variant === 'primary' ? 'text-white/80' : 'text-fg-subtle']"
         viewBox="0 0 20 20"
         fill="currentColor"
         aria-hidden="true"

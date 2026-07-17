@@ -153,4 +153,35 @@ test.group('Boats (functional)', (group) => {
     const found = await Boat.find(boat.id)
     assert.isNotNull(found)
   })
+
+  test('GET /boats/:id renders the merged fiche (maintenance + navigation data) (#365)', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    const response = await client.get(`/boats/${boat.id}`).loginAs(user)
+
+    response.assertStatus(200)
+    // Le rendu doit inclure les données ex-page /navigation désormais fusionnées
+    // dans la même requête (#365) : si le contrôleur ne les avait pas chargées,
+    // le composant boats/show planterait au montage (props requises).
+    const html = response.text()
+    assert.include(html, 'navigationLogs')
+    assert.include(html, 'portOptions')
+  })
+
+  test('GET /boats/:id/navigation redirects to the merged fiche (#365)', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    const response = await client.get(`/boats/${boat.id}/navigation`).loginAs(user).redirects(0)
+
+    response.assertStatus(302)
+    assert.equal(response.header('location'), `/boats/${boat.id}?tab=navigation-logs`)
+  })
 })

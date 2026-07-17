@@ -335,6 +335,24 @@
       "soon": "Soon",
       "planned": "Planned",
       "undated": "Undated"
+    },
+    "groups": {
+      "equipment": "Equipment",
+      "maintenance": "Maintenance",
+      "navigation": "Navigation",
+      "documents": "Documents"
+    },
+    "addMenu": {
+      "label": "+ Add",
+      "aria": "Add…",
+      "entry": "A history entry",
+      "task": "A task",
+      "navigationLog": "A trip",
+      "equipment": "An equipment item"
+    },
+    "moreMenu": {
+      "label": "⋯",
+      "aria": "More actions"
     }
   },
   "specs": {

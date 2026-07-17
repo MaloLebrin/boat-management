@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { sortEnginesByStatus } from '#shared/helpers/engine'
-import { ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import BoatGenericEquipmentCard from '~/components/boats/equipment/BoatGenericEquipmentCard.vue'
 import BoatShowEnginesCard from '~/components/boats/engine/BoatShowEnginesCard.vue'
 import BoatShowRigCard from '~/components/boats/rig/BoatShowRigCard.vue'
@@ -9,18 +9,35 @@ import BoatShowSailsCard from '~/components/boats/sail/BoatShowSailsCard.vue'
 import BoatEquipmentAddModal from '~/components/boats/show/modals/BoatEquipmentAddModal.vue'
 import BoatEquipmentActionModal from '~/components/boats/equipment-actions/BoatEquipmentActionModal.vue'
 import { useT } from '~/composables/use_t'
-import type { BoatShowDetail, EquipmentActionPrefill } from '~/types/boat_show'
+import type { BoatCreateIntent, BoatShowDetail, EquipmentActionPrefill } from '~/types/boat_show'
 
-const props = defineProps<{
-  boat: BoatShowDetail
-  canManageEquipment: boolean
-  canManageActions: boolean
-}>()
+const props = withDefaults(
+  defineProps<{
+    boat: BoatShowDetail
+    canManageEquipment: boolean
+    canManageActions: boolean
+    createIntent?: BoatCreateIntent
+  }>(),
+  { createIntent: null }
+)
+
+const emit = defineEmits<{ createIntentConsumed: [] }>()
 
 const { t } = useT()
 
 const equipmentFilter = ref<'all' | 'engine' | 'sail' | 'rig' | 'safety' | 'generic'>('all')
 const isAddModalOpen = ref(false)
+
+// L'onglet est monté après la demande d'ouverture : on consomme l'intention au
+// montage (et si elle change alors que l'onglet est déjà affiché) — #365.
+function consumeCreateIntent() {
+  if (props.createIntent !== 'equipment') return
+  if (props.canManageEquipment) isAddModalOpen.value = true
+  emit('createIntentConsumed')
+}
+
+onMounted(consumeCreateIntent)
+watch(() => props.createIntent, consumeCreateIntent)
 
 // Equipment-action modal raised from a degraded equipment card (#313)
 const isActionModalOpen = ref(false)

@@ -19,10 +19,10 @@ import type {
 } from '../../shared/types/equipment_action'
 
 /**
- * Intention de création demandée depuis l'en-tête de la fiche bateau (#358).
+ * Intention de création demandée depuis l'en-tête de la fiche bateau (#358, #365).
  * Consommée au montage de l'onglet cible, puis remise à `null`.
  */
-export type BoatCreateIntent = 'event' | 'task' | null
+export type BoatCreateIntent = 'event' | 'task' | 'navigationLog' | 'equipment' | null
 
 /** Seed data to open the equipment-action modal pre-filled from a card (#313). */
 export type EquipmentActionPrefill = {

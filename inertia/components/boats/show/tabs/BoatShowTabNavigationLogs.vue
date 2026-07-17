@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { router } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
@@ -8,18 +8,29 @@ import NavigationLogCloseForm from '~/components/boats/show/tabs/NavigationLogCl
 import NavigationLogCrewPanel from '~/components/boats/show/tabs/NavigationLogCrewPanel.vue'
 import { toNavigationEngineOptions } from '~/utils/navigation_engine_options'
 import { useT } from '~/composables/use_t'
-import type { BoatShowDetail, NavigationLogRow, NavigationLogPortOption } from '~/types/boat_show'
+import type {
+  BoatCreateIntent,
+  BoatShowDetail,
+  NavigationLogRow,
+  NavigationLogPortOption,
+} from '~/types/boat_show'
 import type { CrewMemberOption } from '../../../../../shared/types/crew'
 
-const props = defineProps<{
-  boat: BoatShowDetail
-  navigationLogs: NavigationLogRow[]
-  portOptions: NavigationLogPortOption[]
-  crewMemberOptions: CrewMemberOption[]
-  canCreate: boolean
-  canUpdate: boolean
-  canDelete: boolean
-}>()
+const props = withDefaults(
+  defineProps<{
+    boat: BoatShowDetail
+    navigationLogs: NavigationLogRow[]
+    portOptions: NavigationLogPortOption[]
+    crewMemberOptions: CrewMemberOption[]
+    canCreate: boolean
+    canUpdate: boolean
+    canDelete: boolean
+    createIntent?: BoatCreateIntent
+  }>(),
+  { createIntent: null }
+)
+
+const emit = defineEmits<{ createIntentConsumed: [] }>()
 
 const { t } = useT()
 
@@ -31,6 +42,17 @@ const closingLogId = ref<number | null>(null)
 const hasActiveLog = computed(() =>
   props.navigationLogs.some((log) => log.status === 'in_progress')
 )
+
+// L'onglet est monté après la demande d'ouverture : on consomme l'intention au
+// montage (et si elle change alors que l'onglet est déjà affiché) — #365.
+function consumeCreateIntent() {
+  if (props.createIntent !== 'navigationLog') return
+  if (props.canCreate && !hasActiveLog.value) showCreateForm.value = true
+  emit('createIntentConsumed')
+}
+
+onMounted(consumeCreateIntent)
+watch(() => props.createIntent, consumeCreateIntent)
 
 function formatDateTime(iso: string): string {
   return new Date(iso).toLocaleString(undefined, {

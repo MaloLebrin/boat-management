@@ -1,24 +1,31 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseBreadcrumb from '~/components/base/BaseBreadcrumb.vue'
-import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseTabs from '~/components/base/BaseTabs.vue'
-import BoatModeSwitcher from '~/components/boats/show/BoatModeSwitcher.vue'
+import BoatShowHeaderActions from '~/components/boats/show/BoatShowHeaderActions.vue'
 import BoatShowTabContent from '~/components/boats/show/BoatShowTabContent.vue'
+import NavigationActiveCard from '~/components/boats/show/tabs/NavigationActiveCard.vue'
+import { useBoatShowTabs } from '~/composables/use_boat_show_tabs'
 import { useT } from '~/composables/use_t'
 import type {
   AiSuggestion,
   BoatCreateIntent,
   BoatDocumentRow,
   BoatEquipmentActionRow,
+  BoatIncidentRow,
+  BoatPositionHistoryRow,
   BoatShowDetail,
+  FuelLogRow,
   MaintenanceEventRow,
   MaintenanceSheetRow,
   MaintenanceTaskRow,
+  NavigationLogPortOption,
+  NavigationLogRow,
 } from '~/types/boat_show'
 import type { BoatPricingRow } from '../../../shared/types/boat_pricing'
+import type { CrewMemberOption } from '../../../shared/types/crew'
 
 const { t } = useT()
 
@@ -29,11 +36,24 @@ const props = defineProps<{
   maintenanceSheets: MaintenanceSheetRow[]
   boatDocuments: BoatDocumentRow[]
   equipmentActions: BoatEquipmentActionRow[]
+  incidents: BoatIncidentRow[]
+  fuelLogs: FuelLogRow[]
+  navigationLogs: NavigationLogRow[]
+  portOptions: NavigationLogPortOption[]
+  crewMemberOptions: CrewMemberOption[]
+  positionHistory: BoatPositionHistoryRow[]
+  latestGpsPosition: BoatPositionHistoryRow | null
   canManageMaintenance: boolean
   canManageEquipment: boolean
   canManageDocuments: boolean
   canManageEquipmentActions: boolean
   canDeleteEquipmentActions: boolean
+  canDeleteIncidents: boolean
+  canCreateFuelLogs: boolean
+  canDeleteFuelLogs: boolean
+  canCreateNavigationLogs: boolean
+  canUpdateNavigationLogs: boolean
+  canDeleteNavigationLogs: boolean
   canExport: boolean
   aiSuggestions: AiSuggestion[] | null
   pricing: BoatPricingRow | null
@@ -41,48 +61,20 @@ const props = defineProps<{
   canManagePricing: boolean
 }>()
 
-type TabKey =
-  | 'overview'
-  | 'specs'
-  | 'pricing'
-  | 'equipment'
-  | 'equipmentActions'
-  | 'history'
-  | 'tasks'
-  | 'documents'
-  | 'sheets'
-  | 'admin-docs'
-
-const VALID_TABS: TabKey[] = [
-  'overview',
-  'specs',
-  'pricing',
-  'equipment',
-  'equipmentActions',
-  'history',
-  'tasks',
-  'documents',
-  'sheets',
-  'admin-docs',
-]
-
-function getInitialTab(): TabKey {
-  if (typeof window === 'undefined') return 'overview'
-  const fromUrl = new URLSearchParams(window.location.search).get('tab') as TabKey | null
-  return fromUrl && VALID_TABS.includes(fromUrl) ? fromUrl : 'overview'
-}
-
-const tab = ref<TabKey>(getInitialTab())
-
-watch(tab, (newTab) => {
-  const url = new URL(window.location.href)
-  if (newTab === 'overview') {
-    url.searchParams.delete('tab')
-  } else {
-    url.searchParams.set('tab', newTab)
-  }
-  // On met à jour l'URL sans déclencher de requête Inertia
-  window.history.replaceState(window.history.state, '', url.pathname + url.search)
+const {
+  tab,
+  activeGroupKey,
+  groupTabs,
+  activeGroupSubTabs,
+  isTabLoading,
+  openTasks,
+  goToTab,
+  goToGroup,
+} = useBoatShowTabs({
+  maintenanceTasks: () => props.maintenanceTasks,
+  boatDocuments: () => props.boatDocuments,
+  incidents: () => props.incidents,
+  pricingEnabled: () => props.pricingEnabled,
 })
 
 // L'onglet cible n'est monté qu'après le rendu différé : on expose une intention
@@ -90,8 +82,6 @@ watch(tab, (newTab) => {
 const createIntent = ref<BoatCreateIntent>(null)
 
 const todayIso = computed(() => new Date().toISOString().slice(0, 10))
-
-const openTasks = computed(() => props.maintenanceTasks.filter((task) => task.status === 'open'))
 
 const overdueTasks = computed(() =>
   openTasks.value.filter((task) => task.dueAt && String(task.dueAt) <= todayIso.value)
@@ -105,51 +95,6 @@ const statusBadge = computed(() => {
   return { variant: 'success' as const, label: t('boats.show.status.ok') }
 })
 
-const expiringDocCount = computed(
-  () =>
-    props.boatDocuments.filter((d) => d.status === 'expiring_soon' || d.status === 'expired').length
-)
-
-const tabs = computed(() => [
-  { key: 'overview', label: t('boats.show.tabs.overview') },
-  { key: 'specs', label: t('boats.show.tabs.specs') },
-  ...(props.pricingEnabled ? [{ key: 'pricing', label: t('boats.show.tabs.pricing') }] : []),
-  { key: 'equipment', label: t('boats.show.tabs.equipment') },
-  { key: 'equipmentActions', label: t('boats.show.tabs.equipmentActions') },
-  { key: 'history', label: t('boats.show.tabs.history') },
-  {
-    key: 'tasks',
-    label: t('boats.show.tabs.tasks'),
-    badge: openTasks.value.length > 0 ? String(openTasks.value.length) : undefined,
-  },
-  { key: 'sheets', label: t('boats.show.tabs.sheets') },
-  { key: 'documents', label: t('boats.show.tabs.documents') },
-  {
-    key: 'admin-docs',
-    label: t('boats.show.tabs.adminDocs'),
-    badge: expiringDocCount.value > 0 ? String(expiringDocCount.value) : undefined,
-  },
-])
-
-// Un skeleton s'affiche immédiatement au clic, le temps que le navigateur peigne
-// la frame avant de monter le contenu (souvent lourd) du nouvel onglet (#361).
-const isTabLoading = ref(false)
-
-function nextFrame(): Promise<void> {
-  return new Promise((resolve) => requestAnimationFrame(() => resolve()))
-}
-
-async function goToTab(key: TabKey | string) {
-  const nextTab = key as TabKey
-  if (nextTab === tab.value) return
-  isTabLoading.value = true
-  await nextTick()
-  await nextFrame()
-  tab.value = nextTab
-  await nextTick()
-  isTabLoading.value = false
-}
-
 function openHistoryTab() {
   goToTab('history')
   createIntent.value = 'event'
@@ -160,24 +105,35 @@ function openTasksTab() {
   createIntent.value = 'task'
 }
 
+function openNavigationLogTab() {
+  goToTab('navigation-logs')
+  createIntent.value = 'navigationLog'
+}
+
+function openEquipmentTab() {
+  goToTab('equipment')
+  createIntent.value = 'equipment'
+}
+
 function onCreateIntentConsumed() {
   createIntent.value = null
 }
+
+const activeNavigationLog = computed(
+  () => props.navigationLogs.find((l) => l.status === 'in_progress') ?? null
+)
 </script>
 
 <template>
   <div class="w-full max-w-7xl px-6 py-10 sm:px-8">
-    <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
-      <BaseBreadcrumb
-        class="mb-0!"
-        :items="[
-          { label: t('boats.show.breadcrumbFleet'), href: '/boats' },
-          { label: t('nav.boats') },
-          { label: boat.name },
-        ]"
-      />
-      <BoatModeSwitcher :boat-id="boat.id" mode="management" />
-    </div>
+    <BaseBreadcrumb
+      class="mb-4"
+      :items="[
+        { label: t('boats.show.breadcrumbFleet'), href: '/boats' },
+        { label: t('nav.boats') },
+        { label: boat.name },
+      ]"
+    />
 
     <!-- Header -->
     <header class="space-y-6">
@@ -203,44 +159,37 @@ function onCreateIntentConsumed() {
         </div>
 
         <div class="flex flex-wrap items-center gap-2 justify-end">
-          <BaseButton variant="secondary" size="sm" route="boats.budget" :params="{ id: boat.id }">
-            {{ t('boats.show.budget') }}
-          </BaseButton>
-          <a :href="`/boats/${boat.id}/edit`">
-            <BaseButton variant="secondary" size="sm">{{ t('boats.show.editBoat') }}</BaseButton>
-          </a>
-          <BaseButton
-            v-if="canManageMaintenance"
-            variant="secondary"
-            size="sm"
-            type="button"
-            @click="openHistoryTab"
-          >
-            + {{ t('boats.show.addEntry') }}
-          </BaseButton>
-          <BaseButton
-            v-if="canManageMaintenance"
-            variant="primary"
-            size="sm"
-            type="button"
-            @click="openTasksTab"
-          >
-            + {{ t('boats.show.addTask') }}
-          </BaseButton>
-          <a
-            v-if="canExport"
-            :href="`/boats/${boat.id}/maintenance-log.pdf`"
-            target="_blank"
-            rel="noopener"
-          >
-            <BaseButton variant="secondary" size="sm" type="button">
-              {{ t('boats.maintenanceLog.download') }}
-            </BaseButton>
-          </a>
+          <BoatShowHeaderActions
+            :boat-id="boat.id"
+            :can-manage-maintenance="canManageMaintenance"
+            :can-manage-equipment="canManageEquipment"
+            :can-create-navigation-logs="canCreateNavigationLogs"
+            :can-export="canExport"
+            @add-entry="openHistoryTab"
+            @add-task="openTasksTab"
+            @add-equipment="openEquipmentTab"
+            @add-navigation-log="openNavigationLogTab"
+          />
         </div>
       </div>
 
-      <BaseTabs :model-value="tab" :tabs="tabs" @update:model-value="goToTab" />
+      <BaseTabs :model-value="activeGroupKey" :tabs="groupTabs" @update:model-value="goToGroup" />
+
+      <BaseTabs
+        v-if="activeGroupSubTabs.length > 1"
+        :model-value="tab"
+        :tabs="activeGroupSubTabs"
+        @update:model-value="goToTab"
+      />
+
+      <NavigationActiveCard
+        v-if="activeGroupKey === 'navigation' && activeNavigationLog"
+        :boat="boat"
+        :log="activeNavigationLog"
+        :port-options="portOptions"
+        :can-update="canUpdateNavigationLogs"
+        :can-create-fuel-logs="canCreateFuelLogs"
+      />
     </header>
 
     <BoatShowTabContent

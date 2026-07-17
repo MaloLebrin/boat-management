@@ -18,7 +18,13 @@ router
     router.get('boats/new', [controllers.Boats, 'create']).as('boats.create')
     router.post('boats', [controllers.Boats, 'store']).as('boats.store')
     router.get('boats/:id', [controllers.Boats, 'show']).as('boats.show')
-    router.get('boats/:id/navigation', [controllers.Boats, 'navigation']).as('boats.navigation')
+    // La page « navigation » a été fusionnée dans la fiche bateau (#365) : on
+    // redirige les anciens signets/liens vers le groupe d'onglets Navigation.
+    router
+      .get('boats/:id/navigation', ({ params, response }) =>
+        response.redirect(`/boats/${params.id}?tab=navigation-logs`)
+      )
+      .as('boats.navigation')
     router
       .get('boats/:id/maintenance-log.pdf', [controllers.MaintenanceLogPdf, 'download'])
       .as('boats.maintenanceLog.download')

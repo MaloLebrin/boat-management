@@ -17,7 +17,7 @@ import type { NavigationLogRow, NavigationLogPortOption } from '#shared/types/na
 import type { CrewMemberOption } from '#shared/types/crew'
 import { toBoatEquipmentActionRow } from '#transformers/boat_equipment_action_transformer'
 
-export interface BoatManageContext {
+export interface BoatShowContext {
   positionHistory: BoatPositionHistory[]
   boatMedia: Media[]
   maintenanceEvents: BoatMaintenanceEvent[]
@@ -35,17 +35,11 @@ export interface BoatManageContext {
   equipmentActions: BoatEquipmentAction[]
   canManageEquipmentActions: boolean
   canDeleteEquipmentActions: boolean
-}
-
-export interface BoatNavigationContext {
-  positionHistory: BoatPositionHistory[]
-  boatMedia: Media[]
   incidents: BoatIncident[]
   fuelLogs: BoatFuelLog[]
   navigationLogs: NavigationLog[]
   portOptions: NavigationLogPortOption[]
   crewMemberOptions: CrewMemberOption[]
-  canManageMaintenance: boolean
   canDeleteIncidents: boolean
   canCreateFuelLogs: boolean
   canDeleteFuelLogs: boolean
@@ -82,7 +76,13 @@ export function toEditForm(boat: Boat) {
   }
 }
 
-export function toManageProps(boat: Boat, ctx: BoatManageContext) {
+export function toShowProps(boat: Boat, ctx: BoatShowContext) {
+  const positionHistory = ctx.positionHistory.map(toPositionHistoryEntry)
+  const latestGpsPosition =
+    positionHistory.find((p) => p.latitude !== null && p.endedAt === null) ??
+    positionHistory.find((p) => p.latitude !== null) ??
+    null
+
   return {
     boat: toBoatDetail(boat, ctx),
     maintenanceEvents: ctx.maintenanceEvents.map(toMaintenanceEvent),
@@ -100,18 +100,6 @@ export function toManageProps(boat: Boat, ctx: BoatManageContext) {
     equipmentActions: ctx.equipmentActions.map(toBoatEquipmentActionRow),
     canManageEquipmentActions: ctx.canManageEquipmentActions,
     canDeleteEquipmentActions: ctx.canDeleteEquipmentActions,
-  }
-}
-
-export function toNavigationProps(boat: Boat, ctx: BoatNavigationContext) {
-  const positionHistory = ctx.positionHistory.map(toPositionHistoryEntry)
-  const latestGpsPosition =
-    positionHistory.find((p) => p.latitude !== null && p.endedAt === null) ??
-    positionHistory.find((p) => p.latitude !== null) ??
-    null
-
-  return {
-    boat: toBoatDetail(boat, ctx),
     incidents: ctx.incidents.map(toIncident),
     fuelLogs: ctx.fuelLogs.map(toFuelLog),
     navigationLogs: ctx.navigationLogs.map(toNavigationLog),
@@ -119,7 +107,6 @@ export function toNavigationProps(boat: Boat, ctx: BoatNavigationContext) {
     crewMemberOptions: ctx.crewMemberOptions,
     positionHistory,
     latestGpsPosition,
-    canManageMaintenance: ctx.canManageMaintenance,
     canDeleteIncidents: ctx.canDeleteIncidents,
     canCreateFuelLogs: ctx.canCreateFuelLogs,
     canDeleteFuelLogs: ctx.canDeleteFuelLogs,
@@ -177,10 +164,7 @@ function toFuelLog(log: BoatFuelLog): FuelLogRow {
   }
 }
 
-function toBoatDetail(
-  boat: Boat,
-  ctx: Pick<BoatManageContext | BoatNavigationContext, 'positionHistory' | 'boatMedia'>
-) {
+function toBoatDetail(boat: Boat, ctx: Pick<BoatShowContext, 'positionHistory' | 'boatMedia'>) {
   return {
     id: boat.id,
     name: boat.name,
