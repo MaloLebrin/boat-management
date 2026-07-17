@@ -9,6 +9,7 @@ import BoatShowTabContent from '~/components/boats/show/BoatShowTabContent.vue'
 import NavigationActiveCard from '~/components/boats/show/tabs/NavigationActiveCard.vue'
 import { useBoatShowTabs } from '~/composables/use_boat_show_tabs'
 import { useT } from '~/composables/use_t'
+import { propulsionLabel } from '~/utils/boat_propulsion_label'
 import type {
   AiSuggestion,
   BoatCreateIntent,
@@ -150,7 +151,7 @@ const activeNavigationLog = computed(
               class="text-fg-subtle"
               >·</span
             >
-            <span v-if="boat.propulsionType">{{ boat.propulsionType }}</span>
+            <span v-if="boat.propulsionType">{{ propulsionLabel(t, boat.propulsionType) }}</span>
           </div>
         </div>
 

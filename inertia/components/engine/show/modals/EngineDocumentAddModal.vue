@@ -81,7 +81,7 @@ function submit() {
     :open="open"
     :title="t('boats.show.mediaUpload.modalTitle')"
     :subtitle="t('boats.engineShow.documents.modalSubtitle', { name: engineTitle })"
-    close-label="Annuler"
+    :close-label="t('common.close')"
     size="xl"
     @update:open="close"
   >

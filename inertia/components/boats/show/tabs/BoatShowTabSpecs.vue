@@ -4,6 +4,7 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import { useT } from '~/composables/use_t'
 import type { BoatShowDetail } from '~/types/boat_show'
+import { propulsionLabel } from '~/utils/boat_propulsion_label'
 
 defineProps<{
   boat: BoatShowDetail
@@ -93,7 +94,9 @@ const { t } = useT()
           </div>
           <div>
             <dt class="text-fg-muted">{{ t('boats.hullFields.propulsionType') }}</dt>
-            <dd class="font-semibold text-fg">{{ boat.propulsionType ?? '—' }}</dd>
+            <dd class="font-semibold text-fg">
+              {{ propulsionLabel(t, boat.propulsionType) ?? '—' }}
+            </dd>
           </div>
         </dl>
       </BaseCard>
