@@ -297,9 +297,11 @@ function getTaskComponentLabel(task: MaintenanceTaskRow): string {
       </div>
     </div>
 
-    <!-- Empty state -->
+    <!-- Empty state: only shown when the active filter has no match but other
+         open tasks exist elsewhere — when there are none at all, the panel
+         below already owns the empty message + creation CTA. -->
     <div
-      v-if="filteredTasks.length === 0"
+      v-if="filteredTasks.length === 0 && openTasks.length > 0"
       class="rounded-lg border border-dashed border-border bg-surface-muted/30 p-8 text-center"
     >
       <p class="text-fg-muted">{{ t('boats.maintenance.tasks.emptyFiltered') }}</p>

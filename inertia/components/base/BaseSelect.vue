@@ -65,7 +65,7 @@ const resolvedError = computed(() => {
           )
         "
       >
-        <option value="" :disabled="!allowEmpty">
+        <option v-if="allowEmpty || modelValue === ''" value="" :disabled="!allowEmpty">
           {{ placeholder }}
         </option>
         <option v-for="opt in options" :key="String(opt.value)" :value="opt.value">

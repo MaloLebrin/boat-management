@@ -125,8 +125,8 @@ function update(partial: Partial<BoatListFilters>) {
       </div>
     </div>
 
-    <div class="grid gap-3 md:grid-cols-12 md:items-center">
-      <div class="flex flex-wrap items-center gap-2 md:col-span-6">
+    <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+      <div class="flex flex-wrap items-center gap-2">
         <BaseTabs
           :model-value="viewMode"
           :tabs="viewTabs"
@@ -141,7 +141,7 @@ function update(partial: Partial<BoatListFilters>) {
         </p>
       </div>
 
-      <div class="grid gap-2 sm:grid-cols-3 md:col-span-6 md:justify-end">
+      <div class="grid gap-2 sm:grid-cols-3 md:w-auto md:justify-end">
         <div>
           <BaseSelect
             :label="t('boats.list.sort')"

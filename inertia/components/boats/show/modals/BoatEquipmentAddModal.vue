@@ -1,5 +1,16 @@
 <script setup lang="ts">
 import { Form } from '@adonisjs/inertia/vue'
+import {
+  AdjustmentsVerticalIcon,
+  BoltIcon,
+  Cog6ToothIcon,
+  FlagIcon,
+  LifebuoyIcon,
+  LinkIcon,
+  MapPinIcon,
+  PuzzlePieceIcon,
+  Square3Stack3DIcon,
+} from '@heroicons/vue/24/outline'
 import { computed, ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseModal from '~/components/base/BaseModal.vue'
@@ -32,45 +43,55 @@ const categories = computed(() => [
   {
     key: 'engine',
     label: t('boats.equipmentAddModal.categories.engine'),
-    icon: '⚙',
+    icon: Cog6ToothIcon,
     supported: true,
   },
-  { key: 'sail', label: t('boats.equipmentAddModal.categories.sail'), icon: '⛵', supported: true },
-  { key: 'rig', label: t('boats.equipmentAddModal.categories.rig'), icon: '⚓', supported: true },
+  {
+    key: 'sail',
+    label: t('boats.equipmentAddModal.categories.sail'),
+    icon: FlagIcon,
+    supported: true,
+  },
+  {
+    key: 'rig',
+    label: t('boats.equipmentAddModal.categories.rig'),
+    icon: AdjustmentsVerticalIcon,
+    supported: true,
+  },
   {
     key: 'safety',
     label: t('boats.equipmentAddModal.categories.safety'),
-    icon: '🦺',
+    icon: LifebuoyIcon,
     supported: true,
   },
   {
     key: 'navigation',
     label: t('boats.equipmentAddModal.categories.navigation'),
-    icon: '🧭',
+    icon: MapPinIcon,
     supported: true,
   },
   {
     key: 'electrical',
     label: t('boats.equipmentAddModal.categories.electrical'),
-    icon: '⚡',
+    icon: BoltIcon,
     supported: true,
   },
   {
     key: 'anchoring',
     label: t('boats.equipmentAddModal.categories.anchoring'),
-    icon: '⚓',
+    icon: LinkIcon,
     supported: true,
   },
   {
     key: 'deck',
     label: t('boats.equipmentAddModal.categories.deck'),
-    icon: '🔩',
+    icon: Square3Stack3DIcon,
     supported: true,
   },
   {
     key: 'other',
     label: t('boats.equipmentAddModal.categories.other'),
-    icon: '📦',
+    icon: PuzzlePieceIcon,
     supported: false,
   },
 ])
@@ -130,7 +151,7 @@ function close() {
           ]"
           @click="selectedCategory = cat.key as Category"
         >
-          <span>{{ cat.icon }}</span>
+          <component :is="cat.icon" class="h-4 w-4" aria-hidden="true" />
           {{ cat.label }}
           <span v-if="!cat.supported" class="text-xs opacity-70"
             >({{ t('boats.equipmentAddModal.comingSoon.badge') }})</span
