@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseBreadcrumb from '~/components/base/BaseBreadcrumb.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
@@ -53,13 +53,26 @@ type TabKey =
   | 'sheets'
   | 'admin-docs'
 
-const tab = ref<TabKey>('overview')
+const VALID_TABS: TabKey[] = [
+  'overview',
+  'specs',
+  'pricing',
+  'equipment',
+  'equipmentActions',
+  'history',
+  'tasks',
+  'documents',
+  'sheets',
+  'admin-docs',
+]
 
-onMounted(() => {
-  const urlParams = new URLSearchParams(window.location.search)
-  const fromUrl = urlParams.get('tab') as TabKey | null
-  if (fromUrl) tab.value = fromUrl
-})
+function getInitialTab(): TabKey {
+  if (typeof window === 'undefined') return 'overview'
+  const fromUrl = new URLSearchParams(window.location.search).get('tab') as TabKey | null
+  return fromUrl && VALID_TABS.includes(fromUrl) ? fromUrl : 'overview'
+}
+
+const tab = ref<TabKey>(getInitialTab())
 
 watch(tab, (newTab) => {
   const url = new URL(window.location.href)
