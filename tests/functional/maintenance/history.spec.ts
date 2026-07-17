@@ -2,6 +2,7 @@ import { test } from '@japa/runner'
 import testUtils from '@adonisjs/core/services/test_utils'
 import BoatMaintenanceService from '#services/boat_maintenance_service'
 import { BoatFactory } from '#database/factories/boat_factory'
+import { UserFactory } from '#database/factories/user_factory'
 import { createAdminUser } from '#tests/functional/helpers'
 import type {
   MaintenanceBoatOption,
@@ -15,6 +16,7 @@ type HistoryProps = {
   stats: MaintenanceHistoryStats
   filters: MaintenanceHistoryFilters
   boatOptions: MaintenanceBoatOption[]
+  canExport: boolean
 }
 
 test.group('Maintenance history (functional)', (group) => {
@@ -43,6 +45,21 @@ test.group('Maintenance history (functional)', (group) => {
     assert.equal(props.filters.subject, '')
     assert.equal(props.filters.page, 1)
     assert.isAtLeast(props.boatOptions.length, 1)
+    assert.isTrue(props.canExport)
+  })
+
+  test('GET /maintenance/history reports canExport false for a Starter plan', async ({
+    client,
+    assert,
+  }) => {
+    const user = await UserFactory.with('organization', 1, (org) =>
+      org.merge({ plan: 'starter' })
+    ).create()
+
+    const response = await client.get('/maintenance/history').loginAs(user).withInertia()
+
+    const props = response.inertiaProps as HistoryProps
+    assert.isFalse(props.canExport)
   })
 
   test('GET /maintenance/history applies the subject filter from query params', async ({

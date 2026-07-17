@@ -63,6 +63,25 @@
       "sortRecent": "Plus récent",
       "sortOldest": "Plus ancien",
       "results": "{count} résultat(s)"
+    },
+    "pdf": {
+      "title": "Historique de maintenance",
+      "generatedOn": "Généré le {date}",
+      "filtersNone": "Aucun filtre appliqué",
+      "filterBoat": "Bateau : {name}",
+      "filterSubject": "Sujet : {label}",
+      "filterDateFrom": "Du {date}",
+      "filterDateTo": "Au {date}",
+      "filterSearch": "Recherche : « {query} »",
+      "columns": {
+        "date": "Date",
+        "boat": "Bateau",
+        "subject": "Sujet",
+        "title": "Intervention"
+      },
+      "partsCount": "{count} pièce(s) changée(s)",
+      "noEvents": "Aucun événement ne correspond aux filtres sélectionnés.",
+      "totalEvents": "{count} événement(s)"
     }
   }
 }

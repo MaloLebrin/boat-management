@@ -15,6 +15,7 @@ const props = withDefaults(
     boat: BoatShowDetail
     maintenanceEvents: MaintenanceEventRow[]
     canManageMaintenance: boolean
+    canExport: boolean
     createIntent?: BoatCreateIntent
   }>(),
   { createIntent: null }
@@ -218,11 +219,18 @@ function getSubjectLink(ev: MaintenanceEventRow): string {
           </div>
         </dl>
       </BaseCard>
-      <!-- TODO: implement PDF export for maintenance history (e.g. GET /boats/:id/maintenance/history.pdf) -->
-      <BaseButton variant="secondary" size="sm" class="w-full" disabled>
-        <DocumentTextIcon class="h-4 w-4 mr-2" />
-        {{ t('boats.show.historyTab.exportPdf') }}
-      </BaseButton>
+      <a
+        v-if="canExport"
+        :href="`/boats/${boat.id}/maintenance-log.pdf`"
+        target="_blank"
+        rel="noopener"
+        class="block"
+      >
+        <BaseButton variant="secondary" size="sm" class="w-full" type="button">
+          <DocumentTextIcon class="h-4 w-4 mr-2" />
+          {{ t('boats.show.historyTab.exportPdf') }}
+        </BaseButton>
+      </a>
     </div>
   </div>
 </template>

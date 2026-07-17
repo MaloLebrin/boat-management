@@ -108,6 +108,7 @@ defineEmits<{ goToTab: [key: string]; createIntentConsumed: [] }>()
         :boat="boat"
         :maintenance-events="maintenanceEvents"
         :can-manage-maintenance="canManageMaintenance"
+        :can-export="canExport"
         :create-intent="createIntent"
         @create-intent-consumed="$emit('createIntentConsumed')"
       />
