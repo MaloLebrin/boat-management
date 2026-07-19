@@ -140,6 +140,11 @@ export default class Boat extends BaseModel {
   @hasOne(() => BoatPricing)
   declare pricing: HasOne<typeof BoatPricing>
 
-  @manyToMany(() => User, { pivotTable: 'boat_owners' })
+  // `boat_owners` only has `created_at` (no `updated_at`) — cf. migration
+  // 1820000003000_create_boat_owners_table.
+  @manyToMany(() => User, {
+    pivotTable: 'boat_owners',
+    pivotTimestamps: { createdAt: true, updatedAt: false },
+  })
   declare owners: ManyToMany<typeof User>
 }

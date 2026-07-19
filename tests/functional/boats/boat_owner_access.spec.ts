@@ -14,7 +14,7 @@ test.group('Boat owner portal access (functional)', (group) => {
     const owner = await createBoatOwnerUser(admin.organizationId!)
     await ownedBoat.related('owners').attach([owner.id])
 
-    const response = await client.get('/owner/boats').loginAs(owner)
+    const response = await client.get('/owner/boats').loginAs(owner).withInertia()
 
     response.assertStatus(200)
     const props = response.body().props
@@ -30,7 +30,7 @@ test.group('Boat owner portal access (functional)', (group) => {
     await boat.related('owners').attach([owner.id])
     await BoatMaintenanceEventFactory.merge({ boatId: boat.id }).create()
 
-    const response = await client.get(`/owner/boats/${boat.id}`).loginAs(owner)
+    const response = await client.get(`/owner/boats/${boat.id}`).loginAs(owner).withInertia()
 
     response.assertStatus(200)
     const props = response.body().props

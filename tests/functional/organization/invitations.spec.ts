@@ -346,7 +346,11 @@ test.group('Organization invitations — boat_owner role (functional)', (group) 
     const response = await client
       .post('/organization/invitations')
       .loginAs(admin)
-      .form({ email: 'owner@example.com', role: 'boat_owner', boatIds: [foreignBoat.id] })
+      .form({
+        'email': 'owner@example.com',
+        'role': 'boat_owner',
+        'boatIds[0]': foreignBoat.id,
+      })
       .redirects(0)
 
     response.assertStatus(302)
@@ -372,7 +376,11 @@ test.group('Organization invitations — boat_owner role (functional)', (group) 
     const createResponse = await client
       .post('/organization/invitations')
       .loginAs(admin)
-      .form({ email: 'newowner@example.com', role: 'boat_owner', boatIds: [boat.id] })
+      .form({
+        'email': 'newowner@example.com',
+        'role': 'boat_owner',
+        'boatIds[0]': boat.id,
+      })
       .redirects(0)
     createResponse.assertStatus(302)
 
