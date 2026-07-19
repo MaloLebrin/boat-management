@@ -4,11 +4,13 @@ import { usePage } from '@inertiajs/vue3'
 import { Link } from '@adonisjs/inertia/vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import { useT } from '~/composables/use_t'
+import { usePermissions } from '~/composables/use_permissions'
 import { PLAN_LIMITS } from '../../../shared/types/plan'
 import type { PlanTier } from '../../../shared/types/plan'
 
 const { t } = useT()
 const page = usePage()
+const { can } = usePermissions()
 
 type SettingsSection =
   | 'me'
@@ -20,12 +22,30 @@ type SettingsSection =
   | 'branding'
   | 'import'
 
-const baseSections: { key: SettingsSection; route: string; label: () => string }[] = [
-  { key: 'me', route: 'settings.me', label: () => t('settings.sections.me') },
-  { key: 'org', route: 'settings.org', label: () => t('settings.sections.org') },
-  { key: 'members', route: 'settings.members', label: () => t('settings.sections.members') },
-  { key: 'billing', route: 'settings.billing', label: () => t('settings.sections.billing') },
-]
+// `org`/`members` partagent la même audience que la capability `members.view`
+// (member + admin) — mechanic/boat_owner n'ont accès à aucune section
+// administrative de l'organisation. Cf. #397.
+const baseSections = computed(() => {
+  const result: { key: SettingsSection; route: string; label: () => string }[] = [
+    { key: 'me', route: 'settings.me', label: () => t('settings.sections.me') },
+  ]
+  if (can('members.view')) {
+    result.push({ key: 'org', route: 'settings.org', label: () => t('settings.sections.org') })
+    result.push({
+      key: 'members',
+      route: 'settings.members',
+      label: () => t('settings.sections.members'),
+    })
+  }
+  if (can('subscription.view')) {
+    result.push({
+      key: 'billing',
+      route: 'settings.billing',
+      label: () => t('settings.sections.billing'),
+    })
+  }
+  return result
+})
 
 const VALID_PLANS = new Set<string>(['starter', 'pro', 'enterprise'])
 
@@ -54,7 +74,7 @@ const canWhiteLabel = computed(() => {
 })
 
 const sections = computed(() => {
-  const result = [...baseSections]
+  const result = [...baseSections.value]
   if (canExport.value) {
     result.push({
       key: 'import' as SettingsSection,
@@ -62,21 +82,21 @@ const sections = computed(() => {
       label: () => t('settings.sections.import'),
     })
   }
-  if (canCustomizeAI.value) {
+  if (canCustomizeAI.value && can('ai.configure')) {
     result.push({
       key: 'ai' as SettingsSection,
       route: 'settings.ai',
       label: () => t('settings.sections.ai'),
     })
   }
-  if (canViewAuditLog.value) {
+  if (canViewAuditLog.value && can('audit_log.view')) {
     result.push({
       key: 'audit-log' as SettingsSection,
       route: 'settings.auditLog',
       label: () => t('settings.sections.auditLog'),
     })
   }
-  if (canWhiteLabel.value) {
+  if (canWhiteLabel.value && can('branding.configure')) {
     result.push({
       key: 'branding' as SettingsSection,
       route: 'settings.branding',

@@ -118,6 +118,7 @@
       "deactivate": "Cancel",
       "deactivateIncluded": "Deactivate",
       "proRequired": "Requires an active Pro plan",
+      "adminOnly": "Admins only",
       "charter": {
         "name": "Charter",
         "desc": "Per-boat pricing and seasonal rates"

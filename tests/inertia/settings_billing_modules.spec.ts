@@ -29,6 +29,7 @@ function mountModules(props: Partial<InstanceType<typeof SettingsBillingModules>
       plan: 'pro',
       subscription,
       activeModules: [],
+      canManageBilling: true,
       ...props,
     },
     global: {
@@ -128,4 +129,24 @@ test('clicking deactivate deletes on the module endpoint', async () => {
     data: { module: 'charter' },
     preserveScroll: true,
   })
+})
+
+// subscription.manage gating (#397) — a member has subscription.view but not
+// subscription.manage: the activate/deactivate CTAs must not be actionable.
+
+test('a subscribed Pro org without subscription.manage sees no activate button', () => {
+  const w = mountModules({ plan: 'pro', subscription, activeModules: [], canManageBilling: false })
+  expect(w.text()).not.toContain('settings.billing.modules.activate')
+  expect(w.text()).toContain('settings.billing.modules.adminOnly')
+})
+
+test('Enterprise without subscription.manage sees no activate button', () => {
+  const w = mountModules({
+    plan: 'enterprise',
+    subscription: null,
+    activeModules: [],
+    canManageBilling: false,
+  })
+  expect(w.text()).not.toContain('settings.billing.modules.activate')
+  expect(w.text()).toContain('settings.billing.modules.adminOnly')
 })

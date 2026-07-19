@@ -118,6 +118,7 @@
       "deactivate": "Résilier",
       "deactivateIncluded": "Désactiver",
       "proRequired": "Nécessite un plan Pro actif",
+      "adminOnly": "Réservé aux administrateurs",
       "charter": {
         "name": "Location",
         "desc": "Tarif par bateau et périodes saisonnières"

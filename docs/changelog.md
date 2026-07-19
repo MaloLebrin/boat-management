@@ -3,6 +3,17 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-07-19 — Navigation et CTA filtrés par capability (#397)
+
+La sidebar, la sous-nav `/settings/*` et certains CTA create/delete/manage s'affichaient indépendamment des capabilities réelles de l'utilisateur : un `mechanic` (capabilities limitées à `maintenance.*`) voyait la sidebar staff complète (Clients, Factures, Journal de bord…) menant à des 403, et un `member` voyait des boutons admin-only (suppression de bateau, activation de module de facturation, onglets Réglages « Marque blanche »/« Personnalisation IA ») qui échouaient silencieusement au clic.
+
+- `inertia/composables/use_nav_sections.ts` : chaque item de la sidebar staff est désormais gardé par la même capability que la route serveur correspondante (`boats.view`, `ports.view`, `crew.create`, `incidents.view`, `maintenance.view`, `clients.create`, `invoices.view`, `pricing_seasons.create`) via `usePermissions().can()`. Les sections sans item restant (ex. Activité/Business pour un `mechanic`) sont masquées.
+- `inertia/components/settings/SettingsShell.vue` : les onglets Organisation/Membres (`members.view`), Facturation (`subscription.view`), IA (`ai.configure`), Marque blanche (`branding.configure`) et Journal d'activité (`audit_log.view`) sont désormais gardés par capability en plus du plan — seul « Mon profil » reste toujours visible.
+- `inertia/pages/boats/edit.vue` : le bouton de suppression n'est rendu que si `can('boats.delete')` (admin-only).
+- `inertia/components/settings/SettingsBillingModules.vue` (+ nouvelle prop `canManageBilling` depuis `SettingsBillingTab.vue`) : les CTA « Activer »/« Résilier » (modules Pro et Enterprise) ne sont rendus que si `can('subscription.manage')`, avec un message explicatif (`settings.billing.modules.adminOnly`, FR+EN) sinon.
+- **Tests** : `tests/inertia/use_nav_sections.spec.ts` (filtrage capability, dont mechanic/boat_owner/zéro-capability), `tests/inertia/settings_shell.spec.ts` (nouveau), `tests/inertia/boats_edit_delete_button.spec.ts` (nouveau), `tests/inertia/settings_billing_modules.spec.ts` (gating `subscription.manage`), `tests/inertia/default_layout_sidebar.spec.ts` mis à jour pour le prop `permissions` désormais requis.
+- Backend inchangé — purement une correction d'affichage frontend, cohérente avec les policies déjà en place côté serveur (ou déjà couvertes par #396 pour les routes fleet).
+
 ## 2026-07-19 — Fuite de données : index staff accessibles à mechanic/boat_owner sans capability (#396)
 
 `/boats`, `/reservations`, `/navigation/logbook`, `/navigation/fuel`, `/navigation/incidents` ne vérifiaient aucune policy (contrairement à leur `show` respectif) : un `boat_owner` (0 capability) ou un `mechanic` (`maintenance.*` uniquement) pouvait lister toute la flotte, les réservations, les logs de navigation/carburant et les incidents de l'organisation.
