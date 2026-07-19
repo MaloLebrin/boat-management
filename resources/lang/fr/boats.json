@@ -9,7 +9,11 @@
     "title": "Modifier le bateau",
     "subtitle": "Mettre à jour les informations du bateau",
     "submit": "Enregistrer",
-    "cancel": "Annuler"
+    "cancel": "Annuler",
+    "deleteConfirm": {
+      "title": "Supprimer ce bateau ?",
+      "message": "Cette action supprimera définitivement « {name} » ainsi que tout son historique (maintenance, documents, équipements). Cette action est irréversible."
+    }
   },
   "owners": {
     "title": "Propriétaires",

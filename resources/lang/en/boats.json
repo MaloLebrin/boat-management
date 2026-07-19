@@ -9,7 +9,11 @@
     "title": "Edit boat",
     "subtitle": "Update boat details",
     "submit": "Save",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "deleteConfirm": {
+      "title": "Delete this boat?",
+      "message": "This will permanently delete \"{name}\" and all of its history (maintenance, documents, equipment). This action cannot be undone."
+    }
   },
   "owners": {
     "title": "Owners",

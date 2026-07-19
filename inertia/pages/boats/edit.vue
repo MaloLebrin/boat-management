@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { Form } from '@adonisjs/inertia/vue'
+import { router } from '@inertiajs/vue3'
 import BoatFormHullFields from '~/components/boats/hull/BoatFormHullFields.vue'
 import BoatOwnersManager from '~/components/boats/BoatOwnersManager.vue'
 import type { BoatEditPayload, PortForForm, PropulsionTypeUi } from '~/types/boat_form'
 import { parsePropulsionType } from '~/types/boat_form'
 import { computed, ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
+import BaseConfirmModal from '~/components/base/BaseConfirmModal.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import { useT } from '~/composables/use_t'
 import { usePermissions } from '~/composables/use_permissions'
@@ -28,6 +30,22 @@ const props = defineProps<{
 
 const propulsionType = ref<PropulsionTypeUi>(parsePropulsionType(props.boat.propulsionType))
 const showSailFields = computed(() => propulsionType.value === 'sailboat')
+
+const showDeleteConfirm = ref(false)
+const deleting = ref(false)
+
+function confirmDeleteBoat() {
+  showDeleteConfirm.value = true
+}
+
+function executeDeleteBoat() {
+  deleting.value = true
+  router.delete(`/boats/${props.boat.id}`, {
+    onFinish: () => {
+      deleting.value = false
+    },
+  })
+}
 </script>
 
 <template>
@@ -63,16 +81,17 @@ const showSailFields = computed(() => propulsionType.value === 'sailboat')
         </div>
       </Form>
 
-      <Form
-        v-if="can('boats.delete')"
-        :action="{ url: `/boats/${boat.id}`, method: 'delete' }"
-        class="mt-6 flex justify-end"
-        #default="{ processing: deleting }"
-      >
-        <BaseButton type="submit" variant="danger" size="sm" :disabled="deleting">
+      <div v-if="can('boats.delete')" class="mt-6 flex justify-end">
+        <BaseButton
+          type="button"
+          variant="danger"
+          size="sm"
+          :disabled="deleting"
+          @click="confirmDeleteBoat"
+        >
           {{ t('common.delete') }}
         </BaseButton>
-      </Form>
+      </div>
 
       <BoatOwnersManager
         class="mt-6"
@@ -81,5 +100,15 @@ const showSailFields = computed(() => propulsionType.value === 'sailboat')
         :owner-candidates="ownerCandidates"
       />
     </div>
+
+    <BaseConfirmModal
+      :open="showDeleteConfirm"
+      :title="t('boats.edit.deleteConfirm.title')"
+      :message="t('boats.edit.deleteConfirm.message', { name: boat.name })"
+      :confirm-label="t('common.delete')"
+      :cancel-label="t('boats.edit.cancel')"
+      @update:open="showDeleteConfirm = $event"
+      @confirm="executeDeleteBoat"
+    />
   </div>
 </template>
