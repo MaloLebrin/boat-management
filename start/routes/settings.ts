@@ -37,6 +37,15 @@ router
       .delete('settings/billing/module', [BillingController, 'removeModule'])
       .as('settings.billing.module.remove')
     router
+      .post('settings/billing/module/enterprise', [BillingController, 'activateEnterpriseModule'])
+      .as('settings.billing.module.enterprise.activate')
+    router
+      .delete('settings/billing/module/enterprise', [
+        BillingController,
+        'deactivateEnterpriseModule',
+      ])
+      .as('settings.billing.module.enterprise.deactivate')
+    router
       .post('settings/billing/addon', [BillingController, 'setAddon'])
       .as('settings.billing.addon.set')
     router

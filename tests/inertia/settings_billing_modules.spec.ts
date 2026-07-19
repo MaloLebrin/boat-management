@@ -63,10 +63,44 @@ test('a granted module shows the offered hint and no deactivate button', () => {
   expect(w.text()).toContain('settings.billing.modules.granted')
 })
 
-test('Enterprise shows every module as included, no action buttons', () => {
+test('Enterprise shows an activate button for a module that is not granted', () => {
   const w = mountModules({ plan: 'enterprise', subscription: null, activeModules: [] })
-  expect(w.text()).toContain('settings.billing.modules.included')
-  expect(w.text()).not.toContain('settings.billing.modules.activate')
+  expect(w.text()).toContain('settings.billing.modules.activate')
+  expect(w.text()).not.toContain('settings.billing.modules.deactivateIncluded')
+})
+
+test('Enterprise shows a deactivate button for a granted module', () => {
+  const w = mountModules({
+    plan: 'enterprise',
+    subscription: null,
+    activeModules: [{ module: 'charter', source: 'granted' }],
+  })
+  expect(w.text()).toContain('settings.billing.modules.deactivateIncluded')
+})
+
+test('clicking activate on Enterprise posts to the enterprise module endpoint', async () => {
+  post.mockClear()
+  const w = mountModules({ plan: 'enterprise', subscription: null, activeModules: [] })
+  await w.find('button').trigger('click')
+  expect(post).toHaveBeenCalledWith(
+    '/settings/billing/module/enterprise',
+    { module: 'charter' },
+    { preserveScroll: true }
+  )
+})
+
+test('clicking deactivate on Enterprise deletes on the enterprise module endpoint', async () => {
+  del.mockClear()
+  const w = mountModules({
+    plan: 'enterprise',
+    subscription: null,
+    activeModules: [{ module: 'charter', source: 'granted' }],
+  })
+  await w.find('button').trigger('click')
+  expect(del).toHaveBeenCalledWith('/settings/billing/module/enterprise', {
+    data: { module: 'charter' },
+    preserveScroll: true,
+  })
 })
 
 test('Starter (no subscription) prompts to upgrade to Pro', () => {

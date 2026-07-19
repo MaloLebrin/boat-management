@@ -3,6 +3,16 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-07-17 — Désactivation self-service d'un module inclus sur le plan Enterprise (#353)
+
+Sur le plan Enterprise, tous les modules add-ons (`charter`, `crm_invoicing`) étaient inclus et imposés sans possibilité de désactivation — une organisation qui n'utilise pas un module (ex. une marina sans activité de location) ne pouvait pas le masquer.
+
+- `BillingController` : deux nouvelles routes `POST`/`DELETE /settings/billing/module/enterprise` (`settings.billing.module.enterprise.activate`/`.deactivate`), réservées aux admins d'organisation `plan === 'enterprise'` (nouvelle ability `OrganizationPolicy.manageBilling`). Appellent `OrganizationModuleService.grantModule`/`revokeModule` avec `source: 'granted'` — aucun appel Stripe, sans impact sur le prix (flat pour Enterprise).
+- Une organisation Pro ou Starter qui tape ces routes reçoit une erreur dédiée (`ModulesRequireEnterprisePlanError`) ; les modules `source: 'subscription'` (souscrits via Stripe sur Pro) ne sont jamais touchés par ce chemin.
+- `SettingsBillingModules.vue` : le badge « Inclus » figé pour Enterprise est remplacé par un bouton Activer/Désactiver (nouvelle clé `settings.billing.modules.deactivateIncluded`, distincte de `deactivate`/« Résilier » qui reste le wording Stripe pour Pro).
+- **Limitation connue** : ce toggle agit uniquement sur la table `organization_modules` — `PLAN_LIMITS.enterprise` (`shared/types/plan.ts`) fige encore `canManageClients`/`canManagePricing`/`canManageInvoices` à `true` au niveau du tier, donc désactiver un module ne retire pas (pour l'instant) l'accès réel aux écrans Clients/Factures/Tarification saisonnière ni la nav. Décision explicite de rester au périmètre de l'issue plutôt que de retoucher la résolution des quotas.
+- **Tests** : `tests/functional/billing/enterprise_module_toggle.spec.ts` (nouveau — activation/réactivation admin, 403 non-admin, rejet hors Enterprise, non-régression sur les modules `subscription`) ; `tests/inertia/settings_billing_modules.spec.ts` mis à jour pour le nouveau toggle Enterprise.
+
 ## 2026-07-17 — Petits défauts UI : selects, doubles labels, empty state, icônes (#370)
 
 Correction d'un lot de défauts cosmétiques repérés lors d'un audit UI, chacun trivial isolément mais dégradant la finition perçue.

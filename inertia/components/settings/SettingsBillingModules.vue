@@ -39,6 +39,17 @@ function removeModule(module: PlanModule) {
     preserveScroll: true,
   })
 }
+
+function activateEnterpriseModule(module: PlanModule) {
+  router.post('/settings/billing/module/enterprise', { module }, { preserveScroll: true })
+}
+
+function deactivateEnterpriseModule(module: PlanModule) {
+  router.delete('/settings/billing/module/enterprise', {
+    data: { module },
+    preserveScroll: true,
+  })
+}
 </script>
 
 <template>
@@ -77,12 +88,27 @@ function removeModule(module: PlanModule) {
             {{ priceLabel(module) }}
           </span>
 
-          <!-- Enterprise : tout inclus -->
-          <BaseBadge v-if="plan === 'enterprise'" variant="success">
-            {{ t('settings.billing.modules.included') }}
-          </BaseBadge>
+          <!-- Enterprise : toggle self-service d'un module inclus (#353) -->
+          <template v-if="plan === 'enterprise'">
+            <BaseButton
+              v-if="bySource.get(module) === 'granted'"
+              variant="secondary"
+              size="sm"
+              @click="deactivateEnterpriseModule(module)"
+            >
+              {{ t('settings.billing.modules.deactivateIncluded') }}
+            </BaseButton>
+            <BaseButton
+              v-else
+              variant="primary"
+              size="sm"
+              @click="activateEnterpriseModule(module)"
+            >
+              {{ t('settings.billing.modules.activate') }}
+            </BaseButton>
+          </template>
 
-          <!-- Module offert : pas de résiliation -->
+          <!-- Module offert (Pro, grandfathering) : pas de résiliation -->
           <span v-else-if="bySource.get(module) === 'granted'" class="text-sm text-fg-muted">
             {{ t('settings.billing.modules.grantedHint') }}
           </span>
