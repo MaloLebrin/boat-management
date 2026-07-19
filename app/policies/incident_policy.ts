@@ -4,8 +4,9 @@ import type { AuthorizerResponse } from '@adonisjs/bouncer/types'
 import OrgScopedPolicy from '#utils/org_scoped_policy'
 
 export default class IncidentPolicy extends OrgScopedPolicy {
-  async view(user: User, boat: Boat): Promise<AuthorizerResponse> {
-    return this.sameOrg(user, boat) && (await this.can(user, 'incidents.view'))
+  async view(user: User, boat?: Boat): Promise<AuthorizerResponse> {
+    if (boat && !this.sameOrg(user, boat)) return false
+    return this.can(user, 'incidents.view')
   }
 
   async create(user: User, boat: Boat): Promise<AuthorizerResponse> {

@@ -2,6 +2,8 @@ import BoatReservationService from '#services/boat_reservation_service'
 import InvoiceService from '#services/invoice_service'
 import QuotaService from '#services/quota_service'
 import { toBoatReservationRow } from '#transformers/boat_reservation_transformer'
+import BoatPolicy from '#policies/boat_policy'
+import { boatOwnerPortalRedirect } from '#utils/staff_route_guard'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import type { FleetBoatCalendarEntry } from '#shared/types/reservation'
@@ -15,10 +17,15 @@ export default class ReservationsController {
     private quotaService: QuotaService
   ) {}
 
-  async index({ inertia, auth, request }: HttpContext) {
+  async index({ inertia, auth, request, bouncer, response }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
     await user.load('organization')
+
+    const portalRedirect = await boatOwnerPortalRedirect(user)
+    if (portalRedirect) return response.redirect(portalRedirect)
+
+    await bouncer.with(BoatPolicy).authorize('view')
 
     const rawBoatId = request.qs().boatId
     const selectedBoatId = rawBoatId ? Number(rawBoatId) : null

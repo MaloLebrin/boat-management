@@ -1,4 +1,5 @@
 import { SpotNotFoundError } from '#exceptions/port_errors'
+import { boatOwnerPortalRedirect } from '#utils/staff_route_guard'
 import { QuotaExceededError } from '#exceptions/quota_errors'
 import AiAnalysisService, { type AiSuggestion } from '#services/ai_analysis_service'
 import AuditLogService from '#services/audit_log_service'
@@ -59,10 +60,15 @@ export default class BoatsController {
     private boatOwnerService: BoatOwnerService
   ) {}
 
-  async index({ inertia, auth, request }: HttpContext) {
+  async index({ inertia, auth, request, bouncer, response }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
     await user.load('organization')
+
+    const portalRedirect = await boatOwnerPortalRedirect(user)
+    if (portalRedirect) return response.redirect(portalRedirect)
+
+    await bouncer.with(BoatPolicy).authorize('view')
 
     const [{ boats, filters }, canAddBoat] = await Promise.all([
       this.boatListService.listForUser(user, request.qs()),
