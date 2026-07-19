@@ -66,25 +66,23 @@ test.group('Navigation & dashboard quick-add props (functional)', (group) => {
     )
   })
 
-  test('a user with no organization gets canCreateNavigationLogs/canCreateIncidents false and no port options', async ({
+  test('a user with no organization is denied the staff navigation pages (no boats.view/incidents.view capability, cf. #396)', async ({
+    client,
+  }) => {
+    const user = await UserFactory.create()
+
+    const logbookResponse = await client.get('/navigation/logbook').loginAs(user)
+    logbookResponse.assertStatus(403)
+
+    const incidentsResponse = await client.get('/navigation/incidents').loginAs(user)
+    incidentsResponse.assertStatus(403)
+  })
+
+  test('a user with no organization gets canCreateNavigationLogs/canCreateIncidents false on /dashboard (org-agnostic landing page)', async ({
     client,
     assert,
   }) => {
     const user = await UserFactory.create()
-
-    const logbookResponse = await client.get('/navigation/logbook').loginAs(user).withInertia()
-    logbookResponse.assertStatus(200)
-    const logbookProps = logbookResponse.inertiaProps as {
-      portOptions: unknown[]
-      canCreateNavigationLogs: boolean
-    }
-    assert.isFalse(logbookProps.canCreateNavigationLogs)
-    assert.lengthOf(logbookProps.portOptions, 0)
-
-    const incidentsResponse = await client.get('/navigation/incidents').loginAs(user).withInertia()
-    incidentsResponse.assertStatus(200)
-    const incidentsProps = incidentsResponse.inertiaProps as { canCreateIncidents: boolean }
-    assert.isFalse(incidentsProps.canCreateIncidents)
 
     const dashboardResponse = await client.get('/dashboard').loginAs(user).withInertia()
     dashboardResponse.assertStatus(200)
