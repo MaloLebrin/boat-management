@@ -80,9 +80,11 @@ test.group('Invoices — invoices.view capability (functional)', (group) => {
     const admin = await createEnterpriseAdminUser()
     const invoice = await createInvoice(admin.organizationId!)
 
-    const otherAdmin = await createAdminUser()
+    // Enterprise plan so the request reaches the invoice ownership check
+    // instead of being blocked earlier by the invoices-module quota gate.
+    const otherAdmin = await createEnterpriseAdminUser()
 
-    const response = await client.get(`/invoices/${invoice.id}`).loginAs(otherAdmin)
+    const response = await client.get(`/invoices/${invoice.id}`).loginAs(otherAdmin).redirects(0)
 
     response.assertStatus(302)
     response.assertFlashMessage('error', 'Invoice not found.')

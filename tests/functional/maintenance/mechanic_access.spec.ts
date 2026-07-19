@@ -17,6 +17,7 @@ test.group('Mechanic role — maintenance access (functional)', (group) => {
 
     await client.post(`/boats/${boat.id}/maintenance`).loginAs(mechanic).form({
       subject: 'engine',
+      engineCaption: 'Moteur principal',
       title: 'Vidange moteur',
       performedAt: '2025-05-01',
     })
@@ -38,16 +39,20 @@ test.group('Mechanic role — maintenance access (functional)', (group) => {
 
     await client.post(`/boats/${boat.id}/maintenance`).loginAs(admin).form({
       subject: 'engine',
+      engineCaption: 'Moteur principal',
       title: 'À supprimer',
       performedAt: '2025-05-01',
     })
     const event = await BoatMaintenanceEvent.query().where('boatId', boat.id).firstOrFail()
 
+    // Bouncer redirects form-submission methods (POST/PUT/PATCH/DELETE) back with
+    // a flash error instead of a raw 403, to stay Inertia-friendly — cf. CLAUDE.md.
     const response = await client
       .delete(`/boats/${boat.id}/maintenance/${event.id}`)
       .loginAs(mechanic)
+      .redirects(0)
 
-    response.assertStatus(403)
+    response.assertStatus(302)
     const stillThere = await BoatMaintenanceEvent.find(event.id)
     assert.isNotNull(stillThere)
   })
@@ -61,8 +66,9 @@ test.group('Mechanic role — maintenance access (functional)', (group) => {
       .put(`/boats/${boat.id}`)
       .loginAs(mechanic)
       .form({ name: 'Renamed by mechanic' })
+      .redirects(0)
 
-    response.assertStatus(403)
+    response.assertStatus(302)
   })
 
   test('mechanic cannot access client management (no clients capabilities)', async ({ client }) => {
@@ -73,7 +79,8 @@ test.group('Mechanic role — maintenance access (functional)', (group) => {
       .post('/clients')
       .loginAs(mechanic)
       .form({ firstName: 'Jean', lastName: 'Dupont', email: 'jean@example.com' })
+      .redirects(0)
 
-    response.assertStatus(403)
+    response.assertStatus(302)
   })
 })

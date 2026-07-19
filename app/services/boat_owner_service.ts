@@ -46,14 +46,14 @@ export default class BoatOwnerService {
 
   async listOwnedBoats(user: User): Promise<Boat[]> {
     return Boat.query()
-      .whereHas('owners', (q) => q.where('userId', user.id))
+      .whereHas('owners', (q) => q.where('users.id', user.id))
       .orderBy('name')
   }
 
   async getOwnedBoat(user: User, boatId: number): Promise<Boat | null> {
     return Boat.query()
       .where('id', boatId)
-      .whereHas('owners', (q) => q.where('userId', user.id))
+      .whereHas('owners', (q) => q.where('users.id', user.id))
       .first()
   }
 

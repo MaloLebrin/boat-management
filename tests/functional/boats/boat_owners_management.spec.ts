@@ -94,11 +94,14 @@ test.group('Boat co-ownership management (functional)', (group) => {
     const mechanic = await createMechanicUser(admin.organizationId!)
     const owner = await createBoatOwnerUser(admin.organizationId!)
 
+    // Bouncer redirects form-submission methods (POST/PUT/PATCH/DELETE) back with
+    // a flash error instead of a raw 403, to stay Inertia-friendly — cf. CLAUDE.md.
     const response = await client
       .post(`/boats/${boat.id}/owners`)
       .loginAs(mechanic)
       .form({ userId: owner.id })
+      .redirects(0)
 
-    response.assertStatus(403)
+    response.assertStatus(302)
   })
 })

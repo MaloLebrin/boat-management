@@ -3,6 +3,15 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-07-19 — Correctifs suite à l'ajout des rôles `mechanic`/`boat_owner`
+
+La suite de tests fonctionnels comportait 15 échecs pré-existants sur `main`, hérités de l'ajout des rôles `mechanic`/`boat_owner` (cf. entrée ci-dessous). Deux bugs applicatifs réels en ont été extraits, le reste étant des tests mal écrits.
+
+- **Bug réel — acceptation d'invitation `boat_owner`** (`OrganizationInvitationService.accept`) : l'insert brut (`trx.table('boat_owners').insert(...)`) utilisait des clés camelCase (`boatId`, `userId`, `createdAt`) alors que la table est en snake_case (`boat_id`, `user_id`, `created_at`) — l'insert échouait systématiquement en base réelle (SQLite masquait l'erreur en tests, Postgres la révèle).
+- **Bug réel — pivot `boat_owners` sans timestamp** (`app/models/boat.ts`, `app/models/user.ts`) : les relations `manyToMany` `owners`/`ownedBoats` ne déclaraient pas `pivotTimestamps`, alors que la colonne `created_at` de `boat_owners` est `NOT NULL` sans défaut — tout `attach()` via la relation Lucid échouait en base réelle (500). Ajout de `pivotTimestamps: { createdAt: true, updatedAt: false }` (la table n'a pas de colonne `updated_at`).
+- **Bug réel — scoping propriétaire cassé** (`BoatOwnerService.listOwnedBoats`/`getOwnedBoat`) : `whereHas('owners', q => q.where('userId', user.id))` filtrait sur une colonne `userId` inexistante côté `users` (relation `owners`→`User`, PK `id`) au lieu de `q.where('users.id', user.id)` — masqué jusqu'ici par le bug d'`attach()` ci-dessus qui empêchait d'atteindre cette requête.
+- **Tests corrigés** (pas de bug applicatif) : `mechanic_access.spec.ts` (champ `engineCaption` manquant, requis pour `subject: 'engine'` sans `boatEngineId` ; assertions `403` remplacées par `302` — Bouncer redirige les échecs d'autorisation sur les méthodes de formulaire POST/PUT/PATCH/DELETE au lieu de renvoyer un 403 brut, cf. CLAUDE.md), `boat_owners_management.spec.ts` (même correctif 403→302), `invoice_view_capability.spec.ts` (`.redirects(0)` manquant + org de l'admin non-Enterprise bloquée en amont par le quota module avant d'atteindre la vérification cross-org), `invitations.spec.ts` (tableau `boatIds` à un seul élément mal sérialisé par `.form()` — passer par la notation `'boatIds[0]': id` comme dans `navigation_log_crew.spec.ts`), `boat_owner_access.spec.ts` (`.withInertia()` manquant sur les requêtes GET, donc `response.body()` renvoyait la page HTML complète au lieu du payload JSON Inertia).
+
 ## 2026-07-19 — Ajout des rôles `mechanic` (mécanicien) et `boat_owner` (propriétaire de bateau)
 
 Deux nouveaux rôles utilisateurs, en plus de `admin`/`member` : `mechanic`, membre du staff restreint au module maintenance (org entière, pas d'assignation par tâche), et `boat_owner`, accès self-service en lecture seule scopé à ses propres bateaux (copropriété possible).

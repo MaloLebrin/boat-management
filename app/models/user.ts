@@ -31,7 +31,12 @@ export default class User extends compose(
   @hasMany(() => OrganizationMembership)
   declare memberships: HasMany<typeof OrganizationMembership>
 
-  @manyToMany(() => Boat, { pivotTable: 'boat_owners' })
+  // `boat_owners` only has `created_at` (no `updated_at`) — cf. migration
+  // 1820000003000_create_boat_owners_table.
+  @manyToMany(() => Boat, {
+    pivotTable: 'boat_owners',
+    pivotTimestamps: { createdAt: true, updatedAt: false },
+  })
   declare ownedBoats: ManyToMany<typeof Boat>
 
   get initials() {

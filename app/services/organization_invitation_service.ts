@@ -238,10 +238,12 @@ export default class OrganizationInvitationService {
       await invitation.useTransaction(trx).save()
 
       if (invitation.role === 'boat_owner' && invitation.boatIds?.length) {
+        // Raw query builder insert — bypasses the Lucid model's camelCase→snake_case
+        // naming strategy, so columns must be spelled out as they exist in the table.
         const rows = invitation.boatIds.map((boatId) => ({
-          boatId,
-          userId,
-          createdAt: DateTime.now().toSQL(),
+          boat_id: boatId,
+          user_id: userId,
+          created_at: DateTime.now().toSQL(),
         }))
         await trx.table('boat_owners').insert(rows)
       }
