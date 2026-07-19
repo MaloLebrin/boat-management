@@ -16,10 +16,63 @@ vi.mock('@inertiajs/vue3', async () => {
 
 import { usePage } from '@inertiajs/vue3'
 import { useNavSections } from '../../inertia/composables/use_nav_sections'
+import type { Capability } from '../../shared/types/permissions'
 
-function mountWithPlan(currentPlan: unknown, activeModules: unknown = []) {
+// Toutes les capabilities `member` — cf. shared/types/permissions.ts. Ces tests
+// couvrent le filtrage par plan/module ; le rôle reste `member` sauf précision
+// contraire (voir la section "capability filtering" plus bas pour mechanic/admin).
+const MEMBER_CAPABILITIES: Capability[] = [
+  'members.view',
+  'invitations.view',
+  'audit_log.view',
+  'boats.view',
+  'boats.create',
+  'boats.edit',
+  'boats.manage',
+  'boats.reservations.delete',
+  'clients.create',
+  'clients.update',
+  'crew.create',
+  'crew.update',
+  'fuel_logs.create',
+  'equipmentActions.view',
+  'equipmentActions.create',
+  'equipmentActions.edit',
+  'incidents.view',
+  'incidents.create',
+  'incidents.edit',
+  'inspections.view',
+  'inspections.create',
+  'inspections.edit',
+  'invoices.view',
+  'invoices.create',
+  'invoices.update',
+  'maintenance.view',
+  'maintenance.create',
+  'maintenance.edit',
+  'mouillages.view',
+  'navigation_logs.create',
+  'navigation_logs.update',
+  'ports.view',
+  'pricing_seasons.create',
+  'pricing_seasons.update',
+  'rentalContracts.view',
+  'rentalContracts.create',
+  'rentalContracts.edit',
+  'spots.view',
+  'spots.create',
+  'spots.edit',
+  'subscription.view',
+]
+
+function mountWithPlan(
+  currentPlan: unknown,
+  activeModules: unknown = [],
+  capabilities: Capability[] = MEMBER_CAPABILITIES,
+  role: string | null = 'member'
+) {
   vi.mocked(usePage).mockReturnValue({
-    props: { currentPlan, activeModules },
+    props: { currentPlan, activeModules, permissions: { role, capabilities } },
   } as ReturnType<typeof usePage>)
 
   let result: ReturnType<typeof useNavSections> | undefined
@@ -200,4 +253,43 @@ test('settingsItem exposes the settings link', () => {
     route: null,
     icon: 'gear',
   })
+})
+
+// capability filtering (#397) — a mechanic only has maintenance.* capabilities,
+// no boats.view/incidents.view/etc., so most sections/items must disappear
+// instead of linking to pages that now 403 (cf. #396).
+
+test('mechanic sees only dashboard (fleet) and the maintenance section', () => {
+  const { navSections } = mountWithPlan(
+    'enterprise',
+    [],
+    ['maintenance.view', 'maintenance.create', 'maintenance.edit'],
+    'mechanic'
+  )
+
+  expect(navSections.value).toHaveLength(2)
+  const labels = navSections.value.map((s) => s.label)
+  expect(labels).toEqual(['nav.sections.fleet', 'nav.sections.maintenance'])
+
+  const fleetNames = navSections.value[0].items.map((i) => i.name)
+  expect(fleetNames).toEqual(['nav.dashboard'])
+
+  const maintenanceNames = navSections.value[1].items.map((i) => i.name)
+  expect(maintenanceNames).toEqual(['nav.planning', 'nav.history'])
+})
+
+test('a user with zero capabilities only sees the dashboard item', () => {
+  const { navSections } = mountWithPlan('enterprise', [], [], 'member')
+
+  expect(navSections.value).toHaveLength(1)
+  expect(navSections.value[0].items.map((i) => i.name)).toEqual(['nav.dashboard'])
+})
+
+test('boat_owner still gets the dedicated portal-only section regardless of capabilities/plan', () => {
+  const { navSections } = mountWithPlan('enterprise', [], [], 'boat_owner')
+
+  expect(navSections.value).toHaveLength(1)
+  expect(navSections.value[0].items).toEqual([
+    { name: 'nav.myBoats', path: '/owner/boats', route: null, icon: 'boat' },
+  ])
 })

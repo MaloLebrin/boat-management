@@ -21,8 +21,11 @@ import type {
 import { getUpgradeTier } from '../../../../shared/types/plan'
 import { computed, ref } from 'vue'
 import { useForm } from '@inertiajs/vue3'
+import { usePermissions } from '~/composables/use_permissions'
 
 const { t } = useT()
+const { can } = usePermissions()
+const canManageBilling = computed(() => can('subscription.manage'))
 
 const props = defineProps<{
   plan: PlanTier
@@ -232,6 +235,7 @@ const storageOverflow = computed(() => {
         :plan="plan"
         :subscription="subscription"
         :active-modules="orgModules"
+        :can-manage-billing="canManageBilling"
       />
 
       <SettingsBillingExtraBoats

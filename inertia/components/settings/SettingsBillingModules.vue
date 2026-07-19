@@ -15,12 +15,17 @@ const props = defineProps<{
   plan: PlanTier
   subscription: SubscriptionInfo | null
   activeModules: ActiveModuleInfo[]
+  canManageBilling: boolean
 }>()
 
 const bySource = computed(() => new Map(props.activeModules.map((m) => [m.module, m.source])))
 
-// Un abonné Pro avec un abonnement actif peut activer/résilier des modules.
-const canManage = computed(() => props.plan === 'pro' && props.subscription !== null)
+// Un abonné Pro avec un abonnement actif peut activer/résilier des modules —
+// réservé à `subscription.manage` (admin), cf. #397.
+const canManage = computed(
+  () => props.canManageBilling && props.plan === 'pro' && props.subscription !== null
+)
+const canManageEnterprise = computed(() => props.canManageBilling)
 
 function priceLabel(module: PlanModule): string {
   const interval = props.subscription?.billingInterval ?? 'month'
@@ -89,7 +94,7 @@ function deactivateEnterpriseModule(module: PlanModule) {
           </span>
 
           <!-- Enterprise : toggle self-service d'un module inclus (#353) -->
-          <template v-if="plan === 'enterprise'">
+          <template v-if="plan === 'enterprise' && canManageEnterprise">
             <BaseButton
               v-if="bySource.get(module) === 'granted'"
               variant="secondary"
@@ -107,6 +112,11 @@ function deactivateEnterpriseModule(module: PlanModule) {
               {{ t('settings.billing.modules.activate') }}
             </BaseButton>
           </template>
+
+          <!-- Enterprise, sans subscription.manage -->
+          <span v-else-if="plan === 'enterprise'" class="text-sm text-fg-muted">
+            {{ t('settings.billing.modules.adminOnly') }}
+          </span>
 
           <!-- Module offert (Pro, grandfathering) : pas de résiliation -->
           <span v-else-if="bySource.get(module) === 'granted'" class="text-sm text-fg-muted">
@@ -127,6 +137,11 @@ function deactivateEnterpriseModule(module: PlanModule) {
               {{ t('settings.billing.modules.activate') }}
             </BaseButton>
           </template>
+
+          <!-- Pro abonné, sans subscription.manage -->
+          <span v-else-if="plan === 'pro' && subscription !== null" class="text-sm text-fg-muted">
+            {{ t('settings.billing.modules.adminOnly') }}
+          </span>
 
           <!-- Non éligible (Starter, ou Pro sans abonnement actif) -->
           <span v-else class="text-sm text-fg-muted">

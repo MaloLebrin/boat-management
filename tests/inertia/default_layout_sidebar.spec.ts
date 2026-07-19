@@ -19,6 +19,10 @@ vi.mock('@inertiajs/vue3', () => ({
     props: {
       user: { initials: 'ML', fullName: 'Marie L.' },
       flash: {},
+      permissions: {
+        role: 'member',
+        capabilities: ['boats.view', 'ports.view', 'crew.create', 'maintenance.view'],
+      },
       appT: {
         'nav.dashboard': 'Dashboard',
         'nav.myBoats': 'My boats',

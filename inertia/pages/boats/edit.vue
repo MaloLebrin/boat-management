@@ -8,6 +8,7 @@ import { computed, ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import { useT } from '~/composables/use_t'
+import { usePermissions } from '~/composables/use_permissions'
 
 interface BoatOwnerOption {
   id: number
@@ -16,6 +17,7 @@ interface BoatOwnerOption {
 }
 
 const { t } = useT()
+const { can } = usePermissions()
 
 const props = defineProps<{
   boat: BoatEditPayload
@@ -62,6 +64,7 @@ const showSailFields = computed(() => propulsionType.value === 'sailboat')
       </Form>
 
       <Form
+        v-if="can('boats.delete')"
         :action="{ url: `/boats/${boat.id}`, method: 'delete' }"
         class="mt-6 flex justify-end"
         #default="{ processing: deleting }"
