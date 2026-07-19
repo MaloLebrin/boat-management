@@ -11,6 +11,14 @@
     "submit": "Save",
     "cancel": "Cancel"
   },
+  "owners": {
+    "title": "Owners",
+    "empty": "No owner attached to this boat.",
+    "remove": "Remove",
+    "addLabel": "Add an owner",
+    "add": "Add",
+    "noCandidates": "No user with the \"boat owner\" role is available in this organization."
+  },
   "hullFields": {
     "name": "Name",
     "registrationNumber": "Registration number",

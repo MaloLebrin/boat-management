@@ -12,7 +12,7 @@ export default class HomeController {
     private portService: PortService
   ) {}
 
-  async index({ inertia, auth }: HttpContext) {
+  async index({ inertia, auth, response }: HttpContext) {
     await auth.check()
 
     if (!auth.isAuthenticated) {
@@ -20,6 +20,14 @@ export default class HomeController {
     }
 
     const user = auth.getUserOrFail()
+
+    if (user.organizationId) {
+      const role = await user.getEffectiveRoleInOrg(user.organizationId)
+      if (role === 'boat_owner') {
+        return response.redirect('/owner/boats')
+      }
+    }
+
     const data = await this.dashboardService.getForUser(user)
 
     const latestAnalysis = user.organizationId

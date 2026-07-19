@@ -4,6 +4,7 @@ import { createHash } from 'node:crypto'
 import OrganizationInvitation from '#models/organization_invitation'
 import OrganizationMembership from '#models/organization_membership'
 import { UserFactory } from '#database/factories/user_factory'
+import { BoatFactory } from '#database/factories/boat_factory'
 import { OrganizationInvitationFactory } from '#database/factories/organization_invitation_factory'
 import { createAdminUser } from '#tests/functional/helpers'
 import { DateTime } from 'luxon'
@@ -304,5 +305,112 @@ test.group('Organization invitations — re-invite (functional)', (group) => {
       .where('email', 'owner-no-membership@example.com')
       .first()
     assert.isNull(invitation)
+  })
+})
+
+test.group('Organization invitations — boat_owner role (functional)', (group) => {
+  group.each.setup(() => testUtils.db().truncate())
+
+  test('POST /organization/invitations rejects a boat_owner invitation without boatIds', async ({
+    client,
+    assert,
+  }) => {
+    const admin = await createAdminUser()
+
+    const response = await client
+      .post('/organization/invitations')
+      .loginAs(admin)
+      .form({ email: 'owner@example.com', role: 'boat_owner' })
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertFlashMessage('error', 'Select at least one boat for a boat owner invitation.')
+
+    const invitation = await OrganizationInvitation.query()
+      .where('organizationId', admin.organizationId!)
+      .where('email', 'owner@example.com')
+      .first()
+    assert.isNull(invitation)
+  })
+
+  test('POST /organization/invitations rejects boatIds belonging to another organization', async ({
+    client,
+    assert,
+  }) => {
+    const admin = await createAdminUser()
+    const otherAdmin = await createAdminUser()
+    const foreignBoat = await BoatFactory.merge({
+      organizationId: otherAdmin.organizationId!,
+    }).create()
+
+    const response = await client
+      .post('/organization/invitations')
+      .loginAs(admin)
+      .form({ email: 'owner@example.com', role: 'boat_owner', boatIds: [foreignBoat.id] })
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertFlashMessage(
+      'error',
+      'One or more selected boats do not belong to this organization.'
+    )
+
+    const invitation = await OrganizationInvitation.query()
+      .where('organizationId', admin.organizationId!)
+      .where('email', 'owner@example.com')
+      .first()
+    assert.isNull(invitation)
+  })
+
+  test('accepting a boat_owner invitation with boatIds attaches the boats via boat_owners', async ({
+    client,
+    assert,
+  }) => {
+    const admin = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: admin.organizationId! }).create()
+
+    const createResponse = await client
+      .post('/organization/invitations')
+      .loginAs(admin)
+      .form({ email: 'newowner@example.com', role: 'boat_owner', boatIds: [boat.id] })
+      .redirects(0)
+    createResponse.assertStatus(302)
+
+    const invitation = await OrganizationInvitation.query()
+      .where('organizationId', admin.organizationId!)
+      .where('email', 'newowner@example.com')
+      .where('status', 'pending')
+      .firstOrFail()
+    assert.equal(invitation.role, 'boat_owner')
+    assert.deepEqual(invitation.boatIds, [boat.id])
+
+    // Simulate acceptance directly against the service since the invite email
+    // link carries the plain token, which is never persisted (only its hash) —
+    // recreate a fresh invitation with a known plain token to accept it.
+    const plainToken = 'boat-owner-plain-token-001'
+    await OrganizationInvitation.query()
+      .where('id', invitation.id)
+      .update({
+        token: createHash('sha256').update(plainToken).digest('hex'),
+      })
+
+    const invitedUser = await UserFactory.merge({ email: 'newowner@example.com' }).create()
+
+    const acceptResponse = await client
+      .post('/invitations/accept')
+      .loginAs(invitedUser)
+      .form({ token: plainToken })
+      .redirects(0)
+    acceptResponse.assertStatus(302)
+
+    const membership = await OrganizationMembership.query()
+      .where('userId', invitedUser.id)
+      .where('organizationId', admin.organizationId!)
+      .firstOrFail()
+    assert.equal(membership.role, 'boat_owner')
+
+    await boat.load('owners')
+    assert.equal(boat.owners.length, 1)
+    assert.equal(boat.owners[0].id, invitedUser.id)
   })
 })

@@ -135,8 +135,8 @@ export interface Registry {
       paramsTuple: [ParamValue]
       params: { id: ParamValue }
       query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boats_controller').default['navigation']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boats_controller').default['navigation']>>>
+      response: unknown
+      errorResponse: unknown
     }
   }
   'boats.maintenanceLog.download': {
@@ -2117,6 +2117,30 @@ export interface Registry {
       query: ExtractQuery<InferInput<(typeof import('#validators/billing').moduleActionValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/billing_controller').default['removeModule']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/billing_controller').default['removeModule']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'settings.billing.module.enterprise.activate': {
+    methods: ["POST"]
+    pattern: '/settings/billing/module/enterprise'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/billing').moduleActionValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/billing').moduleActionValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/billing_controller').default['activateEnterpriseModule']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/billing_controller').default['activateEnterpriseModule']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'settings.billing.module.enterprise.deactivate': {
+    methods: ["DELETE"]
+    pattern: '/settings/billing/module/enterprise'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/billing').moduleActionValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/billing').moduleActionValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/billing_controller').default['deactivateEnterpriseModule']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/billing_controller').default['deactivateEnterpriseModule']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'settings.billing.addon.set': {

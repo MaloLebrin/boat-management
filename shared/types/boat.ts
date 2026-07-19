@@ -163,3 +163,15 @@ export type BoatListItem = {
     nextDueAt: string | null
   }
 }
+
+/** Fiche bateau restreinte affichée dans le portail self-service propriétaire. */
+export type BoatOwnerBoatSummary = {
+  id: number
+  name: string
+  registrationNumber: string | null
+  type: string | null
+  manufacturer: string | null
+  model: string | null
+  lengthM: number | null
+  homePort: string | null
+}

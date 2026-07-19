@@ -703,6 +703,19 @@ export class BoatMaintenanceTaskSchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class BoatOwnerSchema extends BaseModel {
+  static $columns = ['boatId', 'createdAt', 'id', 'userId'] as const
+  $columns = BoatOwnerSchema.$columns
+  @column()
+  declare boatId: number
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare userId: number
+}
+
 export class BoatPortStaySchema extends BaseModel {
   static $columns = [
     'boatId',
@@ -1403,6 +1416,30 @@ export class NavigationLogCrewSchema extends BaseModel {
   declare role: string
 }
 
+export class NavigationLogEntrySchema extends BaseModel {
+  static $columns = [
+    'createdAt',
+    'id',
+    'navigationLogId',
+    'note',
+    'recordedAt',
+    'updatedAt',
+  ] as const
+  $columns = NavigationLogEntrySchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare navigationLogId: number
+  @column()
+  declare note: string
+  @column.dateTime()
+  declare recordedAt: DateTime
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class NavigationLogSchema extends BaseModel {
   static $columns = [
     'arrivalPortId',
@@ -1511,6 +1548,7 @@ export class NotificationSchema extends BaseModel {
 export class OrganizationInvitationSchema extends BaseModel {
   static $columns = [
     'acceptedAt',
+    'boatIds',
     'createdAt',
     'email',
     'expiresAt',
@@ -1525,6 +1563,8 @@ export class OrganizationInvitationSchema extends BaseModel {
   $columns = OrganizationInvitationSchema.$columns
   @column.dateTime()
   declare acceptedAt: DateTime | null
+  @column()
+  declare boatIds: any | null
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
   @column()

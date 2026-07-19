@@ -21,6 +21,7 @@ const props = defineProps<{
   pendingInvitations: OrganizationInvitationData[]
   canManageMembers: boolean
   canAddMember: boolean
+  boatOptions: { id: number; name: string }[]
 }>()
 
 const { t } = useT()
@@ -39,6 +40,8 @@ function handleInvite() {
 const roleOptions = computed(() => [
   { label: t('settings.members.roles.admin'), value: 'admin' },
   { label: t('settings.members.roles.member'), value: 'member' },
+  { label: t('settings.members.roles.mechanic'), value: 'mechanic' },
+  { label: t('settings.members.roles.boat_owner'), value: 'boat_owner' },
 ])
 
 function getInitials(member: OrganizationMemberData): string {
@@ -73,6 +76,7 @@ function removeMember(memberId: number) {
 
     <SettingsMembersInviteForm
       v-if="canManageMembers && showInviteForm"
+      :boat-options="boatOptions"
       @close="showInviteForm = false"
     />
 

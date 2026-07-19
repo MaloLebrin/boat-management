@@ -15,6 +15,7 @@ import type { BoatPricingRow } from '#shared/types/boat_pricing'
 import type { FuelLogRow } from '#shared/types/fuel_log'
 import type { NavigationLogRow, NavigationLogPortOption } from '#shared/types/navigation_log'
 import type { CrewMemberOption } from '#shared/types/crew'
+import type { BoatOwnerBoatSummary } from '#shared/types/boat'
 import { toBoatEquipmentActionRow } from '#transformers/boat_equipment_action_transformer'
 
 export interface BoatShowContext {
@@ -46,6 +47,19 @@ export interface BoatShowContext {
   canCreateNavigationLogs: boolean
   canUpdateNavigationLogs: boolean
   canDeleteNavigationLogs: boolean
+}
+
+export function toBoatOwnerSummary(boat: Boat): BoatOwnerBoatSummary {
+  return {
+    id: boat.id,
+    name: boat.name,
+    registrationNumber: boat.registrationNumber,
+    type: boat.type,
+    manufacturer: boat.manufacturer,
+    model: boat.model,
+    lengthM: boat.lengthM,
+    homePort: boat.homePort,
+  }
 }
 
 export function toEditForm(boat: Boat) {

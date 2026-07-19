@@ -11,6 +11,7 @@ const BoatBudgetEntryController = () => import('#controllers/boat_budget_entry_c
 const BoatReservationsController = () => import('#controllers/boat_reservations_controller')
 const BoatPricingController = () => import('#controllers/boat_pricing_controller')
 const BoatEquipmentMediaController = () => import('#controllers/boat_equipment_media_controller')
+const BoatOwnersController = () => import('#controllers/boat_owners_controller')
 
 router
   .group(() => {
@@ -64,6 +65,11 @@ router
     router.delete('boats/:id', [controllers.Boats, 'destroy']).as('boats.destroy')
 
     router.put('boats/:id/pricing', [BoatPricingController, 'update']).as('boats.pricing.update')
+
+    router.post('boats/:id/owners', [BoatOwnersController, 'store']).as('boats.owners.store')
+    router
+      .delete('boats/:id/owners/:userId', [BoatOwnersController, 'destroy'])
+      .as('boats.owners.destroy')
 
     router.patch('boats/:id/assignment', [controllers.Boats, 'assign']).as('boats.assign')
 

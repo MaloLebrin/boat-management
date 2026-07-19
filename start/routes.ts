@@ -11,6 +11,7 @@
 import './routes/_matchers.js'
 import './routes/home.js'
 import './routes/boats.js'
+import './routes/boat_owner_portal.js'
 import './routes/ports.js'
 import './routes/auth.js'
 import './routes/ai.js'

@@ -1,0 +1,26 @@
+{
+  "boats": {
+    "index": {
+      "title": "Mes bateaux",
+      "emptyTitle": "Aucun bateau",
+      "emptyDescription": "Aucun bateau ne vous est rattaché pour le moment.",
+      "homePort": "Port d'attache : {port}"
+    },
+    "show": {
+      "tabs": {
+        "maintenance": "Entretien",
+        "reservations": "Réservations",
+        "invoices": "Factures"
+      },
+      "maintenance": {
+        "emptyTitle": "Aucun entretien enregistré"
+      },
+      "reservations": {
+        "emptyTitle": "Aucune réservation"
+      },
+      "invoices": {
+        "emptyTitle": "Aucune facture"
+      }
+    }
+  }
+}

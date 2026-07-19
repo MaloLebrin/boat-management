@@ -6,6 +6,7 @@ import BoatDocumentService from '#services/boat_document_service'
 import BoatEquipmentActionService from '#services/boat_equipment_action_service'
 import BoatFuelLogService from '#services/boat_fuel_log_service'
 import BoatListService from '#services/boat_list_service'
+import BoatOwnerService from '#services/boat_owner_service'
 import BoatPricingService from '#services/boat_pricing_service'
 import NavigationLogService from '#services/navigation_log_service'
 import CrewService from '#services/crew_service'
@@ -54,7 +55,8 @@ export default class BoatsController {
     private crewService: CrewService,
     private navigationLogService: NavigationLogService,
     private pricingService: BoatPricingService,
-    private equipmentActionService: BoatEquipmentActionService
+    private equipmentActionService: BoatEquipmentActionService,
+    private boatOwnerService: BoatOwnerService
   ) {}
 
   async index({ inertia, auth, request }: HttpContext) {
@@ -261,11 +263,25 @@ export default class BoatsController {
       const boat = await this.boatService.getForUserOrFail(user, Number(params.id))
       await bouncer.with(BoatPolicy).authorize('edit', boat)
 
-      const ports = await this.portService.listWithSpotsForOrg(user)
+      const [ports, owners, ownerCandidates] = await Promise.all([
+        this.portService.listWithSpotsForOrg(user),
+        this.boatOwnerService.listOwners(boat),
+        this.boatOwnerService.listEligibleOwnerCandidates(boat),
+      ])
 
       return inertia.render('boats/edit', {
         boat: toEditForm(boat),
         ports: toPortFormOptions(ports),
+        owners: owners.map((owner) => ({
+          id: owner.id,
+          fullName: owner.fullName,
+          email: owner.email,
+        })),
+        ownerCandidates: ownerCandidates.map((candidate) => ({
+          id: candidate.id,
+          fullName: candidate.fullName,
+          email: candidate.email,
+        })),
       })
     } catch (error) {
       if (error instanceof BoatNotFoundError) {

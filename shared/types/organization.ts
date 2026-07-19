@@ -1,4 +1,4 @@
-export type OrgRole = 'admin' | 'member'
+export type OrgRole = 'admin' | 'member' | 'mechanic' | 'boat_owner'
 
 export type InvitationStatus = 'pending' | 'accepted' | 'cancelled'
 
@@ -18,4 +18,5 @@ export interface OrganizationInvitationData {
   invitedByName: string | null
   expiresAt: string
   createdAt: string
+  boatIds: number[] | null
 }

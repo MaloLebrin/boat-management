@@ -26,6 +26,7 @@
       "email": "Adresse email",
       "emailPlaceholder": "collegue@exemple.com",
       "role": "Rôle",
+      "boats": "Bateaux concernés",
       "submit": "Envoyer l'invitation",
       "cancel": "Annuler"
     },
@@ -39,7 +40,9 @@
     "noName": "Sans nom",
     "roles": {
       "admin": "Admin",
-      "member": "Membre"
+      "member": "Membre",
+      "mechanic": "Mécanicien",
+      "boat_owner": "Propriétaire de bateau"
     },
     "statuses": {
       "active": "Actif",

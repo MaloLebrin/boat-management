@@ -293,6 +293,10 @@ export interface ApiDefinition {
       module: {
         add: typeof routes['settings.billing.module.add']
         remove: typeof routes['settings.billing.module.remove']
+        enterprise: {
+          activate: typeof routes['settings.billing.module.enterprise.activate']
+          deactivate: typeof routes['settings.billing.module.enterprise.deactivate']
+        }
       }
       addon: {
         set: typeof routes['settings.billing.addon.set']

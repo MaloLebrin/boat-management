@@ -90,7 +90,7 @@ export default class InvoicesController {
     if (!loaded) return
     const { org, canManage: moduleActive } = loaded
 
-    await bouncer.with(InvoicePolicy).authorize('create')
+    await bouncer.with(InvoicePolicy).authorize('view')
 
     const filters = this.invoiceService.normalizeFilters(request.qs())
     const invoices = await this.invoiceService.search(org, filters)
@@ -112,10 +112,9 @@ export default class InvoicesController {
     if (!loaded) return
     const { org, canManage: moduleActive } = loaded
 
-    await bouncer.with(InvoicePolicy).authorize('create')
-
     try {
       const invoice = await this.invoiceService.getForOrganizationOrFail(org, Number(params.id))
+      await bouncer.with(InvoicePolicy).authorize('view', invoice)
       const links = await this.invoiceService.getLinks(invoice)
       const canDelete = moduleActive && (await bouncer.with(InvoicePolicy).allows('delete'))
       return inertia.render('invoices/show', {
@@ -236,8 +235,6 @@ export default class InvoicesController {
     if (!loaded) return
     const { org } = loaded
 
-    await bouncer.with(InvoicePolicy).authorize('create')
-
     let invoice
     try {
       invoice = await this.invoiceService.getForOrganizationOrFail(org, Number(params.id))
@@ -248,6 +245,8 @@ export default class InvoicesController {
       }
       throw error
     }
+
+    await bouncer.with(InvoicePolicy).authorize('view', invoice)
 
     const { buffer, filename } = await this.pdfService.generate(invoice, org, i18n)
 

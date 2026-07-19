@@ -180,6 +180,8 @@ export type ScannedRoutes = {
     'settings.billing.portal': { paramsTuple?: []; params?: {} }
     'settings.billing.module.add': { paramsTuple?: []; params?: {} }
     'settings.billing.module.remove': { paramsTuple?: []; params?: {} }
+    'settings.billing.module.enterprise.activate': { paramsTuple?: []; params?: {} }
+    'settings.billing.module.enterprise.deactivate': { paramsTuple?: []; params?: {} }
     'settings.billing.addon.set': { paramsTuple?: []; params?: {} }
     'settings.profile.update': { paramsTuple?: []; params?: {} }
     'settings.org.update': { paramsTuple?: []; params?: {} }
@@ -502,6 +504,7 @@ export type ScannedRoutes = {
     'settings.billing.checkout': { paramsTuple?: []; params?: {} }
     'settings.billing.portal': { paramsTuple?: []; params?: {} }
     'settings.billing.module.add': { paramsTuple?: []; params?: {} }
+    'settings.billing.module.enterprise.activate': { paramsTuple?: []; params?: {} }
     'settings.billing.addon.set': { paramsTuple?: []; params?: {} }
     'settings.branding.logo.upload': { paramsTuple?: []; params?: {} }
     'settings.import.preview': { paramsTuple?: []; params?: {} }
@@ -586,6 +589,7 @@ export type ScannedRoutes = {
     'ports.mouillages.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'mouillageId': ParamValue} }
     'spots.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'settings.billing.module.remove': { paramsTuple?: []; params?: {} }
+    'settings.billing.module.enterprise.deactivate': { paramsTuple?: []; params?: {} }
     'settings.branding.logo.delete': { paramsTuple?: []; params?: {} }
     'organization.members.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'organization.invitations.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }

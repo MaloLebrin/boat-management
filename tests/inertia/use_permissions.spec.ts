@@ -53,6 +53,30 @@ test('member role: isMember true, isAdmin false', () => {
   expect(isMember.value).toBe(true)
 })
 
+test('mechanic role: isMechanic true, other role flags false', () => {
+  const { role, isAdmin, isMember, isMechanic, isBoatOwner } = mountWithPermissions({
+    role: 'mechanic',
+    capabilities: ['maintenance.view', 'maintenance.create', 'maintenance.edit'],
+  })
+  expect(role.value).toBe('mechanic')
+  expect(isMechanic.value).toBe(true)
+  expect(isAdmin.value).toBe(false)
+  expect(isMember.value).toBe(false)
+  expect(isBoatOwner.value).toBe(false)
+})
+
+test('boat_owner role: isBoatOwner true, other role flags false', () => {
+  const { role, isAdmin, isMember, isMechanic, isBoatOwner } = mountWithPermissions({
+    role: 'boat_owner',
+    capabilities: [],
+  })
+  expect(role.value).toBe('boat_owner')
+  expect(isBoatOwner.value).toBe(true)
+  expect(isAdmin.value).toBe(false)
+  expect(isMember.value).toBe(false)
+  expect(isMechanic.value).toBe(false)
+})
+
 test('can() returns true only for granted capabilities', () => {
   const { can } = mountWithPermissions({
     role: 'member',

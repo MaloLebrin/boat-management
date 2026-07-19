@@ -1,16 +1,29 @@
 import { computed } from 'vue'
 import { useT } from '~/composables/use_t'
 import { usePlan } from '~/composables/use_plan'
+import { usePermissions } from '~/composables/use_permissions'
 
 export function useNavSections() {
   const { t } = useT()
   const { effectiveQuotas } = usePlan()
+  const { isBoatOwner } = usePermissions()
 
   const canManageClients = computed(() => effectiveQuotas.value?.canManageClients === true)
   const canManagePricing = computed(() => effectiveQuotas.value?.canManagePricing === true)
   const canManageInvoices = computed(() => effectiveQuotas.value?.canManageInvoices === true)
 
   const navSections = computed(() => {
+    // Portail self-service : accès restreint à ses propres bateaux, aucune des
+    // sections staff (flotte, activité, maintenance, business) n'est pertinente.
+    if (isBoatOwner.value) {
+      return [
+        {
+          label: t('nav.sections.fleet'),
+          items: [{ name: t('nav.myBoats'), path: '/owner/boats', route: null, icon: 'boat' }],
+        },
+      ]
+    }
+
     const businessItems = [
       { name: t('nav.reservations'), path: '/reservations', route: null, icon: 'calendar-check' },
     ]

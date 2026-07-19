@@ -16,3 +16,7 @@ export class InvalidBoatHullError extends Error {
     this.name = 'InvalidBoatHullError'
   }
 }
+
+export class InvalidBoatOwnerAssignmentError extends Error {
+  name = 'InvalidBoatOwnerAssignmentError'
+}

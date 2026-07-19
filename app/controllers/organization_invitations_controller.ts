@@ -5,6 +5,8 @@ import { BrandingService } from '#services/branding_service'
 import OrganizationPolicy from '#policies/organization_policy'
 import {
   AlreadyMemberError,
+  BoatOwnerInvitationRequiresBoatsError,
+  InvalidInvitationBoatsError,
   InvitationAlreadyAcceptedError,
   InvitationEmailMismatchError,
   InvitationExpiredError,
@@ -44,7 +46,8 @@ export default class OrganizationInvitationsController {
         user.organizationId!,
         user.id,
         payload.email,
-        payload.role
+        payload.role,
+        payload.boatIds
       )
 
       const acceptUrl = `${env.get('APP_URL')}/invitations/accept?token=${plainToken}`
@@ -64,6 +67,14 @@ export default class OrganizationInvitationsController {
       }
       if (error instanceof QuotaExceededError) {
         session.flash('error', i18n.t(`flash.quota.${error.feature}Exceeded`))
+        return response.redirect().back()
+      }
+      if (error instanceof BoatOwnerInvitationRequiresBoatsError) {
+        session.flash('error', i18n.t('flash.invitation.boatOwnerRequiresBoat'))
+        return response.redirect().back()
+      }
+      if (error instanceof InvalidInvitationBoatsError) {
+        session.flash('error', i18n.t('flash.invitation.invalidBoats'))
         return response.redirect().back()
       }
       throw error

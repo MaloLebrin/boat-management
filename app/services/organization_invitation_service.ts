@@ -1,11 +1,14 @@
 import Organization from '#models/organization'
 import OrganizationInvitation from '#models/organization_invitation'
 import OrganizationMembership from '#models/organization_membership'
+import Boat from '#models/boat'
 import User from '#models/user'
 import OrganizationInvitationAccepted from '#events/organization_invitation_accepted'
 import OrganizationMemberJoined from '#events/organization_member_joined'
 import {
   AlreadyMemberError,
+  BoatOwnerInvitationRequiresBoatsError,
+  InvalidInvitationBoatsError,
   InvitationAlreadyAcceptedError,
   InvitationEmailMismatchError,
   InvitationExpiredError,
@@ -42,6 +45,7 @@ export default class OrganizationInvitationService {
       invitedByName: inv.invitedBy?.fullName ?? null,
       expiresAt: inv.expiresAt.toISO()!,
       createdAt: inv.createdAt.toISO()!,
+      boatIds: inv.boatIds,
     }))
   }
 
@@ -55,8 +59,24 @@ export default class OrganizationInvitationService {
     orgId: number,
     invitedById: number,
     email: string,
-    role: OrgRole
+    role: OrgRole,
+    boatIds?: number[]
   ): Promise<{ invitation: OrganizationInvitationData; plainToken: string }> {
+    if (role === 'boat_owner') {
+      if (!boatIds || boatIds.length === 0) {
+        throw new BoatOwnerInvitationRequiresBoatsError()
+      }
+
+      const matchingBoatsCount = await Boat.query()
+        .where('organizationId', orgId)
+        .whereIn('id', boatIds)
+        .count('* as total')
+
+      if (Number(matchingBoatsCount[0].$extras.total) !== boatIds.length) {
+        throw new InvalidInvitationBoatsError()
+      }
+    }
+
     // Check if already a member — either via a membership row, or via a user
     // already attached to the organisation that may not have a membership row
     // (e.g. the org owner, cf. A-03/A-04). Both signals are checked because a
@@ -97,6 +117,7 @@ export default class OrganizationInvitationService {
       token: tokenHash,
       status: 'pending',
       expiresAt,
+      boatIds: role === 'boat_owner' ? boatIds! : null,
     })
 
     await invitation.load('invitedBy')
@@ -110,6 +131,7 @@ export default class OrganizationInvitationService {
         invitedByName: invitation.invitedBy?.fullName ?? null,
         expiresAt: invitation.expiresAt.toISO()!,
         createdAt: invitation.createdAt.toISO()!,
+        boatIds: invitation.boatIds,
       },
       plainToken,
     }
@@ -214,6 +236,15 @@ export default class OrganizationInvitationService {
       invitation.status = 'accepted'
       invitation.acceptedAt = DateTime.now()
       await invitation.useTransaction(trx).save()
+
+      if (invitation.role === 'boat_owner' && invitation.boatIds?.length) {
+        const rows = invitation.boatIds.map((boatId) => ({
+          boatId,
+          userId,
+          createdAt: DateTime.now().toSQL(),
+        }))
+        await trx.table('boat_owners').insert(rows)
+      }
 
       return created
     })

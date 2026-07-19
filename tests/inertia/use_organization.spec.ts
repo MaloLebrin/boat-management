@@ -86,6 +86,25 @@ test('isAdmin and isMember are both false for null role', () => {
   expect(isMember.value).toBe(false)
 })
 
+test('isMechanic is true when role is mechanic', () => {
+  const { isMechanic } = mountComposable({ organization: null, currentUserRole: 'mechanic' })
+  expect(isMechanic.value).toBe(true)
+})
+
+test('isBoatOwner is true when role is boat_owner', () => {
+  const { isBoatOwner } = mountComposable({ organization: null, currentUserRole: 'boat_owner' })
+  expect(isBoatOwner.value).toBe(true)
+})
+
+test('isMechanic and isBoatOwner are both false for admin role', () => {
+  const { isMechanic, isBoatOwner } = mountComposable({
+    organization: null,
+    currentUserRole: 'admin',
+  })
+  expect(isMechanic.value).toBe(false)
+  expect(isBoatOwner.value).toBe(false)
+})
+
 test('accepts a ref for organization', () => {
   const orgRef = ref<{ id: number; name: string } | null>({ id: 2, name: 'Test Org' })
   const { organization } = mountComposable({ organization: orgRef })

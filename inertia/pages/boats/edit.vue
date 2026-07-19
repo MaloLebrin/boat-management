@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Form } from '@adonisjs/inertia/vue'
 import BoatFormHullFields from '~/components/boats/hull/BoatFormHullFields.vue'
+import BoatOwnersManager from '~/components/boats/BoatOwnersManager.vue'
 import type { BoatEditPayload, PortForForm, PropulsionTypeUi } from '~/types/boat_form'
 import { parsePropulsionType } from '~/types/boat_form'
 import { computed, ref } from 'vue'
@@ -8,11 +9,19 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import { useT } from '~/composables/use_t'
 
+interface BoatOwnerOption {
+  id: number
+  fullName: string | null
+  email: string
+}
+
 const { t } = useT()
 
 const props = defineProps<{
   boat: BoatEditPayload
   ports: PortForForm[]
+  owners: BoatOwnerOption[]
+  ownerCandidates: BoatOwnerOption[]
 }>()
 
 const propulsionType = ref<PropulsionTypeUi>(parsePropulsionType(props.boat.propulsionType))
@@ -61,6 +70,13 @@ const showSailFields = computed(() => propulsionType.value === 'sailboat')
           {{ t('common.delete') }}
         </BaseButton>
       </Form>
+
+      <BoatOwnersManager
+        class="mt-6"
+        :boat-id="boat.id"
+        :owners="owners"
+        :owner-candidates="ownerCandidates"
+      />
     </div>
   </div>
 </template>

@@ -57,6 +57,8 @@ declare module '@adonisjs/inertia/types' {
     'notifications/index': ExtractProps<(typeof import('../../inertia/pages/notifications/index.vue'))['default']>
     'organization/crew': ExtractProps<(typeof import('../../inertia/pages/organization/crew.vue'))['default']>
     'organization/members': ExtractProps<(typeof import('../../inertia/pages/organization/members.vue'))['default']>
+    'owner/boats/index': ExtractProps<(typeof import('../../inertia/pages/owner/boats/index.vue'))['default']>
+    'owner/boats/show': ExtractProps<(typeof import('../../inertia/pages/owner/boats/show.vue'))['default']>
     'planning/index': ExtractProps<(typeof import('../../inertia/pages/planning/index.vue'))['default']>
     'ports/edit': ExtractProps<(typeof import('../../inertia/pages/ports/edit.vue'))['default']>
     'ports/index': ExtractProps<(typeof import('../../inertia/pages/ports/index.vue'))['default']>

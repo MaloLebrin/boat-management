@@ -11,6 +11,14 @@
     "submit": "Enregistrer",
     "cancel": "Annuler"
   },
+  "owners": {
+    "title": "Propriétaires",
+    "empty": "Aucun propriétaire rattaché à ce bateau.",
+    "remove": "Retirer",
+    "addLabel": "Ajouter un propriétaire",
+    "add": "Ajouter",
+    "noCandidates": "Aucun utilisateur avec le rôle « propriétaire de bateau » disponible dans cette organisation."
+  },
   "hullFields": {
     "name": "Nom",
     "registrationNumber": "Immatriculation",

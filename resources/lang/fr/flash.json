@@ -99,7 +99,15 @@
     "alreadyMember": "Vous êtes déjà membre de cette organisation.",
     "alreadyPending": "Une invitation est déjà en attente pour cet email.",
     "emailMismatch": "Cette invitation a été envoyée à une autre adresse email.",
-    "declined": "Vous avez refusé l'invitation."
+    "declined": "Vous avez refusé l'invitation.",
+    "boatOwnerRequiresBoat": "Sélectionnez au moins un bateau pour une invitation propriétaire.",
+    "invalidBoats": "Un ou plusieurs bateaux sélectionnés n'appartiennent pas à cette organisation."
+  },
+  "owner": {
+    "boatNotFound": "Ce bateau n'est pas rattaché à votre compte.",
+    "invalidAssignment": "Cet utilisateur n'a pas le rôle « propriétaire de bateau » dans cette organisation.",
+    "attached": "Propriétaire ajouté au bateau.",
+    "detached": "Propriétaire retiré du bateau."
   },
   "billing": {
     "notConfigured": "Le paiement n'est pas encore configuré. Contactez le support.",

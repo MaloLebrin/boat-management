@@ -1062,6 +1062,18 @@ const routes = {
     tokens: [{"old":"/settings/billing/module","type":0,"val":"settings","end":""},{"old":"/settings/billing/module","type":0,"val":"billing","end":""},{"old":"/settings/billing/module","type":0,"val":"module","end":""}],
     types: placeholder as Registry['settings.billing.module.remove']['types'],
   },
+  'settings.billing.module.enterprise.activate': {
+    methods: ["POST"],
+    pattern: '/settings/billing/module/enterprise',
+    tokens: [{"old":"/settings/billing/module/enterprise","type":0,"val":"settings","end":""},{"old":"/settings/billing/module/enterprise","type":0,"val":"billing","end":""},{"old":"/settings/billing/module/enterprise","type":0,"val":"module","end":""},{"old":"/settings/billing/module/enterprise","type":0,"val":"enterprise","end":""}],
+    types: placeholder as Registry['settings.billing.module.enterprise.activate']['types'],
+  },
+  'settings.billing.module.enterprise.deactivate': {
+    methods: ["DELETE"],
+    pattern: '/settings/billing/module/enterprise',
+    tokens: [{"old":"/settings/billing/module/enterprise","type":0,"val":"settings","end":""},{"old":"/settings/billing/module/enterprise","type":0,"val":"billing","end":""},{"old":"/settings/billing/module/enterprise","type":0,"val":"module","end":""},{"old":"/settings/billing/module/enterprise","type":0,"val":"enterprise","end":""}],
+    types: placeholder as Registry['settings.billing.module.enterprise.deactivate']['types'],
+  },
   'settings.billing.addon.set': {
     methods: ["POST"],
     pattern: '/settings/billing/addon',

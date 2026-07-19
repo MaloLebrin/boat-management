@@ -99,7 +99,15 @@
     "alreadyMember": "You are already a member of this organisation.",
     "alreadyPending": "An invitation is already pending for this email.",
     "emailMismatch": "This invitation was sent to a different email address.",
-    "declined": "You have declined the invitation."
+    "declined": "You have declined the invitation.",
+    "boatOwnerRequiresBoat": "Select at least one boat for a boat owner invitation.",
+    "invalidBoats": "One or more selected boats do not belong to this organization."
+  },
+  "owner": {
+    "boatNotFound": "This boat is not linked to your account.",
+    "invalidAssignment": "This user does not have the \"boat owner\" role in this organization.",
+    "attached": "Owner added to the boat.",
+    "detached": "Owner removed from the boat."
   },
   "billing": {
     "notConfigured": "Payment is not configured yet. Please contact support.",

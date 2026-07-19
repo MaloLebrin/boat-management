@@ -4,6 +4,7 @@ import SubscriptionService from '#services/subscription_service'
 import QuotaService from '#services/quota_service'
 import AiTokenQuotaService from '#services/ai_token_quota_service'
 import OrganizationModuleService from '#services/organization_module_service'
+import BoatListService from '#services/boat_list_service'
 import { BrandingService } from '#services/branding_service'
 import OrganizationPolicy from '#policies/organization_policy'
 import {
@@ -25,7 +26,8 @@ export default class SettingsController {
     private quotaService: QuotaService,
     private aiTokenQuotaService: AiTokenQuotaService,
     private organizationModuleService: OrganizationModuleService,
-    private brandingService: BrandingService
+    private brandingService: BrandingService,
+    private boatListService: BoatListService
   ) {}
   async me({ inertia }: HttpContext) {
     return inertia.render('settings/me', {})
@@ -47,12 +49,14 @@ export default class SettingsController {
     const user = await auth.authenticate()
     await user.load('organization')
 
-    const [members, pendingInvitations, canManageMembers, canAddMember] = await Promise.all([
-      this.memberService.listMembers(user.organizationId!),
-      this.invitationService.listPending(user.organizationId!),
-      bouncer.with(OrganizationPolicy).allows('manageMembers'),
-      this.quotaService.canAddMember(user.organization),
-    ])
+    const [members, pendingInvitations, canManageMembers, canAddMember, boatOptions] =
+      await Promise.all([
+        this.memberService.listMembers(user.organizationId!),
+        this.invitationService.listPending(user.organizationId!),
+        bouncer.with(OrganizationPolicy).allows('manageMembers'),
+        this.quotaService.canAddMember(user.organization),
+        this.boatListService.listNamesForOrg(user),
+      ])
 
     return inertia.render('settings/members', {
       currentUserId: user.id,
@@ -60,6 +64,7 @@ export default class SettingsController {
       pendingInvitations,
       canManageMembers,
       canAddMember,
+      boatOptions,
     })
   }
 

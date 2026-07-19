@@ -10,12 +10,14 @@ import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseAlert from '~/components/base/BaseAlert.vue'
 import { useT } from '~/composables/use_t'
 
+type MemberRole = 'admin' | 'member' | 'mechanic' | 'boat_owner'
+
 interface OrganizationMemberData {
   id: number
   userId: number
   fullName: string | null
   email: string
-  role: 'admin' | 'member'
+  role: MemberRole
 }
 
 const props = defineProps<{
@@ -31,11 +33,13 @@ const flash = computed(() => page.props.flash as { error?: string; success?: str
 const roleOptions = computed(() => [
   { label: t('organization.members.roles.admin'), value: 'admin' },
   { label: t('organization.members.roles.member'), value: 'member' },
+  { label: t('organization.members.roles.mechanic'), value: 'mechanic' },
+  { label: t('organization.members.roles.boat_owner'), value: 'boat_owner' },
 ])
 
 const inviteForm = useForm({
   email: '',
-  role: 'member' as 'admin' | 'member',
+  role: 'member' as MemberRole,
 })
 
 function submitInvite() {

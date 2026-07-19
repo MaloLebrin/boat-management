@@ -5,8 +5,9 @@ import { DbRememberMeTokensProvider } from '@adonisjs/auth/session'
 import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
 import Organization from '#models/organization'
 import OrganizationMembership from '#models/organization_membership'
-import { beforeSave, belongsTo, hasMany } from '@adonisjs/lucid/orm'
-import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
+import Boat from '#models/boat'
+import { beforeSave, belongsTo, hasMany, manyToMany } from '@adonisjs/lucid/orm'
+import type { BelongsTo, HasMany, ManyToMany } from '@adonisjs/lucid/types/relations'
 import type { OrgRole } from '#shared/types/organization'
 import type { Capability } from '#shared/types/permissions'
 import { ROLE_PERMISSIONS } from '#shared/types/permissions'
@@ -29,6 +30,9 @@ export default class User extends compose(
 
   @hasMany(() => OrganizationMembership)
   declare memberships: HasMany<typeof OrganizationMembership>
+
+  @manyToMany(() => Boat, { pivotTable: 'boat_owners' })
+  declare ownedBoats: ManyToMany<typeof Boat>
 
   get initials() {
     const [first, last] = this.fullName ? this.fullName.split(' ') : this.email.split('@')

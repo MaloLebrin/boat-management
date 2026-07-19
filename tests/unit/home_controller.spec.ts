@@ -68,6 +68,7 @@ test.group('HomeController (unit)', () => {
           id: 1,
           organizationId: 42,
           hasPermission: async () => true,
+          getEffectiveRoleInOrg: async () => 'member',
         }),
       },
     } as any)

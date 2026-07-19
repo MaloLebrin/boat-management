@@ -12,8 +12,9 @@ import BoatSail from '#models/boat_sail'
 import BoatSafetyEquipment from '#models/boat_safety_equipment'
 import NavigationLog from '#models/navigation_log'
 import Spot from '#models/spot'
-import { BaseModel, belongsTo, column, hasMany, hasOne } from '@adonisjs/lucid/orm'
-import type { BelongsTo, HasMany, HasOne } from '@adonisjs/lucid/types/relations'
+import User from '#models/user'
+import { BaseModel, belongsTo, column, hasMany, hasOne, manyToMany } from '@adonisjs/lucid/orm'
+import type { BelongsTo, HasMany, HasOne, ManyToMany } from '@adonisjs/lucid/types/relations'
 import { DateTime } from 'luxon'
 
 export default class Boat extends BaseModel {
@@ -138,4 +139,7 @@ export default class Boat extends BaseModel {
 
   @hasOne(() => BoatPricing)
   declare pricing: HasOne<typeof BoatPricing>
+
+  @manyToMany(() => User, { pivotTable: 'boat_owners' })
+  declare owners: ManyToMany<typeof User>
 }

@@ -15,7 +15,9 @@
     },
     "roles": {
       "admin": "Admin",
-      "member": "Membre"
+      "member": "Membre",
+      "mechanic": "Mécanicien",
+      "boat_owner": "Propriétaire de bateau"
     },
     "remove": "Retirer",
     "noName": "Sans nom"

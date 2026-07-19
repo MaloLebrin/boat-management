@@ -3,6 +3,20 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-07-19 — Ajout des rôles `mechanic` (mécanicien) et `boat_owner` (propriétaire de bateau)
+
+Deux nouveaux rôles utilisateurs, en plus de `admin`/`member` : `mechanic`, membre du staff restreint au module maintenance (org entière, pas d'assignation par tâche), et `boat_owner`, accès self-service en lecture seule scopé à ses propres bateaux (copropriété possible).
+
+- `shared/types/organization.ts` : `OrgRole` étendu à 4 valeurs. `shared/types/permissions.ts` : modèle de permissions restructuré en mapping explicite par rôle (`MECHANIC_CAPABILITIES`, `BOAT_OWNER_CAPABILITIES` — volontairement **vide** pour `boat_owner`, cf. ci-dessous) au lieu du modèle additif `admin = member + adminOnly` qui ne convient plus à des rôles non-supersets de `member`.
+- Migrations : enum `role` étendu sur `organization_memberships`/`organization_invitations` (CHECK constraint Postgres, `ALTER TABLE`) ; colonne `boat_ids` (JSON) sur `organization_invitations` ; nouvelle table pivot `boat_owners` (many-to-many `Boat` ↔ `User`, copropriété).
+- **Portail propriétaire** (`GET /owner/boats`, `GET /owner/boats/:id`, `BoatOwnerPortalController` + `BoatOwnerService`) : lecture seule, scopé par ownership **au niveau requête** (`whereHas('owners', ...)`), volontairement **sans passer par les capabilities/Bouncer** — `boat_owner` n'a donc aucune capability accordée (`BOAT_OWNER_CAPABILITIES = []`), pour ne jamais donner accès aux pages staff complètes (`/boats/:id`, `/invoices`) qui exposent bien plus que le périmètre du portail (fiche bateau, maintenance, réservations, factures liées à une réservation du bateau).
+- Invitation d'un `boat_owner` : `boatIds` requis et validés (appartenance à l'org) à la création de l'invitation, bateaux attachés via `boat_owners` à l'acceptation (même transaction que la création du membership).
+- Gestion admin de la copropriété : `BoatOwnersController` (`POST`/`DELETE /boats/:id/owners`) + section dédiée dans `boats/edit.vue`.
+- Correction d'un gap préexistant : le contrôleur factures réutilisait la capability `invoices.create` pour autoriser la lecture (`index`/`show`/`downloadPdf`) — nouvelle capability `invoices.view`, `InvoicePolicy.view()`, comportement inchangé pour `admin`/`member`.
+- i18n : nouveau namespace `owner.json` (FR+EN), rôles `mechanic`/`boat_owner` ajoutés dans `settings.json`/`organization.json`, messages `flash.json`.
+- **Tests** : `permissions_taxonomy.spec.ts` étendu (4 rôles) ; nouveaux tests fonctionnels `boat_owner_access.spec.ts`, `mechanic_access.spec.ts`, `invoice_view_capability.spec.ts`, `boat_owners_management.spec.ts`, extension de `organization/invitations.spec.ts` ; nouveaux tests Vitest (`use_permissions`, `use_organization`, `settings_members_invite_form`, `owner_boats_show`).
+- **Limitation connue** : une facture sans `reservationId` (créée manuellement, liée à un `clientId` libre) n'est jamais visible dans le portail propriétaire, faute de `boatId` direct sur `Invoice`.
+
 ## 2026-07-17 — Désactivation self-service d'un module inclus sur le plan Enterprise (#353)
 
 Sur le plan Enterprise, tous les modules add-ons (`charter`, `crm_invoicing`) étaient inclus et imposés sans possibilité de désactivation — une organisation qui n'utilise pas un module (ex. une marina sans activité de location) ne pouvait pas le masquer.
