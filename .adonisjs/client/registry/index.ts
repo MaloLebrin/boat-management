@@ -168,6 +168,18 @@ const routes = {
     tokens: [{"old":"/boats/:id/pricing","type":0,"val":"boats","end":""},{"old":"/boats/:id/pricing","type":1,"val":"id","end":""},{"old":"/boats/:id/pricing","type":0,"val":"pricing","end":""}],
     types: placeholder as Registry['boats.pricing.update']['types'],
   },
+  'boats.owners.store': {
+    methods: ["POST"],
+    pattern: '/boats/:id/owners',
+    tokens: [{"old":"/boats/:id/owners","type":0,"val":"boats","end":""},{"old":"/boats/:id/owners","type":1,"val":"id","end":""},{"old":"/boats/:id/owners","type":0,"val":"owners","end":""}],
+    types: placeholder as Registry['boats.owners.store']['types'],
+  },
+  'boats.owners.destroy': {
+    methods: ["DELETE"],
+    pattern: '/boats/:id/owners/:userId',
+    tokens: [{"old":"/boats/:id/owners/:userId","type":0,"val":"boats","end":""},{"old":"/boats/:id/owners/:userId","type":1,"val":"id","end":""},{"old":"/boats/:id/owners/:userId","type":0,"val":"owners","end":""},{"old":"/boats/:id/owners/:userId","type":1,"val":"userId","end":""}],
+    types: placeholder as Registry['boats.owners.destroy']['types'],
+  },
   'boats.assign': {
     methods: ["PATCH"],
     pattern: '/boats/:id/assignment',
@@ -761,6 +773,18 @@ const routes = {
     pattern: '/boats/:boatId/reservations/:reservationId/contract',
     tokens: [{"old":"/boats/:boatId/reservations/:reservationId/contract","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/reservations/:reservationId/contract","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/reservations/:reservationId/contract","type":0,"val":"reservations","end":""},{"old":"/boats/:boatId/reservations/:reservationId/contract","type":1,"val":"reservationId","end":""},{"old":"/boats/:boatId/reservations/:reservationId/contract","type":0,"val":"contract","end":""}],
     types: placeholder as Registry['boats.reservations.contract.destroy']['types'],
+  },
+  'owner.boats.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/owner/boats',
+    tokens: [{"old":"/owner/boats","type":0,"val":"owner","end":""},{"old":"/owner/boats","type":0,"val":"boats","end":""}],
+    types: placeholder as Registry['owner.boats.index']['types'],
+  },
+  'owner.boats.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/owner/boats/:id',
+    tokens: [{"old":"/owner/boats/:id","type":0,"val":"owner","end":""},{"old":"/owner/boats/:id","type":0,"val":"boats","end":""},{"old":"/owner/boats/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['owner.boats.show']['types'],
   },
   'ports.index': {
     methods: ["GET","HEAD"],

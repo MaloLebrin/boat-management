@@ -41,6 +41,10 @@ export interface ApiDefinition {
     pricing: {
       update: typeof routes['boats.pricing.update']
     }
+    owners: {
+      store: typeof routes['boats.owners.store']
+      destroy: typeof routes['boats.owners.destroy']
+    }
     assign: typeof routes['boats.assign']
     engines: {
       show: typeof routes['boats.engines.show']
@@ -210,6 +214,12 @@ export interface ApiDefinition {
     store: typeof routes['boat_generic_equipment.store']
     update: typeof routes['boat_generic_equipment.update']
     destroy: typeof routes['boat_generic_equipment.destroy']
+  }
+  owner: {
+    boats: {
+      index: typeof routes['owner.boats.index']
+      show: typeof routes['owner.boats.show']
+    }
   }
   ports: {
     index: typeof routes['ports.index']

@@ -8,5 +8,10 @@
     "title": "Something went wrong",
     "description": "An unexpected error occurred. Please try again or contact support.",
     "action": "Back to dashboard"
+  },
+  "forbidden": {
+    "title": "Access denied",
+    "description": "You don't have permission to access this page.",
+    "action": "Back to dashboard"
   }
 }

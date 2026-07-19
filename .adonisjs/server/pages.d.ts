@@ -35,6 +35,7 @@ declare module '@adonisjs/inertia/types' {
     'clients/show': ExtractProps<(typeof import('../../inertia/pages/clients/show.vue'))['default']>
     'dashboard': ExtractProps<(typeof import('../../inertia/pages/dashboard.vue'))['default']>
     'design_system': ExtractProps<(typeof import('../../inertia/pages/design_system.vue'))['default']>
+    'errors/forbidden': ExtractProps<(typeof import('../../inertia/pages/errors/forbidden.vue'))['default']>
     'errors/not_found': ExtractProps<(typeof import('../../inertia/pages/errors/not_found.vue'))['default']>
     'errors/server_error': ExtractProps<(typeof import('../../inertia/pages/errors/server_error.vue'))['default']>
     'home': ExtractProps<(typeof import('../../inertia/pages/home.vue'))['default']>
