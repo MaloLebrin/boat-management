@@ -4,6 +4,7 @@ import { Link } from '@adonisjs/inertia/vue'
 import { ref } from 'vue'
 import { MapPinIcon, PencilIcon, TrashIcon } from '@heroicons/vue/24/outline'
 import BaseButton from '~/components/base/BaseButton.vue'
+import BaseConfirmModal from '~/components/base/BaseConfirmModal.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseTabs from '~/components/base/BaseTabs.vue'
 import MarinaMapTab from '~/components/ports/show/tabs/MarinaMapTab.vue'
@@ -25,6 +26,8 @@ const tabs = [
   { key: 'plan', label: t('ports.tabs.plan') },
 ]
 
+const showDeleteConfirm = ref(false)
+
 function handleDeletePort() {
   const hasBoats =
     props.port.pontoons.some((p) => p.boats.length > 0) ||
@@ -33,9 +36,11 @@ function handleDeletePort() {
     alert(t('ports.hasBoats'))
     return
   }
-  if (confirm(t('ports.deleteConfirm'))) {
-    router.delete(`/ports/${props.port.id}`)
-  }
+  showDeleteConfirm.value = true
+}
+
+function executeDeletePort() {
+  router.delete(`/ports/${props.port.id}`)
 }
 </script>
 
@@ -87,5 +92,15 @@ function handleDeletePort() {
       <PortListTab v-if="activeTab === 'list'" :port="port" :boats="boats" />
       <MarinaMapTab v-if="activeTab === 'plan'" :port="port" :boats="boats" />
     </div>
+
+    <BaseConfirmModal
+      :open="showDeleteConfirm"
+      :title="t('ports.delete')"
+      :message="t('ports.deleteConfirm')"
+      :confirm-label="t('common.delete')"
+      :cancel-label="t('common.cancel')"
+      @update:open="showDeleteConfirm = $event"
+      @confirm="executeDeletePort"
+    />
   </div>
 </template>
