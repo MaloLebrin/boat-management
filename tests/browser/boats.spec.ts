@@ -69,9 +69,8 @@ test.group('E2E · Boat lifecycle', (group) => {
 
     const page = await visit(`/boats/${boat.id}/edit`)
     await page.waitForLoadState('networkidle')
-    await page
-      .locator(`form[action="/boats/${boat.id}"][method="delete"] button[type="submit"]`)
-      .click()
+    await page.getByRole('button', { name: 'Delete', exact: true }).click()
+    await page.getByRole('dialog').getByRole('button', { name: 'Delete', exact: true }).click()
 
     await page.waitForURL('**/boats')
     // The boat is gone: its detail page now redirects back to the fleet list.

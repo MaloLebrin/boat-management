@@ -75,7 +75,7 @@ test.group('E2E · Permissions (admin vs member)', (group) => {
     await page.waitForLoadState('networkidle')
 
     const deleteButtonCount = await page
-      .locator(`form[action="/boats/${boat.id}"][method="delete"] button[type="submit"]`)
+      .getByRole('button', { name: 'Delete', exact: true })
       .count()
     if (deleteButtonCount !== 0) {
       throw new Error('Delete button should be hidden for a member without boats.delete (#397)')
@@ -100,9 +100,8 @@ test.group('E2E · Permissions (admin vs member)', (group) => {
 
     const page = await visit(`/boats/${boat.id}/edit`)
     await page.waitForLoadState('networkidle')
-    await page
-      .locator(`form[action="/boats/${boat.id}"][method="delete"] button[type="submit"]`)
-      .click()
+    await page.getByRole('button', { name: 'Delete', exact: true }).click()
+    await page.getByRole('dialog').getByRole('button', { name: 'Delete', exact: true }).click()
 
     await page.waitForURL('**/boats')
     const deleted = await Boat.find(boat.id)
