@@ -8,5 +8,10 @@
     "title": "Une erreur est survenue",
     "description": "Une erreur inattendue s'est produite. Veuillez réessayer ou contacter le support.",
     "action": "Retour au tableau de bord"
+  },
+  "forbidden": {
+    "title": "Accès refusé",
+    "description": "Vous n'avez pas la permission d'accéder à cette page.",
+    "action": "Retour au tableau de bord"
   }
 }

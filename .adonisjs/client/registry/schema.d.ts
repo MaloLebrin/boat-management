@@ -331,6 +331,30 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_pricing_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'boats.owners.store': {
+    methods: ["POST"]
+    pattern: '/boats/:id/owners'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/boat_owner').attachBoatOwnerValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/boat_owner').attachBoatOwnerValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_owners_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_owners_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'boats.owners.destroy': {
+    methods: ["DELETE"]
+    pattern: '/boats/:id/owners/:userId'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { id: ParamValue; userId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_owners_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_owners_controller').default['destroy']>>>
+    }
+  }
   'boats.assign': {
     methods: ["PATCH"]
     pattern: '/boats/:id/assignment'
@@ -1517,6 +1541,30 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/rental_contracts_controller').default['destroy']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/rental_contracts_controller').default['destroy']>>>
+    }
+  }
+  'owner.boats.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/owner/boats'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_owner_portal_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_owner_portal_controller').default['index']>>>
+    }
+  }
+  'owner.boats.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/owner/boats/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_owner_portal_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_owner_portal_controller').default['show']>>>
     }
   }
   'ports.index': {
