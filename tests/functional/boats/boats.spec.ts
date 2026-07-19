@@ -3,7 +3,7 @@ import testUtils from '@adonisjs/core/services/test_utils'
 import Boat from '#models/boat'
 import { UserFactory } from '#database/factories/user_factory'
 import { BoatFactory } from '#database/factories/boat_factory'
-import { createAdminUser } from '#tests/functional/helpers'
+import { createAdminUser, createMemberUser } from '#tests/functional/helpers'
 
 test.group('Boats (functional)', (group) => {
   group.each.setup(() => testUtils.db().truncate())
@@ -150,6 +150,23 @@ test.group('Boats (functional)', (group) => {
     await client.delete(`/boats/${boat.id}`).loginAs(otherUser)
 
     // Boat should still exist since the other user cannot see/delete it
+    const found = await Boat.find(boat.id)
+    assert.isNotNull(found)
+  })
+
+  test('DELETE /boats/:id is denied to a plain member (boats.delete is admin-only)', async ({
+    client,
+    assert,
+  }) => {
+    const admin = await createAdminUser()
+    const member = await createMemberUser(admin.organizationId!)
+    const boat = await BoatFactory.merge({ organizationId: admin.organizationId! }).create()
+
+    // Bouncer redirects form-submission methods (POST/PUT/PATCH/DELETE) back with
+    // a flash error instead of a raw 403, to stay Inertia-friendly — cf. CLAUDE.md.
+    const response = await client.delete(`/boats/${boat.id}`).loginAs(member).redirects(0)
+
+    response.assertStatus(302)
     const found = await Boat.find(boat.id)
     assert.isNotNull(found)
   })

@@ -12,7 +12,8 @@ La sidebar, la sous-nav `/settings/*` et certains CTA create/delete/manage s'aff
 - `inertia/pages/boats/edit.vue` : le bouton de suppression n'est rendu que si `can('boats.delete')` (admin-only).
 - `inertia/components/settings/SettingsBillingModules.vue` (+ nouvelle prop `canManageBilling` depuis `SettingsBillingTab.vue`) : les CTA « Activer »/« Résilier » (modules Pro et Enterprise) ne sont rendus que si `can('subscription.manage')`, avec un message explicatif (`settings.billing.modules.adminOnly`, FR+EN) sinon.
 - **Tests** : `tests/inertia/use_nav_sections.spec.ts` (filtrage capability, dont mechanic/boat_owner/zéro-capability), `tests/inertia/settings_shell.spec.ts` (nouveau), `tests/inertia/boats_edit_delete_button.spec.ts` (nouveau), `tests/inertia/settings_billing_modules.spec.ts` (gating `subscription.manage`), `tests/inertia/default_layout_sidebar.spec.ts` mis à jour pour le prop `permissions` désormais requis.
-- Backend inchangé — purement une correction d'affichage frontend, cohérente avec les policies déjà en place côté serveur (ou déjà couvertes par #396 pour les routes fleet).
+- `tests/browser/permissions.spec.ts` : le test e2e « member cannot delete a boat » cliquait sur le bouton supprimer pour vérifier le refus serveur — devenu impossible puisque le bouton est maintenant masqué. Reformulé pour vérifier l'absence du bouton ; la garantie backend (refus serveur) est désormais couverte indépendamment par le nouveau test fonctionnel `tests/functional/boats/boats.spec.ts` (« DELETE /boats/:id is denied to a plain member »).
+- Backend inchangé côté logique métier — purement une correction d'affichage frontend, cohérente avec les policies déjà en place côté serveur (ou déjà couvertes par #396 pour les routes fleet).
 
 ## 2026-07-19 — Fuite de données : index staff accessibles à mechanic/boat_owner sans capability (#396)
 

@@ -59,7 +59,7 @@ test.group('E2E · Permissions (admin vs member)', (group) => {
     assert.include(bodyText, 'Admin')
   })
 
-  test('member cannot delete a boat — the boat still exists afterward', async ({
+  test('member does not see the delete button on /boats/:id/edit (no boats.delete capability, #397)', async ({
     browserContext,
     visit,
   }) => {
@@ -73,14 +73,20 @@ test.group('E2E · Permissions (admin vs member)', (group) => {
 
     const page = await visit(`/boats/${boat.id}/edit`)
     await page.waitForLoadState('networkidle')
-    await page
-      .locator(`form[action="/boats/${boat.id}"][method="delete"] button[type="submit"]`)
-      .click()
-    await page.waitForLoadState('networkidle')
 
+    const deleteButtonCount = await page
+      .locator(`form[action="/boats/${boat.id}"][method="delete"] button[type="submit"]`)
+      .count()
+    if (deleteButtonCount !== 0) {
+      throw new Error('Delete button should be hidden for a member without boats.delete (#397)')
+    }
+
+    // Backend guarantee (defense in depth, covered independently of the UI):
+    // tests/functional/boats/boats.spec.ts — "DELETE /boats/:id is denied to a
+    // plain member (boats.delete is admin-only)".
     const stillExists = await Boat.find(boat.id)
     if (!stillExists) {
-      throw new Error('BoatPolicy.delete should deny a non-admin member, but the boat was deleted')
+      throw new Error('The boat should not have been deleted')
     }
   })
 
