@@ -78,6 +78,21 @@ node ace db:seed --files database/seeders/billing_module_states_seeder.ts
 
 Le seeder le plus riche : matérialise chaque état de la matrice plan/abonnement/module affichée sur `/settings/billing` (cf. fix #402 sur les états des modules Enterprise/Pro), plus les données métier des domaines `charter`/`crm_invoicing` quand ces modules sont actifs. Mot de passe commun `Password1!`, tous les comptes en `@test.local`.
 
+Le fichier `database/seeders/billing_module_states_seeder.ts` lui-même est volontairement mince (une classe `BaseSeeder` qui orchestre 4 fonctions) : toute la logique vit dans `database/seeders_support/billing_module_states/` — un dossier **frère** de `database/seeders/`, jamais scanné par `db:seed`. C'est une contrainte technique : `@adonisjs/lucid` scanne `database/seeders/` récursivement et essaie d'exécuter **chaque** fichier `.ts` trouvé comme un seeder, donc des fichiers "helpers" sans classe `BaseSeeder` casseraient `db:seed` s'ils étaient placés dans un sous-dossier de `database/seeders/`.
+
+| Fichier de support              | Contenu                                                                                                                                             |
+| ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `constants.ts`                  | `TEST_PASSWORD`                                                                                                                                     |
+| `org_helpers.ts`                | `ensureOwner`, `ensureTeamMember`, `ensureBoat`, `ensureBoats`                                                                                      |
+| `subscription_helpers.ts`       | `ensureSubscription`                                                                                                                                |
+| `module_helpers.ts`             | `ensureModule`, `ensureAddon`                                                                                                                       |
+| `quota_helpers.ts`              | `ensureStorageUsed`, `ensureAiTokenUsage`                                                                                                           |
+| `business_data_helpers.ts`      | `ensureClient`, `ensurePricingSeason`, `ensureReservation`, `ensureRentalContract`, `ensureInvoice`, `seedCharterAndCrmData`, `seedCharterOnlyData` |
+| `seed_core_states.ts`           | états cœur #402 (§1 ci-dessous), retourne les orgs/users réutilisés par les données métier                                                          |
+| `seed_subscription_statuses.ts` | statuts Stripe exhaustifs (§2)                                                                                                                      |
+| `seed_quota_edge_cases.ts`      | cas limites de quota (§3)                                                                                                                           |
+| `seed_module_business_data.ts`  | données métier charter/CRM (§4)                                                                                                                     |
+
 ### 1. États cœur du fix #402 (organizations)
 
 | Org                                                                               | Plan       | Abonnement | Modules                                                              | État `/settings/billing` attendu                                             |
