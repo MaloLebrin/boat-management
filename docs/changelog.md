@@ -3,6 +3,16 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-07-20 — Correction des incohérences de tarifs entre le site marketing et l'app (#401)
+
+Le tableau comparatif de `/fr/tarifs` (« Comparer les plans, ligne par ligne ») affichait en permanence des prix mensuels figés (20 €/mois Pro, 99 €/mois Enterprise) issus de chaînes i18n statiques, même quand le toggle Mensuel/Annuel au-dessus était sur Annuel (16 €/79 €, le défaut) — deux tarifs différents visibles simultanément sur la même page. Par ailleurs, les cartes de plans en mode Annuel et le configurateur de modules/bateaux supplémentaires affichaient un tarif mensuel-équivalent (ex. 3 €/bateau/mois, 12 €/mois pour un module) sans jamais préciser qu'il s'agissait d'un tarif facturé annuellement, créant une contradiction apparente avec les tarifs pleins affichés ailleurs (4 €/bateau/mois en facturation mensuelle sur `/settings/billing`, 15 €/mois pour un module sur la home).
+
+- `app/controllers/marketing_controller.ts` : `detailedTable.planHeaders` (Pro/Enterprise) construit désormais à partir de `PLAN_PRICES` (`shared/types/plan.ts`) au lieu de chaînes i18n figées — seule source de vérité déjà utilisée par le reste de la page tarifs et par `/settings/billing`.
+- `PricingDetailedTableSection.vue` reçoit la prop `billing` et calcule le prix affiché (mensuel ou annuel-équivalent) en fonction du toggle ; le plan Starter garde son libellé statique « Gratuit ».
+- `PricingTiersSection.vue`, `PricingDetailedTableSection.vue`, `PricingConfigurator.vue` et `PricingConfiguratorModuleCard.vue` affichent désormais la mention « Facturé annuellement. » (clé `config_billed_annually` réutilisée) sous le prix dès que le tarif annuel-équivalent est présenté (cartes de plans, tableau comparatif, modules et bateaux supplémentaires du configurateur) — la même mention existait déjà pour le total du configurateur.
+- Suppression des clés i18n `table_plan_pro_price` / `table_plan_enterprise_price` (FR + EN), devenues obsolètes.
+- **Tests** : nouveaux `tests/inertia/pricing_tiers_section.spec.ts` et `tests/inertia/pricing_detailed_table_section.spec.ts` ; `tests/inertia/pricing_configurator.spec.ts` complété (bateaux supplémentaires et modules avec mention annuelle) — `pnpm typecheck` (199 erreurs pré-existantes, inchangées) et `eslint` passent sans nouvelle erreur sur les fichiers modifiés.
+
 ## 2026-07-20 — Uniformisation tutoiement/vouvoiement en français (#400)
 
 Le FR mélangeait tutoiement et vouvoiement, parfois sur le même écran : la page tarifs passait du « tu » (hero, calculateur ROI) au « vous » (configurateur de modules, questions FAQ), la home mélangeait hero en « tu » et section offre modulaire en « vous », et le login FR tutoyait (« Reconnecte-toi à ta flotte ») alors que le reste de l'app vouvoie systématiquement.

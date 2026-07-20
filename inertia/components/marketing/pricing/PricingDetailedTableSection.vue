@@ -18,7 +18,11 @@ interface Group {
 
 interface PlanHeader {
   name: string
-  price: string
+  /** Libellé statique (ex. "Gratuit") pour un plan sans tarification variable. */
+  price?: string
+  priceMonthly?: number
+  priceAnnual?: number
+  pricePer?: string
   cta: string
 }
 
@@ -33,6 +37,8 @@ defineProps<{
   planHeaders: PlanHeader[]
   /** Libellé du badge affiché quand une cellule vaut le sentinel `'addon'`. */
   addonLabel: string
+  billing: 'monthly' | 'annual'
+  billedAnnuallyNote: string
 }>()
 
 const { el, isVisible } = useScrollReveal()
@@ -106,7 +112,16 @@ function collapseAllGroups() {
                   <span v-if="idx === 1" class="text-coral-400">★</span>
                 </p>
                 <p :class="['mt-1 text-xs', idx === 1 ? 'text-white/60' : 'text-fg-subtle']">
-                  {{ plan.price }}
+                  {{
+                    plan.price ??
+                    `${billing === 'annual' ? plan.priceAnnual : plan.priceMonthly} € ${plan.pricePer}`
+                  }}
+                </p>
+                <p
+                  v-if="billing === 'annual' && plan.priceAnnual !== undefined"
+                  :class="['mt-0.5 text-[11px]', idx === 1 ? 'text-white/40' : 'text-fg-subtle']"
+                >
+                  {{ billedAnnuallyNote }}
                 </p>
                 <BaseButton
                   href="/signup"

@@ -161,6 +161,7 @@ const { el, isVisible } = useScrollReveal()
             :desc="m.desc"
             :price="unitPrice(m)"
             :price-per="perMonth"
+            :billed-annually-note="isAnnual ? billedAnnuallyNote : undefined"
             :features="m.features"
             :selected="selected.has(m.key)"
             @toggle="toggle(m.key)"
@@ -176,6 +177,9 @@ const { el, isVisible } = useScrollReveal()
               <p class="mt-0.5 text-sm text-fg-muted">{{ extraBoats.desc }}</p>
               <p class="mt-1 text-sm font-semibold text-fg">
                 {{ extraBoatUnit }} € {{ extraBoats.perBoatLabel }}
+              </p>
+              <p v-if="isAnnual" class="mt-0.5 text-xs text-fg-subtle">
+                {{ billedAnnuallyNote }}
               </p>
             </div>
             <div class="flex items-center gap-2">

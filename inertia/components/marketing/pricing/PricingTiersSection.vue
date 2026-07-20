@@ -27,6 +27,7 @@ defineProps<{
   billing: 'monthly' | 'annual'
   reassurance: ReassuranceItem[]
   featuredBadgeLabel: string
+  billedAnnuallyNote: string
 }>()
 
 const { el, isVisible } = useScrollReveal()
@@ -92,6 +93,14 @@ const { el, isVisible } = useScrollReveal()
               {{ billing === 'annual' ? tier.priceAnnualPer : tier.pricePer }}
             </span>
           </div>
+
+          <!-- Annual billing note -->
+          <p
+            v-if="billing === 'annual' && tier.priceAnnual !== undefined"
+            :class="['mt-1 text-xs', tier.featured ? 'text-white/50' : 'text-fg-subtle']"
+          >
+            {{ billedAnnuallyNote }}
+          </p>
 
           <!-- Sub -->
           <p :class="['mt-2 text-sm', tier.featured ? 'text-white/60' : 'text-fg-muted']">
