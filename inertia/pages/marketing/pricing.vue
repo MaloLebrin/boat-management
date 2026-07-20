@@ -128,6 +128,7 @@ interface PageProps {
         annualLabel: string
         annualBadge: string
       }
+      tierFeaturedBadge: string
       tiers: Tier[]
       reassurance: ReassuranceItem[]
       roi: {
@@ -223,6 +224,7 @@ const hreflangFr = '/fr/tarifs'
     :tiers="t.pricing.tiers"
     :billing="billing"
     :reassurance="t.pricing.reassurance"
+    :featured-badge-label="t.pricing.tierFeaturedBadge"
   />
   <PricingConfigurator v-bind="t.pricing.configurator" :billing="billing" />
   <PricingROISection v-bind="t.pricing.roi" />

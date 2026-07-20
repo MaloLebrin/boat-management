@@ -26,6 +26,7 @@ defineProps<{
   tiers: Tier[]
   billing: 'monthly' | 'annual'
   reassurance: ReassuranceItem[]
+  featuredBadgeLabel: string
 }>()
 
 const { el, isVisible } = useScrollReveal()
@@ -56,7 +57,7 @@ const { el, isVisible } = useScrollReveal()
             v-if="tier.featured"
             class="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-coral-500 px-4 py-1 text-xs font-bold text-white"
           >
-            ★ Recommande
+            ★ {{ featuredBadgeLabel }}
           </span>
 
           <!-- Tag -->

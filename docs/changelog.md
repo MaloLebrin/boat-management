@@ -3,6 +3,16 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-07-20 — Correction orthographique : accents manquants en français (#399)
+
+Des pans entiers du FR étaient écrits sans accents (notamment `marketing.json` et `simulator.json`, mais aussi des chaînes éparses dans `clients.json`, `invitations.json`, `organization.json`, `equipment.json`, `budget.json`, `boats.json`, `maintenance.json`, `public.json`, `settings.json`) — visible jusque dans les `<title>` d'onglets et badges (« Echeance: », « Operationnel », « ★ Recommande », « Greement »…), alors que d'autres sections du même écran étaient correctement accentuées.
+
+- Passe de correction orthographique complète sur `resources/lang/fr/*.json` : ~100 mots corrigés (données, sécurité, échéance, opérationnel, prêt, être, événement, contrôles, équipe, dû, où, à, ça, sûr…), avec attention particulière aux formes homographes ambiguës (`geres` → `gères`/`gérés`, `coute` → `coûte`, `cree` → `crée`/`créé` selon le contexte grammatical).
+- Corrections manuelles supplémentaires non détectables par simple dictionnaire (accord de participe passé) : « Excel fermé/archivé », « tableur partagé », « pensé pour la mer », « connectés », « frais cachés », « ont rangé l'Excel »…
+- Le badge « ★ Recommande » de `PricingTiersSection.vue` était en dur dans le template (violation de la règle i18n) — extrait en clé `marketing.pricing2.tier_featured_badge` (FR : « Recommandé », EN : « Recommended »), propagée depuis `MarketingController#buildPricingPageData` via une nouvelle prop `featuredBadgeLabel`.
+- Vérification systématique que les clés JSON, les valeurs utilisées comme identifiants internes (`item2_key` du sélecteur de personas marketing) et les slugs d'URL (`cta_href`) n'ont pas été altérés par la correction — seul le texte affiché a été modifié.
+- **Tests** : `pnpm typecheck` et `eslint` passent sans nouvelle erreur ; suite fonctionnelle Japa exécutée sans régression.
+
 ## 2026-07-19 — Confirmation obligatoire avant suppression d'un bateau ou d'un port (#398)
 
 `inertia/pages/boats/edit.vue` soumettait la suppression du bateau directement au clic (`<Form method="delete">`), sans aucune confirmation — un clic malencontreux d'un admin supprimait le bateau et tout son historique immuable (maintenance, documents, équipements). `inertia/pages/ports/show.vue` n'utilisait qu'un `confirm()` natif du navigateur, incohérent avec le pattern de confirmation déjà utilisé ailleurs (clients, factures, saisons tarifaires).

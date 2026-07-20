@@ -1,7 +1,7 @@
 {
   "status": {
-    "label": "Etat",
-    "operational": "Operationnel",
+    "label": "État",
+    "operational": "Opérationnel",
     "in_maintenance": "En maintenance",
     "out_of_service": "Hors service",
     "retired": "Retire"
