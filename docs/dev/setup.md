@@ -40,10 +40,13 @@ pnpm dev
 
 Le schéma Lucid généré se trouve dans `database/schema.ts`.
 
-Pour créer des données de démo, le seeder `database/seeders/demo_seeder.ts` requiert:
+Pour créer les données réelles de l'utilisateur admin, le seeder `database/seeders/malo_seeder.ts` requiert:
 
 - `ADMIN_EMAIL`
 - `ADMIN_PASSWORD`
 
 Commande (référence dans le seeder):
-`node ace db:seed --files database/seeders/demo_seeder.ts`
+`node ace db:seed --files database/seeders/malo_seeder.ts`
+
+Pour créer une organisation par état de la matrice plan/abonnement/module de `/settings/billing` (Starter, Pro avec/sans abonnement, modules souscrits/offerts, add-on `extra_boats`, Enterprise avec/sans lignes `granted`) — utile pour QA manuelle sans Stripe, environnements `development`/`test` uniquement:
+`node ace db:seed --files database/seeders/billing_module_states_seeder.ts`

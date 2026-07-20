@@ -127,10 +127,14 @@ Source: `database/schema.ts` (généré automatiquement via migrations).
 
 ## Seed (données démo)
 
-Référence: `database/seeders/demo_seeder.ts`.
+Référence: `database/seeders/malo_seeder.ts` (données réelles de l'utilisateur admin, pas des données de démo génériques — voir `sandbox_seeder.ts` pour la démo "Marina Démo").
 
 - crée (ou réutilise) un admin + organisation via `ADMIN_EMAIL`/`ADMIN_PASSWORD`
-- crée (ou réutilise) le boat `Rhodes 21`
+- crée (ou réutilise) le boat `3D`
 - crée un moteur, des voiles, un rig si absents
+
+Référence: `database/seeders/billing_module_states_seeder.ts` (environnements `development`/`test`).
+
+- crée une organisation par état de la matrice plan/abonnement/module de `/settings/billing` (Starter, Pro sans/avec abonnement, modules `subscription`/`granted`, add-on `extra_boats`, Enterprise avec/sans lignes `organization_modules`)
 - crée de l’historique de maintenance
 - crée des tasks “planned” pour les entrées ayant une `dueAt`

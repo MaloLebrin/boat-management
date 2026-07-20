@@ -10,15 +10,19 @@ import app from '@adonisjs/core/services/app'
 import { BaseSeeder } from '@adonisjs/lucid/seeders'
 import { DateTime } from 'luxon'
 
-export default class extends BaseSeeder {
+export default class MaloSeeder extends BaseSeeder {
   async run() {
     /**
      * Run only this seeder:
-     * `node ace db:seed --files database/seeders/demo_seeder.ts`
+     * `node ace db:seed --files database/seeders/malo_seeder.ts`
      *
-     * This seeder is idempotent-ish:
+     * This seeder reflects the real account/data of the app's own user
+     * (keyed by `ADMIN_EMAIL`), not generic demo data — see `sandbox_seeder.ts`
+     * for the generic "Marina Démo" dataset.
+     *
+     * Idempotent-ish:
      * - Reuses `ADMIN_EMAIL` user if it exists, otherwise creates it with an organization.
-     * - Reuses the "Rhodes 21" boat for that organization if it exists.
+     * - Reuses the "3D" boat for that organization if it exists.
      * - Creates equipment only if missing.
      * - Creates maintenance events only if missing (based on title uniqueness per boat).
      */
@@ -49,13 +53,13 @@ export default class extends BaseSeeder {
     // Find or create boat
     const existingBoat = await Boat.query()
       .where('organizationId', user.organizationId)
-      .where('name', 'Rhodes 21')
+      .where('name', '3D')
       .first()
 
     const boat =
       existingBoat ??
       (await boatService.createForUser(user, {
-        name: 'Rhodes 21',
+        name: '3D',
         propulsionType: 'sailboat',
         lengthM: 6.3,
         beamM: 2.48,
@@ -63,8 +67,8 @@ export default class extends BaseSeeder {
         mastHeightM: 9.5,
         hullMaterial: 'fiberglass',
         yearBuilt: 1978,
-        manufacturer: 'Rhodes',
-        model: '21',
+        manufacturer: 'Figareau',
+        model: 'Rhodes 21',
       }))
 
     // Ensure relations loaded
@@ -83,6 +87,15 @@ export default class extends BaseSeeder {
         installHours: 120,
         manufacturedAt: '2018-04-01',
       })
+      await equipmentService.createEngine(user, boat, {
+        kind: 'outboard',
+        fuel: 'essence',
+        brand: 'Yamaha',
+        model: '4AS',
+        powerHp: 4,
+        installHours: 1004,
+        manufacturedAt: '1998-04-01',
+      })
     }
 
     if (boat.sails.length === 0) {
@@ -99,6 +112,20 @@ export default class extends BaseSeeder {
         material: 'dacron',
         reefPoints: 0,
         manufacturedAt: '2019-06-01',
+      })
+      await equipmentService.createSail(user, boat, {
+        sailType: 'Tourmentin',
+        areaM2: 2.5,
+        material: 'dacron',
+        reefPoints: 0,
+        manufacturedAt: '2024-06-01',
+      })
+      await equipmentService.createSail(user, boat, {
+        sailType: 'Spinnaker',
+        areaM2: 20.0,
+        material: 'polyester',
+        reefPoints: 0,
+        manufacturedAt: '2022-06-01',
       })
     }
 
