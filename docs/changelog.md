@@ -3,6 +3,17 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-07-20 — Correction des états incohérents des modules add-ons sur `/settings/billing` (#402)
+
+Sur la carte « Modules add-ons » de `/settings/billing` : une organisation Enterprise voyait un bouton « Activer » sur un module (Location, CRM & Facturation) pourtant déjà accessible depuis la nav — le module n'existait simplement pas encore en ligne dans `organization_modules`, mais Enterprise inclut tous les modules par tier (`PLAN_LIMITS.enterprise`), indépendamment de cette table ; le clic n'avait donc aucun effet visible. Une organisation Pro seedée sans abonnement Stripe actif (plan interne `pro` mais `subscription === null`) voyait quant à elle « Nécessite un plan Pro actif » sur chaque module sans aucun bouton, message incompréhensible pour un utilisateur qui voit déjà « Plan actuel : Pro » en haut de page.
+
+- `SettingsBillingModules.vue` : pour un plan Enterprise, chaque module affiche désormais un état statique « Inclus dans votre plan » (✓), sans CTA — le toggle self-service activer/désactiver ajouté en #392 reste disponible côté API mais n'est plus exposé sur cette carte, qui n'a plus vocation à piloter un état qui ne dépend pas de `organization_modules` pour ce tier.
+- Pour un plan Pro sans abonnement Stripe actif, le message devient « Activez d'abord votre abonnement Pro pour activer ce module », avec un bouton « Activer l'abonnement Pro » (admin uniquement) qui déclenche le checkout Stripe du plan Pro — distinct du cas Starter, qui garde « Nécessite un plan Pro actif ».
+- Sous-titre de la carte adapté par plan (« Complétez votre plan Pro… » vs « Tous les modules add-ons sont inclus dans votre plan. »).
+- Nouvelles clés i18n FR/EN : `settings.billing.modules.{includedInPlan,subtitleEnterprise,subscriptionRequired,activateSubscription}`.
+- La graphie « Entreprise » vs « Enterprise » signalée dans l'audit est traitée séparément dans #411 (lexique de marque).
+- **Tests** : `tests/inertia/settings_billing_modules.spec.ts` réécrit pour les nouveaux états Enterprise (inclus sans CTA, avec/sans module granted, avec/sans `subscription.manage`) et Pro sans abonnement actif (CTA admin vs message seul, membre non-admin).
+
 ## 2026-07-20 — Correction des incohérences de tarifs entre le site marketing et l'app (#401)
 
 Le tableau comparatif de `/fr/tarifs` (« Comparer les plans, ligne par ligne ») affichait en permanence des prix mensuels figés (20 €/mois Pro, 99 €/mois Enterprise) issus de chaînes i18n statiques, même quand le toggle Mensuel/Annuel au-dessus était sur Annuel (16 €/79 €, le défaut) — deux tarifs différents visibles simultanément sur la même page. Par ailleurs, les cartes de plans en mode Annuel et le configurateur de modules/bateaux supplémentaires affichaient un tarif mensuel-équivalent (ex. 3 €/bateau/mois, 12 €/mois pour un module) sans jamais préciser qu'il s'agissait d'un tarif facturé annuellement, créant une contradiction apparente avec les tarifs pleins affichés ailleurs (4 €/bateau/mois en facturation mensuelle sur `/settings/billing`, 15 €/mois pour un module sur la home).

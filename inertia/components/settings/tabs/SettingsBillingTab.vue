@@ -236,6 +236,7 @@ const storageOverflow = computed(() => {
         :subscription="subscription"
         :active-modules="orgModules"
         :can-manage-billing="canManageBilling"
+        @activate-subscription="startCheckout('pro')"
       />
 
       <SettingsBillingExtraBoats
