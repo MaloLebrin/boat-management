@@ -3,6 +3,15 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-07-20 — Uniformisation tutoiement/vouvoiement en français (#400)
+
+Le FR mélangeait tutoiement et vouvoiement, parfois sur le même écran : la page tarifs passait du « tu » (hero, calculateur ROI) au « vous » (configurateur de modules, questions FAQ), la home mélangeait hero en « tu » et section offre modulaire en « vous », et le login FR tutoyait (« Reconnecte-toi à ta flotte ») alors que le reste de l'app vouvoie systématiquement.
+
+- Norme tranchée et documentée dans `CLAUDE.md` (section Internationalisation) : **tutoiement sur le marketing** (`marketing.json` — home, tarifs, about, contact, guide…), **vouvoiement dans l'app** (tous les autres namespaces, y compris `auth.json` — login/signup/reset). Exception : la section `privacy` (politique de confidentialité RGPD) reste en vouvoiement, convention standard pour un texte légal.
+- `resources/lang/fr/marketing.json` : ~45 chaînes en vouvoiement basculées en tutoiement pour rester cohérentes avec le reste du fichier (configurateur de modules, calculateur ROI, FAQ tarifs, section "modularOffer", démo produit, guide simulateur…). Les questions de FAQ où le "vous" désigne l'équipe FleetAi (« vous avez un programme partenaire ? ») sont conservées telles quelles — ce n'est pas le lecteur qui est vouvoyé.
+- `resources/lang/fr/auth.json` : ~14 chaînes en tutoiement (login, signup, mot de passe oublié) basculées en vouvoiement pour s'aligner sur le reste de l'app.
+- **Tests** : `pnpm typecheck` (erreurs pré-existantes non liées à ce changement, inchangées) ; validation JSON des fichiers modifiés ; vérification manuelle qu'aucun mélange tu/vous ne subsiste par namespace.
+
 ## 2026-07-20 — Correction orthographique : accents manquants en français (#399)
 
 Des pans entiers du FR étaient écrits sans accents (notamment `marketing.json` et `simulator.json`, mais aussi des chaînes éparses dans `clients.json`, `invitations.json`, `organization.json`, `equipment.json`, `budget.json`, `boats.json`, `maintenance.json`, `public.json`, `settings.json`) — visible jusque dans les `<title>` d'onglets et badges (« Echeance: », « Operationnel », « ★ Recommande », « Greement »…), alors que d'autres sections du même écran étaient correctement accentuées.
