@@ -1,9 +1,11 @@
+import AiTokenUsage from '#models/ai_token_usage'
 import Boat from '#models/boat'
 import Organization from '#models/organization'
 import OrganizationMembership from '#models/organization_membership'
 import Subscription from '#models/subscription'
 import OrganizationModuleService from '#services/organization_module_service'
 import UserService from '#services/user_service'
+import { PLAN_LIMITS } from '#shared/types/plan'
 import type { ModuleSource, PlanAddon, PlanModule, PlanTier } from '#shared/types/plan'
 import type { SubscriptionStatus } from '#shared/types/billing'
 import User from '#models/user'
@@ -146,6 +148,18 @@ async function ensureBoats(orgId: number, count: number, namePrefix: string): Pr
   }
 }
 
+/** Sets the org's storage usage directly (mirrors the pattern used in quota tests). */
+async function ensureStorageUsed(orgId: number, bytes: number): Promise<void> {
+  const org = await Organization.findOrFail(orgId)
+  await org.merge({ storageUsedBytes: bytes }).save()
+}
+
+/** Sets the org's AI token usage for the current month (idempotent, upsert). */
+async function ensureAiTokenUsage(orgId: number, tokensUsed: number): Promise<void> {
+  const month = DateTime.now().toFormat('yyyy-MM')
+  await AiTokenUsage.updateOrCreate({ organizationId: orgId, month }, { tokensUsed })
+}
+
 /**
  * Matérialise chaque état de la matrice plan/abonnement/module de
  * `/settings/billing` (cf. fix #402) pour QA manuelle sans passer par Stripe.
@@ -262,6 +276,125 @@ export default class BillingModuleStatesSeeder extends BaseSeeder {
     await ensureModule(moduleService, enterpriseGrantedOrg.id, 'crm_invoicing', 'granted')
     await ensureBoats(enterpriseGrantedOrg.id, 1, 'Grandfather Boat')
     console.log(`✓ enterprise-granted — lignes granted présentes, includedInPlan inchangé`)
+
+    // ─── 10-16. Statuts d'abonnement Stripe exhaustifs ──────────────────────
+    // `SubscriptionService.getActive()` (app/services/subscription_service.ts)
+    // ne considère que active/trialing/past_due comme « abonnement actif » :
+    // c'est la seule chose renvoyée au front (`subscription` prop de
+    // settings_controller.ts#billing). trialing/past_due sont donc visibles
+    // sur la carte Modules comme un Pro actif ; les 5 autres statuts y
+    // apparaissent comme « pas d'abonnement » (même état que pro-no-sub-*)
+    // mais la ligne `subscriptions` reste en base pour QA d'autres écrans
+    // (historique de facturation, reconciliation webhook, etc.).
+    const { org: proTrialingOrg } = await ensureOwner(
+      'pro-sub-trialing@test.local',
+      'Tom Trial',
+      'pro'
+    )
+    await ensureSubscription(proTrialingOrg.id, 'pro', 'trialing')
+    await ensureBoats(proTrialingOrg.id, 1, 'Trial Boat')
+    console.log(`✓ pro-sub-trialing — abonnement en période d'essai (compté « actif »)`)
+
+    const { org: proPastDueOrg } = await ensureOwner(
+      'pro-sub-past-due@test.local',
+      'Paul PastDue',
+      'pro'
+    )
+    await ensureSubscription(proPastDueOrg.id, 'pro', 'past_due')
+    await ensureBoats(proPastDueOrg.id, 1, 'PastDue Boat')
+    console.log(`✓ pro-sub-past-due — paiement en retard (compté « actif », badge warning)`)
+
+    const { org: proCanceledOrg } = await ensureOwner(
+      'pro-sub-canceled@test.local',
+      'Claire Canceled',
+      'starter' // reflète la vraie règle métier : un abonnement annulé fait retomber le plan sur starter (SubscriptionService.syncFromSubscriptionEvent)
+    )
+    await ensureSubscription(proCanceledOrg.id, 'starter', 'canceled')
+    await ensureBoats(proCanceledOrg.id, 1, 'Canceled Boat')
+    console.log(`✓ pro-sub-canceled — abonnement annulé, plan déjà retombé sur starter`)
+
+    const { org: proIncompleteOrg } = await ensureOwner(
+      'pro-sub-incomplete@test.local',
+      'Ivan Incomplete',
+      'pro'
+    )
+    await ensureSubscription(proIncompleteOrg.id, 'pro', 'incomplete')
+    await ensureBoats(proIncompleteOrg.id, 1, 'Incomplete Boat')
+    console.log(`✓ pro-sub-incomplete — premier paiement en attente`)
+
+    const { org: proIncompleteExpiredOrg } = await ensureOwner(
+      'pro-sub-incomplete-expired@test.local',
+      'Eva Expired',
+      'pro'
+    )
+    await ensureSubscription(proIncompleteExpiredOrg.id, 'pro', 'incomplete_expired')
+    await ensureBoats(proIncompleteExpiredOrg.id, 1, 'Expired Boat')
+    console.log(`✓ pro-sub-incomplete-expired — premier paiement jamais complété`)
+
+    const { org: proUnpaidOrg } = await ensureOwner(
+      'pro-sub-unpaid@test.local',
+      'Uma Unpaid',
+      'pro'
+    )
+    await ensureSubscription(proUnpaidOrg.id, 'pro', 'unpaid')
+    await ensureBoats(proUnpaidOrg.id, 1, 'Unpaid Boat')
+    console.log(`✓ pro-sub-unpaid — relances de paiement épuisées`)
+
+    const { org: proPausedOrg } = await ensureOwner(
+      'pro-sub-paused@test.local',
+      'Pia Paused',
+      'pro'
+    )
+    await ensureSubscription(proPausedOrg.id, 'pro', 'paused')
+    await ensureBoats(proPausedOrg.id, 1, 'Paused Boat')
+    console.log(`✓ pro-sub-paused — abonnement mis en pause`)
+
+    // ─── 17-20. Cas limites de quota ────────────────────────────────────────
+    const storageLimitBytesPro = PLAN_LIMITS.pro.storageGb! * 1024 * 1024 * 1024
+
+    const { org: storage80Org } = await ensureOwner(
+      'pro-quota-storage-80@test.local',
+      'Simon Storage80',
+      'pro'
+    )
+    await ensureSubscription(storage80Org.id, 'pro', 'active')
+    await ensureStorageUsed(storage80Org.id, Math.round(storageLimitBytesPro * 0.8))
+    await ensureBoats(storage80Org.id, 1, 'Storage80 Boat')
+    console.log(`✓ pro-quota-storage-80 — stockage à 80% du quota Pro (20GB)`)
+
+    const { org: storage100Org } = await ensureOwner(
+      'pro-quota-storage-100@test.local',
+      'Sara Storage100',
+      'pro'
+    )
+    await ensureSubscription(storage100Org.id, 'pro', 'active')
+    await ensureStorageUsed(storage100Org.id, Math.round(storageLimitBytesPro * 1.02))
+    await ensureBoats(storage100Org.id, 1, 'Storage100 Boat')
+    console.log(`✓ pro-quota-storage-100 — stockage au-delà du quota Pro (20GB)`)
+
+    const { org: aiNearLimitOrg } = await ensureOwner(
+      'pro-quota-ai-near-limit@test.local',
+      'Amir AiTokens',
+      'pro'
+    )
+    await ensureSubscription(aiNearLimitOrg.id, 'pro', 'active')
+    await ensureAiTokenUsage(
+      aiNearLimitOrg.id,
+      Math.round(PLAN_LIMITS.pro.aiTokensPerMonth! * 0.85)
+    )
+    await ensureBoats(aiNearLimitOrg.id, 1, 'AiTokens Boat')
+    console.log(`✓ pro-quota-ai-near-limit — 85% du quota mensuel de tokens IA Pro`)
+
+    const { org: boatsAtLimitOrg } = await ensureOwner(
+      'pro-quota-boats-at-limit@test.local',
+      'Bilal BoatsLimit',
+      'pro'
+    )
+    await ensureSubscription(boatsAtLimitOrg.id, 'pro', 'active')
+    await ensureBoats(boatsAtLimitOrg.id, PLAN_LIMITS.pro.maxBoats!, 'AtLimit Boat')
+    console.log(
+      `✓ pro-quota-boats-at-limit — exactement ${PLAN_LIMITS.pro.maxBoats} bateaux (plafond Pro)`
+    )
 
     console.log('\n✅ BillingModuleStatesSeeder terminé')
     console.log(`   Mot de passe pour tous les comptes : ${TEST_PASSWORD}`)
