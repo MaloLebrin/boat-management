@@ -18,6 +18,8 @@ const props = defineProps<{
   canManageBilling: boolean
 }>()
 
+const emit = defineEmits<{ activateSubscription: [] }>()
+
 const bySource = computed(() => new Map(props.activeModules.map((m) => [m.module, m.source])))
 
 // Un abonné Pro avec un abonnement actif peut activer/résilier des modules —
@@ -25,7 +27,12 @@ const bySource = computed(() => new Map(props.activeModules.map((m) => [m.module
 const canManage = computed(
   () => props.canManageBilling && props.plan === 'pro' && props.subscription !== null
 )
-const canManageEnterprise = computed(() => props.canManageBilling)
+
+const subtitleKey = computed(() =>
+  props.plan === 'enterprise'
+    ? 'settings.billing.modules.subtitleEnterprise'
+    : 'settings.billing.modules.subtitle'
+)
 
 function priceLabel(module: PlanModule): string {
   const interval = props.subscription?.billingInterval ?? 'month'
@@ -44,17 +51,6 @@ function removeModule(module: PlanModule) {
     preserveScroll: true,
   })
 }
-
-function activateEnterpriseModule(module: PlanModule) {
-  router.post('/settings/billing/module/enterprise', { module }, { preserveScroll: true })
-}
-
-function deactivateEnterpriseModule(module: PlanModule) {
-  router.delete('/settings/billing/module/enterprise', {
-    data: { module },
-    preserveScroll: true,
-  })
-}
 </script>
 
 <template>
@@ -63,7 +59,7 @@ function deactivateEnterpriseModule(module: PlanModule) {
       <span class="text-sm font-semibold text-fg">{{ t('settings.billing.modules.title') }}</span>
     </template>
 
-    <p class="mb-4 text-sm text-fg-muted">{{ t('settings.billing.modules.subtitle') }}</p>
+    <p class="mb-4 text-sm text-fg-muted">{{ t(subtitleKey) }}</p>
 
     <ul class="space-y-3">
       <li
@@ -76,12 +72,14 @@ function deactivateEnterpriseModule(module: PlanModule) {
             <span class="font-medium text-fg">{{
               t(`settings.billing.modules.${module}.name`)
             }}</span>
-            <BaseBadge v-if="bySource.get(module) === 'granted'" variant="success">
-              {{ t('settings.billing.modules.granted') }}
-            </BaseBadge>
-            <BaseBadge v-else-if="bySource.has(module)" variant="neutral">
-              {{ t('settings.billing.modules.active') }}
-            </BaseBadge>
+            <template v-if="plan !== 'enterprise'">
+              <BaseBadge v-if="bySource.get(module) === 'granted'" variant="success">
+                {{ t('settings.billing.modules.granted') }}
+              </BaseBadge>
+              <BaseBadge v-else-if="bySource.has(module)" variant="neutral">
+                {{ t('settings.billing.modules.active') }}
+              </BaseBadge>
+            </template>
           </div>
           <p class="mt-0.5 truncate text-sm text-fg-muted">
             {{ t(`settings.billing.modules.${module}.desc`) }}
@@ -89,64 +87,65 @@ function deactivateEnterpriseModule(module: PlanModule) {
         </div>
 
         <div class="flex shrink-0 items-center gap-3">
-          <span v-if="plan !== 'enterprise'" class="text-sm font-semibold text-fg">
-            {{ priceLabel(module) }}
+          <!-- Enterprise : tout est inclus, aucune action à proposer ici (#402) -->
+          <span
+            v-if="plan === 'enterprise'"
+            class="inline-flex items-center gap-1.5 text-sm font-medium text-green-700"
+          >
+            <span aria-hidden="true">✓</span>
+            {{ t('settings.billing.modules.includedInPlan') }}
           </span>
 
-          <!-- Enterprise : toggle self-service d'un module inclus (#353) -->
-          <template v-if="plan === 'enterprise' && canManageEnterprise">
-            <BaseButton
-              v-if="bySource.get(module) === 'granted'"
-              variant="secondary"
-              size="sm"
-              @click="deactivateEnterpriseModule(module)"
-            >
-              {{ t('settings.billing.modules.deactivateIncluded') }}
-            </BaseButton>
-            <BaseButton
-              v-else
-              variant="primary"
-              size="sm"
-              @click="activateEnterpriseModule(module)"
-            >
-              {{ t('settings.billing.modules.activate') }}
-            </BaseButton>
+          <template v-else>
+            <span class="text-sm font-semibold text-fg">
+              {{ priceLabel(module) }}
+            </span>
+
+            <!-- Module offert (Pro, grandfathering) : pas de résiliation -->
+            <span v-if="bySource.get(module) === 'granted'" class="text-sm text-fg-muted">
+              {{ t('settings.billing.modules.grantedHint') }}
+            </span>
+
+            <!-- Abonné Pro : activer / résilier -->
+            <template v-else-if="canManage">
+              <BaseButton
+                v-if="bySource.has(module)"
+                variant="secondary"
+                size="sm"
+                @click="removeModule(module)"
+              >
+                {{ t('settings.billing.modules.deactivate') }}
+              </BaseButton>
+              <BaseButton v-else variant="primary" size="sm" @click="addModule(module)">
+                {{ t('settings.billing.modules.activate') }}
+              </BaseButton>
+            </template>
+
+            <!-- Pro abonné, sans subscription.manage -->
+            <span v-else-if="plan === 'pro' && subscription !== null" class="text-sm text-fg-muted">
+              {{ t('settings.billing.modules.adminOnly') }}
+            </span>
+
+            <!-- Plan Pro (interne) mais abonnement Stripe non actif : distinguer du vrai Starter -->
+            <template v-else-if="plan === 'pro' && subscription === null">
+              <BaseButton
+                v-if="canManageBilling"
+                variant="primary"
+                size="sm"
+                @click="emit('activateSubscription')"
+              >
+                {{ t('settings.billing.modules.activateSubscription') }}
+              </BaseButton>
+              <span v-else class="text-sm text-fg-muted">
+                {{ t('settings.billing.modules.subscriptionRequired') }}
+              </span>
+            </template>
+
+            <!-- Starter : besoin du plan Pro -->
+            <span v-else class="text-sm text-fg-muted">
+              {{ t('settings.billing.modules.proRequired') }}
+            </span>
           </template>
-
-          <!-- Enterprise, sans subscription.manage -->
-          <span v-else-if="plan === 'enterprise'" class="text-sm text-fg-muted">
-            {{ t('settings.billing.modules.adminOnly') }}
-          </span>
-
-          <!-- Module offert (Pro, grandfathering) : pas de résiliation -->
-          <span v-else-if="bySource.get(module) === 'granted'" class="text-sm text-fg-muted">
-            {{ t('settings.billing.modules.grantedHint') }}
-          </span>
-
-          <!-- Abonné Pro : activer / résilier -->
-          <template v-else-if="canManage">
-            <BaseButton
-              v-if="bySource.has(module)"
-              variant="secondary"
-              size="sm"
-              @click="removeModule(module)"
-            >
-              {{ t('settings.billing.modules.deactivate') }}
-            </BaseButton>
-            <BaseButton v-else variant="primary" size="sm" @click="addModule(module)">
-              {{ t('settings.billing.modules.activate') }}
-            </BaseButton>
-          </template>
-
-          <!-- Pro abonné, sans subscription.manage -->
-          <span v-else-if="plan === 'pro' && subscription !== null" class="text-sm text-fg-muted">
-            {{ t('settings.billing.modules.adminOnly') }}
-          </span>
-
-          <!-- Non éligible (Starter, ou Pro sans abonnement actif) -->
-          <span v-else class="text-sm text-fg-muted">
-            {{ t('settings.billing.modules.proRequired') }}
-          </span>
         </div>
       </li>
     </ul>
