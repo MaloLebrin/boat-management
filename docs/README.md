@@ -24,6 +24,7 @@ Cette documentation décrit **fonctionnellement** et **techniquement** le projet
   - `docs/frontend/ui-map.md`
   - `docs/frontend/i18n.md` — internationalisation, `useT()`, ajouter une langue
 - **Tests**: `docs/dev/testing.md`
+- **Seeders**: `docs/dev/seeders.md`
 - **Contribution**: `docs/dev/contributing.md`
 - **Process “doc à jour”**: `docs/process/keeping-docs-up-to-date.md`
 
