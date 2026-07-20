@@ -1,14 +1,14 @@
 {
   "accept": {
     "title": "Rejoindre {orgName}",
-    "invited_by": "Vous avez ete invite par {name} a rejoindre {orgName} en tant que {role}.",
-    "invited_anonymous": "Vous avez ete invite a rejoindre {orgName} en tant que {role}.",
+    "invited_by": "Vous avez été invité par {name} à rejoindre {orgName} en tant que {role}.",
+    "invited_anonymous": "Vous avez été invité à rejoindre {orgName} en tant que {role}.",
     "accept_btn": "Accepter l'invitation",
     "decline_btn": "Refuser",
-    "login_required": "Vous devez etre connecte pour accepter cette invitation.",
+    "login_required": "Vous devez être connecté pour accepter cette invitation.",
     "login_btn": "Se connecter",
-    "error_not_found": "Ce lien d'invitation est invalide ou a deja ete utilise.",
-    "error_expired": "Cette invitation a expire. Demandez a l'administrateur d'en envoyer une nouvelle.",
-    "error_already_used": "Cette invitation a deja ete acceptee."
+    "error_not_found": "Ce lien d'invitation est invalide ou a déjà été utilisé.",
+    "error_expired": "Cette invitation a expiré. Demandez à l'administrateur d'en envoyer une nouvelle.",
+    "error_already_used": "Cette invitation a déjà été acceptée."
   }
 }

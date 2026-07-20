@@ -598,6 +598,7 @@ export default class MarketingController {
           annualLabel: t('billing_annual'),
           annualBadge: t('billing_annual_badge'),
         },
+        tierFeaturedBadge: t('tier_featured_badge'),
         tiers: [
           {
             name: t('tier_starter_name'),

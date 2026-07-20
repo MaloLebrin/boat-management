@@ -1,16 +1,16 @@
 {
   "members": {
-    "title": "Membres de l'equipe",
+    "title": "Membres de l'équipe",
     "invite": {
       "title": "Inviter un membre",
       "email": "Adresse email",
-      "emailPlaceholder": "collegue@exemple.com",
-      "role": "Role",
+      "emailPlaceholder": "collègue@exemple.com",
+      "role": "Rôle",
       "submit": "Inviter"
     },
     "table": {
       "member": "Membre",
-      "role": "Role",
+      "role": "Rôle",
       "actions": "Actions"
     },
     "roles": {

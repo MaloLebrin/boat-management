@@ -683,12 +683,12 @@
     "statusInProgress": "En cours",
     "statusCompleted": "Terminée",
     "markComplete": "Marquer terminée",
-    "progress": "{done}/{total} etapes",
+    "progress": "{done}/{total} étapes",
     "expand": "Voir les étapes",
     "collapse": "Masquer les étapes",
     "filterAll": "Toutes",
     "confirmDelete": "Supprimer cette fiche ?",
-    "noItems": "Aucune etape dans cette fiche.",
+    "noItems": "Aucune étape dans cette fiche.",
     "itemNotesPlaceholder": "Ajouter une note..."
   },
   "simulator": {
