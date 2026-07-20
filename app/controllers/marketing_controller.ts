@@ -599,6 +599,7 @@ export default class MarketingController {
           annualBadge: t('billing_annual_badge'),
         },
         tierFeaturedBadge: t('tier_featured_badge'),
+        billedAnnuallyNote: t('config_billed_annually'),
         tiers: [
           {
             name: t('tier_starter_name'),
@@ -784,6 +785,7 @@ export default class MarketingController {
           expandAll: t('table_expand_all'),
           collapseAll: t('table_collapse_all'),
           addonLabel: t('table_addon_badge'),
+          billedAnnuallyNote: t('config_billed_annually'),
           planHeaders: [
             {
               name: t('table_plan_starter'),
@@ -792,12 +794,16 @@ export default class MarketingController {
             },
             {
               name: t('table_plan_pro'),
-              price: t('table_plan_pro_price'),
+              priceMonthly: PLAN_PRICES.pro.monthly,
+              priceAnnual: PLAN_PRICES.pro.annualMonthly,
+              pricePer: t('tier_price_per'),
               cta: t('table_plan_pro_cta'),
             },
             {
               name: t('table_plan_enterprise'),
-              price: t('table_plan_enterprise_price'),
+              priceMonthly: PLAN_PRICES.enterprise.monthly,
+              priceAnnual: PLAN_PRICES.enterprise.annualMonthly,
+              pricePer: t('tier_price_per'),
               cta: t('table_plan_enterprise_cta'),
             },
           ],

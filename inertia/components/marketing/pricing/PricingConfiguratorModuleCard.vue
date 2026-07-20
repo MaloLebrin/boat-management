@@ -8,6 +8,8 @@ defineProps<{
   /** Prix mensuel affiché (déjà résolu pour l'intervalle courant). */
   price: number
   pricePer: string
+  /** Affiché quand le prix résolu correspond à un tarif facturé annuellement. */
+  billedAnnuallyNote?: string
   features: string[]
   selected: boolean
 }>()
@@ -59,9 +61,14 @@ const emit = defineEmits<{ toggle: [] }>()
       </li>
     </ul>
 
-    <div class="mt-4 flex items-baseline gap-1 border-t border-dashed border-current/10 pt-3">
-      <span class="font-display text-xl text-fg">+{{ price }} €</span>
-      <span class="text-sm text-fg-subtle">{{ pricePer }}</span>
+    <div class="mt-4 border-t border-dashed border-current/10 pt-3">
+      <div class="flex items-baseline gap-1">
+        <span class="font-display text-xl text-fg">+{{ price }} €</span>
+        <span class="text-sm text-fg-subtle">{{ pricePer }}</span>
+      </div>
+      <p v-if="billedAnnuallyNote" class="mt-0.5 text-xs text-fg-subtle">
+        {{ billedAnnuallyNote }}
+      </p>
     </div>
   </button>
 </template>

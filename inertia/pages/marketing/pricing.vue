@@ -89,7 +89,11 @@ interface Configurator {
 }
 interface PlanHeader {
   name: string
-  price: string
+  /** Libellé statique (ex. "Gratuit") pour un plan sans tarification variable. */
+  price?: string
+  priceMonthly?: number
+  priceAnnual?: number
+  pricePer?: string
   cta: string
 }
 interface TestimonialItem {
@@ -129,6 +133,7 @@ interface PageProps {
         annualBadge: string
       }
       tierFeaturedBadge: string
+      billedAnnuallyNote: string
       tiers: Tier[]
       reassurance: ReassuranceItem[]
       roi: {
@@ -165,6 +170,7 @@ interface PageProps {
         expandAll: string
         collapseAll: string
         addonLabel: string
+        billedAnnuallyNote: string
         groups: Group[]
         planHeaders: PlanHeader[]
       }
@@ -225,11 +231,12 @@ const hreflangFr = '/fr/tarifs'
     :billing="billing"
     :reassurance="t.pricing.reassurance"
     :featured-badge-label="t.pricing.tierFeaturedBadge"
+    :billed-annually-note="t.pricing.billedAnnuallyNote"
   />
   <PricingConfigurator v-bind="t.pricing.configurator" :billing="billing" />
   <PricingROISection v-bind="t.pricing.roi" />
   <PricingTestimonialsSection v-bind="t.pricing.testimonials" />
-  <PricingDetailedTableSection v-bind="t.pricing.detailedTable" />
+  <PricingDetailedTableSection v-bind="t.pricing.detailedTable" :billing="billing" />
   <PricingExtrasSection v-bind="t.pricing.extras" />
   <PricingFaqSection v-bind="t.pricing.faq" />
   <HomeFinalCtaSection v-bind="t.pricing.finalCta" />

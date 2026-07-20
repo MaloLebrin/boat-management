@@ -90,3 +90,38 @@ test('annual saving reflects the yearly gap for the current selection', async ()
   // base + charter: ((20+15) - (16+12)) * 12 = 84
   expect(w.vm.annualSaving).toBe(84)
 })
+
+function makePropsWithExtraBoats(billing: 'monthly' | 'annual') {
+  return {
+    ...makeProps(billing),
+    extraBoats: {
+      name: 'Bateaux supplémentaires',
+      desc: 'Au-delà du forfait inclus',
+      priceMonthly: 4,
+      priceAnnual: 3,
+      perBoatLabel: '/bateau/mois',
+    },
+  }
+}
+
+test('extra boats show the monthly unit price with no annual note', () => {
+  const w = mount(PricingConfigurator, { props: makePropsWithExtraBoats('monthly') })
+
+  expect(w.text()).toContain('4 € /bateau/mois')
+  expect(w.text()).not.toContain('Facturé annuellement.')
+})
+
+test('extra boats show the discounted unit price with the billed-annually note', () => {
+  const w = mount(PricingConfigurator, { props: makePropsWithExtraBoats('annual') })
+
+  expect(w.text()).toContain('3 € /bateau/mois')
+  expect(w.text()).toContain('Facturé annuellement.')
+})
+
+test('module cards show the billed-annually note only when annual', () => {
+  const monthly = mount(PricingConfigurator, { props: makeProps('monthly') })
+  expect(monthly.text()).not.toContain('Facturé annuellement.')
+
+  const annual = mount(PricingConfigurator, { props: makeProps('annual') })
+  expect(annual.text()).toContain('Facturé annuellement.')
+})
