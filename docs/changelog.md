@@ -3,6 +3,16 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-07-21 — Lexique unifié des tâches de maintenance + fin des doublons de l'onglet Tâches (#407)
+
+Audit UX du 2026-07-19 : un même statut de tâche portait trois libellés (« Bientôt dû » sur le dashboard, « À venir bientôt » sur le planning, « A venir bientot » — sans accents, codé en dur — sur l'onglet Tâches), l'action de clôture en avait deux (« Marquer fait » vs « Terminé ») sur le même onglet, le bouton d'ajout de la fiche bateau affichait « + + Ajouter », et l'onglet Tâches listait deux fois les mêmes tâches.
+
+- **Statut « bientôt dû » unifié** : nouvelle clé `boats.show.status.dueSoon` (« Bientôt dû » / « Due soon ») réutilisée par la section de l'onglet Tâches ; `planning.kanban.soon` aligné sur le même libellé ; le texte codé en dur « A venir bientot » supprimé (EN + FR).
+- **Action de clôture unifiée** : clé unique `boats.maintenance.tasks.markDone` (« Marquer fait » / « Mark done ») remplaçant l'ancienne `done` (« Terminé »/« Done ») partout ; nouvelle clé `boats.maintenance.tasks.delete` pour l'`aria-label` de suppression.
+- **Bouton « + + Ajouter »** : `BoatShowHeaderActions.vue` ne préfixe plus un « + » littéral, le libellé `addMenu.label` le portant déjà.
+- **Doublon de l'onglet Tâches** : les sections groupées par statut (`BoatShowTabTasks.vue`) deviennent la liste unique ; elles reçoivent désormais la suppression et les notes. `BoatMaintenanceTasksPanel.vue` ne liste plus les tâches et se réduit à son point d'entrée de création (bouton + modale, message vide). Extraction de `BoatTaskActions.vue` (fait/heures moteur/supprimer) et `BoatTaskUrgentCard.vue` (cartes teintées « Urgent »/« Bientôt dû ») pour factoriser et respecter la limite de 250 lignes.
+- Tests : `boat_task_actions.spec.ts` (URLs fait/suppression, saisie heures moteur), `boat_show_tab_tasks.spec.ts` (libellé unifié, notes, en-tête de statut), `boat_show_header_actions.spec.ts` (plus de « + » doublé).
+
 ## 2026-07-21 — Pluralisation ICU des compteurs « (s) » et correction de « 1 bateaux » (#406)
 
 Audit UX du 2026-07-19 : de nombreux compteurs affichaient le suffixe littéral `(s)`/`(x)` au lieu d'accorder correctement le texte (« 2 tâche(s) en retard », « 1 motorisé(s) », « 6 résultat(s) »…), et la liste des bateaux affichait toujours « bateaux » au pluriel même pour un seul résultat (« 1 bateaux »).

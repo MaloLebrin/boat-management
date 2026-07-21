@@ -255,6 +255,7 @@
     "nextTasks": "Prochaines tâches",
     "status": {
       "urgent": "Urgent",
+      "dueSoon": "Bientôt dû",
       "upcoming": "À venir",
       "ok": "OK"
     },
@@ -631,12 +632,13 @@
     },
     "tasks": {
       "title": "Maintenance planifiée",
-      "subtitle": "Tâches ouvertes (par date et par heures moteur).",
+      "subtitle": "Ajoutez une tâche de maintenance planifiée (par date ou par heures moteur).",
       "empty": "Aucune tâche planifiée.",
       "emptyFiltered": "Aucune tâche correspondante.",
       "addTask": "Ajouter une tâche",
       "modalTitle": "Ajouter une tâche",
-      "done": "Terminé",
+      "markDone": "Marquer fait",
+      "delete": "Supprimer",
       "doneHoursPlaceholder": "Terminé à (heures)",
       "urgent": "Urgent",
       "open": "Ouvert",

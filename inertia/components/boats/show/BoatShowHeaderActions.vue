@@ -31,7 +31,7 @@ const menuItemClass =
 
 <template>
   <BaseDropdown v-if="hasAddMenuItems" variant="primary">
-    <template #trigger>+ {{ t('boats.show.addMenu.label') }}</template>
+    <template #trigger>{{ t('boats.show.addMenu.label') }}</template>
     <template #default="{ close }">
       <button
         v-if="canManageMaintenance"

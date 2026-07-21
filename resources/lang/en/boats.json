@@ -255,6 +255,7 @@
     "nextTasks": "Next tasks",
     "status": {
       "urgent": "Urgent",
+      "dueSoon": "Due soon",
       "upcoming": "Upcoming",
       "ok": "OK"
     },
@@ -607,12 +608,13 @@
     },
     "tasks": {
       "title": "Planned maintenance",
-      "subtitle": "Open tasks (date-based and engine-hour based).",
+      "subtitle": "Add a scheduled maintenance task (date-based or engine-hour based).",
       "empty": "No planned tasks.",
       "emptyFiltered": "No matching tasks.",
       "addTask": "Add task",
       "modalTitle": "Add task",
-      "done": "Done",
+      "markDone": "Mark done",
+      "delete": "Delete",
       "doneHoursPlaceholder": "Done @ hours",
       "urgent": "Urgent",
       "open": "Open",

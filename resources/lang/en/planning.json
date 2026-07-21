@@ -11,7 +11,7 @@
   "kanban": {
     "overdue": "Overdue",
     "overdueEmpty": "No overdue tasks",
-    "soon": "Coming soon",
+    "soon": "Due soon",
     "soonEmpty": "No imminent tasks",
     "undated": "Undated",
     "undatedEmpty": "No undated tasks",
