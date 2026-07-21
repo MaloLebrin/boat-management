@@ -29,7 +29,7 @@ function formatDate(iso: string | null): string {
       <li v-for="ev in recentEvents" :key="ev.id" class="flex items-start justify-between gap-3">
         <div>
           <p class="font-semibold text-fg">{{ ev.title }}</p>
-          <p class="text-fg-muted">{{ subjectLabel(ev.subject) }}</p>
+          <p class="text-fg-muted">{{ subjectLabel(t, ev.subject) }}</p>
         </div>
         <span class="shrink-0 text-fg-subtle">{{ formatDate(ev.performedAt) }}</span>
       </li>

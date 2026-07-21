@@ -2,6 +2,7 @@
 import type { PlanningTask } from '#shared/types/planning'
 import BaseCard from '~/components/base/BaseCard.vue'
 import { useT } from '~/composables/use_t'
+import { maintenanceSubjectLabel } from '~/utils/boat_enum_labels'
 
 defineProps<{ tasks: PlanningTask[] }>()
 
@@ -21,7 +22,9 @@ const { t } = useT()
       >
         <div>
           <p class="text-sm font-medium text-fg">{{ task.title }}</p>
-          <p class="text-xs text-fg-muted">{{ task.boatName }} · {{ task.subject }}</p>
+          <p class="text-xs text-fg-muted">
+            {{ task.boatName }} · {{ maintenanceSubjectLabel(t, task.subject) }}
+          </p>
         </div>
         <div class="text-right">
           <p class="text-sm font-semibold text-fg">

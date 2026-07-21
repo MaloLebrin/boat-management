@@ -5,6 +5,7 @@ import { computed, ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BoatMaintenanceTasksPanel from '~/components/boats/maintenance/BoatMaintenanceTasksPanel.vue'
 import { subjectLabel } from '~/components/boats/maintenance/utils'
+import { engineKindLabel, sailTypeLabel } from '~/utils/boat_enum_labels'
 import type { BoatCreateIntent, BoatShowDetail, MaintenanceTaskRow } from '~/types/boat_show'
 import { useT } from '~/composables/use_t'
 
@@ -75,14 +76,15 @@ function formatDate(iso: string | null): string {
 function getTaskComponentLabel(task: MaintenanceTaskRow): string {
   if (task.subject === 'engine' && task.boatEngineId) {
     const engine = props.boat.engines.find((e) => e.id === task.boatEngineId)
-    if (engine) return `${engine.kind} ${engine.brand ?? ''} ${engine.model ?? ''}`.trim()
+    if (engine) {
+      return [engineKindLabel(t, engine.kind), engine.brand, engine.model].filter(Boolean).join(' ')
+    }
   }
   if (task.subject === 'sail' && task.boatSailId) {
     const sail = props.boat.sails.find((s) => s.id === task.boatSailId)
-    if (sail) return sail.sailType
+    if (sail) return sailTypeLabel(t, sail.sailType) ?? sail.sailType
   }
-  if (task.subject === 'rig') return 'Greement'
-  return subjectLabel(task.subject)
+  return subjectLabel(t, task.subject)
 }
 </script>
 

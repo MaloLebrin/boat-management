@@ -16,6 +16,7 @@ import EngineShowTabParts from '~/components/engine/show/tabs/EngineShowTabParts
 import EngineShowTabPhotos from '~/components/engine/show/tabs/EngineShowTabPhotos.vue'
 import EngineShowTabSpecs from '~/components/engine/show/tabs/EngineShowTabSpecs.vue'
 import { useT } from '~/composables/use_t'
+import { engineFuelLabel, engineKindLabel } from '~/utils/boat_enum_labels'
 import type { BoatShowEngine, MaintenanceEventRow, MaintenanceTaskRow } from '~/types/boat_show'
 
 const { t } = useT()
@@ -156,7 +157,7 @@ const engineTitle = computed(() => {
   }
   if (props.engine.brand) return props.engine.brand
   if (props.engine.model) return props.engine.model
-  return props.engine.kind
+  return engineKindLabel(t, props.engine.kind) ?? props.engine.kind
 })
 
 const totalParts = computed(() => {
@@ -192,7 +193,7 @@ function formatYear(iso: string): string {
             }}</BaseBadge>
           </div>
           <div class="mt-3 flex flex-wrap gap-x-6 gap-y-1 text-sm text-fg-muted">
-            <p v-if="engine.fuel">{{ engine.fuel }}</p>
+            <p v-if="engine.fuel">{{ engineFuelLabel(t, engine.fuel) }}</p>
             <p v-if="engine.powerHp">{{ engine.powerHp }} HP</p>
             <p v-if="engine.manufacturedAt">
               {{

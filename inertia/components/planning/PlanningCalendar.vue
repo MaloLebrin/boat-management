@@ -6,6 +6,7 @@ import PlanningCalendarHourTasks from '~/components/planning/PlanningCalendarHou
 import { computed, ref } from 'vue'
 import { router } from '@inertiajs/vue3'
 import { useT } from '~/composables/use_t'
+import { maintenanceSubjectLabel } from '~/utils/boat_enum_labels'
 
 const props = defineProps<{
   tasks: PlanningTask[]
@@ -228,7 +229,9 @@ function isToday(day: number): boolean {
         >
           <div>
             <p class="text-sm font-medium text-fg">{{ task.title }}</p>
-            <p class="text-xs text-fg-muted">{{ task.boatName }} · {{ task.subject }}</p>
+            <p class="text-xs text-fg-muted">
+              {{ task.boatName }} · {{ maintenanceSubjectLabel(t, task.subject) }}
+            </p>
           </div>
           <BaseButton variant="ghost" size="sm" route="boats.show" :params="{ id: task.boatId }">
             {{ t('planning.calendar.schedule') }}

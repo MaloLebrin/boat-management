@@ -9,6 +9,7 @@ import BaseCard from '~/components/base/BaseCard.vue'
 import BaseModal from '~/components/base/BaseModal.vue'
 import { computed, ref } from 'vue'
 import { useT } from '~/composables/use_t'
+import { engineFuelLabel } from '~/utils/boat_enum_labels'
 
 const props = defineProps<{
   boatId: number
@@ -77,7 +78,7 @@ function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutra
                 {{ t(`boats.engines.kindValues.${e.kind}`) }}
               </p>
               <BaseBadge v-if="e.fuel" variant="neutral">
-                {{ e.fuel }}
+                {{ engineFuelLabel(t, e.fuel) }}
               </BaseBadge>
               <BaseBadge :variant="statusVariant(e.status)">
                 {{ t(`equipment.status.${e.status}`) }}

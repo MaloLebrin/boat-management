@@ -4,6 +4,7 @@ import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import { useT } from '~/composables/use_t'
 import { useBoatOptions } from '~/composables/use_boat_options'
+import { engineKindLabel, sailTypeLabel } from '~/utils/boat_enum_labels'
 import type { BoatShowDetail } from '~/types/boat_show'
 import type { MaintenanceTaskSubject } from '../../../../shared/types/maintenance'
 
@@ -25,14 +26,14 @@ const { safetyEquipmentTypeOptions } = useBoatOptions()
 const engineOptions = computed(() =>
   props.boat.engines.map((e) => ({
     value: String(e.id),
-    label: `${e.kind} · ${e.brand ?? ''} ${e.model ?? ''}`.trim(),
+    label: `${engineKindLabel(t, e.kind) ?? e.kind} · ${e.brand ?? ''} ${e.model ?? ''}`.trim(),
   }))
 )
 
 const sailOptions = computed(() =>
   props.boat.sails.map((s) => ({
     value: String(s.id),
-    label: `${s.sailType}${s.areaM2 !== null ? ` · ${s.areaM2} m²` : ''}`,
+    label: `${sailTypeLabel(t, s.sailType) ?? s.sailType}${s.areaM2 !== null ? ` · ${s.areaM2} m²` : ''}`,
   }))
 )
 

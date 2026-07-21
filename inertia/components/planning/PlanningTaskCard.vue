@@ -2,6 +2,7 @@
 import type { PlanningTask } from '#shared/types/planning'
 import BaseButton from '~/components/base/BaseButton.vue'
 import { useT } from '~/composables/use_t'
+import { maintenanceSubjectLabel } from '~/utils/boat_enum_labels'
 
 const props = defineProps<{
   task: PlanningTask
@@ -28,7 +29,7 @@ function formatDue(task: PlanningTask): string {
     <p class="mt-1 text-sm font-semibold text-fg" :class="done ? 'line-through' : ''">
       {{ task.title }}
     </p>
-    <p class="mt-1 text-xs text-fg-muted capitalize">{{ task.subject }}</p>
+    <p class="mt-1 text-xs text-fg-muted">{{ maintenanceSubjectLabel(t, task.subject) }}</p>
     <div class="mt-2 flex items-center justify-between">
       <span
         class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"

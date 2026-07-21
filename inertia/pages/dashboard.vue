@@ -18,6 +18,7 @@ import type {
 } from '#shared/types/dashboard'
 import { useT } from '~/composables/use_t'
 import { propulsionLabel } from '~/utils/boat_propulsion_label'
+import { maintenanceSubjectLabel } from '~/utils/boat_enum_labels'
 import type { AiSuggestion, NavigationLogPortOption } from '~/types/boat_show'
 import { PLAN_LIMITS } from '../../shared/types/plan'
 import type { PlanTier } from '../../shared/types/plan'
@@ -294,7 +295,9 @@ function dismissAlert() {
                   <a :href="`/boats/${ev.boatId}`" class="font-semibold text-fg hover:underline">
                     {{ ev.boatName }}
                   </a>
-                  <p class="mt-1 text-fg-muted">{{ ev.title }} - {{ ev.subject }}</p>
+                  <p class="mt-1 text-fg-muted">
+                    {{ ev.title }} - {{ maintenanceSubjectLabel(t, ev.subject) }}
+                  </p>
                 </div>
                 <div
                   class="shrink-0 rounded-full px-2 py-1 text-xs font-semibold"
