@@ -270,10 +270,7 @@ test.group('Boat Reservations (functional)', (group) => {
       .redirects(0)
 
     response.assertStatus(302)
-    response.assertFlashMessage(
-      'success',
-      'Reservation confirmed. 1 overlapping option(s) cancelled.'
-    )
+    response.assertFlashMessage('success', 'Reservation confirmed. 1 overlapping option cancelled.')
 
     await option.refresh()
     assert.equal(option.status, 'cancelled')

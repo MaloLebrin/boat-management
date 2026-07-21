@@ -48,10 +48,10 @@
   },
   "media": {
     "photosAdded": "{count, plural, one {# photo ajoutée.} other {# photos ajoutées.}}",
-    "photosAddedPartial": "{succeeded} photo(s) ajoutée(s), {failed} échec(s).",
+    "photosAddedPartial": "{succeeded, plural, one {# photo ajoutée} other {# photos ajoutées}}, {failed, plural, one {# échec} other {# échecs}}.",
     "photosAddFailed": "Aucune photo n'a pu être ajoutée.",
     "documentsAdded": "{count, plural, one {# document ajouté.} other {# documents ajoutés.}}",
-    "documentsAddedPartial": "{succeeded} document(s) ajouté(s), {failed} échec(s).",
+    "documentsAddedPartial": "{succeeded, plural, one {# document ajouté} other {# documents ajoutés}}, {failed, plural, one {# échec} other {# échecs}}.",
     "documentsAddFailed": "Aucun document n'a pu être ajouté.",
     "deleted": "Fichier supprimé."
   },
@@ -199,7 +199,7 @@
     "deleted": "Client supprimé.",
     "notFound": "Client introuvable.",
     "documentsAdded": "{count, plural, one {# document ajouté.} other {# documents ajoutés.}}",
-    "documentsAddedPartial": "{succeeded} document(s) ajouté(s), {failed} échec(s).",
+    "documentsAddedPartial": "{succeeded, plural, one {# document ajouté} other {# documents ajoutés}}, {failed, plural, one {# échec} other {# échecs}}.",
     "documentsAddFailed": "Aucun document n'a pu être ajouté.",
     "documentDeleted": "Document supprimé.",
     "anonymized": "Client anonymisé.",
@@ -259,7 +259,7 @@
     "boatNotFound": "Ce bateau n'appartient pas à votre organisation."
   },
   "csv": {
-    "imported": "{count} ligne(s) importée(s) avec succès.",
+    "imported": "{count, plural, one {# ligne importée avec succès.} other {# lignes importées avec succès.}}",
     "boatNotFound": "Bateau introuvable.",
     "previewExpired": "La prévisualisation a expiré. Veuillez réimporter le fichier.",
     "missingHeaders": "En-têtes manquantes dans le fichier CSV : {headers}.",
@@ -299,7 +299,7 @@
     "notFound": "Réservation introuvable.",
     "conflict": "Ce bateau est déjà réservé sur cette période.",
     "endBeforeStart": "La date de fin doit être postérieure à la date de début.",
-    "optionsOverridden": "Réservation confirmée. {count} option(s) en chevauchement annulée(s).",
+    "optionsOverridden": "Réservation confirmée. {count, plural, one {# option en chevauchement annulée.} other {# options en chevauchement annulées.}}",
     "invalidTransition": "Ce changement de statut n'est pas autorisé.",
     "belowMinDays": "La durée de la réservation est inférieure à la durée minimale autorisée pour ce bateau.",
     "aboveMaxDays": "La durée de la réservation dépasse la durée maximale autorisée pour ce bateau.",

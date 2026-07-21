@@ -6,7 +6,7 @@
     "logbook": "+ Logbook entry",
     "incident": "+ Incident"
   },
-  "overdueAlert": "{count} overdue task(s)",
+  "overdueAlert": "{count, plural, one {# overdue task} other {# overdue tasks}}",
   "viewPlanning": "View planning",
   "analyzeFleet": "Analyze fleet",
   "aiPanel": {
@@ -62,10 +62,10 @@
     "viewAll": "View all",
     "addPort": "Add a port",
     "empty": "No port registered yet.",
-    "totalPorts": "{count} port(s)",
-    "totalBoats": "{count} moored boat(s)",
-    "totalFreeSpots": "{count} free spot(s)",
-    "freeSpots": "{free} free / {total}",
+    "totalPorts": "{count, plural, one {# port} other {# ports}}",
+    "totalBoats": "{count, plural, one {# moored boat} other {# moored boats}}",
+    "totalFreeSpots": "{count, plural, one {# free spot} other {# free spots}}",
+    "freeSpots": "{free, plural, one {# free} other {# free}} / {total}",
     "fillRate": "Fill: {rate}%",
     "noSpots": "No spots"
   }

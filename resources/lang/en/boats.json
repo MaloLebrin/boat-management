@@ -280,10 +280,10 @@
       "modalSubtitle": "{name} · Stored on Cloudinary"
     },
     "overview": {
-      "overdueTasks": "{count} overdue task(s)",
+      "overdueTasks": "{count, plural, one {# overdue task} other {# overdue tasks}}",
       "schedule": "Schedule",
       "engineHours": "Engine hours",
-      "engineCount": "{count} engine(s)",
+      "engineCount": "{count, plural, one {# engine} other {# engines}}",
       "lastMaintenance": "Last maintenance",
       "nextTask": "Next task",
       "overdue": "Overdue",
@@ -335,7 +335,7 @@
       "filterHull": "Hull",
       "toggleHide": "Hide",
       "toggleShow": "Details",
-      "pieces": "{count} part(s)",
+      "pieces": "{count, plural, one {# part} other {# parts}}",
       "sidebarTitle": "Last 12 months",
       "sidebarEvents": "Events",
       "sidebarParts": "Parts",
@@ -420,7 +420,7 @@
     "name": "Name",
     "asc": "Asc",
     "desc": "Desc",
-    "boats": "boats",
+    "boats": "{count, plural, one {boat} other {boats}}",
     "clearFilters": "Clear filters",
     "table": {
       "name": "Name",
@@ -511,7 +511,7 @@
       "dueHours": "{hours} hours",
       "totalEvents": "Total events",
       "totalParts": "Total parts",
-      "parts": "{count} part(s)"
+      "parts": "{count, plural, one {# part} other {# parts}}"
     },
     "notes": {
       "title": "Free notes",

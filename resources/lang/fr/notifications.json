@@ -57,31 +57,31 @@
     "maintenance": {
       "overdue": {
         "title": "Maintenance en retard sur {boatName}",
-        "body": "{count} tâche(s) de maintenance sont en retard sur {boatName}."
+        "body": "{count, plural, one {# tâche de maintenance est en retard} other {# tâches de maintenance sont en retard}} sur {boatName}."
       },
       "due_soon": {
         "title": "Maintenance à venir sur {boatName}",
-        "body": "{count} tâche(s) de maintenance arrivent à échéance sur {boatName}."
+        "body": "{count, plural, one {# tâche de maintenance arrive à échéance} other {# tâches de maintenance arrivent à échéance}} sur {boatName}."
       }
     },
     "document": {
       "expiring_soon": {
         "title": "Documents à renouveler sur {boatName}",
-        "body": "{count} document(s) du bateau {boatName} expirent bientôt."
+        "body": "{count, plural, one {# document du bateau {boatName} expire bientôt.} other {# documents du bateau {boatName} expirent bientôt.}}"
       },
       "expired": {
         "title": "Documents expirés sur {boatName}",
-        "body": "{count} document(s) du bateau {boatName} ont expiré."
+        "body": "{count, plural, one {# document du bateau {boatName} a expiré.} other {# documents du bateau {boatName} ont expiré.}}"
       }
     },
     "safety_equipment": {
       "expiring_soon": {
         "title": "Équipements de sécurité à vérifier sur {boatName}",
-        "body": "{count} équipement(s) de sécurité du bateau {boatName} expirent bientôt."
+        "body": "{count, plural, one {# équipement de sécurité du bateau {boatName} expire bientôt.} other {# équipements de sécurité du bateau {boatName} expirent bientôt.}}"
       },
       "expired": {
         "title": "Équipements de sécurité expirés sur {boatName}",
-        "body": "{count} équipement(s) de sécurité du bateau {boatName} ont expiré."
+        "body": "{count, plural, one {# équipement de sécurité du bateau {boatName} a expiré.} other {# équipements de sécurité du bateau {boatName} ont expiré.}}"
       }
     }
   },
@@ -92,7 +92,7 @@
   "markRead": "Marquer comme lu",
   "delete": "Supprimer",
   "viewAll": "Voir toutes les notifications",
-  "unreadCount": "{count} non lue(s)",
+  "unreadCount": "{count, plural, one {# non lue} other {# non lues}}",
   "time": {
     "justNow": "A l'instant",
     "minutesAgo": "Il y a {count} min",

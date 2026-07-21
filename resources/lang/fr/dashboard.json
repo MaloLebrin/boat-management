@@ -6,7 +6,7 @@
     "logbook": "+ Entrée journal",
     "incident": "+ Incident"
   },
-  "overdueAlert": "{count} tâche(s) en retard",
+  "overdueAlert": "{count, plural, one {# tâche en retard} other {# tâches en retard}}",
   "viewPlanning": "Voir le planning",
   "analyzeFleet": "Analyser la flotte",
   "aiPanel": {
@@ -25,11 +25,11 @@
     "delta": {
       "boatsInAlert": "dont {count} en alerte",
       "boatsOk": "Flotte à jour",
-      "boatsWithEngine": "{count} motorisé(s)",
+      "boatsWithEngine": "{count, plural, one {# motorisé} other {# motorisés}}",
       "boatsAllMotorless": "Aucun moteur",
       "boatsWithSail": "{count} à voile",
       "boatsAllSailless": "Aucune voile",
-      "boatsWithRig": "{count} équipé(s)",
+      "boatsWithRig": "{count, plural, one {# équipé} other {# équipés}}",
       "noRig": "Aucun gréement",
       "overdue": "dont {count} en retard",
       "noOverdue": "Aucun retard"
@@ -62,10 +62,10 @@
     "viewAll": "Voir tout",
     "addPort": "Ajouter un port",
     "empty": "Aucun port enregistré.",
-    "totalPorts": "{count} port(s)",
-    "totalBoats": "{count} bateau(x) amarré(s)",
-    "totalFreeSpots": "{count} place(s) libre(s)",
-    "freeSpots": "{free} libre(s) / {total}",
+    "totalPorts": "{count, plural, one {# port} other {# ports}}",
+    "totalBoats": "{count, plural, one {# bateau amarré} other {# bateaux amarrés}}",
+    "totalFreeSpots": "{count, plural, one {# place libre} other {# places libres}}",
+    "freeSpots": "{free, plural, one {# libre} other {# libres}} / {total}",
     "fillRate": "Taux : {rate}%",
     "noSpots": "Aucune place"
   }

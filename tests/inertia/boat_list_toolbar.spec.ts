@@ -5,7 +5,8 @@ import type { BoatListFilters } from '../../inertia/components/boats/list/types'
 
 vi.mock('~/composables/use_t', () => ({
   useT: () => ({
-    t: (key: string) => key,
+    t: (key: string, vars?: Record<string, string>) =>
+      vars ? `${key}:${JSON.stringify(vars)}` : key,
   }),
 }))
 
@@ -44,4 +45,17 @@ test('the view toggle no longer stretches across half the row', () => {
   })
   const toggleRow = w.get('.base-tabs').element.closest('.flex')
   expect(toggleRow?.className).not.toContain('md:col-span-6')
+})
+
+test('passes the total as count to the boats label for correct pluralization', () => {
+  const w = mount(BoatListToolbar, {
+    props: {
+      filters: baseFilters,
+      viewMode: 'table',
+      total: 1,
+      typeOptions: [],
+      propulsionOptions: [],
+    },
+  })
+  expect(w.text()).toContain('boats.list.boats:{"count":"1"}')
 })

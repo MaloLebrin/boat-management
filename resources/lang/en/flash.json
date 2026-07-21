@@ -48,10 +48,10 @@
   },
   "media": {
     "photosAdded": "{count, plural, one {# photo added.} other {# photos added.}}",
-    "photosAddedPartial": "{succeeded} photo(s) added, {failed} failed.",
+    "photosAddedPartial": "{succeeded, plural, one {# photo added} other {# photos added}}, {failed, plural, one {# failure} other {# failures}}.",
     "photosAddFailed": "No photo could be added.",
     "documentsAdded": "{count, plural, one {# document added.} other {# documents added.}}",
-    "documentsAddedPartial": "{succeeded} document(s) added, {failed} failed.",
+    "documentsAddedPartial": "{succeeded, plural, one {# document added} other {# documents added}}, {failed, plural, one {# failure} other {# failures}}.",
     "documentsAddFailed": "No document could be added.",
     "deleted": "File deleted."
   },
@@ -199,7 +199,7 @@
     "deleted": "Client deleted.",
     "notFound": "Client not found.",
     "documentsAdded": "{count, plural, one {# document added.} other {# documents added.}}",
-    "documentsAddedPartial": "{succeeded} document(s) added, {failed} failed.",
+    "documentsAddedPartial": "{succeeded, plural, one {# document added} other {# documents added}}, {failed, plural, one {# failure} other {# failures}}.",
     "documentsAddFailed": "No document could be added.",
     "documentDeleted": "Document deleted.",
     "anonymized": "Client anonymized.",
@@ -259,7 +259,7 @@
     "boatNotFound": "This boat does not belong to your organisation."
   },
   "csv": {
-    "imported": "{count} row(s) imported successfully.",
+    "imported": "{count, plural, one {# row imported successfully.} other {# rows imported successfully.}}",
     "boatNotFound": "Boat not found.",
     "previewExpired": "Preview has expired. Please re-upload the file.",
     "missingHeaders": "Missing headers in CSV file: {headers}.",
@@ -299,7 +299,7 @@
     "notFound": "Reservation not found.",
     "conflict": "This boat is already booked for this period.",
     "endBeforeStart": "End date must be after start date.",
-    "optionsOverridden": "Reservation confirmed. {count} overlapping option(s) cancelled.",
+    "optionsOverridden": "Reservation confirmed. {count, plural, one {# overlapping option cancelled.} other {# overlapping options cancelled.}}",
     "invalidTransition": "This status change is not allowed.",
     "belowMinDays": "The reservation duration is below the minimum allowed for this boat.",
     "aboveMaxDays": "The reservation duration exceeds the maximum allowed for this boat.",

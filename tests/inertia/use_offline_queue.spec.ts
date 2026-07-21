@@ -15,7 +15,8 @@ const mockPageProps = vi.hoisted(() => ({
   appT: {
     'offline.savedQueue': 'Enregistré hors-ligne',
     'offline.syncing': 'Synchronisation en cours…',
-    'offline.syncSuccess': '{count} entrée(s) synchronisée(s)',
+    'offline.syncSuccess':
+      '{count, plural, one {# entrée synchronisée} other {# entrées synchronisées}}',
     'offline.syncError': 'Erreur de synchronisation',
     'offline.conflict.kept': 'Vos modifications seront renvoyées',
     'offline.conflict.discarded': 'Modifications locales abandonnées',

@@ -36,8 +36,8 @@
       "totalCost": "Total cost"
     },
     "timeline": {
-      "events": "{count} event(s)",
-      "pieces": "{count} part(s)",
+      "events": "{count, plural, one {# event} other {# events}}",
+      "pieces": "{count, plural, one {# part} other {# parts}}",
       "show": "Detail",
       "hide": "Hide",
       "partsUsed": "Parts used",
@@ -63,7 +63,7 @@
       "sortLabel": "Sort",
       "sortRecent": "Most recent",
       "sortOldest": "Oldest",
-      "results": "{count} result(s)"
+      "results": "{count, plural, one {# result} other {# results}}"
     },
     "pdf": {
       "title": "Maintenance history",
@@ -80,9 +80,9 @@
         "subject": "Subject",
         "title": "Intervention"
       },
-      "partsCount": "{count} part(s) replaced",
+      "partsCount": "{count, plural, one {# part replaced} other {# parts replaced}}",
       "noEvents": "No events match the selected filters.",
-      "totalEvents": "{count} event(s)"
+      "totalEvents": "{count, plural, one {# event} other {# events}}"
     }
   }
 }
