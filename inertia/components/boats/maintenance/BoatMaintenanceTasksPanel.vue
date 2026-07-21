@@ -1,21 +1,16 @@
 <script setup lang="ts">
 import { Form } from '@adonisjs/inertia/vue'
-import { TrashIcon } from '@heroicons/vue/24/outline'
 import { computed, onMounted, ref, watch } from 'vue'
-import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseModal from '~/components/base/BaseModal.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import type { BoatCreateIntent, BoatShowDetail, MaintenanceTaskRow } from '~/types/boat_show'
-import { subjectLabel } from './utils'
 import { engineKindLabel, sailTypeLabel } from '~/utils/boat_enum_labels'
 import { useT } from '~/composables/use_t'
-import { useDateFormat } from '~/composables/use_date_format'
 
 const { t } = useT()
-const { formatDate } = useDateFormat()
 
 type Subject = 'boat' | 'engine' | 'sail' | 'rig'
 
@@ -31,25 +26,9 @@ const props = withDefaults(
 
 const emit = defineEmits<{ createIntentConsumed: [] }>()
 
-const todayIso = computed(() => new Date().toISOString().slice(0, 10))
-
-const openTasks = computed(() => {
-  const tasks = props.tasks.filter((task) => task.status === 'open')
-  tasks.sort((a, b) => {
-    const ad = a.dueAt ? String(a.dueAt) : null
-    const bd = b.dueAt ? String(b.dueAt) : null
-    if (ad && bd) return ad.localeCompare(bd)
-    if (ad && !bd) return -1
-    if (!ad && bd) return 1
-    return a.id - b.id
-  })
-  return tasks
-})
-
-function urgencyVariant(task: MaintenanceTaskRow) {
-  if (task.dueAt && String(task.dueAt) <= todayIso.value) return 'warning'
-  return 'neutral'
-}
+// La liste des tâches ouvertes est désormais rendue par les sections groupées de
+// l'onglet Tâches (#407) ; ce panneau ne garde que le point d'entrée de création.
+const hasOpenTasks = computed(() => props.tasks.some((task) => task.status === 'open'))
 
 const isCreateOpen = ref(false)
 
@@ -125,89 +104,9 @@ watch(() => props.createIntent, consumeCreateIntent)
       </BaseButton>
     </div>
 
-    <div v-if="openTasks.length === 0" class="text-sm text-fg-muted">
+    <div v-if="!hasOpenTasks" class="text-sm text-fg-muted">
       {{ t('boats.maintenance.tasks.empty') }}
     </div>
-    <ul v-else class="space-y-3">
-      <li
-        v-for="task in openTasks"
-        :key="task.id"
-        class="rounded-(--radius-control) border border-border bg-surface-muted/40 p-3 text-sm"
-      >
-        <div class="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <div class="flex flex-wrap items-center gap-2">
-              <p class="font-semibold text-fg">{{ task.title }}</p>
-              <BaseBadge :variant="urgencyVariant(task)">
-                {{
-                  task.dueAt && String(task.dueAt) <= todayIso
-                    ? t('boats.maintenance.tasks.urgent')
-                    : t('boats.maintenance.tasks.open')
-                }}
-              </BaseBadge>
-            </div>
-            <p class="text-fg-muted">{{ subjectLabel(t, task.subject) }}</p>
-            <p v-if="task.dueAt" class="mt-1 text-xs text-fg-subtle">
-              {{ t('boats.maintenance.tasks.dueAt', { date: formatDate(task.dueAt) }) }}
-            </p>
-            <p v-else-if="task.dueEngineHours !== null" class="mt-1 text-xs text-fg-subtle">
-              {{ t('boats.maintenance.tasks.dueHours', { hours: task.dueEngineHours }) }}
-            </p>
-            <p v-if="task.notes" class="mt-2 text-fg-muted">{{ task.notes }}</p>
-          </div>
-
-          <div v-if="canManageMaintenance" class="flex items-center gap-3">
-            <Form
-              v-if="task.dueEngineHours !== null"
-              :action="{
-                url: `/boats/${boat.id}/maintenance-tasks/${task.id}/done`,
-                method: 'put',
-              }"
-              class="flex items-center gap-2"
-              #default="{ processing }"
-            >
-              <div class="w-36">
-                <BaseInput
-                  id="doneEngineHours"
-                  name="doneEngineHours"
-                  type="number"
-                  inputmode="numeric"
-                  min="0"
-                  step="1"
-                  required
-                  :placeholder="t('boats.maintenance.tasks.doneHoursPlaceholder')"
-                />
-              </div>
-              <BaseButton type="submit" variant="secondary" size="sm" :disabled="processing">
-                {{ t('boats.maintenance.tasks.done') }}
-              </BaseButton>
-            </Form>
-
-            <Form
-              v-else
-              :action="{
-                url: `/boats/${boat.id}/maintenance-tasks/${task.id}/done`,
-                method: 'put',
-              }"
-              #default="{ processing }"
-            >
-              <BaseButton type="submit" variant="secondary" size="sm" :disabled="processing">
-                {{ t('boats.maintenance.tasks.done') }}
-              </BaseButton>
-            </Form>
-
-            <Form
-              :action="{ url: `/boats/${boat.id}/maintenance-tasks/${task.id}`, method: 'delete' }"
-              #default="{ processing }"
-            >
-              <BaseButton type="submit" variant="danger" size="sm" :disabled="processing">
-                <TrashIcon class="w-4 h-4 text-red-800" />
-              </BaseButton>
-            </Form>
-          </div>
-        </div>
-      </li>
-    </ul>
 
     <BaseModal
       v-model:open="isCreateOpen"

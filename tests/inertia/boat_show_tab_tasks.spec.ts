@@ -6,6 +6,7 @@ import type { BoatShowDetail, MaintenanceTaskRow } from '../../inertia/types/boa
 vi.mock('~/composables/use_t', () => ({
   useT: () => ({
     t: (key: string) => key,
+    locale: { value: 'en' },
   }),
 }))
 
@@ -97,4 +98,43 @@ test('shows the "no match" empty state when the active filter excludes existing 
   await undatedFilterButton?.trigger('click')
   expect(w.text()).toContain('boats.maintenance.tasks.emptyFiltered')
   expect(w.text()).toContain('PANEL_LIST')
+})
+
+const overdueTask: MaintenanceTaskRow = {
+  ...openTask,
+  id: 2,
+  title: 'Vidange',
+  dueAt: '2020-01-01',
+  notes: 'Filtre à changer',
+}
+
+const soonTask: MaintenanceTaskRow = {
+  ...openTask,
+  id: 3,
+  title: 'Gréement',
+  dueAt: new Date(Date.now() + 5 * 86_400_000).toISOString().slice(0, 10),
+}
+
+// #407 — un seul libellé de clôture (« markDone »), plus de texte codé en dur.
+test('unifies the close-task label on markDone and shows delete + notes', () => {
+  const w = mount(BoatShowTabTasks, {
+    props: { boat: minimalBoat, maintenanceTasks: [overdueTask], canManageMaintenance: true },
+  })
+  const text = w.text()
+  expect(text).toContain('boats.maintenance.tasks.markDone')
+  expect(text).not.toContain('Marquer fait')
+  expect(text).not.toContain('boats.maintenance.tasks.done')
+  expect(text).toContain('Filtre à changer')
+  // Chaque tâche expose l'action « fait » et l'action « supprimer ».
+  expect(w.findAll('form')).toHaveLength(2)
+})
+
+// #407 — le libellé « bientôt dû » passe par la clé de statut unifiée.
+test('uses the unified due-soon status key for the soon section header', () => {
+  const w = mount(BoatShowTabTasks, {
+    props: { boat: minimalBoat, maintenanceTasks: [soonTask], canManageMaintenance: true },
+  })
+  const text = w.text()
+  expect(text).toContain('boats.show.status.dueSoon')
+  expect(text).not.toContain('A venir bientot')
 })

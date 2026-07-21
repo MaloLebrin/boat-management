@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { Form } from '@adonisjs/inertia/vue'
 import { ClockIcon, ExclamationTriangleIcon } from '@heroicons/vue/24/outline'
 import { computed, ref } from 'vue'
-import BaseButton from '~/components/base/BaseButton.vue'
 import BoatMaintenanceTasksPanel from '~/components/boats/maintenance/BoatMaintenanceTasksPanel.vue'
+import BoatTaskActions from '~/components/boats/maintenance/BoatTaskActions.vue'
+import BoatTaskUrgentCard from '~/components/boats/maintenance/BoatTaskUrgentCard.vue'
 import { subjectLabel } from '~/components/boats/maintenance/utils'
 import { engineKindLabel, sailTypeLabel } from '~/utils/boat_enum_labels'
 import type { BoatCreateIntent, BoatShowDetail, MaintenanceTaskRow } from '~/types/boat_show'
@@ -144,37 +144,15 @@ function getTaskComponentLabel(task: MaintenanceTaskRow): string {
         {{ t('boats.show.status.urgent') }}
       </h3>
       <div class="space-y-3 border-l-4 border-coral-400 pl-4">
-        <div
+        <BoatTaskUrgentCard
           v-for="task in overdueTasks"
           :key="task.id"
-          class="rounded-lg border border-coral-200 bg-coral-50 p-4"
-        >
-          <div class="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <p class="font-semibold text-fg">{{ task.title }}</p>
-              <p class="text-sm text-fg-muted">{{ getTaskComponentLabel(task) }}</p>
-              <p v-if="task.dueAt" class="mt-1 text-xs text-coral-700">
-                {{ t('boats.maintenance.tasks.dueAt', { date: formatDate(task.dueAt) }) }}
-              </p>
-              <p v-else-if="task.dueEngineHours !== null" class="mt-1 text-xs text-coral-700">
-                A {{ task.dueEngineHours }} heures moteur
-              </p>
-            </div>
-            <div v-if="canManageMaintenance" class="flex items-center gap-2">
-              <Form
-                :action="{
-                  url: `/boats/${boat.id}/maintenance-tasks/${task.id}/done`,
-                  method: 'put',
-                }"
-                #default="{ processing }"
-              >
-                <BaseButton type="submit" variant="secondary" size="sm" :disabled="processing">
-                  Marquer fait
-                </BaseButton>
-              </Form>
-            </div>
-          </div>
-        </div>
+          tone="overdue"
+          :task="task"
+          :boat-id="boat.id"
+          :component-label="getTaskComponentLabel(task)"
+          :can-manage="canManageMaintenance"
+        />
       </div>
     </div>
 
@@ -185,37 +163,18 @@ function getTaskComponentLabel(task: MaintenanceTaskRow): string {
     >
       <h3 class="flex items-center gap-2 text-sm font-semibold text-amber-700">
         <ClockIcon class="h-4 w-4" />
-        A venir bientot
+        {{ t('boats.show.status.dueSoon') }}
       </h3>
       <div class="space-y-3 border-l-4 border-amber-400 pl-4">
-        <div
+        <BoatTaskUrgentCard
           v-for="task in soonTasks"
           :key="task.id"
-          class="rounded-lg border border-amber-200 bg-amber-50 p-4"
-        >
-          <div class="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <p class="font-semibold text-fg">{{ task.title }}</p>
-              <p class="text-sm text-fg-muted">{{ getTaskComponentLabel(task) }}</p>
-              <p v-if="task.dueAt" class="mt-1 text-xs text-amber-700">
-                {{ t('boats.maintenance.tasks.dueAt', { date: formatDate(task.dueAt) }) }}
-              </p>
-            </div>
-            <div v-if="canManageMaintenance" class="flex items-center gap-2">
-              <Form
-                :action="{
-                  url: `/boats/${boat.id}/maintenance-tasks/${task.id}/done`,
-                  method: 'put',
-                }"
-                #default="{ processing }"
-              >
-                <BaseButton type="submit" variant="secondary" size="sm" :disabled="processing">
-                  Marquer fait
-                </BaseButton>
-              </Form>
-            </div>
-          </div>
-        </div>
+          tone="soon"
+          :task="task"
+          :boat-id="boat.id"
+          :component-label="getTaskComponentLabel(task)"
+          :can-manage="canManageMaintenance"
+        />
       </div>
     </div>
 
@@ -234,6 +193,7 @@ function getTaskComponentLabel(task: MaintenanceTaskRow): string {
           <div>
             <p class="font-semibold text-fg">{{ task.title }}</p>
             <p class="text-sm text-fg-muted">{{ getTaskComponentLabel(task) }}</p>
+            <p v-if="task.notes" class="mt-1 text-sm text-fg-muted">{{ task.notes }}</p>
           </div>
           <div class="flex items-center gap-3">
             <span v-if="task.dueAt" class="text-sm text-fg-subtle">{{
@@ -242,18 +202,12 @@ function getTaskComponentLabel(task: MaintenanceTaskRow): string {
             <span v-else-if="task.dueEngineHours !== null" class="text-sm text-fg-subtle">
               {{ task.dueEngineHours }}h
             </span>
-            <Form
+            <BoatTaskActions
               v-if="canManageMaintenance"
-              :action="{
-                url: `/boats/${boat.id}/maintenance-tasks/${task.id}/done`,
-                method: 'put',
-              }"
-              #default="{ processing }"
-            >
-              <BaseButton type="submit" variant="ghost" size="sm" :disabled="processing">
-                {{ t('boats.maintenance.tasks.done') }}
-              </BaseButton>
-            </Form>
+              :boat-id="boat.id"
+              :task="task"
+              done-variant="ghost"
+            />
           </div>
         </div>
       </div>
@@ -274,23 +228,18 @@ function getTaskComponentLabel(task: MaintenanceTaskRow): string {
           <div>
             <p class="font-semibold text-fg">{{ task.title }}</p>
             <p class="text-sm text-fg-muted">{{ getTaskComponentLabel(task) }}</p>
+            <p v-if="task.notes" class="mt-1 text-sm text-fg-muted">{{ task.notes }}</p>
           </div>
           <div class="flex items-center gap-3">
             <span v-if="task.dueEngineHours !== null" class="text-sm text-fg-subtle">
               {{ task.dueEngineHours }}h
             </span>
-            <Form
+            <BoatTaskActions
               v-if="canManageMaintenance"
-              :action="{
-                url: `/boats/${boat.id}/maintenance-tasks/${task.id}/done`,
-                method: 'put',
-              }"
-              #default="{ processing }"
-            >
-              <BaseButton type="submit" variant="ghost" size="sm" :disabled="processing">
-                {{ t('boats.maintenance.tasks.done') }}
-              </BaseButton>
-            </Form>
+              :boat-id="boat.id"
+              :task="task"
+              done-variant="ghost"
+            />
           </div>
         </div>
       </div>

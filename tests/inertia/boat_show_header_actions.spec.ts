@@ -37,6 +37,15 @@ describe('BoatShowHeaderActions — regroupement des actions d’en-tête (#365)
     expect(wrapper.text()).not.toContain('boats.show.addMenu.label')
   })
 
+  // #407 — le libellé `addMenu.label` porte déjà le « + » : le template ne doit
+  // pas le préfixer une seconde fois (« + + Ajouter »).
+  test('does not prepend a literal "+" to the add-menu label', () => {
+    const wrapper = mount(BoatShowHeaderActions, { props: baseProps })
+    const trigger = wrapper.findAll('button')[0]!.text().trim()
+    expect(trigger).toBe('boats.show.addMenu.label')
+    expect(trigger.startsWith('+')).toBe(false)
+  })
+
   test('emits addEvent and addTask only when canManageMaintenance is true', async () => {
     const wrapper = mount(BoatShowHeaderActions, { props: baseProps })
     await openAddMenu(wrapper)
