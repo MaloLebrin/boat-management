@@ -40,10 +40,8 @@ pnpm dev
 
 Le schéma Lucid généré se trouve dans `database/schema.ts`.
 
-Pour créer des données de démo, le seeder `database/seeders/demo_seeder.ts` requiert:
+`node ace db:seed` (sans `--files`) exécute tous les seeders de `database/seeders/`. Voir `docs/dev/seeders.md` pour le détail de chacun (rôle, contenu, comptes créés) — en résumé:
 
-- `ADMIN_EMAIL`
-- `ADMIN_PASSWORD`
-
-Commande (référence dans le seeder):
-`node ace db:seed --files database/seeders/demo_seeder.ts`
+- `malo_seeder.ts` : données réelles de l'utilisateur admin, requiert `ADMIN_EMAIL`/`ADMIN_PASSWORD`
+- `sandbox_seeder.ts` : démo générique "Marina Démo"
+- `test_plans_seeder.ts` / `billing_module_states_seeder.ts` : comptes de test par plan/abonnement/module (environnements `development`/`test` uniquement)
