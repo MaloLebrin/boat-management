@@ -3,6 +3,10 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-07-21 — Seeders : `malo_seeder.ts` aligné sur les données réelles actuelles de l'admin
+
+Un dump complet de la DB de dev pour le compte admin (`ADMIN_EMAIL`) a révélé deux écarts entre `malo_seeder.ts` et l'état réel : le plan `enterprise` de l'organisation (fixé directement sur `organizations.plan`, sans abonnement Stripe) n'était jamais posé par le seeder, et un port (« Port de Test Audit », Marseille) existant en base n'était jamais créé. Corrigé : mise à jour idempotente du plan à `enterprise`, création idempotente du port via `PortService.createForUser`. Les dates des 6 événements/5 tâches de maintenance du bateau « 3D », auparavant calculées en relatif à `today`, sont désormais des dates absolues littérales reprises telles quelles de la base (assumé : elles ne bougeront plus lors des prochaines exécutions). Un second bateau résiduel (« Rhodes 21 », artefact d'une ancienne version du seeder avant le renommage en « 3D ») n'est volontairement pas reproduit — ce n'est pas une donnée métier réelle. Vérifié par deux exécutions successives du seeder sur la DB de dev : aucun doublon, comptages inchangés.
+
 ## 2026-07-20 — Seeders : renommage `demo_seeder.ts` → `malo_seeder.ts` et matrice plans/modules
 
 `database/seeders/demo_seeder.ts` créait en réalité le compte réel de l'utilisateur admin (`ADMIN_EMAIL`), pas des données de démo génériques (celles-ci vivent dans `sandbox_seeder.ts`, "Marina Démo") — renommé en `database/seeders/malo_seeder.ts` (classe `MaloSeeder`), comportement inchangé.

@@ -1,10 +1,13 @@
 import Boat from '#models/boat'
 import BoatMaintenanceEvent from '#models/boat_maintenance_event'
 import BoatMaintenanceTask from '#models/boat_maintenance_task'
+import Organization from '#models/organization'
+import Port from '#models/port'
 import User from '#models/user'
 import BoatEquipmentService from '#services/boat_equipment_service'
 import BoatMaintenanceService from '#services/boat_maintenance_service'
 import BoatService from '#services/boat_service'
+import PortService from '#services/port_service'
 import UserService from '#services/user_service'
 import app from '@adonisjs/core/services/app'
 import { BaseSeeder } from '@adonisjs/lucid/seeders'
@@ -47,8 +50,26 @@ export default class MaloSeeder extends BaseSeeder {
       throw new Error('Admin user must belong to an organization')
     }
 
+    // Reflects the real account's plan (enterprise), set directly on the org
+    // rather than via a subscription.
+    const organization = await Organization.findOrFail(user.organizationId)
+    if (organization.plan !== 'enterprise') {
+      await organization.merge({ plan: 'enterprise' }).save()
+    }
+
     const boatService = await app.container.make(BoatService)
     const equipmentService = await app.container.make(BoatEquipmentService)
+    const portService = await app.container.make(PortService)
+
+    // Find or create port
+    const existingPort = await Port.query()
+      .where('organizationId', user.organizationId)
+      .where('name', 'Port de Test Audit')
+      .first()
+
+    if (!existingPort) {
+      await portService.createForUser(user, { name: 'Port de Test Audit', city: 'Marseille' })
+    }
 
     // Find or create boat
     const existingBoat = await Boat.query()
@@ -139,44 +160,45 @@ export default class MaloSeeder extends BaseSeeder {
     }
 
     // Maintenance events (skip if title already exists for this boat)
+    // Dates match the real account's current data as-is (not relative to
+    // today) — see docs/dev/seeders.md.
     const maintenanceService = await app.container.make(BoatMaintenanceService)
-    const today = DateTime.now().startOf('day')
     const eventsToEnsure = [
       {
         title: 'Antifouling annuel',
         subject: 'boat' as const,
-        performedAt: today.minus({ days: 120 }).toISODate()!,
-        dueAt: today.plus({ days: 30 }).toISODate()!,
+        performedAt: '2026-03-22',
+        dueAt: '2026-08-19',
       },
       {
         title: 'Révision moteur',
         subject: 'engine' as const,
-        performedAt: today.minus({ days: 20 }).toISODate()!,
-        dueAt: today.minus({ days: 1 }).toISODate()!, // overdue
+        performedAt: '2026-06-30',
+        dueAt: '2026-07-19',
       },
       {
         title: 'Inspection du gréement',
         subject: 'rig' as const,
-        performedAt: today.minus({ days: 200 }).toISODate()!,
-        dueAt: today.plus({ days: 7 }).toISODate()!, // due soon
+        performedAt: '2026-01-01',
+        dueAt: '2026-07-27',
       },
       {
         title: 'Réparation couture grand-voile',
         subject: 'sail' as const,
-        performedAt: today.minus({ days: 60 }).toISODate()!,
-        dueAt: today.plus({ days: 60 }).toISODate()!,
+        performedAt: '2026-05-21',
+        dueAt: '2026-09-18',
       },
       {
         title: 'Contrôle matériel de sécurité',
         subject: 'boat' as const,
-        performedAt: today.minus({ days: 10 }).toISODate()!,
+        performedAt: '2026-07-10',
         dueAt: null,
       },
       {
         title: "Resserrage de l'accastillage",
         subject: 'boat' as const,
-        performedAt: today.minus({ days: 15 }).toISODate()!,
-        dueAt: today.plus({ days: 90 }).toISODate()!,
+        performedAt: '2026-07-05',
+        dueAt: '2026-10-18',
       },
     ]
 

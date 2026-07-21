@@ -21,13 +21,14 @@ node ace db:seed --files database/seeders/malo_seeder.ts
 
 À ne pas confondre avec une démo générique : ce seeder crée/complète le compte **réel** de l'exploitant du projet, identifié par les variables d'environnement `ADMIN_EMAIL` / `ADMIN_PASSWORD` (`.env`). Il échoue si l'une des deux est absente.
 
-Contenu (classe `MaloSeeder`) :
+Contenu (classe `MaloSeeder`), aligné le 21/07/2026 sur un dump réel de la DB de dev pour coller exactement à la situation actuelle du compte, "toutes entités confondues" :
 
-- utilisateur + organisation via `UserService.signupWithOrganization` (réutilisé si déjà présent)
+- utilisateur + organisation via `UserService.signupWithOrganization` (réutilisé si déjà présent) ; plan mis à `enterprise` directement sur `organizations.plan` (pas d'abonnement Stripe, comme en réalité)
+- un port ("Port de Test Audit", Marseille), créé une seule fois via `PortService.createForUser`
 - un bateau ("3D" en local — le nom réel du bateau de l'utilisateur), équipement (moteur(s), voiles, gréement) créés seulement s'ils manquent
-- 6 événements de maintenance historiques + tâches planifiées associées (`dueAt` futur ou passé pour tester les états "en retard"/"à venir")
+- 6 événements de maintenance historiques + 5 tâches planifiées associées, avec des **dates absolues littérales** reprises telles quelles de la DB réelle (pas de calcul relatif à `today` : une fois créées, ces dates ne bougent plus lors des prochaines exécutions — assumé pour rester fidèle à l'état réel)
 
-Aucune trace des anciens seeds "Rhodes 21" génériques n'est recréée si le bateau a été renommé manuellement — le seeder cherche par nom exact.
+Un second bateau ("Rhodes 21") existe parfois en base comme résidu d'une ancienne version du seeder (avant le renommage en "3D") — volontairement non reproduit ici, ce n'est pas une donnée métier réelle à préserver.
 
 ---
 
