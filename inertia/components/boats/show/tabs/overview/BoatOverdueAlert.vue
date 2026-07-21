@@ -2,16 +2,13 @@
 import { ExclamationTriangleIcon } from '@heroicons/vue/24/outline'
 import BaseButton from '~/components/base/BaseButton.vue'
 import { useT } from '~/composables/use_t'
+import { useDateFormat } from '~/composables/use_date_format'
 import type { MaintenanceTaskRow } from '~/types/boat_show'
 
 defineProps<{ overdueTasks: MaintenanceTaskRow[] }>()
 const emit = defineEmits<{ 'go-to-tab': [tab: string] }>()
 const { t } = useT()
-
-function formatDate(iso: string | null): string {
-  if (!iso) return '—'
-  return iso.slice(0, 10)
-}
+const { formatDate } = useDateFormat()
 </script>
 
 <template>

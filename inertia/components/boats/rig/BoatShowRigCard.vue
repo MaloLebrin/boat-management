@@ -6,6 +6,7 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import type { BoatShowRig } from '~/types/boat_show'
 import { useT } from '~/composables/use_t'
+import { useDateFormat } from '~/composables/use_date_format'
 import { rigTypeLabel } from '~/utils/boat_enum_labels'
 
 defineProps<{
@@ -15,6 +16,7 @@ defineProps<{
 }>()
 
 const { t } = useT()
+const { formatDate } = useDateFormat()
 
 function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutral' {
   if (status === 'operational') return 'success'
@@ -78,7 +80,7 @@ function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutra
         </div>
         <div v-if="rig.manufacturedAt">
           <dt class="text-fg-muted">{{ t('boats.rig.fields.manufacturedAt') }}</dt>
-          <dd class="font-semibold text-fg">{{ rig.manufacturedAt.slice(0, 10) }}</dd>
+          <dd class="font-semibold text-fg">{{ formatDate(rig.manufacturedAt) }}</dd>
         </div>
       </dl>
     </template>

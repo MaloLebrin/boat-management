@@ -17,6 +17,7 @@ import type {
   DashboardUrgentMaintenanceRow,
 } from '#shared/types/dashboard'
 import { useT } from '~/composables/use_t'
+import { useDateFormat } from '~/composables/use_date_format'
 import { propulsionLabel } from '~/utils/boat_propulsion_label'
 import { maintenanceSubjectLabel } from '~/utils/boat_enum_labels'
 import type { AiSuggestion, NavigationLogPortOption } from '~/types/boat_show'
@@ -24,6 +25,7 @@ import { PLAN_LIMITS } from '../../shared/types/plan'
 import type { PlanTier } from '../../shared/types/plan'
 
 const { t } = useT()
+const { formatDate } = useDateFormat()
 const page = usePage()
 
 type StatTone = 'neutral' | 'empty'
@@ -320,7 +322,7 @@ function dismissAlert() {
                 </div>
               </div>
               <p v-if="ev.kind === 'date'" class="mt-2 text-xs text-fg-subtle">
-                {{ t('dashboard.urgentMaintenance.dueAt', { date: ev.dueAt ?? '' }) }}
+                {{ t('dashboard.urgentMaintenance.dueAt', { date: formatDate(ev.dueAt) }) }}
               </p>
               <p v-else class="mt-2 text-xs text-fg-subtle">
                 {{

@@ -2,6 +2,7 @@
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import { useT } from '~/composables/use_t'
+import { useDateFormat } from '~/composables/use_date_format'
 
 defineProps<{
   totalEngineHours: number | null
@@ -12,11 +13,7 @@ defineProps<{
 }>()
 
 const { t } = useT()
-
-function formatDate(iso: string | null): string {
-  if (!iso) return '—'
-  return iso.slice(0, 10)
-}
+const { formatDate } = useDateFormat()
 </script>
 
 <template>

@@ -4,12 +4,14 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import PlanningTaskCard from '~/components/planning/PlanningTaskCard.vue'
 import { ref } from 'vue'
 import { useT } from '~/composables/use_t'
+import { useDateFormat } from '~/composables/use_date_format'
 import { maintenanceSubjectLabel } from '~/utils/boat_enum_labels'
 
 defineProps<{ group: TaskGroup }>()
 const emit = defineEmits<{ ungroup: [groupId: string] }>()
 
 const { t } = useT()
+const { formatDate } = useDateFormat()
 const expanded = ref(false)
 </script>
 
@@ -29,7 +31,7 @@ const expanded = ref(false)
           {{ group.tasks.length }}
         </span>
         <span class="text-xs text-fg-muted"
-          >{{ group.earliestDueAt }} → {{ group.latestDueAt }}</span
+          >{{ formatDate(group.earliestDueAt) }} → {{ formatDate(group.latestDueAt) }}</span
         >
       </div>
       <div class="flex items-center gap-2">

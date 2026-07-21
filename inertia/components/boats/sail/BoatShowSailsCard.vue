@@ -9,6 +9,7 @@ import BaseModal from '~/components/base/BaseModal.vue'
 import type { BoatShowSail } from '~/types/boat_show'
 import BoatEquipmentSailFields from './BoatEquipmentSailFields.vue'
 import { useT } from '~/composables/use_t'
+import { useDateFormat } from '~/composables/use_date_format'
 import { sailTypeLabel } from '~/utils/boat_enum_labels'
 
 defineProps<{
@@ -18,13 +19,8 @@ defineProps<{
 }>()
 
 const { t } = useT()
+const { formatDate } = useDateFormat()
 const isCreateOpen = ref(false)
-
-function performedDisplay(iso: string | null) {
-  if (!iso) return null
-  const d = iso.slice(0, 10)
-  return d || iso
-}
 
 function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutral' {
   if (status === 'operational') return 'success'
@@ -90,8 +86,8 @@ function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutra
             </div>
 
             <div class="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-fg-subtle">
-              <span v-if="performedDisplay(s.manufacturedAt)"
-                >{{ t('boats.sails.mfg') }} {{ performedDisplay(s.manufacturedAt) }}</span
+              <span v-if="s.manufacturedAt"
+                >{{ t('boats.sails.mfg') }} {{ formatDate(s.manufacturedAt) }}</span
               >
             </div>
           </div>
