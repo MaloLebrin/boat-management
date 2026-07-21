@@ -122,11 +122,15 @@ function dismissAlert() {
       class="mb-6"
       @dismiss="dismissAlert"
     >
-      <span class="font-semibold">{{
-        t('dashboard.overdueAlert', { count: String(stats.urgentMaintenance) })
-      }}</span>
-      <span class="mx-2">-</span>
-      <a href="/planning" class="underline hover:no-underline">{{ t('dashboard.viewPlanning') }}</a>
+      <span class="flex flex-wrap items-center gap-2">
+        <span class="font-semibold">{{
+          t('dashboard.overdueAlert', { count: String(stats.urgentMaintenance) })
+        }}</span>
+        <span>-</span>
+        <a href="/planning" class="underline hover:no-underline">{{
+          t('dashboard.viewPlanning')
+        }}</a>
+      </span>
     </BaseAlert>
 
     <div class="flex flex-wrap items-start justify-between gap-4">

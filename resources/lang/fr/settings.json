@@ -140,7 +140,7 @@
       "pricePerBoat": "{amount} €/bateau/mois",
       "totalPerMonth": "{amount} €/mois",
       "apply": "Mettre à jour",
-      "grantedHint": "{count} bateau(x) offert(s)",
+      "grantedHint": "{count, plural, one {# bateau offert} other {# bateaux offerts}}",
       "unlimited": "Bateaux illimités",
       "proRequired": "Nécessite un plan Pro actif"
     }
@@ -207,13 +207,13 @@
     "fileLabel": "Fichier CSV",
     "fileHint": "Format : UTF-8 ou UTF-8 BOM, séparateur `;`. Taille max : 5 Mo.",
     "previewButton": "Prévisualiser",
-    "confirmButton": "Importer {count} ligne(s)",
+    "confirmButton": "{count, plural, one {Importer # ligne} other {Importer # lignes}}",
     "cancelButton": "Annuler",
     "downloadTemplate": "Télécharger le modèle CSV",
     "templateHint": "En-têtes attendues : {headers}",
     "previewTitle": "Aperçu du fichier",
-    "previewSummary": "{valid} ligne(s) valide(s) sur {total}",
-    "previewErrors": "{count} erreur(s)",
+    "previewSummary": "{valid, plural, one {# ligne valide} other {# lignes valides}} sur {total}",
+    "previewErrors": "{count, plural, one {# erreur} other {# erreurs}}",
     "previewColumns": {
       "line": "Ligne",
       "date": "date",

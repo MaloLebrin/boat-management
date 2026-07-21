@@ -14,7 +14,8 @@ vi.mock('@inertiajs/vue3', () => ({
   usePage: () => ({
     props: {
       appT: {
-        'offline.queue.title': '{count} action(s) en attente',
+        'offline.queue.title':
+          '{count, plural, one {# action en attente} other {# actions en attente}}',
         'offline.queue.syncNow': 'Synchroniser',
         'offline.queue.cancel': 'Annuler',
         'offline.queue.cancelled': 'Action annulée',
@@ -79,7 +80,7 @@ describe('OfflinePendingQueue', () => {
     expect(wrapper.find('ul').exists()).toBe(true)
     expect(wrapper.findAll('li')).toHaveLength(1)
     expect(wrapper.text()).toContain('Nouvelle sortie')
-    expect(wrapper.text()).toContain('1 action(s) en attente')
+    expect(wrapper.text()).toContain('1 action en attente')
   })
 
   test('renders all queued items', async () => {
@@ -103,7 +104,7 @@ describe('OfflinePendingQueue', () => {
     expect(wrapper.findAll('li')).toHaveLength(2)
     expect(wrapper.text()).toContain('Nouvelle sortie')
     expect(wrapper.text()).toContain('Avitaillement')
-    expect(wrapper.text()).toContain('2 action(s) en attente')
+    expect(wrapper.text()).toContain('2 actions en attente')
   })
 
   test('cancel button removes item from list', async () => {

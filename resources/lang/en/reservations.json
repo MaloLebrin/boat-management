@@ -2,7 +2,7 @@
   "title": "Reservations",
   "quote": {
     "title": "Price estimate",
-    "nights": "{count} night(s)",
+    "nights": "{count, plural, one {# night} other {# nights}}",
     "base": "Base rate",
     "week": "Weekly rate",
     "perNight": "per night",
@@ -12,8 +12,8 @@
     "apply": "Apply this price",
     "noPricing": "No pricing configured for this boat.",
     "selectDates": "Select dates to see the estimate.",
-    "belowMin": "The minimum stay is {min} night(s).",
-    "aboveMax": "The maximum stay is {max} night(s)."
+    "belowMin": "The minimum stay is {min, plural, one {# night} other {# nights}}.",
+    "aboveMax": "The maximum stay is {max, plural, one {# night} other {# nights}}."
   },
   "subtitle": "Manage your fleet's reservations",
   "fleet": {

@@ -57,31 +57,31 @@
     "maintenance": {
       "overdue": {
         "title": "Overdue maintenance on {boatName}",
-        "body": "{count} maintenance task(s) are overdue on {boatName}."
+        "body": "{count, plural, one {# maintenance task is overdue} other {# maintenance tasks are overdue}} on {boatName}."
       },
       "due_soon": {
         "title": "Upcoming maintenance on {boatName}",
-        "body": "{count} maintenance task(s) are due soon on {boatName}."
+        "body": "{count, plural, one {# maintenance task is due soon} other {# maintenance tasks are due soon}} on {boatName}."
       }
     },
     "document": {
       "expiring_soon": {
         "title": "Documents to renew on {boatName}",
-        "body": "{count} document(s) on {boatName} are expiring soon."
+        "body": "{count, plural, one {# document on {boatName} is expiring soon.} other {# documents on {boatName} are expiring soon.}}"
       },
       "expired": {
         "title": "Expired documents on {boatName}",
-        "body": "{count} document(s) on {boatName} have expired."
+        "body": "{count, plural, one {# document on {boatName} has expired.} other {# documents on {boatName} have expired.}}"
       }
     },
     "safety_equipment": {
       "expiring_soon": {
         "title": "Safety equipment to check on {boatName}",
-        "body": "{count} safety equipment item(s) on {boatName} are expiring soon."
+        "body": "{count, plural, one {# safety equipment item on {boatName} is expiring soon.} other {# safety equipment items on {boatName} are expiring soon.}}"
       },
       "expired": {
         "title": "Expired safety equipment on {boatName}",
-        "body": "{count} safety equipment item(s) on {boatName} have expired."
+        "body": "{count, plural, one {# safety equipment item on {boatName} has expired.} other {# safety equipment items on {boatName} have expired.}}"
       }
     }
   },

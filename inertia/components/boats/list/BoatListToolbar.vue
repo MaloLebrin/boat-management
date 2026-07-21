@@ -134,7 +134,7 @@ function update(partial: Partial<BoatListFilters>) {
         />
         <p class="text-sm text-fg-muted">
           <span class="font-semibold text-fg">{{ total }}</span>
-          {{ t('boats.list.boats') }}
+          {{ t('boats.list.boats', { count: String(total) }) }}
           <span v-if="isLoading" class="ml-2 inline-block text-fg-subtle">{{
             t('common.loading')
           }}</span>

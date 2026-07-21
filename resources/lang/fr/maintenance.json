@@ -36,8 +36,8 @@
       "totalCost": "Coût total"
     },
     "timeline": {
-      "events": "{count} événement(s)",
-      "pieces": "{count} pièce(s)",
+      "events": "{count, plural, one {# événement} other {# événements}}",
+      "pieces": "{count, plural, one {# pièce} other {# pièces}}",
       "show": "Détail",
       "hide": "Masquer",
       "partsUsed": "Pièces utilisées",
@@ -63,7 +63,7 @@
       "sortLabel": "Tri",
       "sortRecent": "Plus récent",
       "sortOldest": "Plus ancien",
-      "results": "{count} résultat(s)"
+      "results": "{count, plural, one {# résultat} other {# résultats}}"
     },
     "pdf": {
       "title": "Historique de maintenance",
@@ -80,9 +80,9 @@
         "subject": "Sujet",
         "title": "Intervention"
       },
-      "partsCount": "{count} pièce(s) changée(s)",
+      "partsCount": "{count, plural, one {# pièce changée} other {# pièces changées}}",
       "noEvents": "Aucun événement ne correspond aux filtres sélectionnés.",
-      "totalEvents": "{count} événement(s)"
+      "totalEvents": "{count, plural, one {# événement} other {# événements}}"
     }
   }
 }

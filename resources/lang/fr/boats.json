@@ -280,10 +280,10 @@
       "modalSubtitle": "{name} · Stocké sur Cloudinary"
     },
     "overview": {
-      "overdueTasks": "{count} tâche(s) en retard",
+      "overdueTasks": "{count, plural, one {# tâche en retard} other {# tâches en retard}}",
       "schedule": "Planifier",
       "engineHours": "Heures moteur",
-      "engineCount": "{count} moteur(s)",
+      "engineCount": "{count, plural, one {# moteur} other {# moteurs}}",
       "lastMaintenance": "Dernière maintenance",
       "nextTask": "Prochaine tâche",
       "overdue": "En retard",
@@ -335,7 +335,7 @@
       "filterHull": "Coque",
       "toggleHide": "Masquer",
       "toggleShow": "Détail",
-      "pieces": "{count} pièce(s)",
+      "pieces": "{count, plural, one {# pièce} other {# pièces}}",
       "sidebarTitle": "12 derniers mois",
       "sidebarEvents": "Événements",
       "sidebarParts": "Pièces",
@@ -444,7 +444,7 @@
     "name": "Nom",
     "asc": "Croissant",
     "desc": "Décroissant",
-    "boats": "bateaux",
+    "boats": "{count, plural, one {bateau} other {bateaux}}",
     "clearFilters": "Effacer les filtres",
     "table": {
       "name": "Nom",
@@ -535,7 +535,7 @@
       "dueHours": "{hours} heures",
       "totalEvents": "Total événements",
       "totalParts": "Total pièces",
-      "parts": "{count} pièce(s)"
+      "parts": "{count, plural, one {# pièce} other {# pièces}}"
     },
     "notes": {
       "title": "Notes libres",
