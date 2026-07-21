@@ -12,8 +12,10 @@ import type { BoatCreateIntent, BoatShowDetail, MaintenanceTaskRow } from '~/typ
 import { subjectLabel } from './utils'
 import { engineKindLabel, sailTypeLabel } from '~/utils/boat_enum_labels'
 import { useT } from '~/composables/use_t'
+import { useDateFormat } from '~/composables/use_date_format'
 
 const { t } = useT()
+const { formatDate } = useDateFormat()
 
 type Subject = 'boat' | 'engine' | 'sail' | 'rig'
 
@@ -146,7 +148,7 @@ watch(() => props.createIntent, consumeCreateIntent)
             </div>
             <p class="text-fg-muted">{{ subjectLabel(t, task.subject) }}</p>
             <p v-if="task.dueAt" class="mt-1 text-xs text-fg-subtle">
-              {{ t('boats.maintenance.tasks.dueAt', { date: task.dueAt }) }}
+              {{ t('boats.maintenance.tasks.dueAt', { date: formatDate(task.dueAt) }) }}
             </p>
             <p v-else-if="task.dueEngineHours !== null" class="mt-1 text-xs text-fg-subtle">
               {{ t('boats.maintenance.tasks.dueHours', { hours: task.dueEngineHours }) }}

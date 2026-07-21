@@ -2,6 +2,7 @@
 import type { PlanningTask } from '#shared/types/planning'
 import BaseButton from '~/components/base/BaseButton.vue'
 import { useT } from '~/composables/use_t'
+import { useDateFormat } from '~/composables/use_date_format'
 import { maintenanceSubjectLabel } from '~/utils/boat_enum_labels'
 
 const props = defineProps<{
@@ -12,9 +13,10 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
+const { formatDate } = useDateFormat()
 
 function formatDue(task: PlanningTask): string {
-  if (task.kind === 'date' && task.dueAt) return task.dueAt
+  if (task.kind === 'date' && task.dueAt) return formatDate(task.dueAt)
   if (task.kind === 'hours' && task.dueEngineHours !== null) return `${task.dueEngineHours}h`
   return '—'
 }

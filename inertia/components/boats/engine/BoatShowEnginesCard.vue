@@ -9,6 +9,7 @@ import BaseCard from '~/components/base/BaseCard.vue'
 import BaseModal from '~/components/base/BaseModal.vue'
 import { computed, ref } from 'vue'
 import { useT } from '~/composables/use_t'
+import { useDateFormat } from '~/composables/use_date_format'
 import { engineFuelLabel } from '~/utils/boat_enum_labels'
 
 const props = defineProps<{
@@ -18,6 +19,7 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
+const { formatDate } = useDateFormat()
 const isCreateOpen = ref(false)
 
 const totalEngineHours = computed(() => {
@@ -25,12 +27,6 @@ const totalEngineHours = computed(() => {
   if (enginesWithHours.length === 0) return null
   return enginesWithHours.reduce((sum, e) => sum + (e.hours ?? 0), 0)
 })
-
-function performedDisplay(iso: string | null) {
-  if (!iso) return null
-  const d = iso.slice(0, 10)
-  return d || iso
-}
 
 function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutral' {
   if (status === 'operational') return 'success'
@@ -104,8 +100,8 @@ function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutra
             </div>
 
             <div class="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-fg-subtle">
-              <span v-if="performedDisplay(e.manufacturedAt)"
-                >{{ t('boats.engines.mfg') }} {{ performedDisplay(e.manufacturedAt) }}</span
+              <span v-if="e.manufacturedAt"
+                >{{ t('boats.engines.mfg') }} {{ formatDate(e.manufacturedAt) }}</span
               >
               <span v-if="e.serialNumber">{{ t('boats.engines.sn') }} {{ e.serialNumber }}</span>
             </div>

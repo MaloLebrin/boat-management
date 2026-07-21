@@ -8,6 +8,7 @@ import { subjectLabel } from '~/components/boats/maintenance/utils'
 import { engineKindLabel, sailTypeLabel } from '~/utils/boat_enum_labels'
 import type { BoatCreateIntent, BoatShowDetail, MaintenanceTaskRow } from '~/types/boat_show'
 import { useT } from '~/composables/use_t'
+import { useDateFormat } from '~/composables/use_date_format'
 
 const props = withDefaults(
   defineProps<{
@@ -22,6 +23,7 @@ const props = withDefaults(
 defineEmits<{ createIntentConsumed: [] }>()
 
 const { t } = useT()
+const { formatDate } = useDateFormat()
 
 const tasksFilter = ref<'all' | 'overdue' | 'soon' | 'planned' | 'undated'>('all')
 
@@ -67,11 +69,6 @@ const filteredTasks = computed(() => {
       return openTasks.value
   }
 })
-
-function formatDate(iso: string | null): string {
-  if (!iso) return '\u2014'
-  return iso.slice(0, 10)
-}
 
 function getTaskComponentLabel(task: MaintenanceTaskRow): string {
   if (task.subject === 'engine' && task.boatEngineId) {
@@ -157,7 +154,7 @@ function getTaskComponentLabel(task: MaintenanceTaskRow): string {
               <p class="font-semibold text-fg">{{ task.title }}</p>
               <p class="text-sm text-fg-muted">{{ getTaskComponentLabel(task) }}</p>
               <p v-if="task.dueAt" class="mt-1 text-xs text-coral-700">
-                Echeance: {{ formatDate(task.dueAt) }}
+                {{ t('boats.maintenance.tasks.dueAt', { date: formatDate(task.dueAt) }) }}
               </p>
               <p v-else-if="task.dueEngineHours !== null" class="mt-1 text-xs text-coral-700">
                 A {{ task.dueEngineHours }} heures moteur
@@ -201,7 +198,7 @@ function getTaskComponentLabel(task: MaintenanceTaskRow): string {
               <p class="font-semibold text-fg">{{ task.title }}</p>
               <p class="text-sm text-fg-muted">{{ getTaskComponentLabel(task) }}</p>
               <p v-if="task.dueAt" class="mt-1 text-xs text-amber-700">
-                Echeance: {{ formatDate(task.dueAt) }}
+                {{ t('boats.maintenance.tasks.dueAt', { date: formatDate(task.dueAt) }) }}
               </p>
             </div>
             <div v-if="canManageMaintenance" class="flex items-center gap-2">

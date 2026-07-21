@@ -6,6 +6,7 @@ import type { PlanningTask } from '../../shared/types/planning'
 vi.mock('~/composables/use_t', () => ({
   useT: () => ({
     t: (key: string) => key,
+    locale: { value: 'en' },
   }),
 }))
 

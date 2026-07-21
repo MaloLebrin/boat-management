@@ -4,6 +4,7 @@ import { ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BoatIncidentForm from '~/components/boats/show/tabs/BoatIncidentForm.vue'
 import { useT } from '~/composables/use_t'
+import { useDateFormat } from '~/composables/use_date_format'
 import type { BoatIncidentRow, BoatShowDetail, IncidentStatus } from '~/types/boat_show'
 
 const props = defineProps<{
@@ -14,6 +15,7 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
+const { formatDate } = useDateFormat()
 
 const showForm = ref(false)
 const editingIncident = ref<BoatIncidentRow | null>(null)
@@ -28,10 +30,6 @@ const STATUS_DOT: Record<IncidentStatus, string> = {
   open: 'bg-coral-500',
   in_progress: 'bg-amber-500',
   closed: 'bg-fg-subtle',
-}
-
-function formatDate(iso: string): string {
-  return iso.slice(0, 10)
 }
 
 function openCreate() {
