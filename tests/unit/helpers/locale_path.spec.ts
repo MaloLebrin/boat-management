@@ -22,6 +22,11 @@ test.group('locale_path', () => {
     assert.equal(buildLocaleSwitchHref('/fr/a-propos', 'en'), '/en/about')
   })
 
+  test('swaps contact page locale (same slug in both locales)', ({ assert }) => {
+    assert.equal(buildLocaleSwitchHref('/en/contact', 'fr'), '/fr/contact')
+    assert.equal(buildLocaleSwitchHref('/fr/contact', 'en'), '/en/contact')
+  })
+
   test('switches locale home', ({ assert }) => {
     assert.equal(buildLocaleSwitchHref('/en', 'fr'), '/fr')
     assert.equal(buildLocaleSwitchHref('/fr', 'en'), '/en')

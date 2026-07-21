@@ -45,6 +45,28 @@ test.group('Auth login (functional)', (group) => {
     response.assertHeader('location', '/login')
   })
 
+  test('redirects an already-authenticated user away from /login to /dashboard', async ({
+    client,
+  }) => {
+    const user = await createAdminUser()
+
+    const response = await client.get('/login').loginAs(user).redirects(0)
+
+    response.assertStatus(302)
+    response.assertHeader('location', '/dashboard')
+  })
+
+  test('redirects an already-authenticated user away from /signup to /dashboard', async ({
+    client,
+  }) => {
+    const user = await createAdminUser()
+
+    const response = await client.get('/signup').loginAs(user).redirects(0)
+
+    response.assertStatus(302)
+    response.assertHeader('location', '/dashboard')
+  })
+
   test('logout redirects away from dashboard', async ({ client }) => {
     const user = await createAdminUser()
 

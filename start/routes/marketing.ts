@@ -33,6 +33,8 @@ router
 
 router.get('/en/about', [MarketingController, 'about']).as('marketing.en.about')
 router.get('/fr/a-propos', [MarketingController, 'about']).as('marketing.fr.about')
+router.get('/en/contact', [MarketingController, 'contact']).as('marketing.en.contact')
+router.get('/fr/contact', [MarketingController, 'contact']).as('marketing.fr.contact')
 router.get('/contact', [MarketingController, 'contact']).as('marketing.contact')
 
 router.post('/simulator/session', [SimulatorController, 'saveSession']).as('simulator.session')
