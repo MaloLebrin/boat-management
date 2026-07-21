@@ -3,7 +3,8 @@ import PublicLayout from '~/layouts/public.vue'
 export default { layout: PublicLayout }
 </script>
 <script setup lang="ts">
-import { Head } from '@inertiajs/vue3'
+import { computed } from 'vue'
+import { Head, usePage } from '@inertiajs/vue3'
 import ContactHeroSection from '~/components/marketing/contact/ContactHeroSection.vue'
 import ContactChannelsSection from '~/components/marketing/contact/ContactChannelsSection.vue'
 import ContactFormSection from '~/components/marketing/contact/ContactFormSection.vue'
@@ -45,6 +46,7 @@ interface PageProps {
       form: {
         eyebrow: string
         title: string
+        subjectLabel: string
         subjects: string[]
         firstNameLabel: string
         lastNameLabel: string
@@ -68,6 +70,9 @@ interface PageProps {
         title: string
         titleHighlight: string
         subtitle: string
+        addrLabel: string
+        hoursLabel: string
+        teamLabel: string
         items: OfficeItem[]
       }
       faq: { eyebrow: string; title: string; titleHighlight: string; items: FaqItem[] }
@@ -77,6 +82,12 @@ interface PageProps {
 
 const props = defineProps<PageProps>()
 const t = props.t
+
+const page = usePage<{ locale?: 'en' | 'fr' }>()
+const locale = computed<'en' | 'fr'>(() => (page.props.locale ?? 'en') as 'en' | 'fr')
+const contactEn = '/en/contact'
+const contactFr = '/fr/contact'
+const canonicalHref = computed(() => (locale.value === 'fr' ? contactFr : contactEn))
 </script>
 
 <template>
@@ -84,7 +95,10 @@ const t = props.t
     <meta name="description" :content="t.meta.description" />
     <meta property="og:title" :content="t.meta.title" />
     <meta property="og:description" :content="t.meta.description" />
-    <link rel="canonical" href="/contact" />
+    <link rel="canonical" :href="canonicalHref" />
+    <link rel="alternate" hreflang="en" :href="contactEn" />
+    <link rel="alternate" hreflang="fr" :href="contactFr" />
+    <link rel="alternate" hreflang="x-default" :href="contactEn" />
   </Head>
 
   <ContactHeroSection v-bind="t.contact.hero" />

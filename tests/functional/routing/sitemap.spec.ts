@@ -21,9 +21,10 @@ test.group('Sitemap (functional)', () => {
       'https://fleetai.app/fr/cout-entretien-bateau',
       'https://fleetai.app/en/about',
       'https://fleetai.app/fr/a-propos',
+      'https://fleetai.app/en/contact',
+      'https://fleetai.app/fr/contact',
       'https://fleetai.app/en/privacy',
       'https://fleetai.app/fr/confidentialite',
-      'https://fleetai.app/contact',
       'https://fleetai.app/design-system',
     ]
     for (const url of expectedUrls) {

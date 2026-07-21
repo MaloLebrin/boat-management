@@ -39,12 +39,12 @@ const LOCALIZED_PAGES = [
     changefreq: 'monthly',
   },
   { en: '/en/about', fr: '/fr/a-propos', priority: '0.5', changefreq: 'monthly' },
+  { en: '/en/contact', fr: '/fr/contact', priority: '0.5', changefreq: 'monthly' },
   { en: '/en/privacy', fr: '/fr/confidentialite', priority: '0.3', changefreq: 'yearly' },
 ] as const
 
 /** Pages servies sur une URL unique (pas d'alternate hreflang). */
 const STANDALONE_PAGES = [
-  { loc: '/contact', priority: '0.5', changefreq: 'monthly' },
   { loc: '/design-system', priority: '0.5', changefreq: 'monthly' },
 ] as const
 

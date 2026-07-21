@@ -1375,6 +1375,7 @@ export default class MarketingController {
         form: {
           eyebrow: t('form_eyebrow'),
           title: t('form_title'),
+          subjectLabel: t('form_subject_label'),
           subjects: [
             t('form_subject1'),
             t('form_subject2'),
@@ -1409,6 +1410,9 @@ export default class MarketingController {
           title: t('offices_title'),
           titleHighlight: t('offices_title_highlight'),
           subtitle: t('offices_subtitle'),
+          addrLabel: t('offices_addr_label'),
+          hoursLabel: t('offices_hours_label'),
+          teamLabel: t('offices_team_label'),
           items: [
             {
               city: t('office1_city'),

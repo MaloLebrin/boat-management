@@ -16,6 +16,9 @@ defineProps<{
   title: string
   titleHighlight: string
   subtitle: string
+  addrLabel: string
+  hoursLabel: string
+  teamLabel: string
   items: OfficeItem[]
 }>()
 
@@ -67,11 +70,11 @@ const { el, isVisible } = useScrollReveal()
           <!-- Details -->
           <div class="p-6">
             <div class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
-              <span class="font-medium text-fg-subtle">Adresse</span>
+              <span class="font-medium text-fg-subtle">{{ addrLabel }}</span>
               <span class="text-fg">{{ office.addr }}</span>
-              <span class="font-medium text-fg-subtle">Horaires</span>
+              <span class="font-medium text-fg-subtle">{{ hoursLabel }}</span>
               <span class="text-fg">{{ office.hours }}</span>
-              <span class="font-medium text-fg-subtle">Équipe</span>
+              <span class="font-medium text-fg-subtle">{{ teamLabel }}</span>
               <span class="text-fg">{{ office.team }}</span>
             </div>
             <div class="mt-4 flex items-start gap-2 rounded-xl bg-cream px-3 py-2">

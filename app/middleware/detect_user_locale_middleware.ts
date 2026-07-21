@@ -25,10 +25,14 @@ export default class DetectUserLocaleMiddleware {
    *
    * Feel free to use different mechanism for finding user language.
    */
-  protected getRequestLocale(ctx: HttpContext) {
+  protected getUrlLocale(ctx: HttpContext): 'en' | 'fr' | null {
     const firstSegment = ctx.request.url().split('?')[0].split('/').filter(Boolean)[0]
-    if (firstSegment === 'en' || firstSegment === 'fr') {
-      return firstSegment
+    return firstSegment === 'en' || firstSegment === 'fr' ? firstSegment : null
+  }
+
+  protected getRequestLocale(ctx: HttpContext, urlLocale: 'en' | 'fr' | null) {
+    if (urlLocale) {
+      return urlLocale
     }
 
     const cookieLocale = ctx.request.cookie('locale')
@@ -44,7 +48,17 @@ export default class DetectUserLocaleMiddleware {
     /**
      * Finding user language
      */
-    const language = this.getRequestLocale(ctx)
+    const urlLocale = this.getUrlLocale(ctx)
+    const language = this.getRequestLocale(ctx, urlLocale)
+
+    /**
+     * A locale carried by the URL prefix (/en/..., /fr/...) is a stronger signal
+     * than a stale cookie — refresh it so unprefixed routes (/login, /contact...)
+     * pick up the locale the visitor is actually browsing in.
+     */
+    if (urlLocale && ctx.request.cookie('locale') !== urlLocale) {
+      ctx.response.cookie('locale', urlLocale, { maxAge: '365d', path: '/', httpOnly: false })
+    }
 
     /**
      * Assigning i18n property to the HTTP context

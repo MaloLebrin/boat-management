@@ -13,6 +13,7 @@ interface SidebarContact {
 defineProps<{
   eyebrow: string
   title: string
+  subjectLabel: string
   subjects: string[]
   firstNameLabel: string
   lastNameLabel: string
@@ -58,7 +59,7 @@ const fleetSizes = ['1-4', '5-20', '20+']
             <!-- Subject pills -->
             <div>
               <p class="mb-3 text-xs font-semibold uppercase tracking-widest text-fg-subtle">
-                Sujet
+                {{ subjectLabel }}
               </p>
               <div class="flex flex-wrap gap-2">
                 <button
