@@ -22,8 +22,8 @@
     "completedWithCount": "{displayed} / {total} complétées"
   },
   "taskKind": {
-    "date": "date",
-    "hours": "heures"
+    "date": "Par date",
+    "hours": "Par heures moteur"
   },
   "calendar": {
     "more": "+{count} autres",

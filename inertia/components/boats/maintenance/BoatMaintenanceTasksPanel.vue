@@ -10,6 +10,7 @@ import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import type { BoatCreateIntent, BoatShowDetail, MaintenanceTaskRow } from '~/types/boat_show'
 import { subjectLabel } from './utils'
+import { engineKindLabel, sailTypeLabel } from '~/utils/boat_enum_labels'
 import { useT } from '~/composables/use_t'
 
 const { t } = useT()
@@ -71,14 +72,14 @@ const subjectOptions = computed<ReadonlyArray<{ label: string; value: Subject }>
 const engineOptions = computed(() =>
   props.boat.engines.map((e) => ({
     value: String(e.id),
-    label: `${e.kind} · ${e.brand ?? ''} ${e.model ?? ''}`.trim(),
+    label: `${engineKindLabel(t, e.kind) ?? e.kind} · ${e.brand ?? ''} ${e.model ?? ''}`.trim(),
   }))
 )
 
 const sailOptions = computed(() =>
   props.boat.sails.map((s) => ({
     value: String(s.id),
-    label: `${s.sailType}${s.areaM2 !== null ? ` · ${s.areaM2} m²` : ''}`,
+    label: `${sailTypeLabel(t, s.sailType) ?? s.sailType}${s.areaM2 !== null ? ` · ${s.areaM2} m²` : ''}`,
   }))
 )
 
@@ -143,7 +144,7 @@ watch(() => props.createIntent, consumeCreateIntent)
                 }}
               </BaseBadge>
             </div>
-            <p class="text-fg-muted">{{ subjectLabel(task.subject) }}</p>
+            <p class="text-fg-muted">{{ subjectLabel(t, task.subject) }}</p>
             <p v-if="task.dueAt" class="mt-1 text-xs text-fg-subtle">
               {{ t('boats.maintenance.tasks.dueAt', { date: task.dueAt }) }}
             </p>

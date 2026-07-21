@@ -3,6 +3,17 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-07-21 — Correction des catégories d'équipement affichées en anglais sur les pages FR (#404)
+
+Audit UX du 2026-07-19 : sur les pages FR, plusieurs écrans affichaient les enums bruts (anglais) au lieu du libellé traduit déjà utilisé correctement par `/maintenance/history` — dashboard (« Révision moteur - engine »), fiche bateau (Aperçu, Historique, Tâches : chips « Boat », « Engine », « Sail », « Rig », « Boat · Whole boat », « outboard Yamaha 8HP »), planning/kanban (chip de sujet + libellé peu clair « date »/« hours » sous chaque échéance), et fiche équipement (« sloop », « essence », « main », « genoa »).
+
+- Nouveau `inertia/utils/boat_enum_labels.ts` : `engineKindLabel`, `engineFuelLabel`, `sailTypeLabel`, `rigTypeLabel`, `maintenanceSubjectLabel` — même pattern que `boat_propulsion_label.ts` (traduit via les clés i18n déjà existantes `boats.options.*`/`maintenance.history.subjects.*`, fallback sur la valeur brute pour une valeur legacy/inconnue).
+- Nouveau `shared/constants/maintenance/maintenance_subjects.ts` (`MAINTENANCE_SUBJECT_OPTIONS`) pour la validation de sujet, sur le modèle de `shared/constants/boats/boat_form_options.ts`.
+- `inertia/components/boats/maintenance/utils.ts` : `subjectLabel`/`targetDescription` ne renvoient plus de texte anglais codé en dur — délèguent à `maintenanceSubjectLabel`. Le chip « Boat · Whole boat » de l'onglet Historique perd son sous-libellé redondant (le sujet seul suffit ; la légende additionnelle ne s'affiche que pour un moteur/une voile ayant une légende propre).
+- Appliqué sur : dashboard (liste maintenance urgente), fiche bateau (Aperçu « Activité récente », Historique, Tâches, panneau de création de tâche/événement, cartes moteur/voile/gréement, fiche moteur détaillée), planning kanban + calendrier (chip de sujet des tâches).
+- `resources/lang/{fr,en}/planning.json` : `taskKind.date`/`taskKind.hours` passent de « date »/« heures » (identiques à l'enum brut, dans les deux langues) à « Par date »/« Par heures moteur » (FR) et « By date »/« By engine hours » (EN).
+- Pas de nouvelle clé de traduction équipement/maintenance ajoutée — toutes existaient déjà dans `boats.json`/`maintenance.json` mais n'étaient pas consommées par ces écrans.
+
 ## 2026-07-21 — Correction des ruptures de langue marketing → auth/contact (#403)
 
 Audit UX du 2026-07-19 : un visiteur francophone parcourant `/fr/...` pouvait retomber en anglais en cliquant sur « Contact » ou « Connexion », et un utilisateur déjà authentifié visitant `/login` était renvoyé vers l'accueil marketing plutôt que son tableau de bord.

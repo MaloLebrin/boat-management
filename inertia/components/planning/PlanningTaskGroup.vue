@@ -4,6 +4,7 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import PlanningTaskCard from '~/components/planning/PlanningTaskCard.vue'
 import { ref } from 'vue'
 import { useT } from '~/composables/use_t'
+import { maintenanceSubjectLabel } from '~/utils/boat_enum_labels'
 
 defineProps<{ group: TaskGroup }>()
 const emit = defineEmits<{ ungroup: [groupId: string] }>()
@@ -19,7 +20,9 @@ const expanded = ref(false)
       @click="expanded = !expanded"
     >
       <div class="flex items-center gap-2">
-        <span class="text-xs font-semibold capitalize text-fg">{{ group.subject }}</span>
+        <span class="text-xs font-semibold text-fg">{{
+          maintenanceSubjectLabel(t, group.subject)
+        }}</span>
         <span
           class="inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-navy-100 px-1 text-xs font-semibold text-navy-700"
         >

@@ -6,6 +6,7 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import type { BoatShowRig } from '~/types/boat_show'
 import { useT } from '~/composables/use_t'
+import { rigTypeLabel } from '~/utils/boat_enum_labels'
 
 defineProps<{
   boatId: number
@@ -65,7 +66,7 @@ function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutra
       <dl class="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
         <div>
           <dt class="text-fg-muted">{{ t('boats.rig.fields.rigType') }}</dt>
-          <dd class="font-semibold text-fg">{{ rig.rigType }}</dd>
+          <dd class="font-semibold text-fg">{{ rigTypeLabel(t, rig.rigType) }}</dd>
         </div>
         <div>
           <dt class="text-fg-muted">{{ t('boats.rig.fields.mastCount') }}</dt>

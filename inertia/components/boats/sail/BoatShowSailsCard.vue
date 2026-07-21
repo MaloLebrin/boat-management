@@ -9,6 +9,7 @@ import BaseModal from '~/components/base/BaseModal.vue'
 import type { BoatShowSail } from '~/types/boat_show'
 import BoatEquipmentSailFields from './BoatEquipmentSailFields.vue'
 import { useT } from '~/composables/use_t'
+import { sailTypeLabel } from '~/utils/boat_enum_labels'
 
 defineProps<{
   boatId: number
@@ -62,7 +63,9 @@ function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutra
         <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
           <div class="min-w-0">
             <div class="flex flex-wrap items-center gap-2">
-              <p class="truncate text-sm font-semibold text-fg">{{ s.sailType }}</p>
+              <p class="truncate text-sm font-semibold text-fg">
+                {{ sailTypeLabel(t, s.sailType) }}
+              </p>
               <BaseBadge v-if="s.material" variant="neutral">
                 {{ s.material }}
               </BaseBadge>
