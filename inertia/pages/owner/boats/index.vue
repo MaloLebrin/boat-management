@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@adonisjs/inertia/vue'
+import { Head } from '@inertiajs/vue3'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseEmptyState from '~/components/base/BaseEmptyState.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
@@ -14,6 +15,8 @@ const { t } = useT()
 </script>
 
 <template>
+  <Head :title="t('owner.boats.index.title')" />
+
   <div class="mx-auto w-full max-w-4xl px-6 py-10 sm:px-8">
     <BaseHeading level="1" class="mb-8">{{ t('owner.boats.index.title') }}</BaseHeading>
 

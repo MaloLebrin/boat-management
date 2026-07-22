@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { router } from '@inertiajs/vue3'
+import { Head, router } from '@inertiajs/vue3'
 import BaseBreadcrumb from '~/components/base/BaseBreadcrumb.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
@@ -82,6 +82,8 @@ const categories = computed(() => [
 </script>
 
 <template>
+  <Head :title="t('budget.title')" />
+
   <div class="w-full max-w-7xl px-6 py-10 sm:px-8">
     <BaseBreadcrumb
       :items="[

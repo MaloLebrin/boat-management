@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { router, usePage } from '@inertiajs/vue3'
+import { Head, router, usePage } from '@inertiajs/vue3'
 import { Link } from '@adonisjs/inertia/vue'
 import BaseAlert from '~/components/base/BaseAlert.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
@@ -99,6 +99,8 @@ function executeDelete() {
 </script>
 
 <template>
+  <Head :title="invoice.number" />
+
   <div class="mx-auto w-full max-w-4xl px-6 py-10 sm:px-8">
     <!-- Breadcrumb -->
     <nav class="mb-6 flex items-center gap-1.5 text-sm text-fg-muted">

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Head } from '@inertiajs/vue3'
 import { Link } from '@adonisjs/inertia/vue'
 import { MapPinIcon, PlusIcon } from '@heroicons/vue/24/outline'
 import BaseButton from '~/components/base/BaseButton.vue'
@@ -15,6 +16,7 @@ const { t } = useT()
 </script>
 
 <template>
+  <Head :title="t('ports.title')" />
   <div class="w-full max-w-5xl px-6 py-10 sm:px-8">
     <div class="flex items-center justify-between">
       <div class="space-y-2">

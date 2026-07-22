@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Form } from '@adonisjs/inertia/vue'
+import { Head } from '@inertiajs/vue3'
 import BoatEquipmentSailFields from '~/components/boats/sail/BoatEquipmentSailFields.vue'
 import type { BoatEquipmentSailFieldsModel } from '~/components/boats/sail/BoatEquipmentSailFields.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
@@ -16,6 +17,8 @@ const { t } = useT()
 </script>
 
 <template>
+  <Head :title="t('boats.sails.editTitle')" />
+
   <div class="mx-auto w-full max-w-xl px-6 py-10 sm:px-8">
     <div class="space-y-2">
       <BaseHeading level="1">{{ t('boats.sails.editTitle') }}</BaseHeading>

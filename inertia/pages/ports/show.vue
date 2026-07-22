@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { router } from '@inertiajs/vue3'
+import { Head, router } from '@inertiajs/vue3'
 import { Link } from '@adonisjs/inertia/vue'
 import { ref } from 'vue'
 import { MapPinIcon, PencilIcon, TrashIcon } from '@heroicons/vue/24/outline'
@@ -45,6 +45,7 @@ function executeDeletePort() {
 </script>
 
 <template>
+  <Head :title="port.name" />
   <div class="w-full max-w-5xl px-6 py-10 sm:px-8">
     <!-- Breadcrumb -->
     <nav class="mb-6 flex items-center gap-1.5 text-sm text-fg-muted">

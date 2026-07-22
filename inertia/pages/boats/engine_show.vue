@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { router } from '@inertiajs/vue3'
+import { Head, router } from '@inertiajs/vue3'
 import { computed, onMounted, ref, watch } from 'vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseBreadcrumb from '~/components/base/BaseBreadcrumb.vue'
@@ -170,6 +170,8 @@ function formatYear(iso: string): string {
 </script>
 
 <template>
+  <Head :title="engineTitle" />
+
   <div class="w-full max-w-7xl px-6 py-10 sm:px-8">
     <BaseBreadcrumb
       :items="[

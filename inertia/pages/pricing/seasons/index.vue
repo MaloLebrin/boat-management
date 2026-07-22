@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { router, usePage } from '@inertiajs/vue3'
+import { Head, router, usePage } from '@inertiajs/vue3'
 import BaseAlert from '~/components/base/BaseAlert.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseConfirmModal from '~/components/base/BaseConfirmModal.vue'
@@ -65,6 +65,8 @@ function executeDelete() {
 </script>
 
 <template>
+  <Head :title="t('pricingSeasons.title')" />
+
   <div class="mx-auto w-full max-w-6xl px-6 py-10 sm:px-8">
     <div class="mb-6 flex items-center justify-between">
       <div>

@@ -1,5 +1,8 @@
 {
   "accept": {
+    "meta": {
+      "title": "Invitation"
+    },
     "title": "Rejoindre {orgName}",
     "invited_by": "Vous avez été invité par {name} à rejoindre {orgName} en tant que {role}.",
     "invited_anonymous": "Vous avez été invité à rejoindre {orgName} en tant que {role}.",

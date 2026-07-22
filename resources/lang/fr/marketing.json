@@ -893,7 +893,7 @@
     "contact_cta_button": "Essayer →"
   },
   "pricing2": {
-    "meta_title": "Tarifs — FleetAi",
+    "meta_title": "Tarifs",
     "meta_description": "Un prix par flotte, pas par utilisateur. Plan gratuit pour 2 bateaux · 20 €/mois (16 € en annuel) pour jusqu'à 8 bateaux · Enterprise 99 €/mois (79 € en annuel).",
     "hero_eyebrow": "TARIFS",
     "hero_title": "Un prix",
@@ -1199,7 +1199,7 @@
     "final_cta_secondary": "Voir une démo"
   },
   "about2": {
-    "meta_title": "À propos — FleetAi",
+    "meta_title": "À propos",
     "meta_description": "FleetAi est une startup française fondée en 2024 à Marseille. Notre mission : donner aux loueurs, écoles et marinas les outils numériques qu'ils méritent.",
     "hero_line1": "Donner aux",
     "hero_line1_highlight": "gens de la mer",
@@ -1341,7 +1341,7 @@
     "final_cta_secondary": "Voir la démo"
   },
   "contact2": {
-    "meta_title": "Contact — FleetAi",
+    "meta_title": "Contact",
     "meta_description": "Une question, une démo, un partenariat ? Parle-nous de ta flotte. On répond sous 4h en jours ouvrés.",
     "hero_eyebrow": "CONTACT",
     "hero_title": "Parle-nous de",
@@ -1505,7 +1505,7 @@
     "final_cta_secondary": "Voir le simulateur"
   },
   "privacy": {
-    "meta_title": "Politique de confidentialité — Fleet AI",
+    "meta_title": "Politique de confidentialité",
     "meta_description": "Comment Fleet AI collecte, utilise et protège vos données personnelles, conformément au RGPD.",
     "hero_eyebrow": "Confidentialité",
     "hero_title": "Politique de",

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Form } from '@adonisjs/inertia/vue'
+import { Head } from '@inertiajs/vue3'
 import { computed, ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
@@ -17,6 +18,8 @@ defineProps<{
 </script>
 
 <template>
+  <Head :title="t('boats.new.title')" />
+
   <div class="w-full max-w-5xl px-6 py-10 sm:px-8">
     <div class="space-y-2">
       <BaseHeading level="1">{{ t('boats.new.title') }}</BaseHeading>

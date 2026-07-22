@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { router } from '@inertiajs/vue3'
+import { Head, router } from '@inertiajs/vue3'
 import { useT } from '~/composables/use_t'
 import { computeSimulatorCosts } from '~/composables/use_simulator_costs'
 import SimulatorStepHull from '~/components/marketing/simulator/SimulatorStepHull.vue'
@@ -86,6 +86,8 @@ function goToBoat() {
 </script>
 
 <template>
+  <Head :title="t('boats.simulator.pageTitle', { name: boat.name })" />
+
   <div class="bg-paper px-6 py-12 lg:px-8 lg:py-16 min-h-screen">
     <div class="mx-auto max-w-xl">
       <!-- Header -->

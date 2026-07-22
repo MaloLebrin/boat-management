@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { router, usePage } from '@inertiajs/vue3'
+import { Head, router, usePage } from '@inertiajs/vue3'
 import { useLocalStorage } from '@vueuse/core'
 import { computed, ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
@@ -86,6 +86,8 @@ function reset() {
 </script>
 
 <template>
+  <Head :title="t('boats.index.title')" />
+
   <div class="w-full max-w-7xl flex-col px-6 py-10 sm:px-8">
     <div class="flex items-center justify-between">
       <div>

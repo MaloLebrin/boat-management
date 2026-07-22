@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { Link } from '@adonisjs/inertia/vue'
+import { Head } from '@inertiajs/vue3'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseTabs from '~/components/base/BaseTabs.vue'
 import BoatOwnerMaintenanceTab from '~/components/owner/BoatOwnerMaintenanceTab.vue'
@@ -51,6 +52,8 @@ const tabs = computed(() => [
 </script>
 
 <template>
+  <Head :title="boat.name" />
+
   <div class="mx-auto w-full max-w-4xl px-6 py-10 sm:px-8">
     <nav class="mb-6 flex items-center gap-1.5 text-sm text-fg-muted">
       <Link href="/owner/boats" class="transition-colors hover:text-fg">

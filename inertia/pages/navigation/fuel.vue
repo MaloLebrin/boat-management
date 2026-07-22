@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { router } from '@inertiajs/vue3'
+import { Head, router } from '@inertiajs/vue3'
 import BaseEmptyState from '~/components/base/BaseEmptyState.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import FuelLogRow from '~/components/navigation/FuelLogRow.vue'
@@ -42,6 +42,7 @@ const totalCost = computed(() =>
 </script>
 
 <template>
+  <Head :title="t('navigation.fuel.title')" />
   <div class="w-full max-w-7xl px-6 py-10 sm:px-8">
     <header class="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
       <div>

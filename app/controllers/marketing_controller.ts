@@ -63,7 +63,7 @@ export default class MarketingController {
         tagline: i18n.t('marketing.brand.tagline'),
       },
       meta: {
-        title: `${i18n.t('marketing.brand.name')} - ${i18n.t('marketing.home.hero.loueurs_title')}`,
+        title: i18n.t('marketing.home.hero.loueurs_title'),
         description: i18n.t('marketing.home.hero.loueurs_subtitle'),
       },
       home: {

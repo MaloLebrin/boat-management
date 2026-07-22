@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@adonisjs/inertia/vue'
-import { router } from '@inertiajs/vue3'
+import { Head, router } from '@inertiajs/vue3'
 import { ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
@@ -36,6 +36,8 @@ function anonymize() {
 </script>
 
 <template>
+  <Head :title="client.fullName" />
+
   <div class="mx-auto w-full max-w-4xl px-6 py-10 sm:px-8">
     <!-- Breadcrumb -->
     <nav class="mb-6 flex items-center gap-1.5 text-sm text-fg-muted">

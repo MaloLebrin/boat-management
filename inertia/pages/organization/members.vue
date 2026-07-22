@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { router, useForm, usePage } from '@inertiajs/vue3'
+import { Head, router, useForm, usePage } from '@inertiajs/vue3'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
@@ -66,6 +66,7 @@ function getInitials(member: OrganizationMemberData): string {
 </script>
 
 <template>
+  <Head :title="t('organization.members.title')" />
   <div class="mx-auto w-full max-w-4xl px-6 py-10 sm:px-8">
     <BaseHeading level="1" class="mb-8">{{ t('organization.members.title') }}</BaseHeading>
 

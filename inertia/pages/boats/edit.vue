@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Form } from '@adonisjs/inertia/vue'
-import { router } from '@inertiajs/vue3'
+import { Head, router } from '@inertiajs/vue3'
 import BoatFormHullFields from '~/components/boats/hull/BoatFormHullFields.vue'
 import BoatOwnersManager from '~/components/boats/BoatOwnersManager.vue'
 import type { BoatEditPayload, PortForForm, PropulsionTypeUi } from '~/types/boat_form'
@@ -49,6 +49,8 @@ function executeDeleteBoat() {
 </script>
 
 <template>
+  <Head :title="t('boats.edit.title')" />
+
   <div class="mx-auto w-full max-w-xl px-6 py-10 sm:px-8">
     <div class="space-y-2">
       <BaseHeading level="1">{{ t('boats.edit.title') }}</BaseHeading>

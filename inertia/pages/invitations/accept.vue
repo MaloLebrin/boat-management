@@ -5,7 +5,7 @@ export default { layout: AuthLayout }
 
 <script setup lang="ts">
 import { Link } from '@adonisjs/inertia/vue'
-import { useForm } from '@inertiajs/vue3'
+import { Head, useForm } from '@inertiajs/vue3'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
@@ -54,6 +54,7 @@ function getRoleLabel(role: OrgRole): string {
 </script>
 
 <template>
+  <Head :title="t('invitations.accept.meta.title')" />
   <div class="flex min-h-[60vh] items-center justify-center px-4 py-12">
     <div class="w-full max-w-md">
       <!-- Error: not found -->

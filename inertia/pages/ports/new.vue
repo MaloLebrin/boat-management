@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useForm } from '@inertiajs/vue3'
+import { Head, useForm } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
@@ -22,6 +22,7 @@ function submit() {
 </script>
 
 <template>
+  <Head :title="t('ports.create')" />
   <div class="mx-auto w-full max-w-xl px-6 py-10 sm:px-8">
     <div class="space-y-2">
       <BaseHeading level="1">{{ t('ports.create') }}</BaseHeading>
