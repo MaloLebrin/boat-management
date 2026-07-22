@@ -47,7 +47,7 @@ const { t } = useT()
       <div class="mt-auto border-t border-white/10 px-2 py-2">
         <div class="flex items-center gap-1.5 px-2 py-1 text-violet-100/70">
           <div class="h-3 w-3 rounded bg-violet-400/40" />
-          <span>FleetAI</span>
+          <span>FleetAi</span>
         </div>
       </div>
     </div>
@@ -202,7 +202,7 @@ const { t } = useT()
           <div class="mb-3 shrink-0 rounded-lg bg-violet-700 p-2 text-white">
             <div class="mb-1 flex items-center gap-1">
               <div class="h-3 w-3 rounded bg-white/30" />
-              <span class="font-medium">FleetAI</span>
+              <span class="font-medium">FleetAi</span>
             </div>
             <p class="text-[9px] text-white/80">Mistral II: vidange moteur en retard de 42h.</p>
             <button

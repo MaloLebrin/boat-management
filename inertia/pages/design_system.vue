@@ -146,11 +146,11 @@ const tableRows = computed(() => {
             <div class="flex items-center gap-3">
               <img
                 :src="brandIconUrl"
-                alt="Fleet AI icon"
+                alt="FleetAi icon"
                 class="h-10 w-10 rounded-(--radius-control) shadow-(--shadow-xs)"
               />
               <div>
-                <p class="font-display text-sm font-semibold text-fg">Fleet AI</p>
+                <p class="font-display text-sm font-semibold text-fg">FleetAi</p>
                 <p class="text-xs font-semibold text-fg-subtle">Horizon · wave · AI spark</p>
               </div>
             </div>
@@ -166,7 +166,7 @@ const tableRows = computed(() => {
           >
             <p class="text-xs font-semibold text-fg-muted">Usage</p>
             <p class="mt-2 text-sm text-fg-muted">
-              Utiliser l’icône seule pour favicon/app icon. Préférer le lockup “Fleet AI” dans le
+              Utiliser l’icône seule pour favicon/app icon. Préférer le lockup “FleetAi” dans le
               header.
             </p>
           </div>

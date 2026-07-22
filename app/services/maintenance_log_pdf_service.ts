@@ -122,7 +122,7 @@ export default class MaintenanceLogPdfService {
     }
 
     const TX = MARGIN + 78
-    doc.fillColor(WHITE).fontSize(18).font('Helvetica-Bold').text('FleetView', TX, 25)
+    doc.fillColor(WHITE).fontSize(18).font('Helvetica-Bold').text('FleetAi', TX, 25)
     doc.fillColor(CORAL).fontSize(10).font('Helvetica').text(t('title'), TX, 49)
     doc.fillColor(WHITE).fontSize(20).font('Helvetica-Bold').text(boat.name, TX, 67)
     doc

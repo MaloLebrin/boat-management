@@ -107,7 +107,7 @@ const modeKey = {
           {{ t(`auth.${modeKey[mode]}.marketing.subtitle`) }}
         </p>
 
-        <!-- FleetAI preview card (login + register only) -->
+        <!-- FleetAi preview card (login + register only) -->
         <div
           v-if="mode === 'login' || mode === 'register'"
           class="mt-9 rounded-xl p-3.5"

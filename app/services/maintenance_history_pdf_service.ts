@@ -58,7 +58,7 @@ export default class MaintenanceHistoryPdfService {
 
     doc.rect(0, 0, PAGE_W, HEADER_H).fill(NAVY)
 
-    doc.fillColor(WHITE).fontSize(18).font('Helvetica-Bold').text('FleetView', MARGIN, 22)
+    doc.fillColor(WHITE).fontSize(18).font('Helvetica-Bold').text('FleetAi', MARGIN, 22)
     doc.fillColor(CORAL).fontSize(12).font('Helvetica-Bold').text(t('title'), MARGIN, 46)
     doc
       .fillColor(GREY_M)
