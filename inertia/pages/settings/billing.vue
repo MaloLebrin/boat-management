@@ -4,8 +4,10 @@ export default { layout: DefaultLayout }
 </script>
 
 <script setup lang="ts">
+import { Head } from '@inertiajs/vue3'
 import SettingsShell from '~/components/settings/SettingsShell.vue'
 import SettingsBillingTab from '~/components/settings/tabs/SettingsBillingTab.vue'
+import { useT } from '~/composables/use_t'
 import type {
   ActiveAddonInfo,
   ActiveModuleInfo,
@@ -21,9 +23,12 @@ defineProps<{
   orgModules: ActiveModuleInfo[]
   orgAddons: ActiveAddonInfo[]
 }>()
+
+const { t } = useT()
 </script>
 
 <template>
+  <Head :title="t('settings.billing.title')" />
   <SettingsShell>
     <SettingsBillingTab
       :plan="plan"

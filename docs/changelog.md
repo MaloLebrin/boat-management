@@ -3,6 +3,14 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-07-22 — Titres d'onglet navigateur sur toutes les pages app + dédup marketing (#410)
+
+Audit UX du 2026-07-19 : la plupart des pages de l'app connectée n'avaient aucun `<Head :title>` (onglet « Fleet AI » nu), et les titres marketing dupliquaient la marque (« Pricing — FleetAi - Fleet AI ») car le suffixe global `- Fleet AI` (`inertia/app.ts`) s'ajoutait à un titre contenant déjà la marque.
+
+- **`<Head :title>` généralisé** sur toutes les pages app qui en manquaient (`/boats` + détails/équipements, `/ports`, `/crew`, `/planning`, `/maintenance/history`, `/clients`, `/invoices`, `/pricing/seasons`, `/notifications`, `/navigation/*`, `/settings/*`, `/organization/members`, `/owner/boats/*`, pages `errors/*` et `invitations/accept`). Chaque titre réutilise la clé i18n du `<BaseHeading level="1">` de la page (ou le nom d'entité dynamique pour les pages de détail : `boat.name`, `client.fullName`, numéro de facture…). La marque est laissée au suffixe global. `settings/index` (redirection serveur) est exclu.
+- **Marketing dédupliqué** : suppression de la marque des titres de page pour laisser le suffixe global l'ajouter une seule fois — home (`marketing_controller`), `pricing2.meta_title`, `about2.meta_title`, `contact2.meta_title` et `privacy.meta_title` (EN + FR).
+- **Nouvelle clé i18n** `invitations.accept.meta.title` (EN + FR) pour la page d'acceptation d'invitation, seule page sans titre de heading réutilisable.
+
 ## 2026-07-22 — Formats numériques et devises cohérents par locale (#409)
 
 Audit UX du 2026-07-19 : les nombres et devises étaient formatés de façon incohérente — « 0.0 L » (point) juste au-dessus de « 0,00 € » (virgule) sur `/navigation/fuel`, « 0 sur 1000000 » non séparé sur `/settings/billing`, et une devise en dollars (« $1,200 ») sur la home EN alors que les prix sont en euros.

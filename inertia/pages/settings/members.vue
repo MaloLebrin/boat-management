@@ -4,8 +4,10 @@ export default { layout: DefaultLayout }
 </script>
 
 <script setup lang="ts">
+import { Head } from '@inertiajs/vue3'
 import SettingsShell from '~/components/settings/SettingsShell.vue'
 import SettingsMembersTab from '~/components/settings/tabs/SettingsMembersTab.vue'
+import { useT } from '~/composables/use_t'
 import type {
   OrganizationMemberData,
   OrganizationInvitationData,
@@ -19,9 +21,12 @@ defineProps<{
   canAddMember: boolean
   boatOptions: { id: number; name: string }[]
 }>()
+
+const { t } = useT()
 </script>
 
 <template>
+  <Head :title="t('settings.members.title')" />
   <SettingsShell>
     <SettingsMembersTab
       :current-user-id="currentUserId"

@@ -893,7 +893,7 @@
     "contact_cta_button": "Try it →"
   },
   "pricing2": {
-    "meta_title": "Pricing — FleetAi",
+    "meta_title": "Pricing",
     "meta_description": "One price per fleet, not per user. Free plan for 2 boats · €20/month (€16 annual) for up to 8 boats · Enterprise €99/month (€79 annual).",
     "hero_eyebrow": "PRICING",
     "hero_title": "One price,",
@@ -1199,7 +1199,7 @@
     "final_cta_secondary": "Watch a demo"
   },
   "about2": {
-    "meta_title": "About — FleetAi",
+    "meta_title": "About",
     "meta_description": "FleetAi is a French startup founded in 2024 in Marseille. Our mission: give rental operators, schools and marinas the digital tools they deserve.",
     "hero_line1": "Giving",
     "hero_line1_highlight": "maritime professionals",
@@ -1341,7 +1341,7 @@
     "final_cta_secondary": "Watch the demo"
   },
   "contact2": {
-    "meta_title": "Contact — FleetAi",
+    "meta_title": "Contact",
     "meta_description": "A question, a demo, a partnership? Tell us about your fleet. We reply within 4 business hours.",
     "hero_eyebrow": "CONTACT",
     "hero_title": "Tell us about",
@@ -1505,7 +1505,7 @@
     "final_cta_secondary": "View the simulator"
   },
   "privacy": {
-    "meta_title": "Privacy Policy — Fleet AI",
+    "meta_title": "Privacy Policy",
     "meta_description": "How Fleet AI collects, uses and protects your personal data, in line with the GDPR.",
     "hero_eyebrow": "Privacy",
     "hero_title": "Privacy",

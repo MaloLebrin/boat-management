@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { nextTick } from 'vue'
 
 vi.mock('@inertiajs/vue3', () => ({
+  Head: { template: '<div><slot /></div>' },
   usePage: () => ({ props: { appT: {}, locale: 'en' } }),
   router: { patch: vi.fn(), post: vi.fn() },
 }))

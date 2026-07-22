@@ -6,7 +6,7 @@ import BaseHeading from '~/components/base/BaseHeading.vue'
 import PlanningCalendar from '~/components/planning/PlanningCalendar.vue'
 import PlanningKanban from '~/components/planning/PlanningKanban.vue'
 import { computed, ref } from 'vue'
-import { router } from '@inertiajs/vue3'
+import { Head, router } from '@inertiajs/vue3'
 import { useT } from '~/composables/use_t'
 
 const props = defineProps<{
@@ -36,6 +36,8 @@ function handleUngroup(groupId: string) {
 </script>
 
 <template>
+  <Head :title="t('planning.title')" />
+
   <div class="w-full max-w-7xl flex-col px-6 py-10 sm:px-8">
     <!-- Page header -->
     <div class="mb-6 flex flex-wrap items-start justify-between gap-4">

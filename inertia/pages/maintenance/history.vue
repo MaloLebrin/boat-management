@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { router, usePage } from '@inertiajs/vue3'
+import { Head, router, usePage } from '@inertiajs/vue3'
 import { computed } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
@@ -74,6 +74,8 @@ function reset() {
 </script>
 
 <template>
+  <Head :title="t('maintenance.history.title')" />
+
   <div class="w-full max-w-7xl px-6 py-10 sm:px-8">
     <!-- Header -->
     <header class="space-y-4">

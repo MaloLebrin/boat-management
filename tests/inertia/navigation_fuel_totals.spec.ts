@@ -5,6 +5,7 @@ import type { FleetFuelLogRow } from '../../shared/types/navigation'
 const mockLocale = { value: 'fr' }
 
 vi.mock('@inertiajs/vue3', () => ({
+  Head: { template: '<div><slot /></div>' },
   usePage: () => ({ props: { appT: {}, locale: mockLocale.value } }),
   router: { visit: vi.fn() },
 }))

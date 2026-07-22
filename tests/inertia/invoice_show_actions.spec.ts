@@ -6,6 +6,7 @@ const mockPost = vi.hoisted(() => vi.fn())
 const mockDelete = vi.hoisted(() => vi.fn())
 
 vi.mock('@inertiajs/vue3', () => ({
+  Head: { template: '<div><slot /></div>' },
   router: { post: mockPost, delete: mockDelete },
   usePage: () => ({ props: { appT: {}, locale: 'en', flash: {} } }),
 }))

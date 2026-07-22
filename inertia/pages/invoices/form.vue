@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { router, usePage } from '@inertiajs/vue3'
+import { Head, router, usePage } from '@inertiajs/vue3'
 import { Link } from '@adonisjs/inertia/vue'
 import BaseAlert from '~/components/base/BaseAlert.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
@@ -84,6 +84,8 @@ function submit() {
 </script>
 
 <template>
+  <Head :title="isEdit ? t('invoices.form.editTitle') : t('invoices.form.createTitle')" />
+
   <div class="mx-auto w-full max-w-4xl px-6 py-10 sm:px-8">
     <nav class="mb-6 flex items-center gap-1.5 text-sm text-fg-muted">
       <Link href="/invoices" class="transition-colors hover:text-fg">{{
