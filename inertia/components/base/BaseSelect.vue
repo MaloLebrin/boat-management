@@ -3,6 +3,9 @@ import BaseField from '~/components/base/BaseField.vue'
 import { selectClass } from '~/utils/form_styles'
 import { computed } from 'vue'
 import { getFieldError, nameToErrorKey, type FormErrors } from '~/utils/form_errors'
+import { useT } from '~/composables/use_t'
+
+const { t } = useT()
 
 type OptionValue = string | number
 
@@ -25,7 +28,6 @@ const props = withDefaults(
   {
     modelValue: '',
     disabled: false,
-    placeholder: 'Select…',
     allowEmpty: false,
   }
 )
@@ -33,6 +35,8 @@ const props = withDefaults(
 defineEmits<{
   (e: 'update:modelValue', value: OptionValue | ''): void
 }>()
+
+const resolvedPlaceholder = computed(() => props.placeholder ?? t('common.selectPlaceholder'))
 
 const resolvedError = computed(() => {
   if (props.error) return props.error
@@ -66,7 +70,7 @@ const resolvedError = computed(() => {
         "
       >
         <option v-if="allowEmpty || modelValue === ''" value="" :disabled="!allowEmpty">
-          {{ placeholder }}
+          {{ resolvedPlaceholder }}
         </option>
         <option v-for="opt in options" :key="String(opt.value)" :value="opt.value">
           {{ opt.label }}

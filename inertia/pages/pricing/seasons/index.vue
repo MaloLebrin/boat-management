@@ -32,10 +32,9 @@ const showCreateForm = ref(false)
 const editingSeason = ref<PricingSeasonRow | null>(null)
 const deletingSeason = ref<PricingSeasonRow | null>(null)
 
-const boatFilterOptions = computed(() => [
-  { label: t('pricingSeasons.filter.allBoats'), value: '' },
-  ...props.boatOptions.map((b) => ({ label: b.name, value: String(b.id) })),
-])
+const boatFilterOptions = computed(() =>
+  props.boatOptions.map((b) => ({ label: b.name, value: String(b.id) }))
+)
 
 function onBoatFilterChange(value: string | number) {
   const boatId = value === '' ? undefined : value
@@ -105,9 +104,9 @@ function executeDelete() {
       <div class="md:col-span-4">
         <BaseSelect
           :label="t('pricingSeasons.filter.boat')"
+          allow-empty
           :model-value="filters.boatId ? String(filters.boatId) : ''"
           :options="boatFilterOptions"
-          allow-empty
           :placeholder="t('pricingSeasons.filter.allBoats')"
           @update:model-value="onBoatFilterChange"
         />
