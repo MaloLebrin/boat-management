@@ -1,5 +1,12 @@
 import { mount } from '@vue/test-utils'
-import { test, expect } from 'vitest'
+import { test, expect, vi } from 'vitest'
+
+vi.mock('~/composables/use_t', () => ({
+  useT: () => ({
+    t: (key: string) => (key === 'common.selectPlaceholder' ? 'Sélectionner…' : key),
+  }),
+}))
+
 import BaseSelect from '../../inertia/components/base/BaseSelect.vue'
 
 test('renders options', () => {
@@ -76,6 +83,19 @@ test('keeps placeholder option visible when allowEmpty is true even with a value
   })
   expect(w.findAll('option').length).toBe(2)
   expect(w.text()).toContain('All')
+})
+
+test('uses translated default placeholder', () => {
+  const w = mount(BaseSelect, {
+    props: {
+      id: 'sp',
+      label: 'Type',
+      options: [{ label: 'One', value: '1' }],
+      modelValue: '',
+    },
+  })
+  expect(w.text()).toContain('Sélectionner…')
+  expect(w.text()).not.toContain('Select…')
 })
 
 test('renders error from errors object using name', () => {

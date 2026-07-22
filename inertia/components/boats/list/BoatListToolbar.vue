@@ -104,7 +104,7 @@ function update(partial: Partial<BoatListFilters>) {
           <BaseSelect
             :label="t('boats.list.type')"
             allow-empty
-            placeholder="All"
+            :placeholder="t('common.all')"
             :model-value="filters.type ?? ''"
             :options="typeOptions"
             @update:model-value="(v) => update({ type: String(v || '') || undefined, page: 1 })"
@@ -114,7 +114,7 @@ function update(partial: Partial<BoatListFilters>) {
           <BaseSelect
             :label="t('boats.list.propulsion')"
             allow-empty
-            placeholder="All"
+            :placeholder="t('common.all')"
             :model-value="filters.propulsionType ?? ''"
             :options="propulsionOptions"
             @update:model-value="
