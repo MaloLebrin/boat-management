@@ -11,6 +11,7 @@ vi.mock('@inertiajs/vue3', async () => {
   const actual = await vi.importActual<typeof import('@inertiajs/vue3')>('@inertiajs/vue3')
   return {
     ...actual,
+    Head: { template: '<div><slot /></div>' },
     usePage: vi.fn(),
     router: { delete: mockDelete },
   }

@@ -2,6 +2,7 @@ import { mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
 vi.mock('@inertiajs/vue3', () => ({
+  Head: { template: '<div><slot /></div>' },
   usePage: () => ({ props: { appT: {}, locale: 'en' } }),
   router: { patch: vi.fn(), post: vi.fn() },
 }))

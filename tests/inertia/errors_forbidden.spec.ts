@@ -8,6 +8,10 @@ vi.mock('~/composables/use_t', () => ({
   }),
 }))
 
+vi.mock('@inertiajs/vue3', () => ({
+  Head: { template: '<div><slot /></div>' },
+}))
+
 vi.mock('@adonisjs/inertia/vue', () => ({
   Link: {
     name: 'MockInertiaLink',

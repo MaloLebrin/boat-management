@@ -9,6 +9,7 @@ vi.mock('~/composables/use_t', () => ({
 }))
 
 vi.mock('@inertiajs/vue3', () => ({
+  Head: { template: '<div><slot /></div>' },
   router: { delete: mockDelete },
 }))
 

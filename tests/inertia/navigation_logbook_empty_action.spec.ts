@@ -5,6 +5,7 @@ import Logbook from '../../inertia/pages/navigation/logbook.vue'
 const visit = vi.fn()
 
 vi.mock('@inertiajs/vue3', () => ({
+  Head: { template: '<div><slot /></div>' },
   router: { visit: (...args: unknown[]) => visit(...args) },
 }))
 

@@ -11,6 +11,7 @@ vi.mock('@adonisjs/inertia/vue', () => ({
 }))
 
 vi.mock('@inertiajs/vue3', () => ({
+  Head: { template: '<div><slot /></div>' },
   usePage: () => ({ props: { appT: {}, locale: 'en' } }),
 }))
 
