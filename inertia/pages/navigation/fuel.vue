@@ -5,10 +5,12 @@ import BaseEmptyState from '~/components/base/BaseEmptyState.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import FuelLogRow from '~/components/navigation/FuelLogRow.vue'
 import NavigationBoatFilter from '~/components/navigation/NavigationBoatFilter.vue'
+import { useNumberFormat } from '~/composables/use_number_format'
 import { useT } from '~/composables/use_t'
 import type { FleetBoatOption, FleetFuelLogRow } from '../../../shared/types/navigation'
 
-const { t, locale } = useT()
+const { t } = useT()
+const { formatNumber, formatCurrency } = useNumberFormat()
 
 const props = defineProps<{
   logs: FleetFuelLogRow[]
@@ -25,13 +27,18 @@ function onEmptyAction() {
 }
 
 const totalLiters = computed(() =>
-  props.logs.reduce((acc, l) => acc + l.quantityLiters, 0).toFixed(1)
+  formatNumber(
+    props.logs.reduce((acc, l) => acc + l.quantityLiters, 0),
+    {
+      minimumFractionDigits: 1,
+      maximumFractionDigits: 1,
+    }
+  )
 )
 
-const totalCost = computed(() => {
-  const sum = props.logs.reduce((acc, l) => acc + (l.totalCost ?? 0), 0)
-  return new Intl.NumberFormat(locale.value, { style: 'currency', currency: 'EUR' }).format(sum)
-})
+const totalCost = computed(() =>
+  formatCurrency(props.logs.reduce((acc, l) => acc + (l.totalCost ?? 0), 0))
+)
 </script>
 
 <template>

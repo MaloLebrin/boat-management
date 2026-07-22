@@ -1,8 +1,10 @@
 <script setup lang="ts">
+import { useNumberFormat } from '~/composables/use_number_format'
 import { useT } from '~/composables/use_t'
 import { computed } from 'vue'
 
 const { t } = useT()
+const { formatNumber } = useNumberFormat()
 
 const props = defineProps<{
   label: string
@@ -18,11 +20,16 @@ function formatBytes(bytes: number): string {
   return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} ${t('settings.billing.usage.gb')}`
 }
 
+function formatCount(value: number | string): string {
+  const n = typeof value === 'number' ? value : Number(value)
+  return Number.isFinite(n) ? formatNumber(n) : String(value)
+}
+
 const displayUsed = computed(() => {
   if (props.isBytes) {
     return formatBytes(Number(props.used))
   }
-  return String(props.used)
+  return formatCount(props.used)
 })
 
 const displayLimit = computed(() => {
@@ -32,7 +39,7 @@ const displayLimit = computed(() => {
   if (props.isBytes) {
     return formatBytes(Number(props.limit))
   }
-  return String(props.limit)
+  return formatCount(props.limit)
 })
 
 const percent = computed(() => {
