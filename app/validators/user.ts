@@ -41,6 +41,15 @@ export const updateProfileValidator = vine.create({
     .transform((v) => v || null),
 })
 
+export const changePasswordValidator = vine.create({
+  currentPassword: vine.string().minLength(1).maxLength(255),
+  password: password().confirmed({ confirmationField: 'passwordConfirmation' }),
+})
+
+export const updateLocaleValidator = vine.create({
+  locale: vine.enum(['en', 'fr'] as const),
+})
+
 export const updateOrganizationValidator = vine.create({
   name: vine.string().minLength(1).maxLength(255),
 })

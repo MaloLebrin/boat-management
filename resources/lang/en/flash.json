@@ -62,6 +62,8 @@
   },
   "settings": {
     "profileUpdated": "Profile updated.",
+    "passwordUpdated": "Password changed.",
+    "localeUpdated": "Language updated.",
     "orgUpdated": "Organisation updated.",
     "aiSettingsUpdated": "AI settings updated.",
     "brandingUpdated": "Appearance updated.",

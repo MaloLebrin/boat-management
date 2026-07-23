@@ -35,6 +35,13 @@ export default class DetectUserLocaleMiddleware {
       return urlLocale
     }
 
+    // Persisted profile preference wins over cookie / Accept-Language for
+    // authenticated users (silent auth already ran) — cf. #414 / #403.
+    const userLocale = ctx.auth?.user?.locale
+    if (userLocale === 'en' || userLocale === 'fr') {
+      return userLocale
+    }
+
     const cookieLocale = ctx.request.cookie('locale')
     if (cookieLocale === 'en' || cookieLocale === 'fr') {
       return cookieLocale

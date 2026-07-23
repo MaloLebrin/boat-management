@@ -2124,6 +2124,7 @@ export class UserSchema extends BaseModel {
     'fullName',
     'id',
     'lastLoginAt',
+    'locale',
     'organizationId',
     'password',
     'updatedAt',
@@ -2139,6 +2140,8 @@ export class UserSchema extends BaseModel {
   declare id: number
   @column.dateTime()
   declare lastLoginAt: DateTime | null
+  @column()
+  declare locale: string | null
   @column()
   declare organizationId: number | null
   @column({ serializeAs: null })
