@@ -60,14 +60,16 @@ node ace db:seed --files database/seeders/test_plans_seeder.ts
 
 Seeder de test minimal : une organisation par plan tier, sans toucher aux abonnements ni aux modules. Mot de passe commun `Password1!`.
 
-| Compte                              | Plan                  | Contenu                                                                              |
-| ----------------------------------- | --------------------- | ------------------------------------------------------------------------------------ |
-| `malolebrin@gmail.com` (si présent) | passé en `enterprise` | —                                                                                    |
-| `starter@test.local`                | starter               | 2 bateaux (quota max atteint)                                                        |
-| `pro@test.local`                    | pro                   | 5 bateaux, 2 membres (`pro-alice@test.local` membre, `pro-charlie@test.local` admin) |
-| `enterprise@test.local`             | enterprise            | 8 bateaux, 4 membres                                                                 |
+| Compte                              | Plan                  | Contenu                                                                                                                                                                      |
+| ----------------------------------- | --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `malolebrin@gmail.com` (si présent) | passé en `enterprise` | —                                                                                                                                                                            |
+| `starter@test.local`                | starter               | 2 bateaux (quota max atteint)                                                                                                                                                |
+| `pro@test.local`                    | pro                   | 5 bateaux, 3 membres (`pro-alice@test.local` membre, `pro-charlie@test.local` admin, `pro-mecano@test.local` mécanicien) + 2 interventions ouvertes (1 en retard, 1 à venir) |
+| `enterprise@test.local`             | enterprise            | 8 bateaux, 4 membres                                                                                                                                                         |
 
-À conserver stable : ces comptes sont utilisés ailleurs (tests manuels historiques). Ne pas y ajouter de nouveaux cas — voir `billing_module_states_seeder.ts` pour toute nouvelle matrice.
+`pro-mecano@test.local` (rôle `mechanic`) sert à tester le dashboard dédié « Mes interventions » (#417) : les 2 interventions ouvertes de la Pro org ont un `dueAt` relatif à la date de seed (retard/à venir garantis).
+
+À conserver stable : ces comptes sont utilisés ailleurs (tests manuels historiques). Ne pas y ajouter de nouvelles **matrices plan/abonnement/module** — voir `billing_module_states_seeder.ts` pour toute nouvelle matrice.
 
 ---
 

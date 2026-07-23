@@ -11,6 +11,7 @@ Audit UX du 2026-07-19 : un mécanicien (capabilities limitées à `maintenance.
 - **Contenu** : deux compteurs (interventions en retard / à venir), une alerte si des tâches sont en retard, et deux listes (en retard, à venir) alimentées par `PlanningService.getPlanningForOrg` (`overdueTasks` / `soonTasks`). Aucun lien vers la fiche bateau (le mécanicien n'a pas `boats.view`) : accès rapide au **planning** (`/planning`) et à l'**historique de maintenance** (`/maintenance/history`), tous deux déjà accessibles au mécanicien.
 - **Composants** : `inertia/pages/dashboard/mechanic.vue` + `inertia/components/dashboard/MechanicInterventionRow.vue`.
 - **i18n** : clés `dashboard.mechanic.*` (EN + FR, vouvoiement).
+- **Seeder** : `test_plans_seeder` ajoute `pro-mecano@test.local` (rôle `mechanic`, mot de passe `Password1!`) dans la Pro org + 2 interventions ouvertes (1 en retard, 1 à venir, `dueAt` relatif au seed) pour tester le dashboard.
 - **Tests** : `tests/functional/dashboard/mechanic_dashboard.spec.ts` (le mécanicien reçoit `dashboard/mechanic` avec les tâches réparties en retard/à venir ; admin & member gardent `dashboard`) et `tests/inertia/mechanic_dashboard.spec.ts` (compteurs, listes, états vides, liens planning/historique).
 
 ## 2026-07-23 — Membres et accès : confirmation au changement de rôle + lien « Assigner ses bateaux » (#415)
