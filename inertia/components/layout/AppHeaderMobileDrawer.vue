@@ -121,13 +121,6 @@ watch(
         >
           {{ t('public.nav.guide') }}
         </Link>
-        <Link
-          href="/design-system"
-          class="block rounded-(--radius-control) px-3 py-2.5 text-sm font-medium text-fg-muted transition-colors duration-(--motion-fast) hover:bg-paper hover:text-fg"
-          @click="emit('close')"
-        >
-          Design system
-        </Link>
       </nav>
 
       <!-- Footer -->

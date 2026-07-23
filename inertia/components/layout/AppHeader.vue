@@ -119,12 +119,6 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
         >
           {{ t('public.nav.guide') }}
         </Link>
-        <Link
-          href="/design-system"
-          class="rounded-(--radius-control) px-3 py-2 text-sm font-medium text-fg-muted transition-colors duration-(--motion-fast) ease-premium hover:bg-paper hover:text-fg"
-        >
-          Design system
-        </Link>
       </nav>
 
       <div class="flex items-center gap-2">
