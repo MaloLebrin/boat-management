@@ -218,7 +218,7 @@ const websiteSchema = computed(() =>
   JSON.stringify({
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    'name': 'Fleet AI',
+    'name': 'FleetAi',
     'url': 'https://fleetai.app',
     'description': t.meta.description,
   })

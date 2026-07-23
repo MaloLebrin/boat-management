@@ -85,6 +85,11 @@ Sur tout écran rendu par Inertia (`inertia/pages/**`, `inertia/components/**`),
 
 Références : [Inertia — Link and Form](https://docs.adonisjs.com/guides/frontend/inertia#link-and-form-components), [Manual visits](https://inertiajs.com/manual-visits).
 
+### Branding (graphie canonique)
+
+- **Marque : toujours `FleetAi`** (F et A majuscules, `i` minuscule) — logo, header, footer, titres d'onglet, assistant IA, emails, PDFs, SEO/JSON-LD. Ne jamais écrire `FleetAI`, `Fleet AI` (avec espace) ni `FleetView` (ancienne marque).
+- **Nom du plan « entreprise »** : côté **FR** toujours `Entreprise` (francisé) dans les chaînes d'affichage ; côté **EN** toujours `Enterprise`. Les **noms de clés i18n** et **identifiants de code** (slug `enterprise`, `ModulesRequireEnterprisePlanError`, clés `header_enterprise`, `subtitleEnterprise`…) restent en anglais et ne se renomment pas.
+
 ### Internationalisation
 
 - **Toute chaîne visible par l'utilisateur doit passer par `t()`** — jamais de texte en dur dans les templates
