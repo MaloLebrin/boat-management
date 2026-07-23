@@ -75,10 +75,11 @@ function selectWintering(value: SimulatorWinteringZone) {
           :selected="modelValue.winteringZone === opt.value"
           :selected-class="opt.selectedClass"
           :unselected-class="opt.unselectedClass"
+          :aria-label="t(opt.labelKey)"
           class="flex flex-col items-center gap-2 px-3 py-4"
           @click="selectWintering(opt.value)"
         >
-          <span class="text-2xl leading-none">{{ opt.icon }}</span>
+          <span class="text-2xl leading-none" aria-hidden="true">{{ opt.icon }}</span>
           <span class="text-center text-xs font-semibold leading-tight">{{ t(opt.labelKey) }}</span>
           <span class="text-center text-[10px] leading-tight text-fg-muted">{{
             t(opt.descKey)

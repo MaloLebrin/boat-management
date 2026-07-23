@@ -149,12 +149,26 @@ function shareResults() {
 
 <template>
   <Head :title="t('simulator.meta_title')">
-    <meta name="description" :content="t('simulator.meta_description')" />
-    <meta property="og:title" :content="t('simulator.meta_title')" />
-    <meta property="og:description" :content="t('simulator.meta_description')" />
-    <link rel="canonical" :href="canonicalHref" />
-    <link rel="alternate" hreflang="en" href="/en/maintenance-cost-simulator" />
-    <link rel="alternate" hreflang="fr" href="/fr/simulateur-cout-entretien" />
+    <meta head-key="description" name="description" :content="t('simulator.meta_description')" />
+    <meta head-key="og:title" property="og:title" :content="t('simulator.meta_title')" />
+    <meta
+      head-key="og:description"
+      property="og:description"
+      :content="t('simulator.meta_description')"
+    />
+    <link head-key="canonical" rel="canonical" :href="canonicalHref" />
+    <link
+      head-key="alternate-en"
+      rel="alternate"
+      hreflang="en"
+      href="/en/maintenance-cost-simulator"
+    />
+    <link
+      head-key="alternate-fr"
+      rel="alternate"
+      hreflang="fr"
+      href="/fr/simulateur-cout-entretien"
+    />
   </Head>
 
   <!-- Hero dark -->
@@ -172,18 +186,21 @@ function shareResults() {
         <em class="text-coral-400">{{ t('simulator.hero_title_highlight') }}</em>
       </h1>
       <p class="mt-4 text-base text-white/60 lg:text-lg">{{ t('simulator.hero_subtitle') }}</p>
-      <div class="mt-6 flex flex-wrap justify-center gap-2">
-        <span
-          v-for="n in [1, 2, 3]"
-          :key="n"
-          class="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3.5 py-1.5 text-xs text-white/60"
-        >
+      <p class="mt-7 text-xs font-semibold uppercase tracking-widest text-white/40">
+        {{ t('simulator.how_eyebrow') }}
+      </p>
+      <div
+        class="mt-3 flex flex-wrap items-center justify-center gap-x-2 gap-y-2"
+        :aria-label="t('simulator.how_eyebrow')"
+      >
+        <template v-for="(n, idx) in [1, 2, 3]" :key="n">
           <span
-            class="flex h-4 w-4 items-center justify-center rounded-full bg-coral-500/30 text-[9px] font-bold text-coral-300"
-            >{{ n }}</span
+            class="rounded-full border border-white/10 bg-white/5 px-3.5 py-1.5 text-xs font-medium text-white/70"
           >
-          {{ t(`simulator.how_step_${n}_title`) }}
-        </span>
+            {{ t(`simulator.how_step_${n}_title`) }}
+          </span>
+          <span v-if="idx < 2" class="text-coral-400/70" aria-hidden="true">→</span>
+        </template>
       </div>
     </div>
   </section>
