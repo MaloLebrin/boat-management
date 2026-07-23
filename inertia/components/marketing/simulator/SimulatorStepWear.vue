@@ -59,6 +59,7 @@ function selectWear(value: SimulatorWearLevel) {
           :selected="modelValue[wearField] === opt.value"
           :selected-class="opt.selectedClass"
           :unselected-class="opt.unselectedClass"
+          :aria-label="`${t(labelKey)} : ${t(opt.labelKey)}`"
           class="w-full px-4 py-3.5 text-left"
           @click="selectWear(opt.value)"
         >

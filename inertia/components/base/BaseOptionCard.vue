@@ -4,6 +4,7 @@ interface Props {
   selectedClass?: string
   unselectedClass?: string
   disabled?: boolean
+  ariaLabel?: string
 }
 
 withDefaults(defineProps<Props>(), {
@@ -25,6 +26,8 @@ defineEmits<{
       selected ? selectedClass : unselectedClass,
     ]"
     :disabled="disabled"
+    :aria-label="ariaLabel"
+    :aria-pressed="selected"
     @click="$emit('click')"
   >
     <slot />

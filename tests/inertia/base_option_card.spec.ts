@@ -66,3 +66,24 @@ test('renders as a button element', () => {
   })
   expect(w.element.tagName).toBe('BUTTON')
 })
+
+test('exposes ariaLabel as the accessible name', () => {
+  const w = mount(BaseOptionCard, {
+    props: { selected: false, ariaLabel: 'Motorboat' },
+    slots: { default: '🚤' },
+  })
+  expect(w.attributes('aria-label')).toBe('Motorboat')
+})
+
+test('reflects selection state via aria-pressed', () => {
+  const selected = mount(BaseOptionCard, {
+    props: { selected: true },
+    slots: { default: 'Test' },
+  })
+  const unselected = mount(BaseOptionCard, {
+    props: { selected: false },
+    slots: { default: 'Test' },
+  })
+  expect(selected.attributes('aria-pressed')).toBe('true')
+  expect(unselected.attributes('aria-pressed')).toBe('false')
+})

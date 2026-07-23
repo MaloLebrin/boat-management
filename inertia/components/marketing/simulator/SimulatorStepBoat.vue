@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useT } from '~/composables/use_t'
 import BaseOptionCard from '~/components/base/BaseOptionCard.vue'
 import type { SimulatorBoatInput, SimulatorBoatType } from '../../../../shared/types/simulator'
@@ -60,8 +60,20 @@ const boatTypeOptions: BoatTypeOption[] = [
 
 const navCategories = ['A', 'B', 'C', 'D'] as const
 
+// Local snapshot so plusieurs champs modifiés dans le même tick (autofill
+// navigateur : lengthM + yearBuilt) fusionnent au lieu de s'écraser — props.modelValue
+// ne se met à jour qu'au tick suivant, la lecture directe perdrait le premier champ.
+const local = ref<Partial<SimulatorBoatInput>>({ ...props.modelValue })
+watch(
+  () => props.modelValue,
+  (value) => {
+    local.value = { ...value }
+  }
+)
+
 function update<K extends keyof SimulatorBoatInput>(key: K, value: SimulatorBoatInput[K]) {
-  emit('update:modelValue', { ...props.modelValue, [key]: value })
+  local.value = { ...local.value, [key]: value }
+  emit('update:modelValue', local.value)
 }
 
 function navCategoryDesc(cat: string): string {
@@ -103,10 +115,11 @@ const canProceed = computed(() => {
           :selected="modelValue.boatType === opt.value"
           :selected-class="opt.selected"
           :unselected-class="opt.unselected"
+          :aria-label="t(opt.labelKey)"
           class="flex flex-col items-center gap-2 px-3 py-4 text-xs font-semibold"
           @click="update('boatType', opt.value)"
         >
-          <span class="text-2xl leading-none">{{ opt.icon }}</span>
+          <span class="text-2xl leading-none" aria-hidden="true">{{ opt.icon }}</span>
           <span class="text-center leading-tight">{{ t(opt.labelKey) }}</span>
         </BaseOptionCard>
       </div>
@@ -157,6 +170,7 @@ const canProceed = computed(() => {
           :selected="modelValue.navigationCategory === cat"
           selected-class="border-navy-500 bg-navy-50"
           unselected-class="border-bone bg-white hover:border-navy-200 hover:bg-navy-50"
+          :aria-label="t(`simulator.nav_category_${cat.toLowerCase()}`)"
           class="p-3 text-left"
           @click="update('navigationCategory', cat)"
         >
