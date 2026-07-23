@@ -33,7 +33,7 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
       <!-- Top-right helper -->
       <div class="flex items-center justify-end gap-3.5 px-8 py-6">
         <span class="text-xs text-fg-muted">{{ t('auth.login.needHelp') }}</span>
-        <BaseButton href="mailto:support@fleetai.io" variant="secondary" size="sm">
+        <BaseButton href="mailto:support@fleetai.app" variant="secondary" size="sm">
           {{ t('auth.login.contactSupport') }}
         </BaseButton>
       </div>

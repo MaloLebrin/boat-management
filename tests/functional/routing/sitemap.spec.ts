@@ -25,11 +25,13 @@ test.group('Sitemap (functional)', () => {
       'https://fleetai.app/fr/contact',
       'https://fleetai.app/en/privacy',
       'https://fleetai.app/fr/confidentialite',
-      'https://fleetai.app/design-system',
     ]
     for (const url of expectedUrls) {
       assert.include(xml, `<loc>${url}</loc>`)
     }
+
+    // /design-system est une page interne : jamais exposée au SEO.
+    assert.notInclude(xml, '/design-system')
 
     // Annotations hreflang (indexation multilingue) + x-default.
     assert.include(xml, 'xmlns:xhtml="http://www.w3.org/1999/xhtml"')

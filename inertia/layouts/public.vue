@@ -90,7 +90,6 @@ const contactHref = computed(() => (locale.value === 'fr' ? '/fr/contact' : '/en
             <Link :href="privacyHref" class="transition-colors hover:text-fg">{{
               t('public.footer.privacy')
             }}</Link>
-            <a class="transition-colors hover:text-fg" href="#">{{ t('public.footer.terms') }}</a>
           </div>
         </div>
       </div>

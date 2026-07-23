@@ -43,10 +43,12 @@ const LOCALIZED_PAGES = [
   { en: '/en/privacy', fr: '/fr/confidentialite', priority: '0.3', changefreq: 'yearly' },
 ] as const
 
-/** Pages servies sur une URL unique (pas d'alternate hreflang). */
-const STANDALONE_PAGES = [
-  { loc: '/design-system', priority: '0.5', changefreq: 'monthly' },
-] as const
+/**
+ * Pages servies sur une URL unique (pas d'alternate hreflang).
+ * `/design-system` est volontairement exclu : page interne accessible par URL
+ * directe uniquement, jamais exposée au SEO ni à la nav publique.
+ */
+const STANDALONE_PAGES: readonly { loc: string; priority: string; changefreq: string }[] = []
 
 router
   .get('/sitemap.xml', ({ response }) => {
