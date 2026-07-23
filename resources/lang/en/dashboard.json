@@ -68,5 +68,24 @@
     "freeSpots": "{free, plural, one {# free} other {# free}} / {total}",
     "fillRate": "Fill: {rate}%",
     "noSpots": "No spots"
+  },
+  "mechanic": {
+    "title": "My interventions",
+    "subtitle": "Your overdue and upcoming maintenance tasks across the organization.",
+    "viewPlanning": "View planning",
+    "viewHistory": "Maintenance history",
+    "overdueAlert": "{count, plural, one {# overdue intervention} other {# overdue interventions}}",
+    "stats": {
+      "overdue": "Overdue",
+      "upcoming": "Upcoming"
+    },
+    "overdueTitle": "Overdue",
+    "overdueEmpty": "No overdue interventions.",
+    "upcomingTitle": "Upcoming",
+    "upcomingEmpty": "No upcoming interventions.",
+    "overdue": "Overdue",
+    "dueSoon": "Due soon",
+    "dueAt": "Due on {date}",
+    "dueAtHours": "Due at {hours}h · current {current}h"
   }
 }

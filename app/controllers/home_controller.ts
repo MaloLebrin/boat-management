@@ -1,5 +1,6 @@
 import AiAnalysisService, { type AiSuggestion } from '#services/ai_analysis_service'
 import DashboardService from '#services/dashboard_service'
+import PlanningService from '#services/planning_service'
 import PortService from '#services/port_service'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
@@ -9,7 +10,8 @@ export default class HomeController {
   constructor(
     private dashboardService: DashboardService,
     private aiService: AiAnalysisService,
-    private portService: PortService
+    private portService: PortService,
+    private planningService: PlanningService
   ) {}
 
   async index({ inertia, auth, response }: HttpContext) {
@@ -25,6 +27,12 @@ export default class HomeController {
       const role = await user.getEffectiveRoleInOrg(user.organizationId)
       if (role === 'boat_owner') {
         return response.redirect('/owner/boats')
+      }
+      // Le mécanicien (capabilities limitées à maintenance.*) n'a pas accès aux
+      // KPIs flotte ni aux CTA hors périmètre : dashboard dédié « mes interventions ».
+      if (role === 'mechanic') {
+        const { overdueTasks, soonTasks } = await this.planningService.getPlanningForOrg(user)
+        return inertia.render('dashboard/mechanic', { overdueTasks, soonTasks })
       }
     }
 

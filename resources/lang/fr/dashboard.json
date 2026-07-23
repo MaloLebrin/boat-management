@@ -68,5 +68,24 @@
     "freeSpots": "{free, plural, one {# libre} other {# libres}} / {total}",
     "fillRate": "Taux : {rate}%",
     "noSpots": "Aucune place"
+  },
+  "mechanic": {
+    "title": "Mes interventions",
+    "subtitle": "Vos tâches de maintenance en retard et à venir sur l'organisation.",
+    "viewPlanning": "Voir le planning",
+    "viewHistory": "Historique de maintenance",
+    "overdueAlert": "{count, plural, one {# intervention en retard} other {# interventions en retard}}",
+    "stats": {
+      "overdue": "En retard",
+      "upcoming": "À venir"
+    },
+    "overdueTitle": "En retard",
+    "overdueEmpty": "Aucune intervention en retard.",
+    "upcomingTitle": "À venir",
+    "upcomingEmpty": "Aucune intervention à venir.",
+    "overdue": "En retard",
+    "dueSoon": "Bientôt dû",
+    "dueAt": "Dû le {date}",
+    "dueAtHours": "Dû à {hours}h · actuel {current}h"
   }
 }
