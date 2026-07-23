@@ -57,6 +57,7 @@ export default class OrganizationMembersController {
     } catch (error) {
       if (error instanceof QuotaExceededError) {
         session.flash('error', i18n.t('flash.quota.membersExceeded'))
+        session.flash('errorAction', '/settings/billing')
         return response.redirect().back()
       }
       if (error instanceof UserNotFoundError) {
