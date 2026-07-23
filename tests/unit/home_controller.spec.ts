@@ -19,6 +19,9 @@ test.group('HomeController (unit)', () => {
         getPlanningForOrg: async () => {
           throw new Error('should not be called')
         },
+      } as any,
+      {
+        getBoatUsage: async () => ({ used: 0, limit: 2 }),
       } as any
     )
 
@@ -59,6 +62,9 @@ test.group('HomeController (unit)', () => {
         getPlanningForOrg: async () => {
           throw new Error('should not be called')
         },
+      } as any,
+      {
+        getBoatUsage: async () => ({ used: 1, limit: 2 }),
       } as any
     )
 
@@ -77,6 +83,8 @@ test.group('HomeController (unit)', () => {
         getUserOrFail: () => ({
           id: 1,
           organizationId: 42,
+          organization: { id: 42, plan: 'starter' },
+          load: async () => {},
           hasPermission: async () => true,
           getEffectiveRoleInOrg: async () => 'member',
         }),
@@ -84,6 +92,8 @@ test.group('HomeController (unit)', () => {
     } as any)
 
     assert.equal(rendered[0]!.component, 'dashboard')
+    assert.equal(rendered[0]!.props.canAddBoat, true)
+    assert.deepEqual(rendered[0]!.props.boatQuota, { used: 1, limit: 2 })
   })
 
   test('renders the dedicated mechanic dashboard for a mechanic', async ({ assert }) => {
@@ -104,6 +114,11 @@ test.group('HomeController (unit)', () => {
           overdueTasks: [{ id: 1 }],
           soonTasks: [{ id: 2 }],
         }),
+      } as any,
+      {
+        getBoatUsage: async () => {
+          throw new Error('should not be called')
+        },
       } as any
     )
 

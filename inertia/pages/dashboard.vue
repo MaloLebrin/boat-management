@@ -8,6 +8,7 @@ import BaseSkeleton from '~/components/base/BaseSkeleton.vue'
 import BaseStatCard from '~/components/base/BaseStatCard.vue'
 import PortDashboardCard from '~/components/dashboard/PortDashboardCard.vue'
 import UpgradePlanModal from '~/components/base/UpgradePlanModal.vue'
+import NewBoatButton from '~/components/boats/NewBoatButton.vue'
 import DashboardQuickAddActions from '~/components/dashboard/DashboardQuickAddActions.vue'
 import type {
   DashboardBoatSummary,
@@ -22,7 +23,7 @@ import { propulsionLabel } from '~/utils/boat_propulsion_label'
 import { maintenanceSubjectLabel } from '~/utils/boat_enum_labels'
 import type { AiSuggestion, NavigationLogPortOption } from '~/types/boat_show'
 import { PLAN_LIMITS } from '../../shared/types/plan'
-import type { PlanTier } from '../../shared/types/plan'
+import type { PlanTier, QuotaUsage } from '../../shared/types/plan'
 
 const { t } = useT()
 const { formatDate } = useDateFormat()
@@ -72,6 +73,8 @@ const props = defineProps<{
   portOptions: NavigationLogPortOption[]
   canCreateNavigationLogs: boolean
   canCreateIncidents: boolean
+  canAddBoat: boolean
+  boatQuota: QuotaUsage['boats']
 }>()
 
 const canUseAI = computed(() => {
@@ -145,12 +148,8 @@ function dismissAlert() {
           :can-create-navigation-logs="canCreateNavigationLogs"
           :can-create-incidents="canCreateIncidents"
         />
-        <a href="/boats">
-          <BaseButton variant="secondary">{{ t('nav.boats') }}</BaseButton>
-        </a>
-        <a href="/boats/new">
-          <BaseButton variant="primary">{{ t('dashboard.newBoat') }}</BaseButton>
-        </a>
+        <BaseButton variant="secondary" route="/boats">{{ t('nav.boats') }}</BaseButton>
+        <NewBoatButton :can-add-boat="canAddBoat" :quota="boatQuota" />
       </div>
     </div>
 

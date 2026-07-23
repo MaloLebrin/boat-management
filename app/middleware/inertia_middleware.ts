@@ -64,6 +64,8 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
     const { session, auth, i18n } = ctx as Partial<HttpContext>
 
     const error = session?.flashMessages.get('error') as string
+    // Cible facultative d'un CTA sur le toast d'erreur (upsell quota, issue #418).
+    const errorAction = session?.flashMessages.get('errorAction') as string | undefined
     const success = session?.flashMessages.get('success') as string
     const info = session?.flashMessages.get('info') as string
 
@@ -104,6 +106,7 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
       path: ctx.inertia.always(ctx.request.url().split('?')[0]),
       flash: ctx.inertia.always({
         error,
+        errorAction,
         success,
         info,
       }),
