@@ -7,11 +7,19 @@ const AuditLogsController = () => import('#controllers/audit_logs_controller')
 const CsvImportController = () => import('#controllers/csv_import_controller')
 
 router
-  .post('/locale', ({ request, response }) => {
+  .post('/locale', async ({ request, response, auth }) => {
     const locale = request.input('locale')
     if (locale === 'en' || locale === 'fr') {
       // httpOnly: false is intentional — the JS language switcher reads this cookie client-side
       response.cookie('locale', locale, { maxAge: '365d', path: '/', httpOnly: false })
+
+      // Persist the preference on the profile for authenticated users so it
+      // survives logout (cf. #414 / #403). The cookie alone is lost once a
+      // fresh browser session starts.
+      if (await auth.check()) {
+        auth.user!.locale = locale
+        await auth.user!.save()
+      }
     }
     return response.redirect().back()
   })
@@ -51,6 +59,10 @@ router
     router
       .put('settings/profile', [SettingsController, 'updateProfile'])
       .as('settings.profile.update')
+    router
+      .put('settings/password', [SettingsController, 'changePassword'])
+      .as('settings.password.update')
+    router.put('settings/locale', [SettingsController, 'updateLocale']).as('settings.locale.update')
     router.put('settings/org', [SettingsController, 'updateOrganization']).as('settings.org.update')
     router.get('settings/ai', [SettingsController, 'ai']).as('settings.ai')
     router.put('settings/ai', [SettingsController, 'updateAiSettings']).as('settings.ai.update')

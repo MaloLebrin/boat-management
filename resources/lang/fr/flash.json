@@ -62,6 +62,8 @@
   },
   "settings": {
     "profileUpdated": "Profil mis à jour.",
+    "passwordUpdated": "Mot de passe modifié.",
+    "localeUpdated": "Langue mise à jour.",
     "orgUpdated": "Organisation mise à jour.",
     "aiSettingsUpdated": "Paramètres IA mis à jour.",
     "brandingUpdated": "Apparence mise à jour.",

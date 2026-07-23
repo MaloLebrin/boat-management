@@ -162,6 +162,23 @@
     "emailHint": "L'adresse email ne peut pas être modifiée.",
     "save": "Enregistrer les modifications"
   },
+  "security": {
+    "title": "Sécurité",
+    "subtitle": "Modifiez votre mot de passe sans quitter l'application.",
+    "currentPasswordLabel": "Mot de passe actuel",
+    "newPasswordLabel": "Nouveau mot de passe",
+    "newPasswordHint": "Entre 8 et 32 caractères.",
+    "confirmPasswordLabel": "Confirmez le nouveau mot de passe",
+    "save": "Modifier le mot de passe"
+  },
+  "language": {
+    "title": "Langue",
+    "subtitle": "Choisissez la langue de votre interface. Cette préférence est enregistrée sur votre profil.",
+    "label": "Langue de l'interface",
+    "english": "English",
+    "french": "Français",
+    "save": "Enregistrer la langue"
+  },
   "ai": {
     "title": "Personnalisation IA",
     "description": "Définissez un contexte métier qui sera injecté dans chaque échange IA de votre organisation.",

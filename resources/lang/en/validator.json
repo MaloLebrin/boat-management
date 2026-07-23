@@ -15,5 +15,8 @@
     "date.afterOrSameAs": "The {field} must be a date after or on the same day as {otherField}.",
     "positive": "The {field} must be a positive number.",
     "withoutDecimals": "The {field} must be a whole number."
+  },
+  "settings": {
+    "wrongCurrentPassword": "The current password is incorrect."
   }
 }

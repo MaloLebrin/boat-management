@@ -8,12 +8,15 @@ import BoatListService from '#services/boat_list_service'
 import { BrandingService } from '#services/branding_service'
 import OrganizationPolicy from '#policies/organization_policy'
 import {
+  changePasswordValidator,
   updateAiSettingsValidator,
+  updateLocaleValidator,
   updateOrganizationValidator,
   updateProfileValidator,
 } from '#validators/user'
 import { updateBrandingValidator, uploadLogoValidator } from '#validators/branding'
 import { inject } from '@adonisjs/core'
+import hash from '@adonisjs/core/services/hash'
 import type { HttpContext } from '@adonisjs/core/http'
 import { PLAN_LIMITS } from '#shared/types/plan'
 
@@ -116,6 +119,41 @@ export default class SettingsController {
     await user.save()
 
     session.flash('success', i18n.t('flash.settings.profileUpdated'))
+    return response.redirect().back()
+  }
+
+  async changePassword({ request, response, session, auth, i18n }: HttpContext) {
+    const user = await auth.authenticate()
+    const { currentPassword, password } = await request.validateUsing(changePasswordValidator)
+
+    const isValid = await hash.verify(user.password, currentPassword)
+    if (!isValid) {
+      session.flashAll()
+      session.flash('inputErrorsBag', {
+        currentPassword: [i18n.t('validator.settings.wrongCurrentPassword')],
+      })
+      return response.redirect().back()
+    }
+
+    user.password = password
+    await user.save()
+
+    session.flash('success', i18n.t('flash.settings.passwordUpdated'))
+    return response.redirect().back()
+  }
+
+  async updateLocale({ request, response, session, auth, i18n }: HttpContext) {
+    const user = await auth.authenticate()
+    const { locale } = await request.validateUsing(updateLocaleValidator)
+
+    user.locale = locale
+    await user.save()
+
+    // Keep the cookie in sync so pre-auth pages (login, marketing) match the
+    // persisted preference right away — cf. #403.
+    response.cookie('locale', locale, { maxAge: '365d', path: '/', httpOnly: false })
+
+    session.flash('success', i18n.t('flash.settings.localeUpdated'))
     return response.redirect().back()
   }
 

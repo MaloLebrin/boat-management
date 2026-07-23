@@ -15,5 +15,8 @@
     "date.afterOrSameAs": "Le champ {field} doit être une date postérieure ou égale à {otherField}.",
     "positive": "Le champ {field} doit être un nombre positif.",
     "withoutDecimals": "Le champ {field} doit être un nombre entier."
+  },
+  "settings": {
+    "wrongCurrentPassword": "Le mot de passe actuel est incorrect."
   }
 }

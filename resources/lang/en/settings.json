@@ -162,6 +162,23 @@
     "emailHint": "Email address cannot be changed.",
     "save": "Save changes"
   },
+  "security": {
+    "title": "Security",
+    "subtitle": "Change your password without leaving the app.",
+    "currentPasswordLabel": "Current password",
+    "newPasswordLabel": "New password",
+    "newPasswordHint": "Between 8 and 32 characters.",
+    "confirmPasswordLabel": "Confirm new password",
+    "save": "Change password"
+  },
+  "language": {
+    "title": "Language",
+    "subtitle": "Choose the language of your interface. This preference is saved to your profile.",
+    "label": "Interface language",
+    "english": "English",
+    "french": "Français",
+    "save": "Save language"
+  },
   "ai": {
     "title": "AI customisation",
     "description": "Define a business context that will be injected into every AI exchange for your organisation.",
