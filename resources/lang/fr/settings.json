@@ -52,7 +52,16 @@
     "remove": "Supprimer",
     "cancelInvitation": "Annuler",
     "pendingInvitations": "Invitations en attente",
-    "activeMembers": "Membres actifs"
+    "activeMembers": "Membres actifs",
+    "roleConfirm": {
+      "title": "Changer le rôle",
+      "summary": "{name} passera du rôle « {from} » au rôle « {to} ».",
+      "impactAdmin": "Ce membre obtiendra un accès administrateur complet : gestion des membres, de la facturation et de tous les bateaux.",
+      "impactBoatOwner": "Ce membre perdra tout accès staff. Il ne verra plus que les bateaux dont il est propriétaire, en lecture seule. Pensez à lui assigner ses bateaux.",
+      "impactStaff": "Les droits d'accès de ce membre seront ajustés en conséquence.",
+      "assignBoats": "Assigner ses bateaux",
+      "confirm": "Confirmer le changement"
+    }
   },
   "billing": {
     "title": "Facturation et plan",

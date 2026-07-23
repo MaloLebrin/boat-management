@@ -52,7 +52,16 @@
     "remove": "Remove",
     "cancelInvitation": "Cancel",
     "pendingInvitations": "Pending invitations",
-    "activeMembers": "Active members"
+    "activeMembers": "Active members",
+    "roleConfirm": {
+      "title": "Change role",
+      "summary": "{name} will move from “{from}” to “{to}”.",
+      "impactAdmin": "This member will gain full admin access: managing members, billing and all boats.",
+      "impactBoatOwner": "This member will lose all staff access. They will only see the boats they own, in read-only mode. Remember to assign their boats.",
+      "impactStaff": "This member's access rights will be adjusted accordingly.",
+      "assignBoats": "Assign their boats",
+      "confirm": "Confirm change"
+    }
   },
   "billing": {
     "title": "Billing & plan",
