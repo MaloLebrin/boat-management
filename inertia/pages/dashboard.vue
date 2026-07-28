@@ -148,7 +148,7 @@ function dismissAlert() {
           :can-create-navigation-logs="canCreateNavigationLogs"
           :can-create-incidents="canCreateIncidents"
         />
-        <BaseButton variant="secondary" route="/boats">{{ t('nav.boats') }}</BaseButton>
+        <BaseButton variant="secondary" route="boats.index">{{ t('nav.boats') }}</BaseButton>
         <NewBoatButton :can-add-boat="canAddBoat" :quota="boatQuota" />
       </div>
     </div>
