@@ -67,6 +67,7 @@ export default class OrganizationInvitationsController {
       }
       if (error instanceof QuotaExceededError) {
         session.flash('error', i18n.t(`flash.quota.${error.feature}Exceeded`))
+        session.flash('errorAction', '/settings/billing')
         return response.redirect().back()
       }
       if (error instanceof BoatOwnerInvitationRequiresBoatsError) {

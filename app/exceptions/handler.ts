@@ -44,6 +44,9 @@ export default class HttpExceptionHandler extends ExceptionHandler {
           ? 'flash.quota.storageOverflow'
           : `flash.quota.${error.feature}Exceeded`
       ctx.session.flash('error', ctx.i18n.t(key))
+      // Upsell (issue #418) : le toast d'erreur quota expose une action « Voir les
+      // offres » vers /settings/billing plutôt qu'un simple message éphémère.
+      ctx.session.flash('errorAction', '/settings/billing')
       return ctx.response.redirect().back()
     }
     // Utilisateur authentifié sans organisation sur une route gatée (#279) :

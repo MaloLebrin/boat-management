@@ -70,15 +70,20 @@ export default class BoatsController {
 
     await bouncer.with(BoatPolicy).authorize('view')
 
-    const [{ boats, filters }, canAddBoat] = await Promise.all([
+    const [{ boats, filters }, boatQuota] = await Promise.all([
       this.boatListService.listForUser(user, request.qs()),
-      user.organization ? this.quotaService.canAddBoat(user.organization) : Promise.resolve(false),
+      user.organization
+        ? this.quotaService.getBoatUsage(user.organization)
+        : Promise.resolve({ used: 0, limit: 0 }),
     ])
+
+    const canAddBoat = boatQuota.limit === null || boatQuota.used < boatQuota.limit
 
     return inertia.render('boats/index', {
       boats,
       filters,
       canAddBoat,
+      boatQuota,
     })
   }
 
@@ -90,6 +95,7 @@ export default class BoatsController {
 
     if (!user.organization || !(await this.quotaService.canAddBoat(user.organization))) {
       session.flash('error', i18n.t('flash.quota.boatsExceeded'))
+      session.flash('errorAction', '/settings/billing')
       return response.redirect('/boats')
     }
 
@@ -111,6 +117,7 @@ export default class BoatsController {
     } catch (error) {
       if (error instanceof QuotaExceededError) {
         session.flash('error', i18n.t(`flash.quota.${error.feature}Exceeded`))
+        session.flash('errorAction', '/settings/billing')
         return response.redirect().back()
       }
       throw error

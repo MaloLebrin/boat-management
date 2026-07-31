@@ -2,15 +2,16 @@
 import { Head, router, usePage } from '@inertiajs/vue3'
 import { useLocalStorage } from '@vueuse/core'
 import { computed, ref } from 'vue'
-import BaseButton from '~/components/base/BaseButton.vue'
 import BaseEmptyState from '~/components/base/BaseEmptyState.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import BoatCards from '~/components/boats/list/BoatCards.vue'
 import BoatListToolbar from '~/components/boats/list/BoatListToolbar.vue'
 import BoatPagination from '~/components/boats/list/BoatPagination.vue'
 import BoatTable from '~/components/boats/list/BoatTable.vue'
+import NewBoatButton from '~/components/boats/NewBoatButton.vue'
 import UpgradePlanModal from '~/components/base/UpgradePlanModal.vue'
 import type { BoatListFilters, BoatsPaginated } from '~/components/boats/list/types'
+import type { QuotaUsage } from '../../../shared/types/plan'
 import { useT } from '~/composables/use_t'
 import { propulsionLabel } from '~/utils/boat_propulsion_label'
 
@@ -20,6 +21,7 @@ const props = defineProps<{
   boats: BoatsPaginated
   filters: BoatListFilters
   canAddBoat: boolean
+  boatQuota: QuotaUsage['boats']
 }>()
 
 const showUpgradeModal = ref(false)
@@ -94,9 +96,7 @@ function reset() {
         <BaseHeading level="1">{{ t('boats.index.title') }}</BaseHeading>
         <p class="mt-2 text-base text-fg-muted">{{ t('boats.index.subtitle') }}</p>
       </div>
-      <BaseButton variant="primary" @click="handleNewBoat">
-        {{ t('boats.index.newBoat') }}
-      </BaseButton>
+      <NewBoatButton :can-add-boat="canAddBoat" :quota="boatQuota" />
     </div>
 
     <BoatListToolbar

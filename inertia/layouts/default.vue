@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Data } from '@generated/data'
-import { usePage } from '@inertiajs/vue3'
+import { router, usePage } from '@inertiajs/vue3'
 import { onBeforeUnmount, ref, watch } from 'vue'
 import { Toaster, toast } from 'vue-sonner'
 import brandIconUrl from '~/assets/brand/fleetai_compass.svg'
@@ -53,7 +53,20 @@ watch(
   () => page.props.flash,
   (flashMessages) => {
     if (flashMessages.error) {
-      toast.error(flashMessages.error)
+      // Upsell quota (issue #418) : le toast d'erreur porte une action « Voir les
+      // offres » vers la page de facturation quand le backend l'a renseignée.
+      const errorAction = flashMessages.errorAction
+      toast.error(
+        flashMessages.error,
+        errorAction
+          ? {
+              action: {
+                label: t('common.viewPlans'),
+                onClick: () => router.visit(errorAction),
+              },
+            }
+          : undefined
+      )
     }
     if (flashMessages.success) {
       toast.success(flashMessages.success)

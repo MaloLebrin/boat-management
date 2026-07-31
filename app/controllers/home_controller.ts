@@ -2,6 +2,7 @@ import AiAnalysisService, { type AiSuggestion } from '#services/ai_analysis_serv
 import DashboardService from '#services/dashboard_service'
 import PlanningService from '#services/planning_service'
 import PortService from '#services/port_service'
+import QuotaService from '#services/quota_service'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 
@@ -11,7 +12,8 @@ export default class HomeController {
     private dashboardService: DashboardService,
     private aiService: AiAnalysisService,
     private portService: PortService,
-    private planningService: PlanningService
+    private planningService: PlanningService,
+    private quotaService: QuotaService
   ) {}
 
   async index({ inertia, auth, response }: HttpContext) {
@@ -53,12 +55,23 @@ export default class HomeController {
       ? await user.hasPermission(user.organizationId, 'incidents.create')
       : false
 
+    // Quota bateaux pour l'upsell du bouton « Nouveau bateau » (issue #418). La
+    // relation `organization` n'est pas chargée à ce stade (le middleware Inertia
+    // ne la charge qu'au rendu partagé) : on la charge explicitement.
+    if (user.organizationId) await user.load('organization')
+    const boatQuota = user.organization
+      ? await this.quotaService.getBoatUsage(user.organization)
+      : { used: 0, limit: 0 }
+    const canAddBoat = boatQuota.limit === null || boatQuota.used < boatQuota.limit
+
     return inertia.render('dashboard', {
       ...data,
       aiFleetAnalysis,
       portOptions,
       canCreateNavigationLogs,
       canCreateIncidents,
+      canAddBoat,
+      boatQuota,
     })
   }
 }

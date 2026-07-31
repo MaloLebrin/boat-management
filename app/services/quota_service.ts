@@ -4,7 +4,7 @@ import Boat from '#models/boat'
 import Organization from '#models/organization'
 import OrganizationMembership from '#models/organization_membership'
 import OrganizationModuleService from '#services/organization_module_service'
-import { PLAN_LIMITS, getUpgradeTier } from '#shared/types/plan'
+import { PLAN_LIMITS, getUpgradeTier, type QuotaUsage } from '#shared/types/plan'
 import { inject } from '@adonisjs/core'
 import StorageThresholdCrossed from '#events/storage_threshold_crossed'
 import db from '@adonisjs/lucid/services/db'
@@ -38,6 +38,18 @@ export default class QuotaService {
       .where('organizationId', org.id)
       .count('* as total')
     return Number(rows[0].$extras.total)
+  }
+
+  /**
+   * Usage bateaux effectif (compteur + plafond) pour l'upsell côté UI (issue #418) :
+   * le badge « 2/2 » et le bouton désactivé au quota ont besoin du couple used/limit,
+   * pas seulement du booléen `canAddBoat`. `limit === null` = plan Enterprise (illimité).
+   */
+  async getBoatUsage(org: Organization | null): Promise<QuotaUsage['boats']> {
+    this.#assertOrganization(org)
+    const { maxBoats } = await this.organizationModuleService.getEffectiveQuotas(org)
+    const used = await this.countBoats(org)
+    return { used, limit: maxBoats }
   }
 
   async canAddBoat(org: Organization | null): Promise<boolean> {
