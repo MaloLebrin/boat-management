@@ -5,7 +5,7 @@ import BaseAlert from '~/components/base/BaseAlert.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseSkeleton from '~/components/base/BaseSkeleton.vue'
-import BaseStatCard from '~/components/base/BaseStatCard.vue'
+import DashboardStatsGrid from '~/components/dashboard/DashboardStatsGrid.vue'
 import PortDashboardCard from '~/components/dashboard/PortDashboardCard.vue'
 import UpgradePlanModal from '~/components/base/UpgradePlanModal.vue'
 import NewBoatButton from '~/components/boats/NewBoatButton.vue'
@@ -28,40 +28,6 @@ import type { PlanTier, QuotaUsage } from '../../shared/types/plan'
 const { t } = useT()
 const { formatDate } = useDateFormat()
 const page = usePage()
-
-type StatTone = 'neutral' | 'empty'
-
-const statTones = computed<Record<'engines' | 'sails' | 'rigs', StatTone>>(() => ({
-  engines: props.stats.engines > 0 ? 'neutral' : 'empty',
-  sails: props.stats.sails > 0 ? 'neutral' : 'empty',
-  rigs: props.stats.rigs > 0 ? 'neutral' : 'empty',
-}))
-
-const statDeltas = computed(() => {
-  const d = props.stats.deltas
-  return {
-    boats:
-      d.boatsInAlert > 0
-        ? t('dashboard.stats.delta.boatsInAlert', { count: String(d.boatsInAlert) })
-        : t('dashboard.stats.delta.boatsOk'),
-    engines:
-      d.boatsWithEngine > 0
-        ? t('dashboard.stats.delta.boatsWithEngine', { count: String(d.boatsWithEngine) })
-        : t('dashboard.stats.delta.boatsAllMotorless'),
-    sails:
-      d.boatsWithSail > 0
-        ? t('dashboard.stats.delta.boatsWithSail', { count: String(d.boatsWithSail) })
-        : t('dashboard.stats.delta.boatsAllSailless'),
-    rigs:
-      d.boatsWithRig > 0
-        ? t('dashboard.stats.delta.boatsWithRig', { count: String(d.boatsWithRig) })
-        : t('dashboard.stats.delta.noRig'),
-    urgentMaintenance:
-      d.overdueCount > 0
-        ? t('dashboard.stats.delta.overdue', { count: String(d.overdueCount) })
-        : t('dashboard.stats.delta.noOverdue'),
-  }
-})
 
 const props = defineProps<{
   boats: DashboardBoatSummary[]
@@ -148,124 +114,17 @@ function dismissAlert() {
           :can-create-navigation-logs="canCreateNavigationLogs"
           :can-create-incidents="canCreateIncidents"
         />
-        <BaseButton variant="secondary" route="boats.index">{{ t('nav.boats') }}</BaseButton>
+        <!-- Navigation (pas une action) : rendu « lien » ghost pour se distinguer
+             des chips d'action « + Entrée journal » / « + Incident » (#419). -->
+        <BaseButton variant="ghost" route="boats.index">
+          <span>{{ t('nav.boats') }}</span>
+          <span aria-hidden="true">&rarr;</span>
+        </BaseButton>
         <NewBoatButton :can-add-boat="canAddBoat" :quota="boatQuota" />
       </div>
     </div>
 
-    <div class="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
-      <BaseStatCard
-        :label="t('dashboard.stats.boats')"
-        :value="String(stats.boats)"
-        :delta="statDeltas.boats"
-        tone="info"
-        href="/boats"
-        :style="{
-          animation: 'fadeUp var(--motion-normal) var(--ease-premium) both',
-          animationDelay: '0ms',
-        }"
-      >
-        <template #icon>
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M3 17l2-7h14l2 7H3zm9-7V4m0 0L6 9m6-5l6 5M3 17a9 9 0 0018 0"
-            />
-          </svg>
-        </template>
-      </BaseStatCard>
-      <BaseStatCard
-        :label="t('dashboard.stats.engines')"
-        :value="String(stats.engines)"
-        :delta="statDeltas.engines"
-        :tone="statTones.engines"
-        href="/boats?hasEngine=true"
-        :style="{
-          animation: 'fadeUp var(--motion-normal) var(--ease-premium) both',
-          animationDelay: '60ms',
-        }"
-      >
-        <template #icon>
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="3" />
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"
-            />
-          </svg>
-        </template>
-      </BaseStatCard>
-      <BaseStatCard
-        :label="t('dashboard.stats.sails')"
-        :value="String(stats.sails)"
-        :delta="statDeltas.sails"
-        :tone="statTones.sails"
-        href="/boats?hasSails=true"
-        :style="{
-          animation: 'fadeUp var(--motion-normal) var(--ease-premium) both',
-          animationDelay: '120ms',
-        }"
-      >
-        <template #icon>
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 3L4 19h8V3zm0 16h8M12 3c2 4 5 9 7 16"
-            />
-          </svg>
-        </template>
-      </BaseStatCard>
-      <BaseStatCard
-        :label="t('dashboard.stats.rigs')"
-        :value="String(stats.rigs)"
-        :delta="statDeltas.rigs"
-        :tone="statTones.rigs"
-        href="/boats?hasRig=true"
-        :style="{
-          animation: 'fadeUp var(--motion-normal) var(--ease-premium) both',
-          animationDelay: '180ms',
-        }"
-      >
-        <template #icon>
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 2v20M6 6l6-4 6 4M8 12h8"
-            />
-          </svg>
-        </template>
-      </BaseStatCard>
-      <BaseStatCard
-        :label="t('dashboard.stats.urgentMaintenance')"
-        :value="String(stats.urgentMaintenance)"
-        :delta="statDeltas.urgentMaintenance"
-        :tone="stats.urgentMaintenance ? 'warning' : 'success'"
-        href="/planning"
-        :style="{
-          animation: 'fadeUp var(--motion-normal) var(--ease-premium) both',
-          animationDelay: '240ms',
-        }"
-      >
-        <template #icon>
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"
-            />
-          </svg>
-        </template>
-      </BaseStatCard>
-    </div>
+    <DashboardStatsGrid class="mt-8" :stats="stats" />
 
     <div class="mt-8">
       <PortDashboardCard :ports="ports" :port-stats="portStats" />

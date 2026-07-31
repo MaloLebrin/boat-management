@@ -22,6 +22,11 @@
     "sails": "Voiles",
     "rigs": "Gréements",
     "urgentMaintenance": "Maintenance urgente",
+    "equipmentEmpty": {
+      "title": "Équipements",
+      "description": "Aucun moteur, voile ou gréement saisi pour votre flotte pour l'instant.",
+      "cta": "Saisir vos équipements"
+    },
     "delta": {
       "boatsInAlert": "dont {count} en alerte",
       "boatsOk": "Flotte à jour",

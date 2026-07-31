@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Form } from '@adonisjs/inertia/vue'
+import { Form, Link } from '@adonisjs/inertia/vue'
 import { Head, router } from '@inertiajs/vue3'
 import BoatFormHullFields from '~/components/boats/hull/BoatFormHullFields.vue'
 import BoatOwnersManager from '~/components/boats/BoatOwnersManager.vue'
@@ -73,12 +73,12 @@ function executeDeleteBoat() {
             <BaseButton type="submit" :disabled="processing">{{
               t('boats.edit.submit')
             }}</BaseButton>
-            <a
+            <Link
               :href="`/boats/${boat.id}`"
               class="text-sm font-semibold text-fg-muted hover:text-fg hover:underline"
             >
               {{ t('boats.edit.cancel') }}
-            </a>
+            </Link>
           </div>
         </div>
       </Form>

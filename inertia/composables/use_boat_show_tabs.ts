@@ -121,11 +121,31 @@ export function useBoatShowTabs(input: {
 
   function getInitialTab(): BoatShowTabKey {
     if (typeof window === 'undefined') return 'overview'
-    const fromUrl = new URLSearchParams(window.location.search).get('tab') as BoatShowTabKey | null
-    return fromUrl && VALID_TABS.value.includes(fromUrl) ? fromUrl : 'overview'
+    const fromUrl = new URLSearchParams(window.location.search).get('tab')
+    if (!fromUrl) return 'overview'
+    if (VALID_TABS.value.includes(fromUrl as BoatShowTabKey)) return fromUrl as BoatShowTabKey
+    // Anciens liens `?tab=<groupe>` (ex: `?tab=maintenance`) : on atterrit sur
+    // le premier onglet feuille du groupe plutôt que de retomber sur Aperçu (#419).
+    const group = groups.value.find((g) => g.key === fromUrl)
+    return group?.tabs[0]?.key ?? 'overview'
   }
 
   const tab = ref<BoatShowTabKey>(getInitialTab())
+
+  // Si le `?tab=` initial n'était pas un onglet feuille (clé de groupe, valeur
+  // inconnue), on normalise l'URL vers l'onglet réellement affiché (#419).
+  if (typeof window !== 'undefined') {
+    const rawParam = new URLSearchParams(window.location.search).get('tab')
+    if (rawParam !== null && rawParam !== tab.value) {
+      const url = new URL(window.location.href)
+      if (tab.value === 'overview') {
+        url.searchParams.delete('tab')
+      } else {
+        url.searchParams.set('tab', tab.value)
+      }
+      window.history.replaceState(window.history.state, '', url.pathname + url.search)
+    }
+  }
 
   // Mémorise le dernier sous-onglet visité par groupe, pour y revenir en
   // cliquant à nouveau sur le groupe dans la barre principale.
