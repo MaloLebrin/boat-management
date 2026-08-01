@@ -137,4 +137,38 @@ describe('useBoatShowTabs — grouping (#365)', () => {
     const { tab } = mountComposable({})
     expect(tab.value).toBe('overview')
   })
+
+  test('an unknown ?tab= value is removed from the URL (#419)', () => {
+    window.history.replaceState({}, '', '/boats/13?tab=not-a-real-tab')
+    mountComposable({})
+    expect(window.location.search).toBe('')
+  })
+
+  test('?tab=maintenance (group key) lands on the first maintenance leaf tab (#419)', () => {
+    window.history.replaceState({}, '', '/boats/13?tab=maintenance')
+    const { tab, activeGroupKey } = mountComposable({})
+    expect(tab.value).toBe('history')
+    expect(activeGroupKey.value).toBe('maintenance')
+  })
+
+  test('?tab=navigation (group key) lands on the navigation logs tab (#419)', () => {
+    window.history.replaceState({}, '', '/boats/13?tab=navigation')
+    const { tab, activeGroupKey } = mountComposable({})
+    expect(tab.value).toBe('navigation-logs')
+    expect(activeGroupKey.value).toBe('navigation')
+  })
+
+  test('a group-key ?tab= is normalized to the resolved leaf tab in the URL (#419)', () => {
+    window.history.replaceState({}, '', '/boats/13?tab=maintenance')
+    mountComposable({})
+    expect(window.location.search).toBe('?tab=history')
+  })
+
+  test('?tab=equipment stays on the equipment leaf tab (leaf wins over group)', () => {
+    window.history.replaceState({}, '', '/boats/13?tab=equipment')
+    const { tab, activeGroupKey } = mountComposable({})
+    expect(tab.value).toBe('equipment')
+    expect(activeGroupKey.value).toBe('equipment')
+    expect(window.location.search).toBe('?tab=equipment')
+  })
 })

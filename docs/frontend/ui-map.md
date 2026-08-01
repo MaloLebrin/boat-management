@@ -15,6 +15,9 @@ Référence: `inertia/app.ts`.
 - Page: `inertia/pages/dashboard.vue`
 - Props: `boats`, `urgentMaintenance`, `stats`
 - Source backend: `DashboardService.getForUser()` appelé depuis `HomeController.index`
+- Composants:
+  - KPIs: `inertia/components/dashboard/DashboardStatsGrid.vue` — grille des 5 cartes stats ; si aucun équipement saisi (0 moteur/voile/gréement), les 3 cartes équipement sont remplacées par une carte combinée avec CTA « Saisir vos équipements » → `/boats` (#419)
+  - En-tête: chips d'action « + Entrée journal » / « + Incident » (`DashboardQuickAddActions.vue`) distinctes du lien de navigation « Bateaux » (variante `ghost` + flèche, #419)
 
 ### Boats (liste / création / édition)
 

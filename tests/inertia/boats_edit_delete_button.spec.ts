@@ -19,6 +19,10 @@ vi.mock('@inertiajs/vue3', async () => {
 
 vi.mock('@adonisjs/inertia/vue', () => ({
   Form: { template: '<form><slot :processing="false" :errors="{}" /></form>' },
+  Link: {
+    template: '<a data-inertia-link :href="href"><slot /></a>',
+    props: ['href'],
+  },
 }))
 
 vi.mock('~/components/boats/hull/BoatFormHullFields.vue', () => ({
@@ -99,6 +103,14 @@ test('clicking delete opens a confirmation modal without deleting immediately (#
 
   expect(w.find('.confirm-modal').exists()).toBe(true)
   expect(mockDelete).not.toHaveBeenCalled()
+})
+
+test('the cancel link is an Inertia Link, not a raw anchor (#419)', () => {
+  const w = mountEdit(['boats.edit'])
+  const cancel = w.findAll('a').find((a) => a.text() === 'boats.edit.cancel')
+  expect(cancel).toBeDefined()
+  expect(cancel!.attributes('data-inertia-link')).toBeDefined()
+  expect(cancel!.attributes('href')).toBe('/boats/1')
 })
 
 test('confirming the modal deletes the boat (#398)', async () => {

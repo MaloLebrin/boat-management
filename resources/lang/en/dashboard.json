@@ -22,6 +22,11 @@
     "sails": "Sails",
     "rigs": "Rigs",
     "urgentMaintenance": "Urgent maintenance",
+    "equipmentEmpty": {
+      "title": "Equipment",
+      "description": "No engines, sails or rigs recorded for your fleet yet.",
+      "cta": "Add your equipment"
+    },
     "delta": {
       "boatsInAlert": "{count} in alert",
       "boatsOk": "Fleet up to date",
