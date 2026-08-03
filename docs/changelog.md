@@ -3,6 +3,21 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-08-03 — Stratégie mobile : analyse d'opportunité (doc) + service worker inopérant en production
+
+Question posée : faut-il une application mobile ? Réponse documentée dans `docs/architecture/mobile-strategy.md` (aucun code modifié).
+
+**Verdict** : pas d'app native. Une API n'existe pas (100 % Inertia, `sessionGuard` seul, 302 vers `/login` au lieu de 401) et devrait être construite avant la première ligne de code natif ; deux des trois motivations (terrain/hors-ligne, push) se traitent dans la PWA existante ; seuls le GPS en tâche de fond et le Bluetooth/NMEA justifient réellement du natif — deux fonctionnalités, pas 68 écrans.
+
+**Découverte au passage, à traiter en priorité : le service worker ne s'installe jamais en production.** Vérifié sur build réel, il lève `non-precached-url` à l'évaluation. Deux causes indépendantes :
+
+- `navigateFallback: '/offline.html'` produit un `createHandlerBoundToURL('/offline.html')` appelé au niveau racine, mais `offline.html` vit dans `public/` alors que `globPatterns` est évalué depuis `public/assets` (`config/vite.ts` → `buildDirectory`). Le fichier n'entre jamais dans le manifeste de précache, et `PrecacheController.createHandlerBoundToURL()` lève de façon synchrone.
+- Le service worker est émis dans `public/assets/` et enregistré à `/assets/sw.js` avec `scope:"/assets/"` — il ne contrôlerait de toute façon aucune navigation vers `/boats`, `/navigation` ou `/planning`, donc la règle `runtimeCaching` NetworkFirst est sans effet.
+
+Conséquences : pas de précache, pas de consultation hors-ligne, `offline.html` jamais servie, toast « prête hors-ligne » jamais déclenché, et bouton « Installer l'application » probablement jamais affiché sur Android (`beforeinstallprompt` requiert un service worker avec gestionnaire `fetch`). **La file d'attente hors-ligne continue de fonctionner** : elle est en JS de page + IndexedDB, indépendante du service worker. Aucun test ne couvrait le service worker — les specs Vitest testent les composables, pas Workbox — d'où l'absence de signal.
+
+Le document liste également la dette documentaire relevée : `docs/frontend/ui-map.md` annonce « SSR désactivé » alors qu'il est activé, `docs/frontend/pwa.md` décrit une intention et non le comportement réel, et `public/site.webmanifest` affiche « FleetAI » (graphie interdite par `CLAUDE.md` — la passe #411 l'avait manqué) avec un `theme_color` hors palette.
+
 ## 2026-08-03 — Seeders : le compte admin réel n'est plus alimenté en données fictives
 
 Le compte `ADMIN_EMAIL` (`malolebrin@gmail.com`) n'est pas un compte de test : c'est le compte réel de l'exploitant. Trois écarts avec la réalité ont été corrigés dans `database/seeders/malo_seeder.ts`.
