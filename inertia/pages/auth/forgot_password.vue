@@ -7,7 +7,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { Form } from '@adonisjs/inertia/vue'
+import { Form, Link } from '@adonisjs/inertia/vue'
 import { Head, usePage } from '@inertiajs/vue3'
 import AuthNavyPanel from '~/components/auth/AuthNavyPanel.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
@@ -40,12 +40,12 @@ const page = usePage()
       <div class="flex flex-1 flex-col items-center justify-center px-8 pb-12 lg:px-16">
         <div class="w-full max-w-sm">
           <!-- Back link -->
-          <a
+          <Link
             href="/login"
             class="mb-4 inline-flex items-center gap-1.5 text-[12px] text-fg-muted no-underline transition-colors hover:text-fg"
           >
             ← {{ t('auth.forgotPassword.backToLogin') }}
-          </a>
+          </Link>
 
           <p class="text-[11px] font-semibold uppercase tracking-[0.12em] text-fg-muted">
             {{ t('auth.forgotPassword.eyebrow') }}
@@ -87,9 +87,10 @@ const page = usePage()
               <p class="text-[13px] leading-relaxed text-mint-700">
                 {{ t('auth.forgotPassword.successContent') }}
               </p>
-              <a href="/login" class="mt-1 text-[12px] font-semibold text-mint-700">
+              <!-- « Renvoyer » : revenir au formulaire vide, pas à la page de connexion. -->
+              <Link href="/forgot-password" class="mt-1 text-[12px] font-semibold text-mint-700">
                 {{ t('auth.forgotPassword.resend') }}
-              </a>
+              </Link>
             </div>
 
             <div
@@ -100,7 +101,13 @@ const page = usePage()
             </div>
 
             <template v-if="!page.props.flash?.success">
-              <Form route="password.forgot" #default="{ processing, errors }">
+              <!--
+                `route="password.forgot"` désignait la route GET (`<Form>` reprend
+                `methods[0]` de la route nommée) : la soumission partait en GET,
+                l'email fuitait en query string et la route POST n'était jamais
+                atteinte (#449). `password_reset.store` est la route POST.
+              -->
+              <Form route="password_reset.store" #default="{ processing, errors }">
                 <div class="flex flex-col gap-3.5">
                   <BaseInput
                     id="email"
