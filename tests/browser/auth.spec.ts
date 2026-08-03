@@ -1,6 +1,7 @@
 import { test } from '@japa/runner'
 import testUtils from '@adonisjs/core/services/test_utils'
 import Organization from '#models/organization'
+import PasswordResetToken from '#models/password_reset_token'
 import User from '#models/user'
 import { createAdminUser, DEFAULT_PASSWORD } from '#tests/browser/helpers'
 
@@ -97,6 +98,39 @@ test.group('E2E · Authentication', (group) => {
     await page.locator('[data-invalid="true"]').first().waitFor()
     const alerts = await page.locator('[role="alert"]').allTextContents()
     assert.isAbove(alerts.length, 0)
+  })
+
+  /**
+   * Regression #449 — the only level that reproduces the reported failure.
+   * The form is submitted through the real DOM: if `<Form>` resolves to the GET
+   * twin of `/forgot-password`, the browser lands on `/forgot-password?email=…`
+   * and no token is ever issued — exactly what the test campaign observed.
+   */
+  test('the forgot-password form posts instead of leaking the email in the URL', async ({
+    visit,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+
+    const page = await visit('/forgot-password')
+    await page.waitForLoadState('networkidle')
+
+    // The POST route is the one sharing this path — the GET twin only renders.
+    await page.assertExists('form[action="/forgot-password"][method="post"]')
+
+    await page.locator('#email').fill(user.email)
+    await page.locator('button[type="submit"]').click()
+
+    // The form is replaced by the confirmation panel once the flash comes back —
+    // waiting on it (rather than on the network) keeps the DB read below in step
+    // with the Inertia visit.
+    await page.locator('#email').waitFor({ state: 'detached' })
+
+    await page.assertPath('/forgot-password')
+    assert.notInclude(page.url(), 'email=', "l'email ne doit jamais transiter en query string")
+
+    const tokens = await PasswordResetToken.query().where('email', user.email)
+    assert.lengthOf(tokens, 1, 'la soumission doit atteindre la route POST et émettre un token')
   })
 
   test('an unauthenticated visit to /boats redirects to /login', async ({ visit }) => {
