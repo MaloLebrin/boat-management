@@ -16,6 +16,10 @@ Source: `database/schema.ts` (généré automatiquement via migrations).
 - `password` (non sérialisé)
 - `fullName`
 - `organizationId` (nullable)
+- `lastLoginAt` (nullable)
+- préférences d'interface, nullables — retombent sur le cookie puis sur un défaut :
+  - `locale` (`en` | `fr`, #414)
+  - `theme` (`system` | `light` | `dark`, #416)
 
 ### boats
 
