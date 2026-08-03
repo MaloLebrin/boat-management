@@ -3,6 +3,8 @@ import User from '#models/user'
 import OrganizationMembership from '#models/organization_membership'
 import { inject } from '@adonisjs/core'
 import db from '@adonisjs/lucid/services/db'
+import type { SignupInput } from '#shared/types/organization'
+import { joinFullName } from '#shared/helpers/full_name'
 
 @inject()
 export default class UserService {
@@ -16,16 +18,21 @@ export default class UserService {
     return await User.verifyCredentials(email, password)
   }
 
-  async signupWithOrganization(payload: {
-    email: string
-    password: string
-    fullName?: string | null
-  }) {
+  /**
+   * Creates the organization, its owner and the admin membership in one
+   * transaction. Every field collected by the signup form is persisted (#448):
+   * first/last name are joined into `users.full_name`, and the organization
+   * name / type / fleet size land on the organization itself.
+   */
+  async signupWithOrganization(payload: SignupInput) {
+    const fullName = joinFullName(payload.firstName, payload.lastName)
+
     return await db.transaction(async (trx) => {
       const organization = await this.organizationService.createForSignup(
         {
-          email: payload.email,
-          fullName: payload.fullName,
+          name: payload.organizationName,
+          type: payload.organizationType,
+          fleetSize: payload.fleetSize,
         },
         trx
       )
@@ -34,7 +41,7 @@ export default class UserService {
         {
           email: payload.email,
           password: payload.password,
-          fullName: payload.fullName ?? null,
+          fullName,
           organizationId: organization.id,
         },
         { client: trx }

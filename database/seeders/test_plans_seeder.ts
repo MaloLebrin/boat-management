@@ -6,6 +6,7 @@ import User from '#models/user'
 import UserService from '#services/user_service'
 import type { OrgRole } from '#shared/types/organization'
 import type { PlanTier } from '#shared/types/plan'
+import { splitFullName } from '#shared/helpers/full_name'
 import app from '@adonisjs/core/services/app'
 import { BaseSeeder } from '@adonisjs/lucid/seeders'
 import { DateTime } from 'luxon'
@@ -29,7 +30,8 @@ async function ensureOwner(
     const result = await userService.signupWithOrganization({
       email,
       password: TEST_PASSWORD,
-      fullName,
+      ...splitFullName(fullName),
+      organizationName: fullName,
     })
     user = result.user
     await result.organization.merge({ plan }).save()

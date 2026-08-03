@@ -5,56 +5,52 @@ import Organization from '#models/organization'
 test.group('OrganizationService (unit)', () => {
   // ── createForSignup ──────────────────────────────────────────────────────
 
-  test("createForSignup avec email et fullName crée l'org avec le bon nom", async ({ assert }) => {
+  test("createForSignup crée l'org avec le nom saisi au formulaire", async ({ assert }) => {
     const svc = new OrganizationService()
-    const org = await svc.createForSignup({
-      email: 'alice@example.com',
-      fullName: 'Alice Dupont',
-    })
+    const org = await svc.createForSignup({ name: 'Marina Bleue' })
 
-    assert.equal(org.name, 'Alice Dupont')
+    assert.equal(org.name, 'Marina Bleue')
     assert.isString(org.slug)
-    assert.include(org.slug, 'alice-dupont')
+    assert.include(org.slug, 'marina-bleue')
     assert.isNumber(org.id)
   })
 
-  test('createForSignup avec email seulement dérive le nom de la partie locale', async ({
+  test('createForSignup persiste le type et la taille de flotte', async ({ assert }) => {
+    const svc = new OrganizationService()
+    const org = await svc.createForSignup({
+      name: 'École de voile du Cotentin',
+      type: 'school',
+      fleetSize: '21-50',
+    })
+
+    const found = await Organization.findOrFail(org.id)
+    assert.equal(found.type, 'school')
+    assert.equal(found.fleetSize, '21-50')
+  })
+
+  test('createForSignup laisse type et taille de flotte à null quand ils sont absents', async ({
     assert,
   }) => {
     const svc = new OrganizationService()
-    const org = await svc.createForSignup({ email: 'skipper.pro@example.com' })
+    const org = await svc.createForSignup({ name: 'Sans profil' })
 
-    assert.equal(org.name, 'skipper.pro')
-    assert.include(org.slug, 'skipper-pro')
+    const found = await Organization.findOrFail(org.id)
+    assert.isNull(found.type)
+    assert.isNull(found.fleetSize)
   })
 
-  test("createForSignup avec fullName vide ou null dérive le nom de l'email", async ({
-    assert,
-  }) => {
+  test('createForSignup trim le nom', async ({ assert }) => {
     const svc = new OrganizationService()
-    const org = await svc.createForSignup({
-      email: 'bob@example.com',
-      fullName: null,
-    })
+    const org = await svc.createForSignup({ name: '  Port Camargue  ' })
 
-    assert.equal(org.name, 'bob')
-  })
-
-  test("createForSignup avec fullName whitespace dérive le nom de l'email", async ({ assert }) => {
-    const svc = new OrganizationService()
-    const org = await svc.createForSignup({
-      email: 'carol@example.com',
-      fullName: '   ',
-    })
-
-    assert.equal(org.name, 'carol')
+    assert.equal(org.name, 'Port Camargue')
   })
 
   test('createForSignup avec même slug de base génère un slug unique', async ({ assert }) => {
     const svc = new OrganizationService()
 
-    const first = await svc.createForSignup({ email: 'john@example.com', fullName: 'John Smith' })
-    const second = await svc.createForSignup({ email: 'john2@example.com', fullName: 'John Smith' })
+    const first = await svc.createForSignup({ name: 'John Smith' })
+    const second = await svc.createForSignup({ name: 'John Smith' })
 
     assert.isString(first.slug)
     assert.isString(second.slug)
@@ -67,7 +63,7 @@ test.group('OrganizationService (unit)', () => {
 
   test('createForSignup normalise les accents dans le slug', async ({ assert }) => {
     const svc = new OrganizationService()
-    const org = await svc.createForSignup({ email: 'a@example.com', fullName: 'Éléonore Château' })
+    const org = await svc.createForSignup({ name: 'Éléonore Château' })
 
     assert.notInclude(org.slug, 'é')
     assert.notInclude(org.slug, 'â')
@@ -76,10 +72,10 @@ test.group('OrganizationService (unit)', () => {
 
   test("createForSignup persist l'org en DB", async ({ assert }) => {
     const svc = new OrganizationService()
-    const org = await svc.createForSignup({ email: 'persist@example.com' })
+    const org = await svc.createForSignup({ name: 'Persisté' })
 
     const found = await Organization.find(org.id)
     assert.isNotNull(found)
-    assert.equal(found!.name, 'persist')
+    assert.equal(found!.name, 'Persisté')
   })
 })

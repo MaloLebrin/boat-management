@@ -8,6 +8,9 @@ Source: `database/schema.ts` (généré automatiquement via migrations).
 
 - `id`
 - `name`, `slug`
+- profil déclaré à l'inscription, nullables (#448) :
+  - `type` (`rental` | `school` | `marina` | `private`)
+  - `fleetSize` (`1-4` | `5-20` | `21-50` | `51+`)
 
 ### users
 

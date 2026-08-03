@@ -15,11 +15,18 @@ test.group('MVP org/users/boats/permissions (integration)', () => {
     const { organization, user } = await userService.signupWithOrganization({
       email: 'alice@example.com',
       password: 'Password123!',
-      fullName: 'Alice Doe',
+      firstName: 'Alice',
+      lastName: 'Doe',
+      organizationName: 'Voiles du Cotentin',
+      organizationType: 'school',
+      fleetSize: '5-20',
     })
 
     assert.equal(user.organizationId, organization.id)
-    assert.equal(organization.name, 'Alice Doe')
+    assert.equal(user.fullName, 'Alice Doe')
+    assert.equal(organization.name, 'Voiles du Cotentin')
+    assert.equal(organization.type, 'school')
+    assert.equal(organization.fleetSize, '5-20')
     assert.isString(organization.slug)
     assert.isAbove(organization.slug.length, 0)
   })

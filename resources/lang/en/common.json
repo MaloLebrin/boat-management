@@ -60,5 +60,8 @@
   "theme.label": "Theme",
   "theme.system": "System theme",
   "theme.light": "Light theme",
-  "theme.dark": "Dark theme"
+  "theme.dark": "Dark theme",
+  "formErrors": {
+    "title": "The form contains errors"
+  }
 }

@@ -63,9 +63,16 @@ const COMPONENTS: Component[] = [
   { path: 'components/ConflictResolutionModal.vue' },
   { path: 'components/Logo.vue' },
   { path: 'components/OfflinePendingQueue.vue' },
+  // Sections extraites de `pages/auth/signup.vue` (#448) : la page était déjà
+  // couverte, ces composants héritent de cette couverture.
+  { path: 'components/auth/signup/SignupIdentityFields.vue' },
+  { path: 'components/auth/signup/SignupOrganizationFields.vue' },
+  { path: 'components/auth/signup/SignupSectionHeader.vue' },
+  { path: 'components/auth/signup/SignupTermsCheckbox.vue' },
   { path: 'components/base/BaseBadge.vue' },
   { path: 'components/base/BaseButton.vue' },
   { path: 'components/base/BaseDropdown.vue' },
+  { path: 'components/base/BaseFormErrorSummary.vue' },
   { path: 'components/base/BaseOptionCard.vue' },
   { path: 'components/base/BaseSegmentedControl.vue' },
   { path: 'components/base/BaseTabs.vue' },

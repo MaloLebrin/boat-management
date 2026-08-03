@@ -1,5 +1,6 @@
 import vine from '@vinejs/vine'
 import { AI_MODEL_OVERRIDES } from '#shared/types/ai'
+import { FLEET_SIZES, ORGANIZATION_TYPES } from '#shared/types/organization'
 import { THEME_PREFERENCES } from '#shared/types/theme'
 
 const email = () => vine.string().email().maxLength(254)
@@ -11,17 +12,23 @@ export const loginValidator = vine.create({
   remember: vine.boolean().optional(),
 })
 
+/**
+ * Mirrors exactly the fields rendered by `inertia/pages/auth/signup.vue` (#448).
+ * Any field added here must be rendered by that form, otherwise its errors are
+ * invisible to the user and the signup fails silently.
+ *
+ * The form has no password confirmation input (it ships a show/hide toggle
+ * instead), so `confirmed()` is deliberately absent.
+ */
 export const signupValidator = vine.create({
-  fullName: vine
-    .string()
-    .trim()
-    .maxLength(255)
-    .nullable()
-    .transform((v) => v || null),
+  firstName: vine.string().trim().minLength(1).maxLength(100),
+  lastName: vine.string().trim().minLength(1).maxLength(100),
   email: email().unique({ table: 'users', column: 'email' }),
-  password: password().confirmed({
-    confirmationField: 'passwordConfirmation',
-  }),
+  password: password(),
+  organizationName: vine.string().trim().minLength(2).maxLength(255),
+  organizationType: vine.enum(ORGANIZATION_TYPES).nullable().optional(),
+  fleetSize: vine.enum(FLEET_SIZES).nullable().optional(),
+  acceptTerms: vine.accepted(),
 })
 
 export const forgotPasswordValidator = vine.create({

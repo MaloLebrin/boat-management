@@ -1416,30 +1416,6 @@ export class NavigationLogCrewSchema extends BaseModel {
   declare role: string
 }
 
-export class NavigationLogEntrySchema extends BaseModel {
-  static $columns = [
-    'createdAt',
-    'id',
-    'navigationLogId',
-    'note',
-    'recordedAt',
-    'updatedAt',
-  ] as const
-  $columns = NavigationLogEntrySchema.$columns
-  @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime
-  @column({ isPrimary: true })
-  declare id: number
-  @column()
-  declare navigationLogId: number
-  @column()
-  declare note: string
-  @column.dateTime()
-  declare recordedAt: DateTime
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updatedAt: DateTime | null
-}
-
 export class NavigationLogSchema extends BaseModel {
   static $columns = [
     'arrivalPortId',
@@ -1640,6 +1616,7 @@ export class OrganizationSchema extends BaseModel {
     'aiSystemPrompt',
     'appName',
     'createdAt',
+    'fleetSize',
     'id',
     'logoPublicId',
     'logoUrl',
@@ -1650,6 +1627,7 @@ export class OrganizationSchema extends BaseModel {
     'slug',
     'storageUsedBytes',
     'stripeCustomerId',
+    'type',
     'updatedAt',
   ] as const
   $columns = OrganizationSchema.$columns
@@ -1661,6 +1639,8 @@ export class OrganizationSchema extends BaseModel {
   declare appName: string | null
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
+  @column()
+  declare fleetSize: string | null
   @column({ isPrimary: true })
   declare id: number
   @column()
@@ -1681,6 +1661,8 @@ export class OrganizationSchema extends BaseModel {
   declare storageUsedBytes: bigint | number
   @column()
   declare stripeCustomerId: string | null
+  @column()
+  declare type: string | null
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
 }
