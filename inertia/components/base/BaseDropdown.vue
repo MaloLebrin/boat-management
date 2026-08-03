@@ -56,7 +56,7 @@ onBeforeUnmount(() => {
     >
       <slot name="trigger"> Menu </slot>
       <svg
-        :class="['h-4 w-4', variant === 'primary' ? 'text-white/80' : 'text-fg-subtle']"
+        :class="['h-4 w-4', variant === 'primary' ? 'text-on-brand/80' : 'text-fg-subtle']"
         viewBox="0 0 20 20"
         fill="currentColor"
         aria-hidden="true"

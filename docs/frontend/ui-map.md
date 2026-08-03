@@ -122,6 +122,22 @@ Les cartes de l'onglet Équipement exposent un lien « voir le détail » vers c
 - **UI** : `ThemeSwitcher.vue` (3 icônes, prop `tone` — `onDark` pour la sidebar navy qui ne bascule pas)
   dans `AsideMenu`, `MobileSidebarDrawer`, `AppHeader` et `AppHeaderMobileDrawer` ; carte
   `settings/me/ThemeCard.vue` (appliquée au clic, sans bouton « Enregistrer »).
+- **Tests, à trois niveaux** — Vitest tourne en happy-dom **sans aucune feuille de style** : il ne peut
+  assertir que des noms de classes, jamais une couleur.
+  1. `tests/inertia/theme_safe_components.spec.ts` — un test par composant touché (80) : relit le
+     source et échoue sur toute couleur figée (palette Tailwind par défaut, `bg-white` opaque, hex
+     brut). Lire le source plutôt que monter couvre toutes les branches, y compris les maps de
+     classes. Les exceptions assumées vivent dans `allow`, avec une raison **et un nombre exact
+     d'occurrences** : un budget dépassé rouvre le débat au lieu de couvrir la nouvelle venue.
+     Détecteur partagé dans `tests/inertia/helpers/theme_tokens.ts`.
+  2. Blocs `describe('dark mode (#416)')` dans les specs de composant existantes — assertions
+     **positives** : chaque variante rend bien son token (`bg-brand` + `text-on-brand`, les 6
+     variantes de `BaseBadge`, les 6 catégories de budget…).
+  3. `tests/browser/dark_mode.spec.ts` — les **vraies couleurs**, seul niveau où le CSS est appliqué :
+     luminance du fond dans les deux thèmes, contraste AA sur des sondes `data-theme-probe` de
+     `/design-system`, et préférence forcée qui survit à un rechargement complet (donc rendue par le
+     serveur, sans flash). Nécessite `PLAYWRIGHT_CHROMIUM_EXECUTABLE` si le Chromium de Playwright
+     n'est pas installé.
 - **Illustrations autonomes non basculées** (palette interne cohérente) : carte marina
   (`ports/show/Marina*.vue`), dégradés `canvas/mesh_gradient_shared.ts`, scène `AboutOriginSection.vue`,
   panneau `AuthNavyPanel.vue` et bandeaux hero navy — sombres dans les deux thèmes.

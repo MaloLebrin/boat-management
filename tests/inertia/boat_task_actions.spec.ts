@@ -63,3 +63,11 @@ describe('BoatTaskActions (#407)', () => {
     expect(w.find('input[name="doneEngineHours"]').exists()).toBe(true)
   })
 })
+
+describe('dark mode (#416)', () => {
+  test('l’icône de suppression utilise le token de danger, pas la palette red', () => {
+    const html = mount(BoatTaskActions, { props: { boatId: 7, task: baseTask } }).html()
+    expect(html).toContain('text-danger-strong')
+    expect(html).not.toMatch(/-red-\d/)
+  })
+})

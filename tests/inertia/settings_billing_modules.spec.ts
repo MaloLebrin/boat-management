@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { expect, test, vi } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 
 vi.mock('~/composables/use_t', () => ({
   useT: () => ({ t: (k: string) => k, locale: { value: 'fr' } }),
@@ -150,4 +150,20 @@ test('a subscribed Pro org without subscription.manage sees no activate button',
   const w = mountModules({ plan: 'pro', subscription, activeModules: [], canManageBilling: false })
   expect(w.text()).not.toContain('settings.billing.modules.activate')
   expect(w.text()).toContain('settings.billing.modules.adminOnly')
+})
+
+describe('dark mode (#416)', () => {
+  test('les cartes de module utilisent bg-surface-muted, pas le token fantôme bg-surface-2', () => {
+    // `bg-surface-2` n'existait dans aucune palette : il rendait transparent
+    // dans les deux thèmes, ce qui ne se voyait que sur fond sombre.
+    const html = mountModules({ plan: 'pro', subscription, activeModules: [] }).html()
+    expect(html).toContain('bg-surface-muted')
+    expect(html).not.toContain('surface-2')
+  })
+
+  test('« inclus dans le plan » utilise le token de succès, pas la palette green', () => {
+    const html = mountModules({ plan: 'enterprise', subscription: null, activeModules: [] }).html()
+    expect(html).toContain('text-success')
+    expect(html).not.toMatch(/-green-\d/)
+  })
 })

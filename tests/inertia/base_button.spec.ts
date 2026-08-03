@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { test, expect, vi } from 'vitest'
+import { describe, test, expect, vi } from 'vitest'
 import BaseButton from '../../inertia/components/base/BaseButton.vue'
 
 vi.mock('@adonisjs/inertia/vue', () => {
@@ -59,4 +59,36 @@ test('prevents navigation when disabled in link mode', async () => {
   w.element.dispatchEvent(event)
   expect(event.defaultPrevented).toBe(true)
   expect(w.attributes('aria-disabled')).toBe('true')
+})
+
+describe('dark mode (#416)', () => {
+  // `text-white` sur `bg-brand` passait sous le seuil AA une fois le brand
+  // éclairci en sombre : le texte posé sur un aplat de marque doit utiliser
+  // `text-on-brand`, qui bascule avec lui.
+  test('la variante primary pose text-on-brand sur bg-brand, jamais text-white', () => {
+    const w = mount(BaseButton, { slots: { default: 'Go' } })
+    const classes = w.classes().join(' ')
+    expect(classes).toContain('bg-brand')
+    expect(classes).toContain('text-on-brand')
+    expect(classes).not.toContain('text-white')
+  })
+
+  test('la variante danger utilise les tokens de danger, pas la palette red', () => {
+    const w = mount(BaseButton, { props: { variant: 'danger' }, slots: { default: 'Del' } })
+    const classes = w.classes().join(' ')
+    expect(classes).toContain('bg-danger-soft')
+    // `text-danger` n'atteint pas 4.5:1 sur `bg-danger-soft` : d'où le palier assombri.
+    expect(classes).toContain('text-danger-strong')
+    expect(classes).not.toMatch(/-red-\d/)
+  })
+
+  test('les variantes de surface s’appuient sur des tokens qui basculent', () => {
+    for (const variant of ['secondary', 'outline', 'ghost'] as const) {
+      const classes = mount(BaseButton, { props: { variant }, slots: { default: 'X' } })
+        .classes()
+        .join(' ')
+      expect(classes, variant).toMatch(/\b(bg-surface|text-fg|border-border)/)
+      expect(classes, variant).not.toContain('bg-white')
+    }
+  })
 })

@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { expect, test } from 'vitest'
+import { describe, expect, test } from 'vitest'
 import PricingConfigurator from '../../inertia/components/marketing/pricing/PricingConfigurator.vue'
 
 function makeProps(billing: 'monthly' | 'annual' = 'monthly') {
@@ -124,4 +124,12 @@ test('module cards show the billed-annually note only when annual', () => {
 
   const annual = mount(PricingConfigurator, { props: makeProps('annual') })
   expect(annual.text()).toContain('Facturé annuellement.')
+})
+
+describe('dark mode (#416)', () => {
+  test('les panneaux du configurateur basculent avec la surface', () => {
+    const html = mount(PricingConfigurator, { props: makeProps('monthly') }).html()
+    expect(html).toContain('bg-surface-elevated')
+    expect(html).not.toContain('bg-white')
+  })
 })

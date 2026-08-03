@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { expect, test } from 'vitest'
+import { describe, expect, test } from 'vitest'
 import PricingDetailedTableSection from '../../inertia/components/marketing/pricing/PricingDetailedTableSection.vue'
 
 function makeProps(billing: 'monthly' | 'annual') {
@@ -47,4 +47,14 @@ test('the free Starter plan keeps its static label regardless of billing', () =>
   const w = mount(PricingDetailedTableSection, { props: makeProps('annual') })
 
   expect(w.text()).toContain('Gratuit')
+})
+
+describe('dark mode (#416)', () => {
+  test('le tableau bascule, seul le CTA sur bandeau navy reste blanc', () => {
+    const html = mount(PricingDetailedTableSection, { props: makeProps('monthly') }).html()
+    expect(html).toContain('bg-surface-elevated')
+    // Le seul `bg-white` restant est le bouton du plan mis en avant, posé sur
+    // un bandeau navy permanent — il doit rester clair dans les deux thèmes.
+    expect(html.match(/bg-white(?![/\w-])/g) ?? []).toHaveLength(1)
+  })
 })

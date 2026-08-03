@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { test, expect, vi, beforeEach, afterEach } from 'vitest'
+import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
 import SimulatorStepWear from '../../inertia/components/marketing/simulator/SimulatorStepWear.vue'
 
 vi.mock('~/composables/use_t', () => ({
@@ -151,4 +151,15 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.useRealTimers()
+})
+
+describe('dark mode (#416)', () => {
+  test('les paliers d’usure s’appuient sur des tokens et des palettes de marque', () => {
+    const html = mount(SimulatorStepWear, {
+      props: { modelValue: {}, wearField: 'hullWear', labelKey: 'simulator.hull_wear_label' },
+    }).html()
+    expect(html).toContain('bg-surface-elevated')
+    expect(html).not.toContain('bg-white')
+    expect(html).not.toMatch(/-(red|green|gray|slate)-\d/)
+  })
 })

@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { expect, test, vi } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 
 vi.mock('~/composables/use_t', () => ({
   useT: () => ({ t: (k: string) => k, locale: { value: 'fr' } }),
@@ -104,4 +104,12 @@ test('Enterprise shows the unlimited badge, no stepper', () => {
 test('Starter (no subscription) prompts to upgrade to Pro', () => {
   const w = mountExtraBoats({ plan: 'starter', subscription: null, activeAddons: [] })
   expect(w.text()).toContain('settings.billing.extraBoats.proRequired')
+})
+
+describe('dark mode (#416)', () => {
+  test('le panneau utilise bg-surface-muted, pas le token fantôme bg-surface-2', () => {
+    const html = mountExtraBoats({ plan: 'pro', subscription: null, activeAddons: [] }).html()
+    expect(html).toContain('bg-surface-muted')
+    expect(html).not.toContain('surface-2')
+  })
 })
