@@ -10,6 +10,16 @@ Référence: `inertia/app.ts`.
 
 ## Pages principales
 
+### Auth — inscription (#448)
+
+- Page: `inertia/pages/auth/signup.vue` — `<Form route="new_account.store">`, backend `NewAccountController.store` + `signupValidator`
+- Sections (la page reste sous la limite de 250 lignes) :
+  - `components/auth/signup/SignupIdentityFields.vue` — `firstName`, `lastName`, `email`, `password` (+ `PasswordStrength`, bouton Afficher/Masquer)
+  - `components/auth/signup/SignupOrganizationFields.vue` — `organizationName`, `organizationType`, `fleetSize` ; les options des deux selects sont générées depuis `ORGANIZATION_TYPES` / `FLEET_SIZES` (`shared/types/organization.ts`), les mêmes constantes que le validator
+  - `components/auth/signup/SignupTermsCheckbox.vue` — case `acceptTerms` avec son propre emplacement d'erreur
+  - `components/auth/signup/SignupSectionHeader.vue` — en-tête numéroté « 01 / 02 »
+- `components/base/BaseFormErrorSummary.vue` en tête de formulaire : reçoit `handled-keys` (les champs qui affichent déjà leur erreur sous l'input) et rend en bandeau `danger` **toutes les autres** erreurs. Sans lui, un champ de validator sans input rend l'échec invisible — c'est exactement le bug #448. Réutilisable sur tout formulaire Inertia.
+
 ### Dashboard
 
 - Page: `inertia/pages/dashboard.vue`

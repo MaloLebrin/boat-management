@@ -2,6 +2,7 @@ import Organization from '#models/organization'
 import { inject } from '@adonisjs/core'
 import crypto from 'node:crypto'
 import type { TransactionClientContract } from '@adonisjs/lucid/types/database'
+import type { CreateOrganizationForSignupInput } from '#shared/types/organization'
 
 function slugify(value: string) {
   const base = value
@@ -17,15 +18,13 @@ function slugify(value: string) {
 
 @inject()
 export default class OrganizationService {
-  async createForSignup(
-    params: { email: string; fullName?: string | null },
-    trx?: TransactionClientContract
-  ) {
-    const name =
-      params.fullName?.trim() ||
-      params.email.split('@')[0]?.trim() ||
-      params.email.trim() ||
-      'Organization'
+  async createForSignup(params: CreateOrganizationForSignupInput, trx?: TransactionClientContract) {
+    const name = params.name.trim() || 'Organization'
+    const attributes = {
+      name,
+      type: params.type ?? null,
+      fleetSize: params.fleetSize ?? null,
+    }
 
     const baseSlug = slugify(name)
 
@@ -35,13 +34,13 @@ export default class OrganizationService {
 
       const existing = await Organization.query({ client: trx }).where('slug', slug).first()
       if (!existing) {
-        return await Organization.create({ name, slug }, { client: trx })
+        return await Organization.create({ ...attributes, slug }, { client: trx })
       }
     }
 
     return await Organization.create(
       {
-        name,
+        ...attributes,
         slug: `${baseSlug}-${crypto.randomBytes(8).toString('hex')}`,
       },
       { client: trx }

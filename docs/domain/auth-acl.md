@@ -11,7 +11,7 @@ Référence routes: `start/routes/auth.ts`.
   - Page: `inertia/pages/auth/signup.vue`
 - `POST /signup` (guest-only)
   - Controller: `NewAccountController.store`
-  - Validation: `signupValidator` (`app/validators/user.ts`)
+  - Validation: `signupValidator` (`app/validators/user.ts`) — `firstName`, `lastName`, `email`, `password`, `organizationName`, `organizationType?`, `fleetSize?`, `acceptTerms`. Le schéma doit rester le miroir exact des champs rendus par la page, sinon l'inscription échoue en silence (#448) ; `tests/inertia/signup_form_validator_sync.spec.ts` le vérifie.
   - Service: `UserService.signupWithOrganization`
   - Auth: `auth.use('web').login(user)`
   - Redirect: route `home`

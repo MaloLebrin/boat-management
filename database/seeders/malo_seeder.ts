@@ -13,6 +13,7 @@ import MouillageService from '#services/mouillage_service'
 import PortService from '#services/port_service'
 import SpotService from '#services/spot_service'
 import UserService from '#services/user_service'
+import { splitFullName } from '#shared/helpers/full_name'
 import app from '@adonisjs/core/services/app'
 import { BaseSeeder } from '@adonisjs/lucid/seeders'
 import { DateTime } from 'luxon'
@@ -53,7 +54,8 @@ export default class MaloSeeder extends BaseSeeder {
       ;({ user } = await userService.signupWithOrganization({
         email: adminEmail,
         password: adminPassword,
-        fullName: 'Administrateur',
+        ...splitFullName('Administrateur'),
+        organizationName: 'Administrateur',
       }))
     }
 

@@ -4,6 +4,7 @@ import OrganizationMembership from '#models/organization_membership'
 import User from '#models/user'
 import UserService from '#services/user_service'
 import type { PlanTier } from '#shared/types/plan'
+import { splitFullName } from '#shared/helpers/full_name'
 import app from '@adonisjs/core/services/app'
 import { TEST_PASSWORD } from '#database/seeders_support/billing_module_states/constants'
 
@@ -24,7 +25,8 @@ export async function ensureOwner(
     const result = await userService.signupWithOrganization({
       email,
       password: TEST_PASSWORD,
-      fullName,
+      ...splitFullName(fullName),
+      organizationName: fullName,
     })
     user = result.user
     await result.organization.merge({ plan }).save()
