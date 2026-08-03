@@ -99,7 +99,7 @@ function getComparisonVal(row: string, col: 'excel' | 'paper' | 'fleetai'): stri
       <div
         v-for="(item, idx) in testimonials.items"
         :key="item.author"
-        class="reveal bg-white border border-bone rounded-xl px-6 py-6 shadow-(--shadow-sm) hover:-translate-y-1 hover:shadow-md transition-all duration-300"
+        class="reveal bg-surface-elevated border border-bone rounded-xl px-6 py-6 shadow-(--shadow-sm) hover:-translate-y-1 hover:shadow-md transition-all duration-300"
         :class="[`reveal-delay-${idx + 1}`, { visible: testimonialsVisible }]"
       >
         <ChatBubbleLeftRightIcon class="h-6 w-6 text-coral-300 mb-3" />

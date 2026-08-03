@@ -40,3 +40,21 @@ describe('SettingsBillingUsageGauge', () => {
     expect(wrapper.text()).not.toContain('5242880')
   })
 })
+
+describe('dark mode (#416)', () => {
+  test('la piste de jauge utilise bg-surface-muted, pas le token fantôme bg-surface-2', () => {
+    const html = mount(SettingsBillingUsageGauge, {
+      props: { label: 'Boats', used: 3, limit: 8 },
+    }).html()
+    expect(html).toContain('bg-surface-muted')
+    expect(html).not.toContain('surface-2')
+  })
+
+  test('le dépassement de quota utilise la palette coral, pas red', () => {
+    const html = mount(SettingsBillingUsageGauge, {
+      props: { label: 'Boats', used: 12, limit: 8 },
+    }).html()
+    expect(html).toContain('bg-coral-600')
+    expect(html).not.toMatch(/-red-\d/)
+  })
+})

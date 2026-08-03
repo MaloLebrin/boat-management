@@ -196,9 +196,14 @@ const tableRows = computed(() => {
           <template #header>
             <h3 class="text-sm font-semibold font-display text-fg">Principes</h3>
           </template>
-          <ul class="px-2 space-y-2 text-sm text-fg-muted">
+          <!-- `data-theme-probe` : points de mesure du contraste pour le test
+               navigateur du thème sombre (tests/browser/dark_mode.spec.ts).
+               Des ancres explicites évitent que le test casse au moindre
+               remaniement de cette page. -->
+          <ul class="px-2 space-y-2 text-sm text-fg-muted" data-theme-probe="muted-text">
             <li>
-              <span class="font-semibold text-fg">Cohérence</span> : tokens sémantiques d’abord.
+              <span class="font-semibold text-fg" data-theme-probe="body-text">Cohérence</span> :
+              tokens sémantiques d’abord.
             </li>
             <li>
               <span class="font-semibold text-fg">Subtil</span> : motion courte, jamais

@@ -2,6 +2,7 @@
 import ProfileCard from '~/components/settings/me/ProfileCard.vue'
 import SecurityCard from '~/components/settings/me/SecurityCard.vue'
 import LanguageCard from '~/components/settings/me/LanguageCard.vue'
+import ThemeCard from '~/components/settings/me/ThemeCard.vue'
 </script>
 
 <template>
@@ -9,5 +10,6 @@ import LanguageCard from '~/components/settings/me/LanguageCard.vue'
     <ProfileCard />
     <SecurityCard />
     <LanguageCard />
+    <ThemeCard />
   </div>
 </template>

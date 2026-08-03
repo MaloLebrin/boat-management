@@ -19,7 +19,9 @@ const { el: faqEl, isVisible: faqVisible } = useScrollReveal()
     <div class="mb-6">
       <BaseHeading level="2">{{ faq.title }}</BaseHeading>
     </div>
-    <div class="bg-white border border-bone rounded-xl overflow-hidden divide-y divide-bone">
+    <div
+      class="bg-surface-elevated border border-bone rounded-xl overflow-hidden divide-y divide-bone"
+    >
       <details v-for="(qa, idx) in faq.items" :key="qa.q" :open="idx === 0" class="group">
         <summary class="flex items-center justify-between gap-4 px-5 py-4 font-semibold text-fg">
           {{ qa.q }}

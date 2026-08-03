@@ -20,7 +20,7 @@ defineEmits<{
       :class="[
         'rounded-full px-3 py-1.5 text-sm font-medium transition-colors',
         modelValue === option.value
-          ? 'bg-brand text-white'
+          ? 'bg-brand text-on-brand'
           : 'bg-surface-muted text-fg-muted hover:bg-surface-elevated hover:text-fg',
       ]"
       @click="$emit('update:modelValue', option.value)"

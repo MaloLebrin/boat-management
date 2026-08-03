@@ -40,7 +40,7 @@ const confirmType = computed(() => (showConfirm.value ? 'text' : 'password'))
         <span class="text-xs text-fg-muted">{{ t('auth.login.needHelp') }}</span>
         <a
           href="mailto:support@fleetai.app"
-          class="rounded-md border border-bone bg-white px-2.5 py-1.5 text-xs font-semibold text-fg transition-colors hover:bg-paper"
+          class="rounded-md border border-bone bg-surface-elevated px-2.5 py-1.5 text-xs font-semibold text-fg transition-colors hover:bg-paper"
         >
           {{ t('auth.login.contactSupport') }}
         </a>
@@ -73,7 +73,7 @@ const confirmType = computed(() => (showConfirm.value ? 'text' : 'password'))
           <div class="mt-7">
             <div
               v-if="page.props.flash?.error"
-              class="mb-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"
+              class="mb-5 rounded-lg border border-coral-200 bg-danger-soft px-4 py-3 text-sm text-danger-strong"
             >
               {{ page.props.flash.error }}
             </div>
@@ -137,8 +137,7 @@ const confirmType = computed(() => (showConfirm.value ? 'text' : 'password'))
                 <button
                   type="submit"
                   :disabled="processing"
-                  class="mt-1 flex w-full items-center justify-center gap-2 rounded-lg px-5 py-3.5 text-sm font-semibold text-white transition-all duration-150 disabled:opacity-60 hover:brightness-110"
-                  style="background: #0b1d2e"
+                  class="mt-1 flex w-full items-center justify-center gap-2 rounded-lg px-5 py-3.5 text-sm font-semibold text-white transition-all duration-150 disabled:opacity-60 hover:brightness-110 bg-brand"
                 >
                   {{ t('auth.resetPassword.submit') }}
                   <svg

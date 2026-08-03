@@ -42,19 +42,19 @@ describe('NotificationBell', () => {
     unreadCount.value = 0
     const w = mount(NotificationBell)
     expect(w.text()).not.toContain('9+')
-    expect(w.find('span.bg-red-500').exists()).toBe(false)
+    expect(w.find('span.bg-coral-600').exists()).toBe(false)
   })
 
   test('shows the unread count badge', () => {
     unreadCount.value = 3
     const w = mount(NotificationBell)
-    expect(w.find('span.bg-red-500').text()).toBe('3')
+    expect(w.find('span.bg-coral-600').text()).toBe('3')
   })
 
   test('caps the unread badge at 9+', () => {
     unreadCount.value = 42
     const w = mount(NotificationBell)
-    expect(w.find('span.bg-red-500').text()).toBe('9+')
+    expect(w.find('span.bg-coral-600').text()).toBe('9+')
   })
 
   test('toggles the panel open and closed on click', async () => {
@@ -74,5 +74,21 @@ describe('NotificationBell', () => {
   test('applies onDark tone classes when requested', () => {
     const w = mount(NotificationBell, { props: { tone: 'onDark' } })
     expect(w.find('button').classes()).toContain('text-navy-100')
+  })
+
+  describe('dark mode (#416)', () => {
+    test('la sidebar navy garde ses classes brutes : elle ne bascule pas', () => {
+      // `tone="onDark"` cible un fond navy-900 permanent, sombre dans les deux
+      // thèmes. Les tokens sémantiques y seraient illisibles.
+      const w = mount(NotificationBell, { props: { tone: 'onDark' } })
+      expect(w.find('button').classes()).toContain('text-navy-100')
+    })
+
+    test('le badge de non-lus utilise la palette coral, pas red', () => {
+      unreadCount.value = 3
+      const w = mount(NotificationBell)
+      expect(w.find('span.bg-coral-600').exists()).toBe(true)
+      expect(w.html()).not.toMatch(/-red-\d/)
+    })
   })
 })

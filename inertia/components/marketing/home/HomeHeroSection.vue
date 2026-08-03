@@ -99,7 +99,7 @@ const { el: tiltEl, transform: tiltTransform } = useTilt({ max: 6, parallax: 0.6
   </section>
 
   <!-- Logos band -->
-  <section class="border-y border-bone bg-white py-8">
+  <section class="border-y border-bone bg-surface-elevated py-8">
     <div class="mx-auto max-w-7xl px-6 lg:px-8">
       <p class="mb-6 text-center text-xs font-semibold uppercase tracking-widest text-fg-subtle">
         {{ socialProof.eyebrow }}

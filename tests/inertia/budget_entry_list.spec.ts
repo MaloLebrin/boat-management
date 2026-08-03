@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { test, expect, vi } from 'vitest'
+import { describe, test, expect, vi } from 'vitest'
 import BudgetEntryList from '../../inertia/components/boats/budget/BudgetEntryList.vue'
 import type { BoatBudgetEntryItem } from '../../shared/types/budget'
 
@@ -83,4 +83,26 @@ test('shows edit and delete buttons when canManage is true', () => {
   const w = mountList([sampleEntry], true)
   expect(w.text()).toContain('common.delete')
   expect(w.text()).toContain('common.edit')
+})
+
+describe('dark mode (#416)', () => {
+  const CATEGORY_TOKENS = [
+    ['maintenance', 'bg-amber-100'],
+    ['fuel', 'bg-sky-100'],
+    ['documents', 'bg-violet-100'],
+    ['port', 'bg-lilac-100'],
+    ['equipment', 'bg-mint-100'],
+    ['other', 'bg-surface-muted'],
+  ] as const
+
+  test.each(CATEGORY_TOKENS)('la pastille %s bascule via %s', (category, token) => {
+    const html = mountList([{ ...sampleEntry, category }]).html()
+    expect(html).toContain(token)
+  })
+
+  test('plus aucune classe dark: dans la liste', () => {
+    // Les `dark:` d'origine s'activaient sur `prefers-color-scheme` alors que
+    // le fond restait crème : ils étaient faux avant même cette PR.
+    expect(mountList([sampleEntry]).html()).not.toContain('dark:')
+  })
 })

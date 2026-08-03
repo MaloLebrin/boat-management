@@ -11,12 +11,19 @@
         role="img"
         aria-label="FleetAi"
       >
-        <circle cx="32" cy="32" r="28" stroke="#0b1d2e" stroke-width="2.6" />
+        <circle cx="32" cy="32" r="28" stroke="var(--color-fg)" stroke-width="2.6" />
         <g class="compass-needle">
-          <path d="M32 9 L37.5 32 L32 36.5 L26.5 32 Z" fill="#0b1d2e" />
-          <path d="M32 55 L37.5 32 L32 27.5 L26.5 32 Z" fill="#e2674f" />
+          <path d="M32 9 L37.5 32 L32 36.5 L26.5 32 Z" fill="var(--color-fg)" />
+          <path d="M32 55 L37.5 32 L32 27.5 L26.5 32 Z" fill="var(--color-coral-500)" />
         </g>
-        <circle cx="32" cy="32" r="2.4" fill="#faf6ee" stroke="#0b1d2e" stroke-width="1.4" />
+        <circle
+          cx="32"
+          cy="32"
+          r="2.4"
+          fill="var(--color-surface)"
+          stroke="var(--color-fg)"
+          stroke-width="1.4"
+        />
       </svg>
     </div>
     <div class="flex flex-col leading-tight">

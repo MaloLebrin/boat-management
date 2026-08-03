@@ -5,6 +5,7 @@ import { computed } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import Logo from '~/components/Logo.vue'
 import LanguageSwitcher from '~/components/layout/LanguageSwitcher.vue'
+import ThemeSwitcher from '~/components/layout/ThemeSwitcher.vue'
 import NavItem from '~/components/layout/NavItem.vue'
 import NotificationBell from '~/components/layout/NotificationBell.vue'
 import { useNavSections } from '~/composables/use_nav_sections'
@@ -80,6 +81,7 @@ function isActive(path: string): boolean {
       </div>
       <div class="flex items-center justify-between mb-3 px-0">
         <LanguageSwitcher />
+        <ThemeSwitcher tone="onDark" />
       </div>
       <div class="flex items-center gap-3 mb-3">
         <div

@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { test, expect, vi } from 'vitest'
+import { describe, test, expect, vi } from 'vitest'
 import BoatEquipmentActionCard from '../../inertia/components/boats/equipment-actions/BoatEquipmentActionCard.vue'
 import type { BoatEquipmentActionRow } from '../../shared/types/equipment_action'
 
@@ -135,10 +135,37 @@ test('applies correct background color for pending status', () => {
 
 test('applies correct background color for ordered status', () => {
   const w = mountCard({ ...sampleAction, status: 'ordered' })
-  expect(w.find('div').classes()).toContain('bg-blue-50')
+  expect(w.find('div').classes()).toContain('bg-sky-50')
 })
 
 test('applies correct background color for done status', () => {
   const w = mountCard({ ...sampleAction, status: 'done' })
-  expect(w.find('div').classes()).toContain('bg-emerald-50')
+  expect(w.find('div').classes()).toContain('bg-mint-50')
+})
+
+describe('dark mode (#416)', () => {
+  // `blue` et `emerald` de la palette Tailwind par défaut ne basculent pas :
+  // remplacés par `sky` et `mint`, inversés par `[data-theme='dark']`.
+  const STATUS_TOKENS = [
+    ['pending', 'bg-amber-50', 'border-amber-200'],
+    ['ordered', 'bg-sky-50', 'border-sky-200'],
+    ['done', 'bg-mint-50', 'border-mint-200'],
+    ['cancelled', 'bg-surface-elevated', 'border-border'],
+  ] as const
+
+  test.each(STATUS_TOKENS)('le statut %s bascule via %s / %s', (status, bg, border) => {
+    const classes = mountCard({ ...sampleAction, status })
+      .find('div')
+      .classes()
+      .join(' ')
+    expect(classes).toContain(bg)
+    expect(classes).toContain(border)
+  })
+
+  test('aucun statut ne retombe sur la palette Tailwind par défaut', () => {
+    for (const [status] of STATUS_TOKENS) {
+      const html = mountCard({ ...sampleAction, status }).html()
+      expect(html, status).not.toMatch(/-(blue|emerald|green|red|gray|slate)-\d/)
+    }
+  })
 })

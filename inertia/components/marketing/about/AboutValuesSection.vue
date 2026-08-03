@@ -34,7 +34,7 @@ const { el, isVisible } = useScrollReveal()
         <div
           v-for="(item, idx) in items"
           :key="item.n"
-          class="rounded-2xl border border-bone bg-white p-8 transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
+          class="rounded-2xl border border-bone bg-surface-elevated p-8 transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
           :style="{ transitionDelay: `${idx * 80}ms` }"
         >
           <p class="font-mono text-xs font-semibold uppercase tracking-widest text-coral-500">

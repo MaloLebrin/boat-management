@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { test, expect, vi } from 'vitest'
+import { describe, test, expect, vi } from 'vitest'
 import BoatShowRigCard from '../../inertia/components/boats/rig/BoatShowRigCard.vue'
 import type { BoatShowRig } from '../../inertia/types/boat_show'
 
@@ -60,4 +60,14 @@ test('does not render the manage link when canManage is false', () => {
     props: { boatId: 10, rig: null, canManage: false },
   })
   expect(w.find('a').exists()).toBe(false)
+})
+
+describe('dark mode (#416)', () => {
+  test('l’icône de suppression utilise le token de danger, pas la palette red', () => {
+    const html = mount(BoatShowRigCard, {
+      props: { boatId: 10, rig: sampleRig, canManage: true },
+    }).html()
+    expect(html).toContain('text-danger-strong')
+    expect(html).not.toMatch(/-red-\d/)
+  })
 })

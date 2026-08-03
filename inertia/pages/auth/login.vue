@@ -80,7 +80,7 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
                 <template #label-right>
                   <a
                     href="/forgot-password"
-                    class="text-[12px] font-semibold text-[#e2674f] no-underline"
+                    class="text-[12px] font-semibold text-coral-500 no-underline"
                     style="border-bottom: 1px solid rgba(226, 103, 79, 0.3); padding-bottom: 1px"
                   >
                     {{ t('auth.login.forgotPassword') }}
@@ -101,7 +101,7 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
                 <input
                   type="checkbox"
                   name="remember"
-                  class="h-[18px] w-[18px] rounded-[5px] border-bone accent-[#0b1d2e]"
+                  class="h-[18px] w-[18px] rounded-[5px] border-border accent-[var(--color-brand)]"
                 />
                 <span class="text-[13px] text-fg-muted">{{ t('auth.login.rememberMe') }}</span>
               </label>
@@ -135,7 +135,7 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
             {{ t('auth.login.noAccount') }}
             <a
               href="/signup"
-              class="font-semibold text-[#e2674f] no-underline"
+              class="font-semibold text-coral-500 no-underline"
               style="border-bottom: 1px solid rgba(226, 103, 79, 0.3); padding-bottom: 1px"
             >
               {{ t('auth.login.createOrg') }} →

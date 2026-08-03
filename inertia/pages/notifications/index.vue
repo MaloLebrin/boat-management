@@ -174,7 +174,7 @@ function handleItemClick(notif: NotificationForFront) {
             </button>
             <button
               type="button"
-              class="rounded-(--radius-control) px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 transition-colors"
+              class="rounded-(--radius-control) px-3 py-1.5 text-xs font-medium text-danger hover:bg-danger-soft transition-colors"
               @click="deleteNotification(notif)"
             >
               {{ t('notifications.delete') }}

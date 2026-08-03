@@ -35,7 +35,7 @@ function labelForType(type: string): string {
       <li
         v-for="action in pendingActions"
         :key="action.id"
-        class="flex items-center justify-between gap-3 rounded-md bg-white border border-amber-200 px-3 py-2 text-sm"
+        class="flex items-center justify-between gap-3 rounded-md bg-surface-elevated border border-amber-200 px-3 py-2 text-sm"
       >
         <div class="min-w-0">
           <p class="font-medium text-fg truncate">{{ labelForType(action.type) }}</p>

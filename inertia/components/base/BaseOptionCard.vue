@@ -9,7 +9,7 @@ interface Props {
 
 withDefaults(defineProps<Props>(), {
   selectedClass: 'border-coral-500 bg-coral-50 text-coral-700',
-  unselectedClass: 'border-bone bg-white text-fg hover:border-fg-subtle',
+  unselectedClass: 'border-border bg-surface-elevated text-fg hover:border-fg-subtle',
   disabled: false,
 })
 

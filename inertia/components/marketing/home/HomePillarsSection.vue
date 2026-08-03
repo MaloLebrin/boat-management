@@ -36,12 +36,12 @@ const { el: sectionEl, isVisible } = useScrollReveal()
         <div
           v-for="(item, idx) in items"
           :key="item.title"
-          class="reveal rounded-xl border border-bone bg-white p-6"
+          class="reveal rounded-xl border border-bone bg-surface-elevated p-6"
           :class="[`reveal-delay-${idx + 1}`, { visible: isVisible }]"
         >
           <div
             class="mb-4 flex h-10 w-10 items-center justify-center rounded-lg text-lg font-semibold"
-            :class="item.isAi ? 'bg-violet-100 text-violet-700' : 'bg-navy-100 text-navy-700'"
+            :class="item.isAi ? 'bg-violet-100 text-violet-700' : 'bg-brand-soft text-brand'"
           >
             {{ item.number }}
           </div>

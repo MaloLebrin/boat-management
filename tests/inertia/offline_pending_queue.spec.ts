@@ -153,4 +153,13 @@ describe('OfflinePendingQueue', () => {
     expect(wrapper.text()).toContain('Avitaillement')
     expect(wrapper.text()).not.toContain('Nouvelle sortie')
   })
+
+  describe('dark mode (#416)', () => {
+    test('les lignes en attente basculent avec la surface', async () => {
+      const wrapper = mountComponent()
+      await flushPromises()
+      expect(wrapper.html()).toContain('bg-surface-elevated')
+      expect(wrapper.html()).not.toContain('bg-white')
+    })
+  })
 })

@@ -208,7 +208,7 @@ function shareResults() {
   <!-- Simulator -->
   <section class="bg-cream px-6 py-12 lg:py-16">
     <div class="mx-auto max-w-2xl">
-      <div class="overflow-hidden rounded-2xl border border-bone bg-white shadow-lg">
+      <div class="overflow-hidden rounded-2xl border border-bone bg-surface-elevated shadow-lg">
         <!-- Top accent bar -->
         <div class="h-1.5 bg-gradient-to-r from-coral-500 to-coral-400" />
 
@@ -216,7 +216,7 @@ function shareResults() {
           <!-- Named stepper -->
           <div
             v-if="!showResult"
-            class="-mx-6 -mt-6 mb-8 flex items-start rounded-t-xl bg-navy-50/60 px-6 py-5 lg:-mx-8 lg:-mt-8 lg:px-8"
+            class="-mx-6 -mt-6 mb-8 flex items-start rounded-t-xl bg-brand-soft/60 px-6 py-5 lg:-mx-8 lg:-mt-8 lg:px-8"
           >
             <template v-for="(step, idx) in steps" :key="step.key">
               <div class="flex flex-col items-center">
@@ -227,7 +227,7 @@ function shareResults() {
                       ? 'bg-mint-600 text-white'
                       : idx === currentStep
                         ? 'bg-coral-500 text-white shadow-md ring-4 ring-coral-100'
-                        : 'bg-navy-50 text-navy-400 ring-1 ring-bone',
+                        : 'bg-brand-soft text-fg-subtle ring-1 ring-border',
                   ]"
                 >
                   <svg
@@ -246,10 +246,10 @@ function shareResults() {
                   :class="[
                     'mt-1.5 hidden max-w-[80px] text-center text-xs font-semibold leading-tight sm:block',
                     idx === currentStep
-                      ? 'text-navy-800'
+                      ? 'text-brand'
                       : idx < currentStep
                         ? 'text-mint-600'
-                        : 'text-navy-400',
+                        : 'text-fg-subtle',
                   ]"
                   >{{ t(step.labelKey) }}</span
                 >

@@ -124,7 +124,7 @@ function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutra
                   :disabled="processing"
                   :aria-label="t('common.delete')"
                 >
-                  <TrashIcon class="w-4 h-4 text-red-800" />
+                  <TrashIcon class="w-4 h-4 text-danger-strong" />
                 </BaseButton>
               </Form>
             </template>

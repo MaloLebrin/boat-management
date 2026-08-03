@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { test, expect, vi } from 'vitest'
+import { describe, test, expect, vi } from 'vitest'
 import SimulatorStepBoat from '../../inertia/components/marketing/simulator/SimulatorStepBoat.vue'
 
 vi.mock('~/composables/use_t', () => ({
@@ -72,4 +72,25 @@ test('resyncs local state when the parent replaces modelValue (restart)', async 
   const emitted = w.emitted('update:modelValue')!
   const last = emitted[emitted.length - 1][0]
   expect(last).toEqual({ hasDedicatedEngine: true, lengthM: 7 })
+})
+
+describe('dark mode (#416)', () => {
+  test('les cartes d’option utilisent des tokens, pas bg-white ni navy figé', () => {
+    const html = mount(SimulatorStepBoat, { props: { modelValue: {} } }).html()
+    expect(html).toContain('bg-surface-elevated')
+    // `border-bone` compte : c'est l'un des quatre neutres chauds remappés en
+    // encre froide par `[data-theme='dark']`, au même titre que `border-border`.
+    expect(html).toMatch(/border-(bone|border)\b/)
+    expect(html).not.toContain('bg-white')
+    // `bg-navy-50 text-navy-700` restait un aplat clair sur une page sombre.
+    expect(html).not.toMatch(/bg-navy-(50|100)\b/)
+  })
+
+  test('l’état sélectionné passe par brand-soft / brand', () => {
+    const html = mount(SimulatorStepBoat, {
+      props: { modelValue: { boatType: 'sailboat' } },
+    }).html()
+    expect(html).toContain('bg-brand-soft')
+    expect(html).toContain('text-brand')
+  })
 })

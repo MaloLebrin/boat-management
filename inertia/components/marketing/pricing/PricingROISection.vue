@@ -132,7 +132,7 @@ function formatCurrency(val: number) {
           <div class="mt-8">
             <div class="flex items-center justify-between">
               <label class="text-sm font-medium text-fg">{{ boatsLabel }}</label>
-              <span class="font-mono text-lg font-bold text-navy-900">{{ boats }}</span>
+              <span class="font-mono text-lg font-bold text-fg">{{ boats }}</span>
             </div>
             <input
               v-model.number="boats"
@@ -147,7 +147,7 @@ function formatCurrency(val: number) {
           <div class="mt-6">
             <div class="flex items-center justify-between">
               <label class="text-sm font-medium text-fg">{{ hourlyLabel }}</label>
-              <span class="font-mono text-lg font-bold text-navy-900">{{ hourlyRate }}€</span>
+              <span class="font-mono text-lg font-bold text-fg">{{ hourlyRate }}€</span>
             </div>
             <input
               v-model.number="hourlyRate"

@@ -166,6 +166,8 @@ export type ScannedRoutes = {
     'marketing.fr.privacy': { paramsTuple?: []; params?: {} }
     'marketing.en.about': { paramsTuple?: []; params?: {} }
     'marketing.fr.about': { paramsTuple?: []; params?: {} }
+    'marketing.en.contact': { paramsTuple?: []; params?: {} }
+    'marketing.fr.contact': { paramsTuple?: []; params?: {} }
     'marketing.contact': { paramsTuple?: []; params?: {} }
     'simulator.session': { paramsTuple?: []; params?: {} }
     'simulator.create_boat': { paramsTuple?: []; params?: {} }
@@ -175,6 +177,7 @@ export type ScannedRoutes = {
     'simulator.share.show.en': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'planning.index': { paramsTuple?: []; params?: {} }
     'locale.set': { paramsTuple?: []; params?: {} }
+    'theme.set': { paramsTuple?: []; params?: {} }
     'settings.index': { paramsTuple?: []; params?: {} }
     'settings.me': { paramsTuple?: []; params?: {} }
     'settings.org': { paramsTuple?: []; params?: {} }
@@ -188,6 +191,9 @@ export type ScannedRoutes = {
     'settings.billing.module.enterprise.deactivate': { paramsTuple?: []; params?: {} }
     'settings.billing.addon.set': { paramsTuple?: []; params?: {} }
     'settings.profile.update': { paramsTuple?: []; params?: {} }
+    'settings.password.update': { paramsTuple?: []; params?: {} }
+    'settings.locale.update': { paramsTuple?: []; params?: {} }
+    'settings.theme.update': { paramsTuple?: []; params?: {} }
     'settings.org.update': { paramsTuple?: []; params?: {} }
     'settings.ai': { paramsTuple?: []; params?: {} }
     'settings.ai.update': { paramsTuple?: []; params?: {} }
@@ -324,6 +330,8 @@ export type ScannedRoutes = {
     'marketing.fr.privacy': { paramsTuple?: []; params?: {} }
     'marketing.en.about': { paramsTuple?: []; params?: {} }
     'marketing.fr.about': { paramsTuple?: []; params?: {} }
+    'marketing.en.contact': { paramsTuple?: []; params?: {} }
+    'marketing.fr.contact': { paramsTuple?: []; params?: {} }
     'marketing.contact': { paramsTuple?: []; params?: {} }
     'simulator.share.show.fr': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'simulator.share.show.en': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
@@ -420,6 +428,8 @@ export type ScannedRoutes = {
     'marketing.fr.privacy': { paramsTuple?: []; params?: {} }
     'marketing.en.about': { paramsTuple?: []; params?: {} }
     'marketing.fr.about': { paramsTuple?: []; params?: {} }
+    'marketing.en.contact': { paramsTuple?: []; params?: {} }
+    'marketing.fr.contact': { paramsTuple?: []; params?: {} }
     'marketing.contact': { paramsTuple?: []; params?: {} }
     'simulator.share.show.fr': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'simulator.share.show.en': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
@@ -510,6 +520,7 @@ export type ScannedRoutes = {
     'simulator.lead': { paramsTuple?: []; params?: {} }
     'simulator.share.store': { paramsTuple?: []; params?: {} }
     'locale.set': { paramsTuple?: []; params?: {} }
+    'theme.set': { paramsTuple?: []; params?: {} }
     'settings.billing.checkout': { paramsTuple?: []; params?: {} }
     'settings.billing.portal': { paramsTuple?: []; params?: {} }
     'settings.billing.module.add': { paramsTuple?: []; params?: {} }
@@ -632,6 +643,9 @@ export type ScannedRoutes = {
     'ports.mouillages.update': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'mouillageId': ParamValue} }
     'spots.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'settings.profile.update': { paramsTuple?: []; params?: {} }
+    'settings.password.update': { paramsTuple?: []; params?: {} }
+    'settings.locale.update': { paramsTuple?: []; params?: {} }
+    'settings.theme.update': { paramsTuple?: []; params?: {} }
     'settings.org.update': { paramsTuple?: []; params?: {} }
     'settings.ai.update': { paramsTuple?: []; params?: {} }
     'settings.branding.update': { paramsTuple?: []; params?: {} }

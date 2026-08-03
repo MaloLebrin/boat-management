@@ -16,6 +16,10 @@ Source: `database/schema.ts` (généré automatiquement via migrations).
 - `password` (non sérialisé)
 - `fullName`
 - `organizationId` (nullable)
+- `lastLoginAt` (nullable)
+- préférences d'interface, nullables — retombent sur le cookie puis sur un défaut :
+  - `locale` (`en` | `fr`, #414)
+  - `theme` (`system` | `light` | `dark`, #416)
 
 ### boats
 
@@ -129,9 +133,10 @@ Source: `database/schema.ts` (généré automatiquement via migrations).
 
 Référence: `database/seeders/malo_seeder.ts` (données réelles de l'utilisateur admin, pas des données de démo génériques — voir `sandbox_seeder.ts` pour la démo "Marina Démo").
 
-- crée (ou réutilise) un admin + organisation via `ADMIN_EMAIL`/`ADMIN_PASSWORD`
-- crée (ou réutilise) le boat `3D`
+- crée (ou réutilise) un admin + organisation via `ADMIN_EMAIL`/`ADMIN_PASSWORD`, plan `pro`
+- crée (ou réutilise) le boat `3D` — le seul de cette organisation
 - crée un moteur, des voiles, un rig si absents
+- crée (ou réutilise) le port `Querqueville` → mouillage `Corps-morts` → spot `B08`, et pose `boats.spotId` sur ce spot
 
 Référence: `database/seeders/billing_module_states_seeder.ts` (environnements `development`/`test`).
 

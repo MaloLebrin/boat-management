@@ -70,7 +70,7 @@ const { el, isVisible } = useScrollReveal()
           <div
             v-for="m in modules"
             :key="m.name"
-            class="rounded-2xl border border-bone bg-white p-5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md"
+            class="rounded-2xl border border-bone bg-surface-elevated p-5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md"
           >
             <div class="flex items-center justify-between gap-3">
               <div class="flex items-center gap-3">

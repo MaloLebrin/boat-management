@@ -28,7 +28,7 @@ const { el: sectionEl, isVisible: sectionVisible } = useScrollReveal()
 <template>
   <section
     :ref="sectionEl"
-    class="reveal mt-14 bg-white rounded-2xl py-14 px-8"
+    class="reveal mt-14 bg-surface-elevated rounded-2xl py-14 px-8"
     :class="{ visible: sectionVisible }"
   >
     <!-- Header -->

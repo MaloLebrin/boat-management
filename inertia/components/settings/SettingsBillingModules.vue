@@ -65,7 +65,7 @@ function removeModule(module: PlanModule) {
       <li
         v-for="module in PLAN_MODULES"
         :key="module"
-        class="flex items-center justify-between gap-3 rounded-lg border border-bone bg-surface-2 p-3"
+        class="flex items-center justify-between gap-3 rounded-lg border border-bone bg-surface-muted p-3"
       >
         <div class="min-w-0">
           <div class="flex items-center gap-2">
@@ -90,7 +90,7 @@ function removeModule(module: PlanModule) {
           <!-- Enterprise : tout est inclus, aucune action à proposer ici (#402) -->
           <span
             v-if="plan === 'enterprise'"
-            class="inline-flex items-center gap-1.5 text-sm font-medium text-green-700"
+            class="inline-flex items-center gap-1.5 text-sm font-medium text-success"
           >
             <span aria-hidden="true">✓</span>
             {{ t('settings.billing.modules.includedInPlan') }}

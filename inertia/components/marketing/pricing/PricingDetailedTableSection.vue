@@ -96,10 +96,10 @@ function collapseAllGroups() {
       </div>
 
       <!-- Table -->
-      <div class="overflow-x-auto rounded-2xl border border-bone bg-white">
+      <div class="overflow-x-auto rounded-2xl border border-bone bg-surface-elevated">
         <table class="w-full min-w-[640px] text-sm">
           <!-- Sticky header -->
-          <thead class="bg-white shadow-sm">
+          <thead class="bg-surface-elevated shadow-sm">
             <tr>
               <th class="w-1/3 px-6 py-4 text-left font-medium text-fg-muted"></th>
               <th

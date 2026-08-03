@@ -58,7 +58,7 @@ const { t } = useT()
         :disabled="processing"
         :aria-label="t('boats.maintenance.tasks.delete')"
       >
-        <TrashIcon class="w-4 h-4 text-red-800" />
+        <TrashIcon class="w-4 h-4 text-danger-strong" />
       </BaseButton>
     </Form>
   </div>

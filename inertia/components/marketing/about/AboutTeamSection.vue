@@ -40,7 +40,7 @@ const { el, isVisible } = useScrollReveal()
         <div
           v-for="(member, idx) in members"
           :key="member.n"
-          class="rounded-2xl border border-bone bg-white p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
+          class="rounded-2xl border border-bone bg-surface-elevated p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
           :style="{ transitionDelay: `${idx * 60}ms` }"
         >
           <div

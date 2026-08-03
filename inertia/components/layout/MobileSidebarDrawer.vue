@@ -3,6 +3,7 @@ import { Form } from '@adonisjs/inertia/vue'
 import { nextTick, ref, watch } from 'vue'
 import brandIconUrl from '~/assets/brand/fleetai_compass.svg'
 import LanguageSwitcher from '~/components/layout/LanguageSwitcher.vue'
+import ThemeSwitcher from '~/components/layout/ThemeSwitcher.vue'
 import NavItem from '~/components/layout/NavItem.vue'
 import { useNavSections } from '~/composables/use_nav_sections'
 import { useT } from '~/composables/use_t'
@@ -118,8 +119,9 @@ function close() {
             @click="close"
           />
         </div>
-        <div class="mb-3">
+        <div class="mb-3 flex items-center justify-between">
           <LanguageSwitcher />
+          <ThemeSwitcher tone="onDark" />
         </div>
         <div class="flex items-center gap-3 mb-3">
           <div

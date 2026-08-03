@@ -40,13 +40,15 @@
     <!-- Main content -->
     <div class="flex flex-1 flex-col overflow-hidden">
       <!-- Header -->
-      <div class="flex items-center justify-between border-b border-bone bg-white px-4 py-2">
+      <div
+        class="flex items-center justify-between border-b border-bone bg-surface-elevated px-4 py-2"
+      >
         <div>
           <p class="font-semibold text-fg">Planning maintenance</p>
           <p class="text-[9px] text-fg-muted">Mai 2025</p>
         </div>
         <div class="flex items-center gap-1">
-          <span class="rounded-l bg-navy-100 px-2 py-1 text-[9px] font-medium text-navy-700"
+          <span class="rounded-l bg-brand-soft px-2 py-1 text-[9px] font-medium text-brand"
             >Calendrier</span
           >
           <span class="rounded-r bg-paper px-2 py-1 text-[9px] text-fg-muted">Kanban</span>
@@ -55,7 +57,7 @@
 
       <!-- Calendar -->
       <div class="flex-1 overflow-auto p-3">
-        <div class="rounded-lg border border-bone bg-white">
+        <div class="rounded-lg border border-bone bg-surface-elevated">
           <!-- Calendar header -->
           <div class="grid grid-cols-7 border-b border-bone bg-paper/50">
             <div class="px-2 py-1.5 text-center text-[9px] font-medium text-fg-muted">Lun</div>
@@ -106,7 +108,7 @@
             <div class="min-h-[48px] border-r border-bone p-1">14</div>
             <div class="min-h-[48px] border-r border-bone p-1">
               <span>15</span>
-              <div class="mt-0.5 rounded bg-navy-100 px-1 py-0.5 text-[8px] text-navy-700">
+              <div class="mt-0.5 rounded bg-brand-soft px-1 py-0.5 text-[8px] text-brand">
                 Sirocco
               </div>
             </div>

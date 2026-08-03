@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import PortsMapCanvas from '../canvas/PortsMapCanvas.vue'
+import { useTheme } from '~/composables/use_theme'
 
 defineProps<{
   eyebrow: string
@@ -7,11 +8,15 @@ defineProps<{
   titleHighlight: string
   subtitle: string
 }>()
+
+const { resolved } = useTheme()
 </script>
 
 <template>
   <section class="relative overflow-hidden bg-cream px-6 pb-12 pt-20 lg:px-8 lg:pt-28">
-    <PortsMapCanvas variant="light" :intensity="0.5" />
+    <!-- Le fond de section suit le thème : la carte doit suivre aussi. `key`
+         force la recréation du canvas, dont le rendu est calculé une fois. -->
+    <PortsMapCanvas :key="resolved" :variant="resolved" :intensity="0.5" />
     <div class="relative mx-auto max-w-3xl text-center">
       <p
         class="font-mono text-xs font-semibold uppercase tracking-widest text-coral-500"

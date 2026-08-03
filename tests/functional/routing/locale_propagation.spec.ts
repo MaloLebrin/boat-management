@@ -25,7 +25,8 @@ test.group('Locale propagation (functional)', () => {
     const loginResponse = await client.get('/login').cookie('locale', localeCookie)
 
     loginResponse.assertStatus(200)
-    assert.include(loginResponse.text(), '<html lang="fr">')
+    // Sans le `>` fermant : la balise <html> porte aussi `data-theme` (#416).
+    assert.include(loginResponse.text(), '<html lang="fr"')
   })
 
   test('locale cookie is refreshed when navigating to the other locale prefix', async ({

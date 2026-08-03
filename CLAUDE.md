@@ -52,6 +52,7 @@ Les PDFs uploadés sont compressés avant envoi sur Cloudinary via `app/services
 - Migrations : toujours avec rollback (`down()` implémenté)
 - Nommage tables : snake_case pluriel (`user_profiles`, `refresh_tokens`)
 - Seeders pour les données de démo (`database/seeders/`)
+- **Le compte `ADMIN_EMAIL` est le compte réel de l'exploitant, pas un compte de test** : seul `malo_seeder.ts` y écrit (un seul bateau « 3D », plan `pro`). Aucun autre seeder ne doit lui rattacher de données ni changer son plan — voir `docs/dev/seeders.md`
 - Jamais de `SELECT *` en production — colonnes explicites
 
 ### Frontend (Vue 3 + Inertia)
@@ -84,6 +85,18 @@ Sur tout écran rendu par Inertia (`inertia/pages/**`, `inertia/components/**`),
 **Exceptions autorisées** : endpoints dédiés API (`/api/**`, clients externes, exports) — jamais dans un composant/page Inertia si une visite `router.*` ou un `<Form>` suffit.
 
 Références : [Inertia — Link and Form](https://docs.adonisjs.com/guides/frontend/inertia#link-and-form-components), [Manual visits](https://inertiajs.com/manual-visits).
+
+### Couleurs et thème clair/sombre
+
+L'app supporte un thème sombre (issue #416) piloté par l'attribut `data-theme` sur `<html>`. Il repose entièrement sur les design tokens de `inertia/css/app.css` : **le thème bascule en redéfinissant des variables, pas en ajoutant des classes**.
+
+- **Toujours utiliser les tokens sémantiques** : `bg-surface`, `bg-surface-elevated`, `bg-surface-muted`, `text-fg`, `text-fg-muted`, `text-fg-subtle`, `border-border`, `text-brand`/`bg-brand`, `text-danger`, `text-success`, `text-warning`, `text-info`.
+- **Texte posé sur un aplat `bg-brand`/`bg-accent`** : `text-on-brand` / `text-on-accent`, jamais `text-white` (le brand s'éclaircit en sombre).
+- **Palettes de marque** (`coral`, `mint`, `amber`, `violet`, `sky`, `lilac`, `peach`) : les paliers `-50`/`-100` sont des **fonds**, `-700`/`-800` de l'**encre** posée dessus, `-300` à `-600` des **tons moyens** (aplats pleins, icônes). Le bloc `[data-theme='dark']` inverse les deux extrémités — respecter ces rôles, sinon le composant s'inverse à l'envers.
+- **Ne jamais introduire** : une couleur Tailwind par défaut (`bg-red-100`, `text-gray-600`, `slate`, `emerald`…), un `bg-white`/`text-navy-900` sur une surface qui bascule, un hex brut ou un `style="background: #…"` dans un composant d'UI.
+- **Classes `dark:`** : inutiles dans le cas général — si vous en avez besoin, c'est probablement qu'un token manque. Elles suivent `data-theme` (pas la media query), via `@custom-variant dark`.
+- **Exceptions légitimes** : les bandeaux et panneaux navy permanents (sidebar, hero marketing, `AuthNavyPanel`) et les illustrations autonomes (carte marina, dégradés mesh, SVG décoratifs) gardent leurs couleurs brutes — elles sont sombres ou cohérentes dans les deux thèmes.
+- Banc d'essai : `/design-system` rend toute la palette et tous les composants `base` — le vérifier dans les deux thèmes après une modification de tokens.
 
 ### Branding (graphie canonique)
 
@@ -160,9 +173,11 @@ tests/
 - Committer des secrets ou `.env`
 - Supprimer des migrations existantes
 - Mettre de la logique de formatage dans les controllers (→ utiliser un transformer)
+- **Écrire des données de test/démo sur le compte `ADMIN_EMAIL`** (→ compte réel ; seul `malo_seeder.ts` y écrit, un seul bateau « 3D », plan `pro`)
 - **Définir des types de controllers/services ailleurs que dans `shared/types/`** (→ un fichier par domaine dans `shared/types/`, réutilisé côté front)
 - **Définir des classes d'erreur inline dans un controller ou service** (→ `app/exceptions/<domaine>_errors.ts`)
 - **Écrire du texte visible en dur dans un template Vue** (→ utiliser `t('clé')`)
+- **Utiliser une couleur Tailwind par défaut ou un hex brut dans un composant d'UI** (→ tokens sémantiques ou palettes de marque, sinon le thème sombre casse)
 - **Utiliser des ternaires `locale === 'fr' ? ... : ...`** (→ utiliser `t()` avec clé dans les deux JSON)
 - **`fetch` / `axios` + JSON + CSRF manuel dans `inertia/**`** pour des mutations déjà couvertes par une page Inertia (→ `router.patch`/`useForm`/`<Form>`+`response.redirect().back()` côté contrôleur)
 - **`response.json({ ok: true })` sur des routes appelées depuis l’UI Inertia** (→ redirection ; réserver le JSON aux vraies routes API)

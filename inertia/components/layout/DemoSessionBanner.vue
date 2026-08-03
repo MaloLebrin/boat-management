@@ -44,7 +44,7 @@ const isVisible = computed(() => Boolean(page.props.demoSessionStartedAt))
     role="status"
     :class="[
       'flex items-center justify-between gap-4 px-4 py-2 text-sm font-medium transition-colors',
-      isUrgent ? 'bg-red-600 text-white' : 'bg-navy-700 text-navy-100',
+      isUrgent ? 'bg-coral-600 text-white' : 'bg-navy-700 text-navy-100',
     ]"
   >
     <span>{{ t('common.demo.banner', { time: formatted }) }}</span>

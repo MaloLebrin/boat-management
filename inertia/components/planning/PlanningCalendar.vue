@@ -80,7 +80,7 @@ function taskPillClass(task: PlanningTask): string {
   const dueDate = task.dueAt
   if (!dueDate) return 'bg-navy-600 text-white'
   const todayIso = today.toISOString().slice(0, 10)
-  if (dueDate < todayIso) return 'bg-red-500 text-white'
+  if (dueDate < todayIso) return 'bg-coral-600 text-white'
   const soon = new Date(today)
   soon.setDate(soon.getDate() + 30)
   if (new Date(dueDate) <= soon) return 'bg-amber-500 text-white'

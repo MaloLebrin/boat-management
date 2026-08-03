@@ -261,6 +261,7 @@ export interface ApiDefinition {
       guide: typeof routes['marketing.en.guide']
       privacy: typeof routes['marketing.en.privacy']
       about: typeof routes['marketing.en.about']
+      contact: typeof routes['marketing.en.contact']
     }
     fr: {
       home: typeof routes['marketing.fr.home']
@@ -269,6 +270,7 @@ export interface ApiDefinition {
       guide: typeof routes['marketing.fr.guide']
       privacy: typeof routes['marketing.fr.privacy']
       about: typeof routes['marketing.fr.about']
+      contact: typeof routes['marketing.fr.contact']
     }
     contact: typeof routes['marketing.contact']
   }
@@ -289,6 +291,9 @@ export interface ApiDefinition {
   }
   locale: {
     set: typeof routes['locale.set']
+  }
+  theme: {
+    set: typeof routes['theme.set']
   }
   settings: {
     index: typeof routes['settings.index']
@@ -314,6 +319,15 @@ export interface ApiDefinition {
     }
     profile: {
       update: typeof routes['settings.profile.update']
+    }
+    password: {
+      update: typeof routes['settings.password.update']
+    }
+    locale: {
+      update: typeof routes['settings.locale.update']
+    }
+    theme: {
+      update: typeof routes['settings.theme.update']
     }
     ai: typeof routes['settings.ai'] & {
       update: typeof routes['settings.ai.update']

@@ -104,4 +104,21 @@ describe('ConflictResolutionModal', () => {
     expect(wrapper.text()).not.toContain('_expectedUpdatedAt')
     expect(wrapper.text()).not.toContain('2026-06-25T10:00')
   })
+
+  describe('dark mode (#416)', () => {
+    test('la modale s’appuie sur des tokens de surface, pas sur bg-white', () => {
+      const html = mountModal().html()
+      expect(html).toContain('bg-surface-elevated')
+      expect(html).toContain('border-border')
+      expect(html).not.toContain('bg-white')
+    })
+
+    test('le texte et les colonnes utilisent des tokens, pas la palette gray', () => {
+      const html = mountModal().html()
+      expect(html).toContain('text-fg')
+      expect(html).not.toMatch(/-(gray|slate)-\d/)
+      // La colonne « serveur » signalait sa différence en bleu Tailwind.
+      expect(html).toContain('text-info')
+    })
+  })
 })

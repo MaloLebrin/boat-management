@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { expect, test, vi } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 import HomeModularOfferSection from '../../inertia/components/marketing/home/HomeModularOfferSection.vue'
 
 vi.mock('@adonisjs/inertia/vue', () => ({
@@ -38,4 +38,12 @@ test('renders the availability note and CTA', () => {
   const w = mount(HomeModularOfferSection, { props: baseProps })
   expect(w.text()).toContain('Modules disponibles sur le plan Pro.')
   expect(w.text()).toContain('Composer mon offre')
+})
+
+describe('dark mode (#416)', () => {
+  test('les cartes de module basculent avec la surface', () => {
+    const html = mount(HomeModularOfferSection, { props: baseProps }).html()
+    expect(html).toContain('bg-surface-elevated')
+    expect(html).not.toContain('bg-white')
+  })
 })

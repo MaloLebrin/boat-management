@@ -56,7 +56,7 @@ const cards = [
   {
     icon: ArrowDownTrayIcon,
     bg: 'bg-paper',
-    iconColor: 'text-navy-700',
+    iconColor: 'text-brand',
     titleColor: 'text-fg',
     descColor: 'text-fg-muted',
   },
@@ -86,6 +86,8 @@ const cards = [
         <div
           class="absolute inset-0 grid grid-cols-3 gap-1.5 p-8 pt-14 opacity-15 pointer-events-none"
         >
+          <!-- Décor posé sur la carte navy-900, sombre dans les deux thèmes :
+               reste blanc, ne suit pas les tokens de surface (#416). -->
           <div v-for="n in 6" :key="n" class="rounded-lg bg-white h-8" />
         </div>
         <!-- Status dots -->

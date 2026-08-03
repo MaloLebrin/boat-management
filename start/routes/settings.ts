@@ -1,5 +1,6 @@
 import { middleware } from '#start/kernel'
 import router from '@adonisjs/core/services/router'
+import { isThemePreference } from '#shared/types/theme'
 
 const SettingsController = () => import('#controllers/settings_controller')
 const BillingController = () => import('#controllers/billing_controller')
@@ -24,6 +25,26 @@ router
     return response.redirect().back()
   })
   .as('locale.set')
+
+router
+  .post('/theme', async ({ request, response, auth }) => {
+    const theme = request.input('theme')
+    if (isThemePreference(theme)) {
+      // Cookie signé, lu côté serveur pour rendre le bon thème dès la
+      // première réponse (cf. `resolveSharedTheme`).
+      response.cookie('theme', theme, { maxAge: '365d', path: '/' })
+
+      // Route publique : le switcher est aussi disponible sur le marketing et
+      // l'écran de login. Quand l'utilisateur est connecté, on persiste en base
+      // pour que la préférence le suive d'un appareil à l'autre.
+      if (await auth.check()) {
+        auth.user!.theme = theme
+        await auth.user!.save()
+      }
+    }
+    return response.redirect().back()
+  })
+  .as('theme.set')
 
 router
   .group(() => {
@@ -63,6 +84,7 @@ router
       .put('settings/password', [SettingsController, 'changePassword'])
       .as('settings.password.update')
     router.put('settings/locale', [SettingsController, 'updateLocale']).as('settings.locale.update')
+    router.put('settings/theme', [SettingsController, 'updateTheme']).as('settings.theme.update')
     router.put('settings/org', [SettingsController, 'updateOrganization']).as('settings.org.update')
     router.get('settings/ai', [SettingsController, 'ai']).as('settings.ai')
     router.put('settings/ai', [SettingsController, 'updateAiSettings']).as('settings.ai.update')

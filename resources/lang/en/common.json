@@ -56,5 +56,9 @@
   "navigationLog.field.arrivalPortName": "Arrival port",
   "navigationLog.field.distanceNm": "Distance (nm)",
   "navigationLog.field.engineHoursEnd": "Engine hours (end)",
-  "navigationLog.field.fuelConsumedLiters": "Fuel consumed (L)"
+  "navigationLog.field.fuelConsumedLiters": "Fuel consumed (L)",
+  "theme.label": "Theme",
+  "theme.system": "System theme",
+  "theme.light": "Light theme",
+  "theme.dark": "Dark theme"
 }

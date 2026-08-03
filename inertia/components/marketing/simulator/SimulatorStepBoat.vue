@@ -32,29 +32,29 @@ const boatTypeOptions: BoatTypeOption[] = [
     value: 'motorboat',
     labelKey: 'simulator.boat_type_motorboat',
     icon: '🚤',
-    selected: 'border-navy-500 bg-navy-50 text-navy-700',
-    unselected: 'border-bone bg-white text-fg hover:border-navy-200 hover:bg-navy-50',
+    selected: 'border-brand bg-brand-soft text-brand',
+    unselected: 'border-bone bg-surface-elevated text-fg hover:border-brand hover:bg-brand-soft',
   },
   {
     value: 'sailboat',
     labelKey: 'simulator.boat_type_sailboat',
     icon: '⛵',
     selected: 'border-coral-500 bg-coral-50 text-coral-700',
-    unselected: 'border-bone bg-white text-fg hover:border-coral-200 hover:bg-coral-50',
+    unselected: 'border-bone bg-surface-elevated text-fg hover:border-coral-200 hover:bg-coral-50',
   },
   {
     value: 'catamaran',
     labelKey: 'simulator.boat_type_catamaran',
     icon: '⛴️',
     selected: 'border-mint-600 bg-mint-50 text-mint-700',
-    unselected: 'border-bone bg-white text-fg hover:border-mint-300 hover:bg-mint-50',
+    unselected: 'border-bone bg-surface-elevated text-fg hover:border-mint-300 hover:bg-mint-50',
   },
   {
     value: 'rib',
     labelKey: 'simulator.boat_type_rib',
     icon: '🛥️',
     selected: 'border-amber-600 bg-amber-50 text-amber-700',
-    unselected: 'border-bone bg-white text-fg hover:border-amber-200 hover:bg-amber-50',
+    unselected: 'border-bone bg-surface-elevated text-fg hover:border-amber-200 hover:bg-amber-50',
   },
 ]
 
@@ -138,7 +138,7 @@ const canProceed = computed(() => {
           max="30"
           step="0.1"
           :value="modelValue.lengthM"
-          class="w-full rounded-lg border border-sand bg-white px-4 py-3 text-fg placeholder:text-fg-subtle focus:border-navy-500 focus:outline-none focus:ring-2 focus:ring-navy-500/15"
+          class="w-full rounded-lg border border-sand bg-surface-elevated px-4 py-3 text-fg placeholder:text-fg-subtle focus:border-navy-500 focus:outline-none focus:ring-2 focus:ring-navy-500/15"
           @input="update('lengthM', Number(($event.target as HTMLInputElement).value))"
         />
       </div>
@@ -152,7 +152,7 @@ const canProceed = computed(() => {
           :min="1950"
           :max="currentYear"
           :value="modelValue.yearBuilt"
-          class="w-full rounded-lg border border-sand bg-white px-4 py-3 text-fg placeholder:text-fg-subtle focus:border-navy-500 focus:outline-none focus:ring-2 focus:ring-navy-500/15"
+          class="w-full rounded-lg border border-sand bg-surface-elevated px-4 py-3 text-fg placeholder:text-fg-subtle focus:border-navy-500 focus:outline-none focus:ring-2 focus:ring-navy-500/15"
           @input="update('yearBuilt', Number(($event.target as HTMLInputElement).value))"
         />
       </div>
@@ -168,8 +168,8 @@ const canProceed = computed(() => {
           v-for="cat in navCategories"
           :key="cat"
           :selected="modelValue.navigationCategory === cat"
-          selected-class="border-navy-500 bg-navy-50"
-          unselected-class="border-bone bg-white hover:border-navy-200 hover:bg-navy-50"
+          selected-class="border-brand bg-brand-soft"
+          unselected-class="border-bone bg-surface-elevated hover:border-brand hover:bg-brand-soft"
           :aria-label="t(`simulator.nav_category_${cat.toLowerCase()}`)"
           class="p-3 text-left"
           @click="update('navigationCategory', cat)"
@@ -177,7 +177,7 @@ const canProceed = computed(() => {
           <span
             :class="[
               'block font-display text-xl font-bold',
-              modelValue.navigationCategory === cat ? 'text-navy-700' : 'text-fg',
+              modelValue.navigationCategory === cat ? 'text-brand' : 'text-fg',
             ]"
             >{{ cat }}</span
           >
@@ -191,13 +191,13 @@ const canProceed = computed(() => {
     <!-- Engine checkbox (sailboat/catamaran only) -->
     <div
       v-if="showEngineCheckbox"
-      class="flex items-center gap-3 rounded-xl border border-bone bg-white p-3"
+      class="flex items-center gap-3 rounded-xl border border-bone bg-surface-elevated p-3"
     >
       <input
         id="hasDedicatedEngine"
         type="checkbox"
         :checked="modelValue.hasDedicatedEngine ?? true"
-        class="size-4 rounded border-sand text-navy-700 focus:ring-navy-500"
+        class="size-4 rounded border-border-strong text-brand focus:ring-brand"
         @change="update('hasDedicatedEngine', ($event.target as HTMLInputElement).checked)"
       />
       <label for="hasDedicatedEngine" class="text-sm text-fg">

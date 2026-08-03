@@ -37,7 +37,7 @@ const componentTag = computed(() => {
 
 const variantClass: Record<NonNullable<typeof props.variant>, string> = {
   primary:
-    'bg-brand text-white shadow-sm hover:bg-brand-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 focus-visible:ring-offset-2 focus-visible:ring-offset-surface',
+    'bg-brand text-on-brand shadow-sm hover:bg-brand-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 focus-visible:ring-offset-2 focus-visible:ring-offset-surface',
   secondary:
     'border border-border-strong bg-surface-elevated text-fg shadow-sm hover:bg-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30 focus-visible:ring-offset-2 focus-visible:ring-offset-surface',
   outline:
@@ -45,7 +45,7 @@ const variantClass: Record<NonNullable<typeof props.variant>, string> = {
   ghost:
     'text-fg-muted hover:bg-surface-muted hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30 focus-visible:ring-offset-2 focus-visible:ring-offset-surface',
   danger:
-    'bg-red-200 text-red-800 shadow-sm hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-800/40 focus-visible:ring-offset-2 focus-visible:ring-offset-surface',
+    'bg-danger-soft text-danger-strong shadow-sm hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger/40 focus-visible:ring-offset-2 focus-visible:ring-offset-surface',
 }
 
 const sizeClass: Record<NonNullable<typeof props.size>, string> = {

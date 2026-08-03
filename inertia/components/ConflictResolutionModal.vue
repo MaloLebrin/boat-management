@@ -51,39 +51,39 @@ function fmt(val: unknown): string {
     <div
       class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
     >
-      <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col">
+      <div
+        class="bg-surface-elevated rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col"
+      >
         <!-- Header -->
-        <div class="px-6 pt-6 pb-4 border-b border-gray-100">
-          <h2 class="text-lg font-semibold text-navy-900">{{ t('offline.conflict.title') }}</h2>
-          <p class="mt-1 text-sm text-gray-500">{{ t('offline.conflict.description') }}</p>
+        <div class="px-6 pt-6 pb-4 border-b border-border">
+          <h2 class="text-lg font-semibold text-fg">{{ t('offline.conflict.title') }}</h2>
+          <p class="mt-1 text-sm text-fg-muted">{{ t('offline.conflict.description') }}</p>
         </div>
 
         <!-- Comparison grid -->
         <div class="overflow-y-auto flex-1 px-6 py-4">
           <div class="grid grid-cols-[auto_1fr_1fr] gap-x-4 text-sm">
-            <div class="pb-2 font-medium text-gray-400 text-xs uppercase tracking-wide"></div>
+            <div class="pb-2 font-medium text-fg-subtle text-xs uppercase tracking-wide"></div>
             <div class="pb-2 font-semibold text-amber-600 text-xs uppercase tracking-wide">
               {{ t('offline.conflict.localVersion') }}
             </div>
-            <div class="pb-2 font-semibold text-blue-600 text-xs uppercase tracking-wide">
+            <div class="pb-2 font-semibold text-info text-xs uppercase tracking-wide">
               {{ t('offline.conflict.serverVersion') }}
             </div>
 
             <template v-for="row in rows" :key="row.key">
-              <div
-                class="py-2 pr-4 font-medium text-gray-700 border-t border-gray-100 whitespace-nowrap"
-              >
+              <div class="py-2 pr-4 font-medium text-fg border-t border-border whitespace-nowrap">
                 {{ row.label }}
               </div>
               <div
-                class="py-2 pr-4 border-t border-gray-100 break-words"
-                :class="row.differs ? 'text-amber-700 font-medium' : 'text-gray-600'"
+                class="py-2 pr-4 border-t border-border break-words"
+                :class="row.differs ? 'text-warning font-medium' : 'text-fg-muted'"
               >
                 {{ fmt(row.local) }}
               </div>
               <div
-                class="py-2 border-t border-gray-100 break-words"
-                :class="row.differs ? 'text-blue-700 font-medium' : 'text-gray-600'"
+                class="py-2 border-t border-border break-words"
+                :class="row.differs ? 'text-info font-medium' : 'text-fg-muted'"
               >
                 {{ fmt(row.server) }}
               </div>
@@ -92,7 +92,7 @@ function fmt(val: unknown): string {
         </div>
 
         <!-- Actions -->
-        <div class="px-6 py-4 border-t border-gray-100 flex justify-end gap-3">
+        <div class="px-6 py-4 border-t border-border flex justify-end gap-3">
           <BaseButton variant="secondary" @click="emit('resolve', 'server')">
             {{ t('offline.conflict.keepServer') }}
           </BaseButton>

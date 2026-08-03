@@ -81,7 +81,7 @@ onBeforeUnmount(() => {
       </svg>
       <span
         v-if="hasUnread"
-        class="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold leading-none text-white"
+        class="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-coral-600 px-1 text-[10px] font-bold leading-none text-white"
         aria-hidden="true"
       >
         {{ unreadCount > 9 ? '9+' : unreadCount }}

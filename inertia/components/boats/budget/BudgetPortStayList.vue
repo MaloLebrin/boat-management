@@ -132,7 +132,7 @@ function formatDate(dateStr: string | null): string {
               </p>
             </div>
             <div class="flex items-center gap-4">
-              <span v-if="stay.cost" class="font-semibold text-teal-600 dark:text-teal-400">
+              <span v-if="stay.cost" class="font-semibold text-lilac-700">
                 {{ formatCurrency(stay.cost) }}
               </span>
               <span v-else class="text-fg-subtle">—</span>

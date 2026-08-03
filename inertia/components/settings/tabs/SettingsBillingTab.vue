@@ -78,7 +78,7 @@ const storageOverflow = computed(() => {
     <div class="space-y-6">
       <div
         v-if="storageOverflow"
-        class="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800"
+        class="rounded-lg border border-coral-200 bg-danger-soft p-4 text-sm text-danger-strong"
       >
         {{ t('settings.billing.storageOverflow') }}
       </div>
@@ -103,7 +103,7 @@ const storageOverflow = computed(() => {
 
         <div class="space-y-5">
           <!-- Subscription info -->
-          <div v-if="subscription" class="rounded-lg bg-surface-2 p-3 text-sm space-y-1">
+          <div v-if="subscription" class="rounded-lg bg-surface-muted p-3 text-sm space-y-1">
             <p v-if="!subscription.cancelAtPeriodEnd" class="text-fg-muted">
               {{
                 t('settings.billing.subscription.renewsOn', {
@@ -155,7 +155,7 @@ const storageOverflow = computed(() => {
               class="flex items-center gap-2"
               :class="quotaUsage.canUseAI ? 'text-fg' : 'text-fg-muted'"
             >
-              <span :class="quotaUsage.canUseAI ? 'text-green-600' : 'text-fg-muted'">
+              <span :class="quotaUsage.canUseAI ? 'text-success' : 'text-fg-muted'">
                 {{ quotaUsage.canUseAI ? '✓' : '✗' }}
               </span>
               {{ t('settings.billing.features.ai') }}
@@ -164,13 +164,13 @@ const storageOverflow = computed(() => {
               class="flex items-center gap-2"
               :class="quotaUsage.canExport ? 'text-fg' : 'text-fg-muted'"
             >
-              <span :class="quotaUsage.canExport ? 'text-green-600' : 'text-fg-muted'">
+              <span :class="quotaUsage.canExport ? 'text-success' : 'text-fg-muted'">
                 {{ quotaUsage.canExport ? '✓' : '✗' }}
               </span>
               {{ t('settings.billing.features.export') }}
             </li>
             <li class="flex items-center gap-2 text-fg">
-              <span class="text-green-600">✓</span>
+              <span class="text-success">✓</span>
               {{ t('settings.billing.features.maintenanceHistory') }}
             </li>
           </ul>
@@ -198,7 +198,7 @@ const storageOverflow = computed(() => {
                 :class="
                   interval === 'month'
                     ? 'bg-brand text-white'
-                    : 'bg-surface-2 text-fg-muted hover:text-fg'
+                    : 'bg-surface-muted text-fg-muted hover:text-fg'
                 "
                 @click="interval = 'month'"
               >
@@ -210,12 +210,12 @@ const storageOverflow = computed(() => {
                 :class="
                   interval === 'year'
                     ? 'bg-brand text-white'
-                    : 'bg-surface-2 text-fg-muted hover:text-fg'
+                    : 'bg-surface-muted text-fg-muted hover:text-fg'
                 "
                 @click="interval = 'year'"
               >
                 {{ t('settings.billing.subscription.interval.year') }}
-                <span class="rounded bg-green-100 px-1 text-xs font-semibold text-green-700">
+                <span class="rounded bg-mint-100 px-1 text-xs font-semibold text-success">
                   {{ t('settings.billing.subscription.annualDiscount') }}
                 </span>
               </button>

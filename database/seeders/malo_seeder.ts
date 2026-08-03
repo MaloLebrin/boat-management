@@ -1,13 +1,17 @@
 import Boat from '#models/boat'
 import BoatMaintenanceEvent from '#models/boat_maintenance_event'
 import BoatMaintenanceTask from '#models/boat_maintenance_task'
+import Mouillage from '#models/mouillage'
 import Organization from '#models/organization'
 import Port from '#models/port'
+import Spot from '#models/spot'
 import User from '#models/user'
 import BoatEquipmentService from '#services/boat_equipment_service'
 import BoatMaintenanceService from '#services/boat_maintenance_service'
 import BoatService from '#services/boat_service'
+import MouillageService from '#services/mouillage_service'
 import PortService from '#services/port_service'
+import SpotService from '#services/spot_service'
 import UserService from '#services/user_service'
 import app from '@adonisjs/core/services/app'
 import { BaseSeeder } from '@adonisjs/lucid/seeders'
@@ -23,10 +27,17 @@ export default class MaloSeeder extends BaseSeeder {
      * (keyed by `ADMIN_EMAIL`), not generic demo data — see `sandbox_seeder.ts`
      * for the generic "Marina Démo" dataset.
      *
+     * That account is a REAL one, so it never gets fabricated data: it owns a
+     * single boat ("3D"), moored on buoy B08 at Querqueville, on the `pro`
+     * plan. This is the only seeder allowed to write to it — the guard rail is
+     * `tests/integration/seeders/admin_account_isolation.spec.ts`.
+     *
      * Idempotent-ish:
      * - Reuses `ADMIN_EMAIL` user if it exists, otherwise creates it with an organization.
      * - Reuses the "3D" boat for that organization if it exists.
      * - Creates equipment only if missing.
+     * - Creates the port/mouillage/spot only if missing, and only reassigns the
+     *   boat when it is not already on B08 (each reassignment logs a berth change).
      * - Creates maintenance events only if missing (based on title uniqueness per boat).
      */
 
@@ -50,26 +61,18 @@ export default class MaloSeeder extends BaseSeeder {
       throw new Error('Admin user must belong to an organization')
     }
 
-    // Reflects the real account's plan (enterprise), set directly on the org
-    // rather than via a subscription.
+    // Reflects the real account's plan (pro), set directly on the org rather
+    // than via a subscription.
     const organization = await Organization.findOrFail(user.organizationId)
-    if (organization.plan !== 'enterprise') {
-      await organization.merge({ plan: 'enterprise' }).save()
+    if (organization.plan !== 'pro') {
+      await organization.merge({ plan: 'pro' }).save()
     }
 
     const boatService = await app.container.make(BoatService)
     const equipmentService = await app.container.make(BoatEquipmentService)
     const portService = await app.container.make(PortService)
-
-    // Find or create port
-    const existingPort = await Port.query()
-      .where('organizationId', user.organizationId)
-      .where('name', 'Port de Test Audit')
-      .first()
-
-    if (!existingPort) {
-      await portService.createForUser(user, { name: 'Port de Test Audit', city: 'Marseille' })
-    }
+    const mouillageService = await app.container.make(MouillageService)
+    const spotService = await app.container.make(SpotService)
 
     // Find or create boat
     const existingBoat = await Boat.query()
@@ -91,6 +94,35 @@ export default class MaloSeeder extends BaseSeeder {
         manufacturer: 'Figareau',
         model: 'Rhodes 21',
       }))
+
+    // Berth: Querqueville → mouillage "Corps-morts" → buoy "B08". Only B08 is
+    // seeded (the buoy the boat actually occupies) — the other buoys of the
+    // real mouillage are not our data to invent.
+    const port =
+      (await Port.query()
+        .where('organizationId', user.organizationId)
+        .where('name', 'Querqueville')
+        .first()) ??
+      (await portService.createForUser(user, {
+        name: 'Querqueville',
+        city: 'Cherbourg-en-Cotentin',
+        country: 'France',
+      }))
+
+    const mouillage =
+      (await Mouillage.query().where('portId', port.id).where('name', 'Corps-morts').first()) ??
+      (await mouillageService.createForPort(port, { name: 'Corps-morts' }))
+
+    const spot =
+      (await Spot.query().where('mouillageId', mouillage.id).where('name', 'B08').first()) ??
+      (await spotService.createForMouillage(mouillage, port, { name: 'B08' }))
+
+    // Guarded: `updateAssignment` logs a berth change in `boat_position_history`
+    // on every call — without this check, re-running the seeder would pile up a
+    // fictitious movement history.
+    if (boat.spotId !== spot.id) {
+      await boatService.updateAssignment(boat, { spotId: spot.id })
+    }
 
     // Ensure relations loaded
     await boat.load('engines')
