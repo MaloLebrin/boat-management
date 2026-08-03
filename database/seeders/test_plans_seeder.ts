@@ -119,26 +119,16 @@ async function ensureOpenTask(
   }
 }
 
+/**
+ * Only creates `@test.local` accounts. It must never touch the `ADMIN_EMAIL`
+ * account, which is the app owner's real one (seeded by `malo_seeder.ts`
+ * alone) — guard rail in `tests/integration/seeders/admin_account_isolation.spec.ts`.
+ */
 export default class TestPlansSeeder extends BaseSeeder {
   static environment = ['development', 'test']
 
   async run() {
-    // ─── 1. malolebrin@gmail.com → Enterprise ────────────────────────────────
-    const adminEmail = process.env.ADMIN_EMAIL ?? 'malolebrin@gmail.com'
-    const adminUser = await User.query().where('email', adminEmail).first()
-    if (adminUser?.organizationId) {
-      const adminOrg = await Organization.findOrFail(adminUser.organizationId)
-      if (adminOrg.plan !== 'enterprise') {
-        await adminOrg.merge({ plan: 'enterprise' }).save()
-        console.log(`✓ ${adminEmail} → enterprise`)
-      } else {
-        console.log(`  ${adminEmail} already enterprise`)
-      }
-    } else {
-      console.log(`  ${adminEmail} not found, skipping`)
-    }
-
-    // ─── 2. Starter org ──────────────────────────────────────────────────────
+    // ─── 1. Starter org ──────────────────────────────────────────────────────
     const { org: starterOrg } = await ensureOwner('starter@test.local', 'Alice Starter', 'starter')
     console.log(`✓ starter@test.local (org #${starterOrg.id}, plan=starter)`)
 
@@ -164,7 +154,7 @@ export default class TestPlansSeeder extends BaseSeeder {
     })
     console.log(`  → 2 bateaux (quota max Starter atteint)`)
 
-    // ─── 3. Pro org ──────────────────────────────────────────────────────────
+    // ─── 2. Pro org ──────────────────────────────────────────────────────────
     const { org: proOrg } = await ensureOwner('pro@test.local', 'Bob Pro', 'pro')
     console.log(`✓ pro@test.local (org #${proOrg.id}, plan=pro)`)
 
@@ -250,7 +240,7 @@ export default class TestPlansSeeder extends BaseSeeder {
     )
     console.log(`  → 2 interventions de maintenance (1 en retard, 1 à venir)`)
 
-    // ─── 4. Enterprise org ───────────────────────────────────────────────────
+    // ─── 3. Enterprise org ───────────────────────────────────────────────────
     const { org: enterpriseOrg } = await ensureOwner(
       'enterprise@test.local',
       'Carol Enterprise',
@@ -359,6 +349,5 @@ export default class TestPlansSeeder extends BaseSeeder {
     console.log('   pro@test.local            → plan Pro, 5 bateaux, 3 membres')
     console.log('   pro-mecano@test.local     → rôle mécanicien (dashboard « Mes interventions »)')
     console.log('   enterprise@test.local     → plan Enterprise, 8 bateaux, 4 membres')
-    console.log(`   ${adminEmail}  → plan Enterprise`)
   }
 }

@@ -52,6 +52,7 @@ Les PDFs uploadés sont compressés avant envoi sur Cloudinary via `app/services
 - Migrations : toujours avec rollback (`down()` implémenté)
 - Nommage tables : snake_case pluriel (`user_profiles`, `refresh_tokens`)
 - Seeders pour les données de démo (`database/seeders/`)
+- **Le compte `ADMIN_EMAIL` est le compte réel de l'exploitant, pas un compte de test** : seul `malo_seeder.ts` y écrit (un seul bateau « 3D », plan `pro`). Aucun autre seeder ne doit lui rattacher de données ni changer son plan — voir `docs/dev/seeders.md`
 - Jamais de `SELECT *` en production — colonnes explicites
 
 ### Frontend (Vue 3 + Inertia)
@@ -172,6 +173,7 @@ tests/
 - Committer des secrets ou `.env`
 - Supprimer des migrations existantes
 - Mettre de la logique de formatage dans les controllers (→ utiliser un transformer)
+- **Écrire des données de test/démo sur le compte `ADMIN_EMAIL`** (→ compte réel ; seul `malo_seeder.ts` y écrit, un seul bateau « 3D », plan `pro`)
 - **Définir des types de controllers/services ailleurs que dans `shared/types/`** (→ un fichier par domaine dans `shared/types/`, réutilisé côté front)
 - **Définir des classes d'erreur inline dans un controller ou service** (→ `app/exceptions/<domaine>_errors.ts`)
 - **Écrire du texte visible en dur dans un template Vue** (→ utiliser `t('clé')`)

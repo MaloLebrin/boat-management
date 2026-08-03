@@ -23,9 +23,9 @@ node ace db:seed --files database/seeders/malo_seeder.ts
 
 Contenu (classe `MaloSeeder`), aligné le 21/07/2026 sur un dump réel de la DB de dev pour coller exactement à la situation actuelle du compte, "toutes entités confondues" :
 
-- utilisateur + organisation via `UserService.signupWithOrganization` (réutilisé si déjà présent) ; plan mis à `enterprise` directement sur `organizations.plan` (pas d'abonnement Stripe, comme en réalité)
-- un port ("Port de Test Audit", Marseille), créé une seule fois via `PortService.createForUser`
+- utilisateur + organisation via `UserService.signupWithOrganization` (réutilisé si déjà présent) ; plan mis à `pro` directement sur `organizations.plan` (pas d'abonnement Stripe, comme en réalité)
 - un bateau ("3D" en local — le nom réel du bateau de l'utilisateur), équipement (moteur(s), voiles, gréement) créés seulement s'ils manquent
+- son poste d'amarrage réel : port "Querqueville" (Cherbourg-en-Cotentin) → mouillage "Corps-morts" → bouée "B08", chaque étage créé une seule fois via `PortService` / `MouillageService` / `SpotService`, puis le bateau affecté au spot. Seule B08 est créée : les autres bouées du mouillage réel ne sont pas des données à inventer. L'affectation est gardée par `if (boat.spotId !== spot.id)` — `BoatService.updateAssignment` journalise un changement de poste dans `boat_position_history` à **chaque** appel, sans la garde on empilerait un historique de mouvements fictif
 - 6 événements de maintenance historiques + 5 tâches planifiées associées, avec des **dates absolues littérales** reprises telles quelles de la DB réelle (pas de calcul relatif à `today` : une fois créées, ces dates ne bougent plus lors des prochaines exécutions — assumé pour rester fidèle à l'état réel)
 
 Un second bateau ("Rhodes 21") existe parfois en base comme résidu d'une ancienne version du seeder (avant le renommage en "3D") — volontairement non reproduit ici, ce n'est pas une donnée métier réelle à préserver.
@@ -60,12 +60,13 @@ node ace db:seed --files database/seeders/test_plans_seeder.ts
 
 Seeder de test minimal : une organisation par plan tier, sans toucher aux abonnements ni aux modules. Mot de passe commun `Password1!`.
 
-| Compte                              | Plan                  | Contenu                                                                                                                                                                      |
-| ----------------------------------- | --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `malolebrin@gmail.com` (si présent) | passé en `enterprise` | —                                                                                                                                                                            |
-| `starter@test.local`                | starter               | 2 bateaux (quota max atteint)                                                                                                                                                |
-| `pro@test.local`                    | pro                   | 5 bateaux, 3 membres (`pro-alice@test.local` membre, `pro-charlie@test.local` admin, `pro-mecano@test.local` mécanicien) + 2 interventions ouvertes (1 en retard, 1 à venir) |
-| `enterprise@test.local`             | enterprise            | 8 bateaux, 4 membres                                                                                                                                                         |
+| Compte                  | Plan       | Contenu                                                                                                                                                                      |
+| ----------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `starter@test.local`    | starter    | 2 bateaux (quota max atteint)                                                                                                                                                |
+| `pro@test.local`        | pro        | 5 bateaux, 3 membres (`pro-alice@test.local` membre, `pro-charlie@test.local` admin, `pro-mecano@test.local` mécanicien) + 2 interventions ouvertes (1 en retard, 1 à venir) |
+| `enterprise@test.local` | enterprise | 8 bateaux, 4 membres                                                                                                                                                         |
+
+Ce seeder ne crée que des comptes `@test.local` : il ne touche jamais au compte `ADMIN_EMAIL` (il forçait auparavant son plan à `enterprise`, ce qui écrasait le plan `pro` réel).
 
 `pro-mecano@test.local` (rôle `mechanic`) sert à tester le dashboard dédié « Mes interventions » (#417) : les 2 interventions ouvertes de la Pro org ont un `dueAt` relatif à la date de seed (retard/à venir garantis).
 
@@ -162,6 +163,7 @@ Comme `InvoiceService.create` alloue toujours un nouveau numéro (`DEV-000001`, 
 
 ## Conventions communes à tous les seeders
 
+- **Le compte `ADMIN_EMAIL` est le compte réel de l'exploitant, pas un compte de test** : seul `malo_seeder.ts` a le droit d'y écrire, son organisation ne contient qu'un bateau ("3D") et reste au plan `pro`. Aucun autre seeder ne doit lui rattacher de données ni modifier son plan. Garde-fou : `tests/integration/seeders/admin_account_isolation.spec.ts`.
 - Jamais `new Model()` : `Model.create()` / `.updateOrCreate()` / `.firstOrCreate()`, ou service applicatif obtenu par DI (`app.container.make(XxxService)`) — jamais de logique métier dupliquée hors service (ex. `organization_modules` : uniquement via `OrganizationModuleService`, jamais en écriture directe sur le modèle).
 - Idempotence : chercher l'existant (par email, nom, tag) avant de créer — un seeder doit pouvoir être relancé sans erreur ni doublon.
 - `test_plans_seeder.ts` et `billing_module_states_seeder.ts` sont restreints à `development`/`test` (`static environment = [...]`) — jamais exécutables accidentellement en production.
