@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { THEME_PREFERENCES, type ThemePreference } from '#shared/types/theme'
 import { useT } from '~/composables/use_t'
 import { useTheme } from '~/composables/use_theme'
-import { THEME_PREFERENCES, type ThemePreference } from '#shared/types/theme'
 
 // `onDark` : la sidebar de l'app reste navy-900 dans les deux thèmes, les
 // tokens sémantiques (qui basculent) y seraient illisibles.
@@ -26,7 +26,7 @@ const LABEL_KEYS: Record<ThemePreference, string> = {
       :aria-pressed="preference === option"
       :title="t(LABEL_KEYS[option])"
       :class="[
-        'inline-flex h-8 w-8 items-center justify-center rounded-(--radius-control) transition-colors duration-(--motion-fast)',
+        'inline-flex h-8 w-8 items-center justify-center rounded-(--radius-control) transition-colors duration-(--motion-fast) cursor-pointer disabled:cursor-not-allowed',
         tone === 'onDark'
           ? preference === option
             ? 'bg-navy-500 text-white'
