@@ -56,7 +56,7 @@ function handleUngroup(groupId: string) {
           :class="[
             'gap-1.5 border transition-colors',
             groupingEnabled
-              ? 'border-navy-300 bg-navy-50 text-navy-700'
+              ? 'border-brand bg-brand-soft text-brand'
               : 'border-border bg-surface text-fg-muted hover:text-fg',
           ]"
           @click="groupingEnabled = !groupingEnabled"
@@ -123,7 +123,7 @@ function handleUngroup(groupId: string) {
     <!-- Pro teaser when starter plan -->
     <div
       v-if="!canGroupTasks && tasks.length > 0"
-      class="mb-4 flex items-center gap-3 rounded-lg border border-navy-200 bg-navy-50 px-4 py-3 text-sm text-navy-700"
+      class="mb-4 flex items-center gap-3 rounded-lg border border-border bg-brand-soft px-4 py-3 text-sm text-brand"
     >
       <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path

@@ -60,7 +60,9 @@ const { el, isVisible } = useScrollReveal()
         <!-- Right: two CTA cards -->
         <div class="flex flex-col gap-4">
           <!-- Try live demo card -->
-          <div class="rounded-2xl border border-coral-200 bg-white p-8 shadow-sm lg:p-10">
+          <div
+            class="rounded-2xl border border-coral-200 bg-surface-elevated p-8 shadow-sm lg:p-10"
+          >
             <div class="mb-6 flex h-14 w-14 items-center justify-center rounded-xl bg-coral-500">
               <PlayCircleIcon class="h-7 w-7 text-white" />
             </div>
@@ -75,12 +77,12 @@ const { el, isVisible } = useScrollReveal()
               >
                 {{ demoForm.processing ? t('loading') : tryDemoLabel }}
               </BaseButton>
-              <p v-if="flashError" class="mt-2 text-sm text-red-600">{{ flashError }}</p>
+              <p v-if="flashError" class="mt-2 text-sm text-danger">{{ flashError }}</p>
             </div>
           </div>
 
           <!-- Book guided demo card -->
-          <div class="rounded-2xl border border-bone bg-white p-8 shadow-sm lg:p-10">
+          <div class="rounded-2xl border border-bone bg-surface-elevated p-8 shadow-sm lg:p-10">
             <div class="mb-6 flex h-14 w-14 items-center justify-center rounded-xl bg-navy-900">
               <CalendarDaysIcon class="h-7 w-7 text-coral-400" />
             </div>

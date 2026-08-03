@@ -35,7 +35,7 @@ const { t } = useT()
               class="h-full rounded-full transition-all"
               :class="
                 (task.currentEngineHours ?? 0) >= (task.dueEngineHours ?? 1)
-                  ? 'bg-red-500'
+                  ? 'bg-coral-600'
                   : 'bg-navy-500'
               "
               :style="{

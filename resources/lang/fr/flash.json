@@ -68,7 +68,8 @@
     "aiSettingsUpdated": "Paramètres IA mis à jour.",
     "brandingUpdated": "Apparence mise à jour.",
     "logoUpdated": "Logo mis à jour.",
-    "logoDeleted": "Logo supprimé."
+    "logoDeleted": "Logo supprimé.",
+    "themeUpdated": "Apparence mise à jour."
   },
   "enginePart": {
     "created": "Pièce ajoutée.",

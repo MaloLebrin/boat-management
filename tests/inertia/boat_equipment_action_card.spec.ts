@@ -135,10 +135,10 @@ test('applies correct background color for pending status', () => {
 
 test('applies correct background color for ordered status', () => {
   const w = mountCard({ ...sampleAction, status: 'ordered' })
-  expect(w.find('div').classes()).toContain('bg-blue-50')
+  expect(w.find('div').classes()).toContain('bg-sky-50')
 })
 
 test('applies correct background color for done status', () => {
   const w = mountCard({ ...sampleAction, status: 'done' })
-  expect(w.find('div').classes()).toContain('bg-emerald-50')
+  expect(w.find('div').classes()).toContain('bg-mint-50')
 })

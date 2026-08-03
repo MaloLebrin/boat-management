@@ -86,7 +86,7 @@ const simulatorHref = computed(() => {
   <!-- Result card -->
   <section class="bg-cream px-6 py-12 lg:py-16">
     <div class="mx-auto max-w-2xl">
-      <div class="overflow-hidden rounded-2xl border border-bone bg-white shadow-lg">
+      <div class="overflow-hidden rounded-2xl border border-bone bg-surface-elevated shadow-lg">
         <div class="h-1.5 bg-gradient-to-r from-coral-500 to-coral-400" />
         <div class="p-6 lg:p-8">
           <SimulatorResultCard :breakdown="breakdown" :input="input" />
@@ -94,7 +94,9 @@ const simulatorHref = computed(() => {
       </div>
 
       <!-- CTA Banner -->
-      <div class="mt-8 rounded-2xl border border-bone bg-white p-6 text-center shadow-lg lg:p-8">
+      <div
+        class="mt-8 rounded-2xl border border-bone bg-surface-elevated p-6 text-center shadow-lg lg:p-8"
+      >
         <h2 class="font-display text-2xl text-fg">
           {{ t('simulator.share_cta_title') }}
         </h2>

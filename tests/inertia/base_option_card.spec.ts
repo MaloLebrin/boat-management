@@ -15,7 +15,7 @@ test('applies unselected classes by default when not selected', () => {
     props: { selected: false },
     slots: { default: 'Test' },
   })
-  expect(w.classes().join(' ')).toContain('border-bone')
+  expect(w.classes().join(' ')).toContain('border-border')
 })
 
 test('applies selected classes when selected', () => {

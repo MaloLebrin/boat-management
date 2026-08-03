@@ -13,6 +13,7 @@ import {
   updateLocaleValidator,
   updateOrganizationValidator,
   updateProfileValidator,
+  updateThemeValidator,
 } from '#validators/user'
 import { updateBrandingValidator, uploadLogoValidator } from '#validators/branding'
 import { inject } from '@adonisjs/core'
@@ -154,6 +155,23 @@ export default class SettingsController {
     response.cookie('locale', locale, { maxAge: '365d', path: '/', httpOnly: false })
 
     session.flash('success', i18n.t('flash.settings.localeUpdated'))
+    return response.redirect().back()
+  }
+
+  async updateTheme({ request, response, session, auth, i18n }: HttpContext) {
+    const user = await auth.authenticate()
+    const { theme } = await request.validateUsing(updateThemeValidator)
+
+    user.theme = theme
+    await user.save()
+
+    // Le cookie double la colonne pour que les pages pré-auth (login,
+    // marketing) rendent le bon thème dès le serveur, sans flash de couleur —
+    // même schéma que la locale (#403). Il est signé et lu côté serveur
+    // uniquement : le front applique le thème via la prop partagée.
+    response.cookie('theme', theme, { maxAge: '365d', path: '/' })
+
+    session.flash('success', i18n.t('flash.settings.themeUpdated'))
     return response.redirect().back()
   }
 

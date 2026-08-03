@@ -49,7 +49,7 @@ const fleetSizes = ['1-4', '5-20', '20+']
     <div class="mx-auto max-w-7xl">
       <div class="grid gap-12 lg:grid-cols-[1.4fr_1fr]">
         <!-- Form card -->
-        <div class="rounded-2xl border border-bone bg-white p-8 shadow-sm">
+        <div class="rounded-2xl border border-bone bg-surface-elevated p-8 shadow-sm">
           <p class="font-mono text-xs font-semibold uppercase tracking-widest text-fg-subtle">
             {{ eyebrow }}
           </p>
@@ -70,7 +70,7 @@ const fleetSizes = ['1-4', '5-20', '20+']
                     'rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors',
                     selectedSubject === s
                       ? 'border-navy-900 bg-cream font-semibold text-fg'
-                      : 'border-bone bg-white text-fg-muted hover:bg-cream/50',
+                      : 'border-bone bg-surface-elevated text-fg-muted hover:bg-cream/50',
                   ]"
                   @click="selectedSubject = s"
                 >
@@ -150,7 +150,7 @@ const fleetSizes = ['1-4', '5-20', '20+']
                       'flex-1 rounded-xl border py-3 text-sm font-medium transition-colors',
                       selectedSize === s
                         ? 'border-navy-900 bg-cream font-semibold text-fg'
-                        : 'border-bone bg-white text-fg-muted hover:bg-cream/50',
+                        : 'border-bone bg-surface-elevated text-fg-muted hover:bg-cream/50',
                     ]"
                     @click="selectedSize = s"
                   >
@@ -179,7 +179,7 @@ const fleetSizes = ['1-4', '5-20', '20+']
               <input type="checkbox" class="mt-0.5 accent-navy-900" checked />
               <span>
                 {{ privacyText }}
-                <a :href="privacyHref" class="text-navy-900 underline">{{ privacyLinkLabel }}</a
+                <a :href="privacyHref" class="text-fg underline">{{ privacyLinkLabel }}</a
                 >.
               </span>
             </label>
@@ -192,7 +192,7 @@ const fleetSizes = ['1-4', '5-20', '20+']
         <!-- Sticky sidebar -->
         <div class="space-y-5 lg:sticky lg:top-20 lg:self-start">
           <!-- Contact info card -->
-          <div class="rounded-2xl border border-bone bg-white p-6">
+          <div class="rounded-2xl border border-bone bg-surface-elevated p-6">
             <p class="font-mono text-xs font-semibold uppercase tracking-widest text-fg-subtle">
               {{ otherMeansTitle }}
             </p>

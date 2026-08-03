@@ -68,7 +68,8 @@
     "aiSettingsUpdated": "AI settings updated.",
     "brandingUpdated": "Appearance updated.",
     "logoUpdated": "Logo updated.",
-    "logoDeleted": "Logo deleted."
+    "logoDeleted": "Logo deleted.",
+    "themeUpdated": "Appearance updated."
   },
   "enginePart": {
     "created": "Part added.",

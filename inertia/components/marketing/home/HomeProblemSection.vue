@@ -38,7 +38,7 @@ const { el: sectionEl, isVisible } = useScrollReveal()
         <div
           v-for="(item, idx) in items"
           :key="item.title"
-          class="reveal rounded-xl border border-bone bg-white p-6 shadow-sm"
+          class="reveal rounded-xl border border-bone bg-surface-elevated p-6 shadow-sm"
           :class="[`reveal-delay-${idx + 1}`, { visible: isVisible }]"
         >
           <p class="mb-4 font-mono text-xs font-medium text-coral-700">

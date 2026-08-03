@@ -102,6 +102,30 @@ Les cartes de l'onglet Équipement exposent un lien « voir le détail » vers c
   - Badge de non-lus + panneau déroulant `NotificationPanel.vue` (5 dernières notifs, lien « Voir toutes » → `/notifications`). État temps réel via `use_notifications.ts` (singleton + abonnement Transmit `notifications/:userId`).
   - Page complète : `inertia/pages/notifications/index.vue`.
 
+## Thème clair / sombre (#416)
+
+- **Déclencheur** : attribut `data-theme="light" | "dark"` sur `<html>`, toujours résolu (jamais `system`).
+  Écrit côté serveur dans `resources/views/inertia_layout.edge` pour un choix explicite ; sinon résolu
+  avant le premier paint par le script inline anti-FOUC (nonce CSP) via `prefers-color-scheme`.
+- **Tokens** : `inertia/css/app.css` — `@custom-variant dark` rattache le variant `dark:` à `data-theme`
+  (et non plus à la media query), puis un bloc `[data-theme='dark']` **hors `@layer`** redéfinit les tokens
+  sémantiques, les neutres chauds (`cream/paper/bone/sand`) et les extrémités des palettes d'accent
+  (`-50`/`-100` deviennent des surfaces sombres, `-700`/`-800` de l'encre claire). Aucun composant ne porte
+  de classe `dark:` : tout passe par les tokens.
+- **Préférence** : `system | light | dark` (`shared/types/theme.ts`), persistée sur `users.theme` **et** dans
+  un cookie signé 365j (`SettingsController.updateTheme`, route publique `POST /theme` pour le marketing et
+  le login). Cascade profil > cookie > `system` dans `resolveSharedTheme` (`inertia_middleware.ts`),
+  exposée en prop partagée `theme`.
+- **Composable** : `inertia/composables/use_theme.ts` → `useTheme()` (`preference`, `resolved`, `setTheme`).
+  Applique le thème immédiatement sur `<html>` puis persiste via `router.put`/`router.post` ; suit un
+  changement d'OS à chaud tant que la préférence vaut `system`.
+- **UI** : `ThemeSwitcher.vue` (3 icônes, prop `tone` — `onDark` pour la sidebar navy qui ne bascule pas)
+  dans `AsideMenu`, `MobileSidebarDrawer`, `AppHeader` et `AppHeaderMobileDrawer` ; carte
+  `settings/me/ThemeCard.vue` (appliquée au clic, sans bouton « Enregistrer »).
+- **Illustrations autonomes non basculées** (palette interne cohérente) : carte marina
+  (`ports/show/Marina*.vue`), dégradés `canvas/mesh_gradient_shared.ts`, scène `AboutOriginSection.vue`,
+  panneau `AuthNavyPanel.vue` et bandeaux hero navy — sombres dans les deux thèmes.
+
 ## Galerie photo partagée
 
 `inertia/components/media/MediaPhotoGallery.vue` — galerie réutilisable pilotée par props

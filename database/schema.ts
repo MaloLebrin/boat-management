@@ -2127,6 +2127,7 @@ export class UserSchema extends BaseModel {
     'locale',
     'organizationId',
     'password',
+    'theme',
     'updatedAt',
   ] as const
   $columns = UserSchema.$columns
@@ -2146,6 +2147,8 @@ export class UserSchema extends BaseModel {
   declare organizationId: number | null
   @column({ serializeAs: null })
   declare password: string
+  @column()
+  declare theme: string | null
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
 }

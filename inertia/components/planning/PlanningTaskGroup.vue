@@ -26,7 +26,7 @@ const expanded = ref(false)
           maintenanceSubjectLabel(t, group.subject)
         }}</span>
         <span
-          class="inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-navy-100 px-1 text-xs font-semibold text-navy-700"
+          class="inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-soft px-1 text-xs font-semibold text-navy-700"
         >
           {{ group.tasks.length }}
         </span>
@@ -55,7 +55,7 @@ const expanded = ref(false)
         :key="task.id"
         :task="task"
         accent-class="border-navy-400"
-        badge-class="bg-navy-100 text-navy-700"
+        badge-class="bg-brand-soft text-brand"
       />
     </div>
   </div>

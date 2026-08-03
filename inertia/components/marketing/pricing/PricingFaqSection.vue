@@ -54,7 +54,9 @@ function toggle(idx: number) {
         </div>
 
         <!-- Right: Accordion -->
-        <div class="divide-y divide-bone rounded-2xl border border-bone bg-white overflow-hidden">
+        <div
+          class="divide-y divide-bone rounded-2xl border border-bone bg-surface-elevated overflow-hidden"
+        >
           <div v-for="(item, idx) in items" :key="item.q">
             <button
               type="button"

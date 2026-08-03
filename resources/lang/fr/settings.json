@@ -188,6 +188,15 @@
     "french": "Français",
     "save": "Enregistrer la langue"
   },
+  "theme": {
+    "title": "Apparence",
+    "subtitle": "Choisissez l'apparence de votre interface. Cette préférence est enregistrée sur votre profil.",
+    "label": "Thème de l'interface",
+    "system": "Système",
+    "light": "Clair",
+    "dark": "Sombre",
+    "autoSaved": "Appliqué immédiatement et enregistré sur votre profil. « Système » suit le réglage de votre appareil."
+  },
   "ai": {
     "title": "Personnalisation IA",
     "description": "Définissez un contexte métier qui sera injecté dans chaque échange IA de votre organisation.",

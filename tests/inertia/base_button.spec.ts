@@ -35,7 +35,7 @@ test('respects disabled prop', () => {
 
 test('uses danger variant classes when variant is danger', () => {
   const w = mount(BaseButton, { props: { variant: 'danger' }, slots: { default: 'Del' } })
-  expect(w.classes().join(' ')).toContain('bg-red-200')
+  expect(w.classes().join(' ')).toContain('bg-danger-soft')
 })
 
 test('renders as anchor when href is provided', () => {

@@ -38,7 +38,9 @@ function toggle(idx: number) {
         </div>
 
         <!-- Right: accordion -->
-        <div class="divide-y divide-bone overflow-hidden rounded-2xl border border-bone bg-white">
+        <div
+          class="divide-y divide-bone overflow-hidden rounded-2xl border border-bone bg-surface-elevated"
+        >
           <div v-for="(item, idx) in items" :key="item.q">
             <button
               type="button"

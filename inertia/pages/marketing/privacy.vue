@@ -99,7 +99,7 @@ const canonicalHref = computed(() =>
       <p class="mt-3 text-fg-muted">{{ props.privacy.contact.body }}</p>
       <a
         :href="`mailto:${props.privacy.contact.email}`"
-        class="mt-4 inline-block font-semibold text-navy-900 underline"
+        class="mt-4 inline-block font-semibold text-fg underline"
         >{{ props.privacy.contact.email }}</a
       >
     </div>

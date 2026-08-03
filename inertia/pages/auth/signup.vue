@@ -38,7 +38,7 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
         <span class="text-xs text-fg-muted">{{ t('auth.login.needHelp') }}</span>
         <a
           href="mailto:support@fleetai.app"
-          class="rounded-md border border-bone bg-white px-2.5 py-1.5 text-xs font-semibold text-fg transition-colors hover:bg-paper"
+          class="rounded-md border border-bone bg-surface-elevated px-2.5 py-1.5 text-xs font-semibold text-fg transition-colors hover:bg-paper"
         >
           {{ t('auth.login.contactSupport') }}
         </a>
@@ -50,10 +50,9 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
           <!-- Trial badge -->
           <div class="flex flex-wrap items-center gap-2">
             <span
-              class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold"
-              style="background: #e6f3ec; color: #1f6b54"
+              class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold bg-mint-50 text-mint-700"
             >
-              <span class="h-1.5 w-1.5 rounded-full bg-[#1f6b54]" />
+              <span class="h-1.5 w-1.5 rounded-full bg-mint-700" />
               {{ t('auth.signup.trialBadge') }}
             </span>
             <span class="text-[11px] text-fg-muted">{{ t('auth.signup.trialCaption') }}</span>
@@ -203,13 +202,13 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
                   type="checkbox"
                   name="acceptTerms"
                   required
-                  class="mt-0.5 h-[18px] w-[18px] shrink-0 rounded-[5px] border-bone accent-[#0b1d2e]"
+                  class="mt-0.5 h-[18px] w-[18px] shrink-0 rounded-[5px] border-border accent-[var(--color-brand)]"
                 />
                 <span class="text-[13px] leading-relaxed text-fg-muted">
                   {{ t('auth.signup.acceptTermsPrefix') }}
-                  <a href="#" class="font-semibold text-[#e2674f]">{{ t('auth.signup.cgu') }}</a>
+                  <a href="#" class="font-semibold text-coral-500">{{ t('auth.signup.cgu') }}</a>
                   {{ t('auth.signup.acceptTermsConjunction') }}
-                  <a href="#" class="font-semibold text-[#e2674f]">{{
+                  <a href="#" class="font-semibold text-coral-500">{{
                     t('auth.signup.privacyPolicy')
                   }}</a
                   >.
@@ -221,8 +220,7 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
               <button
                 type="submit"
                 :disabled="processing"
-                class="mt-1 flex w-full items-center justify-center gap-2 rounded-lg px-5 py-3.5 text-sm font-semibold text-white transition-all duration-150 disabled:opacity-60 hover:brightness-110"
-                style="background: #e2674f"
+                class="mt-1 flex w-full items-center justify-center gap-2 rounded-lg px-5 py-3.5 text-sm font-semibold text-white transition-all duration-150 disabled:opacity-60 hover:brightness-110 bg-coral-500"
               >
                 {{ t('auth.signup.createOrg') }}
                 <svg
@@ -252,7 +250,7 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
                     height="12"
                     viewBox="0 0 24 24"
                     fill="none"
-                    stroke="#1f6b54"
+                    stroke="var(--color-mint-700)"
                     stroke-width="2.2"
                     stroke-linecap="round"
                     stroke-linejoin="round"
@@ -270,7 +268,7 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
             {{ t('auth.signup.hasAccount') }}
             <a
               href="/login"
-              class="font-semibold text-[#e2674f] no-underline"
+              class="font-semibold text-coral-500 no-underline"
               style="border-bottom: 1px solid rgba(226, 103, 79, 0.3); padding-bottom: 1px"
             >
               {{ t('auth.signup.signIn') }} →

@@ -2,6 +2,7 @@
 import { Link } from '@adonisjs/inertia/vue'
 import { nextTick, ref, watch } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
+import ThemeSwitcher from '~/components/layout/ThemeSwitcher.vue'
 import { useT } from '~/composables/use_t'
 
 const props = defineProps<{
@@ -62,10 +63,17 @@ watch(
             xmlns="http://www.w3.org/2000/svg"
             aria-hidden="true"
           >
-            <circle cx="32" cy="32" r="28" stroke="#0b1d2e" stroke-width="2.6" />
-            <path d="M32 9 L37.5 32 L32 36.5 L26.5 32 Z" fill="#0b1d2e" />
+            <circle cx="32" cy="32" r="28" stroke="var(--color-fg)" stroke-width="2.6" />
+            <path d="M32 9 L37.5 32 L32 36.5 L26.5 32 Z" fill="var(--color-fg)" />
             <path d="M32 55 L37.5 32 L32 27.5 L26.5 32 Z" fill="#e2674f" />
-            <circle cx="32" cy="32" r="2.4" fill="#faf6ee" stroke="#0b1d2e" stroke-width="1.4" />
+            <circle
+              cx="32"
+              cy="32"
+              r="2.4"
+              fill="var(--color-surface)"
+              stroke="var(--color-fg)"
+              stroke-width="1.4"
+            />
           </svg>
           <span
             class="font-display text-base leading-none text-fg"
@@ -132,6 +140,9 @@ watch(
         >
           {{ locale === 'en' ? 'FR' : 'EN' }}
         </button>
+        <div class="flex justify-center">
+          <ThemeSwitcher />
+        </div>
         <template v-if="isAuthed">
           <Link href="/dashboard" class="block" @click="emit('close')">
             <BaseButton size="sm" class="w-full">Dashboard</BaseButton>

@@ -42,7 +42,7 @@ const { el, isVisible } = useScrollReveal()
         <div
           v-for="office in items"
           :key="office.city"
-          class="overflow-hidden rounded-2xl border border-bone bg-white shadow-sm"
+          class="overflow-hidden rounded-2xl border border-bone bg-surface-elevated shadow-sm"
         >
           <!-- Gradient header -->
           <div

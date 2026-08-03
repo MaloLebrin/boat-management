@@ -21,15 +21,15 @@ const { formatCurrency } = useCurrencyFormat()
 
 const STATUS_COLORS: Record<EquipmentActionStatus, string> = {
   pending: 'bg-amber-50 text-amber-700 border-amber-200',
-  ordered: 'bg-blue-50 text-blue-700 border-blue-200',
-  done: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  ordered: 'bg-sky-50 text-sky-800 border-sky-200',
+  done: 'bg-mint-50 text-success border-mint-200',
   cancelled: 'bg-surface-muted text-fg-muted border-border',
 }
 
 const STATUS_DOT: Record<EquipmentActionStatus, string> = {
   pending: 'bg-amber-500',
-  ordered: 'bg-blue-500',
-  done: 'bg-emerald-500',
+  ordered: 'bg-sky-500',
+  done: 'bg-mint-600',
   cancelled: 'bg-fg-subtle',
 }
 </script>
@@ -41,9 +41,9 @@ const STATUS_DOT: Record<EquipmentActionStatus, string> = {
       action.status === 'pending'
         ? 'border-amber-200 bg-amber-50'
         : action.status === 'ordered'
-          ? 'border-blue-200 bg-blue-50'
+          ? 'border-sky-200 bg-sky-50'
           : action.status === 'done'
-            ? 'border-emerald-200 bg-emerald-50'
+            ? 'border-mint-200 bg-mint-50'
             : 'border-border bg-surface-elevated',
     ]"
   >

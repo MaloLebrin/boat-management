@@ -42,19 +42,19 @@ describe('NotificationBell', () => {
     unreadCount.value = 0
     const w = mount(NotificationBell)
     expect(w.text()).not.toContain('9+')
-    expect(w.find('span.bg-red-500').exists()).toBe(false)
+    expect(w.find('span.bg-coral-600').exists()).toBe(false)
   })
 
   test('shows the unread count badge', () => {
     unreadCount.value = 3
     const w = mount(NotificationBell)
-    expect(w.find('span.bg-red-500').text()).toBe('3')
+    expect(w.find('span.bg-coral-600').text()).toBe('3')
   })
 
   test('caps the unread badge at 9+', () => {
     unreadCount.value = 42
     const w = mount(NotificationBell)
-    expect(w.find('span.bg-red-500').text()).toBe('9+')
+    expect(w.find('span.bg-coral-600').text()).toBe('9+')
   })
 
   test('toggles the panel open and closed on click', async () => {

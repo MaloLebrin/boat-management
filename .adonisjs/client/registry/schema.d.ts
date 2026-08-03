@@ -1951,6 +1951,30 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['about']>>>
     }
   }
+  'marketing.en.contact': {
+    methods: ["GET","HEAD"]
+    pattern: '/en/contact'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['contact']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['contact']>>>
+    }
+  }
+  'marketing.fr.contact': {
+    methods: ["GET","HEAD"]
+    pattern: '/fr/contact'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['contact']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['contact']>>>
+    }
+  }
   'marketing.contact': {
     methods: ["GET","HEAD"]
     pattern: '/contact'
@@ -2050,6 +2074,18 @@ export interface Registry {
   'locale.set': {
     methods: ["POST"]
     pattern: '/locale'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'theme.set': {
+    methods: ["POST"]
+    pattern: '/theme'
     types: {
       body: {}
       paramsTuple: []
@@ -2213,6 +2249,42 @@ export interface Registry {
       query: ExtractQuery<InferInput<(typeof import('#validators/user').updateProfileValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateProfile']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateProfile']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'settings.password.update': {
+    methods: ["PUT"]
+    pattern: '/settings/password'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/user').changePasswordValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/user').changePasswordValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['changePassword']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['changePassword']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'settings.locale.update': {
+    methods: ["PUT"]
+    pattern: '/settings/locale'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/user').updateLocaleValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/user').updateLocaleValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateLocale']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateLocale']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'settings.theme.update': {
+    methods: ["PUT"]
+    pattern: '/settings/theme'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/user').updateThemeValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/user').updateThemeValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateTheme']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateTheme']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'settings.org.update': {

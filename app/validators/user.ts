@@ -1,5 +1,6 @@
 import vine from '@vinejs/vine'
 import { AI_MODEL_OVERRIDES } from '#shared/types/ai'
+import { THEME_PREFERENCES } from '#shared/types/theme'
 
 const email = () => vine.string().email().maxLength(254)
 const password = () => vine.string().minLength(8).maxLength(32)
@@ -48,6 +49,10 @@ export const changePasswordValidator = vine.create({
 
 export const updateLocaleValidator = vine.create({
   locale: vine.enum(['en', 'fr'] as const),
+})
+
+export const updateThemeValidator = vine.create({
+  theme: vine.enum(THEME_PREFERENCES),
 })
 
 export const updateOrganizationValidator = vine.create({

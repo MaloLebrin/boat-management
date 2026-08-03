@@ -14,5 +14,5 @@ test('applies neutral variant classes by default', () => {
 
 test('applies success variant classes', () => {
   const w = mount(BaseBadge, { props: { variant: 'success' }, slots: { default: 'OK' } })
-  expect(w.classes().join(' ')).toContain('text-mint-800')
+  expect(w.classes().join(' ')).toContain('text-mint-700')
 })

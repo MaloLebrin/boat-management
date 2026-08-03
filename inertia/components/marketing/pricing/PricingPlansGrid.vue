@@ -185,8 +185,8 @@ const proPrice = computed(() => {
 
     <!-- Trust signals -->
     <div class="mt-6 flex flex-wrap items-center justify-center gap-4 text-sm text-fg-muted">
-      <span v-if="trust?.trial" class="flex items-center gap-1.5 font-semibold text-navy-700">
-        <span class="h-1.5 w-1.5 rounded-full bg-navy-700" />
+      <span v-if="trust?.trial" class="flex items-center gap-1.5 font-semibold text-brand">
+        <span class="h-1.5 w-1.5 rounded-full bg-brand" />
         {{ trust.trial }}
       </span>
       <span v-if="trust?.noCard" class="flex items-center gap-1.5">

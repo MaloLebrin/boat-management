@@ -48,7 +48,7 @@ function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutra
             class="inline"
           >
             <BaseButton type="submit" variant="danger" size="sm" :disabled="processing">
-              <TrashIcon class="w-4 h-4 text-red-800" />
+              <TrashIcon class="w-4 h-4 text-danger-strong" />
             </BaseButton>
           </Form>
         </div>

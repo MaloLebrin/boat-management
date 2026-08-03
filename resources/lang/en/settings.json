@@ -188,6 +188,15 @@
     "french": "Français",
     "save": "Save language"
   },
+  "theme": {
+    "title": "Appearance",
+    "subtitle": "Choose the appearance of your interface. This preference is saved to your profile.",
+    "label": "Interface theme",
+    "system": "System",
+    "light": "Light",
+    "dark": "Dark",
+    "autoSaved": "Applied immediately and saved to your profile. « System » follows your device settings."
+  },
   "ai": {
     "title": "AI customisation",
     "description": "Define a business context that will be injected into every AI exchange for your organisation.",

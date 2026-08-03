@@ -36,7 +36,7 @@
         </div>
       </nav>
       <div class="mt-auto border-t border-white/10 px-2 py-2">
-        <div class="flex items-center gap-1.5 rounded bg-violet-600/30 px-2 py-1 text-violet-100">
+        <div class="flex items-center gap-1.5 rounded bg-violet-600/30 px-2 py-1 text-violet-200">
           <div class="h-3 w-3 rounded bg-violet-400" />
           <span class="font-medium">FleetAi</span>
         </div>
@@ -45,16 +45,18 @@
 
     <!-- Main content (faded) -->
     <div class="flex flex-1 flex-col overflow-hidden opacity-40">
-      <div class="flex items-center justify-between border-b border-bone bg-white px-4 py-2">
+      <div
+        class="flex items-center justify-between border-b border-bone bg-surface-elevated px-4 py-2"
+      >
         <p class="font-semibold text-fg">Dashboard</p>
       </div>
       <div class="flex-1 p-3">
         <div class="mb-3 grid grid-cols-3 gap-2">
-          <div class="h-16 rounded-lg border border-bone bg-white" />
-          <div class="h-16 rounded-lg border border-bone bg-white" />
-          <div class="h-16 rounded-lg border border-bone bg-white" />
+          <div class="h-16 rounded-lg border border-bone bg-surface-elevated" />
+          <div class="h-16 rounded-lg border border-bone bg-surface-elevated" />
+          <div class="h-16 rounded-lg border border-bone bg-surface-elevated" />
         </div>
-        <div class="h-32 rounded-lg border border-bone bg-white" />
+        <div class="h-32 rounded-lg border border-bone bg-surface-elevated" />
       </div>
     </div>
 
@@ -84,7 +86,7 @@
         </div>
 
         <!-- AI response -->
-        <div class="mb-3 rounded-lg rounded-bl-sm bg-white p-2">
+        <div class="mb-3 rounded-lg rounded-bl-sm bg-surface-elevated p-2">
           <p class="text-[10px] text-fg">
             Tu as <strong class="text-coral-600">3 maintenances urgentes</strong> cette semaine :
           </p>
@@ -124,7 +126,7 @@
         </div>
 
         <!-- AI response -->
-        <div class="rounded-lg rounded-bl-sm bg-white p-2">
+        <div class="rounded-lg rounded-bl-sm bg-surface-elevated p-2">
           <p class="text-[10px] text-fg">
             <span class="text-mint-600">&#10003;</span> Tache creee pour
             <strong>Mistral II</strong> :

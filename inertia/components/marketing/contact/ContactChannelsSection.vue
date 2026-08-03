@@ -25,7 +25,7 @@ defineProps<{
               ? 'border-navy-900 bg-navy-900 text-white'
               : item.tone === 'coral'
                 ? 'border-coral-500 bg-coral-500 text-white'
-                : 'border-bone bg-white text-fg',
+                : 'border-bone bg-surface-elevated text-fg',
           ]"
         >
           <!-- Icon -->
@@ -63,7 +63,7 @@ defineProps<{
                 ? 'text-coral-400'
                 : item.tone === 'coral'
                   ? 'text-white'
-                  : 'text-navy-900',
+                  : 'text-fg',
             ]"
           >
             {{ item.cta }} →

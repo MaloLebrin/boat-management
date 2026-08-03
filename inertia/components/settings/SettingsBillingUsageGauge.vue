@@ -60,10 +60,10 @@ const isOverLimit = computed(() => percent.value >= 100)
         {{ displayLimit }}
       </span>
     </div>
-    <div v-if="limit !== null" class="h-2 w-full overflow-hidden rounded-full bg-surface-2">
+    <div v-if="limit !== null" class="h-2 w-full overflow-hidden rounded-full bg-surface-muted">
       <div
         class="h-full rounded-full bg-brand transition-all"
-        :class="{ 'bg-red-500': isOverLimit }"
+        :class="{ 'bg-coral-600': isOverLimit }"
         :style="{ width: `${percent}%` }"
       />
     </div>

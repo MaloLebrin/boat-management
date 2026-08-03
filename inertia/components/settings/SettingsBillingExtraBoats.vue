@@ -69,7 +69,7 @@ function apply() {
     <p class="mb-4 text-sm text-fg-muted">{{ t('settings.billing.extraBoats.subtitle') }}</p>
 
     <div
-      class="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-bone bg-surface-2 p-3"
+      class="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-bone bg-surface-muted p-3"
     >
       <div class="min-w-0">
         <div class="flex items-center gap-2">

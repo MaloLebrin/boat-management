@@ -70,7 +70,10 @@ const modalTitle = computed(() =>
       </p>
 
       <!-- Prix du plan cible -->
-      <div v-if="upgradeTier && upgradePrice !== null" class="rounded-lg bg-surface-2 px-4 py-3">
+      <div
+        v-if="upgradeTier && upgradePrice !== null"
+        class="rounded-lg bg-surface-muted px-4 py-3"
+      >
         <p class="text-xs font-medium uppercase tracking-wide text-fg-muted">
           {{ t(`settings.billing.planName.${upgradeTier}`) }}
         </p>
@@ -96,8 +99,8 @@ const modalTitle = computed(() =>
           class="rounded-md px-3 py-1 text-sm font-medium transition-colors"
           :class="
             interval === 'month'
-              ? 'bg-brand text-white'
-              : 'bg-surface-2 text-fg-muted hover:text-fg'
+              ? 'bg-brand text-on-brand'
+              : 'bg-surface-muted text-fg-muted hover:text-fg'
           "
           @click="interval = 'month'"
         >
@@ -107,12 +110,14 @@ const modalTitle = computed(() =>
           type="button"
           class="flex items-center gap-1.5 rounded-md px-3 py-1 text-sm font-medium transition-colors"
           :class="
-            interval === 'year' ? 'bg-brand text-white' : 'bg-surface-2 text-fg-muted hover:text-fg'
+            interval === 'year'
+              ? 'bg-brand text-on-brand'
+              : 'bg-surface-muted text-fg-muted hover:text-fg'
           "
           @click="interval = 'year'"
         >
           {{ t('settings.billing.subscription.interval.year') }}
-          <span class="rounded bg-green-100 px-1 text-xs font-semibold text-green-700">
+          <span class="rounded bg-mint-100 px-1 text-xs font-semibold text-mint-700">
             {{ t('settings.billing.subscription.annualDiscount') }}
           </span>
         </button>

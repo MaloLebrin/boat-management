@@ -34,8 +34,9 @@ const winteringOptions: WinteringOption[] = [
     labelKey: 'simulator.wintering_zone_covered',
     descKey: 'simulator.wintering_zone_covered_desc',
     icon: '🏠',
-    selectedClass: 'border-navy-500 bg-navy-50 text-navy-700',
-    unselectedClass: 'border-bone bg-white text-fg hover:border-navy-200 hover:bg-navy-50',
+    selectedClass: 'border-brand bg-brand-soft text-brand',
+    unselectedClass:
+      'border-bone bg-surface-elevated text-fg hover:border-brand hover:bg-brand-soft',
   },
   {
     value: 'outdoor',
@@ -43,7 +44,8 @@ const winteringOptions: WinteringOption[] = [
     descKey: 'simulator.wintering_zone_outdoor_desc',
     icon: '⛅',
     selectedClass: 'border-amber-600 bg-amber-50 text-amber-700',
-    unselectedClass: 'border-bone bg-white text-fg hover:border-amber-200 hover:bg-amber-50',
+    unselectedClass:
+      'border-bone bg-surface-elevated text-fg hover:border-amber-200 hover:bg-amber-50',
   },
   {
     value: 'sea',
@@ -51,7 +53,8 @@ const winteringOptions: WinteringOption[] = [
     descKey: 'simulator.wintering_zone_sea_desc',
     icon: '⚓',
     selectedClass: 'border-coral-500 bg-coral-50 text-coral-700',
-    unselectedClass: 'border-bone bg-white text-fg hover:border-coral-200 hover:bg-coral-50',
+    unselectedClass:
+      'border-bone bg-surface-elevated text-fg hover:border-coral-200 hover:bg-coral-50',
   },
 ]
 

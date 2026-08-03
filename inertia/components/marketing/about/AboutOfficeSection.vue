@@ -64,7 +64,7 @@ const { el, isVisible } = useScrollReveal()
           <div
             v-for="office in officeCards"
             :key="office.city"
-            class="overflow-hidden rounded-2xl border border-bone bg-white"
+            class="overflow-hidden rounded-2xl border border-bone bg-surface-elevated"
           >
             <div
               class="relative flex items-end px-6 py-8"

@@ -26,7 +26,7 @@ const emit = defineEmits<{ toggle: [] }>()
       'group flex w-full flex-col rounded-2xl border p-5 text-left transition-all duration-200',
       selected
         ? 'border-coral-500 bg-coral-50 shadow-sm'
-        : 'border-bone bg-white hover:border-sand hover:-translate-y-0.5',
+        : 'border-bone bg-surface-elevated hover:border-sand hover:-translate-y-0.5',
     ]"
     @click="emit('toggle')"
   >
@@ -47,7 +47,7 @@ const emit = defineEmits<{ toggle: [] }>()
       >
         <span
           :class="[
-            'inline-block h-5 w-5 rounded-full bg-white shadow transition-transform',
+            'inline-block h-5 w-5 rounded-full bg-surface-elevated shadow transition-transform',
             selected ? 'translate-x-5' : 'translate-x-0',
           ]"
         />

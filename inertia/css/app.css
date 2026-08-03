@@ -8,6 +8,16 @@
 @import '@fontsource/source-sans-3/400.css';
 @import '@fontsource/source-sans-3/600.css';
 
+/* ============================================================
+   THÈME (#416)
+   Le variant `dark:` ne suit plus `prefers-color-scheme` (défaut Tailwind v4)
+   mais l'attribut `data-theme` posé sur <html>. Celui-ci est toujours résolu
+   (`light` ou `dark`, jamais `system`) : soit par le serveur quand
+   l'utilisateur a fait un choix explicite, soit par le script anti-FOUC de
+   `inertia_layout.edge` qui lit `prefers-color-scheme`.
+   ============================================================ */
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
 @theme {
   /* ============================================================
      NAVY — couleur principale brand (profondeurs marines)
@@ -127,11 +137,20 @@
   --color-accent: var(--color-coral-500);
   --color-accent-hover: var(--color-coral-700);
 
+  /* Texte posé SUR un aplat brand / accent. En thème sombre le brand
+     s'éclaircit : `text-white` y tomberait sous le seuil AA, ces tokens
+     basculent à sa place. */
+  --color-on-brand: #ffffff;
+  --color-on-accent: #ffffff;
+
   /* ============================================================
      STATUTS SÉMANTIQUES
      ============================================================ */
   --color-danger: var(--color-coral-500);
   --color-danger-soft: var(--color-coral-50);
+  /* Teinte assombrie du danger, pour du texte posé sur `danger-soft`
+     (`danger` lui-même n'y atteint pas 4.5:1). */
+  --color-danger-strong: var(--color-coral-700);
   --color-success: var(--color-mint-700);
   --color-warning: var(--color-amber-600);
   --color-info: var(--color-navy-500);
@@ -179,6 +198,136 @@
     radial-gradient(ellipse 100% 70% at 95% 0%, rgb(221 231 240 / 0.35), transparent 55%),
     radial-gradient(ellipse 90% 60% at 0% 100%, rgb(250 220 210 / 0.2), transparent 50%),
     radial-gradient(ellipse 70% 50% at 50% 50%, rgb(207 232 222 / 0.15), transparent 55%),
+    linear-gradient(
+      165deg,
+      var(--color-cream) 0%,
+      var(--color-surface) 45%,
+      var(--color-paper) 100%
+    );
+}
+
+/* ============================================================
+   THÈME SOMBRE (#416)
+
+   Bloc volontairement HORS `@layer` : les variables de `@theme` sont émises
+   par Tailwind dans `@layer theme`, et une règle non-layerisée l'emporte
+   toujours sur une règle layerisée, quelle que soit la spécificité.
+
+   Les quatre neutres chauds (cream/paper/bone/sand) sont remappés en même
+   temps que les tokens sémantiques : ce sont des couleurs brutes, mais elles
+   ne servent QUE de fonds et de bordures (aucun `text-cream`, `text-bone`,
+   `text-paper` ni `text-sand` dans le code), y compris à la racine des layouts
+   `public.vue` et `auth.vue`. Les remapper fait basculer ~280 usages sans
+   toucher aux composants.
+   ============================================================ */
+[data-theme='light'] {
+  color-scheme: light;
+}
+
+[data-theme='dark'] {
+  /* Aligne scrollbars, sélecteurs de date et autres contrôles natifs. */
+  color-scheme: dark;
+
+  /* Neutres — encres froides en remplacement des beiges */
+  --color-cream: #0f1a23;
+  --color-paper: #14212c;
+  --color-bone: #223343;
+  --color-sand: #31485d;
+
+  /* ---- Inversion des palettes d'accent ----------------------------------
+     Dans tout le code, ces échelles sont utilisées de façon très régulière :
+     `-50`/`-100` en fond (panneaux teintés, pastilles), `-200` en bordure,
+     `-700`/`-800`/`-900` en texte posé sur ces fonds. On inverse donc les
+     deux extrémités : les paliers clairs deviennent des surfaces sombres,
+     les paliers foncés deviennent de l'encre claire. Les tons moyens
+     (`-300` à `-600`) sont conservés : ils servent aussi bien de fond plein
+     (avec `text-white`) que d'icône sur surface claire, et restent lisibles
+     dans les deux thèmes. */
+  --color-coral-50: #2b1611;
+  --color-coral-100: #3a1e18;
+  --color-coral-200: #55302a;
+  --color-coral-700: #f3a08c;
+  --color-mint-50: #0f241d;
+  --color-mint-100: #163227;
+  --color-mint-200: #234a3c;
+  --color-mint-700: #7fcfae;
+  --color-amber-50: #2a1f0c;
+  --color-amber-100: #3a2b11;
+  --color-amber-700: #e6b45c;
+  --color-violet-50: #1d1930;
+  --color-violet-100: #282240;
+  --color-violet-700: #b3a8d8;
+  --color-sky-50: #0c202c;
+  --color-sky-100: #112d3d;
+  --color-sky-200: #1b4459;
+  --color-sky-700: #7cc3e8;
+  --color-sky-800: #a4d6f0;
+  --color-lilac-50: #1e1533;
+  --color-lilac-100: #2a1d45;
+  --color-lilac-200: #3f2c64;
+  --color-lilac-700: #c0a8f0;
+  --color-lilac-800: #d4c4f5;
+  --color-peach-50: #2c1a0d;
+  --color-peach-100: #3c2411;
+  --color-peach-200: #5a381c;
+  --color-peach-700: #f0a978;
+  --color-peach-800: #f5c4a1;
+
+  /* Surfaces */
+  --color-surface: #0f1a23;
+  --color-surface-elevated: #17242f;
+  --color-surface-muted: #14212c;
+  /* « inverse » s'inverse aussi : c'est la surface à contre-emploi du thème */
+  --color-surface-inverse: #eef3f8;
+
+  /* Texte — contrastes sur --color-surface : fg ≈ 15:1, muted ≈ 9:1,
+     subtle ≈ 5:1 (tous ≥ AA) */
+  --color-fg: #e9eff5;
+  --color-fg-muted: #a3b4c4;
+  --color-fg-subtle: #78899b;
+  /* Doit être explicite : pointait sur --color-cream, remappé ci-dessus */
+  --color-fg-inverse: #0b1d2e;
+
+  /* Bordures */
+  --color-border: #223343;
+  --color-border-strong: #31485d;
+
+  /* Brand — navy-700 est illisible sur fond sombre, on remonte la luminosité
+     et on bascule le texte posé dessus en encre foncée */
+  --color-brand: #6a9dcb;
+  --color-brand-hover: #8ab7de;
+  --color-brand-soft: #1a3247;
+  --color-on-brand: #0b1d2e;
+  --color-on-accent: #2a1109;
+
+  --color-accent: #ea7f6a;
+  --color-accent-hover: #f09b89;
+
+  /* Statuts — `danger-soft`, `danger-strong` et `success` n'ont pas besoin
+     d'override : ils pointent sur coral-50 / coral-700 / mint-700, déjà
+     inversés ci-dessus. Seuls `warning` et `info` sont remontés, leurs
+     paliers d'origine (amber-600, navy-500) restant trop sombres ici. */
+  --color-danger: var(--color-coral-400);
+  --color-warning: #d9a445;
+  --color-info: #7db0da;
+
+  --ring-focus: 0 0 0 3px rgb(106 157 203 / 0.35);
+  --ring-invalid: 0 0 0 3px rgb(234 127 106 / 0.35);
+
+  /* Ombres — l'encre navy (rgb 11 29 46) est invisible sur fond sombre :
+     on passe au noir, plus opaque */
+  --shadow-xs: 0 1px 2px rgb(0 0 0 / 0.35);
+  --shadow-sm: 0 2px 10px -4px rgb(0 0 0 / 0.45), 0 1px 3px rgb(0 0 0 / 0.3);
+  --shadow-md: 0 10px 30px -16px rgb(0 0 0 / 0.55), 0 6px 12px -8px rgb(0 0 0 / 0.35);
+  --shadow-lg: 0 24px 64px -28px rgb(0 0 0 / 0.65), 0 16px 24px -20px rgb(0 0 0 / 0.4);
+  --shadow-card: 0 4px 24px -4px rgb(0 0 0 / 0.4), 0 2px 8px -2px rgb(0 0 0 / 0.25);
+  --shadow-card-hover: 0 12px 40px -8px rgb(0 0 0 / 0.5), 0 4px 12px -4px rgb(0 0 0 / 0.3);
+
+  /* Dégradé de fond des pages app — mêmes positions, teintes sombres */
+  --background-image-gradient-mesh:
+    radial-gradient(ellipse 100% 70% at 95% 0%, rgb(61 111 156 / 0.18), transparent 55%),
+    radial-gradient(ellipse 90% 60% at 0% 100%, rgb(226 103 79 / 0.1), transparent 50%),
+    radial-gradient(ellipse 70% 50% at 50% 50%, rgb(39 133 106 / 0.08), transparent 55%),
     linear-gradient(
       165deg,
       var(--color-cream) 0%,

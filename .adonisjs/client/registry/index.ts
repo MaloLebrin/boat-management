@@ -978,6 +978,18 @@ const routes = {
     tokens: [{"old":"/fr/a-propos","type":0,"val":"fr","end":""},{"old":"/fr/a-propos","type":0,"val":"a-propos","end":""}],
     types: placeholder as Registry['marketing.fr.about']['types'],
   },
+  'marketing.en.contact': {
+    methods: ["GET","HEAD"],
+    pattern: '/en/contact',
+    tokens: [{"old":"/en/contact","type":0,"val":"en","end":""},{"old":"/en/contact","type":0,"val":"contact","end":""}],
+    types: placeholder as Registry['marketing.en.contact']['types'],
+  },
+  'marketing.fr.contact': {
+    methods: ["GET","HEAD"],
+    pattern: '/fr/contact',
+    tokens: [{"old":"/fr/contact","type":0,"val":"fr","end":""},{"old":"/fr/contact","type":0,"val":"contact","end":""}],
+    types: placeholder as Registry['marketing.fr.contact']['types'],
+  },
   'marketing.contact': {
     methods: ["GET","HEAD"],
     pattern: '/contact',
@@ -1031,6 +1043,12 @@ const routes = {
     pattern: '/locale',
     tokens: [{"old":"/locale","type":0,"val":"locale","end":""}],
     types: placeholder as Registry['locale.set']['types'],
+  },
+  'theme.set': {
+    methods: ["POST"],
+    pattern: '/theme',
+    tokens: [{"old":"/theme","type":0,"val":"theme","end":""}],
+    types: placeholder as Registry['theme.set']['types'],
   },
   'settings.index': {
     methods: ["GET","HEAD"],
@@ -1109,6 +1127,24 @@ const routes = {
     pattern: '/settings/profile',
     tokens: [{"old":"/settings/profile","type":0,"val":"settings","end":""},{"old":"/settings/profile","type":0,"val":"profile","end":""}],
     types: placeholder as Registry['settings.profile.update']['types'],
+  },
+  'settings.password.update': {
+    methods: ["PUT"],
+    pattern: '/settings/password',
+    tokens: [{"old":"/settings/password","type":0,"val":"settings","end":""},{"old":"/settings/password","type":0,"val":"password","end":""}],
+    types: placeholder as Registry['settings.password.update']['types'],
+  },
+  'settings.locale.update': {
+    methods: ["PUT"],
+    pattern: '/settings/locale',
+    tokens: [{"old":"/settings/locale","type":0,"val":"settings","end":""},{"old":"/settings/locale","type":0,"val":"locale","end":""}],
+    types: placeholder as Registry['settings.locale.update']['types'],
+  },
+  'settings.theme.update': {
+    methods: ["PUT"],
+    pattern: '/settings/theme',
+    tokens: [{"old":"/settings/theme","type":0,"val":"settings","end":""},{"old":"/settings/theme","type":0,"val":"theme","end":""}],
+    types: placeholder as Registry['settings.theme.update']['types'],
   },
   'settings.org.update': {
     methods: ["PUT"],

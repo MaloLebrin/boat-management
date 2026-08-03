@@ -61,7 +61,7 @@ const { el, isVisible } = useScrollReveal()
               <p class="text-sm font-semibold text-fg">{{ item.name }}</p>
               <p class="text-xs text-fg-subtle">{{ item.org }} - {{ item.role }}</p>
             </div>
-            <span class="rounded-full bg-navy-900/10 px-3 py-1 text-xs font-medium text-navy-900">
+            <span class="rounded-full bg-brand-soft px-3 py-1 text-xs font-medium text-brand">
               {{ item.plan }}
             </span>
           </div>

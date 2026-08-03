@@ -1,5 +1,12 @@
 <!DOCTYPE html>
-<html lang="{{ page?.props?.locale ?? 'en' }}">
+{{--
+  Thème (#416) : `data-theme` n'est écrit côté serveur que pour un choix
+  explicite (`light` / `dark`). Avec la préférence `system`, l'attribut est
+  omis et le script anti-FOUC ci-dessous le résout via `prefers-color-scheme`
+  avant le premier paint.
+--}}
+{{-- Balise gardée sur une seule ligne : des tests fonctionnels assertent `<html lang="fr">`. --}}
+<html lang="{{ page?.props?.locale ?? 'en' }}" data-theme="{{ page?.props?.theme === 'light' || page?.props?.theme === 'dark' ? page.props.theme : '' }}">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -11,8 +18,26 @@
       name="description"
       content="FleetAi helps organizations track boats, equipment, and maintenance with intelligent signals."
     />
+    {{--
+      Résout `system` vers un thème concret avant le premier paint, pour éviter
+      un flash clair sur un OS en sombre (#416). Doit rester en tête de <head>,
+      avant @vite. `nonce` obligatoire : Shield applique une CSP.
+    --}}
+    <script nonce="{{ cspNonce }}">
+      ;(function () {
+        var el = document.documentElement
+        if (!el.getAttribute('data-theme')) {
+          el.setAttribute(
+            'data-theme',
+            window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+          )
+        }
+      })()
+    </script>
+
     <link rel="manifest" href="/site.webmanifest" />
-    <meta name="theme-color" content="#0066cc" />
+    <meta name="theme-color" content="#faf6ee" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0f1a23" media="(prefers-color-scheme: dark)" />
     <link rel="icon" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta property="og:site_name" content="FleetAi" />

@@ -45,7 +45,7 @@ const { t } = useT()
         </div>
       </nav>
       <div class="mt-auto border-t border-white/10 px-2 py-2">
-        <div class="flex items-center gap-1.5 px-2 py-1 text-violet-100/70">
+        <div class="flex items-center gap-1.5 px-2 py-1 text-violet-200/70">
           <div class="h-3 w-3 rounded bg-violet-400/40" />
           <span>FleetAi</span>
         </div>
@@ -55,7 +55,9 @@ const { t } = useT()
     <!-- Main content -->
     <div class="flex flex-1 flex-col overflow-hidden">
       <!-- Header -->
-      <div class="flex items-center justify-between border-b border-bone bg-white px-4 py-2">
+      <div
+        class="flex items-center justify-between border-b border-bone bg-surface-elevated px-4 py-2"
+      >
         <div>
           <p class="font-semibold text-fg">Marina Bleue</p>
           <p class="text-[9px] text-fg-muted">{{ t('homePreview.fleetCount') }}</p>
@@ -88,7 +90,7 @@ const { t } = useT()
 
           <!-- KPI cards -->
           <div class="mb-3 grid grid-cols-4 gap-2">
-            <div class="rounded-lg border border-bone bg-white p-2">
+            <div class="rounded-lg border border-bone bg-surface-elevated p-2">
               <p class="text-[9px] font-medium uppercase text-fg-muted">Flotte</p>
               <p class="font-display text-lg text-fg">22</p>
             </div>
@@ -100,14 +102,14 @@ const { t } = useT()
               <p class="text-[9px] font-medium uppercase text-amber-700">Sous 14j</p>
               <p class="font-display text-lg text-amber-600">7</p>
             </div>
-            <div class="rounded-lg border border-bone bg-white p-2">
+            <div class="rounded-lg border border-bone bg-surface-elevated p-2">
               <p class="text-[9px] font-medium uppercase text-fg-muted">Heures mois</p>
               <p class="font-display text-lg text-fg">186</p>
             </div>
           </div>
 
           <!-- Fleet table -->
-          <div class="rounded-lg border border-bone bg-white">
+          <div class="rounded-lg border border-bone bg-surface-elevated">
             <div class="border-b border-bone px-3 py-2">
               <p class="font-semibold text-fg">Flotte</p>
             </div>
@@ -199,7 +201,7 @@ const { t } = useT()
           class="flex w-[160px] shrink-0 flex-col overflow-hidden border-l border-bone bg-paper/50 p-3"
         >
           <!-- AI panel -->
-          <div class="mb-3 shrink-0 rounded-lg bg-violet-700 p-2 text-white">
+          <div class="mb-3 shrink-0 rounded-lg bg-violet-600 p-2 text-white">
             <div class="mb-1 flex items-center gap-1">
               <div class="h-3 w-3 rounded bg-white/30" />
               <span class="font-medium">FleetAi</span>

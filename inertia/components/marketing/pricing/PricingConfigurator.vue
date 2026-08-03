@@ -170,7 +170,7 @@ const { el, isVisible } = useScrollReveal()
           <!-- Add-on quantitatif : bateaux supplémentaires -->
           <div
             v-if="extraBoats"
-            class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-bone bg-white p-5"
+            class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-bone bg-surface-elevated p-5"
           >
             <div class="min-w-0">
               <h3 class="font-medium text-fg">{{ extraBoats.name }}</h3>
@@ -212,7 +212,7 @@ const { el, isVisible } = useScrollReveal()
 
         <!-- Colonne récap (sticky) — liseré lumineux animé -->
         <aside class="lg:sticky lg:top-24 lg:self-start">
-          <div class="glow-border rounded-2xl border border-bone bg-white p-6 shadow-sm">
+          <div class="glow-border rounded-2xl border border-bone bg-surface-elevated p-6 shadow-sm">
             <p class="text-sm text-fg-muted">{{ totalLabel }}</p>
             <div class="mt-1 flex items-baseline gap-1">
               <span class="font-display text-5xl text-fg tabular-nums">
