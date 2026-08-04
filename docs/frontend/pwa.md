@@ -172,6 +172,11 @@ Les formulaires qui supportent la saisie offline suivent ce pattern dans `handle
 
 ```ts
 function handleSubmit() {
+  // Champs datetime-local : l'offset est relu ici, pas à la construction du
+  // formulaire, pour qu'une saisie mise en file reparte avec le fuseau dans
+  // lequel elle a été tapée (#452).
+  form.tzOffsetMinutes = tzOffsetMinutes()
+
   if (!isOnline.value) {
     enqueue({
       type: 'create-navigation-log', // type lisible
@@ -189,6 +194,12 @@ function handleSubmit() {
   })
 }
 ```
+
+> Un formulaire qui porte un `<input type="datetime-local">` doit inclure
+> `tzOffsetMinutes` dans `useForm` : `payload: form.data()` l'embarque alors dans
+> la file hors-ligne, et le serveur peut reconstruire l'instant visé au rejeu
+> (`toUtcFromLocalInput`). Sans lui, la valeur naïve serait interprétée comme
+> UTC et décalée de l'offset du fuseau.
 
 ### Formulaires supportés
 

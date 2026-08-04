@@ -172,6 +172,14 @@ Dates : formats `YYYY-MM-DDTHH:mm` ou `YYYY-MM-DD`. `clientName` requis (1–255
 `total_price` : `number` ≥ 0, 2 décimales, optionnel/nullable. Règle
 `ends_at > starts_at` vérifiée dans le service (`ReservationValidationError('endBeforeStart')`).
 
+**Fuseau horaire (#452)** : `startsAt`/`endsAt` arrivent d'un `datetime-local`,
+donc en horloge murale naïve. Le formulaire envoie aussi `tzOffsetMinutes`
+(le `getTimezoneOffset()` du navigateur) et le service applique
+`toUtcFromLocalInput` pour stocker l'instant réellement visé. Le champ est
+optionnel : une requête sans offset garde l'ancien comportement
+(naïf interprété comme UTC), ce qui préserve les rejeux hors-ligne et les
+appels API qui postent déjà une date absolue.
+
 ---
 
 ## 6. Tarification 1/3 — Tarif de base (#292)
