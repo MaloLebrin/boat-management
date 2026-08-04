@@ -6,6 +6,8 @@ export type SeaState = 'calm' | 'slight' | 'moderate' | 'rough' | 'very_rough'
 
 export interface CreateNavigationLogPayload {
   departedAt: Date | string | DateTime
+  /** getTimezoneOffset() of the submitting browser — used to shift the naive local datetime to UTC */
+  tzOffsetMinutes?: number
   departurePortId?: number | null
   departurePortName?: string | null
   engineHoursStart?: number | null
@@ -25,6 +27,8 @@ export interface UpdateNavigationLogPayload {
 
 export interface CloseNavigationLogPayload {
   arrivedAt: Date | string | DateTime
+  /** getTimezoneOffset() of the submitting browser — used to shift the naive local datetime to UTC */
+  tzOffsetMinutes?: number
   arrivalPortId?: number | null
   arrivalPortName?: string | null
   distanceNm?: number | null

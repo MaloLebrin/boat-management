@@ -5,6 +5,8 @@ export const createBoatReservationValidator = vine.compile(
   vine.object({
     startsAt: vine.date({ formats: ['YYYY-MM-DDTHH:mm', 'YYYY-MM-DD'] }),
     endsAt: vine.date({ formats: ['YYYY-MM-DDTHH:mm', 'YYYY-MM-DD'] }),
+    // browser's getTimezoneOffset() — shifts the naive local datetime to UTC (#452)
+    tzOffsetMinutes: vine.number().withoutDecimals().optional(),
     clientId: vine.number().positive().optional().nullable(),
     clientName: vine.string().trim().minLength(1).maxLength(255),
     clientEmail: vine.string().trim().email().maxLength(255).optional().nullable(),
@@ -19,6 +21,8 @@ export const updateBoatReservationValidator = vine.compile(
   vine.object({
     startsAt: vine.date({ formats: ['YYYY-MM-DDTHH:mm', 'YYYY-MM-DD'] }).optional(),
     endsAt: vine.date({ formats: ['YYYY-MM-DDTHH:mm', 'YYYY-MM-DD'] }).optional(),
+    // browser's getTimezoneOffset() — shifts the naive local datetime to UTC (#452)
+    tzOffsetMinutes: vine.number().withoutDecimals().optional(),
     clientId: vine.number().positive().optional().nullable(),
     clientName: vine.string().trim().minLength(1).maxLength(255).optional(),
     clientEmail: vine.string().trim().email().maxLength(255).optional().nullable(),

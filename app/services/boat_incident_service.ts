@@ -5,7 +5,7 @@ import type User from '#models/user'
 import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
 import type { CreateIncidentPayload, UpdateIncidentPayload } from '#shared/types/incident'
-import { toDateTime } from '#shared/helpers/date'
+import { toUtcFromLocalInput } from '#shared/helpers/date'
 
 function assertBoatScope(user: User, boat: Boat) {
   if (user.organizationId === null || user.organizationId !== boat.organizationId) {
@@ -50,7 +50,7 @@ export default class BoatIncidentService {
     return await BoatIncident.create({
       boatId: boat.id,
       organizationId: boat.organizationId,
-      occurredAt: toDateTime(payload.occurredAt).plus({ minutes: payload.tzOffsetMinutes ?? 0 }),
+      occurredAt: toUtcFromLocalInput(payload.occurredAt, payload.tzOffsetMinutes),
       type: payload.type,
       location: payload.location?.trim() || null,
       description,
@@ -79,9 +79,7 @@ export default class BoatIncidentService {
     }
 
     if (payload.occurredAt !== undefined) {
-      incident.occurredAt = toDateTime(payload.occurredAt).plus({
-        minutes: payload.tzOffsetMinutes ?? 0,
-      })
+      incident.occurredAt = toUtcFromLocalInput(payload.occurredAt, payload.tzOffsetMinutes)
     }
     if (payload.type !== undefined) incident.type = payload.type
     if (payload.location !== undefined) incident.location = payload.location?.trim() || null

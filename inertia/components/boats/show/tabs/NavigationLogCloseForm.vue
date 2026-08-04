@@ -8,6 +8,7 @@ import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import { useNetworkStatus } from '~/composables/use_network_status'
 import { useOfflineQueue } from '~/composables/use_offline_queue'
 import { useT } from '~/composables/use_t'
+import { nowDatetimeLocalValue, tzOffsetMinutes } from '~/utils/local_datetime'
 import type {
   NavigationLogEngineOption,
   NavigationLogPortOption,
@@ -29,9 +30,7 @@ const { t } = useT()
 const { isOnline } = useNetworkStatus()
 const { enqueue } = useOfflineQueue()
 
-const now = new Date()
-const pad = (n: number) => String(n).padStart(2, '0')
-const defaultArrivedAt = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`
+const defaultArrivedAt = nowDatetimeLocalValue()
 
 const SEA_STATES = ['calm', 'slight', 'moderate', 'rough', 'very_rough'] as const
 
@@ -54,6 +53,9 @@ const engineSelectOptions = computed(() =>
 
 const form = useForm({
   arrivedAt: defaultArrivedAt,
+  // `arrivedAt` is a naive wall-clock: the server needs the browser offset to
+  // store the right instant (#452).
+  tzOffsetMinutes: tzOffsetMinutes(),
   arrivalPortId: '' as string | number,
   arrivalPortName: '',
   distanceNm: null as number | null,
@@ -67,6 +69,8 @@ const form = useForm({
 })
 
 function handleSubmit() {
+  form.tzOffsetMinutes = tzOffsetMinutes()
+
   if (!isOnline.value) {
     enqueue({
       type: 'close-navigation-log',

@@ -95,6 +95,7 @@ export default class BoatReservationsController {
       ;({ cancelledOptions } = await this.reservationService.create(user, boat, {
         startsAt: payload.startsAt,
         endsAt: payload.endsAt,
+        tzOffsetMinutes: payload.tzOffsetMinutes,
         clientId: payload.clientId ?? null,
         clientName: payload.clientName,
         clientEmail: payload.clientEmail ?? null,
@@ -159,6 +160,7 @@ export default class BoatReservationsController {
         {
           startsAt: payload.startsAt,
           endsAt: payload.endsAt,
+          tzOffsetMinutes: payload.tzOffsetMinutes,
           clientId: payload.clientId,
           clientName: payload.clientName,
           clientEmail: payload.clientEmail,

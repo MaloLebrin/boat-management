@@ -9,6 +9,7 @@ import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import InspectionPhotos from '~/components/reservations/inspection/InspectionPhotos.vue'
 import InspectionDefects from '~/components/reservations/inspection/InspectionDefects.vue'
 import { useT } from '~/composables/use_t'
+import { isoToDatetimeLocalValue, tzOffsetMinutes } from '~/utils/local_datetime'
 import type { InspectionKind, InspectionWithPhotos } from '~/types/inspection'
 
 const props = defineProps<{
@@ -26,15 +27,12 @@ const { t } = useT()
 
 const basePath = `/boats/${props.boatId}/reservations/${props.reservationId}`
 
-const performedAt = ref(props.inspection ? toLocalDatetime(props.inspection.performedAt) : '')
+const performedAt = ref(
+  props.inspection ? isoToDatetimeLocalValue(props.inspection.performedAt) : ''
+)
 const fuelLevel = ref(props.inspection?.fuelLevel?.toString() ?? '')
 const engineHours = ref(props.inspection?.engineHours ?? '')
 const notes = ref(props.inspection?.notes ?? '')
-
-function toLocalDatetime(utcIso: string): string {
-  const d = new Date(utcIso)
-  return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16)
-}
 
 function deleteInspection() {
   if (!props.inspection) return
@@ -67,7 +65,7 @@ function deleteInspection() {
       #default="{ processing, errors }"
     >
       <input v-if="!inspection" type="hidden" name="kind" :value="kind" />
-      <input type="hidden" name="tzOffsetMinutes" :value="String(new Date().getTimezoneOffset())" />
+      <input type="hidden" name="tzOffsetMinutes" :value="String(tzOffsetMinutes())" />
 
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <BaseInput

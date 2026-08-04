@@ -13,7 +13,7 @@ import type {
   CreateNavigationLogPayload,
   UpdateNavigationLogPayload,
 } from '#shared/types/navigation_log'
-import { toDateTime } from '#shared/helpers/date'
+import { toUtcFromLocalInput } from '#shared/helpers/date'
 import db from '@adonisjs/lucid/services/db'
 
 export {
@@ -66,7 +66,7 @@ export default class NavigationLogService {
   }
 
   async createForBoat(boat: Boat, payload: CreateNavigationLogPayload) {
-    const departedAt = toDateTime(payload.departedAt)
+    const departedAt = toUtcFromLocalInput(payload.departedAt, payload.tzOffsetMinutes)
 
     // A boat may only have one in-progress trip at a time. Two would make the
     // "active trip" ambiguous and corrupt engine hours on the two closeTrip
@@ -123,7 +123,7 @@ export default class NavigationLogService {
       }
     }
 
-    const arrivedAt = toDateTime(payload.arrivedAt)
+    const arrivedAt = toUtcFromLocalInput(payload.arrivedAt, payload.tzOffsetMinutes)
 
     if (arrivedAt <= log.departedAt) {
       throw new NavigationLogValidationError(

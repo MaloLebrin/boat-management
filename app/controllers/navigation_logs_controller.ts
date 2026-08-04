@@ -44,6 +44,7 @@ export default class NavigationLogsController {
     try {
       await this.navigationLogService.createForBoat(boat, {
         departedAt: payload.departedAt,
+        tzOffsetMinutes: payload.tzOffsetMinutes,
         departurePortId: payload.departurePortId ?? null,
         departurePortName: payload.departurePortName ?? null,
         engineHoursStart: payload.engineHoursStart ?? null,
@@ -139,6 +140,7 @@ export default class NavigationLogsController {
     try {
       await this.navigationLogService.closeTrip(boat, Number(params.logId), {
         arrivedAt: payload.arrivedAt,
+        tzOffsetMinutes: payload.tzOffsetMinutes,
         arrivalPortId: payload.arrivalPortId ?? null,
         arrivalPortName: payload.arrivalPortName ?? null,
         distanceNm: payload.distanceNm ?? null,

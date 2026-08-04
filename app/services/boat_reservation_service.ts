@@ -16,7 +16,7 @@ import type {
   ReservationStatus,
   UpdateReservationPayload,
 } from '#shared/types/reservation'
-import { toDateTime } from '#shared/helpers/date'
+import { toUtcFromLocalInput } from '#shared/helpers/date'
 import { countBilledNights } from '#shared/helpers/reservation_quote'
 import BoatPricingService from '#services/boat_pricing_service'
 import ReservationQuoteService from '#services/reservation_quote_service'
@@ -87,8 +87,8 @@ export default class BoatReservationService {
   ): Promise<{ reservation: BoatReservation; cancelledOptions: number }> {
     assertBoatScope(user, boat)
 
-    const startsAt = toDateTime(payload.startsAt)
-    const endsAt = toDateTime(payload.endsAt)
+    const startsAt = toUtcFromLocalInput(payload.startsAt, payload.tzOffsetMinutes)
+    const endsAt = toUtcFromLocalInput(payload.endsAt, payload.tzOffsetMinutes)
 
     if (endsAt <= startsAt) {
       throw new ReservationValidationError('endsAt must be after startsAt', 'endBeforeStart')
@@ -169,8 +169,13 @@ export default class BoatReservationService {
     if (!reservation) throw new ReservationNotFoundError()
 
     const startsAt =
-      payload.startsAt !== undefined ? toDateTime(payload.startsAt) : reservation.startsAt
-    const endsAt = payload.endsAt !== undefined ? toDateTime(payload.endsAt) : reservation.endsAt
+      payload.startsAt !== undefined
+        ? toUtcFromLocalInput(payload.startsAt, payload.tzOffsetMinutes)
+        : reservation.startsAt
+    const endsAt =
+      payload.endsAt !== undefined
+        ? toUtcFromLocalInput(payload.endsAt, payload.tzOffsetMinutes)
+        : reservation.endsAt
 
     if (endsAt <= startsAt) {
       throw new ReservationValidationError('endsAt must be after startsAt', 'endBeforeStart')

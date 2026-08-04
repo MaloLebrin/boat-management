@@ -2,6 +2,7 @@
 import { useNumberFormat } from '~/composables/use_number_format'
 import { useT } from '~/composables/use_t'
 import type { FleetFuelLogRow } from '../../../shared/types/navigation'
+import { parseDisplayDate } from '~/utils/local_datetime'
 
 const { t, locale } = useT()
 const { formatNumber, formatCurrency } = useNumberFormat()
@@ -9,7 +10,7 @@ const { formatNumber, formatCurrency } = useNumberFormat()
 defineProps<{ row: FleetFuelLogRow }>()
 
 function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString(locale.value, {
+  return parseDisplayDate(iso).toLocaleDateString(locale.value, {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
