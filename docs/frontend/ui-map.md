@@ -14,10 +14,11 @@ Référence: `inertia/app.ts`.
 
 - Page: `inertia/pages/auth/signup.vue` — `<Form route="new_account.store">`, backend `NewAccountController.store` + `signupValidator`
 - Sections (la page reste sous la limite de 250 lignes) :
-  - `components/auth/signup/SignupIdentityFields.vue` — `firstName`, `lastName`, `email`, `password` (+ `PasswordStrength`, bouton Afficher/Masquer)
+  - `components/auth/signup/SignupIdentityFields.vue` — `firstName`, `lastName`, `email`, `password` (+ `PasswordStrength`, bouton Afficher/Masquer). Les bornes du mot de passe (placeholder, hint, `minlength`/`maxlength`) sont interpolées depuis `PASSWORD_MIN_LENGTH` / `PASSWORD_MAX_LENGTH` (`shared/constants/auth.ts`), les mêmes constantes que le validator (#455)
   - `components/auth/signup/SignupOrganizationFields.vue` — `organizationName`, `organizationType`, `fleetSize` ; les options des deux selects sont générées depuis `ORGANIZATION_TYPES` / `FLEET_SIZES` (`shared/types/organization.ts`), les mêmes constantes que le validator
-  - `components/auth/signup/SignupTermsCheckbox.vue` — case `acceptTerms` avec son propre emplacement d'erreur
+  - `components/auth/signup/SignupTermsCheckbox.vue` — case `acceptTerms` avec son propre emplacement d'erreur ; les mentions CGU / confidentialité sont des `<Link>` localisés (`/fr/cgu`•`/en/terms`, `/fr/confidentialite`•`/en/privacy`) ouverts dans un nouvel onglet pour ne pas perdre le formulaire (#455)
   - `components/auth/signup/SignupSectionHeader.vue` — en-tête numéroté « 01 / 02 »
+- Puces du plan gratuit sous le bouton (`STARTER_FEATURES`) : construites depuis `PLAN_LIMITS.starter` (bateaux, membres) avec des clés ICU au pluriel — la page annonçait « utilisateurs illimités » alors que Starter en autorise 1 (#455)
 - `components/base/BaseFormErrorSummary.vue` en tête de formulaire : reçoit `handled-keys` (les champs qui affichent déjà leur erreur sous l'input) et rend en bandeau `danger` **toutes les autres** erreurs. Sans lui, un champ de validator sans input rend l'échec invisible — c'est exactement le bug #448. Réutilisable sur tout formulaire Inertia.
 
 ### Dashboard
@@ -96,7 +97,8 @@ Les cartes de l'onglet Équipement exposent un lien « voir le détail » vers c
 
 ### Marketing (pages publiques)
 
-- Pages : `inertia/pages/marketing/{home,pricing,about,contact,guide,simulator,simulator_share}.vue` — rendues par `MarketingController` (routes locale-préfixées `/en`, `/fr`, voir `start/routes/marketing.ts`), layout `inertia/layouts/public.vue`
+- Pages : `inertia/pages/marketing/{home,pricing,about,contact,guide,simulator,simulator_share,privacy,terms}.vue` — rendues par `MarketingController` (routes locale-préfixées `/en`, `/fr`, voir `start/routes/marketing.ts`), layout `inertia/layouts/public.vue`
+- Pages légales : `privacy.vue` (`/fr/confidentialite`, `/en/privacy`) et `terms.vue` (`/fr/cgu`, `/en/terms`, #455) ne portent que leur `<Head>` et délèguent le rendu à `components/marketing/legal/LegalDocumentSections.vue` (hero + sections numérotées + bloc contact), alimenté par le type `LegalDocument` de `shared/types/marketing.ts`. Les deux sont liées depuis le footer public et la case CGU du signup, et référencées au sitemap avec leurs alternates hreflang
 - i18n : textes construits côté serveur depuis `resources/lang/{en,fr}/marketing.json` et passés en prop `t` (namespace exclu de `appT`)
 - Composants par page dans `inertia/components/marketing/{home,pricing,about,contact,simulator,guide}/`
 - Formulaire de contact (#450) : `contact/ContactFormSection.vue` poste sur `POST /contact` via `useForm` (`preserveScroll`), erreurs VineJS affichées par champ, panneau de confirmation piloté par la prop `contactSent` (flash relu par `MarketingController.contact`) puis par l'état local après `onSuccess`. Barre latérale extraite en `ContactFormSidebar.vue`, pastilles sujet/taille de flotte en `ContactPillGroup.vue`. Les cartes de `ContactChannelsSection.vue` sont des liens : ancre `#contact-form`, `<Link>` `/signup`, `mailto:` support et presse.

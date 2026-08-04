@@ -18,6 +18,7 @@ router
       .as('marketing.en.simulator')
     router.get('/boat-maintenance-cost', [MarketingController, 'guide']).as('marketing.en.guide')
     router.get('/privacy', [MarketingController, 'privacy']).as('marketing.en.privacy')
+    router.get('/terms', [MarketingController, 'terms']).as('marketing.en.terms')
   })
   .prefix('en')
 
@@ -30,6 +31,7 @@ router
       .as('marketing.fr.simulator')
     router.get('/cout-entretien-bateau', [MarketingController, 'guide']).as('marketing.fr.guide')
     router.get('/confidentialite', [MarketingController, 'privacy']).as('marketing.fr.privacy')
+    router.get('/cgu', [MarketingController, 'terms']).as('marketing.fr.terms')
   })
   .prefix('fr')
 

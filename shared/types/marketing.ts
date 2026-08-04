@@ -10,6 +10,29 @@ export type PricingTableRow = [
   enterprise: boolean | string,
 ]
 
+/**
+ * Page légale (politique de confidentialité, CGU) : même gabarit hero +
+ * sections numérotées + bloc contact, une seule source de données (#455).
+ */
+export interface LegalSection {
+  title: string
+  body: string
+  bullets?: string[]
+}
+
+export interface LegalDocument {
+  hero: {
+    eyebrow: string
+    title: string
+    titleHighlight: string
+    subtitle: string
+    updatedLabel: string
+    updatedDate: string
+  }
+  sections: LegalSection[]
+  contact: { title: string; body: string; email: string }
+}
+
 export interface AboutValueItem {
   n: string
   title: string

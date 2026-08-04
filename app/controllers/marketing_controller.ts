@@ -56,6 +56,10 @@ export default class MarketingController {
     return inertia.render('marketing/privacy', this.buildPrivacyPageData(i18n))
   }
 
+  async terms({ inertia, i18n }: HttpContext) {
+    return inertia.render('marketing/terms', this.buildTermsPageData(i18n))
+  }
+
   async simulator({ inertia, auth }: HttpContext) {
     const isAuthenticated = await auth.check()
     let canAddBoat = true
@@ -1373,6 +1377,62 @@ export default class MarketingController {
           },
           { title: t('s9_title'), body: t('s9_body') },
           { title: t('s10_title'), body: t('s10_body') },
+        ],
+        contact: {
+          title: t('contact_title'),
+          body: t('contact_body'),
+          email: t('contact_email'),
+        },
+      },
+    }
+  }
+
+  /**
+   * CGU (#455) : même gabarit que la politique de confidentialité — les CGU
+   * étaient référencées par le signup sans exister nulle part.
+   */
+  private buildTermsPageData(i18n: { t: (key: string) => string }) {
+    const t = (key: string) => i18n.t(`marketing.terms.${key}`)
+
+    return {
+      meta: {
+        title: t('meta_title'),
+        description: t('meta_description'),
+      },
+      terms: {
+        hero: {
+          eyebrow: t('hero_eyebrow'),
+          title: t('hero_title'),
+          titleHighlight: t('hero_title_highlight'),
+          subtitle: t('hero_subtitle'),
+          updatedLabel: t('updated_label'),
+          updatedDate: t('updated_date'),
+        },
+        sections: [
+          { title: t('s1_title'), body: t('s1_body') },
+          { title: t('s2_title'), body: t('s2_body') },
+          {
+            title: t('s3_title'),
+            body: t('s3_body'),
+            bullets: [t('s3_b1'), t('s3_b2'), t('s3_b3'), t('s3_b4')],
+          },
+          {
+            title: t('s4_title'),
+            body: t('s4_body'),
+            bullets: [t('s4_b1'), t('s4_b2'), t('s4_b3'), t('s4_b4')],
+          },
+          { title: t('s5_title'), body: t('s5_body') },
+          { title: t('s6_title'), body: t('s6_body') },
+          {
+            title: t('s7_title'),
+            body: t('s7_body'),
+            bullets: [t('s7_b1'), t('s7_b2'), t('s7_b3'), t('s7_b4')],
+          },
+          { title: t('s8_title'), body: t('s8_body') },
+          { title: t('s9_title'), body: t('s9_body') },
+          { title: t('s10_title'), body: t('s10_body') },
+          { title: t('s11_title'), body: t('s11_body') },
+          { title: t('s12_title'), body: t('s12_body') },
         ],
         contact: {
           title: t('contact_title'),

@@ -117,7 +117,7 @@ L'app supporte un thème sombre (issue #416) piloté par l'attribut `data-theme`
 
 - **Marketing (`marketing.json`, pages publiques `home`, `pricing`, `about`, `contact`, `guide`…) : tutoiement.** Le site s'adresse au visiteur en "tu" du hero à la FAQ, y compris dans les questions/réponses qui s'adressent au lecteur.
 - **App (tous les autres namespaces, y compris `auth.json` — login/signup/reset) : vouvoiement.** Dès qu'un écran fait partie du produit connecté (ou de son entrée, comme l'auth), on vouvoie.
-- **Exception légale** : la section `privacy` de `marketing.json` (politique de confidentialité RGPD) reste en vouvoiement — convention standard pour un texte légal/contractuel, même sur un site au ton tutoiement.
+- **Exception légale** : les sections `privacy` (politique de confidentialité RGPD) et `terms` (CGU) de `marketing.json` restent en vouvoiement — convention standard pour un texte légal/contractuel, même sur un site au ton tutoiement.
 - Une question de FAQ écrite à la voix du visiteur qui s'adresse à l'équipe FleetAi (ex. « vous avez un programme partenaire ? ») peut rester en "vous" : ce "vous" désigne l'entreprise, pas le lecteur — ce n'est pas une entorse à la règle.
 - Ne jamais mélanger tu/vous dans une même page ou un même namespace.
 

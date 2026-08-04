@@ -1,10 +1,12 @@
 import vine from '@vinejs/vine'
+import { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH } from '#shared/constants/auth'
 import { AI_MODEL_OVERRIDES } from '#shared/types/ai'
 import { FLEET_SIZES, ORGANIZATION_TYPES } from '#shared/types/organization'
 import { THEME_PREFERENCES } from '#shared/types/theme'
 
 const email = () => vine.string().email().maxLength(254)
-const password = () => vine.string().minLength(8).maxLength(32)
+// Bornes partagées avec le formulaire signup, qui les affiche (#455).
+const password = () => vine.string().minLength(PASSWORD_MIN_LENGTH).maxLength(PASSWORD_MAX_LENGTH)
 
 export const loginValidator = vine.create({
   email: email(),
