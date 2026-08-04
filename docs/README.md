@@ -19,6 +19,7 @@ Cette documentation décrit **fonctionnellement** et **techniquement** le projet
   - `docs/domain/invoicing.md` — facturation (devis & factures, numérotation, PDF/email, statuts, devis depuis réservation — Enterprise)
   - `docs/domain/clients.md` — CRM clients + lien réservation ↔ client (historique, blocage blacklist — Enterprise)
   - `docs/domain/notifications.md` — notifications par utilisateur (cloche + page, temps réel SSE via Transmit, events → listeners)
+  - `docs/domain/contact.md` — formulaire de contact public (`POST /contact`, throttle, persistance, notification équipe + accusé de réception)
 - **Données**: `docs/data/schema.md`
 - **Frontend (Inertia/Vue)**:
   - `docs/frontend/ui-map.md`

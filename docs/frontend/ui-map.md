@@ -99,6 +99,7 @@ Les cartes de l'onglet Équipement exposent un lien « voir le détail » vers c
 - Pages : `inertia/pages/marketing/{home,pricing,about,contact,guide,simulator,simulator_share}.vue` — rendues par `MarketingController` (routes locale-préfixées `/en`, `/fr`, voir `start/routes/marketing.ts`), layout `inertia/layouts/public.vue`
 - i18n : textes construits côté serveur depuis `resources/lang/{en,fr}/marketing.json` et passés en prop `t` (namespace exclu de `appT`)
 - Composants par page dans `inertia/components/marketing/{home,pricing,about,contact,simulator,guide}/`
+- Formulaire de contact (#450) : `contact/ContactFormSection.vue` poste sur `POST /contact` via `useForm` (`preserveScroll`), erreurs VineJS affichées par champ, panneau de confirmation piloté par la prop `contactSent` (flash relu par `MarketingController.contact`) puis par l'état local après `onSuccess`. Barre latérale extraite en `ContactFormSidebar.vue`, pastilles sujet/taille de flotte en `ContactPillGroup.vue`. Les cartes de `ContactChannelsSection.vue` sont des liens : ancre `#contact-form`, `<Link>` `/signup`, `mailto:` support et presse.
 - Canvas décoratifs (`inertia/components/marketing/canvas/`, tous `aria-hidden`, cycle de vie via `use_canvas_lifecycle.ts`) :
   - `GradientMeshCanvas.vue` — dégradé WebGL (repli 2D) : heros home (`navy`), tarifs (`sunset`), about (`dawn`)
   - `PortsMapCanvas.vue` — carte pointillée + arcs : `HomeStatsBandSection` (`dark`, bande navy), hero contact (`light`)
