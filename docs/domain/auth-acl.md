@@ -15,6 +15,8 @@ Référence routes: `start/routes/auth.ts`.
   - Service: `UserService.signupWithOrganization`
   - Auth: `auth.use('web').login(user)`
   - Redirect: route `home`
+  - Mot de passe : `PASSWORD_MIN_LENGTH` / `PASSWORD_MAX_LENGTH` (`shared/constants/auth.ts`) — mêmes constantes côté formulaire, qui les affiche (#455). Aucune vérification d'e-mail n'existe : `store` connecte l'utilisateur immédiatement et n'envoie qu'un e-mail de bienvenue (`EmailQueueService.sendWelcome`) — ne pas promettre de lien de confirmation dans la copie
+  - Promesses affichées : `tests/functional/auth/signup_claims.spec.ts` relit les chaînes servies dans `appT` pour interdire tout retour d'un quota en dur, d'un « illimité » ou d'un essai 14 jours (#455)
 
 ### Login
 
