@@ -60,7 +60,7 @@ const { el: sectionEl, isVisible: sectionVisible } = useScrollReveal()
         </div>
 
         <!-- Solution -->
-        <div class="rounded-2xl border-t-2 border-navy-900 bg-surface-elevated p-5 shadow-sm">
+        <div class="rounded-2xl border-t-2 border-brand bg-surface-elevated p-5 shadow-sm">
           <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-fg">
             {{ caseStudy.solutionLabel }}
           </p>

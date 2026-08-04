@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import { Head, router, usePage } from '@inertiajs/vue3'
-import { computed, ref } from 'vue'
+import { Head } from '@inertiajs/vue3'
+import { ref } from 'vue'
 import BaseAlert from '~/components/base/BaseAlert.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
-import BaseSkeleton from '~/components/base/BaseSkeleton.vue'
+import DashboardAiPanel from '~/components/dashboard/DashboardAiPanel.vue'
 import DashboardStatsGrid from '~/components/dashboard/DashboardStatsGrid.vue'
 import PortDashboardCard from '~/components/dashboard/PortDashboardCard.vue'
-import UpgradePlanModal from '~/components/base/UpgradePlanModal.vue'
 import NewBoatButton from '~/components/boats/NewBoatButton.vue'
 import DashboardQuickAddActions from '~/components/dashboard/DashboardQuickAddActions.vue'
 import type {
@@ -22,14 +21,12 @@ import { useDateFormat } from '~/composables/use_date_format'
 import { propulsionLabel } from '~/utils/boat_propulsion_label'
 import { maintenanceSubjectLabel } from '~/utils/boat_enum_labels'
 import type { AiSuggestion, NavigationLogPortOption } from '~/types/boat_show'
-import { PLAN_LIMITS } from '../../shared/types/plan'
-import type { PlanTier, QuotaUsage } from '../../shared/types/plan'
+import type { QuotaUsage } from '../../shared/types/plan'
 
 const { t } = useT()
 const { formatDate } = useDateFormat()
-const page = usePage()
 
-const props = defineProps<{
+defineProps<{
   boats: DashboardBoatSummary[]
   urgentMaintenance: DashboardUrgentMaintenanceRow[]
   stats: DashboardStats
@@ -43,32 +40,7 @@ const props = defineProps<{
   boatQuota: QuotaUsage['boats']
 }>()
 
-const canUseAI = computed(() => {
-  const plan = (page.props.currentPlan as PlanTier | undefined) ?? 'starter'
-  return PLAN_LIMITS[plan].canUseAI
-})
-
 const showAlert = ref(true)
-const isAnalyzing = ref(false)
-const showUpgradeModal = ref(false)
-
-function analyzeFleet() {
-  if (!canUseAI.value) {
-    showUpgradeModal.value = true
-    return
-  }
-  isAnalyzing.value = true
-  router.post(
-    '/ai/fleet-analysis',
-    {},
-    {
-      preserveScroll: true,
-      onFinish: () => {
-        isAnalyzing.value = false
-      },
-    }
-  )
-}
 
 function isOverdue(dueAtIso: string) {
   return dueAtIso < new Date().toISOString().slice(0, 10)
@@ -256,50 +228,7 @@ function dismissAlert() {
         </BaseCard>
       </div>
 
-      <div class="bg-surface-inverse text-fg-inverse rounded-xl p-5">
-        <div class="flex items-center gap-2 mb-1">
-          <span class="text-info">&#10022;</span>
-          <h3 class="text-base font-semibold">{{ t('dashboard.aiPanel.title') }}</h3>
-        </div>
-        <p class="text-xs text-fg-inverse/70 mb-4">{{ t('dashboard.aiPanel.suggestions') }}</p>
-
-        <div v-if="isAnalyzing" class="space-y-3 mb-5">
-          <BaseSkeleton height-class="h-14" rounded-class="rounded-lg" class="opacity-30" />
-          <BaseSkeleton height-class="h-14" rounded-class="rounded-lg" class="opacity-20" />
-          <BaseSkeleton height-class="h-10" rounded-class="rounded-lg" class="opacity-10" />
-        </div>
-        <div v-else-if="!aiFleetAnalysis" class="mb-5">
-          <p class="text-sm text-fg-inverse/60">{{ t('dashboard.aiPanel.empty') }}</p>
-        </div>
-        <div v-else-if="aiFleetAnalysis.length === 0" class="mb-5">
-          <p class="text-sm text-fg-inverse/60">{{ t('dashboard.aiPanel.noSuggestions') }}</p>
-        </div>
-        <div v-else class="space-y-3 mb-5">
-          <div
-            v-for="(s, i) in aiFleetAnalysis"
-            :key="i"
-            class="bg-brand/60 rounded-lg p-3 border border-brand"
-          >
-            <p class="text-sm text-fg-inverse">{{ s.text }}</p>
-          </div>
-        </div>
-
-        <BaseButton :disabled="isAnalyzing" class="w-full" @click="analyzeFleet">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-            />
-          </svg>
-          <span>{{
-            isAnalyzing ? t('dashboard.aiPanel.analyzing') : t('dashboard.analyzeFleet')
-          }}</span>
-        </BaseButton>
-      </div>
+      <DashboardAiPanel :ai-fleet-analysis="aiFleetAnalysis" />
     </div>
   </div>
-
-  <UpgradePlanModal v-model:open="showUpgradeModal" feature="ai" />
 </template>

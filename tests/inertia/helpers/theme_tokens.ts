@@ -72,6 +72,23 @@ export const UNSAFE_COLOR_PATTERNS: UnsafeColorPattern[] = [
     regex: /\b(?:fill|stroke|stop-color)="#[0-9a-fA-F]{3,8}"/g,
     hint: 'utiliser currentColor ou var(--color-…) pour que le tracé suive le thème',
   },
+  {
+    // `navy` est la seule palette de marque que `[data-theme='dark']` NE réinverse
+    // PAS : c'est la palette des surfaces *permanentes* (sidebar, bandeaux
+    // marketing, panneaux Assistant IA), sombres dans les deux thèmes. Utilisée
+    // comme les autres — palier pâle en fond, palier foncé en encre — elle fige
+    // donc un bloc clair au milieu d'une page sombre, ou une encre sombre sur un
+    // fond devenu sombre (#457).
+    //
+    // Deux rôles seulement sont fautifs. Les paliers moyens (`-300` à `-500`)
+    // restent lisibles des deux côtés, et `bg-navy-700`/`-800`/`-900` comme
+    // `text-navy-50`/`-100`/`-200`/`-300` sont précisément la recette du panneau
+    // navy permanent : ils ne sont pas signalés.
+    name: 'palette navy à contre-rôle',
+    regex:
+      /\b(?:bg|from|via|to)-navy-(?:25|50|100|200)\b|\b(?:text|border|divide|ring|outline|fill|stroke)-navy-(?:600|700|800|900)\b/g,
+    hint: 'le navy ne se réinverse pas en thème sombre : passer aux tokens brand (bg-brand-soft, text-brand, bg-brand + text-on-brand) ou à une palette qui bascule (sky, lilac…) — sauf sur un panneau navy permanent, à déclarer dans `allow`',
+  },
 ]
 
 export interface UnsafeColorHit {
