@@ -1,6 +1,8 @@
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
-import { ADDON_PRICES, MODULE_PRICES, PLAN_PRICES } from '../../shared/types/plan.js'
+import { ADDON_PRICES, MODULE_PRICES, PLAN_LIMITS, PLAN_PRICES } from '../../shared/types/plan.js'
+import type { BooleanQuotaKey } from '../../shared/types/plan.js'
+import type { PricingTableRow } from '../../shared/types/marketing.js'
 import { CONTACT_FLEET_SIZES, CONTACT_SUBJECTS } from '../../shared/types/contact.js'
 import QuotaService from '#services/quota_service'
 import SimulatorLeadService from '#services/simulator_lead_service'
@@ -591,8 +593,34 @@ export default class MarketingController {
     }
   }
 
-  private buildPricingPageData(i18n: { t: (key: string) => string }) {
-    const t = (key: string) => i18n.t(`marketing.pricing2.${key}`)
+  private buildPricingPageData(i18n: {
+    t: (key: string, params?: Record<string, string>) => string
+  }) {
+    const t = (key: string, params?: Record<string, string>) =>
+      i18n.t(`marketing.pricing2.${key}`, params)
+
+    /**
+     * Cellule de quota du comparatif : la valeur vient de `PLAN_LIMITS`, jamais
+     * d'un nombre recopié dans le JSON de traduction — c'est cette recopie qui
+     * avait fait diverger le comparatif du produit (#454).
+     */
+    const quotaCell = (limit: number | null, boundedKey: string, unlimitedKey: string) =>
+      limit === null ? t(unlimitedKey) : t(boundedKey, { count: String(limit) })
+
+    /** Ligne booléenne du comparatif adossée à un flag de capacité de `PLAN_LIMITS`. */
+    const flagRow = (labelKey: string, flag: BooleanQuotaKey): PricingTableRow => [
+      t(labelKey),
+      PLAN_LIMITS.starter[flag],
+      PLAN_LIMITS.pro[flag],
+      PLAN_LIMITS.enterprise[flag],
+    ]
+
+    /** Rétention de l'audit log : 0 jour = pas d'audit log, `null` = illimité. */
+    const auditCell = (days: number | null) => {
+      if (days === null) return t('table_g3_r3_e')
+      if (days === 0) return false
+      return t('table_g3_r3_p', { count: String(days) })
+    }
 
     return {
       meta: {
@@ -822,12 +850,21 @@ export default class MarketingController {
             {
               title: t('table_g1'),
               rows: [
-                [t('table_g1_r1'), t('table_g1_r1_s'), t('table_g1_r1_p'), t('table_g1_r1_e')],
-                [t('table_g1_r2'), t('table_g1_r2_s'), t('table_g1_r2_p'), t('table_g1_r2_e')],
+                [
+                  t('table_g1_r1'),
+                  quotaCell(PLAN_LIMITS.starter.maxBoats, 'table_g1_r1_s', 'table_g1_r1_e'),
+                  quotaCell(PLAN_LIMITS.pro.maxBoats, 'table_g1_r1_p', 'table_g1_r1_e'),
+                  quotaCell(PLAN_LIMITS.enterprise.maxBoats, 'table_g1_r1_p', 'table_g1_r1_e'),
+                ],
+                [
+                  t('table_g1_r2'),
+                  quotaCell(PLAN_LIMITS.starter.maxMembers, 'table_g1_r2_s', 'table_g1_r2_e'),
+                  quotaCell(PLAN_LIMITS.pro.maxMembers, 'table_g1_r2_p', 'table_g1_r2_e'),
+                  quotaCell(PLAN_LIMITS.enterprise.maxMembers, 'table_g1_r2_p', 'table_g1_r2_e'),
+                ],
                 [t('table_g1_r4'), true, true, true],
-                [t('table_g1_r5'), false, true, true],
-                [t('table_g1_r6'), false, false, true],
-              ] as Array<[string, boolean | string, boolean | string, boolean | string]>,
+                flagRow('table_g1_r6', 'canWhiteLabel'),
+              ] as PricingTableRow[],
             },
             {
               title: t('table_g2'),
@@ -835,40 +872,48 @@ export default class MarketingController {
                 [t('table_g2_r1'), true, true, true],
                 [t('table_g2_r2'), false, true, true],
                 [t('table_g2_r3'), false, true, true],
-                [t('table_g2_r4'), false, true, true],
-                [t('table_g2_r5'), t('table_g2_r5_s'), t('table_g2_r5_pe'), t('table_g2_r5_pe')],
+                flagRow('table_g2_r4', 'canGroupTasks'),
+                [t('table_g2_r5'), true, true, true],
                 [t('table_g2_r6'), false, true, true],
                 [t('table_g2_r7'), false, true, true],
-              ] as Array<[string, boolean | string, boolean | string, boolean | string]>,
+              ] as PricingTableRow[],
             },
             {
               title: t('table_g3'),
               rows: [
-                [t('table_g3_r1'), false, t('table_g3_r1_pe'), t('table_g3_r1_pe')],
                 [t('table_g3_r2'), false, t('table_g3_r2_p'), t('table_g3_r2_e')],
-                [t('table_g3_r3'), false, t('table_g3_r3_p'), t('table_g3_r3_e')],
-                [t('table_g3_r4'), false, true, true],
+                [
+                  t('table_g3_r3'),
+                  auditCell(PLAN_LIMITS.starter.auditLogRetentionDays),
+                  auditCell(PLAN_LIMITS.pro.auditLogRetentionDays),
+                  auditCell(PLAN_LIMITS.enterprise.auditLogRetentionDays),
+                ],
                 [t('table_g3_r5'), true, true, true],
-              ] as Array<[string, boolean | string, boolean | string, boolean | string]>,
+              ] as PricingTableRow[],
             },
             {
               title: t('table_g4'),
               rows: [
-                [t('table_g4_r1'), false, true, true],
-                [t('table_g4_r2'), false, true, true],
-                [t('table_g4_r3'), false, true, true],
-                [t('table_g4_r4'), false, true, true],
-                [t('table_g4_r5'), false, false, true],
+                flagRow('table_g4_r1', 'canUseAI'),
+                flagRow('table_g4_r2', 'canUseAI'),
+                flagRow('table_g4_r3', 'canUseAI'),
+                flagRow('table_g4_r4', 'canUseAI'),
+                flagRow('table_g4_r5', 'canCustomizeAI'),
                 [t('table_g4_r6'), false, t('table_g4_r6_p'), t('table_g4_r6_e')],
-              ] as Array<[string, boolean | string, boolean | string, boolean | string]>,
+              ] as PricingTableRow[],
             },
             {
               title: t('table_g5'),
               rows: [
-                [t('table_g5_r1'), t('table_g5_r1_s'), t('table_g5_r1_p'), t('table_g5_r1_e')],
+                [
+                  t('table_g5_r1'),
+                  quotaCell(PLAN_LIMITS.starter.storageGb, 'table_g5_r1_gb', 'table_g5_r1_e'),
+                  quotaCell(PLAN_LIMITS.pro.storageGb, 'table_g5_r1_gb', 'table_g5_r1_e'),
+                  quotaCell(PLAN_LIMITS.enterprise.storageGb, 'table_g5_r1_gb', 'table_g5_r1_e'),
+                ],
                 [t('table_g5_r3'), false, true, true],
-                [t('table_g5_r4'), true, true, true],
-              ] as Array<[string, boolean | string, boolean | string, boolean | string]>,
+                flagRow('table_g5_r4', 'canExport'),
+              ] as PricingTableRow[],
             },
             {
               title: t('table_g8'),
@@ -879,7 +924,7 @@ export default class MarketingController {
                 [t('table_g8_r4'), false, false, true],
                 [t('table_g8_r5'), false, t('table_g8_r5_p'), t('table_g8_r5_e')],
                 [t('table_g8_r7'), t('table_g8_r7_s'), t('table_g8_r7_p'), t('table_g8_r7_e')],
-              ] as Array<[string, boolean | string, boolean | string, boolean | string]>,
+              ] as PricingTableRow[],
             },
             {
               title: t('table_modules_group'),
@@ -887,7 +932,7 @@ export default class MarketingController {
                 [t('table_modules_pricing'), false, 'addon', true],
                 [t('table_modules_clients'), false, 'addon', true],
                 [t('table_modules_invoices'), false, 'addon', true],
-              ] as Array<[string, boolean | string, boolean | string, boolean | string]>,
+              ] as PricingTableRow[],
             },
           ],
         },
