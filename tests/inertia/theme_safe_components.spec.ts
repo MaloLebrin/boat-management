@@ -99,14 +99,16 @@ const COMPONENTS: Component[] = [
   { path: 'components/marketing/about/AboutValuesSection.vue' },
   { path: 'components/marketing/contact/ContactChannelsSection.vue' },
   { path: 'components/marketing/contact/ContactFaqSection.vue' },
+  { path: 'components/marketing/contact/ContactFormSection.vue' },
   {
-    path: 'components/marketing/contact/ContactFormSection.vue',
+    path: 'components/marketing/contact/ContactFormSidebar.vue',
     allow: [
       { pattern: 'fill="#faf6ee"', count: 1, reason: DECORATIVE_SVG },
       { pattern: 'fill="#e2674f"', count: 1, reason: DECORATIVE_SVG },
       { pattern: 'bg-white', count: 1, reason: `bouton blanc ${NAVY_BAND}` },
     ],
   },
+  { path: 'components/marketing/contact/ContactPillGroup.vue' },
   { path: 'components/marketing/contact/ContactHeroSection.vue' },
   {
     path: 'components/marketing/contact/ContactOfficesSection.vue',

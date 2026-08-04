@@ -18,6 +18,9 @@
     "accepted": "The {field} field must be accepted.",
     "acceptTerms": {
       "accepted": "You must accept the terms and the privacy policy to create an account."
+    },
+    "consent": {
+      "accepted": "You must agree to your information being processed so we can reply to you."
     }
   },
   "settings": {
@@ -31,6 +34,10 @@
     "organizationName": "organization name",
     "organizationType": "organization type",
     "fleetSize": "fleet size",
-    "acceptTerms": "terms and conditions"
+    "acceptTerms": "terms and conditions",
+    "subject": "subject",
+    "organization": "organisation",
+    "message": "message",
+    "consent": "consent"
   }
 }

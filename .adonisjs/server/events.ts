@@ -4,6 +4,7 @@
  */
 
 import AiTokenThresholdCrossed from '#events/ai_token_threshold_crossed'
+import ContactMessageReceived from '#events/contact_message_received'
 import OrganizationInvitationAccepted from '#events/organization_invitation_accepted'
 import OrganizationMemberJoined from '#events/organization_member_joined'
 import OrganizationMemberRemoved from '#events/organization_member_removed'
@@ -16,6 +17,7 @@ import StorageThresholdCrossed from '#events/storage_threshold_crossed'
 
 export const events = {
   AiTokenThresholdCrossed: AiTokenThresholdCrossed,
+  ContactMessageReceived: ContactMessageReceived,
   OrganizationInvitationAccepted: OrganizationInvitationAccepted,
   OrganizationMemberJoined: OrganizationMemberJoined,
   OrganizationMemberRemoved: OrganizationMemberRemoved,
