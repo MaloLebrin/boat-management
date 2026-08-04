@@ -15,9 +15,11 @@
     @end
 
     <div
-      style="padding:16px;background-color:#f4f4f7;border-radius:6px;color:#333333;font-size:15px;line-height:1.6;white-space:pre-wrap;"
+      style="padding:16px;background-color:#f4f4f7;border-radius:6px;color:#333333;font-size:15px;line-height:1.6;"
     >
-      {{ message }}
+      @each(line in messageLines)
+        <p style="margin:0 0 6px;">{{ line }}</p>
+      @end
     </div>
     <table role="presentation" cellspacing="0" cellpadding="0" style="margin:25px auto 0;">
       <tr>

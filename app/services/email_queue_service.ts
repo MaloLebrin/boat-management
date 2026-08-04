@@ -681,7 +681,9 @@ export default class EmailQueueService {
       email: params.email,
       organization: params.organization,
       fleetSize: params.fleetSize,
-      message: params.message,
+      // Une ligne = un <p> : le template n'a plus besoin de `white-space: pre-wrap`,
+      // dont l'indentation serait réintroduite par le formatage.
+      messageLines: params.message.split('\n'),
       locale: params.locale,
     })
 
@@ -725,7 +727,7 @@ export default class EmailQueueService {
 
     const html = await edge.render('emails/contact_message_ack', {
       firstName: params.firstName,
-      message: params.message,
+      messageLines: params.message.split('\n'),
       locale: isFr ? 'fr' : 'en',
       appUrl: env.get('APP_URL'),
     })
