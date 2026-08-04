@@ -230,7 +230,7 @@ test.group('Client anonymize (functional)', (group) => {
     const user = await createAdminUser() // 'pro' plan
     const response = await client.post('/clients/1/anonymize').loginAs(user).redirects(0)
     response.assertStatus(302)
-    response.assertHeader('location', '/')
+    response.assertHeader('location', '/settings/billing')
   })
 
   test('unauthenticated user is redirected to login', async ({ client }) => {

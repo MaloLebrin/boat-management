@@ -37,7 +37,7 @@ test.group('Module read-only residual access — clients (functional)', (group) 
 
     const index = await client.get('/clients').loginAs(user).redirects(0)
     index.assertStatus(302)
-    index.assertHeader('location', '/')
+    index.assertHeader('location', '/settings/billing')
   })
 
   test('writing is blocked even with existing clients (module inactive)', async ({
@@ -53,7 +53,7 @@ test.group('Module read-only residual access — clients (functional)', (group) 
       .form({ firstName: 'Bob', lastName: 'Nope' })
       .redirects(0)
     store.assertStatus(302)
-    store.assertHeader('location', '/')
+    store.assertHeader('location', '/settings/billing')
 
     const count = await Client.query().where('organizationId', user.organizationId!).count('* as t')
     assert.equal(Number(count[0].$extras.t), 1) // no new client created
@@ -109,6 +109,6 @@ test.group('Module read-only residual access — invoices (functional)', (group)
 
     const create = await client.get('/invoices/new').loginAs(user).redirects(0)
     create.assertStatus(302)
-    create.assertHeader('location', '/')
+    create.assertHeader('location', '/settings/billing')
   })
 })

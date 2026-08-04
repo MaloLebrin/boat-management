@@ -285,8 +285,11 @@ test.group('Pricing seasons (functional)', (group) => {
 
     const response = await client.get('/pricing/seasons').loginAs(user).redirects(0)
     response.assertStatus(302)
-    response.assertHeader('location', '/')
-    response.assertFlashMessage('error', 'This feature requires the Enterprise plan.')
+    response.assertHeader('location', '/settings/billing')
+    response.assertFlashMessage(
+      'error',
+      'Seasonal pricing is part of the Charter module — included with Enterprise, or available as an add-on on the Pro plan.'
+    )
 
     const store = await client
       .post('/pricing/seasons')

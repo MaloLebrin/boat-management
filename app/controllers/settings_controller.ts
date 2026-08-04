@@ -20,6 +20,8 @@ import { inject } from '@adonisjs/core'
 import hash from '@adonisjs/core/services/hash'
 import type { HttpContext } from '@adonisjs/core/http'
 import { PLAN_LIMITS } from '#shared/types/plan'
+import type { BooleanQuotaKey } from '#shared/types/plan'
+import { BILLING_SETTINGS_PATH } from '#shared/constants/billing'
 
 @inject()
 export default class SettingsController {
@@ -188,13 +190,19 @@ export default class SettingsController {
     return response.redirect().back()
   }
 
-  async ai({ inertia, auth, bouncer, response }: HttpContext) {
+  async ai({ inertia, auth, bouncer, response, session, i18n }: HttpContext) {
     const user = await auth.authenticate()
     await user.load('organization')
     const org = user.organization
 
-    if (!PLAN_LIMITS[org.plan].canCustomizeAI) {
-      return response.redirect('/settings/billing')
+    if (
+      !this.guardPlanFeature(org, 'canCustomizeAI', 'aiCustomizationRequiresPlan', {
+        response,
+        session,
+        i18n,
+      })
+    ) {
+      return
     }
 
     await bouncer.with(OrganizationPolicy).authorize('configureAI')
@@ -210,8 +218,14 @@ export default class SettingsController {
     await user.load('organization')
     const org = user.organization
 
-    if (!PLAN_LIMITS[org.plan].canCustomizeAI) {
-      return response.redirect('/settings/billing')
+    if (
+      !this.guardPlanFeature(org, 'canCustomizeAI', 'aiCustomizationRequiresPlan', {
+        response,
+        session,
+        i18n,
+      })
+    ) {
+      return
     }
 
     await bouncer.with(OrganizationPolicy).authorize('configureAI')
@@ -227,12 +241,20 @@ export default class SettingsController {
     return response.redirect().back()
   }
 
-  async branding({ inertia, auth, bouncer, response }: HttpContext) {
+  async branding({ inertia, auth, bouncer, response, session, i18n }: HttpContext) {
     const user = await auth.authenticate()
     await user.load('organization')
     const org = user.organization
 
-    if (!this.guardWhiteLabel(org, response)) return
+    if (
+      !this.guardPlanFeature(org, 'canWhiteLabel', 'brandingRequiresPlan', {
+        response,
+        session,
+        i18n,
+      })
+    ) {
+      return
+    }
     await bouncer.with(OrganizationPolicy).authorize('configureBranding')
 
     return inertia.render('settings/branding', {
@@ -245,7 +267,15 @@ export default class SettingsController {
     await user.load('organization')
     const org = user.organization
 
-    if (!this.guardWhiteLabel(org, response)) return
+    if (
+      !this.guardPlanFeature(org, 'canWhiteLabel', 'brandingRequiresPlan', {
+        response,
+        session,
+        i18n,
+      })
+    ) {
+      return
+    }
     await bouncer.with(OrganizationPolicy).authorize('configureBranding')
 
     const data = await request.validateUsing(updateBrandingValidator)
@@ -260,7 +290,15 @@ export default class SettingsController {
     await user.load('organization')
     const org = user.organization
 
-    if (!this.guardWhiteLabel(org, response)) return
+    if (
+      !this.guardPlanFeature(org, 'canWhiteLabel', 'brandingRequiresPlan', {
+        response,
+        session,
+        i18n,
+      })
+    ) {
+      return
+    }
     await bouncer.with(OrganizationPolicy).authorize('configureBranding')
 
     const { logo } = await request.validateUsing(uploadLogoValidator)
@@ -275,7 +313,15 @@ export default class SettingsController {
     await user.load('organization')
     const org = user.organization
 
-    if (!this.guardWhiteLabel(org, response)) return
+    if (
+      !this.guardPlanFeature(org, 'canWhiteLabel', 'brandingRequiresPlan', {
+        response,
+        session,
+        i18n,
+      })
+    ) {
+      return
+    }
     await bouncer.with(OrganizationPolicy).authorize('configureBranding')
 
     await this.brandingService.deleteLogo(org)
@@ -284,12 +330,22 @@ export default class SettingsController {
     return response.redirect().back()
   }
 
-  private guardWhiteLabel(
+  /**
+   * Garde une section de réglages derrière un flag de plan. Une section fermée
+   * renvoie sur la facturation **avec un flash explicite** (#456) : sans lui, la
+   * redirection est muette et l'utilisateur croit à un bug — d'autant que la
+   * carte plan coche « IA / Copilote » sur Pro, alors que seule la
+   * *personnalisation* du prompt est réservée à Entreprise.
+   */
+  private guardPlanFeature(
     org: { plan: keyof typeof PLAN_LIMITS },
-    response: HttpContext['response']
+    flag: BooleanQuotaKey,
+    flashKey: string,
+    { response, session, i18n }: Pick<HttpContext, 'response' | 'session' | 'i18n'>
   ): boolean {
-    if (!PLAN_LIMITS[org.plan].canWhiteLabel) {
-      response.redirect('/settings/billing')
+    if (!PLAN_LIMITS[org.plan][flag]) {
+      session.flash('error', i18n.t(`flash.settings.${flashKey}`))
+      response.redirect(BILLING_SETTINGS_PATH)
       return false
     }
     return true

@@ -17,7 +17,10 @@ const props = defineProps<{
   plan: PlanTier
   subscription: SubscriptionInfo | null
   activeAddons: ActiveAddonInfo[]
+  canManageBilling: boolean
 }>()
+
+const emit = defineEmits<{ activateSubscription: [] }>()
 
 const current = computed(() => props.activeAddons.find((a) => a.addon === 'extra_boats') ?? null)
 const currentQuantity = computed(() => current.value?.quantity ?? 0)
@@ -129,7 +132,25 @@ function apply() {
         </div>
       </div>
 
-      <!-- Non éligible (Starter, ou Pro sans abonnement actif) -->
+      <!-- Plan Pro (colonne DB) mais abonnement Stripe non actif : l'add-on est
+           facturé sur cet abonnement, pas sur le plan. Distinguer ce cas du
+           vrai Starter, sinon le libellé nie un plan Pro que l'org possède
+           bel et bien (#456). -->
+      <template v-else-if="plan === 'pro' && subscription === null">
+        <BaseButton
+          v-if="canManageBilling"
+          variant="primary"
+          size="sm"
+          @click="emit('activateSubscription')"
+        >
+          {{ t('settings.billing.noSubscription.cta') }}
+        </BaseButton>
+        <span v-else class="text-sm text-fg-muted">
+          {{ t('settings.billing.extraBoats.subscriptionRequired') }}
+        </span>
+      </template>
+
+      <!-- Starter : l'add-on n'est vendu qu'à partir du socle Pro -->
       <span v-else class="text-sm text-fg-muted">
         {{ t('settings.billing.extraBoats.proRequired') }}
       </span>

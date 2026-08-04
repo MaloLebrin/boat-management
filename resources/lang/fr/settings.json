@@ -86,7 +86,8 @@
     "features": {
       "ai": "IA / Copilote",
       "export": "Export (PDF / CSV)",
-      "maintenanceHistory": "Historique de maintenance"
+      "maintenanceHistory": "Historique de maintenance",
+      "aiCustomization": "Personnalisation IA (prompt métier)"
     },
     "upgradeTo": {
       "pro": "Passer au plan Pro",
@@ -128,9 +129,9 @@
       "activate": "Activer",
       "deactivate": "Résilier",
       "deactivateIncluded": "Désactiver",
-      "proRequired": "Nécessite un plan Pro actif",
-      "subscriptionRequired": "Activez d'abord votre abonnement Pro pour activer ce module",
-      "activateSubscription": "Activer l'abonnement Pro",
+      "proRequired": "Disponible à partir du plan Pro",
+      "subscriptionRequired": "Nécessite un abonnement actif — un administrateur doit le finaliser",
+      "activateSubscription": "Finaliser l'abonnement",
       "adminOnly": "Réservé aux administrateurs",
       "charter": {
         "name": "Location",
@@ -151,7 +152,14 @@
       "apply": "Mettre à jour",
       "grantedHint": "{count, plural, one {# bateau offert} other {# bateaux offerts}}",
       "unlimited": "Bateaux illimités",
-      "proRequired": "Nécessite un plan Pro actif"
+      "proRequired": "Disponible à partir du plan Pro",
+      "subscriptionRequired": "Nécessite un abonnement actif — un administrateur doit le finaliser"
+    },
+    "noSubscription": {
+      "title": "Votre plan {plan} n'a aucun abonnement actif",
+      "body": "Votre organisation est sur le plan {plan}, mais aucun abonnement actif n'y est rattaché. Les modules add-ons et les bateaux supplémentaires sont facturés sur cet abonnement — finalisez-le pour pouvoir les activer.",
+      "cta": "Finaliser l'abonnement",
+      "adminOnly": "Un administrateur doit finaliser l'abonnement."
     }
   },
   "upgrade": {

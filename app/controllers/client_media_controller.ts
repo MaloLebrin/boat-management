@@ -9,6 +9,7 @@ import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import type Client from '#models/client'
 import type Organization from '#models/organization'
+import { BILLING_SETTINGS_PATH } from '#shared/constants/billing'
 import type User from '#models/user'
 
 function buildContentDisposition(filename: string, format: string): string {
@@ -44,7 +45,7 @@ export default class ClientMediaController {
     } catch (error) {
       if (error instanceof QuotaExceededError) {
         ctx.session.flash('error', ctx.i18n.t('flash.quota.clientsExceeded'))
-        ctx.response.redirect('/')
+        ctx.response.redirect(BILLING_SETTINGS_PATH)
         return null
       }
       throw error
