@@ -86,7 +86,8 @@
     "features": {
       "ai": "AI / Copilot",
       "export": "Export (PDF / CSV)",
-      "maintenanceHistory": "Maintenance history"
+      "maintenanceHistory": "Maintenance history",
+      "aiCustomization": "AI customisation (business prompt)"
     },
     "upgradeTo": {
       "pro": "Upgrade to Pro",
@@ -128,9 +129,9 @@
       "activate": "Activate",
       "deactivate": "Cancel",
       "deactivateIncluded": "Deactivate",
-      "proRequired": "Requires an active Pro plan",
-      "subscriptionRequired": "Activate your Pro subscription first to enable this module",
-      "activateSubscription": "Activate Pro subscription",
+      "proRequired": "Available from the Pro plan",
+      "subscriptionRequired": "Requires an active subscription — an administrator must complete the billing setup",
+      "activateSubscription": "Complete billing setup",
       "adminOnly": "Admins only",
       "charter": {
         "name": "Charter",
@@ -151,7 +152,14 @@
       "apply": "Update",
       "grantedHint": "{count, plural, one {# complimentary boat} other {# complimentary boats}}",
       "unlimited": "Unlimited boats",
-      "proRequired": "Requires an active Pro plan"
+      "proRequired": "Available from the Pro plan",
+      "subscriptionRequired": "Requires an active subscription — an administrator must complete the billing setup"
+    },
+    "noSubscription": {
+      "title": "Your {plan} plan has no active subscription",
+      "body": "Your organisation is on the {plan} plan, but no active subscription is attached to it. Add-on modules and extra boats are billed on that subscription — complete it to enable them.",
+      "cta": "Complete billing setup",
+      "adminOnly": "An administrator must complete the billing setup."
     }
   },
   "upgrade": {

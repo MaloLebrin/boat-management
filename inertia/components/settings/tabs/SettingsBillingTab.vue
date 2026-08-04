@@ -4,8 +4,10 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import SettingsBillingUsageGauge from '~/components/settings/SettingsBillingUsageGauge.vue'
+import SettingsBillingFeatureList from '~/components/settings/SettingsBillingFeatureList.vue'
 import SettingsBillingModules from '~/components/settings/SettingsBillingModules.vue'
 import SettingsBillingExtraBoats from '~/components/settings/SettingsBillingExtraBoats.vue'
+import SettingsBillingSubscriptionNotice from '~/components/settings/SettingsBillingSubscriptionNotice.vue'
 import { useT } from '~/composables/use_t'
 import type {
   ActiveAddonInfo,
@@ -150,30 +152,7 @@ const storageOverflow = computed(() => {
           />
 
           <!-- Features -->
-          <ul class="space-y-2 text-sm">
-            <li
-              class="flex items-center gap-2"
-              :class="quotaUsage.canUseAI ? 'text-fg' : 'text-fg-muted'"
-            >
-              <span :class="quotaUsage.canUseAI ? 'text-success' : 'text-fg-muted'">
-                {{ quotaUsage.canUseAI ? '✓' : '✗' }}
-              </span>
-              {{ t('settings.billing.features.ai') }}
-            </li>
-            <li
-              class="flex items-center gap-2"
-              :class="quotaUsage.canExport ? 'text-fg' : 'text-fg-muted'"
-            >
-              <span :class="quotaUsage.canExport ? 'text-success' : 'text-fg-muted'">
-                {{ quotaUsage.canExport ? '✓' : '✗' }}
-              </span>
-              {{ t('settings.billing.features.export') }}
-            </li>
-            <li class="flex items-center gap-2 text-fg">
-              <span class="text-success">✓</span>
-              {{ t('settings.billing.features.maintenanceHistory') }}
-            </li>
-          </ul>
+          <SettingsBillingFeatureList :plan="plan" :quota-usage="quotaUsage" />
         </div>
 
         <template #footer>
@@ -231,6 +210,16 @@ const storageOverflow = computed(() => {
         </template>
       </BaseCard>
 
+      <!-- Plan Pro en base mais aucun abonnement Stripe actif (#456) : sans ce
+           rappel, les cartes ci-dessous parlent d'« activer l'abonnement Pro »
+           à quelqu'un qui se sait déjà Pro. -->
+      <SettingsBillingSubscriptionNotice
+        v-if="plan === 'pro' && subscription === null"
+        :plan="plan"
+        :can-manage-billing="canManageBilling"
+        @activate-subscription="startCheckout('pro')"
+      />
+
       <SettingsBillingModules
         :plan="plan"
         :subscription="subscription"
@@ -243,6 +232,8 @@ const storageOverflow = computed(() => {
         :plan="plan"
         :subscription="subscription"
         :active-addons="orgAddons"
+        :can-manage-billing="canManageBilling"
+        @activate-subscription="startCheckout('pro')"
       />
     </div>
   </div>

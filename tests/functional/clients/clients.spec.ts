@@ -188,8 +188,11 @@ test.group('Clients (functional)', (group) => {
     const response = await client.get('/clients').loginAs(user).redirects(0)
 
     response.assertStatus(302)
-    response.assertHeader('location', '/')
-    response.assertFlashMessage('error', 'This feature requires the Enterprise plan.')
+    response.assertHeader('location', '/settings/billing')
+    response.assertFlashMessage(
+      'error',
+      'Client management is part of the CRM & Invoicing module — included with Enterprise, or available as an add-on on the Pro plan.'
+    )
   })
 
   test('non-enterprise org is blocked from store with flash', async ({ client, assert }) => {
@@ -205,7 +208,7 @@ test.group('Clients (functional)', (group) => {
       .redirects(0)
 
     response.assertStatus(302)
-    response.assertHeader('location', '/')
+    response.assertHeader('location', '/settings/billing')
 
     // Ensure no client was created
     const count = await Client.query().count('* as total')
@@ -227,8 +230,11 @@ test.group('Clients (functional)', (group) => {
     const response = await client.get('/clients').loginAs(user).redirects(0)
 
     response.assertStatus(302)
-    response.assertHeader('location', '/')
-    response.assertFlashMessage('error', 'This feature requires the Enterprise plan.')
+    response.assertHeader('location', '/settings/billing')
+    response.assertFlashMessage(
+      'error',
+      'Client management is part of the CRM & Invoicing module — included with Enterprise, or available as an add-on on the Pro plan.'
+    )
   })
 
   test('enterprise org succeeds on index', async ({ client }) => {

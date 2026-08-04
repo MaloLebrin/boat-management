@@ -10,14 +10,48 @@ import { createAdminUser } from '#tests/functional/helpers'
 test.group('Module gating (functional)', (group) => {
   group.each.setup(() => testUtils.db().truncate())
 
-  test('pro without module is redirected away from clients, invoices and pricing seasons', async ({
+  test('pro without module is redirected to billing, never to the public marketing home', async ({
     client,
   }) => {
     const user = await createAdminUser()
 
     for (const path of ['/clients', '/invoices', '/pricing/seasons']) {
       const response = await client.get(path).loginAs(user)
-      response.assertRedirectsTo('/')
+      // `/` redirige sur `/en` (home marketing publique), dont le layout ne rend
+      // aucun toast : l'utilisateur connecté y était éjecté sans explication (#456).
+      response.assertRedirectsTo('/settings/billing')
+    }
+  })
+
+  // Le module est vendable en add-on sur le socle Pro depuis #327 : le flash ne
+  // doit plus prétendre que la fonctionnalité « nécessite le plan Entreprise ».
+  test('each gated screen names the missing module and both ways to get it', async ({ client }) => {
+    const user = await createAdminUser()
+
+    const cases = [
+      {
+        path: '/clients',
+        message:
+          'Client management is part of the CRM & Invoicing module — included with Enterprise, or available as an add-on on the Pro plan.',
+      },
+      {
+        path: '/invoices',
+        message:
+          'Quotes and invoices are part of the CRM & Invoicing module — included with Enterprise, or available as an add-on on the Pro plan.',
+      },
+      {
+        path: '/pricing/seasons',
+        message:
+          'Seasonal pricing is part of the Charter module — included with Enterprise, or available as an add-on on the Pro plan.',
+      },
+    ]
+
+    for (const { path, message } of cases) {
+      // `.redirects(0)` : sans lui le client suit la redirection, la page
+      // facturation consomme le flash et l'assertion ne voit plus rien.
+      const response = await client.get(path).loginAs(user).redirects(0)
+      response.assertStatus(302)
+      response.assertFlashMessage('error', message)
     }
   })
 
@@ -35,7 +69,7 @@ test.group('Module gating (functional)', (group) => {
     invoices.assertStatus(200)
 
     const pricing = await client.get('/pricing/seasons').loginAs(user)
-    pricing.assertRedirectsTo('/')
+    pricing.assertRedirectsTo('/settings/billing')
   })
 
   test('pro with charter module can access pricing seasons but not clients', async ({ client }) => {
@@ -47,7 +81,7 @@ test.group('Module gating (functional)', (group) => {
     pricing.assertStatus(200)
 
     const clients = await client.get('/clients').loginAs(user)
-    clients.assertRedirectsTo('/')
+    clients.assertRedirectsTo('/settings/billing')
   })
 
   test('a granted module opens access exactly like a subscribed one', async ({ client }) => {

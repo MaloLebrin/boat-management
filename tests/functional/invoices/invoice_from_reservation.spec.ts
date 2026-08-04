@@ -143,7 +143,7 @@ test.group('Invoice from reservation (functional)', (group) => {
       .redirects(0)
 
     response.assertStatus(302)
-    response.assertHeader('location', '/')
+    response.assertHeader('location', '/settings/billing')
     assert.lengthOf(await Invoice.query().where('reservationId', reservation.id), 0)
   })
 

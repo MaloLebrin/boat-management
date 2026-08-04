@@ -69,7 +69,9 @@
     "brandingUpdated": "Appearance updated.",
     "logoUpdated": "Logo updated.",
     "logoDeleted": "Logo deleted.",
-    "themeUpdated": "Appearance updated."
+    "themeUpdated": "Appearance updated.",
+    "aiCustomizationRequiresPlan": "Customising the AI prompt requires the Enterprise plan. AI and the Copilot are available on Pro, but the business context can only be tailored on Enterprise.",
+    "brandingRequiresPlan": "White labelling (logo and colours) requires the Enterprise plan."
   },
   "enginePart": {
     "created": "Part added.",
@@ -238,9 +240,9 @@
     "aiExceeded": "AI features are not available on your current plan. Upgrade to Pro or Enterprise.",
     "aiTokensExceeded": "You have reached your monthly AI token limit. AI features will reset on the 1st of next month, or upgrade to Enterprise for unlimited usage.",
     "exportExceeded": "Export is not available on your current plan. Upgrade to Pro or Enterprise.",
-    "clientsExceeded": "This feature requires the Enterprise plan.",
-    "pricingExceeded": "This feature requires the Enterprise plan.",
-    "invoicesExceeded": "This feature requires the Enterprise plan.",
+    "clientsExceeded": "Client management is part of the CRM & Invoicing module — included with Enterprise, or available as an add-on on the Pro plan.",
+    "pricingExceeded": "Seasonal pricing is part of the Charter module — included with Enterprise, or available as an add-on on the Pro plan.",
+    "invoicesExceeded": "Quotes and invoices are part of the CRM & Invoicing module — included with Enterprise, or available as an add-on on the Pro plan.",
     "storageExceeded": "You have reached the storage limit of your plan. Upgrade to upload new files.",
     "storageOverflow": "Your storage usage exceeds your current plan limit. Free up space or upgrade your plan."
   },

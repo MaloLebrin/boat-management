@@ -276,8 +276,11 @@ test.group('Invoices (functional)', (group) => {
 
     const index = await client.get('/invoices').loginAs(user).redirects(0)
     index.assertStatus(302)
-    index.assertHeader('location', '/')
-    index.assertFlashMessage('error', 'This feature requires the Enterprise plan.')
+    index.assertHeader('location', '/settings/billing')
+    index.assertFlashMessage(
+      'error',
+      'Quotes and invoices are part of the CRM & Invoicing module — included with Enterprise, or available as an add-on on the Pro plan.'
+    )
 
     await client.post('/invoices').loginAs(user).form(invoiceForm()).redirects(0)
     assert.lengthOf(await Invoice.all(), 0)

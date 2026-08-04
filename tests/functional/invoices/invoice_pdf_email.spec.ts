@@ -122,7 +122,7 @@ test.group('Invoice PDF & email (functional)', (group) => {
     const response = await client.get(`/invoices/${foreign.id}/pdf`).loginAs(user).redirects(0)
 
     response.assertStatus(302)
-    response.assertHeader('location', '/')
+    response.assertHeader('location', '/settings/billing')
   })
 
   test('sending the invoice marks it as sent and flashes success', async ({ client, assert }) => {

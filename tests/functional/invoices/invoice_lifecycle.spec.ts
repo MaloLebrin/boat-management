@@ -172,7 +172,7 @@ test.group('Invoice lifecycle (functional)', (group) => {
     const response = await client.post(`/invoices/${quote.id}/convert`).loginAs(user).redirects(0)
 
     response.assertStatus(302)
-    response.assertHeader('location', '/')
+    response.assertHeader('location', '/settings/billing')
   })
 
   test('markOverdueInvoices flips only sent, unpaid, past-due invoices', async ({ assert }) => {

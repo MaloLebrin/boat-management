@@ -69,7 +69,9 @@
     "brandingUpdated": "Apparence mise à jour.",
     "logoUpdated": "Logo mis à jour.",
     "logoDeleted": "Logo supprimé.",
-    "themeUpdated": "Apparence mise à jour."
+    "themeUpdated": "Apparence mise à jour.",
+    "aiCustomizationRequiresPlan": "La personnalisation du prompt IA nécessite le plan Entreprise. L'IA et le copilote sont disponibles en Pro, mais seul le plan Entreprise permet d'en adapter le contexte métier.",
+    "brandingRequiresPlan": "La marque blanche (logo et couleurs) nécessite le plan Entreprise."
   },
   "enginePart": {
     "created": "Pièce ajoutée.",
@@ -238,9 +240,9 @@
     "aiExceeded": "Les fonctionnalités IA ne sont pas disponibles sur votre plan actuel. Passez au plan Pro ou Entreprise.",
     "aiTokensExceeded": "Vous avez atteint votre limite mensuelle de tokens IA. Les fonctionnalités IA seront réinitialisées le 1er du mois prochain ou passez à Entreprise pour un usage illimité.",
     "exportExceeded": "L'export n'est pas disponible sur votre plan actuel. Passez au plan Pro ou Entreprise.",
-    "clientsExceeded": "Cette fonctionnalité nécessite le plan Entreprise.",
-    "pricingExceeded": "Cette fonctionnalité nécessite le plan Entreprise.",
-    "invoicesExceeded": "Cette fonctionnalité nécessite le plan Entreprise.",
+    "clientsExceeded": "La gestion des clients fait partie du module CRM & Facturation — inclus dans le plan Entreprise, ou disponible en add-on sur le plan Pro.",
+    "pricingExceeded": "Les périodes tarifaires font partie du module Location — inclus dans le plan Entreprise, ou disponible en add-on sur le plan Pro.",
+    "invoicesExceeded": "Les devis et factures font partie du module CRM & Facturation — inclus dans le plan Entreprise, ou disponible en add-on sur le plan Pro.",
     "storageExceeded": "Vous avez atteint la limite de stockage de votre plan. Passez à un plan supérieur pour uploader de nouveaux fichiers.",
     "storageOverflow": "Votre usage de stockage dépasse la limite de votre plan actuel. Libérez de l'espace ou passez à un plan supérieur."
   },

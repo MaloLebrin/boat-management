@@ -110,7 +110,10 @@ test.group('Boat pricing (functional)', (group) => {
       .redirects(0)
 
     response.assertStatus(302)
-    response.assertFlashMessage('error', 'This feature requires the Enterprise plan.')
+    response.assertFlashMessage(
+      'error',
+      'Seasonal pricing is part of the Charter module — included with Enterprise, or available as an add-on on the Pro plan.'
+    )
 
     const pricing = await BoatPricing.query().where('boatId', boat.id).first()
     assert.isNull(pricing)
