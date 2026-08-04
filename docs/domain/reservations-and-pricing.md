@@ -120,11 +120,11 @@ Modèle : `app/models/pricing_season.ts`. Index composite
 
 ## 4. ACL & gating
 
-| Action                               | Contrôle                                                                                                               |
-| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
-| Voir/créer/éditer une réservation    | `bouncer.with(BoatPolicy)` — `view` (index) / `manage` (mutations), même org que le bateau                             |
-| Gérer le tarif de base & les saisons | **plan Enterprise** : `quotaService.assertCanManagePricing(org)` (flag `canManagePricing` dans `shared/types/plan.ts`) |
-| Suppression d'une saison             | admins de l'org uniquement (`PricingSeasonPolicy.before`)                                                              |
+| Action                               | Contrôle                                                                                                                                                                                                                                                                                                                      |
+| ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Voir/créer/éditer une réservation    | `bouncer.with(BoatPolicy)` — `view` (index) / `manage` (mutations), même org que le bateau                                                                                                                                                                                                                                    |
+| Gérer le tarif de base & les saisons | **capacité `canManagePricing`** : tier Enterprise ou module add-on `charter` sur le socle Pro (#327) — `quotaService.assertCanManagePricing(org)`. Un accès sans la capacité est redirigé vers `/settings/billing` (`BILLING_SETTINGS_PATH`), jamais vers `/` qui mène à la home marketing publique sans flash visible (#456) |
+| Suppression d'une saison             | admins de l'org uniquement (`PricingSeasonPolicy.before`)                                                                                                                                                                                                                                                                     |
 
 Le **calcul du total** n'est pas gaté : il lit simplement `boat_pricing` si
 présent. Un bateau sans tarif → aucune estimation, `total_price` reste à la

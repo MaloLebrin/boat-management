@@ -108,6 +108,18 @@ Les cartes de l'onglet Équipement exposent un lien « voir le détail » vers c
   - `ParticleNetworkCanvas.vue` — particules réactives souris : `HomeFinalCtaSection`
 - Détail des animations : `inertia/css/ANIMATIONS.md`
 
+### Settings — facturation (`/settings/billing`)
+
+- Page : `inertia/pages/settings/billing.vue` → `components/settings/tabs/SettingsBillingTab.vue` (props `plan`, `quotaUsage`, `subscription`, `orgModules`, `orgAddons`, servies par `SettingsController.billing`)
+- Sous-composants (le tab reste sous la limite de 250 lignes) :
+  - `SettingsBillingUsageGauge.vue` — jauges bateaux / membres / stockage / tokens IA
+  - `SettingsBillingFeatureList.vue` — capacités du plan. Deux lignes IA distinctes (#456) : « IA / Copilote » (depuis `quotaUsage.canUseAI`) et « Personnalisation IA (prompt métier) » (depuis `PLAN_LIMITS[plan].canCustomizeAI`, qu'aucun module add-on n'accorde). En Pro la première est cochée et la seconde non — les fusionner laissait croire que `/settings/ai` était accessible
+  - `SettingsBillingSubscriptionNotice.vue` — bandeau affiché quand `plan === 'pro' && subscription === null` (#456). L'organisation **a** le plan Pro en base mais aucun abonnement Stripe actif ; le bandeau nomme le plan possédé et explique que modules et add-ons sont facturés sur l'abonnement. CTA « Finaliser l'abonnement » (→ `startCheckout('pro')`) pour un porteur de `subscription.manage`, renvoi vers un administrateur sinon
+  - `SettingsBillingModules.vue` — modules add-ons (`charter`, `crm_invoicing`)
+  - `SettingsBillingExtraBoats.vue` — add-on quantitatif `extra_boats` (stepper). Même distinction plan/abonnement que les modules : la branche « Pro sans abonnement actif » propose de finaliser l'abonnement, la branche Starter affiche « Disponible à partir du plan Pro »
+- **Plan ≠ abonnement** : `plan` est une colonne de `organizations`, `subscription` l'abonnement Stripe actif. Tout libellé qui les confond finit par nier au client un plan qu'il possède — c'est le bug #456. Les libellés « Nécessite un plan Pro actif » sont réservés au vrai Starter.
+- Écrans gatés (`/invoices`, `/pricing/seasons`, `/clients`, `/settings/ai`, `/settings/branding`) : la redirection d'upsell vise `/settings/billing` (`BILLING_SETTINGS_PATH`) et **jamais** `/`, qui redirige sur `/en` — le layout public ne rend aucun toast, le flash y serait perdu (#456).
+
 ## Layout authentifié — navigation & notifications
 
 - Layout `inertia/layouts/default.vue` : sidebar desktop `AsideMenu.vue` (`hidden lg:flex`) + barre header mobile (`lg:hidden`, hamburger). Sections de nav construites par `use_nav_sections.ts`.

@@ -19,12 +19,16 @@ Ces paramètres sont appliqués automatiquement sur **tous les échanges IA de l
 
 ### Qui peut y accéder
 
-- **Plan Enterprise** uniquement — toute tentative d'accès depuis un plan inférieur redirige vers `/settings/billing`
+- **Plan Enterprise** uniquement — toute tentative d'accès depuis un plan inférieur redirige vers `/settings/billing` **avec un flash explicite** (`flash.settings.aiCustomizationRequiresPlan`), posé par `SettingsController.guardPlanFeature()`
 - **Admins de l'organisation** uniquement — `OrganizationPolicy.configureAI()` + `before()` Bouncer
 
 ### Ce que voit un utilisateur Pro
 
-L'onglet « Personnalisation IA » n'apparaît pas dans le nav settings. L'accès direct à `/settings/ai` redirige vers la page facturation.
+L'onglet « Personnalisation IA » n'apparaît pas dans le nav settings. L'accès direct à `/settings/ai` redirige vers la page facturation, avec un flash qui explique la nuance.
+
+Cette nuance compte (#456) : sur le plan Pro, `canUseAI` est `true` — l'IA et le copilote **sont** inclus, seule la personnalisation du prompt ne l'est pas. La carte plan de `/settings/billing` affiche donc deux lignes distinctes, « IA / Copilote » (cochée en Pro) et « Personnalisation IA (prompt métier) » (décochée), rendues par `SettingsBillingFeatureList.vue`. Les fusionner en une seule ligne cochée laissait croire que `/settings/ai` était ouvert.
+
+`guardPlanFeature(org, flag, flashKey, ctx)` est générique (typée sur `BooleanQuotaKey`) et sert aussi à `/settings/branding` (`canWhiteLabel`).
 
 ---
 
