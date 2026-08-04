@@ -38,6 +38,14 @@ test('le footer public ne contient aucun lien mort (href="#")', () => {
   })
   const deadLinks = w.findAll('a[href="#"]')
   expect(deadLinks.length).toBe(0)
-  // Le lien « Conditions » (public.footer.terms) a été retiré en attendant une vraie page CGU.
-  expect(w.html()).not.toContain('public.footer.terms')
+})
+
+// Le lien « CGU » avait été retiré du footer faute de page ; elle existe depuis #455.
+test('le footer public renvoie vers les CGU de la locale courante', () => {
+  const w = mount(PublicLayout, {
+    global: { stubs: { ...stubs, AppHeader: { template: '<div />' } } },
+  })
+
+  expect(w.html()).toContain('public.footer.terms')
+  expect(w.findAll('a[href="/fr/cgu"]').length).toBe(1)
 })

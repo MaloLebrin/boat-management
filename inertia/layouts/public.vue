@@ -26,6 +26,8 @@ const simulatorHref = computed(() =>
 
 const privacyHref = computed(() => (locale.value === 'fr' ? '/fr/confidentialite' : '/en/privacy'))
 
+const termsHref = computed(() => (locale.value === 'fr' ? '/fr/cgu' : '/en/terms'))
+
 const aboutHref = computed(() => (locale.value === 'fr' ? '/fr/a-propos' : '/en/about'))
 
 const contactHref = computed(() => (locale.value === 'fr' ? '/fr/contact' : '/en/contact'))
@@ -89,6 +91,9 @@ const contactHref = computed(() => (locale.value === 'fr' ? '/fr/contact' : '/en
           <div class="grid gap-2 text-sm font-medium text-fg-muted">
             <Link :href="privacyHref" class="transition-colors hover:text-fg">{{
               t('public.footer.privacy')
+            }}</Link>
+            <Link :href="termsHref" class="transition-colors hover:text-fg">{{
+              t('public.footer.terms')
             }}</Link>
           </div>
         </div>

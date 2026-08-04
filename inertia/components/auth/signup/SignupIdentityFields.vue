@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH } from '#shared/constants/auth'
 import PasswordStrength from '~/components/auth/PasswordStrength.vue'
 import SignupSectionHeader from '~/components/auth/signup/SignupSectionHeader.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
@@ -14,6 +15,14 @@ const { t } = useT()
 const showPassword = ref(false)
 const passwordValue = ref('')
 const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
+
+/**
+ * Les deux bornes viennent du validator (#455) : le placeholder annonçait
+ * « 14 caractères minimum » alors que la règle est 8–32, et la borne haute
+ * n'était affichée nulle part — un mot de passe de 33 caractères était rejeté
+ * sans que rien ne l'ait annoncé.
+ */
+const passwordLengthVars = { min: PASSWORD_MIN_LENGTH, max: PASSWORD_MAX_LENGTH }
 </script>
 
 <template>
@@ -63,7 +72,10 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
       :type="passwordType"
       autocomplete="new-password"
       :label="t('auth.signup.passwordLabel')"
-      :placeholder="t('auth.signup.passwordPlaceholder')"
+      :placeholder="t('auth.signup.passwordPlaceholder', passwordLengthVars)"
+      :hint="t('auth.signup.passwordHint', passwordLengthVars)"
+      :minlength="PASSWORD_MIN_LENGTH"
+      :maxlength="PASSWORD_MAX_LENGTH"
       required
       :errors="errors"
       :model-value="passwordValue"

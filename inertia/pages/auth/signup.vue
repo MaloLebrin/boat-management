@@ -9,6 +9,7 @@ export default {
 <script setup lang="ts">
 import { Form } from '@adonisjs/inertia/vue'
 import { Head } from '@inertiajs/vue3'
+import { PLAN_LIMITS } from '#shared/types/plan'
 import AuthNavyPanel from '~/components/auth/AuthNavyPanel.vue'
 import SignupIdentityFields from '~/components/auth/signup/SignupIdentityFields.vue'
 import SignupOrganizationFields from '~/components/auth/signup/SignupOrganizationFields.vue'
@@ -35,6 +36,17 @@ const RENDERED_FIELDS = [
   'organizationType',
   'fleetSize',
   'acceptTerms',
+] as const
+
+/**
+ * Ce que le plan Starter offre réellement, lu dans `PLAN_LIMITS` (#455) : la
+ * page promettait « utilisateurs illimités » (Starter en autorise 1) et
+ * « aucun prélèvement avant J+14 » alors qu'il n'existe aucune période d'essai.
+ */
+const STARTER_FEATURES = [
+  { key: 'featureCSV', vars: undefined },
+  { key: 'featureBoats', vars: { count: PLAN_LIMITS.starter.maxBoats ?? 0 } },
+  { key: 'featureUsers', vars: { count: PLAN_LIMITS.starter.maxMembers ?? 0 } },
 ] as const
 </script>
 
@@ -127,8 +139,8 @@ const RENDERED_FIELDS = [
               <!-- Feature checks -->
               <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[12px] text-fg-muted">
                 <span
-                  v-for="key in ['featureCSV', 'featureUsers', 'featureNoCharge']"
-                  :key="key"
+                  v-for="feature in STARTER_FEATURES"
+                  :key="feature.key"
                   class="inline-flex items-center gap-1.5"
                 >
                   <svg
@@ -144,7 +156,7 @@ const RENDERED_FIELDS = [
                   >
                     <path d="M5 12l5 5L20 7" />
                   </svg>
-                  {{ t(`auth.signup.${key}`) }}
+                  {{ t(`auth.signup.${feature.key}`, feature.vars) }}
                 </span>
               </div>
             </div>
