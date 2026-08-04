@@ -25,6 +25,7 @@ Référence routes: `start/routes/auth.ts`.
   - Controller: `SessionController.store`
   - `User.verifyCredentials(email, password)`
   - `auth.use('web').login(user)`
+  - `session.forget('demoSessionStartedAt')` — voir « Session démo » ci-dessous
   - Redirect: route `home`
 
 ### Logout
@@ -32,7 +33,24 @@ Référence routes: `start/routes/auth.ts`.
 - `POST /logout` (auth-only)
   - Controller: `SessionController.destroy`
   - `auth.use('web').logout()`
+  - `session.forget('demoSessionStartedAt')` — voir « Session démo » ci-dessous
   - Redirect: route `session.create`
+
+### Session démo
+
+`POST /demo` (`DemoController.login`) connecte le compte `DEMO_EMAIL` et pose
+`demoSessionStartedAt` en session ; `CheckDemoSessionMiddleware` déconnecte au-delà de
+`DEMO_SESSION_DURATION_MS`, et `inertia_middleware` partage `demoSessionStartedAt` /
+`demoSessionDurationMs` pour la bannière `DemoSessionBanner.vue`.
+
+Invariants (#451) — `auth.logout()` ne vide pas la session, la clé doit donc être purgée
+explicitement, sinon la bannière suit la session navigateur sur les comptes réels :
+
+- la clé est oubliée au logout (`SessionController.destroy`), au login
+  (`SessionController.store`) et à l'expiration (`CheckDemoSessionMiddleware`) ;
+- `inertia_middleware` ne la partage que si `DemoService.isDemoUser(auth.user.email)`.
+
+Couverture : `tests/functional/auth/demo_session_leak.spec.ts`.
 
 ## Home vs dashboard
 

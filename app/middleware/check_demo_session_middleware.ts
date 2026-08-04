@@ -15,6 +15,9 @@ export default class CheckDemoSessionMiddleware {
       const startedAt = ctx.session.get('demoSessionStartedAt') as number | undefined
       if (!startedAt || Date.now() - startedAt > DEMO_SESSION_DURATION_MS) {
         await ctx.auth.use('web').logout()
+        // #451 — même purge qu'au logout manuel : la clé ne doit pas survivre à la
+        // fin de la session démo, sinon elle suit le navigateur sur le compte suivant.
+        ctx.session.forget('demoSessionStartedAt')
         try {
           await this.demoService.scheduleReset()
         } catch (err) {
