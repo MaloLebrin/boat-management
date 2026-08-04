@@ -122,6 +122,22 @@ Source: `database/schema.ts` (généré automatiquement via migrations).
 - `category` : `maintenance | fuel | documents | port | equipment | other`
 - `description` (nullable)
 
+### contact_messages
+
+Messages du formulaire de contact public (`POST /contact`, #450). Table autonome : aucun lien vers `users`/`organizations`, l'expéditeur n'est pas authentifié.
+
+- `id` (uuid)
+- `subject` : `demo | pricing | migration | technical | partnership | other`
+- `firstName`, `lastName`
+- `email`
+- `organization` (nullable)
+- `fleetSize` (`1-4` | `5-20` | `20+`, nullable)
+- `message` (text)
+- `locale` (`fr` par défaut)
+- `ipAddress` (nullable — renseigné pour tracer le throttle)
+- `createdAt`
+- index sur `email` et `created_at`
+
 ## Relations (résumé)
 
 - `Organization 1..n User` via `users.organizationId`

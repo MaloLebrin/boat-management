@@ -1,8 +1,16 @@
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import { ADDON_PRICES, MODULE_PRICES, PLAN_PRICES } from '../../shared/types/plan.js'
+import { CONTACT_FLEET_SIZES, CONTACT_SUBJECTS } from '../../shared/types/contact.js'
 import QuotaService from '#services/quota_service'
 import SimulatorLeadService from '#services/simulator_lead_service'
+
+/** Ancre du formulaire de contact, ciblée par la carte « Réserver un créneau » (#450). */
+const CONTACT_FORM_ANCHOR = 'contact-form'
+/** Route POST unique du formulaire de contact, quelle que soit la locale de l'URL. */
+const CONTACT_FORM_ACTION = '/contact'
+const SUPPORT_EMAIL = 'support@fleetai.app'
+const PRESS_EMAIL = 'press@fleetai.app'
 
 @inject()
 export default class MarketingController {
@@ -29,9 +37,12 @@ export default class MarketingController {
     })
   }
 
-  async contact({ inertia, i18n }: HttpContext) {
+  async contact({ inertia, i18n, session }: HttpContext) {
     return inertia.render('marketing/contact', {
       t: this.buildContactPageData(i18n),
+      // Rendu après le POST /contact : le panneau de confirmation survit ainsi
+      // à un rechargement complet, sans dépendre de l'état client (#450).
+      contactSent: Boolean(session.flashMessages.get('contactMessageSent')),
     })
   }
 
@@ -1342,6 +1353,9 @@ export default class MarketingController {
           titleHighlight: t('hero_title_highlight'),
           subtitle: t('hero_subtitle'),
         },
+        // `href` + `kind` : chaque carte est un vrai lien (#450). `anchor` cible
+        // le formulaire plus bas dans la page, `internal` passe par <Link> Inertia,
+        // `external` reste une ancre brute (mailto:).
         channels: [
           {
             icon: t('ch1_icon'),
@@ -1349,6 +1363,8 @@ export default class MarketingController {
             desc: t('ch1_desc'),
             cta: t('ch1_cta'),
             tone: 'navy',
+            href: `#${CONTACT_FORM_ANCHOR}`,
+            kind: 'anchor',
           },
           {
             icon: t('ch2_icon'),
@@ -1356,6 +1372,8 @@ export default class MarketingController {
             desc: t('ch2_desc'),
             cta: t('ch2_cta'),
             tone: 'coral',
+            href: '/signup',
+            kind: 'internal',
           },
           {
             icon: t('ch3_icon'),
@@ -1363,6 +1381,8 @@ export default class MarketingController {
             desc: t('ch3_desc'),
             cta: t('ch3_cta'),
             tone: '',
+            href: `mailto:${SUPPORT_EMAIL}`,
+            kind: 'external',
           },
           {
             icon: t('ch4_icon'),
@@ -1370,36 +1390,61 @@ export default class MarketingController {
             desc: t('ch4_desc'),
             cta: t('ch4_cta'),
             tone: '',
+            href: `mailto:${PRESS_EMAIL}`,
+            kind: 'external',
           },
         ],
         form: {
+          anchorId: CONTACT_FORM_ANCHOR,
+          action: CONTACT_FORM_ACTION,
           eyebrow: t('form_eyebrow'),
           title: t('form_title'),
           subjectLabel: t('form_subject_label'),
-          subjects: [
-            t('form_subject1'),
-            t('form_subject2'),
-            t('form_subject3'),
-            t('form_subject4'),
-            t('form_subject5'),
-            t('form_subject6'),
-          ],
+          subjects: CONTACT_SUBJECTS.map((value) => ({
+            value,
+            label: t(`form_subject_${value}`),
+          })),
+          fleetSizes: [...CONTACT_FLEET_SIZES],
           firstNameLabel: t('form_first_name'),
+          firstNamePlaceholder: t('form_first_name_placeholder'),
           lastNameLabel: t('form_last_name'),
+          lastNamePlaceholder: t('form_last_name_placeholder'),
           emailLabel: t('form_email'),
+          emailPlaceholder: t('form_email_placeholder'),
           orgLabel: t('form_org'),
+          orgPlaceholder: t('form_org_placeholder'),
           fleetSizeLabel: t('form_fleet_size'),
           messageLabel: t('form_message'),
           messagePlaceholder: t('form_message_placeholder'),
           privacyText: t('form_privacy_text'),
           privacyLinkLabel: t('form_privacy_link'),
           submitLabel: t('form_submit'),
+          sendingLabel: t('form_sending'),
+          successTitle: t('form_success_title'),
+          successBody: t('form_success_body'),
+          successNewLabel: t('form_success_new'),
+          errorGeneric: t('form_error_generic'),
           responseTime: t('form_response_time'),
           otherMeansTitle: t('form_other_means'),
           sidebarContacts: [
-            { icon: t('sidebar_c1_icon'), label: t('sidebar_c1_label'), sub: t('sidebar_c1_sub') },
-            { icon: t('sidebar_c2_icon'), label: t('sidebar_c2_label'), sub: t('sidebar_c2_sub') },
-            { icon: t('sidebar_c3_icon'), label: t('sidebar_c3_label'), sub: t('sidebar_c3_sub') },
+            {
+              icon: t('sidebar_c1_icon'),
+              label: t('sidebar_c1_label'),
+              sub: t('sidebar_c1_sub'),
+              href: `tel:${t('sidebar_c1_label').replace(/\s/g, '')}`,
+            },
+            {
+              icon: t('sidebar_c2_icon'),
+              label: t('sidebar_c2_label'),
+              sub: t('sidebar_c2_sub'),
+              href: `mailto:${t('sidebar_c2_label')}`,
+            },
+            {
+              icon: t('sidebar_c3_icon'),
+              label: t('sidebar_c3_label'),
+              sub: t('sidebar_c3_sub'),
+              href: `mailto:${t('sidebar_c3_label')}`,
+            },
           ],
           ctaTitle: t('sidebar_cta_title'),
           ctaSubtitle: t('sidebar_cta_subtitle'),

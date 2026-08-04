@@ -11,17 +11,22 @@ import ContactFormSection from '~/components/marketing/contact/ContactFormSectio
 import ContactOfficesSection from '~/components/marketing/contact/ContactOfficesSection.vue'
 import ContactFaqSection from '~/components/marketing/contact/ContactFaqSection.vue'
 
+import type { ContactSubjectOption } from '../../../shared/types/contact'
+
 interface Channel {
   icon: string
   title: string
   desc: string
   cta: string
   tone?: string
+  href: string
+  kind: 'anchor' | 'internal' | 'external'
 }
 interface SidebarContact {
   icon: string
   label: string
   sub: string
+  href: string
 }
 interface OfficeItem {
   city: string
@@ -38,26 +43,40 @@ interface FaqItem {
 }
 
 interface PageProps {
+  /** Vrai juste après un POST /contact réussi (flash), #450. */
+  contactSent: boolean
   t: {
     meta: { title: string; description: string }
     contact: {
       hero: { eyebrow: string; title: string; titleHighlight: string; subtitle: string }
       channels: Channel[]
       form: {
+        anchorId: string
+        action: string
         eyebrow: string
         title: string
         subjectLabel: string
-        subjects: string[]
+        subjects: ContactSubjectOption[]
+        fleetSizes: string[]
         firstNameLabel: string
+        firstNamePlaceholder: string
         lastNameLabel: string
+        lastNamePlaceholder: string
         emailLabel: string
+        emailPlaceholder: string
         orgLabel: string
+        orgPlaceholder: string
         fleetSizeLabel: string
         messageLabel: string
         messagePlaceholder: string
         privacyText: string
         privacyLinkLabel: string
         submitLabel: string
+        sendingLabel: string
+        successTitle: string
+        successBody: string
+        successNewLabel: string
+        errorGeneric: string
         responseTime: string
         otherMeansTitle: string
         sidebarContacts: SidebarContact[]
@@ -82,6 +101,7 @@ interface PageProps {
 
 const props = defineProps<PageProps>()
 const t = props.t
+const contactSent = props.contactSent
 
 const page = usePage<{ locale?: 'en' | 'fr' }>()
 const locale = computed<'en' | 'fr'>(() => (page.props.locale ?? 'en') as 'en' | 'fr')
@@ -103,7 +123,7 @@ const canonicalHref = computed(() => (locale.value === 'fr' ? contactFr : contac
 
   <ContactHeroSection v-bind="t.contact.hero" />
   <ContactChannelsSection :items="t.contact.channels" />
-  <ContactFormSection v-bind="t.contact.form" />
+  <ContactFormSection v-bind="t.contact.form" :sent="contactSent" />
   <ContactOfficesSection v-bind="t.contact.offices" />
   <ContactFaqSection v-bind="t.contact.faq" />
 </template>

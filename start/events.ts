@@ -1,4 +1,5 @@
 import emitter from '@adonisjs/core/services/emitter'
+import ContactMessageReceived from '#events/contact_message_received'
 import SimulatorLeadCreated from '#events/simulator_lead_created'
 import OrganizationMemberJoined from '#events/organization_member_joined'
 import OrganizationMemberRemoved from '#events/organization_member_removed'
@@ -11,6 +12,7 @@ import StorageThresholdCrossed from '#events/storage_threshold_crossed'
 import AiTokenThresholdCrossed from '#events/ai_token_threshold_crossed'
 
 emitter.listen(SimulatorLeadCreated, [() => import('#listeners/on_simulator_lead_created')])
+emitter.listen(ContactMessageReceived, [() => import('#listeners/on_contact_message_received')])
 emitter.listen(OrganizationMemberJoined, [() => import('#listeners/on_organization_member_joined')])
 emitter.listen(OrganizationMemberRemoved, [
   () => import('#listeners/on_organization_member_removed'),

@@ -72,4 +72,8 @@ export default await Env.create(new URL('../', import.meta.url), {
   SMTP_PASSWORD: Env.schema.string.optional(),
   MAIL_FROM_ADDRESS: Env.schema.string(),
   MAIL_FROM_NAME: Env.schema.string(),
+
+  // Boîte qui reçoit les messages du formulaire de contact public (#450).
+  // Vide → repli sur MAIL_FROM_ADDRESS.
+  CONTACT_INBOX_EMAIL: Env.schema.string.optional(),
 })

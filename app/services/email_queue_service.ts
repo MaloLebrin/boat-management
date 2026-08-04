@@ -658,6 +658,102 @@ export default class EmailQueueService {
     })
   }
 
+  /**
+   * Notifie la boîte de contact FleetAi d'un message reçu depuis /contact (#450).
+   */
+  async sendContactMessageNotification(params: {
+    to: string
+    messageId: string
+    subjectLabel: string
+    fullName: string
+    email: string
+    organization: string | null
+    fleetSize: string | null
+    message: string
+    locale: string
+  }) {
+    const subject = `[Contact] ${params.subjectLabel} — ${params.fullName}`
+    const text = `Nouveau message de contact (${params.subjectLabel})\n\nNom : ${params.fullName}\nEmail : ${params.email}\nOrganisation : ${params.organization ?? '—'}\nTaille de flotte : ${params.fleetSize ?? '—'}\nLangue : ${params.locale}\n\n${params.message}`
+
+    const html = await edge.render('emails/contact_message_notification', {
+      subjectLabel: params.subjectLabel,
+      fullName: params.fullName,
+      email: params.email,
+      organization: params.organization,
+      fleetSize: params.fleetSize,
+      // Une ligne = un <p> : le template n'a plus besoin de `white-space: pre-wrap`,
+      // dont l'indentation serait réintroduite par le formatage.
+      messageLines: params.message.split('\n'),
+      locale: params.locale,
+    })
+
+    const partialPayload: Omit<SendEmailPayload, 'dedupKey'> = {
+      to: params.to,
+      subject,
+      text,
+      html,
+      correlationId: `contact-message:${params.messageId}`,
+    }
+
+    const key = SendEmail.dedupKey(partialPayload)
+    const payload: SendEmailPayload = { ...partialPayload, dedupKey: key }
+
+    await this.dedup.enqueueUnique({
+      key,
+      jobName: SendEmail.name,
+      queue: 'emails',
+      payload,
+      dispatch: async (p) => {
+        await SendEmail.dispatch(p)
+      },
+    })
+  }
+
+  /**
+   * Accuse réception à l'expéditeur du formulaire de contact (#450).
+   */
+  async sendContactMessageAck(params: {
+    to: string
+    messageId: string
+    firstName: string
+    message: string
+    locale: string
+  }) {
+    const isFr = params.locale === 'fr'
+    const subject = isFr ? 'Message bien reçu — FleetAi' : 'We received your message — FleetAi'
+    const text = isFr
+      ? `Bonjour ${params.firstName},\n\nMerci pour votre message. Un membre de l'équipe FleetAi vous répond sous 4 heures en jours ouvrés.\n\nCopie de votre message :\n${params.message}`
+      : `Hello ${params.firstName},\n\nThanks for reaching out. A member of the FleetAi team will get back to you within 4 hours on business days.\n\nA copy of your message:\n${params.message}`
+
+    const html = await edge.render('emails/contact_message_ack', {
+      firstName: params.firstName,
+      messageLines: params.message.split('\n'),
+      locale: isFr ? 'fr' : 'en',
+      appUrl: env.get('APP_URL'),
+    })
+
+    const partialPayload: Omit<SendEmailPayload, 'dedupKey'> = {
+      to: params.to,
+      subject,
+      text,
+      html,
+      correlationId: `contact-message-ack:${params.messageId}`,
+    }
+
+    const key = SendEmail.dedupKey(partialPayload)
+    const payload: SendEmailPayload = { ...partialPayload, dedupKey: key }
+
+    await this.dedup.enqueueUnique({
+      key,
+      jobName: SendEmail.name,
+      queue: 'emails',
+      payload,
+      dispatch: async (p) => {
+        await SendEmail.dispatch(p)
+      },
+    })
+  }
+
   async sendInvoice(params: {
     invoiceId: number
     organizationId: number

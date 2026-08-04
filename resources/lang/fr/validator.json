@@ -18,6 +18,9 @@
     "accepted": "Le champ {field} doit être accepté.",
     "acceptTerms": {
       "accepted": "Vous devez accepter les CGU et la politique de confidentialité pour créer un compte."
+    },
+    "consent": {
+      "accepted": "Tu dois accepter le traitement de tes informations pour qu'on puisse te répondre."
     }
   },
   "settings": {
@@ -31,6 +34,10 @@
     "organizationName": "nom de l'organisation",
     "organizationType": "type d'organisation",
     "fleetSize": "taille de flotte",
-    "acceptTerms": "conditions générales"
+    "acceptTerms": "conditions générales",
+    "subject": "sujet",
+    "organization": "organisation",
+    "message": "message",
+    "consent": "consentement"
   }
 }

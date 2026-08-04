@@ -1,7 +1,9 @@
 import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
+import { contactThrottle } from '#start/limiter'
 
 const MarketingController = () => import('#controllers/marketing_controller')
+const ContactMessagesController = () => import('#controllers/contact_messages_controller')
 const SimulatorController = () => import('#controllers/simulator_controller')
 const SimulatorLeadController = () => import('#controllers/simulator_lead_controller')
 
@@ -36,6 +38,13 @@ router.get('/fr/a-propos', [MarketingController, 'about']).as('marketing.fr.abou
 router.get('/en/contact', [MarketingController, 'contact']).as('marketing.en.contact')
 router.get('/fr/contact', [MarketingController, 'contact']).as('marketing.fr.contact')
 router.get('/contact', [MarketingController, 'contact']).as('marketing.contact')
+
+// Soumission du formulaire de contact (#450) — une seule route POST, la page
+// contact la cible quelle que soit la locale de l'URL de rendu.
+router
+  .post('/contact', [ContactMessagesController, 'store'])
+  .as('marketing.contact.store')
+  .use(contactThrottle)
 
 router.post('/simulator/session', [SimulatorController, 'saveSession']).as('simulator.session')
 router
