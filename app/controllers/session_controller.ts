@@ -19,10 +19,14 @@ export default class SessionController {
     return inertia.render('auth/login', {})
   }
 
-  async store({ request, auth, response }: HttpContext) {
+  async store({ request, auth, response, session }: HttpContext) {
     const { email, password, remember } = await request.validateUsing(loginValidator)
     const user = await this.userService.verifyCredentials(email, password)
     await auth.use('web').login(user, remember ?? false)
+    // #451 — filet de sécurité : une session navigateur qui traîne encore un
+    // `demoSessionStartedAt` (session démo antérieure) ne doit pas le transmettre
+    // au compte réel qui vient de s'authentifier.
+    session.forget('demoSessionStartedAt')
     user.lastLoginAt = DateTime.now()
     await user.save()
 
@@ -37,7 +41,7 @@ export default class SessionController {
     response.redirect().toRoute('dashboard')
   }
 
-  async destroy({ auth, response }: HttpContext) {
+  async destroy({ auth, response, session }: HttpContext) {
     const user = auth.user
     const isDemo = user ? this.demoService.isDemoUser(user.email) : false
 
@@ -50,6 +54,10 @@ export default class SessionController {
     }
 
     await auth.use('web').logout()
+    // #451 — `auth.logout()` ne vide pas la session : sans cette purge, le compteur
+    // de session démo restait posé dans le navigateur et la bannière réapparaissait
+    // sur le compte suivant.
+    session.forget('demoSessionStartedAt')
 
     if (isDemo) {
       try {

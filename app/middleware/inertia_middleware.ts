@@ -20,6 +20,7 @@ import NotificationService from '#services/notification_service'
 import OrganizationModuleService from '#services/organization_module_service'
 import PermissionService from '#services/permission_service'
 import { DEMO_SESSION_DURATION_MS } from '#shared/constants/demo'
+import DemoService from '#services/demo_service'
 import type User from '#models/user'
 
 export async function resolveSharedCurrentPlan(
@@ -66,7 +67,8 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
     private brandingService: BrandingService,
     private notificationService: NotificationService,
     private organizationModuleService: OrganizationModuleService,
-    private permissionService: PermissionService
+    private permissionService: PermissionService,
+    private demoService: DemoService
   ) {
     super()
   }
@@ -88,7 +90,16 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
     const success = session?.flashMessages.get('success') as string
     const info = session?.flashMessages.get('info') as string
 
-    const demoSessionStartedAt = session?.get('demoSessionStartedAt') as number | undefined
+    // #451 — la clé de session posée par `/demo` survivait au logout et suivait le
+    // navigateur d'un compte à l'autre : la bannière « Session démo » s'affichait
+    // sur des comptes réels. La clé n'est donc partagée que si l'utilisateur
+    // authentifié est bien le compte démo — la purge côté session reste faite au
+    // logout (`SessionController.destroy`), ceci en est le garde-fou.
+    const storedDemoSessionStartedAt = session?.get('demoSessionStartedAt') as number | undefined
+    const demoSessionStartedAt =
+      auth?.user && this.demoService.isDemoUser(auth.user.email)
+        ? storedDemoSessionStartedAt
+        : undefined
 
     const BACKEND_NAMESPACES = new Set(['flash', 'marketing', 'validator'])
 
