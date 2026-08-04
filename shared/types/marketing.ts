@@ -1,3 +1,15 @@
+/**
+ * Ligne du comparatif détaillé de la page tarifs : le libellé, puis la valeur
+ * pour Starter, Pro et Entreprise. `true`/`false` rendent une coche ou un tiret,
+ * une chaîne rend le texte brut (`'addon'` rend le badge « Add-on »).
+ */
+export type PricingTableRow = [
+  label: string,
+  starter: boolean | string,
+  pro: boolean | string,
+  enterprise: boolean | string,
+]
+
 export interface AboutValueItem {
   n: string
   title: string

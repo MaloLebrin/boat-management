@@ -85,7 +85,7 @@
     "storageOverflow": "Your storage usage exceeds your current plan limit. New uploads are blocked. Free up space or upgrade your plan.",
     "features": {
       "ai": "AI / Copilot",
-      "export": "Export (PDF / CSV / JSON)",
+      "export": "Export (PDF / CSV)",
       "maintenanceHistory": "Maintenance history"
     },
     "upgradeTo": {
