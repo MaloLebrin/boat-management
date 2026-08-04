@@ -60,15 +60,15 @@ const RENDERED_FIELDS = [
       <!-- Form, vertically centred -->
       <div class="flex flex-1 flex-col items-center justify-center px-8 pb-12 lg:px-16">
         <div class="w-full max-w-[460px]">
-          <!-- Trial badge -->
+          <!-- Free plan badge -->
           <div class="flex flex-wrap items-center gap-2">
             <span
               class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold bg-mint-50 text-mint-700"
             >
               <span class="h-1.5 w-1.5 rounded-full bg-mint-700" />
-              {{ t('auth.signup.trialBadge') }}
+              {{ t('auth.signup.freePlanBadge') }}
             </span>
-            <span class="text-[11px] text-fg-muted">{{ t('auth.signup.trialCaption') }}</span>
+            <span class="text-[11px] text-fg-muted">{{ t('auth.signup.freePlanCaption') }}</span>
           </div>
 
           <h1

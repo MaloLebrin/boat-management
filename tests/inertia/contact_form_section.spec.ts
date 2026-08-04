@@ -78,7 +78,7 @@ const formProps = {
     { icon: '✉', label: 'hello@fleetai.app', sub: 'général', href: 'mailto:hello@fleetai.app' },
   ],
   ctaTitle: 'Teste FleetAi',
-  ctaSubtitle: '14 jours gratuits',
+  ctaSubtitle: 'Plan Starter gratuit à vie',
   ctaButton: 'Créer mon organisation',
   sent: false,
 }
@@ -145,7 +145,7 @@ describe('ContactChannelsSection', () => {
     {
       icon: '▶',
       title: 'Tester',
-      desc: '14 jours',
+      desc: 'Plan Starter gratuit',
       cta: 'Créer mon compte',
       tone: 'coral',
       href: '/signup',
