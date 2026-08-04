@@ -19,7 +19,7 @@ type Plan = {
 interface Props {
   plans: { starter: Plan; pro: Plan; enterprise: Plan }
   billing: 'monthly' | 'annual'
-  trust: { noCard: string; cancel: string; euData: string; trial?: string; joinedBy?: string }
+  trust: { noCard: string; cancel: string; euData: string; freeForever?: string; joinedBy?: string }
   signupLabel: string
   locale: 'en' | 'fr'
 }
@@ -185,9 +185,9 @@ const proPrice = computed(() => {
 
     <!-- Trust signals -->
     <div class="mt-6 flex flex-wrap items-center justify-center gap-4 text-sm text-fg-muted">
-      <span v-if="trust?.trial" class="flex items-center gap-1.5 font-semibold text-brand">
+      <span v-if="trust?.freeForever" class="flex items-center gap-1.5 font-semibold text-brand">
         <span class="h-1.5 w-1.5 rounded-full bg-brand" />
-        {{ trust.trial }}
+        {{ trust.freeForever }}
       </span>
       <span v-if="trust?.noCard" class="flex items-center gap-1.5">
         <span class="h-1.5 w-1.5 rounded-full bg-mint-700" />
