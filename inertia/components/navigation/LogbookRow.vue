@@ -2,13 +2,14 @@
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import { useT } from '~/composables/use_t'
 import type { FleetLogbookRow } from '../../../shared/types/navigation'
+import { parseDisplayDate } from '~/utils/local_datetime'
 
 const { t, locale } = useT()
 
 defineProps<{ row: FleetLogbookRow }>()
 
 function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString(locale.value, {
+  return parseDisplayDate(iso).toLocaleDateString(locale.value, {
     day: 'numeric',
     month: 'short',
     year: 'numeric',

@@ -10,7 +10,7 @@ import { CloudinaryFolders } from '#services/cloudinary_service'
 import MediaService from '#services/media_service'
 import { inject } from '@adonisjs/core'
 import type { CreateInspectionPayload, UpdateInspectionPayload } from '#shared/types/inspection'
-import { toDateTime } from '#shared/helpers/date'
+import { toUtcFromLocalInput } from '#shared/helpers/date'
 
 function assertReservationScope(user: User, reservation: BoatReservation) {
   if (user.organizationId === null || user.organizationId !== reservation.organizationId) {
@@ -62,9 +62,7 @@ export default class BoatInspectionService {
         reservationId: reservation.id,
         organizationId: reservation.organizationId,
         kind: payload.kind,
-        performedAt: toDateTime(payload.performedAt).plus({
-          minutes: payload.tzOffsetMinutes ?? 0,
-        }),
+        performedAt: toUtcFromLocalInput(payload.performedAt, payload.tzOffsetMinutes),
         fuelLevel: payload.fuelLevel ?? null,
         engineHours: payload.engineHours?.toString() ?? null,
         notes: payload.notes?.trim() || null,
@@ -105,9 +103,7 @@ export default class BoatInspectionService {
     if (!inspection) throw new BoatInspectionNotFoundError()
 
     if (payload.performedAt !== undefined) {
-      inspection.performedAt = toDateTime(payload.performedAt).plus({
-        minutes: payload.tzOffsetMinutes ?? 0,
-      })
+      inspection.performedAt = toUtcFromLocalInput(payload.performedAt, payload.tzOffsetMinutes)
     }
     if (payload.fuelLevel !== undefined) inspection.fuelLevel = payload.fuelLevel
     if (payload.engineHours !== undefined) {

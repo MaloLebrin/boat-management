@@ -6,6 +6,7 @@ import BaseInput from '~/components/base/BaseInput.vue'
 import { useCurrencyFormat } from '~/composables/use_currency_format'
 import { useT } from '~/composables/use_t'
 import type { BoatPortStayItem } from '#shared/types/budget'
+import { parseDisplayDate } from '~/utils/local_datetime'
 
 const props = defineProps<{
   boatId: number
@@ -58,7 +59,7 @@ function deleteStay(stayId: number) {
 
 function formatDate(dateStr: string | null): string {
   if (!dateStr) return '—'
-  return new Date(dateStr).toLocaleDateString()
+  return parseDisplayDate(dateStr).toLocaleDateString()
 }
 </script>
 

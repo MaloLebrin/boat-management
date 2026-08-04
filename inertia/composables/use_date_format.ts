@@ -1,11 +1,12 @@
 import { useT } from '~/composables/use_t'
+import { parseDisplayDate } from '~/utils/local_datetime'
 
 export function useDateFormat() {
   const { locale } = useT()
 
   function formatDate(iso: string | null | undefined): string {
     if (!iso) return '—'
-    return new Date(iso).toLocaleDateString(locale.value, {
+    return parseDisplayDate(iso).toLocaleDateString(locale.value, {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
@@ -14,7 +15,7 @@ export function useDateFormat() {
 
   function formatDateTime(iso: string | null | undefined): string {
     if (!iso) return '—'
-    return new Date(iso).toLocaleString(locale.value)
+    return parseDisplayDate(iso).toLocaleString(locale.value)
   }
 
   return { formatDate, formatDateTime }

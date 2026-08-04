@@ -7,6 +7,7 @@ import BaseSelect from '~/components/base/BaseSelect.vue'
 import { useCurrencyFormat } from '~/composables/use_currency_format'
 import { useT } from '~/composables/use_t'
 import type { BoatBudgetEntryItem } from '#shared/types/budget'
+import { parseDisplayDate } from '~/utils/local_datetime'
 
 const props = defineProps<{
   boatId: number
@@ -68,7 +69,7 @@ function deleteEntry(entryId: number) {
 }
 
 function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString()
+  return parseDisplayDate(dateStr).toLocaleDateString()
 }
 
 function getCategoryLabel(category: string): string {

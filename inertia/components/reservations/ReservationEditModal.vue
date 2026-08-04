@@ -9,6 +9,7 @@ import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import ReservationQuoteCard from '~/components/reservations/ReservationQuoteCard.vue'
 import { useT } from '~/composables/use_t'
+import { isoToDatetimeLocalValue, tzOffsetMinutes } from '~/utils/local_datetime'
 import type { BoatPricingRow } from '#shared/types/boat_pricing'
 import type { PricingSeasonRow } from '#shared/types/pricing_season'
 import type { ClientOption } from '#shared/types/client'
@@ -32,6 +33,9 @@ const { t } = useT()
 const form = useForm({
   startsAt: '',
   endsAt: '',
+  // `startsAt`/`endsAt` are naive wall-clocks: the server needs the browser
+  // offset to store the right instant (#452).
+  tzOffsetMinutes: tzOffsetMinutes(),
   clientId: '',
   clientName: '',
   clientEmail: '',
@@ -56,8 +60,10 @@ watch(
   () => props.reservation,
   (r) => {
     if (!r) return
-    form.startsAt = r.startsAt.slice(0, 16)
-    form.endsAt = r.endsAt.slice(0, 16)
+    // Stored instants are UTC — render them back as local wall-clock, otherwise
+    // editing a reservation would re-submit a value shifted by the offset (#452).
+    form.startsAt = isoToDatetimeLocalValue(r.startsAt)
+    form.endsAt = isoToDatetimeLocalValue(r.endsAt)
     form.clientId = r.clientId !== null ? String(r.clientId) : ''
     form.clientName = r.clientName
     form.clientEmail = r.clientEmail ?? ''
@@ -81,7 +87,11 @@ watch(
 function submit() {
   if (!props.reservation) return
   form
-    .transform((data) => ({ ...data, clientId: data.clientId ? Number(data.clientId) : null }))
+    .transform((data) => ({
+      ...data,
+      clientId: data.clientId ? Number(data.clientId) : null,
+      tzOffsetMinutes: tzOffsetMinutes(),
+    }))
     .patch(`/boats/${props.boatId}/reservations/${props.reservation.id}`, {
       preserveScroll: true,
       onSuccess: () => emit('update:open', false),

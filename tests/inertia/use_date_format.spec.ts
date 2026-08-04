@@ -42,14 +42,41 @@ describe('useDateFormat', () => {
   test('formatDate follows the current locale', () => {
     mockLocale.value = 'fr'
     const { formatDate } = useDateFormat()
+    // Local midnight, not `new Date('2026-07-12')` (UTC midnight): the calendar
+    // day must not depend on the browser offset — see #452.
     expect(formatDate('2026-07-12')).toBe(
-      new Date('2026-07-12').toLocaleDateString('fr', {
+      new Date(2026, 6, 12).toLocaleDateString('fr', {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric',
       })
     )
     mockLocale.value = 'en'
+  })
+
+  test('formatDate renders a calendar date as the same day in any timezone', () => {
+    // #452: `new Date('2026-08-03')` parses as UTC midnight, which renders as
+    // Aug 2 for any negative offset. A `YYYY-MM-DD` value carries no instant.
+    const { formatDate } = useDateFormat()
+    expect(formatDate('2026-08-03')).toBe(
+      new Date(2026, 7, 3).toLocaleDateString('en', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      })
+    )
+  })
+
+  test('formatDate still renders a full ISO instant in the browser zone', () => {
+    const { formatDate } = useDateFormat()
+    const instant = '2026-01-05T10:00:00.000Z'
+    expect(formatDate(instant)).toBe(
+      new Date(instant).toLocaleDateString('en', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      })
+    )
   })
 
   test('formatDateTime returns a non-empty string', () => {

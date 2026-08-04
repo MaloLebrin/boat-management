@@ -3,6 +3,8 @@ import vine from '@vinejs/vine'
 export const createNavigationLogValidator = vine.create(
   vine.object({
     departedAt: vine.date({ formats: ['YYYY-MM-DDTHH:mm', 'YYYY-MM-DDTHH:mm:ss'] }),
+    // browser's getTimezoneOffset() — shifts the naive local datetime to UTC (#452)
+    tzOffsetMinutes: vine.number().withoutDecimals().optional(),
     departurePortId: vine.number().withoutDecimals().positive().optional(),
     departurePortName: vine.string().trim().maxLength(255).optional(),
     engineHoursStart: vine.number().min(0).optional(),
@@ -32,6 +34,8 @@ export const closeNavigationLogValidator = vine.create(
   vine.object({
     _expectedUpdatedAt: vine.string().optional(),
     arrivedAt: vine.date({ formats: ['YYYY-MM-DDTHH:mm', 'YYYY-MM-DDTHH:mm:ss'] }),
+    // browser's getTimezoneOffset() — shifts the naive local datetime to UTC (#452)
+    tzOffsetMinutes: vine.number().withoutDecimals().optional(),
     arrivalPortId: vine.number().withoutDecimals().positive().optional(),
     arrivalPortName: vine.string().trim().maxLength(255).optional(),
     distanceNm: vine.number().min(0).optional(),
