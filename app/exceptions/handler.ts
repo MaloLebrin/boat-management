@@ -4,6 +4,14 @@ import type { StatusPageRange, StatusPageRenderer } from '@adonisjs/core/types/h
 import { QuotaExceededError } from '#exceptions/quota_errors'
 import { UserNotInOrganizationError } from '#exceptions/organization_errors'
 import { errors as limiterErrors } from '@adonisjs/limiter'
+import { errors as bouncerErrors } from '@adonisjs/bouncer'
+
+/**
+ * Méthodes pour lesquelles Bouncer redirige déjà en arrière avec un flash
+ * d'erreur (comportement Inertia-friendly conservé, cf. `AuthorizationException`).
+ * Tout le reste (GET/HEAD) atterrissait sur un `send('Access denied')` brut.
+ */
+const FORM_SUBMISSION_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE'])
 
 export default class HttpExceptionHandler extends ExceptionHandler {
   /**
@@ -55,7 +63,42 @@ export default class HttpExceptionHandler extends ExceptionHandler {
       ctx.session.flash('error', ctx.i18n.t('flash.organization.required'))
       return ctx.response.redirect('/')
     }
+    // ACL refusée sur une navigation (#458) : `E_AUTHORIZATION_FAILURE` porte sa
+    // propre méthode `handle()`, que le handler de base appelle *avant* les
+    // `statusPages` — un GET HTML recevait donc « Access denied » en texte nu,
+    // sans layout ni i18n. On rend la page Inertia 403 à la place ; les
+    // soumissions de formulaire et les clients JSON gardent le comportement
+    // Bouncer (flash + redirect back, ou payload d'erreur).
+    if (
+      error instanceof bouncerErrors.E_AUTHORIZATION_FAILURE &&
+      this.rendersForbiddenPage(error, ctx)
+    ) {
+      // Contrairement à un contrôleur, la valeur retournée par le handler n'est
+      // pas convertie en corps de réponse : on l'envoie explicitement.
+      const page = await ctx.inertia.render('errors/forbidden', {})
+      return ctx.response.status(403).send(page)
+    }
     return super.handle(error, ctx)
+  }
+
+  /**
+   * Vrai pour une navigation HTML (y compris une visite Inertia) qui n'est pas
+   * une soumission de formulaire. `request.accepts()` renvoie `null` quand aucun
+   * en-tête `Accept` n'est fourni : Bouncer traite ce cas comme du HTML, on fait
+   * de même pour rester aligné.
+   *
+   * Une policy peut refuser avec un autre statut (`AuthorizationResponse.deny`) :
+   * dans ce cas la page 403 mentirait, on laisse la chaîne d'origine répondre.
+   */
+  private rendersForbiddenPage(
+    error: InstanceType<typeof bouncerErrors.E_AUTHORIZATION_FAILURE>,
+    ctx: HttpContext
+  ): boolean {
+    if (!('inertia' in ctx)) return false
+    if ((error.response.status ?? 403) !== 403) return false
+    if (FORM_SUBMISSION_METHODS.has(ctx.request.method())) return false
+    const accepted = ctx.request.accepts(['html', 'application/vnd.api+json', 'json'])
+    return accepted === 'html' || accepted === null
   }
 
   /**
