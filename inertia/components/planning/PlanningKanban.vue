@@ -130,12 +130,21 @@ const doneTasksLabel = computed(() => {
 
     <!-- Planifiées -->
     <div class="flex flex-col gap-3">
+      <!--
+        Les quatre autres colonnes teintent leur en-tête avec une palette de
+        marque, dont les paliers `-50`/`-700` s'inversent sous `[data-theme]`.
+        Le navy, lui, est la palette des surfaces *permanentes* (sidebar, bandeaux)
+        et n'est pas réinversée : `bg-navy-25` restait donc un aplat quasi blanc
+        en thème sombre, seul en-tête clair du kanban (#457). Les tokens `brand`
+        portent la même teinte et basculent, `text-on-brand` suivant sur la
+        pastille.
+      -->
       <div
-        class="flex items-center gap-2 rounded-lg border-l-4 border-navy-600 bg-navy-25 px-3 py-2"
+        class="flex items-center gap-2 rounded-lg border-l-4 border-brand bg-brand-soft px-3 py-2"
       >
-        <h2 class="text-sm font-semibold text-navy-600">{{ t('planning.kanban.planned') }}</h2>
+        <h2 class="text-sm font-semibold text-brand">{{ t('planning.kanban.planned') }}</h2>
         <span
-          class="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-navy-600 px-1.5 text-xs font-semibold text-white"
+          class="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-brand px-1.5 text-xs font-semibold text-on-brand"
         >
           {{ plannedTasks.length }}
         </span>

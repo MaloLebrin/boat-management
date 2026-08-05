@@ -76,7 +76,7 @@ const fleetSizeOptions = computed(() =>
 )
 
 const inputClass =
-  'w-full rounded-xl border bg-cream px-4 py-3 text-sm text-fg outline-none transition-colors focus:border-navy-900'
+  'w-full rounded-xl border bg-cream px-4 py-3 text-sm text-fg outline-none transition-colors focus:border-brand'
 const labelClass = 'mb-1.5 block text-xs font-semibold uppercase tracking-widest text-fg-subtle'
 
 function borderClass(error?: string) {

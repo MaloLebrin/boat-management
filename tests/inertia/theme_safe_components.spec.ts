@@ -54,6 +54,14 @@ const NAVY_BAND = 'sur un bandeau navy permanent (sombre dans les deux thèmes) 
 const MOCK_ILLUSTRATION =
   'maquette d’écran décorative : palette interne cohérente, ne suit pas le thème de la page'
 const DECORATIVE_SVG = 'SVG décoratif en faible opacité sur panneau navy permanent'
+/**
+ * Le pendant du précédent pour la règle « palette navy à contre-rôle » (#457) :
+ * un palier navy foncé posé sur une surface **elle aussi** permanente (sidebar,
+ * carte navy, bouton clair d'un bandeau navy) reste cohérent dans les deux
+ * thèmes. C'est le seul cas où le navy à contre-rôle est légitime.
+ */
+const NAVY_ON_NAVY =
+  'palier navy posé sur une surface navy permanente — cohérent dans les deux thèmes'
 
 /**
  * Les 80 composants dont la PR #416 a réécrit les couleurs.
@@ -84,11 +92,27 @@ const COMPONENTS: Component[] = [
   { path: 'components/boats/maintenance/BoatTaskActions.vue' },
   { path: 'components/boats/rig/BoatShowRigCard.vue' },
   { path: 'components/boats/sail/BoatShowSailsCard.vue' },
+  // Panneaux Assistant IA — panneaux navy permanents, exception documentée dans
+  // CLAUDE.md (#457).
+  { path: 'components/boats/show/tabs/overview/BoatOverviewAiPanel.vue' },
+  {
+    path: 'components/dashboard/DashboardAiPanel.vue',
+    allow: [
+      { pattern: 'bg-white', count: 1, reason: `bouton blanc ${NAVY_BAND}` },
+      { pattern: 'text-navy-900', count: 1, reason: `encre du bouton blanc ${NAVY_BAND}` },
+    ],
+  },
   { path: 'components/layout/AppHeader.vue' },
   { path: 'components/layout/AppHeaderMobileDrawer.vue' },
-  { path: 'components/layout/AsideMenu.vue' },
+  {
+    path: 'components/layout/AsideMenu.vue',
+    allow: [{ pattern: 'border-navy-700', count: 2, reason: NAVY_ON_NAVY }],
+  },
   { path: 'components/layout/DemoSessionBanner.vue' },
-  { path: 'components/layout/MobileSidebarDrawer.vue' },
+  {
+    path: 'components/layout/MobileSidebarDrawer.vue',
+    allow: [{ pattern: 'border-navy-700', count: 2, reason: NAVY_ON_NAVY }],
+  },
   { path: 'components/layout/NotificationBell.vue' },
   { path: 'components/layout/ThemeSwitcher.vue' },
   {
@@ -97,7 +121,10 @@ const COMPONENTS: Component[] = [
   },
   { path: 'components/marketing/about/AboutTeamSection.vue' },
   { path: 'components/marketing/about/AboutValuesSection.vue' },
-  { path: 'components/marketing/contact/ContactChannelsSection.vue' },
+  {
+    path: 'components/marketing/contact/ContactChannelsSection.vue',
+    allow: [{ pattern: 'border-navy-900', count: 1, reason: NAVY_ON_NAVY }],
+  },
   { path: 'components/marketing/contact/ContactFaqSection.vue' },
   { path: 'components/marketing/contact/ContactFormSection.vue' },
   {
@@ -106,6 +133,7 @@ const COMPONENTS: Component[] = [
       { pattern: 'fill="#faf6ee"', count: 1, reason: DECORATIVE_SVG },
       { pattern: 'fill="#e2674f"', count: 1, reason: DECORATIVE_SVG },
       { pattern: 'bg-white', count: 1, reason: `bouton blanc ${NAVY_BAND}` },
+      { pattern: 'text-navy-900', count: 1, reason: `encre du bouton blanc ${NAVY_BAND}` },
     ],
   },
   { path: 'components/marketing/contact/ContactPillGroup.vue' },
@@ -122,7 +150,10 @@ const COMPONENTS: Component[] = [
   { path: 'components/marketing/home/HomeDemoSection.vue' },
   {
     path: 'components/marketing/home/HomeFaqCtaSection.vue',
-    allow: [{ pattern: 'bg-white', count: 1, reason: `bouton blanc ${NAVY_BAND}` }],
+    allow: [
+      { pattern: 'bg-white', count: 1, reason: `bouton blanc ${NAVY_BAND}` },
+      { pattern: 'text-navy-900', count: 1, reason: `encre du bouton blanc ${NAVY_BAND}` },
+    ],
   },
   { path: 'components/marketing/home/HomeFaqSection.vue' },
   { path: 'components/marketing/home/HomeHeroSection.vue' },
@@ -191,17 +222,29 @@ const COMPONENTS: Component[] = [
   { path: 'components/marketing/home/HomeProofSections.vue' },
   { path: 'components/marketing/home/HomeSecuritySection.vue' },
   { path: 'components/marketing/home/HomeTestimonialsSection.vue' },
-  { path: 'components/marketing/pricing/PricingConfigurator.vue' },
+  {
+    path: 'components/marketing/pricing/PricingConfigurator.vue',
+    allow: [{ pattern: 'border-navy-900', count: 1, reason: NAVY_ON_NAVY }],
+  },
   { path: 'components/marketing/pricing/PricingConfiguratorModuleCard.vue' },
   {
     path: 'components/marketing/pricing/PricingDetailedTableSection.vue',
-    allow: [{ pattern: 'bg-white', count: 1, reason: `bouton blanc ${NAVY_BAND}` }],
+    allow: [
+      { pattern: 'bg-white', count: 1, reason: `bouton blanc ${NAVY_BAND}` },
+      { pattern: 'text-navy-900', count: 1, reason: `encre du bouton blanc ${NAVY_BAND}` },
+    ],
   },
   { path: 'components/marketing/pricing/PricingFaqSection.vue' },
-  { path: 'components/marketing/pricing/PricingPlansGrid.vue' },
+  {
+    path: 'components/marketing/pricing/PricingPlansGrid.vue',
+    allow: [{ pattern: 'ring-navy-600', count: 1, reason: NAVY_ON_NAVY }],
+  },
   {
     path: 'components/marketing/pricing/PricingROISection.vue',
-    allow: [{ pattern: 'bg-white', count: 1, reason: `bouton blanc ${NAVY_BAND}` }],
+    allow: [
+      { pattern: 'bg-white', count: 1, reason: `bouton blanc ${NAVY_BAND}` },
+      { pattern: 'text-navy-900', count: 1, reason: `encre du bouton blanc ${NAVY_BAND}` },
+    ],
   },
   { path: 'components/marketing/pricing/PricingTestimonialsSection.vue' },
   { path: 'components/marketing/simulator/SimulatorStepBoat.vue' },
@@ -211,6 +254,7 @@ const COMPONENTS: Component[] = [
   { path: 'components/planning/PlanningCalendarHourTasks.vue' },
   { path: 'components/planning/PlanningKanban.vue' },
   { path: 'components/planning/PlanningTaskGroup.vue' },
+  { path: 'components/reservations/ReservationTimeline.vue' },
   { path: 'components/settings/SettingsBillingExtraBoats.vue' },
   { path: 'components/settings/SettingsBillingModules.vue' },
   { path: 'components/settings/SettingsBillingUsageGauge.vue' },
@@ -219,6 +263,7 @@ const COMPONENTS: Component[] = [
   { path: 'components/settings/tabs/SettingsImportTab.vue' },
   { path: 'components/settings/tabs/SettingsMeTab.vue' },
   { path: 'pages/auth/forgot_password.vue' },
+  { path: 'pages/dashboard.vue' },
   { path: 'pages/auth/login.vue' },
   { path: 'pages/auth/reset_password.vue' },
   { path: 'pages/auth/signup.vue' },
@@ -324,6 +369,11 @@ describe('dark mode (#416) · cohérence de la table', () => {
       '<div class="text-[#ff0000]">',
       '<div style="background: #ff0000">',
       '<path fill="#ff0000" />',
+      // #457 — navy pâle en fond, navy foncé en encre : les deux rôles que
+      // `[data-theme='dark']` ne réinverse pas.
+      '<div class="bg-navy-25">',
+      '<div class="bg-navy-100 text-navy-700">',
+      '<div class="border-navy-900">',
     ]
 
     for (const sample of samples) {
@@ -336,6 +386,10 @@ describe('dark mode (#416) · cohérence de la table', () => {
       '<div class="bg-brand text-on-brand">',
       '<div class="bg-white/10 text-white/60">',
       '<div class="bg-mint-100 text-mint-700">',
+      // La recette du panneau navy permanent : aplat foncé, encre claire.
+      '<div class="bg-navy-900 text-navy-100">',
+      // Tons moyens : lisibles des deux côtés, jamais réinversés donc jamais faux.
+      '<div class="bg-navy-500 text-white">',
       '<path fill="var(--color-fg)" />',
       '<!-- bg-red-100 dans un commentaire ne compte pas -->',
     ]

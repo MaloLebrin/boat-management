@@ -26,7 +26,7 @@ const expanded = ref(false)
           maintenanceSubjectLabel(t, group.subject)
         }}</span>
         <span
-          class="inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-soft px-1 text-xs font-semibold text-navy-700"
+          class="inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-soft px-1 text-xs font-semibold text-brand"
         >
           {{ group.tasks.length }}
         </span>

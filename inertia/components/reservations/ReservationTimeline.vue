@@ -136,7 +136,7 @@ const monthEnd = computed(
               v-for="day in days"
               :key="day"
               class="w-8 shrink-0 text-center text-xs text-fg-muted"
-              :class="isToday(day) ? 'font-bold text-navy-600' : ''"
+              :class="isToday(day) ? 'font-bold text-brand' : ''"
             >
               {{ day }}
               <span
