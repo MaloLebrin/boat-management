@@ -121,6 +121,13 @@ Les cartes de l'onglet Équipement exposent un lien « voir le détail » vers c
 - **Plan ≠ abonnement** : `plan` est une colonne de `organizations`, `subscription` l'abonnement Stripe actif. Tout libellé qui les confond finit par nier au client un plan qu'il possède — c'est le bug #456. Les libellés « Nécessite un plan Pro actif » sont réservés au vrai Starter.
 - Écrans gatés (`/invoices`, `/pricing/seasons`, `/clients`, `/settings/ai`, `/settings/branding`) : la redirection d'upsell vise `/settings/billing` (`BILLING_SETTINGS_PATH`) et **jamais** `/`, qui redirige sur `/en` — le layout public ne rend aucun toast, le flash y serait perdu (#456).
 
+## Pages d'erreur (403 / 404 / 500)
+
+- Pages : `inertia/pages/errors/{forbidden,not_found,server_error}.vue`, layout `inertia/layouts/error.vue`.
+- **Le layout se choisit selon la session** (#458) : coquille applicative (`default.vue`, sidebar + notifications) quand `props.user` est présent, `public.vue` sinon. Les trois pages tenaient auparavant sur le layout public : un utilisateur connecté qui tombait sur une erreur atterrissait sur l'habillage marketing et perdait toute la navigation.
+- **Lien de sortie** : `use_error_page.ts` (`useErrorPageExit(cléAction)`) → `/dashboard` + le libellé de la page pour un utilisateur connecté (chaque rôle y a une vue dédiée via `HomeController#index`), `/` + `errors.backHome` pour un visiteur anonyme — `/dashboard` le renverrait sur l'écran de connexion.
+- **Qui rend ces pages** : les `statusPages` de `app/exceptions/handler.ts` (404, 5xx) **et**, pour un refus d'ACL, une branche explicite du même handler. `E_AUTHORIZATION_FAILURE` est auto-gérée (elle porte sa propre `handle()`) : le handler de base la court-circuite avant d'atteindre les `statusPages`, et un GET HTML recevait `Access denied` en texte nu (#458). Seules les navigations HTML non-formulaire sont détournées vers `errors/forbidden` ; POST/PUT/PATCH/DELETE gardent le flash + retour en arrière de Bouncer, et les clients JSON son payload d'erreur.
+
 ## Layout authentifié — navigation & notifications
 
 - Layout `inertia/layouts/default.vue` : sidebar desktop `AsideMenu.vue` (`hidden lg:flex`) + barre header mobile (`lg:hidden`, hamburger). Sections de nav construites par `use_nav_sections.ts`.
