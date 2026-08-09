@@ -14,15 +14,15 @@ vi.mock('@inertiajs/vue3', () => ({
   usePage: () => ({
     props: {
       appT: {
-        'offline.queue.title':
+        'common.offline.queue.title':
           '{count, plural, one {# action en attente} other {# actions en attente}}',
-        'offline.queue.syncNow': 'Synchroniser',
-        'offline.queue.cancel': 'Annuler',
-        'offline.queue.cancelled': 'Action annulée',
-        'offline.queue.cancelAriaLabel': "Annuler l'action : {type}",
-        'offline.queue.type.create-navigation-log': 'Nouvelle sortie',
-        'offline.queue.type.create-fuel-log': 'Avitaillement',
-        'offline.syncing': 'Synchronisation en cours…',
+        'common.offline.queue.syncNow': 'Synchroniser',
+        'common.offline.queue.cancel': 'Annuler',
+        'common.offline.queue.cancelled': 'Action annulée',
+        'common.offline.queue.cancelAriaLabel': "Annuler l'action : {type}",
+        'common.offline.queue.type.create-navigation-log': 'Nouvelle sortie',
+        'common.offline.queue.type.create-fuel-log': 'Avitaillement',
+        'common.offline.syncing': 'Synchronisation en cours…',
       },
       locale: 'fr',
       flash: {},

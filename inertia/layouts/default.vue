@@ -139,7 +139,7 @@ onBeforeUnmount(() => {
         v-if="!isOnline"
         class="bg-amber-500 text-white text-sm font-medium text-center py-1.5 px-4 shrink-0"
       >
-        {{ t('offline.banner') }}
+        {{ t('common.offline.banner') }}
       </div>
 
       <!-- Scrollable content area -->

@@ -81,6 +81,19 @@ describe('useNetworkStatus', () => {
     expect(result.isOnline.value).toBe(true)
   })
 
+  // Issue #459 — en SSR (Node ≥ 21) `navigator` existe mais `navigator.onLine`
+  // vaut `undefined` : l'état devait rester « en ligne », sinon la bannière
+  // hors-ligne est rendue dans le HTML SSR et clignote jusqu'à l'hydratation.
+  test('isOnline stays true when navigator.onLine is undefined (SSR)', () => {
+    Object.defineProperty(navigator, 'onLine', {
+      value: undefined,
+      writable: true,
+      configurable: true,
+    })
+    const { result } = mountComposable()
+    expect(result.isOnline.value).toBe(true)
+  })
+
   test('removes event listeners on unmount', () => {
     const removeSpy = vi.spyOn(window, 'removeEventListener')
     const { wrapper } = mountComposable()

@@ -16,6 +16,6 @@ export function usePwaUpdate() {
   })
 
   watch(offlineReady, (ready) => {
-    if (ready) toast.success(t('pwa.offlineReady'))
+    if (ready) toast.success(t('common.pwa.offlineReady'))
   })
 }

@@ -63,7 +63,7 @@ export function useOfflineQueue() {
     const db = await getDb()
     await db.add(STORE_NAME, { ...action, createdAt: new Date().toISOString() })
     await refreshCount()
-    toast.info(t('offline.savedQueue'))
+    toast.info(t('common.offline.savedQueue'))
   }
 
   async function drainQueue() {
@@ -78,7 +78,7 @@ export function useOfflineQueue() {
 
     const totalCount = actions.length
     const action = actions[0]
-    toast.info(t('offline.syncing'))
+    toast.info(t('common.offline.syncing'))
 
     // Track whether onSuccess or onError ran so onFinish can detect 5xx/network errors.
     let settled = false
@@ -100,7 +100,7 @@ export function useOfflineQueue() {
         await refreshCount()
         isSyncing.value = false
         if (pendingCount.value === 0) {
-          toast.success(t('offline.syncSuccess', { count: String(totalCount) }))
+          toast.success(t('common.offline.syncSuccess', { count: String(totalCount) }))
         } else {
           await drainQueue()
         }
@@ -111,7 +111,7 @@ export function useOfflineQueue() {
         await db.delete(STORE_NAME, action.id)
         await refreshCount()
         isSyncing.value = false
-        toast.error(t('offline.syncError'))
+        toast.error(t('common.offline.syncError'))
       },
       // On 5xx or unexpected network error, onSuccess/onError are not called.
       // Keep the action in the queue and reset the guard so the next reconnect can retry.
@@ -147,9 +147,9 @@ export function useOfflineQueue() {
         payload: { ...action.payload, _expectedUpdatedAt: serverUpdatedAt },
         createdAt: action.createdAt,
       })
-      toast.info(t('offline.conflict.kept'))
+      toast.info(t('common.offline.conflict.kept'))
     } else {
-      toast.info(t('offline.conflict.discarded'))
+      toast.info(t('common.offline.conflict.discarded'))
     }
 
     await refreshCount()
@@ -164,7 +164,7 @@ export function useOfflineQueue() {
     const db = await getDb()
     await db.delete(STORE_NAME, id)
     await refreshCount()
-    toast.info(t('offline.queue.cancelled'))
+    toast.info(t('common.offline.queue.cancelled'))
   }
 
   if (!countInitialized) {
