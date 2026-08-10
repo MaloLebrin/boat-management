@@ -11,7 +11,7 @@ function formatDate(iso: string): string {
 }
 
 function labelForType(type: string): string {
-  const key = `offline.queue.type.${type}`
+  const key = `common.offline.queue.type.${type}`
   const result = t(key)
   return result === key ? type : result
 }
@@ -24,10 +24,10 @@ function labelForType(type: string): string {
   >
     <div class="flex items-center justify-between gap-3">
       <h3 class="text-sm font-semibold text-amber-900">
-        {{ t('offline.queue.title', { count: String(pendingActions.length) }) }}
+        {{ t('common.offline.queue.title', { count: String(pendingActions.length) }) }}
       </h3>
       <BaseButton variant="ghost" size="sm" :disabled="isSyncing" @click="drainQueue">
-        {{ isSyncing ? t('offline.syncing') : t('offline.queue.syncNow') }}
+        {{ isSyncing ? t('common.offline.syncing') : t('common.offline.queue.syncNow') }}
       </BaseButton>
     </div>
 
@@ -45,10 +45,12 @@ function labelForType(type: string): string {
           variant="danger"
           size="sm"
           :disabled="isSyncing"
-          :aria-label="t('offline.queue.cancelAriaLabel', { type: labelForType(action.type) })"
+          :aria-label="
+            t('common.offline.queue.cancelAriaLabel', { type: labelForType(action.type) })
+          "
           @click="cancelAction(action.id!)"
         >
-          {{ t('offline.queue.cancel') }}
+          {{ t('common.offline.queue.cancel') }}
         </BaseButton>
       </li>
     </ul>

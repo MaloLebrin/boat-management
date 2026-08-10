@@ -31,7 +31,7 @@ const rows = computed(() => {
       const server = props.conflict.serverData[key]
       return {
         key,
-        label: t(`navigationLog.field.${key}`),
+        label: t(`common.navigationLog.field.${key}`),
         local: local ?? null,
         server: server ?? null,
         differs: String(local ?? '') !== String(server ?? ''),
@@ -56,8 +56,8 @@ function fmt(val: unknown): string {
       >
         <!-- Header -->
         <div class="px-6 pt-6 pb-4 border-b border-border">
-          <h2 class="text-lg font-semibold text-fg">{{ t('offline.conflict.title') }}</h2>
-          <p class="mt-1 text-sm text-fg-muted">{{ t('offline.conflict.description') }}</p>
+          <h2 class="text-lg font-semibold text-fg">{{ t('common.offline.conflict.title') }}</h2>
+          <p class="mt-1 text-sm text-fg-muted">{{ t('common.offline.conflict.description') }}</p>
         </div>
 
         <!-- Comparison grid -->
@@ -65,10 +65,10 @@ function fmt(val: unknown): string {
           <div class="grid grid-cols-[auto_1fr_1fr] gap-x-4 text-sm">
             <div class="pb-2 font-medium text-fg-subtle text-xs uppercase tracking-wide"></div>
             <div class="pb-2 font-semibold text-amber-600 text-xs uppercase tracking-wide">
-              {{ t('offline.conflict.localVersion') }}
+              {{ t('common.offline.conflict.localVersion') }}
             </div>
             <div class="pb-2 font-semibold text-info text-xs uppercase tracking-wide">
-              {{ t('offline.conflict.serverVersion') }}
+              {{ t('common.offline.conflict.serverVersion') }}
             </div>
 
             <template v-for="row in rows" :key="row.key">
@@ -94,10 +94,10 @@ function fmt(val: unknown): string {
         <!-- Actions -->
         <div class="px-6 py-4 border-t border-border flex justify-end gap-3">
           <BaseButton variant="secondary" @click="emit('resolve', 'server')">
-            {{ t('offline.conflict.keepServer') }}
+            {{ t('common.offline.conflict.keepServer') }}
           </BaseButton>
           <BaseButton variant="primary" @click="emit('resolve', 'local')">
-            {{ t('offline.conflict.keepLocal') }}
+            {{ t('common.offline.conflict.keepLocal') }}
           </BaseButton>
         </div>
       </div>
