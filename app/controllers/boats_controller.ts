@@ -1,7 +1,7 @@
 import { SpotNotFoundError } from '#exceptions/port_errors'
 import { boatOwnerPortalRedirect } from '#utils/staff_route_guard'
 import { QuotaExceededError } from '#exceptions/quota_errors'
-import AiAnalysisService, { type AiSuggestion } from '#services/ai_analysis_service'
+import AiAnalysisService from '#services/ai_analysis_service'
 import AuditLogService from '#services/audit_log_service'
 import BoatDocumentService from '#services/boat_document_service'
 import BoatEquipmentActionService from '#services/boat_equipment_action_service'
@@ -25,6 +25,8 @@ import OrganizationService from '#services/organization_service'
 import PortService from '#services/port_service'
 import QuotaService from '#services/quota_service'
 import SpotService from '#services/spot_service'
+import { toAppLocale } from '#shared/helpers/locale_path'
+import type { AiSuggestion } from '#shared/types/ai'
 import BoatPolicy from '#policies/boat_policy'
 import EquipmentActionPolicy from '#policies/equipment_action_policy'
 import FuelLogPolicy from '#policies/fuel_log_policy'
@@ -151,7 +153,7 @@ export default class BoatsController {
     }
   }
 
-  async show({ inertia, params, auth, response, bouncer }: HttpContext) {
+  async show({ inertia, params, auth, response, bouncer, i18n }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
@@ -192,7 +194,12 @@ export default class BoatsController {
         this.mediaService.listForEntity('boat', boat.id),
         this.boatService.getPositionHistory(boat.id),
         user.organizationId
-          ? this.aiAnalysisService.getLatestBoatSuggestions(user.id, boat.id, user.organizationId)
+          ? this.aiAnalysisService.getLatestBoatSuggestions(
+              user.id,
+              boat.id,
+              user.organizationId,
+              toAppLocale(i18n.locale)
+            )
           : Promise.resolve(null),
         bouncer.with(BoatPolicy).allows('edit', boat),
         this.documentService.listForBoat(user, boat),

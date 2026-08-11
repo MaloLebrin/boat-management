@@ -2,6 +2,17 @@ export const APP_LOCALES = ['en', 'fr'] as const
 
 export type AppLocale = (typeof APP_LOCALES)[number]
 
+export const DEFAULT_APP_LOCALE: AppLocale = 'fr'
+
+/**
+ * Narrows an arbitrary locale string (`i18n.locale`, a cookie, a profile field)
+ * to a locale the app actually supports. Anything unknown falls back to the
+ * default locale rather than leaking a bogus tag downstream.
+ */
+export function toAppLocale(locale: string | null | undefined): AppLocale {
+  return APP_LOCALES.includes(locale as AppLocale) ? (locale as AppLocale) : DEFAULT_APP_LOCALE
+}
+
 const LOCALE_PREFIX = /^\/(en|fr)(?=\/|$)/
 
 /** Paths that differ between locales (suffix after /en or /fr). */
