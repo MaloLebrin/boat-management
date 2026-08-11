@@ -138,6 +138,19 @@ Messages du formulaire de contact public (`POST /contact`, #450). Table autonome
 - `createdAt`
 - index sur `email` et `created_at`
 
+### ai_analyses
+
+Résultats de génération de l'assistant IA : suggestions de flotte (dashboard) et suggestions par bateau. Une ligne par génération — l'UI n'affiche que la plus récente et l'historique sert d'archive.
+
+- `id`
+- `userId`, `organizationId` (nullable — l'org scope les lectures depuis #H-01)
+- `boatId` (nullable — `null` pour une analyse de flotte)
+- `kind` : `fleet_analysis | boat_suggestions`
+- `locale` (`fr` par défaut, #460) — langue dans laquelle les suggestions ont été rédigées. Le texte étant produit librement par le modèle, il est intraduisible après coup : les lectures filtrent dessus pour ne jamais servir des suggestions françaises à une UI anglaise (et inversement)
+- `responseText` (JSON sérialisé : `[{ "text": "…" }]`)
+- `createdAt`
+- index sur `(organization_id, kind)` et `(organization_id, kind, locale)`
+
 ## Relations (résumé)
 
 - `Organization 1..n User` via `users.organizationId`
@@ -147,6 +160,7 @@ Messages du formulaire de contact public (`POST /contact`, #450). Table autonome
 - `BoatMaintenanceEvent 1..n BoatMaintenancePart`
 - `Boat 1..n BoatPortStay`
 - `Boat 1..n BoatBudgetEntry`
+- `User 1..n AiAnalysis` via `ai_analyses.userId` (`organizationId` scope les lectures, `boatId` distingue flotte et bateau)
 
 ## Seed (données démo)
 
