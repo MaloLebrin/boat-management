@@ -4,9 +4,9 @@ import { useForm, router } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import { useCurrencyFormat } from '~/composables/use_currency_format'
+import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import type { BoatPortStayItem } from '#shared/types/budget'
-import { parseDisplayDate } from '~/utils/local_datetime'
 
 const props = defineProps<{
   boatId: number
@@ -16,6 +16,7 @@ const props = defineProps<{
 
 const { t } = useT()
 const { formatCurrency } = useCurrencyFormat()
+const { formatDate } = useDateFormat()
 
 const editingId = ref<number | null>(null)
 const editForm = useForm({
@@ -55,11 +56,6 @@ function deleteStay(stayId: number) {
   router.delete(`/boats/${props.boatId}/port-stays/${stayId}`, {
     preserveScroll: true,
   })
-}
-
-function formatDate(dateStr: string | null): string {
-  if (!dateStr) return '—'
-  return parseDisplayDate(dateStr).toLocaleDateString()
 }
 </script>
 

@@ -9,8 +9,8 @@ vi.mock('@inertiajs/vue3', () => ({
   usePage: () => ({ props: { appT: {}, locale: 'en' } }),
 }))
 
-vi.mock('~/composables/use_reservation_format', () => ({
-  useReservationFormat: () => ({ formatDate: (s: string) => s.slice(0, 10) }),
+vi.mock('~/composables/use_date_format', () => ({
+  useDateFormat: () => ({ formatDate: (s: string) => s.slice(0, 10) }),
 }))
 
 vi.mock('~/components/base/BaseButton.vue', () => ({

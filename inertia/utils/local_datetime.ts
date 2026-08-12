@@ -16,6 +16,20 @@ export function toDatetimeLocalValue(date: Date): string {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`
 }
 
+/**
+ * Formats a Date as the `YYYY-MM-DD` value a `<input type="date">` expects.
+ * This is a machine format, never shown to the user — user-facing dates go
+ * through `useDateFormat()`.
+ */
+export function toDateInputValue(date: Date): string {
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
+}
+
+/** Today's local calendar day, ready to prefill a `date` input. */
+export function todayDateInputValue(): string {
+  return toDateInputValue(new Date())
+}
+
 /** Current local wall-clock, ready to prefill a `datetime-local` input. */
 export function nowDatetimeLocalValue(): string {
   return toDatetimeLocalValue(new Date())
@@ -35,20 +49,8 @@ export function tzOffsetMinutes(): number {
   return new Date().getTimezoneOffset()
 }
 
-/** Calendar dates are serialised by the transformers as `YYYY-MM-DD` (`toISODate()`). */
-const PLAIN_DATE = /^\d{4}-\d{2}-\d{2}$/
-
 /**
- * Parses a value coming from the backend for display.
- *
- * `new Date('2026-08-03')` is spec'd to parse as UTC midnight, so rendering it in
- * the browser zone slides the day back for any negative offset (a fuel log filled
- * on Aug 3 shows Aug 2 in UTC-5 — see #452). A calendar date carries no instant:
- * anchor it at local midnight so it renders as the same day everywhere.
- * Full ISO timestamps are real instants and keep their local rendering.
+ * Re-exported for the components that still parse a backend date by hand.
+ * Rendering one goes through `useDateFormat()`, which parses it the same way.
  */
-export function parseDisplayDate(iso: string): Date {
-  if (!PLAIN_DATE.test(iso)) return new Date(iso)
-  const [year, month, day] = iso.split('-').map(Number)
-  return new Date(year, month - 1, day)
-}
+export { parseDisplayDate } from '../../shared/helpers/date_format'

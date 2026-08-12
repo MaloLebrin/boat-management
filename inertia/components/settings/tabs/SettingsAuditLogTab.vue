@@ -7,10 +7,12 @@ import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseEmptyState from '~/components/base/BaseEmptyState.vue'
 import BasePagination from '~/components/base/BasePagination.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
+import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import type { AuditLogPage, AuditLogFilters, AuditAction } from '../../../../shared/types/audit_log'
 
 const { t } = useT()
+const { formatDateTime } = useDateFormat()
 
 const props = defineProps<{
   auditLog: AuditLogPage
@@ -77,10 +79,6 @@ function actionVariant(action: AuditAction): 'neutral' | 'success' | 'warning' |
   if (action.endsWith('.create') || action.endsWith('.add')) return 'info'
   return 'neutral'
 }
-
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleString()
-}
 </script>
 
 <template>
@@ -143,7 +141,7 @@ function formatDate(iso: string): string {
               class="border-b border-border last:border-0 hover:bg-surface-muted"
             >
               <td class="px-4 py-3 text-fg-muted whitespace-nowrap">
-                {{ formatDate(entry.createdAt) }}
+                {{ formatDateTime(entry.createdAt) }}
               </td>
               <td class="px-4 py-3">
                 <div class="font-medium">

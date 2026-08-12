@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseEmptyState from '~/components/base/BaseEmptyState.vue'
+import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 
 interface OwnerMaintenanceEvent {
@@ -18,10 +19,7 @@ defineProps<{
 }>()
 
 const { t } = useT()
-
-function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString()
-}
+const { formatDate } = useDateFormat()
 </script>
 
 <template>

@@ -8,6 +8,7 @@ import SettingsBillingFeatureList from '~/components/settings/SettingsBillingFea
 import SettingsBillingModules from '~/components/settings/SettingsBillingModules.vue'
 import SettingsBillingExtraBoats from '~/components/settings/SettingsBillingExtraBoats.vue'
 import SettingsBillingSubscriptionNotice from '~/components/settings/SettingsBillingSubscriptionNotice.vue'
+import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import type {
   ActiveAddonInfo,
@@ -26,6 +27,7 @@ import { useForm } from '@inertiajs/vue3'
 import { usePermissions } from '~/composables/use_permissions'
 
 const { t } = useT()
+const { formatDateLong } = useDateFormat()
 const { can } = usePermissions()
 const canManageBilling = computed(() => can('subscription.manage'))
 
@@ -51,14 +53,6 @@ function startCheckout(planTier: 'pro' | 'enterprise') {
 
 function openPortal() {
   portalForm.post('/settings/billing/portal')
-}
-
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString(undefined, {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  })
 }
 
 const statusVariant = computed((): 'success' | 'warning' | 'neutral' => {
@@ -109,7 +103,7 @@ const storageOverflow = computed(() => {
             <p v-if="!subscription.cancelAtPeriodEnd" class="text-fg-muted">
               {{
                 t('settings.billing.subscription.renewsOn', {
-                  date: formatDate(subscription.currentPeriodEnd),
+                  date: formatDateLong(subscription.currentPeriodEnd),
                 })
               }}
               &mdash;
@@ -117,7 +111,7 @@ const storageOverflow = computed(() => {
             </p>
             <p v-else class="text-amber-600 font-medium">
               {{ t('settings.billing.subscription.cancelAtPeriodEnd') }}
-              {{ formatDate(subscription.currentPeriodEnd) }}
+              {{ formatDateLong(subscription.currentPeriodEnd) }}
             </p>
           </div>
 

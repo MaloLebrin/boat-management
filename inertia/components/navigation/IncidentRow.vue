@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import BaseBadge from '~/components/base/BaseBadge.vue'
+import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import type { FleetIncidentRow } from '../../../shared/types/navigation'
 
-const { t, locale } = useT()
+const { t } = useT()
+const { formatDate } = useDateFormat()
 
 defineProps<{ row: FleetIncidentRow }>()
 
@@ -11,14 +13,6 @@ const statusVariant: Record<string, 'danger' | 'warning' | 'neutral'> = {
   open: 'danger',
   in_progress: 'warning',
   closed: 'neutral',
-}
-
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString(locale.value, {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  })
 }
 </script>
 

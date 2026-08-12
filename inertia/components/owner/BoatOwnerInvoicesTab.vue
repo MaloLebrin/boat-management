@@ -2,6 +2,7 @@
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseEmptyState from '~/components/base/BaseEmptyState.vue'
 import InvoiceStatusBadge from '~/components/invoices/InvoiceStatusBadge.vue'
+import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import type { InvoiceRow } from '../../../shared/types/invoice'
 
@@ -10,11 +11,7 @@ defineProps<{
 }>()
 
 const { t } = useT()
-
-function formatDate(dateStr: string | null): string {
-  if (!dateStr) return '-'
-  return new Date(dateStr).toLocaleDateString()
-}
+const { formatDate } = useDateFormat()
 </script>
 
 <template>

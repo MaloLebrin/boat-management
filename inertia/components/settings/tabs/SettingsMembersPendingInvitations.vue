@@ -4,6 +4,7 @@ import BaseCard from '~/components/base/BaseCard.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
+import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import type { OrganizationInvitationData } from '../../../../shared/types/organization'
 
@@ -11,16 +12,8 @@ defineProps<{
   invitations: OrganizationInvitationData[]
 }>()
 
-const { t, locale } = useT()
-
-function formatDate(dateStr: string): string {
-  const date = new Date(dateStr)
-  return date.toLocaleDateString(locale.value === 'fr' ? 'fr-FR' : 'en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  })
-}
+const { t } = useT()
+const { formatDate } = useDateFormat()
 
 function cancelInvitation(id: number) {
   router.delete(`/organization/invitations/${id}`, { preserveScroll: true })

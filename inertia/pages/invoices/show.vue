@@ -9,6 +9,7 @@ import BaseConfirmModal from '~/components/base/BaseConfirmModal.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import InvoiceStatusBadge from '~/components/invoices/InvoiceStatusBadge.vue'
 import InvoiceLinesCard from '~/components/invoices/InvoiceLinesCard.vue'
+import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import type { InvoiceDetail } from '../../../shared/types/invoice'
 
@@ -18,6 +19,7 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
+const { formatDate } = useDateFormat()
 const page = usePage()
 
 const flash = computed(() => page.props.flash as { error?: string; success?: string } | undefined)
@@ -84,11 +86,6 @@ function markPaid() {
       },
     }
   )
-}
-
-function formatDate(dateStr: string | null): string {
-  if (!dateStr) return '-'
-  return new Date(dateStr).toLocaleDateString()
 }
 
 function executeDelete() {
