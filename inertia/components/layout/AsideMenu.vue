@@ -7,6 +7,7 @@ import Logo from '~/components/Logo.vue'
 import LanguageSwitcher from '~/components/layout/LanguageSwitcher.vue'
 import ThemeSwitcher from '~/components/layout/ThemeSwitcher.vue'
 import NavItem from '~/components/layout/NavItem.vue'
+import NavScrollArea from '~/components/layout/NavScrollArea.vue'
 import NotificationBell from '~/components/layout/NotificationBell.vue'
 import { useNavSections } from '~/composables/use_nav_sections'
 import { usePwaInstall } from '~/composables/use_pwa_install'
@@ -49,7 +50,7 @@ function isActive(path: string): boolean {
     </div>
 
     <!-- Navigation -->
-    <nav class="flex-1 min-h-0 overflow-y-auto px-3 py-4">
+    <NavScrollArea>
       <div v-for="section in navSections" :key="section.label" class="mb-6">
         <p class="px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-navy-300">
           {{ section.label }}
@@ -66,7 +67,7 @@ function isActive(path: string): boolean {
           </li>
         </ul>
       </div>
-    </nav>
+    </NavScrollArea>
 
     <!-- Settings (pinned) + User info + Logout -->
     <div class="mt-auto shrink-0 border-t border-navy-700 px-4 py-4">
