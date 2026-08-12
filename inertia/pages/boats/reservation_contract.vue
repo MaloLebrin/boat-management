@@ -3,7 +3,7 @@ import { computed } from 'vue'
 import { Head } from '@inertiajs/vue3'
 import BaseBreadcrumb from '~/components/base/BaseBreadcrumb.vue'
 import ContractPanel from '~/components/reservations/contract/ContractPanel.vue'
-import { useReservationFormat } from '~/composables/use_reservation_format'
+import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import type { BoatReservationRow } from '~/types/reservation'
 import type { RentalContractRow } from '~/types/rental_contract'
@@ -17,7 +17,7 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
-const { formatDate } = useReservationFormat()
+const { formatDate } = useDateFormat()
 
 const breadcrumbs = computed(() => [
   { label: t('nav.myBoats'), href: '/boats' },

@@ -10,7 +10,7 @@ import BaseHeading from '~/components/base/BaseHeading.vue'
 import ClientDocuments from '~/components/clients/ClientDocuments.vue'
 import ClientStatusBadge from '~/components/clients/ClientStatusBadge.vue'
 import ReservationStatusBadge from '~/components/reservations/ReservationStatusBadge.vue'
-import { useReservationFormat } from '~/composables/use_reservation_format'
+import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import type { ClientRow } from '../../../shared/types/client'
 import type { BoatReservationRow } from '../../../shared/types/reservation'
@@ -25,7 +25,7 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
-const { formatDate } = useReservationFormat()
+const { formatDate } = useDateFormat()
 
 const isAnonymizeModalOpen = ref(false)
 

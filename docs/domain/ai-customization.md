@@ -67,13 +67,15 @@ AiController.fleetAnalysis()
 AiAnalysisService.generateFleetAnalysis(
      userId,
      data,
+     locale,                ← toAppLocale(i18n.locale), #460
      org.aiSystemPrompt,    ← null si non configuré
      org.aiModelOverride    ← null si non configuré
 )
      │
+     │  systemPrompt  = buildSystemPrompt(locale)
      │  systemContent = orgSystemPrompt
-     │    ? `${orgSystemPrompt}\n\n${SYSTEM_PROMPT}`
-     │    : SYSTEM_PROMPT
+     │    ? `${orgSystemPrompt}\n\n${systemPrompt}`
+     │    : systemPrompt
      ▼
 AiService.chat(messages, orgModelOverride)
      │  model = orgModelOverride ?? this.#model   ← env var AI_MODEL
@@ -81,29 +83,34 @@ AiService.chat(messages, orgModelOverride)
 Mistral API
 ```
 
-**Ordre du prompt système** : le prompt de l'organisation est préfixé **avant** le `SYSTEM_PROMPT` interne. Cela permet à l'organisation de poser son contexte métier en premier, les instructions de format restant en second.
+**Ordre du prompt système** : le prompt de l'organisation est préfixé **avant** le prompt interne. Cela permet à l'organisation de poser son contexte métier en premier, les instructions de format restant en second.
+
+**Langue du prompt (#460)** : le prompt interne n'est plus une constante française mais le résultat de `buildSystemPrompt(locale)`, et le message utilisateur celui de `buildFleetUserMessage` / `buildBoatUserMessage`. Les deux moitiés basculent ensemble — traduire la seule consigne finale laisserait un contexte entièrement français, que le modèle suit. Le prompt de l'organisation, lui, n'est pas traduit : il est écrit par l'exploitant et reproduit tel quel.
+
+La locale utilisée est celle de la requête (`i18n.locale`, donc profil > cookie > `Accept-Language`), normalisée par `toAppLocale()`. Elle est stockée sur `ai_analyses.locale` et les lectures (`getLatestFleetAnalysis`, `getLatestBoatSuggestions`) filtrent dessus : une analyse générée en français n'est jamais servie à une UI anglaise, le panneau retombe sur son état vide et propose de relancer la génération.
 
 ---
 
 ## 3. Fichiers clés
 
-| Fichier                                                                                                                                                | Rôle                                                                 |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------- |
-| [`shared/types/plan.ts`](../../shared/types/plan.ts)                                                                                                   | `canCustomizeAI: boolean` dans `PlanQuotas` + `PLAN_LIMITS`          |
-| [`shared/types/ai.ts`](../../shared/types/ai.ts)                                                                                                       | `AI_MODEL_OVERRIDES`, `AiModelOverride`                              |
-| [`database/migrations/1790000000000_add_ai_settings_to_organizations.ts`](../../database/migrations/1790000000000_add_ai_settings_to_organizations.ts) | Colonnes `ai_system_prompt` + `ai_model_override`                    |
-| [`database/schema.ts`](../../database/schema.ts)                                                                                                       | `OrganizationSchema` — colonnes déclarées                            |
-| [`app/models/organization.ts`](../../app/models/organization.ts)                                                                                       | Modèle Lucid (hérite du schema)                                      |
-| [`app/validators/user.ts`](../../app/validators/user.ts)                                                                                               | `updateAiSettingsValidator`                                          |
-| [`app/services/ai_service.ts`](../../app/services/ai_service.ts)                                                                                       | `chat(messages, modelOverride?)`                                     |
-| [`app/services/ai_analysis_service.ts`](../../app/services/ai_analysis_service.ts)                                                                     | `generateFleetAnalysis(..., orgSystemPrompt?, orgModelOverride?)`    |
-| [`app/controllers/ai_controller.ts`](../../app/controllers/ai_controller.ts)                                                                           | Passe `aiSystemPrompt` + `aiModelOverride` aux calls                 |
-| [`app/controllers/settings_controller.ts`](../../app/controllers/settings_controller.ts)                                                               | `ai()` + `updateAiSettings()`                                        |
-| [`app/policies/organization_policy.ts`](../../app/policies/organization_policy.ts)                                                                     | `configureAI()` — retourne `false` (admins autorisés via `before()`) |
-| [`start/routes/settings.ts`](../../start/routes/settings.ts)                                                                                           | `GET/PUT /settings/ai`                                               |
-| [`inertia/pages/settings/ai.vue`](../../inertia/pages/settings/ai.vue)                                                                                 | Page Inertia                                                         |
-| [`inertia/components/settings/tabs/SettingsAiTab.vue`](../../inertia/components/settings/tabs/SettingsAiTab.vue)                                       | Formulaire (textarea + select modèle)                                |
-| [`inertia/components/settings/SettingsShell.vue`](../../inertia/components/settings/SettingsShell.vue)                                                 | Nav conditionnelle Enterprise                                        |
+| Fichier                                                                                                                                                | Rôle                                                                                            |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
+| [`shared/types/plan.ts`](../../shared/types/plan.ts)                                                                                                   | `canCustomizeAI: boolean` dans `PlanQuotas` + `PLAN_LIMITS`                                     |
+| [`shared/types/ai.ts`](../../shared/types/ai.ts)                                                                                                       | `AI_MODEL_OVERRIDES`, `AiModelOverride`                                                         |
+| [`database/migrations/1790000000000_add_ai_settings_to_organizations.ts`](../../database/migrations/1790000000000_add_ai_settings_to_organizations.ts) | Colonnes `ai_system_prompt` + `ai_model_override`                                               |
+| [`database/schema.ts`](../../database/schema.ts)                                                                                                       | `OrganizationSchema` — colonnes déclarées                                                       |
+| [`app/models/organization.ts`](../../app/models/organization.ts)                                                                                       | Modèle Lucid (hérite du schema)                                                                 |
+| [`app/validators/user.ts`](../../app/validators/user.ts)                                                                                               | `updateAiSettingsValidator`                                                                     |
+| [`app/services/ai_service.ts`](../../app/services/ai_service.ts)                                                                                       | `chat(messages, modelOverride?)`                                                                |
+| [`app/services/ai_analysis_service.ts`](../../app/services/ai_analysis_service.ts)                                                                     | `generateFleetAnalysis(..., locale, orgSystemPrompt?, orgModelOverride?)`                       |
+| [`app/services/ai_prompt_service.ts`](../../app/services/ai_prompt_service.ts)                                                                         | Prompts localisés (#460) : `buildSystemPrompt`, `buildFleetUserMessage`, `buildBoatUserMessage` |
+| [`app/controllers/ai_controller.ts`](../../app/controllers/ai_controller.ts)                                                                           | Passe `aiSystemPrompt` + `aiModelOverride` aux calls                                            |
+| [`app/controllers/settings_controller.ts`](../../app/controllers/settings_controller.ts)                                                               | `ai()` + `updateAiSettings()`                                                                   |
+| [`app/policies/organization_policy.ts`](../../app/policies/organization_policy.ts)                                                                     | `configureAI()` — retourne `false` (admins autorisés via `before()`)                            |
+| [`start/routes/settings.ts`](../../start/routes/settings.ts)                                                                                           | `GET/PUT /settings/ai`                                                                          |
+| [`inertia/pages/settings/ai.vue`](../../inertia/pages/settings/ai.vue)                                                                                 | Page Inertia                                                                                    |
+| [`inertia/components/settings/tabs/SettingsAiTab.vue`](../../inertia/components/settings/tabs/SettingsAiTab.vue)                                       | Formulaire (textarea + select modèle)                                                           |
+| [`inertia/components/settings/SettingsShell.vue`](../../inertia/components/settings/SettingsShell.vue)                                                 | Nav conditionnelle Enterprise                                                                   |
 
 ---
 

@@ -6,7 +6,7 @@ import BaseCard from '~/components/base/BaseCard.vue'
 import BaseEmptyState from '~/components/base/BaseEmptyState.vue'
 import ReservationEditModal from '~/components/reservations/ReservationEditModal.vue'
 import ReservationStatusBadge from '~/components/reservations/ReservationStatusBadge.vue'
-import { useReservationFormat } from '~/composables/use_reservation_format'
+import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import type { BoatPricingRow } from '#shared/types/boat_pricing'
 import type { PricingSeasonRow } from '#shared/types/pricing_season'
@@ -23,7 +23,7 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
-const { formatDate } = useReservationFormat()
+const { formatDate } = useDateFormat()
 
 const editingReservation = ref<BoatReservationRow | null>(null)
 const editModalOpen = ref(false)

@@ -114,6 +114,14 @@ L'app supporte un thème sombre (issue #416) piloté par l'attribut `data-theme`
 - Pas de ternaire inline `locale === 'fr' ? '...' : '...'` — utiliser `t()` à la place
 - Toute PR qui ajoute un composant ou une page doit ajouter les clés correspondantes dans les **deux locales** (`en` et `fr`)
 
+#### Dates et heures
+
+- **Toute date affichée passe par `useDateFormat()`** (`inertia/composables/use_date_format.ts`) — jamais `toLocaleDateString` / `toLocaleString` / `new Intl.DateTimeFormat` dans un composant (issue #461)
+- Un écran choisit un **style** dans le catalogue, il n'écrit pas ses propres options `Intl` : `formatDate` (tableaux/listes), `formatDateLong` (titres, cartes), `formatDayMonth`, `formatMonthYear`, `formatDateTime`, `formatTime`, `formatWeekdayDay`, `formatWeekdayShort`. Il manque un cas ? Ajouter un style dans `shared/helpers/date_format.ts`, pas un appel local
+- Sans locale explicite, `Intl` suit le **navigateur** (et non l'app) : c'est ce qui faisait cohabiter trois formats dans une même session EN
+- Côté backend (PDF, e-mails), importer `#shared/helpers/date_format` et passer `i18n.locale` — jamais la locale du serveur
+- `YYYY-MM-DD` pour un `<input type="date">` est un **format machine** : `todayDateInputValue()` / `toDateInputValue()` (`inertia/utils/local_datetime.ts`), pas une locale détournée comme `'en-CA'`
+
 #### Tutoiement / vouvoiement (FR)
 
 - **Marketing (`marketing.json`, pages publiques `home`, `pricing`, `about`, `contact`, `guide`…) : tutoiement.** Le site s'adresse au visiteur en "tu" du hero à la FAQ, y compris dans les questions/réponses qui s'adressent au lecteur.
@@ -180,6 +188,7 @@ tests/
 - **Écrire du texte visible en dur dans un template Vue** (→ utiliser `t('clé')`)
 - **Utiliser une couleur Tailwind par défaut ou un hex brut dans un composant d'UI** (→ tokens sémantiques ou palettes de marque, sinon le thème sombre casse)
 - **Utiliser des ternaires `locale === 'fr' ? ... : ...`** (→ utiliser `t()` avec clé dans les deux JSON)
+- **Appeler `toLocaleDateString` / `toLocaleString` / `Intl.DateTimeFormat` dans un composant ou un service** (→ `useDateFormat()` côté Inertia, `#shared/helpers/date_format` + `i18n.locale` côté backend)
 - **`fetch` / `axios` + JSON + CSRF manuel dans `inertia/**`** pour des mutations déjà couvertes par une page Inertia (→ `router.patch`/`useForm`/`<Form>`+`response.redirect().back()` côté contrôleur)
 - **`response.json({ ok: true })` sur des routes appelées depuis l’UI Inertia** (→ redirection ; réserver le JSON aux vraies routes API)
 - **Ancre `<a href="...">` pour une navigation interne** (→ `<Link>` d'Inertia ; `<a>` seulement pour liens externes/`mailto:`/`tel:`)

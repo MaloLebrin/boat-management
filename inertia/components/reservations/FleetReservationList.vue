@@ -6,7 +6,7 @@ import BaseCard from '~/components/base/BaseCard.vue'
 import BaseEmptyState from '~/components/base/BaseEmptyState.vue'
 import ReservationCreateButton from '~/components/reservations/ReservationCreateButton.vue'
 import ReservationStatusBadge from '~/components/reservations/ReservationStatusBadge.vue'
-import { useReservationFormat } from '~/composables/use_reservation_format'
+import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import type { BoatReservationRow, FleetBoatOption } from '~/types/reservation'
 
@@ -18,7 +18,7 @@ defineProps<{
 }>()
 
 const { t } = useT()
-const { formatDate } = useReservationFormat()
+const { formatDate } = useDateFormat()
 
 function createQuote(reservationId: number) {
   router.post(`/invoices/from-reservation/${reservationId}`, {}, { preserveScroll: true })

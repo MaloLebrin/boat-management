@@ -1,6 +1,7 @@
 import type Invoice from '#models/invoice'
 import type Organization from '#models/organization'
 import type { I18n } from '@adonisjs/i18n'
+import { formatDate } from '#shared/helpers/date_format'
 import { inject } from '@adonisjs/core'
 import PDFDocument from 'pdfkit'
 import { PLAN_LIMITS } from '#shared/types/plan'
@@ -40,7 +41,7 @@ export default class InvoicePdfService {
     const primaryColor =
       canWhiteLabel && org.primaryColor ? org.primaryColor : DEFAULT_PRIMARY_COLOR
 
-    await this.#renderHeader(doc, invoice, org, primaryColor, canWhiteLabel, t)
+    await this.#renderHeader(doc, invoice, org, primaryColor, canWhiteLabel, t, i18n.locale)
     this.#renderMetadata(doc, invoice, t)
     this.#renderLinesTable(doc, invoice, primaryColor, t)
     this.#renderTotals(doc, invoice, t)
@@ -64,7 +65,8 @@ export default class InvoicePdfService {
     org: Organization,
     primaryColor: string,
     canWhiteLabel: boolean,
-    t: (key: string, data?: Record<string, string>) => string
+    t: (key: string, data?: Record<string, string>) => string,
+    locale: string
   ): Promise<void> {
     const HEADER_H = 100
 
@@ -100,7 +102,7 @@ export default class InvoicePdfService {
       .fillColor(GREY_M)
       .fontSize(8)
       .font('Helvetica')
-      .text(t('generatedOn', { date: new Date().toLocaleDateString() }), textX, 75)
+      .text(t('generatedOn', { date: formatDate(new Date(), locale) }), textX, 75)
 
     // Accent bar
     doc.rect(0, HEADER_H, PAGE_W, 3).fill(CORAL)

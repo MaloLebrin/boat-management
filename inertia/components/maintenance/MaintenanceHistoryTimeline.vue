@@ -2,13 +2,15 @@
 import { computed, ref } from 'vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import type { MaintenanceEventRow } from '#shared/types/maintenance'
+import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 
 const props = defineProps<{
   events: MaintenanceEventRow[]
 }>()
 
-const { t, locale } = useT()
+const { t } = useT()
+const { formatMonthYear } = useDateFormat()
 
 const expandedIds = ref<Set<number>>(new Set())
 
@@ -23,10 +25,7 @@ const eventsByMonth = computed(() => {
 })
 
 function formatMonthHeader(yearMonth: string): string {
-  return new Date(yearMonth + '-01').toLocaleDateString(locale.value, {
-    month: 'long',
-    year: 'numeric',
-  })
+  return formatMonthYear(`${yearMonth}-01`)
 }
 
 function getDayNumber(iso: string): string {

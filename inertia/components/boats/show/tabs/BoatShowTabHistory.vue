@@ -7,6 +7,7 @@ import BaseCard from '~/components/base/BaseCard.vue'
 import BaseSegmentedControl from '~/components/base/BaseSegmentedControl.vue'
 import { subjectLabel, targetDescription } from '~/components/boats/maintenance/utils'
 import BoatMaintenanceEventModal from '~/components/boats/show/modals/BoatMaintenanceEventModal.vue'
+import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import type { BoatCreateIntent, BoatShowDetail, MaintenanceEventRow } from '~/types/boat_show'
 
@@ -24,6 +25,7 @@ const props = withDefaults(
 const emit = defineEmits<{ createIntentConsumed: [] }>()
 
 const { t } = useT()
+const { formatMonthYear } = useDateFormat()
 
 const isEventModalOpen = ref(false)
 
@@ -82,9 +84,7 @@ const historyStats = computed(() => {
 })
 
 function formatMonth(monthKey: string): string {
-  const [year, month] = monthKey.split('-')
-  const date = new Date(Number(year), Number(month) - 1, 1)
-  return date.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })
+  return formatMonthYear(`${monthKey}-01`)
 }
 
 function toggleEventDetails(eventId: number) {

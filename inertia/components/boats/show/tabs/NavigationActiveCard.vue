@@ -7,6 +7,8 @@ import BaseInput from '~/components/base/BaseInput.vue'
 import NavigationLogUpdateForm from '~/components/boats/show/tabs/NavigationLogUpdateForm.vue'
 import NavigationLogCloseForm from '~/components/boats/show/tabs/NavigationLogCloseForm.vue'
 import { toNavigationEngineOptions } from '~/utils/navigation_engine_options'
+import { useDateFormat } from '~/composables/use_date_format'
+import { todayDateInputValue } from '~/utils/local_datetime'
 import { useT } from '~/composables/use_t'
 import type { BoatShowDetail, NavigationLogPortOption, NavigationLogRow } from '~/types/boat_show'
 
@@ -19,6 +21,7 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
+const { formatDateTime } = useDateFormat()
 
 const engineOptions = computed(() => toNavigationEngineOptions(props.boat.engines))
 
@@ -26,7 +29,7 @@ const showUpdateForm = ref(false)
 const showFuelForm = ref(false)
 const showCloseForm = ref(false)
 
-const today = new Date().toLocaleDateString('en-CA')
+const today = todayDateInputValue()
 const fuelFueledAt = ref(today)
 
 const elapsed = computed(() => {
@@ -111,15 +114,7 @@ function toggleClose() {
         {{ portLabel(log.departurePortId, log.departurePortName) }}
         <span class="font-normal text-fg-muted ml-2">
           ·
-          {{
-            new Date(log.departedAt).toLocaleString(undefined, {
-              year: 'numeric',
-              month: '2-digit',
-              day: '2-digit',
-              hour: '2-digit',
-              minute: '2-digit',
-            })
-          }}
+          {{ formatDateTime(log.departedAt) }}
         </span>
       </div>
       <div class="flex flex-wrap items-center gap-3 text-xs">

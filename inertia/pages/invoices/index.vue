@@ -11,6 +11,7 @@ import BaseHeading from '~/components/base/BaseHeading.vue'
 import BasePagination from '~/components/base/BasePagination.vue'
 import InvoiceListToolbar from '~/components/invoices/InvoiceListToolbar.vue'
 import InvoiceStatusBadge from '~/components/invoices/InvoiceStatusBadge.vue'
+import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import type {
   InvoiceListFilters,
@@ -28,6 +29,7 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
+const { formatDate } = useDateFormat()
 const page = usePage()
 
 const flash = computed(() => page.props.flash as { error?: string; success?: string } | undefined)
@@ -72,11 +74,6 @@ function formatTotal(invoice: InvoiceRow): string {
     style: 'currency',
     currency: invoice.currency,
   }).format(invoice.total)
-}
-
-function formatDate(dateStr: string | null): string {
-  if (!dateStr) return '-'
-  return new Date(dateStr).toLocaleDateString()
 }
 </script>
 

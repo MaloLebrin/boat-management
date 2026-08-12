@@ -8,6 +8,7 @@ import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import { useNetworkStatus } from '~/composables/use_network_status'
 import { useOfflineQueue } from '~/composables/use_offline_queue'
 import { useT } from '~/composables/use_t'
+import { todayDateInputValue } from '~/utils/local_datetime'
 import type { BoatShowDetail } from '~/types/boat_show'
 
 const props = defineProps<{
@@ -30,7 +31,7 @@ const engineOptions = computed(() =>
 )
 
 const form = useForm({
-  fueledAt: new Date().toLocaleDateString('en-CA'),
+  fueledAt: todayDateInputValue(),
   quantityLiters: '' as string | number,
   pricePerLiter: null as number | null,
   totalCost: null as number | null,

@@ -6,6 +6,7 @@ import type { BoatBudgetEntryItem } from '../../shared/types/budget'
 vi.mock('~/composables/use_t', () => ({
   useT: () => ({
     t: (key: string) => key,
+    locale: { value: 'fr' },
   }),
 }))
 

@@ -1,14 +1,12 @@
 <script setup lang="ts">
 import BaseButton from '~/components/base/BaseButton.vue'
+import { useDateFormat } from '~/composables/use_date_format'
 import { useOfflineQueue } from '~/composables/use_offline_queue'
 import { useT } from '~/composables/use_t'
 
-const { t, locale } = useT()
+const { t } = useT()
+const { formatTime } = useDateFormat()
 const { pendingActions, isSyncing, cancelAction, drainQueue } = useOfflineQueue()
-
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleTimeString(locale.value, { hour: '2-digit', minute: '2-digit' })
-}
 
 function labelForType(type: string): string {
   const key = `common.offline.queue.type.${type}`
@@ -39,7 +37,7 @@ function labelForType(type: string): string {
       >
         <div class="min-w-0">
           <p class="font-medium text-fg truncate">{{ labelForType(action.type) }}</p>
-          <p class="text-xs text-fg-muted">{{ formatDate(action.createdAt) }}</p>
+          <p class="text-xs text-fg-muted">{{ formatTime(action.createdAt) }}</p>
         </div>
         <BaseButton
           variant="danger"

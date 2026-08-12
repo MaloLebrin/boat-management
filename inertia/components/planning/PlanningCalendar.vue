@@ -5,6 +5,7 @@ import BaseCard from '~/components/base/BaseCard.vue'
 import PlanningCalendarHourTasks from '~/components/planning/PlanningCalendarHourTasks.vue'
 import { computed, ref } from 'vue'
 import { router } from '@inertiajs/vue3'
+import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import { maintenanceSubjectLabel } from '~/utils/boat_enum_labels'
 
@@ -12,7 +13,8 @@ const props = defineProps<{
   tasks: PlanningTask[]
 }>()
 
-const { t, locale } = useT()
+const { t } = useT()
+const { formatMonthYear, formatWeekdayDay, formatWeekdayShort } = useDateFormat()
 
 const today = new Date()
 const currentYear = ref(today.getFullYear())
@@ -36,21 +38,12 @@ function nextMonth() {
   }
 }
 
-const monthLabel = computed(() =>
-  new Date(currentYear.value, currentMonth.value).toLocaleDateString(locale.value, {
-    month: 'long',
-    year: 'numeric',
-  })
-)
+const monthLabel = computed(() => formatMonthYear(new Date(currentYear.value, currentMonth.value)))
 
-const weekdays = computed(() => {
-  const formatter = new Intl.DateTimeFormat(locale.value, { weekday: 'short' })
-  return [1, 2, 3, 4, 5, 6, 0].map((day) => {
-    const date = new Date(2024, 0, day === 0 ? 7 : day)
-    const label = formatter.format(date)
-    return label.charAt(0).toUpperCase() + label.slice(1, 3)
-  })
-})
+// January 2024 starts on a Monday: days 1..7 map to Monday..Sunday.
+const weekdays = computed(() =>
+  [1, 2, 3, 4, 5, 6, 0].map((day) => formatWeekdayShort(new Date(2024, 0, day === 0 ? 7 : day)))
+)
 
 const daysInMonth = computed(() => new Date(currentYear.value, currentMonth.value + 1, 0).getDate())
 const firstWeekday = computed(() => {
@@ -88,10 +81,7 @@ function taskPillClass(task: PlanningTask): string {
 }
 
 function agendaDayLabel(day: number): string {
-  return new Date(currentYear.value, currentMonth.value, day).toLocaleDateString(locale.value, {
-    weekday: 'short',
-    day: 'numeric',
-  })
+  return formatWeekdayDay(new Date(currentYear.value, currentMonth.value, day))
 }
 
 function isToday(day: number): boolean {

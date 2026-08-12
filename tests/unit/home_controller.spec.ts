@@ -10,7 +10,7 @@ test.group('HomeController (unit)', () => {
         },
       } as any,
       {
-        getLatestFleetAnalysis: async (_userId: number, _orgId: number) => null,
+        getLatestFleetAnalysis: async (_userId: number, _orgId: number, _locale: string) => null,
       } as any,
       {
         listNamesForOrg: async () => [],
@@ -38,6 +38,7 @@ test.group('HomeController (unit)', () => {
         isAuthenticated: false,
         check: async () => {},
       },
+      i18n: { locale: 'en' },
     } as any)
 
     assert.equal(rendered[0]!.component, 'home')
@@ -53,7 +54,7 @@ test.group('HomeController (unit)', () => {
         }),
       } as any,
       {
-        getLatestFleetAnalysis: async (_userId: number, _orgId: number) => null,
+        getLatestFleetAnalysis: async (_userId: number, _orgId: number, _locale: string) => null,
       } as any,
       {
         listNamesForOrg: async () => [],
@@ -89,6 +90,7 @@ test.group('HomeController (unit)', () => {
           getEffectiveRoleInOrg: async () => 'member',
         }),
       },
+      i18n: { locale: 'en' },
     } as any)
 
     assert.equal(rendered[0]!.component, 'dashboard')
@@ -104,7 +106,7 @@ test.group('HomeController (unit)', () => {
         },
       } as any,
       {
-        getLatestFleetAnalysis: async (_userId: number, _orgId: number) => null,
+        getLatestFleetAnalysis: async (_userId: number, _orgId: number, _locale: string) => null,
       } as any,
       {
         listNamesForOrg: async () => [],
@@ -141,6 +143,7 @@ test.group('HomeController (unit)', () => {
           getEffectiveRoleInOrg: async () => 'mechanic',
         }),
       },
+      i18n: { locale: 'en' },
     } as any)
 
     assert.equal(rendered[0]!.component, 'dashboard/mechanic')

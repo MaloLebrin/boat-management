@@ -4,6 +4,7 @@ import { DateTime } from 'luxon'
 
 export const AiAnalysisFactory = Factory.define(AiAnalysis, () => ({
   kind: 'fleet_analysis' as const,
+  locale: 'fr' as const,
   responseText: JSON.stringify([{ text: 'Test suggestion' }]),
   createdAt: DateTime.now(),
   boatId: null,
