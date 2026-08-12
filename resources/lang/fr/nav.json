@@ -19,6 +19,7 @@
   "clients": "Clients",
   "pricingSeasons": "Périodes tarifaires",
   "invoices": "Factures",
+  "scrollDown": "Afficher les entrées de navigation suivantes",
   "sections": {
     "fleet": "FLOTTE",
     "activity": "ACTIVITÉ",
