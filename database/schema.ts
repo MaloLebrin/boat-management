@@ -13,6 +13,7 @@ export class AiAnalysisSchema extends BaseModel {
     'createdAt',
     'id',
     'kind',
+    'locale',
     'organizationId',
     'responseText',
     'userId',
@@ -26,6 +27,8 @@ export class AiAnalysisSchema extends BaseModel {
   declare id: number
   @column()
   declare kind: string
+  @column()
+  declare locale: string
   @column()
   declare organizationId: number | null
   @column()
@@ -1134,6 +1137,45 @@ export class ClientSchema extends BaseModel {
   declare status: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
+}
+
+export class ContactMessageSchema extends BaseModel {
+  static $columns = [
+    'createdAt',
+    'email',
+    'firstName',
+    'fleetSize',
+    'id',
+    'ipAddress',
+    'lastName',
+    'locale',
+    'message',
+    'organization',
+    'subject',
+  ] as const
+  $columns = ContactMessageSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare email: string
+  @column()
+  declare firstName: string
+  @column()
+  declare fleetSize: string | null
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare ipAddress: string | null
+  @column()
+  declare lastName: string
+  @column()
+  declare locale: string
+  @column()
+  declare message: string
+  @column()
+  declare organization: string | null
+  @column()
+  declare subject: string
 }
 
 export class CrewCertificationSchema extends BaseModel {

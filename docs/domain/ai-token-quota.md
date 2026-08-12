@@ -133,17 +133,17 @@ Supprime toutes les lignes de `ai_token_usages` pour le mois donné. Appelé par
 
 Deux méthodes vérifient et enregistrent le quota :
 
-**`generateFleetAnalysis(userId, org, input, ...)`**
+**`generateFleetAnalysis(userId, org, input, locale, ...)`**
 
 ```
 1. currentUsage = await aiTokenQuotaService.getUsage(org.id)
 2. aiTokenQuotaService.assertCanUseTokens(org, currentUsage)   ← throw si dépassé
 3. { content, tokensUsed } = await aiService.chat([...])
 4. await aiTokenQuotaService.recordUsage(org, tokensUsed)
-5. persist AiAnalysis + return suggestions
+5. persist AiAnalysis (dont `locale`, #460) + return suggestions
 ```
 
-**`generateBoatSuggestions(userId, boatId, org, input, ...)`**
+**`generateBoatSuggestions(userId, boatId, org, input, locale, ...)`**
 
 Même séquence.
 
