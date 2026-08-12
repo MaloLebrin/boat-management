@@ -5,9 +5,9 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import { useCurrencyFormat } from '~/composables/use_currency_format'
+import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import type { BoatBudgetEntryItem } from '#shared/types/budget'
-import { parseDisplayDate } from '~/utils/local_datetime'
 
 const props = defineProps<{
   boatId: number
@@ -17,6 +17,7 @@ const props = defineProps<{
 
 const { t } = useT()
 const { formatCurrency } = useCurrencyFormat()
+const { formatDate } = useDateFormat()
 
 const editingId = ref<number | null>(null)
 const editForm = useForm({
@@ -66,10 +67,6 @@ function deleteEntry(entryId: number) {
   router.delete(`/boats/${props.boatId}/budget/entries/${entryId}`, {
     preserveScroll: true,
   })
-}
-
-function formatDate(dateStr: string): string {
-  return parseDisplayDate(dateStr).toLocaleDateString()
 }
 
 function getCategoryLabel(category: string): string {

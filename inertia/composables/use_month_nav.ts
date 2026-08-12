@@ -1,8 +1,8 @@
 import { computed, ref } from 'vue'
-import { useT } from '~/composables/use_t'
+import { useDateFormat } from '~/composables/use_date_format'
 
 export function useMonthNav() {
-  const { locale } = useT()
+  const { formatMonthYear, formatWeekdayShort } = useDateFormat()
 
   const initDate = new Date()
   const currentYear = ref(initDate.getFullYear())
@@ -27,10 +27,7 @@ export function useMonthNav() {
   }
 
   const monthLabel = computed(() =>
-    new Date(currentYear.value, currentMonth.value).toLocaleDateString(locale.value, {
-      month: 'long',
-      year: 'numeric',
-    })
+    formatMonthYear(new Date(currentYear.value, currentMonth.value))
   )
 
   const daysInMonth = computed(() =>
@@ -51,14 +48,10 @@ export function useMonthNav() {
     )
   }
 
-  const weekdays = computed(() => {
-    const formatter = new Intl.DateTimeFormat(locale.value, { weekday: 'short' })
-    return [1, 2, 3, 4, 5, 6, 0].map((day) => {
-      const date = new Date(2024, 0, day === 0 ? 7 : day)
-      const label = formatter.format(date)
-      return label.charAt(0).toUpperCase() + label.slice(1, 3)
-    })
-  })
+  // January 2024 starts on a Monday: days 1..7 map to Monday..Sunday.
+  const weekdays = computed(() =>
+    [1, 2, 3, 4, 5, 6, 0].map((day) => formatWeekdayShort(new Date(2024, 0, day === 0 ? 7 : day)))
+  )
 
   return {
     currentYear,

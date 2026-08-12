@@ -7,6 +7,7 @@ import NavigationLogForm from '~/components/boats/show/tabs/NavigationLogForm.vu
 import NavigationLogCloseForm from '~/components/boats/show/tabs/NavigationLogCloseForm.vue'
 import NavigationLogCrewPanel from '~/components/boats/show/tabs/NavigationLogCrewPanel.vue'
 import { toNavigationEngineOptions } from '~/utils/navigation_engine_options'
+import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import type {
   BoatCreateIntent,
@@ -33,6 +34,7 @@ const props = withDefaults(
 const emit = defineEmits<{ createIntentConsumed: [] }>()
 
 const { t } = useT()
+const { formatDateTime } = useDateFormat()
 
 const engineOptions = computed(() => toNavigationEngineOptions(props.boat.engines))
 
@@ -53,16 +55,6 @@ function consumeCreateIntent() {
 
 onMounted(consumeCreateIntent)
 watch(() => props.createIntent, consumeCreateIntent)
-
-function formatDateTime(iso: string): string {
-  return new Date(iso).toLocaleString(undefined, {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-}
 
 function portLabel(portId: number | null, portName: string | null): string {
   if (portId) {

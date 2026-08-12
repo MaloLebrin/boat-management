@@ -1,5 +1,6 @@
 import type { MaintenanceEventRow, MaintenanceHistoryFilters } from '#shared/types/maintenance'
 import type { I18n } from '@adonisjs/i18n'
+import { formatDate } from '#shared/helpers/date_format'
 import PDFDocument from 'pdfkit'
 
 const NAVY = '#0b1d2e'
@@ -34,7 +35,7 @@ export default class MaintenanceHistoryPdfService {
       i18n.t(`maintenance.history.pdf.${key}`, data)
     const subjectLabel = (subject: string) => i18n.t(`maintenance.history.subjects.${subject}`)
 
-    this.#renderHeader(doc, filters, boatName, t, subjectLabel)
+    this.#renderHeader(doc, filters, boatName, t, subjectLabel, i18n.locale)
     this.#renderTable(doc, events, t, subjectLabel)
 
     doc.end()
@@ -52,7 +53,8 @@ export default class MaintenanceHistoryPdfService {
     filters: MaintenanceHistoryFilters,
     boatName: string | null,
     t: (key: string, data?: Record<string, string>) => string,
-    subjectLabel: (subject: string) => string
+    subjectLabel: (subject: string) => string,
+    locale: string
   ): void {
     const HEADER_H = 90
 
@@ -64,7 +66,7 @@ export default class MaintenanceHistoryPdfService {
       .fillColor(GREY_M)
       .fontSize(8)
       .font('Helvetica')
-      .text(t('generatedOn', { date: new Date().toLocaleDateString() }), MARGIN, 66)
+      .text(t('generatedOn', { date: formatDate(new Date(), locale) }), MARGIN, 66)
 
     doc.rect(0, HEADER_H, PAGE_W, 3).fill(CORAL)
     doc.fillColor('#000')

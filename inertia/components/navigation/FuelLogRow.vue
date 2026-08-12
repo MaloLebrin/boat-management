@@ -1,21 +1,14 @@
 <script setup lang="ts">
+import { useDateFormat } from '~/composables/use_date_format'
 import { useNumberFormat } from '~/composables/use_number_format'
 import { useT } from '~/composables/use_t'
 import type { FleetFuelLogRow } from '../../../shared/types/navigation'
-import { parseDisplayDate } from '~/utils/local_datetime'
 
-const { t, locale } = useT()
+const { t } = useT()
+const { formatDate } = useDateFormat()
 const { formatNumber, formatCurrency } = useNumberFormat()
 
 defineProps<{ row: FleetFuelLogRow }>()
-
-function formatDate(iso: string): string {
-  return parseDisplayDate(iso).toLocaleDateString(locale.value, {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  })
-}
 </script>
 
 <template>

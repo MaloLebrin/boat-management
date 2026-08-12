@@ -1,20 +1,13 @@
 <script setup lang="ts">
 import BaseBadge from '~/components/base/BaseBadge.vue'
+import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import type { FleetLogbookRow } from '../../../shared/types/navigation'
-import { parseDisplayDate } from '~/utils/local_datetime'
 
-const { t, locale } = useT()
+const { t } = useT()
+const { formatDate } = useDateFormat()
 
 defineProps<{ row: FleetLogbookRow }>()
-
-function formatDate(iso: string): string {
-  return parseDisplayDate(iso).toLocaleDateString(locale.value, {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  })
-}
 </script>
 
 <template>

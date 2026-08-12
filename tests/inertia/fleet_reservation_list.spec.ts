@@ -12,8 +12,8 @@ vi.mock('@adonisjs/inertia/vue', () => ({
   Link: { template: '<a :href="href"><slot /></a>', props: ['href'] },
 }))
 
-vi.mock('~/composables/use_reservation_format', () => ({
-  useReservationFormat: () => ({ formatDate: (s: string) => s.slice(0, 10) }),
+vi.mock('~/composables/use_date_format', () => ({
+  useDateFormat: () => ({ formatDate: (s: string) => s.slice(0, 10) }),
 }))
 
 vi.mock('~/components/reservations/ReservationStatusBadge.vue', () => ({

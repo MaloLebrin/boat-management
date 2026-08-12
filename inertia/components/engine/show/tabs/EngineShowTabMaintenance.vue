@@ -4,10 +4,12 @@ import { Form } from '@adonisjs/inertia/vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
+import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import type { BoatShowEngine, MaintenanceEventRow, MaintenanceTaskRow } from '~/types/boat_show'
 
 const { t } = useT()
+const { formatDateLong, formatMonthYear } = useDateFormat()
 
 const props = defineProps<{
   boat: { id: number; name: string }
@@ -38,14 +40,6 @@ function getTaskStatus(task: MaintenanceTaskRow): 'overdue' | 'soon' | 'schedule
     if (remaining <= 50) return 'soon'
   }
   return 'scheduled'
-}
-
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString('fr-FR', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  })
 }
 </script>
 
@@ -90,7 +84,7 @@ function formatDate(iso: string): string {
                 </div>
                 <p class="text-sm text-fg-muted mt-1">
                   <span v-if="task.dueAt">{{
-                    t('boats.engineShow.maintenance.dueAt', { date: formatDate(task.dueAt) })
+                    t('boats.engineShow.maintenance.dueAt', { date: formatDateLong(task.dueAt) })
                   }}</span>
                   <span v-if="task.dueAt && task.dueEngineHours"> | </span>
                   <span v-if="task.dueEngineHours">{{
@@ -130,12 +124,7 @@ function formatDate(iso: string): string {
         <div v-else class="space-y-6">
           <div v-for="(events, yearMonth) in eventsByYearMonth" :key="yearMonth">
             <p class="text-sm font-semibold text-fg-muted mb-3">
-              {{
-                new Date(yearMonth + '-01').toLocaleDateString('fr-FR', {
-                  month: 'long',
-                  year: 'numeric',
-                })
-              }}
+              {{ formatMonthYear(`${yearMonth}-01`) }}
             </p>
             <div class="space-y-2">
               <div
@@ -144,7 +133,7 @@ function formatDate(iso: string): string {
                 class="flex items-center justify-between rounded-lg border border-border bg-surface-elevated p-3"
               >
                 <div class="flex items-center gap-4">
-                  <span class="text-sm text-fg-muted">{{ formatDate(event.performedAt) }}</span>
+                  <span class="text-sm text-fg-muted">{{ formatDateLong(event.performedAt) }}</span>
                   <span class="font-medium text-fg">{{ event.title }}</span>
                 </div>
                 <span v-if="event.parts.length > 0" class="text-sm text-fg-muted">

@@ -91,4 +91,43 @@ describe('useDateFormat', () => {
     expect(formatDateTime(null)).toBe('—')
     expect(formatDateTime(undefined)).toBe('—')
   })
+
+  // #461: every screen now picks one of these styles instead of writing its own
+  // `toLocaleDateString` options, so they all have to be reachable and bound to
+  // the app locale (not the browser's).
+  test('exposes every date style, each driven by the app locale', () => {
+    mockLocale.value = 'fr'
+    const styles = useDateFormat()
+    expect(styles.formatDate('2026-07-15')).toBe('15/07/2026')
+    expect(styles.formatDateLong('2026-07-15')).toBe('15 juillet 2026')
+    expect(styles.formatDayMonth('2026-07-15')).toBe('15 juil.')
+    expect(styles.formatMonthYear('2026-07-15')).toBe('juillet 2026')
+    expect(styles.formatWeekdayDay('2026-07-15')).toBe('mer. 15')
+    expect(styles.formatWeekdayShort('2026-07-15')).toBe('Mer')
+    mockLocale.value = 'en'
+  })
+
+  test('every style returns an em dash for a missing value', () => {
+    const styles = useDateFormat()
+    const results = [
+      styles.formatDate(null),
+      styles.formatDateLong(null),
+      styles.formatDayMonth(null),
+      styles.formatMonthYear(null),
+      styles.formatDateTime(null),
+      styles.formatTime(null),
+      styles.formatWeekdayDay(null),
+      styles.formatWeekdayShort(null),
+    ]
+    expect(results.every((r) => r === '—')).toBe(true)
+  })
+
+  test('formatTime and formatDateTime accept a Date as well as an ISO string', () => {
+    mockLocale.value = 'fr'
+    const { formatDateTime, formatTime } = useDateFormat()
+    const instant = new Date(2026, 6, 15, 15, 14)
+    expect(formatDateTime(instant)).toBe('15/07/2026 15:14')
+    expect(formatTime(instant)).toBe('15:14')
+    mockLocale.value = 'en'
+  })
 })

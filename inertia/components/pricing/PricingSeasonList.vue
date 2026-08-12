@@ -2,6 +2,7 @@
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
+import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import type { PricingSeasonRow } from '../../../shared/types/pricing_season'
 
@@ -16,11 +17,7 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useT()
-
-function formatDate(dateStr: string): string {
-  const date = new Date(dateStr)
-  return date.toLocaleDateString(undefined, { day: '2-digit', month: 'short' })
-}
+const { formatDayMonth } = useDateFormat()
 
 function formatPricing(season: PricingSeasonRow): string {
   if (season.dailyPrice != null) {
@@ -43,7 +40,7 @@ function formatPricing(season: PricingSeasonRow): string {
         <div class="min-w-0 flex-1">
           <p class="font-semibold text-fg">{{ season.name }}</p>
           <div class="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm text-fg-muted">
-            <span>{{ formatDate(season.startsOn) }} - {{ formatDate(season.endsOn) }}</span>
+            <span>{{ formatDayMonth(season.startsOn) }} - {{ formatDayMonth(season.endsOn) }}</span>
             <span>{{ formatPricing(season) }}</span>
           </div>
           <div class="mt-2 flex flex-wrap items-center gap-2">

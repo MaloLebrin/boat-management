@@ -10,10 +10,12 @@ import { computed, ref } from 'vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BoatMaintenanceSheetItemList from '~/components/boats/sheets/BoatMaintenanceSheetItemList.vue'
+import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import type { BoatShowDetail, MaintenanceSheetRow } from '~/types/boat_show'
 
 const { t } = useT()
+const { formatDate } = useDateFormat()
 
 const props = defineProps<{
   boat: BoatShowDetail
@@ -62,11 +64,9 @@ const progressText = computed(() => {
   return t('boats.sheets.progress', { done: String(done), total: String(total) })
 })
 
-const formattedDate = computed(() => {
-  if (!props.sheet.performedAt) return ''
-  const date = new Date(props.sheet.performedAt)
-  return date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })
-})
+const formattedDate = computed(() =>
+  props.sheet.performedAt ? formatDate(props.sheet.performedAt) : ''
+)
 
 function confirmDelete() {
   if (window.confirm(t('boats.sheets.confirmDelete'))) {

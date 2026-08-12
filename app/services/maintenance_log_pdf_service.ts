@@ -7,6 +7,7 @@ import type BoatSafetyEquipment from '#models/boat_safety_equipment'
 import type BoatSail from '#models/boat_sail'
 import app from '@adonisjs/core/services/app'
 import type { I18n } from '@adonisjs/i18n'
+import { formatDate } from '#shared/helpers/date_format'
 import PDFDocument from 'pdfkit'
 
 type EventRow = {
@@ -85,7 +86,7 @@ export default class MaintenanceLogPdfService {
       }
     })
 
-    this.#renderHeader(doc, boat, t)
+    this.#renderHeader(doc, boat, t, i18n.locale)
     this.#renderBoatSpecs(doc, boat, t, tOpt)
     this.#renderEquipment(doc, boat, rows, t, tOpt)
     this.#renderInventory(doc, boat, t, tOpt)
@@ -108,7 +109,8 @@ export default class MaintenanceLogPdfService {
   #renderHeader(
     doc: PDFKit.PDFDocument,
     boat: Boat,
-    t: (key: string, data?: Record<string, string>) => string
+    t: (key: string, data?: Record<string, string>) => string,
+    locale: string
   ): void {
     const HEADER_H = 118
 
@@ -129,7 +131,7 @@ export default class MaintenanceLogPdfService {
       .fillColor(GREY_M)
       .fontSize(8)
       .font('Helvetica')
-      .text(t('generatedOn', { date: new Date().toLocaleDateString() }), TX, 97)
+      .text(t('generatedOn', { date: formatDate(new Date(), locale) }), TX, 97)
 
     doc.rect(0, HEADER_H, PAGE_W, 3).fill(CORAL)
     doc.text('', MARGIN, HEADER_H + 3 + 20)

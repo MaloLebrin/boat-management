@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import BaseCard from '~/components/base/BaseCard.vue'
 import EngineHoursQuickAddForm from '~/components/boats/engine/EngineHoursQuickAddForm.vue'
+import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import type { BoatShowEngine, MaintenanceEventRow, MaintenanceTaskRow } from '~/types/boat_show'
 
 const { t } = useT()
+const { formatDateLong } = useDateFormat()
 
 defineProps<{
   boatId: number
@@ -18,14 +20,6 @@ defineProps<{
   sortedOpenTasks: MaintenanceTaskRow[]
   canManage: boolean
 }>()
-
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString('fr-FR', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  })
-}
 </script>
 
 <template>
@@ -111,7 +105,7 @@ function formatDate(iso: string): string {
             class="flex items-center justify-between text-sm"
           >
             <span class="font-medium text-fg">{{ event.title }}</span>
-            <span class="text-fg-muted">{{ formatDate(event.performedAt) }}</span>
+            <span class="text-fg-muted">{{ formatDateLong(event.performedAt) }}</span>
           </li>
         </ul>
       </BaseCard>
@@ -146,7 +140,7 @@ function formatDate(iso: string): string {
           <li v-for="task in sortedOpenTasks.slice(0, 5)" :key="task.id" class="text-sm">
             <p class="font-medium text-fg">{{ task.title }}</p>
             <p class="text-fg-muted">
-              <span v-if="task.dueAt">{{ formatDate(task.dueAt) }}</span>
+              <span v-if="task.dueAt">{{ formatDateLong(task.dueAt) }}</span>
               <span v-else-if="task.dueEngineHours">{{ task.dueEngineHours }} h</span>
             </p>
           </li>
