@@ -8,6 +8,7 @@ import DashboardService from '#services/dashboard_service'
 import QuotaService from '#services/quota_service'
 import { QuotaExceededError } from '#exceptions/quota_errors'
 import { aiChatValidator } from '#validators/ai'
+import { toAppLocale } from '#shared/helpers/locale_path'
 import { errors as bouncerErrors } from '@adonisjs/bouncer'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
@@ -72,6 +73,7 @@ export default class AiController {
         user.id,
         user.organization,
         data,
+        toAppLocale(i18n.locale),
         user.organization.aiSystemPrompt,
         user.organization.aiModelOverride
       )
@@ -156,6 +158,7 @@ export default class AiController {
             performedAt: ev.performedAt.toISODate()!,
           })),
         },
+        toAppLocale(i18n.locale),
         user.organization.aiSystemPrompt,
         user.organization.aiModelOverride
       )

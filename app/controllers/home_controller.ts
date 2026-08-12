@@ -1,8 +1,10 @@
-import AiAnalysisService, { type AiSuggestion } from '#services/ai_analysis_service'
+import AiAnalysisService from '#services/ai_analysis_service'
 import DashboardService from '#services/dashboard_service'
 import PlanningService from '#services/planning_service'
 import PortService from '#services/port_service'
 import QuotaService from '#services/quota_service'
+import { toAppLocale } from '#shared/helpers/locale_path'
+import type { AiSuggestion } from '#shared/types/ai'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 
@@ -16,7 +18,7 @@ export default class HomeController {
     private quotaService: QuotaService
   ) {}
 
-  async index({ inertia, auth, response }: HttpContext) {
+  async index({ inertia, auth, response, i18n }: HttpContext) {
     await auth.check()
 
     if (!auth.isAuthenticated) {
@@ -41,7 +43,11 @@ export default class HomeController {
     const data = await this.dashboardService.getForUser(user)
 
     const latestAnalysis = user.organizationId
-      ? await this.aiService.getLatestFleetAnalysis(user.id, user.organizationId)
+      ? await this.aiService.getLatestFleetAnalysis(
+          user.id,
+          user.organizationId,
+          toAppLocale(i18n.locale)
+        )
       : null
     const aiFleetAnalysis: AiSuggestion[] | null = latestAnalysis
       ? (JSON.parse(latestAnalysis.responseText) as AiSuggestion[])
