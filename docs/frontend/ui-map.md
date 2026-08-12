@@ -61,6 +61,14 @@ Référence: `inertia/app.ts`.
   - onglet Équipement : `BoatShowTabEquipment.vue` héberge le modal d'action ; `BoatGenericEquipmentRow.vue` (extrait de `BoatGenericEquipmentCard.vue`) / `BoatSafetyEquipmentCard.vue` exposent un bouton « Ajouter à la liste » sur les items dégradés (#313)
 - Props (types): `inertia/types/boat_show.ts`
 - Source backend: `BoatsController.show`
+- Chargement différé (#463) : les props d'onglet arrivent en deux groupes
+  (`maintenance`, `navigation`) après le rendu du squelette et valent donc
+  `undefined` au premier rendu. `BoatShowTabContent.vue` affiche un skeleton
+  tant que le groupe dont dépend l'onglet actif n'est pas arrivé ; la table
+  onglet → groupe vit dans `inertia/utils/boat_show_tab_data.ts`.
+- Onglet initial : la prop `initialTab` (le `?tab=` vu par le serveur) fait foi,
+  `window.location` n'est lu qu'en repli — c'est ce qui évite le flash d'Aperçu
+  sur un lien profond rendu en SSR.
 
 ### Equipment edit pages
 
