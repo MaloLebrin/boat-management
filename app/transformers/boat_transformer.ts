@@ -8,24 +8,23 @@ import type BoatMaintenanceTask from '#models/boat_maintenance_task'
 import type BoatPositionHistory from '#models/boat_position_history'
 import type NavigationLog from '#models/navigation_log'
 import type Media from '#models/media'
-import type { AiSuggestion } from '#shared/types/ai'
 import type { IncidentType, IncidentStatus } from '#shared/types/incident'
-import type { BoatDocumentRow } from '#shared/types/boat_document'
 import type { BoatPricingRow } from '#shared/types/boat_pricing'
 import type { FuelLogRow } from '#shared/types/fuel_log'
-import type { NavigationLogRow, NavigationLogPortOption } from '#shared/types/navigation_log'
-import type { CrewMemberOption } from '#shared/types/crew'
+import type { NavigationLogRow } from '#shared/types/navigation_log'
 import type { BoatOwnerBoatSummary } from '#shared/types/boat'
 import { toBoatEquipmentActionRow } from '#transformers/boat_equipment_action_transformer'
 
-export interface BoatShowContext {
+/**
+ * Le squelette de la fiche bateau : tout ce qui est rendu avant que les données
+ * d'onglet (différées, cf. #463) n'arrivent — identité du bateau, photos,
+ * position et droits. Ces props sont volontairement peu coûteuses à charger :
+ * c'est ce qui permet à la page de peindre immédiatement au lieu de rester
+ * blanche le temps des ~20 requêtes des onglets.
+ */
+export interface BoatShowShellContext {
   positionHistory: BoatPositionHistory[]
   boatMedia: Media[]
-  maintenanceEvents: BoatMaintenanceEvent[]
-  maintenanceTasks: BoatMaintenanceTask[]
-  maintenanceSheets: BoatMaintenanceSheet[]
-  boatDocuments: BoatDocumentRow[]
-  aiSuggestions: AiSuggestion[] | null
   canManageMaintenance: boolean
   canManageEquipment: boolean
   canManageDocuments: boolean
@@ -33,20 +32,20 @@ export interface BoatShowContext {
   pricing: BoatPricingRow | null
   pricingEnabled: boolean
   canManagePricing: boolean
-  equipmentActions: BoatEquipmentAction[]
   canManageEquipmentActions: boolean
   canDeleteEquipmentActions: boolean
-  incidents: BoatIncident[]
-  fuelLogs: BoatFuelLog[]
-  navigationLogs: NavigationLog[]
-  portOptions: NavigationLogPortOption[]
-  crewMemberOptions: CrewMemberOption[]
   canDeleteIncidents: boolean
   canCreateFuelLogs: boolean
   canDeleteFuelLogs: boolean
   canCreateNavigationLogs: boolean
   canUpdateNavigationLogs: boolean
   canDeleteNavigationLogs: boolean
+  /**
+   * Valeur brute du `?tab=` de l'URL. Résolue côté serveur pour que le SSR rende
+   * directement le bon onglet : sans elle, le rendu serveur retombait sur Aperçu
+   * et l'onglet demandé n'apparaissait qu'à l'hydratation (flash — #463).
+   */
+  initialTab: string | null
 }
 
 export function toBoatOwnerSummary(boat: Boat): BoatOwnerBoatSummary {
@@ -90,7 +89,7 @@ export function toEditForm(boat: Boat) {
   }
 }
 
-export function toShowProps(boat: Boat, ctx: BoatShowContext) {
+export function toShowShellProps(boat: Boat, ctx: BoatShowShellContext) {
   const positionHistory = ctx.positionHistory.map(toPositionHistoryEntry)
   const latestGpsPosition =
     positionHistory.find((p) => p.latitude !== null && p.endedAt === null) ??
@@ -99,26 +98,15 @@ export function toShowProps(boat: Boat, ctx: BoatShowContext) {
 
   return {
     boat: toBoatDetail(boat, ctx),
-    maintenanceEvents: ctx.maintenanceEvents.map(toMaintenanceEvent),
-    maintenanceTasks: ctx.maintenanceTasks.map(toMaintenanceTask),
-    maintenanceSheets: ctx.maintenanceSheets.map(toMaintenanceSheet),
-    boatDocuments: ctx.boatDocuments,
     canManageMaintenance: ctx.canManageMaintenance,
     canManageEquipment: ctx.canManageEquipment,
     canManageDocuments: ctx.canManageDocuments,
     canExport: ctx.canExport,
-    aiSuggestions: ctx.aiSuggestions,
     pricing: ctx.pricing,
     pricingEnabled: ctx.pricingEnabled,
     canManagePricing: ctx.canManagePricing,
-    equipmentActions: ctx.equipmentActions.map(toBoatEquipmentActionRow),
     canManageEquipmentActions: ctx.canManageEquipmentActions,
     canDeleteEquipmentActions: ctx.canDeleteEquipmentActions,
-    incidents: ctx.incidents.map(toIncident),
-    fuelLogs: ctx.fuelLogs.map(toFuelLog),
-    navigationLogs: ctx.navigationLogs.map(toNavigationLog),
-    portOptions: ctx.portOptions,
-    crewMemberOptions: ctx.crewMemberOptions,
     positionHistory,
     latestGpsPosition,
     canDeleteIncidents: ctx.canDeleteIncidents,
@@ -127,7 +115,36 @@ export function toShowProps(boat: Boat, ctx: BoatShowContext) {
     canCreateNavigationLogs: ctx.canCreateNavigationLogs,
     canUpdateNavigationLogs: ctx.canUpdateNavigationLogs,
     canDeleteNavigationLogs: ctx.canDeleteNavigationLogs,
+    initialTab: ctx.initialTab,
   }
+}
+
+export function toMaintenanceEventRows(events: BoatMaintenanceEvent[]) {
+  return events.map(toMaintenanceEvent)
+}
+
+export function toMaintenanceTaskRows(tasks: BoatMaintenanceTask[]) {
+  return tasks.map(toMaintenanceTask)
+}
+
+export function toMaintenanceSheetRows(sheets: BoatMaintenanceSheet[]) {
+  return sheets.map(toMaintenanceSheet)
+}
+
+export function toEquipmentActionRows(actions: BoatEquipmentAction[]) {
+  return actions.map(toBoatEquipmentActionRow)
+}
+
+export function toIncidentRows(incidents: BoatIncident[]) {
+  return incidents.map(toIncident)
+}
+
+export function toFuelLogRows(logs: BoatFuelLog[]): FuelLogRow[] {
+  return logs.map(toFuelLog)
+}
+
+export function toNavigationLogRows(logs: NavigationLog[]): NavigationLogRow[] {
+  return logs.map(toNavigationLog)
 }
 
 function toNavigationLog(log: NavigationLog): NavigationLogRow {
@@ -178,7 +195,10 @@ function toFuelLog(log: BoatFuelLog): FuelLogRow {
   }
 }
 
-function toBoatDetail(boat: Boat, ctx: Pick<BoatShowContext, 'positionHistory' | 'boatMedia'>) {
+function toBoatDetail(
+  boat: Boat,
+  ctx: Pick<BoatShowShellContext, 'positionHistory' | 'boatMedia'>
+) {
   return {
     id: boat.id,
     name: boat.name,
