@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import BaseSkeleton from '~/components/base/BaseSkeleton.vue'
 import BoatShowTabAdminDocs from '~/components/boats/show/tabs/BoatShowTabAdminDocs.vue'
 import BoatShowTabDocuments from '~/components/boats/show/tabs/BoatShowTabDocuments.vue'
@@ -29,39 +30,28 @@ import type {
   NavigationLogPortOption,
   NavigationLogRow,
 } from '~/types/boat_show'
+import type { BoatShowTabKey } from '~/composables/use_boat_show_tabs'
+import { isTabDataReady } from '~/utils/boat_show_tab_data'
 import type { BoatPricingRow } from '../../../../shared/types/boat_pricing'
 import type { CrewMemberOption } from '../../../../shared/types/crew'
 
-type TabKey =
-  | 'overview'
-  | 'specs'
-  | 'pricing'
-  | 'equipment'
-  | 'equipmentActions'
-  | 'history'
-  | 'tasks'
-  | 'documents'
-  | 'sheets'
-  | 'admin-docs'
-  | 'navigation-logs'
-  | 'fuel'
-  | 'incidents'
-  | 'position'
-
-defineProps<{
-  tab: TabKey
+// Les jeux de données d'onglet arrivent en props différées (#463) : `undefined`
+// signifie « pas encore chargé », et l'onglet concerné rend un skeleton.
+const props = defineProps<{
+  tab: BoatShowTabKey
   isLoading: boolean
   boat: BoatShowDetail
-  maintenanceEvents: MaintenanceEventRow[]
-  maintenanceTasks: MaintenanceTaskRow[]
-  maintenanceSheets: MaintenanceSheetRow[]
-  boatDocuments: BoatDocumentRow[]
-  equipmentActions: BoatEquipmentActionRow[]
-  incidents: BoatIncidentRow[]
-  fuelLogs: FuelLogRow[]
-  navigationLogs: NavigationLogRow[]
-  portOptions: NavigationLogPortOption[]
-  crewMemberOptions: CrewMemberOption[]
+  maintenanceEvents?: MaintenanceEventRow[]
+  maintenanceTasks?: MaintenanceTaskRow[]
+  maintenanceSheets?: MaintenanceSheetRow[]
+  boatDocuments?: BoatDocumentRow[]
+  equipmentActions?: BoatEquipmentActionRow[]
+  incidents?: BoatIncidentRow[]
+  fuelLogs?: FuelLogRow[]
+  navigationLogs?: NavigationLogRow[]
+  portOptions?: NavigationLogPortOption[]
+  crewMemberOptions?: CrewMemberOption[]
+  aiSuggestions?: AiSuggestion[] | null
   positionHistory: BoatPositionHistoryRow[]
   latestGpsPosition: BoatPositionHistoryRow | null
   canManageMaintenance: boolean
@@ -76,7 +66,6 @@ defineProps<{
   canUpdateNavigationLogs: boolean
   canDeleteNavigationLogs: boolean
   canExport: boolean
-  aiSuggestions: AiSuggestion[] | null
   createIntent: BoatCreateIntent
   pricing: BoatPricingRow | null
   pricingEnabled: boolean
@@ -84,11 +73,46 @@ defineProps<{
 }>()
 
 defineEmits<{ goToTab: [key: string]; createIntentConsumed: [] }>()
+
+const isMaintenanceGroupLoaded = computed(
+  () =>
+    props.maintenanceEvents !== undefined &&
+    props.maintenanceTasks !== undefined &&
+    props.maintenanceSheets !== undefined &&
+    props.boatDocuments !== undefined &&
+    props.equipmentActions !== undefined &&
+    props.aiSuggestions !== undefined
+)
+
+const isNavigationGroupLoaded = computed(
+  () =>
+    props.navigationLogs !== undefined &&
+    props.fuelLogs !== undefined &&
+    props.incidents !== undefined &&
+    props.portOptions !== undefined &&
+    props.crewMemberOptions !== undefined
+)
+
+// Skeleton tant que le contenu n'est pas montable : soit la bascule d'onglet
+// est en cours (#361), soit les données différées de l'onglet manquent (#463).
+const showSkeleton = computed(
+  () =>
+    props.isLoading ||
+    !isTabDataReady(props.tab, {
+      maintenance: isMaintenanceGroupLoaded.value,
+      navigation: isNavigationGroupLoaded.value,
+    })
+)
 </script>
 
 <template>
   <Transition name="tab" mode="out-in">
-    <div v-if="isLoading" key="loading" class="mt-8 space-y-4" data-testid="tab-content-skeleton">
+    <div
+      v-if="showSkeleton"
+      key="loading"
+      class="mt-8 space-y-4"
+      data-testid="tab-content-skeleton"
+    >
       <BaseSkeleton height-class="h-8" width-class="w-48" />
       <BaseSkeleton height-class="h-32" />
       <BaseSkeleton height-class="h-32" />
@@ -99,10 +123,10 @@ defineEmits<{ goToTab: [key: string]; createIntentConsumed: [] }>()
       <BoatShowTabOverview
         v-if="tab === 'overview'"
         :boat="boat"
-        :maintenance-tasks="maintenanceTasks"
-        :maintenance-events="maintenanceEvents"
+        :maintenance-tasks="maintenanceTasks ?? []"
+        :maintenance-events="maintenanceEvents ?? []"
         :can-manage="canManageEquipment"
-        :ai-suggestions="aiSuggestions"
+        :ai-suggestions="aiSuggestions ?? null"
         @go-to-tab="$emit('goToTab', $event)"
       />
 
@@ -127,7 +151,7 @@ defineEmits<{ goToTab: [key: string]; createIntentConsumed: [] }>()
       <BoatShowTabEquipmentActions
         v-else-if="tab === 'equipmentActions'"
         :boat="boat"
-        :equipment-actions="equipmentActions"
+        :equipment-actions="equipmentActions ?? []"
         :can-manage="canManageEquipmentActions"
         :can-delete="canDeleteEquipmentActions"
       />
@@ -135,7 +159,7 @@ defineEmits<{ goToTab: [key: string]; createIntentConsumed: [] }>()
       <BoatShowTabHistory
         v-else-if="tab === 'history'"
         :boat="boat"
-        :maintenance-events="maintenanceEvents"
+        :maintenance-events="maintenanceEvents ?? []"
         :can-manage-maintenance="canManageMaintenance"
         :can-export="canExport"
         :create-intent="createIntent"
@@ -145,7 +169,7 @@ defineEmits<{ goToTab: [key: string]; createIntentConsumed: [] }>()
       <BoatShowTabTasks
         v-else-if="tab === 'tasks'"
         :boat="boat"
-        :maintenance-tasks="maintenanceTasks"
+        :maintenance-tasks="maintenanceTasks ?? []"
         :can-manage-maintenance="canManageMaintenance"
         :create-intent="createIntent"
         @create-intent-consumed="$emit('createIntentConsumed')"
@@ -154,7 +178,7 @@ defineEmits<{ goToTab: [key: string]; createIntentConsumed: [] }>()
       <BoatShowTabSheets
         v-else-if="tab === 'sheets'"
         :boat="boat"
-        :sheets="maintenanceSheets"
+        :sheets="maintenanceSheets ?? []"
         :can-manage="canManageMaintenance"
       />
 
@@ -167,16 +191,16 @@ defineEmits<{ goToTab: [key: string]; createIntentConsumed: [] }>()
       <BoatShowTabAdminDocs
         v-else-if="tab === 'admin-docs'"
         :boat="boat"
-        :boat-documents="boatDocuments"
+        :boat-documents="boatDocuments ?? []"
         :can-manage="canManageDocuments"
       />
 
       <BoatShowTabNavigationLogs
         v-else-if="tab === 'navigation-logs'"
         :boat="boat"
-        :navigation-logs="navigationLogs"
-        :port-options="portOptions"
-        :crew-member-options="crewMemberOptions"
+        :navigation-logs="navigationLogs ?? []"
+        :port-options="portOptions ?? []"
+        :crew-member-options="crewMemberOptions ?? []"
         :can-create="canCreateNavigationLogs"
         :can-update="canUpdateNavigationLogs"
         :can-delete="canDeleteNavigationLogs"
@@ -187,7 +211,7 @@ defineEmits<{ goToTab: [key: string]; createIntentConsumed: [] }>()
       <BoatShowTabFuelLogs
         v-else-if="tab === 'fuel'"
         :boat="boat"
-        :fuel-logs="fuelLogs"
+        :fuel-logs="fuelLogs ?? []"
         :can-manage="canCreateFuelLogs"
         :can-delete="canDeleteFuelLogs"
       />
@@ -195,7 +219,7 @@ defineEmits<{ goToTab: [key: string]; createIntentConsumed: [] }>()
       <BoatShowTabIncidents
         v-else-if="tab === 'incidents'"
         :boat="boat"
-        :incidents="incidents"
+        :incidents="incidents ?? []"
         :can-manage="canManageMaintenance"
         :can-delete="canDeleteIncidents"
       />

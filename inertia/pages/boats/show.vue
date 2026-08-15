@@ -31,18 +31,23 @@ import type { CrewMemberOption } from '../../../shared/types/crew'
 
 const { t } = useT()
 
+// Les props des groupes « maintenance » et « navigation » sont différées côté
+// serveur (#463) : elles valent `undefined` le temps que leur groupe arrive,
+// et l'onglet concerné affiche un skeleton en attendant.
 const props = defineProps<{
   boat: BoatShowDetail
-  maintenanceEvents: MaintenanceEventRow[]
-  maintenanceTasks: MaintenanceTaskRow[]
-  maintenanceSheets: MaintenanceSheetRow[]
-  boatDocuments: BoatDocumentRow[]
-  equipmentActions: BoatEquipmentActionRow[]
-  incidents: BoatIncidentRow[]
-  fuelLogs: FuelLogRow[]
-  navigationLogs: NavigationLogRow[]
-  portOptions: NavigationLogPortOption[]
-  crewMemberOptions: CrewMemberOption[]
+  maintenanceEvents?: MaintenanceEventRow[]
+  maintenanceTasks?: MaintenanceTaskRow[]
+  maintenanceSheets?: MaintenanceSheetRow[]
+  boatDocuments?: BoatDocumentRow[]
+  equipmentActions?: BoatEquipmentActionRow[]
+  incidents?: BoatIncidentRow[]
+  fuelLogs?: FuelLogRow[]
+  navigationLogs?: NavigationLogRow[]
+  portOptions?: NavigationLogPortOption[]
+  crewMemberOptions?: CrewMemberOption[]
+  aiSuggestions?: AiSuggestion[] | null
+  initialTab?: string | null
   positionHistory: BoatPositionHistoryRow[]
   latestGpsPosition: BoatPositionHistoryRow | null
   canManageMaintenance: boolean
@@ -57,7 +62,6 @@ const props = defineProps<{
   canUpdateNavigationLogs: boolean
   canDeleteNavigationLogs: boolean
   canExport: boolean
-  aiSuggestions: AiSuggestion[] | null
   pricing: BoatPricingRow | null
   pricingEnabled: boolean
   canManagePricing: boolean
@@ -77,6 +81,7 @@ const {
   boatDocuments: () => props.boatDocuments,
   incidents: () => props.incidents,
   pricingEnabled: () => props.pricingEnabled,
+  initialTabParam: () => props.initialTab,
 })
 
 // L'onglet cible n'est monté qu'après le rendu différé : on expose une intention
@@ -122,8 +127,15 @@ function onCreateIntentConsumed() {
 }
 
 const activeNavigationLog = computed(
-  () => props.navigationLogs.find((l) => l.status === 'in_progress') ?? null
+  () => props.navigationLogs?.find((l) => l.status === 'in_progress') ?? null
 )
+
+// `initialTab` ne concerne que la résolution de l'onglet : inutile de le laisser
+// retomber en attribut HTML sur le panneau de contenu.
+const tabContentProps = computed(() => {
+  const { initialTab: _initialTab, ...rest } = props
+  return rest
+})
 </script>
 
 <template>
@@ -183,7 +195,7 @@ const activeNavigationLog = computed(
       />
 
       <NavigationActiveCard
-        v-if="activeGroupKey === 'navigation' && activeNavigationLog"
+        v-if="activeGroupKey === 'navigation' && activeNavigationLog && portOptions"
         :boat="boat"
         :log="activeNavigationLog"
         :port-options="portOptions"
@@ -194,7 +206,7 @@ const activeNavigationLog = computed(
 
     <BoatShowTabContent
       :tab="tab"
-      v-bind="props"
+      v-bind="tabContentProps"
       :is-loading="isTabLoading"
       :create-intent="createIntent"
       @go-to-tab="goToTab"

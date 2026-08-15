@@ -1,5 +1,6 @@
 import { SpotNotFoundError } from '#exceptions/port_errors'
 import { boatOwnerPortalRedirect } from '#utils/staff_route_guard'
+import { deferJson } from '#utils/inertia_defer'
 import { QuotaExceededError } from '#exceptions/quota_errors'
 import AiAnalysisService from '#services/ai_analysis_service'
 import AuditLogService from '#services/audit_log_service'
@@ -11,7 +12,17 @@ import BoatOwnerService from '#services/boat_owner_service'
 import BoatPricingService from '#services/boat_pricing_service'
 import NavigationLogService from '#services/navigation_log_service'
 import CrewService from '#services/crew_service'
-import { toEditForm, toShowProps } from '#transformers/boat_transformer'
+import {
+  toEditForm,
+  toEquipmentActionRows,
+  toFuelLogRows,
+  toIncidentRows,
+  toMaintenanceEventRows,
+  toMaintenanceSheetRows,
+  toMaintenanceTaskRows,
+  toNavigationLogRows,
+  toShowShellProps,
+} from '#transformers/boat_transformer'
 import { toBoatPricingRow } from '#transformers/boat_pricing_transformer'
 import { toPortFormOptions } from '#transformers/port_transformer'
 import BoatIncidentService from '#services/boat_incident_service'
@@ -153,7 +164,14 @@ export default class BoatsController {
     }
   }
 
-  async show({ inertia, params, auth, response, bouncer, i18n }: HttpContext) {
+  /**
+   * La fiche bateau ne charge plus ses ~20 jeux de données d'onglet dans la
+   * réponse initiale (#463) : seul le squelette (bateau, photos, position,
+   * droits) est attendu, le reste est différé en deux groupes chargés en
+   * parallèle juste après le rendu. La page peint donc immédiatement avec ses
+   * onglets et un skeleton, au lieu de rester blanche plusieurs secondes.
+   */
+  async show({ inertia, params, request, auth, response, bouncer, i18n }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
@@ -164,57 +182,28 @@ export default class BoatsController {
       await user.load('organization')
 
       const [
-        maintenanceEvents,
-        maintenanceTasks,
-        maintenanceSheets,
         boatMedia,
         positionHistory,
-        latestSuggestions,
         canManageMaintenance,
-        boatDocuments,
         pricingRow,
-        equipmentActions,
         canManageEquipmentActions,
         canDeleteEquipmentActions,
-        incidents,
-        fuelLogs,
         canDeleteIncidents,
         canCreateFuelLogs,
         canDeleteFuelLogs,
-        crewMemberOptions,
-        navigationLogs,
-        ports,
         canCreateNavigationLogs,
         canUpdateNavigationLogs,
         canDeleteNavigationLogs,
       ] = await Promise.all([
-        this.maintenanceService.listForBoat(user, boat),
-        this.taskService.listForBoat(user, boat),
-        this.sheetService.listForBoat(user, boat),
         this.mediaService.listForEntity('boat', boat.id),
         this.boatService.getPositionHistory(boat.id),
-        user.organizationId
-          ? this.aiAnalysisService.getLatestBoatSuggestions(
-              user.id,
-              boat.id,
-              user.organizationId,
-              toAppLocale(i18n.locale)
-            )
-          : Promise.resolve(null),
         bouncer.with(BoatPolicy).allows('edit', boat),
-        this.documentService.listForBoat(user, boat),
         this.pricingService.getForBoat(boat),
-        this.equipmentActionService.listForBoat(user, boat),
         bouncer.with(EquipmentActionPolicy).allows('create', boat),
         bouncer.with(EquipmentActionPolicy).allows('delete', boat),
-        this.incidentService.listForBoat(user, boat),
-        this.fuelLogService.listForBoat(user, boat),
         bouncer.with(IncidentPolicy).allows('delete', boat),
         bouncer.with(FuelLogPolicy).allows('create', boat),
         bouncer.with(FuelLogPolicy).allows('delete', boat),
-        this.crewService.listOptionsForOrganization(user.organization),
-        this.navigationLogService.listForBoat(boat),
-        this.portService.listNamesForOrg(user),
         bouncer.with(NavigationLogPolicy).allows('create', boat),
         bouncer.with(NavigationLogPolicy).allows('update', boat),
         bouncer.with(NavigationLogPolicy).allows('delete'),
@@ -228,21 +217,13 @@ export default class BoatsController {
         : false
       const canManagePricing = pricingEnabled && canManageMaintenance
       const pricing = pricingRow ? toBoatPricingRow(pricingRow) : null
-      const aiSuggestions: AiSuggestion[] | null = latestSuggestions
-        ? (JSON.parse(latestSuggestions.responseText) as AiSuggestion[])
-        : null
-      const portOptions = ports.map((p) => ({ id: p.id, name: p.name }))
+      const tabParam = request.qs().tab
+      const initialTab = typeof tabParam === 'string' && tabParam !== '' ? tabParam : null
 
-      return inertia.render(
-        'boats/show',
-        toShowProps(boat, {
+      return inertia.render('boats/show', {
+        ...toShowShellProps(boat, {
           positionHistory,
           boatMedia,
-          maintenanceEvents,
-          maintenanceTasks,
-          maintenanceSheets,
-          boatDocuments,
-          aiSuggestions,
           canManageMaintenance,
           canManageEquipment,
           canManageDocuments,
@@ -250,22 +231,88 @@ export default class BoatsController {
           pricing,
           pricingEnabled,
           canManagePricing,
-          equipmentActions,
           canManageEquipmentActions,
           canDeleteEquipmentActions,
-          incidents,
-          fuelLogs,
-          navigationLogs,
-          portOptions,
-          crewMemberOptions,
           canDeleteIncidents,
           canCreateFuelLogs,
           canDeleteFuelLogs,
           canCreateNavigationLogs,
           canUpdateNavigationLogs,
           canDeleteNavigationLogs,
-        })
-      )
+          initialTab,
+        }),
+
+        // Groupe « maintenance » : onglets Aperçu, Historique, Tâches, Fiches,
+        // Actions équipement et Documents administratifs.
+        maintenanceEvents: inertia.defer(
+          deferJson(async () =>
+            toMaintenanceEventRows(await this.maintenanceService.listForBoat(user, boat))
+          ),
+          'maintenance'
+        ),
+        maintenanceTasks: inertia.defer(
+          deferJson(async () =>
+            toMaintenanceTaskRows(await this.taskService.listForBoat(user, boat))
+          ),
+          'maintenance'
+        ),
+        maintenanceSheets: inertia.defer(
+          deferJson(async () =>
+            toMaintenanceSheetRows(await this.sheetService.listForBoat(user, boat))
+          ),
+          'maintenance'
+        ),
+        boatDocuments: inertia.defer(
+          deferJson(() => this.documentService.listForBoat(user, boat)),
+          'maintenance'
+        ),
+        equipmentActions: inertia.defer(
+          deferJson(async () =>
+            toEquipmentActionRows(await this.equipmentActionService.listForBoat(user, boat))
+          ),
+          'maintenance'
+        ),
+        aiSuggestions: inertia.defer(
+          deferJson(async () => {
+            if (!user.organizationId) return null
+            const latest = await this.aiAnalysisService.getLatestBoatSuggestions(
+              user.id,
+              boat.id,
+              user.organizationId,
+              toAppLocale(i18n.locale)
+            )
+            return latest ? (JSON.parse(latest.responseText) as AiSuggestion[]) : null
+          }),
+          'maintenance'
+        ),
+
+        // Groupe « navigation » : onglets Journal de bord, Carburant, Incidents.
+        navigationLogs: inertia.defer(
+          deferJson(async () =>
+            toNavigationLogRows(await this.navigationLogService.listForBoat(boat))
+          ),
+          'navigation'
+        ),
+        fuelLogs: inertia.defer(
+          deferJson(async () => toFuelLogRows(await this.fuelLogService.listForBoat(user, boat))),
+          'navigation'
+        ),
+        incidents: inertia.defer(
+          deferJson(async () => toIncidentRows(await this.incidentService.listForBoat(user, boat))),
+          'navigation'
+        ),
+        portOptions: inertia.defer(
+          deferJson(async () => {
+            const ports = await this.portService.listNamesForOrg(user)
+            return ports.map((p) => ({ id: p.id, name: p.name }))
+          }),
+          'navigation'
+        ),
+        crewMemberOptions: inertia.defer(
+          deferJson(() => this.crewService.listOptionsForOrganization(user.organization)),
+          'navigation'
+        ),
+      })
     } catch (error) {
       if (error instanceof BoatNotFoundError) {
         response.redirect('/boats')

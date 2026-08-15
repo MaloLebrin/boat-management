@@ -29,25 +29,35 @@ type Group = { key: BoatShowGroupKey; label: string; tabs: TabItem[] }
  * l'onglet feuille (ex: `tasks`), le groupe actif en étant déduit.
  */
 export function useBoatShowTabs(input: {
-  maintenanceTasks: () => MaintenanceTaskRow[]
-  boatDocuments: () => BoatDocumentRow[]
-  incidents: () => BoatIncidentRow[]
+  // Les jeux de données d'onglet sont différés (#463) : ils valent `undefined`
+  // tant que leur groupe n'est pas arrivé — les compteurs de badge se
+  // contentent alors d'un tableau vide.
+  maintenanceTasks: () => MaintenanceTaskRow[] | undefined
+  boatDocuments: () => BoatDocumentRow[] | undefined
+  incidents: () => BoatIncidentRow[] | undefined
   pricingEnabled: () => boolean
+  /**
+   * Valeur brute du `?tab=` telle que vue par le serveur. Fournie en prop pour
+   * que le rendu SSR parte du bon onglet : lire `window.location` seul faisait
+   * rendre Aperçu côté serveur puis basculer à l'hydratation (flash — #463).
+   */
+  initialTabParam?: () => string | null | undefined
 }) {
   const { t } = useT()
 
   const openTasks = computed(() =>
-    input.maintenanceTasks().filter((task) => task.status === 'open')
+    (input.maintenanceTasks() ?? []).filter((task) => task.status === 'open')
   )
 
   const expiringDocCount = computed(
     () =>
-      input.boatDocuments().filter((d) => d.status === 'expiring_soon' || d.status === 'expired')
-        .length
+      (input.boatDocuments() ?? []).filter(
+        (d) => d.status === 'expiring_soon' || d.status === 'expired'
+      ).length
   )
 
   const openIncidents = computed(() =>
-    input.incidents().filter((i) => i.status === 'open' || i.status === 'in_progress')
+    (input.incidents() ?? []).filter((i) => i.status === 'open' || i.status === 'in_progress')
   )
 
   const groups = computed<Group[]>(() => [
@@ -119,9 +129,17 @@ export function useBoatShowTabs(input: {
     )
   }
 
+  // Le paramètre vient du serveur (rendu SSR compris) ; on ne retombe sur
+  // `window.location` que s'il n'a pas été fourni.
+  function rawTabParam(): string | null {
+    const fromServer = input.initialTabParam?.()
+    if (fromServer !== undefined) return fromServer
+    if (typeof window === 'undefined') return null
+    return new URLSearchParams(window.location.search).get('tab')
+  }
+
   function getInitialTab(): BoatShowTabKey {
-    if (typeof window === 'undefined') return 'overview'
-    const fromUrl = new URLSearchParams(window.location.search).get('tab')
+    const fromUrl = rawTabParam()
     if (!fromUrl) return 'overview'
     if (VALID_TABS.value.includes(fromUrl as BoatShowTabKey)) return fromUrl as BoatShowTabKey
     // Anciens liens `?tab=<groupe>` (ex: `?tab=maintenance`) : on atterrit sur
@@ -135,7 +153,7 @@ export function useBoatShowTabs(input: {
   // Si le `?tab=` initial n'était pas un onglet feuille (clé de groupe, valeur
   // inconnue), on normalise l'URL vers l'onglet réellement affiché (#419).
   if (typeof window !== 'undefined') {
-    const rawParam = new URLSearchParams(window.location.search).get('tab')
+    const rawParam = rawTabParam()
     if (rawParam !== null && rawParam !== tab.value) {
       const url = new URL(window.location.href)
       if (tab.value === 'overview') {
