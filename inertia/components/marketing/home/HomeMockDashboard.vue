@@ -159,7 +159,7 @@ const { t } = useT()
                   <td class="px-3 py-1.5 text-fg-muted">89h</td>
                 </tr>
                 <tr>
-                  <td class="px-3 py-1.5 font-medium">Alizee</td>
+                  <td class="px-3 py-1.5 font-medium">Alizée</td>
                   <td class="px-3 py-1.5 text-fg-muted">Voilier</td>
                   <td class="px-3 py-1.5">
                     <span

@@ -57,11 +57,11 @@
         </div>
         <div class="mt-2 flex gap-1">
           <span class="rounded bg-brand-soft px-2 py-0.5 text-[9px] font-medium text-brand"
-            >Apercu</span
+            >Aperçu</span
           >
           <span class="px-2 py-0.5 text-[9px] text-fg-muted">Historique</span>
           <span class="px-2 py-0.5 text-[9px] text-fg-muted">Documents</span>
-          <span class="px-2 py-0.5 text-[9px] text-fg-muted">Taches</span>
+          <span class="px-2 py-0.5 text-[9px] text-fg-muted">Tâches</span>
         </div>
       </div>
 
@@ -94,7 +94,7 @@
               <p class="text-[9px] text-fg-subtle">+12h ce mois</p>
             </div>
             <div class="rounded-lg border border-bone bg-surface-elevated p-2">
-              <p class="text-[9px] font-medium uppercase text-fg-muted">Derniere maint.</p>
+              <p class="text-[9px] font-medium uppercase text-fg-muted">Dernière maint.</p>
               <p class="font-display text-lg text-fg">18 avr</p>
               <p class="text-[9px] text-fg-subtle">Antifouling</p>
             </div>
@@ -107,7 +107,7 @@
 
           <!-- Specs grid -->
           <div class="rounded-lg border border-bone bg-surface-elevated p-3">
-            <p class="mb-2 font-semibold text-fg">Specifications</p>
+            <p class="mb-2 font-semibold text-fg">Spécifications</p>
             <div class="grid grid-cols-2 gap-x-4 gap-y-2">
               <div>
                 <p class="text-[9px] text-fg-muted">Longueur</p>
@@ -126,11 +126,11 @@
                 <p class="font-medium">Yanmar 45CV</p>
               </div>
               <div>
-                <p class="text-[9px] text-fg-muted">Annee</p>
+                <p class="text-[9px] text-fg-muted">Année</p>
                 <p class="font-medium">2019</p>
               </div>
               <div>
-                <p class="text-[9px] text-fg-muted">Categorie</p>
+                <p class="text-[9px] text-fg-muted">Catégorie</p>
                 <p class="font-medium">CE-A</p>
               </div>
             </div>
@@ -151,7 +151,7 @@
             <button
               class="mt-1.5 w-full rounded bg-white/20 px-2 py-1 text-[9px] font-medium hover:bg-white/30"
             >
-              Creer tache
+              Créer tâche
             </button>
           </div>
 

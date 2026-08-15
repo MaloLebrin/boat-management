@@ -1,4 +1,5 @@
 import { onMounted, onUnmounted, ref, type Ref } from 'vue'
+import { resolveLocaleTag } from '../../shared/helpers/date_format'
 
 interface CountUpOptions {
   /** Durée de l'animation en ms. */
@@ -11,6 +12,8 @@ interface CountUpOptions {
   suffix?: string
   /** Seuil de déclenchement de l'IntersectionObserver. */
   threshold?: number
+  /** Locale de rendu du nombre (séparateur de milliers, séparateur décimal). */
+  locale?: string
 }
 
 /**
@@ -20,14 +23,29 @@ interface CountUpOptions {
  * directement la valeur finale) et le SSR (aucun accès `window` avant `onMounted`).
  */
 export function useCountUp(target: number, options: CountUpOptions = {}) {
-  const { duration = 1600, decimals = 0, prefix = '', suffix = '', threshold = 0.4 } = options
+  const {
+    duration = 1600,
+    decimals = 0,
+    prefix = '',
+    suffix = '',
+    threshold = 0.4,
+    locale,
+  } = options
 
   const el: Ref<HTMLElement | null> = ref(null)
   const current = ref(0)
   let observer: IntersectionObserver | null = null
   let rafId: number | null = null
 
-  const format = (value: number) => `${prefix}${value.toFixed(decimals)}${suffix}`
+  // `toFixed` rendait `28240` là où la source écrivait « 28 240 » : le compteur
+  // ravalait le séparateur de milliers de la traduction (#465). Le regroupement
+  // suit désormais la locale de l'app — `28 240` (fr) · `28,240` (en).
+  // Instancié une fois : `format` est rappelé à chaque frame d'animation.
+  const numberFormat = new Intl.NumberFormat(resolveLocaleTag(locale), {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  })
+  const format = (value: number) => `${prefix}${numberFormat.format(value)}${suffix}`
   const display = ref(format(0))
 
   function reducedMotion() {

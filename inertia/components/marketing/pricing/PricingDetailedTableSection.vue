@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { ChevronDownIcon, CheckIcon } from '@heroicons/vue/24/solid'
 import BaseButton from '~/components/base/BaseButton.vue'
+import { useNumberFormat } from '~/composables/use_number_format'
 import { useScrollReveal } from '~/composables/use_scroll_reveal'
 
 interface GroupRow {
@@ -42,6 +43,7 @@ defineProps<{
 }>()
 
 const { el, isVisible } = useScrollReveal()
+const { formatPrice } = useNumberFormat()
 
 // First 3 groups open by default
 const openGroups = ref<Set<number>>(new Set([0, 1, 2]))
@@ -114,7 +116,7 @@ function collapseAllGroups() {
                 <p :class="['mt-1 text-xs', idx === 1 ? 'text-white/60' : 'text-fg-subtle']">
                   {{
                     plan.price ??
-                    `${billing === 'annual' ? plan.priceAnnual : plan.priceMonthly} € ${plan.pricePer}`
+                    `${formatPrice(billing === 'annual' ? plan.priceAnnual! : plan.priceMonthly!)} ${plan.pricePer}`
                   }}
                 </p>
                 <p
