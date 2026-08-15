@@ -74,6 +74,93 @@ test('resyncs local state when the parent replaces modelValue (restart)', async 
   expect(last).toEqual({ hasDedicatedEngine: true, lengthM: 7 })
 })
 
+// #464: « 10.5 » tapé au pavé numérique laissait « 5 » dans le champ. Le champ
+// renvoyait `Number(value)` dans `:value`, or « 10. » est incomplet donc lu
+// comme vide : le `0` réinjecté écrasait la frappe en cours.
+describe('length input (#464)', () => {
+  // Rejoue le va-et-vient du parent : `v-model` renvoie chaque émission dans
+  // les props, c'est là que la valeur réinjectée écrasait la saisie.
+  function mountWithParent(modelValue: Record<string, unknown> = {}) {
+    const w = mount(SimulatorStepBoat, { props: { modelValue } })
+    const sync = async () => {
+      const emitted = w.emitted('update:modelValue')!
+      await w.setProps({ modelValue: emitted[emitted.length - 1][0] as Record<string, unknown> })
+    }
+    const last = () => {
+      const emitted = w.emitted('update:modelValue')!
+      return emitted[emitted.length - 1][0] as Record<string, unknown>
+    }
+    return { w, sync, last }
+  }
+
+  test('accepts the decimal point', async () => {
+    const { w, sync, last } = mountWithParent()
+    await w.find('#lengthM').setValue('10.5')
+    await sync()
+    expect(last()).toMatchObject({ lengthM: 10.5 })
+    expect((w.find('#lengthM').element as HTMLInputElement).value).toBe('10.5')
+  })
+
+  test('accepts the decimal comma', async () => {
+    const { w, sync, last } = mountWithParent()
+    await w.find('#lengthM').setValue('10,5')
+    await sync()
+    expect(last()).toMatchObject({ lengthM: 10.5 })
+  })
+
+  test('leaves an in-progress entry alone instead of writing a 0 back', async () => {
+    // Un champ `type="number"` rapporte une valeur vide tant que « 10. » est
+    // incomplet : le composant doit s'abstenir, pas renvoyer `Number('') === 0`.
+    const { w, sync, last } = mountWithParent()
+    const input = w.find('#lengthM')
+
+    await input.setValue('')
+    await sync()
+
+    expect(last().lengthM).toBeUndefined()
+    expect((input.element as HTMLInputElement).value).toBe('')
+  })
+
+  test('clearing the field does not leave a 0 behind', async () => {
+    const { w, sync, last } = mountWithParent()
+    await w.find('#lengthM').setValue('10.5')
+    await sync()
+    await w.find('#lengthM').setValue('')
+    await sync()
+
+    expect(last().lengthM).toBeUndefined()
+    expect((w.find('#lengthM').element as HTMLInputElement).value).toBe('')
+  })
+
+  test('flags an out-of-range length instead of silently disabling Next', async () => {
+    const w = mount(SimulatorStepBoat, { props: { modelValue: {} } })
+    await w.find('#lengthM').setValue('42')
+
+    const error = w.find('#lengthM-error')
+    expect(error.exists()).toBe(true)
+    expect(error.text()).toBe('simulator.length_error')
+    expect(w.find('#lengthM').attributes('aria-invalid')).toBe('true')
+    expect(w.find('#lengthM').attributes('aria-describedby')).toBe('lengthM-error')
+  })
+
+  test('flags an out-of-range year the same way', async () => {
+    const w = mount(SimulatorStepBoat, { props: { modelValue: {} } })
+    await w.find('#yearBuilt').setValue('1899')
+
+    expect(w.find('#yearBuilt-error').exists()).toBe(true)
+    expect(w.find('#yearBuilt').attributes('aria-invalid')).toBe('true')
+  })
+
+  test('stays quiet on an empty or valid field', async () => {
+    const w = mount(SimulatorStepBoat, { props: { modelValue: {} } })
+    expect(w.find('#lengthM-error').exists()).toBe(false)
+
+    await w.find('#lengthM').setValue('10.5')
+    expect(w.find('#lengthM-error').exists()).toBe(false)
+    expect(w.find('#lengthM').attributes('aria-invalid')).toBeUndefined()
+  })
+})
+
 describe('dark mode (#416)', () => {
   test('les cartes d’option utilisent des tokens, pas bg-white ni navy figé', () => {
     const html = mount(SimulatorStepBoat, { props: { modelValue: {} } }).html()
