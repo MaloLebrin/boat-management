@@ -8,6 +8,7 @@ import { Head } from '@inertiajs/vue3'
 import { Link } from '@adonisjs/inertia/vue'
 import { computed } from 'vue'
 import { useT } from '~/composables/use_t'
+import { formatLength } from '../../../shared/helpers/number_format'
 import SimulatorResultCard from '~/components/marketing/simulator/SimulatorResultCard.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import type { SimulatorBoatInput, SimulatorCostBreakdown } from '../../../shared/types/simulator'
@@ -40,10 +41,11 @@ const boatTypeLabel = computed(() => {
 const ogTitle = computed(() => {
   const min = formatCurrency(props.breakdown.totalMin)
   const max = formatCurrency(props.breakdown.totalMax)
+  const length = formatLength(props.input.lengthM, props.locale)
   if (props.locale === 'fr') {
-    return `Entretien ${boatTypeLabel.value} ${props.input.lengthM}m - ${min}-${max}/an | FleetAi`
+    return `Entretien ${boatTypeLabel.value} ${length} - ${min}-${max}/an | FleetAi`
   }
-  return `${props.input.lengthM}m ${boatTypeLabel.value} maintenance - ${min}-${max}/year | FleetAi`
+  return `${length} ${boatTypeLabel.value} maintenance - ${min}-${max}/year | FleetAi`
 })
 
 const ogDescription = computed(() => t('simulator.share_page_subtitle'))

@@ -2,6 +2,7 @@
 import { computed, ref, watch } from 'vue'
 import { useT } from '~/composables/use_t'
 import BaseOptionCard from '~/components/base/BaseOptionCard.vue'
+import SimulatorBoatDimensionsFields from '~/components/marketing/simulator/SimulatorBoatDimensionsFields.vue'
 import type { SimulatorBoatInput, SimulatorBoatType } from '../../../../shared/types/simulator'
 
 interface Props {
@@ -71,7 +72,10 @@ watch(
   }
 )
 
-function update<K extends keyof SimulatorBoatInput>(key: K, value: SimulatorBoatInput[K]) {
+function update<K extends keyof SimulatorBoatInput>(
+  key: K,
+  value: SimulatorBoatInput[K] | undefined
+) {
   local.value = { ...local.value, [key]: value }
   emit('update:modelValue', local.value)
 }
@@ -126,37 +130,12 @@ const canProceed = computed(() => {
     </div>
 
     <!-- Length + Year side by side -->
-    <div class="grid grid-cols-2 gap-4">
-      <div>
-        <label for="lengthM" class="mb-2 block text-sm font-semibold text-fg">
-          {{ t('simulator.length_label') }}
-        </label>
-        <input
-          id="lengthM"
-          type="number"
-          min="2"
-          max="30"
-          step="0.1"
-          :value="modelValue.lengthM"
-          class="w-full rounded-lg border border-sand bg-surface-elevated px-4 py-3 text-fg placeholder:text-fg-subtle focus:border-navy-500 focus:outline-none focus:ring-2 focus:ring-navy-500/15"
-          @input="update('lengthM', Number(($event.target as HTMLInputElement).value))"
-        />
-      </div>
-      <div>
-        <label for="yearBuilt" class="mb-2 block text-sm font-semibold text-fg">
-          {{ t('simulator.year_built_label') }}
-        </label>
-        <input
-          id="yearBuilt"
-          type="number"
-          :min="1950"
-          :max="currentYear"
-          :value="modelValue.yearBuilt"
-          class="w-full rounded-lg border border-sand bg-surface-elevated px-4 py-3 text-fg placeholder:text-fg-subtle focus:border-navy-500 focus:outline-none focus:ring-2 focus:ring-navy-500/15"
-          @input="update('yearBuilt', Number(($event.target as HTMLInputElement).value))"
-        />
-      </div>
-    </div>
+    <SimulatorBoatDimensionsFields
+      :length-m="modelValue.lengthM"
+      :year-built="modelValue.yearBuilt"
+      @update:length-m="update('lengthM', $event)"
+      @update:year-built="update('yearBuilt', $event)"
+    />
 
     <!-- Navigation category -->
     <div>

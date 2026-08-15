@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { router, useForm, usePage } from '@inertiajs/vue3'
 import { useT } from '~/composables/use_t'
+import { useNumberFormat } from '~/composables/use_number_format'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import UpgradePlanModal from '~/components/base/UpgradePlanModal.vue'
@@ -18,7 +19,12 @@ const props = defineProps<Props>()
 const emit = defineEmits<{ (e: 'email-submitted'): void }>()
 
 const { t } = useT()
+const { formatLength } = useNumberFormat()
 const page = usePage<{ locale?: string }>()
+
+// `10,5 m` en FR, `10.5 m` en EN — séparateur et espace inclus (#464), au lieu
+// du `{length}m` collé qui rendait « Votre Voilier 10.5m » dans les deux langues.
+const lengthLabel = computed(() => formatLength(props.input.lengthM))
 
 const showUpgradeModal = ref(false)
 const emailSubmitted = ref(false)
@@ -74,7 +80,7 @@ function submitLead() {
           {{
             t('simulator.cta_add_boat_title', {
               type: t(boatTypeLabels[input.boatType]),
-              length: String(input.lengthM),
+              length: lengthLabel,
             })
           }}
         </template>
@@ -82,7 +88,7 @@ function submitLead() {
           {{
             t('simulator.cta_title', {
               type: t(boatTypeLabels[input.boatType]),
-              length: String(input.lengthM),
+              length: lengthLabel,
             })
           }}
         </template>
