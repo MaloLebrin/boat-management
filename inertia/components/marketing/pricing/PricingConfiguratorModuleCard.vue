@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { CheckIcon } from '@heroicons/vue/24/solid'
+import { useNumberFormat } from '~/composables/use_number_format'
 
 defineProps<{
   icon: string
@@ -13,6 +14,8 @@ defineProps<{
   features: string[]
   selected: boolean
 }>()
+
+const { formatPrice } = useNumberFormat()
 
 const emit = defineEmits<{ toggle: [] }>()
 </script>
@@ -63,7 +66,7 @@ const emit = defineEmits<{ toggle: [] }>()
 
     <div class="mt-4 border-t border-dashed border-current/10 pt-3">
       <div class="flex items-baseline gap-1">
-        <span class="font-display text-xl text-fg">+{{ price }} €</span>
+        <span class="font-display text-xl text-fg">+{{ formatPrice(price) }}</span>
         <span class="text-sm text-fg-subtle">{{ pricePer }}</span>
       </div>
       <p v-if="billedAnnuallyNote" class="mt-0.5 text-xs text-fg-subtle">

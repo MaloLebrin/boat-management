@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useNumberFormat } from '~/composables/use_number_format'
 import { useScrollReveal } from '~/composables/use_scroll_reveal'
 
 interface ModuleItem {
@@ -19,6 +20,7 @@ defineProps<{
 }>()
 
 const { el, isVisible } = useScrollReveal()
+const { formatPrice } = useNumberFormat()
 </script>
 
 <template>
@@ -43,7 +45,7 @@ const { el, isVisible } = useScrollReveal()
           <h3 class="mt-4 font-semibold text-fg">{{ item.name }}</h3>
           <p class="mt-1 text-sm text-fg-muted">{{ item.desc }}</p>
           <div class="mt-4 flex items-baseline gap-1 border-t border-dashed border-current/10 pt-4">
-            <span class="font-display text-2xl text-fg">{{ item.price }} €</span>
+            <span class="font-display text-2xl text-fg">{{ formatPrice(item.price) }}</span>
             <span class="text-sm text-fg-subtle">{{ pricePer }}</span>
           </div>
         </div>

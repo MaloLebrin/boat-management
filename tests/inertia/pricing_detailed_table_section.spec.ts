@@ -1,6 +1,18 @@
 import { mount } from '@vue/test-utils'
-import { describe, expect, test } from 'vitest'
+import { afterEach, describe, expect, test, vi } from 'vitest'
 import PricingDetailedTableSection from '../../inertia/components/marketing/pricing/PricingDetailedTableSection.vue'
+import { formatPrice } from '../../shared/helpers/number_format'
+
+const page = vi.hoisted(() => ({ locale: 'fr' }))
+
+vi.mock('@inertiajs/vue3', async () => {
+  const actual = await vi.importActual<typeof import('@inertiajs/vue3')>('@inertiajs/vue3')
+  return { ...actual, usePage: () => ({ props: { locale: page.locale } }) }
+})
+
+afterEach(() => {
+  page.locale = 'fr'
+})
 
 function makeProps(billing: 'monthly' | 'annual') {
   return {
@@ -30,16 +42,16 @@ function makeProps(billing: 'monthly' | 'annual') {
 test('monthly billing shows the monthly plan prices with no annual note', () => {
   const w = mount(PricingDetailedTableSection, { props: makeProps('monthly') })
 
-  expect(w.text()).toContain('20 € / mois')
-  expect(w.text()).toContain('99 € / mois')
+  expect(w.text()).toContain(`${formatPrice(20, 'fr')} / mois`)
+  expect(w.text()).toContain(`${formatPrice(99, 'fr')} / mois`)
   expect(w.text()).not.toContain('Facturé annuellement.')
 })
 
 test('annual billing shows the discounted plan prices with the billed-annually note', () => {
   const w = mount(PricingDetailedTableSection, { props: makeProps('annual') })
 
-  expect(w.text()).toContain('16 € / mois')
-  expect(w.text()).toContain('79 € / mois')
+  expect(w.text()).toContain(`${formatPrice(16, 'fr')} / mois`)
+  expect(w.text()).toContain(`${formatPrice(79, 'fr')} / mois`)
   expect(w.text()).toContain('Facturé annuellement.')
 })
 

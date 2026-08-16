@@ -37,3 +37,18 @@ export function formatLength(value: number, locale?: string | null): string {
     maximumFractionDigits: 2,
   }).format(value)
 }
+
+/**
+ * A whole-euro price tag — `20 €` (fr) · `€20` (en).
+ *
+ * The marketing pages used to glue a literal ` €` after the number, so the
+ * English pricing page read `20 €` right next to copy announcing `€20` (#465).
+ * Which side the symbol sits on is the locale's business, never the template's.
+ */
+export function formatPrice(value: number, locale?: string | null): string {
+  return new Intl.NumberFormat(resolveLocaleTag(locale), {
+    style: 'currency',
+    currency: 'EUR',
+    maximumFractionDigits: 0,
+  }).format(value)
+}

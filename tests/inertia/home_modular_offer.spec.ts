@@ -1,10 +1,22 @@
 import { mount } from '@vue/test-utils'
-import { describe, expect, test, vi } from 'vitest'
+import { afterEach, describe, expect, test, vi } from 'vitest'
 import HomeModularOfferSection from '../../inertia/components/marketing/home/HomeModularOfferSection.vue'
+import { formatPrice } from '../../shared/helpers/number_format'
 
 vi.mock('@adonisjs/inertia/vue', () => ({
   Link: { template: '<a><slot /></a>' },
 }))
+
+const page = vi.hoisted(() => ({ locale: 'fr' }))
+
+vi.mock('@inertiajs/vue3', async () => {
+  const actual = await vi.importActual<typeof import('@inertiajs/vue3')>('@inertiajs/vue3')
+  return { ...actual, usePage: () => ({ props: { locale: page.locale } }) }
+})
+
+afterEach(() => {
+  page.locale = 'fr'
+})
 
 const baseProps = {
   eyebrow: 'OFFRE MODULAIRE',
@@ -28,10 +40,23 @@ const baseProps = {
 test('renders the base plan price and both modules with prices', () => {
   const w = mount(HomeModularOfferSection, { props: baseProps })
   expect(w.text()).toContain('Plan Pro')
-  expect(w.text()).toContain('20 €')
+  expect(w.text()).toContain(formatPrice(20, 'fr'))
   expect(w.text()).toContain('Location')
   expect(w.text()).toContain('CRM & Facturation')
-  expect(w.text()).toContain('+15 €')
+  expect(w.text()).toContain(`+${formatPrice(15, 'fr')}`)
+})
+
+// #465 — le prix était écrit « {{ basePrice }} € » en dur, si bien que la page
+// EN affichait « 20 € » à côté d'un texte annonçant « €20 ».
+test('places the currency symbol on the side the locale expects', () => {
+  const fr = mount(HomeModularOfferSection, { props: baseProps }).text()
+  expect(fr).toContain(formatPrice(20, 'fr'))
+  expect(fr).toMatch(/20\s?€/)
+
+  page.locale = 'en'
+  const en = mount(HomeModularOfferSection, { props: baseProps }).text()
+  expect(en).toContain('€20')
+  expect(en).not.toMatch(/20\s?€/)
 })
 
 test('renders the availability note and CTA', () => {

@@ -145,7 +145,7 @@
             <div class="min-h-[48px] border-r border-bone p-1">
               <span>28</span>
               <div class="mt-0.5 rounded bg-coral-100 px-1 py-0.5 text-[8px] text-coral-700">
-                Alizee
+                Alizée
               </div>
             </div>
             <div class="min-h-[48px] border-r border-bone p-1">29</div>
@@ -167,11 +167,11 @@
           </div>
           <div class="flex items-center gap-1">
             <div class="h-2 w-2 rounded bg-navy-400" />
-            <span class="text-fg-muted">Planifie</span>
+            <span class="text-fg-muted">Planifié</span>
           </div>
           <div class="flex items-center gap-1">
             <div class="h-2 w-2 rounded bg-mint-400" />
-            <span class="text-fg-muted">Termine</span>
+            <span class="text-fg-muted">Terminé</span>
           </div>
         </div>
       </div>

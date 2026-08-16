@@ -97,7 +97,7 @@
             </li>
             <li class="flex items-start gap-1">
               <span class="mt-0.5 text-coral-500">&#8226;</span>
-              <span><strong>Alizee</strong> : Controle greement (retard 3j)</span>
+              <span><strong>Alizée</strong> : Contrôle gréement (retard 3j)</span>
             </li>
             <li class="flex items-start gap-1">
               <span class="mt-0.5 text-amber-500">&#8226;</span>
@@ -115,7 +115,7 @@
             <button
               class="rounded bg-violet-100 px-2 py-0.5 text-[9px] font-medium text-violet-700 hover:bg-violet-200"
             >
-              Voir details
+              Voir détails
             </button>
           </div>
         </div>
@@ -128,7 +128,7 @@
         <!-- AI response -->
         <div class="rounded-lg rounded-bl-sm bg-surface-elevated p-2">
           <p class="text-[10px] text-fg">
-            <span class="text-mint-600">&#10003;</span> Tache creee pour
+            <span class="text-mint-600">&#10003;</span> Tâche créée pour
             <strong>Mistral II</strong> :
           </p>
           <div class="mt-1.5 rounded border border-bone bg-paper p-1.5 text-[9px]">

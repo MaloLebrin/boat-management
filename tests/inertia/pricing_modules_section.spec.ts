@@ -1,6 +1,18 @@
 import { mount } from '@vue/test-utils'
-import { expect, test } from 'vitest'
+import { afterEach, expect, test, vi } from 'vitest'
 import PricingModulesSection from '../../inertia/components/marketing/pricing/PricingModulesSection.vue'
+import { formatPrice } from '../../shared/helpers/number_format'
+
+const page = vi.hoisted(() => ({ locale: 'fr' }))
+
+vi.mock('@inertiajs/vue3', async () => {
+  const actual = await vi.importActual<typeof import('@inertiajs/vue3')>('@inertiajs/vue3')
+  return { ...actual, usePage: () => ({ props: { locale: page.locale } }) }
+})
+
+afterEach(() => {
+  page.locale = 'fr'
+})
 
 const baseProps = {
   eyebrow: 'MODULES',
@@ -20,7 +32,7 @@ test('renders one card per module with its price', () => {
 
   expect(w.text()).toContain('Location')
   expect(w.text()).toContain('CRM & Facturation')
-  expect(w.text()).toContain('15 €')
+  expect(w.text()).toContain(formatPrice(15, 'fr'))
   expect(w.text()).toContain('/mois')
 })
 

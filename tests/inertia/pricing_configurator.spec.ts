@@ -1,6 +1,18 @@
 import { mount } from '@vue/test-utils'
-import { describe, expect, test } from 'vitest'
+import { afterEach, describe, expect, test, vi } from 'vitest'
 import PricingConfigurator from '../../inertia/components/marketing/pricing/PricingConfigurator.vue'
+import { formatPrice } from '../../shared/helpers/number_format'
+
+const page = vi.hoisted(() => ({ locale: 'fr' }))
+
+vi.mock('@inertiajs/vue3', async () => {
+  const actual = await vi.importActual<typeof import('@inertiajs/vue3')>('@inertiajs/vue3')
+  return { ...actual, usePage: () => ({ props: { locale: page.locale } }) }
+})
+
+afterEach(() => {
+  page.locale = 'fr'
+})
 
 function makeProps(billing: 'monthly' | 'annual' = 'monthly') {
   return {
@@ -54,7 +66,7 @@ function makeProps(billing: 'monthly' | 'annual' = 'monthly') {
 test('total starts at the base price with no module selected', () => {
   const w = mount(PricingConfigurator, { props: makeProps('monthly') })
   expect(w.vm.total).toBe(20)
-  expect(w.text()).toContain('20 €')
+  expect(w.text()).toContain(formatPrice(20, 'fr'))
 })
 
 test('selecting a module adds its monthly price to the total', async () => {
@@ -107,14 +119,14 @@ function makePropsWithExtraBoats(billing: 'monthly' | 'annual') {
 test('extra boats show the monthly unit price with no annual note', () => {
   const w = mount(PricingConfigurator, { props: makePropsWithExtraBoats('monthly') })
 
-  expect(w.text()).toContain('4 € /bateau/mois')
+  expect(w.text()).toContain(`${formatPrice(4, 'fr')} /bateau/mois`)
   expect(w.text()).not.toContain('Facturé annuellement.')
 })
 
 test('extra boats show the discounted unit price with the billed-annually note', () => {
   const w = mount(PricingConfigurator, { props: makePropsWithExtraBoats('annual') })
 
-  expect(w.text()).toContain('3 € /bateau/mois')
+  expect(w.text()).toContain(`${formatPrice(3, 'fr')} /bateau/mois`)
   expect(w.text()).toContain('Facturé annuellement.')
 })
 
