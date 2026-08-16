@@ -76,4 +76,23 @@ export default await Env.create(new URL('../', import.meta.url), {
   // Boîte qui reçoit les messages du formulaire de contact public (#450).
   // Vide → repli sur MAIL_FROM_ADDRESS.
   CONTACT_INBOX_EMAIL: Env.schema.string.optional(),
+
+  // Identité de l'éditeur et de l'hébergeur affichée sur les mentions légales
+  // (#466, obligation LCEN art. 6-III). Optionnelles pour ne pas bloquer le
+  // démarrage en local ou en test : une valeur absente est rendue « à
+  // compléter » sur la page publique — voir docs/dev/mentions-legales.md.
+  LEGAL_COMPANY_NAME: Env.schema.string.optional(),
+  LEGAL_LEGAL_FORM: Env.schema.string.optional(),
+  LEGAL_SHARE_CAPITAL: Env.schema.string.optional(),
+  LEGAL_REGISTRATION_NUMBER: Env.schema.string.optional(),
+  LEGAL_VAT_NUMBER: Env.schema.string.optional(),
+  LEGAL_ADDRESS: Env.schema.string.optional(),
+  LEGAL_CONTACT_EMAIL: Env.schema.string.optional(),
+  LEGAL_CONTACT_PHONE: Env.schema.string.optional(),
+  LEGAL_PUBLICATION_DIRECTOR: Env.schema.string.optional(),
+  LEGAL_HOST_NAME: Env.schema.string.optional(),
+  LEGAL_HOST_ADDRESS: Env.schema.string.optional(),
+  LEGAL_HOST_CONTACT: Env.schema.string.optional(),
+  LEGAL_MEDIATOR_NAME: Env.schema.string.optional(),
+  LEGAL_MEDIATOR_URL: Env.schema.string.optional(),
 })

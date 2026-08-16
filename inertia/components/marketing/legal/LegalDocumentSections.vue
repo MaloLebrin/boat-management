@@ -2,10 +2,16 @@
 import type { LegalDocument } from '#shared/types/marketing'
 
 /**
- * Gabarit commun des pages légales (confidentialité, CGU) : hero, sections
- * numérotées, bloc contact. Les pages ne portent plus que leur `<Head>` (#455).
+ * Gabarit commun des pages légales (confidentialité, CGU, CGV, mentions
+ * légales) : hero, sections numérotées, bloc contact. Les pages ne portent plus
+ * que leur `<Head>` (#455). Une section peut porter une fiche « libellé :
+ * valeur » (`entries`) pour l'identité de l'éditeur et de l'hébergeur (#466).
  */
 defineProps<{ document: LegalDocument }>()
+
+/** Le lien du médiateur et l'e-mail de contact restent cliquables dans la fiche. */
+const isExternalUrl = (value: string) => value.startsWith('https://') || value.startsWith('http://')
+const isEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
 </script>
 
 <template>
@@ -45,6 +51,29 @@ defineProps<{ document: LegalDocument }>()
             <span>{{ bullet }}</span>
           </li>
         </ul>
+
+        <dl
+          v-if="section.entries"
+          class="mt-2 grid gap-3 rounded-2xl border border-border bg-surface p-6 sm:grid-cols-[minmax(0,14rem)_1fr]"
+        >
+          <template v-for="(item, e) in section.entries" :key="e">
+            <dt class="text-sm font-semibold text-fg">{{ item.label }}</dt>
+            <dd class="text-fg-muted">
+              <a
+                v-if="isExternalUrl(item.value)"
+                :href="item.value"
+                rel="noopener noreferrer"
+                target="_blank"
+                class="underline"
+                >{{ item.value }}</a
+              >
+              <a v-else-if="isEmail(item.value)" :href="`mailto:${item.value}`" class="underline">{{
+                item.value
+              }}</a>
+              <span v-else>{{ item.value }}</span>
+            </dd>
+          </template>
+        </dl>
       </article>
     </div>
   </section>

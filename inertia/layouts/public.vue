@@ -28,6 +28,12 @@ const privacyHref = computed(() => (locale.value === 'fr' ? '/fr/confidentialite
 
 const termsHref = computed(() => (locale.value === 'fr' ? '/fr/cgu' : '/en/terms'))
 
+const salesTermsHref = computed(() => (locale.value === 'fr' ? '/fr/cgv' : '/en/sales-terms'))
+
+const legalNoticeHref = computed(() =>
+  locale.value === 'fr' ? '/fr/mentions-legales' : '/en/legal-notice'
+)
+
 const aboutHref = computed(() => (locale.value === 'fr' ? '/fr/a-propos' : '/en/about'))
 
 const contactHref = computed(() => (locale.value === 'fr' ? '/fr/contact' : '/en/contact'))
@@ -94,6 +100,12 @@ const contactHref = computed(() => (locale.value === 'fr' ? '/fr/contact' : '/en
             }}</Link>
             <Link :href="termsHref" class="transition-colors hover:text-fg">{{
               t('public.footer.terms')
+            }}</Link>
+            <Link :href="salesTermsHref" class="transition-colors hover:text-fg">{{
+              t('public.footer.salesTerms')
+            }}</Link>
+            <Link :href="legalNoticeHref" class="transition-colors hover:text-fg">{{
+              t('public.footer.legalNotice')
             }}</Link>
           </div>
         </div>
