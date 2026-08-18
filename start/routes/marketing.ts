@@ -19,6 +19,10 @@ router
     router.get('/boat-maintenance-cost', [MarketingController, 'guide']).as('marketing.en.guide')
     router.get('/privacy', [MarketingController, 'privacy']).as('marketing.en.privacy')
     router.get('/terms', [MarketingController, 'terms']).as('marketing.en.terms')
+    router.get('/sales-terms', [MarketingController, 'salesTerms']).as('marketing.en.sales_terms')
+    router
+      .get('/legal-notice', [MarketingController, 'legalNotice'])
+      .as('marketing.en.legal_notice')
   })
   .prefix('en')
 
@@ -32,6 +36,10 @@ router
     router.get('/cout-entretien-bateau', [MarketingController, 'guide']).as('marketing.fr.guide')
     router.get('/confidentialite', [MarketingController, 'privacy']).as('marketing.fr.privacy')
     router.get('/cgu', [MarketingController, 'terms']).as('marketing.fr.terms')
+    router.get('/cgv', [MarketingController, 'salesTerms']).as('marketing.fr.sales_terms')
+    router
+      .get('/mentions-legales', [MarketingController, 'legalNotice'])
+      .as('marketing.fr.legal_notice')
   })
   .prefix('fr')
 

@@ -11,13 +11,47 @@ export type PricingTableRow = [
 ]
 
 /**
- * Page légale (politique de confidentialité, CGU) : même gabarit hero +
- * sections numérotées + bloc contact, une seule source de données (#455).
+ * Ligne « libellé : valeur » d'une section légale — l'identité de l'éditeur et
+ * de l'hébergeur des mentions légales (#466), qui se lit comme une fiche et non
+ * comme un paragraphe.
+ */
+export interface LegalEntry {
+  label: string
+  value: string
+}
+
+/**
+ * Page légale (politique de confidentialité, CGU, CGV, mentions légales) : même
+ * gabarit hero + sections numérotées + bloc contact, une seule source de
+ * données (#455).
  */
 export interface LegalSection {
   title: string
   body: string
   bullets?: string[]
+  entries?: LegalEntry[]
+}
+
+/**
+ * Identité de l'exploitant exigée par la LCEN (art. 6-III) : elle dépend de la
+ * structure juridique réelle, elle vit donc dans l'environnement et non dans le
+ * code (#466). Une valeur vide est rendue « à compléter » sur la page.
+ */
+export interface LegalEntity {
+  companyName: string
+  legalForm: string
+  shareCapital: string
+  registrationNumber: string
+  vatNumber: string
+  address: string
+  email: string
+  phone: string
+  publicationDirector: string
+  hostName: string
+  hostAddress: string
+  hostContact: string
+  mediatorName: string
+  mediatorUrl: string
 }
 
 export interface LegalDocument {

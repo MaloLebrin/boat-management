@@ -49,3 +49,17 @@ test('le footer public renvoie vers les CGU de la locale courante', () => {
   expect(w.html()).toContain('public.footer.terms')
   expect(w.findAll('a[href="/fr/cgu"]').length).toBe(1)
 })
+
+// #466 — sans mentions légales ni CGV dans le footer, un SaaS payant opéré en
+// France est hors LCEN. Les deux pages doivent être atteignables depuis le pied
+// de page, dans la locale courante.
+test('le footer public renvoie vers les mentions légales et les CGV', () => {
+  const w = mount(PublicLayout, {
+    global: { stubs: { ...stubs, AppHeader: { template: '<div />' } } },
+  })
+
+  expect(w.html()).toContain('public.footer.legalNotice')
+  expect(w.html()).toContain('public.footer.salesTerms')
+  expect(w.findAll('a[href="/fr/mentions-legales"]').length).toBe(1)
+  expect(w.findAll('a[href="/fr/cgv"]').length).toBe(1)
+})

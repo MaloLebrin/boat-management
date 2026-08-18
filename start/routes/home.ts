@@ -42,6 +42,8 @@ const LOCALIZED_PAGES = [
   { en: '/en/contact', fr: '/fr/contact', priority: '0.5', changefreq: 'monthly' },
   { en: '/en/privacy', fr: '/fr/confidentialite', priority: '0.3', changefreq: 'yearly' },
   { en: '/en/terms', fr: '/fr/cgu', priority: '0.3', changefreq: 'yearly' },
+  { en: '/en/sales-terms', fr: '/fr/cgv', priority: '0.3', changefreq: 'yearly' },
+  { en: '/en/legal-notice', fr: '/fr/mentions-legales', priority: '0.3', changefreq: 'yearly' },
 ] as const
 
 /**

@@ -2,7 +2,8 @@ import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import { ADDON_PRICES, MODULE_PRICES, PLAN_LIMITS, PLAN_PRICES } from '../../shared/types/plan.js'
 import type { BooleanQuotaKey } from '../../shared/types/plan.js'
-import type { PricingTableRow } from '../../shared/types/marketing.js'
+import type { LegalEntry, PricingTableRow } from '../../shared/types/marketing.js'
+import legalEntity from '#config/legal'
 import { CONTACT_FLEET_SIZES, CONTACT_SUBJECTS } from '../../shared/types/contact.js'
 import QuotaService from '#services/quota_service'
 import SimulatorLeadService from '#services/simulator_lead_service'
@@ -58,6 +59,14 @@ export default class MarketingController {
 
   async terms({ inertia, i18n }: HttpContext) {
     return inertia.render('marketing/terms', this.buildTermsPageData(i18n))
+  }
+
+  async legalNotice({ inertia, i18n }: HttpContext) {
+    return inertia.render('marketing/legal_notice', this.buildLegalNoticePageData(i18n))
+  }
+
+  async salesTerms({ inertia, i18n }: HttpContext) {
+    return inertia.render('marketing/sales_terms', this.buildSalesTermsPageData(i18n))
   }
 
   async simulator({ inertia, auth }: HttpContext) {
@@ -1433,6 +1442,141 @@ export default class MarketingController {
           { title: t('s10_title'), body: t('s10_body') },
           { title: t('s11_title'), body: t('s11_body') },
           { title: t('s12_title'), body: t('s12_body') },
+        ],
+        contact: {
+          title: t('contact_title'),
+          body: t('contact_body'),
+          email: t('contact_email'),
+        },
+      },
+    }
+  }
+
+  /**
+   * Mentions légales (#466) : le footer n'exposait plus aucun lien légal alors
+   * que la LCEN les impose à un SaaS payant opéré en France. Les libellés
+   * viennent de l'i18n, les valeurs de l'environnement (`config/legal.ts`) —
+   * une valeur absente est rendue « à compléter » plutôt que masquée.
+   */
+  private buildLegalNoticePageData(i18n: { t: (key: string) => string }) {
+    const t = (key: string) => i18n.t(`marketing.legalNotice.${key}`)
+    const pending = t('pending_value')
+    const entry = (labelKey: string, value: string): LegalEntry => ({
+      label: t(labelKey),
+      value: value.trim() || pending,
+    })
+
+    return {
+      meta: {
+        title: t('meta_title'),
+        description: t('meta_description'),
+      },
+      legalNotice: {
+        hero: {
+          eyebrow: t('hero_eyebrow'),
+          title: t('hero_title'),
+          titleHighlight: t('hero_title_highlight'),
+          subtitle: t('hero_subtitle'),
+          updatedLabel: t('updated_label'),
+          updatedDate: t('updated_date'),
+        },
+        sections: [
+          {
+            title: t('s1_title'),
+            body: t('s1_body'),
+            entries: [
+              entry('s1_e1_label', legalEntity.companyName),
+              entry('s1_e2_label', legalEntity.legalForm),
+              entry('s1_e3_label', legalEntity.shareCapital),
+              entry('s1_e4_label', legalEntity.address),
+              entry('s1_e5_label', legalEntity.registrationNumber),
+              entry('s1_e6_label', legalEntity.vatNumber),
+              entry('s1_e7_label', legalEntity.email || SUPPORT_EMAIL),
+              entry('s1_e8_label', legalEntity.phone),
+            ],
+          },
+          {
+            title: t('s2_title'),
+            body: t('s2_body'),
+            entries: [entry('s2_e1_label', legalEntity.publicationDirector)],
+          },
+          {
+            title: t('s3_title'),
+            body: t('s3_body'),
+            entries: [
+              entry('s3_e1_label', legalEntity.hostName),
+              entry('s3_e2_label', legalEntity.hostAddress),
+              entry('s3_e3_label', legalEntity.hostContact),
+            ],
+          },
+          { title: t('s4_title'), body: t('s4_body') },
+          { title: t('s5_title'), body: t('s5_body') },
+          { title: t('s6_title'), body: t('s6_body') },
+          {
+            title: t('s7_title'),
+            body: t('s7_body'),
+            entries: [
+              entry('s7_e1_label', legalEntity.mediatorName),
+              entry('s7_e2_label', legalEntity.mediatorUrl),
+            ],
+          },
+          { title: t('s8_title'), body: t('s8_body') },
+        ],
+        contact: {
+          title: t('contact_title'),
+          body: t('contact_body'),
+          email: t('contact_email'),
+        },
+      },
+    }
+  }
+
+  /**
+   * CGV (#466) : les CGU couvrent l'usage, pas la vente. Un abonnement payant
+   * vendu depuis la France exige ses propres conditions (prix, paiement,
+   * reconduction, rétractation, médiation).
+   */
+  private buildSalesTermsPageData(i18n: { t: (key: string) => string }) {
+    const t = (key: string) => i18n.t(`marketing.salesTerms.${key}`)
+
+    return {
+      meta: {
+        title: t('meta_title'),
+        description: t('meta_description'),
+      },
+      salesTerms: {
+        hero: {
+          eyebrow: t('hero_eyebrow'),
+          title: t('hero_title'),
+          titleHighlight: t('hero_title_highlight'),
+          subtitle: t('hero_subtitle'),
+          updatedLabel: t('updated_label'),
+          updatedDate: t('updated_date'),
+        },
+        sections: [
+          { title: t('s1_title'), body: t('s1_body') },
+          {
+            title: t('s2_title'),
+            body: t('s2_body'),
+            bullets: [t('s2_b1'), t('s2_b2'), t('s2_b3'), t('s2_b4')],
+          },
+          { title: t('s3_title'), body: t('s3_body') },
+          {
+            title: t('s4_title'),
+            body: t('s4_body'),
+            bullets: [t('s4_b1'), t('s4_b2'), t('s4_b3'), t('s4_b4')],
+          },
+          { title: t('s5_title'), body: t('s5_body') },
+          { title: t('s6_title'), body: t('s6_body') },
+          { title: t('s7_title'), body: t('s7_body') },
+          { title: t('s8_title'), body: t('s8_body') },
+          { title: t('s9_title'), body: t('s9_body') },
+          { title: t('s10_title'), body: t('s10_body') },
+          { title: t('s11_title'), body: t('s11_body') },
+          { title: t('s12_title'), body: t('s12_body') },
+          { title: t('s13_title'), body: t('s13_body') },
+          { title: t('s14_title'), body: t('s14_body') },
+          { title: t('s15_title'), body: t('s15_body') },
         ],
         contact: {
           title: t('contact_title'),

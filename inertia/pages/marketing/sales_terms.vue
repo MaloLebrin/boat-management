@@ -1,0 +1,44 @@
+<script lang="ts">
+import PublicLayout from '~/layouts/public.vue'
+
+export default {
+  layout: PublicLayout,
+}
+</script>
+<script setup lang="ts">
+import { Head, usePage } from '@inertiajs/vue3'
+import { computed } from 'vue'
+import type { LegalDocument } from '#shared/types/marketing'
+import LegalDocumentSections from '~/components/marketing/legal/LegalDocumentSections.vue'
+
+/**
+ * CGV (#466) — les CGU encadrent l'usage du service, pas sa vente : un
+ * abonnement payant a besoin de ses propres conditions (prix, paiement,
+ * reconduction, rétractation, médiation).
+ */
+interface SalesTermsData {
+  meta: { title: string; description: string }
+  salesTerms: LegalDocument
+}
+
+type SharedProps = { locale?: 'en' | 'fr' }
+
+const props = defineProps<SalesTermsData>()
+const page = usePage<SharedProps>()
+const locale = computed<'en' | 'fr'>(() => page.props.locale ?? 'en')
+
+const canonicalHref = computed(() => (locale.value === 'fr' ? '/fr/cgv' : '/en/sales-terms'))
+</script>
+
+<template>
+  <Head :title="props.meta.title">
+    <meta name="description" :content="props.meta.description" />
+    <meta property="og:title" :content="props.meta.title" />
+    <meta property="og:description" :content="props.meta.description" />
+    <link rel="canonical" :href="canonicalHref" />
+    <link rel="alternate" hreflang="en" href="/en/sales-terms" />
+    <link rel="alternate" hreflang="fr" href="/fr/cgv" />
+  </Head>
+
+  <LegalDocumentSections :document="props.salesTerms" />
+</template>
