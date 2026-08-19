@@ -1,4 +1,6 @@
 {
+  "E_INVALID_CREDENTIALS": "Incorrect email or password.",
+  "E_UNAUTHORIZED_ACCESS": "Please sign in to access this page.",
   "backHome": "Back to home",
   "notFound": {
     "title": "Page not found",
