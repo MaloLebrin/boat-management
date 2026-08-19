@@ -3,6 +3,7 @@ import BaseCard from '~/components/base/BaseCard.vue'
 import BaseEmptyState from '~/components/base/BaseEmptyState.vue'
 import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
+import { engineCaptionLabel } from '~/utils/boat_enum_labels'
 
 interface OwnerMaintenanceEvent {
   id: number
@@ -35,7 +36,9 @@ const { formatDate } = useDateFormat()
           <p class="text-sm font-semibold text-fg">{{ event.title }}</p>
           <p class="text-xs text-fg-muted">
             {{ t(`maintenance.subjects.${event.subject}`) }}
-            <span v-if="event.engineCaption"> · {{ event.engineCaption }}</span>
+            <span v-if="event.engineCaption">
+              · {{ engineCaptionLabel(t, event.engineCaption) }}</span
+            >
             <span v-if="event.sailCaption"> · {{ event.sailCaption }}</span>
           </p>
           <p v-if="event.notes" class="mt-2 text-sm text-fg-muted">{{ event.notes }}</p>

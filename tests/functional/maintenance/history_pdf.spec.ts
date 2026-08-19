@@ -51,6 +51,28 @@ test.group('Maintenance history PDF (functional)', (group) => {
     assert.equal(response.header('content-type'), 'application/pdf')
   })
 
+  test('GET /maintenance/history.pdf renders an engine caption left at the raw kind token (#472)', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const svc = new BoatMaintenanceService()
+    // Engine without brand/model: the stored caption is the `kind` enum token,
+    // which the PDF must translate instead of printing as-is.
+    await svc.createForBoat(user, boat, {
+      subject: 'engine',
+      engineCaption: 'inboard',
+      performedAt: '2024-04-01',
+      title: 'Vidange',
+    })
+
+    const response = await client.get('/maintenance/history.pdf').loginAs(user).redirects(0)
+
+    response.assertStatus(200)
+    assert.equal(response.header('content-type'), 'application/pdf')
+  })
+
   test('GET /maintenance/history.pdf renders notes and parts without error', async ({
     client,
     assert,

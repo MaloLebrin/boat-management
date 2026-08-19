@@ -8,6 +8,7 @@ import type BoatSail from '#models/boat_sail'
 import app from '@adonisjs/core/services/app'
 import type { I18n } from '@adonisjs/i18n'
 import { formatDate } from '#shared/helpers/date_format'
+import { isEngineKindCaption } from '#shared/helpers/maintenance'
 import PDFDocument from 'pdfkit'
 
 type EventRow = {
@@ -71,7 +72,9 @@ export default class MaintenanceLogPdfService {
         subject: ev.subject,
         title: ev.title,
         notes: ev.notes,
-        engineCaption: ev.engineCaption,
+        engineCaption: isEngineKindCaption(ev.engineCaption)
+          ? tOpt('engineKind', ev.engineCaption)
+          : ev.engineCaption,
         sailCaption: ev.sailCaption,
         safetyCaption: safetyItem ? tOpt('safetyEquipmentType', safetyItem.equipmentType) : null,
         boatEngineId: ev.boatEngineId,
@@ -267,7 +270,8 @@ export default class MaintenanceLogPdfService {
     if (engines.length > 0) {
       this.#sectionBand(doc, t('sectionEngines'))
       for (const engine of engines) {
-        const label = [engine.brand, engine.model].filter(Boolean).join(' ') || engine.kind
+        const label =
+          [engine.brand, engine.model].filter(Boolean).join(' ') || tOpt('engineKind', engine.kind)
         this.#subSectionLabel(doc, label)
 
         const kind = engine.kind ? tOpt('engineKind', engine.kind) : null
