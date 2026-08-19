@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { onMounted, useTemplateRef } from 'vue'
+import { computed, onMounted, useTemplateRef } from 'vue'
 import type { PlanningTask } from '#shared/types/planning'
 import BaseButton from '~/components/base/BaseButton.vue'
 import { useT } from '~/composables/use_t'
 import { useDateFormat } from '~/composables/use_date_format'
+import { usePermissions } from '~/composables/use_permissions'
 import { maintenanceSubjectLabel } from '~/utils/boat_enum_labels'
 
 const props = defineProps<{
@@ -24,6 +25,12 @@ onMounted(() => {
 
 const { t } = useT()
 const { formatDate } = useDateFormat()
+const { can } = usePermissions()
+
+// /boats/:id passe par BoatPolicy.view → capability `boats.view`, que le rôle
+// `mechanic` n'a pas alors que /planning lui est accessible : sans ce garde, la
+// carte affiche un lien qui répond 403 (#473).
+const canViewBoat = computed(() => can('boats.view'))
 
 function formatDue(task: PlanningTask): string {
   if (task.kind === 'date' && task.dueAt) return formatDate(task.dueAt)
@@ -54,9 +61,18 @@ function formatDue(task: PlanningTask): string {
       >
         {{ formatDue(task) }}
       </span>
-      <BaseButton variant="ghost" size="sm" route="boats.show" :params="{ id: task.boatId }">
+      <BaseButton
+        v-if="canViewBoat"
+        variant="ghost"
+        size="sm"
+        route="boats.show"
+        :params="{ id: task.boatId }"
+      >
         {{ t('planning.taskKind.' + task.kind) }}
       </BaseButton>
+      <span v-else class="px-3 text-xs font-semibold text-fg-muted">
+        {{ t('planning.taskKind.' + task.kind) }}
+      </span>
     </div>
   </div>
 </template>

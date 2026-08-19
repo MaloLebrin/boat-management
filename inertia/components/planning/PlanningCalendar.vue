@@ -7,6 +7,7 @@ import { computed, ref } from 'vue'
 import { router } from '@inertiajs/vue3'
 import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
+import { usePermissions } from '~/composables/use_permissions'
 import { maintenanceSubjectLabel } from '~/utils/boat_enum_labels'
 
 const props = defineProps<{
@@ -15,6 +16,16 @@ const props = defineProps<{
 
 const { t } = useT()
 const { formatMonthYear, formatWeekdayDay, formatWeekdayShort } = useDateFormat()
+const { can } = usePermissions()
+
+// Voir PlanningTaskCard : /planning est ouvert à tout utilisateur authentifié, mais
+// /boats/:id exige `boats.view` — un mécanicien n'a donc rien à cliquer ici (#473).
+const canViewBoat = computed(() => can('boats.view'))
+
+function openBoat(boatId: number) {
+  if (!canViewBoat.value) return
+  router.visit(`/boats/${boatId}`)
+}
 
 const today = new Date()
 const currentYear = ref(today.getFullYear())
@@ -143,10 +154,11 @@ function isToday(day: number): boolean {
                 v-for="task in cell.tasks"
                 :key="task.id"
                 :class="[
-                  'flex items-center gap-2 rounded-md px-2 py-1.5 text-sm font-medium cursor-pointer hover:opacity-80',
+                  'flex items-center gap-2 rounded-md px-2 py-1.5 text-sm font-medium',
+                  canViewBoat ? 'cursor-pointer hover:opacity-80' : '',
                   taskPillClass(task),
                 ]"
-                @click="router.visit(`/boats/${task.boatId}`)"
+                @click="openBoat(task.boatId)"
               >
                 <span class="truncate">{{ task.title }}</span>
                 <span class="ml-auto shrink-0 text-xs opacity-75">{{ task.boatName }}</span>
@@ -186,11 +198,12 @@ function isToday(day: number): boolean {
                 v-for="task in cell.tasks.slice(0, 3)"
                 :key="task.id"
                 :class="[
-                  'truncate rounded px-1 py-0.5 text-xs font-medium cursor-pointer hover:opacity-80',
+                  'truncate rounded px-1 py-0.5 text-xs font-medium',
+                  canViewBoat ? 'cursor-pointer hover:opacity-80' : '',
                   taskPillClass(task),
                 ]"
                 :title="task.boatName + ' · ' + task.title"
-                @click="router.visit(`/boats/${task.boatId}`)"
+                @click="openBoat(task.boatId)"
               >
                 {{ task.title }}
               </div>
@@ -223,7 +236,13 @@ function isToday(day: number): boolean {
               {{ task.boatName }} · {{ maintenanceSubjectLabel(t, task.subject) }}
             </p>
           </div>
-          <BaseButton variant="ghost" size="sm" route="boats.show" :params="{ id: task.boatId }">
+          <BaseButton
+            v-if="canViewBoat"
+            variant="ghost"
+            size="sm"
+            route="boats.show"
+            :params="{ id: task.boatId }"
+          >
             {{ t('planning.calendar.schedule') }}
           </BaseButton>
         </div>
