@@ -106,9 +106,12 @@ const sections = computed(() => {
   return result
 })
 
+// Comparaison sur le segment de chemin complet : un `startsWith` brut faisait
+// briller « me » sur /settings/members (préfixe commun). Cf. #471.
 function isActive(key: SettingsSection) {
-  if (key === 'import') return page.url.startsWith('/settings/import')
-  return page.url.startsWith(`/settings/${key}`)
+  const [path] = page.url.split(/[?#]/)
+  const normalized = path.replace(/\/+$/, '')
+  return normalized === `/settings/${key}` || normalized.startsWith(`/settings/${key}/`)
 }
 </script>
 
