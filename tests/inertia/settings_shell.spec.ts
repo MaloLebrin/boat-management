@@ -29,10 +29,10 @@ const ALL_SETTINGS_CAPABILITIES: Capability[] = [
   'branding.configure',
 ]
 
-function mountShell(capabilities: Capability[]) {
+function mountShell(capabilities: Capability[], url = '/settings/me') {
   vi.mocked(usePage).mockReturnValue({
     props: { currentPlan: 'enterprise', permissions: { role: 'member', capabilities } },
-    url: '/settings/me',
+    url,
   } as ReturnType<typeof usePage>)
 
   return mount(SettingsShell, {
@@ -74,4 +74,35 @@ test('a member (view-only capabilities) does not see admin-only ai/branding sect
   expect(w.text()).toContain('settings.sections.auditLog')
   expect(w.text()).not.toContain('settings.sections.ai')
   expect(w.text()).not.toContain('settings.sections.branding')
+})
+
+const ACTIVE_CLASSES = ['bg-brand/10', 'text-brand']
+
+function activeLabels(url: string) {
+  const w = mountShell(ALL_SETTINGS_CAPABILITIES, url)
+  return w
+    .findAll('a')
+    .filter((link) => ACTIVE_CLASSES.every((c) => link.classes().includes(c)))
+    .map((link) => link.text())
+}
+
+test('only the current section is highlighted on /settings/me', () => {
+  expect(activeLabels('/settings/me')).toEqual(['settings.sections.me'])
+})
+
+// « me » est un préfixe de « members » : un startsWith brut surlignait les deux. Cf. #471.
+test('"me" is not highlighted on /settings/members', () => {
+  expect(activeLabels('/settings/members')).toEqual(['settings.sections.members'])
+})
+
+test('a query string does not break the active section', () => {
+  expect(activeLabels('/settings/audit-log?page=2')).toEqual(['settings.sections.auditLog'])
+})
+
+test('a trailing slash does not break the active section', () => {
+  expect(activeLabels('/settings/import/')).toEqual(['settings.sections.import'])
+})
+
+test('a sub-path keeps its parent section highlighted', () => {
+  expect(activeLabels('/settings/billing/checkout')).toEqual(['settings.sections.billing'])
 })
