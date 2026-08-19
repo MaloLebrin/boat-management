@@ -20,7 +20,7 @@ const { t } = useT()
 const { formatDate } = useDateFormat()
 
 const breadcrumbs = computed(() => [
-  { label: t('nav.myBoats'), href: '/boats' },
+  { label: t('boats.index.title'), href: '/boats' },
   { label: props.boat.name, href: `/boats/${props.boat.id}` },
   { label: t('reservations.title'), href: `/boats/${props.boat.id}/reservations` },
   { label: t('rentalContracts.title') },

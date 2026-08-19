@@ -144,7 +144,7 @@ const tabContentProps = computed(() => {
   <div class="w-full max-w-7xl px-6 py-10 sm:px-8">
     <BaseBreadcrumb
       class="mb-4"
-      :items="[{ label: t('boats.show.breadcrumbFleet'), href: '/boats' }, { label: boat.name }]"
+      :items="[{ label: t('boats.index.title'), href: '/boats' }, { label: boat.name }]"
     />
 
     <!-- Header -->

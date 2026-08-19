@@ -25,7 +25,7 @@ vi.mock('@inertiajs/vue3', () => ({
       },
       appT: {
         'nav.dashboard': 'Dashboard',
-        'nav.myBoats': 'My boats',
+        'nav.boats': 'Boats',
         'nav.planning': 'Planning',
         'nav.history': 'History',
         'nav.settings': 'Settings',
@@ -79,7 +79,7 @@ describe('DefaultLayout — sidebar', () => {
   test('shows sidebar links for authenticated user', () => {
     const w = mount(DefaultLayout, { slots: { default: '<div>Content</div>' } })
     expect(w.text()).toContain('Dashboard')
-    expect(w.text()).toContain('My boats')
+    expect(w.text()).toContain('Boats')
     expect(w.text()).toContain('Planning')
     expect(w.text()).toContain('Logout')
   })

@@ -175,7 +175,7 @@ function formatYear(iso: string): string {
   <div class="w-full max-w-7xl px-6 py-10 sm:px-8">
     <BaseBreadcrumb
       :items="[
-        { label: t('boats.show.breadcrumbFleet'), href: '/boats' },
+        { label: t('boats.index.title'), href: '/boats' },
         { label: boat.name, href: `/boats/${boat.id}` },
         {
           label: t('boats.engineShow.breadcrumb.equipment'),

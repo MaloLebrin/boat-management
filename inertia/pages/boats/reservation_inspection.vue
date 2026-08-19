@@ -26,7 +26,7 @@ const checkout = computed(() => props.inspections.find((i) => i.kind === 'checko
 const checkin = computed(() => props.inspections.find((i) => i.kind === 'checkin') ?? null)
 
 const breadcrumbs = computed(() => [
-  { label: t('nav.myBoats'), href: '/boats' },
+  { label: t('boats.index.title'), href: '/boats' },
   { label: props.boat.name, href: `/boats/${props.boat.id}` },
   { label: t('reservations.title'), href: `/boats/${props.boat.id}/reservations` },
   { label: t('inspections.title') },
