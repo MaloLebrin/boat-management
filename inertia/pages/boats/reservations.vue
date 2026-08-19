@@ -30,7 +30,7 @@ const stats = computed(() => ({
 }))
 
 const breadcrumbs = computed(() => [
-  { label: t('nav.myBoats'), href: '/boats' },
+  { label: t('boats.index.title'), href: '/boats' },
   { label: props.boat.name, href: `/boats/${props.boat.id}` },
   { label: t('reservations.title') },
 ])

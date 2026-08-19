@@ -208,7 +208,7 @@ test('fleet section contains dashboard, boats, ports, crew', () => {
   const fleetSection = navSections.value[0]
   const names = fleetSection.items.map((i) => i.name)
   expect(names).toContain('nav.dashboard')
-  expect(names).toContain('nav.myBoats')
+  expect(names).toContain('nav.boats')
   expect(names).toContain('ports.nav')
   expect(names).toContain('nav.crew')
 })

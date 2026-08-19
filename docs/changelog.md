@@ -3,6 +3,14 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-08-19 — Nommage : l'écran des bateaux porte enfin un seul nom (#468)
+
+Suite de la campagne du 03/08 (famille #368). Le même écran `/boats` s'appelait « Mes bateaux » dans la sidebar, « Bateaux » en titre de page et « Flotte » dans les fils d'Ariane — trois noms pour une seule destination.
+
+- **Un seul libellé, celui de la page de destination.** L'entrée de sidebar (`nav.boats`) et les dix fils d'Ariane visant `/boats` reprennent désormais `boats.index.title`, soit « Bateaux » / « Boats » — le titre déjà affiché en haut de l'écran et déjà utilisé par le fil d'Ariane du budget. La clé morte `boats.show.breadcrumbFleet` (« Flotte » / « Fleet ») est supprimée des deux locales.
+- **Le « Mes » n'était pas qu'une incohérence de forme.** Sur `/boats`, la page annonce « Tous les bateaux de votre organisation » : la sidebar promettait un périmètre personnel là où l'écran liste la flotte entière. `nav.myBoats` reste en place pour le **portail propriétaire** (`/owner/boats`), où il est exact et où sidebar et titre de page s'accordaient déjà.
+- **Tests.** 5 tests (`tests/inertia/boats_naming_consistency.spec.ts`) montés sur les vraies traductions, pas sur un `appT` mocké : tout libellé de navigation ou de fil d'Ariane pointant sur `/boats` doit résoudre exactement au titre de la page, dans les deux locales — le test échoue si une page réintroduit « Mes bateaux » ou « Flotte » —, et le portail propriétaire garde son nom propre. Les specs `use_nav_sections` et `default_layout_sidebar` suivent le nouveau libellé.
+
 ## 2026-08-19 — Toasts : un flash finit toujours par disparaître, et celui du premier chargement s'affiche enfin (#467)
 
 Suite de la campagne du 03/08. « Tâche marquée comme terminée. » restait affiché plus de 45 s sur la fiche bateau, à travers plusieurs changements d'onglet.

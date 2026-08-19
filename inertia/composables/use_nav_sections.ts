@@ -31,7 +31,7 @@ export function useNavSections() {
       { name: t('nav.dashboard'), path: '/dashboard', route: 'dashboard', icon: 'house' },
     ]
     if (can('boats.view')) {
-      fleetItems.push({ name: t('nav.myBoats'), path: '/boats', route: null, icon: 'boat' })
+      fleetItems.push({ name: t('nav.boats'), path: '/boats', route: null, icon: 'boat' })
     }
     if (can('ports.view')) {
       fleetItems.push({ name: t('ports.nav'), path: '/ports', route: null, icon: 'anchor' })
