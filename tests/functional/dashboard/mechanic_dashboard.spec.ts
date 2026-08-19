@@ -66,6 +66,33 @@ test.group('Dashboard — dedicated mechanic view (#417)', (group) => {
     assert.notInclude(allIds, planned.id)
   })
 
+  // #473 : les cartes d'intervention pointent vers `/planning?task=<id>` et non
+  // vers `/boats/:id`, que le mécanicien (capabilities `maintenance.*` seules)
+  // n'a pas le droit d'ouvrir.
+  test('a mechanic can open the planning target of an intervention card, but not the boat sheet', async ({
+    client,
+  }) => {
+    const admin = await createAdminUser()
+    const orgId = admin.organizationId!
+    const boat = await BoatFactory.merge({ organizationId: orgId }).create()
+    const task = await BoatMaintenanceTask.create({
+      boatId: boat.id,
+      subject: 'engine',
+      title: 'Vidange en retard',
+      status: 'open',
+      dueAt: DateTime.now().minus({ days: 5 }),
+      dueEngineHours: null,
+    })
+    const mechanic = await createMechanicUser(orgId)
+
+    const planning = await client.get(`/planning?task=${task.id}`).loginAs(mechanic).withInertia()
+    planning.assertStatus(200)
+    planning.assertInertiaComponent('planning/index')
+
+    const boatSheet = await client.get(`/boats/${boat.id}`).loginAs(mechanic).redirects(0)
+    boatSheet.assertStatus(403)
+  })
+
   test('an admin still gets the full dashboard, not the mechanic view', async ({ client }) => {
     const admin = await createAdminUser()
 

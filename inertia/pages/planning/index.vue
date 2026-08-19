@@ -6,8 +6,9 @@ import BaseHeading from '~/components/base/BaseHeading.vue'
 import PlanningCalendar from '~/components/planning/PlanningCalendar.vue'
 import PlanningKanban from '~/components/planning/PlanningKanban.vue'
 import { computed, ref } from 'vue'
-import { Head, router } from '@inertiajs/vue3'
+import { Head, router, usePage } from '@inertiajs/vue3'
 import { useT } from '~/composables/use_t'
+import { usePermissions } from '~/composables/use_permissions'
 
 const props = defineProps<{
   tasks: PlanningTask[]
@@ -22,6 +23,26 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
+const page = usePage()
+const { can } = usePermissions()
+
+/**
+ * Tâche ciblée par `/planning?task=<id>` — le dashboard mécanicien y envoie
+ * depuis ses cartes d'intervention (#473). Lu sur `page.url` (et non
+ * `window.location`) pour que le SSR rende déjà la carte surlignée.
+ */
+const highlightedTaskId = computed(() => {
+  const query = page.url.split('?')[1]
+  if (!query) return null
+  const raw = new URLSearchParams(query).get('task')
+  if (!raw) return null
+  const id = Number(raw)
+  return Number.isInteger(id) && id > 0 ? id : null
+})
+
+// L'action de l'état vide mène à /boats, qui exige `boats.view` : inutile de la
+// proposer à un mécanicien, qui n'y récolterait qu'un 403 (#473).
+const canViewBoats = computed(() => can('boats.view'))
 
 type ViewMode = 'kanban' | 'calendar'
 const viewMode = ref<ViewMode>('kanban')
@@ -141,7 +162,7 @@ function handleUngroup(groupId: string) {
       <BaseEmptyState
         :title="t('planning.empty.title')"
         :description="t('planning.empty.description')"
-        :action-label="t('planning.empty.action')"
+        :action-label="canViewBoats ? t('planning.empty.action') : undefined"
         @action="router.visit('/boats')"
       />
     </div>
@@ -157,6 +178,7 @@ function handleUngroup(groupId: string) {
       :groups="groups"
       :grouping-enabled="groupingEnabled"
       :dismissed-group-ids="dismissedGroupIds"
+      :highlighted-task-id="highlightedTaskId"
       @ungroup="handleUngroup"
     />
 

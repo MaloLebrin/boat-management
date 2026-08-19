@@ -14,6 +14,25 @@ Suite de la campagne du 03/08 (famille #368). `/settings/audit-log` annonçait �
 - **Libellés et couleurs.** Six nouvelles clés dans `settings.auditLog.actions` (EN + FR) ; les pastilles suivent le sens de l'action (`.send`/`.create` en info, `.accept`/`.complete` en succès, `.cancel`/`.delete`/`.remove` en avertissement).
 - **Tests.** 12 tests (`tests/functional/settings/audit_log_actions.spec.ts`, `tests/inertia/settings_audit_log_tab.spec.ts`) couvrent les six nouvelles actions bout en bout — organisation, auteur, entité et métadonnées —, l'absence d'entrée quand l'invitation n'existe pas ou quand la tâche était déjà terminée, et le fait que chaque action du catalogue soit filtrable et traduite. Tous échouent sur le code d'avant.
 
+## 2026-08-19 — Planning : plus de liens vers la fiche bateau pour qui n'y a pas droit (#473)
+
+Suite immédiate de l'entrée précédente (#529), qui avait détourné la carte du dashboard mécanicien vers `/planning?task=<id>` : le planning lui-même gardait le même piège. `/planning` est ouvert à tout utilisateur authentifié, mais `/boats/:id` passe par `BoatPolicy.view` → capability `boats.view`, que le rôle `mechanic` n'a pas (`MECHANIC_CAPABILITIES` se limite au module maintenance). Un mécanicien voyait donc, sur chaque carte de tâche, un bouton qui répondait 403.
+
+- **Les liens du planning sont conditionnés à `boats.view`.** `PlanningTaskCard` n'affiche plus le bouton `boats.show` sans la capability : le libellé du type de tâche (« Par date » / « Par heures moteur ») reste visible, en texte simple, pour ne rien perdre de l'information.
+- **Même correctif dans la vue Calendrier.** Les pastilles de tâche (agenda mobile et grille desktop) déclenchaient un `router.visit('/boats/:id')` au clic : la navigation passe par un garde et le curseur « pointer » disparaît quand elle n'est pas permise. Le bouton « Planifier » de la section « Sans date planifiée » suit la même règle.
+- **L'état vide aussi.** Son action « Voir mes bateaux » mène à `/boats`, qui exige la même capability : elle n'est plus proposée sans `boats.view`.
+- **Aucun changement pour les autres rôles.** Admin et membre ont `boats.view` : tous les liens restent en place.
+- **Tests.** 14 tests (`tests/inertia/planning_task_card.spec.ts`, `planning_calendar_boat_links.spec.ts`, `planning_index_empty_state.spec.ts`, `tests/functional/planning/index.spec.ts`) couvrent la carte, les pastilles du calendrier, le bouton « Planifier » et l'état vide avec et sans la capability, l'absence de prop `permissions` (aucun lien, plutôt qu'un 403), et vérifient côté serveur qu'un mécanicien obtient bien 200 sur `/planning` et 403 sur `/boats/:id` — plusieurs échouent sur le code d'avant.
+
+## 2026-08-19 — Dashboard mécanicien : la carte d'intervention s'ouvre enfin (#473)
+
+Suite de la campagne du 03/08 (famille #417). Sur « Mes interventions », la carte d'une intervention en retard (Sun Odyssey 35 — Vidange moteur) n'était qu'un bloc de texte : aucun clic ne menait à la tâche.
+
+- **Toute la carte est désormais un lien.** `MechanicInterventionRow` enveloppe son contenu dans un `<Link>` Inertia, avec état de survol, anneau de focus clavier et `aria-label` nommant la tâche et le bateau (`dashboard.mechanic.openTask`, ajoutée en FR et EN).
+- **Destination : le planning, pas la fiche bateau.** Le mécanicien n'a que les capabilities `maintenance.*` ; `/boats/:id` passe par `BoatPolicy.view` → `boats.view` et lui répond 403. La carte pointe donc vers `/planning?task=<id>`, seul écran où il peut agir sur la tâche.
+- **`/planning?task=<id>` cible la tâche.** La page lit le paramètre sur `page.url` (et non `window.location`, pour que le SSR rende déjà le bon état), le transmet au kanban, et la carte correspondante s'affiche avec un anneau `ring-brand` en se plaçant à l'écran (`scrollIntoView`). Un `task` absent, non numérique ou hors plage est ignoré. Chaque carte du planning porte aussi un id DOM stable `planning-task-<id>`.
+- **Tests.** 7 tests (`tests/inertia/mechanic_intervention_row.spec.ts`) sur le lien, sa cible, son libellé accessible et les deux formes d'échéance ; 6 tests (`tests/inertia/planning_task_highlight.spec.ts`) sur le surlignage, le scroll et les paramètres invalides ; 1 test fonctionnel (`tests/functional/dashboard/mechanic_dashboard.spec.ts`) vérifiant qu'un mécanicien obtient bien 200 sur `/planning?task=<id>` et 403 sur `/boats/:id`.
+
 ## 2026-08-19 — Moteurs : le type « inboard » ne s'affiche plus en anglais (#472)
 
 Suite de la campagne du 03/08 (famille #368). L'historique d'une fiche bateau affichait « Moteur · inboard » et l'onglet Carburant « inboard — Volvo Penta D2-40 » : la valeur brute de l'énumération `kind`, jamais traduite, au milieu d'une interface en français.
@@ -23,6 +42,7 @@ Suite de la campagne du 03/08 (famille #368). L'historique d'une fiche bateau af
 - **Les libellés déjà en base restent traduits à l'affichage.** Quand un moteur n'a ni marque, ni modèle, ni numéro de série, la légende enregistrée avec un événement d'entretien retombe sur le jeton `kind` — ce jeton reste stocké tel quel, volontairement indépendant de la langue, et c'est la couche d'affichage qui le traduit (`engineCaptionLabel()`, `isEngineKindCaption()` côté PDF). Les lignes déjà en base sont donc réparées sans migration : historique de la fiche bateau, historique global d'entretien et portail propriétaire.
 - **Un seul calcul de titre moteur.** Les quatre écrans qui composaient « marque + modèle, sinon le type » (fiche moteur, fiche pièce, modale d'entretien, modale d'ajout de document) partageaient la même logique dupliquée, dont trois retombaient sur le jeton brut : elle vit désormais dans `engineDisplayTitle()`.
 - **Tests.** 28 tests (`tests/inertia/boat_enum_labels.spec.ts`, `boats_maintenance_utils.spec.ts`, `boat_show_tab_history_caption.spec.ts`, `boat_show_tab_fuel_logs.spec.ts`, `boat_owner_maintenance_tab.spec.ts`, `maintenance_history_timeline_caption.spec.ts`, `boat_fuel_log_form.spec.ts`, `tests/unit/helpers/maintenance.spec.ts`, `tests/functional/maintenance/history_pdf.spec.ts`) couvrent la traduction du jeton, le passage inchangé d'une légende libre et l'absence de légende ; trois d'entre eux sont montés sur les vrais fichiers de traduction et vérifient que chaque type de moteur est traduit dans les deux locales, avec la même graphie dans les deux familles de clés — plusieurs échouent sur le code d'avant.
+
 
 ## 2026-08-19 — Réglages : le sous-menu ne surligne plus qu'une seule section (#471)
 
