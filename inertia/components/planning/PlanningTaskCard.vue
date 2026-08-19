@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { onMounted, useTemplateRef } from 'vue'
 import type { PlanningTask } from '#shared/types/planning'
 import BaseButton from '~/components/base/BaseButton.vue'
 import { useT } from '~/composables/use_t'
@@ -10,7 +11,16 @@ const props = defineProps<{
   accentClass?: string
   badgeClass?: string
   done?: boolean
+  /** Tâche ciblée par `/planning?task=<id>` (#473) : surlignée et amenée à l'écran. */
+  highlighted?: boolean
 }>()
+
+const root = useTemplateRef<HTMLElement>('root')
+
+onMounted(() => {
+  if (!props.highlighted) return
+  root.value?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+})
 
 const { t } = useT()
 const { formatDate } = useDateFormat()
@@ -24,8 +34,13 @@ function formatDue(task: PlanningTask): string {
 
 <template>
   <div
+    :id="`planning-task-${task.id}`"
+    ref="root"
     class="rounded-lg border border-border bg-surface-elevated p-3"
-    :class="accentClass ? `border-l-4 ${accentClass}` : ''"
+    :class="[
+      accentClass ? `border-l-4 ${accentClass}` : '',
+      highlighted ? 'ring-2 ring-brand ring-offset-2 ring-offset-surface' : '',
+    ]"
   >
     <p class="text-xs font-medium text-fg-muted">{{ task.boatName }}</p>
     <p class="mt-1 text-sm font-semibold text-fg" :class="done ? 'line-through' : ''">
