@@ -6,7 +6,7 @@ import BaseHeading from '~/components/base/BaseHeading.vue'
 import PlanningCalendar from '~/components/planning/PlanningCalendar.vue'
 import PlanningKanban from '~/components/planning/PlanningKanban.vue'
 import { computed, ref } from 'vue'
-import { Head, router } from '@inertiajs/vue3'
+import { Head, router, usePage } from '@inertiajs/vue3'
 import { useT } from '~/composables/use_t'
 
 const props = defineProps<{
@@ -22,6 +22,21 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
+const page = usePage()
+
+/**
+ * Tâche ciblée par `/planning?task=<id>` — le dashboard mécanicien y envoie
+ * depuis ses cartes d'intervention (#473). Lu sur `page.url` (et non
+ * `window.location`) pour que le SSR rende déjà la carte surlignée.
+ */
+const highlightedTaskId = computed(() => {
+  const query = page.url.split('?')[1]
+  if (!query) return null
+  const raw = new URLSearchParams(query).get('task')
+  if (!raw) return null
+  const id = Number(raw)
+  return Number.isInteger(id) && id > 0 ? id : null
+})
 
 type ViewMode = 'kanban' | 'calendar'
 const viewMode = ref<ViewMode>('kanban')
@@ -157,6 +172,7 @@ function handleUngroup(groupId: string) {
       :groups="groups"
       :grouping-enabled="groupingEnabled"
       :dismissed-group-ids="dismissedGroupIds"
+      :highlighted-task-id="highlightedTaskId"
       @ungroup="handleUngroup"
     />
 

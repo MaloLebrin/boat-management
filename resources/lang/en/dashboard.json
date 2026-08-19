@@ -90,6 +90,7 @@
     "upcomingEmpty": "No upcoming interventions.",
     "overdue": "Overdue",
     "dueSoon": "Due soon",
+    "openTask": "Open the {title} intervention on {boat}",
     "dueAt": "Due on {date}",
     "dueAtHours": "Due at {hours}h · current {current}h"
   }

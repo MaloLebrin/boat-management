@@ -15,6 +15,8 @@ const props = defineProps<{
   groups: TaskGroup[]
   groupingEnabled: boolean
   dismissedGroupIds: Set<string>
+  /** Tâche ciblée par `/planning?task=<id>` (#473). */
+  highlightedTaskId?: number | null
 }>()
 
 const emit = defineEmits<{ ungroup: [groupId: string] }>()
@@ -69,6 +71,7 @@ const doneTasksLabel = computed(() => {
         v-for="task in overdueTasks"
         :key="task.id"
         :task="task"
+        :highlighted="task.id === highlightedTaskId"
         accent-class="border-coral-400"
         badge-class="bg-coral-100 text-coral-700"
       />
@@ -96,6 +99,7 @@ const doneTasksLabel = computed(() => {
         v-for="task in soonTasks"
         :key="task.id"
         :task="task"
+        :highlighted="task.id === highlightedTaskId"
         accent-class="border-amber-300"
         badge-class="bg-amber-100 text-amber-700"
       />
@@ -123,6 +127,7 @@ const doneTasksLabel = computed(() => {
         v-for="task in undatedTasks"
         :key="task.id"
         :task="task"
+        :highlighted="task.id === highlightedTaskId"
         accent-class="border-fg-subtle"
         badge-class="bg-surface-muted text-fg"
       />
@@ -168,6 +173,7 @@ const doneTasksLabel = computed(() => {
         v-for="task in ungroupedPlannedTasks"
         :key="task.id"
         :task="task"
+        :highlighted="task.id === highlightedTaskId"
         badge-class="bg-surface-muted text-fg-muted"
       />
     </div>
@@ -194,6 +200,7 @@ const doneTasksLabel = computed(() => {
         v-for="task in doneTasks"
         :key="task.id"
         :task="task"
+        :highlighted="task.id === highlightedTaskId"
         accent-class="border-mint-500 opacity-75"
         badge-class="bg-mint-100 text-mint-700"
         :done="true"
