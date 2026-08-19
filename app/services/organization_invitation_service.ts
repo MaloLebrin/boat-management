@@ -139,8 +139,9 @@ export default class OrganizationInvitationService {
 
   /**
    * Cancels an invitation (sets status to 'cancelled').
+   * Returns the cancelled invitation so callers can journal it.
    */
-  async cancel(invitationId: number, orgId: number): Promise<void> {
+  async cancel(invitationId: number, orgId: number): Promise<OrganizationInvitation> {
     const invitation = await OrganizationInvitation.query()
       .where('id', invitationId)
       .where('organizationId', orgId)
@@ -152,6 +153,8 @@ export default class OrganizationInvitationService {
 
     invitation.status = 'cancelled'
     await invitation.save()
+
+    return invitation
   }
 
   /**

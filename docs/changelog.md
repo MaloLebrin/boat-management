@@ -3,6 +3,17 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-08-19 — Journal d'activité : les invitations et les tâches de maintenance y figurent enfin (#474)
+
+Suite de la campagne du 03/08 (famille #368). `/settings/audit-log` annonçait « l'historique des actions importantes réalisées dans votre organisation » mais ne contenait en pratique que des lignes « Connexion » : les deux flux les plus visibles de l'app — inviter quelqu'un, cocher une tâche d'entretien — n'écrivaient rien.
+
+- **Les invitations sont journalisées.** `OrganizationInvitationsController` consigne `invitation.send` (envoi depuis `/settings/members`), `invitation.cancel` (annulation d'une invitation en attente) et `invitation.accept` (acceptation par l'invité), avec l'e-mail et le rôle en métadonnées. L'ajout direct d'un membre écrivait déjà `member.add` / `member.remove` / `member.update_role`, mais l'écran Membres passe par les invitations : c'est ce chemin-là qui était muet.
+- **L'acceptation est rattachée à la bonne organisation.** Un invité peut arriver depuis une autre org : l'entrée utilise `invitation.organizationId`, pas `user.organizationId`, sinon la ligne atterrissait dans le journal de l'organisation qu'il quitte.
+- **Les tâches de maintenance sont journalisées.** `BoatMaintenanceTasksController` consigne `maintenance_task.create`, `maintenance_task.complete` et `maintenance_task.delete`, avec l'intitulé de la tâche et le nom du bateau. Recocher une tâche déjà terminée n'écrit rien : `markDone` renvoie désormais `{ task, completed }` pour distinguer une vraie clôture d'un appel sans effet.
+- **Une seule liste d'actions.** Les actions étaient énumérées trois fois (type TypeScript, validateur VineJS, options du filtre Vue) et avaient déjà divergé. Elles vivent maintenant dans `AUDIT_ACTIONS` (`shared/types/audit_log.ts`), d'où le type, l'enum du validateur et le sélecteur de filtre sont dérivés — ajouter une action ne demande plus qu'une clé de traduction dans les deux locales.
+- **Libellés et couleurs.** Six nouvelles clés dans `settings.auditLog.actions` (EN + FR) ; les pastilles suivent le sens de l'action (`.send`/`.create` en info, `.accept`/`.complete` en succès, `.cancel`/`.delete`/`.remove` en avertissement).
+- **Tests.** 12 tests (`tests/functional/settings/audit_log_actions.spec.ts`, `tests/inertia/settings_audit_log_tab.spec.ts`) couvrent les six nouvelles actions bout en bout — organisation, auteur, entité et métadonnées —, l'absence d'entrée quand l'invitation n'existe pas ou quand la tâche était déjà terminée, et le fait que chaque action du catalogue soit filtrable et traduite. Tous échouent sur le code d'avant.
+
 ## 2026-08-19 — Moteurs : le type « inboard » ne s'affiche plus en anglais (#472)
 
 Suite de la campagne du 03/08 (famille #368). L'historique d'une fiche bateau affichait « Moteur · inboard » et l'onglet Carburant « inboard — Volvo Penta D2-40 » : la valeur brute de l'énumération `kind`, jamais traduite, au milieu d'une interface en français.

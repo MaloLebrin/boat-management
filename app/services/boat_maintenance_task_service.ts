@@ -95,7 +95,16 @@ export default class BoatMaintenanceTaskService {
     })
   }
 
-  async markDone(user: User, boat: Boat, taskId: number, payload: MarkTaskDonePayload) {
+  /**
+   * Marks a task as done. `completed` is false when the task was already
+   * closed, so callers can skip journalling a no-op completion.
+   */
+  async markDone(
+    user: User,
+    boat: Boat,
+    taskId: number,
+    payload: MarkTaskDonePayload
+  ): Promise<{ task: BoatMaintenanceTask; completed: boolean }> {
     assertBoatScope(user, boat)
 
     const task = await BoatMaintenanceTask.query()
@@ -104,7 +113,7 @@ export default class BoatMaintenanceTaskService {
       .first()
 
     if (!task) throw new BoatMaintenanceTaskNotFoundError()
-    if (task.status === 'done') return task
+    if (task.status === 'done') return { task, completed: false }
 
     const doneAt = toDateTime(payload.doneAt ?? DateTime.now())
 
@@ -165,7 +174,7 @@ export default class BoatMaintenanceTaskService {
       })
     }
 
-    return task
+    return { task, completed: true }
   }
 
   async deleteForBoat(user: User, boat: Boat, taskId: number) {
@@ -179,6 +188,8 @@ export default class BoatMaintenanceTaskService {
     if (!task) throw new BoatMaintenanceTaskNotFoundError()
 
     await task.delete()
+
+    return task
   }
 
   /**
