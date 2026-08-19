@@ -1,5 +1,5 @@
 import type { MaintenanceEventRow } from '~/types/boat_show'
-import { maintenanceSubjectLabel } from '~/utils/boat_enum_labels'
+import { engineCaptionLabel, maintenanceSubjectLabel } from '~/utils/boat_enum_labels'
 
 type T = (key: string) => string
 
@@ -18,8 +18,8 @@ export function performedDisplay(iso: string) {
  * engine). Returns null when the subject has no more specific caption to add,
  * so callers can skip the redundant "· <same label>" segment.
  */
-export function targetDescription(ev: MaintenanceEventRow): string | null {
-  if (ev.subject === 'engine') return ev.engineCaption
+export function targetDescription(t: T, ev: MaintenanceEventRow): string | null {
+  if (ev.subject === 'engine') return engineCaptionLabel(t, ev.engineCaption)
   if (ev.subject === 'sail') return ev.sailCaption
   return null
 }

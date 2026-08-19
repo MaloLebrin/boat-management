@@ -43,3 +43,31 @@ export function rigTypeLabel(t: T, value: string | null | undefined): string | n
 export function maintenanceSubjectLabel(t: T, value: string | null | undefined): string | null {
   return labelFor(MAINTENANCE_SUBJECT_OPTIONS, 'maintenance.history.subjects', t, value)
 }
+
+/**
+ * Translated label for the caption of an engine maintenance event.
+ *
+ * The caption is free text, but when the linked engine has no brand/model/serial
+ * number it falls back to the raw `kind` enum token (« inboard »), which used to
+ * surface untranslated in the history — including for rows already stored in
+ * database. A caption that is exactly an enum value is therefore translated, any
+ * other caption is returned as-is (#472).
+ */
+export function engineCaptionLabel(t: T, caption: string | null | undefined): string | null {
+  return engineKindLabel(t, caption)
+}
+
+interface EngineTitleLike {
+  brand: string | null
+  model: string | null
+  kind: string
+}
+
+/**
+ * Display title of an engine: its brand and model, falling back to the
+ * translated `kind` when the engine carries neither (#472).
+ */
+export function engineDisplayTitle(t: T, engine: EngineTitleLike): string {
+  const identity = [engine.brand, engine.model].filter(Boolean).join(' ').trim()
+  return identity || engineKindLabel(t, engine.kind) || engine.kind
+}

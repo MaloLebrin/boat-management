@@ -160,7 +160,9 @@ function getSubjectLink(ev: MaintenanceEventRow): string {
                         class="hover:text-brand hover:underline transition-colors"
                       >
                         {{ subjectLabel(t, ev.subject) }}
-                        <span v-if="targetDescription(ev)"> · {{ targetDescription(ev) }} </span>
+                        <span v-if="targetDescription(t, ev)">
+                          · {{ targetDescription(t, ev) }}
+                        </span>
                       </a>
                     </p>
                     <div v-if="ev.parts.length > 0" class="mt-2 flex items-center gap-2">

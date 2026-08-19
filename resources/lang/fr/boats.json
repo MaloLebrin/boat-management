@@ -62,7 +62,7 @@
     "sn": "N° série",
     "powerUnit": "ch",
     "kindValues": {
-      "inboard": "Inbord",
+      "inboard": "In-bord",
       "outboard": "Hors-bord",
       "electric": "Électrique",
       "hybrid": "Hybride",
@@ -136,7 +136,7 @@
       "other": "Autre"
     },
     "engineKind": {
-      "inboard": "Inbord",
+      "inboard": "In-bord",
       "outboard": "Hors-bord",
       "electric": "Électrique",
       "hybrid": "Hybride",
