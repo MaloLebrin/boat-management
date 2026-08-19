@@ -2,6 +2,7 @@ import BoatMaintenanceTaskService, {
   BoatMaintenanceTaskNotFoundError,
   BoatMaintenanceTaskValidationError,
 } from '#services/boat_maintenance_task_service'
+import AuditLogService from '#services/audit_log_service'
 import BoatService, { BoatNotFoundError } from '#services/boat_service'
 import MaintenancePolicy from '#policies/maintenance_policy'
 import {
@@ -15,7 +16,8 @@ import type { HttpContext } from '@adonisjs/core/http'
 export default class BoatMaintenanceTasksController {
   constructor(
     private boatService: BoatService,
-    private boatMaintenanceTaskService: BoatMaintenanceTaskService
+    private boatMaintenanceTaskService: BoatMaintenanceTaskService,
+    private auditLogService: AuditLogService
   ) {}
 
   async store({ request, response, auth, params, bouncer, session, i18n }: HttpContext) {
@@ -38,7 +40,7 @@ export default class BoatMaintenanceTasksController {
     const payload = await request.validateUsing(createBoatMaintenanceTaskValidator)
 
     try {
-      await this.boatMaintenanceTaskService.createForBoat(user, boat, {
+      const task = await this.boatMaintenanceTaskService.createForBoat(user, boat, {
         subject: payload.subject,
         boatEngineId: payload.boatEngineId ?? null,
         boatSailId: payload.boatSailId ?? null,
@@ -49,6 +51,15 @@ export default class BoatMaintenanceTasksController {
         recurrenceIntervalMonths: payload.recurrenceIntervalMonths ?? null,
         dueEngineHours: payload.dueEngineHours ?? null,
         recurrenceIntervalEngineHours: payload.recurrenceIntervalEngineHours ?? null,
+      })
+
+      await this.auditLogService.log({
+        organizationId: user.organizationId!,
+        userId: user.id,
+        action: 'maintenance_task.create',
+        entityType: 'maintenance_task',
+        entityId: task.id,
+        metadata: { name: task.title, boatName: boat.name },
       })
     } catch (error) {
       if (error instanceof BoatMaintenanceTaskValidationError) {
@@ -83,10 +94,26 @@ export default class BoatMaintenanceTasksController {
     const payload = await request.validateUsing(markBoatMaintenanceTaskDoneValidator)
 
     try {
-      await this.boatMaintenanceTaskService.markDone(user, boat, Number(params.taskId), {
-        doneAt: payload.doneAt ?? undefined,
-        doneEngineHours: payload.doneEngineHours ?? null,
-      })
+      const { task, completed } = await this.boatMaintenanceTaskService.markDone(
+        user,
+        boat,
+        Number(params.taskId),
+        {
+          doneAt: payload.doneAt ?? undefined,
+          doneEngineHours: payload.doneEngineHours ?? null,
+        }
+      )
+
+      if (completed) {
+        await this.auditLogService.log({
+          organizationId: user.organizationId!,
+          userId: user.id,
+          action: 'maintenance_task.complete',
+          entityType: 'maintenance_task',
+          entityId: task.id,
+          metadata: { name: task.title, boatName: boat.name },
+        })
+      }
     } catch (error) {
       if (error instanceof BoatMaintenanceTaskNotFoundError) {
         session.flash('error', i18n.t('flash.maintenanceTasks.notFound'))
@@ -123,7 +150,20 @@ export default class BoatMaintenanceTasksController {
     await bouncer.with(MaintenancePolicy).authorize('delete', boat)
 
     try {
-      await this.boatMaintenanceTaskService.deleteForBoat(user, boat, Number(params.taskId))
+      const task = await this.boatMaintenanceTaskService.deleteForBoat(
+        user,
+        boat,
+        Number(params.taskId)
+      )
+
+      await this.auditLogService.log({
+        organizationId: user.organizationId!,
+        userId: user.id,
+        action: 'maintenance_task.delete',
+        entityType: 'maintenance_task',
+        entityId: task.id,
+        metadata: { name: task.title, boatName: boat.name },
+      })
     } catch (error) {
       if (error instanceof BoatMaintenanceTaskNotFoundError) {
         session.flash('error', i18n.t('flash.maintenanceTasks.notFound'))

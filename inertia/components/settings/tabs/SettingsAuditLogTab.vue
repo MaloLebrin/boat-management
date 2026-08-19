@@ -9,6 +9,7 @@ import BasePagination from '~/components/base/BasePagination.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
+import { AUDIT_ACTIONS } from '../../../../shared/types/audit_log'
 import type { AuditLogPage, AuditLogFilters, AuditAction } from '../../../../shared/types/audit_log'
 
 const { t } = useT()
@@ -33,14 +34,7 @@ const userOptions = computed(() => [
 
 const actionOptions = computed(() => [
   { label: t('settings.auditLog.filters.allActions'), value: '' },
-  { label: t('settings.auditLog.actions.login'), value: 'login' },
-  { label: t('settings.auditLog.actions.logout'), value: 'logout' },
-  { label: t('settings.auditLog.actions.boat_create'), value: 'boat.create' },
-  { label: t('settings.auditLog.actions.boat_update'), value: 'boat.update' },
-  { label: t('settings.auditLog.actions.boat_delete'), value: 'boat.delete' },
-  { label: t('settings.auditLog.actions.member_add'), value: 'member.add' },
-  { label: t('settings.auditLog.actions.member_remove'), value: 'member.remove' },
-  { label: t('settings.auditLog.actions.member_update_role'), value: 'member.update_role' },
+  ...AUDIT_ACTIONS.map((action) => ({ label: actionLabel(action), value: action })),
 ])
 
 function applyFilters() {
@@ -75,8 +69,13 @@ function actionLabel(action: AuditAction): string {
 function actionVariant(action: AuditAction): 'neutral' | 'success' | 'warning' | 'info' {
   if (action === 'login') return 'success'
   if (action === 'logout') return 'neutral'
-  if (action.endsWith('.delete') || action.endsWith('.remove')) return 'warning'
-  if (action.endsWith('.create') || action.endsWith('.add')) return 'info'
+  if (action.endsWith('.delete') || action.endsWith('.remove') || action.endsWith('.cancel')) {
+    return 'warning'
+  }
+  if (action.endsWith('.create') || action.endsWith('.add') || action.endsWith('.send')) {
+    return 'info'
+  }
+  if (action.endsWith('.accept') || action.endsWith('.complete')) return 'success'
   return 'neutral'
 }
 </script>

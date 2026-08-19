@@ -1,3 +1,4 @@
+import AuditLogService from '#services/audit_log_service'
 import OrganizationInvitationService from '#services/organization_invitation_service'
 import EmailQueueService from '#services/email_queue_service'
 import QuotaService from '#services/quota_service'
@@ -28,7 +29,8 @@ export default class OrganizationInvitationsController {
     private invitationService: OrganizationInvitationService,
     private emailQueueService: EmailQueueService,
     private quotaService: QuotaService,
-    private brandingService: BrandingService
+    private brandingService: BrandingService,
+    private auditLogService: AuditLogService
   ) {}
 
   async store({ request, response, auth, bouncer, session, i18n }: HttpContext) {
@@ -57,6 +59,15 @@ export default class OrganizationInvitationsController {
         orgName: user.organization.name,
         acceptUrl,
         branding: this.brandingService.toEmailParams(user.organization),
+      })
+
+      await this.auditLogService.log({
+        organizationId: user.organizationId!,
+        userId: user.id,
+        action: 'invitation.send',
+        entityType: 'invitation',
+        entityId: invitation.id,
+        metadata: { email: invitation.email, role: invitation.role },
       })
 
       session.flash('success', i18n.t('flash.invitation.sent'))
@@ -90,7 +101,18 @@ export default class OrganizationInvitationsController {
     await bouncer.with(OrganizationPolicy).authorize('manageMembers')
 
     try {
-      await this.invitationService.cancel(Number(params.id), user.organizationId!)
+      const invitation = await this.invitationService.cancel(
+        Number(params.id),
+        user.organizationId!
+      )
+      await this.auditLogService.log({
+        organizationId: user.organizationId!,
+        userId: user.id,
+        action: 'invitation.cancel',
+        entityType: 'invitation',
+        entityId: invitation.id,
+        metadata: { email: invitation.email, role: invitation.role },
+      })
       session.flash('success', i18n.t('flash.invitation.cancelled'))
     } catch (error) {
       if (error instanceof InvitationNotFoundError) {
@@ -168,7 +190,18 @@ export default class OrganizationInvitationsController {
 
     try {
       const { token } = await request.validateUsing(acceptInvitationValidator)
-      await this.invitationService.accept(token, user.id)
+      const invitation = await this.invitationService.accept(token, user.id)
+
+      // L'organisation journalisée est celle de l'invitation, pas
+      // `user.organizationId` : l'invité peut arriver d'une autre org.
+      await this.auditLogService.log({
+        organizationId: invitation.organizationId,
+        userId: user.id,
+        action: 'invitation.accept',
+        entityType: 'invitation',
+        entityId: invitation.id,
+        metadata: { email: invitation.email, role: invitation.role },
+      })
 
       session.flash('success', i18n.t('flash.invitation.accepted'))
       return response.redirect().toPath('/settings/members')

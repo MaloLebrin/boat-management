@@ -1,12 +1,21 @@
-export type AuditAction =
-  | 'login'
-  | 'logout'
-  | 'boat.create'
-  | 'boat.update'
-  | 'boat.delete'
-  | 'member.add'
-  | 'member.remove'
-  | 'member.update_role'
+export const AUDIT_ACTIONS = [
+  'login',
+  'logout',
+  'boat.create',
+  'boat.update',
+  'boat.delete',
+  'member.add',
+  'member.remove',
+  'member.update_role',
+  'invitation.send',
+  'invitation.cancel',
+  'invitation.accept',
+  'maintenance_task.create',
+  'maintenance_task.complete',
+  'maintenance_task.delete',
+] as const
+
+export type AuditAction = (typeof AUDIT_ACTIONS)[number]
 
 export interface AuditLogEntry {
   id: number

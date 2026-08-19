@@ -312,7 +312,13 @@
       "boat_delete": "Bateau supprimé",
       "member_add": "Membre ajouté",
       "member_remove": "Membre supprimé",
-      "member_update_role": "Rôle modifié"
+      "member_update_role": "Rôle modifié",
+      "invitation_send": "Invitation envoyée",
+      "invitation_cancel": "Invitation annulée",
+      "invitation_accept": "Invitation acceptée",
+      "maintenance_task_create": "Tâche de maintenance créée",
+      "maintenance_task_complete": "Tâche de maintenance terminée",
+      "maintenance_task_delete": "Tâche de maintenance supprimée"
     },
     "empty": {
       "title": "Aucune activité",
