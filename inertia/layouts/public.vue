@@ -4,6 +4,7 @@ import { Link } from '@adonisjs/inertia/vue'
 import { computed } from 'vue'
 import AppHeader from '~/components/layout/AppHeader.vue'
 import { useT } from '~/composables/use_t'
+import { marketingPath } from '#shared/helpers/locale_path'
 
 type SharedProps = {
   locale?: 'en' | 'fr'
@@ -16,27 +17,23 @@ const { t } = useT()
 const locale = computed<'en' | 'fr'>(() => page.props.locale ?? 'en')
 const copyrightYear = new Date().getFullYear()
 
-const guideHref = computed(() =>
-  locale.value === 'fr' ? '/fr/cout-entretien-bateau' : '/en/boat-maintenance-cost'
-)
+const guideHref = computed(() => marketingPath('guide', locale.value))
 
-const simulatorHref = computed(() =>
-  locale.value === 'fr' ? '/fr/simulateur-cout-entretien' : '/en/maintenance-cost-simulator'
-)
+const pricingHref = computed(() => marketingPath('pricing', locale.value))
 
-const privacyHref = computed(() => (locale.value === 'fr' ? '/fr/confidentialite' : '/en/privacy'))
+const simulatorHref = computed(() => marketingPath('simulator', locale.value))
 
-const termsHref = computed(() => (locale.value === 'fr' ? '/fr/cgu' : '/en/terms'))
+const privacyHref = computed(() => marketingPath('privacy', locale.value))
 
-const salesTermsHref = computed(() => (locale.value === 'fr' ? '/fr/cgv' : '/en/sales-terms'))
+const termsHref = computed(() => marketingPath('terms', locale.value))
 
-const legalNoticeHref = computed(() =>
-  locale.value === 'fr' ? '/fr/mentions-legales' : '/en/legal-notice'
-)
+const salesTermsHref = computed(() => marketingPath('salesTerms', locale.value))
 
-const aboutHref = computed(() => (locale.value === 'fr' ? '/fr/a-propos' : '/en/about'))
+const legalNoticeHref = computed(() => marketingPath('legalNotice', locale.value))
 
-const contactHref = computed(() => (locale.value === 'fr' ? '/fr/contact' : '/en/contact'))
+const aboutHref = computed(() => marketingPath('about', locale.value))
+
+const contactHref = computed(() => marketingPath('contact', locale.value))
 </script>
 
 <template>
@@ -64,7 +61,7 @@ const contactHref = computed(() => (locale.value === 'fr' ? '/fr/contact' : '/en
             <Link :href="`/${locale}#features`" class="transition-colors hover:text-fg">{{
               t('public.footer.features')
             }}</Link>
-            <Link :href="`/${locale}/tarifs`" class="transition-colors hover:text-fg">{{
+            <Link :href="pricingHref" class="transition-colors hover:text-fg">{{
               t('public.footer.pricing')
             }}</Link>
             <Link :href="simulatorHref" class="transition-colors hover:text-fg">{{

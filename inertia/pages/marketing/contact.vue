@@ -12,6 +12,7 @@ import ContactOfficesSection from '~/components/marketing/contact/ContactOffices
 import ContactFaqSection from '~/components/marketing/contact/ContactFaqSection.vue'
 
 import type { ContactSubjectOption } from '../../../shared/types/contact'
+import { marketingPath } from '#shared/helpers/locale_path'
 
 interface Channel {
   icon: string
@@ -105,9 +106,9 @@ const contactSent = props.contactSent
 
 const page = usePage<{ locale?: 'en' | 'fr' }>()
 const locale = computed<'en' | 'fr'>(() => (page.props.locale ?? 'en') as 'en' | 'fr')
-const contactEn = '/en/contact'
-const contactFr = '/fr/contact'
-const canonicalHref = computed(() => (locale.value === 'fr' ? contactFr : contactEn))
+const contactEn = marketingPath('contact', 'en')
+const contactFr = marketingPath('contact', 'fr')
+const canonicalHref = computed(() => marketingPath('contact', locale.value))
 </script>
 
 <template>

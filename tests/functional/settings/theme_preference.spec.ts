@@ -113,7 +113,7 @@ test.group('Theme resolution in the rendered page (#416)', (group) => {
     client,
     assert,
   }) => {
-    const response = await client.get('/en/tarifs').cookie('theme', 'dark')
+    const response = await client.get('/en/pricing').cookie('theme', 'dark')
 
     response.assertStatus(200)
     assert.include(response.text(), 'data-theme="dark"')

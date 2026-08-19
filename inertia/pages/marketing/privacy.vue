@@ -10,6 +10,7 @@ import { Head, usePage } from '@inertiajs/vue3'
 import { computed } from 'vue'
 import type { LegalDocument } from '#shared/types/marketing'
 import LegalDocumentSections from '~/components/marketing/legal/LegalDocumentSections.vue'
+import { marketingPath } from '#shared/helpers/locale_path'
 
 interface PrivacyData {
   meta: { title: string; description: string }
@@ -22,9 +23,9 @@ const props = defineProps<PrivacyData>()
 const page = usePage<SharedProps>()
 const locale = computed<'en' | 'fr'>(() => page.props.locale ?? 'en')
 
-const canonicalHref = computed(() =>
-  locale.value === 'fr' ? '/fr/confidentialite' : '/en/privacy'
-)
+const canonicalHref = computed(() => marketingPath('privacy', locale.value))
+const privacyEn = marketingPath('privacy', 'en')
+const privacyFr = marketingPath('privacy', 'fr')
 </script>
 
 <template>
@@ -33,8 +34,8 @@ const canonicalHref = computed(() =>
     <meta property="og:title" :content="props.meta.title" />
     <meta property="og:description" :content="props.meta.description" />
     <link rel="canonical" :href="canonicalHref" />
-    <link rel="alternate" hreflang="en" href="/en/privacy" />
-    <link rel="alternate" hreflang="fr" href="/fr/confidentialite" />
+    <link rel="alternate" hreflang="en" :href="privacyEn" />
+    <link rel="alternate" hreflang="fr" :href="privacyFr" />
   </Head>
 
   <LegalDocumentSections :document="props.privacy" />

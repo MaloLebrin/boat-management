@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { Link } from '@adonisjs/inertia/vue'
-import { nextTick, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import ThemeSwitcher from '~/components/layout/ThemeSwitcher.vue'
 import { useT } from '~/composables/use_t'
+import { marketingPath } from '#shared/helpers/locale_path'
 
 const props = defineProps<{
   isOpen: boolean
@@ -19,6 +20,8 @@ const emit = defineEmits<{
 
 const { t } = useT()
 const closeButtonEl = ref<HTMLButtonElement | null>(null)
+
+const pricingHref = computed(() => marketingPath('pricing', props.locale))
 
 watch(
   () => props.isOpen,
@@ -116,7 +119,7 @@ watch(
           {{ t('public.nav.features') }}
         </Link>
         <Link
-          :href="`/${locale}/tarifs`"
+          :href="pricingHref"
           class="block rounded-(--radius-control) px-3 py-2.5 text-sm font-medium text-fg-muted transition-colors duration-(--motion-fast) hover:bg-paper hover:text-fg"
           @click="emit('close')"
         >

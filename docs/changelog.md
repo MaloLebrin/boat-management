@@ -3,6 +3,18 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-08-19 — SEO : la page tarifs anglaise vit sur `/en/pricing` (#475)
+
+Suite de la campagne du 03/08. La page tarifs EN était servie sur `/en/tarifs`, un slug français, alors que ses voisines anglaises étaient déjà localisées (`/en/maintenance-cost-simulator`, `/en/boat-maintenance-cost`) : une URL qui ne contient aucun mot-clé anglais et qui trahit la traduction partielle du site aux yeux d'un lecteur comme d'un moteur de recherche.
+
+- **Nouvelle URL anglaise : `/en/pricing`.** `marketing.en.pricing` sert désormais ce chemin ; le français reste sur `/fr/tarifs`.
+- **`/en/tarifs` redirige en 301.** L'ancien slug survit comme route `marketing.en.pricing_legacy` et renvoie une redirection permanente vers `/en/pricing`, pour ne pas perdre le référencement acquis ni casser les liens externes.
+- **Un seul endroit décide des slugs.** `MARKETING_SLUGS` + `marketingPath(page, locale)` (`shared/helpers/locale_path.ts`) deviennent la source de vérité du slug de **chaque** page marketing dans les deux locales. En dépendent le header, le tiroir mobile, le footer, les CTA de la home (`HomeFaqCtaSection`, `HomeDemoSection`), le `ctaHref` de l'offre modulaire côté contrôleur, les `<Head>` des dix pages marketing et le générateur de `sitemap.xml` : plus aucun `/${locale}/tarifs` interpolé ni ternaire `locale === 'fr' ? '/fr/cgu' : '/en/terms'` recopié d'un fichier à l'autre.
+- **Le sélecteur de langue ne renvoie plus sur des 404.** Il ne traduisait que `/about` et les pages au slug identique : sur le simulateur, le guide, la confidentialité, les CGU, les CGV et les mentions légales, il gardait le slug de la locale de départ (`/en/confidentialite`…). `LOCALIZED_PATH_ALIASES` est maintenant dérivé de `MARKETING_SLUGS`, donc complet par construction — y compris `/pricing` ↔ `/tarifs`, et l'ancien `/en/tarifs` reste traduisible tant que la 301 existe.
+- **SEO de la page mis à jour.** Canonical, `hreflang` en/fr et `x-default` pointent sur les nouveaux chemins ; `sitemap.xml` liste `/en/pricing`.
+- **Deux correctifs de liens au passage.** `HomeDemoSection` naviguait par ancres `<a href>` brutes (rechargement complet, routing SPA perdu) : ses deux boutons passent en `<Link>` Inertia. Et `marketing.home.sections.case_study.cta_href` pointait en FR sur `/fr/pricing`, qui n'a jamais existé — corrigé en `/fr/tarifs` (bloc i18n mort, lu par aucun composant).
+- **Tests.** `tests/functional/routing/marketing_slugs.spec.ts` vérifie que **les vingt URLs** du catalogue répondent 200 — c'est le garde-fou qui empêche `MARKETING_SLUGS` de diverger de `start/routes/marketing.ts` ; `pricing_slug.spec.ts` couvre le rendu des deux locales et la 301 de `/en/tarifs` ; `locale_path.spec.ts` balaie le changement de locale sur chaque page, dans les deux sens. Les specs sitemap, propagation de locale, thème, réclamations tarifaires et smoke E2E suivent le nouveau slug.
+
 ## 2026-08-19 — Journal d'activité : les invitations et les tâches de maintenance y figurent enfin (#474)
 
 Suite de la campagne du 03/08 (famille #368). `/settings/audit-log` annonçait « l'historique des actions importantes réalisées dans votre organisation » mais ne contenait en pratique que des lignes « Connexion » : les deux flux les plus visibles de l'app — inviter quelqu'un, cocher une tâche d'entretien — n'écrivaient rien.
@@ -42,7 +54,6 @@ Suite de la campagne du 03/08 (famille #368). L'historique d'une fiche bateau af
 - **Les libellés déjà en base restent traduits à l'affichage.** Quand un moteur n'a ni marque, ni modèle, ni numéro de série, la légende enregistrée avec un événement d'entretien retombe sur le jeton `kind` — ce jeton reste stocké tel quel, volontairement indépendant de la langue, et c'est la couche d'affichage qui le traduit (`engineCaptionLabel()`, `isEngineKindCaption()` côté PDF). Les lignes déjà en base sont donc réparées sans migration : historique de la fiche bateau, historique global d'entretien et portail propriétaire.
 - **Un seul calcul de titre moteur.** Les quatre écrans qui composaient « marque + modèle, sinon le type » (fiche moteur, fiche pièce, modale d'entretien, modale d'ajout de document) partageaient la même logique dupliquée, dont trois retombaient sur le jeton brut : elle vit désormais dans `engineDisplayTitle()`.
 - **Tests.** 28 tests (`tests/inertia/boat_enum_labels.spec.ts`, `boats_maintenance_utils.spec.ts`, `boat_show_tab_history_caption.spec.ts`, `boat_show_tab_fuel_logs.spec.ts`, `boat_owner_maintenance_tab.spec.ts`, `maintenance_history_timeline_caption.spec.ts`, `boat_fuel_log_form.spec.ts`, `tests/unit/helpers/maintenance.spec.ts`, `tests/functional/maintenance/history_pdf.spec.ts`) couvrent la traduction du jeton, le passage inchangé d'une légende libre et l'absence de légende ; trois d'entre eux sont montés sur les vrais fichiers de traduction et vérifient que chaque type de moteur est traduit dans les deux locales, avec la même graphie dans les deux familles de clés — plusieurs échouent sur le code d'avant.
-
 
 ## 2026-08-19 — Réglages : le sous-menu ne surligne plus qu'une seule section (#471)
 

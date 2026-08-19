@@ -1,14 +1,18 @@
 <script setup lang="ts">
 import { Link } from '@adonisjs/inertia/vue'
+import { computed } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import { useScrollReveal } from '~/composables/use_scroll_reveal'
+import { marketingPath } from '#shared/helpers/locale_path'
 
-defineProps<{
+const props = defineProps<{
   faq: { title: string; items: Array<{ q: string; a: string }> }
   finalCta: { title: string; subtitle: string; primary: string; secondary: string }
   locale: 'en' | 'fr'
 }>()
+
+const pricingHref = computed(() => marketingPath('pricing', props.locale))
 
 const { el: faqEl, isVisible: faqVisible } = useScrollReveal()
 </script>
@@ -56,7 +60,7 @@ const { el: faqEl, isVisible: faqVisible } = useScrollReveal()
               {{ finalCta.primary }}
             </BaseButton>
           </a>
-          <Link :href="`/${locale}/tarifs`">
+          <Link :href="pricingHref">
             <BaseButton
               size="lg"
               variant="ghost"

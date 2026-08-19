@@ -10,6 +10,7 @@ import { Head, usePage } from '@inertiajs/vue3'
 import { computed } from 'vue'
 import type { LegalDocument } from '#shared/types/marketing'
 import LegalDocumentSections from '~/components/marketing/legal/LegalDocumentSections.vue'
+import { marketingPath } from '#shared/helpers/locale_path'
 
 /**
  * CGV (#466) — les CGU encadrent l'usage du service, pas sa vente : un
@@ -27,7 +28,9 @@ const props = defineProps<SalesTermsData>()
 const page = usePage<SharedProps>()
 const locale = computed<'en' | 'fr'>(() => page.props.locale ?? 'en')
 
-const canonicalHref = computed(() => (locale.value === 'fr' ? '/fr/cgv' : '/en/sales-terms'))
+const canonicalHref = computed(() => marketingPath('salesTerms', locale.value))
+const salesTermsEn = marketingPath('salesTerms', 'en')
+const salesTermsFr = marketingPath('salesTerms', 'fr')
 </script>
 
 <template>
@@ -36,8 +39,8 @@ const canonicalHref = computed(() => (locale.value === 'fr' ? '/fr/cgv' : '/en/s
     <meta property="og:title" :content="props.meta.title" />
     <meta property="og:description" :content="props.meta.description" />
     <link rel="canonical" :href="canonicalHref" />
-    <link rel="alternate" hreflang="en" href="/en/sales-terms" />
-    <link rel="alternate" hreflang="fr" href="/fr/cgv" />
+    <link rel="alternate" hreflang="en" :href="salesTermsEn" />
+    <link rel="alternate" hreflang="fr" :href="salesTermsFr" />
   </Head>
 
   <LegalDocumentSections :document="props.salesTerms" />

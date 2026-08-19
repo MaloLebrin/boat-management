@@ -12,7 +12,7 @@ test.group('E2E · Public screens smoke', (group) => {
     const urls = [
       '/en',
       '/fr',
-      '/en/tarifs',
+      '/en/pricing',
       '/fr/tarifs',
       '/en/maintenance-cost-simulator',
       '/fr/simulateur-cout-entretien',
