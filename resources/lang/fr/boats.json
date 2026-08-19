@@ -60,7 +60,7 @@
     "delete": "Supprimer",
     "mfg": "Installé le",
     "sn": "N° série",
-    "powerUnit": "cv",
+    "powerUnit": "ch",
     "kindValues": {
       "inboard": "Inbord",
       "outboard": "Hors-bord",
@@ -748,7 +748,7 @@
       "fuel": "Carburant",
       "power": "Puissance",
       "hours": "Heures moteur",
-      "hp": "{value} cv",
+      "hp": "{value} ch",
       "hoursUnit": "{value} h",
       "installYear": "Installé en"
     },

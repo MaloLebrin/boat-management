@@ -59,7 +59,9 @@ function formatYear(iso: string): string {
         <dl class="grid grid-cols-2 gap-4 text-sm">
           <div>
             <dt class="text-fg-muted">{{ t('boats.engineShow.specs.power') }}</dt>
-            <dd class="font-medium text-fg">{{ engine.powerHp ? `${engine.powerHp} HP` : '-' }}</dd>
+            <dd class="font-medium text-fg">
+              {{ engine.powerHp ? `${engine.powerHp} ${t('boats.engines.powerUnit')}` : '-' }}
+            </dd>
           </div>
           <div>
             <dt class="text-fg-muted">{{ t('boats.engineShow.specs.fuel') }}</dt>
