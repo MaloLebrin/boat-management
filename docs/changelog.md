@@ -3,6 +3,17 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-08-19 — SEO : la page tarifs anglaise vit sur `/en/pricing` (#475)
+
+Suite de la campagne du 03/08. La page tarifs EN était servie sur `/en/tarifs`, un slug français, alors que ses voisines anglaises étaient déjà localisées (`/en/maintenance-cost-simulator`, `/en/boat-maintenance-cost`) : une URL qui ne contient aucun mot-clé anglais et qui trahit la traduction partielle du site aux yeux d'un lecteur comme d'un moteur de recherche.
+
+- **Nouvelle URL anglaise : `/en/pricing`.** `marketing.en.pricing` sert désormais ce chemin ; le français reste sur `/fr/tarifs`.
+- **`/en/tarifs` redirige en 301.** L'ancien slug survit comme route `marketing.en.pricing_legacy` et renvoie une redirection permanente vers `/en/pricing`, pour ne pas perdre le référencement acquis ni casser les liens externes.
+- **Un seul endroit décide du slug.** `PRICING_PATHS` / `pricingPath(locale)` (`shared/helpers/locale_path.ts`) sont la source de vérité : header, tiroir mobile, footer, CTA de la home (`HomeFaqCtaSection`, `HomeDemoSection`) et `ctaHref` de l'offre modulaire côté contrôleur en dépendent, plus aucun `/${locale}/tarifs` construit à la main.
+- **Le sélecteur de langue suit.** `LOCALIZED_PATH_ALIASES` fait correspondre `/pricing` ↔ `/tarifs` : passer de la page tarifs FR à l'anglaise (et l'inverse) mène à la bonne URL au lieu d'un 404.
+- **SEO de la page mis à jour.** Canonical, `hreflang` en/fr et `x-default` pointent sur les nouveaux chemins ; `sitemap.xml` liste `/en/pricing`.
+- **Tests.** `tests/functional/routing/pricing_slug.spec.ts` couvre le rendu des deux locales et la 301 de `/en/tarifs` ; les specs sitemap, propagation de locale, thème, réclamations tarifaires, smoke E2E et `locale_path` suivent le nouveau slug.
+
 ## 2026-08-19 — Journal d'activité : les invitations et les tâches de maintenance y figurent enfin (#474)
 
 Suite de la campagne du 03/08 (famille #368). `/settings/audit-log` annonçait « l'historique des actions importantes réalisées dans votre organisation » mais ne contenait en pratique que des lignes « Connexion » : les deux flux les plus visibles de l'app — inviter quelqu'un, cocher une tâche d'entretien — n'écrivaient rien.
@@ -42,7 +53,6 @@ Suite de la campagne du 03/08 (famille #368). L'historique d'une fiche bateau af
 - **Les libellés déjà en base restent traduits à l'affichage.** Quand un moteur n'a ni marque, ni modèle, ni numéro de série, la légende enregistrée avec un événement d'entretien retombe sur le jeton `kind` — ce jeton reste stocké tel quel, volontairement indépendant de la langue, et c'est la couche d'affichage qui le traduit (`engineCaptionLabel()`, `isEngineKindCaption()` côté PDF). Les lignes déjà en base sont donc réparées sans migration : historique de la fiche bateau, historique global d'entretien et portail propriétaire.
 - **Un seul calcul de titre moteur.** Les quatre écrans qui composaient « marque + modèle, sinon le type » (fiche moteur, fiche pièce, modale d'entretien, modale d'ajout de document) partageaient la même logique dupliquée, dont trois retombaient sur le jeton brut : elle vit désormais dans `engineDisplayTitle()`.
 - **Tests.** 28 tests (`tests/inertia/boat_enum_labels.spec.ts`, `boats_maintenance_utils.spec.ts`, `boat_show_tab_history_caption.spec.ts`, `boat_show_tab_fuel_logs.spec.ts`, `boat_owner_maintenance_tab.spec.ts`, `maintenance_history_timeline_caption.spec.ts`, `boat_fuel_log_form.spec.ts`, `tests/unit/helpers/maintenance.spec.ts`, `tests/functional/maintenance/history_pdf.spec.ts`) couvrent la traduction du jeton, le passage inchangé d'une légende libre et l'absence de légende ; trois d'entre eux sont montés sur les vrais fichiers de traduction et vérifient que chaque type de moteur est traduit dans les deux locales, avec la même graphie dans les deux familles de clés — plusieurs échouent sur le code d'avant.
-
 
 ## 2026-08-19 — Réglages : le sous-menu ne surligne plus qu'une seule section (#471)
 

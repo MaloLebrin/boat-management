@@ -4,6 +4,7 @@ import { Link } from '@adonisjs/inertia/vue'
 import { computed } from 'vue'
 import AppHeader from '~/components/layout/AppHeader.vue'
 import { useT } from '~/composables/use_t'
+import { pricingPath } from '#shared/helpers/locale_path'
 
 type SharedProps = {
   locale?: 'en' | 'fr'
@@ -19,6 +20,8 @@ const copyrightYear = new Date().getFullYear()
 const guideHref = computed(() =>
   locale.value === 'fr' ? '/fr/cout-entretien-bateau' : '/en/boat-maintenance-cost'
 )
+
+const pricingHref = computed(() => pricingPath(locale.value))
 
 const simulatorHref = computed(() =>
   locale.value === 'fr' ? '/fr/simulateur-cout-entretien' : '/en/maintenance-cost-simulator'
@@ -64,7 +67,7 @@ const contactHref = computed(() => (locale.value === 'fr' ? '/fr/contact' : '/en
             <Link :href="`/${locale}#features`" class="transition-colors hover:text-fg">{{
               t('public.footer.features')
             }}</Link>
-            <Link :href="`/${locale}/tarifs`" class="transition-colors hover:text-fg">{{
+            <Link :href="pricingHref" class="transition-colors hover:text-fg">{{
               t('public.footer.pricing')
             }}</Link>
             <Link :href="simulatorHref" class="transition-colors hover:text-fg">{{

@@ -15,10 +15,26 @@ export function toAppLocale(locale: string | null | undefined): AppLocale {
 
 const LOCALE_PREFIX = /^\/(en|fr)(?=\/|$)/
 
+/**
+ * Slug de la page tarifs par locale (#475) : l'anglais vit sur `/en/pricing`,
+ * `/en/tarifs` ne subsiste que comme redirection permanente.
+ */
+export const PRICING_PATHS: Record<AppLocale, string> = {
+  en: '/en/pricing',
+  fr: '/fr/tarifs',
+}
+
+/** URL de la page tarifs pour une locale — source de vérité des liens et du SEO. */
+export function pricingPath(locale: AppLocale): string {
+  return PRICING_PATHS[locale]
+}
+
 /** Paths that differ between locales (suffix after /en or /fr). */
 const LOCALIZED_PATH_ALIASES: Record<string, Record<AppLocale, string>> = {
   '/about': { en: '/about', fr: '/a-propos' },
   '/a-propos': { en: '/about', fr: '/a-propos' },
+  '/pricing': { en: '/pricing', fr: '/tarifs' },
+  '/tarifs': { en: '/pricing', fr: '/tarifs' },
 }
 
 export function hasLocalePathPrefix(path: string): boolean {

@@ -5,6 +5,7 @@ import type { BooleanQuotaKey } from '../../shared/types/plan.js'
 import type { LegalEntry, PricingTableRow } from '../../shared/types/marketing.js'
 import legalEntity from '#config/legal'
 import { CONTACT_FLEET_SIZES, CONTACT_SUBJECTS } from '../../shared/types/contact.js'
+import { pricingPath } from '#shared/helpers/locale_path'
 import QuotaService from '#services/quota_service'
 import SimulatorLeadService from '#services/simulator_lead_service'
 
@@ -194,7 +195,7 @@ export default class MarketingController {
           modulesLabel: i18n.t('marketing.home.modularOffer.modules_label'),
           note: i18n.t('marketing.home.modularOffer.note'),
           ctaLabel: i18n.t('marketing.home.modularOffer.cta'),
-          ctaHref: `/${locale}/tarifs`,
+          ctaHref: pricingPath(locale),
           modules: [
             {
               icon: '📅',

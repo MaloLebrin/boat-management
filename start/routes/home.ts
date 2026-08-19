@@ -25,7 +25,7 @@ const SITE_URL = 'https://fleetai.app'
  */
 const LOCALIZED_PAGES = [
   { en: '/en', fr: '/fr', priority: '1.0', changefreq: 'weekly' },
-  { en: '/en/tarifs', fr: '/fr/tarifs', priority: '0.8', changefreq: 'monthly' },
+  { en: '/en/pricing', fr: '/fr/tarifs', priority: '0.8', changefreq: 'monthly' },
   {
     en: '/en/maintenance-cost-simulator',
     fr: '/fr/simulateur-cout-entretien',

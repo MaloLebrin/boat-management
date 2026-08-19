@@ -6,7 +6,7 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import AppHeaderMobileDrawer from '~/components/layout/AppHeaderMobileDrawer.vue'
 import ThemeSwitcher from '~/components/layout/ThemeSwitcher.vue'
 import { useT } from '~/composables/use_t'
-import { buildLocaleSwitchHref, type AppLocale } from '#shared/helpers/locale_path'
+import { buildLocaleSwitchHref, pricingPath, type AppLocale } from '#shared/helpers/locale_path'
 
 type SharedProps = {
   locale?: 'en' | 'fr'
@@ -23,6 +23,8 @@ const isAuthed = computed(() => Boolean(page.props.user))
 const guideHref = computed(() =>
   locale.value === 'fr' ? '/fr/cout-entretien-bateau' : '/en/boat-maintenance-cost'
 )
+
+const pricingHref = computed(() => pricingPath(locale.value))
 
 const otherLocale = computed<AppLocale>(() => (locale.value === 'en' ? 'fr' : 'en'))
 
@@ -116,7 +118,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
           {{ t('public.nav.features') }}
         </Link>
         <Link
-          :href="`/${locale}/tarifs`"
+          :href="pricingHref"
           class="rounded-(--radius-control) px-3 py-2 text-sm font-medium text-fg-muted transition-colors duration-(--motion-fast) ease-premium hover:bg-paper hover:text-fg"
         >
           {{ t('public.nav.pricing') }}

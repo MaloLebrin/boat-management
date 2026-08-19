@@ -12,9 +12,11 @@ test.group('locale_path', () => {
     assert.isNull(buildLocaleSwitchHref('/login', 'fr'))
   })
 
-  test('swaps marketing locale prefix', ({ assert }) => {
+  test('maps pricing page slug per locale (#475)', ({ assert }) => {
+    assert.equal(buildLocaleSwitchHref('/en/pricing', 'fr'), '/fr/tarifs')
+    assert.equal(buildLocaleSwitchHref('/fr/tarifs', 'en'), '/en/pricing')
+    // L'ancien slug EN reste traduisible tant que la redirection 301 existe.
     assert.equal(buildLocaleSwitchHref('/en/tarifs', 'fr'), '/fr/tarifs')
-    assert.equal(buildLocaleSwitchHref('/fr/tarifs', 'en'), '/en/tarifs')
   })
 
   test('maps about page slug per locale', ({ assert }) => {

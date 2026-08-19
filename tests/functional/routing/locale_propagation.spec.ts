@@ -9,7 +9,7 @@ test.group('Locale propagation (functional)', () => {
   })
 
   test('visiting a /en/... page sets a locale=en cookie', async ({ client, assert }) => {
-    const response = await client.get('/en/tarifs')
+    const response = await client.get('/en/pricing')
 
     response.assertStatus(200)
     assert.equal(response.cookie('locale')?.value, 'en')

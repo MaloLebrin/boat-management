@@ -12,7 +12,12 @@ router.get('/', ({ response }) => response.redirect('/en')).as('home')
 router
   .group(() => {
     router.get('/', [MarketingController, 'home']).as('marketing.en.home')
-    router.get('/tarifs', [MarketingController, 'pricing']).as('marketing.en.pricing')
+    router.get('/pricing', [MarketingController, 'pricing']).as('marketing.en.pricing')
+    // #475 — ancien slug FR de la page tarifs EN : redirection permanente vers /en/pricing
+    // pour ne pas perdre le référencement acquis sur /en/tarifs.
+    router
+      .get('/tarifs', ({ response }) => response.redirect('/en/pricing', false, 301))
+      .as('marketing.en.pricing_legacy')
     router
       .get('/maintenance-cost-simulator', [MarketingController, 'simulator'])
       .as('marketing.en.simulator')

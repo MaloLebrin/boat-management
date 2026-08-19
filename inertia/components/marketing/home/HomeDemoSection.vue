@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import { CheckCircleIcon, CalendarDaysIcon, PlayCircleIcon } from '@heroicons/vue/24/outline'
 import { useForm } from '@inertiajs/vue3'
+import { computed } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import { useFlash } from '~/composables/use_flash'
 import { useScrollReveal } from '~/composables/use_scroll_reveal'
 import { useT } from '~/composables/use_t'
+import { pricingPath } from '#shared/helpers/locale_path'
 
 const demoForm = useForm({})
 
-defineProps<{
+const props = defineProps<{
   eyebrow: string
   title: string
   titleHighlight: string
@@ -26,6 +28,8 @@ defineProps<{
 
 const { t } = useT()
 const { errorMessage: flashError } = useFlash()
+
+const pricingHref = computed(() => pricingPath(props.locale))
 
 const { el, isVisible } = useScrollReveal()
 </script>
@@ -95,7 +99,7 @@ const { el, isVisible } = useScrollReveal()
                   {{ ctaLabel }}
                 </BaseButton>
               </a>
-              <a :href="`/${locale}/tarifs`">
+              <a :href="pricingHref">
                 <BaseButton size="lg" variant="ghost" class="w-full justify-center">
                   {{ secondaryLabel }}
                 </BaseButton>
