@@ -63,5 +63,9 @@
   "theme.dark": "Dark theme",
   "formErrors": {
     "title": "The form contains errors"
+  },
+  "toasts": {
+    "region": "Notifications",
+    "close": "Close notification"
   }
 }

@@ -3,6 +3,17 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-08-19 — Toasts : un flash finit toujours par disparaître, et celui du premier chargement s'affiche enfin (#467)
+
+Suite de la campagne du 03/08. « Tâche marquée comme terminée. » restait affiché plus de 45 s sur la fiche bateau, à travers plusieurs changements d'onglet.
+
+- **La cause était une mise en pause qui ne se relâchait jamais.** vue-sonner suspend le minuteur d'un toast tant que le toaster est survolé (`expanded`) ou « en cours d'interaction » (`interacting`, posé au `pointerdown`). Le toaster est en `top-center`, c'est-à-dire pile au-dessus de la barre d'onglets de la fiche bateau : le pointeur ne quittait jamais vraiment la zone, et `interacting` ne retombe même pas si le `pointerup` a lieu ailleurs. Le minuteur restait donc en pause indéfiniment. Comme les onglets de la fiche bateau changent l'URL via `history.replaceState` sans visite Inertia, le `toast.dismiss()` branché sur `page.url` ne partait pas non plus : plus rien ne pouvait retirer le toast.
+- **Garde-fou de durée de vie.** Chaque toast de flash porte désormais une durée nominale explicite (4 s) _et_ un retrait forcé au bout de `FLASH_TOAST_MAX_LIFETIME_MS` (10 s), qui passe outre la pause. En usage normal le minuteur de vue-sonner fait le travail et le garde-fou ne sert à rien ; il ne se déclenche que quand la pause est restée coincée. 10 s laissent le temps de lire, voire de cliquer l'action « Voir les offres » d'un toast d'erreur (#418).
+- **Le flash du tout premier chargement était perdu.** Le watcher `{ immediate: true }` publiait le toast pendant le `setup()` du layout, donc avant que le `<Toaster>` — un composant enfant — se soit abonné au `ToastState` ; vue-sonner ne rejoue pas les toasts publiés sans abonné. Le message est maintenant joué au `mounted` du layout.
+- **Logique mutualisée.** `inertia/composables/use_flash_toasts.ts` remplace les deux watchers dupliqués des layouts `default` et `auth`. Le layout `auth` (login, inscription, réinitialisation) hérite au passage du CTA « Voir les offres » sur les toasts d'erreur. Les minuteurs en attente sont annulés au changement d'URL et au démontage.
+- **Bouton de fermeture.** Les deux toasters affichent une croix de fermeture, avec un libellé accessible traduit (`common.toasts.close`), tout comme le libellé de la région (`common.toasts.region`) — dans les deux locales.
+- **Tests.** 10 tests (`tests/inertia/flash_toasts.spec.ts`) : rendu des trois types de flash, flash arrivant sur une visite Inertia ultérieure, auto-dismiss nominal, retrait d'un toast **survolé** (succès et erreur) une fois la durée de vie maximale atteinte — les deux échouent sans le garde-fou —, CTA d'erreur présent/absent selon `errorAction` et sa cible de navigation, et annulation des minuteurs par `dismissAll()` et par le démontage.
+
 ## 2026-08-16 — Footer : mentions légales et CGV publiées, le pied de page redevient conforme LCEN (#466)
 
 Suite de la campagne du 03/08. Depuis le retrait du lien mort « Conditions » (#413), le footer ne pointait plus vers aucun document légal ; #455 y a réintroduit les CGU et la confidentialité, mais un SaaS **payant** opéré en France doit aussi publier ses **mentions légales** (LCEN art. 6-III) et ses **CGV** (vente à distance). Les deux manquaient — pages comprises.

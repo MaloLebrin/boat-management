@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { Data } from '@generated/data'
-import { router, usePage } from '@inertiajs/vue3'
+import { usePage } from '@inertiajs/vue3'
 import { onBeforeUnmount, ref, watch } from 'vue'
-import { Toaster, toast } from 'vue-sonner'
+import { Toaster } from 'vue-sonner'
 import brandIconUrl from '~/assets/brand/fleetai_compass.svg'
 import AsideMenu from '~/components/layout/AsideMenu.vue'
 import DemoSessionBanner from '~/components/layout/DemoSessionBanner.vue'
@@ -11,6 +11,7 @@ import NotificationBell from '~/components/layout/NotificationBell.vue'
 import { useNetworkStatus } from '~/composables/use_network_status'
 import ConflictResolutionModal from '~/components/ConflictResolutionModal.vue'
 import OfflinePendingQueue from '~/components/OfflinePendingQueue.vue'
+import { useFlashToasts } from '~/composables/use_flash_toasts'
 import { useOfflineQueue } from '~/composables/use_offline_queue'
 import { usePwaUpdate } from '~/composables/use_pwa_update'
 import { useT } from '~/composables/use_t'
@@ -21,6 +22,7 @@ const isSidebarOpen = ref(false)
 const { t } = useT()
 const { isOnline } = useNetworkStatus()
 const { drainQueue, conflictedAction, resolveConflict } = useOfflineQueue()
+const { dismissAll: dismissToasts } = useFlashToasts()
 usePwaUpdate()
 
 watch(isOnline, (online) => {
@@ -44,38 +46,9 @@ function onKeydown(e: KeyboardEvent) {
 watch(
   () => page.url,
   () => {
-    toast.dismiss()
+    dismissToasts()
     closeSidebar()
   }
-)
-
-watch(
-  () => page.props.flash,
-  (flashMessages) => {
-    if (flashMessages.error) {
-      // Upsell quota (issue #418) : le toast d'erreur porte une action « Voir les
-      // offres » vers la page de facturation quand le backend l'a renseignée.
-      const errorAction = flashMessages.errorAction
-      toast.error(
-        flashMessages.error,
-        errorAction
-          ? {
-              action: {
-                label: t('common.viewPlans'),
-                onClick: () => router.visit(errorAction),
-              },
-            }
-          : undefined
-      )
-    }
-    if (flashMessages.success) {
-      toast.success(flashMessages.success)
-    }
-    if (flashMessages.info) {
-      toast.info(flashMessages.info)
-    }
-  },
-  { immediate: true }
 )
 
 watch(
@@ -156,7 +129,13 @@ onBeforeUnmount(() => {
     <!-- Mobile sidebar drawer -->
     <MobileSidebarDrawer :open="isSidebarOpen" :user="page.props.user" @close="closeSidebar" />
 
-    <Toaster position="top-center" rich-colors />
+    <Toaster
+      position="top-center"
+      rich-colors
+      close-button
+      :container-aria-label="t('common.toasts.region')"
+      :toast-options="{ closeButtonAriaLabel: t('common.toasts.close') }"
+    />
 
     <ConflictResolutionModal
       v-if="conflictedAction"
