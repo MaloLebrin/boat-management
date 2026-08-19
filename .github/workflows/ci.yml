@@ -129,8 +129,20 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      # Le binaire Chromium ne dépend que de la version de Playwright, épinglée
+      # par le lockfile : sur cache hit, l'install ci-dessous est un no-op.
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+      # Pas de --with-deps : sur ubuntu-latest il n'installe aucune bibliothèque
+      # système (elles sont déjà présentes), seulement 9 paquets de polices
+      # CJK/cyrillique/thaï dont aucun test e2e n'a besoin. En échange il lance
+      # un apt-get update qui, quand le miroir azure.archive.ubuntu.com est
+      # dégradé, boucle sur des retries pendant plusieurs minutes.
       - name: Install Playwright Chromium
-        run: pnpm exec playwright install --with-deps chromium
+        run: pnpm exec playwright install chromium
       - name: E2E tests (Playwright + Japa browser client)
         run: pnpm test:e2e
         env:
