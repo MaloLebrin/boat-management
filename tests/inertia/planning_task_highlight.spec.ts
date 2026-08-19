@@ -12,12 +12,26 @@ vi.mock('~/composables/use_date_format', () => ({
 
 const pageUrl = ref('/planning')
 
+// Le scénario de ces tests est celui d'un mécanicien arrivant depuis sa carte
+// d'intervention : ses capabilities se limitent au module maintenance, ce dont
+// PlanningTaskCard a besoin pour décider d'afficher ou non le lien vers la
+// fiche bateau (#473). Aucune assertion ici n'en dépend.
+const pageProps = {
+  permissions: {
+    role: 'mechanic',
+    capabilities: ['maintenance.view', 'maintenance.create', 'maintenance.edit'],
+  },
+}
+
 vi.mock('@inertiajs/vue3', () => ({
   Head: { template: '<div><slot /></div>' },
   router: { visit: vi.fn() },
   usePage: () => ({
     get url() {
       return pageUrl.value
+    },
+    get props() {
+      return pageProps
     },
   }),
 }))
