@@ -196,7 +196,7 @@ function formatYear(iso: string): string {
           </div>
           <div class="mt-3 flex flex-wrap gap-x-6 gap-y-1 text-sm text-fg-muted">
             <p v-if="engine.fuel">{{ engineFuelLabel(t, engine.fuel) }}</p>
-            <p v-if="engine.powerHp">{{ engine.powerHp }} HP</p>
+            <p v-if="engine.powerHp">{{ engine.powerHp }} {{ t('boats.engines.powerUnit') }}</p>
             <p v-if="engine.manufacturedAt">
               {{
                 t('boats.engineShow.installedIn', {
