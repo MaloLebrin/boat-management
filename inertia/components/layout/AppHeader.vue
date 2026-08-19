@@ -6,7 +6,7 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import AppHeaderMobileDrawer from '~/components/layout/AppHeaderMobileDrawer.vue'
 import ThemeSwitcher from '~/components/layout/ThemeSwitcher.vue'
 import { useT } from '~/composables/use_t'
-import { buildLocaleSwitchHref, pricingPath, type AppLocale } from '#shared/helpers/locale_path'
+import { buildLocaleSwitchHref, marketingPath, type AppLocale } from '#shared/helpers/locale_path'
 
 type SharedProps = {
   locale?: 'en' | 'fr'
@@ -20,11 +20,9 @@ const { t } = useT()
 const locale = computed<'en' | 'fr'>(() => page.props.locale ?? 'en')
 const isAuthed = computed(() => Boolean(page.props.user))
 
-const guideHref = computed(() =>
-  locale.value === 'fr' ? '/fr/cout-entretien-bateau' : '/en/boat-maintenance-cost'
-)
+const guideHref = computed(() => marketingPath('guide', locale.value))
 
-const pricingHref = computed(() => pricingPath(locale.value))
+const pricingHref = computed(() => marketingPath('pricing', locale.value))
 
 const otherLocale = computed<AppLocale>(() => (locale.value === 'en' ? 'fr' : 'en'))
 

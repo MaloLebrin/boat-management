@@ -4,7 +4,7 @@ import { computed } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import { useScrollReveal } from '~/composables/use_scroll_reveal'
-import { pricingPath } from '#shared/helpers/locale_path'
+import { marketingPath } from '#shared/helpers/locale_path'
 
 const props = defineProps<{
   faq: { title: string; items: Array<{ q: string; a: string }> }
@@ -12,7 +12,7 @@ const props = defineProps<{
   locale: 'en' | 'fr'
 }>()
 
-const pricingHref = computed(() => pricingPath(props.locale))
+const pricingHref = computed(() => marketingPath('pricing', props.locale))
 
 const { el: faqEl, isVisible: faqVisible } = useScrollReveal()
 </script>

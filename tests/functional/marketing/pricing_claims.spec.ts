@@ -2,7 +2,7 @@ import { test } from '@japa/runner'
 import type { ApiClient } from '@japa/api-client'
 import { PLAN_LIMITS } from '#shared/types/plan'
 import type { PricingTableRow } from '#shared/types/marketing'
-import { pricingPath } from '#shared/helpers/locale_path'
+import { marketingPath } from '#shared/helpers/locale_path'
 
 interface PricingProps {
   t: {
@@ -15,7 +15,7 @@ interface PricingProps {
 }
 
 async function fetchPricingProps(client: ApiClient, locale: 'fr' | 'en'): Promise<PricingProps> {
-  const response = await client.get(pricingPath(locale)).withInertia()
+  const response = await client.get(marketingPath('pricing', locale)).withInertia()
   response.assertStatus(200)
   return response.body().props as PricingProps
 }

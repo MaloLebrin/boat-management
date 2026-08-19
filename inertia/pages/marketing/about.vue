@@ -14,15 +14,16 @@ import AboutTimelineSection from '~/components/marketing/about/AboutTimelineSect
 import AboutOfficeSection from '~/components/marketing/about/AboutOfficeSection.vue'
 import HomeFinalCtaSection from '~/components/marketing/home/HomeFinalCtaSection.vue'
 import type { AboutPageProps } from '../../../shared/types/marketing'
+import { marketingPath } from '#shared/helpers/locale_path'
 
 const props = defineProps<AboutPageProps>()
 const t = props.t
 
 const page = usePage<{ locale?: 'en' | 'fr' }>()
 const locale = computed<'en' | 'fr'>(() => (page.props.locale ?? 'en') as 'en' | 'fr')
-const aboutEn = '/en/about'
-const aboutFr = '/fr/a-propos'
-const canonicalHref = computed(() => (locale.value === 'fr' ? aboutFr : aboutEn))
+const aboutEn = marketingPath('about', 'en')
+const aboutFr = marketingPath('about', 'fr')
+const canonicalHref = computed(() => marketingPath('about', locale.value))
 </script>
 
 <template>

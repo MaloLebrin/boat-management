@@ -15,6 +15,7 @@ import SimulatorStepWear from '~/components/marketing/simulator/SimulatorStepWea
 import SimulatorResultCard from '~/components/marketing/simulator/SimulatorResultCard.vue'
 import SimulatorCtaCard from '~/components/marketing/simulator/SimulatorCtaCard.vue'
 import SimulatorExitIntentModal from '~/components/marketing/simulator/SimulatorExitIntentModal.vue'
+import { marketingPath } from '#shared/helpers/locale_path'
 import type {
   SimulatorBoatInput,
   SimulatorCostBreakdown,
@@ -37,9 +38,9 @@ const { t } = useT()
 
 const locale = computed<'en' | 'fr'>(() => (page.props.locale ?? 'fr') as 'en' | 'fr')
 
-const canonicalHref = computed(() =>
-  locale.value === 'fr' ? '/fr/simulateur-cout-entretien' : '/en/maintenance-cost-simulator'
-)
+const canonicalHref = computed(() => marketingPath('simulator', locale.value))
+const simulatorEn = marketingPath('simulator', 'en')
+const simulatorFr = marketingPath('simulator', 'fr')
 
 const currentStep = ref(0)
 const formData = ref<Partial<SimulatorBoatInput>>({
@@ -157,18 +158,8 @@ function shareResults() {
       :content="t('simulator.meta_description')"
     />
     <link head-key="canonical" rel="canonical" :href="canonicalHref" />
-    <link
-      head-key="alternate-en"
-      rel="alternate"
-      hreflang="en"
-      href="/en/maintenance-cost-simulator"
-    />
-    <link
-      head-key="alternate-fr"
-      rel="alternate"
-      hreflang="fr"
-      href="/fr/simulateur-cout-entretien"
-    />
+    <link head-key="alternate-en" rel="alternate" hreflang="en" :href="simulatorEn" />
+    <link head-key="alternate-fr" rel="alternate" hreflang="fr" :href="simulatorFr" />
   </Head>
 
   <!-- Hero dark -->

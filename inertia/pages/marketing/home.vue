@@ -24,6 +24,7 @@ import HomeSecuritySection from '~/components/marketing/home/HomeSecuritySection
 import HomeFaqSection from '~/components/marketing/home/HomeFaqSection.vue'
 import HomeDemoSection from '~/components/marketing/home/HomeDemoSection.vue'
 import HomeFinalCtaSection from '~/components/marketing/home/HomeFinalCtaSection.vue'
+import { marketingPath } from '#shared/helpers/locale_path'
 
 type Persona = 'loueurs' | 'ecoles' | 'marinas' | 'armateurs'
 
@@ -209,8 +210,9 @@ function handlePersonaChange(persona: Persona) {
   activePersona.value = persona
 }
 
-const hreflangEn = '/en'
-const hreflangFr = '/fr'
+const hreflangEn = marketingPath('home', 'en')
+const hreflangFr = marketingPath('home', 'fr')
+const canonicalHref = computed(() => marketingPath('home', locale.value))
 
 // Schéma JSON-LD WebSite rendu dans <Head> (donc présent dans le HTML SSR lu
 // par les crawlers), au lieu d'une injection client-side via onMounted.
@@ -234,7 +236,7 @@ const websiteSchema = computed(() =>
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" :content="t.meta.title" />
     <meta name="twitter:description" :content="t.meta.description" />
-    <link rel="canonical" :href="`/${locale}`" />
+    <link rel="canonical" :href="canonicalHref" />
     <link rel="alternate" hreflang="en" :href="hreflangEn" />
     <link rel="alternate" hreflang="fr" :href="hreflangFr" />
     <link rel="alternate" hreflang="x-default" :href="hreflangEn" />

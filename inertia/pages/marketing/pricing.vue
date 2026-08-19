@@ -14,7 +14,7 @@ import PricingConfigurator from '~/components/marketing/pricing/PricingConfigura
 import PricingExtrasSection from '~/components/marketing/pricing/PricingExtrasSection.vue'
 import PricingFaqSection from '~/components/marketing/pricing/PricingFaqSection.vue'
 import HomeFinalCtaSection from '~/components/marketing/home/HomeFinalCtaSection.vue'
-import { PRICING_PATHS, pricingPath } from '#shared/helpers/locale_path'
+import { marketingPath } from '#shared/helpers/locale_path'
 
 type SharedProps = { locale?: 'en' | 'fr' }
 const page = usePage<SharedProps>()
@@ -208,9 +208,9 @@ const props = defineProps<PageProps>()
 const t = props.t
 const locale = computed<'en' | 'fr'>(() => (page.props.locale ?? 'fr') as 'en' | 'fr')
 const billing = ref<'monthly' | 'annual'>('annual')
-const hreflangEn = PRICING_PATHS.en
-const hreflangFr = PRICING_PATHS.fr
-const canonicalHref = computed(() => pricingPath(locale.value))
+const hreflangEn = marketingPath('pricing', 'en')
+const hreflangFr = marketingPath('pricing', 'fr')
+const canonicalHref = computed(() => marketingPath('pricing', locale.value))
 </script>
 
 <template>

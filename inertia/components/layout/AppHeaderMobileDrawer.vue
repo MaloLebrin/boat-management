@@ -4,7 +4,7 @@ import { computed, nextTick, ref, watch } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import ThemeSwitcher from '~/components/layout/ThemeSwitcher.vue'
 import { useT } from '~/composables/use_t'
-import { pricingPath } from '#shared/helpers/locale_path'
+import { marketingPath } from '#shared/helpers/locale_path'
 
 const props = defineProps<{
   isOpen: boolean
@@ -21,7 +21,7 @@ const emit = defineEmits<{
 const { t } = useT()
 const closeButtonEl = ref<HTMLButtonElement | null>(null)
 
-const pricingHref = computed(() => pricingPath(props.locale))
+const pricingHref = computed(() => marketingPath('pricing', props.locale))
 
 watch(
   () => props.isOpen,

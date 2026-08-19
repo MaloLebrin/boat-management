@@ -10,6 +10,7 @@ import { Head, usePage } from '@inertiajs/vue3'
 import { computed } from 'vue'
 import type { LegalDocument } from '#shared/types/marketing'
 import LegalDocumentSections from '~/components/marketing/legal/LegalDocumentSections.vue'
+import { marketingPath } from '#shared/helpers/locale_path'
 
 /**
  * Mentions légales (#466) — le footer n'exposait plus aucun lien légal, alors
@@ -26,9 +27,9 @@ const props = defineProps<LegalNoticeData>()
 const page = usePage<SharedProps>()
 const locale = computed<'en' | 'fr'>(() => page.props.locale ?? 'en')
 
-const canonicalHref = computed(() =>
-  locale.value === 'fr' ? '/fr/mentions-legales' : '/en/legal-notice'
-)
+const canonicalHref = computed(() => marketingPath('legalNotice', locale.value))
+const legalNoticeEn = marketingPath('legalNotice', 'en')
+const legalNoticeFr = marketingPath('legalNotice', 'fr')
 </script>
 
 <template>
@@ -37,8 +38,8 @@ const canonicalHref = computed(() =>
     <meta property="og:title" :content="props.meta.title" />
     <meta property="og:description" :content="props.meta.description" />
     <link rel="canonical" :href="canonicalHref" />
-    <link rel="alternate" hreflang="en" href="/en/legal-notice" />
-    <link rel="alternate" hreflang="fr" href="/fr/mentions-legales" />
+    <link rel="alternate" hreflang="en" :href="legalNoticeEn" />
+    <link rel="alternate" hreflang="fr" :href="legalNoticeFr" />
   </Head>
 
   <LegalDocumentSections :document="props.legalNotice" />

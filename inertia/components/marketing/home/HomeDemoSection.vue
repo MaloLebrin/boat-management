@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { CheckCircleIcon, CalendarDaysIcon, PlayCircleIcon } from '@heroicons/vue/24/outline'
 import { useForm } from '@inertiajs/vue3'
+import { Link } from '@adonisjs/inertia/vue'
 import { computed } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import { useFlash } from '~/composables/use_flash'
 import { useScrollReveal } from '~/composables/use_scroll_reveal'
 import { useT } from '~/composables/use_t'
-import { pricingPath } from '#shared/helpers/locale_path'
+import { marketingPath } from '#shared/helpers/locale_path'
 
 const demoForm = useForm({})
 
@@ -29,7 +30,7 @@ const props = defineProps<{
 const { t } = useT()
 const { errorMessage: flashError } = useFlash()
 
-const pricingHref = computed(() => pricingPath(props.locale))
+const pricingHref = computed(() => marketingPath('pricing', props.locale))
 
 const { el, isVisible } = useScrollReveal()
 </script>
@@ -94,16 +95,16 @@ const { el, isVisible } = useScrollReveal()
             <p class="mt-2 text-sm text-fg-subtle">{{ noCommitment }}</p>
 
             <div class="mt-6 flex flex-col gap-3">
-              <a :href="ctaHref">
+              <Link :href="ctaHref">
                 <BaseButton size="lg" variant="secondary" class="w-full justify-center">
                   {{ ctaLabel }}
                 </BaseButton>
-              </a>
-              <a :href="pricingHref">
+              </Link>
+              <Link :href="pricingHref">
                 <BaseButton size="lg" variant="ghost" class="w-full justify-center">
                   {{ secondaryLabel }}
                 </BaseButton>
-              </a>
+              </Link>
             </div>
           </div>
         </div>

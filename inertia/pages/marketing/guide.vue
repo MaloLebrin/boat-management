@@ -12,6 +12,7 @@ import { computed } from 'vue'
 import GuideCostTable from '~/components/marketing/guide/GuideCostTable.vue'
 import GuideFaqSection from '~/components/marketing/guide/GuideFaqSection.vue'
 import JsonLd from '~/components/json_ld'
+import { marketingPath } from '#shared/helpers/locale_path'
 
 interface FaqItem {
   q: string
@@ -73,13 +74,11 @@ const props = defineProps<GuideData>()
 const page = usePage<SharedProps>()
 const locale = computed<'en' | 'fr'>(() => page.props.locale ?? 'en')
 
-const simulatorUrl = computed(() =>
-  locale.value === 'fr' ? '/fr/simulateur-cout-entretien' : '/en/maintenance-cost-simulator'
-)
+const simulatorUrl = computed(() => marketingPath('simulator', locale.value))
 
-const canonicalHref = computed(() =>
-  locale.value === 'fr' ? '/fr/cout-entretien-bateau' : '/en/boat-maintenance-cost'
-)
+const canonicalHref = computed(() => marketingPath('guide', locale.value))
+const guideEn = marketingPath('guide', 'en')
+const guideFr = marketingPath('guide', 'fr')
 
 const faqSchema = computed(() =>
   JSON.stringify({
@@ -100,8 +99,8 @@ const faqSchema = computed(() =>
     <meta property="og:title" :content="meta.title" />
     <meta property="og:description" :content="meta.description" />
     <link rel="canonical" :href="canonicalHref" />
-    <link rel="alternate" hreflang="fr" href="/fr/cout-entretien-bateau" />
-    <link rel="alternate" hreflang="en" href="/en/boat-maintenance-cost" />
+    <link rel="alternate" hreflang="fr" :href="guideFr" />
+    <link rel="alternate" hreflang="en" :href="guideEn" />
     <JsonLd :schema="faqSchema" />
   </Head>
 

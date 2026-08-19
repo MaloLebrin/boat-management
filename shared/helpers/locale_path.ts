@@ -16,26 +16,43 @@ export function toAppLocale(locale: string | null | undefined): AppLocale {
 const LOCALE_PREFIX = /^\/(en|fr)(?=\/|$)/
 
 /**
- * Slug de la page tarifs par locale (#475) : l'anglais vit sur `/en/pricing`,
- * `/en/tarifs` ne subsiste que comme redirection permanente.
+ * Slug de chaque page marketing, par locale (#475). Source de vérité unique des
+ * liens internes, des `canonical`/`hreflang`, du sitemap et du sélecteur de
+ * langue : doit rester aligné sur `start/routes/marketing.ts`. Un lien vers une
+ * de ces pages ne s'écrit jamais en interpolant la locale (`/${locale}/tarifs`),
+ * sinon la locale dont le slug diffère tombe sur un 404.
  */
-export const PRICING_PATHS: Record<AppLocale, string> = {
-  en: '/en/pricing',
-  fr: '/fr/tarifs',
+export const MARKETING_SLUGS = {
+  home: { en: '', fr: '' },
+  pricing: { en: '/pricing', fr: '/tarifs' },
+  simulator: { en: '/maintenance-cost-simulator', fr: '/simulateur-cout-entretien' },
+  guide: { en: '/boat-maintenance-cost', fr: '/cout-entretien-bateau' },
+  about: { en: '/about', fr: '/a-propos' },
+  contact: { en: '/contact', fr: '/contact' },
+  privacy: { en: '/privacy', fr: '/confidentialite' },
+  terms: { en: '/terms', fr: '/cgu' },
+  salesTerms: { en: '/sales-terms', fr: '/cgv' },
+  legalNotice: { en: '/legal-notice', fr: '/mentions-legales' },
+} satisfies Record<string, Record<AppLocale, string>>
+
+export type MarketingPage = keyof typeof MARKETING_SLUGS
+
+/** URL d'une page marketing dans une locale : `marketingPath('pricing', 'en')` → `/en/pricing`. */
+export function marketingPath(page: MarketingPage, locale: AppLocale): string {
+  return `/${locale}${MARKETING_SLUGS[page][locale]}`
 }
 
-/** URL de la page tarifs pour une locale — source de vérité des liens et du SEO. */
-export function pricingPath(locale: AppLocale): string {
-  return PRICING_PATHS[locale]
-}
-
-/** Paths that differ between locales (suffix after /en or /fr). */
-const LOCALIZED_PATH_ALIASES: Record<string, Record<AppLocale, string>> = {
-  '/about': { en: '/about', fr: '/a-propos' },
-  '/a-propos': { en: '/about', fr: '/a-propos' },
-  '/pricing': { en: '/pricing', fr: '/tarifs' },
-  '/tarifs': { en: '/pricing', fr: '/tarifs' },
-}
+/**
+ * Index bidirectionnel slug → paire de slugs : `/tarifs` comme `/pricing`
+ * désignent la page tarifs, quelle que soit la locale du chemin d'origine.
+ * L'ancien slug EN `/en/tarifs` (redirigé en 301, #475) reste ainsi traduisible.
+ * La home est exclue : son suffixe est vide, `stripLocalePathPrefix` renvoie `/`.
+ */
+const LOCALIZED_PATH_ALIASES: Record<string, Record<AppLocale, string>> = Object.fromEntries(
+  Object.values(MARKETING_SLUGS)
+    .filter((slugs) => APP_LOCALES.every((locale) => slugs[locale] !== ''))
+    .flatMap((slugs) => APP_LOCALES.map((locale) => [slugs[locale], slugs]))
+)
 
 export function hasLocalePathPrefix(path: string): boolean {
   return LOCALE_PREFIX.test(path)

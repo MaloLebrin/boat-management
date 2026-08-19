@@ -1,5 +1,6 @@
 import { middleware } from '#start/kernel'
 import router from '@adonisjs/core/services/router'
+import { marketingPath, type MarketingPage } from '#shared/helpers/locale_path'
 
 const HomeController = () => import('#controllers/home_controller')
 
@@ -21,30 +22,21 @@ const SITE_URL = 'https://fleetai.app'
 /**
  * Pages marketing localisées (en/fr) : chaque entrée génère une URL par locale,
  * annotée avec les alternates hreflang (+ x-default → en) pour l'indexation
- * multilingue. Les slugs sont la source de vérité de `start/routes/marketing.ts`.
+ * multilingue. Les slugs viennent de `MARKETING_SLUGS` (#475), aligné sur
+ * `start/routes/marketing.ts` : le sitemap ne peut pas dériver des URLs servies.
  */
 const LOCALIZED_PAGES = [
-  { en: '/en', fr: '/fr', priority: '1.0', changefreq: 'weekly' },
-  { en: '/en/pricing', fr: '/fr/tarifs', priority: '0.8', changefreq: 'monthly' },
-  {
-    en: '/en/maintenance-cost-simulator',
-    fr: '/fr/simulateur-cout-entretien',
-    priority: '0.8',
-    changefreq: 'monthly',
-  },
-  {
-    en: '/en/boat-maintenance-cost',
-    fr: '/fr/cout-entretien-bateau',
-    priority: '0.7',
-    changefreq: 'monthly',
-  },
-  { en: '/en/about', fr: '/fr/a-propos', priority: '0.5', changefreq: 'monthly' },
-  { en: '/en/contact', fr: '/fr/contact', priority: '0.5', changefreq: 'monthly' },
-  { en: '/en/privacy', fr: '/fr/confidentialite', priority: '0.3', changefreq: 'yearly' },
-  { en: '/en/terms', fr: '/fr/cgu', priority: '0.3', changefreq: 'yearly' },
-  { en: '/en/sales-terms', fr: '/fr/cgv', priority: '0.3', changefreq: 'yearly' },
-  { en: '/en/legal-notice', fr: '/fr/mentions-legales', priority: '0.3', changefreq: 'yearly' },
-] as const
+  { page: 'home', priority: '1.0', changefreq: 'weekly' },
+  { page: 'pricing', priority: '0.8', changefreq: 'monthly' },
+  { page: 'simulator', priority: '0.8', changefreq: 'monthly' },
+  { page: 'guide', priority: '0.7', changefreq: 'monthly' },
+  { page: 'about', priority: '0.5', changefreq: 'monthly' },
+  { page: 'contact', priority: '0.5', changefreq: 'monthly' },
+  { page: 'privacy', priority: '0.3', changefreq: 'yearly' },
+  { page: 'terms', priority: '0.3', changefreq: 'yearly' },
+  { page: 'salesTerms', priority: '0.3', changefreq: 'yearly' },
+  { page: 'legalNotice', priority: '0.3', changefreq: 'yearly' },
+] as const satisfies readonly { page: MarketingPage; priority: string; changefreq: string }[]
 
 /**
  * Pages servies sur une URL unique (pas d'alternate hreflang).
@@ -62,16 +54,18 @@ router
         `    <xhtml:link rel="alternate" hreflang="x-default" href="${SITE_URL}${en}" />`,
       ].join('\n')
 
-    const localizedUrls = LOCALIZED_PAGES.flatMap((p) =>
-      [p.en, p.fr].map(
+    const localizedUrls = LOCALIZED_PAGES.flatMap((p) => {
+      const en = marketingPath(p.page, 'en')
+      const fr = marketingPath(p.page, 'fr')
+      return [en, fr].map(
         (loc) => `  <url>
     <loc>${SITE_URL}${loc}</loc>
-${alternatesFor(p.en, p.fr)}
+${alternatesFor(en, fr)}
     <changefreq>${p.changefreq}</changefreq>
     <priority>${p.priority}</priority>
   </url>`
       )
-    )
+    })
 
     const standaloneUrls = STANDALONE_PAGES.map(
       (p) => `  <url>
