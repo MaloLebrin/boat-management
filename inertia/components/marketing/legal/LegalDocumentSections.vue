@@ -59,6 +59,7 @@ const isEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
           <template v-for="(item, e) in section.entries" :key="e">
             <dt class="text-sm font-semibold text-fg">{{ item.label }}</dt>
             <dd class="text-fg-muted">
+              <!-- eslint-disable vue/no-restricted-v-bind -- URL externe ou mailto: selon la donnée, jamais un chemin interne -->
               <a
                 v-if="isExternalUrl(item.value)"
                 :href="item.value"
@@ -67,9 +68,12 @@ const isEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
                 class="underline"
                 >{{ item.value }}</a
               >
+              <!-- eslint-enable vue/no-restricted-v-bind -->
+              <!-- eslint-disable vue/no-restricted-v-bind -- URL externe ou mailto: selon la donnée, jamais un chemin interne -->
               <a v-else-if="isEmail(item.value)" :href="`mailto:${item.value}`" class="underline">{{
                 item.value
               }}</a>
+              <!-- eslint-enable vue/no-restricted-v-bind -->
               <span v-else>{{ item.value }}</span>
             </dd>
           </template>
@@ -83,11 +87,13 @@ const isEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
     <div class="mx-auto max-w-3xl rounded-2xl border border-bone bg-cream p-8 text-center">
       <h2 class="font-display text-2xl text-fg">{{ document.contact.title }}</h2>
       <p class="mt-3 text-fg-muted">{{ document.contact.body }}</p>
+      <!-- eslint-disable vue/no-restricted-v-bind -- URL externe ou mailto: selon la donnée, jamais un chemin interne -->
       <a
         :href="`mailto:${document.contact.email}`"
         class="mt-4 inline-block font-semibold text-fg underline"
         >{{ document.contact.email }}</a
       >
+      <!-- eslint-enable vue/no-restricted-v-bind -->
     </div>
   </section>
 </template>

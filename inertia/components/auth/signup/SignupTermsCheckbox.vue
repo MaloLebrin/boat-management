@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { Link } from '@adonisjs/inertia/vue'
 import { usePage } from '@inertiajs/vue3'
 import { computed } from 'vue'
 import { useT } from '~/composables/use_t'
 import { getFieldError, type FormErrors } from '~/utils/form_errors'
+import { marketingPath } from '#shared/helpers/locale_path'
 
 const props = defineProps<{ errors?: FormErrors }>()
 
@@ -17,11 +17,16 @@ const locale = computed<'en' | 'fr'>(() => page.props.locale ?? 'en')
 /**
  * Les deux liens pointaient sur `href="#"` (#455) : la politique de
  * confidentialité existait déjà, les CGU non — elles sont désormais publiées.
- * `target="_blank"` évite de perdre un formulaire à moitié rempli : Inertia
- * n'intercepte pas un `<Link>` qui porte un `target`.
+ *
+ * Ancres `<a>` volontaires malgré la règle « navigation interne = <Link> »
+ * (#533) : `target="_blank"` protège un formulaire à moitié rempli, et un
+ * `<Link>` ne sait pas ouvrir un nouvel onglet. `shouldIntercept()` d'Inertia
+ * ne regarde que les touches de modification et le bouton de la souris, jamais
+ * l'attribut `target` : un clic gauche sur `<Link target="_blank">` est
+ * intercepté et navigue dans le même onglet — exactement ce qu'on veut éviter.
  */
-const termsHref = computed(() => (locale.value === 'fr' ? '/fr/cgu' : '/en/terms'))
-const privacyHref = computed(() => (locale.value === 'fr' ? '/fr/confidentialite' : '/en/privacy'))
+const termsHref = computed(() => marketingPath('terms', locale.value))
+const privacyHref = computed(() => marketingPath('privacy', locale.value))
 
 // `acceptTerms` is a bare checkbox, so it needs its own error slot — otherwise
 // a rejected signup shows nothing at all (#448).
@@ -41,20 +46,18 @@ const error = computed(() => getFieldError(props.errors, 'acceptTerms'))
       />
       <span class="text-[13px] leading-relaxed text-fg-muted">
         {{ t('auth.signup.acceptTermsPrefix') }}
-        <Link
-          :href="termsHref"
-          target="_blank"
-          rel="noopener"
-          class="font-semibold text-coral-500"
-          >{{ t('auth.signup.cgu') }}</Link
-        >
+        <!-- eslint-disable-next-line vue/no-restricted-v-bind -- nouvel onglet : voir le bloc ci-dessus -->
+        <a :href="termsHref" target="_blank" rel="noopener" class="font-semibold text-coral-500">{{
+          t('auth.signup.cgu')
+        }}</a>
         {{ t('auth.signup.acceptTermsConjunction') }}
-        <Link
+        <!-- eslint-disable-next-line vue/no-restricted-v-bind -- nouvel onglet : voir le bloc ci-dessus -->
+        <a
           :href="privacyHref"
           target="_blank"
           rel="noopener"
           class="font-semibold text-coral-500"
-          >{{ t('auth.signup.privacyPolicy') }}</Link
+          >{{ t('auth.signup.privacyPolicy') }}</a
         >.
         {{ t('auth.signup.termsHosting') }}
       </span>

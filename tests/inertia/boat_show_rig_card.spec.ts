@@ -9,10 +9,17 @@ vi.mock('~/composables/use_t', () => ({
   }),
 }))
 
+// Ce mock local remplace entièrement celui de `setup.ts` : il doit donc
+// réexporter `Link`, utilisé par le lien « modifier le gréement » (#533).
 vi.mock('@adonisjs/inertia/vue', () => ({
   Form: {
     template: '<form><slot :processing="false" /></form>',
     props: ['action'],
+  },
+  Link: {
+    name: 'TuyauLink',
+    props: { href: { type: String, required: false } },
+    template: '<a :href="href"><slot /></a>',
   },
 }))
 

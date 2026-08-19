@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Link } from '@adonisjs/inertia/vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
@@ -18,9 +19,12 @@ defineProps<{ row: FleetLogbookRow }>()
       </BaseBadge>
     </td>
     <td class="px-4 py-3 text-sm">
-      <a :href="`/boats/${row.boatId}/navigation`" class="font-medium text-brand hover:underline">
+      <Link
+        :href="`/boats/${row.boatId}/navigation`"
+        class="font-medium text-brand hover:underline"
+      >
         {{ row.boatName }}
-      </a>
+      </Link>
     </td>
     <td class="px-4 py-3 text-sm text-fg">{{ row.departurePortName ?? '—' }}</td>
     <td class="px-4 py-3 text-sm text-fg">{{ row.arrivalPortName ?? '—' }}</td>

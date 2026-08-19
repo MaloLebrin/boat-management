@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Link } from '@adonisjs/inertia/vue'
 interface CostRow {
   type: string
   length: string
@@ -33,16 +34,16 @@ defineProps<Props>()
             <tr>
               <th class="px-4 py-3 text-left font-semibold text-fg">{{ colType }}</th>
               <th class="px-4 py-3 text-left font-semibold text-fg">{{ colLength }}</th>
-              <th class="px-4 py-3 text-left font-semibold text-fg text-coral-600">{{ colBudget }}</th>
-              <th class="hidden px-4 py-3 text-left font-semibold text-fg-muted sm:table-cell">{{ colNote }}</th>
+              <th class="px-4 py-3 text-left font-semibold text-fg text-coral-600">
+                {{ colBudget }}
+              </th>
+              <th class="hidden px-4 py-3 text-left font-semibold text-fg-muted sm:table-cell">
+                {{ colNote }}
+              </th>
             </tr>
           </thead>
           <tbody class="divide-y divide-bone">
-            <tr
-              v-for="(row, i) in rows"
-              :key="i"
-              class="transition-colors hover:bg-bone/40"
-            >
+            <tr v-for="(row, i) in rows" :key="i" class="transition-colors hover:bg-bone/40">
               <td class="px-4 py-3 font-semibold text-fg">{{ row.type }}</td>
               <td class="px-4 py-3 text-fg-muted">{{ row.length }}</td>
               <td class="px-4 py-3 font-semibold text-coral-600">{{ row.budget }}</td>
@@ -53,10 +54,9 @@ defineProps<Props>()
       </div>
 
       <p class="mt-4 text-center">
-        <a
-          :href="simulatorUrl"
-          class="text-sm font-semibold text-coral-500 hover:underline"
-        >{{ ctaLabel }}</a>
+        <Link :href="simulatorUrl" class="text-sm font-semibold text-coral-500 hover:underline">{{
+          ctaLabel
+        }}</Link>
       </p>
     </div>
   </section>

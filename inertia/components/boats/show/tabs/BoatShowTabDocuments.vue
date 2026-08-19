@@ -73,12 +73,14 @@ function formatBytes(bytes: number): string {
             {{ doc.format.toUpperCase() }} · {{ formatBytes(doc.bytes) }}
           </p>
         </div>
+        <!-- eslint-disable vue/no-restricted-v-bind -- téléchargement de document : pas une navigation -->
         <a
           :href="`/boats/${boat.id}/media/${doc.id}/download`"
           class="shrink-0 text-sm font-medium text-brand hover:underline"
         >
           ↓
         </a>
+        <!-- eslint-enable vue/no-restricted-v-bind -->
         <Form
           v-if="canManage"
           :action="{ url: `/boats/${boat.id}/media/${doc.id}`, method: 'delete' }"

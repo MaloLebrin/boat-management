@@ -7,13 +7,14 @@ vi.mock('@adonisjs/inertia/vue', () => {
     Link: {
       name: 'MockInertiaLink',
       props: {
+        href: { type: String, required: false },
         route: { type: String, required: false },
         method: { type: String, required: false },
         preserveScroll: { type: Boolean, required: false },
         preserveState: { type: Boolean, required: false },
         replace: { type: Boolean, required: false },
       },
-      template: '<a data-link route="route"><slot /></a>',
+      template: '<a data-link :href="href"><slot /></a>',
     },
   }
 })
@@ -38,16 +39,55 @@ test('uses danger variant classes when variant is danger', () => {
   expect(w.classes().join(' ')).toContain('bg-danger-soft')
 })
 
-test('renders as anchor when href is provided', () => {
-  const w = mount(BaseButton, { props: { href: '/boats' }, slots: { default: 'Boats' } })
-  expect(w.element.tagName.toLowerCase()).toBe('a')
-  expect(w.attributes('href')).toBe('/boats')
-})
-
 test('renders as inertia Link when route is provided', () => {
   const w = mount(BaseButton, { props: { route: 'dashboard' }, slots: { default: 'Dashboard' } })
   expect(w.element.tagName.toLowerCase()).toBe('a')
   expect(w.attributes('data-link')).toBeDefined()
+})
+
+/**
+ * Un `href` interne est une navigation : il doit passer par `<Link>`, sinon le
+ * bouton recharge toute la page et fait perdre l'état client (#533).
+ */
+describe('href interne vs externe (#533)', () => {
+  test('un href interne passe par le Link Inertia', () => {
+    const w = mount(BaseButton, { props: { href: '/boats' }, slots: { default: 'Boats' } })
+    expect(w.element.tagName.toLowerCase()).toBe('a')
+    expect(w.attributes('data-link')).toBeDefined()
+    expect(w.attributes('href')).toBe('/boats')
+  })
+
+  test('un href absolu reste une ancre brute', () => {
+    const w = mount(BaseButton, {
+      props: { href: 'https://example.org' },
+      slots: { default: 'Doc' },
+    })
+    expect(w.element.tagName.toLowerCase()).toBe('a')
+    expect(w.attributes('data-link')).toBeUndefined()
+    expect(w.attributes('href')).toBe('https://example.org')
+  })
+
+  test('un mailto: reste une ancre brute', () => {
+    const w = mount(BaseButton, {
+      props: { href: 'mailto:support@fleetai.app' },
+      slots: { default: 'Mail' },
+    })
+    expect(w.attributes('data-link')).toBeUndefined()
+  })
+
+  /**
+   * Un téléchargement n'est pas une navigation : une visite Inertia afficherait
+   * le binaire comme une page. `external-href` force l'ancre brute.
+   */
+  test('external-href force l’ancre brute sur un chemin interne', () => {
+    const w = mount(BaseButton, {
+      props: { href: '/invoices/1/pdf', externalHref: true, target: '_blank' },
+      slots: { default: 'PDF' },
+    })
+    expect(w.attributes('data-link')).toBeUndefined()
+    expect(w.attributes('href')).toBe('/invoices/1/pdf')
+    expect(w.attributes('target')).toBe('_blank')
+  })
 })
 
 test('prevents navigation when disabled in link mode', async () => {
@@ -91,4 +131,9 @@ describe('dark mode (#416)', () => {
       expect(classes, variant).not.toContain('bg-white')
     }
   })
+})
+
+test('une URL protocol-relative n’est pas prise pour un chemin interne', () => {
+  const w = mount(BaseButton, { props: { href: '//cdn.example.org/x' }, slots: { default: 'X' } })
+  expect(w.attributes('data-link')).toBeUndefined()
 })

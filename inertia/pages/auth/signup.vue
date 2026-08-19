@@ -7,6 +7,7 @@ export default {
 </script>
 
 <script setup lang="ts">
+import { Link } from '@adonisjs/inertia/vue'
 import { Form } from '@adonisjs/inertia/vue'
 import { Head } from '@inertiajs/vue3'
 import { PLAN_LIMITS } from '#shared/types/plan'
@@ -164,13 +165,13 @@ const STARTER_FEATURES = [
 
           <p class="mt-6 text-center text-[13px] text-fg-muted">
             {{ t('auth.signup.hasAccount') }}
-            <a
+            <Link
               href="/login"
               class="font-semibold text-coral-500 no-underline"
               style="border-bottom: 1px solid rgba(226, 103, 79, 0.3); padding-bottom: 1px"
             >
               {{ t('auth.signup.signIn') }} →
-            </a>
+            </Link>
           </p>
         </div>
       </div>

@@ -84,11 +84,13 @@ function reset() {
           <BaseHeading level="1">{{ t('maintenance.history.title') }}</BaseHeading>
           <p class="mt-2 text-fg-muted">{{ t('maintenance.history.subtitle') }}</p>
         </div>
+        <!-- eslint-disable vue/no-restricted-v-bind -- export PDF : une visite Inertia rendrait le binaire comme une page -->
         <a v-if="canExport" :href="pdfHref" target="_blank" rel="noopener">
           <BaseButton variant="secondary" size="sm" type="button">
             {{ t('maintenance.history.exportPdf') }}
           </BaseButton>
         </a>
+        <!-- eslint-enable vue/no-restricted-v-bind -->
       </div>
     </header>
 

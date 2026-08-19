@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Link } from '@adonisjs/inertia/vue'
 import type { Data } from '@generated/data'
 import { usePage } from '@inertiajs/vue3'
 import { onBeforeUnmount, ref, watch } from 'vue'
@@ -78,10 +79,10 @@ onBeforeUnmount(() => {
       <header
         class="lg:hidden flex items-center justify-between px-4 py-3 bg-navy-900 border-b border-navy-700"
       >
-        <a href="/dashboard" class="flex items-center gap-3">
+        <Link href="/dashboard" class="flex items-center gap-3">
           <img :src="brandIconUrl" alt="FleetAi" class="h-9 w-9 rounded-lg shadow-md" />
           <span class="font-display text-sm font-semibold text-white">FleetAi</span>
-        </a>
+        </Link>
         <div class="flex items-center gap-1">
           <NotificationBell tone="onDark" />
           <button

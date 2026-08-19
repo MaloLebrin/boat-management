@@ -136,11 +136,13 @@ function executeDelete() {
         </p>
       </div>
       <div class="flex flex-wrap items-center gap-2">
+        <!-- eslint-disable vue/no-restricted-v-bind -- téléchargement PDF : une visite Inertia rendrait le binaire comme une page -->
         <a :href="`/invoices/${invoice.id}/pdf`" target="_blank" rel="noopener">
           <BaseButton variant="secondary" size="sm" type="button">
             {{ t('invoices.actions.downloadPdf') }}
           </BaseButton>
         </a>
+        <!-- eslint-enable vue/no-restricted-v-bind -->
         <BaseButton
           variant="secondary"
           size="sm"

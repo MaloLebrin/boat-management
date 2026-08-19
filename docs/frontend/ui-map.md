@@ -104,6 +104,14 @@ Les cartes de l'onglet Équipement exposent un lien « voir le détail » vers c
 - Types frontend: `inertia/types/budget.ts`
 - Source backend: `BudgetController.show`
 
+### Liens et navigation (#533)
+
+- **Navigation interne = `<Link>` (`@adonisjs/inertia/vue`)**, jamais `<a href="/…">` : une ancre brute recharge l'app entière. Deux règles ESLint le tiennent (`vue/no-restricted-static-attribute`, `vue/no-restricted-v-bind` sur `inertia/**/*.vue`).
+- **`BaseButton` applique la règle tout seul** : `href` interne → `<Link>`, `href` absolu (`https:`/`mailto:`/`tel:`) → ancre. La prop **`external-href`** force l'ancre sur un chemin interne — à réserver aux téléchargements et exports (`ContractPanel`, export CSV de `boats/budget.vue`), qu'une visite Inertia rendrait comme une page.
+- **`<Link target="_blank">` n'ouvre pas de nouvel onglet** : `shouldIntercept()` d'Inertia ne regarde que les touches de modification et le bouton de la souris, jamais `target`. Un vrai nouvel onglet demande une ancre `<a target="_blank" rel="noopener">` — c'est le cas des liens CGU/confidentialité de `SignupTermsCheckbox` et du consentement de `ContactFormSection`, qui protègent un formulaire à moitié rempli.
+- **Les 14 ancres restantes** (téléchargements, `mailto:`/`tel:`, URL externes des mentions légales) portent chacune un `eslint-disable` qui en donne la raison — c'est là qu'il faut regarder avant d'en ajouter une.
+- **Côté tests** : `tests/inertia/setup.ts` mocke `Link` globalement (le vrai composant exige un `TuyauProvider`). Un test qui pose son propre `vi.mock('@adonisjs/inertia/vue', …)` remplace ce mock **entièrement** et doit donc réexporter `Link`.
+
 ### Marketing (pages publiques)
 
 - Pages : `inertia/pages/marketing/{home,pricing,about,contact,guide,simulator,simulator_share,privacy,terms,sales_terms,legal_notice}.vue` — rendues par `MarketingController` (routes locale-préfixées `/en`, `/fr`, voir `start/routes/marketing.ts`), layout `inertia/layouts/public.vue`

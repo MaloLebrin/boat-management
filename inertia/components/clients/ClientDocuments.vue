@@ -88,6 +88,7 @@ function confirmDelete() {
             {{ doc.format.toUpperCase() }} · {{ formatBytes(doc.bytes) }}
           </p>
         </div>
+        <!-- eslint-disable vue/no-restricted-v-bind -- téléchargement de document : pas une navigation -->
         <a
           :href="`/clients/${clientId}/media/${doc.id}/download`"
           class="shrink-0 text-sm font-medium text-brand hover:underline"
@@ -95,6 +96,7 @@ function confirmDelete() {
         >
           ↓
         </a>
+        <!-- eslint-enable vue/no-restricted-v-bind -->
         <button
           v-if="canManage"
           type="button"
