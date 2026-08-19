@@ -38,18 +38,27 @@ describe('subjectLabel', () => {
 describe('targetDescription', () => {
   test('returns the engine caption for an engine event', () => {
     const ev = makeEvent({ subject: 'engine', engineCaption: 'Yamaha 8HP' })
-    expect(targetDescription(ev)).toBe('Yamaha 8HP')
+    expect(targetDescription(t, ev)).toBe('Yamaha 8HP')
+  })
+
+  test('translates an engine caption that fell back to the raw kind token (#472)', () => {
+    const ev = makeEvent({ subject: 'engine', engineCaption: 'inboard' })
+    expect(targetDescription(t, ev)).toBe('translated:boats.options.engineKind.inboard')
   })
 
   test('returns the sail caption for a sail event', () => {
     const ev = makeEvent({ subject: 'sail', sailCaption: 'Genoa · 25 m²' })
-    expect(targetDescription(ev)).toBe('Genoa · 25 m²')
+    expect(targetDescription(t, ev)).toBe('Genoa · 25 m²')
   })
 
   test('returns null for subjects without a specific caption (no redundant "· label")', () => {
-    expect(targetDescription(makeEvent({ subject: 'boat' }))).toBeNull()
-    expect(targetDescription(makeEvent({ subject: 'rig' }))).toBeNull()
-    expect(targetDescription(makeEvent({ subject: 'other' }))).toBeNull()
+    expect(targetDescription(t, makeEvent({ subject: 'boat' }))).toBeNull()
+    expect(targetDescription(t, makeEvent({ subject: 'rig' }))).toBeNull()
+    expect(targetDescription(t, makeEvent({ subject: 'other' }))).toBeNull()
+  })
+
+  test('returns null for an engine event without caption', () => {
+    expect(targetDescription(t, makeEvent({ subject: 'engine' }))).toBeNull()
   })
 })
 

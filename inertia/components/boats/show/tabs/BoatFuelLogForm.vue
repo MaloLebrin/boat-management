@@ -8,6 +8,7 @@ import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import { useNetworkStatus } from '~/composables/use_network_status'
 import { useOfflineQueue } from '~/composables/use_offline_queue'
 import { useT } from '~/composables/use_t'
+import { engineKindLabel } from '~/utils/boat_enum_labels'
 import { todayDateInputValue } from '~/utils/local_datetime'
 import type { BoatShowDetail } from '~/types/boat_show'
 
@@ -26,7 +27,7 @@ const { enqueue } = useOfflineQueue()
 const engineOptions = computed(() =>
   props.boat.engines.map((e) => ({
     value: String(e.id),
-    label: `${e.kind}${e.brand ? ` — ${e.brand}` : ''}${e.model ? ` ${e.model}` : ''}`,
+    label: `${engineKindLabel(t, e.kind) ?? e.kind}${e.brand ? ` — ${e.brand}` : ''}${e.model ? ` ${e.model}` : ''}`,
   }))
 )
 

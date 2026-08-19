@@ -4,6 +4,7 @@ import { router } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BoatFuelLogForm from '~/components/boats/show/tabs/BoatFuelLogForm.vue'
 import { useT } from '~/composables/use_t'
+import { engineKindLabel } from '~/utils/boat_enum_labels'
 import type { BoatShowDetail, FuelLogRow } from '~/types/boat_show'
 
 const props = defineProps<{
@@ -23,7 +24,7 @@ function engineLabel(engineId: number | null): string {
   if (!engineId) return ''
   const engine = props.boat.engines.find((e) => e.id === engineId)
   if (!engine) return ''
-  const parts = [engine.kind, engine.brand, engine.model].filter(Boolean)
+  const parts = [engineKindLabel(t, engine.kind), engine.brand, engine.model].filter(Boolean)
   return parts.join(' — ')
 }
 

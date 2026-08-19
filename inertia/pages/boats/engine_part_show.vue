@@ -11,6 +11,7 @@ import EnginePartShowTabDocuments from '~/components/engine/parts/show/tabs/Engi
 import EnginePartShowTabInfo from '~/components/engine/parts/show/tabs/EnginePartShowTabInfo.vue'
 import EnginePartShowTabPhotos from '~/components/engine/parts/show/tabs/EnginePartShowTabPhotos.vue'
 import { useT } from '~/composables/use_t'
+import { engineDisplayTitle } from '~/utils/boat_enum_labels'
 import type { BoatShowEnginePart } from '~/types/boat_show'
 
 const { t } = useT()
@@ -43,10 +44,7 @@ watch(tab, (newTab) => {
 })
 
 function engineTitle(): string {
-  if (props.engine.brand && props.engine.model) return `${props.engine.brand} ${props.engine.model}`
-  if (props.engine.brand) return props.engine.brand
-  if (props.engine.model) return props.engine.model
-  return props.engine.kind
+  return engineDisplayTitle(t, props.engine)
 }
 
 function wearStateVariant(state: string): 'success' | 'info' | 'warning' | 'neutral' | 'danger' {

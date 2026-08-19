@@ -4,6 +4,7 @@ import BaseBadge from '~/components/base/BaseBadge.vue'
 import type { MaintenanceEventRow } from '#shared/types/maintenance'
 import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
+import { engineCaptionLabel } from '~/utils/boat_enum_labels'
 
 const props = defineProps<{
   events: MaintenanceEventRow[]
@@ -45,7 +46,7 @@ function isExpanded(id: number): boolean {
 }
 
 function getEquipmentCaption(event: MaintenanceEventRow): string | null {
-  return event.engineCaption || event.sailCaption || null
+  return engineCaptionLabel(t, event.engineCaption) || event.sailCaption || null
 }
 
 function getSubjectLink(event: MaintenanceEventRow): string {

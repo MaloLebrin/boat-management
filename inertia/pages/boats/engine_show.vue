@@ -16,7 +16,7 @@ import EngineShowTabParts from '~/components/engine/show/tabs/EngineShowTabParts
 import EngineShowTabPhotos from '~/components/engine/show/tabs/EngineShowTabPhotos.vue'
 import EngineShowTabSpecs from '~/components/engine/show/tabs/EngineShowTabSpecs.vue'
 import { useT } from '~/composables/use_t'
-import { engineFuelLabel, engineKindLabel } from '~/utils/boat_enum_labels'
+import { engineDisplayTitle, engineFuelLabel } from '~/utils/boat_enum_labels'
 import type { BoatShowEngine, MaintenanceEventRow, MaintenanceTaskRow } from '~/types/boat_show'
 
 const { t } = useT()
@@ -151,14 +151,7 @@ const eventsByYearMonth = computed(() => {
   return groups
 })
 
-const engineTitle = computed(() => {
-  if (props.engine.brand && props.engine.model) {
-    return `${props.engine.brand} ${props.engine.model}`
-  }
-  if (props.engine.brand) return props.engine.brand
-  if (props.engine.model) return props.engine.model
-  return engineKindLabel(t, props.engine.kind) ?? props.engine.kind
-})
+const engineTitle = computed(() => engineDisplayTitle(t, props.engine))
 
 const totalParts = computed(() => {
   return props.maintenanceEvents.reduce((sum, e) => sum + e.parts.length, 0)

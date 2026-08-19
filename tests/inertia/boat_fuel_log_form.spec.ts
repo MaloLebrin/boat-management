@@ -24,7 +24,15 @@ vi.mock('@inertiajs/vue3', () => ({
     post: mockFormPost,
     data: mockFormData,
   }),
-  usePage: () => ({ props: { appT: {}, locale: 'en' } }),
+  usePage: () => ({
+    props: {
+      appT: {
+        'boats.options.engineKind.inboard': 'In-bord',
+        'boats.options.engineKind.outboard': 'Hors-bord',
+      },
+      locale: 'fr',
+    },
+  }),
 }))
 
 vi.mock('~/composables/use_network_status', () => ({
@@ -85,5 +93,21 @@ describe('BoatFuelLogForm', () => {
     const wrapper = mount(BoatFuelLogForm, { props: { boat } })
     await wrapper.find('button[type="button"]').trigger('click')
     expect(wrapper.emitted('close')).toBeTruthy()
+  })
+
+  test('engine options translate the engine kind instead of showing the raw token (#472)', () => {
+    const boatWithEngines = {
+      ...boat,
+      engines: [
+        { id: 7, kind: 'inboard', brand: 'Volvo Penta', model: 'D2-40' },
+        { id: 8, kind: 'outboard', brand: null, model: null },
+      ],
+    } as any
+    const wrapper = mount(BoatFuelLogForm, { props: { boat: boatWithEngines } })
+    const labels = wrapper.findAll('option').map((o) => o.text())
+
+    expect(labels).toContain('In-bord — Volvo Penta D2-40')
+    expect(labels).toContain('Hors-bord')
+    expect(labels.join(' ')).not.toContain('inboard')
   })
 })
