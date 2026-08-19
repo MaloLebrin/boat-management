@@ -46,12 +46,11 @@ const error = computed(() => getFieldError(props.errors, 'acceptTerms'))
       />
       <span class="text-[13px] leading-relaxed text-fg-muted">
         {{ t('auth.signup.acceptTermsPrefix') }}
-        <!-- eslint-disable-next-line vue/no-restricted-v-bind -- nouvel onglet : voir le bloc ci-dessus -->
+        <!-- eslint-disable vue/no-restricted-v-bind -- nouvel onglet : voir le bloc ci-dessus -->
         <a :href="termsHref" target="_blank" rel="noopener" class="font-semibold text-coral-500">{{
           t('auth.signup.cgu')
         }}</a>
         {{ t('auth.signup.acceptTermsConjunction') }}
-        <!-- eslint-disable-next-line vue/no-restricted-v-bind -- nouvel onglet : voir le bloc ci-dessus -->
         <a
           :href="privacyHref"
           target="_blank"
@@ -59,6 +58,7 @@ const error = computed(() => getFieldError(props.errors, 'acceptTerms'))
           class="font-semibold text-coral-500"
           >{{ t('auth.signup.privacyPolicy') }}</a
         >.
+        <!-- eslint-enable vue/no-restricted-v-bind -->
         {{ t('auth.signup.termsHosting') }}
       </span>
     </label>
