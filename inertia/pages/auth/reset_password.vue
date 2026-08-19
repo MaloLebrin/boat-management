@@ -7,6 +7,7 @@ export default {
 </script>
 
 <script setup lang="ts">
+import { Link } from '@adonisjs/inertia/vue'
 import { Form } from '@adonisjs/inertia/vue'
 import { Head, usePage } from '@inertiajs/vue3'
 import { computed, ref } from 'vue'
@@ -50,12 +51,12 @@ const confirmType = computed(() => (showConfirm.value ? 'text' : 'password'))
       <div class="flex flex-1 flex-col items-center justify-center px-8 pb-12 lg:px-16">
         <div class="w-full max-w-sm">
           <!-- Back link -->
-          <a
+          <Link
             href="/login"
             class="mb-4 inline-flex items-center gap-1.5 text-[12px] text-fg-muted no-underline transition-colors hover:text-fg"
           >
             ← {{ t('auth.resetPassword.backToLogin') }}
-          </a>
+          </Link>
 
           <p class="text-[11px] font-semibold uppercase tracking-[0.12em] text-fg-muted">
             {{ t('auth.resetPassword.eyebrow') }}

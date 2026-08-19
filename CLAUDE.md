@@ -65,7 +65,11 @@ Les PDFs uploadés sont compressés avant envoi sur Cloudinary via `app/services
 - Code partagé backend/frontend dans `shared/` (types, helpers, constants)
 - **Taille max des composants Vue : 250 lignes** (enforced par ESLint `max-lines`) — au-delà, extraire en sous-composants
 - Pages complexes à onglets : chaque onglet = un composant dans `components/<domaine>/show/tabs/`
-- **Navigation interne : toujours `<Link>` (`@adonisjs/inertia/vue`)**, jamais une ancre `<a href="...">` brute — préserve le routing SPA Inertia (pas de full page reload). Ancre `<a>` réservée aux liens externes ou `mailto:`/`tel:`.
+- **Navigation interne : toujours `<Link>` (`@adonisjs/inertia/vue`)**, jamais une ancre `<a href="...">` brute — préserve le routing SPA Inertia (pas de full page reload). Règle ESLint `vue/no-restricted-static-attribute` + `vue/no-restricted-v-bind` sur `inertia/**/*.vue` (#533). Trois exceptions, à marquer par un `eslint-disable` **motivé** :
+  - **lien externe**, `mailto:`, `tel:` ;
+  - **téléchargement / export** (PDF, CSV, média) : une visite Inertia rendrait le binaire comme une page. Sur `BaseButton`, passer `external-href` ;
+  - **ouverture en nouvel onglet** : `shouldIntercept()` d'Inertia ne regarde que les touches de modification et le bouton de la souris, **jamais `target`**. Un clic gauche sur `<Link target="_blank">` est intercepté et navigue dans le même onglet — pour un vrai nouvel onglet il faut une ancre `<a target="_blank" rel="noopener">`.
+- **`BaseButton` suit la même règle** : un `href` commençant par `/` est rendu en `<Link>`, un `href` absolu (`https:`, `mailto:`, `tel:`) ou marqué `external-href` reste une ancre brute.
 
 #### Mutations Inertia (obligatoire sur pages/composants Inertia)
 

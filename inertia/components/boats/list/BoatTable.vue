@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Link } from '@adonisjs/inertia/vue'
 import { computed } from 'vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import type { BoatListItem } from './types'
@@ -56,9 +57,9 @@ function maintenanceLabel(b: BoatListItem) {
           class="transition-colors duration-(--motion-fast) ease-premium hover:bg-lilac-50/60"
         >
           <td class="px-4 py-3">
-            <a :href="`/boats/${boat.id}`" class="font-semibold text-fg hover:underline">
+            <Link :href="`/boats/${boat.id}`" class="font-semibold text-fg hover:underline">
               {{ boat.name }}
-            </a>
+            </Link>
           </td>
           <td v-if="showRegistration" class="px-4 py-3 text-fg-muted">
             {{ boat.registrationNumber ?? '—' }}

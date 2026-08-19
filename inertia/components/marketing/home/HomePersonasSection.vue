@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Link } from '@adonisjs/inertia/vue'
 import { ref, computed } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import { useScrollReveal } from '~/composables/use_scroll_reveal'
@@ -104,9 +105,9 @@ const { el: sectionEl, isVisible } = useScrollReveal()
               </li>
             </ul>
 
-            <a href="/signup">
+            <Link href="/signup">
               <BaseButton>{{ ctaLabel }}</BaseButton>
-            </a>
+            </Link>
           </div>
 
           <!-- Right: quote + stat -->

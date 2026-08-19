@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Link } from '@adonisjs/inertia/vue'
 import { Form } from '@adonisjs/inertia/vue'
 import { Head } from '@inertiajs/vue3'
 import BoatEquipmentSailFields from '~/components/boats/sail/BoatEquipmentSailFields.vue'
@@ -34,12 +35,12 @@ const { t } = useT()
           <BoatEquipmentSailFields :errors="errors" :sail="sail" />
           <div class="mt-6 flex items-center gap-3">
             <BaseButton type="submit" :disabled="processing">{{ t('common.save') }}</BaseButton>
-            <a
+            <Link
               :href="`/boats/${boat.id}`"
               class="text-sm font-semibold text-fg-muted hover:text-fg hover:underline"
             >
               {{ t('common.cancel') }}
-            </a>
+            </Link>
           </div>
         </BaseCard>
       </Form>

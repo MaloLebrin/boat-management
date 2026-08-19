@@ -55,11 +55,11 @@ const { el: faqEl, isVisible: faqVisible } = useScrollReveal()
           <p class="text-pretty text-base text-white/65">{{ finalCta.subtitle }}</p>
         </div>
         <div class="flex flex-wrap items-center justify-start gap-3 lg:justify-end">
-          <a href="/signup">
+          <Link href="/signup">
             <BaseButton size="lg" class="bg-white! text-navy-900! hover:bg-white/90!">
               {{ finalCta.primary }}
             </BaseButton>
-          </a>
+          </Link>
           <Link :href="pricingHref">
             <BaseButton
               size="lg"

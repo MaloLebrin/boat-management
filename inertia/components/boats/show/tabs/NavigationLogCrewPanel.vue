@@ -130,6 +130,7 @@ function removeCrewMember(crewMemberId: number) {
         >
           + {{ t('crew.logCrew.add') }}
         </BaseButton>
+        <!-- eslint-disable vue/no-restricted-v-bind -- téléchargement PDF : une visite Inertia rendrait le binaire comme une page -->
         <a
           :href="`/boats/${boatId}/navigation-logs/${logId}/crew-role.pdf`"
           class="text-xs text-brand hover:underline"
@@ -138,6 +139,7 @@ function removeCrewMember(crewMemberId: number) {
         >
           {{ t('crew.logCrew.downloadPdf') }}
         </a>
+        <!-- eslint-enable vue/no-restricted-v-bind -->
       </div>
     </template>
   </div>

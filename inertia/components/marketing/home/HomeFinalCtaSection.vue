@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Link } from '@adonisjs/inertia/vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import ParticleNetworkCanvas from '~/components/marketing/canvas/ParticleNetworkCanvas.vue'
 
@@ -38,11 +39,11 @@ defineProps<{
       </h2>
       <p class="mt-4 text-lg text-white/60">{{ subtitle }}</p>
       <div class="mt-8 flex flex-wrap items-center justify-center gap-4">
-        <a href="/signup">
+        <Link href="/signup">
           <BaseButton size="lg" class="bg-cream! text-navy-900! hover:bg-cream/90!">
             {{ primaryCta }}
           </BaseButton>
-        </a>
+        </Link>
         <a href="#demo">
           <BaseButton
             size="lg"

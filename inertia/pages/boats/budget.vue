@@ -114,6 +114,7 @@ const categories = computed(() => [
           variant="secondary"
           size="sm"
           :href="`/boats/${boat.id}/export/budget.csv?year=${selectedYear}`"
+          external-href
         >
           {{ t('budget.exportCsv') }}
         </BaseButton>

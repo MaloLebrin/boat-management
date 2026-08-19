@@ -7,6 +7,7 @@ export default {
 </script>
 
 <script setup lang="ts">
+import { Link } from '@adonisjs/inertia/vue'
 import { Form } from '@adonisjs/inertia/vue'
 import { Head } from '@inertiajs/vue3'
 import { computed, ref } from 'vue'
@@ -78,13 +79,13 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
                 @update:model-value="passwordValue = $event"
               >
                 <template #label-right>
-                  <a
+                  <Link
                     href="/forgot-password"
                     class="text-[12px] font-semibold text-coral-500 no-underline"
                     style="border-bottom: 1px solid rgba(226, 103, 79, 0.3); padding-bottom: 1px"
                   >
                     {{ t('auth.login.forgotPassword') }}
-                  </a>
+                  </Link>
                 </template>
                 <template #trailing>
                   <button
@@ -133,13 +134,13 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
 
           <p class="mt-6 text-center text-[13px] text-fg-muted">
             {{ t('auth.login.noAccount') }}
-            <a
+            <Link
               href="/signup"
               class="font-semibold text-coral-500 no-underline"
               style="border-bottom: 1px solid rgba(226, 103, 79, 0.3); padding-bottom: 1px"
             >
               {{ t('auth.login.createOrg') }} →
-            </a>
+            </Link>
           </p>
         </div>
       </div>

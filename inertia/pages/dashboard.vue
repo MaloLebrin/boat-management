@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Link } from '@adonisjs/inertia/vue'
 import { Head } from '@inertiajs/vue3'
 import { ref } from 'vue'
 import BaseAlert from '~/components/base/BaseAlert.vue'
@@ -68,9 +69,9 @@ function dismissAlert() {
           t('dashboard.overdueAlert', { count: String(stats.urgentMaintenance) })
         }}</span>
         <span>-</span>
-        <a href="/planning" class="underline hover:no-underline">{{
+        <Link href="/planning" class="underline hover:no-underline">{{
           t('dashboard.viewPlanning')
-        }}</a>
+        }}</Link>
       </span>
     </BaseAlert>
 
@@ -128,9 +129,9 @@ function dismissAlert() {
             >
               <div class="flex items-start justify-between gap-3">
                 <div>
-                  <a :href="`/boats/${ev.boatId}`" class="font-semibold text-fg hover:underline">
+                  <Link :href="`/boats/${ev.boatId}`" class="font-semibold text-fg hover:underline">
                     {{ ev.boatName }}
-                  </a>
+                  </Link>
                   <p class="mt-1 text-fg-muted">
                     {{ ev.title }} - {{ maintenanceSubjectLabel(t, ev.subject) }}
                   </p>
@@ -174,9 +175,9 @@ function dismissAlert() {
           <template #header>
             <div class="flex items-center justify-between">
               <h2 class="text-sm font-semibold text-fg">{{ t('dashboard.yourBoats.title') }}</h2>
-              <a href="/boats" class="text-sm font-semibold text-brand hover:underline">{{
+              <Link href="/boats" class="text-sm font-semibold text-brand hover:underline">{{
                 t('dashboard.yourBoats.viewAll')
-              }}</a>
+              }}</Link>
             </div>
           </template>
 
@@ -204,9 +205,9 @@ function dismissAlert() {
               <tbody>
                 <tr v-for="b in boats" :key="b.id" class="border-t border-border">
                   <td class="px-4 py-3">
-                    <a :href="`/boats/${b.id}`" class="font-semibold text-fg hover:underline">
+                    <Link :href="`/boats/${b.id}`" class="font-semibold text-fg hover:underline">
                       {{ b.name }}
-                    </a>
+                    </Link>
                   </td>
                   <td class="px-4 py-3 text-fg-muted">
                     {{ propulsionLabel(t, b.propulsionType) ?? '-' }}

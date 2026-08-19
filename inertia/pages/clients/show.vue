@@ -117,6 +117,7 @@ function anonymize() {
           </p>
         </div>
         <div class="flex items-center gap-2">
+          <!-- eslint-disable vue/no-restricted-v-bind -- export de fiche client : pas une navigation -->
           <a
             v-if="canManage"
             :href="`/clients/${client.id}/export`"
@@ -124,6 +125,7 @@ function anonymize() {
           >
             {{ t('clients.gdpr.export') }}
           </a>
+          <!-- eslint-enable vue/no-restricted-v-bind -->
           <BaseButton
             v-if="canAnonymize && !client.anonymizedAt"
             variant="danger"
