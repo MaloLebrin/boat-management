@@ -3,6 +3,14 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-08-20 — Guide entretien : le titre SEO ne reste plus bloqué sur « 2025 » (#476)
+
+Suite de la campagne du 03/08. `/fr/cout-entretien-bateau` s'annonçait « Coût d'entretien bateau 2025 : Guide complet » en août 2026 : l'année était recopiée en dur dans `marketing.guide.meta_title`, dans les deux locales. Un titre daté de l'an passé décrédibilise la page auprès du lecteur comme des moteurs de recherche.
+
+- **L'année est interpolée, plus recopiée.** `meta_title` porte désormais un placeholder ICU `{year}` (EN + FR) ; `MarketingController.buildGuidePageData` le résout à chaque rendu avec `new Date().getFullYear()`. Le titre suit le calendrier sans intervention.
+- **Périmètre.** Seul le titre SEO du guide était concerné : `<title>`, `og:title` et le partage social de `/fr/cout-entretien-bateau` et `/en/boat-maintenance-cost`. Le corps de la page ne mentionnait aucune année.
+- **Tests.** 4 tests (`tests/functional/marketing/guide_seo.spec.ts`) vérifient dans les deux locales que le titre contient l'année courante, que le placeholder est bien résolu et qu'aucune année figée ne subsiste. Ils échouent sur le code d'avant.
+
 ## 2026-08-19 — Journal d'activité : les invitations et les tâches de maintenance y figurent enfin (#474)
 
 Suite de la campagne du 03/08 (famille #368). `/settings/audit-log` annonçait « l'historique des actions importantes réalisées dans votre organisation » mais ne contenait en pratique que des lignes « Connexion » : les deux flux les plus visibles de l'app — inviter quelqu'un, cocher une tâche d'entretien — n'écrivaient rien.
@@ -42,7 +50,6 @@ Suite de la campagne du 03/08 (famille #368). L'historique d'une fiche bateau af
 - **Les libellés déjà en base restent traduits à l'affichage.** Quand un moteur n'a ni marque, ni modèle, ni numéro de série, la légende enregistrée avec un événement d'entretien retombe sur le jeton `kind` — ce jeton reste stocké tel quel, volontairement indépendant de la langue, et c'est la couche d'affichage qui le traduit (`engineCaptionLabel()`, `isEngineKindCaption()` côté PDF). Les lignes déjà en base sont donc réparées sans migration : historique de la fiche bateau, historique global d'entretien et portail propriétaire.
 - **Un seul calcul de titre moteur.** Les quatre écrans qui composaient « marque + modèle, sinon le type » (fiche moteur, fiche pièce, modale d'entretien, modale d'ajout de document) partageaient la même logique dupliquée, dont trois retombaient sur le jeton brut : elle vit désormais dans `engineDisplayTitle()`.
 - **Tests.** 28 tests (`tests/inertia/boat_enum_labels.spec.ts`, `boats_maintenance_utils.spec.ts`, `boat_show_tab_history_caption.spec.ts`, `boat_show_tab_fuel_logs.spec.ts`, `boat_owner_maintenance_tab.spec.ts`, `maintenance_history_timeline_caption.spec.ts`, `boat_fuel_log_form.spec.ts`, `tests/unit/helpers/maintenance.spec.ts`, `tests/functional/maintenance/history_pdf.spec.ts`) couvrent la traduction du jeton, le passage inchangé d'une légende libre et l'absence de légende ; trois d'entre eux sont montés sur les vrais fichiers de traduction et vérifient que chaque type de moteur est traduit dans les deux locales, avec la même graphie dans les deux familles de clés — plusieurs échouent sur le code d'avant.
-
 
 ## 2026-08-19 — Réglages : le sous-menu ne surligne plus qu'une seule section (#471)
 
