@@ -55,7 +55,10 @@
     "noReservations": "Aucune réservation ce mois-ci",
     "allBoats": "Tous les bateaux",
     "more": "+ {count} de plus",
-    "scrollHint": "Faites défiler pour voir tout le mois"
+    "scrollHint": "Faites défiler pour voir tout le mois",
+    "available": "Disponible",
+    "noBoatsTitle": "Aucun bateau dans votre flotte",
+    "noBoatsDescription": "Ajoutez un bateau pour planifier ses réservations."
   },
   "empty": {
     "title": "Aucune réservation",

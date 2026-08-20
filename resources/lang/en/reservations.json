@@ -55,7 +55,10 @@
     "noReservations": "No reservations this month",
     "allBoats": "All boats",
     "more": "+ {count} more",
-    "scrollHint": "Scroll to see the full month"
+    "scrollHint": "Scroll to see the full month",
+    "available": "Available",
+    "noBoatsTitle": "No boats in your fleet",
+    "noBoatsDescription": "Add a boat to schedule its reservations."
   },
   "empty": {
     "title": "No reservations",
