@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { beforeEach, test, expect, vi } from 'vitest'
-import type { PortShowDetail } from '../../inertia/types/port'
+import type { MouillageRow, PontoonRow, PortShowDetail, SpotRow } from '../../inertia/types/port'
 
 const mockDelete = vi.hoisted(() => vi.fn())
 
@@ -79,20 +79,35 @@ test('confirming the modal deletes the port (#398)', async () => {
   expect(mockDelete).toHaveBeenCalledWith('/ports/9')
 })
 
-test('a port with boats assigned to a pontoon shows an alert instead of the confirmation modal', async () => {
+/**
+ * Un bateau est rattaché à une **place**, jamais au ponton : `PontoonRow` /
+ * `MouillageRow` exposent `spots[].boat`, pas de `boats`. La garde de
+ * `handleDeletePort` lisait `p.boats.length` — ces fixtures reprennent donc la
+ * forme réellement envoyée par `PortService.getWithPontoonsAndMouillagesOrFail`.
+ */
+function makePontoon(spots: SpotRow[]): PontoonRow {
+  return { id: 1, name: 'Ponton A', description: null, positionX: null, positionY: null, spots }
+}
+
+function makeMouillage(spots: SpotRow[]): MouillageRow {
+  return {
+    id: 2,
+    name: 'Corps-morts',
+    description: null,
+    positionX: null,
+    positionY: null,
+    spots,
+  }
+}
+
+function makeSpot(name: string, boat: SpotRow['boat'] = null): SpotRow {
+  return { id: name.charCodeAt(0) + name.length, name, description: null, boat }
+}
+
+test('a port with a boat moored on a pontoon spot shows an alert instead of the confirmation modal', async () => {
   const w = mountShow(
     makePort({
-      pontoons: [
-        {
-          id: 1,
-          name: 'Ponton A',
-          description: null,
-          positionX: null,
-          positionY: null,
-          spots: [],
-          boats: [{ id: 1, name: 'Sea Breeze' }],
-        } as never,
-      ],
+      pontoons: [makePontoon([makeSpot('A01'), makeSpot('A02', { id: 1, name: 'Sea Breeze' })])],
     })
   )
   const deleteButton = w.findAll('button').find((b) => b.text().includes('common.delete'))
@@ -100,5 +115,34 @@ test('a port with boats assigned to a pontoon shows an alert instead of the conf
 
   expect(w.find('.confirm-modal').exists()).toBe(false)
   expect(window.alert).toHaveBeenCalledWith('ports.hasBoats')
+  expect(mockDelete).not.toHaveBeenCalled()
+})
+
+test('a port with a boat moored on a mouillage spot shows an alert instead of the confirmation modal', async () => {
+  const w = mountShow(
+    makePort({
+      mouillages: [makeMouillage([makeSpot('B08', { id: 3, name: 'Albatros' })])],
+    })
+  )
+  const deleteButton = w.findAll('button').find((b) => b.text().includes('common.delete'))
+  await deleteButton!.trigger('click')
+
+  expect(w.find('.confirm-modal').exists()).toBe(false)
+  expect(window.alert).toHaveBeenCalledWith('ports.hasBoats')
+  expect(mockDelete).not.toHaveBeenCalled()
+})
+
+test('a port whose pontoons and mouillages are all free still opens the confirmation modal', async () => {
+  const w = mountShow(
+    makePort({
+      pontoons: [makePontoon([makeSpot('A01'), makeSpot('A02')])],
+      mouillages: [makeMouillage([makeSpot('B08')])],
+    })
+  )
+  const deleteButton = w.findAll('button').find((b) => b.text().includes('common.delete'))
+  await deleteButton!.trigger('click')
+
+  expect(w.find('.confirm-modal').exists()).toBe(true)
+  expect(window.alert).not.toHaveBeenCalled()
   expect(mockDelete).not.toHaveBeenCalled()
 })
