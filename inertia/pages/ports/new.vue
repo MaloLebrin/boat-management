@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Link } from '@adonisjs/inertia/vue'
 import { Head, useForm } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
@@ -80,12 +81,12 @@ function submit() {
           <BaseButton type="submit" :disabled="form.processing">
             {{ t('common.save') }}
           </BaseButton>
-          <a
+          <Link
             href="/ports"
             class="text-sm font-semibold text-fg-muted hover:text-fg hover:underline"
           >
             {{ t('common.cancel') }}
-          </a>
+          </Link>
         </div>
       </form>
     </div>

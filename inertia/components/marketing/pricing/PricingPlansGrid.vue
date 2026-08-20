@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Link } from '@adonisjs/inertia/vue'
 import { computed } from 'vue'
 import { CheckCircleIcon, CheckIcon } from '@heroicons/vue/24/outline'
 import BaseBadge from '~/components/base/BaseBadge.vue'
@@ -75,9 +76,9 @@ const proPrice = computed(() => {
           <footer class="mt-1 not-italic font-medium">— {{ plans.starter.quote.author }}</footer>
         </blockquote>
         <template #footer>
-          <a href="/signup">
+          <Link href="/signup">
             <BaseButton variant="secondary">{{ signupLabel }}</BaseButton>
-          </a>
+          </Link>
         </template>
       </BaseCard>
 
@@ -176,9 +177,9 @@ const proPrice = computed(() => {
           <footer class="mt-1 not-italic font-medium">— {{ plans.enterprise.quote.author }}</footer>
         </blockquote>
         <template #footer>
-          <a href="/signup">
+          <Link href="/signup">
             <BaseButton variant="secondary">{{ signupLabel }}</BaseButton>
-          </a>
+          </Link>
         </template>
       </BaseCard>
     </section>

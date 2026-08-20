@@ -5,6 +5,7 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import ContactFormSidebar from './ContactFormSidebar.vue'
 import ContactPillGroup from './ContactPillGroup.vue'
 import { useScrollReveal } from '~/composables/use_scroll_reveal'
+import { marketingPath } from '#shared/helpers/locale_path'
 import type { ContactSubject, ContactSubjectOption } from '../../../../shared/types/contact'
 
 interface SidebarContact {
@@ -52,7 +53,7 @@ const props = defineProps<{
 
 const page = usePage<{ locale?: 'en' | 'fr' }>()
 const locale = computed<'en' | 'fr'>(() => (page.props.locale ?? 'en') as 'en' | 'fr')
-const privacyHref = computed(() => (locale.value === 'fr' ? '/fr/confidentialite' : '/en/privacy'))
+const privacyHref = computed(() => marketingPath('privacy', locale.value))
 
 const { el, isVisible } = useScrollReveal()
 
@@ -231,9 +232,12 @@ function writeAnother() {
                 <input v-model="form.consent" type="checkbox" class="mt-0.5 accent-navy-900" />
                 <span>
                   {{ privacyText }}
-                  <!-- `<a>` légitime : page publique servie hors bundle Inertia -->
-                  <a :href="privacyHref" class="text-fg underline">{{ privacyLinkLabel }}</a
+                  <!-- eslint-disable vue/no-restricted-v-bind -- nouvel onglet : préserve le formulaire, <Link> ignore target -->
+                  <a :href="privacyHref" target="_blank" rel="noopener" class="text-fg underline">{{
+                    privacyLinkLabel
+                  }}</a
                   >.
+                  <!-- eslint-enable vue/no-restricted-v-bind -->
                 </span>
               </label>
               <p v-if="form.errors.consent" class="mt-1 text-xs text-danger">

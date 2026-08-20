@@ -1821,7 +1821,7 @@ export interface Registry {
   }
   'marketing.en.pricing': {
     methods: ["GET","HEAD"]
-    pattern: '/en/tarifs'
+    pattern: '/en/pricing'
     types: {
       body: {}
       paramsTuple: []
@@ -1829,6 +1829,18 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['pricing']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['pricing']>>>
+    }
+  }
+  'marketing.en.pricing_legacy': {
+    methods: ["GET","HEAD"]
+    pattern: '/en/tarifs'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
     }
   }
   'marketing.en.simulator': {

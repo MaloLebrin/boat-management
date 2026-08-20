@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Link } from '@adonisjs/inertia/vue'
 import { Form } from '@adonisjs/inertia/vue'
 import { PencilSquareIcon, PlusCircleIcon, TrashIcon } from '@heroicons/vue/24/outline'
 import BaseBadge from '~/components/base/BaseBadge.vue'
@@ -32,7 +33,7 @@ function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutra
       <div class="flex flex-wrap items-start justify-between gap-2">
         <p class="text-sm font-semibold text-fg">{{ t('boats.rig.title') }}</p>
         <div v-if="canManage" class="flex flex-wrap items-center gap-2">
-          <a
+          <Link
             :href="`/boats/${boatId}/rig/edit`"
             :aria-label="rig ? t('boats.rig.editTitle') : t('boats.rig.addTitle')"
             class="flex items-center gap-1.5 text-sm font-semibold text-fg-muted hover:text-fg hover:underline"
@@ -40,7 +41,7 @@ function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutra
             <PencilSquareIcon v-if="rig" class="w-4 h-4" />
             <PlusCircleIcon v-else class="w-4 h-4" />
             {{ rig ? t('boats.rig.editTitle') : t('boats.rig.addTitle') }}
-          </a>
+          </Link>
           <Form
             v-if="rig"
             :action="{ url: `/boats/${boatId}/rig`, method: 'delete' }"

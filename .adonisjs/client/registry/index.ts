@@ -914,9 +914,15 @@ const routes = {
   },
   'marketing.en.pricing': {
     methods: ["GET","HEAD"],
+    pattern: '/en/pricing',
+    tokens: [{"old":"/en/pricing","type":0,"val":"en","end":""},{"old":"/en/pricing","type":0,"val":"pricing","end":""}],
+    types: placeholder as Registry['marketing.en.pricing']['types'],
+  },
+  'marketing.en.pricing_legacy': {
+    methods: ["GET","HEAD"],
     pattern: '/en/tarifs',
     tokens: [{"old":"/en/tarifs","type":0,"val":"en","end":""},{"old":"/en/tarifs","type":0,"val":"tarifs","end":""}],
-    types: placeholder as Registry['marketing.en.pricing']['types'],
+    types: placeholder as Registry['marketing.en.pricing_legacy']['types'],
   },
   'marketing.en.simulator': {
     methods: ["GET","HEAD"],

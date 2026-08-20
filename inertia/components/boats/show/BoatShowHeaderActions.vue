@@ -96,6 +96,7 @@ const menuItemClass =
       >
         {{ t('boats.show.editBoat') }}
       </Link>
+      <!-- eslint-disable vue/no-restricted-v-bind -- téléchargement PDF : une visite Inertia rendrait le binaire comme une page -->
       <a
         v-if="canExport"
         :href="`/boats/${boatId}/maintenance-log.pdf`"
@@ -107,6 +108,7 @@ const menuItemClass =
       >
         {{ t('boats.maintenanceLog.download') }}
       </a>
+      <!-- eslint-enable vue/no-restricted-v-bind -->
     </template>
   </BaseDropdown>
 </template>

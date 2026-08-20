@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Link } from '@adonisjs/inertia/vue'
 import { Form } from '@adonisjs/inertia/vue'
 import { Head } from '@inertiajs/vue3'
 import { computed, ref } from 'vue'
@@ -41,12 +42,12 @@ defineProps<{
             <BaseButton type="submit" :disabled="processing">{{
               t('boats.new.submit')
             }}</BaseButton>
-            <a
+            <Link
               href="/boats"
               class="text-sm font-semibold text-fg-muted hover:text-fg hover:underline"
             >
               {{ t('boats.new.cancel') }}
-            </a>
+            </Link>
           </div>
         </div>
       </Form>

@@ -26,6 +26,7 @@ defineProps<{
       </p>
       <div class="mt-5 space-y-4">
         <!-- `<a>` légitime : liens mailto:/tel:, pas une navigation interne -->
+        <!-- eslint-disable vue/no-restricted-v-bind -- liens mailto:/tel:, pas une navigation interne -->
         <a
           v-for="c in sidebarContacts"
           :key="c.label"
@@ -42,6 +43,7 @@ defineProps<{
             <p class="text-xs text-fg-subtle">{{ c.sub }}</p>
           </div>
         </a>
+        <!-- eslint-enable vue/no-restricted-v-bind -->
       </div>
     </div>
 

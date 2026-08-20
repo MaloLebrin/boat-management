@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Link } from '@adonisjs/inertia/vue'
 import { Form } from '@adonisjs/inertia/vue'
 import BoatEquipmentEngineFields from './BoatEquipmentEngineFields.vue'
 import EngineHoursQuickAddForm from './EngineHoursQuickAddForm.vue'
@@ -114,12 +115,12 @@ function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutra
               :engine-id="e.id"
               :current-hours="e.hours"
             />
-            <a :href="`/boats/${boatId}/engines/${e.id}`">
+            <Link :href="`/boats/${boatId}/engines/${e.id}`">
               <BaseButton variant="secondary" size="sm" type="button">
                 {{ t('boats.engines.viewDetail') }}
               </BaseButton>
-            </a>
-            <a v-if="canManage" :href="`/boats/${boatId}/engines/${e.id}/edit`">
+            </Link>
+            <Link v-if="canManage" :href="`/boats/${boatId}/engines/${e.id}/edit`">
               <BaseButton
                 variant="ghost"
                 size="sm"
@@ -128,7 +129,7 @@ function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutra
               >
                 {{ t('boats.engines.edit') }}
               </BaseButton>
-            </a>
+            </Link>
             <Form
               v-if="canManage"
               :action="{ url: `/boats/${boatId}/engines/${e.id}`, method: 'delete' }"

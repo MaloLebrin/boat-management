@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Link } from '@adonisjs/inertia/vue'
 import { computed } from 'vue'
 import type { DashboardPortItem, DashboardPortStats } from '#shared/types/dashboard'
 import BaseCard from '~/components/base/BaseCard.vue'
@@ -34,17 +35,17 @@ function locationLabel(port: DashboardPortItem): string {
     <template #header>
       <div class="flex items-center justify-between">
         <h2 class="text-sm font-semibold text-fg">{{ t('dashboard.port.title') }}</h2>
-        <a href="/ports" class="text-sm font-semibold text-brand hover:underline">
+        <Link href="/ports" class="text-sm font-semibold text-brand hover:underline">
           {{ t('dashboard.port.viewAll') }}
-        </a>
+        </Link>
       </div>
     </template>
 
     <div v-if="ports.length === 0" class="flex flex-col items-center gap-3 py-6 text-center">
       <p class="text-sm text-fg-muted">{{ t('dashboard.port.empty') }}</p>
-      <a href="/ports/new" class="text-sm font-semibold text-brand hover:underline">
+      <Link href="/ports/new" class="text-sm font-semibold text-brand hover:underline">
         {{ t('dashboard.port.addPort') }}
-      </a>
+      </Link>
     </div>
 
     <template v-else>
@@ -66,12 +67,12 @@ function locationLabel(port: DashboardPortItem): string {
         >
           <div class="flex items-start justify-between gap-2">
             <div class="min-w-0">
-              <a
+              <Link
                 :href="`/ports/${port.id}`"
                 class="block truncate text-sm font-semibold text-fg hover:underline"
               >
                 {{ port.name }}
-              </a>
+              </Link>
               <p v-if="locationLabel(port)" class="mt-0.5 truncate text-xs text-fg-muted">
                 {{ locationLabel(port) }}
               </p>

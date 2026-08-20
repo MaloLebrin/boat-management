@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Link } from '@adonisjs/inertia/vue'
 import { computed, ref } from 'vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import type { MaintenanceEventRow } from '#shared/types/maintenance'
@@ -100,14 +101,14 @@ function getSubjectLink(event: MaintenanceEventRow): string {
                 </div>
 
                 <div class="flex items-center gap-3 shrink-0">
-                  <a :href="`/boats/${event.boatId}`" class="inline-flex">
+                  <Link :href="`/boats/${event.boatId}`" class="inline-flex">
                     <BaseBadge variant="neutral">{{ event.boatName }}</BaseBadge>
-                  </a>
-                  <a :href="getSubjectLink(event)" class="inline-flex">
+                  </Link>
+                  <Link :href="getSubjectLink(event)" class="inline-flex">
                     <BaseBadge variant="info">{{
                       t(`maintenance.history.subjects.${event.subject}`)
                     }}</BaseBadge>
-                  </a>
+                  </Link>
                   <span v-if="event.parts.length > 0" class="text-sm text-fg-muted">
                     {{
                       t('maintenance.history.timeline.pieces', {

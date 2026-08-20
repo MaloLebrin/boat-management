@@ -14,6 +14,7 @@ import PricingConfigurator from '~/components/marketing/pricing/PricingConfigura
 import PricingExtrasSection from '~/components/marketing/pricing/PricingExtrasSection.vue'
 import PricingFaqSection from '~/components/marketing/pricing/PricingFaqSection.vue'
 import HomeFinalCtaSection from '~/components/marketing/home/HomeFinalCtaSection.vue'
+import { marketingPath } from '#shared/helpers/locale_path'
 
 type SharedProps = { locale?: 'en' | 'fr' }
 const page = usePage<SharedProps>()
@@ -207,8 +208,9 @@ const props = defineProps<PageProps>()
 const t = props.t
 const locale = computed<'en' | 'fr'>(() => (page.props.locale ?? 'fr') as 'en' | 'fr')
 const billing = ref<'monthly' | 'annual'>('annual')
-const hreflangEn = '/en/tarifs'
-const hreflangFr = '/fr/tarifs'
+const hreflangEn = marketingPath('pricing', 'en')
+const hreflangFr = marketingPath('pricing', 'fr')
+const canonicalHref = computed(() => marketingPath('pricing', locale.value))
 </script>
 
 <template>
@@ -216,9 +218,10 @@ const hreflangFr = '/fr/tarifs'
     <meta name="description" :content="t.meta.description" />
     <meta property="og:title" :content="t.meta.title" />
     <meta property="og:description" :content="t.meta.description" />
-    <link rel="canonical" :href="`/${locale}/tarifs`" />
+    <link rel="canonical" :href="canonicalHref" />
     <link rel="alternate" hreflang="en" :href="hreflangEn" />
     <link rel="alternate" hreflang="fr" :href="hreflangFr" />
+    <link rel="alternate" hreflang="x-default" :href="hreflangEn" />
   </Head>
 
   <PricingHeroSection

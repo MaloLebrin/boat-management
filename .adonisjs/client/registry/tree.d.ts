@@ -257,6 +257,7 @@ export interface ApiDefinition {
     en: {
       home: typeof routes['marketing.en.home']
       pricing: typeof routes['marketing.en.pricing']
+      pricingLegacy: typeof routes['marketing.en.pricing_legacy']
       simulator: typeof routes['marketing.en.simulator']
       guide: typeof routes['marketing.en.guide']
       privacy: typeof routes['marketing.en.privacy']

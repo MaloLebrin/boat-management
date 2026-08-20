@@ -13,7 +13,7 @@ test.group('Sitemap (functional)', () => {
     const expectedUrls = [
       'https://fleetai.app/en',
       'https://fleetai.app/fr',
-      'https://fleetai.app/en/tarifs',
+      'https://fleetai.app/en/pricing',
       'https://fleetai.app/fr/tarifs',
       'https://fleetai.app/en/maintenance-cost-simulator',
       'https://fleetai.app/fr/simulateur-cout-entretien',

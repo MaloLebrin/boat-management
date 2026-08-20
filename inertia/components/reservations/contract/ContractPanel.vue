@@ -81,6 +81,7 @@ function destroy() {
         variant="secondary"
         size="sm"
         :href="`${basePath}/pdf`"
+        external-href
         target="_blank"
         rel="noopener"
       >
@@ -92,6 +93,7 @@ function destroy() {
         variant="secondary"
         size="sm"
         :href="`${basePath}/signed-document`"
+        external-href
         target="_blank"
         rel="noopener"
       >

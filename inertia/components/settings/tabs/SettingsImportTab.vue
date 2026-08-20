@@ -104,6 +104,7 @@ function handleCancel() {
         </p>
       </div>
       <div class="flex flex-wrap gap-3">
+        <!-- eslint-disable vue/no-restricted-v-bind -- export CSV : pas une navigation -->
         <a
           v-for="{ key, label } in [
             { key: 'maintenance', label: t('settings.import.exportMaintenance') },
@@ -119,6 +120,7 @@ function handleCancel() {
         >
           {{ label }}
         </a>
+        <!-- eslint-enable vue/no-restricted-v-bind -->
       </div>
     </BaseCard>
 

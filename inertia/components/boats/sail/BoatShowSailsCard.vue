@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Link } from '@adonisjs/inertia/vue'
 import { Form } from '@adonisjs/inertia/vue'
 import { PencilSquareIcon, TrashIcon } from '@heroicons/vue/24/outline'
 import { ref } from 'vue'
@@ -102,7 +103,7 @@ function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutra
               {{ t('boats.sails.viewDetail') }}
             </BaseButton>
             <template v-if="canManage">
-              <a :href="`/boats/${boatId}/sails/${s.id}/edit`">
+              <Link :href="`/boats/${boatId}/sails/${s.id}/edit`">
                 <BaseButton
                   variant="secondary"
                   size="sm"
@@ -111,7 +112,7 @@ function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutra
                 >
                   <PencilSquareIcon class="w-4 h-4" />
                 </BaseButton>
-              </a>
+              </Link>
               <Form
                 :action="{ url: `/boats/${boatId}/sails/${s.id}`, method: 'delete' }"
                 #default="{ processing }"

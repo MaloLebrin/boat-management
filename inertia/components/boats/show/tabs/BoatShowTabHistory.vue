@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Link } from '@adonisjs/inertia/vue'
 import { DocumentTextIcon } from '@heroicons/vue/24/outline'
 import { computed, onMounted, ref, watch } from 'vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
@@ -155,7 +156,7 @@ function getSubjectLink(ev: MaintenanceEventRow): string {
                   <div>
                     <p class="font-semibold text-fg">{{ ev.title }}</p>
                     <p class="text-sm text-fg-muted">
-                      <a
+                      <Link
                         :href="getSubjectLink(ev)"
                         class="hover:text-brand hover:underline transition-colors"
                       >
@@ -163,7 +164,7 @@ function getSubjectLink(ev: MaintenanceEventRow): string {
                         <span v-if="targetDescription(t, ev)">
                           · {{ targetDescription(t, ev) }}
                         </span>
-                      </a>
+                      </Link>
                     </p>
                     <div v-if="ev.parts.length > 0" class="mt-2 flex items-center gap-2">
                       <BaseBadge variant="neutral">
@@ -219,6 +220,7 @@ function getSubjectLink(ev: MaintenanceEventRow): string {
           </div>
         </dl>
       </BaseCard>
+      <!-- eslint-disable vue/no-restricted-v-bind -- téléchargement PDF : une visite Inertia rendrait le binaire comme une page -->
       <a
         v-if="canExport"
         :href="`/boats/${boat.id}/maintenance-log.pdf`"
@@ -231,6 +233,7 @@ function getSubjectLink(ev: MaintenanceEventRow): string {
           {{ t('boats.show.historyTab.exportPdf') }}
         </BaseButton>
       </a>
+      <!-- eslint-enable vue/no-restricted-v-bind -->
     </div>
   </div>
 </template>
