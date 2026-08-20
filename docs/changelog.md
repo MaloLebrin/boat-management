@@ -3,6 +3,14 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-08-20 — Session démo expirée : redirection vers la connexion au lieu d'une page 500 (#478)
+
+Repéré sur la démo publique. Une fois les 15 minutes de `DEMO_SESSION_DURATION_MS` écoulées, le visiteur ne recevait pas le flash « session expirée » mais une **page d'erreur 500** sur n'importe quelle page rechargée.
+
+- **Cause : un ordre de middlewares.** Dans `start/kernel.ts`, `check_demo_session_middleware` était enregistré **avant** `detect_user_locale_middleware`, seul middleware à poser `ctx.i18n`. Sa branche d'expiration appelait `ctx.i18n.t('flash.demo.sessionExpired')` sur un `undefined` → `TypeError: Cannot read properties of undefined (reading 't')`. La branche n'avait donc jamais pu fonctionner depuis son introduction.
+- **Correctif.** `check_demo_session_middleware` passe **après** `detect_user_locale_middleware`, avec un commentaire dans `start/kernel.ts` qui explicite la contrainte (après `silent_auth_middleware` pour `ctx.auth.user`, après `detect_user_locale_middleware` pour `ctx.i18n`). Aucun effet de bord sur les middlewares intermédiaires : `initialize_bouncer_middleware` résout l'utilisateur paresseusement (`() => ctx.auth.user`), et `detect_user_locale_middleware` résout désormais la locale sur le compte démo encore authentifié — donc le flash sort dans la langue du visiteur.
+- **Tests.** `tests/functional/auth/demo_session_expiry.spec.ts` : session démo expirée → 302 vers `/login` + flash `flash.demo.sessionExpired`, session démo sans horodatage → même traitement, session démo encore valide → 200 intact. Les deux premiers échouent sur le code d'avant avec un 500.
+
 ## 2026-08-20 — Suppression d'un port : le bouton ne faisait plus rien (repéré en marge de #478)
 
 Repéré en peuplant la démo publique. Sur `/ports/:id`, le bouton « Supprimer » de l'en-tête ne produisait **ni alerte ni modale de confirmation** dès que le port avait au moins un ponton ou un mouillage : sa garde lisait `pontoon.boats.length`, or un bateau est rattaché à une **place**, pas au ponton. `PontoonRow` / `MouillageRow` exposent `spots[].boat` — `p.boats` valait `undefined` et `.length` levait une `TypeError` avalée par Vue.
