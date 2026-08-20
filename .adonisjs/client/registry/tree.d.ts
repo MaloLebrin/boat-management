@@ -252,41 +252,6 @@ export interface ApiDefinition {
     update: typeof routes['spots.update']
     destroy: typeof routes['spots.destroy']
   }
-  home: typeof routes['home']
-  marketing: {
-    en: {
-      home: typeof routes['marketing.en.home']
-      pricing: typeof routes['marketing.en.pricing']
-      pricingLegacy: typeof routes['marketing.en.pricing_legacy']
-      simulator: typeof routes['marketing.en.simulator']
-      guide: typeof routes['marketing.en.guide']
-      privacy: typeof routes['marketing.en.privacy']
-      about: typeof routes['marketing.en.about']
-      contact: typeof routes['marketing.en.contact']
-    }
-    fr: {
-      home: typeof routes['marketing.fr.home']
-      pricing: typeof routes['marketing.fr.pricing']
-      simulator: typeof routes['marketing.fr.simulator']
-      guide: typeof routes['marketing.fr.guide']
-      privacy: typeof routes['marketing.fr.privacy']
-      about: typeof routes['marketing.fr.about']
-      contact: typeof routes['marketing.fr.contact']
-    }
-    contact: typeof routes['marketing.contact']
-  }
-  simulator: {
-    session: typeof routes['simulator.session']
-    createBoat: typeof routes['simulator.create_boat']
-    lead: typeof routes['simulator.lead']
-    share: {
-      store: typeof routes['simulator.share.store']
-      show: {
-        fr: typeof routes['simulator.share.show.fr']
-        en: typeof routes['simulator.share.show.en']
-      }
-    }
-  }
   planning: {
     index: typeof routes['planning.index']
   }
@@ -351,6 +316,16 @@ export interface ApiDefinition {
     history: typeof routes['maintenance.history'] & {
       pdf: typeof routes['maintenance.history.pdf']
     }
+  }
+  diagnostic: {
+    index: typeof routes['diagnostic.index']
+    firstContact: typeof routes['diagnostic.firstContact']
+    checklist: typeof routes['diagnostic.checklist']
+    sheet: typeof routes['diagnostic.sheet']
+    steps: {
+      toggle: typeof routes['diagnostic.steps.toggle']
+    }
+    reset: typeof routes['diagnostic.reset']
   }
   organization: {
     members: {
@@ -461,6 +436,49 @@ export interface ApiDefinition {
     chat: typeof routes['ai.chat']
     fleetAnalysis: typeof routes['ai.fleetAnalysis']
     boatSuggestions: typeof routes['ai.boatSuggestions']
+  }
+  home: typeof routes['home']
+  marketing: {
+    en: {
+      home: typeof routes['marketing.en.home']
+      pricing: typeof routes['marketing.en.pricing']
+      pricingLegacy: typeof routes['marketing.en.pricing_legacy']
+      simulator: typeof routes['marketing.en.simulator']
+      guide: typeof routes['marketing.en.guide']
+      privacy: typeof routes['marketing.en.privacy']
+      terms: typeof routes['marketing.en.terms']
+      salesTerms: typeof routes['marketing.en.sales_terms']
+      legalNotice: typeof routes['marketing.en.legal_notice']
+      about: typeof routes['marketing.en.about']
+      contact: typeof routes['marketing.en.contact']
+    }
+    fr: {
+      home: typeof routes['marketing.fr.home']
+      pricing: typeof routes['marketing.fr.pricing']
+      simulator: typeof routes['marketing.fr.simulator']
+      guide: typeof routes['marketing.fr.guide']
+      privacy: typeof routes['marketing.fr.privacy']
+      terms: typeof routes['marketing.fr.terms']
+      salesTerms: typeof routes['marketing.fr.sales_terms']
+      legalNotice: typeof routes['marketing.fr.legal_notice']
+      about: typeof routes['marketing.fr.about']
+      contact: typeof routes['marketing.fr.contact']
+    }
+    contact: typeof routes['marketing.contact'] & {
+      store: typeof routes['marketing.contact.store']
+    }
+  }
+  simulator: {
+    session: typeof routes['simulator.session']
+    createBoat: typeof routes['simulator.create_boat']
+    lead: typeof routes['simulator.lead']
+    share: {
+      store: typeof routes['simulator.share.store']
+      show: {
+        fr: typeof routes['simulator.share.show.fr']
+        en: typeof routes['simulator.share.show.en']
+      }
+    }
   }
   demo: {
     login: typeof routes['demo.login']

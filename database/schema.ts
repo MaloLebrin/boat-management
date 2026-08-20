@@ -172,6 +172,19 @@ export class BoatDocumentSchema extends BaseModel {
   declare updatedAt: DateTime
 }
 
+export class BoatEngineDiagnosticCheckSchema extends BaseModel {
+  static $columns = ['boatEngineId', 'createdAt', 'id', 'stepKey'] as const
+  $columns = BoatEngineDiagnosticCheckSchema.$columns
+  @column()
+  declare boatEngineId: number
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare stepKey: string
+}
+
 export class BoatEnginePartSchema extends BaseModel {
   static $columns = [
     'boatEngineId',

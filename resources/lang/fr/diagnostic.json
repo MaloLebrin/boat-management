@@ -1,0 +1,562 @@
+{
+  "index": {
+    "title": "Panne",
+    "subtitle": "Checklists de dépannage guidées pour vos moteurs hors-bord 2 temps. Commencez toujours par la checklist globale : compression, étincelle, essence — dans cet ordre.",
+    "enginesTitle": "Vos moteurs",
+    "empty": "Aucun moteur hors-bord 2 temps dans votre flotte.",
+    "eligibilityHint": "Les checklists de diagnostic concernent les moteurs hors-bord 2 temps. Renseignez le type « hors-bord » et le cycle « 2 temps » sur la fiche d'un moteur pour le voir apparaître ici.",
+    "openChecklist": "Ouvrir la checklist",
+    "firstContactCard": {
+      "title": "Achat d'occasion : premier contact",
+      "text": "Vous allez voir un moteur d'occasion ? Suivez la fiche de premier contact pour l'évaluer sur place, sans rien oublier.",
+      "cta": "Ouvrir la fiche"
+    }
+  },
+  "common": {
+    "progress": "{checked}/{total}",
+    "progressLabel": "{checked} étape(s) cochée(s) sur {total}",
+    "reset": "Réinitialiser",
+    "resetConfirm": "Réinitialiser cette checklist ? Toutes les étapes cochées de ce moteur seront décochées.",
+    "resetSheetConfirm": "Réinitialiser cette fiche ? Les étapes cochées de cette fiche seront décochées pour ce moteur.",
+    "neverDryTitle": "Ne jamais tourner à sec",
+    "neverDry": "Cette fiche implique de démarrer le moteur : toujours dans un bac d'eau ou avec des oreilles de rinçage, jamais à sec. Quelques secondes à sec suffisent à détruire l'impeller.",
+    "backToChecklist": "Retour à la checklist",
+    "backToDiagnostic": "Retour au diagnostic",
+    "openSheet": "Voir la fiche détaillée",
+    "sheetLink": "Fiche : {title}",
+    "warningLabel": "Avertissement",
+    "notesTitle": "À retenir",
+    "localStateHint": "Cette fiche n'est liée à aucun moteur de votre flotte : les cases ne sont pas enregistrées et repartent de zéro à la prochaine visite."
+  },
+  "tab": {
+    "title": "Diagnostic panne",
+    "openFull": "Ouvrir la page diagnostic"
+  },
+  "global": {
+    "title": "Checklist globale — la règle d'or",
+    "intro": "Compression → Étincelle → Essence. Toujours dans cet ordre. On teste l'essence en dernier alors qu'elle est la cause dans 7 à 8,5 cas sur 10, uniquement parce que c'est la réparation la moins chère. Sans compression, rien d'autre ne sert. Les étapes sont ordonnées du moins cher au plus cher.",
+    "steps": {
+      "flywheel": {
+        "label": "Volant moteur tourné à la main sur 360° — pas de point dur",
+        "detail": "Bloqué = piston grippé, éliminatoire."
+      },
+      "gearshift": {
+        "label": "Vitesses : hélice libre au neutre, résistante en marche avant et arrière"
+      },
+      "kill_switch": {
+        "label": "Coupe-circuit en place et en position marche"
+      },
+      "fresh_fuel": {
+        "label": "Essence fraîche, bien mélangée (50:1 sauf spec contraire), sans eau"
+      },
+      "tank_vent": {
+        "label": "Évent du bouchon de réservoir ouvert"
+      },
+      "compression": {
+        "label": "Compression testée sur chaque cylindre"
+      },
+      "spark": {
+        "label": "Étincelle testée sur chaque cylindre"
+      },
+      "fuel_system": {
+        "label": "Circuit d'essence suivi de bout en bout"
+      },
+      "tell_tale": {
+        "label": "Jet témoin présent au démarrage"
+      },
+      "gear_oil": {
+        "label": "Huile d'embase contrôlée (laiteuse = eau)"
+      },
+      "timing": {
+        "label": "Si tout est bon et que ça ne tourne toujours pas : calage"
+      }
+    },
+    "warnings": {
+      "waterOnly": "Toujours dans un bac d'eau ou avec des oreilles de rinçage. Jamais à sec."
+    }
+  },
+  "sheets": {
+    "compression": {
+      "title": "Compression faible ou inégale",
+      "intro": "Test : bougies retirées, manomètre vissé dans le puits, 5 à 8 tractions de lanceur (ou 2 à 4 s au démarreur), sur chaque cylindre, jauge remise à zéro entre deux.",
+      "steps": {
+        "all_cylinders": {
+          "label": "Compression relevée sur tous les cylindres"
+        },
+        "spread_calculated": {
+          "label": "Écart entre cylindres calculé",
+          "detail": "C'est le critère n°1, pas la valeur brute."
+        },
+        "model_spec": {
+          "label": "Spec du modèle vérifiée",
+          "detail": "Certains Johnson/Evinrude 9.5 tournent très bien à 60–68 PSI."
+        },
+        "retest_after_run": {
+          "label": "Moteur longtemps immobilisé ? Refaire le test après quelques heures de fonctionnement"
+        },
+        "retest_after_head": {
+          "label": "Après toute dépose de culasse : recontrôler une fois serré au couple"
+        }
+      },
+      "tables": {
+        "criteria": {
+          "headers": {
+            "criterion": "Critère",
+            "good": "Bon",
+            "bad": "Mauvais"
+          },
+          "rows": {
+            "spread": {
+              "criterion": "Écart entre cylindres",
+              "good": "< 12 %",
+              "bad": "≥ 13 %"
+            },
+            "absolute": {
+              "criterion": "Valeur absolue",
+              "good": "≥ 100 PSI",
+              "bad": "< 100 PSI (à nuancer)"
+            }
+          }
+        }
+      },
+      "warnings": {
+        "gauges": "Les manomètres varient énormément : un modèle à 20 € lit 10 à 15 PSI de moins qu'un pro. Comparez les cylindres entre eux, jamais des chiffres issus de deux manomètres différents."
+      },
+      "notes": {
+        "over_spread": "Si l'écart dépasse 12 % : segments, cylindre marqué ou joint de culasse. C'est la réparation chère — sur un achat, négociez très bas ou passez votre chemin."
+      }
+    },
+    "ignition": {
+      "title": "Pas d'étincelle (ou étincelle faible)",
+      "intro": "Du plus simple au plus cher.",
+      "steps": {
+        "kill_circuit": {
+          "label": "Coupe-circuit : débrancher le fil noir/jaune au power pack et retester",
+          "detail": "Étincelle revenue = défaut dans le circuit d'arrêt (contacteur à clé, faisceau, cosses corrodées)."
+        },
+        "plugs": {
+          "label": "Bougies neuves, écartement vérifié à l'outil (elles ne sont pas réglées d'usine), même marque partout"
+        },
+        "coils": {
+          "label": "Bobines : inspection visuelle du gel au dos",
+          "detail": "Sec, craquelé ou fondu = bobine morte. C'est le composant d'allumage qui lâche le plus souvent."
+        },
+        "rectifier": {
+          "label": "Redresseur : débrancher les fils jaunes et retester (2 secondes, cas rare mais gratuit)"
+        },
+        "cranking_rpm": {
+          "label": "Régime de lancement ≥ 250 tr/min (sinon batterie, câbles ou démarreur)"
+        },
+        "grounds": {
+          "label": "Masses propres, sans corrosion, bien serrées — notamment celles des bobines"
+        },
+        "model_id": {
+          "label": "Modèle + année identifiés sur crowleymarine.com (ex. J50PLEA = Johnson 50 ch 1999)"
+        },
+        "cdi_measures": {
+          "label": "Stator / timer base / power pack mesurés en ohms selon le guide CDI",
+          "detail": "Exemples de valeurs relevées : stator marron ↔ marron/jaune 650–850 Ω (CDI) ou 750–950 Ω (OEM) ; timer base blanc ↔ vert et blanc ↔ bleu 25–30 Ω. Une valeur dans l'une OU l'autre des plages suffit."
+        }
+      },
+      "warnings": {
+        "weak_spark": "Une étincelle visible au testeur peut être trop faible sous compression. Si tout le reste est bon et qu'un cylindre ne tire pas, essayez une bobine."
+      },
+      "notes": {
+        "triage_all": "Règle de tri : aucune étincelle sur aucun cylindre → cherchez ce qui est commun (coupe-circuit, stator, power pack).",
+        "triage_one": "Pas d'étincelle sur un seul cylindre → bougie ou bobine de ce cylindre.",
+        "dva": "Tensions de crête = adaptateur DVA requis. Si la résistance est bonne, la tension l'est aussi dans la quasi-totalité des cas."
+      }
+    },
+    "fuel": {
+      "title": "Alimentation essence (le coupable n°1)",
+      "intro": "Suivez physiquement le trajet : réservoir → durite + poire → filtre → pompe → carburateur → clapets.",
+      "sections": {
+        "tank": {
+          "title": "Réservoir, durite, poire"
+        },
+        "filter_pump": {
+          "title": "Filtre et pompe"
+        },
+        "carburetor": {
+          "title": "Carburateur (~85 % des pannes de fonctionnement)"
+        },
+        "reed_valves": {
+          "title": "Clapets (reed valves) — dernier recours"
+        }
+      },
+      "steps": {
+        "fresh_fuel": {
+          "label": "Essence de moins d'un mois, bien mélangée, sans eau"
+        },
+        "tank_vent": {
+          "label": "Évent du bouchon ouvert"
+        },
+        "black_hose_only": {
+          "label": "Durite noire automobile uniquement",
+          "detail": "Les durites grises ont une doublure que l'éthanol dissout (débris dans le carburateur)."
+        },
+        "primer_bulb": {
+          "label": "Poire montée dans le sens des flèches, elle doit durcir complètement"
+        },
+        "air_leaks": {
+          "label": "Chasse aux entrées d'air : chaque collier, chaque raccord rapide",
+          "detail": "Le moindre sifflement = panne."
+        },
+        "filter_direction": {
+          "label": "Filtre propre et dans le bon sens (flèche)"
+        },
+        "pump_test": {
+          "label": "Test pompe : le moteur cale après 20–60 s ? Redémarrer en pompant la poire en continu",
+          "detail": "S'il reste en vie en pompant la poire → pompe HS."
+        },
+        "pump_replace": {
+          "label": "Remplacement par une pompe neuve montée plutôt qu'un kit"
+        },
+        "carb_photos": {
+          "label": "Photos des durites et tringleries avant démontage"
+        },
+        "carb_removal": {
+          "label": "Dépose : boîte à air, durites, tringlerie, 2 écrous"
+        },
+        "carb_disassembly": {
+          "label": "Démontage : cuve, flotteur, pointeau, tous les gicleurs"
+        },
+        "mixture_screw_count": {
+          "label": "Vis de richesse : compter les tours en la retirant"
+        },
+        "carb_cleaner": {
+          "label": "Nettoyant dans chaque trou et orifice, généreusement — rien ne peut être abîmé"
+        },
+        "cork_float": {
+          "label": "Flotteur en liège → remplacer d'office par un plastique"
+        },
+        "float_level": {
+          "label": "Niveau du flotteur droit dans tous les axes (ajuster la languette)"
+        },
+        "blow_test": {
+          "label": "Test du souffle",
+          "detail": "Cuve en bas → l'air passe ; carburateur retourné → aucun air ne passe."
+        },
+        "reassembly": {
+          "label": "Remontage, puis réglage de la vis de richesse",
+          "detail": "Vis vissée à fond en douceur, desserrée de 1 à 1¼ tour, affinée par ¼ de tour avec 20–30 s de réaction."
+        },
+        "reed_backfire": {
+          "label": "Essence qui refoule par la bouche du carburateur ou retours de flamme ?"
+        },
+        "reed_backlight": {
+          "label": "Lamelles à contre-jour : lumière visible entre les lamelles = à remplacer"
+        }
+      },
+      "tables": {
+        "carb_symptoms": {
+          "headers": {
+            "symptom": "Symptôme",
+            "cause": "Cause probable"
+          },
+          "rows": {
+            "choke_only": {
+              "symptom": "Ne tourne que starter tiré",
+              "cause": "Gicleur de ralenti bouché"
+            },
+            "leaking": {
+              "symptom": "Essence qui coule en pompant la poire",
+              "cause": "Flotteur coincé / pointeau qui ne ferme plus"
+            },
+            "flooding": {
+              "symptom": "Noyade, bougies noires",
+              "cause": "Pointeau usé, flotteur percé, solénoïde d'enrichissement alimenté en permanence (~5,5 ± 1,5 Ω)"
+            },
+            "dry_plugs": {
+              "symptom": "Bougies sèches, aucun carburant",
+              "cause": "Pointeau collé fermé"
+            },
+            "sneezing": {
+              "symptom": "« Éternuement » au ralenti",
+              "cause": "Trop pauvre → enrichir"
+            }
+          }
+        }
+      }
+    },
+    "cooling": {
+      "title": "Refroidissement : pas de jet témoin, surchauffe",
+      "intro": "Du gratuit au lourd.",
+      "steps": {
+        "telltale_nipple": {
+          "label": "Téton du témoin : nids d'insectes, boue — passer un fil de fer fin dans le téton et sa durite",
+          "detail": "Cause ridicule, extrêmement fréquente."
+        },
+        "thermostat": {
+          "label": "Thermostat : le retirer et refaire tourner",
+          "detail": "5 minutes, ça tranche immédiatement. Bloqué fermé par la corrosion = classique."
+        },
+        "impeller": {
+          "label": "Impeller : ailettes recourbées, sèches ou craquelées = à changer (~15 €, LA maintenance n°1)",
+          "detail": "Embase en marche arrière avant dépose, ne pas perdre la clavette, savon liquide au remontage."
+        },
+        "drill_test": {
+          "label": "Test avant de remonter l'embase : perceuse sur l'arbre d'entraînement → l'eau doit gicler au port de sortie"
+        },
+        "water_tube": {
+          "label": "Impeller neuf mais toujours rien ? Tube d'eau en cuivre mal aligné ou conduits internes bouchés",
+          "detail": "Le grommet doit s'emboîter. Test au tuyau d'arrosage dans le tube d'eau : l'eau doit ressortir au boîtier de thermostat."
+        },
+        "water_jackets": {
+          "label": "Chemises d'eau obstruées (sable, calcaire) : dépose du couvercle de culasse, parfois du powerhead",
+          "detail": "Niveau le plus lourd, tout le reste doit être éliminé avant."
+        },
+        "ir_thermometer": {
+          "label": "Contrôle : thermomètre infrarouge sur la culasse près de la bougie"
+        }
+      },
+      "warnings": {
+        "no_thermostat": "Ne roulez pas sans thermostat : un moteur trop froid s'abîme comme un moteur trop chaud."
+      },
+      "notes": {
+        "used_engine": "À retenir : sur un moteur d'occasion « qui chauffe », l'ancien propriétaire a souvent déjà changé l'impeller et retiré le thermostat sans résultat. Ne vous fiez pas aux réparations passées : refaites la checklist depuis le début."
+      }
+    },
+    "gearcase": {
+      "title": "Embase, hélice, transmission",
+      "steps": {
+        "gear_oil": {
+          "label": "Huile d'embase laiteuse ou grise = eau → joints spi à refaire",
+          "detail": "Vidange annuelle systématique."
+        },
+        "shear_pin": {
+          "label": "Hélice qui patine, petits moteurs : goupille de cisaillement cassée",
+          "detail": "Elle doit dépasser en T de part et d'autre du moyeu — pièce à 3 €."
+        },
+        "spun_hub": {
+          "label": "Hélice qui patine, plus gros moteurs : moyeu débrayé",
+          "detail": "Sensation de cavitation à l'accélération → re-moyeuter ou remplacer."
+        },
+        "shift_linkage": {
+          "label": "Passage de vitesses dur ou mort : contrôler d'abord la tringlerie et les câbles avant d'ouvrir l'embase"
+        },
+        "corroded_gearcase": {
+          "label": "Embase soudée par la corrosion : progression douce",
+          "detail": "Vis d'abord (dégrippant + chauffe), puis spatules de plus en plus grosses dans le plan de joint, puis pied-de-biche progressif."
+        },
+        "grease_splines": {
+          "label": "Au remontage : graisser cannelures et filetages"
+        }
+      },
+      "warnings": {
+        "cold_shift": "Par grand froid, la tige de shift devient cassante."
+      }
+    },
+    "electrical": {
+      "title": "Électricité : démarreur, solénoïde, batterie",
+      "steps": {
+        "battery": {
+          "label": "Batterie chargée, cosses propres et serrées — toujours commencer là"
+        },
+        "solenoid_jump": {
+          "label": "Clic sans rotation : shunter les deux grosses bornes du solénoïde",
+          "detail": "Le démarreur tourne → solénoïde HS. Il ne tourne pas → démarreur HS."
+        },
+        "solenoid_welded": {
+          "label": "Solénoïde soudé : au multimètre, toute continuité entre les bornes clé retirée = contacts collés → remplacer",
+          "detail": "Ex. 6 Ω au lieu de rien."
+        },
+        "runaway_starter": {
+          "label": "Démarreur qui continue de tourner moteur lancé : débrancher la batterie immédiatement",
+          "detail": "Court-circuit dans le relais ou le bouton."
+        },
+        "connections": {
+          "label": "Connexions refaites proprement : cosses serties puis gaine thermorétractable",
+          "detail": "Jamais de dominos ni de scotch."
+        },
+        "trim_wiring": {
+          "label": "Trim mort à un poste seulement : suivre les fils bleu/vert",
+          "detail": "Un fil coupé est plus probable qu'un moteur de trim HS. Dépannage en mer : vis de relevage manuel."
+        }
+      }
+    },
+    "timing": {
+      "title": "Calage et link & sync",
+      "intro": "Quand : après réfection de carburateur, après remplacement du timer base / stator / power pack, après avoir touché une tringlerie, ou sur un moteur d'occasion inconnu qui présente les symptômes ci-dessous. Pas systématiquement.",
+      "steps": {
+        "shop_manual": {
+          "label": "Manuel d'atelier du modèle en main",
+          "detail": "Aucune valeur générique ne remplace la spec du moteur."
+        },
+        "cam_roller": {
+          "label": "Galet de came présent et intact (souvent cassé sur les vieux moteurs)"
+        },
+        "fast_start_modules": {
+          "label": "Modules « fast start » / S.L.O.W. débranchés si le manuel le demande"
+        },
+        "throttle_cable": {
+          "label": "Câble d'accélérateur débranché"
+        },
+        "tdc_pointer": {
+          "label": "Pointeur de calage vérifié sur le PMH réel du cylindre n°1",
+          "detail": "Deux positions à profondeur de tige identique : le PMH est au milieu."
+        },
+        "wot_stop": {
+          "label": "Butée de plein gaz : papillons horizontaux",
+          "detail": "C'est la vis qui arrête la course, jamais les butées internes du carburateur."
+        },
+        "max_advance": {
+          "label": "Avance max réglée à la spec, jamais au-delà",
+          "detail": "Ordres de grandeur : ~34° BTDC Mercury crossflow ancien, ~21° direct charge, 19–28° OMC crossflow."
+        },
+        "pickup_timing": {
+          "label": "Prise en charge : repère de came aligné au centre du galet",
+          "detail": "Les gaz commencent à s'ouvrir vers 3–5° BTDC."
+        },
+        "warm_mixture": {
+          "label": "Moteur chaud dans l'eau : richesse affinée au ¼ de tour"
+        },
+        "idle_rpm": {
+          "label": "Ralenti 700–800 tr/min au neutre, 550–650 tr/min en prise"
+        },
+        "cable_preload": {
+          "label": "Câble rebranché avec une légère précharge contre la butée de ralenti"
+        },
+        "sea_trial": {
+          "label": "Essai en eau libre : hole shot franc"
+        }
+      },
+      "tables": {
+        "symptoms": {
+          "headers": {
+            "symptom": "Symptôme",
+            "lead": "Piste"
+          },
+          "rows": {
+            "no_start": {
+              "symptom": "Ne démarre pas malgré compression + étincelle + carburateur propre",
+              "lead": "Avance très déréglée"
+            },
+            "high_idle": {
+              "symptom": "Ralenti trop haut, vis en butée",
+              "lead": "Avance trop importante au ralenti"
+            },
+            "acceleration_gap": {
+              "symptom": "Trou à l'accélération",
+              "lead": "Prise en charge trop tôt ou trop tard"
+            },
+            "detonation": {
+              "symptom": "Détonation, cliquetis à plein gaz",
+              "lead": "Avance max trop élevée ⚠️"
+            }
+          }
+        }
+      },
+      "warnings": {
+        "max_advance": "Une avance max excessive perce les pistons. En cas de doute, réglez en retrait."
+      },
+      "notes": {
+        "single_carb": "Mono-carburateur (4–15 ch) : la partie « sync » disparaît. Si le moteur n'a pas de butée d'avance réglable, ça se réduit à alignement came/galet + vis de richesse + butée de ralenti, sans lampe strobo."
+      }
+    },
+    "first_contact": {
+      "title": "Premier contact (achat d'occasion)",
+      "intro": "À dérouler sur place, devant le vendeur, avant toute négociation.",
+      "steps": {
+        "flywheel": {
+          "label": "Volant tourné à la main sur 360°"
+        },
+        "gearshift": {
+          "label": "Vitesses : neutre libre, marche avant et arrière résistantes"
+        },
+        "compression": {
+          "label": "Compression sur chaque cylindre",
+          "detail": "Un vendeur qui refuse ce test cache souvent quelque chose."
+        },
+        "spark": {
+          "label": "Étincelle sur chaque cylindre"
+        },
+        "gear_oil": {
+          "label": "Huile d'embase vidangée un peu : laiteuse = eau"
+        },
+        "external_tank": {
+          "label": "Réservoir externe propre avec essence fraîche — jamais celui du bateau"
+        },
+        "primer_bulb": {
+          "label": "Poire qui durcit, sans fuite ni bruit d'air"
+        },
+        "start_listen": {
+          "label": "Démarrer et écouter le comportement"
+        }
+      },
+      "notes": {
+        "deal_breakers": "Pannes rédhibitoires : piston grippé, embase qui ne passe pas les vitesses."
+      }
+    }
+  },
+  "tooling": {
+    "title": "Outillage à prévoir",
+    "headers": {
+      "tool": "Outil",
+      "usage": "Usage",
+      "price": "Prix"
+    },
+    "items": {
+      "compression_gauge": {
+        "name": "Manomètre de compression",
+        "usage": "Fiche compression",
+        "price": "~30 €"
+      },
+      "spark_tester": {
+        "name": "Testeur d'étincelle en ligne",
+        "usage": "Fiche allumage",
+        "price": "~6 €"
+      },
+      "gap_tool": {
+        "name": "Outil d'écartement de bougie",
+        "usage": "Fiche allumage",
+        "price": "~2 €"
+      },
+      "multimeter": {
+        "name": "Multimètre",
+        "usage": "Fiches allumage et électricité",
+        "price": "15–60 €"
+      },
+      "flywheel_puller": {
+        "name": "Arrache-volant",
+        "usage": "Fiche allumage (accès stator)",
+        "price": "~25 €"
+      },
+      "carb_cleaner": {
+        "name": "Nettoyant carburateur",
+        "usage": "Fiche essence",
+        "price": "~5 €/bombe"
+      },
+      "ir_thermometer": {
+        "name": "Thermomètre infrarouge",
+        "usage": "Fiche refroidissement",
+        "price": "option"
+      },
+      "torque_wrench": {
+        "name": "Clé dynamométrique",
+        "usage": "Fiches compression et refroidissement",
+        "price": "—"
+      },
+      "timing_light": {
+        "name": "Lampe stroboscopique",
+        "usage": "Fiche calage",
+        "price": "30–80 €"
+      },
+      "dva_adapter": {
+        "name": "Adaptateur DVA",
+        "usage": "Fiche allumage (tensions de crête)",
+        "price": "option"
+      },
+      "water_tub": {
+        "name": "Bac d'eau / oreilles de rinçage",
+        "usage": "Obligatoire",
+        "price": "—"
+      },
+      "cdi_guide": {
+        "name": "Guide CDI « Practical Outboard Ignition Troubleshooting »",
+        "usage": "Fiche allumage",
+        "price": "~30 €"
+      }
+    }
+  }
+}

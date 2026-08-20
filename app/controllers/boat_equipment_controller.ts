@@ -1,6 +1,7 @@
 import BoatPolicy from '#policies/boat_policy'
 import { toMediaRow } from '#transformers/media_row_transformer'
 import BoatEquipmentService, { BoatEquipmentNotFoundError } from '#services/boat_equipment_service'
+import BoatEngineDiagnosticService from '#services/boat_engine_diagnostic_service'
 import BoatEnginePartService from '#services/boat_engine_part_service'
 import BoatHullService, { BoatNotFoundError } from '#services/boat_hull_service'
 import BoatMaintenanceService from '#services/boat_maintenance_service'
@@ -35,7 +36,8 @@ export default class BoatEquipmentController {
     private taskService: BoatMaintenanceTaskService,
     private mediaService: MediaService,
     private enginePartService: BoatEnginePartService,
-    private organizationService: OrganizationService
+    private organizationService: OrganizationService,
+    private diagnosticService: BoatEngineDiagnosticService
   ) {}
 
   private async loadBoatForEquipment(ctx: Pick<HttpContext, 'auth' | 'response' | 'params'>) {
@@ -390,11 +392,18 @@ export default class BoatEquipmentController {
 
     const canManage = await bouncer.with(BoatPolicy).allows('edit', boat)
 
-    const [maintenanceEvents, maintenanceTasks, engineMedia, engineParts] = await Promise.all([
+    const [
+      maintenanceEvents,
+      maintenanceTasks,
+      engineMedia,
+      engineParts,
+      diagnosticCheckedStepKeys,
+    ] = await Promise.all([
       this.maintenanceService.listEventsForEngine(boat.id, engineId),
       this.taskService.listForEngine(boat.id, engineId),
       this.mediaService.listForEntity('boat_engine', engineId),
       this.enginePartService.listForEngine(engineId),
+      this.diagnosticService.getCheckedStepKeysIfEligible(engine),
     ])
 
     return inertia.render('boats/engine_show', {
@@ -454,6 +463,7 @@ export default class BoatEquipmentController {
         boatEngineId: t.boatEngineId,
         recurrenceIntervalEngineHours: t.recurrenceIntervalEngineHours,
       })),
+      diagnosticCheckedStepKeys,
       canManage,
     })
   }
