@@ -272,16 +272,19 @@ export default class BoatsController {
           ),
           'maintenance'
         ),
+        // Jamais `null` ici : le serializer d'Inertia jette « Cannot serialize
+        // an item with null value » quand un callback différé résout `null`
+        // (#478) — l'absence d'analyse est donc portée par la liste vide.
         aiSuggestions: inertia.defer(
           deferJson(async () => {
-            if (!user.organizationId) return null
+            if (!user.organizationId) return []
             const latest = await this.aiAnalysisService.getLatestBoatSuggestions(
               user.id,
               boat.id,
               user.organizationId,
               toAppLocale(i18n.locale)
             )
-            return latest ? (JSON.parse(latest.responseText) as AiSuggestion[]) : null
+            return latest ? (JSON.parse(latest.responseText) as AiSuggestion[]) : []
           }),
           'maintenance'
         ),

@@ -21,6 +21,14 @@ Repéré sur la checklist des fiches de maintenance : la case cochée (`border-m
 - **Vérifié** sur `/design-system` et via les styles calculés dans les deux thèmes ; les anciennes classes sont confirmées inertes (aucun CSS généré).
 - Reste un chantier séparé : ~35 usages de paliers `amber`/`sky`/`violet` non définis qui retombent sur les palettes **Tailwind par défaut** (rendu visible mais hors charte, non inversé en sombre).
 
+## 2026-08-20 — Fiche bateau : plus de 500 « Cannot serialize an item with null value » sans suggestion IA (#478)
+
+Repéré sur la sandbox démo (#537) : ouvrir n'importe quel bateau seedé (ex. « Tempête Douce ») déclenchait une 500 `RuntimeException: Cannot serialize an item with null value` (InertiaSerializer de `@adonisjs/http-transformers`).
+
+- **Cause : pas les champs null du bateau.** Le squelette de `/boats/:id` sérialise très bien un bateau aux champs optionnels null (`type`, immatriculation, dimensions…) — le serializer d'Inertia ne jette que lorsqu'un **prop-fonction résout `null`**. Or le prop différé `aiSuggestions` de `boats#show` retournait `null` quand le bateau n'avait aucune analyse IA : la recharge partielle du groupe `maintenance`, déclenchée juste après le rendu (#463), répondait donc 500 pour tout bateau sans suggestion — dont tous les bateaux de la sandbox.
+- **Correctif.** `aiSuggestions` porte l'absence d'analyse par `[]` au lieu de `null` ; `BoatOverviewAiPanel` affiche l'état vide (« Cliquez sur 'Actualiser'… ») pour une liste vide comme pour `null`. La contrainte « un callback différé ne doit jamais résoudre `null` » est documentée dans `app/utils/inertia_defer.ts`.
+- **Tests.** `tests/functional/boats/boats.spec.ts` : GET `/boats/:id` → 200 avec un bateau aux champs optionnels null (profil des bateaux sandbox), et recharge partielle du groupe `maintenance` sans `AiAnalysis` → 200 avec `aiSuggestions: []` (500 sur le code d'avant). `tests/inertia/boat_overview_ai_panel.spec.ts` : état vide pour `null` et `[]`, suggestions rendues pour une liste remplie.
+
 ## 2026-08-20 — Checklists de diagnostic panne pour hors-bord 2 temps (#515)
 
 Nouvelle section « Panne » : des checklists de dépannage guidées dérivées des notes projet (chaîne Boat Busters + manuels OMC/Mercury/CDI), pour les moteurs **hors-bord 2 temps** (`kind = outboard` et `strokeType = 2_stroke`).

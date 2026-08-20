@@ -253,6 +253,59 @@ test.group('Boats (functional)', (group) => {
     )
   })
 
+  test('GET /boats/:id renvoie 200 pour un bateau aux champs optionnels null (#478)', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    // Mêmes trous que les bateaux seedés de la sandbox démo : ni type, ni
+    // immatriculation, ni dimensions.
+    const boat = await BoatFactory.merge({
+      organizationId: user.organizationId!,
+      registrationNumber: null,
+      type: null,
+      lengthM: null,
+      beamM: null,
+    }).create()
+
+    const response = await client.get(`/boats/${boat.id}`).loginAs(user).withInertia()
+
+    response.assertStatus(200)
+    const props = response.inertiaProps as { boat: { type: string | null } }
+    assert.isNull(props.boat.type)
+  })
+
+  test('la visite partielle du groupe maintenance renvoie 200 sans suggestion IA (#478)', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({
+      organizationId: user.organizationId!,
+      registrationNumber: null,
+      type: null,
+    }).create()
+
+    // Aucune AiAnalysis en base : le prop différé `aiSuggestions` ne doit pas
+    // faire jeter « Cannot serialize an item with null value » au serializer
+    // Inertia (un callback différé n'a pas le droit de résoudre `null`).
+    const response = await client
+      .get(`/boats/${boat.id}`)
+      .loginAs(user)
+      .withInertiaPartialReload('boats/show', [
+        'maintenanceEvents',
+        'maintenanceTasks',
+        'maintenanceSheets',
+        'boatDocuments',
+        'equipmentActions',
+        'aiSuggestions',
+      ])
+
+    response.assertStatus(200)
+    const props = response.inertiaProps as { aiSuggestions: unknown }
+    assert.deepEqual(props.aiSuggestions, [])
+  })
+
   test("GET /boats/:id?tab=… expose l'onglet demandé au rendu serveur (#463)", async ({
     client,
     assert,

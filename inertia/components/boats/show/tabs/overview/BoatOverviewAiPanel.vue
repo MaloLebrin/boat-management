@@ -66,7 +66,7 @@ function refreshSuggestions() {
       <BaseSkeleton height-class="h-10" rounded-class="rounded-lg" class="mb-2 opacity-30" />
       <BaseSkeleton height-class="h-10" rounded-class="rounded-lg" class="opacity-20" />
     </template>
-    <template v-else-if="!aiSuggestions">
+    <template v-else-if="!aiSuggestions || aiSuggestions.length === 0">
       <p class="text-sm text-navy-300">{{ t('boats.show.overview.aiEmpty') }}</p>
     </template>
     <template v-else>
