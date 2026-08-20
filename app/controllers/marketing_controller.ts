@@ -1241,12 +1241,21 @@ export default class MarketingController {
     }
   }
 
-  private buildGuidePageData(i18n: { t: (key: string) => string }) {
-    const t = (key: string) => i18n.t(`marketing.guide.${key}`)
+  private buildGuidePageData(i18n: {
+    t: (key: string, params?: Record<string, string>) => string
+  }) {
+    const t = (key: string, params?: Record<string, string>) =>
+      i18n.t(`marketing.guide.${key}`, params)
+
+    /**
+     * Le titre SEO porte l'année en cours : recopiée en dur, elle affichait
+     * encore « 2025 » en août 2026 et datait la page dans les SERP (#476).
+     */
+    const currentYear = String(new Date().getFullYear())
 
     return {
       meta: {
-        title: t('meta_title'),
+        title: t('meta_title', { year: currentYear }),
         description: t('meta_description'),
       },
       guide: {

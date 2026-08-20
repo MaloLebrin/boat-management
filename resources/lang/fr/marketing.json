@@ -1432,7 +1432,7 @@
     "faq_a5": "Si tu es client, depuis l'app (icône en bas à droite) — sinon support@fleetai.app. Bugs critiques traités sous 6h."
   },
   "guide": {
-    "meta_title": "Coût d'entretien bateau 2025 : Guide complet + Simulateur gratuit",
+    "meta_title": "Coût d'entretien bateau {year} : Guide complet + Simulateur gratuit",
     "meta_description": "Découvre le budget réel d'entretien de ton bateau (voilier, catamaran, moteur). Estime tes coûts annuels selon la réglementation Division 240.",
     "hero_eyebrow": "Guide pratique",
     "hero_title": "Quel est le coût d'entretien",
