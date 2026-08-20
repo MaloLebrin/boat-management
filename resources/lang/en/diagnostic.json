@@ -1,0 +1,562 @@
+{
+  "index": {
+    "title": "Troubleshooting",
+    "subtitle": "Guided troubleshooting checklists for your 2-stroke outboard engines. Always start with the global checklist: compression, spark, fuel — in that order.",
+    "enginesTitle": "Your engines",
+    "empty": "No 2-stroke outboard engine in your fleet.",
+    "eligibilityHint": "Troubleshooting checklists apply to 2-stroke outboard engines. Set the kind to \"outboard\" and the cycle to \"2-stroke\" on an engine's page to see it listed here.",
+    "openChecklist": "Open the checklist",
+    "firstContactCard": {
+      "title": "Buying used: first contact",
+      "text": "Going to see a used engine? Follow the first-contact sheet to assess it on the spot without missing anything.",
+      "cta": "Open the sheet"
+    }
+  },
+  "common": {
+    "progress": "{checked}/{total}",
+    "progressLabel": "{checked} step(s) checked out of {total}",
+    "reset": "Reset",
+    "resetConfirm": "Reset this checklist? All checked steps for this engine will be unchecked.",
+    "resetSheetConfirm": "Reset this sheet? Its checked steps will be unchecked for this engine.",
+    "neverDryTitle": "Never run dry",
+    "neverDry": "This sheet involves starting the engine: always in a water tub or with flushing muffs, never dry. A few seconds dry is enough to destroy the impeller.",
+    "backToChecklist": "Back to the checklist",
+    "backToDiagnostic": "Back to troubleshooting",
+    "openSheet": "See the detailed sheet",
+    "sheetLink": "Sheet: {title}",
+    "warningLabel": "Warning",
+    "notesTitle": "Worth remembering",
+    "localStateHint": "This sheet is not tied to any engine in your fleet: checkboxes are not saved and start fresh on your next visit."
+  },
+  "tab": {
+    "title": "Troubleshooting",
+    "openFull": "Open the troubleshooting page"
+  },
+  "global": {
+    "title": "Global checklist — the golden rule",
+    "intro": "Compression → Spark → Fuel. Always in that order. Fuel is tested last even though it is the cause in 7 to 8.5 cases out of 10, only because it is the cheapest repair. Without compression, nothing else matters. Steps are ordered from cheapest to most expensive.",
+    "steps": {
+      "flywheel": {
+        "label": "Flywheel turned by hand through 360° — no hard spot",
+        "detail": "Stuck = seized piston, deal breaker."
+      },
+      "gearshift": {
+        "label": "Gears: propeller free in neutral, resistant in forward and reverse"
+      },
+      "kill_switch": {
+        "label": "Kill switch in place and in the run position"
+      },
+      "fresh_fuel": {
+        "label": "Fresh fuel, properly mixed (50:1 unless spec says otherwise), no water"
+      },
+      "tank_vent": {
+        "label": "Fuel tank cap vent open"
+      },
+      "compression": {
+        "label": "Compression tested on every cylinder"
+      },
+      "spark": {
+        "label": "Spark tested on every cylinder"
+      },
+      "fuel_system": {
+        "label": "Fuel system followed end to end"
+      },
+      "tell_tale": {
+        "label": "Tell-tale stream present at startup"
+      },
+      "gear_oil": {
+        "label": "Gearcase oil checked (milky = water)"
+      },
+      "timing": {
+        "label": "Everything checks out and it still won't run: timing"
+      }
+    },
+    "warnings": {
+      "waterOnly": "Always in a water tub or with flushing muffs. Never dry."
+    }
+  },
+  "sheets": {
+    "compression": {
+      "title": "Low or uneven compression",
+      "intro": "Test: spark plugs removed, gauge threaded into the plug hole, 5 to 8 pulls of the starter rope (or 2 to 4 s on the electric starter), on every cylinder, gauge zeroed between readings.",
+      "steps": {
+        "all_cylinders": {
+          "label": "Compression recorded on all cylinders"
+        },
+        "spread_calculated": {
+          "label": "Spread between cylinders calculated",
+          "detail": "That is criterion #1, not the raw value."
+        },
+        "model_spec": {
+          "label": "Model spec checked",
+          "detail": "Some Johnson/Evinrude 9.5s run perfectly fine at 60–68 PSI."
+        },
+        "retest_after_run": {
+          "label": "Engine sat unused for a long time? Retest after a few hours of running"
+        },
+        "retest_after_head": {
+          "label": "After any cylinder head removal: recheck once torqued to spec"
+        }
+      },
+      "tables": {
+        "criteria": {
+          "headers": {
+            "criterion": "Criterion",
+            "good": "Good",
+            "bad": "Bad"
+          },
+          "rows": {
+            "spread": {
+              "criterion": "Spread between cylinders",
+              "good": "< 12%",
+              "bad": "≥ 13%"
+            },
+            "absolute": {
+              "criterion": "Absolute value",
+              "good": "≥ 100 PSI",
+              "bad": "< 100 PSI (with caveats)"
+            }
+          }
+        }
+      },
+      "warnings": {
+        "gauges": "Gauges vary wildly: a €20 model reads 10 to 15 PSI lower than a professional one. Compare cylinders against each other, never numbers from two different gauges."
+      },
+      "notes": {
+        "over_spread": "If the spread exceeds 12%: rings, scored cylinder, or head gasket. That is the expensive repair — when buying, negotiate very low or walk away."
+      }
+    },
+    "ignition": {
+      "title": "No spark (or weak spark)",
+      "intro": "From simplest to most expensive.",
+      "steps": {
+        "kill_circuit": {
+          "label": "Kill circuit: disconnect the black/yellow wire at the power pack and retest",
+          "detail": "Spark back = fault in the stop circuit (key switch, harness, corroded terminals)."
+        },
+        "plugs": {
+          "label": "New spark plugs, gap checked with a tool (they are not set at the factory), same brand everywhere"
+        },
+        "coils": {
+          "label": "Coils: visual inspection of the gel on the back",
+          "detail": "Dry, cracked, or melted = dead coil. It is the ignition component that fails most often."
+        },
+        "rectifier": {
+          "label": "Rectifier: disconnect the yellow wires and retest (2 seconds, rare case but free)"
+        },
+        "cranking_rpm": {
+          "label": "Cranking speed ≥ 250 rpm (otherwise battery, cables, or starter)"
+        },
+        "grounds": {
+          "label": "Grounds clean, corrosion-free, tight — especially the coil grounds"
+        },
+        "model_id": {
+          "label": "Model + year identified on crowleymarine.com (e.g. J50PLEA = Johnson 50 hp 1999)"
+        },
+        "cdi_measures": {
+          "label": "Stator / timer base / power pack measured in ohms per the CDI guide",
+          "detail": "Sample readings: stator brown ↔ brown/yellow 650–850 Ω (CDI) or 750–950 Ω (OEM); timer base white ↔ green and white ↔ blue 25–30 Ω. A value inside either range is enough."
+        }
+      },
+      "warnings": {
+        "weak_spark": "A spark visible on the tester can still be too weak under compression. If everything else checks out and one cylinder is not firing, try a coil."
+      },
+      "notes": {
+        "triage_all": "Triage rule: no spark on any cylinder → look for what is shared (kill switch, stator, power pack).",
+        "triage_one": "No spark on a single cylinder → that cylinder's plug or coil.",
+        "dva": "Peak voltages require a DVA adapter. If the resistance is good, the voltage almost always is too."
+      }
+    },
+    "fuel": {
+      "title": "Fuel supply (culprit #1)",
+      "intro": "Physically follow the path: tank → hose + primer bulb → filter → pump → carburetor → reed valves.",
+      "sections": {
+        "tank": {
+          "title": "Tank, hose, primer bulb"
+        },
+        "filter_pump": {
+          "title": "Filter and pump"
+        },
+        "carburetor": {
+          "title": "Carburetor (~85% of running problems)"
+        },
+        "reed_valves": {
+          "title": "Reed valves — last resort"
+        }
+      },
+      "steps": {
+        "fresh_fuel": {
+          "label": "Fuel less than a month old, properly mixed, no water"
+        },
+        "tank_vent": {
+          "label": "Cap vent open"
+        },
+        "black_hose_only": {
+          "label": "Black automotive fuel hose only",
+          "detail": "Grey hoses have a liner that ethanol dissolves (debris in the carburetor)."
+        },
+        "primer_bulb": {
+          "label": "Primer bulb fitted following the arrows, it must get completely firm"
+        },
+        "air_leaks": {
+          "label": "Hunt for air leaks: every clamp, every quick connector",
+          "detail": "The slightest hiss = failure."
+        },
+        "filter_direction": {
+          "label": "Filter clean and fitted the right way (arrow)"
+        },
+        "pump_test": {
+          "label": "Pump test: engine dies after 20–60 s? Restart while squeezing the primer bulb continuously",
+          "detail": "If it stays alive on the bulb → pump is dead."
+        },
+        "pump_replace": {
+          "label": "Replace with a new assembled pump rather than a kit"
+        },
+        "carb_photos": {
+          "label": "Photos of hoses and linkages before disassembly"
+        },
+        "carb_removal": {
+          "label": "Removal: air box, hoses, linkage, 2 nuts"
+        },
+        "carb_disassembly": {
+          "label": "Disassembly: bowl, float, needle valve, every jet"
+        },
+        "mixture_screw_count": {
+          "label": "Mixture screw: count the turns while backing it out"
+        },
+        "carb_cleaner": {
+          "label": "Carb cleaner in every hole and orifice, generously — nothing can be damaged"
+        },
+        "cork_float": {
+          "label": "Cork float → replace with a plastic one outright"
+        },
+        "float_level": {
+          "label": "Float level even on every axis (adjust the tab)"
+        },
+        "blow_test": {
+          "label": "Blow test",
+          "detail": "Bowl down → air passes; carburetor upside down → no air passes."
+        },
+        "reassembly": {
+          "label": "Reassembly, then mixture screw adjustment",
+          "detail": "Screw gently seated, backed out 1 to 1¼ turn, fine-tuned by ¼ turn with 20–30 s to react."
+        },
+        "reed_backfire": {
+          "label": "Fuel spitting back out of the carburetor throat, or backfiring?"
+        },
+        "reed_backlight": {
+          "label": "Reeds against the light: light visible between the petals = replace"
+        }
+      },
+      "tables": {
+        "carb_symptoms": {
+          "headers": {
+            "symptom": "Symptom",
+            "cause": "Likely cause"
+          },
+          "rows": {
+            "choke_only": {
+              "symptom": "Only runs with the choke on",
+              "cause": "Clogged idle jet"
+            },
+            "leaking": {
+              "symptom": "Fuel dripping while squeezing the primer bulb",
+              "cause": "Stuck float / needle valve no longer sealing"
+            },
+            "flooding": {
+              "symptom": "Flooding, black plugs",
+              "cause": "Worn needle valve, punctured float, enrichment solenoid powered permanently (~5.5 ± 1.5 Ω)"
+            },
+            "dry_plugs": {
+              "symptom": "Dry plugs, no fuel at all",
+              "cause": "Needle valve stuck closed"
+            },
+            "sneezing": {
+              "symptom": "\"Sneezing\" at idle",
+              "cause": "Too lean → richen"
+            }
+          }
+        }
+      }
+    },
+    "cooling": {
+      "title": "Cooling: no tell-tale stream, overheating",
+      "intro": "From free to heavy.",
+      "steps": {
+        "telltale_nipple": {
+          "label": "Tell-tale nipple: insect nests, mud — run a thin wire through the nipple and its hose",
+          "detail": "Ridiculous cause, extremely common."
+        },
+        "thermostat": {
+          "label": "Thermostat: remove it and run again",
+          "detail": "5 minutes, it settles the question immediately. Corroded shut = classic."
+        },
+        "impeller": {
+          "label": "Impeller: curled, dry, or cracked vanes = replace (~€15, THE #1 maintenance item)",
+          "detail": "Gearcase in reverse before removal, do not lose the key, liquid soap on reassembly."
+        },
+        "drill_test": {
+          "label": "Test before refitting the gearcase: drill on the driveshaft → water must squirt out of the outlet port"
+        },
+        "water_tube": {
+          "label": "New impeller but still nothing? Misaligned copper water tube or clogged internal passages",
+          "detail": "The grommet must seat properly. Garden hose test into the water tube: water must come out at the thermostat housing."
+        },
+        "water_jackets": {
+          "label": "Blocked water jackets (sand, scale): remove the head cover, sometimes the powerhead",
+          "detail": "Heaviest level, everything else must be ruled out first."
+        },
+        "ir_thermometer": {
+          "label": "Check: infrared thermometer on the head near the spark plug"
+        }
+      },
+      "warnings": {
+        "no_thermostat": "Do not run without a thermostat: an engine running too cold wears just like one running too hot."
+      },
+      "notes": {
+        "used_engine": "Worth remembering: on a used engine \"that overheats\", the previous owner has often already replaced the impeller and removed the thermostat with no result. Do not trust past repairs: run the checklist again from the top."
+      }
+    },
+    "gearcase": {
+      "title": "Gearcase, propeller, drivetrain",
+      "steps": {
+        "gear_oil": {
+          "label": "Milky or grey gearcase oil = water → seals to redo",
+          "detail": "Systematic yearly oil change."
+        },
+        "shear_pin": {
+          "label": "Slipping propeller, small engines: broken shear pin",
+          "detail": "It must stick out in a T on both sides of the hub — a €3 part."
+        },
+        "spun_hub": {
+          "label": "Slipping propeller, bigger engines: spun hub",
+          "detail": "Feels like cavitation under acceleration → re-hub or replace."
+        },
+        "shift_linkage": {
+          "label": "Stiff or dead gear shifting: check the linkage and cables first, before opening the gearcase"
+        },
+        "corroded_gearcase": {
+          "label": "Gearcase welded on by corrosion: gentle escalation",
+          "detail": "Bolts first (penetrating oil + heat), then progressively bigger putty knives in the parting line, then a progressive pry bar."
+        },
+        "grease_splines": {
+          "label": "On reassembly: grease splines and threads"
+        }
+      },
+      "warnings": {
+        "cold_shift": "In severe cold, the shift rod becomes brittle."
+      }
+    },
+    "electrical": {
+      "title": "Electrics: starter, solenoid, battery",
+      "steps": {
+        "battery": {
+          "label": "Battery charged, terminals clean and tight — always start there"
+        },
+        "solenoid_jump": {
+          "label": "Click without rotation: jump the solenoid's two large posts",
+          "detail": "Starter spins → dead solenoid. It does not spin → dead starter."
+        },
+        "solenoid_welded": {
+          "label": "Welded solenoid: with a multimeter, any continuity between the posts with the key out = stuck contacts → replace",
+          "detail": "E.g. 6 Ω instead of nothing."
+        },
+        "runaway_starter": {
+          "label": "Starter that keeps spinning with the engine running: disconnect the battery immediately",
+          "detail": "Short circuit in the relay or the button."
+        },
+        "connections": {
+          "label": "Connections redone properly: crimped terminals then heat-shrink tubing",
+          "detail": "Never wire nuts or tape."
+        },
+        "trim_wiring": {
+          "label": "Trim dead at one station only: follow the blue/green wires",
+          "detail": "A cut wire is more likely than a dead trim motor. At-sea workaround: manual tilt release screw."
+        }
+      }
+    },
+    "timing": {
+      "title": "Timing and link & sync",
+      "intro": "When: after a carburetor rebuild, after replacing the timer base / stator / power pack, after touching any linkage, or on an unknown used engine showing the symptoms below. Not systematically.",
+      "steps": {
+        "shop_manual": {
+          "label": "Shop manual for the model in hand",
+          "detail": "No generic value replaces the engine's spec."
+        },
+        "cam_roller": {
+          "label": "Cam follower roller present and intact (often broken on old engines)"
+        },
+        "fast_start_modules": {
+          "label": "\"Fast start\" / S.L.O.W. modules disconnected if the manual says so"
+        },
+        "throttle_cable": {
+          "label": "Throttle cable disconnected"
+        },
+        "tdc_pointer": {
+          "label": "Timing pointer verified against true TDC of cylinder #1",
+          "detail": "Two positions with identical rod depth: TDC is in the middle."
+        },
+        "wot_stop": {
+          "label": "Wide-open-throttle stop: butterflies horizontal",
+          "detail": "The stop screw ends the travel, never the carburetor's internal stops."
+        },
+        "max_advance": {
+          "label": "Max advance set to spec, never beyond",
+          "detail": "Orders of magnitude: ~34° BTDC old Mercury crossflow, ~21° direct charge, 19–28° OMC crossflow."
+        },
+        "pickup_timing": {
+          "label": "Throttle pickup: cam mark aligned with the center of the roller",
+          "detail": "The throttle starts opening around 3–5° BTDC."
+        },
+        "warm_mixture": {
+          "label": "Engine warm in the water: mixture fine-tuned by ¼ turn"
+        },
+        "idle_rpm": {
+          "label": "Idle 700–800 rpm in neutral, 550–650 rpm in gear"
+        },
+        "cable_preload": {
+          "label": "Cable reconnected with a slight preload against the idle stop"
+        },
+        "sea_trial": {
+          "label": "Open-water trial: crisp hole shot"
+        }
+      },
+      "tables": {
+        "symptoms": {
+          "headers": {
+            "symptom": "Symptom",
+            "lead": "Lead"
+          },
+          "rows": {
+            "no_start": {
+              "symptom": "Won't start despite compression + spark + clean carburetor",
+              "lead": "Timing badly out of adjustment"
+            },
+            "high_idle": {
+              "symptom": "Idle too high, screw at its stop",
+              "lead": "Too much advance at idle"
+            },
+            "acceleration_gap": {
+              "symptom": "Hesitation under acceleration",
+              "lead": "Pickup too early or too late"
+            },
+            "detonation": {
+              "symptom": "Detonation, pinging at full throttle",
+              "lead": "Max advance too high ⚠️"
+            }
+          }
+        }
+      },
+      "warnings": {
+        "max_advance": "Excessive max advance burns holes in pistons. When in doubt, set it retarded."
+      },
+      "notes": {
+        "single_carb": "Single carburetor (4–15 hp): the \"sync\" part disappears. If the engine has no adjustable advance stop, it comes down to cam/roller alignment + mixture screw + idle stop, no timing light."
+      }
+    },
+    "first_contact": {
+      "title": "First contact (buying used)",
+      "intro": "To run on the spot, in front of the seller, before any negotiation.",
+      "steps": {
+        "flywheel": {
+          "label": "Flywheel turned by hand through 360°"
+        },
+        "gearshift": {
+          "label": "Gears: neutral free, forward and reverse resistant"
+        },
+        "compression": {
+          "label": "Compression on every cylinder",
+          "detail": "A seller who refuses this test is often hiding something."
+        },
+        "spark": {
+          "label": "Spark on every cylinder"
+        },
+        "gear_oil": {
+          "label": "Gearcase oil drained a little: milky = water"
+        },
+        "external_tank": {
+          "label": "Clean external tank with fresh fuel — never the boat's own"
+        },
+        "primer_bulb": {
+          "label": "Primer bulb that firms up, no leak, no air noise"
+        },
+        "start_listen": {
+          "label": "Start it and listen to how it behaves"
+        }
+      },
+      "notes": {
+        "deal_breakers": "Deal breakers: seized piston, gearcase that will not shift."
+      }
+    }
+  },
+  "tooling": {
+    "title": "Tools to have",
+    "headers": {
+      "tool": "Tool",
+      "usage": "Use",
+      "price": "Price"
+    },
+    "items": {
+      "compression_gauge": {
+        "name": "Compression gauge",
+        "usage": "Compression sheet",
+        "price": "~€30"
+      },
+      "spark_tester": {
+        "name": "Inline spark tester",
+        "usage": "Ignition sheet",
+        "price": "~€6"
+      },
+      "gap_tool": {
+        "name": "Spark plug gap tool",
+        "usage": "Ignition sheet",
+        "price": "~€2"
+      },
+      "multimeter": {
+        "name": "Multimeter",
+        "usage": "Ignition and electrics sheets",
+        "price": "€15–60"
+      },
+      "flywheel_puller": {
+        "name": "Flywheel puller",
+        "usage": "Ignition sheet (stator access)",
+        "price": "~€25"
+      },
+      "carb_cleaner": {
+        "name": "Carburetor cleaner",
+        "usage": "Fuel sheet",
+        "price": "~€5/can"
+      },
+      "ir_thermometer": {
+        "name": "Infrared thermometer",
+        "usage": "Cooling sheet",
+        "price": "optional"
+      },
+      "torque_wrench": {
+        "name": "Torque wrench",
+        "usage": "Compression and cooling sheets",
+        "price": "—"
+      },
+      "timing_light": {
+        "name": "Timing light",
+        "usage": "Timing sheet",
+        "price": "€30–80"
+      },
+      "dva_adapter": {
+        "name": "DVA adapter",
+        "usage": "Ignition sheet (peak voltages)",
+        "price": "optional"
+      },
+      "water_tub": {
+        "name": "Water tub / flushing muffs",
+        "usage": "Mandatory",
+        "price": "—"
+      },
+      "cdi_guide": {
+        "name": "CDI guide \"Practical Outboard Ignition Troubleshooting\"",
+        "usage": "Ignition sheet",
+        "price": "~€30"
+      }
+    }
+  }
+}

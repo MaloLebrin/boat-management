@@ -8,6 +8,7 @@ import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseTabs from '~/components/base/BaseTabs.vue'
 import EngineMaintenanceEventModal from '~/components/engine/show/EngineMaintenanceEventModal.vue'
+import EngineShowTabDiagnostic from '~/components/engine/show/tabs/EngineShowTabDiagnostic.vue'
 import EngineShowTabDocuments from '~/components/engine/show/tabs/EngineShowTabDocuments.vue'
 import EngineShowTabMaintenance from '~/components/engine/show/tabs/EngineShowTabMaintenance.vue'
 import EngineShowTabNotes from '~/components/engine/show/tabs/EngineShowTabNotes.vue'
@@ -15,6 +16,7 @@ import EngineShowTabOverview from '~/components/engine/show/tabs/EngineShowTabOv
 import EngineShowTabParts from '~/components/engine/show/tabs/EngineShowTabParts.vue'
 import EngineShowTabPhotos from '~/components/engine/show/tabs/EngineShowTabPhotos.vue'
 import EngineShowTabSpecs from '~/components/engine/show/tabs/EngineShowTabSpecs.vue'
+import { GLOBAL_CHECKLIST } from '#shared/constants/diagnostic/diagnostic_content'
 import { useT } from '~/composables/use_t'
 import { engineDisplayTitle, engineFuelLabel } from '~/utils/boat_enum_labels'
 import type { BoatShowEngine, MaintenanceEventRow, MaintenanceTaskRow } from '~/types/boat_show'
@@ -26,10 +28,19 @@ const props = defineProps<{
   engine: BoatShowEngine
   maintenanceEvents: MaintenanceEventRow[]
   maintenanceTasks: MaintenanceTaskRow[]
+  diagnosticCheckedStepKeys: string[] | null
   canManage: boolean
 }>()
 
-type TabKey = 'overview' | 'specs' | 'maintenance' | 'notes' | 'parts' | 'photos' | 'documents'
+type TabKey =
+  | 'overview'
+  | 'specs'
+  | 'maintenance'
+  | 'diagnostic'
+  | 'notes'
+  | 'parts'
+  | 'photos'
+  | 'documents'
 const tab = ref<TabKey>('overview')
 const addEventOpen = ref(false)
 
@@ -37,6 +48,7 @@ const VALID_TABS: TabKey[] = [
   'overview',
   'specs',
   'maintenance',
+  'diagnostic',
   'notes',
   'parts',
   'photos',
@@ -153,6 +165,42 @@ const eventsByYearMonth = computed(() => {
 
 const engineTitle = computed(() => engineDisplayTitle(t, props.engine))
 
+const diagnosticCheckedCount = computed(() => {
+  if (props.diagnosticCheckedStepKeys === null) return 0
+  const checked = new Set(props.diagnosticCheckedStepKeys)
+  return GLOBAL_CHECKLIST.steps.filter((step) => checked.has(step.key)).length
+})
+
+const tabs = computed(() => {
+  const items: { key: TabKey; label: string; badge?: string }[] = [
+    { key: 'overview', label: t('boats.engineShow.tabs.overview') },
+    { key: 'specs', label: t('boats.engineShow.tabs.specs') },
+    {
+      key: 'maintenance',
+      label: t('boats.engineShow.tabs.maintenance'),
+      badge: String(openTasks.value.length),
+    },
+  ]
+  if (props.diagnosticCheckedStepKeys !== null) {
+    items.push({
+      key: 'diagnostic',
+      label: t('boats.engineShow.tabs.diagnostic'),
+      badge: `${diagnosticCheckedCount.value}/${GLOBAL_CHECKLIST.steps.length}`,
+    })
+  }
+  items.push(
+    { key: 'notes', label: t('boats.engineShow.tabs.notes') },
+    { key: 'parts', label: t('boats.engineShow.tabs.parts') },
+    {
+      key: 'photos',
+      label: t('boats.engineShow.tabs.photos'),
+      badge: String(props.engine.photos.length || ''),
+    },
+    { key: 'documents', label: t('boats.engineShow.tabs.documents') }
+  )
+  return items
+})
+
 const totalParts = computed(() => {
   return props.maintenanceEvents.reduce((sum, e) => sum + e.parts.length, 0)
 })
@@ -230,26 +278,7 @@ function formatYear(iso: string): string {
         </div>
       </div>
 
-      <BaseTabs
-        v-model="tab"
-        :tabs="[
-          { key: 'overview', label: t('boats.engineShow.tabs.overview') },
-          { key: 'specs', label: t('boats.engineShow.tabs.specs') },
-          {
-            key: 'maintenance',
-            label: t('boats.engineShow.tabs.maintenance'),
-            badge: String(openTasks.length),
-          },
-          { key: 'notes', label: t('boats.engineShow.tabs.notes') },
-          { key: 'parts', label: t('boats.engineShow.tabs.parts') },
-          {
-            key: 'photos',
-            label: t('boats.engineShow.tabs.photos'),
-            badge: String(engine.photos.length || ''),
-          },
-          { key: 'documents', label: t('boats.engineShow.tabs.documents') },
-        ]"
-      />
+      <BaseTabs v-model="tab" :tabs="tabs" />
     </header>
 
     <Transition name="tab" mode="out-in">
@@ -284,6 +313,13 @@ function formatYear(iso: string): string {
           :total-parts="totalParts"
           :can-manage="canManage"
           :events-by-year-month="eventsByYearMonth"
+        />
+        <EngineShowTabDiagnostic
+          v-else-if="tab === 'diagnostic' && diagnosticCheckedStepKeys !== null"
+          :boat-id="boat.id"
+          :engine-id="engine.id"
+          :checked-step-keys="diagnosticCheckedStepKeys"
+          :can-manage="canManage"
         />
         <EngineShowTabNotes
           v-else-if="tab === 'notes'"

@@ -60,7 +60,8 @@ export function useNavSections() {
     if (can('maintenance.view')) {
       maintenanceItems.push(
         { name: t('nav.planning'), path: '/planning', route: null, icon: 'calendar' },
-        { name: t('nav.history'), path: '/maintenance/history', route: null, icon: 'clock' }
+        { name: t('nav.history'), path: '/maintenance/history', route: null, icon: 'clock' },
+        { name: t('nav.diagnostic'), path: '/diagnostic', route: null, icon: 'alert-triangle' }
       )
     }
 

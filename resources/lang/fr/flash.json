@@ -1,4 +1,10 @@
 {
+  "diagnostic": {
+    "resetDone": "Checklist réinitialisée.",
+    "stepNotFound": "Étape de diagnostic inconnue.",
+    "notEligible": "Les checklists de diagnostic ne concernent que les moteurs hors-bord 2 temps.",
+    "sheetNotFound": "Fiche de diagnostic introuvable."
+  },
   "engine": {
     "added": "Moteur ajouté.",
     "updated": "Moteur mis à jour.",

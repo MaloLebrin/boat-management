@@ -14,6 +14,7 @@ import type BoatReservationTransformer from '#transformers/boat_reservation_tran
 import type BoatTransformer from '#transformers/boat_transformer'
 import type BudgetTransformer from '#transformers/budget_transformer'
 import type ClientTransformer from '#transformers/client_transformer'
+import type DiagnosticTransformer from '#transformers/diagnostic_transformer'
 import type InvoiceTransformer from '#transformers/invoice_transformer'
 import type MaintenanceTransformer from '#transformers/maintenance_transformer'
 import type MediaRowTransformer from '#transformers/media_row_transformer'
@@ -62,6 +63,10 @@ export namespace Data {
   export type Client = InferData<ClientTransformer>
   export namespace Client {
     export type Variants = InferVariants<ClientTransformer>
+  }
+  export type Diagnostic = InferData<DiagnosticTransformer>
+  export namespace Diagnostic {
+    export type Variants = InferVariants<DiagnosticTransformer>
   }
   export type Invoice = InferData<InvoiceTransformer>
   export namespace Invoice {

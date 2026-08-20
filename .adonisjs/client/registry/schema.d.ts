@@ -1795,282 +1795,6 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/spots_controller').default['destroy']>>>
     }
   }
-  'home': {
-    methods: ["GET","HEAD"]
-    pattern: '/'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: unknown
-      errorResponse: unknown
-    }
-  }
-  'marketing.en.home': {
-    methods: ["GET","HEAD"]
-    pattern: '/en'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['home']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['home']>>>
-    }
-  }
-  'marketing.en.pricing': {
-    methods: ["GET","HEAD"]
-    pattern: '/en/pricing'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['pricing']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['pricing']>>>
-    }
-  }
-  'marketing.en.pricing_legacy': {
-    methods: ["GET","HEAD"]
-    pattern: '/en/tarifs'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: unknown
-      errorResponse: unknown
-    }
-  }
-  'marketing.en.simulator': {
-    methods: ["GET","HEAD"]
-    pattern: '/en/maintenance-cost-simulator'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['simulator']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['simulator']>>>
-    }
-  }
-  'marketing.en.guide': {
-    methods: ["GET","HEAD"]
-    pattern: '/en/boat-maintenance-cost'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['guide']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['guide']>>>
-    }
-  }
-  'marketing.en.privacy': {
-    methods: ["GET","HEAD"]
-    pattern: '/en/privacy'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['privacy']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['privacy']>>>
-    }
-  }
-  'marketing.fr.home': {
-    methods: ["GET","HEAD"]
-    pattern: '/fr'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['home']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['home']>>>
-    }
-  }
-  'marketing.fr.pricing': {
-    methods: ["GET","HEAD"]
-    pattern: '/fr/tarifs'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['pricing']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['pricing']>>>
-    }
-  }
-  'marketing.fr.simulator': {
-    methods: ["GET","HEAD"]
-    pattern: '/fr/simulateur-cout-entretien'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['simulator']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['simulator']>>>
-    }
-  }
-  'marketing.fr.guide': {
-    methods: ["GET","HEAD"]
-    pattern: '/fr/cout-entretien-bateau'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['guide']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['guide']>>>
-    }
-  }
-  'marketing.fr.privacy': {
-    methods: ["GET","HEAD"]
-    pattern: '/fr/confidentialite'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['privacy']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['privacy']>>>
-    }
-  }
-  'marketing.en.about': {
-    methods: ["GET","HEAD"]
-    pattern: '/en/about'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['about']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['about']>>>
-    }
-  }
-  'marketing.fr.about': {
-    methods: ["GET","HEAD"]
-    pattern: '/fr/a-propos'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['about']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['about']>>>
-    }
-  }
-  'marketing.en.contact': {
-    methods: ["GET","HEAD"]
-    pattern: '/en/contact'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['contact']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['contact']>>>
-    }
-  }
-  'marketing.fr.contact': {
-    methods: ["GET","HEAD"]
-    pattern: '/fr/contact'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['contact']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['contact']>>>
-    }
-  }
-  'marketing.contact': {
-    methods: ["GET","HEAD"]
-    pattern: '/contact'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['contact']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['contact']>>>
-    }
-  }
-  'simulator.session': {
-    methods: ["POST"]
-    pattern: '/simulator/session'
-    types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/simulator').simulatorValidator)>>
-      paramsTuple: []
-      params: {}
-      query: ExtractQuery<InferInput<(typeof import('#validators/simulator').simulatorValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/simulator_controller').default['saveSession']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/simulator_controller').default['saveSession']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'simulator.create_boat': {
-    methods: ["POST"]
-    pattern: '/boats/from-simulator'
-    types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/simulator').simulatorValidator)>>
-      paramsTuple: []
-      params: {}
-      query: ExtractQuery<InferInput<(typeof import('#validators/simulator').simulatorValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/simulator_controller').default['createBoat']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/simulator_controller').default['createBoat']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'simulator.lead': {
-    methods: ["POST"]
-    pattern: '/simulator/lead'
-    types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/simulator_lead').simulatorLeadValidator)>>
-      paramsTuple: []
-      params: {}
-      query: ExtractQuery<InferInput<(typeof import('#validators/simulator_lead').simulatorLeadValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/simulator_lead_controller').default['store']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/simulator_lead_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'simulator.share.store': {
-    methods: ["POST"]
-    pattern: '/simulator/share'
-    types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/simulator_share').simulatorShareValidator)>>
-      paramsTuple: []
-      params: {}
-      query: ExtractQuery<InferInput<(typeof import('#validators/simulator_share').simulatorShareValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/simulator_share_controller').default['store']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/simulator_share_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'simulator.share.show.fr': {
-    methods: ["GET","HEAD"]
-    pattern: '/simulateur/r/:token'
-    types: {
-      body: {}
-      paramsTuple: [ParamValue]
-      params: { token: ParamValue }
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/simulator_share_controller').default['show']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/simulator_share_controller').default['show']>>>
-    }
-  }
-  'simulator.share.show.en': {
-    methods: ["GET","HEAD"]
-    pattern: '/simulator/r/:token'
-    types: {
-      body: {}
-      paramsTuple: [ParamValue]
-      params: { token: ParamValue }
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/simulator_share_controller').default['show']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/simulator_share_controller').default['show']>>>
-    }
-  }
   'planning.index': {
     methods: ["GET","HEAD"]
     pattern: '/planning'
@@ -2465,6 +2189,78 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/maintenance_history_pdf_controller').default['download']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/maintenance_history_pdf_controller').default['download']>>>
+    }
+  }
+  'diagnostic.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/diagnostic'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_engine_diagnostic_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_engine_diagnostic_controller').default['index']>>>
+    }
+  }
+  'diagnostic.firstContact': {
+    methods: ["GET","HEAD"]
+    pattern: '/diagnostic/first-contact'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_engine_diagnostic_controller').default['firstContact']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_engine_diagnostic_controller').default['firstContact']>>>
+    }
+  }
+  'diagnostic.checklist': {
+    methods: ["GET","HEAD"]
+    pattern: '/boats/:boatId/engines/:engineId/diagnostic'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; engineId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_engine_diagnostic_controller').default['checklist']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_engine_diagnostic_controller').default['checklist']>>>
+    }
+  }
+  'diagnostic.sheet': {
+    methods: ["GET","HEAD"]
+    pattern: '/boats/:boatId/engines/:engineId/diagnostic/sheets/:sheetSlug'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue, ParamValue]
+      params: { boatId: ParamValue; engineId: ParamValue; sheetSlug: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_engine_diagnostic_controller').default['sheet']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_engine_diagnostic_controller').default['sheet']>>>
+    }
+  }
+  'diagnostic.steps.toggle': {
+    methods: ["PATCH"]
+    pattern: '/boats/:boatId/engines/:engineId/diagnostic/steps'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/boat_engine_diagnostic').toggleDiagnosticStepValidator)>>
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; engineId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/boat_engine_diagnostic').toggleDiagnosticStepValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_engine_diagnostic_controller').default['toggleStep']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_engine_diagnostic_controller').default['toggleStep']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'diagnostic.reset': {
+    methods: ["DELETE"]
+    pattern: '/boats/:boatId/engines/:engineId/diagnostic/checks'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/boat_engine_diagnostic').resetDiagnosticValidator)>>
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; engineId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/boat_engine_diagnostic').resetDiagnosticValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_engine_diagnostic_controller').default['reset']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_engine_diagnostic_controller').default['reset']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'organization.members.index': {
@@ -3257,6 +3053,366 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/ai_controller').default['boatSuggestions']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/ai_controller').default['boatSuggestions']>>>
+    }
+  }
+  'home': {
+    methods: ["GET","HEAD"]
+    pattern: '/'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'marketing.en.home': {
+    methods: ["GET","HEAD"]
+    pattern: '/en'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['home']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['home']>>>
+    }
+  }
+  'marketing.en.pricing': {
+    methods: ["GET","HEAD"]
+    pattern: '/en/pricing'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['pricing']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['pricing']>>>
+    }
+  }
+  'marketing.en.pricing_legacy': {
+    methods: ["GET","HEAD"]
+    pattern: '/en/tarifs'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'marketing.en.simulator': {
+    methods: ["GET","HEAD"]
+    pattern: '/en/maintenance-cost-simulator'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['simulator']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['simulator']>>>
+    }
+  }
+  'marketing.en.guide': {
+    methods: ["GET","HEAD"]
+    pattern: '/en/boat-maintenance-cost'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['guide']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['guide']>>>
+    }
+  }
+  'marketing.en.privacy': {
+    methods: ["GET","HEAD"]
+    pattern: '/en/privacy'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['privacy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['privacy']>>>
+    }
+  }
+  'marketing.en.terms': {
+    methods: ["GET","HEAD"]
+    pattern: '/en/terms'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['terms']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['terms']>>>
+    }
+  }
+  'marketing.en.sales_terms': {
+    methods: ["GET","HEAD"]
+    pattern: '/en/sales-terms'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['salesTerms']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['salesTerms']>>>
+    }
+  }
+  'marketing.en.legal_notice': {
+    methods: ["GET","HEAD"]
+    pattern: '/en/legal-notice'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['legalNotice']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['legalNotice']>>>
+    }
+  }
+  'marketing.fr.home': {
+    methods: ["GET","HEAD"]
+    pattern: '/fr'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['home']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['home']>>>
+    }
+  }
+  'marketing.fr.pricing': {
+    methods: ["GET","HEAD"]
+    pattern: '/fr/tarifs'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['pricing']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['pricing']>>>
+    }
+  }
+  'marketing.fr.simulator': {
+    methods: ["GET","HEAD"]
+    pattern: '/fr/simulateur-cout-entretien'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['simulator']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['simulator']>>>
+    }
+  }
+  'marketing.fr.guide': {
+    methods: ["GET","HEAD"]
+    pattern: '/fr/cout-entretien-bateau'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['guide']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['guide']>>>
+    }
+  }
+  'marketing.fr.privacy': {
+    methods: ["GET","HEAD"]
+    pattern: '/fr/confidentialite'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['privacy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['privacy']>>>
+    }
+  }
+  'marketing.fr.terms': {
+    methods: ["GET","HEAD"]
+    pattern: '/fr/cgu'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['terms']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['terms']>>>
+    }
+  }
+  'marketing.fr.sales_terms': {
+    methods: ["GET","HEAD"]
+    pattern: '/fr/cgv'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['salesTerms']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['salesTerms']>>>
+    }
+  }
+  'marketing.fr.legal_notice': {
+    methods: ["GET","HEAD"]
+    pattern: '/fr/mentions-legales'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['legalNotice']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['legalNotice']>>>
+    }
+  }
+  'marketing.en.about': {
+    methods: ["GET","HEAD"]
+    pattern: '/en/about'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['about']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['about']>>>
+    }
+  }
+  'marketing.fr.about': {
+    methods: ["GET","HEAD"]
+    pattern: '/fr/a-propos'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['about']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['about']>>>
+    }
+  }
+  'marketing.en.contact': {
+    methods: ["GET","HEAD"]
+    pattern: '/en/contact'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['contact']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['contact']>>>
+    }
+  }
+  'marketing.fr.contact': {
+    methods: ["GET","HEAD"]
+    pattern: '/fr/contact'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['contact']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['contact']>>>
+    }
+  }
+  'marketing.contact': {
+    methods: ["GET","HEAD"]
+    pattern: '/contact'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['contact']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['contact']>>>
+    }
+  }
+  'marketing.contact.store': {
+    methods: ["POST"]
+    pattern: '/contact'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/contact').contactMessageValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/contact').contactMessageValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/contact_messages_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/contact_messages_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'simulator.session': {
+    methods: ["POST"]
+    pattern: '/simulator/session'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/simulator').simulatorValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/simulator').simulatorValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/simulator_controller').default['saveSession']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/simulator_controller').default['saveSession']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'simulator.create_boat': {
+    methods: ["POST"]
+    pattern: '/boats/from-simulator'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/simulator').simulatorValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/simulator').simulatorValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/simulator_controller').default['createBoat']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/simulator_controller').default['createBoat']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'simulator.lead': {
+    methods: ["POST"]
+    pattern: '/simulator/lead'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/simulator_lead').simulatorLeadValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/simulator_lead').simulatorLeadValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/simulator_lead_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/simulator_lead_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'simulator.share.store': {
+    methods: ["POST"]
+    pattern: '/simulator/share'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/simulator_share').simulatorShareValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/simulator_share').simulatorShareValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/simulator_share_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/simulator_share_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'simulator.share.show.fr': {
+    methods: ["GET","HEAD"]
+    pattern: '/simulateur/r/:token'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { token: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/simulator_share_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/simulator_share_controller').default['show']>>>
+    }
+  }
+  'simulator.share.show.en': {
+    methods: ["GET","HEAD"]
+    pattern: '/simulator/r/:token'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { token: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/simulator_share_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/simulator_share_controller').default['show']>>>
     }
   }
   'demo.login': {

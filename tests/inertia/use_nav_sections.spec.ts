@@ -275,7 +275,7 @@ test('mechanic sees only dashboard (fleet) and the maintenance section', () => {
   expect(fleetNames).toEqual(['nav.dashboard'])
 
   const maintenanceNames = navSections.value[1].items.map((i) => i.name)
-  expect(maintenanceNames).toEqual(['nav.planning', 'nav.history'])
+  expect(maintenanceNames).toEqual(['nav.planning', 'nav.history', 'nav.diagnostic'])
 })
 
 test('a user with zero capabilities only sees the dashboard item', () => {

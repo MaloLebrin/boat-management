@@ -9,6 +9,7 @@ export const controllers = {
   Billing: () => import('#controllers/billing_controller'),
   BoatBudgetEntry: () => import('#controllers/boat_budget_entry_controller'),
   BoatDocuments: () => import('#controllers/boat_documents_controller'),
+  BoatEngineDiagnostic: () => import('#controllers/boat_engine_diagnostic_controller'),
   BoatEngineParts: () => import('#controllers/boat_engine_parts_controller'),
   BoatEquipmentActions: () => import('#controllers/boat_equipment_actions_controller'),
   BoatEquipment: () => import('#controllers/boat_equipment_controller'),
