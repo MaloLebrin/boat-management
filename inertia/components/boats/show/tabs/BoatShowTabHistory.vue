@@ -1,34 +1,45 @@
 <script setup lang="ts">
+import { Link } from '@adonisjs/inertia/vue'
 import { DocumentTextIcon } from '@heroicons/vue/24/outline'
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseSegmentedControl from '~/components/base/BaseSegmentedControl.vue'
 import { subjectLabel, targetDescription } from '~/components/boats/maintenance/utils'
 import BoatMaintenanceEventModal from '~/components/boats/show/modals/BoatMaintenanceEventModal.vue'
+import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
-import type { BoatShowDetail, MaintenanceEventRow } from '~/types/boat_show'
+import type { BoatCreateIntent, BoatShowDetail, MaintenanceEventRow } from '~/types/boat_show'
 
-const props = defineProps<{
-  boat: BoatShowDetail
-  maintenanceEvents: MaintenanceEventRow[]
-  canManageMaintenance: boolean
-  createEventNonce?: number
-}>()
+const props = withDefaults(
+  defineProps<{
+    boat: BoatShowDetail
+    maintenanceEvents: MaintenanceEventRow[]
+    canManageMaintenance: boolean
+    canExport: boolean
+    createIntent?: BoatCreateIntent
+  }>(),
+  { createIntent: null }
+)
+
+const emit = defineEmits<{ createIntentConsumed: [] }>()
 
 const { t } = useT()
+const { formatMonthYear } = useDateFormat()
 
 const isEventModalOpen = ref(false)
 
-watch(
-  () => props.createEventNonce,
-  (v) => {
-    if (!v) return
-    if (!props.canManageMaintenance) return
-    isEventModalOpen.value = true
-  }
-)
+// L'onglet est monté après la demande d'ouverture : on consomme l'intention au
+// montage (et si elle change alors que l'onglet est déjà affiché) — #358.
+function consumeCreateIntent() {
+  if (props.createIntent !== 'event') return
+  if (props.canManageMaintenance) isEventModalOpen.value = true
+  emit('createIntentConsumed')
+}
+
+onMounted(consumeCreateIntent)
+watch(() => props.createIntent, consumeCreateIntent)
 
 const historyFilter = ref<'all' | 'engine' | 'sail' | 'rig' | 'boat'>('all')
 const historySearch = ref('')
@@ -74,9 +85,7 @@ const historyStats = computed(() => {
 })
 
 function formatMonth(monthKey: string): string {
-  const [year, month] = monthKey.split('-')
-  const date = new Date(Number(year), Number(month) - 1, 1)
-  return date.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })
+  return formatMonthYear(`${monthKey}-01`)
 }
 
 function toggleEventDetails(eventId: number) {
@@ -147,15 +156,15 @@ function getSubjectLink(ev: MaintenanceEventRow): string {
                   <div>
                     <p class="font-semibold text-fg">{{ ev.title }}</p>
                     <p class="text-sm text-fg-muted">
-                      <a
+                      <Link
                         :href="getSubjectLink(ev)"
                         class="hover:text-brand hover:underline transition-colors"
                       >
-                        {{ subjectLabel(ev.subject) }}
-                        <span v-if="targetDescription(ev) !== subjectLabel(ev.subject)">
-                          · {{ targetDescription(ev) }}
+                        {{ subjectLabel(t, ev.subject) }}
+                        <span v-if="targetDescription(t, ev)">
+                          · {{ targetDescription(t, ev) }}
                         </span>
-                      </a>
+                      </Link>
                     </p>
                     <div v-if="ev.parts.length > 0" class="mt-2 flex items-center gap-2">
                       <BaseBadge variant="neutral">
@@ -211,11 +220,20 @@ function getSubjectLink(ev: MaintenanceEventRow): string {
           </div>
         </dl>
       </BaseCard>
-      <!-- TODO: implement PDF export for maintenance history (e.g. GET /boats/:id/maintenance/history.pdf) -->
-      <BaseButton variant="secondary" size="sm" class="w-full" disabled>
-        <DocumentTextIcon class="h-4 w-4 mr-2" />
-        {{ t('boats.show.historyTab.exportPdf') }}
-      </BaseButton>
+      <!-- eslint-disable vue/no-restricted-v-bind -- téléchargement PDF : une visite Inertia rendrait le binaire comme une page -->
+      <a
+        v-if="canExport"
+        :href="`/boats/${boat.id}/maintenance-log.pdf`"
+        target="_blank"
+        rel="noopener"
+        class="block"
+      >
+        <BaseButton variant="secondary" size="sm" class="w-full" type="button">
+          <DocumentTextIcon class="h-4 w-4 mr-2" />
+          {{ t('boats.show.historyTab.exportPdf') }}
+        </BaseButton>
+      </a>
+      <!-- eslint-enable vue/no-restricted-v-bind -->
     </div>
   </div>
 </template>

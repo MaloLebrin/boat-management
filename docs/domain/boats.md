@@ -41,13 +41,24 @@ Référence routes: `start/routes/boats.ts`.
     - `BoatService.getForUserOrFail`
     - `BoatMaintenanceService.listForBoat`
     - `BoatMaintenanceTaskService.listForBoat`
+  - Props différées (#463) : la visite initiale ne renvoie que le **squelette**
+    (`toShowShellProps` — bateau, photos, position, droits, tarifs, `initialTab`).
+    Les données d'onglet sont chargées ensuite par `inertia.defer(…, groupe)`,
+    en deux groupes parallèles :
+    - `maintenance` : `maintenanceEvents`, `maintenanceTasks`, `maintenanceSheets`,
+      `boatDocuments`, `equipmentActions`, `aiSuggestions`
+    - `navigation` : `navigationLogs`, `fuelLogs`, `incidents`, `portOptions`,
+      `crewMemberOptions`
+  - `initialTab` : valeur brute du `?tab=`, résolue côté serveur pour que le SSR
+    rende directement le bon onglet (sinon flash d'Aperçu à l'hydratation)
   - Page: `inertia/pages/boats/show.vue`
   - Composants:
     - `inertia/components/boats/hull/BoatShowSpecsCard.vue`
     - `inertia/components/boats/engine/BoatShowEnginesCard.vue`
     - `inertia/components/boats/sail/BoatShowSailsCard.vue`
     - `inertia/components/boats/rig/BoatShowRigCard.vue`
-    - `inertia/components/boats/maintenance/BoatShowMaintenanceSection.vue`
+    - `inertia/components/boats/show/tabs/BoatShowTabTasks.vue`
+    - `inertia/components/boats/show/tabs/BoatShowTabHistory.vue`
 - `GET /boats/:id/edit` (`boats.edit`)
   - Controller: `BoatsController.edit`
   - Page: `inertia/pages/boats/edit.vue`

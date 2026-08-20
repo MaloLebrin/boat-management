@@ -4,7 +4,7 @@ import { Head } from '@inertiajs/vue3'
 import BaseBreadcrumb from '~/components/base/BaseBreadcrumb.vue'
 import InspectionComparison from '~/components/reservations/inspection/InspectionComparison.vue'
 import InspectionPanel from '~/components/reservations/inspection/InspectionPanel.vue'
-import { useReservationFormat } from '~/composables/use_reservation_format'
+import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import type { BoatReservationRow } from '~/types/reservation'
 import type { InspectionWithPhotos } from '~/types/inspection'
@@ -20,13 +20,13 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
-const { formatDate } = useReservationFormat()
+const { formatDate } = useDateFormat()
 
 const checkout = computed(() => props.inspections.find((i) => i.kind === 'checkout') ?? null)
 const checkin = computed(() => props.inspections.find((i) => i.kind === 'checkin') ?? null)
 
 const breadcrumbs = computed(() => [
-  { label: t('nav.myBoats'), href: '/boats' },
+  { label: t('boats.index.title'), href: '/boats' },
   { label: props.boat.name, href: `/boats/${props.boat.id}` },
   { label: t('reservations.title'), href: `/boats/${props.boat.id}/reservations` },
   { label: t('inspections.title') },

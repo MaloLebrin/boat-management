@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Link } from '@adonisjs/inertia/vue'
 import { computed } from 'vue'
 import { CheckCircleIcon, CheckIcon } from '@heroicons/vue/24/outline'
 import BaseBadge from '~/components/base/BaseBadge.vue'
@@ -19,7 +20,7 @@ type Plan = {
 interface Props {
   plans: { starter: Plan; pro: Plan; enterprise: Plan }
   billing: 'monthly' | 'annual'
-  trust: { noCard: string; cancel: string; euData: string; trial?: string; joinedBy?: string }
+  trust: { noCard: string; cancel: string; euData: string; freeForever?: string; joinedBy?: string }
   signupLabel: string
   locale: 'en' | 'fr'
 }
@@ -75,9 +76,9 @@ const proPrice = computed(() => {
           <footer class="mt-1 not-italic font-medium">— {{ plans.starter.quote.author }}</footer>
         </blockquote>
         <template #footer>
-          <a href="/signup">
+          <Link href="/signup">
             <BaseButton variant="secondary">{{ signupLabel }}</BaseButton>
-          </a>
+          </Link>
         </template>
       </BaseCard>
 
@@ -176,18 +177,18 @@ const proPrice = computed(() => {
           <footer class="mt-1 not-italic font-medium">— {{ plans.enterprise.quote.author }}</footer>
         </blockquote>
         <template #footer>
-          <a href="/signup">
+          <Link href="/signup">
             <BaseButton variant="secondary">{{ signupLabel }}</BaseButton>
-          </a>
+          </Link>
         </template>
       </BaseCard>
     </section>
 
     <!-- Trust signals -->
     <div class="mt-6 flex flex-wrap items-center justify-center gap-4 text-sm text-fg-muted">
-      <span v-if="trust?.trial" class="flex items-center gap-1.5 font-semibold text-navy-700">
-        <span class="h-1.5 w-1.5 rounded-full bg-navy-700" />
-        {{ trust.trial }}
+      <span v-if="trust?.freeForever" class="flex items-center gap-1.5 font-semibold text-brand">
+        <span class="h-1.5 w-1.5 rounded-full bg-brand" />
+        {{ trust.freeForever }}
       </span>
       <span v-if="trust?.noCard" class="flex items-center gap-1.5">
         <span class="h-1.5 w-1.5 rounded-full bg-mint-700" />

@@ -6,8 +6,9 @@ import BaseHeading from '~/components/base/BaseHeading.vue'
 import PlanningCalendar from '~/components/planning/PlanningCalendar.vue'
 import PlanningKanban from '~/components/planning/PlanningKanban.vue'
 import { computed, ref } from 'vue'
-import { router } from '@inertiajs/vue3'
+import { Head, router, usePage } from '@inertiajs/vue3'
 import { useT } from '~/composables/use_t'
+import { usePermissions } from '~/composables/use_permissions'
 
 const props = defineProps<{
   tasks: PlanningTask[]
@@ -22,6 +23,26 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
+const page = usePage()
+const { can } = usePermissions()
+
+/**
+ * Tâche ciblée par `/planning?task=<id>` — le dashboard mécanicien y envoie
+ * depuis ses cartes d'intervention (#473). Lu sur `page.url` (et non
+ * `window.location`) pour que le SSR rende déjà la carte surlignée.
+ */
+const highlightedTaskId = computed(() => {
+  const query = page.url.split('?')[1]
+  if (!query) return null
+  const raw = new URLSearchParams(query).get('task')
+  if (!raw) return null
+  const id = Number(raw)
+  return Number.isInteger(id) && id > 0 ? id : null
+})
+
+// L'action de l'état vide mène à /boats, qui exige `boats.view` : inutile de la
+// proposer à un mécanicien, qui n'y récolterait qu'un 403 (#473).
+const canViewBoats = computed(() => can('boats.view'))
 
 type ViewMode = 'kanban' | 'calendar'
 const viewMode = ref<ViewMode>('kanban')
@@ -36,6 +57,8 @@ function handleUngroup(groupId: string) {
 </script>
 
 <template>
+  <Head :title="t('planning.title')" />
+
   <div class="w-full max-w-7xl flex-col px-6 py-10 sm:px-8">
     <!-- Page header -->
     <div class="mb-6 flex flex-wrap items-start justify-between gap-4">
@@ -54,7 +77,7 @@ function handleUngroup(groupId: string) {
           :class="[
             'gap-1.5 border transition-colors',
             groupingEnabled
-              ? 'border-navy-300 bg-navy-50 text-navy-700'
+              ? 'border-brand bg-brand-soft text-brand'
               : 'border-border bg-surface text-fg-muted hover:text-fg',
           ]"
           @click="groupingEnabled = !groupingEnabled"
@@ -121,7 +144,7 @@ function handleUngroup(groupId: string) {
     <!-- Pro teaser when starter plan -->
     <div
       v-if="!canGroupTasks && tasks.length > 0"
-      class="mb-4 flex items-center gap-3 rounded-lg border border-navy-200 bg-navy-50 px-4 py-3 text-sm text-navy-700"
+      class="mb-4 flex items-center gap-3 rounded-lg border border-border bg-brand-soft px-4 py-3 text-sm text-brand"
     >
       <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
@@ -139,7 +162,7 @@ function handleUngroup(groupId: string) {
       <BaseEmptyState
         :title="t('planning.empty.title')"
         :description="t('planning.empty.description')"
-        :action-label="t('planning.empty.action')"
+        :action-label="canViewBoats ? t('planning.empty.action') : undefined"
         @action="router.visit('/boats')"
       />
     </div>
@@ -155,6 +178,7 @@ function handleUngroup(groupId: string) {
       :groups="groups"
       :grouping-enabled="groupingEnabled"
       :dismissed-group-ids="dismissedGroupIds"
+      :highlighted-task-id="highlightedTaskId"
       @ungroup="handleUngroup"
     />
 

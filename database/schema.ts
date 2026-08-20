@@ -13,6 +13,7 @@ export class AiAnalysisSchema extends BaseModel {
     'createdAt',
     'id',
     'kind',
+    'locale',
     'organizationId',
     'responseText',
     'userId',
@@ -26,6 +27,8 @@ export class AiAnalysisSchema extends BaseModel {
   declare id: number
   @column()
   declare kind: string
+  @column()
+  declare locale: string
   @column()
   declare organizationId: number | null
   @column()
@@ -703,6 +706,19 @@ export class BoatMaintenanceTaskSchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class BoatOwnerSchema extends BaseModel {
+  static $columns = ['boatId', 'createdAt', 'id', 'userId'] as const
+  $columns = BoatOwnerSchema.$columns
+  @column()
+  declare boatId: number
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare userId: number
+}
+
 export class BoatPortStaySchema extends BaseModel {
   static $columns = [
     'boatId',
@@ -1123,6 +1139,45 @@ export class ClientSchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class ContactMessageSchema extends BaseModel {
+  static $columns = [
+    'createdAt',
+    'email',
+    'firstName',
+    'fleetSize',
+    'id',
+    'ipAddress',
+    'lastName',
+    'locale',
+    'message',
+    'organization',
+    'subject',
+  ] as const
+  $columns = ContactMessageSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare email: string
+  @column()
+  declare firstName: string
+  @column()
+  declare fleetSize: string | null
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare ipAddress: string | null
+  @column()
+  declare lastName: string
+  @column()
+  declare locale: string
+  @column()
+  declare message: string
+  @column()
+  declare organization: string | null
+  @column()
+  declare subject: string
+}
+
 export class CrewCertificationSchema extends BaseModel {
   static $columns = [
     'createdAt',
@@ -1511,6 +1566,7 @@ export class NotificationSchema extends BaseModel {
 export class OrganizationInvitationSchema extends BaseModel {
   static $columns = [
     'acceptedAt',
+    'boatIds',
     'createdAt',
     'email',
     'expiresAt',
@@ -1525,6 +1581,8 @@ export class OrganizationInvitationSchema extends BaseModel {
   $columns = OrganizationInvitationSchema.$columns
   @column.dateTime()
   declare acceptedAt: DateTime | null
+  @column()
+  declare boatIds: any | null
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
   @column()
@@ -1600,6 +1658,7 @@ export class OrganizationSchema extends BaseModel {
     'aiSystemPrompt',
     'appName',
     'createdAt',
+    'fleetSize',
     'id',
     'logoPublicId',
     'logoUrl',
@@ -1610,6 +1669,7 @@ export class OrganizationSchema extends BaseModel {
     'slug',
     'storageUsedBytes',
     'stripeCustomerId',
+    'type',
     'updatedAt',
   ] as const
   $columns = OrganizationSchema.$columns
@@ -1621,6 +1681,8 @@ export class OrganizationSchema extends BaseModel {
   declare appName: string | null
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
+  @column()
+  declare fleetSize: string | null
   @column({ isPrimary: true })
   declare id: number
   @column()
@@ -1641,6 +1703,8 @@ export class OrganizationSchema extends BaseModel {
   declare storageUsedBytes: bigint | number
   @column()
   declare stripeCustomerId: string | null
+  @column()
+  declare type: string | null
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
 }
@@ -2084,8 +2148,10 @@ export class UserSchema extends BaseModel {
     'fullName',
     'id',
     'lastLoginAt',
+    'locale',
     'organizationId',
     'password',
+    'theme',
     'updatedAt',
   ] as const
   $columns = UserSchema.$columns
@@ -2100,9 +2166,13 @@ export class UserSchema extends BaseModel {
   @column.dateTime()
   declare lastLoginAt: DateTime | null
   @column()
+  declare locale: string | null
+  @column()
   declare organizationId: number | null
   @column({ serializeAs: null })
   declare password: string
+  @column()
+  declare theme: string | null
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
 }

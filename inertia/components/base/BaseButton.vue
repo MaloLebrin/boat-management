@@ -11,6 +11,13 @@ const props = withDefaults(
     route?: string
     params?: Record<string, string | number>
     href?: string
+    /**
+     * Force le rendu en ancre `<a>` brute au lieu d'un `<Link>` Inertia, même
+     * pour un chemin interne (#533). À réserver aux `href` qui ne sont pas une
+     * navigation : téléchargement de fichier, export, ouverture en nouvel
+     * onglet — une visite Inertia y afficherait le binaire comme une page.
+     */
+    externalHref?: boolean
     target?: string
     rel?: string
     method?: 'get' | 'post' | 'put' | 'patch' | 'delete'
@@ -26,7 +33,19 @@ const props = withDefaults(
   }
 )
 
-const isInertiaLink = computed(() => Boolean(props.route))
+/**
+ * Un `href` interne (`/boats/12`) est une navigation : il doit passer par
+ * `<Link>` pour préserver le routing SPA Inertia (#533). Seuls les `href`
+ * absolus (`https:`, `mailto:`, `tel:`) et ceux marqués `external-href`
+ * — téléchargements, exports — restent des ancres brutes.
+ */
+const isInternalHref = computed(() => {
+  if (!props.href || props.externalHref) return false
+  // `//example.org` est une URL protocol-relative, pas un chemin de l'app.
+  return props.href.startsWith('/') && !props.href.startsWith('//')
+})
+
+const isInertiaLink = computed(() => Boolean(props.route) || isInternalHref.value)
 const isAnchorLink = computed(() => !isInertiaLink.value && Boolean(props.href))
 
 const componentTag = computed(() => {
@@ -37,7 +56,7 @@ const componentTag = computed(() => {
 
 const variantClass: Record<NonNullable<typeof props.variant>, string> = {
   primary:
-    'bg-brand text-white shadow-sm hover:bg-brand-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 focus-visible:ring-offset-2 focus-visible:ring-offset-surface',
+    'bg-brand text-on-brand shadow-sm hover:bg-brand-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 focus-visible:ring-offset-2 focus-visible:ring-offset-surface',
   secondary:
     'border border-border-strong bg-surface-elevated text-fg shadow-sm hover:bg-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30 focus-visible:ring-offset-2 focus-visible:ring-offset-surface',
   outline:
@@ -45,7 +64,7 @@ const variantClass: Record<NonNullable<typeof props.variant>, string> = {
   ghost:
     'text-fg-muted hover:bg-surface-muted hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30 focus-visible:ring-offset-2 focus-visible:ring-offset-surface',
   danger:
-    'bg-red-200 text-red-800 shadow-sm hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-800/40 focus-visible:ring-offset-2 focus-visible:ring-offset-surface',
+    'bg-danger-soft text-danger-strong shadow-sm hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger/40 focus-visible:ring-offset-2 focus-visible:ring-offset-surface',
 }
 
 const sizeClass: Record<NonNullable<typeof props.size>, string> = {
@@ -89,7 +108,7 @@ function onClick(e: MouseEvent) {
     :preserve-scroll="isInertiaLink ? preserveScroll : undefined"
     :preserve-state="isInertiaLink ? preserveState : undefined"
     :replace="isInertiaLink ? replace : undefined"
-    :href="isAnchorLink ? href : undefined"
+    :href="route ? undefined : href"
     :target="isAnchorLink ? target : undefined"
     :rel="isAnchorLink ? rel : undefined"
     :aria-disabled="componentTag !== 'button' && disabled ? 'true' : undefined"

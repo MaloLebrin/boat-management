@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Head } from '@inertiajs/vue3'
 import { onMounted, ref, watch } from 'vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseBreadcrumb from '~/components/base/BaseBreadcrumb.vue'
@@ -10,6 +11,7 @@ import EnginePartShowTabDocuments from '~/components/engine/parts/show/tabs/Engi
 import EnginePartShowTabInfo from '~/components/engine/parts/show/tabs/EnginePartShowTabInfo.vue'
 import EnginePartShowTabPhotos from '~/components/engine/parts/show/tabs/EnginePartShowTabPhotos.vue'
 import { useT } from '~/composables/use_t'
+import { engineDisplayTitle } from '~/utils/boat_enum_labels'
 import type { BoatShowEnginePart } from '~/types/boat_show'
 
 const { t } = useT()
@@ -42,10 +44,7 @@ watch(tab, (newTab) => {
 })
 
 function engineTitle(): string {
-  if (props.engine.brand && props.engine.model) return `${props.engine.brand} ${props.engine.model}`
-  if (props.engine.brand) return props.engine.brand
-  if (props.engine.model) return props.engine.model
-  return props.engine.kind
+  return engineDisplayTitle(t, props.engine)
 }
 
 function wearStateVariant(state: string): 'success' | 'info' | 'warning' | 'neutral' | 'danger' {
@@ -58,10 +57,12 @@ function wearStateVariant(state: string): 'success' | 'info' | 'warning' | 'neut
 </script>
 
 <template>
+  <Head :title="part.designation" />
+
   <div class="w-full max-w-7xl px-6 py-10 sm:px-8">
     <BaseBreadcrumb
       :items="[
-        { label: t('boats.show.breadcrumbFleet'), href: '/boats' },
+        { label: t('boats.index.title'), href: '/boats' },
         { label: boat.name, href: `/boats/${boat.id}` },
         {
           label: t('boats.engineShow.breadcrumb.equipment'),

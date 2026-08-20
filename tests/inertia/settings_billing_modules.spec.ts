@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { expect, test, vi } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 
 vi.mock('~/composables/use_t', () => ({
   useT: () => ({ t: (k: string) => k, locale: { value: 'fr' } }),
@@ -29,6 +29,7 @@ function mountModules(props: Partial<InstanceType<typeof SettingsBillingModules>
       plan: 'pro',
       subscription,
       activeModules: [],
+      canManageBilling: true,
       ...props,
     },
     global: {
@@ -63,16 +64,62 @@ test('a granted module shows the offered hint and no deactivate button', () => {
   expect(w.text()).toContain('settings.billing.modules.granted')
 })
 
-test('Enterprise shows every module as included, no action buttons', () => {
+test('Enterprise shows every module as included, with no CTA, whether or not it is granted (#402)', () => {
   const w = mountModules({ plan: 'enterprise', subscription: null, activeModules: [] })
-  expect(w.text()).toContain('settings.billing.modules.included')
+  expect(w.text()).toContain('settings.billing.modules.includedInPlan')
   expect(w.text()).not.toContain('settings.billing.modules.activate')
+  expect(w.text()).not.toContain('settings.billing.modules.deactivateIncluded')
+  expect(w.find('button').exists()).toBe(false)
+})
+
+test('Enterprise still shows every module as included when a module is explicitly granted (#402)', () => {
+  const w = mountModules({
+    plan: 'enterprise',
+    subscription: null,
+    activeModules: [{ module: 'charter', source: 'granted' }],
+  })
+  expect(w.text()).toContain('settings.billing.modules.includedInPlan')
+  expect(w.find('button').exists()).toBe(false)
+})
+
+test('Enterprise without subscription.manage still shows every module as included (#402)', () => {
+  const w = mountModules({
+    plan: 'enterprise',
+    subscription: null,
+    activeModules: [],
+    canManageBilling: false,
+  })
+  expect(w.text()).toContain('settings.billing.modules.includedInPlan')
+  expect(w.text()).not.toContain('settings.billing.modules.adminOnly')
 })
 
 test('Starter (no subscription) prompts to upgrade to Pro', () => {
   const w = mountModules({ plan: 'starter', subscription: null, activeModules: [] })
   expect(w.text()).toContain('settings.billing.modules.proRequired')
   expect(w.text()).not.toContain('settings.billing.modules.activate')
+})
+
+test('a Pro org without an active subscription is invited to activate it first, not told to upgrade (#402)', () => {
+  const w = mountModules({ plan: 'pro', subscription: null, activeModules: [] })
+  expect(w.text()).toContain('settings.billing.modules.activateSubscription')
+  expect(w.text()).not.toContain('settings.billing.modules.proRequired')
+})
+
+test('a Pro org without an active subscription and without subscription.manage sees an informational message only', () => {
+  const w = mountModules({
+    plan: 'pro',
+    subscription: null,
+    activeModules: [],
+    canManageBilling: false,
+  })
+  expect(w.text()).toContain('settings.billing.modules.subscriptionRequired')
+  expect(w.find('button').exists()).toBe(false)
+})
+
+test('clicking the activate-subscription CTA emits activateSubscription', async () => {
+  const w = mountModules({ plan: 'pro', subscription: null, activeModules: [] })
+  await w.find('button').trigger('click')
+  expect(w.emitted('activateSubscription')).toBeTruthy()
 })
 
 test('clicking activate posts to the module endpoint', async () => {
@@ -93,5 +140,30 @@ test('clicking deactivate deletes on the module endpoint', async () => {
   expect(del).toHaveBeenCalledWith('/settings/billing/module', {
     data: { module: 'charter' },
     preserveScroll: true,
+  })
+})
+
+// subscription.manage gating (#397) — a member has subscription.view but not
+// subscription.manage: the activate/deactivate CTAs must not be actionable.
+
+test('a subscribed Pro org without subscription.manage sees no activate button', () => {
+  const w = mountModules({ plan: 'pro', subscription, activeModules: [], canManageBilling: false })
+  expect(w.text()).not.toContain('settings.billing.modules.activate')
+  expect(w.text()).toContain('settings.billing.modules.adminOnly')
+})
+
+describe('dark mode (#416)', () => {
+  test('les cartes de module utilisent bg-surface-muted, pas le token fantôme bg-surface-2', () => {
+    // `bg-surface-2` n'existait dans aucune palette : il rendait transparent
+    // dans les deux thèmes, ce qui ne se voyait que sur fond sombre.
+    const html = mountModules({ plan: 'pro', subscription, activeModules: [] }).html()
+    expect(html).toContain('bg-surface-muted')
+    expect(html).not.toContain('surface-2')
+  })
+
+  test('« inclus dans le plan » utilise le token de succès, pas la palette green', () => {
+    const html = mountModules({ plan: 'enterprise', subscription: null, activeModules: [] }).html()
+    expect(html).toContain('text-success')
+    expect(html).not.toMatch(/-green-\d/)
   })
 })

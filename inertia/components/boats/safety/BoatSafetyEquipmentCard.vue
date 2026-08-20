@@ -7,6 +7,7 @@ import BaseCard from '~/components/base/BaseCard.vue'
 import BaseModal from '~/components/base/BaseModal.vue'
 import BoatSafetyEquipmentFields from './BoatSafetyEquipmentFields.vue'
 import { useT } from '~/composables/use_t'
+import { useDateFormat } from '~/composables/use_date_format'
 import { suggestEquipmentActionType } from '#shared/helpers/equipment_action'
 import type { BoatShowSafetyEquipment, EquipmentActionPrefill } from '~/types/boat_show'
 
@@ -22,6 +23,7 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useT()
+const { formatDate } = useDateFormat()
 
 function emitAddToActions(item: BoatShowSafetyEquipment) {
   emit('addToActions', {
@@ -41,7 +43,7 @@ function statusVariant(status: string): 'success' | 'warning' | 'danger' {
   return 'danger'
 }
 
-function formatDate(iso: string | null) {
+function toDateInputValue(iso: string | null) {
   if (!iso) return null
   return iso.slice(0, 10)
 }
@@ -102,7 +104,7 @@ function closeEdit() {
                 {{ t('boats.safetyEquipment.quantity') }}: {{ item.quantity }}
               </span>
               <span
-                v-if="formatDate(item.expiryDate)"
+                v-if="item.expiryDate"
                 class="rounded-full bg-surface-elevated px-2 py-1 ring-1 ring-border"
               >
                 {{ t('boats.safetyEquipment.expiryDate') }}: {{ formatDate(item.expiryDate) }}
@@ -201,7 +203,7 @@ function closeEdit() {
           :errors="errors"
           :equipment-type="editingItem.equipmentType"
           :quantity="editingItem.quantity !== null ? String(editingItem.quantity) : ''"
-          :expiry-date="formatDate(editingItem.expiryDate) ?? ''"
+          :expiry-date="toDateInputValue(editingItem.expiryDate) ?? ''"
           :status="editingItem.status"
           :notes="editingItem.notes ?? ''"
         />

@@ -150,6 +150,11 @@ export type NumericQuotaKey = {
   [K in keyof PlanQuotas]: PlanQuotas[K] extends number | null ? K : never
 }[keyof PlanQuotas]
 
+/** Clés de `PlanQuotas` dont la valeur est un flag booléen de capacité. */
+export type BooleanQuotaKey = {
+  [K in keyof PlanQuotas]: PlanQuotas[K] extends boolean ? K : never
+}[keyof PlanQuotas]
+
 /**
  * Incrément de quota accordé par **une unité** d'add-on : le champ numérique de
  * `PlanQuotas` visé et le nombre ajouté par unité. La résolution des quotas

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
+import { useNumberFormat } from '~/composables/use_number_format'
 import { useScrollReveal } from '~/composables/use_scroll_reveal'
 import { useTweenNumber } from '~/composables/use_tween_number'
 import PricingConfiguratorModuleCard from './PricingConfiguratorModuleCard.vue'
@@ -118,6 +119,7 @@ const totalDisplay = useTweenNumber(total)
 const savingDisplay = useTweenNumber(annualSaving)
 
 const { el, isVisible } = useScrollReveal()
+const { formatPrice } = useNumberFormat()
 </script>
 
 <template>
@@ -143,7 +145,7 @@ const { el, isVisible } = useScrollReveal()
                 <p class="mt-0.5 text-sm text-white/60">{{ baseDesc }}</p>
               </div>
               <div class="flex items-baseline gap-1">
-                <span class="font-display text-2xl">{{ basePrice }} €</span>
+                <span class="font-display text-2xl">{{ formatPrice(basePrice) }}</span>
                 <span class="text-sm text-white/60">{{ perMonth }}</span>
               </div>
             </div>
@@ -161,6 +163,7 @@ const { el, isVisible } = useScrollReveal()
             :desc="m.desc"
             :price="unitPrice(m)"
             :price-per="perMonth"
+            :billed-annually-note="isAnnual ? billedAnnuallyNote : undefined"
             :features="m.features"
             :selected="selected.has(m.key)"
             @toggle="toggle(m.key)"
@@ -169,13 +172,16 @@ const { el, isVisible } = useScrollReveal()
           <!-- Add-on quantitatif : bateaux supplémentaires -->
           <div
             v-if="extraBoats"
-            class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-bone bg-white p-5"
+            class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-bone bg-surface-elevated p-5"
           >
             <div class="min-w-0">
               <h3 class="font-medium text-fg">{{ extraBoats.name }}</h3>
               <p class="mt-0.5 text-sm text-fg-muted">{{ extraBoats.desc }}</p>
               <p class="mt-1 text-sm font-semibold text-fg">
-                {{ extraBoatUnit }} € {{ extraBoats.perBoatLabel }}
+                {{ formatPrice(extraBoatUnit) }} {{ extraBoats.perBoatLabel }}
+              </p>
+              <p v-if="isAnnual" class="mt-0.5 text-xs text-fg-subtle">
+                {{ billedAnnuallyNote }}
               </p>
             </div>
             <div class="flex items-center gap-2">
@@ -208,16 +214,16 @@ const { el, isVisible } = useScrollReveal()
 
         <!-- Colonne récap (sticky) — liseré lumineux animé -->
         <aside class="lg:sticky lg:top-24 lg:self-start">
-          <div class="glow-border rounded-2xl border border-bone bg-white p-6 shadow-sm">
+          <div class="glow-border rounded-2xl border border-bone bg-surface-elevated p-6 shadow-sm">
             <p class="text-sm text-fg-muted">{{ totalLabel }}</p>
             <div class="mt-1 flex items-baseline gap-1">
               <span class="font-display text-5xl text-fg tabular-nums">
-                {{ Math.round(totalDisplay) }} €
+                {{ formatPrice(Math.round(totalDisplay)) }}
               </span>
               <span class="text-sm text-fg-muted">{{ perMonth }}</span>
             </div>
             <p v-if="isAnnual && annualSaving > 0" class="mt-2 text-sm font-medium text-mint-700">
-              {{ annualSaveLabel }} {{ Math.round(savingDisplay) }} €
+              {{ annualSaveLabel }} {{ formatPrice(Math.round(savingDisplay)) }}
             </p>
             <p v-if="isAnnual" class="mt-1 text-xs text-fg-subtle">{{ billedAnnuallyNote }}</p>
 
@@ -227,7 +233,7 @@ const { el, isVisible } = useScrollReveal()
             <div class="mt-6 border-t border-bone pt-5">
               <div class="flex items-baseline justify-between gap-2">
                 <span class="font-semibold text-fg">{{ enterprise.name }}</span>
-                <span class="font-display text-lg text-fg">{{ enterprisePrice }} €</span>
+                <span class="font-display text-lg text-fg">{{ formatPrice(enterprisePrice) }}</span>
               </div>
               <p class="mt-1 text-xs text-fg-muted">{{ enterprise.note }}</p>
               <BaseButton :href="ctaHref" variant="outline" size="sm" class="mt-3 w-full">

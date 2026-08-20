@@ -14,6 +14,30 @@
     "date": "Le champ {field} doit être une date valide.",
     "date.afterOrSameAs": "Le champ {field} doit être une date postérieure ou égale à {otherField}.",
     "positive": "Le champ {field} doit être un nombre positif.",
-    "withoutDecimals": "Le champ {field} doit être un nombre entier."
+    "withoutDecimals": "Le champ {field} doit être un nombre entier.",
+    "accepted": "Le champ {field} doit être accepté.",
+    "acceptTerms": {
+      "accepted": "Vous devez accepter les CGU et la politique de confidentialité pour créer un compte."
+    },
+    "consent": {
+      "accepted": "Tu dois accepter le traitement de tes informations pour qu'on puisse te répondre."
+    }
+  },
+  "settings": {
+    "wrongCurrentPassword": "Le mot de passe actuel est incorrect."
+  },
+  "fields": {
+    "firstName": "prénom",
+    "lastName": "nom",
+    "email": "email",
+    "password": "mot de passe",
+    "organizationName": "nom de l'organisation",
+    "organizationType": "type d'organisation",
+    "fleetSize": "taille de flotte",
+    "acceptTerms": "conditions générales",
+    "subject": "sujet",
+    "organization": "organisation",
+    "message": "message",
+    "consent": "consentement"
   }
 }

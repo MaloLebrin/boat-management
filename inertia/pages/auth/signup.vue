@@ -7,22 +7,48 @@ export default {
 </script>
 
 <script setup lang="ts">
+import { Link } from '@adonisjs/inertia/vue'
 import { Form } from '@adonisjs/inertia/vue'
 import { Head } from '@inertiajs/vue3'
-import { computed, ref } from 'vue'
+import { PLAN_LIMITS } from '#shared/types/plan'
 import AuthNavyPanel from '~/components/auth/AuthNavyPanel.vue'
-import PasswordStrength from '~/components/auth/PasswordStrength.vue'
-import BaseInput from '~/components/base/BaseInput.vue'
-import BaseSelect from '~/components/base/BaseSelect.vue'
+import SignupIdentityFields from '~/components/auth/signup/SignupIdentityFields.vue'
+import SignupOrganizationFields from '~/components/auth/signup/SignupOrganizationFields.vue'
+import SignupTermsCheckbox from '~/components/auth/signup/SignupTermsCheckbox.vue'
+import BaseFormErrorSummary from '~/components/base/BaseFormErrorSummary.vue'
 import { useT } from '~/composables/use_t'
 
 const { t } = useT()
 
 defineProps<{ fromSimulator?: boolean }>()
 
-const showPassword = ref(false)
-const passwordValue = ref('')
-const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
+/**
+ * Every field of this form is rendered by one of the sections below and shows
+ * its own error. Anything else the validator rejects is surfaced by
+ * `<BaseFormErrorSummary>` — without it, a validator/form mismatch makes the
+ * signup fail silently (#448).
+ */
+const RENDERED_FIELDS = [
+  'firstName',
+  'lastName',
+  'email',
+  'password',
+  'organizationName',
+  'organizationType',
+  'fleetSize',
+  'acceptTerms',
+] as const
+
+/**
+ * Ce que le plan Starter offre réellement, lu dans `PLAN_LIMITS` (#455) : la
+ * page promettait « utilisateurs illimités » (Starter en autorise 1) et
+ * « aucun prélèvement avant J+14 » alors qu'il n'existe aucune période d'essai.
+ */
+const STARTER_FEATURES = [
+  { key: 'featureCSV', vars: undefined },
+  { key: 'featureBoats', vars: { count: PLAN_LIMITS.starter.maxBoats ?? 0 } },
+  { key: 'featureUsers', vars: { count: PLAN_LIMITS.starter.maxMembers ?? 0 } },
+] as const
 </script>
 
 <template>
@@ -37,8 +63,8 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
       <div class="flex items-center justify-end gap-3.5 px-8 py-6">
         <span class="text-xs text-fg-muted">{{ t('auth.login.needHelp') }}</span>
         <a
-          href="mailto:support@fleetai.io"
-          class="rounded-md border border-bone bg-white px-2.5 py-1.5 text-xs font-semibold text-fg transition-colors hover:bg-paper"
+          href="mailto:support@fleetai.app"
+          class="rounded-md border border-bone bg-surface-elevated px-2.5 py-1.5 text-xs font-semibold text-fg transition-colors hover:bg-paper"
         >
           {{ t('auth.login.contactSupport') }}
         </a>
@@ -47,16 +73,15 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
       <!-- Form, vertically centred -->
       <div class="flex flex-1 flex-col items-center justify-center px-8 pb-12 lg:px-16">
         <div class="w-full max-w-[460px]">
-          <!-- Trial badge -->
+          <!-- Free plan badge -->
           <div class="flex flex-wrap items-center gap-2">
             <span
-              class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold"
-              style="background: #e6f3ec; color: #1f6b54"
+              class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold bg-mint-50 text-mint-700"
             >
-              <span class="h-1.5 w-1.5 rounded-full bg-[#1f6b54]" />
-              {{ t('auth.signup.trialBadge') }}
+              <span class="h-1.5 w-1.5 rounded-full bg-mint-700" />
+              {{ t('auth.signup.freePlanBadge') }}
             </span>
-            <span class="text-[11px] text-fg-muted">{{ t('auth.signup.trialCaption') }}</span>
+            <span class="text-[11px] text-fg-muted">{{ t('auth.signup.freePlanCaption') }}</span>
           </div>
 
           <h1
@@ -78,151 +103,23 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
 
           <Form route="new_account.store" class="mt-6" #default="{ processing, errors }">
             <div class="flex flex-col gap-3.5">
-              <!-- Section 01 — Toi -->
-              <div class="flex items-center gap-3">
-                <span class="font-mono text-[11px] text-fg-subtle">01</span>
-                <div class="h-px flex-1 bg-bone" />
-                <div class="text-right">
-                  <div class="text-[13px] font-semibold text-fg">
-                    {{ t('auth.signup.section01Title') }}
-                  </div>
-                  <div class="text-[11px] text-fg-muted">{{ t('auth.signup.section01Sub') }}</div>
-                </div>
-              </div>
-
-              <div class="grid grid-cols-2 gap-2.5">
-                <BaseInput
-                  id="firstName"
-                  name="firstName"
-                  :label="t('auth.signup.firstNameLabel')"
-                  :placeholder="t('auth.signup.firstNamePlaceholder')"
-                  autocomplete="given-name"
-                  :errors="errors"
-                />
-                <BaseInput
-                  id="lastName"
-                  name="lastName"
-                  :label="t('auth.signup.lastNameLabel')"
-                  :placeholder="t('auth.signup.lastNamePlaceholder')"
-                  autocomplete="family-name"
-                  :errors="errors"
-                />
-              </div>
-
-              <BaseInput
-                id="email"
-                name="email"
-                type="email"
-                autocomplete="email"
-                :label="t('auth.signup.emailLabel')"
-                :placeholder="t('auth.signup.emailPlaceholder')"
-                :hint="t('auth.signup.emailHint')"
+              <BaseFormErrorSummary
                 :errors="errors"
+                :handled-keys="RENDERED_FIELDS"
+                :title="t('auth.signup.errorSummaryTitle')"
               />
 
-              <div>
-                <BaseInput
-                  id="password"
-                  name="password"
-                  :type="passwordType"
-                  autocomplete="new-password"
-                  :label="t('auth.signup.passwordLabel')"
-                  :placeholder="t('auth.signup.passwordPlaceholder')"
-                  :errors="errors"
-                  :model-value="passwordValue"
-                  @update:model-value="passwordValue = $event"
-                >
-                  <template #trailing>
-                    <button
-                      type="button"
-                      class="px-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-fg-muted focus-visible:outline-none"
-                      @click="showPassword = !showPassword"
-                    >
-                      {{
-                        showPassword ? t('auth.signup.hidePassword') : t('auth.signup.showPassword')
-                      }}
-                    </button>
-                  </template>
-                </BaseInput>
-                <PasswordStrength :value="passwordValue" />
-              </div>
+              <SignupIdentityFields :errors="errors" />
 
-              <!-- Section 02 — Organisation -->
-              <div class="mt-2.5 flex items-center gap-3">
-                <span class="font-mono text-[11px] text-fg-subtle">02</span>
-                <div class="h-px flex-1 bg-bone" />
-                <div class="text-right">
-                  <div class="text-[13px] font-semibold text-fg">
-                    {{ t('auth.signup.section02Title') }}
-                  </div>
-                  <div class="text-[11px] text-fg-muted">{{ t('auth.signup.section02Sub') }}</div>
-                </div>
-              </div>
+              <SignupOrganizationFields :errors="errors" />
 
-              <BaseInput
-                id="organizationName"
-                name="organizationName"
-                :label="t('auth.signup.orgNameLabel')"
-                :placeholder="t('auth.signup.orgNamePlaceholder')"
-                :hint="t('auth.signup.orgNameHint')"
-                :errors="errors"
-              />
-
-              <div class="grid grid-cols-2 gap-2.5">
-                <BaseSelect
-                  id="organizationType"
-                  name="organizationType"
-                  :label="t('auth.signup.orgTypeLabel')"
-                  :placeholder="t('common.selectPlaceholder')"
-                  :options="[
-                    { value: 'rental', label: t('auth.signup.orgTypes.rental') },
-                    { value: 'school', label: t('auth.signup.orgTypes.school') },
-                    { value: 'marina', label: t('auth.signup.orgTypes.marina') },
-                    { value: 'private', label: t('auth.signup.orgTypes.private') },
-                  ]"
-                  allow-empty
-                />
-                <BaseSelect
-                  id="fleetSize"
-                  name="fleetSize"
-                  :label="t('auth.signup.fleetSizeLabel')"
-                  :placeholder="t('common.selectPlaceholder')"
-                  :options="[
-                    { value: '1-4', label: t('auth.signup.fleetSizes.s1') },
-                    { value: '5-20', label: t('auth.signup.fleetSizes.s2') },
-                    { value: '21-50', label: t('auth.signup.fleetSizes.s3') },
-                    { value: '51+', label: t('auth.signup.fleetSizes.s4') },
-                  ]"
-                  allow-empty
-                />
-              </div>
-
-              <!-- Terms -->
-              <label class="flex cursor-pointer items-start gap-2.5 select-none">
-                <input
-                  type="checkbox"
-                  name="acceptTerms"
-                  required
-                  class="mt-0.5 h-[18px] w-[18px] shrink-0 rounded-[5px] border-bone accent-[#0b1d2e]"
-                />
-                <span class="text-[13px] leading-relaxed text-fg-muted">
-                  {{ t('auth.signup.acceptTermsPrefix') }}
-                  <a href="#" class="font-semibold text-[#e2674f]">{{ t('auth.signup.cgu') }}</a>
-                  {{ t('auth.signup.acceptTermsConjunction') }}
-                  <a href="#" class="font-semibold text-[#e2674f]">{{
-                    t('auth.signup.privacyPolicy')
-                  }}</a
-                  >.
-                  {{ t('auth.signup.termsHosting') }}
-                </span>
-              </label>
+              <SignupTermsCheckbox :errors="errors" />
 
               <!-- Submit (coral) -->
               <button
                 type="submit"
                 :disabled="processing"
-                class="mt-1 flex w-full items-center justify-center gap-2 rounded-lg px-5 py-3.5 text-sm font-semibold text-white transition-all duration-150 disabled:opacity-60 hover:brightness-110"
-                style="background: #e2674f"
+                class="mt-1 flex w-full items-center justify-center gap-2 rounded-lg px-5 py-3.5 text-sm font-semibold text-white transition-all duration-150 disabled:opacity-60 hover:brightness-110 bg-coral-500"
               >
                 {{ t('auth.signup.createOrg') }}
                 <svg
@@ -243,8 +140,8 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
               <!-- Feature checks -->
               <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[12px] text-fg-muted">
                 <span
-                  v-for="key in ['featureCSV', 'featureUsers', 'featureNoCharge']"
-                  :key="key"
+                  v-for="feature in STARTER_FEATURES"
+                  :key="feature.key"
                   class="inline-flex items-center gap-1.5"
                 >
                   <svg
@@ -252,7 +149,7 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
                     height="12"
                     viewBox="0 0 24 24"
                     fill="none"
-                    stroke="#1f6b54"
+                    stroke="var(--color-mint-700)"
                     stroke-width="2.2"
                     stroke-linecap="round"
                     stroke-linejoin="round"
@@ -260,7 +157,7 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
                   >
                     <path d="M5 12l5 5L20 7" />
                   </svg>
-                  {{ t(`auth.signup.${key}`) }}
+                  {{ t(`auth.signup.${feature.key}`, feature.vars) }}
                 </span>
               </div>
             </div>
@@ -268,13 +165,13 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
 
           <p class="mt-6 text-center text-[13px] text-fg-muted">
             {{ t('auth.signup.hasAccount') }}
-            <a
+            <Link
               href="/login"
-              class="font-semibold text-[#e2674f] no-underline"
+              class="font-semibold text-coral-500 no-underline"
               style="border-bottom: 1px solid rgba(226, 103, 79, 0.3); padding-bottom: 1px"
             >
               {{ t('auth.signup.signIn') }} →
-            </a>
+            </Link>
           </p>
         </div>
       </div>

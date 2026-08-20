@@ -4,11 +4,14 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import PlanningTaskCard from '~/components/planning/PlanningTaskCard.vue'
 import { ref } from 'vue'
 import { useT } from '~/composables/use_t'
+import { useDateFormat } from '~/composables/use_date_format'
+import { maintenanceSubjectLabel } from '~/utils/boat_enum_labels'
 
 defineProps<{ group: TaskGroup }>()
 const emit = defineEmits<{ ungroup: [groupId: string] }>()
 
 const { t } = useT()
+const { formatDate } = useDateFormat()
 const expanded = ref(false)
 </script>
 
@@ -19,14 +22,16 @@ const expanded = ref(false)
       @click="expanded = !expanded"
     >
       <div class="flex items-center gap-2">
-        <span class="text-xs font-semibold capitalize text-fg">{{ group.subject }}</span>
+        <span class="text-xs font-semibold text-fg">{{
+          maintenanceSubjectLabel(t, group.subject)
+        }}</span>
         <span
-          class="inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-navy-100 px-1 text-xs font-semibold text-navy-700"
+          class="inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-soft px-1 text-xs font-semibold text-brand"
         >
           {{ group.tasks.length }}
         </span>
         <span class="text-xs text-fg-muted"
-          >{{ group.earliestDueAt }} → {{ group.latestDueAt }}</span
+          >{{ formatDate(group.earliestDueAt) }} → {{ formatDate(group.latestDueAt) }}</span
         >
       </div>
       <div class="flex items-center gap-2">
@@ -50,7 +55,7 @@ const expanded = ref(false)
         :key="task.id"
         :task="task"
         accent-class="border-navy-400"
-        badge-class="bg-navy-100 text-navy-700"
+        badge-class="bg-brand-soft text-brand"
       />
     </div>
   </div>

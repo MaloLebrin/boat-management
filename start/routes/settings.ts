@@ -1,5 +1,6 @@
 import { middleware } from '#start/kernel'
 import router from '@adonisjs/core/services/router'
+import { isThemePreference } from '#shared/types/theme'
 
 const SettingsController = () => import('#controllers/settings_controller')
 const BillingController = () => import('#controllers/billing_controller')
@@ -7,15 +8,43 @@ const AuditLogsController = () => import('#controllers/audit_logs_controller')
 const CsvImportController = () => import('#controllers/csv_import_controller')
 
 router
-  .post('/locale', ({ request, response }) => {
+  .post('/locale', async ({ request, response, auth }) => {
     const locale = request.input('locale')
     if (locale === 'en' || locale === 'fr') {
       // httpOnly: false is intentional — the JS language switcher reads this cookie client-side
       response.cookie('locale', locale, { maxAge: '365d', path: '/', httpOnly: false })
+
+      // Persist the preference on the profile for authenticated users so it
+      // survives logout (cf. #414 / #403). The cookie alone is lost once a
+      // fresh browser session starts.
+      if (await auth.check()) {
+        auth.user!.locale = locale
+        await auth.user!.save()
+      }
     }
     return response.redirect().back()
   })
   .as('locale.set')
+
+router
+  .post('/theme', async ({ request, response, auth }) => {
+    const theme = request.input('theme')
+    if (isThemePreference(theme)) {
+      // Cookie signé, lu côté serveur pour rendre le bon thème dès la
+      // première réponse (cf. `resolveSharedTheme`).
+      response.cookie('theme', theme, { maxAge: '365d', path: '/' })
+
+      // Route publique : le switcher est aussi disponible sur le marketing et
+      // l'écran de login. Quand l'utilisateur est connecté, on persiste en base
+      // pour que la préférence le suive d'un appareil à l'autre.
+      if (await auth.check()) {
+        auth.user!.theme = theme
+        await auth.user!.save()
+      }
+    }
+    return response.redirect().back()
+  })
+  .as('theme.set')
 
 router
   .group(() => {
@@ -37,11 +66,25 @@ router
       .delete('settings/billing/module', [BillingController, 'removeModule'])
       .as('settings.billing.module.remove')
     router
+      .post('settings/billing/module/enterprise', [BillingController, 'activateEnterpriseModule'])
+      .as('settings.billing.module.enterprise.activate')
+    router
+      .delete('settings/billing/module/enterprise', [
+        BillingController,
+        'deactivateEnterpriseModule',
+      ])
+      .as('settings.billing.module.enterprise.deactivate')
+    router
       .post('settings/billing/addon', [BillingController, 'setAddon'])
       .as('settings.billing.addon.set')
     router
       .put('settings/profile', [SettingsController, 'updateProfile'])
       .as('settings.profile.update')
+    router
+      .put('settings/password', [SettingsController, 'changePassword'])
+      .as('settings.password.update')
+    router.put('settings/locale', [SettingsController, 'updateLocale']).as('settings.locale.update')
+    router.put('settings/theme', [SettingsController, 'updateTheme']).as('settings.theme.update')
     router.put('settings/org', [SettingsController, 'updateOrganization']).as('settings.org.update')
     router.get('settings/ai', [SettingsController, 'ai']).as('settings.ai')
     router.put('settings/ai', [SettingsController, 'updateAiSettings']).as('settings.ai.update')

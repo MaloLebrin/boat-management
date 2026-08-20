@@ -121,7 +121,7 @@ test.group('Client GDPR consent + export (functional)', (group) => {
     const user = await createAdminUser() // 'pro' plan
     const response = await client.get('/clients/1/export').loginAs(user).redirects(0)
     response.assertStatus(302)
-    response.assertHeader('location', '/')
+    response.assertHeader('location', '/settings/billing')
   })
 
   test('cannot export a client from another organization (IDOR)', async ({ client }) => {

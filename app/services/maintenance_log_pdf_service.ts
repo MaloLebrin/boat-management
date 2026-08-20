@@ -7,6 +7,8 @@ import type BoatSafetyEquipment from '#models/boat_safety_equipment'
 import type BoatSail from '#models/boat_sail'
 import app from '@adonisjs/core/services/app'
 import type { I18n } from '@adonisjs/i18n'
+import { formatDate } from '#shared/helpers/date_format'
+import { isEngineKindCaption } from '#shared/helpers/maintenance'
 import PDFDocument from 'pdfkit'
 
 type EventRow = {
@@ -70,7 +72,9 @@ export default class MaintenanceLogPdfService {
         subject: ev.subject,
         title: ev.title,
         notes: ev.notes,
-        engineCaption: ev.engineCaption,
+        engineCaption: isEngineKindCaption(ev.engineCaption)
+          ? tOpt('engineKind', ev.engineCaption)
+          : ev.engineCaption,
         sailCaption: ev.sailCaption,
         safetyCaption: safetyItem ? tOpt('safetyEquipmentType', safetyItem.equipmentType) : null,
         boatEngineId: ev.boatEngineId,
@@ -85,7 +89,7 @@ export default class MaintenanceLogPdfService {
       }
     })
 
-    this.#renderHeader(doc, boat, t)
+    this.#renderHeader(doc, boat, t, i18n.locale)
     this.#renderBoatSpecs(doc, boat, t, tOpt)
     this.#renderEquipment(doc, boat, rows, t, tOpt)
     this.#renderInventory(doc, boat, t, tOpt)
@@ -108,7 +112,8 @@ export default class MaintenanceLogPdfService {
   #renderHeader(
     doc: PDFKit.PDFDocument,
     boat: Boat,
-    t: (key: string, data?: Record<string, string>) => string
+    t: (key: string, data?: Record<string, string>) => string,
+    locale: string
   ): void {
     const HEADER_H = 118
 
@@ -122,14 +127,14 @@ export default class MaintenanceLogPdfService {
     }
 
     const TX = MARGIN + 78
-    doc.fillColor(WHITE).fontSize(18).font('Helvetica-Bold').text('FleetView', TX, 25)
+    doc.fillColor(WHITE).fontSize(18).font('Helvetica-Bold').text('FleetAi', TX, 25)
     doc.fillColor(CORAL).fontSize(10).font('Helvetica').text(t('title'), TX, 49)
     doc.fillColor(WHITE).fontSize(20).font('Helvetica-Bold').text(boat.name, TX, 67)
     doc
       .fillColor(GREY_M)
       .fontSize(8)
       .font('Helvetica')
-      .text(t('generatedOn', { date: new Date().toLocaleDateString() }), TX, 97)
+      .text(t('generatedOn', { date: formatDate(new Date(), locale) }), TX, 97)
 
     doc.rect(0, HEADER_H, PAGE_W, 3).fill(CORAL)
     doc.text('', MARGIN, HEADER_H + 3 + 20)
@@ -265,7 +270,8 @@ export default class MaintenanceLogPdfService {
     if (engines.length > 0) {
       this.#sectionBand(doc, t('sectionEngines'))
       for (const engine of engines) {
-        const label = [engine.brand, engine.model].filter(Boolean).join(' ') || engine.kind
+        const label =
+          [engine.brand, engine.model].filter(Boolean).join(' ') || tOpt('engineKind', engine.kind)
         this.#subSectionLabel(doc, label)
 
         const kind = engine.kind ? tOpt('engineKind', engine.kind) : null

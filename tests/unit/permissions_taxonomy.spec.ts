@@ -54,6 +54,7 @@ const SHARED: Capability[] = [
   'inspections.view',
   'inspections.create',
   'inspections.edit',
+  'invoices.view',
   'invoices.create',
   'invoices.update',
   'maintenance.view',
@@ -103,5 +104,28 @@ test.group('Permissions taxonomy (unit)', () => {
     const declared = new Set([...ADMIN_ONLY, ...SHARED])
     assert.equal(declared.size, ADMIN_ONLY.length + SHARED.length)
     assert.equal(declared.size, ROLE_PERMISSIONS.admin.size)
+  })
+
+  test('mechanic only has maintenance capabilities (view/create/edit)', ({ assert }) => {
+    const mechanicCaps = ROLE_PERMISSIONS.mechanic
+    const expected: Capability[] = ['maintenance.view', 'maintenance.create', 'maintenance.edit']
+
+    assert.equal(mechanicCaps.size, expected.length)
+    for (const cap of expected) {
+      assert.isTrue(mechanicCaps.has(cap), `mechanic should have "${cap}"`)
+    }
+    assert.isFalse(mechanicCaps.has('maintenance.delete'))
+    assert.isFalse(mechanicCaps.has('boats.view'))
+    assert.isFalse(mechanicCaps.has('invoices.view'))
+  })
+
+  test('boat_owner has zero capabilities (self-service portal scopes by ownership, not by capability)', ({
+    assert,
+  }) => {
+    // The boat_owner portal (/owner/boats/*) scopes data by ownership at the query
+    // level (BoatOwnerService.getOwnedBoat), never via capabilities — granting any
+    // staff capability here (boats.view, invoices.view...) would leak the full staff
+    // pages (/boats/:id, /invoices) which expose far more than the portal's scope.
+    assert.equal(ROLE_PERMISSIONS.boat_owner.size, 0)
   })
 })

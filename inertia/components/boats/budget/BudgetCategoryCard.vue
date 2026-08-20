@@ -36,12 +36,12 @@ const vsLabel = computed(() =>
 )
 
 const COLORS: Record<string, string> = {
-  maintenance: 'text-amber-600 dark:text-amber-400',
-  fuel: 'text-blue-600 dark:text-blue-400',
-  documents: 'text-purple-600 dark:text-purple-400',
-  port: 'text-teal-600 dark:text-teal-400',
-  equipment: 'text-green-600 dark:text-green-400',
-  entries: 'text-orange-600 dark:text-orange-400',
+  maintenance: 'text-amber-700',
+  fuel: 'text-sky-800',
+  documents: 'text-violet-700',
+  port: 'text-lilac-800',
+  equipment: 'text-mint-700',
+  entries: 'text-peach-700',
   total: 'text-fg',
 }
 </script>
@@ -72,11 +72,7 @@ const COLORS: Record<string, string> = {
         {{ vsLabel }}
         <span
           v-if="delta"
-          :class="
-            delta.positive
-              ? 'text-emerald-600 dark:text-emerald-400'
-              : 'text-red-600 dark:text-red-400'
-          "
+          :class="delta.positive ? 'text-success' : 'text-danger'"
           class="ml-1 font-semibold"
           >{{ delta.label }}</span
         >

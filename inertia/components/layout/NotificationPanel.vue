@@ -5,6 +5,15 @@ import { useNotificationHelpers } from '~/composables/use_notification_helpers'
 import { useT } from '~/composables/use_t'
 import type { NotificationForFront } from '#shared/types/notification'
 
+const props = withDefaults(
+  defineProps<{
+    align?: 'left' | 'right'
+  }>(),
+  {
+    align: 'right',
+  }
+)
+
 const emit = defineEmits<{
   close: []
 }>()
@@ -42,7 +51,8 @@ function handleViewAll() {
 
 <template>
   <div
-    class="absolute right-0 top-full z-50 mt-2 w-80 rounded-xl border border-border bg-surface-elevated shadow-lg"
+    class="absolute top-full z-50 mt-2 w-80 rounded-xl border border-border bg-surface-elevated shadow-lg"
+    :class="props.align === 'left' ? 'left-0' : 'right-0'"
   >
     <div class="flex items-center justify-between border-b border-border px-4 py-3">
       <h3 class="font-display text-sm font-semibold text-fg">

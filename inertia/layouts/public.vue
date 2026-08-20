@@ -4,6 +4,7 @@ import { Link } from '@adonisjs/inertia/vue'
 import { computed } from 'vue'
 import AppHeader from '~/components/layout/AppHeader.vue'
 import { useT } from '~/composables/use_t'
+import { marketingPath } from '#shared/helpers/locale_path'
 
 type SharedProps = {
   locale?: 'en' | 'fr'
@@ -16,17 +17,23 @@ const { t } = useT()
 const locale = computed<'en' | 'fr'>(() => page.props.locale ?? 'en')
 const copyrightYear = new Date().getFullYear()
 
-const guideHref = computed(() =>
-  locale.value === 'fr' ? '/fr/cout-entretien-bateau' : '/en/boat-maintenance-cost'
-)
+const guideHref = computed(() => marketingPath('guide', locale.value))
 
-const simulatorHref = computed(() =>
-  locale.value === 'fr' ? '/fr/simulateur-cout-entretien' : '/en/maintenance-cost-simulator'
-)
+const pricingHref = computed(() => marketingPath('pricing', locale.value))
 
-const privacyHref = computed(() => (locale.value === 'fr' ? '/fr/confidentialite' : '/en/privacy'))
+const simulatorHref = computed(() => marketingPath('simulator', locale.value))
 
-const aboutHref = computed(() => (locale.value === 'fr' ? '/fr/a-propos' : '/en/about'))
+const privacyHref = computed(() => marketingPath('privacy', locale.value))
+
+const termsHref = computed(() => marketingPath('terms', locale.value))
+
+const salesTermsHref = computed(() => marketingPath('salesTerms', locale.value))
+
+const legalNoticeHref = computed(() => marketingPath('legalNotice', locale.value))
+
+const aboutHref = computed(() => marketingPath('about', locale.value))
+
+const contactHref = computed(() => marketingPath('contact', locale.value))
 </script>
 
 <template>
@@ -54,7 +61,7 @@ const aboutHref = computed(() => (locale.value === 'fr' ? '/fr/a-propos' : '/en/
             <Link :href="`/${locale}#features`" class="transition-colors hover:text-fg">{{
               t('public.footer.features')
             }}</Link>
-            <Link :href="`/${locale}/tarifs`" class="transition-colors hover:text-fg">{{
+            <Link :href="pricingHref" class="transition-colors hover:text-fg">{{
               t('public.footer.pricing')
             }}</Link>
             <Link :href="simulatorHref" class="transition-colors hover:text-fg">{{
@@ -71,7 +78,7 @@ const aboutHref = computed(() => (locale.value === 'fr' ? '/fr/a-propos' : '/en/
             {{ t('public.footer.company') }}
           </p>
           <div class="grid gap-2 text-sm font-medium text-fg-muted">
-            <Link href="/contact" class="transition-colors hover:text-fg">{{
+            <Link :href="contactHref" class="transition-colors hover:text-fg">{{
               t('public.footer.contact')
             }}</Link>
             <Link :href="aboutHref" class="transition-colors hover:text-fg">{{
@@ -88,7 +95,15 @@ const aboutHref = computed(() => (locale.value === 'fr' ? '/fr/a-propos' : '/en/
             <Link :href="privacyHref" class="transition-colors hover:text-fg">{{
               t('public.footer.privacy')
             }}</Link>
-            <a class="transition-colors hover:text-fg" href="#">{{ t('public.footer.terms') }}</a>
+            <Link :href="termsHref" class="transition-colors hover:text-fg">{{
+              t('public.footer.terms')
+            }}</Link>
+            <Link :href="salesTermsHref" class="transition-colors hover:text-fg">{{
+              t('public.footer.salesTerms')
+            }}</Link>
+            <Link :href="legalNoticeHref" class="transition-colors hover:text-fg">{{
+              t('public.footer.legalNotice')
+            }}</Link>
           </div>
         </div>
       </div>

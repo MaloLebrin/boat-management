@@ -52,7 +52,7 @@ function refreshSuggestions() {
       </p>
       <button
         type="button"
-        class="text-xs text-navy-500 hover:underline disabled:cursor-not-allowed disabled:opacity-50"
+        class="text-xs text-navy-300 hover:underline disabled:cursor-not-allowed disabled:opacity-50"
         :disabled="isRefreshing"
         @click="refreshSuggestions"
       >

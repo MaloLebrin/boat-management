@@ -26,6 +26,7 @@
       "email": "Email address",
       "emailPlaceholder": "colleague@example.com",
       "role": "Role",
+      "boats": "Boats concerned",
       "submit": "Send invitation",
       "cancel": "Cancel"
     },
@@ -39,7 +40,9 @@
     "noName": "No name",
     "roles": {
       "admin": "Admin",
-      "member": "Member"
+      "member": "Member",
+      "mechanic": "Mechanic",
+      "boat_owner": "Boat owner"
     },
     "statuses": {
       "active": "Active",
@@ -49,7 +52,16 @@
     "remove": "Remove",
     "cancelInvitation": "Cancel",
     "pendingInvitations": "Pending invitations",
-    "activeMembers": "Active members"
+    "activeMembers": "Active members",
+    "roleConfirm": {
+      "title": "Change role",
+      "summary": "{name} will move from “{from}” to “{to}”.",
+      "impactAdmin": "This member will gain full admin access: managing members, billing and all boats.",
+      "impactBoatOwner": "This member will lose all staff access. They will only see the boats they own, in read-only mode. Remember to assign their boats.",
+      "impactStaff": "This member's access rights will be adjusted accordingly.",
+      "assignBoats": "Assign their boats",
+      "confirm": "Confirm change"
+    }
   },
   "billing": {
     "title": "Billing & plan",
@@ -73,8 +85,9 @@
     "storageOverflow": "Your storage usage exceeds your current plan limit. New uploads are blocked. Free up space or upgrade your plan.",
     "features": {
       "ai": "AI / Copilot",
-      "export": "Export (PDF / CSV / JSON)",
-      "maintenanceHistory": "Maintenance history"
+      "export": "Export (PDF / CSV)",
+      "maintenanceHistory": "Maintenance history",
+      "aiCustomization": "AI customisation (business prompt)"
     },
     "upgradeTo": {
       "pro": "Upgrade to Pro",
@@ -106,14 +119,20 @@
     "modules": {
       "title": "Add-on modules",
       "subtitle": "Extend your Pro plan with modules billed separately.",
+      "subtitleEnterprise": "All add-on modules are included in your plan.",
       "pricePerMonth": "€{amount}/mo",
       "active": "Active",
       "granted": "Included",
       "grantedHint": "Included in your plan",
       "included": "Included",
+      "includedInPlan": "Included in your plan",
       "activate": "Activate",
       "deactivate": "Cancel",
-      "proRequired": "Requires an active Pro plan",
+      "deactivateIncluded": "Deactivate",
+      "proRequired": "Available from the Pro plan",
+      "subscriptionRequired": "Requires an active subscription — an administrator must complete the billing setup",
+      "activateSubscription": "Complete billing setup",
+      "adminOnly": "Admins only",
       "charter": {
         "name": "Charter",
         "desc": "Per-boat pricing and seasonal rates"
@@ -131,9 +150,16 @@
       "pricePerBoat": "{amount} €/boat/month",
       "totalPerMonth": "{amount} €/month",
       "apply": "Update",
-      "grantedHint": "{count} complimentary boat(s)",
+      "grantedHint": "{count, plural, one {# complimentary boat} other {# complimentary boats}}",
       "unlimited": "Unlimited boats",
-      "proRequired": "Requires an active Pro plan"
+      "proRequired": "Available from the Pro plan",
+      "subscriptionRequired": "Requires an active subscription — an administrator must complete the billing setup"
+    },
+    "noSubscription": {
+      "title": "Your {plan} plan has no active subscription",
+      "body": "Your organisation is on the {plan} plan, but no active subscription is attached to it. Add-on modules and extra boats are billed on that subscription — complete it to enable them.",
+      "cta": "Complete billing setup",
+      "adminOnly": "An administrator must complete the billing setup."
     }
   },
   "upgrade": {
@@ -152,6 +178,32 @@
     "emailLabel": "Email address",
     "emailHint": "Email address cannot be changed.",
     "save": "Save changes"
+  },
+  "security": {
+    "title": "Security",
+    "subtitle": "Change your password without leaving the app.",
+    "currentPasswordLabel": "Current password",
+    "newPasswordLabel": "New password",
+    "newPasswordHint": "Between 8 and 32 characters.",
+    "confirmPasswordLabel": "Confirm new password",
+    "save": "Change password"
+  },
+  "language": {
+    "title": "Language",
+    "subtitle": "Choose the language of your interface. This preference is saved to your profile.",
+    "label": "Interface language",
+    "english": "English",
+    "french": "Français",
+    "save": "Save language"
+  },
+  "theme": {
+    "title": "Appearance",
+    "subtitle": "Choose the appearance of your interface. This preference is saved to your profile.",
+    "label": "Interface theme",
+    "system": "System",
+    "light": "Light",
+    "dark": "Dark",
+    "autoSaved": "Applied immediately and saved to your profile. « System » follows your device settings."
   },
   "ai": {
     "title": "AI customisation",
@@ -178,7 +230,7 @@
     "primaryColorLabel": "Primary colour",
     "secondaryColorLabel": "Secondary colour",
     "appNameLabel": "Application name",
-    "appNamePlaceholder": "FleetAI",
+    "appNamePlaceholder": "FleetAi",
     "appNameHint": "Replaces the name displayed in the interface.",
     "preview": "Preview",
     "save": "Save",
@@ -198,13 +250,13 @@
     "fileLabel": "CSV file",
     "fileHint": "Format: UTF-8 or UTF-8 BOM, `;` separator. Max size: 5 MB.",
     "previewButton": "Preview",
-    "confirmButton": "Import {count} row(s)",
+    "confirmButton": "{count, plural, one {Import # row} other {Import # rows}}",
     "cancelButton": "Cancel",
     "downloadTemplate": "Download CSV template",
     "templateHint": "Expected headers: {headers}",
     "previewTitle": "File preview",
-    "previewSummary": "{valid} valid row(s) out of {total}",
-    "previewErrors": "{count} error(s)",
+    "previewSummary": "{valid, plural, one {# valid row} other {# valid rows}} out of {total}",
+    "previewErrors": "{count, plural, one {# error} other {# errors}}",
     "previewColumns": {
       "line": "Line",
       "date": "date",
@@ -260,7 +312,13 @@
       "boat_delete": "Boat deleted",
       "member_add": "Member added",
       "member_remove": "Member removed",
-      "member_update_role": "Role updated"
+      "member_update_role": "Role updated",
+      "invitation_send": "Invitation sent",
+      "invitation_cancel": "Invitation cancelled",
+      "invitation_accept": "Invitation accepted",
+      "maintenance_task_create": "Maintenance task created",
+      "maintenance_task_complete": "Maintenance task completed",
+      "maintenance_task_delete": "Maintenance task deleted"
     },
     "empty": {
       "title": "No activity yet",

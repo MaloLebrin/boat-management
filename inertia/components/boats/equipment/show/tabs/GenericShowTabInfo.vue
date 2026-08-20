@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import BaseCard from '~/components/base/BaseCard.vue'
 import { useT } from '~/composables/use_t'
+import { useDateFormat } from '~/composables/use_date_format'
 import type { BoatGenericEquipmentDetail } from '~/types/boat_show'
 
 defineProps<{ item: BoatGenericEquipmentDetail }>()
 
 const { t } = useT()
+const { formatDate } = useDateFormat()
 </script>
 
 <template>
@@ -47,7 +49,7 @@ const { t } = useT()
         <dt class="text-xs font-semibold uppercase tracking-wide text-fg-subtle">
           {{ t('equipment.purchasedAt') }}
         </dt>
-        <dd class="mt-1 text-sm text-fg">{{ item.purchasedAt }}</dd>
+        <dd class="mt-1 text-sm text-fg">{{ formatDate(item.purchasedAt) }}</dd>
       </div>
     </dl>
 

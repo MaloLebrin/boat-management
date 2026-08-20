@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { router, usePage } from '@inertiajs/vue3'
+import { Head, router, usePage } from '@inertiajs/vue3'
 import { Link } from '@adonisjs/inertia/vue'
 import BaseAlert from '~/components/base/BaseAlert.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
@@ -11,6 +11,7 @@ import BaseHeading from '~/components/base/BaseHeading.vue'
 import BasePagination from '~/components/base/BasePagination.vue'
 import InvoiceListToolbar from '~/components/invoices/InvoiceListToolbar.vue'
 import InvoiceStatusBadge from '~/components/invoices/InvoiceStatusBadge.vue'
+import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import type {
   InvoiceListFilters,
@@ -28,6 +29,7 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
+const { formatDate } = useDateFormat()
 const page = usePage()
 
 const flash = computed(() => page.props.flash as { error?: string; success?: string } | undefined)
@@ -73,14 +75,11 @@ function formatTotal(invoice: InvoiceRow): string {
     currency: invoice.currency,
   }).format(invoice.total)
 }
-
-function formatDate(dateStr: string | null): string {
-  if (!dateStr) return '-'
-  return new Date(dateStr).toLocaleDateString()
-}
 </script>
 
 <template>
+  <Head :title="t('invoices.title')" />
+
   <div class="mx-auto w-full max-w-6xl px-6 py-10 sm:px-8">
     <div class="mb-6 flex items-center justify-between">
       <div>

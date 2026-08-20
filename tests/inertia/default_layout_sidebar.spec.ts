@@ -19,19 +19,24 @@ vi.mock('@inertiajs/vue3', () => ({
     props: {
       user: { initials: 'ML', fullName: 'Marie L.' },
       flash: {},
+      permissions: {
+        role: 'member',
+        capabilities: ['boats.view', 'ports.view', 'crew.create', 'maintenance.view'],
+      },
       appT: {
         'nav.dashboard': 'Dashboard',
-        'nav.myBoats': 'My boats',
+        'nav.boats': 'Boats',
         'nav.planning': 'Planning',
         'nav.history': 'History',
         'nav.settings': 'Settings',
         'nav.logout': 'Logout',
         'nav.sections.fleet': 'FLEET',
+        'nav.sections.activity': 'ACTIVITY',
         'nav.sections.maintenance': 'MAINTENANCE',
-        'nav.sections.preferences': 'PREFERENCES',
+        'nav.sections.business': 'MANAGEMENT',
         'ports.nav': 'Ports',
-        'offline.banner': 'You are offline',
-        'pwa.install': 'Install app',
+        'common.offline.banner': 'You are offline',
+        'common.pwa.install': 'Install app',
       },
     },
   }),
@@ -74,7 +79,7 @@ describe('DefaultLayout — sidebar', () => {
   test('shows sidebar links for authenticated user', () => {
     const w = mount(DefaultLayout, { slots: { default: '<div>Content</div>' } })
     expect(w.text()).toContain('Dashboard')
-    expect(w.text()).toContain('My boats')
+    expect(w.text()).toContain('Boats')
     expect(w.text()).toContain('Planning')
     expect(w.text()).toContain('Logout')
   })

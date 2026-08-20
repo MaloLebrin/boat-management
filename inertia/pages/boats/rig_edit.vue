@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import { Link } from '@adonisjs/inertia/vue'
 import { Form } from '@adonisjs/inertia/vue'
+import { Head } from '@inertiajs/vue3'
 import BoatEquipmentRigFields from '~/components/boats/rig/BoatEquipmentRigFields.vue'
 import type { BoatEquipmentRigFieldsModel } from '~/components/boats/rig/BoatEquipmentRigFields.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
@@ -16,6 +18,8 @@ const { t } = useT()
 </script>
 
 <template>
+  <Head :title="rig ? t('boats.rig.editTitle') : t('boats.rig.addTitle')" />
+
   <div class="mx-auto w-full max-w-xl px-6 py-10 sm:px-8">
     <div class="space-y-2">
       <BaseHeading level="1">{{
@@ -33,12 +37,12 @@ const { t } = useT()
           <BoatEquipmentRigFields :errors="errors" :rig="rig" />
           <div class="mt-6 flex items-center gap-3">
             <BaseButton type="submit" :disabled="processing">{{ t('common.save') }}</BaseButton>
-            <a
+            <Link
               :href="`/boats/${boat.id}`"
               class="text-sm font-semibold text-fg-muted hover:text-fg hover:underline"
             >
               {{ t('common.cancel') }}
-            </a>
+            </Link>
           </div>
         </BaseCard>
       </Form>

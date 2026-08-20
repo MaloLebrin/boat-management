@@ -24,8 +24,9 @@
     "invite": "Inviter un membre",
     "inviteForm": {
       "email": "Adresse email",
-      "emailPlaceholder": "collegue@exemple.com",
+      "emailPlaceholder": "collègue@exemple.com",
       "role": "Rôle",
+      "boats": "Bateaux concernés",
       "submit": "Envoyer l'invitation",
       "cancel": "Annuler"
     },
@@ -39,7 +40,9 @@
     "noName": "Sans nom",
     "roles": {
       "admin": "Admin",
-      "member": "Membre"
+      "member": "Membre",
+      "mechanic": "Mécanicien",
+      "boat_owner": "Propriétaire de bateau"
     },
     "statuses": {
       "active": "Actif",
@@ -49,7 +52,16 @@
     "remove": "Supprimer",
     "cancelInvitation": "Annuler",
     "pendingInvitations": "Invitations en attente",
-    "activeMembers": "Membres actifs"
+    "activeMembers": "Membres actifs",
+    "roleConfirm": {
+      "title": "Changer le rôle",
+      "summary": "{name} passera du rôle « {from} » au rôle « {to} ».",
+      "impactAdmin": "Ce membre obtiendra un accès administrateur complet : gestion des membres, de la facturation et de tous les bateaux.",
+      "impactBoatOwner": "Ce membre perdra tout accès staff. Il ne verra plus que les bateaux dont il est propriétaire, en lecture seule. Pensez à lui assigner ses bateaux.",
+      "impactStaff": "Les droits d'accès de ce membre seront ajustés en conséquence.",
+      "assignBoats": "Assigner ses bateaux",
+      "confirm": "Confirmer le changement"
+    }
   },
   "billing": {
     "title": "Facturation et plan",
@@ -73,8 +85,9 @@
     "storageOverflow": "Votre usage de stockage dépasse la limite de votre plan actuel. Les nouveaux uploads sont bloqués. Libérez de l'espace ou passez à un plan supérieur.",
     "features": {
       "ai": "IA / Copilote",
-      "export": "Export (PDF / CSV / JSON)",
-      "maintenanceHistory": "Historique de maintenance"
+      "export": "Export (PDF / CSV)",
+      "maintenanceHistory": "Historique de maintenance",
+      "aiCustomization": "Personnalisation IA (prompt métier)"
     },
     "upgradeTo": {
       "pro": "Passer au plan Pro",
@@ -106,14 +119,20 @@
     "modules": {
       "title": "Modules add-ons",
       "subtitle": "Complétez votre plan Pro avec des modules facturés séparément.",
+      "subtitleEnterprise": "Tous les modules add-ons sont inclus dans votre plan.",
       "pricePerMonth": "{amount} €/mois",
       "active": "Actif",
       "granted": "Offert",
       "grantedHint": "Inclus dans votre offre",
       "included": "Inclus",
+      "includedInPlan": "Inclus dans votre plan",
       "activate": "Activer",
       "deactivate": "Résilier",
-      "proRequired": "Nécessite un plan Pro actif",
+      "deactivateIncluded": "Désactiver",
+      "proRequired": "Disponible à partir du plan Pro",
+      "subscriptionRequired": "Nécessite un abonnement actif — un administrateur doit le finaliser",
+      "activateSubscription": "Finaliser l'abonnement",
+      "adminOnly": "Réservé aux administrateurs",
       "charter": {
         "name": "Location",
         "desc": "Tarif par bateau et périodes saisonnières"
@@ -131,9 +150,16 @@
       "pricePerBoat": "{amount} €/bateau/mois",
       "totalPerMonth": "{amount} €/mois",
       "apply": "Mettre à jour",
-      "grantedHint": "{count} bateau(x) offert(s)",
+      "grantedHint": "{count, plural, one {# bateau offert} other {# bateaux offerts}}",
       "unlimited": "Bateaux illimités",
-      "proRequired": "Nécessite un plan Pro actif"
+      "proRequired": "Disponible à partir du plan Pro",
+      "subscriptionRequired": "Nécessite un abonnement actif — un administrateur doit le finaliser"
+    },
+    "noSubscription": {
+      "title": "Votre plan {plan} n'a aucun abonnement actif",
+      "body": "Votre organisation est sur le plan {plan}, mais aucun abonnement actif n'y est rattaché. Les modules add-ons et les bateaux supplémentaires sont facturés sur cet abonnement — finalisez-le pour pouvoir les activer.",
+      "cta": "Finaliser l'abonnement",
+      "adminOnly": "Un administrateur doit finaliser l'abonnement."
     }
   },
   "upgrade": {
@@ -152,6 +178,32 @@
     "emailLabel": "Adresse email",
     "emailHint": "L'adresse email ne peut pas être modifiée.",
     "save": "Enregistrer les modifications"
+  },
+  "security": {
+    "title": "Sécurité",
+    "subtitle": "Modifiez votre mot de passe sans quitter l'application.",
+    "currentPasswordLabel": "Mot de passe actuel",
+    "newPasswordLabel": "Nouveau mot de passe",
+    "newPasswordHint": "Entre 8 et 32 caractères.",
+    "confirmPasswordLabel": "Confirmez le nouveau mot de passe",
+    "save": "Modifier le mot de passe"
+  },
+  "language": {
+    "title": "Langue",
+    "subtitle": "Choisissez la langue de votre interface. Cette préférence est enregistrée sur votre profil.",
+    "label": "Langue de l'interface",
+    "english": "English",
+    "french": "Français",
+    "save": "Enregistrer la langue"
+  },
+  "theme": {
+    "title": "Apparence",
+    "subtitle": "Choisissez l'apparence de votre interface. Cette préférence est enregistrée sur votre profil.",
+    "label": "Thème de l'interface",
+    "system": "Système",
+    "light": "Clair",
+    "dark": "Sombre",
+    "autoSaved": "Appliqué immédiatement et enregistré sur votre profil. « Système » suit le réglage de votre appareil."
   },
   "ai": {
     "title": "Personnalisation IA",
@@ -178,7 +230,7 @@
     "primaryColorLabel": "Couleur principale",
     "secondaryColorLabel": "Couleur secondaire",
     "appNameLabel": "Nom de l'application",
-    "appNamePlaceholder": "FleetAI",
+    "appNamePlaceholder": "FleetAi",
     "appNameHint": "Remplace le nom affiché dans l'interface.",
     "preview": "Aperçu",
     "save": "Enregistrer",
@@ -198,13 +250,13 @@
     "fileLabel": "Fichier CSV",
     "fileHint": "Format : UTF-8 ou UTF-8 BOM, séparateur `;`. Taille max : 5 Mo.",
     "previewButton": "Prévisualiser",
-    "confirmButton": "Importer {count} ligne(s)",
+    "confirmButton": "{count, plural, one {Importer # ligne} other {Importer # lignes}}",
     "cancelButton": "Annuler",
     "downloadTemplate": "Télécharger le modèle CSV",
     "templateHint": "En-têtes attendues : {headers}",
     "previewTitle": "Aperçu du fichier",
-    "previewSummary": "{valid} ligne(s) valide(s) sur {total}",
-    "previewErrors": "{count} erreur(s)",
+    "previewSummary": "{valid, plural, one {# ligne valide} other {# lignes valides}} sur {total}",
+    "previewErrors": "{count, plural, one {# erreur} other {# erreurs}}",
     "previewColumns": {
       "line": "Ligne",
       "date": "date",
@@ -260,7 +312,13 @@
       "boat_delete": "Bateau supprimé",
       "member_add": "Membre ajouté",
       "member_remove": "Membre supprimé",
-      "member_update_role": "Rôle modifié"
+      "member_update_role": "Rôle modifié",
+      "invitation_send": "Invitation envoyée",
+      "invitation_cancel": "Invitation annulée",
+      "invitation_accept": "Invitation acceptée",
+      "maintenance_task_create": "Tâche de maintenance créée",
+      "maintenance_task_complete": "Tâche de maintenance terminée",
+      "maintenance_task_delete": "Tâche de maintenance supprimée"
     },
     "empty": {
       "title": "Aucune activité",

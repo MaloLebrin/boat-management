@@ -18,3 +18,24 @@ export function toDateTime(value: Date | string | DateTime): DateTime {
   }
   return DateTime.fromISO(String(value), { zone: 'utc' })
 }
+
+/**
+ * Converts a naive `datetime-local` submission into the UTC instant the user
+ * actually meant.
+ *
+ * `toDateTime` re-labels the wall-clock as UTC, which is only correct for a
+ * browser sitting in UTC. Every other timezone would store (and later display)
+ * the value shifted by its offset — see #452. The browser sends its
+ * `Date#getTimezoneOffset()` alongside the field, which is already the number of
+ * minutes to add to local wall-clock to reach UTC (e.g. `-600` for UTC+10), so
+ * the correction is a plain addition.
+ *
+ * `tzOffsetMinutes` is optional on purpose: older clients, offline replays and
+ * API callers that post an absolute datetime simply get the previous behaviour.
+ */
+export function toUtcFromLocalInput(
+  value: Date | string | DateTime,
+  tzOffsetMinutes?: number | null
+): DateTime {
+  return toDateTime(value).plus({ minutes: tzOffsetMinutes ?? 0 })
+}

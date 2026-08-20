@@ -2,6 +2,9 @@
 import type { routes } from './index.ts'
 
 export interface ApiDefinition {
+  eventStream: typeof routes['event_stream']
+  subscribe: typeof routes['subscribe']
+  unsubscribe: typeof routes['unsubscribe']
   dashboard: typeof routes['dashboard']
   designSystem: typeof routes['design_system']
   sitemap: typeof routes['sitemap']
@@ -37,6 +40,10 @@ export interface ApiDefinition {
     destroy: typeof routes['boats.destroy']
     pricing: {
       update: typeof routes['boats.pricing.update']
+    }
+    owners: {
+      store: typeof routes['boats.owners.store']
+      destroy: typeof routes['boats.owners.destroy']
     }
     assign: typeof routes['boats.assign']
     engines: {
@@ -208,6 +215,12 @@ export interface ApiDefinition {
     update: typeof routes['boat_generic_equipment.update']
     destroy: typeof routes['boat_generic_equipment.destroy']
   }
+  owner: {
+    boats: {
+      index: typeof routes['owner.boats.index']
+      show: typeof routes['owner.boats.show']
+    }
+  }
   ports: {
     index: typeof routes['ports.index']
     create: typeof routes['ports.create']
@@ -244,10 +257,12 @@ export interface ApiDefinition {
     en: {
       home: typeof routes['marketing.en.home']
       pricing: typeof routes['marketing.en.pricing']
+      pricingLegacy: typeof routes['marketing.en.pricing_legacy']
       simulator: typeof routes['marketing.en.simulator']
       guide: typeof routes['marketing.en.guide']
       privacy: typeof routes['marketing.en.privacy']
       about: typeof routes['marketing.en.about']
+      contact: typeof routes['marketing.en.contact']
     }
     fr: {
       home: typeof routes['marketing.fr.home']
@@ -256,6 +271,7 @@ export interface ApiDefinition {
       guide: typeof routes['marketing.fr.guide']
       privacy: typeof routes['marketing.fr.privacy']
       about: typeof routes['marketing.fr.about']
+      contact: typeof routes['marketing.fr.contact']
     }
     contact: typeof routes['marketing.contact']
   }
@@ -277,6 +293,9 @@ export interface ApiDefinition {
   locale: {
     set: typeof routes['locale.set']
   }
+  theme: {
+    set: typeof routes['theme.set']
+  }
   settings: {
     index: typeof routes['settings.index']
     me: typeof routes['settings.me']
@@ -290,6 +309,10 @@ export interface ApiDefinition {
       module: {
         add: typeof routes['settings.billing.module.add']
         remove: typeof routes['settings.billing.module.remove']
+        enterprise: {
+          activate: typeof routes['settings.billing.module.enterprise.activate']
+          deactivate: typeof routes['settings.billing.module.enterprise.deactivate']
+        }
       }
       addon: {
         set: typeof routes['settings.billing.addon.set']
@@ -297,6 +320,15 @@ export interface ApiDefinition {
     }
     profile: {
       update: typeof routes['settings.profile.update']
+    }
+    password: {
+      update: typeof routes['settings.password.update']
+    }
+    locale: {
+      update: typeof routes['settings.locale.update']
+    }
+    theme: {
+      update: typeof routes['settings.theme.update']
     }
     ai: typeof routes['settings.ai'] & {
       update: typeof routes['settings.ai.update']
@@ -316,7 +348,9 @@ export interface ApiDefinition {
     }
   }
   maintenance: {
-    history: typeof routes['maintenance.history']
+    history: typeof routes['maintenance.history'] & {
+      pdf: typeof routes['maintenance.history.pdf']
+    }
   }
   organization: {
     members: {
@@ -406,9 +440,6 @@ export interface ApiDefinition {
     update: typeof routes['invoices.update']
     destroy: typeof routes['invoices.destroy']
   }
-  eventStream: typeof routes['event_stream']
-  subscribe: typeof routes['subscribe']
-  unsubscribe: typeof routes['unsubscribe']
   newAccount: {
     create: typeof routes['new_account.create']
     store: typeof routes['new_account.store']

@@ -14,6 +14,7 @@ import PricingConfigurator from '~/components/marketing/pricing/PricingConfigura
 import PricingExtrasSection from '~/components/marketing/pricing/PricingExtrasSection.vue'
 import PricingFaqSection from '~/components/marketing/pricing/PricingFaqSection.vue'
 import HomeFinalCtaSection from '~/components/marketing/home/HomeFinalCtaSection.vue'
+import { marketingPath } from '#shared/helpers/locale_path'
 
 type SharedProps = { locale?: 'en' | 'fr' }
 const page = usePage<SharedProps>()
@@ -89,7 +90,11 @@ interface Configurator {
 }
 interface PlanHeader {
   name: string
-  price: string
+  /** Libellé statique (ex. "Gratuit") pour un plan sans tarification variable. */
+  price?: string
+  priceMonthly?: number
+  priceAnnual?: number
+  pricePer?: string
   cta: string
 }
 interface TestimonialItem {
@@ -128,6 +133,8 @@ interface PageProps {
         annualLabel: string
         annualBadge: string
       }
+      tierFeaturedBadge: string
+      billedAnnuallyNote: string
       tiers: Tier[]
       reassurance: ReassuranceItem[]
       roi: {
@@ -164,6 +171,7 @@ interface PageProps {
         expandAll: string
         collapseAll: string
         addonLabel: string
+        billedAnnuallyNote: string
         groups: Group[]
         planHeaders: PlanHeader[]
       }
@@ -200,8 +208,9 @@ const props = defineProps<PageProps>()
 const t = props.t
 const locale = computed<'en' | 'fr'>(() => (page.props.locale ?? 'fr') as 'en' | 'fr')
 const billing = ref<'monthly' | 'annual'>('annual')
-const hreflangEn = '/en/tarifs'
-const hreflangFr = '/fr/tarifs'
+const hreflangEn = marketingPath('pricing', 'en')
+const hreflangFr = marketingPath('pricing', 'fr')
+const canonicalHref = computed(() => marketingPath('pricing', locale.value))
 </script>
 
 <template>
@@ -209,9 +218,10 @@ const hreflangFr = '/fr/tarifs'
     <meta name="description" :content="t.meta.description" />
     <meta property="og:title" :content="t.meta.title" />
     <meta property="og:description" :content="t.meta.description" />
-    <link rel="canonical" :href="`/${locale}/tarifs`" />
+    <link rel="canonical" :href="canonicalHref" />
     <link rel="alternate" hreflang="en" :href="hreflangEn" />
     <link rel="alternate" hreflang="fr" :href="hreflangFr" />
+    <link rel="alternate" hreflang="x-default" :href="hreflangEn" />
   </Head>
 
   <PricingHeroSection
@@ -223,11 +233,13 @@ const hreflangFr = '/fr/tarifs'
     :tiers="t.pricing.tiers"
     :billing="billing"
     :reassurance="t.pricing.reassurance"
+    :featured-badge-label="t.pricing.tierFeaturedBadge"
+    :billed-annually-note="t.pricing.billedAnnuallyNote"
   />
   <PricingConfigurator v-bind="t.pricing.configurator" :billing="billing" />
   <PricingROISection v-bind="t.pricing.roi" />
   <PricingTestimonialsSection v-bind="t.pricing.testimonials" />
-  <PricingDetailedTableSection v-bind="t.pricing.detailedTable" />
+  <PricingDetailedTableSection v-bind="t.pricing.detailedTable" :billing="billing" />
   <PricingExtrasSection v-bind="t.pricing.extras" />
   <PricingFaqSection v-bind="t.pricing.faq" />
   <HomeFinalCtaSection v-bind="t.pricing.finalCta" />

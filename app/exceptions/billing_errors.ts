@@ -25,3 +25,15 @@ export class ModulesRequireProPlanError extends Error {
     super('Add-on modules can only be subscribed on the Pro plan.')
   }
 }
+
+/**
+ * Le toggle self-service d'un module `granted` (#353) n'est ouvert qu'aux
+ * organisations Enterprise — Starter/Pro passent par `addModule`/`removeModule`
+ * (souscription Stripe) et n'ont pas de module `granted` à basculer.
+ */
+export class ModulesRequireEnterprisePlanError extends Error {
+  name = 'ModulesRequireEnterprisePlanError'
+  constructor() {
+    super('Included modules can only be toggled on the Enterprise plan.')
+  }
+}

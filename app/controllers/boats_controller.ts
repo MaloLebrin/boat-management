@@ -1,15 +1,28 @@
 import { SpotNotFoundError } from '#exceptions/port_errors'
+import { boatOwnerPortalRedirect } from '#utils/staff_route_guard'
+import { deferJson } from '#utils/inertia_defer'
 import { QuotaExceededError } from '#exceptions/quota_errors'
-import AiAnalysisService, { type AiSuggestion } from '#services/ai_analysis_service'
+import AiAnalysisService from '#services/ai_analysis_service'
 import AuditLogService from '#services/audit_log_service'
 import BoatDocumentService from '#services/boat_document_service'
 import BoatEquipmentActionService from '#services/boat_equipment_action_service'
 import BoatFuelLogService from '#services/boat_fuel_log_service'
 import BoatListService from '#services/boat_list_service'
+import BoatOwnerService from '#services/boat_owner_service'
 import BoatPricingService from '#services/boat_pricing_service'
 import NavigationLogService from '#services/navigation_log_service'
 import CrewService from '#services/crew_service'
-import { toEditForm, toManageProps, toNavigationProps } from '#transformers/boat_transformer'
+import {
+  toEditForm,
+  toEquipmentActionRows,
+  toFuelLogRows,
+  toIncidentRows,
+  toMaintenanceEventRows,
+  toMaintenanceSheetRows,
+  toMaintenanceTaskRows,
+  toNavigationLogRows,
+  toShowShellProps,
+} from '#transformers/boat_transformer'
 import { toBoatPricingRow } from '#transformers/boat_pricing_transformer'
 import { toPortFormOptions } from '#transformers/port_transformer'
 import BoatIncidentService from '#services/boat_incident_service'
@@ -23,6 +36,8 @@ import OrganizationService from '#services/organization_service'
 import PortService from '#services/port_service'
 import QuotaService from '#services/quota_service'
 import SpotService from '#services/spot_service'
+import { toAppLocale } from '#shared/helpers/locale_path'
+import type { AiSuggestion } from '#shared/types/ai'
 import BoatPolicy from '#policies/boat_policy'
 import EquipmentActionPolicy from '#policies/equipment_action_policy'
 import FuelLogPolicy from '#policies/fuel_log_policy'
@@ -54,23 +69,34 @@ export default class BoatsController {
     private crewService: CrewService,
     private navigationLogService: NavigationLogService,
     private pricingService: BoatPricingService,
-    private equipmentActionService: BoatEquipmentActionService
+    private equipmentActionService: BoatEquipmentActionService,
+    private boatOwnerService: BoatOwnerService
   ) {}
 
-  async index({ inertia, auth, request }: HttpContext) {
+  async index({ inertia, auth, request, bouncer, response }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
     await user.load('organization')
 
-    const [{ boats, filters }, canAddBoat] = await Promise.all([
+    const portalRedirect = await boatOwnerPortalRedirect(user)
+    if (portalRedirect) return response.redirect(portalRedirect)
+
+    await bouncer.with(BoatPolicy).authorize('view')
+
+    const [{ boats, filters }, boatQuota] = await Promise.all([
       this.boatListService.listForUser(user, request.qs()),
-      user.organization ? this.quotaService.canAddBoat(user.organization) : Promise.resolve(false),
+      user.organization
+        ? this.quotaService.getBoatUsage(user.organization)
+        : Promise.resolve({ used: 0, limit: 0 }),
     ])
+
+    const canAddBoat = boatQuota.limit === null || boatQuota.used < boatQuota.limit
 
     return inertia.render('boats/index', {
       boats,
       filters,
       canAddBoat,
+      boatQuota,
     })
   }
 
@@ -82,6 +108,7 @@ export default class BoatsController {
 
     if (!user.organization || !(await this.quotaService.canAddBoat(user.organization))) {
       session.flash('error', i18n.t('flash.quota.boatsExceeded'))
+      session.flash('errorAction', '/settings/billing')
       return response.redirect('/boats')
     }
 
@@ -103,6 +130,7 @@ export default class BoatsController {
     } catch (error) {
       if (error instanceof QuotaExceededError) {
         session.flash('error', i18n.t(`flash.quota.${error.feature}Exceeded`))
+        session.flash('errorAction', '/settings/billing')
         return response.redirect().back()
       }
       throw error
@@ -136,7 +164,14 @@ export default class BoatsController {
     }
   }
 
-  async show({ inertia, params, auth, response, bouncer }: HttpContext) {
+  /**
+   * La fiche bateau ne charge plus ses ~20 jeux de données d'onglet dans la
+   * réponse initiale (#463) : seul le squelette (bateau, photos, position,
+   * droits) est attendu, le reste est différé en deux groupes chargés en
+   * parallèle juste après le rendu. La page peint donc immédiatement avec ses
+   * onglets et un skeleton, au lieu de rester blanche plusieurs secondes.
+   */
+  async show({ inertia, params, request, auth, response, bouncer, i18n }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
@@ -147,33 +182,31 @@ export default class BoatsController {
       await user.load('organization')
 
       const [
-        maintenanceEvents,
-        maintenanceTasks,
-        maintenanceSheets,
         boatMedia,
         positionHistory,
-        latestSuggestions,
         canManageMaintenance,
-        boatDocuments,
         pricingRow,
-        equipmentActions,
         canManageEquipmentActions,
         canDeleteEquipmentActions,
+        canDeleteIncidents,
+        canCreateFuelLogs,
+        canDeleteFuelLogs,
+        canCreateNavigationLogs,
+        canUpdateNavigationLogs,
+        canDeleteNavigationLogs,
       ] = await Promise.all([
-        this.maintenanceService.listForBoat(user, boat),
-        this.taskService.listForBoat(user, boat),
-        this.sheetService.listForBoat(user, boat),
         this.mediaService.listForEntity('boat', boat.id),
         this.boatService.getPositionHistory(boat.id),
-        user.organizationId
-          ? this.aiAnalysisService.getLatestBoatSuggestions(user.id, boat.id, user.organizationId)
-          : Promise.resolve(null),
         bouncer.with(BoatPolicy).allows('edit', boat),
-        this.documentService.listForBoat(user, boat),
         this.pricingService.getForBoat(boat),
-        this.equipmentActionService.listForBoat(user, boat),
         bouncer.with(EquipmentActionPolicy).allows('create', boat),
         bouncer.with(EquipmentActionPolicy).allows('delete', boat),
+        bouncer.with(IncidentPolicy).allows('delete', boat),
+        bouncer.with(FuelLogPolicy).allows('create', boat),
+        bouncer.with(FuelLogPolicy).allows('delete', boat),
+        bouncer.with(NavigationLogPolicy).allows('create', boat),
+        bouncer.with(NavigationLogPolicy).allows('update', boat),
+        bouncer.with(NavigationLogPolicy).allows('delete'),
       ])
 
       const canManageEquipment = canManageMaintenance
@@ -184,20 +217,13 @@ export default class BoatsController {
         : false
       const canManagePricing = pricingEnabled && canManageMaintenance
       const pricing = pricingRow ? toBoatPricingRow(pricingRow) : null
-      const aiSuggestions: AiSuggestion[] | null = latestSuggestions
-        ? (JSON.parse(latestSuggestions.responseText) as AiSuggestion[])
-        : null
+      const tabParam = request.qs().tab
+      const initialTab = typeof tabParam === 'string' && tabParam !== '' ? tabParam : null
 
-      return inertia.render(
-        'boats/show',
-        toManageProps(boat, {
+      return inertia.render('boats/show', {
+        ...toShowShellProps(boat, {
           positionHistory,
           boatMedia,
-          maintenanceEvents,
-          maintenanceTasks,
-          maintenanceSheets,
-          boatDocuments,
-          aiSuggestions,
           canManageMaintenance,
           canManageEquipment,
           canManageDocuments,
@@ -205,83 +231,88 @@ export default class BoatsController {
           pricing,
           pricingEnabled,
           canManagePricing,
-          equipmentActions,
           canManageEquipmentActions,
           canDeleteEquipmentActions,
-        })
-      )
-    } catch (error) {
-      if (error instanceof BoatNotFoundError) {
-        response.redirect('/boats')
-        return
-      }
-      throw error
-    }
-  }
-
-  async navigation({ inertia, params, auth, response, bouncer }: HttpContext) {
-    await auth.authenticate()
-    const user = auth.getUserOrFail()
-
-    try {
-      const boat = await this.boatService.getFullDetailForUser(user, Number(params.id))
-      await bouncer.with(BoatPolicy).authorize('view', boat)
-
-      await user.load('organization')
-
-      const [
-        incidents,
-        fuelLogs,
-        boatMedia,
-        positionHistory,
-        canManageMaintenance,
-        canDeleteIncidents,
-        canCreateFuelLogs,
-        canDeleteFuelLogs,
-        crewMemberOptions,
-        navigationLogs,
-        ports,
-        canCreateNavigationLogs,
-        canUpdateNavigationLogs,
-        canDeleteNavigationLogs,
-      ] = await Promise.all([
-        this.incidentService.listForBoat(user, boat),
-        this.fuelLogService.listForBoat(user, boat),
-        this.mediaService.listForEntity('boat', boat.id),
-        this.boatService.getPositionHistory(boat.id),
-        bouncer.with(BoatPolicy).allows('edit', boat),
-        bouncer.with(IncidentPolicy).allows('delete', boat),
-        bouncer.with(FuelLogPolicy).allows('create', boat),
-        bouncer.with(FuelLogPolicy).allows('delete', boat),
-        this.crewService.listOptionsForOrganization(user.organization),
-        this.navigationLogService.listForBoat(boat),
-        this.portService.listNamesForOrg(user),
-        bouncer.with(NavigationLogPolicy).allows('create', boat),
-        bouncer.with(NavigationLogPolicy).allows('update', boat),
-        bouncer.with(NavigationLogPolicy).allows('delete'),
-      ])
-
-      const portOptions = ports.map((p) => ({ id: p.id, name: p.name }))
-
-      return inertia.render(
-        'boats/navigation',
-        toNavigationProps(boat, {
-          positionHistory,
-          boatMedia,
-          incidents,
-          fuelLogs,
-          navigationLogs,
-          portOptions,
-          crewMemberOptions,
-          canManageMaintenance,
           canDeleteIncidents,
           canCreateFuelLogs,
           canDeleteFuelLogs,
           canCreateNavigationLogs,
           canUpdateNavigationLogs,
           canDeleteNavigationLogs,
-        })
-      )
+          initialTab,
+        }),
+
+        // Groupe « maintenance » : onglets Aperçu, Historique, Tâches, Fiches,
+        // Actions équipement et Documents administratifs.
+        maintenanceEvents: inertia.defer(
+          deferJson(async () =>
+            toMaintenanceEventRows(await this.maintenanceService.listForBoat(user, boat))
+          ),
+          'maintenance'
+        ),
+        maintenanceTasks: inertia.defer(
+          deferJson(async () =>
+            toMaintenanceTaskRows(await this.taskService.listForBoat(user, boat))
+          ),
+          'maintenance'
+        ),
+        maintenanceSheets: inertia.defer(
+          deferJson(async () =>
+            toMaintenanceSheetRows(await this.sheetService.listForBoat(user, boat))
+          ),
+          'maintenance'
+        ),
+        boatDocuments: inertia.defer(
+          deferJson(() => this.documentService.listForBoat(user, boat)),
+          'maintenance'
+        ),
+        equipmentActions: inertia.defer(
+          deferJson(async () =>
+            toEquipmentActionRows(await this.equipmentActionService.listForBoat(user, boat))
+          ),
+          'maintenance'
+        ),
+        aiSuggestions: inertia.defer(
+          deferJson(async () => {
+            if (!user.organizationId) return null
+            const latest = await this.aiAnalysisService.getLatestBoatSuggestions(
+              user.id,
+              boat.id,
+              user.organizationId,
+              toAppLocale(i18n.locale)
+            )
+            return latest ? (JSON.parse(latest.responseText) as AiSuggestion[]) : null
+          }),
+          'maintenance'
+        ),
+
+        // Groupe « navigation » : onglets Journal de bord, Carburant, Incidents.
+        navigationLogs: inertia.defer(
+          deferJson(async () =>
+            toNavigationLogRows(await this.navigationLogService.listForBoat(boat))
+          ),
+          'navigation'
+        ),
+        fuelLogs: inertia.defer(
+          deferJson(async () => toFuelLogRows(await this.fuelLogService.listForBoat(user, boat))),
+          'navigation'
+        ),
+        incidents: inertia.defer(
+          deferJson(async () => toIncidentRows(await this.incidentService.listForBoat(user, boat))),
+          'navigation'
+        ),
+        portOptions: inertia.defer(
+          deferJson(async () => {
+            const ports = await this.portService.listNamesForOrg(user)
+            return ports.map((p) => ({ id: p.id, name: p.name }))
+          }),
+          'navigation'
+        ),
+        crewMemberOptions: inertia.defer(
+          deferJson(() => this.crewService.listOptionsForOrganization(user.organization)),
+          'navigation'
+        ),
+      })
     } catch (error) {
       if (error instanceof BoatNotFoundError) {
         response.redirect('/boats')
@@ -299,11 +330,25 @@ export default class BoatsController {
       const boat = await this.boatService.getForUserOrFail(user, Number(params.id))
       await bouncer.with(BoatPolicy).authorize('edit', boat)
 
-      const ports = await this.portService.listWithSpotsForOrg(user)
+      const [ports, owners, ownerCandidates] = await Promise.all([
+        this.portService.listWithSpotsForOrg(user),
+        this.boatOwnerService.listOwners(boat),
+        this.boatOwnerService.listEligibleOwnerCandidates(boat),
+      ])
 
       return inertia.render('boats/edit', {
         boat: toEditForm(boat),
         ports: toPortFormOptions(ports),
+        owners: owners.map((owner) => ({
+          id: owner.id,
+          fullName: owner.fullName,
+          email: owner.email,
+        })),
+        ownerCandidates: ownerCandidates.map((candidate) => ({
+          id: candidate.id,
+          fullName: candidate.fullName,
+          email: candidate.email,
+        })),
       })
     } catch (error) {
       if (error instanceof BoatNotFoundError) {

@@ -37,11 +37,11 @@ const { el: sectionEl, isVisible } = useScrollReveal()
           <div
             v-for="(item, idx) in items"
             :key="item.title"
-            class="reveal rounded-xl border border-bone bg-white p-5 transition-transform duration-300 hover:-translate-y-1"
+            class="reveal rounded-xl border border-bone bg-surface-elevated p-5 transition-transform duration-300 hover:-translate-y-1"
             :class="[`reveal-delay-${idx % 4}`, { visible: isVisible }]"
           >
             <div
-              class="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-navy-100 text-xl"
+              class="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-brand-soft text-xl"
             >
               {{ item.icon }}
             </div>

@@ -2,7 +2,7 @@
   "title": "Réservations",
   "quote": {
     "title": "Estimation du prix",
-    "nights": "{count} nuit(s)",
+    "nights": "{count, plural, one {# nuit} other {# nuits}}",
     "base": "Tarif de base",
     "week": "Tarif hebdomadaire",
     "perNight": "par nuit",
@@ -12,13 +12,15 @@
     "apply": "Appliquer ce prix",
     "noPricing": "Aucun tarif configuré pour ce bateau.",
     "selectDates": "Sélectionnez les dates pour voir l'estimation.",
-    "belowMin": "Le séjour minimum est de {min} nuit(s).",
-    "aboveMax": "Le séjour maximum est de {max} nuit(s)."
+    "belowMin": "Le séjour minimum est de {min, plural, one {# nuit} other {# nuits}}.",
+    "aboveMax": "Le séjour maximum est de {max, plural, one {# nuit} other {# nuits}}."
   },
   "subtitle": "Gérez les réservations de votre flotte",
   "fleet": {
     "title": "Calendrier des réservations",
-    "subtitle": "Vue multi-bateaux de toutes les réservations"
+    "subtitle": "Vue multi-bateaux de toutes les réservations",
+    "filterLabel": "Bateau",
+    "chooseBoat": "Choisir un bateau"
   },
   "status": {
     "option": "Option",
@@ -52,7 +54,11 @@
   "calendar": {
     "noReservations": "Aucune réservation ce mois-ci",
     "allBoats": "Tous les bateaux",
-    "more": "+ {count} de plus"
+    "more": "+ {count} de plus",
+    "scrollHint": "Faites défiler pour voir tout le mois",
+    "available": "Disponible",
+    "noBoatsTitle": "Aucun bateau dans votre flotte",
+    "noBoatsDescription": "Ajoutez un bateau pour planifier ses réservations."
   },
   "empty": {
     "title": "Aucune réservation",

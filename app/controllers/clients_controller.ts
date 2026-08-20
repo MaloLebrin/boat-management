@@ -5,6 +5,7 @@ import ClientService, {
 import BoatReservationService from '#services/boat_reservation_service'
 import QuotaService from '#services/quota_service'
 import { QuotaExceededError } from '#exceptions/quota_errors'
+import { UserNotInOrganizationError } from '#exceptions/organization_errors'
 import ClientPolicy from '#policies/client_policy'
 import { createClientValidator, updateClientValidator } from '#validators/client'
 import { toClientRow } from '#transformers/client_transformer'
@@ -14,6 +15,7 @@ import MediaService from '#services/media_service'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import type Organization from '#models/organization'
+import { BILLING_SETTINGS_PATH } from '#shared/constants/billing'
 
 @inject()
 export default class ClientsController {
@@ -42,7 +44,7 @@ export default class ClientsController {
     } catch (error) {
       if (error instanceof QuotaExceededError) {
         session.flash('error', i18n.t('flash.quota.clientsExceeded'))
-        response.redirect('/')
+        response.redirect(BILLING_SETTINGS_PATH)
         return null
       }
       throw error
@@ -69,16 +71,17 @@ export default class ClientsController {
     await user.load('organization')
     const org = user.organization
 
+    // Utilisateur sans organisation (#279) : ce n'est pas un défaut de module —
+    // l'envoyer sur `/settings/billing` y ferait planter `PLAN_LIMITS[org.plan]`.
+    // Le handler global le renvoie à l'accueil avec le bon message.
     if (org === null) {
-      session.flash('error', i18n.t('flash.quota.clientsExceeded'))
-      response.redirect('/')
-      return null
+      throw new UserNotInOrganizationError()
     }
 
     const canManage = await this.quotaService.canManageClients(org)
     if (!canManage && !(await this.clientService.hasAnyForOrg(org.id))) {
       session.flash('error', i18n.t('flash.quota.clientsExceeded'))
-      response.redirect('/')
+      response.redirect(BILLING_SETTINGS_PATH)
       return null
     }
 

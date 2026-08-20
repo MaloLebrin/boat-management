@@ -1,9 +1,15 @@
 {
   "logbook": {
     "title": "Logbook",
-    "subtitle": "All passages logged for your fleet",
+    "subtitle": "All trips logged for your fleet",
+    "quickAdd": "+ Add",
+    "quickAddModal": {
+      "title": "New trip",
+      "selectBoat": "Boat",
+      "selectBoatPlaceholder": "Select a boat…"
+    },
     "stats": {
-      "trips": "Passages",
+      "trips": "Trips",
       "completed": "Completed",
       "totalDistance": "Total distance",
       "openCount": "In progress"
@@ -21,9 +27,10 @@
       "completed": "Completed"
     },
     "empty": {
-      "title": "No passages logged yet",
-      "description": "Passages will appear here once created from a boat's navigation page.",
-      "action": "View my boats"
+      "title": "No trips logged yet",
+      "description": "Create one with the \"Add\" button above, or from a boat's navigation page.",
+      "action": "View my boats",
+      "actionBoat": "Open navigation"
     },
     "nm": "{count} nm"
   },
@@ -45,12 +52,19 @@
     "empty": {
       "title": "No fueling records yet",
       "description": "Fueling records will appear here once created from a boat's navigation page.",
-      "action": "View my boats"
+      "action": "View my boats",
+      "actionBoat": "Open navigation"
     }
   },
   "incidents": {
     "title": "Incidents",
     "subtitle": "Incident tracker for your fleet",
+    "quickAdd": "+ Add",
+    "quickAddModal": {
+      "title": "Report an incident",
+      "selectBoat": "Boat",
+      "selectBoatPlaceholder": "Select a boat…"
+    },
     "stats": {
       "total": "Incidents",
       "open": "Open",
@@ -65,8 +79,9 @@
     },
     "empty": {
       "title": "No incidents reported",
-      "description": "Incidents will appear here once reported from a boat's navigation page.",
-      "action": "View my boats"
+      "description": "Report one with the \"Add\" button above, or from a boat's navigation page.",
+      "action": "View my boats",
+      "actionBoat": "Open navigation"
     }
   },
   "filter": {

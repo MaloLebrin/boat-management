@@ -1,11 +1,12 @@
 import { mount } from '@vue/test-utils'
-import { test, expect, vi } from 'vitest'
+import { describe, test, expect, vi } from 'vitest'
 import BudgetPortStayList from '../../inertia/components/boats/budget/BudgetPortStayList.vue'
 import type { BoatPortStayItem } from '../../shared/types/budget'
 
 vi.mock('~/composables/use_t', () => ({
   useT: () => ({
     t: (key: string) => key,
+    locale: { value: 'fr' },
   }),
 }))
 
@@ -102,4 +103,14 @@ test('does not show edit/delete buttons when canManage is false', () => {
 test('renders notes when present', () => {
   const w = mountList([stayWithNullEndDate])
   expect(w.text()).toContain('Beau mouillage')
+})
+
+describe('dark mode (#416)', () => {
+  test('le coût utilise une palette de marque, pas teal', () => {
+    const stay = { ...stayWithEndDate, cost: 420 }
+    const html = mountList([stay]).html()
+    expect(html).toContain('text-lilac-700')
+    expect(html).not.toMatch(/-teal-\d/)
+    expect(html).not.toContain('dark:')
+  })
 })

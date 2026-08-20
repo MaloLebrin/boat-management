@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { expect, test, vi } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 
 vi.mock('~/composables/use_t', () => ({
   useT: () => ({ t: (k: string) => k, locale: { value: 'fr' } }),
@@ -31,6 +31,7 @@ function mountExtraBoats(
       plan: 'pro',
       subscription,
       activeAddons: [],
+      canManageBilling: true,
       ...props,
     },
     global: {
@@ -104,4 +105,39 @@ test('Enterprise shows the unlimited badge, no stepper', () => {
 test('Starter (no subscription) prompts to upgrade to Pro', () => {
   const w = mountExtraBoats({ plan: 'starter', subscription: null, activeAddons: [] })
   expect(w.text()).toContain('settings.billing.extraBoats.proRequired')
+})
+
+describe('plan Pro sans abonnement Stripe actif (#456)', () => {
+  test("un admin se voit proposer de finaliser l'abonnement, pas d'exiger un plan Pro", () => {
+    const w = mountExtraBoats({ plan: 'pro', subscription: null, activeAddons: [] })
+    expect(w.text()).toContain('settings.billing.noSubscription.cta')
+    expect(w.text()).not.toContain('settings.billing.extraBoats.proRequired')
+  })
+
+  test("émet activateSubscription au clic, plutôt que d'appeler l'endpoint add-on", async () => {
+    post.mockClear()
+    const w = mountExtraBoats({ plan: 'pro', subscription: null, activeAddons: [] })
+    await w.findAll('button')[0].trigger('click')
+    expect(w.emitted('activateSubscription')).toHaveLength(1)
+    expect(post).not.toHaveBeenCalled()
+  })
+
+  test('sans capability billing, le message renvoie vers un administrateur', () => {
+    const w = mountExtraBoats({
+      plan: 'pro',
+      subscription: null,
+      activeAddons: [],
+      canManageBilling: false,
+    })
+    expect(w.text()).toContain('settings.billing.extraBoats.subscriptionRequired')
+    expect(w.text()).not.toContain('settings.billing.extraBoats.proRequired')
+  })
+})
+
+describe('dark mode (#416)', () => {
+  test('le panneau utilise bg-surface-muted, pas le token fantôme bg-surface-2', () => {
+    const html = mountExtraBoats({ plan: 'pro', subscription: null, activeAddons: [] }).html()
+    expect(html).toContain('bg-surface-muted')
+    expect(html).not.toContain('surface-2')
+  })
 })

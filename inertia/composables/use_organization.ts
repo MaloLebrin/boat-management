@@ -16,6 +16,8 @@ interface UseOrganizationReturn {
   currentUserRole: ComputedRef<OrgRole | null>
   isAdmin: ComputedRef<boolean>
   isMember: ComputedRef<boolean>
+  isMechanic: ComputedRef<boolean>
+  isBoatOwner: ComputedRef<boolean>
 }
 
 export function useOrganization(params: UseOrganizationParams): UseOrganizationReturn {
@@ -23,11 +25,15 @@ export function useOrganization(params: UseOrganizationParams): UseOrganizationR
   const currentUserRole = computed(() => toValue(params.currentUserRole) ?? null)
   const isAdmin = computed(() => currentUserRole.value === 'admin')
   const isMember = computed(() => currentUserRole.value === 'member')
+  const isMechanic = computed(() => currentUserRole.value === 'mechanic')
+  const isBoatOwner = computed(() => currentUserRole.value === 'boat_owner')
 
   return {
     organization,
     currentUserRole,
     isAdmin,
     isMember,
+    isMechanic,
+    isBoatOwner,
   }
 }

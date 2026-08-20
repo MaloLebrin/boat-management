@@ -1,4 +1,4 @@
-# FleetAI
+# FleetAi
 
 > Gestion de flotte nautique — maintenance, planification, IA
 

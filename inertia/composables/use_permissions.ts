@@ -15,6 +15,8 @@ export function usePermissions() {
     role,
     isAdmin: computed(() => role.value === 'admin'),
     isMember: computed(() => role.value === 'member'),
+    isMechanic: computed(() => role.value === 'mechanic'),
+    isBoatOwner: computed(() => role.value === 'boat_owner'),
     can: (capability: Capability) => capabilitySet.value.has(capability),
   }
 }

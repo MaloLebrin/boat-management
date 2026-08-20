@@ -4,7 +4,7 @@ import { ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import ContractStatusBadge from '~/components/reservations/contract/ContractStatusBadge.vue'
-import { useReservationFormat } from '~/composables/use_reservation_format'
+import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import type { RentalContractRow } from '~/types/rental_contract'
 
@@ -17,7 +17,7 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
-const { formatDate } = useReservationFormat()
+const { formatDate } = useDateFormat()
 
 const basePath = `/boats/${props.boatId}/reservations/${props.reservationId}/contract`
 
@@ -81,6 +81,7 @@ function destroy() {
         variant="secondary"
         size="sm"
         :href="`${basePath}/pdf`"
+        external-href
         target="_blank"
         rel="noopener"
       >
@@ -92,6 +93,7 @@ function destroy() {
         variant="secondary"
         size="sm"
         :href="`${basePath}/signed-document`"
+        external-href
         target="_blank"
         rel="noopener"
       >

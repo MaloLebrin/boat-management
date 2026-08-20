@@ -36,8 +36,8 @@
       "totalCost": "Coût total"
     },
     "timeline": {
-      "events": "{count} événement(s)",
-      "pieces": "{count} pièce(s)",
+      "events": "{count, plural, one {# événement} other {# événements}}",
+      "pieces": "{count, plural, one {# pièce} other {# pièces}}",
       "show": "Détail",
       "hide": "Masquer",
       "partsUsed": "Pièces utilisées",
@@ -53,6 +53,7 @@
       "action": "Voir les bateaux"
     },
     "filterBar": {
+      "searchLabel": "Recherche",
       "boatLabel": "Bateau",
       "allBoats": "Tous les bateaux",
       "subjectLabel": "Sujet",
@@ -62,7 +63,26 @@
       "sortLabel": "Tri",
       "sortRecent": "Plus récent",
       "sortOldest": "Plus ancien",
-      "results": "{count} résultat(s)"
+      "results": "{count, plural, one {# résultat} other {# résultats}}"
+    },
+    "pdf": {
+      "title": "Historique de maintenance",
+      "generatedOn": "Généré le {date}",
+      "filtersNone": "Aucun filtre appliqué",
+      "filterBoat": "Bateau : {name}",
+      "filterSubject": "Sujet : {label}",
+      "filterDateFrom": "Du {date}",
+      "filterDateTo": "Au {date}",
+      "filterSearch": "Recherche : « {query} »",
+      "columns": {
+        "date": "Date",
+        "boat": "Bateau",
+        "subject": "Sujet",
+        "title": "Intervention"
+      },
+      "partsCount": "{count, plural, one {# pièce changée} other {# pièces changées}}",
+      "noEvents": "Aucun événement ne correspond aux filtres sélectionnés.",
+      "totalEvents": "{count, plural, one {# événement} other {# événements}}"
     }
   }
 }

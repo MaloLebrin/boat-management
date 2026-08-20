@@ -33,7 +33,7 @@ const { el: sectionEl, isVisible } = useScrollReveal()
       <!-- Featured testimonial -->
       <div
         v-if="items[0]?.featured"
-        class="reveal mb-8 rounded-xl border border-bone bg-white p-8 shadow-sm lg:p-10"
+        class="reveal mb-8 rounded-xl border border-bone bg-surface-elevated p-8 shadow-sm lg:p-10"
         :class="{ visible: isVisible }"
       >
         <ChatBubbleLeftRightIcon class="mb-4 h-8 w-8 text-coral-400" />
@@ -51,7 +51,7 @@ const { el: sectionEl, isVisible } = useScrollReveal()
         <div
           v-for="(item, idx) in items.slice(1)"
           :key="item.author"
-          class="reveal rounded-xl border border-bone bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
+          class="reveal rounded-xl border border-bone bg-surface-elevated p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
           :class="[`reveal-delay-${idx + 1}`, { visible: isVisible }]"
         >
           <ChatBubbleLeftRightIcon class="mb-3 h-6 w-6 text-coral-300" />

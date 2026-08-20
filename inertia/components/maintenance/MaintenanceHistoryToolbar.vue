@@ -90,7 +90,7 @@ function update(partial: Partial<MaintenanceHistoryFilters>) {
       <div class="md:col-span-4">
         <BaseInput
           :model-value="qDraft"
-          :label="t('maintenance.history.filterBar.subjectLabel')"
+          :label="t('maintenance.history.filterBar.searchLabel')"
           inputmode="search"
           :placeholder="t('maintenance.history.searchPlaceholder')"
           @update:model-value="onSearchInput"

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Link } from '@adonisjs/inertia/vue'
 import { ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import { useScrollReveal } from '~/composables/use_scroll_reveal'
@@ -37,14 +38,16 @@ const { el: sectionEl, isVisible } = useScrollReveal()
           <h2 class="font-display text-3xl leading-tight text-fg lg:text-4xl">{{ title }}</h2>
           <p class="mt-4 text-fg-muted">{{ subtitle }}</p>
           <div class="mt-8">
-            <a :href="cta.href">
+            <Link :href="cta.href">
               <BaseButton>{{ cta.label }}</BaseButton>
-            </a>
+            </Link>
           </div>
         </div>
 
         <!-- Right: accordion -->
-        <div class="divide-y divide-bone overflow-hidden rounded-xl border border-bone bg-white">
+        <div
+          class="divide-y divide-bone overflow-hidden rounded-xl border border-bone bg-surface-elevated"
+        >
           <div v-for="(item, idx) in items" :key="item.q">
             <button
               type="button"

@@ -15,6 +15,7 @@ import SimulatorStepWear from '~/components/marketing/simulator/SimulatorStepWea
 import SimulatorResultCard from '~/components/marketing/simulator/SimulatorResultCard.vue'
 import SimulatorCtaCard from '~/components/marketing/simulator/SimulatorCtaCard.vue'
 import SimulatorExitIntentModal from '~/components/marketing/simulator/SimulatorExitIntentModal.vue'
+import { marketingPath } from '#shared/helpers/locale_path'
 import type {
   SimulatorBoatInput,
   SimulatorCostBreakdown,
@@ -37,9 +38,9 @@ const { t } = useT()
 
 const locale = computed<'en' | 'fr'>(() => (page.props.locale ?? 'fr') as 'en' | 'fr')
 
-const canonicalHref = computed(() =>
-  locale.value === 'fr' ? '/fr/simulateur-cout-entretien' : '/en/maintenance-cost-simulator'
-)
+const canonicalHref = computed(() => marketingPath('simulator', locale.value))
+const simulatorEn = marketingPath('simulator', 'en')
+const simulatorFr = marketingPath('simulator', 'fr')
 
 const currentStep = ref(0)
 const formData = ref<Partial<SimulatorBoatInput>>({
@@ -149,12 +150,16 @@ function shareResults() {
 
 <template>
   <Head :title="t('simulator.meta_title')">
-    <meta name="description" :content="t('simulator.meta_description')" />
-    <meta property="og:title" :content="t('simulator.meta_title')" />
-    <meta property="og:description" :content="t('simulator.meta_description')" />
-    <link rel="canonical" :href="canonicalHref" />
-    <link rel="alternate" hreflang="en" href="/en/maintenance-cost-simulator" />
-    <link rel="alternate" hreflang="fr" href="/fr/simulateur-cout-entretien" />
+    <meta head-key="description" name="description" :content="t('simulator.meta_description')" />
+    <meta head-key="og:title" property="og:title" :content="t('simulator.meta_title')" />
+    <meta
+      head-key="og:description"
+      property="og:description"
+      :content="t('simulator.meta_description')"
+    />
+    <link head-key="canonical" rel="canonical" :href="canonicalHref" />
+    <link head-key="alternate-en" rel="alternate" hreflang="en" :href="simulatorEn" />
+    <link head-key="alternate-fr" rel="alternate" hreflang="fr" :href="simulatorFr" />
   </Head>
 
   <!-- Hero dark -->
@@ -172,18 +177,21 @@ function shareResults() {
         <em class="text-coral-400">{{ t('simulator.hero_title_highlight') }}</em>
       </h1>
       <p class="mt-4 text-base text-white/60 lg:text-lg">{{ t('simulator.hero_subtitle') }}</p>
-      <div class="mt-6 flex flex-wrap justify-center gap-2">
-        <span
-          v-for="n in [1, 2, 3]"
-          :key="n"
-          class="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3.5 py-1.5 text-xs text-white/60"
-        >
+      <p class="mt-7 text-xs font-semibold uppercase tracking-widest text-white/40">
+        {{ t('simulator.how_eyebrow') }}
+      </p>
+      <div
+        class="mt-3 flex flex-wrap items-center justify-center gap-x-2 gap-y-2"
+        :aria-label="t('simulator.how_eyebrow')"
+      >
+        <template v-for="(n, idx) in [1, 2, 3]" :key="n">
           <span
-            class="flex h-4 w-4 items-center justify-center rounded-full bg-coral-500/30 text-[9px] font-bold text-coral-300"
-            >{{ n }}</span
+            class="rounded-full border border-white/10 bg-white/5 px-3.5 py-1.5 text-xs font-medium text-white/70"
           >
-          {{ t(`simulator.how_step_${n}_title`) }}
-        </span>
+            {{ t(`simulator.how_step_${n}_title`) }}
+          </span>
+          <span v-if="idx < 2" class="text-coral-400/70" aria-hidden="true">→</span>
+        </template>
       </div>
     </div>
   </section>
@@ -191,7 +199,7 @@ function shareResults() {
   <!-- Simulator -->
   <section class="bg-cream px-6 py-12 lg:py-16">
     <div class="mx-auto max-w-2xl">
-      <div class="overflow-hidden rounded-2xl border border-bone bg-white shadow-lg">
+      <div class="overflow-hidden rounded-2xl border border-bone bg-surface-elevated shadow-lg">
         <!-- Top accent bar -->
         <div class="h-1.5 bg-gradient-to-r from-coral-500 to-coral-400" />
 
@@ -199,7 +207,7 @@ function shareResults() {
           <!-- Named stepper -->
           <div
             v-if="!showResult"
-            class="-mx-6 -mt-6 mb-8 flex items-start rounded-t-xl bg-navy-50/60 px-6 py-5 lg:-mx-8 lg:-mt-8 lg:px-8"
+            class="-mx-6 -mt-6 mb-8 flex items-start rounded-t-xl bg-brand-soft/60 px-6 py-5 lg:-mx-8 lg:-mt-8 lg:px-8"
           >
             <template v-for="(step, idx) in steps" :key="step.key">
               <div class="flex flex-col items-center">
@@ -210,7 +218,7 @@ function shareResults() {
                       ? 'bg-mint-600 text-white'
                       : idx === currentStep
                         ? 'bg-coral-500 text-white shadow-md ring-4 ring-coral-100'
-                        : 'bg-navy-50 text-navy-400 ring-1 ring-bone',
+                        : 'bg-brand-soft text-fg-subtle ring-1 ring-border',
                   ]"
                 >
                   <svg
@@ -229,10 +237,10 @@ function shareResults() {
                   :class="[
                     'mt-1.5 hidden max-w-[80px] text-center text-xs font-semibold leading-tight sm:block',
                     idx === currentStep
-                      ? 'text-navy-800'
+                      ? 'text-brand'
                       : idx < currentStep
                         ? 'text-mint-600'
-                        : 'text-navy-400',
+                        : 'text-fg-subtle',
                   ]"
                   >{{ t(step.labelKey) }}</span
                 >

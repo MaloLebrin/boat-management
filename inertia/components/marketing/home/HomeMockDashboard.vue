@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import HomeMockUpcomingTasks from './HomeMockUpcomingTasks.vue'
+import { useT } from '~/composables/use_t'
 
 defineProps<{
   persona?: 'loueurs' | 'ecoles' | 'marinas' | 'armateurs'
 }>()
+
+const { t } = useT()
 </script>
 
 <template>
@@ -42,9 +45,9 @@ defineProps<{
         </div>
       </nav>
       <div class="mt-auto border-t border-white/10 px-2 py-2">
-        <div class="flex items-center gap-1.5 px-2 py-1 text-violet-100/70">
+        <div class="flex items-center gap-1.5 px-2 py-1 text-violet-200/70">
           <div class="h-3 w-3 rounded bg-violet-400/40" />
-          <span>FleetAI</span>
+          <span>FleetAi</span>
         </div>
       </div>
     </div>
@@ -52,10 +55,12 @@ defineProps<{
     <!-- Main content -->
     <div class="flex flex-1 flex-col overflow-hidden">
       <!-- Header -->
-      <div class="flex items-center justify-between border-b border-bone bg-white px-4 py-2">
+      <div
+        class="flex items-center justify-between border-b border-bone bg-surface-elevated px-4 py-2"
+      >
         <div>
           <p class="font-semibold text-fg">Marina Bleue</p>
-          <p class="text-[9px] text-fg-muted">22 bateaux</p>
+          <p class="text-[9px] text-fg-muted">{{ t('homePreview.fleetCount') }}</p>
         </div>
         <div class="flex items-center gap-2">
           <div class="h-5 w-5 rounded-full bg-bone" />
@@ -85,7 +90,7 @@ defineProps<{
 
           <!-- KPI cards -->
           <div class="mb-3 grid grid-cols-4 gap-2">
-            <div class="rounded-lg border border-bone bg-white p-2">
+            <div class="rounded-lg border border-bone bg-surface-elevated p-2">
               <p class="text-[9px] font-medium uppercase text-fg-muted">Flotte</p>
               <p class="font-display text-lg text-fg">22</p>
             </div>
@@ -97,14 +102,14 @@ defineProps<{
               <p class="text-[9px] font-medium uppercase text-amber-700">Sous 14j</p>
               <p class="font-display text-lg text-amber-600">7</p>
             </div>
-            <div class="rounded-lg border border-bone bg-white p-2">
+            <div class="rounded-lg border border-bone bg-surface-elevated p-2">
               <p class="text-[9px] font-medium uppercase text-fg-muted">Heures mois</p>
               <p class="font-display text-lg text-fg">186</p>
             </div>
           </div>
 
           <!-- Fleet table -->
-          <div class="rounded-lg border border-bone bg-white">
+          <div class="rounded-lg border border-bone bg-surface-elevated">
             <div class="border-b border-bone px-3 py-2">
               <p class="font-semibold text-fg">Flotte</p>
             </div>
@@ -154,7 +159,7 @@ defineProps<{
                   <td class="px-3 py-1.5 text-fg-muted">89h</td>
                 </tr>
                 <tr>
-                  <td class="px-3 py-1.5 font-medium">Alizee</td>
+                  <td class="px-3 py-1.5 font-medium">Alizée</td>
                   <td class="px-3 py-1.5 text-fg-muted">Voilier</td>
                   <td class="px-3 py-1.5">
                     <span
@@ -196,10 +201,10 @@ defineProps<{
           class="flex w-[160px] shrink-0 flex-col overflow-hidden border-l border-bone bg-paper/50 p-3"
         >
           <!-- AI panel -->
-          <div class="mb-3 shrink-0 rounded-lg bg-violet-700 p-2 text-white">
+          <div class="mb-3 shrink-0 rounded-lg bg-violet-600 p-2 text-white">
             <div class="mb-1 flex items-center gap-1">
               <div class="h-3 w-3 rounded bg-white/30" />
-              <span class="font-medium">FleetAI</span>
+              <span class="font-medium">FleetAi</span>
             </div>
             <p class="text-[9px] text-white/80">Mistral II: vidange moteur en retard de 42h.</p>
             <button

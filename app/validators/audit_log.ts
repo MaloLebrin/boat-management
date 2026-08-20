@@ -1,20 +1,10 @@
+import { AUDIT_ACTIONS } from '#shared/types/audit_log'
 import vine from '@vinejs/vine'
 
-const auditActions = [
-  'login',
-  'logout',
-  'boat.create',
-  'boat.update',
-  'boat.delete',
-  'member.add',
-  'member.remove',
-  'member.update_role',
-] as const
-
-export const auditLogFiltersValidator = vine.compile(
+export const auditLogFiltersValidator = vine.create(
   vine.object({
     userId: vine.number().optional(),
-    action: vine.enum(auditActions).optional(),
+    action: vine.enum(AUDIT_ACTIONS).optional(),
     from: vine
       .string()
       .regex(/^\d{4}-\d{2}-\d{2}/)

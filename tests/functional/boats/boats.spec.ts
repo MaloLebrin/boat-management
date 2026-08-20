@@ -3,7 +3,8 @@ import testUtils from '@adonisjs/core/services/test_utils'
 import Boat from '#models/boat'
 import { UserFactory } from '#database/factories/user_factory'
 import { BoatFactory } from '#database/factories/boat_factory'
-import { createAdminUser } from '#tests/functional/helpers'
+import { PortFactory } from '#database/factories/port_factory'
+import { createAdminUser, createMemberUser } from '#tests/functional/helpers'
 
 test.group('Boats (functional)', (group) => {
   group.each.setup(() => testUtils.db().truncate())
@@ -152,5 +153,134 @@ test.group('Boats (functional)', (group) => {
     // Boat should still exist since the other user cannot see/delete it
     const found = await Boat.find(boat.id)
     assert.isNotNull(found)
+  })
+
+  test('DELETE /boats/:id is denied to a plain member (boats.delete is admin-only)', async ({
+    client,
+    assert,
+  }) => {
+    const admin = await createAdminUser()
+    const member = await createMemberUser(admin.organizationId!)
+    const boat = await BoatFactory.merge({ organizationId: admin.organizationId! }).create()
+
+    // Bouncer redirects form-submission methods (POST/PUT/PATCH/DELETE) back with
+    // a flash error instead of a raw 403, to stay Inertia-friendly — cf. CLAUDE.md.
+    const response = await client.delete(`/boats/${boat.id}`).loginAs(member).redirects(0)
+
+    response.assertStatus(302)
+    const found = await Boat.find(boat.id)
+    assert.isNotNull(found)
+  })
+
+  test("GET /boats/:id ne charge plus les données d'onglet dans la visite initiale (#463)", async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    const response = await client.get(`/boats/${boat.id}`).loginAs(user).withInertia()
+
+    response.assertStatus(200)
+    const props = response.inertiaProps as Record<string, unknown>
+
+    // Le squelette (identité, photos, position, droits) est bien là…
+    assert.property(props, 'boat')
+    assert.property(props, 'canManageMaintenance')
+    assert.property(props, 'positionHistory')
+
+    // …mais les jeux de données d'onglet sont différés : la page peut peindre
+    // immédiatement au lieu d'attendre une vingtaine de requêtes (#463).
+    assert.notProperty(props, 'maintenanceEvents')
+    assert.notProperty(props, 'navigationLogs')
+    assert.notProperty(props, 'portOptions')
+  })
+
+  test('GET /boats/:id annonce les deux groupes de props différées (#463)', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    const response = await client.get(`/boats/${boat.id}`).loginAs(user).withInertia()
+
+    response.assertStatus(200)
+    const deferred = response.body().deferredProps as Record<string, string[]>
+
+    // Deux groupes = deux requêtes parallèles après le rendu, une par famille
+    // d'onglets, plutôt qu'un seul aller-retour monolithique.
+    assert.includeMembers(deferred.maintenance!, [
+      'maintenanceEvents',
+      'maintenanceTasks',
+      'maintenanceSheets',
+      'boatDocuments',
+      'equipmentActions',
+      'aiSuggestions',
+    ])
+    assert.includeMembers(deferred.navigation!, [
+      'navigationLogs',
+      'fuelLogs',
+      'incidents',
+      'portOptions',
+      'crewMemberOptions',
+    ])
+  })
+
+  test('la visite partielle du groupe navigation renvoie bien ses données (#463)', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const port = await PortFactory.merge({ organizationId: user.organizationId! }).create()
+
+    const response = await client
+      .get(`/boats/${boat.id}`)
+      .loginAs(user)
+      .withInertiaPartialReload('boats/show', ['navigationLogs', 'portOptions'])
+
+    response.assertStatus(200)
+    const props = response.inertiaProps as {
+      navigationLogs: unknown[]
+      portOptions: { id: number; name: string }[]
+    }
+
+    assert.isArray(props.navigationLogs)
+    assert.sameMembers(
+      props.portOptions.map((p) => p.id),
+      [port.id]
+    )
+  })
+
+  test("GET /boats/:id?tab=… expose l'onglet demandé au rendu serveur (#463)", async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    // Sans le paramètre, le SSR rendait Aperçu puis basculait à l'hydratation :
+    // c'est ce flash d'onglet que `initialTab` supprime.
+    const withTab = await client.get(`/boats/${boat.id}?tab=history`).loginAs(user).withInertia()
+    withTab.assertStatus(200)
+    assert.equal((withTab.inertiaProps as { initialTab: string | null }).initialTab, 'history')
+
+    const withoutTab = await client.get(`/boats/${boat.id}`).loginAs(user).withInertia()
+    withoutTab.assertStatus(200)
+    assert.isNull((withoutTab.inertiaProps as { initialTab: string | null }).initialTab)
+  })
+
+  test('GET /boats/:id/navigation redirects to the merged fiche (#365)', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    const response = await client.get(`/boats/${boat.id}/navigation`).loginAs(user).redirects(0)
+
+    response.assertStatus(302)
+    assert.equal(response.header('location'), `/boats/${boat.id}?tab=navigation-logs`)
   })
 })

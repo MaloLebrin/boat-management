@@ -1,8 +1,13 @@
-import { ModulesRequireProPlanError, StripeNotConfiguredError } from '#exceptions/billing_errors'
+import {
+  ModulesRequireEnterprisePlanError,
+  ModulesRequireProPlanError,
+  StripeNotConfiguredError,
+} from '#exceptions/billing_errors'
 import StripeService from '#services/stripe_service'
 import SubscriptionService from '#services/subscription_service'
 import OrganizationModuleService from '#services/organization_module_service'
 import { addonActionValidator, checkoutValidator, moduleActionValidator } from '#validators/billing'
+import OrganizationPolicy from '#policies/organization_policy'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import env from '#start/env'
@@ -143,6 +148,61 @@ export default class BillingController {
   }
 
   /**
+   * Active un module `granted` en self-service sur le plan Enterprise (#353).
+   * Aucun appel Stripe : contrairement à Pro, l'inclusion est offerte et sans
+   * impact tarifaire — on ne fait que recréer la ligne `organization_modules`.
+   */
+  async activateEnterpriseModule({ request, auth, bouncer, response, session, i18n }: HttpContext) {
+    try {
+      const user = await auth.authenticate()
+      await user.load('organization')
+      const org = user.organization
+      await bouncer.with(OrganizationPolicy).authorize('manageBilling')
+      const { module } = await request.validateUsing(moduleActionValidator)
+
+      if (org.plan !== 'enterprise') throw new ModulesRequireEnterprisePlanError()
+
+      await this.organizationModuleService.grantModule(org.id, module, { source: 'granted' })
+
+      session.flash('success', i18n.t('flash.billing.moduleActivated'))
+      return response.redirect().back()
+    } catch (error) {
+      return this.handleModuleError(error, { session, response, i18n })
+    }
+  }
+
+  /**
+   * Désactive un module `granted` en self-service sur le plan Enterprise (#353).
+   * `source: 'granted'` est passé explicitement à `revokeModule` : sans lui, le
+   * filtre par défaut (`subscription`) laisserait la ligne intacte.
+   */
+  async deactivateEnterpriseModule({
+    request,
+    auth,
+    bouncer,
+    response,
+    session,
+    i18n,
+  }: HttpContext) {
+    try {
+      const user = await auth.authenticate()
+      await user.load('organization')
+      const org = user.organization
+      await bouncer.with(OrganizationPolicy).authorize('manageBilling')
+      const { module } = await request.validateUsing(moduleActionValidator)
+
+      if (org.plan !== 'enterprise') throw new ModulesRequireEnterprisePlanError()
+
+      await this.organizationModuleService.revokeModule(org.id, module, { source: 'granted' })
+
+      session.flash('success', i18n.t('flash.billing.moduleDeactivated'))
+      return response.redirect().back()
+    } catch (error) {
+      return this.handleModuleError(error, { session, response, i18n })
+    }
+  }
+
+  /**
    * Règle la quantité d'un add-on quantitatif (ex. `extra_boats`, #333) sur
    * l'abonnement Pro actif. `quantity = 0` retire l'item ; sinon on crée l'item
    * (première souscription) ou on met à jour sa quantité. Le webhook réconcilie
@@ -202,6 +262,10 @@ export default class BillingController {
     }
     if (error instanceof ModulesRequireProPlanError) {
       session.flash('error', i18n.t('flash.billing.modulesRequirePro'))
+      return response.redirect().back()
+    }
+    if (error instanceof ModulesRequireEnterprisePlanError) {
+      session.flash('error', i18n.t('flash.billing.modulesRequireEnterprise'))
       return response.redirect().back()
     }
     // Toute erreur renvoyée par l'API Stripe (ex. `resource_missing` quand une

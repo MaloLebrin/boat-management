@@ -1,6 +1,6 @@
 {
   "title": "Clients",
-  "subtitle": "Gerez vos relations clients",
+  "subtitle": "Gérez vos relations clients",
   "add": "+ Ajouter un client",
   "empty": {
     "title": "Aucun client",
@@ -11,24 +11,24 @@
   "columns": {
     "name": "Nom",
     "email": "Email",
-    "phone": "Telephone",
+    "phone": "Téléphone",
     "permit": "Permis",
     "status": "Statut",
     "actions": "Actions"
   },
   "fields": {
-    "firstName": "Prenom",
+    "firstName": "Prénom",
     "lastName": "Nom",
     "email": "Email (optionnel)",
-    "phone": "Telephone (optionnel)",
+    "phone": "Téléphone (optionnel)",
     "address": "Adresse (optionnel)",
-    "navigationPermitNumber": "Numero de permis (optionnel)",
+    "navigationPermitNumber": "Numéro de permis (optionnel)",
     "navigationPermitType": "Type de permis (optionnel)",
     "status": "Statut",
     "notes": "Notes (optionnel)"
   },
   "permitTypes": {
-    "coastal": "Cotier",
+    "coastal": "Côtier",
     "offshore": "Hauturier",
     "inland": "Fluvial",
     "other": "Autre"
@@ -48,7 +48,7 @@
   },
   "deleteConfirm": {
     "title": "Supprimer le client",
-    "message": "Etes-vous sur de vouloir supprimer ce client ? Cette action est irreversible."
+    "message": "Êtes-vous sûr de vouloir supprimer ce client ? Cette action est irréversible."
   },
   "edit": "Modifier",
   "delete": "Supprimer",

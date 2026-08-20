@@ -4,17 +4,24 @@ import SubscriptionService from '#services/subscription_service'
 import QuotaService from '#services/quota_service'
 import AiTokenQuotaService from '#services/ai_token_quota_service'
 import OrganizationModuleService from '#services/organization_module_service'
+import BoatListService from '#services/boat_list_service'
 import { BrandingService } from '#services/branding_service'
 import OrganizationPolicy from '#policies/organization_policy'
 import {
+  changePasswordValidator,
   updateAiSettingsValidator,
+  updateLocaleValidator,
   updateOrganizationValidator,
   updateProfileValidator,
+  updateThemeValidator,
 } from '#validators/user'
 import { updateBrandingValidator, uploadLogoValidator } from '#validators/branding'
 import { inject } from '@adonisjs/core'
+import hash from '@adonisjs/core/services/hash'
 import type { HttpContext } from '@adonisjs/core/http'
 import { PLAN_LIMITS } from '#shared/types/plan'
+import type { BooleanQuotaKey } from '#shared/types/plan'
+import { BILLING_SETTINGS_PATH } from '#shared/constants/billing'
 
 @inject()
 export default class SettingsController {
@@ -25,7 +32,8 @@ export default class SettingsController {
     private quotaService: QuotaService,
     private aiTokenQuotaService: AiTokenQuotaService,
     private organizationModuleService: OrganizationModuleService,
-    private brandingService: BrandingService
+    private brandingService: BrandingService,
+    private boatListService: BoatListService
   ) {}
   async me({ inertia }: HttpContext) {
     return inertia.render('settings/me', {})
@@ -47,12 +55,14 @@ export default class SettingsController {
     const user = await auth.authenticate()
     await user.load('organization')
 
-    const [members, pendingInvitations, canManageMembers, canAddMember] = await Promise.all([
-      this.memberService.listMembers(user.organizationId!),
-      this.invitationService.listPending(user.organizationId!),
-      bouncer.with(OrganizationPolicy).allows('manageMembers'),
-      this.quotaService.canAddMember(user.organization),
-    ])
+    const [members, pendingInvitations, canManageMembers, canAddMember, boatOptions] =
+      await Promise.all([
+        this.memberService.listMembers(user.organizationId!),
+        this.invitationService.listPending(user.organizationId!),
+        bouncer.with(OrganizationPolicy).allows('manageMembers'),
+        this.quotaService.canAddMember(user.organization),
+        this.boatListService.listNamesForOrg(user),
+      ])
 
     return inertia.render('settings/members', {
       currentUserId: user.id,
@@ -60,6 +70,7 @@ export default class SettingsController {
       pendingInvitations,
       canManageMembers,
       canAddMember,
+      boatOptions,
     })
   }
 
@@ -114,6 +125,58 @@ export default class SettingsController {
     return response.redirect().back()
   }
 
+  async changePassword({ request, response, session, auth, i18n }: HttpContext) {
+    const user = await auth.authenticate()
+    const { currentPassword, password } = await request.validateUsing(changePasswordValidator)
+
+    const isValid = await hash.verify(user.password, currentPassword)
+    if (!isValid) {
+      session.flashAll()
+      session.flash('inputErrorsBag', {
+        currentPassword: [i18n.t('validator.settings.wrongCurrentPassword')],
+      })
+      return response.redirect().back()
+    }
+
+    user.password = password
+    await user.save()
+
+    session.flash('success', i18n.t('flash.settings.passwordUpdated'))
+    return response.redirect().back()
+  }
+
+  async updateLocale({ request, response, session, auth, i18n }: HttpContext) {
+    const user = await auth.authenticate()
+    const { locale } = await request.validateUsing(updateLocaleValidator)
+
+    user.locale = locale
+    await user.save()
+
+    // Keep the cookie in sync so pre-auth pages (login, marketing) match the
+    // persisted preference right away — cf. #403.
+    response.cookie('locale', locale, { maxAge: '365d', path: '/', httpOnly: false })
+
+    session.flash('success', i18n.t('flash.settings.localeUpdated'))
+    return response.redirect().back()
+  }
+
+  async updateTheme({ request, response, session, auth, i18n }: HttpContext) {
+    const user = await auth.authenticate()
+    const { theme } = await request.validateUsing(updateThemeValidator)
+
+    user.theme = theme
+    await user.save()
+
+    // Le cookie double la colonne pour que les pages pré-auth (login,
+    // marketing) rendent le bon thème dès le serveur, sans flash de couleur —
+    // même schéma que la locale (#403). Il est signé et lu côté serveur
+    // uniquement : le front applique le thème via la prop partagée.
+    response.cookie('theme', theme, { maxAge: '365d', path: '/' })
+
+    session.flash('success', i18n.t('flash.settings.themeUpdated'))
+    return response.redirect().back()
+  }
+
   async updateOrganization({ request, response, session, auth, i18n }: HttpContext) {
     const user = await auth.authenticate()
     await user.load('organization')
@@ -127,13 +190,19 @@ export default class SettingsController {
     return response.redirect().back()
   }
 
-  async ai({ inertia, auth, bouncer, response }: HttpContext) {
+  async ai({ inertia, auth, bouncer, response, session, i18n }: HttpContext) {
     const user = await auth.authenticate()
     await user.load('organization')
     const org = user.organization
 
-    if (!PLAN_LIMITS[org.plan].canCustomizeAI) {
-      return response.redirect('/settings/billing')
+    if (
+      !this.guardPlanFeature(org, 'canCustomizeAI', 'aiCustomizationRequiresPlan', {
+        response,
+        session,
+        i18n,
+      })
+    ) {
+      return
     }
 
     await bouncer.with(OrganizationPolicy).authorize('configureAI')
@@ -149,8 +218,14 @@ export default class SettingsController {
     await user.load('organization')
     const org = user.organization
 
-    if (!PLAN_LIMITS[org.plan].canCustomizeAI) {
-      return response.redirect('/settings/billing')
+    if (
+      !this.guardPlanFeature(org, 'canCustomizeAI', 'aiCustomizationRequiresPlan', {
+        response,
+        session,
+        i18n,
+      })
+    ) {
+      return
     }
 
     await bouncer.with(OrganizationPolicy).authorize('configureAI')
@@ -166,12 +241,20 @@ export default class SettingsController {
     return response.redirect().back()
   }
 
-  async branding({ inertia, auth, bouncer, response }: HttpContext) {
+  async branding({ inertia, auth, bouncer, response, session, i18n }: HttpContext) {
     const user = await auth.authenticate()
     await user.load('organization')
     const org = user.organization
 
-    if (!this.guardWhiteLabel(org, response)) return
+    if (
+      !this.guardPlanFeature(org, 'canWhiteLabel', 'brandingRequiresPlan', {
+        response,
+        session,
+        i18n,
+      })
+    ) {
+      return
+    }
     await bouncer.with(OrganizationPolicy).authorize('configureBranding')
 
     return inertia.render('settings/branding', {
@@ -184,7 +267,15 @@ export default class SettingsController {
     await user.load('organization')
     const org = user.organization
 
-    if (!this.guardWhiteLabel(org, response)) return
+    if (
+      !this.guardPlanFeature(org, 'canWhiteLabel', 'brandingRequiresPlan', {
+        response,
+        session,
+        i18n,
+      })
+    ) {
+      return
+    }
     await bouncer.with(OrganizationPolicy).authorize('configureBranding')
 
     const data = await request.validateUsing(updateBrandingValidator)
@@ -199,7 +290,15 @@ export default class SettingsController {
     await user.load('organization')
     const org = user.organization
 
-    if (!this.guardWhiteLabel(org, response)) return
+    if (
+      !this.guardPlanFeature(org, 'canWhiteLabel', 'brandingRequiresPlan', {
+        response,
+        session,
+        i18n,
+      })
+    ) {
+      return
+    }
     await bouncer.with(OrganizationPolicy).authorize('configureBranding')
 
     const { logo } = await request.validateUsing(uploadLogoValidator)
@@ -214,7 +313,15 @@ export default class SettingsController {
     await user.load('organization')
     const org = user.organization
 
-    if (!this.guardWhiteLabel(org, response)) return
+    if (
+      !this.guardPlanFeature(org, 'canWhiteLabel', 'brandingRequiresPlan', {
+        response,
+        session,
+        i18n,
+      })
+    ) {
+      return
+    }
     await bouncer.with(OrganizationPolicy).authorize('configureBranding')
 
     await this.brandingService.deleteLogo(org)
@@ -223,12 +330,22 @@ export default class SettingsController {
     return response.redirect().back()
   }
 
-  private guardWhiteLabel(
+  /**
+   * Garde une section de réglages derrière un flag de plan. Une section fermée
+   * renvoie sur la facturation **avec un flash explicite** (#456) : sans lui, la
+   * redirection est muette et l'utilisateur croit à un bug — d'autant que la
+   * carte plan coche « IA / Copilote » sur Pro, alors que seule la
+   * *personnalisation* du prompt est réservée à Entreprise.
+   */
+  private guardPlanFeature(
     org: { plan: keyof typeof PLAN_LIMITS },
-    response: HttpContext['response']
+    flag: BooleanQuotaKey,
+    flashKey: string,
+    { response, session, i18n }: Pick<HttpContext, 'response' | 'session' | 'i18n'>
   ): boolean {
-    if (!PLAN_LIMITS[org.plan].canWhiteLabel) {
-      response.redirect('/settings/billing')
+    if (!PLAN_LIMITS[org.plan][flag]) {
+      session.flash('error', i18n.t(`flash.settings.${flashKey}`))
+      response.redirect(BILLING_SETTINGS_PATH)
       return false
     }
     return true

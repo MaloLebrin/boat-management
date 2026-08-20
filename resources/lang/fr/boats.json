@@ -9,7 +9,19 @@
     "title": "Modifier le bateau",
     "subtitle": "Mettre à jour les informations du bateau",
     "submit": "Enregistrer",
-    "cancel": "Annuler"
+    "cancel": "Annuler",
+    "deleteConfirm": {
+      "title": "Supprimer ce bateau ?",
+      "message": "Cette action supprimera définitivement « {name} » ainsi que tout son historique (maintenance, documents, équipements). Cette action est irréversible."
+    }
+  },
+  "owners": {
+    "title": "Propriétaires",
+    "empty": "Aucun propriétaire rattaché à ce bateau.",
+    "remove": "Retirer",
+    "addLabel": "Ajouter un propriétaire",
+    "add": "Ajouter",
+    "noCandidates": "Aucun utilisateur avec le rôle « propriétaire de bateau » disponible dans cette organisation."
   },
   "hullFields": {
     "name": "Nom",
@@ -48,9 +60,9 @@
     "delete": "Supprimer",
     "mfg": "Installé le",
     "sn": "N° série",
-    "powerUnit": "cv",
+    "powerUnit": "ch",
     "kindValues": {
-      "inboard": "Inbord",
+      "inboard": "In-bord",
       "outboard": "Hors-bord",
       "electric": "Électrique",
       "hybrid": "Hybride",
@@ -124,7 +136,7 @@
       "other": "Autre"
     },
     "engineKind": {
-      "inboard": "Inbord",
+      "inboard": "In-bord",
       "outboard": "Hors-bord",
       "electric": "Électrique",
       "hybrid": "Hybride",
@@ -222,7 +234,7 @@
     "type": "Type",
     "propulsion": "Propulsion",
     "addTask": "Ajouter une tâche",
-    "addEntry": "Ajouter une entrée",
+    "addEvent": "Ajouter un événement",
     "budget": "Budget",
     "editBoat": "Modifier le bateau",
     "deleteBoat": "Supprimer le bateau",
@@ -239,10 +251,10 @@
       "sheets": "Fiches",
       "adminDocs": "Documents admin."
     },
-    "breadcrumbFleet": "Flotte",
     "nextTasks": "Prochaines tâches",
     "status": {
       "urgent": "Urgent",
+      "dueSoon": "Bientôt dû",
       "upcoming": "À venir",
       "ok": "OK"
     },
@@ -268,10 +280,10 @@
       "modalSubtitle": "{name} · Stocké sur Cloudinary"
     },
     "overview": {
-      "overdueTasks": "{count} tâche(s) en retard",
+      "overdueTasks": "{count, plural, one {# tâche en retard} other {# tâches en retard}}",
       "schedule": "Planifier",
       "engineHours": "Heures moteur",
-      "engineCount": "{count} moteur(s)",
+      "engineCount": "{count, plural, one {# moteur} other {# moteurs}}",
       "lastMaintenance": "Dernière maintenance",
       "nextTask": "Prochaine tâche",
       "overdue": "En retard",
@@ -309,7 +321,8 @@
     },
     "modeSwitch": {
       "management": "Gestion",
-      "navigation": "Navigation"
+      "navigation": "Navigation",
+      "aria": "Mode d'affichage du bateau"
     },
     "historyTab": {
       "addEvent": "Ajouter un événement",
@@ -322,7 +335,7 @@
       "filterHull": "Coque",
       "toggleHide": "Masquer",
       "toggleShow": "Détail",
-      "pieces": "{count} pièce(s)",
+      "pieces": "{count, plural, one {# pièce} other {# pièces}}",
       "sidebarTitle": "12 derniers mois",
       "sidebarEvents": "Événements",
       "sidebarParts": "Pièces",
@@ -334,6 +347,24 @@
       "soon": "Bientôt",
       "planned": "Planifiées",
       "undated": "Non datées"
+    },
+    "groups": {
+      "equipment": "Équipement",
+      "maintenance": "Maintenance",
+      "navigation": "Navigation",
+      "documents": "Documents"
+    },
+    "addMenu": {
+      "label": "+ Ajouter",
+      "aria": "Ajouter…",
+      "event": "Un événement de maintenance",
+      "task": "Une tâche",
+      "navigationLog": "Une sortie",
+      "equipment": "Un équipement"
+    },
+    "moreMenu": {
+      "label": "⋯",
+      "aria": "Autres actions"
     }
   },
   "specs": {
@@ -413,7 +444,7 @@
     "name": "Nom",
     "asc": "Croissant",
     "desc": "Décroissant",
-    "boats": "bateaux",
+    "boats": "{count, plural, one {bateau} other {bateaux}}",
     "clearFilters": "Effacer les filtres",
     "table": {
       "name": "Nom",
@@ -504,7 +535,7 @@
       "dueHours": "{hours} heures",
       "totalEvents": "Total événements",
       "totalParts": "Total pièces",
-      "parts": "{count} pièce(s)"
+      "parts": "{count, plural, one {# pièce} other {# pièces}}"
     },
     "notes": {
       "title": "Notes libres",
@@ -564,8 +595,8 @@
     "events": {
       "title": "Historique de maintenance",
       "subtitle": "Travaux effectués sur le bateau, la coque, un moteur, une voile, le gréement ou autre équipement.",
-      "empty": "Aucune entrée pour l'instant.",
-      "addEntry": "Ajouter une entrée",
+      "empty": "Aucun événement pour l'instant.",
+      "addEvent": "Ajouter un événement",
       "label": "Libellé",
       "subject": "Sujet",
       "wholeBoat": "Bateau entier",
@@ -589,10 +620,10 @@
       "partQty": "Qté",
       "partNotes": "Notes",
       "removePart": "Supprimer",
-      "createEntry": "Créer l'entrée",
+      "createEvent": "Créer l'événement",
       "immutable": "Une fois enregistré, cet événement devient immuable.",
-      "noRig": "Enregistrez un gréement sur ce bateau avant d'ajouter des entrées gréement.",
-      "noSafety": "Enregistrez des équipements de sécurité sur ce bateau avant d'ajouter des entrées sécurité.",
+      "noRig": "Enregistrez un gréement sur ce bateau avant d'ajouter des événements gréement.",
+      "noSafety": "Enregistrez des équipements de sécurité sur ce bateau avant d'ajouter des événements sécurité.",
       "enginePlaceholder": "ex. Moteur diesel intérieur bâbord",
       "sailPlaceholder": "ex. Génois n°2",
       "selectPlaceholder": "— Sélectionner —",
@@ -600,11 +631,13 @@
     },
     "tasks": {
       "title": "Maintenance planifiée",
-      "subtitle": "Tâches ouvertes (par date et par heures moteur).",
+      "subtitle": "Ajoutez une tâche de maintenance planifiée (par date ou par heures moteur).",
       "empty": "Aucune tâche planifiée.",
+      "emptyFiltered": "Aucune tâche correspondante.",
       "addTask": "Ajouter une tâche",
       "modalTitle": "Ajouter une tâche",
-      "done": "Terminé",
+      "markDone": "Marquer fait",
+      "delete": "Supprimer",
       "doneHoursPlaceholder": "Terminé à (heures)",
       "urgent": "Urgent",
       "open": "Ouvert",
@@ -651,12 +684,12 @@
     "statusInProgress": "En cours",
     "statusCompleted": "Terminée",
     "markComplete": "Marquer terminée",
-    "progress": "{done}/{total} etapes",
+    "progress": "{done}/{total} étapes",
     "expand": "Voir les étapes",
     "collapse": "Masquer les étapes",
     "filterAll": "Toutes",
     "confirmDelete": "Supprimer cette fiche ?",
-    "noItems": "Aucune etape dans cette fiche.",
+    "noItems": "Aucune étape dans cette fiche.",
     "itemNotesPlaceholder": "Ajouter une note..."
   },
   "simulator": {
@@ -715,7 +748,7 @@
       "fuel": "Carburant",
       "power": "Puissance",
       "hours": "Heures moteur",
-      "hp": "{value} cv",
+      "hp": "{value} ch",
       "hoursUnit": "{value} h",
       "installYear": "Installé en"
     },

@@ -7,7 +7,7 @@ import { client } from '~/client'
 import Layout from '~/layouts/default.vue'
 import './css/app.css'
 
-const appName = import.meta.env.VITE_APP_NAME || 'Fleet AI'
+const appName = import.meta.env.VITE_APP_NAME || 'FleetAi'
 
 createInertiaApp({
   title: (title) => (title ? `${title} - ${appName}` : appName),
@@ -24,6 +24,6 @@ createInertiaApp({
       .mount(el)
   },
   progress: {
-    color: '#3cb8a2',
+    color: 'var(--color-brand)',
   },
 })

@@ -1,81 +1,94 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { Head } from '@inertiajs/vue3'
+import { computed, ref } from 'vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseBreadcrumb from '~/components/base/BaseBreadcrumb.vue'
-import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseTabs from '~/components/base/BaseTabs.vue'
+import BoatShowHeaderActions from '~/components/boats/show/BoatShowHeaderActions.vue'
 import BoatShowTabContent from '~/components/boats/show/BoatShowTabContent.vue'
+import NavigationActiveCard from '~/components/boats/show/tabs/NavigationActiveCard.vue'
+import { useBoatShowTabs } from '~/composables/use_boat_show_tabs'
 import { useT } from '~/composables/use_t'
+import { propulsionLabel } from '~/utils/boat_propulsion_label'
 import type {
   AiSuggestion,
+  BoatCreateIntent,
   BoatDocumentRow,
   BoatEquipmentActionRow,
+  BoatIncidentRow,
+  BoatPositionHistoryRow,
   BoatShowDetail,
+  FuelLogRow,
   MaintenanceEventRow,
   MaintenanceSheetRow,
   MaintenanceTaskRow,
+  NavigationLogPortOption,
+  NavigationLogRow,
 } from '~/types/boat_show'
 import type { BoatPricingRow } from '../../../shared/types/boat_pricing'
+import type { CrewMemberOption } from '../../../shared/types/crew'
 
 const { t } = useT()
 
+// Les props des groupes « maintenance » et « navigation » sont différées côté
+// serveur (#463) : elles valent `undefined` le temps que leur groupe arrive,
+// et l'onglet concerné affiche un skeleton en attendant.
 const props = defineProps<{
   boat: BoatShowDetail
-  maintenanceEvents: MaintenanceEventRow[]
-  maintenanceTasks: MaintenanceTaskRow[]
-  maintenanceSheets: MaintenanceSheetRow[]
-  boatDocuments: BoatDocumentRow[]
-  equipmentActions: BoatEquipmentActionRow[]
+  maintenanceEvents?: MaintenanceEventRow[]
+  maintenanceTasks?: MaintenanceTaskRow[]
+  maintenanceSheets?: MaintenanceSheetRow[]
+  boatDocuments?: BoatDocumentRow[]
+  equipmentActions?: BoatEquipmentActionRow[]
+  incidents?: BoatIncidentRow[]
+  fuelLogs?: FuelLogRow[]
+  navigationLogs?: NavigationLogRow[]
+  portOptions?: NavigationLogPortOption[]
+  crewMemberOptions?: CrewMemberOption[]
+  aiSuggestions?: AiSuggestion[] | null
+  initialTab?: string | null
+  positionHistory: BoatPositionHistoryRow[]
+  latestGpsPosition: BoatPositionHistoryRow | null
   canManageMaintenance: boolean
   canManageEquipment: boolean
   canManageDocuments: boolean
   canManageEquipmentActions: boolean
   canDeleteEquipmentActions: boolean
+  canDeleteIncidents: boolean
+  canCreateFuelLogs: boolean
+  canDeleteFuelLogs: boolean
+  canCreateNavigationLogs: boolean
+  canUpdateNavigationLogs: boolean
+  canDeleteNavigationLogs: boolean
   canExport: boolean
-  aiSuggestions: AiSuggestion[] | null
   pricing: BoatPricingRow | null
   pricingEnabled: boolean
   canManagePricing: boolean
 }>()
 
-type TabKey =
-  | 'overview'
-  | 'specs'
-  | 'pricing'
-  | 'equipment'
-  | 'equipmentActions'
-  | 'history'
-  | 'tasks'
-  | 'documents'
-  | 'sheets'
-  | 'admin-docs'
-
-const tab = ref<TabKey>('overview')
-
-onMounted(() => {
-  const urlParams = new URLSearchParams(window.location.search)
-  const fromUrl = urlParams.get('tab') as TabKey | null
-  if (fromUrl) tab.value = fromUrl
+const {
+  tab,
+  activeGroupKey,
+  groupTabs,
+  activeGroupSubTabs,
+  isTabLoading,
+  openTasks,
+  goToTab,
+  goToGroup,
+} = useBoatShowTabs({
+  maintenanceTasks: () => props.maintenanceTasks,
+  boatDocuments: () => props.boatDocuments,
+  incidents: () => props.incidents,
+  pricingEnabled: () => props.pricingEnabled,
+  initialTabParam: () => props.initialTab,
 })
 
-watch(tab, (newTab) => {
-  const url = new URL(window.location.href)
-  if (newTab === 'overview') {
-    url.searchParams.delete('tab')
-  } else {
-    url.searchParams.set('tab', newTab)
-  }
-  // On met à jour l'URL sans déclencher de requête Inertia
-  window.history.replaceState(window.history.state, '', url.pathname + url.search)
-})
-
-const createTaskNonce = ref(0)
-const createEventNonce = ref(0)
+// L'onglet cible n'est monté qu'après le rendu différé : on expose une intention
+// explicite que le panneau consomme à son montage, puis remet à null (#358).
+const createIntent = ref<BoatCreateIntent>(null)
 
 const todayIso = computed(() => new Date().toISOString().slice(0, 10))
-
-const openTasks = computed(() => props.maintenanceTasks.filter((task) => task.status === 'open'))
 
 const overdueTasks = computed(() =>
   openTasks.value.filter((task) => task.dueAt && String(task.dueAt) <= todayIso.value)
@@ -89,55 +102,49 @@ const statusBadge = computed(() => {
   return { variant: 'success' as const, label: t('boats.show.status.ok') }
 })
 
-const expiringDocCount = computed(
-  () =>
-    props.boatDocuments.filter((d) => d.status === 'expiring_soon' || d.status === 'expired').length
-)
-
-const tabs = computed(() => [
-  { key: 'overview', label: t('boats.show.tabs.overview') },
-  { key: 'specs', label: t('boats.show.tabs.specs') },
-  ...(props.pricingEnabled ? [{ key: 'pricing', label: t('boats.show.tabs.pricing') }] : []),
-  { key: 'equipment', label: t('boats.show.tabs.equipment') },
-  { key: 'equipmentActions', label: t('boats.show.tabs.equipmentActions') },
-  { key: 'history', label: t('boats.show.tabs.history') },
-  {
-    key: 'tasks',
-    label: t('boats.show.tabs.tasks'),
-    badge: openTasks.value.length > 0 ? String(openTasks.value.length) : undefined,
-  },
-  { key: 'sheets', label: t('boats.show.tabs.sheets') },
-  { key: 'documents', label: t('boats.show.tabs.documents') },
-  {
-    key: 'admin-docs',
-    label: t('boats.show.tabs.adminDocs'),
-    badge: expiringDocCount.value > 0 ? String(expiringDocCount.value) : undefined,
-  },
-])
-
-function goToTab(key: TabKey | string) {
-  tab.value = key as TabKey
-}
-
 function openHistoryTab() {
   goToTab('history')
-  createEventNonce.value++
+  createIntent.value = 'event'
 }
 
 function openTasksTab() {
   goToTab('tasks')
-  createTaskNonce.value++
+  createIntent.value = 'task'
 }
+
+function openNavigationLogTab() {
+  goToTab('navigation-logs')
+  createIntent.value = 'navigationLog'
+}
+
+function openEquipmentTab() {
+  goToTab('equipment')
+  createIntent.value = 'equipment'
+}
+
+function onCreateIntentConsumed() {
+  createIntent.value = null
+}
+
+const activeNavigationLog = computed(
+  () => props.navigationLogs?.find((l) => l.status === 'in_progress') ?? null
+)
+
+// `initialTab` ne concerne que la résolution de l'onglet : inutile de le laisser
+// retomber en attribut HTML sur le panneau de contenu.
+const tabContentProps = computed(() => {
+  const { initialTab: _initialTab, ...rest } = props
+  return rest
+})
 </script>
 
 <template>
+  <Head :title="boat.name" />
+
   <div class="w-full max-w-7xl px-6 py-10 sm:px-8">
     <BaseBreadcrumb
-      :items="[
-        { label: t('boats.show.breadcrumbFleet'), href: '/boats' },
-        { label: t('nav.boats') },
-        { label: boat.name },
-      ]"
+      class="mb-4"
+      :items="[{ label: t('boats.index.title'), href: '/boats' }, { label: boat.name }]"
     />
 
     <!-- Header -->
@@ -159,57 +166,51 @@ function openTasksTab() {
               class="text-fg-subtle"
               >·</span
             >
-            <span v-if="boat.propulsionType">{{ boat.propulsionType }}</span>
+            <span v-if="boat.propulsionType">{{ propulsionLabel(t, boat.propulsionType) }}</span>
           </div>
         </div>
 
         <div class="flex flex-wrap items-center gap-2 justify-end">
-          <BaseButton variant="secondary" size="sm" route="boats.budget" :params="{ id: boat.id }">
-            {{ t('boats.show.budget') }}
-          </BaseButton>
-          <a :href="`/boats/${boat.id}/edit`">
-            <BaseButton variant="secondary" size="sm">{{ t('boats.show.editBoat') }}</BaseButton>
-          </a>
-          <BaseButton
-            v-if="canManageMaintenance"
-            variant="secondary"
-            size="sm"
-            type="button"
-            @click="openHistoryTab"
-          >
-            + {{ t('boats.show.addEntry') }}
-          </BaseButton>
-          <BaseButton
-            v-if="canManageMaintenance"
-            variant="primary"
-            size="sm"
-            type="button"
-            @click="openTasksTab"
-          >
-            + {{ t('boats.show.addTask') }}
-          </BaseButton>
-          <a
-            v-if="canExport"
-            :href="`/boats/${boat.id}/maintenance-log.pdf`"
-            target="_blank"
-            rel="noopener"
-          >
-            <BaseButton variant="secondary" size="sm" type="button">
-              {{ t('boats.maintenanceLog.download') }}
-            </BaseButton>
-          </a>
+          <BoatShowHeaderActions
+            :boat-id="boat.id"
+            :can-manage-maintenance="canManageMaintenance"
+            :can-manage-equipment="canManageEquipment"
+            :can-create-navigation-logs="canCreateNavigationLogs"
+            :can-export="canExport"
+            @add-event="openHistoryTab"
+            @add-task="openTasksTab"
+            @add-equipment="openEquipmentTab"
+            @add-navigation-log="openNavigationLogTab"
+          />
         </div>
       </div>
 
-      <BaseTabs v-model="tab" :tabs="tabs" />
+      <BaseTabs :model-value="activeGroupKey" :tabs="groupTabs" @update:model-value="goToGroup" />
+
+      <BaseTabs
+        v-if="activeGroupSubTabs.length > 1"
+        :model-value="tab"
+        :tabs="activeGroupSubTabs"
+        @update:model-value="goToTab"
+      />
+
+      <NavigationActiveCard
+        v-if="activeGroupKey === 'navigation' && activeNavigationLog && portOptions"
+        :boat="boat"
+        :log="activeNavigationLog"
+        :port-options="portOptions"
+        :can-update="canUpdateNavigationLogs"
+        :can-create-fuel-logs="canCreateFuelLogs"
+      />
     </header>
 
     <BoatShowTabContent
       :tab="tab"
-      v-bind="props"
-      :create-event-nonce="createEventNonce"
-      :create-task-nonce="createTaskNonce"
+      v-bind="tabContentProps"
+      :is-loading="isTabLoading"
+      :create-intent="createIntent"
       @go-to-tab="goToTab"
+      @create-intent-consumed="onCreateIntentConsumed"
     />
   </div>
 </template>

@@ -35,6 +35,11 @@ export default class OrganizationInvitation extends BaseModel {
   @column.dateTime()
   declare acceptedAt: DateTime | null
 
+  @column({
+    prepare: (value: number[] | null) => (value ? JSON.stringify(value) : null),
+  })
+  declare boatIds: number[] | null
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 

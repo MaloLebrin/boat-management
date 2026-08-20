@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { useForm } from '@inertiajs/vue3'
+import { Link } from '@adonisjs/inertia/vue'
+import { Head, useForm } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
@@ -22,6 +23,7 @@ function submit() {
 </script>
 
 <template>
+  <Head :title="t('ports.create')" />
   <div class="mx-auto w-full max-w-xl px-6 py-10 sm:px-8">
     <div class="space-y-2">
       <BaseHeading level="1">{{ t('ports.create') }}</BaseHeading>
@@ -79,12 +81,12 @@ function submit() {
           <BaseButton type="submit" :disabled="form.processing">
             {{ t('common.save') }}
           </BaseButton>
-          <a
+          <Link
             href="/ports"
             class="text-sm font-semibold text-fg-muted hover:text-fg hover:underline"
           >
             {{ t('common.cancel') }}
-          </a>
+          </Link>
         </div>
       </form>
     </div>

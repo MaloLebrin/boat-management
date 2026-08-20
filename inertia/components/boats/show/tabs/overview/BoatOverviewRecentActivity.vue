@@ -3,16 +3,13 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import { subjectLabel } from '~/components/boats/maintenance/utils'
 import { useT } from '~/composables/use_t'
+import { useDateFormat } from '~/composables/use_date_format'
 import type { MaintenanceEventRow } from '~/types/boat_show'
 
 defineProps<{ recentEvents: MaintenanceEventRow[] }>()
 const emit = defineEmits<{ 'go-to-tab': [tab: string] }>()
 const { t } = useT()
-
-function formatDate(iso: string | null): string {
-  if (!iso) return '—'
-  return iso.slice(0, 10)
-}
+const { formatDate } = useDateFormat()
 </script>
 
 <template>
@@ -29,7 +26,7 @@ function formatDate(iso: string | null): string {
       <li v-for="ev in recentEvents" :key="ev.id" class="flex items-start justify-between gap-3">
         <div>
           <p class="font-semibold text-fg">{{ ev.title }}</p>
-          <p class="text-fg-muted">{{ subjectLabel(ev.subject) }}</p>
+          <p class="text-fg-muted">{{ subjectLabel(t, ev.subject) }}</p>
         </div>
         <span class="shrink-0 text-fg-subtle">{{ formatDate(ev.performedAt) }}</span>
       </li>

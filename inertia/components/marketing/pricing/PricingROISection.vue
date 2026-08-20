@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
+import { useNumberFormat } from '~/composables/use_number_format'
 import { useScrollReveal } from '~/composables/use_scroll_reveal'
 
 type ProfileKey = 'loueurs' | 'ecoles' | 'marinas' | 'armateurs'
@@ -31,6 +32,7 @@ const props = defineProps<{
 }>()
 
 const { el, isVisible } = useScrollReveal()
+const { formatPrice } = useNumberFormat()
 
 // Local state
 const boats = ref(12)
@@ -75,7 +77,7 @@ const fleetCost = computed(() => {
 const roi = computed(() => totalSavings.value - fleetCost.value)
 
 const perMonthText = computed(() =>
-  props.perMonthLabel.replace('{amount}', formatCurrency(Math.round(totalSavings.value / 12)))
+  props.perMonthLabel.replace('{amount}', formatPrice(Math.round(totalSavings.value / 12)))
 )
 
 const roiX = computed(() => {
@@ -83,14 +85,6 @@ const roiX = computed(() => {
 })
 
 const profileKeys: ProfileKey[] = ['loueurs', 'ecoles', 'marinas', 'armateurs']
-
-function formatCurrency(val: number) {
-  return new Intl.NumberFormat('fr-FR', {
-    style: 'currency',
-    currency: 'EUR',
-    maximumFractionDigits: 0,
-  }).format(val)
-}
 </script>
 
 <template>
@@ -132,7 +126,7 @@ function formatCurrency(val: number) {
           <div class="mt-8">
             <div class="flex items-center justify-between">
               <label class="text-sm font-medium text-fg">{{ boatsLabel }}</label>
-              <span class="font-mono text-lg font-bold text-navy-900">{{ boats }}</span>
+              <span class="font-mono text-lg font-bold text-fg">{{ boats }}</span>
             </div>
             <input
               v-model.number="boats"
@@ -147,7 +141,7 @@ function formatCurrency(val: number) {
           <div class="mt-6">
             <div class="flex items-center justify-between">
               <label class="text-sm font-medium text-fg">{{ hourlyLabel }}</label>
-              <span class="font-mono text-lg font-bold text-navy-900">{{ hourlyRate }}€</span>
+              <span class="font-mono text-lg font-bold text-fg">{{ formatPrice(hourlyRate) }}</span>
             </div>
             <input
               v-model.number="hourlyRate"
@@ -169,7 +163,7 @@ function formatCurrency(val: number) {
             {{ savingsLabel }}
           </p>
           <p class="mt-2 font-display text-5xl lg:text-6xl xl:text-7xl">
-            {{ formatCurrency(totalSavings) }}
+            {{ formatPrice(totalSavings) }}
           </p>
           <p class="mt-1 text-sm text-white/60">{{ perMonthText }}</p>
 
@@ -177,15 +171,15 @@ function formatCurrency(val: number) {
           <div class="mt-8 space-y-4 border-t border-white/10 pt-6">
             <div class="flex items-center justify-between">
               <span class="text-sm text-white/70">{{ timeLabel }}</span>
-              <span class="font-mono text-sm">{{ formatCurrency(annualLabor) }}</span>
+              <span class="font-mono text-sm">{{ formatPrice(annualLabor) }}</span>
             </div>
             <div class="flex items-center justify-between">
               <span class="text-sm text-white/70">{{ maintLabel }}</span>
-              <span class="font-mono text-sm">{{ formatCurrency(missedMaint) }}</span>
+              <span class="font-mono text-sm">{{ formatPrice(missedMaint) }}</span>
             </div>
             <div class="flex items-center justify-between">
               <span class="text-sm text-white/70">{{ fleetideLabel }}</span>
-              <span class="font-mono text-sm">{{ formatCurrency(optimizations) }}</span>
+              <span class="font-mono text-sm">{{ formatPrice(optimizations) }}</span>
             </div>
           </div>
 
@@ -193,7 +187,7 @@ function formatCurrency(val: number) {
           <div class="mt-6 flex items-center justify-between border-t border-white/10 pt-6">
             <div>
               <p class="text-xs text-white/50">{{ fleetCostLabel }}</p>
-              <p class="font-mono text-lg">{{ formatCurrency(fleetCost) }}</p>
+              <p class="font-mono text-lg">{{ formatPrice(fleetCost) }}</p>
             </div>
             <div class="text-right">
               <p class="text-xs text-white/50">{{ roiLabel }}</p>

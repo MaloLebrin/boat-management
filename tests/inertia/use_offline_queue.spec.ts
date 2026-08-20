@@ -13,13 +13,14 @@ vi.mock('vue-sonner', () => ({
 
 const mockPageProps = vi.hoisted(() => ({
   appT: {
-    'offline.savedQueue': 'Enregistré hors-ligne',
-    'offline.syncing': 'Synchronisation en cours…',
-    'offline.syncSuccess': '{count} entrée(s) synchronisée(s)',
-    'offline.syncError': 'Erreur de synchronisation',
-    'offline.conflict.kept': 'Vos modifications seront renvoyées',
-    'offline.conflict.discarded': 'Modifications locales abandonnées',
-    'offline.queue.cancelled': 'Action annulée',
+    'common.offline.savedQueue': 'Enregistré hors-ligne',
+    'common.offline.syncing': 'Synchronisation en cours…',
+    'common.offline.syncSuccess':
+      '{count, plural, one {# entrée synchronisée} other {# entrées synchronisées}}',
+    'common.offline.syncError': 'Erreur de synchronisation',
+    'common.offline.conflict.kept': 'Vos modifications seront renvoyées',
+    'common.offline.conflict.discarded': 'Modifications locales abandonnées',
+    'common.offline.queue.cancelled': 'Action annulée',
   },
   locale: 'fr',
   flash: {} as Record<string, unknown>,

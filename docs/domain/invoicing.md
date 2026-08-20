@@ -250,10 +250,15 @@ Raccourci métier : générer un devis pré-rempli depuis une réservation.
 
 ## 9. Sécurité, gating & isolation
 
-- **Gating Enterprise** : `QuotaService.assertCanManageInvoices(org)` /
-  `canManageInvoices(org)` (via `PLAN_LIMITS[plan].canManageInvoices` — `false`
-  pour starter/pro, `true` pour enterprise). Un accès non-Enterprise est redirigé
-  avec un flash `flash.quota.invoicesExceeded`.
+- **Gating module** : `QuotaService.assertCanManageInvoices(org)` /
+  `canManageInvoices(org)` (via les quotas effectifs — le tier Enterprise, ou le
+  module add-on `crm_invoicing` souscrit sur le socle Pro, cf. #327). Un accès
+  sans la capacité est redirigé vers **`/settings/billing`**
+  (`BILLING_SETTINGS_PATH`, `shared/constants/billing.ts`) avec un flash
+  `flash.quota.invoicesExceeded` qui nomme le module manquant et les deux façons
+  de l'obtenir. Ne jamais rediriger vers `/` : cette route redirige sur `/en`
+  (home marketing publique), dont le layout ne rend aucun toast — la redirection
+  y est muette et se lit comme une déconnexion (#456).
 - **ACL** : `InvoicePolicy` (Bouncer) — `create`/`update` pour tout membre de
   l'organisation, **`delete` réservé aux admins** (via le hook `before`).
 - **Org-scoping / IDOR** : tout accès passe par

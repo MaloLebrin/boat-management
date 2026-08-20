@@ -27,15 +27,15 @@ const wearOptions = SIMULATOR_WEAR_LEVELS.map((level) => ({
   descKey: `simulator.wear_${level}_desc`,
   selectedClass: {
     new: 'border-mint-300 bg-mint-50 text-mint-700',
-    good: 'border-navy-500 bg-navy-50 text-navy-700',
+    good: 'border-brand bg-brand-soft text-brand',
     worn: 'border-amber-600 bg-amber-50 text-amber-700',
     to_replace: 'border-coral-500 bg-coral-50 text-coral-700',
   }[level],
   unselectedClass: {
-    new: 'border-bone bg-white text-fg hover:border-mint-200 hover:bg-mint-50',
-    good: 'border-bone bg-white text-fg hover:border-navy-100 hover:bg-navy-50',
-    worn: 'border-bone bg-white text-fg hover:border-amber-100 hover:bg-amber-50',
-    to_replace: 'border-bone bg-white text-fg hover:border-coral-100 hover:bg-coral-50',
+    new: 'border-bone bg-surface-elevated text-fg hover:border-mint-200 hover:bg-mint-50',
+    good: 'border-bone bg-surface-elevated text-fg hover:border-brand hover:bg-brand-soft',
+    worn: 'border-bone bg-surface-elevated text-fg hover:border-amber-100 hover:bg-amber-50',
+    to_replace: 'border-bone bg-surface-elevated text-fg hover:border-coral-100 hover:bg-coral-50',
   }[level],
 }))
 
@@ -59,6 +59,7 @@ function selectWear(value: SimulatorWearLevel) {
           :selected="modelValue[wearField] === opt.value"
           :selected-class="opt.selectedClass"
           :unselected-class="opt.unselectedClass"
+          :aria-label="`${t(labelKey)} : ${t(opt.labelKey)}`"
           class="w-full px-4 py-3.5 text-left"
           @click="selectWear(opt.value)"
         >

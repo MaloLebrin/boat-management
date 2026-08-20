@@ -2,7 +2,11 @@
   "title": "Tableau de bord",
   "subtitle": "Vue d'ensemble de votre flotte et de la maintenance à venir.",
   "newBoat": "Nouveau bateau",
-  "overdueAlert": "{count} tâche(s) en retard",
+  "quickAdd": {
+    "logbook": "+ Entrée journal",
+    "incident": "+ Incident"
+  },
+  "overdueAlert": "{count, plural, one {# tâche en retard} other {# tâches en retard}}",
   "viewPlanning": "Voir le planning",
   "analyzeFleet": "Analyser la flotte",
   "aiPanel": {
@@ -18,14 +22,19 @@
     "sails": "Voiles",
     "rigs": "Gréements",
     "urgentMaintenance": "Maintenance urgente",
+    "equipmentEmpty": {
+      "title": "Équipements",
+      "description": "Aucun moteur, voile ou gréement saisi pour votre flotte pour l'instant.",
+      "cta": "Saisir vos équipements"
+    },
     "delta": {
       "boatsInAlert": "dont {count} en alerte",
       "boatsOk": "Flotte à jour",
-      "boatsWithEngine": "{count} motorisé(s)",
+      "boatsWithEngine": "{count, plural, one {# motorisé} other {# motorisés}}",
       "boatsAllMotorless": "Aucun moteur",
       "boatsWithSail": "{count} à voile",
       "boatsAllSailless": "Aucune voile",
-      "boatsWithRig": "{count} équipé(s)",
+      "boatsWithRig": "{count, plural, one {# équipé} other {# équipés}}",
       "noRig": "Aucun gréement",
       "overdue": "dont {count} en retard",
       "noOverdue": "Aucun retard"
@@ -53,16 +62,36 @@
     },
     "empty": "Aucun bateau pour l'instant."
   },
-  "marina": {
-    "title": "Marinas",
+  "port": {
+    "title": "Ports",
     "viewAll": "Voir tout",
-    "addMarina": "Ajouter une marina",
-    "empty": "Aucune marina enregistrée.",
-    "totalMarinas": "{count} marina(s)",
-    "totalBoats": "{count} bateau(x) amarré(s)",
-    "totalFreeSpots": "{count} place(s) libre(s)",
-    "freeSpots": "{free} libre(s) / {total}",
+    "addPort": "Ajouter un port",
+    "empty": "Aucun port enregistré.",
+    "totalPorts": "{count, plural, one {# port} other {# ports}}",
+    "totalBoats": "{count, plural, one {# bateau amarré} other {# bateaux amarrés}}",
+    "totalFreeSpots": "{count, plural, one {# place libre} other {# places libres}}",
+    "freeSpots": "{free, plural, one {# libre} other {# libres}} / {total}",
     "fillRate": "Taux : {rate}%",
     "noSpots": "Aucune place"
+  },
+  "mechanic": {
+    "title": "Mes interventions",
+    "subtitle": "Vos tâches de maintenance en retard et à venir sur l'organisation.",
+    "viewPlanning": "Voir le planning",
+    "viewHistory": "Historique de maintenance",
+    "overdueAlert": "{count, plural, one {# intervention en retard} other {# interventions en retard}}",
+    "stats": {
+      "overdue": "En retard",
+      "upcoming": "À venir"
+    },
+    "overdueTitle": "En retard",
+    "overdueEmpty": "Aucune intervention en retard.",
+    "upcomingTitle": "À venir",
+    "upcomingEmpty": "Aucune intervention à venir.",
+    "overdue": "En retard",
+    "dueSoon": "Bientôt dû",
+    "openTask": "Ouvrir l'intervention {title} sur {boat}",
+    "dueAt": "Dû le {date}",
+    "dueAtHours": "Dû à {hours}h · actuel {current}h"
   }
 }

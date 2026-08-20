@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { Link } from '@adonisjs/inertia/vue'
-import { nextTick, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
+import ThemeSwitcher from '~/components/layout/ThemeSwitcher.vue'
 import { useT } from '~/composables/use_t'
+import { marketingPath } from '#shared/helpers/locale_path'
 
 const props = defineProps<{
   isOpen: boolean
@@ -18,6 +20,8 @@ const emit = defineEmits<{
 
 const { t } = useT()
 const closeButtonEl = ref<HTMLButtonElement | null>(null)
+
+const pricingHref = computed(() => marketingPath('pricing', props.locale))
 
 watch(
   () => props.isOpen,
@@ -62,16 +66,23 @@ watch(
             xmlns="http://www.w3.org/2000/svg"
             aria-hidden="true"
           >
-            <circle cx="32" cy="32" r="28" stroke="#0b1d2e" stroke-width="2.6" />
-            <path d="M32 9 L37.5 32 L32 36.5 L26.5 32 Z" fill="#0b1d2e" />
-            <path d="M32 55 L37.5 32 L32 27.5 L26.5 32 Z" fill="#e2674f" />
-            <circle cx="32" cy="32" r="2.4" fill="#faf6ee" stroke="#0b1d2e" stroke-width="1.4" />
+            <circle cx="32" cy="32" r="28" stroke="var(--color-fg)" stroke-width="2.6" />
+            <path d="M32 9 L37.5 32 L32 36.5 L26.5 32 Z" fill="var(--color-fg)" />
+            <path d="M32 55 L37.5 32 L32 27.5 L26.5 32 Z" fill="var(--color-coral-500)" />
+            <circle
+              cx="32"
+              cy="32"
+              r="2.4"
+              fill="var(--color-surface)"
+              stroke="var(--color-fg)"
+              stroke-width="1.4"
+            />
           </svg>
           <span
             class="font-display text-base leading-none text-fg"
             style="letter-spacing: -0.025em"
           >
-            Fleet<em style="font-style: italic; color: #e2674f">Ai</em>
+            Fleet<em class="italic text-coral-500">Ai</em>
           </span>
         </Link>
         <button
@@ -108,7 +119,7 @@ watch(
           {{ t('public.nav.features') }}
         </Link>
         <Link
-          :href="`/${locale}/tarifs`"
+          :href="pricingHref"
           class="block rounded-(--radius-control) px-3 py-2.5 text-sm font-medium text-fg-muted transition-colors duration-(--motion-fast) hover:bg-paper hover:text-fg"
           @click="emit('close')"
         >
@@ -121,13 +132,6 @@ watch(
         >
           {{ t('public.nav.guide') }}
         </Link>
-        <Link
-          href="/design-system"
-          class="block rounded-(--radius-control) px-3 py-2.5 text-sm font-medium text-fg-muted transition-colors duration-(--motion-fast) hover:bg-paper hover:text-fg"
-          @click="emit('close')"
-        >
-          Design system
-        </Link>
       </nav>
 
       <!-- Footer -->
@@ -139,6 +143,9 @@ watch(
         >
           {{ locale === 'en' ? 'FR' : 'EN' }}
         </button>
+        <div class="flex justify-center">
+          <ThemeSwitcher />
+        </div>
         <template v-if="isAuthed">
           <Link href="/dashboard" class="block" @click="emit('close')">
             <BaseButton size="sm" class="w-full">Dashboard</BaseButton>

@@ -1,5 +1,10 @@
-import AiAnalysisService, { type AiSuggestion } from '#services/ai_analysis_service'
+import AiAnalysisService from '#services/ai_analysis_service'
 import DashboardService from '#services/dashboard_service'
+import PlanningService from '#services/planning_service'
+import PortService from '#services/port_service'
+import QuotaService from '#services/quota_service'
+import { toAppLocale } from '#shared/helpers/locale_path'
+import type { AiSuggestion } from '#shared/types/ai'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 
@@ -7,10 +12,13 @@ import type { HttpContext } from '@adonisjs/core/http'
 export default class HomeController {
   constructor(
     private dashboardService: DashboardService,
-    private aiService: AiAnalysisService
+    private aiService: AiAnalysisService,
+    private portService: PortService,
+    private planningService: PlanningService,
+    private quotaService: QuotaService
   ) {}
 
-  async index({ inertia, auth }: HttpContext) {
+  async index({ inertia, auth, response, i18n }: HttpContext) {
     await auth.check()
 
     if (!auth.isAuthenticated) {
@@ -18,15 +26,58 @@ export default class HomeController {
     }
 
     const user = auth.getUserOrFail()
+
+    if (user.organizationId) {
+      const role = await user.getEffectiveRoleInOrg(user.organizationId)
+      if (role === 'boat_owner') {
+        return response.redirect('/owner/boats')
+      }
+      // Le mécanicien (capabilities limitées à maintenance.*) n'a pas accès aux
+      // KPIs flotte ni aux CTA hors périmètre : dashboard dédié « mes interventions ».
+      if (role === 'mechanic') {
+        const { overdueTasks, soonTasks } = await this.planningService.getPlanningForOrg(user)
+        return inertia.render('dashboard/mechanic', { overdueTasks, soonTasks })
+      }
+    }
+
     const data = await this.dashboardService.getForUser(user)
 
     const latestAnalysis = user.organizationId
-      ? await this.aiService.getLatestFleetAnalysis(user.id, user.organizationId)
+      ? await this.aiService.getLatestFleetAnalysis(
+          user.id,
+          user.organizationId,
+          toAppLocale(i18n.locale)
+        )
       : null
     const aiFleetAnalysis: AiSuggestion[] | null = latestAnalysis
       ? (JSON.parse(latestAnalysis.responseText) as AiSuggestion[])
       : null
 
-    return inertia.render('dashboard', { ...data, aiFleetAnalysis })
+    const portOptions = await this.portService.listNamesForOrg(user)
+    const canCreateNavigationLogs = user.organizationId
+      ? await user.hasPermission(user.organizationId, 'navigation_logs.create')
+      : false
+    const canCreateIncidents = user.organizationId
+      ? await user.hasPermission(user.organizationId, 'incidents.create')
+      : false
+
+    // Quota bateaux pour l'upsell du bouton « Nouveau bateau » (issue #418). La
+    // relation `organization` n'est pas chargée à ce stade (le middleware Inertia
+    // ne la charge qu'au rendu partagé) : on la charge explicitement.
+    if (user.organizationId) await user.load('organization')
+    const boatQuota = user.organization
+      ? await this.quotaService.getBoatUsage(user.organization)
+      : { used: 0, limit: 0 }
+    const canAddBoat = boatQuota.limit === null || boatQuota.used < boatQuota.limit
+
+    return inertia.render('dashboard', {
+      ...data,
+      aiFleetAnalysis,
+      portOptions,
+      canCreateNavigationLogs,
+      canCreateIncidents,
+      canAddBoat,
+      boatQuota,
+    })
   }
 }

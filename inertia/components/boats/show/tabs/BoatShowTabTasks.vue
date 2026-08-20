@@ -1,21 +1,29 @@
 <script setup lang="ts">
-import { Form } from '@adonisjs/inertia/vue'
 import { ClockIcon, ExclamationTriangleIcon } from '@heroicons/vue/24/outline'
 import { computed, ref } from 'vue'
-import BaseButton from '~/components/base/BaseButton.vue'
 import BoatMaintenanceTasksPanel from '~/components/boats/maintenance/BoatMaintenanceTasksPanel.vue'
+import BoatTaskActions from '~/components/boats/maintenance/BoatTaskActions.vue'
+import BoatTaskUrgentCard from '~/components/boats/maintenance/BoatTaskUrgentCard.vue'
 import { subjectLabel } from '~/components/boats/maintenance/utils'
-import type { BoatShowDetail, MaintenanceTaskRow } from '~/types/boat_show'
+import { engineKindLabel, sailTypeLabel } from '~/utils/boat_enum_labels'
+import type { BoatCreateIntent, BoatShowDetail, MaintenanceTaskRow } from '~/types/boat_show'
 import { useT } from '~/composables/use_t'
+import { useDateFormat } from '~/composables/use_date_format'
 
-const props = defineProps<{
-  boat: BoatShowDetail
-  maintenanceTasks: MaintenanceTaskRow[]
-  canManageMaintenance: boolean
-  createTaskNonce: number
-}>()
+const props = withDefaults(
+  defineProps<{
+    boat: BoatShowDetail
+    maintenanceTasks: MaintenanceTaskRow[]
+    canManageMaintenance: boolean
+    createIntent?: BoatCreateIntent
+  }>(),
+  { createIntent: null }
+)
+
+defineEmits<{ createIntentConsumed: [] }>()
 
 const { t } = useT()
+const { formatDate } = useDateFormat()
 
 const tasksFilter = ref<'all' | 'overdue' | 'soon' | 'planned' | 'undated'>('all')
 
@@ -40,9 +48,7 @@ const plannedTasks = computed(() => {
   const thirtyDaysFromNow = new Date()
   thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30)
   const soonIso = thirtyDaysFromNow.toISOString().slice(0, 10)
-  return openTasks.value.filter(
-    (t) => t.dueAt && String(t.dueAt) > soonIso
-  )
+  return openTasks.value.filter((t) => t.dueAt && String(t.dueAt) > soonIso)
 })
 
 const undatedTasks = computed(() => {
@@ -64,22 +70,18 @@ const filteredTasks = computed(() => {
   }
 })
 
-function formatDate(iso: string | null): string {
-  if (!iso) return '\u2014'
-  return iso.slice(0, 10)
-}
-
 function getTaskComponentLabel(task: MaintenanceTaskRow): string {
   if (task.subject === 'engine' && task.boatEngineId) {
     const engine = props.boat.engines.find((e) => e.id === task.boatEngineId)
-    if (engine) return `${engine.kind} ${engine.brand ?? ''} ${engine.model ?? ''}`.trim()
+    if (engine) {
+      return [engineKindLabel(t, engine.kind), engine.brand, engine.model].filter(Boolean).join(' ')
+    }
   }
   if (task.subject === 'sail' && task.boatSailId) {
     const sail = props.boat.sails.find((s) => s.id === task.boatSailId)
-    if (sail) return sail.sailType
+    if (sail) return sailTypeLabel(t, sail.sailType) ?? sail.sailType
   }
-  if (task.subject === 'rig') return 'Greement'
-  return subjectLabel(task.subject)
+  return subjectLabel(t, task.subject)
 }
 </script>
 
@@ -91,10 +93,22 @@ function getTaskComponentLabel(task: MaintenanceTaskRow): string {
         <button
           v-for="filter in [
             { key: 'all', label: t('boats.show.tasksFilter.all') },
-            { key: 'overdue', label: t('boats.show.tasksFilter.overdue'), count: overdueTasks.length },
+            {
+              key: 'overdue',
+              label: t('boats.show.tasksFilter.overdue'),
+              count: overdueTasks.length,
+            },
             { key: 'soon', label: t('boats.show.tasksFilter.soon'), count: soonTasks.length },
-            { key: 'planned', label: t('boats.show.tasksFilter.planned'), count: plannedTasks.length },
-            { key: 'undated', label: t('boats.show.tasksFilter.undated'), count: undatedTasks.length },
+            {
+              key: 'planned',
+              label: t('boats.show.tasksFilter.planned'),
+              count: plannedTasks.length,
+            },
+            {
+              key: 'undated',
+              label: t('boats.show.tasksFilter.undated'),
+              count: undatedTasks.length,
+            },
           ]"
           :key="filter.key"
           type="button"
@@ -130,37 +144,15 @@ function getTaskComponentLabel(task: MaintenanceTaskRow): string {
         {{ t('boats.show.status.urgent') }}
       </h3>
       <div class="space-y-3 border-l-4 border-coral-400 pl-4">
-        <div
+        <BoatTaskUrgentCard
           v-for="task in overdueTasks"
           :key="task.id"
-          class="rounded-lg border border-coral-200 bg-coral-50 p-4"
-        >
-          <div class="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <p class="font-semibold text-fg">{{ task.title }}</p>
-              <p class="text-sm text-fg-muted">{{ getTaskComponentLabel(task) }}</p>
-              <p v-if="task.dueAt" class="mt-1 text-xs text-coral-700">
-                Echeance: {{ formatDate(task.dueAt) }}
-              </p>
-              <p v-else-if="task.dueEngineHours !== null" class="mt-1 text-xs text-coral-700">
-                A {{ task.dueEngineHours }} heures moteur
-              </p>
-            </div>
-            <div v-if="canManageMaintenance" class="flex items-center gap-2">
-              <Form
-                :action="{
-                  url: `/boats/${boat.id}/maintenance-tasks/${task.id}/done`,
-                  method: 'put',
-                }"
-                #default="{ processing }"
-              >
-                <BaseButton type="submit" variant="secondary" size="sm" :disabled="processing">
-                  Marquer fait
-                </BaseButton>
-              </Form>
-            </div>
-          </div>
-        </div>
+          tone="overdue"
+          :task="task"
+          :boat-id="boat.id"
+          :component-label="getTaskComponentLabel(task)"
+          :can-manage="canManageMaintenance"
+        />
       </div>
     </div>
 
@@ -171,37 +163,18 @@ function getTaskComponentLabel(task: MaintenanceTaskRow): string {
     >
       <h3 class="flex items-center gap-2 text-sm font-semibold text-amber-700">
         <ClockIcon class="h-4 w-4" />
-        A venir bientot
+        {{ t('boats.show.status.dueSoon') }}
       </h3>
       <div class="space-y-3 border-l-4 border-amber-400 pl-4">
-        <div
+        <BoatTaskUrgentCard
           v-for="task in soonTasks"
           :key="task.id"
-          class="rounded-lg border border-amber-200 bg-amber-50 p-4"
-        >
-          <div class="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <p class="font-semibold text-fg">{{ task.title }}</p>
-              <p class="text-sm text-fg-muted">{{ getTaskComponentLabel(task) }}</p>
-              <p v-if="task.dueAt" class="mt-1 text-xs text-amber-700">
-                Echeance: {{ formatDate(task.dueAt) }}
-              </p>
-            </div>
-            <div v-if="canManageMaintenance" class="flex items-center gap-2">
-              <Form
-                :action="{
-                  url: `/boats/${boat.id}/maintenance-tasks/${task.id}/done`,
-                  method: 'put',
-                }"
-                #default="{ processing }"
-              >
-                <BaseButton type="submit" variant="secondary" size="sm" :disabled="processing">
-                  Marquer fait
-                </BaseButton>
-              </Form>
-            </div>
-          </div>
-        </div>
+          tone="soon"
+          :task="task"
+          :boat-id="boat.id"
+          :component-label="getTaskComponentLabel(task)"
+          :can-manage="canManageMaintenance"
+        />
       </div>
     </div>
 
@@ -220,6 +193,7 @@ function getTaskComponentLabel(task: MaintenanceTaskRow): string {
           <div>
             <p class="font-semibold text-fg">{{ task.title }}</p>
             <p class="text-sm text-fg-muted">{{ getTaskComponentLabel(task) }}</p>
+            <p v-if="task.notes" class="mt-1 text-sm text-fg-muted">{{ task.notes }}</p>
           </div>
           <div class="flex items-center gap-3">
             <span v-if="task.dueAt" class="text-sm text-fg-subtle">{{
@@ -228,18 +202,12 @@ function getTaskComponentLabel(task: MaintenanceTaskRow): string {
             <span v-else-if="task.dueEngineHours !== null" class="text-sm text-fg-subtle">
               {{ task.dueEngineHours }}h
             </span>
-            <Form
+            <BoatTaskActions
               v-if="canManageMaintenance"
-              :action="{
-                url: `/boats/${boat.id}/maintenance-tasks/${task.id}/done`,
-                method: 'put',
-              }"
-              #default="{ processing }"
-            >
-              <BaseButton type="submit" variant="ghost" size="sm" :disabled="processing">
-                Fait
-              </BaseButton>
-            </Form>
+              :boat-id="boat.id"
+              :task="task"
+              done-variant="ghost"
+            />
           </div>
         </div>
       </div>
@@ -260,34 +228,31 @@ function getTaskComponentLabel(task: MaintenanceTaskRow): string {
           <div>
             <p class="font-semibold text-fg">{{ task.title }}</p>
             <p class="text-sm text-fg-muted">{{ getTaskComponentLabel(task) }}</p>
+            <p v-if="task.notes" class="mt-1 text-sm text-fg-muted">{{ task.notes }}</p>
           </div>
           <div class="flex items-center gap-3">
             <span v-if="task.dueEngineHours !== null" class="text-sm text-fg-subtle">
               {{ task.dueEngineHours }}h
             </span>
-            <Form
+            <BoatTaskActions
               v-if="canManageMaintenance"
-              :action="{
-                url: `/boats/${boat.id}/maintenance-tasks/${task.id}/done`,
-                method: 'put',
-              }"
-              #default="{ processing }"
-            >
-              <BaseButton type="submit" variant="ghost" size="sm" :disabled="processing">
-                Fait
-              </BaseButton>
-            </Form>
+              :boat-id="boat.id"
+              :task="task"
+              done-variant="ghost"
+            />
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Empty state -->
+    <!-- Empty state: only shown when the active filter has no match but other
+         open tasks exist elsewhere — when there are none at all, the panel
+         below already owns the empty message + creation CTA. -->
     <div
-      v-if="filteredTasks.length === 0"
+      v-if="filteredTasks.length === 0 && openTasks.length > 0"
       class="rounded-lg border border-dashed border-border bg-surface-muted/30 p-8 text-center"
     >
-      <p class="text-fg-muted">Aucune tache correspondante.</p>
+      <p class="text-fg-muted">{{ t('boats.maintenance.tasks.emptyFiltered') }}</p>
     </div>
 
     <!-- Tasks panel for creation -->
@@ -296,7 +261,8 @@ function getTaskComponentLabel(task: MaintenanceTaskRow): string {
         :boat="boat"
         :tasks="maintenanceTasks"
         :can-manage-maintenance="canManageMaintenance"
-        :create-task-nonce="createTaskNonce"
+        :create-intent="createIntent"
+        @create-intent-consumed="$emit('createIntentConsumed')"
       />
     </div>
   </div>

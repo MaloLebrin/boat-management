@@ -193,9 +193,17 @@ désormais un `clientId` optionnel.
 
 ## 8. Sécurité & gating
 
-- **Gating Enterprise** : `QuotaService.assertCanManageClients` /
-  `canManageClients` (via `PLAN_LIMITS[plan].canManageClients`). Le module clients
-  (et la fiche `show`) est réservé à Enterprise.
+- **Gating module** : `QuotaService.assertCanManageClients` /
+  `canManageClients` (via les quotas effectifs — le tier Enterprise, ou le module
+  add-on `crm_invoicing` souscrit sur le socle Pro, cf. #327). Un accès sans la
+  capacité est redirigé vers **`/settings/billing`** (`BILLING_SETTINGS_PATH`,
+  `shared/constants/billing.ts`) avec un flash qui nomme le module manquant.
+  Ne jamais rediriger vers `/` : cette route redirige sur `/en` (home marketing
+  publique), dont le layout ne rend aucun toast — la redirection y est muette et
+  se lit comme une déconnexion (#456). Un utilisateur **sans organisation** est un
+  cas distinct : `loadOrgForRead` lève `UserNotInOrganizationError`, traitée par le
+  handler global (retour à l'accueil), car `/settings/billing` planterait sur
+  `PLAN_LIMITS[org.plan]` (#279).
 - **ACL** : `ClientPolicy` (Bouncer) — `delete` réservé aux admins.
 - **Org-scoping / IDOR** : toute lecture/écriture passe par
   `getForOrganizationOrFail` / `#resolveClientId` org-scopés ; un id d'une autre

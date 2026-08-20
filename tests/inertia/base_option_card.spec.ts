@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { test, expect } from 'vitest'
+import { describe, test, expect } from 'vitest'
 import BaseOptionCard from '../../inertia/components/base/BaseOptionCard.vue'
 
 test('renders slot content', () => {
@@ -15,7 +15,7 @@ test('applies unselected classes by default when not selected', () => {
     props: { selected: false },
     slots: { default: 'Test' },
   })
-  expect(w.classes().join(' ')).toContain('border-bone')
+  expect(w.classes().join(' ')).toContain('border-border')
 })
 
 test('applies selected classes when selected', () => {
@@ -65,4 +65,45 @@ test('renders as a button element', () => {
     slots: { default: 'Test' },
   })
   expect(w.element.tagName).toBe('BUTTON')
+})
+
+test('exposes ariaLabel as the accessible name', () => {
+  const w = mount(BaseOptionCard, {
+    props: { selected: false, ariaLabel: 'Motorboat' },
+    slots: { default: '🚤' },
+  })
+  expect(w.attributes('aria-label')).toBe('Motorboat')
+})
+
+test('reflects selection state via aria-pressed', () => {
+  const selected = mount(BaseOptionCard, {
+    props: { selected: true },
+    slots: { default: 'Test' },
+  })
+  const unselected = mount(BaseOptionCard, {
+    props: { selected: false },
+    slots: { default: 'Test' },
+  })
+  expect(selected.attributes('aria-pressed')).toBe('true')
+  expect(unselected.attributes('aria-pressed')).toBe('false')
+})
+
+describe('dark mode (#416)', () => {
+  test('l’état non sélectionné s’appuie sur des tokens de surface', () => {
+    const classes = mount(BaseOptionCard, { props: { selected: false }, slots: { default: 'X' } })
+      .classes()
+      .join(' ')
+    expect(classes).toContain('border-border')
+    expect(classes).toContain('bg-surface-elevated')
+    // `bg-white` figerait la carte en clair pendant que la page s'inverse.
+    expect(classes).not.toContain('bg-white')
+  })
+
+  test('l’état sélectionné utilise la palette coral, inversée en sombre', () => {
+    const classes = mount(BaseOptionCard, { props: { selected: true }, slots: { default: 'X' } })
+      .classes()
+      .join(' ')
+    expect(classes).toContain('bg-coral-50')
+    expect(classes).toContain('text-coral-700')
+  })
 })

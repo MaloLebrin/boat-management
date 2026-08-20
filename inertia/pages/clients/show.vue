@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@adonisjs/inertia/vue'
-import { router } from '@inertiajs/vue3'
+import { Head, router } from '@inertiajs/vue3'
 import { ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
@@ -10,7 +10,7 @@ import BaseHeading from '~/components/base/BaseHeading.vue'
 import ClientDocuments from '~/components/clients/ClientDocuments.vue'
 import ClientStatusBadge from '~/components/clients/ClientStatusBadge.vue'
 import ReservationStatusBadge from '~/components/reservations/ReservationStatusBadge.vue'
-import { useReservationFormat } from '~/composables/use_reservation_format'
+import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import type { ClientRow } from '../../../shared/types/client'
 import type { BoatReservationRow } from '../../../shared/types/reservation'
@@ -25,7 +25,7 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
-const { formatDate } = useReservationFormat()
+const { formatDate } = useDateFormat()
 
 const isAnonymizeModalOpen = ref(false)
 
@@ -36,6 +36,8 @@ function anonymize() {
 </script>
 
 <template>
+  <Head :title="client.fullName" />
+
   <div class="mx-auto w-full max-w-4xl px-6 py-10 sm:px-8">
     <!-- Breadcrumb -->
     <nav class="mb-6 flex items-center gap-1.5 text-sm text-fg-muted">
@@ -115,6 +117,7 @@ function anonymize() {
           </p>
         </div>
         <div class="flex items-center gap-2">
+          <!-- eslint-disable vue/no-restricted-v-bind -- export de fiche client : pas une navigation -->
           <a
             v-if="canManage"
             :href="`/clients/${client.id}/export`"
@@ -122,6 +125,7 @@ function anonymize() {
           >
             {{ t('clients.gdpr.export') }}
           </a>
+          <!-- eslint-enable vue/no-restricted-v-bind -->
           <BaseButton
             v-if="canAnonymize && !client.anonymizedAt"
             variant="danger"

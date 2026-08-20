@@ -1,0 +1,133 @@
+import { describe, expect, test, vi } from 'vitest'
+
+const mockLocale = { value: 'en' }
+
+vi.mock('@inertiajs/vue3', () => ({
+  usePage: () => ({ props: { appT: {}, locale: mockLocale.value } }),
+}))
+
+import { useDateFormat } from '../../inertia/composables/use_date_format'
+
+describe('useDateFormat', () => {
+  test('formatDate returns a non-empty string for an ISO date', () => {
+    const { formatDate } = useDateFormat()
+    const result = formatDate('2026-07-12')
+    expect(typeof result).toBe('string')
+    expect(result.length).toBeGreaterThan(0)
+  })
+
+  test('formatDate never returns the raw ISO string', () => {
+    const { formatDate } = useDateFormat()
+    expect(formatDate('2026-07-12')).not.toBe('2026-07-12')
+  })
+
+  test('formatDate includes the year', () => {
+    const { formatDate } = useDateFormat()
+    expect(formatDate('2026-07-12')).toContain('2026')
+  })
+
+  test('formatDate handles ISO datetime strings', () => {
+    const { formatDate } = useDateFormat()
+    const result = formatDate('2026-01-05T10:00:00.000Z')
+    expect(typeof result).toBe('string')
+    expect(result).toContain('2026')
+  })
+
+  test('formatDate returns an em dash for null/undefined', () => {
+    const { formatDate } = useDateFormat()
+    expect(formatDate(null)).toBe('—')
+    expect(formatDate(undefined)).toBe('—')
+  })
+
+  test('formatDate follows the current locale', () => {
+    mockLocale.value = 'fr'
+    const { formatDate } = useDateFormat()
+    // Local midnight, not `new Date('2026-07-12')` (UTC midnight): the calendar
+    // day must not depend on the browser offset — see #452.
+    expect(formatDate('2026-07-12')).toBe(
+      new Date(2026, 6, 12).toLocaleDateString('fr', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      })
+    )
+    mockLocale.value = 'en'
+  })
+
+  test('formatDate renders a calendar date as the same day in any timezone', () => {
+    // #452: `new Date('2026-08-03')` parses as UTC midnight, which renders as
+    // Aug 2 for any negative offset. A `YYYY-MM-DD` value carries no instant.
+    const { formatDate } = useDateFormat()
+    expect(formatDate('2026-08-03')).toBe(
+      new Date(2026, 7, 3).toLocaleDateString('en', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      })
+    )
+  })
+
+  test('formatDate still renders a full ISO instant in the browser zone', () => {
+    const { formatDate } = useDateFormat()
+    const instant = '2026-01-05T10:00:00.000Z'
+    expect(formatDate(instant)).toBe(
+      new Date(instant).toLocaleDateString('en', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      })
+    )
+  })
+
+  test('formatDateTime returns a non-empty string', () => {
+    const { formatDateTime } = useDateFormat()
+    const result = formatDateTime('2026-07-12T17:20:33.000Z')
+    expect(typeof result).toBe('string')
+    expect(result.length).toBeGreaterThan(0)
+  })
+
+  test('formatDateTime returns an em dash for null/undefined', () => {
+    const { formatDateTime } = useDateFormat()
+    expect(formatDateTime(null)).toBe('—')
+    expect(formatDateTime(undefined)).toBe('—')
+  })
+
+  // #461: every screen now picks one of these styles instead of writing its own
+  // `toLocaleDateString` options, so they all have to be reachable and bound to
+  // the app locale (not the browser's).
+  test('exposes every date style, each driven by the app locale', () => {
+    mockLocale.value = 'fr'
+    const styles = useDateFormat()
+    expect(styles.formatDate('2026-07-15')).toBe('15/07/2026')
+    expect(styles.formatDateLong('2026-07-15')).toBe('15 juillet 2026')
+    expect(styles.formatDayMonth('2026-07-15')).toBe('15 juil.')
+    expect(styles.formatMonthYear('2026-07-15')).toBe('juillet 2026')
+    expect(styles.formatWeekdayDay('2026-07-15')).toBe('mer. 15')
+    expect(styles.formatWeekdayShort('2026-07-15')).toBe('Mer')
+    mockLocale.value = 'en'
+  })
+
+  test('every style returns an em dash for a missing value', () => {
+    const styles = useDateFormat()
+    const results = [
+      styles.formatDate(null),
+      styles.formatDateLong(null),
+      styles.formatDayMonth(null),
+      styles.formatMonthYear(null),
+      styles.formatDateTime(null),
+      styles.formatTime(null),
+      styles.formatWeekdayDay(null),
+      styles.formatWeekdayShort(null),
+    ]
+    expect(results.every((r) => r === '—')).toBe(true)
+  })
+
+  test('formatTime and formatDateTime accept a Date as well as an ISO string', () => {
+    mockLocale.value = 'fr'
+    const { formatDateTime, formatTime } = useDateFormat()
+    const instant = new Date(2026, 6, 15, 15, 14)
+    expect(formatDateTime(instant)).toBe('15/07/2026 15:14')
+    expect(formatTime(instant)).toBe('15:14')
+    mockLocale.value = 'en'
+  })
+})

@@ -10,6 +10,7 @@ vi.mock('@inertiajs/vue3', () => ({
         'common.tone.success': 'success',
         'common.tone.info': 'info',
         'common.tone.warning': 'warning',
+        'common.tone.empty': 'empty',
       },
       locale: 'en',
     },
@@ -46,4 +47,14 @@ test('defaults tone to neutral when not specified', () => {
 test('renders warning tone badge', () => {
   const w = mount(BaseStatCard, { props: { label: 'Alerts', value: '2', tone: 'warning' } })
   expect(w.text()).toContain('warning')
+})
+
+test('renders empty tone badge when there is no data', () => {
+  const w = mount(BaseStatCard, { props: { label: 'Engines', value: '0', tone: 'empty' } })
+  expect(w.text()).toContain('empty')
+})
+
+test('never truncates the label so it stays readable in narrow cards', () => {
+  const w = mount(BaseStatCard, { props: { label: 'Urgent maintenance', value: '2' } })
+  expect(w.find('p.truncate').exists()).toBe(false)
 })

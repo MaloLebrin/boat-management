@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Link } from '@adonisjs/inertia/vue'
 import { computed } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import GradientMeshCanvas from '~/components/marketing/canvas/GradientMeshCanvas.vue'
@@ -61,11 +62,11 @@ const { el: tiltEl, transform: tiltTransform } = useTilt({ max: 6, parallax: 0.6
           class="flex flex-wrap items-center justify-center gap-3 pt-2"
           style="animation: fadeUp 700ms var(--ease-premium) both; animation-delay: 200ms"
         >
-          <a href="/signup">
+          <Link href="/signup">
             <BaseButton size="lg" class="shadow-lg">
               {{ cta.primary }}
             </BaseButton>
-          </a>
+          </Link>
           <a href="#demo">
             <BaseButton
               size="lg"
@@ -99,7 +100,7 @@ const { el: tiltEl, transform: tiltTransform } = useTilt({ max: 6, parallax: 0.6
   </section>
 
   <!-- Logos band -->
-  <section class="border-y border-bone bg-white py-8">
+  <section class="border-y border-bone bg-surface-elevated py-8">
     <div class="mx-auto max-w-7xl px-6 lg:px-8">
       <p class="mb-6 text-center text-xs font-semibold uppercase tracking-widest text-fg-subtle">
         {{ socialProof.eyebrow }}

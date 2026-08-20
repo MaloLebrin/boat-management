@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { test, expect, vi } from 'vitest'
+import { describe, test, expect, vi } from 'vitest'
 import BudgetCategoryCard from '../../inertia/components/boats/budget/BudgetCategoryCard.vue'
 
 vi.mock('~/composables/use_t', () => ({
@@ -73,4 +73,39 @@ test('renders help icon with title when helpText is provided', () => {
 test('does not render help icon when helpText is absent', () => {
   const w = mountCard({})
   expect(w.find('button[title]').exists()).toBe(false)
+})
+
+describe('dark mode (#416)', () => {
+  // Les 6 catégories utilisaient la palette Tailwind par défaut
+  // (blue/purple/teal/green/orange) doublée de classes `dark:`. Elles sont
+  // passées aux palettes de marque, seules inversées par `[data-theme='dark']`.
+  const CATEGORY_TOKENS = [
+    ['maintenance', 'text-amber-700'],
+    ['fuel', 'text-sky-800'],
+    ['documents', 'text-violet-700'],
+    ['port', 'text-lilac-800'],
+    ['equipment', 'text-mint-700'],
+    ['entries', 'text-peach-700'],
+    ['total', 'text-fg'],
+  ] as const
+
+  test.each(CATEGORY_TOKENS)('la catégorie %s bascule via %s', (category, token) => {
+    expect(mountCard({ category }).html()).toContain(token)
+  })
+
+  test('plus aucune classe dark: ni palette Tailwind par défaut', () => {
+    for (const [category] of CATEGORY_TOKENS) {
+      const html = mountCard({ category }).html()
+      expect(html, category).not.toContain('dark:')
+      expect(html, category).not.toMatch(/-(blue|purple|teal|green|orange|emerald|red)-\d/)
+    }
+  })
+
+  test('le delta de comparaison utilise les tokens de statut', () => {
+    const up = mountCard({ amount: 200, previousAmount: 100, previousYear: 2023 }).html()
+    expect(up).toContain('text-danger')
+
+    const down = mountCard({ amount: 50, previousAmount: 100, previousYear: 2023 }).html()
+    expect(down).toContain('text-success')
+  })
 })

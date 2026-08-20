@@ -23,7 +23,7 @@ vi.mock('@inertiajs/vue3', async () => {
     usePage: vi.fn(() => ({
       props: {
         appT: {
-          'pwa.offlineReady': 'Application prête pour une utilisation hors-ligne',
+          'common.pwa.offlineReady': 'Application prête pour une utilisation hors-ligne',
         },
         locale: 'fr',
       },

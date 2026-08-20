@@ -52,6 +52,7 @@ Les PDFs uploadés sont compressés avant envoi sur Cloudinary via `app/services
 - Migrations : toujours avec rollback (`down()` implémenté)
 - Nommage tables : snake_case pluriel (`user_profiles`, `refresh_tokens`)
 - Seeders pour les données de démo (`database/seeders/`)
+- **Le compte `ADMIN_EMAIL` est le compte réel de l'exploitant, pas un compte de test** : seul `malo_seeder.ts` y écrit (un seul bateau « 3D », plan `pro`). Aucun autre seeder ne doit lui rattacher de données ni changer son plan — voir `docs/dev/seeders.md`
 - Jamais de `SELECT *` en production — colonnes explicites
 
 ### Frontend (Vue 3 + Inertia)
@@ -64,7 +65,11 @@ Les PDFs uploadés sont compressés avant envoi sur Cloudinary via `app/services
 - Code partagé backend/frontend dans `shared/` (types, helpers, constants)
 - **Taille max des composants Vue : 250 lignes** (enforced par ESLint `max-lines`) — au-delà, extraire en sous-composants
 - Pages complexes à onglets : chaque onglet = un composant dans `components/<domaine>/show/tabs/`
-- **Navigation interne : toujours `<Link>` (`@adonisjs/inertia/vue`)**, jamais une ancre `<a href="...">` brute — préserve le routing SPA Inertia (pas de full page reload). Ancre `<a>` réservée aux liens externes ou `mailto:`/`tel:`.
+- **Navigation interne : toujours `<Link>` (`@adonisjs/inertia/vue`)**, jamais une ancre `<a href="...">` brute — préserve le routing SPA Inertia (pas de full page reload). Règle ESLint `vue/no-restricted-static-attribute` + `vue/no-restricted-v-bind` sur `inertia/**/*.vue` (#533). Trois exceptions, à marquer par un `eslint-disable` **motivé** :
+  - **lien externe**, `mailto:`, `tel:` ;
+  - **téléchargement / export** (PDF, CSV, média) : une visite Inertia rendrait le binaire comme une page. Sur `BaseButton`, passer `external-href` ;
+  - **ouverture en nouvel onglet** : `shouldIntercept()` d'Inertia ne regarde que les touches de modification et le bouton de la souris, **jamais `target`**. Un clic gauche sur `<Link target="_blank">` est intercepté et navigue dans le même onglet — pour un vrai nouvel onglet il faut une ancre `<a target="_blank" rel="noopener">`.
+- **`BaseButton` suit la même règle** : un `href` commençant par `/` est rendu en `<Link>`, un `href` absolu (`https:`, `mailto:`, `tel:`) ou marqué `external-href` reste une ancre brute.
 
 #### Mutations Inertia (obligatoire sur pages/composants Inertia)
 
@@ -85,6 +90,24 @@ Sur tout écran rendu par Inertia (`inertia/pages/**`, `inertia/components/**`),
 
 Références : [Inertia — Link and Form](https://docs.adonisjs.com/guides/frontend/inertia#link-and-form-components), [Manual visits](https://inertiajs.com/manual-visits).
 
+### Couleurs et thème clair/sombre
+
+L'app supporte un thème sombre (issue #416) piloté par l'attribut `data-theme` sur `<html>`. Il repose entièrement sur les design tokens de `inertia/css/app.css` : **le thème bascule en redéfinissant des variables, pas en ajoutant des classes**.
+
+- **Toujours utiliser les tokens sémantiques** : `bg-surface`, `bg-surface-elevated`, `bg-surface-muted`, `text-fg`, `text-fg-muted`, `text-fg-subtle`, `border-border`, `text-brand`/`bg-brand`, `text-danger`, `text-success`, `text-warning`, `text-info`.
+- **Texte posé sur un aplat `bg-brand`/`bg-accent`** : `text-on-brand` / `text-on-accent`, jamais `text-white` (le brand s'éclaircit en sombre).
+- **Palettes de marque** (`coral`, `mint`, `amber`, `violet`, `sky`, `lilac`, `peach`) : les paliers `-50`/`-100` sont des **fonds**, `-700`/`-800` de l'**encre** posée dessus, `-300` à `-600` des **tons moyens** (aplats pleins, icônes). Le bloc `[data-theme='dark']` inverse les deux extrémités — respecter ces rôles, sinon le composant s'inverse à l'envers.
+- **Le `navy` n'est pas une palette de marque comme les autres** : c'est celle des surfaces **permanentes** (sidebar, bandeaux, panneaux Assistant IA), et le bloc `[data-theme='dark']` ne l'inverse pas. `bg-navy-25`/`-50`/`-100` en fond ou `text-navy-700`/`-900` en encre sur une surface qui bascule figent donc un bloc clair au milieu d'une page sombre — utiliser `bg-brand-soft` / `text-brand` / `bg-brand` + `text-on-brand`. Ce qui reste correct : l'aplat sombre (`bg-navy-800`/`-900`) avec son encre claire (`text-navy-100`/`-300`, `text-white`) et les tons moyens `-300` à `-500`.
+- **Ne jamais introduire** : une couleur Tailwind par défaut (`bg-red-100`, `text-gray-600`, `slate`, `emerald`…), un `bg-white`/`text-navy-900` sur une surface qui bascule, un hex brut ou un `style="background: #…"` dans un composant d'UI.
+- **Classes `dark:`** : inutiles dans le cas général — si vous en avez besoin, c'est probablement qu'un token manque. Elles suivent `data-theme` (pas la media query), via `@custom-variant dark`.
+- **Exceptions légitimes** : les bandeaux et panneaux navy permanents (sidebar, hero marketing, `AuthNavyPanel`) et les illustrations autonomes (carte marina, dégradés mesh, SVG décoratifs) gardent leurs couleurs brutes — elles sont sombres ou cohérentes dans les deux thèmes.
+- Banc d'essai : `/design-system` rend toute la palette et tous les composants `base` — le vérifier dans les deux thèmes après une modification de tokens.
+
+### Branding (graphie canonique)
+
+- **Marque : toujours `FleetAi`** (F et A majuscules, `i` minuscule) — logo, header, footer, titres d'onglet, assistant IA, emails, PDFs, SEO/JSON-LD. Ne jamais écrire `FleetAI`, `Fleet AI` (avec espace) ni `FleetView` (ancienne marque).
+- **Nom du plan « entreprise »** : côté **FR** toujours `Entreprise` (francisé) dans les chaînes d'affichage ; côté **EN** toujours `Enterprise`. Les **noms de clés i18n** et **identifiants de code** (slug `enterprise`, `ModulesRequireEnterprisePlanError`, clés `header_enterprise`, `subtitleEnterprise`…) restent en anglais et ne se renomment pas.
+
 ### Internationalisation
 
 - **Toute chaîne visible par l'utilisateur doit passer par `t()`** — jamais de texte en dur dans les templates
@@ -94,6 +117,22 @@ Références : [Inertia — Link and Form](https://docs.adonisjs.com/guides/fron
 - Interpolation ICU : `t('clé', { count: String(n) })` — les valeurs doivent être des strings
 - Pas de ternaire inline `locale === 'fr' ? '...' : '...'` — utiliser `t()` à la place
 - Toute PR qui ajoute un composant ou une page doit ajouter les clés correspondantes dans les **deux locales** (`en` et `fr`)
+
+#### Dates et heures
+
+- **Toute date affichée passe par `useDateFormat()`** (`inertia/composables/use_date_format.ts`) — jamais `toLocaleDateString` / `toLocaleString` / `new Intl.DateTimeFormat` dans un composant (issue #461)
+- Un écran choisit un **style** dans le catalogue, il n'écrit pas ses propres options `Intl` : `formatDate` (tableaux/listes), `formatDateLong` (titres, cartes), `formatDayMonth`, `formatMonthYear`, `formatDateTime`, `formatTime`, `formatWeekdayDay`, `formatWeekdayShort`. Il manque un cas ? Ajouter un style dans `shared/helpers/date_format.ts`, pas un appel local
+- Sans locale explicite, `Intl` suit le **navigateur** (et non l'app) : c'est ce qui faisait cohabiter trois formats dans une même session EN
+- Côté backend (PDF, e-mails), importer `#shared/helpers/date_format` et passer `i18n.locale` — jamais la locale du serveur
+- `YYYY-MM-DD` pour un `<input type="date">` est un **format machine** : `todayDateInputValue()` / `toDateInputValue()` (`inertia/utils/local_datetime.ts`), pas une locale détournée comme `'en-CA'`
+
+#### Tutoiement / vouvoiement (FR)
+
+- **Marketing (`marketing.json`, pages publiques `home`, `pricing`, `about`, `contact`, `guide`…) : tutoiement.** Le site s'adresse au visiteur en "tu" du hero à la FAQ, y compris dans les questions/réponses qui s'adressent au lecteur.
+- **App (tous les autres namespaces, y compris `auth.json` — login/signup/reset) : vouvoiement.** Dès qu'un écran fait partie du produit connecté (ou de son entrée, comme l'auth), on vouvoie.
+- **Exception légale** : les sections `privacy` (politique de confidentialité RGPD), `terms` (CGU), `salesTerms` (CGV) et `legalNotice` (mentions légales) de `marketing.json` restent en vouvoiement — convention standard pour un texte légal/contractuel, même sur un site au ton tutoiement.
+- Une question de FAQ écrite à la voix du visiteur qui s'adresse à l'équipe FleetAi (ex. « vous avez un programme partenaire ? ») peut rester en "vous" : ce "vous" désigne l'entreprise, pas le lecteur — ce n'est pas une entorse à la règle.
+- Ne jamais mélanger tu/vous dans une même page ou un même namespace.
 
 ## Workflow agent
 
@@ -147,10 +186,13 @@ tests/
 - Committer des secrets ou `.env`
 - Supprimer des migrations existantes
 - Mettre de la logique de formatage dans les controllers (→ utiliser un transformer)
+- **Écrire des données de test/démo sur le compte `ADMIN_EMAIL`** (→ compte réel ; seul `malo_seeder.ts` y écrit, un seul bateau « 3D », plan `pro`)
 - **Définir des types de controllers/services ailleurs que dans `shared/types/`** (→ un fichier par domaine dans `shared/types/`, réutilisé côté front)
 - **Définir des classes d'erreur inline dans un controller ou service** (→ `app/exceptions/<domaine>_errors.ts`)
 - **Écrire du texte visible en dur dans un template Vue** (→ utiliser `t('clé')`)
+- **Utiliser une couleur Tailwind par défaut ou un hex brut dans un composant d'UI** (→ tokens sémantiques ou palettes de marque, sinon le thème sombre casse)
 - **Utiliser des ternaires `locale === 'fr' ? ... : ...`** (→ utiliser `t()` avec clé dans les deux JSON)
+- **Appeler `toLocaleDateString` / `toLocaleString` / `Intl.DateTimeFormat` dans un composant ou un service** (→ `useDateFormat()` côté Inertia, `#shared/helpers/date_format` + `i18n.locale` côté backend)
 - **`fetch` / `axios` + JSON + CSRF manuel dans `inertia/**`** pour des mutations déjà couvertes par une page Inertia (→ `router.patch`/`useForm`/`<Form>`+`response.redirect().back()` côté contrôleur)
 - **`response.json({ ok: true })` sur des routes appelées depuis l’UI Inertia** (→ redirection ; réserver le JSON aux vraies routes API)
 - **Ancre `<a href="...">` pour une navigation interne** (→ `<Link>` d'Inertia ; `<a>` seulement pour liens externes/`mailto:`/`tel:`)

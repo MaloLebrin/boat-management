@@ -13,7 +13,7 @@ const upcomingTasks = [
   },
   {
     boat: 'Tramontane',
-    label: 'Greement - 18 mai',
+    label: 'Gréement - 18 mai',
     dot: 'bg-amber-600',
     card: 'border-amber-200 bg-amber-50',
   },
@@ -25,31 +25,31 @@ const upcomingTasks = [
   },
   {
     boat: 'Sirocco',
-    label: 'Controle securite - 26 mai',
+    label: 'Contrôle sécurité - 26 mai',
     dot: 'bg-mint-600',
     card: 'border-mint-200 bg-mint-50',
   },
   {
     boat: 'Cap Horn',
-    label: 'Revision hivernage - 2 juin',
+    label: 'Révision hivernage - 2 juin',
     dot: 'bg-amber-600',
     card: 'border-amber-200 bg-amber-50',
   },
   {
-    boat: 'Alizee',
+    boat: 'Alizée',
     label: 'Changement voile - 8 juin',
     dot: 'bg-coral-600',
     card: 'border-coral-200 bg-coral-50',
   },
   {
     boat: 'Zephyr',
-    label: 'Controle GPS - 14 juin',
+    label: 'Contrôle GPS - 14 juin',
     dot: 'bg-mint-600',
     card: 'border-mint-200 bg-mint-50',
   },
   {
     boat: 'Bora',
-    label: 'Carenage - 20 juin',
+    label: 'Carénage - 20 juin',
     dot: 'bg-amber-600',
     card: 'border-amber-200 bg-amber-50',
   },
@@ -61,7 +61,7 @@ const loopedTasks = [...upcomingTasks, ...upcomingTasks]
 
 <template>
   <div class="flex min-h-0 flex-1 flex-col">
-    <p class="mb-2 text-[9px] font-medium uppercase text-fg-muted">A venir</p>
+    <p class="mb-2 text-[9px] font-medium uppercase text-fg-muted">À venir</p>
     <div
       class="min-h-0 flex-1 overflow-hidden"
       style="

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Link } from '@adonisjs/inertia/vue'
 import { Form } from '@adonisjs/inertia/vue'
 import { PencilSquareIcon, TrashIcon } from '@heroicons/vue/24/outline'
 import { ref } from 'vue'
@@ -9,6 +10,8 @@ import BaseModal from '~/components/base/BaseModal.vue'
 import type { BoatShowSail } from '~/types/boat_show'
 import BoatEquipmentSailFields from './BoatEquipmentSailFields.vue'
 import { useT } from '~/composables/use_t'
+import { useDateFormat } from '~/composables/use_date_format'
+import { sailTypeLabel } from '~/utils/boat_enum_labels'
 
 defineProps<{
   boatId: number
@@ -17,13 +20,8 @@ defineProps<{
 }>()
 
 const { t } = useT()
+const { formatDate } = useDateFormat()
 const isCreateOpen = ref(false)
-
-function performedDisplay(iso: string | null) {
-  if (!iso) return null
-  const d = iso.slice(0, 10)
-  return d || iso
-}
 
 function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutral' {
   if (status === 'operational') return 'success'
@@ -62,7 +60,9 @@ function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutra
         <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
           <div class="min-w-0">
             <div class="flex flex-wrap items-center gap-2">
-              <p class="truncate text-sm font-semibold text-fg">{{ s.sailType }}</p>
+              <p class="truncate text-sm font-semibold text-fg">
+                {{ sailTypeLabel(t, s.sailType) }}
+              </p>
               <BaseBadge v-if="s.material" variant="neutral">
                 {{ s.material }}
               </BaseBadge>
@@ -87,8 +87,8 @@ function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutra
             </div>
 
             <div class="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-fg-subtle">
-              <span v-if="performedDisplay(s.manufacturedAt)"
-                >{{ t('boats.sails.mfg') }} {{ performedDisplay(s.manufacturedAt) }}</span
+              <span v-if="s.manufacturedAt"
+                >{{ t('boats.sails.mfg') }} {{ formatDate(s.manufacturedAt) }}</span
               >
             </div>
           </div>
@@ -103,7 +103,7 @@ function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutra
               {{ t('boats.sails.viewDetail') }}
             </BaseButton>
             <template v-if="canManage">
-              <a :href="`/boats/${boatId}/sails/${s.id}/edit`">
+              <Link :href="`/boats/${boatId}/sails/${s.id}/edit`">
                 <BaseButton
                   variant="secondary"
                   size="sm"
@@ -112,7 +112,7 @@ function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutra
                 >
                   <PencilSquareIcon class="w-4 h-4" />
                 </BaseButton>
-              </a>
+              </Link>
               <Form
                 :action="{ url: `/boats/${boatId}/sails/${s.id}`, method: 'delete' }"
                 #default="{ processing }"
@@ -125,7 +125,7 @@ function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutra
                   :disabled="processing"
                   :aria-label="t('common.delete')"
                 >
-                  <TrashIcon class="w-4 h-4 text-red-800" />
+                  <TrashIcon class="w-4 h-4 text-danger-strong" />
                 </BaseButton>
               </Form>
             </template>

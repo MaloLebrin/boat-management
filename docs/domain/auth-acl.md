@@ -11,10 +11,12 @@ Référence routes: `start/routes/auth.ts`.
   - Page: `inertia/pages/auth/signup.vue`
 - `POST /signup` (guest-only)
   - Controller: `NewAccountController.store`
-  - Validation: `signupValidator` (`app/validators/user.ts`)
+  - Validation: `signupValidator` (`app/validators/user.ts`) — `firstName`, `lastName`, `email`, `password`, `organizationName`, `organizationType?`, `fleetSize?`, `acceptTerms`. Le schéma doit rester le miroir exact des champs rendus par la page, sinon l'inscription échoue en silence (#448) ; `tests/inertia/signup_form_validator_sync.spec.ts` le vérifie.
   - Service: `UserService.signupWithOrganization`
   - Auth: `auth.use('web').login(user)`
   - Redirect: route `home`
+  - Mot de passe : `PASSWORD_MIN_LENGTH` / `PASSWORD_MAX_LENGTH` (`shared/constants/auth.ts`) — mêmes constantes côté formulaire, qui les affiche (#455). Aucune vérification d'e-mail n'existe : `store` connecte l'utilisateur immédiatement et n'envoie qu'un e-mail de bienvenue (`EmailQueueService.sendWelcome`) — ne pas promettre de lien de confirmation dans la copie
+  - Promesses affichées : `tests/functional/auth/signup_claims.spec.ts` relit les chaînes servies dans `appT` pour interdire tout retour d'un quota en dur, d'un « illimité » ou d'un essai 14 jours (#455)
 
 ### Login
 
@@ -25,6 +27,7 @@ Référence routes: `start/routes/auth.ts`.
   - Controller: `SessionController.store`
   - `User.verifyCredentials(email, password)`
   - `auth.use('web').login(user)`
+  - `session.forget('demoSessionStartedAt')` — voir « Session démo » ci-dessous
   - Redirect: route `home`
 
 ### Logout
@@ -32,7 +35,24 @@ Référence routes: `start/routes/auth.ts`.
 - `POST /logout` (auth-only)
   - Controller: `SessionController.destroy`
   - `auth.use('web').logout()`
+  - `session.forget('demoSessionStartedAt')` — voir « Session démo » ci-dessous
   - Redirect: route `session.create`
+
+### Session démo
+
+`POST /demo` (`DemoController.login`) connecte le compte `DEMO_EMAIL` et pose
+`demoSessionStartedAt` en session ; `CheckDemoSessionMiddleware` déconnecte au-delà de
+`DEMO_SESSION_DURATION_MS`, et `inertia_middleware` partage `demoSessionStartedAt` /
+`demoSessionDurationMs` pour la bannière `DemoSessionBanner.vue`.
+
+Invariants (#451) — `auth.logout()` ne vide pas la session, la clé doit donc être purgée
+explicitement, sinon la bannière suit la session navigateur sur les comptes réels :
+
+- la clé est oubliée au logout (`SessionController.destroy`), au login
+  (`SessionController.store`) et à l'expiration (`CheckDemoSessionMiddleware`) ;
+- `inertia_middleware` ne la partage que si `DemoService.isDemoUser(auth.user.email)`.
+
+Couverture : `tests/functional/auth/demo_session_leak.spec.ts`.
 
 ## Home vs dashboard
 

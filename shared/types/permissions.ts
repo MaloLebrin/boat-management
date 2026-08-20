@@ -35,6 +35,7 @@ export type Capability =
   | 'inspections.create'
   | 'inspections.edit'
   | 'inspections.delete'
+  | 'invoices.view'
   | 'invoices.create'
   | 'invoices.update'
   | 'invoices.delete'
@@ -120,6 +121,7 @@ const MEMBER_CAPABILITIES: Capability[] = [
   'inspections.view',
   'inspections.create',
   'inspections.edit',
+  'invoices.view',
   'invoices.create',
   'invoices.update',
   'maintenance.view',
@@ -140,9 +142,25 @@ const MEMBER_CAPABILITIES: Capability[] = [
   'subscription.view',
 ]
 
+// Staff restreint au module maintenance, organisation entière (pas d'assignation par tâche).
+const MECHANIC_CAPABILITIES: Capability[] = [
+  'maintenance.view',
+  'maintenance.create',
+  'maintenance.edit',
+]
+
+// Accès self-service en lecture seule au portail dédié /owner/boats/:id, scopé par
+// ownership au niveau requête (BoatOwnerService.getOwnedBoat), jamais par capability.
+// Volontairement vide : aucune capability staff (boats.view, invoices.view...) ne doit
+// être accordée ici, sous peine de donner accès aux pages staff complètes (/boats/:id,
+// /invoices) qui exposent bien plus que le périmètre du portail.
+const BOAT_OWNER_CAPABILITIES: Capability[] = []
+
 export const ROLE_PERMISSIONS: Record<OrgRole, ReadonlySet<Capability>> = {
   admin: new Set([...MEMBER_CAPABILITIES, ...ADMIN_ONLY_CAPABILITIES]),
   member: new Set(MEMBER_CAPABILITIES),
+  mechanic: new Set(MECHANIC_CAPABILITIES),
+  boat_owner: new Set(BOAT_OWNER_CAPABILITIES),
 }
 
 export interface PermissionsSharedProps {

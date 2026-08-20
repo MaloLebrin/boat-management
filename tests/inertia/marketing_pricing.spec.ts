@@ -71,7 +71,7 @@ test('renders pricing title (fr)', () => {
             perMonthLabel: '/mois',
             timeLabel: 'Temps',
             maintLabel: 'Maintenance',
-            fleetideLabel: 'FleetAI',
+            fleetideLabel: 'FleetAi',
             fleetCostLabel: 'Coût',
             roiLabel: 'ROI',
             ctaLabel: 'Démarrer',

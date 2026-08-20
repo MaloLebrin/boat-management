@@ -4,8 +4,10 @@ export default { layout: DefaultLayout }
 </script>
 
 <script setup lang="ts">
+import { Head } from '@inertiajs/vue3'
 import SettingsShell from '~/components/settings/SettingsShell.vue'
 import SettingsAuditLogTab from '~/components/settings/tabs/SettingsAuditLogTab.vue'
+import { useT } from '~/composables/use_t'
 import type { AuditLogPage, AuditLogFilters } from '../../../shared/types/audit_log'
 
 defineProps<{
@@ -13,9 +15,12 @@ defineProps<{
   filters: AuditLogFilters
   members: { id: number; fullName: string | null; email: string }[]
 }>()
+
+const { t } = useT()
 </script>
 
 <template>
+  <Head :title="t('settings.auditLog.title')" />
   <SettingsShell>
     <SettingsAuditLogTab :audit-log="auditLog" :filters="filters" :members="members" />
   </SettingsShell>

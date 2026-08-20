@@ -104,7 +104,7 @@ function update(partial: Partial<BoatListFilters>) {
           <BaseSelect
             :label="t('boats.list.type')"
             allow-empty
-            placeholder="All"
+            :placeholder="t('common.all')"
             :model-value="filters.type ?? ''"
             :options="typeOptions"
             @update:model-value="(v) => update({ type: String(v || '') || undefined, page: 1 })"
@@ -114,7 +114,7 @@ function update(partial: Partial<BoatListFilters>) {
           <BaseSelect
             :label="t('boats.list.propulsion')"
             allow-empty
-            placeholder="All"
+            :placeholder="t('common.all')"
             :model-value="filters.propulsionType ?? ''"
             :options="propulsionOptions"
             @update:model-value="
@@ -125,8 +125,8 @@ function update(partial: Partial<BoatListFilters>) {
       </div>
     </div>
 
-    <div class="grid gap-3 md:grid-cols-12 md:items-center">
-      <div class="flex flex-wrap items-center gap-2 md:col-span-6">
+    <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+      <div class="flex flex-wrap items-center gap-2">
         <BaseTabs
           :model-value="viewMode"
           :tabs="viewTabs"
@@ -134,14 +134,14 @@ function update(partial: Partial<BoatListFilters>) {
         />
         <p class="text-sm text-fg-muted">
           <span class="font-semibold text-fg">{{ total }}</span>
-          {{ t('boats.list.boats') }}
+          {{ t('boats.list.boats', { count: String(total) }) }}
           <span v-if="isLoading" class="ml-2 inline-block text-fg-subtle">{{
             t('common.loading')
           }}</span>
         </p>
       </div>
 
-      <div class="grid gap-2 sm:grid-cols-3 md:col-span-6 md:justify-end">
+      <div class="grid gap-2 sm:grid-cols-3 md:w-auto md:justify-end">
         <div>
           <BaseSelect
             :label="t('boats.list.sort')"

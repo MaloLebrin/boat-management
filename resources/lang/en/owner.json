@@ -1,0 +1,26 @@
+{
+  "boats": {
+    "index": {
+      "title": "My boats",
+      "emptyTitle": "No boats",
+      "emptyDescription": "No boat is currently linked to your account.",
+      "homePort": "Home port: {port}"
+    },
+    "show": {
+      "tabs": {
+        "maintenance": "Maintenance",
+        "reservations": "Reservations",
+        "invoices": "Invoices"
+      },
+      "maintenance": {
+        "emptyTitle": "No maintenance recorded"
+      },
+      "reservations": {
+        "emptyTitle": "No reservations"
+      },
+      "invoices": {
+        "emptyTitle": "No invoices"
+      }
+    }
+  }
+}

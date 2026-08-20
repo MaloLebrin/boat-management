@@ -4,6 +4,7 @@ import { useForm, router } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import { useCurrencyFormat } from '~/composables/use_currency_format'
+import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import type { BoatPortStayItem } from '#shared/types/budget'
 
@@ -15,6 +16,7 @@ const props = defineProps<{
 
 const { t } = useT()
 const { formatCurrency } = useCurrencyFormat()
+const { formatDate } = useDateFormat()
 
 const editingId = ref<number | null>(null)
 const editForm = useForm({
@@ -54,11 +56,6 @@ function deleteStay(stayId: number) {
   router.delete(`/boats/${props.boatId}/port-stays/${stayId}`, {
     preserveScroll: true,
   })
-}
-
-function formatDate(dateStr: string | null): string {
-  if (!dateStr) return '—'
-  return new Date(dateStr).toLocaleDateString()
 }
 </script>
 
@@ -132,7 +129,7 @@ function formatDate(dateStr: string | null): string {
               </p>
             </div>
             <div class="flex items-center gap-4">
-              <span v-if="stay.cost" class="font-semibold text-teal-600 dark:text-teal-400">
+              <span v-if="stay.cost" class="font-semibold text-lilac-700">
                 {{ formatCurrency(stay.cost) }}
               </span>
               <span v-else class="text-fg-subtle">—</span>

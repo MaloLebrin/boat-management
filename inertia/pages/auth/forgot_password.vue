@@ -7,7 +7,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { Form } from '@adonisjs/inertia/vue'
+import { Form, Link } from '@adonisjs/inertia/vue'
 import { Head, usePage } from '@inertiajs/vue3'
 import AuthNavyPanel from '~/components/auth/AuthNavyPanel.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
@@ -29,8 +29,8 @@ const page = usePage()
       <div class="flex items-center justify-end gap-3.5 px-8 py-6">
         <span class="text-xs text-fg-muted">{{ t('auth.login.needHelp') }}</span>
         <a
-          href="mailto:support@fleetai.io"
-          class="rounded-md border border-bone bg-white px-2.5 py-1.5 text-xs font-semibold text-fg transition-colors hover:bg-paper"
+          href="mailto:support@fleetai.app"
+          class="rounded-md border border-bone bg-surface-elevated px-2.5 py-1.5 text-xs font-semibold text-fg transition-colors hover:bg-paper"
         >
           {{ t('auth.login.contactSupport') }}
         </a>
@@ -40,12 +40,12 @@ const page = usePage()
       <div class="flex flex-1 flex-col items-center justify-center px-8 pb-12 lg:px-16">
         <div class="w-full max-w-sm">
           <!-- Back link -->
-          <a
+          <Link
             href="/login"
             class="mb-4 inline-flex items-center gap-1.5 text-[12px] text-fg-muted no-underline transition-colors hover:text-fg"
           >
             ← {{ t('auth.forgotPassword.backToLogin') }}
-          </a>
+          </Link>
 
           <p class="text-[11px] font-semibold uppercase tracking-[0.12em] text-fg-muted">
             {{ t('auth.forgotPassword.eyebrow') }}
@@ -64,8 +64,7 @@ const page = usePage()
             <!-- Flash messages -->
             <div
               v-if="page.props.flash?.success"
-              class="flex flex-col gap-2 rounded-[10px] border p-4"
-              style="background: #e6f3ec; border-color: #cfe8de"
+              class="flex flex-col gap-2 rounded-[10px] border p-4 bg-mint-50 border-mint-200"
             >
               <div class="flex items-center gap-2.5">
                 <svg
@@ -73,7 +72,7 @@ const page = usePage()
                   height="18"
                   viewBox="0 0 24 24"
                   fill="none"
-                  stroke="#1f6b54"
+                  stroke="var(--color-mint-700)"
                   stroke-width="2.2"
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -81,27 +80,34 @@ const page = usePage()
                 >
                   <path d="M5 12l5 5L20 7" />
                 </svg>
-                <strong class="text-sm text-[#1f6b54]">{{
+                <strong class="text-sm text-mint-700">{{
                   t('auth.forgotPassword.successTitle')
                 }}</strong>
               </div>
-              <p class="text-[13px] leading-relaxed text-[#1f6b54]">
+              <p class="text-[13px] leading-relaxed text-mint-700">
                 {{ t('auth.forgotPassword.successContent') }}
               </p>
-              <a href="/login" class="mt-1 text-[12px] font-semibold text-[#1f6b54]">
+              <!-- « Renvoyer » : revenir au formulaire vide, pas à la page de connexion. -->
+              <Link href="/forgot-password" class="mt-1 text-[12px] font-semibold text-mint-700">
                 {{ t('auth.forgotPassword.resend') }}
-              </a>
+              </Link>
             </div>
 
             <div
               v-else-if="page.props.flash?.error"
-              class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"
+              class="rounded-lg border border-coral-200 bg-danger-soft px-4 py-3 text-sm text-danger-strong"
             >
               {{ page.props.flash.error }}
             </div>
 
             <template v-if="!page.props.flash?.success">
-              <Form route="password.forgot" #default="{ processing, errors }">
+              <!--
+                `route="password.forgot"` désignait la route GET (`<Form>` reprend
+                `methods[0]` de la route nommée) : la soumission partait en GET,
+                l'email fuitait en query string et la route POST n'était jamais
+                atteinte (#449). `password_reset.store` est la route POST.
+              -->
+              <Form route="password_reset.store" #default="{ processing, errors }">
                 <div class="flex flex-col gap-3.5">
                   <BaseInput
                     id="email"
@@ -117,8 +123,7 @@ const page = usePage()
                   <button
                     type="submit"
                     :disabled="processing"
-                    class="flex w-full items-center justify-center gap-2 rounded-lg px-5 py-3.5 text-sm font-semibold text-white transition-all duration-150 disabled:opacity-60 hover:brightness-110"
-                    style="background: #0b1d2e"
+                    class="flex w-full items-center justify-center gap-2 rounded-lg px-5 py-3.5 text-sm font-semibold text-white transition-all duration-150 disabled:opacity-60 hover:brightness-110 bg-brand"
                   >
                     {{ t('auth.forgotPassword.submit') }}
                     <svg
@@ -140,17 +145,14 @@ const page = usePage()
             </template>
 
             <!-- Spam warning -->
-            <div
-              class="flex gap-2.5 rounded-lg p-3.5"
-              style="background: rgba(11, 29, 46, 0.04); border: 1px solid #ebe2d0"
-            >
+            <div class="flex gap-2.5 rounded-lg p-3.5 bg-surface-muted border border-border">
               <svg
                 class="mt-0.5 shrink-0"
                 width="14"
                 height="14"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="#b87b1d"
+                stroke="var(--color-warning)"
                 stroke-width="1.6"
                 stroke-linecap="round"
                 stroke-linejoin="round"

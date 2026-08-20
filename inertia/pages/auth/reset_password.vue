@@ -7,6 +7,7 @@ export default {
 </script>
 
 <script setup lang="ts">
+import { Link } from '@adonisjs/inertia/vue'
 import { Form } from '@adonisjs/inertia/vue'
 import { Head, usePage } from '@inertiajs/vue3'
 import { computed, ref } from 'vue'
@@ -39,8 +40,8 @@ const confirmType = computed(() => (showConfirm.value ? 'text' : 'password'))
       <div class="flex items-center justify-end gap-3.5 px-8 py-6">
         <span class="text-xs text-fg-muted">{{ t('auth.login.needHelp') }}</span>
         <a
-          href="mailto:support@fleetai.io"
-          class="rounded-md border border-bone bg-white px-2.5 py-1.5 text-xs font-semibold text-fg transition-colors hover:bg-paper"
+          href="mailto:support@fleetai.app"
+          class="rounded-md border border-bone bg-surface-elevated px-2.5 py-1.5 text-xs font-semibold text-fg transition-colors hover:bg-paper"
         >
           {{ t('auth.login.contactSupport') }}
         </a>
@@ -50,12 +51,12 @@ const confirmType = computed(() => (showConfirm.value ? 'text' : 'password'))
       <div class="flex flex-1 flex-col items-center justify-center px-8 pb-12 lg:px-16">
         <div class="w-full max-w-sm">
           <!-- Back link -->
-          <a
+          <Link
             href="/login"
             class="mb-4 inline-flex items-center gap-1.5 text-[12px] text-fg-muted no-underline transition-colors hover:text-fg"
           >
             ← {{ t('auth.resetPassword.backToLogin') }}
-          </a>
+          </Link>
 
           <p class="text-[11px] font-semibold uppercase tracking-[0.12em] text-fg-muted">
             {{ t('auth.resetPassword.eyebrow') }}
@@ -73,7 +74,7 @@ const confirmType = computed(() => (showConfirm.value ? 'text' : 'password'))
           <div class="mt-7">
             <div
               v-if="page.props.flash?.error"
-              class="mb-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"
+              class="mb-5 rounded-lg border border-coral-200 bg-danger-soft px-4 py-3 text-sm text-danger-strong"
             >
               {{ page.props.flash.error }}
             </div>
@@ -137,8 +138,7 @@ const confirmType = computed(() => (showConfirm.value ? 'text' : 'password'))
                 <button
                   type="submit"
                   :disabled="processing"
-                  class="mt-1 flex w-full items-center justify-center gap-2 rounded-lg px-5 py-3.5 text-sm font-semibold text-white transition-all duration-150 disabled:opacity-60 hover:brightness-110"
-                  style="background: #0b1d2e"
+                  class="mt-1 flex w-full items-center justify-center gap-2 rounded-lg px-5 py-3.5 text-sm font-semibold text-white transition-all duration-150 disabled:opacity-60 hover:brightness-110 bg-brand"
                 >
                   {{ t('auth.resetPassword.submit') }}
                   <svg

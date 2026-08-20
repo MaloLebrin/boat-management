@@ -5,13 +5,27 @@ import BaseCard from '~/components/base/BaseCard.vue'
 import PlanningCalendarHourTasks from '~/components/planning/PlanningCalendarHourTasks.vue'
 import { computed, ref } from 'vue'
 import { router } from '@inertiajs/vue3'
+import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
+import { usePermissions } from '~/composables/use_permissions'
+import { maintenanceSubjectLabel } from '~/utils/boat_enum_labels'
 
 const props = defineProps<{
   tasks: PlanningTask[]
 }>()
 
-const { t, locale } = useT()
+const { t } = useT()
+const { formatMonthYear, formatWeekdayDay, formatWeekdayShort } = useDateFormat()
+const { can } = usePermissions()
+
+// Voir PlanningTaskCard : /planning est ouvert à tout utilisateur authentifié, mais
+// /boats/:id exige `boats.view` — un mécanicien n'a donc rien à cliquer ici (#473).
+const canViewBoat = computed(() => can('boats.view'))
+
+function openBoat(boatId: number) {
+  if (!canViewBoat.value) return
+  router.visit(`/boats/${boatId}`)
+}
 
 const today = new Date()
 const currentYear = ref(today.getFullYear())
@@ -35,21 +49,12 @@ function nextMonth() {
   }
 }
 
-const monthLabel = computed(() =>
-  new Date(currentYear.value, currentMonth.value).toLocaleDateString(locale.value, {
-    month: 'long',
-    year: 'numeric',
-  })
-)
+const monthLabel = computed(() => formatMonthYear(new Date(currentYear.value, currentMonth.value)))
 
-const weekdays = computed(() => {
-  const formatter = new Intl.DateTimeFormat(locale.value, { weekday: 'short' })
-  return [1, 2, 3, 4, 5, 6, 0].map((day) => {
-    const date = new Date(2024, 0, day === 0 ? 7 : day)
-    const label = formatter.format(date)
-    return label.charAt(0).toUpperCase() + label.slice(1, 3)
-  })
-})
+// January 2024 starts on a Monday: days 1..7 map to Monday..Sunday.
+const weekdays = computed(() =>
+  [1, 2, 3, 4, 5, 6, 0].map((day) => formatWeekdayShort(new Date(2024, 0, day === 0 ? 7 : day)))
+)
 
 const daysInMonth = computed(() => new Date(currentYear.value, currentMonth.value + 1, 0).getDate())
 const firstWeekday = computed(() => {
@@ -79,7 +84,7 @@ function taskPillClass(task: PlanningTask): string {
   const dueDate = task.dueAt
   if (!dueDate) return 'bg-navy-600 text-white'
   const todayIso = today.toISOString().slice(0, 10)
-  if (dueDate < todayIso) return 'bg-red-500 text-white'
+  if (dueDate < todayIso) return 'bg-coral-600 text-white'
   const soon = new Date(today)
   soon.setDate(soon.getDate() + 30)
   if (new Date(dueDate) <= soon) return 'bg-amber-500 text-white'
@@ -87,10 +92,7 @@ function taskPillClass(task: PlanningTask): string {
 }
 
 function agendaDayLabel(day: number): string {
-  return new Date(currentYear.value, currentMonth.value, day).toLocaleDateString(locale.value, {
-    weekday: 'short',
-    day: 'numeric',
-  })
+  return formatWeekdayDay(new Date(currentYear.value, currentMonth.value, day))
 }
 
 function isToday(day: number): boolean {
@@ -152,10 +154,11 @@ function isToday(day: number): boolean {
                 v-for="task in cell.tasks"
                 :key="task.id"
                 :class="[
-                  'flex items-center gap-2 rounded-md px-2 py-1.5 text-sm font-medium cursor-pointer hover:opacity-80',
+                  'flex items-center gap-2 rounded-md px-2 py-1.5 text-sm font-medium',
+                  canViewBoat ? 'cursor-pointer hover:opacity-80' : '',
                   taskPillClass(task),
                 ]"
-                @click="router.visit(`/boats/${task.boatId}`)"
+                @click="openBoat(task.boatId)"
               >
                 <span class="truncate">{{ task.title }}</span>
                 <span class="ml-auto shrink-0 text-xs opacity-75">{{ task.boatName }}</span>
@@ -195,11 +198,12 @@ function isToday(day: number): boolean {
                 v-for="task in cell.tasks.slice(0, 3)"
                 :key="task.id"
                 :class="[
-                  'truncate rounded px-1 py-0.5 text-xs font-medium cursor-pointer hover:opacity-80',
+                  'truncate rounded px-1 py-0.5 text-xs font-medium',
+                  canViewBoat ? 'cursor-pointer hover:opacity-80' : '',
                   taskPillClass(task),
                 ]"
                 :title="task.boatName + ' · ' + task.title"
-                @click="router.visit(`/boats/${task.boatId}`)"
+                @click="openBoat(task.boatId)"
               >
                 {{ task.title }}
               </div>
@@ -228,9 +232,17 @@ function isToday(day: number): boolean {
         >
           <div>
             <p class="text-sm font-medium text-fg">{{ task.title }}</p>
-            <p class="text-xs text-fg-muted">{{ task.boatName }} · {{ task.subject }}</p>
+            <p class="text-xs text-fg-muted">
+              {{ task.boatName }} · {{ maintenanceSubjectLabel(t, task.subject) }}
+            </p>
           </div>
-          <BaseButton variant="ghost" size="sm" route="boats.show" :params="{ id: task.boatId }">
+          <BaseButton
+            v-if="canViewBoat"
+            variant="ghost"
+            size="sm"
+            route="boats.show"
+            :params="{ id: task.boatId }"
+          >
             {{ t('planning.calendar.schedule') }}
           </BaseButton>
         </div>

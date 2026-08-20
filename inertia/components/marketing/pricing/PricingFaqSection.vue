@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import { usePage } from '@inertiajs/vue3'
 import { ChevronDownIcon } from '@heroicons/vue/24/outline'
 import BaseButton from '~/components/base/BaseButton.vue'
 import { useScrollReveal } from '~/composables/use_scroll_reveal'
@@ -17,6 +18,11 @@ defineProps<{
   ctaLabel: string
   items: FaqItem[]
 }>()
+
+const page = usePage<{ locale?: 'en' | 'fr' }>()
+const contactHref = computed(() =>
+  (page.props.locale ?? 'en') === 'fr' ? '/fr/contact' : '/en/contact'
+)
 
 const { el, isVisible } = useScrollReveal()
 
@@ -41,14 +47,16 @@ function toggle(idx: number) {
           </h2>
           <p class="mt-2 text-fg-muted">{{ subtitle }}</p>
           <div class="mt-6">
-            <BaseButton href="/contact" variant="secondary">
+            <BaseButton :href="contactHref" variant="secondary">
               {{ ctaLabel }}
             </BaseButton>
           </div>
         </div>
 
         <!-- Right: Accordion -->
-        <div class="divide-y divide-bone rounded-2xl border border-bone bg-white overflow-hidden">
+        <div
+          class="divide-y divide-bone rounded-2xl border border-bone bg-surface-elevated overflow-hidden"
+        >
           <div v-for="(item, idx) in items" :key="item.q">
             <button
               type="button"

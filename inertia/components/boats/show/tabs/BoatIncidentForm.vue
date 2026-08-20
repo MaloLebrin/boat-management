@@ -6,15 +6,11 @@ import BaseInput from '~/components/base/BaseInput.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import { useT } from '~/composables/use_t'
-import type {
-  BoatIncidentRow,
-  BoatShowDetail,
-  IncidentStatus,
-  IncidentType,
-} from '~/types/boat_show'
+import { isoToDatetimeLocalValue, tzOffsetMinutes } from '~/utils/local_datetime'
+import type { BoatIncidentRow, IncidentStatus, IncidentType } from '~/types/boat_show'
 
 const props = defineProps<{
-  boat: BoatShowDetail
+  boatId: number
   editingIncident: BoatIncidentRow | null
 }>()
 
@@ -27,7 +23,7 @@ const { t } = useT()
 const formType = ref<IncidentType>(props.editingIncident?.type ?? 'other')
 const formStatus = ref<IncidentStatus>(props.editingIncident?.status ?? 'open')
 const occurredAt = ref(
-  props.editingIncident ? toLocalDatetime(props.editingIncident.occurredAt) : ''
+  props.editingIncident ? isoToDatetimeLocalValue(props.editingIncident.occurredAt) : ''
 )
 const location = ref(props.editingIncident?.location ?? '')
 const insuranceClaimRef = ref(props.editingIncident?.insuranceClaimRef ?? '')
@@ -37,7 +33,7 @@ watch(
   (incident) => {
     formType.value = incident?.type ?? 'other'
     formStatus.value = incident?.status ?? 'open'
-    occurredAt.value = incident ? toLocalDatetime(incident.occurredAt) : ''
+    occurredAt.value = incident ? isoToDatetimeLocalValue(incident.occurredAt) : ''
     location.value = incident?.location ?? ''
     insuranceClaimRef.value = incident?.insuranceClaimRef ?? ''
   }
@@ -63,11 +59,6 @@ const incidentTypeOptions = computed(() =>
 const incidentStatusOptions = computed(() =>
   INCIDENT_STATUSES.map((s) => ({ value: s, label: t(`incidents.status.${s}`) }))
 )
-
-function toLocalDatetime(utcIso: string): string {
-  const d = new Date(utcIso)
-  return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16)
-}
 </script>
 
 <template>
@@ -79,13 +70,13 @@ function toLocalDatetime(utcIso: string): string {
     <Form
       :action="{
         url: editingIncident
-          ? `/boats/${boat.id}/incidents/${editingIncident.id}`
-          : `/boats/${boat.id}/incidents`,
+          ? `/boats/${boatId}/incidents/${editingIncident.id}`
+          : `/boats/${boatId}/incidents`,
         method: editingIncident ? 'put' : 'post',
       }"
       #default="{ processing, errors }"
     >
-      <input type="hidden" name="tzOffsetMinutes" :value="String(new Date().getTimezoneOffset())" />
+      <input type="hidden" name="tzOffsetMinutes" :value="String(tzOffsetMinutes())" />
 
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <BaseInput

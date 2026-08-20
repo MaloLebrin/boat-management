@@ -11,6 +11,7 @@ const BoatBudgetEntryController = () => import('#controllers/boat_budget_entry_c
 const BoatReservationsController = () => import('#controllers/boat_reservations_controller')
 const BoatPricingController = () => import('#controllers/boat_pricing_controller')
 const BoatEquipmentMediaController = () => import('#controllers/boat_equipment_media_controller')
+const BoatOwnersController = () => import('#controllers/boat_owners_controller')
 
 router
   .group(() => {
@@ -18,7 +19,13 @@ router
     router.get('boats/new', [controllers.Boats, 'create']).as('boats.create')
     router.post('boats', [controllers.Boats, 'store']).as('boats.store')
     router.get('boats/:id', [controllers.Boats, 'show']).as('boats.show')
-    router.get('boats/:id/navigation', [controllers.Boats, 'navigation']).as('boats.navigation')
+    // La page « navigation » a été fusionnée dans la fiche bateau (#365) : on
+    // redirige les anciens signets/liens vers le groupe d'onglets Navigation.
+    router
+      .get('boats/:id/navigation', ({ params, response }) =>
+        response.redirect(`/boats/${params.id}?tab=navigation-logs`)
+      )
+      .as('boats.navigation')
     router
       .get('boats/:id/maintenance-log.pdf', [controllers.MaintenanceLogPdf, 'download'])
       .as('boats.maintenanceLog.download')
@@ -58,6 +65,11 @@ router
     router.delete('boats/:id', [controllers.Boats, 'destroy']).as('boats.destroy')
 
     router.put('boats/:id/pricing', [BoatPricingController, 'update']).as('boats.pricing.update')
+
+    router.post('boats/:id/owners', [BoatOwnersController, 'store']).as('boats.owners.store')
+    router
+      .delete('boats/:id/owners/:userId', [BoatOwnersController, 'destroy'])
+      .as('boats.owners.destroy')
 
     router.patch('boats/:id/assignment', [controllers.Boats, 'assign']).as('boats.assign')
 

@@ -2,7 +2,11 @@
   "title": "Dashboard",
   "subtitle": "Overview of your fleet and upcoming maintenance.",
   "newBoat": "New boat",
-  "overdueAlert": "{count} overdue task(s)",
+  "quickAdd": {
+    "logbook": "+ Logbook entry",
+    "incident": "+ Incident"
+  },
+  "overdueAlert": "{count, plural, one {# overdue task} other {# overdue tasks}}",
   "viewPlanning": "View planning",
   "analyzeFleet": "Analyze fleet",
   "aiPanel": {
@@ -18,6 +22,11 @@
     "sails": "Sails",
     "rigs": "Rigs",
     "urgentMaintenance": "Urgent maintenance",
+    "equipmentEmpty": {
+      "title": "Equipment",
+      "description": "No engines, sails or rigs recorded for your fleet yet.",
+      "cta": "Add your equipment"
+    },
     "delta": {
       "boatsInAlert": "{count} in alert",
       "boatsOk": "Fleet up to date",
@@ -53,16 +62,36 @@
     },
     "empty": "No boats yet."
   },
-  "marina": {
-    "title": "Marinas",
+  "port": {
+    "title": "Ports",
     "viewAll": "View all",
-    "addMarina": "Add a marina",
-    "empty": "No marina registered yet.",
-    "totalMarinas": "{count} marina(s)",
-    "totalBoats": "{count} moored boat(s)",
-    "totalFreeSpots": "{count} free spot(s)",
-    "freeSpots": "{free} free / {total}",
+    "addPort": "Add a port",
+    "empty": "No port registered yet.",
+    "totalPorts": "{count, plural, one {# port} other {# ports}}",
+    "totalBoats": "{count, plural, one {# moored boat} other {# moored boats}}",
+    "totalFreeSpots": "{count, plural, one {# free spot} other {# free spots}}",
+    "freeSpots": "{free, plural, one {# free} other {# free}} / {total}",
     "fillRate": "Fill: {rate}%",
     "noSpots": "No spots"
+  },
+  "mechanic": {
+    "title": "My interventions",
+    "subtitle": "Your overdue and upcoming maintenance tasks across the organization.",
+    "viewPlanning": "View planning",
+    "viewHistory": "Maintenance history",
+    "overdueAlert": "{count, plural, one {# overdue intervention} other {# overdue interventions}}",
+    "stats": {
+      "overdue": "Overdue",
+      "upcoming": "Upcoming"
+    },
+    "overdueTitle": "Overdue",
+    "overdueEmpty": "No overdue interventions.",
+    "upcomingTitle": "Upcoming",
+    "upcomingEmpty": "No upcoming interventions.",
+    "overdue": "Overdue",
+    "dueSoon": "Due soon",
+    "openTask": "Open the {title} intervention on {boat}",
+    "dueAt": "Due on {date}",
+    "dueAtHours": "Due at {hours}h · current {current}h"
   }
 }

@@ -1,5 +1,8 @@
+import Organization from '#models/organization'
 import OrganizationMembership from '#models/organization_membership'
 import User from '#models/user'
+import OrganizationMemberRemoved from '#events/organization_member_removed'
+import OrganizationMemberRoleChanged from '#events/organization_member_role_changed'
 import {
   AlreadyMemberError,
   LastAdminError,
@@ -67,6 +70,7 @@ export default class OrganizationMemberService {
     const membership = await OrganizationMembership.query()
       .where('id', membershipId)
       .where('organizationId', orgId)
+      .preload('user')
       .first()
     if (!membership) throw new MemberNotFoundError()
 
@@ -74,14 +78,29 @@ export default class OrganizationMemberService {
       await this.ensureNotLastAdmin(orgId, membership.userId)
     }
 
+    const fromRole = membership.role
+    if (fromRole === role) return
+
     membership.role = role
     await membership.save()
+
+    // Dispatch après commit : le listener écrit des notifications.
+    const organization = await Organization.findOrFail(orgId)
+    const memberName = membership.user.fullName ?? membership.user.email
+    await OrganizationMemberRoleChanged.dispatch(
+      organization,
+      membership.userId,
+      memberName,
+      fromRole,
+      role
+    )
   }
 
   async removeMember(membershipId: number, orgId: number): Promise<void> {
     const membership = await OrganizationMembership.query()
       .where('id', membershipId)
       .where('organizationId', orgId)
+      .preload('user')
       .first()
     if (!membership) throw new MemberNotFoundError()
 
@@ -89,7 +108,15 @@ export default class OrganizationMemberService {
       await this.ensureNotLastAdmin(orgId, membership.userId)
     }
 
+    // Capturer l'identité avant la suppression de la ligne de membership.
+    const removedUserId = membership.userId
+    const memberName = membership.user.fullName ?? membership.user.email
+
     await membership.delete()
+
+    // Dispatch après commit : le listener écrit des notifications.
+    const organization = await Organization.findOrFail(orgId)
+    await OrganizationMemberRemoved.dispatch(organization, removedUserId, memberName)
   }
 
   private async ensureNotLastAdmin(orgId: number, excludeUserId: number): Promise<void> {

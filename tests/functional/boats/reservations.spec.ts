@@ -270,10 +270,7 @@ test.group('Boat Reservations (functional)', (group) => {
       .redirects(0)
 
     response.assertStatus(302)
-    response.assertFlashMessage(
-      'success',
-      'Reservation confirmed. 1 overlapping option(s) cancelled.'
-    )
+    response.assertFlashMessage('success', 'Reservation confirmed. 1 overlapping option cancelled.')
 
     await option.refresh()
     assert.equal(option.status, 'cancelled')
@@ -961,6 +958,87 @@ test.group('Boat Reservations (functional)', (group) => {
     assert.isDefined(entry2)
     assert.lengthOf(entry1!.reservations, 2)
     assert.lengthOf(entry2!.reservations, 1)
+  })
+
+  test('GET /reservations lists every fleet boat in calendarEntries, even without reservations', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const booked = await BoatFactory.merge({
+      organizationId: user.organizationId!,
+      name: 'Alizé',
+    }).create()
+    const free1 = await BoatFactory.merge({
+      organizationId: user.organizationId!,
+      name: 'Bora',
+    }).create()
+    const free2 = await BoatFactory.merge({
+      organizationId: user.organizationId!,
+      name: 'Cyclone',
+    }).create()
+
+    await BoatReservation.create({
+      boatId: booked.id,
+      organizationId: user.organizationId!,
+      status: 'confirmed',
+      startsAt: DateTime.fromISO('2026-04-01T10:00:00'),
+      endsAt: DateTime.fromISO('2026-04-07T10:00:00'),
+      clientName: 'Only Client',
+    })
+
+    const response = await client.get('/reservations').loginAs(user).withInertia()
+
+    response.assertStatus(200)
+
+    type CalendarEntry = { boatId: number; boatName: string; reservations: unknown[] }
+    const props = response.inertiaProps as { calendarEntries: CalendarEntry[] }
+
+    assert.lengthOf(props.calendarEntries, 3)
+    // Ordonné par nom de bateau (listBoatsForOrg trie sur name)
+    assert.deepEqual(
+      props.calendarEntries.map((e) => e.boatId),
+      [booked.id, free1.id, free2.id]
+    )
+    assert.lengthOf(props.calendarEntries.find((e) => e.boatId === booked.id)!.reservations, 1)
+    assert.lengthOf(props.calendarEntries.find((e) => e.boatId === free1.id)!.reservations, 0)
+    assert.lengthOf(props.calendarEntries.find((e) => e.boatId === free2.id)!.reservations, 0)
+  })
+
+  test('GET /reservations scopes calendarEntries to the org fleet', async ({ client, assert }) => {
+    const user = await createAdminUser()
+    const own = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const other = await createAdminUser()
+    await BoatFactory.merge({ organizationId: other.organizationId! }).create()
+
+    const response = await client.get('/reservations').loginAs(user).withInertia()
+
+    response.assertStatus(200)
+    type CalendarEntry = { boatId: number }
+    const props = response.inertiaProps as { calendarEntries: CalendarEntry[] }
+    assert.lengthOf(props.calendarEntries, 1)
+    assert.equal(props.calendarEntries[0].boatId, own.id)
+  })
+
+  test('GET /reservations?boatId= narrows calendarEntries to the selected boat', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat1 = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    const response = await client
+      .get(`/reservations?boatId=${boat1.id}`)
+      .loginAs(user)
+      .withInertia()
+
+    response.assertStatus(200)
+    type CalendarEntry = { boatId: number; reservations: unknown[] }
+    const props = response.inertiaProps as { calendarEntries: CalendarEntry[] }
+    assert.lengthOf(props.calendarEntries, 1)
+    assert.equal(props.calendarEntries[0].boatId, boat1.id)
+    assert.lengthOf(props.calendarEntries[0].reservations, 0)
   })
 
   test('GET /reservations?boatId= filters by boat', async ({ client, assert }) => {

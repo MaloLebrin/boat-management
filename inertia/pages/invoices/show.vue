@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { router, usePage } from '@inertiajs/vue3'
+import { Head, router, usePage } from '@inertiajs/vue3'
 import { Link } from '@adonisjs/inertia/vue'
 import BaseAlert from '~/components/base/BaseAlert.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
@@ -9,6 +9,7 @@ import BaseConfirmModal from '~/components/base/BaseConfirmModal.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import InvoiceStatusBadge from '~/components/invoices/InvoiceStatusBadge.vue'
 import InvoiceLinesCard from '~/components/invoices/InvoiceLinesCard.vue'
+import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import type { InvoiceDetail } from '../../../shared/types/invoice'
 
@@ -18,6 +19,7 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
+const { formatDate } = useDateFormat()
 const page = usePage()
 
 const flash = computed(() => page.props.flash as { error?: string; success?: string } | undefined)
@@ -86,11 +88,6 @@ function markPaid() {
   )
 }
 
-function formatDate(dateStr: string | null): string {
-  if (!dateStr) return '-'
-  return new Date(dateStr).toLocaleDateString()
-}
-
 function executeDelete() {
   router.delete(`/invoices/${props.invoice.id}`, {
     preserveScroll: true,
@@ -99,6 +96,8 @@ function executeDelete() {
 </script>
 
 <template>
+  <Head :title="invoice.number" />
+
   <div class="mx-auto w-full max-w-4xl px-6 py-10 sm:px-8">
     <!-- Breadcrumb -->
     <nav class="mb-6 flex items-center gap-1.5 text-sm text-fg-muted">
@@ -137,11 +136,13 @@ function executeDelete() {
         </p>
       </div>
       <div class="flex flex-wrap items-center gap-2">
+        <!-- eslint-disable vue/no-restricted-v-bind -- téléchargement PDF : une visite Inertia rendrait le binaire comme une page -->
         <a :href="`/invoices/${invoice.id}/pdf`" target="_blank" rel="noopener">
           <BaseButton variant="secondary" size="sm" type="button">
             {{ t('invoices.actions.downloadPdf') }}
           </BaseButton>
         </a>
+        <!-- eslint-enable vue/no-restricted-v-bind -->
         <BaseButton
           variant="secondary"
           size="sm"

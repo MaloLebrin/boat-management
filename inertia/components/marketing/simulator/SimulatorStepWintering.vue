@@ -34,8 +34,9 @@ const winteringOptions: WinteringOption[] = [
     labelKey: 'simulator.wintering_zone_covered',
     descKey: 'simulator.wintering_zone_covered_desc',
     icon: '🏠',
-    selectedClass: 'border-navy-500 bg-navy-50 text-navy-700',
-    unselectedClass: 'border-bone bg-white text-fg hover:border-navy-200 hover:bg-navy-50',
+    selectedClass: 'border-brand bg-brand-soft text-brand',
+    unselectedClass:
+      'border-bone bg-surface-elevated text-fg hover:border-brand hover:bg-brand-soft',
   },
   {
     value: 'outdoor',
@@ -43,7 +44,8 @@ const winteringOptions: WinteringOption[] = [
     descKey: 'simulator.wintering_zone_outdoor_desc',
     icon: '⛅',
     selectedClass: 'border-amber-600 bg-amber-50 text-amber-700',
-    unselectedClass: 'border-bone bg-white text-fg hover:border-amber-200 hover:bg-amber-50',
+    unselectedClass:
+      'border-bone bg-surface-elevated text-fg hover:border-amber-200 hover:bg-amber-50',
   },
   {
     value: 'sea',
@@ -51,7 +53,8 @@ const winteringOptions: WinteringOption[] = [
     descKey: 'simulator.wintering_zone_sea_desc',
     icon: '⚓',
     selectedClass: 'border-coral-500 bg-coral-50 text-coral-700',
-    unselectedClass: 'border-bone bg-white text-fg hover:border-coral-200 hover:bg-coral-50',
+    unselectedClass:
+      'border-bone bg-surface-elevated text-fg hover:border-coral-200 hover:bg-coral-50',
   },
 ]
 
@@ -75,10 +78,11 @@ function selectWintering(value: SimulatorWinteringZone) {
           :selected="modelValue.winteringZone === opt.value"
           :selected-class="opt.selectedClass"
           :unselected-class="opt.unselectedClass"
+          :aria-label="t(opt.labelKey)"
           class="flex flex-col items-center gap-2 px-3 py-4"
           @click="selectWintering(opt.value)"
         >
-          <span class="text-2xl leading-none">{{ opt.icon }}</span>
+          <span class="text-2xl leading-none" aria-hidden="true">{{ opt.icon }}</span>
           <span class="text-center text-xs font-semibold leading-tight">{{ t(opt.labelKey) }}</span>
           <span class="text-center text-[10px] leading-tight text-fg-muted">{{
             t(opt.descKey)

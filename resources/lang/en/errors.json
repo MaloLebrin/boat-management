@@ -1,4 +1,7 @@
 {
+  "E_INVALID_CREDENTIALS": "Incorrect email or password.",
+  "E_UNAUTHORIZED_ACCESS": "Please sign in to access this page.",
+  "backHome": "Back to home",
   "notFound": {
     "title": "Page not found",
     "description": "The page you are looking for does not exist or has been moved.",
@@ -7,6 +10,11 @@
   "serverError": {
     "title": "Something went wrong",
     "description": "An unexpected error occurred. Please try again or contact support.",
+    "action": "Back to dashboard"
+  },
+  "forbidden": {
+    "title": "Access denied",
+    "description": "You don't have permission to access this page.",
     "action": "Back to dashboard"
   }
 }

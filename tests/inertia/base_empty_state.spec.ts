@@ -48,3 +48,21 @@ test('emits action event when action button is clicked', async () => {
   await w.find('button').trigger('click')
   expect(w.emitted('action')).toBeTruthy()
 })
+
+test('renders custom action slot content instead of the default button', () => {
+  const w = mount(BaseEmptyState, {
+    props: { title: 'No items' },
+    slots: { action: '<a data-custom-action>Custom action</a>' },
+  })
+  expect(w.find('[data-custom-action]').exists()).toBe(true)
+  expect(w.text()).toContain('Custom action')
+})
+
+test('action slot content is shown even without actionLabel', () => {
+  const w = mount(BaseEmptyState, {
+    props: { title: 'No items' },
+    slots: { action: '<button data-custom-action>Go</button>' },
+  })
+  expect(w.find('[data-custom-action]').exists()).toBe(true)
+  expect(w.find('button:not([data-custom-action])').exists()).toBe(false)
+})

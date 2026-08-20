@@ -11,7 +11,7 @@
   "kanban": {
     "overdue": "En retard",
     "overdueEmpty": "Aucune tâche en retard",
-    "soon": "À venir bientôt",
+    "soon": "Bientôt dû",
     "soonEmpty": "Aucune tâche imminente",
     "undated": "Non datées",
     "undatedEmpty": "Aucune tâche non datée",
@@ -22,8 +22,8 @@
     "completedWithCount": "{displayed} / {total} complétées"
   },
   "taskKind": {
-    "date": "date",
-    "hours": "heures"
+    "date": "Par date",
+    "hours": "Par heures moteur"
   },
   "calendar": {
     "more": "+{count} autres",

@@ -48,10 +48,10 @@
   },
   "media": {
     "photosAdded": "{count, plural, one {# photo ajoutée.} other {# photos ajoutées.}}",
-    "photosAddedPartial": "{succeeded} photo(s) ajoutée(s), {failed} échec(s).",
+    "photosAddedPartial": "{succeeded, plural, one {# photo ajoutée} other {# photos ajoutées}}, {failed, plural, one {# échec} other {# échecs}}.",
     "photosAddFailed": "Aucune photo n'a pu être ajoutée.",
     "documentsAdded": "{count, plural, one {# document ajouté.} other {# documents ajoutés.}}",
-    "documentsAddedPartial": "{succeeded} document(s) ajouté(s), {failed} échec(s).",
+    "documentsAddedPartial": "{succeeded, plural, one {# document ajouté} other {# documents ajoutés}}, {failed, plural, one {# échec} other {# échecs}}.",
     "documentsAddFailed": "Aucun document n'a pu être ajouté.",
     "deleted": "Fichier supprimé."
   },
@@ -62,11 +62,16 @@
   },
   "settings": {
     "profileUpdated": "Profil mis à jour.",
+    "passwordUpdated": "Mot de passe modifié.",
+    "localeUpdated": "Langue mise à jour.",
     "orgUpdated": "Organisation mise à jour.",
     "aiSettingsUpdated": "Paramètres IA mis à jour.",
     "brandingUpdated": "Apparence mise à jour.",
     "logoUpdated": "Logo mis à jour.",
-    "logoDeleted": "Logo supprimé."
+    "logoDeleted": "Logo supprimé.",
+    "themeUpdated": "Apparence mise à jour.",
+    "aiCustomizationRequiresPlan": "La personnalisation du prompt IA nécessite le plan Entreprise. L'IA et le copilote sont disponibles en Pro, mais seul le plan Entreprise permet d'en adapter le contexte métier.",
+    "brandingRequiresPlan": "La marque blanche (logo et couleurs) nécessite le plan Entreprise."
   },
   "enginePart": {
     "created": "Pièce ajoutée.",
@@ -99,7 +104,15 @@
     "alreadyMember": "Vous êtes déjà membre de cette organisation.",
     "alreadyPending": "Une invitation est déjà en attente pour cet email.",
     "emailMismatch": "Cette invitation a été envoyée à une autre adresse email.",
-    "declined": "Vous avez refusé l'invitation."
+    "declined": "Vous avez refusé l'invitation.",
+    "boatOwnerRequiresBoat": "Sélectionnez au moins un bateau pour une invitation propriétaire.",
+    "invalidBoats": "Un ou plusieurs bateaux sélectionnés n'appartiennent pas à cette organisation."
+  },
+  "owner": {
+    "boatNotFound": "Ce bateau n'est pas rattaché à votre compte.",
+    "invalidAssignment": "Cet utilisateur n'a pas le rôle « propriétaire de bateau » dans cette organisation.",
+    "attached": "Propriétaire ajouté au bateau.",
+    "detached": "Propriétaire retiré du bateau."
   },
   "billing": {
     "notConfigured": "Le paiement n'est pas encore configuré. Contactez le support.",
@@ -110,6 +123,9 @@
     "moduleNotFound": "Ce module n'est pas actif sur votre abonnement.",
     "moduleAlreadyActive": "Ce module est déjà actif sur votre abonnement.",
     "moduleActionFailed": "Le module n'a pas pu être mis à jour. Veuillez réessayer.",
+    "moduleActivated": "Module activé.",
+    "moduleDeactivated": "Module désactivé.",
+    "modulesRequireEnterprise": "Cette action n'est disponible que sur le plan Entreprise.",
     "addonUpdated": "Add-on mis à jour. Le changement s'appliquera une fois le paiement confirmé.",
     "addonRemoved": "Add-on retiré. Il sera retiré une fois la confirmation reçue.",
     "addonNotActive": "Cet add-on n'est pas actif sur votre abonnement."
@@ -188,7 +204,7 @@
     "deleted": "Client supprimé.",
     "notFound": "Client introuvable.",
     "documentsAdded": "{count, plural, one {# document ajouté.} other {# documents ajoutés.}}",
-    "documentsAddedPartial": "{succeeded} document(s) ajouté(s), {failed} échec(s).",
+    "documentsAddedPartial": "{succeeded, plural, one {# document ajouté} other {# documents ajoutés}}, {failed, plural, one {# échec} other {# échecs}}.",
     "documentsAddFailed": "Aucun document n'a pu être ajouté.",
     "documentDeleted": "Document supprimé.",
     "anonymized": "Client anonymisé.",
@@ -222,11 +238,11 @@
     "boatsExceeded": "Vous avez atteint la limite de bateaux de votre plan. Passez à un plan supérieur pour en ajouter.",
     "membersExceeded": "Vous avez atteint la limite de membres de votre plan. Passez à un plan supérieur pour en ajouter.",
     "aiExceeded": "Les fonctionnalités IA ne sont pas disponibles sur votre plan actuel. Passez au plan Pro ou Entreprise.",
-    "aiTokensExceeded": "Vous avez atteint votre limite mensuelle de tokens IA. Les fonctionnalités IA seront réinitialisées le 1er du mois prochain ou passez à Enterprise pour un usage illimité.",
+    "aiTokensExceeded": "Vous avez atteint votre limite mensuelle de tokens IA. Les fonctionnalités IA seront réinitialisées le 1er du mois prochain ou passez à Entreprise pour un usage illimité.",
     "exportExceeded": "L'export n'est pas disponible sur votre plan actuel. Passez au plan Pro ou Entreprise.",
-    "clientsExceeded": "Cette fonctionnalité nécessite le plan Enterprise.",
-    "pricingExceeded": "Cette fonctionnalité nécessite le plan Enterprise.",
-    "invoicesExceeded": "Cette fonctionnalité nécessite le plan Enterprise.",
+    "clientsExceeded": "La gestion des clients fait partie du module CRM & Facturation — inclus dans le plan Entreprise, ou disponible en add-on sur le plan Pro.",
+    "pricingExceeded": "Les périodes tarifaires font partie du module Location — inclus dans le plan Entreprise, ou disponible en add-on sur le plan Pro.",
+    "invoicesExceeded": "Les devis et factures font partie du module CRM & Facturation — inclus dans le plan Entreprise, ou disponible en add-on sur le plan Pro.",
     "storageExceeded": "Vous avez atteint la limite de stockage de votre plan. Passez à un plan supérieur pour uploader de nouveaux fichiers.",
     "storageOverflow": "Votre usage de stockage dépasse la limite de votre plan actuel. Libérez de l'espace ou passez à un plan supérieur."
   },
@@ -248,7 +264,7 @@
     "boatNotFound": "Ce bateau n'appartient pas à votre organisation."
   },
   "csv": {
-    "imported": "{count} ligne(s) importée(s) avec succès.",
+    "imported": "{count, plural, one {# ligne importée avec succès.} other {# lignes importées avec succès.}}",
     "boatNotFound": "Bateau introuvable.",
     "previewExpired": "La prévisualisation a expiré. Veuillez réimporter le fichier.",
     "missingHeaders": "En-têtes manquantes dans le fichier CSV : {headers}.",
@@ -288,7 +304,7 @@
     "notFound": "Réservation introuvable.",
     "conflict": "Ce bateau est déjà réservé sur cette période.",
     "endBeforeStart": "La date de fin doit être postérieure à la date de début.",
-    "optionsOverridden": "Réservation confirmée. {count} option(s) en chevauchement annulée(s).",
+    "optionsOverridden": "Réservation confirmée. {count, plural, one {# option en chevauchement annulée.} other {# options en chevauchement annulées.}}",
     "invalidTransition": "Ce changement de statut n'est pas autorisé.",
     "belowMinDays": "La durée de la réservation est inférieure à la durée minimale autorisée pour ce bateau.",
     "aboveMaxDays": "La durée de la réservation dépasse la durée maximale autorisée pour ce bateau.",

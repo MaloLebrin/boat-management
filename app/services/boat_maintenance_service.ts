@@ -337,6 +337,52 @@ export default class BoatMaintenanceService {
   }
 
   /**
+   * Construit la requête d'historique filtrée (sans tri/pagination) partagée
+   * par `getHistoryForOrg` (vue paginée) et `getHistoryEventsForPdf` (export
+   * complet) — voir #362.
+   */
+  async #buildFilteredHistoryQuery(user: User, filters: MaintenanceHistoryFilters) {
+    const boatOptions: MaintenanceBoatOption[] = []
+    const boatMap = new Map<number, string>()
+
+    if (!user.organizationId) return { filtered: null, boatMap, boatOptions }
+
+    const boatModule = await import('#models/boat')
+    const Boat = boatModule.default
+    const boats = await Boat.query()
+      .select('id', 'name')
+      .where('organizationId', user.organizationId)
+      .orderBy('name', 'asc')
+    const boatIds = boats.map((b) => b.id)
+    for (const b of boats) {
+      boatMap.set(b.id, b.name)
+      boatOptions.push({ id: b.id, name: b.name })
+    }
+
+    if (boatIds.length === 0) return { filtered: null, boatMap, boatOptions }
+
+    const filtered = BoatMaintenanceEvent.query().whereIn('boatId', boatIds)
+
+    if (filters.subject) filtered.where('subject', filters.subject)
+    if (filters.boatId !== null && boatMap.has(filters.boatId)) {
+      filtered.where('boatId', filters.boatId)
+    }
+    if (filters.dateFrom) filtered.where('performedAt', '>=', filters.dateFrom)
+    if (filters.dateTo) filtered.where('performedAt', '<=', filters.dateTo)
+    if (filters.q) {
+      const needle = `%${escapeLike(filters.q)}%`
+      const lowered = filters.q.toLowerCase()
+      const matchIds = boats.filter((b) => b.name.toLowerCase().includes(lowered)).map((b) => b.id)
+      filtered.where((sub) => {
+        sub.whereILike('title', needle)
+        if (matchIds.length) sub.orWhereIn('boatId', matchIds)
+      })
+    }
+
+    return { filtered, boatMap, boatOptions }
+  }
+
+  /**
    * Historique de maintenance filtré et paginé pour toute l'organisation.
    * Les stats sont calculées sur l'ensemble filtré complet (pas seulement la
    * page courante).
@@ -356,36 +402,9 @@ export default class BoatMaintenanceService {
 
     if (!user.organizationId) return emptyResult
 
-    const boatModule = await import('#models/boat')
-    const Boat = boatModule.default
-    const boats = await Boat.query()
-      .select('id', 'name')
-      .where('organizationId', user.organizationId)
-      .orderBy('name', 'asc')
-    const boatIds = boats.map((b) => b.id)
-    const boatMap = new Map(boats.map((b) => [b.id, b.name]))
-    const boatOptions: MaintenanceBoatOption[] = boats.map((b) => ({ id: b.id, name: b.name }))
+    const { filtered, boatMap, boatOptions } = await this.#buildFilteredHistoryQuery(user, filters)
 
-    if (boatIds.length === 0) return { ...emptyResult, boatOptions }
-
-    // Requête filtrée (sans tri/pagination) réutilisée pour les stats via clone.
-    const filtered = BoatMaintenanceEvent.query().whereIn('boatId', boatIds)
-
-    if (filters.subject) filtered.where('subject', filters.subject)
-    if (filters.boatId !== null && boatMap.has(filters.boatId)) {
-      filtered.where('boatId', filters.boatId)
-    }
-    if (filters.dateFrom) filtered.where('performedAt', '>=', filters.dateFrom)
-    if (filters.dateTo) filtered.where('performedAt', '<=', filters.dateTo)
-    if (filters.q) {
-      const needle = `%${escapeLike(filters.q)}%`
-      const lowered = filters.q.toLowerCase()
-      const matchIds = boats.filter((b) => b.name.toLowerCase().includes(lowered)).map((b) => b.id)
-      filtered.where((sub) => {
-        sub.whereILike('title', needle)
-        if (matchIds.length) sub.orWhereIn('boatId', matchIds)
-      })
-    }
+    if (!filtered) return { ...emptyResult, boatOptions }
 
     // Stats sur l'ensemble filtré complet.
     const [eventsCountRow] = await filtered.clone().count('* as total').pojo<{ total: number }>()
@@ -431,5 +450,34 @@ export default class BoatMaintenanceService {
       filters,
       boatOptions,
     }
+  }
+
+  /**
+   * Historique de maintenance filtré pour toute l'organisation, sans
+   * pagination — utilisé pour l'export PDF (#362) qui doit couvrir tout le
+   * jeu de résultats filtré, pas seulement la page affichée à l'écran.
+   */
+  async getHistoryEventsForPdf(user: User, rawQuery: Record<string, unknown> = {}) {
+    const filters = this.normalizeHistoryQuery(rawQuery)
+
+    if (!user.organizationId) {
+      return { events: [] as MaintenanceEventRow[], filters, boatName: null as string | null }
+    }
+
+    const { filtered, boatMap } = await this.#buildFilteredHistoryQuery(user, filters)
+
+    if (!filtered) {
+      return { events: [] as MaintenanceEventRow[], filters, boatName: null as string | null }
+    }
+
+    const events = await filtered
+      .preload('parts')
+      .orderBy('performedAt', filters.sort === 'recent' ? 'desc' : 'asc')
+      .orderBy('id', 'desc')
+
+    const data = events.map((ev) => this.#toEventRow(ev, boatMap.get(ev.boatId) ?? ''))
+    const boatName = filters.boatId !== null ? (boatMap.get(filters.boatId) ?? null) : null
+
+    return { events: data, filters, boatName }
   }
 }

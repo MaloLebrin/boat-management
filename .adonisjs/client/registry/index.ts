@@ -6,6 +6,24 @@ import type { ApiDefinition } from './tree.d.ts'
 const placeholder: any = {}
 
 const routes = {
+  'event_stream': {
+    methods: ["GET","HEAD"],
+    pattern: '/__transmit/events',
+    tokens: [{"old":"/__transmit/events","type":0,"val":"__transmit","end":""},{"old":"/__transmit/events","type":0,"val":"events","end":""}],
+    types: placeholder as Registry['event_stream']['types'],
+  },
+  'subscribe': {
+    methods: ["POST"],
+    pattern: '/__transmit/subscribe',
+    tokens: [{"old":"/__transmit/subscribe","type":0,"val":"__transmit","end":""},{"old":"/__transmit/subscribe","type":0,"val":"subscribe","end":""}],
+    types: placeholder as Registry['subscribe']['types'],
+  },
+  'unsubscribe': {
+    methods: ["POST"],
+    pattern: '/__transmit/unsubscribe',
+    tokens: [{"old":"/__transmit/unsubscribe","type":0,"val":"__transmit","end":""},{"old":"/__transmit/unsubscribe","type":0,"val":"unsubscribe","end":""}],
+    types: placeholder as Registry['unsubscribe']['types'],
+  },
   'dashboard': {
     methods: ["GET","HEAD"],
     pattern: '/dashboard',
@@ -149,6 +167,18 @@ const routes = {
     pattern: '/boats/:id/pricing',
     tokens: [{"old":"/boats/:id/pricing","type":0,"val":"boats","end":""},{"old":"/boats/:id/pricing","type":1,"val":"id","end":""},{"old":"/boats/:id/pricing","type":0,"val":"pricing","end":""}],
     types: placeholder as Registry['boats.pricing.update']['types'],
+  },
+  'boats.owners.store': {
+    methods: ["POST"],
+    pattern: '/boats/:id/owners',
+    tokens: [{"old":"/boats/:id/owners","type":0,"val":"boats","end":""},{"old":"/boats/:id/owners","type":1,"val":"id","end":""},{"old":"/boats/:id/owners","type":0,"val":"owners","end":""}],
+    types: placeholder as Registry['boats.owners.store']['types'],
+  },
+  'boats.owners.destroy': {
+    methods: ["DELETE"],
+    pattern: '/boats/:id/owners/:userId',
+    tokens: [{"old":"/boats/:id/owners/:userId","type":0,"val":"boats","end":""},{"old":"/boats/:id/owners/:userId","type":1,"val":"id","end":""},{"old":"/boats/:id/owners/:userId","type":0,"val":"owners","end":""},{"old":"/boats/:id/owners/:userId","type":1,"val":"userId","end":""}],
+    types: placeholder as Registry['boats.owners.destroy']['types'],
   },
   'boats.assign': {
     methods: ["PATCH"],
@@ -744,6 +774,18 @@ const routes = {
     tokens: [{"old":"/boats/:boatId/reservations/:reservationId/contract","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/reservations/:reservationId/contract","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/reservations/:reservationId/contract","type":0,"val":"reservations","end":""},{"old":"/boats/:boatId/reservations/:reservationId/contract","type":1,"val":"reservationId","end":""},{"old":"/boats/:boatId/reservations/:reservationId/contract","type":0,"val":"contract","end":""}],
     types: placeholder as Registry['boats.reservations.contract.destroy']['types'],
   },
+  'owner.boats.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/owner/boats',
+    tokens: [{"old":"/owner/boats","type":0,"val":"owner","end":""},{"old":"/owner/boats","type":0,"val":"boats","end":""}],
+    types: placeholder as Registry['owner.boats.index']['types'],
+  },
+  'owner.boats.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/owner/boats/:id',
+    tokens: [{"old":"/owner/boats/:id","type":0,"val":"owner","end":""},{"old":"/owner/boats/:id","type":0,"val":"boats","end":""},{"old":"/owner/boats/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['owner.boats.show']['types'],
+  },
   'ports.index': {
     methods: ["GET","HEAD"],
     pattern: '/ports',
@@ -872,9 +914,15 @@ const routes = {
   },
   'marketing.en.pricing': {
     methods: ["GET","HEAD"],
+    pattern: '/en/pricing',
+    tokens: [{"old":"/en/pricing","type":0,"val":"en","end":""},{"old":"/en/pricing","type":0,"val":"pricing","end":""}],
+    types: placeholder as Registry['marketing.en.pricing']['types'],
+  },
+  'marketing.en.pricing_legacy': {
+    methods: ["GET","HEAD"],
     pattern: '/en/tarifs',
     tokens: [{"old":"/en/tarifs","type":0,"val":"en","end":""},{"old":"/en/tarifs","type":0,"val":"tarifs","end":""}],
-    types: placeholder as Registry['marketing.en.pricing']['types'],
+    types: placeholder as Registry['marketing.en.pricing_legacy']['types'],
   },
   'marketing.en.simulator': {
     methods: ["GET","HEAD"],
@@ -936,6 +984,18 @@ const routes = {
     tokens: [{"old":"/fr/a-propos","type":0,"val":"fr","end":""},{"old":"/fr/a-propos","type":0,"val":"a-propos","end":""}],
     types: placeholder as Registry['marketing.fr.about']['types'],
   },
+  'marketing.en.contact': {
+    methods: ["GET","HEAD"],
+    pattern: '/en/contact',
+    tokens: [{"old":"/en/contact","type":0,"val":"en","end":""},{"old":"/en/contact","type":0,"val":"contact","end":""}],
+    types: placeholder as Registry['marketing.en.contact']['types'],
+  },
+  'marketing.fr.contact': {
+    methods: ["GET","HEAD"],
+    pattern: '/fr/contact',
+    tokens: [{"old":"/fr/contact","type":0,"val":"fr","end":""},{"old":"/fr/contact","type":0,"val":"contact","end":""}],
+    types: placeholder as Registry['marketing.fr.contact']['types'],
+  },
   'marketing.contact': {
     methods: ["GET","HEAD"],
     pattern: '/contact',
@@ -989,6 +1049,12 @@ const routes = {
     pattern: '/locale',
     tokens: [{"old":"/locale","type":0,"val":"locale","end":""}],
     types: placeholder as Registry['locale.set']['types'],
+  },
+  'theme.set': {
+    methods: ["POST"],
+    pattern: '/theme',
+    tokens: [{"old":"/theme","type":0,"val":"theme","end":""}],
+    types: placeholder as Registry['theme.set']['types'],
   },
   'settings.index': {
     methods: ["GET","HEAD"],
@@ -1044,6 +1110,18 @@ const routes = {
     tokens: [{"old":"/settings/billing/module","type":0,"val":"settings","end":""},{"old":"/settings/billing/module","type":0,"val":"billing","end":""},{"old":"/settings/billing/module","type":0,"val":"module","end":""}],
     types: placeholder as Registry['settings.billing.module.remove']['types'],
   },
+  'settings.billing.module.enterprise.activate': {
+    methods: ["POST"],
+    pattern: '/settings/billing/module/enterprise',
+    tokens: [{"old":"/settings/billing/module/enterprise","type":0,"val":"settings","end":""},{"old":"/settings/billing/module/enterprise","type":0,"val":"billing","end":""},{"old":"/settings/billing/module/enterprise","type":0,"val":"module","end":""},{"old":"/settings/billing/module/enterprise","type":0,"val":"enterprise","end":""}],
+    types: placeholder as Registry['settings.billing.module.enterprise.activate']['types'],
+  },
+  'settings.billing.module.enterprise.deactivate': {
+    methods: ["DELETE"],
+    pattern: '/settings/billing/module/enterprise',
+    tokens: [{"old":"/settings/billing/module/enterprise","type":0,"val":"settings","end":""},{"old":"/settings/billing/module/enterprise","type":0,"val":"billing","end":""},{"old":"/settings/billing/module/enterprise","type":0,"val":"module","end":""},{"old":"/settings/billing/module/enterprise","type":0,"val":"enterprise","end":""}],
+    types: placeholder as Registry['settings.billing.module.enterprise.deactivate']['types'],
+  },
   'settings.billing.addon.set': {
     methods: ["POST"],
     pattern: '/settings/billing/addon',
@@ -1055,6 +1133,24 @@ const routes = {
     pattern: '/settings/profile',
     tokens: [{"old":"/settings/profile","type":0,"val":"settings","end":""},{"old":"/settings/profile","type":0,"val":"profile","end":""}],
     types: placeholder as Registry['settings.profile.update']['types'],
+  },
+  'settings.password.update': {
+    methods: ["PUT"],
+    pattern: '/settings/password',
+    tokens: [{"old":"/settings/password","type":0,"val":"settings","end":""},{"old":"/settings/password","type":0,"val":"password","end":""}],
+    types: placeholder as Registry['settings.password.update']['types'],
+  },
+  'settings.locale.update': {
+    methods: ["PUT"],
+    pattern: '/settings/locale',
+    tokens: [{"old":"/settings/locale","type":0,"val":"settings","end":""},{"old":"/settings/locale","type":0,"val":"locale","end":""}],
+    types: placeholder as Registry['settings.locale.update']['types'],
+  },
+  'settings.theme.update': {
+    methods: ["PUT"],
+    pattern: '/settings/theme',
+    tokens: [{"old":"/settings/theme","type":0,"val":"settings","end":""},{"old":"/settings/theme","type":0,"val":"theme","end":""}],
+    types: placeholder as Registry['settings.theme.update']['types'],
   },
   'settings.org.update': {
     methods: ["PUT"],
@@ -1133,6 +1229,12 @@ const routes = {
     pattern: '/maintenance/history',
     tokens: [{"old":"/maintenance/history","type":0,"val":"maintenance","end":""},{"old":"/maintenance/history","type":0,"val":"history","end":""}],
     types: placeholder as Registry['maintenance.history']['types'],
+  },
+  'maintenance.history.pdf': {
+    methods: ["GET","HEAD"],
+    pattern: '/maintenance/history.pdf',
+    tokens: [{"old":"/maintenance/history.pdf","type":0,"val":"maintenance","end":""},{"old":"/maintenance/history.pdf","type":0,"val":"history.pdf","end":""}],
+    types: placeholder as Registry['maintenance.history.pdf']['types'],
   },
   'organization.members.index': {
     methods: ["GET","HEAD"],
@@ -1457,24 +1559,6 @@ const routes = {
     pattern: '/invoices/:id',
     tokens: [{"old":"/invoices/:id","type":0,"val":"invoices","end":""},{"old":"/invoices/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['invoices.destroy']['types'],
-  },
-  'event_stream': {
-    methods: ["GET","HEAD"],
-    pattern: '/__transmit/events',
-    tokens: [{"old":"/__transmit/events","type":0,"val":"__transmit","end":""},{"old":"/__transmit/events","type":0,"val":"events","end":""}],
-    types: placeholder as Registry['event_stream']['types'],
-  },
-  'subscribe': {
-    methods: ["POST"],
-    pattern: '/__transmit/subscribe',
-    tokens: [{"old":"/__transmit/subscribe","type":0,"val":"__transmit","end":""},{"old":"/__transmit/subscribe","type":0,"val":"subscribe","end":""}],
-    types: placeholder as Registry['subscribe']['types'],
-  },
-  'unsubscribe': {
-    methods: ["POST"],
-    pattern: '/__transmit/unsubscribe',
-    tokens: [{"old":"/__transmit/unsubscribe","type":0,"val":"__transmit","end":""},{"old":"/__transmit/unsubscribe","type":0,"val":"unsubscribe","end":""}],
-    types: placeholder as Registry['unsubscribe']['types'],
   },
   'new_account.create': {
     methods: ["GET","HEAD"],

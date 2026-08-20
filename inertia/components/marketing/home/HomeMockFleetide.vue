@@ -36,29 +36,31 @@
         </div>
       </nav>
       <div class="mt-auto border-t border-white/10 px-2 py-2">
-        <div class="flex items-center gap-1.5 rounded bg-violet-600/30 px-2 py-1 text-violet-100">
+        <div class="flex items-center gap-1.5 rounded bg-violet-600/30 px-2 py-1 text-violet-200">
           <div class="h-3 w-3 rounded bg-violet-400" />
-          <span class="font-medium">FleetAI</span>
+          <span class="font-medium">FleetAi</span>
         </div>
       </div>
     </div>
 
     <!-- Main content (faded) -->
     <div class="flex flex-1 flex-col overflow-hidden opacity-40">
-      <div class="flex items-center justify-between border-b border-bone bg-white px-4 py-2">
+      <div
+        class="flex items-center justify-between border-b border-bone bg-surface-elevated px-4 py-2"
+      >
         <p class="font-semibold text-fg">Dashboard</p>
       </div>
       <div class="flex-1 p-3">
         <div class="mb-3 grid grid-cols-3 gap-2">
-          <div class="h-16 rounded-lg border border-bone bg-white" />
-          <div class="h-16 rounded-lg border border-bone bg-white" />
-          <div class="h-16 rounded-lg border border-bone bg-white" />
+          <div class="h-16 rounded-lg border border-bone bg-surface-elevated" />
+          <div class="h-16 rounded-lg border border-bone bg-surface-elevated" />
+          <div class="h-16 rounded-lg border border-bone bg-surface-elevated" />
         </div>
-        <div class="h-32 rounded-lg border border-bone bg-white" />
+        <div class="h-32 rounded-lg border border-bone bg-surface-elevated" />
       </div>
     </div>
 
-    <!-- FleetAI panel -->
+    <!-- FleetAi panel -->
     <div
       class="flex w-[200px] shrink-0 flex-col border-l border-violet-600/20"
       style="background: linear-gradient(180deg, #5a4a8a 0%, #4a3a7a 100%)"
@@ -71,7 +73,7 @@
           >
             <span>&#10024;</span>
           </div>
-          <span class="font-medium text-white">FleetAI</span>
+          <span class="font-medium text-white">FleetAi</span>
         </div>
         <p class="mt-0.5 text-[9px] text-white/60">Copilote IA pour ta flotte</p>
       </div>
@@ -84,7 +86,7 @@
         </div>
 
         <!-- AI response -->
-        <div class="mb-3 rounded-lg rounded-bl-sm bg-white p-2">
+        <div class="mb-3 rounded-lg rounded-bl-sm bg-surface-elevated p-2">
           <p class="text-[10px] text-fg">
             Tu as <strong class="text-coral-600">3 maintenances urgentes</strong> cette semaine :
           </p>
@@ -95,7 +97,7 @@
             </li>
             <li class="flex items-start gap-1">
               <span class="mt-0.5 text-coral-500">&#8226;</span>
-              <span><strong>Alizee</strong> : Controle greement (retard 3j)</span>
+              <span><strong>Alizée</strong> : Contrôle gréement (retard 3j)</span>
             </li>
             <li class="flex items-start gap-1">
               <span class="mt-0.5 text-amber-500">&#8226;</span>
@@ -113,7 +115,7 @@
             <button
               class="rounded bg-violet-100 px-2 py-0.5 text-[9px] font-medium text-violet-700 hover:bg-violet-200"
             >
-              Voir details
+              Voir détails
             </button>
           </div>
         </div>
@@ -124,9 +126,9 @@
         </div>
 
         <!-- AI response -->
-        <div class="rounded-lg rounded-bl-sm bg-white p-2">
+        <div class="rounded-lg rounded-bl-sm bg-surface-elevated p-2">
           <p class="text-[10px] text-fg">
-            <span class="text-mint-600">&#10003;</span> Tache creee pour
+            <span class="text-mint-600">&#10003;</span> Tâche créée pour
             <strong>Mistral II</strong> :
           </p>
           <div class="mt-1.5 rounded border border-bone bg-paper p-1.5 text-[9px]">

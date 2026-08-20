@@ -146,11 +146,11 @@ const tableRows = computed(() => {
             <div class="flex items-center gap-3">
               <img
                 :src="brandIconUrl"
-                alt="Fleet AI icon"
+                alt="FleetAi icon"
                 class="h-10 w-10 rounded-(--radius-control) shadow-(--shadow-xs)"
               />
               <div>
-                <p class="font-display text-sm font-semibold text-fg">Fleet AI</p>
+                <p class="font-display text-sm font-semibold text-fg">FleetAi</p>
                 <p class="text-xs font-semibold text-fg-subtle">Horizon · wave · AI spark</p>
               </div>
             </div>
@@ -166,7 +166,7 @@ const tableRows = computed(() => {
           >
             <p class="text-xs font-semibold text-fg-muted">Usage</p>
             <p class="mt-2 text-sm text-fg-muted">
-              Utiliser l’icône seule pour favicon/app icon. Préférer le lockup “Fleet AI” dans le
+              Utiliser l’icône seule pour favicon/app icon. Préférer le lockup “FleetAi” dans le
               header.
             </p>
           </div>
@@ -196,9 +196,14 @@ const tableRows = computed(() => {
           <template #header>
             <h3 class="text-sm font-semibold font-display text-fg">Principes</h3>
           </template>
-          <ul class="px-2 space-y-2 text-sm text-fg-muted">
+          <!-- `data-theme-probe` : points de mesure du contraste pour le test
+               navigateur du thème sombre (tests/browser/dark_mode.spec.ts).
+               Des ancres explicites évitent que le test casse au moindre
+               remaniement de cette page. -->
+          <ul class="px-2 space-y-2 text-sm text-fg-muted" data-theme-probe="muted-text">
             <li>
-              <span class="font-semibold text-fg">Cohérence</span> : tokens sémantiques d’abord.
+              <span class="font-semibold text-fg" data-theme-probe="body-text">Cohérence</span> :
+              tokens sémantiques d’abord.
             </li>
             <li>
               <span class="font-semibold text-fg">Subtil</span> : motion courte, jamais

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { CheckIcon } from '@heroicons/vue/24/solid'
+import { useNumberFormat } from '~/composables/use_number_format'
 
 defineProps<{
   icon: string
@@ -8,9 +9,13 @@ defineProps<{
   /** Prix mensuel affiché (déjà résolu pour l'intervalle courant). */
   price: number
   pricePer: string
+  /** Affiché quand le prix résolu correspond à un tarif facturé annuellement. */
+  billedAnnuallyNote?: string
   features: string[]
   selected: boolean
 }>()
+
+const { formatPrice } = useNumberFormat()
 
 const emit = defineEmits<{ toggle: [] }>()
 </script>
@@ -24,7 +29,7 @@ const emit = defineEmits<{ toggle: [] }>()
       'group flex w-full flex-col rounded-2xl border p-5 text-left transition-all duration-200',
       selected
         ? 'border-coral-500 bg-coral-50 shadow-sm'
-        : 'border-bone bg-white hover:border-sand hover:-translate-y-0.5',
+        : 'border-bone bg-surface-elevated hover:border-sand hover:-translate-y-0.5',
     ]"
     @click="emit('toggle')"
   >
@@ -45,7 +50,7 @@ const emit = defineEmits<{ toggle: [] }>()
       >
         <span
           :class="[
-            'inline-block h-5 w-5 rounded-full bg-white shadow transition-transform',
+            'inline-block h-5 w-5 rounded-full bg-surface-elevated shadow transition-transform',
             selected ? 'translate-x-5' : 'translate-x-0',
           ]"
         />
@@ -59,9 +64,14 @@ const emit = defineEmits<{ toggle: [] }>()
       </li>
     </ul>
 
-    <div class="mt-4 flex items-baseline gap-1 border-t border-dashed border-current/10 pt-3">
-      <span class="font-display text-xl text-fg">+{{ price }} €</span>
-      <span class="text-sm text-fg-subtle">{{ pricePer }}</span>
+    <div class="mt-4 border-t border-dashed border-current/10 pt-3">
+      <div class="flex items-baseline gap-1">
+        <span class="font-display text-xl text-fg">+{{ formatPrice(price) }}</span>
+        <span class="text-sm text-fg-subtle">{{ pricePer }}</span>
+      </div>
+      <p v-if="billedAnnuallyNote" class="mt-0.5 text-xs text-fg-subtle">
+        {{ billedAnnuallyNote }}
+      </p>
     </div>
   </button>
 </template>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { PlusIcon } from '@heroicons/vue/24/solid'
 import BaseButton from '~/components/base/BaseButton.vue'
+import { useNumberFormat } from '~/composables/use_number_format'
 import { useScrollReveal } from '~/composables/use_scroll_reveal'
 
 interface OfferModule {
@@ -27,6 +28,7 @@ defineProps<{
 }>()
 
 const { el, isVisible } = useScrollReveal()
+const { formatPrice } = useNumberFormat()
 </script>
 
 <template>
@@ -51,7 +53,7 @@ const { el, isVisible } = useScrollReveal()
           <h3 class="mt-2 font-display text-2xl">{{ baseName }}</h3>
           <p class="mt-1 text-sm text-white/60">{{ baseDesc }}</p>
           <div class="mt-4 flex items-baseline gap-1">
-            <span class="font-display text-4xl">{{ basePrice }} €</span>
+            <span class="font-display text-4xl">{{ formatPrice(basePrice) }}</span>
             <span class="text-sm text-white/60">{{ pricePer }}</span>
           </div>
         </div>
@@ -70,7 +72,7 @@ const { el, isVisible } = useScrollReveal()
           <div
             v-for="m in modules"
             :key="m.name"
-            class="rounded-2xl border border-bone bg-white p-5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md"
+            class="rounded-2xl border border-bone bg-surface-elevated p-5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md"
           >
             <div class="flex items-center justify-between gap-3">
               <div class="flex items-center gap-3">
@@ -81,7 +83,7 @@ const { el, isVisible } = useScrollReveal()
                 </div>
               </div>
               <div class="flex shrink-0 items-baseline gap-1">
-                <span class="font-display text-lg text-fg">+{{ m.price }} €</span>
+                <span class="font-display text-lg text-fg">+{{ formatPrice(m.price) }}</span>
                 <span class="text-xs text-fg-subtle">{{ pricePer }}</span>
               </div>
             </div>

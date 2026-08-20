@@ -5,6 +5,7 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import { useCurrencyFormat } from '~/composables/use_currency_format'
+import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import type { BoatBudgetEntryItem } from '#shared/types/budget'
 
@@ -16,6 +17,7 @@ const props = defineProps<{
 
 const { t } = useT()
 const { formatCurrency } = useCurrencyFormat()
+const { formatDate } = useDateFormat()
 
 const editingId = ref<number | null>(null)
 const editForm = useForm({
@@ -67,21 +69,17 @@ function deleteEntry(entryId: number) {
   })
 }
 
-function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString()
-}
-
 function getCategoryLabel(category: string): string {
   return t(`budget.entries.categories.${category}`)
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
-  maintenance: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400',
-  fuel: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-  documents: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
-  port: 'bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-400',
-  equipment: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-  other: 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400',
+  maintenance: 'bg-amber-100 text-amber-700',
+  fuel: 'bg-sky-100 text-sky-800',
+  documents: 'bg-violet-100 text-violet-700',
+  port: 'bg-lilac-100 text-lilac-800',
+  equipment: 'bg-mint-100 text-mint-700',
+  other: 'bg-surface-muted text-fg-muted',
 }
 </script>
 
@@ -164,7 +162,7 @@ const CATEGORY_COLORS: Record<string, string> = {
               </p>
             </div>
             <div class="flex items-center gap-4">
-              <span class="font-semibold text-orange-600 dark:text-orange-400">
+              <span class="font-semibold text-peach-700">
                 {{ formatCurrency(entry.amount) }}
               </span>
               <template v-if="canManage">

@@ -8,6 +8,7 @@ import { Head } from '@inertiajs/vue3'
 import { Link } from '@adonisjs/inertia/vue'
 import { computed } from 'vue'
 import { useT } from '~/composables/use_t'
+import { formatLength } from '../../../shared/helpers/number_format'
 import SimulatorResultCard from '~/components/marketing/simulator/SimulatorResultCard.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import type { SimulatorBoatInput, SimulatorCostBreakdown } from '../../../shared/types/simulator'
@@ -40,10 +41,11 @@ const boatTypeLabel = computed(() => {
 const ogTitle = computed(() => {
   const min = formatCurrency(props.breakdown.totalMin)
   const max = formatCurrency(props.breakdown.totalMax)
+  const length = formatLength(props.input.lengthM, props.locale)
   if (props.locale === 'fr') {
-    return `Entretien ${boatTypeLabel.value} ${props.input.lengthM}m - ${min}-${max}/an | FleetAi`
+    return `Entretien ${boatTypeLabel.value} ${length} - ${min}-${max}/an | FleetAi`
   }
-  return `${props.input.lengthM}m ${boatTypeLabel.value} maintenance - ${min}-${max}/year | FleetAi`
+  return `${length} ${boatTypeLabel.value} maintenance - ${min}-${max}/year | FleetAi`
 })
 
 const ogDescription = computed(() => t('simulator.share_page_subtitle'))
@@ -86,7 +88,7 @@ const simulatorHref = computed(() => {
   <!-- Result card -->
   <section class="bg-cream px-6 py-12 lg:py-16">
     <div class="mx-auto max-w-2xl">
-      <div class="overflow-hidden rounded-2xl border border-bone bg-white shadow-lg">
+      <div class="overflow-hidden rounded-2xl border border-bone bg-surface-elevated shadow-lg">
         <div class="h-1.5 bg-gradient-to-r from-coral-500 to-coral-400" />
         <div class="p-6 lg:p-8">
           <SimulatorResultCard :breakdown="breakdown" :input="input" />
@@ -94,7 +96,9 @@ const simulatorHref = computed(() => {
       </div>
 
       <!-- CTA Banner -->
-      <div class="mt-8 rounded-2xl border border-bone bg-white p-6 text-center shadow-lg lg:p-8">
+      <div
+        class="mt-8 rounded-2xl border border-bone bg-surface-elevated p-6 text-center shadow-lg lg:p-8"
+      >
         <h2 class="font-display text-2xl text-fg">
           {{ t('simulator.share_cta_title') }}
         </h2>

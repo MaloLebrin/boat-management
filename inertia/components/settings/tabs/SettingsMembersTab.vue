@@ -8,9 +8,11 @@ import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import SettingsMembersInviteForm from '~/components/settings/tabs/SettingsMembersInviteForm.vue'
 import SettingsMembersPendingInvitations from '~/components/settings/tabs/SettingsMembersPendingInvitations.vue'
+import SettingsMembersRoleModal from '~/components/settings/tabs/SettingsMembersRoleModal.vue'
 import UpgradePlanModal from '~/components/base/UpgradePlanModal.vue'
 import { useT } from '~/composables/use_t'
 import type {
+  OrgRole,
   OrganizationMemberData,
   OrganizationInvitationData,
 } from '../../../../shared/types/organization'
@@ -21,6 +23,7 @@ const props = defineProps<{
   pendingInvitations: OrganizationInvitationData[]
   canManageMembers: boolean
   canAddMember: boolean
+  boatOptions: { id: number; name: string }[]
 }>()
 
 const { t } = useT()
@@ -39,6 +42,8 @@ function handleInvite() {
 const roleOptions = computed(() => [
   { label: t('settings.members.roles.admin'), value: 'admin' },
   { label: t('settings.members.roles.member'), value: 'member' },
+  { label: t('settings.members.roles.mechanic'), value: 'mechanic' },
+  { label: t('settings.members.roles.boat_owner'), value: 'boat_owner' },
 ])
 
 function getInitials(member: OrganizationMemberData): string {
@@ -48,8 +53,36 @@ function getInitials(member: OrganizationMemberData): string {
   return member.email.charAt(0).toUpperCase()
 }
 
-function changeRole(memberId: number, role: string) {
-  router.put(`/organization/members/${memberId}`, { role }, { preserveScroll: true })
+const showRoleModal = ref(false)
+const pendingMember = ref<OrganizationMemberData | null>(null)
+const pendingRole = ref<OrgRole | null>(null)
+// Force le remount des <select> pour revenir au rôle courant quand on annule
+// la confirmation (le model-value reste lié à member.role, non muté).
+const selectVersion = ref(0)
+
+function requestRoleChange(member: OrganizationMemberData, role: string) {
+  if (role === member.role) return
+  pendingMember.value = member
+  pendingRole.value = role as OrgRole
+  showRoleModal.value = true
+}
+
+function confirmRoleChange() {
+  if (!pendingMember.value || !pendingRole.value) return
+  router.put(
+    `/organization/members/${pendingMember.value.id}`,
+    { role: pendingRole.value },
+    { preserveScroll: true }
+  )
+}
+
+function onRoleModalOpen(value: boolean) {
+  showRoleModal.value = value
+  if (!value) {
+    pendingMember.value = null
+    pendingRole.value = null
+    selectVersion.value++
+  }
 }
 
 function removeMember(memberId: number) {
@@ -73,6 +106,7 @@ function removeMember(memberId: number) {
 
     <SettingsMembersInviteForm
       v-if="canManageMembers && showInviteForm"
+      :boat-options="boatOptions"
       @close="showInviteForm = false"
     />
 
@@ -130,9 +164,10 @@ function removeMember(memberId: number) {
             <td class="px-6 py-4">
               <template v-if="canManageMembers && member.userId !== props.currentUserId">
                 <BaseSelect
+                  :key="`role-${member.id}-${selectVersion}`"
                   :model-value="member.role"
                   :options="roleOptions"
-                  @update:model-value="changeRole(member.id, String($event))"
+                  @update:model-value="requestRoleChange(member, String($event))"
                 />
               </template>
               <template v-else>
@@ -168,4 +203,13 @@ function removeMember(memberId: number) {
   </div>
 
   <UpgradePlanModal v-model:open="showUpgradeModal" feature="members" />
+
+  <SettingsMembersRoleModal
+    :open="showRoleModal"
+    :member-name="pendingMember?.fullName ?? pendingMember?.email ?? ''"
+    :current-role="pendingMember?.role ?? 'member'"
+    :new-role="pendingRole"
+    @update:open="onRoleModalOpen"
+    @confirm="confirmRoleChange"
+  />
 </template>

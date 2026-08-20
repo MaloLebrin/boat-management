@@ -15,6 +15,8 @@ const props = defineProps<{
   groups: TaskGroup[]
   groupingEnabled: boolean
   dismissedGroupIds: Set<string>
+  /** Tâche ciblée par `/planning?task=<id>` (#473). */
+  highlightedTaskId?: number | null
 }>()
 
 const emit = defineEmits<{ ungroup: [groupId: string] }>()
@@ -49,10 +51,12 @@ const doneTasksLabel = computed(() => {
   <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
     <!-- En retard -->
     <div class="flex flex-col gap-3">
-      <div class="flex items-center gap-2 rounded-lg border-l-4 border-red-500 bg-red-50 px-3 py-2">
-        <h2 class="text-sm font-semibold text-red-700">{{ t('planning.kanban.overdue') }}</h2>
+      <div
+        class="flex items-center gap-2 rounded-lg border-l-4 border-coral-500 bg-danger-soft px-3 py-2"
+      >
+        <h2 class="text-sm font-semibold text-coral-700">{{ t('planning.kanban.overdue') }}</h2>
         <span
-          class="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-xs font-semibold text-white"
+          class="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-coral-600 px-1.5 text-xs font-semibold text-white"
         >
           {{ overdueTasks.length }}
         </span>
@@ -67,8 +71,9 @@ const doneTasksLabel = computed(() => {
         v-for="task in overdueTasks"
         :key="task.id"
         :task="task"
-        accent-class="border-red-400"
-        badge-class="bg-red-100 text-red-700"
+        :highlighted="task.id === highlightedTaskId"
+        accent-class="border-coral-400"
+        badge-class="bg-coral-100 text-coral-700"
       />
     </div>
 
@@ -94,6 +99,7 @@ const doneTasksLabel = computed(() => {
         v-for="task in soonTasks"
         :key="task.id"
         :task="task"
+        :highlighted="task.id === highlightedTaskId"
         accent-class="border-amber-300"
         badge-class="bg-amber-100 text-amber-700"
       />
@@ -102,11 +108,11 @@ const doneTasksLabel = computed(() => {
     <!-- Non datées -->
     <div class="flex flex-col gap-3">
       <div
-        class="flex items-center gap-2 rounded-lg border-l-4 border-slate-400 bg-slate-50 px-3 py-2"
+        class="flex items-center gap-2 rounded-lg border-l-4 border-fg-subtle bg-surface-muted px-3 py-2"
       >
-        <h2 class="text-sm font-semibold text-slate-700">{{ t('planning.kanban.undated') }}</h2>
+        <h2 class="text-sm font-semibold text-fg">{{ t('planning.kanban.undated') }}</h2>
         <span
-          class="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-slate-400 px-1.5 text-xs font-semibold text-white"
+          class="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-fg-subtle px-1.5 text-xs font-semibold text-white"
         >
           {{ undatedTasks.length }}
         </span>
@@ -121,19 +127,29 @@ const doneTasksLabel = computed(() => {
         v-for="task in undatedTasks"
         :key="task.id"
         :task="task"
-        accent-class="border-slate-400"
-        badge-class="bg-slate-100 text-slate-700"
+        :highlighted="task.id === highlightedTaskId"
+        accent-class="border-fg-subtle"
+        badge-class="bg-surface-muted text-fg"
       />
     </div>
 
     <!-- Planifiées -->
     <div class="flex flex-col gap-3">
+      <!--
+        Les quatre autres colonnes teintent leur en-tête avec une palette de
+        marque, dont les paliers `-50`/`-700` s'inversent sous `[data-theme]`.
+        Le navy, lui, est la palette des surfaces *permanentes* (sidebar, bandeaux)
+        et n'est pas réinversée : `bg-navy-25` restait donc un aplat quasi blanc
+        en thème sombre, seul en-tête clair du kanban (#457). Les tokens `brand`
+        portent la même teinte et basculent, `text-on-brand` suivant sur la
+        pastille.
+      -->
       <div
-        class="flex items-center gap-2 rounded-lg border-l-4 border-navy-600 bg-navy-25 px-3 py-2"
+        class="flex items-center gap-2 rounded-lg border-l-4 border-brand bg-brand-soft px-3 py-2"
       >
-        <h2 class="text-sm font-semibold text-navy-600">{{ t('planning.kanban.planned') }}</h2>
+        <h2 class="text-sm font-semibold text-brand">{{ t('planning.kanban.planned') }}</h2>
         <span
-          class="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-navy-600 px-1.5 text-xs font-semibold text-white"
+          class="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-brand px-1.5 text-xs font-semibold text-on-brand"
         >
           {{ plannedTasks.length }}
         </span>
@@ -157,6 +173,7 @@ const doneTasksLabel = computed(() => {
         v-for="task in ungroupedPlannedTasks"
         :key="task.id"
         :task="task"
+        :highlighted="task.id === highlightedTaskId"
         badge-class="bg-surface-muted text-fg-muted"
       />
     </div>
@@ -183,6 +200,7 @@ const doneTasksLabel = computed(() => {
         v-for="task in doneTasks"
         :key="task.id"
         :task="task"
+        :highlighted="task.id === highlightedTaskId"
         accent-class="border-mint-500 opacity-75"
         badge-class="bg-mint-100 text-mint-700"
         :done="true"

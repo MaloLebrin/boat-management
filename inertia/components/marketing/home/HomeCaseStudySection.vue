@@ -52,7 +52,7 @@ const { el: sectionEl, isVisible: sectionVisible } = useScrollReveal()
       <!-- Content: Challenge / Solution / Results -->
       <div class="grid gap-5 px-6 py-10 sm:px-12 lg:grid-cols-3">
         <!-- Challenge -->
-        <div class="rounded-2xl border-t-2 border-coral-500 bg-white p-5 shadow-sm">
+        <div class="rounded-2xl border-t-2 border-coral-500 bg-surface-elevated p-5 shadow-sm">
           <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-coral-500">
             {{ caseStudy.challengeLabel }}
           </p>
@@ -60,15 +60,15 @@ const { el: sectionEl, isVisible: sectionVisible } = useScrollReveal()
         </div>
 
         <!-- Solution -->
-        <div class="rounded-2xl border-t-2 border-navy-900 bg-white p-5 shadow-sm">
-          <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-navy-900">
+        <div class="rounded-2xl border-t-2 border-brand bg-surface-elevated p-5 shadow-sm">
+          <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-fg">
             {{ caseStudy.solutionLabel }}
           </p>
           <p class="text-sm text-fg-muted">{{ caseStudy.solution }}</p>
         </div>
 
         <!-- Results -->
-        <div class="rounded-2xl border-t-2 border-mint-600 bg-white p-5 shadow-sm">
+        <div class="rounded-2xl border-t-2 border-mint-600 bg-surface-elevated p-5 shadow-sm">
           <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-mint-700">
             {{ caseStudy.resultsLabel }}
           </p>

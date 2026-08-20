@@ -15,12 +15,14 @@
     "legal": "Légal",
     "features": "Fonctionnalités",
     "pricing": "Tarifs",
-    "simulator": "Simulateur de cout",
+    "simulator": "Simulateur de coût",
     "guide": "Guide coût entretien",
     "contact": "Contact",
     "about": "À propos",
     "privacy": "Confidentialité",
-    "terms": "Conditions",
+    "terms": "CGU",
+    "salesTerms": "CGV",
+    "legalNotice": "Mentions légales",
     "bilingual": "Bilingue FR/EN · Hébergé en UE"
   }
 }

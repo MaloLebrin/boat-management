@@ -8,10 +8,11 @@ import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import { useNetworkStatus } from '~/composables/use_network_status'
 import { useOfflineQueue } from '~/composables/use_offline_queue'
 import { useT } from '~/composables/use_t'
-import type { BoatShowDetail, NavigationLogPortOption } from '~/types/boat_show'
+import { nowDatetimeLocalValue, tzOffsetMinutes } from '~/utils/local_datetime'
+import type { NavigationLogPortOption } from '~/types/boat_show'
 
 const props = defineProps<{
-  boat: BoatShowDetail
+  boatId: number
   portOptions: NavigationLogPortOption[]
 }>()
 
@@ -23,9 +24,7 @@ const { t } = useT()
 const { isOnline } = useNetworkStatus()
 const { enqueue } = useOfflineQueue()
 
-const now = new Date()
-const pad = (n: number) => String(n).padStart(2, '0')
-const defaultDepartedAt = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`
+const defaultDepartedAt = nowDatetimeLocalValue()
 
 const SEA_STATES = ['calm', 'slight', 'moderate', 'rough', 'very_rough'] as const
 
@@ -42,6 +41,9 @@ const seaStateOptions = computed(() =>
 
 const form = useForm({
   departedAt: defaultDepartedAt,
+  // `departedAt` is a naive wall-clock: the server needs the browser offset to
+  // store the right instant (#452).
+  tzOffsetMinutes: tzOffsetMinutes(),
   departurePortId: '' as string | number,
   departurePortName: '',
   engineHoursStart: null as number | null,
@@ -52,10 +54,12 @@ const form = useForm({
 })
 
 function handleSubmit() {
+  form.tzOffsetMinutes = tzOffsetMinutes()
+
   if (!isOnline.value) {
     enqueue({
       type: 'create-navigation-log',
-      url: `/boats/${props.boat.id}/navigation-logs`,
+      url: `/boats/${props.boatId}/navigation-logs`,
       method: 'post',
       payload: form.data() as Record<string, unknown>,
     })
@@ -63,7 +67,7 @@ function handleSubmit() {
     return
   }
 
-  form.post(`/boats/${props.boat.id}/navigation-logs`, {
+  form.post(`/boats/${props.boatId}/navigation-logs`, {
     preserveScroll: true,
     onSuccess: () => emit('close'),
   })

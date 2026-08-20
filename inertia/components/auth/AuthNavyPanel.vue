@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Link } from '@adonisjs/inertia/vue'
 import { useT } from '~/composables/use_t'
 
 const props = defineProps<{
@@ -75,7 +76,7 @@ const modeKey = {
 
     <div class="relative z-10 flex flex-1 flex-col px-12 py-14">
       <!-- Logo (variation C — aiguille seule, sans cercle) -->
-      <a href="/" class="inline-flex items-center gap-2.5">
+      <Link href="/" class="inline-flex items-center gap-2.5">
         <svg width="26" height="26" viewBox="0 0 64 64" fill="none" aria-hidden="true">
           <path d="M32 6 L40 32 L32 38 L24 32 Z" fill="#faf6ee" />
           <path d="M32 58 L40 32 L32 26 L24 32 Z" fill="#e2674f" />
@@ -84,7 +85,7 @@ const modeKey = {
         <span class="font-display text-base text-white" style="letter-spacing: -0.025em">
           Fleet<em style="font-style: italic; color: #e2674f">Ai</em>
         </span>
-      </a>
+      </Link>
 
       <!-- Headline block -->
       <div
@@ -107,7 +108,7 @@ const modeKey = {
           {{ t(`auth.${modeKey[mode]}.marketing.subtitle`) }}
         </p>
 
-        <!-- FleetAI preview card (login + register only) -->
+        <!-- FleetAi preview card (login + register only) -->
         <div
           v-if="mode === 'login' || mode === 'register'"
           class="mt-9 rounded-xl p-3.5"

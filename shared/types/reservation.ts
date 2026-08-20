@@ -37,6 +37,8 @@ export interface FleetBoatOption {
 export interface CreateReservationPayload {
   startsAt: Date | string | DateTime
   endsAt: Date | string | DateTime
+  /** getTimezoneOffset() of the submitting browser — used to shift the naive local datetime to UTC */
+  tzOffsetMinutes?: number
   clientId?: number | null
   clientName: string
   clientEmail?: string | null
@@ -49,6 +51,8 @@ export interface CreateReservationPayload {
 export interface UpdateReservationPayload {
   startsAt?: Date | string | DateTime
   endsAt?: Date | string | DateTime
+  /** getTimezoneOffset() of the submitting browser — used to shift the naive local datetime to UTC */
+  tzOffsetMinutes?: number
   clientId?: number | null
   clientName?: string
   clientEmail?: string | null

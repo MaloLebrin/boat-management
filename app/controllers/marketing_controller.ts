@@ -1,8 +1,20 @@
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
-import { ADDON_PRICES, MODULE_PRICES, PLAN_PRICES } from '../../shared/types/plan.js'
+import { ADDON_PRICES, MODULE_PRICES, PLAN_LIMITS, PLAN_PRICES } from '../../shared/types/plan.js'
+import type { BooleanQuotaKey } from '../../shared/types/plan.js'
+import type { LegalEntry, PricingTableRow } from '../../shared/types/marketing.js'
+import legalEntity from '#config/legal'
+import { CONTACT_FLEET_SIZES, CONTACT_SUBJECTS } from '../../shared/types/contact.js'
+import { marketingPath } from '#shared/helpers/locale_path'
 import QuotaService from '#services/quota_service'
 import SimulatorLeadService from '#services/simulator_lead_service'
+
+/** Ancre du formulaire de contact, ciblée par la carte « Réserver un créneau » (#450). */
+const CONTACT_FORM_ANCHOR = 'contact-form'
+/** Route POST unique du formulaire de contact, quelle que soit la locale de l'URL. */
+const CONTACT_FORM_ACTION = '/contact'
+const SUPPORT_EMAIL = 'support@fleetai.app'
+const PRESS_EMAIL = 'press@fleetai.app'
 
 @inject()
 export default class MarketingController {
@@ -29,9 +41,12 @@ export default class MarketingController {
     })
   }
 
-  async contact({ inertia, i18n }: HttpContext) {
+  async contact({ inertia, i18n, session }: HttpContext) {
     return inertia.render('marketing/contact', {
       t: this.buildContactPageData(i18n),
+      // Rendu après le POST /contact : le panneau de confirmation survit ainsi
+      // à un rechargement complet, sans dépendre de l'état client (#450).
+      contactSent: Boolean(session.flashMessages.get('contactMessageSent')),
     })
   }
 
@@ -41,6 +56,18 @@ export default class MarketingController {
 
   async privacy({ inertia, i18n }: HttpContext) {
     return inertia.render('marketing/privacy', this.buildPrivacyPageData(i18n))
+  }
+
+  async terms({ inertia, i18n }: HttpContext) {
+    return inertia.render('marketing/terms', this.buildTermsPageData(i18n))
+  }
+
+  async legalNotice({ inertia, i18n }: HttpContext) {
+    return inertia.render('marketing/legal_notice', this.buildLegalNoticePageData(i18n))
+  }
+
+  async salesTerms({ inertia, i18n }: HttpContext) {
+    return inertia.render('marketing/sales_terms', this.buildSalesTermsPageData(i18n))
   }
 
   async simulator({ inertia, auth }: HttpContext) {
@@ -63,7 +90,7 @@ export default class MarketingController {
         tagline: i18n.t('marketing.brand.tagline'),
       },
       meta: {
-        title: `${i18n.t('marketing.brand.name')} - ${i18n.t('marketing.home.hero.loueurs_title')}`,
+        title: i18n.t('marketing.home.hero.loueurs_title'),
         description: i18n.t('marketing.home.hero.loueurs_subtitle'),
       },
       home: {
@@ -168,7 +195,7 @@ export default class MarketingController {
           modulesLabel: i18n.t('marketing.home.modularOffer.modules_label'),
           note: i18n.t('marketing.home.modularOffer.note'),
           ctaLabel: i18n.t('marketing.home.modularOffer.cta'),
-          ctaHref: `/${locale}/tarifs`,
+          ctaHref: marketingPath('pricing', locale),
           modules: [
             {
               icon: '📅',
@@ -580,8 +607,34 @@ export default class MarketingController {
     }
   }
 
-  private buildPricingPageData(i18n: { t: (key: string) => string }) {
-    const t = (key: string) => i18n.t(`marketing.pricing2.${key}`)
+  private buildPricingPageData(i18n: {
+    t: (key: string, params?: Record<string, string>) => string
+  }) {
+    const t = (key: string, params?: Record<string, string>) =>
+      i18n.t(`marketing.pricing2.${key}`, params)
+
+    /**
+     * Cellule de quota du comparatif : la valeur vient de `PLAN_LIMITS`, jamais
+     * d'un nombre recopié dans le JSON de traduction — c'est cette recopie qui
+     * avait fait diverger le comparatif du produit (#454).
+     */
+    const quotaCell = (limit: number | null, boundedKey: string, unlimitedKey: string) =>
+      limit === null ? t(unlimitedKey) : t(boundedKey, { count: String(limit) })
+
+    /** Ligne booléenne du comparatif adossée à un flag de capacité de `PLAN_LIMITS`. */
+    const flagRow = (labelKey: string, flag: BooleanQuotaKey): PricingTableRow => [
+      t(labelKey),
+      PLAN_LIMITS.starter[flag],
+      PLAN_LIMITS.pro[flag],
+      PLAN_LIMITS.enterprise[flag],
+    ]
+
+    /** Rétention de l'audit log : 0 jour = pas d'audit log, `null` = illimité. */
+    const auditCell = (days: number | null) => {
+      if (days === null) return t('table_g3_r3_e')
+      if (days === 0) return false
+      return t('table_g3_r3_p', { count: String(days) })
+    }
 
     return {
       meta: {
@@ -598,6 +651,8 @@ export default class MarketingController {
           annualLabel: t('billing_annual'),
           annualBadge: t('billing_annual_badge'),
         },
+        tierFeaturedBadge: t('tier_featured_badge'),
+        billedAnnuallyNote: t('config_billed_annually'),
         tiers: [
           {
             name: t('tier_starter_name'),
@@ -783,6 +838,7 @@ export default class MarketingController {
           expandAll: t('table_expand_all'),
           collapseAll: t('table_collapse_all'),
           addonLabel: t('table_addon_badge'),
+          billedAnnuallyNote: t('config_billed_annually'),
           planHeaders: [
             {
               name: t('table_plan_starter'),
@@ -791,12 +847,16 @@ export default class MarketingController {
             },
             {
               name: t('table_plan_pro'),
-              price: t('table_plan_pro_price'),
+              priceMonthly: PLAN_PRICES.pro.monthly,
+              priceAnnual: PLAN_PRICES.pro.annualMonthly,
+              pricePer: t('tier_price_per'),
               cta: t('table_plan_pro_cta'),
             },
             {
               name: t('table_plan_enterprise'),
-              price: t('table_plan_enterprise_price'),
+              priceMonthly: PLAN_PRICES.enterprise.monthly,
+              priceAnnual: PLAN_PRICES.enterprise.annualMonthly,
+              pricePer: t('tier_price_per'),
               cta: t('table_plan_enterprise_cta'),
             },
           ],
@@ -804,12 +864,21 @@ export default class MarketingController {
             {
               title: t('table_g1'),
               rows: [
-                [t('table_g1_r1'), t('table_g1_r1_s'), t('table_g1_r1_p'), t('table_g1_r1_e')],
-                [t('table_g1_r2'), t('table_g1_r2_s'), t('table_g1_r2_p'), t('table_g1_r2_e')],
+                [
+                  t('table_g1_r1'),
+                  quotaCell(PLAN_LIMITS.starter.maxBoats, 'table_g1_r1_s', 'table_g1_r1_e'),
+                  quotaCell(PLAN_LIMITS.pro.maxBoats, 'table_g1_r1_p', 'table_g1_r1_e'),
+                  quotaCell(PLAN_LIMITS.enterprise.maxBoats, 'table_g1_r1_p', 'table_g1_r1_e'),
+                ],
+                [
+                  t('table_g1_r2'),
+                  quotaCell(PLAN_LIMITS.starter.maxMembers, 'table_g1_r2_s', 'table_g1_r2_e'),
+                  quotaCell(PLAN_LIMITS.pro.maxMembers, 'table_g1_r2_p', 'table_g1_r2_e'),
+                  quotaCell(PLAN_LIMITS.enterprise.maxMembers, 'table_g1_r2_p', 'table_g1_r2_e'),
+                ],
                 [t('table_g1_r4'), true, true, true],
-                [t('table_g1_r5'), false, true, true],
-                [t('table_g1_r6'), false, false, true],
-              ] as Array<[string, boolean | string, boolean | string, boolean | string]>,
+                flagRow('table_g1_r6', 'canWhiteLabel'),
+              ] as PricingTableRow[],
             },
             {
               title: t('table_g2'),
@@ -817,40 +886,48 @@ export default class MarketingController {
                 [t('table_g2_r1'), true, true, true],
                 [t('table_g2_r2'), false, true, true],
                 [t('table_g2_r3'), false, true, true],
-                [t('table_g2_r4'), false, true, true],
-                [t('table_g2_r5'), t('table_g2_r5_s'), t('table_g2_r5_pe'), t('table_g2_r5_pe')],
+                flagRow('table_g2_r4', 'canGroupTasks'),
+                [t('table_g2_r5'), true, true, true],
                 [t('table_g2_r6'), false, true, true],
                 [t('table_g2_r7'), false, true, true],
-              ] as Array<[string, boolean | string, boolean | string, boolean | string]>,
+              ] as PricingTableRow[],
             },
             {
               title: t('table_g3'),
               rows: [
-                [t('table_g3_r1'), false, t('table_g3_r1_pe'), t('table_g3_r1_pe')],
                 [t('table_g3_r2'), false, t('table_g3_r2_p'), t('table_g3_r2_e')],
-                [t('table_g3_r3'), false, t('table_g3_r3_p'), t('table_g3_r3_e')],
-                [t('table_g3_r4'), false, true, true],
+                [
+                  t('table_g3_r3'),
+                  auditCell(PLAN_LIMITS.starter.auditLogRetentionDays),
+                  auditCell(PLAN_LIMITS.pro.auditLogRetentionDays),
+                  auditCell(PLAN_LIMITS.enterprise.auditLogRetentionDays),
+                ],
                 [t('table_g3_r5'), true, true, true],
-              ] as Array<[string, boolean | string, boolean | string, boolean | string]>,
+              ] as PricingTableRow[],
             },
             {
               title: t('table_g4'),
               rows: [
-                [t('table_g4_r1'), false, true, true],
-                [t('table_g4_r2'), false, true, true],
-                [t('table_g4_r3'), false, true, true],
-                [t('table_g4_r4'), false, true, true],
-                [t('table_g4_r5'), false, false, true],
+                flagRow('table_g4_r1', 'canUseAI'),
+                flagRow('table_g4_r2', 'canUseAI'),
+                flagRow('table_g4_r3', 'canUseAI'),
+                flagRow('table_g4_r4', 'canUseAI'),
+                flagRow('table_g4_r5', 'canCustomizeAI'),
                 [t('table_g4_r6'), false, t('table_g4_r6_p'), t('table_g4_r6_e')],
-              ] as Array<[string, boolean | string, boolean | string, boolean | string]>,
+              ] as PricingTableRow[],
             },
             {
               title: t('table_g5'),
               rows: [
-                [t('table_g5_r1'), t('table_g5_r1_s'), t('table_g5_r1_p'), t('table_g5_r1_e')],
+                [
+                  t('table_g5_r1'),
+                  quotaCell(PLAN_LIMITS.starter.storageGb, 'table_g5_r1_gb', 'table_g5_r1_e'),
+                  quotaCell(PLAN_LIMITS.pro.storageGb, 'table_g5_r1_gb', 'table_g5_r1_e'),
+                  quotaCell(PLAN_LIMITS.enterprise.storageGb, 'table_g5_r1_gb', 'table_g5_r1_e'),
+                ],
                 [t('table_g5_r3'), false, true, true],
-                [t('table_g5_r4'), true, true, true],
-              ] as Array<[string, boolean | string, boolean | string, boolean | string]>,
+                flagRow('table_g5_r4', 'canExport'),
+              ] as PricingTableRow[],
             },
             {
               title: t('table_g8'),
@@ -861,7 +938,7 @@ export default class MarketingController {
                 [t('table_g8_r4'), false, false, true],
                 [t('table_g8_r5'), false, t('table_g8_r5_p'), t('table_g8_r5_e')],
                 [t('table_g8_r7'), t('table_g8_r7_s'), t('table_g8_r7_p'), t('table_g8_r7_e')],
-              ] as Array<[string, boolean | string, boolean | string, boolean | string]>,
+              ] as PricingTableRow[],
             },
             {
               title: t('table_modules_group'),
@@ -869,7 +946,7 @@ export default class MarketingController {
                 [t('table_modules_pricing'), false, 'addon', true],
                 [t('table_modules_clients'), false, 'addon', true],
                 [t('table_modules_invoices'), false, 'addon', true],
-              ] as Array<[string, boolean | string, boolean | string, boolean | string]>,
+              ] as PricingTableRow[],
             },
           ],
         },
@@ -1164,12 +1241,21 @@ export default class MarketingController {
     }
   }
 
-  private buildGuidePageData(i18n: { t: (key: string) => string }) {
-    const t = (key: string) => i18n.t(`marketing.guide.${key}`)
+  private buildGuidePageData(i18n: {
+    t: (key: string, params?: Record<string, string>) => string
+  }) {
+    const t = (key: string, params?: Record<string, string>) =>
+      i18n.t(`marketing.guide.${key}`, params)
+
+    /**
+     * Le titre SEO porte l'année en cours : recopiée en dur, elle affichait
+     * encore « 2025 » en août 2026 et datait la page dans les SERP (#476).
+     */
+    const currentYear = String(new Date().getFullYear())
 
     return {
       meta: {
-        title: t('meta_title'),
+        title: t('meta_title', { year: currentYear }),
         description: t('meta_description'),
       },
       guide: {
@@ -1320,6 +1406,197 @@ export default class MarketingController {
     }
   }
 
+  /**
+   * CGU (#455) : même gabarit que la politique de confidentialité — les CGU
+   * étaient référencées par le signup sans exister nulle part.
+   */
+  private buildTermsPageData(i18n: { t: (key: string) => string }) {
+    const t = (key: string) => i18n.t(`marketing.terms.${key}`)
+
+    return {
+      meta: {
+        title: t('meta_title'),
+        description: t('meta_description'),
+      },
+      terms: {
+        hero: {
+          eyebrow: t('hero_eyebrow'),
+          title: t('hero_title'),
+          titleHighlight: t('hero_title_highlight'),
+          subtitle: t('hero_subtitle'),
+          updatedLabel: t('updated_label'),
+          updatedDate: t('updated_date'),
+        },
+        sections: [
+          { title: t('s1_title'), body: t('s1_body') },
+          { title: t('s2_title'), body: t('s2_body') },
+          {
+            title: t('s3_title'),
+            body: t('s3_body'),
+            bullets: [t('s3_b1'), t('s3_b2'), t('s3_b3'), t('s3_b4')],
+          },
+          {
+            title: t('s4_title'),
+            body: t('s4_body'),
+            bullets: [t('s4_b1'), t('s4_b2'), t('s4_b3'), t('s4_b4')],
+          },
+          { title: t('s5_title'), body: t('s5_body') },
+          { title: t('s6_title'), body: t('s6_body') },
+          {
+            title: t('s7_title'),
+            body: t('s7_body'),
+            bullets: [t('s7_b1'), t('s7_b2'), t('s7_b3'), t('s7_b4')],
+          },
+          { title: t('s8_title'), body: t('s8_body') },
+          { title: t('s9_title'), body: t('s9_body') },
+          { title: t('s10_title'), body: t('s10_body') },
+          { title: t('s11_title'), body: t('s11_body') },
+          { title: t('s12_title'), body: t('s12_body') },
+        ],
+        contact: {
+          title: t('contact_title'),
+          body: t('contact_body'),
+          email: t('contact_email'),
+        },
+      },
+    }
+  }
+
+  /**
+   * Mentions légales (#466) : le footer n'exposait plus aucun lien légal alors
+   * que la LCEN les impose à un SaaS payant opéré en France. Les libellés
+   * viennent de l'i18n, les valeurs de l'environnement (`config/legal.ts`) —
+   * une valeur absente est rendue « à compléter » plutôt que masquée.
+   */
+  private buildLegalNoticePageData(i18n: { t: (key: string) => string }) {
+    const t = (key: string) => i18n.t(`marketing.legalNotice.${key}`)
+    const pending = t('pending_value')
+    const entry = (labelKey: string, value: string): LegalEntry => ({
+      label: t(labelKey),
+      value: value.trim() || pending,
+    })
+
+    return {
+      meta: {
+        title: t('meta_title'),
+        description: t('meta_description'),
+      },
+      legalNotice: {
+        hero: {
+          eyebrow: t('hero_eyebrow'),
+          title: t('hero_title'),
+          titleHighlight: t('hero_title_highlight'),
+          subtitle: t('hero_subtitle'),
+          updatedLabel: t('updated_label'),
+          updatedDate: t('updated_date'),
+        },
+        sections: [
+          {
+            title: t('s1_title'),
+            body: t('s1_body'),
+            entries: [
+              entry('s1_e1_label', legalEntity.companyName),
+              entry('s1_e2_label', legalEntity.legalForm),
+              entry('s1_e3_label', legalEntity.shareCapital),
+              entry('s1_e4_label', legalEntity.address),
+              entry('s1_e5_label', legalEntity.registrationNumber),
+              entry('s1_e6_label', legalEntity.vatNumber),
+              entry('s1_e7_label', legalEntity.email || SUPPORT_EMAIL),
+              entry('s1_e8_label', legalEntity.phone),
+            ],
+          },
+          {
+            title: t('s2_title'),
+            body: t('s2_body'),
+            entries: [entry('s2_e1_label', legalEntity.publicationDirector)],
+          },
+          {
+            title: t('s3_title'),
+            body: t('s3_body'),
+            entries: [
+              entry('s3_e1_label', legalEntity.hostName),
+              entry('s3_e2_label', legalEntity.hostAddress),
+              entry('s3_e3_label', legalEntity.hostContact),
+            ],
+          },
+          { title: t('s4_title'), body: t('s4_body') },
+          { title: t('s5_title'), body: t('s5_body') },
+          { title: t('s6_title'), body: t('s6_body') },
+          {
+            title: t('s7_title'),
+            body: t('s7_body'),
+            entries: [
+              entry('s7_e1_label', legalEntity.mediatorName),
+              entry('s7_e2_label', legalEntity.mediatorUrl),
+            ],
+          },
+          { title: t('s8_title'), body: t('s8_body') },
+        ],
+        contact: {
+          title: t('contact_title'),
+          body: t('contact_body'),
+          email: t('contact_email'),
+        },
+      },
+    }
+  }
+
+  /**
+   * CGV (#466) : les CGU couvrent l'usage, pas la vente. Un abonnement payant
+   * vendu depuis la France exige ses propres conditions (prix, paiement,
+   * reconduction, rétractation, médiation).
+   */
+  private buildSalesTermsPageData(i18n: { t: (key: string) => string }) {
+    const t = (key: string) => i18n.t(`marketing.salesTerms.${key}`)
+
+    return {
+      meta: {
+        title: t('meta_title'),
+        description: t('meta_description'),
+      },
+      salesTerms: {
+        hero: {
+          eyebrow: t('hero_eyebrow'),
+          title: t('hero_title'),
+          titleHighlight: t('hero_title_highlight'),
+          subtitle: t('hero_subtitle'),
+          updatedLabel: t('updated_label'),
+          updatedDate: t('updated_date'),
+        },
+        sections: [
+          { title: t('s1_title'), body: t('s1_body') },
+          {
+            title: t('s2_title'),
+            body: t('s2_body'),
+            bullets: [t('s2_b1'), t('s2_b2'), t('s2_b3'), t('s2_b4')],
+          },
+          { title: t('s3_title'), body: t('s3_body') },
+          {
+            title: t('s4_title'),
+            body: t('s4_body'),
+            bullets: [t('s4_b1'), t('s4_b2'), t('s4_b3'), t('s4_b4')],
+          },
+          { title: t('s5_title'), body: t('s5_body') },
+          { title: t('s6_title'), body: t('s6_body') },
+          { title: t('s7_title'), body: t('s7_body') },
+          { title: t('s8_title'), body: t('s8_body') },
+          { title: t('s9_title'), body: t('s9_body') },
+          { title: t('s10_title'), body: t('s10_body') },
+          { title: t('s11_title'), body: t('s11_body') },
+          { title: t('s12_title'), body: t('s12_body') },
+          { title: t('s13_title'), body: t('s13_body') },
+          { title: t('s14_title'), body: t('s14_body') },
+          { title: t('s15_title'), body: t('s15_body') },
+        ],
+        contact: {
+          title: t('contact_title'),
+          body: t('contact_body'),
+          email: t('contact_email'),
+        },
+      },
+    }
+  }
+
   private buildContactPageData(i18n: { t: (key: string) => string }) {
     const t = (key: string) => i18n.t(`marketing.contact2.${key}`)
 
@@ -1335,6 +1612,9 @@ export default class MarketingController {
           titleHighlight: t('hero_title_highlight'),
           subtitle: t('hero_subtitle'),
         },
+        // `href` + `kind` : chaque carte est un vrai lien (#450). `anchor` cible
+        // le formulaire plus bas dans la page, `internal` passe par <Link> Inertia,
+        // `external` reste une ancre brute (mailto:).
         channels: [
           {
             icon: t('ch1_icon'),
@@ -1342,6 +1622,8 @@ export default class MarketingController {
             desc: t('ch1_desc'),
             cta: t('ch1_cta'),
             tone: 'navy',
+            href: `#${CONTACT_FORM_ANCHOR}`,
+            kind: 'anchor',
           },
           {
             icon: t('ch2_icon'),
@@ -1349,6 +1631,8 @@ export default class MarketingController {
             desc: t('ch2_desc'),
             cta: t('ch2_cta'),
             tone: 'coral',
+            href: '/signup',
+            kind: 'internal',
           },
           {
             icon: t('ch3_icon'),
@@ -1356,6 +1640,8 @@ export default class MarketingController {
             desc: t('ch3_desc'),
             cta: t('ch3_cta'),
             tone: '',
+            href: `mailto:${SUPPORT_EMAIL}`,
+            kind: 'external',
           },
           {
             icon: t('ch4_icon'),
@@ -1363,35 +1649,61 @@ export default class MarketingController {
             desc: t('ch4_desc'),
             cta: t('ch4_cta'),
             tone: '',
+            href: `mailto:${PRESS_EMAIL}`,
+            kind: 'external',
           },
         ],
         form: {
+          anchorId: CONTACT_FORM_ANCHOR,
+          action: CONTACT_FORM_ACTION,
           eyebrow: t('form_eyebrow'),
           title: t('form_title'),
-          subjects: [
-            t('form_subject1'),
-            t('form_subject2'),
-            t('form_subject3'),
-            t('form_subject4'),
-            t('form_subject5'),
-            t('form_subject6'),
-          ],
+          subjectLabel: t('form_subject_label'),
+          subjects: CONTACT_SUBJECTS.map((value) => ({
+            value,
+            label: t(`form_subject_${value}`),
+          })),
+          fleetSizes: [...CONTACT_FLEET_SIZES],
           firstNameLabel: t('form_first_name'),
+          firstNamePlaceholder: t('form_first_name_placeholder'),
           lastNameLabel: t('form_last_name'),
+          lastNamePlaceholder: t('form_last_name_placeholder'),
           emailLabel: t('form_email'),
+          emailPlaceholder: t('form_email_placeholder'),
           orgLabel: t('form_org'),
+          orgPlaceholder: t('form_org_placeholder'),
           fleetSizeLabel: t('form_fleet_size'),
           messageLabel: t('form_message'),
           messagePlaceholder: t('form_message_placeholder'),
           privacyText: t('form_privacy_text'),
           privacyLinkLabel: t('form_privacy_link'),
           submitLabel: t('form_submit'),
+          sendingLabel: t('form_sending'),
+          successTitle: t('form_success_title'),
+          successBody: t('form_success_body'),
+          successNewLabel: t('form_success_new'),
+          errorGeneric: t('form_error_generic'),
           responseTime: t('form_response_time'),
           otherMeansTitle: t('form_other_means'),
           sidebarContacts: [
-            { icon: t('sidebar_c1_icon'), label: t('sidebar_c1_label'), sub: t('sidebar_c1_sub') },
-            { icon: t('sidebar_c2_icon'), label: t('sidebar_c2_label'), sub: t('sidebar_c2_sub') },
-            { icon: t('sidebar_c3_icon'), label: t('sidebar_c3_label'), sub: t('sidebar_c3_sub') },
+            {
+              icon: t('sidebar_c1_icon'),
+              label: t('sidebar_c1_label'),
+              sub: t('sidebar_c1_sub'),
+              href: `tel:${t('sidebar_c1_label').replace(/\s/g, '')}`,
+            },
+            {
+              icon: t('sidebar_c2_icon'),
+              label: t('sidebar_c2_label'),
+              sub: t('sidebar_c2_sub'),
+              href: `mailto:${t('sidebar_c2_label')}`,
+            },
+            {
+              icon: t('sidebar_c3_icon'),
+              label: t('sidebar_c3_label'),
+              sub: t('sidebar_c3_sub'),
+              href: `mailto:${t('sidebar_c3_label')}`,
+            },
           ],
           ctaTitle: t('sidebar_cta_title'),
           ctaSubtitle: t('sidebar_cta_subtitle'),
@@ -1402,6 +1714,9 @@ export default class MarketingController {
           title: t('offices_title'),
           titleHighlight: t('offices_title_highlight'),
           subtitle: t('offices_subtitle'),
+          addrLabel: t('offices_addr_label'),
+          hoursLabel: t('offices_hours_label'),
+          teamLabel: t('offices_team_label'),
           items: [
             {
               city: t('office1_city'),

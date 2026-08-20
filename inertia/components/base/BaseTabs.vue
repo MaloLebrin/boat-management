@@ -70,7 +70,7 @@ onMounted(() => nextTick(updateIndicator))
         <span>{{ tab.label }}</span>
         <span
           v-if="tab.badge"
-          class="rounded-full bg-navy-100 px-2 py-0.5 text-xs font-semibold text-navy-700 ring-1 ring-navy-200"
+          class="rounded-full bg-brand-soft px-2 py-0.5 text-xs font-semibold text-brand ring-1 ring-border"
         >
           {{ tab.badge }}
         </span>

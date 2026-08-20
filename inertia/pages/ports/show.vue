@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { router } from '@inertiajs/vue3'
+import { Head, router } from '@inertiajs/vue3'
 import { Link } from '@adonisjs/inertia/vue'
 import { ref } from 'vue'
 import { MapPinIcon, PencilIcon, TrashIcon } from '@heroicons/vue/24/outline'
 import BaseButton from '~/components/base/BaseButton.vue'
+import BaseConfirmModal from '~/components/base/BaseConfirmModal.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseTabs from '~/components/base/BaseTabs.vue'
 import MarinaMapTab from '~/components/ports/show/tabs/MarinaMapTab.vue'
@@ -25,21 +26,29 @@ const tabs = [
   { key: 'plan', label: t('ports.tabs.plan') },
 ]
 
+const showDeleteConfirm = ref(false)
+
 function handleDeletePort() {
+  // Un bateau est rattaché à une place, pas au ponton : le ponton n'expose pas
+  // de `boats`. La garde lisait `p.boats.length` — `undefined.length` levait
+  // une TypeError dès qu'un port avait un ponton, et le bouton ne faisait rien.
   const hasBoats =
-    props.port.pontoons.some((p) => p.boats.length > 0) ||
-    props.port.mouillages.some((m) => m.boats.length > 0)
+    props.port.pontoons.some((p) => p.spots.some((s) => s.boat !== null)) ||
+    props.port.mouillages.some((m) => m.spots.some((s) => s.boat !== null))
   if (hasBoats) {
     alert(t('ports.hasBoats'))
     return
   }
-  if (confirm(t('ports.deleteConfirm'))) {
-    router.delete(`/ports/${props.port.id}`)
-  }
+  showDeleteConfirm.value = true
+}
+
+function executeDeletePort() {
+  router.delete(`/ports/${props.port.id}`)
 }
 </script>
 
 <template>
+  <Head :title="port.name" />
   <div class="w-full max-w-5xl px-6 py-10 sm:px-8">
     <!-- Breadcrumb -->
     <nav class="mb-6 flex items-center gap-1.5 text-sm text-fg-muted">
@@ -87,5 +96,15 @@ function handleDeletePort() {
       <PortListTab v-if="activeTab === 'list'" :port="port" :boats="boats" />
       <MarinaMapTab v-if="activeTab === 'plan'" :port="port" :boats="boats" />
     </div>
+
+    <BaseConfirmModal
+      :open="showDeleteConfirm"
+      :title="t('ports.delete')"
+      :message="t('ports.deleteConfirm')"
+      :confirm-label="t('common.delete')"
+      :cancel-label="t('common.cancel')"
+      @update:open="showDeleteConfirm = $event"
+      @confirm="executeDeletePort"
+    />
   </div>
 </template>

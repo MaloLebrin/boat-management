@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import { Link } from '@adonisjs/inertia/vue'
 import { WrenchScrewdriverIcon } from '@heroicons/vue/24/outline'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import { useT } from '~/composables/use_t'
 import type { BoatShowDetail } from '~/types/boat_show'
+import { propulsionLabel } from '~/utils/boat_propulsion_label'
 
 defineProps<{
   boat: BoatShowDetail
@@ -21,9 +23,9 @@ const { t } = useT()
         <template #header>
           <div class="flex items-center justify-between">
             <p class="text-sm font-semibold text-fg">{{ t('boats.specs.identity') }}</p>
-            <a :href="`/boats/${boat.id}/edit`">
+            <Link :href="`/boats/${boat.id}/edit`">
               <BaseButton variant="ghost" size="sm">{{ t('common.edit') }}</BaseButton>
-            </a>
+            </Link>
           </div>
         </template>
         <dl class="grid grid-cols-2 gap-4 text-sm">
@@ -93,7 +95,9 @@ const { t } = useT()
           </div>
           <div>
             <dt class="text-fg-muted">{{ t('boats.hullFields.propulsionType') }}</dt>
-            <dd class="font-semibold text-fg">{{ boat.propulsionType ?? '—' }}</dd>
+            <dd class="font-semibold text-fg">
+              {{ propulsionLabel(t, boat.propulsionType) ?? '—' }}
+            </dd>
           </div>
         </dl>
       </BaseCard>
@@ -201,11 +205,11 @@ const { t } = useT()
           </p>
         </div>
         <div class="mt-4">
-          <a :href="`/boats/${boat.id}/edit`">
+          <Link :href="`/boats/${boat.id}/edit`">
             <BaseButton variant="secondary" size="sm" class="w-full">
               {{ t('boats.show.editBoat') }}
             </BaseButton>
-          </a>
+          </Link>
         </div>
       </BaseCard>
     </div>

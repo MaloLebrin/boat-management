@@ -67,3 +67,17 @@ export class InvitationEmailMismatchError extends Error {
     this.name = 'InvitationEmailMismatchError'
   }
 }
+
+export class BoatOwnerInvitationRequiresBoatsError extends Error {
+  constructor() {
+    super('A boat_owner invitation must specify at least one boat')
+    this.name = 'BoatOwnerInvitationRequiresBoatsError'
+  }
+}
+
+export class InvalidInvitationBoatsError extends Error {
+  constructor() {
+    super('One or more boats do not belong to this organization')
+    this.name = 'InvalidInvitationBoatsError'
+  }
+}

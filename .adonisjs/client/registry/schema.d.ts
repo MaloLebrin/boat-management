@@ -7,6 +7,42 @@ import type { InferInput, SimpleError } from '@vinejs/vine/types'
 export type ParamValue = string | number | bigint | boolean
 
 export interface Registry {
+  'event_stream': {
+    methods: ["GET","HEAD"]
+    pattern: '/__transmit/events'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'subscribe': {
+    methods: ["POST"]
+    pattern: '/__transmit/subscribe'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'unsubscribe': {
+    methods: ["POST"]
+    pattern: '/__transmit/unsubscribe'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
   'dashboard': {
     methods: ["GET","HEAD"]
     pattern: '/dashboard'
@@ -99,8 +135,8 @@ export interface Registry {
       paramsTuple: [ParamValue]
       params: { id: ParamValue }
       query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boats_controller').default['navigation']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boats_controller').default['navigation']>>>
+      response: unknown
+      errorResponse: unknown
     }
   }
   'boats.maintenanceLog.download': {
@@ -293,6 +329,30 @@ export interface Registry {
       query: ExtractQuery<InferInput<(typeof import('#validators/boat_pricing').upsertBoatPricingValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_pricing_controller').default['update']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_pricing_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'boats.owners.store': {
+    methods: ["POST"]
+    pattern: '/boats/:id/owners'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/boat_owner').attachBoatOwnerValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/boat_owner').attachBoatOwnerValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_owners_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_owners_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'boats.owners.destroy': {
+    methods: ["DELETE"]
+    pattern: '/boats/:id/owners/:userId'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { id: ParamValue; userId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_owners_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_owners_controller').default['destroy']>>>
     }
   }
   'boats.assign': {
@@ -1483,6 +1543,30 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/rental_contracts_controller').default['destroy']>>>
     }
   }
+  'owner.boats.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/owner/boats'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_owner_portal_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_owner_portal_controller').default['index']>>>
+    }
+  }
+  'owner.boats.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/owner/boats/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_owner_portal_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_owner_portal_controller').default['show']>>>
+    }
+  }
   'ports.index': {
     methods: ["GET","HEAD"]
     pattern: '/ports'
@@ -1737,7 +1821,7 @@ export interface Registry {
   }
   'marketing.en.pricing': {
     methods: ["GET","HEAD"]
-    pattern: '/en/tarifs'
+    pattern: '/en/pricing'
     types: {
       body: {}
       paramsTuple: []
@@ -1745,6 +1829,18 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['pricing']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['pricing']>>>
+    }
+  }
+  'marketing.en.pricing_legacy': {
+    methods: ["GET","HEAD"]
+    pattern: '/en/tarifs'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
     }
   }
   'marketing.en.simulator': {
@@ -1867,6 +1963,30 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['about']>>>
     }
   }
+  'marketing.en.contact': {
+    methods: ["GET","HEAD"]
+    pattern: '/en/contact'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['contact']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['contact']>>>
+    }
+  }
+  'marketing.fr.contact': {
+    methods: ["GET","HEAD"]
+    pattern: '/fr/contact'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['contact']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['contact']>>>
+    }
+  }
   'marketing.contact': {
     methods: ["GET","HEAD"]
     pattern: '/contact'
@@ -1966,6 +2086,18 @@ export interface Registry {
   'locale.set': {
     methods: ["POST"]
     pattern: '/locale'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'theme.set': {
+    methods: ["POST"]
+    pattern: '/theme'
     types: {
       body: {}
       paramsTuple: []
@@ -2083,6 +2215,30 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/billing_controller').default['removeModule']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'settings.billing.module.enterprise.activate': {
+    methods: ["POST"]
+    pattern: '/settings/billing/module/enterprise'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/billing').moduleActionValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/billing').moduleActionValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/billing_controller').default['activateEnterpriseModule']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/billing_controller').default['activateEnterpriseModule']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'settings.billing.module.enterprise.deactivate': {
+    methods: ["DELETE"]
+    pattern: '/settings/billing/module/enterprise'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/billing').moduleActionValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/billing').moduleActionValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/billing_controller').default['deactivateEnterpriseModule']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/billing_controller').default['deactivateEnterpriseModule']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'settings.billing.addon.set': {
     methods: ["POST"]
     pattern: '/settings/billing/addon'
@@ -2105,6 +2261,42 @@ export interface Registry {
       query: ExtractQuery<InferInput<(typeof import('#validators/user').updateProfileValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateProfile']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateProfile']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'settings.password.update': {
+    methods: ["PUT"]
+    pattern: '/settings/password'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/user').changePasswordValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/user').changePasswordValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['changePassword']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['changePassword']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'settings.locale.update': {
+    methods: ["PUT"]
+    pattern: '/settings/locale'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/user').updateLocaleValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/user').updateLocaleValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateLocale']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateLocale']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'settings.theme.update': {
+    methods: ["PUT"]
+    pattern: '/settings/theme'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/user').updateThemeValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/user').updateThemeValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateTheme']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateTheme']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'settings.org.update': {
@@ -2261,6 +2453,18 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/maintenance_history_controller').default['index']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/maintenance_history_controller').default['index']>>>
+    }
+  }
+  'maintenance.history.pdf': {
+    methods: ["GET","HEAD"]
+    pattern: '/maintenance/history.pdf'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/maintenance_history_pdf_controller').default['download']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/maintenance_history_pdf_controller').default['download']>>>
     }
   }
   'organization.members.index': {
@@ -2909,42 +3113,6 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/invoices_controller').default['destroy']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/invoices_controller').default['destroy']>>>
-    }
-  }
-  'event_stream': {
-    methods: ["GET","HEAD"]
-    pattern: '/__transmit/events'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: unknown
-      errorResponse: unknown
-    }
-  }
-  'subscribe': {
-    methods: ["POST"]
-    pattern: '/__transmit/subscribe'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: unknown
-      errorResponse: unknown
-    }
-  }
-  'unsubscribe': {
-    methods: ["POST"]
-    pattern: '/__transmit/unsubscribe'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: unknown
-      errorResponse: unknown
     }
   }
   'new_account.create': {

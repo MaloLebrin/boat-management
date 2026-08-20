@@ -1,14 +1,18 @@
 <script setup lang="ts">
+import { Link } from '@adonisjs/inertia/vue'
 import { computed, ref } from 'vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import type { MaintenanceEventRow } from '#shared/types/maintenance'
+import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
+import { engineCaptionLabel } from '~/utils/boat_enum_labels'
 
 const props = defineProps<{
   events: MaintenanceEventRow[]
 }>()
 
-const { t, locale } = useT()
+const { t } = useT()
+const { formatMonthYear } = useDateFormat()
 
 const expandedIds = ref<Set<number>>(new Set())
 
@@ -23,10 +27,7 @@ const eventsByMonth = computed(() => {
 })
 
 function formatMonthHeader(yearMonth: string): string {
-  return new Date(yearMonth + '-01').toLocaleDateString(locale.value, {
-    month: 'long',
-    year: 'numeric',
-  })
+  return formatMonthYear(`${yearMonth}-01`)
 }
 
 function getDayNumber(iso: string): string {
@@ -46,7 +47,7 @@ function isExpanded(id: number): boolean {
 }
 
 function getEquipmentCaption(event: MaintenanceEventRow): string | null {
-  return event.engineCaption || event.sailCaption || null
+  return engineCaptionLabel(t, event.engineCaption) || event.sailCaption || null
 }
 
 function getSubjectLink(event: MaintenanceEventRow): string {
@@ -100,14 +101,14 @@ function getSubjectLink(event: MaintenanceEventRow): string {
                 </div>
 
                 <div class="flex items-center gap-3 shrink-0">
-                  <a :href="`/boats/${event.boatId}`" class="inline-flex">
+                  <Link :href="`/boats/${event.boatId}`" class="inline-flex">
                     <BaseBadge variant="neutral">{{ event.boatName }}</BaseBadge>
-                  </a>
-                  <a :href="getSubjectLink(event)" class="inline-flex">
+                  </Link>
+                  <Link :href="getSubjectLink(event)" class="inline-flex">
                     <BaseBadge variant="info">{{
                       t(`maintenance.history.subjects.${event.subject}`)
                     }}</BaseBadge>
-                  </a>
+                  </Link>
                   <span v-if="event.parts.length > 0" class="text-sm text-fg-muted">
                     {{
                       t('maintenance.history.timeline.pieces', {

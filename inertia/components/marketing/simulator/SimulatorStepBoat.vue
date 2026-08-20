@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useT } from '~/composables/use_t'
 import BaseOptionCard from '~/components/base/BaseOptionCard.vue'
+import SimulatorBoatDimensionsFields from '~/components/marketing/simulator/SimulatorBoatDimensionsFields.vue'
 import type { SimulatorBoatInput, SimulatorBoatType } from '../../../../shared/types/simulator'
 
 interface Props {
@@ -32,36 +33,51 @@ const boatTypeOptions: BoatTypeOption[] = [
     value: 'motorboat',
     labelKey: 'simulator.boat_type_motorboat',
     icon: '🚤',
-    selected: 'border-navy-500 bg-navy-50 text-navy-700',
-    unselected: 'border-bone bg-white text-fg hover:border-navy-200 hover:bg-navy-50',
+    selected: 'border-brand bg-brand-soft text-brand',
+    unselected: 'border-bone bg-surface-elevated text-fg hover:border-brand hover:bg-brand-soft',
   },
   {
     value: 'sailboat',
     labelKey: 'simulator.boat_type_sailboat',
     icon: '⛵',
     selected: 'border-coral-500 bg-coral-50 text-coral-700',
-    unselected: 'border-bone bg-white text-fg hover:border-coral-200 hover:bg-coral-50',
+    unselected: 'border-bone bg-surface-elevated text-fg hover:border-coral-200 hover:bg-coral-50',
   },
   {
     value: 'catamaran',
     labelKey: 'simulator.boat_type_catamaran',
     icon: '⛴️',
     selected: 'border-mint-600 bg-mint-50 text-mint-700',
-    unselected: 'border-bone bg-white text-fg hover:border-mint-300 hover:bg-mint-50',
+    unselected: 'border-bone bg-surface-elevated text-fg hover:border-mint-300 hover:bg-mint-50',
   },
   {
     value: 'rib',
     labelKey: 'simulator.boat_type_rib',
     icon: '🛥️',
     selected: 'border-amber-600 bg-amber-50 text-amber-700',
-    unselected: 'border-bone bg-white text-fg hover:border-amber-200 hover:bg-amber-50',
+    unselected: 'border-bone bg-surface-elevated text-fg hover:border-amber-200 hover:bg-amber-50',
   },
 ]
 
 const navCategories = ['A', 'B', 'C', 'D'] as const
 
-function update<K extends keyof SimulatorBoatInput>(key: K, value: SimulatorBoatInput[K]) {
-  emit('update:modelValue', { ...props.modelValue, [key]: value })
+// Local snapshot so plusieurs champs modifiés dans le même tick (autofill
+// navigateur : lengthM + yearBuilt) fusionnent au lieu de s'écraser — props.modelValue
+// ne se met à jour qu'au tick suivant, la lecture directe perdrait le premier champ.
+const local = ref<Partial<SimulatorBoatInput>>({ ...props.modelValue })
+watch(
+  () => props.modelValue,
+  (value) => {
+    local.value = { ...value }
+  }
+)
+
+function update<K extends keyof SimulatorBoatInput>(
+  key: K,
+  value: SimulatorBoatInput[K] | undefined
+) {
+  local.value = { ...local.value, [key]: value }
+  emit('update:modelValue', local.value)
 }
 
 function navCategoryDesc(cat: string): string {
@@ -103,47 +119,23 @@ const canProceed = computed(() => {
           :selected="modelValue.boatType === opt.value"
           :selected-class="opt.selected"
           :unselected-class="opt.unselected"
+          :aria-label="t(opt.labelKey)"
           class="flex flex-col items-center gap-2 px-3 py-4 text-xs font-semibold"
           @click="update('boatType', opt.value)"
         >
-          <span class="text-2xl leading-none">{{ opt.icon }}</span>
+          <span class="text-2xl leading-none" aria-hidden="true">{{ opt.icon }}</span>
           <span class="text-center leading-tight">{{ t(opt.labelKey) }}</span>
         </BaseOptionCard>
       </div>
     </div>
 
     <!-- Length + Year side by side -->
-    <div class="grid grid-cols-2 gap-4">
-      <div>
-        <label for="lengthM" class="mb-2 block text-sm font-semibold text-fg">
-          {{ t('simulator.length_label') }}
-        </label>
-        <input
-          id="lengthM"
-          type="number"
-          min="2"
-          max="30"
-          step="0.1"
-          :value="modelValue.lengthM"
-          class="w-full rounded-lg border border-sand bg-white px-4 py-3 text-fg placeholder:text-fg-subtle focus:border-navy-500 focus:outline-none focus:ring-2 focus:ring-navy-500/15"
-          @input="update('lengthM', Number(($event.target as HTMLInputElement).value))"
-        />
-      </div>
-      <div>
-        <label for="yearBuilt" class="mb-2 block text-sm font-semibold text-fg">
-          {{ t('simulator.year_built_label') }}
-        </label>
-        <input
-          id="yearBuilt"
-          type="number"
-          :min="1950"
-          :max="currentYear"
-          :value="modelValue.yearBuilt"
-          class="w-full rounded-lg border border-sand bg-white px-4 py-3 text-fg placeholder:text-fg-subtle focus:border-navy-500 focus:outline-none focus:ring-2 focus:ring-navy-500/15"
-          @input="update('yearBuilt', Number(($event.target as HTMLInputElement).value))"
-        />
-      </div>
-    </div>
+    <SimulatorBoatDimensionsFields
+      :length-m="modelValue.lengthM"
+      :year-built="modelValue.yearBuilt"
+      @update:length-m="update('lengthM', $event)"
+      @update:year-built="update('yearBuilt', $event)"
+    />
 
     <!-- Navigation category -->
     <div>
@@ -155,15 +147,16 @@ const canProceed = computed(() => {
           v-for="cat in navCategories"
           :key="cat"
           :selected="modelValue.navigationCategory === cat"
-          selected-class="border-navy-500 bg-navy-50"
-          unselected-class="border-bone bg-white hover:border-navy-200 hover:bg-navy-50"
+          selected-class="border-brand bg-brand-soft"
+          unselected-class="border-bone bg-surface-elevated hover:border-brand hover:bg-brand-soft"
+          :aria-label="t(`simulator.nav_category_${cat.toLowerCase()}`)"
           class="p-3 text-left"
           @click="update('navigationCategory', cat)"
         >
           <span
             :class="[
               'block font-display text-xl font-bold',
-              modelValue.navigationCategory === cat ? 'text-navy-700' : 'text-fg',
+              modelValue.navigationCategory === cat ? 'text-brand' : 'text-fg',
             ]"
             >{{ cat }}</span
           >
@@ -177,13 +170,13 @@ const canProceed = computed(() => {
     <!-- Engine checkbox (sailboat/catamaran only) -->
     <div
       v-if="showEngineCheckbox"
-      class="flex items-center gap-3 rounded-xl border border-bone bg-white p-3"
+      class="flex items-center gap-3 rounded-xl border border-bone bg-surface-elevated p-3"
     >
       <input
         id="hasDedicatedEngine"
         type="checkbox"
         :checked="modelValue.hasDedicatedEngine ?? true"
-        class="size-4 rounded border-sand text-navy-700 focus:ring-navy-500"
+        class="size-4 rounded border-border-strong text-brand focus:ring-brand"
         @change="update('hasDedicatedEngine', ($event.target as HTMLInputElement).checked)"
       />
       <label for="hasDedicatedEngine" class="text-sm text-fg">

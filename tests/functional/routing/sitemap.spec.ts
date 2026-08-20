@@ -13,7 +13,7 @@ test.group('Sitemap (functional)', () => {
     const expectedUrls = [
       'https://fleetai.app/en',
       'https://fleetai.app/fr',
-      'https://fleetai.app/en/tarifs',
+      'https://fleetai.app/en/pricing',
       'https://fleetai.app/fr/tarifs',
       'https://fleetai.app/en/maintenance-cost-simulator',
       'https://fleetai.app/fr/simulateur-cout-entretien',
@@ -21,14 +21,17 @@ test.group('Sitemap (functional)', () => {
       'https://fleetai.app/fr/cout-entretien-bateau',
       'https://fleetai.app/en/about',
       'https://fleetai.app/fr/a-propos',
+      'https://fleetai.app/en/contact',
+      'https://fleetai.app/fr/contact',
       'https://fleetai.app/en/privacy',
       'https://fleetai.app/fr/confidentialite',
-      'https://fleetai.app/contact',
-      'https://fleetai.app/design-system',
     ]
     for (const url of expectedUrls) {
       assert.include(xml, `<loc>${url}</loc>`)
     }
+
+    // /design-system est une page interne : jamais exposée au SEO.
+    assert.notInclude(xml, '/design-system')
 
     // Annotations hreflang (indexation multilingue) + x-default.
     assert.include(xml, 'xmlns:xhtml="http://www.w3.org/1999/xhtml"')

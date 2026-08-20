@@ -5,6 +5,7 @@ import { computed, ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseModal from '~/components/base/BaseModal.vue'
 import { useT } from '~/composables/use_t'
+import { engineDisplayTitle } from '~/utils/boat_enum_labels'
 import type { BoatShowEngine } from '~/types/boat_show'
 
 const props = defineProps<{
@@ -23,14 +24,7 @@ const isDragging = ref(false)
 
 const form = useForm({ files: [] as File[], caption: '' })
 
-const engineTitle = computed(() => {
-  if (props.engine.brand && props.engine.model) {
-    return `${props.engine.brand} ${props.engine.model}`
-  }
-  if (props.engine.brand) return props.engine.brand
-  if (props.engine.model) return props.engine.model
-  return props.engine.kind
-})
+const engineTitle = computed(() => engineDisplayTitle(t, props.engine))
 
 function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} o`
@@ -81,7 +75,7 @@ function submit() {
     :open="open"
     :title="t('boats.show.mediaUpload.modalTitle')"
     :subtitle="t('boats.engineShow.documents.modalSubtitle', { name: engineTitle })"
-    close-label="Annuler"
+    :close-label="t('common.close')"
     size="xl"
     @update:open="close"
   >

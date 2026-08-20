@@ -1,11 +1,15 @@
 import Boat from '#models/boat'
+import BoatMaintenanceTask from '#models/boat_maintenance_task'
 import Organization from '#models/organization'
 import OrganizationMembership from '#models/organization_membership'
 import User from '#models/user'
 import UserService from '#services/user_service'
+import type { OrgRole } from '#shared/types/organization'
 import type { PlanTier } from '#shared/types/plan'
+import { splitFullName } from '#shared/helpers/full_name'
 import app from '@adonisjs/core/services/app'
 import { BaseSeeder } from '@adonisjs/lucid/seeders'
+import { DateTime } from 'luxon'
 
 const TEST_PASSWORD = 'Password1!'
 
@@ -26,7 +30,8 @@ async function ensureOwner(
     const result = await userService.signupWithOrganization({
       email,
       password: TEST_PASSWORD,
-      fullName,
+      ...splitFullName(fullName),
+      organizationName: fullName,
     })
     user = result.user
     await result.organization.merge({ plan }).save()
@@ -48,7 +53,7 @@ async function ensureTeamMember(
   email: string,
   fullName: string,
   orgId: number,
-  role: 'admin' | 'member'
+  role: Extract<OrgRole, 'admin' | 'member' | 'mechanic'>
 ): Promise<void> {
   const existing = await User.query().where('email', email).first()
 
@@ -89,26 +94,43 @@ async function ensureBoat(
   }
 }
 
+/**
+ * Creates an open (date-based) maintenance task on a boat if none with that
+ * title exists. `dueAt` is relative to the seed run so the mechanic dashboard
+ * always shows fresh overdue/upcoming interventions.
+ */
+async function ensureOpenTask(
+  boatId: number,
+  title: string,
+  subject: 'boat' | 'engine' | 'sail' | 'rig',
+  dueAt: DateTime
+): Promise<void> {
+  const exists = await BoatMaintenanceTask.query()
+    .where('boatId', boatId)
+    .where('title', title)
+    .first()
+  if (!exists) {
+    await BoatMaintenanceTask.create({
+      boatId,
+      subject,
+      title,
+      status: 'open',
+      dueAt,
+      dueEngineHours: null,
+    })
+  }
+}
+
+/**
+ * Only creates `@test.local` accounts. It must never touch the `ADMIN_EMAIL`
+ * account, which is the app owner's real one (seeded by `malo_seeder.ts`
+ * alone) — guard rail in `tests/integration/seeders/admin_account_isolation.spec.ts`.
+ */
 export default class TestPlansSeeder extends BaseSeeder {
   static environment = ['development', 'test']
 
   async run() {
-    // ─── 1. malolebrin@gmail.com → Enterprise ────────────────────────────────
-    const adminEmail = process.env.ADMIN_EMAIL ?? 'malolebrin@gmail.com'
-    const adminUser = await User.query().where('email', adminEmail).first()
-    if (adminUser?.organizationId) {
-      const adminOrg = await Organization.findOrFail(adminUser.organizationId)
-      if (adminOrg.plan !== 'enterprise') {
-        await adminOrg.merge({ plan: 'enterprise' }).save()
-        console.log(`✓ ${adminEmail} → enterprise`)
-      } else {
-        console.log(`  ${adminEmail} already enterprise`)
-      }
-    } else {
-      console.log(`  ${adminEmail} not found, skipping`)
-    }
-
-    // ─── 2. Starter org ──────────────────────────────────────────────────────
+    // ─── 1. Starter org ──────────────────────────────────────────────────────
     const { org: starterOrg } = await ensureOwner('starter@test.local', 'Alice Starter', 'starter')
     console.log(`✓ starter@test.local (org #${starterOrg.id}, plan=starter)`)
 
@@ -134,13 +156,14 @@ export default class TestPlansSeeder extends BaseSeeder {
     })
     console.log(`  → 2 bateaux (quota max Starter atteint)`)
 
-    // ─── 3. Pro org ──────────────────────────────────────────────────────────
+    // ─── 2. Pro org ──────────────────────────────────────────────────────────
     const { org: proOrg } = await ensureOwner('pro@test.local', 'Bob Pro', 'pro')
     console.log(`✓ pro@test.local (org #${proOrg.id}, plan=pro)`)
 
     await ensureTeamMember('pro-alice@test.local', 'Alice Dupont', proOrg.id, 'member')
     await ensureTeamMember('pro-charlie@test.local', 'Charlie Martin', proOrg.id, 'admin')
-    console.log(`  → 2 membres d'équipe ajoutés`)
+    await ensureTeamMember('pro-mecano@test.local', 'Mallory Mécano', proOrg.id, 'mechanic')
+    console.log(`  → 3 membres d'équipe ajoutés (dont 1 mécanicien)`)
 
     await ensureBoat(proOrg.id, 'Sun Odyssey 35', {
       propulsionType: 'sailboat',
@@ -199,7 +222,27 @@ export default class TestPlansSeeder extends BaseSeeder {
     })
     console.log(`  → 5 bateaux`)
 
-    // ─── 4. Enterprise org ───────────────────────────────────────────────────
+    // Tâches de maintenance pour alimenter le dashboard « Mes interventions »
+    // du mécanicien (une en retard, une à venir).
+    const proBoat = await Boat.query()
+      .where('organizationId', proOrg.id)
+      .orderBy('id', 'asc')
+      .firstOrFail()
+    await ensureOpenTask(
+      proBoat.id,
+      'Vidange moteur (en retard)',
+      'engine',
+      DateTime.now().minus({ days: 8 })
+    )
+    await ensureOpenTask(
+      proBoat.id,
+      'Contrôle du gréement (à venir)',
+      'rig',
+      DateTime.now().plus({ days: 12 })
+    )
+    console.log(`  → 2 interventions de maintenance (1 en retard, 1 à venir)`)
+
+    // ─── 3. Enterprise org ───────────────────────────────────────────────────
     const { org: enterpriseOrg } = await ensureOwner(
       'enterprise@test.local',
       'Carol Enterprise',
@@ -305,8 +348,8 @@ export default class TestPlansSeeder extends BaseSeeder {
     console.log('\n✅ TestPlansSeeder terminé')
     console.log('   Comptes de test (mot de passe : Password1!)')
     console.log('   starter@test.local        → plan Starter, 2 bateaux')
-    console.log('   pro@test.local            → plan Pro, 5 bateaux, 2 membres')
+    console.log('   pro@test.local            → plan Pro, 5 bateaux, 3 membres')
+    console.log('   pro-mecano@test.local     → rôle mécanicien (dashboard « Mes interventions »)')
     console.log('   enterprise@test.local     → plan Enterprise, 8 bateaux, 4 membres')
-    console.log(`   ${adminEmail}  → plan Enterprise`)
   }
 }

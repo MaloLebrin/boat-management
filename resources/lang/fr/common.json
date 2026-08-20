@@ -1,6 +1,7 @@
 {
   "yes": "Oui",
   "no": "Non",
+  "viewPlans": "Voir les offres",
   "cancel": "Annuler",
   "delete": "Supprimer",
   "edit": "Modifier",
@@ -20,12 +21,13 @@
     "neutral": "Normal",
     "success": "Bon",
     "info": "Info",
-    "warning": "Attention"
+    "warning": "Attention",
+    "empty": "Aucune donnée"
   },
   "offline.banner": "Vous êtes hors-ligne — les modifications seront synchronisées à la reconnexion",
   "offline.savedQueue": "Enregistré hors-ligne — sera synchronisé à la reconnexion",
   "offline.syncing": "Synchronisation en cours…",
-  "offline.syncSuccess": "{count} entrée(s) synchronisée(s)",
+  "offline.syncSuccess": "{count, plural, one {# entrée synchronisée} other {# entrées synchronisées}}",
   "offline.syncError": "Erreur de synchronisation — action ignorée",
   "pwa.offlineReady": "Application prête pour une utilisation hors-ligne",
   "pwa.install": "Installer l'application",
@@ -37,7 +39,7 @@
   "offline.conflict.keepServer": "Utiliser la version serveur",
   "offline.conflict.kept": "Vos modifications seront renvoyées au serveur",
   "offline.conflict.discarded": "Modifications locales abandonnées",
-  "offline.queue.title": "{count} action(s) en attente",
+  "offline.queue.title": "{count, plural, one {# action en attente} other {# actions en attente}}",
   "offline.queue.syncNow": "Synchroniser",
   "offline.queue.cancel": "Annuler",
   "offline.queue.cancelled": "Action annulée",
@@ -54,5 +56,16 @@
   "navigationLog.field.arrivalPortName": "Port d'arrivée",
   "navigationLog.field.distanceNm": "Distance (nm)",
   "navigationLog.field.engineHoursEnd": "Heures moteur (fin)",
-  "navigationLog.field.fuelConsumedLiters": "Carburant consommé (L)"
+  "navigationLog.field.fuelConsumedLiters": "Carburant consommé (L)",
+  "theme.label": "Thème",
+  "theme.system": "Thème système",
+  "theme.light": "Thème clair",
+  "theme.dark": "Thème sombre",
+  "formErrors": {
+    "title": "Le formulaire contient des erreurs"
+  },
+  "toasts": {
+    "region": "Notifications",
+    "close": "Fermer la notification"
+  }
 }

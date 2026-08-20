@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { router } from '@inertiajs/vue3'
+import { Head, router } from '@inertiajs/vue3'
 import { computed, onMounted, ref, watch } from 'vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseBreadcrumb from '~/components/base/BaseBreadcrumb.vue'
@@ -16,6 +16,7 @@ import EngineShowTabParts from '~/components/engine/show/tabs/EngineShowTabParts
 import EngineShowTabPhotos from '~/components/engine/show/tabs/EngineShowTabPhotos.vue'
 import EngineShowTabSpecs from '~/components/engine/show/tabs/EngineShowTabSpecs.vue'
 import { useT } from '~/composables/use_t'
+import { engineDisplayTitle, engineFuelLabel } from '~/utils/boat_enum_labels'
 import type { BoatShowEngine, MaintenanceEventRow, MaintenanceTaskRow } from '~/types/boat_show'
 
 const { t } = useT()
@@ -150,14 +151,7 @@ const eventsByYearMonth = computed(() => {
   return groups
 })
 
-const engineTitle = computed(() => {
-  if (props.engine.brand && props.engine.model) {
-    return `${props.engine.brand} ${props.engine.model}`
-  }
-  if (props.engine.brand) return props.engine.brand
-  if (props.engine.model) return props.engine.model
-  return props.engine.kind
-})
+const engineTitle = computed(() => engineDisplayTitle(t, props.engine))
 
 const totalParts = computed(() => {
   return props.maintenanceEvents.reduce((sum, e) => sum + e.parts.length, 0)
@@ -169,10 +163,12 @@ function formatYear(iso: string): string {
 </script>
 
 <template>
+  <Head :title="engineTitle" />
+
   <div class="w-full max-w-7xl px-6 py-10 sm:px-8">
     <BaseBreadcrumb
       :items="[
-        { label: t('boats.show.breadcrumbFleet'), href: '/boats' },
+        { label: t('boats.index.title'), href: '/boats' },
         { label: boat.name, href: `/boats/${boat.id}` },
         {
           label: t('boats.engineShow.breadcrumb.equipment'),
@@ -192,8 +188,8 @@ function formatYear(iso: string): string {
             }}</BaseBadge>
           </div>
           <div class="mt-3 flex flex-wrap gap-x-6 gap-y-1 text-sm text-fg-muted">
-            <p v-if="engine.fuel">{{ engine.fuel }}</p>
-            <p v-if="engine.powerHp">{{ engine.powerHp }} HP</p>
+            <p v-if="engine.fuel">{{ engineFuelLabel(t, engine.fuel) }}</p>
+            <p v-if="engine.powerHp">{{ engine.powerHp }} {{ t('boats.engines.powerUnit') }}</p>
             <p v-if="engine.manufacturedAt">
               {{
                 t('boats.engineShow.installedIn', {

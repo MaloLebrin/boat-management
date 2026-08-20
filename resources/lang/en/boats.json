@@ -9,7 +9,19 @@
     "title": "Edit boat",
     "subtitle": "Update boat details",
     "submit": "Save",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "deleteConfirm": {
+      "title": "Delete this boat?",
+      "message": "This will permanently delete \"{name}\" and all of its history (maintenance, documents, equipment). This action cannot be undone."
+    }
+  },
+  "owners": {
+    "title": "Owners",
+    "empty": "No owner attached to this boat.",
+    "remove": "Remove",
+    "addLabel": "Add an owner",
+    "add": "Add",
+    "noCandidates": "No user with the \"boat owner\" role is available in this organization."
   },
   "hullFields": {
     "name": "Name",
@@ -222,7 +234,7 @@
     "type": "Type",
     "propulsion": "Propulsion",
     "addTask": "Add task",
-    "addEntry": "Add entry",
+    "addEvent": "Add event",
     "budget": "Budget",
     "editBoat": "Edit boat",
     "deleteBoat": "Delete boat",
@@ -239,10 +251,10 @@
       "sheets": "Sheets",
       "adminDocs": "Admin docs"
     },
-    "breadcrumbFleet": "Fleet",
     "nextTasks": "Next tasks",
     "status": {
       "urgent": "Urgent",
+      "dueSoon": "Due soon",
       "upcoming": "Upcoming",
       "ok": "OK"
     },
@@ -268,10 +280,10 @@
       "modalSubtitle": "{name} · Stored on Cloudinary"
     },
     "overview": {
-      "overdueTasks": "{count} overdue task(s)",
+      "overdueTasks": "{count, plural, one {# overdue task} other {# overdue tasks}}",
       "schedule": "Schedule",
       "engineHours": "Engine hours",
-      "engineCount": "{count} engine(s)",
+      "engineCount": "{count, plural, one {# engine} other {# engines}}",
       "lastMaintenance": "Last maintenance",
       "nextTask": "Next task",
       "overdue": "Overdue",
@@ -309,7 +321,8 @@
     },
     "modeSwitch": {
       "management": "Management",
-      "navigation": "Navigation"
+      "navigation": "Navigation",
+      "aria": "Boat view mode"
     },
     "historyTab": {
       "addEvent": "Add event",
@@ -322,7 +335,7 @@
       "filterHull": "Hull",
       "toggleHide": "Hide",
       "toggleShow": "Details",
-      "pieces": "{count} part(s)",
+      "pieces": "{count, plural, one {# part} other {# parts}}",
       "sidebarTitle": "Last 12 months",
       "sidebarEvents": "Events",
       "sidebarParts": "Parts",
@@ -334,6 +347,24 @@
       "soon": "Soon",
       "planned": "Planned",
       "undated": "Undated"
+    },
+    "groups": {
+      "equipment": "Equipment",
+      "maintenance": "Maintenance",
+      "navigation": "Navigation",
+      "documents": "Documents"
+    },
+    "addMenu": {
+      "label": "+ Add",
+      "aria": "Add…",
+      "event": "A maintenance event",
+      "task": "A task",
+      "navigationLog": "A trip",
+      "equipment": "An equipment item"
+    },
+    "moreMenu": {
+      "label": "⋯",
+      "aria": "More actions"
     }
   },
   "specs": {
@@ -389,7 +420,7 @@
     "name": "Name",
     "asc": "Asc",
     "desc": "Desc",
-    "boats": "boats",
+    "boats": "{count, plural, one {boat} other {boats}}",
     "clearFilters": "Clear filters",
     "table": {
       "name": "Name",
@@ -480,7 +511,7 @@
       "dueHours": "{hours} hours",
       "totalEvents": "Total events",
       "totalParts": "Total parts",
-      "parts": "{count} part(s)"
+      "parts": "{count, plural, one {# part} other {# parts}}"
     },
     "notes": {
       "title": "Free notes",
@@ -540,8 +571,8 @@
     "events": {
       "title": "Maintenance history",
       "subtitle": "Work done on the boat, hull, engine, sail, rig, or other equipment.",
-      "empty": "No entries yet.",
-      "addEntry": "Add entry",
+      "empty": "No events yet.",
+      "addEvent": "Add event",
       "label": "Label",
       "subject": "Subject",
       "wholeBoat": "Whole boat",
@@ -565,10 +596,10 @@
       "partQty": "Qty",
       "partNotes": "Notes",
       "removePart": "Remove",
-      "createEntry": "Create entry",
+      "createEvent": "Create event",
       "immutable": "Once saved, this event becomes immutable.",
-      "noRig": "Save a rig on this boat before adding rig entries.",
-      "noSafety": "Save safety equipment on this boat before adding safety entries.",
+      "noRig": "Save a rig on this boat before adding rig events.",
+      "noSafety": "Save safety equipment on this boat before adding safety events.",
       "enginePlaceholder": "e.g. Inboard diesel port",
       "sailPlaceholder": "e.g. Genoa #2",
       "selectPlaceholder": "— Select —",
@@ -576,11 +607,13 @@
     },
     "tasks": {
       "title": "Planned maintenance",
-      "subtitle": "Open tasks (date-based and engine-hour based).",
+      "subtitle": "Add a scheduled maintenance task (date-based or engine-hour based).",
       "empty": "No planned tasks.",
+      "emptyFiltered": "No matching tasks.",
       "addTask": "Add task",
       "modalTitle": "Add task",
-      "done": "Done",
+      "markDone": "Mark done",
+      "delete": "Delete",
       "doneHoursPlaceholder": "Done @ hours",
       "urgent": "Urgent",
       "open": "Open",

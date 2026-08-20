@@ -20,7 +20,6 @@ declare module '@adonisjs/inertia/types' {
     'boats/engine_show': ExtractProps<(typeof import('../../inertia/pages/boats/engine_show.vue'))['default']>
     'boats/generic_equipment_show': ExtractProps<(typeof import('../../inertia/pages/boats/generic_equipment_show.vue'))['default']>
     'boats/index': ExtractProps<(typeof import('../../inertia/pages/boats/index.vue'))['default']>
-    'boats/navigation': ExtractProps<(typeof import('../../inertia/pages/boats/navigation.vue'))['default']>
     'boats/new': ExtractProps<(typeof import('../../inertia/pages/boats/new.vue'))['default']>
     'boats/reservation_contract': ExtractProps<(typeof import('../../inertia/pages/boats/reservation_contract.vue'))['default']>
     'boats/reservation_inspection': ExtractProps<(typeof import('../../inertia/pages/boats/reservation_inspection.vue'))['default']>
@@ -35,7 +34,9 @@ declare module '@adonisjs/inertia/types' {
     'clients/index': ExtractProps<(typeof import('../../inertia/pages/clients/index.vue'))['default']>
     'clients/show': ExtractProps<(typeof import('../../inertia/pages/clients/show.vue'))['default']>
     'dashboard': ExtractProps<(typeof import('../../inertia/pages/dashboard.vue'))['default']>
+    'dashboard/mechanic': ExtractProps<(typeof import('../../inertia/pages/dashboard/mechanic.vue'))['default']>
     'design_system': ExtractProps<(typeof import('../../inertia/pages/design_system.vue'))['default']>
+    'errors/forbidden': ExtractProps<(typeof import('../../inertia/pages/errors/forbidden.vue'))['default']>
     'errors/not_found': ExtractProps<(typeof import('../../inertia/pages/errors/not_found.vue'))['default']>
     'errors/server_error': ExtractProps<(typeof import('../../inertia/pages/errors/server_error.vue'))['default']>
     'home': ExtractProps<(typeof import('../../inertia/pages/home.vue'))['default']>
@@ -48,16 +49,21 @@ declare module '@adonisjs/inertia/types' {
     'marketing/contact': ExtractProps<(typeof import('../../inertia/pages/marketing/contact.vue'))['default']>
     'marketing/guide': ExtractProps<(typeof import('../../inertia/pages/marketing/guide.vue'))['default']>
     'marketing/home': ExtractProps<(typeof import('../../inertia/pages/marketing/home.vue'))['default']>
+    'marketing/legal_notice': ExtractProps<(typeof import('../../inertia/pages/marketing/legal_notice.vue'))['default']>
     'marketing/pricing': ExtractProps<(typeof import('../../inertia/pages/marketing/pricing.vue'))['default']>
     'marketing/privacy': ExtractProps<(typeof import('../../inertia/pages/marketing/privacy.vue'))['default']>
+    'marketing/sales_terms': ExtractProps<(typeof import('../../inertia/pages/marketing/sales_terms.vue'))['default']>
     'marketing/simulator_share': ExtractProps<(typeof import('../../inertia/pages/marketing/simulator_share.vue'))['default']>
     'marketing/simulator': ExtractProps<(typeof import('../../inertia/pages/marketing/simulator.vue'))['default']>
+    'marketing/terms': ExtractProps<(typeof import('../../inertia/pages/marketing/terms.vue'))['default']>
     'navigation/fuel': ExtractProps<(typeof import('../../inertia/pages/navigation/fuel.vue'))['default']>
     'navigation/incidents': ExtractProps<(typeof import('../../inertia/pages/navigation/incidents.vue'))['default']>
     'navigation/logbook': ExtractProps<(typeof import('../../inertia/pages/navigation/logbook.vue'))['default']>
     'notifications/index': ExtractProps<(typeof import('../../inertia/pages/notifications/index.vue'))['default']>
     'organization/crew': ExtractProps<(typeof import('../../inertia/pages/organization/crew.vue'))['default']>
     'organization/members': ExtractProps<(typeof import('../../inertia/pages/organization/members.vue'))['default']>
+    'owner/boats/index': ExtractProps<(typeof import('../../inertia/pages/owner/boats/index.vue'))['default']>
+    'owner/boats/show': ExtractProps<(typeof import('../../inertia/pages/owner/boats/show.vue'))['default']>
     'planning/index': ExtractProps<(typeof import('../../inertia/pages/planning/index.vue'))['default']>
     'ports/edit': ExtractProps<(typeof import('../../inertia/pages/ports/edit.vue'))['default']>
     'ports/index': ExtractProps<(typeof import('../../inertia/pages/ports/index.vue'))['default']>

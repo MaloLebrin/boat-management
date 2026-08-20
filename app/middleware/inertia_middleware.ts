@@ -13,11 +13,14 @@ import {
 import type { BrandingSharedProps } from '#shared/types/branding'
 import type { NotificationsSharedProps } from '#shared/types/notification'
 import type { PermissionsSharedProps } from '#shared/types/permissions'
+import { DEFAULT_THEME_PREFERENCE, isThemePreference } from '#shared/types/theme'
+import type { ThemePreference } from '#shared/types/theme'
 import { BrandingService } from '#services/branding_service'
 import NotificationService from '#services/notification_service'
 import OrganizationModuleService from '#services/organization_module_service'
 import PermissionService from '#services/permission_service'
 import { DEMO_SESSION_DURATION_MS } from '#shared/constants/demo'
+import DemoService from '#services/demo_service'
 import type User from '#models/user'
 
 export async function resolveSharedCurrentPlan(
@@ -29,6 +32,23 @@ export async function resolveSharedCurrentPlan(
   // exists) — mirror the same guard resolveSharedBranding already has below,
   // instead of assuming the relation always resolved.
   return user.organization?.plan
+}
+
+/**
+ * Cascade de résolution du thème (#416), calquée sur celle de la locale dans
+ * `detect_user_locale_middleware` : profil > cookie > défaut `system`.
+ *
+ * `system` est renvoyé tel quel — la résolution vers `light`/`dark` a lieu côté
+ * client (`prefers-color-scheme`), le serveur ne peut pas la connaître.
+ */
+export function resolveSharedTheme(ctx: Partial<HttpContext>): ThemePreference {
+  const userTheme = ctx.auth?.user?.theme
+  if (isThemePreference(userTheme)) return userTheme
+
+  const cookieTheme = ctx.request?.cookie('theme')
+  if (isThemePreference(cookieTheme)) return cookieTheme
+
+  return DEFAULT_THEME_PREFERENCE
 }
 
 export async function resolveSharedBranding(
@@ -47,7 +67,8 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
     private brandingService: BrandingService,
     private notificationService: NotificationService,
     private organizationModuleService: OrganizationModuleService,
-    private permissionService: PermissionService
+    private permissionService: PermissionService,
+    private demoService: DemoService
   ) {
     super()
   }
@@ -64,10 +85,21 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
     const { session, auth, i18n } = ctx as Partial<HttpContext>
 
     const error = session?.flashMessages.get('error') as string
+    // Cible facultative d'un CTA sur le toast d'erreur (upsell quota, issue #418).
+    const errorAction = session?.flashMessages.get('errorAction') as string | undefined
     const success = session?.flashMessages.get('success') as string
     const info = session?.flashMessages.get('info') as string
 
-    const demoSessionStartedAt = session?.get('demoSessionStartedAt') as number | undefined
+    // #451 — la clé de session posée par `/demo` survivait au logout et suivait le
+    // navigateur d'un compte à l'autre : la bannière « Session démo » s'affichait
+    // sur des comptes réels. La clé n'est donc partagée que si l'utilisateur
+    // authentifié est bien le compte démo — la purge côté session reste faite au
+    // logout (`SessionController.destroy`), ceci en est le garde-fou.
+    const storedDemoSessionStartedAt = session?.get('demoSessionStartedAt') as number | undefined
+    const demoSessionStartedAt =
+      auth?.user && this.demoService.isDemoUser(auth.user.email)
+        ? storedDemoSessionStartedAt
+        : undefined
 
     const BACKEND_NAMESPACES = new Set(['flash', 'marketing', 'validator'])
 
@@ -94,6 +126,7 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
     return {
       errors: ctx.inertia.always(this.getValidationErrors(ctx)),
       locale: ctx.inertia.always(i18n?.locale ?? 'en'),
+      theme: ctx.inertia.always(resolveSharedTheme(ctx)),
       appT: ctx.inertia.always(
         Object.fromEntries(
           Object.entries(i18n?.localeTranslations ?? {}).filter(
@@ -104,6 +137,7 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
       path: ctx.inertia.always(ctx.request.url().split('?')[0]),
       flash: ctx.inertia.always({
         error,
+        errorAction,
         success,
         info,
       }),

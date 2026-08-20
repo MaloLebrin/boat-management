@@ -14,3 +14,8 @@ export const aiThrottle = limiter.define('ai', (ctx) => {
 export const demoThrottle = limiter.define('demo', (ctx) => {
   return limiter.allowRequests(5).every('1 minute').usingKey(`demo_${ctx.request.ip()}`)
 })
+
+// Formulaire de contact public (#450) : borne les envois pour éviter le spam.
+export const contactThrottle = limiter.define('contact', (ctx) => {
+  return limiter.allowRequests(5).every('10 minutes').usingKey(`contact_${ctx.request.ip()}`)
+})

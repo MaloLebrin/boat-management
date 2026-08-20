@@ -5,10 +5,19 @@ import Subscription from '#models/subscription'
 import { column, hasMany, hasOne } from '@adonisjs/lucid/orm'
 import type { HasMany, HasOne } from '@adonisjs/lucid/types/relations'
 import type { PlanTier } from '#shared/types/plan'
+import type { FleetSize, OrganizationType } from '#shared/types/organization'
 
 export default class Organization extends OrganizationSchema {
   @column()
   declare plan: PlanTier
+
+  // Business profile declared at signup (#448) — narrowed from the generated
+  // `string | null` columns.
+  @column()
+  declare type: OrganizationType | null
+
+  @column()
+  declare fleetSize: FleetSize | null
 
   // PostgreSQL returns bigInteger columns as strings; cast to number on read
   @column({ consume: (v: unknown) => Number(v) })

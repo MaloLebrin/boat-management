@@ -1,4 +1,7 @@
 {
+  "E_INVALID_CREDENTIALS": "E-mail ou mot de passe incorrect.",
+  "E_UNAUTHORIZED_ACCESS": "Veuillez vous connecter pour accéder à cette page.",
+  "backHome": "Retour à l'accueil",
   "notFound": {
     "title": "Page introuvable",
     "description": "La page que vous cherchez n'existe pas ou a été déplacée.",
@@ -7,6 +10,11 @@
   "serverError": {
     "title": "Une erreur est survenue",
     "description": "Une erreur inattendue s'est produite. Veuillez réessayer ou contacter le support.",
+    "action": "Retour au tableau de bord"
+  },
+  "forbidden": {
+    "title": "Accès refusé",
+    "description": "Vous n'avez pas la permission d'accéder à cette page.",
     "action": "Retour au tableau de bord"
   }
 }

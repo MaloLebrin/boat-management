@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Link } from '@adonisjs/inertia/vue'
 import { ref, computed } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import { useScrollReveal } from '~/composables/use_scroll_reveal'
@@ -64,7 +65,7 @@ const { el: sectionEl, isVisible } = useScrollReveal()
           :class="
             activeKey === item.key
               ? 'bg-navy-900 text-white'
-              : 'bg-white text-fg-muted hover:bg-paper hover:text-fg'
+              : 'bg-surface-elevated text-fg-muted hover:bg-paper hover:text-fg'
           "
           @click="setActive(item.key)"
         >
@@ -73,12 +74,12 @@ const { el: sectionEl, isVisible } = useScrollReveal()
       </div>
 
       <!-- Content card -->
-      <div class="overflow-hidden rounded-2xl border border-bone bg-white shadow-sm">
+      <div class="overflow-hidden rounded-2xl border border-bone bg-surface-elevated shadow-sm">
         <div class="grid lg:grid-cols-2">
           <!-- Left: details -->
           <div class="p-8 lg:p-10">
             <div
-              class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-navy-100 text-2xl"
+              class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-soft text-2xl"
             >
               {{ activeItem.icon }}
             </div>
@@ -104,9 +105,9 @@ const { el: sectionEl, isVisible } = useScrollReveal()
               </li>
             </ul>
 
-            <a href="/signup">
+            <Link href="/signup">
               <BaseButton>{{ ctaLabel }}</BaseButton>
-            </a>
+            </Link>
           </div>
 
           <!-- Right: quote + stat -->
@@ -127,7 +128,7 @@ const { el: sectionEl, isVisible } = useScrollReveal()
 
             <!-- Stat -->
             <div>
-              <p class="font-display text-5xl text-navy-700">{{ activeItem.stat.value }}</p>
+              <p class="font-display text-5xl text-brand">{{ activeItem.stat.value }}</p>
               <p class="mt-1 text-sm text-fg-muted">{{ activeItem.stat.label }}</p>
             </div>
           </div>

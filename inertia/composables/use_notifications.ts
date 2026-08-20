@@ -71,6 +71,11 @@ export function useNotifications() {
   )
 
   onMounted(async () => {
+    // Sous automation (Playwright), ne pas ouvrir de flux SSE persistant : une
+    // connexion EventSource ouverte empêche `networkidle` de se stabiliser et
+    // fait expirer les tests e2e. Le badge reste alimenté par les shared props.
+    if (typeof navigator !== 'undefined' && navigator.webdriver) return
+
     const user = (page.props as Record<string, unknown>).user as { id: number } | undefined
     if (!user?.id || subscribedUserId === user.id || isSubscribing) return
 

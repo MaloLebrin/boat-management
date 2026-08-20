@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { router, usePage } from '@inertiajs/vue3'
+import { Head, router, usePage } from '@inertiajs/vue3'
 import BaseAlert from '~/components/base/BaseAlert.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
@@ -37,6 +37,7 @@ function deleteCertification(memberId: number, certId: number) {
 </script>
 
 <template>
+  <Head :title="t('crew.title')" />
   <div class="mx-auto w-full max-w-4xl px-6 py-10 sm:px-8">
     <div class="mb-8 flex items-center justify-between">
       <BaseHeading level="1">{{ t('crew.title') }}</BaseHeading>

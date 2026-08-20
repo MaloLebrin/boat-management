@@ -2,6 +2,7 @@
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import { useT } from '~/composables/use_t'
+import { engineFuelLabel, engineKindLabel } from '~/utils/boat_enum_labels'
 import type { BoatShowEngine, MaintenanceTaskRow } from '~/types/boat_show'
 
 const { t } = useT()
@@ -58,15 +59,17 @@ function formatYear(iso: string): string {
         <dl class="grid grid-cols-2 gap-4 text-sm">
           <div>
             <dt class="text-fg-muted">{{ t('boats.engineShow.specs.power') }}</dt>
-            <dd class="font-medium text-fg">{{ engine.powerHp ? `${engine.powerHp} HP` : '-' }}</dd>
+            <dd class="font-medium text-fg">
+              {{ engine.powerHp ? `${engine.powerHp} ${t('boats.engines.powerUnit')}` : '-' }}
+            </dd>
           </div>
           <div>
             <dt class="text-fg-muted">{{ t('boats.engineShow.specs.fuel') }}</dt>
-            <dd class="font-medium text-fg">{{ engine.fuel ?? '-' }}</dd>
+            <dd class="font-medium text-fg">{{ engineFuelLabel(t, engine.fuel) ?? '-' }}</dd>
           </div>
           <div>
             <dt class="text-fg-muted">{{ t('boats.engineShow.specs.type') }}</dt>
-            <dd class="font-medium text-fg">{{ engine.kind }}</dd>
+            <dd class="font-medium text-fg">{{ engineKindLabel(t, engine.kind) }}</dd>
           </div>
           <div v-if="engine.strokeType">
             <dt class="text-fg-muted">{{ t('boats.engineShow.specs.strokeType') }}</dt>

@@ -4,8 +4,11 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import SettingsBillingUsageGauge from '~/components/settings/SettingsBillingUsageGauge.vue'
+import SettingsBillingFeatureList from '~/components/settings/SettingsBillingFeatureList.vue'
 import SettingsBillingModules from '~/components/settings/SettingsBillingModules.vue'
 import SettingsBillingExtraBoats from '~/components/settings/SettingsBillingExtraBoats.vue'
+import SettingsBillingSubscriptionNotice from '~/components/settings/SettingsBillingSubscriptionNotice.vue'
+import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import type {
   ActiveAddonInfo,
@@ -21,8 +24,12 @@ import type {
 import { getUpgradeTier } from '../../../../shared/types/plan'
 import { computed, ref } from 'vue'
 import { useForm } from '@inertiajs/vue3'
+import { usePermissions } from '~/composables/use_permissions'
 
 const { t } = useT()
+const { formatDateLong } = useDateFormat()
+const { can } = usePermissions()
+const canManageBilling = computed(() => can('subscription.manage'))
 
 const props = defineProps<{
   plan: PlanTier
@@ -48,14 +55,6 @@ function openPortal() {
   portalForm.post('/settings/billing/portal')
 }
 
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString(undefined, {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  })
-}
-
 const statusVariant = computed((): 'success' | 'warning' | 'neutral' => {
   const s = props.subscription?.status as SubscriptionStatus | undefined
   if (s === 'active' || s === 'trialing') return 'success'
@@ -75,7 +74,7 @@ const storageOverflow = computed(() => {
     <div class="space-y-6">
       <div
         v-if="storageOverflow"
-        class="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800"
+        class="rounded-lg border border-coral-200 bg-danger-soft p-4 text-sm text-danger-strong"
       >
         {{ t('settings.billing.storageOverflow') }}
       </div>
@@ -100,11 +99,11 @@ const storageOverflow = computed(() => {
 
         <div class="space-y-5">
           <!-- Subscription info -->
-          <div v-if="subscription" class="rounded-lg bg-surface-2 p-3 text-sm space-y-1">
+          <div v-if="subscription" class="rounded-lg bg-surface-muted p-3 text-sm space-y-1">
             <p v-if="!subscription.cancelAtPeriodEnd" class="text-fg-muted">
               {{
                 t('settings.billing.subscription.renewsOn', {
-                  date: formatDate(subscription.currentPeriodEnd),
+                  date: formatDateLong(subscription.currentPeriodEnd),
                 })
               }}
               &mdash;
@@ -112,7 +111,7 @@ const storageOverflow = computed(() => {
             </p>
             <p v-else class="text-amber-600 font-medium">
               {{ t('settings.billing.subscription.cancelAtPeriodEnd') }}
-              {{ formatDate(subscription.currentPeriodEnd) }}
+              {{ formatDateLong(subscription.currentPeriodEnd) }}
             </p>
           </div>
 
@@ -147,30 +146,7 @@ const storageOverflow = computed(() => {
           />
 
           <!-- Features -->
-          <ul class="space-y-2 text-sm">
-            <li
-              class="flex items-center gap-2"
-              :class="quotaUsage.canUseAI ? 'text-fg' : 'text-fg-muted'"
-            >
-              <span :class="quotaUsage.canUseAI ? 'text-green-600' : 'text-fg-muted'">
-                {{ quotaUsage.canUseAI ? '✓' : '✗' }}
-              </span>
-              {{ t('settings.billing.features.ai') }}
-            </li>
-            <li
-              class="flex items-center gap-2"
-              :class="quotaUsage.canExport ? 'text-fg' : 'text-fg-muted'"
-            >
-              <span :class="quotaUsage.canExport ? 'text-green-600' : 'text-fg-muted'">
-                {{ quotaUsage.canExport ? '✓' : '✗' }}
-              </span>
-              {{ t('settings.billing.features.export') }}
-            </li>
-            <li class="flex items-center gap-2 text-fg">
-              <span class="text-green-600">✓</span>
-              {{ t('settings.billing.features.maintenanceHistory') }}
-            </li>
-          </ul>
+          <SettingsBillingFeatureList :plan="plan" :quota-usage="quotaUsage" />
         </div>
 
         <template #footer>
@@ -195,7 +171,7 @@ const storageOverflow = computed(() => {
                 :class="
                   interval === 'month'
                     ? 'bg-brand text-white'
-                    : 'bg-surface-2 text-fg-muted hover:text-fg'
+                    : 'bg-surface-muted text-fg-muted hover:text-fg'
                 "
                 @click="interval = 'month'"
               >
@@ -207,12 +183,12 @@ const storageOverflow = computed(() => {
                 :class="
                   interval === 'year'
                     ? 'bg-brand text-white'
-                    : 'bg-surface-2 text-fg-muted hover:text-fg'
+                    : 'bg-surface-muted text-fg-muted hover:text-fg'
                 "
                 @click="interval = 'year'"
               >
                 {{ t('settings.billing.subscription.interval.year') }}
-                <span class="rounded bg-green-100 px-1 text-xs font-semibold text-green-700">
+                <span class="rounded bg-mint-100 px-1 text-xs font-semibold text-success">
                   {{ t('settings.billing.subscription.annualDiscount') }}
                 </span>
               </button>
@@ -228,16 +204,30 @@ const storageOverflow = computed(() => {
         </template>
       </BaseCard>
 
+      <!-- Plan Pro en base mais aucun abonnement Stripe actif (#456) : sans ce
+           rappel, les cartes ci-dessous parlent d'« activer l'abonnement Pro »
+           à quelqu'un qui se sait déjà Pro. -->
+      <SettingsBillingSubscriptionNotice
+        v-if="plan === 'pro' && subscription === null"
+        :plan="plan"
+        :can-manage-billing="canManageBilling"
+        @activate-subscription="startCheckout('pro')"
+      />
+
       <SettingsBillingModules
         :plan="plan"
         :subscription="subscription"
         :active-modules="orgModules"
+        :can-manage-billing="canManageBilling"
+        @activate-subscription="startCheckout('pro')"
       />
 
       <SettingsBillingExtraBoats
         :plan="plan"
         :subscription="subscription"
         :active-addons="orgAddons"
+        :can-manage-billing="canManageBilling"
+        @activate-subscription="startCheckout('pro')"
       />
     </div>
   </div>

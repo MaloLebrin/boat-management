@@ -9,12 +9,14 @@ import EmailQueueService from '#services/email_queue_service'
 import BoatReservationService from '#services/boat_reservation_service'
 import QuotaService from '#services/quota_service'
 import { QuotaExceededError } from '#exceptions/quota_errors'
+import { UserNotInOrganizationError } from '#exceptions/organization_errors'
 import InvoicePolicy from '#policies/invoice_policy'
 import { createInvoiceValidator, updateInvoiceValidator } from '#validators/invoice'
 import { toInvoiceDetail } from '#transformers/invoice_transformer'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import type Organization from '#models/organization'
+import { BILLING_SETTINGS_PATH } from '#shared/constants/billing'
 
 @inject()
 export default class InvoicesController {
@@ -41,7 +43,7 @@ export default class InvoicesController {
     } catch (error) {
       if (error instanceof QuotaExceededError) {
         session.flash('error', i18n.t('flash.quota.invoicesExceeded'))
-        response.redirect('/')
+        response.redirect(BILLING_SETTINGS_PATH)
         return null
       }
       throw error
@@ -68,16 +70,17 @@ export default class InvoicesController {
     await user.load('organization')
     const org = user.organization
 
+    // Utilisateur sans organisation (#279) : ce n'est pas un défaut de module —
+    // l'envoyer sur `/settings/billing` y ferait planter `PLAN_LIMITS[org.plan]`.
+    // Le handler global le renvoie à l'accueil avec le bon message.
     if (org === null) {
-      session.flash('error', i18n.t('flash.quota.invoicesExceeded'))
-      response.redirect('/')
-      return null
+      throw new UserNotInOrganizationError()
     }
 
     const canManage = await this.quotaService.canManageInvoices(org)
     if (!canManage && !(await this.invoiceService.hasAnyForOrg(org.id))) {
       session.flash('error', i18n.t('flash.quota.invoicesExceeded'))
-      response.redirect('/')
+      response.redirect(BILLING_SETTINGS_PATH)
       return null
     }
 
@@ -90,7 +93,7 @@ export default class InvoicesController {
     if (!loaded) return
     const { org, canManage: moduleActive } = loaded
 
-    await bouncer.with(InvoicePolicy).authorize('create')
+    await bouncer.with(InvoicePolicy).authorize('view')
 
     const filters = this.invoiceService.normalizeFilters(request.qs())
     const invoices = await this.invoiceService.search(org, filters)
@@ -112,10 +115,9 @@ export default class InvoicesController {
     if (!loaded) return
     const { org, canManage: moduleActive } = loaded
 
-    await bouncer.with(InvoicePolicy).authorize('create')
-
     try {
       const invoice = await this.invoiceService.getForOrganizationOrFail(org, Number(params.id))
+      await bouncer.with(InvoicePolicy).authorize('view', invoice)
       const links = await this.invoiceService.getLinks(invoice)
       const canDelete = moduleActive && (await bouncer.with(InvoicePolicy).allows('delete'))
       return inertia.render('invoices/show', {
@@ -236,8 +238,6 @@ export default class InvoicesController {
     if (!loaded) return
     const { org } = loaded
 
-    await bouncer.with(InvoicePolicy).authorize('create')
-
     let invoice
     try {
       invoice = await this.invoiceService.getForOrganizationOrFail(org, Number(params.id))
@@ -248,6 +248,8 @@ export default class InvoicesController {
       }
       throw error
     }
+
+    await bouncer.with(InvoicePolicy).authorize('view', invoice)
 
     const { buffer, filename } = await this.pdfService.generate(invoice, org, i18n)
 

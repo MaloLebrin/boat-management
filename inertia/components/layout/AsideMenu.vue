@@ -5,7 +5,10 @@ import { computed } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import Logo from '~/components/Logo.vue'
 import LanguageSwitcher from '~/components/layout/LanguageSwitcher.vue'
+import ThemeSwitcher from '~/components/layout/ThemeSwitcher.vue'
 import NavItem from '~/components/layout/NavItem.vue'
+import NavScrollArea from '~/components/layout/NavScrollArea.vue'
+import NotificationBell from '~/components/layout/NotificationBell.vue'
 import { useNavSections } from '~/composables/use_nav_sections'
 import { usePwaInstall } from '~/composables/use_pwa_install'
 import { useT } from '~/composables/use_t'
@@ -24,7 +27,7 @@ const props = defineProps<{
 
 const page = usePage()
 const { t } = useT()
-const { navSections } = useNavSections()
+const { navSections, settingsItem } = useNavSections()
 const { canInstall, promptInstall } = usePwaInstall()
 
 const currentPath = computed(() => props.currentRoute ?? page.url)
@@ -41,12 +44,13 @@ function isActive(path: string): boolean {
 <template>
   <aside class="hidden lg:flex flex-col w-64 h-full bg-navy-900 text-white">
     <!-- Logo -->
-    <div class="px-5 py-6 border-b border-navy-700">
+    <div class="flex items-center justify-between gap-2 px-5 py-6 border-b border-navy-700">
       <Logo />
+      <NotificationBell align="left" tone="onDark" />
     </div>
 
     <!-- Navigation -->
-    <nav class="flex-1 overflow-y-auto px-3 py-4">
+    <NavScrollArea>
       <div v-for="section in navSections" :key="section.label" class="mb-6">
         <p class="px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-navy-300">
           {{ section.label }}
@@ -63,12 +67,22 @@ function isActive(path: string): boolean {
           </li>
         </ul>
       </div>
-    </nav>
+    </NavScrollArea>
 
-    <!-- User info + Logout -->
-    <div class="mt-auto border-t border-navy-700 px-4 py-4">
+    <!-- Settings (pinned) + User info + Logout -->
+    <div class="mt-auto shrink-0 border-t border-navy-700 px-4 py-4">
+      <div class="mb-3">
+        <NavItem
+          :name="settingsItem.name"
+          :path="settingsItem.path"
+          :route="settingsItem.route"
+          :icon="settingsItem.icon"
+          :is-active="isActive(settingsItem.path)"
+        />
+      </div>
       <div class="flex items-center justify-between mb-3 px-0">
         <LanguageSwitcher />
+        <ThemeSwitcher tone="onDark" />
       </div>
       <div class="flex items-center gap-3 mb-3">
         <div
@@ -99,7 +113,7 @@ function isActive(path: string): boolean {
             d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
           />
         </svg>
-        <span>{{ t('pwa.install') }}</span>
+        <span>{{ t('common.pwa.install') }}</span>
       </BaseButton>
       <Form route="session.destroy">
         <button

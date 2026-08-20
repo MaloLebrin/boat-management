@@ -18,11 +18,14 @@ Cette documentation décrit **fonctionnellement** et **techniquement** le projet
   - `docs/domain/reservations-and-pricing.md` — réservations + tarification (tarif de base, saisons, calcul auto du total)
   - `docs/domain/invoicing.md` — facturation (devis & factures, numérotation, PDF/email, statuts, devis depuis réservation — Enterprise)
   - `docs/domain/clients.md` — CRM clients + lien réservation ↔ client (historique, blocage blacklist — Enterprise)
+  - `docs/domain/notifications.md` — notifications par utilisateur (cloche + page, temps réel SSE via Transmit, events → listeners)
+  - `docs/domain/contact.md` — formulaire de contact public (`POST /contact`, throttle, persistance, notification équipe + accusé de réception)
 - **Données**: `docs/data/schema.md`
 - **Frontend (Inertia/Vue)**:
   - `docs/frontend/ui-map.md`
   - `docs/frontend/i18n.md` — internationalisation, `useT()`, ajouter une langue
 - **Tests**: `docs/dev/testing.md`
+- **Seeders**: `docs/dev/seeders.md`
 - **Contribution**: `docs/dev/contributing.md`
 - **Process “doc à jour”**: `docs/process/keeping-docs-up-to-date.md`
 

@@ -1,6 +1,7 @@
 import { test } from '@japa/runner'
 import testUtils from '@adonisjs/core/services/test_utils'
 import { BoatEngineFactory } from '#database/factories/boat_engine_factory'
+import { BoatRigFactory } from '#database/factories/boat_rig_factory'
 import { BoatSailFactory } from '#database/factories/boat_sail_factory'
 import { createAdminUser, createBoatForUser } from '#tests/browser/helpers'
 
@@ -40,6 +41,13 @@ test.group('E2E · Dashboard stat card links', (group) => {
     visit,
   }) => {
     const user = await createAdminUser()
+    // The per-equipment cards only render once the fleet has equipment: an
+    // empty fleet shows the combined empty-state card instead (#419).
+    const boat = await createBoatForUser(user, { name: 'Fully Equipped' })
+    await BoatEngineFactory.merge({ boatId: boat.id }).create()
+    await BoatSailFactory.merge({ boatId: boat.id }).create()
+    await BoatRigFactory.merge({ boatId: boat.id }).create()
+
     await browserContext.loginAs(user)
 
     const page = await visit('/dashboard')
@@ -51,5 +59,27 @@ test.group('E2E · Dashboard stat card links', (group) => {
     await page.assertExists('a[href="/boats?hasEngine=true"]')
     await page.assertExists('a[href="/boats?hasSails=true"]')
     await page.assertExists('a[href="/boats?hasRig=true"]')
+  })
+
+  test('a fleet without equipment shows the combined empty-state card (#419)', async ({
+    browserContext,
+    visit,
+  }) => {
+    const user = await createAdminUser()
+    await createBoatForUser(user, { name: 'Bare Hull' })
+    await browserContext.loginAs(user)
+
+    const page = await visit('/dashboard')
+    await page.waitForLoadState('networkidle')
+
+    // The three grey per-equipment cards are replaced by one combined card…
+    await page.assertExists('[data-testid="equipment-empty-card"]')
+    await page.assertNotExists('a[href="/boats?hasEngine=true"]')
+    await page.assertNotExists('a[href="/boats?hasSails=true"]')
+    await page.assertNotExists('a[href="/boats?hasRig=true"]')
+
+    // …whose CTA leads to the fleet list.
+    await page.locator('[data-testid="equipment-empty-card"] a[href="/boats"]').click()
+    await page.waitForURL(/\/boats$/)
   })
 })

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { router, useForm, usePage } from '@inertiajs/vue3'
+import { Head, router, useForm, usePage } from '@inertiajs/vue3'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
@@ -10,12 +10,14 @@ import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseAlert from '~/components/base/BaseAlert.vue'
 import { useT } from '~/composables/use_t'
 
+type MemberRole = 'admin' | 'member' | 'mechanic' | 'boat_owner'
+
 interface OrganizationMemberData {
   id: number
   userId: number
   fullName: string | null
   email: string
-  role: 'admin' | 'member'
+  role: MemberRole
 }
 
 const props = defineProps<{
@@ -31,11 +33,13 @@ const flash = computed(() => page.props.flash as { error?: string; success?: str
 const roleOptions = computed(() => [
   { label: t('organization.members.roles.admin'), value: 'admin' },
   { label: t('organization.members.roles.member'), value: 'member' },
+  { label: t('organization.members.roles.mechanic'), value: 'mechanic' },
+  { label: t('organization.members.roles.boat_owner'), value: 'boat_owner' },
 ])
 
 const inviteForm = useForm({
   email: '',
-  role: 'member' as 'admin' | 'member',
+  role: 'member' as MemberRole,
 })
 
 function submitInvite() {
@@ -62,6 +66,7 @@ function getInitials(member: OrganizationMemberData): string {
 </script>
 
 <template>
+  <Head :title="t('organization.members.title')" />
   <div class="mx-auto w-full max-w-4xl px-6 py-10 sm:px-8">
     <BaseHeading level="1" class="mb-8">{{ t('organization.members.title') }}</BaseHeading>
 

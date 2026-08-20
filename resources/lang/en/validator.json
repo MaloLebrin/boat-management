@@ -14,6 +14,30 @@
     "date": "The {field} must be a valid date.",
     "date.afterOrSameAs": "The {field} must be a date after or on the same day as {otherField}.",
     "positive": "The {field} must be a positive number.",
-    "withoutDecimals": "The {field} must be a whole number."
+    "withoutDecimals": "The {field} must be a whole number.",
+    "accepted": "The {field} field must be accepted.",
+    "acceptTerms": {
+      "accepted": "You must accept the terms and the privacy policy to create an account."
+    },
+    "consent": {
+      "accepted": "You must agree to your information being processed so we can reply to you."
+    }
+  },
+  "settings": {
+    "wrongCurrentPassword": "The current password is incorrect."
+  },
+  "fields": {
+    "firstName": "first name",
+    "lastName": "last name",
+    "email": "email",
+    "password": "password",
+    "organizationName": "organization name",
+    "organizationType": "organization type",
+    "fleetSize": "fleet size",
+    "acceptTerms": "terms and conditions",
+    "subject": "subject",
+    "organization": "organisation",
+    "message": "message",
+    "consent": "consent"
   }
 }

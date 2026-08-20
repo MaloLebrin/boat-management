@@ -6,16 +6,16 @@ vi.mock('@inertiajs/vue3', () => ({
   usePage: () => ({
     props: {
       appT: {
-        'offline.conflict.title': 'Conflict detected',
-        'offline.conflict.description': 'Choose a version',
-        'offline.conflict.localVersion': 'Your changes',
-        'offline.conflict.serverVersion': 'Server version',
-        'offline.conflict.keepLocal': 'Keep mine',
-        'offline.conflict.keepServer': 'Use server',
-        'navigationLog.field.windForceBeaufort': 'Wind force',
-        'navigationLog.field.seaState': 'Sea state',
-        'navigationLog.field.crewCount': 'Crew',
-        'navigationLog.field.notes': 'Notes',
+        'common.offline.conflict.title': 'Conflict detected',
+        'common.offline.conflict.description': 'Choose a version',
+        'common.offline.conflict.localVersion': 'Your changes',
+        'common.offline.conflict.serverVersion': 'Server version',
+        'common.offline.conflict.keepLocal': 'Keep mine',
+        'common.offline.conflict.keepServer': 'Use server',
+        'common.navigationLog.field.windForceBeaufort': 'Wind force',
+        'common.navigationLog.field.seaState': 'Sea state',
+        'common.navigationLog.field.crewCount': 'Crew',
+        'common.navigationLog.field.notes': 'Notes',
       },
       locale: 'en',
     },
@@ -103,5 +103,22 @@ describe('ConflictResolutionModal', () => {
     const wrapper = mountModal()
     expect(wrapper.text()).not.toContain('_expectedUpdatedAt')
     expect(wrapper.text()).not.toContain('2026-06-25T10:00')
+  })
+
+  describe('dark mode (#416)', () => {
+    test('la modale s’appuie sur des tokens de surface, pas sur bg-white', () => {
+      const html = mountModal().html()
+      expect(html).toContain('bg-surface-elevated')
+      expect(html).toContain('border-border')
+      expect(html).not.toContain('bg-white')
+    })
+
+    test('le texte et les colonnes utilisent des tokens, pas la palette gray', () => {
+      const html = mountModal().html()
+      expect(html).toContain('text-fg')
+      expect(html).not.toMatch(/-(gray|slate)-\d/)
+      // La colonne « serveur » signalait sa différence en bleu Tailwind.
+      expect(html).toContain('text-info')
+    })
   })
 })

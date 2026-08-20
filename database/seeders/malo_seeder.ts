@@ -1,0 +1,327 @@
+import Boat from '#models/boat'
+import BoatMaintenanceEvent from '#models/boat_maintenance_event'
+import BoatMaintenanceTask from '#models/boat_maintenance_task'
+import Mouillage from '#models/mouillage'
+import Organization from '#models/organization'
+import Port from '#models/port'
+import Spot from '#models/spot'
+import User from '#models/user'
+import BoatEquipmentService from '#services/boat_equipment_service'
+import BoatMaintenanceService from '#services/boat_maintenance_service'
+import BoatService from '#services/boat_service'
+import MouillageService from '#services/mouillage_service'
+import PortService from '#services/port_service'
+import SpotService from '#services/spot_service'
+import UserService from '#services/user_service'
+import { splitFullName } from '#shared/helpers/full_name'
+import app from '@adonisjs/core/services/app'
+import { BaseSeeder } from '@adonisjs/lucid/seeders'
+import { DateTime } from 'luxon'
+
+export default class MaloSeeder extends BaseSeeder {
+  async run() {
+    /**
+     * Run only this seeder:
+     * `node ace db:seed --files database/seeders/malo_seeder.ts`
+     *
+     * This seeder reflects the real account/data of the app's own user
+     * (keyed by `ADMIN_EMAIL`), not generic demo data — see `sandbox_seeder.ts`
+     * for the generic "Marina Démo" dataset.
+     *
+     * That account is a REAL one, so it never gets fabricated data: it owns a
+     * single boat ("3D"), moored on buoy B08 at Querqueville, on the `pro`
+     * plan. This is the only seeder allowed to write to it — the guard rail is
+     * `tests/integration/seeders/admin_account_isolation.spec.ts`.
+     *
+     * Idempotent-ish:
+     * - Reuses `ADMIN_EMAIL` user if it exists, otherwise creates it with an organization.
+     * - Reuses the "3D" boat for that organization if it exists.
+     * - Creates equipment only if missing.
+     * - Creates the port/mouillage/spot only if missing, and only reassigns the
+     *   boat when it is not already on B08 (each reassignment logs a berth change).
+     * - Creates maintenance events only if missing (based on title uniqueness per boat).
+     */
+
+    const adminEmail = process.env.ADMIN_EMAIL
+    const adminPassword = process.env.ADMIN_PASSWORD
+    if (!adminEmail || !adminPassword) {
+      throw new Error('Missing ADMIN_EMAIL / ADMIN_PASSWORD in environment')
+    }
+
+    let user = await User.query().where('email', adminEmail).first()
+    if (!user) {
+      const userService = await app.container.make(UserService)
+      ;({ user } = await userService.signupWithOrganization({
+        email: adminEmail,
+        password: adminPassword,
+        ...splitFullName('Administrateur'),
+        organizationName: 'Administrateur',
+      }))
+    }
+
+    if (user.organizationId === null) {
+      throw new Error('Admin user must belong to an organization')
+    }
+
+    // Reflects the real account's plan (pro), set directly on the org rather
+    // than via a subscription.
+    const organization = await Organization.findOrFail(user.organizationId)
+    if (organization.plan !== 'pro') {
+      await organization.merge({ plan: 'pro' }).save()
+    }
+
+    const boatService = await app.container.make(BoatService)
+    const equipmentService = await app.container.make(BoatEquipmentService)
+    const portService = await app.container.make(PortService)
+    const mouillageService = await app.container.make(MouillageService)
+    const spotService = await app.container.make(SpotService)
+
+    // Find or create boat
+    const existingBoat = await Boat.query()
+      .where('organizationId', user.organizationId)
+      .where('name', '3D')
+      .first()
+
+    const boat =
+      existingBoat ??
+      (await boatService.createForUser(user, {
+        name: '3D',
+        propulsionType: 'sailboat',
+        lengthM: 6.3,
+        beamM: 2.48,
+        draftM: 1.2,
+        mastHeightM: 9.5,
+        hullMaterial: 'fiberglass',
+        yearBuilt: 1978,
+        manufacturer: 'Figareau',
+        model: 'Rhodes 21',
+      }))
+
+    // Berth: Querqueville → mouillage "Corps-morts" → buoy "B08". Only B08 is
+    // seeded (the buoy the boat actually occupies) — the other buoys of the
+    // real mouillage are not our data to invent.
+    const port =
+      (await Port.query()
+        .where('organizationId', user.organizationId)
+        .where('name', 'Querqueville')
+        .first()) ??
+      (await portService.createForUser(user, {
+        name: 'Querqueville',
+        city: 'Cherbourg-en-Cotentin',
+        country: 'France',
+      }))
+
+    const mouillage =
+      (await Mouillage.query().where('portId', port.id).where('name', 'Corps-morts').first()) ??
+      (await mouillageService.createForPort(port, { name: 'Corps-morts' }))
+
+    const spot =
+      (await Spot.query().where('mouillageId', mouillage.id).where('name', 'B08').first()) ??
+      (await spotService.createForMouillage(mouillage, port, { name: 'B08' }))
+
+    // Guarded: `updateAssignment` logs a berth change in `boat_position_history`
+    // on every call — without this check, re-running the seeder would pile up a
+    // fictitious movement history.
+    if (boat.spotId !== spot.id) {
+      await boatService.updateAssignment(boat, { spotId: spot.id })
+    }
+
+    // Ensure relations loaded
+    await boat.load('engines')
+    await boat.load('sails')
+    await boat.load('rig')
+
+    // Equipment (create only if missing)
+    if (boat.engines.length === 0) {
+      await equipmentService.createEngine(user, boat, {
+        kind: 'outboard',
+        fuel: 'essence',
+        brand: 'Yamaha',
+        model: '8HP',
+        powerHp: 8,
+        installHours: 120,
+        manufacturedAt: '2018-04-01',
+      })
+      await equipmentService.createEngine(user, boat, {
+        kind: 'outboard',
+        fuel: 'essence',
+        brand: 'Yamaha',
+        model: '4AS',
+        powerHp: 4,
+        installHours: 1004,
+        manufacturedAt: '1998-04-01',
+      })
+    }
+
+    if (boat.sails.length === 0) {
+      await equipmentService.createSail(user, boat, {
+        sailType: 'main',
+        areaM2: 12.5,
+        material: 'dacron',
+        reefPoints: 2,
+        manufacturedAt: '2020-05-01',
+      })
+      await equipmentService.createSail(user, boat, {
+        sailType: 'genoa',
+        areaM2: 15.0,
+        material: 'dacron',
+        reefPoints: 0,
+        manufacturedAt: '2019-06-01',
+      })
+      await equipmentService.createSail(user, boat, {
+        sailType: 'Tourmentin',
+        areaM2: 2.5,
+        material: 'dacron',
+        reefPoints: 0,
+        manufacturedAt: '2024-06-01',
+      })
+      await equipmentService.createSail(user, boat, {
+        sailType: 'Spinnaker',
+        areaM2: 20.0,
+        material: 'polyester',
+        reefPoints: 0,
+        manufacturedAt: '2022-06-01',
+      })
+    }
+
+    if (!boat.rig) {
+      await equipmentService.upsertRig(user, boat, {
+        rigType: 'sloop',
+        mastCount: 1,
+        spreaders: 2,
+        manufacturedAt: '1978-01-01',
+      })
+    }
+
+    // Maintenance events (skip if title already exists for this boat)
+    // Dates match the real account's current data as-is (not relative to
+    // today) — see docs/dev/seeders.md.
+    const maintenanceService = await app.container.make(BoatMaintenanceService)
+    const eventsToEnsure = [
+      {
+        title: 'Antifouling annuel',
+        subject: 'boat' as const,
+        performedAt: '2026-03-22',
+        dueAt: '2026-08-19',
+      },
+      {
+        title: 'Révision moteur',
+        subject: 'engine' as const,
+        performedAt: '2026-06-30',
+        dueAt: '2026-07-19',
+      },
+      {
+        title: 'Inspection du gréement',
+        subject: 'rig' as const,
+        performedAt: '2026-01-01',
+        dueAt: '2026-07-27',
+      },
+      {
+        title: 'Réparation couture grand-voile',
+        subject: 'sail' as const,
+        performedAt: '2026-05-21',
+        dueAt: '2026-09-18',
+      },
+      {
+        title: 'Contrôle matériel de sécurité',
+        subject: 'boat' as const,
+        performedAt: '2026-07-10',
+        dueAt: null,
+      },
+      {
+        title: "Resserrage de l'accastillage",
+        subject: 'boat' as const,
+        performedAt: '2026-07-05',
+        dueAt: '2026-10-18',
+      },
+    ]
+
+    // refresh relations for engine/sail/rig ids
+    await boat.load('engines')
+    await boat.load('sails')
+    await boat.load('rig')
+
+    for (const e of eventsToEnsure) {
+      const exists = await BoatMaintenanceEvent.query()
+        .where('boatId', boat.id)
+        .where('title', e.title)
+        .first()
+      if (exists) continue
+
+      // If legacy seed entry had a due date, it now becomes a planned task (not part of history)
+      if (e.dueAt) {
+        const engineId = e.subject === 'engine' ? (boat.engines[0]?.id ?? null) : null
+        const sailId = e.subject === 'sail' ? (boat.sails[0]?.id ?? null) : null
+        const rigId = e.subject === 'rig' ? (boat.rig?.id ?? null) : null
+
+        const existingTask = await BoatMaintenanceTask.query()
+          .where('boatId', boat.id)
+          .where('title', e.title)
+          .where('status', 'open')
+          .where('dueAt', e.dueAt)
+          .first()
+
+        if (!existingTask) {
+          await BoatMaintenanceTask.create({
+            boatId: boat.id,
+            subject: e.subject,
+            boatEngineId: engineId,
+            boatSailId: sailId,
+            boatRigId: rigId,
+            title: e.title,
+            notes: null,
+            status: 'open',
+            doneAt: null,
+            dueAt: DateTime.fromISO(e.dueAt),
+            recurrenceIntervalMonths: null,
+            dueEngineHours: null,
+            recurrenceIntervalEngineHours: null,
+            lastDoneEngineHours: null,
+            doneEngineHours: null,
+          })
+        }
+      }
+
+      if (e.subject === 'engine') {
+        const engine = boat.engines[0]
+        await maintenanceService.createForBoat(user, boat, {
+          subject: 'engine',
+          boatEngineId: engine?.id ?? null,
+          engineCaption: engine ? null : 'Hors-bord',
+          performedAt: e.performedAt,
+          title: e.title,
+        })
+        continue
+      }
+
+      if (e.subject === 'sail') {
+        const sail = boat.sails[0]
+        await maintenanceService.createForBoat(user, boat, {
+          subject: 'sail',
+          boatSailId: sail?.id ?? null,
+          sailCaption: sail ? null : 'Grand-voile',
+          performedAt: e.performedAt,
+          title: e.title,
+        })
+        continue
+      }
+
+      if (e.subject === 'rig') {
+        if (!boat.rig) continue
+        await maintenanceService.createForBoat(user, boat, {
+          subject: 'rig',
+          boatRigId: boat.rig.id,
+          performedAt: e.performedAt,
+          title: e.title,
+        })
+        continue
+      }
+
+      await maintenanceService.createForBoat(user, boat, {
+        subject: 'boat',
+        performedAt: e.performedAt,
+        title: e.title,
+      })
+    }
+  }
+}

@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import { CheckCircleIcon, CalendarDaysIcon, PlayCircleIcon } from '@heroicons/vue/24/outline'
 import { useForm } from '@inertiajs/vue3'
+import { Link } from '@adonisjs/inertia/vue'
+import { computed } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import { useFlash } from '~/composables/use_flash'
 import { useScrollReveal } from '~/composables/use_scroll_reveal'
 import { useT } from '~/composables/use_t'
+import { marketingPath } from '#shared/helpers/locale_path'
 
 const demoForm = useForm({})
 
-defineProps<{
+const props = defineProps<{
   eyebrow: string
   title: string
   titleHighlight: string
@@ -26,6 +29,8 @@ defineProps<{
 
 const { t } = useT()
 const { errorMessage: flashError } = useFlash()
+
+const pricingHref = computed(() => marketingPath('pricing', props.locale))
 
 const { el, isVisible } = useScrollReveal()
 </script>
@@ -60,7 +65,9 @@ const { el, isVisible } = useScrollReveal()
         <!-- Right: two CTA cards -->
         <div class="flex flex-col gap-4">
           <!-- Try live demo card -->
-          <div class="rounded-2xl border border-coral-200 bg-white p-8 shadow-sm lg:p-10">
+          <div
+            class="rounded-2xl border border-coral-200 bg-surface-elevated p-8 shadow-sm lg:p-10"
+          >
             <div class="mb-6 flex h-14 w-14 items-center justify-center rounded-xl bg-coral-500">
               <PlayCircleIcon class="h-7 w-7 text-white" />
             </div>
@@ -75,12 +82,12 @@ const { el, isVisible } = useScrollReveal()
               >
                 {{ demoForm.processing ? t('loading') : tryDemoLabel }}
               </BaseButton>
-              <p v-if="flashError" class="mt-2 text-sm text-red-600">{{ flashError }}</p>
+              <p v-if="flashError" class="mt-2 text-sm text-danger">{{ flashError }}</p>
             </div>
           </div>
 
           <!-- Book guided demo card -->
-          <div class="rounded-2xl border border-bone bg-white p-8 shadow-sm lg:p-10">
+          <div class="rounded-2xl border border-bone bg-surface-elevated p-8 shadow-sm lg:p-10">
             <div class="mb-6 flex h-14 w-14 items-center justify-center rounded-xl bg-navy-900">
               <CalendarDaysIcon class="h-7 w-7 text-coral-400" />
             </div>
@@ -88,16 +95,16 @@ const { el, isVisible } = useScrollReveal()
             <p class="mt-2 text-sm text-fg-subtle">{{ noCommitment }}</p>
 
             <div class="mt-6 flex flex-col gap-3">
-              <a :href="ctaHref">
+              <Link :href="ctaHref">
                 <BaseButton size="lg" variant="secondary" class="w-full justify-center">
                   {{ ctaLabel }}
                 </BaseButton>
-              </a>
-              <a :href="`/${locale}/tarifs`">
+              </Link>
+              <Link :href="pricingHref">
                 <BaseButton size="lg" variant="ghost" class="w-full justify-center">
                   {{ secondaryLabel }}
                 </BaseButton>
-              </a>
+              </Link>
             </div>
           </div>
         </div>

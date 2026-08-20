@@ -1,8 +1,14 @@
+import Organization from '#models/organization'
 import OrganizationInvitation from '#models/organization_invitation'
 import OrganizationMembership from '#models/organization_membership'
+import Boat from '#models/boat'
 import User from '#models/user'
+import OrganizationInvitationAccepted from '#events/organization_invitation_accepted'
+import OrganizationMemberJoined from '#events/organization_member_joined'
 import {
   AlreadyMemberError,
+  BoatOwnerInvitationRequiresBoatsError,
+  InvalidInvitationBoatsError,
   InvitationAlreadyAcceptedError,
   InvitationEmailMismatchError,
   InvitationExpiredError,
@@ -39,6 +45,7 @@ export default class OrganizationInvitationService {
       invitedByName: inv.invitedBy?.fullName ?? null,
       expiresAt: inv.expiresAt.toISO()!,
       createdAt: inv.createdAt.toISO()!,
+      boatIds: inv.boatIds,
     }))
   }
 
@@ -52,8 +59,24 @@ export default class OrganizationInvitationService {
     orgId: number,
     invitedById: number,
     email: string,
-    role: OrgRole
+    role: OrgRole,
+    boatIds?: number[]
   ): Promise<{ invitation: OrganizationInvitationData; plainToken: string }> {
+    if (role === 'boat_owner') {
+      if (!boatIds || boatIds.length === 0) {
+        throw new BoatOwnerInvitationRequiresBoatsError()
+      }
+
+      const matchingBoatsCount = await Boat.query()
+        .where('organizationId', orgId)
+        .whereIn('id', boatIds)
+        .count('* as total')
+
+      if (Number(matchingBoatsCount[0].$extras.total) !== boatIds.length) {
+        throw new InvalidInvitationBoatsError()
+      }
+    }
+
     // Check if already a member — either via a membership row, or via a user
     // already attached to the organisation that may not have a membership row
     // (e.g. the org owner, cf. A-03/A-04). Both signals are checked because a
@@ -94,6 +117,7 @@ export default class OrganizationInvitationService {
       token: tokenHash,
       status: 'pending',
       expiresAt,
+      boatIds: role === 'boat_owner' ? boatIds! : null,
     })
 
     await invitation.load('invitedBy')
@@ -107,6 +131,7 @@ export default class OrganizationInvitationService {
         invitedByName: invitation.invitedBy?.fullName ?? null,
         expiresAt: invitation.expiresAt.toISO()!,
         createdAt: invitation.createdAt.toISO()!,
+        boatIds: invitation.boatIds,
       },
       plainToken,
     }
@@ -114,8 +139,9 @@ export default class OrganizationInvitationService {
 
   /**
    * Cancels an invitation (sets status to 'cancelled').
+   * Returns the cancelled invitation so callers can journal it.
    */
-  async cancel(invitationId: number, orgId: number): Promise<void> {
+  async cancel(invitationId: number, orgId: number): Promise<OrganizationInvitation> {
     const invitation = await OrganizationInvitation.query()
       .where('id', invitationId)
       .where('organizationId', orgId)
@@ -127,6 +153,8 @@ export default class OrganizationInvitationService {
 
     invitation.status = 'cancelled'
     await invitation.save()
+
+    return invitation
   }
 
   /**
@@ -195,8 +223,8 @@ export default class OrganizationInvitationService {
       throw new AlreadyMemberError()
     }
 
-    await db.transaction(async (trx) => {
-      await OrganizationMembership.create(
+    const membership = await db.transaction(async (trx) => {
+      const created = await OrganizationMembership.create(
         {
           userId,
           organizationId: invitation.organizationId,
@@ -211,7 +239,28 @@ export default class OrganizationInvitationService {
       invitation.status = 'accepted'
       invitation.acceptedAt = DateTime.now()
       await invitation.useTransaction(trx).save()
+
+      if (invitation.role === 'boat_owner' && invitation.boatIds?.length) {
+        // Raw query builder insert — bypasses the Lucid model's camelCase→snake_case
+        // naming strategy, so columns must be spelled out as they exist in the table.
+        const rows = invitation.boatIds.map((boatId) => ({
+          boat_id: boatId,
+          user_id: userId,
+          created_at: DateTime.now().toSQL(),
+        }))
+        await trx.table('boat_owners').insert(rows)
+      }
+
+      return created
     })
+
+    // Dispatch après commit : les listeners écrivent des notifications et
+    // envoient des emails, ils ne doivent jamais s'appuyer sur une transaction
+    // encore annulable.
+    const organization = await Organization.findOrFail(invitation.organizationId)
+    const memberName = user.fullName ?? user.email
+    await OrganizationMemberJoined.dispatch(membership, organization)
+    await OrganizationInvitationAccepted.dispatch(organization, invitation.invitedById, memberName)
 
     return invitation
   }

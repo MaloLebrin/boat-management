@@ -48,10 +48,10 @@
   },
   "media": {
     "photosAdded": "{count, plural, one {# photo added.} other {# photos added.}}",
-    "photosAddedPartial": "{succeeded} photo(s) added, {failed} failed.",
+    "photosAddedPartial": "{succeeded, plural, one {# photo added} other {# photos added}}, {failed, plural, one {# failure} other {# failures}}.",
     "photosAddFailed": "No photo could be added.",
     "documentsAdded": "{count, plural, one {# document added.} other {# documents added.}}",
-    "documentsAddedPartial": "{succeeded} document(s) added, {failed} failed.",
+    "documentsAddedPartial": "{succeeded, plural, one {# document added} other {# documents added}}, {failed, plural, one {# failure} other {# failures}}.",
     "documentsAddFailed": "No document could be added.",
     "deleted": "File deleted."
   },
@@ -62,11 +62,16 @@
   },
   "settings": {
     "profileUpdated": "Profile updated.",
+    "passwordUpdated": "Password changed.",
+    "localeUpdated": "Language updated.",
     "orgUpdated": "Organisation updated.",
     "aiSettingsUpdated": "AI settings updated.",
     "brandingUpdated": "Appearance updated.",
     "logoUpdated": "Logo updated.",
-    "logoDeleted": "Logo deleted."
+    "logoDeleted": "Logo deleted.",
+    "themeUpdated": "Appearance updated.",
+    "aiCustomizationRequiresPlan": "Customising the AI prompt requires the Enterprise plan. AI and the Copilot are available on Pro, but the business context can only be tailored on Enterprise.",
+    "brandingRequiresPlan": "White labelling (logo and colours) requires the Enterprise plan."
   },
   "enginePart": {
     "created": "Part added.",
@@ -99,7 +104,15 @@
     "alreadyMember": "You are already a member of this organisation.",
     "alreadyPending": "An invitation is already pending for this email.",
     "emailMismatch": "This invitation was sent to a different email address.",
-    "declined": "You have declined the invitation."
+    "declined": "You have declined the invitation.",
+    "boatOwnerRequiresBoat": "Select at least one boat for a boat owner invitation.",
+    "invalidBoats": "One or more selected boats do not belong to this organization."
+  },
+  "owner": {
+    "boatNotFound": "This boat is not linked to your account.",
+    "invalidAssignment": "This user does not have the \"boat owner\" role in this organization.",
+    "attached": "Owner added to the boat.",
+    "detached": "Owner removed from the boat."
   },
   "billing": {
     "notConfigured": "Payment is not configured yet. Please contact support.",
@@ -110,6 +123,9 @@
     "moduleNotFound": "This module is not active on your subscription.",
     "moduleAlreadyActive": "This module is already active on your subscription.",
     "moduleActionFailed": "The module could not be updated. Please try again.",
+    "moduleActivated": "Module activated.",
+    "moduleDeactivated": "Module deactivated.",
+    "modulesRequireEnterprise": "This action is only available on the Enterprise plan.",
     "addonUpdated": "Add-on updated. The change will apply once the payment is confirmed.",
     "addonRemoved": "Add-on removed. It will be removed once confirmed.",
     "addonNotActive": "This add-on is not active on your subscription."
@@ -188,7 +204,7 @@
     "deleted": "Client deleted.",
     "notFound": "Client not found.",
     "documentsAdded": "{count, plural, one {# document added.} other {# documents added.}}",
-    "documentsAddedPartial": "{succeeded} document(s) added, {failed} failed.",
+    "documentsAddedPartial": "{succeeded, plural, one {# document added} other {# documents added}}, {failed, plural, one {# failure} other {# failures}}.",
     "documentsAddFailed": "No document could be added.",
     "documentDeleted": "Document deleted.",
     "anonymized": "Client anonymized.",
@@ -224,9 +240,9 @@
     "aiExceeded": "AI features are not available on your current plan. Upgrade to Pro or Enterprise.",
     "aiTokensExceeded": "You have reached your monthly AI token limit. AI features will reset on the 1st of next month, or upgrade to Enterprise for unlimited usage.",
     "exportExceeded": "Export is not available on your current plan. Upgrade to Pro or Enterprise.",
-    "clientsExceeded": "This feature requires the Enterprise plan.",
-    "pricingExceeded": "This feature requires the Enterprise plan.",
-    "invoicesExceeded": "This feature requires the Enterprise plan.",
+    "clientsExceeded": "Client management is part of the CRM & Invoicing module — included with Enterprise, or available as an add-on on the Pro plan.",
+    "pricingExceeded": "Seasonal pricing is part of the Charter module — included with Enterprise, or available as an add-on on the Pro plan.",
+    "invoicesExceeded": "Quotes and invoices are part of the CRM & Invoicing module — included with Enterprise, or available as an add-on on the Pro plan.",
     "storageExceeded": "You have reached the storage limit of your plan. Upgrade to upload new files.",
     "storageOverflow": "Your storage usage exceeds your current plan limit. Free up space or upgrade your plan."
   },
@@ -248,7 +264,7 @@
     "boatNotFound": "This boat does not belong to your organisation."
   },
   "csv": {
-    "imported": "{count} row(s) imported successfully.",
+    "imported": "{count, plural, one {# row imported successfully.} other {# rows imported successfully.}}",
     "boatNotFound": "Boat not found.",
     "previewExpired": "Preview has expired. Please re-upload the file.",
     "missingHeaders": "Missing headers in CSV file: {headers}.",
@@ -288,7 +304,7 @@
     "notFound": "Reservation not found.",
     "conflict": "This boat is already booked for this period.",
     "endBeforeStart": "End date must be after start date.",
-    "optionsOverridden": "Reservation confirmed. {count} overlapping option(s) cancelled.",
+    "optionsOverridden": "Reservation confirmed. {count, plural, one {# overlapping option cancelled.} other {# overlapping options cancelled.}}",
     "invalidTransition": "This status change is not allowed.",
     "belowMinDays": "The reservation duration is below the minimum allowed for this boat.",
     "aboveMaxDays": "The reservation duration exceeds the maximum allowed for this boat.",

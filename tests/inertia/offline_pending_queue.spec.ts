@@ -14,14 +14,15 @@ vi.mock('@inertiajs/vue3', () => ({
   usePage: () => ({
     props: {
       appT: {
-        'offline.queue.title': '{count} action(s) en attente',
-        'offline.queue.syncNow': 'Synchroniser',
-        'offline.queue.cancel': 'Annuler',
-        'offline.queue.cancelled': 'Action annulée',
-        'offline.queue.cancelAriaLabel': "Annuler l'action : {type}",
-        'offline.queue.type.create-navigation-log': 'Nouvelle sortie',
-        'offline.queue.type.create-fuel-log': 'Avitaillement',
-        'offline.syncing': 'Synchronisation en cours…',
+        'common.offline.queue.title':
+          '{count, plural, one {# action en attente} other {# actions en attente}}',
+        'common.offline.queue.syncNow': 'Synchroniser',
+        'common.offline.queue.cancel': 'Annuler',
+        'common.offline.queue.cancelled': 'Action annulée',
+        'common.offline.queue.cancelAriaLabel': "Annuler l'action : {type}",
+        'common.offline.queue.type.create-navigation-log': 'Nouvelle sortie',
+        'common.offline.queue.type.create-fuel-log': 'Avitaillement',
+        'common.offline.syncing': 'Synchronisation en cours…',
       },
       locale: 'fr',
       flash: {},
@@ -79,7 +80,7 @@ describe('OfflinePendingQueue', () => {
     expect(wrapper.find('ul').exists()).toBe(true)
     expect(wrapper.findAll('li')).toHaveLength(1)
     expect(wrapper.text()).toContain('Nouvelle sortie')
-    expect(wrapper.text()).toContain('1 action(s) en attente')
+    expect(wrapper.text()).toContain('1 action en attente')
   })
 
   test('renders all queued items', async () => {
@@ -103,7 +104,7 @@ describe('OfflinePendingQueue', () => {
     expect(wrapper.findAll('li')).toHaveLength(2)
     expect(wrapper.text()).toContain('Nouvelle sortie')
     expect(wrapper.text()).toContain('Avitaillement')
-    expect(wrapper.text()).toContain('2 action(s) en attente')
+    expect(wrapper.text()).toContain('2 actions en attente')
   })
 
   test('cancel button removes item from list', async () => {
@@ -151,5 +152,14 @@ describe('OfflinePendingQueue', () => {
     await vi.waitFor(() => expect(wrapper.findAll('li')).toHaveLength(1), { timeout: 1000 })
     expect(wrapper.text()).toContain('Avitaillement')
     expect(wrapper.text()).not.toContain('Nouvelle sortie')
+  })
+
+  describe('dark mode (#416)', () => {
+    test('les lignes en attente basculent avec la surface', async () => {
+      const wrapper = mountComponent()
+      await flushPromises()
+      expect(wrapper.html()).toContain('bg-surface-elevated')
+      expect(wrapper.html()).not.toContain('bg-white')
+    })
   })
 })

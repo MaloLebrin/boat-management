@@ -4,17 +4,27 @@
  */
 
 import AiTokenThresholdCrossed from '#events/ai_token_threshold_crossed'
+import ContactMessageReceived from '#events/contact_message_received'
+import OrganizationInvitationAccepted from '#events/organization_invitation_accepted'
 import OrganizationMemberJoined from '#events/organization_member_joined'
+import OrganizationMemberRemoved from '#events/organization_member_removed'
+import OrganizationMemberRoleChanged from '#events/organization_member_role_changed'
 import OrganizationModuleDeactivated from '#events/organization_module_deactivated'
 import OrganizationPlanDowngraded from '#events/organization_plan_downgraded'
+import OrganizationPlanUpgraded from '#events/organization_plan_upgraded'
 import SimulatorLeadCreated from '#events/simulator_lead_created'
 import StorageThresholdCrossed from '#events/storage_threshold_crossed'
 
 export const events = {
   AiTokenThresholdCrossed: AiTokenThresholdCrossed,
+  ContactMessageReceived: ContactMessageReceived,
+  OrganizationInvitationAccepted: OrganizationInvitationAccepted,
   OrganizationMemberJoined: OrganizationMemberJoined,
+  OrganizationMemberRemoved: OrganizationMemberRemoved,
+  OrganizationMemberRoleChanged: OrganizationMemberRoleChanged,
   OrganizationModuleDeactivated: OrganizationModuleDeactivated,
   OrganizationPlanDowngraded: OrganizationPlanDowngraded,
+  OrganizationPlanUpgraded: OrganizationPlanUpgraded,
   SimulatorLeadCreated: SimulatorLeadCreated,
   StorageThresholdCrossed: StorageThresholdCrossed,
 }

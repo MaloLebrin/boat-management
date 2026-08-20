@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { expect, test } from 'vitest'
+import { describe, expect, test } from 'vitest'
 import BaseSegmentedControl from '../../inertia/components/base/BaseSegmentedControl.vue'
 
 const options = [
@@ -46,4 +46,21 @@ test('emits update:modelValue with numeric value', async () => {
   const w = mount(BaseSegmentedControl, { props: { modelValue: 1, options: numOptions } })
   await w.findAll('button')[1].trigger('click')
   expect(w.emitted('update:modelValue')?.[0]).toEqual([2])
+})
+
+describe('dark mode (#416)', () => {
+  test('l’option active pose text-on-brand sur bg-brand', () => {
+    const w = mount(BaseSegmentedControl, { props: { modelValue: 'all', options } })
+    const active = w.findAll('button')[0].classes().join(' ')
+    expect(active).toContain('bg-brand')
+    expect(active).toContain('text-on-brand')
+    expect(active).not.toContain('text-white')
+  })
+
+  test('les options inactives utilisent des tokens de surface', () => {
+    const w = mount(BaseSegmentedControl, { props: { modelValue: 'all', options } })
+    const inactive = w.findAll('button')[1].classes().join(' ')
+    expect(inactive).toContain('bg-surface-muted')
+    expect(inactive).toContain('text-fg-muted')
+  })
 })

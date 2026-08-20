@@ -4,7 +4,7 @@ export default { layout: DefaultLayout }
 </script>
 
 <script setup lang="ts">
-import { router } from '@inertiajs/vue3'
+import { Head, router } from '@inertiajs/vue3'
 import { computed } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
@@ -61,6 +61,8 @@ function handleItemClick(notif: NotificationForFront) {
 </script>
 
 <template>
+  <Head :title="t('notifications.title')" />
+
   <div class="w-full max-w-4xl mx-auto px-6 py-10 sm:px-8">
     <div class="flex items-center justify-between mb-8">
       <div>
@@ -172,7 +174,7 @@ function handleItemClick(notif: NotificationForFront) {
             </button>
             <button
               type="button"
-              class="rounded-(--radius-control) px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 transition-colors"
+              class="rounded-(--radius-control) px-3 py-1.5 text-xs font-medium text-danger hover:bg-danger-soft transition-colors"
               @click="deleteNotification(notif)"
             >
               {{ t('notifications.delete') }}

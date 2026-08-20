@@ -19,10 +19,11 @@
   "clients": "Clients",
   "pricingSeasons": "Pricing seasons",
   "invoices": "Invoices",
+  "scrollDown": "Show more navigation entries",
   "sections": {
     "fleet": "FLEET",
+    "activity": "ACTIVITY",
     "maintenance": "MAINTENANCE",
-    "navigation": "NAVIGATION",
-    "preferences": "PREFERENCES"
+    "business": "MANAGEMENT"
   }
 }

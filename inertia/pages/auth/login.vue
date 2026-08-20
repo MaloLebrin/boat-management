@@ -7,6 +7,7 @@ export default {
 </script>
 
 <script setup lang="ts">
+import { Link } from '@adonisjs/inertia/vue'
 import { Form } from '@adonisjs/inertia/vue'
 import { Head } from '@inertiajs/vue3'
 import { computed, ref } from 'vue'
@@ -33,7 +34,7 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
       <!-- Top-right helper -->
       <div class="flex items-center justify-end gap-3.5 px-8 py-6">
         <span class="text-xs text-fg-muted">{{ t('auth.login.needHelp') }}</span>
-        <BaseButton href="mailto:support@fleetai.io" variant="secondary" size="sm">
+        <BaseButton href="mailto:support@fleetai.app" variant="secondary" size="sm">
           {{ t('auth.login.contactSupport') }}
         </BaseButton>
       </div>
@@ -78,13 +79,13 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
                 @update:model-value="passwordValue = $event"
               >
                 <template #label-right>
-                  <a
+                  <Link
                     href="/forgot-password"
-                    class="text-[12px] font-semibold text-[#e2674f] no-underline"
+                    class="text-[12px] font-semibold text-coral-500 no-underline"
                     style="border-bottom: 1px solid rgba(226, 103, 79, 0.3); padding-bottom: 1px"
                   >
                     {{ t('auth.login.forgotPassword') }}
-                  </a>
+                  </Link>
                 </template>
                 <template #trailing>
                   <button
@@ -101,7 +102,7 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
                 <input
                   type="checkbox"
                   name="remember"
-                  class="h-[18px] w-[18px] rounded-[5px] border-bone accent-[#0b1d2e]"
+                  class="h-[18px] w-[18px] rounded-[5px] border-border accent-[var(--color-brand)]"
                 />
                 <span class="text-[13px] text-fg-muted">{{ t('auth.login.rememberMe') }}</span>
               </label>
@@ -133,13 +134,13 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
 
           <p class="mt-6 text-center text-[13px] text-fg-muted">
             {{ t('auth.login.noAccount') }}
-            <a
+            <Link
               href="/signup"
-              class="font-semibold text-[#e2674f] no-underline"
+              class="font-semibold text-coral-500 no-underline"
               style="border-bottom: 1px solid rgba(226, 103, 79, 0.3); padding-bottom: 1px"
             >
               {{ t('auth.login.createOrg') }} →
-            </a>
+            </Link>
           </p>
         </div>
       </div>

@@ -3,7 +3,7 @@
   "title": "My ports",
   "tabs": {
     "list": "List",
-    "plan": "Marina plan"
+    "plan": "Port plan"
   },
   "plan": {
     "editLayout": "Edit layout",
@@ -12,7 +12,7 @@
     "hint": "Click a berth to assign a boat to it.",
     "help": {
       "toggle": "Help",
-      "title": "How to use the marina plan",
+      "title": "How to use the port plan",
       "select": "Click a berth to open the assignment dialog",
       "move": "In \"Edit layout\" mode, drag a pontoon or anchorage to reposition it"
     }

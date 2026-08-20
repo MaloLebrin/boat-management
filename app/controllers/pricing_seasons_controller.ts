@@ -15,6 +15,7 @@ import {
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import type Organization from '#models/organization'
+import { BILLING_SETTINGS_PATH } from '#shared/constants/billing'
 
 @inject()
 export default class PricingSeasonsController {
@@ -37,7 +38,7 @@ export default class PricingSeasonsController {
     } catch (error) {
       if (error instanceof QuotaExceededError) {
         session.flash('error', i18n.t('flash.quota.pricingExceeded'))
-        response.redirect('/')
+        response.redirect(BILLING_SETTINGS_PATH)
         return null
       }
       throw error

@@ -10,7 +10,18 @@ test.group('HomeController (unit)', () => {
         },
       } as any,
       {
-        getLatestFleetAnalysis: async (_userId: number, _orgId: number) => null,
+        getLatestFleetAnalysis: async (_userId: number, _orgId: number, _locale: string) => null,
+      } as any,
+      {
+        listNamesForOrg: async () => [],
+      } as any,
+      {
+        getPlanningForOrg: async () => {
+          throw new Error('should not be called')
+        },
+      } as any,
+      {
+        getBoatUsage: async () => ({ used: 0, limit: 2 }),
       } as any
     )
 
@@ -27,6 +38,7 @@ test.group('HomeController (unit)', () => {
         isAuthenticated: false,
         check: async () => {},
       },
+      i18n: { locale: 'en' },
     } as any)
 
     assert.equal(rendered[0]!.component, 'home')
@@ -42,7 +54,18 @@ test.group('HomeController (unit)', () => {
         }),
       } as any,
       {
-        getLatestFleetAnalysis: async (_userId: number, _orgId: number) => null,
+        getLatestFleetAnalysis: async (_userId: number, _orgId: number, _locale: string) => null,
+      } as any,
+      {
+        listNamesForOrg: async () => [],
+      } as any,
+      {
+        getPlanningForOrg: async () => {
+          throw new Error('should not be called')
+        },
+      } as any,
+      {
+        getBoatUsage: async () => ({ used: 1, limit: 2 }),
       } as any
     )
 
@@ -58,10 +81,75 @@ test.group('HomeController (unit)', () => {
       auth: {
         isAuthenticated: true,
         check: async () => {},
-        getUserOrFail: () => ({ id: 1, organizationId: 42 }),
+        getUserOrFail: () => ({
+          id: 1,
+          organizationId: 42,
+          organization: { id: 42, plan: 'starter' },
+          load: async () => {},
+          hasPermission: async () => true,
+          getEffectiveRoleInOrg: async () => 'member',
+        }),
       },
+      i18n: { locale: 'en' },
     } as any)
 
     assert.equal(rendered[0]!.component, 'dashboard')
+    assert.equal(rendered[0]!.props.canAddBoat, true)
+    assert.deepEqual(rendered[0]!.props.boatQuota, { used: 1, limit: 2 })
+  })
+
+  test('renders the dedicated mechanic dashboard for a mechanic', async ({ assert }) => {
+    const controller = new HomeController(
+      {
+        getForUser: async () => {
+          throw new Error('should not be called')
+        },
+      } as any,
+      {
+        getLatestFleetAnalysis: async (_userId: number, _orgId: number, _locale: string) => null,
+      } as any,
+      {
+        listNamesForOrg: async () => [],
+      } as any,
+      {
+        getPlanningForOrg: async () => ({
+          overdueTasks: [{ id: 1 }],
+          soonTasks: [{ id: 2 }],
+        }),
+      } as any,
+      {
+        getBoatUsage: async () => {
+          throw new Error('should not be called')
+        },
+      } as any
+    )
+
+    const rendered: Array<{ component: string; props: any }> = []
+
+    await controller.index({
+      inertia: {
+        render: (component: string, props: any) => {
+          rendered.push({ component, props })
+          return { component, props }
+        },
+      },
+      auth: {
+        isAuthenticated: true,
+        check: async () => {},
+        getUserOrFail: () => ({
+          id: 1,
+          organizationId: 42,
+          hasPermission: async () => true,
+          getEffectiveRoleInOrg: async () => 'mechanic',
+        }),
+      },
+      i18n: { locale: 'en' },
+    } as any)
+
+    assert.equal(rendered[0]!.component, 'dashboard/mechanic')
+    assert.deepEqual(rendered[0]!.props, {
+      overdueTasks: [{ id: 1 }],
+      soonTasks: [{ id: 2 }],
+    })
   })
 })

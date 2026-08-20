@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { router, usePage } from '@inertiajs/vue3'
+import { Head, router, usePage } from '@inertiajs/vue3'
 import BaseAlert from '~/components/base/BaseAlert.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseConfirmModal from '~/components/base/BaseConfirmModal.vue'
@@ -32,10 +32,9 @@ const showCreateForm = ref(false)
 const editingSeason = ref<PricingSeasonRow | null>(null)
 const deletingSeason = ref<PricingSeasonRow | null>(null)
 
-const boatFilterOptions = computed(() => [
-  { label: t('pricingSeasons.filter.allBoats'), value: '' },
-  ...props.boatOptions.map((b) => ({ label: b.name, value: String(b.id) })),
-])
+const boatFilterOptions = computed(() =>
+  props.boatOptions.map((b) => ({ label: b.name, value: String(b.id) }))
+)
 
 function onBoatFilterChange(value: string | number) {
   const boatId = value === '' ? undefined : value
@@ -66,6 +65,8 @@ function executeDelete() {
 </script>
 
 <template>
+  <Head :title="t('pricingSeasons.title')" />
+
   <div class="mx-auto w-full max-w-6xl px-6 py-10 sm:px-8">
     <div class="mb-6 flex items-center justify-between">
       <div>
@@ -105,9 +106,9 @@ function executeDelete() {
       <div class="md:col-span-4">
         <BaseSelect
           :label="t('pricingSeasons.filter.boat')"
+          allow-empty
           :model-value="filters.boatId ? String(filters.boatId) : ''"
           :options="boatFilterOptions"
-          allow-empty
           :placeholder="t('pricingSeasons.filter.allBoats')"
           @update:model-value="onBoatFilterChange"
         />

@@ -9,7 +9,7 @@ withDefaults(
     label: string
     value: string
     delta?: string
-    tone?: 'neutral' | 'success' | 'info' | 'warning'
+    tone?: 'neutral' | 'success' | 'info' | 'warning' | 'empty'
     href?: string
   }>(),
   { delta: undefined, tone: 'neutral', href: undefined }
@@ -23,16 +23,16 @@ withDefaults(
     class="rounded-(--radius-card) border border-border bg-surface-elevated p-5 shadow-(--shadow-xs) transition-[transform,box-shadow] duration-(--motion-fast) ease-premium hover:shadow-(--shadow-sm) hover:scale-[1.01]"
     :class="href ? 'block cursor-pointer' : ''"
   >
-    <div class="flex items-center justify-between gap-3">
+    <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
       <div class="flex items-center gap-1.5 min-w-0">
         <span v-if="$slots.icon" class="shrink-0 text-fg-muted">
           <slot name="icon" />
         </span>
-        <p class="text-sm font-semibold text-fg-muted truncate">
+        <p class="text-sm font-semibold text-fg-muted">
           {{ label }}
         </p>
       </div>
-      <BaseBadge :variant="tone">
+      <BaseBadge :variant="tone" class="shrink-0">
         {{ t(`common.tone.${tone}`) }}
       </BaseBadge>
     </div>

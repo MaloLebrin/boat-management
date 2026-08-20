@@ -271,7 +271,7 @@ test.group('Client documents (functional)', (group) => {
         .redirects(0)
 
       response.assertStatus(302)
-      response.assertHeader('location', '/')
+      response.assertHeader('location', '/settings/billing')
       assert.isEmpty(fake.uploaded)
     } finally {
       app.container.restore(CloudinaryService)

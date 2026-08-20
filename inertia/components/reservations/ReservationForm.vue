@@ -9,6 +9,7 @@ import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import ReservationQuoteCard from '~/components/reservations/ReservationQuoteCard.vue'
 import { useT } from '~/composables/use_t'
+import { tzOffsetMinutes } from '~/utils/local_datetime'
 import { computeReservationQuote } from '#shared/helpers/reservation_quote'
 import type { BoatPricingRow } from '#shared/types/boat_pricing'
 import type { PricingSeasonRow } from '#shared/types/pricing_season'
@@ -27,6 +28,9 @@ const { t } = useT()
 const form = useForm({
   startsAt: '',
   endsAt: '',
+  // `startsAt`/`endsAt` are naive wall-clocks: the server needs the browser
+  // offset to store the right instant (#452).
+  tzOffsetMinutes: tzOffsetMinutes(),
   clientId: '',
   clientName: '',
   clientEmail: '',
@@ -68,7 +72,11 @@ watch([() => form.startsAt, () => form.endsAt], ([startsAt, endsAt]) => {
 
 function submit() {
   form
-    .transform((data) => ({ ...data, clientId: data.clientId ? Number(data.clientId) : null }))
+    .transform((data) => ({
+      ...data,
+      clientId: data.clientId ? Number(data.clientId) : null,
+      tzOffsetMinutes: tzOffsetMinutes(),
+    }))
     .post(`/boats/${props.boatId}/reservations`, {
       preserveScroll: true,
       onSuccess: () => form.reset(),

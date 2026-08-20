@@ -1,0 +1,49 @@
+@component('emails/_layout')
+  @slot('content')
+    <h2 style="margin:0 0 20px;color:#333333;font-size:22px;">
+      Nouveau message de contact —
+      {{ subjectLabel }}
+    </h2>
+    <table
+      role="presentation"
+      cellspacing="0"
+      cellpadding="0"
+      width="100%"
+      style="margin:0 0 25px;font-size:15px;color:#555555;"
+    >
+      <tr>
+        <td style="padding:6px 0;width:150px;color:#888888;">Nom</td>
+        <td style="padding:6px 0;">{{ fullName }}</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 0;color:#888888;">Email</td>
+        <td style="padding:6px 0;">
+          <a href="mailto:{{ email }}" style="color:#1e3a5f;">{{ email }}</a>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:6px 0;color:#888888;">Organisation</td>
+        <td style="padding:6px 0;">{{ organization ?? '—' }}</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 0;color:#888888;">Taille de flotte</td>
+        <td style="padding:6px 0;">{{ fleetSize ?? '—' }}</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 0;color:#888888;">Langue</td>
+        <td style="padding:6px 0;">{{ locale }}</td>
+      </tr>
+    </table>
+    <p style="margin:0 0 10px;color:#888888;font-size:13px;">Message</p>
+    <div
+      style="padding:16px;background-color:#f4f4f7;border-radius:6px;color:#333333;font-size:15px;line-height:1.6;"
+    >
+      @each(line in messageLines)
+        <p style="margin:0 0 6px;">{{ line }}</p>
+      @end
+    </div>
+    <p style="margin:25px 0 0;color:#888888;font-size:13px;line-height:1.5;">
+      Réponse annoncée sur la page contact : sous 4 heures en jours ouvrés.
+    </p>
+  @end
+@end

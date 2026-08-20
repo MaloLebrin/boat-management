@@ -1,8 +1,10 @@
 <script setup lang="ts">
+import { Link } from '@adonisjs/inertia/vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import type { BoatListItem } from './types'
 import { useT } from '~/composables/use_t'
+import { propulsionLabel } from '~/utils/boat_propulsion_label'
 
 const { t } = useT()
 
@@ -27,7 +29,7 @@ function maintenanceLabel(b: BoatListItem) {
 
 <template>
   <TransitionGroup name="list" tag="div" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-    <a
+    <Link
       v-for="(boat, i) in boats"
       :key="boat.id"
       :style="{ '--i': i }"
@@ -60,10 +62,10 @@ function maintenanceLabel(b: BoatListItem) {
           <span
             class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-surface-muted text-fg-muted ring-1 ring-border"
           >
-            {{ boat.propulsionType ?? t('boats.list.cards.unknownPropulsion') }}
+            {{ propulsionLabel(t, boat.propulsionType) ?? t('boats.list.cards.unknownPropulsion') }}
           </span>
         </div>
       </BaseCard>
-    </a>
+    </Link>
   </TransitionGroup>
 </template>

@@ -104,6 +104,7 @@ function handleCancel() {
         </p>
       </div>
       <div class="flex flex-wrap gap-3">
+        <!-- eslint-disable vue/no-restricted-v-bind -- export CSV : pas une navigation -->
         <a
           v-for="{ key, label } in [
             { key: 'maintenance', label: t('settings.import.exportMaintenance') },
@@ -119,6 +120,7 @@ function handleCancel() {
         >
           {{ label }}
         </a>
+        <!-- eslint-enable vue/no-restricted-v-bind -->
       </div>
     </BaseCard>
 
@@ -202,7 +204,7 @@ function handleCancel() {
               <tr
                 v-for="row in preview.rows"
                 :key="row.line"
-                :class="row.errors.length === 0 ? 'bg-surface' : 'bg-red-50 dark:bg-red-950/20'"
+                :class="row.errors.length === 0 ? 'bg-surface' : 'bg-danger-soft'"
               >
                 <td class="px-3 py-2 text-fg-muted">{{ row.line }}</td>
                 <td class="px-3 py-2">{{ row.raw['date'] ?? '' }}</td>
@@ -213,8 +215,8 @@ function handleCancel() {
                     :class="[
                       'rounded-full px-2 py-0.5 text-xs font-medium',
                       row.errors.length === 0
-                        ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-                        : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+                        ? 'bg-mint-100 text-mint-700'
+                        : 'bg-coral-100 text-coral-700',
                     ]"
                   >
                     {{
@@ -224,7 +226,7 @@ function handleCancel() {
                     }}
                   </span>
                 </td>
-                <td class="px-3 py-2 text-xs text-red-600 dark:text-red-400">
+                <td class="px-3 py-2 text-xs text-danger">
                   {{ row.errors.map((e) => e.message).join(', ') }}
                 </td>
               </tr>
