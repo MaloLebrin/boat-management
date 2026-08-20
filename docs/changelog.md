@@ -3,6 +3,14 @@
 Toutes les nouvelles fonctionnalités, améliorations et correctifs notables.  
 Format : `[date] — Description`. Les entrées les plus récentes sont en haut.
 
+## 2026-08-20 — Suppression d'un port : le bouton ne faisait plus rien (repéré en marge de #478)
+
+Repéré en peuplant la démo publique. Sur `/ports/:id`, le bouton « Supprimer » de l'en-tête ne produisait **ni alerte ni modale de confirmation** dès que le port avait au moins un ponton ou un mouillage : sa garde lisait `pontoon.boats.length`, or un bateau est rattaché à une **place**, pas au ponton. `PontoonRow` / `MouillageRow` exposent `spots[].boat` — `p.boats` valait `undefined` et `.length` levait une `TypeError` avalée par Vue.
+
+- **La garde suit la vraie forme des props** : `p.spots.some((s) => s.boat !== null)`, pour les pontons comme pour les mouillages.
+- **Pourquoi personne ne l'avait vu.** `vue-tsc` signalait bien `Property 'boats' does not exist on type 'PontoonRow'`, mais `pnpm typecheck` remonte déjà ~200 erreurs préexistantes (majoritairement `inertia.render(...)` typé `never`) : le bruit noyait le signal. Le test Vitest existant, lui, fabriquait un `boats: [...]` forcé par un `as never` — il validait une forme que le contrôleur n'envoie jamais.
+- **Tests.** Les fixtures de `tests/inertia/ports_show_delete.spec.ts` reprennent la forme réellement renvoyée par `PortService.getWithPontoonsAndMouillagesOrFail`, et trois cas sont couverts : bateau amarré sur une place de ponton → alerte, bateau sur une bouée de mouillage → alerte, places toutes libres → modale de confirmation. Les trois échouent sur le code d'avant avec la `TypeError`.
+
 ## 2026-08-20 — Calendrier des réservations : toute la flotte est affichée, pas seulement les bateaux réservés (#477)
 
 Suite de la campagne du 03/08. `/reservations` en vue « Calendrier » ne montrait **qu'une ligne pour cinq bateaux** : les lignes étaient construites à partir des réservations, donc un bateau sans aucune réservation n'existait pas dans la vue. C'est l'inverse de ce que la vue promet — « Vue multi-bateaux de toutes les réservations » sert justement à lire les disponibilités de la flotte d'un coup d'œil.
