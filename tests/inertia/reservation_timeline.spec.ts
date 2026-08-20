@@ -35,6 +35,24 @@ const boats = [
   { id: 2, name: 'Bora Bora' },
 ]
 
+const reservation = {
+  id: 1,
+  boatId: 1,
+  boatName: 'Mistral',
+  organizationId: 1,
+  clientId: null,
+  status: 'confirmed',
+  startsAt: '2026-03-02T10:00:00.000+00:00',
+  endsAt: '2026-03-06T10:00:00.000+00:00',
+  clientName: 'Client A',
+  clientEmail: null,
+  clientPhone: null,
+  notes: null,
+  totalPrice: null,
+  createdAt: '2026-03-01T10:00:00.000+00:00',
+  linkedInvoices: [],
+} satisfies FleetBoatCalendarEntry['reservations'][number]
+
 const entries: FleetBoatCalendarEntry[] = [
   { boatId: 1, boatName: 'Mistral', reservations: [] },
   { boatId: 2, boatName: 'Bora Bora', reservations: [] },
@@ -48,7 +66,25 @@ describe('ReservationTimeline', () => {
     expect(wrapper.findAll('[data-boat-id]')).toHaveLength(2)
   })
 
-  test('shows an empty state with a create-reservation action when entries list is empty', () => {
+  test('renders a row for a boat with no reservation at all (#477)', () => {
+    const wrapper = mount(ReservationTimeline, {
+      props: {
+        calendarEntries: [
+          { boatId: 1, boatName: 'Mistral', reservations: [reservation] },
+          { boatId: 2, boatName: 'Bora Bora', reservations: [] },
+          { boatId: 3, boatName: 'Cyclone', reservations: [] },
+        ],
+        boats,
+        selectedBoatId: null,
+      },
+    })
+    const rows = wrapper.findAll('[data-boat-id]')
+    expect(rows).toHaveLength(3)
+    expect(rows.map((r) => r.attributes('data-boat-id'))).toEqual(['1', '2', '3'])
+    expect(wrapper.find('[data-testid="create-reservation"]').exists()).toBe(false)
+  })
+
+  test('shows an empty state with a create-reservation action when the fleet has no boat', () => {
     const wrapper = mount(ReservationTimeline, {
       props: { calendarEntries: [], boats, selectedBoatId: null },
     })

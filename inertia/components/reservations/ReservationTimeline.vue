@@ -85,6 +85,10 @@ const monthEnd = computed(
         <!-- Legend -->
         <div class="flex items-center gap-4 text-xs text-fg-muted">
           <span class="flex items-center gap-1.5">
+            <span class="h-2.5 w-5 rounded-sm bg-surface-muted ring-1 ring-inset ring-border" />
+            {{ t('reservations.calendar.available') }}
+          </span>
+          <span class="flex items-center gap-1.5">
             <span class="h-2.5 w-5 rounded-sm bg-peach-300" />
             {{ t('reservations.status.option') }}
           </span>
@@ -102,8 +106,8 @@ const monthEnd = computed(
 
     <BaseEmptyState
       v-if="calendarEntries.length === 0"
-      :title="t('reservations.empty.title')"
-      :description="t('reservations.empty.fleetDescription')"
+      :title="t('reservations.calendar.noBoatsTitle')"
+      :description="t('reservations.calendar.noBoatsDescription')"
     >
       <template #action>
         <ReservationCreateButton :boats="boats" :selected-boat-id="selectedBoatId" />

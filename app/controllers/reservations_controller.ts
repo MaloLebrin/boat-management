@@ -1,12 +1,14 @@
 import BoatReservationService from '#services/boat_reservation_service'
 import InvoiceService from '#services/invoice_service'
 import QuotaService from '#services/quota_service'
-import { toBoatReservationRow } from '#transformers/boat_reservation_transformer'
+import {
+  toBoatReservationRow,
+  toFleetCalendarEntries,
+} from '#transformers/boat_reservation_transformer'
 import BoatPolicy from '#policies/boat_policy'
 import { boatOwnerPortalRedirect } from '#utils/staff_route_guard'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
-import type { FleetBoatCalendarEntry } from '#shared/types/reservation'
 import type { InvoiceLink } from '#shared/types/invoice'
 
 @inject()
@@ -51,21 +53,13 @@ export default class ReservationsController {
       toBoatReservationRow(r, r.boat?.name ?? '', linksByReservation.get(r.id) ?? [])
     )
 
-    const calendarEntriesMap = new Map<number, FleetBoatCalendarEntry>()
-    for (const row of rows) {
-      if (!calendarEntriesMap.has(row.boatId)) {
-        calendarEntriesMap.set(row.boatId, {
-          boatId: row.boatId,
-          boatName: row.boatName,
-          reservations: [],
-        })
-      }
-      calendarEntriesMap.get(row.boatId)!.reservations.push(row)
-    }
+    // Le calendrier liste toute la flotte (filtre bateau appliqué), pas seulement
+    // les bateaux ayant une réservation : sinon les disponibilités sont invisibles (#477).
+    const calendarBoats = selectedBoatId ? boats.filter((b) => b.id === selectedBoatId) : boats
 
     return inertia.render('reservations/index', {
       reservations: rows,
-      calendarEntries: Array.from(calendarEntriesMap.values()),
+      calendarEntries: toFleetCalendarEntries(calendarBoats, rows),
       boats,
       selectedBoatId,
       canCreateQuote,
