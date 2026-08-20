@@ -29,9 +29,12 @@ const tabs = [
 const showDeleteConfirm = ref(false)
 
 function handleDeletePort() {
+  // Un bateau est rattaché à une place, pas au ponton : le ponton n'expose pas
+  // de `boats`. La garde lisait `p.boats.length` — `undefined.length` levait
+  // une TypeError dès qu'un port avait un ponton, et le bouton ne faisait rien.
   const hasBoats =
-    props.port.pontoons.some((p) => p.boats.length > 0) ||
-    props.port.mouillages.some((m) => m.boats.length > 0)
+    props.port.pontoons.some((p) => p.spots.some((s) => s.boat !== null)) ||
+    props.port.mouillages.some((m) => m.spots.some((s) => s.boat !== null))
   if (hasBoats) {
     alert(t('ports.hasBoats'))
     return
