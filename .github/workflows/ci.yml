@@ -34,6 +34,29 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm run build
 
+  # Garde de migration TypeScript 6 → 7 (backend).
+  # Étape 4 du plan de montée de version (#373) : « faire tourner les deux
+  # versions jusqu'à ce que les sorties correspondent ». Le backend (`tsc -b`)
+  # est déjà TS 7-ready ; ce job échoue dès qu'une régression casse cette
+  # compatibilité. Le frontend (`vue-tsc`) reste bloqué sur une version
+  # compatible TS 7 et n'est donc pas encore couvert ici.
+  typecheck-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.9.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Type-check backend — TypeScript 6 (version courante)
+        run: pnpm exec tsc -b --force
+      - name: Type-check backend — TypeScript 7 (aperçu migration)
+        run: npx -y -p typescript@7.0.2 tsc -b --force
+
   test-backend:
     runs-on: ubuntu-latest
     services:
