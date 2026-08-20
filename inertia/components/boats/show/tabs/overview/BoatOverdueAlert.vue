@@ -12,14 +12,14 @@ const { formatDate } = useDateFormat()
 </script>
 
 <template>
-  <div v-if="overdueTasks.length > 0" class="rounded-lg border border-coral-300 bg-coral-50 p-4">
+  <div v-if="overdueTasks.length > 0" class="rounded-lg border border-coral-200 bg-coral-50 p-4">
     <div class="flex items-start gap-3">
       <ExclamationTriangleIcon class="mt-0.5 h-5 w-5 shrink-0 text-coral-600" />
       <div class="flex-1">
-        <p class="font-semibold text-coral-900">
+        <p class="font-semibold text-coral-700">
           {{ t('boats.show.overview.overdueTasks', { count: String(overdueTasks.length) }) }}
         </p>
-        <ul class="mt-2 space-y-1 text-sm text-coral-800">
+        <ul class="mt-2 space-y-1 text-sm text-coral-700">
           <li v-for="task in overdueTasks.slice(0, 3)" :key="task.id">
             {{ task.title }} - {{ formatDate(task.dueAt) }}
           </li>

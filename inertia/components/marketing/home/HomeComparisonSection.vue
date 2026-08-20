@@ -18,7 +18,7 @@ defineProps<{
 const { el: sectionEl, isVisible } = useScrollReveal()
 
 function getCellClass(value: string): string {
-  if (value.includes('auto') || value.includes('EU')) return 'text-mint-400 font-semibold'
+  if (value.includes('auto') || value.includes('EU')) return 'text-mint-300 font-semibold'
   if (value === '~') return 'text-amber-400'
   return ''
 }

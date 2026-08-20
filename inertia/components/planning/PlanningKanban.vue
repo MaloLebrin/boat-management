@@ -201,7 +201,7 @@ const doneTasksLabel = computed(() => {
         :key="task.id"
         :task="task"
         :highlighted="task.id === highlightedTaskId"
-        accent-class="border-mint-500 opacity-75"
+        accent-class="border-mint-600 opacity-75"
         badge-class="bg-mint-100 text-mint-700"
         :done="true"
       />

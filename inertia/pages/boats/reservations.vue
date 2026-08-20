@@ -82,12 +82,12 @@ onMounted(() => {
         class="rounded-(--radius-card) border border-border bg-surface-elevated p-5 shadow-(--shadow-xs)"
       >
         <div class="flex items-center gap-2">
-          <span class="h-2 w-2 rounded-full bg-peach-400" />
+          <span class="h-2 w-2 rounded-full bg-peach-300" />
           <p class="text-xs font-semibold uppercase tracking-wide text-fg-muted">
             {{ t('reservations.stats.option') }}
           </p>
         </div>
-        <p class="mt-2 font-display text-3xl font-bold tracking-tight text-peach-600">
+        <p class="mt-2 font-display text-3xl font-bold tracking-tight text-peach-700">
           {{ stats.option }}
         </p>
       </div>
@@ -95,7 +95,7 @@ onMounted(() => {
         class="rounded-(--radius-card) border border-border bg-surface-elevated p-5 shadow-(--shadow-xs)"
       >
         <div class="flex items-center gap-2">
-          <span class="h-2 w-2 rounded-full bg-mint-500" />
+          <span class="h-2 w-2 rounded-full bg-mint-600" />
           <p class="text-xs font-semibold uppercase tracking-wide text-fg-muted">
             {{ t('reservations.stats.confirmed') }}
           </p>

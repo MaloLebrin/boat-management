@@ -15,7 +15,7 @@ defineProps<{
       <div class="flex items-center gap-1.5">
         <div class="h-3 w-3 rounded-full bg-coral-400" />
         <div class="h-3 w-3 rounded-full bg-amber-400" />
-        <div class="h-3 w-3 rounded-full bg-mint-400" />
+        <div class="h-3 w-3 rounded-full bg-mint-300" />
       </div>
       <!-- URL bar -->
       <div class="flex flex-1 items-center justify-center">

@@ -230,7 +230,7 @@ const tableRows = computed(() => {
               peach
             </div>
             <div
-              class="rounded-(--radius-control) border border-border bg-mint-100 px-3 py-2 text-xs font-semibold text-mint-800 ring-1 ring-mint-200"
+              class="rounded-(--radius-control) border border-border bg-mint-100 px-3 py-2 text-xs font-semibold text-mint-700 ring-1 ring-mint-200"
             >
               mint
             </div>

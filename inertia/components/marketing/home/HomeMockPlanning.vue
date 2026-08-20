@@ -170,7 +170,7 @@
             <span class="text-fg-muted">Planifié</span>
           </div>
           <div class="flex items-center gap-1">
-            <div class="h-2 w-2 rounded bg-mint-400" />
+            <div class="h-2 w-2 rounded bg-mint-300" />
             <span class="text-fg-muted">Terminé</span>
           </div>
         </div>

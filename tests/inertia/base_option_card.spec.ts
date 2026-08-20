@@ -28,10 +28,10 @@ test('applies selected classes when selected', () => {
 
 test('uses custom selectedClass when provided', () => {
   const w = mount(BaseOptionCard, {
-    props: { selected: true, selectedClass: 'border-mint-500 bg-mint-100' },
+    props: { selected: true, selectedClass: 'border-mint-600 bg-mint-100' },
     slots: { default: 'Test' },
   })
-  expect(w.classes().join(' ')).toContain('border-mint-500')
+  expect(w.classes().join(' ')).toContain('border-mint-600')
 })
 
 test('uses custom unselectedClass when provided', () => {

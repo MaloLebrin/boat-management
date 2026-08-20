@@ -86,7 +86,7 @@ function handleNotesBlur(item: MaintenanceSheetItemRow) {
           :class="[
             'mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded border transition-colors',
             item.isDone
-              ? 'border-mint-500 bg-mint-500 text-white'
+              ? 'border-brand bg-brand-soft text-brand'
               : 'border-border hover:border-brand',
           ]"
           @click="toggleItemDone(item)"
@@ -110,7 +110,7 @@ function handleNotesBlur(item: MaintenanceSheetItemRow) {
           v-else
           :class="[
             'mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded border',
-            item.isDone ? 'border-mint-500 bg-mint-500 text-white' : 'border-border',
+            item.isDone ? 'border-brand bg-brand-soft text-brand' : 'border-border',
           ]"
         >
           <svg

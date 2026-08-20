@@ -10,8 +10,8 @@ const props = defineProps<{
 }>()
 
 const pillClass: Record<ReservationStatus, string> = {
-  option: 'bg-peach-200 text-peach-900',
-  confirmed: 'bg-mint-200 text-mint-900',
+  option: 'bg-peach-200 text-peach-800',
+  confirmed: 'bg-mint-200 text-mint-700',
   cancelled: 'bg-lilac-100 text-lilac-700 opacity-60',
 }
 

@@ -102,7 +102,7 @@ function getComparisonVal(row: string, col: 'excel' | 'paper' | 'fleetai'): stri
         class="reveal bg-surface-elevated border border-bone rounded-xl px-6 py-6 shadow-(--shadow-sm) hover:-translate-y-1 hover:shadow-md transition-all duration-300"
         :class="[`reveal-delay-${idx + 1}`, { visible: testimonialsVisible }]"
       >
-        <ChatBubbleLeftRightIcon class="h-6 w-6 text-coral-300 mb-3" />
+        <ChatBubbleLeftRightIcon class="h-6 w-6 text-coral-400 mb-3" />
         <p class="text-sm italic text-fg-muted">
           <span class="text-lg text-coral-500/40">"</span>
           {{ item.quote }}

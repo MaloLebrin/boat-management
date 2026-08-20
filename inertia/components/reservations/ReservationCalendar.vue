@@ -54,7 +54,7 @@ const calendarDays = computed(() =>
 
 const pillClass: Record<ReservationStatus, string> = {
   option: 'bg-peach-100 text-peach-800',
-  confirmed: 'bg-mint-100 text-mint-800',
+  confirmed: 'bg-mint-100 text-mint-700',
   cancelled: 'bg-lilac-100 text-lilac-800 line-through',
 }
 </script>

@@ -92,8 +92,8 @@ const cards = [
         </div>
         <!-- Status dots -->
         <div class="absolute top-4 right-4 flex items-center gap-1.5">
-          <span class="h-2.5 w-2.5 rounded-full bg-mint-400 ring-2 ring-mint-400/30" />
-          <span class="h-2.5 w-2.5 rounded-full bg-mint-400 ring-2 ring-mint-400/30" />
+          <span class="h-2.5 w-2.5 rounded-full bg-mint-300 ring-2 ring-mint-300/30" />
+          <span class="h-2.5 w-2.5 rounded-full bg-mint-300 ring-2 ring-mint-300/30" />
           <span class="h-2.5 w-2.5 rounded-full bg-amber-400 ring-2 ring-amber-400/30" />
           <span class="h-2.5 w-2.5 rounded-full bg-coral-400 ring-2 ring-coral-400/30" />
         </div>

@@ -26,7 +26,7 @@ const containerClass = computed(() => {
 
   const toneMap: Record<Variant, string> = {
     info: 'bg-sky-50 text-sky-800',
-    success: 'bg-mint-50 text-mint-800',
+    success: 'bg-mint-50 text-mint-700',
     warning: 'bg-peach-50 text-peach-800',
     danger: 'bg-[var(--color-danger-soft)] text-[var(--color-danger)]',
   }

@@ -54,7 +54,7 @@ const { el: sectionEl, isVisible } = useScrollReveal()
           class="reveal rounded-xl border border-bone bg-surface-elevated p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
           :class="[`reveal-delay-${idx + 1}`, { visible: isVisible }]"
         >
-          <ChatBubbleLeftRightIcon class="mb-3 h-6 w-6 text-coral-300" />
+          <ChatBubbleLeftRightIcon class="mb-3 h-6 w-6 text-coral-400" />
           <p class="text-sm italic text-fg-muted">"{{ item.quote }}"</p>
           <div class="mt-4">
             <p class="font-semibold text-fg">{{ item.author }}</p>

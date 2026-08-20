@@ -118,7 +118,7 @@ const proPrice = computed(() => {
               :key="f"
               class="flex items-center gap-2 text-sm text-white/70"
             >
-              <CheckIcon class="h-4 w-4 shrink-0 text-mint-400" />
+              <CheckIcon class="h-4 w-4 shrink-0 text-mint-300" />
               <span>{{ f }}</span>
             </li>
           </ul>
