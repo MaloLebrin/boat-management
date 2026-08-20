@@ -48,6 +48,9 @@ Contenu :
 - organisation `Marina Démo` (slug `marina-demo`, plan `pro`) et utilisateur `DEMO_EMAIL` (`demo@fleetai.app` par défaut, mot de passe `DEMO_PASSWORD` env ou `demo1234`) — voir `shared/constants/demo.ts`
 - 5 bateaux typés (voiliers + bateaux à moteur), équipement adapté au type de propulsion
 - 5 événements de maintenance par bateau (dates aléatoires dans une plage réaliste)
+- un port de démonstration (`seedDemoPort`, #478) : « Port de la Grande Rade » (Saint-Malo) → 3 pontons (6/6/4 places) + une zone de mouillage (4 bouées), soit 20 places dont 5 occupées par les bateaux de démo. Sans lui, `/ports` affichait « Aucun port enregistré » et le plan marina interactif — argument produit — restait invisible dans la sandbox. Deux points à respecter en cas de modification :
+  - **les positions sont explicites** (repère du canvas `MARINA_CANVAS_WIDTH` × `MARINA_CANVAS_HEIGHT`, soit 1400 × 900) et posées **à la création seulement** : sans position, `MarinaMapTab` retombe sur une grille automatique ; en la réécrivant à chaque run, on annulerait le déplacement fait par un visiteur entre deux resets
+  - **un ponton n'affiche que ses 6 premières places** (`MAX_VISIBLE_SPOTS` dans `MarinaPontoon.vue`, au-delà un « +N ») — d'où des pontons de 6 places maximum
 - 6 notifications de démo (`seedDemoNotifications`) couvrant sévérités/types variés (maintenance en retard, document expirant, équipement de sécurité expiré, membre rejoint, plan mis à niveau, quota de stockage), mélange lu/non-lu
 
 ---
