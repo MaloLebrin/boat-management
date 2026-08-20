@@ -11,6 +11,16 @@ Repéré en peuplant la démo publique. Sur `/ports/:id`, le bouton « Supprimer
 - **Pourquoi personne ne l'avait vu.** `vue-tsc` signalait bien `Property 'boats' does not exist on type 'PontoonRow'`, mais `pnpm typecheck` remonte déjà ~200 erreurs préexistantes (majoritairement `inertia.render(...)` typé `never`) : le bruit noyait le signal. Le test Vitest existant, lui, fabriquait un `boats: [...]` forcé par un `as never` — il validait une forme que le contrôleur n'envoie jamais.
 - **Tests.** Les fixtures de `tests/inertia/ports_show_delete.spec.ts` reprennent la forme réellement renvoyée par `PortService.getWithPontoonsAndMouillagesOrFail`, et trois cas sont couverts : bateau amarré sur une place de ponton → alerte, bateau sur une bouée de mouillage → alerte, places toutes libres → modale de confirmation. Les trois échouent sur le code d'avant avec la `TypeError`.
 
+## 2026-08-20 — Démo publique : la sandbox montre enfin son plan marina (#478)
+
+Suite de la campagne du 03/08. La sandbox « Marina Démo » affichait « Aucun port enregistré » : le plan marina interactif — argument produit mis en avant sur le site — restait invisible pour un visiteur, alors que la démo est justement là pour le montrer.
+
+- **Un port de démonstration complet.** `sandbox_seeder.ts` crée « Port de la Grande Rade » (Saint-Malo) avec 3 pontons (`Ponton A`, `Ponton B`, `Ponton C`), une zone de mouillage (`Corps-morts du Sud`) et 20 places au total.
+- **Le plan est posé, pas subi.** Pontons et mouillage reçoivent des coordonnées explicites dans le repère du canvas (1400 × 900) : sans position enregistrée, `MarinaMapTab` retombe sur une grille automatique qui empile les éléments. Chaque ponton s'arrête à 6 places, la limite affichée par `MarinaPontoon` avant le résumé « +N ».
+- **5 places occupées sur 20.** Les cinq bateaux de démo sont amarrés (Albatros → A03, Cap Mistral → A05, Marin du Vent → B02, Étoile du Port → C01, Tempête Douce → bouée M2) : la carte `/ports` annonce 5 bateaux et 15 places libres, et le plan montre du plein comme du vide.
+- **Idempotence préservée.** Chaque étage (port → ponton/mouillage → place) est cherché par nom avant création, la position n'est écrite qu'à la création, et l'affectation d'un bateau est gardée par `boat.spotId !== spot.id` — sans quoi chaque `db:seed` empilerait un changement de poste fictif dans `boat_position_history`.
+- **Tests.** 6 tests d'intégration (`tests/integration/seeders/demo_marina_plan.spec.ts`) : structure du port, positions présentes, bateaux amarrés, occupation renvoyée par `PortService.listForUser`, non-duplication au second run et reconstruction complète après `DemoService.reset()`. Ils échouent sur le code d'avant.
+
 ## 2026-08-20 — Calendrier des réservations : toute la flotte est affichée, pas seulement les bateaux réservés (#477)
 
 Suite de la campagne du 03/08. `/reservations` en vue « Calendrier » ne montrait **qu'une ligne pour cinq bateaux** : les lignes étaient construites à partir des réservations, donc un bateau sans aucune réservation n'existait pas dans la vue. C'est l'inverse de ce que la vue promet — « Vue multi-bateaux de toutes les réservations » sert justement à lire les disponibilités de la flotte d'un coup d'œil.
