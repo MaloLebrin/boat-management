@@ -45,9 +45,9 @@ router.get('<path>', [controllers.<Controller>, '<method>']).as('<resource>.<act
 - Nommage `resource.action` (ex: `settings.notifications`)
 - Si nouveau domaine : créer le fichier + ajouter `import './routes/<domain>.js'` dans `start/routes.ts`
 
-## Changelog — `docs/changelog.md`
+## Changelog — `docs/changelog/`
 
-Entrée en tête avec date, fichiers créés, description courte.
+Nouveau fichier `YYYY-MM-DD-HHMM-slug.md` avec date en h1, fichiers créés, description courte.
 
 ## Checklist
 

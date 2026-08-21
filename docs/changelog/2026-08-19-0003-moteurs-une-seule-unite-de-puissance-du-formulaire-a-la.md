@@ -1,0 +1,7 @@
+# 2026-08-19 — Moteurs : une seule unité de puissance, du formulaire à la fiche (#469)
+
+Suite de la campagne du 03/08 (famille #368). Le formulaire moteur demandait une « Puissance (ch) » et la fiche bateau réaffichait la même valeur en « 40 cv » — deux notations pour un seul champ, saisi puis relu à quelques clics d'écart.
+
+- **Le français note la puissance en « ch ».** `boats.engines.powerUnit` passe de « cv » à « ch », en accord avec le libellé du formulaire, qui ne bouge pas. « CV » désigne les chevaux fiscaux ; la puissance d'un moteur s'exprime en chevaux-vapeur, notés « ch ». La ligne du PDF de carnet d'entretien (`maintenanceLog.engineFields.hp`) suit. L'anglais était déjà cohérent (« hp » partout) et reste inchangé.
+- **Deux écrans écrivaient l'unité en dur.** L'onglet « Caractéristiques » de la fiche moteur et l'en-tête de `/boats/:id/engines/:engineId` affichaient un « HP » codé dans le gabarit : la puissance restait donc en anglais même en français, et échappait à tout changement d'unité. Les deux passent par `t('boats.engines.powerUnit')`, comme la carte moteurs de la fiche bateau.
+- **Tests.** 8 tests (`tests/inertia/engine_power_unit_consistency.spec.ts`) montés sur les vraies traductions et les vraies sources, pas sur un `appT` mocké : le libellé du formulaire doit annoncer entre parenthèses exactement l'unité affichée, dans les deux locales, le PDF doit reprendre la même, et tout écran rendant `powerHp` doit passer par la clé d'unité sans jamais la réécrire à la main — 4 de ces tests échouent sur le code d'avant.

@@ -1,0 +1,8 @@
+# 2026-08-04 — La bannière « Session démo » ne fuit plus sur les comptes réels (#451)
+
+Repro de la campagne du 03/08 : `/demo` → « Quitter la démo » → connexion `pro@test.local` → la bannière « Session démo — 0:00 restantes » restait affichée sur le compte réel, survivait au rechargement, puis **suivait la session navigateur d'un compte à l'autre** (logout → mécano → entreprise, timer figé à 0:00). Le bouton « Quitter la démo » qu'elle porte aurait déconnecté un utilisateur réel. `DemoController.login` posait `demoSessionStartedAt` en session, personne ne la purgeait, et `inertia_middleware` la partageait sans vérifier l'identité de l'utilisateur courant.
+
+- **Purge au logout.** `auth.logout()` ne vide pas la session : `SessionController.destroy` fait désormais un `session.forget('demoSessionStartedAt')` (pour tout utilisateur, pas seulement le compte démo, afin de nettoyer une clé déjà fuitée). Même purge dans `CheckDemoSessionMiddleware` quand la session démo expire.
+- **Purge au login.** `SessionController.store` oublie la clé juste après l'authentification — filet de sécurité pour les sessions navigateur qui traînent déjà une clé issue d'une démo antérieure.
+- **Garde-fou côté partage.** `inertia_middleware` ne partage `demoSessionStartedAt` / `demoSessionDurationMs` que si `demoService.isDemoUser(auth.user.email)` — la bannière ne peut plus s'afficher hors du compte démo, quelle que soit la session.
+- **Tests** (`tests/functional/auth/demo_session_leak.spec.ts`, 3 tests) : un compte réel avec une clé de session résiduelle ne reçoit aucune prop de bannière ; le logout et le login purgent la clé. Les trois échouent sur le code d'avant.

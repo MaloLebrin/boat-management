@@ -87,4 +87,4 @@ emitter.listen(<EventName>, [
 - [ ] Event câblé dans `start/events.ts`
 - [ ] `node ace generate:manifest` exécuté
 - [ ] Dispatch dans le service (pas dans le controller)
-- [ ] Changelog mis à jour (`docs/changelog.md`)
+- [ ] Changelog : nouveau fichier `docs/changelog/YYYY-MM-DD-HHMM-slug.md`

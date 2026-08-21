@@ -84,4 +84,4 @@ await <JobName>.schedule({})
 - [ ] Le job est dispatché depuis le bon service (pas depuis un controller)
 - [ ] `failed()` implémentée
 - [ ] Si cron : inscription dans `start/scheduler.ts` avec id unique
-- [ ] Changelog mis à jour (`docs/changelog.md`)
+- [ ] Changelog : nouveau fichier `docs/changelog/YYYY-MM-DD-HHMM-slug.md`
