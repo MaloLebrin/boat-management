@@ -141,7 +141,7 @@ L'app supporte un thème sombre (issue #416) piloté par l'attribut `data-theme`
 3. **Tests obligatoires** pour toute logique métier nouvelle
 4. **Pas de `console.log`** en commit — utiliser le logger Adonis
 5. **Migrations** : ne jamais modifier une migration déjà exécutée en production
-6. **Documentation obligatoire** : toute nouvelle feature doit être ajoutée en haut de `docs/changelog.md` avec la date et une description en français (routes, champs, comportements notables)
+6. **Documentation obligatoire** : toute nouvelle feature doit être documentée dans un nouveau fichier `docs/changelog/YYYY-MM-DD-HHMM-slug.md` (un fichier par modification, `HHMM` = heure de rédaction — convention détaillée dans `docs/changelog/README.md`), avec la date et une description en français (routes, champs, comportements notables)
 
 ## Structure projet
 

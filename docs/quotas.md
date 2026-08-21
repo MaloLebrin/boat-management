@@ -294,4 +294,4 @@ Le composant `SettingsBillingUsageGauge` affiche les octets avec les unités loc
 4. Appeler dans le controller concerné (pattern : avant toute écriture, dans try/catch `QuotaExceededError`)
 5. Ajouter les clés i18n : `flash.quota.<feature>Exceeded` en EN et FR
 6. Mettre à jour `SettingsController.billing()` si usage visible sur la page billing
-7. Mettre à jour ce fichier (`docs/quotas.md`) et `docs/changelog.md`
+7. Mettre à jour ce fichier (`docs/quotas.md`) et créer une entrée `docs/changelog/YYYY-MM-DD-HHMM-slug.md`

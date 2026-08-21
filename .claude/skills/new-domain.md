@@ -119,7 +119,7 @@ test.group('<Domain>s (functional)', (group) => {
 })
 ```
 
-**15. `docs/changelog.md`** — entrée en tête avec date + liste des fichiers créés
+**15. Changelog** — nouveau fichier `docs/changelog/YYYY-MM-DD-HHMM-slug.md` avec date en h1 + liste des fichiers créés
 
 ## Checklist
 

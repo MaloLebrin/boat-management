@@ -168,7 +168,7 @@ Références : `resources/lang/{en,fr}/notifications.json`. Le namespace `notifi
 3. Créer un **listener** dans `app/listeners/` qui appelle `notificationService.create({ userId, organizationId, type, severity, title, body, actionUrl, metadata })`. Localiser `title`/`body` via `i18nManager` (ajouter les clés `notifications.messages.<type>.*` dans **`en` et `fr`**).
 4. Brancher le listener dans `start/events.ts` (`emitter.listen`).
 5. Ajouter la clé d'affichage `notifications.types.<type>` (en/fr).
-6. Écrire les tests (voir ci-dessous) et documenter dans `docs/changelog.md`.
+6. Écrire les tests (voir ci-dessous) et documenter dans une entrée `docs/changelog/YYYY-MM-DD-HHMM-slug.md`.
 
 Aucune modification frontend n'est nécessaire : la cloche, le panneau et la page consomment génériquement `NotificationForFront`.
 

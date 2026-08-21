@@ -1,0 +1,3 @@
+# 2026-07-08 — Analyse : proposition d'offre modulaire (socles + add-ons)
+
+Ajout de `docs/offre-modulaire.md` : catalogue des fonctionnalités découpées en modules (socle commun, Location, CRM Clients, Facturation, IA, Marina, Navigation & Bord, Marque blanche, Data & Conformité), comparaison de trois scénarios commerciaux (tiers redécoupés / hybride socles + add-ons / 100 % à la carte) et recommandation : lancer une V1 hybride avec deux modules déjà gatés (**Location** 15 €/mois et **CRM & Facturation** 15 €/mois) sur le socle Pro, Enterprise conservé en bundle tout inclus. Document d'analyse uniquement — aucun changement de code ni de gating.

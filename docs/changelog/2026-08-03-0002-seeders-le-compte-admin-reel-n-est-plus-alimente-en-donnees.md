@@ -1,0 +1,11 @@
+# 2026-08-03 — Seeders : le compte admin réel n'est plus alimenté en données fictives
+
+Le compte `ADMIN_EMAIL` (`malolebrin@gmail.com`) n'est pas un compte de test : c'est le compte réel de l'exploitant. Trois écarts avec la réalité ont été corrigés dans `database/seeders/malo_seeder.ts`.
+
+- **Port réel.** Le seeder créait un port inventé, « Port de Test Audit » à Marseille. Il crée désormais le vrai poste d'amarrage du bateau « 3D » : port `Querqueville` (Cherbourg-en-Cotentin) → mouillage `Corps-morts` → bouée `B08`, via `PortService` / `MouillageService` / `SpotService`, puis affecte le bateau au spot. Seule B08 est créée — les autres bouées du mouillage réel seraient du remplissage. L'affectation est gardée par `if (boat.spotId !== spot.id)` : `BoatService.updateAssignment` journalise un changement de poste dans `boat_position_history` à **chaque** appel, donc sans la garde une seconde exécution du seeder empilerait un historique de mouvements fictif (vérifié : 3 lignes au lieu d'1 après deux runs).
+- **Plan `pro`.** L'organisation était forcée en `enterprise`. Elle est désormais mise à `pro`, toujours directement sur `organizations.plan` sans abonnement Stripe, comme en réalité.
+- **`test_plans_seeder.ts` ne touche plus au compte réel.** Ce seeder de test repassait l'organisation admin en `enterprise` (avec un fallback en dur sur `malolebrin@gmail.com`) — il aurait écrasé le plan `pro` à chaque exécution. Section supprimée ; il ne crée plus que des comptes `@test.local`.
+
+Les données du bateau « 3D » et leurs enfants (2 moteurs, 4 voiles, gréement, 6 événements de maintenance et 5 tâches planifiées) sont conservées telles quelles : elles viennent d'un dump réel.
+
+Garde-fou : `tests/integration/seeders/admin_account_isolation.spec.ts` exécute les quatre seeders puis vérifie que l'organisation admin n'a qu'un bateau (« 3D »), le plan `pro`, un seul port (Querqueville/Corps-morts/B08), que le bateau est bien sur B08 et qu'aucune notification ne lui a été rattachée ; un second test relance `malo_seeder` deux fois et exige une unique ligne `boat_position_history`. Les deux assertions clés ont été vérifiées en cassant volontairement le code (plan remis à `enterprise` → échec ; garde d'affectation retirée → échec).

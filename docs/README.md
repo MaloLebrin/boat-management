@@ -28,6 +28,7 @@ Cette documentation décrit **fonctionnellement** et **techniquement** le projet
 - **Seeders**: `docs/dev/seeders.md`
 - **Contribution**: `docs/dev/contributing.md`
 - **Process “doc à jour”**: `docs/process/keeping-docs-up-to-date.md`
+- **Changelog**: `docs/changelog/` — un fichier par modification (convention dans `docs/changelog/README.md`)
 
 ## Règle de maintenabilité (doc à jour)
 

@@ -1,0 +1,8 @@
+# 2026-08-19 — Dashboard mécanicien : la carte d'intervention s'ouvre enfin (#473)
+
+Suite de la campagne du 03/08 (famille #417). Sur « Mes interventions », la carte d'une intervention en retard (Sun Odyssey 35 — Vidange moteur) n'était qu'un bloc de texte : aucun clic ne menait à la tâche.
+
+- **Toute la carte est désormais un lien.** `MechanicInterventionRow` enveloppe son contenu dans un `<Link>` Inertia, avec état de survol, anneau de focus clavier et `aria-label` nommant la tâche et le bateau (`dashboard.mechanic.openTask`, ajoutée en FR et EN).
+- **Destination : le planning, pas la fiche bateau.** Le mécanicien n'a que les capabilities `maintenance.*` ; `/boats/:id` passe par `BoatPolicy.view` → `boats.view` et lui répond 403. La carte pointe donc vers `/planning?task=<id>`, seul écran où il peut agir sur la tâche.
+- **`/planning?task=<id>` cible la tâche.** La page lit le paramètre sur `page.url` (et non `window.location`, pour que le SSR rende déjà le bon état), le transmet au kanban, et la carte correspondante s'affiche avec un anneau `ring-brand` en se plaçant à l'écran (`scrollIntoView`). Un `task` absent, non numérique ou hors plage est ignoré. Chaque carte du planning porte aussi un id DOM stable `planning-task-<id>`.
+- **Tests.** 7 tests (`tests/inertia/mechanic_intervention_row.spec.ts`) sur le lien, sa cible, son libellé accessible et les deux formes d'échéance ; 6 tests (`tests/inertia/planning_task_highlight.spec.ts`) sur le surlignage, le scroll et les paramètres invalides ; 1 test fonctionnel (`tests/functional/dashboard/mechanic_dashboard.spec.ts`) vérifiant qu'un mécanicien obtient bien 200 sur `/planning?task=<id>` et 403 sur `/boats/:id`.

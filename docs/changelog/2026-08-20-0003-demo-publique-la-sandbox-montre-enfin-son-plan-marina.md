@@ -1,0 +1,9 @@
+# 2026-08-20 — Démo publique : la sandbox montre enfin son plan marina (#478)
+
+Suite de la campagne du 03/08. La sandbox « Marina Démo » affichait « Aucun port enregistré » : le plan marina interactif — argument produit mis en avant sur le site — restait invisible pour un visiteur, alors que la démo est justement là pour le montrer.
+
+- **Un port de démonstration complet.** `sandbox_seeder.ts` crée « Port de la Grande Rade » (Saint-Malo) avec 3 pontons (`Ponton A`, `Ponton B`, `Ponton C`), une zone de mouillage (`Corps-morts du Sud`) et 20 places au total.
+- **Le plan est posé, pas subi.** Pontons et mouillage reçoivent des coordonnées explicites dans le repère du canvas (1400 × 900) : sans position enregistrée, `MarinaMapTab` retombe sur une grille automatique qui empile les éléments. Chaque ponton s'arrête à 6 places, la limite affichée par `MarinaPontoon` avant le résumé « +N ».
+- **5 places occupées sur 20.** Les cinq bateaux de démo sont amarrés (Albatros → A03, Cap Mistral → A05, Marin du Vent → B02, Étoile du Port → C01, Tempête Douce → bouée M2) : la carte `/ports` annonce 5 bateaux et 15 places libres, et le plan montre du plein comme du vide.
+- **Idempotence préservée.** Chaque étage (port → ponton/mouillage → place) est cherché par nom avant création, la position n'est écrite qu'à la création, et l'affectation d'un bateau est gardée par `boat.spotId !== spot.id` — sans quoi chaque `db:seed` empilerait un changement de poste fictif dans `boat_position_history`.
+- **Tests.** 6 tests d'intégration (`tests/integration/seeders/demo_marina_plan.spec.ts`) : structure du port, positions présentes, bateaux amarrés, occupation renvoyée par `PortService.listForUser`, non-duplication au second run et reconstruction complète après `DemoService.reset()`. Ils échouent sur le code d'avant.

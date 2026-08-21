@@ -1,0 +1,7 @@
+# 2026-08-19 — Connexion : le message d'identifiants invalides parle enfin français (#470)
+
+Suite de la campagne du 03/08 (famille #368). Un mot de passe erroné sur `/login` affichait « Invalid user credentials » — le message technique brut d'AdonisJS, en anglais quelle que soit la langue de l'interface.
+
+- **La clé de traduction attendue par le framework n'existait pas.** `E_INVALID_CREDENTIALS` résout son libellé via `i18n.t('errors.E_INVALID_CREDENTIALS')` et retombe sur son message anglais codé en dur quand la clé manque. Elle est ajoutée dans les deux locales (`resources/lang/{en,fr}/errors.json`) : « E-mail ou mot de passe incorrect. » / « Incorrect email or password. » — un message qui ne dit toujours pas lequel des deux champs est en cause, pour ne pas révéler l'existence d'un compte.
+- **Même correctif pour l'autre exception d'auth du framework.** Une navigation invitée vers une page protégée (`/boats` sans session) redirigeait vers `/login` avec un toast « Unauthorized access ». `errors.E_UNAUTHORIZED_ACCESS` est ajoutée sur le même principe : « Veuillez vous connecter pour accéder à cette page. » / « Please sign in to access this page. »
+- **Tests.** 4 tests fonctionnels (`tests/functional/auth/login.spec.ts`) vérifient le message flashé en français et en anglais, sur mot de passe erroné et sur e-mail inconnu, plus la redirection invitée — tous échouent sur le code d'avant, avec les messages bruts du framework.

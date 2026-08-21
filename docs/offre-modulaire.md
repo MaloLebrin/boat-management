@@ -2,7 +2,7 @@
 
 > **Statut** : proposition à arbitrer — aucun changement de code n'a été effectué.
 > **Date** : 8 juillet 2026
-> **Sources** : `shared/types/plan.ts`, `shared/types/permissions.ts`, `docs/billing-and-quotas.md`, `inertia/composables/use_nav_sections.ts`, `inertia/pages/marketing/pricing.vue`, `docs/changelog.md`
+> **Sources** : `shared/types/plan.ts`, `shared/types/permissions.ts`, `docs/billing-and-quotas.md`, `inertia/composables/use_nav_sections.ts`, `inertia/pages/marketing/pricing.vue`, `docs/changelog/`
 
 ## 1. État de l'existant
 

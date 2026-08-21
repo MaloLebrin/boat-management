@@ -167,7 +167,7 @@ database/
   migrations/
   seeders/
 docs/
-  changelog.md       # Journal des fonctionnalités
+  changelog/         # Journal des fonctionnalités — un fichier par modification
 ```
 
 ---
