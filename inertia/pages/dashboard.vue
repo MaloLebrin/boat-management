@@ -142,8 +142,8 @@ function dismissAlert() {
                     ev.kind === 'date' && ev.dueAt && isOverdue(ev.dueAt)
                       ? 'bg-danger/10 text-danger ring-1 ring-danger/20'
                       : ev.kind === 'date'
-                        ? 'bg-amber-500/10 text-amber-800 ring-1 ring-amber-500/20'
-                        : 'bg-sky-500/10 text-sky-800 ring-1 ring-sky-500/20'
+                        ? 'bg-warning/10 text-warning ring-1 ring-warning/20'
+                        : 'bg-sky-700/10 text-sky-800 ring-1 ring-sky-700/20'
                   "
                 >
                   <span v-if="ev.kind === 'date'">

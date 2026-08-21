@@ -51,14 +51,14 @@ const containerClass = computed(() => {
 })
 
 const iconClass = computed<Record<Variant, string>>(() => ({
-  info: 'text-sky-500',
+  info: 'text-sky-700',
   success: 'text-mint-600',
   warning: 'text-peach-700',
   danger: 'text-[var(--color-danger)]',
 }))
 
 const dismissHoverClass = computed<Record<Variant, string>>(() => ({
-  info: 'hover:bg-sky-100 text-sky-600',
+  info: 'hover:bg-sky-100 text-sky-700',
   success: 'hover:bg-mint-100 text-mint-700',
   warning: 'hover:bg-peach-100 text-peach-700',
   danger: 'hover:bg-[var(--color-danger-soft)] text-[var(--color-danger)]',

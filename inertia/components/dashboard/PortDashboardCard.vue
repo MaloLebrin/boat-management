@@ -21,7 +21,7 @@ function fillRate(port: DashboardPortItem): number {
 
 function fillRateColor(rate: number): string {
   if (rate >= 90) return 'bg-danger'
-  if (rate >= 70) return 'bg-amber-500'
+  if (rate >= 70) return 'bg-warning'
   return 'bg-brand'
 }
 

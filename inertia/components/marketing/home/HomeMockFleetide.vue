@@ -36,8 +36,8 @@
         </div>
       </nav>
       <div class="mt-auto border-t border-white/10 px-2 py-2">
-        <div class="flex items-center gap-1.5 rounded bg-violet-600/30 px-2 py-1 text-violet-200">
-          <div class="h-3 w-3 rounded bg-violet-400" />
+        <div class="flex items-center gap-1.5 rounded bg-violet-600/30 px-2 py-1 text-lilac-300">
+          <div class="h-3 w-3 rounded bg-lilac-300" />
           <span class="font-medium">FleetAi</span>
         </div>
       </div>
@@ -100,7 +100,7 @@
               <span><strong>Alizée</strong> : Contrôle gréement (retard 3j)</span>
             </li>
             <li class="flex items-start gap-1">
-              <span class="mt-0.5 text-amber-500">&#8226;</span>
+              <span class="mt-0.5 text-amber-600">&#8226;</span>
               <span><strong>Azur</strong> : Antifouling (dans 5j)</span>
             </li>
           </ul>

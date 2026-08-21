@@ -68,7 +68,7 @@ const mockComponents: Record<MockType, typeof HomeMockBoatDetail> = {
             >
               <svg
                 class="mt-0.5 h-5 w-5 shrink-0"
-                :class="isAi ? 'text-violet-600' : 'text-mint-600'"
+                :class="isAi ? 'text-violet-700' : 'text-mint-600'"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"

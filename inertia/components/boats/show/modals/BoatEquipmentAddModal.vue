@@ -163,7 +163,7 @@ function close() {
     <!-- Coming soon notice -->
     <div
       v-if="selectedCategory === 'other'"
-      class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-6 text-center text-sm text-amber-800"
+      class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-6 text-center text-sm text-amber-700"
     >
       <p class="font-semibold">{{ t('boats.equipmentAddModal.comingSoon.title') }}</p>
       <p class="mt-1 text-xs">{{ t('boats.equipmentAddModal.comingSoon.description') }}</p>

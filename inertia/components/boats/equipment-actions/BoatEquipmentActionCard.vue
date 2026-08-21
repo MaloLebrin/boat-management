@@ -27,8 +27,8 @@ const STATUS_COLORS: Record<EquipmentActionStatus, string> = {
 }
 
 const STATUS_DOT: Record<EquipmentActionStatus, string> = {
-  pending: 'bg-amber-500',
-  ordered: 'bg-sky-500',
+  pending: 'bg-amber-600',
+  ordered: 'bg-sky-700',
   done: 'bg-mint-600',
   cancelled: 'bg-fg-subtle',
 }

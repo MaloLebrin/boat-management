@@ -84,7 +84,7 @@ const doneTasksLabel = computed(() => {
       >
         <h2 class="text-sm font-semibold text-amber-700">{{ t('planning.kanban.soon') }}</h2>
         <span
-          class="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-amber-400 px-1.5 text-xs font-semibold text-white"
+          class="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-amber-600 px-1.5 text-xs font-semibold text-white"
         >
           {{ soonTasks.length }}
         </span>
@@ -100,7 +100,7 @@ const doneTasksLabel = computed(() => {
         :key="task.id"
         :task="task"
         :highlighted="task.id === highlightedTaskId"
-        accent-class="border-amber-300"
+        accent-class="border-amber-400"
         badge-class="bg-amber-100 text-amber-700"
       />
     </div>
