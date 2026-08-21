@@ -136,7 +136,7 @@ const cards = [
           <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-white/60">
             <DocumentTextIcon class="h-5 w-5 text-violet-700" />
           </div>
-          <SparklesIcon class="h-4 w-4 text-violet-400" />
+          <SparklesIcon class="h-4 w-4 text-violet-700" />
         </div>
         <p class="font-semibold text-sm" :class="cards[3].titleColor">
           {{ bentoGrid.items[3].title }}

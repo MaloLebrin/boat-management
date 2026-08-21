@@ -111,7 +111,7 @@ onBeforeUnmount(() => {
       <!-- Offline indicator -->
       <div
         v-if="!isOnline"
-        class="bg-amber-500 text-white text-sm font-medium text-center py-1.5 px-4 shrink-0"
+        class="bg-amber-600 text-white text-sm font-medium text-center py-1.5 px-4 shrink-0"
       >
         {{ t('common.offline.banner') }}
       </div>

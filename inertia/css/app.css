@@ -95,6 +95,8 @@
      ============================================================ */
   --color-amber-700: #965e0e;
   --color-amber-600: #b87b1d;
+  --color-amber-400: #d9a445;
+  --color-amber-200: #f3ddaf;
   --color-amber-100: #fbeacb;
   --color-amber-50: #fcf4e0;
 
@@ -102,6 +104,8 @@
      VIOLET — IA / suggestions Fleetide
      ============================================================ */
   --color-violet-700: #5a4a8a;
+  --color-violet-600: #6e5da3;
+  --color-violet-200: #cdc5e0;
   --color-violet-100: #e0dcec;
   --color-violet-50: #efedf6;
 
@@ -254,9 +258,11 @@
   --color-mint-700: #7fcfae;
   --color-amber-50: #2a1f0c;
   --color-amber-100: #3a2b11;
+  --color-amber-200: #55401d;
   --color-amber-700: #e6b45c;
   --color-violet-50: #1d1930;
   --color-violet-100: #282240;
+  --color-violet-200: #3a3158;
   --color-violet-700: #b3a8d8;
   --color-sky-50: #0c202c;
   --color-sky-100: #112d3d;

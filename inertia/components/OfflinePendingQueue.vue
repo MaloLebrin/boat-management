@@ -18,10 +18,10 @@ function labelForType(type: string): string {
 <template>
   <div
     v-if="pendingActions.length > 0"
-    class="mx-6 mt-4 border border-amber-300 rounded-lg bg-amber-50 p-4 space-y-3"
+    class="mx-6 mt-4 border border-amber-200 rounded-lg bg-amber-50 p-4 space-y-3"
   >
     <div class="flex items-center justify-between gap-3">
-      <h3 class="text-sm font-semibold text-amber-900">
+      <h3 class="text-sm font-semibold text-amber-700">
         {{ t('common.offline.queue.title', { count: String(pendingActions.length) }) }}
       </h3>
       <BaseButton variant="ghost" size="sm" :disabled="isSyncing" @click="drainQueue">

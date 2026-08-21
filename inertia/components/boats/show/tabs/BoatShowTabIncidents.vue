@@ -28,7 +28,7 @@ const STATUS_COLORS: Record<IncidentStatus, string> = {
 
 const STATUS_DOT: Record<IncidentStatus, string> = {
   open: 'bg-coral-500',
-  in_progress: 'bg-amber-500',
+  in_progress: 'bg-amber-600',
   closed: 'bg-fg-subtle',
 }
 
