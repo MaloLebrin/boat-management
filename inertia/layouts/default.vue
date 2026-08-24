@@ -69,15 +69,19 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="h-screen overflow-hidden flex bg-navy-900">
+  <!-- h-dvh (pas h-screen) : sur iOS Safari, 100vh ignore la barre d'URL
+       dynamique et le bas de page devient inaccessible avec overflow-hidden (#484) -->
+  <div class="h-dvh overflow-hidden flex bg-navy-900">
     <!-- Desktop Sidebar (always visible on lg+) -->
     <AsideMenu :user="page.props.user" />
 
     <!-- Main content area -->
     <div class="flex-1 flex flex-col overflow-hidden">
       <!-- Mobile header bar (hamburger + logo) - only on small screens -->
+      <!-- pt = safe-area + py-3 : avec viewport-fit=cover le contenu passe sous
+           l'encoche, le header doit dégager la safe area (#484) -->
       <header
-        class="lg:hidden flex items-center justify-between px-4 py-3 bg-navy-900 border-b border-navy-700"
+        class="lg:hidden flex items-center justify-between px-4 py-3 pt-[calc(env(safe-area-inset-top)+0.75rem)] bg-navy-900 border-b border-navy-700"
       >
         <Link href="/dashboard" class="flex items-center gap-3">
           <img :src="brandIconUrl" alt="FleetAi" class="h-9 w-9 rounded-lg shadow-md" />
