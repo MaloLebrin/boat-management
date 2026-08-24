@@ -33,6 +33,11 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm run build
+      # Le SW généré doit s'évaluer sans lever, sortir à la racine web avec un
+      # scope /, et précacher /offline.html — sinon toute la couche hors-ligne
+      # est inopérante en production (#482, #483)
+      - name: Garde-fou service worker
+        run: pnpm check:sw
 
   test-backend:
     runs-on: ubuntu-latest

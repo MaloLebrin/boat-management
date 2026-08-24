@@ -11,6 +11,7 @@
   "scripts": {
     "start": "node bin/server.js",
     "build": "node ace build",
+    "check:sw": "node scripts/check_sw_build.mjs",
     "dev": "node ace serve --hmr",
     "queue:work": "node ace queue:work",
     "queue:work:ai": "node ace queue:work --queue=ai",
