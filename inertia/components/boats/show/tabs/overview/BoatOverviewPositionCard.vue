@@ -21,6 +21,37 @@ const latitude = ref('')
 const longitude = ref('')
 const saving = ref(false)
 
+const geoSupported = typeof navigator !== 'undefined' && Boolean(navigator.geolocation)
+const locating = ref(false)
+const geoAccuracyMeters = ref<number | null>(null)
+const geoErrorKey = ref<string | null>(null)
+
+function useCurrentPosition() {
+  geoErrorKey.value = null
+  geoAccuracyMeters.value = null
+  locating.value = true
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      locating.value = false
+      // 5 décimales (~1 m), comme l'affichage existant de latestGpsPosition
+      latitude.value = position.coords.latitude.toFixed(5)
+      longitude.value = position.coords.longitude.toFixed(5)
+      geoAccuracyMeters.value = Math.round(position.coords.accuracy)
+    },
+    (error) => {
+      locating.value = false
+      if (error.code === error.PERMISSION_DENIED) {
+        geoErrorKey.value = 'boats.show.position.geoPermissionDenied'
+      } else if (error.code === error.TIMEOUT) {
+        geoErrorKey.value = 'boats.show.position.geoTimeout'
+      } else {
+        geoErrorKey.value = 'boats.show.position.geoUnavailable'
+      }
+    },
+    { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+  )
+}
+
 let map: import('leaflet').Map | null = null
 let marker: import('leaflet').Marker | null = null
 
@@ -119,6 +150,28 @@ function savePosition() {
 
       <div v-if="showForm && canManage" class="space-y-3 rounded-md border border-border p-3">
         <p class="text-xs font-medium text-fg">{{ t('boats.show.position.manualTitle') }}</p>
+        <BaseButton
+          v-if="geoSupported"
+          size="sm"
+          variant="secondary"
+          type="button"
+          :disabled="locating"
+          @click="useCurrentPosition"
+        >
+          {{
+            locating
+              ? t('boats.show.position.locating')
+              : t('boats.show.position.useCurrentPosition')
+          }}
+        </BaseButton>
+        <p v-if="geoErrorKey" class="text-xs text-danger" role="alert">{{ t(geoErrorKey) }}</p>
+        <p v-else-if="geoAccuracyMeters !== null" class="text-xs text-fg-muted">
+          {{
+            t('boats.show.position.geoAccuracy', {
+              meters: String(geoAccuracyMeters),
+            })
+          }}
+        </p>
         <div class="grid grid-cols-2 gap-2">
           <BaseInput
             id="position-lat"

@@ -315,6 +315,12 @@
       "setGps": "Set GPS position",
       "gpsCoords": "GPS coordinates:",
       "manualTitle": "Enter a manual position",
+      "useCurrentPosition": "My current position",
+      "locating": "Locating…",
+      "geoAccuracy": "Position captured (±{meters} m accuracy) — check it before saving.",
+      "geoPermissionDenied": "Location permission denied — allow location access in your browser settings.",
+      "geoUnavailable": "Position unavailable — check that GPS is enabled and try again.",
+      "geoTimeout": "Location request timed out — try again outside or near a window.",
       "latitude": "Latitude",
       "longitude": "Longitude",
       "saveGps": "Save position"
