@@ -17,9 +17,11 @@ vite-plugin-pwa (Workbox)
               → timeout 3 s → fallback cache (7 jours, 30 entrées max)
 
 IndexedDB (via `idb`)
-  └── DB : fleetide-offline-queue
-        └── Store : actions (autoIncrement id)
-              { type, url, method, payload, createdAt }
+  └── DB : fleetide-offline-queue (v2)
+        ├── Store : actions (autoIncrement id)
+        │     { type, url, method, payload, createdAt }
+        └── Store : failed (autoIncrement id) — refus 4xx conservés (#487)
+              { type, url, method, payload, createdAt, failedAt, errors }
 
 Composables
   ├── useNetworkStatus   — réactivité navigator.onLine
@@ -85,12 +87,16 @@ const { isOnline } = useNetworkStatus()
 
 État partagé au niveau module (une seule instance IndexedDB, `pendingCount` et `isSyncing` globaux).
 
-| Export            | Type           | Description                                                |
-| ----------------- | -------------- | ---------------------------------------------------------- |
-| `pendingCount`    | `Ref<number>`  | Nombre d'actions en attente                                |
-| `isSyncing`       | `Ref<boolean>` | Sync en cours                                              |
-| `enqueue(action)` | `async`        | Ajoute une action en IndexedDB, affiche un toast info      |
-| `drainQueue()`    | `async`        | Rejoue les actions une par une via `router.post/patch/put` |
+| Export                    | Type                  | Description                                                     |
+| ------------------------- | --------------------- | --------------------------------------------------------------- |
+| `pendingCount`            | `Ref<number>`         | Nombre d'actions en attente                                     |
+| `failedCount`             | `Ref<number>`         | Nombre d'actions refusées en 4xx, conservées (#487)             |
+| `failedActions`           | `Ref<FailedAction[]>` | Actions en échec — payload + erreurs de validation conservés    |
+| `isSyncing`               | `Ref<boolean>`        | Sync en cours                                                   |
+| `enqueue(action)`         | `async`               | Ajoute une action en IndexedDB, affiche un toast info           |
+| `drainQueue()`            | `async`               | Rejoue les actions une par une via `router.post/patch/put`      |
+| `retryFailedAction(id)`   | `async`               | Remet une action en échec dans la file, puis relance la synchro |
+| `discardFailedAction(id)` | `async`               | Abandon explicite — seule voie de suppression d'un échec        |
 
 **Interface `QueuedAction`**
 
@@ -109,7 +115,8 @@ interface QueuedAction {
 
 - Traite les actions dans l'ordre d'insertion (FIFO).
 - En cas de succès serveur : supprime l'entrée IDB, décrémente `pendingCount`, passe à l'action suivante (récursion).
-- En cas d'erreur serveur : **l'action est ignorée** (supprimée sans retry) pour ne pas bloquer la file. Un toast error est affiché.
+- En cas de refus 4xx (validation) : l'action est **déplacée dans le store `failed`** avec les erreurs renvoyées — jamais détruite (#487) — puis la file continue avec l'action suivante. Un toast error est affiché.
+- En cas de 5xx / erreur réseau : l'action reste en file et sera rejouée à la prochaine reconnexion.
 - `isSyncing` empêche les appels concurrents.
 
 ### `usePwaUpdate`
@@ -216,15 +223,16 @@ function handleSubmit() {
 
 Clés dans `resources/lang/{fr,en}/common.json` :
 
-| Clé                   | FR                                                                             | EN                                                                 |
-| --------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------ |
-| `offline.banner`      | Vous êtes hors-ligne — les modifications seront synchronisées à la reconnexion | You're offline — changes will be saved and synced when reconnected |
-| `offline.savedQueue`  | Enregistré hors-ligne — sera synchronisé à la reconnexion                      | Saved offline — will sync when reconnected                         |
-| `offline.syncing`     | Synchronisation en cours…                                                      | Syncing…                                                           |
-| `offline.syncSuccess` | {count} entrée(s) synchronisée(s)                                              | {count} entry(ies) synced                                          |
-| `offline.syncError`   | Erreur de synchronisation — action ignorée                                     | Sync error — action discarded                                      |
-| `pwa.offlineReady`    | Application prête pour une utilisation hors-ligne                              | App is ready for offline use                                       |
-| `pwa.install`         | Installer l'application                                                        | Install app                                                        |
+| Clé                    | FR                                                                             | EN                                                                 |
+| ---------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------ |
+| `offline.banner`       | Vous êtes hors-ligne — les modifications seront synchronisées à la reconnexion | You're offline — changes will be saved and synced when reconnected |
+| `offline.savedQueue`   | Enregistré hors-ligne — sera synchronisé à la reconnexion                      | Saved offline — will sync when reconnected                         |
+| `offline.syncing`      | Synchronisation en cours…                                                      | Syncing…                                                           |
+| `offline.syncSuccess`  | {count} entrée(s) synchronisée(s)                                              | {count} entry(ies) synced                                          |
+| `offline.syncRejected` | Refusée par le serveur — conservée dans les échecs                             | Rejected by the server — kept in failed actions                    |
+| `offline.failed.*`     | Section « actions en échec » (titre, motif, réessayer, abandonner)             | Failed actions section (title, reason, retry, discard)             |
+| `pwa.offlineReady`     | Application prête pour une utilisation hors-ligne                              | App is ready for offline use                                       |
+| `pwa.install`          | Installer l'application                                                        | Install app                                                        |
 
 ---
 
@@ -260,13 +268,13 @@ Mock de `virtual:pwa-register/vue` via alias Vitest + mock de `vue-sonner`. Cas 
 
 ## Comportements et limites
 
-| Comportement                    | Note                                                                                                                            |
-| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| **Pages non visitées**          | Servies par `public/offline.html` via `navigateFallback` Workbox — message bilingue + bouton "réessayer".                       |
-| **Erreur 5xx / réseau**         | L'action reste en file et `isSyncing` est réinitialisé via `onFinish`. Elle sera rejouée à la prochaine reconnexion.            |
-| **Erreur 4xx (validation)**     | L'action est supprimée pour débloquer la file — les données invalides ne peuvent pas être corrigées offline.                    |
-| **Détection de conflit**        | Les actions PATCH incluent `_expectedUpdatedAt`. Le backend rejette (flash `conflict`) si la sortie a été modifiée entre-temps. |
-| **Last-write-wins (créations)** | Les créations (POST) n'ont pas de conflit — chaque enregistrement est nouveau.                                                  |
+| Comportement                    | Note                                                                                                                                                    |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Pages non visitées**          | Servies par `public/offline.html` via `navigateFallback` Workbox — message bilingue + bouton "réessayer".                                               |
+| **Erreur 5xx / réseau**         | L'action reste en file et `isSyncing` est réinitialisé via `onFinish`. Elle sera rejouée à la prochaine reconnexion.                                    |
+| **Erreur 4xx (validation)**     | L'action passe dans le store `failed` avec ses erreurs (#487). L'UI propose « Réessayer » ou « Abandonner » — rien n'est détruit sans action explicite. |
+| **Détection de conflit**        | Les actions PATCH incluent `_expectedUpdatedAt`. Le backend rejette (flash `conflict`) si la sortie a été modifiée entre-temps.                         |
+| **Last-write-wins (créations)** | Les créations (POST) n'ont pas de conflit — chaque enregistrement est nouveau.                                                                          |
 
 ---
 
