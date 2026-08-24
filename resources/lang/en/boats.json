@@ -260,6 +260,7 @@
     },
     "mediaUpload": {
       "addPhoto": "Add photos",
+      "takePhoto": "Take a photo",
       "addDocument": "Add documents",
       "dropzone": "Drop files here or click to browse",
       "browse": "Browse…",

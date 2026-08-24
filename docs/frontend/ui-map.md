@@ -202,6 +202,11 @@ Les cartes de l'onglet Équipement exposent un lien « voir le détail » vers c
 (`uploadUrl`, `deleteUrlFor`, `photos`, `canUpload`, `canDelete`). Upload via `useForm` +
 `form.post(..., { forceFormData: true })`, suppression via `router.delete`. i18n : `media.photos.*`.
 
+Deux boutons d'upload (#485) : « Ajouter » ouvre le sélecteur (input `multiple`) et
+« Prendre une photo » ouvre l'appareil photo via un **second input** `capture="environment"`
+sans `multiple` — `capture` sur l'input principal supprimerait la sélection multiple sur
+iOS/Android. Même montage dans `BoatPhotoGallery.vue` (fiche bateau).
+
 Consommateurs : `InspectionPhotos.vue` (wrapper fin), et les onglets « Photos » des six équipements —
 `EngineShowTabPhotos`, `EnginePartShowTabPhotos`, `SailShowTabPhotos`, `RigShowTabPhotos`,
 `GenericShowTabPhotos`, `SafetyShowTabPhotos`.
