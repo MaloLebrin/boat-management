@@ -37,12 +37,29 @@ Configuré dans `vite.config.ts` via `VitePWA` :
 | Option           | Valeur                                                                 |
 | ---------------- | ---------------------------------------------------------------------- |
 | `registerType`   | `autoUpdate` — mise à jour silencieuse au rechargement                 |
-| `injectRegister` | `false` — enregistrement manuel dans `inertia/app.ts`                  |
+| `injectRegister` | `false` — enregistrement manuel via `usePwaUpdate` (`useRegisterSW`)   |
 | `manifest`       | `false` — manifest servi depuis `public/site.webmanifest`              |
-| Précache         | `**/*.{js,css,ico,png,svg,woff2}`                                      |
+| `outDir`         | `build/public` — `sw.js` sort à la **racine web**, pas dans `/assets`  |
+| `buildBase`      | `/` — le SW est enregistré à `/sw.js`                                  |
+| `scope`          | `/` — le SW contrôle toutes les navigations                            |
+| Précache         | `assets/**` (`**/*.{js,css,ico,png,svg,woff2}`) + `/offline.html`      |
 | Runtime cache    | `/boats/*`, `/navigation/*`, `/planning/*` — NetworkFirst, 3 s timeout |
 
 **Stratégie NetworkFirst** : le SW tente le réseau en priorité. Si la requête échoue ou dépasse 3 secondes, il sert le cache. Les pages non encore visitées (non cachées) restent inaccessibles hors-ligne.
+
+### Pourquoi le SW sort à la racine web (#482)
+
+Le build client Vite écrit dans `build/public/assets` (imposé par `@adonisjs/inertia/vite`) et `base` vaut `/assets/`. Sans configuration explicite, `vite-plugin-pwa` émettait donc `sw.js` dans `/assets/` et l'enregistrait avec un scope `/assets/` : un tel SW **ne contrôle jamais** une navigation vers `/boats` ou `/planning`, et tout le mode hors-ligne était inopérant. Trois options le corrigent :
+
+- `outDir: 'build/public'` — `sw.js` (et le runtime `workbox-*.js`) sortent à la racine web du build ;
+- `buildBase: '/'` — `useRegisterSW` enregistre `/sw.js` (et non `/assets/sw.js`) ;
+- `scope: '/'` — le SW contrôle toute l'origine.
+
+Deuxième piège : `offline.html` vit dans `public/` et n'est copié dans `build/public` **qu'après** le build Vite (metaFiles de `adonisrc.ts`) — il est donc introuvable au moment où Workbox globbe le répertoire de sortie. Il est précaché explicitement via `additionalManifestEntries`, avec une révision MD5 calculée depuis `public/offline.html`. Sans cette entrée, `navigateFallback` génère un `createHandlerBoundToURL('/offline.html')` qui **lève à l'évaluation du SW** (`non-precached-url`) : le SW ne s'installe jamais.
+
+> ⚠️ L'alternative « servir `/assets/sw.js` avec un en-tête `Service-Worker-Allowed: /` » a été écartée : elle casserait le jour où `assetsUrl` pointe vers un CDN (cross-origin).
+
+En production, `sw.js` est servi par le middleware statique (`build/public` = racine du serveur statique). En dev, aucun SW n'est actif (`devOptions` désactivé) : l'enregistrement de `/sw.js` échoue silencieusement.
 
 ---
 

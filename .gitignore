@@ -13,6 +13,12 @@ tmp/*
 # Frontend assets compiled code
 public/assets
 
+# Service worker généré par vite-plugin-pwa à la racine web (#482)
+public/sw.js
+public/sw.js.map
+public/workbox-*.js
+public/workbox-*.js.map
+
 # Build tools specific
 npm-debug.log
 yarn-error.log
