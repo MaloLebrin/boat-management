@@ -210,12 +210,13 @@ function handleSubmit() {
 
 ### Formulaires supportés
 
-| Composant                     | Type action             | URL                                             | Méthode |
-| ----------------------------- | ----------------------- | ----------------------------------------------- | ------- |
-| `NavigationLogForm.vue`       | `create-navigation-log` | `POST /boats/:id/navigation-logs`               | post    |
-| `BoatFuelLogForm.vue`         | `create-fuel-log`       | `POST /boats/:id/fuel-logs`                     | post    |
-| `NavigationLogUpdateForm.vue` | `update-navigation-log` | `PATCH /boats/:id/navigation-logs/:logId`       | patch   |
-| `NavigationLogCloseForm.vue`  | `close-navigation-log`  | `PATCH /boats/:id/navigation-logs/:logId/close` | patch   |
+| Composant                     | Type action              | URL                                             | Méthode |
+| ----------------------------- | ------------------------ | ----------------------------------------------- | ------- |
+| `NavigationLogForm.vue`       | `create-navigation-log`  | `POST /boats/:id/navigation-logs`               | post    |
+| `BoatFuelLogForm.vue`         | `create-fuel-log`        | `POST /boats/:id/fuel-logs`                     | post    |
+| `NavigationLogUpdateForm.vue` | `update-navigation-log`  | `PATCH /boats/:id/navigation-logs/:logId`       | patch   |
+| `NavigationLogCloseForm.vue`  | `close-navigation-log`   | `PATCH /boats/:id/navigation-logs/:logId/close` | patch   |
+| `EngineHoursQuickAddForm.vue` | `increment-engine-hours` | `PATCH /boats/:id/engines/:engineId/hours`      | patch   |
 
 ---
 

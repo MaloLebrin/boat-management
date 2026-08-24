@@ -4,6 +4,8 @@ import { router } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseModal from '~/components/base/BaseModal.vue'
+import { useNetworkStatus } from '~/composables/use_network_status'
+import { useOfflineQueue } from '~/composables/use_offline_queue'
 import { useT } from '~/composables/use_t'
 
 const props = defineProps<{
@@ -13,6 +15,8 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
+const { isOnline } = useNetworkStatus()
+const { enqueue } = useOfflineQueue()
 const isOpen = ref(false)
 const hoursIncrement = ref('')
 const processing = ref(false)
@@ -20,6 +24,20 @@ const processing = ref(false)
 function submit() {
   const value = Number(hoursIncrement.value)
   if (!Number.isFinite(value) || value <= 0) return
+
+  // Chemin hors-ligne (#488) : l'incrément est commutatif, le rejeu différé
+  // ne peut pas entrer en conflit avec une saisie en ligne intercalée
+  if (!isOnline.value) {
+    enqueue({
+      type: 'increment-engine-hours',
+      url: `/boats/${props.boatId}/engines/${props.engineId}/hours`,
+      method: 'patch',
+      payload: { hoursIncrement: value },
+    })
+    hoursIncrement.value = ''
+    isOpen.value = false
+    return
+  }
 
   processing.value = true
   router.patch(
