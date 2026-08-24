@@ -1,0 +1,9 @@
+# 2026-08-19 — Planning : plus de liens vers la fiche bateau pour qui n'y a pas droit (#473)
+
+Suite immédiate de l'entrée précédente (#529), qui avait détourné la carte du dashboard mécanicien vers `/planning?task=<id>` : le planning lui-même gardait le même piège. `/planning` est ouvert à tout utilisateur authentifié, mais `/boats/:id` passe par `BoatPolicy.view` → capability `boats.view`, que le rôle `mechanic` n'a pas (`MECHANIC_CAPABILITIES` se limite au module maintenance). Un mécanicien voyait donc, sur chaque carte de tâche, un bouton qui répondait 403.
+
+- **Les liens du planning sont conditionnés à `boats.view`.** `PlanningTaskCard` n'affiche plus le bouton `boats.show` sans la capability : le libellé du type de tâche (« Par date » / « Par heures moteur ») reste visible, en texte simple, pour ne rien perdre de l'information.
+- **Même correctif dans la vue Calendrier.** Les pastilles de tâche (agenda mobile et grille desktop) déclenchaient un `router.visit('/boats/:id')` au clic : la navigation passe par un garde et le curseur « pointer » disparaît quand elle n'est pas permise. Le bouton « Planifier » de la section « Sans date planifiée » suit la même règle.
+- **L'état vide aussi.** Son action « Voir mes bateaux » mène à `/boats`, qui exige la même capability : elle n'est plus proposée sans `boats.view`.
+- **Aucun changement pour les autres rôles.** Admin et membre ont `boats.view` : tous les liens restent en place.
+- **Tests.** 14 tests (`tests/inertia/planning_task_card.spec.ts`, `planning_calendar_boat_links.spec.ts`, `planning_index_empty_state.spec.ts`, `tests/functional/planning/index.spec.ts`) couvrent la carte, les pastilles du calendrier, le bouton « Planifier » et l'état vide avec et sans la capability, l'absence de prop `permissions` (aucun lien, plutôt qu'un 403), et vérifient côté serveur qu'un mécanicien obtient bien 200 sur `/planning` et 403 sur `/boats/:id` — plusieurs échouent sur le code d'avant.

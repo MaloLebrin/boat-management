@@ -46,10 +46,10 @@ Lis chaque fichier existant avant de le modifier.
 - Ajouter sous `fields` dans les deux fichiers simultanément
 - Si enum avec valeurs affichées : ajouter aussi les clés pour chaque valeur
 
-**8. `docs/changelog.md`** — entrée en tête :
+**8. Changelog** — nouveau fichier `docs/changelog/YYYY-MM-DD-HHMM-ajout-champ-<field>-<resource>.md` (`HHMM` = heure de rédaction) :
 
 ```
-## YYYY-MM-DD — Ajout champ `<field>` sur `<resource>`
+# YYYY-MM-DD — Ajout champ `<field>` sur `<resource>`
 - migration alter, model, validator, shared types, transformer, pages form, i18n fr+en
 ```
 

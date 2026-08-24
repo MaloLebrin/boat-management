@@ -1,0 +1,10 @@
+# 2026-07-20 — Correction des états incohérents des modules add-ons sur `/settings/billing` (#402)
+
+Sur la carte « Modules add-ons » de `/settings/billing` : une organisation Enterprise voyait un bouton « Activer » sur un module (Location, CRM & Facturation) pourtant déjà accessible depuis la nav — le module n'existait simplement pas encore en ligne dans `organization_modules`, mais Enterprise inclut tous les modules par tier (`PLAN_LIMITS.enterprise`), indépendamment de cette table ; le clic n'avait donc aucun effet visible. Une organisation Pro seedée sans abonnement Stripe actif (plan interne `pro` mais `subscription === null`) voyait quant à elle « Nécessite un plan Pro actif » sur chaque module sans aucun bouton, message incompréhensible pour un utilisateur qui voit déjà « Plan actuel : Pro » en haut de page.
+
+- `SettingsBillingModules.vue` : pour un plan Enterprise, chaque module affiche désormais un état statique « Inclus dans votre plan » (✓), sans CTA — le toggle self-service activer/désactiver ajouté en #392 reste disponible côté API mais n'est plus exposé sur cette carte, qui n'a plus vocation à piloter un état qui ne dépend pas de `organization_modules` pour ce tier.
+- Pour un plan Pro sans abonnement Stripe actif, le message devient « Activez d'abord votre abonnement Pro pour activer ce module », avec un bouton « Activer l'abonnement Pro » (admin uniquement) qui déclenche le checkout Stripe du plan Pro — distinct du cas Starter, qui garde « Nécessite un plan Pro actif ».
+- Sous-titre de la carte adapté par plan (« Complétez votre plan Pro… » vs « Tous les modules add-ons sont inclus dans votre plan. »).
+- Nouvelles clés i18n FR/EN : `settings.billing.modules.{includedInPlan,subtitleEnterprise,subscriptionRequired,activateSubscription}`.
+- La graphie « Entreprise » vs « Enterprise » signalée dans l'audit est traitée séparément dans #411 (lexique de marque).
+- **Tests** : `tests/inertia/settings_billing_modules.spec.ts` réécrit pour les nouveaux états Enterprise (inclus sans CTA, avec/sans module granted, avec/sans `subscription.manage`) et Pro sans abonnement actif (CTA admin vs message seul, membre non-admin).

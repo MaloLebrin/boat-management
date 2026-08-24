@@ -1,0 +1,9 @@
+# 2026-08-20 — Paliers de palette fantômes : couleurs qui ne rendaient rien (checklists de maintenance, alertes, marketing)
+
+Repéré sur la checklist des fiches de maintenance : la case cochée (`border-mint-500 bg-mint-500 text-white` dans `BoatMaintenanceSheetItemList.vue`) n'avait **ni fond ni bordure**, et la coche blanche était invisible en thème clair. Cause : `mint`, `coral`, `lilac`, `peach` sont des palettes maison — un palier non défini dans le `@theme` d'`app.css` ne génère **aucune classe** Tailwind, silencieusement.
+
+- **Case cochée** : alignée sur `DiagnosticStepList` (`border-brand bg-brand-soft text-brand`), lisible dans les deux thèmes.
+- **`--color-coral-200` ajouté au `@theme`** (`#f6c9ba`) : le palier n'existait que dans le bloc `[data-theme='dark']`, donc les ~20 usages (`border-coral-200` des alertes danger, `ring-coral-200` du badge danger…) ne rendaient rien en clair.
+- **Tous les paliers fantômes remappés vers des paliers existants**, en respectant les rôles (fonds `-50/-100`, bordures `-200`, encre `-700/-800`, tons moyens `-300`→`-600`) : `mint-800/900` → `mint-700` (BaseAlert succès, calendrier/timeline réservations, design-system), `peach-900` → `peach-800`, `coral-300/800/900` → `coral-200/700` (alerte tâches en retard), `lilac-600` → `lilac-700` (état vide notifications), `mint-500` → `mint-600` (kanban planning, stats réservations), `peach-400` → `peach-300` et `peach-600` → `peach-700` (stats réservations), `mint-400` → `mint-300` et `coral-300` → `coral-400` (sections marketing home/pricing).
+- **Vérifié** sur `/design-system` et via les styles calculés dans les deux thèmes ; les anciennes classes sont confirmées inertes (aucun CSS généré).
+- Reste un chantier séparé : ~35 usages de paliers `amber`/`sky`/`violet` non définis qui retombent sur les palettes **Tailwind par défaut** (rendu visible mais hors charte, non inversé en sombre).
