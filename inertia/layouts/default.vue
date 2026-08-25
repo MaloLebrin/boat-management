@@ -85,9 +85,10 @@ onBeforeUnmount(() => {
         </Link>
         <div class="flex items-center gap-1">
           <NotificationBell tone="onDark" />
+          <!-- 44 px : seul accès à la navigation sur mobile (#494) -->
           <button
             type="button"
-            class="inline-flex items-center justify-center w-10 h-10 rounded-lg text-navy-100 hover:bg-navy-700 hover:text-white transition-colors"
+            class="inline-flex items-center justify-center w-11 h-11 rounded-lg text-navy-100 hover:bg-navy-700 hover:text-white transition-colors"
             aria-controls="auth-sidebar-drawer"
             :aria-expanded="isSidebarOpen ? 'true' : 'false'"
             @click="openSidebar"

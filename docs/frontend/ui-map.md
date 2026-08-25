@@ -206,6 +206,22 @@ Consommateurs : `InspectionPhotos.vue` (wrapper fin), et les onglets « Photos �
 `EngineShowTabPhotos`, `EnginePartShowTabPhotos`, `SailShowTabPhotos`, `RigShowTabPhotos`,
 `GenericShowTabPhotos`, `SafetyShowTabPhotos`.
 
+## Cibles tactiles (#494)
+
+Sur les écrans terrain, tout contrôle interactif vise **≥ 44 px** de zone tactile (Apple HIG).
+Deux techniques, au choix :
+
+- **taille pleine** quand le visuel le permet (hamburger mobile : `w-11 h-11`) ;
+- **pseudo-zone `pointer-coarse:`** quand agrandir le visuel déséquilibrerait la mise en page :
+  `relative pointer-coarse:before:absolute pointer-coarse:before:content-[''] pointer-coarse:before:-inset-*`
+  — n'agit que sur écran tactile, la densité desktop est intacte. Exemples : case à cocher des
+  fiches d'entretien (20 px visuels + `-inset-3` = 44 px), bouton de fermeture du drawer.
+
+`BaseButton` porte ce mécanisme nativement : `sm` (32 px) et `icon` (32 px) étendent de 12 px,
+`md` (40 px) de 4 px, `lg` est déjà à 44 px — `size="sm"` reste donc utilisable sur les écrans
+terrain. ⚠️ Écrire les classes en littéral complet : le scanner Tailwind ne voit pas les noms
+concaténés. Mesure réelle en navigateur : prévue par #500.
+
 ## Patterns UI (forms)
 
 Le projet utilise le composant `<Form>` fourni par `@adonisjs/inertia/vue`.
