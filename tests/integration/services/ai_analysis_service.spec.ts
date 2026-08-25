@@ -83,6 +83,7 @@ test.group('AiAnalysisService — organization scoping', () => {
       organizationId: orgA.id,
       boatId: boat.id,
       kind: 'boat_suggestions',
+      locale: 'fr',
       responseText: JSON.stringify([{ text: 'Org A boat suggestion' }]),
       createdAt: DateTime.now(),
     })
@@ -102,6 +103,7 @@ test.group('AiAnalysisService — organization scoping', () => {
       organizationId: orgA.id,
       boatId: boat.id,
       kind: 'boat_suggestions',
+      locale: 'fr',
       responseText: JSON.stringify([{ text: 'suggestion' }]),
       createdAt: DateTime.now(),
     })
