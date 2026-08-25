@@ -89,6 +89,11 @@ Une action peut être **rattachée à une inspection de location** (checkout/che
 défauts constatés (« Défauts constatés » sur l'écran d'inspection). La colonne `inspection_id`
 (nullable, `SET NULL`) prévue dès #310 est exploitée ici.
 
+La saisie d'un défaut fonctionne **hors-ligne** (#491) via la file IndexedDB
+(`create-inspection-defect`), à une limite près : un défaut ne peut viser qu'une inspection déjà
+créée en ligne (l'URL exige un `inspectionId` réel). Sans inspection synchronisée, l'ajout
+hors-ligne est désactivé avec un message explicite — voir `docs/frontend/pwa.md`.
+
 - **Déduction du bateau** : le `boat_id` (et l'org) sont **déduits** de la réservation liée à
   l'inspection, jamais saisis. La cohérence bateau ↔ réservation ↔ inspection est garantie par la
   chaîne de résolution imbriquée (`boatService.getForUserOrFail` → `reservationService.findForBoat`

@@ -52,6 +52,7 @@
   "offline.queue.type.create-incident": "New incident",
   "offline.queue.type.update-incident": "Incident update",
   "offline.queue.type.update-sheet-item": "Maintenance sheet item",
+  "offline.queue.type.create-inspection-defect": "Inspection defect",
   "sheetItem.field.isDone": "Done",
   "sheetItem.field.notes": "Notes",
   "offline.failed.title": "{count, plural, one {# failed action} other {# failed actions}}",

@@ -48,6 +48,7 @@
     "empty": "No recorded defects.",
     "add": "+ Report a defect",
     "addTitle": "Report a defect",
+    "offlineNoInspection": "This inspection hasn't been synced to the server yet — defects can't be saved offline. Reconnect and try again.",
     "deleteTitle": "Delete defect"
   },
   "prefill": {

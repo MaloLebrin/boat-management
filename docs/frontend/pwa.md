@@ -218,16 +218,23 @@ function handleSubmit() {
 
 ### Formulaires supportés
 
-| Composant                          | Type action              | URL                                                        | Méthode |
-| ---------------------------------- | ------------------------ | ---------------------------------------------------------- | ------- |
-| `NavigationLogForm.vue`            | `create-navigation-log`  | `POST /boats/:id/navigation-logs`                          | post    |
-| `BoatFuelLogForm.vue`              | `create-fuel-log`        | `POST /boats/:id/fuel-logs`                                | post    |
-| `NavigationLogUpdateForm.vue`      | `update-navigation-log`  | `PATCH /boats/:id/navigation-logs/:logId`                  | patch   |
-| `NavigationLogCloseForm.vue`       | `close-navigation-log`   | `PATCH /boats/:id/navigation-logs/:logId/close`            | patch   |
-| `EngineHoursQuickAddForm.vue`      | `increment-engine-hours` | `PATCH /boats/:id/engines/:engineId/hours`                 | patch   |
-| `BoatIncidentForm.vue`             | `create-incident`        | `POST /boats/:id/incidents`                                | post    |
-| `BoatIncidentForm.vue`             | `update-incident`        | `PUT /boats/:id/incidents/:incidentId`                     | put     |
-| `BoatMaintenanceSheetItemList.vue` | `update-sheet-item`      | `PUT /boats/:id/maintenance-sheets/:sheetId/items/:itemId` | put     |
+| Composant                          | Type action                | URL                                                                    | Méthode |
+| ---------------------------------- | -------------------------- | ---------------------------------------------------------------------- | ------- |
+| `NavigationLogForm.vue`            | `create-navigation-log`    | `POST /boats/:id/navigation-logs`                                      | post    |
+| `BoatFuelLogForm.vue`              | `create-fuel-log`          | `POST /boats/:id/fuel-logs`                                            | post    |
+| `NavigationLogUpdateForm.vue`      | `update-navigation-log`    | `PATCH /boats/:id/navigation-logs/:logId`                              | patch   |
+| `NavigationLogCloseForm.vue`       | `close-navigation-log`     | `PATCH /boats/:id/navigation-logs/:logId/close`                        | patch   |
+| `EngineHoursQuickAddForm.vue`      | `increment-engine-hours`   | `PATCH /boats/:id/engines/:engineId/hours`                             | patch   |
+| `BoatIncidentForm.vue`             | `create-incident`          | `POST /boats/:id/incidents`                                            | post    |
+| `BoatIncidentForm.vue`             | `update-incident`          | `PUT /boats/:id/incidents/:incidentId`                                 | put     |
+| `BoatMaintenanceSheetItemList.vue` | `update-sheet-item`        | `PUT /boats/:id/maintenance-sheets/:sheetId/items/:itemId`             | put     |
+| `InspectionDefectModal.vue`        | `create-inspection-defect` | `POST /boats/:id/reservations/:rid/inspections/:iid/equipment-actions` | post    |
+
+Limite assumée des défauts d'inspection (#491) : un défaut ne peut viser qu'une
+inspection **déjà créée en ligne** (l'URL exige un `inspectionId` réel). Si
+l'inspection n'existe pas encore côté serveur, l'ajout hors-ligne est
+**désactivé avec un message explicite** plutôt que d'échouer silencieusement au
+rejeu — même principe que l'upload photo hors-ligne, hors périmètre v1.
 
 Les items de fiche d'entretien (#490) combinent trois mécanismes : **état
 optimiste** (la case cochée hors-ligne reflète le clic sans attendre les props
