@@ -4,6 +4,7 @@ import { Head, router } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseEmptyState from '~/components/base/BaseEmptyState.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
+import LogbookCard from '~/components/navigation/LogbookCard.vue'
 import LogbookRow from '~/components/navigation/LogbookRow.vue'
 import NavigationBoatFilter from '~/components/navigation/NavigationBoatFilter.vue'
 import QuickAddNavigationLogModal from '~/components/navigation/QuickAddNavigationLogModal.vue'
@@ -96,23 +97,30 @@ function onEmptyAction() {
         @action="onEmptyAction"
       />
 
-      <div v-else class="overflow-x-auto rounded-lg border border-border">
-        <table class="w-full text-left">
-          <thead class="bg-surface-muted text-xs uppercase tracking-wider text-fg-muted">
-            <tr>
-              <th class="px-4 py-3">{{ t('navigation.logbook.columns.status') }}</th>
-              <th class="px-4 py-3">{{ t('navigation.logbook.columns.boat') }}</th>
-              <th class="px-4 py-3">{{ t('navigation.logbook.columns.departure') }}</th>
-              <th class="px-4 py-3">{{ t('navigation.logbook.columns.arrival') }}</th>
-              <th class="px-4 py-3">{{ t('navigation.logbook.columns.distance') }}</th>
-              <th class="px-4 py-3">{{ t('navigation.logbook.columns.date') }}</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-border bg-surface-elevated">
-            <LogbookRow v-for="row in logs" :key="row.id" :row="row" />
-          </tbody>
-        </table>
-      </div>
+      <template v-else>
+        <!-- Repli carte mobile (#493) : lire une sortie sans scroll horizontal -->
+        <div class="lg:hidden space-y-3">
+          <LogbookCard v-for="row in logs" :key="row.id" :row="row" />
+        </div>
+
+        <div class="hidden lg:block overflow-x-auto rounded-lg border border-border">
+          <table class="w-full text-left">
+            <thead class="bg-surface-muted text-xs uppercase tracking-wider text-fg-muted">
+              <tr>
+                <th class="px-4 py-3">{{ t('navigation.logbook.columns.status') }}</th>
+                <th class="px-4 py-3">{{ t('navigation.logbook.columns.boat') }}</th>
+                <th class="px-4 py-3">{{ t('navigation.logbook.columns.departure') }}</th>
+                <th class="px-4 py-3">{{ t('navigation.logbook.columns.arrival') }}</th>
+                <th class="px-4 py-3">{{ t('navigation.logbook.columns.distance') }}</th>
+                <th class="px-4 py-3">{{ t('navigation.logbook.columns.date') }}</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-border bg-surface-elevated">
+              <LogbookRow v-for="row in logs" :key="row.id" :row="row" />
+            </tbody>
+          </table>
+        </div>
+      </template>
     </div>
   </div>
 </template>
