@@ -104,6 +104,17 @@ Les cartes de l'onglet Équipement exposent un lien « voir le détail » vers c
 - Types frontend: `inertia/types/budget.ts`
 - Source backend: `BudgetController.show`
 
+### Onglets scrollables (#495)
+
+`BaseTabs.vue` est scrollable horizontalement avec `snap-x`/`snap-start`, et affiche des
+**dégradés de bord** (`[data-overflow="left|right"]`) quand des onglets dépassent — mis à jour au
+scroll et au redimensionnement (ResizeObserver). Toute page à onglets en bénéficie.
+
+L'écran d'inspection (`boats/reservation_inspection.vue`) bascule ses panneaux Départ/Retour en
+onglets `BaseTabs` **sous `lg`** (comparer sans défilement interminable) et garde les deux colonnes
+au-dessus. Chaque panneau n'est rendu qu'une fois (ids de formulaires uniques) — seule sa
+visibilité change (`hidden lg:block` sur le panneau inactif).
+
 ### Liens et navigation (#533)
 
 - **Navigation interne = `<Link>` (`@adonisjs/inertia/vue`)**, jamais `<a href="/…">` : une ancre brute recharge l'app entière. Deux règles ESLint le tiennent (`vue/no-restricted-static-attribute`, `vue/no-restricted-v-bind` sur `inertia/**/*.vue`).
