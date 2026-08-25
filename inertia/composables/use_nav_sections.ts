@@ -6,7 +6,7 @@ import { usePermissions } from '~/composables/use_permissions'
 export function useNavSections() {
   const { t } = useT()
   const { effectiveQuotas } = usePlan()
-  const { isBoatOwner, can } = usePermissions()
+  const { isBoatOwner, isMechanic, can } = usePermissions()
 
   const canManageClients = computed(() => effectiveQuotas.value?.canManageClients === true)
   const canManagePricing = computed(() => effectiveQuotas.value?.canManagePricing === true)
@@ -112,5 +112,46 @@ export function useNavSections() {
     icon: 'gear',
   }))
 
-  return { navSections, settingsItem }
+  /**
+   * Raccourcis de la bottom tab bar mobile (#492) — 4 entrées max, gardées par
+   * les mêmes capabilities que la nav complète. Le drawer reste la navigation
+   * exhaustive ; ceci n'est qu'un jeu de raccourcis par rôle.
+   */
+  const bottomNavItems = computed(() => {
+    // Portail self-service : un seul écran pertinent, la barre n'apporte rien
+    if (isBoatOwner.value) return []
+
+    const items = [{ name: t('nav.dashboard'), path: '/dashboard', icon: 'house' }]
+
+    if (isMechanic.value) {
+      // Terrain : alternance permanente planning ↔ fiche bateau
+      if (can('maintenance.view')) {
+        items.push(
+          { name: t('nav.planning'), path: '/planning', icon: 'calendar' },
+          { name: t('nav.history'), path: '/maintenance/history', icon: 'clock' }
+        )
+      }
+      if (can('boats.view')) {
+        items.push({ name: t('nav.boats'), path: '/boats', icon: 'boat' })
+      }
+    } else {
+      if (can('boats.view')) {
+        items.push({ name: t('nav.boats'), path: '/boats', icon: 'boat' })
+      }
+      if (can('maintenance.view')) {
+        items.push({ name: t('nav.planning'), path: '/planning', icon: 'calendar' })
+      }
+      if (can('boats.view')) {
+        items.push({
+          name: t('nav.reservations'),
+          path: '/reservations',
+          icon: 'calendar-check',
+        })
+      }
+    }
+
+    return items.slice(0, 4)
+  })
+
+  return { navSections, settingsItem, bottomNavItems }
 }

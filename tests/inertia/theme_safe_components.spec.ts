@@ -104,6 +104,7 @@ const COMPONENTS: Component[] = [
   },
   { path: 'components/layout/AppHeader.vue' },
   { path: 'components/layout/AppHeaderMobileDrawer.vue' },
+  { path: 'components/layout/MobileBottomNav.vue' },
   {
     path: 'components/layout/AsideMenu.vue',
     allow: [{ pattern: 'border-navy-700', count: 2, reason: NAVY_ON_NAVY }],

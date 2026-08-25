@@ -7,6 +7,7 @@ import { Toaster } from 'vue-sonner'
 import brandIconUrl from '~/assets/brand/fleetai_compass.svg'
 import AsideMenu from '~/components/layout/AsideMenu.vue'
 import DemoSessionBanner from '~/components/layout/DemoSessionBanner.vue'
+import MobileBottomNav from '~/components/layout/MobileBottomNav.vue'
 import MobileSidebarDrawer from '~/components/layout/MobileSidebarDrawer.vue'
 import NotificationBell from '~/components/layout/NotificationBell.vue'
 import { useNetworkStatus } from '~/composables/use_network_status'
@@ -129,6 +130,9 @@ onBeforeUnmount(() => {
           </div>
         </Transition>
       </main>
+
+      <!-- Bottom tab bar (mobile only, hors du main scrollable) -->
+      <MobileBottomNav />
     </div>
 
     <!-- Mobile sidebar drawer -->

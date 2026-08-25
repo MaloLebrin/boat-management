@@ -1,6 +1,7 @@
 {
   "workspace": "Workspace",
   "dashboard": "Dashboard",
+  "bottomNav": "Quick navigation",
   "boats": "Boats",
   "planning": "Planning",
   "history": "History",
