@@ -1,3 +1,5 @@
+import type { ConflictSheetItemSnapshot } from '#shared/types/maintenance'
+
 export class BoatMaintenanceNotFoundError extends Error {
   name = 'BoatMaintenanceNotFoundError'
 }
@@ -45,5 +47,12 @@ export class BoatMaintenanceSheetValidationError extends Error {
     readonly errorCode: string
   ) {
     super(message)
+  }
+}
+
+export class BoatMaintenanceSheetItemConflictError extends Error {
+  name = 'BoatMaintenanceSheetItemConflictError'
+  constructor(public readonly currentItem: ConflictSheetItemSnapshot) {
+    super('Conflict detected')
   }
 }

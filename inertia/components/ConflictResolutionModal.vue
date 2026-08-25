@@ -21,17 +21,25 @@ const FIELDS_BY_TYPE: Record<string, string[]> = {
     'crewCount',
     'notes',
   ],
+  'update-sheet-item': ['isDone', 'notes'],
+}
+
+// Chaque type d'action a son propre namespace de libellés de champs
+const LABEL_PREFIX_BY_TYPE: Record<string, string> = {
+  'update-sheet-item': 'common.sheetItem.field',
 }
 
 const rows = computed(() => {
   const keys = FIELDS_BY_TYPE[props.conflict.action.type] ?? []
+  const labelPrefix =
+    LABEL_PREFIX_BY_TYPE[props.conflict.action.type] ?? 'common.navigationLog.field'
   return keys
     .map((key) => {
       const local = props.conflict.action.payload[key]
       const server = props.conflict.serverData[key]
       return {
         key,
-        label: t(`common.navigationLog.field.${key}`),
+        label: t(`${labelPrefix}.${key}`),
         local: local ?? null,
         server: server ?? null,
         differs: String(local ?? '') !== String(server ?? ''),

@@ -19,6 +19,13 @@ export interface QueuedAction {
   method: 'post' | 'patch' | 'put'
   payload: Record<string, unknown>
   createdAt: string
+  /**
+   * Clé de déduplication (#490) : deux enqueue successifs portant la même clé
+   * font un upsert — la dernière valeur remplace la précédente au lieu
+   * d'empiler des actions contradictoires (ex. deux toggles du même item de
+   * fiche d'entretien). Convention : `type:url`.
+   */
+  dedupeKey?: string
 }
 
 export interface FailedAction extends QueuedAction {
@@ -79,6 +86,20 @@ export function useOfflineQueue() {
   async function enqueue(action: Omit<QueuedAction, 'id' | 'createdAt'>) {
     if (!isIndexedDbAvailable()) return
     const db = await getDb()
+
+    if (action.dedupeKey) {
+      const existing = (await db.getAll(STORE_NAME)) as QueuedAction[]
+      const duplicate = existing.find((a) => a.dedupeKey === action.dedupeKey)
+      if (duplicate) {
+        // Upsert : le payload le plus récent remplace l'ancien, la position
+        // FIFO (id, createdAt) est conservée — pas de toast pour ne pas
+        // notifier chaque frappe d'une saisie de notes (#490)
+        await db.put(STORE_NAME, { ...duplicate, payload: action.payload })
+        await refreshCount()
+        return
+      }
+    }
+
     await db.add(STORE_NAME, { ...action, createdAt: new Date().toISOString() })
     await refreshCount()
     toast.info(t('common.offline.savedQueue'))
