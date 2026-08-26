@@ -316,6 +316,12 @@
       "setGps": "Définir position GPS",
       "gpsCoords": "Coordonnées GPS :",
       "manualTitle": "Saisir une position manuelle",
+      "useCurrentPosition": "Ma position actuelle",
+      "locating": "Localisation…",
+      "geoAccuracy": "Position relevée (précision ±{meters} m) — vérifiez-la avant d'enregistrer.",
+      "geoPermissionDenied": "Autorisation de localisation refusée — autorisez l'accès à la position dans les réglages de votre navigateur.",
+      "geoUnavailable": "Position indisponible — vérifiez que le GPS est activé puis réessayez.",
+      "geoTimeout": "Délai de localisation dépassé — réessayez à l'extérieur ou près d'une fenêtre.",
       "latitude": "Latitude",
       "longitude": "Longitude",
       "saveGps": "Enregistrer la position"
