@@ -114,6 +114,22 @@ test.group('Push subscriptions (functional)', (group) => {
     response.assertHeader('location', '/login')
   })
 
+  test('GET /settings/notifications rend la page avec les appareils de l’utilisateur (#498)', async ({
+    client,
+  }) => {
+    const user = await UserFactory.with('organization').create()
+    await client.post('/push/subscriptions').loginAs(user).redirects(0).form(SUBSCRIPTION_BODY)
+
+    const response = await client.get('/settings/notifications').loginAs(user).withInertia()
+
+    response.assertStatus(200)
+    response.assertInertiaComponent('settings/notifications')
+    const props = response.inertiaProps as { pushSubscriptions: Array<{ id: number }> }
+    if (props.pushSubscriptions.length !== 1) {
+      throw new Error(`expected 1 subscription prop, got ${props.pushSubscriptions.length}`)
+    }
+  })
+
   test('un endpoint non-HTTPS est rejeté par la validation', async ({ client, assert }) => {
     const user = await UserFactory.with('organization').create()
 

@@ -155,8 +155,11 @@ terrain (maintenance, documents, équipements de sécurité) sont poussés, la v
   navigateur), `DELETE /push/subscriptions/:id` (depuis l'écran de gestion #498, scopé à
   l'utilisateur).
 
-L'opt-in navigateur, les gestionnaires `push`/`notificationclick` du service worker et l'écran de
-gestion des appareils arrivent avec #498.
+Côté front (#498) : opt-in contextuel (`PushOptInCard.vue`, jamais de prompt à froid), entonnoir
+d'installation iOS (`IosInstallHint.vue`), gestionnaires `push`/`notificationclick` dans
+`inertia/sw.ts` (payload parsé par la fonction pure `inertia/lib/push_payload.ts`), et écran de
+gestion `/settings/notifications` (activer/désactiver cet appareil, liste et retrait des appareils
+abonnés). Détail : `docs/frontend/pwa.md` § Web Push.
 
 ## Routes HTTP
 
