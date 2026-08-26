@@ -8,7 +8,8 @@
     "ai": "Personnalisation IA",
     "auditLog": "Journal d'activité",
     "branding": "Marque blanche",
-    "import": "Import CSV"
+    "import": "Import CSV",
+    "notifications": "Notifications"
   },
   "org": {
     "title": "Profil organisation",
@@ -323,6 +324,26 @@
     "empty": {
       "title": "Aucune activité",
       "description": "Les actions de votre organisation apparaîtront ici."
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "subtitle": "Les notifications push atteignent vos appareils même app fermée.",
+    "notConfigured": "Les notifications push ne sont pas configurées sur ce serveur.",
+    "thisDevice": "Cet appareil",
+    "unsupported": "Ce navigateur ne prend pas en charge les notifications push.",
+    "permissionDenied": "Les notifications sont bloquées pour ce site. Autorisez-les dans les réglages de votre navigateur, puis revenez ici.",
+    "enable": "Activer sur cet appareil",
+    "enabled": "Activées sur cet appareil",
+    "disable": "Désactiver",
+    "devices": {
+      "title": "Appareils abonnés",
+      "empty": "Aucun appareil abonné pour le moment.",
+      "unknownDevice": "Appareil inconnu",
+      "added": "Ajouté le {date}",
+      "lastUsed": "Dernière notification le {date}",
+      "remove": "Retirer",
+      "removeAriaLabel": "Retirer l'appareil : {device}"
     }
   }
 }

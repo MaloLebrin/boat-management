@@ -37,7 +37,7 @@ const contactHref = computed(() => marketingPath('contact', locale.value))
 </script>
 
 <template>
-  <div class="min-h-screen bg-cream text-fg">
+  <div class="min-h-dvh bg-cream text-fg">
     <AppHeader />
 
     <main class="w-full">

@@ -88,7 +88,7 @@ function goToBoat() {
 <template>
   <Head :title="t('boats.simulator.pageTitle', { name: boat.name })" />
 
-  <div class="bg-paper px-6 py-12 lg:px-8 lg:py-16 min-h-screen">
+  <div class="bg-paper px-6 py-12 lg:px-8 lg:py-16 min-h-dvh">
     <div class="mx-auto max-w-xl">
       <!-- Header -->
       <div class="mb-8">

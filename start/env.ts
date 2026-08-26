@@ -64,6 +64,13 @@ export default await Env.create(new URL('../', import.meta.url), {
   STRIPE_PUBLIC_KEY: Env.schema.string.optional(),
   STRIPE_CUSTOMER_PORTAL_ID: Env.schema.string.optional(),
 
+  // Web Push (#497) — obligatoirement optionnels : les environnements sans
+  // clés VAPID (test, CI, local) doivent démarrer, le push est alors désactivé
+  // (voir config/push.ts). Générer une paire : `npx web-push generate-vapid-keys`.
+  VAPID_PUBLIC_KEY: Env.schema.string.optional(),
+  VAPID_PRIVATE_KEY: Env.schema.secret.optional(),
+  VAPID_SUBJECT: Env.schema.string.optional(),
+
   // Mail (SMTP)
   SMTP_HOST: Env.schema.string({ format: 'host' }),
   SMTP_PORT: Env.schema.number(),

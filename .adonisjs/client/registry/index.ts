@@ -930,6 +930,12 @@ const routes = {
     tokens: [{"old":"/settings/me","type":0,"val":"settings","end":""},{"old":"/settings/me","type":0,"val":"me","end":""}],
     types: placeholder as Registry['settings.me']['types'],
   },
+  'settings.notifications': {
+    methods: ["GET","HEAD"],
+    pattern: '/settings/notifications',
+    tokens: [{"old":"/settings/notifications","type":0,"val":"settings","end":""},{"old":"/settings/notifications","type":0,"val":"notifications","end":""}],
+    types: placeholder as Registry['settings.notifications']['types'],
+  },
   'settings.org': {
     methods: ["GET","HEAD"],
     pattern: '/settings/org',
@@ -1715,6 +1721,24 @@ const routes = {
     pattern: '/demo',
     tokens: [{"old":"/demo","type":0,"val":"demo","end":""}],
     types: placeholder as Registry['demo.login']['types'],
+  },
+  'push.subscriptions.store': {
+    methods: ["POST"],
+    pattern: '/push/subscriptions',
+    tokens: [{"old":"/push/subscriptions","type":0,"val":"push","end":""},{"old":"/push/subscriptions","type":0,"val":"subscriptions","end":""}],
+    types: placeholder as Registry['push.subscriptions.store']['types'],
+  },
+  'push.subscriptions.destroyByEndpoint': {
+    methods: ["DELETE"],
+    pattern: '/push/subscriptions',
+    tokens: [{"old":"/push/subscriptions","type":0,"val":"push","end":""},{"old":"/push/subscriptions","type":0,"val":"subscriptions","end":""}],
+    types: placeholder as Registry['push.subscriptions.destroyByEndpoint']['types'],
+  },
+  'push.subscriptions.destroy': {
+    methods: ["DELETE"],
+    pattern: '/push/subscriptions/:id',
+    tokens: [{"old":"/push/subscriptions/:id","type":0,"val":"push","end":""},{"old":"/push/subscriptions/:id","type":0,"val":"subscriptions","end":""},{"old":"/push/subscriptions/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['push.subscriptions.destroy']['types'],
   },
 } as const satisfies Record<string, AdonisEndpoint>
 

@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { mount } from '@vue/test-utils'
 import { beforeEach, describe, expect, test } from 'vitest'
 import { vi } from 'vitest'
@@ -111,5 +113,48 @@ describe('BoatPhotoGallery', () => {
     })
 
     expect(wrapper.find('input[type="file"]').exists()).toBe(false)
+  })
+
+  // #485 — le bouton « Prendre une photo » a son propre input capture, car
+  // `capture` sur l'input principal supprimerait la sélection multiple.
+  test('renders a dedicated camera input with capture and without multiple', () => {
+    const wrapper = mount(BoatPhotoGallery, { props: baseProps as never })
+    const inputs = wrapper.findAll('input[type="file"]')
+
+    expect(inputs).toHaveLength(2)
+    const [galleryInput, cameraInput] = inputs
+    expect(galleryInput.attributes('multiple')).toBeDefined()
+    expect(galleryInput.attributes('capture')).toBeUndefined()
+    expect(cameraInput.attributes('capture')).toBe('environment')
+    expect(cameraInput.attributes('multiple')).toBeUndefined()
+    expect(wrapper.text()).toContain('boats.show.mediaUpload.takePhoto')
+  })
+
+  test('posts the captured photo from the camera input', async () => {
+    const wrapper = mount(BoatPhotoGallery, { props: baseProps as never })
+    const file = new File(['x'], 'capture.jpg', { type: 'image/jpeg' })
+    const cameraInput = wrapper.find('input[capture="environment"]')
+
+    Object.defineProperty(cameraInput.element, 'files', { value: [file] })
+    await cameraInput.trigger('change')
+
+    expect(mockFormPost).toHaveBeenCalledTimes(1)
+    expect(mockFormPost).toHaveBeenCalledWith(
+      '/boats/3/photos',
+      expect.objectContaining({ forceFormData: true, preserveScroll: true })
+    )
+    expect(mockForm.files).toEqual([file])
+  })
+
+  test('takePhoto key is translated in both locales', () => {
+    for (const locale of ['en', 'fr'] as const) {
+      const json = JSON.parse(
+        readFileSync(resolve(__dirname, `../../resources/lang/${locale}/boats.json`), 'utf8')
+      ) as { show: { mediaUpload: Record<string, string> } }
+      expect(
+        json.show.mediaUpload.takePhoto,
+        `boats.show.mediaUpload.takePhoto (${locale})`
+      ).toBeTruthy()
+    }
   })
 })
