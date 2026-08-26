@@ -17,10 +17,12 @@ const mockPageProps = vi.hoisted(() => ({
     'common.offline.syncing': 'Synchronisation en cours…',
     'common.offline.syncSuccess':
       '{count, plural, one {# entrée synchronisée} other {# entrées synchronisées}}',
-    'common.offline.syncError': 'Erreur de synchronisation',
+    'common.offline.syncRejected': 'Refusée par le serveur — conservée dans les échecs',
     'common.offline.conflict.kept': 'Vos modifications seront renvoyées',
     'common.offline.conflict.discarded': 'Modifications locales abandonnées',
     'common.offline.queue.cancelled': 'Action annulée',
+    'common.offline.failed.requeued': 'Action remise en file',
+    'common.offline.failed.discarded': 'Action en échec abandonnée',
   },
   locale: 'fr',
   flash: {} as Record<string, unknown>,
@@ -59,17 +61,17 @@ function mountComposable() {
   return result!
 }
 
-function makeRouterCallOnError() {
+function makeRouterCallOnError(errors?: Record<string, string>) {
   vi.mocked(router.post).mockImplementation((_url, _data, options: any) => {
-    options?.onError?.()
+    options?.onError?.(errors)
     return undefined as any
   })
   vi.mocked(router.patch).mockImplementation((_url, _data, options: any) => {
-    options?.onError?.()
+    options?.onError?.(errors)
     return undefined as any
   })
   vi.mocked(router.put).mockImplementation((_url, _data, options: any) => {
-    options?.onError?.()
+    options?.onError?.(errors)
     return undefined as any
   })
 }
@@ -251,15 +253,16 @@ describe('useOfflineQueue', () => {
     )
   })
 
-  test('drainQueue shows error toast and discards action on server error', async () => {
-    makeRouterCallOnError()
-    const { enqueue, drainQueue, pendingCount } = mountComposable()
+  // #487 — un refus 4xx déplace l'action vers `failed` au lieu de la détruire.
+  test('drainQueue moves a 4xx-rejected action to the failed store with its errors', async () => {
+    makeRouterCallOnError({ departedAt: 'La date de départ est invalide' })
+    const { enqueue, drainQueue, pendingCount, failedCount, failedActions } = mountComposable()
 
     await enqueue({
       type: 'create-navigation-log',
       url: '/boats/1/navigation-logs',
       method: 'post',
-      payload: { departedAt: '2026-06-24T10:00' },
+      payload: { departedAt: 'invalid' },
     })
     expect(pendingCount.value).toBe(1)
 
@@ -268,6 +271,145 @@ describe('useOfflineQueue', () => {
 
     expect(toast.error).toHaveBeenCalledOnce()
     expect(toast.success).not.toHaveBeenCalled()
+    // L'action n'est pas détruite : payload et erreurs sont conservés
+    expect(failedCount.value).toBe(1)
+    expect(failedActions.value[0].type).toBe('create-navigation-log')
+    expect(failedActions.value[0].payload).toEqual({ departedAt: 'invalid' })
+    expect(failedActions.value[0].errors).toEqual({
+      departedAt: 'La date de départ est invalide',
+    })
+    expect(failedActions.value[0].failedAt).toBeTruthy()
+  })
+
+  test('drainQueue keeps a failed action even without an errors object', async () => {
+    makeRouterCallOnError()
+    const { enqueue, drainQueue, pendingCount, failedCount, failedActions } = mountComposable()
+
+    await enqueue({
+      type: 'create-fuel-log',
+      url: '/boats/1/fuel-logs',
+      method: 'post',
+      payload: { quantityLiters: '50' },
+    })
+
+    await drainQueue()
+    await vi.waitFor(() => expect(pendingCount.value).toBe(0), { timeout: 1000 })
+
+    expect(failedCount.value).toBe(1)
+    expect(failedActions.value[0].errors).toEqual({})
+  })
+
+  test('a 4xx failure does not block the rest of the queue', async () => {
+    // Première action refusée (422), la seconde passe
+    vi.mocked(router.post)
+      .mockImplementationOnce((_url, _data, options: any) => {
+        options?.onError?.({ departedAt: 'invalide' })
+        return undefined as any
+      })
+      .mockImplementationOnce((_url, _data, options: any) => {
+        options?.onSuccess?.()
+        return undefined as any
+      })
+    const { enqueue, drainQueue, pendingCount, failedCount } = mountComposable()
+
+    await enqueue({
+      type: 'create-navigation-log',
+      url: '/boats/1/navigation-logs',
+      method: 'post',
+      payload: { departedAt: 'invalid' },
+    })
+    await enqueue({
+      type: 'create-fuel-log',
+      url: '/boats/1/fuel-logs',
+      method: 'post',
+      payload: { quantityLiters: '50' },
+    })
+    expect(pendingCount.value).toBe(2)
+
+    await drainQueue()
+    await vi.waitFor(() => expect(pendingCount.value).toBe(0), { timeout: 1000 })
+
+    expect(failedCount.value).toBe(1)
+    expect(vi.mocked(router.post)).toHaveBeenCalledTimes(2)
+    expect(toast.success).toHaveBeenCalledOnce()
+  })
+
+  test('retryFailedAction re-queues the action and keeps its payload', async () => {
+    makeRouterCallOnError({ departedAt: 'invalide' })
+    const { enqueue, drainQueue, pendingCount, failedCount, failedActions, retryFailedAction } =
+      mountComposable()
+
+    await enqueue({
+      type: 'create-navigation-log',
+      url: '/boats/1/navigation-logs',
+      method: 'post',
+      payload: { departedAt: 'invalid' },
+    })
+    await drainQueue()
+    await vi.waitFor(() => expect(failedCount.value).toBe(1), { timeout: 1000 })
+
+    // Le retry lui-même retombe en échec (mêmes données) — l'action revient en `failed`
+    await retryFailedAction(failedActions.value[0].id!)
+    await vi.waitFor(() => expect(failedCount.value).toBe(1), { timeout: 1000 })
+
+    expect(pendingCount.value).toBe(0)
+    expect(failedActions.value[0].payload).toEqual({ departedAt: 'invalid' })
+    expect(toast.info).toHaveBeenCalledWith('Action remise en file')
+  })
+
+  test('discardFailedAction removes the failed action explicitly', async () => {
+    makeRouterCallOnError({ departedAt: 'invalide' })
+    const { enqueue, drainQueue, failedCount, failedActions, discardFailedAction } =
+      mountComposable()
+
+    await enqueue({
+      type: 'create-navigation-log',
+      url: '/boats/1/navigation-logs',
+      method: 'post',
+      payload: { departedAt: 'invalid' },
+    })
+    await drainQueue()
+    await vi.waitFor(() => expect(failedCount.value).toBe(1), { timeout: 1000 })
+
+    await discardFailedAction(failedActions.value[0].id!)
+
+    expect(failedCount.value).toBe(0)
+    expect(failedActions.value).toHaveLength(0)
+    expect(toast.info).toHaveBeenLastCalledWith('Action en échec abandonnée')
+  })
+
+  test('v1 → v2 migration preserves the existing pending queue', async () => {
+    // Base v1 telle qu'elle existe chez les utilisateurs actuels
+    const { openDB } = await import('idb')
+    const v1 = await openDB('fleetide-offline-queue', 1, {
+      upgrade(db) {
+        db.createObjectStore('actions', { keyPath: 'id', autoIncrement: true })
+      },
+    })
+    await v1.add('actions', {
+      type: 'create-navigation-log',
+      url: '/boats/1/navigation-logs',
+      method: 'post',
+      payload: { departedAt: '2026-06-24T10:00' },
+      createdAt: '2026-06-24T10:00:00.000Z',
+    })
+    v1.close()
+
+    // L'ouverture en v2 (via enqueue) ne doit pas perdre la file existante
+    const { enqueue, pendingCount, pendingActions, failedCount } = mountComposable()
+    await enqueue({
+      type: 'create-fuel-log',
+      url: '/boats/1/fuel-logs',
+      method: 'post',
+      payload: { quantityLiters: '50' },
+    })
+
+    expect(pendingCount.value).toBe(2)
+    expect(pendingActions.value.map((a) => a.type)).toEqual([
+      'create-navigation-log',
+      'create-fuel-log',
+    ])
+    expect(failedCount.value).toBe(0)
   })
 
   test('drainQueue shows syncing toast when starting drain', async () => {

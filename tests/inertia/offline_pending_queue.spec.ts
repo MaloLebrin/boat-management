@@ -23,6 +23,18 @@ vi.mock('@inertiajs/vue3', () => ({
         'common.offline.queue.type.create-navigation-log': 'Nouvelle sortie',
         'common.offline.queue.type.create-fuel-log': 'Avitaillement',
         'common.offline.syncing': 'Synchronisation en cours…',
+        'common.offline.syncRejected': 'Refusée par le serveur — conservée dans les échecs',
+        'common.offline.failed.title':
+          '{count, plural, one {# action en échec} other {# actions en échec}}',
+        'common.offline.failed.description': 'Ces saisies ont été refusées par le serveur.',
+        'common.offline.failed.reason': 'Motif :',
+        'common.offline.failed.noReason': 'Refusée par le serveur (erreur de validation)',
+        'common.offline.failed.retry': 'Réessayer',
+        'common.offline.failed.retryAriaLabel': "Réessayer l'action en échec : {type}",
+        'common.offline.failed.requeued': 'Action remise en file',
+        'common.offline.failed.discard': 'Abandonner',
+        'common.offline.failed.discardAriaLabel': "Abandonner l'action en échec : {type}",
+        'common.offline.failed.discarded': 'Action en échec abandonnée',
       },
       locale: 'fr',
       flash: {},
@@ -152,6 +164,60 @@ describe('OfflinePendingQueue', () => {
     await vi.waitFor(() => expect(wrapper.findAll('li')).toHaveLength(1), { timeout: 1000 })
     expect(wrapper.text()).toContain('Avitaillement')
     expect(wrapper.text()).not.toContain('Nouvelle sortie')
+  })
+
+  describe('actions en échec (#487)', () => {
+    async function seedFailedAction() {
+      const { router } = await import('@inertiajs/vue3')
+      vi.mocked(router.post).mockImplementationOnce((_url, _data, options: any) => {
+        options?.onError?.({ departedAt: 'La date de départ est invalide' })
+        return undefined as any
+      })
+      const { enqueue, drainQueue, failedCount } = useOfflineQueue()
+      await enqueue({
+        type: 'create-navigation-log',
+        url: '/boats/1/navigation-logs',
+        method: 'post',
+        payload: { departedAt: 'invalid' },
+      })
+      await drainQueue()
+      await vi.waitFor(() => expect(failedCount.value).toBe(1), { timeout: 1000 })
+    }
+
+    test('renders the failed section with the rejection reason and both actions', async () => {
+      await seedFailedAction()
+
+      const wrapper = mountComponent()
+      await flushPromises()
+
+      expect(wrapper.text()).toContain('1 action en échec')
+      expect(wrapper.text()).toContain('Motif : La date de départ est invalide')
+      expect(wrapper.text()).toContain('Réessayer')
+      expect(wrapper.text()).toContain('Abandonner')
+    })
+
+    test('discard button removes the failed action', async () => {
+      await seedFailedAction()
+
+      const wrapper = mountComponent()
+      await flushPromises()
+      const discardBtn = wrapper.findAll('button').find((b) => b.text().includes('Abandonner'))!
+
+      await discardBtn.trigger('click')
+
+      await vi.waitFor(() => expect(wrapper.text()).not.toContain('action en échec'), {
+        timeout: 1000,
+      })
+    })
+
+    test('failed actions do not appear in the pending list', async () => {
+      await seedFailedAction()
+
+      const wrapper = mountComponent()
+      await flushPromises()
+
+      expect(wrapper.text()).not.toContain('action en attente')
+    })
   })
 
   describe('dark mode (#416)', () => {
