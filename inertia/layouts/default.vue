@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { Link } from '@adonisjs/inertia/vue'
 import type { Data } from '@generated/data'
-import { usePage } from '@inertiajs/vue3'
-import { onBeforeUnmount, ref, watch } from 'vue'
+import { router, usePage } from '@inertiajs/vue3'
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { Toaster } from 'vue-sonner'
 import brandIconUrl from '~/assets/brand/fleetai_compass.svg'
 import AsideMenu from '~/components/layout/AsideMenu.vue'
@@ -12,6 +12,7 @@ import NotificationBell from '~/components/layout/NotificationBell.vue'
 import { useNetworkStatus } from '~/composables/use_network_status'
 import ConflictResolutionModal from '~/components/ConflictResolutionModal.vue'
 import OfflinePendingQueue from '~/components/OfflinePendingQueue.vue'
+import PushOptInCard from '~/components/pwa/PushOptInCard.vue'
 import { useFlashToasts } from '~/composables/use_flash_toasts'
 import { useOfflineQueue } from '~/composables/use_offline_queue'
 import { usePwaUpdate } from '~/composables/use_pwa_update'
@@ -63,8 +64,26 @@ watch(
   }
 )
 
+// Clic sur une notification push : le SW poste { type: 'push:navigate', url }
+// à la fenêtre focusée — navigation Inertia, pas de rechargement complet (#498)
+function onSwMessage(event: MessageEvent) {
+  const data = event.data as { type?: string; url?: string } | null
+  if (data?.type === 'push:navigate' && typeof data.url === 'string') {
+    router.visit(data.url)
+  }
+}
+
+onMounted(() => {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.addEventListener('message', onSwMessage)
+  }
+})
+
 onBeforeUnmount(() => {
   window.removeEventListener('keydown', onKeydown)
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.removeEventListener('message', onSwMessage)
+  }
 })
 </script>
 
@@ -119,6 +138,7 @@ onBeforeUnmount(() => {
       <!-- Scrollable content area -->
       <main class="flex-1 overflow-y-auto bg-cream">
         <OfflinePendingQueue />
+        <PushOptInCard />
         <Transition name="page" mode="out-in">
           <div :key="page.url">
             <slot />

@@ -1855,6 +1855,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['me']>>>
     }
   }
+  'settings.notifications': {
+    methods: ["GET","HEAD"]
+    pattern: '/settings/notifications'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['notifications']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['notifications']>>>
+    }
+  }
   'settings.org': {
     methods: ["GET","HEAD"]
     pattern: '/settings/org'
@@ -3425,6 +3437,42 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/demo_controller').default['login']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/demo_controller').default['login']>>>
+    }
+  }
+  'push.subscriptions.store': {
+    methods: ["POST"]
+    pattern: '/push/subscriptions'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/push_subscription_validator').subscribePushValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/push_subscription_validator').subscribePushValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/push_subscriptions_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/push_subscriptions_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'push.subscriptions.destroyByEndpoint': {
+    methods: ["DELETE"]
+    pattern: '/push/subscriptions'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/push_subscription_validator').unsubscribePushValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/push_subscription_validator').unsubscribePushValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/push_subscriptions_controller').default['destroyByEndpoint']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/push_subscriptions_controller').default['destroyByEndpoint']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'push.subscriptions.destroy': {
+    methods: ["DELETE"]
+    pattern: '/push/subscriptions/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/push_subscriptions_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/push_subscriptions_controller').default['destroy']>>>
     }
   }
 }

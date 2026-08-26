@@ -92,6 +92,37 @@ En production, `sw.js` est servi par le middleware statique (`build/public` = ra
 
 ---
 
+## Web Push (#498)
+
+Backend : voir `docs/domain/notifications.md` (#497). Côté front :
+
+- **`inertia/lib/push_payload.ts`** — parsing du payload en **fonction pure** (testable sans
+  contexte SW). Ne lève jamais : le SW doit **toujours** appeler `showNotification`, même sur un
+  payload vide/invalide — Safari et Chrome désabonnent un endpoint qui reçoit des push muets. Un
+  `tag` par type coalesce les alertes récurrentes ; une `actionUrl` non relative est remplacée par
+  `/notifications` (pas d'ouverture hors app).
+- **`inertia/sw.ts`** — gestionnaires `push` (showNotification systématique) et
+  `notificationclick` : `clients.matchAll` → fenêtre existante `focus()` +
+  `postMessage({ type: 'push:navigate', url })`, sinon `openWindow(url)`. Le layout
+  (`default.vue`) écoute ces messages et fait un `router.visit(url)` — navigation Inertia, pas de
+  rechargement complet.
+- **`use_push_notifications.ts`** — `isSupported`, `permission`, `isSubscribed`, `subscribe()`,
+  `unsubscribe()`, `urlBase64ToUint8Array`. **`subscribe()` n'est appelé que depuis un geste
+  utilisateur** (exigence navigateur — jamais de prompt à froid, jamais au montage) ; la clé VAPID
+  vient de la shared prop `vapidPublicKey`.
+- **`PushOptInCard.vue`** — opt-in contextuel monté dans `default.vue` : n'apparaît qu'à partir de
+  la **2e session** (compteur en localStorage, marqueur de session en sessionStorage), dismissible
+  (`localStorage`), masqué si permission refusée ou déjà abonné. Sur iOS hors PWA installée, la
+  carte montre `IosInstallHint.vue` à la place du bouton.
+- **`IosInstallHint.vue`** — Web Push iOS exige la PWA installée (16.4+) et Safari n'émet jamais
+  `beforeinstallprompt` : instructions illustrées « Partager → Sur l'écran d'accueil ». Détection
+  via `isIos()` / `isStandalone()` (`use_pwa_install.ts`).
+- **`SettingsNotificationsTab.vue`** (`/settings/notifications`) — gestion permanente : activer /
+  désactiver cet appareil, liste des appareils abonnés (`user_agent`, dates) et retrait par
+  appareil (`DELETE /push/subscriptions/:id`).
+
+---
+
 ## Manifest (`public/site.webmanifest`)
 
 ```json

@@ -141,6 +141,11 @@ visibilité change (`hidden lg:block` sur le panneau inactif).
   - `ParticleNetworkCanvas.vue` — particules réactives souris : `HomeFinalCtaSection`
 - Détail des animations : `inertia/css/ANIMATIONS.md`
 
+### Settings — notifications (`/settings/notifications`, #498)
+
+- Page : `inertia/pages/settings/notifications.vue` → `components/settings/tabs/SettingsNotificationsTab.vue` (prop `pushSubscriptions`, servie par `SettingsController.notifications`), section visible pour **tous les rôles**.
+- Gestion du Web Push : activer/désactiver **cet appareil** (`use_push_notifications.ts` — `subscribe()` uniquement sur geste utilisateur), liste des appareils abonnés (`user_agent`, dates) et retrait par appareil (`DELETE /push/subscriptions/:id`). Sur iOS hors PWA installée, `IosInstallHint.vue` remplace le bouton. Détail : `docs/frontend/pwa.md` § Web Push.
+
 ### Settings — facturation (`/settings/billing`)
 
 - Page : `inertia/pages/settings/billing.vue` → `components/settings/tabs/SettingsBillingTab.vue` (props `plan`, `quotaUsage`, `subscription`, `orgModules`, `orgAddons`, servies par `SettingsController.billing`)

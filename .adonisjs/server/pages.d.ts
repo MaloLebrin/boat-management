@@ -83,6 +83,7 @@ declare module '@adonisjs/inertia/types' {
     'settings/index': ExtractProps<(typeof import('../../inertia/pages/settings/index.vue'))['default']>
     'settings/me': ExtractProps<(typeof import('../../inertia/pages/settings/me.vue'))['default']>
     'settings/members': ExtractProps<(typeof import('../../inertia/pages/settings/members.vue'))['default']>
+    'settings/notifications': ExtractProps<(typeof import('../../inertia/pages/settings/notifications.vue'))['default']>
     'settings/org': ExtractProps<(typeof import('../../inertia/pages/settings/org.vue'))['default']>
   }
 }

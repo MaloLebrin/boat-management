@@ -14,6 +14,7 @@ const { can } = usePermissions()
 
 type SettingsSection =
   | 'me'
+  | 'notifications'
   | 'org'
   | 'members'
   | 'billing'
@@ -28,6 +29,12 @@ type SettingsSection =
 const baseSections = computed(() => {
   const result: { key: SettingsSection; route: string; label: () => string }[] = [
     { key: 'me', route: 'settings.me', label: () => t('settings.sections.me') },
+    // Notifications push (#498) — chaque utilisateur a ses propres appareils
+    {
+      key: 'notifications',
+      route: 'settings.notifications',
+      label: () => t('settings.sections.notifications'),
+    },
   ]
   if (can('members.view')) {
     result.push({ key: 'org', route: 'settings.org', label: () => t('settings.sections.org') })

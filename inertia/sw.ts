@@ -19,6 +19,7 @@ import { ExpirationPlugin } from 'workbox-expiration'
 import { cleanupOutdatedCaches, matchPrecache, precacheAndRoute } from 'workbox-precaching'
 import { NavigationRoute, registerRoute, setCatchHandler } from 'workbox-routing'
 import { NetworkFirst, NetworkOnly } from 'workbox-strategies'
+import { parsePushPayload } from './lib/push_payload'
 
 declare const self: ServiceWorkerGlobalScope & {
   __WB_MANIFEST: Array<{ url: string; revision: string | null }>
@@ -69,4 +70,45 @@ setCatchHandler(async ({ request }) => {
     if (fallback) return fallback
   }
   return Response.error()
+})
+
+// ————— Web Push (#498) —————
+
+// Toujours afficher une notification, même sur payload vide/invalide :
+// Safari comme Chrome désabonnent un endpoint qui reçoit des push muets.
+// `parsePushPayload` ne lève jamais (inertia/lib/push_payload.ts).
+self.addEventListener('push', (event) => {
+  const parsed = parsePushPayload(event.data ? event.data.text() : null)
+  event.waitUntil(
+    self.registration.showNotification(parsed.title, {
+      body: parsed.body,
+      // `tag` coalesce les alertes récurrentes du même type
+      tag: parsed.tag,
+      icon: '/web-app-manifest-192x192.png',
+      badge: '/favicon-96x96.png',
+      data: { url: parsed.url },
+    })
+  )
+})
+
+// Clic : focus d'une fenêtre existante + postMessage (le layout fait un
+// router.visit → navigation Inertia, pas de rechargement complet) ; sinon
+// ouverture d'une nouvelle fenêtre.
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close()
+  const url: string =
+    typeof event.notification.data?.url === 'string' ? event.notification.data.url : '/'
+
+  event.waitUntil(
+    (async () => {
+      const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true })
+      const existing = windows.find((client) => 'focus' in client)
+      if (existing) {
+        await existing.focus()
+        existing.postMessage({ type: 'push:navigate', url })
+        return
+      }
+      await self.clients.openWindow(url)
+    })()
+  )
 })
