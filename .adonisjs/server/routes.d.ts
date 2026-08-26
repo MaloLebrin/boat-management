@@ -158,6 +158,7 @@ export type ScannedRoutes = {
     'theme.set': { paramsTuple?: []; params?: {} }
     'settings.index': { paramsTuple?: []; params?: {} }
     'settings.me': { paramsTuple?: []; params?: {} }
+    'settings.notifications': { paramsTuple?: []; params?: {} }
     'settings.org': { paramsTuple?: []; params?: {} }
     'settings.members': { paramsTuple?: []; params?: {} }
     'settings.billing': { paramsTuple?: []; params?: {} }
@@ -289,6 +290,9 @@ export type ScannedRoutes = {
     'simulator.share.show.fr': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'simulator.share.show.en': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'demo.login': { paramsTuple?: []; params?: {} }
+    'push.subscriptions.store': { paramsTuple?: []; params?: {} }
+    'push.subscriptions.destroyByEndpoint': { paramsTuple?: []; params?: {} }
+    'push.subscriptions.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   GET: {
     'event_stream': { paramsTuple?: []; params?: {} }
@@ -334,6 +338,7 @@ export type ScannedRoutes = {
     'planning.index': { paramsTuple?: []; params?: {} }
     'settings.index': { paramsTuple?: []; params?: {} }
     'settings.me': { paramsTuple?: []; params?: {} }
+    'settings.notifications': { paramsTuple?: []; params?: {} }
     'settings.org': { paramsTuple?: []; params?: {} }
     'settings.members': { paramsTuple?: []; params?: {} }
     'settings.billing': { paramsTuple?: []; params?: {} }
@@ -443,6 +448,7 @@ export type ScannedRoutes = {
     'planning.index': { paramsTuple?: []; params?: {} }
     'settings.index': { paramsTuple?: []; params?: {} }
     'settings.me': { paramsTuple?: []; params?: {} }
+    'settings.notifications': { paramsTuple?: []; params?: {} }
     'settings.org': { paramsTuple?: []; params?: {} }
     'settings.members': { paramsTuple?: []; params?: {} }
     'settings.billing': { paramsTuple?: []; params?: {} }
@@ -592,6 +598,7 @@ export type ScannedRoutes = {
     'simulator.lead': { paramsTuple?: []; params?: {} }
     'simulator.share.store': { paramsTuple?: []; params?: {} }
     'demo.login': { paramsTuple?: []; params?: {} }
+    'push.subscriptions.store': { paramsTuple?: []; params?: {} }
   }
   PATCH: {
     'boats.portStays.update': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'stayId': ParamValue} }
@@ -660,6 +667,8 @@ export type ScannedRoutes = {
     'clients.media.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'mediaId': ParamValue} }
     'pricingSeasons.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'invoices.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'push.subscriptions.destroyByEndpoint': { paramsTuple?: []; params?: {} }
+    'push.subscriptions.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   PUT: {
     'boats.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }

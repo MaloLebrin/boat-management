@@ -120,6 +120,47 @@ Références : `config/transmit.ts`, `start/transmit.ts`, `inertia/composables/u
   - Le CSRF est ajouté manuellement aux requêtes d'abonnement (`beforeSubscribe`/`beforeUnsubscribe`) — c'est **l'exception documentée** au « pas de CSRF manuel » de `CLAUDE.md`, car Transmit n'est pas une visite Inertia.
   - Changement d'utilisateur (logout/login sans reload) → `resetSubscription()` puis remise à zéro de l'état.
 
+## Web Push (#497)
+
+Références : `app/services/web_push_service.ts`, `app/services/push_subscription_service.ts`,
+`app/jobs/send_push_notification.ts`, `config/push.ts`, `shared/constants/push.ts`,
+`start/routes/push.ts`.
+
+Les notifications sortent de l'onglet ouvert : `NotificationService.create()` — le point de
+convergence de tous les émetteurs — dispatche un job `SendPushNotification` **dans son propre
+`try/catch`** (même contrat que le broadcast SSE : un échec de push ne fait jamais échouer la
+création), filtré par `PUSHABLE_NOTIFICATION_TYPES` (`shared/constants/push.ts`) — les événements
+terrain (maintenance, documents, équipements de sécurité) sont poussés, la vie du compte
+(membres, plan, quotas) reste in-app.
+
+- **Abonnements** : `push_subscriptions` (endpoint en `text`, unicité sur `endpoint_hash` SHA-256,
+  clés `p256dh`/`auth`, `failure_count`, `last_used_at`). `subscribe` est un **upsert** sur le hash
+  (le navigateur renvoie le même endpoint à chaque appel) ; un endpoint qui change d'utilisateur
+  bascule vers le nouveau.
+- **Job** (`send_push_notification.ts`, queue `push`, 3 retries) : payload **dénormalisé**
+  (`userId`, `title`, `body`, `actionUrl`, `type`) — reste correct si la notification d'origine a
+  été supprimée. Garde `if (!pushConfig.enabled) return` en tête : avec `QUEUE_DRIVER=sync`
+  (tests), chaque création de notification exécuterait le job en ligne.
+- **Envoi** (`web_push_service.ts`, enveloppe `web-push`) : 404/410 → **purge immédiate** de
+  l'abonnement (endpoint révoqué à l'insu du serveur, ex. PWA retirée de l'écran d'accueil) ;
+  429/5xx → l'erreur remonte pour le retry du job, jamais de purge. `failure_count` trace les
+  échecs consécutifs, remis à zéro au succès.
+- **Configuration** : clés VAPID (`VAPID_PUBLIC_KEY`/`VAPID_PRIVATE_KEY`/`VAPID_SUBJECT`,
+  optionnelles — sans elles le push est désactivé et tous les environnements démarrent). La clé
+  publique est exposée en **shared prop Inertia** (`vapidPublicKey`) plutôt qu'en `VITE_*` : une
+  rotation ne demande pas de rebuild du front. Générer une paire :
+  `npx web-push generate-vapid-keys`.
+- **Routes** (`start/routes/push.ts`, auth + `pushThrottle`, réponses en redirection) :
+  `POST /push/subscriptions` (upsert), `DELETE /push/subscriptions` (par endpoint, depuis le
+  navigateur), `DELETE /push/subscriptions/:id` (depuis l'écran de gestion #498, scopé à
+  l'utilisateur).
+
+Côté front (#498) : opt-in contextuel (`PushOptInCard.vue`, jamais de prompt à froid), entonnoir
+d'installation iOS (`IosInstallHint.vue`), gestionnaires `push`/`notificationclick` dans
+`inertia/sw.ts` (payload parsé par la fonction pure `inertia/lib/push_payload.ts`), et écran de
+gestion `/settings/notifications` (activer/désactiver cet appareil, liste et retrait des appareils
+abonnés). Détail : `docs/frontend/pwa.md` § Web Push.
+
 ## Routes HTTP
 
 Référence : `start/routes/notifications.ts` (groupe sous `middleware.auth()`).

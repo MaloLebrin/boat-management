@@ -2,6 +2,7 @@
 import { Link } from '@adonisjs/inertia/vue'
 import { computed, ref } from 'vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
+import MaintenanceHistoryCard from '~/components/maintenance/MaintenanceHistoryCard.vue'
 import type { MaintenanceEventRow } from '#shared/types/maintenance'
 import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
@@ -74,8 +75,20 @@ function getSubjectLink(event: MaintenanceEventRow): string {
         }}</span>
       </div>
 
+      <!-- Repli carte mobile (#493) : les badges en ligne de la rangée desktop
+           (`shrink-0`) débordent en viewport étroit ; la carte empile tout -->
+      <div class="lg:hidden space-y-3">
+        <MaintenanceHistoryCard
+          v-for="event in monthEvents"
+          :key="event.id"
+          :event="event"
+          :equipment-caption="getEquipmentCaption(event)"
+          :subject-link="getSubjectLink(event)"
+        />
+      </div>
+
       <!-- Events -->
-      <div class="space-y-3">
+      <div class="hidden lg:block space-y-3">
         <div
           v-for="(event, index) in monthEvents"
           :key="event.id"

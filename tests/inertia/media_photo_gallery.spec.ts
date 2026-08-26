@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { mount } from '@vue/test-utils'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 import MediaPhotoGallery from '../../inertia/components/media/MediaPhotoGallery.vue'
@@ -163,5 +165,54 @@ describe('MediaPhotoGallery', () => {
     })
 
     expect(wrapper.text()).not.toContain('media.photos.delete')
+  })
+
+  // #485 — le bouton « Prendre une photo » a son propre input capture, car
+  // `capture` sur l'input principal supprimerait la sélection multiple.
+  test('renders a dedicated camera input with capture and without multiple', () => {
+    const wrapper = mount(MediaPhotoGallery, { props: baseProps })
+    const inputs = wrapper.findAll('input[type="file"]')
+
+    expect(inputs).toHaveLength(2)
+    const [galleryInput, cameraInput] = inputs
+    expect(galleryInput.attributes('multiple')).toBeDefined()
+    expect(galleryInput.attributes('capture')).toBeUndefined()
+    expect(cameraInput.attributes('capture')).toBe('environment')
+    expect(cameraInput.attributes('multiple')).toBeUndefined()
+    expect(wrapper.text()).toContain('media.photos.takePhoto')
+  })
+
+  test('posts the captured photo from the camera input', async () => {
+    const wrapper = mount(MediaPhotoGallery, { props: baseProps })
+    const file = new File(['x'], 'capture.jpg', { type: 'image/jpeg' })
+    const cameraInput = wrapper.find('input[capture="environment"]')
+
+    Object.defineProperty(cameraInput.element, 'files', { value: [file] })
+    await cameraInput.trigger('change')
+
+    expect(mockFormPost).toHaveBeenCalledTimes(1)
+    expect(mockFormPost).toHaveBeenCalledWith(
+      '/boats/1/engines/2/photos',
+      expect.objectContaining({ forceFormData: true, preserveScroll: true })
+    )
+    expect(mockForm.files).toEqual([file])
+  })
+
+  test('hides the camera input when canUpload is false', () => {
+    const wrapper = mount(MediaPhotoGallery, {
+      props: { ...baseProps, canUpload: false, photos: [photo(1)] },
+    })
+
+    expect(wrapper.find('input[capture="environment"]').exists()).toBe(false)
+    expect(wrapper.text()).not.toContain('media.photos.takePhoto')
+  })
+
+  test('takePhoto key is translated in both locales', () => {
+    for (const locale of ['en', 'fr'] as const) {
+      const json = JSON.parse(
+        readFileSync(resolve(__dirname, `../../resources/lang/${locale}/media.json`), 'utf8')
+      ) as { photos: Record<string, string> }
+      expect(json.photos.takePhoto, `media.photos.takePhoto (${locale})`).toBeTruthy()
+    }
   })
 })
