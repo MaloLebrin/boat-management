@@ -1,25 +1,32 @@
 <script setup lang="ts">
 import { router } from '@inertiajs/vue3'
-import { ref, watch } from 'vue'
-import BaseTextarea from '~/components/base/BaseTextarea.vue'
+import { onBeforeUnmount, ref, watch } from 'vue'
+import BoatMaintenanceSheetItemRow from '~/components/boats/sheets/BoatMaintenanceSheetItemRow.vue'
+import { useNetworkStatus } from '~/composables/use_network_status'
+import { useOfflineQueue } from '~/composables/use_offline_queue'
 import { useT } from '~/composables/use_t'
 import type {
   BoatShowDetail,
-  MaintenanceSheetItemRow,
+  MaintenanceSheetItemRow as SheetItemRow,
   MaintenanceSheetRow,
 } from '~/types/boat_show'
 
 const { t } = useT()
+const { isOnline } = useNetworkStatus()
+const { enqueue } = useOfflineQueue()
 
 const props = defineProps<{
   boat: BoatShowDetail
   sheet: MaintenanceSheetRow
-  items: MaintenanceSheetItemRow[]
+  items: SheetItemRow[]
   canManage: boolean
 }>()
 
 const editingNotes = ref<Record<number, string>>({})
 const debounceTimers = ref<Record<number, ReturnType<typeof setTimeout>>>({})
+// Hors-ligne, `item.isDone` (props Inertia) ne bouge pas : sans état optimiste
+// l'utilisateur reclique et empile des actions contradictoires (#490)
+const optimisticDone = ref<Record<number, boolean>>({})
 
 watch(
   () => props.items,
@@ -28,130 +35,103 @@ watch(
       if (editingNotes.value[item.id] === undefined) {
         editingNotes.value[item.id] = item.notes ?? ''
       }
+      // Réconciliation : dès que le serveur reflète l'état optimiste, la prop
+      // redevient la source de vérité
+      if (optimisticDone.value[item.id] === item.isDone) {
+        delete optimisticDone.value[item.id]
+      }
     }
   },
   { immediate: true }
 )
 
-function toggleItemDone(item: MaintenanceSheetItemRow) {
-  if (!props.canManage) return
-  router.put(
-    `/boats/${props.boat.id}/maintenance-sheets/${props.sheet.id}/items/${item.id}`,
-    { isDone: !item.isDone, notes: item.notes ?? '' },
-    { preserveScroll: true }
-  )
+function displayDone(item: SheetItemRow): boolean {
+  return optimisticDone.value[item.id] ?? item.isDone
 }
 
-function updateItemNotes(item: MaintenanceSheetItemRow, newNotes: string) {
+function itemUrl(item: SheetItemRow): string {
+  return `/boats/${props.boat.id}/maintenance-sheets/${props.sheet.id}/items/${item.id}`
+}
+
+function pushUpdate(item: SheetItemRow, isDone: boolean, notes: string) {
+  if (!isOnline.value) {
+    // `_expectedUpdatedAt` : le rejeu refuse d'écraser un item modifié entre-temps ;
+    // `dedupeKey` : deux mises à jour du même item fusionnent en une seule action
+    enqueue({
+      type: 'update-sheet-item',
+      url: itemUrl(item),
+      method: 'put',
+      payload: {
+        isDone,
+        notes,
+        ...(item.updatedAt ? { _expectedUpdatedAt: item.updatedAt } : {}),
+      },
+      dedupeKey: `update-sheet-item:${itemUrl(item)}`,
+    })
+    return
+  }
+  router.put(itemUrl(item), { isDone, notes }, { preserveScroll: true })
+}
+
+function toggleItemDone(item: SheetItemRow) {
+  if (!props.canManage) return
+  const nextDone = !displayDone(item)
+  if (!isOnline.value) optimisticDone.value[item.id] = nextDone
+  pushUpdate(item, nextDone, editingNotes.value[item.id] ?? item.notes ?? '')
+}
+
+function updateItemNotes(item: SheetItemRow, newNotes: string) {
   if (!props.canManage) return
   editingNotes.value[item.id] = newNotes
   if (debounceTimers.value[item.id]) clearTimeout(debounceTimers.value[item.id])
+  // Hors-ligne : pas de debounce — la dédup fusionne les frappes successives,
+  // et rien n'est perdu si le composant est démonté (#490)
+  if (!isOnline.value) {
+    pushUpdate(item, displayDone(item), newNotes)
+    return
+  }
   debounceTimers.value[item.id] = setTimeout(() => {
-    router.put(
-      `/boats/${props.boat.id}/maintenance-sheets/${props.sheet.id}/items/${item.id}`,
-      { isDone: item.isDone, notes: newNotes },
-      { preserveScroll: true }
-    )
+    delete debounceTimers.value[item.id]
+    pushUpdate(item, displayDone(item), newNotes)
   }, 600)
 }
 
-function handleNotesBlur(item: MaintenanceSheetItemRow) {
-  if (debounceTimers.value[item.id]) clearTimeout(debounceTimers.value[item.id])
+function handleNotesBlur(item: SheetItemRow) {
+  if (debounceTimers.value[item.id]) {
+    clearTimeout(debounceTimers.value[item.id])
+    delete debounceTimers.value[item.id]
+  }
   const newNotes = editingNotes.value[item.id] ?? ''
   if (newNotes !== (item.notes ?? '')) {
-    router.put(
-      `/boats/${props.boat.id}/maintenance-sheets/${props.sheet.id}/items/${item.id}`,
-      { isDone: item.isDone, notes: newNotes },
-      { preserveScroll: true }
-    )
+    pushUpdate(item, displayDone(item), newNotes)
   }
 }
+
+onBeforeUnmount(() => {
+  // Un debounce encore armé au démontage serait perdu : on le vide tout de suite
+  for (const item of props.items) {
+    if (debounceTimers.value[item.id]) {
+      clearTimeout(debounceTimers.value[item.id])
+      delete debounceTimers.value[item.id]
+      pushUpdate(item, displayDone(item), editingNotes.value[item.id] ?? '')
+    }
+  }
+})
 </script>
 
 <template>
   <div class="space-y-3">
-    <div
+    <BoatMaintenanceSheetItemRow
       v-for="item in items"
       :key="item.id"
-      :class="[
-        'rounded-lg border p-3 transition-colors',
-        item.isDone ? 'border-border bg-surface-muted/30' : 'border-border bg-surface',
-      ]"
-    >
-      <div class="flex items-start gap-3">
-        <!-- Checkbox -->
-        <button
-          v-if="canManage"
-          type="button"
-          :class="[
-            'mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded border transition-colors',
-            item.isDone
-              ? 'border-brand bg-brand-soft text-brand'
-              : 'border-border hover:border-brand',
-          ]"
-          @click="toggleItemDone(item)"
-        >
-          <svg
-            v-if="item.isDone"
-            class="h-3 w-3"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="3"
-              d="M5 13l4 4L19 7"
-            />
-          </svg>
-        </button>
-        <div
-          v-else
-          :class="[
-            'mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded border',
-            item.isDone ? 'border-brand bg-brand-soft text-brand' : 'border-border',
-          ]"
-        >
-          <svg
-            v-if="item.isDone"
-            class="h-3 w-3"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="3"
-              d="M5 13l4 4L19 7"
-            />
-          </svg>
-        </div>
-
-        <!-- Label and notes -->
-        <div class="flex-1 min-w-0">
-          <p
-            :class="['text-sm font-medium', item.isDone ? 'text-fg-muted line-through' : 'text-fg']"
-          >
-            {{ item.label }}
-          </p>
-
-          <!-- Notes input -->
-          <BaseTextarea
-            v-if="canManage"
-            :model-value="editingNotes[item.id] ?? ''"
-            :placeholder="t('boats.sheets.itemNotesPlaceholder')"
-            :rows="2"
-            compact
-            class="mt-2"
-            @update:model-value="updateItemNotes(item, $event)"
-            @focusout="handleNotesBlur(item)"
-          />
-          <p v-else-if="item.notes" class="mt-1 text-sm text-fg-muted">{{ item.notes }}</p>
-        </div>
-      </div>
-    </div>
+      :item="item"
+      :can-manage="canManage"
+      :display-done="displayDone(item)"
+      :notes-value="editingNotes[item.id] ?? ''"
+      @toggle="toggleItemDone(item)"
+      @update:notes="updateItemNotes(item, $event)"
+      @notes-blur="handleNotesBlur(item)"
+    />
 
     <p v-if="items.length === 0" class="text-sm text-fg-muted text-center py-4">
       {{ t('boats.sheets.noItems') }}

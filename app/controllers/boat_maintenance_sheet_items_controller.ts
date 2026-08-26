@@ -1,4 +1,5 @@
 import BoatMaintenanceSheetService, {
+  BoatMaintenanceSheetItemConflictError,
   BoatMaintenanceSheetItemNotFoundError,
   BoatMaintenanceSheetNotFoundError,
   BoatMaintenanceSheetValidationError,
@@ -38,6 +39,9 @@ export default class BoatMaintenanceSheetItemsController {
 
     await bouncer.with(MaintenancePolicy).authorize('edit', boat)
 
+    // Détection de conflit au rejeu hors-ligne (#490) — hors validateur, comme
+    // pour les journaux de navigation
+    const expectedUpdatedAt = request.input('_expectedUpdatedAt') as string | undefined
     const payload = await request.validateUsing(updateSheetItemValidator)
 
     try {
@@ -49,6 +53,7 @@ export default class BoatMaintenanceSheetItemsController {
         {
           isDone: payload.isDone,
           notes: payload.notes ?? null,
+          expectedUpdatedAt,
         }
       )
     } catch (error) {
@@ -58,6 +63,12 @@ export default class BoatMaintenanceSheetItemsController {
       ) {
         session.flash('error', i18n.t('flash.maintenanceSheets.notFound'))
         response.redirect(`/boats/${boat.id}?tab=sheets`)
+        return
+      }
+      if (error instanceof BoatMaintenanceSheetItemConflictError) {
+        session.flash('conflictData', JSON.stringify(error.currentItem))
+        session.flash('conflictType', 'update-sheet-item')
+        response.redirect().back()
         return
       }
       if (error instanceof BoatMaintenanceSheetValidationError) {

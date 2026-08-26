@@ -39,6 +39,8 @@ export function toMaintenanceSheet(s: BoatMaintenanceSheet) {
       isDone: item.isDone,
       notes: item.notes,
       position: item.position,
+      // le client renvoie cette valeur en `_expectedUpdatedAt` au rejeu hors-ligne (#490)
+      updatedAt: item.updatedAt?.toISO() ?? null,
     })),
     createdAt: s.createdAt.toISO(),
     updatedAt: s.updatedAt?.toISO() ?? null,

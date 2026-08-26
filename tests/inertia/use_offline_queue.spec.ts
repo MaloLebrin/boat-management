@@ -378,6 +378,85 @@ describe('useOfflineQueue', () => {
     expect(toast.info).toHaveBeenLastCalledWith('Action en échec abandonnée')
   })
 
+  // #490 — deux mises à jour du même item ne doivent pas s'empiler : la
+  // seconde écraserait au rejeu les notes saisies entre les deux.
+  test('enqueue with the same dedupeKey upserts instead of stacking', async () => {
+    const { enqueue, pendingCount, pendingActions } = mountComposable()
+
+    await enqueue({
+      type: 'update-sheet-item',
+      url: '/boats/1/maintenance-sheets/2/items/3',
+      method: 'put',
+      payload: { isDone: true, notes: '' },
+      dedupeKey: 'update-sheet-item:/boats/1/maintenance-sheets/2/items/3',
+    })
+    await enqueue({
+      type: 'update-sheet-item',
+      url: '/boats/1/maintenance-sheets/2/items/3',
+      method: 'put',
+      payload: { isDone: false, notes: 'huile changée' },
+      dedupeKey: 'update-sheet-item:/boats/1/maintenance-sheets/2/items/3',
+    })
+
+    expect(pendingCount.value).toBe(1)
+    // La dernière valeur gagne
+    expect(pendingActions.value[0].payload).toEqual({ isDone: false, notes: 'huile changée' })
+    // Un seul toast : l'upsert ne renotifie pas chaque frappe
+    expect(toast.info).toHaveBeenCalledTimes(1)
+  })
+
+  test('enqueue with different dedupeKeys keeps separate actions', async () => {
+    const { enqueue, pendingCount } = mountComposable()
+
+    await enqueue({
+      type: 'update-sheet-item',
+      url: '/boats/1/maintenance-sheets/2/items/3',
+      method: 'put',
+      payload: { isDone: true, notes: '' },
+      dedupeKey: 'update-sheet-item:/boats/1/maintenance-sheets/2/items/3',
+    })
+    await enqueue({
+      type: 'update-sheet-item',
+      url: '/boats/1/maintenance-sheets/2/items/4',
+      method: 'put',
+      payload: { isDone: true, notes: '' },
+      dedupeKey: 'update-sheet-item:/boats/1/maintenance-sheets/2/items/4',
+    })
+
+    expect(pendingCount.value).toBe(2)
+  })
+
+  test('dedupe upsert keeps the original FIFO position', async () => {
+    const { enqueue, pendingActions } = mountComposable()
+
+    await enqueue({
+      type: 'update-sheet-item',
+      url: '/boats/1/maintenance-sheets/2/items/3',
+      method: 'put',
+      payload: { isDone: true, notes: '' },
+      dedupeKey: 'update-sheet-item:/boats/1/maintenance-sheets/2/items/3',
+    })
+    await enqueue({
+      type: 'create-fuel-log',
+      url: '/boats/1/fuel-logs',
+      method: 'post',
+      payload: { quantityLiters: '50' },
+    })
+    await enqueue({
+      type: 'update-sheet-item',
+      url: '/boats/1/maintenance-sheets/2/items/3',
+      method: 'put',
+      payload: { isDone: false, notes: 'v2' },
+      dedupeKey: 'update-sheet-item:/boats/1/maintenance-sheets/2/items/3',
+    })
+
+    expect(pendingActions.value.map((a) => a.type)).toEqual([
+      'update-sheet-item',
+      'create-fuel-log',
+    ])
+    expect(pendingActions.value[0].payload).toEqual({ isDone: false, notes: 'v2' })
+  })
+
   test('v1 → v2 migration preserves the existing pending queue', async () => {
     // Base v1 telle qu'elle existe chez les utilisateurs actuels
     const { openDB } = await import('idb')

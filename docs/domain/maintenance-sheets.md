@@ -5,7 +5,7 @@
 Les fiches de maintenance sont des **listes de contrôle structurées et guidées** pour des opérations nautiques spécifiques. À la différence des événements (historique immuable) et des tâches planifiées (to-do avec échéance), une fiche est :
 
 - **pré-remplie** à la création selon son type (items par défaut définis en code)
-- **interactive** : chaque item est cochable individuellement avec une note optionnelle
+- **interactive** : chaque item est cochable individuellement avec une note optionnelle — y compris **hors-ligne** (#490) : état optimiste côté client, actions dédupliquées dans la file IndexedDB, et rejeu protégé par `_expectedUpdatedAt` (un item modifié entre-temps déclenche la modale de conflit au lieu d'un écrasement silencieux — voir `docs/frontend/pwa.md`)
 - **terminable** : quand tous les items sont cochés, la fiche peut être marquée comme terminée
 
 ## Les cinq types de fiches

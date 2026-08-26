@@ -1,5 +1,6 @@
 import {
   BoatMaintenanceSheetIncompleteError,
+  BoatMaintenanceSheetItemConflictError,
   BoatMaintenanceSheetItemNotFoundError,
   BoatMaintenanceSheetNotFoundError,
   BoatMaintenanceSheetValidationError,
@@ -15,6 +16,7 @@ import { DateTime } from 'luxon'
 
 export {
   BoatMaintenanceSheetIncompleteError,
+  BoatMaintenanceSheetItemConflictError,
   BoatMaintenanceSheetItemNotFoundError,
   BoatMaintenanceSheetNotFoundError,
   BoatMaintenanceSheetValidationError,
@@ -167,6 +169,19 @@ export default class BoatMaintenanceSheetService {
 
     if (!item) {
       throw new BoatMaintenanceSheetItemNotFoundError()
+    }
+
+    // Rejeu hors-ligne : refuser d'écraser un item modifié entre-temps (#490),
+    // même motif que NavigationLogService.closeTrip
+    if (payload.expectedUpdatedAt !== undefined && item.updatedAt) {
+      if (item.updatedAt.toISO() !== payload.expectedUpdatedAt) {
+        throw new BoatMaintenanceSheetItemConflictError({
+          id: item.id,
+          updatedAt: item.updatedAt.toISO()!,
+          isDone: item.isDone,
+          notes: item.notes,
+        })
+      }
     }
 
     item.isDone = payload.isDone

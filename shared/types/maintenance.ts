@@ -136,6 +136,16 @@ export type CreateSheetPayload = {
 export type UpdateItemPayload = {
   isDone: boolean
   notes: string | null
+  /** Détection de conflit au rejeu hors-ligne (#490) — absent pour une édition en ligne directe. */
+  expectedUpdatedAt?: string
+}
+
+/** Snapshot renvoyé au client quand un PUT rejoué entre en conflit (#490). */
+export interface ConflictSheetItemSnapshot {
+  id: number
+  updatedAt: string
+  isDone: boolean
+  notes: string | null
 }
 
 export type MaintenanceDateBadgeRow = { boatId: number | string; nextDueAt: string | null }

@@ -237,6 +237,8 @@ export type MaintenanceSheetItemRow = {
   isDone: boolean
   notes: string | null
   position: number
+  /** ISO — renvoyé en `_expectedUpdatedAt` au rejeu hors-ligne (#490). */
+  updatedAt: string | null
 }
 
 export type MaintenanceSheetRow = {

@@ -185,8 +185,16 @@ interface QueuedAction {
   method: 'post' | 'patch' | 'put'
   payload: Record<string, unknown>
   createdAt: string // ISO 8601
+  dedupeKey?: string // upsert : deux enqueue avec la même clé fusionnent (#490)
 }
 ```
+
+**Déduplication (`dedupeKey`)** : quand une action porte une `dedupeKey`
+(convention `type:url`), un nouvel `enqueue` avec la même clé **remplace** le
+payload existant au lieu d'empiler — deux toggles hors-ligne du même item de
+fiche produisent une seule action, la dernière valeur gagne, la position FIFO
+est conservée. L'upsert n'affiche pas de toast (une saisie de notes au fil de
+l'eau ne renotifie pas chaque frappe).
 
 **Comportement de `drainQueue`**
 
@@ -287,15 +295,25 @@ function handleSubmit() {
 
 ### Formulaires supportés
 
-| Composant                     | Type action              | URL                                             | Méthode |
-| ----------------------------- | ------------------------ | ----------------------------------------------- | ------- |
-| `NavigationLogForm.vue`       | `create-navigation-log`  | `POST /boats/:id/navigation-logs`               | post    |
-| `BoatFuelLogForm.vue`         | `create-fuel-log`        | `POST /boats/:id/fuel-logs`                     | post    |
-| `NavigationLogUpdateForm.vue` | `update-navigation-log`  | `PATCH /boats/:id/navigation-logs/:logId`       | patch   |
-| `NavigationLogCloseForm.vue`  | `close-navigation-log`   | `PATCH /boats/:id/navigation-logs/:logId/close` | patch   |
-| `EngineHoursQuickAddForm.vue` | `increment-engine-hours` | `PATCH /boats/:id/engines/:engineId/hours`      | patch   |
-| `BoatIncidentForm.vue`        | `create-incident`        | `POST /boats/:id/incidents`                     | post    |
-| `BoatIncidentForm.vue`        | `update-incident`        | `PUT /boats/:id/incidents/:incidentId`          | put     |
+| Composant                          | Type action              | URL                                                        | Méthode |
+| ---------------------------------- | ------------------------ | ---------------------------------------------------------- | ------- |
+| `NavigationLogForm.vue`            | `create-navigation-log`  | `POST /boats/:id/navigation-logs`                          | post    |
+| `BoatFuelLogForm.vue`              | `create-fuel-log`        | `POST /boats/:id/fuel-logs`                                | post    |
+| `NavigationLogUpdateForm.vue`      | `update-navigation-log`  | `PATCH /boats/:id/navigation-logs/:logId`                  | patch   |
+| `NavigationLogCloseForm.vue`       | `close-navigation-log`   | `PATCH /boats/:id/navigation-logs/:logId/close`            | patch   |
+| `EngineHoursQuickAddForm.vue`      | `increment-engine-hours` | `PATCH /boats/:id/engines/:engineId/hours`                 | patch   |
+| `BoatIncidentForm.vue`             | `create-incident`        | `POST /boats/:id/incidents`                                | post    |
+| `BoatIncidentForm.vue`             | `update-incident`        | `PUT /boats/:id/incidents/:incidentId`                     | put     |
+| `BoatMaintenanceSheetItemList.vue` | `update-sheet-item`      | `PUT /boats/:id/maintenance-sheets/:sheetId/items/:itemId` | put     |
+
+Les items de fiche d'entretien (#490) combinent trois mécanismes : **état
+optimiste** (la case cochée hors-ligne reflète le clic sans attendre les props
+Inertia, réconcilié dès que le serveur rattrape), **dédup** (`dedupeKey` — deux
+mises à jour du même item fusionnent) et **détection de conflit** (le payload
+porte `_expectedUpdatedAt` ; un rejeu sur un item modifié entre-temps est
+rejeté par le contrôleur et passe par la modale de résolution). Hors-ligne, la
+saisie des notes n'est pas debouncée — chaque frappe met à jour l'action
+dédupliquée, rien n'est perdu au démontage.
 
 ---
 
@@ -393,6 +411,12 @@ Mock de `virtual:pwa-register/vue` via alias Vitest + mock de `vue-sonner`. Cas 
    }
    ```
 
-3. Aucune modification backend nécessaire — la sync utilise les routes existantes.
+3. Aucune modification backend nécessaire **pour les créations** — la sync
+   utilise les routes existantes. ⚠️ Pour un **PUT/PATCH rejoué** sur une
+   ressource que plusieurs personnes éditent, le payload doit porter
+   `_expectedUpdatedAt` **et le contrôleur doit le traiter** (rejet avec flash
+   `conflictData`/`conflictType`) — motif implémenté dans
+   `navigation_logs_controller.ts` et `boat_maintenance_sheet_items_controller.ts` (#490).
+   Sans cela, le rejeu est du last-write-wins silencieux.
 
 4. Ajouter un test dans `tests/inertia/` couvrant les deux chemins (online + offline).

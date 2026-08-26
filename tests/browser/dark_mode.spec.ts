@@ -167,8 +167,17 @@ test.group('E2E · Thème sombre (#416)', (group) => {
     await page.reload({ waitUntil: 'networkidle' })
     assert.equal(await page.getAttribute('html', 'data-theme'), 'dark')
 
-    // L'utilisateur force « Clair » depuis la carte Apparence.
+    // L'utilisateur force « Clair » depuis la carte Apparence. `setTheme` pose
+    // `data-theme` immédiatement (retour visuel optimiste) puis envoie le
+    // PUT /settings/theme : attendre l'attribut ne suffit pas — un reload
+    // immédiat annulerait la requête en vol et le serveur ne persisterait
+    // jamais le choix (flaky vu en CI). On attend donc la réponse du PUT.
+    const themeSaved = page.waitForResponse(
+      (response) =>
+        response.request().method() === 'PUT' && response.url().includes('/settings/theme')
+    )
     await page.locator('[aria-labelledby="theme-label"] button').nth(1).click()
+    await themeSaved
     await page.waitForFunction("document.documentElement.getAttribute('data-theme') === 'light'")
 
     // Rechargement complet, OS toujours en sombre : la préférence doit venir du
