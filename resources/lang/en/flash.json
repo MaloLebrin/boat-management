@@ -324,5 +324,8 @@
   },
   "mouillages": {
     "hasBoats": "Cannot delete this mooring: boats are assigned to it."
+  },
+  "push": {
+    "subscriptionNotFound": "This device is no longer registered."
   }
 }
