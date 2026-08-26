@@ -247,6 +247,21 @@ Clés dans `resources/lang/{fr,en}/common.json` :
 
 ## Tests
 
+### Garde-fou de build — `scripts/check_sw_build.mjs` (#483)
+
+Les specs Vitest ci-dessous testent les **composables**, jamais le service
+worker généré par Workbox — c'est ce trou qui a laissé passer #482. Le
+garde-fou s'exécute sur l'**artefact de build réel** (`node ace build`
+préalable) via `pnpm check:sw`, et tourne en CI dans le job `build` :
+
+- `build/public/sw.js` existe à la racine web (pas sous `/assets/`) ;
+- le SW s'évalue sans lever dans un contexte mocké `node:vm` (le chunk AMD
+  `workbox-*.js` voisin est résolu par un shim `importScripts` ; les erreurs
+  Workbox comme `non-precached-url` arrivent en rejet de promesse asynchrone) ;
+- les listeners `install`/`activate`/`fetch` sont enregistrés ;
+- `/offline.html` figure dans le manifeste de précache ;
+- le bundle client enregistre `/sw.js` avec un scope `/`.
+
 ### `use_offline_queue.spec.ts`
 
 Tests Vitest avec `fake-indexeddb` (IDB réinitialisé entre chaque test) et mocks `vue-sonner` + `@inertiajs/vue3`.
