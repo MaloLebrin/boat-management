@@ -2,6 +2,7 @@
   "photos": {
     "title": "Photos",
     "add": "+ Add photos",
+    "takePhoto": "Take a photo",
     "uploading": "Uploading…",
     "empty": "No photos.",
     "delete": "Delete",

@@ -2,6 +2,7 @@
   "photos": {
     "title": "Photos",
     "add": "+ Ajouter des photos",
+    "takePhoto": "Prendre une photo",
     "uploading": "Envoi en cours…",
     "empty": "Aucune photo.",
     "delete": "Supprimer",

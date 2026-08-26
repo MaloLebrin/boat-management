@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PhotoIcon, PlusIcon } from '@heroicons/vue/24/outline'
+import { CameraIcon, PhotoIcon, PlusIcon } from '@heroicons/vue/24/outline'
 import { router, useForm } from '@inertiajs/vue3'
 import { ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
@@ -16,6 +16,7 @@ const props = defineProps<{
 
 const { t } = useT()
 const fileInput = ref<HTMLInputElement>()
+const cameraInput = ref<HTMLInputElement>()
 const form = useForm({ files: [] as File[] })
 
 function onFileChange(e: Event) {
@@ -31,6 +32,7 @@ function submitPhotos() {
     onSuccess: () => {
       form.reset()
       if (fileInput.value) fileInput.value.value = ''
+      if (cameraInput.value) cameraInput.value.value = ''
     },
   })
 }
@@ -47,17 +49,28 @@ function deletePhoto(mediaId: number) {
       <p class="text-xs font-semibold uppercase tracking-wide text-fg-muted">
         {{ t('media.photos.title') }}
       </p>
-      <BaseButton
-        v-if="canUpload"
-        variant="secondary"
-        size="sm"
-        type="button"
-        :disabled="form.processing"
-        @click="fileInput?.click()"
-      >
-        <PlusIcon class="h-4 w-4 mr-1" />
-        {{ form.processing ? t('media.photos.uploading') : t('media.photos.add') }}
-      </BaseButton>
+      <div v-if="canUpload" class="flex items-center gap-2">
+        <BaseButton
+          variant="secondary"
+          size="sm"
+          type="button"
+          :disabled="form.processing"
+          @click="cameraInput?.click()"
+        >
+          <CameraIcon class="h-4 w-4 mr-1" />
+          {{ t('media.photos.takePhoto') }}
+        </BaseButton>
+        <BaseButton
+          variant="secondary"
+          size="sm"
+          type="button"
+          :disabled="form.processing"
+          @click="fileInput?.click()"
+        >
+          <PlusIcon class="h-4 w-4 mr-1" />
+          {{ form.processing ? t('media.photos.uploading') : t('media.photos.add') }}
+        </BaseButton>
+      </div>
     </div>
 
     <input
@@ -66,6 +79,17 @@ function deletePhoto(mediaId: number) {
       type="file"
       multiple
       accept="image/jpeg,image/png,image/webp,image/gif,.heic,.heif"
+      class="hidden"
+      @change="onFileChange"
+    />
+    <!-- Input caméra séparé : `capture` supprime la sélection multiple depuis
+         la galerie sur iOS/Android, il ne doit pas porter `multiple` (#485) -->
+    <input
+      v-if="canUpload"
+      ref="cameraInput"
+      type="file"
+      accept="image/*"
+      capture="environment"
       class="hidden"
       @change="onFileChange"
     />
