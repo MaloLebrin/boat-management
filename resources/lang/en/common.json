@@ -57,6 +57,8 @@
   "offline.queue.type.close-navigation-log": "Trip log closure",
   "offline.queue.type.create-fuel-log": "Fuel entry",
   "offline.queue.type.increment-engine-hours": "Engine hours",
+  "offline.queue.type.create-incident": "New incident",
+  "offline.queue.type.update-incident": "Incident update",
   "offline.failed.title": "{count, plural, one {# failed action} other {# failed actions}}",
   "offline.failed.description": "These entries were rejected by the server. Retry them or discard them explicitly — nothing is deleted on its own.",
   "offline.failed.reason": "Reason:",

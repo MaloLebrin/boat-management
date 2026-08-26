@@ -294,6 +294,8 @@ function handleSubmit() {
 | `NavigationLogUpdateForm.vue` | `update-navigation-log`  | `PATCH /boats/:id/navigation-logs/:logId`       | patch   |
 | `NavigationLogCloseForm.vue`  | `close-navigation-log`   | `PATCH /boats/:id/navigation-logs/:logId/close` | patch   |
 | `EngineHoursQuickAddForm.vue` | `increment-engine-hours` | `PATCH /boats/:id/engines/:engineId/hours`      | patch   |
+| `BoatIncidentForm.vue`        | `create-incident`        | `POST /boats/:id/incidents`                     | post    |
+| `BoatIncidentForm.vue`        | `update-incident`        | `PUT /boats/:id/incidents/:incidentId`          | put     |
 
 ---
 
