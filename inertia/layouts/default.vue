@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { Link } from '@adonisjs/inertia/vue'
 import type { Data } from '@generated/data'
-import { usePage } from '@inertiajs/vue3'
-import { onBeforeUnmount, ref, watch } from 'vue'
+import { router, usePage } from '@inertiajs/vue3'
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { Toaster } from 'vue-sonner'
 import brandIconUrl from '~/assets/brand/fleetai_compass.svg'
 import AsideMenu from '~/components/layout/AsideMenu.vue'
@@ -12,6 +12,7 @@ import NotificationBell from '~/components/layout/NotificationBell.vue'
 import { useNetworkStatus } from '~/composables/use_network_status'
 import ConflictResolutionModal from '~/components/ConflictResolutionModal.vue'
 import OfflinePendingQueue from '~/components/OfflinePendingQueue.vue'
+import PushOptInCard from '~/components/pwa/PushOptInCard.vue'
 import { useFlashToasts } from '~/composables/use_flash_toasts'
 import { useOfflineQueue } from '~/composables/use_offline_queue'
 import { usePwaUpdate } from '~/composables/use_pwa_update'
@@ -63,21 +64,43 @@ watch(
   }
 )
 
+// Clic sur une notification push : le SW poste { type: 'push:navigate', url }
+// à la fenêtre focusée — navigation Inertia, pas de rechargement complet (#498)
+function onSwMessage(event: MessageEvent) {
+  const data = event.data as { type?: string; url?: string } | null
+  if (data?.type === 'push:navigate' && typeof data.url === 'string') {
+    router.visit(data.url)
+  }
+}
+
+onMounted(() => {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.addEventListener('message', onSwMessage)
+  }
+})
+
 onBeforeUnmount(() => {
   window.removeEventListener('keydown', onKeydown)
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.removeEventListener('message', onSwMessage)
+  }
 })
 </script>
 
 <template>
-  <div class="h-screen overflow-hidden flex bg-navy-900">
+  <!-- h-dvh (pas h-screen) : sur iOS Safari, 100vh ignore la barre d'URL
+       dynamique et le bas de page devient inaccessible avec overflow-hidden (#484) -->
+  <div class="h-dvh overflow-hidden flex bg-navy-900">
     <!-- Desktop Sidebar (always visible on lg+) -->
     <AsideMenu :user="page.props.user" />
 
     <!-- Main content area -->
     <div class="flex-1 flex flex-col overflow-hidden">
       <!-- Mobile header bar (hamburger + logo) - only on small screens -->
+      <!-- pt = safe-area + py-3 : avec viewport-fit=cover le contenu passe sous
+           l'encoche, le header doit dégager la safe area (#484) -->
       <header
-        class="lg:hidden flex items-center justify-between px-4 py-3 bg-navy-900 border-b border-navy-700"
+        class="lg:hidden flex items-center justify-between px-4 py-3 pt-[calc(env(safe-area-inset-top)+0.75rem)] bg-navy-900 border-b border-navy-700"
       >
         <Link href="/dashboard" class="flex items-center gap-3">
           <img :src="brandIconUrl" alt="FleetAi" class="h-9 w-9 rounded-lg shadow-md" />
@@ -119,6 +142,7 @@ onBeforeUnmount(() => {
       <!-- Scrollable content area -->
       <main class="flex-1 overflow-y-auto bg-cream">
         <OfflinePendingQueue />
+        <PushOptInCard />
         <Transition name="page" mode="out-in">
           <div :key="page.url">
             <slot />

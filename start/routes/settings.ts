@@ -50,6 +50,9 @@ router
   .group(() => {
     router.get('settings', ({ response }) => response.redirect('/settings/me')).as('settings.index')
     router.get('settings/me', [SettingsController, 'me']).as('settings.me')
+    router
+      .get('settings/notifications', [SettingsController, 'notifications'])
+      .as('settings.notifications')
     router.get('settings/org', [SettingsController, 'org']).as('settings.org')
     router.get('settings/members', [SettingsController, 'members']).as('settings.members')
     router.get('settings/billing', [SettingsController, 'billing']).as('settings.billing')

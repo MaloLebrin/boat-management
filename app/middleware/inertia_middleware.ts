@@ -17,6 +17,7 @@ import { DEFAULT_THEME_PREFERENCE, isThemePreference } from '#shared/types/theme
 import type { ThemePreference } from '#shared/types/theme'
 import { BrandingService } from '#services/branding_service'
 import NotificationService from '#services/notification_service'
+import pushConfig from '#config/push'
 import OrganizationModuleService from '#services/organization_module_service'
 import PermissionService from '#services/permission_service'
 import { DEMO_SESSION_DURATION_MS } from '#shared/constants/demo'
@@ -151,6 +152,12 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
       activeAddons: ctx.inertia.always(activeAddons as unknown as JSONDataTypes),
       branding: ctx.inertia.always(branding),
       notifications: ctx.inertia.always(notifications as unknown as JSONDataTypes),
+      // Clé publique VAPID (#497) — en shared prop plutôt qu'en VITE_* : une
+      // rotation de clés ne demande pas de rebuild du front. Absente si le
+      // push n'est pas configuré.
+      vapidPublicKey: ctx.inertia.always(
+        pushConfig.enabled ? pushConfig.vapidPublicKey : undefined
+      ),
       permissions: ctx.inertia.always(permissions as unknown as JSONDataTypes),
     }
   }

@@ -4,6 +4,7 @@ import { Head, router } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseEmptyState from '~/components/base/BaseEmptyState.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
+import IncidentCard from '~/components/navigation/IncidentCard.vue'
 import IncidentRow from '~/components/navigation/IncidentRow.vue'
 import NavigationBoatFilter from '~/components/navigation/NavigationBoatFilter.vue'
 import QuickAddIncidentModal from '~/components/navigation/QuickAddIncidentModal.vue'
@@ -93,22 +94,29 @@ function onEmptyAction() {
         @action="onEmptyAction"
       />
 
-      <div v-else class="overflow-x-auto rounded-lg border border-border">
-        <table class="w-full text-left">
-          <thead class="bg-surface-muted text-xs uppercase tracking-wider text-fg-muted">
-            <tr>
-              <th class="px-4 py-3">{{ t('navigation.incidents.columns.status') }}</th>
-              <th class="px-4 py-3">{{ t('navigation.incidents.columns.boat') }}</th>
-              <th class="px-4 py-3">{{ t('navigation.incidents.columns.type') }}</th>
-              <th class="px-4 py-3">{{ t('navigation.incidents.columns.date') }}</th>
-              <th class="px-4 py-3">{{ t('navigation.incidents.columns.location') }}</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-border bg-surface-elevated">
-            <IncidentRow v-for="row in incidents" :key="row.id" :row="row" />
-          </tbody>
-        </table>
-      </div>
+      <template v-else>
+        <!-- Repli carte mobile (#493) : lire un incident sans scroll horizontal -->
+        <div class="lg:hidden space-y-3">
+          <IncidentCard v-for="row in incidents" :key="row.id" :row="row" />
+        </div>
+
+        <div class="hidden lg:block overflow-x-auto rounded-lg border border-border">
+          <table class="w-full text-left">
+            <thead class="bg-surface-muted text-xs uppercase tracking-wider text-fg-muted">
+              <tr>
+                <th class="px-4 py-3">{{ t('navigation.incidents.columns.status') }}</th>
+                <th class="px-4 py-3">{{ t('navigation.incidents.columns.boat') }}</th>
+                <th class="px-4 py-3">{{ t('navigation.incidents.columns.type') }}</th>
+                <th class="px-4 py-3">{{ t('navigation.incidents.columns.date') }}</th>
+                <th class="px-4 py-3">{{ t('navigation.incidents.columns.location') }}</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-border bg-surface-elevated">
+              <IncidentRow v-for="row in incidents" :key="row.id" :row="row" />
+            </tbody>
+          </table>
+        </div>
+      </template>
     </div>
   </div>
 </template>
