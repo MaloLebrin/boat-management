@@ -45,8 +45,11 @@ export default defineConfig({
         globIgnores: ['sw.js', 'workbox-*.js', 'offline.html'],
         additionalManifestEntries: [{ url: '/offline.html', revision: offlineHtmlRevision }],
       },
-      // SW testable avec `pnpm dev` — la validation finale reste sur build réel
-      devOptions: { enabled: true, type: 'module' },
+      // SW testable avec `pnpm dev` — la validation finale reste sur build réel.
+      // Désactivé sous `node ace test` : la suite e2e tournait sans SW avant
+      // #496, et un SW actif y injecte des reloads (optimisation des deps
+      // workbox) et du cache de pages qui rendent les tests navigateur flaky
+      devOptions: { enabled: process.env.NODE_ENV !== 'test', type: 'module' },
     }),
   ],
 

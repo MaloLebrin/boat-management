@@ -40,18 +40,18 @@ manifeste de précache dans `self.__WB_MANIFEST` et bundler le fichier). C'est c
 
 Configuration `VitePWA` (`vite.config.ts`) :
 
-| Option                | Valeur                                                                     |
-| --------------------- | -------------------------------------------------------------------------- |
-| `strategies`          | `injectManifest` — SW custom, plus de génération automatique               |
-| `srcDir` / `filename` | `inertia` / `sw.ts` — bundlé en `sw.js`                                    |
-| `registerType`        | `autoUpdate` — mise à jour silencieuse au rechargement                     |
-| `injectRegister`      | `false` — enregistrement manuel via `usePwaUpdate` (`useRegisterSW`)       |
-| `manifest`            | `false` — manifest servi depuis `public/site.webmanifest`                  |
-| `outDir`              | `build/public` — `sw.js` sort à la **racine web**, pas dans `/assets`      |
-| `buildBase`           | `/` — le SW est enregistré à `/sw.js`                                      |
-| `scope`               | `/` — le SW contrôle toutes les navigations                                |
-| `injectManifest`      | précache `assets/**` (`**/*.{js,css,ico,png,svg,woff2}`) + `/offline.html` |
-| `devOptions`          | `{ enabled: true, type: 'module' }` — SW testable en `pnpm dev`            |
+| Option                | Valeur                                                                                                        |
+| --------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `strategies`          | `injectManifest` — SW custom, plus de génération automatique                                                  |
+| `srcDir` / `filename` | `inertia` / `sw.ts` — bundlé en `sw.js`                                                                       |
+| `registerType`        | `autoUpdate` — mise à jour silencieuse au rechargement                                                        |
+| `injectRegister`      | `false` — enregistrement manuel via `usePwaUpdate` (`useRegisterSW`)                                          |
+| `manifest`            | `false` — manifest servi depuis `public/site.webmanifest`                                                     |
+| `outDir`              | `build/public` — `sw.js` sort à la **racine web**, pas dans `/assets`                                         |
+| `buildBase`           | `/` — le SW est enregistré à `/sw.js`                                                                         |
+| `scope`               | `/` — le SW contrôle toutes les navigations                                                                   |
+| `injectManifest`      | précache `assets/**` (`**/*.{js,css,ico,png,svg,woff2}`) + `/offline.html`                                    |
+| `devOptions`          | `{ enabled: NODE_ENV !== 'test', type: 'module' }` — SW testable en `pnpm dev`, coupé pendant `node ace test` |
 
 ### Ce que `inertia/sw.ts` fait explicitement
 
