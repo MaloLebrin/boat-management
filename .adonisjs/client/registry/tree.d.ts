@@ -264,6 +264,7 @@ export interface ApiDefinition {
   settings: {
     index: typeof routes['settings.index']
     me: typeof routes['settings.me']
+    notifications: typeof routes['settings.notifications']
     org: typeof routes['settings.org'] & {
       update: typeof routes['settings.org.update']
     }
@@ -482,5 +483,12 @@ export interface ApiDefinition {
   }
   demo: {
     login: typeof routes['demo.login']
+  }
+  push: {
+    subscriptions: {
+      store: typeof routes['push.subscriptions.store']
+      destroyByEndpoint: typeof routes['push.subscriptions.destroyByEndpoint']
+      destroy: typeof routes['push.subscriptions.destroy']
+    }
   }
 }

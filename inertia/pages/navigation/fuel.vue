@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { Head, router } from '@inertiajs/vue3'
 import BaseEmptyState from '~/components/base/BaseEmptyState.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
+import FuelLogCard from '~/components/navigation/FuelLogCard.vue'
 import FuelLogRow from '~/components/navigation/FuelLogRow.vue'
 import NavigationBoatFilter from '~/components/navigation/NavigationBoatFilter.vue'
 import { useNumberFormat } from '~/composables/use_number_format'
@@ -78,22 +79,29 @@ const totalCost = computed(() =>
         @action="onEmptyAction"
       />
 
-      <div v-else class="overflow-x-auto rounded-lg border border-border">
-        <table class="w-full text-left">
-          <thead class="bg-surface-muted text-xs uppercase tracking-wider text-fg-muted">
-            <tr>
-              <th class="px-4 py-3">{{ t('navigation.fuel.columns.boat') }}</th>
-              <th class="px-4 py-3">{{ t('navigation.fuel.columns.date') }}</th>
-              <th class="px-4 py-3">{{ t('navigation.fuel.columns.quantity') }}</th>
-              <th class="px-4 py-3">{{ t('navigation.fuel.columns.cost') }}</th>
-              <th class="px-4 py-3">{{ t('navigation.fuel.columns.supplier') }}</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-border bg-surface-elevated">
-            <FuelLogRow v-for="row in logs" :key="row.id" :row="row" />
-          </tbody>
-        </table>
-      </div>
+      <template v-else>
+        <!-- Repli carte mobile (#493) : lire un avitaillement sans scroll horizontal -->
+        <div class="lg:hidden space-y-3">
+          <FuelLogCard v-for="row in logs" :key="row.id" :row="row" />
+        </div>
+
+        <div class="hidden lg:block overflow-x-auto rounded-lg border border-border">
+          <table class="w-full text-left">
+            <thead class="bg-surface-muted text-xs uppercase tracking-wider text-fg-muted">
+              <tr>
+                <th class="px-4 py-3">{{ t('navigation.fuel.columns.boat') }}</th>
+                <th class="px-4 py-3">{{ t('navigation.fuel.columns.date') }}</th>
+                <th class="px-4 py-3">{{ t('navigation.fuel.columns.quantity') }}</th>
+                <th class="px-4 py-3">{{ t('navigation.fuel.columns.cost') }}</th>
+                <th class="px-4 py-3">{{ t('navigation.fuel.columns.supplier') }}</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-border bg-surface-elevated">
+              <FuelLogRow v-for="row in logs" :key="row.id" :row="row" />
+            </tbody>
+          </table>
+        </div>
+      </template>
     </div>
   </div>
 </template>

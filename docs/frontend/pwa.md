@@ -34,17 +34,94 @@ Composables
 
 ## Service Worker
 
-Configuré dans `vite.config.ts` via `VitePWA` :
+Depuis #496, le service worker est un **fichier source du projet** — `inertia/sw.ts` — bundlé par
+`vite-plugin-pwa` en stratégie **`injectManifest`** (le plugin ne fait plus qu'injecter le
+manifeste de précache dans `self.__WB_MANIFEST` et bundler le fichier). C'est ce qui permet d'y
+écrire du code custom, notamment les gestionnaires `push`/`notificationclick` du Web Push
+(#497/#498).
 
-| Option           | Valeur                                                                 |
-| ---------------- | ---------------------------------------------------------------------- |
-| `registerType`   | `autoUpdate` — mise à jour silencieuse au rechargement                 |
-| `injectRegister` | `false` — enregistrement manuel dans `inertia/app.ts`                  |
-| `manifest`       | `false` — manifest servi depuis `public/site.webmanifest`              |
-| Précache         | `**/*.{js,css,ico,png,svg,woff2}`                                      |
-| Runtime cache    | `/boats/*`, `/navigation/*`, `/planning/*` — NetworkFirst, 3 s timeout |
+Configuration `VitePWA` (`vite.config.ts`) :
 
-**Stratégie NetworkFirst** : le SW tente le réseau en priorité. Si la requête échoue ou dépasse 3 secondes, il sert le cache. Les pages non encore visitées (non cachées) restent inaccessibles hors-ligne.
+| Option                | Valeur                                                                                                        |
+| --------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `strategies`          | `injectManifest` — SW custom, plus de génération automatique                                                  |
+| `srcDir` / `filename` | `inertia` / `sw.ts` — bundlé en `sw.js`                                                                       |
+| `registerType`        | `autoUpdate` — mise à jour silencieuse au rechargement                                                        |
+| `injectRegister`      | `false` — enregistrement manuel via `usePwaUpdate` (`useRegisterSW`)                                          |
+| `manifest`            | `false` — manifest servi depuis `public/site.webmanifest`                                                     |
+| `outDir`              | `build/public` — `sw.js` sort à la **racine web**, pas dans `/assets`                                         |
+| `buildBase`           | `/` — le SW est enregistré à `/sw.js`                                                                         |
+| `scope`               | `/` — le SW contrôle toutes les navigations                                                                   |
+| `injectManifest`      | précache `assets/**` (`**/*.{js,css,ico,png,svg,woff2}`) + `/offline.html`                                    |
+| `devOptions`          | `{ enabled: NODE_ENV !== 'test', type: 'module' }` — SW testable en `pnpm dev`, coupé pendant `node ace test` |
+
+### Ce que `inertia/sw.ts` fait explicitement
+
+La bascule `generateSW` → `injectManifest` a supprimé plusieurs comportements implicites, réécrits
+dans le SW :
+
+- **`self.skipWaiting()` + `clients.claim()`** (en natif, pas de workbox-core) — n'étaient plus
+  injectés par `registerType: 'autoUpdate'` ;
+- **précache** : `precacheAndRoute(self.__WB_MANIFEST)` + `cleanupOutdatedCaches()` ;
+- **NetworkFirst** sur les navigations `/boats|/navigation|/planning` (3 s de timeout, 30 entrées,
+  7 jours, réponses 200) — restreint à `request.mode === 'navigate'` : les visites Inertia (XHR
+  `X-Inertia`) répondent du JSON sur les mêmes URLs, les cacher sous la même clé servirait du JSON
+  brut à une navigation hors-ligne ;
+- **`NavigationRoute(NetworkOnly)`** sur toutes les autres navigations (denylist `/api`, `/up`) :
+  indispensable pour que le repli fonctionne — `setCatchHandler` ne rattrape que les requêtes
+  **gérées par une route**, une navigation sans route irait au réseau et échouerait sans repli ;
+- **repli hors-ligne** : `setCatchHandler` sert le `/offline.html` précaché pour tout `document`
+  dont la requête échoue.
+
+**Stratégie NetworkFirst** : le SW tente le réseau en priorité. Si la requête échoue ou dépasse 3 secondes, il sert le cache. Les pages non encore visitées (non cachées) tombent sur `offline.html`.
+
+CSP : `config/shield.ts` garde `defaultSrc: ["'self'"]`, qui couvre `worker-src` par cascade — un
+SW de même origine passe sans changement.
+
+### Pourquoi le SW sort à la racine web (#482)
+
+Le build client Vite écrit dans `build/public/assets` (imposé par `@adonisjs/inertia/vite`) et `base` vaut `/assets/`. Sans configuration explicite, `vite-plugin-pwa` émettait donc `sw.js` dans `/assets/` et l'enregistrait avec un scope `/assets/` : un tel SW **ne contrôle jamais** une navigation vers `/boats` ou `/planning`, et tout le mode hors-ligne était inopérant. Trois options le corrigent :
+
+- `outDir: 'build/public'` — `sw.js` (et le runtime `workbox-*.js`) sortent à la racine web du build ;
+- `buildBase: '/'` — `useRegisterSW` enregistre `/sw.js` (et non `/assets/sw.js`) ;
+- `scope: '/'` — le SW contrôle toute l'origine.
+
+Deuxième piège : `offline.html` vit dans `public/` et n'est copié dans `build/public` **qu'après** le build Vite (metaFiles de `adonisrc.ts`) — il est donc introuvable au moment où Workbox globbe le répertoire de sortie. Il est précaché explicitement via `additionalManifestEntries`, avec une révision MD5 calculée depuis `public/offline.html`.
+
+> ⚠️ L'alternative « servir `/assets/sw.js` avec un en-tête `Service-Worker-Allowed: /` » a été écartée : elle casserait le jour où `assetsUrl` pointe vers un CDN (cross-origin).
+
+En production, `sw.js` est servi par le middleware statique (`build/public` = racine du serveur statique). En dev, `devOptions` sert le SW en module — le comportement final se valide malgré tout sur build réel (`node ace build`), c'est ce que fait le garde-fou `pnpm check:sw` (#483).
+
+---
+
+## Web Push (#498)
+
+Backend : voir `docs/domain/notifications.md` (#497). Côté front :
+
+- **`inertia/lib/push_payload.ts`** — parsing du payload en **fonction pure** (testable sans
+  contexte SW). Ne lève jamais : le SW doit **toujours** appeler `showNotification`, même sur un
+  payload vide/invalide — Safari et Chrome désabonnent un endpoint qui reçoit des push muets. Un
+  `tag` par type coalesce les alertes récurrentes ; une `actionUrl` non relative est remplacée par
+  `/notifications` (pas d'ouverture hors app).
+- **`inertia/sw.ts`** — gestionnaires `push` (showNotification systématique) et
+  `notificationclick` : `clients.matchAll` → fenêtre existante `focus()` +
+  `postMessage({ type: 'push:navigate', url })`, sinon `openWindow(url)`. Le layout
+  (`default.vue`) écoute ces messages et fait un `router.visit(url)` — navigation Inertia, pas de
+  rechargement complet.
+- **`use_push_notifications.ts`** — `isSupported`, `permission`, `isSubscribed`, `subscribe()`,
+  `unsubscribe()`, `urlBase64ToUint8Array`. **`subscribe()` n'est appelé que depuis un geste
+  utilisateur** (exigence navigateur — jamais de prompt à froid, jamais au montage) ; la clé VAPID
+  vient de la shared prop `vapidPublicKey`.
+- **`PushOptInCard.vue`** — opt-in contextuel monté dans `default.vue` : n'apparaît qu'à partir de
+  la **2e session** (compteur en localStorage, marqueur de session en sessionStorage), dismissible
+  (`localStorage`), masqué si permission refusée ou déjà abonné. Sur iOS hors PWA installée, la
+  carte montre `IosInstallHint.vue` à la place du bouton.
+- **`IosInstallHint.vue`** — Web Push iOS exige la PWA installée (16.4+) et Safari n'émet jamais
+  `beforeinstallprompt` : instructions illustrées « Partager → Sur l'écran d'accueil ». Détection
+  via `isIos()` / `isStandalone()` (`use_pwa_install.ts`).
+- **`SettingsNotificationsTab.vue`** (`/settings/notifications`) — gestion permanente : activer /
+  désactiver cet appareil, liste des appareils abonnés (`user_agent`, dates) et retrait par
+  appareil (`DELETE /push/subscriptions/:id`).
 
 ---
 
@@ -238,6 +315,21 @@ Clés dans `resources/lang/{fr,en}/common.json` :
 ---
 
 ## Tests
+
+### Garde-fou de build — `scripts/check_sw_build.mjs` (#483)
+
+Les specs Vitest ci-dessous testent les **composables**, jamais le service
+worker généré par Workbox — c'est ce trou qui a laissé passer #482. Le
+garde-fou s'exécute sur l'**artefact de build réel** (`node ace build`
+préalable) via `pnpm check:sw`, et tourne en CI dans le job `build` :
+
+- `build/public/sw.js` existe à la racine web (pas sous `/assets/`) ;
+- le SW s'évalue sans lever dans un contexte mocké `node:vm` (le chunk AMD
+  `workbox-*.js` voisin est résolu par un shim `importScripts` ; les erreurs
+  Workbox comme `non-precached-url` arrivent en rejet de promesse asynchrone) ;
+- les listeners `install`/`activate`/`fetch` sont enregistrés ;
+- `/offline.html` figure dans le manifeste de précache ;
+- le bundle client enregistre `/sw.js` avec un scope `/`.
 
 ### `use_offline_queue.spec.ts`
 

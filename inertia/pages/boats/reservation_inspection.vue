@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { Head } from '@inertiajs/vue3'
 import BaseBreadcrumb from '~/components/base/BaseBreadcrumb.vue'
+import BaseTabs from '~/components/base/BaseTabs.vue'
 import InspectionComparison from '~/components/reservations/inspection/InspectionComparison.vue'
 import InspectionPanel from '~/components/reservations/inspection/InspectionPanel.vue'
 import { useDateFormat } from '~/composables/use_date_format'
@@ -24,6 +25,17 @@ const { formatDate } = useDateFormat()
 
 const checkout = computed(() => props.inspections.find((i) => i.kind === 'checkout') ?? null)
 const checkin = computed(() => props.inspections.find((i) => i.kind === 'checkin') ?? null)
+
+// Sous lg, les deux panneaux basculent en onglets (#495) : empilés, comparer
+// départ et retour demandait un défilement interminable — l'objet même de
+// l'écran. Chaque panneau n'est rendu qu'une fois (ids de formulaires uniques),
+// seule sa visibilité change selon le breakpoint.
+const activePanel = ref('checkout')
+
+const panelTabs = computed(() => [
+  { key: 'checkout', label: t('inspections.kind.checkout') },
+  { key: 'checkin', label: t('inspections.kind.checkin') },
+])
 
 const breadcrumbs = computed(() => [
   { label: t('boats.index.title'), href: '/boats' },
@@ -48,7 +60,11 @@ const breadcrumbs = computed(() => [
       </p>
     </div>
 
-    <div class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+    <div class="mt-6 lg:hidden">
+      <BaseTabs v-model="activePanel" :tabs="panelTabs" />
+    </div>
+
+    <div class="mt-4 grid grid-cols-1 gap-6 lg:mt-6 lg:grid-cols-2">
       <InspectionPanel
         :boat-id="boat.id"
         :reservation-id="reservation.id"
@@ -58,6 +74,7 @@ const breadcrumbs = computed(() => [
         :can-delete="canDelete"
         :can-manage-actions="canManageActions"
         :can-delete-actions="canDeleteActions"
+        :class="activePanel === 'checkout' ? '' : 'hidden lg:block'"
       />
       <InspectionPanel
         :boat-id="boat.id"
@@ -68,6 +85,7 @@ const breadcrumbs = computed(() => [
         :can-delete="canDelete"
         :can-manage-actions="canManageActions"
         :can-delete-actions="canDeleteActions"
+        :class="activePanel === 'checkin' ? '' : 'hidden lg:block'"
       />
     </div>
 

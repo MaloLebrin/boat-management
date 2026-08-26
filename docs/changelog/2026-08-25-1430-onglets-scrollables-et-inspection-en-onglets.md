@@ -1,0 +1,8 @@
+# 2026-08-25 — Onglets scrollables avec indicateur + inspection en onglets sous lg (#495)
+
+Deux écrans très utilisés à bord avaient une couverture responsive quasi nulle : la fiche bateau (onglets qui dépassent l'écran sans indicateur) et l'état des lieux (deux panneaux très longs empilés sous `lg`, un défilement interminable pour comparer départ et retour — l'objet même de l'écran).
+
+- **`BaseTabs.vue`** (bénéficie à toutes les pages à onglets) : `snap-x` sur la barre + `snap-start` sur les onglets, et **dégradés de bord** (`data-overflow="left|right"`) qui n'apparaissent que quand des onglets débordent — suivis au scroll (`@scroll.passive`) et au redimensionnement (ResizeObserver, déconnecté au démontage). La barre était déjà `overflow-x-auto` depuis #463 ; il manquait le signal visuel.
+- **`boats/reservation_inspection.vue`** : sous `lg`, les panneaux Départ/Retour basculent dans `BaseTabs` (libellés `inspections.kind.*` existants, deux locales) ; au-dessus de `lg`, les deux colonnes restent côte à côte. Chaque panneau n'est rendu **qu'une fois** — seule sa visibilité change (`hidden lg:block` sur l'inactif) — pour éviter des ids de formulaires dupliqués dans le DOM.
+- **Doc.** Section « Onglets scrollables » dans `docs/frontend/ui-map.md`.
+- **Tests.** 3 cas Vitest ajoutés à `base_tabs.spec.ts` : barre scrollable + snap, dégradés présents uniquement en débordement (simulé — happy-dom ne calcule pas de layout) et disparition du dégradé droit en fin de course, motif onglets/grille de l'écran d'inspection (scan source). Vérifié en dev (viewport 375 px, fiche bateau) : barre scrollable, dégradé droit visible au chargement, disparaît en fin de scroll, gauche apparaît. Non-régression du débordement : #500.

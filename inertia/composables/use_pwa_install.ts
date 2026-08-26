@@ -22,6 +22,32 @@ if (typeof window !== 'undefined') {
   })
 }
 
+/**
+ * PWA installée (mode standalone) — sur iOS, Web Push ne fonctionne que dans
+ * ce mode (#498). `navigator.standalone` est le legacy Safari.
+ */
+export function isStandalone(): boolean {
+  if (typeof window === 'undefined') return false
+  return (
+    window.matchMedia('(display-mode: standalone)').matches ||
+    (navigator as { standalone?: boolean }).standalone === true
+  )
+}
+
+/**
+ * Safari iOS n'émet jamais `beforeinstallprompt` (`canInstall` y reste faux) :
+ * l'entonnoir d'installation passe par des instructions manuelles
+ * (`IosInstallHint.vue`). iPadOS se déclare « MacIntel » avec du tactile.
+ */
+export function isIos(): boolean {
+  if (typeof navigator === 'undefined') return false
+  const ua = navigator.userAgent
+  return (
+    /iPad|iPhone|iPod/.test(ua) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+  )
+}
+
 export function usePwaInstall() {
   async function promptInstall() {
     if (!deferredPrompt) return
@@ -31,5 +57,5 @@ export function usePwaInstall() {
     if (outcome === 'accepted') canInstall.value = false
   }
 
-  return { canInstall, promptInstall }
+  return { canInstall, promptInstall, isStandalone, isIos }
 }

@@ -1471,6 +1471,30 @@ export class NavigationLogCrewSchema extends BaseModel {
   declare role: string
 }
 
+export class NavigationLogEntrySchema extends BaseModel {
+  static $columns = [
+    'createdAt',
+    'id',
+    'navigationLogId',
+    'note',
+    'recordedAt',
+    'updatedAt',
+  ] as const
+  $columns = NavigationLogEntrySchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare navigationLogId: number
+  @column()
+  declare note: string
+  @column.dateTime()
+  declare recordedAt: DateTime
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class NavigationLogSchema extends BaseModel {
   static $columns = [
     'arrivalPortId',
@@ -1837,6 +1861,48 @@ export class PricingSeasonSchema extends BaseModel {
   declare startsOn: DateTime
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
+}
+
+export class PushSubscriptionSchema extends BaseModel {
+  static $columns = [
+    'auth',
+    'createdAt',
+    'endpoint',
+    'endpointHash',
+    'failureCount',
+    'id',
+    'lastUsedAt',
+    'organizationId',
+    'p256Dh',
+    'updatedAt',
+    'userAgent',
+    'userId',
+  ] as const
+  $columns = PushSubscriptionSchema.$columns
+  @column()
+  declare auth: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare endpoint: string
+  @column()
+  declare endpointHash: string
+  @column()
+  declare failureCount: number
+  @column({ isPrimary: true })
+  declare id: number
+  @column.dateTime()
+  declare lastUsedAt: DateTime | null
+  @column()
+  declare organizationId: number
+  @column()
+  declare p256Dh: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare userAgent: string | null
+  @column()
+  declare userId: number
 }
 
 export class QueueDedupKeySchema extends BaseModel {
