@@ -22,6 +22,12 @@ export default defineConfig({
       registerType: 'autoUpdate',
       injectRegister: false,
       manifest: false,
+      // injectManifest (#496) : le SW custom inertia/sw.ts porte le runtime
+      // (NetworkFirst, repli hors-ligne, bientôt Web Push) ; le plugin ne fait
+      // plus que bundler le SW et y injecter le manifeste de précache
+      strategies: 'injectManifest',
+      srcDir: 'inertia',
+      filename: 'sw.ts',
       // Le client Vite sort dans build/public/assets (@adonisjs/inertia/vite),
       // mais un SW servi sous /assets/ ne contrôle jamais les navigations
       // (/boats, /planning…) : sw.js doit sortir à la racine web du build et
@@ -29,29 +35,21 @@ export default defineConfig({
       outDir: 'build/public',
       buildBase: '/',
       scope: '/',
-      workbox: {
-        // globDirectory = build/public (dérivé de outDir) : au moment du
-        // generateSW seuls les bundles (assets/**) y sont — les metaFiles
-        // (offline.html, favicons…) ne sont copiés qu'ensuite
+      injectManifest: {
+        // globDirectory = build/public : au moment de l'injection seuls les
+        // bundles (assets/**) y sont — les metaFiles (offline.html, favicons…)
+        // ne sont copiés qu'ensuite, d'où l'entrée manuelle ci-dessous
+        globDirectory: 'build/public',
         globPatterns: ['**/*.{js,css,ico,png,svg,woff2}'],
-        // ne jamais précacher le SW lui-même ni le runtime Workbox
+        // ne jamais précacher le SW lui-même
         globIgnores: ['sw.js', 'workbox-*.js', 'offline.html'],
         additionalManifestEntries: [{ url: '/offline.html', revision: offlineHtmlRevision }],
-        navigateFallback: '/offline.html',
-        navigateFallbackDenylist: [/^\/api\//, /^\/up\b/],
-        runtimeCaching: [
-          {
-            urlPattern: /^\/(boats|navigation|planning)(\/.*)?$/,
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'inertia-pages',
-              networkTimeoutSeconds: 3,
-              expiration: { maxEntries: 30, maxAgeSeconds: 7 * 24 * 3600 },
-              cacheableResponse: { statuses: [200] },
-            },
-          },
-        ],
       },
+      // SW testable avec `pnpm dev` — la validation finale reste sur build réel.
+      // Désactivé sous `node ace test` : la suite e2e tournait sans SW avant
+      // #496, et un SW actif y injecte des reloads (optimisation des deps
+      // workbox) et du cache de pages qui rendent les tests navigateur flaky
+      devOptions: { enabled: process.env.NODE_ENV !== 'test', type: 'module' },
     }),
   ],
 

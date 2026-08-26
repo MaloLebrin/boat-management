@@ -106,10 +106,14 @@ if (evaluationError) {
   }
 }
 
-/* 4 — /offline.html dans le manifeste de précache */
-const manifestEntries = [...swCode.matchAll(/\{url:"([^"]+)",revision:(?:null|"[a-f0-9]+")\}/g)].map(
-  (match) => match[1]
-)
+/* 4 — /offline.html dans le manifeste de précache.
+   Deux formats selon la stratégie : generateSW minifie en clés nues
+   `{url:"…",revision:…}`, injectManifest injecte du JSON `{"revision":…,"url":"…"}`
+   (ordre des clés variable). */
+const manifestEntries = [
+  ...swCode.matchAll(/\{"?url"?:"([^"]+)","?revision"?:(?:null|"[a-f0-9]+")\}/g),
+  ...swCode.matchAll(/\{"?revision"?:(?:null|"[a-f0-9]+"),"?url"?:"([^"]+)"\}/g),
+].map((match) => match[1])
 if (manifestEntries.length === 0) {
   fail('aucun manifeste de précache trouvé dans sw.js')
 } else if (manifestEntries.some((url) => url.replace(/^\//, '') === 'offline.html')) {

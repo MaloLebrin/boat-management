@@ -32,20 +32,49 @@ Composables
 
 ## Service Worker
 
-Configuré dans `vite.config.ts` via `VitePWA` :
+Depuis #496, le service worker est un **fichier source du projet** — `inertia/sw.ts` — bundlé par
+`vite-plugin-pwa` en stratégie **`injectManifest`** (le plugin ne fait plus qu'injecter le
+manifeste de précache dans `self.__WB_MANIFEST` et bundler le fichier). C'est ce qui permet d'y
+écrire du code custom, notamment les gestionnaires `push`/`notificationclick` du Web Push
+(#497/#498).
 
-| Option           | Valeur                                                                 |
-| ---------------- | ---------------------------------------------------------------------- |
-| `registerType`   | `autoUpdate` — mise à jour silencieuse au rechargement                 |
-| `injectRegister` | `false` — enregistrement manuel via `usePwaUpdate` (`useRegisterSW`)   |
-| `manifest`       | `false` — manifest servi depuis `public/site.webmanifest`              |
-| `outDir`         | `build/public` — `sw.js` sort à la **racine web**, pas dans `/assets`  |
-| `buildBase`      | `/` — le SW est enregistré à `/sw.js`                                  |
-| `scope`          | `/` — le SW contrôle toutes les navigations                            |
-| Précache         | `assets/**` (`**/*.{js,css,ico,png,svg,woff2}`) + `/offline.html`      |
-| Runtime cache    | `/boats/*`, `/navigation/*`, `/planning/*` — NetworkFirst, 3 s timeout |
+Configuration `VitePWA` (`vite.config.ts`) :
 
-**Stratégie NetworkFirst** : le SW tente le réseau en priorité. Si la requête échoue ou dépasse 3 secondes, il sert le cache. Les pages non encore visitées (non cachées) restent inaccessibles hors-ligne.
+| Option                | Valeur                                                                                                        |
+| --------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `strategies`          | `injectManifest` — SW custom, plus de génération automatique                                                  |
+| `srcDir` / `filename` | `inertia` / `sw.ts` — bundlé en `sw.js`                                                                       |
+| `registerType`        | `autoUpdate` — mise à jour silencieuse au rechargement                                                        |
+| `injectRegister`      | `false` — enregistrement manuel via `usePwaUpdate` (`useRegisterSW`)                                          |
+| `manifest`            | `false` — manifest servi depuis `public/site.webmanifest`                                                     |
+| `outDir`              | `build/public` — `sw.js` sort à la **racine web**, pas dans `/assets`                                         |
+| `buildBase`           | `/` — le SW est enregistré à `/sw.js`                                                                         |
+| `scope`               | `/` — le SW contrôle toutes les navigations                                                                   |
+| `injectManifest`      | précache `assets/**` (`**/*.{js,css,ico,png,svg,woff2}`) + `/offline.html`                                    |
+| `devOptions`          | `{ enabled: NODE_ENV !== 'test', type: 'module' }` — SW testable en `pnpm dev`, coupé pendant `node ace test` |
+
+### Ce que `inertia/sw.ts` fait explicitement
+
+La bascule `generateSW` → `injectManifest` a supprimé plusieurs comportements implicites, réécrits
+dans le SW :
+
+- **`self.skipWaiting()` + `clients.claim()`** (en natif, pas de workbox-core) — n'étaient plus
+  injectés par `registerType: 'autoUpdate'` ;
+- **précache** : `precacheAndRoute(self.__WB_MANIFEST)` + `cleanupOutdatedCaches()` ;
+- **NetworkFirst** sur les navigations `/boats|/navigation|/planning` (3 s de timeout, 30 entrées,
+  7 jours, réponses 200) — restreint à `request.mode === 'navigate'` : les visites Inertia (XHR
+  `X-Inertia`) répondent du JSON sur les mêmes URLs, les cacher sous la même clé servirait du JSON
+  brut à une navigation hors-ligne ;
+- **`NavigationRoute(NetworkOnly)`** sur toutes les autres navigations (denylist `/api`, `/up`) :
+  indispensable pour que le repli fonctionne — `setCatchHandler` ne rattrape que les requêtes
+  **gérées par une route**, une navigation sans route irait au réseau et échouerait sans repli ;
+- **repli hors-ligne** : `setCatchHandler` sert le `/offline.html` précaché pour tout `document`
+  dont la requête échoue.
+
+**Stratégie NetworkFirst** : le SW tente le réseau en priorité. Si la requête échoue ou dépasse 3 secondes, il sert le cache. Les pages non encore visitées (non cachées) tombent sur `offline.html`.
+
+CSP : `config/shield.ts` garde `defaultSrc: ["'self'"]`, qui couvre `worker-src` par cascade — un
+SW de même origine passe sans changement.
 
 ### Pourquoi le SW sort à la racine web (#482)
 
@@ -55,11 +84,11 @@ Le build client Vite écrit dans `build/public/assets` (imposé par `@adonisjs/i
 - `buildBase: '/'` — `useRegisterSW` enregistre `/sw.js` (et non `/assets/sw.js`) ;
 - `scope: '/'` — le SW contrôle toute l'origine.
 
-Deuxième piège : `offline.html` vit dans `public/` et n'est copié dans `build/public` **qu'après** le build Vite (metaFiles de `adonisrc.ts`) — il est donc introuvable au moment où Workbox globbe le répertoire de sortie. Il est précaché explicitement via `additionalManifestEntries`, avec une révision MD5 calculée depuis `public/offline.html`. Sans cette entrée, `navigateFallback` génère un `createHandlerBoundToURL('/offline.html')` qui **lève à l'évaluation du SW** (`non-precached-url`) : le SW ne s'installe jamais.
+Deuxième piège : `offline.html` vit dans `public/` et n'est copié dans `build/public` **qu'après** le build Vite (metaFiles de `adonisrc.ts`) — il est donc introuvable au moment où Workbox globbe le répertoire de sortie. Il est précaché explicitement via `additionalManifestEntries`, avec une révision MD5 calculée depuis `public/offline.html`.
 
 > ⚠️ L'alternative « servir `/assets/sw.js` avec un en-tête `Service-Worker-Allowed: /` » a été écartée : elle casserait le jour où `assetsUrl` pointe vers un CDN (cross-origin).
 
-En production, `sw.js` est servi par le middleware statique (`build/public` = racine du serveur statique). En dev, aucun SW n'est actif (`devOptions` désactivé) : l'enregistrement de `/sw.js` échoue silencieusement.
+En production, `sw.js` est servi par le middleware statique (`build/public` = racine du serveur statique). En dev, `devOptions` sert le SW en module — le comportement final se valide malgré tout sur build réel (`node ace build`), c'est ce que fait le garde-fou `pnpm check:sw` (#483).
 
 ---
 
