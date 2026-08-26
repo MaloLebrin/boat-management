@@ -211,6 +211,26 @@ Consommateurs : `InspectionPhotos.vue` (wrapper fin), et les onglets « Photos �
 `EngineShowTabPhotos`, `EnginePartShowTabPhotos`, `SailShowTabPhotos`, `RigShowTabPhotos`,
 `GenericShowTabPhotos`, `SafetyShowTabPhotos`.
 
+## Repli carte mobile des tableaux (#493)
+
+Les écrans terrain ne laissent jamais un tableau en scroll horizontal seul sur mobile : chaque
+table est doublée d'un bloc cartes, sur le motif de `boats/index.vue` :
+
+```
+<div class="lg:hidden space-y-3">  …cartes…  </div>
+<div class="hidden lg:block overflow-x-auto">  …table existante…  </div>
+```
+
+- `navigation/logbook.vue` → `LogbookCard.vue` (à côté de `LogbookRow.vue`, mêmes props)
+- `navigation/fuel.vue` → `FuelLogCard.vue`
+- `navigation/incidents.vue` → `IncidentCard.vue`
+- `MaintenanceHistoryTimeline.vue` → `MaintenanceHistoryCard.vue` (la rangée desktop garde ses
+  badges en ligne ; la carte empile tout et porte son propre état déplié)
+
+L'information y est hiérarchisée (trajet/date d'abord, champs secondaires ensuite), pas transposée
+colonne à colonne. Non-régression : `tests/inertia/table_card_collapse.spec.ts` (mêmes données que
+les lignes + classes de breakpoint), débordement horizontal couvert par #500.
+
 ## Patterns UI (forms)
 
 Le projet utilise le composant `<Form>` fourni par `@adonisjs/inertia/vue`.
