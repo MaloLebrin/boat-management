@@ -324,5 +324,8 @@
   },
   "mouillages": {
     "hasBoats": "Impossible de supprimer ce mouillage : des bateaux y sont assignés."
+  },
+  "push": {
+    "subscriptionNotFound": "Cet appareil n'est plus enregistré."
   }
 }

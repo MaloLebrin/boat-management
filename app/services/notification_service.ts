@@ -2,6 +2,8 @@ import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
 import { DateTime } from 'luxon'
 import Notification from '#models/notification'
+import SendPushNotification from '#jobs/send_push_notification'
+import { isPushableNotificationType } from '#shared/constants/push'
 import type { CreateNotificationParams, NotificationsSharedProps } from '#shared/types/notification'
 import * as NotificationTransformer from '#transformers/notification_transformer'
 import transmit from '@adonisjs/transmit/services/main'
@@ -28,6 +30,22 @@ export default class NotificationService {
       transmit.broadcast(`notifications/${notification.userId}`, payload)
     } catch (error) {
       logger.warn({ err: error }, 'failed to broadcast notification via SSE')
+    }
+
+    // Web Push (#497) — même contrat que le broadcast SSE : un échec de
+    // dispatch ne doit jamais faire échouer la création de la notification
+    if (isPushableNotificationType(notification.type)) {
+      try {
+        await SendPushNotification.dispatch({
+          userId: notification.userId,
+          title: notification.title,
+          body: notification.body,
+          actionUrl: notification.actionUrl,
+          type: notification.type,
+        })
+      } catch (error) {
+        logger.warn({ err: error }, 'failed to dispatch push notification job')
+      }
     }
 
     return notification
