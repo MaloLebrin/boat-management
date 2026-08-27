@@ -104,6 +104,17 @@ Les cartes de l'onglet Équipement exposent un lien « voir le détail » vers c
 - Types frontend: `inertia/types/budget.ts`
 - Source backend: `BudgetController.show`
 
+### Onglets scrollables (#495)
+
+`BaseTabs.vue` est scrollable horizontalement avec `snap-x`/`snap-start`, et affiche des
+**dégradés de bord** (`[data-overflow="left|right"]`) quand des onglets dépassent — mis à jour au
+scroll et au redimensionnement (ResizeObserver). Toute page à onglets en bénéficie.
+
+L'écran d'inspection (`boats/reservation_inspection.vue`) bascule ses panneaux Départ/Retour en
+onglets `BaseTabs` **sous `lg`** (comparer sans défilement interminable) et garde les deux colonnes
+au-dessus. Chaque panneau n'est rendu qu'une fois (ids de formulaires uniques) — seule sa
+visibilité change (`hidden lg:block` sur le panneau inactif).
+
 ### Liens et navigation (#533)
 
 - **Navigation interne = `<Link>` (`@adonisjs/inertia/vue`)**, jamais `<a href="/…">` : une ancre brute recharge l'app entière. Deux règles ESLint le tiennent (`vue/no-restricted-static-attribute`, `vue/no-restricted-v-bind` sur `inertia/**/*.vue`).
@@ -129,6 +140,11 @@ Les cartes de l'onglet Équipement exposent un lien « voir le détail » vers c
   - `PortsMapCanvas.vue` — carte pointillée + arcs : `HomeStatsBandSection` (`dark`, bande navy), hero contact (`light`)
   - `ParticleNetworkCanvas.vue` — particules réactives souris : `HomeFinalCtaSection`
 - Détail des animations : `inertia/css/ANIMATIONS.md`
+
+### Settings — notifications (`/settings/notifications`, #498)
+
+- Page : `inertia/pages/settings/notifications.vue` → `components/settings/tabs/SettingsNotificationsTab.vue` (prop `pushSubscriptions`, servie par `SettingsController.notifications`), section visible pour **tous les rôles**.
+- Gestion du Web Push : activer/désactiver **cet appareil** (`use_push_notifications.ts` — `subscribe()` uniquement sur geste utilisateur), liste des appareils abonnés (`user_agent`, dates) et retrait par appareil (`DELETE /push/subscriptions/:id`). Sur iOS hors PWA installée, `IosInstallHint.vue` remplace le bouton. Détail : `docs/frontend/pwa.md` § Web Push.
 
 ### Settings — facturation (`/settings/billing`)
 
@@ -202,6 +218,11 @@ Les cartes de l'onglet Équipement exposent un lien « voir le détail » vers c
 (`uploadUrl`, `deleteUrlFor`, `photos`, `canUpload`, `canDelete`). Upload via `useForm` +
 `form.post(..., { forceFormData: true })`, suppression via `router.delete`. i18n : `media.photos.*`.
 
+Deux boutons d'upload (#485) : « Ajouter » ouvre le sélecteur (input `multiple`) et
+« Prendre une photo » ouvre l'appareil photo via un **second input** `capture="environment"`
+sans `multiple` — `capture` sur l'input principal supprimerait la sélection multiple sur
+iOS/Android. Même montage dans `BoatPhotoGallery.vue` (fiche bateau).
+
 Consommateurs : `InspectionPhotos.vue` (wrapper fin), et les onglets « Photos » des six équipements —
 `EngineShowTabPhotos`, `EnginePartShowTabPhotos`, `SailShowTabPhotos`, `RigShowTabPhotos`,
 `GenericShowTabPhotos`, `SafetyShowTabPhotos`.
@@ -221,6 +242,26 @@ Deux techniques, au choix :
 `md` (40 px) de 4 px, `lg` est déjà à 44 px — `size="sm"` reste donc utilisable sur les écrans
 terrain. ⚠️ Écrire les classes en littéral complet : le scanner Tailwind ne voit pas les noms
 concaténés. Mesure réelle en navigateur : prévue par #500.
+
+## Repli carte mobile des tableaux (#493)
+
+Les écrans terrain ne laissent jamais un tableau en scroll horizontal seul sur mobile : chaque
+table est doublée d'un bloc cartes, sur le motif de `boats/index.vue` :
+
+```
+<div class="lg:hidden space-y-3">  …cartes…  </div>
+<div class="hidden lg:block overflow-x-auto">  …table existante…  </div>
+```
+
+- `navigation/logbook.vue` → `LogbookCard.vue` (à côté de `LogbookRow.vue`, mêmes props)
+- `navigation/fuel.vue` → `FuelLogCard.vue`
+- `navigation/incidents.vue` → `IncidentCard.vue`
+- `MaintenanceHistoryTimeline.vue` → `MaintenanceHistoryCard.vue` (la rangée desktop garde ses
+  badges en ligne ; la carte empile tout et porte son propre état déplié)
+
+L'information y est hiérarchisée (trajet/date d'abord, champs secondaires ensuite), pas transposée
+colonne à colonne. Non-régression : `tests/inertia/table_card_collapse.spec.ts` (mêmes données que
+les lignes + classes de breakpoint), débordement horizontal couvert par #500.
 
 ## Patterns UI (forms)
 

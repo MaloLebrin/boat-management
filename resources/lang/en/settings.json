@@ -8,7 +8,8 @@
     "ai": "AI customisation",
     "auditLog": "Activity log",
     "branding": "White label",
-    "import": "CSV Import"
+    "import": "CSV Import",
+    "notifications": "Notifications"
   },
   "org": {
     "title": "Organisation profile",
@@ -323,6 +324,26 @@
     "empty": {
       "title": "No activity yet",
       "description": "Actions performed in your organisation will appear here."
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "subtitle": "Push notifications reach your devices even when the app is closed.",
+    "notConfigured": "Push notifications are not configured on this server.",
+    "thisDevice": "This device",
+    "unsupported": "This browser doesn't support push notifications.",
+    "permissionDenied": "Notifications are blocked for this site. Allow them in your browser settings, then come back here.",
+    "enable": "Enable on this device",
+    "enabled": "Enabled on this device",
+    "disable": "Disable",
+    "devices": {
+      "title": "Subscribed devices",
+      "empty": "No subscribed devices yet.",
+      "unknownDevice": "Unknown device",
+      "added": "Added {date}",
+      "lastUsed": "Last notified {date}",
+      "remove": "Remove",
+      "removeAriaLabel": "Remove device: {device}"
     }
   }
 }

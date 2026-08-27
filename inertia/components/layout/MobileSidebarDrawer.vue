@@ -58,10 +58,13 @@ function close() {
       role="dialog"
       aria-modal="true"
       :aria-labelledby="drawerTitleId"
-      class="fixed left-0 top-0 z-50 h-full w-64 bg-navy-900 shadow-xl lg:hidden flex flex-col"
+      class="fixed left-0 top-0 z-50 h-dvh w-64 pl-[env(safe-area-inset-left)] bg-navy-900 shadow-xl lg:hidden flex flex-col"
     >
-      <!-- Drawer header -->
-      <div class="shrink-0 flex items-center justify-between px-5 py-4 border-b border-navy-700">
+      <!-- Drawer header : pt = safe-area + py-4, l'encoche ne doit pas recouvrir
+           le titre avec viewport-fit=cover (#484) -->
+      <div
+        class="shrink-0 flex items-center justify-between px-5 py-4 pt-[calc(env(safe-area-inset-top)+1rem)] border-b border-navy-700"
+      >
         <div class="flex items-center gap-3">
           <img :src="brandIconUrl" alt="FleetAi" class="h-10 w-10 rounded-lg shadow-md" />
           <div class="flex flex-col leading-tight">
@@ -111,7 +114,9 @@ function close() {
       </NavScrollArea>
 
       <!-- Drawer footer with settings + user info -->
-      <div class="shrink-0 border-t border-navy-700 px-4 py-4 bg-navy-900">
+      <div
+        class="shrink-0 border-t border-navy-700 px-4 py-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] bg-navy-900"
+      >
         <div class="mb-3">
           <NavItem
             :name="settingsItem.name"

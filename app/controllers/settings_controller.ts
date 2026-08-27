@@ -1,4 +1,6 @@
 import OrganizationMemberService from '#services/organization_member_service'
+import PushSubscriptionService from '#services/push_subscription_service'
+import * as PushSubscriptionTransformer from '#transformers/push_subscription_transformer'
 import OrganizationInvitationService from '#services/organization_invitation_service'
 import SubscriptionService from '#services/subscription_service'
 import QuotaService from '#services/quota_service'
@@ -33,10 +35,20 @@ export default class SettingsController {
     private aiTokenQuotaService: AiTokenQuotaService,
     private organizationModuleService: OrganizationModuleService,
     private brandingService: BrandingService,
-    private boatListService: BoatListService
+    private boatListService: BoatListService,
+    private pushSubscriptionService: PushSubscriptionService
   ) {}
   async me({ inertia }: HttpContext) {
     return inertia.render('settings/me', {})
+  }
+
+  /** Gestion des notifications push et des appareils abonnés (#498). */
+  async notifications({ inertia, auth }: HttpContext) {
+    const user = await auth.authenticate()
+    const subscriptions = await this.pushSubscriptionService.listForUser(user.id)
+    return inertia.render('settings/notifications', {
+      pushSubscriptions: subscriptions.map(PushSubscriptionTransformer.toRow),
+    })
   }
 
   async org({ inertia, auth }: HttpContext) {

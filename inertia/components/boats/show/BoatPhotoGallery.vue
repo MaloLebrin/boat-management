@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PhotoIcon, PlusIcon } from '@heroicons/vue/24/outline'
+import { CameraIcon, PhotoIcon, PlusIcon } from '@heroicons/vue/24/outline'
 import { Form } from '@adonisjs/inertia/vue'
 import { useForm } from '@inertiajs/vue3'
 import { ref } from 'vue'
@@ -15,6 +15,7 @@ const props = defineProps<{
 
 const { t } = useT()
 const fileInput = ref<HTMLInputElement>()
+const cameraInput = ref<HTMLInputElement>()
 const form = useForm({ files: [] as File[] })
 
 const photos = computed<MediaRow[]>(() =>
@@ -34,6 +35,7 @@ function submitPhotos() {
     onSuccess: () => {
       form.reset()
       if (fileInput.value) fileInput.value.value = ''
+      if (cameraInput.value) cameraInput.value.value = ''
     },
   })
 }
@@ -43,21 +45,32 @@ function submitPhotos() {
   <div>
     <div class="flex items-center justify-between mb-3">
       <p class="text-sm font-semibold text-fg">{{ t('boats.show.mediaUpload.photos') }}</p>
-      <BaseButton
-        v-if="canManage"
-        variant="secondary"
-        size="sm"
-        type="button"
-        :disabled="form.processing"
-        @click="fileInput?.click()"
-      >
-        <PlusIcon class="h-4 w-4 mr-1" />
-        {{
-          form.processing
-            ? t('boats.show.mediaUpload.uploading')
-            : t('boats.show.mediaUpload.addPhoto')
-        }}
-      </BaseButton>
+      <div v-if="canManage" class="flex items-center gap-2">
+        <BaseButton
+          variant="secondary"
+          size="sm"
+          type="button"
+          :disabled="form.processing"
+          @click="cameraInput?.click()"
+        >
+          <CameraIcon class="h-4 w-4 mr-1" />
+          {{ t('boats.show.mediaUpload.takePhoto') }}
+        </BaseButton>
+        <BaseButton
+          variant="secondary"
+          size="sm"
+          type="button"
+          :disabled="form.processing"
+          @click="fileInput?.click()"
+        >
+          <PlusIcon class="h-4 w-4 mr-1" />
+          {{
+            form.processing
+              ? t('boats.show.mediaUpload.uploading')
+              : t('boats.show.mediaUpload.addPhoto')
+          }}
+        </BaseButton>
+      </div>
     </div>
 
     <input
@@ -66,6 +79,17 @@ function submitPhotos() {
       type="file"
       multiple
       accept="image/jpeg,image/png,image/webp,image/gif,.heic,.heif"
+      class="hidden"
+      @change="onFileChange"
+    />
+    <!-- Input caméra séparé : `capture` supprime la sélection multiple depuis
+         la galerie sur iOS/Android, il ne doit pas porter `multiple` (#485) -->
+    <input
+      v-if="canManage"
+      ref="cameraInput"
+      type="file"
+      accept="image/*"
+      capture="environment"
       class="hidden"
       @change="onFileChange"
     />
