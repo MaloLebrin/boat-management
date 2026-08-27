@@ -48,6 +48,7 @@
     "empty": "Aucun défaut constaté.",
     "add": "+ Signaler un défaut",
     "addTitle": "Signaler un défaut",
+    "offlineNoInspection": "Cette inspection n'a pas encore été synchronisée avec le serveur — les défauts ne peuvent pas être enregistrés hors-ligne. Reconnectez-vous puis réessayez.",
     "deleteTitle": "Supprimer le défaut"
   },
   "prefill": {

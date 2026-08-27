@@ -33,11 +33,6 @@ export interface FailedAction extends QueuedAction {
   errors: Record<string, string>
 }
 
-export interface FailedAction extends QueuedAction {
-  failedAt: string
-  errors: Record<string, string>
-}
-
 export interface ConflictState {
   action: QueuedAction
   serverData: Record<string, unknown>
