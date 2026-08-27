@@ -74,12 +74,27 @@ const sizeClass: Record<NonNullable<typeof props.size>, string> = {
   icon: 'h-8 w-8 rounded-[var(--radius-control)] p-0',
 }
 
+/**
+ * Zone tactile ≥ 44 px sur pointeur grossier (#494) : le visuel garde sa
+ * densité, un pseudo-élément étend la cible sur écran tactile uniquement
+ * (`pointer-coarse:`). sm/icon font 32 px (+12), md 40 px (+4), lg est déjà
+ * à 44 px. Classes écrites en littéral complet — le scanner Tailwind ne voit
+ * pas les noms concaténés.
+ */
+const touchTargetClass: Record<NonNullable<typeof props.size>, string> = {
+  sm: 'relative pointer-coarse:before:absolute pointer-coarse:before:content-[""] pointer-coarse:before:inset-x-0 pointer-coarse:before:-inset-y-1.5',
+  md: 'relative pointer-coarse:before:absolute pointer-coarse:before:content-[""] pointer-coarse:before:inset-x-0 pointer-coarse:before:-inset-y-0.5',
+  lg: '',
+  icon: 'relative pointer-coarse:before:absolute pointer-coarse:before:content-[""] pointer-coarse:before:-inset-1.5',
+}
+
 const baseClass = computed(() => {
   const classList = [
     'inline-flex items-center justify-center gap-2 transition-colors cursor-pointer',
     'disabled:cursor-not-allowed disabled:opacity-50',
     variantClass[props.variant],
     sizeClass[props.size],
+    touchTargetClass[props.size],
   ]
 
   if ((isInertiaLink.value || isAnchorLink.value) && props.disabled) {

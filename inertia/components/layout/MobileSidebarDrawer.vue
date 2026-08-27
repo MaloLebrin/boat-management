@@ -74,10 +74,11 @@ function close() {
             <span class="text-xs font-medium text-navy-200">Fleet intelligence</span>
           </div>
         </div>
+        <!-- 36 px visuels, 44 px de zone tactile sur écran tactile (#494) -->
         <button
           ref="closeButtonEl"
           type="button"
-          class="inline-flex items-center justify-center w-9 h-9 rounded-lg text-navy-100 hover:bg-navy-700 hover:text-white transition-colors"
+          class="inline-flex items-center justify-center w-9 h-9 rounded-lg text-navy-100 hover:bg-navy-700 hover:text-white transition-colors relative pointer-coarse:before:absolute pointer-coarse:before:content-[''] pointer-coarse:before:-inset-1"
           :aria-label="t('nav.closeMenu')"
           @click="close"
         >

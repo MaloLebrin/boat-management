@@ -28,10 +28,13 @@ const emit = defineEmits<{
     ]"
   >
     <div class="flex items-start gap-3">
-      <!-- Checkbox -->
+      <!-- Checkbox — 20 px visuels, mais 44 px de zone tactile sur écran
+           tactile via pseudo-élément (#494) : agrandir la case déséquilibrerait
+           la fiche, la pseudo-zone préserve la densité -->
       <button
         v-if="canManage"
         type="button"
+        class="relative pointer-coarse:before:absolute pointer-coarse:before:content-[''] pointer-coarse:before:-inset-3"
         :class="[
           'mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded border transition-colors',
           displayDone
