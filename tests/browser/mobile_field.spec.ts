@@ -30,6 +30,29 @@ const FIELD_SCREENS = [
   '/navigation/incidents',
 ]
 
+// Évalué comme string (pas de callback) : le tsconfig backend n'embarque pas la lib DOM
+const HORIZONTAL_OVERFLOW_JS = `({
+  scrollWidth: document.documentElement.scrollWidth,
+  innerWidth: window.innerWidth,
+})`
+
+const TABLE_CARDS_STATE_JS = `(() => {
+  const table = document.querySelector('table')
+  const cards = document.querySelector('.lg\\\\:hidden.space-y-3')
+  const visible = (el) => el !== null && getComputedStyle(el).display !== 'none'
+  return {
+    tableVisible: visible(table?.closest('div.hidden') ?? table),
+    cardsVisible: visible(cards),
+    cardCount: cards ? cards.children.length : 0,
+  }
+})()`
+
+interface TableCardsState {
+  tableVisible: boolean
+  cardsVisible: boolean
+  cardCount: number
+}
+
 async function seedFieldData() {
   const user = await createAdminUser()
   const boat = await createBoatForUser(user, { name: 'Mobile Field Boat' })
@@ -41,7 +64,7 @@ async function seedFieldData() {
     arrivedAt: null,
     departurePortName: 'Marseille',
     arrivalPortName: 'Cassis',
-    distanceNm: 12,
+    distanceNm: '12',
   }).create()
   await BoatFuelLogFactory.merge({
     boatId: boat.id,
@@ -78,10 +101,10 @@ test.group('E2E · Écrans terrain en viewport mobile (#500)', (group) => {
 
     for (const url of [...FIELD_SCREENS, `/boats/${boat.id}`]) {
       await page.goto(url, { waitUntil: 'networkidle' })
-      const { scrollWidth, innerWidth } = await page.evaluate(() => ({
-        scrollWidth: document.documentElement.scrollWidth,
-        innerWidth: window.innerWidth,
-      }))
+      const { scrollWidth, innerWidth } = (await page.evaluate(HORIZONTAL_OVERFLOW_JS)) as {
+        scrollWidth: number
+        innerWidth: number
+      }
       assert.isAtMost(
         scrollWidth,
         innerWidth,
@@ -131,17 +154,7 @@ test.group('E2E · Écrans terrain en viewport mobile (#500)', (group) => {
       await page.setViewportSize(MOBILE)
       await page.goto(url, { waitUntil: 'networkidle' })
 
-      const state = await page.evaluate(() => {
-        const table = document.querySelector('table')
-        const cards = document.querySelector('.lg\\:hidden.space-y-3')
-        const visible = (el: Element | null) =>
-          el !== null && globalThis.getComputedStyle(el).display !== 'none'
-        return {
-          tableVisible: visible(table?.closest('div.hidden') ?? table),
-          cardsVisible: visible(cards),
-          cardCount: cards?.children.length ?? 0,
-        }
-      })
+      const state = (await page.evaluate(TABLE_CARDS_STATE_JS)) as TableCardsState
 
       assert.isTrue(state.cardsVisible, `${url} : les cartes mobiles ne rendent pas`)
       assert.isAbove(state.cardCount, 0, `${url} : aucune carte rendue`)
@@ -149,13 +162,7 @@ test.group('E2E · Écrans terrain en viewport mobile (#500)', (group) => {
 
       // Au-dessus de lg, la table revient et les cartes disparaissent
       await page.setViewportSize(DESKTOP)
-      const desktop = await page.evaluate(() => {
-        const table = document.querySelector('table')
-        const cards = document.querySelector('.lg\\:hidden.space-y-3')
-        const visible = (el: Element | null) =>
-          el !== null && globalThis.getComputedStyle(el).display !== 'none'
-        return { tableVisible: visible(table), cardsVisible: visible(cards) }
-      })
+      const desktop = (await page.evaluate(TABLE_CARDS_STATE_JS)) as TableCardsState
       assert.isTrue(desktop.tableVisible, `${url} : la table doit revenir en desktop`)
       assert.isFalse(desktop.cardsVisible, `${url} : les cartes doivent disparaître en desktop`)
     }
