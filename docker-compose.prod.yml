@@ -1,0 +1,110 @@
+# Déploiement self-host (VPS, Oracle Cloud, Hetzner…) — issue #543
+#
+# Prérequis : un `.env` rempli à côté de ce fichier (voir `.env.example` et
+# `docs/dev/hosting.md`). Il fournit à la fois l'environnement des conteneurs et
+# les valeurs interpolées ci-dessous (`DB_USER`, `DB_PASSWORD`, `DB_DATABASE`,
+# `APP_DOMAIN`, `LETSENCRYPT_EMAIL`). `APP_URL` doit valoir l'URL publique
+# HTTPS ; `DB_HOST` et `HOST` sont forcés plus bas, quoi qu'il contienne.
+#
+#   docker compose -f docker-compose.prod.yml up -d
+#
+# ⚠️ Une seule instance `web` : le transport Transmit est `null`
+# (config/transmit.ts), les événements SSE ne sont donc pas partagés entre
+# processus — deux réplicas web = des notifications perdues une fois sur deux.
+
+x-app: &app
+  image: ghcr.io/malolebrin/boat-management:${IMAGE_TAG:-latest}
+  env_file: .env
+  environment:
+    NODE_ENV: production
+    # Écrasent le `.env` (précédence `environment` > `env_file`) : dans un
+    # conteneur, Postgres est joignable par le nom du service et le serveur doit
+    # écouter sur toutes les interfaces, pas sur `localhost`.
+    DB_HOST: postgres
+    HOST: 0.0.0.0
+  depends_on:
+    postgres:
+      condition: service_healthy
+    migrator:
+      condition: service_completed_successfully
+  restart: unless-stopped
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${DB_USER} -d ${DB_DATABASE}']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  # One-shot exécuté avant `web` et les workers (#542) : un déploiement sur base
+  # vierge, ou incluant une nouvelle migration, n'a besoin d'aucune intervention.
+  # `restart: no` — un `migration:run` qui échoue doit faire échouer le déploiement.
+  migrator:
+    image: ghcr.io/malolebrin/boat-management:${IMAGE_TAG:-latest}
+    env_file: .env
+    environment:
+      NODE_ENV: production
+      DB_HOST: postgres
+    command: ['node', 'ace', 'migration:run', '--force']
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: 'no'
+
+  web:
+    <<: *app
+    # Le scheduler (start/scheduler.ts) n'est préchargé que dans
+    # l'environnement `web` : c'est ce conteneur qui met les jobs cron en file.
+    expose:
+      - '3333'
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -q --spider http://127.0.0.1:3333/up || exit 1']
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # Toutes les queues sauf `ai` : sans ce worker, mails, médias, exports,
+  # imports de maintenance et notifications push ne partent jamais — `queue:work`
+  # sans `--queue` ne traite que `default`.
+  worker:
+    <<: *app
+    command: ['node', 'ace', 'queue:work', '--queue=default,emails,media,exports,maintenance,push']
+
+  # Queue `ai` isolée : les jobs Mistral durent des dizaines de secondes et
+  # monopoliseraient la concurrence du worker principal.
+  worker-ai:
+    <<: *app
+    command: ['node', 'ace', 'queue:work', '--queue=ai']
+
+  caddy:
+    image: caddy:2-alpine
+    ports:
+      - '80:80'
+      - '443:443'
+      - '443:443/udp'
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    environment:
+      APP_DOMAIN: ${APP_DOMAIN}
+      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}
+    depends_on:
+      web:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  pg_data:
+  caddy_data:
+  caddy_config:

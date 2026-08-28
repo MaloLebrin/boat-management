@@ -41,7 +41,12 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      # Ajouter ici l'étape de déploiement selon la plateforme cible :
+      # Ajouter ici l'étape de déploiement selon la plateforme cible (#542).
+      # Quelle que soit la cible, les migrations doivent tourner AVANT le
+      # démarrage de la nouvelle version : release command
+      # `node ace migration:run --force` (= `pnpm migrate:prod`) sur un PaaS,
+      # service one-shot `migrator` du docker-compose.prod.yml en self-host.
+      # Voir docs/dev/hosting.md.
       # Fly.io  → flyctl deploy --image ${{ env.IMAGE }}:${{ github.sha }}
       # Railway → railway deploy
       # K8s     → kubectl set image deployment/app app=${{ env.IMAGE }}:...

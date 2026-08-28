@@ -1,0 +1,10 @@
+# 2026-08-28 — `docker-compose.prod.yml` : web, workers, Postgres et Caddy (#543)
+
+Le `docker-compose.yml` existant ne couvre que le dev (Postgres seul). Nouveau `docker-compose.prod.yml` + `Caddyfile` versionnés pour les cibles VPS / Oracle / self-host : `docker compose -f docker-compose.prod.yml up -d` sur une machine vierge, avec un `.env` rempli, donne une app complète.
+
+- **Services.** `postgres` (`postgres:18-alpine`, volume + healthcheck), `migrator` (one-shot, #542), `web` (image GHCR, healthcheck sur `/up` — #541), `worker`, `worker-ai`, `caddy` (HTTPS automatique).
+- **Toutes les queues sont couvertes.** Les 16 jobs de `app/jobs/` sont répartis sur **7 queues** (`default`, `emails`, `ai`, `media`, `exports`, `maintenance`, `push`) alors que `node ace queue:work` sans `--queue` ne traite que `default` : lancé tel quel, aucun mail, média, export, import de maintenance ni notification push ne serait jamais parti. `worker` couvre les six queues courtes, `worker-ai` isole la queue `ai` dont les jobs Mistral durent des dizaines de secondes. La queue `push` (#497) s'est ajoutée depuis la rédaction de l'issue et fait partie du lot.
+- **`HOST` et `DB_HOST` forcés.** `environment` prime sur `env_file` : le compose impose `HOST=0.0.0.0` et `DB_HOST=postgres`, sinon un `.env` copié depuis `.env.example` (`HOST=localhost`) donnerait un serveur injoignable depuis Caddy.
+- **Caddy et le SSE.** `/__transmit/events` passe par un `handle` dédié, sans compression, `flush_interval -1` et timeouts de transport désactivés : le ping Transmit est à 30 s (`config/transmit.ts`), un proxy qui bufferise ou coupe à 30 s met le client en reconnexion permanente. Le reste du trafic est compressé, timeouts 5 min (uploads, exports PDF).
+- **Une seule instance `web`.** Transport Transmit `null` → les événements SSE ne sont pas partagés entre processus, pas de scale horizontal du web tant qu'un transport Redis n'est pas configuré. C'est aussi ce conteneur qui met en file les jobs planifiés (`start/scheduler.ts` n'est préchargé qu'en environnement `web`).
+- **Documentation.** `docs/dev/hosting.md`, référencé depuis `docs/README.md`.
