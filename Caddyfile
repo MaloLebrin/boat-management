@@ -1,0 +1,38 @@
+# Reverse proxy de production — issue #543.
+# Monté en lecture seule dans le service `caddy` de docker-compose.prod.yml.
+# `APP_DOMAIN` et `LETSENCRYPT_EMAIL` viennent du `.env` du déploiement.
+
+{
+	email {$LETSENCRYPT_EMAIL}
+}
+
+{$APP_DOMAIN} {
+	# Flux SSE de @adonisjs/transmit (config/transmit.ts, ping toutes les 30 s).
+	# Un `handle` dédié : la réponse ne doit être ni compressée ni bufferisée, et
+	# la connexion doit rester ouverte bien au-delà de l'intervalle de ping —
+	# sinon le client se reconnecte en boucle et les notifications sautent.
+	@sse path /__transmit/events
+	handle @sse {
+		reverse_proxy web:3333 {
+			flush_interval -1
+			transport http {
+				read_timeout 0
+				write_timeout 0
+			}
+		}
+	}
+
+	handle {
+		encode zstd gzip
+
+		reverse_proxy web:3333 {
+			transport http {
+				# Confortablement au-dessus des 30 s de ping Transmit, et des
+				# uploads/exports PDF les plus lents.
+				read_timeout 5m
+				write_timeout 5m
+				dial_timeout 5s
+			}
+		}
+	}
+}

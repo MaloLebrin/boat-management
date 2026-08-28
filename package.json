@@ -14,6 +14,7 @@
     "check:sw": "node scripts/check_sw_build.mjs",
     "dev": "node ace serve --hmr",
     "queue:work": "node ace queue:work",
+    "migrate:prod": "node ace migration:run --force",
     "queue:work:ai": "node ace queue:work --queue=ai",
     "test": "node ace test unit integration functional",
     "test:e2e": "node ace test browser",

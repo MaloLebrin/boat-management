@@ -7,6 +7,7 @@ export type ScannedRoutes = {
     'event_stream': { paramsTuple?: []; params?: {} }
     'subscribe': { paramsTuple?: []; params?: {} }
     'unsubscribe': { paramsTuple?: []; params?: {} }
+    'health.show': { paramsTuple?: []; params?: {} }
     'dashboard': { paramsTuple?: []; params?: {} }
     'design_system': { paramsTuple?: []; params?: {} }
     'sitemap': { paramsTuple?: []; params?: {} }
@@ -304,6 +305,7 @@ export type ScannedRoutes = {
   }
   GET: {
     'event_stream': { paramsTuple?: []; params?: {} }
+    'health.show': { paramsTuple?: []; params?: {} }
     'dashboard': { paramsTuple?: []; params?: {} }
     'design_system': { paramsTuple?: []; params?: {} }
     'sitemap': { paramsTuple?: []; params?: {} }
@@ -418,6 +420,7 @@ export type ScannedRoutes = {
   }
   HEAD: {
     'event_stream': { paramsTuple?: []; params?: {} }
+    'health.show': { paramsTuple?: []; params?: {} }
     'dashboard': { paramsTuple?: []; params?: {} }
     'design_system': { paramsTuple?: []; params?: {} }
     'sitemap': { paramsTuple?: []; params?: {} }
