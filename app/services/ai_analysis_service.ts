@@ -6,11 +6,19 @@ import {
   buildFleetUserMessage,
   buildSystemPrompt,
 } from '#services/ai_prompt_service'
+import {
+  buildEngineDiagnosisSystemPrompt,
+  buildEngineDiagnosisUserMessage,
+  parseEngineDiagnosisResponse,
+} from '#services/engine_diagnosis_prompt_service'
 import type Organization from '#models/organization'
 import type {
   AiSuggestion,
   AiSuggestionLocale,
   BoatSuggestionsInput,
+  EngineDiagnosisInput,
+  EngineDiagnosisPanelData,
+  EngineDiagnosisResult,
   FleetAnalysisInput,
 } from '#shared/types/ai'
 import { inject } from '@adonisjs/core'
@@ -147,6 +155,88 @@ export default class AiAnalysisService {
       })
 
       return suggestions
+    })
+  }
+
+  /**
+   * Dernier diagnostic moteur (#516) prêt pour le panneau de la page
+   * checklist : résultat structuré + horodatage, ou `null` sans analyse dans
+   * la locale courante (cf. `getLatestFleetAnalysis` pour le filtre locale).
+   * Une ligne au JSON illisible est ignorée plutôt que de casser la page.
+   */
+  async getLatestEngineDiagnosis(
+    userId: number,
+    engineId: number,
+    orgId: number,
+    locale: AiSuggestionLocale
+  ): Promise<EngineDiagnosisPanelData | null> {
+    const analysis = await AiAnalysis.query()
+      .where('userId', userId)
+      .where('organizationId', orgId)
+      .where('kind', 'engine_diagnosis')
+      .where('boatEngineId', engineId)
+      .where('locale', locale)
+      .orderBy('createdAt', 'desc')
+      .first()
+    if (!analysis) return null
+
+    try {
+      return {
+        result: JSON.parse(analysis.responseText) as EngineDiagnosisResult,
+        createdAt: analysis.createdAt.toISO()!,
+      }
+    } catch {
+      return null
+    }
+  }
+
+  /**
+   * Diagnostic de panne moteur (#516). Contrairement aux suggestions, une
+   * réponse Mistral invalide lève `AiInvalidResponseError` (propagée au
+   * contrôleur) et rien n'est persisté.
+   */
+  async generateEngineDiagnosis(
+    userId: number,
+    boatId: number,
+    engineId: number,
+    org: Organization,
+    input: EngineDiagnosisInput,
+    locale: AiSuggestionLocale,
+    orgSystemPrompt?: string | null,
+    orgModelOverride?: string | null
+  ): Promise<EngineDiagnosisResult> {
+    return this.aiTokenQuotaService.withOrgLock(org.id, async () => {
+      const currentUsage = await this.aiTokenQuotaService.getUsage(org.id)
+      this.aiTokenQuotaService.assertCanUseTokens(org, currentUsage)
+
+      const userMessage = buildEngineDiagnosisUserMessage(input, locale)
+      const systemPrompt = buildEngineDiagnosisSystemPrompt(locale)
+      const systemContent = orgSystemPrompt ? `${orgSystemPrompt}\n\n${systemPrompt}` : systemPrompt
+
+      const { content: rawResponse, tokensUsed } = await this.aiService.chat(
+        [
+          { role: 'system', content: systemContent },
+          { role: 'user', content: userMessage },
+        ],
+        orgModelOverride
+      )
+
+      await this.aiTokenQuotaService.recordUsage(org, tokensUsed)
+
+      const result = parseEngineDiagnosisResponse(rawResponse)
+
+      await AiAnalysis.create({
+        userId,
+        organizationId: org.id,
+        boatId,
+        boatEngineId: engineId,
+        kind: 'engine_diagnosis',
+        locale,
+        responseText: JSON.stringify(result),
+        createdAt: DateTime.now(),
+      })
+
+      return result
     })
   }
 

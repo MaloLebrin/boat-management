@@ -14,5 +14,11 @@ router
         'boatSuggestions',
       ])
       .as('ai.boatSuggestions')
+    router
+      .post('ai/boats/:boatId/engines/:engineId/diagnosis', [
+        () => import('#controllers/ai_controller'),
+        'engineDiagnosis',
+      ])
+      .as('ai.engineDiagnosis')
   })
   .use([middleware.auth(), aiThrottle])

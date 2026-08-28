@@ -558,5 +558,19 @@
         "price": "~30 €"
       }
     }
+  },
+  "ai": {
+    "title": "Assistant IA — diagnostic de panne",
+    "disclaimer": "L'IA recommande, elle ne décide pas : ses conseils ne remplacent pas le manuel d'atelier de votre modèle de moteur.",
+    "empty": "Décrivez les symptômes de la panne, ou lancez une analyse de votre progression dans la checklist.",
+    "inputLabel": "Symptômes ou notes de diagnostic",
+    "placeholder": "Ex. : le moteur démarre puis cale après 30 secondes, la poire reste molle…",
+    "analyzeSymptoms": "Analyser les symptômes",
+    "analyzeProgress": "Analyser ma progression",
+    "analyzing": "Analyse en cours…",
+    "recommendedSheet": "Fiche recommandée",
+    "causesTitle": "Causes probables, de la moins chère à la plus chère",
+    "nextStepTitle": "Prochaine étape",
+    "generatedAt": "Générée le {date}"
   }
 }

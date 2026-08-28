@@ -1,4 +1,5 @@
 import type { AppLocale } from '#shared/helpers/locale_path'
+import type { DiagnosticSheetSlug } from '#shared/types/diagnostic'
 
 export const AI_MODEL_OVERRIDES = [
   'mistral-small-latest',
@@ -32,6 +33,63 @@ export type AiSuggestionLocale = AppLocale
 
 export interface AiSuggestion {
   text: string
+}
+
+/**
+ * Diagnostic de panne moteur assisté par IA (#516) — hors-bord 2 temps.
+ *
+ * Deux modes : `symptoms` (orientation initiale depuis une description en
+ * texte libre) et `progress` (relecture de la progression dans les checklists
+ * de #515 : étapes cochées + notes/résultats saisis).
+ */
+export const ENGINE_DIAGNOSIS_MODES = ['symptoms', 'progress'] as const
+export type EngineDiagnosisMode = (typeof ENGINE_DIAGNOSIS_MODES)[number]
+
+/** Réponse structurée attendue du modèle pour un diagnostic moteur. */
+export interface EngineDiagnosisResult {
+  /** Famille de panne probable / lecture de la progression. */
+  summary: string
+  /** Fiche recommandée — toujours une fiche existante de #515. */
+  recommendedSheet: DiagnosticSheetSlug
+  /** 2–3 causes probables, ordonnées de la moins chère à la plus chère. */
+  causes: string[]
+  /** Prochaine étape concrète à réaliser. */
+  nextStep: string
+}
+
+/** Diagnostic persisté renvoyé à la page checklist (résultat + horodatage). */
+export interface EngineDiagnosisPanelData {
+  result: EngineDiagnosisResult
+  createdAt: string
+}
+
+export interface EngineDiagnosisInput {
+  engine: {
+    brand: string | null
+    model: string | null
+    hours: number | null
+    strokeType: string | null
+  }
+  parts: Array<{
+    designation: string
+    wearState: string | null
+  }>
+  maintenanceEvents: Array<{
+    title: string
+    subject: string
+    performedAt: string
+  }>
+  checklist: {
+    /** Clés stables cochées (`<scope>.<slug>`) — cf. diagnostic_content.ts. */
+    checkedStepKeys: string[]
+    totalGlobalSteps: number
+  }
+  mode: EngineDiagnosisMode
+  /**
+   * Texte saisi par l'utilisateur : symptômes décrits (mode `symptoms`) ou
+   * notes/résultats relevés (mode `progress`, optionnel).
+   */
+  userText: string
 }
 
 export interface FleetAnalysisInput {

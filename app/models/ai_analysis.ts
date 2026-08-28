@@ -1,5 +1,6 @@
 import { AiAnalysisSchema } from '#database/schema'
 import Boat from '#models/boat'
+import BoatEngine from '#models/boat_engine'
 import Organization from '#models/organization'
 import User from '#models/user'
 import { belongsTo } from '@adonisjs/lucid/orm'
@@ -13,6 +14,9 @@ export default class AiAnalysis extends AiAnalysisSchema {
 
   @belongsTo(() => Boat)
   declare boat: BelongsTo<typeof Boat>
+
+  @belongsTo(() => BoatEngine, { foreignKey: 'boatEngineId' })
+  declare engine: BelongsTo<typeof BoatEngine>
 
   @belongsTo(() => Organization)
   declare organization: BelongsTo<typeof Organization>
