@@ -7,8 +7,13 @@ import Boat from '#models/boat'
 import BoatEngine from '#models/boat_engine'
 import BoatEngineDiagnosticCheck from '#models/boat_engine_diagnostic_check'
 import type User from '#models/user'
-import { ALL_DIAGNOSTIC_STEP_KEYS } from '#shared/constants/diagnostic/diagnostic_content'
+import BoatMaintenanceEvent from '#models/boat_maintenance_event'
+import {
+  ALL_DIAGNOSTIC_STEP_KEYS,
+  GLOBAL_CHECKLIST,
+} from '#shared/constants/diagnostic/diagnostic_content'
 import { isDiagnosticEligibleEngine } from '#shared/helpers/diagnostic'
+import type { EngineDiagnosisInput } from '#shared/types/ai'
 import type { DiagnosticEngineRow, DiagnosticResetScope } from '#shared/types/diagnostic'
 import { toDiagnosticEngineRow } from '#transformers/diagnostic_transformer'
 import { assertBoatInUserOrg } from '#utils/boat_utils'
@@ -91,6 +96,49 @@ export default class BoatEngineDiagnosticService {
       .select(['stepKey'])
 
     return checks.map((check) => check.stepKey)
+  }
+
+  /**
+   * Contexte moteur envoyé au diagnostic IA (#516) : fiche moteur, pièces,
+   * historique de maintenance filtré par moteur et progression des checklists.
+   * Le moteur est supposé déjà chargé et scopé via `getEligibleEngineOrFail`.
+   */
+  async getDiagnosisContext(
+    engine: BoatEngine
+  ): Promise<Pick<EngineDiagnosisInput, 'engine' | 'parts' | 'maintenanceEvents' | 'checklist'>> {
+    await engine.load('parts')
+
+    const maintenanceEvents = await BoatMaintenanceEvent.query()
+      .where('boatEngineId', engine.id)
+      .select(['id', 'title', 'subject', 'performedAt'])
+      .orderBy('performedAt', 'desc')
+      .limit(5)
+
+    const checks = await BoatEngineDiagnosticCheck.query()
+      .where('boatEngineId', engine.id)
+      .select(['stepKey'])
+
+    return {
+      engine: {
+        brand: engine.brand,
+        model: engine.model,
+        hours: engine.hours,
+        strokeType: engine.strokeType,
+      },
+      parts: engine.parts.map((part) => ({
+        designation: part.designation,
+        wearState: part.wearState,
+      })),
+      maintenanceEvents: maintenanceEvents.map((event) => ({
+        title: event.title,
+        subject: event.subject,
+        performedAt: event.performedAt.toISODate()!,
+      })),
+      checklist: {
+        checkedStepKeys: checks.map((check) => check.stepKey),
+        totalGlobalSteps: GLOBAL_CHECKLIST.steps.length,
+      },
+    }
   }
 
   async toggleStep(

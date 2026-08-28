@@ -4,10 +4,12 @@ import { computed } from 'vue'
 import BaseAlert from '~/components/base/BaseAlert.vue'
 import BaseBreadcrumb from '~/components/base/BaseBreadcrumb.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
+import DiagnosticAiPanel from '~/components/diagnostic/DiagnosticAiPanel.vue'
 import DiagnosticProgress from '~/components/diagnostic/DiagnosticProgress.vue'
 import DiagnosticResetButton from '~/components/diagnostic/DiagnosticResetButton.vue'
 import DiagnosticStepList from '~/components/diagnostic/DiagnosticStepList.vue'
 import { GLOBAL_CHECKLIST } from '#shared/constants/diagnostic/diagnostic_content'
+import type { EngineDiagnosisPanelData } from '#shared/types/ai'
 import { useT } from '~/composables/use_t'
 import { engineDisplayTitle } from '~/utils/boat_enum_labels'
 
@@ -16,6 +18,7 @@ const props = defineProps<{
   engine: { id: number; brand: string | null; model: string | null; kind: string; status: string }
   checkedStepKeys: string[]
   canManage: boolean
+  aiDiagnosis: EngineDiagnosisPanelData | null
 }>()
 
 const { t } = useT()
@@ -66,6 +69,10 @@ const breadcrumb = computed(() => [
     >
       {{ t(warningKey) }}
     </BaseAlert>
+
+    <div class="mt-6">
+      <DiagnosticAiPanel :boat-id="boat.id" :engine-id="engine.id" :ai-diagnosis="aiDiagnosis" />
+    </div>
 
     <div class="mt-6">
       <DiagnosticProgress :checked="checkedCount" :total="GLOBAL_CHECKLIST.steps.length" />

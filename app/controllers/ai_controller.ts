@@ -1,13 +1,19 @@
 import BoatPolicy from '#policies/boat_policy'
+import MaintenancePolicy from '#policies/maintenance_policy'
 import AiAnalysisService from '#services/ai_analysis_service'
 import AiQueueService from '#services/ai_queue_service'
+import BoatEngineDiagnosticService, {
+  BoatEquipmentNotFoundError,
+  EngineNotDiagnosticEligibleError,
+} from '#services/boat_engine_diagnostic_service'
 import BoatMaintenanceService from '#services/boat_maintenance_service'
 import BoatMaintenanceTaskService from '#services/boat_maintenance_task_service'
 import BoatService, { BoatNotFoundError } from '#services/boat_service'
 import DashboardService from '#services/dashboard_service'
 import QuotaService from '#services/quota_service'
+import { AiInvalidResponseError } from '#exceptions/ai_errors'
 import { QuotaExceededError } from '#exceptions/quota_errors'
-import { aiChatValidator } from '#validators/ai'
+import { aiChatValidator, engineDiagnosisValidator } from '#validators/ai'
 import { toAppLocale } from '#shared/helpers/locale_path'
 import { errors as bouncerErrors } from '@adonisjs/bouncer'
 import { inject } from '@adonisjs/core'
@@ -22,7 +28,8 @@ export default class AiController {
     private boatService: BoatService,
     private boatMaintenanceService: BoatMaintenanceService,
     private boatMaintenanceTaskService: BoatMaintenanceTaskService,
-    private quotaService: QuotaService
+    private quotaService: QuotaService,
+    private diagnosticService: BoatEngineDiagnosticService
   ) {}
 
   async chat({ request, response, auth, session, i18n }: HttpContext) {
@@ -175,5 +182,73 @@ export default class AiController {
     }
 
     return response.redirect(`/boats/${boatId}`)
+  }
+
+  /**
+   * Diagnostic de panne moteur assisté par IA (#516) — réplique le pattern
+   * `boatSuggestions` : quota plan → contexte moteur + checklists → service →
+   * flash + redirection Inertia (la page checklist recharge l'analyse).
+   */
+  async engineDiagnosis({ request, response, auth, params, bouncer, session, i18n }: HttpContext) {
+    await auth.authenticate()
+    const user = auth.getUserOrFail()
+
+    await user.load('organization')
+    try {
+      this.quotaService.assertCanUseAI(user.organization)
+    } catch (error) {
+      if (error instanceof QuotaExceededError) {
+        session.flash('error', i18n.t('flash.quota.aiExceeded'))
+        return response.redirect().back()
+      }
+      throw error
+    }
+
+    const payload = await request.validateUsing(engineDiagnosisValidator)
+
+    try {
+      const boat = await this.boatService.getForUserOrFail(user, Number(params.boatId))
+      await bouncer.with(MaintenancePolicy).authorize('view', boat)
+
+      const engine = await this.diagnosticService.getEligibleEngineOrFail(
+        user,
+        boat,
+        Number(params.engineId)
+      )
+      const context = await this.diagnosticService.getDiagnosisContext(engine)
+
+      await this.aiAnalysisService.generateEngineDiagnosis(
+        user.id,
+        boat.id,
+        engine.id,
+        user.organization,
+        {
+          ...context,
+          mode: payload.mode,
+          userText: (payload.mode === 'symptoms' ? payload.symptoms : payload.notes) ?? '',
+        },
+        toAppLocale(i18n.locale),
+        user.organization.aiSystemPrompt,
+        user.organization.aiModelOverride
+      )
+    } catch (error) {
+      if (error instanceof BoatNotFoundError) {
+        // no flash — boat not found is handled silently
+      } else if (error instanceof BoatEquipmentNotFoundError) {
+        session.flash('error', i18n.t('flash.engine.notFound'))
+      } else if (error instanceof EngineNotDiagnosticEligibleError) {
+        session.flash('error', i18n.t('flash.diagnostic.notEligible'))
+      } else if (error instanceof QuotaExceededError) {
+        session.flash('error', i18n.t('flash.quota.aiTokensExceeded'))
+      } else if (error instanceof AiInvalidResponseError) {
+        session.flash('error', i18n.t('flash.ai.diagnosisInvalidResponse'))
+      } else if (error instanceof bouncerErrors.E_AUTHORIZATION_FAILURE) {
+        throw error
+      } else {
+        session.flash('error', i18n.t('flash.ai.analysisError'))
+      }
+    }
+
+    return response.redirect().back()
   }
 }

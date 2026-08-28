@@ -558,5 +558,19 @@
         "price": "~€30"
       }
     }
+  },
+  "ai": {
+    "title": "AI assistant — troubleshooting",
+    "disclaimer": "The AI recommends, it does not decide: its advice does not replace your engine model's service manual.",
+    "empty": "Describe the failure symptoms, or run an analysis of your checklist progress.",
+    "inputLabel": "Symptoms or diagnostic notes",
+    "placeholder": "E.g.: the engine starts then stalls after 30 seconds, the primer bulb stays soft…",
+    "analyzeSymptoms": "Analyze symptoms",
+    "analyzeProgress": "Analyze my progress",
+    "analyzing": "Analyzing…",
+    "recommendedSheet": "Recommended sheet",
+    "causesTitle": "Probable causes, from cheapest to most expensive",
+    "nextStepTitle": "Next step",
+    "generatedAt": "Generated on {date}"
   }
 }

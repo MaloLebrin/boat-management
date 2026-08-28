@@ -140,16 +140,17 @@ Messages du formulaire de contact public (`POST /contact`, #450). Table autonome
 
 ### ai_analyses
 
-Résultats de génération de l'assistant IA : suggestions de flotte (dashboard) et suggestions par bateau. Une ligne par génération — l'UI n'affiche que la plus récente et l'historique sert d'archive.
+Résultats de génération de l'assistant IA : suggestions de flotte (dashboard), suggestions par bateau et diagnostic de panne moteur (#516). Une ligne par génération — l'UI n'affiche que la plus récente et l'historique sert d'archive.
 
 - `id`
 - `userId`, `organizationId` (nullable — l'org scope les lectures depuis #H-01)
 - `boatId` (nullable — `null` pour une analyse de flotte)
-- `kind` : `fleet_analysis | boat_suggestions`
+- `boatEngineId` (nullable, FK `boat_engines` cascade — renseigné pour un `engine_diagnosis`, #516)
+- `kind` : `fleet_analysis | boat_suggestions | engine_diagnosis`
 - `locale` (`fr` par défaut, #460) — langue dans laquelle les suggestions ont été rédigées. Le texte étant produit librement par le modèle, il est intraduisible après coup : les lectures filtrent dessus pour ne jamais servir des suggestions françaises à une UI anglaise (et inversement)
-- `responseText` (JSON sérialisé : `[{ "text": "…" }]`)
+- `responseText` (JSON sérialisé : `[{ "text": "…" }]` pour les suggestions ; objet `{ summary, recommendedSheet, causes[], nextStep }` pour un `engine_diagnosis`)
 - `createdAt`
-- index sur `(organization_id, kind)` et `(organization_id, kind, locale)`
+- index sur `(organization_id, kind)`, `(organization_id, kind, locale)` et `(boat_engine_id, kind, locale)`
 
 ## Relations (résumé)
 

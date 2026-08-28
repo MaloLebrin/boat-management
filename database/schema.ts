@@ -9,6 +9,7 @@ import { DateTime } from 'luxon'
 
 export class AiAnalysisSchema extends BaseModel {
   static $columns = [
+    'boatEngineId',
     'boatId',
     'createdAt',
     'id',
@@ -19,6 +20,8 @@ export class AiAnalysisSchema extends BaseModel {
     'userId',
   ] as const
   $columns = AiAnalysisSchema.$columns
+  @column()
+  declare boatEngineId: number | null
   @column()
   declare boatId: number | null
   @column.dateTime({ autoCreate: true })

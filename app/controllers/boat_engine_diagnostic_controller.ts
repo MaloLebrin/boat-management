@@ -1,10 +1,12 @@
 import MaintenancePolicy from '#policies/maintenance_policy'
+import AiAnalysisService from '#services/ai_analysis_service'
 import BoatEngineDiagnosticService, {
   BoatEquipmentNotFoundError,
   DiagnosticStepNotFoundError,
   EngineNotDiagnosticEligibleError,
 } from '#services/boat_engine_diagnostic_service'
 import BoatHullService, { BoatNotFoundError } from '#services/boat_hull_service'
+import { toAppLocale } from '#shared/helpers/locale_path'
 import { DIAGNOSTIC_SHEET_SLUGS, type DiagnosticSheetSlug } from '#shared/types/diagnostic'
 import {
   resetDiagnosticValidator,
@@ -17,7 +19,8 @@ import type { HttpContext } from '@adonisjs/core/http'
 export default class BoatEngineDiagnosticController {
   constructor(
     private boatService: BoatHullService,
-    private diagnosticService: BoatEngineDiagnosticService
+    private diagnosticService: BoatEngineDiagnosticService,
+    private aiAnalysisService: AiAnalysisService
   ) {}
 
   private async loadBoat(ctx: Pick<HttpContext, 'auth' | 'response' | 'params'>) {
@@ -75,6 +78,17 @@ export default class BoatEngineDiagnosticController {
       const checkedStepKeys = await this.diagnosticService.getCheckedStepKeys(user, boat, engineId)
       const canManage = await bouncer.with(MaintenancePolicy).allows('edit', boat)
 
+      // Dernier diagnostic IA (#516), relu dans la locale courante — pattern
+      // « générer → recharger la page » des panneaux IA existants.
+      const aiDiagnosis = user.organizationId
+        ? await this.aiAnalysisService.getLatestEngineDiagnosis(
+            user.id,
+            engine.id,
+            user.organizationId,
+            toAppLocale(i18n.locale)
+          )
+        : null
+
       return inertia.render('diagnostic/checklist', {
         boat: { id: boat.id, name: boat.name },
         engine: {
@@ -86,6 +100,7 @@ export default class BoatEngineDiagnosticController {
         },
         checkedStepKeys,
         canManage,
+        aiDiagnosis,
       })
     } catch (error) {
       if (error instanceof BoatEquipmentNotFoundError) {
