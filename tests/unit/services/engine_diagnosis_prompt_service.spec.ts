@@ -136,7 +136,7 @@ test.group('engine_diagnosis_prompt_service — parser (#516)', () => {
       assert.throws(
         () => parseEngineDiagnosisResponse(JSON.stringify(rest)),
         AiInvalidResponseError,
-        undefined,
+        /Engine diagnosis response/,
         `missing ${field} must throw`
       )
     }
