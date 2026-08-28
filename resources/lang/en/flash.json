@@ -328,5 +328,11 @@
   },
   "push": {
     "subscriptionNotFound": "This device is no longer registered."
+  },
+  "spareParts": {
+    "notEligible": "Part identification only applies to outboard engines.",
+    "assemblyNotFound": "Part assembly not found.",
+    "partNotFound": "Unknown catalog part.",
+    "cartItemNotFound": "Repair list item not found."
   }
 }

@@ -1140,6 +1140,48 @@ const routes = {
     tokens: [{"old":"/boats/:boatId/engines/:engineId/diagnostic/checks","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/engines/:engineId/diagnostic/checks","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/engines/:engineId/diagnostic/checks","type":0,"val":"engines","end":""},{"old":"/boats/:boatId/engines/:engineId/diagnostic/checks","type":1,"val":"engineId","end":""},{"old":"/boats/:boatId/engines/:engineId/diagnostic/checks","type":0,"val":"diagnostic","end":""},{"old":"/boats/:boatId/engines/:engineId/diagnostic/checks","type":0,"val":"checks","end":""}],
     types: placeholder as Registry['diagnostic.reset']['types'],
   },
+  'spareParts.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/spare-parts',
+    tokens: [{"old":"/spare-parts","type":0,"val":"spare-parts","end":""}],
+    types: placeholder as Registry['spareParts.index']['types'],
+  },
+  'spareParts.identify': {
+    methods: ["GET","HEAD"],
+    pattern: '/boats/:boatId/engines/:engineId/spare-parts',
+    tokens: [{"old":"/boats/:boatId/engines/:engineId/spare-parts","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/engines/:engineId/spare-parts","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/engines/:engineId/spare-parts","type":0,"val":"engines","end":""},{"old":"/boats/:boatId/engines/:engineId/spare-parts","type":1,"val":"engineId","end":""},{"old":"/boats/:boatId/engines/:engineId/spare-parts","type":0,"val":"spare-parts","end":""}],
+    types: placeholder as Registry['spareParts.identify']['types'],
+  },
+  'spareParts.assembly': {
+    methods: ["GET","HEAD"],
+    pattern: '/boats/:boatId/engines/:engineId/spare-parts/assemblies/:assemblySlug',
+    tokens: [{"old":"/boats/:boatId/engines/:engineId/spare-parts/assemblies/:assemblySlug","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/engines/:engineId/spare-parts/assemblies/:assemblySlug","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/engines/:engineId/spare-parts/assemblies/:assemblySlug","type":0,"val":"engines","end":""},{"old":"/boats/:boatId/engines/:engineId/spare-parts/assemblies/:assemblySlug","type":1,"val":"engineId","end":""},{"old":"/boats/:boatId/engines/:engineId/spare-parts/assemblies/:assemblySlug","type":0,"val":"spare-parts","end":""},{"old":"/boats/:boatId/engines/:engineId/spare-parts/assemblies/:assemblySlug","type":0,"val":"assemblies","end":""},{"old":"/boats/:boatId/engines/:engineId/spare-parts/assemblies/:assemblySlug","type":1,"val":"assemblySlug","end":""}],
+    types: placeholder as Registry['spareParts.assembly']['types'],
+  },
+  'spareParts.cart.add': {
+    methods: ["POST"],
+    pattern: '/boats/:boatId/engines/:engineId/spare-parts/cart',
+    tokens: [{"old":"/boats/:boatId/engines/:engineId/spare-parts/cart","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/engines/:engineId/spare-parts/cart","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/engines/:engineId/spare-parts/cart","type":0,"val":"engines","end":""},{"old":"/boats/:boatId/engines/:engineId/spare-parts/cart","type":1,"val":"engineId","end":""},{"old":"/boats/:boatId/engines/:engineId/spare-parts/cart","type":0,"val":"spare-parts","end":""},{"old":"/boats/:boatId/engines/:engineId/spare-parts/cart","type":0,"val":"cart","end":""}],
+    types: placeholder as Registry['spareParts.cart.add']['types'],
+  },
+  'spareParts.cart.update': {
+    methods: ["PATCH"],
+    pattern: '/boats/:boatId/engines/:engineId/spare-parts/cart/:itemId',
+    tokens: [{"old":"/boats/:boatId/engines/:engineId/spare-parts/cart/:itemId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/engines/:engineId/spare-parts/cart/:itemId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/engines/:engineId/spare-parts/cart/:itemId","type":0,"val":"engines","end":""},{"old":"/boats/:boatId/engines/:engineId/spare-parts/cart/:itemId","type":1,"val":"engineId","end":""},{"old":"/boats/:boatId/engines/:engineId/spare-parts/cart/:itemId","type":0,"val":"spare-parts","end":""},{"old":"/boats/:boatId/engines/:engineId/spare-parts/cart/:itemId","type":0,"val":"cart","end":""},{"old":"/boats/:boatId/engines/:engineId/spare-parts/cart/:itemId","type":1,"val":"itemId","end":""}],
+    types: placeholder as Registry['spareParts.cart.update']['types'],
+  },
+  'spareParts.cart.remove': {
+    methods: ["DELETE"],
+    pattern: '/boats/:boatId/engines/:engineId/spare-parts/cart/:itemId',
+    tokens: [{"old":"/boats/:boatId/engines/:engineId/spare-parts/cart/:itemId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/engines/:engineId/spare-parts/cart/:itemId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/engines/:engineId/spare-parts/cart/:itemId","type":0,"val":"engines","end":""},{"old":"/boats/:boatId/engines/:engineId/spare-parts/cart/:itemId","type":1,"val":"engineId","end":""},{"old":"/boats/:boatId/engines/:engineId/spare-parts/cart/:itemId","type":0,"val":"spare-parts","end":""},{"old":"/boats/:boatId/engines/:engineId/spare-parts/cart/:itemId","type":0,"val":"cart","end":""},{"old":"/boats/:boatId/engines/:engineId/spare-parts/cart/:itemId","type":1,"val":"itemId","end":""}],
+    types: placeholder as Registry['spareParts.cart.remove']['types'],
+  },
+  'spareParts.cart.export': {
+    methods: ["GET","HEAD"],
+    pattern: '/boats/:boatId/engines/:engineId/spare-parts/cart/export',
+    tokens: [{"old":"/boats/:boatId/engines/:engineId/spare-parts/cart/export","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/engines/:engineId/spare-parts/cart/export","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/engines/:engineId/spare-parts/cart/export","type":0,"val":"engines","end":""},{"old":"/boats/:boatId/engines/:engineId/spare-parts/cart/export","type":1,"val":"engineId","end":""},{"old":"/boats/:boatId/engines/:engineId/spare-parts/cart/export","type":0,"val":"spare-parts","end":""},{"old":"/boats/:boatId/engines/:engineId/spare-parts/cart/export","type":0,"val":"cart","end":""},{"old":"/boats/:boatId/engines/:engineId/spare-parts/cart/export","type":0,"val":"export","end":""}],
+    types: placeholder as Registry['spareParts.cart.export']['types'],
+  },
   'organization.members.index': {
     methods: ["GET","HEAD"],
     pattern: '/organization/members',
@@ -1535,6 +1577,12 @@ const routes = {
     pattern: '/ai/boats/:id/suggestions',
     tokens: [{"old":"/ai/boats/:id/suggestions","type":0,"val":"ai","end":""},{"old":"/ai/boats/:id/suggestions","type":0,"val":"boats","end":""},{"old":"/ai/boats/:id/suggestions","type":1,"val":"id","end":""},{"old":"/ai/boats/:id/suggestions","type":0,"val":"suggestions","end":""}],
     types: placeholder as Registry['ai.boatSuggestions']['types'],
+  },
+  'ai.engineDiagnosis': {
+    methods: ["POST"],
+    pattern: '/ai/boats/:boatId/engines/:engineId/diagnosis',
+    tokens: [{"old":"/ai/boats/:boatId/engines/:engineId/diagnosis","type":0,"val":"ai","end":""},{"old":"/ai/boats/:boatId/engines/:engineId/diagnosis","type":0,"val":"boats","end":""},{"old":"/ai/boats/:boatId/engines/:engineId/diagnosis","type":1,"val":"boatId","end":""},{"old":"/ai/boats/:boatId/engines/:engineId/diagnosis","type":0,"val":"engines","end":""},{"old":"/ai/boats/:boatId/engines/:engineId/diagnosis","type":1,"val":"engineId","end":""},{"old":"/ai/boats/:boatId/engines/:engineId/diagnosis","type":0,"val":"diagnosis","end":""}],
+    types: placeholder as Registry['ai.engineDiagnosis']['types'],
   },
   'home': {
     methods: ["GET","HEAD"],

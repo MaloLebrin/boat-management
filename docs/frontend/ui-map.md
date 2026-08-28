@@ -104,6 +104,22 @@ Les cartes de l'onglet Équipement exposent un lien « voir le détail » vers c
 - Types frontend: `inertia/types/budget.ts`
 - Source backend: `BudgetController.show`
 
+### Pièces détachées (#517)
+
+- Pages (GET `/spare-parts`, `/boats/:boatId/engines/:engineId/spare-parts[/assemblies/:assemblySlug]`):
+  - `inertia/pages/spare_parts/index.vue` — parcours en 4 étapes + moteurs hors-bord éligibles (taille du panier)
+  - `inertia/pages/spare_parts/identify.vue` — étape 1 (identité moteur, plaque, avertissement n° de série), grille d'ensembles, pièces sans référence, liste de réparation
+  - `inertia/pages/spare_parts/assembly.vue` — liens vues éclatées revendeurs, décodage référence Yamaha, pièces courantes (nom FR + intitulé catalogue EN), liste de réparation
+- Composants `inertia/components/spare_parts/`:
+  - `SparePartsIdentitySection.vue` — carte identité moteur + aides plaque par marque
+  - `SparePartsAssemblyGrid.vue` — 9 ensembles fonctionnels (label FR + intitulé catalogue EN)
+  - `SparePartsPartList.vue` / `SparePartsUnreferencedList.vue` — fiches pièces avec ajout au panier
+  - `SparePartsRetailerLinks.vue` — ancres externes `target="_blank"` vers Partzilla / Boats.net / Crowley Marine (eslint-disable motivé)
+  - `SparePartsCartPanel.vue` — quantités, référence relevée, suppression, export CSV (`external-href`)
+- Contenu statique: `shared/constants/spare_parts/spare_parts_content.ts` (clés i18n `parts.*`, intitulés catalogue EN littéraux)
+- Liens croisés: fiche de diagnostic → ensemble (`diagnostic/sheet.vue`), onglet Pièces moteur → CTA « Identifier une pièce », sidebar `nav.spareParts`
+- Source backend: `BoatEngineSparePartsController`
+
 ### Onglets scrollables (#495)
 
 `BaseTabs.vue` est scrollable horizontalement avec `snap-x`/`snap-start`, et affiche des
