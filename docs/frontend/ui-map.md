@@ -184,6 +184,7 @@ visibilité change (`hidden lg:block` sur le panneau inactif).
 ## Layout authentifié — navigation & notifications
 
 - Layout `inertia/layouts/default.vue` : sidebar desktop `AsideMenu.vue` (`hidden lg:flex`) + barre header mobile (`lg:hidden`, hamburger). Sections de nav construites par `use_nav_sections.ts`.
+- **Bottom tab bar mobile** (#492) : `MobileBottomNav.vue` (`lg:hidden`), montée dans le flux du shell **hors du `<main>` scrollable** — jamais en `fixed`, donc aucun contenu recouvert — avec `pb-[env(safe-area-inset-bottom)]` pour l'indicateur home iOS (#484). 4 raccourcis max par rôle via `bottomNavItems` (`use_nav_sections.ts`, mêmes capabilities que la nav complète) : `mechanic` → Dashboard/Planning/Historique/Bateaux ; `admin`/`member` → Dashboard/Bateaux/Planning/Réservations ; `boat_owner` → barre masquée. Le drawer `MobileSidebarDrawer.vue` reste la navigation exhaustive — les deux coexistent.
 - Cloche de notifications : `NotificationBell.vue`, montée **dans la sidebar** (`AsideMenu.vue`, à côté du logo, `align="left"`) **et dans le header mobile** (`default.vue`, à côté du hamburger). Props `align` (`left`/`right`, sens d'ouverture du panneau) et `tone` (`default`/`onDark`, contraste sur fond navy).
   - Badge de non-lus + panneau déroulant `NotificationPanel.vue` (5 dernières notifs, lien « Voir toutes » → `/notifications`). État temps réel via `use_notifications.ts` (singleton + abonnement Transmit `notifications/:userId`).
   - Page complète : `inertia/pages/notifications/index.vue`.
