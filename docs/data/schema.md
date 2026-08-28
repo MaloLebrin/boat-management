@@ -152,11 +152,24 @@ Résultats de génération de l'assistant IA : suggestions de flotte (dashboard)
 - `createdAt`
 - index sur `(organization_id, kind)`, `(organization_id, kind, locale)` et `(boat_engine_id, kind, locale)`
 
+### boat_engine_repair_cart_items
+
+Liste de réparation du parcours « identification des pièces détachées » (#517) : les pièces repérées sur les vues éclatées s'accumulent par moteur, avec la référence relevée par l'utilisateur, puis s'exportent en CSV.
+
+- `id`
+- `boatEngineId` (FK `boat_engines` cascade)
+- `partKey` (string 64) — clé stable d'une pièce du catalogue statique (`shared/constants/spare_parts/spare_parts_content.ts`, `<ensemble>.<slug>` ou `unreferenced.<slug>`), jamais renommée
+- `quantity` (défaut 1 — un ré-ajout de la même pièce incrémente, plafond 99)
+- `reference` (nullable — référence constructeur relevée sur la vue éclatée)
+- `createdAt`, `updatedAt`
+- unique `(boat_engine_id, part_key)`, index sur `boat_engine_id`
+
 ## Relations (résumé)
 
 - `Organization 1..n User` via `users.organizationId`
 - `Organization 1..n Boat` via `boats.organizationId`
 - `Boat 1..n BoatEngine/BoatSail/BoatMaintenanceEvent/BoatMaintenanceTask`
+- `BoatEngine 1..n BoatEngineRepairCartItem` via `boat_engine_repair_cart_items.boatEngineId` (#517)
 - `Boat 0..1 BoatRig`
 - `BoatMaintenanceEvent 1..n BoatMaintenancePart`
 - `Boat 1..n BoatPortStay`
