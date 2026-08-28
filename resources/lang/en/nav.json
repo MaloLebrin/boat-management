@@ -26,5 +26,6 @@
     "activity": "ACTIVITY",
     "maintenance": "MAINTENANCE",
     "business": "MANAGEMENT"
-  }
+  },
+  "spareParts": "Spare parts"
 }

@@ -2275,6 +2275,90 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_engine_diagnostic_controller').default['reset']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'spareParts.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/spare-parts'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_engine_spare_parts_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_engine_spare_parts_controller').default['index']>>>
+    }
+  }
+  'spareParts.identify': {
+    methods: ["GET","HEAD"]
+    pattern: '/boats/:boatId/engines/:engineId/spare-parts'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; engineId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_engine_spare_parts_controller').default['identify']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_engine_spare_parts_controller').default['identify']>>>
+    }
+  }
+  'spareParts.assembly': {
+    methods: ["GET","HEAD"]
+    pattern: '/boats/:boatId/engines/:engineId/spare-parts/assemblies/:assemblySlug'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue, ParamValue]
+      params: { boatId: ParamValue; engineId: ParamValue; assemblySlug: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_engine_spare_parts_controller').default['assembly']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_engine_spare_parts_controller').default['assembly']>>>
+    }
+  }
+  'spareParts.cart.add': {
+    methods: ["POST"]
+    pattern: '/boats/:boatId/engines/:engineId/spare-parts/cart'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/spare_parts').addRepairCartItemValidator)>>
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; engineId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/spare_parts').addRepairCartItemValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_engine_spare_parts_controller').default['addCartItem']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_engine_spare_parts_controller').default['addCartItem']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'spareParts.cart.update': {
+    methods: ["PATCH"]
+    pattern: '/boats/:boatId/engines/:engineId/spare-parts/cart/:itemId'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/spare_parts').updateRepairCartItemValidator)>>
+      paramsTuple: [ParamValue, ParamValue, ParamValue]
+      params: { boatId: ParamValue; engineId: ParamValue; itemId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/spare_parts').updateRepairCartItemValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_engine_spare_parts_controller').default['updateCartItem']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_engine_spare_parts_controller').default['updateCartItem']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'spareParts.cart.remove': {
+    methods: ["DELETE"]
+    pattern: '/boats/:boatId/engines/:engineId/spare-parts/cart/:itemId'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue, ParamValue]
+      params: { boatId: ParamValue; engineId: ParamValue; itemId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_engine_spare_parts_controller').default['removeCartItem']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_engine_spare_parts_controller').default['removeCartItem']>>>
+    }
+  }
+  'spareParts.cart.export': {
+    methods: ["GET","HEAD"]
+    pattern: '/boats/:boatId/engines/:engineId/spare-parts/cart/export'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; engineId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_engine_spare_parts_controller').default['exportCart']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_engine_spare_parts_controller').default['exportCart']>>>
+    }
+  }
   'organization.members.index': {
     methods: ["GET","HEAD"]
     pattern: '/organization/members'
@@ -3065,6 +3149,18 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/ai_controller').default['boatSuggestions']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/ai_controller').default['boatSuggestions']>>>
+    }
+  }
+  'ai.engineDiagnosis': {
+    methods: ["POST"]
+    pattern: '/ai/boats/:boatId/engines/:engineId/diagnosis'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/ai').engineDiagnosisValidator)>>
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; engineId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/ai').engineDiagnosisValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/ai_controller').default['engineDiagnosis']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/ai_controller').default['engineDiagnosis']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'home': {

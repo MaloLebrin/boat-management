@@ -1,0 +1,359 @@
+{
+  "index": {
+    "title": "Spare parts",
+    "subtitle": "Holding a part without knowing its name or how to order it? Start from your engine: you never search for a part by name — you spot it visually on an exploded view. The name and the reference are the result of the search, not its starting point.",
+    "stepsTitle": "The 4-step path",
+    "steps": {
+      "identify": "Identify the engine: brand, model code and serial number from the identification plate.",
+      "assembly": "Pick the functional assembly: carburetor, ignition, lower unit…",
+      "sheet": "Spot the part on the catalog's exploded view and note its reference.",
+      "order": "Add it to your repair list and order from a dealer."
+    },
+    "enginesTitle": "Your engines",
+    "empty": "No outboard engine registered",
+    "eligibilityHint": "Part identification relies on the outboard engines registered on your boats. Add an outboard engine from a boat's page to get started.",
+    "openCatalog": "Identify a part",
+    "cartCount": "{count} part(s) in the repair list"
+  },
+  "common": {
+    "catalogNameLabel": "Catalog name",
+    "addToCart": "Add to list",
+    "inCart": "In the list",
+    "sourceNote": "References and indicative prices observed on dealer catalogs (Partzilla, Boats.net, Crowley Marine) — always double-check on your engine's exploded view before ordering.",
+    "backToIdentify": "Back to assemblies"
+  },
+  "identify": {
+    "title": "Identify a part",
+    "intro": "Everything starts from the engine's exact identity: the same assembly exists in dozens of variants depending on the model code and year.",
+    "engineCard": {
+      "title": "Step 1 — Identify the engine",
+      "brand": "Brand",
+      "model": "Model code",
+      "serial": "Serial number",
+      "missing": "Not provided",
+      "missingHint": "Fill in the engine's record with the identification plate details: they are required to open the right catalog.",
+      "editEngine": "Complete the engine record"
+    },
+    "serialWarning": {
+      "title": "The serial number tells variants apart",
+      "text": "The same model code sometimes spans several decades of production. In the catalog, the serial number is what tells the variants apart: note it from the plate before ordering."
+    },
+    "plate": {
+      "title": "Where is the identification plate?",
+      "intro": "The plate carries the brand, the model code and the serial number. Its location depends on the brand:",
+      "yamaha": {
+        "location": "On the clamp bracket (the stirrup that grips the transom), sometimes under the cowling.",
+        "example": "Example: “6E0” is the model code (4/5 hp), “500552” the serial number."
+      },
+      "johnson_evinrude": {
+        "location": "On the transom side of the clamp bracket or under the cowling, depending on the year.",
+        "example": "Example: the code “J50PLEA” decodes as a 1999 Johnson 50 hp — Crowley Marine's decoding tool does the translation."
+      },
+      "mercury_mariner": {
+        "location": "On the clamp bracket or on the block, under the cowling; the serial number is the catalog's entry key."
+      }
+    },
+    "assemblies": {
+      "title": "Step 2 — Pick the functional assembly",
+      "intro": "Browse by assembly, not by part name: each assembly matches an exploded view in the catalog, with its official English heading."
+    }
+  },
+  "assembly": {
+    "explodedTitle": "Step 3 — Open the exploded view",
+    "explodedIntro": "Exploded views belong to the dealers' catalogs: open your brand's catalog, enter the model code and look for the “{catalogLabel}” assembly. Parts carry a clickable callout number that reveals the official name and the reference.",
+    "modelCodeHint": "Model code to enter: {model}",
+    "modelCodeMissing": "First fill in the model code on the engine's record.",
+    "opensNewTab": "(new tab)",
+    "decode": {
+      "title": "Decoding a Yamaha reference",
+      "text": "A Yamaha reference like “{example}” reads as three blocks: the first is the model code, the 5 middle digits ({code}) identify the part's function regardless of the engine, the last one the variant.",
+      "searchHint": "Type the full reference as-is into a search engine: it surfaces every seller and the aftermarket equivalents."
+    },
+    "partsTitle": "Common parts in this assembly",
+    "partsIntro": "French name and English catalog name side by side: the English one is what you will find on the exploded view.",
+    "priceLabel": "Indicative price: {price}",
+    "yamahaFunctionCode": "Yamaha function code: {code}",
+    "diagnosticLink": "Related diagnostic sheet: {title}"
+  },
+  "unreferenced": {
+    "title": "Step 4 — Parts without a manufacturer reference",
+    "intro": "These parts are not ordered by reference: no point searching for a number that doesn't exist. They are bought by dimension or by equivalence.",
+    "items": {
+      "fuel_hose": {
+        "label": "Fuel hose",
+        "advice": "Bought by dimension (inner diameter), black automotive hose only — never clear hose, which hardens and leaks."
+      },
+      "clamps_orings": {
+        "label": "Clamps, O-rings, stainless fasteners",
+        "advice": "Standard hardware: note the diameter and thread, buy A4 stainless for the marine environment."
+      },
+      "spark_plug": {
+        "label": "Spark plug",
+        "advice": "Bought by NGK or Champion equivalence (the reference is etched on the fitted plug), not by manufacturer reference."
+      },
+      "shear_pin": {
+        "label": "Shear pin",
+        "advice": "Note the diameter and length of the fitted pin; always keep a spare one aboard."
+      },
+      "consumables": {
+        "label": "Consumables",
+        "advice": "Carburetor cleaner, penetrating oil, marine grease: generic products from the chandlery or automotive aisle."
+      }
+    }
+  },
+  "cart": {
+    "title": "Repair list",
+    "intro": "Identified parts pile up here; note the reference from the exploded view, then export the list to order.",
+    "empty": "No part in the list for this engine.",
+    "quantityLabel": "Quantity",
+    "referenceLabel": "Noted reference",
+    "referencePlaceholder": "e.g. 6E0-14301-00",
+    "remove": "Remove",
+    "exportCta": "Export as CSV",
+    "export": {
+      "headers": {
+        "assembly": "Assembly",
+        "part": "Part",
+        "catalogName": "Catalog name (EN)",
+        "reference": "Reference",
+        "quantity": "Quantity"
+      }
+    }
+  },
+  "crossLinks": {
+    "fromDiagnostic": "Identify the parts of this assembly: {label}"
+  },
+  "tabCta": {
+    "title": "Don't know a part's name?",
+    "text": "Start from the engine's model code and spot the part on the catalog's exploded view: the guided path takes you all the way to an orderable reference.",
+    "cta": "Identify a part"
+  },
+  "assemblies": {
+    "carburetor": {
+      "label": "Carburetor",
+      "description": "Float chamber, jets, needle valve, float: the most frequently disassembled unit on an outboard — most fuel-delivery failures are solved here.",
+      "parts": {
+        "repair_kit": {
+          "label": "Carburetor repair kit",
+          "detail": "Bundles genuine gaskets, needle valve and jets: usually cheaper than individual parts for a full rebuild.",
+          "price": "≈ €20–60"
+        },
+        "float_chamber_gasket": {
+          "label": "Float chamber gasket",
+          "kit": "Included in the carburetor repair kit — usually a better deal than the part alone.",
+          "price": "≈ €5–15"
+        },
+        "needle_valve": {
+          "label": "Needle valve",
+          "kit": "Included in the carburetor repair kit — usually a better deal than the part alone.",
+          "price": "≈ €10–25"
+        },
+        "main_jet": {
+          "label": "Main jet",
+          "detail": "The size is etched on it: replace like for like, never ream out a clogged jet.",
+          "price": "≈ €8–20"
+        },
+        "pilot_jet": {
+          "label": "Pilot jet",
+          "price": "≈ €8–20"
+        },
+        "float": {
+          "label": "Float",
+          "detail": "A fuel-soaked cork float floods the chamber: replace it with the current plastic model.",
+          "price": "≈ €15–35"
+        },
+        "pilot_screw": {
+          "label": "Pilot screw",
+          "price": "≈ €10–25"
+        }
+      }
+    },
+    "fuel_system": {
+      "label": "Fuel tank and fuel system",
+      "description": "From tank to carburetor: tank, primer bulb, hoses, filter and fuel pump.",
+      "parts": {
+        "fuel_pump_kit": {
+          "label": "Fuel pump diaphragm kit",
+          "detail": "Diaphragms and check valves of the mechanical pump: a porous diaphragm is a classic fuel-delivery failure.",
+          "price": "≈ €15–40"
+        },
+        "fuel_pump_diaphragm": {
+          "label": "Fuel pump diaphragm",
+          "kit": "Included in the fuel pump kit — usually a better deal than the part alone.",
+          "price": "≈ €10–20"
+        },
+        "fuel_filter": {
+          "label": "Fuel filter",
+          "price": "≈ €10–30"
+        },
+        "primer_bulb": {
+          "label": "Primer bulb",
+          "detail": "A bulb that never firms up when pumping points to an air leak or a tired check valve.",
+          "price": "≈ €15–35"
+        },
+        "fuel_connector": {
+          "label": "Tank connector",
+          "price": "≈ €10–30"
+        }
+      }
+    },
+    "ignition": {
+      "label": "Ignition and electrical",
+      "description": "Coils, sensors and the CDI unit: everything that produces and distributes the spark.",
+      "parts": {
+        "cdi_unit": {
+          "label": "CDI unit",
+          "detail": "An expensive part that can't be resold untested: rule out coils and the stop switch before blaming it.",
+          "price": "≈ €150–400"
+        },
+        "ignition_coil": {
+          "label": "Ignition coil",
+          "price": "≈ €40–120"
+        },
+        "charge_coil": {
+          "label": "Charge coil",
+          "price": "≈ €40–100"
+        },
+        "pulser_coil": {
+          "label": "Pulser coil",
+          "price": "≈ €30–90"
+        },
+        "stop_switch": {
+          "label": "Stop switch",
+          "detail": "A shorted stop switch kills all spark: it's the first check, and the cheapest.",
+          "price": "≈ €15–40"
+        }
+      }
+    },
+    "power_unit": {
+      "label": "Power unit",
+      "description": "Cylinder head, pistons, rings and gaskets: the block's internal parts.",
+      "parts": {
+        "head_gasket": {
+          "label": "Cylinder head gasket",
+          "detail": "Replace it every time the head comes off — a reused gasket leaks.",
+          "price": "≈ €20–60"
+        },
+        "piston_ring_set": {
+          "label": "Piston ring set",
+          "price": "≈ €30–80"
+        },
+        "gasket_kit": {
+          "label": "Power head gasket kit",
+          "detail": "Every block gasket in one kit: the right call whenever the engine opens up.",
+          "price": "≈ €50–150"
+        },
+        "thermostat": {
+          "label": "Thermostat",
+          "price": "≈ €20–50"
+        },
+        "anode": {
+          "label": "Internal anode",
+          "detail": "Sacrificial anode of the cooling circuit: check it at every winterizing.",
+          "price": "≈ €10–30"
+        }
+      }
+    },
+    "recoil_starter": {
+      "label": "Recoil starter",
+      "description": "Rope, spiral spring and pawls of the pull starter.",
+      "parts": {
+        "starter_rope": {
+          "label": "Starter rope",
+          "detail": "Also sold by the meter, by dimension; replace it at the first cut strand, before it snaps at sea.",
+          "price": "≈ €5–15"
+        },
+        "spiral_spring": {
+          "label": "Spiral spring",
+          "price": "≈ €15–40"
+        },
+        "drive_pawl": {
+          "label": "Drive pawl",
+          "price": "≈ €10–25"
+        },
+        "starter_handle": {
+          "label": "Starter handle",
+          "price": "≈ €8–20"
+        }
+      }
+    },
+    "lower_unit": {
+      "label": "Lower unit and water pump",
+      "description": "Gear housing, water pump, shaft seals: the submerged part of the engine.",
+      "parts": {
+        "impeller": {
+          "label": "Water pump impeller",
+          "detail": "The number-one wear part: replace it every 2 seasons or as soon as the tell-tale weakens.",
+          "price": "≈ €15–40"
+        },
+        "water_pump_kit": {
+          "label": "Water pump kit",
+          "detail": "Impeller, housing, gaskets and key: prefer the full kit over the impeller alone if the pump housing is scored.",
+          "price": "≈ €30–80"
+        },
+        "gearcase_seal_kit": {
+          "label": "Gearcase seal kit",
+          "price": "≈ €25–60"
+        },
+        "drain_screw_gasket": {
+          "label": "Drain screw gasket",
+          "detail": "Replace it at every gearcase oil change: it's what keeps the water out.",
+          "price": "≈ €2–5"
+        }
+      }
+    },
+    "propeller": {
+      "label": "Propeller",
+      "description": "Propeller and its mounting hardware.",
+      "parts": {
+        "propeller": {
+          "label": "Propeller",
+          "detail": "Diameter and pitch are etched on the hub; a slipping rubber hub (spun hub) can't be seen with the naked eye.",
+          "price": "≈ €60–250"
+        },
+        "propeller_nut": {
+          "label": "Propeller nut",
+          "price": "≈ €5–15"
+        },
+        "thrust_washer": {
+          "label": "Thrust washer",
+          "price": "≈ €5–15"
+        }
+      }
+    },
+    "cowling": {
+      "label": "Cowling",
+      "description": "Top cowling, bottom cowling, latches and seals.",
+      "parts": {
+        "cowling_hook": {
+          "label": "Cowling latch",
+          "price": "≈ €15–40"
+        },
+        "cowling_seal": {
+          "label": "Cowling seal",
+          "detail": "A tired cowling seal lets spray onto the ignition.",
+          "price": "≈ €15–40"
+        }
+      }
+    },
+    "bracket": {
+      "label": "Clamp bracket, tilt",
+      "description": "Transom clamp bracket, tilt pins and external anodes.",
+      "parts": {
+        "clamp_screw": {
+          "label": "Clamp screw",
+          "price": "≈ €10–30"
+        },
+        "tilt_pin": {
+          "label": "Tilt pin",
+          "price": "≈ €10–30"
+        },
+        "anode": {
+          "label": "Bracket anode",
+          "detail": "External sacrificial anode: replace it once half eaten away.",
+          "price": "≈ €10–30"
+        }
+      }
+    }
+  }
+}

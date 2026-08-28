@@ -27,6 +27,7 @@ import type PortTransformer from '#transformers/port_transformer'
 import type PushSubscriptionTransformer from '#transformers/push_subscription_transformer'
 import type RentalContractTransformer from '#transformers/rental_contract_transformer'
 import type SimulatorTransformer from '#transformers/simulator_transformer'
+import type SparePartsTransformer from '#transformers/spare_parts_transformer'
 import type SpotTransformer from '#transformers/spot_transformer'
 import type SubscriptionTransformer from '#transformers/subscription_transformer'
 import type UserTransformer from '#transformers/user_transformer'
@@ -116,6 +117,10 @@ export namespace Data {
   export type Simulator = InferData<SimulatorTransformer>
   export namespace Simulator {
     export type Variants = InferVariants<SimulatorTransformer>
+  }
+  export type SpareParts = InferData<SparePartsTransformer>
+  export namespace SpareParts {
+    export type Variants = InferVariants<SparePartsTransformer>
   }
   export type Spot = InferData<SpotTransformer>
   export namespace Spot {

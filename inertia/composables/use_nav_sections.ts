@@ -61,7 +61,8 @@ export function useNavSections() {
       maintenanceItems.push(
         { name: t('nav.planning'), path: '/planning', route: null, icon: 'calendar' },
         { name: t('nav.history'), path: '/maintenance/history', route: null, icon: 'clock' },
-        { name: t('nav.diagnostic'), path: '/diagnostic', route: null, icon: 'alert-triangle' }
+        { name: t('nav.diagnostic'), path: '/diagnostic', route: null, icon: 'alert-triangle' },
+        { name: t('nav.spareParts'), path: '/spare-parts', route: null, icon: 'gear' }
       )
     }
 

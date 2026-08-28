@@ -12,6 +12,8 @@ const props = defineProps<{
   boatId: number
   engineId: number
   canManage: boolean
+  /** Moteur hors-bord : affiche le parcours d'identification de pièces (#517). */
+  sparePartsEligible?: boolean
 }>()
 
 const { t } = useT()
@@ -113,6 +115,19 @@ function wearStateVariant(state: string): 'success' | 'info' | 'warning' | 'neut
           </tr>
         </tbody>
       </table>
+    </div>
+
+    <div v-if="sparePartsEligible" class="rounded-lg border border-border bg-surface-muted/30 p-4">
+      <h3 class="font-semibold text-fg">{{ t('parts.tabCta.title') }}</h3>
+      <p class="mt-1 text-sm text-fg-muted">{{ t('parts.tabCta.text') }}</p>
+      <BaseButton
+        variant="secondary"
+        size="sm"
+        class="mt-3"
+        :href="`/boats/${boatId}/engines/${engineId}/spare-parts`"
+      >
+        {{ t('parts.tabCta.cta') }}
+      </BaseButton>
     </div>
 
     <EnginePartModal

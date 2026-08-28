@@ -333,6 +333,7 @@ function formatYear(iso: string): string {
           :boat-id="boat.id"
           :engine-id="engine.id"
           :can-manage="canManage"
+          :spare-parts-eligible="engine.kind === 'outboard'"
         />
         <EngineShowTabPhotos
           v-else-if="tab === 'photos'"

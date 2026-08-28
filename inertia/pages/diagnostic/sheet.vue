@@ -7,6 +7,10 @@ import BaseHeading from '~/components/base/BaseHeading.vue'
 import DiagnosticResetButton from '~/components/diagnostic/DiagnosticResetButton.vue'
 import DiagnosticSheetContent from '~/components/diagnostic/DiagnosticSheetContent.vue'
 import { DIAGNOSTIC_SHEETS } from '#shared/constants/diagnostic/diagnostic_content'
+import {
+  DIAGNOSTIC_SHEET_TO_ASSEMBLY,
+  SPARE_PART_ASSEMBLIES,
+} from '#shared/constants/spare_parts/spare_parts_content'
 import type { DiagnosticSheetSlug } from '#shared/types/diagnostic'
 import { useT } from '~/composables/use_t'
 import { engineDisplayTitle } from '~/utils/boat_enum_labels'
@@ -32,6 +36,21 @@ const breadcrumb = computed(() => [
   { label: t('diagnostic.global.title'), href: checklistHref.value },
   { label: t(sheet.value.titleKey) },
 ])
+
+/**
+ * Lien croisé vers l'ensemble de pièces détachées concerné (#517) — les
+ * moteurs éligibles au diagnostic (hors-bord 2 temps) le sont toujours à
+ * l'identification de pièces (hors-bord).
+ */
+const partsAssemblyLink = computed(() => {
+  const assemblySlug = DIAGNOSTIC_SHEET_TO_ASSEMBLY[props.sheetSlug]
+  if (!assemblySlug) return null
+  const assembly = SPARE_PART_ASSEMBLIES[assemblySlug]
+  return {
+    href: `/boats/${props.boat.id}/engines/${props.engine.id}/spare-parts/assemblies/${assemblySlug}`,
+    label: `${t(assembly.labelKey)} (${assembly.catalogLabel})`,
+  }
+})
 </script>
 
 <template>
@@ -65,9 +84,14 @@ const breadcrumb = computed(() => [
     </div>
 
     <Link
-      :href="checklistHref"
-      class="mt-8 inline-block text-sm font-medium text-brand hover:underline"
+      v-if="partsAssemblyLink"
+      :href="partsAssemblyLink.href"
+      class="mt-6 inline-block text-sm font-medium text-brand hover:underline"
     >
+      {{ t('parts.crossLinks.fromDiagnostic', { label: partsAssemblyLink.label }) }}
+    </Link>
+
+    <Link :href="checklistHref" class="mt-8 block text-sm font-medium text-brand hover:underline">
       {{ t('diagnostic.common.backToChecklist') }}
     </Link>
   </div>

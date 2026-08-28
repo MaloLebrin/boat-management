@@ -1,0 +1,359 @@
+{
+  "index": {
+    "title": "Pièces détachées",
+    "subtitle": "Vous avez une pièce en main sans savoir comment elle s'appelle ni comment la commander ? Partez de votre moteur : on ne cherche jamais une pièce par son nom, on la repère visuellement sur une vue éclatée — le nom et la référence sont le résultat de la recherche, pas son point de départ.",
+    "stepsTitle": "Le parcours en 4 étapes",
+    "steps": {
+      "identify": "Identifiez le moteur : marque, code modèle et numéro de série de la plaque signalétique.",
+      "assembly": "Choisissez l'ensemble fonctionnel : carburateur, allumage, embase…",
+      "sheet": "Repérez la pièce sur la vue éclatée du catalogue et relevez sa référence.",
+      "order": "Ajoutez-la à votre liste de réparation et commandez chez un revendeur."
+    },
+    "enginesTitle": "Vos moteurs",
+    "empty": "Aucun moteur hors-bord enregistré",
+    "eligibilityHint": "L'identification de pièces s'appuie sur les moteurs hors-bord enregistrés sur vos bateaux. Ajoutez un moteur hors-bord depuis la fiche d'un bateau pour commencer.",
+    "openCatalog": "Identifier une pièce",
+    "cartCount": "{count} pièce(s) dans la liste de réparation"
+  },
+  "common": {
+    "catalogNameLabel": "Intitulé catalogue",
+    "addToCart": "Ajouter à la liste",
+    "inCart": "Dans la liste",
+    "sourceNote": "Références et prix indicatifs relevés sur les catalogues revendeurs (Partzilla, Boats.net, Crowley Marine) — vérifiez toujours sur la vue éclatée de votre moteur avant de commander.",
+    "backToIdentify": "Retour aux ensembles"
+  },
+  "identify": {
+    "title": "Identifier une pièce",
+    "intro": "Tout part de l'identité exacte du moteur : un même ensemble existe en dizaines de variantes selon le code modèle et l'année.",
+    "engineCard": {
+      "title": "Étape 1 — Identifiez le moteur",
+      "brand": "Marque",
+      "model": "Code modèle",
+      "serial": "Numéro de série",
+      "missing": "Non renseigné",
+      "missingHint": "Complétez la fiche du moteur avec les informations de la plaque signalétique : elles sont indispensables pour ouvrir le bon catalogue.",
+      "editEngine": "Compléter la fiche moteur"
+    },
+    "serialWarning": {
+      "title": "Le numéro de série départage les variantes",
+      "text": "Un même code modèle couvre parfois plusieurs décennies de production. Dans le catalogue, c'est le numéro de série qui départage les variantes : relevez-le sur la plaque avant de commander."
+    },
+    "plate": {
+      "title": "Où trouver la plaque signalétique ?",
+      "intro": "La plaque porte la marque, le code modèle et le numéro de série. Son emplacement dépend de la marque :",
+      "yamaha": {
+        "location": "Sur le support de bridage (l'étrier qui serre le tableau arrière), parfois sous le capot.",
+        "example": "Exemple : « 6E0 » est le code modèle (4/5 ch), « 500552 » le numéro de série."
+      },
+      "johnson_evinrude": {
+        "location": "Sur le tableau arrière du support de bridage ou sous le capot, selon les années.",
+        "example": "Exemple : le code « J50PLEA » se décode en Johnson 50 ch de 1999 — l'outil de décodage de Crowley Marine fait la traduction."
+      },
+      "mercury_mariner": {
+        "location": "Sur le support de bridage ou sur le bloc, sous le capot ; le numéro de série est la clé d'entrée du catalogue."
+      }
+    },
+    "assemblies": {
+      "title": "Étape 2 — Choisissez l'ensemble fonctionnel",
+      "intro": "Naviguez par ensemble, pas par nom de pièce : chaque ensemble correspond à une vue éclatée du catalogue, avec son intitulé anglais officiel."
+    }
+  },
+  "assembly": {
+    "explodedTitle": "Étape 3 — Ouvrez la vue éclatée",
+    "explodedIntro": "Les vues éclatées appartiennent aux catalogues des revendeurs : ouvrez le catalogue de votre marque, saisissez le code modèle et cherchez l'ensemble « {catalogLabel} ». Les pièces y portent un numéro de repère cliquable qui donne le nom officiel et la référence.",
+    "modelCodeHint": "Code modèle à saisir : {model}",
+    "modelCodeMissing": "Renseignez d'abord le code modèle sur la fiche du moteur.",
+    "opensNewTab": "(nouvel onglet)",
+    "decode": {
+      "title": "Décoder une référence Yamaha",
+      "text": "Une référence Yamaha comme « {example} » se lit en trois blocs : le premier est le code modèle, les 5 chiffres centraux ({code}) identifient la fonction de la pièce indépendamment du moteur, le dernier la variante.",
+      "searchHint": "Tapez la référence complète telle quelle dans un moteur de recherche : elle fait ressortir tous les vendeurs et les équivalents aftermarket."
+    },
+    "partsTitle": "Pièces courantes de cet ensemble",
+    "partsIntro": "Nom français et intitulé catalogue anglais côte à côte : c'est l'intitulé anglais que vous retrouverez sur la vue éclatée.",
+    "priceLabel": "Prix indicatif : {price}",
+    "yamahaFunctionCode": "Code fonction Yamaha : {code}",
+    "diagnosticLink": "Fiche de diagnostic liée : {title}"
+  },
+  "unreferenced": {
+    "title": "Étape 4 — Pièces sans référence constructeur",
+    "intro": "Ces pièces ne se commandent pas par référence : inutile de chercher un numéro qui n'existe pas. Elles s'achètent par dimension ou par équivalence.",
+    "items": {
+      "fuel_hose": {
+        "label": "Durite d'essence",
+        "advice": "S'achète à la dimension (diamètre intérieur), en durite noire automobile uniquement — jamais de durite transparente, qui durcit et fuit."
+      },
+      "clamps_orings": {
+        "label": "Colliers, joints toriques, visserie inox",
+        "advice": "Quincaillerie standard : relevez le diamètre et le pas, achetez en inox A4 pour le milieu marin."
+      },
+      "spark_plug": {
+        "label": "Bougie",
+        "advice": "S'achète par équivalence NGK ou Champion (référence gravée sur la bougie en place), pas par référence constructeur."
+      },
+      "shear_pin": {
+        "label": "Goupille de cisaillement",
+        "advice": "Relevez le diamètre et la longueur de la goupille en place ; gardez-en toujours une de rechange à bord."
+      },
+      "consumables": {
+        "label": "Consommables",
+        "advice": "Nettoyant carburateur, dégrippant, graisse marine : produits génériques de rayon accastillage ou auto."
+      }
+    }
+  },
+  "cart": {
+    "title": "Liste de réparation",
+    "intro": "Les pièces identifiées s'accumulent ici ; notez la référence relevée sur la vue éclatée, puis exportez la liste pour commander.",
+    "empty": "Aucune pièce dans la liste pour ce moteur.",
+    "quantityLabel": "Quantité",
+    "referenceLabel": "Référence relevée",
+    "referencePlaceholder": "ex. 6E0-14301-00",
+    "remove": "Retirer",
+    "exportCta": "Exporter en CSV",
+    "export": {
+      "headers": {
+        "assembly": "Ensemble",
+        "part": "Pièce",
+        "catalogName": "Intitulé catalogue (EN)",
+        "reference": "Référence",
+        "quantity": "Quantité"
+      }
+    }
+  },
+  "crossLinks": {
+    "fromDiagnostic": "Identifier les pièces de cet ensemble : {label}"
+  },
+  "tabCta": {
+    "title": "Vous ne connaissez pas le nom d'une pièce ?",
+    "text": "Partez du code modèle du moteur et repérez la pièce sur la vue éclatée du catalogue : le parcours guidé vous mène jusqu'à une référence commandable.",
+    "cta": "Identifier une pièce"
+  },
+  "assemblies": {
+    "carburetor": {
+      "label": "Carburateur",
+      "description": "Cuve, gicleurs, pointeau, flotteur : l'ensemble le plus démonté d'un hors-bord — la plupart des pannes d'alimentation se règlent ici.",
+      "parts": {
+        "repair_kit": {
+          "label": "Kit de réfection carburateur",
+          "detail": "Regroupe joints, pointeau et gicleurs d'origine : souvent plus rentable que les pièces à l'unité pour une réfection complète.",
+          "price": "≈ 20–60 €"
+        },
+        "float_chamber_gasket": {
+          "label": "Joint de cuve",
+          "kit": "Incluse dans le kit de réfection carburateur — souvent plus rentable que la pièce seule.",
+          "price": "≈ 5–15 €"
+        },
+        "needle_valve": {
+          "label": "Pointeau",
+          "kit": "Inclus dans le kit de réfection carburateur — souvent plus rentable que la pièce seule.",
+          "price": "≈ 10–25 €"
+        },
+        "main_jet": {
+          "label": "Gicleur principal",
+          "detail": "Le calibre est gravé dessus : remplacez à l'identique, ne réalésez jamais un gicleur bouché.",
+          "price": "≈ 8–20 €"
+        },
+        "pilot_jet": {
+          "label": "Gicleur de ralenti",
+          "price": "≈ 8–20 €"
+        },
+        "float": {
+          "label": "Flotteur",
+          "detail": "Un flotteur en liège gorgé d'essence fait déborder la cuve : remplacez-le par le modèle actuel en plastique.",
+          "price": "≈ 15–35 €"
+        },
+        "pilot_screw": {
+          "label": "Vis de richesse",
+          "price": "≈ 10–25 €"
+        }
+      }
+    },
+    "fuel_system": {
+      "label": "Réservoir et circuit essence",
+      "description": "Du réservoir au carburateur : réservoir, poire d'amorçage, durites, filtre et pompe à essence.",
+      "parts": {
+        "fuel_pump_kit": {
+          "label": "Kit membranes de pompe à essence",
+          "detail": "Membranes et clapets de la pompe mécanique : une membrane poreuse est une cause classique de panne d'alimentation.",
+          "price": "≈ 15–40 €"
+        },
+        "fuel_pump_diaphragm": {
+          "label": "Membrane de pompe à essence",
+          "kit": "Incluse dans le kit membranes de pompe — souvent plus rentable que la pièce seule.",
+          "price": "≈ 10–20 €"
+        },
+        "fuel_filter": {
+          "label": "Filtre à essence",
+          "price": "≈ 10–30 €"
+        },
+        "primer_bulb": {
+          "label": "Poire d'amorçage",
+          "detail": "Une poire qui ne durcit pas au pompage signe une fuite d'air ou un clapet fatigué.",
+          "price": "≈ 15–35 €"
+        },
+        "fuel_connector": {
+          "label": "Raccord de réservoir",
+          "price": "≈ 10–30 €"
+        }
+      }
+    },
+    "ignition": {
+      "label": "Allumage et électricité",
+      "description": "Bobines, capteurs et boîtier CDI : tout ce qui produit et distribue l'étincelle.",
+      "parts": {
+        "cdi_unit": {
+          "label": "Boîtier CDI",
+          "detail": "Pièce chère et invendable d'occasion sans test : éliminez d'abord bobines et coupe-circuit avant de l'incriminer.",
+          "price": "≈ 150–400 €"
+        },
+        "ignition_coil": {
+          "label": "Bobine d'allumage",
+          "price": "≈ 40–120 €"
+        },
+        "charge_coil": {
+          "label": "Bobine de charge",
+          "price": "≈ 40–100 €"
+        },
+        "pulser_coil": {
+          "label": "Capteur d'impulsions",
+          "price": "≈ 30–90 €"
+        },
+        "stop_switch": {
+          "label": "Coupe-circuit",
+          "detail": "Un coupe-circuit en court-circuit supprime toute étincelle : c'est la première vérification, et la moins chère.",
+          "price": "≈ 15–40 €"
+        }
+      }
+    },
+    "power_unit": {
+      "label": "Bloc moteur",
+      "description": "Culasse, pistons, segments et joints : les pièces internes du bloc.",
+      "parts": {
+        "head_gasket": {
+          "label": "Joint de culasse",
+          "detail": "À remplacer systématiquement après dépose de la culasse — un joint réutilisé fuit.",
+          "price": "≈ 20–60 €"
+        },
+        "piston_ring_set": {
+          "label": "Jeu de segments",
+          "price": "≈ 30–80 €"
+        },
+        "gasket_kit": {
+          "label": "Pochette de joints moteur",
+          "detail": "Tous les joints du bloc en une pochette : la bonne option dès que le moteur s'ouvre.",
+          "price": "≈ 50–150 €"
+        },
+        "thermostat": {
+          "label": "Thermostat",
+          "price": "≈ 20–50 €"
+        },
+        "anode": {
+          "label": "Anode interne",
+          "detail": "Anode sacrificielle du circuit de refroidissement : à contrôler à chaque hivernage.",
+          "price": "≈ 10–30 €"
+        }
+      }
+    },
+    "recoil_starter": {
+      "label": "Lanceur manuel",
+      "description": "Corde, ressort spiral et cliquets du lanceur à tirette.",
+      "parts": {
+        "starter_rope": {
+          "label": "Corde de lanceur",
+          "detail": "S'achète aussi au mètre à la dimension ; remplacez-la au premier toron coupé, avant qu'elle ne casse en mer.",
+          "price": "≈ 5–15 €"
+        },
+        "spiral_spring": {
+          "label": "Ressort spiral",
+          "price": "≈ 15–40 €"
+        },
+        "drive_pawl": {
+          "label": "Cliquet d'entraînement",
+          "price": "≈ 10–25 €"
+        },
+        "starter_handle": {
+          "label": "Poignée de lanceur",
+          "price": "≈ 8–20 €"
+        }
+      }
+    },
+    "lower_unit": {
+      "label": "Embase et pompe à eau",
+      "description": "Carter d'embase, pompe à eau, joints d'arbre : la partie immergée du moteur.",
+      "parts": {
+        "impeller": {
+          "label": "Turbine de pompe à eau",
+          "detail": "La pièce d'usure numéro un : à remplacer toutes les 2 saisons ou dès que le témoin d'eau faiblit.",
+          "price": "≈ 15–40 €"
+        },
+        "water_pump_kit": {
+          "label": "Kit pompe à eau",
+          "detail": "Turbine, corps, joints et clavette : préférez le kit complet à la turbine seule si le corps de pompe est marqué.",
+          "price": "≈ 30–80 €"
+        },
+        "gearcase_seal_kit": {
+          "label": "Kit joints d'embase",
+          "price": "≈ 25–60 €"
+        },
+        "drain_screw_gasket": {
+          "label": "Joint de vis de vidange",
+          "detail": "À remplacer à chaque vidange d'embase : c'est lui qui garde l'eau dehors.",
+          "price": "≈ 2–5 €"
+        }
+      }
+    },
+    "propeller": {
+      "label": "Hélice",
+      "description": "Hélice et sa visserie de fixation.",
+      "parts": {
+        "propeller": {
+          "label": "Hélice",
+          "detail": "Diamètre et pas sont gravés sur le moyeu ; un moyeu caoutchouc qui patine (spun hub) ne se voit pas à l'œil nu.",
+          "price": "≈ 60–250 €"
+        },
+        "propeller_nut": {
+          "label": "Écrou d'hélice",
+          "price": "≈ 5–15 €"
+        },
+        "thrust_washer": {
+          "label": "Rondelle de butée",
+          "price": "≈ 5–15 €"
+        }
+      }
+    },
+    "cowling": {
+      "label": "Capot et carénage",
+      "description": "Capot supérieur, carénage inférieur, verrous et joints d'étanchéité.",
+      "parts": {
+        "cowling_hook": {
+          "label": "Verrou de capot",
+          "price": "≈ 15–40 €"
+        },
+        "cowling_seal": {
+          "label": "Joint de capot",
+          "detail": "Un joint de capot fatigué laisse entrer les embruns sur l'allumage.",
+          "price": "≈ 15–40 €"
+        }
+      }
+    },
+    "bracket": {
+      "label": "Support de bridage, relevage",
+      "description": "Étrier de fixation au tableau, axes de relevage et anodes externes.",
+      "parts": {
+        "clamp_screw": {
+          "label": "Vis de bridage",
+          "price": "≈ 10–30 €"
+        },
+        "tilt_pin": {
+          "label": "Axe de relevage",
+          "price": "≈ 10–30 €"
+        },
+        "anode": {
+          "label": "Anode de support",
+          "detail": "Anode sacrificielle externe : à remplacer dès qu'elle est rongée à moitié.",
+          "price": "≈ 10–30 €"
+        }
+      }
+    }
+  }
+}

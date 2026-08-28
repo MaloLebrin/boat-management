@@ -11,6 +11,7 @@ export const controllers = {
   BoatDocuments: () => import('#controllers/boat_documents_controller'),
   BoatEngineDiagnostic: () => import('#controllers/boat_engine_diagnostic_controller'),
   BoatEngineParts: () => import('#controllers/boat_engine_parts_controller'),
+  BoatEngineSpareParts: () => import('#controllers/boat_engine_spare_parts_controller'),
   BoatEquipmentActions: () => import('#controllers/boat_equipment_actions_controller'),
   BoatEquipment: () => import('#controllers/boat_equipment_controller'),
   BoatEquipmentMedia: () => import('#controllers/boat_equipment_media_controller'),

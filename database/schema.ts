@@ -233,6 +233,33 @@ export class BoatEnginePartSchema extends BaseModel {
   declare wearState: string | null
 }
 
+export class BoatEngineRepairCartItemSchema extends BaseModel {
+  static $columns = [
+    'boatEngineId',
+    'createdAt',
+    'id',
+    'partKey',
+    'quantity',
+    'reference',
+    'updatedAt',
+  ] as const
+  $columns = BoatEngineRepairCartItemSchema.$columns
+  @column()
+  declare boatEngineId: number
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare partKey: string
+  @column()
+  declare quantity: number
+  @column()
+  declare reference: string | null
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
+}
+
 export class BoatEngineSchema extends BaseModel {
   static $columns = [
     'boatId',
@@ -1472,30 +1499,6 @@ export class NavigationLogCrewSchema extends BaseModel {
   declare navigationLogId: number
   @column()
   declare role: string
-}
-
-export class NavigationLogEntrySchema extends BaseModel {
-  static $columns = [
-    'createdAt',
-    'id',
-    'navigationLogId',
-    'note',
-    'recordedAt',
-    'updatedAt',
-  ] as const
-  $columns = NavigationLogEntrySchema.$columns
-  @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime
-  @column({ isPrimary: true })
-  declare id: number
-  @column()
-  declare navigationLogId: number
-  @column()
-  declare note: string
-  @column.dateTime()
-  declare recordedAt: DateTime
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updatedAt: DateTime | null
 }
 
 export class NavigationLogSchema extends BaseModel {

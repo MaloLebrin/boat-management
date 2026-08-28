@@ -328,6 +328,17 @@ export interface ApiDefinition {
     }
     reset: typeof routes['diagnostic.reset']
   }
+  spareParts: {
+    index: typeof routes['spareParts.index']
+    identify: typeof routes['spareParts.identify']
+    assembly: typeof routes['spareParts.assembly']
+    cart: {
+      add: typeof routes['spareParts.cart.add']
+      update: typeof routes['spareParts.cart.update']
+      remove: typeof routes['spareParts.cart.remove']
+      export: typeof routes['spareParts.cart.export']
+    }
+  }
   organization: {
     members: {
       index: typeof routes['organization.members.index']
@@ -437,6 +448,7 @@ export interface ApiDefinition {
     chat: typeof routes['ai.chat']
     fleetAnalysis: typeof routes['ai.fleetAnalysis']
     boatSuggestions: typeof routes['ai.boatSuggestions']
+    engineDiagnosis: typeof routes['ai.engineDiagnosis']
   }
   home: typeof routes['home']
   marketing: {
