@@ -15,6 +15,7 @@ import type {
   BoatListSort,
   BoatSerializedRow,
 } from '#shared/types/boat'
+import { BOAT_CATEGORIES, type BoatCategory } from '#shared/types/boat_catalog'
 import type User from '#models/user'
 import { inject } from '@adonisjs/core'
 
@@ -29,7 +30,10 @@ export default class BoatListService {
 
   normalizeQuery(raw: Record<string, unknown>): Required<BoatListQuery> {
     const q = toTrimmedStringOrUndefined(raw.q) ?? ''
-    const type = toTrimmedStringOrUndefined(raw.type) ?? ''
+    // Vocabulaire fermé (#571) : une valeur hors enum est ignorée plutôt que
+    // transmise telle quelle à la requête.
+    const rawCategory = toTrimmedStringOrUndefined(raw.category) ?? ''
+    const category = (BOAT_CATEGORIES as readonly string[]).includes(rawCategory) ? rawCategory : ''
     const propulsionType = toTrimmedStringOrUndefined(raw.propulsionType) ?? ''
 
     const hasEngine = toBooleanFlag(raw.hasEngine)
@@ -46,7 +50,18 @@ export default class BoatListService {
     const page = clampInt(toIntegerOrUndefined(raw.page) ?? 1, 1, 10_000)
     const perPage = clampInt(toIntegerOrUndefined(raw.perPage) ?? 20, 5, 100)
 
-    return { q, type, propulsionType, hasEngine, hasSails, hasRig, sort, direction, page, perPage }
+    return {
+      q,
+      category,
+      propulsionType,
+      hasEngine,
+      hasSails,
+      hasRig,
+      sort,
+      direction,
+      page,
+      perPage,
+    }
   }
 
   async listNamesForOrg(user: User): Promise<{ id: number; name: string }[]> {
@@ -73,7 +88,7 @@ export default class BoatListService {
 
     const query = Boat.query()
       .where('organizationId', user.organizationId)
-      .select(['id', 'name', 'registrationNumber', 'type', 'propulsionType', 'updatedAt'])
+      .select(['id', 'name', 'registrationNumber', 'category', 'propulsionType', 'updatedAt'])
 
     if (filters.q) {
       const needle = `%${escapeLike(filters.q)}%`
@@ -82,7 +97,7 @@ export default class BoatListService {
       })
     }
 
-    if (filters.type) query.where('type', filters.type)
+    if (filters.category) query.where('category', filters.category)
     if (filters.propulsionType) query.where('propulsionType', filters.propulsionType)
 
     // Filtres de présence d'équipement (cartes du tableau de bord) : on cible
@@ -111,7 +126,7 @@ export default class BoatListService {
           id: b.id,
           name: b.name,
           registrationNumber: b.registrationNumber ?? null,
-          type: b.type ?? null,
+          category: (b.category as BoatCategory | null) ?? null,
           propulsionType: b.propulsionType ?? null,
           updatedAt: b.updatedAt ?? null,
           maintenance: badges.get(Number(b.id)) ?? {

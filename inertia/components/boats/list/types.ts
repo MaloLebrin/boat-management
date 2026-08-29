@@ -3,7 +3,7 @@ export type BoatListDirection = 'asc' | 'desc'
 
 export type BoatListFilters = {
   q?: string
-  type?: string
+  category?: string
   propulsionType?: string
   sort: BoatListSort
   direction: BoatListDirection
@@ -28,7 +28,7 @@ export type BoatListItem = {
   id: number
   name: string
   registrationNumber: string | null
-  type: string | null
+  category: string | null
   propulsionType: string | null
   updatedAt: string | null
   maintenance: BoatMaintenanceBadge

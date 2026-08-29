@@ -1,4 +1,5 @@
 import type { DateTime } from 'luxon'
+import type { BoatCategory } from '#shared/types/boat_catalog'
 
 export type BoatPositionSource = 'manual' | 'ais' | 'gps'
 
@@ -10,7 +11,9 @@ export type BoatPositionPayload = {
 export type BoatHullPayload = {
   name: string
   registrationNumber?: string | null
+  /** Champ texte libre historique — conservé en base, plus alimenté par l'UI (#571). */
   type?: string | null
+  category?: BoatCategory | null
 
   manufacturedAt?: Date | string | DateTime | null
   propulsionType?: string | null
@@ -129,7 +132,7 @@ export type BoatSerializedRow = {
   id: number | string
   name: string
   registrationNumber: string | null
-  type: string | null
+  category: string | null
   propulsionType: string | null
   updatedAt: string | null
 }
@@ -139,7 +142,7 @@ export type BoatListDirection = 'asc' | 'desc'
 
 export type BoatListQuery = {
   q?: string
-  type?: string
+  category?: string
   propulsionType?: string
   hasEngine?: boolean
   hasSails?: boolean
@@ -154,7 +157,7 @@ export type BoatListItem = {
   id: number
   name: string
   registrationNumber: string | null
-  type: string | null
+  category: BoatCategory | null
   propulsionType: string | null
   updatedAt: string | null
   maintenance: {

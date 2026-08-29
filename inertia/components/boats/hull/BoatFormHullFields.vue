@@ -4,11 +4,13 @@ import BaseInput from '~/components/base/BaseInput.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import BoatFormAisFields from '~/components/boats/hull/BoatFormAisFields.vue'
 import BoatFormDimensionsFields from '~/components/boats/hull/BoatFormDimensionsFields.vue'
+import BoatFormIdentityFields from '~/components/boats/hull/BoatFormIdentityFields.vue'
 import BoatFormLegalFields from '~/components/boats/hull/BoatFormLegalFields.vue'
 import BoatFormPositionFields from '~/components/boats/hull/BoatFormPositionFields.vue'
 import { useBoatOptions } from '~/composables/use_boat_options'
 import { useT } from '~/composables/use_t'
 import type { BoatEditPayload, PortForForm, PropulsionTypeUi } from '~/types/boat_form'
+import type { BoatBrandOption, BoatModelOption } from '../../../../shared/types/boat_catalog'
 
 const propulsionType = defineModel<PropulsionTypeUi>('propulsionType', { required: true })
 
@@ -18,14 +20,17 @@ const props = defineProps<{
   showMastHeight: boolean
   errors: Record<string, string | string[] | undefined>
   ports?: PortForForm[]
+  brands?: BoatBrandOption[]
+  catalogModels?: BoatModelOption[]
+  catalogBrandId?: number | null
 }>()
 
 const { t } = useT()
-const { propulsionOptions, hullMaterialOptions, navigationCategoryOptions } = useBoatOptions()
+const { propulsionOptions, hullMaterialOptions } = useBoatOptions()
 
 const name = ref('')
 const registrationNumber = ref('')
-const type = ref('')
+const category = ref('')
 const manufacturedAt = ref('')
 const lengthM = ref('')
 const beamM = ref('')
@@ -57,7 +62,7 @@ function syncFromBoat() {
   const b = props.boat
   name.value = b.name ?? ''
   registrationNumber.value = b.registrationNumber ?? ''
-  type.value = b.type ?? ''
+  category.value = b.category ?? ''
   manufacturedAt.value = b.manufacturedAt ? b.manufacturedAt.slice(0, 10) : ''
   lengthM.value = toStr(b.lengthM)
   beamM.value = toStr(b.beamM)
@@ -121,12 +126,14 @@ watch(
       v-model="registrationNumber"
       :errors="errors"
     />
-    <BaseInput
-      id="type"
-      name="type"
-      :label="t('boats.hullFields.type')"
-      v-model="type"
+    <BoatFormIdentityFields
+      v-model:category="category"
+      v-model:manufacturer="manufacturer"
+      v-model:model="model"
       :errors="errors"
+      :brands="brands"
+      :catalog-models="catalogModels"
+      :catalog-brand-id="catalogBrandId"
     />
     <BaseSelect
       id="propulsionType"
@@ -174,20 +181,6 @@ watch(
         type="number"
         inputmode="numeric"
         v-model="yearBuilt"
-        :errors="errors"
-      />
-      <BaseInput
-        id="manufacturer"
-        name="manufacturer"
-        :label="t('boats.hullFields.manufacturer')"
-        v-model="manufacturer"
-        :errors="errors"
-      />
-      <BaseInput
-        id="model"
-        name="model"
-        :label="t('boats.hullFields.model')"
-        v-model="model"
         :errors="errors"
       />
     </div>

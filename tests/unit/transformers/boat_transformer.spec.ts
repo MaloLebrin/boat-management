@@ -102,6 +102,7 @@ function makeBoat(overrides: Partial<Boat> = {}): Boat {
     name: 'Liberté',
     registrationNumber: 'FR1234',
     type: 'voilier',
+    category: 'sailboat_monohull',
     propulsionType: 'sail',
     lengthM: 12,
     beamM: 4,
@@ -312,7 +313,7 @@ test.group('toEditForm', () => {
     assert.equal(result.id, 1)
     assert.equal(result.name, 'Liberté')
     assert.equal(result.registrationNumber, 'FR1234')
-    assert.equal(result.type, 'voilier')
+    assert.equal(result.category, 'sailboat_monohull')
     assert.equal(result.propulsionType, 'sail')
     assert.equal(result.lengthM, 12)
     assert.equal(result.beamM, 4)

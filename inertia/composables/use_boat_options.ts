@@ -1,5 +1,6 @@
 import { computed } from 'vue'
 import {
+  BOAT_CATEGORY_OPTIONS,
   ENGINE_FUEL_OPTIONS,
   ENGINE_KIND_OPTIONS,
   ENGINE_STROKE_TYPE_OPTIONS,
@@ -16,6 +17,13 @@ import { useT } from './use_t'
 
 export function useBoatOptions() {
   const { t } = useT()
+
+  const categoryOptions = computed(() =>
+    BOAT_CATEGORY_OPTIONS.map((o) => ({
+      value: o.value,
+      label: t(`boats.options.category.${o.value}`),
+    }))
+  )
 
   const propulsionOptions = computed(() =>
     PROPULSION_OPTIONS.map((o) => ({
@@ -92,6 +100,7 @@ export function useBoatOptions() {
   )
 
   return {
+    categoryOptions,
     propulsionOptions,
     hullMaterialOptions,
     engineKindOptions,

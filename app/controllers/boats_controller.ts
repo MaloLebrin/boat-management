@@ -4,6 +4,7 @@ import { deferJson } from '#utils/inertia_defer'
 import { QuotaExceededError } from '#exceptions/quota_errors'
 import AiAnalysisService from '#services/ai_analysis_service'
 import AuditLogService from '#services/audit_log_service'
+import BoatCatalogService from '#services/boat_catalog_service'
 import BoatDocumentService from '#services/boat_document_service'
 import BoatEquipmentActionService from '#services/boat_equipment_action_service'
 import BoatFuelLogService from '#services/boat_fuel_log_service'
@@ -70,7 +71,8 @@ export default class BoatsController {
     private navigationLogService: NavigationLogService,
     private pricingService: BoatPricingService,
     private equipmentActionService: BoatEquipmentActionService,
-    private boatOwnerService: BoatOwnerService
+    private boatOwnerService: BoatOwnerService,
+    private boatCatalogService: BoatCatalogService
   ) {}
 
   async index({ inertia, auth, request, bouncer, response }: HttpContext) {
@@ -100,7 +102,7 @@ export default class BoatsController {
     })
   }
 
-  async create({ inertia, auth, bouncer, response, session, i18n }: HttpContext) {
+  async create({ inertia, auth, bouncer, response, session, i18n, request }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
     await bouncer.with(BoatPolicy).authorize('create')
@@ -112,11 +114,45 @@ export default class BoatsController {
       return response.redirect('/boats')
     }
 
-    const ports = await this.portService.listWithSpotsForOrg(user)
+    const [ports, brands, catalog] = await Promise.all([
+      this.portService.listWithSpotsForOrg(user),
+      this.boatCatalogService.listBrands(),
+      this.resolveCatalogModels(request.qs().brandId),
+    ])
 
     return inertia.render('boats/new', {
       ports: toPortFormOptions(ports),
+      brands,
+      catalogModels: catalog.models,
+      catalogBrandId: catalog.brandId,
     })
+  }
+
+  /**
+   * Modèles de la marque sélectionnée, rechargés par le formulaire via
+   * `router.reload({ only: ['catalogModels'], data: { brandId } })` (#571) —
+   * aucune route `/api` ni `fetch` n'est nécessaire côté Inertia.
+   *
+   * À l'édition, aucun `brandId` n'est encore dans l'URL : on rapproche alors
+   * le `manufacturer` déjà saisi d'une marque du catalogue, pour que la liste
+   * des modèles soit utile dès l'ouverture du formulaire.
+   */
+  private async resolveCatalogModels(rawBrandId: unknown, manufacturer?: string | null) {
+    const requestedId = Number(rawBrandId)
+    if (Number.isInteger(requestedId) && requestedId > 0) {
+      return {
+        brandId: requestedId,
+        models: await this.boatCatalogService.listModels({ brandId: requestedId }),
+      }
+    }
+
+    const brand = await this.boatCatalogService.resolveBrand(manufacturer)
+    if (!brand) return { brandId: null, models: [] }
+
+    return {
+      brandId: brand.id,
+      models: await this.boatCatalogService.listModels({ brandId: brand.id }),
+    }
   }
 
   async store({ request, response, auth, bouncer, session, i18n }: HttpContext) {
@@ -325,7 +361,7 @@ export default class BoatsController {
     }
   }
 
-  async edit({ inertia, params, auth, response, bouncer }: HttpContext) {
+  async edit({ inertia, params, auth, response, bouncer, request }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
@@ -333,15 +369,20 @@ export default class BoatsController {
       const boat = await this.boatService.getForUserOrFail(user, Number(params.id))
       await bouncer.with(BoatPolicy).authorize('edit', boat)
 
-      const [ports, owners, ownerCandidates] = await Promise.all([
+      const [ports, owners, ownerCandidates, brands, catalog] = await Promise.all([
         this.portService.listWithSpotsForOrg(user),
         this.boatOwnerService.listOwners(boat),
         this.boatOwnerService.listEligibleOwnerCandidates(boat),
+        this.boatCatalogService.listBrands(),
+        this.resolveCatalogModels(request.qs().brandId, boat.manufacturer),
       ])
 
       return inertia.render('boats/edit', {
         boat: toEditForm(boat),
         ports: toPortFormOptions(ports),
+        brands,
+        catalogModels: catalog.models,
+        catalogBrandId: catalog.brandId,
         owners: owners.map((owner) => ({
           id: owner.id,
           fullName: owner.fullName,

@@ -258,12 +258,13 @@ test.group('Boats (functional)', (group) => {
     assert,
   }) => {
     const user = await createAdminUser()
-    // Mêmes trous que les bateaux seedés de la sandbox démo : ni type, ni
+    // Mêmes trous que les bateaux seedés de la sandbox démo : ni catégorie, ni
     // immatriculation, ni dimensions.
     const boat = await BoatFactory.merge({
       organizationId: user.organizationId!,
       registrationNumber: null,
       type: null,
+      category: null,
       lengthM: null,
       beamM: null,
     }).create()
@@ -271,8 +272,8 @@ test.group('Boats (functional)', (group) => {
     const response = await client.get(`/boats/${boat.id}`).loginAs(user).withInertia()
 
     response.assertStatus(200)
-    const props = response.inertiaProps as { boat: { type: string | null } }
-    assert.isNull(props.boat.type)
+    const props = response.inertiaProps as { boat: { category: string | null } }
+    assert.isNull(props.boat.category)
   })
 
   test('la visite partielle du groupe maintenance renvoie 200 sans suggestion IA (#478)', async ({

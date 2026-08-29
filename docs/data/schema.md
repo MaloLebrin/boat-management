@@ -28,10 +28,37 @@ Source: `database/schema.ts` (généré automatiquement via migrations).
 
 - `id`
 - `organizationId`
-- identité: `name`, `registrationNumber`, `type`
+- identité: `name`, `registrationNumber`, `category` (enum `BOAT_CATEGORIES`, nullable, indexée)
+- identité historique: `type` — texte libre conservé pour les bateaux antérieurs à #571, plus
+  alimenté par le formulaire ni affiché ; seul le backfill de la migration le relit
 - propulsion/specs: `propulsionType`, `lengthM`, `beamM`, `draftM`, `mastHeightM`
 - matériaux: `hullMaterial`
 - construction: `yearBuilt`, `manufacturer`, `model`, `manufacturedAt`
+
+`category` ne doit pas être confondue avec `navigationCategory` (catégorie CE A/B/C/D).
+
+### boat_brands
+
+Référentiel global du catalogue de bateaux (#571), sans `organizationId` : alimenté par
+`database/seeders/boat_catalog_seeder.ts`, jamais par les utilisateurs.
+
+- `id`
+- `slug` (unique, **stable à vie** — jamais renommé)
+- `name` (nom commercial officiel, accents compris — jamais traduit), `country`
+- `categories` (`jsonb`) — une marque peut couvrir plusieurs catégories
+- `aliases` (`jsonb`) — orthographes et anciens noms, base de `BoatCatalogService.resolveBrand()`
+- `foundedYear`, `discontinuedYear`, `isActive`
+- timestamps
+
+### boat_models
+
+- `id`, `boatBrandId` (FK `boat_brands`, `onDelete cascade`)
+- `slug` (unique par marque, stable à vie), `name`
+- `category` — un modèle appartient à **une seule** catégorie
+- `lengthM`, `productionStartYear`, `productionEndYear` — renseignés seulement quand la valeur est
+  certaine ; les gammes discontinuées sont conservées
+- `aliases` (`jsonb`)
+- timestamps
 
 ### boat_engines
 
@@ -211,6 +238,9 @@ Fiches CRM (module `crm_invoicing`).
 - `Organization 1..n Boat` via `boats.organizationId`
 - `Boat 1..n BoatEngine/BoatSail/BoatMaintenanceEvent/BoatMaintenanceTask`
 - `BoatEngine 1..n BoatEngineRepairCartItem` via `boat_engine_repair_cart_items.boatEngineId` (#517)
+- `BoatBrand 1..n BoatModel` via `boat_models.boatBrandId` (#571) — référentiel global, non rattaché
+  à une organisation ; `boats.manufacturer` / `boats.model` restent du **texte libre** et ne portent
+  aucune clé étrangère vers ce catalogue, c'est ce qui garde une saisie hors catalogue possible
 - `Boat 0..1 BoatRig`
 - `BoatMaintenanceEvent 1..n BoatMaintenancePart`
 - `Boat 1..n BoatPortStay`
@@ -219,6 +249,18 @@ Fiches CRM (module `crm_invoicing`).
 - `CrewMember 1..n CrewCertification` via `crew_certifications.crewMemberId`
 - `Boat 1..n BoatReservation`, `Client 0..n BoatReservation` via `boat_reservations.clientId`
 - `Boat 1..n BoatFuelLog`, `BoatEngine 0..n BoatFuelLog` via `boat_fuel_logs.boatEngineId`
+
+## Catalogue de bateaux (référentiel, pas de la démo)
+
+Référence : `database/seeders/boat_catalog_seeder.ts`, alimenté par `database/data/boat_catalog/`
+(un fichier par catégorie, règles de saisie dans le `README.md` du dossier).
+
+- **Pas de `static environment`** : contrairement aux seeders ci-dessous, celui-ci alimente un
+  référentiel métier et tourne en production, enchaîné derrière le `migration:run --force` du
+  service `migrator` de `docker-compose.prod.yml` (#542, #571).
+- **Idempotent** : `updateOrCreate` sur le slug (marques) puis sur `(boatBrandId, slug)` (modèles),
+  **jamais de `delete`** — une ligne retirée des fichiers de données reste en base, elle peut être
+  référencée. Le rejouer met le corpus à jour sans créer de doublon.
 
 ## Seed (données démo)
 

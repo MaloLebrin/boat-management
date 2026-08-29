@@ -27,6 +27,7 @@
     "name": "Name",
     "registrationNumber": "Registration number",
     "type": "Type",
+    "category": "Category",
     "propulsionType": "Propulsion type",
     "manufacturedAt": "Manufacturing date",
     "lengthM": "Length (m)",
@@ -216,6 +217,23 @@
       "ok": "OK",
       "to_check": "To check",
       "to_replace": "To replace"
+    },
+    "category": {
+      "sailboat_monohull": "Monohull sailboat",
+      "sailboat_multihull": "Sailing multihull",
+      "motor_yacht": "Motor yacht",
+      "power_catamaran": "Power catamaran",
+      "trawler": "Trawler",
+      "open_dayboat": "Open / day boat",
+      "fishing": "Fishing boat",
+      "rib": "RIB",
+      "jetski": "Personal watercraft",
+      "houseboat": "Houseboat / canal boat",
+      "dinghy": "Dinghy",
+      "tender": "Tender",
+      "classic": "Classic boat",
+      "workboat": "Workboat",
+      "other": "Other"
     }
   },
   "index": {
@@ -419,7 +437,7 @@
   "list": {
     "search": "Search",
     "searchPlaceholder": "Search by name or registration…",
-    "type": "Type",
+    "category": "Category",
     "propulsion": "Propulsion",
     "sort": "Sort",
     "direction": "Direction",
@@ -432,12 +450,12 @@
     "table": {
       "name": "Name",
       "registration": "Registration",
-      "type": "Type",
+      "category": "Category",
       "propulsion": "Propulsion",
       "maintenance": "Maintenance"
     },
     "cards": {
-      "unknownType": "Unknown type",
+      "unknownCategory": "Unknown category",
       "unknownPropulsion": "Unknown propulsion"
     },
     "maintenance": {
@@ -914,5 +932,14 @@
       "equipmentType": "Equipment type",
       "expiryDate": "Expiry date"
     }
+  },
+  "catalog": {
+    "categoryHint": "Drives which builders are suggested below. Not the same as the CE design category (A/B/C/D).",
+    "brandPlaceholder": "e.g. Bénéteau…",
+    "modelPlaceholder": "e.g. Oceanis 46.1…",
+    "freeTextHint": "You can enter a value that is not in the catalogue: it will be saved as typed.",
+    "modelNeedsBrandHint": "Pick a builder from the catalogue to see its models. Free text is still accepted.",
+    "noBrandMatch": "No matching builder — your entry will be kept.",
+    "noModelMatch": "No matching model — your entry will be kept."
   }
 }

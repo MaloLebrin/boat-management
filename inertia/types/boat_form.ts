@@ -1,5 +1,7 @@
 /** Form row types and hull-only edit payload (engines / sails / rig are managed on the boat detail page). */
 
+import type { BoatCategory } from '../../shared/types/boat_catalog'
+
 export type EngineKind = 'inboard' | 'outboard' | 'electric' | 'hybrid' | 'other'
 export type NavigationCategory = 'A' | 'B' | 'C' | 'D'
 export type EngineFuel = 'diesel' | 'essence' | 'electric' | 'other' | ''
@@ -22,7 +24,7 @@ export type BoatEditPayload = {
   id: number
   name: string
   registrationNumber: string | null
-  type: string | null
+  category: BoatCategory | null
   manufacturedAt: string | null
   propulsionType: string | null
   lengthM: number | null

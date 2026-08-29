@@ -4,6 +4,7 @@ import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import type { BoatListItem } from './types'
 import { useT } from '~/composables/use_t'
+import { boatCategoryLabel } from '~/utils/boat_category_label'
 import { propulsionLabel } from '~/utils/boat_propulsion_label'
 
 const { t } = useT()
@@ -57,7 +58,7 @@ function maintenanceLabel(b: BoatListItem) {
           <span
             class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-surface-muted text-fg-muted ring-1 ring-border"
           >
-            {{ boat.type ?? t('boats.list.cards.unknownType') }}
+            {{ boatCategoryLabel(t, boat.category) ?? t('boats.list.cards.unknownCategory') }}
           </span>
           <span
             class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-surface-muted text-fg-muted ring-1 ring-border"
