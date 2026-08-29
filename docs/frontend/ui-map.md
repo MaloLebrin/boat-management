@@ -36,13 +36,25 @@ Référence: `inertia/app.ts`.
 - `boats/index`: `inertia/pages/boats/index.vue`
   - props: `boats[]`
   - backend: `BoatsController.index` → `BoatService.listForUser`
+  - filtre catégorie (#571) : `BoatListToolbar` propose les libellés traduits de `BOAT_CATEGORIES`
+    (`useBoatOptions().categoryOptions`) et navigue en `?category=`. Il ne reconstruit plus ses
+    options depuis les valeurs distinctes de la page. `BoatTable` / `BoatCards` affichent la
+    catégorie traduite via `~/utils/boat_category_label`.
 - `boats/new`: `inertia/pages/boats/new.vue`
   - form POST `/boats`
-  - composant: `BoatFormHullFields`
+  - composant: `BoatFormHullFields`, qui délègue l'identité à
+    `inertia/components/boats/hull/BoatFormIdentityFields.vue` (#571) — catégorie en `BaseSelect`,
+    constructeur et modèle en `BaseCombobox`. Les modèles de la marque retenue arrivent par
+    `router.reload({ only: ['catalogModels'], data: { brandId } })` ; **une saisie hors catalogue
+    est acceptée telle quelle**.
+  - props catalogue: `brands`, `catalogModels`, `catalogBrandId`
   - backend: `BoatsController.store`
 - `boats/edit`: `inertia/pages/boats/edit.vue`
   - form PUT `/boats/:id`
   - delete via form DELETE `/boats/:id`
+  - mêmes props catalogue que `boats/new` ; `catalogBrandId` vient de
+    `BoatCatalogService.resolveBrand(boat.manufacturer)` pour que la liste des modèles soit utile
+    dès l'ouverture
   - backend: `BoatsController.update` / `BoatsController.destroy`
 
 ### Boat show (équipement + maintenance)

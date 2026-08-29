@@ -27,10 +27,15 @@ Référence routes: `start/routes/boats.ts`.
   - Controller: `app/controllers/boats_controller.ts` → `index`
   - Service: `app/services/boat_service.ts` → `listForUser`
   - Page: `inertia/pages/boats/index.vue`
+  - Filtres: `?q=`, `?category=` (vocabulaire fermé `BOAT_CATEGORIES`, #571 — remplace `?type=`),
+    `?propulsionType=`, `?sort=`, `?direction=`. Une `category` hors enum est ignorée.
 - `GET /boats/new` (`boats.create`)
   - Controller: `BoatsController.create`
   - ACL: `bouncer.authorize('boatCreate')`
   - Page: `inertia/pages/boats/new.vue`
+  - Props catalogue (#571) : `brands` (`BoatCatalogService.listBrands`), `catalogModels` et
+    `catalogBrandId`. `?brandId=` recharge `catalogModels` par visite Inertia partielle — pas de
+    route `/api`, pas de `fetch`.
 - `POST /boats` (`boats.store`)
   - Controller: `BoatsController.store` (validator `createBoatValidator`)
   - Service: `BoatService.createForUser`
@@ -134,3 +139,20 @@ Référence: `app/controllers/boat_budget_entry_controller.ts`, `app/services/bo
 Référence: `app/services/boat_service.ts`.
 
 - Si `propulsionType === 'sailboat'`, alors `mastHeightM` est requis (create + update).
+
+### Catalogue de marques et modèles (#571)
+
+Référence : `app/services/boat_catalog_service.ts`, corpus dans `database/data/boat_catalog/`.
+
+- **La saisie libre reste acceptée, toujours.** `manufacturer` et `model` sont du texte libre sans
+  clé étrangère vers le catalogue : une marque absente est enregistrée telle quelle. C'est
+  l'invariant du lot, et les valeurs hors catalogue servent de file d'attente d'enrichissement.
+- `listBrands({ category })` **priorise** la catégorie choisie, elle ne la filtre jamais : un
+  chantier absent de la catégorie doit rester proposé.
+- `resolveBrand(freeText)` rapproche une saisie libre d'une marque via son slug puis ses `aliases`
+  (normalisation sans accent ni ponctuation), et renvoie `null` hors catalogue. Utilisé à l'édition
+  pour charger d'emblée les modèles du constructeur déjà saisi.
+- `boats.category` est un vocabulaire fermé (`BOAT_CATEGORIES`), nullable : un bateau sans catégorie
+  reste valide. `boats.type`, le champ texte libre historique, reste en base mais n'est plus
+  alimenté par le formulaire — une mise à jour ne l'écrase pas.
+- Ne pas confondre avec `navigationCategory` (catégorie CE A/B/C/D).
