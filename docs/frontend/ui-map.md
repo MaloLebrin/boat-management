@@ -69,6 +69,8 @@ Référence: `inertia/app.ts`.
   - sails: `inertia/components/boats/sail/BoatShowSailsCard.vue`
   - rig: `inertia/components/boats/rig/BoatShowRigCard.vue`
   - maintenance: `inertia/components/boats/show/tabs/BoatShowTabTasks.vue` (onglet « Tâches ») et `inertia/components/boats/show/tabs/BoatShowTabHistory.vue` (onglet « Historique »)
+    - `BoatMaintenanceTasksPanel.vue` garde le point d'entrée de création et délègue le formulaire à `BoatMaintenanceTaskForm.vue` (#581)
+    - le champ titre du formulaire de tâche et des modales d'événement (`BoatMaintenanceEventModal.vue`, `EngineMaintenanceEventModal.vue`) est une `BaseCombobox` alimentée par le catalogue d'opérations standard, via `inertia/composables/use_maintenance_operations.ts` (#581) — la saisie libre reste acceptée telle quelle
   - equipment-actions (onglet "Achats/réparations"):
     - `inertia/components/boats/equipment-actions/BoatEquipmentActionCard.vue` — carte individuelle action
     - `inertia/components/boats/equipment-actions/BoatEquipmentActionModal.vue` — modal création/édition (prop `prefill` pour l'ajout depuis un équipement, #313)
