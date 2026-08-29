@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { Form } from '@adonisjs/inertia/vue'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
+import BaseCombobox from '~/components/base/BaseCombobox.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseModal from '~/components/base/BaseModal.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
+import { useMaintenanceOperations } from '~/composables/use_maintenance_operations'
 import { useT } from '~/composables/use_t'
 import { engineDisplayTitle } from '~/utils/boat_enum_labels'
 import type { BoatShowEngine } from '~/types/boat_show'
@@ -27,6 +29,13 @@ const entryTitle = ref('')
 const entryNotes = ref('')
 
 const engineLabel = engineDisplayTitle(t, props.engine)
+
+// Le sujet est figé sur « moteur » : le catalogue (#581) ne propose donc que les
+// opérations cohérentes avec la famille de ce moteur précis.
+const { operationOptions } = useMaintenanceOperations(
+  () => 'engine' as const,
+  computed(() => [props.engine])
+)
 
 function addPartRow() {
   partRows.value.push({ name: '', quantity: '', notes: '' })
@@ -68,12 +77,15 @@ function close() {
         :errors="errors"
       />
 
-      <BaseInput
+      <BaseCombobox
         id="maint-title"
         name="title"
         :label="t('boats.maintenance.events.titleField')"
         required
-        :placeholder="t('boats.maintenance.events.titlePlaceholder')"
+        :placeholder="t('boats.maintenance.operations.placeholder')"
+        :hint="t('boats.maintenance.operations.hint')"
+        :empty-label="t('boats.maintenance.operations.noMatch')"
+        :options="operationOptions"
         v-model="entryTitle"
         :errors="errors"
       />

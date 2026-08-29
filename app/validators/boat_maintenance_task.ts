@@ -1,17 +1,5 @@
+import { MAINTENANCE_SUBJECTS } from '#shared/constants/maintenance/maintenance_subjects'
 import vine from '@vinejs/vine'
-
-const subjectChoices = [
-  'boat',
-  'hull',
-  'engine',
-  'sail',
-  'rig',
-  'electrical',
-  'plumbing',
-  'safety',
-  'deck',
-  'other',
-] as const
 
 function optionalIdFromForm() {
   return vine
@@ -41,11 +29,11 @@ function optionalNonNegativeIntFromForm() {
 
 export const createBoatMaintenanceTaskValidator = vine.create(
   vine.object({
-    subject: vine.enum(subjectChoices),
+    subject: vine.enum(MAINTENANCE_SUBJECTS),
     boatEngineId: optionalIdFromForm(),
     boatSailId: optionalIdFromForm(),
     boatRigId: optionalIdFromForm(),
-    title: vine.string().trim().minLength(1),
+    title: vine.string().trim().minLength(1).maxLength(200),
     notes: vine.string().trim().optional(),
 
     dueAt: vine

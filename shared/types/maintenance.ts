@@ -1,16 +1,8 @@
 import type { DateTime } from 'luxon'
+import type { MaintenanceSubject } from '#shared/constants/maintenance/maintenance_subjects'
 
-export type MaintenanceTaskSubject =
-  | 'boat'
-  | 'hull'
-  | 'engine'
-  | 'sail'
-  | 'rig'
-  | 'electrical'
-  | 'plumbing'
-  | 'safety'
-  | 'deck'
-  | 'other'
+/** Alias historique de `MaintenanceSubject` — même vocabulaire, une seule source. */
+export type MaintenanceTaskSubject = MaintenanceSubject
 
 export type MaintenancePartInput = {
   name?: string | null
@@ -21,17 +13,7 @@ export type MaintenancePartInput = {
 }
 
 export type CreateMaintenancePayload = {
-  subject:
-    | 'boat'
-    | 'hull'
-    | 'engine'
-    | 'sail'
-    | 'rig'
-    | 'electrical'
-    | 'plumbing'
-    | 'safety'
-    | 'deck'
-    | 'other'
+  subject: MaintenanceSubject
   boatEngineId?: number | null
   boatSailId?: number | null
   boatRigId?: number | null
@@ -155,4 +137,48 @@ export type MaintenanceMaxDoneRow = { boatEngineId: number | string; maxDone: nu
 export type MaintenanceBadgeOpts = {
   urgentWithinDays?: number
   urgentWithinEngineHours?: number
+}
+
+/**
+ * Familles de moteur du catalogue d'opérations standard (#581).
+ *
+ * Repli assumé en attendant `ENGINE_FAMILIES` (#574) : la famille est dérivée
+ * du couple `kind` / `fuel` déjà saisi sur `boat_engines`. Elle ne sert qu'à
+ * écarter les opérations incohérentes (pas de bougies sur un diesel) — jamais
+ * à restreindre la saisie libre.
+ */
+export const MAINTENANCE_ENGINE_FAMILIES = [
+  'inboard_diesel',
+  'inboard_petrol',
+  'outboard_petrol',
+  'outboard_diesel',
+  'electric',
+  'hybrid',
+] as const
+
+export type MaintenanceEngineFamily = (typeof MAINTENANCE_ENGINE_FAMILIES)[number]
+
+/**
+ * Opération de maintenance standard du catalogue (#581).
+ *
+ * `key` est un identifiant **stable à vie** : il préfixe la clé i18n, sert de
+ * valeur d'option dans la combobox et pourra un jour être persisté
+ * (`operation_key`) pour des statistiques par opération. On peut en insérer de
+ * nouvelles à n'importe quelle position, jamais en renommer une.
+ *
+ * Les intervalles sont des **défauts indicatifs**, pas une prescription : ils
+ * pré-remplissent un champ vide et le manuel constructeur reste la référence.
+ */
+export interface MaintenanceOperation {
+  /** `'engine.oil_change'` — préfixé par le sujet, stable à vie. */
+  key: string
+  subject: MaintenanceSubject
+  /** `'maintenance.operations.engine.oil_change.label'`. */
+  labelKey: string
+  /** Familles moteur concernées ; absent = toutes. */
+  families?: readonly MaintenanceEngineFamily[]
+  defaultIntervalMonths?: number
+  defaultIntervalEngineHours?: number
+  /** Précision affichée sous le libellé (« selon le manuel constructeur »…). */
+  noteKey?: string
 }

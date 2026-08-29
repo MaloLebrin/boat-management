@@ -687,7 +687,21 @@
       "titleField": "Titre",
       "titlePlaceholder": "ex. Vidange, inspection du gréement",
       "notes": "Notes",
-      "selectPlaceholder": "— Sélectionner —"
+      "selectPlaceholder": "— Sélectionner —",
+      "hull": "Coque",
+      "electrical": "Électricité",
+      "plumbing": "Plomberie",
+      "safety": "Sécurité",
+      "deck": "Pont / Accastillage",
+      "other": "Autre"
+    },
+    "operations": {
+      "hint": "Choisissez une opération du catalogue, ou saisissez librement votre propre intitulé.",
+      "placeholder": "ex. Vidange moteur",
+      "noMatch": "Aucune opération du catalogue ne correspond — votre saisie sera conservée telle quelle.",
+      "intervalMonths": "tous les {count} mois",
+      "intervalEngineHours": "toutes les {count} h moteur",
+      "indicative": "Intervalle indicatif"
     }
   },
   "sheets": {

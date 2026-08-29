@@ -84,5 +84,349 @@
       "noEvents": "Aucun événement ne correspond aux filtres sélectionnés.",
       "totalEvents": "{count, plural, one {# événement} other {# événements}}"
     }
+  },
+  "operations": {
+    "boat": {
+      "winterizing": {
+        "label": "Hivernage du bateau",
+        "note": "Programme complet de mise en hivernage — moteur, circuits d'eau, batteries, protection."
+      },
+      "recommissioning": {
+        "label": "Déshivernage et remise à l'eau"
+      },
+      "haul_out": {
+        "label": "Sortie d'eau annuelle"
+      },
+      "insurance_survey": {
+        "label": "Expertise d'assurance",
+        "note": "Périodicité fixée par le contrat d'assurance."
+      },
+      "deep_clean": {
+        "label": "Nettoyage complet intérieur et extérieur"
+      },
+      "gas_installation": {
+        "label": "Contrôle de l'installation gaz",
+        "note": "Contrôle par un professionnel habilité, selon la réglementation locale."
+      },
+      "documents_check": {
+        "label": "Vérification des documents de bord"
+      }
+    },
+    "hull": {
+      "antifouling": {
+        "label": "Carénage et antifouling",
+        "note": "Périodicité selon le programme de navigation et l'antifouling utilisé."
+      },
+      "anodes": {
+        "label": "Anodes de coque"
+      },
+      "thru_hulls": {
+        "label": "Passe-coques et vannes",
+        "note": "À contrôler à chaque sortie d'eau : manœuvre, corrosion, colliers."
+      },
+      "saildrive_boot": {
+        "label": "Soufflet de saildrive",
+        "note": "Remplacement préconisé tous les 7 ans par la plupart des constructeurs."
+      },
+      "osmosis_check": {
+        "label": "Contrôle d'osmose"
+      },
+      "rudder_bearing": {
+        "label": "Bagues de safran et jeu de mèche"
+      },
+      "keel_bolts": {
+        "label": "Contrôle des boulons de quille"
+      },
+      "hull_polish": {
+        "label": "Lustrage de la coque"
+      },
+      "waterline_cleaning": {
+        "label": "Nettoyage de la ligne de flottaison"
+      },
+      "propeller_service": {
+        "label": "Entretien de l'hélice et traitement"
+      }
+    },
+    "engine": {
+      "oil_change": {
+        "label": "Vidange moteur",
+        "note": "Au premier des deux termes atteint — se reporter au manuel constructeur."
+      },
+      "oil_filter": {
+        "label": "Filtre à huile"
+      },
+      "fuel_filter_diesel": {
+        "label": "Filtre à gasoil et décanteur",
+        "note": "Purger le décanteur beaucoup plus souvent que le remplacement du filtre."
+      },
+      "fuel_filter_petrol": {
+        "label": "Filtre à essence"
+      },
+      "air_filter": {
+        "label": "Filtre à air et reniflard"
+      },
+      "impeller": {
+        "label": "Turbine de pompe à eau de mer",
+        "note": "À remplacer sans attendre après toute surchauffe ou marche à sec."
+      },
+      "raw_water_strainer": {
+        "label": "Crépine et filtre à eau de mer"
+      },
+      "coolant": {
+        "label": "Liquide de refroidissement"
+      },
+      "heat_exchanger": {
+        "label": "Nettoyage de l'échangeur"
+      },
+      "thermostat": {
+        "label": "Thermostat"
+      },
+      "anodes": {
+        "label": "Anodes moteur",
+        "note": "À contrôler bien plus souvent que l'intervalle de remplacement."
+      },
+      "belt": {
+        "label": "Courroie d'alternateur"
+      },
+      "spark_plugs": {
+        "label": "Bougies d'allumage"
+      },
+      "gearbox_oil": {
+        "label": "Huile d'embase ou d'inverseur"
+      },
+      "gearbox_anodes": {
+        "label": "Anodes d'embase"
+      },
+      "stern_gland": {
+        "label": "Presse-étoupe"
+      },
+      "shaft_alignment": {
+        "label": "Alignement de la ligne d'arbre"
+      },
+      "injectors": {
+        "label": "Contrôle des injecteurs",
+        "note": "Opération d'atelier — intervalle très variable selon le motoriste."
+      },
+      "valve_clearance": {
+        "label": "Réglage du jeu aux soupapes",
+        "note": "Se reporter au manuel constructeur : certains moteurs n'en demandent jamais."
+      },
+      "exhaust_elbow": {
+        "label": "Coude d'échappement",
+        "note": "Point de corrosion classique des diesels marins : à inspecter bien avant l'échéance."
+      },
+      "mounts": {
+        "label": "Silentblocs et supports moteur"
+      },
+      "control_cables": {
+        "label": "Câbles de commande"
+      },
+      "winterizing": {
+        "label": "Hivernage du moteur",
+        "note": "Rinçage, antigel, protection interne — selon la procédure du constructeur."
+      },
+      "tilt_trim_service": {
+        "label": "Entretien du système de relevage"
+      },
+      "electric_drive_check": {
+        "label": "Contrôle du moteur électrique et des connexions"
+      },
+      "traction_battery_check": {
+        "label": "Contrôle du pack de traction",
+        "note": "Diagnostic à confier au constructeur ou à un installateur agréé."
+      }
+    },
+    "sail": {
+      "loft_inspection": {
+        "label": "Visite à la voilerie",
+        "note": "Lavage, contrôle des coutures et des renforts, réparations éventuelles."
+      },
+      "mainsail_check": {
+        "label": "Contrôle de la grand-voile"
+      },
+      "headsail_uv_strip": {
+        "label": "Bande anti-UV du génois"
+      },
+      "sail_washing": {
+        "label": "Lavage et séchage des voiles"
+      },
+      "batten_check": {
+        "label": "Contrôle des lattes et coulisseaux"
+      },
+      "storm_sails": {
+        "label": "Vérification des voiles de gros temps"
+      }
+    },
+    "rig": {
+      "standing_rigging_check": {
+        "label": "Contrôle du gréement dormant",
+        "note": "Contrôle visuel des terminaisons, cadènes et ridoirs."
+      },
+      "standing_rigging_replacement": {
+        "label": "Remplacement du gréement dormant",
+        "note": "Préconisation courante de 10 ans — exigée plus tôt par certains assureurs."
+      },
+      "running_rigging": {
+        "label": "Remplacement du gréement courant"
+      },
+      "mast_fittings": {
+        "label": "Accastillage de mât et feux"
+      },
+      "mast_step": {
+        "label": "Contrôle du pied de mât et des cadènes"
+      },
+      "furler_service": {
+        "label": "Révision de l'enrouleur"
+      },
+      "rig_tuning": {
+        "label": "Réglage de la tension du gréement"
+      },
+      "mast_unstepping": {
+        "label": "Démâtage et inspection complète",
+        "note": "Souvent couplé au remplacement du gréement dormant."
+      }
+    },
+    "electrical": {
+      "battery_check": {
+        "label": "Contrôle des batteries"
+      },
+      "service_battery_bank": {
+        "label": "Remplacement du parc servitude",
+        "note": "Durée de vie très dépendante de la technologie et du cyclage."
+      },
+      "engine_battery": {
+        "label": "Remplacement de la batterie de démarrage"
+      },
+      "connections_bonding": {
+        "label": "Connexions et masses"
+      },
+      "alternator": {
+        "label": "Contrôle de l'alternateur et de la charge"
+      },
+      "shore_power": {
+        "label": "Prise de quai et différentiel",
+        "note": "Test du différentiel à faire à chaque début de saison."
+      },
+      "navigation_lights": {
+        "label": "Feux de navigation"
+      },
+      "solar_regulator": {
+        "label": "Panneaux solaires et régulateur"
+      },
+      "electronics_update": {
+        "label": "Mise à jour de l'électronique de bord"
+      }
+    },
+    "plumbing": {
+      "bilge_pumps": {
+        "label": "Pompes de cale et contacteurs",
+        "note": "Tester le déclenchement automatique, pas seulement la marche forcée."
+      },
+      "marine_toilet": {
+        "label": "Révision du WC marin"
+      },
+      "holding_tank": {
+        "label": "Cuve à eaux noires et vannes"
+      },
+      "fresh_water_circuit": {
+        "label": "Désinfection du circuit d'eau douce"
+      },
+      "water_pump_filter": {
+        "label": "Filtre de pompe à eau douce"
+      },
+      "hoses_clamps": {
+        "label": "Durites et colliers"
+      },
+      "seacocks_grease": {
+        "label": "Graissage des vannes"
+      },
+      "watermaker": {
+        "label": "Entretien du dessalinisateur",
+        "note": "Rinçage et conservation selon la notice, surtout avant un arrêt prolongé."
+      }
+    },
+    "safety": {
+      "liferaft_service": {
+        "label": "Révision du radeau de survie",
+        "note": "Périodicité fixée par le constructeur du radeau — souvent 1 à 3 ans."
+      },
+      "fire_extinguishers": {
+        "label": "Contrôle des extincteurs",
+        "note": "Contrôle annuel, épreuve périodique selon le type d'appareil."
+      },
+      "flares": {
+        "label": "Remplacement des fusées de détresse",
+        "note": "Les fusées portent une date de péremption — la reporter à l'échéance."
+      },
+      "lifejackets": {
+        "label": "Gilets gonflables et percuteurs",
+        "note": "Contrôle de la cartouche, du percuteur et de l'étanchéité du gilet."
+      },
+      "epirb_battery": {
+        "label": "Batterie de la balise EPIRB",
+        "note": "Date de remplacement inscrite sur la balise."
+      },
+      "harness_lifelines": {
+        "label": "Harnais et lignes de vie"
+      },
+      "first_aid_kit": {
+        "label": "Pharmacie de bord"
+      },
+      "bilge_alarm": {
+        "label": "Alarme de cale et détecteur de gaz"
+      },
+      "sound_signals": {
+        "label": "Moyens de signalisation sonore"
+      }
+    },
+    "deck": {
+      "winches": {
+        "label": "Démontage et graissage des winchs",
+        "note": "Un winch démonté chaque année suffit sur un bateau peu utilisé."
+      },
+      "windlass": {
+        "label": "Guindeau et mouillage"
+      },
+      "anchor_chain": {
+        "label": "Marquage et retournement de la chaîne"
+      },
+      "hatches_seals": {
+        "label": "Joints de panneaux et hublots"
+      },
+      "teak_care": {
+        "label": "Entretien du teck"
+      },
+      "canvas_covers": {
+        "label": "Taud, bimini et capote"
+      },
+      "blocks_clutches": {
+        "label": "Poulies et bloqueurs"
+      },
+      "guardrails": {
+        "label": "Filières et chandeliers"
+      },
+      "steering_system": {
+        "label": "Direction, drosses et vérin",
+        "note": "Contrôler le jeu et la lubrification avant chaque saison."
+      }
+    },
+    "other": {
+      "tender_service": {
+        "label": "Entretien de l'annexe"
+      },
+      "outboard_tender_service": {
+        "label": "Entretien du hors-bord d'annexe"
+      },
+      "trailer_service": {
+        "label": "Entretien de la remorque",
+        "note": "Roulements, feux, freins et sangles — contrôle avant chaque convoyage."
+      },
+      "heating_service": {
+        "label": "Entretien du chauffage"
+      },
+      "refrigeration_service": {
+        "label": "Entretien du groupe froid"
+      }
+    }
   }
 }
