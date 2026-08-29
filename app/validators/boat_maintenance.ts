@@ -1,17 +1,8 @@
+import { MAINTENANCE_SUBJECTS } from '#shared/constants/maintenance/maintenance_subjects'
 import vine from '@vinejs/vine'
 
-export const maintenanceSubjects = [
-  'boat',
-  'hull',
-  'engine',
-  'sail',
-  'rig',
-  'electrical',
-  'plumbing',
-  'safety',
-  'deck',
-  'other',
-] as const
+/** Réexport historique — la source unique est `maintenance_subjects.ts`. */
+export const maintenanceSubjects = MAINTENANCE_SUBJECTS
 
 function optionalIdFromForm() {
   return vine
@@ -41,7 +32,7 @@ function optionalDecimalFromForm() {
 
 export const createBoatMaintenanceValidator = vine.create(
   vine.object({
-    subject: vine.enum(maintenanceSubjects),
+    subject: vine.enum(MAINTENANCE_SUBJECTS),
     boatEngineId: optionalIdFromForm(),
     boatSailId: optionalIdFromForm(),
     boatRigId: optionalIdFromForm(),

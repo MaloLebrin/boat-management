@@ -2,11 +2,13 @@
 import { Form } from '@adonisjs/inertia/vue'
 import { computed, ref, watch } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
+import BaseCombobox, { type ComboboxOption } from '~/components/base/BaseCombobox.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseModal from '~/components/base/BaseModal.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import BoatMaintenanceSubjectFields from './BoatMaintenanceSubjectFields.vue'
+import { useMaintenanceOperations } from '~/composables/use_maintenance_operations'
 import { useT } from '~/composables/use_t'
 import type { BoatShowDetail } from '~/types/boat_show'
 import type { MaintenanceTaskSubject } from '../../../../shared/types/maintenance'
@@ -49,7 +51,32 @@ const subjectOptions = computed<ReadonlyArray<{ label: string; value: Maintenanc
   ]
 )
 
+const { operationOptions, findOperation } = useMaintenanceOperations(
+  subject,
+  () => props.boat.engines
+)
+
+/**
+ * Retenir une opération du catalogue (#581) remplit le titre — fait par la
+ * combobox — et aligne le sujet. Un événement n'a pas de récurrence : il n'y a
+ * donc rien d'autre à pré-remplir ici.
+ */
+function onOperationSelected(option: ComboboxOption) {
+  const operation = findOperation(option.value)
+  if (!operation || operation.subject === subject.value) return
+  subjectChangedByCatalog = true
+  subject.value = operation.subject
+}
+
+// Changer de sujet à la main repart d'un formulaire vierge ; le changement venu
+// du catalogue ne doit pas effacer le titre qu'il vient justement de remplir.
+let subjectChangedByCatalog = false
+
 watch(subject, () => {
+  if (subjectChangedByCatalog) {
+    subjectChangedByCatalog = false
+    return
+  }
   boatEngineId.value = ''
   boatSailId.value = ''
   boatSafetyEquipmentId.value = ''
@@ -120,14 +147,18 @@ function close() {
         v-model:sail-caption-manual="sailCaptionManual"
       />
 
-      <BaseInput
+      <BaseCombobox
         id="maint-title"
         name="title"
         :label="t('boats.maintenance.events.titleField')"
         required
-        :placeholder="t('boats.maintenance.events.titlePlaceholder')"
+        :placeholder="t('boats.maintenance.operations.placeholder')"
+        :hint="t('boats.maintenance.operations.hint')"
+        :empty-label="t('boats.maintenance.operations.noMatch')"
+        :options="operationOptions"
         v-model="entryTitle"
         :errors="errors"
+        @select="onOperationSelected"
       />
 
       <BaseTextarea

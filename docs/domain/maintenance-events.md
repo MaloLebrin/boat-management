@@ -14,7 +14,7 @@ Références: `app/models/boat_maintenance_event.ts`, `app/models/boat_maintenan
 
 - `boat_maintenance_events`
   - `boat_id`
-  - `subject`: `boat | engine | sail | rig`
+  - `subject`: une des 10 valeurs de `MAINTENANCE_SUBJECTS` (`boat | hull | engine | sail | rig | electrical | plumbing | safety | deck | other`), source unique dans `shared/constants/maintenance/maintenance_subjects.ts`
   - `performed_at` (date)
   - `title`, `notes`
   - cibles optionnelles selon le sujet:
@@ -24,6 +24,8 @@ Références: `app/models/boat_maintenance_event.ts`, `app/models/boat_maintenan
 - `boat_maintenance_parts`
   - `maintenance_event_id`
   - `name`, `quantity` (int ou null), `notes`
+
+Le `title` est un texte libre plafonné à 200 caractères.
 
 ## Routes → controllers → services → UI
 
@@ -45,7 +47,7 @@ Références:
 Règles côté service (résumé, source: `BoatMaintenanceService.createForBoat`):
 
 - user doit appartenir à la même org que le boat
-- `subject` valide: `boat | engine | sail | rig`
+- `subject` valide: une des 10 valeurs de `MAINTENANCE_SUBJECTS`
 - `subject=engine`:
   - si un `boatEngineId` est fourni, il doit appartenir au boat
   - `engineCaption` doit être fourni ou dérivable de l’engine
@@ -61,6 +63,22 @@ Règles côté service (résumé, source: `BoatMaintenanceService.createForBoat`
   - Controller: `BoatMaintenancesController.destroy`
   - ACL: `boatUpdate`
   - Service: `BoatMaintenanceService.deleteForBoat`
+
+## Catalogue d'opérations standard (#581)
+
+Le champ titre des deux modales d'événement
+(`BoatMaintenanceEventModal.vue`, `EngineMaintenanceEventModal.vue`) est une
+**combobox** alimentée par `shared/constants/maintenance/maintenance_operations.ts`.
+
+- retenir une opération remplit le titre et aligne le `subject` — un événement
+  n'ayant pas de récurrence, il n'y a rien d'autre à pré-remplir ;
+- la **saisie libre reste acceptée telle quelle** et part inchangée au serveur ;
+- sur la modale moteur, le sujet est figé et les opérations sont filtrées par la
+  famille de ce moteur précis (voir `docs/domain/maintenance-tasks.md` pour le
+  détail du corpus et des familles).
+
+Normaliser les titres à la saisie sert directement l'analyse de flotte :
+`app/services/ai_prompt_service.ts` transmet ces titres verbatim à l'IA.
 
 ## UI (boat show)
 

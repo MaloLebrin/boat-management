@@ -84,5 +84,349 @@
       "noEvents": "No events match the selected filters.",
       "totalEvents": "{count, plural, one {# event} other {# events}}"
     }
+  },
+  "operations": {
+    "boat": {
+      "winterizing": {
+        "label": "Winterizing",
+        "note": "Full winterizing programme - engine, water circuits, batteries, covers."
+      },
+      "recommissioning": {
+        "label": "Recommissioning and launch"
+      },
+      "haul_out": {
+        "label": "Annual haul-out"
+      },
+      "insurance_survey": {
+        "label": "Insurance survey",
+        "note": "Interval set by your insurance contract."
+      },
+      "deep_clean": {
+        "label": "Full interior and exterior clean"
+      },
+      "gas_installation": {
+        "label": "Gas installation check",
+        "note": "To be carried out by a qualified professional, per local regulations."
+      },
+      "documents_check": {
+        "label": "On-board paperwork check"
+      }
+    },
+    "hull": {
+      "antifouling": {
+        "label": "Haul-out and antifouling",
+        "note": "Interval depends on your sailing programme and the antifouling used."
+      },
+      "anodes": {
+        "label": "Hull anodes"
+      },
+      "thru_hulls": {
+        "label": "Thru-hulls and seacocks",
+        "note": "Check at every haul-out: operation, corrosion, hose clamps."
+      },
+      "saildrive_boot": {
+        "label": "Saildrive boot",
+        "note": "Most manufacturers recommend replacement every 7 years."
+      },
+      "osmosis_check": {
+        "label": "Osmosis check"
+      },
+      "rudder_bearing": {
+        "label": "Rudder bearings and stock play"
+      },
+      "keel_bolts": {
+        "label": "Keel bolt check"
+      },
+      "hull_polish": {
+        "label": "Hull polish"
+      },
+      "waterline_cleaning": {
+        "label": "Waterline cleaning"
+      },
+      "propeller_service": {
+        "label": "Propeller service and coating"
+      }
+    },
+    "engine": {
+      "oil_change": {
+        "label": "Engine oil change",
+        "note": "Whichever comes first - refer to the manufacturer's manual."
+      },
+      "oil_filter": {
+        "label": "Oil filter"
+      },
+      "fuel_filter_diesel": {
+        "label": "Fuel filter and water separator",
+        "note": "Drain the water separator far more often than you replace the filter."
+      },
+      "fuel_filter_petrol": {
+        "label": "Petrol fuel filter"
+      },
+      "air_filter": {
+        "label": "Air filter and breather"
+      },
+      "impeller": {
+        "label": "Raw water pump impeller",
+        "note": "Replace immediately after any overheating or dry running."
+      },
+      "raw_water_strainer": {
+        "label": "Raw water strainer"
+      },
+      "coolant": {
+        "label": "Coolant"
+      },
+      "heat_exchanger": {
+        "label": "Heat exchanger cleaning"
+      },
+      "thermostat": {
+        "label": "Thermostat"
+      },
+      "anodes": {
+        "label": "Engine anodes",
+        "note": "Inspect far more often than the replacement interval."
+      },
+      "belt": {
+        "label": "Alternator belt"
+      },
+      "spark_plugs": {
+        "label": "Spark plugs"
+      },
+      "gearbox_oil": {
+        "label": "Gearbox or lower unit oil"
+      },
+      "gearbox_anodes": {
+        "label": "Lower unit anodes"
+      },
+      "stern_gland": {
+        "label": "Stern gland"
+      },
+      "shaft_alignment": {
+        "label": "Shaft alignment"
+      },
+      "injectors": {
+        "label": "Injector check",
+        "note": "Workshop operation - the interval varies widely between engine makers."
+      },
+      "valve_clearance": {
+        "label": "Valve clearance adjustment",
+        "note": "Refer to the manufacturer's manual: some engines never require it."
+      },
+      "exhaust_elbow": {
+        "label": "Exhaust elbow",
+        "note": "A classic corrosion point on marine diesels: inspect well before the interval."
+      },
+      "mounts": {
+        "label": "Engine mounts"
+      },
+      "control_cables": {
+        "label": "Control cables"
+      },
+      "winterizing": {
+        "label": "Engine winterizing",
+        "note": "Flushing, antifreeze, internal protection - follow the manufacturer's procedure."
+      },
+      "tilt_trim_service": {
+        "label": "Tilt and trim service"
+      },
+      "electric_drive_check": {
+        "label": "Electric drive and wiring check"
+      },
+      "traction_battery_check": {
+        "label": "Traction battery pack check",
+        "note": "Have the diagnosis done by the manufacturer or an approved installer."
+      }
+    },
+    "sail": {
+      "loft_inspection": {
+        "label": "Sail loft inspection",
+        "note": "Washing, seam and reinforcement check, repairs where needed."
+      },
+      "mainsail_check": {
+        "label": "Mainsail check"
+      },
+      "headsail_uv_strip": {
+        "label": "Headsail UV strip"
+      },
+      "sail_washing": {
+        "label": "Sail washing and drying"
+      },
+      "batten_check": {
+        "label": "Batten and slide check"
+      },
+      "storm_sails": {
+        "label": "Storm sail check"
+      }
+    },
+    "rig": {
+      "standing_rigging_check": {
+        "label": "Standing rigging inspection",
+        "note": "Visual check of terminals, chainplates and turnbuckles."
+      },
+      "standing_rigging_replacement": {
+        "label": "Standing rigging replacement",
+        "note": "Commonly recommended at 10 years - some insurers require it sooner."
+      },
+      "running_rigging": {
+        "label": "Running rigging replacement"
+      },
+      "mast_fittings": {
+        "label": "Mast fittings and lights"
+      },
+      "mast_step": {
+        "label": "Mast step and chainplate check"
+      },
+      "furler_service": {
+        "label": "Furler service"
+      },
+      "rig_tuning": {
+        "label": "Rig tuning"
+      },
+      "mast_unstepping": {
+        "label": "Unstepping and full mast inspection",
+        "note": "Often combined with standing rigging replacement."
+      }
+    },
+    "electrical": {
+      "battery_check": {
+        "label": "Battery check"
+      },
+      "service_battery_bank": {
+        "label": "Service battery bank replacement",
+        "note": "Service life depends heavily on the technology and the cycling."
+      },
+      "engine_battery": {
+        "label": "Starter battery replacement"
+      },
+      "connections_bonding": {
+        "label": "Connections and bonding"
+      },
+      "alternator": {
+        "label": "Alternator and charging check"
+      },
+      "shore_power": {
+        "label": "Shore power inlet and RCD",
+        "note": "Test the residual current device at the start of every season."
+      },
+      "navigation_lights": {
+        "label": "Navigation lights"
+      },
+      "solar_regulator": {
+        "label": "Solar panels and regulator"
+      },
+      "electronics_update": {
+        "label": "On-board electronics update"
+      }
+    },
+    "plumbing": {
+      "bilge_pumps": {
+        "label": "Bilge pumps and float switches",
+        "note": "Test the automatic trigger, not just the manual override."
+      },
+      "marine_toilet": {
+        "label": "Marine toilet service"
+      },
+      "holding_tank": {
+        "label": "Holding tank and valves"
+      },
+      "fresh_water_circuit": {
+        "label": "Fresh water system disinfection"
+      },
+      "water_pump_filter": {
+        "label": "Fresh water pump filter"
+      },
+      "hoses_clamps": {
+        "label": "Hoses and clamps"
+      },
+      "seacocks_grease": {
+        "label": "Seacock greasing"
+      },
+      "watermaker": {
+        "label": "Watermaker service",
+        "note": "Flush and pickle per the manual, especially before a long lay-up."
+      }
+    },
+    "safety": {
+      "liferaft_service": {
+        "label": "Liferaft service",
+        "note": "Interval set by the liferaft manufacturer - often 1 to 3 years."
+      },
+      "fire_extinguishers": {
+        "label": "Fire extinguisher check",
+        "note": "Annual check, with periodic pressure testing depending on the type."
+      },
+      "flares": {
+        "label": "Distress flare replacement",
+        "note": "Flares carry an expiry date - use it as the due date."
+      },
+      "lifejackets": {
+        "label": "Lifejackets and inflators",
+        "note": "Check the cylinder, the inflator head and the bladder's air tightness."
+      },
+      "epirb_battery": {
+        "label": "EPIRB battery",
+        "note": "The replacement date is printed on the beacon."
+      },
+      "harness_lifelines": {
+        "label": "Harnesses and jackstays"
+      },
+      "first_aid_kit": {
+        "label": "First aid kit"
+      },
+      "bilge_alarm": {
+        "label": "Bilge alarm and gas detector"
+      },
+      "sound_signals": {
+        "label": "Sound signalling devices"
+      }
+    },
+    "deck": {
+      "winches": {
+        "label": "Winch strip-down and greasing",
+        "note": "One winch stripped per year is enough on a lightly used boat."
+      },
+      "windlass": {
+        "label": "Windlass and ground tackle"
+      },
+      "anchor_chain": {
+        "label": "Anchor chain marking and end-for-ending"
+      },
+      "hatches_seals": {
+        "label": "Hatch and portlight seals"
+      },
+      "teak_care": {
+        "label": "Teak care"
+      },
+      "canvas_covers": {
+        "label": "Sail cover, bimini and sprayhood"
+      },
+      "blocks_clutches": {
+        "label": "Blocks and clutches"
+      },
+      "guardrails": {
+        "label": "Guardrails and stanchions"
+      },
+      "steering_system": {
+        "label": "Steering system, cables and ram",
+        "note": "Check play and lubrication before each season."
+      }
+    },
+    "other": {
+      "tender_service": {
+        "label": "Tender service"
+      },
+      "outboard_tender_service": {
+        "label": "Tender outboard service"
+      },
+      "trailer_service": {
+        "label": "Trailer service",
+        "note": "Bearings, lights, brakes and straps - check before every tow."
+      },
+      "heating_service": {
+        "label": "Heater service"
+      },
+      "refrigeration_service": {
+        "label": "Refrigeration service"
+      }
+    }
   }
 }

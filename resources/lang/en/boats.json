@@ -663,7 +663,21 @@
       "titleField": "Title",
       "titlePlaceholder": "e.g. Oil change, inspect rigging",
       "notes": "Notes",
-      "selectPlaceholder": "— Select —"
+      "selectPlaceholder": "— Select —",
+      "hull": "Hull",
+      "electrical": "Electrical",
+      "plumbing": "Plumbing",
+      "safety": "Safety",
+      "deck": "Deck / Fittings",
+      "other": "Other"
+    },
+    "operations": {
+      "hint": "Pick a standard operation from the catalogue, or type your own title.",
+      "placeholder": "e.g. Engine oil change",
+      "noMatch": "No catalogue operation matches — your entry is kept as typed.",
+      "intervalMonths": "every {count} months",
+      "intervalEngineHours": "every {count} engine hours",
+      "indicative": "Indicative interval"
     }
   },
   "sheets": {
