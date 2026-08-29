@@ -40,6 +40,7 @@ export default class NavigationService {
         'windForceBeaufort'
       )
       .preload('boat', (q) => q.select('id', 'name'))
+      .withCount('entries')
       .where('organizationId', user.organizationId)
       .orderBy('departedAt', 'desc')
       .orderBy('id', 'desc')
@@ -61,6 +62,7 @@ export default class NavigationService {
       crewCount: log.crewCount,
       seaState: log.seaState,
       windForceBeaufort: log.windForceBeaufort,
+      entriesCount: Number(log.$extras?.entries_count ?? 0),
     }))
   }
 

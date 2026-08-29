@@ -627,6 +627,19 @@ test.group('toNavigationLogRows', () => {
     assert.lengthOf(rows[0]!.crew, 0)
   })
 
+  test('navigationLog maps entries_count from $extras (0 when absent)', ({ assert }) => {
+    const withCount = makeNavigationLog({
+      $preloaded: { crew: false },
+      crew: [],
+      $extras: { entries_count: '3' },
+    })
+    const withoutExtras = makeNavigationLog({ $preloaded: { crew: false }, crew: [] })
+    const rows = toNavigationLogRows([withCount, withoutExtras] as unknown as NavigationLog[])
+
+    assert.equal(rows[0]!.entriesCount, 3)
+    assert.equal(rows[1]!.entriesCount, 0)
+  })
+
   test('navigationLog crew empty when $preloaded.crew is false', ({ assert }) => {
     const log = makeNavigationLog({
       $preloaded: { crew: false },

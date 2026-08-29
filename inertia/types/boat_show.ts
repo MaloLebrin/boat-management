@@ -259,6 +259,7 @@ export type {
   SeaState,
   NavigationLogPortOption,
   NavigationLogEngineOption,
+  NavigationLogEntryRow,
 } from '../../shared/types/navigation_log'
 
 export type AiSuggestion = { text: string }

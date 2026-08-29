@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { Form } from '@adonisjs/inertia/vue'
+import { Form, Link } from '@adonisjs/inertia/vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
+import NavigationLogEntryQuickAdd from '~/components/boats/show/tabs/NavigationLogEntryQuickAdd.vue'
 import NavigationLogUpdateForm from '~/components/boats/show/tabs/NavigationLogUpdateForm.vue'
 import NavigationLogCloseForm from '~/components/boats/show/tabs/NavigationLogCloseForm.vue'
 import { toNavigationEngineOptions } from '~/utils/navigation_engine_options'
@@ -131,7 +132,21 @@ function toggleClose() {
         </span>
       </div>
       <p v-if="log.notes" class="whitespace-pre-wrap text-xs text-fg-muted mt-1">{{ log.notes }}</p>
+      <Link
+        :href="`/boats/${boat.id}/navigation-logs/${log.id}`"
+        class="inline-block text-xs font-medium text-brand hover:underline"
+      >
+        {{ t('navigation_logs.entries.pointCount', { count: String(log.entriesCount) }) }}
+        · {{ t('navigation_logs.entries.detailLink') }}
+      </Link>
     </div>
+
+    <!-- Point de log au tap : rafale GPS 3-5 s → COG/SOG pré-remplis -->
+    <NavigationLogEntryQuickAdd
+      v-if="canUpdate && !showCloseForm"
+      :boat-id="boat.id"
+      :log-id="log.id"
+    />
 
     <!-- Update form -->
     <NavigationLogUpdateForm

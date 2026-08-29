@@ -57,6 +57,7 @@ export const controllers = {
   Mouillages: () => import('#controllers/mouillages_controller'),
   Navigation: () => import('#controllers/navigation_controller'),
   NavigationLogCrew: () => import('#controllers/navigation_log_crew_controller'),
+  NavigationLogEntries: () => import('#controllers/navigation_log_entries_controller'),
   NavigationLogs: () => import('#controllers/navigation_logs_controller'),
   NewAccount: () => import('#controllers/new_account_controller'),
   Notifications: () => import('#controllers/notifications_controller'),

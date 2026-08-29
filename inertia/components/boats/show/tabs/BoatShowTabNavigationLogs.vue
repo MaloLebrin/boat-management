@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
 import { router } from '@inertiajs/vue3'
+import { Link } from '@adonisjs/inertia/vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import NavigationLogForm from '~/components/boats/show/tabs/NavigationLogForm.vue'
@@ -171,6 +172,13 @@ function deleteLog(logId: number) {
                 <span v-if="log.crewCount !== null">
                   {{ t('navigation_logs.crew', { count: String(log.crewCount) }) }}
                 </span>
+                <Link
+                  :href="`/boats/${boat.id}/navigation-logs/${log.id}`"
+                  class="font-medium text-brand hover:underline"
+                >
+                  {{ t('navigation_logs.entries.pointCount', { count: String(log.entriesCount) }) }}
+                  · {{ t('navigation_logs.entries.detailLink') }}
+                </Link>
               </div>
 
               <!-- Notes -->

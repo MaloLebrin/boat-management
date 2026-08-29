@@ -240,6 +240,37 @@ Fiches CRM (module `crm_invoicing`).
 - `supplier`, `notes`
 - `createdAt`, `updatedAt`
 
+### navigation_logs
+
+Une ligne = une **sortie** (trip) du journal de bord — doc de domaine : `docs/domain/navigation-logs.md`.
+
+- `id`, `boatId` (CASCADE), `organizationId` (CASCADE)
+- `status` — `in_progress` | `completed` ; **index partiel `one_in_progress_per_boat`** (#182) : une seule sortie en cours par bateau, garanti côté base
+- `departedAt` (indexé), `arrivedAt` (nullable)
+- `departurePortId` / `arrivalPortId` (FK → ports, SET NULL) + `departurePortName` / `arrivalPortName` (nom libre)
+- `distanceNm`, `engineHoursStart`, `engineHoursEnd`, `fuelConsumedLiters`
+- `windForceBeaufort` (0–12), `seaState` (`calm`…`very_rough`), `crewCount`, `notes`
+- `createdAt`, `updatedAt`
+
+### navigation_log_crew
+
+Pivot équipage d'une sortie (#101, IDOR scellé en #157).
+
+- `navigationLogId` + `crewMemberId` (CASCADE), unicité du couple
+- `role` — `skipper` | `crew` | `passenger`
+
+### navigation_log_entries
+
+Une ligne = un **point de log** consigné en cours de sortie (rafale GPS au tap → COG/SOG).
+
+- `id`, `navigationLogId` (CASCADE), `organizationId` (CASCADE)
+- `recordedAt` (index composite `(navigationLogId, recordedAt)`)
+- `latitude` / `longitude` (nullables — point sans GPS possible, toujours fournis ensemble), `gpsAccuracyM`
+- `cogDeg` (0–359, **null si vitesse quasi nulle** — mouillage), `sogKn`
+- `sailConfig`, `note`
+- `twdDeg`, `twaDeg`, `weatherSnapshot` (jsonb) — **réservés à l'itération météo GRIB**, jamais écrits aujourd'hui
+- `createdAt`, `updatedAt`
+
 ## Relations (résumé)
 
 - `Organization 1..n User` via `users.organizationId`
@@ -257,6 +288,8 @@ Fiches CRM (module `crm_invoicing`).
 - `CrewMember 1..n CrewCertification` via `crew_certifications.crewMemberId`
 - `Boat 1..n BoatReservation`, `Client 0..n BoatReservation` via `boat_reservations.clientId`
 - `Boat 1..n BoatFuelLog`, `BoatEngine 0..n BoatFuelLog` via `boat_fuel_logs.boatEngineId`
+- `Boat 1..n NavigationLog` ; `NavigationLog n..n CrewMember` via `navigation_log_crew` (rôle sur le pivot)
+- `NavigationLog 1..n NavigationLogEntry` via `navigation_log_entries.navigationLogId`
 
 ## Catalogue de bateaux (référentiel, pas de la démo)
 

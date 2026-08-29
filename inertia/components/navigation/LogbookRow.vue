@@ -31,6 +31,14 @@ defineProps<{ row: FleetLogbookRow }>()
     <td class="px-4 py-3 text-sm text-fg-muted">
       {{ row.distanceNm ? t('navigation.logbook.nm', { count: String(row.distanceNm) }) : '—' }}
     </td>
-    <td class="px-4 py-3 text-sm text-fg-muted">{{ formatDate(row.departedAt) }}</td>
+    <td class="px-4 py-3 text-sm text-fg-muted">
+      {{ formatDate(row.departedAt) }}
+      <Link
+        :href="`/boats/${row.boatId}/navigation-logs/${row.id}`"
+        class="ml-2 text-xs font-medium text-brand hover:underline"
+      >
+        {{ t('navigation_logs.entries.pointCount', { count: String(row.entriesCount) }) }}
+      </Link>
+    </td>
   </tr>
 </template>

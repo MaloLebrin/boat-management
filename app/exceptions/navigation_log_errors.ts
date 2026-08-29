@@ -15,6 +15,14 @@ export class NavigationLogConflictError extends Error {
   }
 }
 
+export class NavigationLogEntryNotFoundError extends Error {
+  name = 'NavigationLogEntryNotFoundError'
+}
+
+export class NavigationLogEntryNotEditableError extends Error {
+  name = 'NavigationLogEntryNotEditableError'
+}
+
 export class NavigationLogValidationError extends Error {
   name = 'NavigationLogValidationError'
   constructor(
