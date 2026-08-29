@@ -16,6 +16,7 @@ import type { FuelLogRow } from '#shared/types/fuel_log'
 import type { NavigationLogEntryRow, NavigationLogRow } from '#shared/types/navigation_log'
 import type { BoatOwnerBoatSummary } from '#shared/types/boat'
 import type { BoatCategory } from '#shared/types/boat_catalog'
+import type { SafetyComplianceReport } from '#shared/types/safety'
 import { toBoatEquipmentActionRow } from '#transformers/boat_equipment_action_transformer'
 
 /**
@@ -56,6 +57,12 @@ export interface BoatShowShellContext {
    * et l'onglet demandé n'apparaissait qu'à l'hydratation (flash — #463).
    */
   initialTab: string | null
+  /**
+   * Rapport de conformité Division 240 (#582), calculé sur l'inventaire déjà
+   * chargé. `zone: null` (bateau sans zone d'armement déclarée) = aucun
+   * contrôle : le panneau se contente alors d'inviter à renseigner la zone.
+   */
+  safetyCompliance: SafetyComplianceReport
 }
 
 export function toBoatOwnerSummary(boat: Boat): BoatOwnerBoatSummary {
@@ -89,6 +96,7 @@ export function toEditForm(boat: Boat) {
     manufacturedAt: boat.manufacturedAt ? boat.manufacturedAt.toISODate() : null,
     homePort: boat.homePort,
     navigationCategory: boat.navigationCategory,
+    armamentZone: boat.armamentZone,
     hullIdentificationNumber: boat.hullIdentificationNumber,
     francisationNumber: boat.francisationNumber,
     flagCountry: boat.flagCountry,
@@ -127,6 +135,7 @@ export function toShowShellProps(boat: Boat, ctx: BoatShowShellContext) {
     canDeleteNavigationLogs: ctx.canDeleteNavigationLogs,
     homePortId: ctx.homePortId,
     initialTab: ctx.initialTab,
+    safetyCompliance: ctx.safetyCompliance,
   }
 }
 
@@ -249,6 +258,7 @@ function toBoatDetail(
     model: boat.model,
     homePort: boat.homePort,
     navigationCategory: boat.navigationCategory,
+    armamentZone: boat.armamentZone,
     hullIdentificationNumber: boat.hullIdentificationNumber,
     francisationNumber: boat.francisationNumber,
     flagCountry: boat.flagCountry,

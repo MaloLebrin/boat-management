@@ -51,7 +51,10 @@
     "selectCountryPlaceholder": "Select a country…",
     "aisSection": "AIS Identification",
     "mmsi": "MMSI (9 digits)",
-    "imoNumber": "IMO number"
+    "imoNumber": "IMO number",
+    "navigationCategoryHint": "Manufacturer's CE design category (A–D): what the hull can take. It has no bearing on the safety gear you must carry.",
+    "armamentZone": "Sailing area",
+    "armamentZoneHint": "How far from shelter you sail. This — not the CE design category — determines the safety equipment required by French Division 240."
   },
   "engines": {
     "title": "Engines",
@@ -235,6 +238,12 @@
       "classic": "Classic boat",
       "workboat": "Workboat",
       "other": "Other"
+    },
+    "armamentZone": {
+      "basic": "Sheltered — up to 2 NM from shelter",
+      "coastal": "Coastal — up to 6 NM",
+      "semi_offshore": "Semi-offshore — up to 60 NM",
+      "offshore": "Offshore — beyond 60 NM"
     }
   },
   "index": {
@@ -963,5 +972,65 @@
     "freeTextHint": "Type the home port name freely.",
     "noMatch": "No matching port — your entry will be kept.",
     "viewPort": "Open this port"
+  },
+  "safetyCompliance": {
+    "title": "Safety equipment compliance",
+    "score": "{score}%",
+    "summary": "{satisfied} of {total} requirements covered.",
+    "allGood": "Every tracked requirement for this area is covered.",
+    "addEquipment": "Add this equipment",
+    "articleRef": "Division 240, annex {ref}",
+    "disclaimer": "This check helps you prepare your safety equipment: it replaces neither the official Division 240 text nor an inspection by the maritime authorities.",
+    "textVersion": "Based on the text in force in {version}.",
+    "noZone": {
+      "description": "Set the boat's sailing area to turn on Division 240 compliance tracking. With no area declared, nothing is checked.",
+      "cta": "Set the sailing area"
+    },
+    "status": {
+      "missing": "Missing",
+      "insufficient_quantity": "Not enough",
+      "expired": "Expired",
+      "expiring_soon": "Expiring soon",
+      "review_due": "Service overdue",
+      "review_due_soon": "Service due soon"
+    },
+    "detail": {
+      "required": "Required quantity: {count}",
+      "quantity": "{current} on board, {required} required",
+      "due": "Due: {date}",
+      "defaultLifetime": "Due date derived from the purchase date — {lifetime}"
+    },
+    "requirements": {
+      "basic.life_jacket": "Personal flotation device (one per person)",
+      "basic.bilge_pump": "Bailing device (pump or bailer)",
+      "basic.anchor": "Anchor and rode",
+      "basic.fire_extinguisher": "Fire extinguisher",
+      "coastal.flare": "Hand-held red flares",
+      "coastal.compass": "Magnetic compass",
+      "semi_offshore.life_raft": "Life raft",
+      "semi_offshore.first_aid_kit": "First aid kit",
+      "semi_offshore.vhf_radio": "Fixed VHF radio",
+      "semi_offshore.lifebuoy": "Lifebuoy",
+      "semi_offshore.harness": "Harness and tether (sailing boats)",
+      "offshore.epirb": "Distress beacon (EPIRB / PLB)",
+      "offshore.gps": "Means of fixing a position and following a route"
+    },
+    "lifetimes": {
+      "flare": "expires 3 years after purchase",
+      "first_aid_kit": "expires 3 years after purchase",
+      "fire_extinguisher": "yearly check",
+      "life_raft": "yearly service",
+      "life_jacket": "service every 2 years (inflatable jackets)",
+      "epirb": "battery replaced every 5 years"
+    },
+    "untracked": {
+      "title": "Requirements the inventory does not track",
+      "individual_light": "individual light for locating a person",
+      "towing_line": "towing line",
+      "colreg_rules": "COLREGs (collision regulations)",
+      "charts": "nautical charts and publications",
+      "weather_forecast": "means of receiving weather forecasts",
+      "summary_document": "safety equipment summary sheet"
+    }
   }
 }

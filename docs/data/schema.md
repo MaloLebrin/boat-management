@@ -36,8 +36,15 @@ Source: `database/schema.ts` (généré automatiquement via migrations).
 - construction: `yearBuilt`, `manufacturer`, `model`, `manufacturedAt`
 - réglementaire: `flagCountry` (code ISO 3166-1 alpha-2, vocabulaire `COUNTRY_CODES`, nullable —
   cf. #580), `navigationCategory`, `hullIdentificationNumber`, `francisationNumber`, `maxPersons`
+- armement: `armamentZone` (`basic | coastal | semi_offshore | offshore`, nullable — cf. #582)
 
 `category` ne doit pas être confondue avec `navigationCategory` (catégorie CE A/B/C/D).
+
+`armamentZone` non plus : `navigationCategory` est la **catégorie de conception CE** (ce que la
+coque encaisse), `armamentZone` la **distance d'un abri** déclarée par l'utilisateur, seule
+grandeur sur laquelle raisonne la Division 240. Un bateau de catégorie CE B peut naviguer en zone
+`basic`, et inversement. Colonne nullable sans valeur par défaut : sans zone déclarée, aucun
+contrôle de conformité n'est effectué (cf. `docs/domain/safety-compliance.md`).
 
 `flagCountry` et `ports.country` partagent le même vocabulaire fermé (`shared/constants/countries.ts`).
 La migration `1834000000000_normalize_country_codes` a normalisé l'existant en best-effort et

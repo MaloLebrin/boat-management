@@ -160,6 +160,7 @@ export default class BoatHullService {
 
             homePort: payload.homePort ?? null,
             navigationCategory: payload.navigationCategory ?? null,
+            armamentZone: payload.armamentZone ?? null,
             hullIdentificationNumber: payload.hullIdentificationNumber ?? null,
             francisationNumber: payload.francisationNumber ?? null,
             flagCountry: payload.flagCountry ?? null,
@@ -221,6 +222,7 @@ export default class BoatHullService {
 
     boat.homePort = payload.homePort ?? null
     boat.navigationCategory = payload.navigationCategory ?? null
+    boat.armamentZone = payload.armamentZone ?? null
     boat.hullIdentificationNumber = payload.hullIdentificationNumber ?? null
     boat.francisationNumber = payload.francisationNumber ?? null
     boat.flagCountry = payload.flagCountry ?? null

@@ -46,6 +46,7 @@ const manufacturer = ref('')
 const model = ref('')
 const homePort = ref('')
 const navigationCategory = ref('')
+const armamentZone = ref('')
 const hullIdentificationNumber = ref('')
 const francisationNumber = ref('')
 const flagCountry = ref('')
@@ -87,6 +88,7 @@ function syncFromBoat() {
   model.value = b.model ?? ''
   homePort.value = b.homePort ?? ''
   navigationCategory.value = b.navigationCategory ?? ''
+  armamentZone.value = b.armamentZone ?? ''
   hullIdentificationNumber.value = b.hullIdentificationNumber ?? ''
   francisationNumber.value = b.francisationNumber ?? ''
   flagCountry.value = b.flagCountry ?? ''
@@ -216,6 +218,7 @@ watch(
 
     <BoatFormLegalFields
       v-model:navigation-category="navigationCategory"
+      v-model:armament-zone="armamentZone"
       v-model:max-persons="maxPersons"
       v-model:hull-identification-number="hullIdentificationNumber"
       v-model:francisation-number="francisationNumber"

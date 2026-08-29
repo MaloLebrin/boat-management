@@ -76,6 +76,7 @@ Référence: `inertia/app.ts`.
     - `inertia/components/boats/equipment-actions/BoatEquipmentActionModal.vue` — modal création/édition (prop `prefill` pour l'ajout depuis un équipement, #313)
     - `inertia/components/boats/show/tabs/BoatShowTabEquipmentActions.vue` — onglet liste avec filtres
   - onglet Équipement : `BoatShowTabEquipment.vue` héberge le modal d'action ; `BoatGenericEquipmentRow.vue` (extrait de `BoatGenericEquipmentCard.vue`) / `BoatSafetyEquipmentCard.vue` exposent un bouton « Ajouter à la liste » sur les items dégradés (#313)
+  - filtre « Sécurité » : `BoatSafetyCompliancePanel.vue` (#582) rend le rapport Division 240 (prop `safetyCompliance` du squelette) au-dessus de `BoatSafetyEquipmentCard.vue`, qu'il pilote via `prefillEquipmentType` pour ouvrir la création pré-remplie sur un équipement manquant
 - Props (types): `inertia/types/boat_show.ts`
 - Source backend: `BoatsController.show`
 - Chargement différé (#463) : les props d'onglet arrivent en deux groupes

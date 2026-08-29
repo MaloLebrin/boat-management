@@ -7,6 +7,7 @@ import BoatMaintenanceTask from '#models/boat_maintenance_task'
 import BoatSafetyEquipment from '#models/boat_safety_equipment'
 import OrganizationMembership from '#models/organization_membership'
 import NotificationService from '#services/notification_service'
+import { resolveEffectiveExpiry } from '#shared/helpers/safety_compliance'
 import type { NotificationSeverity, NotificationType } from '#shared/types/notification'
 
 /** Fenêtre « bientôt » (jours) pour les échéances/expirations à venir. */
@@ -128,11 +129,22 @@ export default class NotificationScanService {
     ]
   }
 
+  /**
+   * Équipements de sécurité échus — sur la date **saisie** comme sur la durée
+   * de vie **par défaut** du corpus Division 240 (#582).
+   *
+   * Sans ce second volet, un extincteur ou des fusées dont l'utilisateur n'a
+   * jamais rempli la date de péremption n'étaient jamais signalés, alors que la
+   * date d'achat suffit à les dater. Une révision échue (extincteur, radeau)
+   * emprunte le même type de notification qu'une péremption : le vocabulaire
+   * `NotificationType` ne distingue pas les deux, et l'action attendue — ouvrir
+   * la fiche bateau — est la même.
+   */
   private async scanSafetyEquipment(): Promise<ScanGroup[]> {
     const today = DateTime.now().startOf('day')
     const soon = today.plus({ days: DUE_SOON_WINDOW_DAYS })
 
-    const [expired, expiringSoon] = await Promise.all([
+    const [expired, expiringSoon, undated] = await Promise.all([
       BoatSafetyEquipment.query()
         .whereNotNull('expiry_date')
         .where('expiry_date', '<', today.toISODate()!)
@@ -142,11 +154,32 @@ export default class NotificationScanService {
         .where('expiry_date', '>=', today.toISODate()!)
         .where('expiry_date', '<=', soon.toISODate()!)
         .preload('boat'),
+      BoatSafetyEquipment.query()
+        .whereNull('expiry_date')
+        .whereNotNull('purchased_at')
+        .preload('boat'),
     ])
 
+    // La durée de vie dépend du type d'équipement : le tri se fait donc en
+    // mémoire, sur le seul lot des équipements datés d'un achat sans péremption.
+    const derivedExpired: BoatSafetyEquipment[] = []
+    const derivedExpiringSoon: BoatSafetyEquipment[] = []
+    for (const item of undated) {
+      const expiry = resolveEffectiveExpiry(item)
+      if (!expiry) continue
+      if (expiry.date < today) derivedExpired.push(item)
+      else if (expiry.date <= soon) derivedExpiringSoon.push(item)
+    }
+
+    // Les deux volets sont fusionnés avant l'agrégation : sans quoi un bateau
+    // cumulant les deux cas recevrait deux notifications du même type.
     return [
-      ...this.groupByBoat(expired, 'safety_equipment.expired', 'error'),
-      ...this.groupByBoat(expiringSoon, 'safety_equipment.expiring_soon', 'warning'),
+      ...this.groupByBoat([...expired, ...derivedExpired], 'safety_equipment.expired', 'error'),
+      ...this.groupByBoat(
+        [...expiringSoon, ...derivedExpiringSoon],
+        'safety_equipment.expiring_soon',
+        'warning'
+      ),
     ]
   }
 

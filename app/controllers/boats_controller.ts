@@ -11,6 +11,7 @@ import BoatFuelLogService from '#services/boat_fuel_log_service'
 import BoatListService from '#services/boat_list_service'
 import BoatOwnerService from '#services/boat_owner_service'
 import BoatPricingService from '#services/boat_pricing_service'
+import BoatSafetyComplianceService from '#services/boat_safety_compliance_service'
 import NavigationLogService from '#services/navigation_log_service'
 import CrewService from '#services/crew_service'
 import {
@@ -72,7 +73,8 @@ export default class BoatsController {
     private pricingService: BoatPricingService,
     private equipmentActionService: BoatEquipmentActionService,
     private boatOwnerService: BoatOwnerService,
-    private boatCatalogService: BoatCatalogService
+    private boatCatalogService: BoatCatalogService,
+    private safetyComplianceService: BoatSafetyComplianceService
   ) {}
 
   async index({ inertia, auth, request, bouncer, response }: HttpContext) {
@@ -281,6 +283,7 @@ export default class BoatsController {
           canUpdateNavigationLogs,
           canDeleteNavigationLogs,
           initialTab,
+          safetyCompliance: this.safetyComplianceService.forBoat(boat),
         }),
 
         // Groupe « maintenance » : onglets Aperçu, Historique, Tâches, Fiches,

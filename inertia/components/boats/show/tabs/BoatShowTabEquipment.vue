@@ -4,12 +4,14 @@ import { onMounted, ref, watch } from 'vue'
 import BoatGenericEquipmentCard from '~/components/boats/equipment/BoatGenericEquipmentCard.vue'
 import BoatShowEnginesCard from '~/components/boats/engine/BoatShowEnginesCard.vue'
 import BoatShowRigCard from '~/components/boats/rig/BoatShowRigCard.vue'
+import BoatSafetyCompliancePanel from '~/components/boats/safety/BoatSafetyCompliancePanel.vue'
 import BoatSafetyEquipmentCard from '~/components/boats/safety/BoatSafetyEquipmentCard.vue'
 import BoatShowSailsCard from '~/components/boats/sail/BoatShowSailsCard.vue'
 import BoatEquipmentAddModal from '~/components/boats/show/modals/BoatEquipmentAddModal.vue'
 import BoatEquipmentActionModal from '~/components/boats/equipment-actions/BoatEquipmentActionModal.vue'
 import { useT } from '~/composables/use_t'
 import type { BoatCreateIntent, BoatShowDetail, EquipmentActionPrefill } from '~/types/boat_show'
+import type { SafetyComplianceReport } from '#shared/types/safety'
 
 const props = withDefaults(
   defineProps<{
@@ -17,6 +19,8 @@ const props = withDefaults(
     canManageEquipment: boolean
     canManageActions: boolean
     createIntent?: BoatCreateIntent
+    /** Rapport de conformité Division 240 (#582), calculé côté serveur. */
+    safetyCompliance: SafetyComplianceReport
   }>(),
   { createIntent: null }
 )
@@ -38,6 +42,10 @@ function consumeCreateIntent() {
 
 onMounted(consumeCreateIntent)
 watch(() => props.createIntent, consumeCreateIntent)
+
+// Type demandé par le panneau de conformité : transmis à la carte inventaire,
+// qui ouvre sa modale de création pré-remplie puis rend la main (#582).
+const safetyPrefillType = ref<string | null>(null)
 
 // Equipment-action modal raised from a degraded equipment card (#313)
 const isActionModalOpen = ref(false)
@@ -118,14 +126,22 @@ function openActionModal(payload: EquipmentActionPrefill) {
       <BoatShowRigCard :boat-id="boat.id" :rig="boat.rig" :can-manage="canManageEquipment" />
     </div>
 
-    <!-- Safety equipment card -->
-    <div v-if="equipmentFilter === 'all' || equipmentFilter === 'safety'">
+    <!-- Safety compliance + equipment cards -->
+    <div v-if="equipmentFilter === 'all' || equipmentFilter === 'safety'" class="space-y-6">
+      <BoatSafetyCompliancePanel
+        :boat-id="boat.id"
+        :report="safetyCompliance"
+        :can-manage="canManageEquipment"
+        @add-equipment="(type) => (safetyPrefillType = type)"
+      />
       <BoatSafetyEquipmentCard
         :boat-id="boat.id"
         :items="boat.safetyEquipment"
         :can-manage="canManageEquipment"
         :can-manage-actions="canManageActions"
+        :prefill-equipment-type="safetyPrefillType"
         @add-to-actions="openActionModal"
+        @prefill-consumed="safetyPrefillType = null"
       />
     </div>
 

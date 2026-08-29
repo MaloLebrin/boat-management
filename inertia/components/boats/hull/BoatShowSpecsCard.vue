@@ -72,6 +72,15 @@ const { countryName } = useCountries()
         </dd>
       </div>
       <div>
+        <dt class="text-fg-muted">{{ t('boats.hullFields.armamentZone') }}</dt>
+        <dd class="font-semibold text-fg">
+          <template v-if="boat.armamentZone">
+            {{ t(`boats.options.armamentZone.${boat.armamentZone}`) }}
+          </template>
+          <template v-else>—</template>
+        </dd>
+      </div>
+      <div>
         <dt class="text-fg-muted">{{ t('boats.hullFields.hullIdentificationNumber') }}</dt>
         <dd class="font-semibold text-fg">{{ boat.hullIdentificationNumber ?? '—' }}</dd>
       </div>
