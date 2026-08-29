@@ -942,5 +942,12 @@
     "modelNeedsBrandHint": "Pick a builder from the catalogue to see its models. Free text is still accepted.",
     "noBrandMatch": "No matching builder — your entry will be kept.",
     "noModelMatch": "No matching model — your entry will be kept."
+  },
+  "homePortSuggest": {
+    "placeholder": "e.g. Port-la-Forêt…",
+    "hint": "Pick a port from your organisation or type any name: the value is saved as typed.",
+    "freeTextHint": "Type the home port name freely.",
+    "noMatch": "No matching port — your entry will be kept.",
+    "viewPort": "Open this port"
   }
 }

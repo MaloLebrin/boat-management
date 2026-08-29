@@ -942,5 +942,12 @@
     "modelNeedsBrandHint": "Choisissez un constructeur du catalogue pour voir ses modèles. La saisie libre reste acceptée.",
     "noBrandMatch": "Aucun constructeur ne correspond — votre saisie sera conservée.",
     "noModelMatch": "Aucun modèle ne correspond — votre saisie sera conservée."
+  },
+  "homePortSuggest": {
+    "placeholder": "Ex. Port-la-Forêt…",
+    "hint": "Choisissez un port de votre organisation ou saisissez librement le nom : la valeur est enregistrée telle quelle.",
+    "freeTextHint": "Saisissez librement le nom du port d'attache.",
+    "noMatch": "Aucun port ne correspond — votre saisie sera conservée.",
+    "viewPort": "Voir la fiche de ce port"
   }
 }

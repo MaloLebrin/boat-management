@@ -7,7 +7,7 @@ import type User from '#models/user'
 import db from '@adonisjs/lucid/services/db'
 import { PortHasBoatsError, PortNotFoundError } from '#exceptions/port_errors'
 import { UserNotInOrganizationError } from '#exceptions/organization_errors'
-import type { PortAggRow, PortPayload } from '#shared/types/port'
+import type { PortAggRow, PortNameOption, PortPayload } from '#shared/types/port'
 import { inject } from '@adonisjs/core'
 
 function assertPortInUserOrg(user: User, port: Port) {
@@ -140,7 +140,7 @@ export default class PortService {
       .orderBy('name', 'asc')
   }
 
-  async listNamesForOrg(user: User): Promise<{ id: number; name: string }[]> {
+  async listNamesForOrg(user: User): Promise<PortNameOption[]> {
     if (user.organizationId === null) return []
 
     const ports = await Port.query()
@@ -149,6 +149,24 @@ export default class PortService {
       .orderBy('name', 'asc')
 
     return ports.map((p) => ({ id: p.id, name: p.name }))
+  }
+
+  /**
+   * Rapproche un nom de port saisi en texte libre (`boats.home_port`) d'un port
+   * de l'organisation (#579).
+   *
+   * Comparaison **à plat** sur le nom, sans FK ni jointure : la colonne texte
+   * reste la source de vérité, et un port de passage hors référentiel ne
+   * remonte simplement rien. La casse et les espaces de bordure sont ignorés —
+   * la combobox écrit le nom canonique, mais les valeurs déjà en base ont pu
+   * être saisies avant elle.
+   */
+  async findIdByName(user: User, name: string | null | undefined): Promise<number | null> {
+    const needle = name?.trim().toLocaleLowerCase()
+    if (!needle) return null
+
+    const ports = await this.listNamesForOrg(user)
+    return ports.find((p) => p.name.trim().toLocaleLowerCase() === needle)?.id ?? null
   }
 
   async getWithPontoonsAndMouillagesOrFail(user: User, portId: number) {

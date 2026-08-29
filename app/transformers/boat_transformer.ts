@@ -28,6 +28,13 @@ import { toBoatEquipmentActionRow } from '#transformers/boat_equipment_action_tr
 export interface BoatShowShellContext {
   positionHistory: BoatPositionHistory[]
   boatMedia: Media[]
+  /**
+   * Port de l'organisation dont le nom correspond exactement au `home_port`
+   * saisi en texte libre (#579), ou `null`. Sert uniquement à proposer le lien
+   * vers la fiche port : aucune FK n'est posée, la colonne texte reste la
+   * source de vérité.
+   */
+  homePortId: number | null
   canManageMaintenance: boolean
   canManageEquipment: boolean
   canManageDocuments: boolean
@@ -118,6 +125,7 @@ export function toShowShellProps(boat: Boat, ctx: BoatShowShellContext) {
     canCreateNavigationLogs: ctx.canCreateNavigationLogs,
     canUpdateNavigationLogs: ctx.canUpdateNavigationLogs,
     canDeleteNavigationLogs: ctx.canDeleteNavigationLogs,
+    homePortId: ctx.homePortId,
     initialTab: ctx.initialTab,
   }
 }

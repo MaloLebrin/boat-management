@@ -14,6 +14,7 @@ import BudgetEntryList from '~/components/boats/budget/BudgetEntryList.vue'
 import { useCurrencyFormat } from '~/composables/use_currency_format'
 import { useT } from '~/composables/use_t'
 import type { BudgetData, BoatPortStayItem, BoatBudgetEntryItem } from '~/types/budget'
+import type { PortNameOption } from '../../../shared/types/port'
 
 const props = defineProps<{
   boat: { id: number; name: string }
@@ -22,6 +23,7 @@ const props = defineProps<{
   portStays: BoatPortStayItem[]
   entries: BoatBudgetEntryItem[]
   canManage: boolean
+  portOptions: PortNameOption[]
 }>()
 
 const { t } = useT()
@@ -161,8 +163,13 @@ const categories = computed(() => [
 
       <!-- Port stays section -->
       <div class="space-y-4">
-        <BudgetPortStayForm v-if="canManage" :boat-id="boat.id" />
-        <BudgetPortStayList :boat-id="boat.id" :stays="portStays" :can-manage="canManage" />
+        <BudgetPortStayForm v-if="canManage" :boat-id="boat.id" :port-options="portOptions" />
+        <BudgetPortStayList
+          :boat-id="boat.id"
+          :stays="portStays"
+          :can-manage="canManage"
+          :port-options="portOptions"
+        />
       </div>
 
       <!-- Budget entries section -->

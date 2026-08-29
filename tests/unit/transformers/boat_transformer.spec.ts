@@ -298,6 +298,7 @@ function makeShellContext(overrides: Partial<BoatShowShellContext> = {}): BoatSh
     canCreateNavigationLogs: true,
     canUpdateNavigationLogs: true,
     canDeleteNavigationLogs: false,
+    homePortId: null,
     initialTab: null,
     ...overrides,
   }

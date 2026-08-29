@@ -70,6 +70,8 @@ const props = defineProps<{
   pricing: BoatPricingRow | null
   pricingEnabled: boolean
   canManagePricing: boolean
+  /** Port de l'org rapproché du `homePort` texte libre (#579), ou `null`. */
+  homePortId: number | null
 }>()
 
 defineEmits<{ goToTab: [key: string]; createIntentConsumed: [] }>()
@@ -130,7 +132,7 @@ const showSkeleton = computed(
         @go-to-tab="$emit('goToTab', $event)"
       />
 
-      <BoatShowTabSpecs v-else-if="tab === 'specs'" :boat="boat" />
+      <BoatShowTabSpecs v-else-if="tab === 'specs'" :boat="boat" :home-port-id="homePortId" />
 
       <BoatShowTabPricing
         v-else-if="tab === 'pricing'"

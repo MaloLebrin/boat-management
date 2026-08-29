@@ -5,6 +5,7 @@ import BoatFormHullFields from '~/components/boats/hull/BoatFormHullFields.vue'
 import BoatOwnersManager from '~/components/boats/BoatOwnersManager.vue'
 import type { BoatEditPayload, PortForForm, PropulsionTypeUi } from '~/types/boat_form'
 import type { BoatBrandOption, BoatModelOption } from '../../../shared/types/boat_catalog'
+import type { PortNameOption } from '../../../shared/types/port'
 import { parsePropulsionType } from '~/types/boat_form'
 import { computed, ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
@@ -25,6 +26,7 @@ const { can } = usePermissions()
 const props = defineProps<{
   boat: BoatEditPayload
   ports: PortForForm[]
+  portOptions: PortNameOption[]
   owners: BoatOwnerOption[]
   ownerCandidates: BoatOwnerOption[]
   brands: BoatBrandOption[]
@@ -71,6 +73,7 @@ function executeDeleteBoat() {
             :show-mast-height="showSailFields"
             :errors="errors"
             :ports="ports"
+            :port-options="portOptions"
             :brands="brands"
             :catalog-models="catalogModels"
             :catalog-brand-id="catalogBrandId"
