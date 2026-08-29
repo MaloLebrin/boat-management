@@ -1,4 +1,5 @@
 import NavigationLogService from '#services/navigation_log_service'
+import NavigationLogEntryService from '#services/navigation_log_entry_service'
 import {
   NavigationLogConflictError,
   NavigationLogInProgressError,
@@ -7,6 +8,7 @@ import {
 } from '#exceptions/navigation_log_errors'
 import BoatService, { BoatNotFoundError } from '#services/boat_service'
 import NavigationLogPolicy from '#policies/navigation_log_policy'
+import { toNavigationLog, toNavigationLogEntryRows } from '#transformers/boat_transformer'
 import {
   createNavigationLogValidator,
   closeNavigationLogValidator,
@@ -19,8 +21,51 @@ import type { HttpContext } from '@adonisjs/core/http'
 export default class NavigationLogsController {
   constructor(
     private boatService: BoatService,
-    private navigationLogService: NavigationLogService
+    private navigationLogService: NavigationLogService,
+    private entryService: NavigationLogEntryService
   ) {}
+
+  async show({ inertia, response, auth, params, bouncer, session, i18n }: HttpContext) {
+    await auth.authenticate()
+    const user = auth.getUserOrFail()
+
+    let boat
+    try {
+      boat = await this.boatService.getForUserOrFail(user, Number(params.boatId))
+    } catch (error) {
+      if (error instanceof BoatNotFoundError) {
+        response.redirect('/boats')
+        return
+      }
+      throw error
+    }
+
+    let log
+    try {
+      log = await this.navigationLogService.getDetailForBoat(boat, Number(params.logId))
+    } catch (error) {
+      if (error instanceof NavigationLogNotFoundError) {
+        session.flash('error', i18n.t('flash.navigationLog.notFound'))
+        response.redirect(`/boats/${boat.id}?tab=navigation-logs`)
+        return
+      }
+      throw error
+    }
+
+    const [entries, canUpdate, canCorrectCompleted] = await Promise.all([
+      this.entryService.listForLog(log),
+      bouncer.with(NavigationLogPolicy).allows('update', boat),
+      bouncer.with(NavigationLogPolicy).allows('delete'),
+    ])
+
+    return inertia.render('boats/navigation_log_show', {
+      boat: { id: boat.id, name: boat.name },
+      log: toNavigationLog(log),
+      entries: toNavigationLogEntryRows(entries),
+      canUpdate,
+      canCorrectCompleted,
+    })
+  }
 
   async store({ request, response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()

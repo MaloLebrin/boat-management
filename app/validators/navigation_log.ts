@@ -30,6 +30,38 @@ export const updateNavigationLogValidator = vine.create(
   })
 )
 
+export const createNavigationLogEntryValidator = vine.create(
+  vine.object({
+    recordedAt: vine.date({ formats: ['YYYY-MM-DDTHH:mm', 'YYYY-MM-DDTHH:mm:ss'] }),
+    // browser's getTimezoneOffset() — shifts the naive local datetime to UTC (#452)
+    tzOffsetMinutes: vine.number().withoutDecimals().optional(),
+    latitude: vine.number().min(-90).max(90).nullable().optional(),
+    longitude: vine.number().min(-180).max(180).nullable().optional(),
+    gpsAccuracyM: vine.number().min(0).nullable().optional(),
+    cogDeg: vine.number().withoutDecimals().min(0).max(359).nullable().optional(),
+    sogKn: vine.number().min(0).max(99).nullable().optional(),
+    sailConfig: vine.string().trim().maxLength(255).nullable().optional(),
+    note: vine.string().trim().maxLength(2000).nullable().optional(),
+  })
+)
+
+export const updateNavigationLogEntryValidator = vine.create(
+  vine.object({
+    recordedAt: vine.date({ formats: ['YYYY-MM-DDTHH:mm', 'YYYY-MM-DDTHH:mm:ss'] }).optional(),
+    // browser's getTimezoneOffset() — shifts the naive local datetime to UTC (#452)
+    tzOffsetMinutes: vine.number().withoutDecimals().optional(),
+    // nullable + optional: an absent field is left untouched (preserve), while an
+    // explicit null (an emptied form field) clears the value. See #180.
+    latitude: vine.number().min(-90).max(90).nullable().optional(),
+    longitude: vine.number().min(-180).max(180).nullable().optional(),
+    gpsAccuracyM: vine.number().min(0).nullable().optional(),
+    cogDeg: vine.number().withoutDecimals().min(0).max(359).nullable().optional(),
+    sogKn: vine.number().min(0).max(99).nullable().optional(),
+    sailConfig: vine.string().trim().maxLength(255).nullable().optional(),
+    note: vine.string().trim().maxLength(2000).nullable().optional(),
+  })
+)
+
 export const closeNavigationLogValidator = vine.create(
   vine.object({
     _expectedUpdatedAt: vine.string().optional(),

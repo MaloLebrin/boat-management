@@ -336,6 +336,27 @@ router
         'download',
       ])
       .as('boats.navigationLogs.crewRole.download')
+    router
+      .get('boats/:boatId/navigation-logs/:logId', [controllers.NavigationLogs, 'show'])
+      .as('boats.navigationLogs.show')
+    router
+      .post('boats/:boatId/navigation-logs/:logId/entries', [
+        controllers.NavigationLogEntries,
+        'store',
+      ])
+      .as('boats.navigationLogs.entries.store')
+    router
+      .patch('boats/:boatId/navigation-logs/:logId/entries/:entryId', [
+        controllers.NavigationLogEntries,
+        'update',
+      ])
+      .as('boats.navigationLogs.entries.update')
+    router
+      .delete('boats/:boatId/navigation-logs/:logId/entries/:entryId', [
+        controllers.NavigationLogEntries,
+        'destroy',
+      ])
+      .as('boats.navigationLogs.entries.destroy')
 
     router
       .post('boats/:boatId/admin-documents', [controllers.BoatDocuments, 'store'])

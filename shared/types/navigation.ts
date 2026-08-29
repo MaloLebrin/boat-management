@@ -15,6 +15,7 @@ export interface FleetLogbookRow {
   crewCount: number | null
   seaState: SeaState | null
   windForceBeaufort: number | null
+  entriesCount: number
 }
 
 export interface FleetFuelLogRow {

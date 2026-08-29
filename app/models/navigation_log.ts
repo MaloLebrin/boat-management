@@ -1,8 +1,9 @@
 import Boat from '#models/boat'
 import CrewMember from '#models/crew_member'
+import NavigationLogEntry from '#models/navigation_log_entry'
 import Port from '#models/port'
-import { BaseModel, belongsTo, column, manyToMany } from '@adonisjs/lucid/orm'
-import type { BelongsTo, ManyToMany } from '@adonisjs/lucid/types/relations'
+import { BaseModel, belongsTo, column, hasMany, manyToMany } from '@adonisjs/lucid/orm'
+import type { BelongsTo, HasMany, ManyToMany } from '@adonisjs/lucid/types/relations'
 import { DateTime } from 'luxon'
 import type { NavigationLogStatus, SeaState } from '#shared/types/navigation_log'
 
@@ -83,4 +84,7 @@ export default class NavigationLog extends BaseModel {
     pivotColumns: ['role'],
   })
   declare crew: ManyToMany<typeof CrewMember>
+
+  @hasMany(() => NavigationLogEntry)
+  declare entries: HasMany<typeof NavigationLogEntry>
 }

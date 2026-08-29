@@ -38,6 +38,13 @@ defineProps<{ row: FleetLogbookRow }>()
       <template v-if="row.distanceNm">
         · {{ t('navigation.logbook.nm', { count: String(row.distanceNm) }) }}
       </template>
+      ·
+      <Link
+        :href="`/boats/${row.boatId}/navigation-logs/${row.id}`"
+        class="font-medium text-brand hover:underline"
+      >
+        {{ t('navigation_logs.entries.pointCount', { count: String(row.entriesCount) }) }}
+      </Link>
     </p>
   </div>
 </template>

@@ -181,6 +181,14 @@
     "conflict": "Cette sortie a été modifiée entre-temps — synchronisation annulée.",
     "alreadyInProgress": "Ce bateau a déjà une sortie en cours. Clôturez-la avant d'en démarrer une nouvelle."
   },
+  "navigationLogEntry": {
+    "created": "Point de log ajouté.",
+    "updated": "Point de log mis à jour.",
+    "deleted": "Point de log supprimé.",
+    "notFound": "Point de log introuvable.",
+    "notEditable": "Cette sortie est clôturée — les points ne sont plus modifiables.",
+    "coordinatesUnpaired": "La latitude et la longitude doivent être renseignées ensemble."
+  },
   "boat": {
     "registrationTaken": "Un bateau avec ce numéro d'immatriculation existe déjà dans votre organisation."
   },

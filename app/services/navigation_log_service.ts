@@ -61,6 +61,7 @@ export default class NavigationLogService {
     return await NavigationLog.query()
       .where('boatId', boat.id)
       .preload('crew')
+      .withCount('entries')
       .orderBy('departedAt', 'desc')
       .orderBy('id', 'desc')
   }
@@ -207,6 +208,18 @@ export default class NavigationLogService {
 
   async getForBoat(boat: Boat, logId: number) {
     const log = await NavigationLog.query().where('id', logId).where('boatId', boat.id).first()
+    if (!log) throw new NavigationLogNotFoundError()
+    return log
+  }
+
+  /** Sortie complète pour la page de détail : équipage préchargé + nombre de points. */
+  async getDetailForBoat(boat: Boat, logId: number) {
+    const log = await NavigationLog.query()
+      .where('id', logId)
+      .where('boatId', boat.id)
+      .preload('crew')
+      .withCount('entries')
+      .first()
     if (!log) throw new NavigationLogNotFoundError()
     return log
   }

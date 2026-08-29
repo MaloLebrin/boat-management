@@ -7,12 +7,13 @@ import type BoatMaintenanceSheet from '#models/boat_maintenance_sheet'
 import type BoatMaintenanceTask from '#models/boat_maintenance_task'
 import type BoatPositionHistory from '#models/boat_position_history'
 import type NavigationLog from '#models/navigation_log'
+import type NavigationLogEntry from '#models/navigation_log_entry'
 import type Media from '#models/media'
 import type { IncidentType, IncidentStatus } from '#shared/types/incident'
 import type { BoatPricingRow } from '#shared/types/boat_pricing'
 import type { EngineFuel } from '#shared/constants/boats/boat_form_options'
 import type { FuelLogRow } from '#shared/types/fuel_log'
-import type { NavigationLogRow } from '#shared/types/navigation_log'
+import type { NavigationLogEntryRow, NavigationLogRow } from '#shared/types/navigation_log'
 import type { BoatOwnerBoatSummary } from '#shared/types/boat'
 import type { BoatCategory } from '#shared/types/boat_catalog'
 import { toBoatEquipmentActionRow } from '#transformers/boat_equipment_action_transformer'
@@ -149,7 +150,26 @@ export function toNavigationLogRows(logs: NavigationLog[]): NavigationLogRow[] {
   return logs.map(toNavigationLog)
 }
 
-function toNavigationLog(log: NavigationLog): NavigationLogRow {
+export function toNavigationLogEntryRows(entries: NavigationLogEntry[]): NavigationLogEntryRow[] {
+  return entries.map((entry) => ({
+    id: entry.id,
+    navigationLogId: entry.navigationLogId,
+    recordedAt: entry.recordedAt.toISO()!,
+    latitude: entry.latitude !== null ? Number.parseFloat(entry.latitude) : null,
+    longitude: entry.longitude !== null ? Number.parseFloat(entry.longitude) : null,
+    gpsAccuracyM: entry.gpsAccuracyM !== null ? Number.parseFloat(entry.gpsAccuracyM) : null,
+    cogDeg: entry.cogDeg,
+    sogKn: entry.sogKn !== null ? Number.parseFloat(entry.sogKn) : null,
+    sailConfig: entry.sailConfig,
+    note: entry.note,
+    twdDeg: entry.twdDeg,
+    twaDeg: entry.twaDeg,
+    createdAt: entry.createdAt.toISO()!,
+    updatedAt: (entry.updatedAt ?? entry.createdAt).toISO()!,
+  }))
+}
+
+export function toNavigationLog(log: NavigationLog): NavigationLogRow {
   return {
     id: log.id,
     boatId: log.boatId,
@@ -177,6 +197,7 @@ function toNavigationLog(log: NavigationLog): NavigationLogRow {
       fullName: m.fullName,
       role: m.$extras.pivot_role,
     })),
+    entriesCount: Number(log.$extras?.entries_count ?? 0),
   }
 }
 
