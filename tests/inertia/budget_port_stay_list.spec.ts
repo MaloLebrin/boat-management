@@ -1,5 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { describe, test, expect, vi } from 'vitest'
+import BaseCombobox from '../../inertia/components/base/BaseCombobox.vue'
 import BudgetPortStayList from '../../inertia/components/boats/budget/BudgetPortStayList.vue'
 import type { BoatPortStayItem } from '../../shared/types/budget'
 
@@ -57,8 +58,12 @@ const stayWithNullEndDate: BoatPortStayItem = {
   notes: 'Beau mouillage',
 }
 
-function mountList(stays: BoatPortStayItem[] = [], canManage = true) {
-  return mount(BudgetPortStayList, { props: { boatId: 1, stays, canManage } })
+function mountList(
+  stays: BoatPortStayItem[] = [],
+  canManage = true,
+  portOptions?: { id: number; name: string }[]
+) {
+  return mount(BudgetPortStayList, { props: { boatId: 1, stays, canManage, portOptions } })
 }
 
 test('shows noStays message when list is empty', () => {
@@ -113,4 +118,18 @@ describe('dark mode (#416)', () => {
     expect(html).not.toMatch(/-teal-\d/)
     expect(html).not.toContain('dark:')
   })
+})
+
+// Édition d'escale : même assistance à la saisie que le formulaire (#579).
+test('le formulaire d’édition propose les ports de l’organisation', async () => {
+  const w = mountList([stayWithEndDate], true, [{ id: 7, name: 'Port-la-Forêt' }])
+
+  await w
+    .findAll('button')
+    .find((b) => b.text() === 'common.edit')!
+    .trigger('click')
+
+  const combobox = w.findComponent(BaseCombobox)
+  expect(combobox.exists()).toBe(true)
+  expect(combobox.props('options')).toEqual([{ value: '7', label: 'Port-la-Forêt' }])
 })

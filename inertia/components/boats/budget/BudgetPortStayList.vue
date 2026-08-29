@@ -1,20 +1,28 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useForm, router } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
+import BaseCombobox, { type ComboboxOption } from '~/components/base/BaseCombobox.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import { useCurrencyFormat } from '~/composables/use_currency_format'
 import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import type { BoatPortStayItem } from '#shared/types/budget'
+import type { PortNameOption } from '#shared/types/port'
 
 const props = defineProps<{
   boatId: number
   stays: BoatPortStayItem[]
   canManage: boolean
+  /** Ports de l'organisation proposés en suggestion (#579) — saisie libre conservée. */
+  portOptions?: PortNameOption[]
 }>()
 
 const { t } = useT()
+
+const portSuggestions = computed<ComboboxOption[]>(() =>
+  (props.portOptions ?? []).map((port) => ({ value: String(port.id), label: port.name }))
+)
 const { formatCurrency } = useCurrencyFormat()
 const { formatDate } = useDateFormat()
 
@@ -72,9 +80,14 @@ function deleteStay(stayId: number) {
         <template v-if="editingId === stay.id">
           <p class="text-sm font-semibold text-fg mb-3">{{ t('budget.portStay.editTitle') }}</p>
           <form class="grid grid-cols-1 gap-3 sm:grid-cols-2" @submit.prevent="submitEdit(stay.id)">
-            <BaseInput
+            <BaseCombobox
+              :id="`portStayEditPortName-${stay.id}`"
               v-model="editForm.portName"
               :label="t('budget.portStay.portName')"
+              :placeholder="t('budget.portStay.portNamePlaceholder')"
+              :hint="portSuggestions.length > 0 ? t('budget.portStay.portNameHint') : undefined"
+              :empty-label="t('budget.portStay.noPortMatch')"
+              :options="portSuggestions"
               :error="editForm.errors.portName"
               required
             />

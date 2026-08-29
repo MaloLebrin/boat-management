@@ -9,6 +9,7 @@ import BoatFormHullFields from '~/components/boats/hull/BoatFormHullFields.vue'
 import { useT } from '~/composables/use_t'
 import type { PortForForm, PropulsionTypeUi } from '~/types/boat_form'
 import type { BoatBrandOption, BoatModelOption } from '../../../shared/types/boat_catalog'
+import type { PortNameOption } from '../../../shared/types/port'
 
 const { t } = useT()
 const propulsionType = ref<PropulsionTypeUi>('')
@@ -16,6 +17,7 @@ const showSailFields = computed(() => propulsionType.value === 'sailboat')
 
 defineProps<{
   ports: PortForForm[]
+  portOptions: PortNameOption[]
   brands: BoatBrandOption[]
   catalogModels: BoatModelOption[]
   catalogBrandId: number | null
@@ -40,6 +42,7 @@ defineProps<{
             :show-mast-height="showSailFields"
             :errors="errors"
             :ports="ports"
+            :port-options="portOptions"
             :brands="brands"
             :catalog-models="catalogModels"
             :catalog-brand-id="catalogBrandId"

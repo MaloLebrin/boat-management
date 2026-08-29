@@ -32,6 +32,7 @@ const props = withDefaults(
     options: ReadonlyArray<ComboboxOption>
     modelValue?: string
     disabled?: boolean
+    required?: boolean
     error?: string
     errors?: FormErrors
     errorKey?: string
@@ -41,6 +42,7 @@ const props = withDefaults(
   {
     modelValue: '',
     disabled: false,
+    required: false,
     maxVisible: 50,
   }
 )
@@ -180,6 +182,7 @@ function onBlur() {
         :value="modelValue"
         :placeholder="placeholder"
         :disabled="disabled"
+        :required="required"
         :data-invalid="resolvedError ? 'true' : undefined"
         :aria-invalid="resolvedError ? 'true' : undefined"
         :class="[inputClass, 'pr-9']"

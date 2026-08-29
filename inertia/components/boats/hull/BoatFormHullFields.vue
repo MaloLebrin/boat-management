@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
+import BaseCombobox, { type ComboboxOption } from '~/components/base/BaseCombobox.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import BoatFormAisFields from '~/components/boats/hull/BoatFormAisFields.vue'
@@ -11,6 +12,7 @@ import { useBoatOptions } from '~/composables/use_boat_options'
 import { useT } from '~/composables/use_t'
 import type { BoatEditPayload, PortForForm, PropulsionTypeUi } from '~/types/boat_form'
 import type { BoatBrandOption, BoatModelOption } from '../../../../shared/types/boat_catalog'
+import type { PortNameOption } from '../../../../shared/types/port'
 
 const propulsionType = defineModel<PropulsionTypeUi>('propulsionType', { required: true })
 
@@ -20,6 +22,8 @@ const props = defineProps<{
   showMastHeight: boolean
   errors: Record<string, string | string[] | undefined>
   ports?: PortForForm[]
+  /** Ports de l'organisation proposés en suggestion du port d'attache (#579). */
+  portOptions?: PortNameOption[]
   brands?: BoatBrandOption[]
   catalogModels?: BoatModelOption[]
   catalogBrandId?: number | null
@@ -52,6 +56,15 @@ const spotId = ref<number | ''>('')
 const initialPortId = ref<number | undefined>(undefined)
 const initialPontoonId = ref<number | undefined>(undefined)
 const initialMouillageId = ref<number | undefined>(undefined)
+
+/**
+ * Le port d'attache reste un champ texte libre (#579) : la liste ne fait que
+ * proposer les ports de l'organisation. Une org sans module marina n'a
+ * simplement aucune suggestion, et le champ se comporte comme avant.
+ */
+const homePortOptions = computed<ComboboxOption[]>(() =>
+  (props.portOptions ?? []).map((port) => ({ value: String(port.id), label: port.name }))
+)
 
 function toStr(val: number | null | undefined): string {
   return val != null ? String(val) : ''
@@ -185,10 +198,18 @@ watch(
       />
     </div>
 
-    <BaseInput
+    <BaseCombobox
       id="homePort"
       name="homePort"
       :label="t('boats.hullFields.homePort')"
+      :placeholder="t('boats.homePortSuggest.placeholder')"
+      :hint="
+        homePortOptions.length > 0
+          ? t('boats.homePortSuggest.hint')
+          : t('boats.homePortSuggest.freeTextHint')
+      "
+      :empty-label="t('boats.homePortSuggest.noMatch')"
+      :options="homePortOptions"
       v-model="homePort"
       :errors="errors"
     />

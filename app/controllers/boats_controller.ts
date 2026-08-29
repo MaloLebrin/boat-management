@@ -114,14 +114,16 @@ export default class BoatsController {
       return response.redirect('/boats')
     }
 
-    const [ports, brands, catalog] = await Promise.all([
+    const [ports, portOptions, brands, catalog] = await Promise.all([
       this.portService.listWithSpotsForOrg(user),
+      this.portService.listNamesForOrg(user),
       this.boatCatalogService.listBrands(),
       this.resolveCatalogModels(request.qs().brandId),
     ])
 
     return inertia.render('boats/new', {
       ports: toPortFormOptions(ports),
+      portOptions,
       brands,
       catalogModels: catalog.models,
       catalogBrandId: catalog.brandId,
@@ -220,6 +222,7 @@ export default class BoatsController {
       const [
         boatMedia,
         positionHistory,
+        homePortId,
         canManageMaintenance,
         pricingRow,
         canManageEquipmentActions,
@@ -233,6 +236,7 @@ export default class BoatsController {
       ] = await Promise.all([
         this.mediaService.listForEntity('boat', boat.id),
         this.boatService.getPositionHistory(boat.id),
+        this.portService.findIdByName(user, boat.homePort),
         bouncer.with(BoatPolicy).allows('edit', boat),
         this.pricingService.getForBoat(boat),
         bouncer.with(EquipmentActionPolicy).allows('create', boat),
@@ -260,6 +264,7 @@ export default class BoatsController {
         ...toShowShellProps(boat, {
           positionHistory,
           boatMedia,
+          homePortId,
           canManageMaintenance,
           canManageEquipment,
           canManageDocuments,
@@ -369,8 +374,9 @@ export default class BoatsController {
       const boat = await this.boatService.getForUserOrFail(user, Number(params.id))
       await bouncer.with(BoatPolicy).authorize('edit', boat)
 
-      const [ports, owners, ownerCandidates, brands, catalog] = await Promise.all([
+      const [ports, portOptions, owners, ownerCandidates, brands, catalog] = await Promise.all([
         this.portService.listWithSpotsForOrg(user),
+        this.portService.listNamesForOrg(user),
         this.boatOwnerService.listOwners(boat),
         this.boatOwnerService.listEligibleOwnerCandidates(boat),
         this.boatCatalogService.listBrands(),
@@ -380,6 +386,7 @@ export default class BoatsController {
       return inertia.render('boats/edit', {
         boat: toEditForm(boat),
         ports: toPortFormOptions(ports),
+        portOptions,
         brands,
         catalogModels: catalog.models,
         catalogBrandId: catalog.brandId,

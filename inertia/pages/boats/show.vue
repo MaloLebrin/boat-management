@@ -66,6 +66,11 @@ const props = defineProps<{
   pricing: BoatPricingRow | null
   pricingEnabled: boolean
   canManagePricing: boolean
+  /**
+   * Port de l'organisation dont le nom correspond au `homePort` texte libre
+   * (#579), s'il y en a un : la fiche propose alors le lien vers ce port.
+   */
+  homePortId: number | null
 }>()
 
 const {

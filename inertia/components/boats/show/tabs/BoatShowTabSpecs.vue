@@ -11,6 +11,13 @@ import { propulsionLabel } from '~/utils/boat_propulsion_label'
 
 defineProps<{
   boat: BoatShowDetail
+  /**
+   * Port de l'organisation dont le nom correspond au `homePort` saisi en texte
+   * libre (#579). Rapprochement à plat côté serveur : `null` dès que la saisie
+   * ne désigne aucun port du référentiel (port de passage, org sans module
+   * marina…), et le champ reste alors du simple texte.
+   */
+  homePortId: number | null
 }>()
 
 const { t } = useT()
@@ -113,7 +120,17 @@ const { countryName } = useCountries()
         <dl class="grid grid-cols-2 gap-4 text-sm">
           <div>
             <dt class="text-fg-muted">{{ t('boats.hullFields.homePort') }}</dt>
-            <dd class="font-semibold text-fg">{{ boat.homePort ?? '—' }}</dd>
+            <dd class="font-semibold text-fg">
+              <Link
+                v-if="homePortId !== null"
+                :href="`/ports/${homePortId}`"
+                class="text-brand hover:underline"
+                :title="t('boats.homePortSuggest.viewPort')"
+              >
+                {{ boat.homePort }}
+              </Link>
+              <template v-else>{{ boat.homePort ?? '—' }}</template>
+            </dd>
           </div>
           <div>
             <dt class="text-fg-muted">{{ t('boats.hullFields.navigationCategory') }}</dt>

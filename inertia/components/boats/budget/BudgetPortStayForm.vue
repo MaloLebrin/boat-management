@@ -1,15 +1,24 @@
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3'
+import { computed } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
+import BaseCombobox, { type ComboboxOption } from '~/components/base/BaseCombobox.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import { useT } from '~/composables/use_t'
+import type { PortNameOption } from '#shared/types/port'
 
 const props = defineProps<{
   boatId: number
+  /** Ports de l'organisation proposés en suggestion (#579) — saisie libre conservée. */
+  portOptions?: PortNameOption[]
 }>()
 
 const { t } = useT()
+
+const portSuggestions = computed<ComboboxOption[]>(() =>
+  (props.portOptions ?? []).map((port) => ({ value: String(port.id), label: port.name }))
+)
 
 const form = useForm({
   portName: '',
@@ -33,9 +42,14 @@ function submit() {
   >
     <h3 class="text-base font-semibold text-fg mb-4">{{ t('budget.portStay.formTitle') }}</h3>
     <form class="grid grid-cols-1 gap-4 sm:grid-cols-2" @submit.prevent="submit">
-      <BaseInput
+      <BaseCombobox
+        id="portStayPortName"
         v-model="form.portName"
         :label="t('budget.portStay.portName')"
+        :placeholder="t('budget.portStay.portNamePlaceholder')"
+        :hint="portSuggestions.length > 0 ? t('budget.portStay.portNameHint') : undefined"
+        :empty-label="t('budget.portStay.noPortMatch')"
+        :options="portSuggestions"
         :error="form.errors.portName"
         required
       />
