@@ -3,6 +3,7 @@ import { Link } from '@adonisjs/inertia/vue'
 import { computed } from 'vue'
 import type { DashboardPortItem, DashboardPortStats } from '#shared/types/dashboard'
 import BaseCard from '~/components/base/BaseCard.vue'
+import { useCountries } from '~/composables/use_countries'
 import { useT } from '~/composables/use_t'
 
 const props = defineProps<{
@@ -11,6 +12,7 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
+const { countryName } = useCountries()
 
 const displayedPorts = computed(() => props.ports.slice(0, 5))
 
@@ -26,7 +28,7 @@ function fillRateColor(rate: number): string {
 }
 
 function locationLabel(port: DashboardPortItem): string {
-  return [port.city, port.country].filter(Boolean).join(', ')
+  return [port.city, countryName(port.country)].filter(Boolean).join(', ')
 }
 </script>
 

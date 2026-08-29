@@ -9,6 +9,7 @@ import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseTabs from '~/components/base/BaseTabs.vue'
 import MarinaMapTab from '~/components/ports/show/tabs/MarinaMapTab.vue'
 import PortListTab from '~/components/ports/show/tabs/PortListTab.vue'
+import { useCountries } from '~/composables/use_countries'
 import { useT } from '~/composables/use_t'
 import type { BoatOption, PortShowDetail } from '~/types/port'
 
@@ -18,6 +19,12 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
+const { countryName } = useCountries()
+
+/** `Marseille, France` — le pays seul s'affiche aussi, sans virgule orpheline. */
+function locationLabel(port: PortShowDetail): string {
+  return [port.city, countryName(port.country)].filter(Boolean).join(', ')
+}
 
 const activeTab = ref<'list' | 'plan'>('list')
 
@@ -65,8 +72,8 @@ function executeDeletePort() {
         </div>
         <div>
           <BaseHeading level="1">{{ port.name }}</BaseHeading>
-          <p v-if="port.city" class="mt-1 text-fg-muted">
-            {{ port.city }}<span v-if="port.country">, {{ port.country }}</span>
+          <p v-if="port.city || port.country" class="mt-1 text-fg-muted">
+            {{ locationLabel(port) }}
           </p>
           <p v-if="port.address" class="mt-0.5 text-sm text-fg-muted">{{ port.address }}</p>
           <p v-if="port.notes" class="mt-1 text-xs text-fg-subtle italic">{{ port.notes }}</p>

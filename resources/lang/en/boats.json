@@ -48,6 +48,7 @@
     "mouillage": "Anchorage",
     "spotIdentifier": "Berth number",
     "selectPlaceholder": "Select…",
+    "selectCountryPlaceholder": "Select a country…",
     "aisSection": "AIS Identification",
     "mmsi": "MMSI (9 digits)",
     "imoNumber": "IMO number"

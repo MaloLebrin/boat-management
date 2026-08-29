@@ -48,6 +48,7 @@
     "mouillage": "Mouillage",
     "spotIdentifier": "N° d'emplacement",
     "selectPlaceholder": "Sélectionner…",
+    "selectCountryPlaceholder": "Sélectionnez un pays…",
     "aisSection": "Identification AIS",
     "mmsi": "MMSI (9 chiffres)",
     "imoNumber": "N° IMO"

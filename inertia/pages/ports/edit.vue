@@ -4,11 +4,14 @@ import { Head, useForm } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
+import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
+import { useCountries } from '~/composables/use_countries'
 import { useT } from '~/composables/use_t'
 import type { PortEditPayload } from '~/types/port'
 
 const { t } = useT()
+const { countryOptions } = useCountries()
 
 const props = defineProps<{
   port: PortEditPayload
@@ -54,13 +57,15 @@ function submit() {
             :errors="form.errors"
           />
 
-          <BaseInput
+          <BaseSelect
             id="country"
             name="country"
             :label="t('ports.fields.country')"
+            :placeholder="t('ports.fields.selectCountryPlaceholder')"
+            :allow-empty="true"
+            :options="countryOptions"
             v-model="form.country"
             :errors="form.errors"
-            maxlength="2"
           />
         </div>
 
