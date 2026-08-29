@@ -107,5 +107,6 @@
   "toasts": {
     "region": "Notifications",
     "close": "Fermer la notification"
-  }
+  },
+  "noResults": "Aucun résultat"
 }

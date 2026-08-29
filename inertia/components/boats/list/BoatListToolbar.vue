@@ -15,7 +15,7 @@ const props = defineProps<{
   viewMode: 'table' | 'cards'
   total: number
   isLoading?: boolean
-  typeOptions: Array<{ label: string; value: string }>
+  categoryOptions: Array<{ label: string; value: string }>
   propulsionOptions: Array<{ label: string; value: string }>
 }>()
 
@@ -45,7 +45,7 @@ const qDraft = ref(props.filters.q ?? '')
 const hasActiveFilters = computed(() => {
   return (
     Boolean(props.filters.q?.trim()) ||
-    Boolean(props.filters.type) ||
+    Boolean(props.filters.category) ||
     Boolean(props.filters.propulsionType)
   )
 })
@@ -100,14 +100,14 @@ function update(partial: Partial<BoatListFilters>) {
       </div>
 
       <div class="grid gap-2 sm:grid-cols-2 md:col-span-6 md:justify-end">
-        <div v-if="typeOptions.length > 0">
+        <div v-if="categoryOptions.length > 0">
           <BaseSelect
-            :label="t('boats.list.type')"
+            :label="t('boats.list.category')"
             allow-empty
             :placeholder="t('common.all')"
-            :model-value="filters.type ?? ''"
-            :options="typeOptions"
-            @update:model-value="(v) => update({ type: String(v || '') || undefined, page: 1 })"
+            :model-value="filters.category ?? ''"
+            :options="categoryOptions"
+            @update:model-value="(v) => update({ category: String(v || '') || undefined, page: 1 })"
           />
         </div>
         <div v-if="propulsionOptions.length > 0">

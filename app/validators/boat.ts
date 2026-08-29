@@ -1,5 +1,6 @@
 import vine from '@vinejs/vine'
 import { ENGINE_FUELS } from '#shared/constants/boats/boat_form_options'
+import { BOAT_CATEGORIES } from '#shared/types/boat_catalog'
 
 export const propulsionTypes = ['sailboat', 'motorboat', 'catamaran', 'rib', 'other'] as const
 export const hullMaterials = ['fiberglass', 'aluminum', 'steel', 'wood', 'carbon', 'other'] as const
@@ -52,6 +53,7 @@ export const createBoatValidator = vine.create({
   registrationNumber: vine.string().trim().maxLength(64).nullable().optional(),
   propulsionType: vine.enum(propulsionTypes).nullable().optional(),
   type: vine.string().trim().maxLength(64).nullable().optional(),
+  category: vine.enum(BOAT_CATEGORIES).nullable().optional(),
 
   manufacturedAt: vine.date().nullable().optional(),
 
@@ -90,6 +92,7 @@ export const updateBoatValidator = vine.create(
     registrationNumber: vine.string().trim().maxLength(64).nullable().optional(),
     propulsionType: vine.enum(propulsionTypes).nullable().optional(),
     type: vine.string().trim().maxLength(64).nullable().optional(),
+    category: vine.enum(BOAT_CATEGORIES).nullable().optional(),
 
     manufacturedAt: vine.date().nullable().optional(),
 

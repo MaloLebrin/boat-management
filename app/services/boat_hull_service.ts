@@ -145,6 +145,7 @@ export default class BoatHullService {
             name: payload.name,
             registrationNumber: payload.registrationNumber ?? null,
             type: payload.type ?? null,
+            category: payload.category ?? null,
             manufacturedAt: toDateOrNull(payload.manufacturedAt),
 
             propulsionType: payload.propulsionType ?? null,
@@ -201,7 +202,11 @@ export default class BoatHullService {
 
     boat.name = payload.name
     boat.registrationNumber = payload.registrationNumber ?? null
-    boat.type = payload.type ?? null
+    // `type` n'est plus alimenté par le formulaire (#571) : on ne l'écrase que
+    // s'il est explicitement fourni, sans quoi une simple édition effacerait la
+    // valeur texte libre historique.
+    if (payload.type !== undefined) boat.type = payload.type
+    boat.category = payload.category ?? null
     boat.manufacturedAt = toDateOrNull(payload.manufacturedAt)
 
     boat.propulsionType = payload.propulsionType ?? null

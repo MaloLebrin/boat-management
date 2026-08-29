@@ -1,5 +1,30 @@
 /** Single source for boat form select options (labels + values). */
 
+/**
+ * Catégories de bateau (#571) — vocabulaire fermé qui remplace le champ texte
+ * libre `type` dans le formulaire. Les libellés ci-dessous sont un repli EN :
+ * l'affichage passe par `t('boats.options.category.<slug>')`.
+ *
+ * Rien à voir avec `NAVIGATION_CATEGORY_OPTIONS` (catégorie CE A/B/C/D).
+ */
+export const BOAT_CATEGORY_OPTIONS = [
+  { value: 'sailboat_monohull', label: 'Monohull sailboat' },
+  { value: 'sailboat_multihull', label: 'Sailing multihull' },
+  { value: 'motor_yacht', label: 'Motor yacht' },
+  { value: 'power_catamaran', label: 'Power catamaran' },
+  { value: 'trawler', label: 'Trawler' },
+  { value: 'open_dayboat', label: 'Open / day boat' },
+  { value: 'fishing', label: 'Fishing boat' },
+  { value: 'rib', label: 'RIB' },
+  { value: 'jetski', label: 'Personal watercraft' },
+  { value: 'houseboat', label: 'Houseboat / canal boat' },
+  { value: 'dinghy', label: 'Dinghy' },
+  { value: 'tender', label: 'Tender' },
+  { value: 'classic', label: 'Classic boat' },
+  { value: 'workboat', label: 'Workboat' },
+  { value: 'other', label: 'Other' },
+] as const
+
 export const PROPULSION_OPTIONS = [
   { value: 'sailboat', label: 'Sailboat' },
   { value: 'motorboat', label: 'Motorboat' },

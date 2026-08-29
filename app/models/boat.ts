@@ -35,6 +35,13 @@ export default class Boat extends BaseModel {
   @column()
   declare type: string | null
 
+  /**
+   * Catégorie du vocabulaire `BOAT_CATEGORIES` (#571). Remplace `type` côté
+   * formulaire et filtre ; `type` reste en base pour les bateaux historiques.
+   */
+  @column()
+  declare category: string | null
+
   @column()
   declare propulsionType: string | null
 

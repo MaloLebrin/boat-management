@@ -10,6 +10,7 @@ import BoatShowTabContent from '~/components/boats/show/BoatShowTabContent.vue'
 import NavigationActiveCard from '~/components/boats/show/tabs/NavigationActiveCard.vue'
 import { useBoatShowTabs } from '~/composables/use_boat_show_tabs'
 import { useT } from '~/composables/use_t'
+import { boatCategoryLabel } from '~/utils/boat_category_label'
 import { propulsionLabel } from '~/utils/boat_propulsion_label'
 import type {
   AiSuggestion,
@@ -158,11 +159,11 @@ const tabContentProps = computed(() => {
             </BaseBadge>
           </div>
           <div class="mt-2 flex flex-wrap items-center gap-2 text-sm text-fg-muted">
-            <span v-if="boat.type">{{ boat.type }}</span>
-            <span v-if="boat.type && boat.registrationNumber" class="text-fg-subtle">·</span>
+            <span v-if="boat.category">{{ boatCategoryLabel(t, boat.category) }}</span>
+            <span v-if="boat.category && boat.registrationNumber" class="text-fg-subtle">·</span>
             <span v-if="boat.registrationNumber">{{ boat.registrationNumber }}</span>
             <span
-              v-if="(boat.type || boat.registrationNumber) && boat.propulsionType"
+              v-if="(boat.category || boat.registrationNumber) && boat.propulsionType"
               class="text-fg-subtle"
               >·</span
             >

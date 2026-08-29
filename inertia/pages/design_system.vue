@@ -18,6 +18,7 @@ import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseCheckbox from '~/components/base/BaseCheckbox.vue'
+import BaseCombobox from '~/components/base/BaseCombobox.vue'
 import BaseDropdown from '~/components/base/BaseDropdown.vue'
 import BaseEmptyState from '~/components/base/BaseEmptyState.vue'
 import BaseField from '~/components/base/BaseField.vue'
@@ -41,6 +42,16 @@ const modalOpen = ref(false)
 
 const radioValue = ref<'fast' | 'safe'>('safe')
 const engineType = ref('')
+// Combobox (#571) : saisie libre à suggestions — taper « bene » remonte
+// « Bénéteau », mais une marque hors liste reste acceptée telle quelle.
+const boatBrand = ref('')
+const boatBrandOptions = [
+  { value: 'beneteau', label: 'Bénéteau', hint: 'Voilier monocoque · Vedette' },
+  { value: 'jeanneau', label: 'Jeanneau', hint: 'Voilier monocoque · Pêche-promenade' },
+  { value: 'lagoon', label: 'Lagoon', hint: 'Catamaran à voile' },
+  { value: 'zodiac', label: 'Zodiac', hint: 'Semi-rigide · Annexe' },
+  { value: 'axopar', label: 'Axopar', hint: 'Open / day-boat' },
+]
 const shipName = ref('Belle Hélène')
 const notes = ref('')
 const agree = ref(false)
@@ -337,6 +348,15 @@ const tableRows = computed(() => {
                 { label: 'Catamaran', value: 'cat' },
               ]"
               placeholder="Choisir…"
+            />
+            <BaseCombobox
+              v-model="boatBrand"
+              id="boatBrand"
+              label="Constructeur"
+              placeholder="Ex. Bénéteau…"
+              hint="Une marque hors catalogue reste acceptée"
+              empty-label="Aucune marque ne correspond"
+              :options="boatBrandOptions"
             />
             <BaseTextarea
               v-model="notes"

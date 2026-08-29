@@ -48,13 +48,21 @@ services:
   # One-shot exécuté avant `web` et les workers (#542) : un déploiement sur base
   # vierge, ou incluant une nouvelle migration, n'a besoin d'aucune intervention.
   # `restart: no` — un `migration:run` qui échoue doit faire échouer le déploiement.
+  #
+  # Le seeder du catalogue de bateaux (#571) s'enchaîne derrière : c'est un
+  # référentiel métier, pas des données de démo, et il est idempotent
+  # (`updateOrCreate` sur le slug, jamais de `delete`) — le rejouer à chaque
+  # déploiement met le corpus à jour sans doublon.
   migrator:
     image: ghcr.io/malolebrin/boat-management:${IMAGE_TAG:-latest}
     env_file: .env
     environment:
       NODE_ENV: production
       DB_HOST: postgres
-    command: ['node', 'ace', 'migration:run', '--force']
+    command:
+      - sh
+      - -c
+      - node ace migration:run --force && node ace db:seed --files=database/seeders/boat_catalog_seeder.js --force
     depends_on:
       postgres:
         condition: service_healthy

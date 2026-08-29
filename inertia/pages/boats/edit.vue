@@ -4,6 +4,7 @@ import { Head, router } from '@inertiajs/vue3'
 import BoatFormHullFields from '~/components/boats/hull/BoatFormHullFields.vue'
 import BoatOwnersManager from '~/components/boats/BoatOwnersManager.vue'
 import type { BoatEditPayload, PortForForm, PropulsionTypeUi } from '~/types/boat_form'
+import type { BoatBrandOption, BoatModelOption } from '../../../shared/types/boat_catalog'
 import { parsePropulsionType } from '~/types/boat_form'
 import { computed, ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
@@ -26,6 +27,9 @@ const props = defineProps<{
   ports: PortForForm[]
   owners: BoatOwnerOption[]
   ownerCandidates: BoatOwnerOption[]
+  brands: BoatBrandOption[]
+  catalogModels: BoatModelOption[]
+  catalogBrandId: number | null
 }>()
 
 const propulsionType = ref<PropulsionTypeUi>(parsePropulsionType(props.boat.propulsionType))
@@ -67,6 +71,9 @@ function executeDeleteBoat() {
             :show-mast-height="showSailFields"
             :errors="errors"
             :ports="ports"
+            :brands="brands"
+            :catalog-models="catalogModels"
+            :catalog-brand-id="catalogBrandId"
           />
 
           <div class="flex items-center gap-3">

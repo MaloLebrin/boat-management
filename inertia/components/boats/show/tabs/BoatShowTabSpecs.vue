@@ -5,6 +5,7 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import { useT } from '~/composables/use_t'
 import type { BoatShowDetail } from '~/types/boat_show'
+import { boatCategoryLabel } from '~/utils/boat_category_label'
 import { propulsionLabel } from '~/utils/boat_propulsion_label'
 
 defineProps<{
@@ -34,8 +35,8 @@ const { t } = useT()
             <dd class="font-semibold text-fg">{{ boat.name }}</dd>
           </div>
           <div>
-            <dt class="text-fg-muted">{{ t('boats.hullFields.type') }}</dt>
-            <dd class="font-semibold text-fg">{{ boat.type ?? '—' }}</dd>
+            <dt class="text-fg-muted">{{ t('boats.hullFields.category') }}</dt>
+            <dd class="font-semibold text-fg">{{ boatCategoryLabel(t, boat.category) ?? '—' }}</dd>
           </div>
           <div>
             <dt class="text-fg-muted">{{ t('boats.hullFields.registrationNumber') }}</dt>

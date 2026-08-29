@@ -158,7 +158,7 @@ export type BoatShowDetail = {
   id: number
   name: string
   registrationNumber: string | null
-  type: string | null
+  category: string | null
   propulsionType: string | null
   lengthM: number | null
   beamM: number | null

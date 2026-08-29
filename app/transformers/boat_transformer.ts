@@ -14,6 +14,7 @@ import type { EngineFuel } from '#shared/constants/boats/boat_form_options'
 import type { FuelLogRow } from '#shared/types/fuel_log'
 import type { NavigationLogRow } from '#shared/types/navigation_log'
 import type { BoatOwnerBoatSummary } from '#shared/types/boat'
+import type { BoatCategory } from '#shared/types/boat_catalog'
 import { toBoatEquipmentActionRow } from '#transformers/boat_equipment_action_transformer'
 
 /**
@@ -67,7 +68,7 @@ export function toEditForm(boat: Boat) {
     id: boat.id,
     name: boat.name,
     registrationNumber: boat.registrationNumber,
-    type: boat.type,
+    category: boat.category as BoatCategory | null,
     propulsionType: boat.propulsionType,
     lengthM: boat.lengthM,
     beamM: boat.beamM,
@@ -207,7 +208,7 @@ function toBoatDetail(
     id: boat.id,
     name: boat.name,
     registrationNumber: boat.registrationNumber,
-    type: boat.type,
+    category: boat.category as BoatCategory | null,
     propulsionType: boat.propulsionType,
     lengthM: boat.lengthM,
     beamM: boat.beamM,

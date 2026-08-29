@@ -18,7 +18,7 @@ function makeBoat(overrides: Partial<BoatListItem> = {}): BoatListItem {
     id: 1,
     name: 'Hanse 388',
     registrationNumber: null,
-    type: null,
+    category: null,
     propulsionType: 'sailboat',
     updatedAt: null,
     maintenance: { urgentCount: 0, upcomingCount: 0, nextDueAt: null },
@@ -26,10 +26,10 @@ function makeBoat(overrides: Partial<BoatListItem> = {}): BoatListItem {
   }
 }
 
-test('hides Registration and Type columns when no boat has that data', () => {
+test('hides Registration and Category columns when no boat has that data', () => {
   const w = mount(BoatTable, { props: { boats: [makeBoat(), makeBoat({ id: 2 })] } })
   expect(w.text()).not.toContain('boats.list.table.registration')
-  expect(w.text()).not.toContain('boats.list.table.type')
+  expect(w.text()).not.toContain('boats.list.table.category')
   expect(w.findAll('th').length).toBe(3)
 })
 
@@ -39,13 +39,14 @@ test('shows Registration column when at least one boat has a registration number
   })
   expect(w.text()).toContain('boats.list.table.registration')
   expect(w.text()).toContain('FR-1234')
-  expect(w.text()).not.toContain('boats.list.table.type')
+  expect(w.text()).not.toContain('boats.list.table.category')
 })
 
-test('shows Type column when at least one boat has a type', () => {
+test('shows Category column when at least one boat has a category', () => {
   const w = mount(BoatTable, {
-    props: { boats: [makeBoat(), makeBoat({ id: 2, type: 'Monohull' })] },
+    props: { boats: [makeBoat(), makeBoat({ id: 2, category: 'sailboat_monohull' })] },
   })
-  expect(w.text()).toContain('boats.list.table.type')
-  expect(w.text()).toContain('Monohull')
+  expect(w.text()).toContain('boats.list.table.category')
+  // Le libellé passe par `boatCategoryLabel` : le mock de `t` renvoie la clé.
+  expect(w.text()).toContain('boats.options.category.sailboat_monohull')
 })

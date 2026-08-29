@@ -39,7 +39,7 @@ test('the view toggle no longer stretches across half the row', () => {
       filters: baseFilters,
       viewMode: 'table',
       total: 3,
-      typeOptions: [],
+      categoryOptions: [],
       propulsionOptions: [],
     },
   })
@@ -53,7 +53,7 @@ test('passes the total as count to the boats label for correct pluralization', (
       filters: baseFilters,
       viewMode: 'table',
       total: 1,
-      typeOptions: [],
+      categoryOptions: [],
       propulsionOptions: [],
     },
   })

@@ -1,0 +1,370 @@
+import type { BoatBrandSeed } from '#shared/types/boat_catalog'
+
+/**
+ * Open et day-boats (#571).
+ *
+ * Règles de saisie (détail : `database/data/boat_catalog/README.md`) — `name` =
+ * nom commercial officiel, jamais traduit ; `slug` kebab-case **stable à vie** ;
+ * `aliases` = orthographes réellement rencontrées ; une marque est déclarée une
+ * seule fois, ses modèles groupés par catégorie ; les années ne sont
+ * renseignées que lorsqu'elles sont certaines.
+ *
+ * Beaucoup de constructeurs d'open ont aussi une gamme de vedettes : ils sont
+ * alors déclarés dans `motor_yacht.ts` (Sea Ray, Bayliner, Axopar, Frauscher,
+ * Chaparral, Quicksilver…). Ce fichier ne porte que les chantiers dont l'open
+ * est le cœur de gamme.
+ */
+export const OPEN_DAYBOAT_BRANDS: readonly BoatBrandSeed[] = [
+  {
+    slug: 'boesch',
+    name: 'Boesch',
+    country: 'CH',
+    categories: ['open_dayboat', 'classic'],
+    aliases: ['boesch', 'Boesch Motorboote'],
+    models: {
+      open_dayboat: [
+        'Boesch 510 Costa Brava',
+        'Boesch 620 Bimini',
+        'Boesch 710 Costa Brava',
+        'Boesch 750 Portofino',
+        'Boesch 900 St. Tropez',
+        'Boesch 970 Riviera',
+      ],
+    },
+  },
+  {
+    slug: 'pegase',
+    name: 'Pégase',
+    country: 'FR',
+    categories: ['open_dayboat', 'fishing'],
+    aliases: ['pegase', 'Pégase Bateaux'],
+    models: {
+      open_dayboat: ['Pégase 555', 'Pégase 600', 'Pégase 650', 'Pégase 750'],
+    },
+  },
+  {
+    slug: 'b2-marine',
+    name: 'B2 Marine',
+    country: 'FR',
+    categories: ['open_dayboat', 'fishing'],
+    aliases: ['b2 marine', 'b2marine', 'Cap Ferret B2'],
+    models: {
+      open_dayboat: [
+        'B2 Marine Cap Ferret 452 Open',
+        'B2 Marine Cap Ferret 552 Open',
+        'B2 Marine Cap Ferret 602 Open',
+        'B2 Marine Cap Ferret 672 Open',
+        'B2 Marine Cap Ferret 752 Open',
+        'B2 Marine Cap Ferret 802 Open',
+      ],
+      fishing: [
+        'B2 Marine Cap Ferret 552 Cruiser',
+        'B2 Marine Cap Ferret 652 Cruiser',
+        'B2 Marine Cap Ferret 752 Cruiser',
+        'B2 Marine Cap Ferret 902 Cruiser',
+      ],
+    },
+  },
+  {
+    slug: 'ocqueteau',
+    name: 'Ocqueteau',
+    country: 'FR',
+    categories: ['fishing', 'open_dayboat'],
+    aliases: ['ocqueteau', 'Chantier Ocqueteau'],
+    models: {
+      fishing: [
+        'Ocqueteau Ostrea 600',
+        'Ocqueteau Ostrea 700',
+        'Ocqueteau Ostrea 800',
+        'Ocqueteau Timonier 605',
+        'Ocqueteau Timonier 725',
+        'Ocqueteau Abaco 21',
+        'Ocqueteau Abaco 23',
+        'Ocqueteau 645',
+        'Ocqueteau 815',
+      ],
+    },
+  },
+  {
+    slug: 'white-shark',
+    name: 'White Shark',
+    country: 'FR',
+    categories: ['open_dayboat', 'fishing'],
+    aliases: ['white shark', 'whiteshark', 'Kelt White Shark'],
+    models: {
+      open_dayboat: [
+        'White Shark 205',
+        'White Shark 225',
+        'White Shark 226',
+        'White Shark 255',
+        'White Shark 285',
+      ],
+    },
+  },
+  {
+    slug: 'stingray-boats',
+    name: 'Stingray Boats',
+    country: 'US',
+    categories: ['open_dayboat'],
+    aliases: ['stingray', 'Stingray Boats'],
+    models: {
+      open_dayboat: [
+        'Stingray 172 SC',
+        'Stingray 182 SC',
+        'Stingray 191 DC',
+        'Stingray 198 LX',
+        'Stingray 208 CR',
+        'Stingray 214 LR',
+        'Stingray 234 LR',
+        'Stingray 253 CR',
+      ],
+    },
+  },
+  {
+    slug: 'crownline',
+    name: 'Crownline',
+    country: 'US',
+    categories: ['open_dayboat', 'motor_yacht'],
+    aliases: ['crownline', 'Crownline Boats'],
+    models: {
+      open_dayboat: [
+        'Crownline 180 SS',
+        'Crownline 200 SS',
+        'Crownline 220 SS',
+        'Crownline 235 SS',
+        'Crownline 255 SS',
+        'Crownline 265 SS',
+        'Crownline E23 XS',
+        'Crownline E255 XS',
+        'Crownline E29 XS',
+      ],
+      motor_yacht: ['Crownline 305 SS', 'Crownline 320 CR', 'Crownline 350 SY'],
+    },
+  },
+  {
+    slug: 'glastron',
+    name: 'Glastron',
+    country: 'US',
+    categories: ['open_dayboat'],
+    aliases: ['glastron', 'Glastron Boats'],
+    models: {
+      open_dayboat: [
+        'Glastron GT 180',
+        'Glastron GT 200',
+        'Glastron GT 205',
+        'Glastron GT 225',
+        'Glastron GTD 220',
+        'Glastron GTD 245',
+        'Glastron GTS 207',
+        'Glastron GTS 245',
+      ],
+    },
+  },
+  {
+    slug: 'scarab-boats',
+    name: 'Scarab',
+    country: 'US',
+    categories: ['open_dayboat'],
+    aliases: ['scarab', 'Scarab Boats', 'Wellcraft Scarab'],
+    models: {
+      open_dayboat: [
+        'Scarab 165 ID',
+        'Scarab 195 ID',
+        'Scarab 215 ID',
+        'Scarab 255 ID',
+        'Scarab 285 ID',
+        'Scarab 302 HO',
+      ],
+    },
+  },
+  {
+    slug: 'yamaha-boats',
+    name: 'Yamaha Boats',
+    country: 'JP',
+    categories: ['open_dayboat'],
+    aliases: ['yamaha boats', 'Yamaha Jet Boats'],
+    models: {
+      open_dayboat: [
+        'Yamaha 195S',
+        'Yamaha 210 FSH',
+        'Yamaha 212S',
+        'Yamaha 222SD',
+        'Yamaha 252SD',
+        'Yamaha 255 FSH',
+        'Yamaha AR190',
+        'Yamaha AR195',
+        'Yamaha AR250',
+        'Yamaha SX190',
+        'Yamaha SX210',
+        'Yamaha 275SD',
+      ],
+    },
+  },
+  {
+    slug: 'malibu-boats',
+    name: 'Malibu Boats',
+    country: 'US',
+    categories: ['open_dayboat'],
+    aliases: ['malibu', 'Malibu Boats'],
+    models: {
+      open_dayboat: [
+        'Malibu Wakesetter 21 LX',
+        'Malibu Wakesetter 22 LSV',
+        'Malibu Wakesetter 23 LSV',
+        'Malibu Wakesetter 24 MXZ',
+        'Malibu Wakesetter 25 LSV',
+        'Malibu Response TXi',
+        'Malibu M220',
+        'Malibu M240',
+      ],
+    },
+  },
+  {
+    slug: 'mastercraft',
+    name: 'MasterCraft',
+    country: 'US',
+    categories: ['open_dayboat'],
+    aliases: ['mastercraft', 'Master Craft'],
+    models: {
+      open_dayboat: [
+        'MasterCraft XT20',
+        'MasterCraft XT22',
+        'MasterCraft XT24',
+        'MasterCraft XT25',
+        'MasterCraft X22',
+        'MasterCraft X24',
+        'MasterCraft X26',
+        'MasterCraft NXT20',
+        'MasterCraft NXT22',
+        'MasterCraft ProStar',
+      ],
+    },
+  },
+  {
+    slug: 'nautique',
+    name: 'Nautique',
+    country: 'US',
+    categories: ['open_dayboat'],
+    aliases: ['nautique', 'Correct Craft Nautique', 'Ski Nautique'],
+    models: {
+      open_dayboat: [
+        'Nautique Ski Nautique 200',
+        'Nautique Super Air Nautique G21',
+        'Nautique Super Air Nautique G23',
+        'Nautique Super Air Nautique G25',
+        'Nautique Super Air Nautique S23',
+        'Nautique GS20',
+        'Nautique GS22',
+        'Nautique GS24',
+      ],
+    },
+  },
+  {
+    slug: 'zar-formenti',
+    name: 'Zar Formenti',
+    country: 'IT',
+    categories: ['rib', 'open_dayboat'],
+    aliases: ['zar', 'zar formenti', 'Zar Mini'],
+    models: {
+      rib: [
+        'Zar Formenti 43',
+        'Zar Formenti 53',
+        'Zar Formenti 57',
+        'Zar Formenti 61',
+        'Zar Formenti 65',
+        'Zar Formenti 71',
+        'Zar Formenti 85 SL',
+        'Zar Formenti 95 SL',
+        'Zar Mini Lift 6',
+        'Zar Mini Lift 7',
+        'Zar Mini RIB 12',
+        'Zar Mini RIB 14',
+      ],
+    },
+  },
+  {
+    slug: 'karnic-boats',
+    name: 'Karnic Boats',
+    country: 'CY',
+    categories: ['open_dayboat', 'fishing'],
+    aliases: ['karnic', 'Karnic Boats'],
+    models: {
+      open_dayboat: [
+        'Karnic SL 601',
+        'Karnic SL 602',
+        'Karnic SL 651',
+        'Karnic SL 652',
+        'Karnic SL 702',
+        'Karnic SL 800',
+        'Karnic SL 900',
+      ],
+      fishing: ['Karnic Bluewater 2251', 'Karnic Bluewater 2460', 'Karnic Bluewater 2965'],
+    },
+  },
+  {
+    slug: 'olympic-boats',
+    name: 'Olympic Boats',
+    country: 'GR',
+    categories: ['open_dayboat', 'fishing'],
+    aliases: ['olympic boats', 'olympicboats'],
+    models: {
+      open_dayboat: ['Olympic 490 SX', 'Olympic 520 SX', 'Olympic 580 SX', 'Olympic 630 SX'],
+      fishing: ['Olympic 490 CC', 'Olympic 550 FB', 'Olympic 700 CC'],
+    },
+  },
+  {
+    slug: 'terhi-boats',
+    name: 'Terhi',
+    country: 'FI',
+    categories: ['open_dayboat', 'tender'],
+    aliases: ['terhi', 'Terhi Boats'],
+    models: {
+      open_dayboat: [
+        'Terhi 385',
+        'Terhi 400',
+        'Terhi 445',
+        'Terhi 450 C',
+        'Terhi 475 Twin C',
+        'Terhi 480 BR',
+      ],
+      tender: ['Terhi 240', 'Terhi Nordic 6020', 'Terhi Sunny'],
+    },
+  },
+  {
+    slug: 'silver-boats',
+    name: 'Silver Boats',
+    country: 'FI',
+    categories: ['open_dayboat', 'fishing'],
+    aliases: ['silver', 'Silver Boats', 'TG Boats Silver'],
+    models: {
+      open_dayboat: [
+        'Silver Shark BR',
+        'Silver Shark CC',
+        'Silver Eagle BR',
+        'Silver Eagle CC',
+        'Silver Fox DC',
+        'Silver Beaver DC',
+        'Silver Hawk BR',
+        'Silver Hawk CC',
+      ],
+      fishing: ['Silver Shark CA', 'Silver Hawk CA', 'Silver Wolf CA'],
+    },
+  },
+  {
+    slug: 'marinello',
+    name: 'Marinello',
+    country: 'IT',
+    categories: ['open_dayboat', 'fishing'],
+    aliases: ['marinello', 'Marinello Boats'],
+    models: {
+      open_dayboat: [
+        'Marinello Eden 18',
+        'Marinello Eden 20',
+        'Marinello Eden 22',
+        'Marinello Fisherman 16',
+        'Marinello Fisherman 19',
+        'Marinello Fisherman 605',
+      ],
+    },
+  },
+]

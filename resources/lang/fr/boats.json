@@ -27,6 +27,7 @@
     "name": "Nom",
     "registrationNumber": "Immatriculation",
     "type": "Type",
+    "category": "Catégorie",
     "propulsionType": "Type de propulsion",
     "manufacturedAt": "Date de fabrication",
     "lengthM": "Longueur (m)",
@@ -216,6 +217,23 @@
       "ok": "OK",
       "to_check": "À vérifier",
       "to_replace": "À remplacer"
+    },
+    "category": {
+      "sailboat_monohull": "Voilier monocoque",
+      "sailboat_multihull": "Catamaran / trimaran à voile",
+      "motor_yacht": "Vedette / yacht à moteur",
+      "power_catamaran": "Catamaran à moteur",
+      "trawler": "Trawler / vedette hauturière",
+      "open_dayboat": "Open / day-boat",
+      "fishing": "Pêche-promenade",
+      "rib": "Semi-rigide",
+      "jetski": "Jet-ski",
+      "houseboat": "Péniche / bateau fluvial",
+      "dinghy": "Dériveur / voile légère",
+      "tender": "Annexe",
+      "classic": "Bateau classique / traditionnel",
+      "workboat": "Navire de servitude / professionnel",
+      "other": "Autre"
     }
   },
   "index": {
@@ -443,7 +461,7 @@
   "list": {
     "search": "Rechercher",
     "searchPlaceholder": "Rechercher par nom ou immatriculation…",
-    "type": "Type",
+    "category": "Catégorie",
     "propulsion": "Propulsion",
     "sort": "Tri",
     "direction": "Ordre",
@@ -456,12 +474,12 @@
     "table": {
       "name": "Nom",
       "registration": "Immatriculation",
-      "type": "Type",
+      "category": "Catégorie",
       "propulsion": "Propulsion",
       "maintenance": "Maintenance"
     },
     "cards": {
-      "unknownType": "Type inconnu",
+      "unknownCategory": "Catégorie inconnue",
       "unknownPropulsion": "Propulsion inconnue"
     },
     "maintenance": {
@@ -914,5 +932,14 @@
       "equipmentType": "Type d'équipement",
       "expiryDate": "Date d'expiration"
     }
+  },
+  "catalog": {
+    "categoryHint": "Détermine les constructeurs proposés ci-dessous. Sans rapport avec la catégorie de navigation (A/B/C/D).",
+    "brandPlaceholder": "Ex. Bénéteau…",
+    "modelPlaceholder": "Ex. Oceanis 46.1…",
+    "freeTextHint": "Vous pouvez saisir une valeur absente du catalogue : elle sera enregistrée telle quelle.",
+    "modelNeedsBrandHint": "Choisissez un constructeur du catalogue pour voir ses modèles. La saisie libre reste acceptée.",
+    "noBrandMatch": "Aucun constructeur ne correspond — votre saisie sera conservée.",
+    "noModelMatch": "Aucun modèle ne correspond — votre saisie sera conservée."
   }
 }

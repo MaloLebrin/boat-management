@@ -14,8 +14,13 @@ import type { BoatListFilters, BoatsPaginated } from '~/components/boats/list/ty
 import type { QuotaUsage } from '../../../shared/types/plan'
 import { useT } from '~/composables/use_t'
 import { propulsionLabel } from '~/utils/boat_propulsion_label'
+import { useBoatOptions } from '~/composables/use_boat_options'
 
 const { t } = useT()
+// Le filtre s'appuie sur le vocabulaire fermé `BOAT_CATEGORIES` (#571) et non
+// plus sur les valeurs distinctes de la page courante : « Voilier », « voilier »
+// et « Voilier monocoque » donnaient trois filtres pour la même chose.
+const { categoryOptions } = useBoatOptions()
 
 const props = defineProps<{
   boats: BoatsPaginated
@@ -42,14 +47,6 @@ const isLoading = computed(() => page.props?.processing === true)
 const VIEW_MODE_KEY = 'boats.index.viewMode'
 const viewMode = useLocalStorage<'table' | 'cards'>(VIEW_MODE_KEY, 'table')
 
-const typeOptions = computed(() => {
-  const set = new Set<string>()
-  for (const b of boatsData.value) if (b.type) set.add(b.type)
-  return Array.from(set)
-    .sort((a, b) => a.localeCompare(b))
-    .map((v) => ({ label: v, value: v }))
-})
-
 const propulsionOptions = computed(() => {
   const set = new Set<string>()
   for (const b of boatsData.value) if (b.propulsionType) set.add(b.propulsionType)
@@ -63,7 +60,7 @@ function navigate(next: BoatListFilters) {
     '/boats',
     {
       q: next.q || undefined,
-      type: next.type || undefined,
+      category: next.category || undefined,
       propulsionType: next.propulsionType || undefined,
       sort: next.sort,
       direction: next.direction,
@@ -77,7 +74,7 @@ function navigate(next: BoatListFilters) {
 function reset() {
   navigate({
     q: undefined,
-    type: undefined,
+    category: undefined,
     propulsionType: undefined,
     sort: props.filters.sort,
     direction: props.filters.direction,
@@ -104,7 +101,7 @@ function reset() {
       :view-mode="viewMode"
       :total="boats.meta.total"
       :is-loading="isLoading"
-      :type-options="typeOptions"
+      :category-options="categoryOptions"
       :propulsion-options="propulsionOptions"
       @update:view-mode="(v) => (viewMode = v)"
       @update:filters="navigate"
