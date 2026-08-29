@@ -156,3 +156,22 @@ Référence : `app/services/boat_catalog_service.ts`, corpus dans `database/data
   reste valide. `boats.type`, le champ texte libre historique, reste en base mais n'est plus
   alimenté par le formulaire — une mise à jour ne l'écrase pas.
 - Ne pas confondre avec `navigationCategory` (catégorie CE A/B/C/D).
+
+### Pavillon et pays (#580)
+
+Référence : `shared/constants/countries.ts`, `shared/helpers/countries.ts`.
+
+- `boats.flagCountry` et `ports.country` partagent un **vocabulaire fermé** : les 249 codes
+  ISO 3166-1 alpha-2 de `COUNTRY_CODES`, câblés aux quatre validators via `vine.enum()` et aux
+  formulaires via `BaseSelect`. Les deux champs restent nullable.
+- Les libellés ne sont **pas** des clés i18n : `countryName(code, locale)` les résout via
+  `Intl.DisplayNames` dans la locale de l'app — jamais celle du navigateur, même règle que les
+  dates. Une valeur hors liste est rendue **telle quelle**.
+- **Aucun enregistrement existant n'est bloqué en édition.** La migration
+  `1834000000000_normalize_country_codes` normalise ce qu'elle sait (`France`/`FRA` → `FR`,
+  `UK`/`Royaume-Uni` → `GB`) et conserve intact ce qu'elle ne sait pas (`Bretagne`). Le champ étant
+  nullable, ne pas renvoyer la valeur legacy ne casse rien ; au prochain enregistrement de la fiche
+  le select est vide et la valeur part à `null`.
+- `normalizeCountryCode()` est la seule logique de rapprochement (alpha-2, alias hors norme,
+  alpha-3, puis noms `fr`/`en`) — la migration n'en est qu'un appelant, comme
+  `deriveCategoryFromLegacy` pour les catégories.
