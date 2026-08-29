@@ -3,6 +3,7 @@ import { Link } from '@adonisjs/inertia/vue'
 import { WrenchScrewdriverIcon } from '@heroicons/vue/24/outline'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
+import { useCountries } from '~/composables/use_countries'
 import { useT } from '~/composables/use_t'
 import type { BoatShowDetail } from '~/types/boat_show'
 import { boatCategoryLabel } from '~/utils/boat_category_label'
@@ -13,6 +14,7 @@ defineProps<{
 }>()
 
 const { t } = useT()
+const { countryName } = useCountries()
 </script>
 
 <template>
@@ -132,7 +134,7 @@ const { t } = useT()
           </div>
           <div>
             <dt class="text-fg-muted">{{ t('boats.hullFields.flagCountry') }}</dt>
-            <dd class="font-semibold text-fg">{{ boat.flagCountry ?? '—' }}</dd>
+            <dd class="font-semibold text-fg">{{ countryName(boat.flagCountry) || '—' }}</dd>
           </div>
           <div>
             <dt class="text-fg-muted">{{ t('boats.hullFields.maxPersons') }}</dt>

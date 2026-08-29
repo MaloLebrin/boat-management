@@ -52,6 +52,7 @@
     "name": "Nom du port",
     "city": "Ville",
     "country": "Pays",
+    "selectCountryPlaceholder": "Sélectionnez un pays…",
     "address": "Adresse",
     "notes": "Notes"
   },

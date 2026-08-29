@@ -2,6 +2,7 @@
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import { useBoatOptions } from '~/composables/use_boat_options'
+import { useCountries } from '~/composables/use_countries'
 import { useT } from '~/composables/use_t'
 
 defineProps<{
@@ -18,6 +19,7 @@ const flagCountry = defineModel<string>('flagCountry', { required: true })
 
 const { t } = useT()
 const { navigationCategoryOptions } = useBoatOptions()
+const { countryOptions } = useCountries()
 </script>
 
 <template>
@@ -59,10 +61,13 @@ const { navigationCategoryOptions } = useBoatOptions()
         :errors="errors"
       />
     </div>
-    <BaseInput
+    <BaseSelect
       id="flagCountry"
       name="flagCountry"
       :label="t('boats.hullFields.flagCountry')"
+      :placeholder="t('boats.hullFields.selectCountryPlaceholder')"
+      :allow-empty="true"
+      :options="countryOptions"
       v-model="flagCountry"
       :errors="errors"
     />

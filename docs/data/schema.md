@@ -34,8 +34,16 @@ Source: `database/schema.ts` (généré automatiquement via migrations).
 - propulsion/specs: `propulsionType`, `lengthM`, `beamM`, `draftM`, `mastHeightM`
 - matériaux: `hullMaterial`
 - construction: `yearBuilt`, `manufacturer`, `model`, `manufacturedAt`
+- réglementaire: `flagCountry` (code ISO 3166-1 alpha-2, vocabulaire `COUNTRY_CODES`, nullable —
+  cf. #580), `navigationCategory`, `hullIdentificationNumber`, `francisationNumber`, `maxPersons`
 
 `category` ne doit pas être confondue avec `navigationCategory` (catégorie CE A/B/C/D).
+
+`flagCountry` et `ports.country` partagent le même vocabulaire fermé (`shared/constants/countries.ts`).
+La migration `1834000000000_normalize_country_codes` a normalisé l'existant en best-effort et
+**conserve les valeurs non mappables** : la colonne peut donc encore porter du texte libre
+historique, que l'affichage rend brut. Les largeurs de colonnes n'ont pas été rétrécies pour cette
+raison.
 
 ### boat_brands
 

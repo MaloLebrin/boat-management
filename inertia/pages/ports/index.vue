@@ -5,6 +5,7 @@ import { MapPinIcon, PlusIcon } from '@heroicons/vue/24/outline'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
+import { useCountries } from '~/composables/use_countries'
 import { useT } from '~/composables/use_t'
 import type { PortListItem } from '~/types/port'
 
@@ -13,6 +14,12 @@ defineProps<{
 }>()
 
 const { t } = useT()
+const { countryName } = useCountries()
+
+/** `Marseille, France` — le pays seul s'affiche aussi, sans virgule orpheline. */
+function locationLabel(port: PortListItem): string {
+  return [port.city, countryName(port.country)].filter(Boolean).join(', ')
+}
 </script>
 
 <template>
@@ -56,8 +63,8 @@ const { t } = useT()
               <h3 class="font-semibold text-fg group-hover:text-brand">
                 {{ port.name }}
               </h3>
-              <p v-if="port.city" class="mt-1 text-sm text-fg-muted">
-                {{ port.city }}<span v-if="port.country">, {{ port.country }}</span>
+              <p v-if="port.city || port.country" class="mt-1 text-sm text-fg-muted">
+                {{ locationLabel(port) }}
               </p>
             </div>
             <MapPinIcon class="h-5 w-5 text-fg-subtle shrink-0" />

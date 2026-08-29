@@ -47,6 +47,9 @@ Référence: `inertia/app.ts`.
     constructeur et modèle en `BaseCombobox`. Les modèles de la marque retenue arrivent par
     `router.reload({ only: ['catalogModels'], data: { brandId } })` ; **une saisie hors catalogue
     est acceptée telle quelle**.
+  - `inertia/components/boats/hull/BoatFormLegalFields.vue` — le **pavillon** est un `BaseSelect`
+    de pays ISO 3166-1 alimenté par `useCountries()` (#580), option vide comprise ; ce n'est plus
+    un champ texte libre
   - props catalogue: `brands`, `catalogModels`, `catalogBrandId`
   - backend: `BoatsController.store`
 - `boats/edit`: `inertia/pages/boats/edit.vue`
@@ -101,6 +104,19 @@ Chaque page charge ses photos via `mediaService.listForEntity(<entityType>, id)`
 - safety: `inertia/pages/boats/safety_equipment_show.vue` (GET `/boats/:boatId/safety-equipment/:itemId`)
 
 Les cartes de l'onglet Équipement exposent un lien « voir le détail » vers ces pages.
+
+### Ports (liste / création / édition)
+
+- `ports/index`: `inertia/pages/ports/index.vue` — GET `/ports`, `PortsController.index`
+  - chaque carte affiche `ville, pays` via `locationLabel()` ; le pays passe par `countryName()`
+    (#580) et s'affiche même sans ville
+- `ports/new`: `inertia/pages/ports/new.vue` — form POST `/ports`, `PortsController.store`
+- `ports/edit`: `inertia/pages/ports/edit.vue` — form PUT `/ports/:id`, `PortsController.update`
+  - dans les deux formulaires, le **pays** est un `BaseSelect` ISO 3166-1 alimenté par
+    `useCountries()` (#580). Il remplace le `<BaseInput maxlength="2">` qui bridait la saisie à
+    2 caractères alors que le serveur en acceptait 8.
+- `ports/show`: `inertia/pages/ports/show.vue` — GET `/ports/:id`, onglets `list | plan`,
+  suppression via `router.delete('/ports/:id')`
 
 ### Budget
 

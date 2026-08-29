@@ -1,6 +1,7 @@
 import vine from '@vinejs/vine'
 import { ENGINE_FUELS } from '#shared/constants/boats/boat_form_options'
 import { BOAT_CATEGORIES } from '#shared/types/boat_catalog'
+import { COUNTRY_CODES } from '#shared/constants/countries'
 
 export const propulsionTypes = ['sailboat', 'motorboat', 'catamaran', 'rib', 'other'] as const
 export const hullMaterials = ['fiberglass', 'aluminum', 'steel', 'wood', 'carbon', 'other'] as const
@@ -71,7 +72,7 @@ export const createBoatValidator = vine.create({
   navigationCategory: vine.enum(navigationCategories).nullable().optional(),
   hullIdentificationNumber: vine.string().trim().maxLength(64).nullable().optional(),
   francisationNumber: vine.string().trim().maxLength(64).nullable().optional(),
-  flagCountry: vine.string().trim().maxLength(8).nullable().optional(),
+  flagCountry: vine.enum(COUNTRY_CODES).nullable().optional(),
   maxPersons: vine.number().withoutDecimals().positive().nullable().optional(),
 
   mmsi: vine
@@ -110,7 +111,7 @@ export const updateBoatValidator = vine.create(
     navigationCategory: vine.enum(navigationCategories).nullable().optional(),
     hullIdentificationNumber: vine.string().trim().maxLength(64).nullable().optional(),
     francisationNumber: vine.string().trim().maxLength(64).nullable().optional(),
-    flagCountry: vine.string().trim().maxLength(8).nullable().optional(),
+    flagCountry: vine.enum(COUNTRY_CODES).nullable().optional(),
     maxPersons: vine.number().withoutDecimals().positive().nullable().optional(),
 
     mmsi: vine
