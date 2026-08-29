@@ -1,0 +1,180 @@
+import type { EngineBrandSeed } from '#shared/types/engine_catalog'
+
+/**
+ * In-bord essence et embase Z (#573).
+ *
+ * Règles de saisie (détail : `database/data/engine_catalog/README.md`) —
+ * `name` = désignation commerciale, jamais traduite ; `slug` kebab-case
+ * **stable à vie** ; `aliases` = orthographes réellement rencontrées ; une
+ * marque est déclarée une seule fois, ses modèles groupés par famille.
+ *
+ * Volvo Penta couvre aussi cette famille : ses blocs essence sont déclarés avec
+ * le reste de la marque dans `inboard_diesel.ts`, une marque ne se déclarant
+ * qu'une fois.
+ */
+export const INBOARD_PETROL_BRANDS: readonly EngineBrandSeed[] = [
+  {
+    slug: 'mercruiser',
+    name: 'MerCruiser',
+    country: 'US',
+    families: ['inboard_petrol'],
+    aliases: ['mercruiser', 'mercury mercruiser', 'mer cruiser'],
+    modelCodeFromName: true,
+    modelDefaults: { fuel: 'essence', strokeType: '4_stroke' },
+    models: {
+      inboard_petrol: [
+        { name: '3.0L MPI', powerHp: 135, cylinders: 4 },
+        { name: '3.0L TKS', powerHp: 135, cylinders: 4 },
+        { name: '4.3L MPI', powerHp: 220, cylinders: 6 },
+        { name: '4.5L MPI', powerHp: 250, cylinders: 8 },
+        { name: '5.0L MPI', powerHp: 260, cylinders: 8 },
+        { name: '5.7L MPI', powerHp: 300, cylinders: 8 },
+        { name: '6.2L MPI', powerHp: 300, cylinders: 8 },
+        { name: '6.2L 350', powerHp: 350, cylinders: 8 },
+        { name: '8.2L MAG', powerHp: 380, cylinders: 8 },
+        { name: '8.2L MAG HO', powerHp: 430, cylinders: 8 },
+        { name: '350 MAG MPI', powerHp: 300, cylinders: 8 },
+        { name: '377 MAG', powerHp: 320, cylinders: 8 },
+        { name: '496 MAG', powerHp: 375, cylinders: 8 },
+        { name: '496 MAG HO', powerHp: 425, cylinders: 8 },
+        { name: '454 MAG MPI', powerHp: 310, cylinders: 8 },
+        { name: '502 MAG MPI', powerHp: 415, cylinders: 8 },
+        { name: 'Alpha One 4.3', powerHp: 190, cylinders: 6 },
+        { name: 'Bravo Three 6.2', powerHp: 300, cylinders: 8 },
+        { name: '470', powerHp: 170, cylinders: 4 },
+        { name: '165 Inline Six', powerHp: 165, cylinders: 6 },
+        { name: '888 V8', powerHp: 188, cylinders: 8 },
+        { name: '898 V8', powerHp: 198, cylinders: 8 },
+        { name: '260 V8', powerHp: 260, cylinders: 8 },
+        { name: '5.7L Carb', powerHp: 250, cylinders: 8 },
+        { name: '4.3L Carb', powerHp: 190, cylinders: 6 },
+        { name: '2.5L TKS', powerHp: 120, cylinders: 4 },
+        { name: 'TowSport 5.7', powerHp: 320, cylinders: 8 },
+        { name: 'TowSport 6.2', powerHp: 380, cylinders: 8 },
+        // Blocs diesel marinisés distribués sous la marque.
+        { name: '1.7L Diesel', powerHp: 120, fuel: 'diesel', cylinders: 4 },
+        { name: '2.8L Diesel', powerHp: 220, fuel: 'diesel', cylinders: 4 },
+        { name: '4.2L Diesel', powerHp: 335, fuel: 'diesel', cylinders: 8 },
+      ],
+    },
+  },
+  {
+    slug: 'crusader-engines',
+    name: 'Crusader Engines',
+    country: 'US',
+    families: ['inboard_petrol'],
+    aliases: ['crusader', 'crusader engines', 'crusader marine'],
+    modelCodeFromName: true,
+    modelDefaults: { fuel: 'essence', strokeType: '4_stroke' },
+    models: {
+      inboard_petrol: [
+        { name: '5.0L MPI', powerHp: 270, cylinders: 8 },
+        { name: '5.7L MPI', powerHp: 320, cylinders: 8 },
+        { name: '6.0L MPI', powerHp: 375, cylinders: 8 },
+        { name: '8.1L MPI', powerHp: 420, cylinders: 8 },
+        { name: '454 XL', powerHp: 385, cylinders: 8 },
+        { name: '502 XL', powerHp: 450, cylinders: 8 },
+        { name: 'CH350', powerHp: 300, cylinders: 8 },
+        { name: 'CH454', powerHp: 340, cylinders: 8 },
+        { name: 'Captain 5.7', powerHp: 320, cylinders: 8 },
+        { name: 'Captain 8.1', powerHp: 425, cylinders: 8 },
+        { name: 'Challenger 350', powerHp: 320, cylinders: 8 },
+        { name: 'Challenger 454', powerHp: 385, cylinders: 8 },
+      ],
+    },
+  },
+  {
+    slug: 'marine-power',
+    name: 'Marine Power',
+    country: 'US',
+    families: ['inboard_petrol'],
+    aliases: ['marine power', 'marinepower'],
+    modelCodeFromName: true,
+    modelDefaults: { fuel: 'essence', strokeType: '4_stroke' },
+    models: {
+      inboard_petrol: [
+        { name: '5.0L V8', powerHp: 260, cylinders: 8 },
+        { name: '5.7L V8', powerHp: 300, cylinders: 8 },
+        { name: '6.0L V8', powerHp: 350, cylinders: 8 },
+        { name: '6.2L V8', powerHp: 400, cylinders: 8 },
+        { name: '7.4L V8', powerHp: 425, cylinders: 8 },
+        { name: '8.1L V8', powerHp: 450, cylinders: 8 },
+        { name: '350 MPI', powerHp: 320, cylinders: 8 },
+        { name: '383 Stroker', powerHp: 400, cylinders: 8 },
+        { name: '454 MPI', powerHp: 400, cylinders: 8 },
+        { name: '502 MPI', powerHp: 450, cylinders: 8 },
+      ],
+    },
+  },
+  {
+    slug: 'ilmor-marine',
+    name: 'Ilmor Marine',
+    country: 'US',
+    families: ['inboard_petrol'],
+    aliases: ['ilmor', 'ilmor marine'],
+    modelCodeFromName: true,
+    modelDefaults: { fuel: 'essence', strokeType: '4_stroke' },
+    models: {
+      inboard_petrol: [
+        { name: '5.7L MV8', powerHp: 350, cylinders: 8 },
+        { name: '6.0L MV8', powerHp: 400, cylinders: 8 },
+        { name: '6.2L MV8', powerHp: 430, cylinders: 8 },
+        { name: '7.4L MV8', powerHp: 500, cylinders: 8 },
+        { name: '8.2L MV8', powerHp: 560, cylinders: 8 },
+        { name: 'GDI 6.2L', powerHp: 450, cylinders: 8 },
+        { name: 'GDI 7.4L', powerHp: 520, cylinders: 8 },
+        { name: 'Supercharged 7.4L', powerHp: 620, cylinders: 8 },
+      ],
+    },
+  },
+  {
+    slug: 'indmar',
+    name: 'Indmar',
+    country: 'US',
+    families: ['inboard_petrol'],
+    aliases: ['indmar', 'indmar marine'],
+    modelCodeFromName: true,
+    modelDefaults: { fuel: 'essence', strokeType: '4_stroke' },
+    models: {
+      inboard_petrol: [
+        { name: 'Raptor 400', powerHp: 400, cylinders: 8 },
+        { name: 'Raptor 440', powerHp: 440, cylinders: 8 },
+        { name: 'Raptor 450', powerHp: 450, cylinders: 8 },
+        { name: 'Raptor 575', powerHp: 575, cylinders: 8 },
+        { name: 'Raptor 6.2L', powerHp: 400, cylinders: 8 },
+        { name: 'Assault 340', powerHp: 340, cylinders: 8 },
+        { name: 'Monsoon 340', powerHp: 340, cylinders: 8 },
+        { name: 'Monsoon 409', powerHp: 409, cylinders: 8 },
+        { name: 'Ford 5.7L', powerHp: 325, cylinders: 8 },
+        { name: 'Ford 6.0L', powerHp: 350, cylinders: 8 },
+        { name: 'Ecoboost 400', powerHp: 400, cylinders: 6 },
+        { name: 'Marine Power 5.7', powerHp: 320, cylinders: 8 },
+      ],
+    },
+  },
+  {
+    slug: 'pcm-pleasurecraft',
+    name: 'PCM (Pleasurecraft Marine)',
+    country: 'US',
+    families: ['inboard_petrol'],
+    aliases: ['pcm', 'pleasurecraft', 'pleasurecraft marine', 'pcm marine'],
+    modelCodeFromName: true,
+    modelDefaults: { fuel: 'essence', strokeType: '4_stroke' },
+    models: {
+      inboard_petrol: [
+        { name: 'ZR409', powerHp: 409, cylinders: 8 },
+        { name: 'ZR450', powerHp: 450, cylinders: 8 },
+        { name: 'ZZ6', powerHp: 400, cylinders: 8 },
+        { name: 'ZZ8', powerHp: 450, cylinders: 8 },
+        { name: 'XS550', powerHp: 550, cylinders: 8 },
+        { name: 'H6', powerHp: 350, cylinders: 8 },
+        { name: 'EX343', powerHp: 343, cylinders: 8 },
+        { name: 'EX400', powerHp: 400, cylinders: 8 },
+        { name: 'Excalibur 330', powerHp: 330, cylinders: 8 },
+        { name: 'Excalibur 343', powerHp: 343, cylinders: 8 },
+        { name: 'GT-40', powerHp: 310, cylinders: 8 },
+        { name: 'GT-50', powerHp: 350, cylinders: 8 },
+      ],
+    },
+  },
+]

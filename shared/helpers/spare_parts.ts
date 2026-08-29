@@ -2,7 +2,11 @@ import {
   GENERIC_RETAILERS,
   SPARE_PARTS_RETAILERS,
 } from '#shared/constants/spare_parts/spare_parts_content'
-import type { SparePartsBrandSlug, SparePartsRetailerLink } from '#shared/types/spare_parts'
+import {
+  SPARE_PARTS_BRAND_SLUGS,
+  type SparePartsBrandSlug,
+  type SparePartsRetailerLink,
+} from '#shared/types/spare_parts'
 
 /**
  * Un moteur est éligible à l'identification des pièces détachées (#517) s'il
@@ -15,16 +19,28 @@ export function isSparePartsEligibleEngine(engine: { kind: string }): boolean {
 }
 
 /**
- * Rattache la marque libre saisie sur le moteur (`Yamaha`, `evinrude 6cv`…)
- * à une marque du corpus v1, ou `null` si elle n'en fait pas partie.
+ * Traduit une marque du **catalogue moteur** (#573) en marque du corpus pièces
+ * détachées, ou `null` quand le corpus v1 ne la couvre pas.
+ *
+ * Remplace l'ancien `resolveSparePartsBrand()`, dont la cascade de `if` codée
+ * en dur ne connaissait que trois marques et ne savait rien faire d'un `Honda`
+ * ou d'un `Volvo Penta`. La **normalisation** du texte libre a migré en base
+ * (`EngineCatalogService.resolveBrand()`, résolution sur slug et alias) : les
+ * écrans reçoivent désormais le slug déjà résolu par le contrôleur, et cette
+ * fonction ne fait plus que la **couverture** — le catalogue compte des dizaines
+ * de marques, le corpus de pièces trois. Un `Honda` est donc bien résolu comme
+ * marque, et renvoie pourtant `null` ici : il n'a pas de contenu pièces.
+ *
+ * Les trois slugs du corpus sont ceux du catalogue, stables à vie de part et
+ * d'autre — d'où le simple test d'appartenance.
  */
-export function resolveSparePartsBrand(brand: string | null): SparePartsBrandSlug | null {
-  if (!brand) return null
-  const normalized = brand.toLowerCase()
-  if (normalized.includes('yamaha')) return 'yamaha'
-  if (/johnson|evinrude|\bomc\b/.test(normalized)) return 'johnson-evinrude'
-  if (/mercury|mariner/.test(normalized)) return 'mercury-mariner'
-  return null
+export function sparePartsBrandFromCatalogSlug(
+  catalogBrandSlug: string | null | undefined
+): SparePartsBrandSlug | null {
+  if (!catalogBrandSlug) return null
+  return (SPARE_PARTS_BRAND_SLUGS as readonly string[]).includes(catalogBrandSlug)
+    ? (catalogBrandSlug as SparePartsBrandSlug)
+    : null
 }
 
 /** Liens catalogues revendeurs pour une marque (génériques si inconnue). */

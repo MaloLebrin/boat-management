@@ -85,6 +85,15 @@
       "strokeType": "Cycle moteur",
       "installHours": "Heures à l'installation"
     },
+    "catalog": {
+      "brandPlaceholder": "Ex. Volvo Penta…",
+      "modelPlaceholder": "Ex. D2-40…",
+      "powerHint": "{power} ch",
+      "freeTextHint": "Vous pouvez saisir une valeur absente du catalogue : elle sera enregistrée telle quelle.",
+      "modelNeedsBrandHint": "Choisissez une marque du catalogue pour voir ses modèles. La saisie libre reste acceptée.",
+      "noBrandMatch": "Aucune marque ne correspond — votre saisie sera conservée.",
+      "noModelMatch": "Aucun modèle ne correspond — votre saisie sera conservée."
+    },
     "editTitle": "Modifier le moteur",
     "modal": {
       "title": "Ajouter un moteur",
@@ -152,6 +161,14 @@
       "essence": "Essence",
       "electric": "Électrique",
       "other": "Autre"
+    },
+    "engineFamily": {
+      "outboard_thermal": "Hors-bord thermique",
+      "outboard_electric": "Hors-bord / propulsion électrique",
+      "inboard_diesel": "In-bord diesel",
+      "inboard_petrol": "In-bord essence et embase Z",
+      "jet": "Jet",
+      "generator": "Groupe électrogène"
     },
     "sailType": {
       "main": "Grand-voile",

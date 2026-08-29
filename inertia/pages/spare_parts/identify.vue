@@ -17,6 +17,7 @@ const props = defineProps<{
     id: number
     brand: string | null
     model: string | null
+    catalogBrandSlug: string | null
     serialNumber: string | null
     kind: string
     status: string

@@ -94,6 +94,45 @@ export class AuditLogSchema extends BaseModel {
   declare userId: number | null
 }
 
+export class BoatBrandSchema extends BaseModel {
+  static $columns = [
+    'aliases',
+    'categories',
+    'country',
+    'createdAt',
+    'discontinuedYear',
+    'foundedYear',
+    'id',
+    'isActive',
+    'name',
+    'slug',
+    'updatedAt',
+  ] as const
+  $columns = BoatBrandSchema.$columns
+  @column()
+  declare aliases: any | null
+  @column()
+  declare categories: any
+  @column()
+  declare country: string | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare discontinuedYear: number | null
+  @column()
+  declare foundedYear: number | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare isActive: boolean
+  @column()
+  declare name: string
+  @column()
+  declare slug: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
+}
+
 export class BoatBudgetEntrySchema extends BaseModel {
   static $columns = [
     'amount',
@@ -265,6 +304,7 @@ export class BoatEngineSchema extends BaseModel {
     'boatId',
     'brand',
     'createdAt',
+    'engineModelId',
     'fuel',
     'hours',
     'id',
@@ -287,6 +327,8 @@ export class BoatEngineSchema extends BaseModel {
   declare brand: string | null
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
+  @column()
+  declare engineModelId: number | null
   @column()
   declare fuel: string | null
   @column()
@@ -752,6 +794,45 @@ export class BoatMaintenanceTaskSchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class BoatModelSchema extends BaseModel {
+  static $columns = [
+    'aliases',
+    'boatBrandId',
+    'category',
+    'createdAt',
+    'id',
+    'lengthM',
+    'name',
+    'productionEndYear',
+    'productionStartYear',
+    'slug',
+    'updatedAt',
+  ] as const
+  $columns = BoatModelSchema.$columns
+  @column()
+  declare aliases: any | null
+  @column()
+  declare boatBrandId: number
+  @column()
+  declare category: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare lengthM: string | null
+  @column()
+  declare name: string
+  @column()
+  declare productionEndYear: number | null
+  @column()
+  declare productionStartYear: number | null
+  @column()
+  declare slug: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
+}
+
 export class BoatOwnerSchema extends BaseModel {
   static $columns = ['boatId', 'createdAt', 'id', 'userId'] as const
   $columns = BoatOwnerSchema.$columns
@@ -1057,6 +1138,7 @@ export class BoatSchema extends BaseModel {
   static $columns = [
     'armamentZone',
     'beamM',
+    'category',
     'createdAt',
     'draftM',
     'flagCountry',
@@ -1088,6 +1170,8 @@ export class BoatSchema extends BaseModel {
   declare armamentZone: string | null
   @column()
   declare beamM: number | null
+  @column()
+  declare category: string | null
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
   @column()
@@ -1288,6 +1372,93 @@ export class CrewMemberSchema extends BaseModel {
   declare phone: string | null
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
+}
+
+export class EngineBrandSchema extends BaseModel {
+  static $columns = [
+    'aliases',
+    'country',
+    'createdAt',
+    'families',
+    'id',
+    'isActive',
+    'name',
+    'slug',
+    'updatedAt',
+  ] as const
+  $columns = EngineBrandSchema.$columns
+  @column()
+  declare aliases: any | null
+  @column()
+  declare country: string | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare families: any
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare isActive: boolean
+  @column()
+  declare name: string
+  @column()
+  declare slug: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
+}
+
+export class EngineModelSchema extends BaseModel {
+  static $columns = [
+    'aliases',
+    'createdAt',
+    'cylinders',
+    'displacementCc',
+    'engineBrandId',
+    'family',
+    'fuel',
+    'id',
+    'modelCode',
+    'name',
+    'powerHp',
+    'productionEndYear',
+    'productionStartYear',
+    'slug',
+    'strokeType',
+    'updatedAt',
+  ] as const
+  $columns = EngineModelSchema.$columns
+  @column()
+  declare aliases: any | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare cylinders: number | null
+  @column()
+  declare displacementCc: number | null
+  @column()
+  declare engineBrandId: number
+  @column()
+  declare family: string
+  @column()
+  declare fuel: string | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare modelCode: string | null
+  @column()
+  declare name: string
+  @column()
+  declare powerHp: string | null
+  @column()
+  declare productionEndYear: number | null
+  @column()
+  declare productionStartYear: number | null
+  @column()
+  declare slug: string
+  @column()
+  declare strokeType: string | null
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
 }
 
 export class InvoiceCounterSchema extends BaseModel {
@@ -1508,6 +1679,60 @@ export class NavigationLogCrewSchema extends BaseModel {
   declare navigationLogId: number
   @column()
   declare role: string
+}
+
+export class NavigationLogEntrySchema extends BaseModel {
+  static $columns = [
+    'cogDeg',
+    'createdAt',
+    'gpsAccuracyM',
+    'id',
+    'latitude',
+    'longitude',
+    'navigationLogId',
+    'note',
+    'organizationId',
+    'recordedAt',
+    'sailConfig',
+    'sogKn',
+    'twaDeg',
+    'twdDeg',
+    'updatedAt',
+    'weatherSnapshot',
+  ] as const
+  $columns = NavigationLogEntrySchema.$columns
+  @column()
+  declare cogDeg: number | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare gpsAccuracyM: string | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare latitude: string | null
+  @column()
+  declare longitude: string | null
+  @column()
+  declare navigationLogId: number
+  @column()
+  declare note: string | null
+  @column()
+  declare organizationId: number
+  @column.dateTime()
+  declare recordedAt: DateTime
+  @column()
+  declare sailConfig: string | null
+  @column()
+  declare sogKn: string | null
+  @column()
+  declare twaDeg: number | null
+  @column()
+  declare twdDeg: number | null
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare weatherSnapshot: any | null
 }
 
 export class NavigationLogSchema extends BaseModel {

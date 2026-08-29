@@ -85,6 +85,15 @@
       "strokeType": "Engine cycle",
       "installHours": "Hours at installation"
     },
+    "catalog": {
+      "brandPlaceholder": "e.g. Volvo Penta…",
+      "modelPlaceholder": "e.g. D2-40…",
+      "powerHint": "{power} hp",
+      "freeTextHint": "You can enter a value that is not in the catalogue: it will be saved as typed.",
+      "modelNeedsBrandHint": "Pick a brand from the catalogue to see its models. Free text is still accepted.",
+      "noBrandMatch": "No matching brand — your entry will be kept.",
+      "noModelMatch": "No matching model — your entry will be kept."
+    },
     "editTitle": "Edit engine",
     "modal": {
       "title": "Add engine",
@@ -152,6 +161,14 @@
       "essence": "Gasoline",
       "electric": "Electric",
       "other": "Other"
+    },
+    "engineFamily": {
+      "outboard_thermal": "Combustion outboard",
+      "outboard_electric": "Electric outboard / drive",
+      "inboard_diesel": "Diesel inboard",
+      "inboard_petrol": "Petrol inboard and sterndrive",
+      "jet": "Jet",
+      "generator": "Generator set"
     },
     "sailType": {
       "main": "Main",

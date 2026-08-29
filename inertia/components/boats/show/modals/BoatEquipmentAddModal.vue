@@ -35,8 +35,13 @@ const emit = defineEmits<{
   (e: 'update:open', value: boolean): void
 }>()
 
+/** Identifie cette modale dans l'URL de l'aller-retour catalogue (#573). */
+const ENGINE_FORM_SURFACE = 'equipment-add'
+
 const { t } = useT()
 
+// Au retour de l'aller-retour catalogue (#573), l'utilisateur était forcément
+// sur la catégorie moteur : elle est déjà la valeur par défaut.
 const selectedCategory = ref<Category>('engine')
 
 const categories = computed(() => [
@@ -177,7 +182,11 @@ function close() {
         class="space-y-4"
         #default="{ processing, errors }"
       >
-        <BoatEquipmentEngineFields v-if="selectedCategory === 'engine'" :errors="errors" />
+        <BoatEquipmentEngineFields
+          v-if="selectedCategory === 'engine'"
+          :errors="errors"
+          :surface="ENGINE_FORM_SURFACE"
+        />
         <BoatEquipmentSailFields v-else-if="selectedCategory === 'sail'" :errors="errors" />
         <BoatEquipmentRigFields
           v-else-if="selectedCategory === 'rig'"

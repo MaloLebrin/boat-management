@@ -6,6 +6,7 @@ import BoatEngineSparePartsService, {
   SparePartNotFoundError,
 } from '#services/boat_engine_spare_parts_service'
 import BoatHullService, { BoatNotFoundError } from '#services/boat_hull_service'
+import EngineCatalogService from '#services/engine_catalog_service'
 import { PART_ASSEMBLY_SLUGS, type PartAssemblySlug } from '#shared/types/spare_parts'
 import { addRepairCartItemValidator, updateRepairCartItemValidator } from '#validators/spare_parts'
 import { inject } from '@adonisjs/core'
@@ -16,7 +17,8 @@ import type BoatEngine from '#models/boat_engine'
 export default class BoatEngineSparePartsController {
   constructor(
     private boatService: BoatHullService,
-    private sparePartsService: BoatEngineSparePartsService
+    private sparePartsService: BoatEngineSparePartsService,
+    private engineCatalogService: EngineCatalogService
   ) {}
 
   private async loadBoat(ctx: Pick<HttpContext, 'auth' | 'response' | 'params'>) {
@@ -33,11 +35,24 @@ export default class BoatEngineSparePartsController {
     }
   }
 
-  private engineProps(engine: BoatEngine) {
+  /**
+   * Projection du moteur vers Inertia, avec sa marque **rapprochée du catalogue
+   * côté serveur** (#573).
+   *
+   * `EngineCatalogService.resolveBrand()` interroge la base : les composants
+   * pièces détachées ne peuvent pas l'appeler eux-mêmes, ils reçoivent donc le
+   * slug résolu et le traduisent en marque du corpus #517 avec le helper pur
+   * `sparePartsBrandFromCatalogSlug()`. `catalogBrandSlug` vaut `null` pour une
+   * saisie hors catalogue, cas que les écrans savent déjà traiter.
+   */
+  private async engineProps(engine: BoatEngine) {
+    const catalogBrand = await this.engineCatalogService.resolveBrand(engine.brand)
+
     return {
       id: engine.id,
       brand: engine.brand,
       model: engine.model,
+      catalogBrandSlug: catalogBrand?.slug ?? null,
       serialNumber: engine.serialNumber,
       kind: engine.kind,
       status: engine.status,
@@ -75,7 +90,7 @@ export default class BoatEngineSparePartsController {
 
       return inertia.render('spare_parts/identify', {
         boat: { id: boat.id, name: boat.name },
-        engine: this.engineProps(engine),
+        engine: await this.engineProps(engine),
         cartItems,
         canManage,
       })
@@ -116,7 +131,7 @@ export default class BoatEngineSparePartsController {
 
       return inertia.render('spare_parts/assembly', {
         boat: { id: boat.id, name: boat.name },
-        engine: this.engineProps(engine),
+        engine: await this.engineProps(engine),
         assemblySlug: assemblySlug as PartAssemblySlug,
         cartItems,
         canManage,

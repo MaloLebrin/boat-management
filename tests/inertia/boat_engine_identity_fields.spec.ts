@@ -1,0 +1,151 @@
+import { mount } from '@vue/test-utils'
+import { test, expect, vi } from 'vitest'
+
+const reload = vi.fn()
+
+vi.mock('@inertiajs/vue3', () => ({
+  router: { reload: (...args: unknown[]) => reload(...args) },
+}))
+
+vi.mock('~/composables/use_t', () => ({
+  useT: () => ({ t: (key: string) => key }),
+}))
+
+import BaseCombobox from '../../inertia/components/base/BaseCombobox.vue'
+import BoatEngineIdentityFields from '../../inertia/components/boats/engine/BoatEngineIdentityFields.vue'
+import type { EngineBrandOption, EngineModelOption } from '../../shared/types/engine_catalog'
+
+const BRANDS: EngineBrandOption[] = [
+  {
+    id: 1,
+    slug: 'volvo-penta',
+    name: 'Volvo Penta',
+    country: 'SE',
+    families: ['inboard_diesel', 'inboard_petrol'],
+  },
+  { id: 2, slug: 'yamaha', name: 'Yamaha', country: 'JP', families: ['outboard_thermal'] },
+]
+
+const MODELS: EngineModelOption[] = [
+  {
+    id: 10,
+    slug: 'd2-40',
+    name: 'D2-40',
+    modelCode: 'D2-40',
+    family: 'inboard_diesel',
+    powerHp: 40,
+    strokeType: null,
+    fuel: 'diesel',
+    productionStartYear: null,
+    productionEndYear: null,
+  },
+]
+
+function mountFields(props: Record<string, unknown> = {}) {
+  reload.mockClear()
+  return mount(BoatEngineIdentityFields, {
+    props: {
+      brand: '',
+      model: '',
+      errors: {},
+      brands: BRANDS,
+      catalogModels: [],
+      catalogBrandId: null,
+      engineModelId: null,
+      ...props,
+    },
+  })
+}
+
+function comboboxes(wrapper: ReturnType<typeof mountFields>) {
+  return wrapper.findAllComponents(BaseCombobox)
+}
+
+test('rend marque et modèle en champs de formulaire natifs', () => {
+  const wrapper = mountFields()
+
+  // C'est un `<Form>` Inertia qui sérialise la page : les champs doivent rester
+  // de vrais `input[name]`, sinon rien ne part au serveur.
+  expect(wrapper.find('input[name="brand"]').exists()).toBe(true)
+  expect(wrapper.find('input[name="model"]').exists()).toBe(true)
+  expect(wrapper.find('input[type="hidden"][name="engineModelId"]').exists()).toBe(true)
+})
+
+test('propose toutes les marques du catalogue avec leur famille en indice', () => {
+  const wrapper = mountFields()
+  const options = comboboxes(wrapper)[0].props('options') as Array<{ label: string; hint?: string }>
+
+  expect(options.map((o) => o.label)).toEqual(['Volvo Penta', 'Yamaha'])
+  expect(options[0].hint).toContain('boats.options.engineFamily.inboard_diesel')
+})
+
+test('choisir une marque recharge les modèles par visite Inertia partielle', async () => {
+  const wrapper = mountFields()
+
+  comboboxes(wrapper)[0].vm.$emit('select', { value: '1', label: 'Volvo Penta' })
+  await wrapper.vm.$nextTick()
+
+  // `engineCatalogBrandId` fait partie du rechargement : la visite remonte
+  // l'arbre, c'est le serveur qui réapprend au formulaire la marque retenue.
+  expect(reload).toHaveBeenCalledWith({
+    only: ['engineCatalogModels', 'engineCatalogBrandId'],
+    data: { engineBrandId: 1 },
+    preserveScroll: true,
+  })
+})
+
+test('ne propose aucun modèle tant qu’aucune marque du catalogue n’est retenue', () => {
+  const wrapper = mountFields({ catalogModels: MODELS })
+
+  expect(comboboxes(wrapper)[1].props('options')).toEqual([])
+})
+
+test('propose les modèles de la marque rapprochée par le serveur', () => {
+  const wrapper = mountFields({
+    brand: 'Volvo Penta',
+    catalogBrandId: 1,
+    catalogModels: MODELS,
+  })
+  const options = comboboxes(wrapper)[1].props('options') as Array<{ label: string; hint?: string }>
+
+  expect(options.map((o) => o.label)).toEqual(['D2-40'])
+  expect(options[0].hint).toContain('boats.engines.catalog.powerHint')
+})
+
+test('retenir un modèle remonte la fiche catalogue et pose le rattachement', async () => {
+  const wrapper = mountFields({ brand: 'Volvo Penta', catalogBrandId: 1, catalogModels: MODELS })
+
+  comboboxes(wrapper)[1].vm.$emit('select', { value: '10', label: 'D2-40' })
+  await wrapper.vm.$nextTick()
+
+  expect(wrapper.emitted('select-model')?.at(-1)).toEqual([MODELS[0]])
+  expect(wrapper.find('input[name="engineModelId"]').attributes('value')).toBe('10')
+})
+
+test('retaper la marque invalide les modèles et le rattachement', async () => {
+  const wrapper = mountFields({ brand: 'Volvo Penta', catalogBrandId: 1, catalogModels: MODELS })
+
+  comboboxes(wrapper)[1].vm.$emit('select', { value: '10', label: 'D2-40' })
+  await wrapper.setProps({ brand: 'Chantier de mon oncle' })
+
+  expect(comboboxes(wrapper)[1].props('options')).toEqual([])
+  expect(wrapper.find('input[name="engineModelId"]').attributes('value')).toBe('')
+})
+
+test('retaper le modèle relâche le rattachement, la saisie reste acceptée', async () => {
+  const wrapper = mountFields({ brand: 'Volvo Penta', catalogBrandId: 1, catalogModels: MODELS })
+
+  comboboxes(wrapper)[1].vm.$emit('select', { value: '10', label: 'D2-40' })
+  await wrapper.setProps({ model: 'D2-40 revisité' })
+
+  expect(wrapper.find('input[name="engineModelId"]').attributes('value')).toBe('')
+})
+
+test('une saisie hors catalogue remonte telle quelle et ne déclenche aucune visite', async () => {
+  const wrapper = mountFields()
+
+  await wrapper.find('input[name="brand"]').setValue('Moteur de mon oncle')
+
+  expect(wrapper.emitted('update:brand')?.at(-1)).toEqual(['Moteur de mon oncle'])
+  expect(reload).not.toHaveBeenCalled()
+})

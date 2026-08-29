@@ -6,6 +6,7 @@ import BoatEnginePartService from '#services/boat_engine_part_service'
 import BoatHullService, { BoatNotFoundError } from '#services/boat_hull_service'
 import BoatMaintenanceService from '#services/boat_maintenance_service'
 import BoatMaintenanceTaskService from '#services/boat_maintenance_task_service'
+import EngineCatalogService from '#services/engine_catalog_service'
 import MediaService from '#services/media_service'
 import OrganizationService from '#services/organization_service'
 import {
@@ -37,7 +38,8 @@ export default class BoatEquipmentController {
     private mediaService: MediaService,
     private enginePartService: BoatEnginePartService,
     private organizationService: OrganizationService,
-    private diagnosticService: BoatEngineDiagnosticService
+    private diagnosticService: BoatEngineDiagnosticService,
+    private engineCatalogService: EngineCatalogService
   ) {}
 
   private async loadBoatForEquipment(ctx: Pick<HttpContext, 'auth' | 'response' | 'params'>) {
@@ -69,7 +71,16 @@ export default class BoatEquipmentController {
     response.redirect(`/boats/${boat.id}`)
   }
 
-  async editEngine({ inertia, response, auth, params, bouncer, session, i18n }: HttpContext) {
+  async editEngine({
+    inertia,
+    request,
+    response,
+    auth,
+    params,
+    bouncer,
+    session,
+    i18n,
+  }: HttpContext) {
     await auth.authenticate()
     const loaded = await this.loadBoatForEquipment({ auth, response, params })
     if (!loaded) return
@@ -84,6 +95,11 @@ export default class BoatEquipmentController {
       return
     }
 
+    const catalog = await this.engineCatalogService.formProps(
+      request.qs().engineBrandId,
+      engine.brand
+    )
+
     return inertia.render('boats/engine_edit', {
       boat: { id: boat.id, name: boat.name },
       engine: {
@@ -93,6 +109,7 @@ export default class BoatEquipmentController {
         strokeType: engine.strokeType,
         brand: engine.brand,
         model: engine.model,
+        engineModelId: engine.engineModelId,
         serialNumber: engine.serialNumber,
         manufacturedAt: engine.manufacturedAt ? engine.manufacturedAt.toISODate() : null,
         powerHp: engine.powerHp,
@@ -100,6 +117,7 @@ export default class BoatEquipmentController {
         installHours: engine.installHours,
         status: engine.status,
       },
+      ...catalog,
     })
   }
 

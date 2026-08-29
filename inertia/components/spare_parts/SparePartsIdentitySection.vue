@@ -4,18 +4,24 @@ import BaseAlert from '~/components/base/BaseAlert.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import { ENGINE_PLATE_HINTS } from '#shared/constants/spare_parts/spare_parts_content'
-import { resolveSparePartsBrand } from '#shared/helpers/spare_parts'
+import { sparePartsBrandFromCatalogSlug } from '#shared/helpers/spare_parts'
 import { useT } from '~/composables/use_t'
 
 const props = defineProps<{
   boatId: number
-  engine: { id: number; brand: string | null; model: string | null; serialNumber: string | null }
+  engine: {
+    id: number
+    brand: string | null
+    model: string | null
+    catalogBrandSlug: string | null
+    serialNumber: string | null
+  }
   canManage: boolean
 }>()
 
 const { t } = useT()
 
-const brandSlug = computed(() => resolveSparePartsBrand(props.engine.brand))
+const brandSlug = computed(() => sparePartsBrandFromCatalogSlug(props.engine.catalogBrandSlug))
 
 /** Aide plaque de la marque du moteur, ou de toutes si elle n'est pas reconnue. */
 const plateHints = computed(() =>

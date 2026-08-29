@@ -27,6 +27,9 @@ export default class BoatEngineService {
       strokeType: payload.strokeType ?? null,
       brand: payload.brand ?? null,
       model: payload.model ?? null,
+      // Rattachement au catalogue (#573) : `brand`/`model` restent alimentés,
+      // ce sont eux le repli texte libre.
+      engineModelId: payload.engineModelId ?? null,
       serialNumber: payload.serialNumber ?? null,
       manufacturedAt: toDateOrNull(payload.manufacturedAt),
       powerHp: payload.powerHp ?? null,
@@ -52,6 +55,7 @@ export default class BoatEngineService {
     engine.strokeType = payload.strokeType ?? null
     engine.brand = payload.brand ?? null
     engine.model = payload.model ?? null
+    engine.engineModelId = payload.engineModelId ?? null
     engine.serialNumber = payload.serialNumber ?? null
     engine.manufacturedAt = toDateOrNull(payload.manufacturedAt)
     engine.powerHp = payload.powerHp ?? null

@@ -9,6 +9,7 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseModal from '~/components/base/BaseModal.vue'
 import { computed, ref } from 'vue'
+import { shouldReopenEngineForm } from '~/composables/use_engine_form_draft'
 import { useT } from '~/composables/use_t'
 import { useDateFormat } from '~/composables/use_date_format'
 import { engineFuelLabel } from '~/utils/boat_enum_labels'
@@ -19,9 +20,14 @@ const props = defineProps<{
   canManage: boolean
 }>()
 
+/** Identifie cette modale dans l'URL de l'aller-retour catalogue. */
+const ENGINE_FORM_SURFACE = 'engines-card'
+
 const { t } = useT()
 const { formatDate } = useDateFormat()
-const isCreateOpen = ref(false)
+// La visite partielle qui charge les modèles du catalogue (#573) remonte
+// l'arbre : la modale se rouvre depuis l'URL, seul état qui traverse.
+const isCreateOpen = ref(shouldReopenEngineForm(ENGINE_FORM_SURFACE))
 
 const totalEngineHours = computed(() => {
   const enginesWithHours = props.engines.filter((e) => e.hours !== null)
@@ -162,7 +168,7 @@ function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutra
         class="space-y-4"
         #default="{ processing, errors }"
       >
-        <BoatEquipmentEngineFields :errors="errors" />
+        <BoatEquipmentEngineFields :errors="errors" :surface="ENGINE_FORM_SURFACE" />
         <div class="flex items-center justify-end gap-2 pt-2">
           <BaseButton variant="ghost" type="button" @click="isCreateOpen = false">{{
             t('boats.engines.modal.cancel')
