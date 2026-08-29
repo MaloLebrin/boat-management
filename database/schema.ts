@@ -1055,6 +1055,7 @@ export class BoatSailSchema extends BaseModel {
 
 export class BoatSchema extends BaseModel {
   static $columns = [
+    'armamentZone',
     'beamM',
     'createdAt',
     'draftM',
@@ -1083,6 +1084,8 @@ export class BoatSchema extends BaseModel {
     'yearBuilt',
   ] as const
   $columns = BoatSchema.$columns
+  @column()
+  declare armamentZone: string | null
   @column()
   declare beamM: number | null
   @column.dateTime({ autoCreate: true })

@@ -13,6 +13,7 @@ import {
   SAFETY_EQUIPMENT_TYPE_OPTIONS,
   SAIL_TYPE_OPTIONS,
 } from '../../shared/constants/boats/boat_form_options'
+import { ARMAMENT_ZONE_OPTIONS } from '../../shared/constants/safety/division240_content'
 import { useT } from './use_t'
 
 export function useBoatOptions() {
@@ -78,6 +79,13 @@ export function useBoatOptions() {
     }))
   )
 
+  const armamentZoneOptions = computed(() =>
+    ARMAMENT_ZONE_OPTIONS.map((o) => ({
+      value: o.value,
+      label: t(`boats.options.armamentZone.${o.value}`),
+    }))
+  )
+
   const safetyEquipmentTypeOptions = computed(() =>
     SAFETY_EQUIPMENT_TYPE_OPTIONS.map((o) => ({
       value: o.value,
@@ -109,6 +117,7 @@ export function useBoatOptions() {
     sailTypeOptions,
     rigTypeOptions,
     navigationCategoryOptions,
+    armamentZoneOptions,
     safetyEquipmentTypeOptions,
     safetyEquipmentStatusOptions,
     genericEquipmentStatusOptions,

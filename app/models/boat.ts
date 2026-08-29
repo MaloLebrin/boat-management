@@ -75,8 +75,18 @@ export default class Boat extends BaseModel {
   @column()
   declare homePort: string | null
 
+  /** Catégorie de conception CE (A–D) — ce que la coque encaisse. */
   @column()
   declare navigationCategory: string | null
+
+  /**
+   * Zone d'armement Division 240 (#582) : la distance d'un abri sur laquelle le
+   * bateau navigue. Sans rapport avec `navigationCategory` — c'est elle, et elle
+   * seule, qui détermine le matériel de sécurité exigé. `null` = non déclarée,
+   * aucun contrôle de conformité.
+   */
+  @column()
+  declare armamentZone: string | null
 
   @column()
   declare hullIdentificationNumber: string | null

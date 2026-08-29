@@ -170,6 +170,7 @@ export type BoatShowDetail = {
   model: string | null
   homePort: string | null
   navigationCategory: string | null
+  armamentZone: string | null
   hullIdentificationNumber: string | null
   francisationNumber: string | null
   flagCountry: string | null

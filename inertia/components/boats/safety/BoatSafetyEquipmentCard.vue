@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Form } from '@adonisjs/inertia/vue'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
@@ -11,15 +11,24 @@ import { useDateFormat } from '~/composables/use_date_format'
 import { suggestEquipmentActionType } from '#shared/helpers/equipment_action'
 import type { BoatShowSafetyEquipment, EquipmentActionPrefill } from '~/types/boat_show'
 
-defineProps<{
-  boatId: number
-  items: BoatShowSafetyEquipment[]
-  canManage: boolean
-  canManageActions: boolean
-}>()
+const props = withDefaults(
+  defineProps<{
+    boatId: number
+    items: BoatShowSafetyEquipment[]
+    canManage: boolean
+    canManageActions: boolean
+    /**
+     * Type demandé par le panneau de conformité (#582) : ouvre la modale de
+     * création pré-remplie sur ce type d'équipement.
+     */
+    prefillEquipmentType?: string | null
+  }>(),
+  { prefillEquipmentType: null }
+)
 
 const emit = defineEmits<{
   (e: 'addToActions', payload: EquipmentActionPrefill): void
+  (e: 'prefillConsumed'): void
 }>()
 
 const { t } = useT()
@@ -35,7 +44,26 @@ function emitAddToActions(item: BoatShowSafetyEquipment) {
 }
 
 const isCreateOpen = ref(false)
+const createEquipmentType = ref('')
 const editingItem = ref<BoatShowSafetyEquipment | null>(null)
+
+// L'intention d'ajout vient d'un autre composant : on la consomme aussitôt pour
+// que refermer puis re-cliquer la même ligne rouvre bien la modale.
+watch(
+  () => props.prefillEquipmentType,
+  (equipmentType) => {
+    if (!equipmentType) return
+    createEquipmentType.value = equipmentType
+    isCreateOpen.value = true
+    emit('prefillConsumed')
+  },
+  { immediate: true }
+)
+
+function openCreate() {
+  createEquipmentType.value = ''
+  isCreateOpen.value = true
+}
 
 function statusVariant(status: string): 'success' | 'warning' | 'danger' {
   if (status === 'ok') return 'success'
@@ -68,7 +96,7 @@ function closeEdit() {
           size="sm"
           type="button"
           :aria-label="t('boats.safetyEquipment.add')"
-          @click="isCreateOpen = true"
+          @click="openCreate()"
         >
           {{ t('boats.safetyEquipment.add') }}
         </BaseButton>
@@ -170,11 +198,12 @@ function closeEdit() {
       :close-label="t('common.close')"
     >
       <Form
+        :key="`create-${createEquipmentType}`"
         :action="{ url: `/boats/${boatId}/safety-equipment`, method: 'post' }"
         @success="isCreateOpen = false"
         #default="{ processing, errors }"
       >
-        <BoatSafetyEquipmentFields :errors="errors" />
+        <BoatSafetyEquipmentFields :errors="errors" :equipment-type="createEquipmentType" />
         <div class="flex items-center justify-end gap-2 pt-4">
           <BaseButton variant="ghost" type="button" @click="isCreateOpen = false">
             {{ t('boats.safetyEquipment.modal.cancel') }}

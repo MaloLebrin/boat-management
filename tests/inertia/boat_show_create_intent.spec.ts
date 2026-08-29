@@ -81,8 +81,22 @@ const boat = {
   genericEquipment: [],
 } as never
 
+// Rapport de conformité #582 : zone non déclarée = aucun contrôle, ce qui suffit
+// aux scénarios d'intention de création testés ici.
+const safetyCompliance = {
+  zone: null,
+  textVersion: '2024-01',
+  maxPersons: null,
+  requirementCount: 0,
+  satisfiedCount: 0,
+  score: null,
+  issues: [],
+  untrackedItemKeys: [],
+} as never
+
 const tabContentProps = {
   boat,
+  safetyCompliance,
   maintenanceEvents: [],
   maintenanceTasks: [],
   maintenanceSheets: [],
@@ -222,6 +236,7 @@ describe('BoatShowTabEquipment — createIntent (#365)', () => {
     const wrapper = mount(BoatShowTabEquipment, {
       props: {
         boat,
+        safetyCompliance,
         canManageEquipment: true,
         canManageActions: true,
         createIntent: 'equipment',
@@ -238,6 +253,7 @@ describe('BoatShowTabEquipment — createIntent (#365)', () => {
     const wrapper = mount(BoatShowTabEquipment, {
       props: {
         boat,
+        safetyCompliance,
         canManageEquipment: false,
         canManageActions: true,
         createIntent: 'equipment',
@@ -254,6 +270,7 @@ describe('BoatShowTabEquipment — createIntent (#365)', () => {
     const wrapper = mount(BoatShowTabEquipment, {
       props: {
         boat,
+        safetyCompliance,
         canManageEquipment: true,
         canManageActions: true,
         createIntent: 'task',

@@ -51,7 +51,10 @@
     "selectCountryPlaceholder": "Sélectionnez un pays…",
     "aisSection": "Identification AIS",
     "mmsi": "MMSI (9 chiffres)",
-    "imoNumber": "N° IMO"
+    "imoNumber": "N° IMO",
+    "navigationCategoryHint": "Catégorie de conception CE (A–D) donnée par le constructeur : ce que la coque encaisse. Sans effet sur le matériel de sécurité exigé.",
+    "armamentZone": "Zone d'armement",
+    "armamentZoneHint": "Distance maximale d'un abri à laquelle vous naviguez : c'est elle, et non la catégorie CE, qui détermine le matériel de sécurité exigé (Division 240)."
   },
   "engines": {
     "title": "Moteurs",
@@ -235,6 +238,12 @@
       "classic": "Bateau classique / traditionnel",
       "workboat": "Navire de servitude / professionnel",
       "other": "Autre"
+    },
+    "armamentZone": {
+      "basic": "Basique — jusqu'à 2 milles d'un abri",
+      "coastal": "Côtier — jusqu'à 6 milles",
+      "semi_offshore": "Semi-hauturier — jusqu'à 60 milles",
+      "offshore": "Hauturier — au-delà de 60 milles"
     }
   },
   "index": {
@@ -963,5 +972,65 @@
     "freeTextHint": "Saisissez librement le nom du port d'attache.",
     "noMatch": "Aucun port ne correspond — votre saisie sera conservée.",
     "viewPort": "Voir la fiche de ce port"
+  },
+  "safetyCompliance": {
+    "title": "Conformité de l'armement",
+    "score": "{score} %",
+    "summary": "{satisfied} exigences couvertes sur {total}.",
+    "allGood": "Toutes les exigences suivies pour cette zone sont couvertes.",
+    "addEquipment": "Ajouter cet équipement",
+    "articleRef": "Division 240, annexe {ref}",
+    "disclaimer": "Ce suivi vous aide à préparer votre armement : il ne remplace ni le texte officiel de la Division 240 ni un contrôle des Affaires maritimes.",
+    "textVersion": "Corpus établi sur le texte en vigueur en {version}.",
+    "noZone": {
+      "description": "Renseignez la zone d'armement du bateau pour activer le suivi de conformité Division 240. Sans zone déclarée, aucun contrôle n'est effectué.",
+      "cta": "Renseigner la zone d'armement"
+    },
+    "status": {
+      "missing": "Absent",
+      "insufficient_quantity": "Quantité insuffisante",
+      "expired": "Périmé",
+      "expiring_soon": "Bientôt périmé",
+      "review_due": "Révision en retard",
+      "review_due_soon": "Révision à prévoir"
+    },
+    "detail": {
+      "required": "Quantité exigée : {count}",
+      "quantity": "{current} à bord, {required} exigés",
+      "due": "Échéance : {date}",
+      "defaultLifetime": "Échéance déduite de la date d'achat — {lifetime}"
+    },
+    "requirements": {
+      "basic.life_jacket": "Équipement individuel de flottabilité (un par personne)",
+      "basic.bilge_pump": "Dispositif d'assèchement (pompe ou écope)",
+      "basic.anchor": "Ligne de mouillage",
+      "basic.fire_extinguisher": "Extincteur",
+      "coastal.flare": "Feux rouges à main",
+      "coastal.compass": "Compas magnétique",
+      "semi_offshore.life_raft": "Radeau de survie",
+      "semi_offshore.first_aid_kit": "Trousse de secours",
+      "semi_offshore.vhf_radio": "VHF fixe",
+      "semi_offshore.lifebuoy": "Bouée couronne",
+      "semi_offshore.harness": "Harnais et longe (voiliers)",
+      "offshore.epirb": "Balise de détresse (EPIRB / PLB)",
+      "offshore.gps": "Moyen de faire le point et de suivre une route"
+    },
+    "lifetimes": {
+      "flare": "péremption 3 ans après l'achat",
+      "first_aid_kit": "péremption 3 ans après l'achat",
+      "fire_extinguisher": "vérification annuelle",
+      "life_raft": "révision annuelle",
+      "life_jacket": "révision tous les 2 ans (gilets gonflables)",
+      "epirb": "batterie à remplacer tous les 5 ans"
+    },
+    "untracked": {
+      "title": "Exigences non suivies par l'inventaire",
+      "individual_light": "moyen de repérage lumineux individuel",
+      "towing_line": "moyen de remorquage",
+      "colreg_rules": "RIPAM (règles de barre et de route)",
+      "charts": "cartes marines et documents nautiques",
+      "weather_forecast": "moyen de réception des bulletins météo",
+      "summary_document": "document de synthèse (fiche d'armement)"
+    }
   }
 }

@@ -1,5 +1,6 @@
 import type { DateTime } from 'luxon'
 import type { BoatCategory } from '#shared/types/boat_catalog'
+import type { ArmamentZone } from '#shared/types/safety'
 
 export type BoatPositionSource = 'manual' | 'ais' | 'gps'
 
@@ -27,7 +28,10 @@ export type BoatHullPayload = {
   model?: string | null
 
   homePort?: string | null
+  /** Catégorie de conception CE (A–D). */
   navigationCategory?: string | null
+  /** Zone d'armement Division 240 (#582) — distance d'un abri, ≠ catégorie CE. */
+  armamentZone?: ArmamentZone | null
   hullIdentificationNumber?: string | null
   francisationNumber?: string | null
   flagCountry?: string | null

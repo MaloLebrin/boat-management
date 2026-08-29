@@ -2,6 +2,7 @@ import vine from '@vinejs/vine'
 import { ENGINE_FUELS } from '#shared/constants/boats/boat_form_options'
 import { BOAT_CATEGORIES } from '#shared/types/boat_catalog'
 import { COUNTRY_CODES } from '#shared/constants/countries'
+import { ARMAMENT_ZONES } from '#shared/types/safety'
 
 export const propulsionTypes = ['sailboat', 'motorboat', 'catamaran', 'rib', 'other'] as const
 export const hullMaterials = ['fiberglass', 'aluminum', 'steel', 'wood', 'carbon', 'other'] as const
@@ -29,6 +30,11 @@ export const rigTypes = [
 ] as const
 
 export const navigationCategories = ['A', 'B', 'C', 'D'] as const
+/**
+ * Zone d'armement Division 240 (#582) — distance d'un abri déclarée par
+ * l'utilisateur. Rien à voir avec `navigationCategories` (conception CE A–D).
+ */
+export const armamentZones = ARMAMENT_ZONES
 export const safetyEquipmentTypes = [
   'life_jacket',
   'life_raft',
@@ -70,6 +76,7 @@ export const createBoatValidator = vine.create({
 
   homePort: vine.string().trim().maxLength(120).nullable().optional(),
   navigationCategory: vine.enum(navigationCategories).nullable().optional(),
+  armamentZone: vine.enum(armamentZones).nullable().optional(),
   hullIdentificationNumber: vine.string().trim().maxLength(64).nullable().optional(),
   francisationNumber: vine.string().trim().maxLength(64).nullable().optional(),
   flagCountry: vine.enum(COUNTRY_CODES).nullable().optional(),
@@ -109,6 +116,7 @@ export const updateBoatValidator = vine.create(
 
     homePort: vine.string().trim().maxLength(120).nullable().optional(),
     navigationCategory: vine.enum(navigationCategories).nullable().optional(),
+    armamentZone: vine.enum(armamentZones).nullable().optional(),
     hullIdentificationNumber: vine.string().trim().maxLength(64).nullable().optional(),
     francisationNumber: vine.string().trim().maxLength(64).nullable().optional(),
     flagCountry: vine.enum(COUNTRY_CODES).nullable().optional(),

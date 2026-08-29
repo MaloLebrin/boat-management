@@ -28,6 +28,7 @@ import type {
   NavigationLogRow,
 } from '~/types/boat_show'
 import type { BoatPricingRow } from '../../../shared/types/boat_pricing'
+import type { SafetyComplianceReport } from '../../../shared/types/safety'
 import type { CrewMemberOption } from '../../../shared/types/crew'
 
 const { t } = useT()
@@ -71,6 +72,8 @@ const props = defineProps<{
    * (#579), s'il y en a un : la fiche propose alors le lien vers ce port.
    */
   homePortId: number | null
+  /** Rapport de conformité Division 240 (#582) — calculé côté serveur. */
+  safetyCompliance: SafetyComplianceReport
 }>()
 
 const {

@@ -10,6 +10,7 @@ defineProps<{
 }>()
 
 const navigationCategory = defineModel<string>('navigationCategory', { required: true })
+const armamentZone = defineModel<string>('armamentZone', { required: true })
 const maxPersons = defineModel<string>('maxPersons', { required: true })
 const hullIdentificationNumber = defineModel<string>('hullIdentificationNumber', {
   required: true,
@@ -18,7 +19,7 @@ const francisationNumber = defineModel<string>('francisationNumber', { required:
 const flagCountry = defineModel<string>('flagCountry', { required: true })
 
 const { t } = useT()
-const { navigationCategoryOptions } = useBoatOptions()
+const { navigationCategoryOptions, armamentZoneOptions } = useBoatOptions()
 const { countryOptions } = useCountries()
 </script>
 
@@ -29,6 +30,7 @@ const { countryOptions } = useCountries()
         id="navigationCategory"
         name="navigationCategory"
         :label="t('boats.hullFields.navigationCategory')"
+        :hint="t('boats.hullFields.navigationCategoryHint')"
         :placeholder="t('boats.hullFields.selectPlaceholder')"
         :allow-empty="true"
         :options="navigationCategoryOptions"
@@ -61,6 +63,20 @@ const { countryOptions } = useCountries()
         :errors="errors"
       />
     </div>
+    <!-- Zone d'armement : distance d'un abri (Division 240), sans rapport avec
+         la catégorie CE ci-dessus — l'aide de champ le rappelle (#582). -->
+    <BaseSelect
+      id="armamentZone"
+      name="armamentZone"
+      :label="t('boats.hullFields.armamentZone')"
+      :hint="t('boats.hullFields.armamentZoneHint')"
+      :placeholder="t('boats.hullFields.selectPlaceholder')"
+      :allow-empty="true"
+      :options="armamentZoneOptions"
+      v-model="armamentZone"
+      :errors="errors"
+    />
+
     <BaseSelect
       id="flagCountry"
       name="flagCountry"

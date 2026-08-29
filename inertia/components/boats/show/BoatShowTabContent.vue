@@ -33,6 +33,7 @@ import type {
 import type { BoatShowTabKey } from '~/composables/use_boat_show_tabs'
 import { isTabDataReady } from '~/utils/boat_show_tab_data'
 import type { BoatPricingRow } from '../../../../shared/types/boat_pricing'
+import type { SafetyComplianceReport } from '../../../../shared/types/safety'
 import type { CrewMemberOption } from '../../../../shared/types/crew'
 
 // Les jeux de données d'onglet arrivent en props différées (#463) : `undefined`
@@ -72,6 +73,8 @@ const props = defineProps<{
   canManagePricing: boolean
   /** Port de l'org rapproché du `homePort` texte libre (#579), ou `null`. */
   homePortId: number | null
+  /** Rapport de conformité Division 240 (#582) — calculé côté serveur. */
+  safetyCompliance: SafetyComplianceReport
 }>()
 
 defineEmits<{ goToTab: [key: string]; createIntentConsumed: [] }>()
@@ -144,6 +147,7 @@ const showSkeleton = computed(
       <BoatShowTabEquipment
         v-else-if="tab === 'equipment'"
         :boat="boat"
+        :safety-compliance="safetyCompliance"
         :can-manage-equipment="canManageEquipment"
         :can-manage-actions="canManageEquipmentActions"
         :create-intent="createIntent"

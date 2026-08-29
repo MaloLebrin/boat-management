@@ -11,6 +11,7 @@ import {
   toShowShellProps,
   type BoatShowShellContext,
 } from '#transformers/boat_transformer'
+import BoatSafetyComplianceService from '#services/boat_safety_compliance_service'
 import type Boat from '#models/boat'
 import type BoatPositionHistory from '#models/boat_position_history'
 import type BoatEngine from '#models/boat_engine'
@@ -300,6 +301,12 @@ function makeShellContext(overrides: Partial<BoatShowShellContext> = {}): BoatSh
     canDeleteNavigationLogs: false,
     homePortId: null,
     initialTab: null,
+    safetyCompliance: new BoatSafetyComplianceService().buildReport({
+      armamentZone: null,
+      maxPersons: null,
+      propulsionType: null,
+      items: [],
+    }),
     ...overrides,
   }
 }
