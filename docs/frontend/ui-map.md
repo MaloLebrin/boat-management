@@ -260,6 +260,30 @@ Deux techniques, au choix :
 terrain. ⚠️ Écrire les classes en littéral complet : le scanner Tailwind ne voit pas les noms
 concaténés. Mesure réelle en navigateur : prévue par #500.
 
+### Vocabulaires métier partagés (#585)
+
+Quatre écrans lisent des listes de valeurs qui ne vivent **jamais** dans le composant :
+
+- **Titres de navigation** — `useNavigationTitles()` (`inertia/composables/use_navigation_titles.ts`)
+  sert à la fois le select des certifications (`CrewCertificationForm.vue`), son badge
+  (`CrewCertificationBadge.vue`), le select des permis clients (`ClientForm.vue`) et la
+  colonne permis de `clients/index.vue`. Libellés sous `common.navigationTitles.*`.
+  Le select client réinjecte la valeur déjà enregistrée si elle ne fait plus partie
+  des options : sans ça, une fiche saisie avant #585 s'ouvrirait avec un select vide
+  et l'enregistrement effacerait son permis.
+- **Date d'expiration proposée** — `CrewCertificationForm.vue` suggère `expiresAt`
+  d'après `suggestedExpiryDate()` et n'écrase jamais une date saisie ; un `hint`
+  signale que la valeur est une proposition.
+- **Type de prestation** — `RESERVATION_TYPES` alimente les selects
+  (`ReservationForm.vue`, `ReservationEditModal.vue`), le badge
+  `ReservationTypeBadge.vue` (listes) et le filtre de `reservations/index.vue`.
+  Calendrier et frise sont trop denses pour un badge : le type y passe par
+  l'attribut `title` de la pastille.
+- **Carburant** — `useBoatOptions().engineFuelOptions` alimente le select carburant
+  de `BoatFuelLogForm.vue`, pré-rempli d'après le moteur sélectionné (jamais par-dessus
+  une saisie), et `engineFuelLabel()` l'affichage (onglet Carburant, `FuelLogRow.vue`,
+  `FuelLogCard.vue`).
+
 ## Repli carte mobile des tableaux (#493)
 
 Les écrans terrain ne laissent jamais un tableau en scroll horizontal seul sur mobile : chaque
