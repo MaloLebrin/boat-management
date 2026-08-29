@@ -93,6 +93,7 @@ const totalCost = computed(() =>
                 <th class="px-4 py-3">{{ t('navigation.fuel.columns.date') }}</th>
                 <th class="px-4 py-3">{{ t('navigation.fuel.columns.quantity') }}</th>
                 <th class="px-4 py-3">{{ t('navigation.fuel.columns.cost') }}</th>
+                <th class="px-4 py-3">{{ t('navigation.fuel.columns.fuelType') }}</th>
                 <th class="px-4 py-3">{{ t('navigation.fuel.columns.supplier') }}</th>
               </tr>
             </thead>

@@ -14,7 +14,8 @@ import { computeReservationQuote } from '#shared/helpers/reservation_quote'
 import type { BoatPricingRow } from '#shared/types/boat_pricing'
 import type { PricingSeasonRow } from '#shared/types/pricing_season'
 import type { ClientOption } from '#shared/types/client'
-import type { ReservationStatus } from '~/types/reservation'
+import { RESERVATION_TYPES } from '#shared/types/reservation'
+import type { ReservationStatus, ReservationType } from '~/types/reservation'
 
 const props = defineProps<{
   boatId: number
@@ -36,6 +37,7 @@ const form = useForm({
   clientEmail: '',
   clientPhone: '',
   status: 'option' as ReservationStatus,
+  type: '' as ReservationType | '',
   notes: '',
   totalPrice: '',
 })
@@ -45,6 +47,11 @@ const statusOptions = [
   { value: 'confirmed', label: t('reservations.status.confirmed') },
   { value: 'cancelled', label: t('reservations.status.cancelled') },
 ]
+
+const typeOptions = RESERVATION_TYPES.map((value) => ({
+  value,
+  label: t(`reservations.types.${value}`),
+}))
 
 const clientSelectOptions = computed(() => [
   { value: '', label: t('reservations.form.noClientOption') },
@@ -75,6 +82,8 @@ function submit() {
     .transform((data) => ({
       ...data,
       clientId: data.clientId ? Number(data.clientId) : null,
+      // Un select vide vaut « non précisé », pas la chaîne vide (#585).
+      type: data.type || null,
       tzOffsetMinutes: tzOffsetMinutes(),
     }))
     .post(`/boats/${props.boatId}/reservations`, {
@@ -122,6 +131,14 @@ function submit() {
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <BaseField :label="t('reservations.form.status')" :error="form.errors.status">
           <BaseSelect v-model="form.status" :options="statusOptions" />
+        </BaseField>
+        <BaseField :label="t('reservations.form.type')" :error="form.errors.type">
+          <BaseSelect
+            v-model="form.type"
+            :options="typeOptions"
+            :placeholder="t('reservations.form.noType')"
+            allow-empty
+          />
         </BaseField>
       </div>
 

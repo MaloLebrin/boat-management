@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { FleetBoatCalendarEntry, ReservationStatus } from '~/types/reservation'
+import { useT } from '~/composables/use_t'
+import type {
+  BoatReservationRow,
+  FleetBoatCalendarEntry,
+  ReservationStatus,
+} from '~/types/reservation'
 
 const props = defineProps<{
   entry: FleetBoatCalendarEntry
@@ -8,6 +13,17 @@ const props = defineProps<{
   monthStart: string
   monthEnd: string
 }>()
+
+const { t } = useT()
+
+/**
+ * Une barre de frise n'a pas la place d'un badge : le type de prestation
+ * rejoint l'infobulle, à côté du nom du client (#585).
+ */
+function pillTitle(row: BoatReservationRow): string {
+  if (!row.type) return row.clientName
+  return `${row.clientName} — ${t(`reservations.types.${row.type}`)}`
+}
 
 const pillClass: Record<ReservationStatus, string> = {
   option: 'bg-peach-200 text-peach-800',
@@ -58,7 +74,7 @@ const coveredByDay = computed(() => {
             ]"
             :title="
               coveredByDay.get(day)?.startsAt.slice(0, 10) === isoForDay(day)
-                ? coveredByDay.get(day)?.clientName
+                ? pillTitle(coveredByDay.get(day)!)
                 : ''
             "
           >

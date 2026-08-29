@@ -13,7 +13,8 @@ import { isoToDatetimeLocalValue, tzOffsetMinutes } from '~/utils/local_datetime
 import type { BoatPricingRow } from '#shared/types/boat_pricing'
 import type { PricingSeasonRow } from '#shared/types/pricing_season'
 import type { ClientOption } from '#shared/types/client'
-import type { BoatReservationRow, ReservationStatus } from '~/types/reservation'
+import { RESERVATION_TYPES } from '#shared/types/reservation'
+import type { BoatReservationRow, ReservationStatus, ReservationType } from '~/types/reservation'
 
 const props = defineProps<{
   open: boolean
@@ -41,6 +42,7 @@ const form = useForm({
   clientEmail: '',
   clientPhone: '',
   status: 'option' as ReservationStatus,
+  type: '' as ReservationType | '',
   notes: '',
   totalPrice: '',
 })
@@ -50,6 +52,11 @@ const statusOptions = [
   { value: 'confirmed', label: t('reservations.status.confirmed') },
   { value: 'cancelled', label: t('reservations.status.cancelled') },
 ]
+
+const typeOptions = RESERVATION_TYPES.map((value) => ({
+  value,
+  label: t(`reservations.types.${value}`),
+}))
 
 const clientSelectOptions = computed(() => [
   { value: '', label: t('reservations.form.noClientOption') },
@@ -69,6 +76,7 @@ watch(
     form.clientEmail = r.clientEmail ?? ''
     form.clientPhone = r.clientPhone ?? ''
     form.status = r.status
+    form.type = r.type ?? ''
     form.notes = r.notes ?? ''
     form.totalPrice = r.totalPrice ?? ''
   }
@@ -90,6 +98,8 @@ function submit() {
     .transform((data) => ({
       ...data,
       clientId: data.clientId ? Number(data.clientId) : null,
+      // Un select vide vaut « non précisé », pas la chaîne vide (#585).
+      type: data.type || null,
       tzOffsetMinutes: tzOffsetMinutes(),
     }))
     .patch(`/boats/${props.boatId}/reservations/${props.reservation.id}`, {
@@ -128,6 +138,14 @@ function submit() {
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <BaseField :label="t('reservations.form.status')" :error="form.errors.status">
           <BaseSelect v-model="form.status" :options="statusOptions" />
+        </BaseField>
+        <BaseField :label="t('reservations.form.type')" :error="form.errors.type">
+          <BaseSelect
+            v-model="form.type"
+            :options="typeOptions"
+            :placeholder="t('reservations.form.noType')"
+            allow-empty
+          />
         </BaseField>
       </div>
 

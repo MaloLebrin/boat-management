@@ -14,20 +14,13 @@
     "notes": "Notes (optionnel)",
     "certType": "Type de certification",
     "referenceNumber": "Numéro de référence (optionnel)",
-    "expiresAt": "Date d'expiration (optionnel)"
+    "expiresAt": "Date d'expiration (optionnel)",
+    "expiresAtSuggested": "Date proposée d'après la durée de validité du titre — modifiable."
   },
   "roles": {
     "skipper": "Skipper",
     "crew": "Équipier",
     "passenger": "Passager"
-  },
-  "certTypes": {
-    "coastal_permit": "Permis côtier",
-    "offshore_permit": "Permis hauturier",
-    "vhf": "VHF / CRR",
-    "stcw_basic": "STCW de base",
-    "stcw_proficiency": "STCW avancé",
-    "other": "Autre"
   },
   "certStatus": {
     "valid": "Valide",

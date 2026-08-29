@@ -1,12 +1,12 @@
 import type { DateTime } from 'luxon'
+import type { NavigationTitle } from './navigation_title.js'
 
-export type CrewCertificationType =
-  | 'coastal_permit'
-  | 'offshore_permit'
-  | 'vhf'
-  | 'stcw_basic'
-  | 'stcw_proficiency'
-  | 'other'
+/**
+ * Les certifications d'équipage puisent dans le vocabulaire partagé des titres
+ * de navigation (#585) — même liste que les permis clients, pas une liste
+ * voisine à entretenir.
+ */
+export type CrewCertificationType = NavigationTitle
 
 export type NavigationLogCrewRole = 'skipper' | 'crew' | 'passenger'
 

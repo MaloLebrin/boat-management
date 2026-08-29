@@ -377,6 +377,7 @@ export class BoatFuelLogSchema extends BaseModel {
     'boatId',
     'createdAt',
     'engineHoursAtFueling',
+    'fuelType',
     'fueledAt',
     'id',
     'notes',
@@ -396,6 +397,8 @@ export class BoatFuelLogSchema extends BaseModel {
   declare createdAt: DateTime
   @column()
   declare engineHoursAtFueling: string | null
+  @column()
+  declare fuelType: string | null
   @column.date()
   declare fueledAt: DateTime
   @column({ isPrimary: true })
@@ -894,6 +897,7 @@ export class BoatReservationSchema extends BaseModel {
     'startsAt',
     'status',
     'totalPrice',
+    'type',
     'updatedAt',
   ] as const
   $columns = BoatReservationSchema.$columns
@@ -923,6 +927,8 @@ export class BoatReservationSchema extends BaseModel {
   declare status: string
   @column()
   declare totalPrice: string | null
+  @column()
+  declare type: string | null
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime
 }

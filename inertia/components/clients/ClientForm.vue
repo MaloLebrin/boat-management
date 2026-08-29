@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3'
+import { computed } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCheckbox from '~/components/base/BaseCheckbox.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
+import { useNavigationTitles } from '~/composables/use_navigation_titles'
 import { useT } from '~/composables/use_t'
 import type { ClientRow, ClientPermitType, ClientStatus } from '../../../shared/types/client'
 
@@ -17,6 +19,7 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useT()
+const { clientPermitTypeOptions } = useNavigationTitles()
 
 const isEdit = Boolean(props.client)
 
@@ -33,12 +36,10 @@ const form = useForm({
   gdprConsent: props.client?.gdprConsentAt != null,
 })
 
-const permitTypeOptions: Array<{ label: string; value: ClientPermitType }> = [
-  { label: t('clients.permitTypes.coastal'), value: 'coastal' },
-  { label: t('clients.permitTypes.offshore'), value: 'offshore' },
-  { label: t('clients.permitTypes.inland'), value: 'inland' },
-  { label: t('clients.permitTypes.other'), value: 'other' },
-]
+// La valeur déjà enregistrée reste proposée, même retirée du vocabulaire.
+const permitTypeOptions = computed(() =>
+  clientPermitTypeOptions(props.client?.navigationPermitType ?? null)
+)
 
 const statusOptions: Array<{ label: string; value: ClientStatus }> = [
   { label: t('clients.status.active'), value: 'active' },

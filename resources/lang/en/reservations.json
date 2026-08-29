@@ -20,7 +20,9 @@
     "title": "Reservation calendar",
     "subtitle": "Multi-boat view of all reservations",
     "filterLabel": "Boat",
-    "chooseBoat": "Choose a boat"
+    "chooseBoat": "Choose a boat",
+    "typeFilterLabel": "Charter type",
+    "allTypes": "All types"
   },
   "status": {
     "option": "Option",
@@ -49,7 +51,9 @@
     "cancel": "Cancel",
     "edit": "Edit",
     "delete": "Delete",
-    "confirmDelete": "Delete this reservation?"
+    "confirmDelete": "Delete this reservation?",
+    "type": "Charter type",
+    "noType": "Unspecified"
   },
   "calendar": {
     "noReservations": "No reservations this month",
@@ -75,11 +79,19 @@
     "client": "Client",
     "status": "Status",
     "price": "Price",
-    "documents": "Documents"
+    "documents": "Documents",
+    "type": "Type"
   },
   "actions": {
     "createQuote": "Create a quote",
     "inspection": "Inspection",
     "contract": "Rental contract"
+  },
+  "types": {
+    "bareboat": "Bareboat",
+    "skippered": "Skippered",
+    "day_charter": "Day charter",
+    "cabin": "Cabin charter",
+    "other": "Other"
   }
 }

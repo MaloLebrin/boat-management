@@ -1,4 +1,5 @@
 import vine from '@vinejs/vine'
+import { NAVIGATION_TITLES } from '#shared/types/navigation_title'
 
 export const createCrewMemberValidator = vine.create(
   vine.object({
@@ -22,14 +23,7 @@ export const updateCrewMemberValidator = vine.create(
 
 export const createCrewCertificationValidator = vine.create(
   vine.object({
-    type: vine.enum([
-      'coastal_permit',
-      'offshore_permit',
-      'vhf',
-      'stcw_basic',
-      'stcw_proficiency',
-      'other',
-    ] as const),
+    type: vine.enum(NAVIGATION_TITLES),
     referenceNumber: vine.string().trim().maxLength(100).optional(),
     expiresAt: vine.date({ formats: ['YYYY-MM-DD'] }).optional(),
   })

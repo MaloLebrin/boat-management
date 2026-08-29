@@ -3,7 +3,7 @@ import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 import { DateTime } from 'luxon'
 import Boat from '#models/boat'
 import Organization from '#models/organization'
-import type { ReservationStatus } from '#shared/types/reservation'
+import type { ReservationStatus, ReservationType } from '#shared/types/reservation'
 
 export default class BoatReservation extends BaseModel {
   static table = 'boat_reservations'
@@ -25,6 +25,11 @@ export default class BoatReservation extends BaseModel {
 
   @column()
   declare status: ReservationStatus
+
+  // Type de prestation (#585) — nullable : les réservations antérieures n'en
+  // portent aucun et restent affichées telles quelles.
+  @column()
+  declare type: ReservationType | null
 
   @column.dateTime()
   declare startsAt: DateTime

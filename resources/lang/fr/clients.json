@@ -27,12 +27,6 @@
     "status": "Statut",
     "notes": "Notes (optionnel)"
   },
-  "permitTypes": {
-    "coastal": "Côtier",
-    "offshore": "Hauturier",
-    "inland": "Fluvial",
-    "other": "Autre"
-  },
   "status": {
     "active": "Actif",
     "inactive": "Inactif",

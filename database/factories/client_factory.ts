@@ -2,11 +2,12 @@ import Client from '#models/client'
 import Factory from '@adonisjs/lucid/factories'
 import type { FactoryContextContract } from '@adonisjs/lucid/types/factory'
 import { OrganizationFactory } from '#database/factories/organization_factory'
-import type { ClientStatus, ClientPermitType } from '#shared/types/client'
+import { CLIENT_PERMIT_TYPES } from '#shared/types/client'
+import type { ClientStatus } from '#shared/types/client'
 
 export const ClientFactory = Factory.define(Client, ({ faker }: FactoryContextContract) => {
   const statuses: ClientStatus[] = ['active', 'inactive', 'blacklisted']
-  const permitTypes: ClientPermitType[] = ['coastal', 'offshore', 'inland', 'other']
+  const permitTypes = CLIENT_PERMIT_TYPES
 
   return {
     firstName: faker.person.firstName(),

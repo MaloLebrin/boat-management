@@ -3,6 +3,7 @@ import { Link } from '@adonisjs/inertia/vue'
 import { useDateFormat } from '~/composables/use_date_format'
 import { useNumberFormat } from '~/composables/use_number_format'
 import { useT } from '~/composables/use_t'
+import { engineFuelLabel } from '~/utils/boat_enum_labels'
 import type { FleetFuelLogRow } from '../../../shared/types/navigation'
 
 const { t } = useT()
@@ -29,6 +30,7 @@ defineProps<{ row: FleetFuelLogRow }>()
     <p class="text-sm font-medium text-fg">
       {{ t('navigation.fuel.liters', { count: formatNumber(row.quantityLiters) }) }}
       <template v-if="row.totalCost"> · {{ formatCurrency(row.totalCost) }}</template>
+      <template v-if="row.fuelType"> · {{ engineFuelLabel(t, row.fuelType) }}</template>
     </p>
 
     <p v-if="row.supplier" class="text-sm text-fg-muted">{{ row.supplier }}</p>

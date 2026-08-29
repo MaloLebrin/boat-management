@@ -14,6 +14,7 @@ import type {
   CreateReservationPayload,
   FleetBoatOption,
   ReservationStatus,
+  ReservationType,
   UpdateReservationPayload,
 } from '#shared/types/reservation'
 import { toUtcFromLocalInput } from '#shared/helpers/date'
@@ -65,7 +66,11 @@ export default class BoatReservationService {
     return boats.map((b) => ({ id: b.id, name: b.name }))
   }
 
-  async listForOrg(user: User, boatIdFilter?: number | null): Promise<BoatReservation[]> {
+  async listForOrg(
+    user: User,
+    boatIdFilter?: number | null,
+    typeFilter?: ReservationType | null
+  ): Promise<BoatReservation[]> {
     if (user.organizationId === null) return []
 
     const query = BoatReservation.query()
@@ -75,6 +80,10 @@ export default class BoatReservationService {
 
     if (boatIdFilter) {
       query.where('boatId', boatIdFilter)
+    }
+
+    if (typeFilter) {
+      query.where('type', typeFilter)
     }
 
     return query
@@ -137,6 +146,7 @@ export default class BoatReservationService {
           boatId: boat.id,
           organizationId: boat.organizationId,
           status,
+          type: payload.type ?? null,
           startsAt,
           endsAt,
           clientId,
@@ -230,6 +240,7 @@ export default class BoatReservationService {
       if (payload.clientPhone !== undefined)
         reservation.clientPhone = payload.clientPhone?.trim() || null
       if (payload.status !== undefined) reservation.status = payload.status
+      if (payload.type !== undefined) reservation.type = payload.type
       if (payload.notes !== undefined) reservation.notes = payload.notes?.trim() || null
       if (payload.totalPrice !== undefined) {
         reservation.totalPrice = payload.totalPrice !== null ? String(payload.totalPrice) : null

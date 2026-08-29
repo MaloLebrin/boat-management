@@ -3,4 +3,5 @@ export type {
   FleetBoatCalendarEntry,
   FleetBoatOption,
   ReservationStatus,
+  ReservationType,
 } from '../../shared/types/reservation'

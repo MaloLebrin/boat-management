@@ -6,6 +6,7 @@ import BaseCard from '~/components/base/BaseCard.vue'
 import BaseEmptyState from '~/components/base/BaseEmptyState.vue'
 import ReservationEditModal from '~/components/reservations/ReservationEditModal.vue'
 import ReservationStatusBadge from '~/components/reservations/ReservationStatusBadge.vue'
+import ReservationTypeBadge from '~/components/reservations/ReservationTypeBadge.vue'
 import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import type { BoatPricingRow } from '#shared/types/boat_pricing'
@@ -55,6 +56,7 @@ function deleteReservation(id: number) {
             <th class="px-4 pb-3 first:pl-0">{{ t('reservations.columns.period') }}</th>
             <th class="px-4 pb-3">{{ t('reservations.columns.client') }}</th>
             <th class="px-4 pb-3">{{ t('reservations.columns.status') }}</th>
+            <th class="px-4 pb-3">{{ t('reservations.columns.type') }}</th>
             <th class="px-4 pb-3 text-right">{{ t('reservations.columns.price') }}</th>
             <th v-if="canManage" class="px-4 pb-3 last:pr-0" />
           </tr>
@@ -93,6 +95,9 @@ function deleteReservation(id: number) {
             </td>
             <td class="px-4 py-3">
               <ReservationStatusBadge :status="row.status" />
+            </td>
+            <td class="px-4 py-3">
+              <ReservationTypeBadge :type="row.type" />
             </td>
             <td class="px-4 py-3 text-right font-medium text-fg">
               {{ row.totalPrice ? `${row.totalPrice} €` : '—' }}
