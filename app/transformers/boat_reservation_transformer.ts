@@ -18,6 +18,7 @@ export function toBoatReservationRow(
     organizationId: reservation.organizationId,
     clientId: reservation.clientId,
     status: reservation.status,
+    type: reservation.type,
     startsAt: reservation.startsAt.toISO()!,
     endsAt: reservation.endsAt.toISO()!,
     clientName: reservation.clientName,

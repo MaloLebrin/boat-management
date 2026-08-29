@@ -14,7 +14,10 @@
     "boatEngineId": "Engine (optional)",
     "supplier": "Supplier (optional)",
     "notes": "Notes (optional)",
-    "noEngine": "None / unspecified"
+    "noEngine": "None / unspecified",
+    "fuelType": "Fuel (optional)",
+    "noFuelType": "Unspecified",
+    "fuelTypeFromEngine": "Prefilled from the selected engine — editable."
   },
   "form": {
     "createTitle": "Record a fill-up",

@@ -10,6 +10,7 @@ import type NavigationLog from '#models/navigation_log'
 import type Media from '#models/media'
 import type { IncidentType, IncidentStatus } from '#shared/types/incident'
 import type { BoatPricingRow } from '#shared/types/boat_pricing'
+import type { EngineFuel } from '#shared/constants/boats/boat_form_options'
 import type { FuelLogRow } from '#shared/types/fuel_log'
 import type { NavigationLogRow } from '#shared/types/navigation_log'
 import type { BoatOwnerBoatSummary } from '#shared/types/boat'
@@ -189,6 +190,9 @@ function toFuelLog(log: BoatFuelLog): FuelLogRow {
     totalCost: log.totalCost !== null ? Number.parseFloat(log.totalCost) : null,
     engineHoursAtFueling:
       log.engineHoursAtFueling !== null ? Number.parseFloat(log.engineHoursAtFueling) : null,
+    // La colonne est un texte contraint côté base : le schéma généré ne peut
+    // pas la typer plus finement que `string`.
+    fuelType: log.fuelType as EngineFuel | null,
     supplier: log.supplier,
     notes: log.notes,
     createdAt: log.createdAt.toISO()!,

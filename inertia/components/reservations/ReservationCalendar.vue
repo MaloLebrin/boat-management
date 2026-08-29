@@ -52,6 +52,15 @@ const calendarDays = computed(() =>
   }))
 )
 
+/**
+ * Les pastilles du calendrier sont trop étroites pour un badge : le type de
+ * prestation rejoint l'infobulle, à côté du nom du client (#585).
+ */
+function pillTitle(row: BoatReservationRow): string {
+  if (!row.type) return row.clientName
+  return `${row.clientName} — ${t(`reservations.types.${row.type}`)}`
+}
+
 const pillClass: Record<ReservationStatus, string> = {
   option: 'bg-peach-100 text-peach-800',
   confirmed: 'bg-mint-100 text-mint-700',
@@ -122,7 +131,7 @@ const pillClass: Record<ReservationStatus, string> = {
               v-for="res in cell.reservations.slice(0, 2)"
               :key="res.id"
               :class="['truncate rounded px-1 py-0.5 text-xs font-medium', pillClass[res.status]]"
-              :title="res.clientName"
+              :title="pillTitle(res)"
             >
               {{ res.clientName }}
             </div>

@@ -20,7 +20,9 @@
     "title": "Calendrier des réservations",
     "subtitle": "Vue multi-bateaux de toutes les réservations",
     "filterLabel": "Bateau",
-    "chooseBoat": "Choisir un bateau"
+    "chooseBoat": "Choisir un bateau",
+    "typeFilterLabel": "Type de prestation",
+    "allTypes": "Tous les types"
   },
   "status": {
     "option": "Option",
@@ -49,7 +51,9 @@
     "cancel": "Annuler",
     "edit": "Modifier",
     "delete": "Supprimer",
-    "confirmDelete": "Supprimer cette réservation ?"
+    "confirmDelete": "Supprimer cette réservation ?",
+    "type": "Type de prestation",
+    "noType": "Non précisé"
   },
   "calendar": {
     "noReservations": "Aucune réservation ce mois-ci",
@@ -75,11 +79,19 @@
     "client": "Client",
     "status": "Statut",
     "price": "Prix",
-    "documents": "Documents"
+    "documents": "Documents",
+    "type": "Type"
   },
   "actions": {
     "createQuote": "Créer un devis",
     "inspection": "État des lieux",
     "contract": "Contrat de location"
+  },
+  "types": {
+    "bareboat": "Coque nue",
+    "skippered": "Avec skipper",
+    "day_charter": "Journée",
+    "cabin": "Cabine",
+    "other": "Autre"
   }
 }

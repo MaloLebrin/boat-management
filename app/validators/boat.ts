@@ -1,10 +1,11 @@
 import vine from '@vinejs/vine'
+import { ENGINE_FUELS } from '#shared/constants/boats/boat_form_options'
 
 export const propulsionTypes = ['sailboat', 'motorboat', 'catamaran', 'rib', 'other'] as const
 export const hullMaterials = ['fiberglass', 'aluminum', 'steel', 'wood', 'carbon', 'other'] as const
 
 export const engineKinds = ['inboard', 'outboard', 'electric', 'hybrid', 'other'] as const
-export const engineFuels = ['diesel', 'essence', 'electric', 'other'] as const
+export const engineFuels = ENGINE_FUELS
 
 export const sailTypes = [
   'main',

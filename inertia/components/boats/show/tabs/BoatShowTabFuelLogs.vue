@@ -4,7 +4,7 @@ import { router } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BoatFuelLogForm from '~/components/boats/show/tabs/BoatFuelLogForm.vue'
 import { useT } from '~/composables/use_t'
-import { engineKindLabel } from '~/utils/boat_enum_labels'
+import { engineFuelLabel, engineKindLabel } from '~/utils/boat_enum_labels'
 import type { BoatShowDetail, FuelLogRow } from '~/types/boat_show'
 
 const props = defineProps<{
@@ -84,6 +84,7 @@ function deleteFuelLog(logId: number) {
             <!-- Engine + hours -->
             <div class="mt-1 flex flex-wrap items-center gap-3 text-xs text-fg-muted">
               <span v-if="log.boatEngineId">{{ engineLabel(log.boatEngineId) }}</span>
+              <span v-if="log.fuelType">{{ engineFuelLabel(t, log.fuelType) }}</span>
               <span v-if="log.engineHoursAtFueling !== null">
                 {{ log.engineHoursAtFueling.toFixed(1) }} {{ t('fuel_logs.engineHoursSuffix') }}
               </span>

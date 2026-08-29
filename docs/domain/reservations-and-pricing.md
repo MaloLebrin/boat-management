@@ -72,6 +72,7 @@ Modèle : `app/models/boat_reservation.ts`.
 | `boat_id`                       | fk → boats         |                                              |
 | `organization_id`               | fk → organizations | scope org                                    |
 | `status`                        | enum               | `option` \| `confirmed` \| `cancelled`       |
+| `type`                          | enum?              | Type de prestation (#585) — voir ci-dessous  |
 | `starts_at` / `ends_at`         | datetime           | Luxon `DateTime` (heure incluse)             |
 | `client_name`                   | string             | **client en texte libre — pas de FK client** |
 | `client_email` / `client_phone` | string?            | dénormalisés                                 |
@@ -81,6 +82,25 @@ Modèle : `app/models/boat_reservation.ts`.
 
 > ℹ️ Le client est **dénormalisé** (pas de `client_id`). Il n'y a **ni caution
 > ni devise** sur la réservation : ces informations vivent sur `boat_pricing`.
+
+**Type de prestation (#585).** `bareboat` | `skippered` | `day_charter` |
+`cabin` | `other` (`RESERVATION_TYPES`, `shared/types/reservation.ts`),
+**nullable** avec contrainte CHECK : une location coque nue, une sortie skippée
+et une croisière à la cabine n'ont ni le même prix ni les mêmes obligations
+(skipper à bord, permis du client), que `status` seul ne distinguait pas.
+
+- Saisie : select dans `ReservationForm.vue` et `ReservationEditModal.vue`
+  (vide = « non précisé », envoyé en `null`).
+- Affichage : `ReservationTypeBadge.vue` dans la liste par bateau et la liste
+  flotte. Le calendrier et la frise sont trop denses pour un badge : le type y
+  rejoint l'infobulle, à côté du nom du client.
+- Filtre : `GET /reservations?type=…`, cumulable avec `?boatId=`. Une valeur
+  inconnue est ignorée plutôt que rejetée.
+- Les réservations antérieures gardent `type` nul et s'affichent sans badge.
+
+> ⚠️ Hors périmètre de #585 : la vérification croisée « le client a-t-il le
+> permis requis par le type de réservation ? » et toute tarification
+> différenciée par type.
 
 ### 3.2 `boat_pricing` (#292 — 1:1 par bateau)
 

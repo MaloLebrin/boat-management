@@ -46,7 +46,8 @@
       "date": "Date",
       "quantity": "Quantité",
       "cost": "Coût",
-      "supplier": "Fournisseur"
+      "supplier": "Fournisseur",
+      "fuelType": "Carburant"
     },
     "liters": "{count} L",
     "empty": {

@@ -27,12 +27,6 @@
     "status": "Status",
     "notes": "Notes (optional)"
   },
-  "permitTypes": {
-    "coastal": "Coastal",
-    "offshore": "Offshore",
-    "inland": "Inland",
-    "other": "Other"
-  },
   "status": {
     "active": "Active",
     "inactive": "Inactive",

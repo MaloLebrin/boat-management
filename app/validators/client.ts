@@ -1,4 +1,5 @@
 import vine from '@vinejs/vine'
+import { ACCEPTED_CLIENT_PERMIT_TYPES } from '#shared/types/client'
 
 export const createClientValidator = vine.create(
   vine.object({
@@ -8,10 +9,10 @@ export const createClientValidator = vine.create(
     phone: vine.string().trim().maxLength(50).nullable().optional(),
     address: vine.string().trim().maxLength(1000).nullable().optional(),
     navigationPermitNumber: vine.string().trim().maxLength(100).nullable().optional(),
-    navigationPermitType: vine
-      .enum(['coastal', 'offshore', 'inland', 'other'] as const)
-      .nullable()
-      .optional(),
+    // Vocabulaire partagé avec les certifications d'équipage (#585) — les
+    // anciennes valeurs restent acceptées pour ne pas invalider les fiches
+    // déjà saisies.
+    navigationPermitType: vine.enum(ACCEPTED_CLIENT_PERMIT_TYPES).nullable().optional(),
     status: vine.enum(['active', 'inactive', 'blacklisted'] as const).optional(),
     notes: vine.string().trim().maxLength(5000).nullable().optional(),
     gdprConsent: vine.boolean().optional(),
@@ -26,10 +27,10 @@ export const updateClientValidator = vine.create(
     phone: vine.string().trim().maxLength(50).nullable().optional(),
     address: vine.string().trim().maxLength(1000).nullable().optional(),
     navigationPermitNumber: vine.string().trim().maxLength(100).nullable().optional(),
-    navigationPermitType: vine
-      .enum(['coastal', 'offshore', 'inland', 'other'] as const)
-      .nullable()
-      .optional(),
+    // Vocabulaire partagé avec les certifications d'équipage (#585) — les
+    // anciennes valeurs restent acceptées pour ne pas invalider les fiches
+    // déjà saisies.
+    navigationPermitType: vine.enum(ACCEPTED_CLIENT_PERMIT_TYPES).nullable().optional(),
     status: vine.enum(['active', 'inactive', 'blacklisted'] as const).optional(),
     notes: vine.string().trim().maxLength(5000).nullable().optional(),
     gdprConsent: vine.boolean().optional(),

@@ -111,6 +111,7 @@ export default class CsvExportController {
       'prix_par_litre',
       'coût_total',
       'heures_moteur',
+      'carburant',
       'fournisseur',
       'notes',
     ]
@@ -120,6 +121,8 @@ export default class CsvExportController {
       l.pricePerLiter ?? '',
       l.totalCost ?? '',
       l.engineHoursAtFueling ?? '',
+      // Vide pour les pleins antérieurs à #585 — la colonne existe quand même.
+      l.fuelType ?? '',
       l.supplier ?? '',
       l.notes ?? '',
     ])

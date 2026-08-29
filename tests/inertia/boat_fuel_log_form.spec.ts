@@ -5,25 +5,35 @@ import BoatFuelLogForm from '../../inertia/components/boats/show/tabs/BoatFuelLo
 const mockIsOnline = vi.hoisted(() => ({ value: true }))
 const mockEnqueue = vi.hoisted(() => vi.fn())
 const mockFormPost = vi.hoisted(() => vi.fn())
+const mockFormTransform = vi.hoisted(() => vi.fn())
 const mockFormData = vi.hoisted(() =>
   vi.fn(() => ({ fueledAt: '2026-06-25', quantityLiters: '50', supplier: '', notes: '' }))
 )
 
 vi.mock('@inertiajs/vue3', () => ({
-  useForm: () => ({
-    fueledAt: '2026-06-25',
-    quantityLiters: '',
-    pricePerLiter: '',
-    totalCost: '',
-    boatEngineId: '',
-    engineHoursAtFueling: '',
-    supplier: '',
-    notes: '',
-    errors: {},
-    processing: false,
-    post: mockFormPost,
-    data: mockFormData,
-  }),
+  useForm: () => {
+    const form = {
+      fueledAt: '2026-06-25',
+      quantityLiters: '',
+      pricePerLiter: '',
+      totalCost: '',
+      boatEngineId: '',
+      fuelType: '',
+      engineHoursAtFueling: '',
+      supplier: '',
+      notes: '',
+      errors: {},
+      processing: false,
+      post: mockFormPost,
+      data: mockFormData,
+      // `transform` renvoie le formulaire pour permettre le chaînage (#585).
+      transform: (...args: unknown[]) => {
+        mockFormTransform(...args)
+        return form
+      },
+    }
+    return form
+  },
   usePage: () => ({
     props: {
       appT: {

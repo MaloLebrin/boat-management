@@ -39,11 +39,23 @@ organisation ; le rattachement à un client est un **plus** optionnel.
 | `phone`                    | string, nullable                           |                              |
 | `address`                  | string, nullable                           |                              |
 | `navigation_permit_number` | string, nullable                           |                              |
-| `navigation_permit_type`   | enum, nullable                             |                              |
+| `navigation_permit_type`   | string, nullable                           | Titres de navigation (#585)  |
 | `status`                   | enum `active` / `inactive` / `blacklisted` | Défaut `active`              |
 | `notes`                    | text, nullable                             |                              |
 | `gdpr_consent_at`          | datetime, nullable                         | Consentement RGPD (#276)     |
 | `anonymized_at`            | datetime, nullable                         | Anonymisé si non-null (#276) |
+
+**`navigation_permit_type` (#585).** Même vocabulaire que
+`crew_certifications.type` (`shared/types/navigation_title.ts`), plus `none`
+(« aucun permis »). La colonne reste un texte libre en base : c'est le validator
+VineJS qui contraint les valeurs, via `ACCEPTED_CLIENT_PERMIT_TYPES`
+(`shared/types/client.ts`).
+
+Les valeurs écrites avant #585 — `coastal`, `offshore`, `inland` — restent
+**acceptées en création comme en mise à jour** et gardent un libellé. Elles ne
+sont plus proposées à la saisie, mais une fiche qui en porte une la conserve
+sélectionnée dans le formulaire : sans cela, un simple enregistrement aurait
+effacé le permis du client.
 
 ### Lien sur `boat_reservations` (#275)
 

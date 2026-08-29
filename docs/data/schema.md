@@ -164,6 +164,47 @@ Liste de réparation du parcours « identification des pièces détachées » (#
 - `createdAt`, `updatedAt`
 - unique `(boat_engine_id, part_key)`, index sur `boat_engine_id`
 
+### crew_certifications
+
+Titres de navigation d'un équipier (`crew_members`). Le vocabulaire de `type` est **partagé** avec les permis clients — source unique `shared/types/navigation_title.ts` (#585).
+
+- `id`
+- `crewMemberId` (FK `crew_members` cascade)
+- `type` — `coastal_permit` | `offshore_permit` | `inland_permit` | `captain_200` | `vhf` | `crr` | `stcw_basic` | `stcw_proficiency` | `medical_certificate` | `first_aid` | `other` (contrainte CHECK)
+- `referenceNumber` (nullable)
+- `expiresAt` (nullable, indexé) — le formulaire propose une date d'après `shared/helpers/navigation_title.ts` (médical 2 ans, STCW 5 ans) sans jamais écraser une saisie
+- `createdAt`, `updatedAt`
+
+### clients
+
+Fiches CRM (module `crm_invoicing`).
+
+- `id`, `organizationId`
+- identité : `firstName`, `lastName`, `email`, `phone`, `address`
+- `navigationPermitNumber` (nullable)
+- `navigationPermitType` (nullable, colonne texte libre validée côté VineJS) — mêmes valeurs que `crew_certifications.type`, plus `none` (#585). Les valeurs historiques `coastal`, `offshore`, `inland` restent acceptées et affichées, mais ne sont plus proposées à la saisie
+- `status` (`active` | `inactive` | `blacklisted`)
+- `notes`, `gdprConsentAt`, `anonymizedAt` (#276)
+- `createdAt`, `updatedAt`
+
+### boat_reservations
+
+- `id`, `boatId`, `organizationId`, `clientId` (nullable, SET NULL)
+- `status` (`option` | `confirmed` | `cancelled`)
+- `type` (**nullable**, contrainte CHECK) — `bareboat` | `skippered` | `day_charter` | `cabin` | `other` (#585). Les réservations antérieures restent sans type et s'affichent sans badge
+- période : `startsAt`, `endsAt`
+- instantané client : `clientName`, `clientEmail`, `clientPhone`
+- `notes`, `totalPrice`
+- `createdAt`, `updatedAt`
+
+### boat_fuel_logs
+
+- `id`, `boatId`, `organizationId`, `boatEngineId` (nullable, SET NULL)
+- `fueledAt` (indexé), `quantityLiters`, `pricePerLiter`, `totalCost`, `engineHoursAtFueling`
+- `fuelType` (**nullable**, contrainte CHECK) — `diesel` | `essence` | `electric` | `other`, même vocabulaire que `boat_engines.fuel` (#585). Pré-rempli d'après le moteur choisi, modifiable — indispensable en bi-motorisation (in-bord diesel + hors-bord essence). Exporté en CSV (colonne `carburant`, vide pour l'historique)
+- `supplier`, `notes`
+- `createdAt`, `updatedAt`
+
 ## Relations (résumé)
 
 - `Organization 1..n User` via `users.organizationId`
@@ -175,6 +216,9 @@ Liste de réparation du parcours « identification des pièces détachées » (#
 - `Boat 1..n BoatPortStay`
 - `Boat 1..n BoatBudgetEntry`
 - `User 1..n AiAnalysis` via `ai_analyses.userId` (`organizationId` scope les lectures, `boatId` distingue flotte et bateau)
+- `CrewMember 1..n CrewCertification` via `crew_certifications.crewMemberId`
+- `Boat 1..n BoatReservation`, `Client 0..n BoatReservation` via `boat_reservations.clientId`
+- `Boat 1..n BoatFuelLog`, `BoatEngine 0..n BoatFuelLog` via `boat_fuel_logs.boatEngineId`
 
 ## Seed (données démo)
 

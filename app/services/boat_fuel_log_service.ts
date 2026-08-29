@@ -18,9 +18,11 @@ export default class BoatFuelLogService {
   }
 
   async createForBoat(_user: User, boat: Boat, payload: CreateFuelLogPayload) {
+    let engineFuel: string | null = null
+
     if (payload.boatEngineId) {
       const engine = await BoatEngine.query()
-        .select('id')
+        .select('id', 'fuel')
         .where('id', payload.boatEngineId)
         .where('boatId', boat.id)
         .first()
@@ -31,6 +33,8 @@ export default class BoatFuelLogService {
           'engineNotBelongs'
         )
       }
+
+      engineFuel = engine.fuel
     }
 
     if (
@@ -68,6 +72,10 @@ export default class BoatFuelLogService {
         payload.engineHoursAtFueling !== null && payload.engineHoursAtFueling !== undefined
           ? String(payload.engineHoursAtFueling)
           : null,
+      // Le formulaire pré-remplit déjà le carburant depuis le moteur choisi ;
+      // ce repli couvre les envois qui ne passent pas par lui (file d'attente
+      // hors-ligne, import). Un carburant explicite n'est jamais écrasé (#585).
+      fuelType: payload.fuelType ?? engineFuel,
       supplier: payload.supplier?.trim() || null,
       notes: payload.notes?.trim() || null,
     })

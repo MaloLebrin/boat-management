@@ -40,6 +40,7 @@ const baseProps = {
   calendarEntries: [],
   boats,
   selectedBoatId: null,
+  selectedType: null,
   canCreateQuote: false,
 }
 
@@ -64,17 +65,56 @@ test('boat filter select has an explicit label', () => {
 
 test('boat filter shows "all boats" as the selected option when unfiltered', () => {
   const w = mount(ReservationsIndex, { props: baseProps })
-  const select = w.get('select')
-  expect(select.element.value).toBe('')
+  const select = w.get('#fleet-boat-filter')
+  expect((select.element as HTMLSelectElement).value).toBe('')
   // Exactly one empty-value option: the "all boats" placeholder, no duplicate.
-  const emptyOptions = w.findAll('option').filter((o) => o.attributes('value') === '')
+  const emptyOptions = select.findAll('option').filter((o) => o.attributes('value') === '')
   expect(emptyOptions).toHaveLength(1)
   expect(emptyOptions[0].text()).toBe('reservations.calendar.allBoats')
 })
 
+test('charter type filter shows "all types" as the selected option when unfiltered (#585)', () => {
+  const w = mount(ReservationsIndex, { props: baseProps })
+  const select = w.get('#fleet-type-filter')
+  expect((select.element as HTMLSelectElement).value).toBe('')
+  const emptyOptions = select.findAll('option').filter((o) => o.attributes('value') === '')
+  expect(emptyOptions).toHaveLength(1)
+  expect(emptyOptions[0].text()).toBe('reservations.fleet.allTypes')
+  expect(select.findAll('option').map((o) => o.attributes('value'))).toEqual([
+    '',
+    'bareboat',
+    'skippered',
+    'day_charter',
+    'cabin',
+    'other',
+  ])
+})
+
+test('changing the charter type filter navigates with the type (#585)', async () => {
+  const w = mount(ReservationsIndex, { props: baseProps })
+  await w.get('#fleet-type-filter').setValue('skippered')
+  expect(routerGet).toHaveBeenCalledWith(
+    '/reservations',
+    { type: 'skippered' },
+    expect.objectContaining({ preserveScroll: true })
+  )
+})
+
+test('changing one filter keeps the other one applied (#585)', async () => {
+  const w = mount(ReservationsIndex, {
+    props: { ...baseProps, selectedBoatId: 6 },
+  })
+  await w.get('#fleet-type-filter').setValue('cabin')
+  expect(routerGet).toHaveBeenCalledWith(
+    '/reservations',
+    { boatId: '6', type: 'cabin' },
+    expect.objectContaining({ preserveScroll: true })
+  )
+})
+
 test('changing the filter navigates with the boat id', async () => {
   const w = mount(ReservationsIndex, { props: baseProps })
-  await w.get('select').setValue('6')
+  await w.get('#fleet-boat-filter').setValue('6')
   expect(routerGet).toHaveBeenCalledWith(
     '/reservations',
     { boatId: '6' },

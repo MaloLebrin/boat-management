@@ -7,10 +7,12 @@ import FleetReservationList from '~/components/reservations/FleetReservationList
 import ReservationCreateButton from '~/components/reservations/ReservationCreateButton.vue'
 import ReservationTimeline from '~/components/reservations/ReservationTimeline.vue'
 import { useT } from '~/composables/use_t'
+import { RESERVATION_TYPES } from '#shared/types/reservation'
 import type {
   BoatReservationRow,
   FleetBoatCalendarEntry,
   FleetBoatOption,
+  ReservationType,
 } from '~/types/reservation'
 
 const props = defineProps<{
@@ -18,6 +20,7 @@ const props = defineProps<{
   calendarEntries: FleetBoatCalendarEntry[]
   boats: FleetBoatOption[]
   selectedBoatId: number | null
+  selectedType: ReservationType | null
   canCreateQuote: boolean
 }>()
 
@@ -32,8 +35,18 @@ onMounted(() => {
 
 const boatOptions = computed(() => props.boats.map((b) => ({ value: String(b.id), label: b.name })))
 
-function filterByBoat(boatId: string) {
-  const query = boatId ? { boatId } : {}
+const typeOptions = computed(() =>
+  RESERVATION_TYPES.map((value) => ({ value, label: t(`reservations.types.${value}`) }))
+)
+
+// Les deux filtres cohabitent : changer l'un préserve l'autre (#585).
+// `BaseSelect` émet `string | number | ''` — d'où la normalisation en chaîne.
+function applyFilters(next: { boatId?: string | number; type?: string | number }) {
+  const boatId = next.boatId ?? props.selectedBoatId ?? ''
+  const type = next.type ?? props.selectedType ?? ''
+  const query: Record<string, string> = {}
+  if (boatId) query.boatId = String(boatId)
+  if (type) query.type = String(type)
   router.get('/reservations', query, { preserveScroll: true })
 }
 </script>
@@ -91,17 +104,30 @@ function filterByBoat(boatId: string) {
       </div>
     </div>
 
-    <!-- Boat filter -->
-    <div class="mt-6 w-56">
-      <BaseSelect
-        id="fleet-boat-filter"
-        :label="t('reservations.fleet.filterLabel')"
-        :model-value="selectedBoatId ? String(selectedBoatId) : ''"
-        :options="boatOptions"
-        :placeholder="t('reservations.calendar.allBoats')"
-        allow-empty
-        @update:model-value="filterByBoat"
-      />
+    <!-- Boat + charter type filters -->
+    <div class="mt-6 flex flex-wrap gap-4">
+      <div class="w-56">
+        <BaseSelect
+          id="fleet-boat-filter"
+          :label="t('reservations.fleet.filterLabel')"
+          :model-value="selectedBoatId ? String(selectedBoatId) : ''"
+          :options="boatOptions"
+          :placeholder="t('reservations.calendar.allBoats')"
+          allow-empty
+          @update:model-value="applyFilters({ boatId: $event })"
+        />
+      </div>
+      <div class="w-56">
+        <BaseSelect
+          id="fleet-type-filter"
+          :label="t('reservations.fleet.typeFilterLabel')"
+          :model-value="selectedType ?? ''"
+          :options="typeOptions"
+          :placeholder="t('reservations.fleet.allTypes')"
+          allow-empty
+          @update:model-value="applyFilters({ type: $event })"
+        />
+      </div>
     </div>
 
     <div class="mt-6">

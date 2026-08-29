@@ -3,6 +3,7 @@ import BoatFuelLog from '#models/boat_fuel_log'
 import BoatIncident from '#models/boat_incident'
 import NavigationLog from '#models/navigation_log'
 import type User from '#models/user'
+import type { EngineFuel } from '#shared/constants/boats/boat_form_options'
 import type { IncidentStatus, IncidentType } from '#shared/types/incident'
 import type {
   FleetBoatOption,
@@ -67,7 +68,16 @@ export default class NavigationService {
     if (!user.organizationId) return []
 
     const query = BoatFuelLog.query()
-      .select('id', 'boatId', 'fueledAt', 'quantityLiters', 'totalCost', 'supplier', 'notes')
+      .select(
+        'id',
+        'boatId',
+        'fueledAt',
+        'quantityLiters',
+        'totalCost',
+        'fuelType',
+        'supplier',
+        'notes'
+      )
       .preload('boat', (q) => q.select('id', 'name'))
       .where('organizationId', user.organizationId)
       .orderBy('fueledAt', 'desc')
@@ -84,6 +94,9 @@ export default class NavigationService {
       fueledAt: log.fueledAt.toISODate()!,
       quantityLiters: Number(log.quantityLiters),
       totalCost: log.totalCost ? Number(log.totalCost) : null,
+      // Colonne texte contrainte côté base : le schéma généré ne la type pas
+      // plus finement que `string`.
+      fuelType: log.fuelType as EngineFuel | null,
       supplier: log.supplier,
       notes: log.notes,
     }))

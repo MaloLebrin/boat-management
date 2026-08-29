@@ -101,6 +101,7 @@ export default class BoatReservationsController {
         clientEmail: payload.clientEmail ?? null,
         clientPhone: payload.clientPhone ?? null,
         status: payload.status,
+        type: payload.type ?? null,
         notes: payload.notes ?? null,
         totalPrice: payload.totalPrice ?? null,
       }))
@@ -166,6 +167,7 @@ export default class BoatReservationsController {
           clientEmail: payload.clientEmail,
           clientPhone: payload.clientPhone,
           status: payload.status,
+          type: payload.type,
           notes: payload.notes,
           totalPrice: payload.totalPrice,
         }

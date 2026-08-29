@@ -42,6 +42,7 @@ export default class BoatFuelLogsController {
         totalCost: payload.totalCost ?? null,
         engineHoursAtFueling: payload.engineHoursAtFueling ?? null,
         boatEngineId: payload.boatEngineId ?? null,
+        fuelType: payload.fuelType ?? null,
         supplier: payload.supplier ?? null,
         notes: payload.notes ?? null,
       })

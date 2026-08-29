@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useForm } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
@@ -8,8 +8,10 @@ import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import { useNetworkStatus } from '~/composables/use_network_status'
 import { useOfflineQueue } from '~/composables/use_offline_queue'
 import { useT } from '~/composables/use_t'
+import { useBoatOptions } from '~/composables/use_boat_options'
 import { engineKindLabel } from '~/utils/boat_enum_labels'
 import { todayDateInputValue } from '~/utils/local_datetime'
+import type { EngineFuel } from '#shared/constants/boats/boat_form_options'
 import type { BoatShowDetail } from '~/types/boat_show'
 
 const props = defineProps<{
@@ -21,6 +23,7 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useT()
+const { engineFuelOptions } = useBoatOptions()
 const { isOnline } = useNetworkStatus()
 const { enqueue } = useOfflineQueue()
 
@@ -37,10 +40,30 @@ const form = useForm({
   pricePerLiter: null as number | null,
   totalCost: null as number | null,
   boatEngineId: '' as string | number,
+  fuelType: '' as EngineFuel | '',
   engineHoursAtFueling: null as number | null,
   supplier: '',
   notes: '',
 })
+
+/**
+ * Carburant pré-rempli d'après le moteur choisi (#585) : on ne remplace la
+ * valeur que si elle est vide ou porte encore une proposition — un carburant
+ * saisi à la main reste maître, y compris sur une annexe qui ne tourne pas au
+ * même carburant que le moteur sélectionné.
+ */
+const suggestedFuel = ref<EngineFuel | ''>('')
+
+watch(
+  () => form.boatEngineId,
+  (engineId) => {
+    if (form.fuelType !== '' && form.fuelType !== suggestedFuel.value) return
+    const engine = props.boat.engines.find((e) => String(e.id) === String(engineId))
+    const suggestion = (engine?.fuel ?? '') as EngineFuel | ''
+    suggestedFuel.value = suggestion
+    form.fuelType = suggestion
+  }
+)
 
 function handleSubmit() {
   if (!isOnline.value) {
@@ -54,10 +77,13 @@ function handleSubmit() {
     return
   }
 
-  form.post(`/boats/${props.boat.id}/fuel-logs`, {
-    preserveScroll: true,
-    onSuccess: () => emit('close'),
-  })
+  form
+    // Un select vide vaut « non précisé », pas la chaîne vide (#585).
+    .transform((data) => ({ ...data, fuelType: data.fuelType || null }))
+    .post(`/boats/${props.boat.id}/fuel-logs`, {
+      preserveScroll: true,
+      onSuccess: () => emit('close'),
+    })
 }
 </script>
 
@@ -124,6 +150,17 @@ function handleSubmit() {
           :error="form.errors.boatEngineId"
           allow-empty
           :placeholder="t('fuel_logs.fields.noEngine')"
+        />
+
+        <BaseSelect
+          v-model="form.fuelType"
+          name="fuelType"
+          :label="t('fuel_logs.fields.fuelType')"
+          :options="engineFuelOptions"
+          :error="form.errors.fuelType"
+          allow-empty
+          :placeholder="t('fuel_logs.fields.noFuelType')"
+          :hint="suggestedFuel !== '' ? t('fuel_logs.fields.fuelTypeFromEngine') : undefined"
         />
 
         <BaseInput

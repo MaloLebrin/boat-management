@@ -35,8 +35,12 @@ date;titre;sujet;notes;légende_moteur;légende_voile;coût_total
 **fuel-logs.csv**
 
 ```
-date;quantité_litres;prix_par_litre;coût_total;heures_moteur;fournisseur;notes
+date;quantité_litres;prix_par_litre;coût_total;heures_moteur;carburant;fournisseur;notes
 ```
+
+> `carburant` (#585) reprend le vocabulaire de `boat_engines.fuel`
+> (`diesel` | `essence` | `electric` | `other`) et reste **vide** pour les pleins
+> antérieurs, qui n'en portaient pas.
 
 **navigation-logs.csv**
 

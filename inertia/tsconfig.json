@@ -18,6 +18,7 @@
     "../shared/constants/boats/boat_form_options.ts",
     "../shared/constants/equipment_action.ts",
     "../shared/helpers/equipment_action.ts",
+    "../shared/helpers/navigation_title.ts",
     "../shared/types/**/*.ts"
   ]
 }

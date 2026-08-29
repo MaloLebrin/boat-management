@@ -12,6 +12,7 @@ import BasePagination from '~/components/base/BasePagination.vue'
 import ClientForm from '~/components/clients/ClientForm.vue'
 import ClientListToolbar from '~/components/clients/ClientListToolbar.vue'
 import ClientStatusBadge from '~/components/clients/ClientStatusBadge.vue'
+import { useNavigationTitles } from '~/composables/use_navigation_titles'
 import { useT } from '~/composables/use_t'
 import type { ClientListFilters, ClientRow, ClientsPaginated } from '../../../shared/types/client'
 
@@ -23,6 +24,7 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
+const { navigationTitleLabel } = useNavigationTitles()
 const page = usePage()
 
 const flash = computed(() => page.props.flash as { error?: string; success?: string } | undefined)
@@ -62,7 +64,7 @@ function executeDelete() {
 
 function getPermitLabel(client: ClientRow): string {
   if (!client.navigationPermitType) return '-'
-  const type = t(`clients.permitTypes.${client.navigationPermitType}`)
+  const type = navigationTitleLabel(client.navigationPermitType)
   return client.navigationPermitNumber ? `${type} (${client.navigationPermitNumber})` : type
 }
 </script>

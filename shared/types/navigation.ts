@@ -1,3 +1,4 @@
+import type { EngineFuel } from '../constants/boats/boat_form_options.js'
 import type { IncidentStatus, IncidentType } from './incident.js'
 import type { NavigationLogStatus, SeaState } from './navigation_log.js'
 
@@ -23,6 +24,8 @@ export interface FleetFuelLogRow {
   fueledAt: string
   quantityLiters: number
   totalCost: number | null
+  /** Carburant avitaillé (#585) — nul sur les pleins antérieurs. */
+  fuelType: EngineFuel | null
   supplier: string | null
   notes: string | null
 }

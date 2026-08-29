@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import BaseBadge from '~/components/base/BaseBadge.vue'
+import { useNavigationTitles } from '~/composables/use_navigation_titles'
 import { useT } from '~/composables/use_t'
 import type { CrewCertificationRow } from '../../../shared/types/crew'
 
@@ -8,12 +9,13 @@ defineProps<{
 }>()
 
 const { t } = useT()
+const { navigationTitleLabel } = useNavigationTitles()
 </script>
 
 <template>
   <span class="inline-flex items-center gap-1">
     <span class="text-xs font-medium text-fg">
-      {{ t(`crew.certTypes.${certification.type}`) }}
+      {{ navigationTitleLabel(certification.type) }}
     </span>
     <BaseBadge v-if="certification.isExpired" variant="danger">
       {{ t('crew.certStatus.expired') }}

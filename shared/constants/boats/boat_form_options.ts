@@ -25,6 +25,13 @@ export const ENGINE_KIND_OPTIONS = [
   { value: 'other', label: 'Other' },
 ] as const
 
+/**
+ * Vocabulaire des carburants — porté par le moteur (`boat_engines.fuel`) et,
+ * depuis #585, par le plein lui-même (`boat_fuel_logs.fuel_type`).
+ */
+export const ENGINE_FUELS = ['diesel', 'essence', 'electric', 'other'] as const
+export type EngineFuel = (typeof ENGINE_FUELS)[number]
+
 export const ENGINE_FUEL_OPTIONS = [
   { value: 'diesel', label: 'Diesel' },
   { value: 'essence', label: 'Essence' },

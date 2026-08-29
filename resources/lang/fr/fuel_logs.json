@@ -14,7 +14,10 @@
     "boatEngineId": "Moteur (optionnel)",
     "supplier": "Fournisseur (optionnel)",
     "notes": "Notes (optionnel)",
-    "noEngine": "Aucun / non précisé"
+    "noEngine": "Aucun / non précisé",
+    "fuelType": "Carburant (optionnel)",
+    "noFuelType": "Non précisé",
+    "fuelTypeFromEngine": "Pré-rempli d’après le moteur sélectionné — modifiable."
   },
   "form": {
     "createTitle": "Enregistrer un avitaillement",

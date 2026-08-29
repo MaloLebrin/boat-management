@@ -10,6 +10,7 @@ import { boatOwnerPortalRedirect } from '#utils/staff_route_guard'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import type { InvoiceLink } from '#shared/types/invoice'
+import { RESERVATION_TYPES, type ReservationType } from '#shared/types/reservation'
 
 @inject()
 export default class ReservationsController {
@@ -32,9 +33,16 @@ export default class ReservationsController {
     const rawBoatId = request.qs().boatId
     const selectedBoatId = rawBoatId ? Number(rawBoatId) : null
 
+    // Filtre type de prestation (#585) — une valeur inconnue est ignorée
+    // plutôt que rejetée : la page reste lisible avec une URL bricolée.
+    const rawType = request.qs().type
+    const selectedType = RESERVATION_TYPES.includes(rawType as ReservationType)
+      ? (rawType as ReservationType)
+      : null
+
     const [boats, reservations] = await Promise.all([
       this.reservationService.listBoatsForOrg(user),
-      this.reservationService.listForOrg(user, selectedBoatId),
+      this.reservationService.listForOrg(user, selectedBoatId, selectedType),
     ])
 
     // Surface the reservation ↔ document link (org-scoped batch lookup) and
@@ -62,6 +70,7 @@ export default class ReservationsController {
       calendarEntries: toFleetCalendarEntries(calendarBoats, rows),
       boats,
       selectedBoatId,
+      selectedType,
       canCreateQuote,
     })
   }

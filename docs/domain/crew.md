@@ -27,13 +27,30 @@ Références : `app/models/crew_member.ts`, `app/models/crew_certification.ts`, 
 
 ### `crew_certifications`
 
-| Colonne            | Type              | Contrainte                                                                            |
-| ------------------ | ----------------- | ------------------------------------------------------------------------------------- |
-| `id`               | integer PK        | —                                                                                     |
-| `crew_member_id`   | FK → crew_members | CASCADE                                                                               |
-| `type`             | enum              | `coastal_permit \| offshore_permit \| vhf \| stcw_basic \| stcw_proficiency \| other` |
-| `reference_number` | string            | nullable                                                                              |
-| `expires_at`       | date              | nullable, indexé                                                                      |
+| Colonne            | Type              | Contrainte                                                            |
+| ------------------ | ----------------- | --------------------------------------------------------------------- |
+| `id`               | integer PK        | —                                                                     |
+| `crew_member_id`   | FK → crew_members | CASCADE                                                               |
+| `type`             | enum              | Vocabulaire partagé des titres de navigation (#585) — voir ci-dessous |
+| `reference_number` | string            | nullable                                                              |
+| `expires_at`       | date              | nullable, indexé                                                      |
+
+**Vocabulaire des titres de navigation (#585).** Source unique
+`shared/types/navigation_title.ts`, **partagée avec `clients.navigation_permit_type`** :
+`coastal_permit`, `offshore_permit`, `inland_permit`, `captain_200`, `vhf`, `crr`,
+`stcw_basic`, `stcw_proficiency`, `medical_certificate`, `first_aid`, `other`.
+Contrainte CHECK en base (migration `1830000000000_*`). Ne jamais redéclarer la
+liste ailleurs : les deux domaines doivent rester alignés.
+
+Libellés : namespace i18n unique `common.navigationTitles.*` (`fr` + `en`),
+lu côté front par `useNavigationTitles()` (`inertia/composables/use_navigation_titles.ts`).
+
+**Durée de validité par défaut.** `shared/helpers/navigation_title.ts` porte les
+durées des titres qui se périment (visite médicale 2 ans, STCW 5 ans) et expose
+`suggestedExpiryDate(type)`. Le formulaire s'en sert pour **proposer** une date
+d'expiration : la suggestion ne remplace `expires_at` que s'il est vide ou porte
+encore une proposition précédente, jamais une date saisie. Les titres délivrés à
+vie (permis français, CRR, PSC1) ne proposent rien.
 
 ### `navigation_log_crew` (pivot)
 
