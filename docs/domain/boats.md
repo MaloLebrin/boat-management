@@ -157,6 +157,40 @@ Référence : `app/services/boat_catalog_service.ts`, corpus dans `database/data
   alimenté par le formulaire — une mise à jour ne l'écrase pas.
 - Ne pas confondre avec `navigationCategory` (catégorie CE A/B/C/D).
 
+### Catalogue de marques et modèles moteurs (#573)
+
+Référence : `app/services/engine_catalog_service.ts`, corpus dans `database/data/engine_catalog/`
+(un fichier par famille de motorisation). Miroir du catalogue de bateaux ci-dessus.
+
+- **La saisie libre reste acceptée, toujours.** `boat_engines.brand` et `boat_engines.model` restent
+  du texte libre et restent alimentés ; `engine_model_id` n'est qu'un rattachement facultatif
+  (nullable, `ON DELETE SET NULL`). Un moteur hors catalogue est parfaitement valide, et retirer un
+  modèle du corpus ne fait perdre aucune saisie.
+- `ENGINE_FAMILIES` (`shared/types/engine_catalog.ts`) : `outboard_thermal`, `outboard_electric`,
+  `inboard_diesel`, `inboard_petrol`, `jet`, `generator`. Vocabulaire volontairement grossier — la
+  nomenclature fine est le sujet de la sous-issue 2/4. À ne pas confondre avec `kind`, saisi sur le
+  moteur lui-même.
+- `listBrands({ family })` **priorise** la famille, elle ne la filtre jamais.
+- `resolveBrand(freeText)` **remplace** l'ancien `resolveSparePartsBrand()` et sa cascade de trois
+  `if`. Résolution en deux passes sur le slug, le nom et les `aliases` en base : égalité stricte
+  d'abord (seule capable de rattacher un alias qui n'est pas un mot de la saisie, `VP` → Volvo
+  Penta), puis groupes de mots consécutifs du plus long au plus court — ce qui retrouve une marque
+  noyée dans une saisie plus large (`EVINRUDE 6cv`, `Volvo Penta D2-40`) sans les faux positifs d'un
+  `includes` sur un slug court comme `omc`. `Mercury MerCruiser` tombe sur MerCruiser, pas sur
+  Mercury. Renvoie `null` hors catalogue.
+- `formProps(rawBrandId, freeTextBrand)` assemble les props du formulaire ; à défaut de `brandId`
+  dans l'URL, il rapproche la marque déjà saisie pour que la liste des modèles soit utile dès
+  l'ouverture.
+- **Pièces détachées (#517)** : `resolveBrand()` interroge la base, un composant Vue ne peut pas
+  l'appeler. `BoatEngineSparePartsController.engineProps()` expose donc un `catalogBrandSlug` déjà
+  résolu, que les écrans traduisent avec le helper pur `sparePartsBrandFromCatalogSlug()` — lequel
+  ne fait plus que la **couverture** du corpus de pièces (trois marques). Un `Honda` est bien résolu
+  comme marque du catalogue mais renvoie `null` côté pièces : repli sur `GENERIC_RETAILERS` et les
+  aides plaque de toutes les marques, comme avant.
+- `model_code` est le code de la **plaque signalétique**, jamais une reconstitution : renseigné
+  quand le nom commercial en tient lieu (`D2-40`, `3YM30`), vide chez les hors-bord japonais dont le
+  préfixe ne se déduit pas du nom.
+
 ### Pavillon et pays (#580)
 
 Référence : `shared/constants/countries.ts`, `shared/helpers/countries.ts`.
