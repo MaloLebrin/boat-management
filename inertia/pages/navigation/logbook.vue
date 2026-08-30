@@ -27,14 +27,22 @@ const showQuickAdd = ref(false)
 const totalCompleted = computed(() => props.logs.filter((l) => l.status === 'completed').length)
 const totalDistanceNm = computed(() => props.logs.reduce((acc, l) => acc + (l.distanceNm ?? 0), 0))
 
+/**
+ * Flotte mono-bateau (#603) : inutile de renvoyer vers la liste des bateaux
+ * pour choisir, on emmène directement sur le seul bateau de la flotte.
+ */
+const targetBoatId = computed(
+  () => props.selectedBoatId ?? (props.boats.length === 1 ? props.boats[0].id : null)
+)
+
 const emptyActionLabel = computed(() =>
-  props.selectedBoatId
+  targetBoatId.value
     ? t('navigation.logbook.empty.actionBoat')
     : t('navigation.logbook.empty.action')
 )
 
 function onEmptyAction() {
-  router.visit(props.selectedBoatId ? `/boats/${props.selectedBoatId}/navigation` : '/boats')
+  router.visit(targetBoatId.value ? `/boats/${targetBoatId.value}/navigation` : '/boats')
 }
 </script>
 
