@@ -30,11 +30,17 @@ export function useNavSections() {
     // Chaque item est gardé derrière la même capability que celle vérifiée
     // côté serveur sur la route correspondante — cf. #397 (liens morts pour
     // mechanic, dont les capabilities se limitent à maintenance.*).
-    const fleetItems = [
+    // Type explicite : sans lui, l'inférence fige `route: string` sur le seul
+    // item du littéral et rejette les `route: null` poussés ensuite.
+    const fleetItems: { name: string; path: string; route: string | null; icon: string }[] = [
       { name: t('nav.dashboard'), path: '/dashboard', route: 'dashboard', icon: 'house' },
     ]
     if (can('boats.view')) {
       fleetItems.push({ name: t('nav.boats'), path: '/boats', route: null, icon: 'boat' })
+      // Inventaire moteur transverse (#598) — même capability que `/boats`, dont
+      // il n'est qu'une autre entrée : `EnginesController.index` autorise avec
+      // `BoatPolicy.view`.
+      fleetItems.push({ name: t('nav.engines'), path: '/engines', route: null, icon: 'engine' })
     }
     if (canManagePorts.value && can('ports.view')) {
       fleetItems.push({ name: t('ports.nav'), path: '/ports', route: null, icon: 'anchor' })

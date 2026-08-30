@@ -137,6 +137,7 @@ export type ScannedRoutes = {
     'boats.reservations.contract.send': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
     'boats.reservations.contract.sign': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
     'boats.reservations.contract.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
+    'engines.index': { paramsTuple?: []; params?: {} }
     'owner.boats.index': { paramsTuple?: []; params?: {} }
     'owner.boats.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'ports.index': { paramsTuple?: []; params?: {} }
@@ -278,6 +279,7 @@ export type ScannedRoutes = {
     'marketing.en.pricing_legacy': { paramsTuple?: []; params?: {} }
     'marketing.en.simulator': { paramsTuple?: []; params?: {} }
     'marketing.en.guide': { paramsTuple?: []; params?: {} }
+    'marketing.en.diagnosisAi': { paramsTuple?: []; params?: {} }
     'marketing.en.privacy': { paramsTuple?: []; params?: {} }
     'marketing.en.terms': { paramsTuple?: []; params?: {} }
     'marketing.en.sales_terms': { paramsTuple?: []; params?: {} }
@@ -286,6 +288,7 @@ export type ScannedRoutes = {
     'marketing.fr.pricing': { paramsTuple?: []; params?: {} }
     'marketing.fr.simulator': { paramsTuple?: []; params?: {} }
     'marketing.fr.guide': { paramsTuple?: []; params?: {} }
+    'marketing.fr.diagnosisAi': { paramsTuple?: []; params?: {} }
     'marketing.fr.privacy': { paramsTuple?: []; params?: {} }
     'marketing.fr.terms': { paramsTuple?: []; params?: {} }
     'marketing.fr.sales_terms': { paramsTuple?: []; params?: {} }
@@ -299,6 +302,8 @@ export type ScannedRoutes = {
     'simulator.session': { paramsTuple?: []; params?: {} }
     'simulator.create_boat': { paramsTuple?: []; params?: {} }
     'simulator.lead': { paramsTuple?: []; params?: {} }
+    'public_diagnosis.start': { paramsTuple?: []; params?: {} }
+    'public_diagnosis.message': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'simulator.share.store': { paramsTuple?: []; params?: {} }
     'simulator.share.show.fr': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'simulator.share.show.en': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
@@ -344,6 +349,7 @@ export type ScannedRoutes = {
     'boats.reservations.contract.show': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
     'boats.reservations.contract.pdf': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
     'boats.reservations.contract.signedDocument': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
+    'engines.index': { paramsTuple?: []; params?: {} }
     'owner.boats.index': { paramsTuple?: []; params?: {} }
     'owner.boats.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'ports.index': { paramsTuple?: []; params?: {} }
@@ -403,6 +409,7 @@ export type ScannedRoutes = {
     'marketing.en.pricing_legacy': { paramsTuple?: []; params?: {} }
     'marketing.en.simulator': { paramsTuple?: []; params?: {} }
     'marketing.en.guide': { paramsTuple?: []; params?: {} }
+    'marketing.en.diagnosisAi': { paramsTuple?: []; params?: {} }
     'marketing.en.privacy': { paramsTuple?: []; params?: {} }
     'marketing.en.terms': { paramsTuple?: []; params?: {} }
     'marketing.en.sales_terms': { paramsTuple?: []; params?: {} }
@@ -411,6 +418,7 @@ export type ScannedRoutes = {
     'marketing.fr.pricing': { paramsTuple?: []; params?: {} }
     'marketing.fr.simulator': { paramsTuple?: []; params?: {} }
     'marketing.fr.guide': { paramsTuple?: []; params?: {} }
+    'marketing.fr.diagnosisAi': { paramsTuple?: []; params?: {} }
     'marketing.fr.privacy': { paramsTuple?: []; params?: {} }
     'marketing.fr.terms': { paramsTuple?: []; params?: {} }
     'marketing.fr.sales_terms': { paramsTuple?: []; params?: {} }
@@ -460,6 +468,7 @@ export type ScannedRoutes = {
     'boats.reservations.contract.show': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
     'boats.reservations.contract.pdf': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
     'boats.reservations.contract.signedDocument': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
+    'engines.index': { paramsTuple?: []; params?: {} }
     'owner.boats.index': { paramsTuple?: []; params?: {} }
     'owner.boats.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'ports.index': { paramsTuple?: []; params?: {} }
@@ -519,6 +528,7 @@ export type ScannedRoutes = {
     'marketing.en.pricing_legacy': { paramsTuple?: []; params?: {} }
     'marketing.en.simulator': { paramsTuple?: []; params?: {} }
     'marketing.en.guide': { paramsTuple?: []; params?: {} }
+    'marketing.en.diagnosisAi': { paramsTuple?: []; params?: {} }
     'marketing.en.privacy': { paramsTuple?: []; params?: {} }
     'marketing.en.terms': { paramsTuple?: []; params?: {} }
     'marketing.en.sales_terms': { paramsTuple?: []; params?: {} }
@@ -527,6 +537,7 @@ export type ScannedRoutes = {
     'marketing.fr.pricing': { paramsTuple?: []; params?: {} }
     'marketing.fr.simulator': { paramsTuple?: []; params?: {} }
     'marketing.fr.guide': { paramsTuple?: []; params?: {} }
+    'marketing.fr.diagnosisAi': { paramsTuple?: []; params?: {} }
     'marketing.fr.privacy': { paramsTuple?: []; params?: {} }
     'marketing.fr.terms': { paramsTuple?: []; params?: {} }
     'marketing.fr.sales_terms': { paramsTuple?: []; params?: {} }
@@ -624,6 +635,8 @@ export type ScannedRoutes = {
     'simulator.session': { paramsTuple?: []; params?: {} }
     'simulator.create_boat': { paramsTuple?: []; params?: {} }
     'simulator.lead': { paramsTuple?: []; params?: {} }
+    'public_diagnosis.start': { paramsTuple?: []; params?: {} }
+    'public_diagnosis.message': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'simulator.share.store': { paramsTuple?: []; params?: {} }
     'demo.login': { paramsTuple?: []; params?: {} }
     'push.subscriptions.store': { paramsTuple?: []; params?: {} }

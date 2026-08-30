@@ -41,6 +41,7 @@ declare module '@adonisjs/inertia/types' {
     'diagnostic/first_contact': ExtractProps<(typeof import('../../inertia/pages/diagnostic/first_contact.vue'))['default']>
     'diagnostic/index': ExtractProps<(typeof import('../../inertia/pages/diagnostic/index.vue'))['default']>
     'diagnostic/sheet': ExtractProps<(typeof import('../../inertia/pages/diagnostic/sheet.vue'))['default']>
+    'engines/index': ExtractProps<(typeof import('../../inertia/pages/engines/index.vue'))['default']>
     'errors/forbidden': ExtractProps<(typeof import('../../inertia/pages/errors/forbidden.vue'))['default']>
     'errors/not_found': ExtractProps<(typeof import('../../inertia/pages/errors/not_found.vue'))['default']>
     'errors/server_error': ExtractProps<(typeof import('../../inertia/pages/errors/server_error.vue'))['default']>

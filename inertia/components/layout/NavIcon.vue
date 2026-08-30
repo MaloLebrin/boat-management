@@ -179,4 +179,27 @@ defineProps<{ name: string }>()
       d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0zM12 9v4M12 17h.01"
     />
   </svg>
+  <!-- Bloc moteur (#598) — volontairement distinct de `gear`, déjà porté par
+       les pièces détachées et les réglages. -->
+  <svg
+    v-else-if="name === 'engine'"
+    class="w-5 h-5 shrink-0"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      d="M6.75 19.5h10.5a2.25 2.25 0 002.25-2.25V6.75a2.25 2.25 0 00-2.25-2.25H6.75A2.25 2.25 0 004.5 6.75v10.5a2.25 2.25 0 002.25 2.25z"
+    />
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 9h6v6H9V9z" />
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      d="M9 3v1.5M15 3v1.5M9 19.5V21m6-1.5V21M3 9h1.5M3 15h1.5M19.5 9H21m-1.5 6H21"
+    />
+  </svg>
 </template>

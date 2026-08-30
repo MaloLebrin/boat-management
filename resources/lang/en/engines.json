@@ -1,0 +1,54 @@
+{
+  "index": {
+    "title": "Engines",
+    "subtitle": "Every engine in your fleet, without opening each boat's page.",
+    "empty": {
+      "title": "No engines yet",
+      "description": "Engines are added from a boat's Equipment tab. They will show up here afterwards.",
+      "action": "View my boats"
+    },
+    "noResults": {
+      "title": "No engine matches",
+      "description": "Adjust your search or clear the filters to see the whole fleet again.",
+      "action": "Clear filters"
+    }
+  },
+  "summary": {
+    "total": "Engines",
+    "operational": "Operational",
+    "inMaintenance": "In maintenance",
+    "outOfService": "Out of service"
+  },
+  "list": {
+    "search": "Search",
+    "searchPlaceholder": "Brand, model, serial number or boat…",
+    "boat": "Boat",
+    "kind": "Type",
+    "status": "Status",
+    "family": "Powertrain",
+    "sort": "Sort",
+    "direction": "Direction",
+    "recent": "Recently updated",
+    "brand": "Brand",
+    "hours": "Hours",
+    "asc": "Asc",
+    "desc": "Desc",
+    "viewTable": "Table",
+    "viewCards": "Cards",
+    "engines": "{count, plural, one {engine} other {engines}}",
+    "clearFilters": "Clear filters",
+    "unknownFamily": "Powertrain not set",
+    "noHours": "No hours recorded",
+    "hoursValue": "{hours} h",
+    "powerValue": "{power} hp",
+    "table": {
+      "engine": "Engine",
+      "boat": "Boat",
+      "kind": "Type",
+      "family": "Powertrain",
+      "power": "Power",
+      "hours": "Hours",
+      "status": "Status"
+    }
+  }
+}

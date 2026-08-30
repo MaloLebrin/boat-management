@@ -1603,6 +1603,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/rental_contracts_controller').default['destroy']>>>
     }
   }
+  'engines.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/engines'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/engines_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/engines_controller').default['index']>>>
+    }
+  }
   'owner.boats.index': {
     methods: ["GET","HEAD"]
     pattern: '/owner/boats'
@@ -3295,6 +3307,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['guide']>>>
     }
   }
+  'marketing.en.diagnosisAi': {
+    methods: ["GET","HEAD"]
+    pattern: '/en/engine-diagnosis-ai'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/public_diagnosis_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/public_diagnosis_controller').default['show']>>>
+    }
+  }
   'marketing.en.privacy': {
     methods: ["GET","HEAD"]
     pattern: '/en/privacy'
@@ -3389,6 +3413,18 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['guide']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_controller').default['guide']>>>
+    }
+  }
+  'marketing.fr.diagnosisAi': {
+    methods: ["GET","HEAD"]
+    pattern: '/fr/diagnostic-panne-ia'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/public_diagnosis_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/public_diagnosis_controller').default['show']>>>
     }
   }
   'marketing.fr.privacy': {
@@ -3545,6 +3581,30 @@ export interface Registry {
       query: ExtractQuery<InferInput<(typeof import('#validators/simulator_lead').simulatorLeadValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/simulator_lead_controller').default['store']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/simulator_lead_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'public_diagnosis.start': {
+    methods: ["POST"]
+    pattern: '/diagnosis-ai/conversations'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/public_diagnosis').publicDiagnosisStartValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/public_diagnosis').publicDiagnosisStartValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/public_diagnosis_controller').default['start']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/public_diagnosis_controller').default['start']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'public_diagnosis.message': {
+    methods: ["POST"]
+    pattern: '/diagnosis-ai/conversations/:token/messages'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/public_diagnosis').publicDiagnosisMessageValidator)>>
+      paramsTuple: [ParamValue]
+      params: { token: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/public_diagnosis').publicDiagnosisMessageValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/public_diagnosis_controller').default['message']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/public_diagnosis_controller').default['message']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'simulator.share.store': {

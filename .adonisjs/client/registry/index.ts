@@ -804,6 +804,12 @@ const routes = {
     tokens: [{"old":"/boats/:boatId/reservations/:reservationId/contract","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/reservations/:reservationId/contract","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/reservations/:reservationId/contract","type":0,"val":"reservations","end":""},{"old":"/boats/:boatId/reservations/:reservationId/contract","type":1,"val":"reservationId","end":""},{"old":"/boats/:boatId/reservations/:reservationId/contract","type":0,"val":"contract","end":""}],
     types: placeholder as Registry['boats.reservations.contract.destroy']['types'],
   },
+  'engines.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/engines',
+    tokens: [{"old":"/engines","type":0,"val":"engines","end":""}],
+    types: placeholder as Registry['engines.index']['types'],
+  },
   'owner.boats.index': {
     methods: ["GET","HEAD"],
     pattern: '/owner/boats',
@@ -1650,6 +1656,12 @@ const routes = {
     tokens: [{"old":"/en/boat-maintenance-cost","type":0,"val":"en","end":""},{"old":"/en/boat-maintenance-cost","type":0,"val":"boat-maintenance-cost","end":""}],
     types: placeholder as Registry['marketing.en.guide']['types'],
   },
+  'marketing.en.diagnosisAi': {
+    methods: ["GET","HEAD"],
+    pattern: '/en/engine-diagnosis-ai',
+    tokens: [{"old":"/en/engine-diagnosis-ai","type":0,"val":"en","end":""},{"old":"/en/engine-diagnosis-ai","type":0,"val":"engine-diagnosis-ai","end":""}],
+    types: placeholder as Registry['marketing.en.diagnosisAi']['types'],
+  },
   'marketing.en.privacy': {
     methods: ["GET","HEAD"],
     pattern: '/en/privacy',
@@ -1697,6 +1709,12 @@ const routes = {
     pattern: '/fr/cout-entretien-bateau',
     tokens: [{"old":"/fr/cout-entretien-bateau","type":0,"val":"fr","end":""},{"old":"/fr/cout-entretien-bateau","type":0,"val":"cout-entretien-bateau","end":""}],
     types: placeholder as Registry['marketing.fr.guide']['types'],
+  },
+  'marketing.fr.diagnosisAi': {
+    methods: ["GET","HEAD"],
+    pattern: '/fr/diagnostic-panne-ia',
+    tokens: [{"old":"/fr/diagnostic-panne-ia","type":0,"val":"fr","end":""},{"old":"/fr/diagnostic-panne-ia","type":0,"val":"diagnostic-panne-ia","end":""}],
+    types: placeholder as Registry['marketing.fr.diagnosisAi']['types'],
   },
   'marketing.fr.privacy': {
     methods: ["GET","HEAD"],
@@ -1775,6 +1793,18 @@ const routes = {
     pattern: '/simulator/lead',
     tokens: [{"old":"/simulator/lead","type":0,"val":"simulator","end":""},{"old":"/simulator/lead","type":0,"val":"lead","end":""}],
     types: placeholder as Registry['simulator.lead']['types'],
+  },
+  'public_diagnosis.start': {
+    methods: ["POST"],
+    pattern: '/diagnosis-ai/conversations',
+    tokens: [{"old":"/diagnosis-ai/conversations","type":0,"val":"diagnosis-ai","end":""},{"old":"/diagnosis-ai/conversations","type":0,"val":"conversations","end":""}],
+    types: placeholder as Registry['public_diagnosis.start']['types'],
+  },
+  'public_diagnosis.message': {
+    methods: ["POST"],
+    pattern: '/diagnosis-ai/conversations/:token/messages',
+    tokens: [{"old":"/diagnosis-ai/conversations/:token/messages","type":0,"val":"diagnosis-ai","end":""},{"old":"/diagnosis-ai/conversations/:token/messages","type":0,"val":"conversations","end":""},{"old":"/diagnosis-ai/conversations/:token/messages","type":1,"val":"token","end":""},{"old":"/diagnosis-ai/conversations/:token/messages","type":0,"val":"messages","end":""}],
+    types: placeholder as Registry['public_diagnosis.message']['types'],
   },
   'simulator.share.store': {
     methods: ["POST"],
