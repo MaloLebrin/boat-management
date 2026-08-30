@@ -24,6 +24,12 @@ const routes = {
     tokens: [{"old":"/__transmit/unsubscribe","type":0,"val":"__transmit","end":""},{"old":"/__transmit/unsubscribe","type":0,"val":"unsubscribe","end":""}],
     types: placeholder as Registry['unsubscribe']['types'],
   },
+  'health.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/up',
+    tokens: [{"old":"/up","type":0,"val":"up","end":""}],
+    types: placeholder as Registry['health.show']['types'],
+  },
   'dashboard': {
     methods: ["GET","HEAD"],
     pattern: '/dashboard',
@@ -635,6 +641,30 @@ const routes = {
     pattern: '/boats/:boatId/navigation-logs/:logId/crew-role.pdf',
     tokens: [{"old":"/boats/:boatId/navigation-logs/:logId/crew-role.pdf","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/navigation-logs/:logId/crew-role.pdf","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/navigation-logs/:logId/crew-role.pdf","type":0,"val":"navigation-logs","end":""},{"old":"/boats/:boatId/navigation-logs/:logId/crew-role.pdf","type":1,"val":"logId","end":""},{"old":"/boats/:boatId/navigation-logs/:logId/crew-role.pdf","type":0,"val":"crew-role.pdf","end":""}],
     types: placeholder as Registry['boats.navigationLogs.crewRole.download']['types'],
+  },
+  'boats.navigationLogs.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/boats/:boatId/navigation-logs/:logId',
+    tokens: [{"old":"/boats/:boatId/navigation-logs/:logId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/navigation-logs/:logId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/navigation-logs/:logId","type":0,"val":"navigation-logs","end":""},{"old":"/boats/:boatId/navigation-logs/:logId","type":1,"val":"logId","end":""}],
+    types: placeholder as Registry['boats.navigationLogs.show']['types'],
+  },
+  'boats.navigationLogs.entries.store': {
+    methods: ["POST"],
+    pattern: '/boats/:boatId/navigation-logs/:logId/entries',
+    tokens: [{"old":"/boats/:boatId/navigation-logs/:logId/entries","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/navigation-logs/:logId/entries","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/navigation-logs/:logId/entries","type":0,"val":"navigation-logs","end":""},{"old":"/boats/:boatId/navigation-logs/:logId/entries","type":1,"val":"logId","end":""},{"old":"/boats/:boatId/navigation-logs/:logId/entries","type":0,"val":"entries","end":""}],
+    types: placeholder as Registry['boats.navigationLogs.entries.store']['types'],
+  },
+  'boats.navigationLogs.entries.update': {
+    methods: ["PATCH"],
+    pattern: '/boats/:boatId/navigation-logs/:logId/entries/:entryId',
+    tokens: [{"old":"/boats/:boatId/navigation-logs/:logId/entries/:entryId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/navigation-logs/:logId/entries/:entryId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/navigation-logs/:logId/entries/:entryId","type":0,"val":"navigation-logs","end":""},{"old":"/boats/:boatId/navigation-logs/:logId/entries/:entryId","type":1,"val":"logId","end":""},{"old":"/boats/:boatId/navigation-logs/:logId/entries/:entryId","type":0,"val":"entries","end":""},{"old":"/boats/:boatId/navigation-logs/:logId/entries/:entryId","type":1,"val":"entryId","end":""}],
+    types: placeholder as Registry['boats.navigationLogs.entries.update']['types'],
+  },
+  'boats.navigationLogs.entries.destroy': {
+    methods: ["DELETE"],
+    pattern: '/boats/:boatId/navigation-logs/:logId/entries/:entryId',
+    tokens: [{"old":"/boats/:boatId/navigation-logs/:logId/entries/:entryId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/navigation-logs/:logId/entries/:entryId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/navigation-logs/:logId/entries/:entryId","type":0,"val":"navigation-logs","end":""},{"old":"/boats/:boatId/navigation-logs/:logId/entries/:entryId","type":1,"val":"logId","end":""},{"old":"/boats/:boatId/navigation-logs/:logId/entries/:entryId","type":0,"val":"entries","end":""},{"old":"/boats/:boatId/navigation-logs/:logId/entries/:entryId","type":1,"val":"entryId","end":""}],
+    types: placeholder as Registry['boats.navigationLogs.entries.destroy']['types'],
   },
   'boats.adminDocuments.store': {
     methods: ["POST"],

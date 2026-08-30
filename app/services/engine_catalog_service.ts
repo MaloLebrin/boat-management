@@ -29,7 +29,7 @@ export default class EngineCatalogService {
    */
   async listBrands(options: ListEngineBrandsOptions = {}): Promise<EngineBrandOption[]> {
     const query = EngineBrand.query()
-      .select(['id', 'slug', 'name', 'country', 'families'])
+      .select(['id', 'slug', 'name', 'country', 'families', 'aliases'])
       .where('isActive', true)
       .orderBy('name', 'asc')
       .limit(options.limit ?? DEFAULT_BRAND_LIMIT)
@@ -190,6 +190,7 @@ export default class EngineCatalogService {
       name: brand.name,
       country: brand.country,
       families: brand.families ?? [],
+      aliases: brand.aliases ?? [],
     }
   }
 }

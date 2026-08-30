@@ -27,6 +27,7 @@ const BRANDS: EngineBrandOption[] = [
     name: 'Volvo Penta',
     country: 'SE',
     families: ['inboard_diesel'],
+    aliases: ['volvo', 'VP'],
   },
 ]
 

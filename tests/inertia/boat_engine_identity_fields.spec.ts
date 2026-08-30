@@ -22,8 +22,16 @@ const BRANDS: EngineBrandOption[] = [
     name: 'Volvo Penta',
     country: 'SE',
     families: ['inboard_diesel', 'inboard_petrol'],
+    aliases: ['volvo', 'VP'],
   },
-  { id: 2, slug: 'yamaha', name: 'Yamaha', country: 'JP', families: ['outboard_thermal'] },
+  {
+    id: 2,
+    slug: 'yamaha',
+    name: 'Yamaha',
+    country: 'JP',
+    families: ['outboard_thermal'],
+    aliases: [],
+  },
 ]
 
 const MODELS: EngineModelOption[] = [
@@ -77,6 +85,15 @@ test('propose toutes les marques du catalogue avec leur famille en indice', () =
 
   expect(options.map((o) => o.label)).toEqual(['Volvo Penta', 'Yamaha'])
   expect(options[0].hint).toContain('boats.options.engineCatalogFamily.inboard_diesel')
+})
+
+test('les alias du catalogue rendent la marque trouvable sous ses autres noms', () => {
+  const wrapper = mountFields()
+  const options = comboboxes(wrapper)[0].props('options') as Array<{ keywords?: string[] }>
+
+  // Sans eux, une marque absorbée (Mariner sous Mercury, Evinrude sous Johnson)
+  // reste introuvable dans la liste alors que le serveur sait la rapprocher.
+  expect(options[0].keywords).toEqual(['volvo', 'VP'])
 })
 
 test('choisir une marque recharge les modèles par visite Inertia partielle', async () => {
