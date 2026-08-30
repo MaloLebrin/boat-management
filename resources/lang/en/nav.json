@@ -28,5 +28,6 @@
     "maintenance": "MAINTENANCE",
     "business": "MANAGEMENT"
   },
-  "spareParts": "Spare parts"
+  "spareParts": "Spare parts",
+  "engines": "Engines"
 }

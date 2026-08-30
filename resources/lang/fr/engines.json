@@ -1,0 +1,54 @@
+{
+  "index": {
+    "title": "Moteurs",
+    "subtitle": "Tous les moteurs de votre flotte, sans passer par la fiche de chaque bateau.",
+    "empty": {
+      "title": "Aucun moteur",
+      "description": "Les moteurs s'ajoutent depuis l'onglet Équipement d'un bateau. Ils apparaîtront ensuite ici.",
+      "action": "Voir mes bateaux"
+    },
+    "noResults": {
+      "title": "Aucun moteur ne correspond",
+      "description": "Modifiez votre recherche ou effacez les filtres pour retrouver toute la flotte.",
+      "action": "Effacer les filtres"
+    }
+  },
+  "summary": {
+    "total": "Moteurs",
+    "operational": "Opérationnels",
+    "inMaintenance": "En maintenance",
+    "outOfService": "Hors service"
+  },
+  "list": {
+    "search": "Rechercher",
+    "searchPlaceholder": "Marque, modèle, n° de série ou bateau…",
+    "boat": "Bateau",
+    "kind": "Type",
+    "status": "Statut",
+    "family": "Motorisation",
+    "sort": "Trier par",
+    "direction": "Ordre",
+    "recent": "Mis à jour récemment",
+    "brand": "Marque",
+    "hours": "Heures",
+    "asc": "Croissant",
+    "desc": "Décroissant",
+    "viewTable": "Tableau",
+    "viewCards": "Cartes",
+    "engines": "{count, plural, one {moteur} other {moteurs}}",
+    "clearFilters": "Effacer les filtres",
+    "unknownFamily": "Motorisation non renseignée",
+    "noHours": "Heures non relevées",
+    "hoursValue": "{hours} h",
+    "powerValue": "{power} ch",
+    "table": {
+      "engine": "Moteur",
+      "boat": "Bateau",
+      "kind": "Type",
+      "family": "Motorisation",
+      "power": "Puissance",
+      "hours": "Heures",
+      "status": "Statut"
+    }
+  }
+}

@@ -127,6 +127,24 @@ Chaque page charge ses photos via `mediaService.listForEntity(<entityType>, id)`
 
 Les cartes de l'onglet Équipement exposent un lien « voir le détail » vers ces pages.
 
+### Engines (inventaire transverse, #598)
+
+- `engines/index`: `inertia/pages/engines/index.vue` (GET `/engines`)
+  - props: `engines` (paginé), `filters`, `boatOptions`, `summary`
+  - backend: `EnginesController.index` → `EngineListService.listForUser`
+  - sous-composants (`inertia/components/engines/list/`) : `EngineSummary` (4 tuiles de flotte),
+    `EngineListToolbar` (recherche + filtres bateau/type/motorisation/statut + tri + bascule
+    tableau/cartes), `EngineTable`, `EngineCards`
+  - la navigation se fait en `router.get('/engines', …, { preserveScroll, preserveState, replace })`,
+    les filtres vivent donc dans l'URL et sont partageables
+  - `EngineTable` masque les colonnes motorisation / puissance / heures quand aucune ligne
+    affichée ne les renseigne (même règle que `BoatTable`)
+  - deux états vides distincts : flotte sans aucun moteur (CTA vers `/boats`) et recherche sans
+    résultat (CTA « effacer les filtres »)
+  - pastille de statut mutualisée avec la fiche bateau via `~/utils/engine_status`
+  - entrée de nav `nav.engines` (section FLOTTE, icône `engine` de `NavIcon.vue`), gardée par
+    `boats.view` comme `/boats`
+
 ### Ports (liste / création / édition)
 
 Section réservée aux plans **Pro** et **Entreprise** (#604) : `RequirePortsPlanMiddleware` ferme

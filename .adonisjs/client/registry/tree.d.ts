@@ -224,6 +224,9 @@ export interface ApiDefinition {
     update: typeof routes['boat_generic_equipment.update']
     destroy: typeof routes['boat_generic_equipment.destroy']
   }
+  engines: {
+    index: typeof routes['engines.index']
+  }
   owner: {
     boats: {
       index: typeof routes['owner.boats.index']
@@ -467,6 +470,7 @@ export interface ApiDefinition {
       pricingLegacy: typeof routes['marketing.en.pricing_legacy']
       simulator: typeof routes['marketing.en.simulator']
       guide: typeof routes['marketing.en.guide']
+      diagnosisAi: typeof routes['marketing.en.diagnosisAi']
       privacy: typeof routes['marketing.en.privacy']
       terms: typeof routes['marketing.en.terms']
       salesTerms: typeof routes['marketing.en.sales_terms']
@@ -479,6 +483,7 @@ export interface ApiDefinition {
       pricing: typeof routes['marketing.fr.pricing']
       simulator: typeof routes['marketing.fr.simulator']
       guide: typeof routes['marketing.fr.guide']
+      diagnosisAi: typeof routes['marketing.fr.diagnosisAi']
       privacy: typeof routes['marketing.fr.privacy']
       terms: typeof routes['marketing.fr.terms']
       salesTerms: typeof routes['marketing.fr.sales_terms']
@@ -501,6 +506,10 @@ export interface ApiDefinition {
         en: typeof routes['simulator.share.show.en']
       }
     }
+  }
+  publicDiagnosis: {
+    start: typeof routes['public_diagnosis.start']
+    message: typeof routes['public_diagnosis.message']
   }
   demo: {
     login: typeof routes['demo.login']

@@ -28,5 +28,6 @@
     "maintenance": "MAINTENANCE",
     "business": "GESTION"
   },
-  "spareParts": "Pièces détachées"
+  "spareParts": "Pièces détachées",
+  "engines": "Moteurs"
 }

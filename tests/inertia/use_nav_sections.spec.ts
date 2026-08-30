@@ -246,14 +246,28 @@ test('section labels are the expected i18n keys', () => {
 
 // Plan `pro` : depuis #604 la cartographie de port est fermée au plan Starter,
 // c'est donc le premier plan où la section flotte est au complet.
-test('fleet section contains dashboard, boats, ports, crew', () => {
+test('fleet section contains dashboard, boats, engines, ports, crew', () => {
   const { navSections } = mountWithPlan('pro')
   const fleetSection = navSections.value[0]
   const names = fleetSection.items.map((i) => i.name)
   expect(names).toContain('nav.dashboard')
   expect(names).toContain('nav.boats')
+  expect(names).toContain('nav.engines')
   expect(names).toContain('ports.nav')
   expect(names).toContain('nav.crew')
+})
+
+// L'inventaire moteur (#598) est gardé par `boats.view`, comme la route
+// serveur : sans cette capability, le lien serait mort.
+test('engines item is gated behind boats.view, like /boats', () => {
+  const withoutBoats = mountWithPlan(
+    'pro',
+    [],
+    MEMBER_CAPABILITIES.filter((c) => c !== 'boats.view')
+  )
+  const names = withoutBoats.navSections.value[0].items.map((i) => i.name)
+  expect(names).not.toContain('nav.engines')
+  expect(names).not.toContain('nav.boats')
 })
 
 // activity section items
