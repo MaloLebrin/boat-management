@@ -129,6 +129,10 @@ Les cartes de l'onglet Équipement exposent un lien « voir le détail » vers c
 
 ### Ports (liste / création / édition)
 
+Section réservée aux plans **Pro** et **Entreprise** (#604) : `RequirePortsPlanMiddleware` ferme
+tout le groupe `/ports/*` au plan Starter (redirection `/settings/billing`), l'entrée « Ports » de
+la nav et la carte ports du dashboard sont masquées via `effectiveQuotas.canManagePorts`.
+
 - `ports/index`: `inertia/pages/ports/index.vue` — GET `/ports`, `PortsController.index`
   - chaque carte affiche `ville, pays` via `locationLabel()` ; le pays passe par `countryName()`
     (#580) et s'affiche même sans ville

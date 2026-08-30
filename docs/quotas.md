@@ -12,6 +12,7 @@ Source de vérité : `shared/types/plan.ts` — `PLAN_LIMITS`.
 | IA / Copilote    | ✗       | ✓         | ✓          |
 | Tokens IA / mois | ✗       | 1 000 000 | ∞          |
 | Export           | ✗       | ✓         | ✓          |
+| Ports (marina)   | ✗       | ✓         | ✓          |
 
 `null` = illimité. Le plan est assigné manuellement en BDD sur la table `organizations` (colonne `plan` enum `starter|pro|enterprise`, défaut `starter`). Pas de Stripe.
 
@@ -36,6 +37,7 @@ En plus du plan, une organisation **Pro** peut souscrire des **add-ons quantitat
 - Réduction annuelle de 20 % appliquée automatiquement (badge `billing_annual_badge: "−20 %"`).
 - Aucun frais caché.
 - Le plan Starter est un plan solo (1 membre = l'owner uniquement). Les plans Pro et Enterprise permettent d'inviter plusieurs membres.
+- La **cartographie de port** (ports, pontons, mouillages, places) est fermée au plan Starter (#604) : un ou deux bateaux personnels n'ont pas de marina à modéliser. Aucun module ni add-on ne l'accorde — c'est une capacité de tier pure (`PLAN_LIMITS[...].canManagePorts`, jamais les quotas effectifs). Le groupe de routes `/ports/*` est gardé par `RequirePortsPlanMiddleware` (redirection vers `/settings/billing` + flash `flash.quota.portsExceeded`), et `PortService.listForUser` / `listWithSpotsForOrg` / `listNamesForOrg` renvoient vide, ce qui escamote le sélecteur de place du formulaire bateau, les ports du carnet de bord et du budget, et la carte ports du dashboard.
 
 ---
 
@@ -45,6 +47,7 @@ En plus du plan, une organisation **Pro** peut souscrire des **add-ons quantitat
 shared/types/plan.ts                    — PlanTier, PlanQuotas, QuotaUsage, PLAN_LIMITS, getUpgradeTier()
 app/exceptions/quota_errors.ts          — QuotaExceededError
 app/services/quota_service.ts           — méthodes can*/assert*/storage
+app/middleware/require_ports_plan_middleware.ts — garde de plan du groupe /ports/* (#604)
 app/services/media_service.ts           — upload/deleteById avec tracking quota
 app/services/ai_token_quota_service.ts  — getUsage/assertCanUseTokens/recordUsage/resetMonth
 app/jobs/reset_ai_token_usage.ts        — reset mensuel (cron 1er du mois 01h00)

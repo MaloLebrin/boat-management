@@ -11,6 +11,9 @@ export function useNavSections() {
   const canManageClients = computed(() => effectiveQuotas.value?.canManageClients === true)
   const canManagePricing = computed(() => effectiveQuotas.value?.canManagePricing === true)
   const canManageInvoices = computed(() => effectiveQuotas.value?.canManageInvoices === true)
+  // Cartographie de port réservée aux plans Pro et Entreprise (#604) — même
+  // garde que `RequirePortsPlanMiddleware` côté serveur, sinon lien mort.
+  const canManagePorts = computed(() => effectiveQuotas.value?.canManagePorts === true)
 
   const navSections = computed(() => {
     // Portail self-service : accès restreint à ses propres bateaux, aucune des
@@ -33,7 +36,7 @@ export function useNavSections() {
     if (can('boats.view')) {
       fleetItems.push({ name: t('nav.boats'), path: '/boats', route: null, icon: 'boat' })
     }
-    if (can('ports.view')) {
+    if (canManagePorts.value && can('ports.view')) {
       fleetItems.push({ name: t('ports.nav'), path: '/ports', route: null, icon: 'anchor' })
     }
     if (can('crew.create')) {

@@ -185,6 +185,47 @@ test('missing activeModules prop falls back to tier flags only', () => {
   expect(names).toContain('nav.clients')
 })
 
+// cartographie de port réservée aux plans Pro et Entreprise (#604)
+
+const FLEET_SECTION_INDEX = 0
+
+test('pro plan includes ports.nav item in fleet section', () => {
+  const { navSections } = mountWithPlan('pro')
+  const names = navSections.value[FLEET_SECTION_INDEX].items.map((i) => i.name)
+  expect(names).toContain('ports.nav')
+})
+
+test('enterprise plan includes ports.nav item in fleet section', () => {
+  const { navSections } = mountWithPlan('enterprise')
+  const names = navSections.value[FLEET_SECTION_INDEX].items.map((i) => i.name)
+  expect(names).toContain('ports.nav')
+})
+
+test('starter plan does NOT include ports.nav item in fleet section', () => {
+  const { navSections } = mountWithPlan('starter')
+  const names = navSections.value[FLEET_SECTION_INDEX].items.map((i) => i.name)
+  expect(names).not.toContain('ports.nav')
+})
+
+test('null plan does NOT include ports.nav item', () => {
+  const { navSections } = mountWithPlan(null)
+  const names = navSections.value[FLEET_SECTION_INDEX].items.map((i) => i.name)
+  expect(names).not.toContain('ports.nav')
+})
+
+test('no module grants ports on a starter plan', () => {
+  const { navSections } = mountWithPlan('starter', ['crm_invoicing', 'charter'])
+  const names = navSections.value[FLEET_SECTION_INDEX].items.map((i) => i.name)
+  expect(names).not.toContain('ports.nav')
+})
+
+test('a pro plan without the ports.view capability does NOT include ports.nav', () => {
+  const withoutPortsView = MEMBER_CAPABILITIES.filter((c) => c !== 'ports.view')
+  const { navSections } = mountWithPlan('pro', [], withoutPortsView)
+  const names = navSections.value[FLEET_SECTION_INDEX].items.map((i) => i.name)
+  expect(names).not.toContain('ports.nav')
+})
+
 // 4 sections are always present
 
 test('navSections always returns 4 sections', () => {
@@ -203,8 +244,10 @@ test('section labels are the expected i18n keys', () => {
 
 // fleet section base items
 
+// Plan `pro` : depuis #604 la cartographie de port est fermée au plan Starter,
+// c'est donc le premier plan où la section flotte est au complet.
 test('fleet section contains dashboard, boats, ports, crew', () => {
-  const { navSections } = mountWithPlan('starter')
+  const { navSections } = mountWithPlan('pro')
   const fleetSection = navSections.value[0]
   const names = fleetSection.items.map((i) => i.name)
   expect(names).toContain('nav.dashboard')

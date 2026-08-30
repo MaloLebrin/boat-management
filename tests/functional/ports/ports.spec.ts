@@ -1,18 +1,17 @@
 import { test } from '@japa/runner'
 import testUtils from '@adonisjs/core/services/test_utils'
 import Port from '#models/port'
-import { UserFactory } from '#database/factories/user_factory'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { PortFactory } from '#database/factories/port_factory'
 import { PontoonFactory } from '#database/factories/pontoon_factory'
 import { SpotFactory } from '#database/factories/spot_factory'
-import { createAdminUser } from '#tests/functional/helpers'
+import { createAdminUser, createProPlanUser } from '#tests/functional/helpers'
 
 test.group('Ports (functional)', (group) => {
   group.each.setup(() => testUtils.db().truncate())
 
   test('GET /ports returns 200 for authenticated user', async ({ client }) => {
-    const user = await UserFactory.with('organization').create()
+    const user = await createProPlanUser()
 
     const response = await client.get('/ports').loginAs(user)
 
@@ -60,7 +59,7 @@ test.group('Ports (functional)', (group) => {
   })
 
   test('GET /ports/:id redirects to /ports for port from another org', async ({ client }) => {
-    const user = await UserFactory.with('organization').create()
+    const user = await createProPlanUser()
     const otherPort = await PortFactory.with('organization').create()
 
     const response = await client.get(`/ports/${otherPort.id}`).loginAs(user)
@@ -98,7 +97,7 @@ test.group('Ports (functional)', (group) => {
     client,
     assert,
   }) => {
-    const otherUser = await UserFactory.with('organization').create()
+    const otherUser = await createProPlanUser()
     const owner = await createAdminUser()
     const port = await PortFactory.merge({ organizationId: owner.organizationId! }).create()
 

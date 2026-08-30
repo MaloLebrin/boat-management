@@ -220,4 +220,52 @@ test.group('QuotaService (unit)', () => {
     assert.equal(error!.feature, 'export')
     assert.equal(error!.upgradeTo, 'pro')
   })
+
+  // ── canManagePorts / assertCanManagePorts (#604) ─────────────────────────
+
+  test('canManagePorts retourne false pour le plan starter', async ({ assert }) => {
+    const org = await OrganizationFactory.merge({ plan: 'starter' }).make()
+
+    const svc = await app.container.make(QuotaService)
+    assert.isFalse(svc.canManagePorts(org))
+  })
+
+  test('canManagePorts retourne true pour les plans pro et enterprise', async ({ assert }) => {
+    const pro = await OrganizationFactory.merge({ plan: 'pro' }).make()
+    const enterprise = await OrganizationFactory.merge({ plan: 'enterprise' }).make()
+
+    const svc = await app.container.make(QuotaService)
+    assert.isTrue(svc.canManagePorts(pro))
+    assert.isTrue(svc.canManagePorts(enterprise))
+  })
+
+  test('assertCanManagePorts throw pour le plan starter', async ({ assert }) => {
+    const org = await OrganizationFactory.merge({ plan: 'starter' }).make()
+
+    const svc = await app.container.make(QuotaService)
+    assert.throws(() => svc.assertCanManagePorts(org), QuotaExceededError)
+  })
+
+  test('assertCanManagePorts ne throw pas pour le plan pro', async ({ assert }) => {
+    const org = await OrganizationFactory.merge({ plan: 'pro' }).make()
+
+    const svc = await app.container.make(QuotaService)
+    assert.doesNotThrow(() => svc.assertCanManagePorts(org))
+  })
+
+  test('assertCanManagePorts QuotaExceededError a la bonne feature', async ({ assert }) => {
+    const org = await OrganizationFactory.merge({ plan: 'starter' }).make()
+
+    const svc = await app.container.make(QuotaService)
+    let error: QuotaExceededError | undefined
+    try {
+      svc.assertCanManagePorts(org)
+    } catch (err) {
+      error = err as QuotaExceededError
+    }
+
+    assert.instanceOf(error, QuotaExceededError)
+    assert.equal(error!.feature, 'ports')
+    assert.equal(error!.upgradeTo, 'pro')
+  })
 })

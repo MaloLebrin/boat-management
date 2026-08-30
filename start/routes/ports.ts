@@ -57,4 +57,6 @@ router
     router.put('spots/:id', [controllers.Spots, 'update']).as('spots.update')
     router.delete('spots/:id', [controllers.Spots, 'destroy']).as('spots.destroy')
   })
-  .use(middleware.auth())
+  // Cartographie de port réservée aux plans Pro et Entreprise (#604) : la garde
+  // vient après `auth()`, dont elle dépend pour lire l'organisation de l'utilisateur.
+  .use([middleware.auth(), middleware.requirePortsPlan()])
