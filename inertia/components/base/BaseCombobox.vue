@@ -25,6 +25,13 @@ export interface ComboboxOption {
    * commercial exact.
    */
   keywords?: readonly string[]
+  /**
+   * Intitulé de la section sous laquelle l'option est rangée (#597). Les
+   * options d'un même groupe doivent se suivre : l'en-tête est rendu au
+   * changement de groupe, jamais réordonné — c'est l'appelant qui décide de
+   * l'ordre, la liste se contente de le donner à lire.
+   */
+  group?: string
 }
 
 const props = withDefaults(
@@ -93,6 +100,20 @@ const filtered = computed(() => {
   const source = needle ? props.options.filter((o) => matches(o, needle)) : props.options
   return source.slice(0, props.maxVisible)
 })
+
+/**
+ * Les options visibles, chacune sachant si elle ouvre une nouvelle section.
+ * L'index reste celui de `filtered` : la navigation clavier ignore les
+ * en-têtes, qui ne sont pas des options.
+ */
+const rows = computed(() =>
+  filtered.value.map((option, index) => ({
+    option,
+    index,
+    groupLabel:
+      option.group && option.group !== filtered.value[index - 1]?.group ? option.group : null,
+  }))
+)
 
 const activeOptionId = computed(() =>
   activeIndex.value >= 0 && activeIndex.value < filtered.value.length
@@ -221,20 +242,29 @@ function onBlur() {
         role="listbox"
         class="absolute z-20 mt-1 max-h-64 w-full overflow-y-auto rounded-[var(--radius-control)] border border-border bg-surface-elevated py-1 shadow-lg"
       >
-        <li
-          v-for="(option, index) in filtered"
-          :id="`${id}-option-${index}`"
-          :key="option.value"
-          role="option"
-          :aria-selected="index === activeIndex"
-          class="cursor-pointer px-3 py-2 text-sm text-fg"
-          :class="index === activeIndex ? 'bg-surface-muted' : 'hover:bg-surface-muted'"
-          @mousedown.prevent="choose(option)"
-          @mousemove="activeIndex = index"
-        >
-          <span class="block font-medium">{{ option.label }}</span>
-          <span v-if="option.hint" class="block text-xs text-fg-subtle">{{ option.hint }}</span>
-        </li>
+        <template v-for="row in rows" :key="row.option.value">
+          <li
+            v-if="row.groupLabel"
+            role="presentation"
+            class="px-3 pb-1 pt-2 text-xs font-semibold uppercase tracking-wide text-fg-subtle"
+          >
+            {{ row.groupLabel }}
+          </li>
+          <li
+            :id="`${id}-option-${row.index}`"
+            role="option"
+            :aria-selected="row.index === activeIndex"
+            class="cursor-pointer px-3 py-2 text-sm text-fg"
+            :class="row.index === activeIndex ? 'bg-surface-muted' : 'hover:bg-surface-muted'"
+            @mousedown.prevent="choose(row.option)"
+            @mousemove="activeIndex = row.index"
+          >
+            <span class="block font-medium">{{ row.option.label }}</span>
+            <span v-if="row.option.hint" class="block text-xs text-fg-subtle">{{
+              row.option.hint
+            }}</span>
+          </li>
+        </template>
         <li
           v-if="filtered.length === 0"
           class="px-3 py-2 text-sm text-fg-subtle"

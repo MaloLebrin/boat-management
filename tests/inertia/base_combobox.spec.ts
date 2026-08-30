@@ -150,3 +150,47 @@ test('affiche le message de repli quand rien ne correspond', async () => {
 
   expect(w.text()).toContain('Aucun constructeur — votre saisie sera conservée')
 })
+
+test('range les options en sections et n’affiche l’intitulé qu’au changement de groupe', async () => {
+  const w = mount(BaseCombobox, {
+    props: {
+      id: 'brand',
+      name: 'manufacturer',
+      options: [
+        { value: 'yamaha', label: 'Yamaha', group: 'Marques de ce type' },
+        { value: 'tohatsu', label: 'Tohatsu', group: 'Marques de ce type' },
+        { value: 'yanmar', label: 'Yanmar', group: 'Autres marques' },
+      ],
+      modelValue: '',
+    },
+  })
+  await w.find('input').trigger('focus')
+
+  const headers = w.findAll('[role="listbox"] li[role="presentation"]')
+  expect(headers.map((h) => h.text())).toEqual(['Marques de ce type', 'Autres marques'])
+  // Les en-têtes ne sont pas des options : la navigation clavier et le décompte
+  // ARIA continuent de ne voir que les trois marques.
+  expect(w.findAll('[role="option"]')).toHaveLength(3)
+})
+
+test('les en-têtes de section ne perturbent pas la navigation clavier', async () => {
+  const w = mount(BaseCombobox, {
+    props: {
+      id: 'brand',
+      options: [
+        { value: 'yamaha', label: 'Yamaha', group: 'Marques de ce type' },
+        { value: 'yanmar', label: 'Yanmar', group: 'Autres marques' },
+      ],
+      modelValue: '',
+    },
+  })
+  const input = w.find('input')
+  await input.trigger('focus')
+  await input.trigger('keydown', { key: 'ArrowDown' })
+  await input.trigger('keydown', { key: 'ArrowDown' })
+  await input.trigger('keydown', { key: 'Enter' })
+
+  // Deux flèches depuis « rien de surligné » doivent atteindre la 2e marque, et
+  // non un en-tête.
+  expect(w.emitted('update:modelValue')?.at(-1)).toEqual(['Yanmar'])
+})

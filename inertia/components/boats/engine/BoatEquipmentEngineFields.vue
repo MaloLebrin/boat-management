@@ -8,7 +8,10 @@ import { useBoatOptions } from '~/composables/use_boat_options'
 import { useEngineCatalog } from '~/composables/use_engine_catalog'
 import { useEngineFormDraft } from '~/composables/use_engine_form_draft'
 import { ENGINE_KIND_OPTIONS } from '#shared/constants/boats/boat_form_options'
-import { engineFamilyFromCatalogModel } from '#shared/helpers/engine_family'
+import {
+  engineCatalogFamiliesFromSignals,
+  engineFamilyFromCatalogModel,
+} from '#shared/helpers/engine_family'
 import type { EngineModelOption } from '#shared/types/engine_catalog'
 
 export type BoatEquipmentEngineFieldsModel = {
@@ -104,6 +107,19 @@ useEngineFormDraft(
 watch(() => props.engine?.id, syncFromProps)
 
 /**
+ * Familles du catalogue que le type de moteur saisi désigne (#597) — le
+ * sélecteur de marque s'y adapte à chaque changement de `kind`, `fuel` ou
+ * `family`, sans aller-retour serveur : les marques sont déjà toutes là.
+ */
+const catalogFamilies = computed(() =>
+  engineCatalogFamiliesFromSignals({
+    kind: kind.value,
+    fuel: fuel.value,
+    family: family.value,
+  })
+)
+
+/**
  * Pré-remplissage **non destructif** au choix d'un modèle du catalogue : on ne
  * renseigne que les champs restés vides. Une valeur déjà saisie par
  * l'utilisateur — y compris héritée du moteur en cours d'édition — n'est jamais
@@ -180,6 +196,7 @@ function applyCatalogModel(catalogModel: EngineModelOption) {
       :brands="brands"
       :catalog-models="catalogModels"
       :catalog-brand-id="catalogBrandId"
+      :catalog-families="catalogFamilies"
       :engine-model-id="engine?.engineModelId ?? null"
       :surface="surface"
       @select-model="applyCatalogModel"
