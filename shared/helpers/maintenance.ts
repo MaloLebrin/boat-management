@@ -1,4 +1,7 @@
-import { ENGINE_KIND_OPTIONS } from '#shared/constants/boats/boat_form_options'
+import {
+  ENGINE_KIND_OPTIONS,
+  SAIL_MATERIAL_OPTIONS,
+} from '#shared/constants/boats/boat_form_options'
 
 export { toDateTime } from '#shared/helpers/date'
 
@@ -36,9 +39,17 @@ interface SailLike {
 }
 
 export function buildSailCaption(sail: SailLike): string {
+  // Depuis #578, `material` est un slug d'enum (`nylon_spi`) : le caption étant
+  // stocké tel quel, on y écrit le libellé de repli EN plutôt que le slug. La
+  // traduction complète des captions stockés est le chantier #472.
+  const materialLabel = sail.material
+    ? (SAIL_MATERIAL_OPTIONS.find((option) => option.value === sail.material)?.label ??
+      sail.material)
+    : null
+
   const bits = [
     sail.sailType,
-    sail.material,
+    materialLabel,
     sail.areaM2 !== null ? `${sail.areaM2} m²` : null,
   ].filter(Boolean)
   return bits.join(' · ')

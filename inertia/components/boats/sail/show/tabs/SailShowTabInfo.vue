@@ -2,6 +2,7 @@
 import BaseCard from '~/components/base/BaseCard.vue'
 import { useT } from '~/composables/use_t'
 import { useDateFormat } from '~/composables/use_date_format'
+import { sailMaterialLabel } from '~/utils/boat_enum_labels'
 import type { BoatSailDetail } from '~/types/boat_show'
 
 defineProps<{ sail: BoatSailDetail }>()
@@ -25,11 +26,17 @@ const { formatDate } = useDateFormat()
         </dt>
         <dd class="mt-1 text-sm text-fg">{{ sail.areaM2 }}</dd>
       </div>
+      <div v-if="sail.sailmaker">
+        <dt class="text-xs font-semibold uppercase tracking-wide text-fg-subtle">
+          {{ t('boats.sailShow.fields.sailmaker') }}
+        </dt>
+        <dd class="mt-1 text-sm text-fg">{{ sail.sailmaker }}</dd>
+      </div>
       <div v-if="sail.material">
         <dt class="text-xs font-semibold uppercase tracking-wide text-fg-subtle">
           {{ t('boats.sailShow.fields.material') }}
         </dt>
-        <dd class="mt-1 text-sm text-fg">{{ sail.material }}</dd>
+        <dd class="mt-1 text-sm text-fg">{{ sailMaterialLabel(t, sail.material) }}</dd>
       </div>
       <div v-if="sail.reefPoints !== null">
         <dt class="text-xs font-semibold uppercase tracking-wide text-fg-subtle">

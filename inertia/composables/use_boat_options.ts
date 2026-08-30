@@ -13,6 +13,7 @@ import {
   RIG_TYPE_OPTIONS,
   SAFETY_EQUIPMENT_STATUS_OPTIONS,
   SAFETY_EQUIPMENT_TYPE_OPTIONS,
+  SAIL_MATERIAL_OPTIONS,
   SAIL_TYPE_OPTIONS,
 } from '../../shared/constants/boats/boat_form_options'
 import { ARMAMENT_ZONE_OPTIONS } from '../../shared/constants/safety/division240_content'
@@ -77,6 +78,13 @@ export function useBoatOptions() {
     }))
   )
 
+  const sailMaterialOptions = computed(() =>
+    SAIL_MATERIAL_OPTIONS.map((o) => ({
+      value: o.value,
+      label: t(`boats.options.sailMaterial.${o.value}`),
+    }))
+  )
+
   const rigTypeOptions = computed(() =>
     RIG_TYPE_OPTIONS.map((o) => ({ value: o.value, label: t(`boats.options.rigType.${o.value}`) }))
   )
@@ -132,6 +140,7 @@ export function useBoatOptions() {
     engineFuelOptions,
     engineStrokeTypeOptions,
     sailTypeOptions,
+    sailMaterialOptions,
     rigTypeOptions,
     navigationCategoryOptions,
     armamentZoneOptions,

@@ -1176,7 +1176,9 @@ export class BoatSailSchema extends BaseModel {
     'purchasePrice',
     'purchasedAt',
     'reefPoints',
+    'sailLoftId',
     'sailType',
+    'sailmaker',
     'status',
     'updatedAt',
   ] as const
@@ -1202,7 +1204,11 @@ export class BoatSailSchema extends BaseModel {
   @column()
   declare reefPoints: number | null
   @column()
+  declare sailLoftId: number | null
+  @column()
   declare sailType: string
+  @column()
+  declare sailmaker: string | null
   @column()
   declare status: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })
@@ -2510,6 +2516,36 @@ export class RentalContractSchema extends BaseModel {
   declare status: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
+}
+
+export class SailLoftSchema extends BaseModel {
+  static $columns = [
+    'aliases',
+    'country',
+    'createdAt',
+    'id',
+    'isActive',
+    'name',
+    'slug',
+    'updatedAt',
+  ] as const
+  $columns = SailLoftSchema.$columns
+  @column()
+  declare aliases: any | null
+  @column()
+  declare country: string | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare isActive: boolean
+  @column()
+  declare name: string
+  @column()
+  declare slug: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
 }
 
 export class SimulatorLeadSchema extends BaseModel {

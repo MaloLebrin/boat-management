@@ -11,7 +11,7 @@ import type { BoatShowSail } from '~/types/boat_show'
 import BoatEquipmentSailFields from './BoatEquipmentSailFields.vue'
 import { useT } from '~/composables/use_t'
 import { useDateFormat } from '~/composables/use_date_format'
-import { sailTypeLabel } from '~/utils/boat_enum_labels'
+import { sailMaterialLabel, sailTypeLabel } from '~/utils/boat_enum_labels'
 
 defineProps<{
   boatId: number
@@ -64,7 +64,7 @@ function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutra
                 {{ sailTypeLabel(t, s.sailType) }}
               </p>
               <BaseBadge v-if="s.material" variant="neutral">
-                {{ s.material }}
+                {{ sailMaterialLabel(t, s.material) }}
               </BaseBadge>
               <BaseBadge :variant="statusVariant(s.status)">
                 {{ t(`equipment.status.${s.status}`) }}

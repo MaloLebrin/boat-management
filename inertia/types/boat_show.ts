@@ -111,6 +111,10 @@ export type BoatShowSail = {
   material: string | null
   reefPoints: number | null
   status: 'operational' | 'in_maintenance' | 'out_of_service' | 'retired'
+  /** Voilerie en texte libre (#578) — source de vérité, saisie hors référentiel comprise. */
+  sailmaker: string | null
+  /** Rattachement facultatif au référentiel `sail_lofts` (#578). */
+  sailLoftId: number | null
 }
 
 export type BoatShowRig = {

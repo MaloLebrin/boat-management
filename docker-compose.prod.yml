@@ -49,10 +49,11 @@ services:
   # vierge, ou incluant une nouvelle migration, n'a besoin d'aucune intervention.
   # `restart: no` — un `migration:run` qui échoue doit faire échouer le déploiement.
   #
-  # Les seeders de catalogue (bateaux #571, moteurs #573) s'enchaînent
-  # derrière : ce sont des référentiels métier, pas des données de démo, et ils
-  # sont idempotents (`updateOrCreate` sur le slug, jamais de `delete`) — les
-  # rejouer à chaque déploiement met les corpus à jour sans doublon.
+  # Les seeders de catalogue (bateaux #571, moteurs #573, équipements #577,
+  # voileries #578) s'enchaînent derrière : ce sont des référentiels métier, pas
+  # des données de démo, et ils sont idempotents (`updateOrCreate` sur le slug,
+  # jamais de `delete`) — les rejouer à chaque déploiement met les corpus à jour
+  # sans doublon.
   migrator:
     image: ghcr.io/malolebrin/boat-management:${IMAGE_TAG:-latest}
     env_file: .env
@@ -62,7 +63,7 @@ services:
     command:
       - sh
       - -c
-      - node ace migration:run --force && node ace db:seed --files=database/seeders/boat_catalog_seeder.js --force && node ace db:seed --files=database/seeders/engine_catalog_seeder.js --force && node ace db:seed --files=database/seeders/equipment_catalog_seeder.js --force
+      - node ace migration:run --force && node ace db:seed --files=database/seeders/boat_catalog_seeder.js --force && node ace db:seed --files=database/seeders/engine_catalog_seeder.js --force && node ace db:seed --files=database/seeders/equipment_catalog_seeder.js --force && node ace db:seed --files=database/seeders/sail_loft_seeder.js --force
     depends_on:
       postgres:
         condition: service_healthy

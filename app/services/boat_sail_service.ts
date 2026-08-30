@@ -26,8 +26,11 @@ export default class BoatSailService {
       areaM2: payload.areaM2 ?? null,
       material: payload.material ?? null,
       reefPoints: payload.reefPoints ?? null,
+      notes: payload.notes ?? null,
       purchasePrice: payload.purchasePrice ?? null,
       purchasedAt: toDateOrNull(payload.purchasedAt),
+      sailmaker: payload.sailmaker ?? null,
+      sailLoftId: payload.sailLoftId ?? null,
     })
   }
 
@@ -45,6 +48,8 @@ export default class BoatSailService {
     sail.notes = payload.notes ?? null
     sail.purchasePrice = payload.purchasePrice ?? null
     sail.purchasedAt = toDateOrNull(payload.purchasedAt)
+    sail.sailmaker = payload.sailmaker ?? null
+    sail.sailLoftId = payload.sailLoftId ?? null
 
     await sail.save()
     return sail

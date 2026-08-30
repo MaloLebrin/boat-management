@@ -9,6 +9,7 @@ import BoatMaintenanceTaskService from '#services/boat_maintenance_task_service'
 import EngineCatalogService from '#services/engine_catalog_service'
 import MediaService from '#services/media_service'
 import OrganizationService from '#services/organization_service'
+import SailLoftService from '#services/sail_loft_service'
 import {
   type BoatEngineFormBody,
   type BoatRigFormBody,
@@ -39,7 +40,8 @@ export default class BoatEquipmentController {
     private enginePartService: BoatEnginePartService,
     private organizationService: OrganizationService,
     private diagnosticService: BoatEngineDiagnosticService,
-    private engineCatalogService: EngineCatalogService
+    private engineCatalogService: EngineCatalogService,
+    private sailLoftService: SailLoftService
   ) {}
 
   private async loadBoatForEquipment(ctx: Pick<HttpContext, 'auth' | 'response' | 'params'>) {
@@ -219,7 +221,10 @@ export default class BoatEquipmentController {
         reefPoints: sail.reefPoints,
         status: sail.status,
         notes: sail.notes,
+        sailmaker: sail.sailmaker,
+        sailLoftId: sail.sailLoftId,
       },
+      ...(await this.sailLoftService.formProps(sail)),
     })
   }
 
@@ -250,6 +255,8 @@ export default class BoatEquipmentController {
         reefPoints: sail.reefPoints,
         status: sail.status,
         notes: sail.notes,
+        sailmaker: sail.sailmaker,
+        sailLoftId: sail.sailLoftId,
         photos: media.filter((m) => m.kind === 'photo').map(toMediaRow),
       },
       canManage,

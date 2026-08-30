@@ -1,6 +1,7 @@
 import vine from '@vinejs/vine'
 import { engineFuels, engineKinds, rigTypes, sailTypes } from '#validators/boat'
 import { ENGINE_FAMILIES } from '#shared/types/engine_catalog'
+import { SAIL_MATERIALS } from '#shared/types/boat'
 import type { BoatEnginePayload, BoatRigPayload, BoatSailPayload } from '#shared/types/boat'
 
 export const equipmentStatuses = [
@@ -62,16 +63,28 @@ export type BoatEngineFormBody = {
   status?: string
 }
 
+/**
+ * Matériau de voile (#578) — vocabulaire fermé, « je ne sais pas » est une
+ * réponse valide (le select vide envoie une chaîne vide).
+ */
+const sailMaterialChoices = [...SAIL_MATERIALS, '', '__none__'] as string[]
+
 const sailPayload = vine.object({
   sailType: vine.enum(sailTypes),
   manufacturedAt: vine.string().trim().optional(),
   areaM2: vine.string().trim().optional(),
-  material: vine.string().trim().maxLength(120).optional(),
+  material: vine.string().trim().in(sailMaterialChoices).optional(),
   reefPoints: vine.string().trim().optional(),
   status: vine.enum(equipmentStatuses).optional(),
   notes: vine.string().trim().maxLength(5000).optional(),
   purchasePrice: vine.string().trim().optional(),
   purchasedAt: vine.string().trim().optional(),
+  sailmaker: vine.string().trim().maxLength(160).optional(),
+  // Rattachement au référentiel des voileries (#578), posé par la combobox du
+  // formulaire. Volontairement une simple chaîne : le champ est masqué, une
+  // valeur aberrante doit se neutraliser en `null` plutôt que faire échouer la
+  // saisie — `sailmaker` reste la source de vérité.
+  sailLoftId: vine.string().trim().optional(),
 })
 
 export const storeBoatSailValidator = vine.create(sailPayload)
@@ -88,6 +101,8 @@ export type BoatSailFormBody = {
   notes?: string
   purchasePrice?: string
   purchasedAt?: string
+  sailmaker?: string
+  sailLoftId?: string
 }
 
 const rigPayload = vine.object({
@@ -185,16 +200,23 @@ export function equipmentBodyToEnginePayload(body: BoatEngineFormBody): BoatEngi
 }
 
 export function equipmentBodyToSailPayload(body: BoatSailFormBody): BoatSailPayload {
+  const material =
+    body.material === undefined || body.material === '' || body.material === '__none__'
+      ? null
+      : body.material
+
   return {
     sailType: body.sailType,
     manufacturedAt: emptyToNull(body.manufacturedAt),
     areaM2: parseOptionalPositiveFloat(body.areaM2),
-    material: emptyToNull(body.material),
+    material,
     reefPoints: parseOptionalNonNegativeInt(body.reefPoints),
     status: (body.status ?? 'operational') as EquipmentStatus,
     notes: emptyToNull(body.notes),
     purchasePrice: emptyToNull(body.purchasePrice),
     purchasedAt: emptyToNull(body.purchasedAt),
+    sailmaker: emptyToNull(body.sailmaker),
+    sailLoftId: parseOptionalId(body.sailLoftId),
   }
 }
 

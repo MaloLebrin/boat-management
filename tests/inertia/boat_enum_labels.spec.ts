@@ -7,6 +7,7 @@ import {
   engineSerialSuffix,
   maintenanceSubjectLabel,
   rigTypeLabel,
+  sailMaterialLabel,
   sailTypeLabel,
 } from '../../inertia/utils/boat_enum_labels'
 import { ENGINE_KIND_OPTIONS } from '../../shared/constants/boats/boat_form_options'
@@ -47,6 +48,23 @@ describe('sailTypeLabel', () => {
 
   test('falls back to the raw value for an unknown sail type', () => {
     expect(sailTypeLabel(t, 'legacy-value')).toBe('legacy-value')
+  })
+})
+
+describe('sailMaterialLabel', () => {
+  test('translates a known sail material', () => {
+    expect(sailMaterialLabel(t, 'dacron')).toBe('translated:boats.options.sailMaterial.dacron')
+  })
+
+  test('falls back to the raw value for a legacy material', () => {
+    // Les voiles antérieures à la normalisation #578 peuvent porter n'importe
+    // quelle chaîne : elle doit s'afficher telle quelle, jamais une clé cassée.
+    expect(sailMaterialLabel(t, 'kevlar taffeta')).toBe('kevlar taffeta')
+  })
+
+  test('returns null for a null or undefined value', () => {
+    expect(sailMaterialLabel(t, null)).toBeNull()
+    expect(sailMaterialLabel(t, undefined)).toBeNull()
   })
 })
 
