@@ -2,7 +2,6 @@ import { INBOARD_SPARE_PART_ASSEMBLIES } from '#shared/constants/spare_parts/inb
 import type { DiagnosticSheetSlug } from '#shared/types/diagnostic'
 import type { EngineFamily } from '#shared/types/engine_catalog'
 import type {
-  EnginePlateHint,
   PartAssemblySlug,
   SparePartAssembly,
   SparePartCatalogEntry,
@@ -13,8 +12,12 @@ import type {
 
 /**
  * Contenu statique de l'identification des pièces détachées : ensembles
- * fonctionnels, pièces courantes, pièces sans référence, plaques signalétiques
- * et liens revendeurs.
+ * fonctionnels, pièces courantes, pièces sans référence et liens revendeurs.
+ *
+ * Les aides plaque signalétique ont quitté ce fichier avec #575 : elles sont
+ * désormais portées par `engine_brands` (`plate_location_key`,
+ * `plate_example_key`) et couvrent tout le catalogue de #573, là où le tableau
+ * statique s'arrêtait à trois marques.
  *
  * Ce fichier porte les **neuf ensembles hors-bord** de l'issue #517 et agrège
  * les **douze ensembles in-bord** de #574
@@ -427,27 +430,6 @@ export const UNREFERENCED_PARTS: readonly UnreferencedPartItem[] = [
     key: 'unreferenced.consumables',
     labelKey: 'parts.unreferenced.items.consumables.label',
     adviceKey: 'parts.unreferenced.items.consumables.advice',
-  },
-]
-
-/** Aide visuelle : où trouver la plaque signalétique selon la marque. */
-export const ENGINE_PLATE_HINTS: readonly EnginePlateHint[] = [
-  {
-    brand: 'yamaha',
-    brandName: 'Yamaha',
-    locationKey: 'parts.identify.plate.yamaha.location',
-    exampleKey: 'parts.identify.plate.yamaha.example',
-  },
-  {
-    brand: 'johnson-evinrude',
-    brandName: 'Johnson / Evinrude',
-    locationKey: 'parts.identify.plate.johnson_evinrude.location',
-    exampleKey: 'parts.identify.plate.johnson_evinrude.example',
-  },
-  {
-    brand: 'mercury-mariner',
-    brandName: 'Mercury / Mariner',
-    locationKey: 'parts.identify.plate.mercury_mariner.location',
   },
 ]
 

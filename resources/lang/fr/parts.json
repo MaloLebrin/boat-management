@@ -37,7 +37,8 @@
     },
     "serialWarning": {
       "title": "Le numéro de série départage les variantes",
-      "text": "Un même code modèle couvre parfois plusieurs décennies de production. Dans le catalogue, c'est le numéro de série qui départage les variantes : relevez-le sur la plaque avant de commander."
+      "text": "Un même code modèle couvre parfois plusieurs décennies de production. Dans le catalogue, c'est le numéro de série qui départage les variantes : relevez-le sur la plaque avant de commander.",
+      "ambiguous": "Le code « {model} » correspond à {count} modèles du catalogue : seul le numéro de série permet de trancher."
     },
     "plate": {
       "title": "Où trouver la plaque signalétique ?",
@@ -52,6 +53,35 @@
       },
       "mercury_mariner": {
         "location": "Sur le support de bridage ou sur le bloc, sous le capot ; le numéro de série est la clé d'entrée du catalogue."
+      },
+      "unknownBrand": "La marque de ce moteur n'est pas encore couverte par nos aides plaque : la plaque se trouve presque toujours sur le support de bridage, le tableau arrière ou le bloc, sous le capot.",
+      "suzuki": {
+        "location": "Sur le support de bridage, côté tribord, ou sous le capot sur le bloc."
+      },
+      "honda": {
+        "location": "Sur le support de bridage ou sur le carter, sous le capot ; la plaque porte le type de moteur et le numéro de série."
+      },
+      "tohatsu": {
+        "location": "Sur le support de bridage ; les modèles récents portent aussi une étiquette sous le capot."
+      },
+      "selva": {
+        "location": "Sur le support de bridage ; les blocs sont d'origine Yamaha, la référence Yamaha correspondante est souvent gravée sur le moteur."
+      },
+      "volvo_penta": {
+        "location": "Sur le cache-culbuteurs ou le carter de distribution, et sur l'embase pour un saildrive : deux plaques distinctes, relevez les deux.",
+        "example": "Exemple : « D1-20 » est la désignation du moteur, le numéro à sept chiffres qui suit identifie l'exemplaire."
+      },
+      "yanmar": {
+        "location": "Sur le cache-culbuteurs ou sur le bloc, côté échangeur ; le numéro de série est aussi frappé sur le bloc."
+      },
+      "nanni": {
+        "location": "Sur le cache-culbuteurs ; le bloc d'origine (Kubota, Toyota) porte en plus sa propre plaque, utile pour les pièces moteur."
+      },
+      "beta_marine": {
+        "location": "Sur le cache-culbuteurs ou le capot d'insonorisation ; le bloc Kubota d'origine porte sa propre plaque."
+      },
+      "mercruiser": {
+        "location": "Sur le carter de distribution ou le collecteur, et sur l'embase pour un Z-drive : relevez les deux numéros."
       }
     },
     "assemblies": {
@@ -117,8 +147,10 @@
         "part": "Pièce",
         "catalogName": "Intitulé catalogue (EN)",
         "reference": "Référence",
-        "quantity": "Quantité"
-      }
+        "quantity": "Quantité",
+        "referenceSource": "Source de la référence"
+      },
+      "manualSource": "Saisie manuelle"
     }
   },
   "crossLinks": {
@@ -702,5 +734,11 @@
         }
       }
     }
+  },
+  "reference": {
+    "label": "Référence constructeur",
+    "sourcePrefix": "Source :",
+    "verifiedAt": "Vérifiée le {date}.",
+    "unverified": "Non revérifiée — contrôlez-la sur la vue éclatée avant de commander."
   }
 }

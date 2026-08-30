@@ -10,25 +10,22 @@ import SparePartsPartList from '~/components/spare_parts/SparePartsPartList.vue'
 import SparePartsRetailerLinks from '~/components/spare_parts/SparePartsRetailerLinks.vue'
 import { DIAGNOSTIC_SHEETS } from '#shared/constants/diagnostic/diagnostic_content'
 import { SPARE_PART_ASSEMBLIES } from '#shared/constants/spare_parts/spare_parts_content'
-import { sparePartsBrandFromCatalogSlug, yamahaReferenceExample } from '#shared/helpers/spare_parts'
-import type { PartAssemblySlug, RepairCartItemRow } from '#shared/types/spare_parts'
+import { referenceExampleFromPattern } from '#shared/helpers/spare_parts'
+import type {
+  PartAssemblySlug,
+  RepairCartItemRow,
+  SparePartReferenceRow,
+  SparePartsEngineProps,
+} from '#shared/types/spare_parts'
 import { useT } from '~/composables/use_t'
 import { engineDisplayTitle } from '~/utils/boat_enum_labels'
 
 const props = defineProps<{
   boat: { id: number; name: string }
-  engine: {
-    id: number
-    brand: string | null
-    model: string | null
-    catalogBrandSlug: string | null
-    serialNumber: string | null
-    kind: string
-    /** Famille de motorisation (#574) — décide des ensembles proposés. */
-    family: string | null
-    status: string
-  }
+  engine: SparePartsEngineProps
   assemblySlug: PartAssemblySlug
+  /** Références constructeur connues pour ce moteur (#575). */
+  partReferences: SparePartReferenceRow[]
   cartItems: RepairCartItemRow[]
   canManage: boolean
 }>()
@@ -41,12 +38,24 @@ const identifyHref = computed(
   () => `/boats/${props.boat.id}/engines/${props.engine.id}/spare-parts`
 )
 
-/** Carte « décoder une référence » : marque Yamaha + code fonction connu. */
-const yamahaDecode = computed(() => {
+/**
+ * Carte « décoder une référence » (#575) : la marque déclare un motif de
+ * référence et l'ensemble a un code fonction connu.
+ *
+ * Généralise le cas Yamaha de #517, qui testait la marque en dur. Une marque
+ * sans motif n'affiche pas la carte du tout — c'est déjà ce que voyait un
+ * possesseur de Mercury avant #575.
+ */
+const referenceDecode = computed(() => {
+  const pattern = props.engine.referencePattern
   const code = assembly.value.yamahaFunctionCode
-  if (!code || sparePartsBrandFromCatalogSlug(props.engine.catalogBrandSlug) !== 'yamaha')
-    return null
-  return { code, example: yamahaReferenceExample(props.engine.model, code) }
+  if (!pattern || !code) return null
+
+  return {
+    code,
+    example: referenceExampleFromPattern(pattern, props.engine.model, code),
+    explanationKey: pattern.explanationKey,
+  }
 })
 
 const diagnosticSheetLink = computed(() => {
@@ -81,14 +90,14 @@ const breadcrumb = computed(() => [
       <SparePartsRetailerLinks :engine="engine" :catalog-label="assembly.catalogLabel" />
     </div>
 
-    <div v-if="yamahaDecode" class="mt-6">
+    <div v-if="referenceDecode" class="mt-6">
       <BaseCard padded>
         <h2 class="text-lg font-semibold text-fg">{{ t('parts.assembly.decode.title') }}</h2>
         <p class="mt-1 text-sm text-fg-muted">
           {{
-            t('parts.assembly.decode.text', {
-              example: yamahaDecode.example,
-              code: yamahaDecode.code,
+            t(referenceDecode.explanationKey, {
+              example: referenceDecode.example,
+              code: referenceDecode.code,
             })
           }}
         </p>
@@ -102,6 +111,7 @@ const breadcrumb = computed(() => [
       <SparePartsPartList
         :parts="assembly.parts"
         :cart-items="cartItems"
+        :references="partReferences"
         :can-manage="canManage"
         :boat-id="boat.id"
         :engine-id="engine.id"
@@ -119,6 +129,7 @@ const breadcrumb = computed(() => [
     <div class="mt-10">
       <SparePartsCartPanel
         :cart-items="cartItems"
+        :references="partReferences"
         :can-manage="canManage"
         :boat-id="boat.id"
         :engine-id="engine.id"

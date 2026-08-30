@@ -1386,6 +1386,9 @@ export class EngineBrandSchema extends BaseModel {
     'id',
     'isActive',
     'name',
+    'plateExampleKey',
+    'plateLocationKey',
+    'referencePattern',
     'slug',
     'updatedAt',
   ] as const
@@ -1404,6 +1407,12 @@ export class EngineBrandSchema extends BaseModel {
   declare isActive: boolean
   @column()
   declare name: string
+  @column()
+  declare plateExampleKey: string | null
+  @column()
+  declare plateLocationKey: string | null
+  @column()
+  declare referencePattern: any | null
   @column()
   declare slug: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })
@@ -1462,6 +1471,39 @@ export class EngineModelSchema extends BaseModel {
   declare strokeType: string | null
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime
+}
+
+export class EnginePartReferenceSchema extends BaseModel {
+  static $columns = [
+    'createdAt',
+    'engineModelId',
+    'id',
+    'partKey',
+    'reference',
+    'sourceLabel',
+    'sourceUrl',
+    'updatedAt',
+    'verifiedAt',
+  ] as const
+  $columns = EnginePartReferenceSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare engineModelId: number
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare partKey: string
+  @column()
+  declare reference: string
+  @column()
+  declare sourceLabel: string
+  @column()
+  declare sourceUrl: string | null
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
+  @column.date()
+  declare verifiedAt: DateTime | null
 }
 
 export class InvoiceCounterSchema extends BaseModel {

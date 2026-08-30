@@ -3,6 +3,7 @@ import EngineModel from '#models/engine_model'
 import { normalizeCatalogText } from '#shared/helpers/boat_catalog'
 import { catalogTokenNgrams } from '#shared/helpers/engine_catalog'
 import { escapeLike } from '#shared/helpers/query'
+import type { EnginePlateHint } from '#shared/types/spare_parts'
 import type {
   EngineBrandOption,
   EngineModelOption,
@@ -154,6 +155,9 @@ export default class EngineCatalogService {
       'country',
       'families',
       'aliases',
+      // Le motif de référence (#575) voyage avec la marque résolue : les écrans
+      // pièces détachées le reçoivent sans second aller-retour.
+      'referencePattern',
     ])
 
     // Première passe : égalité stricte, comme `BoatCatalogService.resolveBrand`.
@@ -181,6 +185,92 @@ export default class EngineCatalogService {
     }
 
     return null
+  }
+
+  /**
+   * Aides plaque signalétique (#575) : celle de la marque du moteur, ou toutes
+   * celles du catalogue quand la marque n'est pas résolue.
+   *
+   * C'est le comportement de #517 — marque inconnue → on affiche tout ce qu'on
+   * sait, faute de mieux — mais servi par le catalogue au lieu d'un tableau de
+   * trois marques codé en dur. Une marque qui n'a pas encore d'aide n'apparaît
+   * pas : mieux vaut une liste courte que des lignes vides.
+   */
+  async plateHints(brandSlug: string | null | undefined): Promise<EnginePlateHint[]> {
+    const query = EngineBrand.query()
+      .select(['id', 'slug', 'name', 'plateLocationKey', 'plateExampleKey'])
+      .whereNotNull('plateLocationKey')
+      .orderBy('name', 'asc')
+
+    if (brandSlug) query.where('slug', brandSlug)
+
+    const brands = await query
+
+    return brands.map((brand) => ({
+      brandSlug: brand.slug,
+      brandName: brand.name,
+      // `whereNotNull` ci-dessus garantit la clé ; le `??` n'est là que pour le
+      // typage de la colonne nullable.
+      locationKey: brand.plateLocationKey ?? '',
+      exampleKey: brand.plateExampleKey,
+    }))
+  }
+
+  /**
+   * Modèle du catalogue correspondant à un moteur : celui **rattaché**
+   * (`engine_model_id`, #573) en priorité, sinon celui que la saisie libre
+   * `brand` + `model` permet de rapprocher.
+   *
+   * Le repli n'est pas de la redondance : les moteurs saisis avant #573 n'ont
+   * pas de `engine_model_id`, et un `Yamaha` / `F150` doit tout de même trouver
+   * ses références. Le rapprochement se fait sur le nom, le code plaque puis
+   * les alias du modèle, toujours **au sein de la marque résolue** — sans quoi
+   * un `D2-40` de deux motoristes se confondrait.
+   */
+  async resolveModelForEngine(engine: {
+    engineModelId?: number | null
+    brand?: string | null
+    model?: string | null
+  }): Promise<EngineModel | null> {
+    if (engine.engineModelId) {
+      const linked = await EngineModel.find(engine.engineModelId)
+      if (linked) return linked
+    }
+
+    if (!engine.model) return null
+    const brand = await this.resolveBrand(engine.brand)
+    if (!brand) return null
+
+    const needle = normalizeCatalogText(engine.model)
+    if (!needle) return null
+
+    const models = await EngineModel.query()
+      .where('engineBrandId', brand.id)
+      .select(['id', 'engineBrandId', 'slug', 'name', 'modelCode', 'family', 'aliases'])
+
+    return (
+      models.find((model) =>
+        [model.slug, model.name, model.modelCode, ...(model.aliases ?? [])].some(
+          (candidate) => candidate && normalizeCatalogText(candidate) === needle
+        )
+      ) ?? null
+    )
+  }
+
+  /**
+   * Nombre de modèles du catalogue partageant un même code plaque (#575).
+   *
+   * Sert l'avertissement « le numéro de série départage les variantes » : dès
+   * qu'un `model_code` couvre plusieurs modèles, l'écran le dit explicitement
+   * au lieu de s'en tenir à la mise en garde générale.
+   */
+  async countModelsForModelCode(modelCode: string | null | undefined): Promise<number> {
+    if (!modelCode?.trim()) return 0
+
+    const result = await EngineModel.query()
+      .where('modelCode', modelCode.trim())
+      .count('* as total')
+    return Number(result[0]?.$extras.total ?? 0)
   }
 
   private toBrandOption(brand: EngineBrand): EngineBrandOption {

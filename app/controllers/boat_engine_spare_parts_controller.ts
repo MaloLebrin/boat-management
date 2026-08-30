@@ -48,12 +48,24 @@ export default class BoatEngineSparePartsController {
    */
   private async engineProps(engine: BoatEngine) {
     const catalogBrand = await this.engineCatalogService.resolveBrand(engine.brand)
+    const catalogModel = await this.engineCatalogService.resolveModelForEngine(engine)
+
+    // Un code plaque partagé par plusieurs modèles est exactement le cas que la
+    // mise en garde « le numéro de série départage les variantes » vise (#575) :
+    // l'écran le dit alors explicitement, au lieu de s'en tenir au général.
+    const modelCode = catalogModel?.modelCode ?? engine.model
+    const modelCodeMatches = await this.engineCatalogService.countModelsForModelCode(modelCode)
 
     return {
       id: engine.id,
       brand: engine.brand,
       model: engine.model,
       catalogBrandSlug: catalogBrand?.slug ?? null,
+      // Motif de décodage des références de la marque (#575), `null` quand elle
+      // n'en déclare pas : la carte « décoder une référence » ne s'affiche
+      // alors pas du tout, comme pour toute marque non-Yamaha avant #575.
+      referencePattern: catalogBrand?.referencePattern ?? null,
+      modelCodeMatches,
       serialNumber: engine.serialNumber,
       kind: engine.kind,
       // Famille de motorisation (#574) : c'est elle qui décide des ensembles
@@ -91,10 +103,15 @@ export default class BoatEngineSparePartsController {
       const engine = await this.sparePartsService.getEligibleEngineOrFail(user, boat, engineId)
       const cartItems = await this.sparePartsService.getCartItems(engine)
       const canManage = await bouncer.with(MaintenancePolicy).allows('edit', boat)
+      const engineProps = await this.engineProps(engine)
 
       return inertia.render('spare_parts/identify', {
         boat: { id: boat.id, name: boat.name },
-        engine: await this.engineProps(engine),
+        engine: engineProps,
+        // Aides plaque portées par le catalogue (#575) : celle de la marque du
+        // moteur, ou toutes celles connues quand la marque n'est pas résolue.
+        plateHints: await this.engineCatalogService.plateHints(engineProps.catalogBrandSlug),
+        partReferences: await this.sparePartsService.getPartReferences(engine),
         cartItems,
         canManage,
       })
@@ -145,6 +162,7 @@ export default class BoatEngineSparePartsController {
         boat: { id: boat.id, name: boat.name },
         engine: await this.engineProps(engine),
         assemblySlug: assemblySlug as PartAssemblySlug,
+        partReferences: await this.sparePartsService.getPartReferences(engine),
         cartItems,
         canManage,
       })

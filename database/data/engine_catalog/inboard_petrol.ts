@@ -21,6 +21,7 @@ export const INBOARD_PETROL_BRANDS: readonly EngineBrandSeed[] = [
     aliases: ['mercruiser', 'mercury mercruiser', 'mer cruiser'],
     modelCodeFromName: true,
     modelDefaults: { fuel: 'essence', strokeType: '4_stroke' },
+    plateLocationKey: 'parts.identify.plate.mercruiser.location',
     models: {
       inboard_petrol: [
         { name: '3.0L MPI', powerHp: 135, cylinders: 4 },

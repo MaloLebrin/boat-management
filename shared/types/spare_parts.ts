@@ -1,5 +1,5 @@
 import type { DiagnosticSheetSlug } from '#shared/types/diagnostic'
-import type { EngineFamily } from '#shared/types/engine_catalog'
+import type { EngineFamily, EngineReferencePattern } from '#shared/types/engine_catalog'
 
 /**
  * Ensembles fonctionnels des catalogues de pièces détachées. La nomenclature
@@ -97,13 +97,18 @@ export interface UnreferencedPartItem {
   adviceKey: string
 }
 
-/** Où trouver la plaque signalétique selon la marque. */
+/**
+ * Où trouver la plaque signalétique, **porté par la marque du catalogue**
+ * (#575) : la ligne vient de `engine_brands.plate_location_key` /
+ * `plate_example_key`, plus d'un tableau statique de trois marques.
+ */
 export interface EnginePlateHint {
-  brand: SparePartsBrandSlug
+  /** Slug de la marque du catalogue moteur (#573), pas du corpus pièces. */
+  brandSlug: string
   /** Nom d'affichage de la marque (nom propre, identique dans les deux locales). */
   brandName: string
   locationKey: string
-  exampleKey?: string
+  exampleKey: string | null
 }
 
 /** Lien sortant vers un catalogue revendeur (vue éclatée) — solution v1. */
@@ -143,6 +148,50 @@ export interface RepairCartItemRow {
   id: number
   partKey: string
   quantity: number
-  /** Référence constructeur relevée par l'utilisateur sur la vue éclatée. */
+  /**
+   * Référence constructeur : pré-remplie depuis `engine_part_references` quand
+   * le couple (modèle, pièce) en a une (#575), sinon relevée par l'utilisateur
+   * sur la vue éclatée. Modifiable dans les deux cas.
+   */
   reference: string | null
+}
+
+/**
+ * Moteur tel que le contrôleur le projette vers les écrans « pièces
+ * détachées ». Les deux pages (identification, ensemble) reçoivent exactement
+ * la même forme — d'où le type partagé plutôt que deux `defineProps` jumeaux.
+ */
+export interface SparePartsEngineProps {
+  id: number
+  brand: string | null
+  model: string | null
+  /** Slug de la marque du catalogue moteur (#573), résolu côté serveur. */
+  catalogBrandSlug: string | null
+  /** Motif de décodage des références de la marque (#575), si elle en a un. */
+  referencePattern: EngineReferencePattern | null
+  /**
+   * Nombre de modèles du catalogue partageant le code plaque du moteur (#575).
+   * Au-delà de 1, l'écran précise que le numéro de série départage les variantes.
+   */
+  modelCodeMatches: number
+  serialNumber: string | null
+  kind: string
+  /** Famille de motorisation (#574) — décide des ensembles proposés. */
+  family: string | null
+  status: string
+}
+
+/**
+ * Référence constructeur connue pour un couple (modèle moteur, pièce) — #575.
+ *
+ * `sourceLabel` n'est jamais vide : la colonne est `NOT NULL` en base, de sorte
+ * qu'aucune référence ne puisse s'afficher sans indication de sa provenance.
+ */
+export interface SparePartReferenceRow {
+  partKey: string
+  reference: string
+  sourceLabel: string
+  sourceUrl: string | null
+  /** `YYYY-MM-DD`, `null` tant que l'entrée n'a pas été revérifiée. */
+  verifiedAt: string | null
 }

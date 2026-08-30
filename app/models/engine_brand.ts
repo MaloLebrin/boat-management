@@ -1,5 +1,5 @@
 import EngineModel from '#models/engine_model'
-import type { EngineCatalogFamily } from '#shared/types/engine_catalog'
+import type { EngineCatalogFamily, EngineReferencePattern } from '#shared/types/engine_catalog'
 import { BaseModel, column, hasMany } from '@adonisjs/lucid/orm'
 import type { HasMany } from '@adonisjs/lucid/types/relations'
 import { DateTime } from 'luxon'
@@ -44,6 +44,24 @@ export default class EngineBrand extends BaseModel {
 
   @column()
   declare isActive: boolean
+
+  /**
+   * Où trouver la plaque signalétique chez cette marque (#575) — clés i18n,
+   * `null` tant que le contenu n'a pas été écrit pour elle.
+   */
+  @column()
+  declare plateLocationKey: string | null
+
+  @column()
+  declare plateExampleKey: string | null
+
+  /** Motif de décodage des références constructeur (#575), si la marque en a un. */
+  @column({
+    prepare: (value: unknown) =>
+      value === null || value === undefined ? value : JSON.stringify(value),
+    consume: (value: unknown) => (typeof value === 'string' ? JSON.parse(value) : value),
+  })
+  declare referencePattern: EngineReferencePattern | null
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime

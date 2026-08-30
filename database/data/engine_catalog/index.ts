@@ -1,8 +1,10 @@
+import { ALL_SPARE_PART_KEYS } from '#shared/constants/spare_parts/spare_parts_content'
 import { slugifyCatalogName } from '#shared/helpers/boat_catalog'
 import type {
   EngineBrandSeed,
   EngineCatalogFamily,
   EngineModelSeed,
+  EnginePartReferenceSeed,
 } from '#shared/types/engine_catalog'
 import { GENERATOR_BRANDS } from './generator.js'
 import { INBOARD_DIESEL_BRANDS } from './inboard_diesel.js'
@@ -10,6 +12,7 @@ import { INBOARD_PETROL_BRANDS } from './inboard_petrol.js'
 import { JET_BRANDS } from './jet.js'
 import { OUTBOARD_ELECTRIC_BRANDS } from './outboard_electric.js'
 import { OUTBOARD_THERMAL_BRANDS } from './outboard_thermal.js'
+import { ENGINE_PART_REFERENCES } from './part_references.js'
 
 /**
  * Corpus v1 du catalogue moteur (#573), agrégé depuis un fichier par famille.
@@ -87,3 +90,43 @@ export function countEngineCatalogModels(): number {
     0
   )
 }
+
+/**
+ * Références constructeur du corpus (#575), vérifiées au chargement.
+ *
+ * Trois erreurs se paient à l'insertion et sont donc levées ici, où le message
+ * nomme l'entrée fautive : une source vide (la colonne est `NOT NULL`, mais un
+ * `sourceLabel` réduit à des espaces passerait), une clé de pièce inconnue du
+ * catalogue (`ALL_SPARE_PART_KEYS`, le même vocabulaire que le panier), et un
+ * couple (modèle, pièce) déclaré deux fois — que la contrainte d'unicité
+ * rejetterait, ou pire, que le seeder écraserait silencieusement.
+ */
+export const ENGINE_CATALOG_PART_REFERENCES: readonly EnginePartReferenceSeed[] = (() => {
+  const seen = new Set<string>()
+
+  for (const entry of ENGINE_PART_REFERENCES) {
+    const label = `${entry.brandSlug}/${entry.modelSlug}/${entry.partKey}`
+
+    if (entry.sourceLabel.trim() === '') {
+      throw new Error(
+        `Références constructeur : l'entrée « ${label} » n'a pas de source. ` +
+          `Une référence sans source ne se saisit pas.`
+      )
+    }
+    if (!ALL_SPARE_PART_KEYS.has(entry.partKey)) {
+      throw new Error(
+        `Références constructeur : la clé de pièce « ${entry.partKey} » (entrée ` +
+          `« ${label} ») n'existe pas au catalogue de pièces.`
+      )
+    }
+    if (seen.has(label)) {
+      throw new Error(
+        `Références constructeur : le couple « ${label} » est déclaré deux fois. ` +
+          `Un modèle ne porte qu'une référence par pièce.`
+      )
+    }
+    seen.add(label)
+  }
+
+  return ENGINE_PART_REFERENCES
+})()

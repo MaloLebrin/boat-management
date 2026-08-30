@@ -75,6 +75,26 @@ export function isEngineCatalogFamily(value: unknown): value is EngineCatalogFam
   return typeof value === 'string' && (ENGINE_CATALOG_FAMILIES as readonly string[]).includes(value)
 }
 
+/**
+ * Motif de référence constructeur d'une marque (#575).
+ *
+ * Généralise le cas Yamaha, seul décodage que #517 savait faire et qui était
+ * codé en dur : les 5 chiffres centraux d'une référence identifient la
+ * **fonction** de la pièce indépendamment du moteur, le premier bloc est le
+ * code plaque, le dernier la variante. Une marque qui ne déclare pas de motif
+ * n'affiche simplement pas de carte de décodage.
+ */
+export interface EngineReferencePattern {
+  /** Gabarit interpolé : `{modelCode}` et `{functionCode}`. */
+  template: string
+  /** Code plaque de repli quand celui du moteur est absent ou non conforme. */
+  fallbackModelCode: string
+  /** Motif (source de `RegExp`) qu'un code plaque doit respecter pour servir. */
+  modelCodePattern: string
+  /** Clé i18n du texte explicatif de la carte « décoder une référence ». */
+  explanationKey: string
+}
+
 /** Cycle moteur, aligné sur `engineStrokeTypes` du validator d'équipement. */
 export type EngineStrokeType = '2_stroke' | '4_stroke'
 
@@ -140,6 +160,16 @@ export interface EngineBrandSeed {
   aliases?: readonly string[]
   isActive?: boolean
   /**
+   * Où trouver la plaque signalétique chez cette marque (#575) — clés i18n.
+   * Remplace le tableau statique `ENGINE_PLATE_HINTS`, qui ne couvrait que
+   * trois marques et les affichait toutes les trois dès que la marque du
+   * moteur n'était pas reconnue.
+   */
+  plateLocationKey?: string
+  plateExampleKey?: string
+  /** Motif de référence constructeur, quand la marque en a un connu (#575). */
+  referencePattern?: EngineReferencePattern
+  /**
    * Valeurs appliquées à tous les modèles de la marque qui ne les précisent
    * pas — un hors-bord thermique moderne est 4 temps à essence, l'écrire une
    * fois vaut mieux que neuf cents fois.
@@ -155,6 +185,30 @@ export interface EngineBrandSeed {
   modelCodeFromName?: boolean
   /** La clé porte la famille des modèles qu'elle groupe. */
   models: Partial<Record<EngineCatalogFamily, readonly EngineModelSeedEntry[]>>
+}
+
+/**
+ * Référence constructeur d'un fichier de données
+ * (`database/data/engine_catalog/part_references.ts`) — #575.
+ *
+ * `sourceLabel` est **obligatoire** ici comme en base : une entrée sans source
+ * ne se seed pas, donc ne peut pas s'afficher. C'est le critère « aucune
+ * référence affichée sans indication de sa source » tenu par le type autant que
+ * par le schéma.
+ */
+export interface EnginePartReferenceSeed {
+  /** Slug de la marque du catalogue (`yamaha`, `volvo-penta`). */
+  brandSlug: string
+  /** Slug du modèle au sein de la marque (`4as`, `d1-20`). */
+  modelSlug: string
+  /** Clé du catalogue de pièces (`lower-unit.impeller`). */
+  partKey: string
+  reference: string
+  /** D'où vient la référence — jamais vide. */
+  sourceLabel: string
+  sourceUrl?: string
+  /** `YYYY-MM-DD` ; absent tant que l'entrée n'a pas été revérifiée. */
+  verifiedAt?: string
 }
 
 export interface ListEngineBrandsOptions {
