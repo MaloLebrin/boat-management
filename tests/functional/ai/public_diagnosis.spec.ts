@@ -9,6 +9,7 @@ import { UserFactory } from '#database/factories/user_factory'
 import { createAdminUser } from '#tests/functional/helpers'
 import { PUBLIC_DIAGNOSIS_SESSION_KEY } from '#shared/types/public_diagnosis'
 import type { AiChatMessage } from '#services/ai_service'
+import type { AiChatMessage as StoredChatMessage } from '#shared/types/ai'
 
 const QUESTION_RESPONSE = JSON.stringify({
   type: 'question',
@@ -327,7 +328,7 @@ test.group('Public AI diagnosis chat (functional, #602)', (group) => {
     assert,
     client,
   }) => {
-    const messages: AiChatMessage[] = []
+    const messages: StoredChatMessage[] = []
     for (let i = 0; i < 10; i++) {
       messages.push({ role: 'user', content: `message ${i}` })
       messages.push({ role: 'assistant', content: `question ${i}` })
