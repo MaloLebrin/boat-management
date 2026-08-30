@@ -39,7 +39,7 @@ const coolingRawWaterAssembly: SparePartAssembly = {
     'pod_drive',
     'generator',
   ],
-  diagnosticSheet: 'cooling',
+  diagnosticSheet: 'inboard-cooling',
   parts: [
     {
       key: 'cooling-raw-water.impeller',
@@ -92,6 +92,7 @@ const coolingFreshWaterAssembly: SparePartAssembly = {
   catalogLabel: 'FRESH WATER COOLING',
   descriptionKey: 'parts.assemblies.cooling_fresh_water.description',
   families: ['inboard_diesel_shaft', 'inboard_diesel_saildrive', 'generator'],
+  diagnosticSheet: 'inboard-cooling',
   parts: [
     {
       key: 'cooling-fresh-water.thermostat',
@@ -135,7 +136,7 @@ const injectionAssembly: SparePartAssembly = {
   catalogLabel: 'FUEL INJECTION',
   descriptionKey: 'parts.assemblies.injection.description',
   families: ['inboard_diesel_shaft', 'inboard_diesel_saildrive', 'generator'],
-  diagnosticSheet: 'fuel',
+  diagnosticSheet: 'diesel-fuel',
   parts: [
     {
       key: 'injection.pre_filter_element',
@@ -187,6 +188,7 @@ const exhaustAssembly: SparePartAssembly = {
     'pod_drive',
     'generator',
   ],
+  diagnosticSheet: 'wet-exhaust',
   parts: [
     {
       key: 'exhaust.exhaust_elbow',
@@ -232,7 +234,7 @@ const gearboxAssembly: SparePartAssembly = {
   catalogLabel: 'MARINE GEAR / TRANSMISSION',
   descriptionKey: 'parts.assemblies.gearbox.description',
   families: ['inboard_diesel_shaft', 'inboard_petrol', 'sterndrive', 'pod_drive'],
-  diagnosticSheet: 'gearcase',
+  diagnosticSheet: 'gearbox',
   parts: [
     {
       key: 'gearbox.gear_oil',
@@ -277,6 +279,7 @@ const saildriveAssembly: SparePartAssembly = {
   catalogLabel: 'SAIL DRIVE',
   descriptionKey: 'parts.assemblies.saildrive.description',
   families: ['inboard_diesel_saildrive'],
+  diagnosticSheet: 'saildrive',
   parts: [
     {
       key: 'saildrive.diaphragm',
@@ -358,6 +361,7 @@ const shaftLineAssembly: SparePartAssembly = {
   catalogLabel: 'SHAFT / STERN TUBE',
   descriptionKey: 'parts.assemblies.shaft_line.description',
   families: ['inboard_diesel_shaft', 'inboard_petrol', 'electric_inboard'],
+  diagnosticSheet: 'shaft-line',
   parts: [
     {
       key: 'shaft-line.stuffing_box_packing',
@@ -500,6 +504,7 @@ const airIntakeAssembly: SparePartAssembly = {
   catalogLabel: 'AIR INTAKE / TURBO',
   descriptionKey: 'parts.assemblies.air_intake.description',
   families: ['inboard_diesel_shaft', 'inboard_diesel_saildrive', 'generator'],
+  diagnosticSheet: 'diesel-smoke',
   parts: [
     {
       key: 'air-intake.air_filter',

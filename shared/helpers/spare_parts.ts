@@ -3,12 +3,8 @@ import {
   SPARE_PART_ASSEMBLIES,
   SPARE_PARTS_RETAILERS,
 } from '#shared/constants/spare_parts/spare_parts_content'
-import { engineFamilyFromSignals } from '#shared/helpers/engine_family'
-import {
-  isEngineFamily,
-  type EngineFamily,
-  type EngineReferencePattern,
-} from '#shared/types/engine_catalog'
+import { resolveEngineFamily } from '#shared/helpers/engine_family'
+import type { EngineFamily, EngineReferencePattern } from '#shared/types/engine_catalog'
 import {
   SPARE_PARTS_BRAND_SLUGS,
   type PartAssemblySlug,
@@ -34,17 +30,11 @@ export interface SparePartsEngine {
 }
 
 /**
- * Famille retenue pour la nomenclature : celle **saisie** sur le moteur, sinon
- * celle que `kind`/`fuel`/`stroke_type` permettent de déduire (#574).
- *
- * Le repli sur la dérivation n'est pas de la redondance avec le backfill de la
- * migration : un moteur créé sans famille — l'API, un import, un formulaire
- * laissé vide — doit rendre la même chose qu'un moteur backfillé.
+ * Réexport historique : la résolution de famille sert aussi au diagnostic
+ * (#576), elle vit désormais dans `#shared/helpers/engine_family` aux côtés de
+ * `engineFamilyFromSignals`.
  */
-export function resolveEngineFamily(engine: SparePartsEngine): EngineFamily | null {
-  if (isEngineFamily(engine.family)) return engine.family
-  return engineFamilyFromSignals(engine)
-}
+export { resolveEngineFamily }
 
 /**
  * Ensembles fonctionnels d'une famille de motorisation (#574) — l'ordre du

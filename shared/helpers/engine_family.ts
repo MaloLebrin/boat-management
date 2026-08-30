@@ -1,7 +1,8 @@
-import type {
-  EngineCatalogFamily,
-  EngineFamily,
-  EngineStrokeType,
+import {
+  isEngineFamily,
+  type EngineCatalogFamily,
+  type EngineFamily,
+  type EngineStrokeType,
 } from '#shared/types/engine_catalog'
 
 /**
@@ -59,6 +60,22 @@ export function engineFamilyFromSignals(engine: EngineFamilySignals): EngineFami
   if (kind === 'hybrid') return 'hybrid'
 
   return null
+}
+
+/**
+ * Famille retenue pour tout contenu servi par motorisation — nomenclature de
+ * pièces (#574), fiches de diagnostic (#576) : celle **saisie** sur le moteur,
+ * sinon celle que `kind`/`fuel`/`stroke_type` permettent de déduire.
+ *
+ * Le repli sur la dérivation n'est pas de la redondance avec le backfill de la
+ * migration : un moteur créé sans famille — l'API, un import, un formulaire
+ * laissé vide — doit rendre la même chose qu'un moteur backfillé.
+ */
+export function resolveEngineFamily(
+  engine: EngineFamilySignals & { family?: string | null }
+): EngineFamily | null {
+  if (isEngineFamily(engine.family)) return engine.family
+  return engineFamilyFromSignals(engine)
 }
 
 /**

@@ -466,18 +466,32 @@ export const GENERIC_RETAILERS: readonly SparePartsRetailerLink[] = [
 ]
 
 /**
- * Fiche de diagnostic (#515) → ensemble de pièces concerné, pour le lien
+ * Fiche de diagnostic (#515, #576) → ensemble de pièces concerné, pour le lien
  * direct « identifier les pièces » depuis les checklists (ex. fiche 3
  * « carburateur » → éclaté CARBURETOR).
+ *
+ * La table est la **réciproque** de `SparePartAssembly.diagnosticSheet` : pour
+ * toute entrée `fiche → ensemble`, l'ensemble doit renvoyer vers cette même
+ * fiche, et toute fiche citée par un ensemble doit figurer ici. L'invariant est
+ * testé (`tests/inertia/spare_parts_content.spec.ts`) — il ne tenait pas avant
+ * #576 : `gearcase` pointait vers `lower-unit`, qui renvoie vers `cooling`, et
+ * `electrical` vers `ignition`, qui n'a jamais renvoyé vers `electrical`.
  */
 export const DIAGNOSTIC_SHEET_TO_ASSEMBLY: Partial<Record<DiagnosticSheetSlug, PartAssemblySlug>> =
   {
-    compression: 'power-unit',
-    ignition: 'ignition',
-    fuel: 'carburetor',
-    cooling: 'lower-unit',
-    gearcase: 'lower-unit',
-    electrical: 'ignition',
+    'compression': 'power-unit',
+    'ignition': 'ignition',
+    'fuel': 'carburetor',
+    'cooling': 'lower-unit',
+    'gearcase': 'propeller',
+    'electrical': 'starting-charging',
+    'inboard-cooling': 'cooling-raw-water',
+    'diesel-fuel': 'injection',
+    'diesel-smoke': 'air-intake',
+    'wet-exhaust': 'exhaust',
+    'gearbox': 'gearbox',
+    'shaft-line': 'shaft-line',
+    'saildrive': 'saildrive',
   }
 
 /** Index à plat du catalogue (ensembles + pièces sans référence), par clé. */

@@ -69,6 +69,12 @@ export interface EngineDiagnosisInput {
     model: string | null
     hours: number | null
     strokeType: string | null
+    /**
+     * Famille de motorisation résolue (#576) — c'est elle qui cadre le prompt
+     * et la liste des fiches recommandables. `null` reste accepté : le prompt
+     * retombe alors sur le corpus hors-bord 2 temps de #516.
+     */
+    family: string | null
   }
   parts: Array<{
     designation: string

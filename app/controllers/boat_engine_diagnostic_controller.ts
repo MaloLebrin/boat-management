@@ -6,6 +6,8 @@ import BoatEngineDiagnosticService, {
   EngineNotDiagnosticEligibleError,
 } from '#services/boat_engine_diagnostic_service'
 import BoatHullService, { BoatNotFoundError } from '#services/boat_hull_service'
+import { isSheetForEngine } from '#shared/helpers/diagnostic'
+import { resolveEngineFamily } from '#shared/helpers/engine_family'
 import { toAppLocale } from '#shared/helpers/locale_path'
 import { DIAGNOSTIC_SHEET_SLUGS, type DiagnosticSheetSlug } from '#shared/types/diagnostic'
 import {
@@ -97,6 +99,7 @@ export default class BoatEngineDiagnosticController {
           model: engine.model,
           serialNumber: engine.serialNumber,
           kind: engine.kind,
+          family: resolveEngineFamily(engine),
           status: engine.status,
         },
         checkedStepKeys,
@@ -139,6 +142,15 @@ export default class BoatEngineDiagnosticController {
 
     try {
       const engine = await this.diagnosticService.getEligibleEngineOrFail(user, boat, engineId)
+
+      // Un slug valide ne suffit pas depuis #576 : les fiches sont servies par
+      // famille, et une URL forgée ne doit pas ouvrir la fiche « saildrive » sur
+      // un hors-bord ni « link & sync » sur un diesel.
+      if (!isSheetForEngine(engine, sheetSlug as DiagnosticSheetSlug)) {
+        session.flash('error', i18n.t('flash.diagnostic.sheetNotForEngine'))
+        return response.redirect(`/boats/${boat.id}/engines/${engineId}/diagnostic`)
+      }
+
       const checkedStepKeys = await this.diagnosticService.getCheckedStepKeys(user, boat, engineId)
       const canManage = await bouncer.with(MaintenancePolicy).allows('edit', boat)
 
@@ -150,6 +162,7 @@ export default class BoatEngineDiagnosticController {
           model: engine.model,
           serialNumber: engine.serialNumber,
           kind: engine.kind,
+          family: resolveEngineFamily(engine),
           status: engine.status,
         },
         sheetSlug: sheetSlug as DiagnosticSheetSlug,

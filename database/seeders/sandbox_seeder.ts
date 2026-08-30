@@ -188,9 +188,13 @@ export async function seedDemoData() {
 
     if (def.propulsionType === 'sailboat') {
       if (boat.engines.length === 0) {
+        // Saildrive : la famille rend le voilier éligible aux fiches in-bord de
+        // #576 (refroidissement, gasoil, saildrive) dans la sandbox.
         await equipmentService.createEngine(user, boat, {
           kind: 'inboard',
           fuel: 'diesel',
+          strokeType: '4_stroke',
+          family: 'inboard_diesel_saildrive',
           brand: 'Volvo',
           model: 'D1-20',
           powerHp: 20,
@@ -227,6 +231,8 @@ export async function seedDemoData() {
         await equipmentService.createEngine(user, boat, {
           kind: 'outboard',
           fuel: 'essence',
+          strokeType: '4_stroke',
+          family: 'outboard_4t',
           brand: 'Mercury',
           model: '60 EFI',
           powerHp: 60,

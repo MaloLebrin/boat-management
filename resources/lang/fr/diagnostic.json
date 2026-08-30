@@ -1,10 +1,10 @@
 {
   "index": {
     "title": "Panne",
-    "subtitle": "Checklists de dépannage guidées pour vos moteurs hors-bord 2 temps. Commencez toujours par la checklist globale : compression, étincelle, essence — dans cet ordre.",
+    "subtitle": "Checklists de dépannage guidées pour vos moteurs : hors-bord 2 temps et in-bord diesel. Commencez toujours par la checklist globale, elle vous oriente vers la bonne fiche.",
     "enginesTitle": "Vos moteurs",
-    "empty": "Aucun moteur hors-bord 2 temps dans votre flotte.",
-    "eligibilityHint": "Les checklists de diagnostic concernent les moteurs hors-bord 2 temps. Renseignez le type « hors-bord » et le cycle « 2 temps » sur la fiche d'un moteur pour le voir apparaître ici.",
+    "empty": "Aucun moteur éligible au diagnostic dans votre flotte.",
+    "eligibilityHint": "Les checklists de diagnostic couvrent les hors-bord 2 temps et les motorisations in-bord (diesel en ligne d'arbre ou saildrive, embase Z, groupe électrogène). Renseignez la famille de motorisation sur la fiche d'un moteur pour le voir apparaître ici.",
     "openChecklist": "Ouvrir la checklist",
     "firstContactCard": {
       "title": "Achat d'occasion : premier contact",
@@ -26,7 +26,10 @@
     "sheetLink": "Fiche : {title}",
     "warningLabel": "Avertissement",
     "notesTitle": "À retenir",
-    "localStateHint": "Cette fiche n'est liée à aucun moteur de votre flotte : les cases ne sont pas enregistrées et repartent de zéro à la prochaine visite."
+    "localStateHint": "Cette fiche n'est liée à aucun moteur de votre flotte : les cases ne sont pas enregistrées et repartent de zéro à la prochaine visite.",
+    "safetyTitle": "Sécurité",
+    "seaCockTitle": "Vanne de coque ouverte avant de démarrer",
+    "seaCock": "Cette fiche implique de démarrer le moteur : vérifiez que la vanne de coque d'eau de mer est ouverte et qu'un filet d'eau sort à l'échappement dans les premières secondes. Sans eau, coupez immédiatement — la turbine se détruit en quelques secondes."
   },
   "tab": {
     "title": "Diagnostic panne",
@@ -372,7 +375,38 @@
         "trim_wiring": {
           "label": "Trim mort à un poste seulement : suivre les fils bleu/vert",
           "detail": "Un fil coupé est plus probable qu'un moteur de trim HS. Dépannage en mer : vis de relevage manuel."
+        },
+        "battery_switch": {
+          "label": "Coupe-batterie enclenché, parc démarrage distinct du parc servitude",
+          "detail": "Un parc servitude à plat ne doit pas empêcher de démarrer : si c'est le cas, le coupleur ou le câblage est en cause."
+        },
+        "start_battery_load": {
+          "label": "Batterie de démarrage testée en charge, pas seulement au voltmètre",
+          "detail": "Une batterie fatiguée affiche 12,6 V au repos et s'effondre dès qu'on lance : seul un test en charge la démasque."
+        },
+        "glow_plugs": {
+          "label": "Préchauffage : temporisation et bougies fonctionnelles",
+          "detail": "Un diesel qui démarre bien à chaud et refuse à froid désigne le préchauffage avant l'alimentation."
+        },
+        "start_relay": {
+          "label": "Relais et contacteur de démarrage : clic audible, contacts sains",
+          "detail": "Un clic sans rotation oriente vers le démarreur ou ses câbles ; aucun clic, vers le contacteur et son alimentation."
+        },
+        "alternator_belt": {
+          "label": "Courroie d'alternateur : tension et absence de patinage",
+          "detail": "Moteur coupé, clé retirée. Une courroie qui patine siffle et laisse une poussière noire."
+        },
+        "alternator_output": {
+          "label": "Tension de charge mesurée moteur tournant",
+          "detail": "Sans charge mesurable, la batterie se vide au fil des sorties et la panne se déclare loin du ponton."
+        },
+        "panel_alarm": {
+          "label": "Alarmes du tableau (température, pression d'huile) actives au contact",
+          "detail": "Ces alarmes doivent sonner clé mise, moteur arrêté. Muettes, elles ne vous préviendront de rien."
         }
+      },
+      "sections": {
+        "inboard_charging": "Démarrage et charge — in-bord"
       }
     },
     "timing": {
@@ -487,6 +521,413 @@
       "notes": {
         "deal_breakers": "Pannes rédhibitoires : piston grippé, embase qui ne passe pas les vitesses."
       }
+    },
+    "inboard_cooling": {
+      "title": "Surchauffe et refroidissement",
+      "intro": "Un in-bord se refroidit en deux temps : l'eau de mer aspirée sous la coque refroidit un circuit fermé, puis part à l'échappement. Suivez l'eau de mer dans l'ordre — c'est presque toujours là que ça bloque — avant de toucher au circuit fermé.",
+      "sections": {
+        "raw_water": "Circuit d'eau de mer, dans l'ordre du parcours",
+        "fresh_water": "Circuit fermé et échange"
+      },
+      "steps": {
+        "sea_cock": {
+          "label": "Vanne de coque ouverte, passe-coque non obstrué"
+        },
+        "strainer": {
+          "label": "Crépine démontée, panier nettoyé, joint du couvercle en état",
+          "detail": "Un joint durci laisse entrer de l'air : la pompe désamorce sans qu'aucune saleté soit visible."
+        },
+        "hose_collapse": {
+          "label": "Durite d'aspiration non écrasée ni affaissée",
+          "detail": "Une durite qui s'écrase à haut régime donne une surchauffe uniquement en charge."
+        },
+        "impeller": {
+          "label": "Turbine déposée : pales souples, sans déformation ni pale manquante",
+          "detail": "Une turbine se change à l'usure, pas à la panne — pales durcies ou couchées, elle est en fin de vie."
+        },
+        "impeller_debris": {
+          "label": "Pales manquantes recherchées en aval (échangeur, coude)",
+          "detail": "Un morceau de turbine parti en aval bouche l'échangeur : tant qu'il y est, la surchauffe revient."
+        },
+        "pump_cover": {
+          "label": "Couvercle de pompe plan, non rayé, joint neuf au remontage"
+        },
+        "coolant_level": {
+          "label": "Niveau du circuit fermé et état du liquide",
+          "detail": "Moteur froid uniquement. Un liquide brunâtre ou huileux signale un échange interne."
+        },
+        "belt": {
+          "label": "Courroie d'entraînement de la pompe : tension, état, alignement",
+          "detail": "Moteur coupé, clé retirée."
+        },
+        "thermostat": {
+          "label": "Thermostat déposé et testé, ou remplacé",
+          "detail": "Bloqué fermé : surchauffe immédiate. Bloqué ouvert : le moteur ne monte jamais en température."
+        },
+        "heat_exchanger": {
+          "label": "Faisceau de l'échangeur : entartrage, dépôts, obstruction",
+          "detail": "Une surchauffe qui monte lentement, seulement en charge, désigne l'échangeur avant la turbine."
+        },
+        "anodes": {
+          "label": "Anodes du circuit contrôlées et remplacées si consommées",
+          "detail": "Une anode oubliée finit en morceaux dans le faisceau, qu'elle bouche à son tour."
+        },
+        "exhaust_elbow": {
+          "label": "Coude d'échappement non entartré ni corrodé"
+        }
+      },
+      "tables": {
+        "symptoms": {
+          "headers": {
+            "symptom": "Symptôme",
+            "reading": "Lecture",
+            "check": "À contrôler d'abord"
+          },
+          "rows": {
+            "no_water": {
+              "symptom": "Pas d'eau à l'échappement au démarrage",
+              "reading": "Le circuit d'eau de mer n'aspire pas",
+              "check": "Vanne de coque, crépine, joint de couvercle, turbine"
+            },
+            "water_no_alarm": {
+              "symptom": "Eau présente mais alarme de température",
+              "reading": "L'eau circule, l'échange ne se fait plus",
+              "check": "Thermostat, échangeur entartré, niveau du circuit fermé"
+            },
+            "steam": {
+              "symptom": "Vapeur ou eau bouillante à l'échappement",
+              "reading": "Débit d'eau de mer insuffisant",
+              "check": "Turbine, durite écrasée, coude entartré. Coupez le moteur."
+            },
+            "slow_rise": {
+              "symptom": "Température qui monte seulement en charge",
+              "reading": "Le circuit suffit au ralenti, plus au-delà",
+              "check": "Échangeur, courroie qui patine, coude d'échappement"
+            }
+          }
+        }
+      },
+      "warnings": {
+        "hotPressurisedCircuit": "N'ouvrez jamais le bouchon d'un circuit de refroidissement chaud sous pression : la vapeur et le liquide brûlant sortent d'un coup. Attendez le refroidissement complet.",
+        "engineOffBeforeBelt": "Coupez le moteur et retirez la clé avant toute intervention sur une courroie ou une poulie.",
+        "neverRunDry": "Ne faites jamais tourner le moteur vanne fermée, même quelques secondes : la turbine est détruite avant que l'alarme ne sonne."
+      },
+      "notes": {
+        "impeller_interval": "La turbine est une pièce d'usure : la plupart des motoristes la donnent pour une saison ou deux, et il vaut mieux en avoir une de rechange à bord qu'une neuve au ponton. Reportez-vous au manuel d'atelier de votre modèle pour l'intervalle exact."
+      }
+    },
+    "diesel_fuel": {
+      "title": "Circuit gasoil",
+      "intro": "Sur un diesel de plaisance, l'alimentation est la première cause de panne, et c'est presque toujours de l'eau ou des dépôts venus du fond du réservoir. Suivez le circuit dans l'ordre, du réservoir vers les injecteurs.",
+      "steps": {
+        "tank_valve": {
+          "label": "Vanne de réservoir ouverte, niveau réel suffisant"
+        },
+        "prefilter_bowl": {
+          "label": "Bol du préfiltre décanteur purgé : ni eau ni boues",
+          "detail": "L'eau se dépose au fond, plus claire et plus dense que le gasoil. Purgez jusqu'à ne voir que du gasoil."
+        },
+        "prefilter_element": {
+          "label": "Cartouche du préfiltre remplacée si encrassée",
+          "detail": "Notez la date : une cartouche qui se colmate en quelques heures signale un réservoir sale, pas un filtre défectueux."
+        },
+        "engine_filter": {
+          "label": "Filtre à gasoil moteur remplacé et son joint neuf"
+        },
+        "bleed": {
+          "label": "Circuit purgé selon la procédure du manuel d'atelier",
+          "detail": "Un diesel ne redémarre pas tant qu'il reste de l'air : purgez dans l'ordre indiqué par le constructeur, du filtre vers la pompe."
+        },
+        "air_leak": {
+          "label": "Entrée d'air recherchée côté aspiration",
+          "detail": "Raccords, joints de filtre, durites poreuses : le moteur peut aspirer de l'air sans qu'une goutte de gasoil ne fuie à l'extérieur."
+        },
+        "lift_pump": {
+          "label": "Pompe d'alimentation : débit vérifié",
+          "detail": "Amorçage manuel dur ou sans résistance, débit nul : la pompe ou sa membrane est en cause."
+        },
+        "stop_solenoid": {
+          "label": "Coupure d'arrêt (solénoïde ou câble) en position marche",
+          "detail": "Un moteur qui lance normalement, sans jamais partir, avec un circuit gasoil sain : regardez d'abord l'arrêt."
+        },
+        "injector_return": {
+          "label": "Retour d'injecteurs contrôlé",
+          "detail": "Un retour anormalement abondant désigne un injecteur usé. Le contrôle et le tarage des injecteurs se font en atelier."
+        },
+        "tank_bottom": {
+          "label": "Fond de réservoir contrôlé si le colmatage se répète",
+          "detail": "Filtres qui se bouchent coup sur coup : c'est le réservoir qu'il faut nettoyer, pas le filtre qu'il faut changer."
+        }
+      },
+      "tables": {
+        "symptoms": {
+          "headers": {
+            "symptom": "Symptôme",
+            "reading": "Lecture",
+            "check": "À contrôler d'abord"
+          },
+          "rows": {
+            "starts_then_stalls": {
+              "symptom": "Démarre puis cale au bout de quelques minutes",
+              "reading": "Alimentation qui se raréfie",
+              "check": "Préfiltre colmaté, entrée d'air, évent de réservoir"
+            },
+            "power_loss_swell": {
+              "symptom": "Perte de puissance dans la houle",
+              "reading": "Les dépôts du fond de réservoir sont remis en suspension",
+              "check": "Bol du préfiltre, cartouche, propreté du réservoir"
+            },
+            "no_start_after_filter": {
+              "symptom": "Ne repart pas après un changement de filtre",
+              "reading": "De l'air est resté dans le circuit",
+              "check": "Purge complète selon la procédure du manuel"
+            },
+            "hunting": {
+              "symptom": "Régime instable, le moteur « pompe »",
+              "reading": "Alimentation irrégulière ou air aspiré",
+              "check": "Entrée d'air côté aspiration, filtre partiellement colmaté"
+            }
+          }
+        }
+      },
+      "warnings": {
+        "highPressureInjection": "Ne desserrez jamais un raccord haute pression moteur tournant : le jet d'un injecteur diesel traverse la peau et provoque une blessure grave, souvent sans douleur immédiate. Toute intervention sur l'injection se fait moteur arrêté.",
+        "fuelAndHotParts": "Le gasoil projeté sur un collecteur chaud s'enflamme. Coupez le moteur, laissez refroidir, et gardez de quoi absorber à portée de main."
+      },
+      "notes": {
+        "diesel_bug": "Les micro-organismes qui se développent à l'interface eau-gasoil (« diesel bug ») forment les boues noires qu'on retrouve dans les filtres. Un réservoir tenu plein limite la condensation, et donc l'eau dont ils vivent."
+      }
+    },
+    "diesel_smoke": {
+      "title": "Fumées : noire, blanche ou bleue",
+      "intro": "La couleur des fumées est l'aide au tri la plus rapide sur un diesel : elle ne donne pas la panne, mais elle désigne la famille à explorer. Observez-la moteur chaud et en charge, pas au ralenti au ponton.",
+      "steps": {
+        "color_identified": {
+          "label": "Couleur identifiée en charge, moteur chaud",
+          "detail": "Noire = combustion, blanche = eau ou injection, bleue = huile. Voir le tableau ci-dessus."
+        },
+        "air_filter": {
+          "label": "Filtre à air et aération du compartiment dégagés",
+          "detail": "Un moteur qui manque d'air fume noir : c'est le contrôle le moins cher, faites-le en premier."
+        },
+        "overload": {
+          "label": "Hélice et charge adaptées : le moteur atteint son régime maxi",
+          "detail": "Une hélice trop chargée ou une carène sale font fumer noir en permanence et usent le moteur."
+        },
+        "back_pressure": {
+          "label": "Contre-pression d'échappement écartée"
+        },
+        "coolant_loss": {
+          "label": "Niveau du circuit fermé suivi sur plusieurs sorties",
+          "detail": "Fumée blanche persistante et niveau qui baisse : de l'eau passe dans la combustion, arrêtez-vous là et faites contrôler."
+        },
+        "oil_level_rising": {
+          "label": "Niveau d'huile moteur : ni montée, ni aspect laiteux",
+          "detail": "Un niveau qui monte tout seul, c'est de l'eau ou du gasoil dans le carter. Ne naviguez pas."
+        },
+        "cold_start_only": {
+          "label": "Fumée présente à froid seulement, ou en permanence",
+          "detail": "Un peu de blanc les premières secondes à froid est normal ; le même nuage à chaud ne l'est pas."
+        }
+      },
+      "tables": {
+        "colors": {
+          "headers": {
+            "color": "Couleur",
+            "reading": "Lecture",
+            "check": "À contrôler d'abord"
+          },
+          "rows": {
+            "black": {
+              "color": "Noire",
+              "reading": "Combustion incomplète : trop de gasoil ou pas assez d'air",
+              "check": "Filtre à air, aération du compartiment, hélice trop chargée, contre-pression d'échappement"
+            },
+            "white": {
+              "color": "Blanche",
+              "reading": "De l'eau dans la combustion, ou du gasoil imbrûlé",
+              "check": "Niveau du circuit fermé, joint de culasse, injection. À froid et brièvement, c'est normal."
+            },
+            "blue": {
+              "color": "Bleue",
+              "reading": "De l'huile brûle dans la chambre",
+              "check": "Niveau d'huile trop haut, segmentation, guides de soupapes. Usure interne : atelier."
+            }
+          }
+        }
+      },
+      "warnings": {
+        "whiteSmokeMeansWater": "Une fumée blanche persistante à chaud, avec un niveau de liquide de refroidissement qui baisse, signale de l'eau dans les cylindres. Ne prolongez pas la navigation : faites contrôler avant de repartir."
+      },
+      "notes": {
+        "cold_start_haze": "Toute valeur chiffrée — pression de compression, tarage d'injecteur, opacité — se lit dans le manuel d'atelier de votre modèle. Ce tableau oriente, il ne mesure pas."
+      }
+    },
+    "wet_exhaust": {
+      "title": "Échappement humide et waterlock",
+      "intro": "L'échappement d'un in-bord évacue les gaz et l'eau de mer ensemble. Quand il se bouche, s'affaisse ou se corrode, l'eau peut remonter vers le moteur : c'est la panne la plus chère de cette liste, et la plus évitable.",
+      "steps": {
+        "elbow_corrosion": {
+          "label": "Coude d'échappement déposé et inspecté : corrosion, entartrage",
+          "detail": "C'est la pièce d'usure de l'échappement. Un coude percé envoie de l'eau dans le moteur par l'échappement."
+        },
+        "elbow_injection": {
+          "label": "Point d'injection d'eau du coude dégagé",
+          "detail": "Entartré, il fait grimper la contre-pression et la température sans autre symptôme."
+        },
+        "waterlock_full": {
+          "label": "Waterlock vidé et non fissuré",
+          "detail": "Après plusieurs tentatives de démarrage infructueuses, il se remplit : videz-le avant de relancer."
+        },
+        "hose_sag": {
+          "label": "Tuyau d'échappement soutenu, sans point bas où l'eau stagne",
+          "detail": "Un tuyau affaissé fait siphon et retient l'eau, qui finit par remonter."
+        },
+        "swan_neck": {
+          "label": "Col de cygne suffisamment haut au-dessus de la flottaison",
+          "detail": "C'est lui qui empêche la mer d'entrer par la sortie d'échappement au mouillage ou au portant."
+        },
+        "siphon_break": {
+          "label": "Casse-siphon (col de cygne du circuit d'eau) dégagé",
+          "detail": "Bouché, il laisse le circuit se siphonner et remplir le moteur à l'arrêt."
+        },
+        "clamps": {
+          "label": "Colliers doublés et en inox, sans trace de rouille"
+        }
+      },
+      "warnings": {
+        "waterInCylinders": "N'insistez jamais au démarreur quand le moteur ne part pas : chaque tentative envoie de l'eau dans l'échappement, et cette eau peut remonter dans les cylindres. Après trois essais sans succès, fermez la vanne de coque et videz le waterlock.",
+        "carbonMonoxide": "Un échappement qui fuit dans le compartiment moteur rejette du monoxyde de carbone dans le bateau : il est inodore et mortel. Toute fuite se traite avant de naviguer, et un détecteur de CO à bord n'est pas un luxe."
+      },
+      "notes": {
+        "elbow_interval": "Le coude d'échappement est un consommable, pas une pièce à vie : la plupart des motoristes le donnent pour quelques centaines d'heures ou quelques saisons. Reportez-vous au manuel d'atelier de votre modèle."
+      }
+    },
+    "gearbox": {
+      "title": "Inverseur",
+      "intro": "Pas d'engagement, à-coups, bruit à l'embrayage : avant de suspecter l'inverseur lui-même, contrôlez l'huile et la commande. La grande majorité des pannes d'engagement se règle sur le câble ou le niveau.",
+      "steps": {
+        "oil_level": {
+          "label": "Niveau d'huile contrôlé selon la procédure du constructeur",
+          "detail": "Certains inverseurs se contrôlent moteur chaud et venant de tourner : la méthode change le résultat, suivez le manuel d'atelier."
+        },
+        "oil_color": {
+          "label": "Aspect de l'huile : ni laiteuse, ni brûlée, sans particules",
+          "detail": "Laiteuse = eau, par le refroidisseur d'huile. Brune et brûlée = disques qui patinent."
+        },
+        "control_cable": {
+          "label": "Câble de commande : gaine en état, course libre, chape serrée",
+          "detail": "Un câble grippé ou une chape desserrée empêche l'inverseur d'atteindre le cran d'engagement."
+        },
+        "lever_travel": {
+          "label": "Course du levier : le bras d'inverseur atteint ses deux butées",
+          "detail": "À vérifier au moteur, pas à la manette : le réglage se fait au niveau du bras."
+        },
+        "damper_plate": {
+          "label": "Accouplement souple : bruit métallique au ralenti au point mort",
+          "detail": "Un cliquetis qui disparaît en embrayant désigne l'accouplement souple, entre moteur et inverseur."
+        },
+        "output_seal": {
+          "label": "Joint spi de sortie sec, sans suintement",
+          "detail": "Une trace d'huile sous l'accouplement vient souvent de là, pas du moteur."
+        },
+        "oil_cooler": {
+          "label": "Refroidisseur d'huile d'inverseur contrôlé",
+          "detail": "C'est par lui que l'eau de mer entre dans l'huile quand le faisceau est percé."
+        }
+      },
+      "warnings": {
+        "noEngagementUnderLoad": "N'essayez pas de forcer un engagement au moteur emballé, ni d'engager à haut régime : l'accouplement souple et les disques n'y résistent pas. Un essai en charge se fait amarré court, sur des amarres en bon état, à bas régime."
+      },
+      "notes": {
+        "oil_spec": "L'huile d'inverseur n'est pas toujours celle du moteur — certains modèles demandent une huile de transmission automatique. La référence exacte est dans le manuel d'atelier."
+      }
+    },
+    "shaft_line": {
+      "title": "Ligne d'arbre et presse-étoupe",
+      "intro": "Le presse-étoupe est le seul point de la ligne d'arbre où l'eau entre volontairement. Vibrations, chauffe ou entrée d'eau : ce sont les mêmes causes qui reviennent — tresse usée, bague hydrolube, alignement.",
+      "steps": {
+        "packing_drip": {
+          "label": "Goutte à goutte conforme au réglage du constructeur",
+          "detail": "Un presse-étoupe classique doit goutter légèrement en marche. Serré à sec, il chauffe et détruit l'arbre."
+        },
+        "packing_tightening": {
+          "label": "Écrou de serrage et contre-écrou bloqués, sans jeu",
+          "detail": "Reprenez le serrage par petits quarts de tour, bateau à flot, en surveillant la température après quelques minutes."
+        },
+        "packing_age": {
+          "label": "Âge de la tresse connu, remplacement planifié",
+          "detail": "Une tresse durcie ne se rattrape pas au serrage : elle marque l'arbre au lieu d'étancher."
+        },
+        "cutless_bearing": {
+          "label": "Bague hydrolube : jeu vertical de l'arbre dans la chaise",
+          "detail": "Un jeu perceptible à la main signale une bague usée — vibrations et usure de l'arbre suivent."
+        },
+        "shaft_play": {
+          "label": "Arbre droit, sans marque d'usure ni corrosion au passage de coque"
+        },
+        "alignment": {
+          "label": "Alignement moteur / arbre contrôlé, bateau à flot",
+          "detail": "L'alignement se contrôle à flot et gréé : la coque travaille, un contrôle à terre ne vaut rien."
+        },
+        "coupling_bolts": {
+          "label": "Boulons d'accouplement serrés et freinés"
+        },
+        "propeller_fouling": {
+          "label": "Hélice propre, pales sans choc ni déformation",
+          "detail": "Une hélice engagée dans un bout ou déformée par un choc donne une vibration franche, proportionnelle au régime."
+        }
+      },
+      "warnings": {
+        "floodingRisk": "Une entrée d'eau au presse-étoupe est une voie d'eau : elle ne se répare pas en mer si elle s'aggrave. Prévoyez de quoi obturer à portée, sachez où est votre pompe de cale, et rentrez si le débit augmente.",
+        "engineOffBeforeShaft": "Coupez le moteur, retirez la clé et immobilisez l'arbre avant toute intervention sur la ligne d'arbre : un arbre entraîné par le courant tourne aussi à l'arrêt."
+      },
+      "notes": {
+        "dripless_variants": "Les presse-étoupe à joint tournant (« dripless ») ne gouttent pas et se contrôlent autrement : soufflet, purge d'air après mise à l'eau, date de remplacement du soufflet. Suivez la notice du fabricant, pas la règle du goutte à goutte."
+      }
+    },
+    "saildrive": {
+      "title": "Saildrive",
+      "intro": "Le saildrive traverse la coque : son soufflet est la seule barrière entre la mer et le bateau. C'est la fiche où l'entretien préventif compte plus que le diagnostic — un soufflet hors d'âge se change avant de fuir, pas après.",
+      "steps": {
+        "diaphragm_date": {
+          "label": "Date de pose du soufflet connue et dans la limite du constructeur",
+          "detail": "Le soufflet a une date de péremption, souvent sept ans, indépendante de son aspect. Notez la date de pose : sans elle, on ne sait pas."
+        },
+        "diaphragm_condition": {
+          "label": "Soufflet inspecté : ni craquelure, ni gonflement, ni trace de vieillissement",
+          "detail": "Un soufflet peut paraître sain et être hors d'âge — l'aspect ne remplace jamais la date."
+        },
+        "water_alarm": {
+          "label": "Alarme de présence d'eau entre les deux soufflets testée",
+          "detail": "Sur les installations à double soufflet, c'est elle qui prévient de la rupture du premier. Testez-la, elle ne sert à rien si elle est morte."
+        },
+        "oil_level": {
+          "label": "Niveau d'huile d'embase contrôlé"
+        },
+        "oil_emulsion": {
+          "label": "Huile d'embase non émulsionnée",
+          "detail": "Une huile laiteuse, couleur café au lait, signale de l'eau par les joints spi : sortie d'eau nécessaire."
+        },
+        "anodes": {
+          "label": "Anodes de l'embase contrôlées et remplacées si consommées",
+          "detail": "Une embase alu sans anode se corrode vite, et la corrosion ne se rattrape pas."
+        },
+        "paint_compatibility": {
+          "label": "Antifouling compatible avec une embase aluminium",
+          "detail": "Un antifouling cuivré appliqué directement sur l'alu déclenche une corrosion galvanique. Utilisez un produit prévu pour les embases."
+        },
+        "gaiter_clamps": {
+          "label": "Colliers du soufflet en place, en inox, sans corrosion"
+        }
+      },
+      "warnings": {
+        "diaphragmExpiry": "Le soufflet de saildrive n'est pas une pièce d'usure ordinaire : c'est un élément de sécurité à date de péremption. Un soufflet hors d'âge, même d'aspect impeccable, est un risque de voie d'eau majeure — remplacez-le à l'échéance donnée par le constructeur, sans attendre un symptôme.",
+        "floodingRisk": "Une entrée d'eau au niveau de l'embase se traite à terre. Si vous constatez de l'eau dans le compartiment moteur au niveau du saildrive, rentrez et faites sortir le bateau."
+      },
+      "notes": {
+        "haul_out_required": "Le remplacement du soufflet impose une sortie d'eau et la dépose de l'embase : anticipez-le au calendrier de carénage plutôt que de le découvrir à l'expertise."
+      }
     }
   },
   "tooling": {
@@ -572,5 +1013,59 @@
     "causesTitle": "Causes probables, de la moins chère à la plus chère",
     "nextStepTitle": "Prochaine étape",
     "generatedAt": "Générée le {date}"
+  },
+  "globalInboard": {
+    "title": "Checklist globale in-bord — avant de démonter quoi que ce soit",
+    "intro": "Un diesel a besoin d'air propre, de gasoil propre et de refroidissement. Les étapes sont ordonnées du moins cher au plus cher : tout ce qui se contrôle à la main, sans outil et sans rien démonter, vient d'abord. La panne est presque toujours là.",
+    "steps": {
+      "battery_switch": {
+        "label": "Coupe-batterie enclenché, cosses propres et serrées",
+        "detail": "Une cosse verte ou un coupe-batterie oublié imite parfaitement un démarreur mort."
+      },
+      "sea_cock": {
+        "label": "Vanne de coque d'eau de mer ouverte",
+        "detail": "Premier réflexe après un hivernage ou un carénage : c'est l'oubli le plus courant."
+      },
+      "strainer": {
+        "label": "Crépine (filtre à eau de mer) propre, couvercle bien serré"
+      },
+      "raw_water_flow": {
+        "label": "Filet d'eau à l'échappement dans les secondes qui suivent le démarrage",
+        "detail": "Pas d'eau : coupez tout de suite, n'attendez pas l'alarme de température."
+      },
+      "coolant_level": {
+        "label": "Niveau du circuit fermé contrôlé, moteur froid",
+        "detail": "Un niveau qui baisse sans fuite visible se retrouve souvent dans l'huile ou à l'échappement."
+      },
+      "belt": {
+        "label": "Courroie d'alternateur et de pompe : tension et état",
+        "detail": "Moteur coupé et clé retirée. De la poussière noire sous la courroie signale un désalignement."
+      },
+      "oil_level": {
+        "label": "Niveau et aspect de l'huile moteur",
+        "detail": "Laiteuse ou en excès : de l'eau ou du gasoil est passé dans le carter, ne démarrez pas."
+      },
+      "fuel_supply": {
+        "label": "Gasoil en quantité suffisante, vanne de réservoir ouverte"
+      },
+      "prefilter_bowl": {
+        "label": "Bol du préfiltre décanteur : ni eau ni dépôts",
+        "detail": "L'eau se voit au fond du bol, plus dense et plus claire que le gasoil."
+      },
+      "exhaust_smoke": {
+        "label": "Couleur des fumées au démarrage et en charge"
+      },
+      "gearbox_oil": {
+        "label": "Niveau et couleur de l'huile d'inverseur"
+      },
+      "bilge_dry": {
+        "label": "Fond de cale sec sous le moteur et au passage de coque",
+        "detail": "Une eau salée sous le moteur ne vient jamais de nulle part : cherchez la source avant de naviguer."
+      }
+    },
+    "warnings": {
+      "hotPressurisedCircuit": "N'ouvrez jamais le bouchon d'un circuit de refroidissement chaud sous pression : la vapeur et le liquide brûlant sortent d'un coup. Attendez le refroidissement complet du moteur.",
+      "engineOffBeforeBelt": "Coupez le moteur et retirez la clé avant toute intervention sur une courroie, une poulie ou l'accouplement — une mise en route accidentelle emporte une main."
+    }
   }
 }

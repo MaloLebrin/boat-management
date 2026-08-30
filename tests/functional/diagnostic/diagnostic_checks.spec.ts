@@ -6,7 +6,13 @@ import { BoatEngineFactory } from '#database/factories/boat_engine_factory'
 import { createAdminUser, createMechanicUser } from '#tests/functional/helpers'
 
 async function makeEligibleEngine(boatId: number) {
-  return BoatEngineFactory.merge({ boatId, kind: 'outboard', strokeType: '2_stroke' }).create()
+  return BoatEngineFactory.merge({
+    boatId,
+    kind: 'outboard',
+    fuel: 'essence',
+    strokeType: '2_stroke',
+    family: 'outboard_2t',
+  }).create()
 }
 
 async function checksFor(engineId: number) {
@@ -74,13 +80,79 @@ test.group('Diagnostic checks (functional)', (group) => {
     assert.lengthOf(await checksFor(engine.id), 0)
   })
 
-  test('PATCH toggle on an ineligible engine flashes an error', async ({ client, assert }) => {
+  test('PATCH toggle accepts an inboard checklist key on a diesel (#576)', async ({
+    client,
+    assert,
+  }) => {
     const user = await createAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
     const engine = await BoatEngineFactory.merge({
       boatId: boat.id,
       kind: 'inboard',
-      strokeType: null,
+      fuel: 'diesel',
+      strokeType: '4_stroke',
+      family: 'inboard_diesel_shaft',
+    }).create()
+
+    const url = `/boats/${boat.id}/engines/${engine.id}/diagnostic/steps`
+    const response = await client
+      .patch(url)
+      .loginAs(user)
+      .form({ stepKey: 'global-inboard.prefilter_bowl', checked: true })
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertFlashMissing('error')
+    const checks = await checksFor(engine.id)
+    assert.lengthOf(checks, 1)
+    assert.equal(checks[0].stepKey, 'global-inboard.prefilter_bowl')
+  })
+
+  test('PATCH reset scoped to a checklist leaves the other family untouched (#576)', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const engine = await BoatEngineFactory.merge({
+      boatId: boat.id,
+      kind: 'inboard',
+      fuel: 'diesel',
+      strokeType: '4_stroke',
+      family: 'inboard_diesel_shaft',
+    }).create()
+
+    const url = `/boats/${boat.id}/engines/${engine.id}/diagnostic`
+    for (const stepKey of ['global-inboard.prefilter_bowl', 'diesel-fuel.bleed']) {
+      await client.patch(`${url}/steps`).loginAs(user).form({ stepKey, checked: true }).redirects(0)
+    }
+
+    // Le préfixe `global.` du hors-bord ne doit pas emporter `global-inboard.` :
+    // les deux checklists cohabitent sur des espaces de clés distincts.
+    await client.delete(`${url}/checks`).loginAs(user).form({ scope: 'global' }).redirects(0)
+    assert.lengthOf(await checksFor(engine.id), 2)
+
+    await client
+      .delete(`${url}/checks`)
+      .loginAs(user)
+      .form({ scope: 'global-inboard' })
+      .redirects(0)
+    const remaining = await checksFor(engine.id)
+    assert.lengthOf(remaining, 1)
+    assert.equal(remaining[0].stepKey, 'diesel-fuel.bleed')
+  })
+
+  test('PATCH toggle on an ineligible engine flashes an error', async ({ client, assert }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    // Hors-bord 4 temps : la seule motorisation courante qu'aucune fiche ne
+    // sert depuis #576 — un in-bord diesel est désormais éligible.
+    const engine = await BoatEngineFactory.merge({
+      boatId: boat.id,
+      kind: 'outboard',
+      fuel: 'essence',
+      strokeType: '4_stroke',
+      family: 'outboard_4t',
     }).create()
 
     const response = await client
@@ -92,7 +164,7 @@ test.group('Diagnostic checks (functional)', (group) => {
     response.assertStatus(302)
     response.assertFlashMessage(
       'error',
-      'Troubleshooting checklists only apply to 2-stroke outboard engines.'
+      'Troubleshooting checklists are not available for this engine family.'
     )
     assert.lengthOf(await checksFor(engine.id), 0)
   })
