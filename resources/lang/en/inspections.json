@@ -28,5 +28,94 @@
     "fuelLevel": "Fuel level",
     "engineHours": "Engine hours",
     "unavailable": "Fill in both inspections to see the comparison."
+  },
+  "checklist": {
+    "title": "Checklist",
+    "progress": "{checked}/{total} items checked",
+    "state": {
+      "ok": "OK",
+      "remark": "Remark",
+      "damage": "Damage",
+      "notInspected": "Not inspected"
+    },
+    "noteLabel": "Note",
+    "notePlaceholder": "Describe what you observed…",
+    "noteRequired": "A note is required for a remark or damage.",
+    "save": "Save",
+    "cancel": "Cancel",
+    "uncheck": "Reset to not inspected",
+    "createAction": "Create an equipment action",
+    "checkoutLabel": "At checkout: {state}",
+    "degraded": "Degraded since checkout",
+    "sections": {
+      "hull_deck": {
+        "title": "Hull & deck",
+        "items": {
+          "hull_condition": "Hull condition (impacts, scratches, gelcoat)",
+          "deck_condition": "Deck condition (non-slip, cracks)",
+          "fenders_lines": "Fenders and mooring lines",
+          "windows_hatches": "Windows and hatches (watertightness)",
+          "anchor_windlass": "Ground tackle: anchor, chain, windlass"
+        }
+      },
+      "rigging": {
+        "title": "Mast & rigging",
+        "items": {
+          "mast_spars": "Mast and spars",
+          "standing_rigging": "Standing rigging (shrouds, forestay, turnbuckles)",
+          "running_rigging": "Running rigging (halyards, sheets)",
+          "sails_condition": "Sails condition",
+          "winches": "Winches and deck hardware"
+        }
+      },
+      "engine": {
+        "title": "Engine & levels",
+        "items": {
+          "engine_start": "Engine start",
+          "engine_oil": "Engine oil level",
+          "coolant": "Coolant level",
+          "fuel_system": "Fuel system (no leaks)",
+          "bilge": "Dry bilge, bilge pump",
+          "propeller": "Propeller and drive"
+        }
+      },
+      "electrical": {
+        "title": "Electricity & electronics",
+        "items": {
+          "batteries": "Batteries (charge, terminals)",
+          "navigation_lights": "Navigation lights",
+          "electronics": "Onboard electronics (GPS, depth sounder, VHF)",
+          "shore_power": "Shore power and charger"
+        }
+      },
+      "safety": {
+        "title": "Safety",
+        "items": {
+          "lifejackets": "Life jackets (count, condition)",
+          "extinguishers": "Fire extinguishers (presence, dates)",
+          "flares": "Distress flares (expiry)",
+          "first_aid": "First aid kit",
+          "liferaft": "Life raft (service date)"
+        }
+      },
+      "interior": {
+        "title": "Interior & cleanliness",
+        "items": {
+          "cabin_condition": "Cabins and upholstery condition",
+          "galley": "Galley (stove, fridge)",
+          "heads": "Heads and black water",
+          "water_system": "Fresh water (tank, pump)",
+          "cleanliness": "Overall cleanliness"
+        }
+      },
+      "tender": {
+        "title": "Tender & accessories",
+        "items": {
+          "tender_condition": "Tender (tubes, floor)",
+          "tender_outboard": "Tender outboard",
+          "accessories": "Accessories (oars, pump)"
+        }
+      }
+    }
   }
 }

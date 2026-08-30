@@ -596,6 +596,33 @@ export class BoatIncidentSchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class BoatInspectionItemSchema extends BaseModel {
+  static $columns = [
+    'boatInspectionId',
+    'createdAt',
+    'id',
+    'itemKey',
+    'note',
+    'state',
+    'updatedAt',
+  ] as const
+  $columns = BoatInspectionItemSchema.$columns
+  @column()
+  declare boatInspectionId: number
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare itemKey: string
+  @column()
+  declare note: string | null
+  @column()
+  declare state: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class BoatInspectionSchema extends BaseModel {
   static $columns = [
     'createdAt',

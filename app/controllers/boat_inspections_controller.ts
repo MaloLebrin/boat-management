@@ -16,11 +16,17 @@ import OrganizationService from '#services/organization_service'
 import InspectionPolicy from '#policies/inspection_policy'
 import EquipmentActionPolicy from '#policies/equipment_action_policy'
 import {
+  clearBoatInspectionItemValidator,
   createBoatInspectionValidator,
+  setBoatInspectionItemValidator,
   updateBoatInspectionValidator,
 } from '#validators/boat_inspection'
 import { createBoatEquipmentActionValidator } from '#validators/boat_equipment_action'
-import { toBoatInspectionRow } from '#transformers/boat_inspection_transformer'
+import {
+  toBoatInspectionItemRow,
+  toBoatInspectionRow,
+} from '#transformers/boat_inspection_transformer'
+import { inspectionCategoryForBoat } from '#shared/helpers/inspection_checklist'
 import { toBoatReservationRow } from '#transformers/boat_reservation_transformer'
 import { toBoatEquipmentActionRow } from '#transformers/boat_equipment_action_transformer'
 import { inject } from '@adonisjs/core'
@@ -103,16 +109,19 @@ export default class BoatInspectionsController {
     const inspectionsWithMedia = await Promise.all(
       inspections.map(async (inspection) => {
         const actions = await this.equipmentActionService.listForInspection(user, boat, inspection)
+        const items = await this.inspectionService.listItems(user, reservation, inspection.id)
         return {
           ...toBoatInspectionRow(inspection),
           photos: await this.mediaService.listForEntity('inspection', inspection.id),
           actions: actions.map(toBoatEquipmentActionRow),
+          items: items.map(toBoatInspectionItemRow),
         }
       })
     )
 
     return inertia.render('boats/reservation_inspection', {
-      boat: { id: boat.id, name: boat.name },
+      // La catégorie (repli legacy inclus) filtre la checklist côté client (#584).
+      boat: { id: boat.id, name: boat.name, category: inspectionCategoryForBoat(boat) },
       reservation: toBoatReservationRow(reservation, boat.name),
       inspections: inspectionsWithMedia,
       canEdit,
@@ -240,6 +249,80 @@ export default class BoatInspectionsController {
 
     session.flash('success', i18n.t('flash.inspections.deleted'))
     response.redirect(`/boats/${boat.id}/reservations/${reservation.id}/inspection`)
+  }
+
+  /**
+   * Record the state of one checklist item (#584): `ok` on a tap, `remark` or
+   * `damage` with a mandatory note. Upsert on (inspection, itemKey).
+   */
+  async setItem({ request, response, auth, params, bouncer, session, i18n }: HttpContext) {
+    await auth.authenticate()
+    const user = auth.getUserOrFail()
+
+    const loaded = await this.resolve(
+      user,
+      Number(params.boatId),
+      Number(params.reservationId),
+      response
+    )
+    if (!loaded) return
+
+    const { reservation } = loaded
+    await bouncer.with(InspectionPolicy).authorize('edit', reservation)
+
+    const payload = await request.validateUsing(setBoatInspectionItemValidator)
+
+    try {
+      await this.inspectionService.setItem(user, reservation, Number(params.inspectionId), payload)
+    } catch (error) {
+      if (error instanceof BoatInspectionNotFoundError) {
+        session.flash('error', i18n.t('flash.inspections.notFound'))
+        return response.redirect().back()
+      }
+      if (error instanceof BoatInspectionValidationError) {
+        session.flash('error', i18n.t(`flash.inspections.${error.errorCode}`))
+        return response.redirect().back()
+      }
+      throw error
+    }
+
+    response.redirect().back()
+  }
+
+  /** Reset a checklist item back to "not inspected" by deleting its row (#584). */
+  async destroyItem({ request, response, auth, params, bouncer, session, i18n }: HttpContext) {
+    await auth.authenticate()
+    const user = auth.getUserOrFail()
+
+    const loaded = await this.resolve(
+      user,
+      Number(params.boatId),
+      Number(params.reservationId),
+      response
+    )
+    if (!loaded) return
+
+    const { reservation } = loaded
+    await bouncer.with(InspectionPolicy).authorize('edit', reservation)
+
+    const payload = await request.validateUsing(clearBoatInspectionItemValidator)
+
+    try {
+      await this.inspectionService.clearItem(
+        user,
+        reservation,
+        Number(params.inspectionId),
+        payload.itemKey
+      )
+    } catch (error) {
+      if (error instanceof BoatInspectionNotFoundError) {
+        session.flash('error', i18n.t('flash.inspections.notFound'))
+        return response.redirect().back()
+      }
+      throw error
+    }
+
+    response.redirect().back()
   }
 
   /**

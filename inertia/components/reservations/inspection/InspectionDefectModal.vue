@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3'
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseModal from '~/components/base/BaseModal.vue'
@@ -25,6 +25,11 @@ const props = defineProps<{
    */
   inspectionId: number | null
   open: boolean
+  /**
+   * Brouillon proposé à l'ouverture — un dommage de la checklist (#584) arrive
+   * ici avec le libellé du point et la note du constat déjà remplis.
+   */
+  prefill?: { label: string; notes: string } | null
 }>()
 
 const emit = defineEmits<{
@@ -42,6 +47,17 @@ const form = useForm({
   notes: '',
   estimatedCost: '',
 })
+
+watch(
+  () => props.open,
+  (open) => {
+    if (open && props.prefill) {
+      form.label = props.prefill.label
+      form.actionType = 'to_repair'
+      form.notes = props.prefill.notes
+    }
+  }
+)
 
 const actionUrl = computed(
   () =>

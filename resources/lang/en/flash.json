@@ -162,7 +162,8 @@
     "updated": "Inspection updated.",
     "deleted": "Inspection deleted.",
     "notFound": "Inspection not found.",
-    "kindAlreadyExists": "An inspection already exists for this type (checkout/checkin)."
+    "kindAlreadyExists": "An inspection already exists for this type (checkout/checkin).",
+    "itemNotFound": "Unknown checklist item."
   },
   "fuelLog": {
     "created": "Fuel log recorded.",

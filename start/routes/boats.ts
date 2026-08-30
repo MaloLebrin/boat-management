@@ -409,6 +409,19 @@ router
         'destroy',
       ])
       .as('boats.reservations.inspections.destroy')
+    // Checklist d'état des lieux : constat par point de contrôle (#584)
+    router
+      .patch('boats/:boatId/reservations/:reservationId/inspections/:inspectionId/items', [
+        controllers.BoatInspections,
+        'setItem',
+      ])
+      .as('boats.reservations.inspections.items.set')
+    router
+      .delete('boats/:boatId/reservations/:reservationId/inspections/:inspectionId/items', [
+        controllers.BoatInspections,
+        'destroyItem',
+      ])
+      .as('boats.reservations.inspections.items.destroy')
     // Défauts constatés → actions équipement liées à l'inspection (#311)
     router
       .post(

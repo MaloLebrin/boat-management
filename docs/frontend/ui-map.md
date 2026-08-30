@@ -245,6 +245,19 @@ onglets `BaseTabs` **sous `lg`** (comparer sans défilement interminable) et gar
 au-dessus. Chaque panneau n'est rendu qu'une fois (ids de formulaires uniques) — seule sa
 visibilité change (`hidden lg:block` sur le panneau inactif).
 
+### Checklist d'état des lieux (#584)
+
+Chaque panneau d'inspection embarque `InspectionChecklist.vue` (sections + progression) et
+`InspectionChecklistItem.vue` (ligne : tap = `ok`, note obligatoire sur `remark`/`damage`, cibles
+tactiles ≥ 44 px). Le contenu vient du corpus statique
+`shared/constants/inspections/inspection_checklist_content.ts`, filtré par la catégorie du bateau
+(`inspectionSectionsForCategory`, prop `boat.category` calculée côté serveur avec repli legacy) —
+seul l'état persisté (`items`) transite par Inertia, comme les checklists de diagnostic. Sur le
+panneau Retour, chaque point affiche son état au Départ et signale une dégradation en rouge. Un
+point en `damage` ouvre `InspectionDefectModal` **pré-remplie** (prop `prefill` : libellé du point +
+note du constat). Mutations via `router.patch`/`router.delete` + `preserveScroll` sur
+`.../inspections/:inspectionId/items`. Voir `docs/domain/inspections.md`.
+
 ### Liens et navigation (#533)
 
 - **Navigation interne = `<Link>` (`@adonisjs/inertia/vue`)**, jamais `<a href="/…">` : une ancre brute recharge l'app entière. Deux règles ESLint le tiennent (`vue/no-restricted-static-attribute`, `vue/no-restricted-v-bind` sur `inertia/**/*.vue`).

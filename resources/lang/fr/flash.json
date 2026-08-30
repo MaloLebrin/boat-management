@@ -162,7 +162,8 @@
     "updated": "État des lieux mis à jour.",
     "deleted": "État des lieux supprimé.",
     "notFound": "État des lieux introuvable.",
-    "kindAlreadyExists": "Un état des lieux existe déjà pour ce type (départ/retour)."
+    "kindAlreadyExists": "Un état des lieux existe déjà pour ce type (départ/retour).",
+    "itemNotFound": "Point de contrôle inconnu."
   },
   "fuelLog": {
     "created": "Avitaillement enregistré.",

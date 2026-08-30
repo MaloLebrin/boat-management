@@ -28,5 +28,94 @@
     "fuelLevel": "Niveau carburant",
     "engineHours": "Heures moteur",
     "unavailable": "Renseignez les deux états des lieux pour voir la comparaison."
+  },
+  "checklist": {
+    "title": "Checklist",
+    "progress": "{checked}/{total} points contrôlés",
+    "state": {
+      "ok": "OK",
+      "remark": "Remarque",
+      "damage": "Dommage",
+      "notInspected": "Non contrôlé"
+    },
+    "noteLabel": "Note",
+    "notePlaceholder": "Décrivez le constat…",
+    "noteRequired": "Une note est requise pour une remarque ou un dommage.",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "uncheck": "Repasser en non contrôlé",
+    "createAction": "Créer une action d'équipement",
+    "checkoutLabel": "Au départ : {state}",
+    "degraded": "Dégradé depuis le départ",
+    "sections": {
+      "hull_deck": {
+        "title": "Coque et pont",
+        "items": {
+          "hull_condition": "État de la coque (impacts, rayures, gelcoat)",
+          "deck_condition": "État du pont (antidérapant, fissures)",
+          "fenders_lines": "Défenses et amarres",
+          "windows_hatches": "Hublots et panneaux de pont (étanchéité)",
+          "anchor_windlass": "Mouillage : ancre, chaîne, guindeau"
+        }
+      },
+      "rigging": {
+        "title": "Mât et gréement",
+        "items": {
+          "mast_spars": "Mât et espars",
+          "standing_rigging": "Gréement dormant (haubans, étai, ridoirs)",
+          "running_rigging": "Gréement courant (drisses, écoutes)",
+          "sails_condition": "État des voiles",
+          "winches": "Winchs et accastillage"
+        }
+      },
+      "engine": {
+        "title": "Moteur et niveaux",
+        "items": {
+          "engine_start": "Démarrage du moteur",
+          "engine_oil": "Niveau d'huile moteur",
+          "coolant": "Liquide de refroidissement",
+          "fuel_system": "Circuit carburant (absence de fuite)",
+          "bilge": "Fond de cale sec, pompe de cale",
+          "propeller": "Hélice et embase"
+        }
+      },
+      "electrical": {
+        "title": "Électricité et électronique",
+        "items": {
+          "batteries": "Batteries (charge, cosses)",
+          "navigation_lights": "Feux de navigation",
+          "electronics": "Électronique de bord (GPS, sondeur, VHF)",
+          "shore_power": "Prise de quai et chargeur"
+        }
+      },
+      "safety": {
+        "title": "Sécurité",
+        "items": {
+          "lifejackets": "Gilets de sauvetage (nombre, état)",
+          "extinguishers": "Extincteurs (présence, dates)",
+          "flares": "Fusées de détresse (péremption)",
+          "first_aid": "Trousse de secours",
+          "liferaft": "Radeau de survie (révision)"
+        }
+      },
+      "interior": {
+        "title": "Intérieur et propreté",
+        "items": {
+          "cabin_condition": "État des cabines et sellerie",
+          "galley": "Cuisine (réchaud, réfrigérateur)",
+          "heads": "WC marins et eaux noires",
+          "water_system": "Eau douce (réservoir, pompe)",
+          "cleanliness": "Propreté générale"
+        }
+      },
+      "tender": {
+        "title": "Annexe et accessoires",
+        "items": {
+          "tender_condition": "Annexe (boudins, plancher)",
+          "tender_outboard": "Moteur d'annexe",
+          "accessories": "Accessoires (avirons, gonfleur)"
+        }
+      }
+    }
   }
 }
