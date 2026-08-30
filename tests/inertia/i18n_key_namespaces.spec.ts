@@ -28,13 +28,7 @@ const LOCALES = ['en', 'fr'] as const
  * À vider au fur et à mesure — le test échoue aussi si une entrée devient
  * obsolète, pour éviter que cette liste ne pourrisse.
  */
-const KNOWN_UNRESOLVED = [
-  'boats.equipment.notes.label',
-  'boats.equipment.notes.placeholder',
-  'equipment.notes',
-  'equipment.purchasePrice',
-  'equipment.purchasedAt',
-]
+const KNOWN_UNRESOLVED = ['boats.equipment.notes.label', 'boats.equipment.notes.placeholder']
 
 function flatten(value: unknown, prefix: string, out: Set<string>) {
   if (value !== null && typeof value === 'object') {

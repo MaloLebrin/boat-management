@@ -280,6 +280,15 @@
       "coastal": "Côtier — jusqu'à 6 milles",
       "semi_offshore": "Semi-hauturier — jusqu'à 60 milles",
       "offshore": "Hauturier — au-delà de 60 milles"
+    },
+    "genericEquipmentCategory": {
+      "navigation": "Électronique de navigation",
+      "electrical": "Électricité",
+      "anchoring": "Mouillage",
+      "deck": "Pont et accastillage",
+      "energy": "Énergie et chauffage",
+      "comfort": "Confort et vie à bord",
+      "plumbing": "Plomberie et circuit d'eau"
     }
   },
   "index": {
@@ -491,9 +500,12 @@
       "other": "Autre",
       "safety": "Sécurité",
       "navigation": "Navigation électronique",
-      "electrical": "Électricité / Énergie",
+      "electrical": "Électricité",
       "anchoring": "Mouillage",
-      "deck": "Pont / Accastillage"
+      "deck": "Pont / Accastillage",
+      "energy": "Énergie / Chauffage",
+      "comfort": "Confort",
+      "plumbing": "Plomberie"
     },
     "comingSoon": {
       "title": "Catégorie bientôt disponible",
@@ -938,7 +950,16 @@
       "cancel": "Annuler",
       "submit": "Enregistrer"
     },
-    "viewDetail": "Voir le détail"
+    "viewDetail": "Voir le détail",
+    "category": "Catégorie",
+    "catalog": {
+      "freeTextHint": "Vous pouvez saisir une valeur absente du catalogue : elle sera enregistrée telle quelle.",
+      "modelNeedsBrandHint": "Choisissez une marque du catalogue pour voir ses modèles. La saisie libre reste acceptée.",
+      "noBrandMatch": "Aucune marque ne correspond — votre saisie sera conservée.",
+      "noModelMatch": "Aucun modèle ne correspond — votre saisie sera conservée.",
+      "brandGroupForCategory": "Marques de cette catégorie",
+      "brandGroupOther": "Autres marques"
+    }
   },
   "sailShow": {
     "title": "Voile",

@@ -120,19 +120,38 @@ export type BoatSafetyEquipmentPayload = {
   purchasedAt?: Date | string | DateTime | null
 }
 
+/**
+ * Catégories d'équipement générique (#577). Les trois dernières (`energy`,
+ * `comfort`, `plumbing`) étendent les quatre historiques — les valeurs déjà en
+ * base restent toutes valides, il n'y a pas de backfill.
+ */
 export const GENERIC_EQUIPMENT_CATEGORIES = [
   'navigation',
   'electrical',
   'anchoring',
   'deck',
+  'energy',
+  'comfort',
+  'plumbing',
 ] as const
 export type GenericEquipmentCategory = (typeof GENERIC_EQUIPMENT_CATEGORIES)[number]
+
+export function isGenericEquipmentCategory(value: unknown): value is GenericEquipmentCategory {
+  return (
+    typeof value === 'string' && (GENERIC_EQUIPMENT_CATEGORIES as readonly string[]).includes(value)
+  )
+}
 
 export type BoatGenericEquipmentPayload = {
   category: GenericEquipmentCategory
   name: string
   brand?: string | null
   model?: string | null
+  /**
+   * Rattachement au catalogue d'équipements (#577), facultatif : `brand` et
+   * `model` restent la source de vérité et le repli texte libre.
+   */
+  equipmentModelId?: number | null
   quantity?: number | null
   status?: string | null
   notes?: string | null

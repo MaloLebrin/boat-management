@@ -17,6 +17,7 @@ import type {
   EquipmentActionType as EquipmentActionTypeValue,
   EquipmentReferenceType as EquipmentReferenceTypeValue,
 } from '../../shared/types/equipment_action'
+import type { GenericEquipmentCategory } from '../../shared/types/boat'
 
 /**
  * Intention de création demandée depuis l'en-tête de la fiche bateau (#358, #365).
@@ -43,10 +44,12 @@ export type BoatShowSafetyEquipment = {
 
 export type BoatShowGenericEquipment = {
   id: number
-  category: 'navigation' | 'electrical' | 'anchoring' | 'deck'
+  category: GenericEquipmentCategory
   name: string
   brand: string | null
   model: string | null
+  /** Rattachement au catalogue d'équipements (#577), facultatif. */
+  equipmentModelId: number | null
   quantity: number | null
   status: 'ok' | 'to_check' | 'to_replace'
   notes: string | null

@@ -6,6 +6,7 @@ import AiAnalysisService from '#services/ai_analysis_service'
 import AuditLogService from '#services/audit_log_service'
 import BoatCatalogService from '#services/boat_catalog_service'
 import EngineCatalogService from '#services/engine_catalog_service'
+import EquipmentCatalogService from '#services/equipment_catalog_service'
 import BoatDocumentService from '#services/boat_document_service'
 import BoatEquipmentActionService from '#services/boat_equipment_action_service'
 import BoatFuelLogService from '#services/boat_fuel_log_service'
@@ -76,6 +77,7 @@ export default class BoatsController {
     private boatOwnerService: BoatOwnerService,
     private boatCatalogService: BoatCatalogService,
     private engineCatalogService: EngineCatalogService,
+    private equipmentCatalogService: EquipmentCatalogService,
     private safetyComplianceService: BoatSafetyComplianceService
   ) {}
 
@@ -259,6 +261,13 @@ export default class BoatsController {
       // `router.reload({ only: ['engineCatalogModels'], data: { engineBrandId } })`.
       const engineCatalog = await this.engineCatalogService.formProps(request.qs().engineBrandId)
 
+      // Même mécanique pour le formulaire d'équipement générique (#577) : les
+      // modèles sont rechargés par
+      // `router.reload({ only: ['equipmentCatalogModels'], data: { equipmentBrandId } })`.
+      const equipmentCatalog = await this.equipmentCatalogService.formProps(
+        request.qs().equipmentBrandId
+      )
+
       const canManageEquipment = canManageMaintenance
       const canManageDocuments = canManageMaintenance
       const canExport = user.organization ? this.quotaService.canExport(user.organization) : false
@@ -294,6 +303,7 @@ export default class BoatsController {
           safetyCompliance: this.safetyComplianceService.forBoat(boat),
         }),
         ...engineCatalog,
+        ...equipmentCatalog,
 
         // Groupe « maintenance » : onglets Aperçu, Historique, Tâches, Fiches,
         // Actions équipement et Documents administratifs.

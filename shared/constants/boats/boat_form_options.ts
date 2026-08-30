@@ -152,3 +152,19 @@ export const GENERIC_EQUIPMENT_STATUS_OPTIONS = [
   { value: 'to_check', label: 'To check' },
   { value: 'to_replace', label: 'To replace' },
 ] as const
+
+/**
+ * Catégories d'équipement générique (#577) — liste et ordre alignés sur
+ * `GENERIC_EQUIPMENT_CATEGORIES` (`shared/types/boat.ts`), la constante que le
+ * validator suit. Les libellés ci-dessous sont un repli EN : l'affichage passe
+ * par `t('boats.options.genericEquipmentCategory.<slug>')`.
+ */
+export const GENERIC_EQUIPMENT_CATEGORY_OPTIONS = [
+  { value: 'navigation', label: 'Navigation electronics' },
+  { value: 'electrical', label: 'Electrical' },
+  { value: 'anchoring', label: 'Anchoring' },
+  { value: 'deck', label: 'Deck hardware' },
+  { value: 'energy', label: 'Energy & heating' },
+  { value: 'comfort', label: 'Comfort & living' },
+  { value: 'plumbing', label: 'Plumbing & water' },
+] as const

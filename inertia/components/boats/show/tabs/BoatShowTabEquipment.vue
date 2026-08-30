@@ -10,6 +10,7 @@ import BoatShowSailsCard from '~/components/boats/sail/BoatShowSailsCard.vue'
 import BoatEquipmentAddModal from '~/components/boats/show/modals/BoatEquipmentAddModal.vue'
 import BoatEquipmentActionModal from '~/components/boats/equipment-actions/BoatEquipmentActionModal.vue'
 import { shouldReopenEngineForm } from '~/composables/use_engine_form_draft'
+import { shouldReopenGenericEquipmentForm } from '~/composables/use_generic_equipment_form_draft'
 import { useT } from '~/composables/use_t'
 import type { BoatCreateIntent, BoatShowDetail, EquipmentActionPrefill } from '~/types/boat_show'
 import type { SafetyComplianceReport } from '#shared/types/safety'
@@ -31,9 +32,11 @@ const emit = defineEmits<{ createIntentConsumed: [] }>()
 const { t } = useT()
 
 const equipmentFilter = ref<'all' | 'engine' | 'sail' | 'rig' | 'safety' | 'generic'>('all')
-// Rouverte depuis l'URL après la visite partielle du catalogue moteur (#573),
-// qui remonte l'arbre et emporterait sinon ce booléen.
-const isAddModalOpen = ref(shouldReopenEngineForm('equipment-add'))
+// Rouverte depuis l'URL après la visite partielle du catalogue moteur (#573)
+// ou équipement (#577), qui remonte l'arbre et emporterait sinon ce booléen.
+const isAddModalOpen = ref(
+  shouldReopenEngineForm('equipment-add') || shouldReopenGenericEquipmentForm('equipment-add')
+)
 
 // L'onglet est monté après la demande d'ouverture : on consomme l'intention au
 // montage (et si elle change alors que l'onglet est déjà affiché) — #365.

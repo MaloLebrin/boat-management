@@ -512,6 +512,7 @@ export class BoatGenericEquipmentSchema extends BaseModel {
     'brand',
     'category',
     'createdAt',
+    'equipmentModelId',
     'id',
     'model',
     'name',
@@ -531,6 +532,8 @@ export class BoatGenericEquipmentSchema extends BaseModel {
   declare category: string
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
+  @column()
+  declare equipmentModelId: number | null
   @column({ isPrimary: true })
   declare id: number
   @column()
@@ -1573,6 +1576,75 @@ export class EnginePartReferenceSchema extends BaseModel {
   declare updatedAt: DateTime
   @column.date()
   declare verifiedAt: DateTime | null
+}
+
+export class EquipmentBrandSchema extends BaseModel {
+  static $columns = [
+    'aliases',
+    'categories',
+    'country',
+    'createdAt',
+    'id',
+    'isActive',
+    'name',
+    'slug',
+    'updatedAt',
+  ] as const
+  $columns = EquipmentBrandSchema.$columns
+  @column()
+  declare aliases: any | null
+  @column()
+  declare categories: any
+  @column()
+  declare country: string | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare isActive: boolean
+  @column()
+  declare name: string
+  @column()
+  declare slug: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
+}
+
+export class EquipmentModelSchema extends BaseModel {
+  static $columns = [
+    'aliases',
+    'category',
+    'createdAt',
+    'equipmentBrandId',
+    'id',
+    'name',
+    'productionEndYear',
+    'productionStartYear',
+    'slug',
+    'updatedAt',
+  ] as const
+  $columns = EquipmentModelSchema.$columns
+  @column()
+  declare aliases: any | null
+  @column()
+  declare category: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare equipmentBrandId: number
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare name: string
+  @column()
+  declare productionEndYear: number | null
+  @column()
+  declare productionStartYear: number | null
+  @column()
+  declare slug: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
 }
 
 export class InvoiceCounterSchema extends BaseModel {

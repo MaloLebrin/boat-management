@@ -8,6 +8,7 @@ import OrganizationService from '#services/organization_service'
 import { toMediaRow } from '#transformers/media_row_transformer'
 import {
   createGenericEquipmentValidator,
+  parseEquipmentCatalogId,
   updateGenericEquipmentValidator,
 } from '#validators/boat_generic_equipment'
 import { inject } from '@adonisjs/core'
@@ -59,6 +60,7 @@ export default class BoatGenericEquipmentController {
         name: item.name,
         brand: item.brand,
         model: item.model,
+        equipmentModelId: item.equipmentModelId,
         category: item.category,
         quantity: item.quantity,
         status: item.status,
@@ -77,9 +79,14 @@ export default class BoatGenericEquipmentController {
     if (!loaded) return
     const { user, boat } = loaded
     await bouncer.with(BoatPolicy).authorize('edit', boat)
-    const payload = await request.validateUsing(createGenericEquipmentValidator)
+    const { equipmentModelId, ...body } = await request.validateUsing(
+      createGenericEquipmentValidator
+    )
     try {
-      await this.equipmentService.create(user, boat, payload)
+      await this.equipmentService.create(user, boat, {
+        ...body,
+        equipmentModelId: parseEquipmentCatalogId(equipmentModelId),
+      })
     } catch (error) {
       if (error instanceof BoatEquipmentNotFoundError) {
         session.flash('error', i18n.t('flash.genericEquipment.notFound'))
@@ -98,9 +105,14 @@ export default class BoatGenericEquipmentController {
     if (!loaded) return
     const { user, boat } = loaded
     await bouncer.with(BoatPolicy).authorize('edit', boat)
-    const payload = await request.validateUsing(updateGenericEquipmentValidator)
+    const { equipmentModelId, ...body } = await request.validateUsing(
+      updateGenericEquipmentValidator
+    )
     try {
-      await this.equipmentService.update(user, boat, Number(params.itemId), payload)
+      await this.equipmentService.update(user, boat, Number(params.itemId), {
+        ...body,
+        equipmentModelId: parseEquipmentCatalogId(equipmentModelId),
+      })
     } catch (error) {
       if (error instanceof BoatEquipmentNotFoundError) {
         session.flash('error', i18n.t('flash.genericEquipment.notFound'))

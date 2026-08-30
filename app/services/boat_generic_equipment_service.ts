@@ -29,6 +29,7 @@ export default class BoatGenericEquipmentService {
       name: payload.name,
       brand: payload.brand ?? null,
       model: payload.model ?? null,
+      equipmentModelId: payload.equipmentModelId ?? null,
       quantity: payload.quantity ?? null,
       status: (payload.status as 'ok' | 'to_check' | 'to_replace') ?? 'ok',
       notes: payload.notes ?? null,
@@ -50,6 +51,7 @@ export default class BoatGenericEquipmentService {
     item.name = payload.name
     item.brand = payload.brand ?? null
     item.model = payload.model ?? null
+    item.equipmentModelId = payload.equipmentModelId ?? null
     item.quantity = payload.quantity ?? null
     item.status = (payload.status as 'ok' | 'to_check' | 'to_replace') ?? item.status
     item.notes = payload.notes ?? null

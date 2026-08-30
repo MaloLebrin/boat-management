@@ -14,7 +14,7 @@
     "check:sw": "node scripts/check_sw_build.mjs",
     "dev": "node ace serve --hmr",
     "queue:work": "node ace queue:work",
-    "migrate:prod": "node ace migration:run --force && node ace db:seed --files=database/seeders/boat_catalog_seeder.js --force && node ace db:seed --files=database/seeders/engine_catalog_seeder.js --force",
+    "migrate:prod": "node ace migration:run --force && node ace db:seed --files=database/seeders/boat_catalog_seeder.js --force && node ace db:seed --files=database/seeders/engine_catalog_seeder.js --force && node ace db:seed --files=database/seeders/equipment_catalog_seeder.js --force",
     "queue:work:ai": "node ace queue:work --queue=ai",
     "test": "node ace test unit integration functional",
     "test:e2e": "node ace test browser",

@@ -128,6 +128,49 @@ alimentée par `engine_catalog_seeder` depuis `database/data/engine_catalog/part
 - `createdAt`, `updatedAt`
 - unique `(engine_model_id, part_key)`, index sur `engine_model_id`
 
+### equipment_brands
+
+Référentiel global du catalogue d'équipements génériques (#577), sans `organizationId` : alimenté
+par `database/seeders/equipment_catalog_seeder.ts`, jamais par les utilisateurs. Miroir de
+`engine_brands`.
+
+- `id`
+- `slug` (unique, **stable à vie** — jamais renommé)
+- `name` (nom commercial officiel, casse comprise — jamais traduit), `country`
+- `categories` (`jsonb`) — une marque peut couvrir plusieurs catégories d'équipement (Lewmar :
+  mouillage et accastillage, Quick : mouillage, électricité et plomberie). Le vocabulaire est celui
+  de `boat_generic_equipment.category` (`GENERIC_EQUIPMENT_CATEGORIES`)
+- `aliases` (`jsonb`) — orthographes et anciens noms (`waeco`, `autohelm`), base de
+  `EquipmentCatalogService.resolveBrand()`
+- `isActive`
+- timestamps
+
+### equipment_models
+
+- `id`, `equipmentBrandId` (FK `equipment_brands`, `onDelete cascade`)
+- `slug` (unique par marque, stable à vie), `name`
+- `category` — un modèle appartient à **une seule** catégorie
+- `productionStartYear`, `productionEndYear` — les gammes discontinuées sont conservées,
+  renseignés seulement quand la date est certaine
+- `aliases` (`jsonb`)
+- timestamps
+
+### boat_generic_equipment
+
+Équipements génériques d'un bateau (électronique, électricité, mouillage, pont, énergie, confort,
+plomberie).
+
+- `id`, `boatId` (FK `boats`, `onDelete cascade`)
+- `category` — `GENERIC_EQUIPMENT_CATEGORIES` (#577 : `navigation`, `electrical`, `anchoring`,
+  `deck`, `energy`, `comfort`, `plumbing`)
+- `name`, `brand`, `model` (texte libre), `quantity`, `status` (`ok | to_check | to_replace`),
+  `notes`
+- `equipmentModelId` (FK `equipment_models`, **nullable**, `onDelete set null`) — rattachement au
+  catalogue (#577). `brand` et `model` restent alimentés et font foi : c'est le repli texte libre,
+  un équipement hors catalogue est parfaitement valide
+- `purchasePrice`, `purchasedAt`
+- timestamps
+
 ### boat_engines
 
 - `id`, `boatId`
