@@ -88,6 +88,13 @@ Référentiel global du catalogue moteur (#573), sans `organizationId` : aliment
 - `aliases` (`jsonb`) — orthographes et anciens noms (`volvo`, `VP`), base de
   `EngineCatalogService.resolveBrand()`
 - `isActive`
+- `plateLocationKey`, `plateExampleKey` (nullables) — clés i18n de l'aide « où trouver la plaque
+  signalétique » (#575). Elles remplacent le tableau statique `ENGINE_PLATE_HINTS`, qui ne couvrait
+  que trois marques ; une marque sans aide n'apparaît simplement pas dans la liste
+- `referencePattern` (`jsonb`, nullable) — motif de décodage des références constructeur (#575) :
+  `{ template, fallbackModelCode, modelCodePattern, explanationKey }`. Seule une marque qui en
+  déclare un affiche la carte « décoder une référence » ; c'est la généralisation du cas Yamaha,
+  qui était codé en dur dans `yamahaReferenceExample()`
 - timestamps
 
 ### engine_models
@@ -102,6 +109,24 @@ Référentiel global du catalogue moteur (#573), sans `organizationId` : aliment
 - `productionStartYear`, `productionEndYear` — les gammes discontinuées sont conservées
 - `aliases` (`jsonb`)
 - timestamps
+
+### engine_part_references
+
+Références constructeur rattachées à un couple (modèle du catalogue, pièce) — #575. Table globale,
+alimentée par `engine_catalog_seeder` depuis `database/data/engine_catalog/part_references.ts`.
+
+- `id`, `engineModelId` (FK `engine_models`, `onDelete cascade`)
+- `partKey` (string 64) — même vocabulaire que le panier (`ALL_SPARE_PART_KEYS`)
+- `reference` (string 64) — la référence constructeur
+- `sourceLabel` (string 120, **NOT NULL**) — d'où vient la référence. Le `NOT NULL` est le cœur de
+  l'issue : c'est la traduction en contrainte de schéma du critère d'acceptation de #517, « aucune
+  référence n'est affichée sans indication de sa source ». Une référence sans source ne peut pas
+  entrer en base, donc ne peut pas s'afficher
+- `sourceUrl` (`text`, nullable) — lien vérifiable quand il existe
+- `verifiedAt` (`date`, nullable) — dernière vérification ; vide = jamais revérifiée, et l'écran le
+  dit explicitement au lieu de présenter l'entrée comme certaine
+- `createdAt`, `updatedAt`
+- unique `(engine_model_id, part_key)`, index sur `engine_model_id`
 
 ### boat_engines
 
@@ -236,7 +261,9 @@ Liste de réparation du parcours « identification des pièces détachées » (#
 - `boatEngineId` (FK `boat_engines` cascade)
 - `partKey` (string 64) — clé stable d'une pièce du catalogue statique (`shared/constants/spare_parts/`, `<ensemble>.<slug>` ou `unreferenced.<slug>`), jamais renommée : #574 en a inséré 58 sans en renommer aucune
 - `quantity` (défaut 1 — un ré-ajout de la même pièce incrémente, plafond 99)
-- `reference` (nullable — référence constructeur relevée sur la vue éclatée)
+- `reference` (nullable) — référence constructeur : **pré-remplie** depuis `engine_part_references`
+  quand le couple (modèle, pièce) en a une (#575), sinon relevée par l'utilisateur sur la vue
+  éclatée. Modifiable dans les deux cas — le catalogue assiste la saisie, il ne la contraint pas
 - `createdAt`, `updatedAt`
 - unique `(boat_engine_id, part_key)`, index sur `boat_engine_id`
 
@@ -321,6 +348,9 @@ Une ligne = un **point de log** consigné en cours de sortie (rafale GPS au tap 
 - `BoatBrand 1..n BoatModel` via `boat_models.boatBrandId` (#571) — référentiel global, non rattaché
   à une organisation ; `boats.manufacturer` / `boats.model` restent du **texte libre** et ne portent
   aucune clé étrangère vers ce catalogue, c'est ce qui garde une saisie hors catalogue possible
+- `EngineModel 1..n EnginePartReference` via `engine_part_references.engineModelId` (#575, cascade) —
+  une pièce sans référence connue n'a simplement pas de ligne, et l'écran retombe sur les liens
+  revendeurs de #517
 - `EngineBrand 1..n EngineModel` via `engine_models.engineBrandId` (#573) — même référentiel global ;
   `BoatEngine 0..1 EngineModel` via `boat_engines.engineModelId`, **nullable** et en `SET NULL` :
   `brand` / `model` restent le repli texte libre, retirer un modèle du corpus ne fait perdre aucune

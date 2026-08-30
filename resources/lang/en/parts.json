@@ -37,7 +37,8 @@
     },
     "serialWarning": {
       "title": "The serial number tells variants apart",
-      "text": "The same model code sometimes spans several decades of production. In the catalog, the serial number is what tells the variants apart: note it from the plate before ordering."
+      "text": "The same model code sometimes spans several decades of production. In the catalog, the serial number is what tells the variants apart: note it from the plate before ordering.",
+      "ambiguous": "Code \"{model}\" matches {count} catalogue models: only the serial number tells them apart."
     },
     "plate": {
       "title": "Where is the identification plate?",
@@ -52,6 +53,35 @@
       },
       "mercury_mariner": {
         "location": "On the clamp bracket or on the block, under the cowling; the serial number is the catalog's entry key."
+      },
+      "unknownBrand": "This engine's brand isn't covered by our plate hints yet: the plate is almost always on the clamp bracket, the transom bracket or the block, under the cowling.",
+      "suzuki": {
+        "location": "On the clamp bracket, starboard side, or on the block under the cowling."
+      },
+      "honda": {
+        "location": "On the clamp bracket or on the crankcase under the cowling; the plate carries the engine type and serial number."
+      },
+      "tohatsu": {
+        "location": "On the clamp bracket; recent models also carry a label under the cowling."
+      },
+      "selva": {
+        "location": "On the clamp bracket; the powerheads are Yamaha-built, and the matching Yamaha reference is often stamped on the engine."
+      },
+      "volvo_penta": {
+        "location": "On the rocker cover or timing case, and on the drive leg for a saildrive: two separate plates, take down both.",
+        "example": "Example: \"D1-20\" is the engine designation, the seven-digit number that follows identifies the individual unit."
+      },
+      "yanmar": {
+        "location": "On the rocker cover or on the block, heat-exchanger side; the serial number is also stamped on the block."
+      },
+      "nanni": {
+        "location": "On the rocker cover; the base engine (Kubota, Toyota) carries its own plate as well, useful for engine parts."
+      },
+      "beta_marine": {
+        "location": "On the rocker cover or the sound shield; the underlying Kubota block carries its own plate."
+      },
+      "mercruiser": {
+        "location": "On the timing cover or the manifold, and on the drive for a sterndrive: take down both numbers."
       }
     },
     "assemblies": {
@@ -117,8 +147,10 @@
         "part": "Part",
         "catalogName": "Catalog name (EN)",
         "reference": "Reference",
-        "quantity": "Quantity"
-      }
+        "quantity": "Quantity",
+        "referenceSource": "Reference source"
+      },
+      "manualSource": "Entered manually"
     }
   },
   "crossLinks": {
@@ -702,5 +734,11 @@
         }
       }
     }
+  },
+  "reference": {
+    "label": "Manufacturer reference",
+    "sourcePrefix": "Source:",
+    "verifiedAt": "Checked on {date}.",
+    "unverified": "Not re-checked — confirm it on the exploded view before ordering."
   }
 }

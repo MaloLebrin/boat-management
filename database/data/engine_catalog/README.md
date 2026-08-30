@@ -45,6 +45,36 @@ L'exhaustivité est un objectif continu, pas un prérequis de merge. Les valeurs
 catalogue par les utilisateurs servent de file d'attente d'enrichissement : le formulaire les
 accepte telles quelles, c'est l'invariant de l'épic #572.
 
+## Aides plaque et motif de référence (#575)
+
+- **`plateLocationKey` / `plateExampleKey`** : clés i18n de l'aide « où trouver la plaque
+  signalétique ». Les ajouter dans `resources/lang/{en,fr}/parts.json` sous
+  `parts.identify.plate.<marque>` — un test refuse une clé déclarée ici et absente d'une locale.
+  Une marque sans aide n'apparaît simplement pas dans la liste : mieux vaut une liste courte qu'une
+  ligne vide.
+- **`referencePattern`** : à ne déclarer que pour une marque dont le décodage est **connu et
+  documenté**. Chez Yamaha, les 5 chiffres centraux d'une référence identifient la fonction de la
+  pièce indépendamment du moteur — le motif vit dans `#shared/helpers/spare_parts`
+  (`YAMAHA_REFERENCE_PATTERN`), lu à la fois par le seed et par les écrans. Sans motif, la carte
+  « décoder une référence » ne s'affiche pas, ce qui est le bon défaut.
+
+## Références constructeur (`part_references.ts`, #575)
+
+Un fichier à part, une entrée par couple (modèle, pièce). **Règle unique : une entrée sans source
+ne se saisit pas** — `sourceLabel` est obligatoire dans le type comme en base (`NOT NULL`), et
+`index.ts` refuse au chargement une source vide, une clé de pièce inconnue d'`ALL_SPARE_PART_KEYS`
+ou un couple déclaré deux fois.
+
+- `brandSlug` / `modelSlug` désignent une marque et un modèle **existants** : un slug inconnu fait
+  échouer le seeder, parce que c'est une faute de frappe, pas une donnée manquante.
+- `verifiedAt` ne se renseigne qu'**après recontrôle sur la source citée**. Vide, l'entrée est
+  affichée avec la mention « non revérifiée — contrôlez-la avant de commander » ; c'est aussi ce
+  qui permet de repérer les entrées à recontrôler.
+- Priorité : pièces d'usure (turbines, kits de pompe à eau, filtres, anodes, joints de saildrive,
+  courroies) des modèles les plus répandus, puis les modèles déjà présents dans l'app. Une pièce
+  sans référence connue affiche l'écran d'avant, liens revendeurs compris — l'exhaustivité n'est
+  pas un prérequis.
+
 ## Ajouter une marque
 
 1. La déclarer dans le fichier de sa famille principale, avec toutes ses `families`.

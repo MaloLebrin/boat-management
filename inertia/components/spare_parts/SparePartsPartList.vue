@@ -3,12 +3,24 @@ import { router } from '@inertiajs/vue3'
 import { computed } from 'vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
-import type { RepairCartItemRow, SparePartItem } from '#shared/types/spare_parts'
+import SparePartsReferenceSource from '~/components/spare_parts/SparePartsReferenceSource.vue'
+import type {
+  RepairCartItemRow,
+  SparePartItem,
+  SparePartReferenceRow,
+} from '#shared/types/spare_parts'
 import { useT } from '~/composables/use_t'
 
 const props = defineProps<{
   parts: readonly SparePartItem[]
   cartItems: RepairCartItemRow[]
+  /**
+   * Références constructeur connues pour ce moteur (#575). Vide pour un moteur
+   * hors catalogue ou une pièce sans référence saisie : la ligne rend alors
+   * exactement ce qu'elle rendait avant, et l'utilisateur relève le numéro sur
+   * la vue éclatée du revendeur.
+   */
+  references: SparePartReferenceRow[]
   canManage: boolean
   boatId: number
   engineId: number
@@ -17,6 +29,10 @@ const props = defineProps<{
 const { t } = useT()
 
 const cartByKey = computed(() => new Map(props.cartItems.map((item) => [item.partKey, item])))
+
+const referenceByKey = computed(
+  () => new Map(props.references.map((reference) => [reference.partKey, reference]))
+)
 
 function addToCart(part: SparePartItem) {
   router.post(
@@ -39,6 +55,9 @@ function addToCart(part: SparePartItem) {
         </div>
         <p v-if="part.detailKey" class="mt-1 text-sm text-fg-muted">{{ t(part.detailKey) }}</p>
         <p v-if="part.kitKey" class="mt-1 text-sm text-info">{{ t(part.kitKey) }}</p>
+        <div v-if="referenceByKey.has(part.key)" class="mt-2 max-w-md">
+          <SparePartsReferenceSource :reference="referenceByKey.get(part.key)!" />
+        </div>
         <div class="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm text-fg-muted">
           <span v-if="part.priceKey">
             {{ t('parts.assembly.priceLabel', { price: t(part.priceKey) }) }}

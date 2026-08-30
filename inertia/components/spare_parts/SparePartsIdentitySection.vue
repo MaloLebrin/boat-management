@@ -3,8 +3,7 @@ import { computed } from 'vue'
 import BaseAlert from '~/components/base/BaseAlert.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
-import { ENGINE_PLATE_HINTS } from '#shared/constants/spare_parts/spare_parts_content'
-import { sparePartsBrandFromCatalogSlug } from '#shared/helpers/spare_parts'
+import type { EnginePlateHint } from '#shared/types/spare_parts'
 import { useT } from '~/composables/use_t'
 
 const props = defineProps<{
@@ -15,20 +14,27 @@ const props = defineProps<{
     model: string | null
     catalogBrandSlug: string | null
     serialNumber: string | null
+    /** Modèles du catalogue partageant ce code plaque (#575). */
+    modelCodeMatches: number
   }
+  /**
+   * Aides plaque signalétique, servies par le catalogue moteur (#575) : celle
+   * de la marque du moteur, ou toutes les aides connues quand la marque n'est
+   * pas résolue. Le composant ne filtre plus rien lui-même — le tableau
+   * statique de trois marques a disparu avec #575.
+   */
+  plateHints: EnginePlateHint[]
   canManage: boolean
 }>()
 
 const { t } = useT()
 
-const brandSlug = computed(() => sparePartsBrandFromCatalogSlug(props.engine.catalogBrandSlug))
-
-/** Aide plaque de la marque du moteur, ou de toutes si elle n'est pas reconnue. */
-const plateHints = computed(() =>
-  brandSlug.value
-    ? ENGINE_PLATE_HINTS.filter((hint) => hint.brand === brandSlug.value)
-    : ENGINE_PLATE_HINTS
-)
+/**
+ * Le code plaque du moteur couvre plusieurs modèles du catalogue : c'est
+ * exactement le cas que l'avertissement « numéro de série » vise, on le dit
+ * alors explicitement plutôt que de s'en tenir à la mise en garde générale.
+ */
+const ambiguousModelCode = computed(() => props.engine.modelCodeMatches > 1)
 
 const missingIdentity = computed(() => !props.engine.model || !props.engine.serialNumber)
 
@@ -73,14 +79,25 @@ const identityRows = computed(() => [
 
     <BaseAlert variant="warning" :title="t('parts.identify.serialWarning.title')" class="mt-4">
       {{ t('parts.identify.serialWarning.text') }}
+      <span v-if="ambiguousModelCode" class="mt-2 block font-medium">
+        {{
+          t('parts.identify.serialWarning.ambiguous', {
+            count: String(engine.modelCodeMatches),
+            model: engine.model ?? '',
+          })
+        }}
+      </span>
     </BaseAlert>
 
     <h3 class="mt-6 font-semibold text-fg">{{ t('parts.identify.plate.title') }}</h3>
     <p class="mt-1 text-sm text-fg-muted">{{ t('parts.identify.plate.intro') }}</p>
-    <ul class="mt-3 space-y-3">
+    <p v-if="plateHints.length === 0" class="mt-3 text-sm text-fg-muted">
+      {{ t('parts.identify.plate.unknownBrand') }}
+    </p>
+    <ul v-else class="mt-3 space-y-3">
       <li
         v-for="hint in plateHints"
-        :key="hint.brand"
+        :key="hint.brandSlug"
         class="rounded-lg border border-border bg-surface p-3"
       >
         <p class="text-sm font-medium text-fg">{{ hint.brandName }}</p>

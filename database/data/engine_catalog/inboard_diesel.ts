@@ -27,6 +27,8 @@ export const INBOARD_DIESEL_BRANDS: readonly EngineBrandSeed[] = [
     // Le carburant est précisé modèle par modèle (la marque couvre diesel et
     // essence), mais les deux gammes sont à cycle 4 temps.
     modelDefaults: { strokeType: '4_stroke' },
+    plateLocationKey: 'parts.identify.plate.volvo_penta.location',
+    plateExampleKey: 'parts.identify.plate.volvo_penta.example',
     models: {
       inboard_diesel: [
         { name: 'D1-13', powerHp: 12, fuel: 'diesel', cylinders: 2 },
@@ -109,6 +111,7 @@ export const INBOARD_DIESEL_BRANDS: readonly EngineBrandSeed[] = [
     aliases: ['yanmar', 'yanmar marine'],
     modelCodeFromName: true,
     modelDefaults: { fuel: 'diesel', strokeType: '4_stroke' },
+    plateLocationKey: 'parts.identify.plate.yanmar.location',
     models: {
       inboard_diesel: [
         { name: '1GM10', powerHp: 9, cylinders: 1 },
@@ -158,6 +161,7 @@ export const INBOARD_DIESEL_BRANDS: readonly EngineBrandSeed[] = [
     aliases: ['nanni', 'nanni diesel', 'nani'],
     modelCodeFromName: true,
     modelDefaults: { fuel: 'diesel', strokeType: '4_stroke' },
+    plateLocationKey: 'parts.identify.plate.nanni.location',
     models: {
       inboard_diesel: [
         { name: 'N2.10', powerHp: 10, cylinders: 2 },
@@ -229,6 +233,7 @@ export const INBOARD_DIESEL_BRANDS: readonly EngineBrandSeed[] = [
     aliases: ['beta', 'beta marine'],
     modelCodeFromName: true,
     modelDefaults: { fuel: 'diesel', strokeType: '4_stroke' },
+    plateLocationKey: 'parts.identify.plate.beta_marine.location',
     models: {
       inboard_diesel: [
         { name: 'Beta 10', powerHp: 10, cylinders: 2 },

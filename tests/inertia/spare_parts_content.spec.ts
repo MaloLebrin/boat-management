@@ -212,7 +212,14 @@ describe('SparePartsPartList (#517)', () => {
   test('affiche le nom FR (clé i18n) et l’intitulé catalogue EN côte à côte', () => {
     const assembly = SPARE_PART_ASSEMBLIES.carburetor
     const wrapper = mount(SparePartsPartList, {
-      props: { parts: assembly.parts, cartItems: [], canManage: true, boatId: 1, engineId: 2 },
+      props: {
+        parts: assembly.parts,
+        cartItems: [],
+        references: [],
+        canManage: true,
+        boatId: 1,
+        engineId: 2,
+      },
     })
 
     expect(wrapper.text()).toContain('parts.assemblies.carburetor.parts.repair_kit.label')
@@ -226,6 +233,7 @@ describe('SparePartsPartList (#517)', () => {
       props: {
         parts: assembly.parts,
         cartItems: [{ id: 1, partKey: 'carburetor.repair_kit', quantity: 2, reference: null }],
+        references: [],
         canManage: true,
         boatId: 1,
         engineId: 2,

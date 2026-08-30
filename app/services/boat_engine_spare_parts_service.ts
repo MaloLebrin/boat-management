@@ -8,12 +8,18 @@ import Boat from '#models/boat'
 import BoatEngine from '#models/boat_engine'
 import BoatEngineRepairCartItem from '#models/boat_engine_repair_cart_item'
 import type User from '#models/user'
+import EngineCatalogService from '#services/engine_catalog_service'
+import EnginePartReferenceService from '#services/engine_part_reference_service'
 import {
   ALL_SPARE_PART_KEYS,
   SPARE_PART_CATALOG_INDEX,
 } from '#shared/constants/spare_parts/spare_parts_content'
 import { isSparePartsEligibleEngine } from '#shared/helpers/spare_parts'
-import type { RepairCartItemRow, SparePartsEngineRow } from '#shared/types/spare_parts'
+import type {
+  RepairCartItemRow,
+  SparePartReferenceRow,
+  SparePartsEngineRow,
+} from '#shared/types/spare_parts'
 import { toRepairCartItemRow, toSparePartsEngineRow } from '#transformers/spare_parts_transformer'
 import { assertBoatInUserOrg } from '#utils/boat_utils'
 import { inject } from '@adonisjs/core'
@@ -29,6 +35,11 @@ const MAX_CART_QUANTITY = 99
 
 @inject()
 export default class BoatEngineSparePartsService {
+  constructor(
+    private engineCatalogService: EngineCatalogService,
+    private partReferenceService: EnginePartReferenceService
+  ) {}
+
   /**
    * Moteurs de l'organisation du user éligibles à l'identification de pièces,
    * avec la taille du panier de réparation.
@@ -122,7 +133,39 @@ export default class BoatEngineSparePartsService {
       return
     }
 
-    await BoatEngineRepairCartItem.create({ boatEngineId: engine.id, partKey, quantity: 1 })
+    // Référence pré-remplie quand le couple (modèle, pièce) en a une (#575).
+    // Elle reste modifiable : la colonne est la même que celle que l'utilisateur
+    // saisissait à la main depuis #517, et le panneau du panier l'édite comme
+    // avant. Aucune référence connue → `null`, écran strictement inchangé.
+    const known = await this.referenceFor(engine, partKey)
+
+    await BoatEngineRepairCartItem.create({
+      boatEngineId: engine.id,
+      partKey,
+      quantity: 1,
+      reference: known?.reference ?? null,
+    })
+  }
+
+  /**
+   * Références constructeur connues pour le moteur, indexées par clé de pièce.
+   *
+   * Le modèle du catalogue est celui **rattaché** au moteur, ou celui que la
+   * saisie libre permet de rapprocher — un moteur hors catalogue rend une carte
+   * vide, et les écrans retombent sur les liens revendeurs.
+   */
+  async getPartReferences(engine: BoatEngine): Promise<SparePartReferenceRow[]> {
+    const model = await this.engineCatalogService.resolveModelForEngine(engine)
+    const references = await this.partReferenceService.forEngineModel(model?.id ?? null)
+    return [...references.values()]
+  }
+
+  private async referenceFor(
+    engine: BoatEngine,
+    partKey: string
+  ): Promise<SparePartReferenceRow | null> {
+    const model = await this.engineCatalogService.resolveModelForEngine(engine)
+    return this.partReferenceService.forEngineModelPart(model?.id ?? null, partKey)
   }
 
   async updateCartItem(
@@ -167,16 +210,33 @@ export default class BoatEngineSparePartsService {
       .orderBy('createdAt', 'asc')
       .select(['id', 'boatEngineId', 'partKey', 'quantity', 'reference', 'createdAt'])
 
+    // Le modèle est résolu une fois pour tout l'export : un panier de vingt
+    // lignes ne doit pas déclencher vingt rapprochements de catalogue.
+    const model = await this.engineCatalogService.resolveModelForEngine(engine)
+    const references = await this.partReferenceService.forEngineModel(model?.id ?? null)
+
     const header = [
       translate('parts.cart.export.headers.assembly'),
       translate('parts.cart.export.headers.part'),
       translate('parts.cart.export.headers.catalogName'),
       translate('parts.cart.export.headers.reference'),
+      // Une référence ne voyage jamais sans sa source, export compris (#575).
+      translate('parts.cart.export.headers.referenceSource'),
       translate('parts.cart.export.headers.quantity'),
     ]
 
     const rows = items.map((item) => {
       const entry = SPARE_PART_CATALOG_INDEX.get(item.partKey)
+      const known = references.get(item.partKey)
+      // La source du catalogue ne vaut que pour **cette** référence : dès que
+      // l'utilisateur en saisit une autre, c'est sa saisie qui est la source.
+      const source =
+        item.reference === null
+          ? ''
+          : known && known.reference === item.reference
+            ? known.sourceLabel
+            : translate('parts.cart.export.manualSource')
+
       return [
         entry?.assemblyLabelKey
           ? translate(entry.assemblyLabelKey)
@@ -184,6 +244,7 @@ export default class BoatEngineSparePartsService {
         entry ? translate(entry.labelKey) : item.partKey,
         entry?.catalogName ?? '',
         item.reference ?? '',
+        source,
         String(item.quantity),
       ]
     })

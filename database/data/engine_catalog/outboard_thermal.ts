@@ -1,3 +1,4 @@
+import { YAMAHA_REFERENCE_PATTERN } from '#shared/helpers/spare_parts'
 import type { EngineBrandSeed } from '#shared/types/engine_catalog'
 
 /**
@@ -19,6 +20,13 @@ export const OUTBOARD_THERMAL_BRANDS: readonly EngineBrandSeed[] = [
     families: ['outboard_thermal'],
     aliases: ['yamaha', 'yamaha marine', 'yamaha outboards', 'yam'],
     modelDefaults: { fuel: 'essence' },
+    plateLocationKey: 'parts.identify.plate.yamaha.location',
+    plateExampleKey: 'parts.identify.plate.yamaha.example',
+    // Seul motif de décodage connu du corpus : les 5 chiffres centraux d'une
+    // référence Yamaha identifient la fonction de la pièce, indépendamment du
+    // moteur. Défini une fois dans `#shared/helpers/spare_parts` — le seed et
+    // les écrans lisent la même définition.
+    referencePattern: YAMAHA_REFERENCE_PATTERN,
     models: {
       outboard_thermal: [
         // Gamme 4 temps « F », la désignation porte la puissance en chevaux.
@@ -99,6 +107,7 @@ export const OUTBOARD_THERMAL_BRANDS: readonly EngineBrandSeed[] = [
     families: ['outboard_thermal'],
     aliases: ['mercury', 'mariner', 'mercury marine', 'mercury mariner', 'merc'],
     modelDefaults: { fuel: 'essence' },
+    plateLocationKey: 'parts.identify.plate.mercury_mariner.location',
     models: {
       outboard_thermal: [
         { name: 'F2.5 FourStroke', powerHp: 2.5, strokeType: '4_stroke' },
@@ -179,6 +188,7 @@ export const OUTBOARD_THERMAL_BRANDS: readonly EngineBrandSeed[] = [
     families: ['outboard_thermal'],
     aliases: ['suzuki', 'suzuki marine', 'suzuki outboard'],
     modelDefaults: { fuel: 'essence', strokeType: '4_stroke' },
+    plateLocationKey: 'parts.identify.plate.suzuki.location',
     models: {
       outboard_thermal: [
         { name: 'DF2.5', powerHp: 2.5 },
@@ -226,6 +236,7 @@ export const OUTBOARD_THERMAL_BRANDS: readonly EngineBrandSeed[] = [
     aliases: ['honda', 'honda marine', 'honda bf', 'honda outboard'],
     // Honda n'a produit que des 4 temps sur toute la gamme hors-bord.
     modelDefaults: { fuel: 'essence', strokeType: '4_stroke' },
+    plateLocationKey: 'parts.identify.plate.honda.location',
     models: {
       outboard_thermal: [
         { name: 'BF2.3', powerHp: 2.3 },
@@ -264,6 +275,7 @@ export const OUTBOARD_THERMAL_BRANDS: readonly EngineBrandSeed[] = [
     families: ['outboard_thermal'],
     aliases: ['tohatsu', 'tohatsu marine'],
     modelDefaults: { fuel: 'essence' },
+    plateLocationKey: 'parts.identify.plate.tohatsu.location',
     models: {
       outboard_thermal: [
         { name: 'MFS2.5', powerHp: 2.5, strokeType: '4_stroke' },
@@ -331,6 +343,8 @@ export const OUTBOARD_THERMAL_BRANDS: readonly EngineBrandSeed[] = [
     // est la maison mère commune aux deux marques.
     aliases: ['johnson', 'evinrude', 'omc', 'evinrude etec', 'johnson evinrude', 'e-tec'],
     modelDefaults: { fuel: 'essence', strokeType: '2_stroke' },
+    plateLocationKey: 'parts.identify.plate.johnson_evinrude.location',
+    plateExampleKey: 'parts.identify.plate.johnson_evinrude.example',
     models: {
       outboard_thermal: [
         { name: 'E-TEC 15', powerHp: 15 },
@@ -383,6 +397,7 @@ export const OUTBOARD_THERMAL_BRANDS: readonly EngineBrandSeed[] = [
     families: ['outboard_thermal'],
     aliases: ['selva', 'selva marine'],
     modelDefaults: { fuel: 'essence', strokeType: '4_stroke' },
+    plateLocationKey: 'parts.identify.plate.selva.location',
     models: {
       outboard_thermal: [
         { name: 'Guppy 2.5', powerHp: 2.5 },

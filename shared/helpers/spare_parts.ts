@@ -4,7 +4,11 @@ import {
   SPARE_PARTS_RETAILERS,
 } from '#shared/constants/spare_parts/spare_parts_content'
 import { engineFamilyFromSignals } from '#shared/helpers/engine_family'
-import { isEngineFamily, type EngineFamily } from '#shared/types/engine_catalog'
+import {
+  isEngineFamily,
+  type EngineFamily,
+  type EngineReferencePattern,
+} from '#shared/types/engine_catalog'
 import {
   SPARE_PARTS_BRAND_SLUGS,
   type PartAssemblySlug,
@@ -113,12 +117,48 @@ export function retailerLinksForBrand(
 }
 
 /**
- * Exemple de référence Yamaha (`6E0-14301-00`) construit à partir du code
- * modèle du moteur quand il ressemble à un code Yamaha, sinon sur l'exemple
- * de l'issue (`6E0`).
+ * Motif de référence Yamaha — le seul que #517 savait décoder, en dur.
+ *
+ * Il vit ici plutôt qu'en base parce qu'il a deux consommateurs : le seed de
+ * `engine_brands.reference_pattern` (#575), et `yamahaReferenceExample()`
+ * ci-dessous, que les écrans appellent sans requête. Les deux lisent donc
+ * exactement la même définition.
+ */
+export const YAMAHA_REFERENCE_PATTERN: EngineReferencePattern = {
+  template: '{modelCode}-{functionCode}-00',
+  fallbackModelCode: '6E0',
+  modelCodePattern: '^[0-9a-z]{2,4}$',
+  explanationKey: 'parts.assembly.decode.text',
+}
+
+/**
+ * Exemple de référence construit à partir du motif de la marque et du code
+ * modèle du moteur — généralisation du cas Yamaha (#575).
+ *
+ * Le code plaque du moteur n'entre dans le gabarit que s'il respecte le motif
+ * de la marque ; sinon on retombe sur le code de repli. C'est exactement la
+ * règle de #517 (`F150 XCA` n'est pas un code plaque, `6E0` en est un), mais
+ * portée par la marque au lieu d'être écrite dans la fonction.
+ */
+export function referenceExampleFromPattern(
+  pattern: EngineReferencePattern,
+  model: string | null,
+  functionCode: string
+): string {
+  const trimmed = model?.trim() ?? ''
+  const matches = trimmed !== '' && new RegExp(pattern.modelCodePattern, 'i').test(trimmed)
+  const modelCode = matches ? trimmed.toUpperCase() : pattern.fallbackModelCode
+
+  return pattern.template
+    .replaceAll('{modelCode}', modelCode)
+    .replaceAll('{functionCode}', functionCode)
+}
+
+/**
+ * Exemple de référence Yamaha (`6E0-14301-00`) — cas particulier de
+ * `referenceExampleFromPattern()`, conservé pour ce que les écrans en font
+ * quand la marque ne porte pas encore son motif en base.
  */
 export function yamahaReferenceExample(model: string | null, functionCode: string): string {
-  const modelCode =
-    model && /^[0-9a-z]{2,4}$/i.test(model.trim()) ? model.trim().toUpperCase() : '6E0'
-  return `${modelCode}-${functionCode}-00`
+  return referenceExampleFromPattern(YAMAHA_REFERENCE_PATTERN, model, functionCode)
 }

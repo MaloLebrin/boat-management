@@ -4,11 +4,13 @@ import { computed } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import { SPARE_PART_CATALOG_INDEX } from '#shared/constants/spare_parts/spare_parts_content'
-import type { RepairCartItemRow } from '#shared/types/spare_parts'
+import type { RepairCartItemRow, SparePartReferenceRow } from '#shared/types/spare_parts'
 import { useT } from '~/composables/use_t'
 
 const props = defineProps<{
   cartItems: RepairCartItemRow[]
+  /** Références connues du moteur (#575) — sert à créditer la source affichée. */
+  references: SparePartReferenceRow[]
   canManage: boolean
   boatId: number
   engineId: number
@@ -20,6 +22,23 @@ const baseUrl = computed(() => `/boats/${props.boatId}/engines/${props.engineId}
 
 function entryFor(item: RepairCartItemRow) {
   return SPARE_PART_CATALOG_INDEX.get(item.partKey)
+}
+
+const referenceByKey = computed(
+  () => new Map(props.references.map((reference) => [reference.partKey, reference]))
+)
+
+/**
+ * Source à créditer sous la référence d'une ligne.
+ *
+ * Elle n'a de sens que tant que la ligne porte **la** référence du catalogue :
+ * dès que l'utilisateur en saisit une autre, la source du catalogue ne la
+ * couvre plus et on ne l'affiche pas — une référence n'est jamais présentée
+ * sous une source qui ne la garantit pas.
+ */
+function sourceFor(item: RepairCartItemRow): SparePartReferenceRow | null {
+  const known = referenceByKey.value.get(item.partKey)
+  return known && known.reference === item.reference ? known : null
 }
 
 function updateQuantity(item: RepairCartItemRow, delta: number) {
@@ -73,6 +92,9 @@ function removeItem(item: RepairCartItemRow) {
           </p>
           <p v-if="entryFor(item)?.catalogName" class="font-mono text-xs text-fg-muted">
             {{ entryFor(item)!.catalogName }}
+          </p>
+          <p v-if="sourceFor(item)" class="mt-1 text-xs text-fg-subtle">
+            {{ t('parts.reference.sourcePrefix') }} {{ sourceFor(item)!.sourceLabel }}
           </p>
         </div>
 

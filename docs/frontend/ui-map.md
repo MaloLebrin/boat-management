@@ -154,21 +154,27 @@ Les cartes de l'onglet Équipement exposent un lien « voir le détail » vers c
 - Types frontend: `inertia/types/budget.ts`
 - Source backend: `BudgetController.show`
 
-### Pièces détachées (#517, #574)
+### Pièces détachées (#517, #574, #575)
 
 - Pages (GET `/spare-parts`, `/boats/:boatId/engines/:engineId/spare-parts[/assemblies/:assemblySlug]`):
   - `inertia/pages/spare_parts/index.vue` — parcours en 4 étapes + moteurs de l'organisation avec
     leur motorisation (ou « à préciser ») et la taille du panier
   - `inertia/pages/spare_parts/identify.vue` — étape 1 (identité moteur, plaque, avertissement n° de série), grille d'ensembles, pièces sans référence, liste de réparation
-  - `inertia/pages/spare_parts/assembly.vue` — liens vues éclatées revendeurs, décodage référence Yamaha, pièces courantes (nom FR + intitulé catalogue EN), liste de réparation
+  - `inertia/pages/spare_parts/assembly.vue` — liens vues éclatées revendeurs, carte de décodage de référence (motif de la marque, #575), pièces courantes (nom FR + intitulé catalogue EN, référence sourcée quand elle est connue), liste de réparation
 - Composants `inertia/components/spare_parts/`:
-  - `SparePartsIdentitySection.vue` — carte identité moteur + aides plaque par marque
+  - `SparePartsIdentitySection.vue` — carte identité moteur + aides plaque **servies par le backend**
+    (`engine_brands.plate_location_key`, #575) : le composant ne filtre plus rien lui-même. La mise
+    en garde « numéro de série » se précise quand le code plaque couvre plusieurs modèles
   - `SparePartsAssemblyGrid.vue` — ensembles fonctionnels **filtrés par la famille de motorisation**
     du moteur (`assembliesForEngine()`, #574) : 21 au catalogue, jamais une grille vide — une
     famille inconnue retombe sur les ensembles génériques
   - `SparePartsPartList.vue` / `SparePartsUnreferencedList.vue` — fiches pièces avec ajout au panier
+  - `SparePartsReferenceSource.vue` — référence constructeur **toujours accompagnée de sa source**
+    (#575), seul composant qui en affiche une : une entrée jamais revérifiée le dit explicitement
   - `SparePartsRetailerLinks.vue` — ancres externes `target="_blank"` vers Partzilla / Boats.net / Crowley Marine (eslint-disable motivé)
-  - `SparePartsCartPanel.vue` — quantités, référence relevée, suppression, export CSV (`external-href`)
+  - `SparePartsCartPanel.vue` — quantités, référence (pré-remplie depuis le catalogue quand elle est
+    connue, toujours modifiable), source créditée tant que la ligne porte la référence du catalogue,
+    suppression, export CSV (`external-href`)
 - Contenu statique: `shared/constants/spare_parts/spare_parts_content.ts` (9 ensembles hors-bord) et
   `shared/constants/spare_parts/inboard_assemblies.ts` (12 ensembles in-bord, embases, groupe
   électrogène) — clés i18n `parts.*`, intitulés catalogue EN littéraux

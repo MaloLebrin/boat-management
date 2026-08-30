@@ -7,23 +7,22 @@ import SparePartsAssemblyGrid from '~/components/spare_parts/SparePartsAssemblyG
 import SparePartsCartPanel from '~/components/spare_parts/SparePartsCartPanel.vue'
 import SparePartsIdentitySection from '~/components/spare_parts/SparePartsIdentitySection.vue'
 import SparePartsUnreferencedList from '~/components/spare_parts/SparePartsUnreferencedList.vue'
-import type { RepairCartItemRow } from '#shared/types/spare_parts'
+import type {
+  EnginePlateHint,
+  RepairCartItemRow,
+  SparePartReferenceRow,
+  SparePartsEngineProps,
+} from '#shared/types/spare_parts'
 import { useT } from '~/composables/use_t'
 import { engineDisplayTitle } from '~/utils/boat_enum_labels'
 
 const props = defineProps<{
   boat: { id: number; name: string }
-  engine: {
-    id: number
-    brand: string | null
-    model: string | null
-    catalogBrandSlug: string | null
-    serialNumber: string | null
-    kind: string
-    /** Famille de motorisation (#574) — décide des ensembles proposés. */
-    family: string | null
-    status: string
-  }
+  engine: SparePartsEngineProps
+  /** Aides plaque servies par le catalogue moteur (#575). */
+  plateHints: EnginePlateHint[]
+  /** Références constructeur connues pour ce moteur (#575). */
+  partReferences: SparePartReferenceRow[]
   cartItems: RepairCartItemRow[]
   canManage: boolean
 }>()
@@ -50,7 +49,12 @@ const breadcrumb = computed(() => [
     <p class="mt-4 max-w-3xl text-sm text-fg-muted">{{ t('parts.identify.intro') }}</p>
 
     <div class="mt-6">
-      <SparePartsIdentitySection :boat-id="boat.id" :engine="engine" :can-manage="canManage" />
+      <SparePartsIdentitySection
+        :boat-id="boat.id"
+        :engine="engine"
+        :plate-hints="plateHints"
+        :can-manage="canManage"
+      />
     </div>
 
     <h2 class="mt-10 text-lg font-semibold text-fg">{{ t('parts.identify.assemblies.title') }}</h2>
@@ -71,6 +75,7 @@ const breadcrumb = computed(() => [
     <div class="mt-10">
       <SparePartsCartPanel
         :cart-items="cartItems"
+        :references="partReferences"
         :can-manage="canManage"
         :boat-id="boat.id"
         :engine-id="engine.id"
