@@ -338,8 +338,8 @@
     "subscriptionNotFound": "Cet appareil n'est plus enregistré."
   },
   "spareParts": {
-    "notEligible": "L'identification de pièces ne concerne que les moteurs hors-bord.",
-    "assemblyNotFound": "Ensemble de pièces introuvable.",
+    "notEligible": "Ce moteur n'a pas de nomenclature de pièces.",
+    "assemblyNotFound": "Ensemble de pièces introuvable pour cette motorisation.",
     "partNotFound": "Pièce inconnue du catalogue.",
     "cartItemNotFound": "Ligne de la liste de réparation introuvable."
   }

@@ -1,6 +1,7 @@
 import { computed } from 'vue'
 import {
   BOAT_CATEGORY_OPTIONS,
+  BOAT_ENGINE_FAMILY_OPTIONS,
   ENGINE_FUEL_OPTIONS,
   ENGINE_KIND_OPTIONS,
   ENGINE_STROKE_TYPE_OPTIONS,
@@ -44,6 +45,13 @@ export function useBoatOptions() {
     ENGINE_KIND_OPTIONS.map((o) => ({
       value: o.value,
       label: t(`boats.options.engineKind.${o.value}`),
+    }))
+  )
+
+  const engineFamilyOptions = computed(() =>
+    BOAT_ENGINE_FAMILY_OPTIONS.map((o) => ({
+      value: o.value,
+      label: t(`boats.options.engineFamily.${o.value}`),
     }))
   )
 
@@ -112,6 +120,7 @@ export function useBoatOptions() {
     propulsionOptions,
     hullMaterialOptions,
     engineKindOptions,
+    engineFamilyOptions,
     engineFuelOptions,
     engineStrokeTypeOptions,
     sailTypeOptions,

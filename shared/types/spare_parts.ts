@@ -1,9 +1,19 @@
 import type { DiagnosticSheetSlug } from '#shared/types/diagnostic'
+import type { EngineFamily } from '#shared/types/engine_catalog'
 
 /**
- * Ensembles fonctionnels des catalogues de pièces détachées hors-bord (#517).
- * La nomenclature (slug + intitulé catalogue EN) est commune aux catalogues
- * revendeurs (Partzilla, Boats.net, Crowley Marine).
+ * Ensembles fonctionnels des catalogues de pièces détachées. La nomenclature
+ * (slug + intitulé catalogue EN) est commune aux catalogues revendeurs
+ * (Partzilla, Boats.net, Crowley Marine).
+ *
+ * Les neuf premiers décrivent l'architecture d'un **hors-bord** (#517), les
+ * douze suivants celle des **in-bord, embases et groupes électrogènes** (#574).
+ * Un ensemble déclare les familles de motorisation auxquelles il s'applique
+ * (`SparePartAssembly.families`) : c'est cette déclaration, et non le `kind` du
+ * moteur, qui décide de ce qu'un écran affiche.
+ *
+ * Slugs **kebab-case en code**, **snake_case en clé i18n**
+ * (`parts.assemblies.cooling_raw_water`) — correspondance héritée de #517.
  */
 export const PART_ASSEMBLY_SLUGS = [
   'carburetor',
@@ -15,6 +25,18 @@ export const PART_ASSEMBLY_SLUGS = [
   'propeller',
   'cowling',
   'bracket',
+  'cooling-raw-water',
+  'cooling-fresh-water',
+  'injection',
+  'exhaust',
+  'gearbox',
+  'saildrive',
+  'sterndrive',
+  'shaft-line',
+  'starting-charging',
+  'lubrication',
+  'air-intake',
+  'controls',
 ] as const
 
 export type PartAssemblySlug = (typeof PART_ASSEMBLY_SLUGS)[number]
@@ -49,6 +71,13 @@ export interface SparePartAssembly {
   /** Intitulé catalogue EN (`CARBURETOR`, `LOWER CASING / WATER PUMP`…). */
   catalogLabel: string
   descriptionKey: string
+  /**
+   * Familles de motorisation auxquelles l'ensemble s'applique (#574) — un
+   * saildrive n'est proposé qu'à un saildrive, un carburateur jamais à un
+   * diesel. Jamais vide : un ensemble qui ne servirait à aucune famille n'a
+   * pas lieu d'exister.
+   */
+  families: readonly EngineFamily[]
   /** Code fonction Yamaha de l'ensemble, si connu (ex. `14301` = carburateur). */
   yamahaFunctionCode?: string
   /** Fiche de diagnostic (#515) correspondante, pour le lien croisé. */
@@ -102,6 +131,8 @@ export interface SparePartsEngineRow {
   brand: string | null
   model: string | null
   kind: string
+  /** Famille de motorisation (#574), `null` tant qu'elle n'est pas précisée. */
+  family: string | null
   status: string
   /** Nombre de lignes dans le panier de réparation. */
   cartCount: number

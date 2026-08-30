@@ -107,6 +107,9 @@ Référentiel global du catalogue moteur (#573), sans `organizationId` : aliment
 
 - `id`, `boatId`
 - `kind`, `status`
+- `family` (string 40, **nullable**, indexée) — famille de motorisation (#574), moteur **et**
+  transmission (`outboard_2t`, `inboard_diesel_saildrive`, `sterndrive`…). C'est elle qui décide de
+  la nomenclature de pièces détachées ; un moteur sans famille retombe sur les ensembles génériques
 - détails: `fuel`, `strokeType`, `brand`, `model`, `serialNumber`, `notes`
 - `engineModelId` (FK `engine_models`, **nullable**, `onDelete set null`) — rattachement au
   catalogue (#573). `brand` et `model` restent alimentés et font foi : c'est le repli texte libre,
@@ -231,7 +234,7 @@ Liste de réparation du parcours « identification des pièces détachées » (#
 
 - `id`
 - `boatEngineId` (FK `boat_engines` cascade)
-- `partKey` (string 64) — clé stable d'une pièce du catalogue statique (`shared/constants/spare_parts/spare_parts_content.ts`, `<ensemble>.<slug>` ou `unreferenced.<slug>`), jamais renommée
+- `partKey` (string 64) — clé stable d'une pièce du catalogue statique (`shared/constants/spare_parts/`, `<ensemble>.<slug>` ou `unreferenced.<slug>`), jamais renommée : #574 en a inséré 58 sans en renommer aucune
 - `quantity` (défaut 1 — un ré-ajout de la même pièce incrémente, plafond 99)
 - `reference` (nullable — référence constructeur relevée sur la vue éclatée)
 - `createdAt`, `updatedAt`

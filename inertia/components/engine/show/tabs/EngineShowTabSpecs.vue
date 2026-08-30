@@ -71,6 +71,12 @@ function formatYear(iso: string): string {
             <dt class="text-fg-muted">{{ t('boats.engineShow.specs.type') }}</dt>
             <dd class="font-medium text-fg">{{ engineKindLabel(t, engine.kind) }}</dd>
           </div>
+          <div v-if="engine.family">
+            <dt class="text-fg-muted">{{ t('boats.engineShow.specs.family') }}</dt>
+            <dd class="font-medium text-fg">
+              {{ t(`boats.options.engineFamily.${engine.family}`) }}
+            </dd>
+          </div>
           <div v-if="engine.strokeType">
             <dt class="text-fg-muted">{{ t('boats.engineShow.specs.strokeType') }}</dt>
             <dd class="font-medium text-fg">

@@ -47,6 +47,12 @@ export type BoatEnginePayload = {
   kind: string
   fuel?: string | null
   strokeType?: string | null
+  /**
+   * Famille de motorisation (#574) — moteur **et** transmission. `null` quand
+   * l'utilisateur ne l'a pas précisée : le service la déduit alors en
+   * best-effort de `kind`/`fuel`/`strokeType`.
+   */
+  family?: string | null
   brand?: string | null
   model?: string | null
   /** Ligne du catalogue moteur (#573), `null` pour une saisie hors catalogue. */

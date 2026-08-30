@@ -10,10 +10,11 @@
       "order": "Ajoutez-la à votre liste de réparation et commandez chez un revendeur."
     },
     "enginesTitle": "Vos moteurs",
-    "empty": "Aucun moteur hors-bord enregistré",
-    "eligibilityHint": "L'identification de pièces s'appuie sur les moteurs hors-bord enregistrés sur vos bateaux. Ajoutez un moteur hors-bord depuis la fiche d'un bateau pour commencer.",
+    "empty": "Aucun moteur enregistré",
+    "eligibilityHint": "L'identification de pièces s'appuie sur les moteurs enregistrés sur vos bateaux. Ajoutez un moteur depuis la fiche d'un bateau pour commencer.",
     "openCatalog": "Identifier une pièce",
-    "cartCount": "{count} pièce(s) dans la liste de réparation"
+    "cartCount": "{count} pièce(s) dans la liste de réparation",
+    "unknownFamily": "Motorisation à préciser"
   },
   "common": {
     "catalogNameLabel": "Intitulé catalogue",
@@ -352,6 +353,352 @@
           "label": "Anode de support",
           "detail": "Anode sacrificielle externe : à remplacer dès qu'elle est rongée à moitié.",
           "price": "≈ 10–30 €"
+        }
+      }
+    },
+    "cooling_raw_water": {
+      "label": "Circuit d'eau de mer",
+      "description": "Pompe à eau de mer, turbine, échangeur et anodes : le circuit qui refroidit le moteur avec l'eau dans laquelle vous naviguez.",
+      "parts": {
+        "impeller": {
+          "label": "Turbine de pompe à eau de mer",
+          "detail": "La pièce d'usure numéro un : à remplacer chaque saison, et à garder en rechange à bord.",
+          "price": "≈ 20–60 €"
+        },
+        "pump_repair_kit": {
+          "label": "Kit de réfection de pompe",
+          "detail": "Turbine, joints, couvercle et roulements : à préférer à la turbine seule si le corps de pompe est marqué.",
+          "price": "≈ 60–150 €"
+        },
+        "pump_cover_gasket": {
+          "label": "Joint de couvercle de pompe",
+          "kit": "Inclus dans le kit de réfection de pompe.",
+          "price": "≈ 3–10 €"
+        },
+        "heat_exchanger_anode": {
+          "label": "Anode crayon d'échangeur",
+          "detail": "Anode sacrificielle vissée dans l'échangeur : à contrôler à chaque hivernage, c'est elle qui protège tout le circuit.",
+          "price": "≈ 8–25 €"
+        },
+        "heat_exchanger_gasket_kit": {
+          "label": "Kit de joints d'échangeur",
+          "detail": "Joints et bagues des tubulures, à remplacer au démontage de l'échangeur pour détartrage.",
+          "price": "≈ 20–60 €"
+        },
+        "strainer_seal": {
+          "label": "Joint de couvercle de crépine",
+          "detail": "Le joint du filtre à eau de mer : une prise d'air ici et la pompe désamorce.",
+          "price": "≈ 5–15 €"
+        }
+      }
+    },
+    "cooling_fresh_water": {
+      "label": "Circuit d'eau douce",
+      "description": "Thermostat, durites, vase d'expansion : le circuit fermé de liquide de refroidissement d'un moteur à double circuit.",
+      "parts": {
+        "thermostat": {
+          "label": "Thermostat",
+          "detail": "Un moteur qui monte lentement en température, ou qui chauffe sans raison, commence souvent ici.",
+          "price": "≈ 15–50 €"
+        },
+        "thermostat_gasket": {
+          "label": "Joint de thermostat",
+          "price": "≈ 3–12 €"
+        },
+        "coolant_hose": {
+          "label": "Durite de refroidissement",
+          "detail": "Notez le diamètre intérieur et la longueur avant de commander : beaucoup se vendent au mètre.",
+          "price": "≈ 10–40 €"
+        },
+        "expansion_tank_cap": {
+          "label": "Bouchon de vase d'expansion",
+          "detail": "Un bouchon qui ne tient plus la pression fait bouillir un circuit pourtant sain.",
+          "price": "≈ 10–30 €"
+        },
+        "circulating_pump": {
+          "label": "Pompe de circulation",
+          "price": "≈ 120–350 €"
+        }
+      }
+    },
+    "injection": {
+      "label": "Alimentation et injection",
+      "description": "Préfiltre décanteur, filtres, injecteurs : sur un diesel, la propreté du gasoil est la première cause de panne.",
+      "parts": {
+        "pre_filter_element": {
+          "label": "Cartouche de préfiltre décanteur",
+          "detail": "Le Racor et ses équivalents : cartouche changée chaque saison, cuve purgée dès que l'eau s'y voit.",
+          "price": "≈ 15–45 €"
+        },
+        "fuel_filter": {
+          "label": "Filtre à gasoil moteur",
+          "detail": "Le second filtre, sur le moteur lui-même : il se change en même temps que le préfiltre.",
+          "price": "≈ 15–50 €"
+        },
+        "injector": {
+          "label": "Injecteur",
+          "detail": "Se contrôle et se tare sur banc chez un diéséliste : un injecteur qui goutte noircit l'échappement.",
+          "price": "≈ 80–250 €"
+        },
+        "injector_seal_kit": {
+          "label": "Kit de joints d'injecteur",
+          "kit": "Joints cuivre et rondelles pare-feu, à remplacer systématiquement à la dépose.",
+          "price": "≈ 5–25 €"
+        },
+        "lift_pump": {
+          "label": "Pompe d'alimentation",
+          "price": "≈ 60–200 €"
+        }
+      }
+    },
+    "exhaust": {
+      "label": "Échappement humide",
+      "description": "Coude d'échappement, waterlock, tuyau : la ligne où l'eau de mer rejoint les gaz — et où la corrosion travaille.",
+      "parts": {
+        "exhaust_elbow": {
+          "label": "Coude d'échappement",
+          "detail": "Pièce d'usure : il s'entartre et se perce de l'intérieur. À déposer et contrôler tous les 4 à 5 ans.",
+          "price": "≈ 150–600 €"
+        },
+        "elbow_gasket": {
+          "label": "Joint de coude d'échappement",
+          "kit": "À remplacer systématiquement à la dépose du coude.",
+          "price": "≈ 5–25 €"
+        },
+        "waterlock": {
+          "label": "Waterlock (pot d'échappement)",
+          "detail": "Empêche l'eau de remonter vers le moteur à l'arrêt : un waterlock fendu se remplace, il ne se répare pas.",
+          "price": "≈ 80–300 €"
+        },
+        "exhaust_hose": {
+          "label": "Tuyau d'échappement",
+          "detail": "Tuyau marine armé spécifique : un tuyau d'eau ordinaire s'écrase et brûle.",
+          "price": "≈ 25–90 € le mètre"
+        },
+        "hose_clamps": {
+          "label": "Colliers inox",
+          "detail": "Toujours par paire sur un raccord d'échappement, vis décalées pour pouvoir les serrer.",
+          "price": "≈ 2–8 €"
+        }
+      }
+    },
+    "gearbox": {
+      "label": "Inverseur et accouplement",
+      "description": "Inverseur, huile, câble de commande et accouplement souple : ce qui transmet — ou ne transmet plus — la puissance à l'hélice.",
+      "parts": {
+        "gear_oil": {
+          "label": "Huile d'inverseur",
+          "detail": "ATF ou huile moteur selon le modèle : vérifiez la préconisation, les deux ne se remplacent pas l'une l'autre.",
+          "price": "≈ 10–30 €"
+        },
+        "output_seal": {
+          "label": "Joint spi de sortie",
+          "detail": "Une trace d'huile sur l'accouplement vient presque toujours de là.",
+          "price": "≈ 15–50 €"
+        },
+        "shift_cable": {
+          "label": "Câble de commande d'inverseur",
+          "price": "≈ 40–120 €"
+        },
+        "flexible_coupling": {
+          "label": "Accouplement souple",
+          "detail": "Absorbe les vibrations entre inverseur et ligne d'arbre : un caoutchouc fendu se voit à l'œil.",
+          "price": "≈ 80–300 €"
+        },
+        "damper_plate": {
+          "label": "Disque d'accouplement (damper)",
+          "detail": "Entre volant moteur et inverseur : un cliquetis au ralenti, au point mort, le désigne.",
+          "price": "≈ 100–350 €"
+        }
+      }
+    },
+    "saildrive": {
+      "label": "Saildrive",
+      "description": "Soufflet, anodes et huile d'embase : l'embase traversante d'un voilier, avec l'échéance d'entretien la plus critique du bord.",
+      "parts": {
+        "diaphragm": {
+          "label": "Soufflet d'étanchéité",
+          "detail": "C'est lui qui tient l'eau hors du bateau : remplacement impératif tous les 7 ans, bateau à terre.",
+          "price": "≈ 250–700 €"
+        },
+        "anode": {
+          "label": "Anode de saildrive",
+          "detail": "À contrôler à chaque carénage : une anode consommée met l'embase en aluminium en première ligne.",
+          "price": "≈ 25–80 €"
+        },
+        "oil_seal": {
+          "label": "Joint spi d'arbre d'hélice",
+          "detail": "Une huile d'embase laiteuse signale son passage : elle a laissé entrer l'eau.",
+          "price": "≈ 20–70 €"
+        },
+        "gear_oil": {
+          "label": "Huile d'embase",
+          "price": "≈ 15–40 €"
+        }
+      }
+    },
+    "sterndrive": {
+      "label": "Embase Z",
+      "description": "Soufflets, cardans, vérins de trim et anodes : l'embase arrière d'une installation à embase Z.",
+      "parts": {
+        "bellows_kit": {
+          "label": "Kit de soufflets",
+          "detail": "Soufflet de cardan, d'échappement et de direction : ils se remplacent ensemble, tous les 4 à 5 ans.",
+          "price": "≈ 60–200 €"
+        },
+        "u_joint": {
+          "label": "Cardan de transmission",
+          "detail": "Un couinement à la manœuvre ou une trace de graisse dans le soufflet le désignent.",
+          "price": "≈ 80–250 €"
+        },
+        "trim_cylinder": {
+          "label": "Vérin de trim",
+          "price": "≈ 150–500 €"
+        },
+        "anode_kit": {
+          "label": "Kit d'anodes d'embase",
+          "detail": "Anodes de plaque, de vérins et d'hélice : à contrôler à chaque sortie d'eau.",
+          "price": "≈ 30–90 €"
+        },
+        "gimbal_bearing": {
+          "label": "Roulement de gimbal",
+          "detail": "Se change soufflets déposés : autant le faire dans le même passage au chantier.",
+          "price": "≈ 50–150 €"
+        }
+      }
+    },
+    "shaft_line": {
+      "label": "Ligne d'arbre",
+      "description": "Presse-étoupe, tresse, palier hydrolube et arbre : la traversée de coque d'un in-bord classique.",
+      "parts": {
+        "stuffing_box_packing": {
+          "label": "Tresse de presse-étoupe",
+          "detail": "Se vend au mètre, à la section de votre arbre : trois tours coupés en biseau, coupes décalées.",
+          "price": "≈ 15–50 €"
+        },
+        "stuffing_box": {
+          "label": "Presse-étoupe",
+          "detail": "Modèle à tresse ou à joint tournant sans entretien : les deux se remplacent bateau à terre.",
+          "price": "≈ 100–400 €"
+        },
+        "cutless_bearing": {
+          "label": "Palier hydrolube",
+          "detail": "Le palier caoutchouc et laiton du tube d'étambot : du jeu à la main sur l'arbre signale sa fin.",
+          "price": "≈ 40–150 €"
+        },
+        "shaft": {
+          "label": "Arbre d'hélice",
+          "price": "≈ 300–1200 €"
+        },
+        "shaft_anode": {
+          "label": "Anode d'arbre",
+          "detail": "Bague sacrificielle serrée sur l'arbre : à remplacer à chaque carénage.",
+          "price": "≈ 15–50 €"
+        }
+      }
+    },
+    "starting_charging": {
+      "label": "Démarrage et charge",
+      "description": "Démarreur, alternateur, courroie et relais : le circuit qui lance le moteur et recharge les batteries.",
+      "parts": {
+        "starter_motor": {
+          "label": "Démarreur",
+          "detail": "Un simple clic sans rotation vient plus souvent du relais ou des cosses que du démarreur lui-même.",
+          "price": "≈ 150–500 €"
+        },
+        "starter_solenoid": {
+          "label": "Relais de démarreur",
+          "price": "≈ 30–120 €"
+        },
+        "alternator": {
+          "label": "Alternateur",
+          "price": "≈ 200–700 €"
+        },
+        "drive_belt": {
+          "label": "Courroie d'alternateur",
+          "detail": "Poussière noire sous la poulie ou charge qui plafonne : commencez toujours par la courroie et sa tension.",
+          "price": "≈ 10–35 €"
+        },
+        "voltage_regulator": {
+          "label": "Régulateur de charge",
+          "price": "≈ 40–200 €"
+        }
+      }
+    },
+    "lubrication": {
+      "label": "Lubrification",
+      "description": "Filtre à huile, pompe et joints de carter : la vidange et tout ce qui l'accompagne.",
+      "parts": {
+        "oil_filter": {
+          "label": "Filtre à huile",
+          "detail": "À changer à chaque vidange : le filtre coûte moins cher que l'huile qu'il protège.",
+          "price": "≈ 10–35 €"
+        },
+        "engine_oil": {
+          "label": "Huile moteur",
+          "detail": "Grade et norme selon le manuel du moteur : une huile automobile ne convient pas à tous les marins.",
+          "price": "≈ 25–80 €"
+        },
+        "oil_pump": {
+          "label": "Pompe à huile",
+          "price": "≈ 100–400 €"
+        },
+        "sump_gasket": {
+          "label": "Joint de carter",
+          "price": "≈ 15–60 €"
+        }
+      }
+    },
+    "air_intake": {
+      "label": "Admission d'air et turbo",
+      "description": "Filtre à air, turbo, intercooler : ce qui alimente la combustion d'un diesel, suralimenté ou non.",
+      "parts": {
+        "air_filter": {
+          "label": "Filtre à air",
+          "detail": "Souvent un simple élément mousse lavable sur les petits diesels marins : nettoyez-le plutôt que de le jeter.",
+          "price": "≈ 15–60 €"
+        },
+        "turbocharger": {
+          "label": "Turbocompresseur",
+          "detail": "Sifflement nouveau ou fumée bleue à l'accélération : l'échange standard coûte souvent bien moins que le neuf.",
+          "price": "≈ 600–2000 €"
+        },
+        "intercooler_gasket_kit": {
+          "label": "Kit de joints d'intercooler",
+          "price": "≈ 20–80 €"
+        },
+        "intake_hose": {
+          "label": "Durite d'admission",
+          "price": "≈ 20–70 €"
+        },
+        "breather_filter": {
+          "label": "Filtre de reniflard",
+          "detail": "Un reniflard bouché met le carter en pression et fait suinter les joints.",
+          "price": "≈ 15–50 €"
+        }
+      }
+    },
+    "controls": {
+      "label": "Commandes et direction",
+      "description": "Boîtier de commande, câbles, direction : ce qui relie le poste de barre au moteur, quelle que soit la motorisation.",
+      "parts": {
+        "control_box": {
+          "label": "Boîtier de commande",
+          "price": "≈ 150–600 €"
+        },
+        "throttle_cable": {
+          "label": "Câble d'accélérateur",
+          "detail": "Se commande à la longueur exacte (en pieds chez les constructeurs américains) : mesurez l'ancien avant.",
+          "price": "≈ 40–120 €"
+        },
+        "steering_seal_kit": {
+          "label": "Kit de joints de direction hydraulique",
+          "detail": "Direction molle ou suintante à la barre : le kit de joints coûte dix fois moins cher que le vérin.",
+          "price": "≈ 40–150 €"
+        },
+        "key_switch": {
+          "label": "Contacteur à clé",
+          "price": "≈ 30–120 €"
         }
       }
     }

@@ -19,10 +19,16 @@ import {
 } from '../../shared/constants/spare_parts/spare_parts_content'
 import { DIAGNOSTIC_SHEETS } from '../../shared/constants/diagnostic/diagnostic_content'
 import {
+  assembliesForEngine,
+  assembliesForEngineFamily,
+  GENERIC_ASSEMBLY_SLUGS,
+  isAssemblyForEngine,
   isSparePartsEligibleEngine,
   sparePartsBrandFromCatalogSlug,
   yamahaReferenceExample,
 } from '../../shared/helpers/spare_parts'
+import { ENGINE_FAMILIES } from '../../shared/types/engine_catalog'
+import { BOAT_ENGINE_FAMILY_OPTIONS } from '../../shared/constants/boats/boat_form_options'
 
 function flattenKeys(node: unknown, prefix: string): string[] {
   if (typeof node !== 'object' || node === null) return [prefix]
@@ -31,9 +37,9 @@ function flattenKeys(node: unknown, prefix: string): string[] {
   )
 }
 
-function localeKeys(locale: 'en' | 'fr'): Set<string> {
-  const raw = readFileSync(join(process.cwd(), 'resources', 'lang', locale, 'parts.json'))
-  return new Set(flattenKeys(JSON.parse(raw.toString()), 'parts'))
+function localeKeys(locale: 'en' | 'fr', namespace = 'parts'): Set<string> {
+  const raw = readFileSync(join(process.cwd(), 'resources', 'lang', locale, `${namespace}.json`))
+  return new Set(flattenKeys(JSON.parse(raw.toString()), namespace))
 }
 
 describe('Contenu pièces détachées (#517)', () => {
@@ -86,9 +92,97 @@ describe('Contenu pièces détachées (#517)', () => {
     }
   })
 
-  test('éligibilité : hors-bord uniquement', () => {
-    expect(isSparePartsEligibleEngine({ kind: 'outboard' })).toBe(true)
-    expect(isSparePartsEligibleEngine({ kind: 'inboard' })).toBe(false)
+  test('chaque ensemble déclare au moins une famille de motorisation (#574)', () => {
+    for (const assembly of Object.values(SPARE_PART_ASSEMBLIES)) {
+      expect(assembly.families.length, `familles manquantes sur ${assembly.slug}`).toBeGreaterThan(
+        0
+      )
+      for (const family of assembly.families) {
+        expect(ENGINE_FAMILIES, `famille inconnue sur ${assembly.slug}`).toContain(family)
+      }
+    }
+  })
+
+  test('aucune famille ne se retrouve sans ensemble', () => {
+    for (const family of ENGINE_FAMILIES) {
+      expect(
+        assembliesForEngineFamily(family).length,
+        `aucun ensemble pour la famille ${family}`
+      ).toBeGreaterThan(0)
+    }
+  })
+
+  test('une famille absente retombe sur les ensembles génériques, jamais sur du vide', () => {
+    const generic = assembliesForEngineFamily(null)
+    expect(generic.map((assembly) => assembly.slug)).toEqual([...GENERIC_ASSEMBLY_SLUGS])
+  })
+
+  test('éligibilité : la famille décide, plus le seul `kind`', () => {
+    // Le hors-bord de #517 reste servi…
+    expect(isSparePartsEligibleEngine({ kind: 'outboard', family: 'outboard_4t' })).toBe(true)
+    // …et l'in-bord diesel, que #517 fermait, accède désormais à l'écran.
+    expect(isSparePartsEligibleEngine({ kind: 'inboard', family: 'inboard_diesel_shaft' })).toBe(
+      true
+    )
+    // Famille absente : la dérivation depuis kind/fuel prend le relais.
+    expect(isSparePartsEligibleEngine({ kind: 'inboard', fuel: 'diesel' })).toBe(true)
+    // Rien de connu : ensembles génériques, donc écran utilisable quand même.
+    expect(isSparePartsEligibleEngine({ kind: 'other' })).toBe(true)
+  })
+
+  test('la nomenclature servie suit la famille', () => {
+    const inboardDiesel = assembliesForEngine({
+      kind: 'inboard',
+      fuel: 'diesel',
+      family: 'inboard_diesel_shaft',
+    }).map((assembly) => assembly.slug)
+
+    expect(inboardDiesel).toContain('injection')
+    expect(inboardDiesel).toContain('shaft-line')
+    expect(inboardDiesel).toContain('cooling-raw-water')
+    // Ni carburateur ni lanceur sur un diesel, ni saildrive sur une ligne d'arbre.
+    expect(inboardDiesel).not.toContain('carburetor')
+    expect(inboardDiesel).not.toContain('recoil-starter')
+    expect(inboardDiesel).not.toContain('saildrive')
+
+    const outboard = assembliesForEngine({ kind: 'outboard', strokeType: '2_stroke' }).map(
+      (assembly) => assembly.slug
+    )
+    expect(outboard).toContain('carburetor')
+    expect(outboard).toContain('lower-unit')
+    expect(outboard).not.toContain('saildrive')
+    // La lubrification est propre au 4 temps : un 2 temps mélange l'huile.
+    expect(outboard).not.toContain('lubrication')
+
+    expect(
+      assembliesForEngine({
+        kind: 'inboard',
+        fuel: 'diesel',
+        family: 'inboard_diesel_saildrive',
+      }).map((assembly) => assembly.slug)
+    ).toContain('saildrive')
+  })
+
+  test('un ensemble étranger à la famille est refusé', () => {
+    const inboard = { kind: 'inboard', family: 'inboard_diesel_shaft' }
+    expect(isAssemblyForEngine(inboard, 'injection')).toBe(true)
+    expect(isAssemblyForEngine(inboard, 'carburetor')).toBe(false)
+    expect(isAssemblyForEngine(inboard, 'saildrive')).toBe(false)
+  })
+
+  test('les options du formulaire couvrent exactement les familles, dans l’ordre', () => {
+    expect(BOAT_ENGINE_FAMILY_OPTIONS.map((option) => option.value)).toEqual([...ENGINE_FAMILIES])
+  })
+
+  test('chaque famille a son libellé dans les deux locales', () => {
+    const en = localeKeys('en', 'boats')
+    const fr = localeKeys('fr', 'boats')
+
+    for (const family of ENGINE_FAMILIES) {
+      const key = `boats.options.engineFamily.${family}`
+      expect(fr.has(key), `clé FR manquante : ${key}`).toBe(true)
+      expect(en.has(key), `clé EN manquante : ${key}`).toBe(true)
+    }
   })
 
   // La normalisation du texte libre (`Yamaha`, `EVINRUDE 6cv`, `Mariner`) a

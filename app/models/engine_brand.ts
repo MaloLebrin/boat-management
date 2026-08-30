@@ -1,5 +1,5 @@
 import EngineModel from '#models/engine_model'
-import type { EngineFamily } from '#shared/types/engine_catalog'
+import type { EngineCatalogFamily } from '#shared/types/engine_catalog'
 import { BaseModel, column, hasMany } from '@adonisjs/lucid/orm'
 import type { HasMany } from '@adonisjs/lucid/types/relations'
 import { DateTime } from 'luxon'
@@ -32,7 +32,7 @@ export default class EngineBrand extends BaseModel {
       value === null || value === undefined ? value : JSON.stringify(value),
     consume: (value: unknown) => (typeof value === 'string' ? JSON.parse(value) : value),
   })
-  declare families: EngineFamily[]
+  declare families: EngineCatalogFamily[]
 
   /** Orthographes et anciens noms rencontrés en saisie libre. */
   @column({

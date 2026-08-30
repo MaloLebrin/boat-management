@@ -97,8 +97,12 @@ Référence: `inertia/app.ts`.
     modèle en `BaseCombobox`, modèles chargés par
     `router.reload({ only: ['engineCatalogModels', 'engineCatalogBrandId'], data: { engineBrandId } })` ;
     **une saisie hors catalogue est acceptée telle quelle**. Retenir un modèle pré-remplit
-    puissance, carburant et cycle **uniquement s'ils sont vides**, et pose `engineModelId` en champ
-    caché ; retaper marque ou modèle relâche ce rattachement
+    puissance, carburant, cycle et **motorisation** (#574) **uniquement s'ils sont vides**, et pose
+    `engineModelId` en champ caché ; retaper marque ou modèle relâche ce rattachement
+  - motorisation (#574): `<select name="family">` facultatif (« — » = je ne sais pas), options
+    `BOAT_ENGINE_FAMILY_OPTIONS` libellées par `boats.options.engineFamily.*`. C'est ce champ, et
+    non `kind`, qui décide de la nomenclature de pièces détachées ; le libellé est rappelé dans
+    l'onglet Caractéristiques de la fiche moteur
   - props catalogue lues dans les props de page via `inertia/composables/use_engine_catalog.ts` —
     le formulaire est monté à quatre niveaux sous `boats/show`, elles ne descendent pas de main en
     main
@@ -150,20 +154,27 @@ Les cartes de l'onglet Équipement exposent un lien « voir le détail » vers c
 - Types frontend: `inertia/types/budget.ts`
 - Source backend: `BudgetController.show`
 
-### Pièces détachées (#517)
+### Pièces détachées (#517, #574)
 
 - Pages (GET `/spare-parts`, `/boats/:boatId/engines/:engineId/spare-parts[/assemblies/:assemblySlug]`):
-  - `inertia/pages/spare_parts/index.vue` — parcours en 4 étapes + moteurs hors-bord éligibles (taille du panier)
+  - `inertia/pages/spare_parts/index.vue` — parcours en 4 étapes + moteurs de l'organisation avec
+    leur motorisation (ou « à préciser ») et la taille du panier
   - `inertia/pages/spare_parts/identify.vue` — étape 1 (identité moteur, plaque, avertissement n° de série), grille d'ensembles, pièces sans référence, liste de réparation
   - `inertia/pages/spare_parts/assembly.vue` — liens vues éclatées revendeurs, décodage référence Yamaha, pièces courantes (nom FR + intitulé catalogue EN), liste de réparation
 - Composants `inertia/components/spare_parts/`:
   - `SparePartsIdentitySection.vue` — carte identité moteur + aides plaque par marque
-  - `SparePartsAssemblyGrid.vue` — 9 ensembles fonctionnels (label FR + intitulé catalogue EN)
+  - `SparePartsAssemblyGrid.vue` — ensembles fonctionnels **filtrés par la famille de motorisation**
+    du moteur (`assembliesForEngine()`, #574) : 21 au catalogue, jamais une grille vide — une
+    famille inconnue retombe sur les ensembles génériques
   - `SparePartsPartList.vue` / `SparePartsUnreferencedList.vue` — fiches pièces avec ajout au panier
   - `SparePartsRetailerLinks.vue` — ancres externes `target="_blank"` vers Partzilla / Boats.net / Crowley Marine (eslint-disable motivé)
   - `SparePartsCartPanel.vue` — quantités, référence relevée, suppression, export CSV (`external-href`)
-- Contenu statique: `shared/constants/spare_parts/spare_parts_content.ts` (clés i18n `parts.*`, intitulés catalogue EN littéraux)
-- Liens croisés: fiche de diagnostic → ensemble (`diagnostic/sheet.vue`), onglet Pièces moteur → CTA « Identifier une pièce », sidebar `nav.spareParts`
+- Contenu statique: `shared/constants/spare_parts/spare_parts_content.ts` (9 ensembles hors-bord) et
+  `shared/constants/spare_parts/inboard_assemblies.ts` (12 ensembles in-bord, embases, groupe
+  électrogène) — clés i18n `parts.*`, intitulés catalogue EN littéraux
+- Liens croisés: fiche de diagnostic → ensemble (`diagnostic/sheet.vue`), onglet Pièces moteur → CTA
+  « Identifier une pièce » conditionné par `isSparePartsEligibleEngine()` (jamais une règle dupliquée
+  dans un template), sidebar `nav.spareParts`
 - Source backend: `BoatEngineSparePartsController`
 
 ### Onglets scrollables (#495)

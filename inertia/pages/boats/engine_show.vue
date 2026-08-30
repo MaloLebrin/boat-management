@@ -17,6 +17,7 @@ import EngineShowTabParts from '~/components/engine/show/tabs/EngineShowTabParts
 import EngineShowTabPhotos from '~/components/engine/show/tabs/EngineShowTabPhotos.vue'
 import EngineShowTabSpecs from '~/components/engine/show/tabs/EngineShowTabSpecs.vue'
 import { GLOBAL_CHECKLIST } from '#shared/constants/diagnostic/diagnostic_content'
+import { isSparePartsEligibleEngine } from '#shared/helpers/spare_parts'
 import { useT } from '~/composables/use_t'
 import { engineDisplayTitle, engineFuelLabel } from '~/utils/boat_enum_labels'
 import type { BoatShowEngine, MaintenanceEventRow, MaintenanceTaskRow } from '~/types/boat_show'
@@ -333,7 +334,7 @@ function formatYear(iso: string): string {
           :boat-id="boat.id"
           :engine-id="engine.id"
           :can-manage="canManage"
-          :spare-parts-eligible="engine.kind === 'outboard'"
+          :spare-parts-eligible="isSparePartsEligibleEngine(engine)"
         />
         <EngineShowTabPhotos
           v-else-if="tab === 'photos'"
