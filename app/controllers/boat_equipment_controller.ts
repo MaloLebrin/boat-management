@@ -131,12 +131,13 @@ export default class BoatEquipmentController {
     await bouncer.with(BoatPolicy).authorize('edit', boat)
 
     const body = (await request.validateUsing(updateBoatEngineValidator)) as BoatEngineFormBody
+    const engineId = Number(params.engineId)
 
     try {
       await this.equipmentService.updateEngine(
         loaded.user,
         boat,
-        Number(params.engineId),
+        engineId,
         equipmentBodyToEnginePayload(body)
       )
     } catch (error) {
@@ -149,7 +150,7 @@ export default class BoatEquipmentController {
     }
 
     session.flash('success', i18n.t('flash.engine.updated'))
-    response.redirect(`/boats/${boat.id}`)
+    response.redirect(`/boats/${boat.id}/engines/${engineId}`)
   }
 
   async destroyEngine({ response, auth, params, bouncer, session, i18n }: HttpContext) {

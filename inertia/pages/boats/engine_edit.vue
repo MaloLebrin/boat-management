@@ -36,7 +36,7 @@ const { t } = useT()
           <div class="mt-6 flex items-center gap-3">
             <BaseButton type="submit" :disabled="processing">{{ t('common.save') }}</BaseButton>
             <Link
-              :href="`/boats/${boat.id}`"
+              :href="`/boats/${boat.id}/engines/${engine.id}`"
               class="text-sm font-semibold text-fg-muted hover:text-fg hover:underline"
             >
               {{ t('common.cancel') }}
