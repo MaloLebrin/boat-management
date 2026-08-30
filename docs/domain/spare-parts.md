@@ -102,4 +102,4 @@ Service : `app/services/boat_engine_spare_parts_service.ts` (erreurs dans `app/e
 
 ## Hors périmètre
 
-Reconnaissance de pièce par photo ; vues éclatées intégrées (partenariat/affiliation ou schémas propres) ; reprise automatisée des catalogues revendeurs (contenus sous droits) ; prix et disponibilité en temps réel — les `priceKey` restent des fourchettes indicatives ; compatibilité croisée entre modèles (« cette turbine va aussi sur… ») ; affiliation ou partenariat revendeur, point ouvert de #517 ; checklists de diagnostic in-bord.
+Reconnaissance de pièce par photo ; vues éclatées intégrées (partenariat/affiliation ou schémas propres) ; reprise automatisée des catalogues revendeurs (contenus sous droits) ; prix et disponibilité en temps réel — les `priceKey` restent des fourchettes indicatives ; compatibilité croisée entre modèles (« cette turbine va aussi sur… ») ; affiliation ou partenariat revendeur, point ouvert de #517. Les checklists de diagnostic in-bord, un temps listées ici, sont livrées par #576 — voir `docs/domain/diagnostic.md`.
