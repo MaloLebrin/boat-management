@@ -19,6 +19,7 @@ vi.mock('@adonisjs/inertia/vue', () => ({
 }))
 
 import AppHeader from '../../inertia/components/layout/AppHeader.vue'
+import AppHeaderMobileDrawer from '../../inertia/components/layout/AppHeaderMobileDrawer.vue'
 import PublicLayout from '../../inertia/layouts/public.vue'
 
 const stubs = {
@@ -62,4 +63,24 @@ test('le footer public renvoie vers les mentions légales et les CGV', () => {
   expect(w.html()).toContain('public.footer.salesTerms')
   expect(w.findAll('a[href="/fr/mentions-legales"]').length).toBe(1)
   expect(w.findAll('a[href="/fr/cgv"]').length).toBe(1)
+})
+
+// #609 — la page publique de diagnostic IA n'était reliée au site que par le
+// footer. C'est notre meilleur argument d'entrée : elle doit être atteignable
+// depuis la nav principale, desktop comme mobile.
+test('la nav publique du header renvoie vers le diagnostic de panne IA', () => {
+  const w = mount(AppHeader, { global: { stubs } })
+
+  expect(w.html()).toContain('public.nav.diagnosisAi')
+  expect(w.findAll('a[href="/fr/diagnostic-panne-ia"]').length).toBe(1)
+})
+
+test('le drawer mobile renvoie vers le diagnostic de panne IA', () => {
+  const w = mount(AppHeaderMobileDrawer, {
+    props: { isOpen: true, locale: 'fr', guideHref: '/fr/cout-entretien-bateau', isAuthed: false },
+    global: { stubs },
+  })
+
+  expect(w.html()).toContain('public.nav.diagnosisAi')
+  expect(w.findAll('a[href="/fr/diagnostic-panne-ia"]').length).toBe(1)
 })

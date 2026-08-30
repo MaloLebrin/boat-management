@@ -23,6 +23,8 @@ const closeButtonEl = ref<HTMLButtonElement | null>(null)
 
 const pricingHref = computed(() => marketingPath('pricing', props.locale))
 
+const diagnosisHref = computed(() => marketingPath('diagnosisAi', props.locale))
+
 watch(
   () => props.isOpen,
   async (open) => {
@@ -124,6 +126,13 @@ watch(
           @click="emit('close')"
         >
           {{ t('public.nav.pricing') }}
+        </Link>
+        <Link
+          :href="diagnosisHref"
+          class="block rounded-(--radius-control) px-3 py-2.5 text-sm font-medium text-fg-muted transition-colors duration-(--motion-fast) hover:bg-paper hover:text-fg"
+          @click="emit('close')"
+        >
+          {{ t('public.nav.diagnosisAi') }}
         </Link>
         <Link
           :href="guideHref"

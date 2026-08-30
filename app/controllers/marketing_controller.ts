@@ -5,6 +5,7 @@ import type { BooleanQuotaKey } from '../../shared/types/plan.js'
 import type { LegalEntry, PricingTableRow } from '../../shared/types/marketing.js'
 import legalEntity from '#config/legal'
 import { CONTACT_FLEET_SIZES, CONTACT_SUBJECTS } from '../../shared/types/contact.js'
+import { PUBLIC_DIAGNOSIS_LIFETIME_LIMIT } from '../../shared/types/public_diagnosis.js'
 import { marketingPath } from '#shared/helpers/locale_path'
 import QuotaService from '#services/quota_service'
 import SimulatorLeadService from '#services/simulator_lead_service'
@@ -82,7 +83,10 @@ export default class MarketingController {
     return inertia.render('marketing/simulator', { isAuthenticated, canAddBoat, benchmarks })
   }
 
-  private buildHomePageData(i18n: { t: (key: string) => string; locale: string }) {
+  private buildHomePageData(i18n: {
+    t: (key: string, params?: Record<string, string>) => string
+    locale: string
+  }) {
     const locale = i18n.locale === 'fr' ? 'fr' : 'en'
     return {
       brand: {
@@ -499,6 +503,27 @@ export default class MarketingController {
             { q: i18n.t('marketing.home.faq.item8_q'), a: i18n.t('marketing.home.faq.item8_a') },
           ],
         },
+        diagnosis: {
+          eyebrow: i18n.t('marketing.home.diagnosis.eyebrow'),
+          title: i18n.t('marketing.home.diagnosis.title'),
+          titleHighlight: i18n.t('marketing.home.diagnosis.title_highlight'),
+          subtitle: i18n.t('marketing.home.diagnosis.subtitle'),
+          items: [
+            i18n.t('marketing.home.diagnosis.item1'),
+            i18n.t('marketing.home.diagnosis.item2'),
+            i18n.t('marketing.home.diagnosis.item3'),
+          ],
+          ctaLabel: i18n.t('marketing.home.diagnosis.cta_label'),
+          // Le CTA vise le chat public, pas /signup : c'est justement l'entrée
+          // sans friction du tunnel d'acquisition (#609).
+          ctaHref: marketingPath('diagnosisAi', locale),
+          // Le quota affiché vient de la constante, jamais d'un nombre recopié
+          // dans le JSON de traduction (#454).
+          note: i18n.t('marketing.home.diagnosis.note', {
+            count: String(PUBLIC_DIAGNOSIS_LIFETIME_LIMIT),
+          }),
+          disclaimer: i18n.t('marketing.home.diagnosis.disclaimer'),
+        },
         demo: {
           eyebrow: i18n.t('marketing.home.demo.eyebrow'),
           title: i18n.t('marketing.home.demo.title'),
@@ -666,6 +691,10 @@ export default class MarketingController {
               [t('tier_starter_feat3'), t('tier_starter_feat3_sub')],
               [t('tier_starter_feat5')],
               [t('tier_starter_feat6'), t('tier_starter_feat6_sub')],
+              [
+                t('tier_starter_feat7', { count: String(PUBLIC_DIAGNOSIS_LIFETIME_LIMIT) }),
+                t('tier_starter_feat7_sub'),
+              ],
             ] as Array<[string, string?]>,
             cta: t('tier_starter_cta'),
             ctaVariant: 'outline',
@@ -914,6 +943,12 @@ export default class MarketingController {
                 flagRow('table_g4_r4', 'canUseAI'),
                 flagRow('table_g4_r5', 'canCustomizeAI'),
                 [t('table_g4_r6'), false, t('table_g4_r6_p'), t('table_g4_r6_e')],
+                [
+                  t('table_g4_r7'),
+                  t('table_g4_r7_s', { count: String(PUBLIC_DIAGNOSIS_LIFETIME_LIMIT) }),
+                  t('table_g4_r7_p'),
+                  t('table_g4_r7_p'),
+                ],
               ] as PricingTableRow[],
             },
             {
@@ -1016,8 +1051,9 @@ export default class MarketingController {
             { q: t('faq_q4'), a: t('faq_a4') },
             { q: t('faq_q5'), a: t('faq_a5') },
             { q: t('faq_q6'), a: t('faq_a6') },
-            { q: t('faq_q7'), a: t('faq_a7') },
+            { q: t('faq_q7'), a: t('faq_a7', { count: String(PUBLIC_DIAGNOSIS_LIFETIME_LIMIT) }) },
             { q: t('faq_q8'), a: t('faq_a8') },
+            { q: t('faq_q9'), a: t('faq_a9', { count: String(PUBLIC_DIAGNOSIS_LIFETIME_LIMIT) }) },
           ],
         },
         finalCta: {

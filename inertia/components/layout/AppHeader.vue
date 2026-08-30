@@ -24,6 +24,8 @@ const guideHref = computed(() => marketingPath('guide', locale.value))
 
 const pricingHref = computed(() => marketingPath('pricing', locale.value))
 
+const diagnosisHref = computed(() => marketingPath('diagnosisAi', locale.value))
+
 const otherLocale = computed<AppLocale>(() => (locale.value === 'en' ? 'fr' : 'en'))
 
 const localeSwitchHref = computed(() =>
@@ -120,6 +122,12 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
           class="rounded-(--radius-control) px-3 py-2 text-sm font-medium text-fg-muted transition-colors duration-(--motion-fast) ease-premium hover:bg-paper hover:text-fg"
         >
           {{ t('public.nav.pricing') }}
+        </Link>
+        <Link
+          :href="diagnosisHref"
+          class="rounded-(--radius-control) px-3 py-2 text-sm font-medium text-fg-muted transition-colors duration-(--motion-fast) ease-premium hover:bg-paper hover:text-fg"
+        >
+          {{ t('public.nav.diagnosisAi') }}
         </Link>
         <Link
           :href="guideHref"
