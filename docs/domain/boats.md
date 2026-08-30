@@ -253,6 +253,33 @@ Webasto` → Isotherm et non Webasto). Renvoie `null` hors catalogue.
 - Seeder `equipment_catalog_seeder.ts` idempotent (`updateOrCreate` sur slug, jamais de `delete`),
   branché sur le déploiement à côté des catalogues bateaux et moteurs.
 
+### Référentiel des voileries et matériau de voile (#578)
+
+Référence : `app/services/sail_loft_service.ts`, corpus dans `database/data/sail_lofts/`. Miroir
+simplifié du catalogue d'équipements ci-dessus, appliqué à `boat_sails` — **pas de table de
+modèles** : une voile est un produit sur mesure, le référentiel s'arrête à la voilerie.
+
+- **La saisie libre reste acceptée, toujours.** `boat_sails.sailmaker` (colonne neuve : les voiles
+  n'avaient aucun champ marque) est du texte libre et reste alimenté ; `sail_loft_id` n'est qu'un
+  rattachement facultatif (nullable, `ON DELETE SET NULL`).
+- `resolveLoft(freeText)` : mêmes deux passes que les autres catalogues (égalité stricte sur
+  slug/nom/alias — `elvstrom` → Elvström Sails, `p&b` → Pinnell & Bax —, puis n-grammes du plus
+  long au plus court — `GV North Sails 2021` → North Sails). Renvoie `null` hors référentiel.
+- `formProps(sail?)` assemble les props Inertia (`sailLofts`, `sailCatalogLoftId`) posées par
+  `BoatsController.show` (carte Voiles, modale d'ajout) et `BoatEquipmentController.editSail`,
+  lues par `inertia/composables/use_sail_lofts.ts`. Pas de rechargement partiel — pas de modèles
+  à charger derrière une voilerie.
+- **Matériau** : `boat_sails.material` est un enum `SAIL_MATERIALS` (`shared/types/boat.ts` —
+  `dacron`, `laminate`, `hydranet`, `membrane`, `nylon_spi`, `cuben`, `other`), validé par
+  `vine…in()` tolérant au vide sur store et update. La migration
+  `1843000002000_normalize_boat_sails_material` normalise l'existant via
+  `normalizeSailMaterial()` (`shared/helpers/sail_material.ts`, insensible casse/accents, motifs
+  du spécifique au générique) ; une valeur non mappable passe à `other` **avec recopie de la
+  saisie d'origine dans `notes`** — rien n'est perdu. L'affichage traduit les slugs et replie sur
+  la valeur brute (`sailMaterialLabel`).
+- Seeder `sail_loft_seeder.ts` idempotent (`updateOrCreate` sur slug, jamais de `delete`),
+  branché sur le déploiement à côté des trois autres catalogues.
+
 ### Pavillon et pays (#580)
 
 Référence : `shared/constants/countries.ts`, `shared/helpers/countries.ts`.

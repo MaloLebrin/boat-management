@@ -127,6 +127,11 @@ Référence: `inertia/app.ts`.
     brouillon et réouverture des modales via `use_generic_equipment_form_draft.ts`
     (`?equipmentForm=<surface>`), même mécanique que le formulaire moteur
 - sails: `inertia/pages/boats/sail_edit.vue` (PUT `/boats/:boatId/sails/:sailId`)
+  - champs partagés `inertia/components/boats/sail/BoatEquipmentSailFields.vue` (aussi montés par
+    la carte Voiles et la modale d'ajout de `boats/show`) : voilerie en `BaseCombobox` nourrie par
+    le référentiel `sail_lofts` (#578, alias cherchables, saisie libre acceptée, hidden
+    `sailLoftId` relâché au retapage), matériau en `BaseSelect` fermé sur `SAIL_MATERIALS` ;
+    props lues via `inertia/composables/use_sail_lofts.ts`
 - rig: `inertia/pages/boats/rig_edit.vue` (PUT `/boats/:boatId/rig`)
 
 ### Equipment detail pages (onglets `info | photos`)
