@@ -253,6 +253,22 @@ Résultats de génération de l'assistant IA : suggestions de flotte (dashboard)
 - `createdAt`
 - index sur `(organization_id, kind)`, `(organization_id, kind, locale)` et `(boat_engine_id, kind, locale)`
 
+### ai_diagnosis_conversations
+
+Conversations du chat IA public de diagnostic de panne (#602), le tunnel d'acquisition accessible sans compte. `userId`/`organizationId` nullables : une conversation anonyme n'a ni l'un ni l'autre (la propriété passe par la session) ; FK en `SET NULL` pour que les lignes survivent à la suppression du compte — elles portent le suivi des coûts. Le plafond « 2 conversations à vie » d'un plan `starter` est un simple `count(*)` sur `organization_id` : la ligne EST le compteur.
+
+- `id`
+- `token` (12 hex, unique — identifiant opaque exposé dans les routes, pattern `simulator_shares`)
+- `userId` (nullable, FK `users` SET NULL)
+- `organizationId` (nullable, FK `organizations` SET NULL, indexé)
+- `locale`
+- `status` : `active | completed` (une conversation `completed` est verrouillée)
+- `context` (jsonb nullable — type moteur, marque, heures saisis librement au 1er message, aucune entité)
+- `messages` (jsonb — fil `AiChatMessage[]` affiché tel quel)
+- `result` (jsonb nullable — diagnostic final `{ summary, causes[], nextStep }`, rempli à la complétion)
+- `tokensUsed` (cumul des tokens Mistral de la conversation, **y compris anonyme** — les plans avec IA émargent en plus à `ai_token_usages`)
+- `createdAt`, `updatedAt`
+
 ### boat_engine_repair_cart_items
 
 Liste de réparation du parcours « identification des pièces détachées » (#517) : les pièces repérées sur les vues éclatées s'accumulent par moteur, avec la référence relevée par l'utilisateur, puis s'exportent en CSV.

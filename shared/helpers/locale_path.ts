@@ -27,6 +27,7 @@ export const MARKETING_SLUGS = {
   pricing: { en: '/pricing', fr: '/tarifs' },
   simulator: { en: '/maintenance-cost-simulator', fr: '/simulateur-cout-entretien' },
   guide: { en: '/boat-maintenance-cost', fr: '/cout-entretien-bateau' },
+  diagnosisAi: { en: '/engine-diagnosis-ai', fr: '/diagnostic-panne-ia' },
   about: { en: '/about', fr: '/a-propos' },
   contact: { en: '/contact', fr: '/contact' },
   privacy: { en: '/privacy', fr: '/confidentialite' },

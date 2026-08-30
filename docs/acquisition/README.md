@@ -6,14 +6,14 @@ L'acquisition repose sur un **tunnel simulateur → signup** : un visiteur sans 
 
 Deux vecteurs complémentaires :
 
-| Vecteur | Mécanisme | État |
-|---|---|---|
-| SEO organique | Page guide + simulateur public indexés sur requêtes coût entretien bateau | ✅ en place |
-| Conversion visiteur | Tunnel simulateur → signup → bateau auto-créé | ✅ en place |
-| Lead magnet | Capture email visiteur non prêt à s'inscrire | ✅ implémenté (2026-06-09) |
-| CTA visuel | Réduire le poids du bouton "Recalculer" face à la CTA signup | ✅ implémenté (2026-06-09) |
-| Signup contextualisé | Bandeau "votre bateau sera ajouté" sur la page signup | ✅ implémenté (2026-06-09) |
-
+| Vecteur              | Mécanisme                                                                                  | État                       |
+| -------------------- | ------------------------------------------------------------------------------------------ | -------------------------- |
+| SEO organique        | Page guide + simulateur public indexés sur requêtes coût entretien bateau                  | ✅ en place                |
+| Conversion visiteur  | Tunnel simulateur → signup → bateau auto-créé                                              | ✅ en place                |
+| Lead magnet          | Capture email visiteur non prêt à s'inscrire                                               | ✅ implémenté (2026-06-09) |
+| CTA visuel           | Réduire le poids du bouton "Recalculer" face à la CTA signup                               | ✅ implémenté (2026-06-09) |
+| Signup contextualisé | Bandeau "votre bateau sera ajouté" sur la page signup                                      | ✅ implémenté (2026-06-09) |
+| Chat diagnostic IA   | Tunnel diagnostic de panne → signup (`?from=diagnostic`), 2 conversations gratuites (#602) | ✅ implémenté (2026-08-30) |
 
 ---
 
@@ -75,17 +75,17 @@ Implémenté le 2026-06-09.
 
 #### Architecture
 
-| Couche | Fichier | Rôle |
-|---|---|---|
-| Migration | `database/migrations/1786000000000_create_simulator_leads_table.ts` | Table `simulator_leads` |
-| Model | `app/models/simulator_lead.ts` | Lucid model, UUID, pas de `updatedAt` |
-| Service | `app/services/simulator_lead_service.ts` | `create()` — upsert sur email |
-| Controller | `app/controllers/simulator_lead_controller.ts` | `store()` — valide, appelle service, redirect back |
-| Validator | `app/validators/simulator_lead.ts` | VineJS `simulatorLeadValidator` |
-| Route | `start/routes/marketing.ts` | `POST /simulator/lead` → `simulator.lead` (public) |
-| Type | `shared/types/simulator.ts` | `SimulatorLeadPayload` |
-| Composant | `inertia/components/marketing/simulator/SimulatorCtaCard.vue` | CTA + formulaire email |
-| Tests | `tests/functional/simulator.spec.ts` | 3 tests fonctionnels Japa |
+| Couche     | Fichier                                                             | Rôle                                               |
+| ---------- | ------------------------------------------------------------------- | -------------------------------------------------- |
+| Migration  | `database/migrations/1786000000000_create_simulator_leads_table.ts` | Table `simulator_leads`                            |
+| Model      | `app/models/simulator_lead.ts`                                      | Lucid model, UUID, pas de `updatedAt`              |
+| Service    | `app/services/simulator_lead_service.ts`                            | `create()` — upsert sur email                      |
+| Controller | `app/controllers/simulator_lead_controller.ts`                      | `store()` — valide, appelle service, redirect back |
+| Validator  | `app/validators/simulator_lead.ts`                                  | VineJS `simulatorLeadValidator`                    |
+| Route      | `start/routes/marketing.ts`                                         | `POST /simulator/lead` → `simulator.lead` (public) |
+| Type       | `shared/types/simulator.ts`                                         | `SimulatorLeadPayload`                             |
+| Composant  | `inertia/components/marketing/simulator/SimulatorCtaCard.vue`       | CTA + formulaire email                             |
+| Tests      | `tests/functional/simulator.spec.ts`                                | 3 tests fonctionnels Japa                          |
 
 #### Schéma `simulator_leads`
 
@@ -115,14 +115,14 @@ created_at  timestamp
 
 Namespace `simulator.*` dans `resources/lang/{fr,en}/simulator.json` :
 
-| Clé | FR | EN |
-|---|---|---|
-| `cta_or_divider` | ou | or |
-| `cta_email_title` | Recevoir ce rapport par email | Get this report by email |
-| `cta_email_placeholder` | votre@email.com | your@email.com |
-| `cta_email_button` | Envoyer | Send |
-| `cta_email_success` | ✓ Rapport envoyé ! Vérifiez votre boîte. | ✓ Report sent! Check your inbox. |
-| `cta_email_rgpd` | Vos données ne seront pas partagées. | Your data will not be shared. |
+| Clé                     | FR                                       | EN                               |
+| ----------------------- | ---------------------------------------- | -------------------------------- |
+| `cta_or_divider`        | ou                                       | or                               |
+| `cta_email_title`       | Recevoir ce rapport par email            | Get this report by email         |
+| `cta_email_placeholder` | votre@email.com                          | your@email.com                   |
+| `cta_email_button`      | Envoyer                                  | Send                             |
+| `cta_email_success`     | ✓ Rapport envoyé ! Vérifiez votre boîte. | ✓ Report sent! Check your inbox. |
+| `cta_email_rgpd`        | Vos données ne seront pas partagées.     | Your data will not be shared.    |
 
 #### RGPD
 

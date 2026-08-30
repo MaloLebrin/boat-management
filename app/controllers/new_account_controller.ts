@@ -17,7 +17,8 @@ export default class NewAccountController {
 
   async create({ inertia, request }: HttpContext) {
     const fromSimulator = request.qs().from === 'simulator'
-    return inertia.render('auth/signup', { fromSimulator })
+    const fromDiagnostic = request.qs().from === 'diagnostic'
+    return inertia.render('auth/signup', { fromSimulator, fromDiagnostic })
   }
 
   async store({ request, response, auth, session }: HttpContext) {
