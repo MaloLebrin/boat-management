@@ -113,6 +113,19 @@ Référence: `inertia/app.ts`.
     préexistant, identique sur le formulaire bateau de #571) :
     `inertia/composables/use_engine_form_draft.ts` range la saisie en cours dans l'historique
     Inertia (`useRemember`) et fait rouvrir les modales depuis l'URL (`?engineForm=<surface>`)
+- generic equipment (#577): `inertia/components/boats/equipment/BoatGenericEquipmentFields.vue`,
+  monté par `BoatGenericEquipmentCard.vue` (modales création/édition) et `BoatEquipmentAddModal.vue`
+  - la **catégorie est un select** (`GENERIC_EQUIPMENT_CATEGORY_OPTIONS`) partout sauf dans la
+    modale d'ajout, où les pastilles la choisissent (champ caché, prop `category-locked`)
+  - identité: `BoatGenericEquipmentIdentityFields.vue` — marque et modèle en `BaseCombobox`,
+    modèles chargés par
+    `router.reload({ only: ['equipmentCatalogModels', 'equipmentCatalogBrandId'], data: { equipmentBrandId } })` ;
+    **une saisie hors catalogue est acceptée telle quelle**. Les marques de la catégorie de
+    l'équipement remontent en tête sans jamais filtrer ; retaper marque ou modèle relâche le
+    rattachement `equipmentModelId`
+  - props catalogue lues dans les props de page via `inertia/composables/use_equipment_catalog.ts` ;
+    brouillon et réouverture des modales via `use_generic_equipment_form_draft.ts`
+    (`?equipmentForm=<surface>`), même mécanique que le formulaire moteur
 - sails: `inertia/pages/boats/sail_edit.vue` (PUT `/boats/:boatId/sails/:sailId`)
 - rig: `inertia/pages/boats/rig_edit.vue` (PUT `/boats/:boatId/rig`)
 

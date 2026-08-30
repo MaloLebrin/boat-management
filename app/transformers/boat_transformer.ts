@@ -378,6 +378,9 @@ function toGenericEquipmentItem(item: Boat['genericEquipment'][number]) {
     name: item.name,
     brand: item.brand,
     model: item.model,
+    // Rattachement au catalogue (#577) — réémis tel quel par le formulaire
+    // d'édition tant que la saisie ne change pas.
+    equipmentModelId: item.equipmentModelId,
     quantity: item.quantity,
     status: item.status,
     notes: item.notes,

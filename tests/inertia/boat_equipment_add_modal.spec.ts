@@ -94,7 +94,7 @@ test('renders category buttons as SVG icons instead of emoji', () => {
     props: { boat: minimalBoat, canManageEquipment: true, open: true },
   })
   const buttons = w.findAll('button').filter((b) => b.find('svg').exists())
-  expect(buttons.length).toBe(9)
+  expect(buttons.length).toBe(12)
   expect(w.text()).not.toMatch(EMOJI_REGEX)
 })
 

@@ -228,6 +228,31 @@ Référence : `app/services/engine_catalog_service.ts`, corpus dans `database/da
   quand le nom commercial en tient lieu (`D2-40`, `3YM30`), vide chez les hors-bord japonais dont le
   préfixe ne se déduit pas du nom.
 
+### Catalogue de marques et modèles d'équipements (#577)
+
+Référence : `app/services/equipment_catalog_service.ts`, corpus dans
+`database/data/equipment_catalog/` (un fichier par catégorie d'équipement générique). Décalque du
+catalogue moteur ci-dessus, appliqué à `boat_generic_equipment`.
+
+- **La saisie libre reste acceptée, toujours.** `brand` et `model` restent du texte libre et
+  restent alimentés ; `equipment_model_id` n'est qu'un rattachement facultatif (nullable,
+  `ON DELETE SET NULL`). Un équipement hors catalogue est parfaitement valide.
+- Les catégories du catalogue sont celles de l'équipement lui-même
+  (`GENERIC_EQUIPMENT_CATEGORIES`, étendu par #577 : `energy`, `comfort`, `plumbing` en plus des
+  quatre historiques) — pas de vocabulaire intermédiaire comme les familles moteur.
+- `listBrands({ category })` **priorise** la catégorie, elle ne la filtre jamais ; une marque peut
+  couvrir plusieurs catégories (`equipment_brands.categories`, jsonb).
+- `resolveBrand(freeText)` : mêmes deux passes que le catalogue moteur (égalité stricte sur
+  slug/nom/alias — `waeco` → Dometic —, puis n-grammes du plus long au plus court — `frigo Indel
+Webasto` → Isotherm et non Webasto). Renvoie `null` hors catalogue.
+- `formProps(rawBrandId, freeTextBrand)` assemble les props Inertia (`equipmentBrands`,
+  `equipmentCatalogBrandId`, `equipmentCatalogModels`), rechargées par
+  `router.reload({ only: [...], data: { equipmentBrandId } })` depuis la fiche bateau.
+- Les **groupes électrogènes** ne sont pas dupliqués ici : ils relèvent du catalogue moteur
+  (famille `generator`), un groupe se saisit comme un moteur.
+- Seeder `equipment_catalog_seeder.ts` idempotent (`updateOrCreate` sur slug, jamais de `delete`),
+  branché sur le déploiement à côté des catalogues bateaux et moteurs.
+
 ### Pavillon et pays (#580)
 
 Référence : `shared/constants/countries.ts`, `shared/helpers/countries.ts`.

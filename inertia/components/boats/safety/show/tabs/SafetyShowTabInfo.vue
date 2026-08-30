@@ -35,13 +35,13 @@ const { formatDate } = useDateFormat()
       </div>
       <div v-if="item.purchasePrice !== null">
         <dt class="text-xs font-semibold uppercase tracking-wide text-fg-subtle">
-          {{ t('equipment.purchasePrice') }}
+          {{ t('equipment.purchasePrice.label') }}
         </dt>
         <dd class="mt-1 text-sm text-fg">{{ item.purchasePrice }}</dd>
       </div>
       <div v-if="item.purchasedAt">
         <dt class="text-xs font-semibold uppercase tracking-wide text-fg-subtle">
-          {{ t('equipment.purchasedAt') }}
+          {{ t('equipment.purchasedAt.label') }}
         </dt>
         <dd class="mt-1 text-sm text-fg">{{ formatDate(item.purchasedAt) }}</dd>
       </div>
@@ -49,7 +49,7 @@ const { formatDate } = useDateFormat()
 
     <div v-if="item.notes" class="mt-6 border-t border-border pt-4">
       <p class="text-xs font-semibold uppercase tracking-wide text-fg-subtle">
-        {{ t('equipment.notes') }}
+        {{ t('equipment.notes.label') }}
       </p>
       <p class="mt-1 whitespace-pre-line text-sm text-fg-muted">{{ item.notes }}</p>
     </div>

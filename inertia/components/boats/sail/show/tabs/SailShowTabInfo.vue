@@ -47,7 +47,7 @@ const { formatDate } = useDateFormat()
 
     <div v-if="sail.notes" class="mt-6 border-t border-border pt-4">
       <p class="text-xs font-semibold uppercase tracking-wide text-fg-subtle">
-        {{ t('equipment.notes') }}
+        {{ t('equipment.notes.label') }}
       </p>
       <p class="mt-1 whitespace-pre-line text-sm text-fg-muted">{{ sail.notes }}</p>
     </div>

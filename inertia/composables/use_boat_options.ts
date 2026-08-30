@@ -5,6 +5,7 @@ import {
   ENGINE_FUEL_OPTIONS,
   ENGINE_KIND_OPTIONS,
   ENGINE_STROKE_TYPE_OPTIONS,
+  GENERIC_EQUIPMENT_CATEGORY_OPTIONS,
   GENERIC_EQUIPMENT_STATUS_OPTIONS,
   HULL_MATERIAL_OPTIONS,
   NAVIGATION_CATEGORY_OPTIONS,
@@ -115,6 +116,13 @@ export function useBoatOptions() {
     }))
   )
 
+  const genericEquipmentCategoryOptions = computed(() =>
+    GENERIC_EQUIPMENT_CATEGORY_OPTIONS.map((o) => ({
+      value: o.value,
+      label: t(`boats.options.genericEquipmentCategory.${o.value}`),
+    }))
+  )
+
   return {
     categoryOptions,
     propulsionOptions,
@@ -130,5 +138,6 @@ export function useBoatOptions() {
     safetyEquipmentTypeOptions,
     safetyEquipmentStatusOptions,
     genericEquipmentStatusOptions,
+    genericEquipmentCategoryOptions,
   }
 }

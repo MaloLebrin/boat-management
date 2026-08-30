@@ -280,6 +280,15 @@
       "coastal": "Coastal — up to 6 NM",
       "semi_offshore": "Semi-offshore — up to 60 NM",
       "offshore": "Offshore — beyond 60 NM"
+    },
+    "genericEquipmentCategory": {
+      "navigation": "Navigation electronics",
+      "electrical": "Electrical",
+      "anchoring": "Anchoring",
+      "deck": "Deck hardware",
+      "energy": "Energy and heating",
+      "comfort": "Comfort and living",
+      "plumbing": "Plumbing and water systems"
     }
   },
   "index": {
@@ -898,9 +907,12 @@
       "other": "Other",
       "safety": "Safety",
       "navigation": "Electronics & Navigation",
-      "electrical": "Electrical & Energy",
+      "electrical": "Electrical",
       "anchoring": "Anchoring",
-      "deck": "Deck & Hardware"
+      "deck": "Deck & Hardware",
+      "energy": "Energy / Heating",
+      "comfort": "Comfort",
+      "plumbing": "Plumbing"
     },
     "comingSoon": {
       "title": "Category coming soon",
@@ -938,7 +950,16 @@
       "cancel": "Cancel",
       "submit": "Save"
     },
-    "viewDetail": "View details"
+    "viewDetail": "View details",
+    "category": "Category",
+    "catalog": {
+      "freeTextHint": "You can enter a value that is not in the catalogue: it will be saved as typed.",
+      "modelNeedsBrandHint": "Pick a brand from the catalogue to see its models. Free text is still accepted.",
+      "noBrandMatch": "No matching brand — your entry will be kept.",
+      "noModelMatch": "No matching model — your entry will be kept.",
+      "brandGroupForCategory": "Brands for this category",
+      "brandGroupOther": "Other brands"
+    }
   },
   "sailShow": {
     "title": "Sail",

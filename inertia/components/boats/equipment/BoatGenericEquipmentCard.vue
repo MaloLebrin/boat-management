@@ -6,11 +6,14 @@ import BaseCard from '~/components/base/BaseCard.vue'
 import BaseModal from '~/components/base/BaseModal.vue'
 import BoatGenericEquipmentFields from './BoatGenericEquipmentFields.vue'
 import BoatGenericEquipmentRow from './BoatGenericEquipmentRow.vue'
+import {
+  genericEquipmentFormSurfaceParam,
+  shouldReopenGenericEquipmentForm,
+} from '~/composables/use_generic_equipment_form_draft'
 import { useT } from '~/composables/use_t'
 import { suggestEquipmentActionType } from '#shared/helpers/equipment_action'
+import { GENERIC_EQUIPMENT_CATEGORIES, type GenericEquipmentCategory } from '#shared/types/boat'
 import type { BoatShowGenericEquipment, EquipmentActionPrefill } from '~/types/boat_show'
-
-type GenericCategory = BoatShowGenericEquipment['category']
 
 const props = defineProps<{
   boatId: number
@@ -23,6 +26,10 @@ const emit = defineEmits<{
   (e: 'addToActions', payload: EquipmentActionPrefill): void
 }>()
 
+/** Identifient ces modales dans l'URL de l'aller-retour catalogue (#577). */
+const CREATE_SURFACE = 'generic-card'
+const EDIT_SURFACE_PREFIX = 'generic-card-edit-'
+
 const { t } = useT()
 
 function emitAddToActions(item: BoatShowGenericEquipment) {
@@ -34,21 +41,29 @@ function emitAddToActions(item: BoatShowGenericEquipment) {
   })
 }
 
-const isCreateOpen = ref(false)
-const createCategory = ref<GenericCategory>('navigation')
-const editingItem = ref<BoatShowGenericEquipment | null>(null)
+// La visite partielle qui charge les modèles du catalogue (#577) remonte
+// l'arbre : les modales se rouvrent depuis l'URL, seul état qui traverse.
+const isCreateOpen = ref(shouldReopenGenericEquipmentForm(CREATE_SURFACE))
+const createCategory = ref<GenericEquipmentCategory>('navigation')
 
-const CATEGORY_ORDER: GenericCategory[] = ['navigation', 'electrical', 'anchoring', 'deck']
+function reopenedEditItem(): BoatShowGenericEquipment | null {
+  const surface = genericEquipmentFormSurfaceParam()
+  if (!surface?.startsWith(EDIT_SURFACE_PREFIX)) return null
+  const id = Number(surface.slice(EDIT_SURFACE_PREFIX.length))
+  return props.items.find((item) => item.id === id) ?? null
+}
+
+const editingItem = ref<BoatShowGenericEquipment | null>(reopenedEditItem())
 
 const groupedItems = computed(() => {
-  return CATEGORY_ORDER.map((cat) => ({
+  return GENERIC_EQUIPMENT_CATEGORIES.map((cat) => ({
     category: cat,
     label: t(`boats.equipmentAddModal.categories.${cat}`),
     items: props.items.filter((i) => i.category === cat),
   })).filter((g) => g.items.length > 0)
 })
 
-function openCreate(category: GenericCategory) {
+function openCreate(category: GenericEquipmentCategory) {
   createCategory.value = category
   isCreateOpen.value = true
 }
@@ -115,8 +130,11 @@ function closeEdit() {
         @success="isCreateOpen = false"
         #default="{ processing, errors }"
       >
-        <input type="hidden" name="category" :value="createCategory" />
-        <BoatGenericEquipmentFields :errors="errors" />
+        <BoatGenericEquipmentFields
+          :errors="errors"
+          :initial-category="createCategory"
+          :surface="CREATE_SURFACE"
+        />
         <div class="flex items-center justify-end gap-2 pt-4">
           <BaseButton variant="ghost" type="button" @click="isCreateOpen = false">
             {{ t('boats.genericEquipment.modal.cancel') }}
@@ -144,15 +162,13 @@ function closeEdit() {
         @success="closeEdit()"
         #default="{ processing, errors }"
       >
-        <input type="hidden" name="category" :value="editingItem.category" />
+        <!-- La catégorie est un select comme les autres champs : un guindeau
+             créé par erreur en `deck` se corrige ici, sans supprimer/recréer
+             (#577). -->
         <BoatGenericEquipmentFields
           :errors="errors"
-          :name="editingItem.name"
-          :brand="editingItem.brand ?? ''"
-          :model="editingItem.model ?? ''"
-          :quantity="editingItem.quantity !== null ? String(editingItem.quantity) : ''"
-          :status="editingItem.status"
-          :notes="editingItem.notes ?? ''"
+          :item="editingItem"
+          :surface="`${EDIT_SURFACE_PREFIX}${editingItem.id}`"
         />
         <div class="flex items-center justify-end gap-2 pt-4">
           <BaseButton variant="ghost" type="button" @click="closeEdit()">
