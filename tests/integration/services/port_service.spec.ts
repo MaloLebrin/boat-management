@@ -9,6 +9,15 @@ import { BoatFactory } from '#database/factories/boat_factory'
 import { PontoonFactory } from '#database/factories/pontoon_factory'
 import Spot from '#models/spot'
 
+/**
+ * Depuis #604 les listes de ports sont fermées au plan Starter : les tests qui
+ * exercent `listForUser` / `listWithSpotsForOrg` / `listNamesForOrg` doivent
+ * partir d'une organisation au plan `pro`.
+ */
+function proPlanUser() {
+  return UserFactory.with('organization', 1, (org) => org.merge({ plan: 'pro' })).create()
+}
+
 test.group('PortService (unit)', () => {
   // ── createForUser ────────────────────────────────────────────────────────
 
@@ -168,7 +177,7 @@ test.group('PortService (unit)', () => {
   // ── listForUser ──────────────────────────────────────────────────────────
 
   test("listForUser retourne uniquement les ports de l'organisation", async ({ assert }) => {
-    const user = await UserFactory.with('organization').create()
+    const user = await proPlanUser()
     await PortFactory.merge({ organizationId: user.organizationId! }).createMany(2)
     // port d'une autre org
     await PortFactory.with('organization').create()
@@ -194,7 +203,7 @@ test.group('PortService (unit)', () => {
   })
 
   test('listForUser retourne les compteurs boatCount et freeSpots', async ({ assert }) => {
-    const user = await UserFactory.with('organization').create()
+    const user = await proPlanUser()
     const port = await PortFactory.merge({ organizationId: user.organizationId! }).create()
     const pontoon = await PontoonFactory.merge({ portId: port.id }).create()
     const spot = await Spot.create({
@@ -221,7 +230,7 @@ test.group('PortService (unit)', () => {
   test('listWithSpotsForOrg retourne les ports avec pontoons et mouillages préchargés', async ({
     assert,
   }) => {
-    const user = await UserFactory.with('organization').create()
+    const user = await proPlanUser()
     const port = await PortFactory.merge({ organizationId: user.organizationId! }).create()
     await PontoonFactory.merge({ portId: port.id }).create()
 
@@ -233,6 +242,54 @@ test.group('PortService (unit)', () => {
     assert.isDefined(found)
     assert.isArray(found!.pontoons)
     assert.lengthOf(found!.pontoons, 1)
+  })
+
+  // ── garde de plan (#604) ─────────────────────────────────────────────────
+
+  test('listForUser retourne un tableau vide sur un plan Starter', async ({ assert }) => {
+    const user = await UserFactory.with('organization', 1, (org) =>
+      org.merge({ plan: 'starter' })
+    ).create()
+    await PortFactory.merge({ organizationId: user.organizationId! }).createMany(2)
+
+    const svc = new PortService()
+
+    assert.deepEqual(await svc.listForUser(user), [])
+  })
+
+  test('listWithSpotsForOrg retourne un tableau vide sur un plan Starter', async ({ assert }) => {
+    const user = await UserFactory.with('organization', 1, (org) =>
+      org.merge({ plan: 'starter' })
+    ).create()
+    const port = await PortFactory.merge({ organizationId: user.organizationId! }).create()
+    await PontoonFactory.merge({ portId: port.id }).create()
+
+    const svc = new PortService()
+
+    assert.deepEqual(await svc.listWithSpotsForOrg(user), [])
+  })
+
+  test('listNamesForOrg retourne un tableau vide sur un plan Starter', async ({ assert }) => {
+    const user = await UserFactory.with('organization', 1, (org) =>
+      org.merge({ plan: 'starter' })
+    ).create()
+    await PortFactory.merge({ organizationId: user.organizationId!, name: 'Concarneau' }).create()
+
+    const svc = new PortService()
+
+    assert.deepEqual(await svc.listNamesForOrg(user), [])
+  })
+
+  test('listNamesForOrg reste peuplé sur un plan Pro', async ({ assert }) => {
+    const user = await proPlanUser()
+    const port = await PortFactory.merge({
+      organizationId: user.organizationId!,
+      name: 'Concarneau',
+    }).create()
+
+    const svc = new PortService()
+
+    assert.deepEqual(await svc.listNamesForOrg(user), [{ id: port.id, name: 'Concarneau' }])
   })
 
   test("listWithSpotsForOrg retourne un tableau vide si l'user n'a pas d'org", async ({

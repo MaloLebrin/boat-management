@@ -51,3 +51,22 @@ export async function createBoatOwnerUser(organizationId: number): Promise<User>
   await OrganizationMembership.create({ userId: owner.id, organizationId, role: 'boat_owner' })
   return owner
 }
+
+/**
+ * Crée un utilisateur dans une organisation au plan `pro`, sans membership —
+ * ses capabilities sont donc celles du rôle par défaut, pas celles d'un admin.
+ * Utile aux fonctionnalités fermées au plan Starter (cartographie de port,
+ * #604) quand le test porte sur le plan et non sur le rôle.
+ */
+export async function createProPlanUser(): Promise<User> {
+  return UserFactory.with('organization', 1, (org) => org.merge({ plan: 'pro' })).create()
+}
+
+/**
+ * Crée un utilisateur dans une organisation au plan `starter`. Le plan par
+ * défaut de `OrganizationFactory` l'est déjà, mais l'expliciter documente les
+ * tests qui vérifient précisément un blocage lié au plan individuel (#604).
+ */
+export async function createStarterPlanUser(): Promise<User> {
+  return UserFactory.with('organization', 1, (org) => org.merge({ plan: 'starter' })).create()
+}

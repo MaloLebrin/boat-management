@@ -184,6 +184,29 @@ export default class QuotaService {
     }
   }
 
+  /**
+   * Cartographie de port (ports, pontons, mouillages, places) — capacité de
+   * tier uniquement : aucun module add-on ne l'accorde, elle suit donc
+   * `PLAN_LIMITS` et non les quotas effectifs. Réservée à Pro et Entreprise :
+   * un plan Starter cadre un ou deux bateaux personnels, il n'a pas de marina
+   * à modéliser (#604).
+   */
+  canManagePorts(org: Organization | null): boolean {
+    this.#assertOrganization(org)
+    return PLAN_LIMITS[org.plan].canManagePorts
+  }
+
+  assertCanManagePorts(org: Organization | null): void {
+    this.#assertOrganization(org)
+    if (!PLAN_LIMITS[org.plan].canManagePorts) {
+      throw new QuotaExceededError('ports', {
+        limit: null,
+        current: 0,
+        upgradeTo: getUpgradeTier(org.plan),
+      })
+    }
+  }
+
   storageLimitBytes(org: Organization | null): number | null {
     this.#assertOrganization(org)
     const gb = PLAN_LIMITS[org.plan].storageGb

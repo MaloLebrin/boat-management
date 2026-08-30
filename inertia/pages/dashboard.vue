@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Link } from '@adonisjs/inertia/vue'
 import { Head } from '@inertiajs/vue3'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import BaseAlert from '~/components/base/BaseAlert.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
@@ -19,6 +19,7 @@ import type {
 } from '#shared/types/dashboard'
 import { useT } from '~/composables/use_t'
 import { useDateFormat } from '~/composables/use_date_format'
+import { usePlan } from '~/composables/use_plan'
 import { propulsionLabel } from '~/utils/boat_propulsion_label'
 import { maintenanceSubjectLabel } from '~/utils/boat_enum_labels'
 import type { AiSuggestion, NavigationLogPortOption } from '~/types/boat_show'
@@ -26,6 +27,9 @@ import type { QuotaUsage } from '../../shared/types/plan'
 
 const { t } = useT()
 const { formatDate } = useDateFormat()
+const { effectiveQuotas } = usePlan()
+
+const canManagePorts = computed(() => effectiveQuotas.value?.canManagePorts === true)
 
 defineProps<{
   boats: DashboardBoatSummary[]
@@ -99,7 +103,9 @@ function dismissAlert() {
 
     <DashboardStatsGrid class="mt-8" :stats="stats" />
 
-    <div class="mt-8">
+    <!-- Cartographie de port réservée aux plans Pro et Entreprise (#604) : sur
+         Starter, l'état vide de la carte inviterait à créer un port inaccessible. -->
+    <div v-if="canManagePorts" class="mt-8">
       <PortDashboardCard :ports="ports" :port-stats="portStats" />
     </div>
 

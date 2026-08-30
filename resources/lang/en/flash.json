@@ -264,6 +264,7 @@
     "clientsExceeded": "Client management is part of the CRM & Invoicing module — included with Enterprise, or available as an add-on on the Pro plan.",
     "pricingExceeded": "Seasonal pricing is part of the Charter module — included with Enterprise, or available as an add-on on the Pro plan.",
     "invoicesExceeded": "Quotes and invoices are part of the CRM & Invoicing module — included with Enterprise, or available as an add-on on the Pro plan.",
+    "portsExceeded": "Port mapping (pontoons, moorings, berths) is not available on the Starter plan. Upgrade to Pro or Enterprise.",
     "storageExceeded": "You have reached the storage limit of your plan. Upgrade to upload new files.",
     "storageOverflow": "Your storage usage exceeds your current plan limit. Free up space or upgrade your plan."
   },

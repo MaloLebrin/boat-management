@@ -1,9 +1,11 @@
 import Boat from '#models/boat'
 import Mouillage from '#models/mouillage'
+import Organization from '#models/organization'
 import Pontoon from '#models/pontoon'
 import Port from '#models/port'
 import Spot from '#models/spot'
 import type User from '#models/user'
+import { PLAN_LIMITS } from '#shared/types/plan'
 import db from '@adonisjs/lucid/services/db'
 import { PortHasBoatsError, PortNotFoundError } from '#exceptions/port_errors'
 import { UserNotInOrganizationError } from '#exceptions/organization_errors'
@@ -18,11 +20,37 @@ function assertPortInUserOrg(user: User, port: Port) {
 
 @inject()
 export default class PortService {
+  /**
+   * Un plan Starter n'a pas accès à la cartographie de port (#604) : ses listes
+   * sont vides, ce qui escamote d'un coup toutes les surfaces qui les
+   * consomment (sélecteur de place du formulaire bateau, ports du carnet de
+   * bord, escales du budget, carte ports du dashboard) sans que chacune ait à
+   * connaître le plan. Les routes `/ports/*` elles-mêmes sont fermées en amont
+   * par `RequirePortsPlanMiddleware`.
+   *
+   * Compte sans organisation (#279) : traité comme un accès fermé, pas comme
+   * une erreur — les appelants attendent une liste.
+   *
+   * Renvoie l'`organizationId` sur lequel lister, ou `null` si l'accès est
+   * fermé — la forme `number | null` évite aux appelants de refaire le
+   * rétrécissement de type sur `user.organizationId`.
+   */
+  async #listableOrgId(user: User): Promise<number | null> {
+    if (user.organizationId === null) return null
+    const org = await Organization.query()
+      .where('id', user.organizationId)
+      .select('id', 'plan')
+      .first()
+    if (org === null || !PLAN_LIMITS[org.plan].canManagePorts) return null
+    return user.organizationId
+  }
+
   async listForUser(user: User) {
-    if (user.organizationId === null) return []
+    const organizationId = await this.#listableOrgId(user)
+    if (organizationId === null) return []
 
     const ports = await Port.query()
-      .where('organizationId', user.organizationId)
+      .where('organizationId', organizationId)
       .withCount('pontoons')
       .withCount('mouillages')
       .orderBy('name', 'asc')
@@ -127,10 +155,11 @@ export default class PortService {
    * Used in boat create/edit forms.
    */
   async listWithSpotsForOrg(user: User): Promise<Port[]> {
-    if (user.organizationId === null) return []
+    const organizationId = await this.#listableOrgId(user)
+    if (organizationId === null) return []
 
     return await Port.query()
-      .where('organizationId', user.organizationId)
+      .where('organizationId', organizationId)
       .preload('pontoons', (q) =>
         q.orderBy('name', 'asc').preload('spots', (sq) => sq.orderBy('name', 'asc'))
       )
@@ -141,10 +170,11 @@ export default class PortService {
   }
 
   async listNamesForOrg(user: User): Promise<PortNameOption[]> {
-    if (user.organizationId === null) return []
+    const organizationId = await this.#listableOrgId(user)
+    if (organizationId === null) return []
 
     const ports = await Port.query()
-      .where('organizationId', user.organizationId)
+      .where('organizationId', organizationId)
       .select('id', 'name')
       .orderBy('name', 'asc')
 
