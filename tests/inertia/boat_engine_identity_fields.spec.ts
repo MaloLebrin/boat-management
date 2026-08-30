@@ -166,3 +166,64 @@ test('une saisie hors catalogue remonte telle quelle et ne déclenche aucune vis
   expect(wrapper.emitted('update:brand')?.at(-1)).toEqual(['Moteur de mon oncle'])
   expect(reload).not.toHaveBeenCalled()
 })
+
+test('sans type de moteur renseigné, la liste garde son ordre alphabétique sans sections', () => {
+  const wrapper = mountFields()
+  const options = comboboxes(wrapper)[0].props('options') as Array<{
+    label: string
+    group?: string
+  }>
+
+  expect(options.map((o) => o.label)).toEqual(['Volvo Penta', 'Yamaha'])
+  expect(options.every((o) => o.group === undefined)).toBe(true)
+})
+
+test('le type de moteur fait remonter les marques de sa famille en tête (#597)', () => {
+  const wrapper = mountFields({ catalogFamilies: ['outboard_thermal'] })
+  const options = comboboxes(wrapper)[0].props('options') as Array<{
+    label: string
+    group?: string
+  }>
+
+  // La liste est tronquée à cinquante suggestions : sans cette remontée, un
+  // motoriste hors-bord en fin d'alphabet pouvait ne jamais s'afficher.
+  expect(options.map((o) => o.label)).toEqual(['Yamaha', 'Volvo Penta'])
+  expect(options[0].group).toBe('boats.engines.catalog.brandGroupForEngineType')
+})
+
+test('les marques hors du type restent proposées, sous « autres marques »', () => {
+  const wrapper = mountFields({ catalogFamilies: ['outboard_thermal'] })
+  const options = comboboxes(wrapper)[0].props('options') as Array<{
+    label: string
+    group?: string
+  }>
+
+  // La famille priorise, elle ne filtre jamais : un moteur d'occasion hors
+  // corpus, ou une marque mal classée, doit rester atteignable.
+  expect(options).toHaveLength(BRANDS.length)
+  expect(options[1]).toMatchObject({
+    label: 'Volvo Penta',
+    group: 'boats.engines.catalog.brandGroupOther',
+  })
+})
+
+test('une marque multi-familles remonte dès qu’une seule famille correspond', () => {
+  const wrapper = mountFields({ catalogFamilies: ['inboard_petrol'] })
+  const options = comboboxes(wrapper)[0].props('options') as Array<{ label: string }>
+
+  // Volvo Penta couvre `inboard_diesel` et `inboard_petrol`.
+  expect(options[0].label).toBe('Volvo Penta')
+})
+
+test('la priorisation conserve les alias, la marque reste trouvable sous ses autres noms', () => {
+  const wrapper = mountFields({ catalogFamilies: ['outboard_thermal'] })
+  const options = comboboxes(wrapper)[0].props('options') as Array<{
+    label: string
+    keywords?: string[]
+    hint?: string
+  }>
+  const volvo = options.find((o) => o.label === 'Volvo Penta')
+
+  expect(volvo?.keywords).toEqual(['volvo', 'VP'])
+  expect(volvo?.hint).toContain('boats.options.engineCatalogFamily.inboard_diesel')
+})

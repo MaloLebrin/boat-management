@@ -94,7 +94,9 @@
       "freeTextHint": "Vous pouvez saisir une valeur absente du catalogue : elle sera enregistrée telle quelle.",
       "modelNeedsBrandHint": "Choisissez une marque du catalogue pour voir ses modèles. La saisie libre reste acceptée.",
       "noBrandMatch": "Aucune marque ne correspond — votre saisie sera conservée.",
-      "noModelMatch": "Aucun modèle ne correspond — votre saisie sera conservée."
+      "noModelMatch": "Aucun modèle ne correspond — votre saisie sera conservée.",
+      "brandGroupForEngineType": "Marques de ce type de moteur",
+      "brandGroupOther": "Autres marques"
     },
     "editTitle": "Modifier le moteur",
     "modal": {

@@ -139,3 +139,76 @@ test('sans catalogue en props de page, le formulaire reste en saisie libre', () 
   expect(brandCombobox!.props('options')).toEqual([])
   expect(wrapper.find('input[name="brand"]').exists()).toBe(true)
 })
+
+/** Deux motoristes de familles opposées, pour observer l'effet du type saisi. */
+const TWO_BRANDS: EngineBrandOption[] = [
+  BRANDS[0],
+  {
+    id: 2,
+    slug: 'yamaha',
+    name: 'Yamaha',
+    country: 'JP',
+    families: ['outboard_thermal'],
+    aliases: [],
+  },
+]
+
+function mountWithTwoBrands() {
+  Object.assign(pageProps, {
+    engineBrands: TWO_BRANDS,
+    engineCatalogModels: [],
+    engineCatalogBrandId: null,
+  })
+  return mount(BoatEquipmentEngineFields, { props: { errors: {}, engine: null } })
+}
+
+function brandOptions(wrapper: ReturnType<typeof mountWithTwoBrands>) {
+  const combobox = wrapper.findAllComponents(BaseCombobox).find((c) => c.props('name') === 'brand')
+  return combobox!.props('options') as Array<{ label: string; group?: string }>
+}
+
+test('le sélecteur de marque suit le type de moteur saisi (#597)', async () => {
+  const wrapper = mountWithTwoBrands()
+
+  // À la création, le type par défaut est « in-bord » : le motoriste in-bord
+  // passe devant.
+  expect(brandOptions(wrapper).map((o) => o.label)).toEqual(['Volvo Penta', 'Yamaha'])
+
+  await wrapper.find('select[name="kind"]').setValue('outboard')
+
+  expect(brandOptions(wrapper).map((o) => o.label)).toEqual(['Yamaha', 'Volvo Penta'])
+  expect(brandOptions(wrapper)[0].group).toBe('boats.engines.catalog.brandGroupForEngineType')
+})
+
+test('le carburant affine le type sans jamais retirer de marque', async () => {
+  const wrapper = mountWithTwoBrands()
+
+  await wrapper.find('select[name="kind"]').setValue('inboard')
+  await wrapper.find('select[name="fuel"]').setValue('diesel')
+
+  const options = brandOptions(wrapper)
+  expect(options[0].label).toBe('Volvo Penta')
+  // Priorisation, pas filtrage : Yamaha reste proposée sous « autres marques ».
+  expect(options.map((o) => o.label)).toEqual(['Volvo Penta', 'Yamaha'])
+  expect(options[1].group).toBe('boats.engines.catalog.brandGroupOther')
+})
+
+test('la famille de motorisation l’emporte sur le type, plus précise', async () => {
+  const wrapper = mountWithTwoBrands()
+
+  await wrapper.find('select[name="kind"]').setValue('outboard')
+  // L'utilisateur précise « embase Z » : une installation in-bord essence.
+  await wrapper.find('select[name="family"]').setValue('sterndrive')
+
+  expect(brandOptions(wrapper)[0].label).toBe('Volvo Penta')
+})
+
+test('un type sans gamme au catalogue ne priorise rien', async () => {
+  const wrapper = mountWithTwoBrands()
+
+  await wrapper.find('select[name="kind"]').setValue('hybrid')
+
+  const options = brandOptions(wrapper)
+  expect(options.map((o) => o.label)).toEqual(['Volvo Penta', 'Yamaha'])
+  expect(options.every((o) => o.group === undefined)).toBe(true)
+})

@@ -94,7 +94,9 @@
       "freeTextHint": "You can enter a value that is not in the catalogue: it will be saved as typed.",
       "modelNeedsBrandHint": "Pick a brand from the catalogue to see its models. Free text is still accepted.",
       "noBrandMatch": "No matching brand — your entry will be kept.",
-      "noModelMatch": "No matching model — your entry will be kept."
+      "noModelMatch": "No matching model — your entry will be kept.",
+      "brandGroupForEngineType": "Brands for this engine type",
+      "brandGroupOther": "Other brands"
     },
     "editTitle": "Edit engine",
     "modal": {

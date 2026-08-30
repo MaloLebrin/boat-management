@@ -1,9 +1,10 @@
 import { test } from '@japa/runner'
 import {
+  engineCatalogFamiliesFromSignals,
   engineFamilyFromCatalogModel,
   engineFamilyFromSignals,
 } from '#shared/helpers/engine_family'
-import { ENGINE_FAMILIES } from '#shared/types/engine_catalog'
+import { ENGINE_CATALOG_FAMILIES, ENGINE_FAMILIES } from '#shared/types/engine_catalog'
 
 test.group('Dérivation de la famille de motorisation (#574)', () => {
   test('déduit la famille hors-bord du cycle moteur', ({ assert }) => {
@@ -80,5 +81,85 @@ test.group('Dérivation de la famille de motorisation (#574)', () => {
     assert.equal(engineFamilyFromCatalogModel({ family: 'inboard_petrol' }), 'inboard_petrol')
     assert.equal(engineFamilyFromCatalogModel({ family: 'jet' }), 'jet')
     assert.equal(engineFamilyFromCatalogModel({ family: 'generator' }), 'generator')
+  })
+})
+
+test.group('Familles du catalogue déduites du type de moteur (#597)', () => {
+  test('un hors-bord ne remonte que les gammes hors-bord', ({ assert }) => {
+    assert.deepEqual(engineCatalogFamiliesFromSignals({ kind: 'outboard', fuel: 'essence' }), [
+      'outboard_thermal',
+    ])
+    assert.deepEqual(engineCatalogFamiliesFromSignals({ kind: 'outboard', fuel: 'electric' }), [
+      'outboard_electric',
+    ])
+  })
+
+  test('sans carburant, retient les deux gammes plausibles plutôt que d’en inventer une', ({
+    assert,
+  }) => {
+    assert.deepEqual(engineCatalogFamiliesFromSignals({ kind: 'outboard' }), [
+      'outboard_thermal',
+      'outboard_electric',
+    ])
+    assert.deepEqual(engineCatalogFamiliesFromSignals({ kind: 'inboard' }), [
+      'inboard_diesel',
+      'inboard_petrol',
+    ])
+  })
+
+  test('un in-bord suit son carburant', ({ assert }) => {
+    assert.deepEqual(engineCatalogFamiliesFromSignals({ kind: 'inboard', fuel: 'diesel' }), [
+      'inboard_diesel',
+    ])
+    assert.deepEqual(engineCatalogFamiliesFromSignals({ kind: 'inboard', fuel: 'essence' }), [
+      'inboard_petrol',
+    ])
+    // Seule gamme électrique du catalogue — son libellé couvre les propulsions
+    // électriques, embase comprise.
+    assert.deepEqual(engineCatalogFamiliesFromSignals({ kind: 'inboard', fuel: 'electric' }), [
+      'outboard_electric',
+    ])
+  })
+
+  test('la famille saisie l’emporte sur `kind` + `fuel`, plus précise', ({ assert }) => {
+    // L'utilisateur a explicitement dit « embase Z » : le hors-bord hérité du
+    // `kind` ne doit pas primer.
+    assert.deepEqual(
+      engineCatalogFamiliesFromSignals({ kind: 'outboard', fuel: 'essence', family: 'sterndrive' }),
+      ['inboard_petrol']
+    )
+    assert.deepEqual(
+      engineCatalogFamiliesFromSignals({ kind: 'inboard', family: 'inboard_diesel_saildrive' }),
+      ['inboard_diesel']
+    )
+    assert.deepEqual(engineCatalogFamiliesFromSignals({ kind: 'inboard', family: 'jet' }), ['jet'])
+    assert.deepEqual(engineCatalogFamiliesFromSignals({ kind: 'inboard', family: 'generator' }), [
+      'generator',
+    ])
+  })
+
+  test('ne privilégie rien quand le type ne désigne aucune gamme', ({ assert }) => {
+    // Un tableau vide veut dire « rien à privilégier », jamais « aucune
+    // marque » : le sélecteur garde alors son ordre alphabétique complet.
+    assert.deepEqual(engineCatalogFamiliesFromSignals({ kind: 'hybrid' }), [])
+    assert.deepEqual(engineCatalogFamiliesFromSignals({ kind: 'other' }), [])
+    assert.deepEqual(engineCatalogFamiliesFromSignals({}), [])
+    assert.deepEqual(engineCatalogFamiliesFromSignals({ kind: '', fuel: '', family: '' }), [])
+  })
+
+  test('ne renvoie que des familles du catalogue', ({ assert }) => {
+    const cases = [
+      { kind: 'outboard' },
+      { kind: 'inboard' },
+      { kind: 'electric' },
+      { kind: 'inboard', family: 'pod_drive' },
+      { kind: 'outboard', family: 'electric_inboard' },
+      { kind: 'outboard', family: 'outboard_2t' },
+    ]
+    for (const signals of cases) {
+      for (const family of engineCatalogFamiliesFromSignals(signals)) {
+        assert.include(ENGINE_CATALOG_FAMILIES, family)
+      }
+    }
   })
 })
