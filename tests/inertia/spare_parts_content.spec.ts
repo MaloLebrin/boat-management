@@ -20,7 +20,7 @@ import {
 import { DIAGNOSTIC_SHEETS } from '../../shared/constants/diagnostic/diagnostic_content'
 import {
   isSparePartsEligibleEngine,
-  resolveSparePartsBrand,
+  sparePartsBrandFromCatalogSlug,
   yamahaReferenceExample,
 } from '../../shared/helpers/spare_parts'
 
@@ -91,12 +91,20 @@ describe('Contenu pièces détachées (#517)', () => {
     expect(isSparePartsEligibleEngine({ kind: 'inboard' })).toBe(false)
   })
 
-  test('résolution de marque libre vers le corpus', () => {
-    expect(resolveSparePartsBrand('Yamaha')).toBe('yamaha')
-    expect(resolveSparePartsBrand('EVINRUDE 6cv')).toBe('johnson-evinrude')
-    expect(resolveSparePartsBrand('Mariner')).toBe('mercury-mariner')
-    expect(resolveSparePartsBrand('Honda')).toBeNull()
-    expect(resolveSparePartsBrand(null)).toBeNull()
+  // La normalisation du texte libre (`Yamaha`, `EVINRUDE 6cv`, `Mariner`) a
+  // migré en base avec le catalogue moteur (#573) et est couverte par
+  // `tests/functional/boats/engine_catalog.spec.ts`. Ne reste ici que la
+  // **couverture** : quelles marques du catalogue ont du contenu pièces.
+  test('couverture du corpus pièces par les marques du catalogue', () => {
+    expect(sparePartsBrandFromCatalogSlug('yamaha')).toBe('yamaha')
+    expect(sparePartsBrandFromCatalogSlug('johnson-evinrude')).toBe('johnson-evinrude')
+    expect(sparePartsBrandFromCatalogSlug('mercury-mariner')).toBe('mercury-mariner')
+    // Honda est bien une marque du catalogue, mais le corpus pièces v1 ne la
+    // couvre pas : les écrans retombent sur les liens revendeurs génériques et
+    // les aides plaque de toutes les marques, comme avant #573.
+    expect(sparePartsBrandFromCatalogSlug('honda-marine')).toBeNull()
+    expect(sparePartsBrandFromCatalogSlug('volvo-penta')).toBeNull()
+    expect(sparePartsBrandFromCatalogSlug(null)).toBeNull()
   })
 
   test('exemple de référence Yamaha construit sur le code modèle du moteur', () => {

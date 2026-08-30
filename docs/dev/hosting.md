@@ -54,7 +54,8 @@ migre au boot casse dès qu'il y a plus d'un conteneur. Elles tournent comme une
   donc qu'une fois les migrations passées, et un `migration:run` en échec fait
   échouer le déploiement (`restart: 'no'`).
 - **PaaS** : configurer la _release command_ de la plateforme sur
-  `node ace migration:run --force` (alias `pnpm migrate:prod`). `--force` est
+  `pnpm migrate:prod`, qui enchaîne `node ace migration:run --force` puis les
+  seeders de catalogue bateaux (#571) et moteurs (#573). `--force` est
   obligatoire : Adonis refuse sinon de migrer avec `NODE_ENV=production`.
 
 Un déploiement sur base vierge n'a besoin d'aucune intervention manuelle :
@@ -73,14 +74,14 @@ docker compose -f docker-compose.prod.yml up -d
 
 Les services :
 
-| Service     | Rôle                                                                         |
-| ----------- | ---------------------------------------------------------------------------- |
-| `postgres`  | `postgres:18-alpine`, volume `pg_data`, healthcheck `pg_isready`             |
-| `migrator`  | One-shot `node ace migration:run --force`, bloque le reste tant qu'il tourne |
-| `web`       | `node bin/server.js`, healthcheck sur `/up`, exposé au seul réseau Compose   |
-| `worker`    | `queue:work --queue=default,emails,media,exports,maintenance,push`           |
-| `worker-ai` | `queue:work --queue=ai`, isolé (jobs Mistral longs)                          |
-| `caddy`     | HTTPS automatique (Let's Encrypt), reverse proxy vers `web`                  |
+| Service     | Rôle                                                                       |
+| ----------- | -------------------------------------------------------------------------- |
+| `postgres`  | `postgres:18-alpine`, volume `pg_data`, healthcheck `pg_isready`           |
+| `migrator`  | One-shot `migration:run --force` + seeders de catalogue, bloque le reste   |
+| `web`       | `node bin/server.js`, healthcheck sur `/up`, exposé au seul réseau Compose |
+| `worker`    | `queue:work --queue=default,emails,media,exports,maintenance,push`         |
+| `worker-ai` | `queue:work --queue=ai`, isolé (jobs Mistral longs)                        |
+| `caddy`     | HTTPS automatique (Let's Encrypt), reverse proxy vers `web`                |
 
 ### Pourquoi deux workers, et pas `pnpm queue:work`
 
@@ -120,7 +121,7 @@ PDF).
 L'image GHCR fonctionne telle quelle. À configurer :
 
 - **Health check** : `GET /up` (voir plus bas) ;
-- **Release command** : `node ace migration:run --force` ;
+- **Release command** : `pnpm migrate:prod` (migrations + seeders de catalogue) ;
 - **Process web** : `node bin/server.js` (le `CMD` par défaut) ;
 - **Process workers** : deux workers séparés, mêmes commandes que le compose.
   Une plateforme qui ne permet qu'un seul process type ⇒ fusionner en

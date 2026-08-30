@@ -1,17 +1,21 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import BaseCard from '~/components/base/BaseCard.vue'
-import { resolveSparePartsBrand, retailerLinksForBrand } from '#shared/helpers/spare_parts'
+import { retailerLinksForBrand, sparePartsBrandFromCatalogSlug } from '#shared/helpers/spare_parts'
 import { useT } from '~/composables/use_t'
 
 const props = defineProps<{
-  engine: { brand: string | null; model: string | null }
+  engine: { brand: string | null; model: string | null; catalogBrandSlug: string | null }
   catalogLabel: string
 }>()
 
 const { t } = useT()
 
-const retailers = computed(() => retailerLinksForBrand(resolveSparePartsBrand(props.engine.brand)))
+// La marque est rapprochée du catalogue côté serveur (#573) ; il ne reste ici
+// que la couverture du corpus pièces, qui retombe sur les liens génériques.
+const retailers = computed(() =>
+  retailerLinksForBrand(sparePartsBrandFromCatalogSlug(props.engine.catalogBrandSlug))
+)
 </script>
 
 <template>

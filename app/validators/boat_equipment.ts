@@ -23,6 +23,11 @@ const enginePayload = vine.object({
   strokeType: vine.string().trim().in(strokeTypeChoices).optional(),
   brand: vine.string().trim().maxLength(120).optional(),
   model: vine.string().trim().maxLength(120).optional(),
+  // Rattachement au catalogue moteur (#573), posé par la combobox du
+  // formulaire. Volontairement une simple chaîne : le champ est masqué, une
+  // valeur aberrante doit se neutraliser en `null` plutôt que faire échouer la
+  // saisie — `brand` et `model` restent la source de vérité.
+  engineModelId: vine.string().trim().optional(),
   serialNumber: vine.string().trim().maxLength(120).optional(),
   manufacturedAt: vine.string().trim().optional(),
   powerHp: vine.string().trim().optional(),
@@ -40,6 +45,7 @@ export type BoatEngineFormBody = {
   strokeType?: string
   brand?: string
   model?: string
+  engineModelId?: string
   serialNumber?: string
   manufacturedAt?: string
   powerHp?: string
@@ -121,6 +127,18 @@ function parseOptionalNonNegativeInt(raw: string | undefined): number | null {
   return n
 }
 
+/**
+ * Identifiant de ligne du catalogue : entier strictement positif, `null` sinon.
+ * Une valeur absente ou aberrante ne casse pas la saisie — le moteur reste
+ * simplement non rattaché, ce qui est un état parfaitement valide.
+ */
+function parseOptionalId(raw: string | undefined): number | null {
+  if (raw === undefined || raw.trim() === '') return null
+  const n = Number.parseInt(raw, 10)
+  if (!Number.isInteger(n) || n <= 0) return null
+  return n
+}
+
 function emptyToNull(s: string | undefined): string | null {
   if (s === undefined) return null
   const t = s.trim()
@@ -142,6 +160,7 @@ export function equipmentBodyToEnginePayload(body: BoatEngineFormBody): BoatEngi
     strokeType,
     brand: emptyToNull(body.brand),
     model: emptyToNull(body.model),
+    engineModelId: parseOptionalId(body.engineModelId),
     serialNumber: emptyToNull(body.serialNumber),
     manufacturedAt: emptyToNull(body.manufacturedAt),
     powerHp: parseOptionalPositiveFloat(body.powerHp),

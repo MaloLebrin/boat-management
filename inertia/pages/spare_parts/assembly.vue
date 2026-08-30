@@ -10,7 +10,7 @@ import SparePartsPartList from '~/components/spare_parts/SparePartsPartList.vue'
 import SparePartsRetailerLinks from '~/components/spare_parts/SparePartsRetailerLinks.vue'
 import { DIAGNOSTIC_SHEETS } from '#shared/constants/diagnostic/diagnostic_content'
 import { SPARE_PART_ASSEMBLIES } from '#shared/constants/spare_parts/spare_parts_content'
-import { resolveSparePartsBrand, yamahaReferenceExample } from '#shared/helpers/spare_parts'
+import { sparePartsBrandFromCatalogSlug, yamahaReferenceExample } from '#shared/helpers/spare_parts'
 import type { PartAssemblySlug, RepairCartItemRow } from '#shared/types/spare_parts'
 import { useT } from '~/composables/use_t'
 import { engineDisplayTitle } from '~/utils/boat_enum_labels'
@@ -21,6 +21,7 @@ const props = defineProps<{
     id: number
     brand: string | null
     model: string | null
+    catalogBrandSlug: string | null
     serialNumber: string | null
     kind: string
     status: string
@@ -41,7 +42,8 @@ const identifyHref = computed(
 /** Carte « décoder une référence » : marque Yamaha + code fonction connu. */
 const yamahaDecode = computed(() => {
   const code = assembly.value.yamahaFunctionCode
-  if (!code || resolveSparePartsBrand(props.engine.brand) !== 'yamaha') return null
+  if (!code || sparePartsBrandFromCatalogSlug(props.engine.catalogBrandSlug) !== 'yamaha')
+    return null
   return { code, example: yamahaReferenceExample(props.engine.model, code) }
 })
 

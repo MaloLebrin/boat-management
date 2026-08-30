@@ -75,13 +75,44 @@ Référentiel global du catalogue de bateaux (#571), sans `organizationId` : ali
 - `aliases` (`jsonb`)
 - timestamps
 
+### engine_brands
+
+Référentiel global du catalogue moteur (#573), sans `organizationId` : alimenté par
+`database/seeders/engine_catalog_seeder.ts`, jamais par les utilisateurs. Miroir de `boat_brands`.
+
+- `id`
+- `slug` (unique, **stable à vie** — jamais renommé)
+- `name` (nom commercial officiel, casse comprise — jamais traduit), `country`
+- `families` (`jsonb`) — un motoriste peut couvrir plusieurs familles (Volvo Penta : diesel et
+  essence)
+- `aliases` (`jsonb`) — orthographes et anciens noms (`volvo`, `VP`), base de
+  `EngineCatalogService.resolveBrand()`
+- `isActive`
+- timestamps
+
+### engine_models
+
+- `id`, `engineBrandId` (FK `engine_brands`, `onDelete cascade`)
+- `slug` (unique par marque, stable à vie), `name`
+- `modelCode` — le code de la **plaque signalétique** (`D2-40`, `6E0`), jamais une reconstitution ;
+  vide chez les hors-bord japonais, dont le préfixe ne se déduit pas du nom commercial
+- `family` — un modèle appartient à **une seule** famille
+- `powerHp`, `displacementCc`, `cylinders`, `strokeType`, `fuel` — servent au pré-remplissage non
+  destructif du formulaire moteur, renseignés seulement quand la valeur est certaine
+- `productionStartYear`, `productionEndYear` — les gammes discontinuées sont conservées
+- `aliases` (`jsonb`)
+- timestamps
+
 ### boat_engines
 
 - `id`, `boatId`
-- `kind`
-- détails: `fuel`, `brand`, `model`, `serialNumber`
+- `kind`, `status`
+- détails: `fuel`, `strokeType`, `brand`, `model`, `serialNumber`, `notes`
+- `engineModelId` (FK `engine_models`, **nullable**, `onDelete set null`) — rattachement au
+  catalogue (#573). `brand` et `model` restent alimentés et font foi : c'est le repli texte libre,
+  un moteur hors catalogue est parfaitement valide
 - puissance: `powerHp`, `powerKw`
-- `hours`
+- `hours` (total courant), `installHours` (référence figée à la création)
 - `manufacturedAt`
 
 ### boat_sails
@@ -287,6 +318,10 @@ Une ligne = un **point de log** consigné en cours de sortie (rafale GPS au tap 
 - `BoatBrand 1..n BoatModel` via `boat_models.boatBrandId` (#571) — référentiel global, non rattaché
   à une organisation ; `boats.manufacturer` / `boats.model` restent du **texte libre** et ne portent
   aucune clé étrangère vers ce catalogue, c'est ce qui garde une saisie hors catalogue possible
+- `EngineBrand 1..n EngineModel` via `engine_models.engineBrandId` (#573) — même référentiel global ;
+  `BoatEngine 0..1 EngineModel` via `boat_engines.engineModelId`, **nullable** et en `SET NULL` :
+  `brand` / `model` restent le repli texte libre, retirer un modèle du corpus ne fait perdre aucune
+  saisie
 - `Boat 0..1 BoatRig`
 - `BoatMaintenanceEvent 1..n BoatMaintenancePart`
 - `Boat 1..n BoatPortStay`
@@ -298,17 +333,19 @@ Une ligne = un **point de log** consigné en cours de sortie (rafale GPS au tap 
 - `Boat 1..n NavigationLog` ; `NavigationLog n..n CrewMember` via `navigation_log_crew` (rôle sur le pivot)
 - `NavigationLog 1..n NavigationLogEntry` via `navigation_log_entries.navigationLogId`
 
-## Catalogue de bateaux (référentiel, pas de la démo)
+## Catalogues bateaux et moteurs (référentiels, pas de la démo)
 
-Référence : `database/seeders/boat_catalog_seeder.ts`, alimenté par `database/data/boat_catalog/`
-(un fichier par catégorie, règles de saisie dans le `README.md` du dossier).
+Références : `database/seeders/boat_catalog_seeder.ts` alimenté par `database/data/boat_catalog/`
+(un fichier par catégorie) et `database/seeders/engine_catalog_seeder.ts` alimenté par
+`database/data/engine_catalog/` (un fichier par famille de motorisation). Règles de saisie dans le
+`README.md` de chaque dossier.
 
-- **Pas de `static environment`** : contrairement aux seeders ci-dessous, celui-ci alimente un
-  référentiel métier et tourne en production, enchaîné derrière le `migration:run --force` du
-  service `migrator` de `docker-compose.prod.yml` (#542, #571).
-- **Idempotent** : `updateOrCreate` sur le slug (marques) puis sur `(boatBrandId, slug)` (modèles),
+- **Pas de `static environment`** : contrairement aux seeders ci-dessous, ceux-ci alimentent des
+  référentiels métier et tournent en production, enchaînés derrière le `migration:run --force` du
+  service `migrator` de `docker-compose.prod.yml` (#542, #571, #573).
+- **Idempotents** : `updateOrCreate` sur le slug (marques) puis sur `(<marque>Id, slug)` (modèles),
   **jamais de `delete`** — une ligne retirée des fichiers de données reste en base, elle peut être
-  référencée. Le rejouer met le corpus à jour sans créer de doublon.
+  référencée. Les rejouer met les corpus à jour sans créer de doublon.
 
 ## Seed (données démo)
 

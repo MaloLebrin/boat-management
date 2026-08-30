@@ -49,6 +49,8 @@ export type BoatEnginePayload = {
   strokeType?: string | null
   brand?: string | null
   model?: string | null
+  /** Ligne du catalogue moteur (#573), `null` pour une saisie hors catalogue. */
+  engineModelId?: number | null
   serialNumber?: string | null
   manufacturedAt?: Date | string | DateTime | null
   powerHp?: number | null

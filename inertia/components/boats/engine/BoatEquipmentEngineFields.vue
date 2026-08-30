@@ -2,9 +2,13 @@
 import { computed, ref, watch } from 'vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
+import BoatEngineIdentityFields from '~/components/boats/engine/BoatEngineIdentityFields.vue'
 import { useT } from '~/composables/use_t'
 import { useBoatOptions } from '~/composables/use_boat_options'
+import { useEngineCatalog } from '~/composables/use_engine_catalog'
+import { useEngineFormDraft } from '~/composables/use_engine_form_draft'
 import { ENGINE_KIND_OPTIONS } from '#shared/constants/boats/boat_form_options'
+import type { EngineModelOption } from '#shared/types/engine_catalog'
 
 export type BoatEquipmentEngineFieldsModel = {
   id?: number
@@ -13,6 +17,7 @@ export type BoatEquipmentEngineFieldsModel = {
   strokeType: '2_stroke' | '4_stroke' | null
   brand: string | null
   model: string | null
+  engineModelId?: number | null
   serialNumber: string | null
   manufacturedAt: string | null
   powerHp: number | null
@@ -24,12 +29,18 @@ export type BoatEquipmentEngineFieldsModel = {
 const props = defineProps<{
   errors: Record<string, string | string[] | undefined>
   engine?: BoatEquipmentEngineFieldsModel | null
+  /** Surface d'origine quand le formulaire est monté dans une modale. */
+  surface?: string | null
 }>()
 
 const isEditMode = computed(() => Boolean(props.engine))
 
 const { t } = useT()
 const { engineKindOptions, engineFuelOptions, engineStrokeTypeOptions } = useBoatOptions()
+// Catalogue moteur (#573) : lu dans les props de la page, pas passé de main en
+// main — ce formulaire est monté depuis trois écrans, à quatre niveaux de
+// profondeur sous la fiche bateau.
+const { brands, catalogModels, catalogBrandId } = useEngineCatalog()
 
 const statusOptions = computed(() => [
   { value: 'operational', label: t('equipment.status.operational') },
@@ -64,11 +75,43 @@ function syncFromProps() {
   status.value = e?.status ?? 'operational'
 }
 
-watch(
-  () => props.engine,
-  () => syncFromProps(),
-  { immediate: true }
+useEngineFormDraft(
+  String(props.engine?.id ?? 'new'),
+  {
+    kind,
+    fuel,
+    strokeType,
+    installHours,
+    brand,
+    model,
+    serialNumber,
+    manufacturedAt,
+    powerHp,
+    status,
+  },
+  syncFromProps
 )
+
+// On resynchronise sur l'**identité** du moteur, pas sur la référence de la
+// prop : cette dernière change à chaque visite partielle.
+watch(() => props.engine?.id, syncFromProps)
+
+/**
+ * Pré-remplissage **non destructif** au choix d'un modèle du catalogue : on ne
+ * renseigne que les champs restés vides. Une valeur déjà saisie par
+ * l'utilisateur — y compris héritée du moteur en cours d'édition — n'est jamais
+ * écrasée : c'est lui qui connaît son moteur, le catalogue ne fait que
+ * proposer.
+ */
+function applyCatalogModel(catalogModel: EngineModelOption) {
+  if (powerHp.value === '' && catalogModel.powerHp !== null) {
+    powerHp.value = String(catalogModel.powerHp)
+  }
+  if (fuel.value === '' && catalogModel.fuel !== null) fuel.value = catalogModel.fuel
+  if (strokeType.value === '' && catalogModel.strokeType !== null) {
+    strokeType.value = catalogModel.strokeType
+  }
+}
 </script>
 
 <template>
@@ -104,19 +147,16 @@ watch(
       :errors="errors"
     />
 
-    <BaseInput
-      id="brand"
-      name="brand"
-      :label="t('boats.engines.fields.brand')"
-      v-model="brand"
+    <BoatEngineIdentityFields
+      v-model:brand="brand"
+      v-model:model="model"
       :errors="errors"
-    />
-    <BaseInput
-      id="model"
-      name="model"
-      :label="t('boats.engines.fields.model')"
-      v-model="model"
-      :errors="errors"
+      :brands="brands"
+      :catalog-models="catalogModels"
+      :catalog-brand-id="catalogBrandId"
+      :engine-model-id="engine?.engineModelId ?? null"
+      :surface="surface"
+      @select-model="applyCatalogModel"
     />
     <BaseInput
       id="serialNumber"

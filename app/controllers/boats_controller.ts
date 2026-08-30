@@ -5,6 +5,7 @@ import { QuotaExceededError } from '#exceptions/quota_errors'
 import AiAnalysisService from '#services/ai_analysis_service'
 import AuditLogService from '#services/audit_log_service'
 import BoatCatalogService from '#services/boat_catalog_service'
+import EngineCatalogService from '#services/engine_catalog_service'
 import BoatDocumentService from '#services/boat_document_service'
 import BoatEquipmentActionService from '#services/boat_equipment_action_service'
 import BoatFuelLogService from '#services/boat_fuel_log_service'
@@ -74,6 +75,7 @@ export default class BoatsController {
     private equipmentActionService: BoatEquipmentActionService,
     private boatOwnerService: BoatOwnerService,
     private boatCatalogService: BoatCatalogService,
+    private engineCatalogService: EngineCatalogService,
     private safetyComplianceService: BoatSafetyComplianceService
   ) {}
 
@@ -251,6 +253,12 @@ export default class BoatsController {
         bouncer.with(NavigationLogPolicy).allows('delete'),
       ])
 
+      // Le formulaire moteur est monté depuis cette page (carte Moteurs et
+      // modale d'ajout d'équipement) : il lui faut le catalogue (#573). Les
+      // modèles sont rechargés par
+      // `router.reload({ only: ['engineCatalogModels'], data: { engineBrandId } })`.
+      const engineCatalog = await this.engineCatalogService.formProps(request.qs().engineBrandId)
+
       const canManageEquipment = canManageMaintenance
       const canManageDocuments = canManageMaintenance
       const canExport = user.organization ? this.quotaService.canExport(user.organization) : false
@@ -285,6 +293,7 @@ export default class BoatsController {
           initialTab,
           safetyCompliance: this.safetyComplianceService.forBoat(boat),
         }),
+        ...engineCatalog,
 
         // Groupe « maintenance » : onglets Aperçu, Historique, Tâches, Fiches,
         // Actions équipement et Documents administratifs.

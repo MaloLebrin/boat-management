@@ -91,6 +91,21 @@ Référence: `inertia/app.ts`.
 ### Equipment edit pages
 
 - engines: `inertia/pages/boats/engine_edit.vue` (PUT `/boats/:boatId/engines/:engineId`)
+  - champs partagés: `inertia/components/boats/engine/BoatEquipmentEngineFields.vue`, monté aussi
+    par `BoatShowEnginesCard.vue` et `BoatEquipmentAddModal.vue`
+  - identité (#573): `inertia/components/boats/engine/BoatEngineIdentityFields.vue` — marque et
+    modèle en `BaseCombobox`, modèles chargés par
+    `router.reload({ only: ['engineCatalogModels', 'engineCatalogBrandId'], data: { engineBrandId } })` ;
+    **une saisie hors catalogue est acceptée telle quelle**. Retenir un modèle pré-remplit
+    puissance, carburant et cycle **uniquement s'ils sont vides**, et pose `engineModelId` en champ
+    caché ; retaper marque ou modèle relâche ce rattachement
+  - props catalogue lues dans les props de page via `inertia/composables/use_engine_catalog.ts` —
+    le formulaire est monté à quatre niveaux sous `boats/show`, elles ne descendent pas de main en
+    main
+  - la visite partielle **remonte le sous-arbre du formulaire** sur cette application (comportement
+    préexistant, identique sur le formulaire bateau de #571) :
+    `inertia/composables/use_engine_form_draft.ts` range la saisie en cours dans l'historique
+    Inertia (`useRemember`) et fait rouvrir les modales depuis l'URL (`?engineForm=<surface>`)
 - sails: `inertia/pages/boats/sail_edit.vue` (PUT `/boats/:boatId/sails/:sailId`)
 - rig: `inertia/pages/boats/rig_edit.vue` (PUT `/boats/:boatId/rig`)
 

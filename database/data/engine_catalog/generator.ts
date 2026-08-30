@@ -1,0 +1,220 @@
+import type { EngineBrandSeed } from '#shared/types/engine_catalog'
+
+/**
+ * Groupes électrogènes de bord (#573).
+ *
+ * Règles de saisie (détail : `database/data/engine_catalog/README.md`) —
+ * `name` = désignation commerciale, jamais traduite ; `slug` kebab-case
+ * **stable à vie** ; `aliases` = orthographes réellement rencontrées ; une
+ * marque est déclarée une seule fois, ses modèles groupés par famille.
+ *
+ * Chez ces constructeurs la désignation porte la **puissance électrique en
+ * kVA ou kW**, pas une puissance de propulsion : `powerHp` reste donc vide,
+ * conformément à la règle « un champ vide vaut mieux qu'une valeur
+ * approximative ».
+ *
+ * `kohler` seul désigne cette gamme de groupes ; le motoriste diesel de
+ * propulsion est déclaré sous `lombardini-marine`.
+ */
+export const GENERATOR_BRANDS: readonly EngineBrandSeed[] = [
+  {
+    slug: 'onan',
+    name: 'Cummins Onan',
+    country: 'US',
+    families: ['generator'],
+    aliases: ['onan', 'cummins onan', 'onan generator'],
+    modelCodeFromName: true,
+    modelDefaults: { fuel: 'diesel', strokeType: '4_stroke' },
+    models: {
+      generator: [
+        'MDKBH 5 kW',
+        'MDKBH 7 kW',
+        'MDKBP 9 kW',
+        'MDKBP 11 kW',
+        'MDKBS 13.5 kW',
+        'MDKBT 17 kW',
+        'MDKDL 21.5 kW',
+        'MDKDM 27 kW',
+        'MDKDN 32 kW',
+        'QD 8000',
+        'QD 12000',
+        'MDKUA 5 kW',
+        { name: 'MGKBD 4 kW', fuel: 'essence' },
+        { name: 'MGKBD 6 kW', fuel: 'essence' },
+        { name: 'Marine Genset 3.5 kW', fuel: 'essence' },
+      ],
+    },
+  },
+  {
+    slug: 'fischer-panda',
+    name: 'Fischer Panda',
+    country: 'DE',
+    families: ['generator'],
+    aliases: ['fischer panda', 'fischerpanda', 'panda generator'],
+    modelCodeFromName: true,
+    modelDefaults: { fuel: 'diesel', strokeType: '4_stroke' },
+    models: {
+      generator: [
+        'Panda 4200i',
+        'Panda 5000i',
+        'Panda 6500i',
+        'Panda 8000i',
+        'Panda 10000i',
+        'Panda 12000i',
+        'Panda 15000i',
+        'Panda 25i',
+        'Panda 30i',
+        'Panda 45i',
+        'Panda AGT-DC 4000',
+        'Panda AGT-DC 6000',
+        'Panda AGT-DC 10000',
+        'Panda 4000s',
+        'Panda 8000s',
+      ],
+    },
+  },
+  {
+    slug: 'northern-lights',
+    name: 'Northern Lights',
+    country: 'US',
+    families: ['generator'],
+    aliases: ['northern lights', 'northernlights', 'lugger'],
+    modelCodeFromName: true,
+    modelDefaults: { fuel: 'diesel', strokeType: '4_stroke' },
+    models: {
+      generator: [
+        'M643N 4.5 kW',
+        'M673L 6 kW',
+        'M753K 9 kW',
+        'M773LW 12 kW',
+        'M843NW 16 kW',
+        'M844LW 20 kW',
+        'M864W 25 kW',
+        'M944T 33 kW',
+        'M1064T 50 kW',
+        'M1066A 65 kW',
+        'M20CRW 20 kW',
+        'M35C3 35 kW',
+      ],
+    },
+  },
+  {
+    slug: 'kohler-power',
+    name: 'Kohler Power',
+    country: 'US',
+    families: ['generator'],
+    aliases: ['kohler', 'kohler power', 'kohler generator', 'kohler marine'],
+    modelCodeFromName: true,
+    modelDefaults: { fuel: 'diesel', strokeType: '4_stroke' },
+    models: {
+      generator: [
+        '4EFOZD',
+        '5EFOZD',
+        '6EFOZD',
+        '7EFOZD',
+        '9EFOZD',
+        '11EFOZD',
+        '13EFOZD',
+        '17EFOZD',
+        '21EFOZD',
+        '28EFOZD',
+        { name: '5EKD Gasoline', fuel: 'essence' },
+        { name: '8EKOZD Gasoline', fuel: 'essence' },
+      ],
+    },
+  },
+  {
+    slug: 'mase-generators',
+    name: 'Mase Generators',
+    country: 'IT',
+    families: ['generator'],
+    aliases: ['mase', 'mase generators', 'mase generatori'],
+    modelCodeFromName: true,
+    modelDefaults: { fuel: 'diesel', strokeType: '4_stroke' },
+    models: {
+      generator: [
+        'IS 3.5',
+        'IS 5.0',
+        'IS 6.5',
+        'IS 8.0',
+        'IS 10.0',
+        'IS 13.5',
+        'IS 16.5',
+        'IS 22.0',
+        'VS 4.5',
+        'VS 7.5',
+        'VS 10.5',
+        'Mariner 4000',
+        'Mariner 5000',
+        'Mariner 7000',
+      ],
+    },
+  },
+  {
+    slug: 'paguro',
+    name: 'Paguro',
+    country: 'IT',
+    families: ['generator'],
+    aliases: ['paguro', 'paguro generator'],
+    modelCodeFromName: true,
+    modelDefaults: { fuel: 'diesel', strokeType: '4_stroke' },
+    models: {
+      generator: [
+        'Paguro 3000',
+        'Paguro 4000',
+        'Paguro 4500',
+        'Paguro 6500',
+        'Paguro 9000',
+        'Paguro 14000',
+        'Paguro 18000',
+        'Paguro 21500',
+        'Paguro 2SY',
+        'Paguro 4SY',
+      ],
+    },
+  },
+  {
+    slug: 'whisperpower',
+    name: 'WhisperPower',
+    country: 'NL',
+    families: ['generator'],
+    aliases: ['whisperpower', 'whisper power'],
+    modelCodeFromName: true,
+    modelDefaults: { fuel: 'diesel', strokeType: '4_stroke' },
+    models: {
+      generator: [
+        'M-SC 3.5',
+        'M-SC 4.5',
+        'M-SC 6',
+        'M-SC 8',
+        'M-SC 10',
+        'M-SC 12',
+        'M-GV 4',
+        'M-GV 7',
+        'Piccolo 8',
+        'Beltpack 3',
+      ],
+    },
+  },
+  {
+    slug: 'dometic-generators',
+    name: 'Dometic',
+    country: 'SE',
+    families: ['generator'],
+    aliases: ['dometic', 'dometic generator', 'cruisair generator'],
+    modelCodeFromName: true,
+    modelDefaults: { fuel: 'diesel', strokeType: '4_stroke' },
+    models: {
+      generator: [
+        'T4 3.5 kW',
+        'T4 5 kW',
+        'T4 7 kW',
+        'T4 9 kW',
+        'T4 11 kW',
+        'T4 13.5 kW',
+        'DG 4.0',
+        'DG 6.0',
+      ],
+    },
+  },
+]

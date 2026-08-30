@@ -1,6 +1,6 @@
 # Seeders
 
-Quatre seeders dans `database/seeders/`, chacun avec un rôle distinct. `node ace db:seed` (sans `--files`) exécute **tous** les fichiers du dossier — utiliser `--files` pour n'en lancer qu'un.
+Six seeders dans `database/seeders/`, chacun avec un rôle distinct. `node ace db:seed` (sans `--files`) exécute **tous** les fichiers du dossier — utiliser `--files` pour n'en lancer qu'un.
 
 | Fichier                           | Rôle                                                                 | Environnement         |
 | --------------------------------- | -------------------------------------------------------------------- | --------------------- |
@@ -8,8 +8,17 @@ Quatre seeders dans `database/seeders/`, chacun avec un rôle distinct. `node ac
 | `sandbox_seeder.ts`               | Démo générique "Marina Démo", réinitialisable                        | tous                  |
 | `test_plans_seeder.ts`            | 3 orgs simples, une par plan tier                                    | `development`, `test` |
 | `billing_module_states_seeder.ts` | Matrice exhaustive plans/abonnements/modules/quotas + données métier | `development`, `test` |
+| `boat_catalog_seeder.ts`          | Référentiel de marques et modèles de bateau (#571)                   | tous, **production**  |
+| `engine_catalog_seeder.ts`        | Référentiel de marques et modèles de motorisation (#573)             | tous, **production**  |
 
 Tous sont **idempotents** : relancer un seeder ne crée jamais de doublon (recherche par email/nom/tag avant création).
+
+Les deux seeders de **catalogue** se distinguent des autres : ce ne sont pas des données de démo mais
+des référentiels métier, sans `static environment`, enchaînés derrière le `migration:run --force` du
+service `migrator` en production (`pnpm migrate:prod`). Ils font `updateOrCreate` sur le slug et
+**jamais de `delete`** : une marque ou un modèle retiré des fichiers de données reste en base, il peut
+être référencé par un bateau ou un moteur existant. Le contenu vit dans `database/data/<catalogue>/`,
+règles de saisie dans le `README.md` de chaque dossier.
 
 ---
 
