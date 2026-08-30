@@ -91,6 +91,9 @@ Référence: `inertia/app.ts`.
 ### Equipment edit pages
 
 - engines: `inertia/pages/boats/engine_edit.vue` (PUT `/boats/:boatId/engines/:engineId`)
+  - retour (#599): valider **et** annuler ramènent sur la fiche moteur
+    `/boats/:boatId/engines/:engineId` — la plupart des points d'entrée du formulaire sont des
+    écrans moteur. La création (`storeEngine`) reste sur la fiche bateau, d'où part sa modale.
   - champs partagés: `inertia/components/boats/engine/BoatEquipmentEngineFields.vue`, monté aussi
     par `BoatShowEnginesCard.vue` et `BoatEquipmentAddModal.vue`
   - identité (#573): `inertia/components/boats/engine/BoatEngineIdentityFields.vue` — marque et
