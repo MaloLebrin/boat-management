@@ -5,7 +5,7 @@ import BoatMaintenanceTasksPanel from '~/components/boats/maintenance/BoatMainte
 import BoatTaskActions from '~/components/boats/maintenance/BoatTaskActions.vue'
 import BoatTaskUrgentCard from '~/components/boats/maintenance/BoatTaskUrgentCard.vue'
 import { subjectLabel } from '~/components/boats/maintenance/utils'
-import { engineKindLabel, sailTypeLabel } from '~/utils/boat_enum_labels'
+import { engineKindLabel, engineSerialSuffix, sailTypeLabel } from '~/utils/boat_enum_labels'
 import type { BoatCreateIntent, BoatShowDetail, MaintenanceTaskRow } from '~/types/boat_show'
 import { useT } from '~/composables/use_t'
 import { useDateFormat } from '~/composables/use_date_format'
@@ -74,7 +74,7 @@ function getTaskComponentLabel(task: MaintenanceTaskRow): string {
   if (task.subject === 'engine' && task.boatEngineId) {
     const engine = props.boat.engines.find((e) => e.id === task.boatEngineId)
     if (engine) {
-      return [engineKindLabel(t, engine.kind), engine.brand, engine.model].filter(Boolean).join(' ')
+      return `${[engineKindLabel(t, engine.kind), engine.brand, engine.model].filter(Boolean).join(' ')}${engineSerialSuffix(t, engine.serialNumber)}`
     }
   }
   if (task.subject === 'sail' && task.boatSailId) {

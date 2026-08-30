@@ -37,7 +37,7 @@ const emit = defineEmits<{ createIntentConsumed: [] }>()
 const { t } = useT()
 const { formatDateTime } = useDateFormat()
 
-const engineOptions = computed(() => toNavigationEngineOptions(props.boat.engines))
+const engineOptions = computed(() => toNavigationEngineOptions(t, props.boat.engines))
 
 const showCreateForm = ref(false)
 const closingLogId = ref<number | null>(null)

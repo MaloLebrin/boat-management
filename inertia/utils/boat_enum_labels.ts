@@ -61,13 +61,25 @@ interface EngineTitleLike {
   brand: string | null
   model: string | null
   kind: string
+  serialNumber?: string | null
+}
+
+/**
+ * Suffix « · N° série X » to append after an engine's name (#601) — empty when
+ * the engine has no serial number. Shared by every label that names an engine,
+ * so twin engines (same brand/model) stay distinguishable everywhere.
+ */
+export function engineSerialSuffix(t: T, serialNumber: string | null | undefined): string {
+  return serialNumber ? ` · ${t('boats.engines.sn')} ${serialNumber}` : ''
 }
 
 /**
  * Display title of an engine: its brand and model, falling back to the
- * translated `kind` when the engine carries neither (#472).
+ * translated `kind` when the engine carries neither (#472), always followed by
+ * its serial number when it has one (#601).
  */
 export function engineDisplayTitle(t: T, engine: EngineTitleLike): string {
   const identity = [engine.brand, engine.model].filter(Boolean).join(' ').trim()
-  return identity || engineKindLabel(t, engine.kind) || engine.kind
+  const name = identity || engineKindLabel(t, engine.kind) || engine.kind
+  return `${name}${engineSerialSuffix(t, engine.serialNumber)}`
 }

@@ -18,7 +18,13 @@ const { t } = useT()
 
 const props = defineProps<{
   boat: { id: number; name: string }
-  engine: { id: number; kind: string; brand: string | null; model: string | null }
+  engine: {
+    id: number
+    kind: string
+    brand: string | null
+    model: string | null
+    serialNumber: string | null
+  }
   part: BoatShowEnginePart
   canManage: boolean
 }>()

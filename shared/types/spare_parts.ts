@@ -135,6 +135,7 @@ export interface SparePartsEngineRow {
   boatName: string
   brand: string | null
   model: string | null
+  serialNumber: string | null
   kind: string
   /** Famille de motorisation (#574), `null` tant qu'elle n'est pas précisée. */
   family: string | null

@@ -17,7 +17,14 @@ import { engineDisplayTitle } from '~/utils/boat_enum_labels'
 
 const props = defineProps<{
   boat: { id: number; name: string }
-  engine: { id: number; brand: string | null; model: string | null; kind: string; status: string }
+  engine: {
+    id: number
+    brand: string | null
+    model: string | null
+    serialNumber: string | null
+    kind: string
+    status: string
+  }
   sheetSlug: DiagnosticSheetSlug
   checkedStepKeys: string[]
   canManage: boolean

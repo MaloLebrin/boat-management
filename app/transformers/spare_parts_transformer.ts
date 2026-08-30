@@ -14,6 +14,7 @@ export function toSparePartsEngineRow(
     boatName: boat.name,
     brand: engine.brand,
     model: engine.model,
+    serialNumber: engine.serialNumber,
     kind: engine.kind,
     family: engine.family,
     status: engine.status,

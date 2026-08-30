@@ -9,7 +9,7 @@ import { useNetworkStatus } from '~/composables/use_network_status'
 import { useOfflineQueue } from '~/composables/use_offline_queue'
 import { useT } from '~/composables/use_t'
 import { useBoatOptions } from '~/composables/use_boat_options'
-import { engineKindLabel } from '~/utils/boat_enum_labels'
+import { engineKindLabel, engineSerialSuffix } from '~/utils/boat_enum_labels'
 import { todayDateInputValue } from '~/utils/local_datetime'
 import type { EngineFuel } from '#shared/constants/boats/boat_form_options'
 import type { BoatShowDetail } from '~/types/boat_show'
@@ -30,7 +30,7 @@ const { enqueue } = useOfflineQueue()
 const engineOptions = computed(() =>
   props.boat.engines.map((e) => ({
     value: String(e.id),
-    label: `${engineKindLabel(t, e.kind) ?? e.kind}${e.brand ? ` — ${e.brand}` : ''}${e.model ? ` ${e.model}` : ''}`,
+    label: `${engineKindLabel(t, e.kind) ?? e.kind}${e.brand ? ` — ${e.brand}` : ''}${e.model ? ` ${e.model}` : ''}${engineSerialSuffix(t, e.serialNumber)}`,
   }))
 )
 
