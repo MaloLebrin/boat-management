@@ -1,10 +1,10 @@
 {
   "index": {
     "title": "Troubleshooting",
-    "subtitle": "Guided troubleshooting checklists for your 2-stroke outboard engines. Always start with the global checklist: compression, spark, fuel — in that order.",
+    "subtitle": "Guided troubleshooting checklists for your engines: 2-stroke outboards and inboard diesels. Always start with the global checklist, it points you to the right sheet.",
     "enginesTitle": "Your engines",
-    "empty": "No 2-stroke outboard engine in your fleet.",
-    "eligibilityHint": "Troubleshooting checklists apply to 2-stroke outboard engines. Set the kind to \"outboard\" and the cycle to \"2-stroke\" on an engine's page to see it listed here.",
+    "empty": "No engine eligible for troubleshooting in your fleet.",
+    "eligibilityHint": "Troubleshooting checklists cover 2-stroke outboards and inboard engines (diesel on a shaft line or saildrive, sterndrives, generator sets). Set the engine family on an engine's page to see it listed here.",
     "openChecklist": "Open the checklist",
     "firstContactCard": {
       "title": "Buying used: first contact",
@@ -26,7 +26,10 @@
     "sheetLink": "Sheet: {title}",
     "warningLabel": "Warning",
     "notesTitle": "Worth remembering",
-    "localStateHint": "This sheet is not tied to any engine in your fleet: checkboxes are not saved and start fresh on your next visit."
+    "localStateHint": "This sheet is not tied to any engine in your fleet: checkboxes are not saved and start fresh on your next visit.",
+    "safetyTitle": "Safety",
+    "seaCockTitle": "Open the sea cock before starting",
+    "seaCock": "This sheet involves starting the engine: make sure the raw water sea cock is open and that water comes out of the exhaust within the first few seconds. With no water, shut down immediately — the impeller is destroyed in seconds."
   },
   "tab": {
     "title": "Troubleshooting",
@@ -372,7 +375,38 @@
         "trim_wiring": {
           "label": "Trim dead at one station only: follow the blue/green wires",
           "detail": "A cut wire is more likely than a dead trim motor. At-sea workaround: manual tilt release screw."
+        },
+        "battery_switch": {
+          "label": "Battery switch on, start bank separate from the service bank",
+          "detail": "A flat service bank must not stop you starting: if it does, the combiner or the wiring is at fault."
+        },
+        "start_battery_load": {
+          "label": "Start battery tested under load, not just with a voltmeter",
+          "detail": "A tired battery reads 12.6 V at rest and collapses the moment you crank: only a load test exposes it."
+        },
+        "glow_plugs": {
+          "label": "Pre-heating: timer and glow plugs working",
+          "detail": "A diesel that starts well hot and refuses cold points to pre-heating before fuel supply."
+        },
+        "start_relay": {
+          "label": "Start relay and switch: audible click, sound contacts",
+          "detail": "A click with no rotation points to the starter or its cables; no click at all, to the switch and its supply."
+        },
+        "alternator_belt": {
+          "label": "Alternator belt: tension and no slipping",
+          "detail": "Engine off, key removed. A slipping belt squeals and leaves black dust."
+        },
+        "alternator_output": {
+          "label": "Charging voltage measured with the engine running",
+          "detail": "With no measurable charge the battery drains outing after outing, and the failure happens far from the pontoon."
+        },
+        "panel_alarm": {
+          "label": "Panel alarms (temperature, oil pressure) live with the ignition on",
+          "detail": "These alarms must sound with the key on and the engine stopped. Silent, they will warn you of nothing."
         }
+      },
+      "sections": {
+        "inboard_charging": "Starting and charging — inboard"
       }
     },
     "timing": {
@@ -487,6 +521,413 @@
       "notes": {
         "deal_breakers": "Deal breakers: seized piston, gearcase that will not shift."
       }
+    },
+    "inboard_cooling": {
+      "title": "Overheating and cooling",
+      "intro": "An inboard cools in two stages: raw water drawn from under the hull cools a closed circuit, then leaves through the exhaust. Follow the raw water in order — that is almost always where it blocks — before touching the closed circuit.",
+      "sections": {
+        "raw_water": "Raw water circuit, in flow order",
+        "fresh_water": "Closed circuit and heat exchange"
+      },
+      "steps": {
+        "sea_cock": {
+          "label": "Sea cock open, through-hull clear"
+        },
+        "strainer": {
+          "label": "Strainer opened, basket cleaned, lid seal in good condition",
+          "detail": "A hardened seal lets air in: the pump loses its prime with no visible dirt at all."
+        },
+        "hose_collapse": {
+          "label": "Suction hose neither collapsed nor sagging",
+          "detail": "A hose that collapses at high revs causes overheating only under load."
+        },
+        "impeller": {
+          "label": "Impeller removed: vanes supple, none deformed or missing",
+          "detail": "An impeller is replaced on wear, not on failure — hardened or set vanes mean it is at the end of its life."
+        },
+        "impeller_debris": {
+          "label": "Missing vanes searched for downstream (heat exchanger, elbow)",
+          "detail": "A piece of impeller carried downstream blocks the exchanger: while it is there, the overheating comes back."
+        },
+        "pump_cover": {
+          "label": "Pump cover flat, unscored, new gasket on reassembly"
+        },
+        "coolant_level": {
+          "label": "Closed circuit level and coolant condition",
+          "detail": "Cold engine only. Brownish or oily coolant points to an internal leak."
+        },
+        "belt": {
+          "label": "Pump drive belt: tension, condition, alignment",
+          "detail": "Engine off, key removed."
+        },
+        "thermostat": {
+          "label": "Thermostat removed and tested, or replaced",
+          "detail": "Stuck closed: immediate overheating. Stuck open: the engine never reaches temperature."
+        },
+        "heat_exchanger": {
+          "label": "Exchanger core: scaling, deposits, blockage",
+          "detail": "Overheating that builds slowly, only under load, points to the exchanger before the impeller."
+        },
+        "anodes": {
+          "label": "Circuit anodes checked and replaced when consumed",
+          "detail": "A forgotten anode ends up in pieces inside the core, which it then blocks in turn."
+        },
+        "exhaust_elbow": {
+          "label": "Exhaust elbow free of scale and corrosion"
+        }
+      },
+      "tables": {
+        "symptoms": {
+          "headers": {
+            "symptom": "Symptom",
+            "reading": "Reading",
+            "check": "Check first"
+          },
+          "rows": {
+            "no_water": {
+              "symptom": "No water at the exhaust on start-up",
+              "reading": "The raw water circuit is not drawing",
+              "check": "Sea cock, strainer, lid seal, impeller"
+            },
+            "water_no_alarm": {
+              "symptom": "Water flowing but temperature alarm",
+              "reading": "Water circulates, heat exchange no longer happens",
+              "check": "Thermostat, scaled exchanger, closed circuit level"
+            },
+            "steam": {
+              "symptom": "Steam or boiling water at the exhaust",
+              "reading": "Insufficient raw water flow",
+              "check": "Impeller, collapsed hose, scaled elbow. Shut the engine down."
+            },
+            "slow_rise": {
+              "symptom": "Temperature rising only under load",
+              "reading": "The circuit copes at idle, not beyond",
+              "check": "Heat exchanger, slipping belt, exhaust elbow"
+            }
+          }
+        }
+      },
+      "warnings": {
+        "hotPressurisedCircuit": "Never open the cap of a hot, pressurised cooling circuit: steam and boiling coolant come out all at once. Wait until it has fully cooled down.",
+        "engineOffBeforeBelt": "Shut the engine down and remove the key before touching a belt or a pulley.",
+        "neverRunDry": "Never run the engine with the sea cock closed, not even for a few seconds: the impeller is destroyed before the alarm sounds."
+      },
+      "notes": {
+        "impeller_interval": "The impeller is a wear part: most engine makers rate it for a season or two, and a spare on board beats a new one at the pontoon. See your model's service manual for the exact interval."
+      }
+    },
+    "diesel_fuel": {
+      "title": "Fuel circuit",
+      "intro": "On a leisure diesel, fuel supply is the leading cause of failure, and it is almost always water or deposits from the bottom of the tank. Follow the circuit in order, from the tank to the injectors.",
+      "steps": {
+        "tank_valve": {
+          "label": "Tank valve open, actual level sufficient"
+        },
+        "prefilter_bowl": {
+          "label": "Pre-filter bowl drained: no water, no sludge",
+          "detail": "Water settles at the bottom, clearer and denser than the fuel. Drain until only fuel comes out."
+        },
+        "prefilter_element": {
+          "label": "Pre-filter element replaced if clogged",
+          "detail": "Note the date: an element that clogs within hours points to a dirty tank, not a faulty filter."
+        },
+        "engine_filter": {
+          "label": "Engine fuel filter replaced, with a new seal"
+        },
+        "bleed": {
+          "label": "Circuit bled following the service manual procedure",
+          "detail": "A diesel will not restart while air remains: bleed in the order the manufacturer gives, from the filter towards the pump."
+        },
+        "air_leak": {
+          "label": "Air leak searched for on the suction side",
+          "detail": "Fittings, filter seals, porous hoses: the engine can draw air without a single drop of fuel leaking out."
+        },
+        "lift_pump": {
+          "label": "Lift pump: flow verified",
+          "detail": "Hand priming that is stiff or offers no resistance, and no flow: the pump or its diaphragm is at fault."
+        },
+        "stop_solenoid": {
+          "label": "Stop control (solenoid or cable) in the run position",
+          "detail": "An engine that cranks normally, never fires, with a healthy fuel circuit: look at the stop control first."
+        },
+        "injector_return": {
+          "label": "Injector return flow checked",
+          "detail": "An unusually heavy return points to a worn injector. Injector testing and calibration is workshop work."
+        },
+        "tank_bottom": {
+          "label": "Tank bottom inspected if clogging keeps recurring",
+          "detail": "Filters blocking one after another: it is the tank that needs cleaning, not the filter that needs changing."
+        }
+      },
+      "tables": {
+        "symptoms": {
+          "headers": {
+            "symptom": "Symptom",
+            "reading": "Reading",
+            "check": "Check first"
+          },
+          "rows": {
+            "starts_then_stalls": {
+              "symptom": "Starts then stalls after a few minutes",
+              "reading": "Fuel supply drying up",
+              "check": "Clogged pre-filter, air leak, tank vent"
+            },
+            "power_loss_swell": {
+              "symptom": "Power loss in a swell",
+              "reading": "Deposits from the tank bottom are stirred back up",
+              "check": "Pre-filter bowl, element, tank cleanliness"
+            },
+            "no_start_after_filter": {
+              "symptom": "Will not restart after a filter change",
+              "reading": "Air is still in the circuit",
+              "check": "Full bleed following the manual procedure"
+            },
+            "hunting": {
+              "symptom": "Unstable revs, the engine hunts",
+              "reading": "Irregular supply or air being drawn in",
+              "check": "Air leak on the suction side, partially clogged filter"
+            }
+          }
+        }
+      },
+      "warnings": {
+        "highPressureInjection": "Never loosen a high-pressure fitting with the engine running: a diesel injector jet goes through skin and causes serious injury, often with no immediate pain. All work on the injection system is done with the engine stopped.",
+        "fuelAndHotParts": "Fuel sprayed onto a hot manifold ignites. Shut the engine down, let it cool, and keep absorbent material within reach."
+      },
+      "notes": {
+        "diesel_bug": "The micro-organisms that grow at the water-fuel interface (\"diesel bug\") form the black sludge found in filters. Keeping the tank full limits condensation, and therefore the water they live on."
+      }
+    },
+    "diesel_smoke": {
+      "title": "Smoke: black, white or blue",
+      "intro": "Smoke colour is the fastest sorting aid on a diesel: it does not name the fault, but it points at the family to explore. Read it with a hot engine under load, not at idle on the pontoon.",
+      "steps": {
+        "color_identified": {
+          "label": "Colour identified under load, engine hot",
+          "detail": "Black = combustion, white = water or injection, blue = oil. See the table above."
+        },
+        "air_filter": {
+          "label": "Air filter and engine bay ventilation clear",
+          "detail": "An engine starved of air smokes black: it is the cheapest check, do it first."
+        },
+        "overload": {
+          "label": "Propeller and load suited: the engine reaches its maximum revs",
+          "detail": "An over-pitched propeller or a fouled hull makes it smoke black constantly and wears the engine."
+        },
+        "back_pressure": {
+          "label": "Exhaust back pressure ruled out"
+        },
+        "coolant_loss": {
+          "label": "Closed circuit level tracked over several outings",
+          "detail": "Persistent white smoke with a dropping level: water is reaching combustion — stop there and have it checked."
+        },
+        "oil_level_rising": {
+          "label": "Engine oil level: neither rising nor milky",
+          "detail": "A level that rises on its own means water or fuel in the sump. Do not go out."
+        },
+        "cold_start_only": {
+          "label": "Smoke present on cold start only, or all the time",
+          "detail": "A little white for the first few seconds when cold is normal; the same cloud when hot is not."
+        }
+      },
+      "tables": {
+        "colors": {
+          "headers": {
+            "color": "Colour",
+            "reading": "Reading",
+            "check": "Check first"
+          },
+          "rows": {
+            "black": {
+              "color": "Black",
+              "reading": "Incomplete combustion: too much fuel or not enough air",
+              "check": "Air filter, engine bay ventilation, over-pitched propeller, exhaust back pressure"
+            },
+            "white": {
+              "color": "White",
+              "reading": "Water in combustion, or unburnt fuel",
+              "check": "Closed circuit level, head gasket, injection. Briefly, when cold, it is normal."
+            },
+            "blue": {
+              "color": "Blue",
+              "reading": "Oil burning in the chamber",
+              "check": "Oil level too high, piston rings, valve guides. Internal wear: workshop."
+            }
+          }
+        }
+      },
+      "warnings": {
+        "whiteSmokeMeansWater": "Persistent white smoke when hot, together with a dropping coolant level, means water in the cylinders. Do not carry on cruising: have it checked before going out again."
+      },
+      "notes": {
+        "cold_start_haze": "Every numeric value — compression pressure, injector setting, opacity — belongs to your model's service manual. This table points you in a direction, it does not measure anything."
+      }
+    },
+    "wet_exhaust": {
+      "title": "Wet exhaust and waterlock",
+      "intro": "An inboard exhaust carries gases and raw water together. When it blocks, sags or corrodes, water can find its way back to the engine: the most expensive failure on this list, and the most avoidable.",
+      "steps": {
+        "elbow_corrosion": {
+          "label": "Exhaust elbow removed and inspected: corrosion, scaling",
+          "detail": "It is the wear part of the exhaust. A holed elbow sends water into the engine through the exhaust."
+        },
+        "elbow_injection": {
+          "label": "Elbow water injection point clear",
+          "detail": "Scaled up, it raises back pressure and temperature with no other symptom."
+        },
+        "waterlock_full": {
+          "label": "Waterlock emptied and not cracked",
+          "detail": "After several failed start attempts it fills up: empty it before cranking again."
+        },
+        "hose_sag": {
+          "label": "Exhaust hose supported, with no low point where water sits",
+          "detail": "A sagging hose forms a trap and holds water, which eventually finds its way back."
+        },
+        "swan_neck": {
+          "label": "Swan neck high enough above the waterline",
+          "detail": "It is what stops the sea entering through the exhaust outlet at anchor or downwind."
+        },
+        "siphon_break": {
+          "label": "Siphon break (anti-siphon loop) clear",
+          "detail": "Blocked, it lets the circuit siphon and fill the engine while stopped."
+        },
+        "clamps": {
+          "label": "Doubled stainless clamps, with no trace of rust"
+        }
+      },
+      "warnings": {
+        "waterInCylinders": "Never keep cranking when the engine will not start: each attempt sends water into the exhaust, and that water can reach the cylinders. After three unsuccessful attempts, close the sea cock and empty the waterlock.",
+        "carbonMonoxide": "An exhaust leaking into the engine bay releases carbon monoxide into the boat: it is odourless and lethal. Any leak is fixed before going out, and a CO detector on board is not a luxury."
+      },
+      "notes": {
+        "elbow_interval": "The exhaust elbow is a consumable, not a lifetime part: most engine makers rate it for a few hundred hours or a few seasons. See your model's service manual."
+      }
+    },
+    "gearbox": {
+      "title": "Gearbox",
+      "intro": "No engagement, jerky shifts, noise on engaging: before suspecting the gearbox itself, check the oil and the control. The vast majority of engagement faults are solved on the cable or the level.",
+      "steps": {
+        "oil_level": {
+          "label": "Oil level checked following the manufacturer's procedure",
+          "detail": "Some gearboxes are checked hot and just after running: the method changes the reading, follow the service manual."
+        },
+        "oil_color": {
+          "label": "Oil appearance: neither milky nor burnt, no particles",
+          "detail": "Milky = water, through the oil cooler. Brown and burnt = slipping plates."
+        },
+        "control_cable": {
+          "label": "Control cable: outer in good condition, free travel, clevis tight",
+          "detail": "A seized cable or a loose clevis stops the gearbox reaching its engagement detent."
+        },
+        "lever_travel": {
+          "label": "Lever travel: the gearbox arm reaches both stops",
+          "detail": "Check at the gearbox, not at the throttle lever: the adjustment is made at the arm."
+        },
+        "damper_plate": {
+          "label": "Damper plate: metallic noise at idle in neutral",
+          "detail": "A rattle that disappears when engaging points to the damper plate, between engine and gearbox."
+        },
+        "output_seal": {
+          "label": "Output shaft seal dry, with no weeping",
+          "detail": "An oil trace under the coupling often comes from here, not from the engine."
+        },
+        "oil_cooler": {
+          "label": "Gearbox oil cooler checked",
+          "detail": "It is where raw water gets into the oil when the core is holed."
+        }
+      },
+      "warnings": {
+        "noEngagementUnderLoad": "Do not force an engagement with the engine revving, or engage at high revs: the damper plate and the plates will not take it. A load test is done short-tied alongside, on sound lines, at low revs."
+      },
+      "notes": {
+        "oil_spec": "Gearbox oil is not always engine oil — some models call for automatic transmission fluid. The exact specification is in the service manual."
+      }
+    },
+    "shaft_line": {
+      "title": "Shaft line and stuffing box",
+      "intro": "The stuffing box is the one point on the shaft line where water comes in on purpose. Vibration, heat or water ingress: the same causes come back — worn packing, cutless bearing, alignment.",
+      "steps": {
+        "packing_drip": {
+          "label": "Drip rate matching the manufacturer's setting",
+          "detail": "A traditional stuffing box should drip slightly while running. Tightened dry, it heats up and destroys the shaft."
+        },
+        "packing_tightening": {
+          "label": "Gland nut and lock nut tight, with no play",
+          "detail": "Tighten in small quarter turns, with the boat afloat, checking the temperature after a few minutes."
+        },
+        "packing_age": {
+          "label": "Packing age known, replacement planned",
+          "detail": "Hardened packing cannot be recovered by tightening: it scores the shaft instead of sealing it."
+        },
+        "cutless_bearing": {
+          "label": "Cutless bearing: vertical shaft play in the bracket",
+          "detail": "Play you can feel by hand means a worn bearing — vibration and shaft wear follow."
+        },
+        "shaft_play": {
+          "label": "Shaft straight, with no wear mark or corrosion at the hull fitting"
+        },
+        "alignment": {
+          "label": "Engine to shaft alignment checked with the boat afloat",
+          "detail": "Alignment is checked afloat and rigged: the hull works, a check ashore is worthless."
+        },
+        "coupling_bolts": {
+          "label": "Coupling bolts tight and locked"
+        },
+        "propeller_fouling": {
+          "label": "Propeller clean, blades free of impact damage or distortion",
+          "detail": "A propeller fouled by a line or bent by an impact gives a clear vibration, proportional to the revs."
+        }
+      },
+      "warnings": {
+        "floodingRisk": "Water coming in at the stuffing box is a leak: it cannot be repaired at sea if it worsens. Keep something to plug it within reach, know where your bilge pump is, and head back if the flow increases.",
+        "engineOffBeforeShaft": "Shut the engine down, remove the key and lock the shaft before working on the shaft line: a shaft driven by the current turns even when stopped."
+      },
+      "notes": {
+        "dripless_variants": "Dripless shaft seals do not drip and are checked differently: bellows, air purge after launching, bellows replacement date. Follow the manufacturer's instructions, not the drip rule."
+      }
+    },
+    "saildrive": {
+      "title": "Saildrive",
+      "intro": "The saildrive goes through the hull: its diaphragm is the only barrier between the sea and the boat. This is the sheet where preventive maintenance matters more than diagnosis — an out-of-date diaphragm is replaced before it leaks, not after.",
+      "steps": {
+        "diaphragm_date": {
+          "label": "Diaphragm fitting date known and within the manufacturer's limit",
+          "detail": "The diaphragm has an expiry date, often seven years, independent of how it looks. Record the fitting date: without it, nobody knows."
+        },
+        "diaphragm_condition": {
+          "label": "Diaphragm inspected: no cracking, swelling or signs of ageing",
+          "detail": "A diaphragm can look sound and still be out of date — appearance never replaces the date."
+        },
+        "water_alarm": {
+          "label": "Water-between-diaphragms alarm tested",
+          "detail": "On twin-diaphragm installations it is what warns you the first one has failed. Test it: a dead alarm protects nothing."
+        },
+        "oil_level": {
+          "label": "Leg oil level checked"
+        },
+        "oil_emulsion": {
+          "label": "Leg oil not emulsified",
+          "detail": "Milky, coffee-coloured oil means water past the seals: a haul-out is needed."
+        },
+        "anodes": {
+          "label": "Leg anodes checked and replaced when consumed",
+          "detail": "An aluminium leg with no anode corrodes quickly, and corrosion cannot be undone."
+        },
+        "paint_compatibility": {
+          "label": "Antifouling compatible with an aluminium leg",
+          "detail": "Copper-based antifouling applied straight onto aluminium triggers galvanic corrosion. Use a product made for legs."
+        },
+        "gaiter_clamps": {
+          "label": "Diaphragm clamps in place, stainless, free of corrosion"
+        }
+      },
+      "warnings": {
+        "diaphragmExpiry": "A saildrive diaphragm is not an ordinary wear part: it is a safety item with an expiry date. An out-of-date diaphragm, however perfect it looks, is a major flooding risk — replace it at the interval the manufacturer gives, without waiting for a symptom.",
+        "floodingRisk": "Water coming in at the leg is dealt with ashore. If you find water in the engine bay around the saildrive, head back and have the boat lifted."
+      },
+      "notes": {
+        "haul_out_required": "Replacing the diaphragm requires a haul-out and removal of the leg: plan it into the yard schedule rather than discovering it at survey."
+      }
     }
   },
   "tooling": {
@@ -572,5 +1013,59 @@
     "causesTitle": "Probable causes, from cheapest to most expensive",
     "nextStepTitle": "Next step",
     "generatedAt": "Generated on {date}"
+  },
+  "globalInboard": {
+    "title": "Inboard global checklist — before dismantling anything",
+    "intro": "A diesel needs clean air, clean fuel and cooling. Steps are ordered from cheapest to most expensive: everything you can check by hand, with no tool and nothing to dismantle, comes first. That is almost always where the fault is.",
+    "steps": {
+      "battery_switch": {
+        "label": "Battery switch on, terminals clean and tight",
+        "detail": "A green terminal or a forgotten battery switch imitates a dead starter perfectly."
+      },
+      "sea_cock": {
+        "label": "Raw water sea cock open",
+        "detail": "First reflex after winter storage or a haul-out: it is the most common oversight."
+      },
+      "strainer": {
+        "label": "Strainer (raw water filter) clean, lid properly tightened"
+      },
+      "raw_water_flow": {
+        "label": "Water at the exhaust within seconds of starting",
+        "detail": "No water: shut down at once, do not wait for the temperature alarm."
+      },
+      "coolant_level": {
+        "label": "Closed circuit level checked, engine cold",
+        "detail": "A level that drops with no visible leak often ends up in the oil or at the exhaust."
+      },
+      "belt": {
+        "label": "Alternator and pump belt: tension and condition",
+        "detail": "Engine off, key removed. Black dust under the belt points to a misalignment."
+      },
+      "oil_level": {
+        "label": "Engine oil level and appearance",
+        "detail": "Milky or over-full: water or fuel has reached the sump — do not start."
+      },
+      "fuel_supply": {
+        "label": "Enough fuel on board, tank valve open"
+      },
+      "prefilter_bowl": {
+        "label": "Pre-filter bowl: no water, no deposits",
+        "detail": "Water shows at the bottom of the bowl, denser and clearer than the fuel."
+      },
+      "exhaust_smoke": {
+        "label": "Exhaust smoke colour on start-up and under load"
+      },
+      "gearbox_oil": {
+        "label": "Gearbox oil level and colour"
+      },
+      "bilge_dry": {
+        "label": "Bilge dry under the engine and at the hull fitting",
+        "detail": "Salt water under the engine never comes from nowhere: find the source before going out."
+      }
+    },
+    "warnings": {
+      "hotPressurisedCircuit": "Never open the cap of a hot, pressurised cooling circuit: steam and boiling coolant come out all at once. Wait until the engine has fully cooled down.",
+      "engineOffBeforeBelt": "Shut the engine down and remove the key before touching a belt, a pulley or the coupling — an accidental start takes a hand off."
+    }
   }
 }

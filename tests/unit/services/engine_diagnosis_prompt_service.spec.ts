@@ -5,11 +5,18 @@ import {
   buildEngineDiagnosisUserMessage,
   parseEngineDiagnosisResponse,
 } from '#services/engine_diagnosis_prompt_service'
+import { sheetsForEngineFamily } from '#shared/helpers/diagnostic'
 import type { EngineDiagnosisInput } from '#shared/types/ai'
-import { DIAGNOSTIC_SHEET_SLUGS } from '#shared/types/diagnostic'
+import type { EngineFamily } from '#shared/types/engine_catalog'
 
 const BASE_INPUT: EngineDiagnosisInput = {
-  engine: { brand: 'Johnson', model: 'J50PLEA', hours: 320, strokeType: '2_stroke' },
+  engine: {
+    brand: 'Johnson',
+    model: 'J50PLEA',
+    hours: 320,
+    strokeType: '2_stroke',
+    family: 'outboard_2t',
+  },
   parts: [{ designation: 'Impeller', wearState: 'worn' }],
   maintenanceEvents: [{ title: 'Oil change', subject: 'engine', performedAt: '2026-05-10' }],
   checklist: {
@@ -28,13 +35,65 @@ const VALID_RESPONSE = JSON.stringify({
 })
 
 test.group('engine_diagnosis_prompt_service — system prompt (#516)', () => {
-  test('each locale references every sheet slug of #515', ({ assert }) => {
+  test('each locale lists every sheet slug served to the engine family (#576)', ({ assert }) => {
+    const families: EngineFamily[] = [
+      'outboard_2t',
+      'inboard_diesel_shaft',
+      'inboard_diesel_saildrive',
+    ]
+
     for (const locale of ['fr', 'en'] as const) {
-      const prompt = buildEngineDiagnosisSystemPrompt(locale)
-      for (const slug of DIAGNOSTIC_SHEET_SLUGS) {
-        assert.include(prompt, `"${slug}"`, `${locale} prompt must list ${slug}`)
+      for (const family of families) {
+        const prompt = buildEngineDiagnosisSystemPrompt(locale, family)
+        for (const sheet of sheetsForEngineFamily(family)) {
+          assert.include(
+            prompt,
+            `"${sheet.slug}"`,
+            `${locale}/${family} prompt must list ${sheet.slug}`
+          )
+        }
       }
     }
+  })
+
+  test('without a family the prompt stays the 2-stroke outboard one of #516', ({ assert }) => {
+    for (const locale of ['fr', 'en'] as const) {
+      assert.equal(
+        buildEngineDiagnosisSystemPrompt(locale),
+        buildEngineDiagnosisSystemPrompt(locale, 'outboard_2t')
+      )
+    }
+  })
+
+  /**
+   * Le risque principal de #576 : un diesel diagnostiqué en 2 temps produirait
+   * des conseils faux (mélange 50:1, clapets, power pack, link & sync).
+   */
+  test('an inboard diesel prompt never frames the engine as a 2-stroke outboard', ({ assert }) => {
+    const fr = buildEngineDiagnosisSystemPrompt('fr', 'inboard_diesel_shaft')
+    assert.notInclude(fr, '2 temps')
+    assert.notInclude(fr, 'hors-bord')
+    assert.include(fr, 'in-bord')
+    assert.include(fr, '"diesel-fuel"')
+
+    const en = buildEngineDiagnosisSystemPrompt('en', 'inboard_diesel_shaft')
+    assert.notInclude(en, '2-stroke')
+    assert.notInclude(en, 'outboard')
+    assert.include(en, 'inboard')
+    assert.include(en, '"diesel-fuel"')
+  })
+
+  test('an inboard diesel prompt carries no 2-stroke-only sheet', ({ assert }) => {
+    const prompt = buildEngineDiagnosisSystemPrompt('fr', 'inboard_diesel_saildrive')
+
+    for (const outboardOnly of ['compression', 'ignition', 'timing', 'gearcase']) {
+      assert.notInclude(
+        prompt,
+        `"${outboardOnly}"`,
+        `${outboardOnly} must not be offered to a diesel`
+      )
+    }
+    assert.include(prompt, '"saildrive"')
   })
 
   test('the prompt forbids inventing model-specific numeric specs', ({ assert }) => {
@@ -56,6 +115,8 @@ test.group('engine_diagnosis_prompt_service — system prompt (#516)', () => {
     const fr = buildEngineDiagnosisSystemPrompt('fr')
     assert.include(fr, 'Rédige tout en français')
     assert.include(fr, 'Tu es un mécanicien expert')
+    assert.notInclude(fr, '{expertise}')
+    assert.notInclude(fr, '{digest}')
   })
 })
 
@@ -82,11 +143,48 @@ test.group('engine_diagnosis_prompt_service — user message (#516)', () => {
     assert.include(message, "Review the user's progress")
   })
 
+  test('the engine line names the family, never a hard-coded 2T (#576)', ({ assert }) => {
+    const fr = buildEngineDiagnosisUserMessage(
+      { ...BASE_INPUT, engine: { ...BASE_INPUT.engine, family: 'inboard_diesel_saildrive' } },
+      'fr'
+    )
+    assert.include(fr, 'in-bord diesel, saildrive')
+    assert.notInclude(fr, '(2T,')
+
+    const en = buildEngineDiagnosisUserMessage(
+      { ...BASE_INPUT, engine: { ...BASE_INPUT.engine, family: 'inboard_diesel_shaft' } },
+      'en'
+    )
+    assert.include(en, 'inboard diesel, shaft line')
+    assert.notInclude(en, '(2T,')
+  })
+
+  test('an outboard 2-stroke is still described as such', ({ assert }) => {
+    assert.include(buildEngineDiagnosisUserMessage(BASE_INPUT, 'fr'), 'hors-bord 2 temps')
+    assert.include(buildEngineDiagnosisUserMessage(BASE_INPUT, 'en'), '2-stroke outboard')
+  })
+
+  test('an engine without family falls back to an explicit label', ({ assert }) => {
+    const message = buildEngineDiagnosisUserMessage(
+      { ...BASE_INPUT, engine: { ...BASE_INPUT.engine, family: null } },
+      'fr'
+    )
+
+    assert.include(message, 'motorisation non précisée')
+    assert.notInclude(message, 'null')
+  })
+
   test('an engine without brand or checked steps falls back to labels', ({ assert }) => {
     const message = buildEngineDiagnosisUserMessage(
       {
         ...BASE_INPUT,
-        engine: { brand: null, model: null, hours: null, strokeType: '2_stroke' },
+        engine: {
+          brand: null,
+          model: null,
+          hours: null,
+          strokeType: '2_stroke',
+          family: 'outboard_2t',
+        },
         parts: [],
         maintenanceEvents: [],
         checklist: { checkedStepKeys: [], totalGlobalSteps: 11 },
@@ -125,6 +223,26 @@ test.group('engine_diagnosis_prompt_service — parser (#516)', () => {
     const raw = VALID_RESPONSE.replace('"fuel"', '"fiche-9"')
 
     assert.throws(() => parseEngineDiagnosisResponse(raw), AiInvalidResponseError)
+  })
+
+  test('rejects a sheet that does not serve the engine family (#576)', ({ assert }) => {
+    // « fuel » est une fiche valide, mais c'est celle du carburateur 2 temps :
+    // la recommander sur un diesel serait un conseil faux, pas une imprécision.
+    assert.throws(
+      () => parseEngineDiagnosisResponse(VALID_RESPONSE, 'inboard_diesel_shaft'),
+      AiInvalidResponseError,
+      /does not apply to this engine family/
+    )
+
+    const dieselResponse = VALID_RESPONSE.replace('"fuel"', '"diesel-fuel"')
+    assert.equal(
+      parseEngineDiagnosisResponse(dieselResponse, 'inboard_diesel_shaft').recommendedSheet,
+      'diesel-fuel'
+    )
+  })
+
+  test('without a family every known sheet is still accepted (#516)', ({ assert }) => {
+    assert.equal(parseEngineDiagnosisResponse(VALID_RESPONSE).recommendedSheet, 'fuel')
   })
 
   test('throws AiInvalidResponseError when a required field is missing or empty', ({ assert }) => {

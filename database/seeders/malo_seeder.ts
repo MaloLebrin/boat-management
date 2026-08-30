@@ -133,9 +133,13 @@ export default class MaloSeeder extends BaseSeeder {
 
     // Equipment (create only if missing)
     if (boat.engines.length === 0) {
+      // `strokeType` et `family` renseignés (#576) : sans eux les checklists de
+      // diagnostic restaient invisibles en démo, faute de moteur éligible.
       await equipmentService.createEngine(user, boat, {
         kind: 'outboard',
         fuel: 'essence',
+        strokeType: '2_stroke',
+        family: 'outboard_2t',
         brand: 'Yamaha',
         model: '8HP',
         powerHp: 8,
@@ -145,6 +149,8 @@ export default class MaloSeeder extends BaseSeeder {
       await equipmentService.createEngine(user, boat, {
         kind: 'outboard',
         fuel: 'essence',
+        strokeType: '2_stroke',
+        family: 'outboard_2t',
         brand: 'Yamaha',
         model: '4AS',
         powerHp: 4,

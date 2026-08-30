@@ -8,11 +8,9 @@ import BoatEngine from '#models/boat_engine'
 import BoatEngineDiagnosticCheck from '#models/boat_engine_diagnostic_check'
 import type User from '#models/user'
 import BoatMaintenanceEvent from '#models/boat_maintenance_event'
-import {
-  ALL_DIAGNOSTIC_STEP_KEYS,
-  GLOBAL_CHECKLIST,
-} from '#shared/constants/diagnostic/diagnostic_content'
-import { isDiagnosticEligibleEngine } from '#shared/helpers/diagnostic'
+import { ALL_DIAGNOSTIC_STEP_KEYS } from '#shared/constants/diagnostic/diagnostic_content'
+import { globalChecklistForEngine, isDiagnosticEligibleEngine } from '#shared/helpers/diagnostic'
+import { resolveEngineFamily } from '#shared/helpers/engine_family'
 import type { EngineDiagnosisInput } from '#shared/types/ai'
 import type { DiagnosticEngineRow, DiagnosticResetScope } from '#shared/types/diagnostic'
 import { toDiagnosticEngineRow } from '#transformers/diagnostic_transformer'
@@ -24,8 +22,12 @@ export { BoatEquipmentNotFoundError, DiagnosticStepNotFoundError, EngineNotDiagn
 @inject()
 export default class BoatEngineDiagnosticService {
   /**
-   * Moteurs éligibles au diagnostic (hors-bord 2 temps) de l'organisation du
-   * user, avec la progression de la checklist globale.
+   * Moteurs éligibles au diagnostic de l'organisation du user, avec la
+   * progression de leur checklist globale.
+   *
+   * L'éligibilité suit la **famille de motorisation** depuis #576 : `family`,
+   * `fuel` et `strokeType` sont donc tous chargés — la famille saisie l'emporte,
+   * les deux autres servent au repli pour un moteur créé sans famille.
    */
   async listEligibleEnginesForUser(user: User): Promise<DiagnosticEngineRow[]> {
     if (user.organizationId === null) return []
@@ -41,7 +43,9 @@ export default class BoatEngineDiagnosticService {
           'model',
           'serialNumber',
           'kind',
+          'fuel',
           'strokeType',
+          'family',
           'status',
         ])
       )
@@ -53,22 +57,37 @@ export default class BoatEngineDiagnosticService {
     )
     if (eligible.length === 0) return []
 
+    // Les préfixes de checklist globale diffèrent d'une famille à l'autre
+    // (`global.` hors-bord, `global-inboard.` in-bord) : on charge toutes les
+    // clés cochées et on compte celles du préfixe propre à chaque moteur, plutôt
+    // qu'un `like 'global.%'` qui ne saurait compter qu'une famille.
     const checks = await BoatEngineDiagnosticCheck.query()
       .whereIn(
         'boatEngineId',
         eligible.map(({ engine }) => engine.id)
       )
-      .where('stepKey', 'like', 'global.%')
-      .select(['boatEngineId'])
+      .select(['boatEngineId', 'stepKey'])
 
-    const checkedCounts = new Map<number, number>()
+    const checkedKeys = new Map<number, string[]>()
     for (const check of checks) {
-      checkedCounts.set(check.boatEngineId, (checkedCounts.get(check.boatEngineId) ?? 0) + 1)
+      const keys = checkedKeys.get(check.boatEngineId)
+      if (keys) keys.push(check.stepKey)
+      else checkedKeys.set(check.boatEngineId, [check.stepKey])
     }
 
-    return eligible.map(({ boat, engine }) =>
-      toDiagnosticEngineRow(engine, boat, checkedCounts.get(engine.id) ?? 0)
-    )
+    return eligible.map(({ boat, engine }) => {
+      const checklist = globalChecklistForEngine(engine)
+      const keys = new Set(checkedKeys.get(engine.id) ?? [])
+      const checkedCount = checklist
+        ? checklist.steps.filter((step) => keys.has(step.key)).length
+        : 0
+
+      return toDiagnosticEngineRow(engine, boat, {
+        checkedCount,
+        totalSteps: checklist?.steps.length ?? 0,
+        family: resolveEngineFamily(engine),
+      })
+    })
   }
 
   /** Charge un moteur éligible du bateau, en vérifiant le scoping org. */
@@ -133,6 +152,9 @@ export default class BoatEngineDiagnosticService {
         model: engine.model,
         hours: engine.hours,
         strokeType: engine.strokeType,
+        // Le prompt décrit le moteur par sa famille (#576) : un diagnostic
+        // diesel qui raisonnerait en 2 temps produirait des conseils faux.
+        family: resolveEngineFamily(engine),
       },
       parts: engine.parts.map((part) => ({
         designation: part.designation,
@@ -145,7 +167,7 @@ export default class BoatEngineDiagnosticService {
       })),
       checklist: {
         checkedStepKeys: checks.map((check) => check.stepKey),
-        totalGlobalSteps: GLOBAL_CHECKLIST.steps.length,
+        totalGlobalSteps: globalChecklistForEngine(engine)?.steps.length ?? 0,
       },
     }
   }

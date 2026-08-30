@@ -16,7 +16,8 @@ import EngineShowTabOverview from '~/components/engine/show/tabs/EngineShowTabOv
 import EngineShowTabParts from '~/components/engine/show/tabs/EngineShowTabParts.vue'
 import EngineShowTabPhotos from '~/components/engine/show/tabs/EngineShowTabPhotos.vue'
 import EngineShowTabSpecs from '~/components/engine/show/tabs/EngineShowTabSpecs.vue'
-import { GLOBAL_CHECKLIST } from '#shared/constants/diagnostic/diagnostic_content'
+import { globalChecklistForFamily } from '#shared/helpers/diagnostic'
+import { resolveEngineFamily } from '#shared/helpers/engine_family'
 import { isSparePartsEligibleEngine } from '#shared/helpers/spare_parts'
 import { useT } from '~/composables/use_t'
 import { engineDisplayTitle, engineFuelLabel } from '~/utils/boat_enum_labels'
@@ -166,10 +167,18 @@ const eventsByYearMonth = computed(() => {
 
 const engineTitle = computed(() => engineDisplayTitle(t, props.engine))
 
+/**
+ * Famille de motorisation retenue pour le diagnostic (#576) : celle saisie,
+ * sinon celle déduite de `kind`/`fuel`/`strokeType`. C'est elle qui choisit la
+ * checklist globale — et donc le compteur affiché sur l'onglet.
+ */
+const diagnosticFamily = computed(() => resolveEngineFamily(props.engine))
+const diagnosticChecklist = computed(() => globalChecklistForFamily(diagnosticFamily.value))
+
 const diagnosticCheckedCount = computed(() => {
   if (props.diagnosticCheckedStepKeys === null) return 0
   const checked = new Set(props.diagnosticCheckedStepKeys)
-  return GLOBAL_CHECKLIST.steps.filter((step) => checked.has(step.key)).length
+  return diagnosticChecklist.value?.steps.filter((step) => checked.has(step.key)).length ?? 0
 })
 
 const tabs = computed(() => {
@@ -186,7 +195,7 @@ const tabs = computed(() => {
     items.push({
       key: 'diagnostic',
       label: t('boats.engineShow.tabs.diagnostic'),
-      badge: `${diagnosticCheckedCount.value}/${GLOBAL_CHECKLIST.steps.length}`,
+      badge: `${diagnosticCheckedCount.value}/${diagnosticChecklist.value?.steps.length ?? 0}`,
     })
   }
   items.push(
@@ -319,6 +328,7 @@ function formatYear(iso: string): string {
           v-else-if="tab === 'diagnostic' && diagnosticCheckedStepKeys !== null"
           :boat-id="boat.id"
           :engine-id="engine.id"
+          :family="diagnosticFamily"
           :checked-step-keys="diagnosticCheckedStepKeys"
           :can-manage="canManage"
         />

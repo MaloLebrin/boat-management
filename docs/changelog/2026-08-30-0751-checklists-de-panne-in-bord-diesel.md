@@ -1,0 +1,27 @@
+# 2026-08-30 — Checklists de panne pour l'in-bord diesel (#576)
+
+Les checklists de diagnostic (#515) et le diagnostic assisté par IA (#516) étaient réservés aux hors-bord 2 temps par un test codé en dur (`kind === 'outboard' && strokeType === '2_stroke'`). C'était justifié tant que le contenu se limitait à cette famille — mélange 50:1, clapets, power pack, link & sync. Une fois les familles de motorisation posées (#574) et les pièces détachées ouvertes à l'in-bord, la restriction créait une incohérence visible : un diesel avait accès aux pièces mais pas au diagnostic, sur la famille où l'immobilisation coûte le plus cher. Dernière sous-issue de l'épic #572.
+
+- **Éligibilité par famille.** `isDiagnosticEligibleEngine()` ne teste plus `kind`/`stroke_type` mais la présence d'au moins une fiche déclarée pour la famille du moteur — le critère de `isSparePartsEligibleEngine()` (#574). `DiagnosticSheet.families` est renseigné sur les 8 fiches existantes (`outboard_2t`), le comportement des hors-bord 2 temps est inchangé. La famille saisie l'emporte, sinon elle est déduite de `kind`/`fuel`/`stroke_type` — `resolveEngineFamily()` a migré de `#shared/helpers/spare_parts` vers `#shared/helpers/engine_family`, qu'elle partage maintenant avec le diagnostic.
+
+- **Sept fiches in-bord livrées** (`shared/constants/diagnostic/inboard_diesel_sheets.ts`) : surchauffe et refroidissement, circuit gasoil, fumées, échappement humide et waterlock, inverseur, ligne d'arbre et presse-étoupe, saildrive. Chacune avec ses étapes ordonnées du moins cher au plus cher, ses tableaux de tri et ses avertissements. La fiche « démarrage et charge » n'est pas une huitième fiche : `electrical` est **élargie** aux in-bord, avec une section restreinte par `DiagnosticSection.families` — un hors-bord n'a ni courroie d'alternateur ni bougies de préchauffage, et ne les voit pas.
+
+- **Avertissements de sécurité propres au diesel**, absents du corpus hors-bord et couverts par un test : date de péremption du soufflet de saildrive (risque de voie d'eau, pas pièce d'usure), circuit de refroidissement chaud sous pression, moteur coupé avant toute intervention sur une courroie, raccord haute pression jamais desserré moteur tournant. Le rappel « avant de démarrer » suit la famille : « jamais à sec » pour un hors-bord, « vanne de coque ouverte » pour un in-bord.
+
+- **Checklist globale par famille.** Le tri de premier niveau du 2 temps (jet témoin, essence 50:1, calage) n'a pas de sens sur un diesel : une seconde checklist `global-inboard` est livrée, avec son **propre préfixe de clés**, si bien qu'une case cochée sur un hors-bord n'est jamais comptée pour un in-bord. Le total d'étapes dépend désormais de la famille — `DiagnosticEngineRow` porte `family` et `totalSteps` par ligne.
+
+- **Prompt IA paramétré par famille**, le point le plus sensible de l'issue : un diesel cadré en 2 temps produirait des conseils faux, pas seulement imprécis. Le `(2T, …h)` littéral de `engine_diagnosis_prompt_service.ts` cède la place au libellé de famille, l'expertise annoncée dans le prompt système et le condensé de fiches injecté sont choisis par la famille, et `parseEngineDiagnosisResponse()` refuse une fiche qui ne la sert pas — `fuel` est un slug valide, le recommander sur un diesel ne l'est pas. Sans famille connue, le comportement de #516 est conservé à l'identique. Les garde-fous de #516 (gating plan et quota, pas de spec chiffrée inventée) sont inchangés.
+
+- **Liens croisés fiche ↔ ensemble de pièces corrigés.** `gearcase` pointait vers `lower-unit`, qui renvoie vers `cooling` : l'aller-retour ne bouclait pas ; `electrical` pointait vers `ignition`, sans réciproque. Ils visent désormais `propeller` et `starting-charging`, et les fiches in-bord sont rattachées à leurs ensembles (#574). Trois invariants testés empêchent la divergence de revenir.
+
+- **Applicabilité vérifiée côté contrôleur.** Un slug valide ne suffit plus : la page fiche refuse une fiche étrangère à la motorisation (URL forgée, ancien lien) avec le flash `flash.diagnostic.sheetNotForEngine`. Le message `flash.diagnostic.notEligible` ne parle plus de « hors-bord 2 temps ».
+
+- **Clés persistées intactes.** Les `boat_engine_diagnostic_checks.step_key` d'avant cette issue — 82 clés, relevées sur la version précédente du corpus — existent toutes à l'identique : un test les liste nommément, en renommer une décocherait silencieusement les checklists de tous les utilisateurs. Aucune migration.
+
+- **Seeders.** `malo_seeder.ts` (Yamaha 8HP et 4AS, `outboard_2t`) et `sandbox_seeder.ts` (Volvo D1-20 en `inboard_diesel_saildrive`, Mercury 60 EFI en `outboard_4t`) renseignent `strokeType` et `family` : la fonctionnalité était jusqu'ici invisible en démo comme en sandbox, faute de moteur éligible.
+
+- **i18n** complète `fr` + `en` (`diagnostic.*`, `flash.diagnostic.*`), vouvoiement, aucune chaîne en dur. La page index ne promet plus « vos moteurs hors-bord 2 temps ».
+
+- **Tests.** Vitest : invariants de contenu, unicité et préfixe des clés d'étapes, clés persistées, checklists disjointes, présence des clés dans les deux locales, éligibilité par famille, réciprocité des liens croisés. Japa : construction du prompt et du parser par famille, pages et fiches par motorisation, gating plan/quota du diagnostic IA. 1691 tests backend et 1564 tests front au vert.
+
+- **Documentation.** `docs/domain/diagnostic.md` créé (le domaine n'en avait aucune) ; `docs/domain/spare-parts.md` complété sur la réciprocité des liens croisés.

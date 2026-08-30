@@ -2,12 +2,15 @@
 import BaseAlert from '~/components/base/BaseAlert.vue'
 import DiagnosticStepList from '~/components/diagnostic/DiagnosticStepList.vue'
 import DiagnosticTable from '~/components/diagnostic/DiagnosticTable.vue'
+import { computed } from 'vue'
+import { sectionsForFamily } from '#shared/helpers/diagnostic'
 import type { DiagnosticSheet } from '#shared/types/diagnostic'
+import type { EngineFamily } from '#shared/types/engine_catalog'
 import { useT } from '~/composables/use_t'
 
 const { t } = useT()
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     sheet: DiagnosticSheet
     checkedKeys: ReadonlySet<string>
@@ -15,8 +18,25 @@ withDefaults(
     mode?: 'persisted' | 'local'
     boatId?: number
     engineId?: number
+    /**
+     * Famille du moteur (#576) : elle écarte les sections qui ne le concernent
+     * pas sur les fiches élargies. `null` rend la fiche entière — la page
+     * autonome « premier contact » n'a pas de moteur.
+     */
+    family?: EngineFamily | null
   }>(),
-  { mode: 'persisted', boatId: undefined, engineId: undefined }
+  { mode: 'persisted', boatId: undefined, engineId: undefined, family: null }
+)
+
+const sections = computed(() => sectionsForFamily(props.sheet, props.family))
+
+/** Rappel de sécurité avant un essai moteur — hors-bord par défaut (#515). */
+const runningEngineWarning = computed(
+  () =>
+    props.sheet.runningEngineWarning ?? {
+      titleKey: 'diagnostic.common.neverDryTitle',
+      textKey: 'diagnostic.common.neverDry',
+    }
 )
 
 const emit = defineEmits<{
@@ -29,16 +49,16 @@ const emit = defineEmits<{
     <BaseAlert
       v-if="sheet.requiresRunningEngine"
       variant="warning"
-      :title="t('diagnostic.common.neverDryTitle')"
+      :title="t(runningEngineWarning.titleKey)"
     >
-      {{ t('diagnostic.common.neverDry') }}
+      {{ t(runningEngineWarning.textKey) }}
     </BaseAlert>
 
     <p v-if="sheet.introKey" class="text-sm text-fg-muted">{{ t(sheet.introKey) }}</p>
 
     <DiagnosticTable v-for="table in sheet.tables ?? []" :key="table.id" :table="table" />
 
-    <section v-for="(section, index) in sheet.sections" :key="index" class="space-y-3">
+    <section v-for="(section, index) in sections" :key="index" class="space-y-3">
       <h3 v-if="section.titleKey" class="text-sm font-semibold text-fg">
         {{ t(section.titleKey) }}
       </h3>

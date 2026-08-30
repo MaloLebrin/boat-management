@@ -4,20 +4,44 @@ import type {
   EngineDiagnosisInput,
   EngineDiagnosisResult,
 } from '#shared/types/ai'
+import { sheetsForEngineFamily } from '#shared/helpers/diagnostic'
 import { DIAGNOSTIC_SHEET_SLUGS, type DiagnosticSheetSlug } from '#shared/types/diagnostic'
+import { isEngineFamily, type EngineFamily } from '#shared/types/engine_catalog'
 
 /**
  * Prompts localisés du diagnostic de panne moteur assisté par IA (#516),
- * hors-bord 2 temps uniquement.
+ * **paramétrés par famille de motorisation** depuis #576.
  *
  * Builders purs (aucune dépendance Adonis) pour rester testables sans
  * conteneur ni base de données — même convention que `ai_prompt_service.ts`.
  *
- * Le prompt système embarque un condensé des fiches de diagnostic de #515
- * (la source de vérité du contenu) et deux garde-fous propres à ce domaine :
+ * Le prompt système embarque un condensé des fiches de diagnostic (#515, #576 —
+ * la source de vérité du contenu) et deux garde-fous propres à ce domaine :
  * ne jamais inventer de spec chiffrée propre à un modèle de moteur, et ne
- * recommander que des fiches existantes (1–8).
+ * recommander qu'une fiche existante.
+ *
+ * La famille est le point sensible de l'issue : tant que le `2T` était codé en
+ * dur, un in-bord diesel devenu éligible se serait vu diagnostiquer en 2 temps —
+ * mélange 50:1, clapets, link & sync — soit des conseils faux sur un moteur qui
+ * n'a rien de tout cela. Le condensé injecté et la liste de fiches autorisées
+ * sont donc dérivés de la famille, pas d'une constante.
  */
+
+/**
+ * Groupes de familles servis par un corpus de fiches distinct. `outboard_2t`
+ * est le corpus de #515, `inboard` celui de #576 ; toute autre famille n'a pas
+ * de fiche et n'atteint jamais ce service (elle n'est pas éligible).
+ */
+type DiagnosisFamilyGroup = 'outboard_2t' | 'inboard'
+
+function familyGroup(family: EngineFamily | null): DiagnosisFamilyGroup {
+  return family === 'outboard_2t' || family === null ? 'outboard_2t' : 'inboard'
+}
+
+/** Famille d'un contexte de diagnostic, `null` si elle n'est pas renseignée. */
+function inputFamily(engine: { family?: string | null }): EngineFamily | null {
+  return isEngineFamily(engine.family) ? engine.family : null
+}
 
 // Exporté pour le chat public de diagnostic (#602), qui réutilise le même
 // socle de connaissance sans exposer les slugs de fiches aux visiteurs.
@@ -44,8 +68,78 @@ Règle d'or : Compression → Étincelle → Essence, toujours dans cet ordre �
 Golden rule: Compression → Spark → Fuel, always in that order — test from cheapest to most expensive.`,
 }
 
+/** Condensé du corpus in-bord (#576) — diesel ligne d'arbre, saildrive, embase Z, groupe. */
+export const INBOARD_SHEET_DIGESTS: Record<AiSuggestionLocale, string> = {
+  fr: `Fiches de diagnostic disponibles (slug → contenu) :
+- "inboard-cooling" : surchauffe, alarme de température, vapeur à l'échappement. Suivre l'eau de mer dans l'ordre : vanne de coque, crépine, durite écrasée, turbine, couvercle de pompe ; puis le circuit fermé : niveau, courroie, thermostat, échangeur entartré, anodes. Pas d'eau à l'échappement au démarrage = couper immédiatement.
+- "diesel-fuel" : circuit gasoil — la cause n°1 sur un diesel de plaisance, presque toujours de l'eau ou des dépôts. Démarre puis cale, perte de puissance dans la houle : bol du préfiltre décanteur, cartouche, filtre moteur, purge, entrée d'air côté aspiration, pompe d'alimentation, retour d'injecteurs.
+- "diesel-smoke" : couleur des fumées comme aide au tri. Noire = combustion (air, surcharge, contre-pression) ; blanche = eau ou injection ; bleue = huile. À lire moteur chaud, en charge.
+- "wet-exhaust" : échappement humide et waterlock. Coude d'échappement corrodé ou entartré, waterlock plein, tuyau affaissé, col de cygne trop bas, casse-siphon bouché. Risque d'eau dans les cylindres si on insiste au démarreur.
+- "gearbox" : inverseur — pas d'engagement, à-coups. Niveau et couleur de l'huile (laiteuse = eau par le refroidisseur), câble de commande et course du levier, accouplement souple, joint spi de sortie.
+- "shaft-line" : ligne d'arbre et presse-étoupe — vibrations, entrée d'eau au passage de coque. Goutte à goutte réglé, serrage, âge de la tresse, bague hydrolube, jeu d'arbre, alignement, hélice engagée.
+- "saildrive" : entrée d'eau, huile émulsionnée. Le soufflet a une **date de péremption** (typiquement 7 ans) : hors d'âge, c'est un risque de voie d'eau, pas une pièce d'usure ordinaire. Anodes, niveau et aspect de l'huile, joint d'embase, compatibilité de l'antifouling avec l'embase alu.
+- "electrical" : démarrage et charge — coupe-batterie, cosses, batterie de servitude distincte, préchauffage, relais, démarreur, courroie et débit d'alternateur.
+Règle d'or : un diesel a besoin d'air propre, de gasoil propre et de refroidissement. On contrôle d'abord ce qui se voit sans outil (vanne, crépine, bol du préfiltre, niveaux, courroie), avant tout démontage.`,
+  en: `Available diagnostic sheets (slug → content):
+- "inboard-cooling": overheating, temperature alarm, steam at the exhaust. Follow the raw water in order: sea cock, strainer, collapsed hose, impeller, pump cover; then the closed circuit: level, belt, thermostat, scaled heat exchanger, anodes. No water at the exhaust on start-up = shut down immediately.
+- "diesel-fuel": fuel circuit — the #1 cause on a leisure diesel, almost always water or deposits. Starts then stalls, power loss in a swell: pre-filter bowl, element, engine filter, bleeding, air leak on the suction side, lift pump, injector return.
+- "diesel-smoke": exhaust smoke colour as a sorting aid. Black = combustion (air, overload, back pressure); white = water or injection; blue = oil. Read it with a hot engine, under load.
+- "wet-exhaust": wet exhaust and waterlock. Corroded or scaled exhaust elbow, full waterlock, sagging hose, swan neck too low, blocked siphon break. Risk of water in the cylinders if you keep cranking.
+- "gearbox": transmission — no engagement, jerky shifts. Oil level and colour (milky = water through the cooler), control cable and lever travel, damper plate, output seal.
+- "shaft-line": shaft line and stuffing box — vibration, water ingress at the hull fitting. Drip rate, tightening, packing age, cutless bearing, shaft play, alignment, fouled propeller.
+- "saildrive": water ingress, emulsified oil. The diaphragm has an **expiry date** (typically 7 years): out of date, it is a flooding risk, not an ordinary wear part. Anodes, oil level and condition, drive seal, antifouling compatible with the aluminium leg.
+- "electrical": starting and charging — battery switch, terminals, separate service battery, glow plugs, relay, starter, belt and alternator output.
+Golden rule: a diesel needs clean air, clean fuel and cooling. Check what is visible without a tool first (sea cock, strainer, pre-filter bowl, levels, belt), before dismantling anything.`,
+}
+
+/** Condensé injecté dans le prompt système, choisi par la famille du moteur. */
+export function sheetDigestForFamily(
+  family: EngineFamily | null,
+  locale: AiSuggestionLocale
+): string {
+  return familyGroup(family) === 'inboard' ? INBOARD_SHEET_DIGESTS[locale] : SHEET_DIGESTS[locale]
+}
+
+/**
+ * Description de la motorisation posée en tête du prompt système. Remplace le
+ * « mécanicien expert en moteurs hors-bord 2 temps » codé en dur : c'est la
+ * phrase qui décidait du cadre de raisonnement du modèle.
+ */
+const FAMILY_EXPERTISE: Record<DiagnosisFamilyGroup, Record<AiSuggestionLocale, string>> = {
+  outboard_2t: {
+    fr: 'moteurs hors-bord 2 temps',
+    en: '2-stroke outboard',
+  },
+  inboard: {
+    fr: "motorisations in-bord de plaisance — diesel en ligne d'arbre ou saildrive, embase Z et groupe électrogène",
+    en: 'leisure inboard engines — diesel on a shaft line or saildrive, sterndrives and generators',
+  },
+}
+
+/** Libellé de la famille, tel qu'il apparaît dans la ligne « Moteur » du message. */
+const FAMILY_LABELS: Record<EngineFamily, Record<AiSuggestionLocale, string>> = {
+  outboard_2t: { fr: 'hors-bord 2 temps', en: '2-stroke outboard' },
+  outboard_4t: { fr: 'hors-bord 4 temps', en: '4-stroke outboard' },
+  inboard_diesel_shaft: { fr: "in-bord diesel, ligne d'arbre", en: 'inboard diesel, shaft line' },
+  inboard_diesel_saildrive: { fr: 'in-bord diesel, saildrive', en: 'inboard diesel, saildrive' },
+  inboard_petrol: { fr: 'in-bord essence', en: 'inboard petrol' },
+  sterndrive: { fr: 'embase Z', en: 'sterndrive' },
+  pod_drive: { fr: 'propulsion POD', en: 'pod drive' },
+  jet: { fr: 'hydrojet', en: 'jet drive' },
+  electric_outboard: { fr: 'hors-bord électrique', en: 'electric outboard' },
+  electric_inboard: { fr: 'in-bord électrique', en: 'electric inboard' },
+  hybrid: { fr: 'hybride', en: 'hybrid' },
+  generator: { fr: 'groupe électrogène', en: 'generator set' },
+  other: { fr: 'motorisation non précisée', en: 'unspecified engine type' },
+}
+
+const UNKNOWN_FAMILY: Record<AiSuggestionLocale, string> = {
+  fr: 'motorisation non précisée',
+  en: 'unspecified engine type',
+}
+
 const SYSTEM_PROMPTS: Record<AiSuggestionLocale, string> = {
-  fr: `Tu es un mécanicien expert en moteurs hors-bord 2 temps, intégré à une application de gestion de bateaux qui guide l'utilisateur à travers des checklists de diagnostic de panne.
+  fr: `Tu es un mécanicien expert en {expertise}, intégré à une application de gestion de bateaux qui guide l'utilisateur à travers des checklists de diagnostic de panne.
 
 {digest}
 
@@ -55,7 +149,7 @@ Règles impératives :
 - N'invente JAMAIS de spécification chiffrée propre à un modèle de moteur (couple de serrage, degrés d'avance, PSI attendus, résistances) : renvoie au manuel d'atelier du modèle pour toute valeur spécifique. Seuls les ordres de grandeur déjà présents dans les fiches ci-dessus peuvent être cités.
 - Tu recommandes, tu ne décides pas : tes conseils ne remplacent pas le manuel d'atelier.
 Exemple de réponse : {"summary":"Panne d'alimentation probable","recommendedSheet":"fuel","causes":["Évent du réservoir fermé","Filtre à essence bouché","Gicleur de ralenti obstrué"],"nextStep":"Vérifier que la poire d'amorçage durcit complètement"}`,
-  en: `You are an expert 2-stroke outboard mechanic, embedded in a boat management application that walks the user through troubleshooting checklists.
+  en: `You are an expert {expertise} mechanic, embedded in a boat management application that walks the user through troubleshooting checklists.
 
 {digest}
 
@@ -130,8 +224,19 @@ const LABELS: Record<AiSuggestionLocale, DiagnosisLabels> = {
   },
 }
 
-export function buildEngineDiagnosisSystemPrompt(locale: AiSuggestionLocale): string {
-  return SYSTEM_PROMPTS[locale].replace('{digest}', SHEET_DIGESTS[locale])
+/**
+ * Prompt système du diagnostic moteur, cadré par la **famille** (#576).
+ *
+ * `family` absente (contexte ancien, moteur sans motorisation renseignée) →
+ * corpus hors-bord 2 temps, le comportement de #516 à l'identique.
+ */
+export function buildEngineDiagnosisSystemPrompt(
+  locale: AiSuggestionLocale,
+  family: EngineFamily | null = null
+): string {
+  return SYSTEM_PROMPTS[locale]
+    .replace('{expertise}', FAMILY_EXPERTISE[familyGroup(family)][locale])
+    .replace('{digest}', sheetDigestForFamily(family, locale))
 }
 
 export function buildEngineDiagnosisUserMessage(
@@ -141,7 +246,11 @@ export function buildEngineDiagnosisUserMessage(
   const { engine, parts, maintenanceEvents, checklist, mode, userText } = input
   const l = LABELS[locale]
 
-  const engineLine = `${engine.brand ?? l.unknownBrand} ${engine.model ?? ''} (2T, ${engine.hours ?? l.unknownHours}h)`
+  // La famille remplace le « 2T » codé en dur de #516 : c'est la seule ligne du
+  // message qui dise au modèle sur quel type de moteur il raisonne.
+  const family = inputFamily(engine)
+  const familyLabel = family ? FAMILY_LABELS[family][locale] : UNKNOWN_FAMILY[locale]
+  const engineLine = `${engine.brand ?? l.unknownBrand} ${engine.model ?? ''} (${familyLabel}, ${engine.hours ?? l.unknownHours}h)`
 
   const partsList =
     parts.length > 0
@@ -193,7 +302,10 @@ ${userTextBlock}`
  * diagnostic est une réponse structurée dont chaque champ est affiché — un
  * objet partiel ou une fiche inventée ne doivent jamais être persistés.
  */
-export function parseEngineDiagnosisResponse(raw: string): EngineDiagnosisResult {
+export function parseEngineDiagnosisResponse(
+  raw: string,
+  family: EngineFamily | null = null
+): EngineDiagnosisResult {
   let parsed: unknown
   try {
     const match = raw.match(/\{[\s\S]*\}/)
@@ -217,6 +329,14 @@ export function parseEngineDiagnosisResponse(raw: string): EngineDiagnosisResult
     !DIAGNOSTIC_SHEET_SLUGS.includes(recommendedSheet as DiagnosticSheetSlug)
   ) {
     throw new AiInvalidResponseError('Engine diagnosis response references an unknown sheet')
+  }
+  // Une fiche valide dans l'absolu peut être hors sujet pour la motorisation :
+  // renvoyer un diesel vers « link & sync » serait un conseil faux, pas une
+  // simple imprécision. Sans famille connue on ne restreint pas (#516).
+  if (family && !sheetsForEngineFamily(family).some((sheet) => sheet.slug === recommendedSheet)) {
+    throw new AiInvalidResponseError(
+      'Engine diagnosis response references a sheet that does not apply to this engine family'
+    )
   }
   if (typeof nextStep !== 'string' || nextStep.trim().length === 0) {
     throw new AiInvalidResponseError('Engine diagnosis response has no next step')

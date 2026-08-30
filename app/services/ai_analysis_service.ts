@@ -23,6 +23,7 @@ import type {
 } from '#shared/types/ai'
 import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
+import { isEngineFamily } from '#shared/types/engine_catalog'
 
 @inject()
 export default class AiAnalysisService {
@@ -209,8 +210,12 @@ export default class AiAnalysisService {
       const currentUsage = await this.aiTokenQuotaService.getUsage(org.id)
       this.aiTokenQuotaService.assertCanUseTokens(org, currentUsage)
 
+      // La famille du moteur cadre le prompt et restreint les fiches
+      // recommandables (#576) : un diesel ne doit pas être diagnostiqué en 2T.
+      const family = isEngineFamily(input.engine.family) ? input.engine.family : null
+
       const userMessage = buildEngineDiagnosisUserMessage(input, locale)
-      const systemPrompt = buildEngineDiagnosisSystemPrompt(locale)
+      const systemPrompt = buildEngineDiagnosisSystemPrompt(locale, family)
       const systemContent = orgSystemPrompt ? `${orgSystemPrompt}\n\n${systemPrompt}` : systemPrompt
 
       const { content: rawResponse, tokensUsed } = await this.aiService.chat(
@@ -223,7 +228,7 @@ export default class AiAnalysisService {
 
       await this.aiTokenQuotaService.recordUsage(org, tokensUsed)
 
-      const result = parseEngineDiagnosisResponse(rawResponse)
+      const result = parseEngineDiagnosisResponse(rawResponse, family)
 
       await AiAnalysis.create({
         userId,

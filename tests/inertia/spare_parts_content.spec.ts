@@ -92,6 +92,46 @@ describe('Contenu pièces détachées (#517)', () => {
     }
   })
 
+  /**
+   * Invariant de #576 : les deux tables de liens croisés sont réciproques.
+   * Avant, `gearcase` renvoyait vers `lower-unit`, qui renvoie vers `cooling` —
+   * l'aller-retour ne bouclait pas — et `electrical` vers `ignition`, sans
+   * réciproque. Sans ce test, rien n'empêchait la divergence de revenir.
+   */
+  test('le lien fiche → ensemble boucle dans les deux sens (#576)', () => {
+    for (const [sheetSlug, assemblySlug] of Object.entries(DIAGNOSTIC_SHEET_TO_ASSEMBLY)) {
+      expect(
+        SPARE_PART_ASSEMBLIES[assemblySlug].diagnosticSheet,
+        `${sheetSlug} → ${assemblySlug} ne revient pas vers ${sheetSlug}`
+      ).toBe(sheetSlug)
+    }
+  })
+
+  test('toute fiche citée par un ensemble figure dans la table inverse (#576)', () => {
+    for (const assembly of Object.values(SPARE_PART_ASSEMBLIES)) {
+      if (!assembly.diagnosticSheet) continue
+      expect(
+        DIAGNOSTIC_SHEET_TO_ASSEMBLY[assembly.diagnosticSheet],
+        `${assembly.slug} cite ${assembly.diagnosticSheet}, absente de la table inverse`
+      ).toBeDefined()
+    }
+  })
+
+  test('un lien croisé sert au moins une famille commune aux deux côtés (#576)', () => {
+    // Un lien entre une fiche in-bord et un ensemble hors-bord serait valide au
+    // sens des slugs et pourtant inatteignable : aucun moteur ne verrait les deux.
+    for (const [sheetSlug, assemblySlug] of Object.entries(DIAGNOSTIC_SHEET_TO_ASSEMBLY)) {
+      const sheet = DIAGNOSTIC_SHEETS[sheetSlug as keyof typeof DIAGNOSTIC_SHEETS]
+      const shared = SPARE_PART_ASSEMBLIES[assemblySlug].families.filter((family) =>
+        sheet.families.includes(family)
+      )
+      expect(
+        shared.length,
+        `${sheetSlug} et ${assemblySlug} n'ont aucune famille commune`
+      ).toBeGreaterThan(0)
+    }
+  })
+
   test('chaque ensemble déclare au moins une famille de motorisation (#574)', () => {
     for (const assembly of Object.values(SPARE_PART_ASSEMBLIES)) {
       expect(assembly.families.length, `familles manquantes sur ${assembly.slug}`).toBeGreaterThan(

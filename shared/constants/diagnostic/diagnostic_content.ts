@@ -1,14 +1,23 @@
+import {
+  INBOARD_DIESEL_SHEETS,
+  INBOARD_ELECTRICAL_FAMILIES,
+  INBOARD_ELECTRICAL_SECTION,
+  INBOARD_GLOBAL_CHECKLIST,
+} from '#shared/constants/diagnostic/inboard_diesel_sheets'
 import type {
   DiagnosticGlobalChecklist,
   DiagnosticSheet,
   DiagnosticSheetSlug,
   DiagnosticToolRow,
 } from '#shared/types/diagnostic'
+import { ENGINE_FAMILIES, type EngineFamily } from '#shared/types/engine_catalog'
 
 /**
  * Contenu statique des checklists de diagnostic panne hors-bord 2 temps
- * (issue #515). L'ordre des tableaux `steps` est l'ordre d'affichage — du
- * moins cher au plus cher — et n'est pas modifiable par l'utilisateur.
+ * (issue #515), agrégé avec le corpus in-bord de #576
+ * (`inboard_diesel_sheets.ts`). L'ordre des tableaux `steps` est l'ordre
+ * d'affichage — du moins cher au plus cher — et n'est pas modifiable par
+ * l'utilisateur.
  *
  * Les `key` des étapes sont persistées en base (`boat_engine_diagnostic_checks.step_key`)
  * et ne doivent JAMAIS être renommées ; on peut en insérer de nouvelles à
@@ -18,9 +27,21 @@ import type {
  *   fiche 1 → compression, fiche 2 → ignition, fiche 3 → fuel,
  *   fiche 4 → cooling, fiche 5 → gearcase, fiche 6 → electrical,
  *   fiche 7 → timing, fiche 8 → first-contact.
+ *
+ * Chaque fiche déclare depuis #576 les **familles de motorisation** qu'elle
+ * sert : c'est ce qui décide de l'éligibilité au diagnostic, en remplacement du
+ * `kind === 'outboard' && strokeType === '2_stroke'` codé en dur. Le contenu de
+ * ce fichier reste propre au 2 temps (mélange 50:1, clapets, power pack,
+ * link & sync) — sauf `electrical` et `first-contact`, élargies plutôt que
+ * dupliquées.
  */
 
+/** Le corpus de #515 décrit un hors-bord 2 temps, et rien d'autre. */
+const OUTBOARD_2T: readonly EngineFamily[] = ['outboard_2t']
+
 export const GLOBAL_CHECKLIST: DiagnosticGlobalChecklist = {
+  scope: 'global',
+  families: OUTBOARD_2T,
   titleKey: 'diagnostic.global.title',
   introKey: 'diagnostic.global.intro',
   steps: [
@@ -77,6 +98,7 @@ export const GLOBAL_CHECKLIST: DiagnosticGlobalChecklist = {
     },
   ],
   warningKeys: ['diagnostic.global.warnings.waterOnly'],
+  warningTitleKey: 'diagnostic.common.neverDryTitle',
 }
 
 const compressionSheet: DiagnosticSheet = {
@@ -84,6 +106,7 @@ const compressionSheet: DiagnosticSheet = {
   titleKey: 'diagnostic.sheets.compression.title',
   introKey: 'diagnostic.sheets.compression.intro',
   requiresRunningEngine: false,
+  families: OUTBOARD_2T,
   sections: [
     {
       steps: [
@@ -143,6 +166,7 @@ const ignitionSheet: DiagnosticSheet = {
   titleKey: 'diagnostic.sheets.ignition.title',
   introKey: 'diagnostic.sheets.ignition.intro',
   requiresRunningEngine: true,
+  families: OUTBOARD_2T,
   sections: [
     {
       steps: [
@@ -197,6 +221,7 @@ const fuelSheet: DiagnosticSheet = {
   titleKey: 'diagnostic.sheets.fuel.title',
   introKey: 'diagnostic.sheets.fuel.intro',
   requiresRunningEngine: true,
+  families: OUTBOARD_2T,
   sections: [
     {
       titleKey: 'diagnostic.sheets.fuel.sections.tank.title',
@@ -339,6 +364,7 @@ const coolingSheet: DiagnosticSheet = {
   titleKey: 'diagnostic.sheets.cooling.title',
   introKey: 'diagnostic.sheets.cooling.intro',
   requiresRunningEngine: true,
+  families: OUTBOARD_2T,
   sections: [
     {
       steps: [
@@ -386,6 +412,7 @@ const gearcaseSheet: DiagnosticSheet = {
   slug: 'gearcase',
   titleKey: 'diagnostic.sheets.gearcase.title',
   requiresRunningEngine: false,
+  families: OUTBOARD_2T,
   sections: [
     {
       steps: [
@@ -427,8 +454,12 @@ const electricalSheet: DiagnosticSheet = {
   slug: 'electrical',
   titleKey: 'diagnostic.sheets.electrical.title',
   requiresRunningEngine: false,
+  families: [...OUTBOARD_2T, ...INBOARD_ELECTRICAL_FAMILIES],
   sections: [
     {
+      // Batterie, solénoïde et cosses valent pour toutes les motorisations ;
+      // le câblage de trim est propre au hors-bord, d'où la section restreinte.
+      families: OUTBOARD_2T,
       steps: [
         {
           key: 'electrical.battery',
@@ -461,6 +492,7 @@ const electricalSheet: DiagnosticSheet = {
         },
       ],
     },
+    INBOARD_ELECTRICAL_SECTION,
   ],
   warningKeys: [],
 }
@@ -470,6 +502,7 @@ const timingSheet: DiagnosticSheet = {
   titleKey: 'diagnostic.sheets.timing.title',
   introKey: 'diagnostic.sheets.timing.intro',
   requiresRunningEngine: true,
+  families: OUTBOARD_2T,
   sections: [
     {
       steps: [
@@ -565,6 +598,7 @@ const firstContactSheet: DiagnosticSheet = {
   titleKey: 'diagnostic.sheets.first_contact.title',
   introKey: 'diagnostic.sheets.first_contact.intro',
   requiresRunningEngine: true,
+  families: ENGINE_FAMILIES,
   standalone: true,
   sections: [
     {
@@ -618,7 +652,18 @@ export const DIAGNOSTIC_SHEETS: Record<DiagnosticSheetSlug, DiagnosticSheet> = {
   'electrical': electricalSheet,
   'timing': timingSheet,
   'first-contact': firstContactSheet,
+  ...INBOARD_DIESEL_SHEETS,
 }
+
+/**
+ * Checklists globales, une par grande famille (#576). Chacune porte son propre
+ * préfixe de clés : les cases cochées d'un hors-bord et celles d'un in-bord ne
+ * se comptent jamais ensemble.
+ */
+export const GLOBAL_CHECKLISTS: readonly DiagnosticGlobalChecklist[] = [
+  GLOBAL_CHECKLIST,
+  INBOARD_GLOBAL_CHECKLIST,
+]
 
 export const DIAGNOSTIC_TOOLS: readonly DiagnosticToolRow[] = [
   'compression_gauge',
@@ -647,7 +692,7 @@ export const DIAGNOSTIC_TOOLS: readonly DiagnosticToolRow[] = [
  */
 export const ALL_DIAGNOSTIC_STEP_KEYS: ReadonlySet<string> = new Set(
   [
-    ...GLOBAL_CHECKLIST.steps,
+    ...GLOBAL_CHECKLISTS.flatMap((checklist) => [...checklist.steps]),
     ...Object.values(DIAGNOSTIC_SHEETS)
       .filter((sheet) => !sheet.standalone)
       .flatMap((sheet) => sheet.sections.flatMap((section) => [...section.steps])),

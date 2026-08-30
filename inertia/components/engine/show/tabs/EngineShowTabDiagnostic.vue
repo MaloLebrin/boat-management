@@ -6,7 +6,8 @@ import BaseCard from '~/components/base/BaseCard.vue'
 import DiagnosticProgress from '~/components/diagnostic/DiagnosticProgress.vue'
 import DiagnosticResetButton from '~/components/diagnostic/DiagnosticResetButton.vue'
 import DiagnosticStepList from '~/components/diagnostic/DiagnosticStepList.vue'
-import { GLOBAL_CHECKLIST } from '#shared/constants/diagnostic/diagnostic_content'
+import { globalChecklistForFamily } from '#shared/helpers/diagnostic'
+import type { EngineFamily } from '#shared/types/engine_catalog'
 import { useT } from '~/composables/use_t'
 
 const { t } = useT()
@@ -14,43 +15,46 @@ const { t } = useT()
 const props = defineProps<{
   boatId: number
   engineId: number
+  /** Famille du moteur (#576) : elle choisit la checklist globale servie. */
+  family: EngineFamily | null
   checkedStepKeys: string[]
   canManage: boolean
 }>()
 
 const checkedKeys = computed(() => new Set(props.checkedStepKeys))
+const checklist = computed(() => globalChecklistForFamily(props.family))
 const checkedCount = computed(
-  () => GLOBAL_CHECKLIST.steps.filter((step) => checkedKeys.value.has(step.key)).length
+  () => checklist.value?.steps.filter((step) => checkedKeys.value.has(step.key)).length ?? 0
 )
 </script>
 
 <template>
-  <BaseCard padded>
+  <BaseCard v-if="checklist" padded>
     <div class="flex items-start justify-between gap-4">
       <div>
-        <h2 class="text-lg font-semibold text-fg">{{ t('diagnostic.global.title') }}</h2>
-        <p class="mt-1 text-sm text-fg-muted">{{ t('diagnostic.global.intro') }}</p>
+        <h2 class="text-lg font-semibold text-fg">{{ t(checklist.titleKey) }}</h2>
+        <p class="mt-1 text-sm text-fg-muted">{{ t(checklist.introKey) }}</p>
       </div>
       <DiagnosticResetButton v-if="canManage" :boat-id="boatId" :engine-id="engineId" scope="all" />
     </div>
 
     <BaseAlert
-      v-for="warningKey in GLOBAL_CHECKLIST.warningKeys"
+      v-for="warningKey in checklist.warningKeys"
       :key="warningKey"
       variant="warning"
-      :title="t('diagnostic.common.neverDryTitle')"
+      :title="t(checklist.warningTitleKey)"
       class="mt-4"
     >
       {{ t(warningKey) }}
     </BaseAlert>
 
     <div class="mt-6">
-      <DiagnosticProgress :checked="checkedCount" :total="GLOBAL_CHECKLIST.steps.length" />
+      <DiagnosticProgress :checked="checkedCount" :total="checklist.steps.length" />
     </div>
 
     <div class="mt-4">
       <DiagnosticStepList
-        :steps="GLOBAL_CHECKLIST.steps"
+        :steps="checklist.steps"
         :checked-keys="checkedKeys"
         :can-manage="canManage"
         :boat-id="boatId"

@@ -6,7 +6,7 @@ import BaseCard from '~/components/base/BaseCard.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import DiagnosticProgress from '~/components/diagnostic/DiagnosticProgress.vue'
 import DiagnosticTable from '~/components/diagnostic/DiagnosticTable.vue'
-import { DIAGNOSTIC_TOOLS, GLOBAL_CHECKLIST } from '#shared/constants/diagnostic/diagnostic_content'
+import { DIAGNOSTIC_TOOLS } from '#shared/constants/diagnostic/diagnostic_content'
 import type {
   DiagnosticEngineRow,
   DiagnosticTable as DiagnosticTableType,
@@ -19,8 +19,6 @@ defineProps<{
 }>()
 
 const { t } = useT()
-
-const totalSteps = GLOBAL_CHECKLIST.steps.length
 
 const toolingTable: DiagnosticTableType = {
   id: 'tooling',
@@ -66,7 +64,7 @@ const toolingTable: DiagnosticTableType = {
           </h3>
           <p class="mt-1 text-sm text-fg-muted">{{ engine.boatName }}</p>
           <div class="mt-4">
-            <DiagnosticProgress :checked="engine.checkedCount" :total="totalSteps" />
+            <DiagnosticProgress :checked="engine.checkedCount" :total="engine.totalSteps" />
           </div>
           <p class="mt-3 text-sm font-medium text-brand">
             {{ t('diagnostic.index.openChecklist') }}

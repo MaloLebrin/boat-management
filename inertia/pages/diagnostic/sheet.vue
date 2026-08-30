@@ -12,6 +12,7 @@ import {
   SPARE_PART_ASSEMBLIES,
 } from '#shared/constants/spare_parts/spare_parts_content'
 import type { DiagnosticSheetSlug } from '#shared/types/diagnostic'
+import type { EngineFamily } from '#shared/types/engine_catalog'
 import { useT } from '~/composables/use_t'
 import { engineDisplayTitle } from '~/utils/boat_enum_labels'
 
@@ -23,6 +24,7 @@ const props = defineProps<{
     model: string | null
     serialNumber: string | null
     kind: string
+    family: EngineFamily | null
     status: string
   }
   sheetSlug: DiagnosticSheetSlug
@@ -45,9 +47,9 @@ const breadcrumb = computed(() => [
 ])
 
 /**
- * Lien croisé vers l'ensemble de pièces détachées concerné (#517) — les
- * moteurs éligibles au diagnostic (hors-bord 2 temps) le sont toujours à
- * l'identification de pièces (hors-bord).
+ * Lien croisé vers l'ensemble de pièces détachées concerné (#517) — un moteur
+ * éligible au diagnostic l'est toujours à l'identification de pièces : les deux
+ * parcours suivent la même famille de motorisation (#574, #576).
  */
 const partsAssemblyLink = computed(() => {
   const assemblySlug = DIAGNOSTIC_SHEET_TO_ASSEMBLY[props.sheetSlug]
@@ -83,6 +85,7 @@ const partsAssemblyLink = computed(() => {
     <div class="mt-6">
       <DiagnosticSheetContent
         :sheet="sheet"
+        :family="engine.family"
         :checked-keys="checkedKeys"
         :can-manage="canManage"
         :boat-id="boat.id"

@@ -2,8 +2,9 @@
   "diagnostic": {
     "resetDone": "Checklist reset.",
     "stepNotFound": "Unknown diagnostic step.",
-    "notEligible": "Troubleshooting checklists only apply to 2-stroke outboard engines.",
-    "sheetNotFound": "Diagnostic sheet not found."
+    "notEligible": "Troubleshooting checklists are not available for this engine family.",
+    "sheetNotFound": "Diagnostic sheet not found.",
+    "sheetNotForEngine": "This diagnostic sheet does not apply to this engine family."
   },
   "engine": {
     "added": "Engine added.",

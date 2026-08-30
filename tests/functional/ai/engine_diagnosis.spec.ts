@@ -44,7 +44,23 @@ async function makeEligibleSetup() {
   const engine = await BoatEngineFactory.merge({
     boatId: boat.id,
     kind: 'outboard',
+    fuel: 'essence',
     strokeType: '2_stroke',
+    family: 'outboard_2t',
+  }).create()
+  return { user, boat, engine, url: `/ai/boats/${boat.id}/engines/${engine.id}/diagnosis` }
+}
+
+/** Même montage pour un in-bord diesel saildrive, éligible depuis #576. */
+async function makeSaildriveSetup() {
+  const user = await createAdminUser()
+  const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+  const engine = await BoatEngineFactory.merge({
+    boatId: boat.id,
+    kind: 'inboard',
+    fuel: 'diesel',
+    strokeType: '4_stroke',
+    family: 'inboard_diesel_saildrive',
   }).create()
   return { user, boat, engine, url: `/ai/boats/${boat.id}/engines/${engine.id}/diagnosis` }
 }
@@ -84,7 +100,7 @@ test.group('AI engine diagnosis — engineDiagnosis (functional, #516)', (group)
     assert.lengthOf(await AiAnalysis.all(), 0)
   })
 
-  test('an ineligible engine (4-stroke) flashes an error and stores nothing', async ({
+  test('an ineligible engine (4-stroke outboard) flashes an error and stores nothing', async ({
     assert,
     client,
   }) => {
@@ -93,7 +109,9 @@ test.group('AI engine diagnosis — engineDiagnosis (functional, #516)', (group)
     const engine = await BoatEngineFactory.merge({
       boatId: boat.id,
       kind: 'outboard',
+      fuel: 'essence',
       strokeType: '4_stroke',
+      family: 'outboard_4t',
     }).create()
     swapAiService(VALID_RESPONSE)
 
@@ -106,7 +124,7 @@ test.group('AI engine diagnosis — engineDiagnosis (functional, #516)', (group)
     response.assertStatus(302)
     response.assertFlashMessage(
       'error',
-      'Troubleshooting checklists only apply to 2-stroke outboard engines.'
+      'Troubleshooting checklists are not available for this engine family.'
     )
     assert.lengthOf(await AiAnalysis.all(), 0)
   })
@@ -143,6 +161,66 @@ test.group('AI engine diagnosis — engineDiagnosis (functional, #516)', (group)
     // Consommation décomptée du quota mensuel
     const usage = await AiTokenUsage.query().where('organizationId', user.organizationId!).first()
     assert.equal(Number(usage!.tokensUsed), 42)
+  })
+
+  /**
+   * Le risque central de #576 : c'est la ligne « Moteur » et le condensé de
+   * fiches injectés qui décident du cadre de raisonnement du modèle. Un diesel
+   * cadré en 2 temps produirait des conseils faux.
+   */
+  test('an inboard diesel is prompted as such, never as a 2-stroke (#576)', async ({
+    assert,
+    client,
+  }) => {
+    const { user, url } = await makeSaildriveSetup()
+    const calls = swapAiService(
+      JSON.stringify({ ...JSON.parse(VALID_RESPONSE), recommendedSheet: 'diesel-fuel' })
+    )
+
+    const response = await client
+      .post(url)
+      .loginAs(user)
+      .form({ mode: 'symptoms', symptoms: 'starts then stalls, loses power in a swell' })
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertFlashMissing('error')
+
+    assert.lengthOf(calls, 1)
+    const [system, userMessage] = calls[0]
+
+    assert.include(system.content, '"diesel-fuel"')
+    assert.include(system.content, '"saildrive"')
+    assert.notInclude(system.content, '2-stroke')
+    assert.notInclude(system.content, '"timing"')
+
+    assert.include(userMessage.content, 'inboard diesel, saildrive')
+    assert.notInclude(userMessage.content, '(2T,')
+
+    const analyses = await AiAnalysis.all()
+    assert.equal(JSON.parse(analyses[0].responseText).recommendedSheet, 'diesel-fuel')
+  })
+
+  test('a sheet outside the engine family is rejected and nothing is stored (#576)', async ({
+    assert,
+    client,
+  }) => {
+    const { user, url } = await makeSaildriveSetup()
+    // « fuel » est une fiche valide — mais c'est celle du carburateur 2 temps.
+    swapAiService(VALID_RESPONSE)
+
+    const response = await client
+      .post(url)
+      .loginAs(user)
+      .form({ mode: 'symptoms', symptoms: 'starts then stalls' })
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertFlashMessage(
+      'error',
+      'The AI assistant returned an unusable response. Please try again.'
+    )
+    assert.lengthOf(await AiAnalysis.all(), 0)
   })
 
   test('progress mode sends the checked steps without requiring symptoms', async ({
