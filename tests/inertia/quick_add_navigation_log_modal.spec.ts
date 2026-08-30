@@ -69,4 +69,44 @@ describe('QuickAddNavigationLogModal', () => {
     await wrapper.find('.nav-log-form').trigger('click')
     expect(wrapper.emitted('update:open')).toEqual([[false]])
   })
+
+  describe('single boat fleet (#603)', () => {
+    const singleBoat: FleetBoatOption[] = [{ id: 7, name: 'Mistral' }]
+
+    test('skips the selector and opens the form on the only boat', () => {
+      const wrapper = mount(QuickAddNavigationLogModal, {
+        props: { open: true, boats: singleBoat, portOptions: [], defaultBoatId: null },
+      })
+      expect(wrapper.find('select').exists()).toBe(false)
+      expect(wrapper.find('.nav-log-form').text()).toBe('7')
+    })
+
+    test('keeps the only boat selected after a close/reopen cycle', async () => {
+      const wrapper = mount(QuickAddNavigationLogModal, {
+        props: { open: true, boats: singleBoat, portOptions: [], defaultBoatId: null },
+      })
+      await wrapper.find('.nav-log-form').trigger('click')
+      await wrapper.setProps({ open: false })
+      await wrapper.setProps({ open: true })
+      expect(wrapper.find('select').exists()).toBe(false)
+      expect(wrapper.find('.nav-log-form').text()).toBe('7')
+    })
+
+    test('still shows the selector when the fleet has several boats', () => {
+      const wrapper = mount(QuickAddNavigationLogModal, {
+        props: { open: true, boats, portOptions: [], defaultBoatId: null },
+      })
+      expect(wrapper.find('select').exists()).toBe(true)
+      expect(wrapper.find('.nav-log-form').exists()).toBe(false)
+    })
+
+    test('selects the boat when the fleet narrows down to one', async () => {
+      const wrapper = mount(QuickAddNavigationLogModal, {
+        props: { open: true, boats, portOptions: [], defaultBoatId: null },
+      })
+      await wrapper.setProps({ boats: singleBoat })
+      expect(wrapper.find('select').exists()).toBe(false)
+      expect(wrapper.find('.nav-log-form').text()).toBe('7')
+    })
+  })
 })

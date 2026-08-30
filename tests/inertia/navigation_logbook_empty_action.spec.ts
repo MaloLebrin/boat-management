@@ -52,3 +52,28 @@ test('empty state routes to the boats list when no boat is filtered', async () =
   await action.trigger('click')
   expect(visit).toHaveBeenCalledWith('/boats')
 })
+
+test('empty state routes straight to the only boat of the fleet (#603)', async () => {
+  const w = mount(Logbook, {
+    props: { ...baseProps, boats: [{ id: 7, name: 'Mistral' }], selectedBoatId: null },
+  })
+  const action = w.get('[data-empty-action]')
+  expect(action.attributes('data-label')).toBe('navigation.logbook.empty.actionBoat')
+  await action.trigger('click')
+  expect(visit).toHaveBeenCalledWith('/boats/7/navigation')
+})
+
+test('empty state still routes to the boats list with several boats', async () => {
+  const w = mount(Logbook, {
+    props: {
+      ...baseProps,
+      boats: [
+        { id: 7, name: 'Mistral' },
+        { id: 8, name: 'Zephyr' },
+      ],
+      selectedBoatId: null,
+    },
+  })
+  await w.get('[data-empty-action]').trigger('click')
+  expect(visit).toHaveBeenCalledWith('/boats')
+})
