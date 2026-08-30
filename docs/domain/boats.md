@@ -81,6 +81,22 @@ Référence routes: `start/routes/boats.ts`.
 Référence: `app/controllers/boat_equipment_controller.ts` et `app/services/boat_service.ts`.
 
 - **Engines**
+  - `GET /engines` (`engines.index`, `start/routes/engines.ts`) — **inventaire transverse** (#598)
+    - Controller: `app/controllers/engines_controller.ts` → `index`
+    - Service: `app/services/engine_list_service.ts` → `listForUser`
+    - Transformer: `app/transformers/engine_list_transformer.ts` → `toEngineListItem`
+    - Page: `inertia/pages/engines/index.vue`
+    - ACL: `bouncer.with(BoatPolicy).authorize('view')` — même capability que `/boats/:id` ;
+      un `boat_owner` est redirigé vers `/owner/boats` (`boatOwnerPortalRedirect`).
+    - Filtres: `?q=` (marque, modèle, n° de série **et nom du bateau**), `?boatId=`, `?kind=`,
+      `?status=`, `?family=`, `?sort=` (`recent` | `brand` | `hours`), `?direction=`, `?page=`,
+      `?perPage=`. Vocabulaires fermés : une valeur hors enum est ignorée. Un `boatId` d'une
+      autre organisation est traité comme absent et le filtre renvoyé au front est remis à `0`.
+    - Prop `summary` : compteurs par statut calculés sur **tout le périmètre**, pas sur la page —
+      ils ne bougent ni au feuilletage ni à la recherche (`retired` compté avec `out_of_service`).
+    - Scoping : `boat_engines` n'a pas d'`organizationId`, le service charge d'abord les bateaux
+      de l'organisation puis borne la requête par `whereIn('boatId', …)` — pas de jointure, qui
+      rendrait `id`, `name` et `updated_at` ambigus dans un `ModelQueryBuilder`.
   - `POST /boats/:boatId/engines` → `BoatEquipmentController.storeEngine`
     - Service: `BoatService.createEngine`
   - `GET /boats/:boatId/engines/:engineId/edit` → `BoatEquipmentController.editEngine`
