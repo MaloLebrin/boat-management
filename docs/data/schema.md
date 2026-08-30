@@ -202,7 +202,7 @@ alimentée par `engine_catalog_seeder` depuis `database/data/engine_catalog/part
 - `notes` (nullable)
 - `estimatedCost`, `actualCost` (decimal 10,2, nullable)
 - référence polymorphe: `equipmentType` (`generic | safety | engine | sail | rig`), `equipmentId`
-- `inspectionId` (FK nullable, réservé usage futur)
+- `inspectionId` (FK `boat_inspections` nullable, SET NULL) — renseigné quand l'action a été levée depuis un état des lieux (#311) ; supprimer l'inspection ne détruit pas l'action
 - `createdBy` (FK users)
 - `resolvedAt` (timestamp nullable, auto-positionné au passage à `done`)
 
@@ -315,6 +315,29 @@ Fiches CRM (module `crm_invoicing`).
 - instantané client : `clientName`, `clientEmail`, `clientPhone`
 - `notes`, `totalPrice`
 - `createdAt`, `updatedAt`
+
+### boat_inspections
+
+États des lieux d'une réservation (check-out au départ, check-in au retour). Voir `docs/domain/inspections.md`.
+
+- `id`, `reservationId` (FK `boat_reservations` cascade), `organizationId` (FK cascade)
+- `kind` : `checkout | checkin` (contrainte CHECK) — unique `(reservation_id, kind)` : un seul état des lieux de chaque type par réservation
+- `performedAt` (timestamp)
+- `fuelLevel` (int 0–100, nullable), `engineHours` (decimal 6,2, nullable)
+- `notes` (text nullable) — le constat hors-checklist
+- `createdAt`, `updatedAt`
+
+### boat_inspection_items
+
+Constats structurés de la checklist d'état des lieux (#584). Le contenu des points de contrôle vit dans le corpus statique `shared/constants/inspections/inspection_checklist_content.ts` (clés stables jamais renommées, ciblage par catégorie de bateau #571) — la table ne persiste que les constats, sur le modèle de `boat_engine_diagnostic_checks`.
+
+- `id`
+- `boatInspectionId` (FK `boat_inspections` cascade)
+- `itemKey` (string 64) — clé stable d'un point du corpus (`<section>.<slug>`), validée contre le corpus côté service
+- `state` : `ok | remark | damage` (contrainte CHECK) — l'absence de ligne signifie « non contrôlé »
+- `note` (text nullable) — obligatoire côté validation quand `state` vaut `remark` ou `damage`, effacée au retour à `ok`
+- `createdAt`, `updatedAt`
+- unique `(boat_inspection_id, item_key)`, index sur `boat_inspection_id`
 
 ### boat_fuel_logs
 

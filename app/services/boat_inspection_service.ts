@@ -3,13 +3,19 @@ import {
   BoatInspectionValidationError,
 } from '#exceptions/inspection_errors'
 import BoatInspection from '#models/boat_inspection'
+import BoatInspectionItem from '#models/boat_inspection_item'
 import type BoatReservation from '#models/boat_reservation'
 import type Organization from '#models/organization'
 import type User from '#models/user'
 import { CloudinaryFolders } from '#services/cloudinary_service'
 import MediaService from '#services/media_service'
 import { inject } from '@adonisjs/core'
-import type { CreateInspectionPayload, UpdateInspectionPayload } from '#shared/types/inspection'
+import { ALL_INSPECTION_ITEM_KEYS } from '#shared/constants/inspections/inspection_checklist_content'
+import type {
+  CreateInspectionPayload,
+  SetInspectionItemPayload,
+  UpdateInspectionPayload,
+} from '#shared/types/inspection'
 import { toUtcFromLocalInput } from '#shared/helpers/date'
 
 function assertReservationScope(user: User, reservation: BoatReservation) {
@@ -113,6 +119,51 @@ export default class BoatInspectionService {
 
     await inspection.save()
     return inspection
+  }
+
+  /** Constats de la checklist d'une inspection (#584) — le frontend les rapproche du corpus par clé. */
+  async listItems(user: User, reservation: BoatReservation, inspectionId: number) {
+    await this.findForReservation(user, reservation, inspectionId)
+
+    return await BoatInspectionItem.query()
+      .where('boatInspectionId', inspectionId)
+      .orderBy('itemKey', 'asc')
+  }
+
+  /**
+   * Enregistre (ou met à jour) le constat d'un point de contrôle. L'upsert sur
+   * l'unique `(boat_inspection_id, item_key)` rend l'opération idempotente ;
+   * repasser un point en `ok` efface sa note, devenue sans objet.
+   */
+  async setItem(
+    user: User,
+    reservation: BoatReservation,
+    inspectionId: number,
+    payload: SetInspectionItemPayload
+  ) {
+    const inspection = await this.findForReservation(user, reservation, inspectionId)
+
+    if (!ALL_INSPECTION_ITEM_KEYS.has(payload.itemKey)) {
+      throw new BoatInspectionValidationError('unknown checklist item', 'itemNotFound')
+    }
+
+    return await BoatInspectionItem.updateOrCreate(
+      { boatInspectionId: inspection.id, itemKey: payload.itemKey },
+      {
+        state: payload.state,
+        note: payload.state === 'ok' ? null : (payload.note?.trim() ?? null),
+      }
+    )
+  }
+
+  /** Repasse un point de contrôle à « non contrôlé » en supprimant sa ligne. */
+  async clearItem(user: User, reservation: BoatReservation, inspectionId: number, itemKey: string) {
+    const inspection = await this.findForReservation(user, reservation, inspectionId)
+
+    await BoatInspectionItem.query()
+      .where('boatInspectionId', inspection.id)
+      .where('itemKey', itemKey)
+      .delete()
   }
 
   async deleteForReservation(

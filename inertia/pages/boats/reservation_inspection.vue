@@ -7,11 +7,12 @@ import InspectionComparison from '~/components/reservations/inspection/Inspectio
 import InspectionPanel from '~/components/reservations/inspection/InspectionPanel.vue'
 import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
+import type { BoatCategory } from '#shared/types/boat_catalog'
 import type { BoatReservationRow } from '~/types/reservation'
 import type { InspectionWithPhotos } from '~/types/inspection'
 
 const props = defineProps<{
-  boat: { id: number; name: string }
+  boat: { id: number; name: string; category: BoatCategory | null }
   reservation: BoatReservationRow
   inspections: InspectionWithPhotos[]
   canEdit: boolean
@@ -70,6 +71,8 @@ const breadcrumbs = computed(() => [
         :reservation-id="reservation.id"
         kind="checkout"
         :inspection="checkout"
+        :category="boat.category"
+        :counterpart="null"
         :can-edit="canEdit"
         :can-delete="canDelete"
         :can-manage-actions="canManageActions"
@@ -81,6 +84,8 @@ const breadcrumbs = computed(() => [
         :reservation-id="reservation.id"
         kind="checkin"
         :inspection="checkin"
+        :category="boat.category"
+        :counterpart="checkout"
         :can-edit="canEdit"
         :can-delete="canDelete"
         :can-manage-actions="canManageActions"

@@ -6,10 +6,12 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
+import InspectionChecklist from '~/components/reservations/inspection/InspectionChecklist.vue'
 import InspectionPhotos from '~/components/reservations/inspection/InspectionPhotos.vue'
 import InspectionDefects from '~/components/reservations/inspection/InspectionDefects.vue'
 import { useT } from '~/composables/use_t'
 import { isoToDatetimeLocalValue, tzOffsetMinutes } from '~/utils/local_datetime'
+import type { BoatCategory } from '#shared/types/boat_catalog'
 import type { InspectionKind, InspectionWithPhotos } from '~/types/inspection'
 
 const props = defineProps<{
@@ -17,6 +19,10 @@ const props = defineProps<{
   reservationId: number
   kind: InspectionKind
   inspection: InspectionWithPhotos | null
+  /** Catégorie effective du bateau — filtre la checklist (#584). */
+  category: BoatCategory | null
+  /** Inspection de check-out affichée en regard sur le panneau check-in (#584). */
+  counterpart: InspectionWithPhotos | null
   canEdit: boolean
   canDelete: boolean
   canManageActions: boolean
@@ -117,6 +123,18 @@ function deleteInspection() {
     <p v-else-if="!inspection" class="text-sm text-fg-muted">
       {{ t(`inspections.empty.${kind}`) }}
     </p>
+
+    <InspectionChecklist
+      v-if="inspection"
+      :boat-id="boatId"
+      :reservation-id="reservationId"
+      :inspection-id="inspection.id"
+      :category="category"
+      :items="inspection.items"
+      :counterpart-items="counterpart ? counterpart.items : null"
+      :can-edit="canEdit"
+      :can-manage-actions="canManageActions"
+    />
 
     <InspectionPhotos
       v-if="inspection"
