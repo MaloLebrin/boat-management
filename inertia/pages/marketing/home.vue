@@ -14,6 +14,7 @@ import HomeProblemSection from '~/components/marketing/home/HomeProblemSection.v
 import HomePillarsSection from '~/components/marketing/home/HomePillarsSection.vue'
 import HomeModularOfferSection from '~/components/marketing/home/HomeModularOfferSection.vue'
 import HomeFeatureSection from '~/components/marketing/home/HomeFeatureSection.vue'
+import HomeDiagnosisSection from '~/components/marketing/home/HomeDiagnosisSection.vue'
 import HomeCaseStudySection from '~/components/marketing/home/HomeCaseStudySection.vue'
 import HomeHowItWorksSection from '~/components/marketing/home/HomeHowItWorksSection.vue'
 import HomePersonasSection from '~/components/marketing/home/HomePersonasSection.vue'
@@ -172,6 +173,17 @@ interface PageProps {
         cta: { label: string; href: string }
         items: FaqItem[]
       }
+      diagnosis: {
+        eyebrow: string
+        title: string
+        titleHighlight: string
+        subtitle: string
+        items: string[]
+        ctaLabel: string
+        ctaHref: string
+        note: string
+        disclaimer: string
+      }
       demo: {
         eyebrow: string
         title: string
@@ -300,6 +312,9 @@ const websiteSchema = computed(() =>
     bg-class="bg-cream"
     is-ai
   />
+
+  <!-- 4bis. Diagnostic de panne IA — essai gratuit sans compte (#609) -->
+  <HomeDiagnosisSection v-bind="t.home.diagnosis" />
 
   <!-- 5. How it works -->
   <HomeHowItWorksSection
