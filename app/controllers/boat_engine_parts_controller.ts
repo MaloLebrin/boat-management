@@ -61,7 +61,13 @@ export default class BoatEnginePartsController {
 
     return inertia.render('boats/engine_part_show', {
       boat: { id: boat.id, name: boat.name },
-      engine: { id: engine.id, kind: engine.kind, brand: engine.brand, model: engine.model },
+      engine: {
+        id: engine.id,
+        kind: engine.kind,
+        brand: engine.brand,
+        model: engine.model,
+        serialNumber: engine.serialNumber,
+      },
       part: {
         id: part.id,
         designation: part.designation,

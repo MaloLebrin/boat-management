@@ -24,7 +24,7 @@ const props = defineProps<{
 const { t } = useT()
 const { formatDateTime } = useDateFormat()
 
-const engineOptions = computed(() => toNavigationEngineOptions(props.boat.engines))
+const engineOptions = computed(() => toNavigationEngineOptions(t, props.boat.engines))
 
 const showUpdateForm = ref(false)
 const showFuelForm = ref(false)

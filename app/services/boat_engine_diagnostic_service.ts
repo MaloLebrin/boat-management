@@ -34,7 +34,16 @@ export default class BoatEngineDiagnosticService {
       .where('organizationId', user.organizationId)
       .select(['id', 'name'])
       .preload('engines', (query) =>
-        query.select(['id', 'boatId', 'brand', 'model', 'kind', 'strokeType', 'status'])
+        query.select([
+          'id',
+          'boatId',
+          'brand',
+          'model',
+          'serialNumber',
+          'kind',
+          'strokeType',
+          'status',
+        ])
       )
 
     const eligible = boats.flatMap((boat) =>

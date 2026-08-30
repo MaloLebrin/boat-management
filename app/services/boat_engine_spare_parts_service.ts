@@ -60,6 +60,7 @@ export default class BoatEngineSparePartsService {
           'boatId',
           'brand',
           'model',
+          'serialNumber',
           'kind',
           'fuel',
           'strokeType',

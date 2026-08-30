@@ -70,6 +70,7 @@ export interface DiagnosticEngineRow {
   boatName: string
   brand: string | null
   model: string | null
+  serialNumber: string | null
   kind: string
   status: string
   /** Nombre d'étapes cochées sur la checklist globale. */

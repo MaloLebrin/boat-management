@@ -13,6 +13,7 @@ export function toDiagnosticEngineRow(
     boatName: boat.name,
     brand: engine.brand,
     model: engine.model,
+    serialNumber: engine.serialNumber,
     kind: engine.kind,
     status: engine.status,
     checkedCount,

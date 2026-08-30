@@ -1,11 +1,15 @@
 import type { BoatShowEngine, NavigationLogEngineOption } from '~/types/boat_show'
+import { engineSerialSuffix } from '~/utils/boat_enum_labels'
 
 /** Engine statuses that make an engine unavailable for hour tracking. */
 const INACTIVE_ENGINE_STATUSES = ['out_of_service', 'retired']
 
-function engineLabel(engine: Pick<BoatShowEngine, 'id' | 'brand' | 'model'>): string {
+function engineLabel(
+  t: (key: string) => string,
+  engine: Pick<BoatShowEngine, 'id' | 'brand' | 'model' | 'serialNumber'>
+): string {
   const label = [engine.brand, engine.model].filter(Boolean).join(' ').trim()
-  return label || `#${engine.id}`
+  return `${label || `#${engine.id}`}${engineSerialSuffix(t, engine.serialNumber)}`
 }
 
 /**
@@ -13,9 +17,10 @@ function engineLabel(engine: Pick<BoatShowEngine, 'id' | 'brand' | 'model'>): st
  * only active engines (an out-of-service / retired engine can't accrue hours).
  */
 export function toNavigationEngineOptions(
-  engines: Pick<BoatShowEngine, 'id' | 'brand' | 'model' | 'status'>[]
+  t: (key: string) => string,
+  engines: Pick<BoatShowEngine, 'id' | 'brand' | 'model' | 'serialNumber' | 'status'>[]
 ): NavigationLogEngineOption[] {
   return engines
     .filter((e) => !INACTIVE_ENGINE_STATUSES.includes(e.status))
-    .map((e) => ({ id: e.id, label: engineLabel(e) }))
+    .map((e) => ({ id: e.id, label: engineLabel(t, e) }))
 }

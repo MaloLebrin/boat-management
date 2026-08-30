@@ -4,6 +4,7 @@ import {
   engineDisplayTitle,
   engineFuelLabel,
   engineKindLabel,
+  engineSerialSuffix,
   maintenanceSubjectLabel,
   rigTypeLabel,
   sailTypeLabel,
@@ -108,6 +109,41 @@ describe('engineDisplayTitle', () => {
     expect(engineDisplayTitle(t, { brand: null, model: null, kind: 'legacy-value' })).toBe(
       'legacy-value'
     )
+  })
+
+  test('always appends the serial number when the engine has one (#601)', () => {
+    expect(
+      engineDisplayTitle(t, {
+        brand: 'Volvo Penta',
+        model: 'D2-40',
+        kind: 'inboard',
+        serialNumber: 'SN-12345',
+      })
+    ).toBe('Volvo Penta D2-40 · translated:boats.engines.sn SN-12345')
+  })
+
+  test('appends the serial number after the kind fallback too (#601)', () => {
+    expect(
+      engineDisplayTitle(t, { brand: null, model: null, kind: 'inboard', serialNumber: 'X99' })
+    ).toBe('translated:boats.options.engineKind.inboard · translated:boats.engines.sn X99')
+  })
+
+  test('leaves the title untouched when the serial number is absent', () => {
+    expect(
+      engineDisplayTitle(t, { brand: 'Yamaha', model: 'F8', kind: 'outboard', serialNumber: null })
+    ).toBe('Yamaha F8')
+  })
+})
+
+describe('engineSerialSuffix', () => {
+  test('builds the « · SN xxx » suffix for a known serial number (#601)', () => {
+    expect(engineSerialSuffix(t, 'ABC-123')).toBe(' · translated:boats.engines.sn ABC-123')
+  })
+
+  test('is empty for a missing serial number', () => {
+    expect(engineSerialSuffix(t, null)).toBe('')
+    expect(engineSerialSuffix(t, undefined)).toBe('')
+    expect(engineSerialSuffix(t, '')).toBe('')
   })
 })
 

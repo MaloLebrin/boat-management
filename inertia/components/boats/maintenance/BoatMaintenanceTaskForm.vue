@@ -9,7 +9,7 @@ import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import { prefillInterval, useMaintenanceOperations } from '~/composables/use_maintenance_operations'
 import { useT } from '~/composables/use_t'
 import type { BoatShowDetail } from '~/types/boat_show'
-import { engineKindLabel, sailTypeLabel } from '~/utils/boat_enum_labels'
+import { engineKindLabel, engineSerialSuffix, sailTypeLabel } from '~/utils/boat_enum_labels'
 import type { MaintenanceSubject } from '#shared/constants/maintenance/maintenance_subjects'
 import type { MaintenanceOperation } from '#shared/types/maintenance'
 
@@ -57,7 +57,7 @@ const subjectOptions = computed<ReadonlyArray<{ label: string; value: Maintenanc
 const engineOptions = computed(() =>
   props.boat.engines.map((e) => ({
     value: String(e.id),
-    label: `${engineKindLabel(t, e.kind) ?? e.kind} · ${e.brand ?? ''} ${e.model ?? ''}`.trim(),
+    label: `${`${engineKindLabel(t, e.kind) ?? e.kind} · ${e.brand ?? ''} ${e.model ?? ''}`.trim()}${engineSerialSuffix(t, e.serialNumber)}`,
   }))
 )
 
