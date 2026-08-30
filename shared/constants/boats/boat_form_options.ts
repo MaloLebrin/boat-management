@@ -95,6 +95,22 @@ export const ENGINE_STROKE_TYPE_OPTIONS = [
   { value: '4_stroke', label: '4-stroke' },
 ] as const
 
+/**
+ * Matériaux de voile (#578) — vocabulaire fermé (`SAIL_MATERIALS`) qui remplace
+ * le texte libre de `boat_sails.material`. Les libellés ci-dessous sont un
+ * repli EN : l'affichage passe par `t('boats.options.sailMaterial.<slug>')`.
+ * La liste et l'ordre suivent `SAIL_MATERIALS` — vérifié par test.
+ */
+export const SAIL_MATERIAL_OPTIONS = [
+  { value: 'dacron', label: 'Dacron (woven polyester)' },
+  { value: 'laminate', label: 'Laminate (Mylar/Pentex)' },
+  { value: 'hydranet', label: 'Hydra Net' },
+  { value: 'membrane', label: 'Membrane (3Di, DFi, carbon/aramid)' },
+  { value: 'nylon_spi', label: 'Nylon (spinnaker)' },
+  { value: 'cuben', label: 'Cuben / Ultra PE' },
+  { value: 'other', label: 'Other' },
+] as const
+
 export const SAIL_TYPE_OPTIONS = [
   { value: 'main', label: 'Main' },
   { value: 'genoa', label: 'Genoa' },

@@ -9,6 +9,7 @@ import app from '@adonisjs/core/services/app'
 import type { I18n } from '@adonisjs/i18n'
 import { formatDate } from '#shared/helpers/date_format'
 import { isEngineKindCaption } from '#shared/helpers/maintenance'
+import { isSailMaterial } from '#shared/types/boat'
 import PDFDocument from 'pdfkit'
 
 type EventRow = {
@@ -314,7 +315,15 @@ export default class MaintenanceLogPdfService {
 
         const specs: Array<[string, string]> = (
           [
-            [t('sailFields.material'), sail.material],
+            [t('sailFields.sailmaker'), sail.sailmaker],
+            // Libellé traduit pour les slugs de l'enum (#578), valeur brute en
+            // repli pour les lignes antérieures à la normalisation.
+            [
+              t('sailFields.material'),
+              sail.material && isSailMaterial(sail.material)
+                ? tOpt('sailMaterial', sail.material)
+                : sail.material,
+            ],
             [
               t('sailFields.area'),
               sail.areaM2 !== null
@@ -694,7 +703,10 @@ export default class MaintenanceLogPdfService {
 
     for (const sail of sails) {
       const name = tOpt('sailType', sail.sailType)
-      const material = sail.material ?? '—'
+      const material =
+        sail.material && isSailMaterial(sail.material)
+          ? tOpt('sailMaterial', sail.material)
+          : (sail.material ?? '—')
       const status = sail.status ? tOpt('equipmentStatus', sail.status) : '—'
       rows.push([name, material, status, mechanicalEquipmentStatusColor(sail.status)])
     }

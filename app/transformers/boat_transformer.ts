@@ -331,6 +331,8 @@ function toSail(s: Boat['sails'][number]) {
     material: s.material,
     reefPoints: s.reefPoints,
     status: s.status,
+    sailmaker: s.sailmaker,
+    sailLoftId: s.sailLoftId,
   }
 }
 

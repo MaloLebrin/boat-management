@@ -74,6 +74,10 @@ export type BoatSailPayload = {
   notes?: string | null
   purchasePrice?: string | null
   purchasedAt?: Date | string | DateTime | null
+  /** Voilerie en texte libre (#578) — source de vérité, jamais contrainte par le catalogue. */
+  sailmaker?: string | null
+  /** Rattachement au référentiel `sail_lofts` (#578), facultatif. */
+  sailLoftId?: number | null
 }
 
 export type BoatRigPayload = {
@@ -87,6 +91,27 @@ export type BoatRigPayload = {
 
 export const PART_WEAR_STATES = ['new', 'good', 'worn', 'to_replace', 'damaged'] as const
 export type PartWearState = (typeof PART_WEAR_STATES)[number]
+
+/**
+ * Matériaux de voile (#578) — vocabulaire fermé qui remplace le texte libre de
+ * `boat_sails.material`. Les valeurs déjà en base sont normalisées par
+ * migration best-effort ; une valeur non mappable devient `other` et la saisie
+ * d'origine est recopiée dans `notes` (aucune information perdue).
+ */
+export const SAIL_MATERIALS = [
+  'dacron',
+  'laminate',
+  'hydranet',
+  'membrane',
+  'nylon_spi',
+  'cuben',
+  'other',
+] as const
+export type SailMaterial = (typeof SAIL_MATERIALS)[number]
+
+export function isSailMaterial(value: unknown): value is SailMaterial {
+  return typeof value === 'string' && (SAIL_MATERIALS as readonly string[]).includes(value)
+}
 
 export type BoatEnginePartPayload = {
   designation: string

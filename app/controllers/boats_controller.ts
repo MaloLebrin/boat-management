@@ -7,6 +7,7 @@ import AuditLogService from '#services/audit_log_service'
 import BoatCatalogService from '#services/boat_catalog_service'
 import EngineCatalogService from '#services/engine_catalog_service'
 import EquipmentCatalogService from '#services/equipment_catalog_service'
+import SailLoftService from '#services/sail_loft_service'
 import BoatDocumentService from '#services/boat_document_service'
 import BoatEquipmentActionService from '#services/boat_equipment_action_service'
 import BoatFuelLogService from '#services/boat_fuel_log_service'
@@ -78,6 +79,7 @@ export default class BoatsController {
     private boatCatalogService: BoatCatalogService,
     private engineCatalogService: EngineCatalogService,
     private equipmentCatalogService: EquipmentCatalogService,
+    private sailLoftService: SailLoftService,
     private safetyComplianceService: BoatSafetyComplianceService
   ) {}
 
@@ -268,6 +270,12 @@ export default class BoatsController {
         request.qs().equipmentBrandId
       )
 
+      // Le formulaire voile est aussi monté depuis cette page (carte Voiles et
+      // modale d'ajout) : il lui faut le référentiel des voileries (#578). Pas
+      // de modèles derrière une voilerie, donc pas de rechargement partiel —
+      // une seule liste statique.
+      const sailLoftProps = await this.sailLoftService.formProps()
+
       const canManageEquipment = canManageMaintenance
       const canManageDocuments = canManageMaintenance
       const canExport = user.organization ? this.quotaService.canExport(user.organization) : false
@@ -304,6 +312,7 @@ export default class BoatsController {
         }),
         ...engineCatalog,
         ...equipmentCatalog,
+        ...sailLoftProps,
 
         // Groupe « maintenance » : onglets Aperçu, Historique, Tâches, Fiches,
         // Actions équipement et Documents administratifs.

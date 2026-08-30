@@ -2,6 +2,7 @@ import {
   ENGINE_FUEL_OPTIONS,
   ENGINE_KIND_OPTIONS,
   RIG_TYPE_OPTIONS,
+  SAIL_MATERIAL_OPTIONS,
   SAIL_TYPE_OPTIONS,
 } from '../../shared/constants/boats/boat_form_options'
 import { MAINTENANCE_SUBJECT_OPTIONS } from '../../shared/constants/maintenance/maintenance_subjects'
@@ -32,6 +33,14 @@ export function engineFuelLabel(t: T, value: string | null | undefined): string 
 /** Translated label for a sail's type enum value (main/genoa/jib...). */
 export function sailTypeLabel(t: T, value: string | null | undefined): string | null {
   return labelFor(SAIL_TYPE_OPTIONS, 'boats.options.sailType', t, value)
+}
+
+/**
+ * Translated label for a sail's material enum value (dacron/laminate/membrane...),
+ * falling back to the raw value for legacy rows stored before #578.
+ */
+export function sailMaterialLabel(t: T, value: string | null | undefined): string | null {
+  return labelFor(SAIL_MATERIAL_OPTIONS, 'boats.options.sailMaterial', t, value)
 }
 
 /** Translated label for a rig's type enum value (sloop/cutter/ketch...). */

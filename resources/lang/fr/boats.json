@@ -124,6 +124,14 @@
     },
     "viewDetail": "Voir le détail"
   },
+  "sailFields": {
+    "areaM2": "Surface (m²)",
+    "material": "Matériau",
+    "sailmaker": "Voilerie",
+    "sailmakerPlaceholder": "ex. North Sails, Incidence, Delta Voiles…",
+    "sailmakerHint": "Choisissez une voilerie ou saisissez la vôtre — toute saisie est acceptée.",
+    "noSailmakerMatch": "Aucune voilerie correspondante — votre saisie sera conservée telle quelle."
+  },
   "rig": {
     "title": "Gréement",
     "editTitle": "Modifier le gréement",
@@ -196,6 +204,15 @@
       "spinnaker": "Spinnaker",
       "gennaker": "Gennaker",
       "storm_jib": "Tourmentin",
+      "other": "Autre"
+    },
+    "sailMaterial": {
+      "dacron": "Dacron (polyester tissé)",
+      "laminate": "Laminé (Mylar/Pentex)",
+      "hydranet": "Hydra Net",
+      "membrane": "Membrane (3Di, DFi, carbone/aramide)",
+      "nylon_spi": "Nylon (spi)",
+      "cuben": "Cuben / Ultra PE",
       "other": "Autre"
     },
     "rigType": {
@@ -853,6 +870,7 @@
     },
     "sailFields": {
       "type": "Type",
+      "sailmaker": "Voilerie",
       "material": "Matériau",
       "area": "Surface",
       "areaUnit": "{value} m²",
@@ -971,6 +989,7 @@
     },
     "fields": {
       "sailType": "Type de voile",
+      "sailmaker": "Voilerie",
       "areaM2": "Surface (m²)",
       "material": "Matériau",
       "reefPoints": "Points de ris",

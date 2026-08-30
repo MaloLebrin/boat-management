@@ -155,6 +155,20 @@ par `database/seeders/equipment_catalog_seeder.ts`, jamais par les utilisateurs.
 - `aliases` (`jsonb`)
 - timestamps
 
+### sail_lofts
+
+Référentiel global des voileries (#578), sans `organizationId` : alimenté par
+`database/seeders/sail_loft_seeder.ts`, jamais par les utilisateurs. Miroir simplifié de
+`equipment_brands` — **pas de table de modèles** : une voile est un produit sur mesure.
+
+- `id`
+- `slug` (unique, **stable à vie** — jamais renommé)
+- `name` (nom commercial officiel, casse et accents compris — jamais traduit), `country`
+- `aliases` (`jsonb`) — orthographes et anciens noms (`elvstrom`, `incidences`, `p&b`), base de
+  `SailLoftService.resolveLoft()`
+- `isActive`
+- timestamps
+
 ### boat_generic_equipment
 
 Équipements génériques d'un bateau (électronique, électricité, mouillage, pont, énergie, confort,
@@ -190,7 +204,16 @@ plomberie).
 
 - `id`, `boatId`
 - `sailType`
-- `areaM2`, `material`, `reefPoints`
+- `areaM2`, `reefPoints`
+- `material` — enum `SAIL_MATERIALS` (#578) : les valeurs libres historiques ont été normalisées
+  par migration best-effort, le résidu non mappable est passé en `other` avec la saisie d'origine
+  recopiée dans `notes`
+- `sailmaker` — voilerie en texte libre (#578), **source de vérité**, jamais contrainte par le
+  référentiel
+- `sailLoftId` (FK `sail_lofts`, nullable, `onDelete set null`) — rattachement facultatif au
+  référentiel
+- `status`, `notes`
+- `purchasePrice`, `purchasedAt`
 - `manufacturedAt`
 
 ### boat_rigs

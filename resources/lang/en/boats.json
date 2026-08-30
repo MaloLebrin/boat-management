@@ -124,6 +124,14 @@
     },
     "viewDetail": "View details"
   },
+  "sailFields": {
+    "areaM2": "Area (m²)",
+    "material": "Material",
+    "sailmaker": "Sailmaker",
+    "sailmakerPlaceholder": "e.g. North Sails, Incidence, Delta Voiles…",
+    "sailmakerHint": "Pick a sail loft or type your own — any entry is accepted.",
+    "noSailmakerMatch": "No matching sail loft — your entry will be kept as typed."
+  },
   "rig": {
     "title": "Rig",
     "editTitle": "Edit rig",
@@ -196,6 +204,15 @@
       "spinnaker": "Spinnaker",
       "gennaker": "Gennaker",
       "storm_jib": "Storm jib",
+      "other": "Other"
+    },
+    "sailMaterial": {
+      "dacron": "Dacron (woven polyester)",
+      "laminate": "Laminate (Mylar/Pentex)",
+      "hydranet": "Hydra Net",
+      "membrane": "Membrane (3Di, DFi, carbon/aramid)",
+      "nylon_spi": "Nylon (spinnaker)",
+      "cuben": "Cuben / Ultra PE",
       "other": "Other"
     },
     "rigType": {
@@ -826,6 +843,7 @@
     },
     "sailFields": {
       "type": "Type",
+      "sailmaker": "Sailmaker",
       "material": "Material",
       "area": "Area",
       "areaUnit": "{value} m²",
@@ -971,6 +989,7 @@
     },
     "fields": {
       "sailType": "Sail type",
+      "sailmaker": "Sailmaker",
       "areaM2": "Area (m²)",
       "material": "Material",
       "reefPoints": "Reef points",

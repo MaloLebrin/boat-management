@@ -13,6 +13,7 @@ import {
   ENGINE_KIND_OPTIONS,
   ENGINE_FUEL_OPTIONS,
   ENGINE_STROKE_TYPE_OPTIONS,
+  SAIL_MATERIAL_OPTIONS,
   SAIL_TYPE_OPTIONS,
   RIG_TYPE_OPTIONS,
   NAVIGATION_CATEGORY_OPTIONS,
@@ -112,6 +113,19 @@ test('sailTypeOptions labels are i18n keys', () => {
   sailTypeOptions.value.forEach((opt, i) => {
     expect(opt.value).toBe(SAIL_TYPE_OPTIONS[i].value)
     expect(opt.label).toBe(`boats.options.sailType.${SAIL_TYPE_OPTIONS[i].value}`)
+  })
+})
+
+test('sailMaterialOptions length matches source constant', () => {
+  const { sailMaterialOptions } = mountComposable()
+  expect(sailMaterialOptions.value).toHaveLength(SAIL_MATERIAL_OPTIONS.length)
+})
+
+test('sailMaterialOptions labels are i18n keys', () => {
+  const { sailMaterialOptions } = mountComposable()
+  sailMaterialOptions.value.forEach((opt, i) => {
+    expect(opt.value).toBe(SAIL_MATERIAL_OPTIONS[i].value)
+    expect(opt.label).toBe(`boats.options.sailMaterial.${SAIL_MATERIAL_OPTIONS[i].value}`)
   })
 })
 
