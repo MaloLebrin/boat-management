@@ -140,6 +140,32 @@ test.group('EngineCatalogService — listBrands', (group) => {
     assert.lengthOf(searched, 1)
     assert.equal(searched[0].slug, 'volvo-penta')
   })
+
+  test('expose les alias — la liste du formulaire cherche comme resolveBrand', async ({
+    assert,
+  }) => {
+    await seedBrands()
+    const service = await app.container.make(EngineCatalogService)
+
+    const brands = await service.listBrands()
+    const mercury = brands.find((brand) => brand.slug === 'mercury-mariner')
+
+    // Sans eux, `mariner` ne remonte rien dans le combobox alors que le serveur
+    // sait rapprocher la saisie : la marque absorbée devient introuvable.
+    assert.includeMembers(mercury?.aliases ?? [], ['mariner'])
+
+    // Une marque sans alias en base retombe sur un tableau vide, jamais `null` :
+    // le front itère dessus sans garde.
+    await EngineBrand.create({
+      slug: 'sans-alias',
+      name: 'Sans Alias',
+      families: ['inboard_diesel'],
+      isActive: true,
+    })
+    const refreshed = await service.listBrands()
+    const bare = refreshed.find((brand) => brand.slug === 'sans-alias')
+    assert.deepEqual(bare?.aliases, [])
+  })
 })
 
 test.group('EngineCatalogService — listModels', (group) => {

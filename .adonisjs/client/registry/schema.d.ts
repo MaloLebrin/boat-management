@@ -43,6 +43,18 @@ export interface Registry {
       errorResponse: unknown
     }
   }
+  'health.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/up'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/health_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/health_controller').default['show']>>>
+    }
+  }
   'dashboard': {
     methods: ["GET","HEAD"]
     pattern: '/dashboard'
@@ -1265,6 +1277,54 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/crew_role_pdf_controller').default['download']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/crew_role_pdf_controller').default['download']>>>
+    }
+  }
+  'boats.navigationLogs.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/boats/:boatId/navigation-logs/:logId'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; logId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/navigation_logs_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/navigation_logs_controller').default['show']>>>
+    }
+  }
+  'boats.navigationLogs.entries.store': {
+    methods: ["POST"]
+    pattern: '/boats/:boatId/navigation-logs/:logId/entries'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/navigation_log').createNavigationLogEntryValidator)>>
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; logId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/navigation_log').createNavigationLogEntryValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/navigation_log_entries_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/navigation_log_entries_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'boats.navigationLogs.entries.update': {
+    methods: ["PATCH"]
+    pattern: '/boats/:boatId/navigation-logs/:logId/entries/:entryId'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/navigation_log').updateNavigationLogEntryValidator)>>
+      paramsTuple: [ParamValue, ParamValue, ParamValue]
+      params: { boatId: ParamValue; logId: ParamValue; entryId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/navigation_log').updateNavigationLogEntryValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/navigation_log_entries_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/navigation_log_entries_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'boats.navigationLogs.entries.destroy': {
+    methods: ["DELETE"]
+    pattern: '/boats/:boatId/navigation-logs/:logId/entries/:entryId'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue, ParamValue]
+      params: { boatId: ParamValue; logId: ParamValue; entryId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/navigation_log_entries_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/navigation_log_entries_controller').default['destroy']>>>
     }
   }
   'boats.adminDocuments.store': {

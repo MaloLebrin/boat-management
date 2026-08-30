@@ -58,6 +58,9 @@ const brandOptions = computed<ComboboxOption[]>(() =>
     value: String(b.id),
     label: b.name,
     hint: b.families.map((f) => t(`boats.options.engineCatalogFamily.${f}`)).join(' · '),
+    // Les alias du catalogue rendent la liste aussi tolérante que
+    // `resolveBrand` côté serveur : `omc`, `merc`, `VP` remontent leur marque.
+    keywords: b.aliases,
   }))
 )
 

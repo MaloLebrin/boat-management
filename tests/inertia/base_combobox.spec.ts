@@ -10,7 +10,7 @@ import BaseCombobox from '../../inertia/components/base/BaseCombobox.vue'
 const OPTIONS = [
   { value: 'beneteau', label: 'Bénéteau', hint: 'Voilier monocoque' },
   { value: 'jeanneau', label: 'Jeanneau' },
-  { value: 'zodiac', label: 'Zodiac' },
+  { value: 'zodiac', label: 'Zodiac', keywords: ['bombard', 'zodiac nautic'] },
 ]
 
 function mountCombobox(modelValue = '') {
@@ -50,6 +50,24 @@ test('filtre sans tenir compte de la casse ni des accents', async () => {
   const options = w.findAll('[role="option"]')
   expect(options.length).toBe(1)
   expect(options[0].text()).toContain('Bénéteau')
+})
+
+test('un mot-clé remonte l’option sans jamais s’afficher', async () => {
+  const w = mountCombobox('bombard')
+  await w.find('input').trigger('focus')
+
+  const options = w.findAll('[role="option"]')
+  expect(options.length).toBe(1)
+  expect(options[0].text()).toContain('Zodiac')
+  // Le mot-clé sert la recherche, il n'entre pas dans le libellé affiché.
+  expect(options[0].text()).not.toContain('bombard')
+})
+
+test('une option sans mot-clé n’est pas remontée par la saisie d’un autre', async () => {
+  const w = mountCombobox('bombard')
+  await w.find('input').trigger('focus')
+
+  expect(w.text()).not.toContain('Jeanneau')
 })
 
 test('émet la saisie brute — une valeur hors catalogue reste acceptée', async () => {

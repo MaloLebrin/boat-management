@@ -110,6 +110,10 @@ export type ScannedRoutes = {
     'boats.navigationLogs.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue} }
     'boats.navigationLogs.crew.sync': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue} }
     'boats.navigationLogs.crewRole.download': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue} }
+    'boats.navigationLogs.show': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue} }
+    'boats.navigationLogs.entries.store': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue} }
+    'boats.navigationLogs.entries.update': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue,'entryId': ParamValue} }
+    'boats.navigationLogs.entries.destroy': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue,'entryId': ParamValue} }
     'boats.adminDocuments.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'boats.adminDocuments.update': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'documentId': ParamValue} }
     'boats.adminDocuments.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'documentId': ParamValue} }
@@ -334,6 +338,7 @@ export type ScannedRoutes = {
     'boats.genericEquipment.show': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'itemId': ParamValue} }
     'boats.simulator': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.navigationLogs.crewRole.download': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue} }
+    'boats.navigationLogs.show': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue} }
     'boats.reservations.index': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'boats.reservations.inspection.show': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
     'boats.reservations.contract.show': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
@@ -449,6 +454,7 @@ export type ScannedRoutes = {
     'boats.genericEquipment.show': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'itemId': ParamValue} }
     'boats.simulator': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.navigationLogs.crewRole.download': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue} }
+    'boats.navigationLogs.show': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue} }
     'boats.reservations.index': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'boats.reservations.inspection.show': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
     'boats.reservations.contract.show': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
@@ -562,6 +568,7 @@ export type ScannedRoutes = {
     'boats.equipmentActions.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'boats.fuelLogs.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'boats.navigationLogs.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
+    'boats.navigationLogs.entries.store': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue} }
     'boats.adminDocuments.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'boats.position.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'boats.reservations.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
@@ -631,6 +638,7 @@ export type ScannedRoutes = {
     'boats.navigationLogs.update': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue} }
     'boats.navigationLogs.close': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue} }
     'boats.navigationLogs.crew.sync': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue} }
+    'boats.navigationLogs.entries.update': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue,'entryId': ParamValue} }
     'boats.reservations.update': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
     'ports.pontoons.updatePosition': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'pontoonId': ParamValue} }
     'ports.mouillages.updatePosition': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'mouillageId': ParamValue} }
@@ -666,6 +674,7 @@ export type ScannedRoutes = {
     'boats.equipmentActions.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'actionId': ParamValue} }
     'boats.fuelLogs.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue} }
     'boats.navigationLogs.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue} }
+    'boats.navigationLogs.entries.destroy': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue,'entryId': ParamValue} }
     'boats.adminDocuments.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'documentId': ParamValue} }
     'boats.reservations.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
     'boats.reservations.inspections.destroy': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue,'inspectionId': ParamValue} }

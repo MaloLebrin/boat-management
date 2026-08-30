@@ -5,6 +5,9 @@ export interface ApiDefinition {
   eventStream: typeof routes['event_stream']
   subscribe: typeof routes['subscribe']
   unsubscribe: typeof routes['unsubscribe']
+  health: {
+    show: typeof routes['health.show']
+  }
   dashboard: typeof routes['dashboard']
   designSystem: typeof routes['design_system']
   sitemap: typeof routes['sitemap']
@@ -126,6 +129,12 @@ export interface ApiDefinition {
       }
       crewRole: {
         download: typeof routes['boats.navigationLogs.crewRole.download']
+      }
+      show: typeof routes['boats.navigationLogs.show']
+      entries: {
+        store: typeof routes['boats.navigationLogs.entries.store']
+        update: typeof routes['boats.navigationLogs.entries.update']
+        destroy: typeof routes['boats.navigationLogs.entries.destroy']
       }
     }
     adminDocuments: {

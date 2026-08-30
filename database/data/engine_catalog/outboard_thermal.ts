@@ -97,11 +97,14 @@ export const OUTBOARD_THERMAL_BRANDS: readonly EngineBrandSeed[] = [
   },
   {
     slug: 'mercury-mariner',
-    name: 'Mercury',
+    // `mariner` est la marque jumelle historique : le corpus pièces détachées
+    // (#517) les traite ensemble, d'où le slug commun — stable à vie. Le nom
+    // les porte toutes les deux, comme `Johnson / Evinrude` : la liste du
+    // formulaire n'affiche que le `name`, un propriétaire de Mariner doit y
+    // reconnaître sa marque sans savoir qu'elle a été absorbée par Mercury.
+    name: 'Mercury / Mariner',
     country: 'US',
     families: ['outboard_thermal'],
-    // `mariner` est la marque jumelle historique : le corpus pièces détachées
-    // (#517) les traite ensemble, d'où le slug commun — stable à vie.
     aliases: ['mercury', 'mariner', 'mercury marine', 'mercury mariner', 'merc'],
     modelDefaults: { fuel: 'essence' },
     plateLocationKey: 'parts.identify.plate.mercury_mariner.location',

@@ -18,6 +18,13 @@ export interface ComboboxOption {
   label: string
   /** Ligne secondaire (pays, catégorie…), affichée en gris sous le libellé. */
   hint?: string
+  /**
+   * Termes qui doivent faire remonter l'option sans jamais s'afficher : alias,
+   * anciens noms, marques absorbées (`mariner` → « Mercury / Mariner », `VP` →
+   * « Volvo Penta »). Sans eux, une option n'est trouvable que sous son nom
+   * commercial exact.
+   */
+  keywords?: readonly string[]
 }
 
 const props = withDefaults(
@@ -65,8 +72,9 @@ const resolvedError = computed(() => {
 })
 
 /**
- * Filtrage insensible à la casse et aux accents, sur le libellé comme sur la
- * valeur : taper « bene » doit remonter « Bénéteau ».
+ * Filtrage insensible à la casse et aux accents, sur le libellé, la valeur et
+ * les mots-clés : taper « bene » doit remonter « Bénéteau », « mariner »
+ * « Mercury / Mariner ».
  */
 function fold(value: string): string {
   return value
@@ -75,11 +83,14 @@ function fold(value: string): string {
     .toLowerCase()
 }
 
+function matches(option: ComboboxOption, needle: string): boolean {
+  if (fold(option.label).includes(needle) || fold(option.value).includes(needle)) return true
+  return (option.keywords ?? []).some((keyword) => fold(keyword).includes(needle))
+}
+
 const filtered = computed(() => {
   const needle = fold(props.modelValue.trim())
-  const source = needle
-    ? props.options.filter((o) => fold(o.label).includes(needle) || fold(o.value).includes(needle))
-    : props.options
+  const source = needle ? props.options.filter((o) => matches(o, needle)) : props.options
   return source.slice(0, props.maxVisible)
 })
 

@@ -105,6 +105,13 @@ export interface EngineBrandOption {
   name: string
   country: string | null
   families: EngineCatalogFamily[]
+  /**
+   * Orthographes et anciens noms, tels que `EngineBrand.aliases`. Exposés pour
+   * que la recherche du formulaire réponde comme `resolveBrand` côté serveur :
+   * `VP` doit remonter Volvo Penta, `omc` Johnson / Evinrude. Sans eux la liste
+   * ne connaît que le nom commercial, et une marque absorbée reste introuvable.
+   */
+  aliases: string[]
 }
 
 /**
