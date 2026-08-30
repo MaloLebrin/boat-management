@@ -176,6 +176,32 @@ la nav et la carte ports du dashboard sont masquées via `effectiveQuotas.canMan
 - Types frontend: `inertia/types/budget.ts`
 - Source backend: `BudgetController.show`
 
+### Diagnostic de panne (#515, #516, #576)
+
+- Pages (GET `/diagnostic`, `/boats/:boatId/engines/:engineId/diagnostic[/sheets/:sheetSlug]`) :
+  - `inertia/pages/diagnostic/index.vue` — moteurs éligibles de l'organisation ; la progression se
+    lit sur `engine.totalSteps`, propre à la **famille** du moteur (#576), plus sur une constante
+    globale — hors-bord et in-bord n'ont pas la même checklist
+  - `inertia/pages/diagnostic/checklist.vue` — checklist globale résolue par la famille
+    (`globalChecklistForFamily()`), titre, intro et avertissements portés par la checklist elle-même
+  - `inertia/pages/diagnostic/sheet.vue` — fiche détaillée, `family` passée au contenu
+  - `inertia/pages/diagnostic/first_contact.vue` — fiche autonome d'achat d'occasion (état local)
+- Composants :
+  - `diagnostic/DiagnosticSheetContent.vue` — sections **filtrées par famille**
+    (`sectionsForFamily()`) : `electrical` est élargie aux in-bord sans être dupliquée, un hors-bord
+    n'y voit pas les bougies de préchauffage ni un diesel le câblage de trim. Le rappel avant essai
+    moteur suit aussi la famille (« jamais à sec » / « vanne de coque ouverte »)
+  - `diagnostic/DiagnosticStepList.vue`, `DiagnosticProgress.vue`, `DiagnosticResetButton.vue`,
+    `DiagnosticTable.vue`, `DiagnosticAiPanel.vue`
+  - `engine/show/tabs/EngineShowTabDiagnostic.vue` — reçoit `family` et rend la checklist de cette
+    famille ; le badge d'onglet de `boats/engine_show.vue` compte sur la même
+- Contenu statique : `shared/constants/diagnostic/diagnostic_content.ts` (corpus hors-bord 2 temps)
+  et `shared/constants/diagnostic/inboard_diesel_sheets.ts` (corpus in-bord) — clés i18n
+  `diagnostic.*`, aucune règle d'éligibilité dupliquée dans un template
+  (`isDiagnosticEligibleEngine()`, `#shared/helpers/diagnostic`)
+- Source backend : `BoatEngineDiagnosticController`, `AiController.engineDiagnosis`
+- Détail du domaine : `docs/domain/diagnostic.md`
+
 ### Pièces détachées (#517, #574, #575)
 
 - Pages (GET `/spare-parts`, `/boats/:boatId/engines/:engineId/spare-parts[/assemblies/:assemblySlug]`):
