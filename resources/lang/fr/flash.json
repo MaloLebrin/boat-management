@@ -249,6 +249,12 @@
     "deleted": "Contrat supprimé.",
     "invalidTransition": "Ce changement de statut n'est pas autorisé."
   },
+  "publicDiagnosis": {
+    "quotaExhausted": "Vous avez utilisé vos diagnostics gratuits. Créez un compte pour continuer à entretenir votre bateau avec FleetAi.",
+    "notFound": "Conversation introuvable.",
+    "conversationCompleted": "Ce diagnostic est terminé. Démarrez une nouvelle conversation pour décrire une autre panne.",
+    "maxMessagesReached": "Cette conversation a atteint sa taille maximale. Démarrez une nouvelle conversation."
+  },
   "quota": {
     "boatsExceeded": "Vous avez atteint la limite de bateaux de votre plan. Passez à un plan supérieur pour en ajouter.",
     "membersExceeded": "Vous avez atteint la limite de membres de votre plan. Passez à un plan supérieur pour en ajouter.",

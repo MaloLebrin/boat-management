@@ -19,7 +19,9 @@ import { DIAGNOSTIC_SHEET_SLUGS, type DiagnosticSheetSlug } from '#shared/types/
  * recommander que des fiches existantes (1–8).
  */
 
-const SHEET_DIGESTS: Record<AiSuggestionLocale, string> = {
+// Exporté pour le chat public de diagnostic (#602), qui réutilise le même
+// socle de connaissance sans exposer les slugs de fiches aux visiteurs.
+export const SHEET_DIGESTS: Record<AiSuggestionLocale, string> = {
   fr: `Fiches de diagnostic disponibles (slug → contenu) :
 - "compression" (fiche 1) : compression faible ou inégale. Critère n°1 : l'écart entre cylindres (< 12 % = bon, ≥ 13 % = mauvais), pas la valeur brute. Réparation chère (segments, joint de culasse).
 - "ignition" (fiche 2) : pas d'étincelle ou étincelle faible. Du plus simple au plus cher : coupe-circuit, bougies neuves à l'écartement vérifié, bobines (gel du dos sec/craquelé = morte), redresseur, régime de lancement ≥ 250 tr/min, masses, stator/timer base/power pack mesurés en ohms. Aucun cylindre = cause commune ; un seul cylindre = bougie ou bobine.

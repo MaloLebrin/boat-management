@@ -20,6 +20,15 @@ export const contactThrottle = limiter.define('contact', (ctx) => {
   return limiter.allowRequests(5).every('10 minutes').usingKey(`contact_${ctx.request.ip()}`)
 })
 
+// Chat IA public de diagnostic (#602) : endpoint anonyme dont chaque requête
+// déclenche un appel Mistral synchrone — plus strict que `aiThrottle`.
+export const publicDiagnosisThrottle = limiter.define('public_diagnosis', (ctx) => {
+  return limiter
+    .allowRequests(6)
+    .every('1 minute')
+    .usingKey(`public_diag_${ctx.auth.user?.id ?? ctx.request.ip()}`)
+})
+
 // Abonnements Web Push (#497) : le navigateur ne (ré)abonne qu'à l'activation
 // ou au chargement — au-delà, c'est un script.
 export const pushThrottle = limiter.define('push', (ctx) => {

@@ -40,6 +40,48 @@ export class AiAnalysisSchema extends BaseModel {
   declare userId: number
 }
 
+export class AiDiagnosisConversationSchema extends BaseModel {
+  static $columns = [
+    'context',
+    'createdAt',
+    'id',
+    'locale',
+    'messages',
+    'organizationId',
+    'result',
+    'status',
+    'token',
+    'tokensUsed',
+    'updatedAt',
+    'userId',
+  ] as const
+  $columns = AiDiagnosisConversationSchema.$columns
+  @column()
+  declare context: any | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare locale: string
+  @column()
+  declare messages: any
+  @column()
+  declare organizationId: number | null
+  @column()
+  declare result: any | null
+  @column()
+  declare status: string
+  @column()
+  declare token: string
+  @column()
+  declare tokensUsed: number
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
+  @column()
+  declare userId: number | null
+}
+
 export class AiTokenUsageSchema extends BaseModel {
   static $columns = [
     'createdAt',
