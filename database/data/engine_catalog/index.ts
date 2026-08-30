@@ -1,5 +1,9 @@
 import { slugifyCatalogName } from '#shared/helpers/boat_catalog'
-import type { EngineBrandSeed, EngineFamily, EngineModelSeed } from '#shared/types/engine_catalog'
+import type {
+  EngineBrandSeed,
+  EngineCatalogFamily,
+  EngineModelSeed,
+} from '#shared/types/engine_catalog'
 import { GENERATOR_BRANDS } from './generator.js'
 import { INBOARD_DIESEL_BRANDS } from './inboard_diesel.js'
 import { INBOARD_PETROL_BRANDS } from './inboard_petrol.js'
@@ -48,7 +52,7 @@ export const ENGINE_CATALOG_BRANDS: readonly EngineBrandSeed[] = (() => {
 
 export interface NormalizedEngineModel extends EngineModelSeed {
   slug: string
-  family: EngineFamily
+  family: EngineCatalogFamily
 }
 
 /**
@@ -67,7 +71,7 @@ export function normalizeEngineBrandModels(brand: EngineBrandSeed): NormalizedEn
         ...brand.modelDefaults,
         ...seed,
         slug: seed.slug ?? slugifyCatalogName(seed.name),
-        family: seed.family ?? (family as EngineFamily),
+        family: seed.family ?? (family as EngineCatalogFamily),
         modelCode: seed.modelCode ?? (brand.modelCodeFromName ? seed.name : undefined),
       })
     }

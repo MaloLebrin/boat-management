@@ -1,6 +1,6 @@
 import EngineBrand from '#models/engine_brand'
 import type { EngineFuel } from '#shared/constants/boats/boat_form_options'
-import type { EngineFamily, EngineStrokeType } from '#shared/types/engine_catalog'
+import type { EngineCatalogFamily, EngineStrokeType } from '#shared/types/engine_catalog'
 import { BaseModel, belongsTo, column } from '@adonisjs/lucid/orm'
 import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 import { DateTime } from 'luxon'
@@ -31,7 +31,7 @@ export default class EngineModel extends BaseModel {
   declare modelCode: string | null
 
   @column()
-  declare family: EngineFamily
+  declare family: EngineCatalogFamily
 
   @column({ consume: (value: unknown) => (value === null ? null : Number(value)) })
   declare powerHp: number | null

@@ -6,6 +6,7 @@ import type Organization from '#models/organization'
 import type User from '#models/user'
 import { CloudinaryFolders } from '#services/cloudinary_service'
 import MediaService from '#services/media_service'
+import { engineFamilyFromSignals } from '#shared/helpers/engine_family'
 import type { BoatEnginePayload } from '#shared/types/boat'
 import { assertBoatInUserOrg, toDateOrNull } from '#utils/boat_utils'
 import { inject } from '@adonisjs/core'
@@ -17,6 +18,19 @@ export type { BoatEnginePayload }
 export default class BoatEngineService {
   constructor(private mediaService: MediaService) {}
 
+  /**
+   * Famille de motorisation (#574) : celle saisie, sinon la meilleure
+   * déduction de `kind`/`fuel`/`strokeType`.
+   *
+   * Le formulaire propose la famille, il ne l'impose pas ; un moteur créé par
+   * un import ou une API sans ce champ doit malgré tout arriver avec la même
+   * valeur qu'un moteur backfillé par la migration — sans quoi la nomenclature
+   * de pièces dépendrait de la porte d'entrée.
+   */
+  private resolveFamily(payload: BoatEnginePayload): string | null {
+    return payload.family ?? engineFamilyFromSignals(payload)
+  }
+
   async create(user: User, boat: Boat, payload: BoatEnginePayload) {
     assertBoatInUserOrg(user, boat)
 
@@ -25,6 +39,7 @@ export default class BoatEngineService {
       kind: payload.kind,
       fuel: payload.fuel ?? null,
       strokeType: payload.strokeType ?? null,
+      family: this.resolveFamily(payload),
       brand: payload.brand ?? null,
       model: payload.model ?? null,
       // Rattachement au catalogue (#573) : `brand`/`model` restent alimentés,
@@ -53,6 +68,7 @@ export default class BoatEngineService {
     engine.kind = payload.kind
     engine.fuel = payload.fuel ?? null
     engine.strokeType = payload.strokeType ?? null
+    engine.family = this.resolveFamily(payload)
     engine.brand = payload.brand ?? null
     engine.model = payload.model ?? null
     engine.engineModelId = payload.engineModelId ?? null

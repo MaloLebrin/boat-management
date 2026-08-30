@@ -83,6 +83,8 @@
       "powerHp": "Power (hp)",
       "hours": "Hours",
       "strokeType": "Engine cycle",
+      "family": "Motorisation",
+      "familyHint": "Engine and transmission: this pair decides which spare parts are offered. Fill it in if you know it.",
       "installHours": "Hours at installation"
     },
     "catalog": {
@@ -156,19 +158,34 @@
       "hybrid": "Hybrid",
       "other": "Other"
     },
-    "engineFuel": {
-      "diesel": "Diesel",
-      "essence": "Gasoline",
-      "electric": "Electric",
+    "engineFamily": {
+      "outboard_2t": "2-stroke outboard",
+      "outboard_4t": "4-stroke outboard",
+      "inboard_diesel_shaft": "Diesel inboard, shaft drive",
+      "inboard_diesel_saildrive": "Diesel inboard, sail drive",
+      "inboard_petrol": "Petrol inboard",
+      "sterndrive": "Sterndrive",
+      "pod_drive": "Pod drive (IPS, Zeus)",
+      "jet": "Jet drive",
+      "electric_outboard": "Electric outboard",
+      "electric_inboard": "Electric inboard",
+      "hybrid": "Hybrid",
+      "generator": "Marine generator",
       "other": "Other"
     },
-    "engineFamily": {
+    "engineCatalogFamily": {
       "outboard_thermal": "Combustion outboard",
       "outboard_electric": "Electric outboard / drive",
       "inboard_diesel": "Diesel inboard",
       "inboard_petrol": "Petrol inboard and sterndrive",
       "jet": "Jet",
       "generator": "Generator set"
+    },
+    "engineFuel": {
+      "diesel": "Diesel",
+      "essence": "Gasoline",
+      "electric": "Electric",
+      "other": "Other"
     },
     "sailType": {
       "main": "Main",
@@ -544,6 +561,7 @@
       "power": "Power",
       "fuel": "Fuel",
       "type": "Type",
+      "family": "Motorisation",
       "thresholds": "Maintenance thresholds",
       "noThreshold": "No threshold defined",
       "every": "Every {hours} h",

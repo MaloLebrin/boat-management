@@ -7,6 +7,7 @@ import BoatEngineSparePartsService, {
 } from '#services/boat_engine_spare_parts_service'
 import BoatHullService, { BoatNotFoundError } from '#services/boat_hull_service'
 import EngineCatalogService from '#services/engine_catalog_service'
+import { isAssemblyForEngine } from '#shared/helpers/spare_parts'
 import { PART_ASSEMBLY_SLUGS, type PartAssemblySlug } from '#shared/types/spare_parts'
 import { addRepairCartItemValidator, updateRepairCartItemValidator } from '#validators/spare_parts'
 import { inject } from '@adonisjs/core'
@@ -55,6 +56,9 @@ export default class BoatEngineSparePartsController {
       catalogBrandSlug: catalogBrand?.slug ?? null,
       serialNumber: engine.serialNumber,
       kind: engine.kind,
+      // Famille de motorisation (#574) : c'est elle qui décide des ensembles
+      // affichés, les écrans la reçoivent telle quelle.
+      family: engine.family,
       status: engine.status,
     }
   }
@@ -126,6 +130,14 @@ export default class BoatEngineSparePartsController {
 
     try {
       const engine = await this.sparePartsService.getEligibleEngineOrFail(user, boat, engineId)
+
+      // Un ensemble étranger à la famille du moteur (URL forgée, lien croisé
+      // d'un autre moteur) n'a rien à afficher : même sortie qu'un slug inconnu.
+      if (!isAssemblyForEngine(engine, assemblySlug as PartAssemblySlug)) {
+        session.flash('error', i18n.t('flash.spareParts.assemblyNotFound'))
+        return response.redirect(`/boats/${boat.id}/engines/${engineId}/spare-parts`)
+      }
+
       const cartItems = await this.sparePartsService.getCartItems(engine)
       const canManage = await bouncer.with(MaintenancePolicy).allows('edit', boat)
 

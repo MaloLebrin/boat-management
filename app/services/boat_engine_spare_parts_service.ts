@@ -30,8 +30,12 @@ const MAX_CART_QUANTITY = 99
 @inject()
 export default class BoatEngineSparePartsService {
   /**
-   * Moteurs éligibles à l'identification de pièces (hors-bord) de
-   * l'organisation du user, avec la taille du panier de réparation.
+   * Moteurs de l'organisation du user éligibles à l'identification de pièces,
+   * avec la taille du panier de réparation.
+   *
+   * L'éligibilité vient de la **famille de motorisation** depuis #574 : un
+   * in-bord diesel a désormais sa nomenclature, là où #517 ne servait que les
+   * hors-bord.
    */
   async listEligibleEnginesForUser(user: User): Promise<SparePartsEngineRow[]> {
     if (user.organizationId === null) return []
@@ -40,7 +44,17 @@ export default class BoatEngineSparePartsService {
       .where('organizationId', user.organizationId)
       .select(['id', 'name'])
       .preload('engines', (query) =>
-        query.select(['id', 'boatId', 'brand', 'model', 'kind', 'status'])
+        query.select([
+          'id',
+          'boatId',
+          'brand',
+          'model',
+          'kind',
+          'fuel',
+          'strokeType',
+          'family',
+          'status',
+        ])
       )
 
     const eligible = boats.flatMap((boat) =>

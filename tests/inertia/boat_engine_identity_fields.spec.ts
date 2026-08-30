@@ -76,7 +76,7 @@ test('propose toutes les marques du catalogue avec leur famille en indice', () =
   const options = comboboxes(wrapper)[0].props('options') as Array<{ label: string; hint?: string }>
 
   expect(options.map((o) => o.label)).toEqual(['Volvo Penta', 'Yamaha'])
-  expect(options[0].hint).toContain('boats.options.engineFamily.inboard_diesel')
+  expect(options[0].hint).toContain('boats.options.engineCatalogFamily.inboard_diesel')
 })
 
 test('choisir une marque recharge les modèles par visite Inertia partielle', async () => {

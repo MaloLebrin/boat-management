@@ -12,7 +12,12 @@ const props = defineProps<{
   boatId: number
   engineId: number
   canManage: boolean
-  /** Moteur hors-bord : affiche le parcours d'identification de pièces (#517). */
+  /**
+   * Le moteur a une nomenclature de pièces : affiche le parcours
+   * d'identification (#517). Depuis #574 l'éligibilité vient de la famille de
+   * motorisation, plus du seul `kind === 'outboard'` — la règle vit dans
+   * `isSparePartsEligibleEngine()`, jamais dupliquée dans un template.
+   */
   sparePartsEligible?: boolean
 }>()
 

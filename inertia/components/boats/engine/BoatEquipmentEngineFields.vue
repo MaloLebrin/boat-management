@@ -8,6 +8,7 @@ import { useBoatOptions } from '~/composables/use_boat_options'
 import { useEngineCatalog } from '~/composables/use_engine_catalog'
 import { useEngineFormDraft } from '~/composables/use_engine_form_draft'
 import { ENGINE_KIND_OPTIONS } from '#shared/constants/boats/boat_form_options'
+import { engineFamilyFromCatalogModel } from '#shared/helpers/engine_family'
 import type { EngineModelOption } from '#shared/types/engine_catalog'
 
 export type BoatEquipmentEngineFieldsModel = {
@@ -15,6 +16,8 @@ export type BoatEquipmentEngineFieldsModel = {
   kind: string
   fuel: string | null
   strokeType: '2_stroke' | '4_stroke' | null
+  /** Famille de motorisation (#574) — facultative. */
+  family: string | null
   brand: string | null
   model: string | null
   engineModelId?: number | null
@@ -36,7 +39,8 @@ const props = defineProps<{
 const isEditMode = computed(() => Boolean(props.engine))
 
 const { t } = useT()
-const { engineKindOptions, engineFuelOptions, engineStrokeTypeOptions } = useBoatOptions()
+const { engineKindOptions, engineFamilyOptions, engineFuelOptions, engineStrokeTypeOptions } =
+  useBoatOptions()
 // Catalogue moteur (#573) : lu dans les props de la page, pas passé de main en
 // main — ce formulaire est monté depuis trois écrans, à quatre niveaux de
 // profondeur sous la fiche bateau.
@@ -50,6 +54,7 @@ const statusOptions = computed(() => [
 ])
 
 const kind = ref('')
+const family = ref('')
 const fuel = ref('')
 const strokeType = ref('')
 const installHours = ref('')
@@ -63,6 +68,7 @@ const status = ref('')
 function syncFromProps() {
   const e = props.engine
   kind.value = e?.kind ?? ENGINE_KIND_OPTIONS[0]?.value ?? ''
+  family.value = e?.family ?? ''
   fuel.value = e?.fuel ?? ''
   strokeType.value = e?.strokeType ?? ''
   installHours.value =
@@ -79,6 +85,7 @@ useEngineFormDraft(
   String(props.engine?.id ?? 'new'),
   {
     kind,
+    family,
     fuel,
     strokeType,
     installHours,
@@ -111,6 +118,12 @@ function applyCatalogModel(catalogModel: EngineModelOption) {
   if (strokeType.value === '' && catalogModel.strokeType !== null) {
     strokeType.value = catalogModel.strokeType
   }
+  // Le catalogue classe des gammes, pas des installations : il ne connaît pas
+  // la transmission. La famille proposée est donc la variante la plus courante
+  // (ligne d'arbre pour un diesel), que l'utilisateur reste libre de corriger.
+  if (family.value === '') {
+    family.value = engineFamilyFromCatalogModel(catalogModel) ?? ''
+  }
 }
 </script>
 
@@ -133,6 +146,19 @@ function applyCatalogModel(catalogModel: EngineModelOption) {
       :allow-empty="true"
       :options="engineFuelOptions"
       v-model="fuel"
+      :errors="errors"
+    />
+
+    <BaseSelect
+      id="family"
+      name="family"
+      class="col-span-2"
+      :label="t('boats.engines.fields.family')"
+      :hint="t('boats.engines.fields.familyHint')"
+      placeholder="—"
+      :allow-empty="true"
+      :options="engineFamilyOptions"
+      v-model="family"
       :errors="errors"
     />
 

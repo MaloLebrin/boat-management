@@ -310,6 +310,8 @@ function toEngine(e: Boat['engines'][number]) {
     id: e.id,
     kind: e.kind,
     fuel: e.fuel,
+    // Famille de motorisation (#574) — moteur et transmission.
+    family: e.family,
     brand: e.brand,
     model: e.model,
     serialNumber: e.serialNumber,

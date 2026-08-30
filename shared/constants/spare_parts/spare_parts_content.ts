@@ -1,4 +1,6 @@
+import { INBOARD_SPARE_PART_ASSEMBLIES } from '#shared/constants/spare_parts/inboard_assemblies'
 import type { DiagnosticSheetSlug } from '#shared/types/diagnostic'
+import type { EngineFamily } from '#shared/types/engine_catalog'
 import type {
   EnginePlateHint,
   PartAssemblySlug,
@@ -10,9 +12,14 @@ import type {
 } from '#shared/types/spare_parts'
 
 /**
- * Contenu statique de l'identification des pièces détachées hors-bord
- * (issue #517) : ensembles fonctionnels, pièces courantes, pièces sans
- * référence, plaques signalétiques et liens revendeurs.
+ * Contenu statique de l'identification des pièces détachées : ensembles
+ * fonctionnels, pièces courantes, pièces sans référence, plaques signalétiques
+ * et liens revendeurs.
+ *
+ * Ce fichier porte les **neuf ensembles hors-bord** de l'issue #517 et agrège
+ * les **douze ensembles in-bord** de #574
+ * (`inboard_assemblies.ts`) — l'index à plat, les clés persistables et les
+ * liens revendeurs restent communs.
  *
  * Les `key` des pièces sont persistées en base
  * (`boat_engine_repair_cart_items.part_key`) et ne doivent JAMAIS être
@@ -23,11 +30,19 @@ import type {
  * locales — ce sont des identifiants de recherche, pas de l'UI copy.
  */
 
+/**
+ * Les deux familles hors-bord partagent la quasi-totalité de la nomenclature de
+ * #517 : seule `lubrication` (#574) est propre au 4 temps, et seul le 2 temps
+ * mélange l'huile au carburant. D'où la constante commune.
+ */
+const OUTBOARD_FAMILIES: readonly EngineFamily[] = ['outboard_2t', 'outboard_4t']
+
 const carburetorAssembly: SparePartAssembly = {
   slug: 'carburetor',
   labelKey: 'parts.assemblies.carburetor.label',
   catalogLabel: 'CARBURETOR',
   descriptionKey: 'parts.assemblies.carburetor.description',
+  families: [...OUTBOARD_FAMILIES, 'jet'],
   yamahaFunctionCode: '14301',
   diagnosticSheet: 'fuel',
   parts: [
@@ -86,6 +101,7 @@ const fuelSystemAssembly: SparePartAssembly = {
   labelKey: 'parts.assemblies.fuel_system.label',
   catalogLabel: 'FUEL TANK / FUEL PUMP',
   descriptionKey: 'parts.assemblies.fuel_system.description',
+  families: [...OUTBOARD_FAMILIES, 'jet'],
   diagnosticSheet: 'fuel',
   parts: [
     {
@@ -129,6 +145,7 @@ const ignitionAssembly: SparePartAssembly = {
   labelKey: 'parts.assemblies.ignition.label',
   catalogLabel: 'ELECTRICAL / CDI',
   descriptionKey: 'parts.assemblies.ignition.description',
+  families: [...OUTBOARD_FAMILIES, 'jet'],
   diagnosticSheet: 'ignition',
   parts: [
     {
@@ -171,6 +188,7 @@ const powerUnitAssembly: SparePartAssembly = {
   labelKey: 'parts.assemblies.power_unit.label',
   catalogLabel: 'POWER UNIT / CYLINDER CRANKCASE',
   descriptionKey: 'parts.assemblies.power_unit.description',
+  families: [...OUTBOARD_FAMILIES, 'jet'],
   diagnosticSheet: 'compression',
   parts: [
     {
@@ -214,6 +232,7 @@ const recoilStarterAssembly: SparePartAssembly = {
   labelKey: 'parts.assemblies.recoil_starter.label',
   catalogLabel: 'STARTER, RECOIL',
   descriptionKey: 'parts.assemblies.recoil_starter.description',
+  families: OUTBOARD_FAMILIES,
   parts: [
     {
       key: 'recoil-starter.starter_rope',
@@ -248,6 +267,7 @@ const lowerUnitAssembly: SparePartAssembly = {
   labelKey: 'parts.assemblies.lower_unit.label',
   catalogLabel: 'LOWER CASING / WATER PUMP',
   descriptionKey: 'parts.assemblies.lower_unit.description',
+  families: OUTBOARD_FAMILIES,
   diagnosticSheet: 'cooling',
   parts: [
     {
@@ -286,6 +306,7 @@ const propellerAssembly: SparePartAssembly = {
   labelKey: 'parts.assemblies.propeller.label',
   catalogLabel: 'PROPELLER',
   descriptionKey: 'parts.assemblies.propeller.description',
+  families: [...OUTBOARD_FAMILIES, 'electric_outboard', 'sterndrive'],
   diagnosticSheet: 'gearcase',
   parts: [
     {
@@ -315,6 +336,7 @@ const cowlingAssembly: SparePartAssembly = {
   labelKey: 'parts.assemblies.cowling.label',
   catalogLabel: 'COWLING / BOTTOM COWLING',
   descriptionKey: 'parts.assemblies.cowling.description',
+  families: [...OUTBOARD_FAMILIES, 'electric_outboard'],
   parts: [
     {
       key: 'cowling.cowling_hook',
@@ -337,6 +359,7 @@ const bracketAssembly: SparePartAssembly = {
   labelKey: 'parts.assemblies.bracket.label',
   catalogLabel: 'BRACKET / SWIVEL',
   descriptionKey: 'parts.assemblies.bracket.description',
+  families: [...OUTBOARD_FAMILIES, 'electric_outboard'],
   parts: [
     {
       key: 'bracket.clamp_screw',
@@ -360,6 +383,11 @@ const bracketAssembly: SparePartAssembly = {
   ],
 }
 
+/**
+ * Catalogue complet, hors-bord puis in-bord. L'ordre est celui de l'affichage
+ * quand une famille les retient tous ; `assembliesForEngineFamily()`
+ * (`#shared/helpers/spare_parts`) le filtre sans le réordonner.
+ */
 export const SPARE_PART_ASSEMBLIES: Record<PartAssemblySlug, SparePartAssembly> = {
   'carburetor': carburetorAssembly,
   'fuel-system': fuelSystemAssembly,
@@ -370,6 +398,7 @@ export const SPARE_PART_ASSEMBLIES: Record<PartAssemblySlug, SparePartAssembly> 
   'propeller': propellerAssembly,
   'cowling': cowlingAssembly,
   'bracket': bracketAssembly,
+  ...INBOARD_SPARE_PART_ASSEMBLIES,
 }
 
 /** Étape 4 — pièces qui ne nécessitent pas de référence constructeur. */

@@ -84,6 +84,9 @@ test('retenir un modèle pré-remplit les champs restés vides', async () => {
   expect(value(wrapper, 'input[name="powerHp"]')).toBe('40')
   expect(value(wrapper, 'select[name="fuel"]')).toBe('diesel')
   expect(value(wrapper, 'select[name="strokeType"]')).toBe('4_stroke')
+  // Le catalogue classe des gammes : il propose la transmission la plus
+  // courante d'un diesel, la ligne d'arbre (#574).
+  expect(value(wrapper, 'select[name="family"]')).toBe('inboard_diesel_shaft')
 })
 
 test('le pré-remplissage n’écrase jamais une valeur déjà saisie', async () => {
@@ -93,6 +96,7 @@ test('le pré-remplissage n’écrase jamais une valeur déjà saisie', async ()
     kind: 'inboard',
     fuel: 'essence',
     strokeType: '2_stroke',
+    family: 'inboard_diesel_saildrive',
     brand: 'Volvo Penta',
     model: '',
     serialNumber: null,
@@ -108,6 +112,18 @@ test('le pré-remplissage n’écrase jamais une valeur déjà saisie', async ()
   expect(value(wrapper, 'input[name="powerHp"]')).toBe('38')
   expect(value(wrapper, 'select[name="fuel"]')).toBe('essence')
   expect(value(wrapper, 'select[name="strokeType"]')).toBe('2_stroke')
+  expect(value(wrapper, 'select[name="family"]')).toBe('inboard_diesel_saildrive')
+})
+
+test('la famille reste facultative : « — » est une réponse valide', () => {
+  const wrapper = mountFields()
+
+  // Aucune famille présélectionnée à la création : le champ part vide, et la
+  // valeur envoyée au serveur est neutralisée en `null` par le validator.
+  expect(value(wrapper, 'select[name="family"]')).toBe('')
+  const options = wrapper.findAll('select[name="family"] option').map((o) => o.attributes('value'))
+  expect(options).toContain('inboard_diesel_saildrive')
+  expect(options).toContain('outboard_2t')
 })
 
 test('sans catalogue en props de page, le formulaire reste en saisie libre', () => {

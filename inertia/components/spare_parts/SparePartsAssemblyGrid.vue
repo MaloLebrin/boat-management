@@ -1,16 +1,24 @@
 <script setup lang="ts">
 import { Link } from '@adonisjs/inertia/vue'
-import { SPARE_PART_ASSEMBLIES } from '#shared/constants/spare_parts/spare_parts_content'
+import { computed } from 'vue'
+import { assembliesForEngine } from '#shared/helpers/spare_parts'
 import { useT } from '~/composables/use_t'
 
-defineProps<{
+const props = defineProps<{
   boatId: number
   engineId: number
+  /**
+   * Moteur dont on liste les ensembles : c'est sa **famille de motorisation**
+   * (#574) qui décide de la nomenclature — pas de carburateur sur un diesel, pas
+   * de saildrive sur un hors-bord. Une famille absente retombe sur les
+   * ensembles génériques, jamais sur une grille vide.
+   */
+  engine: { kind?: string | null; fuel?: string | null; family?: string | null }
 }>()
 
 const { t } = useT()
 
-const assemblies = Object.values(SPARE_PART_ASSEMBLIES)
+const assemblies = computed(() => assembliesForEngine(props.engine))
 </script>
 
 <template>

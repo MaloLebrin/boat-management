@@ -70,6 +70,13 @@ const stepKeys = [
             {{ engineDisplayTitle(t, engine) }}
           </h3>
           <p class="mt-1 text-sm text-fg-muted">{{ engine.boatName }}</p>
+          <p class="mt-1 text-sm text-fg-subtle">
+            {{
+              engine.family
+                ? t(`boats.options.engineFamily.${engine.family}`)
+                : t('parts.index.unknownFamily')
+            }}
+          </p>
           <p v-if="engine.cartCount > 0" class="mt-3 text-sm text-fg-muted">
             {{ t('parts.index.cartCount', { count: String(engine.cartCount) }) }}
           </p>

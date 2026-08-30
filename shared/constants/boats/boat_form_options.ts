@@ -51,6 +51,32 @@ export const ENGINE_KIND_OPTIONS = [
 ] as const
 
 /**
+ * Familles de motorisation (#574) — moteur **et** transmission, `boat_engines.family`.
+ * Les libellés ci-dessous sont un repli EN : l'affichage passe par
+ * `t('boats.options.engineFamily.<slug>')`.
+ *
+ * Rien à voir avec `ENGINE_KIND_OPTIONS` (`kind`, qui reste saisi) ni avec les
+ * familles du catalogue moteur (`ENGINE_CATALOG_FAMILIES`, #573), qui classent
+ * des gammes de modèles. La liste et l'ordre suivent `ENGINE_FAMILIES` —
+ * `tests/inertia/boat_form_options.spec.ts` le vérifie.
+ */
+export const BOAT_ENGINE_FAMILY_OPTIONS = [
+  { value: 'outboard_2t', label: '2-stroke outboard' },
+  { value: 'outboard_4t', label: '4-stroke outboard' },
+  { value: 'inboard_diesel_shaft', label: 'Diesel inboard, shaft drive' },
+  { value: 'inboard_diesel_saildrive', label: 'Diesel inboard, sail drive' },
+  { value: 'inboard_petrol', label: 'Petrol inboard' },
+  { value: 'sterndrive', label: 'Sterndrive' },
+  { value: 'pod_drive', label: 'Pod drive' },
+  { value: 'jet', label: 'Jet drive' },
+  { value: 'electric_outboard', label: 'Electric outboard' },
+  { value: 'electric_inboard', label: 'Electric inboard' },
+  { value: 'hybrid', label: 'Hybrid' },
+  { value: 'generator', label: 'Marine generator' },
+  { value: 'other', label: 'Other' },
+] as const
+
+/**
  * Vocabulaire des carburants — porté par le moteur (`boat_engines.fuel`) et,
  * depuis #585, par le plein lui-même (`boat_fuel_logs.fuel_type`).
  */

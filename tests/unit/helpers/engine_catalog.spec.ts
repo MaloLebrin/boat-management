@@ -5,7 +5,7 @@ import {
 import { ENGINE_FUELS } from '#shared/constants/boats/boat_form_options'
 import { normalizeCatalogText, slugifyCatalogName } from '#shared/helpers/boat_catalog'
 import { catalogTokenNgrams, catalogTokens } from '#shared/helpers/engine_catalog'
-import { ENGINE_FAMILIES } from '#shared/types/engine_catalog'
+import { ENGINE_CATALOG_FAMILIES } from '#shared/types/engine_catalog'
 import { test } from '@japa/runner'
 
 test.group('catalogTokens', () => {
@@ -58,7 +58,7 @@ test.group('corpus du catalogue moteur', () => {
       for (const model of normalizeEngineBrandModels(brand)) covered.add(model.family)
     }
 
-    for (const family of ENGINE_FAMILIES) {
+    for (const family of ENGINE_CATALOG_FAMILIES) {
       assert.isTrue(covered.has(family), `aucun modèle pour la famille ${family}`)
     }
   })
@@ -72,7 +72,7 @@ test.group('corpus du catalogue moteur', () => {
       )
       assert.isNotEmpty(brand.families, `marque sans famille: ${brand.slug}`)
       for (const family of brand.families) {
-        assert.include(ENGINE_FAMILIES, family, `famille inconnue sur ${brand.slug}`)
+        assert.include(ENGINE_CATALOG_FAMILIES, family, `famille inconnue sur ${brand.slug}`)
       }
 
       const slugs = new Set<string>()
@@ -88,7 +88,7 @@ test.group('corpus du catalogue moteur', () => {
         )
         slugs.add(model.slug)
 
-        assert.include(ENGINE_FAMILIES, model.family, `famille inconnue sur ${model.slug}`)
+        assert.include(ENGINE_CATALOG_FAMILIES, model.family, `famille inconnue sur ${model.slug}`)
         if (model.fuel) assert.include(ENGINE_FUELS, model.fuel, `carburant inconnu: ${model.slug}`)
         if (model.strokeType) {
           assert.include(['2_stroke', '4_stroke'], model.strokeType, `cycle inconnu: ${model.slug}`)

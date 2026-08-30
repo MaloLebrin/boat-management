@@ -15,6 +15,7 @@ export function toSparePartsEngineRow(
     brand: engine.brand,
     model: engine.model,
     kind: engine.kind,
+    family: engine.family,
     status: engine.status,
     cartCount,
   }

@@ -83,6 +83,8 @@
       "powerHp": "Puissance (ch)",
       "hours": "Heures",
       "strokeType": "Cycle moteur",
+      "family": "Motorisation",
+      "familyHint": "Moteur et transmission : c'est ce couple qui détermine les pièces détachées proposées. À préciser si vous le connaissez.",
       "installHours": "Heures à l'installation"
     },
     "catalog": {
@@ -156,19 +158,34 @@
       "hybrid": "Hybride",
       "other": "Autre"
     },
-    "engineFuel": {
-      "diesel": "Diesel",
-      "essence": "Essence",
-      "electric": "Électrique",
+    "engineFamily": {
+      "outboard_2t": "Hors-bord 2 temps",
+      "outboard_4t": "Hors-bord 4 temps",
+      "inboard_diesel_shaft": "In-bord diesel, ligne d'arbre",
+      "inboard_diesel_saildrive": "In-bord diesel, saildrive",
+      "inboard_petrol": "In-bord essence",
+      "sterndrive": "Embase Z",
+      "pod_drive": "Propulsion pod (IPS, Zeus)",
+      "jet": "Hydrojet",
+      "electric_outboard": "Hors-bord électrique",
+      "electric_inboard": "Propulsion électrique in-bord",
+      "hybrid": "Hybride",
+      "generator": "Groupe électrogène de bord",
       "other": "Autre"
     },
-    "engineFamily": {
+    "engineCatalogFamily": {
       "outboard_thermal": "Hors-bord thermique",
       "outboard_electric": "Hors-bord / propulsion électrique",
       "inboard_diesel": "In-bord diesel",
       "inboard_petrol": "In-bord essence et embase Z",
       "jet": "Jet",
       "generator": "Groupe électrogène"
+    },
+    "engineFuel": {
+      "diesel": "Diesel",
+      "essence": "Essence",
+      "electric": "Électrique",
+      "other": "Autre"
     },
     "sailType": {
       "main": "Grand-voile",
@@ -568,6 +585,7 @@
       "power": "Puissance",
       "fuel": "Carburant",
       "type": "Type",
+      "family": "Motorisation",
       "thresholds": "Seuils de maintenance",
       "noThreshold": "Aucun seuil défini",
       "every": "Toutes les {hours} h",

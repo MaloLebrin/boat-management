@@ -24,6 +24,8 @@ const props = defineProps<{
     catalogBrandSlug: string | null
     serialNumber: string | null
     kind: string
+    /** Famille de motorisation (#574) — décide des ensembles proposés. */
+    family: string | null
     status: string
   }
   assemblySlug: PartAssemblySlug

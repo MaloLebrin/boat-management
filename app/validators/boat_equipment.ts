@@ -1,5 +1,6 @@
 import vine from '@vinejs/vine'
 import { engineFuels, engineKinds, rigTypes, sailTypes } from '#validators/boat'
+import { ENGINE_FAMILIES } from '#shared/types/engine_catalog'
 import type { BoatEnginePayload, BoatRigPayload, BoatSailPayload } from '#shared/types/boat'
 
 export const equipmentStatuses = [
@@ -17,10 +18,17 @@ export type EngineStrokeType = (typeof engineStrokeTypes)[number]
 
 const strokeTypeChoices = [...engineStrokeTypes, '', '__none__'] as string[]
 
+/**
+ * Famille de motorisation (#574) — facultative : « je ne sais pas » est une
+ * réponse valide, le moteur retombe alors sur la nomenclature générique.
+ */
+const familyChoices = [...ENGINE_FAMILIES, '', '__none__'] as string[]
+
 const enginePayload = vine.object({
   kind: vine.enum(engineKinds),
   fuel: vine.string().trim().maxLength(32).in(fuelChoices).optional(),
   strokeType: vine.string().trim().in(strokeTypeChoices).optional(),
+  family: vine.string().trim().in(familyChoices).optional(),
   brand: vine.string().trim().maxLength(120).optional(),
   model: vine.string().trim().maxLength(120).optional(),
   // Rattachement au catalogue moteur (#573), posé par la combobox du
@@ -43,6 +51,7 @@ export type BoatEngineFormBody = {
   kind: string
   fuel?: string
   strokeType?: string
+  family?: string
   brand?: string
   model?: string
   engineModelId?: string
@@ -154,10 +163,16 @@ export function equipmentBodyToEnginePayload(body: BoatEngineFormBody): BoatEngi
       ? null
       : (body.strokeType as EngineStrokeType)
 
+  const family =
+    body.family === undefined || body.family === '' || body.family === '__none__'
+      ? null
+      : body.family
+
   return {
     kind: body.kind,
     fuel,
     strokeType,
+    family,
     brand: emptyToNull(body.brand),
     model: emptyToNull(body.model),
     engineModelId: parseOptionalId(body.engineModelId),

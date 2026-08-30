@@ -1,21 +1,83 @@
 import {
   GENERIC_RETAILERS,
+  SPARE_PART_ASSEMBLIES,
   SPARE_PARTS_RETAILERS,
 } from '#shared/constants/spare_parts/spare_parts_content'
+import { engineFamilyFromSignals } from '#shared/helpers/engine_family'
+import { isEngineFamily, type EngineFamily } from '#shared/types/engine_catalog'
 import {
   SPARE_PARTS_BRAND_SLUGS,
+  type PartAssemblySlug,
+  type SparePartAssembly,
   type SparePartsBrandSlug,
   type SparePartsRetailerLink,
 } from '#shared/types/spare_parts'
 
 /**
- * Un moteur est éligible à l'identification des pièces détachées (#517) s'il
- * est hors-bord : le parcours (plaque signalétique, ensembles fonctionnels,
- * catalogues revendeurs) est propre à cette famille. Valeur issue de
- * `ENGINE_KIND_OPTIONS`.
+ * Ensembles servis à un moteur dont la famille est inconnue : ce qu'on peut
+ * affirmer de **n'importe quelle** motorisation. Un écran vide serait une
+ * régression — l'utilisateur qui ne sait pas nommer sa pièce est justement
+ * celui qui n'a pas renseigné sa famille.
  */
-export function isSparePartsEligibleEngine(engine: { kind: string }): boolean {
-  return engine.kind === 'outboard'
+export const GENERIC_ASSEMBLY_SLUGS: readonly PartAssemblySlug[] = ['starting-charging', 'controls']
+
+/** Signature minimale d'un moteur pour la résolution de famille. */
+export interface SparePartsEngine {
+  kind?: string | null
+  fuel?: string | null
+  strokeType?: string | null
+  family?: string | null
+}
+
+/**
+ * Famille retenue pour la nomenclature : celle **saisie** sur le moteur, sinon
+ * celle que `kind`/`fuel`/`stroke_type` permettent de déduire (#574).
+ *
+ * Le repli sur la dérivation n'est pas de la redondance avec le backfill de la
+ * migration : un moteur créé sans famille — l'API, un import, un formulaire
+ * laissé vide — doit rendre la même chose qu'un moteur backfillé.
+ */
+export function resolveEngineFamily(engine: SparePartsEngine): EngineFamily | null {
+  if (isEngineFamily(engine.family)) return engine.family
+  return engineFamilyFromSignals(engine)
+}
+
+/**
+ * Ensembles fonctionnels d'une famille de motorisation (#574) — l'ordre du
+ * catalogue est conservé. Une famille inconnue ou absente retombe sur les
+ * ensembles génériques, jamais sur une liste vide.
+ */
+export function assembliesForEngineFamily(
+  family: EngineFamily | null
+): readonly SparePartAssembly[] {
+  const assemblies = Object.values(SPARE_PART_ASSEMBLIES)
+  if (!family) {
+    return assemblies.filter((assembly) => GENERIC_ASSEMBLY_SLUGS.includes(assembly.slug))
+  }
+  return assemblies.filter((assembly) => assembly.families.includes(family))
+}
+
+/** Ensembles fonctionnels servis à un moteur, famille résolue comprise. */
+export function assembliesForEngine(engine: SparePartsEngine): readonly SparePartAssembly[] {
+  return assembliesForEngineFamily(resolveEngineFamily(engine))
+}
+
+/**
+ * Un moteur est éligible à l'identification des pièces détachées dès qu'au
+ * moins un ensemble fonctionnel le concerne (#574).
+ *
+ * Remplace le `kind === 'outboard'` de #517, qui fermait le parcours aux
+ * in-bord alors que ce sont eux qui portent la nomenclature la plus fournie.
+ * C'est bien la **famille** qui décide, pas le `kind` : `kind` ne distingue ni
+ * une ligne d'arbre d'un saildrive, ni un 2 temps d'un 4 temps.
+ */
+export function isSparePartsEligibleEngine(engine: SparePartsEngine): boolean {
+  return assembliesForEngine(engine).length > 0
+}
+
+/** L'ensemble demandé s'applique-t-il bien à ce moteur ? (URL forgée, lien croisé) */
+export function isAssemblyForEngine(engine: SparePartsEngine, slug: PartAssemblySlug): boolean {
+  return assembliesForEngine(engine).some((assembly) => assembly.slug === slug)
 }
 
 /**

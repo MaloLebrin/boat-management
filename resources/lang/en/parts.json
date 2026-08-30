@@ -10,10 +10,11 @@
       "order": "Add it to your repair list and order from a dealer."
     },
     "enginesTitle": "Your engines",
-    "empty": "No outboard engine registered",
-    "eligibilityHint": "Part identification relies on the outboard engines registered on your boats. Add an outboard engine from a boat's page to get started.",
+    "empty": "No engine registered",
+    "eligibilityHint": "Part identification relies on the engines registered on your boats. Add an engine from a boat's page to get started.",
     "openCatalog": "Identify a part",
-    "cartCount": "{count} part(s) in the repair list"
+    "cartCount": "{count} part(s) in the repair list",
+    "unknownFamily": "Motorisation to be specified"
   },
   "common": {
     "catalogNameLabel": "Catalog name",
@@ -352,6 +353,352 @@
           "label": "Bracket anode",
           "detail": "External sacrificial anode: replace it once half eaten away.",
           "price": "≈ €10–30"
+        }
+      }
+    },
+    "cooling_raw_water": {
+      "label": "Raw water circuit",
+      "description": "Raw water pump, impeller, heat exchanger and anodes: the circuit that cools the engine with the water you sail in.",
+      "parts": {
+        "impeller": {
+          "label": "Raw water pump impeller",
+          "detail": "The number-one wear part: replace it every season, and keep a spare on board.",
+          "price": "≈ €20–60"
+        },
+        "pump_repair_kit": {
+          "label": "Water pump repair kit",
+          "detail": "Impeller, seals, cover plate and bearings: prefer it over the impeller alone if the pump housing is scored.",
+          "price": "≈ €60–150"
+        },
+        "pump_cover_gasket": {
+          "label": "Pump cover gasket",
+          "kit": "Included in the water pump repair kit.",
+          "price": "≈ €3–10"
+        },
+        "heat_exchanger_anode": {
+          "label": "Heat exchanger pencil anode",
+          "detail": "Sacrificial anode screwed into the heat exchanger: check it at every winterizing, it protects the whole circuit.",
+          "price": "≈ €8–25"
+        },
+        "heat_exchanger_gasket_kit": {
+          "label": "Heat exchanger gasket kit",
+          "detail": "Tube stack seals and O-rings, to be replaced when the exchanger comes apart for descaling.",
+          "price": "≈ €20–60"
+        },
+        "strainer_seal": {
+          "label": "Strainer cover seal",
+          "detail": "The raw water strainer seal: an air leak here and the pump loses its prime.",
+          "price": "≈ €5–15"
+        }
+      }
+    },
+    "cooling_fresh_water": {
+      "label": "Fresh water cooling",
+      "description": "Thermostat, hoses, expansion tank: the closed coolant loop of a heat-exchanged engine.",
+      "parts": {
+        "thermostat": {
+          "label": "Thermostat",
+          "detail": "An engine that warms up slowly, or overheats for no reason, often starts here.",
+          "price": "≈ €15–50"
+        },
+        "thermostat_gasket": {
+          "label": "Thermostat gasket",
+          "price": "≈ €3–12"
+        },
+        "coolant_hose": {
+          "label": "Coolant hose",
+          "detail": "Note the inner diameter and length before ordering: many are sold by the metre.",
+          "price": "≈ €10–40"
+        },
+        "expansion_tank_cap": {
+          "label": "Expansion tank pressure cap",
+          "detail": "A cap that no longer holds pressure will boil an otherwise healthy circuit.",
+          "price": "≈ €10–30"
+        },
+        "circulating_pump": {
+          "label": "Circulating pump",
+          "price": "≈ €120–350"
+        }
+      }
+    },
+    "injection": {
+      "label": "Fuel and injection",
+      "description": "Water-separating pre-filter, filters, injectors: on a diesel, clean fuel is the first cause of trouble.",
+      "parts": {
+        "pre_filter_element": {
+          "label": "Water-separating pre-filter element",
+          "detail": "The Racor and its equivalents: change the element every season, drain the bowl as soon as water shows.",
+          "price": "≈ €15–45"
+        },
+        "fuel_filter": {
+          "label": "Engine fuel filter",
+          "detail": "The second filter, on the engine itself: change it together with the pre-filter.",
+          "price": "≈ €15–50"
+        },
+        "injector": {
+          "label": "Injector",
+          "detail": "Tested and calibrated on a bench by a diesel shop: a dribbling injector blackens the exhaust.",
+          "price": "≈ €80–250"
+        },
+        "injector_seal_kit": {
+          "label": "Injector seal kit",
+          "kit": "Copper washers and heat shields, always replaced when an injector comes out.",
+          "price": "≈ €5–25"
+        },
+        "lift_pump": {
+          "label": "Fuel feed pump",
+          "price": "≈ €60–200"
+        }
+      }
+    },
+    "exhaust": {
+      "label": "Wet exhaust",
+      "description": "Exhaust elbow, water lock, hose: the line where raw water joins the gases — and where corrosion works.",
+      "parts": {
+        "exhaust_elbow": {
+          "label": "Exhaust elbow",
+          "detail": "A wear part: it scales up and corrodes from the inside. Remove and inspect it every 4 to 5 years.",
+          "price": "≈ €150–600"
+        },
+        "elbow_gasket": {
+          "label": "Exhaust elbow gasket",
+          "kit": "Always replaced when the elbow comes off.",
+          "price": "≈ €5–25"
+        },
+        "waterlock": {
+          "label": "Water lock",
+          "detail": "Keeps water from siphoning back into the engine at rest: a cracked water lock is replaced, not repaired.",
+          "price": "≈ €80–300"
+        },
+        "exhaust_hose": {
+          "label": "Exhaust hose",
+          "detail": "Purpose-made wire-reinforced marine hose: an ordinary water hose collapses and burns.",
+          "price": "≈ €25–90 per metre"
+        },
+        "hose_clamps": {
+          "label": "Stainless hose clamps",
+          "detail": "Always in pairs on an exhaust joint, screws offset so both stay reachable.",
+          "price": "≈ €2–8"
+        }
+      }
+    },
+    "gearbox": {
+      "label": "Marine gear and coupling",
+      "description": "Gearbox, oil, shift cable and flexible coupling: what passes the power to the propeller — or stops passing it.",
+      "parts": {
+        "gear_oil": {
+          "label": "Gearbox oil",
+          "detail": "ATF or engine oil depending on the model: check the manual, one does not stand in for the other.",
+          "price": "≈ €10–30"
+        },
+        "output_seal": {
+          "label": "Output shaft oil seal",
+          "detail": "An oil trace on the coupling almost always comes from here.",
+          "price": "≈ €15–50"
+        },
+        "shift_cable": {
+          "label": "Gear shift cable",
+          "price": "≈ €40–120"
+        },
+        "flexible_coupling": {
+          "label": "Flexible coupling",
+          "detail": "Absorbs vibration between gearbox and shaft: a cracked rubber shows at a glance.",
+          "price": "≈ €80–300"
+        },
+        "damper_plate": {
+          "label": "Damper plate",
+          "detail": "Between flywheel and gearbox: a rattle at idle in neutral points straight at it.",
+          "price": "≈ €100–350"
+        }
+      }
+    },
+    "saildrive": {
+      "label": "Sail drive",
+      "description": "Diaphragm, anodes and gear oil: a sailboat's through-hull drive leg, and the most critical service deadline on board.",
+      "parts": {
+        "diaphragm": {
+          "label": "Rubber diaphragm",
+          "detail": "This is what keeps the sea out of the boat: mandatory replacement every 7 years, boat ashore.",
+          "price": "≈ €250–700"
+        },
+        "anode": {
+          "label": "Sail drive anode",
+          "detail": "Check it at every haul-out: a spent anode leaves the aluminium leg on the front line.",
+          "price": "≈ €25–80"
+        },
+        "oil_seal": {
+          "label": "Propeller shaft oil seal",
+          "detail": "Milky gear oil is its calling card: water has found its way in.",
+          "price": "≈ €20–70"
+        },
+        "gear_oil": {
+          "label": "Gear oil",
+          "price": "≈ €15–40"
+        }
+      }
+    },
+    "sterndrive": {
+      "label": "Stern drive",
+      "description": "Bellows, universal joints, trim cylinders and anodes: the drive leg of a sterndrive installation.",
+      "parts": {
+        "bellows_kit": {
+          "label": "Bellows kit",
+          "detail": "Drive, exhaust and shift bellows: they are replaced together, every 4 to 5 years.",
+          "price": "≈ €60–200"
+        },
+        "u_joint": {
+          "label": "Universal joint",
+          "detail": "A squeal when manoeuvring, or grease inside the bellows, points at it.",
+          "price": "≈ €80–250"
+        },
+        "trim_cylinder": {
+          "label": "Trim cylinder",
+          "price": "≈ €150–500"
+        },
+        "anode_kit": {
+          "label": "Drive anode kit",
+          "detail": "Plate, cylinder and propeller anodes: check them at every haul-out.",
+          "price": "≈ €30–90"
+        },
+        "gimbal_bearing": {
+          "label": "Gimbal bearing",
+          "detail": "Replaced with the bellows off: worth doing in the same yard visit.",
+          "price": "≈ €50–150"
+        }
+      }
+    },
+    "shaft_line": {
+      "label": "Shaft line",
+      "description": "Stuffing box, packing, cutless bearing and shaft: the hull passage of a conventional inboard.",
+      "parts": {
+        "stuffing_box_packing": {
+          "label": "Stuffing box packing",
+          "detail": "Sold by the metre in your shaft's section: three turns cut at an angle, cuts staggered.",
+          "price": "≈ €15–50"
+        },
+        "stuffing_box": {
+          "label": "Stuffing box",
+          "detail": "Traditional packing or maintenance-free dripless: both are replaced with the boat ashore.",
+          "price": "≈ €100–400"
+        },
+        "cutless_bearing": {
+          "label": "Cutless bearing",
+          "detail": "The rubber-and-brass stern tube bearing: play felt by hand on the shaft means it is done.",
+          "price": "≈ €40–150"
+        },
+        "shaft": {
+          "label": "Propeller shaft",
+          "price": "≈ €300–1,200"
+        },
+        "shaft_anode": {
+          "label": "Shaft anode",
+          "detail": "A sacrificial collar clamped on the shaft: replace it at every haul-out.",
+          "price": "≈ €15–50"
+        }
+      }
+    },
+    "starting_charging": {
+      "label": "Starting and charging",
+      "description": "Starter, alternator, belt and solenoid: the circuit that cranks the engine and charges the batteries.",
+      "parts": {
+        "starter_motor": {
+          "label": "Starter motor",
+          "detail": "A single click with no cranking is more often the solenoid or the terminals than the starter itself.",
+          "price": "≈ €150–500"
+        },
+        "starter_solenoid": {
+          "label": "Starter solenoid",
+          "price": "≈ €30–120"
+        },
+        "alternator": {
+          "label": "Alternator",
+          "price": "≈ €200–700"
+        },
+        "drive_belt": {
+          "label": "Alternator drive belt",
+          "detail": "Black dust under the pulley or a charge that plateaus: always start with the belt and its tension.",
+          "price": "≈ €10–35"
+        },
+        "voltage_regulator": {
+          "label": "Voltage regulator",
+          "price": "≈ €40–200"
+        }
+      }
+    },
+    "lubrication": {
+      "label": "Lubrication",
+      "description": "Oil filter, pump and sump gaskets: the oil change and everything that goes with it.",
+      "parts": {
+        "oil_filter": {
+          "label": "Oil filter",
+          "detail": "Change it at every oil change: the filter costs less than the oil it protects.",
+          "price": "≈ €10–35"
+        },
+        "engine_oil": {
+          "label": "Engine oil",
+          "detail": "Grade and specification per the engine manual: an automotive oil does not suit every marine engine.",
+          "price": "≈ €25–80"
+        },
+        "oil_pump": {
+          "label": "Oil pump",
+          "price": "≈ €100–400"
+        },
+        "sump_gasket": {
+          "label": "Oil sump gasket",
+          "price": "≈ €15–60"
+        }
+      }
+    },
+    "air_intake": {
+      "label": "Air intake and turbo",
+      "description": "Air filter, turbo, intercooler: what feeds a diesel's combustion, turbocharged or not.",
+      "parts": {
+        "air_filter": {
+          "label": "Air filter element",
+          "detail": "Often a washable foam element on small marine diesels: clean it rather than bin it.",
+          "price": "≈ €15–60"
+        },
+        "turbocharger": {
+          "label": "Turbocharger",
+          "detail": "A new whistle or blue smoke under acceleration: a reconditioned exchange unit often costs far less than new.",
+          "price": "≈ €600–2,000"
+        },
+        "intercooler_gasket_kit": {
+          "label": "Intercooler gasket kit",
+          "price": "≈ €20–80"
+        },
+        "intake_hose": {
+          "label": "Air intake hose",
+          "price": "≈ €20–70"
+        },
+        "breather_filter": {
+          "label": "Crankcase breather filter",
+          "detail": "A blocked breather pressurises the crankcase and makes the seals weep.",
+          "price": "≈ €15–50"
+        }
+      }
+    },
+    "controls": {
+      "label": "Controls and steering",
+      "description": "Control box, cables, steering: what links the helm to the engine, whatever the motorisation.",
+      "parts": {
+        "control_box": {
+          "label": "Remote control box",
+          "price": "≈ €150–600"
+        },
+        "throttle_cable": {
+          "label": "Throttle cable",
+          "detail": "Ordered at an exact length (in feet from US builders): measure the old one first.",
+          "price": "≈ €40–120"
+        },
+        "steering_seal_kit": {
+          "label": "Hydraulic steering seal kit",
+          "detail": "Spongy or weeping steering at the helm: the seal kit costs ten times less than the cylinder.",
+          "price": "≈ €40–150"
+        },
+        "key_switch": {
+          "label": "Key switch",
+          "price": "≈ €30–120"
         }
       }
     }

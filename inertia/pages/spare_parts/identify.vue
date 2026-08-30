@@ -20,6 +20,8 @@ const props = defineProps<{
     catalogBrandSlug: string | null
     serialNumber: string | null
     kind: string
+    /** Famille de motorisation (#574) — décide des ensembles proposés. */
+    family: string | null
     status: string
   }
   cartItems: RepairCartItemRow[]
@@ -54,7 +56,7 @@ const breadcrumb = computed(() => [
     <h2 class="mt-10 text-lg font-semibold text-fg">{{ t('parts.identify.assemblies.title') }}</h2>
     <p class="mt-1 max-w-3xl text-sm text-fg-muted">{{ t('parts.identify.assemblies.intro') }}</p>
     <div class="mt-4">
-      <SparePartsAssemblyGrid :boat-id="boat.id" :engine-id="engine.id" />
+      <SparePartsAssemblyGrid :boat-id="boat.id" :engine-id="engine.id" :engine="engine" />
     </div>
 
     <div class="mt-10">

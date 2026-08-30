@@ -305,6 +305,7 @@ export class BoatEngineSchema extends BaseModel {
     'brand',
     'createdAt',
     'engineModelId',
+    'family',
     'fuel',
     'hours',
     'id',
@@ -329,6 +330,8 @@ export class BoatEngineSchema extends BaseModel {
   declare createdAt: DateTime
   @column()
   declare engineModelId: number | null
+  @column()
+  declare family: string | null
   @column()
   declare fuel: string | null
   @column()

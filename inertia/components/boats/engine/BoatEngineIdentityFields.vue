@@ -57,7 +57,7 @@ const brandOptions = computed<ComboboxOption[]>(() =>
   (props.brands ?? []).map((b) => ({
     value: String(b.id),
     label: b.name,
-    hint: b.families.map((f) => t(`boats.options.engineFamily.${f}`)).join(' · '),
+    hint: b.families.map((f) => t(`boats.options.engineCatalogFamily.${f}`)).join(' · '),
   }))
 )
 

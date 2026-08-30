@@ -11,17 +11,56 @@ import type { EngineFuel } from '#shared/constants/boats/boat_form_options'
  */
 
 /**
- * Familles de motorisation — vocabulaire fermé qui regroupe les marques du
- * corpus et **priorise** les suggestions du formulaire.
+ * Familles de **motorisation** — vocabulaire fermé qui décrit une installation
+ * réelle : le moteur *et sa transmission*. C'est elle qui détermine la
+ * nomenclature de pièces (#574), là où `kind`, `fuel` et `stroke_type` ne
+ * suffisent pas — un même Volvo Penta D2-40 n'a pas les mêmes pièces en
+ * saildrive et en ligne d'arbre.
  *
- * Volontairement grossier : la nomenclature fine des familles et des pièces est
- * le sujet de la sous-issue 2/4. Ici on ne pose que ce dont
- * `EngineCatalogService.listBrands({ family })` a besoin.
+ * Portée par `boat_engines.family` (nullable) : un moteur sans famille reste
+ * parfaitement utilisable, il retombe sur la nomenclature générique.
  *
- * Ne pas confondre avec `ENGINE_KINDS` (`inboard`, `outboard`, `electric`,
- * `hybrid`, `other`), qui est le champ `kind` saisi sur le moteur lui-même.
+ * Ne pas confondre avec :
+ * - `ENGINE_KINDS` (`inboard`, `outboard`, `electric`, `hybrid`, `other`), le
+ *   champ `kind` saisi sur le moteur ;
+ * - `ENGINE_CATALOG_FAMILIES` ci-dessous, qui classe les **modèles du
+ *   catalogue** — un modèle ne connaît pas la transmission sous laquelle il
+ *   sera installé.
  */
 export const ENGINE_FAMILIES = [
+  'outboard_2t',
+  'outboard_4t',
+  'inboard_diesel_shaft',
+  'inboard_diesel_saildrive',
+  'inboard_petrol',
+  'sterndrive',
+  'pod_drive',
+  'jet',
+  'electric_outboard',
+  'electric_inboard',
+  'hybrid',
+  'generator',
+  'other',
+] as const
+
+export type EngineFamily = (typeof ENGINE_FAMILIES)[number]
+
+export function isEngineFamily(value: unknown): value is EngineFamily {
+  return typeof value === 'string' && (ENGINE_FAMILIES as readonly string[]).includes(value)
+}
+
+/**
+ * Familles du **catalogue** (#573) — vocabulaire volontairement grossier qui
+ * regroupe les marques du corpus et **priorise** les suggestions du formulaire.
+ * Il classe des *modèles* (`engine_models.family`, `engine_brands.families`) :
+ * un motoriste couvre une gamme, pas une installation.
+ *
+ * Distinct de `ENGINE_FAMILIES` par nature, pas par finesse : la transmission
+ * (ligne d'arbre, saildrive, embase Z) est une propriété de l'installation, que
+ * le catalogue ne peut pas connaître. `engineFamilyFromCatalogModel()`
+ * (`#shared/helpers/engine_family`) fait le pont, en best-effort.
+ */
+export const ENGINE_CATALOG_FAMILIES = [
   'outboard_thermal',
   'outboard_electric',
   'inboard_diesel',
@@ -30,10 +69,10 @@ export const ENGINE_FAMILIES = [
   'generator',
 ] as const
 
-export type EngineFamily = (typeof ENGINE_FAMILIES)[number]
+export type EngineCatalogFamily = (typeof ENGINE_CATALOG_FAMILIES)[number]
 
-export function isEngineFamily(value: unknown): value is EngineFamily {
-  return typeof value === 'string' && (ENGINE_FAMILIES as readonly string[]).includes(value)
+export function isEngineCatalogFamily(value: unknown): value is EngineCatalogFamily {
+  return typeof value === 'string' && (ENGINE_CATALOG_FAMILIES as readonly string[]).includes(value)
 }
 
 /** Cycle moteur, aligné sur `engineStrokeTypes` du validator d'équipement. */
@@ -45,7 +84,7 @@ export interface EngineBrandOption {
   slug: string
   name: string
   country: string | null
-  families: EngineFamily[]
+  families: EngineCatalogFamily[]
 }
 
 /**
@@ -59,7 +98,7 @@ export interface EngineModelOption {
   name: string
   /** Code plaque signalétique (`6E0`, `J50PLEA`, `D2-40`) — jamais reconstitué. */
   modelCode: string | null
-  family: EngineFamily
+  family: EngineCatalogFamily
   powerHp: number | null
   strokeType: EngineStrokeType | null
   fuel: EngineFuel | null
@@ -78,7 +117,7 @@ export interface EngineModelSeed {
   /** Le code tel qu'il figure sur la plaque, jamais une reconstitution. */
   modelCode?: string
   /** Famille du modèle — à défaut, celle sous laquelle il est groupé. */
-  family?: EngineFamily
+  family?: EngineCatalogFamily
   powerHp?: number
   displacementCc?: number
   cylinders?: number
@@ -96,7 +135,7 @@ export interface EngineBrandSeed {
   slug: string
   name: string
   country?: string
-  families: readonly EngineFamily[]
+  families: readonly EngineCatalogFamily[]
   /** Orthographes réellement rencontrées et anciens noms (`volvo`, `VP`). */
   aliases?: readonly string[]
   isActive?: boolean
@@ -115,12 +154,12 @@ export interface EngineBrandSeed {
    */
   modelCodeFromName?: boolean
   /** La clé porte la famille des modèles qu'elle groupe. */
-  models: Partial<Record<EngineFamily, readonly EngineModelSeedEntry[]>>
+  models: Partial<Record<EngineCatalogFamily, readonly EngineModelSeedEntry[]>>
 }
 
 export interface ListEngineBrandsOptions {
   /** Priorise les marques de cette famille — ne s'y limite jamais. */
-  family?: EngineFamily | null
+  family?: EngineCatalogFamily | null
   q?: string | null
   limit?: number
 }

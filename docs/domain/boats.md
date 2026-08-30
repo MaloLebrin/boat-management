@@ -157,6 +157,24 @@ Référence : `app/services/boat_catalog_service.ts`, corpus dans `database/data
   alimenté par le formulaire — une mise à jour ne l'écrase pas.
 - Ne pas confondre avec `navigationCategory` (catégorie CE A/B/C/D).
 
+### Famille de motorisation (#574)
+
+`boat_engines.family` (nullable, indexée) décrit le couple **moteur + transmission** :
+`outboard_2t`, `outboard_4t`, `inboard_diesel_shaft`, `inboard_diesel_saildrive`, `inboard_petrol`,
+`sterndrive`, `pod_drive`, `jet`, `electric_outboard`, `electric_inboard`, `hybrid`, `generator`,
+`other` (`ENGINE_FAMILIES`). C'est elle, et non `kind`, qui décide de la nomenclature de pièces
+détachées — voir `docs/domain/spare-parts.md`.
+
+- **Facultative.** « Je ne sais pas » est une réponse valide : le moteur retombe sur la nomenclature
+  générique. Le sélecteur du formulaire est vide par défaut et se pré-remplit — sans jamais écraser
+  une saisie — quand un modèle du catalogue est retenu.
+- **Déduite à défaut.** `engineFamilyFromSignals()` (`shared/helpers/engine_family.ts`) la déduit de
+  `kind`/`fuel`/`strokeType` à la création comme au backfill (migration `1838000000000`). Elle
+  renvoie `null` dès que la réponse serait une invention : un `kind` `electric` ne dit pas si le
+  moteur est in-bord ou hors-bord. Deux défauts assumés : un hors-bord sans cycle est classé
+  4 temps (cas dominant, et les deux familles hors-bord partagent presque toute la nomenclature),
+  un in-bord diesel est classé ligne d'arbre (la variante saildrive n'est pas devinable).
+
 ### Catalogue de marques et modèles moteurs (#573)
 
 Référence : `app/services/engine_catalog_service.ts`, corpus dans `database/data/engine_catalog/`
@@ -166,10 +184,13 @@ Référence : `app/services/engine_catalog_service.ts`, corpus dans `database/da
   du texte libre et restent alimentés ; `engine_model_id` n'est qu'un rattachement facultatif
   (nullable, `ON DELETE SET NULL`). Un moteur hors catalogue est parfaitement valide, et retirer un
   modèle du corpus ne fait perdre aucune saisie.
-- `ENGINE_FAMILIES` (`shared/types/engine_catalog.ts`) : `outboard_thermal`, `outboard_electric`,
-  `inboard_diesel`, `inboard_petrol`, `jet`, `generator`. Vocabulaire volontairement grossier — la
-  nomenclature fine est le sujet de la sous-issue 2/4. À ne pas confondre avec `kind`, saisi sur le
-  moteur lui-même.
+- `ENGINE_CATALOG_FAMILIES` (`shared/types/engine_catalog.ts`) : `outboard_thermal`,
+  `outboard_electric`, `inboard_diesel`, `inboard_petrol`, `jet`, `generator`. Vocabulaire
+  volontairement grossier — il classe des **gammes de modèles**, qui ne connaissent pas la
+  transmission sous laquelle elles seront installées. À ne pas confondre avec `kind`, saisi sur le
+  moteur, ni avec `ENGINE_FAMILIES` (#574, `boat_engines.family`), la famille de motorisation qui
+  décide de la nomenclature de pièces. `engineFamilyFromCatalogModel()`
+  (`shared/helpers/engine_family.ts`) fait le pont, en best-effort.
 - `listBrands({ family })` **priorise** la famille, elle ne la filtre jamais.
 - `resolveBrand(freeText)` **remplace** l'ancien `resolveSparePartsBrand()` et sa cascade de trois
   `if`. Résolution en deux passes sur le slug, le nom et les `aliases` en base : égalité stricte
