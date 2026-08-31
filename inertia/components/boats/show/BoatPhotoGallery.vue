@@ -4,6 +4,7 @@ import { Form } from '@adonisjs/inertia/vue'
 import { useForm } from '@inertiajs/vue3'
 import { ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
+import { useNetworkStatus } from '~/composables/use_network_status'
 import { useT } from '~/composables/use_t'
 import type { BoatShowDetail, MediaRow } from '~/types/boat_show'
 import { computed } from 'vue'
@@ -14,6 +15,7 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
+const { isOnline } = useNetworkStatus()
 const fileInput = ref<HTMLInputElement>()
 const cameraInput = ref<HTMLInputElement>()
 const form = useForm({ files: [] as File[] })
@@ -29,6 +31,8 @@ function onFileChange(e: Event) {
 }
 
 function submitPhotos() {
+  // Refus explicite hors-ligne : la file IndexedDB ne transporte pas de multipart (#621)
+  if (!isOnline.value) return
   form.post(`/boats/${props.boat.id}/photos`, {
     forceFormData: true,
     preserveScroll: true,
@@ -50,7 +54,7 @@ function submitPhotos() {
           variant="secondary"
           size="sm"
           type="button"
-          :disabled="form.processing"
+          :disabled="form.processing || !isOnline"
           @click="cameraInput?.click()"
         >
           <CameraIcon class="h-4 w-4 mr-1" />
@@ -60,7 +64,7 @@ function submitPhotos() {
           variant="secondary"
           size="sm"
           type="button"
-          :disabled="form.processing"
+          :disabled="form.processing || !isOnline"
           @click="fileInput?.click()"
         >
           <PlusIcon class="h-4 w-4 mr-1" />
@@ -72,6 +76,14 @@ function submitPhotos() {
         </BaseButton>
       </div>
     </div>
+
+    <p
+      v-if="canManage && !isOnline"
+      class="mb-3 rounded-md border border-warning/40 bg-surface-muted px-3 py-2 text-sm text-fg"
+      role="alert"
+    >
+      {{ t('common.offline.photoUploadUnavailable') }}
+    </p>
 
     <input
       v-if="canManage"
@@ -98,8 +110,8 @@ function submitPhotos() {
     <div
       v-if="photos.length === 0"
       class="rounded-lg border-2 border-dashed border-border bg-surface-muted/30 p-8 text-center"
-      :class="{ 'cursor-pointer hover:border-brand/50 transition-colors': canManage }"
-      @click="canManage ? fileInput?.click() : undefined"
+      :class="{ 'cursor-pointer hover:border-brand/50 transition-colors': canManage && isOnline }"
+      @click="canManage && isOnline ? fileInput?.click() : undefined"
     >
       <PhotoIcon class="mx-auto h-8 w-8 text-fg-subtle" />
       <p class="mt-2 text-sm text-fg-muted">{{ t('boats.show.mediaUpload.noPhotos') }}</p>
@@ -150,7 +162,7 @@ function submitPhotos() {
       <button
         v-if="canManage"
         type="button"
-        :disabled="form.processing"
+        :disabled="form.processing || !isOnline"
         class="aspect-square rounded-lg border-2 border-dashed border-border bg-surface-muted/30 flex flex-col items-center justify-center gap-1 hover:border-brand/50 transition-colors disabled:opacity-50"
         @click="fileInput?.click()"
       >

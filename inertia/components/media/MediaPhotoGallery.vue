@@ -3,6 +3,7 @@ import { CameraIcon, PhotoIcon, PlusIcon } from '@heroicons/vue/24/outline'
 import { router, useForm } from '@inertiajs/vue3'
 import { ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
+import { useNetworkStatus } from '~/composables/use_network_status'
 import { useT } from '~/composables/use_t'
 import type { MediaRow } from '~/types/boat_show'
 
@@ -15,6 +16,7 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
+const { isOnline } = useNetworkStatus()
 const fileInput = ref<HTMLInputElement>()
 const cameraInput = ref<HTMLInputElement>()
 const form = useForm({ files: [] as File[] })
@@ -26,6 +28,8 @@ function onFileChange(e: Event) {
 }
 
 function submitPhotos() {
+  // Refus explicite hors-ligne : la file IndexedDB ne transporte pas de multipart (#621)
+  if (!isOnline.value) return
   form.post(props.uploadUrl, {
     forceFormData: true,
     preserveScroll: true,
@@ -54,7 +58,7 @@ function deletePhoto(mediaId: number) {
           variant="secondary"
           size="sm"
           type="button"
-          :disabled="form.processing"
+          :disabled="form.processing || !isOnline"
           @click="cameraInput?.click()"
         >
           <CameraIcon class="h-4 w-4 mr-1" />
@@ -64,7 +68,7 @@ function deletePhoto(mediaId: number) {
           variant="secondary"
           size="sm"
           type="button"
-          :disabled="form.processing"
+          :disabled="form.processing || !isOnline"
           @click="fileInput?.click()"
         >
           <PlusIcon class="h-4 w-4 mr-1" />
@@ -72,6 +76,14 @@ function deletePhoto(mediaId: number) {
         </BaseButton>
       </div>
     </div>
+
+    <p
+      v-if="canUpload && !isOnline"
+      class="mb-2 rounded-md border border-warning/40 bg-surface-muted px-3 py-2 text-sm text-fg"
+      role="alert"
+    >
+      {{ t('common.offline.photoUploadUnavailable') }}
+    </p>
 
     <input
       v-if="canUpload"
@@ -123,8 +135,9 @@ function deletePhoto(mediaId: number) {
 
     <div
       v-if="canUpload && photos.length === 0"
-      class="mt-2 rounded-lg border-2 border-dashed border-border bg-surface-muted/30 p-6 text-center cursor-pointer hover:border-brand/50 transition-colors"
-      @click="fileInput?.click()"
+      class="mt-2 rounded-lg border-2 border-dashed border-border bg-surface-muted/30 p-6 text-center"
+      :class="isOnline ? 'cursor-pointer hover:border-brand/50 transition-colors' : 'opacity-50'"
+      @click="isOnline ? fileInput?.click() : undefined"
     >
       <PhotoIcon class="mx-auto h-6 w-6 text-fg-subtle" />
     </div>
