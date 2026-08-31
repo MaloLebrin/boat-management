@@ -259,6 +259,22 @@ plomberie).
   - `recurrenceIntervalMonths`
   - `recurrenceIntervalEngineHours`
 
+### boat_maintenance_sheets (fiches guidées)
+
+- `id`, `boatId`
+- `type` (contrainte CHECK) : `entretien | montage | hivernage | dehivernage | atelier | moteur_saison | carenage | catamaran | semi_rigide` — les quatre derniers ajoutés par #583
+- `status`: `in_progress | completed`
+- `title`, `notes`
+- `performedAt` (date)
+
+### boat_maintenance_sheet_items
+
+- `id`, `boatMaintenanceSheetId`
+- `label` — texte copié du corpus dans la locale de l'utilisateur à l'instanciation (#583)
+- `templateKey` (**nullable**, varchar 64) — clé stable du corpus (`hivernage.drain_engine`…, cf. `shared/constants/maintenance/maintenance_sheet_content.ts`) ; `null` pour les fiches antérieures à #583 (pas de backfill)
+- `position` (ordre d'affichage)
+- `isDone`, `notes`
+
 ### boat_equipment_actions
 
 - `id`, `boatId`, `organizationId`

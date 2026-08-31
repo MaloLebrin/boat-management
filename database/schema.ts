@@ -755,6 +755,7 @@ export class BoatMaintenanceSheetItemSchema extends BaseModel {
     'label',
     'notes',
     'position',
+    'templateKey',
     'updatedAt',
   ] as const
   $columns = BoatMaintenanceSheetItemSchema.$columns
@@ -772,6 +773,8 @@ export class BoatMaintenanceSheetItemSchema extends BaseModel {
   declare notes: string | null
   @column()
   declare position: number
+  @column()
+  declare templateKey: string | null
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
 }

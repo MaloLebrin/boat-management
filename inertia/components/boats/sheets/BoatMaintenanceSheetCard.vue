@@ -12,6 +12,7 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BoatMaintenanceSheetItemList from '~/components/boats/sheets/BoatMaintenanceSheetItemList.vue'
 import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
+import { MAINTENANCE_SHEET_TEMPLATES } from '#shared/constants/maintenance/maintenance_sheet_content'
 import type { BoatShowDetail, MaintenanceSheetRow } from '~/types/boat_show'
 
 const { t } = useT()
@@ -33,20 +34,15 @@ const typeBadgeVariant = computed(() => {
       hivernage: 'warning',
       dehivernage: 'success',
       atelier: 'neutral',
+      moteur_saison: 'info',
+      carenage: 'warning',
+      catamaran: 'neutral',
+      semi_rigide: 'success',
     }
   return variants[props.sheet.type]
 })
 
-const typeLabel = computed(() => {
-  const labels: Record<MaintenanceSheetRow['type'], string> = {
-    entretien: t('boats.sheets.typeEntretien'),
-    montage: t('boats.sheets.typeMontage'),
-    hivernage: t('boats.sheets.typeHivernage'),
-    dehivernage: t('boats.sheets.typeDehivernage'),
-    atelier: t('boats.sheets.typeAtelier'),
-  }
-  return labels[props.sheet.type]
-})
+const typeLabel = computed(() => t(MAINTENANCE_SHEET_TEMPLATES[props.sheet.type].labelKey))
 
 const statusBadgeVariant = computed(() => {
   return props.sheet.status === 'completed' ? 'success' : 'info'

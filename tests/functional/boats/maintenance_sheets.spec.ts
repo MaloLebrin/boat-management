@@ -5,6 +5,7 @@ import BoatMaintenanceSheetItem from '#models/boat_maintenance_sheet_item'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { BoatMaintenanceSheetFactory } from '#database/factories/boat_maintenance_sheet_factory'
 import { createAdminUser } from '#tests/functional/helpers'
+import type { ApiClient } from '@japa/api-client'
 
 async function makeSheet(boatId: number) {
   return BoatMaintenanceSheetFactory.merge({
@@ -22,6 +23,92 @@ function addItem(sheetId: number, position: number, isDone: boolean) {
     isDone,
   })
 }
+
+test.group('Maintenance sheet instantiation from the corpus (#583)', (group) => {
+  group.each.setup(() => testUtils.db().truncate())
+
+  async function createSheet(
+    client: ApiClient,
+    user: Awaited<ReturnType<typeof createAdminUser>>,
+    type: string
+  ) {
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    const response = await client
+      .post(`/boats/${boat.id}/maintenance-sheets`)
+      .loginAs(user)
+      .redirects(0)
+      .form({ type, title: 'Fiche de test', performedAt: '2026-05-01' })
+
+    response.assertStatus(302)
+
+    return await BoatMaintenanceSheet.query()
+      .where('boatId', boat.id)
+      .preload('items', (query) => query.orderBy('position', 'asc'))
+      .firstOrFail()
+  }
+
+  test('un utilisateur FR reçoit les libellés historiques inchangés', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    user.locale = 'fr'
+    await user.save()
+
+    const sheet = await createSheet(client, user, 'entretien')
+
+    assert.lengthOf(sheet.items, 10)
+    assert.equal(sheet.items[0].label, 'Inspection visuelle de la coque')
+    assert.equal(sheet.items[0].templateKey, 'entretien.hull_visual_inspection')
+    assert.equal(sheet.items[9].label, 'Nettoyage général')
+  })
+
+  test('un utilisateur EN reçoit des items en anglais', async ({ client, assert }) => {
+    const user = await createAdminUser()
+    user.locale = 'en'
+    await user.save()
+
+    const sheet = await createSheet(client, user, 'hivernage')
+
+    assert.lengthOf(sheet.items, 14)
+    assert.equal(sheet.items[0].label, 'Haul-out and hull cleaning')
+    assert.equal(sheet.items[3].templateKey, 'hivernage.drain_engine')
+    assert.equal(sheet.items[3].label, 'Engine oil change and flush')
+  })
+
+  test('les nouveaux types de fiche (#583) sont instanciables', async ({ client, assert }) => {
+    const user = await createAdminUser()
+    user.locale = 'fr'
+    await user.save()
+
+    const sheet = await createSheet(client, user, 'semi_rigide')
+
+    assert.equal(sheet.type, 'semi_rigide')
+    assert.lengthOf(sheet.items, 8)
+    assert.equal(sheet.items[0].label, 'Contrôle de la pression des flotteurs')
+    assert.equal(sheet.items[0].templateKey, 'semi_rigide.tubes_pressure_check')
+  })
+
+  test('un type inconnu est refusé par la validation', async ({ client, assert }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    const response = await client
+      .post(`/boats/${boat.id}/maintenance-sheets`)
+      .loginAs(user)
+      .redirects(0)
+      .header('referer', `/boats/${boat.id}?tab=sheets`)
+      .form({ type: 'plongee', title: 'Fiche de test', performedAt: '2026-05-01' })
+
+    // Erreur de validation session : redirection back + erreurs flashées
+    response.assertStatus(302)
+    assert.property(response.flashMessages(), 'inputErrorsBag')
+
+    const count = await BoatMaintenanceSheet.query().where('boatId', boat.id).count('* as total')
+    assert.equal(Number(count[0].$extras.total), 0)
+  })
+})
 
 test.group('Maintenance sheet completion (functional)', (group) => {
   group.each.setup(() => testUtils.db().truncate())

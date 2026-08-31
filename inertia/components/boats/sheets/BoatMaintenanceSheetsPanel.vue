@@ -9,9 +9,8 @@ import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import BoatMaintenanceSheetCard from '~/components/boats/sheets/BoatMaintenanceSheetCard.vue'
 import { useT } from '~/composables/use_t'
-import type { BoatShowDetail, MaintenanceSheetRow } from '~/types/boat_show'
-
-type SheetType = 'entretien' | 'montage' | 'hivernage' | 'dehivernage' | 'atelier'
+import { MAINTENANCE_SHEET_TEMPLATE_LIST } from '#shared/constants/maintenance/maintenance_sheet_content'
+import type { BoatShowDetail, MaintenanceSheetRow, SheetType } from '~/types/boat_show'
 
 const { t } = useT()
 
@@ -33,21 +32,19 @@ const form = useForm({
   notes: '',
 })
 
-const typeOptions = computed(() => [
-  { value: 'entretien', label: t('boats.sheets.typeEntretien') },
-  { value: 'montage', label: t('boats.sheets.typeMontage') },
-  { value: 'hivernage', label: t('boats.sheets.typeHivernage') },
-  { value: 'dehivernage', label: t('boats.sheets.typeDehivernage') },
-  { value: 'atelier', label: t('boats.sheets.typeAtelier') },
-])
+const typeOptions = computed(() =>
+  MAINTENANCE_SHEET_TEMPLATE_LIST.map((template) => ({
+    value: template.type,
+    label: t(template.labelKey),
+  }))
+)
 
 const filterOptions = computed(() => [
   { key: 'all', label: t('boats.sheets.filterAll') },
-  { key: 'entretien', label: t('boats.sheets.typeEntretien') },
-  { key: 'montage', label: t('boats.sheets.typeMontage') },
-  { key: 'hivernage', label: t('boats.sheets.typeHivernage') },
-  { key: 'dehivernage', label: t('boats.sheets.typeDehivernage') },
-  { key: 'atelier', label: t('boats.sheets.typeAtelier') },
+  ...MAINTENANCE_SHEET_TEMPLATE_LIST.map((template) => ({
+    key: template.type,
+    label: t(template.labelKey),
+  })),
 ])
 
 const filteredSheets = computed(() => {

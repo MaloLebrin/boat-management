@@ -1,6 +1,7 @@
+import { SHEET_TYPES } from '#shared/types/maintenance'
 import vine from '@vinejs/vine'
 
-export const sheetTypes = ['entretien', 'montage', 'hivernage', 'dehivernage', 'atelier'] as const
+export const sheetTypes = SHEET_TYPES
 
 export const createBoatMaintenanceSheetValidator = vine.create(
   vine.object({

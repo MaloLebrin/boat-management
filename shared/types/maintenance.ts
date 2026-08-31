@@ -104,9 +104,49 @@ export type BoatMaintenanceBadge = {
   nextDueAt: string | null
 }
 
-export type SheetType = 'entretien' | 'montage' | 'hivernage' | 'dehivernage' | 'atelier'
+/**
+ * Types de fiches de maintenance guidées (#583). Les cinq premiers sont
+ * historiques ; `moteur_saison`, `carenage`, `catamaran` et `semi_rigide`
+ * étendent le corpus au-delà du voilier. L'ordre est celui d'affichage.
+ */
+export const SHEET_TYPES = [
+  'entretien',
+  'montage',
+  'hivernage',
+  'dehivernage',
+  'atelier',
+  'moteur_saison',
+  'carenage',
+  'catamaran',
+  'semi_rigide',
+] as const
 
-export type SheetTemplateItem = { label: string; position: number }
+export type SheetType = (typeof SHEET_TYPES)[number]
+
+/**
+ * Item du corpus des fiches guidées (#583).
+ *
+ * `key` (`'hivernage.drain_engine'`…) est persistée en base
+ * (`boat_maintenance_sheet_items.template_key`) et ne doit JAMAIS être
+ * renommée ; on peut en insérer de nouvelles à n'importe quelle position —
+ * même contrat que `part_key` (pièces) et `step_key` (diagnostic).
+ */
+export interface MaintenanceSheetTemplateItem {
+  /** `'<type>.<slug>'` — stable à vie. */
+  key: string
+  /** `'maintenance.sheets.<type>.items.<slug>'` — présent dans les deux locales. */
+  labelKey: string
+}
+
+export interface MaintenanceSheetTemplate {
+  type: SheetType
+  /** `'maintenance.sheets.<type>.label'` — libellé du type de fiche. */
+  labelKey: string
+  items: readonly MaintenanceSheetTemplateItem[]
+}
+
+/** Item résolu dans la locale de l'utilisateur, prêt à être copié en base. */
+export type SheetTemplateItem = { templateKey: string; label: string; position: number }
 
 export type CreateSheetPayload = {
   type: SheetType

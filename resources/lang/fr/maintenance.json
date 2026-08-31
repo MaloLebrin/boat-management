@@ -428,5 +428,146 @@
         "label": "Entretien du groupe froid"
       }
     }
+  },
+  "sheets": {
+    "entretien": {
+      "label": "Entretien",
+      "items": {
+        "hull_visual_inspection": "Inspection visuelle de la coque",
+        "anodes_check": "Vérification et remplacement des anodes",
+        "rudder_check": "Contrôle du safran et axe de gouvernail",
+        "engine_inspection": "Inspection du moteur (niveaux, filtres, courroies)",
+        "electrical_check": "Vérification du circuit électrique",
+        "nav_instruments_check": "Contrôle des instruments de navigation",
+        "deck_hardware_inspection": "Inspection de l'accastillage",
+        "safety_equipment_check": "Vérification des équipements de sécurité",
+        "standing_rigging_check": "Contrôle du gréement dormant",
+        "general_cleaning": "Nettoyage général"
+      }
+    },
+    "montage": {
+      "label": "Montage",
+      "items": {
+        "mast_spreaders_check": "Vérification du mât et barres de flèche",
+        "shrouds_stays_inspection": "Inspection des haubans et étais",
+        "standing_rigging_setup": "Montage et réglage du gréement dormant",
+        "sails_installation": "Installation et orientation des voiles",
+        "running_rigging_tuning": "Réglage du gréement courant",
+        "clutches_blocks_check": "Vérification des bloqueurs et poulies",
+        "winches_test": "Test des winches",
+        "masthead_instruments_check": "Contrôle des têtes de mât et instruments",
+        "backstay_forestay_check": "Vérification du pataras et étai de trinquette",
+        "short_sea_trial": "Test de navigation courte"
+      }
+    },
+    "hivernage": {
+      "label": "Hivernage",
+      "items": {
+        "haul_out_cleaning": "Sortie de l'eau et nettoyage de la coque",
+        "antifouling_treatment": "Traitement antifouling",
+        "anodes_check": "Vérification et remplacement des anodes",
+        "drain_engine": "Vidange et rinçage du moteur",
+        "cooling_antifreeze": "Antigel du circuit de refroidissement",
+        "fuel_stabilizer": "Traitement du carburant (stabilisateur)",
+        "batteries_storage": "Décharge contrôlée et stockage des batteries",
+        "sails_removal": "Démontage et rangement des voiles",
+        "running_rigging_removal": "Démontage du gréement courant",
+        "lines_blocks_protection": "Protection des cordages et poulies",
+        "seacocks_closing": "Fermeture des vannes de coque",
+        "electronics_storage": "Mise hors tension et rangement de l'électronique",
+        "ventilation": "Ventilation du bateau",
+        "winter_cover": "Pose de la bâche de protection"
+      }
+    },
+    "dehivernage": {
+      "label": "Déshivernage",
+      "items": {
+        "hull_inspection": "Inspection générale de la coque",
+        "seacocks_check": "Vérification des passe-coques et vannes",
+        "rudder_steering_check": "Contrôle du safran et du gouvernail",
+        "batteries_recharge": "Remise en charge des batteries",
+        "engine_service": "Révision du moteur (huile, filtres, courroies)",
+        "cooling_system_test": "Test du circuit de refroidissement",
+        "electrical_check": "Vérification du circuit électrique",
+        "sails_installation": "Montage des voiles",
+        "standing_rigging_check": "Vérification du gréement dormant",
+        "running_rigging_check": "Vérification du gréement courant",
+        "nav_instruments_test": "Test des instruments de navigation",
+        "vhf_radio_test": "Test de la VHF et de la radio",
+        "safety_gear_check": "Vérification de l'armement de sécurité",
+        "sea_trial": "Essai en mer"
+      }
+    },
+    "atelier": {
+      "label": "Atelier",
+      "items": {
+        "initial_diagnosis": "Diagnostic initial",
+        "workstation_preparation": "Préparation du poste de travail",
+        "parts_removal": "Dépose des pièces concernées",
+        "parts_repair": "Réparation / remplacement des pièces",
+        "tests_checks": "Tests et contrôles",
+        "reassembly": "Remontage et ajustements",
+        "workstation_cleaning": "Nettoyage du poste de travail",
+        "work_report": "Compte-rendu des travaux effectués"
+      }
+    },
+    "moteur_saison": {
+      "label": "Saison moteur",
+      "items": {
+        "fluid_levels_check": "Contrôle des niveaux (huile moteur, embase, direction)",
+        "oil_filter_change": "Vidange et remplacement du filtre à huile",
+        "impeller_check": "Contrôle ou remplacement de la turbine de pompe à eau",
+        "engine_anodes_check": "Vérification et remplacement des anodes moteur",
+        "fuel_filter_change": "Remplacement du filtre à carburant et contrôle des durites",
+        "cooling_flush": "Rinçage du circuit de refroidissement à l'eau douce",
+        "battery_check": "Contrôle et charge de la batterie moteur",
+        "spark_plugs_check": "Contrôle des bougies (hors-bord essence)",
+        "belts_check": "Contrôle des courroies (in-bord)",
+        "propeller_check": "Contrôle de l'hélice et de son écrou",
+        "controls_check": "Contrôle des commandes gaz / inverseur et des câbles",
+        "engine_test_run": "Essai moteur (démarrage, température, alarmes)"
+      }
+    },
+    "carenage": {
+      "label": "Carénage",
+      "items": {
+        "haul_out": "Sortie de l'eau et calage du bateau",
+        "pressure_wash": "Nettoyage haute pression de la carène",
+        "underwater_hull_check": "Contrôle des œuvres vives (osmose, chocs, fissures)",
+        "anodes_replacement": "Remplacement des anodes",
+        "through_hulls_check": "Contrôle des passe-coques et vannes",
+        "propeller_shaft_check": "Contrôle de l'hélice, de l'arbre ou de l'embase",
+        "sanding_preparation": "Ponçage et préparation de la carène",
+        "antifouling_application": "Application de l'antifouling",
+        "hull_polishing": "Lustrage de la coque et de la ligne de flottaison",
+        "relaunch": "Remise à l'eau et contrôle d'étanchéité"
+      }
+    },
+    "catamaran": {
+      "label": "Catamaran",
+      "items": {
+        "port_engine_line_check": "Contrôle de la ligne moteur bâbord (niveaux, anodes, turbine)",
+        "starboard_engine_line_check": "Contrôle de la ligne moteur tribord (niveaux, anodes, turbine)",
+        "hulls_inspection": "Inspection des deux coques et de la nacelle",
+        "trampoline_check": "Contrôle du trampoline et de ses fixations",
+        "watertight_lockers_check": "Inspection des cases étanches et des nables",
+        "steering_sync_check": "Contrôle et synchronisation des deux safrans",
+        "bimini_lazybag_check": "Contrôle du bimini et du lazy-bag",
+        "davits_tender_check": "Contrôle des bossoirs et de l'annexe"
+      }
+    },
+    "semi_rigide": {
+      "label": "Semi-rigide",
+      "items": {
+        "tubes_pressure_check": "Contrôle de la pression des flotteurs",
+        "tubes_bonding_check": "Inspection des collages et points de ragage des flotteurs",
+        "valves_check": "Contrôle des valves de gonflage",
+        "freshwater_rinse": "Rinçage à l'eau douce (coque, accastillage)",
+        "engine_flush": "Rinçage du circuit de refroidissement moteur",
+        "trailer_check": "Contrôle de la remorque (rouleaux, sangles, feux, roulements)",
+        "tubes_protection": "Nettoyage et protection UV des flotteurs",
+        "winter_storage": "Hivernage : dégonflage partiel et stockage à l'abri"
+      }
+    }
   }
 }

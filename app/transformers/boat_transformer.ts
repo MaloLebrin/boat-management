@@ -10,6 +10,7 @@ import type NavigationLog from '#models/navigation_log'
 import type NavigationLogEntry from '#models/navigation_log_entry'
 import type Media from '#models/media'
 import type { IncidentType, IncidentStatus } from '#shared/types/incident'
+import type { SheetType } from '#shared/types/maintenance'
 import type { BoatPricingRow } from '#shared/types/boat_pricing'
 import type { EngineFuel } from '#shared/constants/boats/boat_form_options'
 import type { FuelLogRow } from '#shared/types/fuel_log'
@@ -446,7 +447,7 @@ function toIncident(i: BoatIncident) {
 function toMaintenanceSheet(s: BoatMaintenanceSheet) {
   return {
     id: s.id,
-    type: s.type as 'entretien' | 'montage' | 'hivernage' | 'dehivernage' | 'atelier',
+    type: s.type as SheetType,
     title: s.title,
     status: s.status as 'in_progress' | 'completed',
     performedAt: s.performedAt.toISODate()!,

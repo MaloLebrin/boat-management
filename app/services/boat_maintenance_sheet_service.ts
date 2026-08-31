@@ -55,11 +55,14 @@ export default class BoatMaintenanceSheetService {
 
   /**
    * Creates a new maintenance sheet for a boat with default items from template.
+   * Template labels are resolved in `locale` at instantiation time (#583) —
+   * items are copied into the database and stay as-is afterwards.
    */
   async createForBoat(
     user: User,
     boat: Boat,
-    payload: CreateSheetPayload
+    payload: CreateSheetPayload,
+    locale?: string
   ): Promise<BoatMaintenanceSheet> {
     assertBoatScope(user, boat)
 
@@ -72,13 +75,14 @@ export default class BoatMaintenanceSheetService {
       status: 'in_progress',
     })
 
-    const templateItems = this.templateService.getItems(payload.type)
+    const templateItems = this.templateService.getItems(payload.type, locale)
 
     await Promise.all(
       templateItems.map((item) =>
         BoatMaintenanceSheetItem.create({
           boatMaintenanceSheetId: sheet.id,
           label: item.label,
+          templateKey: item.templateKey,
           position: item.position,
           isDone: false,
           notes: null,

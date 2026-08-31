@@ -18,6 +18,7 @@ import type {
   EquipmentReferenceType as EquipmentReferenceTypeValue,
 } from '../../shared/types/equipment_action'
 import type { GenericEquipmentCategory } from '../../shared/types/boat'
+import type { SheetType } from '../../shared/types/maintenance'
 
 /**
  * Intention de création demandée depuis l'en-tête de la fiche bateau (#358, #365).
@@ -253,7 +254,7 @@ export type MaintenanceSheetItemRow = {
 
 export type MaintenanceSheetRow = {
   id: number
-  type: 'entretien' | 'montage' | 'hivernage' | 'dehivernage' | 'atelier'
+  type: SheetType
   title: string
   status: 'in_progress' | 'completed'
   performedAt: string
@@ -261,6 +262,7 @@ export type MaintenanceSheetRow = {
   items: MaintenanceSheetItemRow[]
 }
 
+export type { SheetType } from '../../shared/types/maintenance'
 export type { IncidentType, IncidentStatus, BoatIncidentRow } from '../../shared/types/incident'
 export type { FuelLogRow } from '../../shared/types/fuel_log'
 export type {

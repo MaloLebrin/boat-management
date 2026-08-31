@@ -1,5 +1,6 @@
 import type BoatMaintenanceSheet from '#models/boat_maintenance_sheet'
 import type BoatMaintenanceTask from '#models/boat_maintenance_task'
+import type { SheetType } from '#shared/types/maintenance'
 
 export function toMaintenanceTask(t: BoatMaintenanceTask) {
   return {
@@ -28,7 +29,7 @@ export function toMaintenanceSheet(s: BoatMaintenanceSheet) {
   return {
     id: s.id,
     boatId: s.boatId,
-    type: s.type as 'entretien' | 'montage' | 'hivernage' | 'dehivernage' | 'atelier',
+    type: s.type as SheetType,
     title: s.title,
     status: s.status as 'in_progress' | 'completed',
     performedAt: s.performedAt.toISODate(),
