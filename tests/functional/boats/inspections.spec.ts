@@ -4,7 +4,6 @@ import app from '@adonisjs/core/services/app'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { BoatReservationFactory } from '#database/factories/boat_reservation_factory'
 import { MediaFactory } from '#database/factories/media_factory'
-import { UserFactory } from '#database/factories/user_factory'
 import {
   createCharterAdminUser,
   createEnterprisePlanUser,

@@ -5,7 +5,6 @@ import mail from '@adonisjs/mail/services/main'
 import i18nManager from '@adonisjs/i18n/services/main'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { BoatReservationFactory } from '#database/factories/boat_reservation_factory'
-import { UserFactory } from '#database/factories/user_factory'
 import {
   createCharterAdminUser,
   createEnterprisePlanUser,
