@@ -3,7 +3,7 @@ import testUtils from '@adonisjs/core/services/test_utils'
 import { DateTime } from 'luxon'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { UserFactory } from '#database/factories/user_factory'
-import { createAdminUser } from '#tests/functional/helpers'
+import { createAdminUser, createCharterAdminUser } from '#tests/functional/helpers'
 import OrganizationMembership from '#models/organization_membership'
 import BoatReservation from '#models/boat_reservation'
 import Client from '#models/client'
@@ -173,7 +173,7 @@ test.group('Invoice from reservation (functional)', (group) => {
     client,
     assert,
   }) => {
-    const user = await createAdminUser() // pro
+    const user = await createCharterAdminUser() // pro + module Location, sans facturation
     await createReservation(user.organizationId!, { totalPrice: '100.00' })
 
     const response = await client.get('/reservations').loginAs(user).withInertia()
