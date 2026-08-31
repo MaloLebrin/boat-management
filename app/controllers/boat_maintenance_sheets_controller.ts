@@ -40,12 +40,19 @@ export default class BoatMaintenanceSheetsController {
 
     const payload = await request.validateUsing(createBoatMaintenanceSheetValidator)
 
-    await this.boatMaintenanceSheetService.createForBoat(user, boat, {
-      type: payload.type as SheetType,
-      title: payload.title,
-      performedAt: payload.performedAt,
-      notes: payload.notes ?? null,
-    })
+    await this.boatMaintenanceSheetService.createForBoat(
+      user,
+      boat,
+      {
+        type: payload.type as SheetType,
+        title: payload.title,
+        performedAt: payload.performedAt,
+        notes: payload.notes ?? null,
+      },
+      // Les libellés du gabarit sont figés dans la locale de l'utilisateur au
+      // moment de l'instanciation (#583).
+      i18n.locale
+    )
 
     session.flash('success', i18n.t('flash.maintenanceSheets.created'))
     response.redirect(`/boats/${boat.id}?tab=sheets`)

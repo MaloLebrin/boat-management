@@ -428,5 +428,146 @@
         "label": "Refrigeration service"
       }
     }
+  },
+  "sheets": {
+    "entretien": {
+      "label": "Maintenance",
+      "items": {
+        "hull_visual_inspection": "Visual hull inspection",
+        "anodes_check": "Anode check and replacement",
+        "rudder_check": "Rudder and rudder stock check",
+        "engine_inspection": "Engine inspection (levels, filters, belts)",
+        "electrical_check": "Electrical system check",
+        "nav_instruments_check": "Navigation instruments check",
+        "deck_hardware_inspection": "Deck hardware inspection",
+        "safety_equipment_check": "Safety equipment check",
+        "standing_rigging_check": "Standing rigging check",
+        "general_cleaning": "General cleaning"
+      }
+    },
+    "montage": {
+      "label": "Rigging",
+      "items": {
+        "mast_spreaders_check": "Mast and spreaders check",
+        "shrouds_stays_inspection": "Shrouds and stays inspection",
+        "standing_rigging_setup": "Standing rigging setup and tuning",
+        "sails_installation": "Sail installation and trim",
+        "running_rigging_tuning": "Running rigging adjustment",
+        "clutches_blocks_check": "Clutches and blocks check",
+        "winches_test": "Winch test",
+        "masthead_instruments_check": "Masthead and instruments check",
+        "backstay_forestay_check": "Backstay and inner forestay check",
+        "short_sea_trial": "Short sea trial"
+      }
+    },
+    "hivernage": {
+      "label": "Winterization",
+      "items": {
+        "haul_out_cleaning": "Haul-out and hull cleaning",
+        "antifouling_treatment": "Antifouling treatment",
+        "anodes_check": "Anode check and replacement",
+        "drain_engine": "Engine oil change and flush",
+        "cooling_antifreeze": "Cooling system antifreeze",
+        "fuel_stabilizer": "Fuel treatment (stabilizer)",
+        "batteries_storage": "Controlled discharge and battery storage",
+        "sails_removal": "Sail removal and storage",
+        "running_rigging_removal": "Running rigging removal",
+        "lines_blocks_protection": "Lines and blocks protection",
+        "seacocks_closing": "Seacock closing",
+        "electronics_storage": "Electronics power-off and storage",
+        "ventilation": "Boat ventilation",
+        "winter_cover": "Winter cover installation"
+      }
+    },
+    "dehivernage": {
+      "label": "Spring commissioning",
+      "items": {
+        "hull_inspection": "General hull inspection",
+        "seacocks_check": "Through-hulls and seacocks check",
+        "rudder_steering_check": "Rudder and steering check",
+        "batteries_recharge": "Battery recharging",
+        "engine_service": "Engine service (oil, filters, belts)",
+        "cooling_system_test": "Cooling system test",
+        "electrical_check": "Electrical system check",
+        "sails_installation": "Sail installation",
+        "standing_rigging_check": "Standing rigging check",
+        "running_rigging_check": "Running rigging check",
+        "nav_instruments_test": "Navigation instruments test",
+        "vhf_radio_test": "VHF and radio test",
+        "safety_gear_check": "Safety gear check",
+        "sea_trial": "Sea trial"
+      }
+    },
+    "atelier": {
+      "label": "Workshop",
+      "items": {
+        "initial_diagnosis": "Initial diagnosis",
+        "workstation_preparation": "Workstation preparation",
+        "parts_removal": "Removal of affected parts",
+        "parts_repair": "Parts repair / replacement",
+        "tests_checks": "Tests and checks",
+        "reassembly": "Reassembly and adjustments",
+        "workstation_cleaning": "Workstation cleaning",
+        "work_report": "Work report"
+      }
+    },
+    "moteur_saison": {
+      "label": "Engine season",
+      "items": {
+        "fluid_levels_check": "Fluid level check (engine oil, gearcase, steering)",
+        "oil_filter_change": "Oil change and oil filter replacement",
+        "impeller_check": "Water pump impeller check or replacement",
+        "engine_anodes_check": "Engine anode check and replacement",
+        "fuel_filter_change": "Fuel filter replacement and hose check",
+        "cooling_flush": "Freshwater cooling system flush",
+        "battery_check": "Engine battery check and charge",
+        "spark_plugs_check": "Spark plug check (petrol outboard)",
+        "belts_check": "Belt check (inboard)",
+        "propeller_check": "Propeller and prop nut check",
+        "controls_check": "Throttle / gear controls and cables check",
+        "engine_test_run": "Engine test run (start-up, temperature, alarms)"
+      }
+    },
+    "carenage": {
+      "label": "Haul-out & antifouling",
+      "items": {
+        "haul_out": "Haul-out and boat propping",
+        "pressure_wash": "High-pressure hull wash",
+        "underwater_hull_check": "Underwater hull check (osmosis, impacts, cracks)",
+        "anodes_replacement": "Anode replacement",
+        "through_hulls_check": "Through-hulls and seacocks check",
+        "propeller_shaft_check": "Propeller, shaft or drive check",
+        "sanding_preparation": "Hull sanding and preparation",
+        "antifouling_application": "Antifouling application",
+        "hull_polishing": "Hull and waterline polishing",
+        "relaunch": "Relaunch and watertightness check"
+      }
+    },
+    "catamaran": {
+      "label": "Catamaran",
+      "items": {
+        "port_engine_line_check": "Port engine line check (levels, anodes, impeller)",
+        "starboard_engine_line_check": "Starboard engine line check (levels, anodes, impeller)",
+        "hulls_inspection": "Both hulls and bridgedeck inspection",
+        "trampoline_check": "Trampoline and lashings check",
+        "watertight_lockers_check": "Watertight lockers and drain plugs inspection",
+        "steering_sync_check": "Twin rudder check and synchronization",
+        "bimini_lazybag_check": "Bimini and lazy bag check",
+        "davits_tender_check": "Davits and tender check"
+      }
+    },
+    "semi_rigide": {
+      "label": "RIB",
+      "items": {
+        "tubes_pressure_check": "Tube pressure check",
+        "tubes_bonding_check": "Tube bonding and chafing points inspection",
+        "valves_check": "Inflation valve check",
+        "freshwater_rinse": "Freshwater rinse (hull, hardware)",
+        "engine_flush": "Engine cooling system flush",
+        "trailer_check": "Trailer check (rollers, straps, lights, bearings)",
+        "tubes_protection": "Tube cleaning and UV protection",
+        "winter_storage": "Winter storage: partial deflation and sheltered storage"
+      }
+    }
   }
 }
