@@ -284,6 +284,7 @@ const websiteSchema = computed(() =>
 
   <!-- 4. Feature deep-dives -->
   <HomeFeatureSection
+    anchor-id="features"
     :eyebrow="t.home.features[0].eyebrow"
     :title="t.home.features[0].title"
     :title-highlight="t.home.features[0].titleHighlight"

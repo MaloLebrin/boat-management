@@ -18,6 +18,7 @@ interface FeatureData {
   isAi?: boolean
   reversed?: boolean
   bgClass?: string
+  anchorId?: string
 }
 
 const props = defineProps<FeatureData>()
@@ -34,8 +35,9 @@ const mockComponents: Record<MockType, typeof HomeMockBoatDetail> = {
 
 <template>
   <section
+    :id="anchorId"
     :ref="sectionEl"
-    class="reveal px-6 py-20 lg:px-8 lg:py-24"
+    class="reveal scroll-mt-24 px-6 py-20 lg:px-8 lg:py-24"
     :class="[bgClass || 'bg-cream', { visible: isVisible }]"
   >
     <div class="mx-auto max-w-7xl">
