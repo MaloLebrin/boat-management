@@ -4,8 +4,11 @@ import app from '@adonisjs/core/services/app'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { BoatReservationFactory } from '#database/factories/boat_reservation_factory'
 import { MediaFactory } from '#database/factories/media_factory'
-import { UserFactory } from '#database/factories/user_factory'
-import { createAdminUser, createMemberUser } from '#tests/functional/helpers'
+import {
+  createCharterAdminUser,
+  createEnterprisePlanUser,
+  createMemberUser,
+} from '#tests/functional/helpers'
 import { CloudinaryService } from '#services/cloudinary_service'
 import BoatInspection from '#models/boat_inspection'
 import Media from '#models/media'
@@ -24,7 +27,7 @@ test.group('Boat Inspections (functional)', (group) => {
   // --- show ---
 
   test('GET .../inspection renders the page for an authorized user', async ({ client }) => {
-    const user = await createAdminUser()
+    const user = await createCharterAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
     const reservation = await BoatReservationFactory.merge({
       boatId: boat.id,
@@ -41,7 +44,7 @@ test.group('Boat Inspections (functional)', (group) => {
   })
 
   test('GET .../inspection redirects to /login when unauthenticated', async ({ client }) => {
-    const user = await createAdminUser()
+    const user = await createCharterAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
     const reservation = await BoatReservationFactory.merge({
       boatId: boat.id,
@@ -57,7 +60,7 @@ test.group('Boat Inspections (functional)', (group) => {
   })
 
   test('GET .../inspection redirects to /boats when boat not found', async ({ client }) => {
-    const user = await createAdminUser()
+    const user = await createCharterAdminUser()
 
     const response = await client
       .get('/boats/999999/reservations/1/inspection')
@@ -71,7 +74,7 @@ test.group('Boat Inspections (functional)', (group) => {
   test('GET .../inspection redirects to reservations index when reservation not found', async ({
     client,
   }) => {
-    const user = await createAdminUser()
+    const user = await createCharterAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
 
     const response = await client
@@ -84,8 +87,8 @@ test.group('Boat Inspections (functional)', (group) => {
   })
 
   test('GET .../inspection rejects cross-org attempt', async ({ client }) => {
-    const owner = await createAdminUser()
-    const other = await UserFactory.with('organization').create()
+    const owner = await createCharterAdminUser()
+    const other = await createEnterprisePlanUser()
     const boat = await BoatFactory.merge({ organizationId: owner.organizationId! }).create()
     const reservation = await BoatReservationFactory.merge({
       boatId: boat.id,
@@ -104,7 +107,7 @@ test.group('Boat Inspections (functional)', (group) => {
   // --- store ---
 
   test('POST .../inspections creates a checkout inspection', async ({ client, assert }) => {
-    const user = await createAdminUser()
+    const user = await createCharterAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
     const reservation = await BoatReservationFactory.merge({
       boatId: boat.id,
@@ -130,7 +133,7 @@ test.group('Boat Inspections (functional)', (group) => {
     client,
     assert,
   }) => {
-    const admin = await createAdminUser()
+    const admin = await createCharterAdminUser()
     const member = await createMemberUser(admin.organizationId!)
     const boat = await BoatFactory.merge({ organizationId: admin.organizationId! }).create()
     const reservation = await BoatReservationFactory.merge({
@@ -154,7 +157,7 @@ test.group('Boat Inspections (functional)', (group) => {
     client,
     assert,
   }) => {
-    const user = await createAdminUser()
+    const user = await createCharterAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
     const reservation = await BoatReservationFactory.merge({
       boatId: boat.id,
@@ -179,8 +182,8 @@ test.group('Boat Inspections (functional)', (group) => {
   })
 
   test('POST .../inspections rejects cross-org attempt', async ({ client, assert }) => {
-    const owner = await createAdminUser()
-    const other = await UserFactory.with('organization').create()
+    const owner = await createCharterAdminUser()
+    const other = await createEnterprisePlanUser()
     const boat = await BoatFactory.merge({ organizationId: owner.organizationId! }).create()
     const reservation = await BoatReservationFactory.merge({
       boatId: boat.id,
@@ -202,7 +205,7 @@ test.group('Boat Inspections (functional)', (group) => {
   // --- update ---
 
   test('PUT .../inspections/:id updates fields', async ({ client, assert }) => {
-    const user = await createAdminUser()
+    const user = await createCharterAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
     const reservation = await BoatReservationFactory.merge({
       boatId: boat.id,
@@ -235,7 +238,7 @@ test.group('Boat Inspections (functional)', (group) => {
     client,
     assert,
   }) => {
-    const user = await createAdminUser()
+    const user = await createCharterAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
     const reservation = await BoatReservationFactory.merge({
       boatId: boat.id,
@@ -265,7 +268,7 @@ test.group('Boat Inspections (functional)', (group) => {
   })
 
   test('PUT .../inspections/:id returns 302 when inspection not found', async ({ client }) => {
-    const user = await createAdminUser()
+    const user = await createCharterAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
     const reservation = await BoatReservationFactory.merge({
       boatId: boat.id,
@@ -287,7 +290,7 @@ test.group('Boat Inspections (functional)', (group) => {
     client,
     assert,
   }) => {
-    const admin = await createAdminUser()
+    const admin = await createCharterAdminUser()
     const member = await createMemberUser(admin.organizationId!)
     const boat = await BoatFactory.merge({ organizationId: admin.organizationId! }).create()
     const reservation = await BoatReservationFactory.merge({
@@ -316,7 +319,7 @@ test.group('Boat Inspections (functional)', (group) => {
   })
 
   test('DELETE .../inspections/:id allows admin to delete', async ({ client, assert }) => {
-    const admin = await createAdminUser()
+    const admin = await createCharterAdminUser()
     const boat = await BoatFactory.merge({ organizationId: admin.organizationId! }).create()
     const reservation = await BoatReservationFactory.merge({
       boatId: boat.id,
@@ -356,7 +359,7 @@ test.group('Boat Inspections (functional)', (group) => {
     )
 
     try {
-      const admin = await createAdminUser()
+      const admin = await createCharterAdminUser()
       const boat = await BoatFactory.merge({ organizationId: admin.organizationId! }).create()
       const reservation = await BoatReservationFactory.merge({
         boatId: boat.id,
@@ -399,7 +402,7 @@ test.group('Boat Inspections (functional)', (group) => {
   // --- validators ---
 
   test('POST .../inspections rejects a non-integer fuelLevel', async ({ client, assert }) => {
-    const user = await createAdminUser()
+    const user = await createCharterAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
     const reservation = await BoatReservationFactory.merge({
       boatId: boat.id,
@@ -422,7 +425,7 @@ test.group('Boat Inspections (functional)', (group) => {
     client,
     assert,
   }) => {
-    const user = await createAdminUser()
+    const user = await createCharterAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
     const reservation = await BoatReservationFactory.merge({
       boatId: boat.id,
@@ -447,7 +450,7 @@ test.group('Boat Inspections (functional)', (group) => {
     client,
     assert,
   }) => {
-    const admin = await createAdminUser()
+    const admin = await createCharterAdminUser()
     const member = await createMemberUser(admin.organizationId!)
     const boat = await BoatFactory.merge({ organizationId: admin.organizationId! }).create()
     const reservation = await BoatReservationFactory.merge({
@@ -497,7 +500,7 @@ test.group('Boat Inspections (functional)', (group) => {
     )
 
     try {
-      const admin = await createAdminUser()
+      const admin = await createCharterAdminUser()
       const boat = await BoatFactory.merge({ organizationId: admin.organizationId! }).create()
       const reservation = await BoatReservationFactory.merge({
         boatId: boat.id,
@@ -562,7 +565,7 @@ test.group('Boat Inspections (functional)', (group) => {
     )
 
     try {
-      const admin = await createAdminUser()
+      const admin = await createCharterAdminUser()
       const boat = await BoatFactory.merge({ organizationId: admin.organizationId! }).create()
       const reservation = await BoatReservationFactory.merge({
         boatId: boat.id,

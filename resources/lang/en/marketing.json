@@ -83,7 +83,7 @@
       "note": "Modules available on the Pro plan — all included in Enterprise.",
       "cta": "Build my plan",
       "charter_name": "Charter",
-      "charter_desc": "Per-boat pricing and seasonal periods.",
+      "charter_desc": "Reservations, inspections, contracts, per-boat pricing and seasonal periods.",
       "crm_name": "CRM & Invoicing",
       "crm_desc": "Client records, quotes and invoices."
     },
@@ -1150,7 +1150,7 @@
     "modules_included": "All modules are included in Enterprise.",
     "modules_price_per": "/mo",
     "modules_charter_name": "Charter",
-    "modules_charter_desc": "Per-boat pricing and seasonal rates for rental businesses.",
+    "modules_charter_desc": "Reservations, inspections, contracts and seasonal pricing for rental businesses.",
     "modules_crm_name": "CRM & Invoicing",
     "modules_crm_desc": "Client records, GDPR, quotes and invoices.",
     "config_eyebrow": "CONFIGURATOR",

@@ -1,7 +1,7 @@
 import { test } from '@japa/runner'
 import testUtils from '@adonisjs/core/services/test_utils'
 import { BoatFactory } from '#database/factories/boat_factory'
-import { createAdminUser } from '#tests/functional/helpers'
+import { createCharterAdminUser } from '#tests/functional/helpers'
 import BoatPricing from '#models/boat_pricing'
 import BoatReservation from '#models/boat_reservation'
 import PricingSeason from '#models/pricing_season'
@@ -22,7 +22,7 @@ test.group('Reservation pricing (functional)', (group) => {
     client,
     assert,
   }) => {
-    const user = await createAdminUser()
+    const user = await createCharterAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
     await BoatPricing.create({
       organizationId: user.organizationId!,
@@ -43,7 +43,7 @@ test.group('Reservation pricing (functional)', (group) => {
   })
 
   test('store keeps a user-provided total_price', async ({ client, assert }) => {
-    const user = await createAdminUser()
+    const user = await createCharterAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
     await BoatPricing.create({
       organizationId: user.organizationId!,
@@ -63,7 +63,7 @@ test.group('Reservation pricing (functional)', (group) => {
   })
 
   test('auto-filled total reflects an applicable season', async ({ client, assert }) => {
-    const user = await createAdminUser()
+    const user = await createCharterAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
     await BoatPricing.create({
       organizationId: user.organizationId!,
@@ -93,7 +93,7 @@ test.group('Reservation pricing (functional)', (group) => {
   })
 
   test('store rejects a reservation shorter than min days', async ({ client, assert }) => {
-    const user = await createAdminUser()
+    const user = await createCharterAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
     await BoatPricing.create({
       organizationId: user.organizationId!,
@@ -119,7 +119,7 @@ test.group('Reservation pricing (functional)', (group) => {
   })
 
   test('store rejects a reservation longer than max days', async ({ client, assert }) => {
-    const user = await createAdminUser()
+    const user = await createCharterAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
     await BoatPricing.create({
       organizationId: user.organizationId!,
@@ -145,7 +145,7 @@ test.group('Reservation pricing (functional)', (group) => {
   })
 
   test('index exposes boatPricing and pricingSeasons props', async ({ client, assert }) => {
-    const user = await createAdminUser()
+    const user = await createCharterAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
     await BoatPricing.create({
       organizationId: user.organizationId!,
@@ -180,7 +180,7 @@ test.group('Reservation pricing (functional)', (group) => {
     client,
     assert,
   }) => {
-    const user = await createAdminUser()
+    const user = await createCharterAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
 
     await client

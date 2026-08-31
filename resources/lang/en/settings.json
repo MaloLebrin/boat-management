@@ -136,7 +136,7 @@
       "adminOnly": "Admins only",
       "charter": {
         "name": "Charter",
-        "desc": "Per-boat pricing and seasonal rates"
+        "desc": "Reservations, inspections, rental contracts, per-boat pricing and seasonal rates"
       },
       "crm_invoicing": {
         "name": "CRM & Invoicing",

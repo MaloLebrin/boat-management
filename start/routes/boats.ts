@@ -372,123 +372,136 @@ router
       .post('boats/:boatId/position', [controllers.BoatPosition, 'store'])
       .as('boats.position.store')
 
+    // Domaine réservations — calendrier par bateau, états des lieux, contrats
+    // de location : périmètre du module Location (charter), gardé par le même
+    // middleware que la route flotte `/reservations` (#595).
     router
-      .get('boats/:boatId/reservations', [BoatReservationsController, 'index'])
-      .as('boats.reservations.index')
-    router
-      .post('boats/:boatId/reservations', [BoatReservationsController, 'store'])
-      .as('boats.reservations.store')
-    router
-      .patch('boats/:boatId/reservations/:reservationId', [BoatReservationsController, 'update'])
-      .as('boats.reservations.update')
-    router
-      .delete('boats/:boatId/reservations/:reservationId', [BoatReservationsController, 'destroy'])
-      .as('boats.reservations.destroy')
+      .group(() => {
+        router
+          .get('boats/:boatId/reservations', [BoatReservationsController, 'index'])
+          .as('boats.reservations.index')
+        router
+          .post('boats/:boatId/reservations', [BoatReservationsController, 'store'])
+          .as('boats.reservations.store')
+        router
+          .patch('boats/:boatId/reservations/:reservationId', [
+            BoatReservationsController,
+            'update',
+          ])
+          .as('boats.reservations.update')
+        router
+          .delete('boats/:boatId/reservations/:reservationId', [
+            BoatReservationsController,
+            'destroy',
+          ])
+          .as('boats.reservations.destroy')
 
-    router
-      .get('boats/:boatId/reservations/:reservationId/inspection', [
-        controllers.BoatInspections,
-        'show',
-      ])
-      .as('boats.reservations.inspection.show')
-    router
-      .post('boats/:boatId/reservations/:reservationId/inspections', [
-        controllers.BoatInspections,
-        'store',
-      ])
-      .as('boats.reservations.inspections.store')
-    router
-      .put('boats/:boatId/reservations/:reservationId/inspections/:inspectionId', [
-        controllers.BoatInspections,
-        'update',
-      ])
-      .as('boats.reservations.inspections.update')
-    router
-      .delete('boats/:boatId/reservations/:reservationId/inspections/:inspectionId', [
-        controllers.BoatInspections,
-        'destroy',
-      ])
-      .as('boats.reservations.inspections.destroy')
-    // Checklist d'état des lieux : constat par point de contrôle (#584)
-    router
-      .patch('boats/:boatId/reservations/:reservationId/inspections/:inspectionId/items', [
-        controllers.BoatInspections,
-        'setItem',
-      ])
-      .as('boats.reservations.inspections.items.set')
-    router
-      .delete('boats/:boatId/reservations/:reservationId/inspections/:inspectionId/items', [
-        controllers.BoatInspections,
-        'destroyItem',
-      ])
-      .as('boats.reservations.inspections.items.destroy')
-    // Défauts constatés → actions équipement liées à l'inspection (#311)
-    router
-      .post(
-        'boats/:boatId/reservations/:reservationId/inspections/:inspectionId/equipment-actions',
-        [controllers.BoatInspections, 'storeEquipmentAction']
-      )
-      .as('boats.reservations.inspections.equipmentActions.store')
-    router
-      .delete(
-        'boats/:boatId/reservations/:reservationId/inspections/:inspectionId/equipment-actions/:actionId',
-        [controllers.BoatInspections, 'destroyEquipmentAction']
-      )
-      .as('boats.reservations.inspections.equipmentActions.destroy')
-    router
-      .post('boats/:boatId/reservations/:reservationId/inspections/:inspectionId/photos', [
-        controllers.BoatMedia,
-        'storeInspectionPhoto',
-      ])
-      .as('boats.reservations.inspections.photos.store')
-    router
-      .delete(
-        'boats/:boatId/reservations/:reservationId/inspections/:inspectionId/photos/:mediaId',
-        [controllers.BoatMedia, 'destroyInspectionMedia']
-      )
-      .as('boats.reservations.inspections.photos.destroy')
+        router
+          .get('boats/:boatId/reservations/:reservationId/inspection', [
+            controllers.BoatInspections,
+            'show',
+          ])
+          .as('boats.reservations.inspection.show')
+        router
+          .post('boats/:boatId/reservations/:reservationId/inspections', [
+            controllers.BoatInspections,
+            'store',
+          ])
+          .as('boats.reservations.inspections.store')
+        router
+          .put('boats/:boatId/reservations/:reservationId/inspections/:inspectionId', [
+            controllers.BoatInspections,
+            'update',
+          ])
+          .as('boats.reservations.inspections.update')
+        router
+          .delete('boats/:boatId/reservations/:reservationId/inspections/:inspectionId', [
+            controllers.BoatInspections,
+            'destroy',
+          ])
+          .as('boats.reservations.inspections.destroy')
+        // Checklist d'état des lieux : constat par point de contrôle (#584)
+        router
+          .patch('boats/:boatId/reservations/:reservationId/inspections/:inspectionId/items', [
+            controllers.BoatInspections,
+            'setItem',
+          ])
+          .as('boats.reservations.inspections.items.set')
+        router
+          .delete('boats/:boatId/reservations/:reservationId/inspections/:inspectionId/items', [
+            controllers.BoatInspections,
+            'destroyItem',
+          ])
+          .as('boats.reservations.inspections.items.destroy')
+        // Défauts constatés → actions équipement liées à l'inspection (#311)
+        router
+          .post(
+            'boats/:boatId/reservations/:reservationId/inspections/:inspectionId/equipment-actions',
+            [controllers.BoatInspections, 'storeEquipmentAction']
+          )
+          .as('boats.reservations.inspections.equipmentActions.store')
+        router
+          .delete(
+            'boats/:boatId/reservations/:reservationId/inspections/:inspectionId/equipment-actions/:actionId',
+            [controllers.BoatInspections, 'destroyEquipmentAction']
+          )
+          .as('boats.reservations.inspections.equipmentActions.destroy')
+        router
+          .post('boats/:boatId/reservations/:reservationId/inspections/:inspectionId/photos', [
+            controllers.BoatMedia,
+            'storeInspectionPhoto',
+          ])
+          .as('boats.reservations.inspections.photos.store')
+        router
+          .delete(
+            'boats/:boatId/reservations/:reservationId/inspections/:inspectionId/photos/:mediaId',
+            [controllers.BoatMedia, 'destroyInspectionMedia']
+          )
+          .as('boats.reservations.inspections.photos.destroy')
 
-    router
-      .get('boats/:boatId/reservations/:reservationId/contract', [
-        controllers.RentalContracts,
-        'show',
-      ])
-      .as('boats.reservations.contract.show')
-    router
-      .post('boats/:boatId/reservations/:reservationId/contract', [
-        controllers.RentalContracts,
-        'store',
-      ])
-      .as('boats.reservations.contract.store')
-    router
-      .get('boats/:boatId/reservations/:reservationId/contract/pdf', [
-        controllers.RentalContracts,
-        'downloadPdf',
-      ])
-      .as('boats.reservations.contract.pdf')
-    router
-      .get('boats/:boatId/reservations/:reservationId/contract/signed-document', [
-        controllers.RentalContracts,
-        'downloadSignedDocument',
-      ])
-      .as('boats.reservations.contract.signedDocument')
-    router
-      .post('boats/:boatId/reservations/:reservationId/contract/send', [
-        controllers.RentalContracts,
-        'send',
-      ])
-      .as('boats.reservations.contract.send')
-    router
-      .post('boats/:boatId/reservations/:reservationId/contract/sign', [
-        controllers.RentalContracts,
-        'sign',
-      ])
-      .as('boats.reservations.contract.sign')
-    router
-      .delete('boats/:boatId/reservations/:reservationId/contract', [
-        controllers.RentalContracts,
-        'destroy',
-      ])
-      .as('boats.reservations.contract.destroy')
+        router
+          .get('boats/:boatId/reservations/:reservationId/contract', [
+            controllers.RentalContracts,
+            'show',
+          ])
+          .as('boats.reservations.contract.show')
+        router
+          .post('boats/:boatId/reservations/:reservationId/contract', [
+            controllers.RentalContracts,
+            'store',
+          ])
+          .as('boats.reservations.contract.store')
+        router
+          .get('boats/:boatId/reservations/:reservationId/contract/pdf', [
+            controllers.RentalContracts,
+            'downloadPdf',
+          ])
+          .as('boats.reservations.contract.pdf')
+        router
+          .get('boats/:boatId/reservations/:reservationId/contract/signed-document', [
+            controllers.RentalContracts,
+            'downloadSignedDocument',
+          ])
+          .as('boats.reservations.contract.signedDocument')
+        router
+          .post('boats/:boatId/reservations/:reservationId/contract/send', [
+            controllers.RentalContracts,
+            'send',
+          ])
+          .as('boats.reservations.contract.send')
+        router
+          .post('boats/:boatId/reservations/:reservationId/contract/sign', [
+            controllers.RentalContracts,
+            'sign',
+          ])
+          .as('boats.reservations.contract.sign')
+        router
+          .delete('boats/:boatId/reservations/:reservationId/contract', [
+            controllers.RentalContracts,
+            'destroy',
+          ])
+          .as('boats.reservations.contract.destroy')
+      })
+      .use(middleware.requireReservationsPlan())
   })
   .use(middleware.auth())

@@ -43,4 +43,5 @@ export const middleware = router.named({
   guest: () => import('#middleware/guest_middleware'),
   auth: () => import('#middleware/auth_middleware'),
   requirePortsPlan: () => import('#middleware/require_ports_plan_middleware'),
+  requireReservationsPlan: () => import('#middleware/require_reservations_plan_middleware'),
 })

@@ -1,7 +1,7 @@
 import { BoatFactory } from '#database/factories/boat_factory'
 import NavigationLog from '#models/navigation_log'
 import BoatReservation from '#models/boat_reservation'
-import { createAdminUser } from '#tests/functional/helpers'
+import { createAdminUser, createCharterAdminUser } from '#tests/functional/helpers'
 import testUtils from '@adonisjs/core/services/test_utils'
 import { test } from '@japa/runner'
 
@@ -83,7 +83,7 @@ test.group('Timezone offset on datetime-local submissions (functional)', (group)
     client,
     assert,
   }) => {
-    const user = await createAdminUser()
+    const user = await createCharterAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
 
     const response = await client

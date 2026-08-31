@@ -1,5 +1,6 @@
 import OrganizationMembership from '#models/organization_membership'
 import type User from '#models/user'
+import OrganizationModuleService from '#services/organization_module_service'
 import { UserFactory } from '#database/factories/user_factory'
 
 /**
@@ -18,6 +19,20 @@ export async function createAdminUser(): Promise<User> {
       role: 'admin',
     })
   }
+  return user
+}
+
+/**
+ * Comme `createAdminUser`, mais l'organisation (plan `pro`) a le module
+ * Location (`charter`) actif. Requis par les routes du domaine réservations —
+ * réservations, états des lieux, contrats — gardées par
+ * `RequireReservationsPlanMiddleware` depuis #595.
+ */
+export async function createCharterAdminUser(): Promise<User> {
+  const user = await createAdminUser()
+  await new OrganizationModuleService().grantModule(user.organizationId!, 'charter', {
+    source: 'subscription',
+  })
   return user
 }
 
@@ -60,6 +75,17 @@ export async function createBoatOwnerUser(organizationId: number): Promise<User>
  */
 export async function createProPlanUser(): Promise<User> {
   return UserFactory.with('organization', 1, (org) => org.merge({ plan: 'pro' })).create()
+}
+
+/**
+ * Crée un utilisateur d'une organisation au plan `enterprise` (tous modules
+ * inclus), sans membership. Sert notamment d'« attaquant » cross-org dans les
+ * tests du domaine réservations : l'Entreprise passe
+ * `RequireReservationsPlanMiddleware`, le test vérifie donc bien l'isolation
+ * entre organisations, pas le gating de module (#595).
+ */
+export async function createEnterprisePlanUser(): Promise<User> {
+  return UserFactory.with('organization', 1, (org) => org.merge({ plan: 'enterprise' })).create()
 }
 
 /**
