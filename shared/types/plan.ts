@@ -17,6 +17,11 @@ export interface PlanQuotas {
   canManageClients: boolean
   /** Tarification par bateau — Enterprise only. */
   canManagePricing: boolean
+  /**
+   * Réservations, états des lieux et contrats de location — périmètre du
+   * module Location (#595). Inclus en Entreprise, add-on `charter` sur Pro.
+   */
+  canManageReservations: boolean
   /** Devis/factures — Enterprise only. */
   canManageInvoices: boolean
   /**
@@ -62,6 +67,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanQuotas> = {
     canWhiteLabel: false,
     canManageClients: false,
     canManagePricing: false,
+    canManageReservations: false,
     canManageInvoices: false,
     canManagePorts: false,
   },
@@ -78,6 +84,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanQuotas> = {
     canWhiteLabel: false,
     canManageClients: false,
     canManagePricing: false,
+    canManageReservations: false,
     canManageInvoices: false,
     canManagePorts: true,
   },
@@ -94,6 +101,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanQuotas> = {
     canWhiteLabel: true,
     canManageClients: true,
     canManagePricing: true,
+    canManageReservations: true,
     canManageInvoices: true,
     canManagePorts: true,
   },
@@ -130,7 +138,7 @@ export const MODULE_PRICES: Record<PlanModule, PlanPrice> = {
  * qu'accorder des capacités, jamais en retirer.
  */
 export const MODULE_FLAGS: Record<PlanModule, Partial<PlanQuotas>> = {
-  charter: { canManagePricing: true },
+  charter: { canManagePricing: true, canManageReservations: true },
   crm_invoicing: { canManageClients: true, canManageInvoices: true },
 }
 

@@ -9,6 +9,7 @@ export type QuotaFeature =
   | 'storage'
   | 'clients'
   | 'pricing'
+  | 'reservations'
   | 'invoices'
   | 'ports'
 

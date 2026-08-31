@@ -136,7 +136,7 @@
       "adminOnly": "Réservé aux administrateurs",
       "charter": {
         "name": "Location",
-        "desc": "Tarif par bateau et périodes saisonnières"
+        "desc": "Réservations, états des lieux, contrats, tarif par bateau et périodes saisonnières"
       },
       "crm_invoicing": {
         "name": "CRM & Facturation",

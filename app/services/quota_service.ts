@@ -166,6 +166,24 @@ export default class QuotaService {
     }
   }
 
+  async canManageReservations(org: Organization | null): Promise<boolean> {
+    this.#assertOrganization(org)
+    const limits = await this.organizationModuleService.getEffectiveQuotas(org)
+    return limits.canManageReservations
+  }
+
+  async assertCanManageReservations(org: Organization | null): Promise<void> {
+    this.#assertOrganization(org)
+    const limits = await this.organizationModuleService.getEffectiveQuotas(org)
+    if (!limits.canManageReservations) {
+      throw new QuotaExceededError('reservations', {
+        limit: null,
+        current: 0,
+        upgradeTo: getUpgradeTier(org.plan),
+      })
+    }
+  }
+
   async canManageInvoices(org: Organization | null): Promise<boolean> {
     this.#assertOrganization(org)
     const limits = await this.organizationModuleService.getEffectiveQuotas(org)

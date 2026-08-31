@@ -3,7 +3,7 @@ import testUtils from '@adonisjs/core/services/test_utils'
 import { DateTime } from 'luxon'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { UserFactory } from '#database/factories/user_factory'
-import { createAdminUser } from '#tests/functional/helpers'
+import { createCharterAdminUser } from '#tests/functional/helpers'
 import OrganizationMembership from '#models/organization_membership'
 import BoatReservation from '#models/boat_reservation'
 import Client from '#models/client'
@@ -38,7 +38,7 @@ test.group('Reservation ↔ client link (#275)', (group) => {
   group.each.setup(() => testUtils.db().truncate())
 
   test('links a reservation to a client on create', async ({ client, assert }) => {
-    const user = await createAdminUser()
+    const user = await createCharterAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
     const c = await makeClient(user.organizationId!)
 
@@ -54,7 +54,7 @@ test.group('Reservation ↔ client link (#275)', (group) => {
   })
 
   test('refuses to create a reservation for a blacklisted client', async ({ client, assert }) => {
-    const user = await createAdminUser()
+    const user = await createCharterAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
     const c = await makeClient(user.organizationId!, 'blacklisted')
 
@@ -70,7 +70,7 @@ test.group('Reservation ↔ client link (#275)', (group) => {
   })
 
   test('refuses to update a reservation onto a blacklisted client', async ({ client, assert }) => {
-    const user = await createAdminUser()
+    const user = await createCharterAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
     const blacklisted = await makeClient(user.organizationId!, 'blacklisted')
     const reservation = await BoatReservation.create({
@@ -95,8 +95,8 @@ test.group('Reservation ↔ client link (#275)', (group) => {
   })
 
   test('ignores a client id from another organization', async ({ client, assert }) => {
-    const user = await createAdminUser()
-    const other = await createAdminUser()
+    const user = await createCharterAdminUser()
+    const other = await createCharterAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
     const foreignClient = await makeClient(other.organizationId!)
 
@@ -113,7 +113,7 @@ test.group('Reservation ↔ client link (#275)', (group) => {
   test('deleting a client nulls the reservation link but keeps the snapshot', async ({
     assert,
   }) => {
-    const user = await createAdminUser()
+    const user = await createCharterAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
     const c = await makeClient(user.organizationId!)
     const reservation = await BoatReservation.create({

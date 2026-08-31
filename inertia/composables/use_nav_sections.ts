@@ -14,6 +14,11 @@ export function useNavSections() {
   // Cartographie de port réservée aux plans Pro et Entreprise (#604) — même
   // garde que `RequirePortsPlanMiddleware` côté serveur, sinon lien mort.
   const canManagePorts = computed(() => effectiveQuotas.value?.canManagePorts === true)
+  // Réservations réservées au module Location / plan Entreprise (#595) — même
+  // garde que `RequireReservationsPlanMiddleware` côté serveur.
+  const canManageReservations = computed(
+    () => effectiveQuotas.value?.canManageReservations === true
+  )
 
   const navSections = computed(() => {
     // Portail self-service : accès restreint à ses propres bateaux, aucune des
@@ -76,7 +81,7 @@ export function useNavSections() {
     }
 
     const businessItems: { name: string; path: string; route: null; icon: string }[] = []
-    if (can('boats.view')) {
+    if (canManageReservations.value && can('boats.view')) {
       businessItems.push({
         name: t('nav.reservations'),
         path: '/reservations',
@@ -151,7 +156,7 @@ export function useNavSections() {
       if (can('maintenance.view')) {
         items.push({ name: t('nav.planning'), path: '/planning', icon: 'calendar' })
       }
-      if (can('boats.view')) {
+      if (canManageReservations.value && can('boats.view')) {
         items.push({
           name: t('nav.reservations'),
           path: '/reservations',

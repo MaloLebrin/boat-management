@@ -2,7 +2,7 @@ import { test } from '@japa/runner'
 import testUtils from '@adonisjs/core/services/test_utils'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { BoatReservationFactory } from '#database/factories/boat_reservation_factory'
-import { createAdminUser } from '#tests/functional/helpers'
+import { createCharterAdminUser } from '#tests/functional/helpers'
 import BoatReservation from '#models/boat_reservation'
 import { RESERVATION_TYPES } from '#shared/types/reservation'
 
@@ -18,7 +18,7 @@ test.group('Reservation type (functional)', (group) => {
   group.each.setup(() => testUtils.db().truncate())
 
   test('POST enregistre chacun des types de prestation', async ({ client, assert }) => {
-    const user = await createAdminUser()
+    const user = await createCharterAdminUser()
 
     for (const [index, type] of RESERVATION_TYPES.entries()) {
       const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
@@ -33,7 +33,7 @@ test.group('Reservation type (functional)', (group) => {
   })
 
   test('POST sans type laisse la réservation sans type', async ({ client, assert }) => {
-    const user = await createAdminUser()
+    const user = await createCharterAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
 
     await client.post(`/boats/${boat.id}/reservations`).loginAs(user).form(VALID_RESERVATION)
@@ -43,7 +43,7 @@ test.group('Reservation type (functional)', (group) => {
   })
 
   test('POST refuse un type hors vocabulaire', async ({ client, assert }) => {
-    const user = await createAdminUser()
+    const user = await createCharterAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
 
     await client
@@ -55,7 +55,7 @@ test.group('Reservation type (functional)', (group) => {
   })
 
   test('PATCH renseigne puis efface le type', async ({ client, assert }) => {
-    const user = await createAdminUser()
+    const user = await createCharterAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
     const reservation = await BoatReservationFactory.merge({
       boatId: boat.id,
@@ -80,7 +80,7 @@ test.group('Reservation type (functional)', (group) => {
   })
 
   test('PATCH sans champ `type` ne touche pas au type existant', async ({ client, assert }) => {
-    const user = await createAdminUser()
+    const user = await createCharterAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
     const reservation = await BoatReservationFactory.merge({
       boatId: boat.id,
@@ -98,7 +98,7 @@ test.group('Reservation type (functional)', (group) => {
   })
 
   test('GET /reservations filtre la liste par type de prestation', async ({ client, assert }) => {
-    const user = await createAdminUser()
+    const user = await createCharterAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
 
     await BoatReservationFactory.merge({
@@ -127,7 +127,7 @@ test.group('Reservation type (functional)', (group) => {
   })
 
   test('GET /reservations ignore un filtre de type inconnu', async ({ client, assert }) => {
-    const user = await createAdminUser()
+    const user = await createCharterAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
     await BoatReservationFactory.merge({
       boatId: boat.id,

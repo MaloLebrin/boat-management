@@ -3,7 +3,7 @@ import testUtils from '@adonisjs/core/services/test_utils'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { BoatReservationFactory } from '#database/factories/boat_reservation_factory'
 import { UserFactory } from '#database/factories/user_factory'
-import { createAdminUser } from '#tests/functional/helpers'
+import { createCharterAdminUser, createEnterprisePlanUser } from '#tests/functional/helpers'
 import BoatInspection from '#models/boat_inspection'
 import BoatInspectionItem from '#models/boat_inspection_item'
 import { DateTime } from 'luxon'
@@ -25,7 +25,7 @@ test.group('Boat inspection checklist items (functional)', (group) => {
   group.each.setup(() => testUtils.db().truncate())
 
   async function setupInspection() {
-    const user = await createAdminUser()
+    const user = await createCharterAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
     const reservation = await BoatReservationFactory.merge({
       boatId: boat.id,
@@ -143,7 +143,7 @@ test.group('Boat inspection checklist items (functional)', (group) => {
 
   test('PATCH items rejects a cross-org attempt and stores nothing', async ({ client, assert }) => {
     const { boat, reservation, inspection } = await setupInspection()
-    const other = await UserFactory.with('organization').create()
+    const other = await createEnterprisePlanUser()
 
     const response = await client
       .patch(itemsUrl(boat.id, reservation.id, inspection.id))

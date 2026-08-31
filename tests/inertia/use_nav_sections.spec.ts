@@ -90,15 +90,19 @@ function mountWithPlan(
   return result!
 }
 
-// business section index (fleet=0, activity=1, maintenance=2, business=3)
-const BUSINESS_SECTION_INDEX = 3
+// La section business n'existe que si au moins un item est accordé par le
+// plan ou un module (#595) : on la retrouve par son label plutôt que par un
+// index figé, et une section absente équivaut à une liste vide.
+function businessNames(navSections: ReturnType<typeof useNavSections>['navSections']): string[] {
+  const section = navSections.value.find((s) => s.label === 'nav.sections.business')
+  return section ? section.items.map((i) => i.name) : []
+}
 
 // enterprise plan allows clients
 
 test('enterprise plan includes nav.clients item in business section', () => {
   const { navSections } = mountWithPlan('enterprise')
-  const businessSection = navSections.value[BUSINESS_SECTION_INDEX]
-  const names = businessSection.items.map((i) => i.name)
+  const names = businessNames(navSections)
   expect(names).toContain('nav.clients')
 })
 
@@ -106,8 +110,7 @@ test('enterprise plan includes nav.clients item in business section', () => {
 
 test('pro plan does NOT include nav.clients item in business section', () => {
   const { navSections } = mountWithPlan('pro')
-  const businessSection = navSections.value[BUSINESS_SECTION_INDEX]
-  const names = businessSection.items.map((i) => i.name)
+  const names = businessNames(navSections)
   expect(names).not.toContain('nav.clients')
 })
 
@@ -115,8 +118,7 @@ test('pro plan does NOT include nav.clients item in business section', () => {
 
 test('starter plan does NOT include nav.clients item in business section', () => {
   const { navSections } = mountWithPlan('starter')
-  const businessSection = navSections.value[BUSINESS_SECTION_INDEX]
-  const names = businessSection.items.map((i) => i.name)
+  const names = businessNames(navSections)
   expect(names).not.toContain('nav.clients')
 })
 
@@ -124,22 +126,19 @@ test('starter plan does NOT include nav.clients item in business section', () =>
 
 test('null plan does NOT include nav.clients item', () => {
   const { navSections } = mountWithPlan(null)
-  const businessSection = navSections.value[BUSINESS_SECTION_INDEX]
-  const names = businessSection.items.map((i) => i.name)
+  const names = businessNames(navSections)
   expect(names).not.toContain('nav.clients')
 })
 
 test('undefined plan does NOT include nav.clients item', () => {
   const { navSections } = mountWithPlan(undefined)
-  const businessSection = navSections.value[BUSINESS_SECTION_INDEX]
-  const names = businessSection.items.map((i) => i.name)
+  const names = businessNames(navSections)
   expect(names).not.toContain('nav.clients')
 })
 
 test('unknown plan string does NOT include nav.clients item', () => {
   const { navSections } = mountWithPlan('unknown_plan')
-  const businessSection = navSections.value[BUSINESS_SECTION_INDEX]
-  const names = businessSection.items.map((i) => i.name)
+  const names = businessNames(navSections)
   expect(names).not.toContain('nav.clients')
 })
 
@@ -147,41 +146,37 @@ test('unknown plan string does NOT include nav.clients item', () => {
 
 test('pro plan with crm_invoicing module includes clients and invoices items', () => {
   const { navSections } = mountWithPlan('pro', ['crm_invoicing'])
-  const businessSection = navSections.value[BUSINESS_SECTION_INDEX]
-  const names = businessSection.items.map((i) => i.name)
+  const names = businessNames(navSections)
   expect(names).toContain('nav.clients')
   expect(names).toContain('nav.invoices')
   expect(names).not.toContain('nav.pricingSeasons')
 })
 
-test('pro plan with charter module includes pricing seasons item only', () => {
+test('pro plan with charter module includes pricing seasons and reservations, not CRM items', () => {
   const { navSections } = mountWithPlan('pro', ['charter'])
-  const businessSection = navSections.value[BUSINESS_SECTION_INDEX]
-  const names = businessSection.items.map((i) => i.name)
+  const names = businessNames(navSections)
   expect(names).toContain('nav.pricingSeasons')
+  expect(names).toContain('nav.reservations')
   expect(names).not.toContain('nav.clients')
   expect(names).not.toContain('nav.invoices')
 })
 
 test('starter plan with a module still resolves the granted flags', () => {
   const { navSections } = mountWithPlan('starter', ['crm_invoicing'])
-  const businessSection = navSections.value[BUSINESS_SECTION_INDEX]
-  const names = businessSection.items.map((i) => i.name)
+  const names = businessNames(navSections)
   expect(names).toContain('nav.clients')
 })
 
 test('invalid activeModules values are ignored', () => {
   const { navSections } = mountWithPlan('pro', ['marina', 42, null])
-  const businessSection = navSections.value[BUSINESS_SECTION_INDEX]
-  const names = businessSection.items.map((i) => i.name)
+  const names = businessNames(navSections)
   expect(names).not.toContain('nav.clients')
   expect(names).not.toContain('nav.pricingSeasons')
 })
 
 test('missing activeModules prop falls back to tier flags only', () => {
   const { navSections } = mountWithPlan('enterprise', undefined)
-  const businessSection = navSections.value[BUSINESS_SECTION_INDEX]
-  const names = businessSection.items.map((i) => i.name)
+  const names = businessNames(navSections)
   expect(names).toContain('nav.clients')
 })
 
@@ -226,19 +221,23 @@ test('a pro plan without the ports.view capability does NOT include ports.nav', 
   expect(names).not.toContain('ports.nav')
 })
 
-// 4 sections are always present
+// sections présentes par plan — la section business n'apparaît que si un plan
+// ou un module accorde au moins un de ses items (#595)
 
-test('navSections always returns 4 sections', () => {
+test('starter plan returns 3 sections — no business item is granted', () => {
   const { navSections } = mountWithPlan('starter')
-  expect(navSections.value).toHaveLength(4)
-})
-
-test('section labels are the expected i18n keys', () => {
-  const { navSections } = mountWithPlan('starter')
+  expect(navSections.value).toHaveLength(3)
   const labels = navSections.value.map((s) => s.label)
   expect(labels).toContain('nav.sections.fleet')
   expect(labels).toContain('nav.sections.activity')
   expect(labels).toContain('nav.sections.maintenance')
+  expect(labels).not.toContain('nav.sections.business')
+})
+
+test('enterprise plan returns the 4 sections including business', () => {
+  const { navSections } = mountWithPlan('enterprise')
+  expect(navSections.value).toHaveLength(4)
+  const labels = navSections.value.map((s) => s.label)
   expect(labels).toContain('nav.sections.business')
 })
 
@@ -291,13 +290,32 @@ test('maintenance section contains planning and history items', () => {
   expect(names).toContain('nav.history')
 })
 
-// business section base items
+// réservations gatées par le module Location / plan Entreprise (#595) — même
+// garde que `RequireReservationsPlanMiddleware` côté serveur, sinon lien mort.
 
-test('business section always contains reservations', () => {
+test('enterprise plan includes nav.reservations item in business section', () => {
+  const { navSections } = mountWithPlan('enterprise')
+  expect(businessNames(navSections)).toContain('nav.reservations')
+})
+
+test('pro plan with charter module includes nav.reservations item', () => {
+  const { navSections } = mountWithPlan('pro', ['charter'])
+  expect(businessNames(navSections)).toContain('nav.reservations')
+})
+
+test('pro plan without module does NOT include nav.reservations item', () => {
+  const { navSections } = mountWithPlan('pro')
+  expect(businessNames(navSections)).not.toContain('nav.reservations')
+})
+
+test('starter plan does NOT include nav.reservations item', () => {
   const { navSections } = mountWithPlan('starter')
-  const businessSection = navSections.value[BUSINESS_SECTION_INDEX]
-  const names = businessSection.items.map((i) => i.name)
-  expect(names).toContain('nav.reservations')
+  expect(businessNames(navSections)).not.toContain('nav.reservations')
+})
+
+test('crm_invoicing module does NOT grant nav.reservations', () => {
+  const { navSections } = mountWithPlan('pro', ['crm_invoicing'])
+  expect(businessNames(navSections)).not.toContain('nav.reservations')
 })
 
 // settings item pinned outside navSections

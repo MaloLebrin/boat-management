@@ -10,6 +10,9 @@ import { beforeEach, describe, expect, test, vi } from 'vitest'
 const mockRole = vi.hoisted(() => ({ value: 'mechanic' as string | null }))
 const mockCaps = vi.hoisted(() => ({ value: new Set<string>() }))
 const mockUrl = vi.hoisted(() => ({ value: '/dashboard' }))
+// Quotas effectifs mockés : les réservations sont gatées par le module
+// Location / plan Entreprise (#595), comme dans la nav complète.
+const mockQuotas = vi.hoisted(() => ({ value: { canManageReservations: true } }))
 
 vi.mock('@inertiajs/vue3', () => ({
   usePage: () => ({
@@ -32,7 +35,13 @@ vi.mock('~/composables/use_permissions', () => ({
 }))
 
 vi.mock('~/composables/use_plan', () => ({
-  usePlan: () => ({ effectiveQuotas: { value: {} } }),
+  usePlan: () => ({
+    effectiveQuotas: {
+      get value() {
+        return mockQuotas.value
+      },
+    },
+  }),
 }))
 
 vi.mock('@adonisjs/inertia/vue', () => ({
@@ -56,6 +65,7 @@ describe('MobileBottomNav (#492)', () => {
     mockRole.value = 'mechanic'
     mockCaps.value = new Set(ALL_CAPS)
     mockUrl.value = '/dashboard'
+    mockQuotas.value = { canManageReservations: true }
   })
 
   test('mechanic: 4 entries — dashboard, planning, history, boats', () => {
@@ -80,6 +90,18 @@ describe('MobileBottomNav (#492)', () => {
       '/boats',
       '/planning',
       '/reservations',
+    ])
+  })
+
+  test('admin without the charter module: the reservations shortcut disappears (#595)', () => {
+    mockRole.value = 'admin'
+    mockQuotas.value = { canManageReservations: false }
+    const wrapper = mount(MobileBottomNav)
+
+    expect(wrapper.findAll('a').map((l) => l.attributes('href'))).toEqual([
+      '/dashboard',
+      '/boats',
+      '/planning',
     ])
   })
 

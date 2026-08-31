@@ -2,7 +2,7 @@ import { test } from '@japa/runner'
 import testUtils from '@adonisjs/core/services/test_utils'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { BoatReservationFactory } from '#database/factories/boat_reservation_factory'
-import { createAdminUser, createMemberUser } from '#tests/functional/helpers'
+import { createCharterAdminUser, createMemberUser } from '#tests/functional/helpers'
 import BoatInspection from '#models/boat_inspection'
 import BoatEquipmentAction from '#models/boat_equipment_action'
 import type Boat from '#models/boat'
@@ -35,7 +35,7 @@ test.group('Inspection → equipment actions (#311)', (group) => {
     client,
     assert,
   }) => {
-    const admin = await createAdminUser()
+    const admin = await createCharterAdminUser()
     const boat = await BoatFactory.merge({ organizationId: admin.organizationId! }).create()
     const { reservation, inspection } = await makeInspection(boat)
 
@@ -61,7 +61,7 @@ test.group('Inspection → equipment actions (#311)', (group) => {
   })
 
   test('rejects a boatId that does not own the inspection (IDOR)', async ({ client, assert }) => {
-    const admin = await createAdminUser()
+    const admin = await createCharterAdminUser()
     const boatA = await BoatFactory.merge({ organizationId: admin.organizationId! }).create()
     const boatB = await BoatFactory.merge({ organizationId: admin.organizationId! }).create()
     const { reservation, inspection } = await makeInspection(boatA)
@@ -79,8 +79,8 @@ test.group('Inspection → equipment actions (#311)', (group) => {
   })
 
   test('cannot create under another organization inspection (IDOR)', async ({ client, assert }) => {
-    const admin = await createAdminUser()
-    const other = await createAdminUser()
+    const admin = await createCharterAdminUser()
+    const other = await createCharterAdminUser()
     const otherBoat = await BoatFactory.merge({ organizationId: other.organizationId! }).create()
     const { reservation, inspection } = await makeInspection(otherBoat)
 
@@ -97,7 +97,7 @@ test.group('Inspection → equipment actions (#311)', (group) => {
   })
 
   test('the inspection page lists the linked actions', async ({ client, assert }) => {
-    const admin = await createAdminUser()
+    const admin = await createCharterAdminUser()
     const boat = await BoatFactory.merge({ organizationId: admin.organizationId! }).create()
     const { reservation, inspection } = await makeInspection(boat)
     await BoatEquipmentAction.create({
@@ -119,7 +119,7 @@ test.group('Inspection → equipment actions (#311)', (group) => {
   })
 
   test('admin can delete an action from the inspection', async ({ client, assert }) => {
-    const admin = await createAdminUser()
+    const admin = await createCharterAdminUser()
     const boat = await BoatFactory.merge({ organizationId: admin.organizationId! }).create()
     const { reservation, inspection } = await makeInspection(boat)
     const action = await BoatEquipmentAction.create({
@@ -142,7 +142,7 @@ test.group('Inspection → equipment actions (#311)', (group) => {
   })
 
   test('member cannot delete an action (admin-only)', async ({ client, assert }) => {
-    const admin = await createAdminUser()
+    const admin = await createCharterAdminUser()
     const member = await createMemberUser(admin.organizationId!)
     const boat = await BoatFactory.merge({ organizationId: admin.organizationId! }).create()
     const { reservation, inspection } = await makeInspection(boat)
@@ -165,7 +165,7 @@ test.group('Inspection → equipment actions (#311)', (group) => {
   })
 
   test('member can create (create is a member capability)', async ({ client, assert }) => {
-    const admin = await createAdminUser()
+    const admin = await createCharterAdminUser()
     const member = await createMemberUser(admin.organizationId!)
     const boat = await BoatFactory.merge({ organizationId: admin.organizationId! }).create()
     const { reservation, inspection } = await makeInspection(boat)

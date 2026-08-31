@@ -83,7 +83,7 @@
       "note": "Modules disponibles sur le plan Pro — tous inclus dans Entreprise.",
       "cta": "Composer mon offre",
       "charter_name": "Location",
-      "charter_desc": "Tarif par bateau et périodes saisonnières.",
+      "charter_desc": "Réservations, états des lieux, contrats, tarif par bateau et périodes saisonnières.",
       "crm_name": "CRM & Facturation",
       "crm_desc": "Fiches clients, devis et factures."
     },
@@ -1150,7 +1150,7 @@
     "modules_included": "Tous les modules sont inclus dans Entreprise.",
     "modules_price_per": "/mois",
     "modules_charter_name": "Location",
-    "modules_charter_desc": "Tarif par bateau et périodes saisonnières pour les loueurs.",
+    "modules_charter_desc": "Réservations, états des lieux, contrats et tarification saisonnière pour les loueurs.",
     "modules_crm_name": "CRM & Facturation",
     "modules_crm_desc": "Fiches clients, RGPD, devis et factures.",
     "config_eyebrow": "CONFIGURATEUR",

@@ -2,7 +2,7 @@ import { test } from '@japa/runner'
 import testUtils from '@adonisjs/core/services/test_utils'
 import { BoatFactory } from '#database/factories/boat_factory'
 import {
-  createAdminUser,
+  createCharterAdminUser,
   createBoatOwnerUser,
   createMechanicUser,
   createMemberUser,
@@ -23,7 +23,7 @@ test.group('Staff index routes — mechanic/boat_owner access (functional, #396)
     test(`GET ${route.name} is denied to a mechanic (no matching capability)`, async ({
       client,
     }) => {
-      const admin = await createAdminUser()
+      const admin = await createCharterAdminUser()
       await BoatFactory.merge({ organizationId: admin.organizationId! }).create()
       const mechanic = await createMechanicUser(admin.organizationId!)
 
@@ -35,7 +35,7 @@ test.group('Staff index routes — mechanic/boat_owner access (functional, #396)
     test(`GET ${route.name} redirects a boat_owner to the dedicated portal instead of leaking fleet data`, async ({
       client,
     }) => {
-      const admin = await createAdminUser()
+      const admin = await createCharterAdminUser()
       await BoatFactory.merge({ organizationId: admin.organizationId! }).create()
       const owner = await createBoatOwnerUser(admin.organizationId!)
 
@@ -48,7 +48,7 @@ test.group('Staff index routes — mechanic/boat_owner access (functional, #396)
     test(`GET ${route.name} stays accessible to a member (boats.view/incidents.view capability)`, async ({
       client,
     }) => {
-      const admin = await createAdminUser()
+      const admin = await createCharterAdminUser()
       await BoatFactory.merge({ organizationId: admin.organizationId! }).create()
       const member = await createMemberUser(admin.organizationId!)
 
