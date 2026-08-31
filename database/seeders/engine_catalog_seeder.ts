@@ -24,27 +24,49 @@ import { DateTime } from 'luxon'
  */
 export default class EngineCatalogSeeder extends BaseSeeder {
   async run() {
-    let brandCount = 0
-    let modelCount = 0
+    const modelCounts = await Promise.all(ENGINE_CATALOG_BRANDS.map((seed) => this.seedBrand(seed)))
 
-    for (const seed of ENGINE_CATALOG_BRANDS) {
-      const brand = await EngineBrand.updateOrCreate(
-        { slug: seed.slug },
-        {
-          name: seed.name,
-          country: seed.country ?? null,
-          families: [...seed.families],
-          aliases: seed.aliases ? [...seed.aliases] : null,
-          isActive: seed.isActive ?? true,
-          plateLocationKey: seed.plateLocationKey ?? null,
-          plateExampleKey: seed.plateExampleKey ?? null,
-          referencePattern: seed.referencePattern ?? null,
-        }
-      )
-      brandCount += 1
+    const brandCount = modelCounts.length
+    const modelCount = modelCounts.reduce((total, count) => total + count, 0)
 
-      for (const model of normalizeEngineBrandModels(seed)) {
-        await EngineModel.updateOrCreate(
+    const referenceCount = await this.seedPartReferences()
+
+    logger.info(
+      `Catalogue moteur : ${brandCount} marques, ${modelCount} modèles, ` +
+        `${referenceCount} références constructeur`
+    )
+  }
+
+  /**
+   * Une marque et ses modèles sont indépendants des autres marques : les
+   * upserts tournent en parallèle plutôt qu'en boucle `for` séquentielle, ce
+   * qui divise nettement le temps du seeder sur un corpus de plusieurs
+   * centaines de lignes.
+   */
+  private async seedBrand(seed: (typeof ENGINE_CATALOG_BRANDS)[number]): Promise<number> {
+    const brand = await EngineBrand.updateOrCreate(
+      { slug: seed.slug },
+      {
+        name: seed.name,
+        country: seed.country ?? null,
+        families: [...seed.families],
+        aliases: seed.aliases ? [...seed.aliases] : null,
+        isActive: seed.isActive ?? true,
+        plateLocationKey: seed.plateLocationKey ?? null,
+        plateExampleKey: seed.plateExampleKey ?? null,
+        referencePattern: seed.referencePattern ?? null,
+      }
+    )
+
+    // Dédoublonnage défensif par slug (dernier gagne, comme l'ancienne boucle
+    // séquentielle) : deux upserts parallèles sur la même clé unique
+    // (marque, slug) provoqueraient une violation de contrainte.
+    const models = [
+      ...new Map(normalizeEngineBrandModels(seed).map((model) => [model.slug, model])).values(),
+    ]
+    await Promise.all(
+      models.map((model) =>
+        EngineModel.updateOrCreate(
           { engineBrandId: brand.id, slug: model.slug },
           {
             name: model.name,
@@ -60,16 +82,10 @@ export default class EngineCatalogSeeder extends BaseSeeder {
             aliases: model.aliases ?? null,
           }
         )
-        modelCount += 1
-      }
-    }
-
-    const referenceCount = await this.seedPartReferences()
-
-    logger.info(
-      `Catalogue moteur : ${brandCount} marques, ${modelCount} modèles, ` +
-        `${referenceCount} références constructeur`
+      )
     )
+
+    return models.length
   }
 
   /**
@@ -83,44 +99,52 @@ export default class EngineCatalogSeeder extends BaseSeeder {
    * et `ENGINE_CATALOG_PART_REFERENCES` le vérifie au chargement.
    */
   private async seedPartReferences(): Promise<number> {
-    const modelIds = new Map<string, number>()
-    let count = 0
+    const cacheKeys = [
+      ...new Set(
+        ENGINE_CATALOG_PART_REFERENCES.map((entry) => `${entry.brandSlug}/${entry.modelSlug}`)
+      ),
+    ]
 
-    for (const entry of ENGINE_CATALOG_PART_REFERENCES) {
-      const cacheKey = `${entry.brandSlug}/${entry.modelSlug}`
-      let modelId = modelIds.get(cacheKey)
+    const modelIds = new Map<string, number>(
+      await Promise.all(
+        cacheKeys.map(async (cacheKey): Promise<[string, number]> => {
+          const [brandSlug, modelSlug] = cacheKey.split('/')
+          const model = await EngineModel.query()
+            .select('engine_models.id')
+            .join('engine_brands', 'engine_brands.id', 'engine_models.engine_brand_id')
+            .where('engine_brands.slug', brandSlug)
+            .where('engine_models.slug', modelSlug)
+            .first()
 
-      if (modelId === undefined) {
-        const model = await EngineModel.query()
-          .select('engine_models.id')
-          .join('engine_brands', 'engine_brands.id', 'engine_models.engine_brand_id')
-          .where('engine_brands.slug', entry.brandSlug)
-          .where('engine_models.slug', entry.modelSlug)
-          .first()
+          if (!model) {
+            throw new Error(
+              `Références constructeur : le modèle « ${cacheKey} » n'existe pas au ` +
+                `catalogue moteur. Vérifiez le slug de la marque et du modèle.`
+            )
+          }
 
-        if (!model) {
-          throw new Error(
-            `Références constructeur : le modèle « ${cacheKey} » n'existe pas au ` +
-              `catalogue moteur. Vérifiez le slug de la marque et du modèle.`
-          )
-        }
-
-        modelId = model.id
-        modelIds.set(cacheKey, modelId)
-      }
-
-      await EnginePartReference.updateOrCreate(
-        { engineModelId: modelId, partKey: entry.partKey },
-        {
-          reference: entry.reference,
-          sourceLabel: entry.sourceLabel,
-          sourceUrl: entry.sourceUrl ?? null,
-          verifiedAt: entry.verifiedAt ? DateTime.fromISO(entry.verifiedAt) : null,
-        }
+          return [cacheKey, model.id]
+        })
       )
-      count += 1
-    }
+    )
 
-    return count
+    await Promise.all(
+      ENGINE_CATALOG_PART_REFERENCES.map((entry) =>
+        EnginePartReference.updateOrCreate(
+          {
+            engineModelId: modelIds.get(`${entry.brandSlug}/${entry.modelSlug}`)!,
+            partKey: entry.partKey,
+          },
+          {
+            reference: entry.reference,
+            sourceLabel: entry.sourceLabel,
+            sourceUrl: entry.sourceUrl ?? null,
+            verifiedAt: entry.verifiedAt ? DateTime.fromISO(entry.verifiedAt) : null,
+          }
+        )
+      )
+    )
+
+    return ENGINE_CATALOG_PART_REFERENCES.length
   }
 }

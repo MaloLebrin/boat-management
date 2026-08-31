@@ -21,24 +21,43 @@ import { BaseSeeder } from '@adonisjs/lucid/seeders'
  */
 export default class EquipmentCatalogSeeder extends BaseSeeder {
   async run() {
-    let brandCount = 0
-    let modelCount = 0
+    const modelCounts = await Promise.all(
+      EQUIPMENT_CATALOG_BRANDS.map((seed) => this.seedBrand(seed))
+    )
 
-    for (const seed of EQUIPMENT_CATALOG_BRANDS) {
-      const brand = await EquipmentBrand.updateOrCreate(
-        { slug: seed.slug },
-        {
-          name: seed.name,
-          country: seed.country ?? null,
-          categories: [...seed.categories],
-          aliases: seed.aliases ? [...seed.aliases] : null,
-          isActive: seed.isActive ?? true,
-        }
-      )
-      brandCount += 1
+    const brandCount = modelCounts.length
+    const modelCount = modelCounts.reduce((total, count) => total + count, 0)
 
-      for (const model of normalizeEquipmentBrandModels(seed)) {
-        await EquipmentModel.updateOrCreate(
+    logger.info(`Catalogue équipement : ${brandCount} marques, ${modelCount} modèles`)
+  }
+
+  /**
+   * Une marque et ses modèles sont indépendants des autres marques : les
+   * upserts tournent en parallèle plutôt qu'en boucle `for` séquentielle, ce
+   * qui divise nettement le temps du seeder sur un corpus de plusieurs
+   * centaines de lignes.
+   */
+  private async seedBrand(seed: (typeof EQUIPMENT_CATALOG_BRANDS)[number]): Promise<number> {
+    const brand = await EquipmentBrand.updateOrCreate(
+      { slug: seed.slug },
+      {
+        name: seed.name,
+        country: seed.country ?? null,
+        categories: [...seed.categories],
+        aliases: seed.aliases ? [...seed.aliases] : null,
+        isActive: seed.isActive ?? true,
+      }
+    )
+
+    // Dédoublonnage défensif par slug (dernier gagne, comme l'ancienne boucle
+    // séquentielle) : deux upserts parallèles sur la même clé unique
+    // (marque, slug) provoqueraient une violation de contrainte.
+    const models = [
+      ...new Map(normalizeEquipmentBrandModels(seed).map((model) => [model.slug, model])).values(),
+    ]
+    await Promise.all(
+      models.map((model) =>
+        EquipmentModel.updateOrCreate(
           { equipmentBrandId: brand.id, slug: model.slug },
           {
             name: model.name,
@@ -48,10 +67,9 @@ export default class EquipmentCatalogSeeder extends BaseSeeder {
             aliases: model.aliases ?? null,
           }
         )
-        modelCount += 1
-      }
-    }
+      )
+    )
 
-    logger.info(`Catalogue équipement : ${brandCount} marques, ${modelCount} modèles`)
+    return models.length
   }
 }
