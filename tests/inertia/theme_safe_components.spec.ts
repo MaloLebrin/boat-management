@@ -147,10 +147,6 @@ const COMPONENTS: Component[] = [
     path: 'components/marketing/contact/ContactOfficesSection.vue',
     allow: [{ pattern: 'fill="#faf6ee"', count: 2, reason: DECORATIVE_SVG }],
   },
-  {
-    path: 'components/marketing/home/HomeBentoGridSection.vue',
-    allow: [{ pattern: 'bg-white', count: 1, reason: `grille de pontons décorative ${NAVY_BAND}` }],
-  },
   { path: 'components/marketing/home/HomeCaseStudySection.vue' },
   { path: 'components/marketing/home/HomeDemoSection.vue' },
   {
