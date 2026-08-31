@@ -39,6 +39,7 @@
     "warning": "Attention",
     "empty": "Aucune donnée"
   },
+  "offline.photoUploadUnavailable": "L'ajout de photos est indisponible hors connexion. Reconnectez-vous puis réessayez.",
   "offline.banner": "Vous êtes hors-ligne — les modifications seront synchronisées à la reconnexion",
   "offline.savedQueue": "Enregistré hors-ligne — sera synchronisé à la reconnexion",
   "offline.syncing": "Synchronisation en cours…",

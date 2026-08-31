@@ -25,6 +25,15 @@ vi.mock('@adonisjs/inertia/vue', () => ({
   },
 }))
 
+const mockIsOnline = vi.hoisted(() => ({ value: true }))
+// Un vrai ref est requis : le template déballe `isOnline` (pas d'accès `.value` en script)
+vi.mock('~/composables/use_network_status', async () => {
+  const { computed } = await import('vue')
+  return {
+    useNetworkStatus: () => ({ isOnline: computed(() => mockIsOnline.value) }),
+  }
+})
+
 vi.mock('~/components/base/BaseButton.vue', () => ({
   default: {
     template:
@@ -58,6 +67,7 @@ describe('BoatPhotoGallery', () => {
     vi.clearAllMocks()
     mockForm.files = []
     mockForm.processing = false
+    mockIsOnline.value = true
   })
 
   test('renders the empty state when the boat has no photos', () => {
@@ -144,6 +154,55 @@ describe('BoatPhotoGallery', () => {
       expect.objectContaining({ forceFormData: true, preserveScroll: true })
     )
     expect(mockForm.files).toEqual([file])
+  })
+
+  // #621 — refus explicite hors-ligne : la file IndexedDB ne transporte pas de multipart.
+  test('disables the upload buttons and tile and shows an offline message when offline', () => {
+    mockIsOnline.value = false
+    const wrapper = mount(BoatPhotoGallery, {
+      props: { ...baseProps, boat: { id: 3, media: [photo(1)] } } as never,
+    })
+
+    const uploadButtons = wrapper.findAll('button[type="button"]')
+    expect(uploadButtons.length).toBeGreaterThanOrEqual(3)
+    for (const button of uploadButtons) {
+      expect(button.attributes('disabled')).toBeDefined()
+    }
+    const alert = wrapper.find('[role="alert"]')
+    expect(alert.exists()).toBe(true)
+    expect(alert.text()).toContain('common.offline.photoUploadUnavailable')
+  })
+
+  test('does not post files selected while offline', async () => {
+    mockIsOnline.value = false
+    const wrapper = mount(BoatPhotoGallery, { props: baseProps as never })
+    const file = new File(['x'], 'boat.jpg', { type: 'image/jpeg' })
+    const input = wrapper.find('input[type="file"]')
+
+    Object.defineProperty(input.element, 'files', { value: [file] })
+    await input.trigger('change')
+
+    expect(mockFormPost).not.toHaveBeenCalled()
+  })
+
+  test('keeps the upload enabled and hides the offline message when online', () => {
+    const wrapper = mount(BoatPhotoGallery, { props: baseProps as never })
+
+    for (const button of wrapper.findAll('button[type="button"]')) {
+      expect(button.attributes('disabled')).toBeUndefined()
+    }
+    expect(wrapper.find('[role="alert"]').exists()).toBe(false)
+  })
+
+  test('does not open the file picker from the empty state when offline', async () => {
+    mockIsOnline.value = false
+    const wrapper = mount(BoatPhotoGallery, { props: baseProps as never })
+    const input = wrapper.find('input[type="file"]')
+    const clickSpy = vi.spyOn(input.element as HTMLInputElement, 'click')
+
+    await wrapper.find('.border-dashed').trigger('click')
+
+    expect(clickSpy).not.toHaveBeenCalled()
   })
 
   test('takePhoto key is translated in both locales', () => {
