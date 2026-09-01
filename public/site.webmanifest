@@ -1,9 +1,9 @@
 {
-  "name": "FleetAI",
-  "short_name": "FleetAI",
+  "name": "FleetAi",
+  "short_name": "FleetAi",
   "start_url": "/",
   "display": "standalone",
-  "theme_color": "#0066cc",
+  "theme_color": "#0b1d2e",
   "background_color": "#ffffff",
   "icons": [
     {
