@@ -6,7 +6,7 @@ Référence: `inertia/app.ts`.
 
 - résout les pages via `./pages/${name}.vue` et `import.meta.glob('./pages/**/*.vue')`
 - applique le layout par défaut `inertia/layouts/default.vue`
-- SSR désactivé (voir `config/inertia.ts`)
+- SSR activé (`config/inertia.ts` : `ssr.enabled: true`, entrypoint `inertia/ssr.ts`)
 
 ## Pages principales
 

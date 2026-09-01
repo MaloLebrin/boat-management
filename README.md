@@ -32,6 +32,15 @@ Application SaaS multi-tenant pour les plaisanciers et gestionnaires de flotte. 
 - Analyse Mistral AI des données de maintenance via système de queue asynchrone
 - Interface de prompt sur le tableau de bord
 
+### PWA terrain (hors-ligne)
+
+- **Installable** sur mobile et desktop (manifest + icônes maskable) — « Ajouter à l'écran d'accueil »
+- **Service worker** (`inertia/sw.ts`, Workbox `injectManifest`) : precache des assets et d'`offline.html`, cache NetworkFirst sur les pages bateaux/navigation/planning déjà visitées
+- **File hors-ligne** : saisies sans connexion (journal de bord, avitaillement) stockées en IndexedDB et rejouées automatiquement au retour du réseau
+- **Web Push** : notifications d'alertes avec opt-in contextuel et gestion des appareils dans `/settings/notifications`
+
+Détails : [`docs/architecture/pwa-terrain-epic-481.md`](docs/architecture/pwa-terrain-epic-481.md) et [`docs/frontend/pwa.md`](docs/frontend/pwa.md).
+
 ### Marketing & Acquisition
 
 - **Simulateur de coûts** : estimation des frais d'entretien, comparaison anonymisée avec bateaux similaires (benchmark)

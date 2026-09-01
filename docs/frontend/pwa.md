@@ -2,7 +2,7 @@
 
 ## Vue d'ensemble
 
-Fleetide est une PWA installable sur mobile et desktop. Le mode hors-ligne permet de **consulter les pages déjà visitées** et de **saisir des données sans connexion** (journal de bord, avitaillement). Les entrées sont stockées localement et synchronisées automatiquement au retour de la connexion.
+FleetAi est une PWA installable sur mobile et desktop. Le mode hors-ligne permet de **consulter les pages déjà visitées** et de **saisir des données sans connexion** (journal de bord, avitaillement). Les entrées sont stockées localement et synchronisées automatiquement au retour de la connexion.
 
 ---
 
@@ -129,11 +129,11 @@ Backend : voir `docs/domain/notifications.md` (#497). Côté front :
 
 ```json
 {
-  "name": "Fleetide",
-  "short_name": "Fleetide",
+  "name": "FleetAi",
+  "short_name": "FleetAi",
   "start_url": "/",
   "display": "standalone",
-  "theme_color": "#0066cc",
+  "theme_color": "#0b1d2e",
   "background_color": "#ffffff",
   "icons": [
     { "src": "/web-app-manifest-192x192.png", "sizes": "192x192", "purpose": "maskable" },
@@ -143,6 +143,10 @@ Backend : voir `docs/domain/notifications.md` (#497). Côté front :
 ```
 
 L'app s'installe sur Android/iOS via le bouton « Ajouter à l'écran d'accueil » du navigateur.
+
+`theme_color` est aligné sur la palette (`--color-navy-900: #0b1d2e`, la couleur des surfaces
+permanentes — sidebar) ; à l'exécution, les balises `<meta name="theme-color">` de
+`resources/views/inertia_layout.edge` prennent le relais selon le thème clair/sombre (#623).
 
 ---
 
