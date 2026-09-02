@@ -46,6 +46,7 @@ vi.mock('~/composables/use_network_status', () => ({
 
 vi.mock('~/composables/use_offline_queue', () => ({
   useOfflineQueue: () => ({ enqueue: mockEnqueue }),
+  isTempId: (value: unknown) => typeof value === 'string' && value.startsWith('tmp_'),
 }))
 
 vi.mock('~/components/base/BaseModal.vue', () => ({
@@ -114,7 +115,7 @@ import InspectionDefectModal from '../../inertia/components/reservations/inspect
 const baseProps = { boatId: 3, reservationId: 7, inspectionId: 9, open: true }
 const ACTION_URL = '/boats/3/reservations/7/inspections/9/equipment-actions'
 
-describe('InspectionDefectModal — hors-ligne (#491)', () => {
+describe('InspectionDefectModal — hors-ligne (#491, #622)', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockIsOnline.value = true
@@ -198,6 +199,35 @@ describe('InspectionDefectModal — hors-ligne (#491)', () => {
     expect(mockFormPost).not.toHaveBeenCalled()
   })
 
+  test('offline on an inspection still queued: enqueues with dependsOn on the temp id', async () => {
+    mockIsOnline.value = false
+    const wrapper = mount(InspectionDefectModal, {
+      props: { ...baseProps, inspectionId: 'tmp_abc123' },
+    })
+    mockForm.label = 'Taquet arraché'
+
+    await wrapper.find('form').trigger('submit')
+
+    expect(mockEnqueue).toHaveBeenCalledWith({
+      type: 'create-inspection-defect',
+      url: '/boats/3/reservations/7/inspections/tmp_abc123/equipment-actions',
+      method: 'post',
+      payload: { label: 'Taquet arraché', actionType: 'to_repair' },
+      dependsOn: 'tmp_abc123',
+    })
+    expect(wrapper.text()).not.toContain('equipmentActions.defects.offlineNoInspection')
+  })
+
+  test('a real inspection id never carries dependsOn', async () => {
+    mockIsOnline.value = false
+    const wrapper = mount(InspectionDefectModal, { props: baseProps })
+    mockForm.label = 'Voile déchirée'
+
+    await wrapper.find('form').trigger('submit')
+
+    expect(mockEnqueue.mock.calls[0][0]).not.toHaveProperty('dependsOn')
+  })
+
   test('online without inspectionId is not blocked by the offline guard', () => {
     const wrapper = mount(InspectionDefectModal, {
       props: { ...baseProps, inspectionId: null },
@@ -216,6 +246,15 @@ describe('InspectionDefectModal — hors-ligne (#491)', () => {
         common['offline.queue.type.create-inspection-defect'],
         `offline.queue.type.create-inspection-defect (${locale})`
       ).toBeTruthy()
+      for (const key of [
+        'offline.queue.type.create-inspection',
+        'offline.queue.type.update-inspection',
+        'offline.queue.dependsOn',
+        'offline.failed.dependencyBlocked',
+        'offline.conflict.descriptionInspection',
+      ]) {
+        expect(common[key], `${key} (${locale})`).toBeTruthy()
+      }
       const ea = JSON.parse(
         readFileSync(
           resolve(__dirname, `../../resources/lang/${locale}/equipmentActions.json`),

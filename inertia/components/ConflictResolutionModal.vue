@@ -22,11 +22,18 @@ const FIELDS_BY_TYPE: Record<string, string[]> = {
     'notes',
   ],
   'update-sheet-item': ['isDone', 'notes'],
+  'update-inspection': ['performedAt', 'fuelLevel', 'engineHours', 'notes'],
 }
 
 // Chaque type d'action a son propre namespace de libellés de champs
 const LABEL_PREFIX_BY_TYPE: Record<string, string> = {
   'update-sheet-item': 'common.sheetItem.field',
+  'update-inspection': 'inspections.fields',
+}
+
+// La description parle de « cette sortie » : un état des lieux a la sienne (#622).
+const DESCRIPTION_BY_TYPE: Record<string, string> = {
+  'update-inspection': 'common.offline.conflict.descriptionInspection',
 }
 
 const rows = computed(() => {
@@ -48,6 +55,10 @@ const rows = computed(() => {
     .filter((r) => r.local !== null || r.server !== null)
 })
 
+const description = computed(() =>
+  t(DESCRIPTION_BY_TYPE[props.conflict.action.type] ?? 'common.offline.conflict.description')
+)
+
 function fmt(val: unknown): string {
   if (val === null || val === undefined || val === '') return '—'
   return String(val)
@@ -65,7 +76,7 @@ function fmt(val: unknown): string {
         <!-- Header -->
         <div class="px-6 pt-6 pb-4 border-b border-border">
           <h2 class="text-lg font-semibold text-fg">{{ t('common.offline.conflict.title') }}</h2>
-          <p class="mt-1 text-sm text-fg-muted">{{ t('common.offline.conflict.description') }}</p>
+          <p class="mt-1 text-sm text-fg-muted">{{ description }}</p>
         </div>
 
         <!-- Comparison grid -->

@@ -118,8 +118,21 @@ Les photos restent au niveau de l'inspection (pipeline média existant,
 `equipment_media`) — le rattachement par item envisagé dans #584 est resté hors
 périmètre, le pipeline n'étant pas générique par item.
 
+## Hors-ligne (#491, #622)
+
+Un état des lieux se **crée hors-ligne** : la création part dans la file
+IndexedDB avec un jeton temporaire (`create-inspection`), les défauts saisis
+dans la foulée le référencent, et la synchro rejoue la création puis réécrit les
+défauts avec l'ID réel. Modifier un état des lieux déjà en base fonctionne aussi
+hors-ligne (`update-inspection`), avec détection de conflit `_expectedUpdatedAt`.
+
+Restent indisponibles tant que l'état des lieux n'est pas synchronisé, avec un
+message explicite : la **checklist** (les constats `PATCH .../items` n'ont pas de
+chemin hors-ligne) et l'**ajout de photos** (#621). Mécanique détaillée dans
+`docs/frontend/pwa.md`, section « Dépendances entre actions ».
+
 ## Hors périmètre (#584)
 
 PDF d'état des lieux signable, caution/facturation des dommages, checklists
-personnalisables par organisation, mode hors-ligne complet (les défauts ont
-déjà leur file hors-ligne, #491).
+personnalisables par organisation, checklist et photos hors-ligne (voir
+ci-dessus).

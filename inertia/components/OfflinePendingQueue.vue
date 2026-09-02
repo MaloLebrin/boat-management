@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import { useDateFormat } from '~/composables/use_date_format'
-import { useOfflineQueue } from '~/composables/use_offline_queue'
+import { groupByDependency, useOfflineQueue } from '~/composables/use_offline_queue'
 import { useT } from '~/composables/use_t'
 
 const { t } = useT()
@@ -15,6 +16,11 @@ const {
   retryFailedAction,
   discardFailedAction,
 } = useOfflineQueue()
+
+// Une création hors-ligne et les saisies qui la référencent forment un tout :
+// les afficher imbriquées évite qu'un défaut apparaisse orphelin (#622).
+const pendingGroups = computed(() => groupByDependency(pendingActions.value))
+const failedGroups = computed(() => groupByDependency(failedActions.value))
 
 function labelForType(type: string): string {
   const key = `common.offline.queue.type.${type}`
@@ -44,25 +50,45 @@ function failureReason(errors: Record<string, string>): string {
 
     <ul class="space-y-2">
       <li
-        v-for="action in pendingActions"
-        :key="action.id"
-        class="flex items-center justify-between gap-3 rounded-md bg-surface-elevated border border-amber-200 px-3 py-2 text-sm"
+        v-for="group in pendingGroups"
+        :key="group.action.id"
+        class="space-y-2"
+        data-test="queue-group"
       >
-        <div class="min-w-0">
-          <p class="font-medium text-fg truncate">{{ labelForType(action.type) }}</p>
-          <p class="text-xs text-fg-muted">{{ formatTime(action.createdAt) }}</p>
-        </div>
-        <BaseButton
-          variant="danger"
-          size="sm"
-          :disabled="isSyncing"
-          :aria-label="
-            t('common.offline.queue.cancelAriaLabel', { type: labelForType(action.type) })
-          "
-          @click="cancelAction(action.id!)"
+        <div
+          class="flex items-center justify-between gap-3 rounded-md bg-surface-elevated border border-amber-200 px-3 py-2 text-sm"
         >
-          {{ t('common.offline.queue.cancel') }}
-        </BaseButton>
+          <div class="min-w-0">
+            <p class="font-medium text-fg truncate">{{ labelForType(group.action.type) }}</p>
+            <p class="text-xs text-fg-muted">{{ formatTime(group.action.createdAt) }}</p>
+          </div>
+          <BaseButton
+            variant="danger"
+            size="sm"
+            :disabled="isSyncing"
+            :aria-label="
+              t('common.offline.queue.cancelAriaLabel', { type: labelForType(group.action.type) })
+            "
+            @click="cancelAction(group.action.id!)"
+          >
+            {{ t('common.offline.queue.cancel') }}
+          </BaseButton>
+        </div>
+
+        <ul
+          v-if="group.dependents.length > 0"
+          class="ml-4 space-y-2 border-l border-amber-200 pl-3"
+        >
+          <li
+            v-for="dependent in group.dependents"
+            :key="dependent.id"
+            class="rounded-md bg-surface-elevated border border-amber-200 px-3 py-2 text-sm"
+            data-test="queue-dependent"
+          >
+            <p class="font-medium text-fg truncate">{{ labelForType(dependent.type) }}</p>
+            <p class="text-xs text-fg-muted">{{ t('common.offline.queue.dependsOn') }}</p>
+          </li>
+        </ul>
       </li>
     </ul>
   </div>
@@ -81,43 +107,72 @@ function failureReason(errors: Record<string, string>): string {
 
     <ul class="space-y-2">
       <li
-        v-for="action in failedActions"
-        :key="action.id"
-        class="rounded-md bg-surface-elevated border border-danger/30 px-3 py-2 text-sm space-y-2"
+        v-for="group in failedGroups"
+        :key="group.action.id"
+        class="space-y-2"
+        data-test="failed-group"
       >
-        <div class="flex items-center justify-between gap-3">
-          <div class="min-w-0">
-            <p class="font-medium text-fg truncate">{{ labelForType(action.type) }}</p>
-            <p class="text-xs text-fg-muted">{{ formatTime(action.failedAt) }}</p>
+        <div
+          class="rounded-md bg-surface-elevated border border-danger/30 px-3 py-2 text-sm space-y-2"
+        >
+          <div class="flex items-center justify-between gap-3">
+            <div class="min-w-0">
+              <p class="font-medium text-fg truncate">{{ labelForType(group.action.type) }}</p>
+              <p class="text-xs text-fg-muted">{{ formatTime(group.action.failedAt) }}</p>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <BaseButton
+                variant="secondary"
+                size="sm"
+                :disabled="isSyncing"
+                :aria-label="
+                  t('common.offline.failed.retryAriaLabel', {
+                    type: labelForType(group.action.type),
+                  })
+                "
+                @click="retryFailedAction(group.action.id!)"
+              >
+                {{ t('common.offline.failed.retry') }}
+              </BaseButton>
+              <BaseButton
+                variant="danger"
+                size="sm"
+                :disabled="isSyncing"
+                :aria-label="
+                  t('common.offline.failed.discardAriaLabel', {
+                    type: labelForType(group.action.type),
+                  })
+                "
+                @click="discardFailedAction(group.action.id!)"
+              >
+                {{ t('common.offline.failed.discard') }}
+              </BaseButton>
+            </div>
           </div>
-          <div class="flex items-center gap-2 shrink-0">
-            <BaseButton
-              variant="secondary"
-              size="sm"
-              :disabled="isSyncing"
-              :aria-label="
-                t('common.offline.failed.retryAriaLabel', { type: labelForType(action.type) })
-              "
-              @click="retryFailedAction(action.id!)"
-            >
-              {{ t('common.offline.failed.retry') }}
-            </BaseButton>
-            <BaseButton
-              variant="danger"
-              size="sm"
-              :disabled="isSyncing"
-              :aria-label="
-                t('common.offline.failed.discardAriaLabel', { type: labelForType(action.type) })
-              "
-              @click="discardFailedAction(action.id!)"
-            >
-              {{ t('common.offline.failed.discard') }}
-            </BaseButton>
-          </div>
+          <p class="text-xs text-danger-strong">
+            {{ t('common.offline.failed.reason') }} {{ failureReason(group.action.errors) }}
+          </p>
         </div>
-        <p class="text-xs text-danger-strong">
-          {{ t('common.offline.failed.reason') }} {{ failureReason(action.errors) }}
-        </p>
+
+        <!-- Reprise et abandon agissent sur le groupe : une fille seule
+             rejouerait sur un jeton temporaire que plus rien ne résout. -->
+        <ul
+          v-if="group.dependents.length > 0"
+          class="ml-4 space-y-2 border-l border-danger/30 pl-3"
+        >
+          <li
+            v-for="dependent in group.dependents"
+            :key="dependent.id"
+            class="rounded-md bg-surface-elevated border border-danger/30 px-3 py-2 text-sm space-y-1"
+            data-test="failed-dependent"
+          >
+            <p class="font-medium text-fg truncate">{{ labelForType(dependent.type) }}</p>
+            <p class="text-xs text-fg-muted">{{ t('common.offline.queue.dependsOn') }}</p>
+            <p class="text-xs text-danger-strong">
+              {{ t('common.offline.failed.reason') }} {{ failureReason(dependent.errors) }}
+            </p>
+          </li>
+        </ul>
       </li>
     </ul>
   </div>

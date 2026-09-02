@@ -1,5 +1,6 @@
 import { BoatNotFoundError } from '#exceptions/boat_errors'
 import {
+  BoatInspectionConflictError,
   BoatInspectionNotFoundError,
   BoatInspectionValidationError,
 } from '#exceptions/inspection_errors'
@@ -27,6 +28,11 @@ import {
   toBoatInspectionRow,
 } from '#transformers/boat_inspection_transformer'
 import { inspectionCategoryForBoat } from '#shared/helpers/inspection_checklist'
+import {
+  CREATE_INSPECTION_ACTION,
+  CREATE_INSPECTION_DEFECT_ACTION,
+  UPDATE_INSPECTION_ACTION,
+} from '#shared/constants/offline_queue'
 import { toBoatReservationRow } from '#transformers/boat_reservation_transformer'
 import { toBoatEquipmentActionRow } from '#transformers/boat_equipment_action_transformer'
 import { inject } from '@adonisjs/core'
@@ -148,8 +154,9 @@ export default class BoatInspectionsController {
 
     const payload = await request.validateUsing(createBoatInspectionValidator)
 
+    let inspection
     try {
-      await this.inspectionService.createForReservation(user, reservation, {
+      inspection = await this.inspectionService.createForReservation(user, reservation, {
         kind: payload.kind,
         performedAt: payload.performedAt,
         tzOffsetMinutes: payload.tzOffsetMinutes,
@@ -160,15 +167,22 @@ export default class BoatInspectionsController {
     } catch (error) {
       if (error instanceof BoatInspectionNotFoundError) {
         session.flash('error', i18n.t('flash.inspections.notFound'))
+        session.flash('rejectedType', CREATE_INSPECTION_ACTION)
         return response.redirect().back()
       }
       if (error instanceof BoatInspectionValidationError) {
         session.flash('error', i18n.t(`flash.inspections.${error.errorCode}`))
+        session.flash('rejectedType', CREATE_INSPECTION_ACTION)
         return response.redirect().back()
       }
       throw error
     }
 
+    // Résolution de dépendances (#622) : une inspection créée hors-ligne porte
+    // un ID temporaire côté client. L'ID réel remonte ici pour que la file
+    // réécrive les actions filles (défauts) avant de les rejouer.
+    session.flash('createdResourceType', CREATE_INSPECTION_ACTION)
+    session.flash('createdResourceId', String(inspection.id))
     session.flash('success', i18n.t('flash.inspections.created'))
     response.redirect(`/boats/${boat.id}/reservations/${reservation.id}/inspection`)
   }
@@ -196,6 +210,7 @@ export default class BoatInspectionsController {
         reservation,
         Number(params.inspectionId),
         {
+          expectedUpdatedAt: payload._expectedUpdatedAt,
           performedAt: payload.performedAt,
           tzOffsetMinutes: payload.tzOffsetMinutes,
           fuelLevel: payload.fuelLevel,
@@ -206,6 +221,14 @@ export default class BoatInspectionsController {
     } catch (error) {
       if (error instanceof BoatInspectionNotFoundError) {
         session.flash('error', i18n.t('flash.inspections.notFound'))
+        session.flash('rejectedType', UPDATE_INSPECTION_ACTION)
+        return response.redirect().back()
+      }
+      // Le PUT rejoué vise une inspection modifiée entre-temps (#622) : la
+      // modale de résolution tranche côté client, pas un last-write-wins.
+      if (error instanceof BoatInspectionConflictError) {
+        session.flash('conflictData', JSON.stringify(error.currentInspection))
+        session.flash('conflictType', UPDATE_INSPECTION_ACTION)
         return response.redirect().back()
       }
       throw error
@@ -364,6 +387,7 @@ export default class BoatInspectionsController {
     } catch (error) {
       if (error instanceof BoatInspectionNotFoundError) {
         session.flash('error', i18n.t('flash.inspections.notFound'))
+        session.flash('rejectedType', CREATE_INSPECTION_DEFECT_ACTION)
         return response.redirect().back()
       }
       throw error
@@ -376,10 +400,12 @@ export default class BoatInspectionsController {
     } catch (error) {
       if (error instanceof BoatEquipmentActionValidationError) {
         session.flash('error', i18n.t(`flash.equipmentActions.${error.errorCode}`))
+        session.flash('rejectedType', CREATE_INSPECTION_DEFECT_ACTION)
         return response.redirect().back()
       }
       if (error instanceof BoatEquipmentActionNotFoundError) {
         session.flash('error', i18n.t('flash.equipmentActions.notFound'))
+        session.flash('rejectedType', CREATE_INSPECTION_DEFECT_ACTION)
         return response.redirect().back()
       }
       throw error

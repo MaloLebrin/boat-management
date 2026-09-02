@@ -91,6 +91,19 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
     const success = session?.flashMessages.get('success') as string
     const info = session?.flashMessages.get('info') as string
 
+    // Protocole de la file hors-ligne (#490, #622) : `drainQueue` lit ces
+    // marqueurs dans `page.props.flash` pour distinguer un rejeu accepté d'un
+    // refus métier rendu en redirection, et pour récupérer l'ID réel d'une
+    // ressource créée sous ID temporaire. Sans partage ici, la modale de
+    // conflit et la résolution de dépendances ne se déclenchent jamais.
+    const conflictData = session?.flashMessages.get('conflictData') as string | undefined
+    const conflictType = session?.flashMessages.get('conflictType') as string | undefined
+    const rejectedType = session?.flashMessages.get('rejectedType') as string | undefined
+    const createdResourceType = session?.flashMessages.get('createdResourceType') as
+      | string
+      | undefined
+    const createdResourceId = session?.flashMessages.get('createdResourceId') as string | undefined
+
     // #451 — la clé de session posée par `/demo` survivait au logout et suivait le
     // navigateur d'un compte à l'autre : la bannière « Session démo » s'affichait
     // sur des comptes réels. La clé n'est donc partagée que si l'utilisateur
@@ -141,6 +154,11 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
         errorAction,
         success,
         info,
+        conflictData,
+        conflictType,
+        rejectedType,
+        createdResourceType,
+        createdResourceId,
       }),
       demoSessionStartedAt: ctx.inertia.always(demoSessionStartedAt),
       demoSessionDurationMs: ctx.inertia.always(

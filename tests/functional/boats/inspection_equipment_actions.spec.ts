@@ -186,4 +186,27 @@ test.group('Inspection → equipment actions (#311)', (group) => {
     response.assertStatus(302)
     response.assertHeader('location', '/login')
   })
+
+  test('POST .../equipment-actions on an unknown inspection is marked as rejected (#622)', async ({
+    client,
+  }) => {
+    const user = await createCharterAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const reservation = await BoatReservationFactory.merge({
+      boatId: boat.id,
+      organizationId: boat.organizationId,
+    }).create()
+
+    // Cas du rejeu d'un défaut dont l'inspection parente n'a pas été créée :
+    // sans marqueur, la file verrait un succès Inertia et détruirait la saisie.
+    const response = await client
+      .post(`/boats/${boat.id}/reservations/${reservation.id}/inspections/999999/equipment-actions`)
+      .form({ label: 'Taquet arraché', actionType: 'to_repair' })
+      .loginAs(user)
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertFlashMessage('rejectedType', 'create-inspection-defect')
+    response.assertFlashMessage('error')
+  })
 })

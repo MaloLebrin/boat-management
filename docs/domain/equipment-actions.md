@@ -90,9 +90,11 @@ défauts constatés (« Défauts constatés » sur l'écran d'inspection). La co
 (nullable, `SET NULL`) prévue dès #310 est exploitée ici.
 
 La saisie d'un défaut fonctionne **hors-ligne** (#491) via la file IndexedDB
-(`create-inspection-defect`), à une limite près : un défaut ne peut viser qu'une inspection déjà
-créée en ligne (l'URL exige un `inspectionId` réel). Sans inspection synchronisée, l'ajout
-hors-ligne est désactivé avec un message explicite — voir `docs/frontend/pwa.md`.
+(`create-inspection-defect`), y compris sur une inspection **elle-même créée hors-ligne** (#622) :
+l'action porte alors `dependsOn: <jeton temporaire>`, et son URL est réécrite avec l'`inspectionId`
+réel au moment de la synchro. Sans aucune inspection — même temporaire — l'ajout hors-ligne reste
+désactivé avec un message explicite. Voir `docs/frontend/pwa.md`, section « Dépendances entre
+actions ».
 
 - **Déduction du bateau** : le `boat_id` (et l'org) sont **déduits** de la réservation liée à
   l'inspection, jamais saisis. La cohérence bateau ↔ réservation ↔ inspection est garantie par la

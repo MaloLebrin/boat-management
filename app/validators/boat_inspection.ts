@@ -17,6 +17,9 @@ export const createBoatInspectionValidator = vine.create(
 
 export const updateBoatInspectionValidator = vine.create(
   vine.object({
+    // Rejeu hors-ligne (#622) : `updatedAt` connu du client au moment de la
+    // saisie — le service rejette si l'inspection a bougé depuis.
+    _expectedUpdatedAt: vine.string().optional(),
     performedAt: vine.date({ formats: ['YYYY-MM-DDTHH:mm', 'YYYY-MM-DD'] }).optional(),
     // browser's getTimezoneOffset() — shifts the naive local datetime to UTC
     tzOffsetMinutes: vine.number().withoutDecimals().optional(),

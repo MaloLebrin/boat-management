@@ -7,8 +7,9 @@ import BaseModal from '~/components/base/BaseModal.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import { useNetworkStatus } from '~/composables/use_network_status'
-import { useOfflineQueue } from '~/composables/use_offline_queue'
+import { isTempId, useOfflineQueue } from '~/composables/use_offline_queue'
 import { useT } from '~/composables/use_t'
+import { CREATE_INSPECTION_DEFECT_ACTION } from '#shared/constants/offline_queue'
 import {
   EQUIPMENT_ACTION_TYPES,
   EQUIPMENT_REFERENCE_TYPES,
@@ -20,10 +21,12 @@ const props = defineProps<{
   boatId: number
   reservationId: number
   /**
-   * Null tant que l'inspection n'existe pas côté serveur (création hors-ligne,
-   * hors périmètre v1) : l'ajout de défaut est alors refusé explicitement (#491).
+   * ID réel de l'inspection, ou jeton temporaire (`tmp_…`) d'un état des lieux
+   * créé hors-ligne (#622) : le défaut est alors mis en file avec `dependsOn`,
+   * et son URL est réécrite à la synchro. `null` quand aucune inspection
+   * n'existe encore — l'ajout hors-ligne est refusé explicitement (#491).
    */
-  inspectionId: number | null
+  inspectionId: number | string | null
   open: boolean
   /**
    * Brouillon proposé à l'ouverture — un dommage de la checklist (#584) arrive
@@ -64,8 +67,8 @@ const actionUrl = computed(
     `/boats/${props.boatId}/reservations/${props.reservationId}/inspections/${props.inspectionId}/equipment-actions`
 )
 
-// Un défaut ne peut viser qu'une inspection déjà créée en ligne — refuser
-// explicitement vaut mieux qu'un échec silencieux au rejeu (#491)
+// Sans inspection — même temporaire — l'URL cible n'existe pas : refuser
+// explicitement vaut mieux qu'un échec silencieux au rejeu (#491, #622)
 const offlineUnavailable = computed(() => !isOnline.value && !props.inspectionId)
 
 const actionTypeOptions = computed(() =>
@@ -98,10 +101,13 @@ function handleSubmit() {
 
   if (!isOnline.value) {
     enqueue({
-      type: 'create-inspection-defect',
+      type: CREATE_INSPECTION_DEFECT_ACTION,
       url: actionUrl.value,
       method: 'post',
       payload: cleanPayload(),
+      // Rattachement à un état des lieux encore en file : l'URL porte le jeton
+      // temporaire, la synchro y substitue l'ID réel avant de rejouer (#622).
+      ...(isTempId(props.inspectionId) ? { dependsOn: props.inspectionId } : {}),
     })
     close()
     return

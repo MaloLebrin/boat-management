@@ -8,6 +8,13 @@
     "checkout": "No checkout inspection yet.",
     "checkin": "No checkin inspection yet."
   },
+  "pending": {
+    "badge": "Waiting to sync",
+    "description": "This inspection is saved on this device. It will be sent to the server as soon as the network is back.",
+    "checklistUnavailable": "The checklist will be available once the inspection has synced.",
+    "photosUnavailable": "Adding photos will be available once the inspection has synced.",
+    "defectPending": "Defect waiting to sync"
+  },
   "fields": {
     "performedAt": "Recorded at",
     "fuelLevel": "Fuel level (%)",

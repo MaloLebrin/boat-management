@@ -42,6 +42,8 @@ export type CreateInspectionPayload = {
 }
 
 export type UpdateInspectionPayload = {
+  /** Rejeu hors-ligne (#622) : ISO de l'`updatedAt` connu du client. */
+  expectedUpdatedAt?: string
   performedAt?: Date | string | DateTime
   /** getTimezoneOffset() of the submitting browser — used to shift the naive local datetime to UTC */
   tzOffsetMinutes?: number
@@ -59,6 +61,8 @@ export type BoatInspectionRow = {
   engineHours: string | null
   notes: string | null
   createdAt: string
+  /** Base de la détection de conflit sur un PUT rejoué hors-ligne (#622). */
+  updatedAt: string
 }
 
 export type SetInspectionItemPayload = {
@@ -73,4 +77,18 @@ export type BoatInspectionItemRow = {
   itemKey: string
   state: InspectionItemState
   note: string | null
+}
+
+/**
+ * Instantané renvoyé au client quand un PUT rejoué depuis la file hors-ligne
+ * arrive sur une inspection modifiée entre-temps (#622) — mêmes champs que le
+ * formulaire, pour que la modale de résolution puisse les confronter.
+ */
+export interface ConflictInspectionSnapshot {
+  id: number
+  updatedAt: string
+  performedAt: string
+  fuelLevel: number | null
+  engineHours: string | null
+  notes: string | null
 }

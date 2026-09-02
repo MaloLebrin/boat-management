@@ -181,6 +181,160 @@ test.group('Boat Inspections (functional)', (group) => {
     assert.lengthOf(inspections, 1)
   })
 
+  // --- protocole de la file hors-ligne (#622) ---
+
+  test('POST .../inspections flashes the created id so the queue can resolve temp ids', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createCharterAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const reservation = await BoatReservationFactory.merge({
+      boatId: boat.id,
+      organizationId: boat.organizationId,
+    }).create()
+
+    const response = await client
+      .post(`/boats/${boat.id}/reservations/${reservation.id}/inspections`)
+      .form(VALID_INSPECTION)
+      .loginAs(user)
+      .redirects(0)
+
+    const inspection = await BoatInspection.query()
+      .where('reservationId', reservation.id)
+      .firstOrFail()
+
+    response.assertStatus(302)
+    response.assertFlashMessage('createdResourceType', 'create-inspection')
+    response.assertFlashMessage('createdResourceId', String(inspection.id))
+    assert.equal(inspection.kind, 'checkout')
+  })
+
+  test('POST .../inspections marks a duplicate kind as rejected, not as a silent success', async ({
+    client,
+  }) => {
+    const user = await createCharterAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const reservation = await BoatReservationFactory.merge({
+      boatId: boat.id,
+      organizationId: boat.organizationId,
+    }).create()
+
+    await client
+      .post(`/boats/${boat.id}/reservations/${reservation.id}/inspections`)
+      .form(VALID_INSPECTION)
+      .loginAs(user)
+
+    const response = await client
+      .post(`/boats/${boat.id}/reservations/${reservation.id}/inspections`)
+      .form(VALID_INSPECTION)
+      .loginAs(user)
+      .redirects(0)
+
+    // Sans ce marqueur, `drainQueue` verrait un succès Inertia et détruirait la saisie.
+    response.assertStatus(302)
+    response.assertFlashMessage('rejectedType', 'create-inspection')
+    response.assertFlashMessage('error')
+  })
+
+  test('PUT .../inspections/:id with a stale _expectedUpdatedAt is rejected with conflictData', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createCharterAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const reservation = await BoatReservationFactory.merge({
+      boatId: boat.id,
+      organizationId: boat.organizationId,
+    }).create()
+
+    await client
+      .post(`/boats/${boat.id}/reservations/${reservation.id}/inspections`)
+      .form(VALID_INSPECTION)
+      .loginAs(user)
+
+    const inspection = await BoatInspection.query()
+      .where('reservationId', reservation.id)
+      .firstOrFail()
+
+    const response = await client
+      .put(`/boats/${boat.id}/reservations/${reservation.id}/inspections/${inspection.id}`)
+      .form({ fuelLevel: 10, _expectedUpdatedAt: '2020-01-01T00:00:00.000+00:00' })
+      .loginAs(user)
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertFlashMessage('conflictType', 'update-inspection')
+    response.assertFlashMessage('conflictData')
+
+    await inspection.refresh()
+    assert.equal(inspection.fuelLevel, 80)
+  })
+
+  test('PUT .../inspections/:id with an up-to-date _expectedUpdatedAt goes through', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createCharterAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const reservation = await BoatReservationFactory.merge({
+      boatId: boat.id,
+      organizationId: boat.organizationId,
+    }).create()
+
+    await client
+      .post(`/boats/${boat.id}/reservations/${reservation.id}/inspections`)
+      .form(VALID_INSPECTION)
+      .loginAs(user)
+
+    const inspection = await BoatInspection.query()
+      .where('reservationId', reservation.id)
+      .firstOrFail()
+
+    const response = await client
+      .put(`/boats/${boat.id}/reservations/${reservation.id}/inspections/${inspection.id}`)
+      .form({ fuelLevel: 10, _expectedUpdatedAt: inspection.updatedAt.toISO() })
+      .loginAs(user)
+      .redirects(0)
+
+    response.assertStatus(302)
+
+    await inspection.refresh()
+    assert.equal(inspection.fuelLevel, 10)
+  })
+
+  test('PUT .../inspections/:id without _expectedUpdatedAt keeps the previous behaviour', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createCharterAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const reservation = await BoatReservationFactory.merge({
+      boatId: boat.id,
+      organizationId: boat.organizationId,
+    }).create()
+
+    await client
+      .post(`/boats/${boat.id}/reservations/${reservation.id}/inspections`)
+      .form(VALID_INSPECTION)
+      .loginAs(user)
+
+    const inspection = await BoatInspection.query()
+      .where('reservationId', reservation.id)
+      .firstOrFail()
+
+    const response = await client
+      .put(`/boats/${boat.id}/reservations/${reservation.id}/inspections/${inspection.id}`)
+      .form({ fuelLevel: 20 })
+      .loginAs(user)
+      .redirects(0)
+
+    response.assertStatus(302)
+
+    await inspection.refresh()
+    assert.equal(inspection.fuelLevel, 20)
+  })
+
   test('POST .../inspections rejects cross-org attempt', async ({ client, assert }) => {
     const owner = await createCharterAdminUser()
     const other = await createEnterprisePlanUser()
