@@ -293,7 +293,7 @@ test.group('Boat Inspections (functional)', (group) => {
 
     const response = await client
       .put(`/boats/${boat.id}/reservations/${reservation.id}/inspections/${inspection.id}`)
-      .form({ fuelLevel: 10, _expectedUpdatedAt: inspection.updatedAt.toISO() })
+      .form({ fuelLevel: 10, _expectedUpdatedAt: inspection.updatedAt?.toISO() })
       .loginAs(user)
       .redirects(0)
 
