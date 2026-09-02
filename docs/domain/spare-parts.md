@@ -100,6 +100,17 @@ Service : `app/services/boat_engine_spare_parts_service.ts` (erreurs dans `app/e
 - Onglet Pièces de la page moteur → CTA « Identifier une pièce », conditionné par `isSparePartsEligibleEngine()` — la règle n'est jamais dupliquée dans un template.
 - Sidebar, section Maintenance → entrée « Pièces détachées » (`nav.spareParts`).
 
+## Chat IA de recherche de références (#634, Phase 1)
+
+Un chatbot conversationnel exploite enfin le `serialNumber` des moteurs : il identifie le modèle exact (`engine_models`) à partir du numéro de série et du motif de plaque de la marque, puis mappe la pièce demandée sur le vocabulaire fermé `SPARE_PART_CATALOG_INDEX` filtré par la famille (#574). Réservé aux plans avec IA (`QuotaService.assertCanUseAI` côté backend, `UpgradePlanModal` côté front), quota de tokens mensuel habituel (`AiTokenQuotaService.withOrgLock`).
+
+- **Machine à états à deux phases** (colonne `phase` de `ai_part_search_conversations`) : `engine` (identification) puis `part` (choix de pièce). Court-circuit : un moteur dont le modèle est résolu par le catalogue (#573) démarre directement en phase `part` ; une marque hors catalogue assume l'échec d'emblée (`context.identificationFailed`).
+- **Anti-hallucination** : le LLM ne rend que des identifiants du vocabulaire injecté dans son prompt (`modelCode` de la liste de la marque, `partKey` du catalogue), revalidés par le backend (`EngineCatalogService.resolveModelForEngine`, vocabulaire de la famille). La référence affichée provient **exclusivement** de `engine_part_references` via `SparePartsReferenceSource` ; pièce sans référence → repli revendeurs de #517 ; aucune pièce ne correspond → renvoi vers l'identification manuelle. Les messages de repli sont des textes statiques i18n, jamais délégués au modèle.
+- **Routes** `spareParts.chat.show|start|message` (`start/routes/spare_parts.ts`, groupe auth, mutations sous `aiThrottle`), contrôleur `SparePartChatController` en redirections Inertia. Service `SparePartChatService` + prompts purs `spare_part_chat_prompt_service.ts` (fr/en), types `shared/types/spare_part_chat.ts`, erreurs `app/exceptions/spare_part_chat_errors.ts`.
+- Une conversation = une pièce (10 messages utilisateur max, instruction de clôture au dernier tour) ; « nouvelle recherche » pour recommencer. L'ajout au panier passe par la route `spareParts.cart.add` existante, qui pré-remplit déjà la référence.
+
+La Phase 2 de #634 (chat public marketing, saisie libre marque + numéro de série) n'est pas livrée.
+
 ## Hors périmètre
 
 Reconnaissance de pièce par photo ; vues éclatées intégrées (partenariat/affiliation ou schémas propres) ; reprise automatisée des catalogues revendeurs (contenus sous droits) ; prix et disponibilité en temps réel — les `priceKey` restent des fourchettes indicatives ; compatibilité croisée entre modèles (« cette turbine va aussi sur… ») ; affiliation ou partenariat revendeur, point ouvert de #517. Les checklists de diagnostic in-bord, un temps listées ici, sont livrées par #576 — voir `docs/domain/diagnostic.md`.

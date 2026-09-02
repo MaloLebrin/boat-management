@@ -351,6 +351,25 @@ Conversations du chat IA public de diagnostic de panne (#602), le tunnel d'acqui
 - `tokensUsed` (cumul des tokens Mistral de la conversation, **y compris anonyme** — les plans avec IA émargent en plus à `ai_token_usages`)
 - `createdAt`, `updatedAt`
 
+### ai_part_search_conversations
+
+Conversations du chat IA de recherche de références de pièces par numéro de série (#634), réservé aux plans avec IA (`canUseAI`). Calquée sur `ai_diagnosis_conversations` : fil en blob JSON, pas de table de messages ; FK en `SET NULL` pour que les lignes survivent à la suppression du compte, du moteur ou du modèle — elles portent le suivi des coûts. La propriété d'une conversation se prouve par le couple (`user_id`, `boat_engine_id`).
+
+- `id`
+- `token` (12 hex, unique — identifiant opaque exposé dans les routes)
+- `userId` (nullable, FK `users` SET NULL)
+- `organizationId` (nullable, FK `organizations` SET NULL, indexé)
+- `boatEngineId` (nullable, FK `boat_engines` SET NULL, indexé)
+- `identifiedEngineModelId` (nullable, FK `engine_models` SET NULL) — modèle du catalogue identifié, au court-circuit (moteur déjà résolu, #573) ou au fil de la conversation (numéro de série interprété)
+- `locale`
+- `status` : `active | completed` (une conversation `completed` est verrouillée)
+- `phase` : `engine | part` — l'aiguillage du prompt système à chaque tour (identification du modèle, puis choix de la pièce)
+- `context` (jsonb nullable — **snapshot** du moteur à la création : marque, modèle, serial, slug catalogue, famille, `identificationFailed`)
+- `messages` (jsonb — fil `AiChatMessage[]` affiché tel quel)
+- `result` (jsonb nullable — `{ partKey, reference }` : la référence vient **exclusivement** de `engine_part_references` avec sa source, jamais du texte du modèle)
+- `tokensUsed` (cumul des tokens Mistral, émargé en plus à `ai_token_usages`)
+- `createdAt`, `updatedAt`
+
 ### boat_engine_repair_cart_items
 
 Liste de réparation du parcours « identification des pièces détachées » (#517) : les pièces repérées sur les vues éclatées s'accumulent par moteur, avec la référence relevée par l'utilisateur, puis s'exportent en CSV.
