@@ -3,6 +3,7 @@ import { computed, ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import { useNumberFormat } from '~/composables/use_number_format'
 import { useScrollReveal } from '~/composables/use_scroll_reveal'
+import { ADDON_PRICES, PLAN_LIMITS, PLAN_PRICES } from '../../../../shared/types/plan'
 
 type ProfileKey = 'loueurs' | 'ecoles' | 'marinas' | 'armateurs'
 
@@ -68,13 +69,23 @@ const totalSavings = computed(() => {
   return annualLabor.value + missedMaint.value + optimizations.value
 })
 
+/**
+ * Coût FleetAi annuel pour la flotte simulée, dérivé du barème réel (#612) :
+ * Starter tant que la flotte tient dans son quota, puis le socle Pro, puis Pro
+ * complété d'autant d'add-ons `extra_boats` que de bateaux au-delà — plafonné
+ * par Entreprise, qui redevient la meilleure affaire à partir d'une vingtaine
+ * de bateaux. La section chiffrait auparavant un tarif Pro à 29 €/mois qui
+ * n'existe plus, et un seuil de 25 bateaux sans rapport avec `PLAN_LIMITS`.
+ */
 const fleetCost = computed(() => {
-  if (boats.value <= 2) return 0
-  if (boats.value <= 25) return 348 // 29 * 12
-  return 1200 // Enterprise estimate
+  const fleet = boats.value
+  if (fleet <= (PLAN_LIMITS.starter.maxBoats ?? 0)) return 0
+  const proMax = PLAN_LIMITS.pro.maxBoats ?? 0
+  if (fleet <= proMax) return PLAN_PRICES.pro.annualTotal
+  const withExtraBoats =
+    PLAN_PRICES.pro.annualTotal + (fleet - proMax) * ADDON_PRICES.extra_boats.annualTotal
+  return Math.min(withExtraBoats, PLAN_PRICES.enterprise.annualTotal)
 })
-
-const roi = computed(() => totalSavings.value - fleetCost.value)
 
 const perMonthText = computed(() =>
   props.perMonthLabel.replace('{amount}', formatPrice(Math.round(totalSavings.value / 12)))

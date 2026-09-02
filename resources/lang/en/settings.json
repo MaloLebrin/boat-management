@@ -115,13 +115,13 @@
         "month": "Monthly",
         "year": "Annual"
       },
-      "annualDiscount": "-20%"
+      "annualDiscount": "−20%"
     },
     "modules": {
       "title": "Add-on modules",
       "subtitle": "Extend your Pro plan with modules billed separately.",
       "subtitleEnterprise": "All add-on modules are included in your plan.",
-      "pricePerMonth": "€{amount}/mo",
+      "pricePerMonth": "{amount}/mo",
       "active": "Active",
       "granted": "Included",
       "grantedHint": "Included in your plan",
@@ -148,8 +148,8 @@
       "subtitle": "Go beyond your Pro plan limit by adding boats on demand.",
       "name": "Extra boats",
       "desc": "Each added boat raises your quota above your plan.",
-      "pricePerBoat": "{amount} €/boat/month",
-      "totalPerMonth": "{amount} €/month",
+      "pricePerBoat": "{amount}/boat/month",
+      "totalPerMonth": "{amount}/month",
       "apply": "Update",
       "grantedHint": "{count, plural, one {# complimentary boat} other {# complimentary boats}}",
       "unlimited": "Unlimited boats",
@@ -168,7 +168,7 @@
     "members": "You have reached the member limit for your current plan ({limit} members).",
     "ai": "AI features are not available on the Starter plan.",
     "export": "Export is not available on the Starter plan.",
-    "priceAnnual": "Billed annually — {total} €/year",
+    "priceAnnual": "Billed annually — {total}/year",
     "contactUs": "You are already on the Enterprise plan. Contact us to discuss your needs.",
     "cancel": "Cancel"
   },

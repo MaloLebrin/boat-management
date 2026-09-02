@@ -1,17 +1,52 @@
 import { test } from '@japa/runner'
 import type { ApiClient } from '@japa/api-client'
-import { PLAN_LIMITS } from '#shared/types/plan'
+import { ADDON_PRICES, PLAN_LIMITS, PLAN_PRICES } from '#shared/types/plan'
+import { formatPrice } from '#shared/helpers/number_format'
 import type { PricingTableRow } from '#shared/types/marketing'
 import { marketingPath } from '#shared/helpers/locale_path'
 
+interface PricingTier {
+  name: string
+  price: number
+  priceAnnual?: number
+  sub: string
+  feats: Array<[string, string?]>
+}
+
 interface PricingProps {
   t: {
+    meta: { description: string }
     pricing: {
       hero: { subtitle: string }
+      tiers: PricingTier[]
+      tierFreeLabel: string
       detailedTable: { groups: Array<{ title: string; rows: PricingTableRow[] }> }
       faq: { items: Array<{ q: string; a: string }> }
     }
   }
+}
+
+interface HomeProps {
+  t: { home: { faq: { items: Array<{ q: string; a: string }> } } }
+}
+
+async function fetchHomeProps(client: ApiClient, locale: 'fr' | 'en'): Promise<HomeProps> {
+  const response = await client.get(marketingPath('home', locale)).withInertia()
+  response.assertStatus(200)
+  return response.body().props as HomeProps
+}
+
+/** Tout le texte tarifaire rendu par la page, aplati. */
+function allPricingCopy(props: PricingProps): string {
+  return [
+    props.t.meta.description,
+    props.t.pricing.hero.subtitle,
+    ...props.t.pricing.tiers.flatMap((tier) => [
+      tier.sub,
+      ...tier.feats.flatMap((feat) => feat.filter(Boolean) as string[]),
+    ]),
+    ...props.t.pricing.faq.items.flatMap((item) => [item.q, item.a]),
+  ].join(' | ')
 }
 
 async function fetchPricingProps(client: ApiClient, locale: 'fr' | 'en'): Promise<PricingProps> {
@@ -164,6 +199,104 @@ test.group('Pricing page — promesses alignées sur le produit (#454)', () => {
       const answers = props.t.pricing.faq.items.map((i) => i.a).join(' ')
 
       assert.include(answers, String(PLAN_LIMITS.pro.maxBoats))
+    })
+  }
+})
+
+test.group('Pricing page — un seul barème, dérivé de PLAN_PRICES (#612)', () => {
+  for (const locale of ['fr', 'en'] as const) {
+    test(`[${locale}] aucun placeholder ICU ne fuit dans la copie rendue`, async ({
+      client,
+      assert,
+    }) => {
+      const props = await fetchPricingProps(client, locale)
+
+      // Une clé paramétrée mais jamais alimentée rendrait « {proBoats} » tel
+      // quel : la copie tarifaire ne doit contenir aucune accolade résiduelle.
+      assert.notMatch(allPricingCopy(props), /\{[a-zA-Z]+\}/)
+    })
+
+    test(`[${locale}] la meta description cite les prix de PLAN_PRICES`, async ({
+      client,
+      assert,
+    }) => {
+      const props = await fetchPricingProps(client, locale)
+      const description = props.t.meta.description
+
+      for (const amount of [
+        PLAN_PRICES.pro.monthly,
+        PLAN_PRICES.pro.annualMonthly,
+        PLAN_PRICES.enterprise.monthly,
+        PLAN_PRICES.enterprise.annualMonthly,
+      ]) {
+        assert.include(description, formatPrice(amount, locale))
+      }
+      assert.include(description, String(PLAN_LIMITS.pro.maxBoats))
+    })
+
+    test(`[${locale}] les cartes de plans portent les prix du barème`, async ({
+      client,
+      assert,
+    }) => {
+      const props = await fetchPricingProps(client, locale)
+      const [starter, pro, enterprise] = props.t.pricing.tiers
+
+      assert.strictEqual(starter.price, PLAN_PRICES.starter.monthly)
+      assert.strictEqual(pro.price, PLAN_PRICES.pro.monthly)
+      assert.strictEqual(pro.priceAnnual, PLAN_PRICES.pro.annualMonthly)
+      assert.strictEqual(enterprise.price, PLAN_PRICES.enterprise.monthly)
+      assert.strictEqual(enterprise.priceAnnual, PLAN_PRICES.enterprise.annualMonthly)
+      // Le socle gratuit s'affiche par un libellé, jamais par un « 0 € ».
+      assert.isNotEmpty(props.t.pricing.tierFreeLabel)
+    })
+
+    test(`[${locale}] les cartes citent les quotas de PLAN_LIMITS`, async ({ client, assert }) => {
+      const props = await fetchPricingProps(client, locale)
+      const [starter, pro] = props.t.pricing.tiers
+      const starterCopy = [starter.sub, ...starter.feats.map((f) => f[0])].join(' | ')
+      const proCopy = [pro.sub, ...pro.feats.flatMap((f) => f.filter(Boolean))].join(' | ')
+
+      assert.include(starterCopy, String(PLAN_LIMITS.starter.maxBoats))
+      assert.include(proCopy, String(PLAN_LIMITS.pro.maxBoats))
+      assert.include(proCopy, String(PLAN_LIMITS.pro.maxMembers))
+      assert.include(proCopy, String(PLAN_LIMITS.pro.storageGb))
+    })
+
+    test(`[${locale}] la FAQ tarifs chiffre l'add-on au prix de ADDON_PRICES`, async ({
+      client,
+      assert,
+    }) => {
+      const props = await fetchPricingProps(client, locale)
+      const answers = props.t.pricing.faq.items.map((i) => i.a).join(' ')
+
+      assert.include(answers, formatPrice(ADDON_PRICES.extra_boats.monthly, locale))
+    })
+
+    test(`[${locale}] la FAQ home chiffre la flotte d'exemple au vrai barème`, async ({
+      client,
+      assert,
+    }) => {
+      const props = await fetchHomeProps(client, locale)
+      const items = props.t.home.faq.items
+      const answers = items.map((i) => i.a).join(' ')
+      const proBoats = PLAN_LIMITS.pro.maxBoats!
+      const fleet = 15
+      const total = PLAN_PRICES.pro.monthly + (fleet - proBoats) * ADDON_PRICES.extra_boats.monthly
+
+      assert.notMatch(items.map((i) => `${i.q} ${i.a}`).join(' '), /\{[a-zA-Z]+\}/)
+      assert.include(answers, formatPrice(PLAN_PRICES.pro.monthly, locale))
+      assert.include(answers, formatPrice(ADDON_PRICES.extra_boats.monthly, locale))
+      assert.include(answers, formatPrice(total, locale))
+      assert.include(answers, formatPrice(PLAN_PRICES.enterprise.monthly, locale))
+    })
+
+    test(`[${locale}] aucun tarif périmé ne subsiste dans la copie`, async ({ client, assert }) => {
+      const props = await fetchPricingProps(client, locale)
+      const copy = allPricingCopy(props)
+
+      // 29 €/mois était l'ancien socle Pro, chiffré nulle part ailleurs que
+      // dans le calculateur ROI : il ne doit pas non plus revenir par la copie.
+      assert.notInclude(copy, formatPrice(29, locale))
     })
   }
 })

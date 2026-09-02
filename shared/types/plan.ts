@@ -47,6 +47,13 @@ export interface PlanPrice {
   annualTotal: number
 }
 
+/**
+ * Barème des socles. `annualTotal` est le montant **réellement facturé** par
+ * Stripe pour douze mois ; `annualMonthly` en est le mensuel-équivalent affiché
+ * sur la page tarifs, arrondi à l'euro (#612). Entreprise est le seul palier où
+ * l'arrondi se voit : 950 / 12 = 79,17 € affichés « 79 € ». La correspondance
+ * avec le catalogue Stripe se vérifie par `node ace pricing:check`.
+ */
 export const PLAN_PRICES: Record<PlanTier, PlanPrice> = {
   starter: { monthly: 0, annualMonthly: 0, annualTotal: 0 },
   pro: { monthly: 20, annualMonthly: 16, annualTotal: 192 },

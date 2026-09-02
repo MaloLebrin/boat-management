@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { CheckIcon } from '@heroicons/vue/24/solid'
 import BaseButton from '~/components/base/BaseButton.vue'
+import { useNumberFormat } from '~/composables/use_number_format'
 import { useScrollReveal } from '~/composables/use_scroll_reveal'
 
 interface Tier {
   name: string
   tag: string
-  price: string | number
+  price: number
   pricePer?: string
-  priceAnnual?: string | number
+  priceAnnual?: number
   priceAnnualPer?: string
   sub: string
   featured?: boolean
@@ -28,9 +29,26 @@ defineProps<{
   reassurance: ReassuranceItem[]
   featuredBadgeLabel: string
   billedAnnuallyNote: string
+  /** Libellé du prix nul, ex. « Gratuit » — un plan à 0 € ne s'écrit pas « 0 € ». */
+  freeLabel: string
 }>()
 
 const { el, isVisible } = useScrollReveal()
+const { formatPrice } = useNumberFormat()
+
+/**
+ * Prix affiché sur une carte (#612). Le montant passe par `formatPrice` comme
+ * partout ailleurs sur la page — la carte rendait le nombre nu, si bien que
+ * « 20 » y côtoyait « 20 € » dans le comparatif deux sections plus bas — et un
+ * socle gratuit affiche son libellé plutôt qu'un « 0 » suivi de « / mois ».
+ */
+function priceOf(tier: Tier, billing: 'monthly' | 'annual'): number {
+  return billing === 'annual' && tier.priceAnnual !== undefined ? tier.priceAnnual : tier.price
+}
+
+function isFree(tier: Tier, billing: 'monthly' | 'annual'): boolean {
+  return priceOf(tier, billing) === 0
+}
 </script>
 
 <template>
@@ -77,16 +95,13 @@ const { el, isVisible } = useScrollReveal()
           <!-- Price -->
           <div class="mt-4 flex items-baseline gap-1">
             <span class="font-display text-5xl lg:text-6xl">
-              {{
-                billing === 'annual' && tier.priceAnnual !== undefined
-                  ? tier.priceAnnual
-                  : tier.price
-              }}
+              {{ isFree(tier, billing) ? freeLabel : formatPrice(priceOf(tier, billing)) }}
             </span>
             <span
               v-if="
-                (billing === 'annual' && tier.priceAnnualPer) ||
-                (billing === 'monthly' && tier.pricePer)
+                !isFree(tier, billing) &&
+                ((billing === 'annual' && tier.priceAnnualPer) ||
+                  (billing === 'monthly' && tier.pricePer))
               "
               :class="['text-sm', tier.featured ? 'text-white/60' : 'text-fg-muted']"
             >
@@ -96,7 +111,7 @@ const { el, isVisible } = useScrollReveal()
 
           <!-- Annual billing note -->
           <p
-            v-if="billing === 'annual' && tier.priceAnnual !== undefined"
+            v-if="billing === 'annual' && tier.priceAnnual !== undefined && !isFree(tier, billing)"
             :class="['mt-1 text-xs', tier.featured ? 'text-white/50' : 'text-fg-subtle']"
           >
             {{ billedAnnuallyNote }}

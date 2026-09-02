@@ -110,6 +110,14 @@ export default class StripeService {
     await this.stripe.subscriptionItems.del(subscriptionItemId)
   }
 
+  /**
+   * Lit un prix du catalogue Stripe. Utilisé par `pricing:check` (#612) pour
+   * confronter les montants réellement facturés au barème du code.
+   */
+  async retrievePrice(priceId: string): Promise<Stripe.Price> {
+    return this.stripe.prices.retrieve(priceId)
+  }
+
   constructWebhookEvent(rawBody: string, signature: string): Stripe.Event {
     const secret = env.get('STRIPE_WEBHOOK_SECRET')
     if (!secret) throw new StripeNotConfiguredError()

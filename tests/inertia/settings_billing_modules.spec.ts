@@ -1,8 +1,15 @@
 import { mount } from '@vue/test-utils'
 import { describe, expect, test, vi } from 'vitest'
 
+// `t` rend la clé suivie de ses paramètres : les assertions historiques
+// portent sur la clé (`toContain`), et les montants formatés restent
+// observables pour vérifier qu'ils passent bien par `formatPrice` (#612).
 vi.mock('~/composables/use_t', () => ({
-  useT: () => ({ t: (k: string) => k, locale: { value: 'fr' } }),
+  useT: () => ({
+    t: (k: string, vars?: Record<string, string>) =>
+      vars ? `${k} ${Object.values(vars).join(' ')}` : k,
+    locale: { value: 'fr' },
+  }),
 }))
 
 const { post, del } = vi.hoisted(() => ({ post: vi.fn(), del: vi.fn() }))
@@ -13,6 +20,8 @@ vi.mock('@inertiajs/vue3', async () => {
 
 import SettingsBillingModules from '../../inertia/components/settings/SettingsBillingModules.vue'
 import type { SubscriptionInfo } from '../../shared/types/billing'
+import { MODULE_PRICES } from '../../shared/types/plan'
+import { formatPrice } from '../../shared/helpers/number_format'
 
 const subscription: SubscriptionInfo = {
   id: 1,
@@ -165,5 +174,22 @@ describe('dark mode (#416)', () => {
     const html = mountModules({ plan: 'enterprise', subscription: null, activeModules: [] }).html()
     expect(html).toContain('text-success')
     expect(html).not.toMatch(/-green-\d/)
+  })
+})
+
+describe('formatage du prix (#612)', () => {
+  test('le prix mensuel du module passe par formatPrice', () => {
+    const w = mountModules({ activeModules: [] })
+
+    expect(w.text()).toContain(formatPrice(MODULE_PRICES.charter.monthly, 'fr'))
+  })
+
+  test('un abonnement annuel affiche le tarif annuel-équivalent du module', () => {
+    const w = mountModules({
+      subscription: { ...subscription, billingInterval: 'year' },
+      activeModules: [],
+    })
+
+    expect(w.text()).toContain(formatPrice(MODULE_PRICES.charter.annualMonthly, 'fr'))
   })
 })

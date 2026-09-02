@@ -4,6 +4,7 @@ import { usePage, useForm } from '@inertiajs/vue3'
 import BaseModal from '~/components/base/BaseModal.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import { useT } from '~/composables/use_t'
+import { useNumberFormat } from '~/composables/use_number_format'
 import { PLAN_LIMITS, PLAN_PRICES, getUpgradeTier } from '../../../shared/types/plan'
 import type { PlanTier } from '../../../shared/types/plan'
 import type { BillingInterval } from '../../../shared/types/billing'
@@ -16,6 +17,7 @@ const props = defineProps<{
 const emit = defineEmits<{ 'update:open': [boolean] }>()
 
 const { t } = useT()
+const { formatPrice } = useNumberFormat()
 const page = usePage()
 
 const currentPlan = computed<PlanTier>(
@@ -78,15 +80,15 @@ const modalTitle = computed(() =>
           {{ t(`settings.billing.planName.${upgradeTier}`) }}
         </p>
         <p class="mt-1 text-2xl font-bold text-fg">
-          {{ upgradePrice }}
+          {{ formatPrice(upgradePrice) }}
           <span class="text-base font-normal text-fg-muted"
-            >€ / {{ t('settings.billing.subscription.interval.month').toLowerCase() }}</span
+            >/ {{ t('settings.billing.subscription.interval.month').toLowerCase() }}</span
           >
         </p>
         <p v-if="interval === 'year'" class="mt-0.5 text-xs text-fg-muted">
           {{
             t('settings.upgrade.priceAnnual', {
-              total: String(PLAN_PRICES[upgradeTier].annualTotal),
+              total: formatPrice(PLAN_PRICES[upgradeTier].annualTotal),
             })
           }}
         </p>

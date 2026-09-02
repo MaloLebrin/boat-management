@@ -3,6 +3,7 @@ import BaseCard from '~/components/base/BaseCard.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import { useT } from '~/composables/use_t'
+import { useNumberFormat } from '~/composables/use_number_format'
 import { computed, ref, watch } from 'vue'
 import { router } from '@inertiajs/vue3'
 import { ADDON_PRICES } from '../../../shared/types/plan'
@@ -12,6 +13,7 @@ import type { SubscriptionInfo } from '../../../shared/types/billing'
 const MAX_EXTRA_BOATS = 100
 
 const { t } = useT()
+const { formatPrice } = useNumberFormat()
 
 const props = defineProps<{
   plan: PlanTier
@@ -83,7 +85,7 @@ function apply() {
         </div>
         <p class="mt-0.5 text-sm text-fg-muted">{{ t('settings.billing.extraBoats.desc') }}</p>
         <p v-if="plan !== 'enterprise'" class="mt-1 text-sm font-semibold text-fg">
-          {{ t('settings.billing.extraBoats.pricePerBoat', { amount: String(unitPrice) }) }}
+          {{ t('settings.billing.extraBoats.pricePerBoat', { amount: formatPrice(unitPrice) }) }}
         </p>
       </div>
 
@@ -124,7 +126,9 @@ function apply() {
         </div>
         <div class="flex flex-col items-end gap-1">
           <span class="text-sm font-semibold text-fg">
-            {{ t('settings.billing.extraBoats.totalPerMonth', { amount: String(totalPrice) }) }}
+            {{
+              t('settings.billing.extraBoats.totalPerMonth', { amount: formatPrice(totalPrice) })
+            }}
           </span>
           <BaseButton variant="primary" size="sm" :disabled="!isDirty" @click="apply">
             {{ t('settings.billing.extraBoats.apply') }}
