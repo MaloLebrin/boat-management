@@ -1,4 +1,5 @@
 import {
+  BoatInspectionConflictError,
   BoatInspectionNotFoundError,
   BoatInspectionValidationError,
 } from '#exceptions/inspection_errors'
@@ -12,11 +13,24 @@ import MediaService from '#services/media_service'
 import { inject } from '@adonisjs/core'
 import { ALL_INSPECTION_ITEM_KEYS } from '#shared/constants/inspections/inspection_checklist_content'
 import type {
+  ConflictInspectionSnapshot,
   CreateInspectionPayload,
   SetInspectionItemPayload,
   UpdateInspectionPayload,
 } from '#shared/types/inspection'
 import { toUtcFromLocalInput } from '#shared/helpers/date'
+
+/** Champs confrontés à la version locale par la modale de résolution (#622). */
+function buildConflictSnapshot(inspection: BoatInspection): ConflictInspectionSnapshot {
+  return {
+    id: inspection.id,
+    updatedAt: inspection.updatedAt?.toISO() ?? '',
+    performedAt: inspection.performedAt?.toISO() ?? '',
+    fuelLevel: inspection.fuelLevel,
+    engineHours: inspection.engineHours,
+    notes: inspection.notes,
+  }
+}
 
 function assertReservationScope(user: User, reservation: BoatReservation) {
   if (user.organizationId === null || user.organizationId !== reservation.organizationId) {
@@ -107,6 +121,14 @@ export default class BoatInspectionService {
       .first()
 
     if (!inspection) throw new BoatInspectionNotFoundError()
+
+    // Rejeu hors-ligne (#622) : l'inspection a bougé depuis la saisie — la
+    // modale de résolution tranche plutôt qu'un last-write-wins silencieux.
+    if (payload.expectedUpdatedAt !== undefined && inspection.updatedAt) {
+      if (inspection.updatedAt.toISO() !== payload.expectedUpdatedAt) {
+        throw new BoatInspectionConflictError(buildConflictSnapshot(inspection))
+      }
+    }
 
     if (payload.performedAt !== undefined) {
       inspection.performedAt = toUtcFromLocalInput(payload.performedAt, payload.tzOffsetMinutes)

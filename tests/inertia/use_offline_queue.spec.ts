@@ -23,6 +23,8 @@ const mockPageProps = vi.hoisted(() => ({
     'common.offline.queue.cancelled': 'Action annulée',
     'common.offline.failed.requeued': 'Action remise en file',
     'common.offline.failed.discarded': 'Action en échec abandonnée',
+    'common.offline.failed.dependencyBlocked':
+      "L'état des lieux auquel cette saisie est rattachée n'a pas pu être enregistré.",
   },
   locale: 'fr',
   flash: {} as Record<string, unknown>,
@@ -43,7 +45,12 @@ vi.mock('@inertiajs/vue3', async () => {
 
 import { router } from '@inertiajs/vue3'
 import { toast } from 'vue-sonner'
-import { conflictedAction, useOfflineQueue } from '../../inertia/composables/use_offline_queue'
+import {
+  conflictedAction,
+  groupByDependency,
+  newTempId,
+  useOfflineQueue,
+} from '../../inertia/composables/use_offline_queue'
 
 function mountComposable() {
   let result: ReturnType<typeof useOfflineQueue> | undefined
@@ -104,6 +111,33 @@ function makeRouterCallOnSuccess() {
     options?.onSuccess?.()
     return undefined as any
   })
+}
+
+/** Le contrôleur a rendu l'ID réel de la ressource créée (#622). */
+function makeRouterCallOnSuccessWithCreatedId(
+  createdResourceType: string,
+  createdResourceId: string
+) {
+  const impl = (_url: string, _data: unknown, options: any) => {
+    mockPageProps.flash = { createdResourceType, createdResourceId }
+    options?.onSuccess?.()
+    return undefined as any
+  }
+  vi.mocked(router.post).mockImplementation(impl)
+  vi.mocked(router.patch).mockImplementation(impl)
+  vi.mocked(router.put).mockImplementation(impl)
+}
+
+/** Refus métier rendu en redirection : succès Inertia, mais `rejectedType` posé (#622). */
+function makeRouterCallOnSuccessWithRejection(rejectedType: string, error: string) {
+  const impl = (_url: string, _data: unknown, options: any) => {
+    mockPageProps.flash = { rejectedType, error }
+    options?.onSuccess?.()
+    return undefined as any
+  }
+  vi.mocked(router.post).mockImplementation(impl)
+  vi.mocked(router.patch).mockImplementation(impl)
+  vi.mocked(router.put).mockImplementation(impl)
 }
 
 function makeRouterCallOnSuccessWithConflict(
@@ -713,5 +747,230 @@ describe('useOfflineQueue', () => {
 
     expect(pendingCount.value).toBe(1)
     expect(pendingActions.value[0].type).toBe('create-fuel-log')
+  })
+
+  // #622 — une création hors-ligne porte un jeton temporaire, les actions qui la
+  // référencent ne sont rejouables qu'une fois l'ID réel connu.
+  describe('dépendances entre actions (#622)', () => {
+    const TEMP_ID = 'tmp_inspection1'
+    const CREATE_URL = '/boats/1/reservations/2/inspections'
+    const DEFECT_URL = `/boats/1/reservations/2/inspections/${TEMP_ID}/equipment-actions`
+
+    async function enqueueInspectionWithDefect(
+      enqueue: ReturnType<typeof mountComposable>['enqueue']
+    ) {
+      await enqueue({
+        type: 'create-inspection',
+        url: CREATE_URL,
+        method: 'post',
+        payload: { kind: 'checkout', performedAt: '2026-09-02T10:00' },
+        tempId: TEMP_ID,
+      })
+      await enqueue({
+        type: 'create-inspection-defect',
+        url: DEFECT_URL,
+        method: 'post',
+        payload: { label: 'Taquet arraché', actionType: 'to_repair', inspectionId: TEMP_ID },
+        dependsOn: TEMP_ID,
+      })
+    }
+
+    test('newTempId produces a non-numeric token', () => {
+      const id = newTempId()
+      expect(id.startsWith('tmp_')).toBe(true)
+      expect(Number.isFinite(Number(id))).toBe(false)
+      expect(newTempId()).not.toBe(id)
+    })
+
+    test('the created id rewrites the dependent url and clears dependsOn', async () => {
+      // La fille est laissée en file après réécriture (le rejeu ne « settle »
+      // pas), pour pouvoir observer sa forme résolue.
+      makeRouterCallOnFinishOnly()
+      vi.mocked(router.post).mockImplementationOnce((_url, _data, options: any) => {
+        mockPageProps.flash = { createdResourceType: 'create-inspection', createdResourceId: '42' }
+        options?.onSuccess?.()
+        return undefined as any
+      })
+      const { enqueue, drainQueue, pendingActions } = mountComposable()
+      await enqueueInspectionWithDefect(enqueue)
+
+      await drainQueue()
+
+      await vi.waitFor(() => expect(pendingActions.value).toHaveLength(1), { timeout: 1000 })
+      const dependent = pendingActions.value[0]
+      expect(dependent.url).toBe('/boats/1/reservations/2/inspections/42/equipment-actions')
+      expect(dependent.dependsOn).toBeUndefined()
+      expect(dependent.payload.inspectionId).toBe(42)
+      // Et la fille est bien rejouée sur l'URL réelle, pas sur le jeton.
+      expect(vi.mocked(router.post).mock.calls.at(-1)?.[0]).toBe(
+        '/boats/1/reservations/2/inspections/42/equipment-actions'
+      )
+    })
+
+    test('a 4xx on the parent cascades its dependents to the failed store', async () => {
+      makeRouterCallOnError({ performedAt: 'Date invalide' })
+      const { enqueue, drainQueue, pendingCount, failedActions } = mountComposable()
+      await enqueueInspectionWithDefect(enqueue)
+
+      await drainQueue()
+
+      await vi.waitFor(() => expect(failedActions.value).toHaveLength(2), { timeout: 1000 })
+      expect(pendingCount.value).toBe(0)
+      const dependent = failedActions.value.find((a) => a.type === 'create-inspection-defect')
+      // `dependsOn` est conservé : c'est ce qui permet la reprise groupée.
+      expect(dependent?.dependsOn).toBe(TEMP_ID)
+      expect(dependent?.errors.dependency).toContain('état des lieux')
+      // Le payload de la saisie est intact — rien n'est détruit (#487).
+      expect(dependent?.payload.label).toBe('Taquet arraché')
+    })
+
+    test('a business refusal flashed as a redirect is kept instead of being deleted', async () => {
+      makeRouterCallOnSuccessWithRejection('create-inspection', 'Un état des lieux existe déjà')
+      const { enqueue, drainQueue, pendingCount, failedActions } = mountComposable()
+      await enqueueInspectionWithDefect(enqueue)
+
+      await drainQueue()
+
+      await vi.waitFor(() => expect(failedActions.value).toHaveLength(2), { timeout: 1000 })
+      expect(pendingCount.value).toBe(0)
+      const creation = failedActions.value.find((a) => a.type === 'create-inspection')
+      expect(creation?.errors.reason).toBe('Un état des lieux existe déjà')
+      expect(toast.error).toHaveBeenCalled()
+    })
+
+    test('a rejectedType meant for another action type is ignored', async () => {
+      makeRouterCallOnSuccessWithRejection('create-fuel-log', 'Refus sans rapport')
+      const { enqueue, drainQueue, pendingCount, failedCount } = mountComposable()
+
+      await enqueue({
+        type: 'create-navigation-log',
+        url: '/boats/1/navigation-logs',
+        method: 'post',
+        payload: { departedAt: '2026-06-24T10:00' },
+      })
+      await drainQueue()
+
+      await vi.waitFor(() => expect(pendingCount.value).toBe(0), { timeout: 1000 })
+      expect(failedCount.value).toBe(0)
+    })
+
+    test('a success without a created id fails the dependents rather than replaying them', async () => {
+      makeRouterCallOnSuccess()
+      const { enqueue, drainQueue, pendingCount, failedActions } = mountComposable()
+      await enqueueInspectionWithDefect(enqueue)
+
+      await drainQueue()
+
+      await vi.waitFor(() => expect(failedActions.value).toHaveLength(1), { timeout: 1000 })
+      expect(failedActions.value[0].type).toBe('create-inspection-defect')
+      expect(pendingCount.value).toBe(0)
+    })
+
+    test('retryFailedAction re-queues the whole group, parent first', async () => {
+      makeRouterCallOnError({ performedAt: 'Date invalide' })
+      const { enqueue, drainQueue, failedActions, retryFailedAction, pendingActions } =
+        mountComposable()
+      await enqueueInspectionWithDefect(enqueue)
+      await drainQueue()
+      await vi.waitFor(() => expect(failedActions.value).toHaveLength(2), { timeout: 1000 })
+
+      // La reprise ne doit pas rejouer immédiatement : on neutralise le routeur.
+      makeRouterCallOnFinishOnly()
+      const creationId = failedActions.value.find((a) => a.type === 'create-inspection')!.id!
+      await retryFailedAction(creationId)
+
+      await vi.waitFor(() => expect(pendingActions.value).toHaveLength(2), { timeout: 1000 })
+      expect(failedActions.value).toHaveLength(0)
+      expect(pendingActions.value[0].type).toBe('create-inspection')
+      expect(pendingActions.value[0].tempId).toBe(TEMP_ID)
+      expect(pendingActions.value[1].dependsOn).toBe(TEMP_ID)
+    })
+
+    test('discardFailedAction drops the whole group', async () => {
+      makeRouterCallOnError({ performedAt: 'Date invalide' })
+      const { enqueue, drainQueue, failedActions, discardFailedAction } = mountComposable()
+      await enqueueInspectionWithDefect(enqueue)
+      await drainQueue()
+      await vi.waitFor(() => expect(failedActions.value).toHaveLength(2), { timeout: 1000 })
+
+      const creationId = failedActions.value.find((a) => a.type === 'create-inspection')!.id!
+      await discardFailedAction(creationId)
+
+      expect(failedActions.value).toHaveLength(0)
+    })
+
+    test('cancelAction on a pending creation also drops its dependents', async () => {
+      const { enqueue, cancelAction, pendingActions, pendingCount } = mountComposable()
+      await enqueueInspectionWithDefect(enqueue)
+
+      const creationId = pendingActions.value.find((a) => a.type === 'create-inspection')!.id!
+      await cancelAction(creationId)
+
+      expect(pendingCount.value).toBe(0)
+    })
+
+    test('re-enqueuing the creation keeps its temp id so defects stay attached', async () => {
+      const { enqueue, pendingActions } = mountComposable()
+      await enqueue({
+        type: 'create-inspection',
+        url: CREATE_URL,
+        method: 'post',
+        payload: { kind: 'checkout', performedAt: '2026-09-02T10:00' },
+        dedupeKey: `create-inspection:${CREATE_URL}:checkout`,
+        tempId: TEMP_ID,
+      })
+      await enqueue({
+        type: 'create-inspection',
+        url: CREATE_URL,
+        method: 'post',
+        payload: { kind: 'checkout', performedAt: '2026-09-02T11:30' },
+        dedupeKey: `create-inspection:${CREATE_URL}:checkout`,
+        tempId: 'tmp_other',
+      })
+
+      expect(pendingActions.value).toHaveLength(1)
+      expect(pendingActions.value[0].tempId).toBe(TEMP_ID)
+      expect(pendingActions.value[0].payload.performedAt).toBe('2026-09-02T11:30')
+    })
+
+    test('groupByDependency nests dependents and keeps orphans standalone', () => {
+      const groups = groupByDependency([
+        {
+          id: 1,
+          type: 'create-inspection',
+          url: '/a',
+          method: 'post',
+          payload: {},
+          createdAt: '',
+          tempId: TEMP_ID,
+        },
+        {
+          id: 2,
+          type: 'create-inspection-defect',
+          url: '/b',
+          method: 'post',
+          payload: {},
+          createdAt: '',
+          dependsOn: TEMP_ID,
+        },
+        { id: 3, type: 'create-fuel-log', url: '/c', method: 'post', payload: {}, createdAt: '' },
+        {
+          id: 4,
+          type: 'create-inspection-defect',
+          url: '/d',
+          method: 'post',
+          payload: {},
+          createdAt: '',
+          dependsOn: 'tmp_gone',
+        },
+      ])
+
+      expect(groups).toHaveLength(3)
+      expect(groups[0].action.id).toBe(1)
+      expect(groups[0].dependents.map((d) => d.id)).toEqual([2])
+      expect(groups[1].action.id).toBe(3)
+      expect(groups[2].action.id).toBe(4)
+      expect(groups[2].dependents).toHaveLength(0)
+    })
   })
 })

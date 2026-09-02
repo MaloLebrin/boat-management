@@ -310,12 +310,18 @@ function handleSubmit() {
 | `BoatIncidentForm.vue`             | `update-incident`          | `PUT /boats/:id/incidents/:incidentId`                                 | put     |
 | `BoatMaintenanceSheetItemList.vue` | `update-sheet-item`        | `PUT /boats/:id/maintenance-sheets/:sheetId/items/:itemId`             | put     |
 | `InspectionDefectModal.vue`        | `create-inspection-defect` | `POST /boats/:id/reservations/:rid/inspections/:iid/equipment-actions` | post    |
+| `InspectionForm.vue`               | `create-inspection`        | `POST /boats/:id/reservations/:rid/inspections`                        | post    |
+| `InspectionForm.vue`               | `update-inspection`        | `PUT /boats/:id/reservations/:rid/inspections/:iid`                    | put     |
 
-Limite assumée des défauts d'inspection (#491) : un défaut ne peut viser qu'une
-inspection **déjà créée en ligne** (l'URL exige un `inspectionId` réel). Si
-l'inspection n'existe pas encore côté serveur, l'ajout hors-ligne est
-**désactivé avec un message explicite** plutôt que d'échouer silencieusement au
-rejeu — même principe que l'upload photo hors-ligne, hors périmètre v1.
+Depuis #622, un état des lieux se crée hors-ligne : la création part en file
+avec un **jeton temporaire**, et les défauts saisis dans la foulée le
+référencent (voir « Dépendances entre actions » ci-dessous). Ce qui reste
+indisponible sur un état des lieux pas encore synchronisé, avec un message
+explicite plutôt qu'un échec silencieux : la **checklist** (les constats
+`PATCH .../items` n'ont pas de chemin hors-ligne) et l'**ajout de photos**
+(#621 — la file stocke du JSON, pas des `File`). Le refus explicite de
+`InspectionDefectModal` (#491) ne subsiste que lorsqu'il n'existe aucun état des
+lieux, même temporaire.
 
 Les items de fiche d'entretien (#490) combinent trois mécanismes : **état
 optimiste** (la case cochée hors-ligne reflète le clic sans attendre les props
@@ -392,13 +398,59 @@ Mock de `virtual:pwa-register/vue` via alias Vitest + mock de `vue-sonner`. Cas 
 
 ## Comportements et limites
 
-| Comportement                    | Note                                                                                                                                                    |
-| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Pages non visitées**          | Servies par `public/offline.html` via `navigateFallback` Workbox — message bilingue + bouton "réessayer".                                               |
-| **Erreur 5xx / réseau**         | L'action reste en file et `isSyncing` est réinitialisé via `onFinish`. Elle sera rejouée à la prochaine reconnexion.                                    |
-| **Erreur 4xx (validation)**     | L'action passe dans le store `failed` avec ses erreurs (#487). L'UI propose « Réessayer » ou « Abandonner » — rien n'est détruit sans action explicite. |
-| **Détection de conflit**        | Les actions PATCH incluent `_expectedUpdatedAt`. Le backend rejette (flash `conflict`) si la sortie a été modifiée entre-temps.                         |
-| **Last-write-wins (créations)** | Les créations (POST) n'ont pas de conflit — chaque enregistrement est nouveau.                                                                          |
+| Comportement                    | Note                                                                                                                                                                                                          |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Pages non visitées**          | Servies par `public/offline.html` via `navigateFallback` Workbox — message bilingue + bouton "réessayer".                                                                                                     |
+| **Erreur 5xx / réseau**         | L'action reste en file et `isSyncing` est réinitialisé via `onFinish`. Elle sera rejouée à la prochaine reconnexion.                                                                                          |
+| **Erreur 4xx (validation)**     | L'action passe dans le store `failed` avec ses erreurs (#487). L'UI propose « Réessayer » ou « Abandonner » — rien n'est détruit sans action explicite.                                                       |
+| **Détection de conflit**        | Les actions PATCH incluent `_expectedUpdatedAt`. Le backend rejette (flash `conflict`) si la sortie a été modifiée entre-temps.                                                                               |
+| **Last-write-wins (créations)** | Les créations (POST) n'ont pas de conflit — chaque enregistrement est nouveau.                                                                                                                                |
+| **Refus métier en redirection** | Un contrôleur qui refuse par `flash('error')` + `redirect().back()` rend un **succès** côté Inertia. Le flash `rejectedType` (#622) range alors l'action dans `failed` au lieu de la détruire avec la saisie. |
+| **Dépendances entre actions**   | Une création `tempId` et ses actions `dependsOn` sont rejouées dans l'ordre, résolues par l'ID réel, et échouent ensemble (#622).                                                                             |
+
+---
+
+## Dépendances entre actions (#622)
+
+Jusqu'au lot 3, la file ne contenait que des actions **indépendantes** : chacune
+portait une URL complète, rejouable telle quelle. Créer un état des lieux
+hors-ligne casse cette hypothèse — les défauts saisis juste après visent
+`/inspections/:iid/equipment-actions`, dont l'`iid` n'existe pas encore.
+
+Deux champs optionnels de `QueuedAction` portent le lien :
+
+| Champ       | Sens                                                                                                |
+| ----------- | --------------------------------------------------------------------------------------------------- |
+| `tempId`    | Cette action **crée** une ressource ; le jeton (`tmp_…`, jamais numérique) l'identifie côté client. |
+| `dependsOn` | Cette action **référence** un `tempId` — son URL (et parfois son payload) le contient.              |
+
+Le protocole complet, du formulaire au rejeu :
+
+1. `InspectionForm.vue` enfile la création avec `tempId: newTempId()` et un
+   `dedupeKey` par `(réservation, kind)` — ré-éditer la saisie met à jour la
+   même action **sans changer son jeton**, donc sans orpheliner les défauts.
+2. `usePendingInspection()` **dérive** l'état des lieux en attente de
+   `pendingActions` (et non d'un `ref` local) : la saisie survit à un
+   rechargement, puisque IndexedDB reste la seule source de vérité.
+3. `InspectionDefectModal.vue` enfile chaque défaut avec `dependsOn: <jeton>` ;
+   l'URL contient le jeton.
+4. La position FIFO garantit que la création part en premier. Au succès, le
+   contrôleur a flashé `createdResourceType` + `createdResourceId` : `drainQueue`
+   réécrit URL et payload de chaque action `dependsOn`, efface le lien, et la
+   suite du rejeu est ordinaire.
+5. Échec partiel : si la création est refusée (4xx ou `rejectedType`), ses
+   dépendants **cascadent** vers `failed` avec le motif
+   `offline.failed.dependencyBlocked`, `dependsOn` conservé. `OfflinePendingQueue`
+   les affiche imbriqués sous leur parente ; « Réessayer » et « Abandonner »
+   agissent sur le groupe entier, et annuler une création en attente emporte ses
+   filles — seules, elles rejoueraient sur un jeton que plus rien ne résout.
+6. Garde-fou : une création qui réussit **sans** rendre d'ID fait aussi cascader
+   ses dépendants, plutôt que de les rejouer sur une URL contenant `tmp_…`.
+
+⚠️ Ces marqueurs voyagent par la prop partagée `flash` — `conflictData`,
+`conflictType`, `rejectedType`, `createdResourceType` et `createdResourceId` sont
+exposés dans `app/middleware/inertia_middleware.ts`. Un flash posé par un
+contrôleur mais absent de cette liste n'atteint jamais `page.props.flash`.
 
 ---
 
@@ -422,8 +474,13 @@ Mock de `virtual:pwa-register/vue` via alias Vitest + mock de `vue-sonner`. Cas 
    }
    ```
 
-3. Aucune modification backend nécessaire **pour les créations** — la sync
-   utilise les routes existantes. ⚠️ Pour un **PUT/PATCH rejoué** sur une
+3. Aucune modification backend nécessaire **pour les créations sans dépendance** —
+   la sync utilise les routes existantes. ⚠️ Si d'autres actions doivent
+   référencer la ressource créée, le contrôleur doit flasher
+   `createdResourceType` + `createdResourceId` (#622, motif
+   `boat_inspections_controller.ts`), et tout refus métier rendu par
+   `flash('error')` + `redirect().back()` doit poser `rejectedType` — sinon la
+   file voit un succès et détruit la saisie. ⚠️ Pour un **PUT/PATCH rejoué** sur une
    ressource que plusieurs personnes éditent, le payload doit porter
    `_expectedUpdatedAt` **et le contrôleur doit le traiter** (rejet avec flash
    `conflictData`/`conflictType`) — motif implémenté dans

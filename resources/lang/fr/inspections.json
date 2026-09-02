@@ -8,6 +8,13 @@
     "checkout": "Aucun état des lieux de départ pour l'instant.",
     "checkin": "Aucun état des lieux de retour pour l'instant."
   },
+  "pending": {
+    "badge": "En attente de synchronisation",
+    "description": "Cet état des lieux est enregistré sur cet appareil. Il sera envoyé au serveur dès le retour du réseau.",
+    "checklistUnavailable": "La checklist sera disponible une fois l'état des lieux synchronisé.",
+    "photosUnavailable": "L'ajout de photos sera disponible une fois l'état des lieux synchronisé.",
+    "defectPending": "Défaut en attente de synchronisation"
+  },
   "fields": {
     "performedAt": "Date du relevé",
     "fuelLevel": "Niveau carburant (%)",

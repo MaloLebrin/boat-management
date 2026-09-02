@@ -17,6 +17,7 @@ export function toBoatInspectionRow(inspection: BoatInspection): BoatInspectionR
     engineHours: inspection.engineHours,
     notes: inspection.notes,
     createdAt: inspection.createdAt.toISO()!,
+    updatedAt: inspection.updatedAt?.toISO() ?? inspection.createdAt.toISO()!,
   }
 }
 

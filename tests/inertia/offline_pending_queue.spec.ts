@@ -35,6 +35,11 @@ vi.mock('@inertiajs/vue3', () => ({
         'common.offline.failed.discard': 'Abandonner',
         'common.offline.failed.discardAriaLabel': "Abandonner l'action en échec : {type}",
         'common.offline.failed.discarded': 'Action en échec abandonnée',
+        'common.offline.failed.dependencyBlocked':
+          "L'état des lieux auquel cette saisie est rattachée n'a pas pu être enregistré.",
+        'common.offline.queue.dependsOn': "Rattaché à l'état des lieux en attente",
+        'common.offline.queue.type.create-inspection': 'Nouvel état des lieux',
+        'common.offline.queue.type.create-inspection-defect': "Défaut d'inspection",
       },
       locale: 'fr',
       flash: {},
@@ -226,6 +231,102 @@ describe('OfflinePendingQueue', () => {
       await flushPromises()
       expect(wrapper.html()).toContain('bg-surface-elevated')
       expect(wrapper.html()).not.toContain('bg-white')
+    })
+  })
+
+  // #622 — une création et les saisies qui la référencent sont affichées comme
+  // un seul bloc : reprendre ou abandonner est une décision unique.
+  describe('groupes de dépendance (#622)', () => {
+    const TEMP_ID = 'tmp_inspection1'
+
+    async function seedInspectionGroup() {
+      const { enqueue } = useOfflineQueue()
+      await enqueue({
+        type: 'create-inspection',
+        url: '/boats/1/reservations/2/inspections',
+        method: 'post',
+        payload: { kind: 'checkout', performedAt: '2026-09-02T10:00' },
+        tempId: TEMP_ID,
+      })
+      await enqueue({
+        type: 'create-inspection-defect',
+        url: `/boats/1/reservations/2/inspections/${TEMP_ID}/equipment-actions`,
+        method: 'post',
+        payload: { label: 'Taquet arraché', actionType: 'to_repair' },
+        dependsOn: TEMP_ID,
+      })
+    }
+
+    test('the queued defect is nested under its inspection, not listed on its own', async () => {
+      await seedInspectionGroup()
+
+      const wrapper = mountComponent()
+      await flushPromises()
+
+      // Une seule entrée racine, la fille imbriquée dedans.
+      const rootItems = wrapper.findAll('[data-test="queue-group"]')
+      expect(rootItems).toHaveLength(1)
+      expect(rootItems[0].text()).toContain('Nouvel état des lieux')
+      expect(rootItems[0].find('[data-test="queue-dependent"]').text()).toContain(
+        "Défaut d'inspection"
+      )
+      expect(wrapper.text()).toContain("Rattaché à l'état des lieux en attente")
+      // La fille n'a pas de bouton propre : le groupe s'annule d'un bloc.
+      expect(rootItems[0].findAll('button')).toHaveLength(1)
+    })
+
+    test('cancelling the pending inspection removes the whole group', async () => {
+      await seedInspectionGroup()
+
+      const wrapper = mountComponent()
+      await flushPromises()
+
+      await wrapper.find('li button').trigger('click')
+
+      await vi.waitFor(() => expect(wrapper.find('ul').exists()).toBe(false), { timeout: 1000 })
+    })
+
+    test('a cascaded failure shows the dependent under its parent with its reason', async () => {
+      const { router } = await import('@inertiajs/vue3')
+      vi.mocked(router.post).mockImplementationOnce((_url, _data, options: any) => {
+        options?.onError?.({ performedAt: 'La date du relevé est invalide' })
+        return undefined as any
+      })
+      await seedInspectionGroup()
+      const { drainQueue, failedCount } = useOfflineQueue()
+      await drainQueue()
+      await vi.waitFor(() => expect(failedCount.value).toBe(2), { timeout: 1000 })
+
+      const wrapper = mountComponent()
+      await flushPromises()
+
+      expect(wrapper.text()).toContain('2 actions en échec')
+      expect(wrapper.text()).toContain('Motif : La date du relevé est invalide')
+      expect(wrapper.text()).toContain("Motif : L'état des lieux auquel cette saisie est rattachée")
+      // Reprise et abandon ne s'offrent que sur la parente.
+      const failedRoots = wrapper.findAll('[data-test="failed-group"]')
+      expect(failedRoots).toHaveLength(1)
+      expect(failedRoots[0].findAll('button')).toHaveLength(2)
+      expect(failedRoots[0].findAll('[data-test="failed-dependent"]')).toHaveLength(1)
+    })
+
+    test('discarding the failed inspection discards its dependent too', async () => {
+      const { router } = await import('@inertiajs/vue3')
+      vi.mocked(router.post).mockImplementationOnce((_url, _data, options: any) => {
+        options?.onError?.({ performedAt: 'La date du relevé est invalide' })
+        return undefined as any
+      })
+      await seedInspectionGroup()
+      const { drainQueue, failedCount } = useOfflineQueue()
+      await drainQueue()
+      await vi.waitFor(() => expect(failedCount.value).toBe(2), { timeout: 1000 })
+
+      const wrapper = mountComponent()
+      await flushPromises()
+      const buttons = wrapper.findAll('li button')
+      await buttons[buttons.length - 1].trigger('click')
+
+      await vi.waitFor(() => expect(failedCount.value).toBe(0), { timeout: 1000 })
     })
   })
 })

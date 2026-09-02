@@ -12,7 +12,12 @@ import type { BoatEquipmentActionRow } from '~/types/boat_show'
 const props = defineProps<{
   boatId: number
   reservationId: number
-  inspectionId: number
+  /**
+   * ID réel, ou jeton temporaire d'un état des lieux encore en file (#622) —
+   * la suppression est alors désactivée par l'appelant (rien à supprimer côté
+   * serveur).
+   */
+  inspectionId: number | string
   actions: BoatEquipmentActionRow[]
   canManage: boolean
   canDelete: boolean

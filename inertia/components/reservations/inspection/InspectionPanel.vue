@@ -1,16 +1,13 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { Form } from '@adonisjs/inertia/vue'
 import { router } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
-import BaseInput from '~/components/base/BaseInput.vue'
-import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import InspectionChecklist from '~/components/reservations/inspection/InspectionChecklist.vue'
+import InspectionForm from '~/components/reservations/inspection/InspectionForm.vue'
 import InspectionPhotos from '~/components/reservations/inspection/InspectionPhotos.vue'
 import InspectionDefects from '~/components/reservations/inspection/InspectionDefects.vue'
+import { usePendingInspection } from '~/composables/use_pending_inspection'
 import { useT } from '~/composables/use_t'
-import { isoToDatetimeLocalValue, tzOffsetMinutes } from '~/utils/local_datetime'
 import type { BoatCategory } from '#shared/types/boat_catalog'
 import type { InspectionKind, InspectionWithPhotos } from '~/types/inspection'
 
@@ -33,12 +30,12 @@ const { t } = useT()
 
 const basePath = `/boats/${props.boatId}/reservations/${props.reservationId}`
 
-const performedAt = ref(
-  props.inspection ? isoToDatetimeLocalValue(props.inspection.performedAt) : ''
-)
-const fuelLevel = ref(props.inspection?.fuelLevel?.toString() ?? '')
-const engineHours = ref(props.inspection?.engineHours ?? '')
-const notes = ref(props.inspection?.notes ?? '')
+/**
+ * État des lieux saisi hors-ligne et pas encore synchronisé (#622) : dérivé de
+ * la file, il porte un jeton temporaire que les défauts référencent. Il n'est
+ * pris en compte que tant que le serveur n'a pas rendu l'inspection réelle.
+ */
+const pendingInspection = usePendingInspection(props.boatId, props.reservationId, props.kind)
 
 function deleteInspection() {
   if (!props.inspection) return
@@ -62,99 +59,78 @@ function deleteInspection() {
       </BaseButton>
     </div>
 
-    <Form
-      v-if="canEdit"
-      :action="{
-        url: inspection ? `${basePath}/inspections/${inspection.id}` : `${basePath}/inspections`,
-        method: inspection ? 'put' : 'post',
-      }"
-      #default="{ processing, errors }"
+    <div
+      v-if="!inspection && pendingInspection"
+      class="rounded-md border border-warning/40 bg-surface-muted px-3 py-2 space-y-1"
+      role="status"
     >
-      <input v-if="!inspection" type="hidden" name="kind" :value="kind" />
-      <input type="hidden" name="tzOffsetMinutes" :value="String(tzOffsetMinutes())" />
+      <p class="text-sm font-medium text-fg">{{ t('inspections.pending.badge') }}</p>
+      <p class="text-xs text-fg-muted">{{ t('inspections.pending.description') }}</p>
+    </div>
 
-      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <BaseInput
-          v-model="performedAt"
-          type="datetime-local"
-          id="performedAt"
-          name="performedAt"
-          :label="t('inspections.fields.performedAt')"
-          :error="errors.performedAt"
-          required
-        />
-        <BaseInput
-          v-model="fuelLevel"
-          type="number"
-          min="0"
-          max="100"
-          id="fuelLevel"
-          name="fuelLevel"
-          :label="t('inspections.fields.fuelLevel')"
-          :error="errors.fuelLevel"
-        />
-        <BaseInput
-          v-model="engineHours"
-          type="number"
-          min="0"
-          step="0.1"
-          id="engineHours"
-          name="engineHours"
-          :label="t('inspections.fields.engineHours')"
-          :error="errors.engineHours"
-        />
-        <BaseTextarea
-          v-model="notes"
-          name="notes"
-          :label="t('inspections.fields.notes')"
-          :errors="errors"
-          :rows="2"
-          class="sm:col-span-2"
-        />
-      </div>
-
-      <div class="mt-4 flex justify-end">
-        <BaseButton type="submit" variant="primary" size="sm" :disabled="processing">
-          {{ t('inspections.form.submit') }}
-        </BaseButton>
-      </div>
-    </Form>
+    <InspectionForm
+      v-if="canEdit"
+      :boat-id="boatId"
+      :reservation-id="reservationId"
+      :kind="kind"
+      :inspection="inspection"
+      :pending="pendingInspection"
+    />
 
     <p v-else-if="!inspection" class="text-sm text-fg-muted">
       {{ t(`inspections.empty.${kind}`) }}
     </p>
 
-    <InspectionChecklist
-      v-if="inspection"
-      :boat-id="boatId"
-      :reservation-id="reservationId"
-      :inspection-id="inspection.id"
-      :category="category"
-      :items="inspection.items"
-      :counterpart-items="counterpart ? counterpart.items : null"
-      :can-edit="canEdit"
-      :can-manage-actions="canManageActions"
-    />
+    <template v-if="inspection">
+      <InspectionChecklist
+        :boat-id="boatId"
+        :reservation-id="reservationId"
+        :inspection-id="inspection.id"
+        :category="category"
+        :items="inspection.items"
+        :counterpart-items="counterpart ? counterpart.items : null"
+        :can-edit="canEdit"
+        :can-manage-actions="canManageActions"
+      />
 
-    <InspectionPhotos
-      v-if="inspection"
-      :upload-url="`${basePath}/inspections/${inspection.id}/photos`"
-      :delete-url-for="
-        (mediaId: number) => `${basePath}/inspections/${inspection!.id}/photos/${mediaId}`
-      "
-      :photos="inspection.photos"
-      :can-upload="canEdit"
-      :can-delete="canDelete"
-    />
+      <InspectionPhotos
+        :upload-url="`${basePath}/inspections/${inspection.id}/photos`"
+        :delete-url-for="
+          (mediaId: number) => `${basePath}/inspections/${inspection!.id}/photos/${mediaId}`
+        "
+        :photos="inspection.photos"
+        :can-upload="canEdit"
+        :can-delete="canDelete"
+      />
 
-    <InspectionDefects
-      v-if="inspection"
-      :boat-id="boatId"
-      :reservation-id="reservationId"
-      :inspection-id="inspection.id"
-      :actions="inspection.actions"
-      :can-manage="canManageActions"
-      :can-delete="canDeleteActions"
-    />
+      <InspectionDefects
+        :boat-id="boatId"
+        :reservation-id="reservationId"
+        :inspection-id="inspection.id"
+        :actions="inspection.actions"
+        :can-manage="canManageActions"
+        :can-delete="canDeleteActions"
+      />
+    </template>
+
+    <!-- Inspection encore en file : seuls les défauts sont saisissables (#622).
+         La checklist et les photos exigent un ID réel côté serveur. -->
+    <template v-else-if="pendingInspection">
+      <p class="border-t border-border pt-4 text-sm text-fg-muted" role="alert">
+        {{ t('inspections.pending.checklistUnavailable') }}
+      </p>
+      <p class="text-sm text-fg-muted" role="alert">
+        {{ t('inspections.pending.photosUnavailable') }}
+      </p>
+
+      <InspectionDefects
+        :boat-id="boatId"
+        :reservation-id="reservationId"
+        :inspection-id="pendingInspection.id"
+        :actions="pendingInspection.actions"
+        :can-manage="canManageActions"
+        :can-delete="false"
+      />
+    </template>
   </BaseCard>
 </template>
