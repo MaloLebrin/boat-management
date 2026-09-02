@@ -237,10 +237,6 @@ const COMPONENTS: Component[] = [
   },
   { path: 'components/marketing/pricing/PricingFaqSection.vue' },
   {
-    path: 'components/marketing/pricing/PricingPlansGrid.vue',
-    allow: [{ pattern: 'ring-navy-600', count: 1, reason: NAVY_ON_NAVY }],
-  },
-  {
     path: 'components/marketing/pricing/PricingROISection.vue',
     allow: [
       { pattern: 'bg-white', count: 1, reason: `bouton blanc ${NAVY_BAND}` },

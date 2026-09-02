@@ -1,8 +1,15 @@
 import { mount } from '@vue/test-utils'
 import { describe, expect, test, vi } from 'vitest'
 
+// `t` rend la clé suivie de ses paramètres : les assertions historiques
+// portent sur la clé (`toContain`), et les montants formatés restent
+// observables pour vérifier qu'ils passent bien par `formatPrice` (#612).
 vi.mock('~/composables/use_t', () => ({
-  useT: () => ({ t: (k: string) => k, locale: { value: 'fr' } }),
+  useT: () => ({
+    t: (k: string, vars?: Record<string, string>) =>
+      vars ? `${k} ${Object.values(vars).join(' ')}` : k,
+    locale: { value: 'fr' },
+  }),
 }))
 
 const { post } = vi.hoisted(() => ({ post: vi.fn() }))
@@ -13,6 +20,8 @@ vi.mock('@inertiajs/vue3', async () => {
 
 import SettingsBillingExtraBoats from '../../inertia/components/settings/SettingsBillingExtraBoats.vue'
 import type { SubscriptionInfo } from '../../shared/types/billing'
+import { ADDON_PRICES } from '../../shared/types/plan'
+import { formatPrice } from '../../shared/helpers/number_format'
 
 const subscription: SubscriptionInfo = {
   id: 1,
@@ -139,5 +148,25 @@ describe('dark mode (#416)', () => {
     const html = mountExtraBoats({ plan: 'pro', subscription: null, activeAddons: [] }).html()
     expect(html).toContain('bg-surface-muted')
     expect(html).not.toContain('surface-2')
+  })
+})
+
+describe('formatage du prix (#612)', () => {
+  test('le prix unitaire passe par formatPrice, sans « € » collé dans la clé', () => {
+    const w = mountExtraBoats({
+      activeAddons: [{ addon: 'extra_boats', quantity: 2, source: 'subscription' }],
+    })
+
+    expect(w.text()).toContain(formatPrice(ADDON_PRICES.extra_boats.monthly, 'fr'))
+    expect(w.text()).toContain(formatPrice(2 * ADDON_PRICES.extra_boats.monthly, 'fr'))
+  })
+
+  test("un abonnement annuel affiche le tarif annuel-équivalent de l'add-on", () => {
+    const w = mountExtraBoats({
+      subscription: { ...subscription, billingInterval: 'year' },
+      activeAddons: [{ addon: 'extra_boats', quantity: 1, source: 'subscription' }],
+    })
+
+    expect(w.text()).toContain(formatPrice(ADDON_PRICES.extra_boats.annualMonthly, 'fr'))
   })
 })

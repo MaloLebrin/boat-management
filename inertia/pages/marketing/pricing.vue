@@ -26,9 +26,9 @@ interface ReassuranceItem {
 interface Tier {
   name: string
   tag: string
-  price: string | number
+  price: number
   pricePer?: string
-  priceAnnual?: string | number
+  priceAnnual?: number
   priceAnnualPer?: string
   sub: string
   featured?: boolean
@@ -135,6 +135,8 @@ interface PageProps {
       }
       tierFeaturedBadge: string
       billedAnnuallyNote: string
+      /** Libellé d'un socle à 0 € — « Gratuit » plutôt qu'un « 0 € » formaté. */
+      tierFreeLabel: string
       tiers: Tier[]
       reassurance: ReassuranceItem[]
       roi: {
@@ -235,6 +237,7 @@ const canonicalHref = computed(() => marketingPath('pricing', locale.value))
     :reassurance="t.pricing.reassurance"
     :featured-badge-label="t.pricing.tierFeaturedBadge"
     :billed-annually-note="t.pricing.billedAnnuallyNote"
+    :free-label="t.pricing.tierFreeLabel"
   />
   <PricingConfigurator v-bind="t.pricing.configurator" :billing="billing" />
   <PricingROISection v-bind="t.pricing.roi" />

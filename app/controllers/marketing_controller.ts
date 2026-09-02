@@ -7,6 +7,7 @@ import legalEntity from '#config/legal'
 import { CONTACT_FLEET_SIZES, CONTACT_SUBJECTS } from '../../shared/types/contact.js'
 import { PUBLIC_DIAGNOSIS_LIFETIME_LIMIT } from '../../shared/types/public_diagnosis.js'
 import { marketingPath } from '#shared/helpers/locale_path'
+import { formatPrice } from '#shared/helpers/number_format'
 import QuotaService from '#services/quota_service'
 import SimulatorLeadService from '#services/simulator_lead_service'
 
@@ -14,6 +15,12 @@ import SimulatorLeadService from '#services/simulator_lead_service'
 const CONTACT_FORM_ANCHOR = 'contact-form'
 /** Route POST unique du formulaire de contact, quelle que soit la locale de l'URL. */
 const CONTACT_FORM_ACTION = '/contact'
+/**
+ * Taille de flotte citée en exemple par la FAQ tarifaire de la home. Le montant
+ * associé n'est pas recopié : il se calcule (socle Pro + un add-on `extra_boats`
+ * par bateau au-delà du quota), pour que la réponse suive le barème (#505, #612).
+ */
+const FAQ_EXAMPLE_FLEET_SIZE = 15
 const SUPPORT_EMAIL = 'support@fleetai.app'
 const PRESS_EMAIL = 'press@fleetai.app'
 
@@ -81,6 +88,34 @@ export default class MarketingController {
     }
     const benchmarks = await this.simulatorLeadService.getBenchmarks()
     return inertia.render('marketing/simulator', { isAuthenticated, canAddBoat, benchmarks })
+  }
+
+  /**
+   * Montants et quotas injectés dans la copie marketing (#612). Une chaîne de
+   * traduction pose un patron ICU, jamais un nombre recopié : c'est la recopie
+   * qui avait laissé vivre « 15 bateaux à 20 €/mois » (#505) et un comparatif
+   * figé à côté du vrai barème (#454). Les prix passent par `formatPrice` avec
+   * la locale de la requête, jamais celle du serveur.
+   */
+  private pricingCopyParams(locale: string): Record<string, string> {
+    const price = (value: number) => formatPrice(value, locale)
+    const proBoats = PLAN_LIMITS.pro.maxBoats ?? 0
+    const extraBoats = Math.max(FAQ_EXAMPLE_FLEET_SIZE - proBoats, 0)
+
+    return {
+      starterBoats: String(PLAN_LIMITS.starter.maxBoats ?? 0),
+      starterMembers: String(PLAN_LIMITS.starter.maxMembers ?? 0),
+      proBoats: String(proBoats),
+      proMembers: String(PLAN_LIMITS.pro.maxMembers ?? 0),
+      proStorage: String(PLAN_LIMITS.pro.storageGb ?? 0),
+      proMonthly: price(PLAN_PRICES.pro.monthly),
+      proAnnual: price(PLAN_PRICES.pro.annualMonthly),
+      enterpriseMonthly: price(PLAN_PRICES.enterprise.monthly),
+      enterpriseAnnual: price(PLAN_PRICES.enterprise.annualMonthly),
+      extraBoatPrice: price(ADDON_PRICES.extra_boats.monthly),
+      fleetBoats: String(FAQ_EXAMPLE_FLEET_SIZE),
+      fleetTotal: price(PLAN_PRICES.pro.monthly + extraBoats * ADDON_PRICES.extra_boats.monthly),
+    }
   }
 
   private buildHomePageData(i18n: {
@@ -496,7 +531,10 @@ export default class MarketingController {
             { q: i18n.t('marketing.home.faq.item1_q'), a: i18n.t('marketing.home.faq.item1_a') },
             { q: i18n.t('marketing.home.faq.item2_q'), a: i18n.t('marketing.home.faq.item2_a') },
             { q: i18n.t('marketing.home.faq.item3_q'), a: i18n.t('marketing.home.faq.item3_a') },
-            { q: i18n.t('marketing.home.faq.item4_q'), a: i18n.t('marketing.home.faq.item4_a') },
+            {
+              q: i18n.t('marketing.home.faq.item4_q', this.pricingCopyParams(locale)),
+              a: i18n.t('marketing.home.faq.item4_a', this.pricingCopyParams(locale)),
+            },
             { q: i18n.t('marketing.home.faq.item5_q'), a: i18n.t('marketing.home.faq.item5_a') },
             { q: i18n.t('marketing.home.faq.item6_q'), a: i18n.t('marketing.home.faq.item6_a') },
             { q: i18n.t('marketing.home.faq.item7_q'), a: i18n.t('marketing.home.faq.item7_a') },
@@ -634,9 +672,13 @@ export default class MarketingController {
 
   private buildPricingPageData(i18n: {
     t: (key: string, params?: Record<string, string>) => string
+    locale: string
   }) {
+    const priceParams = this.pricingCopyParams(i18n.locale)
+    // Les montants et quotas du barème sont disponibles dans **toute** chaîne de
+    // la page ; une clé qui n'en cite aucun les ignore simplement.
     const t = (key: string, params?: Record<string, string>) =>
-      i18n.t(`marketing.pricing2.${key}`, params)
+      i18n.t(`marketing.pricing2.${key}`, { ...priceParams, ...params })
 
     /**
      * Cellule de quota du comparatif : la valeur vient de `PLAN_LIMITS`, jamais
@@ -678,6 +720,7 @@ export default class MarketingController {
         },
         tierFeaturedBadge: t('tier_featured_badge'),
         billedAnnuallyNote: t('config_billed_annually'),
+        tierFreeLabel: t('table_plan_starter_price'),
         tiers: [
           {
             name: t('tier_starter_name'),

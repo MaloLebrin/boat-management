@@ -14,7 +14,7 @@ Source de vérité : `shared/types/plan.ts` — `PLAN_LIMITS`.
 | Export           | ✗       | ✓         | ✓          |
 | Ports (marina)   | ✗       | ✓         | ✓          |
 
-`null` = illimité. Le plan est assigné manuellement en BDD sur la table `organizations` (colonne `plan` enum `starter|pro|enterprise`, défaut `starter`). Pas de Stripe.
+`null` = illimité. Le plan vit sur la table `organizations` (colonne `plan` enum `starter|pro|enterprise`, défaut `starter`). Il n'est **pas** saisi à la main : il est écrit par la synchronisation Stripe (`SubscriptionService.syncFromCheckoutSession` / `syncFromSubscriptionEvent`, déclenchées par `POST /webhooks/stripe`), et retombe sur `starter` à l'annulation. Voir [`docs/billing-and-quotas.md`](billing-and-quotas.md).
 
 ### Add-ons quantitatifs (épic #333)
 
@@ -27,14 +27,20 @@ En plus du plan, une organisation **Pro** peut souscrire des **add-ons quantitat
 
 ## Tarifs
 
+Source de vérité : `PLAN_PRICES`, `MODULE_PRICES` et `ADDON_PRICES` (`shared/types/plan.ts`) — jamais un montant recopié dans une chaîne de traduction ou dans un composant.
+
 | Plan       | Mensuel     | Annuel (−20 %)         |
 | ---------- | ----------- | ---------------------- |
 | Starter    | Gratuit     | Gratuit                |
 | Pro        | 20 € / mois | 16 € / mois (192 €/an) |
-| Enterprise | Sur devis   | Sur devis              |
+| Enterprise | 99 € / mois | 79 € / mois (950 €/an) |
+
+`annualTotal` est le montant **réellement facturé** par Stripe pour douze mois ; `annualMonthly` en est le mensuel-équivalent affiché, arrondi à l'euro. Entreprise est le seul palier où l'arrondi se voit (950 / 12 = 79,17 € affichés « 79 € »).
+
+**`node ace pricing:check`** confronte ces trois barèmes au catalogue Stripe (montant, devise, intervalle, prix archivé) et sort en code 1 au premier écart. C'est le seul point où le prix affiché et le prix facturé se regardent : à lancer avant tout changement de tarif. Les prix restent en dur côté code — la page tarifs est publique et rendue en SSR sans clé Stripe (toutes les variables `STRIPE_*` sont optionnelles), et les composants Vue importent le barème de façon synchrone.
 
 - Facturation par organisation, pas par utilisateur ni par bateau.
-- Réduction annuelle de 20 % appliquée automatiquement (badge `billing_annual_badge: "−20 %"`).
+- Réduction annuelle d'au moins 20 % appliquée automatiquement (badge `billing_annual_badge: "−20 %"`). L'écart joue toujours en faveur du client : Entreprise remise de 20,2 %, `extra_boats` de 25 %. L'invariant est figé par `tests/unit/plan_prices.spec.ts`.
 - Aucun frais caché.
 - Le plan Starter est un plan solo (1 membre = l'owner uniquement). Les plans Pro et Enterprise permettent d'inviter plusieurs membres.
 - La **cartographie de port** (ports, pontons, mouillages, places) est fermée au plan Starter (#604) : un ou deux bateaux personnels n'ont pas de marina à modéliser. Aucun module ni add-on ne l'accorde — c'est une capacité de tier pure (`PLAN_LIMITS[...].canManagePorts`, jamais les quotas effectifs). Le groupe de routes `/ports/*` est gardé par `RequirePortsPlanMiddleware` (redirection vers `/settings/billing` + flash `flash.quota.portsExceeded`), et `PortService.listForUser` / `listWithSpotsForOrg` / `listNamesForOrg` renvoient vide, ce qui escamote le sélecteur de place du formulaire bateau, les ports du carnet de bord et du budget, et la carte ports du dashboard.

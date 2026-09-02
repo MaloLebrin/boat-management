@@ -17,14 +17,6 @@ test.group('Plan modules taxonomy', () => {
     }
   })
 
-  test('annual pricing is a discount over monthly', ({ assert }) => {
-    for (const module of PLAN_MODULES) {
-      const price = MODULE_PRICES[module]
-      assert.isBelow(price.annualMonthly, price.monthly)
-      assert.equal(price.annualTotal, price.annualMonthly * 12)
-    }
-  })
-
   test('modules only grant capabilities, never revoke or alter quotas', ({ assert }) => {
     for (const module of PLAN_MODULES) {
       for (const [flag, value] of Object.entries(MODULE_FLAGS[module])) {

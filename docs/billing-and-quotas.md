@@ -37,6 +37,21 @@ En plus du tier, une organisation **Pro** peut souscrire des **modules add-ons**
 - **Résiliation** : le retrait d'un item Stripe émet `OrganizationModuleDeactivated` (notification + email) ; les données du module restent en **lecture seule** (factures/devis consultables + PDF/export, clients consultables). Écriture rétablie à la réactivation.
 - **Idempotence** : `addSubscriptionItem` passe une clé d'idempotence Stripe (`add-module:{subscriptionId}:{priceId}`) — deux ajouts concurrents ne créent qu'un item. Le garde applicatif `hasModule` couvre en amont le double-clic.
 
+### 1.2 Add-on quantitatif `extra_boats` (épic #333)
+
+| Add-on        | Prix (mensuel / annuel-équivalent / total annuel) | Effet                   |
+| ------------- | ------------------------------------------------- | ----------------------- |
+| `extra_boats` | 4 € / 3 € / 36 €                                  | `maxBoats` +1 par unité |
+
+Vendable sur Pro uniquement (Enterprise a `maxBoats: null`), quantité 0–100, ligne `module = 'extra_boats'` de `organization_modules` avec sa colonne `quantity`.
+
+### 1.3 Barème et catalogue Stripe (#612)
+
+`PLAN_PRICES` / `MODULE_PRICES` / `ADDON_PRICES` sont les montants **affichés** ; Stripe détient les montants **facturés**. Deux garde-fous :
+
+- `tests/unit/plan_prices.spec.ts` fige les invariants internes — `annualMonthly === Math.round(annualTotal / 12)` (Entreprise est le seul palier où l'arrondi se voit : 950 / 12 = 79,17 affichés « 79 »), remise annuelle ≥ 20 %, progression des paliers.
+- `node ace pricing:check` (`PricingCatalogService`) lit les 10 prix configurés chez Stripe et compare montant, devise et intervalle, en sortant en code 1 au premier écart. Un prix annuel Stripe porte le **total annuel**, pas le mensuel-équivalent. Les identifiants non renseignés sont listés à part, pour qu'un environnement sans Stripe reste utilisable.
+
 ### Rollout grandfathering (une fois au déploiement)
 
 Après migration, exécuter la commande Ace pour qu'aucune organisation Enterprise existante ne perde de fonctionnalité :
@@ -321,20 +336,21 @@ Utilisateur                App                    Stripe
 
 ## 10. Fichiers de référence
 
-| Fichier                                                                             | Rôle                                                        |
-| ----------------------------------------------------------------------------------- | ----------------------------------------------------------- |
-| [`shared/types/plan.ts`](../shared/types/plan.ts)                                   | `PLAN_LIMITS`, `PlanTier`, `QuotaUsage`                     |
-| [`shared/types/billing.ts`](../shared/types/billing.ts)                             | `SubscriptionInfo`, `SubscriptionStatus`, `CheckoutPayload` |
-| [`app/services/quota_service.ts`](../app/services/quota_service.ts)                 | Assertions de quotas                                        |
-| [`app/services/stripe_service.ts`](../app/services/stripe_service.ts)               | Client Stripe, sessions                                     |
-| [`app/services/subscription_service.ts`](../app/services/subscription_service.ts)   | Sync webhooks, `getActive`, `toInfo`                        |
-| [`app/controllers/billing_controller.ts`](../app/controllers/billing_controller.ts) | Checkout, portal, webhook                                   |
-| [`app/exceptions/quota_errors.ts`](../app/exceptions/quota_errors.ts)               | `QuotaExceededError`                                        |
-| [`app/exceptions/billing_errors.ts`](../app/exceptions/billing_errors.ts)           | `StripeNotConfiguredError`, `StripeCustomerError`           |
-| [`app/models/subscription.ts`](../app/models/subscription.ts)                       | Modèle Lucid                                                |
-| [`app/models/organization.ts`](../app/models/organization.ts)                       | `plan`, `stripeCustomerId`, relation subscription           |
-| [`start/routes/webhooks.ts`](../start/routes/webhooks.ts)                           | Route publique webhook                                      |
-| [`start/routes/settings.ts`](../start/routes/settings.ts)                           | Routes billing (checkout, portal)                           |
+| Fichier                                                                                 | Rôle                                                          |
+| --------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| [`shared/types/plan.ts`](../shared/types/plan.ts)                                       | `PLAN_LIMITS`, `PlanTier`, `QuotaUsage`                       |
+| [`shared/types/billing.ts`](../shared/types/billing.ts)                                 | `SubscriptionInfo`, `SubscriptionStatus`, `CheckoutPayload`   |
+| [`app/services/quota_service.ts`](../app/services/quota_service.ts)                     | Assertions de quotas                                          |
+| [`app/services/pricing_catalog_service.ts`](../app/services/pricing_catalog_service.ts) | Confrontation du barème au catalogue Stripe (`pricing:check`) |
+| [`app/services/stripe_service.ts`](../app/services/stripe_service.ts)                   | Client Stripe, sessions                                       |
+| [`app/services/subscription_service.ts`](../app/services/subscription_service.ts)       | Sync webhooks, `getActive`, `toInfo`                          |
+| [`app/controllers/billing_controller.ts`](../app/controllers/billing_controller.ts)     | Checkout, portal, webhook                                     |
+| [`app/exceptions/quota_errors.ts`](../app/exceptions/quota_errors.ts)                   | `QuotaExceededError`                                          |
+| [`app/exceptions/billing_errors.ts`](../app/exceptions/billing_errors.ts)               | `StripeNotConfiguredError`, `StripeCustomerError`             |
+| [`app/models/subscription.ts`](../app/models/subscription.ts)                           | Modèle Lucid                                                  |
+| [`app/models/organization.ts`](../app/models/organization.ts)                           | `plan`, `stripeCustomerId`, relation subscription             |
+| [`start/routes/webhooks.ts`](../start/routes/webhooks.ts)                               | Route publique webhook                                        |
+| [`start/routes/settings.ts`](../start/routes/settings.ts)                               | Routes billing (checkout, portal)                             |
 
 Les cartes de test Stripe standard :
 

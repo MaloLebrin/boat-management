@@ -3,6 +3,7 @@ import BaseCard from '~/components/base/BaseCard.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import { useT } from '~/composables/use_t'
+import { useNumberFormat } from '~/composables/use_number_format'
 import { computed } from 'vue'
 import { router } from '@inertiajs/vue3'
 import { MODULE_PRICES, PLAN_MODULES } from '../../../shared/types/plan'
@@ -10,6 +11,7 @@ import type { ActiveModuleInfo, PlanModule, PlanTier } from '../../../shared/typ
 import type { SubscriptionInfo } from '../../../shared/types/billing'
 
 const { t } = useT()
+const { formatPrice } = useNumberFormat()
 
 const props = defineProps<{
   plan: PlanTier
@@ -38,7 +40,7 @@ function priceLabel(module: PlanModule): string {
   const interval = props.subscription?.billingInterval ?? 'month'
   const price = MODULE_PRICES[module]
   const amount = interval === 'year' ? price.annualMonthly : price.monthly
-  return t('settings.billing.modules.pricePerMonth', { amount: String(amount) })
+  return t('settings.billing.modules.pricePerMonth', { amount: formatPrice(amount) })
 }
 
 function addModule(module: PlanModule) {
