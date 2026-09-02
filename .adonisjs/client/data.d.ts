@@ -29,6 +29,7 @@ import type PublicDiagnosisTransformer from '#transformers/public_diagnosis_tran
 import type PushSubscriptionTransformer from '#transformers/push_subscription_transformer'
 import type RentalContractTransformer from '#transformers/rental_contract_transformer'
 import type SimulatorTransformer from '#transformers/simulator_transformer'
+import type SparePartChatTransformer from '#transformers/spare_part_chat_transformer'
 import type SparePartsTransformer from '#transformers/spare_parts_transformer'
 import type SpotTransformer from '#transformers/spot_transformer'
 import type SubscriptionTransformer from '#transformers/subscription_transformer'
@@ -127,6 +128,10 @@ export namespace Data {
   export type Simulator = InferData<SimulatorTransformer>
   export namespace Simulator {
     export type Variants = InferVariants<SimulatorTransformer>
+  }
+  export type SparePartChat = InferData<SparePartChatTransformer>
+  export namespace SparePartChat {
+    export type Variants = InferVariants<SparePartChatTransformer>
   }
   export type SpareParts = InferData<SparePartsTransformer>
   export namespace SpareParts {

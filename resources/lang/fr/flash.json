@@ -351,6 +351,9 @@
     "notEligible": "Ce moteur n'a pas de nomenclature de pièces.",
     "assemblyNotFound": "Ensemble de pièces introuvable pour cette motorisation.",
     "partNotFound": "Pièce inconnue du catalogue.",
-    "cartItemNotFound": "Ligne de la liste de réparation introuvable."
+    "cartItemNotFound": "Ligne de la liste de réparation introuvable.",
+    "chatNotFound": "Conversation introuvable.",
+    "chatCompleted": "Cette recherche est terminée. Démarrez une nouvelle recherche pour une autre pièce.",
+    "chatMaxMessages": "Cette conversation a atteint sa taille maximale. Démarrez une nouvelle recherche."
   }
 }

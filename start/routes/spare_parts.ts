@@ -1,8 +1,10 @@
+import { aiThrottle } from '#start/limiter'
 import { middleware } from '#start/kernel'
 import router from '@adonisjs/core/services/router'
 
 const BoatEngineSparePartsController = () =>
   import('#controllers/boat_engine_spare_parts_controller')
+const SparePartChatController = () => import('#controllers/spare_part_chat_controller')
 
 router
   .group(() => {
@@ -21,6 +23,27 @@ router
       ])
       .where('assemblySlug', /^[a-z-]+$/)
       .as('spareParts.assembly')
+
+    // Chat IA de recherche de références par numéro de série (#634). Les
+    // mutations déclenchent un appel Mistral synchrone → même throttle que les
+    // routes IA authentifiées.
+    router
+      .get('boats/:boatId/engines/:engineId/spare-parts/chat', [SparePartChatController, 'show'])
+      .as('spareParts.chat.show')
+    router
+      .post('boats/:boatId/engines/:engineId/spare-parts/chat/conversations', [
+        SparePartChatController,
+        'start',
+      ])
+      .as('spareParts.chat.start')
+      .use(aiThrottle)
+    router
+      .post('boats/:boatId/engines/:engineId/spare-parts/chat/conversations/:token/messages', [
+        SparePartChatController,
+        'message',
+      ])
+      .as('spareParts.chat.message')
+      .use(aiThrottle)
 
     router
       .post('boats/:boatId/engines/:engineId/spare-parts/cart', [

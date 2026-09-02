@@ -4,6 +4,7 @@ import { Link } from '@adonisjs/inertia/vue'
 import { CogIcon } from '@heroicons/vue/24/outline'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
+import SparePartsAiEntryCard from '~/components/spare_parts/chat/SparePartsAiEntryCard.vue'
 import type { SparePartsEngineRow } from '#shared/types/spare_parts'
 import { useT } from '~/composables/use_t'
 import { engineDisplayTitle } from '~/utils/boat_enum_labels'
@@ -42,6 +43,10 @@ const stepKeys = [
           </li>
         </ol>
       </BaseCard>
+    </div>
+
+    <div v-if="engines.length > 0" class="mt-6">
+      <SparePartsAiEntryCard :engines="engines" />
     </div>
 
     <h2 class="mt-8 text-lg font-semibold text-fg">{{ t('parts.index.enginesTitle') }}</h2>
