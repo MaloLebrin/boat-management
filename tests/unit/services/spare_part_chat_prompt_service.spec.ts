@@ -87,6 +87,40 @@ test.group('spare_part_chat_prompt_service — prompts (#634)', () => {
       assert.include(buildPartSearchFinalTurnInstruction(locale, 'part'), '"part"')
     }
   })
+
+  test('the FR tone defaults to vouvoiement, informal switches to tutoiement', ({ assert }) => {
+    // L'app connectée vouvoie (défaut) ; le chat public marketing tutoie
+    // (#634 Phase 2) — même contrat JSON dans les deux cas.
+    const formalEngine = buildEngineIdentificationSystemPrompt('fr', ENGINE_INPUT)
+    assert.include(formalEngine, 'en vouvoyant')
+    assert.notInclude(formalEngine, 'en tutoyant')
+
+    const informalEngine = buildEngineIdentificationSystemPrompt('fr', ENGINE_INPUT, 'informal')
+    assert.include(informalEngine, 'en tutoyant')
+    assert.notInclude(informalEngine, 'en vouvoyant')
+    assert.include(informalEngine, '"type":"engine"')
+
+    const informalPart = buildPartSearchSystemPrompt('fr', PART_INPUT, 'informal')
+    assert.include(informalPart, 'en tutoyant')
+    assert.include(informalPart, '"type":"part"')
+  })
+
+  test('the EN prompts are identical whatever the tone, with no leftover placeholder', ({
+    assert,
+  }) => {
+    for (const tone of ['formal', 'informal'] as const) {
+      const engine = buildEngineIdentificationSystemPrompt('en', ENGINE_INPUT, tone)
+      const part = buildPartSearchSystemPrompt('en', PART_INPUT, tone)
+      assert.include(engine, 'Write "message" in English')
+      assert.include(part, 'Write "message" in English')
+      assert.notInclude(engine, '{toneLine}')
+      assert.notInclude(part, '{toneLine}')
+    }
+    assert.equal(
+      buildEngineIdentificationSystemPrompt('en', ENGINE_INPUT, 'formal'),
+      buildEngineIdentificationSystemPrompt('en', ENGINE_INPUT, 'informal')
+    )
+  })
 })
 
 test.group('spare_part_chat_prompt_service — parse (#634)', () => {

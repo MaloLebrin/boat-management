@@ -20,7 +20,7 @@ import { useT } from '~/composables/use_t'
 
 const { t } = useT()
 
-defineProps<{ fromSimulator?: boolean; fromDiagnostic?: boolean }>()
+defineProps<{ fromSimulator?: boolean; fromDiagnostic?: boolean; fromPartsAi?: boolean }>()
 
 /**
  * Every field of this form is rendered by one of the sections below and shows
@@ -106,6 +106,13 @@ const STARTER_FEATURES = [
             class="mb-5 rounded-xl border border-coral-200 bg-coral-50 px-4 py-3 text-sm text-fg"
           >
             {{ t('auth.signup.fromDiagnosticNotice') }}
+          </div>
+
+          <div
+            v-if="fromPartsAi"
+            class="mb-5 rounded-xl border border-coral-200 bg-coral-50 px-4 py-3 text-sm text-fg"
+          >
+            {{ t('auth.signup.fromPartsAiNotice') }}
           </div>
 
           <Form route="new_account.store" class="mt-6" #default="{ processing, errors }">

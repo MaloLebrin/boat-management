@@ -29,6 +29,16 @@ export const publicDiagnosisThrottle = limiter.define('public_diagnosis', (ctx) 
     .usingKey(`public_diag_${ctx.auth.user?.id ?? ctx.request.ip()}`)
 })
 
+// Chat IA public de recherche de références de pièces (#634, Phase 2) : même
+// contrainte que le diagnostic public, avec son propre compteur — les deux
+// features ne doivent pas se voler leur budget de requêtes.
+export const publicPartSearchThrottle = limiter.define('public_part_search', (ctx) => {
+  return limiter
+    .allowRequests(6)
+    .every('1 minute')
+    .usingKey(`public_parts_${ctx.auth.user?.id ?? ctx.request.ip()}`)
+})
+
 // Abonnements Web Push (#497) : le navigateur ne (ré)abonne qu'à l'activation
 // ou au chargement — au-delà, c'est un script.
 export const pushThrottle = limiter.define('push', (ctx) => {

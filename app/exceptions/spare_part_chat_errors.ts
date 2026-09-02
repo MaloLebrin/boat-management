@@ -17,3 +17,10 @@ export class PartSearchMaxMessagesReachedError extends Error {
   status = 422
   code = 'E_PART_SEARCH_MAX_MESSAGES'
 }
+
+/** Conversations gratuites du chat public épuisées (anonyme ou plan sans IA). */
+export class PartSearchQuotaExhaustedError extends Error {
+  name = 'PartSearchQuotaExhaustedError'
+  status = 429
+  code = 'E_PART_SEARCH_QUOTA_EXHAUSTED'
+}

@@ -84,3 +84,25 @@ test('le drawer mobile renvoie vers le diagnostic de panne IA', () => {
   expect(w.html()).toContain('public.nav.diagnosisAi')
   expect(w.findAll('a[href="/fr/diagnostic-panne-ia"]').length).toBe(1)
 })
+
+// #634 Phase 2 — la recherche de références de pièces est le second tunnel
+// d'acquisition IA : atteignable depuis la nav principale, le drawer mobile et
+// le footer, dans la locale courante.
+test('la nav publique renvoie vers la recherche de pièces IA (header, drawer, footer)', () => {
+  const header = mount(AppHeader, { global: { stubs } })
+  expect(header.html()).toContain('public.nav.partsAi')
+  expect(header.findAll('a[href="/fr/reference-piece-moteur-ia"]').length).toBe(1)
+
+  const drawer = mount(AppHeaderMobileDrawer, {
+    props: { isOpen: true, locale: 'fr', guideHref: '/fr/cout-entretien-bateau', isAuthed: false },
+    global: { stubs },
+  })
+  expect(drawer.html()).toContain('public.nav.partsAi')
+  expect(drawer.findAll('a[href="/fr/reference-piece-moteur-ia"]').length).toBe(1)
+
+  const footer = mount(PublicLayout, {
+    global: { stubs: { ...stubs, AppHeader: { template: '<div />' } } },
+  })
+  expect(footer.html()).toContain('public.footer.partsAi')
+  expect(footer.findAll('a[href="/fr/reference-piece-moteur-ia"]').length).toBe(1)
+})

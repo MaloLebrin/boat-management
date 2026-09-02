@@ -5,9 +5,11 @@ import type { SparePartReferenceRow } from '#shared/types/spare_parts'
 /**
  * Chat IA de recherche de références de pièces par numéro de série (#634).
  *
- * Réservé aux plans avec IA (`canUseAI`) : contrairement au diagnostic public
- * (#602), il n'y a ni conversations gratuites ni comptage de session — le
- * cycle de quota de tokens mensuel existant s'applique tel quel.
+ * Deux entrées partagent ces types : le chat de l'app connectée (réservé aux
+ * plans avec IA, quota de tokens mensuel, aucun comptage de session) et le
+ * chat public marketing (Phase 2), qui reprend les limites à vie du diagnostic
+ * public (#602) — comptage en session pour les anonymes, en base pour les
+ * plans sans IA.
  *
  * Le LLM sert à comprendre l'utilisateur et à interpréter le numéro de série,
  * **jamais à produire une référence** : toute référence affichée provient de
@@ -22,6 +24,23 @@ export const PART_SEARCH_MAX_USER_MESSAGES = 10
 
 /** Longueur max d'un message — alignée sur le chat public (#602). */
 export const PART_SEARCH_MESSAGE_MAX_LENGTH = 4000
+
+/**
+ * Conversations gratuites « à vie » du chat public (Phase 2) — même valeur et
+ * même mécanique que `PUBLIC_DIAGNOSIS_LIFETIME_LIMIT` (#602) : la liste de
+ * tokens en session compte les conversations des anonymes et prouve leur
+ * propriété ; les plans sans IA sont comptés en base sur l'organisation.
+ */
+export const PUBLIC_PART_SEARCH_LIFETIME_LIMIT = 2
+
+/** Clé de session des tokens de conversations publiques anonymes. */
+export const PUBLIC_PART_SEARCH_SESSION_KEY = 'publicPartSearchTokens'
+
+/**
+ * Ton des prompts : l'app connectée vouvoie, le marketing tutoie — même
+ * contrat JSON, seule la consigne de rédaction change.
+ */
+export type SparePartChatTone = 'formal' | 'informal'
 
 /**
  * Phase de la conversation, pilotée par le backend :
@@ -84,4 +103,29 @@ export interface PartSearchConversationProps {
   messages: AiChatMessage[]
   result: PartSearchResult | null
   identificationFailed: boolean
+}
+
+/** Formulaire de démarrage du chat public : tout est en saisie libre. */
+export interface PublicPartSearchStartInput {
+  message: string
+  brand: string | null
+  serialNumber: string | null
+}
+
+/** Quota affiché sur la page publique — `limit: null` = illimité (plan IA). */
+export interface PublicPartSearchQuotaProps {
+  used: number
+  limit: number | null
+}
+
+/**
+ * Conversation de la page publique : les props connectées plus le snapshot
+ * moteur qui alimente les liens revendeurs (#517) — jamais le numéro de série.
+ */
+export interface PublicPartSearchConversationProps extends PartSearchConversationProps {
+  engine: {
+    brand: string | null
+    model: string | null
+    catalogBrandSlug: string | null
+  }
 }

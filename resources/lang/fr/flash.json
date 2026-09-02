@@ -257,6 +257,12 @@
     "conversationCompleted": "Ce diagnostic est terminé. Démarrez une nouvelle conversation pour décrire une autre panne.",
     "maxMessagesReached": "Cette conversation a atteint sa taille maximale. Démarrez une nouvelle conversation."
   },
+  "publicPartSearch": {
+    "quotaExhausted": "Vous avez utilisé vos recherches de pièces gratuites. Créez un compte pour continuer à entretenir votre bateau avec FleetAi.",
+    "notFound": "Conversation introuvable.",
+    "conversationCompleted": "Cette recherche est terminée. Démarrez une nouvelle conversation pour chercher une autre pièce.",
+    "maxMessagesReached": "Cette conversation a atteint sa taille maximale. Démarrez une nouvelle conversation."
+  },
   "quota": {
     "boatsExceeded": "Vous avez atteint la limite de bateaux de votre plan. Passez à un plan supérieur pour en ajouter.",
     "membersExceeded": "Vous avez atteint la limite de membres de votre plan. Passez à un plan supérieur pour en ajouter.",

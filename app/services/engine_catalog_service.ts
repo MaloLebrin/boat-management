@@ -246,7 +246,19 @@ export default class EngineCatalogService {
 
     const models = await EngineModel.query()
       .where('engineBrandId', brand.id)
-      .select(['id', 'engineBrandId', 'slug', 'name', 'modelCode', 'family', 'aliases'])
+      // `strokeType`/`fuel` servent `engineFamilyFromCatalogModel()` : sans eux
+      // un hors-bord thermique serait toujours classé 4 temps.
+      .select([
+        'id',
+        'engineBrandId',
+        'slug',
+        'name',
+        'modelCode',
+        'family',
+        'strokeType',
+        'fuel',
+        'aliases',
+      ])
 
     return (
       models.find((model) =>

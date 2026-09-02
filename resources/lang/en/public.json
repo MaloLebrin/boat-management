@@ -3,6 +3,7 @@
     "features": "Features",
     "pricing": "Pricing",
     "diagnosisAi": "AI diagnosis",
+    "partsAi": "AI parts finder",
     "guide": "Maintenance guide"
   },
   "actions": {
@@ -19,6 +20,7 @@
     "simulator": "Cost Simulator",
     "guide": "Maintenance cost guide",
     "diagnosisAi": "AI breakdown diagnosis",
+    "partsAi": "AI parts reference finder",
     "contact": "Contact",
     "about": "About",
     "privacy": "Privacy",
