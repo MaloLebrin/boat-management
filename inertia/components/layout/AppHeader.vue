@@ -4,9 +4,11 @@ import { Link } from '@adonisjs/inertia/vue'
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import AppHeaderMobileDrawer from '~/components/layout/AppHeaderMobileDrawer.vue'
+import AppHeaderProductMenu from '~/components/layout/AppHeaderProductMenu.vue'
 import ThemeSwitcher from '~/components/layout/ThemeSwitcher.vue'
 import { useT } from '~/composables/use_t'
-import { buildLocaleSwitchHref, marketingPath, type AppLocale } from '#shared/helpers/locale_path'
+import { usePublicNav } from '~/composables/use_public_nav'
+import { buildLocaleSwitchHref, type AppLocale } from '#shared/helpers/locale_path'
 
 type SharedProps = {
   locale?: 'en' | 'fr'
@@ -20,13 +22,8 @@ const { t } = useT()
 const locale = computed<'en' | 'fr'>(() => page.props.locale ?? 'en')
 const isAuthed = computed(() => Boolean(page.props.user))
 
-const guideHref = computed(() => marketingPath('guide', locale.value))
-
-const pricingHref = computed(() => marketingPath('pricing', locale.value))
-
-const diagnosisHref = computed(() => marketingPath('diagnosisAi', locale.value))
-
-const partsAiHref = computed(() => marketingPath('partsAi', locale.value))
+// Nav publique partagée avec le drawer mobile (source unique : use_public_nav).
+const { productGroups, topLinks } = usePublicNav(locale)
 
 const otherLocale = computed<AppLocale>(() => (locale.value === 'en' ? 'fr' : 'en'))
 
@@ -113,35 +110,14 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
       </Link>
 
       <nav class="hidden items-center gap-1 md:flex">
+        <AppHeaderProductMenu :groups="productGroups" />
         <Link
-          :href="`/${locale}#features`"
+          v-for="link in topLinks"
+          :key="link.href"
+          :href="link.href"
           class="rounded-(--radius-control) px-3 py-2 text-sm font-medium text-fg-muted transition-colors duration-(--motion-fast) ease-premium hover:bg-paper hover:text-fg"
         >
-          {{ t('public.nav.features') }}
-        </Link>
-        <Link
-          :href="pricingHref"
-          class="rounded-(--radius-control) px-3 py-2 text-sm font-medium text-fg-muted transition-colors duration-(--motion-fast) ease-premium hover:bg-paper hover:text-fg"
-        >
-          {{ t('public.nav.pricing') }}
-        </Link>
-        <Link
-          :href="diagnosisHref"
-          class="rounded-(--radius-control) px-3 py-2 text-sm font-medium text-fg-muted transition-colors duration-(--motion-fast) ease-premium hover:bg-paper hover:text-fg"
-        >
-          {{ t('public.nav.diagnosisAi') }}
-        </Link>
-        <Link
-          :href="partsAiHref"
-          class="rounded-(--radius-control) px-3 py-2 text-sm font-medium text-fg-muted transition-colors duration-(--motion-fast) ease-premium hover:bg-paper hover:text-fg"
-        >
-          {{ t('public.nav.partsAi') }}
-        </Link>
-        <Link
-          :href="guideHref"
-          class="rounded-(--radius-control) px-3 py-2 text-sm font-medium text-fg-muted transition-colors duration-(--motion-fast) ease-premium hover:bg-paper hover:text-fg"
-        >
-          {{ t('public.nav.guide') }}
+          {{ t(link.labelKey) }}
         </Link>
       </nav>
 
@@ -199,7 +175,6 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
   <AppHeaderMobileDrawer
     :is-open="isMenuOpen"
     :locale="locale"
-    :guide-href="guideHref"
     :is-authed="isAuthed"
     @close="closeMenu"
     @switch-locale="switchLocale"

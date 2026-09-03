@@ -4,12 +4,11 @@ import { computed, nextTick, ref, watch } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import ThemeSwitcher from '~/components/layout/ThemeSwitcher.vue'
 import { useT } from '~/composables/use_t'
-import { marketingPath } from '#shared/helpers/locale_path'
+import { usePublicNav } from '~/composables/use_public_nav'
 
 const props = defineProps<{
   isOpen: boolean
   locale: 'en' | 'fr'
-  guideHref: string
   isAuthed: boolean
 }>()
 
@@ -21,11 +20,9 @@ const emit = defineEmits<{
 const { t } = useT()
 const closeButtonEl = ref<HTMLButtonElement | null>(null)
 
-const pricingHref = computed(() => marketingPath('pricing', props.locale))
-
-const diagnosisHref = computed(() => marketingPath('diagnosisAi', props.locale))
-
-const partsAiHref = computed(() => marketingPath('partsAi', props.locale))
+// Mêmes groupes et liens que le header desktop (source unique : use_public_nav).
+const localeRef = computed(() => props.locale)
+const { productGroups, topLinks } = usePublicNav(localeRef)
 
 watch(
   () => props.isOpen,
@@ -113,43 +110,33 @@ watch(
         </button>
       </div>
 
-      <!-- Nav links -->
-      <nav class="flex-1 overflow-y-auto px-4 py-5 space-y-1">
-        <Link
-          :href="`/${locale}#features`"
-          class="block rounded-(--radius-control) px-3 py-2.5 text-sm font-medium text-fg-muted transition-colors duration-(--motion-fast) hover:bg-paper hover:text-fg"
-          @click="emit('close')"
-        >
-          {{ t('public.nav.features') }}
-        </Link>
-        <Link
-          :href="pricingHref"
-          class="block rounded-(--radius-control) px-3 py-2.5 text-sm font-medium text-fg-muted transition-colors duration-(--motion-fast) hover:bg-paper hover:text-fg"
-          @click="emit('close')"
-        >
-          {{ t('public.nav.pricing') }}
-        </Link>
-        <Link
-          :href="diagnosisHref"
-          class="block rounded-(--radius-control) px-3 py-2.5 text-sm font-medium text-fg-muted transition-colors duration-(--motion-fast) hover:bg-paper hover:text-fg"
-          @click="emit('close')"
-        >
-          {{ t('public.nav.diagnosisAi') }}
-        </Link>
-        <Link
-          :href="partsAiHref"
-          class="block rounded-(--radius-control) px-3 py-2.5 text-sm font-medium text-fg-muted transition-colors duration-(--motion-fast) hover:bg-paper hover:text-fg"
-          @click="emit('close')"
-        >
-          {{ t('public.nav.partsAi') }}
-        </Link>
-        <Link
-          :href="guideHref"
-          class="block rounded-(--radius-control) px-3 py-2.5 text-sm font-medium text-fg-muted transition-colors duration-(--motion-fast) hover:bg-paper hover:text-fg"
-          @click="emit('close')"
-        >
-          {{ t('public.nav.guide') }}
-        </Link>
+      <!-- Nav links : groupes du menu Produit à plat sous intertitres, puis liens de premier niveau -->
+      <nav class="flex-1 overflow-y-auto px-4 py-5">
+        <div v-for="group in productGroups" :key="group.labelKey" class="mb-4">
+          <p class="px-3 pb-1 text-xs font-semibold uppercase tracking-wider text-fg-subtle">
+            {{ t(group.labelKey) }}
+          </p>
+          <Link
+            v-for="link in group.links"
+            :key="link.href"
+            :href="link.href"
+            class="block rounded-(--radius-control) px-3 py-2.5 text-sm font-medium text-fg-muted transition-colors duration-(--motion-fast) hover:bg-paper hover:text-fg"
+            @click="emit('close')"
+          >
+            {{ t(link.labelKey) }}
+          </Link>
+        </div>
+        <div class="space-y-1 border-t border-bone pt-4">
+          <Link
+            v-for="link in topLinks"
+            :key="link.href"
+            :href="link.href"
+            class="block rounded-(--radius-control) px-3 py-2.5 text-sm font-medium text-fg-muted transition-colors duration-(--motion-fast) hover:bg-paper hover:text-fg"
+            @click="emit('close')"
+          >
+            {{ t(link.labelKey) }}
+          </Link>
+        </div>
       </nav>
 
       <!-- Footer -->

@@ -4,7 +4,15 @@
     "pricing": "Pricing",
     "diagnosisAi": "AI diagnosis",
     "partsAi": "AI parts finder",
-    "guide": "Maintenance guide"
+    "guide": "Maintenance guide",
+    "product": "Product",
+    "productFeaturesGroup": "Features",
+    "productToolsGroup": "Free tools",
+    "maintenance": "Maintenance log",
+    "fleet": "Planning & fleet",
+    "aiAssistant": "AI assistant",
+    "simulator": "Cost simulator",
+    "help": "Help"
   },
   "actions": {
     "login": "Login",
@@ -27,6 +35,11 @@
     "terms": "Terms",
     "salesTerms": "Sales terms",
     "legalNotice": "Legal notice",
-    "bilingual": "Bilingual EN/FR · EU-hosted"
+    "bilingual": "Bilingual EN/FR · EU-hosted",
+    "resources": "Resources",
+    "maintenance": "Maintenance log",
+    "fleet": "Planning & fleet",
+    "aiAssistant": "AI assistant",
+    "help": "Help & support"
   }
 }
