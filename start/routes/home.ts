@@ -28,6 +28,9 @@ const SITE_URL = 'https://fleetai.app'
 const LOCALIZED_PAGES = [
   { page: 'home', priority: '1.0', changefreq: 'weekly' },
   { page: 'pricing', priority: '0.8', changefreq: 'monthly' },
+  { page: 'maintenance', priority: '0.8', changefreq: 'monthly' },
+  { page: 'fleet', priority: '0.8', changefreq: 'monthly' },
+  { page: 'aiAssistant', priority: '0.8', changefreq: 'monthly' },
   { page: 'simulator', priority: '0.8', changefreq: 'monthly' },
   { page: 'guide', priority: '0.7', changefreq: 'monthly' },
   { page: 'diagnosisAi', priority: '0.8', changefreq: 'monthly' },

@@ -3,6 +3,7 @@ import { middleware } from '#start/kernel'
 import { contactThrottle, publicDiagnosisThrottle, publicPartSearchThrottle } from '#start/limiter'
 
 const MarketingController = () => import('#controllers/marketing_controller')
+const MarketingFeaturesController = () => import('#controllers/marketing_features_controller')
 const ContactMessagesController = () => import('#controllers/contact_messages_controller')
 const SimulatorController = () => import('#controllers/simulator_controller')
 const SimulatorLeadController = () => import('#controllers/simulator_lead_controller')
@@ -20,6 +21,17 @@ router
     router
       .get('/tarifs', ({ response }) => response.redirect('/en/pricing', false, 301))
       .as('marketing.en.pricing_legacy')
+    // Pages fonctionnalité dédiées (compréhension acheteur + SEO) — slugs à
+    // mots-clés, alignés sur MARKETING_SLUGS (shared/helpers/locale_path.ts).
+    router
+      .get('/boat-maintenance-log', [MarketingFeaturesController, 'maintenance'])
+      .as('marketing.en.maintenance')
+    router
+      .get('/boat-fleet-management', [MarketingFeaturesController, 'fleet'])
+      .as('marketing.en.fleet')
+    router
+      .get('/ai-boat-assistant', [MarketingFeaturesController, 'aiAssistant'])
+      .as('marketing.en.aiAssistant')
     router
       .get('/maintenance-cost-simulator', [MarketingController, 'simulator'])
       .as('marketing.en.simulator')
@@ -43,6 +55,15 @@ router
   .group(() => {
     router.get('/', [MarketingController, 'home']).as('marketing.fr.home')
     router.get('/tarifs', [MarketingController, 'pricing']).as('marketing.fr.pricing')
+    router
+      .get('/carnet-entretien-bateau', [MarketingFeaturesController, 'maintenance'])
+      .as('marketing.fr.maintenance')
+    router
+      .get('/gestion-flotte-bateaux', [MarketingFeaturesController, 'fleet'])
+      .as('marketing.fr.fleet')
+    router
+      .get('/assistant-ia-bateau', [MarketingFeaturesController, 'aiAssistant'])
+      .as('marketing.fr.aiAssistant')
     router
       .get('/simulateur-cout-entretien', [MarketingController, 'simulator'])
       .as('marketing.fr.simulator')

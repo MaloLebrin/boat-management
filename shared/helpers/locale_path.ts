@@ -25,6 +25,9 @@ const LOCALE_PREFIX = /^\/(en|fr)(?=\/|$)/
 export const MARKETING_SLUGS = {
   home: { en: '', fr: '' },
   pricing: { en: '/pricing', fr: '/tarifs' },
+  maintenance: { en: '/boat-maintenance-log', fr: '/carnet-entretien-bateau' },
+  fleet: { en: '/boat-fleet-management', fr: '/gestion-flotte-bateaux' },
+  aiAssistant: { en: '/ai-boat-assistant', fr: '/assistant-ia-bateau' },
   simulator: { en: '/maintenance-cost-simulator', fr: '/simulateur-cout-entretien' },
   guide: { en: '/boat-maintenance-cost', fr: '/cout-entretien-bateau' },
   diagnosisAi: { en: '/engine-diagnosis-ai', fr: '/diagnostic-panne-ia' },

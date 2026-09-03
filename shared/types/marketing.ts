@@ -67,6 +67,89 @@ export interface LegalDocument {
   contact: { title: string; body: string; email: string }
 }
 
+/**
+ * Pages marketing dédiées aux fonctionnalités cœur (compréhension acheteur +
+ * SEO). Une seule page Vue (`marketing/feature`) rend les trois, pilotée par
+ * `featureKey` ; la copie vit sous `marketing.features.<featureKey>.*`.
+ */
+export type FeaturePageKey = 'maintenance' | 'fleet' | 'aiAssistant'
+
+/** Mocks produit réutilisés des sections de la home (`HomeMock*`). */
+export type FeatureMockType = 'boatDetail' | 'planning' | 'fleetide' | 'dashboard' | 'upcomingTasks'
+
+export interface FeatureCta {
+  label: string
+  href: string
+}
+
+export interface FeatureBlock {
+  eyebrow: string
+  title: string
+  titleHighlight: string
+  body: string
+  bullets: string[]
+  mockType: FeatureMockType
+}
+
+/** Carte de maillage interne vers une autre page marketing (feature ou outil). */
+export interface FeatureCrossLink {
+  title: string
+  description: string
+  href: string
+}
+
+export interface FeatureFaqItem {
+  q: string
+  a: string
+}
+
+export interface FeaturePageProps {
+  featureKey: FeaturePageKey
+  t: {
+    meta: { title: string; description: string }
+    hero: {
+      eyebrow: string
+      title: string
+      titleHighlight: string
+      subtitle: string
+      primaryCta: FeatureCta
+      secondaryCta: FeatureCta
+      reassurance: string
+      mockType: FeatureMockType
+    }
+    blocks: FeatureBlock[]
+    steps: {
+      eyebrow: string
+      title: string
+      subtitle: string
+      items: Array<{ step: string; title: string; description: string }>
+    }
+    proof: {
+      stats: Array<{ value: string; label: string }>
+      quote: { text: string; author: string; role: string }
+    }
+    crossLinks: {
+      eyebrow: string
+      title: string
+      linkLabel: string
+      items: FeatureCrossLink[]
+    }
+    faq: {
+      eyebrow: string
+      title: string
+      titleHighlight: string
+      items: FeatureFaqItem[]
+    }
+    finalCta: {
+      title: string
+      titleHighlight: string
+      subtitle: string
+      primaryCta: FeatureCta
+      secondaryCta: FeatureCta
+    }
+  }
+}
+
 export interface AboutValueItem {
   n: string
   title: string
