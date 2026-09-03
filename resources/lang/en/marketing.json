@@ -1249,7 +1249,9 @@
         "diagnosis_title": "AI engine diagnosis",
         "diagnosis_desc": "Describe your engine issue and the AI points you to the likely causes. Free, no account needed.",
         "parts_title": "AI part finder",
-        "parts_desc": "Find the exact engine part reference from its serial number. Free, no account needed."
+        "parts_desc": "Find the exact engine part reference from its serial number. Free, no account needed.",
+        "guide_title": "Guide: boat maintenance costs",
+        "guide_desc": "Average budgets by boat type, cost categories and ways to save."
       }
     },
     "maintenance": {
@@ -1441,5 +1443,40 @@
       "final_highlight": "aboard your team.",
       "final_subtitle": "Create your account and ask the assistant your first question today."
     }
+  },
+  "help": {
+    "meta_title": "Help & support — FleetAi",
+    "meta_description": "Need a hand? Contact channels, frequently asked questions and resources to get the most out of FleetAi.",
+    "hero_eyebrow": "Help & support",
+    "hero_title": "Need a",
+    "hero_title_highlight": "hand?",
+    "hero_subtitle": "A question about the product, your account or billing: start here — and if you can't find it, we're one email away.",
+    "channel1_title": "Email support",
+    "channel1_desc": "A question, a blocker? The team replies within 4 business hours.",
+    "channel1_cta": "support@fleetai.app",
+    "channel2_title": "Send a message",
+    "channel2_desc": "Describe what you need through the contact form and we'll get back to you quickly.",
+    "channel2_cta": "Open the form",
+    "channel3_title": "Book a demo",
+    "channel3_desc": "30 minutes with the team to see FleetAi applied to your fleet.",
+    "channel3_cta": "Book a slot",
+    "faq_eyebrow": "FAQ",
+    "faq_title": "Answers to",
+    "faq_title_highlight": "frequent questions",
+    "group_start_title": "Getting started",
+    "group_billing_title": "Pricing & billing",
+    "group_security_title": "Data & security",
+    "security_q1": "Where is my data hosted?",
+    "security_a1": "In the European Union (OVHcloud, Strasbourg), with no transfer outside the EU. Everything is encrypted in transit (TLS 1.3) and at rest (AES-256).",
+    "security_q2": "Is FleetAi GDPR compliant?",
+    "security_a2": "Yes: dedicated DPO, deletion of your data on request within 30 days, daily backups kept for 30 days.",
+    "resources_eyebrow": "Resources",
+    "resources_title": "Move forward on your own",
+    "resources_subtitle": "Free guides and tools, no account needed.",
+    "final_title": "Still stuck?",
+    "final_highlight": "We're here.",
+    "final_subtitle": "Write to us — a real person answers.",
+    "final_primary": "Contact the team",
+    "final_secondary": "Create a free account"
   }
 }

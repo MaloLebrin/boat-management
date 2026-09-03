@@ -150,6 +150,48 @@ export interface FeaturePageProps {
   }
 }
 
+/**
+ * Page « Aide & support » : canaux de contact, FAQ agrégée par thèmes (les
+ * réponses réutilisent les clés i18n de la home et du pricing — zéro copie
+ * dupliquée) et ressources en self-service.
+ */
+export interface HelpChannelCard {
+  title: string
+  description: string
+  ctaLabel: string
+  href: string
+  /** `true` = lien externe (mailto) rendu en ancre brute, pas en <Link> Inertia. */
+  external?: boolean
+}
+
+export interface HelpFaqGroup {
+  title: string
+  items: FeatureFaqItem[]
+}
+
+export interface HelpPageProps {
+  t: {
+    meta: { title: string; description: string }
+    hero: { eyebrow: string; title: string; titleHighlight: string; subtitle: string }
+    channels: HelpChannelCard[]
+    faq: { eyebrow: string; title: string; titleHighlight: string; groups: HelpFaqGroup[] }
+    resources: {
+      eyebrow: string
+      title: string
+      subtitle: string
+      linkLabel: string
+      items: FeatureCrossLink[]
+    }
+    finalCta: {
+      title: string
+      titleHighlight: string
+      subtitle: string
+      primaryCta: FeatureCta
+      secondaryCta: FeatureCta
+    }
+  }
+}
+
 export interface AboutValueItem {
   n: string
   title: string

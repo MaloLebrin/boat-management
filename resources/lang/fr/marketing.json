@@ -1249,7 +1249,9 @@
         "diagnosis_title": "Diagnostic de panne IA",
         "diagnosis_desc": "Décris ta panne moteur, l'IA t'oriente vers les causes probables. Gratuit, sans compte.",
         "parts_title": "Recherche de pièces IA",
-        "parts_desc": "Retrouve la référence exacte d'une pièce moteur à partir de son numéro de série. Gratuit, sans compte."
+        "parts_desc": "Retrouve la référence exacte d'une pièce moteur à partir de son numéro de série. Gratuit, sans compte.",
+        "guide_title": "Guide : le coût d'entretien d'un bateau",
+        "guide_desc": "Budgets moyens par type de bateau, postes de dépense et leviers d'économie."
       }
     },
     "maintenance": {
@@ -1441,5 +1443,40 @@
       "final_highlight": "dans ton équipe.",
       "final_subtitle": "Crée ton compte et pose ta première question à l'assistant dès aujourd'hui."
     }
+  },
+  "help": {
+    "meta_title": "Aide & support — FleetAi",
+    "meta_description": "Besoin d'un coup de main ? Canaux de contact, questions fréquentes et ressources pour bien utiliser FleetAi.",
+    "hero_eyebrow": "Aide & support",
+    "hero_title": "Besoin d'un",
+    "hero_title_highlight": "coup de main ?",
+    "hero_subtitle": "Une question sur le produit, ton compte ou la facturation : commence ici — et si tu ne trouves pas, on est à un email.",
+    "channel1_title": "Écris au support",
+    "channel1_desc": "Une question, un blocage ? L'équipe te répond sous 4 h ouvrées.",
+    "channel1_cta": "support@fleetai.app",
+    "channel2_title": "Envoie un message",
+    "channel2_desc": "Décris ton besoin via le formulaire de contact, on revient vers toi rapidement.",
+    "channel2_cta": "Ouvrir le formulaire",
+    "channel3_title": "Réserve une démo",
+    "channel3_desc": "30 minutes avec l'équipe pour voir FleetAi appliqué à ta flotte.",
+    "channel3_cta": "Réserver un créneau",
+    "faq_eyebrow": "FAQ",
+    "faq_title": "Les réponses",
+    "faq_title_highlight": "aux questions fréquentes",
+    "group_start_title": "Bien démarrer",
+    "group_billing_title": "Tarifs & facturation",
+    "group_security_title": "Données & sécurité",
+    "security_q1": "Où sont hébergées mes données ?",
+    "security_a1": "En Union européenne (OVHcloud, Strasbourg), sans transfert hors UE. Tout est chiffré en transit (TLS 1.3) et au repos (AES-256).",
+    "security_q2": "FleetAi est-il conforme au RGPD ?",
+    "security_a2": "Oui : DPO dédié, suppression de tes données sur demande sous 30 jours, sauvegardes quotidiennes conservées 30 jours.",
+    "resources_eyebrow": "Ressources",
+    "resources_title": "Avance en autonomie",
+    "resources_subtitle": "Guides et outils gratuits, accessibles sans compte.",
+    "final_title": "Toujours bloqué ?",
+    "final_highlight": "On est là.",
+    "final_subtitle": "Écris-nous — une vraie personne te répond.",
+    "final_primary": "Contacter l'équipe",
+    "final_secondary": "Créer un compte gratuit"
   }
 }

@@ -28,6 +28,7 @@ export const MARKETING_SLUGS = {
   maintenance: { en: '/boat-maintenance-log', fr: '/carnet-entretien-bateau' },
   fleet: { en: '/boat-fleet-management', fr: '/gestion-flotte-bateaux' },
   aiAssistant: { en: '/ai-boat-assistant', fr: '/assistant-ia-bateau' },
+  help: { en: '/help', fr: '/aide' },
   simulator: { en: '/maintenance-cost-simulator', fr: '/simulateur-cout-entretien' },
   guide: { en: '/boat-maintenance-cost', fr: '/cout-entretien-bateau' },
   diagnosisAi: { en: '/engine-diagnosis-ai', fr: '/diagnostic-panne-ia' },

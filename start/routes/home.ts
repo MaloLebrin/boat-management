@@ -35,6 +35,7 @@ const LOCALIZED_PAGES = [
   { page: 'guide', priority: '0.7', changefreq: 'monthly' },
   { page: 'diagnosisAi', priority: '0.8', changefreq: 'monthly' },
   { page: 'partsAi', priority: '0.8', changefreq: 'monthly' },
+  { page: 'help', priority: '0.5', changefreq: 'monthly' },
   { page: 'about', priority: '0.5', changefreq: 'monthly' },
   { page: 'contact', priority: '0.5', changefreq: 'monthly' },
   { page: 'privacy', priority: '0.3', changefreq: 'yearly' },

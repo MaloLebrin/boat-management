@@ -42,6 +42,7 @@ router
     router
       .get('/engine-part-finder-ai', [PublicPartSearchController, 'show'])
       .as('marketing.en.partsAi')
+    router.get('/help', [MarketingController, 'help']).as('marketing.en.help')
     router.get('/privacy', [MarketingController, 'privacy']).as('marketing.en.privacy')
     router.get('/terms', [MarketingController, 'terms']).as('marketing.en.terms')
     router.get('/sales-terms', [MarketingController, 'salesTerms']).as('marketing.en.sales_terms')
@@ -74,6 +75,7 @@ router
     router
       .get('/reference-piece-moteur-ia', [PublicPartSearchController, 'show'])
       .as('marketing.fr.partsAi')
+    router.get('/aide', [MarketingController, 'help']).as('marketing.fr.help')
     router.get('/confidentialite', [MarketingController, 'privacy']).as('marketing.fr.privacy')
     router.get('/cgu', [MarketingController, 'terms']).as('marketing.fr.terms')
     router.get('/cgv', [MarketingController, 'salesTerms']).as('marketing.fr.sales_terms')
