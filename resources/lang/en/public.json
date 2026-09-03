@@ -16,7 +16,8 @@
   },
   "actions": {
     "login": "Login",
-    "tryFree": "Try free"
+    "tryFree": "Try free",
+    "learnMore": "Learn more"
   },
   "footer": {
     "tagline": "Maritime fleet maintenance, made simple.",

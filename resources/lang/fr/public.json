@@ -16,7 +16,8 @@
   },
   "actions": {
     "login": "Connexion",
-    "tryFree": "Essayer gratuitement"
+    "tryFree": "Essayer gratuitement",
+    "learnMore": "En savoir plus"
   },
   "footer": {
     "tagline": "La maintenance maritime, sans douleur.",

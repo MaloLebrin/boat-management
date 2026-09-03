@@ -11,20 +11,26 @@ import { computed, ref } from 'vue'
 import JsonLd from '~/components/json_ld'
 import HomeHeroSection from '~/components/marketing/home/HomeHeroSection.vue'
 import HomeProblemSection from '~/components/marketing/home/HomeProblemSection.vue'
-import HomePillarsSection from '~/components/marketing/home/HomePillarsSection.vue'
-import HomeModularOfferSection from '~/components/marketing/home/HomeModularOfferSection.vue'
 import HomeFeatureSection from '~/components/marketing/home/HomeFeatureSection.vue'
 import HomeDiagnosisSection from '~/components/marketing/home/HomeDiagnosisSection.vue'
-import HomeCaseStudySection from '~/components/marketing/home/HomeCaseStudySection.vue'
 import HomeHowItWorksSection from '~/components/marketing/home/HomeHowItWorksSection.vue'
-import HomePersonasSection from '~/components/marketing/home/HomePersonasSection.vue'
-import HomeStatsBandSection from '~/components/marketing/home/HomeStatsBandSection.vue'
-import HomeComparisonSection from '~/components/marketing/home/HomeComparisonSection.vue'
 import HomeTestimonialsSection from '~/components/marketing/home/HomeTestimonialsSection.vue'
-import HomeSecuritySection from '~/components/marketing/home/HomeSecuritySection.vue'
 import HomeFaqSection from '~/components/marketing/home/HomeFaqSection.vue'
-import HomeDemoSection from '~/components/marketing/home/HomeDemoSection.vue'
 import HomeFinalCtaSection from '~/components/marketing/home/HomeFinalCtaSection.vue'
+// --- Sections retirées de l'affichage (refonte marketing 2026-09, home resserrée
+// --- à 10 sections orientées conversion). Composants conservés volontairement —
+// --- voir le commentaire en tête de chacun. Réactivation : décommenter l'import
+// --- et le bloc <template> correspondant, leurs props sont toujours servies par
+// --- buildHomePageData (app/controllers/marketing_controller.ts).
+// import HomePillarsSection from '~/components/marketing/home/HomePillarsSection.vue'
+// import HomeModularOfferSection from '~/components/marketing/home/HomeModularOfferSection.vue'
+// import HomeCaseStudySection from '~/components/marketing/home/HomeCaseStudySection.vue'
+// import HomePersonasSection from '~/components/marketing/home/HomePersonasSection.vue'
+// import HomeStatsBandSection from '~/components/marketing/home/HomeStatsBandSection.vue'
+// import HomeComparisonSection from '~/components/marketing/home/HomeComparisonSection.vue'
+// import HomeSecuritySection from '~/components/marketing/home/HomeSecuritySection.vue'
+// import HomeDemoSection from '~/components/marketing/home/HomeDemoSection.vue'
+import { useT } from '~/composables/use_t'
 import { marketingPath } from '#shared/helpers/locale_path'
 
 type Persona = 'loueurs' | 'ecoles' | 'marinas' | 'armateurs'
@@ -215,12 +221,32 @@ const page = usePage<SharedProps>()
 const props = defineProps<PageProps>()
 const locale = computed<'en' | 'fr'>(() => (page.props.locale ?? 'en') as 'en' | 'fr')
 const t = props.t
+const { t: appT } = useT()
 
 const activePersona = ref<Persona>('loueurs')
 
-function handlePersonaChange(persona: Persona) {
-  activePersona.value = persona
-}
+// Le commutateur de persona (HomePersonasSection, retirée de l'affichage avec la
+// refonte 2026-09) pilotait le hero via @persona-change : le hero reste sur le
+// persona par défaut. Réactivation : décommenter la section et ce handler.
+// function handlePersonaChange(persona: Persona) {
+//   activePersona.value = persona
+// }
+
+// CTA d'approfondissement des 3 blocs features vers leurs pages dédiées
+// (maillage interne, refonte 2026-09). Libellé hors de buildHomePageData pour
+// laisser le builder et PageProps inchangés (sections conservées réactivables).
+const featureCtas = computed(() =>
+  (['maintenance', 'fleet', 'aiAssistant'] as const).map((pageKey) => ({
+    label: appT('public.actions.learnMore'),
+    href: marketingPath(pageKey, locale.value),
+  }))
+)
+
+// « Réserver une démo » pointait sur l'ancre #demo de HomeDemoSection, retirée
+// de l'affichage : cible désormais le formulaire de contact (ancre côté
+// contrôleur : CONTACT_FORM_ANCHOR). Réactivation de la section → retirer ces
+// props secondary-href pour revenir à l'ancre.
+const demoCtaHref = computed(() => `${marketingPath('contact', locale.value)}#contact-form`)
 
 const hreflangEn = marketingPath('home', 'en')
 const hreflangFr = marketingPath('home', 'fr')
@@ -263,6 +289,7 @@ const websiteSchema = computed(() =>
     :caption="t.home.hero.caption"
     :social-proof="t.home.socialProof"
     :locale="locale"
+    :secondary-href="demoCtaHref"
   />
 
   <!-- 2. Problem -->
@@ -272,17 +299,21 @@ const websiteSchema = computed(() =>
     :items="t.home.problem.items"
   />
 
-  <!-- 3. Pillars -->
+  <!-- Section retirée (refonte 2026-09) : 3. Pillars — paraphrase abstraite des
+       3 features, redondante avec les deep-dives ci-dessous.
   <HomePillarsSection
     :title="t.home.pillars.title"
     :title-highlight="t.home.pillars.titleHighlight"
     :items="t.home.pillars.items"
   />
+  -->
 
-  <!-- 3bis. Offre modulaire (socle + modules add-ons) -->
+  <!-- Section retirée (refonte 2026-09) : 3bis. Offre modulaire — détail
+       tarifaire prématuré à ce stade du parcours, la page /tarifs est au header.
   <HomeModularOfferSection v-bind="t.home.modularOffer" />
+  -->
 
-  <!-- 4. Feature deep-dives -->
+  <!-- 3-5. Feature deep-dives, chacun relié à sa page dédiée -->
   <HomeFeatureSection
     anchor-id="features"
     :eyebrow="t.home.features[0].eyebrow"
@@ -290,6 +321,7 @@ const websiteSchema = computed(() =>
     :title-highlight="t.home.features[0].titleHighlight"
     :body="t.home.features[0].body"
     :bullets="t.home.features[0].bullets"
+    :cta="featureCtas[0]"
     mock-type="boatDetail"
     bg-class="bg-cream"
   />
@@ -299,6 +331,7 @@ const websiteSchema = computed(() =>
     :title-highlight="t.home.features[1].titleHighlight"
     :body="t.home.features[1].body"
     :bullets="t.home.features[1].bullets"
+    :cta="featureCtas[1]"
     mock-type="planning"
     bg-class="bg-paper"
     reversed
@@ -309,15 +342,16 @@ const websiteSchema = computed(() =>
     :title-highlight="t.home.features[2].titleHighlight"
     :body="t.home.features[2].body"
     :bullets="t.home.features[2].bullets"
+    :cta="featureCtas[2]"
     mock-type="fleetide"
     bg-class="bg-cream"
     is-ai
   />
 
-  <!-- 4bis. Diagnostic de panne IA — essai gratuit sans compte (#609) -->
+  <!-- 6. Diagnostic de panne IA — essai gratuit sans compte (#609), lead magnet -->
   <HomeDiagnosisSection v-bind="t.home.diagnosis" />
 
-  <!-- 5. How it works -->
+  <!-- 7. How it works — lève l'objection migration / temps de mise en route -->
   <HomeHowItWorksSection
     :how-it-works="t.home.howItWorks"
     :preview="t.home.preview"
@@ -325,10 +359,14 @@ const websiteSchema = computed(() =>
     :locale="locale"
   />
 
-  <!-- 6. Case study -->
+  <!-- Section retirée (refonte 2026-09) : Case study — étude de cas fictive,
+       preuve plus faible que les témoignages conservés ; son CTA simulateur vit
+       désormais au header (menu Produit) et au footer.
   <HomeCaseStudySection :case-study="t.home.caseStudy" />
+  -->
 
-  <!-- 7. Personas -->
+  <!-- Section retirée (refonte 2026-09) : Personas — long ; pilotait le hero via
+       @persona-change (réactiver aussi handlePersonaChange dans le script).
   <HomePersonasSection
     :title="t.home.personas.title"
     :subtitle="t.home.personas.subtitle"
@@ -336,29 +374,37 @@ const websiteSchema = computed(() =>
     :items="t.home.personas.items"
     @persona-change="handlePersonaChange"
   />
+  -->
 
-  <!-- 8. Stats band -->
+  <!-- Section retirée (refonte 2026-09) : Stats band — chiffres redondants avec
+       le social proof du hero et les stats des pages fonctionnalité.
   <HomeStatsBandSection :stats="t.home.statsBand" />
+  -->
 
-  <!-- 9. Testimonials -->
+  <!-- 8. Testimonials — preuve sociale -->
   <HomeTestimonialsSection :title="t.home.testimonials.title" :items="t.home.testimonials.items" />
 
-  <!-- 10. Comparison table -->
+  <!-- Section retirée (refonte 2026-09) : Comparison — tableau long, l'argument
+       Excel/papier est déjà porté par la section Problem.
   <HomeComparisonSection
     :title="t.home.comparison.title"
     :subtitle="t.home.comparison.subtitle"
     :cols="t.home.comparison.cols"
     :rows="t.home.comparison.rows"
   />
+  -->
 
-  <!-- 11. Security -->
+  <!-- Section retirée (refonte 2026-09) : Security — rassurance de second
+       niveau, reprise par la FAQ de la page /aide (groupe Données & sécurité).
   <HomeSecuritySection
     :title="t.home.security.title"
     :subtitle="t.home.security.subtitle"
     :items="t.home.security.items"
   />
+  -->
 
-  <!-- 12. Demo -->
+  <!-- Section retirée (refonte 2026-09) : Demo — la demande de démo vit sur
+       /contact (relayée par la page /aide et le footer).
   <HomeDemoSection
     :eyebrow="t.home.demo.eyebrow"
     :title="t.home.demo.title"
@@ -374,8 +420,9 @@ const websiteSchema = computed(() =>
     :demo-login-path="t.home.demo.demoLoginPath"
     :locale="locale"
   />
+  -->
 
-  <!-- 13. FAQ -->
+  <!-- 9. FAQ — objections restantes (props consommées par pricing_claims.spec.ts) -->
   <HomeFaqSection
     :title="t.home.faq.title"
     :subtitle="t.home.faq.subtitle"
@@ -383,12 +430,13 @@ const websiteSchema = computed(() =>
     :items="t.home.faq.items"
   />
 
-  <!-- 14. Final CTA -->
+  <!-- 10. Final CTA -->
   <HomeFinalCtaSection
     :title="t.home.finalCta.title"
     :title-highlight="t.home.finalCta.titleHighlight"
     :subtitle="t.home.finalCta.subtitle"
     :primary-cta="t.home.finalCta.primaryCta"
     :secondary-cta="t.home.finalCta.secondaryCta"
+    :secondary-href="demoCtaHref"
   />
 </template>

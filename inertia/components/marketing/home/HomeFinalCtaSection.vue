@@ -9,6 +9,8 @@ defineProps<{
   subtitle: string
   primaryCta: string
   secondaryCta: string
+  /** Cible du CTA secondaire ; à défaut, ancre historique #demo (même page). */
+  secondaryHref?: string
 }>()
 </script>
 
@@ -44,7 +46,17 @@ defineProps<{
             {{ primaryCta }}
           </BaseButton>
         </Link>
-        <a href="#demo">
+        <!-- Sans `secondaryHref`, comportement historique : ancre #demo (même page). -->
+        <Link v-if="secondaryHref" :href="secondaryHref">
+          <BaseButton
+            size="lg"
+            variant="ghost"
+            class="border! border-white/20! text-white/70! hover:bg-white/10! hover:text-white!"
+          >
+            {{ secondaryCta }}
+          </BaseButton>
+        </Link>
+        <a v-else href="#demo">
           <BaseButton
             size="lg"
             variant="ghost"
