@@ -3,6 +3,7 @@ import { Head } from '@inertiajs/vue3'
 import { computed } from 'vue'
 import BaseBreadcrumb from '~/components/base/BaseBreadcrumb.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
+import SparePartsAiEntryCard from '~/components/spare_parts/chat/SparePartsAiEntryCard.vue'
 import SparePartsAssemblyGrid from '~/components/spare_parts/SparePartsAssemblyGrid.vue'
 import SparePartsCartPanel from '~/components/spare_parts/SparePartsCartPanel.vue'
 import SparePartsIdentitySection from '~/components/spare_parts/SparePartsIdentitySection.vue'
@@ -55,6 +56,10 @@ const breadcrumb = computed(() => [
         :plate-hints="plateHints"
         :can-manage="canManage"
       />
+    </div>
+
+    <div class="mt-6">
+      <SparePartsAiEntryCard :boat-id="boat.id" :engine-id="engine.id" />
     </div>
 
     <h2 class="mt-10 text-lg font-semibold text-fg">{{ t('parts.identify.assemblies.title') }}</h2>

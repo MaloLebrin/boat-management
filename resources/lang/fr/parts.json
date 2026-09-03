@@ -740,5 +740,30 @@
     "sourcePrefix": "Source :",
     "verifiedAt": "Vérifiée le {date}.",
     "unverified": "Non revérifiée — contrôlez-la sur la vue éclatée avant de commander."
+  },
+  "ai": {
+    "entryTitle": "Assistant IA — trouver une référence",
+    "entryText": "Décrivez la pièce que vous cherchez : l'assistant identifie le modèle exact de votre moteur à partir de son numéro de série, puis retrouve la référence constructeur quand elle est connue de notre base.",
+    "entrySelectLabel": "Moteur concerné",
+    "entryCta": "Trouver ma référence avec l'IA",
+    "chatTitle": "Recherche de référence assistée par IA",
+    "intro": "Indiquez la pièce que vous cherchez (ex. : « la turbine de la pompe à eau »). Si le modèle exact de votre moteur n'est pas encore identifié, l'assistant vous demandera son numéro de série ou le code de sa plaque signalétique.",
+    "composerPlaceholder": "Ex. : je cherche la turbine de la pompe à eau…",
+    "composerStart": "Démarrer la recherche",
+    "composerSend": "Envoyer",
+    "thinking": "L'assistant réfléchit…",
+    "chatYou": "Vous",
+    "chatAssistant": "Assistant",
+    "identificationFailedTitle": "Modèle non identifié",
+    "identificationFailedText": "Le modèle exact de votre moteur n'a pas pu être déterminé. Vous pouvez continuer à décrire votre pièce — la recherche s'appuiera sur les liens revendeurs — ou passer par l'identification manuelle.",
+    "manualFallbackCta": "Ouvrir l'identification manuelle",
+    "resultTitle": "Pièce identifiée",
+    "resultNoReference": "Nous n'avons pas encore de référence vérifiée pour cette pièce sur votre moteur. Repérez-la sur la vue éclatée d'un catalogue revendeur pour relever sa référence.",
+    "resultNoMatch": "Cette pièce ne figure pas dans notre nomenclature. Passez par l'identification manuelle pour la repérer sur une vue éclatée.",
+    "addToCart": "Ajouter à la liste de réparation",
+    "addedToCart": "Ajoutée à la liste de réparation",
+    "viewAssembly": "Voir l'ensemble de la pièce",
+    "newSearch": "Nouvelle recherche",
+    "disclaimer": "L'assistant recommande, il ne décide pas : les références affichées proviennent de notre base et sont toujours accompagnées de leur source — vérifiez-les sur la vue éclatée avant de commander."
   }
 }

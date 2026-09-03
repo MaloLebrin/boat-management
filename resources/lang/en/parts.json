@@ -740,5 +740,30 @@
     "sourcePrefix": "Source:",
     "verifiedAt": "Checked on {date}.",
     "unverified": "Not re-checked — confirm it on the exploded view before ordering."
+  },
+  "ai": {
+    "entryTitle": "AI assistant — find a reference",
+    "entryText": "Describe the part you are looking for: the assistant identifies the exact model of your engine from its serial number, then retrieves the manufacturer reference when our database knows it.",
+    "entrySelectLabel": "Engine",
+    "entryCta": "Find my reference with AI",
+    "chatTitle": "AI-assisted reference search",
+    "intro": "Tell us which part you are looking for (e.g. “the water pump impeller”). If the exact model of your engine is not identified yet, the assistant will ask for its serial number or the code on its identification plate.",
+    "composerPlaceholder": "E.g.: I am looking for the water pump impeller…",
+    "composerStart": "Start the search",
+    "composerSend": "Send",
+    "thinking": "The assistant is thinking…",
+    "chatYou": "You",
+    "chatAssistant": "Assistant",
+    "identificationFailedTitle": "Model not identified",
+    "identificationFailedText": "The exact model of your engine could not be determined. You can keep describing your part — the search will rely on retailer links — or switch to manual identification.",
+    "manualFallbackCta": "Open manual identification",
+    "resultTitle": "Part identified",
+    "resultNoReference": "We do not have a verified reference for this part on your engine yet. Locate it on a retailer exploded view to note its reference.",
+    "resultNoMatch": "This part is not in our nomenclature. Use manual identification to locate it on an exploded view.",
+    "addToCart": "Add to the repair list",
+    "addedToCart": "Added to the repair list",
+    "viewAssembly": "View the part's assembly",
+    "newSearch": "New search",
+    "disclaimer": "The assistant recommends, it does not decide: displayed references come from our database and always carry their source — check them on the exploded view before ordering."
   }
 }

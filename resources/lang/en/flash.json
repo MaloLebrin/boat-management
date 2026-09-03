@@ -351,6 +351,9 @@
     "notEligible": "This engine has no parts nomenclature.",
     "assemblyNotFound": "Part assembly not found for this motorisation.",
     "partNotFound": "Unknown catalog part.",
-    "cartItemNotFound": "Repair list item not found."
+    "cartItemNotFound": "Repair list item not found.",
+    "chatNotFound": "Conversation not found.",
+    "chatCompleted": "This search is complete. Start a new search for another part.",
+    "chatMaxMessages": "This conversation has reached its maximum size. Start a new search."
   }
 }

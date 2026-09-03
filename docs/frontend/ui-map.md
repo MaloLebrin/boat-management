@@ -244,6 +244,14 @@ la nav et la carte ports du dashboard sont masquées via `effectiveQuotas.canMan
   - `SparePartsCartPanel.vue` — quantités, référence (pré-remplie depuis le catalogue quand elle est
     connue, toujours modifiable), source créditée tant que la ligne porte la référence du catalogue,
     suppression, export CSV (`external-href`)
+- Chat IA de recherche de références (#634, GET `/boats/:boatId/engines/:engineId/spare-parts/chat`) :
+  - `inertia/pages/spare_parts/chat.vue` — page dédiée par moteur, conversation persistée
+  - `inertia/components/spare_parts/chat/` : `SparePartsAiEntryCard.vue` (carte navy d'entrée sur
+    l'index — sélecteur de moteur — et la page d'identification ; plan sans IA → `UpgradePlanModal`),
+    `SparePartsChatPanel.vue` (bulle optimiste pendant l'appel Mistral synchrone, encart statique
+    d'échec d'identification), `SparePartsChatMessage.vue` (libellés vouvoyés `parts.ai.*` — ceux du
+    chat public tutoient), `SparePartsChatComposer.vue`, `SparePartsChatResultCard.vue` (référence
+    via `SparePartsReferenceSource`, ajout au panier, replis revendeurs / identification manuelle)
 - Contenu statique: `shared/constants/spare_parts/spare_parts_content.ts` (9 ensembles hors-bord) et
   `shared/constants/spare_parts/inboard_assemblies.ts` (12 ensembles in-bord, embases, groupe
   électrogène) — clés i18n `parts.*`, intitulés catalogue EN littéraux

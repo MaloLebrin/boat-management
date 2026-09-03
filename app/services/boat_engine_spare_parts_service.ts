@@ -18,6 +18,7 @@ import { isSparePartsEligibleEngine } from '#shared/helpers/spare_parts'
 import type {
   RepairCartItemRow,
   SparePartReferenceRow,
+  SparePartsEngineProps,
   SparePartsEngineRow,
 } from '#shared/types/spare_parts'
 import { toRepairCartItemRow, toSparePartsEngineRow } from '#transformers/spare_parts_transformer'
@@ -102,6 +103,48 @@ export default class BoatEngineSparePartsService {
     if (!isSparePartsEligibleEngine(engine)) throw new EngineNotSparePartsEligibleError()
 
     return engine
+  }
+
+  /**
+   * Projection du moteur vers les écrans « pièces détachées », avec sa marque
+   * **rapprochée du catalogue côté serveur** (#573).
+   *
+   * `EngineCatalogService.resolveBrand()` interroge la base : les composants
+   * pièces détachées ne peuvent pas l'appeler eux-mêmes, ils reçoivent donc le
+   * slug résolu et le traduisent en marque du corpus #517 avec le helper pur
+   * `sparePartsBrandFromCatalogSlug()`. `catalogBrandSlug` vaut `null` pour une
+   * saisie hors catalogue, cas que les écrans savent déjà traiter.
+   *
+   * Extraite du contrôleur (#634) : la page d'identification, la page
+   * d'ensemble et le chat IA servent exactement la même forme.
+   */
+  async getEngineProps(engine: BoatEngine): Promise<SparePartsEngineProps> {
+    const catalogBrand = await this.engineCatalogService.resolveBrand(engine.brand)
+    const catalogModel = await this.engineCatalogService.resolveModelForEngine(engine)
+
+    // Un code plaque partagé par plusieurs modèles est exactement le cas que la
+    // mise en garde « le numéro de série départage les variantes » vise (#575) :
+    // l'écran le dit alors explicitement, au lieu de s'en tenir au général.
+    const modelCode = catalogModel?.modelCode ?? engine.model
+    const modelCodeMatches = await this.engineCatalogService.countModelsForModelCode(modelCode)
+
+    return {
+      id: engine.id,
+      brand: engine.brand,
+      model: engine.model,
+      catalogBrandSlug: catalogBrand?.slug ?? null,
+      // Motif de décodage des références de la marque (#575), `null` quand elle
+      // n'en déclare pas : la carte « décoder une référence » ne s'affiche
+      // alors pas du tout, comme pour toute marque non-Yamaha avant #575.
+      referencePattern: catalogBrand?.referencePattern ?? null,
+      modelCodeMatches,
+      serialNumber: engine.serialNumber,
+      kind: engine.kind,
+      // Famille de motorisation (#574) : c'est elle qui décide des ensembles
+      // affichés, les écrans la reçoivent telle quelle.
+      family: engine.family,
+      status: engine.status,
+    }
   }
 
   /** Lignes du panier de réparation d'un moteur déjà chargé et scopé. */

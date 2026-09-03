@@ -12,7 +12,6 @@ import { PART_ASSEMBLY_SLUGS, type PartAssemblySlug } from '#shared/types/spare_
 import { addRepairCartItemValidator, updateRepairCartItemValidator } from '#validators/spare_parts'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
-import type BoatEngine from '#models/boat_engine'
 
 @inject()
 export default class BoatEngineSparePartsController {
@@ -33,45 +32,6 @@ export default class BoatEngineSparePartsController {
         return null
       }
       throw error
-    }
-  }
-
-  /**
-   * Projection du moteur vers Inertia, avec sa marque **rapprochée du catalogue
-   * côté serveur** (#573).
-   *
-   * `EngineCatalogService.resolveBrand()` interroge la base : les composants
-   * pièces détachées ne peuvent pas l'appeler eux-mêmes, ils reçoivent donc le
-   * slug résolu et le traduisent en marque du corpus #517 avec le helper pur
-   * `sparePartsBrandFromCatalogSlug()`. `catalogBrandSlug` vaut `null` pour une
-   * saisie hors catalogue, cas que les écrans savent déjà traiter.
-   */
-  private async engineProps(engine: BoatEngine) {
-    const catalogBrand = await this.engineCatalogService.resolveBrand(engine.brand)
-    const catalogModel = await this.engineCatalogService.resolveModelForEngine(engine)
-
-    // Un code plaque partagé par plusieurs modèles est exactement le cas que la
-    // mise en garde « le numéro de série départage les variantes » vise (#575) :
-    // l'écran le dit alors explicitement, au lieu de s'en tenir au général.
-    const modelCode = catalogModel?.modelCode ?? engine.model
-    const modelCodeMatches = await this.engineCatalogService.countModelsForModelCode(modelCode)
-
-    return {
-      id: engine.id,
-      brand: engine.brand,
-      model: engine.model,
-      catalogBrandSlug: catalogBrand?.slug ?? null,
-      // Motif de décodage des références de la marque (#575), `null` quand elle
-      // n'en déclare pas : la carte « décoder une référence » ne s'affiche
-      // alors pas du tout, comme pour toute marque non-Yamaha avant #575.
-      referencePattern: catalogBrand?.referencePattern ?? null,
-      modelCodeMatches,
-      serialNumber: engine.serialNumber,
-      kind: engine.kind,
-      // Famille de motorisation (#574) : c'est elle qui décide des ensembles
-      // affichés, les écrans la reçoivent telle quelle.
-      family: engine.family,
-      status: engine.status,
     }
   }
 
@@ -103,7 +63,7 @@ export default class BoatEngineSparePartsController {
       const engine = await this.sparePartsService.getEligibleEngineOrFail(user, boat, engineId)
       const cartItems = await this.sparePartsService.getCartItems(engine)
       const canManage = await bouncer.with(MaintenancePolicy).allows('edit', boat)
-      const engineProps = await this.engineProps(engine)
+      const engineProps = await this.sparePartsService.getEngineProps(engine)
 
       return inertia.render('spare_parts/identify', {
         boat: { id: boat.id, name: boat.name },
@@ -160,7 +120,7 @@ export default class BoatEngineSparePartsController {
 
       return inertia.render('spare_parts/assembly', {
         boat: { id: boat.id, name: boat.name },
-        engine: await this.engineProps(engine),
+        engine: await this.sparePartsService.getEngineProps(engine),
         assemblySlug: assemblySlug as PartAssemblySlug,
         partReferences: await this.sparePartsService.getPartReferences(engine),
         cartItems,
