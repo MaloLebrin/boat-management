@@ -3,6 +3,7 @@
     "features": "Fonctionnalités",
     "pricing": "Tarifs",
     "diagnosisAi": "Diagnostic IA",
+    "partsAi": "Pièces IA",
     "guide": "Guide entretien"
   },
   "actions": {
@@ -19,6 +20,7 @@
     "simulator": "Simulateur de coût",
     "guide": "Guide coût entretien",
     "diagnosisAi": "Diagnostic de panne IA",
+    "partsAi": "Recherche de pièces IA",
     "contact": "Contact",
     "about": "À propos",
     "privacy": "Confidentialité",

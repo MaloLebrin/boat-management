@@ -109,7 +109,15 @@ Un chatbot conversationnel exploite enfin le `serialNumber` des moteurs : il ide
 - **Routes** `spareParts.chat.show|start|message` (`start/routes/spare_parts.ts`, groupe auth, mutations sous `aiThrottle`), contrôleur `SparePartChatController` en redirections Inertia. Service `SparePartChatService` + prompts purs `spare_part_chat_prompt_service.ts` (fr/en), types `shared/types/spare_part_chat.ts`, erreurs `app/exceptions/spare_part_chat_errors.ts`.
 - Une conversation = une pièce (10 messages utilisateur max, instruction de clôture au dernier tour) ; « nouvelle recherche » pour recommencer. L'ajout au panier passe par la route `spareParts.cart.add` existante, qui pré-remplit déjà la référence.
 
-La Phase 2 de #634 (chat public marketing, saisie libre marque + numéro de série) n'est pas livrée.
+## Chat public de recherche de références (#634, Phase 2)
+
+Le même chatbot, ouvert en page publique marketing (`/en/engine-part-finder-ai`, `/fr/reference-piece-moteur-ia`) — le tunnel d'acquisition jumeau du diagnostic public (#602), en saisie libre marque + numéro de série.
+
+- **Service dédié `PublicPartSearchService`** (contrôleur `PublicPartSearchController`, POST non localisés `/parts-ai/conversations[...]` sous `publicPartSearchThrottle` 6/min) : trois régimes de quota calqués sur #602 — anonyme = `PUBLIC_PART_SEARCH_LIFETIME_LIMIT` (2) conversations à vie comptées par la session (liste de tokens = compteur **et** preuve de propriété) ; `starter` = même plafond compté en base sur l'org ; plans avec IA = sans plafond, quota de tokens mensuel.
+- **Même table, discriminant `boat_engine_id` null** : les conversations publiques partagent `ai_part_search_conversations` avec la Phase 1 et tous les accès publics filtrent `whereNull('boatEngineId')` — une conversation du chat connecté est invisible et injoignable depuis la page publique.
+- **Mêmes phases, deux ajustements** : une identification réussie snapshotte `context.model` (code plaque, pour les liens revendeurs) et `context.family` via `engineFamilyFromCatalogModel()` ; famille inconnue → vocabulaire = **catalogue complet** (le repli générique de la navigation manuelle est trop étroit pour un visiteur dont on ne sait rien). Anti-hallucination inchangée.
+- **Ton** : les builders de prompts prennent un paramètre `tone` — `formal` (défaut, app connectée) ou `informal` (public) ; namespace i18n dédié `publicPartSearch` (fr tutoiement). `SparePartsReferenceSource` (prop `i18nPrefix`) et `SparePartsRetailerLinks` (prop `keys`) affichent les libellés publics sans dupliquer les composants.
+- **Acquisition** : CTA `/signup?from=parts` (quota épuisé, carte résultat) → notice `auth.signup.fromPartsAiNotice` ; liens nav/footer publics ; entrée sitemap `partsAi`. La mise en avant home/tarifs (pattern #609) reste à faire.
 
 ## Hors périmètre
 

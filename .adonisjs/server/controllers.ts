@@ -70,6 +70,7 @@ export const controllers = {
   Ports: () => import('#controllers/ports_controller'),
   PricingSeasons: () => import('#controllers/pricing_seasons_controller'),
   PublicDiagnosis: () => import('#controllers/public_diagnosis_controller'),
+  PublicPartSearch: () => import('#controllers/public_part_search_controller'),
   PushSubscriptions: () => import('#controllers/push_subscriptions_controller'),
   RentalContracts: () => import('#controllers/rental_contracts_controller'),
   Reservations: () => import('#controllers/reservations_controller'),

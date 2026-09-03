@@ -1,7 +1,11 @@
 import { AiInvalidResponseError } from '#exceptions/ai_errors'
 import type { AiSuggestionLocale } from '#shared/types/ai'
 import type { EngineReferencePattern } from '#shared/types/engine_catalog'
-import type { PartSearchPhase, SparePartChatAiReply } from '#shared/types/spare_part_chat'
+import type {
+  PartSearchPhase,
+  SparePartChatAiReply,
+  SparePartChatTone,
+} from '#shared/types/spare_part_chat'
 
 /**
  * Prompts localisés du chat IA de recherche de références de pièces (#634).
@@ -34,7 +38,7 @@ Règles impératives :
 - Le code plaque figure souvent en préfixe du numéro de série — appuie-toi dessus pour départager les variantes.
 - Ne cite JAMAIS de référence de pièce détachée : ce n'est pas encore le sujet.
 - Pose le moins de questions possible.
-- Rédige "message" en français en vouvoyant l'utilisateur, quelle que soit sa langue.`,
+- {toneLine}`,
   en: `You are a marine engine identification assistant, embedded in FleetAi, a boat management application. A user is looking for a spare part reference for their {brandName} engine: before talking parts, the exact engine model must be identified from its serial number or the code on its identification plate.
 
 Serial number recorded on the engine: {serialNumber}
@@ -50,7 +54,7 @@ Mandatory rules:
 - The plate code often appears as a prefix of the serial number — rely on it to tell variants apart.
 - NEVER quote a spare part reference: that is not the topic yet.
 - Ask as few questions as possible.
-- Write "message" in English, whatever the user's language.`,
+- {toneLine}`,
 }
 
 const PART_SYSTEM_PROMPTS: Record<AiSuggestionLocale, string> = {
@@ -66,7 +70,7 @@ Règles impératives :
 - Ne cite JAMAIS de référence constructeur ni de numéro de pièce : la référence est fournie par la base de données de FleetAi, jamais par toi.
 - N'invente JAMAIS une clé absente du catalogue : en cas de doute entre deux, pose une question ; si rien ne correspond, renvoie null.
 - Pose le moins de questions possible : si la demande est claire, rends la pièce directement.
-- Rédige "message" en français en vouvoyant l'utilisateur, quelle que soit sa langue.`,
+- {toneLine}`,
   en: `You are a marine spare parts search assistant, embedded in FleetAi, a boat management application. The user owns the following engine: {engineLabel}. Your mission: understand which part they are looking for and match it to ONE entry of the catalog below.
 
 Parts catalog (key — catalog label):
@@ -79,7 +83,23 @@ Mandatory rules:
 - NEVER quote a manufacturer reference or a part number: the reference comes from the FleetAi database, never from you.
 - NEVER invent a key absent from the catalog: when hesitating between two, ask a question; when nothing matches, return null.
 - Ask as few questions as possible: when the request is clear, return the part right away.
-- Write "message" in English, whatever the user's language.`,
+- {toneLine}`,
+}
+
+/**
+ * Consigne de rédaction injectée en dernière règle : l'app connectée vouvoie
+ * (`formal`), le marketing tutoie (`informal`) — même contrat JSON partout.
+ * L'anglais n'a pas cette distinction : la ligne est identique.
+ */
+const TONE_LINES: Record<AiSuggestionLocale, Record<SparePartChatTone, string>> = {
+  fr: {
+    formal: 'Rédige "message" en français en vouvoyant l\'utilisateur, quelle que soit sa langue.',
+    informal: 'Rédige "message" en français en tutoyant l\'utilisateur, quelle que soit sa langue.',
+  },
+  en: {
+    formal: 'Write "message" in English, whatever the user\'s language.',
+    informal: 'Write "message" in English, whatever the user\'s language.',
+  },
 }
 
 interface SparePartChatLabels {
@@ -150,7 +170,8 @@ export interface PartSearchFirstMessageInput {
 
 export function buildEngineIdentificationSystemPrompt(
   locale: AiSuggestionLocale,
-  input: EngineIdentificationPromptInput
+  input: EngineIdentificationPromptInput,
+  tone: SparePartChatTone = 'formal'
 ): string {
   const l = LABELS[locale]
   const patternHint = input.referencePattern
@@ -164,15 +185,18 @@ export function buildEngineIdentificationSystemPrompt(
     .replace('{serialNumber}', input.serialNumber ?? l.unknown)
     .replace('{patternHint}\n', patternHint)
     .replace('{modelLines}', input.modelLines)
+    .replace('{toneLine}', TONE_LINES[locale][tone])
 }
 
 export function buildPartSearchSystemPrompt(
   locale: AiSuggestionLocale,
-  input: PartSearchPromptInput
+  input: PartSearchPromptInput,
+  tone: SparePartChatTone = 'formal'
 ): string {
   return PART_SYSTEM_PROMPTS[locale]
     .replace('{engineLabel}', input.engineLabel)
     .replace('{vocabularyLines}', input.vocabularyLines)
+    .replace('{toneLine}', TONE_LINES[locale][tone])
 }
 
 /**

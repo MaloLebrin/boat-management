@@ -28,6 +28,7 @@ export const MARKETING_SLUGS = {
   simulator: { en: '/maintenance-cost-simulator', fr: '/simulateur-cout-entretien' },
   guide: { en: '/boat-maintenance-cost', fr: '/cout-entretien-bateau' },
   diagnosisAi: { en: '/engine-diagnosis-ai', fr: '/diagnostic-panne-ia' },
+  partsAi: { en: '/engine-part-finder-ai', fr: '/reference-piece-moteur-ia' },
   about: { en: '/about', fr: '/a-propos' },
   contact: { en: '/contact', fr: '/contact' },
   privacy: { en: '/privacy', fr: '/confidentialite' },

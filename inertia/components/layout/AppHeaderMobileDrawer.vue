@@ -25,6 +25,8 @@ const pricingHref = computed(() => marketingPath('pricing', props.locale))
 
 const diagnosisHref = computed(() => marketingPath('diagnosisAi', props.locale))
 
+const partsAiHref = computed(() => marketingPath('partsAi', props.locale))
+
 watch(
   () => props.isOpen,
   async (open) => {
@@ -133,6 +135,13 @@ watch(
           @click="emit('close')"
         >
           {{ t('public.nav.diagnosisAi') }}
+        </Link>
+        <Link
+          :href="partsAiHref"
+          class="block rounded-(--radius-control) px-3 py-2.5 text-sm font-medium text-fg-muted transition-colors duration-(--motion-fast) hover:bg-paper hover:text-fg"
+          @click="emit('close')"
+        >
+          {{ t('public.nav.partsAi') }}
         </Link>
         <Link
           :href="guideHref"

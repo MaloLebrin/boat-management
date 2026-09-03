@@ -1,12 +1,13 @@
 import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
-import { contactThrottle, publicDiagnosisThrottle } from '#start/limiter'
+import { contactThrottle, publicDiagnosisThrottle, publicPartSearchThrottle } from '#start/limiter'
 
 const MarketingController = () => import('#controllers/marketing_controller')
 const ContactMessagesController = () => import('#controllers/contact_messages_controller')
 const SimulatorController = () => import('#controllers/simulator_controller')
 const SimulatorLeadController = () => import('#controllers/simulator_lead_controller')
 const PublicDiagnosisController = () => import('#controllers/public_diagnosis_controller')
+const PublicPartSearchController = () => import('#controllers/public_part_search_controller')
 
 router.get('/', ({ response }) => response.redirect('/en')).as('home')
 
@@ -26,6 +27,9 @@ router
     router
       .get('/engine-diagnosis-ai', [PublicDiagnosisController, 'show'])
       .as('marketing.en.diagnosisAi')
+    router
+      .get('/engine-part-finder-ai', [PublicPartSearchController, 'show'])
+      .as('marketing.en.partsAi')
     router.get('/privacy', [MarketingController, 'privacy']).as('marketing.en.privacy')
     router.get('/terms', [MarketingController, 'terms']).as('marketing.en.terms')
     router.get('/sales-terms', [MarketingController, 'salesTerms']).as('marketing.en.sales_terms')
@@ -46,6 +50,9 @@ router
     router
       .get('/diagnostic-panne-ia', [PublicDiagnosisController, 'show'])
       .as('marketing.fr.diagnosisAi')
+    router
+      .get('/reference-piece-moteur-ia', [PublicPartSearchController, 'show'])
+      .as('marketing.fr.partsAi')
     router.get('/confidentialite', [MarketingController, 'privacy']).as('marketing.fr.privacy')
     router.get('/cgu', [MarketingController, 'terms']).as('marketing.fr.terms')
     router.get('/cgv', [MarketingController, 'salesTerms']).as('marketing.fr.sales_terms')
@@ -86,6 +93,17 @@ router
   .post('/diagnosis-ai/conversations/:token/messages', [PublicDiagnosisController, 'message'])
   .as('public_diagnosis.message')
   .use(publicDiagnosisThrottle)
+
+// Chat IA public de recherche de références de pièces (#634, Phase 2) — mêmes
+// conventions : POST non localisés, throttle dédié.
+router
+  .post('/parts-ai/conversations', [PublicPartSearchController, 'start'])
+  .as('public_part_search.start')
+  .use(publicPartSearchThrottle)
+router
+  .post('/parts-ai/conversations/:token/messages', [PublicPartSearchController, 'message'])
+  .as('public_part_search.message')
+  .use(publicPartSearchThrottle)
 
 const SimulatorShareController = () => import('#controllers/simulator_share_controller')
 

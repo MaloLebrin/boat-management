@@ -353,7 +353,12 @@ Conversations du chat IA public de diagnostic de panne (#602), le tunnel d'acqui
 
 ### ai_part_search_conversations
 
-Conversations du chat IA de recherche de références de pièces par numéro de série (#634), réservé aux plans avec IA (`canUseAI`). Calquée sur `ai_diagnosis_conversations` : fil en blob JSON, pas de table de messages ; FK en `SET NULL` pour que les lignes survivent à la suppression du compte, du moteur ou du modèle — elles portent le suivi des coûts. La propriété d'une conversation se prouve par le couple (`user_id`, `boat_engine_id`).
+Conversations du chat IA de recherche de références de pièces par numéro de série (#634). Calquée sur `ai_diagnosis_conversations` : fil en blob JSON, pas de table de messages ; FK en `SET NULL` pour que les lignes survivent à la suppression du compte, du moteur ou du modèle — elles portent le suivi des coûts.
+
+La table sert **deux entrées** qui se distinguent par `boat_engine_id` :
+
+- **chat connecté** (Phase 1, `boat_engine_id` non null) : réservé aux plans avec IA (`canUseAI`), la propriété se prouve par le couple (`user_id`, `boat_engine_id`) ;
+- **chat public marketing** (Phase 2, `boat_engine_id` **null**) : ouvert aux anonymes — `user_id`/`organization_id` null, la propriété passe par la liste de tokens en session (`publicPartSearchTokens`), qui est aussi le compteur du plafond « 2 conversations à vie ». Pour un plan `starter`, le même plafond est un `count(*)` sur `organization_id` + `boat_engine_id IS NULL` : la ligne EST le compteur. Tous les accès publics filtrent `whereNull('boat_engine_id')`, dans les deux sens.
 
 - `id`
 - `token` (12 hex, unique — identifiant opaque exposé dans les routes)

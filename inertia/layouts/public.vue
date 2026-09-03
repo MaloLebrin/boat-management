@@ -25,6 +25,8 @@ const simulatorHref = computed(() => marketingPath('simulator', locale.value))
 
 const diagnosisAiHref = computed(() => marketingPath('diagnosisAi', locale.value))
 
+const partsAiHref = computed(() => marketingPath('partsAi', locale.value))
+
 const privacyHref = computed(() => marketingPath('privacy', locale.value))
 
 const termsHref = computed(() => marketingPath('terms', locale.value))
@@ -74,6 +76,9 @@ const contactHref = computed(() => marketingPath('contact', locale.value))
             }}</Link>
             <Link :href="diagnosisAiHref" class="transition-colors hover:text-fg">{{
               t('public.footer.diagnosisAi')
+            }}</Link>
+            <Link :href="partsAiHref" class="transition-colors hover:text-fg">{{
+              t('public.footer.partsAi')
             }}</Link>
           </div>
         </div>

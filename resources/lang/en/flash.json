@@ -257,6 +257,12 @@
     "conversationCompleted": "This diagnosis is complete. Start a new conversation to describe another breakdown.",
     "maxMessagesReached": "This conversation has reached its maximum size. Start a new conversation."
   },
+  "publicPartSearch": {
+    "quotaExhausted": "You have used your free part searches. Create an account to keep maintaining your boat with FleetAi.",
+    "notFound": "Conversation not found.",
+    "conversationCompleted": "This search is complete. Start a new conversation to look for another part.",
+    "maxMessagesReached": "This conversation has reached its maximum size. Start a new conversation."
+  },
   "quota": {
     "boatsExceeded": "You have reached the boat limit for your plan. Upgrade to add more boats.",
     "membersExceeded": "You have reached the member limit for your plan. Upgrade to add more members.",
