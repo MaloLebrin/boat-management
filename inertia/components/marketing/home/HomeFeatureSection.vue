@@ -1,12 +1,14 @@
 <script setup lang="ts">
+import { Link } from '@adonisjs/inertia/vue'
 import { useScrollReveal } from '~/composables/use_scroll_reveal'
 import { useTilt } from '~/composables/use_tilt'
 import HomeBrowserFrame from './HomeBrowserFrame.vue'
 import HomeMockBoatDetail from './HomeMockBoatDetail.vue'
 import HomeMockPlanning from './HomeMockPlanning.vue'
 import HomeMockFleetide from './HomeMockFleetide.vue'
-
-type MockType = 'boatDetail' | 'planning' | 'fleetide'
+import HomeMockDashboard from './HomeMockDashboard.vue'
+import HomeMockUpcomingTasks from './HomeMockUpcomingTasks.vue'
+import type { FeatureCta, FeatureMockType } from '#shared/types/marketing'
 
 interface FeatureData {
   eyebrow: string
@@ -14,11 +16,13 @@ interface FeatureData {
   titleHighlight: string
   body: string
   bullets: string[]
-  mockType: MockType
+  mockType: FeatureMockType
   isAi?: boolean
   reversed?: boolean
   bgClass?: string
   anchorId?: string
+  /** Lien d'approfondissement vers la page marketing dédiée à la fonctionnalité. */
+  cta?: FeatureCta
 }
 
 const props = defineProps<FeatureData>()
@@ -26,10 +30,12 @@ const props = defineProps<FeatureData>()
 const { el: sectionEl, isVisible } = useScrollReveal()
 const { el: tiltEl, transform: tiltTransform } = useTilt({ max: 7 })
 
-const mockComponents: Record<MockType, typeof HomeMockBoatDetail> = {
+const mockComponents: Record<FeatureMockType, typeof HomeMockBoatDetail> = {
   boatDetail: HomeMockBoatDetail,
   planning: HomeMockPlanning,
   fleetide: HomeMockFleetide,
+  dashboard: HomeMockDashboard,
+  upcomingTasks: HomeMockUpcomingTasks,
 }
 </script>
 
@@ -81,6 +87,17 @@ const mockComponents: Record<MockType, typeof HomeMockBoatDetail> = {
               <span>{{ bullet }}</span>
             </li>
           </ul>
+          <Link
+            v-if="cta"
+            :href="cta.href"
+            class="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold"
+            :class="
+              isAi ? 'text-violet-700 hover:text-violet-800' : 'text-coral-600 hover:text-coral-700'
+            "
+          >
+            {{ cta.label }}
+            <span aria-hidden="true">→</span>
+          </Link>
         </div>
 
         <!-- Mock — carte 3D inclinable au survol -->
@@ -91,7 +108,12 @@ const mockComponents: Record<MockType, typeof HomeMockBoatDetail> = {
           :style="{ transform: tiltTransform }"
         >
           <HomeBrowserFrame>
-            <component :is="mockComponents[mockType]" />
+            <!-- upcomingTasks est un panneau à défilement infini (flex-1) conçu
+                 pour vivre dans le dashboard : hors de lui, il faut le borner. -->
+            <div v-if="mockType === 'upcomingTasks'" class="flex h-80 flex-col bg-cream p-4">
+              <component :is="mockComponents[mockType]" />
+            </div>
+            <component :is="mockComponents[mockType]" v-else />
           </HomeBrowserFrame>
         </div>
       </div>

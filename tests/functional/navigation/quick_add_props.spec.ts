@@ -1,11 +1,11 @@
 import { PortFactory } from '#database/factories/port_factory'
 import { UserFactory } from '#database/factories/user_factory'
 import { createAdminUser } from '#tests/functional/helpers'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { test } from '@japa/runner'
 
 test.group('Navigation & dashboard quick-add props (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('GET /navigation/logbook exposes portOptions and canCreateNavigationLogs for an org member', async ({
     client,

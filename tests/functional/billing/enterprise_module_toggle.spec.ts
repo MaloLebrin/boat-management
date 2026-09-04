@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import OrganizationModuleService from '#services/organization_module_service'
 import OrganizationMembership from '#models/organization_membership'
 import { UserFactory } from '#database/factories/user_factory'
@@ -23,7 +23,7 @@ async function createAdminOnPlan(plan: 'starter' | 'pro' | 'enterprise') {
 }
 
 test.group('Enterprise module toggle (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('an Enterprise admin can deactivate a granted module', async ({ client }) => {
     const user = await createAdminOnPlan('enterprise')

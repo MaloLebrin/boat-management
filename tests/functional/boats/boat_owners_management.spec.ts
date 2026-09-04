@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { BoatFactory } from '#database/factories/boat_factory'
 import {
   createAdminUser,
@@ -9,7 +9,7 @@ import {
 } from '#tests/functional/helpers'
 
 test.group('Boat co-ownership management (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('admin attaches a boat_owner user to a boat', async ({ client, assert }) => {
     const admin = await createAdminUser()

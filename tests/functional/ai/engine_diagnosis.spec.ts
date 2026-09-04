@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import app from '@adonisjs/core/services/app'
 import { DateTime } from 'luxon'
 import AiAnalysis from '#models/ai_analysis'
@@ -66,7 +66,7 @@ async function makeSaildriveSetup() {
 }
 
 test.group('AI engine diagnosis — engineDiagnosis (functional, #516)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
   group.each.teardown(() => {
     app.container.restore(AiService)
   })

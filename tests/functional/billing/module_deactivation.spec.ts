@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import app from '@adonisjs/core/services/app'
 import emitter from '@adonisjs/core/services/emitter'
 import StripeService from '#services/stripe_service'
@@ -44,7 +44,7 @@ function makeService() {
 }
 
 test.group('Module deactivation — event dispatch (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('removing a subscription module dispatches OrganizationModuleDeactivated', async ({
     assert,
@@ -86,7 +86,7 @@ test.group('Module deactivation — event dispatch (functional)', (group) => {
 })
 
 test.group('Module deactivation — listener (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('notifies every admin and enqueues an email', async ({ assert, cleanup }) => {
     const enqueued: Array<{ module: string; to: string }> = []

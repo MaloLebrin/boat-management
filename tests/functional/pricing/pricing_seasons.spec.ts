@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { UserFactory } from '#database/factories/user_factory'
 import OrganizationMembership from '#models/organization_membership'
@@ -21,7 +21,7 @@ async function createEnterpriseAdminUser() {
 }
 
 test.group('Pricing seasons (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('creates a global season with a multiplier', async ({ client, assert }) => {
     const user = await createEnterpriseAdminUser()

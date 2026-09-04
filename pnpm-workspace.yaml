@@ -2,3 +2,5 @@ allowBuilds:
   '@swc/core': true
   better-sqlite3: true
   esbuild: true
+patchedDependencies:
+  jsonschema@1.5.0: patches/jsonschema@1.5.0.patch

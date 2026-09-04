@@ -22,6 +22,8 @@ const props = defineProps<{
   caption: string
   socialProof: { eyebrow: string; logos: string[] }
   locale: 'en' | 'fr'
+  /** Cible du CTA secondaire ; à défaut, ancre historique #demo (même page). */
+  secondaryHref?: string
 }>()
 
 // `armateurs` n'a pas de contenu hero dédié → repli sur `loueurs` (évite un
@@ -67,7 +69,17 @@ const { el: tiltEl, transform: tiltTransform } = useTilt({ max: 6, parallax: 0.6
               {{ cta.primary }}
             </BaseButton>
           </Link>
-          <a href="#demo">
+          <!-- Sans `secondaryHref`, comportement historique : ancre #demo (même page). -->
+          <Link v-if="secondaryHref" :href="secondaryHref">
+            <BaseButton
+              size="lg"
+              variant="outline"
+              class="border-white/30! text-white! hover:bg-white/10!"
+            >
+              {{ cta.secondary }}
+            </BaseButton>
+          </Link>
+          <a v-else href="#demo">
             <BaseButton
               size="lg"
               variant="outline"

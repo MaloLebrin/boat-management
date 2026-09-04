@@ -4,11 +4,20 @@
     "pricing": "Tarifs",
     "diagnosisAi": "Diagnostic IA",
     "partsAi": "Pièces IA",
-    "guide": "Guide entretien"
+    "guide": "Guide entretien",
+    "product": "Produit",
+    "productFeaturesGroup": "Fonctionnalités",
+    "productToolsGroup": "Outils gratuits",
+    "maintenance": "Carnet d'entretien",
+    "fleet": "Planning & flotte",
+    "aiAssistant": "Assistant IA",
+    "simulator": "Simulateur de coût",
+    "help": "Aide"
   },
   "actions": {
     "login": "Connexion",
-    "tryFree": "Essayer gratuitement"
+    "tryFree": "Essayer gratuitement",
+    "learnMore": "En savoir plus"
   },
   "footer": {
     "tagline": "La maintenance maritime, sans douleur.",
@@ -27,6 +36,11 @@
     "terms": "CGU",
     "salesTerms": "CGV",
     "legalNotice": "Mentions légales",
-    "bilingual": "Bilingue FR/EN · Hébergé en UE"
+    "bilingual": "Bilingue FR/EN · Hébergé en UE",
+    "resources": "Ressources",
+    "maintenance": "Carnet d'entretien",
+    "fleet": "Planning & flotte",
+    "aiAssistant": "Assistant IA",
+    "help": "Aide & support"
   }
 }

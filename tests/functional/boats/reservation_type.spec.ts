@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { BoatReservationFactory } from '#database/factories/boat_reservation_factory'
 import { createCharterAdminUser } from '#tests/functional/helpers'
@@ -15,7 +15,7 @@ const VALID_RESERVATION = {
 
 /** Type de prestation d'une réservation (#585). */
 test.group('Reservation type (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('POST enregistre chacun des types de prestation', async ({ client, assert }) => {
     const user = await createCharterAdminUser()

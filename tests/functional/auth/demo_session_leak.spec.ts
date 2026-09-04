@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { createAdminUser } from '#tests/functional/helpers'
 import { UserFactory } from '#database/factories/user_factory'
 
@@ -16,7 +16,7 @@ import { UserFactory } from '#database/factories/user_factory'
  * non-partage de la prop pour un utilisateur non-démo.
  */
 test.group('Demo session leak (#451)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('a real user never receives the demo banner props, even with a stale session key', async ({
     client,

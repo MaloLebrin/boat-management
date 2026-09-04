@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { createAdminUser } from '#tests/functional/helpers'
 
 const AI_CUSTOMIZATION_FLASH =
@@ -18,7 +18,7 @@ const AI_CUSTOMIZATION_FLASH =
  * dès que le client suit la redirection.
  */
 test.group('Plan-gated settings sections (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('AI customisation redirects a Pro org to billing with an explicit flash', async ({
     client,

@@ -1,9 +1,9 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { UserFactory } from '#database/factories/user_factory'
 
 test.group('Theme preference (#416)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('PUT /settings/theme persists the preference and sets the cookie', async ({
     client,
@@ -77,7 +77,7 @@ test.group('Theme preference (#416)', (group) => {
 })
 
 test.group('Theme resolution in the rendered page (#416)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('an explicit preference is written on <html> server-side', async ({ client, assert }) => {
     const response = await client.get('/login').cookie('theme', 'dark')

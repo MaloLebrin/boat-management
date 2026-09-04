@@ -1,3 +1,12 @@
+<!--
+  SECTION RETIRÉE DE L'AFFICHAGE — refonte marketing 2026-09 (home resserrée à 10 sections).
+  Rôle d'origine : grille sécurité & conformité (hébergement UE, chiffrement, RGPD…) — repris par la FAQ de la page /aide.
+  Ce composant n'est plus monté nulle part, mais il est conservé volontairement
+  (décision propriétaire : aucun composant supprimé, même après merge). NE PAS SUPPRIMER.
+  Réactivation : décommenter son import et son bloc dans inertia/pages/marketing/home.vue ;
+  ses props sont toujours construites par buildHomePageData
+  (app/controllers/marketing_controller.ts), aucune reprise backend nécessaire.
+-->
 <script setup lang="ts">
 import { useScrollReveal } from '~/composables/use_scroll_reveal'
 

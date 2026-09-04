@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import Port from '#models/port'
 import Pontoon from '#models/pontoon'
 import { PortFactory } from '#database/factories/port_factory'
@@ -18,7 +18,7 @@ import {
  * groupe de routes `/ports/*` au plan Starter.
  */
 test.group('Ports — garde de plan (#604)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('GET /ports redirige un plan Starter vers la facturation', async ({ client }) => {
     const user = await createStarterPlanUser()

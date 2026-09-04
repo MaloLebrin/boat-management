@@ -1,9 +1,9 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { createAdminUser } from '#tests/functional/helpers'
 
 test.group('Auth login (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('redirects to /dashboard on valid credentials', async ({ client }) => {
     const user = await createAdminUser()

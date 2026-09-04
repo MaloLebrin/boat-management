@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import app from '@adonisjs/core/services/app'
 import mail from '@adonisjs/mail/services/main'
 import i18nManager from '@adonisjs/i18n/services/main'
@@ -50,7 +50,7 @@ function swapFakeCloudinaryUpload() {
 }
 
 test.group('Rental contracts (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
   group.each.setup(() => {
     mail.fake()
   })

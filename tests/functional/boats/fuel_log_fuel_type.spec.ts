@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { BoatEngineFactory } from '#database/factories/boat_engine_factory'
 import { BoatFuelLogFactory } from '#database/factories/boat_fuel_log_factory'
@@ -8,7 +8,7 @@ import BoatFuelLog from '#models/boat_fuel_log'
 
 /** Carburant du plein (#585). */
 test.group('Fuel log fuel type (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('POST enregistre le carburant fourni', async ({ client, assert }) => {
     const user = await createAdminUser()

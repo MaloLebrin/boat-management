@@ -1,12 +1,12 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import OrganizationMembership from '#models/organization_membership'
 import { UserFactory } from '#database/factories/user_factory'
 import { OrganizationMembershipFactory } from '#database/factories/organization_membership_factory'
 import { createAdminUser } from '#tests/functional/helpers'
 
 test.group('Organization members (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('GET /organization/members returns 200 for admin user', async ({ client }) => {
     const user = await createAdminUser()

@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { BoatEngineFactory } from '#database/factories/boat_engine_factory'
 import { createAdminUser, createBoatOwnerUser } from '#tests/functional/helpers'
@@ -13,7 +13,7 @@ type IndexProps = {
 }
 
 test.group('Engines index (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('GET /engines requires authentication', async ({ client }) => {
     const response = await client.get('/engines').redirects(0)

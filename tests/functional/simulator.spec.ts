@@ -1,5 +1,5 @@
 import SimulatorLead from '#models/simulator_lead'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import mail from '@adonisjs/mail/services/main'
 import { test } from '@japa/runner'
 
@@ -16,7 +16,7 @@ const validPayload = {
 }
 
 test.group('Simulator lead (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
   group.each.setup(() => {
     mail.fake()
   })

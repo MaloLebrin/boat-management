@@ -3,12 +3,12 @@ import { NavigationLogEntryFactory } from '#database/factories/navigation_log_en
 import { NavigationLogFactory } from '#database/factories/navigation_log_factory'
 import NavigationLogEntry from '#models/navigation_log_entry'
 import { createAdminUser, createMemberUser, createBoatOwnerUser } from '#tests/functional/helpers'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { test } from '@japa/runner'
 import { DateTime } from 'luxon'
 
 test.group('Navigation log entries (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   // ─── store ───────────────────────────────────────────────────────────────
 

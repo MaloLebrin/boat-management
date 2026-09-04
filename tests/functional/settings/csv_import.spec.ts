@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { UserFactory } from '#database/factories/user_factory'
 
@@ -13,7 +13,7 @@ const INVALID_ROW_CSV = `date;title;subject;notes;engine_caption;sail_caption;co
 `
 
 test.group('CSV import preview (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('POST /settings/import/preview redirige vers /settings/import pour un plan starter', async ({
     client,

@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import app from '@adonisjs/core/services/app'
 import { DateTime } from 'luxon'
 import AiDiagnosisConversation from '#models/ai_diagnosis_conversation'
@@ -44,7 +44,7 @@ function startForm(message = 'Engine starts then stalls after 30 seconds') {
 }
 
 test.group('Public AI diagnosis chat (functional, #602)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
   group.each.teardown(() => {
     app.container.restore(AiService)
   })

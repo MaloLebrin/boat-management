@@ -8,7 +8,7 @@ import {
   updateBoatEngineValidator,
 } from '#validators/boat_equipment'
 import app from '@adonisjs/core/services/app'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import db from '@adonisjs/lucid/services/db'
 import { test } from '@japa/runner'
 
@@ -100,7 +100,7 @@ async function seedBrands() {
 }
 
 test.group('EngineCatalogService — listBrands', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('priorise la famille choisie sans jamais s’y limiter', async ({ assert }) => {
     await seedBrands()
@@ -169,7 +169,7 @@ test.group('EngineCatalogService — listBrands', (group) => {
 })
 
 test.group('EngineCatalogService — listModels', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('renvoie les modèles de la marque, triés par nom, avec de quoi pré-remplir', async ({
     assert,
@@ -201,7 +201,7 @@ test.group('EngineCatalogService — listModels', (group) => {
 })
 
 test.group('EngineCatalogService — resolveBrand', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('rapproche les orthographes réellement rencontrées', async ({ assert }) => {
     await seedBrands()
@@ -254,7 +254,7 @@ test.group('EngineCatalogService — resolveBrand', (group) => {
 })
 
 test.group('EngineCatalogService — formProps', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('charge les modèles de la marque demandée par le rechargement partiel', async ({
     assert,
@@ -332,7 +332,7 @@ test.group('Validators moteur — rattachement au catalogue', () => {
 })
 
 test.group('EngineCatalogSeeder — idempotence', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('rejoué deux fois, ne crée ni doublon ni suppression', async ({ assert }) => {
     const seeder = new EngineCatalogSeeder(db.connection())

@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import app from '@adonisjs/core/services/app'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { BoatDocumentFactory } from '#database/factories/boat_document_factory'
@@ -11,7 +11,7 @@ import Media from '#models/media'
 import { CloudinaryService } from '#services/cloudinary_service'
 
 test.group('Boat Documents — DELETE (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('DELETE /boats/:boatId/admin-documents/:documentId supprime le document sans media', async ({
     client,

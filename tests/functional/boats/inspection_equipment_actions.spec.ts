@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { BoatReservationFactory } from '#database/factories/boat_reservation_factory'
 import { createCharterAdminUser, createMemberUser } from '#tests/functional/helpers'
@@ -29,7 +29,7 @@ function actionsUrl(boatId: number, reservationId: number, inspectionId: number)
 }
 
 test.group('Inspection → equipment actions (#311)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('creates an action linked to the inspection, boat_id deduced', async ({
     client,

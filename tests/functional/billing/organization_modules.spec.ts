@@ -1,11 +1,11 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import OrganizationModule from '#models/organization_module'
 import OrganizationModuleService from '#services/organization_module_service'
 import { OrganizationFactory } from '#database/factories/organization_factory'
 
 test.group('OrganizationModuleService', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('an organization has no active module by default', async ({ assert }) => {
     const org = await OrganizationFactory.create()

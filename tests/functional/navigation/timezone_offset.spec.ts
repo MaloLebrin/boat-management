@@ -2,7 +2,7 @@ import { BoatFactory } from '#database/factories/boat_factory'
 import NavigationLog from '#models/navigation_log'
 import BoatReservation from '#models/boat_reservation'
 import { createAdminUser, createCharterAdminUser } from '#tests/functional/helpers'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { test } from '@japa/runner'
 
 /**
@@ -12,7 +12,7 @@ import { test } from '@japa/runner'
  * came back as 01:19 the next day).
  */
 test.group('Timezone offset on datetime-local submissions (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('POST navigation-logs stores the instant meant by a UTC+10 browser', async ({
     client,

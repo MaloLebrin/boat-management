@@ -1,3 +1,12 @@
+<!--
+  SECTION RETIRÉE DE L'AFFICHAGE — refonte marketing 2026-09 (home resserrée à 10 sections).
+  Rôle d'origine : demande de démo (ancre #demo, ciblée par les CTA secondaires du hero et du CTA final) + accès à la démo publique.
+  Ce composant n'est plus monté nulle part, mais il est conservé volontairement
+  (décision propriétaire : aucun composant supprimé, même après merge). NE PAS SUPPRIMER.
+  Réactivation : décommenter son import et son bloc dans inertia/pages/marketing/home.vue ;
+  ses props sont toujours construites par buildHomePageData
+  (app/controllers/marketing_controller.ts), aucune reprise backend nécessaire.
+-->
 <script setup lang="ts">
 import { CheckCircleIcon, CalendarDaysIcon, PlayCircleIcon } from '@heroicons/vue/24/outline'
 import { useForm } from '@inertiajs/vue3'

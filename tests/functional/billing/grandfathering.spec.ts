@@ -1,12 +1,12 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import OrganizationModule from '#models/organization_module'
 import OrganizationModuleService from '#services/organization_module_service'
 import { PLAN_MODULES } from '#shared/types/plan'
 import { OrganizationFactory } from '#database/factories/organization_factory'
 
 test.group('Grandfathering — grant modules to Enterprise orgs (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('grants every module as granted to each Enterprise organization', async ({ assert }) => {
     const ent1 = await OrganizationFactory.merge({ plan: 'enterprise' }).create()

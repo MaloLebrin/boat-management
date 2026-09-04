@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import app from '@adonisjs/core/services/app'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { BoatEngineFactory } from '#database/factories/boat_engine_factory'
@@ -50,7 +50,7 @@ function swapFakeCloudinary() {
 }
 
 test.group('Boat Media — DELETE (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('DELETE /boats/:boatId/media/:mediaId supprime le media du bateau', async ({
     client,
@@ -226,7 +226,7 @@ test.group('Boat Media — DELETE (functional)', (group) => {
 })
 
 test.group('Boat Media — POST photos (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('POST /boats/:boatId/photos attaches a single photo', async ({ client, assert }) => {
     const fake = swapFakeCloudinary()
@@ -308,7 +308,7 @@ test.group('Boat Media — POST photos (functional)', (group) => {
 })
 
 test.group('Boat Media — POST documents (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('POST /boats/:boatId/documents attaches multiple documents in one request', async ({
     client,

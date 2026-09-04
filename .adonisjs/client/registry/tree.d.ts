@@ -157,6 +157,10 @@ export interface ApiDefinition {
         store: typeof routes['boats.reservations.inspections.store']
         update: typeof routes['boats.reservations.inspections.update']
         destroy: typeof routes['boats.reservations.inspections.destroy']
+        items: {
+          set: typeof routes['boats.reservations.inspections.items.set']
+          destroy: typeof routes['boats.reservations.inspections.items.destroy']
+        }
         equipmentActions: {
           store: typeof routes['boats.reservations.inspections.equipmentActions.store']
           destroy: typeof routes['boats.reservations.inspections.equipmentActions.destroy']
@@ -340,17 +344,6 @@ export interface ApiDefinition {
     }
     reset: typeof routes['diagnostic.reset']
   }
-  spareParts: {
-    index: typeof routes['spareParts.index']
-    identify: typeof routes['spareParts.identify']
-    assembly: typeof routes['spareParts.assembly']
-    cart: {
-      add: typeof routes['spareParts.cart.add']
-      update: typeof routes['spareParts.cart.update']
-      remove: typeof routes['spareParts.cart.remove']
-      export: typeof routes['spareParts.cart.export']
-    }
-  }
   organization: {
     members: {
       index: typeof routes['organization.members.index']
@@ -468,9 +461,14 @@ export interface ApiDefinition {
       home: typeof routes['marketing.en.home']
       pricing: typeof routes['marketing.en.pricing']
       pricingLegacy: typeof routes['marketing.en.pricing_legacy']
+      maintenance: typeof routes['marketing.en.maintenance']
+      fleet: typeof routes['marketing.en.fleet']
+      aiAssistant: typeof routes['marketing.en.aiAssistant']
       simulator: typeof routes['marketing.en.simulator']
       guide: typeof routes['marketing.en.guide']
       diagnosisAi: typeof routes['marketing.en.diagnosisAi']
+      partsAi: typeof routes['marketing.en.partsAi']
+      help: typeof routes['marketing.en.help']
       privacy: typeof routes['marketing.en.privacy']
       terms: typeof routes['marketing.en.terms']
       salesTerms: typeof routes['marketing.en.sales_terms']
@@ -481,9 +479,14 @@ export interface ApiDefinition {
     fr: {
       home: typeof routes['marketing.fr.home']
       pricing: typeof routes['marketing.fr.pricing']
+      maintenance: typeof routes['marketing.fr.maintenance']
+      fleet: typeof routes['marketing.fr.fleet']
+      aiAssistant: typeof routes['marketing.fr.aiAssistant']
       simulator: typeof routes['marketing.fr.simulator']
       guide: typeof routes['marketing.fr.guide']
       diagnosisAi: typeof routes['marketing.fr.diagnosisAi']
+      partsAi: typeof routes['marketing.fr.partsAi']
+      help: typeof routes['marketing.fr.help']
       privacy: typeof routes['marketing.fr.privacy']
       terms: typeof routes['marketing.fr.terms']
       salesTerms: typeof routes['marketing.fr.sales_terms']
@@ -510,6 +513,26 @@ export interface ApiDefinition {
   publicDiagnosis: {
     start: typeof routes['public_diagnosis.start']
     message: typeof routes['public_diagnosis.message']
+  }
+  publicPartSearch: {
+    start: typeof routes['public_part_search.start']
+    message: typeof routes['public_part_search.message']
+  }
+  spareParts: {
+    index: typeof routes['spareParts.index']
+    identify: typeof routes['spareParts.identify']
+    assembly: typeof routes['spareParts.assembly']
+    chat: {
+      show: typeof routes['spareParts.chat.show']
+      start: typeof routes['spareParts.chat.start']
+      message: typeof routes['spareParts.chat.message']
+    }
+    cart: {
+      add: typeof routes['spareParts.cart.add']
+      update: typeof routes['spareParts.cart.update']
+      remove: typeof routes['spareParts.cart.remove']
+      export: typeof routes['spareParts.cart.export']
+    }
   }
   demo: {
     login: typeof routes['demo.login']

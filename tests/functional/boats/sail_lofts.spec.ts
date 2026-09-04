@@ -10,7 +10,7 @@ import {
 } from '#validators/boat_equipment'
 import { createAdminUser } from '#tests/functional/helpers'
 import app from '@adonisjs/core/services/app'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import db from '@adonisjs/lucid/services/db'
 import { test } from '@japa/runner'
 
@@ -61,7 +61,7 @@ async function seedLofts() {
 }
 
 test.group('SailLoftService — listLofts', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('trie par nom et exclut les voileries inactives', async ({ assert }) => {
     await seedLofts()
@@ -106,7 +106,7 @@ test.group('SailLoftService — listLofts', (group) => {
 })
 
 test.group('SailLoftService — resolveLoft', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('rapproche les orthographes réellement rencontrées', async ({ assert }) => {
     await seedLofts()
@@ -154,7 +154,7 @@ test.group('SailLoftService — resolveLoft', (group) => {
 })
 
 test.group('SailLoftService — formProps', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('réémet le rattachement déjà posé sur la voile', async ({ assert }) => {
     const { north } = await seedLofts()
@@ -251,7 +251,7 @@ test.group('Validators voile — matériau et voilerie (#578)', () => {
 })
 
 test.group('Voiles — persistance voilerie et rattachement (#578)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('POST persiste voilerie, rattachement, matériau et notes', async ({ client, assert }) => {
     const { incidence } = await seedLofts()
@@ -346,7 +346,7 @@ test.group('Voiles — persistance voilerie et rattachement (#578)', (group) => 
 })
 
 test.group('SailLoftSeeder — idempotence (#578)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('rejoué deux fois, ne crée ni doublon ni suppression', async ({ assert }) => {
     const seeder = new SailLoftSeeder(db.connection())

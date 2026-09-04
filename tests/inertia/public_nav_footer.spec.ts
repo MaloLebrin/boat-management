@@ -65,9 +65,18 @@ test('le footer public renvoie vers les mentions légales et les CGV', () => {
   expect(w.findAll('a[href="/fr/cgv"]').length).toBe(1)
 })
 
+// Depuis la refonte marketing 2026-09, les liens produit du header desktop
+// vivent dans le dropdown « Produit » : on l'ouvre avant d'asserter.
+async function mountHeaderWithOpenProductMenu() {
+  const w = mount(AppHeader, { global: { stubs } })
+  await w.find('button[aria-haspopup="true"]').trigger('click')
+  return w
+}
+
 // #609 — la page publique de diagnostic IA n'était reliée au site que par le
 // footer. C'est notre meilleur argument d'entrée : elle doit être atteignable
-// depuis la nav principale, desktop comme mobile.
+// depuis la nav principale, desktop comme mobile — en lien direct, sans
+// passer par le dropdown « Produit » (outil d'acquisition).
 test('la nav publique du header renvoie vers le diagnostic de panne IA', () => {
   const w = mount(AppHeader, { global: { stubs } })
 
@@ -77,7 +86,7 @@ test('la nav publique du header renvoie vers le diagnostic de panne IA', () => {
 
 test('le drawer mobile renvoie vers le diagnostic de panne IA', () => {
   const w = mount(AppHeaderMobileDrawer, {
-    props: { isOpen: true, locale: 'fr', guideHref: '/fr/cout-entretien-bateau', isAuthed: false },
+    props: { isOpen: true, locale: 'fr', isAuthed: false },
     global: { stubs },
   })
 
@@ -94,7 +103,7 @@ test('la nav publique renvoie vers la recherche de pièces IA (header, drawer, f
   expect(header.findAll('a[href="/fr/reference-piece-moteur-ia"]').length).toBe(1)
 
   const drawer = mount(AppHeaderMobileDrawer, {
-    props: { isOpen: true, locale: 'fr', guideHref: '/fr/cout-entretien-bateau', isAuthed: false },
+    props: { isOpen: true, locale: 'fr', isAuthed: false },
     global: { stubs },
   })
   expect(drawer.html()).toContain('public.nav.partsAi')
@@ -105,4 +114,65 @@ test('la nav publique renvoie vers la recherche de pièces IA (header, drawer, f
   })
   expect(footer.html()).toContain('public.footer.partsAi')
   expect(footer.findAll('a[href="/fr/reference-piece-moteur-ia"]').length).toBe(1)
+})
+
+// Refonte marketing 2026-09 — les pages fonctionnalité (carnet d'entretien,
+// flotte, assistant IA), le simulateur et l'aide doivent être atteignables
+// depuis le header (dropdown Produit + liens directs), le drawer et le footer.
+const FEATURE_HREFS = [
+  '/fr/carnet-entretien-bateau',
+  '/fr/gestion-flotte-bateaux',
+  '/fr/assistant-ia-bateau',
+]
+
+// Les outils gratuits sont des tunnels d'acquisition : liens directs du
+// header, visibles sans ouvrir le dropdown « Produit ».
+const TOOL_HREFS = [
+  '/fr/simulateur-cout-entretien',
+  '/fr/diagnostic-panne-ia',
+  '/fr/reference-piece-moteur-ia',
+]
+
+test('le menu Produit du header renvoie vers les pages fonctionnalité', async () => {
+  const w = await mountHeaderWithOpenProductMenu()
+
+  for (const href of FEATURE_HREFS) {
+    expect(w.findAll(`a[href="${href}"]`).length).toBe(1)
+  }
+  expect(w.findAll('a[href="/fr/aide"]').length).toBe(1)
+})
+
+test('les outils gratuits sont des liens directs du header, hors dropdown', () => {
+  const w = mount(AppHeader, { global: { stubs } })
+
+  for (const href of TOOL_HREFS) {
+    expect(w.findAll(`a[href="${href}"]`).length).toBe(1)
+  }
+})
+
+test('le drawer mobile renvoie vers les pages fonctionnalité, les outils gratuits et l’aide', () => {
+  const w = mount(AppHeaderMobileDrawer, {
+    props: { isOpen: true, locale: 'fr', isAuthed: false },
+    global: { stubs },
+  })
+
+  for (const href of [...FEATURE_HREFS, ...TOOL_HREFS, '/fr/aide']) {
+    expect(w.findAll(`a[href="${href}"]`).length).toBe(1)
+  }
+})
+
+test('le footer public renvoie vers les pages fonctionnalité et l’aide', () => {
+  const w = mount(PublicLayout, {
+    global: { stubs: { ...stubs, AppHeader: { template: '<div />' } } },
+  })
+
+  expect(w.html()).toContain('public.footer.resources')
+  for (const href of [
+    '/fr/carnet-entretien-bateau',
+    '/fr/gestion-flotte-bateaux',
+    '/fr/assistant-ia-bateau',
+    '/fr/aide',
+  ]) {
+    expect(w.findAll(`a[href="${href}"]`).length).toBe(1)
+  }
 })

@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { UserFactory } from '#database/factories/user_factory'
 import { DEMO_EMAIL, DEMO_SESSION_DURATION_MS } from '#shared/constants/demo'
 
@@ -14,7 +14,7 @@ import { DEMO_EMAIL, DEMO_SESSION_DURATION_MS } from '#shared/constants/demo'
  * d'être redirigé vers la connexion avec le flash « session expirée ».
  */
 test.group('Demo session expiry (#478)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   async function createDemoUser() {
     return UserFactory.merge({ email: DEMO_EMAIL })

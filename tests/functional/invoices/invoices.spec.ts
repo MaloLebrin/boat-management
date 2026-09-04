@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { UserFactory } from '#database/factories/user_factory'
 import { BoatFactory } from '#database/factories/boat_factory'
 import OrganizationMembership from '#models/organization_membership'
@@ -41,7 +41,7 @@ function invoiceForm(overrides: Record<string, unknown> = {}) {
 }
 
 test.group('Invoices (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('store creates an invoice with lines and server-computed totals', async ({
     client,

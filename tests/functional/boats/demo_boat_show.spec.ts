@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import Boat from '#models/boat'
 import User from '#models/user'
 import { seedDemoData } from '#database/seeders/sandbox_seeder'
@@ -19,7 +19,7 @@ import { DEMO_EMAIL, DEMO_ORG_SLUG } from '#shared/constants/demo'
  * en complément des tests unitaires du correctif dans `boats.spec.ts`.
  */
 test.group('Demo boat show (#478)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   const MAINTENANCE_PROPS = [
     'maintenanceEvents',

@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { DateTime } from 'luxon'
 import BoatSafetyEquipment from '#models/boat_safety_equipment'
 import { BoatFactory } from '#database/factories/boat_factory'
@@ -14,7 +14,7 @@ import type { SafetyComplianceReport } from '#shared/types/safety'
  * contaminer, et une zone vide ne déclenche aucun contrôle.
  */
 test.group('Boat armament zone (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('PUT enregistre une zone du vocabulaire', async ({ client, assert }) => {
     const user = await createAdminUser()

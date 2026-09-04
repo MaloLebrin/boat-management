@@ -1,3 +1,12 @@
+<!--
+  COMPOSANT NON UTILISÉ — retiré de la home antérieurement à la refonte marketing 2026-09.
+  Rôle d'origine : galerie de captures d'écran produit d'une ancienne itération de la home.
+  Ce composant n'est monté nulle part, mais il est conservé volontairement
+  (décision propriétaire : aucun composant supprimé, même après merge). NE PAS SUPPRIMER.
+  Réactivation : recréer son import et son bloc dans inertia/pages/marketing/home.vue ;
+  ses props ne sont pas (ou plus) servies par buildHomePageData
+  (app/controllers/marketing_controller.ts) — à rebrancher côté contrôleur.
+-->
 <script setup lang="ts">
 import { ref } from 'vue'
 import {

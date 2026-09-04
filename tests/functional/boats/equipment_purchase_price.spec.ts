@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { BoatEngineFactory } from '#database/factories/boat_engine_factory'
 import { createAdminUser } from '#tests/functional/helpers'
@@ -8,7 +8,7 @@ import BoatGenericEquipment from '#models/boat_generic_equipment'
 import BoatEnginePart from '#models/boat_engine_part'
 
 test.group('Equipment purchasePrice validation (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('POST safety-equipment rejects a negative purchasePrice', async ({ client, assert }) => {
     const user = await createAdminUser()

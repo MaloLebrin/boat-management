@@ -13,7 +13,7 @@ import type User from '#models/user'
 import { CloudinaryService } from '#services/cloudinary_service'
 import type { MediaEntityType } from '#shared/constants/media'
 import app from '@adonisjs/core/services/app'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { test } from '@japa/runner'
 
 async function createEnterpriseAdminUser() {
@@ -151,7 +151,7 @@ const CASES: EquipmentCase[] = [
 ]
 
 test.group('Equipment photos — upload (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   for (const c of CASES) {
     test(`POST attaches a photo to the ${c.name}`, async ({ client, assert }) => {
@@ -318,7 +318,7 @@ test.group('Equipment photos — upload (functional)', (group) => {
 })
 
 test.group('Equipment photos — delete (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   for (const c of CASES) {
     test(`DELETE removes the ${c.name} photo and purges Cloudinary`, async ({ client, assert }) => {
@@ -358,7 +358,7 @@ test.group('Equipment photos — delete (functional)', (group) => {
 })
 
 test.group('Equipment photos — IDOR (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('engine of another boat is rejected', async ({ client, assert }) => {
     const fake = swapFakeCloudinary()
@@ -575,7 +575,7 @@ test.group('Equipment photos — IDOR (functional)', (group) => {
 })
 
 test.group('Equipment photos — cleanup on delete (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('deleting a sail purges its photos', async ({ client, assert }) => {
     const fake = swapFakeCloudinary()

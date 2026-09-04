@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import BoatMaintenanceEvent from '#models/boat_maintenance_event'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { createAdminUser, createMechanicUser } from '#tests/functional/helpers'
@@ -11,7 +11,7 @@ import { createAdminUser, createMechanicUser } from '#tests/functional/helpers'
  * comportements Bouncer conservés (formulaires, JSON) ne régressent pas.
  */
 test.group('403 — page d’erreur habillée (functional, #458)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('GET /boats en rôle mécanicien rend la page Inertia errors/forbidden', async ({
     client,

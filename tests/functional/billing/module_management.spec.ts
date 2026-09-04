@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import app from '@adonisjs/core/services/app'
 import Stripe from 'stripe'
 import { DateTime } from 'luxon'
@@ -37,7 +37,7 @@ async function seedActiveSubscription(organizationId: number) {
 }
 
 test.group('Billing module management (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('the billing page exposes the active modules with their source', async ({ client }) => {
     const user = await createAdminUser() // Pro

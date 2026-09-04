@@ -1,3 +1,12 @@
+<!--
+  SECTION RETIRÉE DE L'AFFICHAGE — refonte marketing 2026-09 (home resserrée à 10 sections).
+  Rôle d'origine : onglets personas (loueurs / écoles / marinas / armateurs) qui pilotaient le hero via l'événement persona-change (réactiver aussi handlePersonaChange dans home.vue).
+  Ce composant n'est plus monté nulle part, mais il est conservé volontairement
+  (décision propriétaire : aucun composant supprimé, même après merge). NE PAS SUPPRIMER.
+  Réactivation : décommenter son import et son bloc dans inertia/pages/marketing/home.vue ;
+  ses props sont toujours construites par buildHomePageData
+  (app/controllers/marketing_controller.ts), aucune reprise backend nécessaire.
+-->
 <script setup lang="ts">
 import { Link } from '@adonisjs/inertia/vue'
 import { ref, computed } from 'vue'

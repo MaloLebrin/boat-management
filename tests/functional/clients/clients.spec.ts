@@ -2,7 +2,7 @@ import { UserFactory } from '#database/factories/user_factory'
 import Client from '#models/client'
 import OrganizationMembership from '#models/organization_membership'
 import { createAdminUser } from '#tests/functional/helpers'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { test } from '@japa/runner'
 
 /**
@@ -23,7 +23,7 @@ async function createEnterpriseAdminUser() {
 }
 
 test.group('Clients (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('index lists only current-org clients (org-scoping)', async ({ client, assert }) => {
     const user = await createEnterpriseAdminUser()

@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import {
   createAdminUser,
   createBoatForUser,
@@ -7,7 +7,7 @@ import {
 } from '#tests/browser/helpers'
 
 test.group('E2E · Maintenance history', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('/maintenance redirects to the history view', async ({ browserContext, visit }) => {
     const user = await createAdminUser()

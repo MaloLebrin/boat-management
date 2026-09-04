@@ -1,11 +1,11 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { BoatMaintenanceEventFactory } from '#database/factories/boat_maintenance_event_factory'
 import { createAdminUser, createBoatOwnerUser } from '#tests/functional/helpers'
 
 test.group('Boat owner portal access (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('GET /owner/boats lists only boats the owner is attached to', async ({ client, assert }) => {
     const admin = await createAdminUser()

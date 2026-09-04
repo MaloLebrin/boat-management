@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import type { Page } from 'playwright'
 import { createAdminUser } from '#tests/browser/helpers'
 
@@ -76,7 +76,7 @@ const CONTRAST_TARGETS = [
 ]
 
 test.group('E2E · Thème sombre (#416)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('les pages publiques résolvent data-theme selon la préférence système', async ({
     visit,

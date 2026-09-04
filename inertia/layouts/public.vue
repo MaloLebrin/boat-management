@@ -23,6 +23,14 @@ const pricingHref = computed(() => marketingPath('pricing', locale.value))
 
 const simulatorHref = computed(() => marketingPath('simulator', locale.value))
 
+const maintenanceHref = computed(() => marketingPath('maintenance', locale.value))
+
+const fleetHref = computed(() => marketingPath('fleet', locale.value))
+
+const aiAssistantHref = computed(() => marketingPath('aiAssistant', locale.value))
+
+const helpHref = computed(() => marketingPath('help', locale.value))
+
 const diagnosisAiHref = computed(() => marketingPath('diagnosisAi', locale.value))
 
 const partsAiHref = computed(() => marketingPath('partsAi', locale.value))
@@ -49,7 +57,7 @@ const contactHref = computed(() => marketingPath('contact', locale.value))
     </main>
 
     <footer class="border-t border-bone bg-paper">
-      <div class="mx-auto grid max-w-7xl gap-10 px-6 py-12 md:grid-cols-4">
+      <div class="mx-auto grid max-w-7xl gap-10 px-6 py-12 md:grid-cols-3 lg:grid-cols-5">
         <div class="space-y-3">
           <p class="font-display text-sm text-fg" style="letter-spacing: -0.025em">
             Fleet<em style="font-style: italic; color: #e2674f">Ai</em>
@@ -62,12 +70,26 @@ const contactHref = computed(() => marketingPath('contact', locale.value))
             {{ t('public.footer.product') }}
           </p>
           <div class="grid gap-2 text-sm font-medium text-fg-muted">
-            <Link :href="`/${locale}#features`" class="transition-colors hover:text-fg">{{
-              t('public.footer.features')
+            <Link :href="maintenanceHref" class="transition-colors hover:text-fg">{{
+              t('public.footer.maintenance')
+            }}</Link>
+            <Link :href="fleetHref" class="transition-colors hover:text-fg">{{
+              t('public.footer.fleet')
+            }}</Link>
+            <Link :href="aiAssistantHref" class="transition-colors hover:text-fg">{{
+              t('public.footer.aiAssistant')
             }}</Link>
             <Link :href="pricingHref" class="transition-colors hover:text-fg">{{
               t('public.footer.pricing')
             }}</Link>
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          <p class="text-xs font-semibold uppercase tracking-wider text-fg-subtle">
+            {{ t('public.footer.resources') }}
+          </p>
+          <div class="grid gap-2 text-sm font-medium text-fg-muted">
             <Link :href="simulatorHref" class="transition-colors hover:text-fg">{{
               t('public.footer.simulator')
             }}</Link>
@@ -79,6 +101,9 @@ const contactHref = computed(() => marketingPath('contact', locale.value))
             }}</Link>
             <Link :href="partsAiHref" class="transition-colors hover:text-fg">{{
               t('public.footer.partsAi')
+            }}</Link>
+            <Link :href="helpHref" class="transition-colors hover:text-fg">{{
+              t('public.footer.help')
             }}</Link>
           </div>
         </div>

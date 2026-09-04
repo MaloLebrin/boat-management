@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import Boat from '#models/boat'
 import OrganizationMembership from '#models/organization_membership'
 import { UserFactory } from '#database/factories/user_factory'
@@ -16,7 +16,7 @@ async function createMemberInSameOrg(orgId: number) {
 }
 
 test.group('E2E · Permissions (admin vs member)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('admin sees member-management controls on /settings/members', async ({
     browserContext,

@@ -1,12 +1,12 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { createAdminUser, createMechanicUser, createMemberUser } from '#tests/functional/helpers'
 import BoatMaintenanceTask from '#models/boat_maintenance_task'
 import { DateTime } from 'luxon'
 
 test.group('Dashboard — dedicated mechanic view (#417)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('a mechanic lands on the dedicated dashboard/mechanic page with overdue and upcoming interventions', async ({
     client,

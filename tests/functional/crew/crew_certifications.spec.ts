@@ -2,11 +2,11 @@ import { UserFactory } from '#database/factories/user_factory'
 import CrewCertification from '#models/crew_certification'
 import CrewMember from '#models/crew_member'
 import { createAdminUser } from '#tests/functional/helpers'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { test } from '@japa/runner'
 
 test.group('Crew certifications (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('POST store crée une certification avec expiresAt ISO valide (#158)', async ({
     client,

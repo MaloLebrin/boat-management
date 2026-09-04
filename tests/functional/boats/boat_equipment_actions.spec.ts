@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { UserFactory } from '#database/factories/user_factory'
 import { createAdminUser, createMemberUser } from '#tests/functional/helpers'
@@ -14,7 +14,7 @@ const VALID_ACTION = {
 }
 
 test.group('Boat Equipment Actions (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   // --- CRUD: store ---
 

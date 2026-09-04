@@ -3,6 +3,7 @@ import { middleware } from '#start/kernel'
 import { contactThrottle, publicDiagnosisThrottle, publicPartSearchThrottle } from '#start/limiter'
 
 const MarketingController = () => import('#controllers/marketing_controller')
+const MarketingFeaturesController = () => import('#controllers/marketing_features_controller')
 const ContactMessagesController = () => import('#controllers/contact_messages_controller')
 const SimulatorController = () => import('#controllers/simulator_controller')
 const SimulatorLeadController = () => import('#controllers/simulator_lead_controller')
@@ -20,6 +21,17 @@ router
     router
       .get('/tarifs', ({ response }) => response.redirect('/en/pricing', false, 301))
       .as('marketing.en.pricing_legacy')
+    // Pages fonctionnalité dédiées (compréhension acheteur + SEO) — slugs à
+    // mots-clés, alignés sur MARKETING_SLUGS (shared/helpers/locale_path.ts).
+    router
+      .get('/boat-maintenance-log', [MarketingFeaturesController, 'maintenance'])
+      .as('marketing.en.maintenance')
+    router
+      .get('/boat-fleet-management', [MarketingFeaturesController, 'fleet'])
+      .as('marketing.en.fleet')
+    router
+      .get('/ai-boat-assistant', [MarketingFeaturesController, 'aiAssistant'])
+      .as('marketing.en.aiAssistant')
     router
       .get('/maintenance-cost-simulator', [MarketingController, 'simulator'])
       .as('marketing.en.simulator')
@@ -30,6 +42,7 @@ router
     router
       .get('/engine-part-finder-ai', [PublicPartSearchController, 'show'])
       .as('marketing.en.partsAi')
+    router.get('/help', [MarketingController, 'help']).as('marketing.en.help')
     router.get('/privacy', [MarketingController, 'privacy']).as('marketing.en.privacy')
     router.get('/terms', [MarketingController, 'terms']).as('marketing.en.terms')
     router.get('/sales-terms', [MarketingController, 'salesTerms']).as('marketing.en.sales_terms')
@@ -44,6 +57,15 @@ router
     router.get('/', [MarketingController, 'home']).as('marketing.fr.home')
     router.get('/tarifs', [MarketingController, 'pricing']).as('marketing.fr.pricing')
     router
+      .get('/carnet-entretien-bateau', [MarketingFeaturesController, 'maintenance'])
+      .as('marketing.fr.maintenance')
+    router
+      .get('/gestion-flotte-bateaux', [MarketingFeaturesController, 'fleet'])
+      .as('marketing.fr.fleet')
+    router
+      .get('/assistant-ia-bateau', [MarketingFeaturesController, 'aiAssistant'])
+      .as('marketing.fr.aiAssistant')
+    router
       .get('/simulateur-cout-entretien', [MarketingController, 'simulator'])
       .as('marketing.fr.simulator')
     router.get('/cout-entretien-bateau', [MarketingController, 'guide']).as('marketing.fr.guide')
@@ -53,6 +75,7 @@ router
     router
       .get('/reference-piece-moteur-ia', [PublicPartSearchController, 'show'])
       .as('marketing.fr.partsAi')
+    router.get('/aide', [MarketingController, 'help']).as('marketing.fr.help')
     router.get('/confidentialite', [MarketingController, 'privacy']).as('marketing.fr.privacy')
     router.get('/cgu', [MarketingController, 'terms']).as('marketing.fr.terms')
     router.get('/cgv', [MarketingController, 'salesTerms']).as('marketing.fr.sales_terms')

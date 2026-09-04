@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import PasswordResetToken from '#models/password_reset_token'
 import { createAdminUser } from '#tests/functional/helpers'
 import { DateTime } from 'luxon'
@@ -13,7 +13,7 @@ import { DateTime } from 'luxon'
  * token.
  */
 test.group('Auth forgot password (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('POST /forgot-password issues a reset token and redirects back to the form', async ({
     client,

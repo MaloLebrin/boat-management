@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import app from '@adonisjs/core/services/app'
 import { DateTime } from 'luxon'
 import { UserFactory } from '#database/factories/user_factory'
@@ -62,7 +62,7 @@ async function createDocument(organizationId: number, opts: InvoiceOpts = {}) {
 }
 
 test.group('Invoice lifecycle (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('converts a quote into a new invoice linked to the origin', async ({ client, assert }) => {
     const user = await createEnterpriseAdminUser()

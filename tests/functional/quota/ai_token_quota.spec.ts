@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { OrganizationFactory } from '#database/factories/organization_factory'
 import AiTokenQuotaService from '#services/ai_token_quota_service'
 import AiTokenUsage from '#models/ai_token_usage'
@@ -8,7 +8,7 @@ import app from '@adonisjs/core/services/app'
 import { DateTime } from 'luxon'
 
 test.group('AiTokenQuota (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('getUsage returns 0 when no record exists', async ({ assert }) => {
     const org = await OrganizationFactory.merge({ plan: 'pro' }).create()

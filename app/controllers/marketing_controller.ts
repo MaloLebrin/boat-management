@@ -2,7 +2,7 @@ import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import { ADDON_PRICES, MODULE_PRICES, PLAN_LIMITS, PLAN_PRICES } from '../../shared/types/plan.js'
 import type { BooleanQuotaKey } from '../../shared/types/plan.js'
-import type { LegalEntry, PricingTableRow } from '../../shared/types/marketing.js'
+import type { HelpPageProps, LegalEntry, PricingTableRow } from '../../shared/types/marketing.js'
 import legalEntity from '#config/legal'
 import { CONTACT_FLEET_SIZES, CONTACT_SUBJECTS } from '../../shared/types/contact.js'
 import { PUBLIC_DIAGNOSIS_LIFETIME_LIMIT } from '../../shared/types/public_diagnosis.js'
@@ -60,6 +60,10 @@ export default class MarketingController {
 
   async guide({ inertia, i18n }: HttpContext) {
     return inertia.render('marketing/guide', this.buildGuidePageData(i18n))
+  }
+
+  async help({ inertia, i18n }: HttpContext) {
+    return inertia.render('marketing/help', this.buildHelpPageData(i18n))
   }
 
   async privacy({ inertia, i18n }: HttpContext) {
@@ -1671,6 +1675,126 @@ export default class MarketingController {
           title: t('contact_title'),
           body: t('contact_body'),
           email: t('contact_email'),
+        },
+      },
+    }
+  }
+
+  /**
+   * Page « Aide & support » : les réponses de la FAQ agrégée réutilisent les
+   * clés existantes de la FAQ home et de la FAQ tarifs (mêmes montants ICU via
+   * `pricingCopyParams`) — zéro texte dupliqué. Vit ici (et non dans
+   * MarketingFeaturesController) précisément pour accéder à ces paramètres.
+   */
+  private buildHelpPageData(i18n: {
+    t: (key: string, params?: Record<string, string>) => string
+    locale: string
+  }): HelpPageProps {
+    const locale = i18n.locale === 'fr' ? 'fr' : 'en'
+    const t = (key: string) => i18n.t(`marketing.help.${key}`)
+    const card = (key: string) => i18n.t(`marketing.features.shared.cards.${key}`)
+    const params = this.pricingCopyParams(locale)
+    const homeFaq = (n: number) => ({
+      q: i18n.t(`marketing.home.faq.item${n}_q`, params),
+      a: i18n.t(`marketing.home.faq.item${n}_a`, params),
+    })
+    const pricingFaq = (n: number) => ({
+      q: i18n.t(`marketing.pricing2.faq_q${n}`, params),
+      a: i18n.t(`marketing.pricing2.faq_a${n}`, params),
+    })
+    const contactFormHref = `${marketingPath('contact', locale)}#${CONTACT_FORM_ANCHOR}`
+
+    return {
+      t: {
+        meta: {
+          title: t('meta_title'),
+          description: t('meta_description'),
+        },
+        hero: {
+          eyebrow: t('hero_eyebrow'),
+          title: t('hero_title'),
+          titleHighlight: t('hero_title_highlight'),
+          subtitle: t('hero_subtitle'),
+        },
+        channels: [
+          {
+            title: t('channel1_title'),
+            description: t('channel1_desc'),
+            ctaLabel: t('channel1_cta'),
+            href: `mailto:${SUPPORT_EMAIL}`,
+            external: true,
+          },
+          {
+            title: t('channel2_title'),
+            description: t('channel2_desc'),
+            ctaLabel: t('channel2_cta'),
+            href: contactFormHref,
+          },
+          {
+            title: t('channel3_title'),
+            description: t('channel3_desc'),
+            ctaLabel: t('channel3_cta'),
+            href: contactFormHref,
+          },
+        ],
+        faq: {
+          eyebrow: t('faq_eyebrow'),
+          title: t('faq_title'),
+          titleHighlight: t('faq_title_highlight'),
+          groups: [
+            {
+              title: t('group_start_title'),
+              items: [homeFaq(1), homeFaq(3), homeFaq(5), homeFaq(8)],
+            },
+            {
+              title: t('group_billing_title'),
+              items: [pricingFaq(1), homeFaq(4), pricingFaq(3), pricingFaq(5)],
+            },
+            {
+              title: t('group_security_title'),
+              items: [
+                { q: t('security_q1'), a: t('security_a1') },
+                { q: t('security_q2'), a: t('security_a2') },
+                homeFaq(6),
+                homeFaq(7),
+              ],
+            },
+          ],
+        },
+        resources: {
+          eyebrow: t('resources_eyebrow'),
+          title: t('resources_title'),
+          subtitle: t('resources_subtitle'),
+          linkLabel: i18n.t('marketing.features.shared.cross_link_label'),
+          items: [
+            {
+              title: card('guide_title'),
+              description: card('guide_desc'),
+              href: marketingPath('guide', locale),
+            },
+            {
+              title: card('simulator_title'),
+              description: card('simulator_desc'),
+              href: marketingPath('simulator', locale),
+            },
+            {
+              title: card('diagnosis_title'),
+              description: card('diagnosis_desc'),
+              href: marketingPath('diagnosisAi', locale),
+            },
+            {
+              title: card('parts_title'),
+              description: card('parts_desc'),
+              href: marketingPath('partsAi', locale),
+            },
+          ],
+        },
+        finalCta: {
+          title: t('final_title'),
+          titleHighlight: t('final_highlight'),
+          subtitle: t('final_subtitle'),
+          primaryCta: { label: t('final_primary'), href: contactFormHref },
+          secondaryCta: { label: t('final_secondary'), href: '/signup' },
         },
       },
     }

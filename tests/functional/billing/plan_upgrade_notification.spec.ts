@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import app from '@adonisjs/core/services/app'
 import emitter from '@adonisjs/core/services/emitter'
 import StripeService from '#services/stripe_service'
@@ -37,7 +37,7 @@ function fakeSub(customerId: string, priceId: string) {
 }
 
 test.group('Plan upgrade — event dispatch (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('upgrading starter → pro dispatches OrganizationPlanUpgraded', async ({
     assert,
@@ -61,7 +61,7 @@ test.group('Plan upgrade — event dispatch (functional)', (group) => {
 })
 
 test.group('Plan upgrade — listener (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('notifies every admin', async ({ assert }) => {
     const org = await OrganizationFactory.create()

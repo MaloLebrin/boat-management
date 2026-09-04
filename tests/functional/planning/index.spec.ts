@@ -1,12 +1,12 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { createAdminUser, createMechanicUser, createMemberUser } from '#tests/functional/helpers'
 import BoatMaintenanceTask from '#models/boat_maintenance_task'
 import { DateTime } from 'luxon'
 
 test.group('Planning index — undated bucket (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('GET /planning separates tasks without dueAt/dueEngineHours into undatedTasks', async ({
     client,
@@ -96,7 +96,7 @@ test.group('Planning index — undated bucket (functional)', (group) => {
 })
 
 test.group('Planning index — accès mécanicien (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('GET /planning est accessible au mécanicien mais /boats/:id lui répond 403 (#473)', async ({
     client,

@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { createHash } from 'node:crypto'
 import OrganizationInvitation from '#models/organization_invitation'
 import OrganizationMembership from '#models/organization_membership'
@@ -14,7 +14,7 @@ function sha256(value: string): string {
 }
 
 test.group('Organization invitations — accept (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('POST /invitations/accept creates membership for correct user', async ({
     client,
@@ -168,7 +168,7 @@ test.group('Organization invitations — accept (functional)', (group) => {
 })
 
 test.group('Organization invitations — decline (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('POST /invitations/decline cancels the invitation', async ({ client, assert }) => {
     const admin = await createAdminUser()
@@ -234,7 +234,7 @@ test.group('Organization invitations — decline (functional)', (group) => {
 })
 
 test.group('Organization invitations — re-invite (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('POST /organization/invitations replaces existing pending invitation', async ({
     client,
@@ -309,7 +309,7 @@ test.group('Organization invitations — re-invite (functional)', (group) => {
 })
 
 test.group('Organization invitations — boat_owner role (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('POST /organization/invitations rejects a boat_owner invitation without boatIds', async ({
     client,

@@ -3,7 +3,7 @@ import Client from '#models/client'
 import OrganizationMembership from '#models/organization_membership'
 import { UserFactory } from '#database/factories/user_factory'
 import { createAdminUser } from '#tests/functional/helpers'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { test } from '@japa/runner'
 
 /**
@@ -27,7 +27,7 @@ async function createEnterpriseAdminUser() {
 }
 
 test.group('Search LIKE escaping (issue #278)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('clients: q="%" only returns rows containing a literal %', async ({ client, assert }) => {
     const user = await createEnterpriseAdminUser()

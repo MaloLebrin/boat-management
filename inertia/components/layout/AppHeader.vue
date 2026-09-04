@@ -4,9 +4,11 @@ import { Link } from '@adonisjs/inertia/vue'
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import AppHeaderMobileDrawer from '~/components/layout/AppHeaderMobileDrawer.vue'
+import AppHeaderProductMenu from '~/components/layout/AppHeaderProductMenu.vue'
 import ThemeSwitcher from '~/components/layout/ThemeSwitcher.vue'
 import { useT } from '~/composables/use_t'
-import { buildLocaleSwitchHref, marketingPath, type AppLocale } from '#shared/helpers/locale_path'
+import { usePublicNav } from '~/composables/use_public_nav'
+import { buildLocaleSwitchHref, type AppLocale } from '#shared/helpers/locale_path'
 
 type SharedProps = {
   locale?: 'en' | 'fr'
@@ -20,13 +22,8 @@ const { t } = useT()
 const locale = computed<'en' | 'fr'>(() => page.props.locale ?? 'en')
 const isAuthed = computed(() => Boolean(page.props.user))
 
-const guideHref = computed(() => marketingPath('guide', locale.value))
-
-const pricingHref = computed(() => marketingPath('pricing', locale.value))
-
-const diagnosisHref = computed(() => marketingPath('diagnosisAi', locale.value))
-
-const partsAiHref = computed(() => marketingPath('partsAi', locale.value))
+// Nav publique partagée avec le drawer mobile (source unique : use_public_nav).
+const { productGroups, toolLinks, topLinks } = usePublicNav(locale)
 
 const otherLocale = computed<AppLocale>(() => (locale.value === 'en' ? 'fr' : 'en'))
 
@@ -112,43 +109,24 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
         </span>
       </Link>
 
-      <nav class="hidden items-center gap-1 md:flex">
+      <!-- 7 items (dropdown + outils gratuits + liens directs) : trop large
+           pour 768 px, la nav complète n'apparaît qu'à partir de lg. -->
+      <nav class="hidden items-center gap-0 lg:flex xl:gap-1">
+        <AppHeaderProductMenu :groups="productGroups" />
         <Link
-          :href="`/${locale}#features`"
-          class="rounded-(--radius-control) px-3 py-2 text-sm font-medium text-fg-muted transition-colors duration-(--motion-fast) ease-premium hover:bg-paper hover:text-fg"
+          v-for="link in [...toolLinks, ...topLinks]"
+          :key="link.href"
+          :href="link.href"
+          class="whitespace-nowrap rounded-(--radius-control) px-1.5 py-2 text-sm font-medium text-fg-muted transition-colors duration-(--motion-fast) ease-premium hover:bg-paper hover:text-fg xl:px-3"
         >
-          {{ t('public.nav.features') }}
-        </Link>
-        <Link
-          :href="pricingHref"
-          class="rounded-(--radius-control) px-3 py-2 text-sm font-medium text-fg-muted transition-colors duration-(--motion-fast) ease-premium hover:bg-paper hover:text-fg"
-        >
-          {{ t('public.nav.pricing') }}
-        </Link>
-        <Link
-          :href="diagnosisHref"
-          class="rounded-(--radius-control) px-3 py-2 text-sm font-medium text-fg-muted transition-colors duration-(--motion-fast) ease-premium hover:bg-paper hover:text-fg"
-        >
-          {{ t('public.nav.diagnosisAi') }}
-        </Link>
-        <Link
-          :href="partsAiHref"
-          class="rounded-(--radius-control) px-3 py-2 text-sm font-medium text-fg-muted transition-colors duration-(--motion-fast) ease-premium hover:bg-paper hover:text-fg"
-        >
-          {{ t('public.nav.partsAi') }}
-        </Link>
-        <Link
-          :href="guideHref"
-          class="rounded-(--radius-control) px-3 py-2 text-sm font-medium text-fg-muted transition-colors duration-(--motion-fast) ease-premium hover:bg-paper hover:text-fg"
-        >
-          {{ t('public.nav.guide') }}
+          {{ t(link.labelKey) }}
         </Link>
       </nav>
 
       <div class="flex items-center gap-2">
         <button
           type="button"
-          class="inline-flex h-9 items-center justify-center rounded-(--radius-control) px-3 text-sm font-medium text-fg-muted transition-colors duration-(--motion-fast) hover:bg-paper hover:text-fg"
+          class="inline-flex h-9 items-center justify-center rounded-(--radius-control) px-2 text-sm font-medium text-fg-muted transition-colors duration-(--motion-fast) hover:bg-paper hover:text-fg xl:px-3"
           @click="switchLocale"
         >
           {{ locale === 'en' ? 'FR' : 'EN' }}
@@ -161,17 +139,21 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
         </template>
         <template v-else>
           <Link href="/login" class="hidden md:inline-flex">
-            <BaseButton variant="ghost" size="sm">{{ t('public.actions.login') }}</BaseButton>
+            <BaseButton variant="ghost" size="sm" class="whitespace-nowrap">{{
+              t('public.actions.login')
+            }}</BaseButton>
           </Link>
           <Link href="/signup" class="hidden md:inline-flex">
-            <BaseButton size="sm">{{ t('public.actions.tryFree') }}</BaseButton>
+            <BaseButton size="sm" class="whitespace-nowrap">{{
+              t('public.actions.tryFree')
+            }}</BaseButton>
           </Link>
         </template>
 
-        <!-- Hamburger button (mobile only) -->
+        <!-- Hamburger button (mobile + tablette, tant que la nav complète est masquée) -->
         <button
           type="button"
-          class="inline-flex md:hidden items-center justify-center w-10 h-10 rounded-(--radius-control) text-fg-muted transition-colors duration-(--motion-fast) hover:bg-paper hover:text-fg"
+          class="inline-flex lg:hidden items-center justify-center w-10 h-10 rounded-(--radius-control) text-fg-muted transition-colors duration-(--motion-fast) hover:bg-paper hover:text-fg"
           aria-controls="public-nav-drawer"
           :aria-expanded="isMenuOpen ? 'true' : 'false'"
           @click="openMenu"
@@ -199,7 +181,6 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
   <AppHeaderMobileDrawer
     :is-open="isMenuOpen"
     :locale="locale"
-    :guide-href="guideHref"
     :is-authed="isAuthed"
     @close="closeMenu"
     @switch-locale="switchLocale"

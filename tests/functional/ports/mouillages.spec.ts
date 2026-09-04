@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import Mouillage from '#models/mouillage'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { PortFactory } from '#database/factories/port_factory'
@@ -9,7 +9,7 @@ import { createAdminUser } from '#tests/functional/helpers'
 import { MARINA_CANVAS_HEIGHT, MARINA_CANVAS_WIDTH } from '#shared/constants/marina_layout'
 
 test.group('Mouillages (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('DELETE /ports/:portId/mouillages/:mouillageId deletes mouillage and redirects', async ({
     client,
