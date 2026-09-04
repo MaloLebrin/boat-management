@@ -21,8 +21,14 @@ const { t } = useT()
 const closeButtonEl = ref<HTMLButtonElement | null>(null)
 
 // Mêmes groupes et liens que le header desktop (source unique : use_public_nav).
+// Les outils gratuits, liens directs sur desktop, gardent ici leur intertitre.
 const localeRef = computed(() => props.locale)
-const { productGroups, topLinks } = usePublicNav(localeRef)
+const { productGroups, toolLinks, topLinks } = usePublicNav(localeRef)
+
+const drawerGroups = computed(() => [
+  ...productGroups.value,
+  { labelKey: 'public.nav.productToolsGroup', links: toolLinks.value },
+])
 
 watch(
   () => props.isOpen,
@@ -41,7 +47,7 @@ watch(
     <button
       v-if="isOpen"
       type="button"
-      class="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm md:hidden"
+      class="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm lg:hidden"
       :aria-label="t('nav.closeMenu')"
       @click="emit('close')"
     />
@@ -54,7 +60,7 @@ watch(
       id="public-nav-drawer"
       role="dialog"
       aria-modal="true"
-      class="fixed right-0 top-0 z-50 h-full w-72 bg-cream shadow-xl md:hidden flex flex-col"
+      class="fixed right-0 top-0 z-50 h-full w-72 bg-cream shadow-xl lg:hidden flex flex-col"
     >
       <!-- Header -->
       <div class="flex items-center justify-between px-5 py-4 border-b border-bone">
@@ -110,9 +116,9 @@ watch(
         </button>
       </div>
 
-      <!-- Nav links : groupes du menu Produit à plat sous intertitres, puis liens de premier niveau -->
+      <!-- Nav links : fonctionnalités puis outils gratuits sous intertitres, puis liens de premier niveau -->
       <nav class="flex-1 overflow-y-auto px-4 py-5">
-        <div v-for="group in productGroups" :key="group.labelKey" class="mb-4">
+        <div v-for="group in drawerGroups" :key="group.labelKey" class="mb-4">
           <p class="px-3 pb-1 text-xs font-semibold uppercase tracking-wider text-fg-subtle">
             {{ t(group.labelKey) }}
           </p>

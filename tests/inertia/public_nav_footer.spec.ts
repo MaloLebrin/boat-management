@@ -75,9 +75,10 @@ async function mountHeaderWithOpenProductMenu() {
 
 // #609 — la page publique de diagnostic IA n'était reliée au site que par le
 // footer. C'est notre meilleur argument d'entrée : elle doit être atteignable
-// depuis la nav principale, desktop comme mobile.
-test('la nav publique du header renvoie vers le diagnostic de panne IA', async () => {
-  const w = await mountHeaderWithOpenProductMenu()
+// depuis la nav principale, desktop comme mobile — en lien direct, sans
+// passer par le dropdown « Produit » (outil d'acquisition).
+test('la nav publique du header renvoie vers le diagnostic de panne IA', () => {
+  const w = mount(AppHeader, { global: { stubs } })
 
   expect(w.html()).toContain('public.nav.diagnosisAi')
   expect(w.findAll('a[href="/fr/diagnostic-panne-ia"]').length).toBe(1)
@@ -96,8 +97,8 @@ test('le drawer mobile renvoie vers le diagnostic de panne IA', () => {
 // #634 Phase 2 — la recherche de références de pièces est le second tunnel
 // d'acquisition IA : atteignable depuis la nav principale, le drawer mobile et
 // le footer, dans la locale courante.
-test('la nav publique renvoie vers la recherche de pièces IA (header, drawer, footer)', async () => {
-  const header = await mountHeaderWithOpenProductMenu()
+test('la nav publique renvoie vers la recherche de pièces IA (header, drawer, footer)', () => {
+  const header = mount(AppHeader, { global: { stubs } })
   expect(header.html()).toContain('public.nav.partsAi')
   expect(header.findAll('a[href="/fr/reference-piece-moteur-ia"]').length).toBe(1)
 
@@ -117,15 +118,22 @@ test('la nav publique renvoie vers la recherche de pièces IA (header, drawer, f
 
 // Refonte marketing 2026-09 — les pages fonctionnalité (carnet d'entretien,
 // flotte, assistant IA), le simulateur et l'aide doivent être atteignables
-// depuis le header (dropdown Produit + lien Aide), le drawer et le footer.
+// depuis le header (dropdown Produit + liens directs), le drawer et le footer.
 const FEATURE_HREFS = [
   '/fr/carnet-entretien-bateau',
   '/fr/gestion-flotte-bateaux',
   '/fr/assistant-ia-bateau',
-  '/fr/simulateur-cout-entretien',
 ]
 
-test('le menu Produit du header renvoie vers les pages fonctionnalité et le simulateur', async () => {
+// Les outils gratuits sont des tunnels d'acquisition : liens directs du
+// header, visibles sans ouvrir le dropdown « Produit ».
+const TOOL_HREFS = [
+  '/fr/simulateur-cout-entretien',
+  '/fr/diagnostic-panne-ia',
+  '/fr/reference-piece-moteur-ia',
+]
+
+test('le menu Produit du header renvoie vers les pages fonctionnalité', async () => {
   const w = await mountHeaderWithOpenProductMenu()
 
   for (const href of FEATURE_HREFS) {
@@ -134,13 +142,21 @@ test('le menu Produit du header renvoie vers les pages fonctionnalité et le sim
   expect(w.findAll('a[href="/fr/aide"]').length).toBe(1)
 })
 
-test('le drawer mobile renvoie vers les pages fonctionnalité, le simulateur et l’aide', () => {
+test('les outils gratuits sont des liens directs du header, hors dropdown', () => {
+  const w = mount(AppHeader, { global: { stubs } })
+
+  for (const href of TOOL_HREFS) {
+    expect(w.findAll(`a[href="${href}"]`).length).toBe(1)
+  }
+})
+
+test('le drawer mobile renvoie vers les pages fonctionnalité, les outils gratuits et l’aide', () => {
   const w = mount(AppHeaderMobileDrawer, {
     props: { isOpen: true, locale: 'fr', isAuthed: false },
     global: { stubs },
   })
 
-  for (const href of [...FEATURE_HREFS, '/fr/aide']) {
+  for (const href of [...FEATURE_HREFS, ...TOOL_HREFS, '/fr/aide']) {
     expect(w.findAll(`a[href="${href}"]`).length).toBe(1)
   }
 })

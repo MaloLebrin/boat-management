@@ -18,7 +18,7 @@ export interface PublicNavGroup {
  * viennent de `marketingPath` (jamais d'interpolation de locale, #475).
  */
 export function usePublicNav(locale: Ref<AppLocale>) {
-  /** Groupes du menu « Produit » : pages fonctionnalité, puis outils gratuits. */
+  /** Groupes du menu « Produit » : uniquement les pages fonctionnalité. */
   const productGroups = computed<PublicNavGroup[]>(() => [
     {
       labelKey: 'public.nav.productFeaturesGroup',
@@ -28,22 +28,24 @@ export function usePublicNav(locale: Ref<AppLocale>) {
         { labelKey: 'public.nav.aiAssistant', href: marketingPath('aiAssistant', locale.value) },
       ],
     },
-    {
-      labelKey: 'public.nav.productToolsGroup',
-      links: [
-        { labelKey: 'public.nav.simulator', href: marketingPath('simulator', locale.value) },
-        { labelKey: 'public.nav.diagnosisAi', href: marketingPath('diagnosisAi', locale.value) },
-        { labelKey: 'public.nav.partsAi', href: marketingPath('partsAi', locale.value) },
-      ],
-    },
   ])
 
-  /** Liens de premier niveau, à droite du menu « Produit ». */
+  /**
+   * Outils gratuits d'acquisition : liens directs du header, hors dropdown —
+   * ils doivent rester visibles sans clic (tunnels d'acquisition).
+   */
+  const toolLinks = computed<PublicNavLink[]>(() => [
+    { labelKey: 'public.nav.simulator', href: marketingPath('simulator', locale.value) },
+    { labelKey: 'public.nav.diagnosisAi', href: marketingPath('diagnosisAi', locale.value) },
+    { labelKey: 'public.nav.partsAi', href: marketingPath('partsAi', locale.value) },
+  ])
+
+  /** Liens de premier niveau, à droite des outils gratuits. */
   const topLinks = computed<PublicNavLink[]>(() => [
     { labelKey: 'public.nav.pricing', href: marketingPath('pricing', locale.value) },
     { labelKey: 'public.nav.guide', href: marketingPath('guide', locale.value) },
     { labelKey: 'public.nav.help', href: marketingPath('help', locale.value) },
   ])
 
-  return { productGroups, topLinks }
+  return { productGroups, toolLinks, topLinks }
 }

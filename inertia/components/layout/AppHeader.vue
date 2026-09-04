@@ -23,7 +23,7 @@ const locale = computed<'en' | 'fr'>(() => page.props.locale ?? 'en')
 const isAuthed = computed(() => Boolean(page.props.user))
 
 // Nav publique partagée avec le drawer mobile (source unique : use_public_nav).
-const { productGroups, topLinks } = usePublicNav(locale)
+const { productGroups, toolLinks, topLinks } = usePublicNav(locale)
 
 const otherLocale = computed<AppLocale>(() => (locale.value === 'en' ? 'fr' : 'en'))
 
@@ -109,13 +109,15 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
         </span>
       </Link>
 
-      <nav class="hidden items-center gap-1 md:flex">
+      <!-- 7 items (dropdown + outils gratuits + liens directs) : trop large
+           pour 768 px, la nav complète n'apparaît qu'à partir de lg. -->
+      <nav class="hidden items-center gap-0 lg:flex xl:gap-1">
         <AppHeaderProductMenu :groups="productGroups" />
         <Link
-          v-for="link in topLinks"
+          v-for="link in [...toolLinks, ...topLinks]"
           :key="link.href"
           :href="link.href"
-          class="rounded-(--radius-control) px-3 py-2 text-sm font-medium text-fg-muted transition-colors duration-(--motion-fast) ease-premium hover:bg-paper hover:text-fg"
+          class="whitespace-nowrap rounded-(--radius-control) px-1.5 py-2 text-sm font-medium text-fg-muted transition-colors duration-(--motion-fast) ease-premium hover:bg-paper hover:text-fg xl:px-3"
         >
           {{ t(link.labelKey) }}
         </Link>
@@ -124,7 +126,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
       <div class="flex items-center gap-2">
         <button
           type="button"
-          class="inline-flex h-9 items-center justify-center rounded-(--radius-control) px-3 text-sm font-medium text-fg-muted transition-colors duration-(--motion-fast) hover:bg-paper hover:text-fg"
+          class="inline-flex h-9 items-center justify-center rounded-(--radius-control) px-2 text-sm font-medium text-fg-muted transition-colors duration-(--motion-fast) hover:bg-paper hover:text-fg xl:px-3"
           @click="switchLocale"
         >
           {{ locale === 'en' ? 'FR' : 'EN' }}
@@ -137,17 +139,21 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
         </template>
         <template v-else>
           <Link href="/login" class="hidden md:inline-flex">
-            <BaseButton variant="ghost" size="sm">{{ t('public.actions.login') }}</BaseButton>
+            <BaseButton variant="ghost" size="sm" class="whitespace-nowrap">{{
+              t('public.actions.login')
+            }}</BaseButton>
           </Link>
           <Link href="/signup" class="hidden md:inline-flex">
-            <BaseButton size="sm">{{ t('public.actions.tryFree') }}</BaseButton>
+            <BaseButton size="sm" class="whitespace-nowrap">{{
+              t('public.actions.tryFree')
+            }}</BaseButton>
           </Link>
         </template>
 
-        <!-- Hamburger button (mobile only) -->
+        <!-- Hamburger button (mobile + tablette, tant que la nav complète est masquée) -->
         <button
           type="button"
-          class="inline-flex md:hidden items-center justify-center w-10 h-10 rounded-(--radius-control) text-fg-muted transition-colors duration-(--motion-fast) hover:bg-paper hover:text-fg"
+          class="inline-flex lg:hidden items-center justify-center w-10 h-10 rounded-(--radius-control) text-fg-muted transition-colors duration-(--motion-fast) hover:bg-paper hover:text-fg"
           aria-controls="public-nav-drawer"
           :aria-expanded="isMenuOpen ? 'true' : 'false'"
           @click="openMenu"
