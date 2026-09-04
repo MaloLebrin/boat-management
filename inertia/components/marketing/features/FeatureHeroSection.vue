@@ -62,7 +62,12 @@ const mockComponents: Record<FeatureMockType, typeof HomeMockBoatDetail> = {
 
     <div class="mx-auto mt-12 max-w-4xl">
       <HomeBrowserFrame>
-        <component :is="mockComponents[mockType]" />
+        <!-- upcomingTasks est un panneau à défilement infini (flex-1) conçu
+             pour vivre dans le dashboard : hors de lui, il faut le borner. -->
+        <div v-if="mockType === 'upcomingTasks'" class="flex h-80 flex-col bg-cream p-4">
+          <component :is="mockComponents[mockType]" />
+        </div>
+        <component :is="mockComponents[mockType]" v-else />
       </HomeBrowserFrame>
     </div>
   </section>
