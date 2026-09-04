@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { DateTime } from 'luxon'
 import { NavigationLogFactory } from '#database/factories/navigation_log_factory'
 import { BoatFuelLogFactory } from '#database/factories/boat_fuel_log_factory'
@@ -86,7 +86,7 @@ async function seedFieldData() {
 }
 
 test.group('E2E · Écrans terrain en viewport mobile (#500)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('aucun débordement horizontal sur les écrans de terrain', async ({
     browserContext,

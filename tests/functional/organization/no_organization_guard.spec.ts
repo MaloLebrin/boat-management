@@ -1,5 +1,5 @@
 import { UserFactory } from '#database/factories/user_factory'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { test } from '@japa/runner'
 
 /**
@@ -12,7 +12,7 @@ import { test } from '@japa/runner'
  * traitée par le handler global → redirection propre vers l'accueil (pas de 500).
  */
 test.group('No-organization guard on gated routes (issue #279)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('clients index: user without org is redirected to / (not 500)', async ({ client }) => {
     // UserFactory sans .with('organization') → organizationId null

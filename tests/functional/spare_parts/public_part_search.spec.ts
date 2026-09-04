@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import app from '@adonisjs/core/services/app'
 import { DateTime } from 'luxon'
 import AiPartSearchConversation from '#models/ai_part_search_conversation'
@@ -107,7 +107,7 @@ function startForm(message = 'I am looking for the water pump impeller') {
 }
 
 test.group('Public spare part AI chat (functional, #634 Phase 2)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
   group.each.teardown(() => {
     app.container.restore(AiService)
   })

@@ -1,10 +1,10 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import hash from '@adonisjs/core/services/hash'
 import { UserFactory } from '#database/factories/user_factory'
 
 test.group('Settings account — password & locale (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('PUT /settings/password changes the password with valid current password', async ({
     client,

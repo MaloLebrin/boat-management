@@ -1,0 +1,19 @@
+diff --git a/lib/validator.js b/lib/validator.js
+index cca5e9c2216fd72d5da7eb63a38cebdf025e366e..2c43ae11762eaeb1e8472cf2d441c2771a16610c 100644
+--- a/lib/validator.js
++++ b/lib/validator.js
+@@ -260,8 +260,12 @@ Validator.prototype.resolve = function resolve (schema, switchSchema, ctx) {
+     return {subschema: ctx.schemas[switchSchema], switchSchema: switchSchema};
+   }
+   // Else try walking the property pointer
+-  let parsed = new URL(switchSchema,'thismessage::/');
+-  let fragment = parsed.hash;
++  // `new URL(ref, 'thismessage::/')` throws "Invalid URL" on Node >= 24.20 and
++  // Node >= 26: resolving a path-absolute reference (e.g. "/x#/definitions/Y")
++  // against a base whose path is opaque is a spec failure. Only the fragment is
++  // needed here, so read it off the string instead of re-parsing the reference.
++  var hashIndex = switchSchema.indexOf('#');
++  var fragment = hashIndex === -1 ? '' : switchSchema.slice(hashIndex);
+   var document = fragment && fragment.length && switchSchema.substr(0, switchSchema.length - fragment.length);
+   if (!document || !ctx.schemas[document]) {
+     throw new SchemaError("no such schema <" + switchSchema + ">", schema);

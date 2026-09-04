@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import Organization from '#models/organization'
 import User from '#models/user'
 import OrganizationMembership from '#models/organization_membership'
@@ -24,7 +24,7 @@ function signupForm(overrides: Record<string, string> = {}) {
 }
 
 test.group('Auth signup (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('creates account and redirects to /dashboard', async ({ client, assert }) => {
     const response = await client.post('/signup').form(signupForm())

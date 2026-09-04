@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import OrganizationModule from '#models/organization_module'
 import Subscription from '#models/subscription'
 import StripeService from '#services/stripe_service'
@@ -47,7 +47,7 @@ async function activeModules(organizationId: number): Promise<string[]> {
 }
 
 test.group('SubscriptionService module reconciliation (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('a Pro subscription with a charter item activates the charter module', async ({
     assert,

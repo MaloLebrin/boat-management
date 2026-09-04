@@ -1,12 +1,12 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import Organization from '#models/organization'
 import PasswordResetToken from '#models/password_reset_token'
 import User from '#models/user'
 import { createAdminUser, DEFAULT_PASSWORD } from '#tests/browser/helpers'
 
 test.group('E2E · Authentication', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('a user logs in through the real /login form and lands on the dashboard', async ({
     visit,

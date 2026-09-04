@@ -155,6 +155,21 @@ export default defineConfig({
       pattern: 'resources/lang/**/*.{json,yaml,yml}',
       reloadServer: false,
     },
+    /**
+     * L'image de production reinstalle les dependances depuis `build/` : sans
+     * `pnpm-workspace.yaml` ni `patches/`, `pnpm install --prod
+     * --frozen-lockfile` ne retrouve pas le `patchedDependencies` declare dans
+     * le lockfile, et le correctif jsonschema (kernel Ace sur Node >= 24.20,
+     * cf. `node ace migration:run` au demarrage) ne serait pas applique.
+     */
+    {
+      pattern: 'pnpm-workspace.yaml',
+      reloadServer: false,
+    },
+    {
+      pattern: 'patches/**',
+      reloadServer: false,
+    },
   ],
 
   hooks: {

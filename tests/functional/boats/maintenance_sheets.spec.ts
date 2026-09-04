@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import BoatMaintenanceSheet from '#models/boat_maintenance_sheet'
 import BoatMaintenanceSheetItem from '#models/boat_maintenance_sheet_item'
 import { BoatFactory } from '#database/factories/boat_factory'
@@ -25,7 +25,7 @@ function addItem(sheetId: number, position: number, isDone: boolean) {
 }
 
 test.group('Maintenance sheet instantiation from the corpus (#583)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   async function createSheet(
     client: ApiClient,
@@ -111,7 +111,7 @@ test.group('Maintenance sheet instantiation from the corpus (#583)', (group) => 
 })
 
 test.group('Maintenance sheet completion (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('PUT complete is rejected when an item is not done (#185)', async ({ client, assert }) => {
     const user = await createAdminUser()
@@ -171,7 +171,7 @@ test.group('Maintenance sheet completion (functional)', (group) => {
 })
 
 test.group('Maintenance sheet item conflict detection (#490)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('PUT item with a stale _expectedUpdatedAt is rejected with conflictData', async ({
     client,

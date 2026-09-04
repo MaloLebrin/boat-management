@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import app from '@adonisjs/core/services/app'
 import emitter from '@adonisjs/core/services/emitter'
 import Notification from '#models/notification'
@@ -22,7 +22,7 @@ async function orgWithAdmin() {
 }
 
 test.group('Member notifications — listeners (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('member.removed notifies remaining admins and the removed user', async ({ assert }) => {
     const { org, admin } = await orgWithAdmin()
@@ -88,7 +88,7 @@ test.group('Member notifications — listeners (functional)', (group) => {
 })
 
 test.group('Member service — event dispatch (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('removeMember dispatches OrganizationMemberRemoved after commit', async ({ cleanup }) => {
     const events = emitter.fake()

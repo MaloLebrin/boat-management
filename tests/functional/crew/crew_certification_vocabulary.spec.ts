@@ -5,7 +5,7 @@ import Client from '#models/client'
 import OrganizationMembership from '#models/organization_membership'
 import { createAdminUser } from '#tests/functional/helpers'
 import { NAVIGATION_TITLES } from '#shared/types/navigation_title'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { test } from '@japa/runner'
 
 /**
@@ -14,7 +14,7 @@ import { test } from '@japa/runner'
  * invalidée.
  */
 test.group('Vocabulaire des titres de navigation (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   /** Les fiches clients relèvent du module CRM : plan Enterprise requis. */
   async function createEnterpriseAdminUser() {

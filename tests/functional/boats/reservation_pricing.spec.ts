@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { createCharterAdminUser } from '#tests/functional/helpers'
 import BoatPricing from '#models/boat_pricing'
@@ -16,7 +16,7 @@ const BASE_RESERVATION = {
 }
 
 test.group('Reservation pricing (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('store auto-fills total_price from base daily price when omitted', async ({
     client,

@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import Organization from '#models/organization'
 import { UserFactory } from '#database/factories/user_factory'
 import { OrganizationFactory } from '#database/factories/organization_factory'
@@ -7,7 +7,7 @@ import QuotaService from '#services/quota_service'
 import app from '@adonisjs/core/services/app'
 
 test.group('Storage Quota (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('storageLimitBytes returns correct limit for starter plan', async ({ assert }) => {
     const org = await OrganizationFactory.merge({ plan: 'starter' }).create()

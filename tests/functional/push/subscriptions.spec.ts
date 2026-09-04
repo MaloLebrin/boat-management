@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { UserFactory } from '#database/factories/user_factory'
 import PushSubscription from '#models/push_subscription'
 
@@ -11,7 +11,7 @@ const SUBSCRIPTION_BODY = {
 }
 
 test.group('Push subscriptions (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('POST /push/subscriptions crée un abonnement pour l’utilisateur connecté', async ({
     client,

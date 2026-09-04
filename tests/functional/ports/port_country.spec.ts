@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import Port from '#models/port'
 import { PortFactory } from '#database/factories/port_factory'
 import { createAdminUser } from '#tests/functional/helpers'
@@ -11,7 +11,7 @@ import { createAdminUser } from '#tests/functional/helpers'
  * la saisie à 2 caractères alors que le serveur en acceptait 8.
  */
 test.group('Port country (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('POST enregistre un code pays de la liste', async ({ client, assert }) => {
     const user = await createAdminUser()

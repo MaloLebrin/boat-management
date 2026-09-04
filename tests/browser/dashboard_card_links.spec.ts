@@ -1,12 +1,12 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { BoatEngineFactory } from '#database/factories/boat_engine_factory'
 import { BoatRigFactory } from '#database/factories/boat_rig_factory'
 import { BoatSailFactory } from '#database/factories/boat_sail_factory'
 import { createAdminUser, createBoatForUser } from '#tests/browser/helpers'
 
 test.group('E2E · Dashboard stat card links', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('the Moteurs card leads to the engine-filtered fleet list', async ({
     browserContext,

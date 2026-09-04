@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import BoatEngineDiagnosticCheck from '#models/boat_engine_diagnostic_check'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { BoatEngineFactory } from '#database/factories/boat_engine_factory'
@@ -20,7 +20,7 @@ async function checksFor(engineId: number) {
 }
 
 test.group('Diagnostic checks (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('PATCH toggle checked=true creates the check, idempotently', async ({ client, assert }) => {
     const user = await createAdminUser()

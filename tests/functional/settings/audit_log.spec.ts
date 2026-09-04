@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { UserFactory } from '#database/factories/user_factory'
 import { createAdminUser } from '#tests/functional/helpers'
 import AuditLog from '#models/audit_log'
@@ -7,7 +7,7 @@ import AuditLogService from '#services/audit_log_service'
 import { DateTime } from 'luxon'
 
 test.group('AuditLog (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('GET /settings/audit-log returns 200 for Pro plan admin', async ({ client }) => {
     const user = await createAdminUser()

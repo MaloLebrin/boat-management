@@ -6,12 +6,12 @@ import BoatEngine from '#models/boat_engine'
 import NavigationLog from '#models/navigation_log'
 import OrganizationMembership from '#models/organization_membership'
 import { createAdminUser } from '#tests/functional/helpers'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { test } from '@japa/runner'
 import { DateTime } from 'luxon'
 
 test.group('Navigation logs (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   // ─── store ───────────────────────────────────────────────────────────────
 

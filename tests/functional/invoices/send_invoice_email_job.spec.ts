@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import mail from '@adonisjs/mail/services/main'
 import app from '@adonisjs/core/services/app'
 import { DateTime } from 'luxon'
@@ -26,7 +26,7 @@ async function createEnterpriseOrgUser() {
 }
 
 test.group('SendInvoiceEmail job', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('generates the PDF and sends an email with a PDF attachment', async ({ assert }) => {
     // Callback-based `mail.send((message) => …)` is tracked in the `messages`

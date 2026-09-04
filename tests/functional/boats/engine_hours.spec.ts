@@ -1,12 +1,12 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import BoatEngine from '#models/boat_engine'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { BoatEngineFactory } from '#database/factories/boat_engine_factory'
 import { createAdminUser } from '#tests/functional/helpers'
 
 test.group('Engine hours mirror installHours at creation (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('POST engine sets hours to the same value as installHours', async ({ client, assert }) => {
     const user = await createAdminUser()
@@ -74,7 +74,7 @@ test.group('Engine hours mirror installHours at creation (functional)', (group) 
 })
 
 test.group('Engine hours increment (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   async function setupEngine(hours: number | null) {
     const user = await createAdminUser()
@@ -145,7 +145,7 @@ test.group('Engine hours increment (functional)', (group) => {
 })
 
 test.group('Engine hours DB-level monotonic trigger (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('a direct SQL decrease bypassing the app layer is rejected', async ({ assert }) => {
     const user = await createAdminUser()

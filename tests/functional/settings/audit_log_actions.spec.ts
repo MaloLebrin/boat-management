@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { createHash } from 'node:crypto'
 import { DateTime } from 'luxon'
 import AuditLog from '#models/audit_log'
@@ -23,7 +23,7 @@ async function findLog(organizationId: number, action: AuditAction) {
 }
 
 test.group('AuditLog — invitations (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('POST /organization/invitations logs invitation.send', async ({ client, assert }) => {
     const admin = await createAdminUser()
@@ -127,7 +127,7 @@ test.group('AuditLog — invitations (functional)', (group) => {
 })
 
 test.group('AuditLog — maintenance tasks (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('POST /boats/:boatId/maintenance-tasks logs maintenance_task.create', async ({
     client,

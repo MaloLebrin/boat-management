@@ -1,9 +1,9 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { createAdminUser, createBoatForUser } from '#tests/browser/helpers'
 
 test.group('E2E · Boat lifecycle', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('create a boat through the form and land on its detail page', async ({
     browserContext,

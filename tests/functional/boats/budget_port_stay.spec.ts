@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { DateTime } from 'luxon'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { BoatPortStayFactory } from '#database/factories/boat_port_stay_factory'
@@ -8,7 +8,7 @@ import { createAdminUser } from '#tests/functional/helpers'
 import BoatPortStay from '#models/boat_port_stay'
 
 test.group('Budget Port Stay (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('POST /boats/:id/port-stays creates a port stay for authorized user', async ({
     client,

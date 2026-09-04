@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import app from '@adonisjs/core/services/app'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { BoatEngineFactory } from '#database/factories/boat_engine_factory'
@@ -10,7 +10,7 @@ import Media from '#models/media'
 import { CloudinaryService } from '#services/cloudinary_service'
 
 test.group('BoatEngineParts — destroyMedia (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('DELETE supprime le media de la pièce moteur', async ({ client, assert }) => {
     const deletedPublicIds: string[] = []
@@ -176,7 +176,7 @@ test.group('BoatEngineParts — destroyMedia (functional)', (group) => {
 })
 
 test.group('BoatEngineParts — downloadMedia (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('GET — IDOR : engineId appartenant à un autre bateau est rejeté', async ({
     client,
@@ -260,7 +260,7 @@ test.group('BoatEngineParts — downloadMedia (functional)', (group) => {
 })
 
 test.group('BoatEngineParts — storeDocument (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('POST attaches multiple documents to the engine part in one request', async ({
     client,

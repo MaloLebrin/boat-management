@@ -1,12 +1,12 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import BoatMaintenanceEvent from '#models/boat_maintenance_event'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { BoatSafetyEquipmentFactory } from '#database/factories/boat_safety_equipment_factory'
 import { createAdminUser } from '#tests/functional/helpers'
 
 test.group('Maintenance events (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('POST /boats/:id/maintenance creates an event', async ({ client, assert }) => {
     const user = await createAdminUser()

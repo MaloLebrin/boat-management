@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { createAdminUser } from '#tests/functional/helpers'
 
 /**
@@ -11,7 +11,7 @@ import { createAdminUser } from '#tests/functional/helpers'
  * validation `vine.array`). Les cas « autorisés » envoient donc deux modules.
  */
 test.group('Billing checkout — module guard (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('modules requested on the Enterprise plan are rejected before Stripe', async ({
     client,

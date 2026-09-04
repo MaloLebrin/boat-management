@@ -3,7 +3,7 @@ import { BoatFactory } from '#database/factories/boat_factory'
 import BoatEngine from '#models/boat_engine'
 import { createAdminUser } from '#tests/functional/helpers'
 import { equipmentBodyToEnginePayload, storeBoatEngineValidator } from '#validators/boat_equipment'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { test } from '@japa/runner'
 
 /**
@@ -11,7 +11,7 @@ import { test } from '@japa/runner'
  * et `stroke_type` ne savent pas dire — la transmission.
  */
 test.group('Famille de motorisation (#574)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('POST engine enregistre la famille saisie', async ({ client, assert }) => {
     const user = await createAdminUser()

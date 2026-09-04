@@ -5,11 +5,11 @@ import CrewMember from '#models/crew_member'
 import NavigationLog from '#models/navigation_log'
 import CrewService from '#services/crew_service'
 import { createAdminUser } from '#tests/functional/helpers'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { test } from '@japa/runner'
 
 test.group('Navigation log crew sync (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('PATCH crew sync assigns valid crew members', async ({ client, assert }) => {
     const user = await createAdminUser()

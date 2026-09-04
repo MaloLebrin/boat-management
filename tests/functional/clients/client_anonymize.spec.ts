@@ -8,7 +8,7 @@ import OrganizationMembership from '#models/organization_membership'
 import { createAdminUser } from '#tests/functional/helpers'
 import { CloudinaryService } from '#services/cloudinary_service'
 import app from '@adonisjs/core/services/app'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { test } from '@japa/runner'
 
 async function createEnterpriseUser(role: 'admin' | 'member' = 'admin') {
@@ -41,7 +41,7 @@ function swapFakeCloudinary() {
 }
 
 test.group('Client anonymize (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('anonymizes PII, deletes documents and stamps anonymized_at', async ({ client, assert }) => {
     swapFakeCloudinary()

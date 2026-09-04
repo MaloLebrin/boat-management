@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import OrganizationModule from '#models/organization_module'
 import StripeService from '#services/stripe_service'
 import SubscriptionService from '#services/subscription_service'
@@ -46,7 +46,7 @@ async function extraBoatsRow(organizationId: number) {
 }
 
 test.group('SubscriptionService extra_boats add-on reconciliation (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('an extra_boats item activates the add-on with its Stripe quantity', async ({ assert }) => {
     const org = await OrganizationFactory.merge({ stripeCustomerId: 'cus_x', plan: 'pro' }).create()

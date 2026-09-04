@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import {
   createBoatForUser,
   createEnterpriseAdminUser,
@@ -12,7 +12,7 @@ import {
  * (i.e. is not bounced to /login or an error page).
  */
 test.group('E2E · Authenticated screens smoke', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('every main authenticated screen renders', async ({ browserContext, visit, assert }) => {
     // Enterprise plan so plan-gated screens (AI, branding, clients) are reachable.

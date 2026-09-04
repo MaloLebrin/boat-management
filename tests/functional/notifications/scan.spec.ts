@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { DateTime } from 'luxon'
 import Notification from '#models/notification'
 import BoatDocument from '#models/boat_document'
@@ -61,7 +61,7 @@ async function seedFleetWithOverdueItems() {
 }
 
 test.group('NotificationScanService (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('creates overdue/expired notifications for admins only', async ({ assert }) => {
     const { admin, member } = await seedFleetWithOverdueItems()
@@ -125,7 +125,7 @@ test.group('NotificationScanService (functional)', (group) => {
  * date de péremption saisie mais avec une date d'achat est daté par son type.
  */
 test.group('NotificationScanService — durées de vie par défaut (#582)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   async function seedOrgWithBoat() {
     const org = await OrganizationFactory.create()

@@ -5,7 +5,7 @@ import BoatCatalogSeeder from '#database/seeders/boat_catalog_seeder'
 import { createBoatValidator, updateBoatValidator } from '#validators/boat'
 import app from '@adonisjs/core/services/app'
 import db from '@adonisjs/lucid/services/db'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { test } from '@japa/runner'
 
 /**
@@ -54,7 +54,7 @@ async function seedBrands() {
 }
 
 test.group('BoatCatalogService — listBrands', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('priorise la catégorie choisie sans jamais s’y limiter', async ({ assert }) => {
     await seedBrands()
@@ -94,7 +94,7 @@ test.group('BoatCatalogService — listBrands', (group) => {
 })
 
 test.group('BoatCatalogService — listModels', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('renvoie les modèles de la marque, triés par nom', async ({ assert }) => {
     const { beneteau } = await seedBrands()
@@ -120,7 +120,7 @@ test.group('BoatCatalogService — listModels', (group) => {
 })
 
 test.group('BoatCatalogService — resolveBrand', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('rapproche les orthographes réellement rencontrées', async ({ assert }) => {
     await seedBrands()
@@ -180,7 +180,7 @@ test.group('Validators bateau — catégorie', () => {
 })
 
 test.group('BoatCatalogSeeder — idempotence', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('rejoué deux fois, ne crée ni doublon ni suppression', async ({ assert }) => {
     const seeder = new BoatCatalogSeeder(db.connection())

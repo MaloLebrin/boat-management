@@ -13,7 +13,7 @@ import {
 } from '#validators/boat_generic_equipment'
 import { createAdminUser } from '#tests/functional/helpers'
 import app from '@adonisjs/core/services/app'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import db from '@adonisjs/lucid/services/db'
 import { test } from '@japa/runner'
 
@@ -90,7 +90,7 @@ async function seedBrands() {
 }
 
 test.group('EquipmentCatalogService — listBrands', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('priorise la catégorie choisie sans jamais s’y limiter', async ({ assert }) => {
     await seedBrands()
@@ -152,7 +152,7 @@ test.group('EquipmentCatalogService — listBrands', (group) => {
 })
 
 test.group('EquipmentCatalogService — listModels', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('renvoie les modèles de la marque, triés par nom', async ({ assert }) => {
     const { garmin } = await seedBrands()
@@ -179,7 +179,7 @@ test.group('EquipmentCatalogService — listModels', (group) => {
 })
 
 test.group('EquipmentCatalogService — resolveBrand', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('rapproche les orthographes réellement rencontrées', async ({ assert }) => {
     await seedBrands()
@@ -229,7 +229,7 @@ test.group('EquipmentCatalogService — resolveBrand', (group) => {
 })
 
 test.group('EquipmentCatalogService — formProps', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('charge les modèles de la marque demandée par le rechargement partiel', async ({
     assert,
@@ -364,7 +364,7 @@ test.group('Validators équipement générique — catalogue et garde-fous (#577
 })
 
 test.group('Équipement générique — édition de catégorie et rattachement (#577)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('PUT change la catégorie d’un équipement existant', async ({ client, assert }) => {
     const user = await createAdminUser()
@@ -444,7 +444,7 @@ test.group('Équipement générique — édition de catégorie et rattachement (
 })
 
 test.group('EquipmentCatalogSeeder — idempotence (#577)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('rejoué deux fois, ne crée ni doublon ni suppression', async ({ assert }) => {
     const seeder = new EquipmentCatalogSeeder(db.connection())

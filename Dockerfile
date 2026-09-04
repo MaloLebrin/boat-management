@@ -10,6 +10,9 @@ RUN corepack enable pnpm
 WORKDIR /app
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+# `patches/` porte le correctif jsonschema sans lequel le kernel Ace ne boote
+# pas sur Node >= 24.20 — il doit etre present avant l'installation.
+COPY patches ./patches
 RUN pnpm install --frozen-lockfile
 
 COPY . .

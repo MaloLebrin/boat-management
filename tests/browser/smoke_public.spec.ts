@@ -1,12 +1,12 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 
 /**
  * Navigable smoke test for the public / marketing surface — no authentication.
  * Each page must respond without an HTTP error.
  */
 test.group('E2E · Public screens smoke', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('public and marketing pages render in both locales', async ({ visit, assert }) => {
     const urls = [

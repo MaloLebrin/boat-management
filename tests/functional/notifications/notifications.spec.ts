@@ -1,12 +1,12 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { DateTime } from 'luxon'
 import Notification from '#models/notification'
 import { UserFactory } from '#database/factories/user_factory'
 import { NotificationFactory } from '#database/factories/notification_factory'
 
 test.group('Notifications — markAllRead datetime consistency', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('PATCH /notifications/read-all marks all unread notifications as read', async ({
     client,

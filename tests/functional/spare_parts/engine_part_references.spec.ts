@@ -6,7 +6,7 @@ import EngineModel from '#models/engine_model'
 import EnginePartReference from '#models/engine_part_reference'
 import { YAMAHA_REFERENCE_PATTERN } from '#shared/helpers/spare_parts'
 import { createAdminUser } from '#tests/functional/helpers'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import db from '@adonisjs/lucid/services/db'
 import { test } from '@japa/runner'
 
@@ -63,7 +63,7 @@ async function makeCatalogEngine(boatId: number) {
 }
 
 test.group('Références constructeur — contrainte de source (#575)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('une référence sans source est refusée par la base', async ({ assert }) => {
     const { model } = await seedCatalog()
@@ -101,7 +101,7 @@ test.group('Références constructeur — contrainte de source (#575)', (group) 
 })
 
 test.group('Références constructeur — panier et export (#575)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('l’ajout au panier pré-remplit la référence connue', async ({ client, assert }) => {
     await seedCatalog()
@@ -239,7 +239,7 @@ test.group('Références constructeur — panier et export (#575)', (group) => {
 })
 
 test.group('Références constructeur — écrans (#575)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('la page ensemble sert les références et le motif de décodage', async ({
     client,

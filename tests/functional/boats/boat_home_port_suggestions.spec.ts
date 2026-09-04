@@ -4,7 +4,7 @@ import Port from '#models/port'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { PortFactory } from '#database/factories/port_factory'
 import { createAdminUser } from '#tests/functional/helpers'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { test } from '@japa/runner'
 
 /**
@@ -17,7 +17,7 @@ import { test } from '@japa/runner'
 type PortOption = { id: number; name: string }
 
 test.group('Port d’attache — suggestions de ports (#579)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('GET /boats/new expose les ports de l’organisation', async ({ client, assert }) => {
     const user = await createAdminUser()

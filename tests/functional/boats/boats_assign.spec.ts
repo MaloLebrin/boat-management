@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import Boat from '#models/boat'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { PontoonFactory } from '#database/factories/pontoon_factory'
@@ -13,7 +13,7 @@ async function makeSpot(organizationId: number) {
 }
 
 test.group('Boats assign (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('PATCH /boats/:id/assignment assigns a free spot to a boat', async ({ client, assert }) => {
     const user = await createAdminUser()

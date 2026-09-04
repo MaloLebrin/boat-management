@@ -1,6 +1,6 @@
 import { test } from '@japa/runner'
 import { DateTime } from 'luxon'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import Client from '#models/client'
 import Invoice from '#models/invoice'
 import OrganizationModuleService from '#services/organization_module_service'
@@ -12,7 +12,7 @@ import { createAdminUser } from '#tests/functional/helpers'
  * On simule des données historiques (créées quand le module était actif).
  */
 test.group('Module read-only residual access — clients (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   async function seedClient(organizationId: number) {
     return Client.create({
@@ -76,7 +76,7 @@ test.group('Module read-only residual access — clients (functional)', (group) 
 })
 
 test.group('Module read-only residual access — invoices (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   async function seedInvoice(organizationId: number) {
     return Invoice.create({

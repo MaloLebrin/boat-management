@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import emitter from '@adonisjs/core/services/emitter'
 import Subscription from '#models/subscription'
 import SubscriptionService from '#services/subscription_service'
@@ -40,7 +40,7 @@ const PERIOD = {
 }
 
 test.group('SubscriptionService period bounds (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('upsert stores Stripe item current_period bounds verbatim, not a recomputed anchor loop', async ({
     assert,
@@ -67,7 +67,7 @@ test.group('SubscriptionService period bounds (functional)', (group) => {
 })
 
 test.group('SubscriptionService sync atomicity (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('subscription upsert and org plan update commit together, event dispatched after commit', async ({
     assert,

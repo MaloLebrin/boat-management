@@ -1,9 +1,9 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { SimulatorShareFactory } from '#database/factories/simulator_share_factory'
 
 test.group('Simulator share (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('GET /simulateur/r/:token returns 200 with valid token', async ({ client }) => {
     const share = await SimulatorShareFactory.merge({ locale: 'fr' }).create()

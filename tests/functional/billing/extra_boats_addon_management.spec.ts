@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { DateTime } from 'luxon'
 import Subscription from '#models/subscription'
 import OrganizationModuleService from '#services/organization_module_service'
@@ -34,7 +34,7 @@ async function seedActiveSubscription(organizationId: number) {
 }
 
 test.group('Billing extra_boats add-on management (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('the billing page exposes active add-ons with quantity and source', async ({ client }) => {
     const user = await createAdminUser() // Pro

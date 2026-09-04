@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import OrganizationModuleService from '#services/organization_module_service'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { createAdminUser } from '#tests/functional/helpers'
@@ -9,7 +9,7 @@ import { createAdminUser } from '#tests/functional/helpers'
  * `createAdminUser()` crée un admin d'une organisation en plan Pro.
  */
 test.group('Module gating (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('pro without module is redirected to billing, never to the public marketing home', async ({
     client,

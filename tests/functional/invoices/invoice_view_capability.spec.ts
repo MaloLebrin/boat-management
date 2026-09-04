@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { DateTime } from 'luxon'
 import Invoice from '#models/invoice'
 import OrganizationMembership from '#models/organization_membership'
@@ -41,7 +41,7 @@ async function createInvoice(organizationId: number, number = 'DEV-000001') {
 }
 
 test.group('Invoices — invoices.view capability (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('member (regression) can still list, view and download invoices', async ({
     client,

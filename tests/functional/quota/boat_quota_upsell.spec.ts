@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import OrganizationMembership from '#models/organization_membership'
 import { UserFactory } from '#database/factories/user_factory'
 import { BoatFactory } from '#database/factories/boat_factory'
@@ -21,7 +21,7 @@ async function createAdminWithPlan(plan: PlanTier) {
 }
 
 test.group('Boat quota upsell (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('GET /boats exposes boatQuota and canAddBoat=false when at the starter limit', async ({
     client,

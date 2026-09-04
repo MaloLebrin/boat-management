@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import { DateTime } from 'luxon'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { createAdminUser } from '#tests/functional/helpers'
@@ -10,7 +10,7 @@ import BoatEnginePart from '#models/boat_engine_part'
 import BoatEngine from '#models/boat_engine'
 
 test.group('Budget Equipment (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('GET /boats/:id/budget includes equipment purchases in totals', async ({
     client,

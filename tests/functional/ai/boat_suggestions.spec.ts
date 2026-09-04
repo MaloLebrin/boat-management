@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import testUtils from '@adonisjs/core/services/test_utils'
+import { truncateDb } from '#tests/utils/db'
 import app from '@adonisjs/core/services/app'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { UserFactory } from '#database/factories/user_factory'
@@ -7,7 +7,7 @@ import { OrganizationFactory } from '#database/factories/organization_factory'
 import BoatHullService from '#services/boat_hull_service'
 
 test.group('AI boat suggestions — boatSuggestions (functional)', (group) => {
-  group.each.setup(() => testUtils.db().truncate())
+  group.each.setup(() => truncateDb())
 
   test('POST /ai/boats/:id/suggestions redirects to /login when unauthenticated', async ({
     client,
