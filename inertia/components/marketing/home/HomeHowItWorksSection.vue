@@ -106,7 +106,11 @@ const { el: previewEl, isVisible: previewVisible } = useScrollReveal()
   </section>
 
   <!-- Section 6: Preview dashboard mockup -->
-  <section :ref="previewEl" class="mt-14 reveal px-6 lg:px-8" :class="{ visible: previewVisible }">
+  <section
+    :ref="previewEl"
+    class="mt-14 pb-14 reveal px-6 lg:px-8 lg:pb-20"
+    :class="{ visible: previewVisible }"
+  >
     <div class="mx-auto grid max-w-6xl gap-8 lg:grid-cols-2 lg:items-center">
       <div class="space-y-3">
         <BaseHeading level="2">{{ preview.title }}</BaseHeading>
