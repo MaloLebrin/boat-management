@@ -184,6 +184,8 @@ export type ScannedRoutes = {
     'settings.org.update': { paramsTuple?: []; params?: {} }
     'settings.ai': { paramsTuple?: []; params?: {} }
     'settings.ai.update': { paramsTuple?: []; params?: {} }
+    'settings.ai.apiKey.update': { paramsTuple?: []; params?: {} }
+    'settings.ai.apiKey.remove': { paramsTuple?: []; params?: {} }
     'settings.auditLog': { paramsTuple?: []; params?: {} }
     'settings.branding': { paramsTuple?: []; params?: {} }
     'settings.branding.update': { paramsTuple?: []; params?: {} }
@@ -268,6 +270,11 @@ export type ScannedRoutes = {
     'ai.fleetAnalysis': { paramsTuple?: []; params?: {} }
     'ai.boatSuggestions': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'ai.engineDiagnosis': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
+    'assistant.start': { paramsTuple?: []; params?: {} }
+    'assistant.message': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'assistant.action.confirm': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'assistant.action.dismiss': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'assistant.archive': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'home': { paramsTuple?: []; params?: {} }
     'marketing.en.home': { paramsTuple?: []; params?: {} }
     'marketing.en.pricing': { paramsTuple?: []; params?: {} }
@@ -669,6 +676,11 @@ export type ScannedRoutes = {
     'ai.fleetAnalysis': { paramsTuple?: []; params?: {} }
     'ai.boatSuggestions': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'ai.engineDiagnosis': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
+    'assistant.start': { paramsTuple?: []; params?: {} }
+    'assistant.message': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'assistant.action.confirm': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'assistant.action.dismiss': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'assistant.archive': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'marketing.contact.store': { paramsTuple?: []; params?: {} }
     'simulator.session': { paramsTuple?: []; params?: {} }
     'simulator.create_boat': { paramsTuple?: []; params?: {} }
@@ -745,6 +757,7 @@ export type ScannedRoutes = {
     'spots.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'settings.billing.module.remove': { paramsTuple?: []; params?: {} }
     'settings.billing.module.enterprise.deactivate': { paramsTuple?: []; params?: {} }
+    'settings.ai.apiKey.remove': { paramsTuple?: []; params?: {} }
     'settings.branding.logo.delete': { paramsTuple?: []; params?: {} }
     'diagnostic.reset': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
     'organization.members.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -786,6 +799,7 @@ export type ScannedRoutes = {
     'settings.theme.update': { paramsTuple?: []; params?: {} }
     'settings.org.update': { paramsTuple?: []; params?: {} }
     'settings.ai.update': { paramsTuple?: []; params?: {} }
+    'settings.ai.apiKey.update': { paramsTuple?: []; params?: {} }
     'settings.branding.update': { paramsTuple?: []; params?: {} }
     'organization.members.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'crew.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }

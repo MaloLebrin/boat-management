@@ -219,7 +219,16 @@
       "mistral-medium-latest": "Mistral Medium (équilibré)",
       "mistral-large-latest": "Mistral Large (performant)"
     },
-    "save": "Enregistrer"
+    "save": "Enregistrer",
+    "apiKey": {
+      "label": "Clé API Mistral",
+      "hint": "Utilisez votre propre clé Mistral AI : la consommation IA est alors facturée sur votre compte Mistral et ne compte plus dans le quota mensuel de tokens de votre plan. La clé est stockée chiffrée et n’est jamais réaffichée.",
+      "configured": "Une clé est configurée pour votre organisation.",
+      "placeholder": "Collez votre clé API Mistral",
+      "placeholderSet": "Saisissez une nouvelle clé pour remplacer l’actuelle",
+      "save": "Enregistrer la clé",
+      "remove": "Retirer la clé"
+    }
   },
   "branding": {
     "title": "Marque blanche",

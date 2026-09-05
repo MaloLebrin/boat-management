@@ -314,6 +314,10 @@ export interface ApiDefinition {
     }
     ai: typeof routes['settings.ai'] & {
       update: typeof routes['settings.ai.update']
+      apiKey: {
+        update: typeof routes['settings.ai.apiKey.update']
+        remove: typeof routes['settings.ai.apiKey.remove']
+      }
     }
     auditLog: typeof routes['settings.auditLog']
     branding: typeof routes['settings.branding'] & {
@@ -454,6 +458,15 @@ export interface ApiDefinition {
     fleetAnalysis: typeof routes['ai.fleetAnalysis']
     boatSuggestions: typeof routes['ai.boatSuggestions']
     engineDiagnosis: typeof routes['ai.engineDiagnosis']
+  }
+  assistant: {
+    start: typeof routes['assistant.start']
+    message: typeof routes['assistant.message']
+    action: {
+      confirm: typeof routes['assistant.action.confirm']
+      dismiss: typeof routes['assistant.action.dismiss']
+    }
+    archive: typeof routes['assistant.archive']
   }
   home: typeof routes['home']
   marketing: {

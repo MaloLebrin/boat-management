@@ -1,0 +1,42 @@
+{
+  "subtitle": "Copilote IA pour votre flotte",
+  "open": "Ouvrir l’assistant FleetAi",
+  "close": "Fermer l’assistant",
+  "newConversation": "Nouvelle conversation",
+  "intro": "Posez une question sur votre flotte : maintenances urgentes, état d’un bateau, planification d’une tâche, panne moteur ou pièce détachée.",
+  "composerPlaceholder": "Posez votre question…",
+  "composerStart": "Démarrer la conversation",
+  "composerSend": "Envoyer",
+  "thinking": "FleetAi réfléchit…",
+  "chatYou": "Vous",
+  "chatAssistant": "FleetAi",
+  "maxMessages": "Cette conversation a atteint sa limite de messages. Démarrez-en une nouvelle pour continuer.",
+  "disclaimer": "FleetAi s’appuie sur les données de votre flotte et peut se tromper. Vérifiez avant d’agir.",
+  "proposal": {
+    "title": "Proposition de tâche",
+    "boat": "Bateau :",
+    "due": "Échéance :",
+    "dueHours": "{hours} heures moteur",
+    "recurrence": "Récurrence :",
+    "recurrenceMonths": "tous les {count} mois",
+    "recurrenceHours": "toutes les {hours} heures moteur",
+    "confirm": "Créer la tâche",
+    "dismiss": "Refuser",
+    "noPermission": "Vous n’avez pas la permission de créer des tâches de maintenance."
+  },
+  "taskCreated": {
+    "title": "Tâche créée pour {boat}",
+    "dueHours": "Échéance à {hours} heures moteur",
+    "viewPlanning": "Voir dans le planning"
+  },
+  "taskDismissed": "Proposition refusée.",
+  "handoff": {
+    "diagnosis": "Ouvrir le diagnostic pour {engine} ({boat})",
+    "partSearch": "Chercher une pièce pour {engine} ({boat})"
+  },
+  "upsell": {
+    "title": "Découvrez votre copilote de flotte",
+    "text": "Posez vos questions en langage naturel, obtenez des réponses fondées sur vos données et créez des tâches de maintenance en un clic.",
+    "cta": "Découvrir les plans IA"
+  }
+}

@@ -79,7 +79,10 @@
     "logoDeleted": "Logo supprimé.",
     "themeUpdated": "Apparence mise à jour.",
     "aiCustomizationRequiresPlan": "La personnalisation du prompt IA nécessite le plan Entreprise. L'IA et le copilote sont disponibles en Pro, mais seul le plan Entreprise permet d'en adapter le contexte métier.",
-    "brandingRequiresPlan": "La marque blanche (logo et couleurs) nécessite le plan Entreprise."
+    "brandingRequiresPlan": "La marque blanche (logo et couleurs) nécessite le plan Entreprise.",
+    "aiApiKeyUpdated": "Clé API IA enregistrée.",
+    "aiApiKeyRemoved": "Clé API IA retirée.",
+    "aiSettingsRequirePlan": "Les réglages IA nécessitent un plan avec accès à l’IA."
   },
   "enginePart": {
     "created": "Pièce ajoutée.",
@@ -361,5 +364,16 @@
     "chatNotFound": "Conversation introuvable.",
     "chatCompleted": "Cette recherche est terminée. Démarrez une nouvelle recherche pour une autre pièce.",
     "chatMaxMessages": "Cette conversation a atteint sa taille maximale. Démarrez une nouvelle recherche."
+  },
+  "assistant": {
+    "chatNotFound": "Conversation introuvable.",
+    "maxMessages": "Cette conversation a atteint sa limite de messages. Démarrez-en une nouvelle pour continuer.",
+    "actionPending": "Une proposition de tâche attend votre réponse. Confirmez-la ou refusez-la pour continuer.",
+    "noPendingAction": "Aucune proposition n’attend de confirmation.",
+    "taskCreated": "Tâche de maintenance créée.",
+    "invalidResponse": "L’assistant a renvoyé une réponse inexploitable. Réessayez.",
+    "budgetExceeded": "Cette conversation a atteint sa limite d’utilisation IA. Démarrez-en une nouvelle pour continuer.",
+    "customKeyFailed": "L’appel IA a échoué avec la clé API de votre organisation. Vérifiez-la dans les réglages IA.",
+    "boatNotFound": "Le bateau de cette proposition n’existe plus."
   }
 }

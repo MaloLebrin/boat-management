@@ -219,7 +219,16 @@
       "mistral-medium-latest": "Mistral Medium (balanced)",
       "mistral-large-latest": "Mistral Large (powerful)"
     },
-    "save": "Save"
+    "save": "Save",
+    "apiKey": {
+      "label": "Mistral API key",
+      "hint": "Use your own Mistral AI key: AI usage is then billed to your Mistral account and no longer counts against your plan’s monthly token quota. The key is stored encrypted and never displayed again.",
+      "configured": "A key is configured for your organisation.",
+      "placeholder": "Paste your Mistral API key",
+      "placeholderSet": "Enter a new key to replace the current one",
+      "save": "Save key",
+      "remove": "Remove key"
+    }
   },
   "branding": {
     "title": "White label",

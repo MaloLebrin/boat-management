@@ -23,6 +23,11 @@ export default class Organization extends OrganizationSchema {
   @column({ consume: (v: unknown) => Number(v) })
   declare storageUsedBytes: number
 
+  // Clé API Mistral BYOK — chiffrée au repos, jamais sérialisée : seul le
+  // booléen `hasCustomApiKey` construit dans SettingsController sort du backend.
+  @column({ serializeAs: null })
+  declare aiApiKeyEncrypted: string | null
+
   @hasMany(() => Port)
   declare ports: HasMany<typeof Port>
 

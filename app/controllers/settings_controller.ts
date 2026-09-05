@@ -11,6 +11,7 @@ import { BrandingService } from '#services/branding_service'
 import OrganizationPolicy from '#policies/organization_policy'
 import {
   changePasswordValidator,
+  updateAiApiKeyValidator,
   updateAiSettingsValidator,
   updateLocaleValidator,
   updateOrganizationValidator,
@@ -19,6 +20,7 @@ import {
 } from '#validators/user'
 import { updateBrandingValidator, uploadLogoValidator } from '#validators/branding'
 import { inject } from '@adonisjs/core'
+import encryption from '@adonisjs/core/services/encryption'
 import hash from '@adonisjs/core/services/hash'
 import type { HttpContext } from '@adonisjs/core/http'
 import { PLAN_LIMITS } from '#shared/types/plan'
@@ -207,8 +209,12 @@ export default class SettingsController {
     await user.load('organization')
     const org = user.organization
 
+    // La page est ouverte dès qu'un plan a l'IA (`canUseAI`) : la clé API BYOK
+    // est un outil de maîtrise des coûts, pas une personnalisation enterprise.
+    // Les sections prompt/modèle restent gardées par `canCustomizeAI`
+    // (`updateAiSettings`) et masquées côté front.
     if (
-      !this.guardPlanFeature(org, 'canCustomizeAI', 'aiCustomizationRequiresPlan', {
+      !this.guardPlanFeature(org, 'canUseAI', 'aiSettingsRequirePlan', {
         response,
         session,
         i18n,
@@ -222,6 +228,8 @@ export default class SettingsController {
     return inertia.render('settings/ai', {
       aiSystemPrompt: org.aiSystemPrompt,
       aiModelOverride: org.aiModelOverride,
+      // Jamais la clé elle-même — seul ce booléen sort du backend.
+      hasCustomApiKey: org.aiApiKeyEncrypted !== null,
     })
   }
 
@@ -250,6 +258,50 @@ export default class SettingsController {
     await org.save()
 
     session.flash('success', i18n.t('flash.settings.aiSettingsUpdated'))
+    return response.redirect().back()
+  }
+
+  /** Enregistre la clé API Mistral de l'org (BYOK) — chiffrée au repos. */
+  async updateAiApiKey({ request, response, session, auth, bouncer, i18n }: HttpContext) {
+    const user = await auth.authenticate()
+    await user.load('organization')
+    const org = user.organization
+
+    if (
+      !this.guardPlanFeature(org, 'canUseAI', 'aiSettingsRequirePlan', { response, session, i18n })
+    ) {
+      return
+    }
+
+    await bouncer.with(OrganizationPolicy).authorize('configureAI')
+
+    const { aiApiKey } = await request.validateUsing(updateAiApiKeyValidator)
+
+    org.aiApiKeyEncrypted = encryption.encrypt(aiApiKey)
+    await org.save()
+
+    session.flash('success', i18n.t('flash.settings.aiApiKeyUpdated'))
+    return response.redirect().back()
+  }
+
+  /** Retire la clé API de l'org — retour à la clé de l'app et à son quota. */
+  async removeAiApiKey({ response, session, auth, bouncer, i18n }: HttpContext) {
+    const user = await auth.authenticate()
+    await user.load('organization')
+    const org = user.organization
+
+    if (
+      !this.guardPlanFeature(org, 'canUseAI', 'aiSettingsRequirePlan', { response, session, i18n })
+    ) {
+      return
+    }
+
+    await bouncer.with(OrganizationPolicy).authorize('configureAI')
+
+    org.aiApiKeyEncrypted = null
+    await org.save()
+
+    session.flash('success', i18n.t('flash.settings.aiApiKeyRemoved'))
     return response.redirect().back()
   }
 

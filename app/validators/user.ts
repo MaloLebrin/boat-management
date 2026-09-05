@@ -68,6 +68,14 @@ export const updateOrganizationValidator = vine.create({
   name: vine.string().minLength(1).maxLength(255),
 })
 
+/**
+ * Clé API Mistral BYOK (copilote FleetAi) : write-only — jamais renvoyée au
+ * front. La suppression passe par une route dédiée, pas par une valeur vide.
+ */
+export const updateAiApiKeyValidator = vine.create({
+  aiApiKey: vine.string().trim().minLength(8).maxLength(200),
+})
+
 export const updateAiSettingsValidator = vine.create({
   aiSystemPrompt: vine
     .string()

@@ -22,6 +22,9 @@ import OrganizationModuleService from '#services/organization_module_service'
 import PermissionService from '#services/permission_service'
 import { DEMO_SESSION_DURATION_MS } from '#shared/constants/demo'
 import DemoService from '#services/demo_service'
+import AssistantChatService from '#services/assistant_chat_service'
+import { toAssistantConversationProps } from '#transformers/assistant_transformer'
+import type { AssistantConversationProps } from '#shared/types/assistant'
 import type User from '#models/user'
 
 export async function resolveSharedCurrentPlan(
@@ -69,7 +72,8 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
     private notificationService: NotificationService,
     private organizationModuleService: OrganizationModuleService,
     private permissionService: PermissionService,
-    private demoService: DemoService
+    private demoService: DemoService,
+    private assistantChatService: AssistantChatService
   ) {
     super()
   }
@@ -177,6 +181,20 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
         pushConfig.enabled ? pushConfig.vapidPublicKey : undefined
       ),
       permissions: ctx.inertia.always(permissions as unknown as JSONDataTypes),
+      // Conversation du copilote FleetAi : prop « optional » — évaluée
+      // uniquement quand le panneau la demande via un partial reload
+      // (`only: ['assistantConversation']`), zéro coût sur les pages normales.
+      // Enveloppée dans un objet : le serializer Inertia jette sur une prop
+      // résolue à `null` (même contrainte que `aiFleetAnalysis`, cf. #478).
+      assistantConversation: ctx.inertia.optional(async () => {
+        const conversation = auth?.user
+          ? await this.assistantChatService.getActiveConversation(auth.user)
+          : null
+        const props: { conversation: AssistantConversationProps | null } = {
+          conversation: conversation ? toAssistantConversationProps(conversation) : null,
+        }
+        return props as unknown as JSONDataTypes
+      }),
     }
   }
 

@@ -1,0 +1,42 @@
+{
+  "subtitle": "AI copilot for your fleet",
+  "open": "Open the FleetAi assistant",
+  "close": "Close the assistant",
+  "newConversation": "New conversation",
+  "intro": "Ask a question about your fleet: urgent maintenance, boat status, scheduling a task, an engine fault or a spare part.",
+  "composerPlaceholder": "Ask your question…",
+  "composerStart": "Start the conversation",
+  "composerSend": "Send",
+  "thinking": "FleetAi is thinking…",
+  "chatYou": "You",
+  "chatAssistant": "FleetAi",
+  "maxMessages": "This conversation has reached its message limit. Start a new one to continue.",
+  "disclaimer": "FleetAi relies on your fleet data and can make mistakes. Verify before acting.",
+  "proposal": {
+    "title": "Task proposal",
+    "boat": "Boat:",
+    "due": "Due:",
+    "dueHours": "{hours} engine hours",
+    "recurrence": "Repeats:",
+    "recurrenceMonths": "every {count} months",
+    "recurrenceHours": "every {hours} engine hours",
+    "confirm": "Create the task",
+    "dismiss": "Dismiss",
+    "noPermission": "You do not have permission to create maintenance tasks."
+  },
+  "taskCreated": {
+    "title": "Task created for {boat}",
+    "dueHours": "Due at {hours} engine hours",
+    "viewPlanning": "View in planning"
+  },
+  "taskDismissed": "Proposal dismissed.",
+  "handoff": {
+    "diagnosis": "Open the diagnosis for {engine} ({boat})",
+    "partSearch": "Search a part for {engine} ({boat})"
+  },
+  "upsell": {
+    "title": "Meet your fleet copilot",
+    "text": "Ask questions in natural language, get answers based on your data and create maintenance tasks in one click.",
+    "cta": "Discover AI plans"
+  }
+}

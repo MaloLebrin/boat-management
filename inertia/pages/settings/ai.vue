@@ -12,6 +12,7 @@ import { useT } from '~/composables/use_t'
 defineProps<{
   aiSystemPrompt: string | null
   aiModelOverride: string | null
+  hasCustomApiKey: boolean
 }>()
 
 const { t } = useT()
@@ -20,6 +21,10 @@ const { t } = useT()
 <template>
   <Head :title="t('settings.ai.title')" />
   <SettingsShell>
-    <SettingsAiTab :ai-system-prompt="aiSystemPrompt" :ai-model-override="aiModelOverride" />
+    <SettingsAiTab
+      :ai-system-prompt="aiSystemPrompt"
+      :ai-model-override="aiModelOverride"
+      :has-custom-api-key="hasCustomApiKey"
+    />
   </SettingsShell>
 </template>

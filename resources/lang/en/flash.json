@@ -79,7 +79,10 @@
     "logoDeleted": "Logo deleted.",
     "themeUpdated": "Appearance updated.",
     "aiCustomizationRequiresPlan": "Customising the AI prompt requires the Enterprise plan. AI and the Copilot are available on Pro, but the business context can only be tailored on Enterprise.",
-    "brandingRequiresPlan": "White labelling (logo and colours) requires the Enterprise plan."
+    "brandingRequiresPlan": "White labelling (logo and colours) requires the Enterprise plan.",
+    "aiApiKeyUpdated": "AI API key saved.",
+    "aiApiKeyRemoved": "AI API key removed.",
+    "aiSettingsRequirePlan": "AI settings require a plan with AI access."
   },
   "enginePart": {
     "created": "Part added.",
@@ -361,5 +364,16 @@
     "chatNotFound": "Conversation not found.",
     "chatCompleted": "This search is complete. Start a new search for another part.",
     "chatMaxMessages": "This conversation has reached its maximum size. Start a new search."
+  },
+  "assistant": {
+    "chatNotFound": "Conversation not found.",
+    "maxMessages": "This conversation has reached its message limit. Start a new one to continue.",
+    "actionPending": "A task proposal is awaiting your answer. Confirm or dismiss it to continue.",
+    "noPendingAction": "No proposal is awaiting confirmation.",
+    "taskCreated": "Maintenance task created.",
+    "invalidResponse": "The assistant returned an unusable answer. Please try again.",
+    "budgetExceeded": "This conversation has reached its AI usage limit. Start a new one to continue.",
+    "customKeyFailed": "The AI call failed with your organisation API key. Check it in the AI settings.",
+    "boatNotFound": "The boat in this proposal no longer exists."
   }
 }

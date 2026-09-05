@@ -19,10 +19,14 @@ export default class AiService {
 
   async chat(
     messages: AiChatMessage[],
-    modelOverride?: string | null
+    modelOverride?: string | null,
+    apiKeyOverride?: string | null
   ): Promise<{ content: string; tokensUsed: number }> {
     const model = modelOverride ?? this.#model
-    const response = await this.#client.chat.complete({
+    // BYOK : une org avec sa propre clé Mistral consomme sur son compte —
+    // client dédié pour l'appel, la clé de l'app reste le défaut.
+    const client = apiKeyOverride ? new Mistral({ apiKey: apiKeyOverride }) : this.#client
+    const response = await client.chat.complete({
       model,
       messages,
     })
