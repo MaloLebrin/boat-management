@@ -1,4 +1,19 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { computed } from 'vue'
+import { useT } from '~/composables/use_t'
+
+const { t } = useT()
+
+const weekdays = computed(() => [
+  t('homePreview.mock.planning.dayMon'),
+  t('homePreview.mock.planning.dayTue'),
+  t('homePreview.mock.planning.dayWed'),
+  t('homePreview.mock.planning.dayThu'),
+  t('homePreview.mock.planning.dayFri'),
+  t('homePreview.mock.planning.daySat'),
+  t('homePreview.mock.planning.daySun'),
+])
+</script>
 
 <template>
   <div class="flex h-full w-full overflow-hidden rounded-lg bg-cream" style="font-size: 10px">
@@ -20,19 +35,19 @@
       <nav class="mt-2 flex flex-col gap-0.5 px-2">
         <div class="flex items-center gap-1.5 px-2 py-1.5 text-white/50">
           <div class="h-3 w-3 rounded bg-white/20" />
-          <span>Dashboard</span>
+          <span>{{ t('homePreview.mock.nav.dashboard') }}</span>
         </div>
         <div class="flex items-center gap-1.5 px-2 py-1.5 text-white/50">
           <div class="h-3 w-3 rounded bg-white/20" />
-          <span>Bateaux</span>
+          <span>{{ t('homePreview.mock.nav.boats') }}</span>
         </div>
         <div class="flex items-center gap-1.5 rounded bg-white/10 px-2 py-1.5 text-white">
           <div class="h-3 w-3 rounded bg-white/30" />
-          <span>Planning</span>
+          <span>{{ t('homePreview.mock.nav.planning') }}</span>
         </div>
         <div class="flex items-center gap-1.5 px-2 py-1.5 text-white/50">
           <div class="h-3 w-3 rounded bg-white/20" />
-          <span>Historique</span>
+          <span>{{ t('homePreview.mock.nav.history') }}</span>
         </div>
       </nav>
     </div>
@@ -44,14 +59,16 @@
         class="flex items-center justify-between border-b border-bone bg-surface-elevated px-4 py-2"
       >
         <div>
-          <p class="font-semibold text-fg">Planning maintenance</p>
-          <p class="text-[9px] text-fg-muted">Mai 2025</p>
+          <p class="font-semibold text-fg">{{ t('homePreview.mock.planning.title') }}</p>
+          <p class="text-[9px] text-fg-muted">{{ t('homePreview.mock.planning.month') }}</p>
         </div>
         <div class="flex items-center gap-1">
-          <span class="rounded-l bg-brand-soft px-2 py-1 text-[9px] font-medium text-brand"
-            >Calendrier</span
-          >
-          <span class="rounded-r bg-paper px-2 py-1 text-[9px] text-fg-muted">Kanban</span>
+          <span class="rounded-l bg-brand-soft px-2 py-1 text-[9px] font-medium text-brand">{{
+            t('homePreview.mock.planning.viewCalendar')
+          }}</span>
+          <span class="rounded-r bg-paper px-2 py-1 text-[9px] text-fg-muted">{{
+            t('homePreview.mock.planning.viewKanban')
+          }}</span>
         </div>
       </div>
 
@@ -60,13 +77,13 @@
         <div class="rounded-lg border border-bone bg-surface-elevated">
           <!-- Calendar header -->
           <div class="grid grid-cols-7 border-b border-bone bg-paper/50">
-            <div class="px-2 py-1.5 text-center text-[9px] font-medium text-fg-muted">Lun</div>
-            <div class="px-2 py-1.5 text-center text-[9px] font-medium text-fg-muted">Mar</div>
-            <div class="px-2 py-1.5 text-center text-[9px] font-medium text-fg-muted">Mer</div>
-            <div class="px-2 py-1.5 text-center text-[9px] font-medium text-fg-muted">Jeu</div>
-            <div class="px-2 py-1.5 text-center text-[9px] font-medium text-fg-muted">Ven</div>
-            <div class="px-2 py-1.5 text-center text-[9px] font-medium text-fg-muted">Sam</div>
-            <div class="px-2 py-1.5 text-center text-[9px] font-medium text-fg-muted">Dim</div>
+            <div
+              v-for="day in weekdays"
+              :key="day"
+              class="px-2 py-1.5 text-center text-[9px] font-medium text-fg-muted"
+            >
+              {{ day }}
+            </div>
           </div>
 
           <!-- Week 1 -->
@@ -159,19 +176,19 @@
         <div class="mt-2 flex items-center gap-3 text-[9px]">
           <div class="flex items-center gap-1">
             <div class="h-2 w-2 rounded bg-coral-400" />
-            <span class="text-fg-muted">En retard</span>
+            <span class="text-fg-muted">{{ t('homePreview.mock.planning.legendOverdue') }}</span>
           </div>
           <div class="flex items-center gap-1">
             <div class="h-2 w-2 rounded bg-amber-400" />
-            <span class="text-fg-muted">Sous 14j</span>
+            <span class="text-fg-muted">{{ t('homePreview.mock.planning.legendDueSoon') }}</span>
           </div>
           <div class="flex items-center gap-1">
             <div class="h-2 w-2 rounded bg-navy-400" />
-            <span class="text-fg-muted">Planifié</span>
+            <span class="text-fg-muted">{{ t('homePreview.mock.planning.legendPlanned') }}</span>
           </div>
           <div class="flex items-center gap-1">
             <div class="h-2 w-2 rounded bg-mint-300" />
-            <span class="text-fg-muted">Terminé</span>
+            <span class="text-fg-muted">{{ t('homePreview.mock.planning.legendDone') }}</span>
           </div>
         </div>
       </div>

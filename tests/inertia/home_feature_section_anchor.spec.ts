@@ -1,5 +1,12 @@
 import { mount } from '@vue/test-utils'
-import { expect, test } from 'vitest'
+import { expect, test, vi } from 'vitest'
+
+// La maquette rendue par la section (HomeMockBoatDetail) lit `appT` via useT :
+// hors app Inertia, on mocke le composable comme dans marketing_feature.spec.ts.
+vi.mock('~/composables/use_t', () => ({
+  useT: () => ({ t: (k: string) => k, locale: { value: 'fr' } }),
+}))
+
 import HomeFeatureSection from '../../inertia/components/marketing/home/HomeFeatureSection.vue'
 
 const baseProps = {

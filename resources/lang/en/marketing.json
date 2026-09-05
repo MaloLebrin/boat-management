@@ -832,6 +832,8 @@
     "office_title_highlight": "overlooking its users.",
     "office_body": "Our headquarters is on quai du Port, Marseille. Six minutes' walk from the Vieux-Port, ten minutes by boat from the marina that started it all. Paris outpost for sales.",
     "office_location_label": "Address",
+    "office_hours_label": "Hours",
+    "office_team_label": "Team",
     "office_loc1_city": "Marseille",
     "office_loc1_addr": "12 quai du Port · 13002",
     "office_loc1_role": "HQ · product team",

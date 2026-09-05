@@ -284,6 +284,8 @@ export interface AboutPageProps {
         titleHighlight: string
         body: string
         locationLabel: string
+        hoursLabel: string
+        teamLabel: string
         locations: AboutLocation[]
         officeCards: AboutOfficeCard[]
       }

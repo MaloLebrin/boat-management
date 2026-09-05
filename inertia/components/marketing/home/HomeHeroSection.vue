@@ -103,7 +103,7 @@ const { el: tiltEl, transform: tiltTransform } = useTilt({ max: 6, parallax: 0.6
         <div class="float-slow">
           <div :ref="tiltEl" class="will-change-transform" :style="{ transform: tiltTransform }">
             <HomeBrowserFrame>
-              <HomeMockDashboard :persona="activePersona" />
+              <HomeMockDashboard />
             </HomeBrowserFrame>
           </div>
         </div>

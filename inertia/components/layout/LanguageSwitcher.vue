@@ -19,7 +19,7 @@ function switchLocale(newLocale: 'en' | 'fr') {
       :class="
         locale === 'en'
           ? 'bg-navy-500 text-white'
-          : 'text-navy-200 hover:text-white hover:bg-navy-700'
+          : 'text-navy-200 hover:text-white hover:bg-navy-700 cursor-pointer'
       "
       @click="switchLocale('en')"
     >

@@ -1,67 +1,74 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import { useT } from '~/composables/use_t'
+
 // Panneau « À venir » du mock dashboard : liste de tâches qui défile en boucle
 // verticale continue (mock « vivant »). Extrait de HomeMockDashboard pour tenir
 // sous la limite de 250 lignes.
 // Assez d'items uniques pour que la boucle (translate -50%) reste sans couture
 // même quand la liste remplit toute la hauteur du panneau.
-const upcomingTasks = [
+const { t } = useT()
+
+const upcomingTasks = computed(() => [
   {
     boat: 'Azur',
-    label: 'Antifouling - 12 mai',
+    label: t('homePreview.mock.upcoming.taskAntifouling'),
     dot: 'bg-coral-600',
     card: 'border-coral-200 bg-coral-50',
   },
   {
     boat: 'Tramontane',
-    label: 'Gréement - 18 mai',
+    label: t('homePreview.mock.upcoming.taskRigging'),
     dot: 'bg-amber-600',
     card: 'border-amber-200 bg-amber-50',
   },
   {
     boat: 'Mistral II',
-    label: 'Vidange moteur - 21 mai',
+    label: t('homePreview.mock.upcoming.taskOilChange'),
     dot: 'bg-coral-600',
     card: 'border-coral-200 bg-coral-50',
   },
   {
     boat: 'Sirocco',
-    label: 'Contrôle sécurité - 26 mai',
+    label: t('homePreview.mock.upcoming.taskSafetyCheck'),
     dot: 'bg-mint-600',
     card: 'border-mint-200 bg-mint-50',
   },
   {
     boat: 'Cap Horn',
-    label: 'Révision hivernage - 2 juin',
+    label: t('homePreview.mock.upcoming.taskWinterizing'),
     dot: 'bg-amber-600',
     card: 'border-amber-200 bg-amber-50',
   },
   {
     boat: 'Alizée',
-    label: 'Changement voile - 8 juin',
+    label: t('homePreview.mock.upcoming.taskSailChange'),
     dot: 'bg-coral-600',
     card: 'border-coral-200 bg-coral-50',
   },
   {
     boat: 'Zephyr',
-    label: 'Contrôle GPS - 14 juin',
+    label: t('homePreview.mock.upcoming.taskGpsCheck'),
     dot: 'bg-mint-600',
     card: 'border-mint-200 bg-mint-50',
   },
   {
     boat: 'Bora',
-    label: 'Carénage - 20 juin',
+    label: t('homePreview.mock.upcoming.taskHullCleaning'),
     dot: 'bg-amber-600',
     card: 'border-amber-200 bg-amber-50',
   },
-]
+])
 
 // Liste dupliquee pour un defilement en boucle sans couture (translate -50%).
-const loopedTasks = [...upcomingTasks, ...upcomingTasks]
+const loopedTasks = computed(() => [...upcomingTasks.value, ...upcomingTasks.value])
 </script>
 
 <template>
   <div class="flex min-h-0 flex-1 flex-col">
-    <p class="mb-2 text-[9px] font-medium uppercase text-fg-muted">À venir</p>
+    <p class="mb-2 text-[9px] font-medium uppercase text-fg-muted">
+      {{ t('homePreview.mock.upcoming.title') }}
+    </p>
     <div
       class="min-h-0 flex-1 overflow-hidden"
       style="

@@ -1,4 +1,8 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { useT } from '~/composables/use_t'
+
+const { t } = useT()
+</script>
 
 <template>
   <div class="flex h-full w-full overflow-hidden rounded-lg bg-cream" style="font-size: 10px">
@@ -20,19 +24,19 @@
       <nav class="mt-2 flex flex-col gap-0.5 px-2">
         <div class="flex items-center gap-1.5 px-2 py-1.5 text-white/50">
           <div class="h-3 w-3 rounded bg-white/20" />
-          <span>Dashboard</span>
+          <span>{{ t('homePreview.mock.nav.dashboard') }}</span>
         </div>
         <div class="flex items-center gap-1.5 px-2 py-1.5 text-white/50">
           <div class="h-3 w-3 rounded bg-white/20" />
-          <span>Bateaux</span>
+          <span>{{ t('homePreview.mock.nav.boats') }}</span>
         </div>
         <div class="flex items-center gap-1.5 px-2 py-1.5 text-white/50">
           <div class="h-3 w-3 rounded bg-white/20" />
-          <span>Planning</span>
+          <span>{{ t('homePreview.mock.nav.planning') }}</span>
         </div>
         <div class="flex items-center gap-1.5 px-2 py-1.5 text-white/50">
           <div class="h-3 w-3 rounded bg-white/20" />
-          <span>Historique</span>
+          <span>{{ t('homePreview.mock.nav.history') }}</span>
         </div>
       </nav>
       <div class="mt-auto border-t border-white/10 px-2 py-2">
@@ -48,7 +52,7 @@
       <div
         class="flex items-center justify-between border-b border-bone bg-surface-elevated px-4 py-2"
       >
-        <p class="font-semibold text-fg">Dashboard</p>
+        <p class="font-semibold text-fg">{{ t('homePreview.mock.nav.dashboard') }}</p>
       </div>
       <div class="flex-1 p-3">
         <div class="mb-3 grid grid-cols-3 gap-2">
@@ -75,33 +79,48 @@
           </div>
           <span class="font-medium text-white">FleetAi</span>
         </div>
-        <p class="mt-0.5 text-[9px] text-white/60">Copilote IA pour ta flotte</p>
+        <p class="mt-0.5 text-[9px] text-white/60">
+          {{ t('homePreview.mock.fleetide.subtitle') }}
+        </p>
       </div>
 
       <!-- Chat messages -->
       <div class="flex-1 overflow-auto p-3">
         <!-- User message -->
         <div class="mb-3 ml-4 rounded-lg rounded-br-sm bg-navy-800 p-2 text-white">
-          <p class="text-[10px]">Quelles maintenances sont urgentes cette semaine ?</p>
+          <p class="text-[10px]">{{ t('homePreview.mock.fleetide.userQuestion1') }}</p>
         </div>
 
         <!-- AI response -->
         <div class="mb-3 rounded-lg rounded-bl-sm bg-surface-elevated p-2">
           <p class="text-[10px] text-fg">
-            Tu as <strong class="text-coral-600">3 maintenances urgentes</strong> cette semaine :
+            {{ t('homePreview.mock.fleetide.answerPrefix') }}
+            <strong class="text-coral-600">{{
+              t('homePreview.mock.fleetide.answerStrong')
+            }}</strong>
+            {{ t('homePreview.mock.fleetide.answerSuffix') }}
           </p>
           <ul class="mt-1.5 space-y-1 text-[9px] text-fg-muted">
             <li class="flex items-start gap-1">
               <span class="mt-0.5 text-coral-500">&#8226;</span>
-              <span><strong>Mistral II</strong> : Vidange moteur (retard 42h)</span>
+              <span
+                ><strong>Mistral II</strong>{{ t('homePreview.mock.fleetide.itemSep')
+                }}{{ t('homePreview.mock.fleetide.itemOilChange') }}</span
+              >
             </li>
             <li class="flex items-start gap-1">
               <span class="mt-0.5 text-coral-500">&#8226;</span>
-              <span><strong>Alizée</strong> : Contrôle gréement (retard 3j)</span>
+              <span
+                ><strong>Alizée</strong>{{ t('homePreview.mock.fleetide.itemSep')
+                }}{{ t('homePreview.mock.fleetide.itemRigging') }}</span
+              >
             </li>
             <li class="flex items-start gap-1">
               <span class="mt-0.5 text-amber-600">&#8226;</span>
-              <span><strong>Azur</strong> : Antifouling (dans 5j)</span>
+              <span
+                ><strong>Azur</strong>{{ t('homePreview.mock.fleetide.itemSep')
+                }}{{ t('homePreview.mock.fleetide.itemAntifouling') }}</span
+              >
             </li>
           </ul>
 
@@ -110,30 +129,31 @@
             <button
               class="rounded bg-violet-100 px-2 py-0.5 text-[9px] font-medium text-violet-700 hover:bg-violet-200"
             >
-              Planifier Mistral II
+              {{ t('homePreview.mock.fleetide.buttonSchedule') }}
             </button>
             <button
               class="rounded bg-violet-100 px-2 py-0.5 text-[9px] font-medium text-violet-700 hover:bg-violet-200"
             >
-              Voir détails
+              {{ t('homePreview.mock.fleetide.buttonDetails') }}
             </button>
           </div>
         </div>
 
         <!-- User message -->
         <div class="mb-3 ml-4 rounded-lg rounded-br-sm bg-navy-800 p-2 text-white">
-          <p class="text-[10px]">Planifie la vidange pour demain 9h</p>
+          <p class="text-[10px]">{{ t('homePreview.mock.fleetide.userQuestion2') }}</p>
         </div>
 
         <!-- AI response -->
         <div class="rounded-lg rounded-bl-sm bg-surface-elevated p-2">
           <p class="text-[10px] text-fg">
-            <span class="text-mint-600">&#10003;</span> Tâche créée pour
-            <strong>Mistral II</strong> :
+            <span class="text-mint-600">&#10003;</span>
+            {{ t('homePreview.mock.fleetide.taskCreatedPrefix') }}
+            <strong>Mistral II</strong>{{ t('homePreview.mock.fleetide.taskCreatedSuffix') }}
           </p>
           <div class="mt-1.5 rounded border border-bone bg-paper p-1.5 text-[9px]">
-            <p class="font-medium text-fg">Vidange moteur</p>
-            <p class="text-fg-muted">Demain 9h00 - Ponton B-12</p>
+            <p class="font-medium text-fg">{{ t('homePreview.mock.fleetide.taskCardTitle') }}</p>
+            <p class="text-fg-muted">{{ t('homePreview.mock.fleetide.taskCardMeta') }}</p>
           </div>
         </div>
       </div>
@@ -143,7 +163,7 @@
         <div class="flex items-center gap-2 rounded-lg bg-white/10 px-2 py-1.5">
           <input
             type="text"
-            placeholder="Pose ta question..."
+            :placeholder="t('homePreview.mock.fleetide.placeholder')"
             class="flex-1 bg-transparent text-[10px] text-white placeholder-white/50 outline-none"
             disabled
           />

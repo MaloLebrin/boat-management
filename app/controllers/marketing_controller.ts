@@ -1275,6 +1275,8 @@ export default class MarketingController {
           titleHighlight: t('office_title_highlight'),
           body: t('office_body'),
           locationLabel: t('office_location_label'),
+          hoursLabel: t('office_hours_label'),
+          teamLabel: t('office_team_label'),
           locations: [
             {
               city: t('office_loc1_city'),

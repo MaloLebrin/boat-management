@@ -55,6 +55,7 @@ export const controllers = {
   MaintenanceHistoryPdf: () => import('#controllers/maintenance_history_pdf_controller'),
   MaintenanceLogPdf: () => import('#controllers/maintenance_log_pdf_controller'),
   Marketing: () => import('#controllers/marketing_controller'),
+  MarketingFeatures: () => import('#controllers/marketing_features_controller'),
   Mouillages: () => import('#controllers/mouillages_controller'),
   Navigation: () => import('#controllers/navigation_controller'),
   NavigationLogCrew: () => import('#controllers/navigation_log_crew_controller'),
@@ -81,5 +82,4 @@ export const controllers = {
   SimulatorShare: () => import('#controllers/simulator_share_controller'),
   SparePartChat: () => import('#controllers/spare_part_chat_controller'),
   Spots: () => import('#controllers/spots_controller'),
-  MarketingFeatures: () => import('#controllers/marketing_features_controller'),
 }

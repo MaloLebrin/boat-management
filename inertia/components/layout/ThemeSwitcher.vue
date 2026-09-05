@@ -30,10 +30,10 @@ const LABEL_KEYS: Record<ThemePreference, string> = {
         tone === 'onDark'
           ? preference === option
             ? 'bg-navy-500 text-white'
-            : 'text-navy-200 hover:bg-navy-700 hover:text-white'
+            : 'text-navy-200 hover:bg-navy-700 hover:text-white cursor-pointer'
           : preference === option
             ? 'bg-brand text-on-brand'
-            : 'text-fg-muted hover:bg-surface-muted hover:text-fg',
+            : 'text-fg-muted hover:bg-surface-muted hover:text-fg cursor-pointer',
       ]"
       @click="setTheme(option)"
     >
