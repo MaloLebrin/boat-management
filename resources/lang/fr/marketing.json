@@ -12,7 +12,7 @@
   "home": {
     "hero": {
       "cta_primary": "Commencer gratuitement",
-      "cta_secondary": "Réserver une démo",
+      "cta_secondary": "Essayer la démo",
       "caption": "Plan Starter gratuit à vie - sans carte bleue - setup en 5 min",
       "loueurs_title": "Tu gères ta flotte dans Excel.",
       "loueurs_highlight": "Tu peux faire mieux.",
@@ -301,7 +301,7 @@
       "title_highlight": "Sans engagement.",
       "subtitle": "Crée ton organisation, importe tes bateaux, et laisse FleetAi te montrer ce que tu rates.",
       "primary_cta": "Créer mon organisation",
-      "secondary_cta": "Réserver une démo"
+      "secondary_cta": "Essayer la démo"
     },
     "case_study": {
       "title": "Comment une marina a réduit ses retards de maintenance de 80 %",
@@ -353,14 +353,14 @@
     },
     "demo": {
       "eyebrow": "DÉMO PRODUIT",
-      "title": "30 minutes pour voir",
+      "title": "Deux minutes pour voir",
       "title_highlight": "la différence.",
-      "subtitle": "Un expert te montre l'app avec tes données réelles — sans jargon, sans présentation PowerPoint.",
+      "subtitle": "Essaie l'app en accès libre sur une flotte de démo, ou écris-nous via le formulaire de contact — sans jargon, sans présentation PowerPoint.",
       "item1": "Dashboard flotte configure avec tes bateaux",
       "item2": "Historique maintenance et alertes en temps réel",
       "item3": "Assistant IA FleetAi sur tes cas concrets",
       "item4": "Configuration initiale en moins de 15 minutes",
-      "cta_label": "Réserver une démo gratuite",
+      "cta_label": "Nous écrire",
       "cta_href": "/contact",
       "secondary_label": "Voir les tarifs",
       "no_commitment": "Sans engagement · Réponse sous 24h",
@@ -715,7 +715,7 @@
     "final_cta_highlight": "gratuit à vie.",
     "final_cta_subtitle": "Sans carte bleue. Sans engagement. Configure ta flotte en 5 minutes.",
     "final_cta_primary": "Créer mon organisation",
-    "final_cta_secondary": "Voir une démo"
+    "final_cta_secondary": "Essayer la démo"
   },
   "about2": {
     "meta_title": "À propos",
@@ -859,7 +859,7 @@
     "final_cta_highlight": "40+ flottes.",
     "final_cta_subtitle": "Commence gratuitement avec le plan Starter. Aucune carte bleue requise.",
     "final_cta_primary": "Créer mon organisation",
-    "final_cta_secondary": "Voir la démo"
+    "final_cta_secondary": "Essayer la démo"
   },
   "contact2": {
     "meta_title": "Contact",
@@ -869,9 +869,9 @@
     "hero_title_highlight": "ta flotte.",
     "hero_subtitle": "On répond sous 4h en jours ouvrés. Pas de bot. C'est l'un de nous qui te lit.",
     "ch1_icon": "✦",
-    "ch1_title": "Démo personnalisée",
-    "ch1_desc": "20 min en visio avec Anaïs ou Théo. Sur ta flotte réelle.",
-    "ch1_cta": "Réserver un créneau",
+    "ch1_title": "Démo en accès libre",
+    "ch1_desc": "Explore FleetAi sur une flotte de démo. Accès instantané, sans inscription.",
+    "ch1_cta": "Lancer la démo",
     "ch2_icon": "▶",
     "ch2_title": "Tester sans parler",
     "ch2_desc": "Plan Starter gratuit, configuré en 5 minutes. Sans CB.",
@@ -950,8 +950,8 @@
     "faq_title_highlight": "vraiment.",
     "faq_q1": "Combien de temps pour avoir une réponse ?",
     "faq_a1": "Sous 4 heures en jours ouvrés, en français. La nuit et le weekend, on lit mais on ne répond pas.",
-    "faq_q2": "Puis-je avoir une démo sur ma vraie flotte ?",
-    "faq_a2": "Oui. Réserve un créneau de 20 min — on travaille avec tes données pendant la session. Confidentialité garantie.",
+    "faq_q2": "Puis-je voir FleetAi en action avant de m'inscrire ?",
+    "faq_a2": "Oui — la démo est en accès libre sur une flotte d'exemple, sans inscription. Pour parler de ta propre flotte, écris-nous via le formulaire : on te répond sous 4h en jours ouvrés.",
     "faq_q3": "Vous parlez anglais ?",
     "faq_a3": "Oui, l'équipe est bilingue FR/EN. Si tu écris en anglais, on te répondra en anglais.",
     "faq_q4": "Je suis intégrateur / consultant, vous avez un programme partenaire ?",
@@ -1459,9 +1459,9 @@
     "channel2_title": "Envoie un message",
     "channel2_desc": "Décris ton besoin via le formulaire de contact, on revient vers toi rapidement.",
     "channel2_cta": "Ouvrir le formulaire",
-    "channel3_title": "Réserve une démo",
-    "channel3_desc": "30 minutes avec l'équipe pour voir FleetAi appliqué à ta flotte.",
-    "channel3_cta": "Réserver un créneau",
+    "channel3_title": "Essaie la démo",
+    "channel3_desc": "Explore FleetAi en accès libre sur une flotte de démo, sans inscription.",
+    "channel3_cta": "Lancer la démo",
     "faq_eyebrow": "FAQ",
     "faq_title": "Les réponses",
     "faq_title_highlight": "aux questions fréquentes",

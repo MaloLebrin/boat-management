@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useForm } from '@inertiajs/vue3'
 import { Link } from '@adonisjs/inertia/vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import ParticleNetworkCanvas from '~/components/marketing/canvas/ParticleNetworkCanvas.vue'
@@ -9,9 +10,17 @@ defineProps<{
   subtitle: string
   primaryCta: string
   secondaryCta: string
+  /**
+   * Route POST de la démo autonome : le CTA secondaire devient un bouton qui
+   * ouvre une session de démo en libre accès (on ne « réserve » pas de démo).
+   */
+  demoLoginPath?: string
   /** Cible du CTA secondaire ; à défaut, ancre historique #demo (même page). */
   secondaryHref?: string
 }>()
+
+// Session de démo autonome : POST Inertia (CSRF automatique), comme HomeDemoSection.
+const demoForm = useForm({})
 </script>
 
 <template>
@@ -46,8 +55,19 @@ defineProps<{
             {{ primaryCta }}
           </BaseButton>
         </Link>
-        <!-- Sans `secondaryHref`, comportement historique : ancre #demo (même page). -->
-        <Link v-if="secondaryHref" :href="secondaryHref">
+        <!-- Avec `demoLoginPath`, le CTA secondaire lance la démo autonome ;
+             sans `secondaryHref`, comportement historique : ancre #demo (même page). -->
+        <BaseButton
+          v-if="demoLoginPath"
+          size="lg"
+          variant="ghost"
+          class="border! border-white/20! text-white/70! hover:bg-white/10! hover:text-white!"
+          :disabled="demoForm.processing"
+          @click="demoForm.post(demoLoginPath)"
+        >
+          {{ secondaryCta }}
+        </BaseButton>
+        <Link v-else-if="secondaryHref" :href="secondaryHref">
           <BaseButton
             size="lg"
             variant="ghost"

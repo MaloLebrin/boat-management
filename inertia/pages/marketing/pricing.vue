@@ -201,6 +201,8 @@ interface PageProps {
         subtitle: string
         primaryCta: string
         secondaryCta: string
+        /** Route POST de la démo autonome, cible du CTA secondaire. */
+        demoLoginPath: string
       }
     }
   }

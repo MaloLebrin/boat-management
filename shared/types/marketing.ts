@@ -162,6 +162,8 @@ export interface HelpChannelCard {
   href: string
   /** `true` = lien externe (mailto) rendu en ancre brute, pas en <Link> Inertia. */
   external?: boolean
+  /** `true` = bouton qui lance la session de démo autonome (POST Inertia sur `href`). */
+  demo?: boolean
 }
 
 export interface HelpFaqGroup {
@@ -295,6 +297,8 @@ export interface AboutPageProps {
         subtitle: string
         primaryCta: string
         secondaryCta: string
+        /** Route POST de la démo autonome, cible du CTA secondaire. */
+        demoLoginPath: string
       }
     }
   }

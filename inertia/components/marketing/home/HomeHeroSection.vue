@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useForm } from '@inertiajs/vue3'
 import { Link } from '@adonisjs/inertia/vue'
 import { computed } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
@@ -22,9 +23,17 @@ const props = defineProps<{
   caption: string
   socialProof: { eyebrow: string; logos: string[] }
   locale: 'en' | 'fr'
+  /**
+   * Route POST de la démo autonome : le CTA secondaire devient un bouton qui
+   * ouvre une session de démo en libre accès (on ne « réserve » pas de démo).
+   */
+  demoLoginPath?: string
   /** Cible du CTA secondaire ; à défaut, ancre historique #demo (même page). */
   secondaryHref?: string
 }>()
+
+// Session de démo autonome : POST Inertia (CSRF automatique), comme HomeDemoSection.
+const demoForm = useForm({})
 
 // `armateurs` n'a pas de contenu hero dédié → repli sur `loueurs` (évite un
 // rendu `undefined` quand l'onglet persona correspondant est sélectionné).
@@ -69,8 +78,19 @@ const { el: tiltEl, transform: tiltTransform } = useTilt({ max: 6, parallax: 0.6
               {{ cta.primary }}
             </BaseButton>
           </Link>
-          <!-- Sans `secondaryHref`, comportement historique : ancre #demo (même page). -->
-          <Link v-if="secondaryHref" :href="secondaryHref">
+          <!-- Avec `demoLoginPath`, le CTA secondaire lance la démo autonome ;
+               sans `secondaryHref`, comportement historique : ancre #demo (même page). -->
+          <BaseButton
+            v-if="demoLoginPath"
+            size="lg"
+            variant="outline"
+            class="border-white/30! text-white! hover:bg-white/10!"
+            :disabled="demoForm.processing"
+            @click="demoForm.post(demoLoginPath)"
+          >
+            {{ cta.secondary }}
+          </BaseButton>
+          <Link v-else-if="secondaryHref" :href="secondaryHref">
             <BaseButton
               size="lg"
               variant="outline"

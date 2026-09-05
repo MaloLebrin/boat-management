@@ -135,12 +135,12 @@ describe('ContactChannelsSection', () => {
   const items = [
     {
       icon: '✦',
-      title: 'Démo',
-      desc: '20 min',
-      cta: 'Réserver un créneau',
+      title: 'Démo en accès libre',
+      desc: 'Flotte de démo, sans inscription',
+      cta: 'Lancer la démo',
       tone: 'navy',
-      href: '#contact-form',
-      kind: 'anchor' as const,
+      href: '/demo',
+      kind: 'demo' as const,
     },
     {
       icon: '▶',
@@ -161,11 +161,23 @@ describe('ContactChannelsSection', () => {
     },
   ]
 
-  test('every CTA card is a link, not a decorative paragraph', () => {
+  test('every CTA card is actionable, not a decorative paragraph', () => {
     const wrapper = mount(ContactChannelsSection, { props: { items } })
 
-    expect(wrapper.find('a[href="#contact-form"]').exists()).toBe(true)
+    expect(wrapper.find('button[type="button"]').exists()).toBe(true)
     expect(wrapper.find('a[href="mailto:support@fleetai.app"]').exists()).toBe(true)
     expect(wrapper.find('[data-link][href="/signup"]').exists()).toBe(true)
+  })
+
+  test('the demo card launches the self-guided demo session via POST', async () => {
+    const wrapper = mount(ContactChannelsSection, { props: { items } })
+
+    const demoCard = wrapper
+      .findAll('button')
+      .find((button) => button.text().includes('Lancer la démo'))
+    expect(demoCard).toBeDefined()
+    await demoCard!.trigger('click')
+
+    expect(mockFormPost).toHaveBeenCalledWith('/demo')
   })
 })

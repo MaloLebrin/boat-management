@@ -242,11 +242,9 @@ const featureCtas = computed(() =>
   }))
 )
 
-// « Réserver une démo » pointait sur l'ancre #demo de HomeDemoSection, retirée
-// de l'affichage : cible désormais le formulaire de contact (ancre côté
-// contrôleur : CONTACT_FORM_ANCHOR). Réactivation de la section → retirer ces
-// props secondary-href pour revenir à l'ancre.
-const demoCtaHref = computed(() => `${marketingPath('contact', locale.value)}#contact-form`)
+// « Essayer la démo » : le CTA secondaire du hero et du CTA final lance la
+// session de démo autonome (POST /demo) — on ne « réserve » pas de démo, on
+// l'essaie soi-même ou on passe par le formulaire de contact.
 
 const hreflangEn = marketingPath('home', 'en')
 const hreflangFr = marketingPath('home', 'fr')
@@ -289,7 +287,7 @@ const websiteSchema = computed(() =>
     :caption="t.home.hero.caption"
     :social-proof="t.home.socialProof"
     :locale="locale"
-    :secondary-href="demoCtaHref"
+    :demo-login-path="t.home.demo.demoLoginPath"
   />
 
   <!-- 2. Problem -->
@@ -403,8 +401,8 @@ const websiteSchema = computed(() =>
   />
   -->
 
-  <!-- Section retirée (refonte 2026-09) : Demo — la demande de démo vit sur
-       /contact (relayée par la page /aide et le footer).
+  <!-- Section retirée (refonte 2026-09) : Demo — la démo autonome se lance
+       depuis les CTA secondaires (hero, CTA final) et les pages /contact et /aide.
   <HomeDemoSection
     :eyebrow="t.home.demo.eyebrow"
     :title="t.home.demo.title"
@@ -437,6 +435,6 @@ const websiteSchema = computed(() =>
     :subtitle="t.home.finalCta.subtitle"
     :primary-cta="t.home.finalCta.primaryCta"
     :secondary-cta="t.home.finalCta.secondaryCta"
-    :secondary-href="demoCtaHref"
+    :demo-login-path="t.home.demo.demoLoginPath"
   />
 </template>

@@ -11,10 +11,16 @@ import { formatPrice } from '#shared/helpers/number_format'
 import QuotaService from '#services/quota_service'
 import SimulatorLeadService from '#services/simulator_lead_service'
 
-/** Ancre du formulaire de contact, ciblée par la carte « Réserver un créneau » (#450). */
+/** Ancre du formulaire de contact, ciblée par les cartes et CTA « Écris-nous » (#450). */
 const CONTACT_FORM_ANCHOR = 'contact-form'
 /** Route POST unique du formulaire de contact, quelle que soit la locale de l'URL. */
 const CONTACT_FORM_ACTION = '/contact'
+/**
+ * Route POST de la démo autonome (session en libre accès, sans inscription).
+ * On ne « réserve » pas de démo : tous les CTA démo lancent cette session,
+ * le formulaire de contact restant la voie pour parler à l'équipe.
+ */
+const DEMO_LOGIN_PATH = '/demo'
 /**
  * Taille de flotte citée en exemple par la FAQ tarifaire de la home. Le montant
  * associé n'est pas recopié : il se calcule (socle Pro + un add-on `extra_boats`
@@ -583,7 +589,7 @@ export default class MarketingController {
           noCommitment: i18n.t('marketing.home.demo.no_commitment'),
           tryDemoLabel: i18n.t('marketing.home.demo.try_demo_label'),
           tryDemoSubtitle: i18n.t('marketing.home.demo.try_demo_subtitle'),
-          demoLoginPath: '/demo',
+          demoLoginPath: DEMO_LOGIN_PATH,
         },
         finalCta: {
           title: i18n.t('marketing.home.final_cta.title'),
@@ -1109,6 +1115,7 @@ export default class MarketingController {
           subtitle: t('final_cta_subtitle'),
           primaryCta: t('final_cta_primary'),
           secondaryCta: t('final_cta_secondary'),
+          demoLoginPath: DEMO_LOGIN_PATH,
         },
       },
     }
@@ -1321,6 +1328,7 @@ export default class MarketingController {
           subtitle: t('final_cta_subtitle'),
           primaryCta: t('final_cta_primary'),
           secondaryCta: t('final_cta_secondary'),
+          demoLoginPath: DEMO_LOGIN_PATH,
         },
       },
     }
@@ -1736,7 +1744,8 @@ export default class MarketingController {
             title: t('channel3_title'),
             description: t('channel3_desc'),
             ctaLabel: t('channel3_cta'),
-            href: contactFormHref,
+            href: DEMO_LOGIN_PATH,
+            demo: true,
           },
         ],
         faq: {
@@ -1827,8 +1836,8 @@ export default class MarketingController {
             desc: t('ch1_desc'),
             cta: t('ch1_cta'),
             tone: 'navy',
-            href: `#${CONTACT_FORM_ANCHOR}`,
-            kind: 'anchor',
+            href: DEMO_LOGIN_PATH,
+            kind: 'demo',
           },
           {
             icon: t('ch2_icon'),

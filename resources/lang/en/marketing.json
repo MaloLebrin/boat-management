@@ -12,7 +12,7 @@
   "home": {
     "hero": {
       "cta_primary": "Start for free",
-      "cta_secondary": "Book a demo",
+      "cta_secondary": "Try the demo",
       "caption": "Free Starter plan forever - no credit card - setup in 5 min",
       "loueurs_title": "You manage your fleet in Excel.",
       "loueurs_highlight": "You can do better.",
@@ -301,7 +301,7 @@
       "title_highlight": "No commitment.",
       "subtitle": "Create your organization, import your boats, and let FleetAi show you what you're missing.",
       "primary_cta": "Create my organization",
-      "secondary_cta": "Book a demo"
+      "secondary_cta": "Try the demo"
     },
     "case_study": {
       "title": "How a marina reduced maintenance delays by 80%",
@@ -353,14 +353,14 @@
     },
     "demo": {
       "eyebrow": "PRODUCT DEMO",
-      "title": "30 minutes to see",
+      "title": "Two minutes to see",
       "title_highlight": "the difference.",
-      "subtitle": "An expert walks you through the app with your real data — no jargon, no PowerPoint.",
+      "subtitle": "Try the app freely on a demo fleet, or write to us through the contact form — no jargon, no PowerPoint.",
       "item1": "Live fleet dashboard configured with your boats",
       "item2": "Maintenance history and real-time alerts",
       "item3": "FleetAi AI assistant on your specific use cases",
       "item4": "Initial setup done in under 15 minutes",
-      "cta_label": "Book a free demo",
+      "cta_label": "Write to us",
       "cta_href": "/contact",
       "secondary_label": "See pricing",
       "no_commitment": "No commitment · Reply within 24h",
@@ -715,7 +715,7 @@
     "final_cta_highlight": "free forever.",
     "final_cta_subtitle": "No credit card. No commitment. Set up your fleet in 5 minutes.",
     "final_cta_primary": "Create my organisation",
-    "final_cta_secondary": "Watch a demo"
+    "final_cta_secondary": "Try the demo"
   },
   "about2": {
     "meta_title": "About",
@@ -859,7 +859,7 @@
     "final_cta_highlight": "40+ fleets.",
     "final_cta_subtitle": "Start for free with the Starter plan. No credit card required.",
     "final_cta_primary": "Create my organisation",
-    "final_cta_secondary": "Watch the demo"
+    "final_cta_secondary": "Try the demo"
   },
   "contact2": {
     "meta_title": "Contact",
@@ -869,9 +869,9 @@
     "hero_title_highlight": "your fleet.",
     "hero_subtitle": "We reply within 4 business hours. No bot. One of us reads your message.",
     "ch1_icon": "✦",
-    "ch1_title": "Personalised demo",
-    "ch1_desc": "20-min video call with Anaïs or Théo. On your real fleet.",
-    "ch1_cta": "Book a slot",
+    "ch1_title": "Self-guided demo",
+    "ch1_desc": "Explore FleetAi on a demo fleet. Instant access, no sign-up.",
+    "ch1_cta": "Launch the demo",
     "ch2_icon": "▶",
     "ch2_title": "Try without talking",
     "ch2_desc": "Free Starter plan, set up in 5 minutes. No CC.",
@@ -950,8 +950,8 @@
     "faq_title_highlight": "write to us.",
     "faq_q1": "How long to get a reply?",
     "faq_a1": "Within 4 hours on business days, in English or French. Nights and weekends, we read but don't reply.",
-    "faq_q2": "Can I get a demo on my real fleet?",
-    "faq_a2": "Yes. Book a 20-min slot — we work with your data during the session. Confidentiality guaranteed.",
+    "faq_q2": "Can I see FleetAi in action before signing up?",
+    "faq_a2": "Yes — the demo is freely accessible on a sample fleet, no sign-up needed. To talk about your own fleet, write to us through the form: we reply within 4 business hours.",
     "faq_q3": "Do you speak English?",
     "faq_a3": "Yes, the team is bilingual EN/FR. If you write in English, we'll reply in English.",
     "faq_q4": "I'm an integrator / consultant, do you have a partner programme?",
@@ -1459,9 +1459,9 @@
     "channel2_title": "Send a message",
     "channel2_desc": "Describe what you need through the contact form and we'll get back to you quickly.",
     "channel2_cta": "Open the form",
-    "channel3_title": "Book a demo",
-    "channel3_desc": "30 minutes with the team to see FleetAi applied to your fleet.",
-    "channel3_cta": "Book a slot",
+    "channel3_title": "Try the demo",
+    "channel3_desc": "Explore FleetAi freely on a demo fleet, no sign-up needed.",
+    "channel3_cta": "Launch the demo",
     "faq_eyebrow": "FAQ",
     "faq_title": "Answers to",
     "faq_title_highlight": "frequent questions",

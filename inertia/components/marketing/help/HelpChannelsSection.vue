@@ -1,10 +1,14 @@
 <script setup lang="ts">
+import { useForm } from '@inertiajs/vue3'
 import { Link } from '@adonisjs/inertia/vue'
 import type { HelpChannelCard } from '#shared/types/marketing'
 
 defineProps<{
   items: HelpChannelCard[]
 }>()
+
+// Session de démo autonome : POST Inertia (CSRF automatique), comme HomeDemoSection.
+const demoForm = useForm({})
 </script>
 
 <template>
@@ -27,6 +31,16 @@ defineProps<{
           <span aria-hidden="true">→</span>
         </a>
         <!-- eslint-enable vue/no-restricted-v-bind -->
+        <button
+          v-else-if="item.demo"
+          type="button"
+          class="mt-4 text-left text-sm font-semibold text-coral-600 hover:text-coral-700"
+          :disabled="demoForm.processing"
+          @click="demoForm.post(item.href)"
+        >
+          {{ item.ctaLabel }}
+          <span aria-hidden="true">→</span>
+        </button>
         <Link
           v-else
           :href="item.href"

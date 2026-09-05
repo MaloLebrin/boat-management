@@ -21,7 +21,7 @@ interface Channel {
   cta: string
   tone?: string
   href: string
-  kind: 'anchor' | 'internal' | 'external'
+  kind: 'anchor' | 'internal' | 'external' | 'demo'
 }
 interface SidebarContact {
   icon: string

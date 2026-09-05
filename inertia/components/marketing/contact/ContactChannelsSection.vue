@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useForm } from '@inertiajs/vue3'
 import { Link } from '@adonisjs/inertia/vue'
 
 interface Channel {
@@ -9,13 +10,23 @@ interface Channel {
   tone?: string
   /** Cible du clic (#450) — les cartes ne sont plus décoratives. */
   href: string
-  /** `anchor` = saut dans la page, `internal` = <Link> Inertia, `external` = mailto:. */
-  kind: 'anchor' | 'internal' | 'external'
+  /**
+   * `anchor` = saut dans la page, `internal` = <Link> Inertia, `external` = mailto:,
+   * `demo` = bouton qui lance la session de démo autonome (POST Inertia sur `href`).
+   */
+  kind: 'anchor' | 'internal' | 'external' | 'demo'
 }
 
 defineProps<{
   items: Channel[]
 }>()
+
+// Session de démo autonome : POST Inertia (CSRF automatique), comme HomeDemoSection.
+const demoForm = useForm({})
+
+function onCardClick(item: Channel) {
+  if (item.kind === 'demo' && !demoForm.processing) demoForm.post(item.href)
+}
 
 function cardClass(tone?: string) {
   if (tone === 'navy') return 'border-navy-900 bg-navy-900 text-white'
@@ -41,14 +52,17 @@ function ctaClass(tone?: string) {
     <div class="mx-auto max-w-7xl">
       <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
         <component
-          :is="item.kind === 'internal' ? Link : 'a'"
+          :is="item.kind === 'demo' ? 'button' : item.kind === 'internal' ? Link : 'a'"
           v-for="(item, idx) in items"
           :key="idx"
-          :href="item.href"
+          :href="item.kind === 'demo' ? undefined : item.href"
+          :type="item.kind === 'demo' ? 'button' : undefined"
+          :disabled="item.kind === 'demo' && demoForm.processing ? true : undefined"
           :class="[
-            'flex min-h-56 flex-col gap-4 rounded-2xl border p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-md',
+            'flex min-h-56 flex-col gap-4 rounded-2xl border p-6 text-left transition-all duration-300 hover:-translate-y-1 hover:shadow-md',
             cardClass(item.tone),
           ]"
+          @click="onCardClick(item)"
         >
           <!-- Icon -->
           <div
