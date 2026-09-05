@@ -40,6 +40,45 @@ export class AiAnalysisSchema extends BaseModel {
   declare userId: number
 }
 
+export class AiAssistantConversationSchema extends BaseModel {
+  static $columns = [
+    'createdAt',
+    'id',
+    'locale',
+    'messages',
+    'organizationId',
+    'pendingAction',
+    'status',
+    'token',
+    'tokensUsed',
+    'updatedAt',
+    'userId',
+  ] as const
+  $columns = AiAssistantConversationSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare locale: string
+  @column()
+  declare messages: any
+  @column()
+  declare organizationId: number | null
+  @column()
+  declare pendingAction: any | null
+  @column()
+  declare status: string
+  @column()
+  declare token: string
+  @column()
+  declare tokensUsed: number
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
+  @column()
+  declare userId: number | null
+}
+
 export class AiDiagnosisConversationSchema extends BaseModel {
   static $columns = [
     'context',
@@ -2177,6 +2216,7 @@ export class OrganizationModuleSchema extends BaseModel {
 
 export class OrganizationSchema extends BaseModel {
   static $columns = [
+    'aiApiKeyEncrypted',
     'aiModelOverride',
     'aiSystemPrompt',
     'appName',
@@ -2196,6 +2236,8 @@ export class OrganizationSchema extends BaseModel {
     'updatedAt',
   ] as const
   $columns = OrganizationSchema.$columns
+  @column()
+  declare aiApiKeyEncrypted: string | null
   @column()
   declare aiModelOverride: string | null
   @column()

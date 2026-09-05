@@ -2167,6 +2167,30 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateAiSettings']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'settings.ai.apiKey.update': {
+    methods: ["PUT"]
+    pattern: '/settings/ai/api-key'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/user').updateAiApiKeyValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/user').updateAiApiKeyValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateAiApiKey']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateAiApiKey']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'settings.ai.apiKey.remove': {
+    methods: ["DELETE"]
+    pattern: '/settings/ai/api-key'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['removeAiApiKey']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['removeAiApiKey']>>>
+    }
+  }
   'settings.auditLog': {
     methods: ["GET","HEAD"]
     pattern: '/settings/audit-log'
@@ -3173,6 +3197,66 @@ export interface Registry {
       query: ExtractQuery<InferInput<(typeof import('#validators/ai').engineDiagnosisValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/ai_controller').default['engineDiagnosis']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/ai_controller').default['engineDiagnosis']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'assistant.start': {
+    methods: ["POST"]
+    pattern: '/assistant/conversations'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/assistant').assistantMessageValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/assistant').assistantMessageValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/assistant_controller').default['start']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/assistant_controller').default['start']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'assistant.message': {
+    methods: ["POST"]
+    pattern: '/assistant/conversations/:token/messages'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/assistant').assistantMessageValidator)>>
+      paramsTuple: [ParamValue]
+      params: { token: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/assistant').assistantMessageValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/assistant_controller').default['message']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/assistant_controller').default['message']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'assistant.action.confirm': {
+    methods: ["POST"]
+    pattern: '/assistant/conversations/:token/action/confirm'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { token: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/assistant_controller').default['confirmAction']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/assistant_controller').default['confirmAction']>>>
+    }
+  }
+  'assistant.action.dismiss': {
+    methods: ["POST"]
+    pattern: '/assistant/conversations/:token/action/dismiss'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { token: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/assistant_controller').default['dismissAction']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/assistant_controller').default['dismissAction']>>>
+    }
+  }
+  'assistant.archive': {
+    methods: ["POST"]
+    pattern: '/assistant/conversations/:token/archive'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { token: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/assistant_controller').default['archive']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/assistant_controller').default['archive']>>>
     }
   }
   'home': {

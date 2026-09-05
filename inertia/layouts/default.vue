@@ -6,11 +6,14 @@ import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { Toaster } from 'vue-sonner'
 import brandIconUrl from '~/assets/brand/fleetai_compass.svg'
 import AsideMenu from '~/components/layout/AsideMenu.vue'
+import AssistantPanel from '~/components/assistant/AssistantPanel.vue'
 import DemoSessionBanner from '~/components/layout/DemoSessionBanner.vue'
 import MobileBottomNav from '~/components/layout/MobileBottomNav.vue'
 import MobileSidebarDrawer from '~/components/layout/MobileSidebarDrawer.vue'
 import NotificationBell from '~/components/layout/NotificationBell.vue'
+import { useAssistantPanel } from '~/composables/use_assistant_panel'
 import { useNetworkStatus } from '~/composables/use_network_status'
+import { usePermissions } from '~/composables/use_permissions'
 import ConflictResolutionModal from '~/components/ConflictResolutionModal.vue'
 import OfflinePendingQueue from '~/components/OfflinePendingQueue.vue'
 import PushOptInCard from '~/components/pwa/PushOptInCard.vue'
@@ -24,6 +27,8 @@ const isSidebarOpen = ref(false)
 
 const { t } = useT()
 const { isOnline } = useNetworkStatus()
+const { isOpen: isAssistantOpen } = useAssistantPanel()
+const { isBoatOwner } = usePermissions()
 const { drainQueue, conflictedAction, resolveConflict } = useOfflineQueue()
 const { dismissAll: dismissToasts } = useFlashToasts()
 usePwaUpdate()
@@ -155,6 +160,9 @@ onBeforeUnmount(() => {
       <!-- Bottom tab bar (mobile only, hors du main scrollable) -->
       <MobileBottomNav />
     </div>
+
+    <!-- Copilote FleetAi : rail droit sur desktop, drawer sur mobile -->
+    <AssistantPanel v-if="page.props.user && !isBoatOwner && isAssistantOpen" />
 
     <!-- Mobile sidebar drawer -->
     <MobileSidebarDrawer :open="isSidebarOpen" :user="page.props.user" @close="closeSidebar" />

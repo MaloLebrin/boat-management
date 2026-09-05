@@ -1086,6 +1086,18 @@ const routes = {
     tokens: [{"old":"/settings/ai","type":0,"val":"settings","end":""},{"old":"/settings/ai","type":0,"val":"ai","end":""}],
     types: placeholder as Registry['settings.ai.update']['types'],
   },
+  'settings.ai.apiKey.update': {
+    methods: ["PUT"],
+    pattern: '/settings/ai/api-key',
+    tokens: [{"old":"/settings/ai/api-key","type":0,"val":"settings","end":""},{"old":"/settings/ai/api-key","type":0,"val":"ai","end":""},{"old":"/settings/ai/api-key","type":0,"val":"api-key","end":""}],
+    types: placeholder as Registry['settings.ai.apiKey.update']['types'],
+  },
+  'settings.ai.apiKey.remove': {
+    methods: ["DELETE"],
+    pattern: '/settings/ai/api-key',
+    tokens: [{"old":"/settings/ai/api-key","type":0,"val":"settings","end":""},{"old":"/settings/ai/api-key","type":0,"val":"ai","end":""},{"old":"/settings/ai/api-key","type":0,"val":"api-key","end":""}],
+    types: placeholder as Registry['settings.ai.apiKey.remove']['types'],
+  },
   'settings.auditLog': {
     methods: ["GET","HEAD"],
     pattern: '/settings/audit-log',
@@ -1589,6 +1601,36 @@ const routes = {
     pattern: '/ai/boats/:boatId/engines/:engineId/diagnosis',
     tokens: [{"old":"/ai/boats/:boatId/engines/:engineId/diagnosis","type":0,"val":"ai","end":""},{"old":"/ai/boats/:boatId/engines/:engineId/diagnosis","type":0,"val":"boats","end":""},{"old":"/ai/boats/:boatId/engines/:engineId/diagnosis","type":1,"val":"boatId","end":""},{"old":"/ai/boats/:boatId/engines/:engineId/diagnosis","type":0,"val":"engines","end":""},{"old":"/ai/boats/:boatId/engines/:engineId/diagnosis","type":1,"val":"engineId","end":""},{"old":"/ai/boats/:boatId/engines/:engineId/diagnosis","type":0,"val":"diagnosis","end":""}],
     types: placeholder as Registry['ai.engineDiagnosis']['types'],
+  },
+  'assistant.start': {
+    methods: ["POST"],
+    pattern: '/assistant/conversations',
+    tokens: [{"old":"/assistant/conversations","type":0,"val":"assistant","end":""},{"old":"/assistant/conversations","type":0,"val":"conversations","end":""}],
+    types: placeholder as Registry['assistant.start']['types'],
+  },
+  'assistant.message': {
+    methods: ["POST"],
+    pattern: '/assistant/conversations/:token/messages',
+    tokens: [{"old":"/assistant/conversations/:token/messages","type":0,"val":"assistant","end":""},{"old":"/assistant/conversations/:token/messages","type":0,"val":"conversations","end":""},{"old":"/assistant/conversations/:token/messages","type":1,"val":"token","end":""},{"old":"/assistant/conversations/:token/messages","type":0,"val":"messages","end":""}],
+    types: placeholder as Registry['assistant.message']['types'],
+  },
+  'assistant.action.confirm': {
+    methods: ["POST"],
+    pattern: '/assistant/conversations/:token/action/confirm',
+    tokens: [{"old":"/assistant/conversations/:token/action/confirm","type":0,"val":"assistant","end":""},{"old":"/assistant/conversations/:token/action/confirm","type":0,"val":"conversations","end":""},{"old":"/assistant/conversations/:token/action/confirm","type":1,"val":"token","end":""},{"old":"/assistant/conversations/:token/action/confirm","type":0,"val":"action","end":""},{"old":"/assistant/conversations/:token/action/confirm","type":0,"val":"confirm","end":""}],
+    types: placeholder as Registry['assistant.action.confirm']['types'],
+  },
+  'assistant.action.dismiss': {
+    methods: ["POST"],
+    pattern: '/assistant/conversations/:token/action/dismiss',
+    tokens: [{"old":"/assistant/conversations/:token/action/dismiss","type":0,"val":"assistant","end":""},{"old":"/assistant/conversations/:token/action/dismiss","type":0,"val":"conversations","end":""},{"old":"/assistant/conversations/:token/action/dismiss","type":1,"val":"token","end":""},{"old":"/assistant/conversations/:token/action/dismiss","type":0,"val":"action","end":""},{"old":"/assistant/conversations/:token/action/dismiss","type":0,"val":"dismiss","end":""}],
+    types: placeholder as Registry['assistant.action.dismiss']['types'],
+  },
+  'assistant.archive': {
+    methods: ["POST"],
+    pattern: '/assistant/conversations/:token/archive',
+    tokens: [{"old":"/assistant/conversations/:token/archive","type":0,"val":"assistant","end":""},{"old":"/assistant/conversations/:token/archive","type":0,"val":"conversations","end":""},{"old":"/assistant/conversations/:token/archive","type":1,"val":"token","end":""},{"old":"/assistant/conversations/:token/archive","type":0,"val":"archive","end":""}],
+    types: placeholder as Registry['assistant.archive']['types'],
   },
   'home': {
     methods: ["GET","HEAD"],

@@ -2,6 +2,7 @@
 import { Form } from '@adonisjs/inertia/vue'
 import { nextTick, ref, watch } from 'vue'
 import brandIconUrl from '~/assets/brand/fleetai_compass.svg'
+import AssistantEntryButton from '~/components/assistant/AssistantEntryButton.vue'
 import LanguageSwitcher from '~/components/layout/LanguageSwitcher.vue'
 import ThemeSwitcher from '~/components/layout/ThemeSwitcher.vue'
 import NavItem from '~/components/layout/NavItem.vue'
@@ -118,6 +119,7 @@ function close() {
         class="shrink-0 border-t border-navy-700 px-4 py-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] bg-navy-900"
       >
         <div class="mb-3">
+          <AssistantEntryButton class="mb-2" @activate="close" />
           <NavItem
             :name="settingsItem.name"
             :path="settingsItem.path"

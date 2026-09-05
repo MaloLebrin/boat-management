@@ -91,6 +91,12 @@ router
     router.put('settings/org', [SettingsController, 'updateOrganization']).as('settings.org.update')
     router.get('settings/ai', [SettingsController, 'ai']).as('settings.ai')
     router.put('settings/ai', [SettingsController, 'updateAiSettings']).as('settings.ai.update')
+    router
+      .put('settings/ai/api-key', [SettingsController, 'updateAiApiKey'])
+      .as('settings.ai.apiKey.update')
+    router
+      .delete('settings/ai/api-key', [SettingsController, 'removeAiApiKey'])
+      .as('settings.ai.apiKey.remove')
     router.get('settings/audit-log', [AuditLogsController, 'index']).as('settings.auditLog')
     router.get('settings/branding', [SettingsController, 'branding']).as('settings.branding')
     router

@@ -20,16 +20,16 @@ const AI_CUSTOMIZATION_FLASH =
 test.group('Plan-gated settings sections (functional)', (group) => {
   group.each.setup(() => truncateDb())
 
-  test('AI customisation redirects a Pro org to billing with an explicit flash', async ({
-    client,
-  }) => {
+  test('the AI settings page opens for a Pro org (BYOK key lives there)', async ({ client }) => {
+    // Depuis le copilote FleetAi, la page `/settings/ai` est ouverte dès
+    // `canUseAI` : elle héberge la clé API Mistral (BYOK), outil de maîtrise
+    // des coûts. La personnalisation prompt/modèle reste gardée par
+    // `canCustomizeAI` (test suivant) et masquée côté front.
     const user = await createAdminUser()
 
-    const response = await client.get('/settings/ai').loginAs(user).redirects(0)
+    const response = await client.get('/settings/ai').loginAs(user)
 
-    response.assertStatus(302)
-    response.assertHeader('location', '/settings/billing')
-    response.assertFlashMessage('error', AI_CUSTOMIZATION_FLASH)
+    response.assertStatus(200)
   })
 
   test('updating AI settings on a Pro org is refused with the same explanation', async ({

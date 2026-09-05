@@ -62,10 +62,13 @@ const canExport = computed(() => {
   return PLAN_LIMITS[plan as PlanTier].canExport
 })
 
-const canCustomizeAI = computed(() => {
+// La section IA s'ouvre dès qu'un plan a l'IA : la clé API BYOK y vit pour
+// les plans pro, la personnalisation (prompt/modèle) reste enterprise et le
+// backend garde ses propres guards.
+const canUseAI = computed(() => {
   const plan = page.props.currentPlan
   if (typeof plan !== 'string' || !VALID_PLANS.has(plan)) return false
-  return PLAN_LIMITS[plan as PlanTier].canCustomizeAI
+  return PLAN_LIMITS[plan as PlanTier].canUseAI
 })
 
 const canViewAuditLog = computed(() => {
@@ -89,7 +92,7 @@ const sections = computed(() => {
       label: () => t('settings.sections.import'),
     })
   }
-  if (canCustomizeAI.value && can('ai.configure')) {
+  if (canUseAI.value && can('ai.configure')) {
     result.push({
       key: 'ai' as SettingsSection,
       route: 'settings.ai',

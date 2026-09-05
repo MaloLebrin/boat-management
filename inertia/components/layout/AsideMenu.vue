@@ -2,6 +2,7 @@
 import { Form } from '@adonisjs/inertia/vue'
 import { usePage } from '@inertiajs/vue3'
 import { computed } from 'vue'
+import AssistantEntryButton from '~/components/assistant/AssistantEntryButton.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import Logo from '~/components/Logo.vue'
 import LanguageSwitcher from '~/components/layout/LanguageSwitcher.vue'
@@ -72,6 +73,7 @@ function isActive(path: string): boolean {
     <!-- Settings (pinned) + User info + Logout -->
     <div class="mt-auto shrink-0 border-t border-navy-700 px-4 py-4">
       <div class="mb-3">
+        <AssistantEntryButton class="mb-2" />
         <NavItem
           :name="settingsItem.name"
           :path="settingsItem.path"
