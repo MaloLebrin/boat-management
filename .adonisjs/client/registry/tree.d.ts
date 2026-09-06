@@ -457,6 +457,7 @@ export interface ApiDefinition {
     chat: typeof routes['ai.chat']
     fleetAnalysis: typeof routes['ai.fleetAnalysis']
     boatSuggestions: typeof routes['ai.boatSuggestions']
+    engineSuggestions: typeof routes['ai.engineSuggestions']
     engineDiagnosis: typeof routes['ai.engineDiagnosis']
   }
   assistant: {

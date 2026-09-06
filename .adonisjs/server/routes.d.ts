@@ -269,6 +269,7 @@ export type ScannedRoutes = {
     'ai.chat': { paramsTuple?: []; params?: {} }
     'ai.fleetAnalysis': { paramsTuple?: []; params?: {} }
     'ai.boatSuggestions': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'ai.engineSuggestions': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
     'ai.engineDiagnosis': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
     'assistant.start': { paramsTuple?: []; params?: {} }
     'assistant.message': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
@@ -675,6 +676,7 @@ export type ScannedRoutes = {
     'ai.chat': { paramsTuple?: []; params?: {} }
     'ai.fleetAnalysis': { paramsTuple?: []; params?: {} }
     'ai.boatSuggestions': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'ai.engineSuggestions': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
     'ai.engineDiagnosis': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
     'assistant.start': { paramsTuple?: []; params?: {} }
     'assistant.message': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }

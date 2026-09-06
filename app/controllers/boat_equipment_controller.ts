@@ -1,5 +1,6 @@
 import BoatPolicy from '#policies/boat_policy'
 import { toMediaRow } from '#transformers/media_row_transformer'
+import AiAnalysisService from '#services/ai_analysis_service'
 import BoatEquipmentService, { BoatEquipmentNotFoundError } from '#services/boat_equipment_service'
 import BoatEngineDiagnosticService from '#services/boat_engine_diagnostic_service'
 import BoatEnginePartService from '#services/boat_engine_part_service'
@@ -26,6 +27,9 @@ import {
   updateEquipmentStatusValidator,
   upsertBoatRigValidator,
 } from '#validators/boat_equipment'
+import { toAppLocale } from '#shared/helpers/locale_path'
+import type { AiSuggestion } from '#shared/types/ai'
+import { deferJson } from '#utils/inertia_defer'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 
@@ -41,7 +45,8 @@ export default class BoatEquipmentController {
     private organizationService: OrganizationService,
     private diagnosticService: BoatEngineDiagnosticService,
     private engineCatalogService: EngineCatalogService,
-    private sailLoftService: SailLoftService
+    private sailLoftService: SailLoftService,
+    private aiAnalysisService: AiAnalysisService
   ) {}
 
   private async loadBoatForEquipment(ctx: Pick<HttpContext, 'auth' | 'response' | 'params'>) {
@@ -404,7 +409,7 @@ export default class BoatEquipmentController {
     response.redirect(`/boats/${boat.id}`)
   }
 
-  async showEngine({ inertia, response, auth, params, bouncer }: HttpContext) {
+  async showEngine({ inertia, response, auth, params, bouncer, i18n }: HttpContext) {
     await auth.authenticate()
     const loaded = await this.loadBoatForEquipment({ auth, response, params })
     if (!loaded) return
@@ -493,6 +498,25 @@ export default class BoatEquipmentController {
       })),
       diagnosticCheckedStepKeys,
       canManage,
+      // Jamais `null` ici : le serializer d'Inertia jette « Cannot serialize
+      // an item with null value » quand un callback différé résout `null`
+      // (#478) — l'absence d'analyse est donc portée par la liste vide.
+      aiSuggestions: inertia.defer(
+        deferJson(async () => {
+          const latest = await this.aiAnalysisService.getLatestEngineSuggestions(
+            loaded.user.id,
+            engineId,
+            boat.organizationId,
+            toAppLocale(i18n.locale)
+          )
+          if (!latest) return []
+          try {
+            return JSON.parse(latest.responseText) as AiSuggestion[]
+          } catch {
+            return []
+          }
+        })
+      ),
     })
   }
 

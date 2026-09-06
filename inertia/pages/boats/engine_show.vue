@@ -21,6 +21,7 @@ import { resolveEngineFamily } from '#shared/helpers/engine_family'
 import { isSparePartsEligibleEngine } from '#shared/helpers/spare_parts'
 import { useT } from '~/composables/use_t'
 import { engineDisplayTitle, engineFuelLabel } from '~/utils/boat_enum_labels'
+import type { AiSuggestion } from '#shared/types/ai'
 import type { BoatShowEngine, MaintenanceEventRow, MaintenanceTaskRow } from '~/types/boat_show'
 
 const { t } = useT()
@@ -32,6 +33,8 @@ const props = defineProps<{
   maintenanceTasks: MaintenanceTaskRow[]
   diagnosticCheckedStepKeys: string[] | null
   canManage: boolean
+  /** Prop différée (deferJson) — `undefined` tant qu'Inertia ne l'a pas résolue. */
+  aiSuggestions?: AiSuggestion[] | null
 }>()
 
 type TabKey =
@@ -305,6 +308,7 @@ function formatYear(iso: string): string {
           :is-over-threshold="isOverThreshold"
           :sorted-open-tasks="sortedOpenTasks"
           :can-manage="canManage"
+          :ai-suggestions="aiSuggestions ?? null"
         />
         <EngineShowTabSpecs
           v-else-if="tab === 'specs'"

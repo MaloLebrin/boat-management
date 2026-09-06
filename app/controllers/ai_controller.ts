@@ -6,8 +6,7 @@ import BoatEngineDiagnosticService, {
   BoatEquipmentNotFoundError,
   EngineNotDiagnosticEligibleError,
 } from '#services/boat_engine_diagnostic_service'
-import BoatMaintenanceService from '#services/boat_maintenance_service'
-import BoatMaintenanceTaskService from '#services/boat_maintenance_task_service'
+import AiSuggestionContextService from '#services/ai_suggestion_context_service'
 import BoatService, { BoatNotFoundError } from '#services/boat_service'
 import DashboardService from '#services/dashboard_service'
 import QuotaService from '#services/quota_service'
@@ -26,8 +25,7 @@ export default class AiController {
     private dashboardService: DashboardService,
     private aiAnalysisService: AiAnalysisService,
     private boatService: BoatService,
-    private boatMaintenanceService: BoatMaintenanceService,
-    private boatMaintenanceTaskService: BoatMaintenanceTaskService,
+    private suggestionContextService: AiSuggestionContextService,
     private quotaService: QuotaService,
     private diagnosticService: BoatEngineDiagnosticService
   ) {}
@@ -114,57 +112,16 @@ export default class AiController {
     try {
       const boat = await this.boatService.getForUserOrFail(user, boatId)
       await bouncer.with(BoatPolicy).authorize('view', boat)
-      await boat.load('safetyEquipment')
 
-      const maintenanceEvents = await this.boatMaintenanceService.listForBoat(user, boat)
-      const maintenanceTasks = await this.boatMaintenanceTaskService.listForBoat(user, boat)
+      // Contexte construit par le service partagé avec le job planifié : les
+      // deux chemins produisent le même input, donc le même `contextHash`.
+      const input = await this.suggestionContextService.buildBoatInput(boat.id)
 
       await this.aiAnalysisService.generateBoatSuggestions(
         user.id,
         boat.id,
         user.organization,
-        {
-          boat: {
-            id: boat.id,
-            name: boat.name,
-            type: boat.type,
-            propulsionType: boat.propulsionType,
-            yearBuilt: boat.yearBuilt,
-            manufacturer: boat.manufacturer,
-            model: boat.model,
-            homePort: boat.homePort,
-            navigationCategory: boat.navigationCategory,
-            engines: boat.engines.map((e) => ({
-              kind: e.kind,
-              fuel: e.fuel,
-              hours: e.hours,
-              brand: e.brand,
-              model: e.model,
-            })),
-            sails: boat.sails.map((s) => ({
-              sailType: s.sailType,
-              manufacturedAt: s.manufacturedAt ? s.manufacturedAt.toISODate() : null,
-              status: s.status,
-            })),
-            rig: boat.rig ? { rigType: boat.rig.rigType, status: boat.rig.status } : null,
-            safetyEquipment: boat.safetyEquipment.map((eq) => ({
-              equipmentType: eq.equipmentType,
-              expiryDate: eq.expiryDate ? eq.expiryDate.toISODate() : null,
-              status: eq.status,
-            })),
-          },
-          maintenanceTasks: maintenanceTasks.map((t) => ({
-            title: t.title,
-            subject: t.subject,
-            dueAt: t.dueAt ? t.dueAt.toISODate() : null,
-            status: t.status,
-          })),
-          maintenanceEvents: maintenanceEvents.map((ev) => ({
-            title: ev.title,
-            subject: ev.subject,
-            performedAt: ev.performedAt.toISODate()!,
-          })),
-        },
+        input,
         toAppLocale(i18n.locale),
         user.organization.aiSystemPrompt,
         user.organization.aiModelOverride
@@ -182,6 +139,66 @@ export default class AiController {
     }
 
     return response.redirect(`/boats/${boatId}`)
+  }
+
+  /**
+   * Suggestions de maintenance d'un moteur — réplique le pattern
+   * `boatSuggestions` scopé sur un moteur : quota plan → contexte (pièces,
+   * tâches, catalogue d'opérations) → service → redirection vers la page
+   * moteur (la prop différée `aiSuggestions` recharge l'analyse).
+   */
+  async engineSuggestions({ response, auth, params, bouncer, session, i18n }: HttpContext) {
+    await auth.authenticate()
+    const user = auth.getUserOrFail()
+    const boatId = Number(params.boatId)
+    const engineId = Number(params.engineId)
+
+    await user.load('organization')
+    try {
+      this.quotaService.assertCanUseAI(user.organization)
+    } catch (error) {
+      if (error instanceof QuotaExceededError) {
+        session.flash('error', i18n.t('flash.quota.aiExceeded'))
+        return response.redirect().back()
+      }
+      throw error
+    }
+
+    try {
+      const boat = await this.boatService.getForUserOrFail(user, boatId)
+      await bouncer.with(BoatPolicy).authorize('view', boat)
+
+      const engine = boat.engines.find((e) => e.id === engineId)
+      if (!engine) throw new BoatEquipmentNotFoundError()
+
+      const locale = toAppLocale(i18n.locale)
+      const input = await this.suggestionContextService.buildEngineInput(boat, engine, locale)
+
+      await this.aiAnalysisService.generateEngineSuggestions(
+        user.id,
+        boat.id,
+        engine.id,
+        user.organization,
+        input,
+        locale,
+        user.organization.aiSystemPrompt,
+        user.organization.aiModelOverride
+      )
+    } catch (error) {
+      if (error instanceof BoatNotFoundError) {
+        // no flash — boat not found is handled silently
+      } else if (error instanceof BoatEquipmentNotFoundError) {
+        session.flash('error', i18n.t('flash.engine.notFound'))
+      } else if (error instanceof QuotaExceededError) {
+        session.flash('error', i18n.t('flash.quota.aiTokensExceeded'))
+      } else if (error instanceof bouncerErrors.E_AUTHORIZATION_FAILURE) {
+        throw error
+      } else {
+        session.flash('error', i18n.t('flash.ai.analysisError'))
+      }
+    }
+
+    return response.redirect(`/boats/${boatId}/engines/${engineId}`)
   }
 
   /**

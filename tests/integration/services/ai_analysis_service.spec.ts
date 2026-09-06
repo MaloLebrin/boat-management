@@ -228,6 +228,7 @@ const BOAT_INPUT: BoatSuggestionsInput = {
     sails: [],
     rig: null,
     safetyEquipment: [],
+    genericEquipment: [],
   },
   maintenanceTasks: [],
   maintenanceEvents: [],

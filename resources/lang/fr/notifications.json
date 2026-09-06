@@ -83,6 +83,12 @@
         "title": "Équipements de sécurité expirés sur {boatName}",
         "body": "{count, plural, one {# équipement de sécurité du bateau {boatName} a expiré.} other {# équipements de sécurité du bateau {boatName} ont expiré.}}"
       }
+    },
+    "ai": {
+      "suggestions_ready": {
+        "title": "Nouvelles suggestions IA pour {boatName}",
+        "body": "{count, plural, one {# nouvelle analyse IA est disponible} other {# nouvelles analyses IA sont disponibles}} pour {boatName}."
+      }
     }
   },
   "title": "Notifications",
@@ -114,6 +120,7 @@
     "document.expired": "Document expiré",
     "safety_equipment.expiring_soon": "Équipement de sécurité expirant",
     "safety_equipment.expired": "Équipement de sécurité expiré",
-    "invitation.accepted": "Invitation acceptée"
+    "invitation.accepted": "Invitation acceptée",
+    "ai.suggestions_ready": "Suggestions IA"
   }
 }

@@ -137,9 +137,15 @@ export interface BoatSuggestionsInput {
     engines: Array<{
       kind: string
       fuel: string | null
+      family: string | null
       hours: number | null
+      installHours: number | null
       brand: string | null
       model: string | null
+      /** Désignations des pièces usées (`worn`/`to_replace`/`damaged`). */
+      partsToReplace: string[]
+      /** Désignations des pièces sous leur seuil d'alerte de stock. */
+      lowStockParts: string[]
     }>
     sails: Array<{
       sailType: string
@@ -150,7 +156,18 @@ export interface BoatSuggestionsInput {
     safetyEquipment: Array<{
       equipmentType: string
       expiryDate: string | null
+      /**
+       * Expiration effective : `expiryDate` ou, à défaut, date dérivée de la
+       * durée de vie Division 240 (`resolveEffectiveExpiry`).
+       */
+      effectiveExpiryDate: string | null
       status: string
+    }>
+    genericEquipment: Array<{
+      category: string
+      brand: string | null
+      status: string
+      purchasedAt: string | null
     }>
   }
   maintenanceTasks: Array<{
@@ -163,5 +180,53 @@ export interface BoatSuggestionsInput {
     title: string
     subject: string
     performedAt: string
+  }>
+}
+
+/**
+ * Contexte des suggestions IA d'un moteur (`kind: 'engine_suggestions'`).
+ * Même contrat de sortie que les suggestions bateau (`AiSuggestion[]`), mais
+ * centré sur un moteur : pièces (usure, stock), tâches/événements du moteur et
+ * intervalles du catalogue d'opérations standard de sa famille (#581).
+ */
+export interface EngineSuggestionsInput {
+  engine: {
+    kind: string
+    fuel: string | null
+    family: string | null
+    brand: string | null
+    model: string | null
+    powerHp: number | null
+    hours: number | null
+    installHours: number | null
+    manufacturedAt: string | null
+    status: string
+  }
+  parts: Array<{
+    designation: string
+    reference: string | null
+    wearState: string | null
+    stock: number | null
+    minStockAlert: number | null
+    purchasedAt: string | null
+  }>
+  maintenanceTasks: Array<{
+    title: string
+    subject: string
+    status: string
+    dueAt: string | null
+    dueEngineHours: number | null
+  }>
+  /** 5 derniers événements de maintenance liés au moteur. */
+  maintenanceEvents: Array<{
+    title: string
+    subject: string
+    performedAt: string
+  }>
+  /** Opérations du catalogue standard pour la famille du moteur, label déjà localisé. */
+  catalogOperations: Array<{
+    label: string
+    intervalMonths: number | null
+    intervalEngineHours: number | null
   }>
 }
