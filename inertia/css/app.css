@@ -212,6 +212,42 @@
 }
 
 /* ============================================================
+   CURSEURS DES ÉLÉMENTS INTERACTIFS
+
+   Tailwind v4 n'applique plus `cursor: pointer` aux boutons par défaut.
+   Cette règle globale équivaut à poser `cursor-pointer
+   disabled:cursor-not-allowed` sur chaque élément cliquable, sans avoir
+   à répéter les classes dans les composants.
+   ============================================================ */
+@layer base {
+  a[href],
+  button,
+  select,
+  summary,
+  label[for],
+  [role='button'],
+  [role='tab'],
+  [role='menuitem'],
+  [role='option'],
+  input[type='button'],
+  input[type='submit'],
+  input[type='reset'],
+  input[type='checkbox'],
+  input[type='radio'],
+  input[type='range'],
+  input[type='file'] {
+    cursor: pointer;
+  }
+
+  button:disabled,
+  select:disabled,
+  input:disabled,
+  [aria-disabled='true'] {
+    cursor: not-allowed;
+  }
+}
+
+/* ============================================================
    THÈME SOMBRE (#416)
 
    Bloc volontairement HORS `@layer` : les variables de `@theme` sont émises
