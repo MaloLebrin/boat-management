@@ -38,6 +38,7 @@ const EMPTY_BOAT_INPUT: BoatSuggestionsInput = {
     sails: [],
     rig: null,
     safetyEquipment: [],
+    genericEquipment: [],
   },
   maintenanceTasks: [],
   maintenanceEvents: [],
@@ -124,11 +125,93 @@ test.group('ai_prompt_service — boat user message (#460)', () => {
       ...EMPTY_BOAT_INPUT,
       boat: {
         ...EMPTY_BOAT_INPUT.boat,
-        safetyEquipment: [{ equipmentType: 'liferaft', expiryDate: '2027-01-01', status: 'ok' }],
+        safetyEquipment: [
+          {
+            equipmentType: 'liferaft',
+            expiryDate: '2027-01-01',
+            effectiveExpiryDate: '2027-01-01',
+            status: 'ok',
+          },
+        ],
       },
     }
 
     assert.include(buildBoatUserMessage(input, 'en'), 'expires 2027-01-01')
     assert.include(buildBoatUserMessage(input, 'fr'), 'expire 2027-01-01')
+  })
+
+  test('an undated safety item falls back to its Division 240 effective expiry', ({ assert }) => {
+    const input: BoatSuggestionsInput = {
+      ...EMPTY_BOAT_INPUT,
+      boat: {
+        ...EMPTY_BOAT_INPUT.boat,
+        safetyEquipment: [
+          {
+            equipmentType: 'flares',
+            expiryDate: null,
+            effectiveExpiryDate: '2026-06-01',
+            status: 'ok',
+          },
+        ],
+      },
+    }
+
+    assert.include(buildBoatUserMessage(input, 'en'), 'expires 2026-06-01')
+    assert.include(buildBoatUserMessage(input, 'fr'), 'expire 2026-06-01')
+  })
+
+  test('engine part alerts (wear + low stock) are localized', ({ assert }) => {
+    const input: BoatSuggestionsInput = {
+      ...EMPTY_BOAT_INPUT,
+      boat: {
+        ...EMPTY_BOAT_INPUT.boat,
+        engines: [
+          {
+            kind: 'outboard',
+            fuel: 'essence',
+            family: 'outboard_petrol',
+            hours: 480,
+            installHours: 0,
+            brand: 'Yamaha',
+            model: 'F100',
+            partsToReplace: ['Turbine'],
+            lowStockParts: ['Filtre à huile'],
+          },
+        ],
+      },
+    }
+
+    const en = buildBoatUserMessage(input, 'en')
+    assert.include(en, 'parts to replace: Turbine')
+    assert.include(en, 'low stock: Filtre à huile')
+
+    const fr = buildBoatUserMessage(input, 'fr')
+    assert.include(fr, 'pièces à remplacer : Turbine')
+    assert.include(fr, 'stock bas : Filtre à huile')
+  })
+
+  test('generic equipment is listed with its status and purchase date', ({ assert }) => {
+    const input: BoatSuggestionsInput = {
+      ...EMPTY_BOAT_INPUT,
+      boat: {
+        ...EMPTY_BOAT_INPUT.boat,
+        genericEquipment: [
+          {
+            category: 'electronics',
+            brand: 'Garmin',
+            status: 'to_check',
+            purchasedAt: '2020-05-01',
+          },
+        ],
+      },
+    }
+
+    const en = buildBoatUserMessage(input, 'en')
+    assert.include(en, 'Other equipment:')
+    assert.include(en, '- electronics Garmin (to_check) — purchased on 2020-05-01')
+
+    const fr = buildBoatUserMessage(input, 'fr')
+    assert.include(fr, 'Autres équipements :')
+    assert.include(fr, '- electronics Garmin (to_check) — acheté le 2020-05-01')
   })
 })

@@ -11,6 +11,7 @@ export class AiAnalysisSchema extends BaseModel {
   static $columns = [
     'boatEngineId',
     'boatId',
+    'contextHash',
     'createdAt',
     'id',
     'kind',
@@ -24,6 +25,8 @@ export class AiAnalysisSchema extends BaseModel {
   declare boatEngineId: number | null
   @column()
   declare boatId: number | null
+  @column()
+  declare contextHash: string | null
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
   @column({ isPrimary: true })
@@ -37,7 +40,7 @@ export class AiAnalysisSchema extends BaseModel {
   @column()
   declare responseText: string
   @column()
-  declare userId: number
+  declare userId: number | null
 }
 
 export class AiAssistantConversationSchema extends BaseModel {

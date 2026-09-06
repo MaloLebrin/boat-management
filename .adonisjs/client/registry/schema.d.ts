@@ -3187,6 +3187,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/ai_controller').default['boatSuggestions']>>>
     }
   }
+  'ai.engineSuggestions': {
+    methods: ["POST"]
+    pattern: '/ai/boats/:boatId/engines/:engineId/suggestions'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; engineId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/ai_controller').default['engineSuggestions']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/ai_controller').default['engineSuggestions']>>>
+    }
+  }
   'ai.engineDiagnosis': {
     methods: ["POST"]
     pattern: '/ai/boats/:boatId/engines/:engineId/diagnosis'

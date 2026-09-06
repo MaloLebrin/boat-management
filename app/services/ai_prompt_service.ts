@@ -44,6 +44,9 @@ interface PromptLabels {
   dueDate: string
   currentHours: (current: number | null, due: number | null) => string
   expiresOn: string
+  partsToReplace: string
+  lowStock: string
+  purchasedOn: string
   /** Séparateur des puces : le français insère une espace insécable avant le « : » */
   colon: string
 }
@@ -66,6 +69,9 @@ const LABELS: Record<AiSuggestionLocale, PromptLabels> = {
     dueDate: "date d'échéance",
     currentHours: (current, due) => `${current}h actuelles / ${due}h requises`,
     expiresOn: 'expire',
+    partsToReplace: 'pièces à remplacer',
+    lowStock: 'stock bas',
+    purchasedOn: 'acheté le',
     colon: ' : ',
   },
   en: {
@@ -85,6 +91,9 @@ const LABELS: Record<AiSuggestionLocale, PromptLabels> = {
     dueDate: 'due date',
     currentHours: (current, due) => `${current}h logged / ${due}h required`,
     expiresOn: 'expires',
+    partsToReplace: 'parts to replace',
+    lowStock: 'low stock',
+    purchasedOn: 'purchased on',
     colon: ': ',
   },
 }
@@ -154,10 +163,16 @@ export function buildBoatUserMessage(
   const enginesList =
     boat.engines.length > 0
       ? boat.engines
-          .map(
-            (e) =>
-              `- ${e.kind} ${e.brand ?? ''} ${e.model ?? ''} (${e.fuel ?? l.unknownFuel}, ${e.hours ?? '?'}h)`
-          )
+          .map((e) => {
+            const alerts: string[] = []
+            if (e.partsToReplace.length > 0) {
+              alerts.push(`${l.partsToReplace}${l.colon}${e.partsToReplace.join(', ')}`)
+            }
+            if (e.lowStockParts.length > 0) {
+              alerts.push(`${l.lowStock}${l.colon}${e.lowStockParts.join(', ')}`)
+            }
+            return `- ${e.kind} ${e.brand ?? ''} ${e.model ?? ''} (${e.fuel ?? l.unknownFuel}, ${e.hours ?? '?'}h)${alerts.length > 0 ? ` — ${alerts.join(' ; ')}` : ''}`
+          })
           .join('\n')
       : l.noneMasculine
 
@@ -168,12 +183,24 @@ export function buildBoatUserMessage(
 
   const rigInfo = boat.rig ? `${boat.rig.rigType} (${boat.rig.status})` : l.noneMasculine
 
+  // L'expiration effective (#582) couvre aussi les équipements sans date
+  // saisie mais datables par leur durée de vie Division 240.
   const safetyList =
     boat.safetyEquipment.length > 0
       ? boat.safetyEquipment
+          .map((eq) => {
+            const expiry = eq.effectiveExpiryDate ?? eq.expiryDate
+            return `- ${eq.equipmentType} (${eq.status})${expiry ? ` — ${l.expiresOn} ${expiry}` : ''}`
+          })
+          .join('\n')
+      : l.noneMasculine
+
+  const genericEquipmentList =
+    boat.genericEquipment.length > 0
+      ? boat.genericEquipment
           .map(
             (eq) =>
-              `- ${eq.equipmentType} (${eq.status})${eq.expiryDate ? ` — ${l.expiresOn} ${eq.expiryDate}` : ''}`
+              `- ${eq.category}${eq.brand ? ` ${eq.brand}` : ''} (${eq.status})${eq.purchasedAt ? ` — ${l.purchasedOn} ${eq.purchasedAt}` : ''}`
           )
           .join('\n')
       : l.noneMasculine
@@ -205,6 +232,9 @@ Rig: ${rigInfo}
 Safety equipment:
 ${safetyList}
 
+Other equipment:
+${genericEquipmentList}
+
 Open tasks: ${openTasks.length}, ${tasksWithDueAt.length} of them with a due date
 
 Latest maintenance operations (5 max):
@@ -227,6 +257,9 @@ Gréement : ${rigInfo}
 
 Équipements sécurité :
 ${safetyList}
+
+Autres équipements :
+${genericEquipmentList}
 
 Tâches ouvertes : ${openTasks.length} dont ${tasksWithDueAt.length} avec date d'échéance
 

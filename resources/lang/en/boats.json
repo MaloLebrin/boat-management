@@ -569,8 +569,9 @@
       "recentMaintenance": "Recent maintenance",
       "noEvent": "No event recorded",
       "aiTitle": "AI Assistant",
-      "aiPrompt1": "When is the next oil change due?",
-      "aiPrompt2": "Engine failure history",
+      "aiEmpty": "Click 'Refresh' to get AI-powered suggestions.",
+      "aiRefresh": "Refresh",
+      "aiRefreshing": "Analyzing...",
       "nextDue": "Next due",
       "noTaskPlanned": "No planned tasks"
     },

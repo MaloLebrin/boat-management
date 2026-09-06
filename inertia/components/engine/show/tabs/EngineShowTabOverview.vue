@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import type { AiSuggestion } from '#shared/types/ai'
 import BaseCard from '~/components/base/BaseCard.vue'
 import EngineHoursQuickAddForm from '~/components/boats/engine/EngineHoursQuickAddForm.vue'
+import EngineAiSuggestionsPanel from '~/components/engine/show/EngineAiSuggestionsPanel.vue'
 import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import type { BoatShowEngine, MaintenanceEventRow, MaintenanceTaskRow } from '~/types/boat_show'
@@ -19,6 +21,7 @@ defineProps<{
   isOverThreshold: boolean
   sortedOpenTasks: MaintenanceTaskRow[]
   canManage: boolean
+  aiSuggestions: AiSuggestion[] | null
 }>()
 </script>
 
@@ -114,19 +117,11 @@ defineProps<{
     <!-- Right rail -->
     <div class="w-full lg:w-72 space-y-6">
       <!-- AI Panel -->
-      <div class="bg-navy-800 text-white rounded-xl p-4">
-        <p class="font-semibold flex items-center gap-2">
-          <span class="text-brand">&#10022;</span> {{ t('boats.engineShow.overview.aiTitle') }}
-        </p>
-        <div class="mt-4 space-y-2">
-          <div class="bg-white/10 rounded-lg px-3 py-2 text-sm">
-            {{ t('boats.engineShow.overview.aiPrompt1') }}
-          </div>
-          <div class="bg-white/10 rounded-lg px-3 py-2 text-sm">
-            {{ t('boats.engineShow.overview.aiPrompt2') }}
-          </div>
-        </div>
-      </div>
+      <EngineAiSuggestionsPanel
+        :boat-id="boatId"
+        :engine-id="engine.id"
+        :ai-suggestions="aiSuggestions"
+      />
 
       <!-- Prochaines echeances -->
       <BaseCard>

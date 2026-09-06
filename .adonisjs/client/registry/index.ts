@@ -1596,6 +1596,12 @@ const routes = {
     tokens: [{"old":"/ai/boats/:id/suggestions","type":0,"val":"ai","end":""},{"old":"/ai/boats/:id/suggestions","type":0,"val":"boats","end":""},{"old":"/ai/boats/:id/suggestions","type":1,"val":"id","end":""},{"old":"/ai/boats/:id/suggestions","type":0,"val":"suggestions","end":""}],
     types: placeholder as Registry['ai.boatSuggestions']['types'],
   },
+  'ai.engineSuggestions': {
+    methods: ["POST"],
+    pattern: '/ai/boats/:boatId/engines/:engineId/suggestions',
+    tokens: [{"old":"/ai/boats/:boatId/engines/:engineId/suggestions","type":0,"val":"ai","end":""},{"old":"/ai/boats/:boatId/engines/:engineId/suggestions","type":0,"val":"boats","end":""},{"old":"/ai/boats/:boatId/engines/:engineId/suggestions","type":1,"val":"boatId","end":""},{"old":"/ai/boats/:boatId/engines/:engineId/suggestions","type":0,"val":"engines","end":""},{"old":"/ai/boats/:boatId/engines/:engineId/suggestions","type":1,"val":"engineId","end":""},{"old":"/ai/boats/:boatId/engines/:engineId/suggestions","type":0,"val":"suggestions","end":""}],
+    types: placeholder as Registry['ai.engineSuggestions']['types'],
+  },
   'ai.engineDiagnosis': {
     methods: ["POST"],
     pattern: '/ai/boats/:boatId/engines/:engineId/diagnosis',

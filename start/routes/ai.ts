@@ -15,6 +15,12 @@ router
       ])
       .as('ai.boatSuggestions')
     router
+      .post('ai/boats/:boatId/engines/:engineId/suggestions', [
+        () => import('#controllers/ai_controller'),
+        'engineSuggestions',
+      ])
+      .as('ai.engineSuggestions')
+    router
       .post('ai/boats/:boatId/engines/:engineId/diagnosis', [
         () => import('#controllers/ai_controller'),
         'engineDiagnosis',

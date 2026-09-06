@@ -596,8 +596,9 @@
       "recentMaintenance": "Maintenance récente",
       "noEvent": "Aucun événement enregistré",
       "aiTitle": "Assistant IA",
-      "aiPrompt1": "Quand faire la prochaine vidange ?",
-      "aiPrompt2": "Historique des pannes moteur",
+      "aiEmpty": "Cliquez sur 'Actualiser' pour des suggestions IA.",
+      "aiRefresh": "Actualiser",
+      "aiRefreshing": "Analyse...",
       "nextDue": "Prochaines échéances",
       "noTaskPlanned": "Aucune tâche planifiée"
     },

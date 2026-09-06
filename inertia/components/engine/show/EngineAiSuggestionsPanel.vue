@@ -1,0 +1,87 @@
+<script setup lang="ts">
+import { router, usePage } from '@inertiajs/vue3'
+import { computed, ref } from 'vue'
+import BaseSkeleton from '~/components/base/BaseSkeleton.vue'
+import UpgradePlanModal from '~/components/base/UpgradePlanModal.vue'
+import { useT } from '~/composables/use_t'
+import type { AiSuggestion } from '#shared/types/ai'
+import { PLAN_LIMITS } from '../../../../shared/types/plan'
+import type { PlanTier } from '../../../../shared/types/plan'
+
+const props = defineProps<{
+  boatId: number
+  engineId: number
+  aiSuggestions: AiSuggestion[] | null
+}>()
+
+const { t } = useT()
+const page = usePage()
+
+const canUseAI = computed(() => {
+  const plan = (page.props.currentPlan as PlanTier | undefined) ?? 'starter'
+  return PLAN_LIMITS[plan].canUseAI
+})
+
+const isRefreshing = ref(false)
+const showUpgradeModal = ref(false)
+
+function refreshSuggestions() {
+  if (!canUseAI.value) {
+    showUpgradeModal.value = true
+    return
+  }
+  isRefreshing.value = true
+  router.post(
+    `/ai/boats/${props.boatId}/engines/${props.engineId}/suggestions`,
+    {},
+    {
+      preserveScroll: true,
+      onFinish: () => {
+        isRefreshing.value = false
+      },
+    }
+  )
+}
+</script>
+
+<template>
+  <div class="rounded-xl bg-navy-800 p-4 text-white">
+    <div class="mb-3 flex items-center justify-between">
+      <p class="flex items-center gap-2 font-semibold">
+        <span class="text-brand">&#10022;</span>
+        {{ t('boats.engineShow.overview.aiTitle') }}
+      </p>
+      <button
+        type="button"
+        class="text-xs text-navy-300 hover:underline disabled:cursor-not-allowed disabled:opacity-50"
+        :disabled="isRefreshing"
+        @click="refreshSuggestions"
+      >
+        {{
+          isRefreshing
+            ? t('boats.engineShow.overview.aiRefreshing')
+            : t('boats.engineShow.overview.aiRefresh')
+        }}
+      </button>
+    </div>
+
+    <template v-if="isRefreshing">
+      <BaseSkeleton height-class="h-10" rounded-class="rounded-lg" class="mb-2 opacity-30" />
+      <BaseSkeleton height-class="h-10" rounded-class="rounded-lg" class="opacity-20" />
+    </template>
+    <template v-else-if="!aiSuggestions || aiSuggestions.length === 0">
+      <p class="text-sm text-navy-300">{{ t('boats.engineShow.overview.aiEmpty') }}</p>
+    </template>
+    <template v-else>
+      <div
+        v-for="(s, i) in aiSuggestions"
+        :key="i"
+        class="mb-2 rounded-lg bg-navy-700 px-3 py-2 text-sm last:mb-0"
+      >
+        {{ s.text }}
+      </div>
+    </template>
+  </div>
+
+  <UpgradePlanModal v-model:open="showUpgradeModal" feature="ai" />
+</template>

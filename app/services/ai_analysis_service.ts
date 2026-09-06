@@ -6,6 +6,8 @@ import {
   buildFleetUserMessage,
   buildSystemPrompt,
 } from '#services/ai_prompt_service'
+import { buildEngineSuggestionsUserMessage } from '#services/engine_suggestions_prompt_service'
+import { computeContextHash } from '#utils/context_hash'
 import {
   buildEngineDiagnosisSystemPrompt,
   buildEngineDiagnosisUserMessage,
@@ -19,6 +21,7 @@ import type {
   EngineDiagnosisInput,
   EngineDiagnosisPanelData,
   EngineDiagnosisResult,
+  EngineSuggestionsInput,
   FleetAnalysisInput,
 } from '#shared/types/ai'
 import { inject } from '@adonisjs/core'
@@ -57,6 +60,9 @@ export default class AiAnalysisService {
   /**
    * Get the latest boat suggestions for a user and boat, in the locale they are
    * browsing in (cf. `getLatestFleetAnalysis`).
+   *
+   * Les lignes `userId NULL` sont générées par le job planifié : elles
+   * appartiennent à l'organisation et sont visibles de tous ses membres.
    */
   async getLatestBoatSuggestions(
     userId: number,
@@ -65,13 +71,55 @@ export default class AiAnalysisService {
     locale: AiSuggestionLocale
   ): Promise<AiAnalysis | null> {
     return AiAnalysis.query()
-      .where('userId', userId)
+      .where((query) => query.where('userId', userId).orWhereNull('userId'))
       .where('organizationId', orgId)
       .where('kind', 'boat_suggestions')
       .where('boatId', boatId)
       .where('locale', locale)
       .orderBy('createdAt', 'desc')
       .first()
+  }
+
+  /**
+   * Dernières suggestions d'un moteur (`kind: 'engine_suggestions'`), lignes
+   * planifiées (`userId NULL`) comprises — cf. `getLatestBoatSuggestions`.
+   */
+  async getLatestEngineSuggestions(
+    userId: number,
+    engineId: number,
+    orgId: number,
+    locale: AiSuggestionLocale
+  ): Promise<AiAnalysis | null> {
+    return AiAnalysis.query()
+      .where((query) => query.where('userId', userId).orWhereNull('userId'))
+      .where('organizationId', orgId)
+      .where('kind', 'engine_suggestions')
+      .where('boatEngineId', engineId)
+      .where('locale', locale)
+      .orderBy('createdAt', 'desc')
+      .first()
+  }
+
+  /**
+   * Dernière analyse d'un scope (bateau ou moteur) tous utilisateurs
+   * confondus — utilisée par le job planifié pour la cadence et la
+   * comparaison de `contextHash` : un refresh manuel récent compte autant
+   * qu'une génération planifiée.
+   */
+  async getLatestForScope(
+    kind: 'boat_suggestions' | 'engine_suggestions',
+    orgId: number,
+    scope: { boatId?: number; engineId?: number },
+    locale: AiSuggestionLocale
+  ): Promise<AiAnalysis | null> {
+    const query = AiAnalysis.query()
+      .where('organizationId', orgId)
+      .where('kind', kind)
+      .where('locale', locale)
+      .orderBy('createdAt', 'desc')
+    if (scope.boatId !== undefined) query.where('boatId', scope.boatId)
+    if (scope.engineId !== undefined) query.where('boatEngineId', scope.engineId)
+    return query.first()
   }
 
   async generateFleetAnalysis(
@@ -116,8 +164,13 @@ export default class AiAnalysisService {
     })
   }
 
+  /**
+   * `userId: null` = génération planifiée (job quotidien) : la ligne
+   * appartient à l'organisation. Le `contextHash` stocké permet au job de
+   * sauter la régénération quand le contexte n'a pas changé.
+   */
   async generateBoatSuggestions(
-    userId: number,
+    userId: number | null,
     boatId: number,
     org: Organization,
     input: BoatSuggestionsInput,
@@ -152,6 +205,58 @@ export default class AiAnalysisService {
         kind: 'boat_suggestions',
         locale,
         responseText: JSON.stringify(suggestions),
+        contextHash: computeContextHash(input),
+        createdAt: DateTime.now(),
+      })
+
+      return suggestions
+    })
+  }
+
+  /**
+   * Suggestions de maintenance d'un moteur — même cycle que
+   * `generateBoatSuggestions` (verrou d'org → quota → appel → parse →
+   * persistance), scopé `boatEngineId` avec `kind: 'engine_suggestions'`.
+   */
+  async generateEngineSuggestions(
+    userId: number | null,
+    boatId: number,
+    engineId: number,
+    org: Organization,
+    input: EngineSuggestionsInput,
+    locale: AiSuggestionLocale,
+    orgSystemPrompt?: string | null,
+    orgModelOverride?: string | null
+  ): Promise<AiSuggestion[]> {
+    return this.aiTokenQuotaService.withOrgLock(org.id, async () => {
+      const currentUsage = await this.aiTokenQuotaService.getUsage(org.id)
+      this.aiTokenQuotaService.assertCanUseTokens(org, currentUsage)
+
+      const userMessage = buildEngineSuggestionsUserMessage(input, locale)
+      const systemPrompt = buildSystemPrompt(locale)
+      const systemContent = orgSystemPrompt ? `${orgSystemPrompt}\n\n${systemPrompt}` : systemPrompt
+
+      const { content: rawResponse, tokensUsed } = await this.aiService.chat(
+        [
+          { role: 'system', content: systemContent },
+          { role: 'user', content: userMessage },
+        ],
+        orgModelOverride
+      )
+
+      await this.aiTokenQuotaService.recordUsage(org, tokensUsed)
+
+      const suggestions = this.#parseResponse(rawResponse)
+
+      await AiAnalysis.create({
+        userId,
+        organizationId: org.id,
+        boatId,
+        boatEngineId: engineId,
+        kind: 'engine_suggestions',
+        locale,
+        responseText: JSON.stringify(suggestions),
+        contextHash: computeContextHash(input),
         createdAt: DateTime.now(),
       })
 
