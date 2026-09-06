@@ -24,7 +24,8 @@
     }
   },
   "settings": {
-    "wrongCurrentPassword": "The current password is incorrect."
+    "wrongCurrentPassword": "The current password is incorrect.",
+    "aiModelWrongProvider": "This model does not belong to the active AI provider."
   },
   "fields": {
     "firstName": "first name",

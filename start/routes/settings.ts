@@ -1,6 +1,10 @@
 import { middleware } from '#start/kernel'
 import router from '@adonisjs/core/services/router'
+import { AI_PROVIDERS } from '#shared/types/ai'
 import { isThemePreference } from '#shared/types/theme'
+
+// Un fournisseur inconnu ne matche pas la route → 404 natif (pas de 500).
+const AI_PROVIDER_MATCHER = new RegExp(`^(${AI_PROVIDERS.join('|')})$`)
 
 const SettingsController = () => import('#controllers/settings_controller')
 const BillingController = () => import('#controllers/billing_controller')
@@ -92,11 +96,16 @@ router
     router.get('settings/ai', [SettingsController, 'ai']).as('settings.ai')
     router.put('settings/ai', [SettingsController, 'updateAiSettings']).as('settings.ai.update')
     router
-      .put('settings/ai/api-key', [SettingsController, 'updateAiApiKey'])
-      .as('settings.ai.apiKey.update')
+      .put('settings/ai/provider', [SettingsController, 'updateAiProvider'])
+      .as('settings.ai.provider.update')
     router
-      .delete('settings/ai/api-key', [SettingsController, 'removeAiApiKey'])
+      .put('settings/ai/api-key/:provider', [SettingsController, 'updateAiApiKey'])
+      .as('settings.ai.apiKey.update')
+      .where('provider', AI_PROVIDER_MATCHER)
+    router
+      .delete('settings/ai/api-key/:provider', [SettingsController, 'removeAiApiKey'])
       .as('settings.ai.apiKey.remove')
+      .where('provider', AI_PROVIDER_MATCHER)
     router.get('settings/audit-log', [AuditLogsController, 'index']).as('settings.auditLog')
     router.get('settings/branding', [SettingsController, 'branding']).as('settings.branding')
     router

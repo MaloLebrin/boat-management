@@ -217,17 +217,35 @@
     "models": {
       "mistral-small-latest": "Mistral Small (rapide)",
       "mistral-medium-latest": "Mistral Medium (équilibré)",
-      "mistral-large-latest": "Mistral Large (performant)"
+      "mistral-large-latest": "Mistral Large (performant)",
+      "claude-haiku-4-5": "Claude Haiku 4.5 (rapide)",
+      "claude-sonnet-5": "Claude Sonnet 5 (équilibré)",
+      "claude-opus-5": "Claude Opus 5 (performant)",
+      "gpt-5-1": "GPT-5.1 (performant)",
+      "gpt-5": "GPT-5 (équilibré)",
+      "gpt-5-mini": "GPT-5 mini (rapide)",
+      "gemini-2-5-flash": "Gemini 2.5 Flash (rapide)",
+      "gemini-2-5-pro": "Gemini 2.5 Pro (performant)"
     },
     "save": "Enregistrer",
     "apiKey": {
-      "label": "Clé API Mistral",
-      "hint": "Utilisez votre propre clé Mistral AI : la consommation IA est alors facturée sur votre compte Mistral et ne compte plus dans le quota mensuel de tokens de votre plan. La clé est stockée chiffrée et n’est jamais réaffichée.",
+      "label": "Clé API {provider}",
       "configured": "Une clé est configurée pour votre organisation.",
-      "placeholder": "Collez votre clé API Mistral",
+      "placeholder": "Collez votre clé API {provider}",
       "placeholderSet": "Saisissez une nouvelle clé pour remplacer l’actuelle",
       "save": "Enregistrer la clé",
       "remove": "Retirer la clé"
+    },
+    "apiKeys": {
+      "title": "Clés API IA",
+      "description": "Utilisez vos propres clés API (Mistral, Claude, ChatGPT ou Gemini) : la consommation IA du copilote FleetAi est alors facturée sur votre compte chez ce fournisseur et ne compte plus dans le quota mensuel de tokens de votre plan. Les clés sont stockées chiffrées et ne sont jamais réaffichées."
+    },
+    "activeProvider": {
+      "title": "Fournisseur IA actif",
+      "description": "Le copilote FleetAi utilise la clé du fournisseur sélectionné. Seuls les fournisseurs avec une clé enregistrée sont sélectionnables.",
+      "label": "Fournisseur",
+      "appDefault": "Défaut de l’application (Mistral, quota mensuel)",
+      "save": "Enregistrer"
     }
   },
   "branding": {

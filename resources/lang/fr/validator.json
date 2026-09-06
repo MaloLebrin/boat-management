@@ -24,7 +24,8 @@
     }
   },
   "settings": {
-    "wrongCurrentPassword": "Le mot de passe actuel est incorrect."
+    "wrongCurrentPassword": "Le mot de passe actuel est incorrect.",
+    "aiModelWrongProvider": "Ce modèle n’appartient pas au fournisseur IA actif."
   },
   "fields": {
     "firstName": "prénom",

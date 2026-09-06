@@ -82,7 +82,9 @@
     "brandingRequiresPlan": "White labelling (logo and colours) requires the Enterprise plan.",
     "aiApiKeyUpdated": "AI API key saved.",
     "aiApiKeyRemoved": "AI API key removed.",
-    "aiSettingsRequirePlan": "AI settings require a plan with AI access."
+    "aiSettingsRequirePlan": "AI settings require a plan with AI access.",
+    "aiProviderUpdated": "AI provider updated.",
+    "aiProviderKeyMissing": "Add an API key for this provider first."
   },
   "enginePart": {
     "created": "Part added.",

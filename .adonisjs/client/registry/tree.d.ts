@@ -314,6 +314,9 @@ export interface ApiDefinition {
     }
     ai: typeof routes['settings.ai'] & {
       update: typeof routes['settings.ai.update']
+      provider: {
+        update: typeof routes['settings.ai.provider.update']
+      }
       apiKey: {
         update: typeof routes['settings.ai.apiKey.update']
         remove: typeof routes['settings.ai.apiKey.remove']

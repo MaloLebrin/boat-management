@@ -217,17 +217,35 @@
     "models": {
       "mistral-small-latest": "Mistral Small (fast)",
       "mistral-medium-latest": "Mistral Medium (balanced)",
-      "mistral-large-latest": "Mistral Large (powerful)"
+      "mistral-large-latest": "Mistral Large (powerful)",
+      "claude-haiku-4-5": "Claude Haiku 4.5 (fast)",
+      "claude-sonnet-5": "Claude Sonnet 5 (balanced)",
+      "claude-opus-5": "Claude Opus 5 (powerful)",
+      "gpt-5-1": "GPT-5.1 (powerful)",
+      "gpt-5": "GPT-5 (balanced)",
+      "gpt-5-mini": "GPT-5 mini (fast)",
+      "gemini-2-5-flash": "Gemini 2.5 Flash (fast)",
+      "gemini-2-5-pro": "Gemini 2.5 Pro (powerful)"
     },
     "save": "Save",
     "apiKey": {
-      "label": "Mistral API key",
-      "hint": "Use your own Mistral AI key: AI usage is then billed to your Mistral account and no longer counts against your plan’s monthly token quota. The key is stored encrypted and never displayed again.",
+      "label": "{provider} API key",
       "configured": "A key is configured for your organisation.",
-      "placeholder": "Paste your Mistral API key",
+      "placeholder": "Paste your {provider} API key",
       "placeholderSet": "Enter a new key to replace the current one",
       "save": "Save key",
       "remove": "Remove key"
+    },
+    "apiKeys": {
+      "title": "AI API keys",
+      "description": "Use your own API keys (Mistral, Claude, ChatGPT or Gemini): AI usage from the FleetAi copilot is then billed to your account with that provider and no longer counts against your plan’s monthly token quota. Keys are stored encrypted and never displayed again."
+    },
+    "activeProvider": {
+      "title": "Active AI provider",
+      "description": "The FleetAi copilot uses the key of the selected provider. Only providers with a saved key can be selected.",
+      "label": "Provider",
+      "appDefault": "App default (Mistral, monthly quota)",
+      "save": "Save"
     }
   },
   "branding": {

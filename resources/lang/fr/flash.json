@@ -82,7 +82,9 @@
     "brandingRequiresPlan": "La marque blanche (logo et couleurs) nécessite le plan Entreprise.",
     "aiApiKeyUpdated": "Clé API IA enregistrée.",
     "aiApiKeyRemoved": "Clé API IA retirée.",
-    "aiSettingsRequirePlan": "Les réglages IA nécessitent un plan avec accès à l’IA."
+    "aiSettingsRequirePlan": "Les réglages IA nécessitent un plan avec accès à l’IA.",
+    "aiProviderUpdated": "Fournisseur IA mis à jour.",
+    "aiProviderKeyMissing": "Ajoutez d’abord une clé API pour ce fournisseur."
   },
   "enginePart": {
     "created": "Pièce ajoutée.",

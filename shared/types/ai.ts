@@ -1,12 +1,67 @@
 import type { AppLocale } from '#shared/helpers/locale_path'
 import type { DiagnosticSheetSlug } from '#shared/types/diagnostic'
 
-export const AI_MODEL_OVERRIDES = [
-  'mistral-small-latest',
-  'mistral-medium-latest',
-  'mistral-large-latest',
-] as const
-export type AiModelOverride = (typeof AI_MODEL_OVERRIDES)[number]
+/**
+ * Fournisseurs IA supportés en BYOK (#clé API par organisation). `mistral`
+ * reste le fournisseur de l'app : sans clé d'org, les appels partent sur la
+ * clé Mistral de l'app et le quota mensuel s'applique.
+ */
+export const AI_PROVIDERS = ['mistral', 'anthropic', 'openai', 'google'] as const
+export type AiProvider = (typeof AI_PROVIDERS)[number]
+
+/** Noms commerciaux — des marques, jamais traduites (pas de clé i18n). */
+export const AI_PROVIDER_LABELS: Record<AiProvider, string> = {
+  mistral: 'Mistral',
+  anthropic: 'Claude',
+  openai: 'ChatGPT',
+  google: 'Gemini',
+}
+
+export const AI_MODELS_BY_PROVIDER = {
+  mistral: ['mistral-small-latest', 'mistral-medium-latest', 'mistral-large-latest'],
+  anthropic: ['claude-haiku-4-5', 'claude-sonnet-5', 'claude-opus-5'],
+  openai: ['gpt-5.1', 'gpt-5', 'gpt-5-mini'],
+  google: ['gemini-2.5-flash', 'gemini-2.5-pro'],
+} as const satisfies Record<AiProvider, readonly string[]>
+
+/** Union de tous les modèles sélectionnables (validation de `aiModelOverride`). */
+export const ALL_AI_MODELS = Object.values(AI_MODELS_BY_PROVIDER).flat()
+
+/** Défaut par fournisseur — même philosophie « petit modèle » que mistral-small. */
+export const DEFAULT_AI_MODEL_BY_PROVIDER: Record<AiProvider, string> = {
+  mistral: 'mistral-small-latest',
+  anthropic: 'claude-sonnet-5',
+  openai: 'gpt-5-mini',
+  google: 'gemini-2.5-flash',
+}
+
+export function isAiProvider(value: unknown): value is AiProvider {
+  return typeof value === 'string' && (AI_PROVIDERS as readonly string[]).includes(value)
+}
+
+export function modelBelongsToProvider(model: string, provider: AiProvider): boolean {
+  return (AI_MODELS_BY_PROVIDER[provider] as readonly string[]).includes(model)
+}
+
+/**
+ * Clé i18n sûre pour un identifiant de modèle : `gpt-5.1` → `gpt-5-1` — un
+ * point dans la clé casserait la résolution par chemin des JSON de langue.
+ */
+export function aiModelI18nKey(model: string): string {
+  return model.replaceAll('.', '-')
+}
+
+/**
+ * Options d'un appel `AiService.chat`. Sans `provider`, l'appel part chez
+ * Mistral avec la clé de l'app. Un `model` étranger au fournisseur est ignoré
+ * (fallback sur le défaut du fournisseur) : `aiModelOverride` peut rester
+ * configuré pour un autre provider que celui de l'appel.
+ */
+export interface AiChatOptions {
+  provider?: AiProvider | null
+  model?: string | null
+  apiKey?: string | null
+}
 
 export type AiAnalysisStatus = 'pending' | 'running' | 'done' | 'failed'
 

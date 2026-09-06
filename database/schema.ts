@@ -2128,6 +2128,30 @@ export class NotificationSchema extends BaseModel {
   declare userId: number
 }
 
+export class OrganizationAiKeySchema extends BaseModel {
+  static $columns = [
+    'apiKeyEncrypted',
+    'createdAt',
+    'id',
+    'organizationId',
+    'provider',
+    'updatedAt',
+  ] as const
+  $columns = OrganizationAiKeySchema.$columns
+  @column()
+  declare apiKeyEncrypted: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare organizationId: number
+  @column()
+  declare provider: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
+}
+
 export class OrganizationInvitationSchema extends BaseModel {
   static $columns = [
     'acceptedAt',
@@ -2219,8 +2243,8 @@ export class OrganizationModuleSchema extends BaseModel {
 
 export class OrganizationSchema extends BaseModel {
   static $columns = [
-    'aiApiKeyEncrypted',
     'aiModelOverride',
+    'aiProvider',
     'aiSystemPrompt',
     'appName',
     'createdAt',
@@ -2240,9 +2264,9 @@ export class OrganizationSchema extends BaseModel {
   ] as const
   $columns = OrganizationSchema.$columns
   @column()
-  declare aiApiKeyEncrypted: string | null
-  @column()
   declare aiModelOverride: string | null
+  @column()
+  declare aiProvider: string | null
   @column()
   declare aiSystemPrompt: string | null
   @column()

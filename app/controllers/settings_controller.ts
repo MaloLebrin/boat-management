@@ -1,3 +1,4 @@
+import OrganizationAiKeyService from '#services/organization_ai_key_service'
 import OrganizationMemberService from '#services/organization_member_service'
 import PushSubscriptionService from '#services/push_subscription_service'
 import * as PushSubscriptionTransformer from '#transformers/push_subscription_transformer'
@@ -12,6 +13,7 @@ import OrganizationPolicy from '#policies/organization_policy'
 import {
   changePasswordValidator,
   updateAiApiKeyValidator,
+  updateAiProviderValidator,
   updateAiSettingsValidator,
   updateLocaleValidator,
   updateOrganizationValidator,
@@ -19,10 +21,11 @@ import {
   updateThemeValidator,
 } from '#validators/user'
 import { updateBrandingValidator, uploadLogoValidator } from '#validators/branding'
+import { AiProviderKeyMissingError } from '#exceptions/ai_errors'
 import { inject } from '@adonisjs/core'
-import encryption from '@adonisjs/core/services/encryption'
 import hash from '@adonisjs/core/services/hash'
 import type { HttpContext } from '@adonisjs/core/http'
+import { isAiProvider, modelBelongsToProvider } from '#shared/types/ai'
 import { PLAN_LIMITS } from '#shared/types/plan'
 import type { BooleanQuotaKey } from '#shared/types/plan'
 import { BILLING_SETTINGS_PATH } from '#shared/constants/billing'
@@ -38,7 +41,8 @@ export default class SettingsController {
     private organizationModuleService: OrganizationModuleService,
     private brandingService: BrandingService,
     private boatListService: BoatListService,
-    private pushSubscriptionService: PushSubscriptionService
+    private pushSubscriptionService: PushSubscriptionService,
+    private organizationAiKeyService: OrganizationAiKeyService
   ) {}
   async me({ inertia }: HttpContext) {
     return inertia.render('settings/me', {})
@@ -228,8 +232,9 @@ export default class SettingsController {
     return inertia.render('settings/ai', {
       aiSystemPrompt: org.aiSystemPrompt,
       aiModelOverride: org.aiModelOverride,
-      // Jamais la clé elle-même — seul ce booléen sort du backend.
-      hasCustomApiKey: org.aiApiKeyEncrypted !== null,
+      aiProvider: org.aiProvider,
+      // Jamais les clés elles-mêmes — seuls ces booléens sortent du backend.
+      configuredProviders: await this.organizationAiKeyService.listConfigured(org.id),
     })
   }
 
@@ -253,16 +258,27 @@ export default class SettingsController {
     const { aiSystemPrompt, aiModelOverride } =
       await request.validateUsing(updateAiSettingsValidator)
 
+    // Le validator accepte l'union des modèles de tous les fournisseurs ; ici
+    // on vérifie l'appartenance au fournisseur actif de l'org (null = mistral).
+    const model = aiModelOverride ?? null
+    if (model !== null && !modelBelongsToProvider(model, org.aiProvider ?? 'mistral')) {
+      session.flashAll()
+      session.flash('inputErrorsBag', {
+        aiModelOverride: [i18n.t('validator.settings.aiModelWrongProvider')],
+      })
+      return response.redirect().back()
+    }
+
     org.aiSystemPrompt = aiSystemPrompt ?? null
-    org.aiModelOverride = aiModelOverride ?? null
+    org.aiModelOverride = model
     await org.save()
 
     session.flash('success', i18n.t('flash.settings.aiSettingsUpdated'))
     return response.redirect().back()
   }
 
-  /** Enregistre la clé API Mistral de l'org (BYOK) — chiffrée au repos. */
-  async updateAiApiKey({ request, response, session, auth, bouncer, i18n }: HttpContext) {
+  /** Enregistre la clé API du fournisseur `:provider` (BYOK) — chiffrée au repos. */
+  async updateAiApiKey({ request, params, response, session, auth, bouncer, i18n }: HttpContext) {
     const user = await auth.authenticate()
     await user.load('organization')
     const org = user.organization
@@ -275,17 +291,24 @@ export default class SettingsController {
 
     await bouncer.with(OrganizationPolicy).authorize('configureAI')
 
+    // Le matcher de route garantit déjà un fournisseur connu — narrowing TS.
+    if (!isAiProvider(params.provider)) {
+      return response.notFound()
+    }
+
     const { aiApiKey } = await request.validateUsing(updateAiApiKeyValidator)
 
-    org.aiApiKeyEncrypted = encryption.encrypt(aiApiKey)
-    await org.save()
+    await this.organizationAiKeyService.setKey(org, params.provider, aiApiKey)
 
     session.flash('success', i18n.t('flash.settings.aiApiKeyUpdated'))
     return response.redirect().back()
   }
 
-  /** Retire la clé API de l'org — retour à la clé de l'app et à son quota. */
-  async removeAiApiKey({ response, session, auth, bouncer, i18n }: HttpContext) {
+  /**
+   * Retire la clé du fournisseur `:provider`. Si c'était le fournisseur actif,
+   * l'org revient à la clé de l'app et à son quota.
+   */
+  async removeAiApiKey({ params, response, session, auth, bouncer, i18n }: HttpContext) {
     const user = await auth.authenticate()
     await user.load('organization')
     const org = user.organization
@@ -298,10 +321,43 @@ export default class SettingsController {
 
     await bouncer.with(OrganizationPolicy).authorize('configureAI')
 
-    org.aiApiKeyEncrypted = null
-    await org.save()
+    if (!isAiProvider(params.provider)) {
+      return response.notFound()
+    }
+
+    await this.organizationAiKeyService.removeKey(org, params.provider)
 
     session.flash('success', i18n.t('flash.settings.aiApiKeyRemoved'))
+    return response.redirect().back()
+  }
+
+  /** Sélectionne le fournisseur IA actif — refuse un fournisseur sans clé. */
+  async updateAiProvider({ request, response, session, auth, bouncer, i18n }: HttpContext) {
+    const user = await auth.authenticate()
+    await user.load('organization')
+    const org = user.organization
+
+    if (
+      !this.guardPlanFeature(org, 'canUseAI', 'aiSettingsRequirePlan', { response, session, i18n })
+    ) {
+      return
+    }
+
+    await bouncer.with(OrganizationPolicy).authorize('configureAI')
+
+    const { aiProvider } = await request.validateUsing(updateAiProviderValidator)
+
+    try {
+      await this.organizationAiKeyService.setActiveProvider(org, aiProvider)
+    } catch (error) {
+      if (error instanceof AiProviderKeyMissingError) {
+        session.flash('error', i18n.t('flash.settings.aiProviderKeyMissing'))
+        return response.redirect().back()
+      }
+      throw error
+    }
+
+    session.flash('success', i18n.t('flash.settings.aiProviderUpdated'))
     return response.redirect().back()
   }
 
