@@ -1086,16 +1086,22 @@ const routes = {
     tokens: [{"old":"/settings/ai","type":0,"val":"settings","end":""},{"old":"/settings/ai","type":0,"val":"ai","end":""}],
     types: placeholder as Registry['settings.ai.update']['types'],
   },
+  'settings.ai.provider.update': {
+    methods: ["PUT"],
+    pattern: '/settings/ai/provider',
+    tokens: [{"old":"/settings/ai/provider","type":0,"val":"settings","end":""},{"old":"/settings/ai/provider","type":0,"val":"ai","end":""},{"old":"/settings/ai/provider","type":0,"val":"provider","end":""}],
+    types: placeholder as Registry['settings.ai.provider.update']['types'],
+  },
   'settings.ai.apiKey.update': {
     methods: ["PUT"],
-    pattern: '/settings/ai/api-key',
-    tokens: [{"old":"/settings/ai/api-key","type":0,"val":"settings","end":""},{"old":"/settings/ai/api-key","type":0,"val":"ai","end":""},{"old":"/settings/ai/api-key","type":0,"val":"api-key","end":""}],
+    pattern: '/settings/ai/api-key/:provider',
+    tokens: [{"old":"/settings/ai/api-key/:provider","type":0,"val":"settings","end":""},{"old":"/settings/ai/api-key/:provider","type":0,"val":"ai","end":""},{"old":"/settings/ai/api-key/:provider","type":0,"val":"api-key","end":""},{"old":"/settings/ai/api-key/:provider","type":1,"val":"provider","end":""}],
     types: placeholder as Registry['settings.ai.apiKey.update']['types'],
   },
   'settings.ai.apiKey.remove': {
     methods: ["DELETE"],
-    pattern: '/settings/ai/api-key',
-    tokens: [{"old":"/settings/ai/api-key","type":0,"val":"settings","end":""},{"old":"/settings/ai/api-key","type":0,"val":"ai","end":""},{"old":"/settings/ai/api-key","type":0,"val":"api-key","end":""}],
+    pattern: '/settings/ai/api-key/:provider',
+    tokens: [{"old":"/settings/ai/api-key/:provider","type":0,"val":"settings","end":""},{"old":"/settings/ai/api-key/:provider","type":0,"val":"ai","end":""},{"old":"/settings/ai/api-key/:provider","type":0,"val":"api-key","end":""},{"old":"/settings/ai/api-key/:provider","type":1,"val":"provider","end":""}],
     types: placeholder as Registry['settings.ai.apiKey.remove']['types'],
   },
   'settings.auditLog': {

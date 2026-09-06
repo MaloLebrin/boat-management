@@ -143,7 +143,7 @@ export default class AiAnalysisService {
           { role: 'system', content: systemContent },
           { role: 'user', content: userMessage },
         ],
-        orgModelOverride
+        { model: orgModelOverride }
       )
 
       await this.aiTokenQuotaService.recordUsage(org, tokensUsed)
@@ -191,7 +191,7 @@ export default class AiAnalysisService {
           { role: 'system', content: systemContent },
           { role: 'user', content: userMessage },
         ],
-        orgModelOverride
+        { model: orgModelOverride }
       )
 
       await this.aiTokenQuotaService.recordUsage(org, tokensUsed)
@@ -241,7 +241,7 @@ export default class AiAnalysisService {
           { role: 'system', content: systemContent },
           { role: 'user', content: userMessage },
         ],
-        orgModelOverride
+        { model: orgModelOverride }
       )
 
       await this.aiTokenQuotaService.recordUsage(org, tokensUsed)
@@ -328,7 +328,7 @@ export default class AiAnalysisService {
           { role: 'system', content: systemContent },
           { role: 'user', content: userMessage },
         ],
-        orgModelOverride
+        { model: orgModelOverride }
       )
 
       await this.aiTokenQuotaService.recordUsage(org, tokensUsed)

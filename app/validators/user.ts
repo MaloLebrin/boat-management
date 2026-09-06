@@ -1,6 +1,6 @@
 import vine from '@vinejs/vine'
 import { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH } from '#shared/constants/auth'
-import { AI_MODEL_OVERRIDES } from '#shared/types/ai'
+import { AI_PROVIDERS, ALL_AI_MODELS } from '#shared/types/ai'
 import { FLEET_SIZES, ORGANIZATION_TYPES } from '#shared/types/organization'
 import { THEME_PREFERENCES } from '#shared/types/theme'
 
@@ -69,11 +69,17 @@ export const updateOrganizationValidator = vine.create({
 })
 
 /**
- * Clé API Mistral BYOK (copilote FleetAi) : write-only — jamais renvoyée au
- * front. La suppression passe par une route dédiée, pas par une valeur vide.
+ * Clé API IA BYOK (copilote FleetAi) — un fournisseur par route
+ * (`/settings/ai/api-key/:provider`) : write-only, jamais renvoyée au front.
+ * La suppression passe par une route dédiée, pas par une valeur vide.
  */
 export const updateAiApiKeyValidator = vine.create({
   aiApiKey: vine.string().trim().minLength(8).maxLength(200),
+})
+
+/** Fournisseur IA actif — `null` = clé Mistral de l'app (quota applicable). */
+export const updateAiProviderValidator = vine.create({
+  aiProvider: vine.enum(AI_PROVIDERS).nullable(),
 })
 
 export const updateAiSettingsValidator = vine.create({
@@ -82,5 +88,7 @@ export const updateAiSettingsValidator = vine.create({
     .maxLength(2000)
     .nullable()
     .transform((v) => v || null),
-  aiModelOverride: vine.enum(AI_MODEL_OVERRIDES).nullable().optional(),
+  // Union des modèles de tous les fournisseurs ; l'appartenance au fournisseur
+  // actif est vérifiée dans le contrôleur (le validator n'a pas l'org).
+  aiModelOverride: vine.enum(ALL_AI_MODELS).nullable().optional(),
 })

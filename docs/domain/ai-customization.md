@@ -77,11 +77,14 @@ AiAnalysisService.generateFleetAnalysis(
      │    ? `${orgSystemPrompt}\n\n${systemPrompt}`
      │    : systemPrompt
      ▼
-AiService.chat(messages, orgModelOverride)
-     │  model = orgModelOverride ?? this.#model   ← env var AI_MODEL
+AiService.chat(messages, { model: orgModelOverride })
+     │  provider = 'mistral' (défaut — pas de BYOK hors assistant)
+     │  model = orgModelOverride s'il appartient au provider, sinon défaut (env AI_MODEL)
      ▼
 Mistral API
 ```
+
+**Résolution du modèle** : un `aiModelOverride` étranger au fournisseur de l'appel (ex. `claude-sonnet-5` alors que l'appel part chez Mistral) est **ignoré** — `AiService` retombe sur le défaut du fournisseur. C'est ce qui permet à une org de configurer un modèle Claude pour son assistant (BYOK multi-fournisseurs) sans casser les analyses/suggestions qui restent sur la clé Mistral de l'app.
 
 **Ordre du prompt système** : le prompt de l'organisation est préfixé **avant** le prompt interne. Cela permet à l'organisation de poser son contexte métier en premier, les instructions de format restant en second.
 
@@ -96,12 +99,13 @@ La locale utilisée est celle de la requête (`i18n.locale`, donc profil > cooki
 | Fichier                                                                                                                                                | Rôle                                                                                            |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
 | [`shared/types/plan.ts`](../../shared/types/plan.ts)                                                                                                   | `canCustomizeAI: boolean` dans `PlanQuotas` + `PLAN_LIMITS`                                     |
-| [`shared/types/ai.ts`](../../shared/types/ai.ts)                                                                                                       | `AI_MODEL_OVERRIDES`, `AiModelOverride`                                                         |
+| [`shared/types/ai.ts`](../../shared/types/ai.ts)                                                                                                       | `AI_PROVIDERS`, `AI_MODELS_BY_PROVIDER`, `ALL_AI_MODELS`, `AiChatOptions`                       |
 | [`database/migrations/1790000000000_add_ai_settings_to_organizations.ts`](../../database/migrations/1790000000000_add_ai_settings_to_organizations.ts) | Colonnes `ai_system_prompt` + `ai_model_override`                                               |
 | [`database/schema.ts`](../../database/schema.ts)                                                                                                       | `OrganizationSchema` — colonnes déclarées                                                       |
 | [`app/models/organization.ts`](../../app/models/organization.ts)                                                                                       | Modèle Lucid (hérite du schema)                                                                 |
 | [`app/validators/user.ts`](../../app/validators/user.ts)                                                                                               | `updateAiSettingsValidator`                                                                     |
-| [`app/services/ai_service.ts`](../../app/services/ai_service.ts)                                                                                       | `chat(messages, modelOverride?)`                                                                |
+| [`app/services/ai_service.ts`](../../app/services/ai_service.ts)                                                                                       | `chat(messages, options)` — un adaptateur par fournisseur (Mistral/Anthropic/OpenAI/Google)     |
+| [`app/services/organization_ai_key_service.ts`](../../app/services/organization_ai_key_service.ts)                                                     | Clés BYOK par fournisseur + fournisseur actif                                                   |
 | [`app/services/ai_analysis_service.ts`](../../app/services/ai_analysis_service.ts)                                                                     | `generateFleetAnalysis(..., locale, orgSystemPrompt?, orgModelOverride?)`                       |
 | [`app/services/ai_prompt_service.ts`](../../app/services/ai_prompt_service.ts)                                                                         | Prompts localisés (#460) : `buildSystemPrompt`, `buildFleetUserMessage`, `buildBoatUserMessage` |
 | [`app/controllers/ai_controller.ts`](../../app/controllers/ai_controller.ts)                                                                           | Passe `aiSystemPrompt` + `aiModelOverride` aux calls                                            |
@@ -153,7 +157,7 @@ Points notables :
 
 - **Transform `"" → null`** : une textarea vidée envoie `""`, qui serait stocké tel quel sans ce transform. Le transform garantit que la colonne reste à `NULL` quand le prompt est effacé.
 - **`aiModelOverride` absent** : `.optional()` accepte les payloads sans la clé ; le controller normalise `undefined → null` via `?? null`.
-- **Enum strict** : seuls les 3 modèles listés dans `AI_MODEL_OVERRIDES` (`shared/types/ai.ts`) sont acceptés.
+- **Enum = union de tous les fournisseurs** : le validator accepte tout modèle de `ALL_AI_MODELS` (`shared/types/ai.ts`) ; l'appartenance au **fournisseur actif** de l'org est vérifiée dans `updateAiSettings` (erreur de champ `validator.settings.aiModelWrongProvider` sinon).
 
 ---
 
@@ -188,17 +192,20 @@ Ce pattern est identique à `manageMembers()` — c'est la convention ACL du pro
 
 ---
 
-## 7. Modèles disponibles
+## 7. Fournisseurs et modèles disponibles
 
-Définis dans `shared/types/ai.ts` (source de vérité) :
+Définis dans `shared/types/ai.ts` (source de vérité) — `AI_MODELS_BY_PROVIDER` :
 
-| Valeur                  | Label UI       | Usage recommandé                    |
-| ----------------------- | -------------- | ----------------------------------- |
-| `mistral-small-latest`  | Mistral Small  | Requêtes courtes, réponses rapides  |
-| `mistral-medium-latest` | Mistral Medium | Équilibre coût / qualité            |
-| `mistral-large-latest`  | Mistral Large  | Analyse complexe, flotte importante |
+| Fournisseur (`AiProvider`) | Marque (UI) | Modèles                                                                 |
+| -------------------------- | ----------- | ----------------------------------------------------------------------- |
+| `mistral`                  | Mistral     | `mistral-small-latest`, `mistral-medium-latest`, `mistral-large-latest` |
+| `anthropic`                | Claude      | `claude-haiku-4-5`, `claude-sonnet-5`, `claude-opus-5`                  |
+| `openai`                   | ChatGPT     | `gpt-5.1`, `gpt-5`, `gpt-5-mini`                                        |
+| `google`                   | Gemini      | `gemini-2.5-flash`, `gemini-2.5-pro`                                    |
 
-Le modèle par défaut (sans override) est contrôlé par la variable d'env `AI_MODEL` (défaut `mistral-small-latest`).
+Le select de la page settings ne propose que les modèles du **fournisseur actif** de l'org (`organizations.ai_provider`, `null` = Mistral). Le modèle par défaut sans override : env `AI_MODEL` pour Mistral (défaut `mistral-small-latest`), `DEFAULT_AI_MODEL_BY_PROVIDER` pour les autres. Les clés i18n des labels sont **sanitizées** (`gpt-5.1` → `settings.ai.models.gpt-5-1` via `aiModelI18nKey` — un point casserait la résolution par chemin).
+
+Les fournisseurs non-Mistral n'existent qu'en **BYOK** : la clé API de l'org (table `organization_ai_keys`, une ligne par couple org/fournisseur, chiffrée) est consommée **uniquement par le copilote FleetAi** — cf. changelog `2026-09-06-0110-byok-multi-fournisseurs-ia.md`.
 
 ---
 
@@ -257,7 +264,7 @@ Flash : `flash.settings.aiSettingsUpdated` (FR + EN).
 | `MISTRAL_API_KEY` | Clé API Mistral (obligatoire)        | —                      |
 | `AI_MODEL`        | Modèle utilisé si aucun override org | `mistral-small-latest` |
 
-L'override de l'organisation prend la priorité sur `AI_MODEL` mais ne remplace pas `MISTRAL_API_KEY` (toujours le compte de la plateforme).
+L'override de l'organisation prend la priorité sur `AI_MODEL` mais ne remplace pas `MISTRAL_API_KEY` (toujours le compte de la plateforme) — sauf pour le copilote quand l'org a un fournisseur actif BYOK (`organizations.ai_provider` + `organization_ai_keys`).
 
 ---
 
@@ -265,7 +272,7 @@ L'override de l'organisation prend la priorité sur `AI_MODEL` mais ne remplace 
 
 ### Fine-tuning Mistral
 
-La colonne `ai_model_override` accepte n'importe quel identifiant de modèle (varchar 100). Un modèle fine-tuné Mistral peut être référencé directement via cet identifiant sans modifier le code — il suffit d'élargir l'enum `AI_MODEL_OVERRIDES` dans `shared/types/ai.ts` et le validateur suit automatiquement.
+La colonne `ai_model_override` accepte n'importe quel identifiant de modèle (varchar 100). Un modèle fine-tuné Mistral peut être référencé directement via cet identifiant sans modifier le code — il suffit de l'ajouter à `AI_MODELS_BY_PROVIDER.mistral` dans `shared/types/ai.ts` : le validateur (`ALL_AI_MODELS`) et la résolution de modèle de `AiService` suivent automatiquement.
 
 Procédure Mistral fine-tuning :
 

@@ -184,8 +184,9 @@ export type ScannedRoutes = {
     'settings.org.update': { paramsTuple?: []; params?: {} }
     'settings.ai': { paramsTuple?: []; params?: {} }
     'settings.ai.update': { paramsTuple?: []; params?: {} }
-    'settings.ai.apiKey.update': { paramsTuple?: []; params?: {} }
-    'settings.ai.apiKey.remove': { paramsTuple?: []; params?: {} }
+    'settings.ai.provider.update': { paramsTuple?: []; params?: {} }
+    'settings.ai.apiKey.update': { paramsTuple: [ParamValue]; params: {'provider': ParamValue} }
+    'settings.ai.apiKey.remove': { paramsTuple: [ParamValue]; params: {'provider': ParamValue} }
     'settings.auditLog': { paramsTuple?: []; params?: {} }
     'settings.branding': { paramsTuple?: []; params?: {} }
     'settings.branding.update': { paramsTuple?: []; params?: {} }
@@ -759,7 +760,7 @@ export type ScannedRoutes = {
     'spots.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'settings.billing.module.remove': { paramsTuple?: []; params?: {} }
     'settings.billing.module.enterprise.deactivate': { paramsTuple?: []; params?: {} }
-    'settings.ai.apiKey.remove': { paramsTuple?: []; params?: {} }
+    'settings.ai.apiKey.remove': { paramsTuple: [ParamValue]; params: {'provider': ParamValue} }
     'settings.branding.logo.delete': { paramsTuple?: []; params?: {} }
     'diagnostic.reset': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
     'organization.members.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -801,7 +802,8 @@ export type ScannedRoutes = {
     'settings.theme.update': { paramsTuple?: []; params?: {} }
     'settings.org.update': { paramsTuple?: []; params?: {} }
     'settings.ai.update': { paramsTuple?: []; params?: {} }
-    'settings.ai.apiKey.update': { paramsTuple?: []; params?: {} }
+    'settings.ai.provider.update': { paramsTuple?: []; params?: {} }
+    'settings.ai.apiKey.update': { paramsTuple: [ParamValue]; params: {'provider': ParamValue} }
     'settings.branding.update': { paramsTuple?: []; params?: {} }
     'organization.members.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'crew.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }

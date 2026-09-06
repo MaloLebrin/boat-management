@@ -2167,13 +2167,25 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateAiSettings']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
-  'settings.ai.apiKey.update': {
+  'settings.ai.provider.update': {
     methods: ["PUT"]
-    pattern: '/settings/ai/api-key'
+    pattern: '/settings/ai/provider'
     types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/user').updateAiApiKeyValidator)>>
+      body: ExtractBody<InferInput<(typeof import('#validators/user').updateAiProviderValidator)>>
       paramsTuple: []
       params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/user').updateAiProviderValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateAiProvider']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateAiProvider']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'settings.ai.apiKey.update': {
+    methods: ["PUT"]
+    pattern: '/settings/ai/api-key/:provider'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/user').updateAiApiKeyValidator)>>
+      paramsTuple: [ParamValue]
+      params: { provider: ParamValue }
       query: ExtractQuery<InferInput<(typeof import('#validators/user').updateAiApiKeyValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateAiApiKey']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateAiApiKey']>>> | { status: 422; response: { errors: SimpleError[] } }
@@ -2181,11 +2193,11 @@ export interface Registry {
   }
   'settings.ai.apiKey.remove': {
     methods: ["DELETE"]
-    pattern: '/settings/ai/api-key'
+    pattern: '/settings/ai/api-key/:provider'
     types: {
       body: {}
-      paramsTuple: []
-      params: {}
+      paramsTuple: [ParamValue]
+      params: { provider: ParamValue }
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['removeAiApiKey']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['removeAiApiKey']>>>

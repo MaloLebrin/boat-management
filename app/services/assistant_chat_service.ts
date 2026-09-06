@@ -15,6 +15,7 @@ import AiService from '#services/ai_service'
 import AiTokenQuotaService from '#services/ai_token_quota_service'
 import AssistantContextService from '#services/assistant_context_service'
 import BoatMaintenanceTaskService from '#services/boat_maintenance_task_service'
+import OrganizationAiKeyService from '#services/organization_ai_key_service'
 import { buildAssistantSystemPrompt, parseAssistantReply } from '#services/assistant_prompt_service'
 import type { AiSuggestionLocale } from '#shared/types/ai'
 import {
@@ -26,8 +27,8 @@ import {
   type AssistantMessage,
   type AssistantTaskProposal,
 } from '#shared/types/assistant'
+import type { AiProvider } from '#shared/types/ai'
 import { inject } from '@adonisjs/core'
-import encryption from '@adonisjs/core/services/encryption'
 import { DateTime } from 'luxon'
 import { randomBytes } from 'node:crypto'
 
@@ -43,9 +44,10 @@ import { randomBytes } from 'node:crypto'
  * - une proposition de tâche est validée contre le roster puis stockée dans
  *   `pendingAction` : l'écriture réelle n'a lieu qu'à la confirmation
  *   explicite, depuis les données stockées côté serveur ;
- * - BYOK : une org avec sa propre clé Mistral (chiffrée) consomme sur son
- *   compte — le quota de tokens mensuel de l'app ne s'applique plus, l'usage
- *   reste enregistré pour les statistiques.
+ * - BYOK : une org avec un fournisseur IA actif (sa propre clé Mistral,
+ *   Claude, ChatGPT ou Gemini — chiffrée) consomme sur son compte — le quota
+ *   de tokens mensuel de l'app ne s'applique plus, l'usage reste enregistré
+ *   pour les statistiques.
  */
 @inject()
 export default class AssistantChatService {
@@ -53,7 +55,8 @@ export default class AssistantChatService {
     private aiService: AiService,
     private aiTokenQuotaService: AiTokenQuotaService,
     private contextService: AssistantContextService,
-    private maintenanceTaskService: BoatMaintenanceTaskService
+    private maintenanceTaskService: BoatMaintenanceTaskService,
+    private organizationAiKeyService: OrganizationAiKeyService
   ) {}
 
   /** Conversation active de l'utilisateur (une seule à la fois). */
@@ -199,9 +202,10 @@ export default class AssistantChatService {
   }
 
   /**
-   * Cycle de quota canonique — sauf BYOK : une org avec sa propre clé Mistral
-   * n'est pas soumise au quota de tokens de l'app (consommation sur son
-   * compte), l'usage reste émargé pour les statistiques.
+   * Cycle de quota canonique — sauf BYOK : une org avec un fournisseur actif
+   * (sa propre clé Mistral, Claude, ChatGPT ou Gemini) n'est pas soumise au
+   * quota de tokens de l'app (consommation sur son compte), l'usage reste
+   * émargé pour les statistiques.
    */
   #exchangeWithQuota(
     conversation: AiAssistantConversation,
@@ -209,12 +213,12 @@ export default class AssistantChatService {
     user: User
   ): Promise<AiAssistantConversation> {
     return this.aiTokenQuotaService.withOrgLock(user.organization.id, async () => {
-      const apiKey = this.#decryptOrgApiKey(user)
-      if (apiKey === null) {
+      const active = await this.organizationAiKeyService.resolveActiveKey(user.organization)
+      if (active === null) {
         const currentUsage = await this.aiTokenQuotaService.getUsage(user.organization.id)
         this.aiTokenQuotaService.assertCanUseTokens(user.organization, currentUsage)
       }
-      return this.#exchange(conversation, message, user, apiKey)
+      return this.#exchange(conversation, message, user, active)
     })
   }
 
@@ -227,7 +231,7 @@ export default class AssistantChatService {
     conversation: AiAssistantConversation,
     userMessage: string,
     user: User,
-    apiKey: string | null
+    active: { provider: AiProvider; apiKey: string } | null
   ): Promise<AiAssistantConversation> {
     const roster = await this.contextService.buildFleetRoster(user)
 
@@ -241,15 +245,18 @@ export default class AssistantChatService {
     try {
       const aiResponse = await this.aiService.chat(
         await this.#toAiMessages(conversation, pendingMessages, user, roster),
-        user.organization.aiModelOverride,
-        apiKey
+        {
+          provider: active?.provider ?? 'mistral',
+          model: user.organization.aiModelOverride,
+          apiKey: active?.apiKey ?? null,
+        }
       )
       content = aiResponse.content
       tokensUsed = aiResponse.tokensUsed
     } catch (error) {
       // BYOK : un échec avec la clé de l'org (révoquée, invalide, sans crédit)
       // est signalé comme tel — l'utilisateur doit vérifier ses réglages IA.
-      if (apiKey !== null) throw new AssistantCustomKeyFailedError()
+      if (active !== null) throw new AssistantCustomKeyFailedError()
       throw error
     }
 
@@ -388,12 +395,6 @@ export default class AssistantChatService {
     }
     // handoff : le message du modèle porte déjà le contexte.
     return message.content
-  }
-
-  #decryptOrgApiKey(user: User): string | null {
-    const stored = user.organization.aiApiKeyEncrypted
-    if (!stored) return null
-    return encryption.decrypt<string>(stored)
   }
 
   async #findOwnedActiveOrFail(user: User, token: string): Promise<AiAssistantConversation> {

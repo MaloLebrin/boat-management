@@ -12,7 +12,9 @@ import { BoatFactory } from '#database/factories/boat_factory'
 import { BoatEngineFactory } from '#database/factories/boat_engine_factory'
 import { UserFactory } from '#database/factories/user_factory'
 import { createAdminUser } from '#tests/functional/helpers'
+import OrganizationAiKey from '#models/organization_ai_key'
 import type { AiChatMessage } from '#services/ai_service'
+import type { AiChatOptions, AiProvider } from '#shared/types/ai'
 import type { AssistantMessage } from '#shared/types/assistant'
 
 const ANSWER_RESPONSE = JSON.stringify({
@@ -49,21 +51,27 @@ function handoffResponse(boatId: number, engineId: number) {
   })
 }
 
-type AiCall = { messages: AiChatMessage[]; modelOverride: string | null; apiKey: string | null }
+type AiCall = {
+  messages: AiChatMessage[]
+  provider: AiProvider | null
+  model: string | null
+  apiKey: string | null
+}
 
-/** Fake AiService qui capture messages, modèle et clé BYOK. */
+/** Fake AiService qui capture messages, fournisseur, modèle et clé BYOK. */
 function swapAiService(content: string, tokensUsed = 42) {
   const calls: AiCall[] = []
   app.container.swap(
     AiService,
     () =>
       ({
-        chat: async (
-          messages: AiChatMessage[],
-          modelOverride?: string | null,
-          apiKey?: string | null
-        ) => {
-          calls.push({ messages, modelOverride: modelOverride ?? null, apiKey: apiKey ?? null })
+        chat: async (messages: AiChatMessage[], options: AiChatOptions = {}) => {
+          calls.push({
+            messages,
+            provider: options.provider ?? null,
+            model: options.model ?? null,
+            apiKey: options.apiKey ?? null,
+          })
           return { content, tokensUsed }
         },
       }) as unknown as AiService
@@ -497,7 +505,12 @@ test.group('Assistant FleetAi chat (functional)', (group) => {
     const user = await createAdminUser()
     await makeBoat(user.organizationId!)
     const org = await Organization.findOrFail(user.organizationId!)
-    org.aiApiKeyEncrypted = encryption.encrypt('sk-org-own-key')
+    await OrganizationAiKey.create({
+      organizationId: org.id,
+      provider: 'mistral',
+      apiKeyEncrypted: encryption.encrypt('sk-org-own-key'),
+    })
+    org.aiProvider = 'mistral'
     await org.save()
 
     // Quota mensuel épuisé : sans BYOK l'appel serait bloqué.
@@ -516,11 +529,72 @@ test.group('Assistant FleetAi chat (functional)', (group) => {
 
     response.assertFlashMissing('error')
     assert.lengthOf(calls, 1)
+    assert.equal(calls[0].provider, 'mistral')
     assert.equal(calls[0].apiKey, 'sk-org-own-key')
 
     // L'usage reste émargé pour les statistiques.
     const usage = await AiTokenUsage.query().where('organizationId', user.organizationId!).first()
     assert.equal(Number(usage!.tokensUsed), 1_000_060)
+  })
+
+  test('the active provider (e.g. Claude) routes the AI call with its key', async ({
+    assert,
+    client,
+  }) => {
+    const user = await createAdminUser()
+    await makeBoat(user.organizationId!)
+    const org = await Organization.findOrFail(user.organizationId!)
+    await OrganizationAiKey.create({
+      organizationId: org.id,
+      provider: 'anthropic',
+      apiKeyEncrypted: encryption.encrypt('sk-ant-org-key'),
+    })
+    org.aiProvider = 'anthropic'
+    await org.save()
+
+    const calls = swapAiService(ANSWER_RESPONSE)
+
+    const response = await client
+      .post('/assistant/conversations')
+      .loginAs(user)
+      .form({ message: 'Hello' })
+      .redirects(0)
+
+    response.assertFlashMissing('error')
+    assert.lengthOf(calls, 1)
+    assert.equal(calls[0].provider, 'anthropic')
+    assert.equal(calls[0].apiKey, 'sk-ant-org-key')
+  })
+
+  test('without an active provider the app default (Mistral) is used and quota applies', async ({
+    assert,
+    client,
+  }) => {
+    const user = await createAdminUser()
+    await makeBoat(user.organizationId!)
+    // Une clé enregistrée mais PAS sélectionnée comme fournisseur actif ne
+    // bypasse rien : quota épuisé → l'appel est bloqué.
+    const org = await Organization.findOrFail(user.organizationId!)
+    await OrganizationAiKey.create({
+      organizationId: org.id,
+      provider: 'anthropic',
+      apiKeyEncrypted: encryption.encrypt('sk-ant-org-key'),
+    })
+    await AiTokenUsage.create({
+      organizationId: user.organizationId!,
+      month: DateTime.now().toFormat('yyyy-MM'),
+      tokensUsed: 1_000_000,
+    })
+    const calls = swapAiService(ANSWER_RESPONSE)
+
+    const response = await client
+      .post('/assistant/conversations')
+      .loginAs(user)
+      .form({ message: 'Hello' })
+      .redirects(0)
+
+    response.assertStatus(302)
+    assert.lengthOf(calls, 0)
   })
 
   test('archive closes the active conversation', async ({ assert, client }) => {
