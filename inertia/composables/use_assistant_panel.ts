@@ -1,7 +1,7 @@
 import { router, usePage } from '@inertiajs/vue3'
 import { computed, ref, watch } from 'vue'
 import { PLAN_LIMITS, type PlanTier } from '#shared/types/plan'
-import type { AssistantConversationProps } from '#shared/types/assistant'
+import type { AssistantAiUsageProps, AssistantConversationProps } from '#shared/types/assistant'
 
 const STORAGE_KEY = 'fleetai:assistant:open'
 
@@ -11,6 +11,8 @@ const STORAGE_KEY = 'fleetai:assistant:open'
  */
 const isOpen = ref(false)
 const conversation = ref<AssistantConversationProps | null>(null)
+/** Consommation IA du mois (#642) — rendue en pied de panneau. */
+const aiUsage = ref<AssistantAiUsageProps | null>(null)
 /** La prop `assistantConversation` a été chargée au moins une fois. */
 const hasLoaded = ref(false)
 let restoredFromStorage = false
@@ -52,8 +54,12 @@ export function useAssistantPanel() {
     (value) => {
       if (value === undefined) return
       // Prop enveloppée : le serializer Inertia refuse une prop résolue à `null`.
-      const wrapped = value as { conversation: AssistantConversationProps | null }
+      const wrapped = value as {
+        conversation: AssistantConversationProps | null
+        aiUsage?: AssistantAiUsageProps | null
+      }
       conversation.value = wrapped.conversation
+      aiUsage.value = wrapped.aiUsage ?? null
       hasLoaded.value = true
     },
     { immediate: true }
@@ -92,5 +98,5 @@ export function useAssistantPanel() {
     open()
   }
 
-  return { isOpen, conversation, hasLoaded, canUseAI, open, close, toggle, ensureLoaded }
+  return { isOpen, conversation, aiUsage, hasLoaded, canUseAI, open, close, toggle, ensureLoaded }
 }

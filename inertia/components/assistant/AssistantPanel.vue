@@ -1,12 +1,17 @@
 <script setup lang="ts">
+import { Link } from '@adonisjs/inertia/vue'
 import { router } from '@inertiajs/vue3'
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import AssistantComposer from '~/components/assistant/AssistantComposer.vue'
 import AssistantThread from '~/components/assistant/AssistantThread.vue'
 import AssistantUpsell from '~/components/assistant/AssistantUpsell.vue'
 import { useAssistantPanel } from '~/composables/use_assistant_panel'
+import { useNumberFormat } from '~/composables/use_number_format'
 import { useT } from '~/composables/use_t'
-import { ASSISTANT_MAX_USER_MESSAGES } from '#shared/types/assistant'
+import {
+  ASSISTANT_AI_USAGE_WARNING_RATIO,
+  ASSISTANT_MAX_USER_MESSAGES,
+} from '#shared/types/assistant'
 
 /**
  * Panneau du copilote FleetAi — rail droit sur desktop, drawer plein écran sur
@@ -14,7 +19,26 @@ import { ASSISTANT_MAX_USER_MESSAGES } from '#shared/types/assistant'
  * documentée dans CLAUDE.md, comme la sidebar et `DashboardAiPanel`.
  */
 const { t } = useT()
-const { conversation, canUseAI, close, ensureLoaded } = useAssistantPanel()
+const { formatNumber } = useNumberFormat()
+const { conversation, aiUsage, canUseAI, close, ensureLoaded } = useAssistantPanel()
+
+/**
+ * Pied de consommation (#642) : la paire { used, limit } du mois, discrète en
+ * temps normal, avertissement avec lien facturation au-delà de 80 %. `limit`
+ * null = illimité (Entreprise ou BYOK) : rien à afficher.
+ */
+const usageLine = computed(() => {
+  if (aiUsage.value === null || aiUsage.value.limit === null) return null
+  return t('assistant.usage.line', {
+    used: formatNumber(aiUsage.value.used),
+    limit: formatNumber(aiUsage.value.limit),
+  })
+})
+
+const usageWarning = computed(() => {
+  if (aiUsage.value === null || aiUsage.value.limit === null) return false
+  return aiUsage.value.used >= aiUsage.value.limit * ASSISTANT_AI_USAGE_WARNING_RATIO
+})
 
 const processing = ref(false)
 /** Message affiché en optimiste pendant l'appel Mistral synchrone. */
@@ -169,6 +193,23 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
           :disabled="composerDisabled"
           @submit="submit"
         />
+        <!-- Consommation IA du mois (#642) -->
+        <p
+          v-if="usageLine"
+          :class="[
+            'mt-2 text-[11px] leading-snug',
+            usageWarning ? 'text-amber-400' : 'text-navy-400',
+          ]"
+        >
+          {{ usageLine }}
+          <Link
+            v-if="usageWarning"
+            href="/settings/billing"
+            class="font-medium text-lilac-300 hover:underline"
+          >
+            {{ t('assistant.usage.manage') }}
+          </Link>
+        </p>
         <p class="mt-2 text-[11px] leading-snug text-navy-400">{{ t('assistant.disclaimer') }}</p>
       </div>
     </template>

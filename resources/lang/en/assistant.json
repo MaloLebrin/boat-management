@@ -30,6 +30,37 @@
     "viewPlanning": "View in planning"
   },
   "taskDismissed": "Proposal dismissed.",
+  "sources": {
+    "fleet_data": "Your fleet data",
+    "product": "FleetAi help",
+    "general": "General knowledge"
+  },
+  "navTargets": {
+    "dashboard": "Open the dashboard",
+    "boats": "View boats",
+    "engines": "View engines",
+    "planning": "Open the planning",
+    "maintenanceHistory": "View maintenance history",
+    "ports": "View ports",
+    "navigationLogbook": "Open the logbook",
+    "navigationFuel": "View fuel logs",
+    "navigationIncidents": "View incidents",
+    "reservations": "View reservations",
+    "clients": "View clients",
+    "invoices": "View quotes and invoices",
+    "crew": "View crew",
+    "settingsBilling": "Open billing",
+    "settingsAi": "Open AI settings",
+    "settingsMembers": "Manage members",
+    "settingsImport": "Open data import",
+    "diagnostic": "Open fault diagnosis",
+    "spareParts": "View spare parts",
+    "notifications": "View notifications"
+  },
+  "usage": {
+    "line": "AI this month: {used} / {limit} tokens.",
+    "manage": "Manage my subscription"
+  },
   "handoff": {
     "diagnosis": "Open the diagnosis for {engine} ({boat})",
     "partSearch": "Search a part for {engine} ({boat})"

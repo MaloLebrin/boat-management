@@ -44,6 +44,72 @@ export type AssistantStatus = 'active' | 'archived'
 export type AssistantHandoffTarget = 'diagnosis' | 'part_search'
 
 /**
+ * Source d'une réponse `answer` (#642) — rendue par le front comme un badge
+ * i18n sous la bulle, jamais comme une phrase du modèle :
+ * - `fleet_data` : appuyée sur les données de l'organisation (outils) ;
+ * - `product` : explication du produit FleetAi ;
+ * - `general` : connaissance nautique générale, signalée comme telle.
+ */
+export const ASSISTANT_ANSWER_SOURCES = ['fleet_data', 'product', 'general'] as const
+export type AssistantAnswerSource = (typeof ASSISTANT_ANSWER_SOURCES)[number]
+
+/**
+ * Cibles de navigation proposables par le copilote (#642) — vocabulaire fermé
+ * de routes nommées existantes, validé côté serveur puis rendu en `<Link>`.
+ * `path` est le chemin réel de la route (`start/routes/`), `i18nKey` le
+ * libellé du lien (les deux locales) — jamais de texte du modèle.
+ */
+export const ASSISTANT_NAV_TARGETS = {
+  'dashboard': { path: '/dashboard', i18nKey: 'assistant.navTargets.dashboard' },
+  'boats.index': { path: '/boats', i18nKey: 'assistant.navTargets.boats' },
+  'engines.index': { path: '/engines', i18nKey: 'assistant.navTargets.engines' },
+  'planning.index': { path: '/planning', i18nKey: 'assistant.navTargets.planning' },
+  'maintenance.history': {
+    path: '/maintenance/history',
+    i18nKey: 'assistant.navTargets.maintenanceHistory',
+  },
+  'ports.index': { path: '/ports', i18nKey: 'assistant.navTargets.ports' },
+  'navigation.logbook': {
+    path: '/navigation/logbook',
+    i18nKey: 'assistant.navTargets.navigationLogbook',
+  },
+  'navigation.fuel': { path: '/navigation/fuel', i18nKey: 'assistant.navTargets.navigationFuel' },
+  'navigation.incidents': {
+    path: '/navigation/incidents',
+    i18nKey: 'assistant.navTargets.navigationIncidents',
+  },
+  'reservations.index': { path: '/reservations', i18nKey: 'assistant.navTargets.reservations' },
+  'clients.index': { path: '/clients', i18nKey: 'assistant.navTargets.clients' },
+  'invoices.index': { path: '/invoices', i18nKey: 'assistant.navTargets.invoices' },
+  'crew.index': { path: '/crew', i18nKey: 'assistant.navTargets.crew' },
+  'settings.billing': {
+    path: '/settings/billing',
+    i18nKey: 'assistant.navTargets.settingsBilling',
+  },
+  'settings.ai': { path: '/settings/ai', i18nKey: 'assistant.navTargets.settingsAi' },
+  'settings.members': {
+    path: '/settings/members',
+    i18nKey: 'assistant.navTargets.settingsMembers',
+  },
+  'settings.import': { path: '/settings/import', i18nKey: 'assistant.navTargets.settingsImport' },
+  'diagnostic.index': { path: '/diagnostic', i18nKey: 'assistant.navTargets.diagnostic' },
+  'spareParts.index': { path: '/spare-parts', i18nKey: 'assistant.navTargets.spareParts' },
+  'notifications.index': { path: '/notifications', i18nKey: 'assistant.navTargets.notifications' },
+} as const satisfies Record<string, { path: string; i18nKey: string }>
+
+export type AssistantNavTarget = keyof typeof ASSISTANT_NAV_TARGETS
+
+export function isAssistantNavTarget(value: unknown): value is AssistantNavTarget {
+  return typeof value === 'string' && value in ASSISTANT_NAV_TARGETS
+}
+
+export function isAssistantAnswerSource(value: unknown): value is AssistantAnswerSource {
+  return (
+    typeof value === 'string' && (ASSISTANT_ANSWER_SOURCES as readonly string[]).includes(value)
+  )
+}
+
+/**
  * Réponse JSON discriminée attendue du modèle à chaque tour :
  * - `answer` : réponse conversationnelle appuyée sur le contexte injecté ;
  * - `propose_task` : proposition de tâche de maintenance — validée contre le
@@ -52,7 +118,12 @@ export type AssistantHandoffTarget = 'diagnosis' | 'part_search'
  *   pièces, avec le bateau/moteur résolu conversationnellement.
  */
 export type AssistantAiReply =
-  | { type: 'answer'; message: string }
+  | {
+      type: 'answer'
+      message: string
+      source?: AssistantAnswerSource
+      navTarget?: AssistantNavTarget
+    }
   | {
       type: 'propose_task'
       message: string
@@ -123,7 +194,24 @@ export interface AssistantMessage {
   role: 'user' | 'assistant'
   content: string
   card?: AssistantMessageCard
+  /** #642 — source d'une réponse `answer`, rendue en badge i18n sous la bulle. */
+  source?: AssistantAnswerSource
+  /** #642 — cible de navigation validée côté serveur, rendue en `<Link>`. */
+  navTarget?: AssistantNavTarget
 }
+
+/**
+ * Consommation IA du mois de l'organisation (#642) — rendue en pied de
+ * panneau, avertissement au-delà de 80 %. `limit` null = illimité. Le
+ * `tokensUsed` de la conversation, lui, reste privé (règle du transformer).
+ */
+export interface AssistantAiUsageProps {
+  used: number
+  limit: number | null
+}
+
+/** Seuil (0–1) au-delà duquel le pied de consommation devient un avertissement. */
+export const ASSISTANT_AI_USAGE_WARNING_RATIO = 0.8
 
 /** Conversation envoyée au panneau (prop partagée `assistantConversation`). */
 export interface AssistantConversationProps {
