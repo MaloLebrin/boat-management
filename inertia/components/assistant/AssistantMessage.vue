@@ -3,12 +3,16 @@ import { Link } from '@adonisjs/inertia/vue'
 import { computed } from 'vue'
 import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
-import type { AssistantMessage as AssistantMessageType } from '#shared/types/assistant'
+import {
+  ASSISTANT_NAV_TARGETS,
+  type AssistantMessage as AssistantMessageType,
+} from '#shared/types/assistant'
 
 /**
  * Bulle du copilote FleetAi, posée sur le panneau navy permanent. Les cartes
- * (`task_created`, `task_dismissed`, `handoff`) sont rendues via i18n — leur
- * texte n'est jamais généré par le LLM.
+ * (`task_created`, `task_dismissed`, `handoff`), le badge de source et le lien
+ * de navigation (#642) sont rendus via i18n — leur texte n'est jamais généré
+ * par le LLM.
  */
 const props = defineProps<{ message: AssistantMessageType }>()
 
@@ -16,6 +20,18 @@ const { t } = useT()
 const { formatDate } = useDateFormat()
 
 const card = computed(() => props.message.card ?? null)
+
+/** Badge de source d'une réponse assistant (#642) — clé i18n, jamais du texte modèle. */
+const sourceLabel = computed(() => {
+  if (props.message.role !== 'assistant' || props.message.source === undefined) return null
+  return t(`assistant.sources.${props.message.source}`)
+})
+
+/** Cible de navigation validée côté serveur (#642) — vocabulaire fermé. */
+const navTarget = computed(() => {
+  if (props.message.navTarget === undefined) return null
+  return ASSISTANT_NAV_TARGETS[props.message.navTarget] ?? null
+})
 
 const handoffHref = computed(() => {
   if (card.value?.kind !== 'handoff') return null
@@ -51,6 +67,33 @@ const taskCreatedDue = computed(() => {
       </p>
       <p class="whitespace-pre-line">{{ message.content }}</p>
     </div>
+  </div>
+
+  <!-- Badge de source (#642) — sous la bulle, rendu i18n -->
+  <div v-if="sourceLabel" class="-mt-1 flex justify-start">
+    <span
+      class="rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-navy-300"
+    >
+      {{ sourceLabel }}
+    </span>
+  </div>
+
+  <!-- Lien de navigation proposé (#642) — cible validée côté serveur -->
+  <div v-if="navTarget" class="flex justify-start">
+    <Link
+      :href="navTarget.path"
+      class="inline-flex items-center gap-2 text-xs font-medium text-lilac-300 hover:underline"
+    >
+      <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M13 7l5 5m0 0l-5 5m5-5H6"
+        />
+      </svg>
+      {{ t(navTarget.i18nKey) }}
+    </Link>
   </div>
 
   <!-- Carte « tâche créée » -->

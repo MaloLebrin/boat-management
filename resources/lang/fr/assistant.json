@@ -30,6 +30,37 @@
     "viewPlanning": "Voir dans le planning"
   },
   "taskDismissed": "Proposition refusée.",
+  "sources": {
+    "fleet_data": "Données de votre flotte",
+    "product": "Aide FleetAi",
+    "general": "Connaissance générale"
+  },
+  "navTargets": {
+    "dashboard": "Ouvrir le tableau de bord",
+    "boats": "Voir les bateaux",
+    "engines": "Voir les moteurs",
+    "planning": "Ouvrir le planning",
+    "maintenanceHistory": "Voir l’historique d’entretien",
+    "ports": "Voir les ports",
+    "navigationLogbook": "Ouvrir le journal de navigation",
+    "navigationFuel": "Voir les pleins de carburant",
+    "navigationIncidents": "Voir les incidents",
+    "reservations": "Voir les réservations",
+    "clients": "Voir les clients",
+    "invoices": "Voir les devis et factures",
+    "crew": "Voir l’équipage",
+    "settingsBilling": "Ouvrir la facturation",
+    "settingsAi": "Ouvrir les réglages IA",
+    "settingsMembers": "Gérer les membres",
+    "settingsImport": "Ouvrir l’import de données",
+    "diagnostic": "Ouvrir le diagnostic de panne",
+    "spareParts": "Voir les pièces détachées",
+    "notifications": "Voir les notifications"
+  },
+  "usage": {
+    "line": "IA ce mois-ci : {used} / {limit} tokens.",
+    "manage": "Gérer mon abonnement"
+  },
   "handoff": {
     "diagnosis": "Ouvrir le diagnostic pour {engine} ({boat})",
     "partSearch": "Chercher une pièce pour {engine} ({boat})"

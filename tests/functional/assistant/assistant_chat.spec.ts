@@ -11,11 +11,11 @@ import OrganizationMembership from '#models/organization_membership'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { BoatEngineFactory } from '#database/factories/boat_engine_factory'
 import { UserFactory } from '#database/factories/user_factory'
-import { createAdminUser } from '#tests/functional/helpers'
+import { createAdminUser, createMechanicUser } from '#tests/functional/helpers'
 import OrganizationAiKey from '#models/organization_ai_key'
 import type { AiChatMessage } from '#services/ai_service'
-import type { AiChatOptions, AiProvider } from '#shared/types/ai'
-import type { AssistantMessage } from '#shared/types/assistant'
+import type { AiChatOptions, AiProvider, AiToolCall, AiToolDefinition } from '#shared/types/ai'
+import { ASSISTANT_CONVERSATION_TOKEN_BUDGET, type AssistantMessage } from '#shared/types/assistant'
 
 const ANSWER_RESPONSE = JSON.stringify({
   type: 'answer',
@@ -56,10 +56,22 @@ type AiCall = {
   provider: AiProvider | null
   model: string | null
   apiKey: string | null
+  tools: AiToolDefinition[] | null
 }
 
-/** Fake AiService qui capture messages, fournisseur, modèle et clé BYOK. */
-function swapAiService(content: string, tokensUsed = 42) {
+/** Une réponse scriptée du fake — string = réponse finale sans appel d'outil. */
+type FakeAiTurn = { content?: string; toolCalls?: AiToolCall[]; tokensUsed?: number }
+
+/**
+ * Fake AiService qui capture messages, fournisseur, modèle, clé BYOK et outils
+ * proposés. `script` est une file de réponses (#642) : chaque appel consomme
+ * la suivante, la dernière est répétée — ce qui simule « appel d'outil puis
+ * réponse finale ». Une simple string reste le cas d'un tour sans outil.
+ */
+function swapAiService(script: string | Array<string | FakeAiTurn>, tokensUsed = 42) {
+  const turns: FakeAiTurn[] = (Array.isArray(script) ? script : [script]).map((turn) =>
+    typeof turn === 'string' ? { content: turn } : turn
+  )
   const calls: AiCall[] = []
   app.container.swap(
     AiService,
@@ -71,8 +83,14 @@ function swapAiService(content: string, tokensUsed = 42) {
             provider: options.provider ?? null,
             model: options.model ?? null,
             apiKey: options.apiKey ?? null,
+            tools: options.tools ?? null,
           })
-          return { content, tokensUsed }
+          const turn = turns[Math.min(calls.length - 1, turns.length - 1)]
+          return {
+            content: turn.content ?? '',
+            toolCalls: turn.toolCalls ?? [],
+            tokensUsed: turn.tokensUsed ?? tokensUsed,
+          }
         },
       }) as unknown as AiService
   )
@@ -439,7 +457,9 @@ test.group('Assistant FleetAi chat (functional)', (group) => {
     client,
   }) => {
     const user = await createAdminUser()
-    const conversation = await makeConversation(user, { tokensUsed: 100_000 })
+    const conversation = await makeConversation(user, {
+      tokensUsed: ASSISTANT_CONVERSATION_TOKEN_BUDGET,
+    })
     const calls = swapAiService(ANSWER_RESPONSE)
 
     const response = await client
@@ -609,5 +629,152 @@ test.group('Assistant FleetAi chat (functional)', (group) => {
     response.assertStatus(302)
     await conversation.refresh()
     assert.equal(conversation.status, 'archived')
+  })
+})
+
+test.group('Assistant FleetAi chat — boucle d’outils (#642)', (group) => {
+  group.each.setup(() => truncateDb())
+  group.each.teardown(() => {
+    app.container.restore(AiService)
+  })
+
+  const ANSWER_WITH_SOURCE = JSON.stringify({
+    type: 'answer',
+    message: 'The engine totals 220 hours.',
+    source: 'fleet_data',
+    navTarget: 'engines.index',
+  })
+
+  test('un appel d’outil est exécuté, la boucle s’arrête et seuls user + réponse sont persistés', async ({
+    assert,
+    client,
+  }) => {
+    const user = await createAdminUser()
+    await makeBoat(user.organizationId!)
+    const calls = swapAiService([
+      { toolCalls: [{ id: 't1', name: 'fleet_overview', arguments: {} }], tokensUsed: 10 },
+      { content: ANSWER_WITH_SOURCE, tokensUsed: 20 },
+    ])
+
+    const response = await client
+      .post('/assistant/conversations')
+      .loginAs(user)
+      .form({ message: 'How is the fleet doing?' })
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertFlashMissing('error')
+
+    // Deux appels IA : l'outil est proposé au premier, exécuté, et son
+    // résultat repoussé dans le fil du second.
+    assert.lengthOf(calls, 2)
+    assert.isNotNull(calls[0].tools)
+    assert.include(
+      calls[0].tools!.map((tool) => tool.name),
+      'fleet_overview'
+    )
+    const toolMessage = calls[1].messages.find((m) => m.role === 'tool')
+    assert.isDefined(toolMessage)
+    assert.equal(toolMessage!.toolCallId, 't1')
+    assert.include(toolMessage!.content, 'stats')
+
+    // Échafaudage de tour : les messages d'outils ne sont pas persistés,
+    // source et navTarget le sont ; les tokens des deux tours sont sommés
+    // et émargés une seule fois.
+    const [conversation] = await AiAssistantConversation.all()
+    assert.lengthOf(conversation.messages, 2)
+    assert.equal(conversation.messages[1].source, 'fleet_data')
+    assert.equal(conversation.messages[1].navTarget, 'engines.index')
+    assert.equal(conversation.tokensUsed, 30)
+    const usage = await AiTokenUsage.query().where('organizationId', user.organizationId!).first()
+    assert.equal(Number(usage!.tokensUsed), 30)
+  })
+
+  test('la boucle est bornée : un modèle qui boucle épuise ses tours puis échoue proprement', async ({
+    assert,
+    client,
+  }) => {
+    const user = await createAdminUser()
+    await makeBoat(user.organizationId!)
+    // Le fake répète le dernier tour : appels d'outils sans fin, jamais de
+    // contenu final.
+    const calls = swapAiService([
+      { toolCalls: [{ id: 't1', name: 'fleet_overview', arguments: {} }], tokensUsed: 10 },
+    ])
+
+    const response = await client
+      .post('/assistant/conversations')
+      .loginAs(user)
+      .form({ message: 'Loop forever' })
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertFlashMessage(
+      'error',
+      'The assistant returned an unusable answer. Please try again.'
+    )
+
+    // 3 tours outillés + 1 appel final sans outils + 1 relance corrective.
+    assert.lengthOf(calls, 5)
+    assert.isNull(calls[3].tools)
+    assert.isNull(calls[4].tools)
+    // Rien n'est persisté en cas d'échec (invariant #602/#634).
+    assert.lengthOf(await AiAssistantConversation.all(), 0)
+    assert.isNull(await AiTokenUsage.query().where('organizationId', user.organizationId!).first())
+  })
+
+  test('la relance corrective récupère une réponse finale hors contrat', async ({
+    assert,
+    client,
+  }) => {
+    const user = await createAdminUser()
+    await makeBoat(user.organizationId!)
+    const calls = swapAiService([
+      { content: 'Sure! Here is my answer in plain text.', tokensUsed: 15 },
+      { content: ANSWER_RESPONSE, tokensUsed: 25 },
+    ])
+
+    const response = await client
+      .post('/assistant/conversations')
+      .loginAs(user)
+      .form({ message: 'Hello' })
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertFlashMissing('error')
+
+    assert.lengthOf(calls, 2)
+    // La relance repart sans outils, avec la consigne corrective en dernier
+    // message utilisateur.
+    assert.isNull(calls[1].tools)
+    const lastMessage = calls[1].messages.at(-1)
+    assert.equal(lastMessage!.role, 'user')
+    assert.include(lastMessage!.content, 'JSON')
+
+    const [conversation] = await AiAssistantConversation.all()
+    assert.equal(conversation.tokensUsed, 40)
+    assert.lengthOf(conversation.messages, 2)
+  })
+
+  test('un mechanic ne se voit proposer que la maintenance et l’aide produit', async ({
+    assert,
+    client,
+  }) => {
+    const admin = await createAdminUser()
+    await makeBoat(admin.organizationId!)
+    const mechanic = await createMechanicUser(admin.organizationId!)
+    const calls = swapAiService(ANSWER_RESPONSE)
+
+    await client
+      .post('/assistant/conversations')
+      .loginAs(mechanic)
+      .form({ message: 'What is overdue?' })
+      .redirects(0)
+
+    assert.lengthOf(calls, 1)
+    assert.sameMembers(
+      (calls[0].tools ?? []).map((tool) => tool.name),
+      ['list_maintenance', 'search_product_help']
+    )
   })
 })

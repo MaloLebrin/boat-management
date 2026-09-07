@@ -22,9 +22,10 @@ import OrganizationModuleService from '#services/organization_module_service'
 import PermissionService from '#services/permission_service'
 import { DEMO_SESSION_DURATION_MS } from '#shared/constants/demo'
 import DemoService from '#services/demo_service'
+import AiTokenQuotaService from '#services/ai_token_quota_service'
 import AssistantChatService from '#services/assistant_chat_service'
 import { toAssistantConversationProps } from '#transformers/assistant_transformer'
-import type { AssistantConversationProps } from '#shared/types/assistant'
+import type { AssistantAiUsageProps, AssistantConversationProps } from '#shared/types/assistant'
 import type User from '#models/user'
 
 export async function resolveSharedCurrentPlan(
@@ -73,7 +74,8 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
     private organizationModuleService: OrganizationModuleService,
     private permissionService: PermissionService,
     private demoService: DemoService,
-    private assistantChatService: AssistantChatService
+    private assistantChatService: AssistantChatService,
+    private aiTokenQuotaService: AiTokenQuotaService
   ) {
     super()
   }
@@ -190,8 +192,22 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
         const conversation = auth?.user
           ? await this.assistantChatService.getActiveConversation(auth.user)
           : null
-        const props: { conversation: AssistantConversationProps | null } = {
+        // Consommation IA du mois (#642) : même paire que la page de
+        // facturation (`AiTokenQuotaService.getUsage` + `PLAN_LIMITS`),
+        // rendue en pied de panneau.
+        const organization = auth?.user?.organization
+        const aiUsage: AssistantAiUsageProps | null = organization
+          ? {
+              used: await this.aiTokenQuotaService.getUsage(organization.id),
+              limit: PLAN_LIMITS[organization.plan].aiTokensPerMonth,
+            }
+          : null
+        const props: {
+          conversation: AssistantConversationProps | null
+          aiUsage: AssistantAiUsageProps | null
+        } = {
           conversation: conversation ? toAssistantConversationProps(conversation) : null,
+          aiUsage,
         }
         return props as unknown as JSONDataTypes
       }),

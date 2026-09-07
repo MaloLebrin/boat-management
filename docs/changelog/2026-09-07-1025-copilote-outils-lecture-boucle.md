@@ -1,0 +1,9 @@
+# 2026-09-07 — Copilote : outils de lecture et boucle d'orchestration (#642)
+
+Le copilote ne voit plus seulement le roster et le digest planning : il récupère les données de l'organisation en appelant des outils bornés, au prix de deux à trois allers-retours par question.
+
+- **Registre.** `app/services/assistant_tools_service.ts` : dix outils de lecture enveloppant des services déjà scopés à l'organisation — `list_boats`, `get_boat` (coque + sécurité Division 240 + budget optionnel), `get_engine` (pièces et stock bas), `list_maintenance` (planning ou historique), `fleet_overview`, `list_ports`, `list_operations` (journal, carburant, incidents), `list_commercial` (réservations, clients, factures), `search_product_help`, `get_organization_status`. Contrat dans `shared/types/assistant_tools.ts`.
+- **Gardes.** `definitionsFor(user)` filtre par capability du rôle et par flags de plan **effectifs** (tier + modules + add-ons) ; `run()` re-vérifie et ne lève jamais — toute erreur repart au modèle en `{ error }`. Un id d'une autre organisation ne renvoie jamais de données. Aucun outil d'écriture.
+- **Bornage.** Formes compactes, résultats sérialisés tronqués à 4000 caractères (`truncated: true`) ; arguments coercés (`"22"` → `22`) ; nom d'outil inconnu → liste des noms valides.
+- **Boucle.** `AssistantChatService.#exchange` : 3 tours / 6 appels max, dernier appel sans outils quand le budget de conversation est franchi, une relance corrective sur réponse finale hors contrat. Les messages d'outils restent un échafaudage de tour (jamais persistés) ; tokens sommés, un seul `recordUsage`, un seul `save`. Budget de conversation : 100 000 → 250 000 tokens.
+- **Tests.** `tests/functional/assistant/assistant_tools.spec.ts` (filtrage par rôle et plan, cloisonnement inter-org, coercion) ; `assistant_chat.spec.ts` étendu avec un fake `AiService` en file scriptée (outil exécuté, bornes, relance corrective, rien persisté en échec).
