@@ -14,8 +14,8 @@ import { UserFactory } from '#database/factories/user_factory'
 import { createAdminUser } from '#tests/functional/helpers'
 import OrganizationAiKey from '#models/organization_ai_key'
 import type { AiChatMessage } from '#services/ai_service'
-import type { AiChatOptions, AiProvider } from '#shared/types/ai'
-import type { AssistantMessage } from '#shared/types/assistant'
+import type { AiChatOptions, AiProvider, AiToolCall, AiToolDefinition } from '#shared/types/ai'
+import { ASSISTANT_CONVERSATION_TOKEN_BUDGET, type AssistantMessage } from '#shared/types/assistant'
 
 const ANSWER_RESPONSE = JSON.stringify({
   type: 'answer',
@@ -56,10 +56,22 @@ type AiCall = {
   provider: AiProvider | null
   model: string | null
   apiKey: string | null
+  tools: AiToolDefinition[] | null
 }
 
-/** Fake AiService qui capture messages, fournisseur, modèle et clé BYOK. */
-function swapAiService(content: string, tokensUsed = 42) {
+/** Une réponse scriptée du fake — string = réponse finale sans appel d'outil. */
+type FakeAiTurn = { content?: string; toolCalls?: AiToolCall[]; tokensUsed?: number }
+
+/**
+ * Fake AiService qui capture messages, fournisseur, modèle, clé BYOK et outils
+ * proposés. `script` est une file de réponses (#642) : chaque appel consomme
+ * la suivante, la dernière est répétée — ce qui simule « appel d'outil puis
+ * réponse finale ». Une simple string reste le cas d'un tour sans outil.
+ */
+function swapAiService(script: string | Array<string | FakeAiTurn>, tokensUsed = 42) {
+  const turns: FakeAiTurn[] = (Array.isArray(script) ? script : [script]).map((turn) =>
+    typeof turn === 'string' ? { content: turn } : turn
+  )
   const calls: AiCall[] = []
   app.container.swap(
     AiService,
@@ -71,8 +83,14 @@ function swapAiService(content: string, tokensUsed = 42) {
             provider: options.provider ?? null,
             model: options.model ?? null,
             apiKey: options.apiKey ?? null,
+            tools: options.tools ?? null,
           })
-          return { content, tokensUsed }
+          const turn = turns[Math.min(calls.length - 1, turns.length - 1)]
+          return {
+            content: turn.content ?? '',
+            toolCalls: turn.toolCalls ?? [],
+            tokensUsed: turn.tokensUsed ?? tokensUsed,
+          }
         },
       }) as unknown as AiService
   )
@@ -439,7 +457,9 @@ test.group('Assistant FleetAi chat (functional)', (group) => {
     client,
   }) => {
     const user = await createAdminUser()
-    const conversation = await makeConversation(user, { tokensUsed: 100_000 })
+    const conversation = await makeConversation(user, {
+      tokensUsed: ASSISTANT_CONVERSATION_TOKEN_BUDGET,
+    })
     const calls = swapAiService(ANSWER_RESPONSE)
 
     const response = await client

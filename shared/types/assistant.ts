@@ -27,9 +27,12 @@ export const ASSISTANT_HISTORY_WINDOW = 12
 /**
  * Plafond de tokens par conversation : au-delà, l'utilisateur est invité à
  * démarrer une nouvelle conversation (le contexte est de toute façon
- * reconstruit à chaque tour, rien n'est perdu).
+ * reconstruit à chaque tour, rien n'est perdu). 250k depuis #642 : un tour
+ * outillé coûte deux à trois appels — à 100k une conversation était coupée
+ * au bout de six à dix questions. Plafond par conversation, sans effet sur le
+ * quota mensuel de l'organisation.
  */
-export const ASSISTANT_CONVERSATION_TOKEN_BUDGET = 100_000
+export const ASSISTANT_CONVERSATION_TOKEN_BUDGET = 250_000
 
 /** Bornes du contexte flotte injecté dans le prompt système. */
 export const ASSISTANT_ROSTER_MAX_BOATS = 40

@@ -11,9 +11,10 @@ import AiAssistantConversation from '#models/ai_assistant_conversation'
 import type Boat from '#models/boat'
 import type BoatMaintenanceTask from '#models/boat_maintenance_task'
 import type User from '#models/user'
-import AiService from '#services/ai_service'
+import AiService, { type AiChatMessage } from '#services/ai_service'
 import AiTokenQuotaService from '#services/ai_token_quota_service'
 import AssistantContextService from '#services/assistant_context_service'
+import AssistantToolsService from '#services/assistant_tools_service'
 import BoatMaintenanceTaskService from '#services/boat_maintenance_task_service'
 import OrganizationAiKeyService from '#services/organization_ai_key_service'
 import { buildAssistantSystemPrompt, parseAssistantReply } from '#services/assistant_prompt_service'
@@ -27,7 +28,11 @@ import {
   type AssistantMessage,
   type AssistantTaskProposal,
 } from '#shared/types/assistant'
-import type { AiProvider } from '#shared/types/ai'
+import {
+  ASSISTANT_MAX_TOOL_CALLS_PER_TURN,
+  ASSISTANT_MAX_TOOL_ROUNDS,
+} from '#shared/types/assistant_tools'
+import type { AiChatOptions, AiProvider } from '#shared/types/ai'
 import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
 import { randomBytes } from 'node:crypto'
@@ -56,7 +61,8 @@ export default class AssistantChatService {
     private aiTokenQuotaService: AiTokenQuotaService,
     private contextService: AssistantContextService,
     private maintenanceTaskService: BoatMaintenanceTaskService,
-    private organizationAiKeyService: OrganizationAiKeyService
+    private organizationAiKeyService: OrganizationAiKeyService,
+    private toolsService: AssistantToolsService
   ) {}
 
   /** Conversation active de l'utilisateur (une seule à la fois). */
@@ -223,9 +229,13 @@ export default class AssistantChatService {
   }
 
   /**
-   * Un tour de chat : contexte reconstruit, appel modèle, parse + validation
-   * des ids contre le roster, puis persistance en une fois — une réponse
-   * invalide lève avant toute écriture (invariant #602/#634).
+   * Un tour de chat : contexte reconstruit, boucle d'outils bornée (#642),
+   * parse + validation des ids contre le roster, puis persistance en une fois
+   * — une réponse invalide lève avant toute écriture (invariant #602/#634).
+   *
+   * Les messages d'outils sont un échafaudage de tour : ils ne sont jamais
+   * stockés dans la conversation. Seuls le message utilisateur et la réponse
+   * finale entrent dans le blob, ce qui préserve la fenêtre d'historique.
    */
   async #exchange(
     conversation: AiAssistantConversation,
@@ -240,27 +250,72 @@ export default class AssistantChatService {
       { role: 'user', content: userMessage },
     ]
 
-    let content: string
-    let tokensUsed: number
-    try {
-      const aiResponse = await this.aiService.chat(
-        await this.#toAiMessages(conversation, pendingMessages, user, roster),
-        {
-          provider: active?.provider ?? 'mistral',
-          model: user.organization.aiModelOverride,
-          apiKey: active?.apiKey ?? null,
-        }
-      )
-      content = aiResponse.content
-      tokensUsed = aiResponse.tokensUsed
-    } catch (error) {
-      // BYOK : un échec avec la clé de l'org (révoquée, invalide, sans crédit)
-      // est signalé comme tel — l'utilisateur doit vérifier ses réglages IA.
-      if (active !== null) throw new AssistantCustomKeyFailedError()
-      throw error
+    const tools = await this.toolsService.definitionsFor(user)
+    const options: AiChatOptions = {
+      provider: active?.provider ?? 'mistral',
+      model: user.organization.aiModelOverride,
+      apiKey: active?.apiKey ?? null,
     }
 
-    const reply = parseAssistantReply(content)
+    const scaffold: AiChatMessage[] = await this.#toAiMessages(
+      conversation,
+      pendingMessages,
+      user,
+      roster
+    )
+
+    let content = ''
+    let tokensUsed = 0
+    let rounds = 0
+    let callsUsed = 0
+
+    // Boucle bornée : tant que le modèle renvoie des appels d'outils, on les
+    // exécute et on repousse leurs résultats dans le fil. Budget de la
+    // conversation franchi en cours de boucle → un dernier appel sans outils
+    // obtient une réponse finale.
+    while (true) {
+      const withinBudget =
+        conversation.tokensUsed + tokensUsed < ASSISTANT_CONVERSATION_TOKEN_BUDGET
+      const offerTools =
+        tools.length > 0 &&
+        rounds < ASSISTANT_MAX_TOOL_ROUNDS &&
+        callsUsed < ASSISTANT_MAX_TOOL_CALLS_PER_TURN &&
+        withinBudget
+
+      const aiResponse = await this.#chatOrFail(
+        scaffold,
+        offerTools ? { ...options, tools } : options,
+        active
+      )
+      tokensUsed += aiResponse.tokensUsed
+
+      // Un appel d'outil accompagné de texte est traité comme un appel
+      // d'outil : le texte n'est qu'un préambule, pas la réponse finale.
+      if (!offerTools || aiResponse.toolCalls.length === 0) {
+        content = aiResponse.content
+        break
+      }
+
+      rounds += 1
+      const calls = aiResponse.toolCalls.slice(0, ASSISTANT_MAX_TOOL_CALLS_PER_TURN - callsUsed)
+      callsUsed += calls.length
+
+      scaffold.push({ role: 'assistant', content: aiResponse.content, toolCalls: calls })
+      for (const call of calls) {
+        // `run` ne lève jamais : une erreur repart au modèle comme résultat.
+        const result = await this.toolsService.run(user, call)
+        scaffold.push({ role: 'tool', content: result, toolCallId: call.id })
+      }
+    }
+
+    const { reply, retryTokens } = await this.#parseWithCorrectiveRetry(
+      content,
+      scaffold,
+      options,
+      active,
+      conversation.locale as AiSuggestionLocale
+    )
+    tokensUsed += retryTokens
 
     // Validations AVANT toute écriture : chaque id rendu par le modèle doit
     // appartenir au roster de l'org.
@@ -299,6 +354,60 @@ export default class AssistantChatService {
     await this.aiTokenQuotaService.recordUsage(user.organization, tokensUsed)
 
     return conversation
+  }
+
+  /**
+   * Appel modèle avec la sémantique d'erreur BYOK : un échec avec la clé de
+   * l'org (révoquée, invalide, sans crédit) est signalé comme tel —
+   * l'utilisateur doit vérifier ses réglages IA.
+   */
+  async #chatOrFail(
+    messages: AiChatMessage[],
+    options: AiChatOptions,
+    active: { provider: AiProvider; apiKey: string } | null
+  ) {
+    try {
+      return await this.aiService.chat(messages, options)
+    } catch (error) {
+      if (active !== null) throw new AssistantCustomKeyFailedError()
+      throw error
+    }
+  }
+
+  /**
+   * Parse du contenu final avec UNE relance corrective : le petit modèle se
+   * trompe régulièrement de forme après une série d'appels d'outils — on lui
+   * redemande une seule fois l'objet JSON, sans outils, puis
+   * `AiInvalidResponseError` si la relance échoue aussi.
+   */
+  async #parseWithCorrectiveRetry(
+    content: string,
+    scaffold: AiChatMessage[],
+    options: AiChatOptions,
+    active: { provider: AiProvider; apiKey: string } | null,
+    locale: AiSuggestionLocale
+  ): Promise<{ reply: AssistantAiReply; retryTokens: number }> {
+    try {
+      return { reply: parseAssistantReply(content), retryTokens: 0 }
+    } catch (error) {
+      if (!(error instanceof AiInvalidResponseError)) throw error
+    }
+
+    const correction =
+      locale === 'fr'
+        ? 'Réponds uniquement par l’objet JSON demandé, sans aucun texte autour.'
+        : 'Reply with only the requested JSON object, with no surrounding text.'
+
+    const retryResponse = await this.#chatOrFail(
+      [...scaffold, { role: 'assistant', content }, { role: 'user', content: correction }],
+      options,
+      active
+    )
+
+    return {
+      reply: parseAssistantReply(retryResponse.content),
+      retryTokens: retryResponse.tokensUsed,
+    }
   }
 
   /** Miroir des règles de `BoatMaintenanceTaskService.createForBoat` + roster. */
@@ -356,7 +465,7 @@ export default class AssistantChatService {
     pendingMessages: AssistantMessage[],
     user: User,
     roster: AssistantFleetRoster
-  ): Promise<Array<{ role: 'system' | 'user' | 'assistant'; content: string }>> {
+  ): Promise<AiChatMessage[]> {
     const locale = conversation.locale as AiSuggestionLocale
     const fr = locale === 'fr'
 
