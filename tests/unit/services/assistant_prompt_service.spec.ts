@@ -41,6 +41,11 @@ test.group('Assistant — prompt système (#642)', () => {
       }
     }
   })
+
+  test('le prompt interdit les formes structurées incomplètes', ({ assert }) => {
+    assert.include(buildAssistantSystemPrompt('fr', PROMPT_CTX), 'forme structurée incomplète')
+    assert.include(buildAssistantSystemPrompt('en', PROMPT_CTX), 'incomplete structured shape')
+  })
 })
 
 test.group('Assistant — parse de la réponse (#642)', () => {
@@ -315,9 +320,11 @@ test.group('Assistant — alias propose_task', () => {
   })
 
   /**
-   * Régression : sans cette tolérance, « ajoute une révision moteur sur le 3D »
-   * (sans date) finissait en `AiInvalidResponseError` → toast « réponse
-   * inexploitable » et tour perdu, alors que le modèle demandait l'échéance.
+   * Régressions : une forme structurée incomplète est une question de
+   * clarification, pas une réponse cassée. Sans ces tolérances, « ajoute une
+   * révision moteur sur le 3D » ou « la liste des pièces pour l'entretien du
+   * moteur » finissaient en `AiInvalidResponseError` → toast « réponse
+   * inexploitable » et tour perdu.
    */
   test('une proposition de tâche sans échéance est dégradée en answer', ({ assert }) => {
     const reply = parseAssistantReply(
@@ -354,6 +361,109 @@ test.group('Assistant — alias propose_task', () => {
     )
 
     assert.deepEqual(reply, { type: 'answer', message: 'Quelle échéance souhaitez-vous ?' })
+  })
+
+  test('un create_task sans bateau est dégradé en answer', ({ assert }) => {
+    const reply = parseAssistantReply(
+      JSON.stringify({
+        type: 'propose_action',
+        message: 'Quel bateau ?',
+        action: {
+          kind: 'create_task',
+          boatId: null,
+          subject: 'engine',
+          title: 'Révision moteur',
+          dueAt: '2026-10-07',
+        },
+      })
+    )
+
+    assert.deepEqual(reply, { type: 'answer', message: 'Quel bateau ?' })
+  })
+
+  test('un create_task sans sujet est dégradé en answer', ({ assert }) => {
+    const reply = parseAssistantReply(
+      JSON.stringify({
+        type: 'propose_action',
+        message: "Quel type d'entretien ?",
+        action: { kind: 'create_task', boatId: 22, title: 'Révision', dueAt: '2026-10-07' },
+      })
+    )
+
+    assert.equal(reply.type, 'answer')
+  })
+
+  test('un propose_action sans objet action est dégradé en answer', ({ assert }) => {
+    const reply = parseAssistantReply('{"type":"propose_action","message":"Quel bateau ?"}')
+
+    assert.deepEqual(reply, { type: 'answer', message: 'Quel bateau ?' })
+  })
+
+  test('un propose_task sans objet task est dégradé en answer', ({ assert }) => {
+    const reply = parseAssistantReply('{"type":"propose_task","message":"Quel bateau ?"}')
+
+    assert.deepEqual(reply, { type: 'answer', message: 'Quel bateau ?' })
+  })
+
+  /**
+   * Un sujet PRÉSENT mais hors vocabulaire reste fatal : le modèle contredit le
+   * contrat, contrairement à l'absence de champ qui n'est qu'une demande de
+   * précision.
+   */
+  test('un sujet hors liste reste fatal', ({ assert }) => {
+    assert.throws(
+      () =>
+        parseAssistantReply(
+          JSON.stringify({
+            type: 'propose_action',
+            message: 'x',
+            action: {
+              kind: 'create_task',
+              boatId: 22,
+              subject: 'teleportation',
+              title: 'Révision',
+              dueAt: '2026-10-07',
+            },
+          })
+        ),
+      AiInvalidResponseError
+    )
+  })
+})
+
+test.group('Assistant — handoff incomplet', () => {
+  test('un handoff sans engineId est dégradé en answer', ({ assert }) => {
+    const reply = parseAssistantReply(
+      '{"type":"handoff","message":"Lequel des deux moteurs ?","target":"part_search","boatId":22,"engineId":null}'
+    )
+
+    assert.deepEqual(reply, { type: 'answer', message: 'Lequel des deux moteurs ?' })
+  })
+
+  test('un handoff sans aucun id est dégradé en answer', ({ assert }) => {
+    const reply = parseAssistantReply(
+      '{"type":"handoff","message":"Quel bateau et quel moteur ?","target":"part_search"}'
+    )
+
+    assert.equal(reply.type, 'answer')
+  })
+
+  test('un handoff sans target est dégradé en answer', ({ assert }) => {
+    const reply = parseAssistantReply(
+      '{"type":"handoff","message":"Précisez votre besoin","boatId":22,"engineId":7}'
+    )
+
+    assert.equal(reply.type, 'answer')
+  })
+
+  test('un handoff dont engineId n est pas un entier reste fatal', ({ assert }) => {
+    assert.throws(
+      () =>
+        parseAssistantReply(
+          '{"type":"handoff","message":"x","target":"diagnosis","boatId":22,"engineId":"le Mercury"}'
+        ),
+      AiInvalidResponseError
+    )
   })
 })
 

@@ -409,6 +409,39 @@ test.group('Assistant FleetAi chat (functional)', (group) => {
     }
   })
 
+  test('a handoff without an engine id continues the thread as an answer', async ({
+    assert,
+    client,
+  }) => {
+    const user = await createAdminUser()
+    const { boat } = await makeBoat(user.organizationId!)
+    swapAiService(
+      JSON.stringify({
+        type: 'handoff',
+        message: 'Which of the two engines needs those parts?',
+        target: 'part_search',
+        boatId: boat.id,
+        engineId: null,
+      })
+    )
+
+    const response = await client
+      .post('/assistant/conversations')
+      .loginAs(user)
+      .form({ message: 'List the parts for the engine service' })
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertFlashMissing('error')
+
+    const conversations = await AiAssistantConversation.all()
+    assert.lengthOf(conversations, 1)
+    const last = conversations[0].messages.at(-1)!
+    assert.equal(last.role, 'assistant')
+    assert.equal(last.content, 'Which of the two engines needs those parts?')
+    assert.isUndefined(last.card)
+  })
+
   test('a handoff naming an engine outside the boat persists nothing', async ({
     assert,
     client,

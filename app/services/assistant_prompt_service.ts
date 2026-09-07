@@ -56,6 +56,7 @@ Actions possibles :
   Si une information manque pour remplir une action (quel bateau ? quelle date ?), pose la question via "answer" plutôt que de deviner.
   - {"type":"handoff","message":"...","target":"diagnosis","boatId":0,"engineId":0} — quand l'utilisateur décrit une panne moteur ("target":"diagnosis") ou cherche une référence de pièce ("target":"part_search") : identifie le bateau et le moteur concernés dans la flotte ci-dessus. "message" (300 caractères max) explique où tu l'orientes.
 - N'invente JAMAIS un id absent de la flotte ci-dessus : si le bateau ou le moteur demandé n'y figure pas, réponds par "answer" en le disant.
+- N'émets JAMAIS une forme structurée incomplète : une action dont il manque un champ obligatoire (bateau, échéance, moteur…) ni un "handoff" sans "boatId" ET "engineId" — dans tous ces cas, la demande de précision passe par "answer".
 - Ne décline que le hors-sujet RÉEL (sans aucun rapport avec le nautisme, la flotte ou le produit FleetAi) : la culture nautique générale est dans ton périmètre, réponds avec "source":"general".
 - Rédige "message" en français en vouvoyant l'utilisateur, quelle que soit sa langue.`,
   en: `You are FleetAi, the AI copilot of a boat fleet management application. You answer any question about: (1) the user's organization DATA, through the tools at your disposal; (2) the FleetAi PRODUCT itself (features, plans, quotas), through the search_product_help tool; (3) general NAUTICAL knowledge (navigation, upkeep, safety, regulations), from your own knowledge, flagged as such. You can also PROPOSE actions (schedule maintenance, record engine hours, a trip, a refueling, an incident, a reservation, a client, a part stock) — each is only executed after the user's explicit confirmation — and route to the engine fault diagnosis or the spare part reference search.
@@ -85,6 +86,7 @@ Available actions:
   When information is missing to fill an action (which boat? which date?), ask via "answer" rather than guessing.
   - {"type":"handoff","message":"...","target":"diagnosis","boatId":0,"engineId":0} — when the user describes an engine fault ("target":"diagnosis") or looks for a part reference ("target":"part_search"): identify the boat and engine involved from the fleet above. "message" (300 characters max) explains where you are routing them.
 - NEVER invent an id absent from the fleet above: when the requested boat or engine is not listed, reply with "answer" saying so.
+- NEVER emit an incomplete structured shape: an action missing a required field (boat, due date, engine…) or a "handoff" without both "boatId" and "engineId" — in all these cases, ask for the missing detail with "answer".
 - Only decline what is TRULY off-topic (nothing to do with boating, the fleet or the FleetAi product): general nautical knowledge is in scope, answer it with "source":"general".
 - Write "message" in English, whatever the user's language.`,
 }
@@ -260,15 +262,29 @@ function toEnumOrNull<T extends string>(value: unknown, allowed: readonly T[]): 
     : null
 }
 
+/** Le modèle n'a pas renseigné le champ — par opposition à une valeur fausse. */
+function isMissing(value: unknown): boolean {
+  return value === null || value === undefined
+}
+
 /**
  * Parse la réponse du modèle en `AssistantAiReply`. Une réponse malformée lève
  * `AiInvalidResponseError` : rien ne doit être persisté (invariant #602/#634).
  * La validation d'appartenance des ids au roster relève du service de chat.
  *
- * Seule tolérance : une `propose_task` sans échéance est dégradée en `answer`
- * (le modèle demande la date au lieu de la deviner) — sans elle, une demande
- * aussi banale que « ajoute une révision moteur sur le 3D » finissait en toast
- * « réponse inexploitable ».
+ * Distinction centrale : une forme structurée **incomplète** n'est pas une
+ * réponse cassée. Quand le modèle a compris la demande mais qu'il lui manque un
+ * élément (quel bateau ? quel moteur ? quelle échéance ?), il emballe sa
+ * question de clarification dans un `propose_task` ou un `handoff` aux champs
+ * `null` — son `message` reste parfaitement exploitable. On dégrade alors en
+ * `answer` : le fil continue et l'utilisateur complète. Sans cela, des demandes
+ * banales (« ajoute une révision moteur sur le 3D », « la liste des pièces pour
+ * l'entretien du moteur ») finissaient en toast « réponse inexploitable », tour
+ * perdu.
+ *
+ * Reste fatal : un JSON invalide, un `message` vide, un `type` inconnu et toute
+ * valeur **présente mais fausse** (sujet hors liste, date illisible, id non
+ * entier, cible de handoff inconnue) — là, le modèle contredit le contrat.
  */
 export function parseAssistantReply(raw: string): AssistantAiReply {
   let parsed: unknown
@@ -290,6 +306,8 @@ export function parseAssistantReply(raw: string): AssistantAiReply {
     throw new AiInvalidResponseError('Assistant reply has no message')
   }
 
+  const answer: AssistantAiReply = { type: 'answer', message: message.trim() }
+
   if (candidate.type === 'answer') {
     const reply: Extract<AssistantAiReply, { type: 'answer' }> = {
       type: 'answer',
@@ -306,11 +324,10 @@ export function parseAssistantReply(raw: string): AssistantAiReply {
   // actionnable) est mappée sur `propose_action` + `kind: 'create_task'`.
   if (candidate.type === 'propose_task') {
     const task = candidate.task
-    if (typeof task !== 'object' || task === null) {
-      throw new AiInvalidResponseError('Assistant task proposal has no task object')
-    }
+    // Pas d'objet `task` : le modèle n'a pas encore de quoi proposer.
+    if (typeof task !== 'object' || task === null) return answer
     const proposedTask = task as Record<string, unknown>
-    if (isTaskProposalWithoutDue(proposedTask)) return { type: 'answer', message: message.trim() }
+    if (isIncompleteTaskProposal(proposedTask)) return answer
     return {
       type: 'propose_action',
       message: message.trim(),
@@ -320,13 +337,10 @@ export function parseAssistantReply(raw: string): AssistantAiReply {
 
   if (candidate.type === 'propose_action') {
     const action = candidate.action
-    if (typeof action !== 'object' || action === null) {
-      throw new AiInvalidResponseError('Assistant action proposal has no action object')
-    }
+    // Pas d'objet `action` : le modèle n'a pas encore de quoi proposer.
+    if (typeof action !== 'object' || action === null) return answer
     const proposed = action as Record<string, unknown>
-    if (proposed.kind === 'create_task' && isTaskProposalWithoutDue(proposed)) {
-      return { type: 'answer', message: message.trim() }
-    }
+    if (proposed.kind === 'create_task' && isIncompleteTaskProposal(proposed)) return answer
     return {
       type: 'propose_action',
       message: message.trim(),
@@ -336,9 +350,14 @@ export function parseAssistantReply(raw: string): AssistantAiReply {
 
   if (candidate.type === 'handoff') {
     const target = candidate.target
+    if (isMissing(target)) return answer
     if (target !== 'diagnosis' && target !== 'part_search') {
       throw new AiInvalidResponseError('Assistant handoff has an unknown target')
     }
+    // Bateau ou moteur non identifiés : le modèle demande lequel — on ne peut
+    // pas orienter, mais sa question reste affichable.
+    if (isMissing(candidate.boatId) || isMissing(candidate.engineId)) return answer
+
     return {
       type: 'handoff',
       message: message.trim(),
@@ -352,15 +371,17 @@ export function parseAssistantReply(raw: string): AssistantAiReply {
 }
 
 /**
- * Échéance absente sur une proposition de tâche : le modèle a compris la
- * demande mais lui manque la date — son `message` est déjà la question de
- * clarification. On dégrade en `answer` plutôt que de lever : le tour reste
- * exploitable et l'utilisateur répond avec l'échéance (une proposition sans
- * échéance serait de toute façon refusée par `BoatMaintenanceTaskService`).
- * Lecture défensive : les helpers `toNullable*` lèvent sur un type inattendu,
- * or ici seule l'absence d'échéance nous intéresse.
+ * Forme incomplète d'une proposition de tâche : le modèle a compris la demande
+ * mais lui manque un élément (quel bateau ? quel sujet ? quelle échéance ?) — son
+ * `message` est déjà la question de clarification. L'appelant dégrade alors en
+ * `answer` plutôt que de lever : le fil continue et l'utilisateur complète (une
+ * proposition amputée serait de toute façon refusée à la confirmation).
+ * Lecture défensive : les helpers `toNullable*` lèvent sur un type inattendu, or
+ * ici seule l'ABSENCE nous intéresse — une valeur présente mais fausse reste
+ * fatale, dans `parseCreateTaskAction`.
  */
-function isTaskProposalWithoutDue(t: Record<string, unknown>): boolean {
+function isIncompleteTaskProposal(t: Record<string, unknown>): boolean {
+  if (isMissing(t.boatId) || isMissing(t.subject) || isMissing(t.title)) return true
   const hasDueAt = typeof t.dueAt === 'string' && t.dueAt.trim().length > 0
   const hasDueEngineHours = typeof t.dueEngineHours === 'number' && t.dueEngineHours > 0
   return !hasDueAt && !hasDueEngineHours
