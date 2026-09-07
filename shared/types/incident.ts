@@ -1,14 +1,17 @@
 import type { DateTime } from 'luxon'
 
-export type IncidentType =
-  | 'grounding'
-  | 'flooding'
-  | 'rigging_failure'
-  | 'engine_failure'
-  | 'collision'
-  | 'fire'
-  | 'theft_vandalism'
-  | 'other'
+export const INCIDENT_TYPES = [
+  'grounding',
+  'flooding',
+  'rigging_failure',
+  'engine_failure',
+  'collision',
+  'fire',
+  'theft_vandalism',
+  'other',
+] as const
+
+export type IncidentType = (typeof INCIDENT_TYPES)[number]
 
 export type IncidentStatus = 'open' | 'in_progress' | 'closed'
 

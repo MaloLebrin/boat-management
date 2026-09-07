@@ -13,6 +13,16 @@ export const AUDIT_ACTIONS = [
   'maintenance_task.create',
   'maintenance_task.complete',
   'maintenance_task.delete',
+  // Actions confirmées depuis le copilote FleetAi (agent actionnable) : même
+  // journal que les créations manuelles correspondantes.
+  'engine.add_hours',
+  'navigation_log.create',
+  'navigation_log.close',
+  'fuel_log.create',
+  'incident.create',
+  'reservation.create',
+  'client.create',
+  'engine_part.set_stock',
 ] as const
 
 export type AuditAction = (typeof AUDIT_ACTIONS)[number]

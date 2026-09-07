@@ -346,7 +346,15 @@
       "invitation_accept": "Invitation acceptée",
       "maintenance_task_create": "Tâche de maintenance créée",
       "maintenance_task_complete": "Tâche de maintenance terminée",
-      "maintenance_task_delete": "Tâche de maintenance supprimée"
+      "maintenance_task_delete": "Tâche de maintenance supprimée",
+      "engine_add_hours": "Heures moteur ajoutées",
+      "navigation_log_create": "Sortie ouverte",
+      "navigation_log_close": "Sortie clôturée",
+      "fuel_log_create": "Plein enregistré",
+      "incident_create": "Incident déclaré",
+      "reservation_create": "Réservation créée",
+      "client_create": "Client créé",
+      "engine_part_set_stock": "Stock de pièce mis à jour"
     },
     "empty": {
       "title": "Aucune activité",

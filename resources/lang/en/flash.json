@@ -376,6 +376,20 @@
     "invalidResponse": "The assistant returned an unusable answer. Please try again.",
     "budgetExceeded": "This conversation has reached its AI usage limit. Start a new one to continue.",
     "customKeyFailed": "The AI call failed with your organisation API key. Check it in the AI settings.",
-    "boatNotFound": "The boat in this proposal no longer exists."
+    "boatNotFound": "The boat in this proposal no longer exists.",
+    "actionNotAllowed": "Your role or plan no longer allows this action.",
+    "actionEntityGone": "The item targeted by this proposal no longer exists.",
+    "tripInProgress": "This boat already has a trip in progress: close it before opening another one.",
+    "actionFailed": "This proposal was rejected by the app rules. Dismiss it and rephrase your request.",
+    "actions": {
+      "add_engine_hours": "Engine hours added.",
+      "start_trip": "Trip opened in the logbook.",
+      "close_trip": "Trip closed.",
+      "log_fuel": "Refueling recorded.",
+      "report_incident": "Incident reported.",
+      "create_reservation": "Reservation created.",
+      "create_client": "Client record created.",
+      "set_part_stock": "Part stock updated."
+    }
   }
 }

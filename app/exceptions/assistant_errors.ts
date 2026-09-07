@@ -39,3 +39,24 @@ export class AssistantCustomKeyFailedError extends Error {
   status = 502
   code = 'E_ASSISTANT_CUSTOM_KEY_FAILED'
 }
+
+/**
+ * Confirmation d'une action que le rôle ou le plan effectif n'autorise plus —
+ * les gardes sont re-vérifiées à l'exécution, le plan peut avoir changé entre
+ * la proposition et le clic.
+ */
+export class AssistantActionNotAllowedError extends Error {
+  name = 'AssistantActionNotAllowedError'
+  status = 403
+  code = 'E_ASSISTANT_ACTION_NOT_ALLOWED'
+}
+
+/**
+ * L'entité visée par l'action a disparu entre la proposition et la
+ * confirmation (pièce supprimée, sortie déjà clôturée…).
+ */
+export class AssistantActionEntityGoneError extends Error {
+  name = 'AssistantActionEntityGoneError'
+  status = 409
+  code = 'E_ASSISTANT_ACTION_ENTITY_GONE'
+}

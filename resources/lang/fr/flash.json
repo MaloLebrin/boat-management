@@ -376,6 +376,20 @@
     "invalidResponse": "L’assistant a renvoyé une réponse inexploitable. Réessayez.",
     "budgetExceeded": "Cette conversation a atteint sa limite d’utilisation IA. Démarrez-en une nouvelle pour continuer.",
     "customKeyFailed": "L’appel IA a échoué avec la clé API de votre organisation. Vérifiez-la dans les réglages IA.",
-    "boatNotFound": "Le bateau de cette proposition n’existe plus."
+    "boatNotFound": "Le bateau de cette proposition n’existe plus.",
+    "actionNotAllowed": "Votre rôle ou votre plan ne permet plus cette action.",
+    "actionEntityGone": "L’élément visé par cette proposition n’existe plus.",
+    "tripInProgress": "Ce bateau a déjà une sortie en cours : clôturez-la avant d’en ouvrir une autre.",
+    "actionFailed": "Cette proposition a été rejetée par les règles de l’app. Refusez-la et reformulez votre demande.",
+    "actions": {
+      "add_engine_hours": "Heures moteur ajoutées.",
+      "start_trip": "Sortie ouverte au journal de bord.",
+      "close_trip": "Sortie clôturée.",
+      "log_fuel": "Plein de carburant enregistré.",
+      "report_incident": "Incident déclaré.",
+      "create_reservation": "Réservation créée.",
+      "create_client": "Fiche client créée.",
+      "set_part_stock": "Stock de la pièce mis à jour."
+    }
   }
 }
