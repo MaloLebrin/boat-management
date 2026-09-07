@@ -264,6 +264,11 @@ function toEnumOrNull<T extends string>(value: unknown, allowed: readonly T[]): 
  * Parse la réponse du modèle en `AssistantAiReply`. Une réponse malformée lève
  * `AiInvalidResponseError` : rien ne doit être persisté (invariant #602/#634).
  * La validation d'appartenance des ids au roster relève du service de chat.
+ *
+ * Seule tolérance : une `propose_task` sans échéance est dégradée en `answer`
+ * (le modèle demande la date au lieu de la deviner) — sans elle, une demande
+ * aussi banale que « ajoute une révision moteur sur le 3D » finissait en toast
+ * « réponse inexploitable ».
  */
 export function parseAssistantReply(raw: string): AssistantAiReply {
   let parsed: unknown
@@ -304,10 +309,12 @@ export function parseAssistantReply(raw: string): AssistantAiReply {
     if (typeof task !== 'object' || task === null) {
       throw new AiInvalidResponseError('Assistant task proposal has no task object')
     }
+    const proposedTask = task as Record<string, unknown>
+    if (isTaskProposalWithoutDue(proposedTask)) return { type: 'answer', message: message.trim() }
     return {
       type: 'propose_action',
       message: message.trim(),
-      action: parseCreateTaskAction(task as Record<string, unknown>),
+      action: parseCreateTaskAction(proposedTask),
     }
   }
 
@@ -316,10 +323,14 @@ export function parseAssistantReply(raw: string): AssistantAiReply {
     if (typeof action !== 'object' || action === null) {
       throw new AiInvalidResponseError('Assistant action proposal has no action object')
     }
+    const proposed = action as Record<string, unknown>
+    if (proposed.kind === 'create_task' && isTaskProposalWithoutDue(proposed)) {
+      return { type: 'answer', message: message.trim() }
+    }
     return {
       type: 'propose_action',
       message: message.trim(),
-      action: parseProposedAction(action as Record<string, unknown>),
+      action: parseProposedAction(proposed),
     }
   }
 
@@ -338,6 +349,21 @@ export function parseAssistantReply(raw: string): AssistantAiReply {
   }
 
   throw new AiInvalidResponseError('Assistant reply has an unknown type')
+}
+
+/**
+ * Échéance absente sur une proposition de tâche : le modèle a compris la
+ * demande mais lui manque la date — son `message` est déjà la question de
+ * clarification. On dégrade en `answer` plutôt que de lever : le tour reste
+ * exploitable et l'utilisateur répond avec l'échéance (une proposition sans
+ * échéance serait de toute façon refusée par `BoatMaintenanceTaskService`).
+ * Lecture défensive : les helpers `toNullable*` lèvent sur un type inattendu,
+ * or ici seule l'absence d'échéance nous intéresse.
+ */
+function isTaskProposalWithoutDue(t: Record<string, unknown>): boolean {
+  const hasDueAt = typeof t.dueAt === 'string' && t.dueAt.trim().length > 0
+  const hasDueEngineHours = typeof t.dueEngineHours === 'number' && t.dueEngineHours > 0
+  return !hasDueAt && !hasDueEngineHours
 }
 
 function parseCreateTaskAction(

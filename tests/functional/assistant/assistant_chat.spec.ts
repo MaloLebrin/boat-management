@@ -268,6 +268,39 @@ test.group('Assistant FleetAi chat (functional)', (group) => {
     assert.lengthOf(await AiAssistantConversation.all(), 0)
   })
 
+  /**
+   * Régression : le modèle emballe sa demande d'échéance dans un
+   * `propose_task` sans `dueAt` ni `dueEngineHours`. Le tour doit se
+   * poursuivre comme une simple réponse — auparavant l'utilisateur recevait
+   * « réponse inexploitable » et son message était perdu.
+   */
+  test('a proposal without a due date continues the thread as an answer', async ({
+    assert,
+    client,
+  }) => {
+    const user = await createAdminUser()
+    const { boat } = await makeBoat(user.organizationId!)
+    swapAiService(proposeTaskResponse(boat.id, { dueAt: null, dueEngineHours: null }))
+
+    const response = await client
+      .post('/assistant/conversations')
+      .loginAs(user)
+      .form({ message: 'Add an engine service on Mistral II' })
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertFlashMissing('error')
+
+    const conversations = await AiAssistantConversation.all()
+    assert.lengthOf(conversations, 1)
+    const conversation = conversations[0]
+    assert.isNull(conversation.pendingAction)
+    assert.lengthOf(conversation.messages, 2)
+    assert.equal(conversation.messages[1].role, 'assistant')
+    assert.equal(conversation.messages[1].content, 'I can schedule the oil change for tomorrow.')
+    assert.isUndefined(conversation.messages[1].card)
+  })
+
   test('a valid task proposal is stored as pending action, never written directly', async ({
     assert,
     client,

@@ -313,6 +313,48 @@ test.group('Assistant — alias propose_task', () => {
       assert.equal(reply.action.title, 'Oil change')
     }
   })
+
+  /**
+   * Régression : sans cette tolérance, « ajoute une révision moteur sur le 3D »
+   * (sans date) finissait en `AiInvalidResponseError` → toast « réponse
+   * inexploitable » et tour perdu, alors que le modèle demandait l'échéance.
+   */
+  test('une proposition de tâche sans échéance est dégradée en answer', ({ assert }) => {
+    const reply = parseAssistantReply(
+      JSON.stringify({
+        type: 'propose_task',
+        message: 'Quelle échéance souhaitez-vous ?',
+        task: {
+          boatId: 22,
+          subject: 'engine',
+          title: 'Révision moteur',
+          dueAt: null,
+          dueEngineHours: null,
+        },
+      })
+    )
+
+    assert.deepEqual(reply, { type: 'answer', message: 'Quelle échéance souhaitez-vous ?' })
+  })
+
+  test('un create_task sans échéance est dégradé en answer', ({ assert }) => {
+    const reply = parseAssistantReply(
+      JSON.stringify({
+        type: 'propose_action',
+        message: 'Quelle échéance souhaitez-vous ?',
+        action: {
+          kind: 'create_task',
+          boatId: 22,
+          subject: 'engine',
+          title: 'Révision moteur',
+          dueAt: null,
+          dueEngineHours: null,
+        },
+      })
+    )
+
+    assert.deepEqual(reply, { type: 'answer', message: 'Quelle échéance souhaitez-vous ?' })
+  })
 })
 
 test.group('Assistant — buildActionLines', () => {
