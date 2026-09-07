@@ -303,7 +303,11 @@ export default class AssistantChatService {
       scaffold.push({ role: 'assistant', content: aiResponse.content, toolCalls: calls })
       for (const call of calls) {
         // `run` ne lève jamais : une erreur repart au modèle comme résultat.
-        const result = await this.toolsService.run(user, call)
+        const result = await this.toolsService.run(
+          user,
+          call,
+          conversation.locale as AiSuggestionLocale
+        )
         scaffold.push({ role: 'tool', content: result, toolCallId: call.id })
       }
     }
@@ -321,6 +325,18 @@ export default class AssistantChatService {
     // appartenir au roster de l'org.
     let pendingAction: AssistantTaskProposal | null = null
     let assistantMessage: AssistantMessage = { role: 'assistant', content: reply.message }
+
+    if (reply.type === 'answer') {
+      // `source` et `navTarget` sortent du vocabulaire fermé validé par le
+      // parse — le front les rend en badge i18n et en <Link>, jamais en texte
+      // du modèle.
+      assistantMessage = {
+        role: 'assistant',
+        content: reply.message,
+        ...(reply.source !== undefined ? { source: reply.source } : {}),
+        ...(reply.navTarget !== undefined ? { navTarget: reply.navTarget } : {}),
+      }
+    }
 
     if (reply.type === 'propose_task') {
       pendingAction = this.#validateTaskProposal(reply, roster)

@@ -1,6 +1,7 @@
 import BoatEngine from '#models/boat_engine'
 import type User from '#models/user'
 import AiTokenQuotaService from '#services/ai_token_quota_service'
+import AssistantProductHelpService from '#services/assistant_product_help_service'
 import BoatEnginePartService from '#services/boat_engine_part_service'
 import BoatHullService from '#services/boat_hull_service'
 import BoatListService from '#services/boat_list_service'
@@ -17,7 +18,8 @@ import PlanningService from '#services/planning_service'
 import PortService from '#services/port_service'
 import QuotaService from '#services/quota_service'
 import SubscriptionService from '#services/subscription_service'
-import type { AiToolCall, AiToolDefinition } from '#shared/types/ai'
+import { DEFAULT_APP_LOCALE } from '#shared/helpers/locale_path'
+import type { AiSuggestionLocale, AiToolCall, AiToolDefinition } from '#shared/types/ai'
 import {
   ASSISTANT_TOOL_RESULT_MAX_CHARS,
   type AssistantToolSpec,
@@ -32,7 +34,7 @@ import { DateTime } from 'luxon'
  * référence le modèle `User`, jamais importé depuis `shared/`.
  */
 interface AssistantTool extends AssistantToolSpec {
-  execute(user: User, args: Record<string, unknown>): Promise<unknown>
+  execute(user: User, args: Record<string, unknown>, locale: AiSuggestionLocale): Promise<unknown>
 }
 
 /* --- Coercion des arguments : un petit modèle envoie "22" pour 22. --------- */
@@ -59,6 +61,20 @@ function toStr(value: unknown): string | null {
 function toEnum<T extends string>(value: unknown, allowed: readonly T[]): T | null {
   const str = toStr(value)
   return str !== null && (allowed as readonly string[]).includes(str) ? (str as T) : null
+}
+
+/**
+ * Sérialisation d'un résultat d'outil, tronquée à
+ * `ASSISTANT_TOOL_RESULT_MAX_CHARS` avec `truncated: true` — sans elle,
+ * `list_boats` sur une grosse flotte fait exploser le tour.
+ */
+export function serializeToolResult(result: unknown): string {
+  const json = JSON.stringify(result) ?? 'null'
+  if (json.length <= ASSISTANT_TOOL_RESULT_MAX_CHARS) return json
+  return JSON.stringify({
+    truncated: true,
+    preview: json.slice(0, ASSISTANT_TOOL_RESULT_MAX_CHARS),
+  })
 }
 
 /**
@@ -91,6 +107,7 @@ export default class AssistantToolsService {
     private navigationService: NavigationService,
     private planningService: PlanningService,
     private portService: PortService,
+    private productHelpService: AssistantProductHelpService,
     private quotaService: QuotaService,
     private reservationService: BoatReservationService,
     private safetyComplianceService: BoatSafetyComplianceService,
@@ -125,7 +142,11 @@ export default class AssistantToolsService {
    * `definitionsFor` sont re-vérifiées : un modèle peut halluciner un appel
    * vers un outil qui ne lui a pas été proposé.
    */
-  async run(user: User, call: AiToolCall): Promise<string> {
+  async run(
+    user: User,
+    call: AiToolCall,
+    locale: AiSuggestionLocale = DEFAULT_APP_LOCALE
+  ): Promise<string> {
     const tool = this.#tools().find((t) => t.name === call.name)
     if (tool === undefined) {
       return this.#serialize({
@@ -148,7 +169,7 @@ export default class AssistantToolsService {
           return this.#serialize({ error: 'Not available on your plan' })
         }
       }
-      const result = await tool.execute(user, call.arguments)
+      const result = await tool.execute(user, call.arguments, locale)
       return this.#serialize(result)
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Tool execution failed'
@@ -157,12 +178,7 @@ export default class AssistantToolsService {
   }
 
   #serialize(result: unknown): string {
-    const json = JSON.stringify(result) ?? 'null'
-    if (json.length <= ASSISTANT_TOOL_RESULT_MAX_CHARS) return json
-    return JSON.stringify({
-      truncated: true,
-      preview: json.slice(0, ASSISTANT_TOOL_RESULT_MAX_CHARS),
-    })
+    return serializeToolResult(result)
   }
 
   #tools(): AssistantTool[] {
@@ -518,6 +534,23 @@ export default class AssistantToolsService {
               currency: invoice.currency,
             })),
           }
+        },
+      },
+      {
+        name: 'search_product_help',
+        description:
+          'Search the FleetAi product knowledge base. Use for questions about what FleetAi can do, how a feature works, plans, modules and quotas.',
+        parameters: {
+          type: 'object',
+          properties: {
+            query: { type: 'string', description: 'The question or feature to look up' },
+          },
+          required: ['query'],
+        },
+        execute: async (_user, args, locale) => {
+          const query = toStr(args.query)
+          if (query === null) return { error: 'query is required' }
+          return { results: this.productHelpService.search(query, locale) }
         },
       },
       {
