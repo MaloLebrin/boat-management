@@ -169,6 +169,12 @@ Même séquence.
 
 Le `QuotaExceededError` est intercepté et ne lève **pas** vers le framework de queue — cela évite 2 retries inutiles (la limite mensuelle ne change pas entre les tentatives). `markFailed()` est appelé pour libérer le dedup key et permettre une future requête.
 
+### 5.3 `AssistantChatService` (copilote, #642)
+
+`app/services/assistant_chat_service.ts` — voir `docs/domain/assistant.md`.
+
+Le tour du copilote passe par `withOrgLock` + `assertCanUseTokens` (sauf BYOK), puis la **boucle d'outils** enchaîne un à quatre appels `aiService.chat` (appels d'outils, réponse finale, éventuelle relance corrective). **Coût par message** : les tokens de tous les appels du tour sont sommés et émargés en un seul `recordUsage` — une question outillée coûte typiquement deux à trois fois le prix d'une question simple (le prompt système et le fil sont repayés à chaque aller-retour, plus les schémas d'outils et leurs résultats). C'est la raison du budget par conversation à 250 000 tokens (`ASSISTANT_CONVERSATION_TOKEN_BUDGET`) et de l'affichage de la consommation en pied de panneau (`aiUsage { used, limit }` dans la prop `assistantConversation`).
+
 ---
 
 ## 6. Notification par email (seuils 80 % et 100 %)

@@ -142,6 +142,7 @@ L'app supporte un thème sombre (issue #416) piloté par l'attribut `data-theme`
 4. **Pas de `console.log`** en commit — utiliser le logger Adonis
 5. **Migrations** : ne jamais modifier une migration déjà exécutée en production
 6. **Documentation obligatoire** : toute nouvelle feature doit être documentée dans un nouveau fichier `docs/changelog/YYYY-MM-DD-HHMM-slug.md` (un fichier par modification, `HHMM` = heure de rédaction — convention détaillée dans `docs/changelog/README.md`), avec la date et une description en français (routes, champs, comportements notables)
+7. **Base de connaissance du copilote** : toute nouvelle feature ajoute son entrée dans `shared/constants/assistant/product_knowledge.ts` (titre/corps dans les deux locales, mots-clés normalisés sans accents, `navTarget` si un écran existe, `planFlag` si la feature est gardée par le plan) — sinon l'assistant décrit un produit qui n'existe plus (#642)
 
 ## Structure projet
 
