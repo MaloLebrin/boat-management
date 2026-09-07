@@ -348,6 +348,7 @@ note du constat). Mutations via `router.patch`/`router.delete` + `preserveScroll
 - Cloche de notifications : `NotificationBell.vue`, montée **dans la sidebar** (`AsideMenu.vue`, à côté du logo, `align="left"`) **et dans le header mobile** (`default.vue`, à côté du hamburger). Props `align` (`left`/`right`, sens d'ouverture du panneau) et `tone` (`default`/`onDark`, contraste sur fond navy).
   - Badge de non-lus + panneau déroulant `NotificationPanel.vue` (5 dernières notifs, lien « Voir toutes » → `/notifications`). État temps réel via `use_notifications.ts` (singleton + abonnement Transmit `notifications/:userId`).
   - Page complète : `inertia/pages/notifications/index.vue`.
+- **Copilote FleetAi** (#602, élargi #642) : `components/assistant/` — `AssistantPanel.vue` (rail droit desktop / drawer mobile, surface navy permanente ; pied de consommation `aiUsage { used, limit }` depuis la prop partagée enveloppée `assistantConversation`, avertissement + lien `/settings/billing` au-delà de 80 %), `AssistantThread.vue`, `AssistantMessage.vue` (bulles ; cartes `task_created`/`task_dismissed`/`handoff` ; badge de source `assistant.sources.*` sous la bulle et lien de navigation `ASSISTANT_NAV_TARGETS` rendu en `<Link>` — tout en i18n, jamais du texte modèle), `AssistantActionCard.vue`, `AssistantComposer.vue`, `AssistantUpsell.vue`. État : `use_assistant_panel.ts` (module-level, `localStorage`).
 
 ## Thème clair / sombre (#416)
 
