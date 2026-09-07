@@ -52,6 +52,24 @@ export function aiModelI18nKey(model: string): string {
 }
 
 /**
+ * Outil que le modèle peut appeler pendant un tour (#642). Format neutre,
+ * traduit par chaque adaptateur de `AiService` vers son shape natif.
+ */
+export interface AiToolDefinition {
+  name: string
+  description: string
+  /** JSON Schema d'objet, envoyé tel quel aux quatre fournisseurs. */
+  parameters: Record<string, unknown>
+}
+
+/** Appel d'outil rendu par le modèle — `id` à renvoyer avec le résultat. */
+export interface AiToolCall {
+  id: string
+  name: string
+  arguments: Record<string, unknown>
+}
+
+/**
  * Options d'un appel `AiService.chat`. Sans `provider`, l'appel part chez
  * Mistral avec la clé de l'app. Un `model` étranger au fournisseur est ignoré
  * (fallback sur le défaut du fournisseur) : `aiModelOverride` peut rester
@@ -61,6 +79,7 @@ export interface AiChatOptions {
   provider?: AiProvider | null
   model?: string | null
   apiKey?: string | null
+  tools?: AiToolDefinition[]
 }
 
 export type AiAnalysisStatus = 'pending' | 'running' | 'done' | 'failed'
