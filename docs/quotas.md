@@ -43,7 +43,7 @@ Source de vérité : `PLAN_PRICES`, `MODULE_PRICES` et `ADDON_PRICES` (`shared/t
 - Réduction annuelle d'au moins 20 % appliquée automatiquement (badge `billing_annual_badge: "−20 %"`). L'écart joue toujours en faveur du client : Entreprise remise de 20,2 %, `extra_boats` de 25 %. L'invariant est figé par `tests/unit/plan_prices.spec.ts`.
 - Aucun frais caché.
 - Le plan Starter est un plan solo (1 membre = l'owner uniquement). Les plans Pro et Enterprise permettent d'inviter plusieurs membres.
-- La **cartographie de port** (ports, pontons, mouillages, places) est fermée au plan Starter (#604) : un ou deux bateaux personnels n'ont pas de marina à modéliser. Aucun module ni add-on ne l'accorde — c'est une capacité de tier pure (`PLAN_LIMITS[...].canManagePorts`, jamais les quotas effectifs). Le groupe de routes `/ports/*` est gardé par `RequirePortsPlanMiddleware` (redirection vers `/settings/billing` + flash `flash.quota.portsExceeded`), et `PortService.listForUser` / `listWithSpotsForOrg` / `listNamesForOrg` renvoient vide, ce qui escamote le sélecteur de place du formulaire bateau, les ports du carnet de bord et du budget, et la carte ports du dashboard.
+- La **cartographie de port** (ports, pontons, mouillages, places) est fermée au plan Starter (#604) et, quel que soit le plan, aux organisations dont le profil déclaré à l'inscription est « particulier » (`organizations.type === 'private'`) — un profil non renseigné (`null`) ne restreint rien. Cette seconde garde est une restriction de **profil** et non de tier : aucun changement d'abonnement ne l'ouvre, `RequirePortsPlanMiddleware` renvoie donc vers `/dashboard` avec `flash.ports.unavailableForPrivateProfile` au lieu de l'upsell vers la facturation, et les données déjà saisies restent en base (elles réapparaissent si le profil change). La règle vit dans `applyOrganizationProfileOverrides` / `canManagePortsFor` (`shared/helpers/plan.ts`), appliquée en dernier par `resolveEffectiveQuotas`. Pour le reste : un ou deux bateaux personnels n'ont pas de marina à modéliser. Aucun module ni add-on ne l'accorde — c'est une capacité de tier pure (`PLAN_LIMITS[...].canManagePorts`, jamais les quotas effectifs). Le groupe de routes `/ports/*` est gardé par `RequirePortsPlanMiddleware` (redirection vers `/settings/billing` + flash `flash.quota.portsExceeded`), et `PortService.listForUser` / `listWithSpotsForOrg` / `listNamesForOrg` renvoient vide, ce qui escamote le sélecteur de place du formulaire bateau, les ports du carnet de bord et du budget, et la carte ports du dashboard.
 
 ---
 
@@ -51,9 +51,11 @@ Source de vérité : `PLAN_PRICES`, `MODULE_PRICES` et `ADDON_PRICES` (`shared/t
 
 ```
 shared/types/plan.ts                    — PlanTier, PlanQuotas, QuotaUsage, PLAN_LIMITS, getUpgradeTier()
+shared/helpers/plan.ts                  — resolveEffectiveQuotas, applyOrganizationProfileOverrides, canManagePortsFor
 app/exceptions/quota_errors.ts          — QuotaExceededError
+app/exceptions/port_errors.ts           — PortsUnavailableForPrivateProfileError
 app/services/quota_service.ts           — méthodes can*/assert*/storage
-app/middleware/require_ports_plan_middleware.ts — garde de plan du groupe /ports/* (#604)
+app/middleware/require_ports_plan_middleware.ts — garde de plan et de profil du groupe /ports/* (#604)
 app/services/media_service.ts           — upload/deleteById avec tracking quota
 app/services/ai_token_quota_service.ts  — getUsage/assertCanUseTokens/recordUsage/resetMonth
 app/jobs/reset_ai_token_usage.ts        — reset mensuel (cron 1er du mois 01h00)

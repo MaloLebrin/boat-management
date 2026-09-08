@@ -1,5 +1,10 @@
 import { test } from '@japa/runner'
-import { resolveEffectiveQuotas } from '#shared/helpers/plan'
+import {
+  applyOrganizationProfileOverrides,
+  canManagePortsFor,
+  isPortlessOrganizationProfile,
+  resolveEffectiveQuotas,
+} from '#shared/helpers/plan'
 import { PLAN_LIMITS } from '#shared/types/plan'
 
 test.group('resolveEffectiveQuotas', () => {
@@ -75,5 +80,85 @@ test.group('resolveEffectiveQuotas', () => {
   test('extra_boats never degrades an unlimited (null) quota', ({ assert }) => {
     const quotas = resolveEffectiveQuotas('enterprise', [], [{ addon: 'extra_boats', quantity: 4 }])
     assert.isNull(quotas.maxBoats)
+  })
+})
+
+/**
+ * Restriction de profil sur la cartographie de port : une organisation déclarée
+ * « particulier » à l'inscription n'a pas de marina à modéliser, quel que soit
+ * son plan. Un profil non renseigné (`null`) ne restreint rien — un compte qui
+ * n'a jamais eu l'occasion de se déclarer ne doit pas perdre l'accès.
+ */
+test.group('restriction de profil — cartographie de port', () => {
+  test('isPortlessOrganizationProfile ne restreint que le profil particulier', ({ assert }) => {
+    assert.isTrue(isPortlessOrganizationProfile('private'))
+    assert.isFalse(isPortlessOrganizationProfile('marina'))
+    assert.isFalse(isPortlessOrganizationProfile('rental'))
+    assert.isFalse(isPortlessOrganizationProfile('school'))
+    assert.isFalse(isPortlessOrganizationProfile(null))
+  })
+
+  test('applyOrganizationProfileOverrides renvoie les quotas tels quels hors particulier', ({
+    assert,
+  }) => {
+    assert.strictEqual(
+      applyOrganizationProfileOverrides(PLAN_LIMITS.pro, null),
+      PLAN_LIMITS.pro,
+      "un profil sans restriction ne recopie même pas l'objet"
+    )
+    assert.strictEqual(
+      applyOrganizationProfileOverrides(PLAN_LIMITS.pro, 'marina'),
+      PLAN_LIMITS.pro
+    )
+  })
+
+  test('applyOrganizationProfileOverrides ne coupe que les ports et ne mute pas la source', ({
+    assert,
+  }) => {
+    const before = { ...PLAN_LIMITS.enterprise }
+    const quotas = applyOrganizationProfileOverrides(PLAN_LIMITS.enterprise, 'private')
+
+    assert.isFalse(quotas.canManagePorts)
+    assert.deepEqual(
+      { ...quotas, canManagePorts: true },
+      PLAN_LIMITS.enterprise,
+      'aucun autre quota ne bouge'
+    )
+    assert.deepEqual(PLAN_LIMITS.enterprise, before, "l'objet source reste intact")
+  })
+
+  test('canManagePortsFor croise le plan et le profil', ({ assert }) => {
+    assert.isTrue(canManagePortsFor('pro', null))
+    assert.isTrue(canManagePortsFor('pro', 'marina'))
+    assert.isTrue(canManagePortsFor('enterprise', 'rental'))
+    assert.isFalse(canManagePortsFor('pro', 'private'))
+    assert.isFalse(canManagePortsFor('enterprise', 'private'))
+    // Le plan continue de gouverner indépendamment du profil.
+    assert.isFalse(canManagePortsFor('starter', 'marina'))
+    assert.isFalse(canManagePortsFor('starter', 'private'))
+  })
+
+  test('le profil est appliqué après les modules et les add-ons', ({ assert }) => {
+    const quotas = resolveEffectiveQuotas(
+      'pro',
+      ['charter', 'crm_invoicing'],
+      [{ addon: 'extra_boats', quantity: 2 }],
+      'private'
+    )
+
+    assert.isFalse(quotas.canManagePorts, 'le profil retire les ports')
+    assert.isTrue(quotas.canManageReservations, 'les modules restent accordés')
+    assert.isTrue(quotas.canManageInvoices)
+    assert.equal(
+      quotas.maxBoats,
+      (PLAN_LIMITS.pro.maxBoats as number) + 2,
+      "l'add-on reste appliqué"
+    )
+  })
+
+  test('le quatrième argument omis ou nul laisse la résolution inchangée', ({ assert }) => {
+    assert.deepEqual(resolveEffectiveQuotas('pro', []), PLAN_LIMITS.pro)
+    assert.deepEqual(resolveEffectiveQuotas('pro', [], [], null), PLAN_LIMITS.pro)
+    assert.deepEqual(resolveEffectiveQuotas('pro', [], [], 'marina'), PLAN_LIMITS.pro)
   })
 })

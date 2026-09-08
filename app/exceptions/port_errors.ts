@@ -25,3 +25,13 @@ export class MouillageHasBoatsError extends Error {
 export class SpotNotFoundError extends Error {
   name = 'SpotNotFoundError'
 }
+
+/**
+ * Refus de la cartographie de port lié au **profil** de l'organisation (compte
+ * particulier), et non à son plan : aucun changement d'abonnement ne la
+ * débloquera, d'où une erreur distincte de `QuotaExceededError` — le message
+ * d'upsell vers un plan supérieur serait mensonger.
+ */
+export class PortsUnavailableForPrivateProfileError extends Error {
+  name = 'PortsUnavailableForPrivateProfileError'
+}

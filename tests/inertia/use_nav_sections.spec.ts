@@ -69,10 +69,11 @@ function mountWithPlan(
   currentPlan: unknown,
   activeModules: unknown = [],
   capabilities: Capability[] = MEMBER_CAPABILITIES,
-  role: string | null = 'member'
+  role: string | null = 'member',
+  organizationType: unknown = undefined
 ) {
   vi.mocked(usePage).mockReturnValue({
-    props: { currentPlan, activeModules, permissions: { role, capabilities } },
+    props: { currentPlan, activeModules, organizationType, permissions: { role, capabilities } },
   } as ReturnType<typeof usePage>)
 
   let result: ReturnType<typeof useNavSections> | undefined
@@ -212,6 +213,18 @@ test('no module grants ports on a starter plan', () => {
   const { navSections } = mountWithPlan('starter', ['crm_invoicing', 'charter'])
   const names = navSections.value[FLEET_SECTION_INDEX].items.map((i) => i.name)
   expect(names).not.toContain('ports.nav')
+})
+
+test('a private organization profile does NOT include ports.nav', () => {
+  const { navSections } = mountWithPlan('pro', [], MEMBER_CAPABILITIES, 'member', 'private')
+  const names = navSections.value.flatMap((s) => s.items.map((i) => i.name))
+  expect(names).not.toContain('ports.nav')
+})
+
+test('a professional organization profile keeps ports.nav', () => {
+  const { navSections } = mountWithPlan('pro', [], MEMBER_CAPABILITIES, 'member', 'marina')
+  const names = navSections.value.flatMap((s) => s.items.map((i) => i.name))
+  expect(names).toContain('ports.nav')
 })
 
 test('a pro plan without the ports.view capability does NOT include ports.nav', () => {

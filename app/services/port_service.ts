@@ -5,7 +5,7 @@ import Pontoon from '#models/pontoon'
 import Port from '#models/port'
 import Spot from '#models/spot'
 import type User from '#models/user'
-import { PLAN_LIMITS } from '#shared/types/plan'
+import { canManagePortsFor } from '#shared/helpers/plan'
 import db from '@adonisjs/lucid/services/db'
 import { PortHasBoatsError, PortNotFoundError } from '#exceptions/port_errors'
 import { UserNotInOrganizationError } from '#exceptions/organization_errors'
@@ -21,7 +21,8 @@ function assertPortInUserOrg(user: User, port: Port) {
 @inject()
 export default class PortService {
   /**
-   * Un plan Starter n'a pas accès à la cartographie de port (#604) : ses listes
+   * Un plan Starter — et, quel que soit son plan, une organisation déclarée
+   * particulier — n'a pas accès à la cartographie de port (#604) : ses listes
    * sont vides, ce qui escamote d'un coup toutes les surfaces qui les
    * consomment (sélecteur de place du formulaire bateau, ports du carnet de
    * bord, escales du budget, carte ports du dashboard) sans que chacune ait à
@@ -39,9 +40,9 @@ export default class PortService {
     if (user.organizationId === null) return null
     const org = await Organization.query()
       .where('id', user.organizationId)
-      .select('id', 'plan')
+      .select('id', 'plan', 'type')
       .first()
-    if (org === null || !PLAN_LIMITS[org.plan].canManagePorts) return null
+    if (org === null || !canManagePortsFor(org.plan, org.type)) return null
     return user.organizationId
   }
 

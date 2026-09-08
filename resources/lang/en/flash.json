@@ -347,7 +347,8 @@
     "blacklistedClient": "This client is blacklisted: booking not allowed."
   },
   "ports": {
-    "hasBoats": "Cannot delete this port: boats are assigned to it."
+    "hasBoats": "Cannot delete this port: boats are assigned to it.",
+    "unavailableForPrivateProfile": "Port mapping is not available for a private owner account."
   },
   "pontoons": {
     "hasBoats": "Cannot delete this pontoon: boats are assigned to it."

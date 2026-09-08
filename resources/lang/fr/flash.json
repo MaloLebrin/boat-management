@@ -347,7 +347,8 @@
     "blacklistedClient": "Ce client est blacklisté : réservation impossible."
   },
   "ports": {
-    "hasBoats": "Impossible de supprimer ce port : des bateaux y sont assignés."
+    "hasBoats": "Impossible de supprimer ce port : des bateaux y sont assignés.",
+    "unavailableForPrivateProfile": "La cartographie de port n'est pas disponible pour un compte particulier."
   },
   "pontoons": {
     "hasBoats": "Impossible de supprimer ce ponton : des bateaux y sont assignés."

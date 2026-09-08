@@ -2,6 +2,7 @@ import { test } from '@japa/runner'
 import QuotaService from '#services/quota_service'
 import OrganizationModuleService from '#services/organization_module_service'
 import { QuotaExceededError } from '#exceptions/quota_errors'
+import { PortsUnavailableForPrivateProfileError } from '#exceptions/port_errors'
 import { OrganizationFactory } from '#database/factories/organization_factory'
 import { UserFactory } from '#database/factories/user_factory'
 import { BoatFactory } from '#database/factories/boat_factory'
@@ -267,5 +268,79 @@ test.group('QuotaService (unit)', () => {
     assert.instanceOf(error, QuotaExceededError)
     assert.equal(error!.feature, 'ports')
     assert.equal(error!.upgradeTo, 'pro')
+  })
+
+  // ── garde de profil : organisation « particulier » ────────────────────────
+
+  test('canManagePorts retourne false pour un profil particulier, quel que soit le plan', async ({
+    assert,
+  }) => {
+    const pro = await OrganizationFactory.merge({ plan: 'pro', type: 'private' }).make()
+    const enterprise = await OrganizationFactory.merge({
+      plan: 'enterprise',
+      type: 'private',
+    }).make()
+
+    const svc = await app.container.make(QuotaService)
+    assert.isFalse(svc.canManagePorts(pro))
+    assert.isFalse(svc.canManagePorts(enterprise))
+  })
+
+  test('canManagePorts reste true pour un profil professionnel ou non renseigné', async ({
+    assert,
+  }) => {
+    const marina = await OrganizationFactory.merge({ plan: 'pro', type: 'marina' }).make()
+    const undeclared = await OrganizationFactory.merge({ plan: 'pro', type: null }).make()
+
+    const svc = await app.container.make(QuotaService)
+    assert.isTrue(svc.canManagePorts(marina))
+    assert.isTrue(svc.canManagePorts(undeclared))
+  })
+
+  test('assertCanManagePorts distingue le refus de profil du refus de plan', async ({ assert }) => {
+    const org = await OrganizationFactory.merge({ plan: 'pro', type: 'private' }).make()
+
+    const svc = await app.container.make(QuotaService)
+    let error: unknown
+    try {
+      svc.assertCanManagePorts(org)
+    } catch (err) {
+      error = err
+    }
+
+    // L'upsell de `QuotaExceededError` mentirait : aucun plan n'ouvre les ports
+    // à un particulier.
+    assert.instanceOf(error, PortsUnavailableForPrivateProfileError)
+    assert.notInstanceOf(error, QuotaExceededError)
+  })
+
+  test('assertCanManagePorts privilégie le refus de profil même en plan starter', async ({
+    assert,
+  }) => {
+    const org = await OrganizationFactory.merge({ plan: 'starter', type: 'private' }).make()
+
+    const svc = await app.container.make(QuotaService)
+    assert.throws(() => svc.assertCanManagePorts(org), PortsUnavailableForPrivateProfileError)
+  })
+
+  test('assertCanManagePorts ne throw pas pour un plan pro au profil marina', async ({
+    assert,
+  }) => {
+    const org = await OrganizationFactory.merge({ plan: 'pro', type: 'marina' }).make()
+
+    const svc = await app.container.make(QuotaService)
+    assert.doesNotThrow(() => svc.assertCanManagePorts(org))
+  })
+
+  test('getEffectiveQuotas coupe les ports pour un profil particulier', async ({ assert }) => {
+    const org = await OrganizationFactory.merge({ plan: 'pro', type: 'private' }).create()
+
+    const svc = await app.container.make(OrganizationModuleService)
+    const quotas = await svc.getEffectiveQuotas(org)
+
+    assert.isFalse(quotas.canManagePorts)
+    // Les autres capacités du plan restent celles du tier.
+    assert.isTrue(quotas.canUseAI)
+    assert.isTrue(quotas.canExport)
   })
 })
