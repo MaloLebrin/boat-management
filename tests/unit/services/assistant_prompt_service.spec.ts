@@ -211,6 +211,56 @@ test.group('Assistant — parseProposedAction erreurs de validation', () => {
     )
   })
 
+  test('une date que Luxon rejette leve AiInvalidResponseError meme si Date.parse l accepte', ({
+    assert,
+  }) => {
+    // `Date.parse` accepte ces deux formes ; `DateTime.fromISO` non. Les
+    // laisser passer stockerait une proposition qui casse a la confirmation.
+    for (const departedAt of ['2026-09-07 14:30', '07/09/2026']) {
+      assert.throws(
+        () =>
+          parseAssistantReply(
+            JSON.stringify({
+              type: 'propose_action',
+              message: 'Sortie',
+              action: {
+                kind: 'start_trip',
+                boatId: 1,
+                departedAt,
+                departurePortName: null,
+                engineHoursStart: null,
+                crewCount: null,
+                notes: null,
+              },
+            })
+          ),
+        AiInvalidResponseError
+      )
+    }
+  })
+
+  test('une date ISO valide passe', ({ assert }) => {
+    const reply = parseAssistantReply(
+      JSON.stringify({
+        type: 'propose_action',
+        message: 'Sortie',
+        action: {
+          kind: 'start_trip',
+          boatId: 1,
+          departedAt: '2026-09-07T14:30',
+          departurePortName: 'Camaret',
+          engineHoursStart: null,
+          crewCount: null,
+          notes: null,
+        },
+      })
+    )
+    assert.equal(reply.type, 'propose_action')
+    if (reply.type === 'propose_action' && reply.action.kind === 'start_trip') {
+      assert.equal(reply.action.departedAt, '2026-09-07T14:30')
+    }
+  })
+
   test('log_fuel sans quantityLiters leve AiInvalidResponseError', ({ assert }) => {
     assert.throws(
       () =>

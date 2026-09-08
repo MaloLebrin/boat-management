@@ -5,11 +5,13 @@ import type {
   AssistantEngineHoursAction,
   AssistantPartStockAction,
   AssistantPendingAction,
+  AssistantReservationAction,
   AssistantTaskAction,
 } from '../../shared/types/assistant'
 
 const routerPost = vi.fn()
 let capabilities: string[] = ['maintenance.create']
+let currentPlan = 'enterprise'
 
 vi.mock('@inertiajs/vue3', () => ({
   router: { post: (...args: unknown[]) => routerPost(...args) },
@@ -46,6 +48,9 @@ vi.mock('@inertiajs/vue3', () => ({
       },
       locale: 'fr',
       permissions: { role: 'admin', capabilities },
+      currentPlan,
+      activeModules: [],
+      activeAddons: [],
     },
   }),
 }))
@@ -101,6 +106,26 @@ function makePartStockAction(
   }
 }
 
+function makeReservationAction(
+  overrides: Partial<AssistantReservationAction> = {}
+): AssistantReservationAction {
+  return {
+    kind: 'create_reservation',
+    boatId: 1,
+    boatName: 'Mistral II',
+    startsAt: '2026-09-07T09:00',
+    endsAt: '2026-09-09T18:00',
+    tzOffsetMinutes: -120,
+    clientId: null,
+    clientName: 'Eric Tabarly',
+    clientEmail: null,
+    clientPhone: null,
+    reservationType: null,
+    notes: null,
+    ...overrides,
+  }
+}
+
 function mountCard(proposal: AssistantPendingAction = makeTaskProposal()) {
   return mount(AssistantActionCard, { props: { token: 'cafebabe0001', proposal } })
 }
@@ -109,6 +134,7 @@ describe('AssistantActionCard', () => {
   beforeEach(() => {
     routerPost.mockClear()
     capabilities = ['maintenance.create', 'boats.edit']
+    currentPlan = 'enterprise'
   })
 
   test('affiche le recapitulatif de la proposition create_task (compat)', () => {
@@ -172,5 +198,24 @@ describe('AssistantActionCard', () => {
     const labels = wrapper.findAll('button').map((b) => b.text())
     expect(labels).not.toContain('Confirmer')
     expect(labels).toContain('Refuser')
+  })
+
+  test('create_reservation confirmable avec la capability et le plan', () => {
+    capabilities = ['boats.manage']
+    const labels = mountCard(makeReservationAction())
+      .findAll('button')
+      .map((b) => b.text())
+    expect(labels).toContain('Confirmer')
+  })
+
+  test('create_reservation masque quand le plan ne porte pas les reservations', () => {
+    // La capability suffit au role, mais le serveur re-verifie le flag de plan :
+    // afficher le bouton mènerait à un clic qui echoue.
+    capabilities = ['boats.manage']
+    currentPlan = 'pro'
+    const wrapper = mountCard(makeReservationAction())
+    const labels = wrapper.findAll('button').map((b) => b.text())
+    expect(labels).not.toContain('Confirmer')
+    expect(wrapper.text()).toContain("Vous n'avez pas la permission")
   })
 })

@@ -2,6 +2,7 @@ import { AiInvalidResponseError } from '#exceptions/ai_errors'
 import {
   AssistantActionEntityGoneError,
   AssistantActionNotAllowedError,
+  AssistantActionNotExecutableError,
 } from '#exceptions/assistant_errors'
 import type Boat from '#models/boat'
 import BoatEngine from '#models/boat_engine'
@@ -34,8 +35,10 @@ import {
   type AssistantActionOutcome,
   type AssistantFleetRoster,
   type AssistantPendingAction,
+  type AssistantProposalContext,
   type AssistantProposedAction,
 } from '#shared/types/assistant'
+import { ROLE_PERMISSIONS } from '#shared/types/permissions'
 import type { PlanQuotas } from '#shared/types/plan'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
@@ -77,10 +80,16 @@ export default class AssistantActionsService {
     const quotas =
       effectiveQuotas ?? (await this.moduleService.getEffectiveQuotas(user.organization))
 
+    // Rôle résolu UNE fois : `user.hasPermission` refait un SELECT sur
+    // `organization_memberships` à chaque appel, soit neuf par tour ici.
+    const role = await user.getEffectiveRoleInOrg(user.organizationId)
+    if (role === null) return []
+    const granted = ROLE_PERMISSIONS[role]
+
     const kinds: AssistantActionKind[] = []
     for (const kind of ASSISTANT_ACTION_KINDS) {
       const meta = ASSISTANT_ACTION_META[kind]
-      if (!(await user.hasPermission(user.organizationId, meta.capability))) continue
+      if (!granted.has(meta.capability)) continue
       if (meta.planFlag !== undefined && !quotas[meta.planFlag]) continue
       kinds.push(kind)
     }
@@ -97,9 +106,10 @@ export default class AssistantActionsService {
   async validateProposal(
     user: User,
     action: AssistantProposedAction,
-    roster: AssistantFleetRoster
+    roster: AssistantFleetRoster,
+    context: AssistantProposalContext
   ): Promise<AssistantPendingAction> {
-    const allowed = await this.allowedKindsFor(user)
+    const allowed = await this.allowedKindsFor(user, context.quotas)
     if (!allowed.includes(action.kind)) {
       throw new AiInvalidResponseError('Assistant proposed an action not offered to this user')
     }
@@ -156,7 +166,13 @@ export default class AssistantActionsService {
 
       case 'start_trip': {
         const { kind, boatId, ...rest } = action
-        return { kind, boatId, boatName: boat.name, ...rest }
+        return {
+          kind,
+          boatId,
+          boatName: boat.name,
+          tzOffsetMinutes: context.tzOffsetMinutes,
+          ...rest,
+        }
       }
 
       case 'close_trip': {
@@ -174,7 +190,9 @@ export default class AssistantActionsService {
           .where('status', 'in_progress')
           .first()
         if (log === null) {
-          throw new AiInvalidResponseError('Assistant close_trip: the boat has no trip in progress')
+          // État normal de la flotte, pas une réponse malformée : le tour
+          // continue et l'assistant le dit (cf. `AssistantChatService`).
+          throw new AssistantActionNotExecutableError('no_trip_in_progress')
         }
         const { kind, boatId, ...rest } = action
         return {
@@ -184,6 +202,7 @@ export default class AssistantActionsService {
           logId: log.id,
           departedAt: log.departedAt?.toISO() ?? '',
           engineLabel,
+          tzOffsetMinutes: context.tzOffsetMinutes,
           ...rest,
         }
       }
@@ -203,7 +222,13 @@ export default class AssistantActionsService {
 
       case 'report_incident': {
         const { kind, boatId, ...rest } = action
-        return { kind, boatId, boatName: boat.name, ...rest }
+        return {
+          kind,
+          boatId,
+          boatName: boat.name,
+          tzOffsetMinutes: context.tzOffsetMinutes,
+          ...rest,
+        }
       }
 
       case 'create_reservation': {
@@ -220,7 +245,13 @@ export default class AssistantActionsService {
           }
         }
         const { kind, boatId, ...rest } = action
-        return { kind, boatId, boatName: boat.name, ...rest }
+        return {
+          kind,
+          boatId,
+          boatName: boat.name,
+          tzOffsetMinutes: context.tzOffsetMinutes,
+          ...rest,
+        }
       }
 
       case 'set_part_stock': {
@@ -377,6 +408,9 @@ export default class AssistantActionsService {
       case 'start_trip': {
         const log = await this.navigationLogService.createForBoat(boat!, {
           departedAt: pending.departedAt,
+          // Le confirm n'accepte aucun payload : l'offset vient de la
+          // proposition, sinon la wall-clock locale serait écrite en UTC.
+          tzOffsetMinutes: pending.tzOffsetMinutes ?? undefined,
           departurePortName: pending.departurePortName,
           engineHoursStart: pending.engineHoursStart,
           crewCount: pending.crewCount,
@@ -399,16 +433,18 @@ export default class AssistantActionsService {
       }
 
       case 'close_trip': {
-        // Re-résolution défensive : la sortie de la proposition peut avoir été
-        // clôturée entre-temps — l'unique `in_progress` du bateau fait foi.
+        // Re-résolution défensive : la sortie proposée peut avoir été clôturée
+        // entre-temps. Elle doit rester CELLE de la proposition — sinon un
+        // départ ouvert depuis serait clôturé avec les données de la carte.
         const log = await NavigationLog.query()
           .select('id')
           .where('boatId', boat!.id)
           .where('status', 'in_progress')
           .first()
-        if (log === null) throw new AssistantActionEntityGoneError()
+        if (log === null || log.id !== pending.logId) throw new AssistantActionEntityGoneError()
         const closed = await this.navigationLogService.closeTrip(boat!, log.id, {
           arrivedAt: pending.arrivedAt,
+          tzOffsetMinutes: pending.tzOffsetMinutes ?? undefined,
           arrivalPortName: pending.arrivalPortName,
           distanceNm: pending.distanceNm,
           engineHoursEnd: pending.engineHoursEnd,
@@ -462,6 +498,7 @@ export default class AssistantActionsService {
       case 'report_incident': {
         const incident = await this.incidentService.createForBoat(user, boat!, {
           occurredAt: pending.occurredAt,
+          tzOffsetMinutes: pending.tzOffsetMinutes ?? undefined,
           type: pending.incidentType,
           location: pending.location,
           description: pending.description,
@@ -486,6 +523,7 @@ export default class AssistantActionsService {
         const { reservation } = await this.reservationService.create(user, boat!, {
           startsAt: pending.startsAt,
           endsAt: pending.endsAt,
+          tzOffsetMinutes: pending.tzOffsetMinutes ?? undefined,
           clientId: pending.clientId,
           clientName: pending.clientName,
           clientEmail: pending.clientEmail,

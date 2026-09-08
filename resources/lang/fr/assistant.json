@@ -147,8 +147,8 @@
     "cta": "Découvrir les plans IA"
   },
   "starters": {
-    "overdue": "Quelles sont les {count} tâches en retard et lesquelles traiter en priorité ?",
-    "dueSoon": "Que dois-je préparer pour les {count} tâches bientôt dues ?",
+    "overdue": "{count, plural, one {Quelle est la tâche en retard et faut-il la traiter en priorité ?} other {Quelles sont les # tâches en retard et lesquelles traiter en priorité ?}}",
+    "dueSoon": "{count, plural, one {Que dois-je préparer pour la tâche bientôt due ?} other {Que dois-je préparer pour les # tâches bientôt dues ?}}",
     "boatPage": "Quel est l'état du bateau {boat} ?",
     "reservations": "Quelles sont les prochaines réservations de la flotte ?",
     "navigation": "Quelles sont les dernières sorties et les derniers pleins ?",

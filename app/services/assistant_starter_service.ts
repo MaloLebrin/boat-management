@@ -25,18 +25,20 @@ export default class AssistantStarterService {
     const starters: AssistantStarterProps[] = []
 
     try {
-      const planning = await this.planningService.getPlanningForOrg(user)
-      if (planning.overdueTasks.length > 0) {
+      // Comptes seuls : `countDueTasksForOrg` classe comme le planning sans
+      // construire tâches terminées, totaux ni groupes — deux nombres suffisent.
+      const due = await this.planningService.countDueTasksForOrg(user)
+      if (due.overdue > 0) {
         starters.push({
           id: 'overdue',
           i18nKey: 'assistant.starters.overdue',
-          params: { count: String(planning.overdueTasks.length) },
+          params: { count: String(due.overdue) },
         })
-      } else if (planning.soonTasks.length > 0) {
+      } else if (due.soon > 0) {
         starters.push({
           id: 'dueSoon',
           i18nKey: 'assistant.starters.dueSoon',
-          params: { count: String(planning.soonTasks.length) },
+          params: { count: String(due.soon) },
         })
       }
     } catch {

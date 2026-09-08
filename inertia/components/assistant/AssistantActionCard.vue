@@ -3,12 +3,13 @@ import { router } from '@inertiajs/vue3'
 import { computed, ref } from 'vue'
 import AssistantActionSummary from '~/components/assistant/AssistantActionSummary.vue'
 import { usePermissions } from '~/composables/use_permissions'
+import { usePlan } from '~/composables/use_plan'
 import { useT } from '~/composables/use_t'
 import { ASSISTANT_ACTION_META, type AssistantPendingAction } from '#shared/types/assistant'
 
 /**
  * Carte de confirmation d'une proposition d'action. Les boutons n'envoient
- * AUCUN payload : le serveur execute uniquement la proposition stockee dans
+ * AUCUN payload : le serveur exécute uniquement la proposition stockée dans
  * `pending_action` (et la policy Bouncer reste le vrai garde-fou — le masquage
  * du bouton sans capability n'est que du confort).
  */
@@ -19,6 +20,7 @@ const props = defineProps<{
 
 const { t } = useT()
 const { can } = usePermissions()
+const { effectiveQuotas } = usePlan()
 
 const processing = ref(false)
 
@@ -30,10 +32,16 @@ const taskTitle = computed(() =>
   props.proposal.kind === 'create_task' ? props.proposal.title : null
 )
 
-/** Whether the user has the capability to confirm this action. */
+/**
+ * Confirmation possible : capability du rôle ET flag de plan effectif — les
+ * deux gardes que le serveur re-vérifie au confirm. Sans le flag, un plan
+ * rétrogradé après la proposition afficherait un bouton qui échoue au clic.
+ */
 const canConfirm = computed(() => {
   const meta = ASSISTANT_ACTION_META[props.proposal.kind]
-  return can(meta.capability)
+  if (!can(meta.capability)) return false
+  if (meta.planFlag === undefined) return true
+  return effectiveQuotas.value?.[meta.planFlag] === true
 })
 
 /** Confirm button label — task-specific for create_task, generic otherwise. */

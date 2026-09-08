@@ -147,8 +147,8 @@
     "cta": "Discover AI plans"
   },
   "starters": {
-    "overdue": "What are the {count} overdue tasks and which should I handle first?",
-    "dueSoon": "What should I prepare for the {count} tasks due soon?",
+    "overdue": "{count, plural, one {What is the overdue task and should I handle it first?} other {What are the # overdue tasks and which should I handle first?}}",
+    "dueSoon": "{count, plural, one {What should I prepare for the task due soon?} other {What should I prepare for the # tasks due soon?}}",
     "boatPage": "What is the current status of {boat}?",
     "reservations": "What are the fleet's upcoming reservations?",
     "navigation": "What are the latest trips and refuelings?",

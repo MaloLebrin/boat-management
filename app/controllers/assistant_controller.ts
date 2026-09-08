@@ -67,12 +67,10 @@ export default class AssistantController {
       await user.load('organization')
       this.quotaService.assertCanUseAI(user.organization)
 
-      await this.chatService.start(
-        user,
-        payload.message,
-        toAppLocale(i18n.locale),
-        payload.pageUrl ?? null
-      )
+      await this.chatService.start(user, payload.message, toAppLocale(i18n.locale), {
+        pageUrl: payload.pageUrl ?? null,
+        tzOffsetMinutes: payload.tzOffsetMinutes ?? null,
+      })
     } catch (error) {
       this.#flashError(error, session, i18n)
     }
@@ -90,12 +88,10 @@ export default class AssistantController {
       await user.load('organization')
       this.quotaService.assertCanUseAI(user.organization)
 
-      await this.chatService.addMessage(
-        user,
-        String(params.token),
-        payload.message,
-        payload.pageUrl ?? null
-      )
+      await this.chatService.addMessage(user, String(params.token), payload.message, {
+        pageUrl: payload.pageUrl ?? null,
+        tzOffsetMinutes: payload.tzOffsetMinutes ?? null,
+      })
     } catch (error) {
       this.#flashError(error, session, i18n)
     }

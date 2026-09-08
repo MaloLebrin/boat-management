@@ -1,11 +1,13 @@
 import { AiInvalidResponseError } from '#exceptions/ai_errors'
 import {
+  AssistantActionNotExecutableError,
   AssistantConversationBudgetExceededError,
   AssistantConversationNotFoundError,
   AssistantCustomKeyFailedError,
   AssistantMaxMessagesReachedError,
   AssistantNoPendingActionError,
   AssistantPendingActionRequiredError,
+  type AssistantNotExecutableReason,
 } from '#exceptions/assistant_errors'
 import AiAssistantConversation from '#models/ai_assistant_conversation'
 import type Boat from '#models/boat'
@@ -37,6 +39,7 @@ import {
   type AssistantFleetRoster,
   type AssistantMessage,
   type AssistantPendingAction,
+  type AssistantTurnContext,
 } from '#shared/types/assistant'
 import {
   ASSISTANT_MAX_TOOL_CALLS_PER_TURN,
@@ -65,6 +68,23 @@ import { randomBytes } from 'node:crypto'
  *   de tokens mensuel de l'app ne s'applique plus, l'usage reste enregistré
  *   pour les statistiques.
  */
+/**
+ * Réponses de repli quand une proposition n'est pas exécutable en l'état :
+ * texte du serveur, jamais du modèle — même règle que les cartes.
+ */
+const NOT_EXECUTABLE_MESSAGES: Record<
+  AssistantNotExecutableReason,
+  Record<AiSuggestionLocale, string>
+> = {
+  no_trip_in_progress: {
+    fr: "Aucune sortie n'est en cours sur ce bateau : il n'y a rien à clôturer. Ouvrez d'abord une sortie, ou dites-moi si vous vouliez en enregistrer une déjà terminée.",
+    en: 'No trip is in progress on this boat, so there is nothing to close. Open a trip first, or tell me if you meant to record one that is already finished.',
+  },
+}
+
+/** Tour sans contexte client (appels internes, tests). */
+const EMPTY_TURN_CONTEXT: AssistantTurnContext = { pageUrl: null, tzOffsetMinutes: null }
+
 @inject()
 export default class AssistantChatService {
   constructor(
@@ -93,7 +113,7 @@ export default class AssistantChatService {
     user: User,
     message: string,
     locale: AiSuggestionLocale,
-    pageUrl: string | null = null
+    turn: AssistantTurnContext = EMPTY_TURN_CONTEXT
   ): Promise<AiAssistantConversation> {
     await this.#loadOrganization(user)
 
@@ -114,7 +134,7 @@ export default class AssistantChatService {
     conversation.pendingAction = null
     conversation.tokensUsed = 0
 
-    return this.#exchangeWithQuota(conversation, message, user, pageUrl)
+    return this.#exchangeWithQuota(conversation, message, user, turn)
   }
 
   /** Ajoute un message utilisateur à la conversation active. */
@@ -122,7 +142,7 @@ export default class AssistantChatService {
     user: User,
     token: string,
     message: string,
-    pageUrl: string | null = null
+    turn: AssistantTurnContext = EMPTY_TURN_CONTEXT
   ): Promise<AiAssistantConversation> {
     await this.#loadOrganization(user)
 
@@ -141,7 +161,7 @@ export default class AssistantChatService {
       throw new AssistantConversationBudgetExceededError()
     }
 
-    return this.#exchangeWithQuota(conversation, message, user, pageUrl)
+    return this.#exchangeWithQuota(conversation, message, user, turn)
   }
 
   /** Conversation active possédant une action en attente — pour la confirmation. */
@@ -229,7 +249,7 @@ export default class AssistantChatService {
     conversation: AiAssistantConversation,
     message: string,
     user: User,
-    pageUrl: string | null
+    turn: AssistantTurnContext
   ): Promise<AiAssistantConversation> {
     return this.aiTokenQuotaService.withOrgLock(user.organization.id, async () => {
       const active = await this.organizationAiKeyService.resolveActiveKey(user.organization)
@@ -237,7 +257,7 @@ export default class AssistantChatService {
         const currentUsage = await this.aiTokenQuotaService.getUsage(user.organization.id)
         this.aiTokenQuotaService.assertCanUseTokens(user.organization, currentUsage)
       }
-      return this.#exchange(conversation, message, user, active, pageUrl)
+      return this.#exchange(conversation, message, user, active, turn)
     })
   }
 
@@ -255,7 +275,7 @@ export default class AssistantChatService {
     userMessage: string,
     user: User,
     active: { provider: AiProvider; apiKey: string } | null,
-    pageUrl: string | null
+    turn: AssistantTurnContext
   ): Promise<AiAssistantConversation> {
     const roster = await this.contextService.buildFleetRoster(user)
 
@@ -279,7 +299,7 @@ export default class AssistantChatService {
       user,
       roster,
       allowedKinds,
-      pageUrl,
+      turn.pageUrl,
       quotas
     )
 
@@ -358,7 +378,23 @@ export default class AssistantChatService {
     }
 
     if (reply.type === 'propose_action') {
-      pendingAction = await this.actionsService.validateProposal(user, reply.action, roster)
+      try {
+        pendingAction = await this.actionsService.validateProposal(user, reply.action, roster, {
+          quotas,
+          tzOffsetMinutes: turn.tzOffsetMinutes,
+        })
+      } catch (error) {
+        // La flotte ne permet pas d'exécuter l'action (aucune sortie ouverte à
+        // clôturer, par exemple) : ce n'est pas une réponse malformée, on ne
+        // jette pas le tour — l'assistant l'explique et le fil continue.
+        if (!(error instanceof AssistantActionNotExecutableError)) throw error
+        assistantMessage = {
+          role: 'assistant',
+          content:
+            NOT_EXECUTABLE_MESSAGES[error.reason][conversation.locale === 'fr' ? 'fr' : 'en'],
+          source: 'fleet_data',
+        }
+      }
     }
 
     if (reply.type === 'handoff') {

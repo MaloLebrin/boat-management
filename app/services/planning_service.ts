@@ -11,6 +11,12 @@ import { DateTime } from 'luxon'
 
 export type { PlanningResult }
 
+/** Seuil « bientôt due » d'une tâche en heures moteur. */
+const SOON_HOURS_THRESHOLD = 50
+
+/** Champs d'une tâche qui suffisent à la classer en retard / bientôt due. */
+type DueScoring = Pick<PlanningTask, 'kind' | 'dueAt' | 'dueEngineHours' | 'currentEngineHours'>
+
 @inject()
 export default class PlanningService {
   constructor(private taskGroupingService: TaskGroupingService) {}
@@ -76,7 +82,6 @@ export default class PlanningService {
 
     const today = DateTime.now().startOf('day')
     const soonDateThreshold = today.plus({ days: 30 })
-    const soonHoursThreshold = 50
 
     const toTask = (t: BoatMaintenanceTask): PlanningTask => {
       const boat = boatMap.get(t.boatId)!
@@ -112,7 +117,7 @@ export default class PlanningService {
       }
 
       const isOverdue = this.isOverdue(task, today)
-      const isSoon = this.isSoon(task, today, soonDateThreshold, soonHoursThreshold)
+      const isSoon = this.isSoon(task, today, soonDateThreshold, SOON_HOURS_THRESHOLD)
 
       if (isOverdue) {
         overdueTasks.push(task)
@@ -138,7 +143,59 @@ export default class PlanningService {
     }
   }
 
-  private isOverdue(task: PlanningTask, today: DateTime): boolean {
+  /**
+   * Compte seul des tâches en retard / bientôt dues — même classement que
+   * `getPlanningForOrg`, sans les tâches terminées, leur total, la ligne
+   * organisation ni le groupement. Pour les appelants qui n'ont besoin que des
+   * deux nombres (suggestions de démarrage du copilote).
+   */
+  async countDueTasksForOrg(user: User): Promise<{ overdue: number; soon: number }> {
+    if (user.organizationId === null) return { overdue: 0, soon: 0 }
+
+    const boats = await Boat.query()
+      .select('id')
+      .where('organizationId', user.organizationId)
+      .preload('engines', (query) => query.select('id', 'boatId', 'hours'))
+
+    if (boats.length === 0) return { overdue: 0, soon: 0 }
+
+    const engineHours = new Map<number, number | null>()
+    for (const boat of boats) {
+      for (const engine of boat.engines) engineHours.set(engine.id, engine.hours)
+    }
+
+    const rawTasks = await BoatMaintenanceTask.query()
+      .select('id', 'boatId', 'boatEngineId', 'dueAt', 'dueEngineHours')
+      .whereIn(
+        'boatId',
+        boats.map((b) => b.id)
+      )
+      .where('status', 'open')
+
+    const today = DateTime.now().startOf('day')
+    const soonDateThreshold = today.plus({ days: 30 })
+
+    let overdue = 0
+    let soon = 0
+    for (const task of rawTasks) {
+      const dueAt = task.dueAt ? task.dueAt.toISODate() : null
+      if (dueAt === null && task.dueEngineHours === null) continue
+
+      const scored: DueScoring = {
+        kind: task.dueEngineHours !== null ? 'hours' : 'date',
+        dueAt,
+        dueEngineHours: task.dueEngineHours,
+        currentEngineHours: task.boatEngineId ? (engineHours.get(task.boatEngineId) ?? null) : null,
+      }
+
+      if (this.isOverdue(scored, today)) overdue += 1
+      else if (this.isSoon(scored, today, soonDateThreshold, SOON_HOURS_THRESHOLD)) soon += 1
+    }
+
+    return { overdue, soon }
+  }
+
+  private isOverdue(task: DueScoring, today: DateTime): boolean {
     if (task.kind === 'date' && task.dueAt) {
       const dueDate = DateTime.fromISO(task.dueAt)
       return dueDate < today
@@ -152,7 +209,7 @@ export default class PlanningService {
   }
 
   private isSoon(
-    task: PlanningTask,
+    task: DueScoring,
     today: DateTime,
     soonDateThreshold: DateTime,
     soonHoursThreshold: number

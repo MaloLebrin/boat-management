@@ -822,6 +822,84 @@ test.group('Assistant FleetAi chat — agent actionnable et contexte de page', (
     }
   })
 
+  test('close_trip sans sortie en cours répond au lieu de jeter le tour', async ({
+    assert,
+    client,
+  }) => {
+    const user = await createAdminUser()
+    const { boat } = await makeBoat(user.organizationId!)
+    // État normal de la flotte, pas une réponse malformée : la conversation
+    // doit exister et porter une réponse, sans action en attente.
+    swapAiService(
+      JSON.stringify({
+        type: 'propose_action',
+        message: 'I will close the trip.',
+        action: {
+          kind: 'close_trip',
+          boatId: boat.id,
+          arrivedAt: '2026-09-07T18:00',
+          arrivalPortName: 'Brest',
+          distanceNm: null,
+          engineHoursEnd: null,
+          boatEngineId: null,
+          fuelConsumedLiters: null,
+          notes: null,
+        },
+      })
+    )
+
+    const response = await client
+      .post('/assistant/conversations')
+      .loginAs(user)
+      .form({ message: 'Close the trip for Mistral II' })
+      .redirects(0)
+
+    response.assertFlashMissing('error')
+    const [conversation] = await AiAssistantConversation.all()
+    assert.isNull(conversation.pendingAction)
+    const last = conversation.messages.at(-1)!
+    assert.equal(last.role, 'assistant')
+    assert.include(last.content, 'No trip is in progress')
+    assert.isUndefined(last.card)
+  })
+
+  test("le décalage de fuseau du message est recopié dans l'action en attente", async ({
+    assert,
+    client,
+  }) => {
+    const user = await createAdminUser()
+    const { boat } = await makeBoat(user.organizationId!)
+    swapAiService(
+      JSON.stringify({
+        type: 'propose_action',
+        message: 'Open the trip?',
+        action: {
+          kind: 'start_trip',
+          boatId: boat.id,
+          departedAt: '2026-09-07T09:00',
+          departurePortName: 'Camaret',
+          engineHoursStart: null,
+          crewCount: null,
+          notes: null,
+        },
+      })
+    )
+
+    const response = await client
+      .post('/assistant/conversations')
+      .loginAs(user)
+      .form({ message: 'We are leaving Camaret at 9', tzOffsetMinutes: -120 })
+      .redirects(0)
+
+    response.assertFlashMissing('error')
+    const [conversation] = await AiAssistantConversation.all()
+    const pending = conversation.pendingAction
+    assert.equal(pending?.kind, 'start_trip')
+    if (pending?.kind === 'start_trip') {
+      assert.equal(pending.tzOffsetMinutes, -120)
+    }
+  })
+
   test('un kind non offert au rôle ne persiste rien', async ({ assert, client }) => {
     const admin = await createAdminUser()
     await makeBoat(admin.organizationId!)

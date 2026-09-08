@@ -4,6 +4,7 @@ import type { AuditAction } from '#shared/types/audit_log'
 import type { IncidentType } from '#shared/types/incident'
 import type { MaintenanceTaskSubject } from '#shared/types/maintenance'
 import type { Capability } from '#shared/types/permissions'
+import type { PlanQuotas } from '#shared/types/plan'
 import type { ReservationType } from '#shared/types/reservation'
 
 /**
@@ -28,6 +29,15 @@ export const ASSISTANT_MESSAGE_MAX_LENGTH = 4000
  * Purement indicative pour le prompt — jamais stockée.
  */
 export const ASSISTANT_PAGE_URL_MAX_LENGTH = 300
+
+/**
+ * Bornes du décalage de fuseau envoyé avec un message (`Date#getTimezoneOffset()`,
+ * minutes à ajouter à l'heure locale pour obtenir UTC) : de -840 (UTC+14) à
+ * +720 (UTC-12). Stocké dans les actions datées pour que la confirmation, qui
+ * n'accepte aucun payload, retrouve l'heure que l'utilisateur voulait dire.
+ */
+export const ASSISTANT_TZ_OFFSET_MIN = -840
+export const ASSISTANT_TZ_OFFSET_MAX = 720
 
 /**
  * Fenêtre d'historique rejouée au modèle : le fil complet reste stocké et
@@ -394,6 +404,8 @@ export interface AssistantStartTripAction {
   boatId: number
   boatName: string
   departedAt: string
+  /** Décalage du navigateur au moment de la proposition — null si inconnu. */
+  tzOffsetMinutes: number | null
   departurePortName: string | null
   engineHoursStart: number | null
   crewCount: number | null
@@ -408,6 +420,8 @@ export interface AssistantCloseTripAction {
   logId: number
   departedAt: string
   arrivedAt: string
+  /** Décalage du navigateur au moment de la proposition — null si inconnu. */
+  tzOffsetMinutes: number | null
   arrivalPortName: string | null
   distanceNm: number | null
   engineHoursEnd: number | null
@@ -437,6 +451,8 @@ export interface AssistantIncidentAction {
   boatId: number
   boatName: string
   occurredAt: string
+  /** Décalage du navigateur au moment de la proposition — null si inconnu. */
+  tzOffsetMinutes: number | null
   incidentType: IncidentType
   location: string | null
   description: string
@@ -448,6 +464,8 @@ export interface AssistantReservationAction {
   boatName: string
   startsAt: string
   endsAt: string
+  /** Décalage du navigateur au moment de la proposition — null si inconnu. */
+  tzOffsetMinutes: number | null
   /** Client existant validé org — sinon null (client libre `clientName`). */
   clientId: number | null
   clientName: string
@@ -490,6 +508,27 @@ export type AssistantPendingAction =
   | AssistantReservationAction
   | AssistantClientAction
   | AssistantPartStockAction
+
+/**
+ * Contexte client d'un tour de conversation : la page depuis laquelle
+ * l'utilisateur écrit et le décalage de fuseau de son navigateur. Rien de tout
+ * cela n'est stocké dans le fil — le contexte de page est reconstruit à chaque
+ * tour, l'offset n'est recopié que dans les actions datées en attente.
+ */
+export interface AssistantTurnContext {
+  pageUrl: string | null
+  tzOffsetMinutes: number | null
+}
+
+/**
+ * Contexte du tour passé à la validation d'une proposition : quotas déjà
+ * résolus par l'appelant (évite un second calcul) et décalage de fuseau du
+ * navigateur, recopié dans les actions datées.
+ */
+export interface AssistantProposalContext {
+  quotas?: PlanQuotas
+  tzOffsetMinutes: number | null
+}
 
 /**
  * Cartes structurées attachées à un message assistant : leur texte est rendu

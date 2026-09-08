@@ -304,6 +304,7 @@ test.group('Assistant FleetAi actions — kinds de l’agent actionnable', (grou
       boatId: boat.id,
       boatName: 'Mistral II',
       occurredAt: '2026-09-06T16:30',
+      tzOffsetMinutes: null,
       incidentType: 'grounding',
       location: 'Chenal du Fromveur',
       description: 'Talonnage léger à marée basse, coque à inspecter.',
@@ -330,6 +331,7 @@ test.group('Assistant FleetAi actions — kinds de l’agent actionnable', (grou
       boatId: boat.id,
       boatName: 'Mistral II',
       departedAt: '2026-09-07T09:00',
+      tzOffsetMinutes: null,
       departurePortName: 'Camaret',
       engineHoursStart: null,
       crewCount: 3,
@@ -376,6 +378,7 @@ test.group('Assistant FleetAi actions — kinds de l’agent actionnable', (grou
       logId: log.id,
       departedAt: log.departedAt!.toISO()!,
       arrivedAt: DateTime.now().plus({ hours: 1 }).toISO()!,
+      tzOffsetMinutes: null,
       arrivalPortName: 'Brest',
       distanceNm: 12,
       engineHoursEnd: 120,
@@ -403,6 +406,7 @@ test.group('Assistant FleetAi actions — kinds de l’agent actionnable', (grou
         logId: log.id,
         departedAt: log.departedAt!.toISO()!,
         arrivedAt: DateTime.now().plus({ hours: 2 }).toISO()!,
+        tzOffsetMinutes: null,
         arrivalPortName: null,
         distanceNm: null,
         engineHoursEnd: null,
@@ -415,6 +419,83 @@ test.group('Assistant FleetAi actions — kinds de l’agent actionnable', (grou
     )
     const gone = await confirm(client, again.token, user)
     gone.assertFlashMessage('error', 'The item targeted by this proposal no longer exists.')
+  })
+
+  test("le décalage de fuseau de la proposition est appliqué à l'écriture", async ({
+    assert,
+    client,
+  }) => {
+    const user = await createAdminUser()
+    const { boat } = await makeBoat(user.organizationId!)
+    // -120 = `Date#getTimezoneOffset()` d'un navigateur en UTC+2 : 09:00 chez
+    // l'utilisateur doit être écrit 07:00 UTC, pas 09:00.
+    const conversation = await makeConversationWithPending(user, {
+      kind: 'start_trip',
+      boatId: boat.id,
+      boatName: 'Mistral II',
+      departedAt: '2026-09-07T09:00',
+      tzOffsetMinutes: -120,
+      departurePortName: 'Camaret',
+      engineHoursStart: null,
+      crewCount: null,
+      notes: null,
+    })
+
+    const response = await confirm(client, conversation.token, user)
+    response.assertFlashMessage('success', 'Trip opened in the logbook.')
+
+    const logs = await NavigationLog.query().where('boatId', boat.id)
+    assert.lengthOf(logs, 1)
+    assert.equal(logs[0].departedAt!.toUTC().toFormat('yyyy-MM-dd HH:mm'), '2026-09-07 07:00')
+  })
+
+  test('close_trip ne clôture jamais une autre sortie que celle proposée', async ({
+    assert,
+    client,
+  }) => {
+    const user = await createAdminUser()
+    const { boat } = await makeBoat(user.organizationId!)
+    const proposed = await NavigationLog.create({
+      boatId: boat.id,
+      organizationId: boat.organizationId,
+      status: 'in_progress',
+      departedAt: DateTime.now().minus({ hours: 6 }),
+    })
+    const conversation = await makeConversationWithPending(user, {
+      kind: 'close_trip',
+      boatId: boat.id,
+      boatName: 'Mistral II',
+      logId: proposed.id,
+      departedAt: proposed.departedAt!.toISO()!,
+      arrivedAt: DateTime.now().toISO()!,
+      tzOffsetMinutes: null,
+      arrivalPortName: 'Brest',
+      distanceNm: 12,
+      engineHoursEnd: null,
+      boatEngineId: null,
+      engineLabel: null,
+      fuelConsumedLiters: null,
+      notes: null,
+    })
+
+    // La sortie proposée est clôturée ailleurs, une autre est ouverte : la
+    // confirmation ne doit PAS lui appliquer les données de la carte.
+    proposed.status = 'completed'
+    proposed.arrivedAt = DateTime.now().minus({ hours: 1 })
+    await proposed.save()
+    const other = await NavigationLog.create({
+      boatId: boat.id,
+      organizationId: boat.organizationId,
+      status: 'in_progress',
+      departedAt: DateTime.now().minus({ minutes: 30 }),
+    })
+
+    const gone = await confirm(client, conversation.token, user)
+    gone.assertFlashMessage('error', 'The item targeted by this proposal no longer exists.')
+
+    await other.refresh()
+    assert.equal(other.status, 'in_progress')
+    assert.isNull(other.arrivalPortName)
   })
 
   test('create_client : créé avec le module CRM, refusé sans lui', async ({ assert, client }) => {

@@ -8,6 +8,7 @@ import AssistantUpsell from '~/components/assistant/AssistantUpsell.vue'
 import { useAssistantPanel } from '~/composables/use_assistant_panel'
 import { useNumberFormat } from '~/composables/use_number_format'
 import { useT } from '~/composables/use_t'
+import { tzOffsetMinutes } from '~/utils/local_datetime'
 import {
   ASSISTANT_AI_USAGE_WARNING_RATIO,
   ASSISTANT_MAX_USER_MESSAGES,
@@ -69,7 +70,13 @@ function submit(message: string) {
     url,
     // `pageUrl` : la page depuis laquelle l'utilisateur écrit — le serveur la
     // résout en contexte de prompt (« ce bateau »), jamais stockée.
-    { message, pageUrl: page.url.slice(0, ASSISTANT_PAGE_URL_MAX_LENGTH) },
+    // `tzOffsetMinutes` : la confirmation d'action n'envoie aucun payload, donc
+    // l'offset part avec le message et suit la proposition jusqu'à l'exécution.
+    {
+      message,
+      pageUrl: page.url.slice(0, ASSISTANT_PAGE_URL_MAX_LENGTH),
+      tzOffsetMinutes: tzOffsetMinutes(),
+    },
     {
       preserveScroll: true,
       preserveState: true,

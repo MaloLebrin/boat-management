@@ -13,6 +13,7 @@ import {
 import { INCIDENT_TYPES } from '#shared/types/incident'
 import type { MaintenanceTaskSubject } from '#shared/types/maintenance'
 import { RESERVATION_TYPES } from '#shared/types/reservation'
+import { DateTime } from 'luxon'
 
 /**
  * Prompts du copilote FleetAi — builders purs, même convention que
@@ -236,10 +237,15 @@ function toNullablePositiveNumber(value: unknown): number | null {
   return value
 }
 
-/** Date/heure ISO requise, en heure locale de l'utilisateur. */
+/**
+ * Date/heure ISO requise, en heure locale de l'utilisateur. Validée avec le
+ * MÊME parseur que l'écriture (`toDateTime` → `DateTime.fromISO`) : `Date.parse`
+ * accepte « 2026-09-07 14:30 » ou « 07/09/2026 » que Luxon rejette, ce qui
+ * laisserait passer une proposition qui casse à la confirmation.
+ */
 function toDateString(value: unknown, what: string): string {
   const str = toRequiredString(value, what)
-  if (Number.isNaN(Date.parse(str))) {
+  if (!DateTime.fromISO(str).isValid) {
     throw new AiInvalidResponseError(`Assistant action has an unparseable ${what}`)
   }
   return str
@@ -346,7 +352,7 @@ function parseCreateTaskAction(
   }
 
   const dueAt = toNullableString(t.dueAt)
-  if (dueAt !== null && Number.isNaN(Date.parse(dueAt))) {
+  if (dueAt !== null && !DateTime.fromISO(dueAt).isValid) {
     throw new AiInvalidResponseError('Assistant task proposal has an unparseable dueAt')
   }
   const dueEngineHours = toNullablePositiveInt(t.dueEngineHours)

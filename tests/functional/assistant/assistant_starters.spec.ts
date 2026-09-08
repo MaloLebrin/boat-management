@@ -3,6 +3,7 @@ import { truncateDb } from '#tests/utils/db'
 import app from '@adonisjs/core/services/app'
 import AssistantStarterService from '#services/assistant_starter_service'
 import BoatMaintenanceTaskService from '#services/boat_maintenance_task_service'
+import { BoatEngineFactory } from '#database/factories/boat_engine_factory'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { createAdminUser } from '#tests/functional/helpers'
 import { ASSISTANT_MAX_STARTERS } from '#shared/types/assistant'
@@ -53,6 +54,64 @@ test.group('Assistant FleetAi — suggestions de démarrage', (group) => {
     assert.equal(starters[0].id, 'overdue')
     assert.equal(starters[0].params.count, '1')
     assert.equal(starters[0].i18nKey, 'assistant.starters.overdue')
+  })
+
+  test('une échéance en heures moteur est classée comme dans le planning', async ({ assert }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({
+      organizationId: user.organizationId!,
+      name: 'Pen Duick',
+    }).create()
+    const engine = await BoatEngineFactory.merge({ boatId: boat.id, hours: 300 }).create()
+    const taskService = await app.container.make(BoatMaintenanceTaskService)
+    // Compteur à 300 h, échéance à 250 h : en retard, comme le planning.
+    await taskService.createForBoat(user, boat, {
+      subject: 'engine',
+      title: 'Vidange',
+      notes: null,
+      boatEngineId: engine.id,
+      dueAt: null,
+      dueEngineHours: 250,
+      recurrenceIntervalMonths: null,
+      recurrenceIntervalEngineHours: null,
+    })
+
+    const service = await app.container.make(AssistantStarterService)
+    const starters = await service.buildStarters(user, null)
+
+    assert.equal(starters[0].id, 'overdue')
+    assert.equal(starters[0].params.count, '1')
+  })
+
+  test('une échéance en heures encore lointaine ne produit aucun starter de tâche', async ({
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({
+      organizationId: user.organizationId!,
+      name: 'Pen Duick',
+    }).create()
+    const engine = await BoatEngineFactory.merge({ boatId: boat.id, hours: 100 }).create()
+    const taskService = await app.container.make(BoatMaintenanceTaskService)
+    // 400 h restantes : ni en retard, ni bientôt due (seuil de 50 h).
+    await taskService.createForBoat(user, boat, {
+      subject: 'engine',
+      title: 'Vidange',
+      notes: null,
+      boatEngineId: engine.id,
+      dueAt: null,
+      dueEngineHours: 500,
+      recurrenceIntervalMonths: null,
+      recurrenceIntervalEngineHours: null,
+    })
+
+    const service = await app.container.make(AssistantStarterService)
+    const starters = await service.buildStarters(user, null)
+
+    assert.deepEqual(
+      starters.map((s) => s.id),
+      ['fleetSummary', 'help']
+    )
   })
 
   test('sur une fiche bateau, le starter de page porte le nom du bateau', async ({ assert }) => {
