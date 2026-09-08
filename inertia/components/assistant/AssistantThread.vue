@@ -3,14 +3,18 @@ import { nextTick, ref, watch } from 'vue'
 import AssistantActionCard from '~/components/assistant/AssistantActionCard.vue'
 import AssistantMessage from '~/components/assistant/AssistantMessage.vue'
 import { useT } from '~/composables/use_t'
-import type { AssistantConversationProps } from '#shared/types/assistant'
+import type { AssistantConversationProps, AssistantStarterProps } from '#shared/types/assistant'
 
 /** Fil du copilote : messages, bulle optimiste, carte d'action en attente. */
 const props = defineProps<{
   conversation: AssistantConversationProps | null
   pendingMessage: string | null
   processing: boolean
+  starters?: AssistantStarterProps[]
 }>()
+
+/** Clic sur une suggestion : le libellé RENDU (locale de l'utilisateur) part comme message. */
+const emit = defineEmits<{ starter: [message: string] }>()
 
 const { t } = useT()
 
@@ -37,6 +41,22 @@ watch(
       <p v-if="conversation === null && pendingMessage === null" class="text-sm text-navy-200">
         {{ t('assistant.intro') }}
       </p>
+
+      <!-- Suggestions de démarrage : fil vide uniquement, texte 100 % i18n -->
+      <div
+        v-if="conversation === null && pendingMessage === null && (starters?.length ?? 0) > 0"
+        class="flex flex-wrap gap-2"
+      >
+        <button
+          v-for="starter in starters"
+          :key="starter.id"
+          type="button"
+          class="rounded-full border border-navy-600 bg-white/5 px-3 py-1.5 text-left text-xs text-navy-100 transition-colors hover:bg-navy-700"
+          @click="emit('starter', t(starter.i18nKey, starter.params))"
+        >
+          {{ t(starter.i18nKey, starter.params) }}
+        </button>
+      </div>
 
       <AssistantMessage
         v-for="(message, idx) in conversation?.messages ?? []"

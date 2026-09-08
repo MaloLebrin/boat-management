@@ -288,10 +288,15 @@ test.group('Assistant FleetAi chat (functional)', (group) => {
     const conversations = await AiAssistantConversation.all()
     const conversation = conversations[0]
     assert.isNotNull(conversation.pendingAction)
-    assert.equal(conversation.pendingAction!.boatId, boat.id)
-    assert.equal(conversation.pendingAction!.boatName, 'Mistral II')
-    assert.equal(conversation.pendingAction!.engineLabel, 'Yamaha 4AS')
-    assert.equal(conversation.pendingAction!.title, 'Oil change')
+    const pending = conversation.pendingAction as Extract<
+      import('#shared/types/assistant').AssistantPendingAction,
+      { kind: 'create_task' }
+    >
+    assert.equal(pending.kind, 'create_task')
+    assert.equal(pending.boatId, boat.id)
+    assert.equal(pending.boatName, 'Mistral II')
+    assert.equal(pending.engineLabel, 'Yamaha 4AS')
+    assert.equal(pending.title, 'Oil change')
   })
 
   test('a task proposal naming a boat outside the roster persists nothing', async ({
@@ -776,5 +781,230 @@ test.group('Assistant FleetAi chat — boucle d’outils (#642)', (group) => {
       (calls[0].tools ?? []).map((tool) => tool.name),
       ['list_maintenance', 'search_product_help']
     )
+  })
+})
+
+test.group('Assistant FleetAi chat — agent actionnable et contexte de page', (group) => {
+  group.each.setup(() => truncateDb())
+  group.each.teardown(() => {
+    app.container.restore(AiService)
+  })
+
+  test('une propose_action add_engine_hours est validée et rangée en pending', async ({
+    assert,
+    client,
+  }) => {
+    const user = await createAdminUser()
+    const { boat, engine } = await makeBoat(user.organizationId!)
+    swapAiService(
+      JSON.stringify({
+        type: 'propose_action',
+        message: 'Add 22 hours to the engine?',
+        action: { kind: 'add_engine_hours', boatId: boat.id, engineId: engine.id, incrementBy: 22 },
+      })
+    )
+
+    const response = await client
+      .post('/assistant/conversations')
+      .loginAs(user)
+      .form({ message: 'We motored 22 hours this week' })
+      .redirects(0)
+
+    response.assertFlashMissing('error')
+    const [conversation] = await AiAssistantConversation.all()
+    const pending = conversation.pendingAction
+    assert.equal(pending?.kind, 'add_engine_hours')
+    if (pending?.kind === 'add_engine_hours') {
+      assert.equal(pending.boatId, boat.id)
+      assert.equal(pending.boatName, 'Mistral II')
+      assert.equal(pending.engineLabel, 'Yamaha 4AS')
+      assert.equal(pending.incrementBy, 22)
+    }
+  })
+
+  test('close_trip sans sortie en cours répond au lieu de jeter le tour', async ({
+    assert,
+    client,
+  }) => {
+    const user = await createAdminUser()
+    const { boat } = await makeBoat(user.organizationId!)
+    // État normal de la flotte, pas une réponse malformée : la conversation
+    // doit exister et porter une réponse, sans action en attente.
+    swapAiService(
+      JSON.stringify({
+        type: 'propose_action',
+        message: 'I will close the trip.',
+        action: {
+          kind: 'close_trip',
+          boatId: boat.id,
+          arrivedAt: '2026-09-07T18:00',
+          arrivalPortName: 'Brest',
+          distanceNm: null,
+          engineHoursEnd: null,
+          boatEngineId: null,
+          fuelConsumedLiters: null,
+          notes: null,
+        },
+      })
+    )
+
+    const response = await client
+      .post('/assistant/conversations')
+      .loginAs(user)
+      .form({ message: 'Close the trip for Mistral II' })
+      .redirects(0)
+
+    response.assertFlashMissing('error')
+    const [conversation] = await AiAssistantConversation.all()
+    assert.isNull(conversation.pendingAction)
+    const last = conversation.messages.at(-1)!
+    assert.equal(last.role, 'assistant')
+    assert.include(last.content, 'No trip is in progress')
+    assert.isUndefined(last.card)
+  })
+
+  test("le décalage de fuseau du message est recopié dans l'action en attente", async ({
+    assert,
+    client,
+  }) => {
+    const user = await createAdminUser()
+    const { boat } = await makeBoat(user.organizationId!)
+    swapAiService(
+      JSON.stringify({
+        type: 'propose_action',
+        message: 'Open the trip?',
+        action: {
+          kind: 'start_trip',
+          boatId: boat.id,
+          departedAt: '2026-09-07T09:00',
+          departurePortName: 'Camaret',
+          engineHoursStart: null,
+          crewCount: null,
+          notes: null,
+        },
+      })
+    )
+
+    const response = await client
+      .post('/assistant/conversations')
+      .loginAs(user)
+      .form({ message: 'We are leaving Camaret at 9', tzOffsetMinutes: -120 })
+      .redirects(0)
+
+    response.assertFlashMissing('error')
+    const [conversation] = await AiAssistantConversation.all()
+    const pending = conversation.pendingAction
+    assert.equal(pending?.kind, 'start_trip')
+    if (pending?.kind === 'start_trip') {
+      assert.equal(pending.tzOffsetMinutes, -120)
+    }
+  })
+
+  test('un kind non offert au rôle ne persiste rien', async ({ assert, client }) => {
+    const admin = await createAdminUser()
+    await makeBoat(admin.organizationId!)
+    const mechanic = await createMechanicUser(admin.organizationId!)
+    // Le mécanicien n'a pas `clients.create` : le modèle hallucine un kind qui
+    // ne lui a pas été proposé — rejeté avant toute écriture.
+    swapAiService(
+      JSON.stringify({
+        type: 'propose_action',
+        message: 'Create the client?',
+        action: {
+          kind: 'create_client',
+          firstName: 'Éric',
+          lastName: 'Tabarly',
+          email: null,
+          phone: null,
+          notes: null,
+        },
+      })
+    )
+
+    const response = await client
+      .post('/assistant/conversations')
+      .loginAs(mechanic)
+      .form({ message: 'Add Éric Tabarly as a client' })
+      .redirects(0)
+
+    response.assertFlashMessage(
+      'error',
+      'The assistant returned an unusable answer. Please try again.'
+    )
+    assert.lengthOf(await AiAssistantConversation.all(), 0)
+  })
+
+  test('le prompt système porte la page courante quand pageUrl est fourni', async ({
+    assert,
+    client,
+  }) => {
+    const user = await createAdminUser()
+    const { boat } = await makeBoat(user.organizationId!)
+    const calls = swapAiService(ANSWER_RESPONSE)
+
+    await client
+      .post('/assistant/conversations')
+      .loginAs(user)
+      .form({
+        message: 'What should I check on this boat?',
+        pageUrl: `/boats/${boat.id}?tab=engines`,
+      })
+      .redirects(0)
+
+    const system = calls[0].messages[0]
+    assert.equal(system.role, 'system')
+    assert.include(system.content, `Boat page for Mistral II (#${boat.id})`)
+  })
+
+  test('sans pageUrl, aucune section de page dans le prompt', async ({ assert, client }) => {
+    const user = await createAdminUser()
+    await makeBoat(user.organizationId!)
+    const calls = swapAiService(ANSWER_RESPONSE)
+
+    await client
+      .post('/assistant/conversations')
+      .loginAs(user)
+      .form({ message: 'Hello' })
+      .redirects(0)
+
+    assert.notInclude(calls[0].messages[0].content, 'current page')
+  })
+
+  test('un pageUrl d’une autre organisation ne fuit rien dans le prompt', async ({
+    assert,
+    client,
+  }) => {
+    const user = await createAdminUser()
+    await makeBoat(user.organizationId!)
+    const otherOrgAdmin = await createAdminUser()
+    const { boat: foreignBoat } = await makeBoat(otherOrgAdmin.organizationId!, 'Secret Yacht')
+    const calls = swapAiService(ANSWER_RESPONSE)
+
+    await client
+      .post('/assistant/conversations')
+      .loginAs(user)
+      .form({ message: 'Hello', pageUrl: `/boats/${foreignBoat.id}` })
+      .redirects(0)
+
+    assert.notInclude(calls[0].messages[0].content, 'Secret Yacht')
+    assert.notInclude(calls[0].messages[0].content, 'current page')
+  })
+
+  test('un pageUrl trop long est rejeté par la validation, rien n’est créé', async ({
+    assert,
+    client,
+  }) => {
+    const user = await createAdminUser()
+    swapAiService(ANSWER_RESPONSE)
+    const response = await client
+      .post('/assistant/conversations')
+      .loginAs(user)
+      .form({ message: 'Hello', pageUrl: `/${'x'.repeat(320)}` })
+      .redirects(0)
+
+    // Convention Inertia : erreur de validation = redirect back avec erreurs
+    // de session, jamais de page 422.
+    response.assertStatus(302)
+    assert.lengthOf(await AiAssistantConversation.all(), 0)
   })
 })

@@ -9,15 +9,20 @@ vi.mock('@inertiajs/vue3', () => ({
       appT: {
         'assistant.chatYou': 'Vous',
         'assistant.chatAssistant': 'FleetAi',
-        'assistant.taskCreated.title': 'Tâche créée pour {boat}',
-        'assistant.taskCreated.dueHours': 'Échéance à {hours} heures moteur',
+        'assistant.taskCreated.title': 'Tache creee pour {boat}',
+        'assistant.taskCreated.dueHours': 'Echeance a {hours} heures moteur',
         'assistant.taskCreated.viewPlanning': 'Voir dans le planning',
-        'assistant.taskDismissed': 'Proposition refusée.',
+        'assistant.taskDismissed': 'Proposition refusee.',
         'assistant.handoff.diagnosis': 'Ouvrir le diagnostic pour {engine} ({boat})',
-        'assistant.handoff.partSearch': 'Chercher une pièce pour {engine} ({boat})',
-        'assistant.sources.fleet_data': 'Données de votre flotte',
-        'assistant.sources.general': 'Connaissance générale',
+        'assistant.handoff.partSearch': 'Chercher une piece pour {engine} ({boat})',
+        'assistant.sources.fleet_data': 'Donnees de votre flotte',
+        'assistant.sources.general': 'Connaissance generale',
         'assistant.navTargets.engines': 'Voir les moteurs',
+        'assistant.actionDone.add_engine_hours': 'Heures moteur ajoutees',
+        'assistant.actionDone.start_trip': 'Sortie ouverte au journal de bord',
+        'assistant.actionDone.log_fuel': 'Plein enregistre',
+        'assistant.actionDone.set_part_stock': 'Stock mis a jour',
+        'assistant.card.actionDismissed': 'Proposition refusee.',
       },
       locale: 'fr',
     },
@@ -43,7 +48,7 @@ describe('AssistantMessage', () => {
     expect(text).toContain('Bonjour')
   })
 
-  test('affiche la carte de tâche créée via i18n, jamais du texte LLM', () => {
+  test('affiche la carte de tache creee via i18n, jamais du texte LLM', () => {
     const wrapper = mountMessage({
       role: 'assistant',
       content: '',
@@ -57,19 +62,19 @@ describe('AssistantMessage', () => {
       },
     })
     const text = wrapper.text().replace(/\s+/g, ' ')
-    expect(text).toContain('Tâche créée pour Mistral II')
+    expect(text).toContain('Tache creee pour Mistral II')
     expect(text).toContain('Vidange moteur')
-    expect(text).toContain('Échéance à 250 heures moteur')
+    expect(text).toContain('Echeance a 250 heures moteur')
     expect(wrapper.find('a').attributes('href')).toBe('/planning')
   })
 
-  test('affiche la mention de proposition refusée', () => {
+  test('affiche la mention de proposition refusee', () => {
     const text = mountMessage({
       role: 'assistant',
       content: '',
       card: { kind: 'task_dismissed' },
     }).text()
-    expect(text).toContain('Proposition refusée.')
+    expect(text).toContain('Proposition refusee.')
   })
 
   test('la carte handoff diagnostic pointe vers la page diagnostic du moteur', () => {
@@ -95,30 +100,30 @@ describe('AssistantMessage', () => {
       content: 'Le moteur totalise 220 heures.',
       source: 'fleet_data',
     }).text()
-    expect(text).toContain('Données de votre flotte')
+    expect(text).toContain('Donnees de votre flotte')
   })
 
-  test('aucun badge quand la réponse ne porte pas de source', () => {
+  test('aucun badge quand la reponse ne porte pas de source', () => {
     const text = mountMessage({ role: 'assistant', content: 'Bonjour.' }).text()
-    expect(text).not.toContain('Données de votre flotte')
+    expect(text).not.toContain('Donnees de votre flotte')
   })
 
-  test('rend le lien de navigation validé côté serveur en <Link> (#642)', () => {
+  test('rend le lien de navigation valide cote serveur en <Link> (#642)', () => {
     const wrapper = mountMessage({
       role: 'assistant',
-      content: 'Vos moteurs sont listés ici.',
+      content: 'Vos moteurs sont listes ici.',
       source: 'general',
       navTarget: 'engines.index',
     })
-    expect(wrapper.text()).toContain('Connaissance générale')
+    expect(wrapper.text()).toContain('Connaissance generale')
     expect(wrapper.text()).toContain('Voir les moteurs')
     expect(wrapper.find('a').attributes('href')).toBe('/engines')
   })
 
-  test('la carte handoff pièces pointe vers le chat pièces détachées', () => {
+  test('la carte handoff pieces pointe vers le chat pieces detachees', () => {
     const wrapper = mountMessage({
       role: 'assistant',
-      content: 'Cherchons cette pièce.',
+      content: 'Cherchons cette piece.',
       card: {
         kind: 'handoff',
         target: 'part_search',
@@ -129,5 +134,32 @@ describe('AssistantMessage', () => {
       },
     })
     expect(wrapper.find('a').attributes('href')).toBe('/boats/3/engines/7/spare-parts/chat')
+  })
+
+  test('affiche la carte action_done avec label et boatName', () => {
+    const wrapper = mountMessage({
+      role: 'assistant',
+      content: '',
+      card: {
+        kind: 'action_done',
+        actionKind: 'add_engine_hours',
+        boatName: 'Mistral II',
+        label: '+15 h sur Yamaha 4AS',
+        entityId: 42,
+      },
+    })
+    const text = wrapper.text().replace(/\s+/g, ' ')
+    expect(text).toContain('Heures moteur ajoutees')
+    expect(text).toContain('+15 h sur Yamaha 4AS')
+    expect(text).toContain('Mistral II')
+  })
+
+  test('affiche la carte action_dismissed', () => {
+    const text = mountMessage({
+      role: 'assistant',
+      content: '',
+      card: { kind: 'action_dismissed', actionKind: 'log_fuel' },
+    }).text()
+    expect(text).toContain('Proposition refusee.')
   })
 })

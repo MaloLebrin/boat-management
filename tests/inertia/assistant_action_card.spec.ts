@@ -1,36 +1,63 @@
 import { mount } from '@vue/test-utils'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 import AssistantActionCard from '../../inertia/components/assistant/AssistantActionCard.vue'
-import type { AssistantTaskProposal } from '../../shared/types/assistant'
+import type {
+  AssistantEngineHoursAction,
+  AssistantPartStockAction,
+  AssistantPendingAction,
+  AssistantReservationAction,
+  AssistantTaskAction,
+} from '../../shared/types/assistant'
 
 const routerPost = vi.fn()
 let capabilities: string[] = ['maintenance.create']
+let currentPlan = 'enterprise'
 
 vi.mock('@inertiajs/vue3', () => ({
   router: { post: (...args: unknown[]) => routerPost(...args) },
   usePage: () => ({
     props: {
       appT: {
-        'assistant.proposal.title': 'Proposition de tâche',
+        'assistant.proposal.kinds.create_task': 'Proposition de tache de maintenance',
+        'assistant.proposal.kinds.add_engine_hours': "Ajout d'heures moteur",
+        'assistant.proposal.kinds.set_part_stock': 'Mise a jour de stock',
+        'assistant.proposal.kinds.start_trip': 'Ouverture de sortie',
+        'assistant.proposal.kinds.close_trip': 'Cloture de sortie',
+        'assistant.proposal.kinds.log_fuel': 'Plein de carburant',
+        'assistant.proposal.kinds.report_incident': "Declaration d'incident",
+        'assistant.proposal.kinds.create_reservation': 'Proposition de reservation',
+        'assistant.proposal.kinds.create_client': 'Nouvelle fiche client',
+        'assistant.proposal.title': 'Proposition de tache',
         'assistant.proposal.boat': 'Bateau :',
-        'assistant.proposal.due': 'Échéance :',
+        'assistant.proposal.engine': 'Moteur :',
+        'assistant.proposal.due': 'Echeance :',
         'assistant.proposal.dueHours': '{hours} heures moteur',
-        'assistant.proposal.recurrence': 'Récurrence :',
+        'assistant.proposal.recurrence': 'Recurrence :',
         'assistant.proposal.recurrenceMonths': 'tous les {count} mois',
         'assistant.proposal.recurrenceHours': 'toutes les {hours} heures moteur',
-        'assistant.proposal.confirm': 'Créer la tâche',
+        'assistant.proposal.increment': '+{hours} h',
+        'assistant.proposal.currentHours': 'Compteur actuel :',
+        'assistant.proposal.part': 'Piece :',
+        'assistant.proposal.stock': 'Stock :',
+        'assistant.proposal.stockChange': '{old} -> {new}',
+        'assistant.proposal.confirm': 'Creer la tache',
+        'assistant.proposal.confirmAction': 'Confirmer',
         'assistant.proposal.dismiss': 'Refuser',
         'assistant.proposal.noPermission':
-          'Vous n’avez pas la permission de créer des tâches de maintenance.',
+          "Vous n'avez pas la permission d'effectuer cette action.",
       },
       locale: 'fr',
       permissions: { role: 'admin', capabilities },
+      currentPlan,
+      activeModules: [],
+      activeAddons: [],
     },
   }),
 }))
 
-function makeProposal(overrides: Partial<AssistantTaskProposal> = {}): AssistantTaskProposal {
+function makeTaskProposal(overrides: Partial<AssistantTaskAction> = {}): AssistantTaskAction {
   return {
+    kind: 'create_task',
     boatId: 1,
     boatName: 'Mistral II',
     engineLabel: 'Yamaha 4AS',
@@ -46,26 +73,98 @@ function makeProposal(overrides: Partial<AssistantTaskProposal> = {}): Assistant
   }
 }
 
-function mountCard(proposal = makeProposal()) {
+function makeEngineHoursAction(
+  overrides: Partial<AssistantEngineHoursAction> = {}
+): AssistantEngineHoursAction {
+  return {
+    kind: 'add_engine_hours',
+    boatId: 1,
+    boatName: 'Mistral II',
+    engineId: 2,
+    engineLabel: 'Yamaha 4AS',
+    incrementBy: 15,
+    currentHours: 250,
+    ...overrides,
+  }
+}
+
+function makePartStockAction(
+  overrides: Partial<AssistantPartStockAction> = {}
+): AssistantPartStockAction {
+  return {
+    kind: 'set_part_stock',
+    boatId: 1,
+    boatName: 'Mistral II',
+    engineId: 2,
+    engineLabel: 'Yamaha 4AS',
+    partId: 42,
+    designation: 'Filtre a huile',
+    reference: 'YAM-F-001',
+    oldStock: 3,
+    newStock: 1,
+    ...overrides,
+  }
+}
+
+function makeReservationAction(
+  overrides: Partial<AssistantReservationAction> = {}
+): AssistantReservationAction {
+  return {
+    kind: 'create_reservation',
+    boatId: 1,
+    boatName: 'Mistral II',
+    startsAt: '2026-09-07T09:00',
+    endsAt: '2026-09-09T18:00',
+    tzOffsetMinutes: -120,
+    clientId: null,
+    clientName: 'Eric Tabarly',
+    clientEmail: null,
+    clientPhone: null,
+    reservationType: null,
+    notes: null,
+    ...overrides,
+  }
+}
+
+function mountCard(proposal: AssistantPendingAction = makeTaskProposal()) {
   return mount(AssistantActionCard, { props: { token: 'cafebabe0001', proposal } })
 }
 
 describe('AssistantActionCard', () => {
   beforeEach(() => {
     routerPost.mockClear()
-    capabilities = ['maintenance.create']
+    capabilities = ['maintenance.create', 'boats.edit']
+    currentPlan = 'enterprise'
   })
 
-  test('affiche le récapitulatif de la proposition', () => {
+  test('affiche le recapitulatif de la proposition create_task (compat)', () => {
     const text = mountCard().text().replace(/\s+/g, ' ')
+    expect(text).toContain('Proposition de tache de maintenance')
     expect(text).toContain('Vidange moteur')
     expect(text).toContain('Mistral II — Yamaha 4AS')
     expect(text).toContain('tous les 6 mois')
   })
 
-  test('affiche une échéance en heures moteur', () => {
-    const text = mountCard(makeProposal({ dueAt: null, dueEngineHours: 250 })).text()
+  test('affiche une echeance en heures moteur pour create_task', () => {
+    const text = mountCard(makeTaskProposal({ dueAt: null, dueEngineHours: 250 })).text()
     expect(text).toContain('250 heures moteur')
+  })
+
+  test('affiche le titre et increment pour add_engine_hours', () => {
+    const wrapper = mountCard(makeEngineHoursAction())
+    const text = wrapper.text().replace(/\s+/g, ' ')
+    expect(text).toContain("Ajout d'heures moteur")
+    expect(text).toContain('+15 h')
+    expect(text).toContain('Compteur actuel :')
+    expect(text).toContain('250 h')
+  })
+
+  test('affiche le stock old -> new pour set_part_stock', () => {
+    const wrapper = mountCard(makePartStockAction())
+    const text = wrapper.text().replace(/\s+/g, ' ')
+    expect(text).toContain('Mise a jour de stock')
+    expect(text).toContain('Filtre a huile (YAM-F-001)')
+    expect(text).toContain('3 -> 1')
   })
 
   test('confirmer poste sur la route de confirmation, sans payload', async () => {
@@ -84,12 +183,39 @@ describe('AssistantActionCard', () => {
     expect(routerPost.mock.calls[0][0]).toBe('/assistant/conversations/cafebabe0001/action/dismiss')
   })
 
-  test('sans maintenance.create, le bouton confirmer est masqué', () => {
+  test('sans capability requise, le bouton confirmer est masque', () => {
     capabilities = []
     const wrapper = mountCard()
     const labels = wrapper.findAll('button').map((b) => b.text())
-    expect(labels).not.toContain('Créer la tâche')
+    expect(labels).not.toContain('Creer la tache')
     expect(labels).toContain('Refuser')
-    expect(wrapper.text()).toContain('Vous n’avez pas la permission')
+    expect(wrapper.text()).toContain("Vous n'avez pas la permission")
+  })
+
+  test('bouton confirmer masque pour add_engine_hours sans boats.edit', () => {
+    capabilities = ['maintenance.create'] // No boats.edit
+    const wrapper = mountCard(makeEngineHoursAction())
+    const labels = wrapper.findAll('button').map((b) => b.text())
+    expect(labels).not.toContain('Confirmer')
+    expect(labels).toContain('Refuser')
+  })
+
+  test('create_reservation confirmable avec la capability et le plan', () => {
+    capabilities = ['boats.manage']
+    const labels = mountCard(makeReservationAction())
+      .findAll('button')
+      .map((b) => b.text())
+    expect(labels).toContain('Confirmer')
+  })
+
+  test('create_reservation masque quand le plan ne porte pas les reservations', () => {
+    // La capability suffit au role, mais le serveur re-verifie le flag de plan :
+    // afficher le bouton mènerait à un clic qui echoue.
+    capabilities = ['boats.manage']
+    currentPlan = 'pro'
+    const wrapper = mountCard(makeReservationAction())
+    const labels = wrapper.findAll('button').map((b) => b.text())
+    expect(labels).not.toContain('Confirmer')
+    expect(wrapper.text()).toContain("Vous n'avez pas la permission")
   })
 })

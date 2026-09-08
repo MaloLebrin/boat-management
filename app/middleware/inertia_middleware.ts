@@ -24,8 +24,13 @@ import { DEMO_SESSION_DURATION_MS } from '#shared/constants/demo'
 import DemoService from '#services/demo_service'
 import AiTokenQuotaService from '#services/ai_token_quota_service'
 import AssistantChatService from '#services/assistant_chat_service'
+import AssistantStarterService from '#services/assistant_starter_service'
 import { toAssistantConversationProps } from '#transformers/assistant_transformer'
-import type { AssistantAiUsageProps, AssistantConversationProps } from '#shared/types/assistant'
+import type {
+  AssistantAiUsageProps,
+  AssistantConversationProps,
+  AssistantStarterProps,
+} from '#shared/types/assistant'
 import type User from '#models/user'
 
 export async function resolveSharedCurrentPlan(
@@ -75,6 +80,7 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
     private permissionService: PermissionService,
     private demoService: DemoService,
     private assistantChatService: AssistantChatService,
+    private assistantStarterService: AssistantStarterService,
     private aiTokenQuotaService: AiTokenQuotaService
   ) {
     super()
@@ -202,12 +208,23 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
               limit: PLAN_LIMITS[organization.plan].aiTokensPerMonth,
             }
           : null
+        // Suggestions de démarrage : uniquement sur fil vide — les partial
+        // reloads qui suivent chaque message ne paient rien.
+        const starters: AssistantStarterProps[] =
+          auth?.user && conversation === null
+            ? await this.assistantStarterService.buildStarters(
+                auth.user,
+                ctx.request.url().split('?')[0]
+              )
+            : []
         const props: {
           conversation: AssistantConversationProps | null
           aiUsage: AssistantAiUsageProps | null
+          starters: AssistantStarterProps[]
         } = {
           conversation: conversation ? toAssistantConversationProps(conversation) : null,
           aiUsage,
+          starters,
         }
         return props as unknown as JSONDataTypes
       }),

@@ -39,3 +39,42 @@ export class AssistantCustomKeyFailedError extends Error {
   status = 502
   code = 'E_ASSISTANT_CUSTOM_KEY_FAILED'
 }
+
+/**
+ * Confirmation d'une action que le rôle ou le plan effectif n'autorise plus —
+ * les gardes sont re-vérifiées à l'exécution, le plan peut avoir changé entre
+ * la proposition et le clic.
+ */
+export class AssistantActionNotAllowedError extends Error {
+  name = 'AssistantActionNotAllowedError'
+  status = 403
+  code = 'E_ASSISTANT_ACTION_NOT_ALLOWED'
+}
+
+/**
+ * L'entité visée par l'action a disparu entre la proposition et la
+ * confirmation (pièce supprimée, sortie déjà clôturée…).
+ */
+export class AssistantActionEntityGoneError extends Error {
+  name = 'AssistantActionEntityGoneError'
+  status = 409
+  code = 'E_ASSISTANT_ACTION_ENTITY_GONE'
+}
+
+/**
+ * Proposition refusée parce que l'état de la flotte ne permet pas de
+ * l'exécuter (clôturer une sortie alors qu'aucune n'est ouverte). Ce n'est PAS
+ * une réponse malformée : le tour n'est pas jeté, `AssistantChatService` le
+ * dégrade en réponse conversationnelle qui explique le blocage.
+ */
+export type AssistantNotExecutableReason = 'no_trip_in_progress'
+
+export class AssistantActionNotExecutableError extends Error {
+  name = 'AssistantActionNotExecutableError'
+  status = 409
+  code = 'E_ASSISTANT_ACTION_NOT_EXECUTABLE'
+
+  constructor(readonly reason: AssistantNotExecutableReason) {
+    super(`Assistant action is not executable: ${reason}`)
+  }
+}

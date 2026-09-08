@@ -117,12 +117,32 @@ const taskCreatedDue = computed(() => {
     </Link>
   </div>
 
-  <!-- Proposition refusée -->
+  <!-- Proposition de tache refusee (legacy create_task) -->
   <p v-else-if="card?.kind === 'task_dismissed'" class="text-xs italic text-navy-400">
     {{ t('assistant.taskDismissed') }}
   </p>
 
-  <!-- Handoff vers le diagnostic ou la recherche de pièces -->
+  <!-- Action confirmee et executee (agent actionnable) -->
+  <div
+    v-else-if="card?.kind === 'action_done'"
+    class="rounded-xl border border-mint-500/40 bg-mint-500/10 px-4 py-3"
+  >
+    <p class="flex items-center gap-2 text-sm font-semibold text-white">
+      <svg class="h-4 w-4 text-mint-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+      </svg>
+      {{ t(`assistant.actionDone.${card.actionKind}`) }}
+    </p>
+    <p v-if="card.label" class="mt-1 text-sm text-navy-100">{{ card.label }}</p>
+    <p v-if="card.boatName" class="mt-0.5 text-xs text-navy-300">{{ card.boatName }}</p>
+  </div>
+
+  <!-- Proposition refusee (agent actionnable) -->
+  <p v-else-if="card?.kind === 'action_dismissed'" class="text-xs italic text-navy-400">
+    {{ t('assistant.card.actionDismissed') }}
+  </p>
+
+  <!-- Handoff vers le diagnostic ou la recherche de pieces -->
   <div v-else-if="card?.kind === 'handoff' && handoffHref" class="flex justify-start">
     <Link
       :href="handoffHref"

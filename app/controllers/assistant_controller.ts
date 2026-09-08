@@ -1,5 +1,7 @@
 import { AiInvalidResponseError } from '#exceptions/ai_errors'
 import {
+  AssistantActionEntityGoneError,
+  AssistantActionNotAllowedError,
   AssistantConversationBudgetExceededError,
   AssistantConversationNotFoundError,
   AssistantCustomKeyFailedError,
@@ -7,12 +9,26 @@ import {
   AssistantNoPendingActionError,
   AssistantPendingActionRequiredError,
 } from '#exceptions/assistant_errors'
+import { BoatEquipmentNotFoundError } from '#exceptions/boat_errors'
+import { BoatFuelLogValidationError } from '#exceptions/fuel_log_errors'
+import { BoatIncidentValidationError } from '#exceptions/incident_errors'
 import { BoatMaintenanceTaskValidationError } from '#exceptions/maintenance_errors'
+import {
+  NavigationLogInProgressError,
+  NavigationLogNotFoundError,
+  NavigationLogValidationError,
+} from '#exceptions/navigation_log_errors'
 import { QuotaExceededError } from '#exceptions/quota_errors'
-import MaintenancePolicy from '#policies/maintenance_policy'
+import {
+  ReservationBlacklistedClientError,
+  ReservationConflictError,
+  ReservationDurationError,
+  ReservationValidationError,
+} from '#exceptions/reservation_errors'
+import AssistantActionsService from '#services/assistant_actions_service'
 import AssistantChatService from '#services/assistant_chat_service'
 import AuditLogService from '#services/audit_log_service'
-import BoatHullService, { BoatNotFoundError } from '#services/boat_hull_service'
+import { BoatNotFoundError } from '#services/boat_hull_service'
 import QuotaService from '#services/quota_service'
 import { assistantMessageValidator } from '#validators/assistant'
 import { toAppLocale } from '#shared/helpers/locale_path'
@@ -29,13 +45,14 @@ import type { HttpContext } from '@adonisjs/core/http'
  * partial reload de la prop partagée `assistantConversation`.
  *
  * `confirmAction` n'accepte AUCUN payload client : il exécute la proposition
- * stockée côté serveur (`pendingAction`), derrière `MaintenancePolicy.create`.
+ * stockée côté serveur (`pendingAction`), derrière le Bouncer du kind sur
+ * l'entité rechargée (`AssistantActionsService.authorizeConfirm`).
  */
 @inject()
 export default class AssistantController {
   constructor(
+    private actionsService: AssistantActionsService,
     private chatService: AssistantChatService,
-    private boatService: BoatHullService,
     private quotaService: QuotaService,
     private auditLogService: AuditLogService
   ) {}
@@ -50,7 +67,10 @@ export default class AssistantController {
       await user.load('organization')
       this.quotaService.assertCanUseAI(user.organization)
 
-      await this.chatService.start(user, payload.message, toAppLocale(i18n.locale))
+      await this.chatService.start(user, payload.message, toAppLocale(i18n.locale), {
+        pageUrl: payload.pageUrl ?? null,
+        tzOffsetMinutes: payload.tzOffsetMinutes ?? null,
+      })
     } catch (error) {
       this.#flashError(error, session, i18n)
     }
@@ -68,7 +88,10 @@ export default class AssistantController {
       await user.load('organization')
       this.quotaService.assertCanUseAI(user.organization)
 
-      await this.chatService.addMessage(user, String(params.token), payload.message)
+      await this.chatService.addMessage(user, String(params.token), payload.message, {
+        pageUrl: payload.pageUrl ?? null,
+        tzOffsetMinutes: payload.tzOffsetMinutes ?? null,
+      })
     } catch (error) {
       this.#flashError(error, session, i18n)
     }
@@ -87,22 +110,24 @@ export default class AssistantController {
       const { conversation, proposal } =
         await this.chatService.getConversationWithPendingActionOrFail(user, String(params.token))
 
-      const boat = await this.boatService.getForUserOrFail(user, proposal.boatId)
-      await bouncer.with(MaintenancePolicy).authorize('create', boat)
+      // Entité rechargée côté serveur puis Bouncer par kind — jamais depuis
+      // un payload client.
+      const boat = await this.actionsService.resolveBoat(user, proposal)
+      await this.actionsService.authorizeConfirm(bouncer, proposal, boat)
 
-      const { task } = await this.chatService.confirmPendingAction(user, boat, conversation)
+      const { outcome } = await this.chatService.confirmPendingAction(user, boat, conversation)
 
-      // Même journal que la création manuelle (`boat_maintenance_tasks_controller`).
+      // Même journal que la création manuelle équivalente.
       await this.auditLogService.log({
         organizationId: user.organizationId!,
         userId: user.id,
-        action: 'maintenance_task.create',
-        entityType: 'maintenance_task',
-        entityId: task.id,
-        metadata: { name: task.title, boatName: boat.name },
+        action: outcome.auditAction,
+        entityType: outcome.entityType,
+        entityId: outcome.entityId,
+        metadata: outcome.metadata,
       })
 
-      session.flash('success', i18n.t('flash.assistant.taskCreated'))
+      session.flash('success', i18n.t(outcome.flashKey))
     } catch (error) {
       this.#flashError(error, session, i18n)
     }
@@ -166,8 +191,28 @@ export default class AssistantController {
       // Le bateau de la proposition a disparu entre-temps (supprimé) :
       // la proposition n'est plus exécutable.
       session.flash('error', i18n.t('flash.assistant.boatNotFound'))
-    } else if (error instanceof BoatMaintenanceTaskValidationError) {
-      session.flash('error', i18n.t('flash.assistant.invalidResponse'))
+    } else if (error instanceof AssistantActionNotAllowedError) {
+      session.flash('error', i18n.t('flash.assistant.actionNotAllowed'))
+    } else if (error instanceof AssistantActionEntityGoneError) {
+      session.flash('error', i18n.t('flash.assistant.actionEntityGone'))
+    } else if (error instanceof NavigationLogInProgressError) {
+      session.flash('error', i18n.t('flash.assistant.tripInProgress'))
+    } else if (
+      // Règle métier rejetée par le service à l'exécution (dates incohérentes,
+      // conflit de réservation, client blacklisté, moteur hors bateau…) : la
+      // proposition reste affichée, l'utilisateur peut la refuser.
+      error instanceof BoatMaintenanceTaskValidationError ||
+      error instanceof NavigationLogValidationError ||
+      error instanceof NavigationLogNotFoundError ||
+      error instanceof BoatFuelLogValidationError ||
+      error instanceof BoatIncidentValidationError ||
+      error instanceof ReservationValidationError ||
+      error instanceof ReservationConflictError ||
+      error instanceof ReservationDurationError ||
+      error instanceof ReservationBlacklistedClientError ||
+      error instanceof BoatEquipmentNotFoundError
+    ) {
+      session.flash('error', i18n.t('flash.assistant.actionFailed'))
     } else {
       throw error
     }

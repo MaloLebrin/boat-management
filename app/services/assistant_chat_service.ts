@@ -1,38 +1,52 @@
 import { AiInvalidResponseError } from '#exceptions/ai_errors'
 import {
+  AssistantActionNotExecutableError,
   AssistantConversationBudgetExceededError,
   AssistantConversationNotFoundError,
   AssistantCustomKeyFailedError,
   AssistantMaxMessagesReachedError,
   AssistantNoPendingActionError,
   AssistantPendingActionRequiredError,
+  type AssistantNotExecutableReason,
 } from '#exceptions/assistant_errors'
 import AiAssistantConversation from '#models/ai_assistant_conversation'
 import type Boat from '#models/boat'
-import type BoatMaintenanceTask from '#models/boat_maintenance_task'
 import type User from '#models/user'
 import AiService, { type AiChatMessage } from '#services/ai_service'
 import AiTokenQuotaService from '#services/ai_token_quota_service'
+import AssistantActionsService from '#services/assistant_actions_service'
 import AssistantContextService from '#services/assistant_context_service'
+import AssistantPageContextService, {
+  normalizePath,
+} from '#services/assistant_page_context_service'
+import AssistantPlaybookService from '#services/assistant_playbook_service'
+import OrganizationModuleService from '#services/organization_module_service'
 import AssistantToolsService from '#services/assistant_tools_service'
-import BoatMaintenanceTaskService from '#services/boat_maintenance_task_service'
 import OrganizationAiKeyService from '#services/organization_ai_key_service'
-import { buildAssistantSystemPrompt, parseAssistantReply } from '#services/assistant_prompt_service'
+import {
+  buildActionLines,
+  buildAssistantSystemPrompt,
+  parseAssistantReply,
+} from '#services/assistant_prompt_service'
 import type { AiSuggestionLocale } from '#shared/types/ai'
 import {
   ASSISTANT_CONVERSATION_TOKEN_BUDGET,
   ASSISTANT_HISTORY_WINDOW,
   ASSISTANT_MAX_USER_MESSAGES,
+  type AssistantActionKind,
+  type AssistantActionOutcome,
   type AssistantAiReply,
   type AssistantFleetRoster,
   type AssistantMessage,
-  type AssistantTaskProposal,
+  type AssistantPendingAction,
+  type AssistantTurnContext,
 } from '#shared/types/assistant'
 import {
   ASSISTANT_MAX_TOOL_CALLS_PER_TURN,
   ASSISTANT_MAX_TOOL_ROUNDS,
 } from '#shared/types/assistant_tools'
 import type { AiChatOptions, AiProvider } from '#shared/types/ai'
+import type { PlanQuotas } from '#shared/types/plan'
 import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
 import { randomBytes } from 'node:crypto'
@@ -54,14 +68,34 @@ import { randomBytes } from 'node:crypto'
  *   de tokens mensuel de l'app ne s'applique plus, l'usage reste enregistré
  *   pour les statistiques.
  */
+/**
+ * Réponses de repli quand une proposition n'est pas exécutable en l'état :
+ * texte du serveur, jamais du modèle — même règle que les cartes.
+ */
+const NOT_EXECUTABLE_MESSAGES: Record<
+  AssistantNotExecutableReason,
+  Record<AiSuggestionLocale, string>
+> = {
+  no_trip_in_progress: {
+    fr: "Aucune sortie n'est en cours sur ce bateau : il n'y a rien à clôturer. Ouvrez d'abord une sortie, ou dites-moi si vous vouliez en enregistrer une déjà terminée.",
+    en: 'No trip is in progress on this boat, so there is nothing to close. Open a trip first, or tell me if you meant to record one that is already finished.',
+  },
+}
+
+/** Tour sans contexte client (appels internes, tests). */
+const EMPTY_TURN_CONTEXT: AssistantTurnContext = { pageUrl: null, tzOffsetMinutes: null }
+
 @inject()
 export default class AssistantChatService {
   constructor(
+    private actionsService: AssistantActionsService,
     private aiService: AiService,
     private aiTokenQuotaService: AiTokenQuotaService,
     private contextService: AssistantContextService,
-    private maintenanceTaskService: BoatMaintenanceTaskService,
+    private moduleService: OrganizationModuleService,
     private organizationAiKeyService: OrganizationAiKeyService,
+    private pageContextService: AssistantPageContextService,
+    private playbookService: AssistantPlaybookService,
     private toolsService: AssistantToolsService
   ) {}
 
@@ -78,7 +112,8 @@ export default class AssistantChatService {
   async start(
     user: User,
     message: string,
-    locale: AiSuggestionLocale
+    locale: AiSuggestionLocale,
+    turn: AssistantTurnContext = EMPTY_TURN_CONTEXT
   ): Promise<AiAssistantConversation> {
     await this.#loadOrganization(user)
 
@@ -99,11 +134,16 @@ export default class AssistantChatService {
     conversation.pendingAction = null
     conversation.tokensUsed = 0
 
-    return this.#exchangeWithQuota(conversation, message, user)
+    return this.#exchangeWithQuota(conversation, message, user, turn)
   }
 
   /** Ajoute un message utilisateur à la conversation active. */
-  async addMessage(user: User, token: string, message: string): Promise<AiAssistantConversation> {
+  async addMessage(
+    user: User,
+    token: string,
+    message: string,
+    turn: AssistantTurnContext = EMPTY_TURN_CONTEXT
+  ): Promise<AiAssistantConversation> {
     await this.#loadOrganization(user)
 
     const conversation = await this.#findOwnedActiveOrFail(user, token)
@@ -121,14 +161,14 @@ export default class AssistantChatService {
       throw new AssistantConversationBudgetExceededError()
     }
 
-    return this.#exchangeWithQuota(conversation, message, user)
+    return this.#exchangeWithQuota(conversation, message, user, turn)
   }
 
   /** Conversation active possédant une action en attente — pour la confirmation. */
   async getConversationWithPendingActionOrFail(
     user: User,
     token: string
-  ): Promise<{ conversation: AiAssistantConversation; proposal: AssistantTaskProposal }> {
+  ): Promise<{ conversation: AiAssistantConversation; proposal: AssistantPendingAction }> {
     const conversation = await this.#findOwnedActiveOrFail(user, token)
     if (conversation.pendingAction === null) {
       throw new AssistantNoPendingActionError()
@@ -137,62 +177,54 @@ export default class AssistantChatService {
   }
 
   /**
-   * Exécute la proposition stockée : crée la tâche via le service de
-   * maintenance (qui revalide ses règles), vide `pendingAction` et appose la
-   * carte de création. Le bateau est chargé et autorisé par le contrôleur
-   * (bouncer `MaintenancePolicy.create`) — jamais depuis un payload client.
+   * Exécute la proposition stockée via le registre d'actions (le service
+   * métier revalide ses règles), vide `pendingAction` et appose la carte de
+   * résultat. Le bateau est chargé et autorisé par le contrôleur (Bouncer par
+   * kind) — jamais depuis un payload client.
    */
   async confirmPendingAction(
     user: User,
-    boat: Boat,
+    boat: Boat | null,
     conversation: AiAssistantConversation
-  ): Promise<{ conversation: AiAssistantConversation; task: BoatMaintenanceTask }> {
+  ): Promise<{ conversation: AiAssistantConversation; outcome: AssistantActionOutcome }> {
     const proposal = conversation.pendingAction
     // Re-lecture défensive : idempotence au double-clic (le premier clic a vidé l'action).
     if (proposal === null) {
       throw new AssistantNoPendingActionError()
     }
 
-    const task = await this.maintenanceTaskService.createForBoat(user, boat, {
-      subject: proposal.subject,
-      title: proposal.title,
-      notes: proposal.notes,
-      boatEngineId: proposal.boatEngineId,
-      dueAt: proposal.dueAt,
-      dueEngineHours: proposal.dueEngineHours,
-      recurrenceIntervalMonths: proposal.recurrenceIntervalMonths,
-      recurrenceIntervalEngineHours: proposal.recurrenceIntervalEngineHours,
-    })
+    const outcome = await this.actionsService.execute(user, boat, proposal)
 
     conversation.pendingAction = null
     conversation.messages = [
       ...conversation.messages,
-      {
-        role: 'assistant',
-        content: '',
-        card: {
-          kind: 'task_created',
-          taskId: task.id,
-          boatName: proposal.boatName,
-          title: proposal.title,
-          dueAt: proposal.dueAt,
-          dueEngineHours: proposal.dueEngineHours,
-        },
-      },
+      { role: 'assistant', content: '', card: outcome.card },
     ]
     await conversation.save()
 
-    return { conversation, task }
+    return { conversation, outcome }
   }
 
   /** Refuse la proposition en attente — le fil reprend. */
   async dismissPendingAction(user: User, token: string): Promise<AiAssistantConversation> {
-    const { conversation } = await this.getConversationWithPendingActionOrFail(user, token)
+    const { conversation, proposal } = await this.getConversationWithPendingActionOrFail(
+      user,
+      token
+    )
 
     conversation.pendingAction = null
     conversation.messages = [
       ...conversation.messages,
-      { role: 'assistant', content: '', card: { kind: 'task_dismissed' } },
+      // `task_dismissed` conservé pour la proposition de tâche : les fils
+      // stockés d'avant l'agent actionnable le portent déjà.
+      {
+        role: 'assistant',
+        content: '',
+        card:
+          proposal.kind === 'create_task'
+            ? { kind: 'task_dismissed' }
+            : { kind: 'action_dismissed', actionKind: proposal.kind },
+      },
     ]
     await conversation.save()
 
@@ -216,7 +248,8 @@ export default class AssistantChatService {
   #exchangeWithQuota(
     conversation: AiAssistantConversation,
     message: string,
-    user: User
+    user: User,
+    turn: AssistantTurnContext
   ): Promise<AiAssistantConversation> {
     return this.aiTokenQuotaService.withOrgLock(user.organization.id, async () => {
       const active = await this.organizationAiKeyService.resolveActiveKey(user.organization)
@@ -224,7 +257,7 @@ export default class AssistantChatService {
         const currentUsage = await this.aiTokenQuotaService.getUsage(user.organization.id)
         this.aiTokenQuotaService.assertCanUseTokens(user.organization, currentUsage)
       }
-      return this.#exchange(conversation, message, user, active)
+      return this.#exchange(conversation, message, user, active, turn)
     })
   }
 
@@ -241,7 +274,8 @@ export default class AssistantChatService {
     conversation: AiAssistantConversation,
     userMessage: string,
     user: User,
-    active: { provider: AiProvider; apiKey: string } | null
+    active: { provider: AiProvider; apiKey: string } | null,
+    turn: AssistantTurnContext
   ): Promise<AiAssistantConversation> {
     const roster = await this.contextService.buildFleetRoster(user)
 
@@ -251,6 +285,8 @@ export default class AssistantChatService {
     ]
 
     const tools = await this.toolsService.definitionsFor(user)
+    const quotas = await this.moduleService.getEffectiveQuotas(user.organization)
+    const allowedKinds = await this.actionsService.allowedKindsFor(user, quotas)
     const options: AiChatOptions = {
       provider: active?.provider ?? 'mistral',
       model: user.organization.aiModelOverride,
@@ -261,7 +297,10 @@ export default class AssistantChatService {
       conversation,
       pendingMessages,
       user,
-      roster
+      roster,
+      allowedKinds,
+      turn.pageUrl,
+      quotas
     )
 
     let content = ''
@@ -323,7 +362,7 @@ export default class AssistantChatService {
 
     // Validations AVANT toute écriture : chaque id rendu par le modèle doit
     // appartenir au roster de l'org.
-    let pendingAction: AssistantTaskProposal | null = null
+    let pendingAction: AssistantPendingAction | null = null
     let assistantMessage: AssistantMessage = { role: 'assistant', content: reply.message }
 
     if (reply.type === 'answer') {
@@ -338,8 +377,24 @@ export default class AssistantChatService {
       }
     }
 
-    if (reply.type === 'propose_task') {
-      pendingAction = this.#validateTaskProposal(reply, roster)
+    if (reply.type === 'propose_action') {
+      try {
+        pendingAction = await this.actionsService.validateProposal(user, reply.action, roster, {
+          quotas,
+          tzOffsetMinutes: turn.tzOffsetMinutes,
+        })
+      } catch (error) {
+        // La flotte ne permet pas d'exécuter l'action (aucune sortie ouverte à
+        // clôturer, par exemple) : ce n'est pas une réponse malformée, on ne
+        // jette pas le tour — l'assistant l'explique et le fil continue.
+        if (!(error instanceof AssistantActionNotExecutableError)) throw error
+        assistantMessage = {
+          role: 'assistant',
+          content:
+            NOT_EXECUTABLE_MESSAGES[error.reason][conversation.locale === 'fr' ? 'fr' : 'en'],
+          source: 'fleet_data',
+        }
+      }
     }
 
     if (reply.type === 'handoff') {
@@ -426,51 +481,6 @@ export default class AssistantChatService {
     }
   }
 
-  /** Miroir des règles de `BoatMaintenanceTaskService.createForBoat` + roster. */
-  #validateTaskProposal(
-    reply: Extract<AssistantAiReply, { type: 'propose_task' }>,
-    roster: AssistantFleetRoster
-  ): AssistantTaskProposal {
-    const { task } = reply
-
-    const boat = roster.boats.find((b) => b.id === task.boatId)
-    if (boat === undefined) {
-      throw new AiInvalidResponseError('Assistant task proposal names a boat outside the roster')
-    }
-
-    let engineLabel: string | null = null
-    if (task.boatEngineId !== null) {
-      const engine = boat.engines.find((e) => e.id === task.boatEngineId)
-      if (engine === undefined) {
-        throw new AiInvalidResponseError('Assistant task proposal names an engine outside the boat')
-      }
-      engineLabel = engine.label
-    }
-
-    const hasEngineHours =
-      task.dueEngineHours !== null || task.recurrenceIntervalEngineHours !== null
-    if (hasEngineHours && task.subject !== 'engine') {
-      throw new AiInvalidResponseError('Assistant engine-hour proposal must have subject=engine')
-    }
-    if (hasEngineHours && task.boatEngineId === null) {
-      throw new AiInvalidResponseError('Assistant engine-hour proposal has no boatEngineId')
-    }
-
-    return {
-      boatId: boat.id,
-      boatName: boat.name,
-      engineLabel,
-      subject: task.subject,
-      title: task.title,
-      notes: task.notes,
-      boatEngineId: task.boatEngineId,
-      dueAt: task.dueAt,
-      dueEngineHours: task.dueEngineHours,
-      recurrenceIntervalMonths: task.recurrenceIntervalMonths,
-      recurrenceIntervalEngineHours: task.recurrenceIntervalEngineHours,
-    }
-  }
-
   /**
    * Fil envoyé au modèle : prompt système reconstruit à chaque tour (jamais
    * stocké), fenêtre glissante sur l'historique, cartes structurées rendues en
@@ -480,7 +490,10 @@ export default class AssistantChatService {
     conversation: AiAssistantConversation,
     pendingMessages: AssistantMessage[],
     user: User,
-    roster: AssistantFleetRoster
+    roster: AssistantFleetRoster,
+    allowedKinds: AssistantActionKind[],
+    pageUrl: string | null,
+    quotas: PlanQuotas
   ): Promise<AiChatMessage[]> {
     const locale = conversation.locale as AiSuggestionLocale
     const fr = locale === 'fr'
@@ -491,6 +504,12 @@ export default class AssistantChatService {
     }))
 
     const digestLines = await this.contextService.buildFleetDigestLines(user, locale)
+    const pageLine = await this.pageContextService.resolvePageLine(user, pageUrl, locale)
+
+    // Playbooks : sélection déterministe sur le message courant + la page.
+    const pagePath = pageUrl !== null ? normalizePath(pageUrl) : null
+    const userMessage = pendingMessages.at(-1)?.content ?? ''
+    const playbooks = this.playbookService.select(userMessage, pagePath, quotas, locale)
 
     const systemPrompt = buildAssistantSystemPrompt(locale, {
       orgName: user.organization.name,
@@ -498,6 +517,9 @@ export default class AssistantChatService {
       rosterLines: this.contextService.rosterLines(roster),
       rosterTruncated: roster.truncated,
       digestLines,
+      actionLines: buildActionLines(allowedKinds, locale),
+      pageLine,
+      playbookSection: this.playbookService.buildPromptSection(playbooks, locale),
       customPrompt: user.organization.aiSystemPrompt,
     })
 
@@ -517,6 +539,17 @@ export default class AssistantChatService {
       return fr
         ? '[Proposition de tâche refusée par l’utilisateur]'
         : '[Task proposal dismissed by the user]'
+    }
+    if (card.kind === 'action_done') {
+      const detail = [card.label, card.boatName].filter((v) => v !== null).join(' — ')
+      return fr
+        ? `[Action ${card.actionKind} confirmée et exécutée${detail ? ` : ${detail}` : ''}]`
+        : `[Action ${card.actionKind} confirmed and executed${detail ? `: ${detail}` : ''}]`
+    }
+    if (card.kind === 'action_dismissed') {
+      return fr
+        ? `[Proposition ${card.actionKind} refusée par l’utilisateur]`
+        : `[${card.actionKind} proposal dismissed by the user]`
     }
     // handoff : le message du modèle porte déjà le contexte.
     return message.content

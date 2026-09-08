@@ -2,6 +2,7 @@ import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 import type {
   AssistantMessage,
+  AssistantPendingAction,
   AssistantStatus,
   AssistantTaskProposal,
 } from '#shared/types/assistant'
@@ -44,11 +45,18 @@ export default class AiAssistantConversation extends BaseModel {
   declare messages: AssistantMessage[]
 
   @column({
-    prepare: (v: AssistantTaskProposal | null) => (v === null ? null : JSON.stringify(v)),
-    consume: (v: string | AssistantTaskProposal | null) =>
-      typeof v === 'string' ? JSON.parse(v) : v,
+    prepare: (v: AssistantPendingAction | null) => (v === null ? null : JSON.stringify(v)),
+    // Les blobs antérieurs à l'agent actionnable n'ont pas de champ `kind` :
+    // ils sont des propositions de tâche — enveloppés à la lecture, sans
+    // migration (une action en attente bloque le fil, il y en a très peu).
+    consume: (v: string | AssistantPendingAction | null): AssistantPendingAction | null => {
+      const parsed = typeof v === 'string' ? (JSON.parse(v) as AssistantPendingAction | null) : v
+      if (parsed === null) return null
+      if ('kind' in parsed) return parsed
+      return { ...(parsed as AssistantTaskProposal), kind: 'create_task' }
+    },
   })
-  declare pendingAction: AssistantTaskProposal | null
+  declare pendingAction: AssistantPendingAction | null
 
   @column()
   declare tokensUsed: number

@@ -346,7 +346,15 @@
       "invitation_accept": "Invitation accepted",
       "maintenance_task_create": "Maintenance task created",
       "maintenance_task_complete": "Maintenance task completed",
-      "maintenance_task_delete": "Maintenance task deleted"
+      "maintenance_task_delete": "Maintenance task deleted",
+      "engine_add_hours": "Engine hours added",
+      "navigation_log_create": "Trip opened",
+      "navigation_log_close": "Trip closed",
+      "fuel_log_create": "Refueling recorded",
+      "incident_create": "Incident reported",
+      "reservation_create": "Reservation created",
+      "client_create": "Client created",
+      "engine_part_set_stock": "Part stock updated"
     },
     "empty": {
       "title": "No activity yet",

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@adonisjs/inertia/vue'
-import { router } from '@inertiajs/vue3'
+import { router, usePage } from '@inertiajs/vue3'
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import AssistantComposer from '~/components/assistant/AssistantComposer.vue'
 import AssistantThread from '~/components/assistant/AssistantThread.vue'
@@ -8,9 +8,11 @@ import AssistantUpsell from '~/components/assistant/AssistantUpsell.vue'
 import { useAssistantPanel } from '~/composables/use_assistant_panel'
 import { useNumberFormat } from '~/composables/use_number_format'
 import { useT } from '~/composables/use_t'
+import { tzOffsetMinutes } from '~/utils/local_datetime'
 import {
   ASSISTANT_AI_USAGE_WARNING_RATIO,
   ASSISTANT_MAX_USER_MESSAGES,
+  ASSISTANT_PAGE_URL_MAX_LENGTH,
 } from '#shared/types/assistant'
 
 /**
@@ -20,7 +22,7 @@ import {
  */
 const { t } = useT()
 const { formatNumber } = useNumberFormat()
-const { conversation, aiUsage, canUseAI, close, ensureLoaded } = useAssistantPanel()
+const { conversation, aiUsage, starters, canUseAI, close, ensureLoaded } = useAssistantPanel()
 
 /**
  * Pied de consommation (#642) : la paire { used, limit } du mois, discrète en
@@ -56,6 +58,8 @@ const composerDisabled = computed(
 
 const showComposer = computed(() => !maxMessagesReached.value)
 
+const page = usePage()
+
 function submit(message: string) {
   const url = conversation.value
     ? `/assistant/conversations/${conversation.value.token}/messages`
@@ -64,7 +68,15 @@ function submit(message: string) {
   pendingMessage.value = message
   router.post(
     url,
-    { message },
+    // `pageUrl` : la page depuis laquelle l'utilisateur écrit — le serveur la
+    // résout en contexte de prompt (« ce bateau »), jamais stockée.
+    // `tzOffsetMinutes` : la confirmation d'action n'envoie aucun payload, donc
+    // l'offset part avec le message et suit la proposition jusqu'à l'exécution.
+    {
+      message,
+      pageUrl: page.url.slice(0, ASSISTANT_PAGE_URL_MAX_LENGTH),
+      tzOffsetMinutes: tzOffsetMinutes(),
+    },
     {
       preserveScroll: true,
       preserveState: true,
@@ -178,6 +190,8 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
         :conversation="conversation"
         :pending-message="pendingMessage"
         :processing="processing"
+        :starters="starters"
+        @starter="submit"
       />
 
       <div
