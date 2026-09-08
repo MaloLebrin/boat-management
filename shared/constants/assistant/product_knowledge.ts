@@ -539,8 +539,8 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
       fr: 'Gestion des ports',
     },
     body: {
-      en: 'The Ports page (/ports) lets Pro and Enterprise organizations manage their ports: name, city, country, address and notes, with a detail page per port. Creating, editing and deleting a port is reserved to organization admins; every member can view. Ports feed the rest of the app: they are suggested when entering a home port, a departure or arrival port in the logbook, or a port stay in the budget — those fields remain free text, the list only assists input. Starter plans do not include marina mapping.',
-      fr: 'La page Ports (/ports) permet aux organisations Pro et Entreprise de gérer leurs ports : nom, ville, pays, adresse et notes, avec une page de détail par port. Créer, modifier et supprimer un port est réservé aux admins de l’organisation ; tout membre peut consulter. Les ports alimentent le reste de l’app : ils sont suggérés à la saisie d’un port d’attache, d’un port de départ ou d’arrivée dans le journal de bord, ou d’une escale dans le budget — ces champs restent en texte libre, la liste ne fait qu’assister la saisie. Le plan Starter n’inclut pas la cartographie marina.',
+      en: 'The Ports page (/ports) lets Pro and Enterprise organizations manage their ports: name, city, country, address and notes, with a detail page per port. Creating, editing and deleting a port is reserved to organization admins; every member can view. Ports feed the rest of the app: they are suggested when entering a home port, a departure or arrival port in the logbook, or a port stay in the budget — those fields remain free text, the list only assists input. Starter plans do not include marina mapping, and neither do organizations whose declared profile is a private owner: no plan change unlocks it for them, only a change of profile.',
+      fr: 'La page Ports (/ports) permet aux organisations Pro et Entreprise de gérer leurs ports : nom, ville, pays, adresse et notes, avec une page de détail par port. Créer, modifier et supprimer un port est réservé aux admins de l’organisation ; tout membre peut consulter. Les ports alimentent le reste de l’app : ils sont suggérés à la saisie d’un port d’attache, d’un port de départ ou d’arrivée dans le journal de bord, ou d’une escale dans le budget — ces champs restent en texte libre, la liste ne fait qu’assister la saisie. Le plan Starter n’inclut pas la cartographie marina, et les organisations dont le profil déclaré est « particulier » non plus : aucun changement de plan ne l’ouvre, seul un changement de profil le ferait.',
     },
     keywords: [
       'port',
@@ -553,6 +553,10 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
       'gestion',
       'harbour',
       'harbor',
+      'particulier',
+      'private',
+      'profil',
+      'profile',
     ],
     navTarget: 'ports.index',
     planFlag: 'canManagePorts',
@@ -564,8 +568,8 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
       fr: 'Plan de marina : pontons, mouillages et places',
     },
     body: {
-      en: 'Inside a port, Pro and Enterprise organizations map the marina: pontoons and mooring areas are created with their positions on an interactive 2D plan, and each carries berths (spots) where boats can be assigned. Positions are adjusted by drag on the plan and saved instantly. Creating, editing and deleting pontoons, moorings and their positions is reserved to admins; berths can be created and edited by members. The map gives a visual overview of where every boat of the organization is berthed.',
-      fr: 'À l’intérieur d’un port, les organisations Pro et Entreprise cartographient la marina : les pontons et les zones de mouillage sont créés avec leur position sur un plan 2D interactif, et chacun porte des places (spots) où affecter des bateaux. Les positions s’ajustent par glisser-déposer sur le plan et sont enregistrées immédiatement. Créer, modifier et supprimer pontons, mouillages et positions est réservé aux admins ; les places peuvent être créées et modifiées par les membres. Le plan donne une vue visuelle de l’emplacement de chaque bateau de l’organisation.',
+      en: 'Inside a port, Pro and Enterprise organizations map the marina: pontoons and mooring areas are created with their positions on an interactive 2D plan, and each carries berths (spots) where boats can be assigned. Positions are adjusted by drag on the plan and saved instantly. Creating, editing and deleting pontoons, moorings and their positions is reserved to admins; berths can be created and edited by members. The map gives a visual overview of where every boat of the organization is berthed. It is unavailable to organizations declared as private owners, whatever their plan.',
+      fr: 'À l’intérieur d’un port, les organisations Pro et Entreprise cartographient la marina : les pontons et les zones de mouillage sont créés avec leur position sur un plan 2D interactif, et chacun porte des places (spots) où affecter des bateaux. Les positions s’ajustent par glisser-déposer sur le plan et sont enregistrées immédiatement. Créer, modifier et supprimer pontons, mouillages et positions est réservé aux admins ; les places peuvent être créées et modifiées par les membres. Le plan donne une vue visuelle de l’emplacement de chaque bateau de l’organisation. Il n’est pas proposé aux organisations déclarées « particulier », quel que soit leur plan.',
     },
     keywords: [
       'ponton',

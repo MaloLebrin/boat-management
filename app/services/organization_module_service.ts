@@ -85,7 +85,13 @@ export default class OrganizationModuleService {
   /**
    * Quotas effectifs de l'organisation : ceux de son tier, fusionnés avec les
    * flags de ses modules actifs, puis augmentés par ses add-ons quantitatifs
-   * (helper pur `resolveEffectiveQuotas`).
+   * (helper pur `resolveEffectiveQuotas`), et enfin restreints par le profil
+   * déclaré à l'inscription (`org.type`) — un compte particulier n'a pas de
+   * marina à cartographier.
+   *
+   * C'est le point de passage unique du backend : le copilote (outils,
+   * playbooks, actions) et la page facturation en héritent sans connaître la
+   * règle de profil.
    */
   async getEffectiveQuotas(org: Organization): Promise<PlanQuotas> {
     const rows = await OrganizationModule.query().where('organizationId', org.id)
@@ -93,7 +99,7 @@ export default class OrganizationModuleService {
     const addons = rows
       .filter((row) => isPlanAddon(row.module))
       .map((row) => ({ addon: row.module as PlanAddon, quantity: row.quantity }))
-    return resolveEffectiveQuotas(org.plan, modules, addons)
+    return resolveEffectiveQuotas(org.plan, modules, addons, org.type)
   }
 
   async hasModule(organizationId: number, module: PlanModule): Promise<boolean> {

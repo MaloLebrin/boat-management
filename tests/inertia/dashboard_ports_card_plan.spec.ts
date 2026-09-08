@@ -45,9 +45,13 @@ const stubs = {
   PortDashboardCard: { template: '<div class="port-dashboard-card" />' },
 }
 
-function mountDashboard(currentPlan: unknown, ports: DashboardPortItem[] = [PORT]) {
+function mountDashboard(
+  currentPlan: unknown,
+  ports: DashboardPortItem[] = [PORT],
+  organizationType: unknown = undefined
+) {
   vi.mocked(usePage).mockReturnValue({
-    props: { currentPlan, activeModules: [], activeAddons: [] },
+    props: { currentPlan, activeModules: [], activeAddons: [], organizationType },
   } as unknown as ReturnType<typeof usePage>)
 
   return mount(Dashboard, {
@@ -106,5 +110,15 @@ test('un plan absent masque la carte ports du dashboard', () => {
 
 test('le plan Pro sans aucun port affiche quand même la carte et son état vide', () => {
   const wrapper = mountDashboard('pro', [])
+  expect(wrapper.find('.port-dashboard-card').exists()).toBe(true)
+})
+
+test('the ports card is hidden for a private organization profile', () => {
+  const wrapper = mountDashboard('pro', [PORT], 'private')
+  expect(wrapper.find('.port-dashboard-card').exists()).toBe(false)
+})
+
+test('the ports card stays visible for a professional profile', () => {
+  const wrapper = mountDashboard('pro', [PORT], 'marina')
   expect(wrapper.find('.port-dashboard-card').exists()).toBe(true)
 })

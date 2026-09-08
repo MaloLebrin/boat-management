@@ -32,6 +32,7 @@ import type {
   AssistantStarterProps,
 } from '#shared/types/assistant'
 import type User from '#models/user'
+import type { OrganizationType } from '#shared/types/organization'
 
 export async function resolveSharedCurrentPlan(
   user: User | undefined
@@ -42,6 +43,23 @@ export async function resolveSharedCurrentPlan(
   // exists) — mirror the same guard resolveSharedBranding already has below,
   // instead of assuming the relation always resolved.
   return user.organization?.plan
+}
+
+/**
+ * Profil déclaré à l'inscription (`organizations.type`), partagé avec le front
+ * parce qu'il restreint des capacités : un compte particulier n'a pas de
+ * marina à cartographier.
+ *
+ * Profil non renseigné → `undefined`, comme `resolveSharedCurrentPlan` : le
+ * sérialiseur Inertia refuse un `null` dans `always()`, et une prop absente dit
+ * exactement la même chose côté front — aucune restriction.
+ */
+export async function resolveSharedOrganizationType(
+  user: User | undefined
+): Promise<OrganizationType | undefined> {
+  if (!user?.organizationId) return undefined
+  await user.load('organization')
+  return user.organization?.type ?? undefined
 }
 
 /**
@@ -133,6 +151,7 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
       await auth.user.load('organization')
     }
     const currentPlan = await resolveSharedCurrentPlan(auth?.user)
+    const organizationType = await resolveSharedOrganizationType(auth?.user)
     // Modules add-ons actifs (épic #327) : partagés avec `currentPlan` pour que
     // le front résolve les quotas effectifs via le même helper que le backend.
     const activeModules: PlanModule[] = auth?.user?.organizationId
@@ -178,6 +197,7 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
       ),
       user: ctx.inertia.always(auth?.user ? UserTransformer.transform(auth.user) : undefined),
       currentPlan: ctx.inertia.always(currentPlan),
+      organizationType: ctx.inertia.always(organizationType),
       activeModules: ctx.inertia.always(activeModules),
       activeAddons: ctx.inertia.always(activeAddons as unknown as JSONDataTypes),
       branding: ctx.inertia.always(branding),

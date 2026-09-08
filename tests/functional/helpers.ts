@@ -2,6 +2,8 @@ import OrganizationMembership from '#models/organization_membership'
 import type User from '#models/user'
 import OrganizationModuleService from '#services/organization_module_service'
 import { UserFactory } from '#database/factories/user_factory'
+import type { PlanTier } from '#shared/types/plan'
+import type { OrganizationType } from '#shared/types/organization'
 
 /**
  * Creates a user with admin membership in their organization.
@@ -95,4 +97,16 @@ export async function createEnterprisePlanUser(): Promise<User> {
  */
 export async function createStarterPlanUser(): Promise<User> {
   return UserFactory.with('organization', 1, (org) => org.merge({ plan: 'starter' })).create()
+}
+
+/**
+ * Crée un utilisateur dans une organisation d'un plan et d'un profil déclarés,
+ * sans membership. Sert aux tests de la garde de profil sur la cartographie de
+ * port : c'est le couple (plan, `organizations.type`) qui décide, pas le rôle.
+ */
+export async function createPlanUserWithProfile(
+  plan: PlanTier,
+  type: OrganizationType | null
+): Promise<User> {
+  return UserFactory.with('organization', 1, (org) => org.merge({ plan, type })).create()
 }

@@ -1,10 +1,12 @@
 import { QuotaExceededError } from '#exceptions/quota_errors'
+import { PortsUnavailableForPrivateProfileError } from '#exceptions/port_errors'
 import { UserNotInOrganizationError } from '#exceptions/organization_errors'
 import Boat from '#models/boat'
 import Organization from '#models/organization'
 import OrganizationMembership from '#models/organization_membership'
 import OrganizationModuleService from '#services/organization_module_service'
 import { PLAN_LIMITS, getUpgradeTier, type QuotaUsage } from '#shared/types/plan'
+import { canManagePortsFor, isPortlessOrganizationProfile } from '#shared/helpers/plan'
 import { inject } from '@adonisjs/core'
 import StorageThresholdCrossed from '#events/storage_threshold_crossed'
 import db from '@adonisjs/lucid/services/db'
@@ -208,14 +210,27 @@ export default class QuotaService {
    * `PLAN_LIMITS` et non les quotas effectifs. Réservée à Pro et Entreprise :
    * un plan Starter cadre un ou deux bateaux personnels, il n'a pas de marina
    * à modéliser (#604).
+   *
+   * S'y ajoute une restriction de **profil** : une organisation déclarée
+   * particulier (`organizations.type === 'private'`) n'a pas de marina non
+   * plus, même sur un plan qui inclut la fonctionnalité.
    */
   canManagePorts(org: Organization | null): boolean {
     this.#assertOrganization(org)
-    return PLAN_LIMITS[org.plan].canManagePorts
+    return canManagePortsFor(org.plan, org.type)
   }
 
+  /**
+   * Deux refus distincts, dans cet ordre : le **profil** d'abord, parce qu'un
+   * compte particulier ne débloquera jamais la cartographie en changeant de
+   * plan — lui proposer un upgrade serait faux. Le plan ensuite, avec son
+   * upsell habituel.
+   */
   assertCanManagePorts(org: Organization | null): void {
     this.#assertOrganization(org)
+    if (isPortlessOrganizationProfile(org.type)) {
+      throw new PortsUnavailableForPrivateProfileError()
+    }
     if (!PLAN_LIMITS[org.plan].canManagePorts) {
       throw new QuotaExceededError('ports', {
         limit: null,

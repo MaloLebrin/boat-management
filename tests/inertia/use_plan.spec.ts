@@ -119,3 +119,52 @@ test('an extra_boats add-on lifts maxBoats by its quantity', () => {
   // Pro (8) + 3 bateaux supplémentaires
   expect(effectiveQuotas.value?.maxBoats).toBe(11)
 })
+
+// organizationType
+
+test('organizationType returns the profile when it is a known value', () => {
+  const { organizationType } = mountWithProps({
+    currentPlan: 'pro',
+    organizationType: 'private',
+  })
+  expect(organizationType.value).toBe('private')
+})
+
+test('organizationType is null for an unknown, missing or non-string profile', () => {
+  expect(
+    mountWithProps({ currentPlan: 'pro', organizationType: 'ferry' }).organizationType.value
+  ).toBeNull()
+  expect(mountWithProps({ currentPlan: 'pro' }).organizationType.value).toBeNull()
+  expect(
+    mountWithProps({ currentPlan: 'pro', organizationType: 42 }).organizationType.value
+  ).toBeNull()
+})
+
+test('a private profile removes port mapping whatever the plan', () => {
+  expect(
+    mountWithProps({ currentPlan: 'pro', organizationType: 'private' }).effectiveQuotas.value
+      ?.canManagePorts
+  ).toBe(false)
+  expect(
+    mountWithProps({ currentPlan: 'enterprise', organizationType: 'private' }).effectiveQuotas.value
+      ?.canManagePorts
+  ).toBe(false)
+})
+
+test('a private profile removes nothing but port mapping', () => {
+  const { effectiveQuotas } = mountWithProps({
+    currentPlan: 'enterprise',
+    organizationType: 'private',
+  })
+  expect(effectiveQuotas.value?.canManageClients).toBe(true)
+  expect(effectiveQuotas.value?.canManageInvoices).toBe(true)
+  expect(effectiveQuotas.value?.canUseAI).toBe(true)
+})
+
+test('a professional or undeclared profile keeps port mapping', () => {
+  expect(
+    mountWithProps({ currentPlan: 'pro', organizationType: 'marina' }).effectiveQuotas.value
+      ?.canManagePorts
+  ).toBe(true)
+  expect(mountWithProps({ currentPlan: 'pro' }).effectiveQuotas.value?.canManagePorts).toBe(true)
+})

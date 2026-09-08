@@ -3,6 +3,8 @@ import { usePage } from '@inertiajs/vue3'
 import { resolveEffectiveQuotas } from '../../shared/helpers/plan'
 import type { ActiveAddonQuantity } from '../../shared/helpers/plan'
 import { isPlanAddon, isPlanModule } from '../../shared/types/plan'
+import { ORGANIZATION_TYPES } from '../../shared/types/organization'
+import type { OrganizationType } from '../../shared/types/organization'
 import type { ActiveAddonInfo, PlanModule, PlanQuotas, PlanTier } from '../../shared/types/plan'
 
 const VALID_PLANS = new Set<string>(['starter', 'pro', 'enterprise'])
@@ -10,9 +12,10 @@ const VALID_PLANS = new Set<string>(['starter', 'pro', 'enterprise'])
 /**
  * Plan courant, modules actifs, add-ons quantitatifs et quotas effectifs de
  * l'organisation, dérivés des props Inertia partagées (`currentPlan`,
- * `activeModules`, `activeAddons`). Les quotas effectifs sont résolus par le
- * même helper pur que le backend (`resolveEffectiveQuotas`) — ne jamais
- * recombiner tier + modules + add-ons ailleurs.
+ * `activeModules`, `activeAddons`, `organizationType`). Les quotas effectifs
+ * sont résolus par le même helper pur que le backend
+ * (`resolveEffectiveQuotas`) — ne jamais recombiner tier + modules + add-ons +
+ * profil ailleurs.
  */
 export function usePlan() {
   const page = usePage()
@@ -44,14 +47,32 @@ export function usePlan() {
     )
   })
 
+  /**
+   * Profil déclaré à l'inscription : il restreint des capacités (un compte
+   * particulier n'a pas de marina à cartographier). Prop absente ou valeur
+   * inconnue → `null`, c'est-à-dire aucune restriction, comme côté backend.
+   */
+  const organizationType = computed<OrganizationType | null>(() => {
+    const value = page.props.organizationType
+    if (typeof value !== 'string') return null
+    return (ORGANIZATION_TYPES as readonly string[]).includes(value)
+      ? (value as OrganizationType)
+      : null
+  })
+
   const effectiveQuotas = computed<PlanQuotas | null>(() => {
     if (currentPlan.value === null) return null
     const addons: ActiveAddonQuantity[] = activeAddons.value.map((a) => ({
       addon: a.addon,
       quantity: a.quantity,
     }))
-    return resolveEffectiveQuotas(currentPlan.value, activeModules.value, addons)
+    return resolveEffectiveQuotas(
+      currentPlan.value,
+      activeModules.value,
+      addons,
+      organizationType.value
+    )
   })
 
-  return { currentPlan, activeModules, activeAddons, effectiveQuotas }
+  return { currentPlan, activeModules, activeAddons, organizationType, effectiveQuotas }
 }
