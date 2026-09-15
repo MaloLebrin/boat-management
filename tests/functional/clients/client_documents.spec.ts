@@ -1,63 +1,10 @@
-import { UserFactory } from '#database/factories/user_factory'
 import { MediaFactory } from '#database/factories/media_factory'
 import Client from '#models/client'
 import Media from '#models/media'
-import OrganizationMembership from '#models/organization_membership'
-import { createAdminUser } from '#tests/functional/helpers'
-import { CloudinaryService } from '#services/cloudinary_service'
-import app from '@adonisjs/core/services/app'
+import { createAdminUser, createEnterpriseAdminUser } from '#tests/functional/helpers'
 import { truncateDb } from '#tests/utils/db'
 import { test } from '@japa/runner'
-
-async function createEnterpriseAdminUser() {
-  const user = await UserFactory.with('organization', 1, (org) =>
-    org.merge({ plan: 'enterprise' })
-  ).create()
-  if (user.organizationId) {
-    await OrganizationMembership.create({
-      userId: user.id,
-      organizationId: user.organizationId,
-      role: 'admin',
-    })
-  }
-  return user
-}
-
-function swapFakeCloudinary() {
-  const uploaded: string[] = []
-  const deletedPublicIds: string[] = []
-  const deletedFolders: string[] = []
-  app.container.swap(
-    CloudinaryService,
-    () =>
-      ({
-        uploadDocument: async () => {
-          const publicId = `fake-client-doc-${uploaded.length}`
-          uploaded.push(publicId)
-          return {
-            publicId,
-            url: `http://res.cloudinary.com/${publicId}.pdf`,
-            secureUrl: `https://res.cloudinary.com/${publicId}.pdf`,
-            format: 'pdf',
-            resourceType: 'raw',
-            bytes: 2048,
-            originalFilename: 'permit',
-          }
-        },
-        deleteFile: async (publicId: string) => {
-          deletedPublicIds.push(publicId)
-        },
-        deleteFolder: async (folder: string) => {
-          deletedFolders.push(folder)
-        },
-        downloadAsBuffer: async () => ({
-          buffer: Buffer.from('%PDF-1.4 fake'),
-          contentType: 'application/pdf',
-        }),
-      }) as unknown as CloudinaryService
-  )
-  return { uploaded, deletedPublicIds, deletedFolders }
-}
+import { restoreCloudinary, swapFakeCloudinary } from '#tests/support/fakes'
 
 test.group('Client documents (functional)', (group) => {
   group.each.setup(() => truncateDb())
@@ -92,7 +39,7 @@ test.group('Client documents (functional)', (group) => {
       assert.equal(media.kind, 'document')
       assert.lengthOf(fake.uploaded, 1)
     } finally {
-      app.container.restore(CloudinaryService)
+      restoreCloudinary()
     }
   })
 
@@ -130,7 +77,7 @@ test.group('Client documents (functional)', (group) => {
       assert.lengthOf(medias, 2)
       assert.lengthOf(fake.uploaded, 2)
     } finally {
-      app.container.restore(CloudinaryService)
+      restoreCloudinary()
     }
   })
 
@@ -184,7 +131,7 @@ test.group('Client documents (functional)', (group) => {
       assert.isNull(await Media.find(media.id))
       assert.deepEqual(fake.deletedPublicIds, [media.cloudinaryPublicId])
     } finally {
-      app.container.restore(CloudinaryService)
+      restoreCloudinary()
     }
   })
 
@@ -220,7 +167,7 @@ test.group('Client documents (functional)', (group) => {
       assert.isNotNull(await Media.find(media.id))
       assert.isEmpty(fake.deletedPublicIds)
     } finally {
-      app.container.restore(CloudinaryService)
+      restoreCloudinary()
     }
   })
 
@@ -252,7 +199,7 @@ test.group('Client documents (functional)', (group) => {
       assert.equal(Number(remaining[0].$extras.total), 0)
       assert.lengthOf(fake.deletedFolders, 1)
     } finally {
-      app.container.restore(CloudinaryService)
+      restoreCloudinary()
     }
   })
 
@@ -274,7 +221,7 @@ test.group('Client documents (functional)', (group) => {
       response.assertHeader('location', '/settings/billing')
       assert.isEmpty(fake.uploaded)
     } finally {
-      app.container.restore(CloudinaryService)
+      restoreCloudinary()
     }
   })
 
@@ -302,7 +249,7 @@ test.group('Client documents (functional)', (group) => {
       response.assertStatus(200)
       response.assertHeader('content-type', 'application/pdf')
     } finally {
-      app.container.restore(CloudinaryService)
+      restoreCloudinary()
     }
   })
 

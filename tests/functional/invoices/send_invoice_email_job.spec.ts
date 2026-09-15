@@ -3,27 +3,12 @@ import { truncateDb } from '#tests/utils/db'
 import mail from '@adonisjs/mail/services/main'
 import app from '@adonisjs/core/services/app'
 import { DateTime } from 'luxon'
-import { UserFactory } from '#database/factories/user_factory'
-import OrganizationMembership from '#models/organization_membership'
 import Client from '#models/client'
 import Invoice from '#models/invoice'
 import InvoiceLine from '#models/invoice_line'
 import QueueDedupService from '#services/queue_dedup_service'
 import SendInvoiceEmail, { type SendInvoiceEmailPayload } from '#jobs/send_invoice_email'
-
-async function createEnterpriseOrgUser() {
-  const user = await UserFactory.with('organization', 1, (org) =>
-    org.merge({ plan: 'enterprise' })
-  ).create()
-  if (user.organizationId) {
-    await OrganizationMembership.create({
-      userId: user.id,
-      organizationId: user.organizationId,
-      role: 'admin',
-    })
-  }
-  return user
-}
+import { createEnterpriseAdminUser } from '#tests/functional/helpers'
 
 test.group('SendInvoiceEmail job', (group) => {
   group.each.setup(() => truncateDb())
@@ -33,7 +18,7 @@ test.group('SendInvoiceEmail job', (group) => {
     // collection (the `mails` collection only captures class-based BaseMail).
     const { messages } = mail.fake()
 
-    const user = await createEnterpriseOrgUser()
+    const user = await createEnterpriseAdminUser()
     const orgId = user.organizationId!
     const c = await Client.create({
       organizationId: orgId,

@@ -1,15 +1,13 @@
 import { test } from '@japa/runner'
 import { truncateDb } from '#tests/utils/db'
-import app from '@adonisjs/core/services/app'
 import { DateTime } from 'luxon'
 import AiDiagnosisConversation from '#models/ai_diagnosis_conversation'
 import AiTokenUsage from '#models/ai_token_usage'
-import AiService from '#services/ai_service'
 import { UserFactory } from '#database/factories/user_factory'
 import { createAdminUser } from '#tests/functional/helpers'
 import { PUBLIC_DIAGNOSIS_SESSION_KEY } from '#shared/types/public_diagnosis'
-import type { AiChatMessage } from '#services/ai_service'
 import type { AiChatMessage as StoredChatMessage } from '#shared/types/ai'
+import { restoreAiService, swapAiService } from '#tests/support/fakes'
 
 const QUESTION_RESPONSE = JSON.stringify({
   type: 'question',
@@ -23,22 +21,6 @@ const DIAGNOSIS_RESPONSE = JSON.stringify({
   nextStep: 'Check that the primer bulb firms up completely',
 })
 
-/** Copie du helper de `engine_diagnosis.spec.ts` : fake AiService + capture des appels. */
-function swapAiService(content: string, tokensUsed = 42) {
-  const calls: AiChatMessage[][] = []
-  app.container.swap(
-    AiService,
-    () =>
-      ({
-        chat: async (messages: AiChatMessage[]) => {
-          calls.push(messages)
-          return { content, tokensUsed }
-        },
-      }) as unknown as AiService
-  )
-  return calls
-}
-
 function startForm(message = 'Engine starts then stalls after 30 seconds') {
   return { message, engineType: '2-stroke outboard', brand: 'Yamaha', hours: 350 }
 }
@@ -46,7 +28,7 @@ function startForm(message = 'Engine starts then stalls after 30 seconds') {
 test.group('Public AI diagnosis chat (functional, #602)', (group) => {
   group.each.setup(() => truncateDb())
   group.each.teardown(() => {
-    app.container.restore(AiService)
+    restoreAiService()
   })
 
   test('the marketing page renders for anonymous visitors in both locales', async ({
@@ -93,10 +75,10 @@ test.group('Public AI diagnosis chat (functional, #602)', (group) => {
     // Le prompt système embarque le socle des fiches ; le 1er message
     // utilisateur envoyé au modèle est reconstruit avec le contexte moteur.
     assert.lengthOf(calls, 1)
-    assert.equal(calls[0][0].role, 'system')
-    assert.include(calls[0][0].content, '"compression"')
-    assert.include(calls[0][1].content, 'Yamaha')
-    assert.include(calls[0][1].content, 'stalls after 30 seconds')
+    assert.equal(calls[0].messages[0].role, 'system')
+    assert.include(calls[0].messages[0].content, '"compression"')
+    assert.include(calls[0].messages[1].content, 'Yamaha')
+    assert.include(calls[0].messages[1].content, 'stalls after 30 seconds')
   })
 
   test('a third anonymous conversation is refused without any AI call', async ({

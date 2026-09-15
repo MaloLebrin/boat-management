@@ -2,23 +2,12 @@ import { test } from '@japa/runner'
 import { truncateDb } from '#tests/utils/db'
 import { DateTime } from 'luxon'
 import Invoice from '#models/invoice'
-import OrganizationMembership from '#models/organization_membership'
-import { UserFactory } from '#database/factories/user_factory'
-import { createAdminUser, createBoatOwnerUser, createMemberUser } from '#tests/functional/helpers'
-
-async function createEnterpriseAdminUser() {
-  const user = await UserFactory.with('organization', 1, (org) =>
-    org.merge({ plan: 'enterprise' })
-  ).create()
-  if (user.organizationId) {
-    await OrganizationMembership.create({
-      userId: user.id,
-      organizationId: user.organizationId,
-      role: 'admin',
-    })
-  }
-  return user
-}
+import {
+  createAdminUser,
+  createBoatOwnerUser,
+  createEnterpriseAdminUser,
+  createMemberUser,
+} from '#tests/functional/helpers'
 
 async function createInvoice(organizationId: number, number = 'DEV-000001') {
   return Invoice.create({

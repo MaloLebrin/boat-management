@@ -1,30 +1,8 @@
 import { BoatFactory } from '#database/factories/boat_factory'
 import Client from '#models/client'
-import OrganizationMembership from '#models/organization_membership'
-import { UserFactory } from '#database/factories/user_factory'
-import { createAdminUser } from '#tests/functional/helpers'
+import { createAdminUser, createEnterpriseAdminUser } from '#tests/functional/helpers'
 import { truncateDb } from '#tests/utils/db'
 import { test } from '@japa/runner'
-
-/**
- * Régression issue #278 : la saisie de recherche est interpolée dans un motif
- * `ILIKE` ; sans échapper les métacaractères LIKE (`%`, `_`), `q = '%'`
- * renvoyait toutes les lignes de l'org et `q = 'A_B'` matchait aussi `AXB`.
- */
-
-async function createEnterpriseAdminUser() {
-  const user = await UserFactory.with('organization', 1, (org) =>
-    org.merge({ plan: 'enterprise' })
-  ).create()
-  if (user.organizationId) {
-    await OrganizationMembership.create({
-      userId: user.id,
-      organizationId: user.organizationId,
-      role: 'admin',
-    })
-  }
-  return user
-}
 
 test.group('Search LIKE escaping (issue #278)', (group) => {
   group.each.setup(() => truncateDb())

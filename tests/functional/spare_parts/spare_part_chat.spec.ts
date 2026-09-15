@@ -1,10 +1,8 @@
 import { test } from '@japa/runner'
 import { truncateDb } from '#tests/utils/db'
-import app from '@adonisjs/core/services/app'
 import { DateTime } from 'luxon'
 import AiPartSearchConversation from '#models/ai_part_search_conversation'
 import AiTokenUsage from '#models/ai_token_usage'
-import AiService from '#services/ai_service'
 import EngineBrand from '#models/engine_brand'
 import EngineModel from '#models/engine_model'
 import EnginePartReference from '#models/engine_part_reference'
@@ -14,9 +12,9 @@ import { BoatEngineFactory } from '#database/factories/boat_engine_factory'
 import { UserFactory } from '#database/factories/user_factory'
 import { createAdminUser } from '#tests/functional/helpers'
 import { YAMAHA_REFERENCE_PATTERN } from '#shared/helpers/spare_parts'
-import type { AiChatMessage } from '#services/ai_service'
 import type { AiChatMessage as StoredChatMessage } from '#shared/types/ai'
 import type { PartSearchContext } from '#shared/types/spare_part_chat'
+import { restoreAiService, swapAiService } from '#tests/support/fakes'
 
 const QUESTION_RESPONSE = JSON.stringify({
   type: 'question',
@@ -60,22 +58,6 @@ const PART_NO_MATCH_RESPONSE = JSON.stringify({
   partKey: null,
   message: 'No catalog part matches your request.',
 })
-
-/** Copie du helper de `public_diagnosis.spec.ts` : fake AiService + capture des appels. */
-function swapAiService(content: string, tokensUsed = 42) {
-  const calls: AiChatMessage[][] = []
-  app.container.swap(
-    AiService,
-    () =>
-      ({
-        chat: async (messages: AiChatMessage[]) => {
-          calls.push(messages)
-          return { content, tokensUsed }
-        },
-      }) as unknown as AiService
-  )
-  return calls
-}
 
 /** Catalogue minimal : Yamaha 4AS (code plaque 6E0) + une référence de turbine. */
 async function seedCatalog() {
@@ -144,7 +126,7 @@ const ENGINE_CONTEXT: PartSearchContext = {
 test.group('Spare part AI chat (functional, #634)', (group) => {
   group.each.setup(() => truncateDb())
   group.each.teardown(() => {
-    app.container.restore(AiService)
+    restoreAiService()
   })
 
   test('the chat page renders for a pro plan with no conversation yet', async ({
@@ -232,12 +214,12 @@ test.group('Spare part AI chat (functional, #634)', (group) => {
     // Le prompt système porte le vocabulaire de la famille, pas la liste des
     // codes plaque ; le 1er message est reconstruit avec le contexte moteur.
     assert.lengthOf(calls, 1)
-    assert.equal(calls[0][0].role, 'system')
-    assert.include(calls[0][0].content, 'lower-unit.impeller')
-    assert.notInclude(calls[0][0].content, '- 4AS — 6E0')
-    assert.include(calls[0][1].content, 'Yamaha')
-    assert.include(calls[0][1].content, '6E0-S-123456')
-    assert.include(calls[0][1].content, 'water pump impeller')
+    assert.equal(calls[0].messages[0].role, 'system')
+    assert.include(calls[0].messages[0].content, 'lower-unit.impeller')
+    assert.notInclude(calls[0].messages[0].content, '- 4AS — 6E0')
+    assert.include(calls[0].messages[1].content, 'Yamaha')
+    assert.include(calls[0].messages[1].content, '6E0-S-123456')
+    assert.include(calls[0].messages[1].content, 'water pump impeller')
   })
 
   test('an unresolved model starts in engine phase with plate codes and pattern', async ({
@@ -264,8 +246,8 @@ test.group('Spare part AI chat (functional, #634)', (group) => {
     assert.isNull(conversation.identifiedEngineModelId)
     assert.isFalse(conversation.context?.identificationFailed)
 
-    assert.include(calls[0][0].content, '4AS — 6E0')
-    assert.include(calls[0][0].content, YAMAHA_REFERENCE_PATTERN.template)
+    assert.include(calls[0].messages[0].content, '4AS — 6E0')
+    assert.include(calls[0].messages[0].content, YAMAHA_REFERENCE_PATTERN.template)
   })
 
   test('an out-of-catalog brand starts in part phase with the failure assumed', async ({
@@ -529,7 +511,7 @@ test.group('Spare part AI chat (functional, #634)', (group) => {
       .form({ message: 'last try' })
       .redirects(0)
     tenth.assertFlashMissing('error')
-    const lastSent = calls[0][calls[0].length - 1]
+    const lastSent = calls[0].messages[calls[0].messages.length - 1]
     assert.include(lastSent.content, 'final answer')
     assert.include(lastSent.content, '"part"')
 

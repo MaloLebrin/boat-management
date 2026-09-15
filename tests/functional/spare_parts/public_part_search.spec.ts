@@ -1,10 +1,8 @@
 import { test } from '@japa/runner'
 import { truncateDb } from '#tests/utils/db'
-import app from '@adonisjs/core/services/app'
 import { DateTime } from 'luxon'
 import AiPartSearchConversation from '#models/ai_part_search_conversation'
 import AiTokenUsage from '#models/ai_token_usage'
-import AiService from '#services/ai_service'
 import EngineBrand from '#models/engine_brand'
 import EngineModel from '#models/engine_model'
 import EnginePartReference from '#models/engine_part_reference'
@@ -15,8 +13,8 @@ import { UserFactory } from '#database/factories/user_factory'
 import { createAdminUser } from '#tests/functional/helpers'
 import { YAMAHA_REFERENCE_PATTERN } from '#shared/helpers/spare_parts'
 import { PUBLIC_PART_SEARCH_SESSION_KEY } from '#shared/types/spare_part_chat'
-import type { AiChatMessage } from '#services/ai_service'
 import type { PartSearchContext } from '#shared/types/spare_part_chat'
+import { restoreAiService, swapAiService } from '#tests/support/fakes'
 
 const QUESTION_RESPONSE = JSON.stringify({
   type: 'question',
@@ -42,22 +40,6 @@ const PART_OUTSIDE_CATALOG_RESPONSE = JSON.stringify({
   partKey: 'lower-unit.flux_capacitor',
   message: 'Found it.',
 })
-
-/** Copie du helper de `spare_part_chat.spec.ts` : fake AiService + capture des appels. */
-function swapAiService(content: string, tokensUsed = 42) {
-  const calls: AiChatMessage[][] = []
-  app.container.swap(
-    AiService,
-    () =>
-      ({
-        chat: async (messages: AiChatMessage[]) => {
-          calls.push(messages)
-          return { content, tokensUsed }
-        },
-      }) as unknown as AiService
-  )
-  return calls
-}
 
 /** Catalogue minimal : Yamaha 4AS (code plaque 6E0) + une référence de turbine. */
 async function seedCatalog() {
@@ -109,7 +91,7 @@ function startForm(message = 'I am looking for the water pump impeller') {
 test.group('Public spare part AI chat (functional, #634 Phase 2)', (group) => {
   group.each.setup(() => truncateDb())
   group.each.teardown(() => {
-    app.container.restore(AiService)
+    restoreAiService()
   })
 
   test('the marketing page renders for anonymous visitors in both locales', async ({
@@ -156,12 +138,12 @@ test.group('Public spare part AI chat (functional, #634 Phase 2)', (group) => {
     // Le prompt d'identification porte la liste des codes plaque et le motif
     // de référence de la marque ; le 1er message est reconstruit avec la saisie.
     assert.lengthOf(calls, 1)
-    assert.equal(calls[0][0].role, 'system')
-    assert.include(calls[0][0].content, '4AS — 6E0')
-    assert.include(calls[0][0].content, YAMAHA_REFERENCE_PATTERN.template)
-    assert.include(calls[0][1].content, 'Yamaha')
-    assert.include(calls[0][1].content, '6E0-S-123456')
-    assert.include(calls[0][1].content, 'water pump impeller')
+    assert.equal(calls[0].messages[0].role, 'system')
+    assert.include(calls[0].messages[0].content, '4AS — 6E0')
+    assert.include(calls[0].messages[0].content, YAMAHA_REFERENCE_PATTERN.template)
+    assert.include(calls[0].messages[1].content, 'Yamaha')
+    assert.include(calls[0].messages[1].content, '6E0-S-123456')
+    assert.include(calls[0].messages[1].content, 'water pump impeller')
   })
 
   test('an out-of-catalog brand starts in part phase with the full vocabulary', async ({
@@ -184,7 +166,7 @@ test.group('Public spare part AI chat (functional, #634 Phase 2)', (group) => {
 
     // Famille inconnue → catalogue complet, pas le repli générique
     // (démarrage/commandes) qui ne contiendrait pas l'embase.
-    assert.include(calls[0][0].content, 'lower-unit.impeller')
+    assert.include(calls[0].messages[0].content, 'lower-unit.impeller')
   })
 
   test('a third anonymous conversation is refused without any AI call', async ({

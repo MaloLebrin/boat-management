@@ -1,16 +1,14 @@
 import { test } from '@japa/runner'
 import { truncateDb } from '#tests/utils/db'
-import app from '@adonisjs/core/services/app'
 import { DateTime } from 'luxon'
 import AiAnalysis from '#models/ai_analysis'
 import AiTokenUsage from '#models/ai_token_usage'
 import BoatEngineDiagnosticCheck from '#models/boat_engine_diagnostic_check'
-import AiService from '#services/ai_service'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { BoatEngineFactory } from '#database/factories/boat_engine_factory'
 import { UserFactory } from '#database/factories/user_factory'
 import { createAdminUser } from '#tests/functional/helpers'
-import type { AiChatMessage } from '#services/ai_service'
+import { restoreAiService, swapAiService } from '#tests/support/fakes'
 
 const VALID_RESPONSE = JSON.stringify({
   summary: 'Probable fuel supply issue',
@@ -18,25 +16,6 @@ const VALID_RESPONSE = JSON.stringify({
   causes: ['Closed tank vent', 'Clogged fuel filter', 'Blocked idle jet'],
   nextStep: 'Check that the primer bulb firms up completely',
 })
-
-/**
- * Swaps AiService for a fake returning `content`, capturing the messages of
- * every call. Callers must restore the container in a `finally` block.
- */
-function swapAiService(content: string, tokensUsed = 42) {
-  const calls: AiChatMessage[][] = []
-  app.container.swap(
-    AiService,
-    () =>
-      ({
-        chat: async (messages: AiChatMessage[]) => {
-          calls.push(messages)
-          return { content, tokensUsed }
-        },
-      }) as unknown as AiService
-  )
-  return calls
-}
 
 async function makeEligibleSetup() {
   const user = await createAdminUser()
@@ -68,7 +47,7 @@ async function makeSaildriveSetup() {
 test.group('AI engine diagnosis — engineDiagnosis (functional, #516)', (group) => {
   group.each.setup(() => truncateDb())
   group.each.teardown(() => {
-    app.container.restore(AiService)
+    restoreAiService()
   })
 
   test('redirects to /login when unauthenticated', async ({ client }) => {
@@ -156,7 +135,7 @@ test.group('AI engine diagnosis — engineDiagnosis (functional, #516)', (group)
 
     // Le message utilisateur contient bien les symptômes décrits
     assert.lengthOf(calls, 1)
-    assert.include(calls[0][1].content, 'stalls after 30 seconds')
+    assert.include(calls[0].messages[1].content, 'stalls after 30 seconds')
 
     // Consommation décomptée du quota mensuel
     const usage = await AiTokenUsage.query().where('organizationId', user.organizationId!).first()
@@ -187,7 +166,7 @@ test.group('AI engine diagnosis — engineDiagnosis (functional, #516)', (group)
     response.assertFlashMissing('error')
 
     assert.lengthOf(calls, 1)
-    const [system, userMessage] = calls[0]
+    const [system, userMessage] = calls[0].messages
 
     assert.include(system.content, '"diesel-fuel"')
     assert.include(system.content, '"saildrive"')
@@ -240,8 +219,8 @@ test.group('AI engine diagnosis — engineDiagnosis (functional, #516)', (group)
     response.assertStatus(302)
     response.assertFlashMissing('error')
     assert.lengthOf(calls, 1)
-    assert.include(calls[0][1].content, 'global.flywheel')
-    assert.include(calls[0][1].content, 'Compression: 110 and 108 PSI')
+    assert.include(calls[0].messages[1].content, 'global.flywheel')
+    assert.include(calls[0].messages[1].content, 'Compression: 110 and 108 PSI')
     assert.lengthOf(await AiAnalysis.all(), 1)
   })
 

@@ -2,23 +2,8 @@ import { test } from '@japa/runner'
 import { truncateDb } from '#tests/utils/db'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { UserFactory } from '#database/factories/user_factory'
-import OrganizationMembership from '#models/organization_membership'
 import PricingSeason from '#models/pricing_season'
-import { createAdminUser } from '#tests/functional/helpers'
-
-async function createEnterpriseAdminUser() {
-  const user = await UserFactory.with('organization', 1, (org) =>
-    org.merge({ plan: 'enterprise' })
-  ).create()
-  if (user.organizationId) {
-    await OrganizationMembership.create({
-      userId: user.id,
-      organizationId: user.organizationId,
-      role: 'admin',
-    })
-  }
-  return user
-}
+import { createAdminUser, createEnterpriseAdminUser } from '#tests/functional/helpers'
 
 test.group('Pricing seasons (functional)', (group) => {
   group.each.setup(() => truncateDb())

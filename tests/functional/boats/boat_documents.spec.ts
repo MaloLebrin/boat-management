@@ -1,6 +1,5 @@
 import { test } from '@japa/runner'
 import { truncateDb } from '#tests/utils/db'
-import app from '@adonisjs/core/services/app'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { BoatDocumentFactory } from '#database/factories/boat_document_factory'
 import { MediaFactory } from '#database/factories/media_factory'
@@ -8,7 +7,7 @@ import { UserFactory } from '#database/factories/user_factory'
 import { createAdminUser } from '#tests/functional/helpers'
 import BoatDocument from '#models/boat_document'
 import Media from '#models/media'
-import { CloudinaryService } from '#services/cloudinary_service'
+import { restoreCloudinary, swapFakeCloudinary } from '#tests/support/fakes'
 
 test.group('Boat Documents — DELETE (functional)', (group) => {
   group.each.setup(() => truncateDb())
@@ -40,17 +39,7 @@ test.group('Boat Documents — DELETE (functional)', (group) => {
     client,
     assert,
   }) => {
-    const deletedPublicIds: string[] = []
-    app.container.swap(
-      CloudinaryService,
-      () =>
-        ({
-          deleteFile: async (publicId: string) => {
-            deletedPublicIds.push(publicId)
-          },
-          deleteFolder: async () => {},
-        }) as unknown as CloudinaryService
-    )
+    const { deletedPublicIds } = swapFakeCloudinary()
 
     try {
       const user = await createAdminUser()
@@ -82,7 +71,7 @@ test.group('Boat Documents — DELETE (functional)', (group) => {
       assert.lengthOf(deletedPublicIds, 1)
       assert.equal(deletedPublicIds[0], media.cloudinaryPublicId)
     } finally {
-      app.container.restore(CloudinaryService)
+      restoreCloudinary()
     }
   })
 

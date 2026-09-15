@@ -6,9 +6,10 @@ import { OrganizationFactory } from '#database/factories/organization_factory'
 import { UserFactory } from '#database/factories/user_factory'
 import app from '@adonisjs/core/services/app'
 import AiAnalysisService from '#services/ai_analysis_service'
-import AiService, { type AiChatMessage } from '#services/ai_service'
+import { type AiChatMessage } from '#services/ai_service'
 import type { BoatSuggestionsInput, FleetAnalysisInput } from '#shared/types/ai'
 import { DateTime } from 'luxon'
+import { restoreAiService, swapAiService, type FakeAiCall } from '#tests/support/fakes'
 
 test.group('AiAnalysisService — organization scoping', () => {
   test('getLatestFleetAnalysis returns null when org has no analyses', async ({ assert }) => {
@@ -239,22 +240,11 @@ const BOAT_INPUT: BoatSuggestionsInput = {
 // indéfiniment. Chaque test crée ses propres org/user/bateau et ne requête que
 // les siens.
 test.group('AiAnalysisService — generation honours the caller locale (#460)', (group) => {
-  let capturedMessages: AiChatMessage[] = []
+  let calls: FakeAiCall[] = []
 
   group.each.setup(() => {
-    capturedMessages = []
-    app.container.swap(
-      AiService,
-      () =>
-        ({
-          chat: async (messages: AiChatMessage[]) => {
-            capturedMessages = messages
-            return { content: '[{"text":"A suggestion"}]', tokensUsed: 42 }
-          },
-        }) as unknown as AiService
-    )
-
-    return () => app.container.restore(AiService)
+    calls = swapAiService('[{"text":"A suggestion"}]')
+    return () => restoreAiService()
   })
 
   test('generateFleetAnalysis prompts in English and stamps the analysis with "en"', async ({
@@ -266,8 +256,8 @@ test.group('AiAnalysisService — generation honours the caller locale (#460)', 
     const svc = await app.container.make(AiAnalysisService)
     await svc.generateFleetAnalysis(user.id, org, FLEET_INPUT, 'en')
 
-    const system = capturedMessages.find((m) => m.role === 'system')!.content
-    const userMessage = capturedMessages.find((m) => m.role === 'user')!.content
+    const system = calls.at(-1)!.messages.find((m) => m.role === 'system')!.content
+    const userMessage = calls.at(-1)!.messages.find((m) => m.role === 'user')!.content
 
     assert.include(system, 'Write every suggestion in English')
     assert.notInclude(system, 'Tu es un expert en maintenance marine')
@@ -285,8 +275,8 @@ test.group('AiAnalysisService — generation honours the caller locale (#460)', 
     const svc = await app.container.make(AiAnalysisService)
     await svc.generateFleetAnalysis(user.id, org, FLEET_INPUT, 'fr')
 
-    const system = capturedMessages.find((m) => m.role === 'system')!.content
-    const userMessage = capturedMessages.find((m) => m.role === 'user')!.content
+    const system = calls.at(-1)!.messages.find((m) => m.role === 'system')!.content
+    const userMessage = calls.at(-1)!.messages.find((m) => m.role === 'user')!.content
 
     assert.include(system, 'Tu es un expert en maintenance marine')
     assert.include(userMessage, 'Analyse cette flotte de bateaux')
@@ -305,7 +295,7 @@ test.group('AiAnalysisService — generation honours the caller locale (#460)', 
     const svc = await app.container.make(AiAnalysisService)
     await svc.generateBoatSuggestions(user.id, boat.id, org, BOAT_INPUT, 'en')
 
-    const userMessage = capturedMessages.find((m) => m.role === 'user')!.content
+    const userMessage = calls.at(-1)!.messages.find((m) => m.role === 'user')!.content
     assert.include(userMessage, 'Analyze this boat')
     assert.include(userMessage, 'Home port:')
 
@@ -320,7 +310,7 @@ test.group('AiAnalysisService — generation honours the caller locale (#460)', 
     const svc = await app.container.make(AiAnalysisService)
     await svc.generateFleetAnalysis(user.id, org, FLEET_INPUT, 'en', 'Focus on safety equipment.')
 
-    const system = capturedMessages.find((m) => m.role === 'system')!.content
+    const system = calls.at(-1)!.messages.find((m) => m.role === 'system')!.content
     assert.isTrue(system.startsWith('Focus on safety equipment.'))
     assert.include(system, 'Write every suggestion in English')
   })

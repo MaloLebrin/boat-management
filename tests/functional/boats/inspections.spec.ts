@@ -1,6 +1,5 @@
 import { test } from '@japa/runner'
 import { truncateDb } from '#tests/utils/db'
-import app from '@adonisjs/core/services/app'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { BoatReservationFactory } from '#database/factories/boat_reservation_factory'
 import { MediaFactory } from '#database/factories/media_factory'
@@ -9,9 +8,9 @@ import {
   createEnterprisePlanUser,
   createMemberUser,
 } from '#tests/functional/helpers'
-import { CloudinaryService } from '#services/cloudinary_service'
 import BoatInspection from '#models/boat_inspection'
 import Media from '#models/media'
+import { restoreCloudinary, swapFakeCloudinary } from '#tests/support/fakes'
 
 const VALID_INSPECTION = {
   kind: 'checkout',
@@ -501,16 +500,7 @@ test.group('Boat Inspections (functional)', (group) => {
   })
 
   test('DELETE .../inspections/:id deletes its associated photos', async ({ client, assert }) => {
-    const deletedFolders: string[] = []
-    app.container.swap(
-      CloudinaryService,
-      () =>
-        ({
-          deleteFolder: async (folderPath: string) => {
-            deletedFolders.push(folderPath)
-          },
-        }) as unknown as CloudinaryService
-    )
+    const { deletedFolders } = swapFakeCloudinary()
 
     try {
       const admin = await createCharterAdminUser()
@@ -549,7 +539,7 @@ test.group('Boat Inspections (functional)', (group) => {
       assert.lengthOf(deletedFolders, 1)
       assert.include(deletedFolders[0], `reservations/${reservation.id}/inspections/checkout`)
     } finally {
-      app.container.restore(CloudinaryService)
+      restoreCloudinary()
     }
   })
 
@@ -642,16 +632,7 @@ test.group('Boat Inspections (functional)', (group) => {
     client,
     assert,
   }) => {
-    const deletedPublicIds: string[] = []
-    app.container.swap(
-      CloudinaryService,
-      () =>
-        ({
-          deleteFile: async (publicId: string) => {
-            deletedPublicIds.push(publicId)
-          },
-        }) as unknown as CloudinaryService
-    )
+    const { deletedPublicIds } = swapFakeCloudinary()
 
     try {
       const admin = await createCharterAdminUser()
@@ -687,7 +668,7 @@ test.group('Boat Inspections (functional)', (group) => {
       assert.isNull(existing)
       assert.deepEqual(deletedPublicIds, [media.cloudinaryPublicId])
     } finally {
-      app.container.restore(CloudinaryService)
+      restoreCloudinary()
     }
   })
 
@@ -695,28 +676,7 @@ test.group('Boat Inspections (functional)', (group) => {
     client,
     assert,
   }) => {
-    const uploaded: string[] = []
-    app.container.swap(
-      CloudinaryService,
-      () =>
-        ({
-          uploadImage: async () => {
-            const publicId = `fake-inspection-photo-${uploaded.length}`
-            uploaded.push(publicId)
-            return {
-              publicId,
-              url: `http://res.cloudinary.com/${publicId}.jpg`,
-              secureUrl: `https://res.cloudinary.com/${publicId}.jpg`,
-              format: 'jpg',
-              resourceType: 'image',
-              bytes: 1024,
-              originalFilename: 'photo',
-              width: 800,
-              height: 600,
-            }
-          },
-        }) as unknown as CloudinaryService
-    )
+    const { uploaded } = swapFakeCloudinary()
 
     try {
       const admin = await createCharterAdminUser()
@@ -762,7 +722,7 @@ test.group('Boat Inspections (functional)', (group) => {
       assert.lengthOf(medias, 2)
       assert.lengthOf(uploaded, 2)
     } finally {
-      app.container.restore(CloudinaryService)
+      restoreCloudinary()
     }
   })
 })

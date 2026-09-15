@@ -2,26 +2,10 @@ import { test } from '@japa/runner'
 import { truncateDb } from '#tests/utils/db'
 import app from '@adonisjs/core/services/app'
 import { DateTime } from 'luxon'
-import { UserFactory } from '#database/factories/user_factory'
-import OrganizationMembership from '#models/organization_membership'
 import Invoice from '#models/invoice'
 import InvoiceLine from '#models/invoice_line'
 import InvoiceService from '#services/invoice_service'
-import { createAdminUser } from '#tests/functional/helpers'
-
-async function createEnterpriseAdminUser() {
-  const user = await UserFactory.with('organization', 1, (org) =>
-    org.merge({ plan: 'enterprise' })
-  ).create()
-  if (user.organizationId) {
-    await OrganizationMembership.create({
-      userId: user.id,
-      organizationId: user.organizationId,
-      role: 'admin',
-    })
-  }
-  return user
-}
+import { createAdminUser, createEnterpriseAdminUser } from '#tests/functional/helpers'
 
 interface InvoiceOpts {
   kind?: 'quote' | 'invoice'
