@@ -129,6 +129,9 @@ export interface DiagnosticEngineRow {
   model: string | null
   serialNumber: string | null
   kind: string
+  fuel: string | null
+  /** Cycle moteur saisi (2T / 4T), `null` si non renseigné. */
+  strokeType: string | null
   family: EngineFamily | null
   status: string
   /** Nombre d'étapes cochées sur la checklist globale du moteur. */

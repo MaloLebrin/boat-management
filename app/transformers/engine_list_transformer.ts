@@ -26,6 +26,7 @@ export function toEngineListItem(row: EngineSerializedRow, boatName: string): En
     kind: row.kind,
     fuel: row.fuel,
     family: isEngineFamily(row.family) ? row.family : null,
+    strokeType: row.strokeType,
     status: row.status,
     powerHp: toNumberOrNull(row.powerHp),
     hours: toNumberOrNull(row.hours),

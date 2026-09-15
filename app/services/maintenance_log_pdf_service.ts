@@ -8,6 +8,7 @@ import type BoatSail from '#models/boat_sail'
 import app from '@adonisjs/core/services/app'
 import type { I18n } from '@adonisjs/i18n'
 import { formatDate } from '#shared/helpers/date_format'
+import { resolveEngineStrokeType } from '#shared/helpers/engine_stroke'
 import { isEngineKindCaption } from '#shared/helpers/maintenance'
 import { isSailMaterial } from '#shared/types/boat'
 import PDFDocument from 'pdfkit'
@@ -142,6 +143,12 @@ export default class MaintenanceLogPdfService {
     doc.fillColor('#000')
   }
 
+  /** Suffixe « · 4T » d'un libellé moteur, vide quand le cycle est indécidable. */
+  #engineStrokeSuffix(engine: BoatEngine, tOpt: (ns: string, key: string) => string): string {
+    const strokeType = resolveEngineStrokeType(engine)
+    return strokeType ? ` · ${tOpt('strokeTypeShort', strokeType)}` : ''
+  }
+
   #sectionBand(doc: PDFKit.PDFDocument, label: string): void {
     if (doc.y > 760) doc.addPage()
     const y = doc.y
@@ -271,8 +278,9 @@ export default class MaintenanceLogPdfService {
     if (engines.length > 0) {
       this.#sectionBand(doc, t('sectionEngines'))
       for (const engine of engines) {
-        const label =
+        const baseLabel =
           [engine.brand, engine.model].filter(Boolean).join(' ') || tOpt('engineKind', engine.kind)
+        const label = baseLabel + this.#engineStrokeSuffix(engine, tOpt)
         this.#subSectionLabel(doc, label)
 
         const kind = engine.kind ? tOpt('engineKind', engine.kind) : null
@@ -505,7 +513,8 @@ export default class MaintenanceLogPdfService {
     for (const engine of engines) {
       const evs = rows.filter((r) => r.boatEngineId === engine.id)
       if (evs.length === 0) continue
-      const label = [engine.brand, engine.model].filter(Boolean).join(' ') || `#${engine.id}`
+      const baseLabel = [engine.brand, engine.model].filter(Boolean).join(' ') || `#${engine.id}`
+      const label = baseLabel + this.#engineStrokeSuffix(engine, tOpt)
       this.#subSectionLabel(doc, t('historyFor', { name: label }))
       this.#eventList(doc, evs, t)
     }
@@ -646,8 +655,8 @@ export default class MaintenanceLogPdfService {
     if (enginesWithParts.length > 0) {
       this.#subSectionLabel(doc, t('inventoryParts'))
       for (const engine of enginesWithParts) {
-        const engineLabel =
-          [engine.brand, engine.model].filter(Boolean).join(' ') || `#${engine.id}`
+        const baseLabel = [engine.brand, engine.model].filter(Boolean).join(' ') || `#${engine.id}`
+        const engineLabel = baseLabel + this.#engineStrokeSuffix(engine, tOpt)
         const parts = (engine.parts as unknown as BoatEnginePart[]) ?? []
         this.#renderEnginePartsTable(doc, engineLabel, parts, t, tOpt)
         doc.moveDown(0.4)
@@ -695,7 +704,8 @@ export default class MaintenanceLogPdfService {
     const rows: Array<[string, string, string, string]> = []
 
     for (const engine of engines) {
-      const name = [engine.brand, engine.model].filter(Boolean).join(' ') || `#${engine.id}`
+      const baseName = [engine.brand, engine.model].filter(Boolean).join(' ') || `#${engine.id}`
+      const name = baseName + this.#engineStrokeSuffix(engine, tOpt)
       const type = engine.kind ? tOpt('engineKind', engine.kind) : t('inventoryFields.engine')
       const status = engine.status ? tOpt('equipmentStatus', engine.status) : '—'
       rows.push([name, type, status, mechanicalEquipmentStatusColor(engine.status)])

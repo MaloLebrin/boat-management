@@ -113,6 +113,10 @@ export interface TaskEquipmentSource {
     id: number
     kind: string
     fuel: string | null
+    /** Cycle moteur saisi (2T / 4T), `null` si non renseigné. */
+    strokeType: string | null
+    /** Famille de motorisation (#574), `null` tant qu'elle n'est pas précisée. */
+    family: string | null
     brand: string | null
     model: string | null
     serialNumber: string | null

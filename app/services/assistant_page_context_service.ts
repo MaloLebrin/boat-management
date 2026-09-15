@@ -2,6 +2,7 @@ import BoatEngine from '#models/boat_engine'
 import Client from '#models/client'
 import type User from '#models/user'
 import BoatListService from '#services/boat_list_service'
+import { engineLabelWithStroke } from '#shared/helpers/engine_stroke'
 import type { AiSuggestionLocale } from '#shared/types/ai'
 import { ASSISTANT_NAV_TARGETS } from '#shared/types/assistant'
 import { inject } from '@adonisjs/core'
@@ -76,13 +77,14 @@ export default class AssistantPageContextService {
     if (boat === undefined) return null
 
     const engine = await BoatEngine.query()
-      .select(['id', 'brand', 'model'])
+      .select(['id', 'brand', 'model', 'strokeType', 'family', 'fuel', 'kind'])
       .where('id', engineId)
       .where('boatId', boat.id)
       .first()
     if (engine === null) return null
 
-    const label = [engine.brand, engine.model].filter(Boolean).join(' ') || `#${engine.id}`
+    const baseLabel = [engine.brand, engine.model].filter(Boolean).join(' ') || `#${engine.id}`
+    const label = engineLabelWithStroke(baseLabel, engine)
     return locale === 'fr'
       ? `Moteur ${label} (#${engine.id}) du bateau ${boat.name} (#${boat.id})`
       : `Engine ${label} (#${engine.id}) of boat ${boat.name} (#${boat.id})`

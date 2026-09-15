@@ -2,7 +2,9 @@
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import { useT } from '~/composables/use_t'
+import { computed } from 'vue'
 import { engineFuelLabel, engineKindLabel } from '~/utils/boat_enum_labels'
+import { resolveEngineStrokeType } from '#shared/helpers/engine_stroke'
 import type { BoatShowEngine, MaintenanceTaskRow } from '~/types/boat_show'
 
 const { t } = useT()
@@ -13,6 +15,9 @@ const props = defineProps<{
   openTasks: MaintenanceTaskRow[]
   canManage: boolean
 }>()
+
+/** Cycle saisi, ou déduit de la famille / du carburant quand il ne l'est pas. */
+const strokeType = computed(() => resolveEngineStrokeType(props.engine))
 
 function formatYear(iso: string): string {
   return new Date(iso).getFullYear().toString()
@@ -77,10 +82,10 @@ function formatYear(iso: string): string {
               {{ t(`boats.options.engineFamily.${engine.family}`) }}
             </dd>
           </div>
-          <div v-if="engine.strokeType">
+          <div v-if="strokeType">
             <dt class="text-fg-muted">{{ t('boats.engineShow.specs.strokeType') }}</dt>
             <dd class="font-medium text-fg">
-              {{ t(`boats.options.strokeType.${engine.strokeType}`) }}
+              {{ t(`boats.options.strokeType.${strokeType}`) }}
             </dd>
           </div>
         </dl>

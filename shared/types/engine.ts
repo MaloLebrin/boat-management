@@ -42,6 +42,8 @@ export type EngineListItem = {
   kind: string
   fuel: string | null
   family: EngineFamily | null
+  /** Cycle moteur saisi (2T / 4T), `null` si non renseigné. */
+  strokeType: string | null
   status: string
   powerHp: number | null
   hours: number | null
@@ -70,6 +72,7 @@ export type EngineSerializedRow = {
   kind: string
   fuel: string | null
   family: string | null
+  strokeType: string | null
   status: string
   powerHp: number | string | null
   hours: number | string | null

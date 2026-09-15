@@ -27,6 +27,8 @@ export function toTaskEquipmentSource(models: TaskEquipmentModels): TaskEquipmen
       id: e.id,
       kind: e.kind,
       fuel: e.fuel,
+      strokeType: e.strokeType,
+      family: e.family,
       brand: e.brand,
       model: e.model,
       serialNumber: e.serialNumber,

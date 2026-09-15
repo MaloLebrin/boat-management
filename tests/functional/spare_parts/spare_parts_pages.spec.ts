@@ -226,6 +226,60 @@ test.group('Spare parts pages (functional)', (group) => {
     assert.include(csv.text(), 'IMPELLER')
   })
 
+  test('GET /spare-parts expose strokeType et fuel dans SparePartsEngineRow', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const outboard = await makeEligibleEngine(boat.id) // family outboard_4t
+    const inboard = await makeInboardDieselEngine(boat.id)
+
+    const response = await client.get('/spare-parts').loginAs(user).withInertia()
+
+    response.assertStatus(200)
+    const props = response.inertiaProps as {
+      engines: Array<{ id: number; fuel: string | null; strokeType: string | null }>
+    }
+    const rows = new Map(props.engines.map((e) => [e.id, e]))
+    // Les deux champs sont présents sur chaque ligne.
+    assert.isTrue(Object.prototype.hasOwnProperty.call(rows.get(outboard.id), 'fuel'))
+    assert.isTrue(Object.prototype.hasOwnProperty.call(rows.get(outboard.id), 'strokeType'))
+    assert.isTrue(Object.prototype.hasOwnProperty.call(rows.get(inboard.id), 'fuel'))
+    assert.isTrue(Object.prototype.hasOwnProperty.call(rows.get(inboard.id), 'strokeType'))
+    // Valeurs cohérentes avec les fixtures.
+    assert.equal(rows.get(inboard.id)?.fuel, 'diesel')
+  })
+
+  test('GET identify expose strokeType et fuel dans SparePartsEngineProps', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const engine = await BoatEngineFactory.merge({
+      boatId: boat.id,
+      kind: 'outboard',
+      fuel: 'essence',
+      family: 'outboard_2t',
+      strokeType: '2_stroke',
+      brand: 'Yamaha',
+      model: '6E0',
+    }).create()
+
+    const response = await client
+      .get(`/boats/${boat.id}/engines/${engine.id}/spare-parts`)
+      .loginAs(user)
+      .withInertia()
+
+    response.assertStatus(200)
+    const props = response.inertiaProps as {
+      engine: { fuel: string | null; strokeType: string | null }
+    }
+    assert.equal(props.engine.fuel, 'essence')
+    assert.equal(props.engine.strokeType, '2_stroke')
+  })
+
   test('GET identify on a boat from another org redirects to /boats', async ({ client }) => {
     const user = await createAdminUser()
     const otherUser = await createAdminUser()

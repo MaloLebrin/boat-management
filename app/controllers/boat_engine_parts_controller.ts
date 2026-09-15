@@ -64,6 +64,9 @@ export default class BoatEnginePartsController {
       engine: {
         id: engine.id,
         kind: engine.kind,
+        fuel: engine.fuel,
+        strokeType: engine.strokeType,
+        family: engine.family,
         brand: engine.brand,
         model: engine.model,
         serialNumber: engine.serialNumber,

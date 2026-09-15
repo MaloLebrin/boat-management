@@ -5,6 +5,8 @@ import {
   engineFuelLabel,
   engineKindLabel,
   engineSerialSuffix,
+  engineStrokeShortLabel,
+  engineStrokeSuffix,
   maintenanceSubjectLabel,
   rigTypeLabel,
   sailMaterialLabel,
@@ -107,6 +109,7 @@ describe('engineCaptionLabel', () => {
 
 describe('engineDisplayTitle', () => {
   test('joins brand and model when both are known', () => {
+    // kind: 'inboard' sans fuel ni family ne suffit pas à déduire le cycle
     expect(engineDisplayTitle(t, { brand: 'Volvo Penta', model: 'D2-40', kind: 'inboard' })).toBe(
       'Volvo Penta D2-40'
     )
@@ -118,6 +121,7 @@ describe('engineDisplayTitle', () => {
   })
 
   test('falls back to the translated kind rather than the raw token (#472)', () => {
+    // kind: 'inboard' sans fuel ni family ne suffit pas à déduire le cycle
     expect(engineDisplayTitle(t, { brand: null, model: null, kind: 'inboard' })).toBe(
       'translated:boats.options.engineKind.inboard'
     )
@@ -130,6 +134,7 @@ describe('engineDisplayTitle', () => {
   })
 
   test('always appends the serial number when the engine has one (#601)', () => {
+    // kind: 'inboard' sans fuel ni family ne suffit pas à déduire le cycle
     expect(
       engineDisplayTitle(t, {
         brand: 'Volvo Penta',
@@ -141,6 +146,7 @@ describe('engineDisplayTitle', () => {
   })
 
   test('appends the serial number after the kind fallback too (#601)', () => {
+    // kind: 'inboard' sans fuel ni family ne suffit pas à déduire le cycle
     expect(
       engineDisplayTitle(t, { brand: null, model: null, kind: 'inboard', serialNumber: 'X99' })
     ).toBe('translated:boats.options.engineKind.inboard · translated:boats.engines.sn X99')
@@ -150,6 +156,66 @@ describe('engineDisplayTitle', () => {
     expect(
       engineDisplayTitle(t, { brand: 'Yamaha', model: 'F8', kind: 'outboard', serialNumber: null })
     ).toBe('Yamaha F8')
+  })
+
+  test('includes the stroke cycle between name and serial number', () => {
+    expect(
+      engineDisplayTitle(t, {
+        brand: 'Yamaha',
+        model: 'F8',
+        kind: 'outboard',
+        family: 'outboard_4t',
+        serialNumber: 'Y123',
+      })
+    ).toBe(
+      'Yamaha F8 · translated:boats.options.strokeTypeShort.4_stroke · translated:boats.engines.sn Y123'
+    )
+  })
+
+  test('includes explicit 2-stroke in the title', () => {
+    expect(
+      engineDisplayTitle(t, {
+        brand: 'Mercury',
+        model: '15M',
+        kind: 'outboard',
+        strokeType: '2_stroke',
+      })
+    ).toBe('Mercury 15M · translated:boats.options.strokeTypeShort.2_stroke')
+  })
+
+  test('does not include stroke for electric engines', () => {
+    expect(
+      engineDisplayTitle(t, {
+        brand: 'Torqeedo',
+        model: 'Travel 1103',
+        kind: 'electric',
+      })
+    ).toBe('Torqeedo Travel 1103')
+  })
+
+  test('infers 4-stroke for diesel inboard', () => {
+    expect(
+      engineDisplayTitle(t, {
+        brand: 'Yanmar',
+        model: '3YM30',
+        kind: 'inboard',
+        fuel: 'diesel',
+      })
+    ).toBe('Yanmar 3YM30 · translated:boats.options.strokeTypeShort.4_stroke')
+  })
+
+  test('infers 4-stroke for diesel inboard with serial number', () => {
+    expect(
+      engineDisplayTitle(t, {
+        brand: 'Volvo Penta',
+        model: 'D2-40',
+        kind: 'inboard',
+        fuel: 'diesel',
+        serialNumber: 'SN-12345',
+      })
+    ).toBe(
+      'Volvo Penta D2-40 · translated:boats.options.strokeTypeShort.4_stroke · translated:boats.engines.sn SN-12345'
+    )
   })
 })
 
@@ -162,6 +228,68 @@ describe('engineSerialSuffix', () => {
     expect(engineSerialSuffix(t, null)).toBe('')
     expect(engineSerialSuffix(t, undefined)).toBe('')
     expect(engineSerialSuffix(t, '')).toBe('')
+  })
+})
+
+describe('engineStrokeShortLabel', () => {
+  test('returns the short label for an explicit 2-stroke', () => {
+    expect(engineStrokeShortLabel(t, { strokeType: '2_stroke' })).toBe(
+      'translated:boats.options.strokeTypeShort.2_stroke'
+    )
+  })
+
+  test('returns the short label for an explicit 4-stroke', () => {
+    expect(engineStrokeShortLabel(t, { strokeType: '4_stroke' })).toBe(
+      'translated:boats.options.strokeTypeShort.4_stroke'
+    )
+  })
+
+  test('infers 4-stroke for a diesel engine', () => {
+    expect(engineStrokeShortLabel(t, { fuel: 'diesel', kind: 'inboard' })).toBe(
+      'translated:boats.options.strokeTypeShort.4_stroke'
+    )
+  })
+
+  test('infers 4-stroke from the outboard_4t family', () => {
+    expect(engineStrokeShortLabel(t, { family: 'outboard_4t' })).toBe(
+      'translated:boats.options.strokeTypeShort.4_stroke'
+    )
+  })
+
+  test('infers 2-stroke from the outboard_2t family', () => {
+    expect(engineStrokeShortLabel(t, { family: 'outboard_2t' })).toBe(
+      'translated:boats.options.strokeTypeShort.2_stroke'
+    )
+  })
+
+  test('returns null for an electric engine', () => {
+    expect(engineStrokeShortLabel(t, { fuel: 'electric' })).toBeNull()
+    expect(engineStrokeShortLabel(t, { kind: 'electric' })).toBeNull()
+    expect(engineStrokeShortLabel(t, { family: 'electric_outboard' })).toBeNull()
+  })
+
+  test('returns null for a petrol outboard without explicit stroke or family', () => {
+    expect(
+      engineStrokeShortLabel(t, { kind: 'outboard', fuel: 'essence', strokeType: null })
+    ).toBeNull()
+  })
+})
+
+describe('engineStrokeSuffix', () => {
+  test('builds the « · 4T » suffix for an inferred 4-stroke', () => {
+    expect(engineStrokeSuffix(t, { fuel: 'diesel' })).toBe(
+      ' · translated:boats.options.strokeTypeShort.4_stroke'
+    )
+  })
+
+  test('builds the « · 2T » suffix for an explicit 2-stroke', () => {
+    expect(engineStrokeSuffix(t, { strokeType: '2_stroke' })).toBe(
+      ' · translated:boats.options.strokeTypeShort.2_stroke'
+    )
+  })
+
+  test('is empty when the stroke type cannot be resolved', () => {
+    expect(engineStrokeSuffix(t, { kind: 'outboard', fuel: 'essence' })).toBe('')
   })
 })
 

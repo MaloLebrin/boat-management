@@ -140,6 +140,8 @@ export default class BoatEngineSparePartsService {
       modelCodeMatches,
       serialNumber: engine.serialNumber,
       kind: engine.kind,
+      fuel: engine.fuel,
+      strokeType: engine.strokeType,
       // Famille de motorisation (#574) : c'est elle qui décide des ensembles
       // affichés, les écrans la reçoivent telle quelle.
       family: engine.family,

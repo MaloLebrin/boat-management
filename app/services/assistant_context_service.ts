@@ -2,6 +2,7 @@ import BoatEngine from '#models/boat_engine'
 import type User from '#models/user'
 import BoatListService from '#services/boat_list_service'
 import PlanningService from '#services/planning_service'
+import { engineLabelWithStroke } from '#shared/helpers/engine_stroke'
 import {
   ASSISTANT_DIGEST_MAX_TASKS,
   ASSISTANT_ROSTER_MAX_BOATS,
@@ -38,13 +39,14 @@ export default class AssistantContextService {
     const engines = boatIds.length
       ? await BoatEngine.query()
           .whereIn('boatId', boatIds)
-          .select(['id', 'boatId', 'brand', 'model'])
+          .select(['id', 'boatId', 'brand', 'model', 'strokeType', 'family', 'fuel', 'kind'])
           .orderBy('id', 'asc')
       : []
 
     const enginesByBoat = new Map<number, { id: number; label: string }[]>()
     for (const engine of engines) {
-      const label = [engine.brand, engine.model].filter(Boolean).join(' ') || `#${engine.id}`
+      const baseLabel = [engine.brand, engine.model].filter(Boolean).join(' ') || `#${engine.id}`
+      const label = engineLabelWithStroke(baseLabel, engine)
       const list = enginesByBoat.get(engine.boatId) ?? []
       list.push({ id: engine.id, label })
       enginesByBoat.set(engine.boatId, list)

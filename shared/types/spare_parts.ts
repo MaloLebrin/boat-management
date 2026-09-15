@@ -137,6 +137,9 @@ export interface SparePartsEngineRow {
   model: string | null
   serialNumber: string | null
   kind: string
+  fuel: string | null
+  /** Cycle moteur saisi (2T / 4T), `null` si non renseigné. */
+  strokeType: string | null
   /** Famille de motorisation (#574), `null` tant qu'elle n'est pas précisée. */
   family: string | null
   status: string
@@ -160,7 +163,7 @@ export interface RepairCartItemRow {
 /**
  * Moteur tel que le contrôleur le projette vers les écrans « pièces
  * détachées ». Les deux pages (identification, ensemble) reçoivent exactement
- * la même forme — d'où le type partagé plutôt que deux `defineProps` jumeaux.
+ * la même forme — d'ou le type partagé plutôt que deux `defineProps` jumeaux.
  */
 export interface SparePartsEngineProps {
   id: number
@@ -177,6 +180,9 @@ export interface SparePartsEngineProps {
   modelCodeMatches: number
   serialNumber: string | null
   kind: string
+  fuel: string | null
+  /** Cycle moteur saisi (2T / 4T), `null` si non renseigné. */
+  strokeType: string | null
   /** Famille de motorisation (#574) — décide des ensembles proposés. */
   family: string | null
   status: string

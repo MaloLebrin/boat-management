@@ -6,6 +6,7 @@ const EMPTY_INPUT: EngineSuggestionsInput = {
   engine: {
     kind: 'outboard',
     fuel: null,
+    strokeType: null,
     family: null,
     brand: null,
     model: null,
@@ -25,6 +26,7 @@ const FULL_INPUT: EngineSuggestionsInput = {
   engine: {
     kind: 'outboard',
     fuel: 'essence',
+    strokeType: '4_stroke',
     family: 'outboard_petrol',
     brand: 'Yamaha',
     model: 'F100',
@@ -90,6 +92,46 @@ test.group('engine_suggestions_prompt_service — user message', () => {
     assert.include(message, 'achetée le 2023-04-15')
     assert.include(message, 'Vidange — échéance 2026-10-01, à 500h')
     assert.include(message, 'Oil change : tous les 12 mois / toutes les 100h')
+  })
+
+  test('engine line includes stroke suffix when cycle is known', ({ assert }) => {
+    // FULL_INPUT : strokeType '4_stroke' saisi → suffixe « 4T »
+    const en = buildEngineSuggestionsUserMessage(FULL_INPUT, 'en')
+    const fr = buildEngineSuggestionsUserMessage(FULL_INPUT, 'fr')
+    assert.include(en, 'outboard Yamaha F100 4T')
+    assert.include(fr, 'outboard Yamaha F100 4T')
+
+    // Moteur diesel in-bord : cycle déduit de la famille sans strokeType.
+    const dieselInput: EngineSuggestionsInput = {
+      ...EMPTY_INPUT,
+      engine: {
+        ...EMPTY_INPUT.engine,
+        kind: 'inboard',
+        fuel: 'diesel',
+        strokeType: null,
+        family: 'inboard_diesel_shaft',
+        brand: 'Volvo',
+        model: 'D2-40',
+      },
+    }
+    assert.include(buildEngineSuggestionsUserMessage(dieselInput, 'en'), 'inboard Volvo D2-40 4T')
+
+    // Hors-bord essence sans indice : pas de suffixe.
+    const noStrokeInput: EngineSuggestionsInput = {
+      ...EMPTY_INPUT,
+      engine: {
+        ...EMPTY_INPUT.engine,
+        kind: 'outboard',
+        fuel: 'essence',
+        strokeType: null,
+        family: null,
+        brand: 'Honda',
+        model: 'BF5',
+      },
+    }
+    const noStrokeMsg = buildEngineSuggestionsUserMessage(noStrokeInput, 'en')
+    assert.notInclude(noStrokeMsg, '2T')
+    assert.notInclude(noStrokeMsg, '4T')
   })
 
   test('closed tasks are excluded from the open-tasks section', ({ assert }) => {
