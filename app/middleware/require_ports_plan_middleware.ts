@@ -8,10 +8,9 @@ import type { NextFn } from '@adonisjs/core/types/http'
 
 /**
  * Garde de plan et de profil sur toute la cartographie de port (#604) : ports,
- * pontons, mouillages et places. Le plan Starter — un ou deux bateaux
- * personnels — n'a pas de marina à modéliser, la section entière lui est
- * fermée ; il en va de même, quel que soit son plan, d'une organisation
- * déclarée particulier à l'inscription.
+ * pontons, mouillages et places. La section est réservée au plan Entreprise :
+ * Starter et Pro en sont fermés ; il en va de même, quel que soit son plan,
+ * d'une organisation déclarée particulier à l'inscription.
  *
  * Les deux refus ne mènent pas au même endroit : un plan trop bas renvoie vers
  * la facturation avec un upsell, un profil particulier vers le dashboard —

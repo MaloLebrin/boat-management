@@ -1,6 +1,6 @@
 import { PortFactory } from '#database/factories/port_factory'
 import { UserFactory } from '#database/factories/user_factory'
-import { createAdminUser } from '#tests/functional/helpers'
+import { createAdminUser, createEnterpriseAdminUser } from '#tests/functional/helpers'
 import { truncateDb } from '#tests/utils/db'
 import { test } from '@japa/runner'
 
@@ -11,7 +11,7 @@ test.group('Navigation & dashboard quick-add props (functional)', (group) => {
     client,
     assert,
   }) => {
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
     const port = await PortFactory.merge({ organizationId: user.organizationId! }).create()
 
     const response = await client.get('/navigation/logbook').loginAs(user).withInertia()
@@ -46,7 +46,7 @@ test.group('Navigation & dashboard quick-add props (functional)', (group) => {
     client,
     assert,
   }) => {
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
     const port = await PortFactory.merge({ organizationId: user.organizationId! }).create()
 
     const response = await client.get('/dashboard').loginAs(user).withInertia()
@@ -64,6 +64,20 @@ test.group('Navigation & dashboard quick-add props (functional)', (group) => {
       props.portOptions.map((p) => p.id),
       [port.id]
     )
+  })
+
+  test('GET /dashboard exposes no portOptions on the Pro plan (marina mapping is Enterprise-only)', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    await PortFactory.merge({ organizationId: user.organizationId! }).create()
+
+    const response = await client.get('/dashboard').loginAs(user).withInertia()
+
+    response.assertStatus(200)
+    const props = response.inertiaProps as { portOptions: { id: number; name: string }[] }
+    assert.deepEqual(props.portOptions, [])
   })
 
   test('a user with no organization is denied the staff navigation pages (no boats.view/incidents.view capability, cf. #396)', async ({

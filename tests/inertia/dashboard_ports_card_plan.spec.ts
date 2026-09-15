@@ -86,11 +86,12 @@ function mountDashboard(
 }
 
 // #604 — la carte ports du dashboard suit la même garde de plan que la nav et
-// les routes : sur Starter, son état vide inviterait à créer un port inaccessible.
+// les routes : hors Entreprise, son état vide inviterait à créer un port
+// inaccessible.
 
-test('le plan Pro affiche la carte ports du dashboard', () => {
+test('le plan Pro masque la carte ports du dashboard', () => {
   const wrapper = mountDashboard('pro')
-  expect(wrapper.find('.port-dashboard-card').exists()).toBe(true)
+  expect(wrapper.find('.port-dashboard-card').exists()).toBe(false)
 })
 
 test('le plan Entreprise affiche la carte ports du dashboard', () => {
@@ -108,17 +109,17 @@ test('un plan absent masque la carte ports du dashboard', () => {
   expect(wrapper.find('.port-dashboard-card').exists()).toBe(false)
 })
 
-test('le plan Pro sans aucun port affiche quand même la carte et son état vide', () => {
-  const wrapper = mountDashboard('pro', [])
+test('le plan Entreprise sans aucun port affiche quand même la carte et son état vide', () => {
+  const wrapper = mountDashboard('enterprise', [])
   expect(wrapper.find('.port-dashboard-card').exists()).toBe(true)
 })
 
 test('the ports card is hidden for a private organization profile', () => {
-  const wrapper = mountDashboard('pro', [PORT], 'private')
+  const wrapper = mountDashboard('enterprise', [PORT], 'private')
   expect(wrapper.find('.port-dashboard-card').exists()).toBe(false)
 })
 
 test('the ports card stays visible for a professional profile', () => {
-  const wrapper = mountDashboard('pro', [PORT], 'marina')
+  const wrapper = mountDashboard('enterprise', [PORT], 'marina')
   expect(wrapper.find('.port-dashboard-card').exists()).toBe(true)
 })

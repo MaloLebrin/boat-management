@@ -10,10 +10,8 @@ import type { OrganizationType } from '#shared/types/organization'
  * Required for operations that are guarded by policies checking admin role
  * (BoatPolicy.delete, MaintenancePolicy.delete, etc.).
  */
-export async function createAdminUser(): Promise<User> {
-  const user = await UserFactory.with('organization', 1, (org) =>
-    org.merge({ plan: 'pro' })
-  ).create()
+export async function createAdminUser(plan: PlanTier = 'pro'): Promise<User> {
+  const user = await UserFactory.with('organization', 1, (org) => org.merge({ plan })).create()
   if (user.organizationId) {
     await OrganizationMembership.create({
       userId: user.id,
@@ -22,6 +20,15 @@ export async function createAdminUser(): Promise<User> {
     })
   }
   return user
+}
+
+/**
+ * Admin d'une organisation au plan `enterprise`. Requis par les routes de la
+ * cartographie de port (ports, pontons, mouillages, places), réservée au plan
+ * Entreprise et gardée par `RequirePortsPlanMiddleware`.
+ */
+export async function createEnterpriseAdminUser(): Promise<User> {
+  return createAdminUser('enterprise')
 }
 
 /**
@@ -72,8 +79,7 @@ export async function createBoatOwnerUser(organizationId: number): Promise<User>
 /**
  * Crée un utilisateur dans une organisation au plan `pro`, sans membership —
  * ses capabilities sont donc celles du rôle par défaut, pas celles d'un admin.
- * Utile aux fonctionnalités fermées au plan Starter (cartographie de port,
- * #604) quand le test porte sur le plan et non sur le rôle.
+ * Utile aux tests qui portent sur le plan et non sur le rôle.
  */
 export async function createProPlanUser(): Promise<User> {
   return UserFactory.with('organization', 1, (org) => org.merge({ plan: 'pro' })).create()

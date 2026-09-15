@@ -3,7 +3,7 @@ import BoatPortStay from '#models/boat_port_stay'
 import Port from '#models/port'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { PortFactory } from '#database/factories/port_factory'
-import { createAdminUser } from '#tests/functional/helpers'
+import { createEnterpriseAdminUser } from '#tests/functional/helpers'
 import { truncateDb } from '#tests/utils/db'
 import { test } from '@japa/runner'
 
@@ -20,7 +20,7 @@ test.group('Port d’attache — suggestions de ports (#579)', (group) => {
   group.each.setup(() => truncateDb())
 
   test('GET /boats/new expose les ports de l’organisation', async ({ client, assert }) => {
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
     await PortFactory.merge({
       organizationId: user.organizationId!,
       name: 'Port-la-Forêt',
@@ -38,7 +38,7 @@ test.group('Port d’attache — suggestions de ports (#579)', (group) => {
   })
 
   test('GET /boats/:id/edit expose les ports de l’organisation', async ({ client, assert }) => {
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
     const port = await PortFactory.merge({
       organizationId: user.organizationId!,
       name: 'Port-la-Forêt',
@@ -53,7 +53,7 @@ test.group('Port d’attache — suggestions de ports (#579)', (group) => {
   })
 
   test('une organisation sans port reçoit une liste vide', async ({ client, assert }) => {
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
 
     const response = await client.get('/boats/new').loginAs(user).withInertia()
 
@@ -62,8 +62,8 @@ test.group('Port d’attache — suggestions de ports (#579)', (group) => {
   })
 
   test('les ports d’une autre organisation ne sont jamais proposés', async ({ client, assert }) => {
-    const user = await createAdminUser()
-    const other = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
+    const other = await createEnterpriseAdminUser()
     await PortFactory.merge({ organizationId: user.organizationId!, name: 'Le Crouesty' }).create()
     await PortFactory.merge({
       organizationId: other.organizationId!,
@@ -83,7 +83,7 @@ test.group('Port d’attache — suggestions de ports (#579)', (group) => {
     client,
     assert,
   }) => {
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
     const port = await PortFactory.merge({
       organizationId: user.organizationId!,
       name: 'Port-la-Forêt',
@@ -101,7 +101,7 @@ test.group('Port d’attache — suggestions de ports (#579)', (group) => {
     client,
     assert,
   }) => {
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
     const port = await PortFactory.merge({
       organizationId: user.organizationId!,
       name: 'Port-la-Forêt',
@@ -119,7 +119,7 @@ test.group('Port d’attache — suggestions de ports (#579)', (group) => {
   })
 
   test('un port d’attache hors référentiel ne remonte aucun port', async ({ client, assert }) => {
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
     await PortFactory.merge({
       organizationId: user.organizationId!,
       name: 'Port-la-Forêt',
@@ -136,7 +136,7 @@ test.group('Port d’attache — suggestions de ports (#579)', (group) => {
   })
 
   test('un bateau sans port d’attache ne remonte aucun port', async ({ client, assert }) => {
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
     await PortFactory.merge({
       organizationId: user.organizationId!,
       name: 'Port-la-Forêt',
@@ -156,8 +156,8 @@ test.group('Port d’attache — suggestions de ports (#579)', (group) => {
     client,
     assert,
   }) => {
-    const user = await createAdminUser()
-    const other = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
+    const other = await createEnterpriseAdminUser()
     await PortFactory.merge({
       organizationId: other.organizationId!,
       name: 'Port-la-Forêt',
@@ -177,7 +177,7 @@ test.group('Port d’attache — suggestions de ports (#579)', (group) => {
     client,
     assert,
   }) => {
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
     await PortFactory.merge({
       organizationId: user.organizationId!,
       name: 'Port-la-Forêt',
@@ -197,7 +197,7 @@ test.group('Port d’attache — suggestions de ports (#579)', (group) => {
   })
 
   test('une escale garde son nom de port en texte libre', async ({ client, assert }) => {
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
 
     const response = await client

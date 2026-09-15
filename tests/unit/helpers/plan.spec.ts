@@ -128,12 +128,15 @@ test.group('restriction de profil — cartographie de port', () => {
   })
 
   test('canManagePortsFor croise le plan et le profil', ({ assert }) => {
-    assert.isTrue(canManagePortsFor('pro', null))
-    assert.isTrue(canManagePortsFor('pro', 'marina'))
+    assert.isTrue(canManagePortsFor('enterprise', null))
+    assert.isTrue(canManagePortsFor('enterprise', 'marina'))
     assert.isTrue(canManagePortsFor('enterprise', 'rental'))
-    assert.isFalse(canManagePortsFor('pro', 'private'))
     assert.isFalse(canManagePortsFor('enterprise', 'private'))
-    // Le plan continue de gouverner indépendamment du profil.
+    // Le plan continue de gouverner indépendamment du profil : la cartographie
+    // de port est réservée au plan Entreprise.
+    assert.isFalse(canManagePortsFor('pro', null))
+    assert.isFalse(canManagePortsFor('pro', 'marina'))
+    assert.isFalse(canManagePortsFor('pro', 'private'))
     assert.isFalse(canManagePortsFor('starter', 'marina'))
     assert.isFalse(canManagePortsFor('starter', 'private'))
   })

@@ -5,7 +5,7 @@ import { BoatFactory } from '#database/factories/boat_factory'
 import { PortFactory } from '#database/factories/port_factory'
 import { PontoonFactory } from '#database/factories/pontoon_factory'
 import { SpotFactory } from '#database/factories/spot_factory'
-import { createAdminUser } from '#tests/functional/helpers'
+import { createEnterpriseAdminUser } from '#tests/functional/helpers'
 import { MARINA_CANVAS_HEIGHT, MARINA_CANVAS_WIDTH } from '#shared/constants/marina_layout'
 
 test.group('Pontoons (functional)', (group) => {
@@ -15,7 +15,7 @@ test.group('Pontoons (functional)', (group) => {
     client,
     assert,
   }) => {
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
     const port = await PortFactory.merge({ organizationId: user.organizationId! }).create()
     const pontoon = await PontoonFactory.merge({ portId: port.id }).create()
 
@@ -30,7 +30,7 @@ test.group('Pontoons (functional)', (group) => {
     client,
     assert,
   }) => {
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
     const port = await PortFactory.merge({ organizationId: user.organizationId! }).create()
     const pontoon = await PontoonFactory.merge({ portId: port.id }).create()
     const spot = await SpotFactory.merge({
@@ -54,7 +54,7 @@ test.group('Pontoons (functional)', (group) => {
     client,
     assert,
   }) => {
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
     const port = await PortFactory.merge({ organizationId: user.organizationId! }).create()
     const pontoon = await PontoonFactory.merge({ portId: port.id }).create()
 
@@ -71,7 +71,7 @@ test.group('Pontoons (functional)', (group) => {
   })
 
   test('PATCH .../position rejette des coordonnées négatives', async ({ client, assert }) => {
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
     const port = await PortFactory.merge({ organizationId: user.organizationId! }).create()
     const pontoon = await PontoonFactory.merge({ portId: port.id }).create()
 
@@ -91,7 +91,7 @@ test.group('Pontoons (functional)', (group) => {
     client,
     assert,
   }) => {
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
     const port = await PortFactory.merge({ organizationId: user.organizationId! }).create()
     const pontoon = await PontoonFactory.merge({ portId: port.id }).create()
 

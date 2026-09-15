@@ -5,7 +5,7 @@ import { BoatFactory } from '#database/factories/boat_factory'
 import { PortFactory } from '#database/factories/port_factory'
 import { MouillageFactory } from '#database/factories/mouillage_factory'
 import { SpotFactory } from '#database/factories/spot_factory'
-import { createAdminUser } from '#tests/functional/helpers'
+import { createEnterpriseAdminUser } from '#tests/functional/helpers'
 import { MARINA_CANVAS_HEIGHT, MARINA_CANVAS_WIDTH } from '#shared/constants/marina_layout'
 
 test.group('Mouillages (functional)', (group) => {
@@ -15,7 +15,7 @@ test.group('Mouillages (functional)', (group) => {
     client,
     assert,
   }) => {
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
     const port = await PortFactory.merge({ organizationId: user.organizationId! }).create()
     const mouillage = await MouillageFactory.merge({ portId: port.id }).create()
 
@@ -32,7 +32,7 @@ test.group('Mouillages (functional)', (group) => {
     client,
     assert,
   }) => {
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
     const port = await PortFactory.merge({ organizationId: user.organizationId! }).create()
     const mouillage = await MouillageFactory.merge({ portId: port.id }).create()
     const spot = await SpotFactory.merge({
@@ -56,7 +56,7 @@ test.group('Mouillages (functional)', (group) => {
     client,
     assert,
   }) => {
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
     const port = await PortFactory.merge({ organizationId: user.organizationId! }).create()
     const mouillage = await MouillageFactory.merge({ portId: port.id }).create()
 
@@ -73,7 +73,7 @@ test.group('Mouillages (functional)', (group) => {
   })
 
   test('PATCH .../position rejette des coordonnées négatives', async ({ client, assert }) => {
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
     const port = await PortFactory.merge({ organizationId: user.organizationId! }).create()
     const mouillage = await MouillageFactory.merge({ portId: port.id }).create()
 
@@ -93,7 +93,7 @@ test.group('Mouillages (functional)', (group) => {
     client,
     assert,
   }) => {
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
     const port = await PortFactory.merge({ organizationId: user.organizationId! }).create()
     const mouillage = await MouillageFactory.merge({ portId: port.id }).create()
 

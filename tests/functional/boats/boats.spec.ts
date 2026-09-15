@@ -4,7 +4,11 @@ import Boat from '#models/boat'
 import { UserFactory } from '#database/factories/user_factory'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { PortFactory } from '#database/factories/port_factory'
-import { createAdminUser, createMemberUser } from '#tests/functional/helpers'
+import {
+  createAdminUser,
+  createEnterpriseAdminUser,
+  createMemberUser,
+} from '#tests/functional/helpers'
 
 test.group('Boats (functional)', (group) => {
   group.each.setup(() => truncateDb())
@@ -231,7 +235,7 @@ test.group('Boats (functional)', (group) => {
     client,
     assert,
   }) => {
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
     const port = await PortFactory.merge({ organizationId: user.organizationId! }).create()
 

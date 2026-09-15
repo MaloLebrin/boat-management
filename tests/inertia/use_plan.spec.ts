@@ -163,8 +163,18 @@ test('a private profile removes nothing but port mapping', () => {
 
 test('a professional or undeclared profile keeps port mapping', () => {
   expect(
-    mountWithProps({ currentPlan: 'pro', organizationType: 'marina' }).effectiveQuotas.value
+    mountWithProps({ currentPlan: 'enterprise', organizationType: 'marina' }).effectiveQuotas.value
       ?.canManagePorts
   ).toBe(true)
-  expect(mountWithProps({ currentPlan: 'pro' }).effectiveQuotas.value?.canManagePorts).toBe(true)
+  expect(mountWithProps({ currentPlan: 'enterprise' }).effectiveQuotas.value?.canManagePorts).toBe(
+    true
+  )
+})
+
+test('the pro plan does not include port mapping, whatever the profile', () => {
+  expect(mountWithProps({ currentPlan: 'pro' }).effectiveQuotas.value?.canManagePorts).toBe(false)
+  expect(
+    mountWithProps({ currentPlan: 'pro', organizationType: 'marina' }).effectiveQuotas.value
+      ?.canManagePorts
+  ).toBe(false)
 })

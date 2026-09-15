@@ -34,7 +34,7 @@ Contenu (classe `MaloSeeder`), aligné le 21/07/2026 sur un dump réel de la DB 
 
 - utilisateur + organisation via `UserService.signupWithOrganization` (réutilisé si déjà présent) ; plan mis à `pro` directement sur `organizations.plan` (pas d'abonnement Stripe, comme en réalité)
 - un bateau ("3D" en local — le nom réel du bateau de l'utilisateur), équipement (moteur(s), voiles, gréement) créés seulement s'ils manquent
-- son poste d'amarrage réel : port "Querqueville" (Cherbourg-en-Cotentin) → mouillage "Corps-morts" → bouée "B08", chaque étage créé une seule fois via `PortService` / `MouillageService` / `SpotService`, puis le bateau affecté au spot. Seule B08 est créée : les autres bouées du mouillage réel ne sont pas des données à inventer. L'affectation est gardée par `if (boat.spotId !== spot.id)` — `BoatService.updateAssignment` journalise un changement de poste dans `boat_position_history` à **chaque** appel, sans la garde on empilerait un historique de mouvements fictif
+- **aucune donnée de port** (port, mouillage, place) : la cartographie de port est réservée au plan Entreprise, un compte `pro` ne la verrait pas. L'ancien poste réel (Querqueville → « Corps-morts » → B08) n'est plus seedé ; une base déjà seedée le conserve, simplement invisible
 - 6 événements de maintenance historiques + 5 tâches planifiées associées, avec des **dates absolues littérales** reprises telles quelles de la DB réelle (pas de calcul relatif à `today` : une fois créées, ces dates ne bougent plus lors des prochaines exécutions — assumé pour rester fidèle à l'état réel)
 
 Un second bateau ("Rhodes 21") existe parfois en base comme résidu d'une ancienne version du seeder (avant le renommage en "3D") — volontairement non reproduit ici, ce n'est pas une donnée métier réelle à préserver.
@@ -54,7 +54,7 @@ La vraie démo générique du produit, présentée aux visiteurs/prospects. Expo
 
 Contenu :
 
-- organisation `Marina Démo` (slug `marina-demo`, plan `pro`) et utilisateur `DEMO_EMAIL` (`demo@fleetai.app` par défaut, mot de passe `DEMO_PASSWORD` env ou `demo1234`) — voir `shared/constants/demo.ts`
+- organisation `Marina Démo` (slug `marina-demo`, plan `enterprise` — seul plan qui ouvre la cartographie de port ; une org démo existante restée en `pro` est remontée au passage) et utilisateur `DEMO_EMAIL` (`demo@fleetai.app` par défaut, mot de passe `DEMO_PASSWORD` env ou `demo1234`) — voir `shared/constants/demo.ts`
 - 5 bateaux typés (voiliers + bateaux à moteur), équipement adapté au type de propulsion
 - 5 événements de maintenance par bateau (dates aléatoires dans une plage réaliste)
 - un port de démonstration (`seedDemoPort`, #478) : « Port de la Grande Rade » (Saint-Malo) → 3 pontons (6/6/4 places) + une zone de mouillage (4 bouées), soit 20 places dont 5 occupées par les bateaux de démo. Sans lui, `/ports` affichait « Aucun port enregistré » et le plan marina interactif — argument produit — restait invisible dans la sandbox. Deux points à respecter en cas de modification :

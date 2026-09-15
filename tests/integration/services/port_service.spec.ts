@@ -10,12 +10,12 @@ import { PontoonFactory } from '#database/factories/pontoon_factory'
 import Spot from '#models/spot'
 
 /**
- * Depuis #604 les listes de ports sont fermées au plan Starter : les tests qui
+ * Depuis #604 les listes de ports sont fermées hors plan Entreprise : les tests qui
  * exercent `listForUser` / `listWithSpotsForOrg` / `listNamesForOrg` doivent
- * partir d'une organisation au plan `pro`.
+ * partir d'une organisation au plan `enterprise`, seul plan qui l'inclut.
  */
-function proPlanUser() {
-  return UserFactory.with('organization', 1, (org) => org.merge({ plan: 'pro' })).create()
+function enterprisePlanUser() {
+  return UserFactory.with('organization', 1, (org) => org.merge({ plan: 'enterprise' })).create()
 }
 
 test.group('PortService (unit)', () => {
@@ -177,7 +177,7 @@ test.group('PortService (unit)', () => {
   // ── listForUser ──────────────────────────────────────────────────────────
 
   test("listForUser retourne uniquement les ports de l'organisation", async ({ assert }) => {
-    const user = await proPlanUser()
+    const user = await enterprisePlanUser()
     await PortFactory.merge({ organizationId: user.organizationId! }).createMany(2)
     // port d'une autre org
     await PortFactory.with('organization').create()
@@ -203,7 +203,7 @@ test.group('PortService (unit)', () => {
   })
 
   test('listForUser retourne les compteurs boatCount et freeSpots', async ({ assert }) => {
-    const user = await proPlanUser()
+    const user = await enterprisePlanUser()
     const port = await PortFactory.merge({ organizationId: user.organizationId! }).create()
     const pontoon = await PontoonFactory.merge({ portId: port.id }).create()
     const spot = await Spot.create({
@@ -230,7 +230,7 @@ test.group('PortService (unit)', () => {
   test('listWithSpotsForOrg retourne les ports avec pontoons et mouillages préchargés', async ({
     assert,
   }) => {
-    const user = await proPlanUser()
+    const user = await enterprisePlanUser()
     const port = await PortFactory.merge({ organizationId: user.organizationId! }).create()
     await PontoonFactory.merge({ portId: port.id }).create()
 
@@ -280,8 +280,22 @@ test.group('PortService (unit)', () => {
     assert.deepEqual(await svc.listNamesForOrg(user), [])
   })
 
-  test('listNamesForOrg reste peuplé sur un plan Pro', async ({ assert }) => {
-    const user = await proPlanUser()
+  test('listForUser et listNamesForOrg retournent un tableau vide sur un plan Pro', async ({
+    assert,
+  }) => {
+    const user = await UserFactory.with('organization', 1, (org) =>
+      org.merge({ plan: 'pro' })
+    ).create()
+    await PortFactory.merge({ organizationId: user.organizationId!, name: 'Concarneau' }).create()
+
+    const svc = new PortService()
+
+    assert.deepEqual(await svc.listForUser(user), [])
+    assert.deepEqual(await svc.listNamesForOrg(user), [])
+  })
+
+  test('listNamesForOrg reste peuplé sur un plan Entreprise', async ({ assert }) => {
+    const user = await enterprisePlanUser()
     const port = await PortFactory.merge({
       organizationId: user.organizationId!,
       name: 'Concarneau',

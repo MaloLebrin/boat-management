@@ -94,8 +94,12 @@ export async function seedDemoData() {
     org = await Organization.create({
       name: 'Marina Démo',
       slug: DEMO_ORG_SLUG,
-      plan: 'pro',
+      plan: 'enterprise',
     })
+  } else if (org.plan !== 'enterprise') {
+    // Le plan marina est réservé à Entreprise : une démo créée en Pro le
+    // perdrait, on la remonte au passage.
+    await org.merge({ plan: 'enterprise' }).save()
   }
 
   let user = await User.query().where('email', DEMO_EMAIL).first()

@@ -70,7 +70,7 @@ test.group('Assistant FleetAi — registre d’outils (functional)', (group) => 
     ])
   })
 
-  test('un admin Pro sans module ne voit pas l’outil commercial mais garde les ports', async ({
+  test('un admin Pro sans module ne voit ni l’outil commercial ni les ports', async ({
     assert,
   }) => {
     const user = await createAdminUser()
@@ -79,8 +79,18 @@ test.group('Assistant FleetAi — registre d’outils (functional)', (group) => 
     const definitions = await service.definitionsFor(user)
     const names = definitions.map((d) => d.name)
     assert.notInclude(names, 'list_commercial')
-    assert.include(names, 'list_ports')
+    // La cartographie de port est réservée au plan Entreprise.
+    assert.notInclude(names, 'list_ports')
     assert.include(names, 'get_organization_status')
+  })
+
+  test('un admin Entreprise voit l’outil des ports', async ({ assert }) => {
+    const user = await createEnterpriseAdmin()
+    const service = await makeService()
+
+    const definitions = await service.definitionsFor(user)
+    const names = definitions.map((d) => d.name)
+    assert.include(names, 'list_ports')
   })
 
   test('le module charter rend l’outil commercial visible sur un plan Pro', async ({ assert }) => {

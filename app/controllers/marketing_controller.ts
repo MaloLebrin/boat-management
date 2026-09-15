@@ -785,6 +785,7 @@ export default class MarketingController {
             sub: t('tier_enterprise_sub'),
             feats: [
               [t('tier_enterprise_feat1')],
+              [t('tier_enterprise_feat2'), t('tier_enterprise_feat2_sub')],
               [t('tier_enterprise_feat4')],
               [t('tier_enterprise_feat5'), t('tier_enterprise_feat5_sub')],
               [t('tier_enterprise_feat6'), t('tier_enterprise_feat6_sub')],
@@ -972,6 +973,7 @@ export default class MarketingController {
                 [t('table_g2_r5'), true, true, true],
                 [t('table_g2_r6'), false, true, true],
                 [t('table_g2_r7'), false, true, true],
+                flagRow('table_g2_r8', 'canManagePorts'),
               ] as PricingTableRow[],
             },
             {

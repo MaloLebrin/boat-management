@@ -231,12 +231,17 @@ test.group('QuotaService (unit)', () => {
     assert.isFalse(svc.canManagePorts(org))
   })
 
-  test('canManagePorts retourne true pour les plans pro et enterprise', async ({ assert }) => {
+  test('canManagePorts retourne false pour le plan pro', async ({ assert }) => {
     const pro = await OrganizationFactory.merge({ plan: 'pro' }).make()
+
+    const svc = await app.container.make(QuotaService)
+    assert.isFalse(svc.canManagePorts(pro))
+  })
+
+  test('canManagePorts retourne true pour le plan enterprise', async ({ assert }) => {
     const enterprise = await OrganizationFactory.merge({ plan: 'enterprise' }).make()
 
     const svc = await app.container.make(QuotaService)
-    assert.isTrue(svc.canManagePorts(pro))
     assert.isTrue(svc.canManagePorts(enterprise))
   })
 
@@ -247,8 +252,26 @@ test.group('QuotaService (unit)', () => {
     assert.throws(() => svc.assertCanManagePorts(org), QuotaExceededError)
   })
 
-  test('assertCanManagePorts ne throw pas pour le plan pro', async ({ assert }) => {
+  test('assertCanManagePorts throw pour le plan pro avec un upsell Entreprise', async ({
+    assert,
+  }) => {
     const org = await OrganizationFactory.merge({ plan: 'pro' }).make()
+
+    const svc = await app.container.make(QuotaService)
+    let error: QuotaExceededError | undefined
+    try {
+      svc.assertCanManagePorts(org)
+    } catch (err) {
+      error = err as QuotaExceededError
+    }
+
+    assert.instanceOf(error, QuotaExceededError)
+    assert.equal(error!.feature, 'ports')
+    assert.equal(error!.upgradeTo, 'enterprise')
+  })
+
+  test('assertCanManagePorts ne throw pas pour le plan enterprise', async ({ assert }) => {
+    const org = await OrganizationFactory.merge({ plan: 'enterprise' }).make()
 
     const svc = await app.container.make(QuotaService)
     assert.doesNotThrow(() => svc.assertCanManagePorts(org))
@@ -289,8 +312,8 @@ test.group('QuotaService (unit)', () => {
   test('canManagePorts reste true pour un profil professionnel ou non renseigné', async ({
     assert,
   }) => {
-    const marina = await OrganizationFactory.merge({ plan: 'pro', type: 'marina' }).make()
-    const undeclared = await OrganizationFactory.merge({ plan: 'pro', type: null }).make()
+    const marina = await OrganizationFactory.merge({ plan: 'enterprise', type: 'marina' }).make()
+    const undeclared = await OrganizationFactory.merge({ plan: 'enterprise', type: null }).make()
 
     const svc = await app.container.make(QuotaService)
     assert.isTrue(svc.canManagePorts(marina))
@@ -323,10 +346,10 @@ test.group('QuotaService (unit)', () => {
     assert.throws(() => svc.assertCanManagePorts(org), PortsUnavailableForPrivateProfileError)
   })
 
-  test('assertCanManagePorts ne throw pas pour un plan pro au profil marina', async ({
+  test('assertCanManagePorts ne throw pas pour un plan enterprise au profil marina', async ({
     assert,
   }) => {
-    const org = await OrganizationFactory.merge({ plan: 'pro', type: 'marina' }).make()
+    const org = await OrganizationFactory.merge({ plan: 'enterprise', type: 'marina' }).make()
 
     const svc = await app.container.make(QuotaService)
     assert.doesNotThrow(() => svc.assertCanManagePorts(org))

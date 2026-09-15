@@ -5,13 +5,13 @@ import { BoatFactory } from '#database/factories/boat_factory'
 import { PortFactory } from '#database/factories/port_factory'
 import { PontoonFactory } from '#database/factories/pontoon_factory'
 import { SpotFactory } from '#database/factories/spot_factory'
-import { createAdminUser, createProPlanUser } from '#tests/functional/helpers'
+import { createEnterpriseAdminUser, createEnterprisePlanUser } from '#tests/functional/helpers'
 
 test.group('Ports (functional)', (group) => {
   group.each.setup(() => truncateDb())
 
   test('GET /ports returns 200 for authenticated user', async ({ client }) => {
-    const user = await createProPlanUser()
+    const user = await createEnterprisePlanUser()
 
     const response = await client.get('/ports').loginAs(user)
 
@@ -26,7 +26,7 @@ test.group('Ports (functional)', (group) => {
   })
 
   test('POST /ports creates a port and redirects to its page', async ({ client, assert }) => {
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
 
     const response = await client.post('/ports').loginAs(user).form({
       name: 'Port Vieux',
@@ -39,7 +39,7 @@ test.group('Ports (functional)', (group) => {
   })
 
   test('POST /ports does not create port when name is missing', async ({ client, assert }) => {
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
 
     const response = await client.post('/ports').loginAs(user).form({
       city: 'Marseille',
@@ -50,7 +50,7 @@ test.group('Ports (functional)', (group) => {
   })
 
   test('GET /ports/:id returns 200 for port in same org', async ({ client }) => {
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
     const port = await PortFactory.merge({ organizationId: user.organizationId! }).create()
 
     const response = await client.get(`/ports/${port.id}`).loginAs(user)
@@ -59,7 +59,7 @@ test.group('Ports (functional)', (group) => {
   })
 
   test('GET /ports/:id redirects to /ports for port from another org', async ({ client }) => {
-    const user = await createProPlanUser()
+    const user = await createEnterprisePlanUser()
     const otherPort = await PortFactory.with('organization').create()
 
     const response = await client.get(`/ports/${otherPort.id}`).loginAs(user)
@@ -68,7 +68,7 @@ test.group('Ports (functional)', (group) => {
   })
 
   test('PUT /ports/:id updates port and redirects to its page', async ({ client, assert }) => {
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
     const port = await PortFactory.merge({ organizationId: user.organizationId! }).create()
 
     const response = await client.put(`/ports/${port.id}`).loginAs(user).form({
@@ -82,7 +82,7 @@ test.group('Ports (functional)', (group) => {
   })
 
   test('DELETE /ports/:id deletes port and redirects to /ports', async ({ client, assert }) => {
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
     const port = await PortFactory.merge({ organizationId: user.organizationId! }).create()
 
     const response = await client.delete(`/ports/${port.id}`).loginAs(user)
@@ -97,8 +97,8 @@ test.group('Ports (functional)', (group) => {
     client,
     assert,
   }) => {
-    const otherUser = await createProPlanUser()
-    const owner = await createAdminUser()
+    const otherUser = await createEnterprisePlanUser()
+    const owner = await createEnterpriseAdminUser()
     const port = await PortFactory.merge({ organizationId: owner.organizationId! }).create()
 
     await client.delete(`/ports/${port.id}`).loginAs(otherUser)
@@ -111,7 +111,7 @@ test.group('Ports (functional)', (group) => {
     client,
     assert,
   }) => {
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
     const port = await PortFactory.merge({ organizationId: user.organizationId! }).create()
     const pontoon = await PontoonFactory.merge({ portId: port.id }).create()
     const spot = await SpotFactory.merge({

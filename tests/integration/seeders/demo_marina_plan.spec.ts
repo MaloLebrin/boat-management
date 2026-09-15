@@ -94,6 +94,26 @@ test.group('Seeders — plan marina de la démo', () => {
     assert.lengthOf(spots, TOTAL_SPOTS)
   }).timeout(120_000)
 
+  test('the demo org is on the Enterprise plan, which unlocks marina mapping', async ({
+    assert,
+  }) => {
+    await new SandboxSeeder(client()).run()
+
+    const org = await demoOrganization()
+    assert.equal(org.plan, 'enterprise')
+  }).timeout(120_000)
+
+  test('a demo org left on the Pro plan is upgraded on re-seed', async ({ assert }) => {
+    await new SandboxSeeder(client()).run()
+    const org = await demoOrganization()
+    await org.merge({ plan: 'pro' }).save()
+
+    await new SandboxSeeder(client()).run()
+
+    const reloaded = await demoOrganization()
+    assert.equal(reloaded.plan, 'enterprise')
+  }).timeout(120_000)
+
   test('every pontoon and mouillage carries a canvas position', async ({ assert }) => {
     await new SandboxSeeder(client()).run()
 

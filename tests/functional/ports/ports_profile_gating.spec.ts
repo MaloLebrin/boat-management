@@ -20,8 +20,10 @@ import { createPlanUserWithProfile } from '#tests/functional/helpers'
 test.group('Ports — garde de profil « particulier »', (group) => {
   group.each.setup(() => truncateDb())
 
-  test('GET /ports redirige un compte Pro particulier vers le dashboard', async ({ client }) => {
-    const user = await createPlanUserWithProfile('pro', 'private')
+  test('GET /ports redirige un compte Entreprise particulier vers le dashboard', async ({
+    client,
+  }) => {
+    const user = await createPlanUserWithProfile('enterprise', 'private')
 
     const response = await client.get('/ports').loginAs(user).redirects(0)
 
@@ -30,8 +32,8 @@ test.group('Ports — garde de profil « particulier »', (group) => {
     response.assertHeader('location', '/dashboard')
   })
 
-  test('GET /ports/new est fermé à un compte Pro particulier', async ({ client }) => {
-    const user = await createPlanUserWithProfile('pro', 'private')
+  test('GET /ports/new est fermé à un compte Entreprise particulier', async ({ client }) => {
+    const user = await createPlanUserWithProfile('enterprise', 'private')
 
     const response = await client.get('/ports/new').loginAs(user).redirects(0)
 
@@ -40,7 +42,7 @@ test.group('Ports — garde de profil « particulier »', (group) => {
   })
 
   test('GET /ports/:id est fermé même sur un port de son organisation', async ({ client }) => {
-    const user = await createPlanUserWithProfile('pro', 'private')
+    const user = await createPlanUserWithProfile('enterprise', 'private')
     const port = await PortFactory.merge({ organizationId: user.organizationId! }).create()
 
     const response = await client.get(`/ports/${port.id}`).loginAs(user).redirects(0)
@@ -49,11 +51,11 @@ test.group('Ports — garde de profil « particulier »', (group) => {
     response.assertHeader('location', '/dashboard')
   })
 
-  test('POST /ports ne crée pas de port pour un compte Pro particulier', async ({
+  test('POST /ports ne crée pas de port pour un compte Entreprise particulier', async ({
     client,
     assert,
   }) => {
-    const user = await createPlanUserWithProfile('pro', 'private')
+    const user = await createPlanUserWithProfile('enterprise', 'private')
 
     const response = await client
       .post('/ports')
@@ -65,11 +67,11 @@ test.group('Ports — garde de profil « particulier »', (group) => {
     assert.isNull(await Port.findBy('name', 'Port Particulier'))
   })
 
-  test('POST /ports/:portId/pontoons est fermé à un compte Pro particulier', async ({
+  test('POST /ports/:portId/pontoons est fermé à un compte Entreprise particulier', async ({
     client,
     assert,
   }) => {
-    const user = await createPlanUserWithProfile('pro', 'private')
+    const user = await createPlanUserWithProfile('enterprise', 'private')
     const port = await PortFactory.merge({ organizationId: user.organizationId! }).create()
 
     const response = await client
@@ -86,7 +88,7 @@ test.group('Ports — garde de profil « particulier »', (group) => {
     client,
     assert,
   }) => {
-    const user = await createPlanUserWithProfile('pro', 'private')
+    const user = await createPlanUserWithProfile('enterprise', 'private')
     const port = await PortFactory.merge({ organizationId: user.organizationId! }).create()
 
     await client.delete(`/ports/${port.id}`).loginAs(user).redirects(0)
@@ -104,7 +106,7 @@ test.group('Ports — garde de profil « particulier »', (group) => {
   })
 
   test('un profil professionnel garde l’accès', async ({ client }) => {
-    const user = await createPlanUserWithProfile('pro', 'marina')
+    const user = await createPlanUserWithProfile('enterprise', 'marina')
 
     const response = await client.get('/ports').loginAs(user)
 
@@ -114,7 +116,7 @@ test.group('Ports — garde de profil « particulier »', (group) => {
   test('un profil non renseigné garde l’accès', async ({ client }) => {
     // Comptes antérieurs à la collecte du profil, jamais backfillés : une
     // absence de déclaration n'est pas une déclaration de « particulier ».
-    const user = await createPlanUserWithProfile('pro', null)
+    const user = await createPlanUserWithProfile('enterprise', null)
 
     const response = await client.get('/ports').loginAs(user)
 
@@ -122,7 +124,7 @@ test.group('Ports — garde de profil « particulier »', (group) => {
   })
 
   test('les ports existants réapparaissent si le profil change', async ({ client, assert }) => {
-    const user = await createPlanUserWithProfile('pro', 'private')
+    const user = await createPlanUserWithProfile('enterprise', 'private')
     const port = await PortFactory.merge({
       organizationId: user.organizationId!,
       name: 'Port Retrouvé',
@@ -143,7 +145,7 @@ test.group('Ports — garde de profil « particulier »', (group) => {
   })
 
   test('un port existant reste invisible du formulaire bateau', async ({ client, assert }) => {
-    const user = await createPlanUserWithProfile('pro', 'private')
+    const user = await createPlanUserWithProfile('enterprise', 'private')
     const port = await PortFactory.merge({ organizationId: user.organizationId! }).create()
     const pontoon = await PontoonFactory.merge({ portId: port.id }).create()
     await SpotFactory.merge({
@@ -160,7 +162,7 @@ test.group('Ports — garde de profil « particulier »', (group) => {
   })
 
   test('la prop partagée organizationType est exposée au front', async ({ client, assert }) => {
-    const user = await createPlanUserWithProfile('pro', 'private')
+    const user = await createPlanUserWithProfile('enterprise', 'private')
 
     const response = await client.get('/dashboard').loginAs(user).withInertia()
 

@@ -2,7 +2,7 @@ import { test } from '@japa/runner'
 import { truncateDb } from '#tests/utils/db'
 import Port from '#models/port'
 import { PortFactory } from '#database/factories/port_factory'
-import { createAdminUser } from '#tests/functional/helpers'
+import { createEnterpriseAdminUser } from '#tests/functional/helpers'
 
 /**
  * Pays du port en liste fermée ISO 3166-1 alpha-2 (#580).
@@ -14,7 +14,7 @@ test.group('Port country (functional)', (group) => {
   group.each.setup(() => truncateDb())
 
   test('POST enregistre un code pays de la liste', async ({ client, assert }) => {
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
 
     await client.post('/ports').loginAs(user).form({ name: 'Port Vieux', country: 'FR' })
 
@@ -24,7 +24,7 @@ test.group('Port country (functional)', (group) => {
   })
 
   test('POST refuse une valeur hors liste', async ({ client, assert }) => {
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
 
     await client.post('/ports').loginAs(user).form({ name: 'Port Refusé', country: 'France' })
 
@@ -35,7 +35,7 @@ test.group('Port country (functional)', (group) => {
     client,
     assert,
   }) => {
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
 
     await client.post('/ports').loginAs(user).form({ name: 'Port Sans Pays', country: '' })
 
@@ -46,7 +46,7 @@ test.group('Port country (functional)', (group) => {
 
   /** Même garantie que côté bateau : aucun port existant n'est bloqué en édition. */
   test('un port portant un ancien pays libre reste éditable', async ({ client, assert }) => {
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
     const port = await PortFactory.merge({ organizationId: user.organizationId! }).create()
 
     await Port.query().where('id', port.id).update({ country: 'Bretagne' })

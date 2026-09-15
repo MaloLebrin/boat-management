@@ -1,11 +1,8 @@
 import Boat from '#models/boat'
 import BoatMaintenanceEvent from '#models/boat_maintenance_event'
-import BoatPositionHistory from '#models/boat_position_history'
-import Mouillage from '#models/mouillage'
 import Notification from '#models/notification'
 import Organization from '#models/organization'
 import Port from '#models/port'
-import Spot from '#models/spot'
 import User from '#models/user'
 import BillingModuleStatesSeeder from '#database/seeders/billing_module_states_seeder'
 import MaloSeeder from '#database/seeders/malo_seeder'
@@ -18,7 +15,8 @@ import { test } from '@japa/runner'
 /**
  * The `ADMIN_EMAIL` account is the app owner's REAL account, not a test one.
  * Only `malo_seeder.ts` may write to it, and its organization must hold exactly
- * one boat ("3D") on the `pro` plan. This guards against a future seeder
+ * one boat ("3D") on the `pro` plan, and no port data (marina mapping is an
+ * Enterprise feature). This guards against a future seeder
  * quietly hanging fabricated data off it.
  */
 const ADMIN_EMAIL = 'seed-admin@test.local'
@@ -74,19 +72,7 @@ test.group('Seeders — admin account isolation', (group) => {
     assert.equal(boats[0].name, '3D')
 
     const ports = await Port.query().where('organizationId', organization.id)
-    assert.lengthOf(ports, 1)
-    assert.equal(ports[0].name, 'Querqueville')
-
-    const mouillages = await Mouillage.query().where('portId', ports[0].id)
-    assert.lengthOf(mouillages, 1)
-    assert.equal(mouillages[0].name, 'Corps-morts')
-
-    const spots = await Spot.query().where('mouillageId', mouillages[0].id)
-    assert.lengthOf(spots, 1)
-    assert.equal(spots[0].name, 'B08')
-
-    // The boat is actually moored on B08
-    assert.equal(boats[0].spotId, spots[0].id)
+    assert.lengthOf(ports, 0)
 
     const notifications = await Notification.query().where('userId', user.id)
     assert.lengthOf(notifications, 0)
@@ -100,17 +86,6 @@ test.group('Seeders — admin account isolation', (group) => {
 
     const boats = await Boat.query().where('organizationId', organization.id)
     assert.lengthOf(boats, 1)
-
-    const ports = await Port.query().where('organizationId', organization.id)
-    assert.lengthOf(ports, 1)
-
-    const spots = await Spot.query().where('organizationId', organization.id)
-    assert.lengthOf(spots, 1)
-
-    // A second run must not re-assign the boat: each assignment logs a berth
-    // change, which would pile up a fictitious movement history.
-    const history = await BoatPositionHistory.query().where('boatId', boats[0].id)
-    assert.lengthOf(history, 1)
 
     const events = await BoatMaintenanceEvent.query().where('boatId', boats[0].id)
     const titles = events.map((e) => e.title)

@@ -25,9 +25,9 @@ export interface PlanQuotas {
   /** Devis/factures — Enterprise only. */
   canManageInvoices: boolean
   /**
-   * Ports, pontons, mouillages et places (cartographie marina) — Pro et
-   * Enterprise. Sans objet sur Starter (#604) : le plan « individuel » cadre
-   * un ou deux bateaux personnels, il n'y a pas de marina à cartographier.
+   * Ports, pontons, mouillages et places (cartographie marina) — Enterprise
+   * uniquement. Fermé à Starter (#604) et à Pro : modéliser une marina relève
+   * de l'offre supérieure.
    */
   canManagePorts: boolean
 }
@@ -93,7 +93,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanQuotas> = {
     canManagePricing: false,
     canManageReservations: false,
     canManageInvoices: false,
-    canManagePorts: true,
+    canManagePorts: false,
   },
   enterprise: {
     maxBoats: null,
