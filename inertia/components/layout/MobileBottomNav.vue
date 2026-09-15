@@ -4,14 +4,14 @@ import { usePage } from '@inertiajs/vue3'
 import NavIcon from '~/components/layout/NavIcon.vue'
 import { useNavSections } from '~/composables/use_nav_sections'
 import { useT } from '~/composables/use_t'
+import { isNavPathActive } from '~/utils/nav_active'
 
 const page = usePage()
 const { t } = useT()
 const { bottomNavItems } = useNavSections()
 
 function isActive(path: string): boolean {
-  const url = page.url
-  return url === path || url.startsWith(`${path}/`) || url.startsWith(`${path}?`)
+  return isNavPathActive(page.url, path)
 }
 </script>
 

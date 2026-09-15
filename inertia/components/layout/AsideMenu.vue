@@ -11,6 +11,7 @@ import NotificationBell from '~/components/layout/NotificationBell.vue'
 import { useNavSections } from '~/composables/use_nav_sections'
 import { usePwaInstall } from '~/composables/use_pwa_install'
 import { useT } from '~/composables/use_t'
+import { isNavPathActive } from '~/utils/nav_active'
 
 type AuthUser = {
   id: number
@@ -32,11 +33,7 @@ const { canInstall, promptInstall } = usePwaInstall()
 const currentPath = computed(() => props.currentRoute ?? page.url)
 
 function isActive(path: string): boolean {
-  const current = currentPath.value
-  if (path === '/dashboard') {
-    return current === '/dashboard' || current === '/en/dashboard' || current === '/fr/dashboard'
-  }
-  return current.startsWith(path) || current.includes(path)
+  return isNavPathActive(currentPath.value, path)
 }
 </script>
 
