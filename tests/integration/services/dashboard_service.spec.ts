@@ -68,6 +68,15 @@ test.group('DashboardService (unit)', () => {
       recurrenceIntervalEngineHours: null,
     })
 
+    await BoatMaintenanceTask.create({
+      boatId: boat.id,
+      subject: 'boat',
+      status: 'open',
+      dueAt: null,
+      dueEngineHours: null,
+      title: 'Undated to-do',
+    })
+
     const svc = new DashboardService(new PortService())
     const data = await svc.getForUser(user, { urgentWithinDays: 14, urgentLimit: 10 })
 

@@ -423,6 +423,8 @@ function toMaintenanceTask(t: BoatMaintenanceTask) {
     boatEngineId: t.boatEngineId,
     boatSailId: t.boatSailId,
     boatRigId: t.boatRigId,
+    boatSafetyEquipmentId: t.boatSafetyEquipmentId,
+    boatGenericEquipmentId: t.boatGenericEquipmentId,
     recurrenceIntervalMonths: t.recurrenceIntervalMonths,
     recurrenceIntervalEngineHours: t.recurrenceIntervalEngineHours,
   }

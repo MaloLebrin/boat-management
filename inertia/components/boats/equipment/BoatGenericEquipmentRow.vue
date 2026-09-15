@@ -2,19 +2,23 @@
 import { Form } from '@adonisjs/inertia/vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
+import EquipmentAddTaskButton from '~/components/boats/maintenance/EquipmentAddTaskButton.vue'
 import { useT } from '~/composables/use_t'
 import type { BoatShowGenericEquipment } from '~/types/boat_show'
+import type { TaskEquipmentRef } from '#shared/types/maintenance'
 
 defineProps<{
   boatId: number
   item: BoatShowGenericEquipment
   canManage: boolean
   canManageActions: boolean
+  canAddTask?: boolean
 }>()
 
 const emit = defineEmits<{
   (e: 'edit', item: BoatShowGenericEquipment): void
   (e: 'addToActions', item: BoatShowGenericEquipment): void
+  (e: 'addTask', equipment: TaskEquipmentRef): void
 }>()
 
 const { t } = useT()
@@ -70,6 +74,11 @@ function statusVariant(status: string): 'success' | 'warning' | 'danger' {
         >
           {{ t('boats.genericEquipment.viewDetail') }}
         </BaseButton>
+        <EquipmentAddTaskButton
+          v-if="canAddTask"
+          :equipment="{ type: 'generic', id: item.id }"
+          @add-task="emit('addTask', $event)"
+        />
         <BaseButton
           v-if="canManageActions && item.status !== 'ok'"
           variant="secondary"

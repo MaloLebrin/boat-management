@@ -269,15 +269,10 @@ test.group('Assistant FleetAi chat (functional)', (group) => {
   })
 
   /**
-   * Régression : le modèle emballe sa demande d'échéance dans un
-   * `propose_task` sans `dueAt` ni `dueEngineHours`. Le tour doit se
-   * poursuivre comme une simple réponse — auparavant l'utilisateur recevait
-   * « réponse inexploitable » et son message était perdu.
+   * Une tâche sans échéance est une simple chose à faire : la proposition est
+   * conservée comme action en attente, au lieu d'être dégradée en réponse.
    */
-  test('a proposal without a due date continues the thread as an answer', async ({
-    assert,
-    client,
-  }) => {
+  test('a proposal without a due date is kept as pending action', async ({ assert, client }) => {
     const user = await createAdminUser()
     const { boat } = await makeBoat(user.organizationId!)
     swapAiService(proposeTaskResponse(boat.id, { dueAt: null, dueEngineHours: null }))
@@ -293,12 +288,7 @@ test.group('Assistant FleetAi chat (functional)', (group) => {
 
     const conversations = await AiAssistantConversation.all()
     assert.lengthOf(conversations, 1)
-    const conversation = conversations[0]
-    assert.isNull(conversation.pendingAction)
-    assert.lengthOf(conversation.messages, 2)
-    assert.equal(conversation.messages[1].role, 'assistant')
-    assert.equal(conversation.messages[1].content, 'I can schedule the oil change for tomorrow.')
-    assert.isUndefined(conversation.messages[1].card)
+    assert.isNotNull(conversations[0].pendingAction)
   })
 
   test('a valid task proposal is stored as pending action, never written directly', async ({

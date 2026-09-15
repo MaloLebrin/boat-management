@@ -9,6 +9,7 @@ import {
   createBoatMaintenanceTaskValidator,
   markBoatMaintenanceTaskDoneValidator,
 } from '#validators/boat_maintenance_task'
+import { equipmentRefOf } from '#shared/helpers/maintenance_task_equipment'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 
@@ -41,10 +42,12 @@ export default class BoatMaintenanceTasksController {
 
     try {
       const task = await this.boatMaintenanceTaskService.createForBoat(user, boat, {
-        subject: payload.subject,
+        subject: payload.subject ?? null,
         boatEngineId: payload.boatEngineId ?? null,
         boatSailId: payload.boatSailId ?? null,
         boatRigId: payload.boatRigId ?? null,
+        boatSafetyEquipmentId: payload.boatSafetyEquipmentId ?? null,
+        boatGenericEquipmentId: payload.boatGenericEquipmentId ?? null,
         title: payload.title,
         notes: payload.notes ?? null,
         dueAt: payload.dueAt ?? null,
@@ -53,25 +56,30 @@ export default class BoatMaintenanceTasksController {
         recurrenceIntervalEngineHours: payload.recurrenceIntervalEngineHours ?? null,
       })
 
+      const equipment = equipmentRefOf(task)
       await this.auditLogService.log({
         organizationId: user.organizationId!,
         userId: user.id,
         action: 'maintenance_task.create',
         entityType: 'maintenance_task',
         entityId: task.id,
-        metadata: { name: task.title, boatName: boat.name },
+        metadata: {
+          name: task.title,
+          boatName: boat.name,
+          ...(equipment ? { equipmentType: equipment.type } : {}),
+        },
       })
     } catch (error) {
       if (error instanceof BoatMaintenanceTaskValidationError) {
         session.flash('error', i18n.t(`flash.maintenanceTasks.${error.errorCode}`))
-        response.redirect(`/boats/${boat.id}`)
+        response.redirect().back()
         return
       }
       throw error
     }
 
     session.flash('success', i18n.t('flash.maintenanceTasks.created'))
-    response.redirect(`/boats/${boat.id}`)
+    response.redirect().back()
   }
 
   async markDone({ request, response, auth, params, bouncer, session, i18n }: HttpContext) {
@@ -117,19 +125,19 @@ export default class BoatMaintenanceTasksController {
     } catch (error) {
       if (error instanceof BoatMaintenanceTaskNotFoundError) {
         session.flash('error', i18n.t('flash.maintenanceTasks.notFound'))
-        response.redirect(`/boats/${boat.id}`)
+        response.redirect().back()
         return
       }
       if (error instanceof BoatMaintenanceTaskValidationError) {
         session.flash('error', i18n.t(`flash.maintenanceTasks.${error.errorCode}`))
-        response.redirect(`/boats/${boat.id}`)
+        response.redirect().back()
         return
       }
       throw error
     }
 
     session.flash('success', i18n.t('flash.maintenanceTasks.markedDone'))
-    response.redirect(`/boats/${boat.id}`)
+    response.redirect().back()
   }
 
   async destroy({ response, auth, params, bouncer, session, i18n }: HttpContext) {
@@ -167,13 +175,13 @@ export default class BoatMaintenanceTasksController {
     } catch (error) {
       if (error instanceof BoatMaintenanceTaskNotFoundError) {
         session.flash('error', i18n.t('flash.maintenanceTasks.notFound'))
-        response.redirect(`/boats/${boat.id}`)
+        response.redirect().back()
         return
       }
       throw error
     }
 
     session.flash('success', i18n.t('flash.maintenanceTasks.removed'))
-    response.redirect(`/boats/${boat.id}`)
+    response.redirect().back()
   }
 }

@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
-import BaseModal from '~/components/base/BaseModal.vue'
-import BoatMaintenanceTaskForm from '~/components/boats/maintenance/BoatMaintenanceTaskForm.vue'
+import BoatMaintenanceTaskModal from '~/components/boats/maintenance/BoatMaintenanceTaskModal.vue'
 import type { BoatCreateIntent, BoatShowDetail, MaintenanceTaskRow } from '~/types/boat_show'
 import { useT } from '~/composables/use_t'
 
@@ -61,16 +60,6 @@ watch(() => props.createIntent, consumeCreateIntent)
       {{ t('boats.maintenance.tasks.empty') }}
     </div>
 
-    <BaseModal
-      v-model:open="isCreateOpen"
-      :title="t('boats.maintenance.tasks.modalTitle')"
-      close-label="Close"
-    >
-      <BoatMaintenanceTaskForm
-        :boat="boat"
-        @submitted="isCreateOpen = false"
-        @cancel="isCreateOpen = false"
-      />
-    </BaseModal>
+    <BoatMaintenanceTaskModal v-model:open="isCreateOpen" :boat-id="boat.id" :equipment="boat" />
   </div>
 </template>

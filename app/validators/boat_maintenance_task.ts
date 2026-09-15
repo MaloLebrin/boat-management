@@ -29,10 +29,12 @@ function optionalNonNegativeIntFromForm() {
 
 export const createBoatMaintenanceTaskValidator = vine.create(
   vine.object({
-    subject: vine.enum(MAINTENANCE_SUBJECTS),
+    subject: vine.enum(MAINTENANCE_SUBJECTS).optional(),
     boatEngineId: optionalIdFromForm(),
     boatSailId: optionalIdFromForm(),
     boatRigId: optionalIdFromForm(),
+    boatSafetyEquipmentId: optionalIdFromForm(),
+    boatGenericEquipmentId: optionalIdFromForm(),
     title: vine.string().trim().minLength(1).maxLength(200),
     notes: vine.string().trim().optional(),
 

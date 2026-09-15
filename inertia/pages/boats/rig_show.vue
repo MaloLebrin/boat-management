@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3'
-import { onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseBreadcrumb from '~/components/base/BaseBreadcrumb.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
@@ -8,23 +8,37 @@ import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseTabs from '~/components/base/BaseTabs.vue'
 import RigShowTabInfo from '~/components/boats/rig/show/tabs/RigShowTabInfo.vue'
 import RigShowTabPhotos from '~/components/boats/rig/show/tabs/RigShowTabPhotos.vue'
+import EquipmentTasksSection from '~/components/boats/maintenance/EquipmentTasksSection.vue'
 import { useT } from '~/composables/use_t'
-import type { BoatRigDetail } from '~/types/boat_show'
+import type { BoatRigDetail, MaintenanceTaskRow } from '~/types/boat_show'
+import type {
+  MaintenanceTaskPermissions,
+  TaskEquipmentRef,
+  TaskEquipmentSource,
+} from '#shared/types/maintenance'
 
 const { t } = useT()
 
-defineProps<{
+const props = defineProps<{
   boat: { id: number; name: string }
   rig: BoatRigDetail
   canManage: boolean
+  maintenanceTasks: MaintenanceTaskRow[]
+  taskEquipment: TaskEquipmentSource
+  taskPermissions: MaintenanceTaskPermissions
 }>()
 
-type TabKey = 'info' | 'photos'
+const taskRef = computed<TaskEquipmentRef>(() => ({ type: 'rig', id: props.rig.id }))
+const openTaskCount = computed(
+  () => props.maintenanceTasks.filter((t) => t.status === 'open').length
+)
+
+type TabKey = 'info' | 'tasks' | 'photos'
 const tab = ref<TabKey>('info')
 
 onMounted(() => {
   const fromUrl = new URLSearchParams(window.location.search).get('tab') as TabKey | null
-  if (fromUrl === 'photos') tab.value = fromUrl
+  if (fromUrl === 'photos' || fromUrl === 'tasks') tab.value = fromUrl
 })
 
 watch(tab, (newTab) => {
@@ -87,6 +101,11 @@ function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutra
         :tabs="[
           { key: 'info', label: t('boats.rigShow.tabs.info') },
           {
+            key: 'tasks',
+            label: t('boats.maintenance.tasks.sectionTitle'),
+            badge: String(openTaskCount || ''),
+          },
+          {
             key: 'photos',
             label: t('boats.rigShow.tabs.photos'),
             badge: String(rig.photos.length || ''),
@@ -98,7 +117,20 @@ function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutra
     <Transition name="tab" mode="out-in">
       <div :key="tab" class="mt-8">
         <RigShowTabInfo v-if="tab === 'info'" :rig="rig" />
-        <RigShowTabPhotos v-else :boat="boat" :rig="rig" :can-manage="canManage" />
+        <RigShowTabPhotos
+          v-else-if="tab === 'photos'"
+          :boat="boat"
+          :rig="rig"
+          :can-manage="canManage"
+        />
+        <EquipmentTasksSection
+          v-else
+          :boat-id="boat.id"
+          :equipment-ref="taskRef"
+          :equipment="taskEquipment"
+          :tasks="maintenanceTasks"
+          :permissions="taskPermissions"
+        />
       </div>
     </Transition>
   </div>

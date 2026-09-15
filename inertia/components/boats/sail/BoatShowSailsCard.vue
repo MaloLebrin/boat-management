@@ -7,17 +7,25 @@ import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseModal from '~/components/base/BaseModal.vue'
+import EquipmentAddTaskButton from '~/components/boats/maintenance/EquipmentAddTaskButton.vue'
 import type { BoatShowSail } from '~/types/boat_show'
 import BoatEquipmentSailFields from './BoatEquipmentSailFields.vue'
 import { useT } from '~/composables/use_t'
 import { useDateFormat } from '~/composables/use_date_format'
 import { sailMaterialLabel, sailTypeLabel } from '~/utils/boat_enum_labels'
+import type { TaskEquipmentRef } from '#shared/types/maintenance'
 
-defineProps<{
-  boatId: number
-  sails: BoatShowSail[]
-  canManage: boolean
-}>()
+withDefaults(
+  defineProps<{
+    boatId: number
+    sails: BoatShowSail[]
+    canManage: boolean
+    canAddTask?: boolean
+  }>(),
+  { canAddTask: false }
+)
+
+defineEmits<{ (e: 'addTask', equipment: TaskEquipmentRef): void }>()
 
 const { t } = useT()
 const { formatDate } = useDateFormat()
@@ -94,6 +102,11 @@ function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutra
           </div>
 
           <div class="flex flex-wrap items-center gap-2 md:justify-end">
+            <EquipmentAddTaskButton
+              v-if="canAddTask"
+              :equipment="{ type: 'sail', id: s.id }"
+              @add-task="$emit('addTask', $event)"
+            />
             <BaseButton
               variant="ghost"
               size="sm"

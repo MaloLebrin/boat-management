@@ -1,10 +1,13 @@
 import AiAnalysisService from '#services/ai_analysis_service'
+import BoatMaintenanceTaskService from '#services/boat_maintenance_task_service'
 import DashboardService from '#services/dashboard_service'
 import PlanningService from '#services/planning_service'
 import PortService from '#services/port_service'
 import QuotaService from '#services/quota_service'
+import { toBoatTaskEquipment } from '#transformers/maintenance_transformer'
 import { toAppLocale } from '#shared/helpers/locale_path'
 import type { AiSuggestion } from '#shared/types/ai'
+import { deferJson } from '#utils/inertia_defer'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 
@@ -15,10 +18,11 @@ export default class HomeController {
     private aiService: AiAnalysisService,
     private portService: PortService,
     private planningService: PlanningService,
-    private quotaService: QuotaService
+    private quotaService: QuotaService,
+    private taskService: BoatMaintenanceTaskService
   ) {}
 
-  async index({ inertia, auth, response, i18n }: HttpContext) {
+  async index({ inertia, auth, request, response, i18n }: HttpContext) {
     await auth.check()
 
     if (!auth.isAuthenticated) {
@@ -60,6 +64,9 @@ export default class HomeController {
     const canCreateIncidents = user.organizationId
       ? await user.hasPermission(user.organizationId, 'incidents.create')
       : false
+    const canCreateMaintenanceTasks = user.organizationId
+      ? await user.hasPermission(user.organizationId, 'maintenance.create')
+      : false
 
     // Quota bateaux pour l'upsell du bouton « Nouveau bateau » (issue #418). La
     // relation `organization` n'est pas chargée à ce stade (le middleware Inertia
@@ -76,6 +83,17 @@ export default class HomeController {
       portOptions,
       canCreateNavigationLogs,
       canCreateIncidents,
+      canCreateMaintenanceTasks,
+      // Chargé à la demande par l'ajout rapide de tâche, une fois le bateau choisi.
+      taskEquipment: inertia.optional(
+        deferJson(async () => {
+          const boatId = Number(request.qs().taskBoatId)
+          const boat = Number.isInteger(boatId)
+            ? await this.taskService.findBoatWithEquipment(user, boatId)
+            : null
+          return toBoatTaskEquipment(boat)
+        })
+      ),
       canAddBoat,
       boatQuota,
     })

@@ -176,8 +176,8 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
       fr: 'Tâches de maintenance planifiées',
     },
     body: {
-      en: 'A maintenance task is created on a boat with a title, a subject among ten (boat, hull, engine, sail, rig, electrical, plumbing, safety, deck, other), and at least one due condition: a due date and/or an engine-hour threshold. Hour-based tasks require the engine subject and a target engine. Marking a task done records the completion date and, for hour-based tasks, the engine hours at completion. Tasks live on the boat Tasks tab and feed the planning and the dashboard urgent list.',
-      fr: 'Une tâche de maintenance se crée sur un bateau avec un titre, un sujet parmi dix (bateau, coque, moteur, voile, gréement, électricité, plomberie, sécurité, pont, autre) et au moins une échéance : une date et/ou un seuil d’heures moteur. Une tâche en heures exige le sujet moteur et un moteur cible. Marquer une tâche faite enregistre la date de réalisation et, pour une tâche en heures, les heures moteur au moment de la clôture. Les tâches vivent dans l’onglet Tâches du bateau et alimentent le planning et la liste urgente du tableau de bord.',
+      en: 'A maintenance task is a to-do on a boat: a title is enough. It targets the whole boat or one equipment (engine, sail, rig, safety or generic item) and carries a subject among ten, derived from the equipment when omitted. A due date and an engine-hour threshold are optional; an undated task stays in the “undated” group and never triggers reminders. Hour-based tasks require the engine subject and an engine. Add tasks from the boat Tasks tab (type a title, press Enter), the Task button on each equipment card, the Tasks tab of equipment detail pages, or the dashboard quick add. Marking a task done records the date and, for hour-based tasks, the engine hours. Tasks feed the planning and the dashboard urgent list.',
+      fr: 'Une tâche de maintenance est une chose à faire sur un bateau : un titre suffit. Elle vise le bateau entier ou un équipement (moteur, voile, gréement, sécurité, générique) et porte un sujet parmi dix, déduit de l’équipement s’il est omis. Date et seuil d’heures moteur sont facultatifs : une tâche sans date reste dans « Sans date » et ne déclenche aucun rappel. Une tâche en heures exige le sujet moteur et un moteur. On ajoute une tâche depuis l’onglet Tâches (un titre puis Entrée), le bouton Tâche de chaque carte d’équipement, l’onglet Tâches des pages d’équipement ou l’ajout rapide du tableau de bord. Marquer fait enregistre la date et, en heures, le relevé moteur. Les tâches alimentent le planning et la liste urgente.',
     },
     keywords: [
       'tache',
@@ -189,6 +189,10 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
       'due date',
       'planifier',
       'todo',
+      'a faire',
+      'sans date',
+      'equipement',
+      'ajout rapide',
       'sujet',
     ],
     navTarget: 'planning.index',

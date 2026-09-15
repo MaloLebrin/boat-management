@@ -22,7 +22,8 @@ test.group('HomeController (unit)', () => {
       } as any,
       {
         getBoatUsage: async () => ({ used: 0, limit: 2 }),
-      } as any
+      } as any,
+      {} as any
     )
 
     const rendered: Array<{ component: string; props: any }> = []
@@ -66,7 +67,8 @@ test.group('HomeController (unit)', () => {
       } as any,
       {
         getBoatUsage: async () => ({ used: 1, limit: 2 }),
-      } as any
+      } as any,
+      {} as any
     )
 
     const rendered: Array<{ component: string; props: any }> = []
@@ -77,7 +79,9 @@ test.group('HomeController (unit)', () => {
           rendered.push({ component, props })
           return { component, props }
         },
+        optional: (fn: unknown) => fn,
       },
+      request: { qs: () => ({}) },
       auth: {
         isAuthenticated: true,
         check: async () => {},
@@ -121,7 +125,8 @@ test.group('HomeController (unit)', () => {
         getBoatUsage: async () => {
           throw new Error('should not be called')
         },
-      } as any
+      } as any,
+      {} as any
     )
 
     const rendered: Array<{ component: string; props: any }> = []

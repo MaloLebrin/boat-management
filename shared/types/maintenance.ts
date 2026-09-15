@@ -1,5 +1,7 @@
 import type { DateTime } from 'luxon'
 import type { MaintenanceSubject } from '#shared/constants/maintenance/maintenance_subjects'
+import type { EquipmentReferenceType } from '#shared/constants/equipment_action'
+import type { GenericEquipmentCategory } from '#shared/types/boat'
 
 /** Alias historique de `MaintenanceSubject` — même vocabulaire, une seule source. */
 export type MaintenanceTaskSubject = MaintenanceSubject
@@ -81,16 +83,68 @@ export type MaintenanceHistoryPaginated = {
 }
 
 export type CreateMaintenanceTaskPayload = {
-  subject: MaintenanceTaskSubject
+  /** Absent : déduit de l'équipement visé, sinon `'boat'`. */
+  subject?: MaintenanceTaskSubject | null
   title: string
   notes?: string | null
   boatEngineId?: number | null
   boatSailId?: number | null
   boatRigId?: number | null
+  boatSafetyEquipmentId?: number | null
+  boatGenericEquipmentId?: number | null
   dueAt?: Date | string | DateTime | null
   recurrenceIntervalMonths?: number | null
   dueEngineHours?: number | null
   recurrenceIntervalEngineHours?: number | null
+}
+
+/** Équipement visé par une tâche — au plus un par tâche. */
+export interface TaskEquipmentRef {
+  type: EquipmentReferenceType
+  id: number
+}
+
+/**
+ * Équipements d'un bateau proposés dans le formulaire de tâche. `BoatShowDetail`
+ * y est structurellement compatible : la fiche bateau le passe tel quel.
+ */
+export interface TaskEquipmentSource {
+  engines: Array<{
+    id: number
+    kind: string
+    fuel: string | null
+    brand: string | null
+    model: string | null
+    serialNumber: string | null
+  }>
+  sails: Array<{ id: number; sailType: string; areaM2: number | null }>
+  rig: { id: number } | null
+  safetyEquipment: Array<{ id: number; equipmentType: string }>
+  genericEquipment: Array<{ id: number; name: string; category: GenericEquipmentCategory }>
+}
+
+/**
+ * Équipements du bateau choisi dans l'ajout rapide du dashboard, chargés par
+ * rechargement partiel. `boatId: null` quand aucun bateau (valide) n'est choisi —
+ * jamais `null` au niveau racine (#478).
+ */
+export interface BoatTaskEquipment {
+  boatId: number | null
+  equipment: TaskEquipmentSource
+}
+
+/** Droits sur les tâches, calculés via `MaintenancePolicy` pour la page courante. */
+export interface MaintenanceTaskPermissions {
+  canCreate: boolean
+  canEdit: boolean
+  canDelete: boolean
+}
+
+/** Pré-remplissage du formulaire de tâche depuis un point d'entrée équipement. */
+export interface TaskFormPrefill {
+  subject?: MaintenanceTaskSubject
+  equipment?: TaskEquipmentRef
+  title?: string
 }
 
 export type MarkTaskDonePayload = {

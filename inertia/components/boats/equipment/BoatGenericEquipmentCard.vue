@@ -14,16 +14,19 @@ import { useT } from '~/composables/use_t'
 import { suggestEquipmentActionType } from '#shared/helpers/equipment_action'
 import { GENERIC_EQUIPMENT_CATEGORIES, type GenericEquipmentCategory } from '#shared/types/boat'
 import type { BoatShowGenericEquipment, EquipmentActionPrefill } from '~/types/boat_show'
+import type { TaskEquipmentRef } from '#shared/types/maintenance'
 
 const props = defineProps<{
   boatId: number
   items: BoatShowGenericEquipment[]
   canManage: boolean
   canManageActions: boolean
+  canAddTask?: boolean
 }>()
 
 const emit = defineEmits<{
   (e: 'addToActions', payload: EquipmentActionPrefill): void
+  (e: 'addTask', equipment: TaskEquipmentRef): void
 }>()
 
 /** Identifient ces modales dans l'URL de l'aller-retour catalogue (#577). */
@@ -113,7 +116,9 @@ function closeEdit() {
             :can-manage="canManage"
             :can-manage-actions="canManageActions"
             @edit="openEdit"
+            :can-add-task="canAddTask"
             @add-to-actions="emitAddToActions"
+            @add-task="emit('addTask', $event)"
           />
         </ul>
       </div>

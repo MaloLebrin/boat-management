@@ -5,7 +5,11 @@ import BoatGenericEquipmentService, {
 import BoatHullService, { BoatNotFoundError } from '#services/boat_hull_service'
 import MediaService from '#services/media_service'
 import OrganizationService from '#services/organization_service'
+import BoatMaintenanceTaskService from '#services/boat_maintenance_task_service'
+import { toMaintenanceTaskRows } from '#transformers/boat_transformer'
 import { toMediaRow } from '#transformers/media_row_transformer'
+import { toTaskEquipmentSource } from '#transformers/maintenance_transformer'
+import { maintenanceTaskPermissions } from '#utils/maintenance_task_permissions'
 import {
   createGenericEquipmentValidator,
   parseEquipmentCatalogId,
@@ -20,7 +24,8 @@ export default class BoatGenericEquipmentController {
     private boatService: BoatHullService,
     private equipmentService: BoatGenericEquipmentService,
     private organizationService: OrganizationService,
-    private mediaService: MediaService
+    private mediaService: MediaService,
+    private taskService: BoatMaintenanceTaskService
   ) {}
 
   private async loadBoat(ctx: Pick<HttpContext, 'auth' | 'response' | 'params'>) {
@@ -50,8 +55,12 @@ export default class BoatGenericEquipmentController {
       return
     }
 
-    const canManage = await bouncer.with(BoatPolicy).allows('edit', boat)
-    const media = await this.mediaService.listForEntity('boat_generic_equipment', item.id)
+    const [canManage, media, maintenanceTasks, taskPermissions] = await Promise.all([
+      bouncer.with(BoatPolicy).allows('edit', boat),
+      this.mediaService.listForEntity('boat_generic_equipment', item.id),
+      this.taskService.listForEquipment(boat.id, { type: 'generic', id: item.id }),
+      maintenanceTaskPermissions(bouncer, boat),
+    ])
 
     return inertia.render('boats/generic_equipment_show', {
       boat: { id: boat.id, name: boat.name },
@@ -70,6 +79,9 @@ export default class BoatGenericEquipmentController {
         photos: media.filter((m) => m.kind === 'photo').map(toMediaRow),
       },
       canManage,
+      maintenanceTasks: toMaintenanceTaskRows(maintenanceTasks),
+      taskEquipment: toTaskEquipmentSource({ genericEquipment: [item] }),
+      taskPermissions,
     })
   }
 

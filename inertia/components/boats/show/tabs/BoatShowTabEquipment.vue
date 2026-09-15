@@ -9,22 +9,26 @@ import BoatSafetyEquipmentCard from '~/components/boats/safety/BoatSafetyEquipme
 import BoatShowSailsCard from '~/components/boats/sail/BoatShowSailsCard.vue'
 import BoatEquipmentAddModal from '~/components/boats/show/modals/BoatEquipmentAddModal.vue'
 import BoatEquipmentActionModal from '~/components/boats/equipment-actions/BoatEquipmentActionModal.vue'
+import BoatMaintenanceTaskModal from '~/components/boats/maintenance/BoatMaintenanceTaskModal.vue'
 import { shouldReopenEngineForm } from '~/composables/use_engine_form_draft'
 import { shouldReopenGenericEquipmentForm } from '~/composables/use_generic_equipment_form_draft'
 import { useT } from '~/composables/use_t'
 import type { BoatCreateIntent, BoatShowDetail, EquipmentActionPrefill } from '~/types/boat_show'
 import type { SafetyComplianceReport } from '#shared/types/safety'
+import type { TaskEquipmentRef } from '#shared/types/maintenance'
 
 const props = withDefaults(
   defineProps<{
     boat: BoatShowDetail
     canManageEquipment: boolean
     canManageActions: boolean
+    /** Droit `maintenance.create` : raccourci « + Tâche » sur chaque équipement. */
+    canManageMaintenance?: boolean
     createIntent?: BoatCreateIntent
     /** Rapport de conformité Division 240 (#582), calculé côté serveur. */
     safetyCompliance: SafetyComplianceReport
   }>(),
-  { createIntent: null }
+  { createIntent: null, canManageMaintenance: false }
 )
 
 const emit = defineEmits<{ createIntentConsumed: [] }>()
@@ -61,6 +65,15 @@ function openActionModal(payload: EquipmentActionPrefill) {
   actionPrefill.value = payload
   isActionModalOpen.value = true
 }
+
+// Tâche rattachée à un équipement, ouverte depuis sa carte : équipement figé.
+const isTaskModalOpen = ref(false)
+const taskEquipment = ref<TaskEquipmentRef | null>(null)
+
+function openTaskModal(equipment: TaskEquipmentRef) {
+  taskEquipment.value = equipment
+  isTaskModalOpen.value = true
+}
 </script>
 
 <template>
@@ -75,6 +88,15 @@ function openActionModal(payload: EquipmentActionPrefill) {
     :boat="boat"
     :editing-action="null"
     :prefill="actionPrefill"
+  />
+
+  <BoatMaintenanceTaskModal
+    v-if="canManageMaintenance"
+    v-model:open="isTaskModalOpen"
+    :boat-id="boat.id"
+    :equipment="boat"
+    :prefill="taskEquipment ? { equipment: taskEquipment } : null"
+    :lock-equipment="taskEquipment !== null"
   />
 
   <div class="space-y-6">
@@ -119,17 +141,31 @@ function openActionModal(payload: EquipmentActionPrefill) {
         :boat-id="boat.id"
         :engines="sortEnginesByStatus(boat.engines)"
         :can-manage="canManageEquipment"
+        :can-add-task="canManageMaintenance"
+        @add-task="openTaskModal"
       />
     </div>
 
     <!-- Sail cards -->
     <div v-if="equipmentFilter === 'all' || equipmentFilter === 'sail'">
-      <BoatShowSailsCard :boat-id="boat.id" :sails="boat.sails" :can-manage="canManageEquipment" />
+      <BoatShowSailsCard
+        :boat-id="boat.id"
+        :sails="boat.sails"
+        :can-manage="canManageEquipment"
+        :can-add-task="canManageMaintenance"
+        @add-task="openTaskModal"
+      />
     </div>
 
     <!-- Rig card -->
     <div v-if="equipmentFilter === 'all' || equipmentFilter === 'rig'">
-      <BoatShowRigCard :boat-id="boat.id" :rig="boat.rig" :can-manage="canManageEquipment" />
+      <BoatShowRigCard
+        :boat-id="boat.id"
+        :rig="boat.rig"
+        :can-manage="canManageEquipment"
+        :can-add-task="canManageMaintenance"
+        @add-task="openTaskModal"
+      />
     </div>
 
     <!-- Safety compliance + equipment cards -->
@@ -146,6 +182,8 @@ function openActionModal(payload: EquipmentActionPrefill) {
         :can-manage="canManageEquipment"
         :can-manage-actions="canManageActions"
         :prefill-equipment-type="safetyPrefillType"
+        :can-add-task="canManageMaintenance"
+        @add-task="openTaskModal"
         @add-to-actions="openActionModal"
         @prefill-consumed="safetyPrefillType = null"
       />
@@ -158,7 +196,9 @@ function openActionModal(payload: EquipmentActionPrefill) {
         :items="boat.genericEquipment"
         :can-manage="canManageEquipment"
         :can-manage-actions="canManageActions"
+        :can-add-task="canManageMaintenance"
         @add-to-actions="openActionModal"
+        @add-task="openTaskModal"
       />
     </div>
   </div>

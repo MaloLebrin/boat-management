@@ -5,7 +5,8 @@ import { nextTick } from 'vue'
 vi.mock('@inertiajs/vue3', () => ({
   usePage: () => ({ props: { appT: {}, locale: 'en' } }),
   router: { patch: vi.fn(), post: vi.fn(), delete: vi.fn() },
-  useForm: () => ({
+  useForm: (initial: Record<string, unknown> = {}) => ({
+    ...initial,
     departedAt: '2026-06-25T10:00',
     departurePortId: '',
     departurePortName: '',

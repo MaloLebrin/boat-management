@@ -3,15 +3,19 @@ import { computed, ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import QuickAddIncidentModal from '~/components/navigation/QuickAddIncidentModal.vue'
 import QuickAddNavigationLogModal from '~/components/navigation/QuickAddNavigationLogModal.vue'
+import QuickAddMaintenanceTaskModal from '~/components/dashboard/QuickAddMaintenanceTaskModal.vue'
 import { useT } from '~/composables/use_t'
 import type { NavigationLogPortOption } from '~/types/boat_show'
 import type { DashboardBoatSummary } from '#shared/types/dashboard'
+import type { BoatTaskEquipment } from '#shared/types/maintenance'
 
 const props = defineProps<{
   boats: DashboardBoatSummary[]
   portOptions: NavigationLogPortOption[]
   canCreateNavigationLogs: boolean
   canCreateIncidents: boolean
+  canCreateMaintenanceTasks: boolean
+  taskEquipment?: BoatTaskEquipment
 }>()
 
 const { t } = useT()
@@ -20,6 +24,7 @@ const fleetBoatOptions = computed(() => props.boats.map((b) => ({ id: b.id, name
 
 const showQuickAddLogbook = ref(false)
 const showQuickAddIncident = ref(false)
+const taskModal = ref<InstanceType<typeof QuickAddMaintenanceTaskModal> | null>(null)
 </script>
 
 <template>
@@ -37,6 +42,14 @@ const showQuickAddIncident = ref(false)
   >
     {{ t('dashboard.quickAdd.incident') }}
   </BaseButton>
+  <BaseButton
+    v-if="canCreateMaintenanceTasks && boats.length > 0"
+    variant="secondary"
+    data-testid="dashboard-quick-add-task"
+    @click="taskModal?.openModal()"
+  >
+    {{ t('dashboard.quickAdd.task') }}
+  </BaseButton>
 
   <QuickAddNavigationLogModal
     v-model:open="showQuickAddLogbook"
@@ -48,5 +61,11 @@ const showQuickAddIncident = ref(false)
     v-model:open="showQuickAddIncident"
     :boats="fleetBoatOptions"
     :default-boat-id="null"
+  />
+  <QuickAddMaintenanceTaskModal
+    v-if="canCreateMaintenanceTasks"
+    ref="taskModal"
+    :boats="fleetBoatOptions"
+    :task-equipment="taskEquipment"
   />
 </template>

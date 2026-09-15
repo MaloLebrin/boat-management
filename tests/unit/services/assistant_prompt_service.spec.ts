@@ -326,11 +326,11 @@ test.group('Assistant — alias propose_task', () => {
    * moteur » finissaient en `AiInvalidResponseError` → toast « réponse
    * inexploitable » et tour perdu.
    */
-  test('une proposition de tâche sans échéance est dégradée en answer', ({ assert }) => {
+  test('une proposition de tâche sans échéance reste une proposition', ({ assert }) => {
     const reply = parseAssistantReply(
       JSON.stringify({
         type: 'propose_task',
-        message: 'Quelle échéance souhaitez-vous ?',
+        message: 'Ajouter « Révision moteur » ?',
         task: {
           boatId: 22,
           subject: 'engine',
@@ -341,14 +341,18 @@ test.group('Assistant — alias propose_task', () => {
       })
     )
 
-    assert.deepEqual(reply, { type: 'answer', message: 'Quelle échéance souhaitez-vous ?' })
+    assert.equal(reply.type, 'propose_action')
+    if (reply.type === 'propose_action' && reply.action.kind === 'create_task') {
+      assert.isNull(reply.action.dueAt)
+      assert.isNull(reply.action.dueEngineHours)
+    }
   })
 
-  test('un create_task sans échéance est dégradé en answer', ({ assert }) => {
+  test('un create_task sans échéance reste une proposition', ({ assert }) => {
     const reply = parseAssistantReply(
       JSON.stringify({
         type: 'propose_action',
-        message: 'Quelle échéance souhaitez-vous ?',
+        message: 'Ajouter « Révision moteur » ?',
         action: {
           kind: 'create_task',
           boatId: 22,
@@ -360,7 +364,7 @@ test.group('Assistant — alias propose_task', () => {
       })
     )
 
-    assert.deepEqual(reply, { type: 'answer', message: 'Quelle échéance souhaitez-vous ?' })
+    assert.equal(reply.type, 'propose_action')
   })
 
   test('un create_task sans bateau est dégradé en answer', ({ assert }) => {

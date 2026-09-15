@@ -5,16 +5,24 @@ import { PencilSquareIcon, PlusCircleIcon, TrashIcon } from '@heroicons/vue/24/o
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
+import EquipmentAddTaskButton from '~/components/boats/maintenance/EquipmentAddTaskButton.vue'
 import type { BoatShowRig } from '~/types/boat_show'
 import { useT } from '~/composables/use_t'
 import { useDateFormat } from '~/composables/use_date_format'
 import { rigTypeLabel } from '~/utils/boat_enum_labels'
+import type { TaskEquipmentRef } from '#shared/types/maintenance'
 
-defineProps<{
-  boatId: number
-  rig: BoatShowRig | null
-  canManage: boolean
-}>()
+withDefaults(
+  defineProps<{
+    boatId: number
+    rig: BoatShowRig | null
+    canManage: boolean
+    canAddTask?: boolean
+  }>(),
+  { canAddTask: false }
+)
+
+defineEmits<{ (e: 'addTask', equipment: TaskEquipmentRef): void }>()
 
 const { t } = useT()
 const { formatDate } = useDateFormat()
@@ -62,9 +70,16 @@ function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutra
         <BaseBadge :variant="statusVariant(rig.status)">
           {{ t(`equipment.status.${rig.status}`) }}
         </BaseBadge>
-        <BaseButton variant="ghost" size="sm" route="boats.rig.show" :params="{ boatId }">
-          {{ t('boats.rig.viewDetail') }}
-        </BaseButton>
+        <div class="flex flex-wrap items-center gap-2">
+          <EquipmentAddTaskButton
+            v-if="canAddTask"
+            :equipment="{ type: 'rig', id: rig.id }"
+            @add-task="$emit('addTask', $event)"
+          />
+          <BaseButton variant="ghost" size="sm" route="boats.rig.show" :params="{ boatId }">
+            {{ t('boats.rig.viewDetail') }}
+          </BaseButton>
+        </div>
       </div>
       <dl class="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
         <div>

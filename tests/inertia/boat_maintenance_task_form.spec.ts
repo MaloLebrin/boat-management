@@ -17,24 +17,28 @@ import BaseCombobox from '../../inertia/components/base/BaseCombobox.vue'
 import BoatMaintenanceTaskForm from '../../inertia/components/boats/maintenance/BoatMaintenanceTaskForm.vue'
 import { MAINTENANCE_OPERATION_INDEX } from '../../shared/constants/maintenance/maintenance_operations'
 
-function boat(engines: Array<{ kind: string; fuel: string | null }> = []) {
+function equipment(engines: Array<{ kind: string; fuel: string | null }> = []) {
   return {
-    id: 7,
-    name: 'Bel Ami',
     rig: null,
     sails: [],
+    safetyEquipment: [{ id: 30, equipmentType: 'life_raft' }],
+    genericEquipment: [{ id: 40, name: 'Solar panel', category: 'energy' as const }],
     engines: engines.map((engine, index) => ({
       id: index + 1,
       brand: 'Volvo',
       model: 'D2-40',
+      serialNumber: null,
       ...engine,
     })),
   }
 }
 
-function mountForm(engines: Array<{ kind: string; fuel: string | null }> = []) {
+function mountForm(
+  engines: Array<{ kind: string; fuel: string | null }> = [],
+  extra: Record<string, unknown> = {}
+) {
   return mount(BoatMaintenanceTaskForm, {
-    props: { boat: boat(engines) as never },
+    props: { boatId: 7, equipment: equipment(engines), ...extra },
   })
 }
 
@@ -160,4 +164,57 @@ test('les 10 sujets sont sélectionnables, comme le validator les accepte', () =
     'deck',
     'other',
   ])
+})
+
+test('un équipement verrouillé est envoyé en champs cachés, sans sélecteur de sujet', () => {
+  const w = mountForm([], {
+    prefill: { equipment: { type: 'generic', id: 40 } },
+    lockEquipment: true,
+  })
+
+  expect(w.find('select[name="subject"]').exists()).toBe(false)
+  expect(w.find('input[type="hidden"][name="subject"]').attributes('value')).toBe('electrical')
+  expect(w.find('input[type="hidden"][name="boatGenericEquipmentId"]').attributes('value')).toBe(
+    '40'
+  )
+  expect(w.find('[data-testid="task-locked-equipment"]').text()).toContain('Solar panel')
+})
+
+test('une opération du catalogue ne change pas le sujet d’un équipement verrouillé', async () => {
+  const w = mountForm([{ kind: 'inboard', fuel: 'diesel' }], {
+    prefill: { equipment: { type: 'safety', id: 30 } },
+    lockEquipment: true,
+  })
+
+  const combobox = w.findComponent(BaseCombobox)
+  combobox.vm.$emit('select', { value: 'engine.oil_change', label: 'Oil change' })
+  await w.vm.$nextTick()
+
+  expect(w.find('input[type="hidden"][name="subject"]').attributes('value')).toBe('safety')
+  expect(w.find('input[name="boatSafetyEquipmentId"]').attributes('value')).toBe('30')
+})
+
+test('l’échéance est facultative : aucun champ date n’est requis', () => {
+  const w = mountForm()
+
+  expect(w.find('input[name="dueAt"]').attributes('required')).toBeUndefined()
+})
+
+test('le sujet sécurité propose les équipements de sécurité du bateau', async () => {
+  const w = mountForm()
+
+  await w.find('select[name="subject"]').setValue('safety')
+
+  const values = w
+    .findAll('select[name="boatSafetyEquipmentId"] option')
+    .map((o) => o.attributes('value'))
+  expect(values).toContain('30')
+})
+
+test('un sujet non dédié propose les équipements génériques', async () => {
+  const w = mountForm()
+
+  expect(w.find('select[name="boatGenericEquipmentId"]').exists()).toBe(true)
+  await w.find('select[name="subject"]').setValue('engine')
+  expect(w.find('select[name="boatGenericEquipmentId"]').exists()).toBe(false)
 })

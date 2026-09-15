@@ -4,7 +4,11 @@
   "newBoat": "Nouveau bateau",
   "quickAdd": {
     "logbook": "+ Entrée journal",
-    "incident": "+ Incident"
+    "incident": "+ Incident",
+    "task": "+ Tâche",
+    "taskModalTitle": "Ajouter une tâche",
+    "selectBoat": "Bateau",
+    "selectBoatPlaceholder": "— Choisir un bateau —"
   },
   "overdueAlert": "{count, plural, one {# tâche en retard} other {# tâches en retard}}",
   "viewPlanning": "Voir le planning",

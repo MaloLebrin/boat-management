@@ -2,15 +2,29 @@ import {
   BoatMaintenanceTaskNotFoundError,
   BoatMaintenanceTaskValidationError,
 } from '#exceptions/maintenance_errors'
+import BoatEngine from '#models/boat_engine'
+import BoatGenericEquipment from '#models/boat_generic_equipment'
 import BoatMaintenanceTask from '#models/boat_maintenance_task'
-import type Boat from '#models/boat'
+import BoatRig from '#models/boat_rig'
+import BoatSafetyEquipment from '#models/boat_safety_equipment'
+import BoatSail from '#models/boat_sail'
+import Boat from '#models/boat'
 import type User from '#models/user'
 import { inject } from '@adonisjs/core'
+import type { ModelQueryBuilderContract } from '@adonisjs/lucid/types/model'
 import { DateTime } from 'luxon'
+import {
+  equipmentFieldName,
+  equipmentRefsOf,
+  requiredSubjectForEquipment,
+  subjectForEquipment,
+} from '#shared/helpers/maintenance_task_equipment'
+import type { GenericEquipmentCategory } from '#shared/types/boat'
 import type {
   CreateMaintenanceTaskPayload,
   MaintenanceTaskSubject,
   MarkTaskDonePayload,
+  TaskEquipmentRef,
 } from '#shared/types/maintenance'
 
 export { BoatMaintenanceTaskNotFoundError, BoatMaintenanceTaskValidationError }
@@ -28,16 +42,65 @@ function assertBoatScope(user: User, boat: Boat) {
   }
 }
 
+const EQUIPMENT_MODELS = {
+  engine: BoatEngine,
+  sail: BoatSail,
+  rig: BoatRig,
+  safety: BoatSafetyEquipment,
+  generic: BoatGenericEquipment,
+} as const
+
+/**
+ * Charge l'équipement visé en le bornant au bateau : un id d'un autre bateau
+ * (ou d'une autre organisation) est refusé. Renvoie la catégorie pour un
+ * équipement générique, qui sert à déduire le sujet.
+ */
+async function findBoatEquipment(
+  boatId: number,
+  ref: TaskEquipmentRef
+): Promise<{ genericCategory: GenericEquipmentCategory | null }> {
+  if (ref.type === 'generic') {
+    const generic = await BoatGenericEquipment.query()
+      .where('id', ref.id)
+      .where('boatId', boatId)
+      .select('id', 'category')
+      .first()
+    if (!generic) throw equipmentNotFound()
+    return { genericCategory: generic.category as GenericEquipmentCategory }
+  }
+
+  const found = await EQUIPMENT_MODELS[ref.type]
+    .query()
+    .where('id', ref.id)
+    .where('boatId', boatId)
+    .select('id')
+    .first()
+  if (!found) throw equipmentNotFound()
+  return { genericCategory: null }
+}
+
+function equipmentNotFound() {
+  return new BoatMaintenanceTaskValidationError(
+    'Equipment does not belong to this boat',
+    'equipmentNotFound'
+  )
+}
+
+/** Tâches ouvertes d'abord, puis datées avant non datées (NULLS LAST portable PG/SQLite). */
+function orderTasks(query: ModelQueryBuilderContract<typeof BoatMaintenanceTask>) {
+  return query
+    .orderBy('status', 'asc')
+    .orderByRaw('CASE WHEN due_at IS NULL THEN 1 ELSE 0 END')
+    .orderBy('dueAt', 'asc')
+    .orderBy('id', 'desc')
+}
+
 @inject()
 export default class BoatMaintenanceTaskService {
   async listForBoat(user: User, boat: Boat) {
     assertBoatScope(user, boat)
 
-    return await BoatMaintenanceTask.query()
-      .where('boatId', boat.id)
-      .orderBy('status', 'asc')
-      .orderBy('dueAt', 'asc')
-      .orderBy('id', 'desc')
+    return await orderTasks(BoatMaintenanceTask.query().where('boatId', boat.id))
   }
 
   async createForBoat(user: User, boat: Boat, payload: CreateMaintenanceTaskPayload) {
@@ -50,17 +113,28 @@ export default class BoatMaintenanceTaskService {
     const dueEngineHours = payload.dueEngineHours ?? null
     const recurrenceEngineHours = payload.recurrenceIntervalEngineHours ?? null
 
-    if (!dueAt && dueEngineHours === null) {
+    const refs = equipmentRefsOf(payload)
+    if (refs.length > 1) {
       throw new BoatMaintenanceTaskValidationError(
-        'Either dueAt or dueEngineHours is required',
-        'dueRequired'
+        'A task targets at most one equipment',
+        'multipleEquipment'
+      )
+    }
+    const ref = refs[0] ?? null
+    const equipment = ref ? await findBoatEquipment(boat.id, ref) : null
+
+    const subject: MaintenanceTaskSubject =
+      payload.subject ?? (ref ? subjectForEquipment(ref.type, equipment?.genericCategory) : 'boat')
+
+    const requiredSubject = ref ? requiredSubjectForEquipment(ref.type) : null
+    if (requiredSubject !== null && subject !== requiredSubject) {
+      throw new BoatMaintenanceTaskValidationError(
+        `Subject ${subject} does not match ${requiredSubject} equipment`,
+        'subjectEquipmentMismatch'
       )
     }
 
-    if (
-      (dueEngineHours !== null || recurrenceEngineHours !== null) &&
-      payload.subject !== 'engine'
-    ) {
+    if ((dueEngineHours !== null || recurrenceEngineHours !== null) && subject !== 'engine') {
       throw new BoatMaintenanceTaskValidationError(
         'Engine-hour tasks must have subject=engine',
         'engineSubjectRequired'
@@ -76,12 +150,19 @@ export default class BoatMaintenanceTaskService {
 
     const notes = payload.notes?.trim() ? payload.notes.trim() : null
 
+    const equipmentColumns = {
+      boatEngineId: null,
+      boatSailId: null,
+      boatRigId: null,
+      boatSafetyEquipmentId: null,
+      boatGenericEquipmentId: null,
+      ...(ref ? { [equipmentFieldName(ref.type)]: ref.id } : {}),
+    }
+
     return await BoatMaintenanceTask.create({
       boatId: boat.id,
-      subject: payload.subject,
-      boatEngineId: payload.boatEngineId ?? null,
-      boatSailId: payload.boatSailId ?? null,
-      boatRigId: payload.boatRigId ?? null,
+      subject,
+      ...equipmentColumns,
       title,
       notes,
       status: 'open',
@@ -161,6 +242,8 @@ export default class BoatMaintenanceTaskService {
         boatEngineId: task.boatEngineId,
         boatSailId: task.boatSailId,
         boatRigId: task.boatRigId,
+        boatSafetyEquipmentId: task.boatSafetyEquipmentId,
+        boatGenericEquipmentId: task.boatGenericEquipmentId,
         title: task.title,
         notes: task.notes,
         status: 'open',
@@ -193,14 +276,35 @@ export default class BoatMaintenanceTaskService {
   }
 
   /**
-   * Lists maintenance tasks for a specific engine.
+   * Tâches rattachées à un équipement du bateau (moteur, voile, gréement,
+   * sécurité, générique). Le bateau doit déjà être autorisé par l'appelant.
    */
+  async listForEquipment(boatId: number, ref: TaskEquipmentRef) {
+    return await orderTasks(
+      BoatMaintenanceTask.query()
+        .where('boatId', boatId)
+        .where(equipmentFieldName(ref.type), ref.id)
+    )
+  }
+
+  /**
+   * Bateau de l'organisation avec tous ses équipements, pour proposer les cibles
+   * d'une tâche hors fiche bateau (dashboard). `null` si le bateau est hors périmètre.
+   */
+  async findBoatWithEquipment(user: User, boatId: number) {
+    if (user.organizationId === null) return null
+    return await Boat.query()
+      .where('id', boatId)
+      .where('organizationId', user.organizationId)
+      .preload('engines')
+      .preload('sails')
+      .preload('rig')
+      .preload('safetyEquipment')
+      .preload('genericEquipment')
+      .first()
+  }
+
   async listForEngine(boatId: number, engineId: number) {
-    return await BoatMaintenanceTask.query()
-      .where('boatId', boatId)
-      .where('boatEngineId', engineId)
-      .orderBy('status', 'asc')
-      .orderBy('dueAt', 'asc')
-      .orderBy('id', 'desc')
+    return await this.listForEquipment(boatId, { type: 'engine', id: engineId })
   }
 }

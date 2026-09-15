@@ -3,7 +3,11 @@ import BoatEquipmentService, { BoatEquipmentNotFoundError } from '#services/boat
 import BoatHullService, { BoatNotFoundError } from '#services/boat_hull_service'
 import MediaService from '#services/media_service'
 import OrganizationService from '#services/organization_service'
+import BoatMaintenanceTaskService from '#services/boat_maintenance_task_service'
+import { toMaintenanceTaskRows } from '#transformers/boat_transformer'
 import { toMediaRow } from '#transformers/media_row_transformer'
+import { toTaskEquipmentSource } from '#transformers/maintenance_transformer'
+import { maintenanceTaskPermissions } from '#utils/maintenance_task_permissions'
 import {
   createSafetyEquipmentValidator,
   updateSafetyEquipmentValidator,
@@ -17,7 +21,8 @@ export default class BoatSafetyEquipmentController {
     private boatService: BoatHullService,
     private equipmentService: BoatEquipmentService,
     private organizationService: OrganizationService,
-    private mediaService: MediaService
+    private mediaService: MediaService,
+    private taskService: BoatMaintenanceTaskService
   ) {}
 
   private async loadBoat(ctx: Pick<HttpContext, 'auth' | 'response' | 'params'>) {
@@ -47,8 +52,12 @@ export default class BoatSafetyEquipmentController {
       return
     }
 
-    const canManage = await bouncer.with(BoatPolicy).allows('edit', boat)
-    const media = await this.mediaService.listForEntity('boat_safety_equipment', item.id)
+    const [canManage, media, maintenanceTasks, taskPermissions] = await Promise.all([
+      bouncer.with(BoatPolicy).allows('edit', boat),
+      this.mediaService.listForEntity('boat_safety_equipment', item.id),
+      this.taskService.listForEquipment(boat.id, { type: 'safety', id: item.id }),
+      maintenanceTaskPermissions(bouncer, boat),
+    ])
 
     return inertia.render('boats/safety_equipment_show', {
       boat: { id: boat.id, name: boat.name },
@@ -64,6 +73,9 @@ export default class BoatSafetyEquipmentController {
         photos: media.filter((m) => m.kind === 'photo').map(toMediaRow),
       },
       canManage,
+      maintenanceTasks: toMaintenanceTaskRows(maintenanceTasks),
+      taskEquipment: toTaskEquipmentSource({ safetyEquipment: [item] }),
+      taskPermissions,
     })
   }
 

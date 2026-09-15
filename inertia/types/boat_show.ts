@@ -238,6 +238,8 @@ export type MaintenanceTaskRow = {
   boatEngineId: number | null
   boatSailId: number | null
   boatRigId: number | null
+  boatSafetyEquipmentId: number | null
+  boatGenericEquipmentId: number | null
   recurrenceIntervalMonths: number | null
   recurrenceIntervalEngineHours: number | null
 }
