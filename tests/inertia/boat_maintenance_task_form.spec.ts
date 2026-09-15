@@ -250,3 +250,21 @@ test("l'échéance en heures d'un moteur verrouillé suit son compteur", () => {
 
   expect(w.find('input[name="dueEngineHours"]').attributes('min')).toBe('81')
 })
+
+test("l'échéance en heures se remplit avec le minimum au premier contact", async () => {
+  const w = mountForm([{ kind: 'inboard', fuel: 'diesel', hours: 1240 }])
+
+  await w.find('select[name="subject"]').setValue('engine')
+  await w.find('select[name="boatEngineId"]').setValue('1')
+  const dueHours = () => w.find<HTMLInputElement>('input[name="dueEngineHours"]')
+
+  expect(dueHours().element.value).toBe('')
+  await dueHours().trigger('focus')
+  expect(dueHours().element.value).toBe('1241')
+
+  // Une valeur déjà saisie n'est jamais écrasée.
+  await dueHours().setValue('1500')
+  await dueHours().trigger('blur')
+  await dueHours().trigger('focus')
+  expect(dueHours().element.value).toBe('1500')
+})

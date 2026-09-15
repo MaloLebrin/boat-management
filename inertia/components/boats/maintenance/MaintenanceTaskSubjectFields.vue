@@ -51,6 +51,12 @@ const selectedEngineHours = computed(() => {
   const id = locked?.type === 'engine' ? locked.id : Number(engineId.value)
   return props.equipment.engines.find((engine) => engine.id === id)?.hours ?? null
 })
+const minDueEngineHours = computed(() => (selectedEngineHours.value ?? 0) + 1)
+
+// Au premier contact, le champ vide part du minimum accepté : l'utilisateur n'a plus qu'à monter.
+function prefillDueEngineHours() {
+  if (dueEngineHours.value === '') dueEngineHours.value = String(minDueEngineHours.value)
+}
 
 const DEDICATED_SUBJECTS: ReadonlyArray<MaintenanceSubject> = ['engine', 'sail', 'rig', 'safety']
 const showsGenericSelect = computed(
@@ -159,9 +165,10 @@ const showsGenericSelect = computed(
         "
         type="number"
         inputmode="numeric"
-        :min="String((selectedEngineHours ?? 0) + 1)"
+        :min="String(minDueEngineHours)"
         step="1"
         v-model="dueEngineHours"
+        @focus="prefillDueEngineHours"
         :errors="errors"
       />
       <BaseInput
