@@ -242,6 +242,69 @@ test.group('BoatMaintenanceTaskService (unit)', () => {
     assert.equal(tasks[1]!.lastDoneEngineHours, 155)
   })
 
+  test('createForBoat refuses an engine-hour due not above the engine counter', async ({
+    assert,
+  }) => {
+    const { user, boat } = await makeUserBoat()
+    const engine = await BoatEngineFactory.merge({ boatId: boat.id, hours: 300 }).create()
+    const svc = new BoatMaintenanceTaskService()
+
+    for (const dueEngineHours of [300, 250]) {
+      try {
+        await svc.createForBoat(user, boat, {
+          boatEngineId: engine.id,
+          title: 'Oil change',
+          dueEngineHours,
+        })
+        assert.fail(`due ${dueEngineHours} should be refused`)
+      } catch (error) {
+        assert.instanceOf(error, BoatMaintenanceTaskValidationError)
+        const validationError = error as BoatMaintenanceTaskValidationError
+        assert.equal(validationError.errorCode, 'dueEngineHoursNotAboveCurrent')
+        assert.equal(validationError.details.currentHours, 300)
+      }
+    }
+
+    const task = await svc.createForBoat(user, boat, {
+      boatEngineId: engine.id,
+      title: 'Oil change',
+      dueEngineHours: 301,
+    })
+    assert.equal(task.dueEngineHours, 301)
+    assert.lengthOf(await BoatMaintenanceTask.query().where('boatId', boat.id), 1)
+  })
+
+  test('createForBoat keeps the engine-hour due optional', async ({ assert }) => {
+    const { user, boat } = await makeUserBoat()
+    const engine = await BoatEngineFactory.merge({ boatId: boat.id, hours: 300 }).create()
+
+    const task = await new BoatMaintenanceTaskService().createForBoat(user, boat, {
+      boatEngineId: engine.id,
+      title: 'Check impeller',
+    })
+
+    assert.equal(task.subject, 'engine')
+    assert.isNull(task.dueEngineHours)
+  })
+
+  test('createForBoat treats an engine without counter as 0 hours', async ({ assert }) => {
+    const { user, boat } = await makeUserBoat()
+    const engine = await BoatEngineFactory.merge({ boatId: boat.id, hours: null }).create()
+    const svc = new BoatMaintenanceTaskService()
+
+    await assert.rejects(
+      () =>
+        svc.createForBoat(user, boat, { boatEngineId: engine.id, title: 'X', dueEngineHours: 0 }),
+      BoatMaintenanceTaskValidationError
+    )
+    const task = await svc.createForBoat(user, boat, {
+      boatEngineId: engine.id,
+      title: 'Oil change',
+      dueEngineHours: 1,
+    })
+    assert.equal(task.dueEngineHours, 1)
+  })
+
   test('cross-boat scope hides tasks', async ({ assert }) => {
     const userA = await UserFactory.with('organization').create()
     const userB = await UserFactory.with('organization').create()

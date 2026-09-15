@@ -105,6 +105,40 @@ test.group('Maintenance tasks — quick add (functional)', (group) => {
     assert.lengthOf(await BoatMaintenanceTask.all(), 0)
   })
 
+  test('an engine-hour due not above the engine counter is a field error', async ({
+    client,
+    assert,
+  }) => {
+    const admin = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: admin.organizationId! }).create()
+    const engine = await BoatEngineFactory.merge({ boatId: boat.id, hours: 400 }).create()
+    const enginePage = `/boats/${boat.id}/engines/${engine.id}`
+
+    const response = await client
+      .post(`/boats/${boat.id}/maintenance-tasks`)
+      .loginAs(admin)
+      .header('referer', enginePage)
+      .form({ title: 'Oil change', boatEngineId: String(engine.id), dueEngineHours: '400' })
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertHeader('location', enginePage)
+    const flash = response.flashMessages() as {
+      inputErrorsBag?: { dueEngineHours?: string[] }
+    }
+    assert.deepEqual(flash.inputErrorsBag?.dueEngineHours, [
+      "Must be greater than the engine's current hours (400 h).",
+    ])
+    assert.lengthOf(await BoatMaintenanceTask.all(), 0)
+
+    await client
+      .post(`/boats/${boat.id}/maintenance-tasks`)
+      .loginAs(admin)
+      .form({ title: 'Oil change', boatEngineId: String(engine.id), dueEngineHours: '401' })
+    const task = await BoatMaintenanceTask.query().where('boatId', boat.id).firstOrFail()
+    assert.equal(task.dueEngineHours, 401)
+  })
+
   test('mark done and delete redirect back to the page of origin', async ({ client, assert }) => {
     const admin = await createAdminUser()
     const boat = await BoatFactory.merge({ organizationId: admin.organizationId! }).create()

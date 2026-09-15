@@ -372,6 +372,31 @@ test.group('Assistant FleetAi chat (functional)', (group) => {
     assert.lengthOf(await AiAssistantConversation.query().where('userId', user.id), 0)
   })
 
+  test('an engine-hour proposal not above the engine counter persists nothing', async ({
+    assert,
+    client,
+  }) => {
+    const user = await createAdminUser()
+    const { boat } = await makeBoat(user.organizationId!)
+    const engine = await BoatEngineFactory.merge({ boatId: boat.id, hours: 250 }).create()
+    swapAiService(
+      proposeTaskResponse(boat.id, { dueAt: null, dueEngineHours: 250, boatEngineId: engine.id })
+    )
+
+    const response = await client
+      .post('/assistant/conversations')
+      .loginAs(user)
+      .form({ message: 'Oil change at 250 hours' })
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertFlashMessage(
+      'error',
+      'The assistant returned an unusable answer. Please try again.'
+    )
+    assert.lengthOf(await AiAssistantConversation.query().where('userId', user.id), 0)
+  })
+
   test('a valid handoff attaches the card with server-resolved labels', async ({
     assert,
     client,

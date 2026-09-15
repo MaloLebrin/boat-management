@@ -3,6 +3,7 @@ import { truncateDb } from '#tests/utils/db'
 import app from '@adonisjs/core/services/app'
 import AssistantStarterService from '#services/assistant_starter_service'
 import BoatMaintenanceTaskService from '#services/boat_maintenance_task_service'
+import BoatMaintenanceTask from '#models/boat_maintenance_task'
 import { BoatEngineFactory } from '#database/factories/boat_engine_factory'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { createAdminUser } from '#tests/functional/helpers'
@@ -63,17 +64,15 @@ test.group('Assistant FleetAi — suggestions de démarrage', (group) => {
       name: 'Pen Duick',
     }).create()
     const engine = await BoatEngineFactory.merge({ boatId: boat.id, hours: 300 }).create()
-    const taskService = await app.container.make(BoatMaintenanceTaskService)
-    // Compteur à 300 h, échéance à 250 h : en retard, comme le planning.
-    await taskService.createForBoat(user, boat, {
+    // Compteur à 300 h, échéance à 250 h : en retard, comme le planning. Créée en
+    // base car le service refuse une échéance déjà dépassée à la création.
+    await BoatMaintenanceTask.create({
+      boatId: boat.id,
       subject: 'engine',
       title: 'Vidange',
-      notes: null,
+      status: 'open',
       boatEngineId: engine.id,
-      dueAt: null,
       dueEngineHours: 250,
-      recurrenceIntervalMonths: null,
-      recurrenceIntervalEngineHours: null,
     })
 
     const service = await app.container.make(AssistantStarterService)

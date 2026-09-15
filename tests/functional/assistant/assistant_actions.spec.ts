@@ -25,6 +25,7 @@ async function makeBoat(organizationId: number) {
     kind: 'outboard',
     brand: 'Yamaha',
     model: '4AS',
+    hours: 120,
   }).create()
   return { boat, engine }
 }

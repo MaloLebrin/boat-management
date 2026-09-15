@@ -17,7 +17,9 @@ import BaseCombobox from '../../inertia/components/base/BaseCombobox.vue'
 import BoatMaintenanceTaskForm from '../../inertia/components/boats/maintenance/BoatMaintenanceTaskForm.vue'
 import { MAINTENANCE_OPERATION_INDEX } from '../../shared/constants/maintenance/maintenance_operations'
 
-function equipment(engines: Array<{ kind: string; fuel: string | null }> = []) {
+type EngineSeed = { kind: string; fuel: string | null; hours?: number | null }
+
+function equipment(engines: EngineSeed[] = []) {
   return {
     rig: null,
     sails: [],
@@ -28,15 +30,13 @@ function equipment(engines: Array<{ kind: string; fuel: string | null }> = []) {
       brand: 'Volvo',
       model: 'D2-40',
       serialNumber: null,
+      hours: null,
       ...engine,
     })),
   }
 }
 
-function mountForm(
-  engines: Array<{ kind: string; fuel: string | null }> = [],
-  extra: Record<string, unknown> = {}
-) {
+function mountForm(engines: EngineSeed[] = [], extra: Record<string, unknown> = {}) {
   return mount(BoatMaintenanceTaskForm, {
     props: { boatId: 7, equipment: equipment(engines), ...extra },
   })
@@ -217,4 +217,36 @@ test('un sujet non dédié propose les équipements génériques', async () => {
   expect(w.find('select[name="boatGenericEquipmentId"]').exists()).toBe(true)
   await w.find('select[name="subject"]').setValue('engine')
   expect(w.find('select[name="boatGenericEquipmentId"]').exists()).toBe(false)
+})
+
+test("l'échéance en heures doit dépasser le compteur du moteur retenu", async () => {
+  const w = mountForm([
+    { kind: 'inboard', fuel: 'diesel', hours: 1240 },
+    { kind: 'outboard', fuel: 'gasoline', hours: null },
+  ])
+
+  await w.find('select[name="subject"]').setValue('engine')
+  const dueHours = () => w.find('input[name="dueEngineHours"]')
+
+  // Aucun moteur retenu : borne basse à 1, sans aide.
+  expect(dueHours().attributes('min')).toBe('1')
+  expect(dueHours().attributes('required')).toBeUndefined()
+  expect(w.text()).not.toContain('boats.maintenance.tasks.currentEngineHoursHint')
+
+  await w.find('select[name="boatEngineId"]').setValue('1')
+  expect(dueHours().attributes('min')).toBe('1241')
+  expect(w.text()).toContain('boats.maintenance.tasks.currentEngineHoursHint')
+
+  // Moteur sans compteur : compté comme 0 h.
+  await w.find('select[name="boatEngineId"]').setValue('2')
+  expect(dueHours().attributes('min')).toBe('1')
+})
+
+test("l'échéance en heures d'un moteur verrouillé suit son compteur", () => {
+  const w = mountForm([{ kind: 'inboard', fuel: 'diesel', hours: 80 }], {
+    prefill: { equipment: { type: 'engine', id: 1 } },
+    lockEquipment: true,
+  })
+
+  expect(w.find('input[name="dueEngineHours"]').attributes('min')).toBe('81')
 })

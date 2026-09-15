@@ -22,7 +22,8 @@ export class BoatMaintenanceTaskValidationError extends Error {
   name = 'BoatMaintenanceTaskValidationError'
   constructor(
     message: string,
-    readonly errorCode: string
+    readonly errorCode: string,
+    readonly details: { currentHours?: number } = {}
   ) {
     super(message)
   }

@@ -70,6 +70,21 @@ export default class BoatMaintenanceTasksController {
         },
       })
     } catch (error) {
+      if (
+        error instanceof BoatMaintenanceTaskValidationError &&
+        error.errorCode === 'dueEngineHoursNotAboveCurrent'
+      ) {
+        session.flashAll()
+        session.flash('inputErrorsBag', {
+          dueEngineHours: [
+            i18n.t('validator.maintenanceTasks.dueEngineHoursNotAboveCurrent', {
+              current: String(error.details.currentHours ?? 0),
+            }),
+          ],
+        })
+        response.redirect().back()
+        return
+      }
       if (error instanceof BoatMaintenanceTaskValidationError) {
         session.flash('error', i18n.t(`flash.maintenanceTasks.${error.errorCode}`))
         response.redirect().back()

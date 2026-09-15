@@ -27,6 +27,9 @@
     "wrongCurrentPassword": "Le mot de passe actuel est incorrect.",
     "aiModelWrongProvider": "Ce modèle n’appartient pas au fournisseur IA actif."
   },
+  "maintenanceTasks": {
+    "dueEngineHoursNotAboveCurrent": "Doit être supérieur au compteur actuel du moteur ({current} h)."
+  },
   "fields": {
     "firstName": "prénom",
     "lastName": "nom",

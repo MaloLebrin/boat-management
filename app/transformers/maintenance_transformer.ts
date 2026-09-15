@@ -30,6 +30,7 @@ export function toTaskEquipmentSource(models: TaskEquipmentModels): TaskEquipmen
       brand: e.brand,
       model: e.model,
       serialNumber: e.serialNumber,
+      hours: e.hours,
     })),
     sails: (models.sails ?? []).map((s) => ({ id: s.id, sailType: s.sailType, areaM2: s.areaM2 })),
     rig: models.rig ? { id: models.rig.id } : null,

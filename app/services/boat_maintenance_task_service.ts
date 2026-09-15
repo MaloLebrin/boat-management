@@ -58,7 +58,7 @@ const EQUIPMENT_MODELS = {
 async function findBoatEquipment(
   boatId: number,
   ref: TaskEquipmentRef
-): Promise<{ genericCategory: GenericEquipmentCategory | null }> {
+): Promise<{ genericCategory: GenericEquipmentCategory | null; engineHours: number | null }> {
   if (ref.type === 'generic') {
     const generic = await BoatGenericEquipment.query()
       .where('id', ref.id)
@@ -66,7 +66,17 @@ async function findBoatEquipment(
       .select('id', 'category')
       .first()
     if (!generic) throw equipmentNotFound()
-    return { genericCategory: generic.category as GenericEquipmentCategory }
+    return { genericCategory: generic.category as GenericEquipmentCategory, engineHours: null }
+  }
+
+  if (ref.type === 'engine') {
+    const engine = await BoatEngine.query()
+      .where('id', ref.id)
+      .where('boatId', boatId)
+      .select('id', 'hours')
+      .first()
+    if (!engine) throw equipmentNotFound()
+    return { genericCategory: null, engineHours: engine.hours }
   }
 
   const found = await EQUIPMENT_MODELS[ref.type]
@@ -76,7 +86,7 @@ async function findBoatEquipment(
     .select('id')
     .first()
   if (!found) throw equipmentNotFound()
-  return { genericCategory: null }
+  return { genericCategory: null, engineHours: null }
 }
 
 function equipmentNotFound() {
@@ -145,6 +155,16 @@ export default class BoatMaintenanceTaskService {
       throw new BoatMaintenanceTaskValidationError(
         'boatEngineId is required for engine-hour tasks',
         'engineIdRequired'
+      )
+    }
+
+    // Une échéance au compteur actuel (ou en dessous) serait en retard dès sa création.
+    const currentEngineHours = equipment?.engineHours ?? 0
+    if (dueEngineHours !== null && dueEngineHours <= currentEngineHours) {
+      throw new BoatMaintenanceTaskValidationError(
+        'dueEngineHours must be above the current engine hours',
+        'dueEngineHoursNotAboveCurrent',
+        { currentHours: currentEngineHours }
       )
     }
 

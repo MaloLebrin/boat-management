@@ -143,6 +143,18 @@ export default class AssistantActionsService {
         if (hasEngineHours && action.boatEngineId === null) {
           throw new AiInvalidResponseError('Assistant engine-hour proposal has no boatEngineId')
         }
+        if (action.dueEngineHours !== null && action.boatEngineId !== null) {
+          const row = await BoatEngine.query()
+            .select('id', 'hours')
+            .where('id', action.boatEngineId)
+            .first()
+          // Même règle que `createForBoat` : une échéance ≤ compteur naît en retard.
+          if (action.dueEngineHours <= (row?.hours ?? 0)) {
+            throw new AiInvalidResponseError(
+              'Assistant engine-hour due is not above the current engine hours'
+            )
+          }
+        }
         const { kind, boatId, ...rest } = action
         return { kind, boatId, boatName: boat.name, engineLabel, ...rest }
       }
