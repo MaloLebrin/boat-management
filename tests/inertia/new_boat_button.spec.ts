@@ -1,32 +1,24 @@
-import { mount } from '@vue/test-utils'
-import { test, expect, vi, beforeEach } from 'vitest'
+import { expect, test, vi } from 'vitest'
 import NewBoatButton from '../../inertia/components/boats/NewBoatButton.vue'
 import type { QuotaUsage } from '../../shared/types/plan'
+import { mountWithStubs, routerSpies } from './helpers/mount'
 
-const { visit } = vi.hoisted(() => ({ visit: vi.fn() }))
-
-vi.mock('@inertiajs/vue3', () => ({
-  router: { visit },
-}))
-
-vi.mock('~/composables/use_t', () => ({
-  useT: () => ({ t: (key: string) => key }),
-}))
-
-vi.mock('~/components/base/BaseButton.vue', () => ({
-  default: { template: '<button @click="$emit(\'click\')"><slot /></button>' },
-}))
-
-// Stub de la modale d'upsell : on vérifie seulement son ouverture (prop `open`).
-vi.mock('~/components/base/UpgradePlanModal.vue', () => ({
-  default: { props: ['open'], template: '<div class="upgrade-modal" v-if="open" />' },
-}))
+vi.mock('@inertiajs/vue3', async () => {
+  const { inertiaMock } = await import('./helpers/inertia_mock')
+  return inertiaMock()
+})
 
 function mountButton(canAddBoat: boolean, quota: QuotaUsage['boats']) {
-  return mount(NewBoatButton, { props: { canAddBoat, quota } })
+  return mountWithStubs(NewBoatButton, {
+    props: { canAddBoat, quota },
+    stubs: {
+      // La variante warning (pêche) du vrai `BaseBadge` fait partie de l'assertion.
+      BaseBadge: false,
+      // Modale d'upsell : on vérifie seulement son ouverture (prop `open`).
+      UpgradePlanModal: { props: ['open'], template: '<div class="upgrade-modal" v-if="open" />' },
+    },
+  })
 }
-
-beforeEach(() => visit.mockClear())
 
 test('shows the used/limit badge below the quota and navigates on click', async () => {
   const w = mountButton(true, { used: 1, limit: 2 })
@@ -37,7 +29,7 @@ test('shows the used/limit badge below the quota and navigates on click', async 
   expect(w.find('.inline-flex').attributes('title')).toBeUndefined()
 
   await w.find('button').trigger('click')
-  expect(visit).toHaveBeenCalledWith('/boats/new')
+  expect(routerSpies.visit).toHaveBeenCalledWith('/boats/new')
   expect(w.find('.upgrade-modal').exists()).toBe(false)
 })
 
@@ -50,7 +42,7 @@ test('at the quota: warning badge, tooltip, and opens the upsell modal instead o
   expect(w.find('.inline-flex').attributes('title')).toBe('boats.index.quotaReached')
 
   await w.find('button').trigger('click')
-  expect(visit).not.toHaveBeenCalled()
+  expect(routerSpies.visit).not.toHaveBeenCalled()
   expect(w.find('.upgrade-modal').exists()).toBe(true)
 })
 
