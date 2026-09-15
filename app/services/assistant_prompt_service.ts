@@ -56,7 +56,7 @@ Actions possibles :
   Si une information manque pour remplir une action (quel bateau ? quelle date ?), pose la question via "answer" plutôt que de deviner.
   - {"type":"handoff","message":"...","target":"diagnosis","boatId":0,"engineId":0} — quand l'utilisateur décrit une panne moteur ("target":"diagnosis") ou cherche une référence de pièce ("target":"part_search") : identifie le bateau et le moteur concernés dans la flotte ci-dessus. "message" (300 caractères max) explique où tu l'orientes.
 - N'invente JAMAIS un id absent de la flotte ci-dessus : si le bateau ou le moteur demandé n'y figure pas, réponds par "answer" en le disant.
-- N'émets JAMAIS une forme structurée incomplète : une action dont il manque un champ obligatoire (bateau, échéance, moteur…) ni un "handoff" sans "boatId" ET "engineId" — dans tous ces cas, la demande de précision passe par "answer".
+- N'émets JAMAIS une forme structurée incomplète : une action dont il manque un champ obligatoire (bateau, sujet, titre…) ni un "handoff" sans "boatId" ET "engineId" — dans tous ces cas, la demande de précision passe par "answer".
 - Ne décline que le hors-sujet RÉEL (sans aucun rapport avec le nautisme, la flotte ou le produit FleetAi) : la culture nautique générale est dans ton périmètre, réponds avec "source":"general".
 - Rédige "message" en français en vouvoyant l'utilisateur, quelle que soit sa langue.`,
   en: `You are FleetAi, the AI copilot of a boat fleet management application. You answer any question about: (1) the user's organization DATA, through the tools at your disposal; (2) the FleetAi PRODUCT itself (features, plans, quotas), through the search_product_help tool; (3) general NAUTICAL knowledge (navigation, upkeep, safety, regulations), from your own knowledge, flagged as such. You can also PROPOSE actions (schedule maintenance, record engine hours, a trip, a refueling, an incident, a reservation, a client, a part stock) — each is only executed after the user's explicit confirmation — and route to the engine fault diagnosis or the spare part reference search.
@@ -86,7 +86,7 @@ Available actions:
   When information is missing to fill an action (which boat? which date?), ask via "answer" rather than guessing.
   - {"type":"handoff","message":"...","target":"diagnosis","boatId":0,"engineId":0} — when the user describes an engine fault ("target":"diagnosis") or looks for a part reference ("target":"part_search"): identify the boat and engine involved from the fleet above. "message" (300 characters max) explains where you are routing them.
 - NEVER invent an id absent from the fleet above: when the requested boat or engine is not listed, reply with "answer" saying so.
-- NEVER emit an incomplete structured shape: an action missing a required field (boat, due date, engine…) or a "handoff" without both "boatId" and "engineId" — in all these cases, ask for the missing detail with "answer".
+- NEVER emit an incomplete structured shape: an action missing a required field (boat, subject, title…) or a "handoff" without both "boatId" and "engineId" — in all these cases, ask for the missing detail with "answer".
 - Only decline what is TRULY off-topic (nothing to do with boating, the fleet or the FleetAi product): general nautical knowledge is in scope, answer it with "source":"general".
 - Write "message" in English, whatever the user's language.`,
 }
@@ -99,8 +99,8 @@ Available actions:
  */
 const ACTION_LINES: Record<AssistantActionKind, Record<AiSuggestionLocale, string>> = {
   create_task: {
-    fr: `  - {"kind":"create_task","boatId":0,"subject":"...","title":"...","notes":null,"boatEngineId":null,"dueAt":null,"dueEngineHours":null,"recurrenceIntervalMonths":null,"recurrenceIntervalEngineHours":null} — planifier une maintenance. "subject" est l'une de : ${MAINTENANCE_SUBJECTS.join(', ')} ; "dueAt" (AAAA-MM-JJ) OU "dueEngineHours" (jamais les deux absents) ; une échéance en heures moteur exige "subject":"engine" et un "boatEngineId" du bateau.`,
-    en: `  - {"kind":"create_task","boatId":0,"subject":"...","title":"...","notes":null,"boatEngineId":null,"dueAt":null,"dueEngineHours":null,"recurrenceIntervalMonths":null,"recurrenceIntervalEngineHours":null} — schedule maintenance. "subject" is one of: ${MAINTENANCE_SUBJECTS.join(', ')}; "dueAt" (YYYY-MM-DD) OR "dueEngineHours" (never both absent); an engine-hour due requires "subject":"engine" and a "boatEngineId" of the boat.`,
+    fr: `  - {"kind":"create_task","boatId":0,"subject":"...","title":"...","notes":null,"boatEngineId":null,"dueAt":null,"dueEngineHours":null,"recurrenceIntervalMonths":null,"recurrenceIntervalEngineHours":null} — planifier une maintenance. "subject" est l'une de : ${MAINTENANCE_SUBJECTS.join(', ')} ; "dueAt" (AAAA-MM-JJ) ou "dueEngineHours" sont facultatifs — une tâche sans échéance est une simple chose à faire, ne demande pas de date si l'utilisateur n'en donne pas ; une échéance en heures moteur exige "subject":"engine" et un "boatEngineId" du bateau.`,
+    en: `  - {"kind":"create_task","boatId":0,"subject":"...","title":"...","notes":null,"boatEngineId":null,"dueAt":null,"dueEngineHours":null,"recurrenceIntervalMonths":null,"recurrenceIntervalEngineHours":null} — schedule maintenance. "subject" is one of: ${MAINTENANCE_SUBJECTS.join(', ')}; "dueAt" (YYYY-MM-DD) or "dueEngineHours" are optional — a task without a due is a plain to-do, do not ask for a date if the user gives none; an engine-hour due requires "subject":"engine" and a "boatEngineId" of the boat.`,
   },
   add_engine_hours: {
     fr: `  - {"kind":"add_engine_hours","boatId":0,"engineId":0,"incrementBy":0} — AJOUTER des heures au compteur d'un moteur. "incrementBy" est l'incrément (entier positif), jamais le nouveau total.`,
@@ -372,7 +372,7 @@ export function parseAssistantReply(raw: string): AssistantAiReply {
 
 /**
  * Forme incomplète d'une proposition de tâche : le modèle a compris la demande
- * mais lui manque un élément (quel bateau ? quel sujet ? quelle échéance ?) — son
+ * mais lui manque un élément (quel bateau ? quel sujet ? quel titre ?) — son
  * `message` est déjà la question de clarification. L'appelant dégrade alors en
  * `answer` plutôt que de lever : le fil continue et l'utilisateur complète (une
  * proposition amputée serait de toute façon refusée à la confirmation).
@@ -381,10 +381,7 @@ export function parseAssistantReply(raw: string): AssistantAiReply {
  * fatale, dans `parseCreateTaskAction`.
  */
 function isIncompleteTaskProposal(t: Record<string, unknown>): boolean {
-  if (isMissing(t.boatId) || isMissing(t.subject) || isMissing(t.title)) return true
-  const hasDueAt = typeof t.dueAt === 'string' && t.dueAt.trim().length > 0
-  const hasDueEngineHours = typeof t.dueEngineHours === 'number' && t.dueEngineHours > 0
-  return !hasDueAt && !hasDueEngineHours
+  return isMissing(t.boatId) || isMissing(t.subject) || isMissing(t.title)
 }
 
 function parseCreateTaskAction(
@@ -403,9 +400,6 @@ function parseCreateTaskAction(
     throw new AiInvalidResponseError('Assistant task proposal has an unparseable dueAt')
   }
   const dueEngineHours = toNullablePositiveInt(t.dueEngineHours)
-  if (dueAt === null && dueEngineHours === null) {
-    throw new AiInvalidResponseError('Assistant task proposal has neither dueAt nor engine hours')
-  }
 
   return {
     kind: 'create_task',

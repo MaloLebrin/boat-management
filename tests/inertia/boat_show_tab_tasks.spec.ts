@@ -75,6 +75,8 @@ const openTask: MaintenanceTaskRow = {
   boatEngineId: null,
   boatSailId: null,
   boatRigId: null,
+  boatSafetyEquipmentId: null,
+  boatGenericEquipmentId: null,
   recurrenceIntervalMonths: null,
   recurrenceIntervalEngineHours: null,
 }
@@ -126,7 +128,34 @@ test('unifies the close-task label on markDone and shows delete + notes', () => 
   expect(text).not.toContain('boats.maintenance.tasks.done')
   expect(text).toContain('Filtre à changer')
   // Chaque tâche expose l'action « fait » et l'action « supprimer ».
-  expect(w.findAll('form')).toHaveLength(2)
+  expect(w.findAll('form:not([data-testid="task-quick-add"])')).toHaveLength(2)
+})
+
+test('shows the quick add input only to users who can create tasks', () => {
+  const manager = mount(BoatShowTabTasks, {
+    props: { boat: minimalBoat, maintenanceTasks: [], canManageMaintenance: true },
+  })
+  const reader = mount(BoatShowTabTasks, {
+    props: { boat: minimalBoat, maintenanceTasks: [], canManageMaintenance: false },
+  })
+
+  expect(manager.find('[data-testid="task-quick-add"]').exists()).toBe(true)
+  expect(reader.find('[data-testid="task-quick-add"]').exists()).toBe(false)
+})
+
+test('labels a task linked to generic equipment with the equipment name', () => {
+  const w = mount(BoatShowTabTasks, {
+    props: {
+      boat: {
+        ...minimalBoat,
+        genericEquipment: [{ id: 5, name: 'Guindeau', category: 'anchoring' }],
+      } as unknown as BoatShowDetail,
+      maintenanceTasks: [{ ...overdueTask, subject: 'deck', boatGenericEquipmentId: 5 }],
+      canManageMaintenance: false,
+    },
+  })
+
+  expect(w.text()).toContain('Guindeau')
 })
 
 // #407 — le libellé « bientôt dû » passe par la clé de statut unifiée.

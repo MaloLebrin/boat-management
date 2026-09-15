@@ -1,12 +1,15 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { Form } from '@adonisjs/inertia/vue'
+import { computed, ref } from 'vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
+import BoatMaintenanceTaskModal from '~/components/boats/maintenance/BoatMaintenanceTaskModal.vue'
+import BoatTaskActions from '~/components/boats/maintenance/BoatTaskActions.vue'
+import MaintenanceTaskQuickAdd from '~/components/boats/maintenance/MaintenanceTaskQuickAdd.vue'
 import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import type { BoatShowEngine, MaintenanceEventRow, MaintenanceTaskRow } from '~/types/boat_show'
+import type { MaintenanceTaskPermissions, TaskEquipmentSource } from '#shared/types/maintenance'
 
 const { t } = useT()
 const { formatDateLong, formatMonthYear } = useDateFormat()
@@ -18,9 +21,13 @@ const props = defineProps<{
   openTasks: MaintenanceTaskRow[]
   sortedOpenTasks: MaintenanceTaskRow[]
   totalParts: number
-  canManage: boolean
+  taskEquipment: TaskEquipmentSource
+  taskPermissions: MaintenanceTaskPermissions
   eventsByYearMonth: Record<string, MaintenanceEventRow[]>
 }>()
+
+const isTaskModalOpen = ref(false)
+const engineRef = computed(() => ({ type: 'engine' as const, id: props.engine.id }))
 
 const todayIso = computed(() => new Date().toISOString().slice(0, 10))
 
@@ -48,9 +55,26 @@ function getTaskStatus(task: MaintenanceTaskRow): 'overdue' | 'soon' | 'schedule
     <div class="flex-1 space-y-8">
       <!-- A venir -->
       <section>
-        <h2 class="text-lg font-semibold text-fg mb-4">
-          {{ t('boats.engineShow.maintenance.upcoming') }}
-        </h2>
+        <div class="mb-4 flex items-center justify-between gap-3">
+          <h2 class="text-lg font-semibold text-fg">
+            {{ t('boats.engineShow.maintenance.upcoming') }}
+          </h2>
+          <BaseButton
+            v-if="taskPermissions.canCreate"
+            variant="secondary"
+            size="sm"
+            type="button"
+            @click="isTaskModalOpen = true"
+          >
+            {{ t('boats.maintenance.tasks.addTask') }}
+          </BaseButton>
+        </div>
+        <MaintenanceTaskQuickAdd
+          v-if="taskPermissions.canCreate"
+          class="mb-4"
+          :boat-id="boat.id"
+          :equipment="engineRef"
+        />
         <div v-if="openTasks.length === 0" class="text-sm text-fg-muted">
           {{ t('boats.engineShow.maintenance.noUpcoming') }}
         </div>
@@ -94,19 +118,11 @@ function getTaskStatus(task: MaintenanceTaskRow): 'overdue' | 'soon' | 'schedule
                   }}</span>
                 </p>
               </div>
-              <div v-if="canManage" class="flex items-center gap-2">
+              <div v-if="taskPermissions.canEdit" class="flex items-center gap-2">
                 <BaseButton variant="ghost" size="sm" href="/planning">
                   {{ t('boats.engineShow.actions.schedule') }}
                 </BaseButton>
-                <Form
-                  :action="`/boats/${boat.id}/maintenance-tasks/${task.id}/done`"
-                  method="put"
-                  class="inline"
-                >
-                  <BaseButton variant="secondary" size="sm" type="submit">
-                    {{ t('boats.engineShow.actions.markDone') }}
-                  </BaseButton>
-                </Form>
+                <BoatTaskActions :boat-id="boat.id" :task="task" />
               </div>
             </div>
           </div>
@@ -166,5 +182,14 @@ function getTaskStatus(task: MaintenanceTaskRow): 'overdue' | 'soon' | 'schedule
         {{ t('boats.engineShow.actions.exportPdf') }}
       </BaseButton>
     </div>
+
+    <BoatMaintenanceTaskModal
+      v-if="taskPermissions.canCreate"
+      v-model:open="isTaskModalOpen"
+      :boat-id="boat.id"
+      :equipment="taskEquipment"
+      :prefill="{ equipment: engineRef }"
+      lock-equipment
+    />
   </div>
 </template>

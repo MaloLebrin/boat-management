@@ -115,6 +115,16 @@ test.group('NotificationScanService (functional)', (group) => {
       recurrenceIntervalEngineHours: null,
     })
 
+    // Simple chose à faire, sans échéance : jamais notifiée.
+    await BoatMaintenanceTask.create({
+      boatId: boat.id,
+      subject: 'boat',
+      status: 'open',
+      dueAt: null,
+      dueEngineHours: null,
+      title: 'Undated to-do',
+    })
+
     const { created } = await makeService().run()
     assert.equal(created, 0)
   })

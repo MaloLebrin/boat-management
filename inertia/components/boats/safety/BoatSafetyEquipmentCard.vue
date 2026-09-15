@@ -6,10 +6,12 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseModal from '~/components/base/BaseModal.vue'
 import BoatSafetyEquipmentFields from './BoatSafetyEquipmentFields.vue'
+import EquipmentAddTaskButton from '~/components/boats/maintenance/EquipmentAddTaskButton.vue'
 import { useT } from '~/composables/use_t'
 import { useDateFormat } from '~/composables/use_date_format'
 import { suggestEquipmentActionType } from '#shared/helpers/equipment_action'
 import type { BoatShowSafetyEquipment, EquipmentActionPrefill } from '~/types/boat_show'
+import type { TaskEquipmentRef } from '#shared/types/maintenance'
 
 const props = withDefaults(
   defineProps<{
@@ -17,18 +19,20 @@ const props = withDefaults(
     items: BoatShowSafetyEquipment[]
     canManage: boolean
     canManageActions: boolean
+    canAddTask?: boolean
     /**
      * Type demandé par le panneau de conformité (#582) : ouvre la modale de
      * création pré-remplie sur ce type d'équipement.
      */
     prefillEquipmentType?: string | null
   }>(),
-  { prefillEquipmentType: null }
+  { prefillEquipmentType: null, canAddTask: false }
 )
 
 const emit = defineEmits<{
   (e: 'addToActions', payload: EquipmentActionPrefill): void
   (e: 'prefillConsumed'): void
+  (e: 'addTask', equipment: TaskEquipmentRef): void
 }>()
 
 const { t } = useT()
@@ -71,18 +75,9 @@ function statusVariant(status: string): 'success' | 'warning' | 'danger' {
   return 'danger'
 }
 
-function toDateInputValue(iso: string | null) {
-  if (!iso) return null
-  return iso.slice(0, 10)
-}
-
-function openEdit(item: BoatShowSafetyEquipment) {
-  editingItem.value = item
-}
-
-function closeEdit() {
-  editingItem.value = null
-}
+const toDateInputValue = (iso: string | null) => (iso ? iso.slice(0, 10) : null)
+const openEdit = (item: BoatShowSafetyEquipment) => (editingItem.value = item)
+const closeEdit = () => (editingItem.value = null)
 </script>
 
 <template>
@@ -151,6 +146,11 @@ function closeEdit() {
             >
               {{ t('boats.safetyEquipment.viewDetail') }}
             </BaseButton>
+            <EquipmentAddTaskButton
+              v-if="canAddTask"
+              :equipment="{ type: 'safety', id: item.id }"
+              @add-task="emit('addTask', $event)"
+            />
             <BaseButton
               v-if="canManageActions && item.status !== 'ok'"
               variant="secondary"

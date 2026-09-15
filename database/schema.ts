@@ -908,8 +908,10 @@ export class BoatMaintenanceSheetSchema extends BaseModel {
 export class BoatMaintenanceTaskSchema extends BaseModel {
   static $columns = [
     'boatEngineId',
+    'boatGenericEquipmentId',
     'boatId',
     'boatRigId',
+    'boatSafetyEquipmentId',
     'boatSailId',
     'createdAt',
     'doneAt',
@@ -930,9 +932,13 @@ export class BoatMaintenanceTaskSchema extends BaseModel {
   @column()
   declare boatEngineId: number | null
   @column()
+  declare boatGenericEquipmentId: number | null
+  @column()
   declare boatId: number
   @column()
   declare boatRigId: number | null
+  @column()
+  declare boatSafetyEquipmentId: number | null
   @column()
   declare boatSailId: number | null
   @column.dateTime({ autoCreate: true })

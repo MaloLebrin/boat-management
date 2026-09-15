@@ -150,6 +150,7 @@ const showSkeleton = computed(
         :safety-compliance="safetyCompliance"
         :can-manage-equipment="canManageEquipment"
         :can-manage-actions="canManageEquipmentActions"
+        :can-manage-maintenance="canManageMaintenance"
         :create-intent="createIntent"
         @create-intent-consumed="$emit('createIntentConsumed')"
       />

@@ -8,17 +8,25 @@ import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseModal from '~/components/base/BaseModal.vue'
+import EquipmentAddTaskButton from '~/components/boats/maintenance/EquipmentAddTaskButton.vue'
 import { computed, ref } from 'vue'
 import { shouldReopenEngineForm } from '~/composables/use_engine_form_draft'
 import { useT } from '~/composables/use_t'
 import { useDateFormat } from '~/composables/use_date_format'
 import { engineFuelLabel } from '~/utils/boat_enum_labels'
+import type { TaskEquipmentRef } from '#shared/types/maintenance'
 
-const props = defineProps<{
-  boatId: number
-  engines: BoatShowEngine[]
-  canManage: boolean
-}>()
+const props = withDefaults(
+  defineProps<{
+    boatId: number
+    engines: BoatShowEngine[]
+    canManage: boolean
+    canAddTask?: boolean
+  }>(),
+  { canAddTask: false }
+)
+
+defineEmits<{ (e: 'addTask', equipment: TaskEquipmentRef): void }>()
 
 /** Identifie cette modale dans l'URL de l'aller-retour catalogue. */
 const ENGINE_FORM_SURFACE = 'engines-card'
@@ -120,6 +128,11 @@ function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutra
               :boat-id="boatId"
               :engine-id="e.id"
               :current-hours="e.hours"
+            />
+            <EquipmentAddTaskButton
+              v-if="canAddTask"
+              :equipment="{ type: 'engine', id: e.id }"
+              @add-task="$emit('addTask', $event)"
             />
             <Link :href="`/boats/${boatId}/engines/${e.id}`">
               <BaseButton variant="secondary" size="sm" type="button">

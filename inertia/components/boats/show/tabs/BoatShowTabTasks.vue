@@ -4,8 +4,13 @@ import { computed, ref } from 'vue'
 import BoatMaintenanceTasksPanel from '~/components/boats/maintenance/BoatMaintenanceTasksPanel.vue'
 import BoatTaskActions from '~/components/boats/maintenance/BoatTaskActions.vue'
 import BoatTaskUrgentCard from '~/components/boats/maintenance/BoatTaskUrgentCard.vue'
+import MaintenanceTaskQuickAdd from '~/components/boats/maintenance/MaintenanceTaskQuickAdd.vue'
+import BoatTasksFilterPills, {
+  type BoatTasksFilter,
+} from '~/components/boats/show/tabs/BoatTasksFilterPills.vue'
 import { subjectLabel } from '~/components/boats/maintenance/utils'
-import { engineKindLabel, engineSerialSuffix, sailTypeLabel } from '~/utils/boat_enum_labels'
+import { useTaskEquipmentOptions } from '~/composables/use_task_equipment_options'
+import { equipmentRefOf } from '#shared/helpers/maintenance_task_equipment'
 import type { BoatCreateIntent, BoatShowDetail, MaintenanceTaskRow } from '~/types/boat_show'
 import { useT } from '~/composables/use_t'
 import { useDateFormat } from '~/composables/use_date_format'
@@ -25,7 +30,7 @@ defineEmits<{ createIntentConsumed: [] }>()
 const { t } = useT()
 const { formatDate } = useDateFormat()
 
-const tasksFilter = ref<'all' | 'overdue' | 'soon' | 'planned' | 'undated'>('all')
+const tasksFilter = ref<BoatTasksFilter>('all')
 
 const todayIso = computed(() => new Date().toISOString().slice(0, 10))
 
@@ -70,69 +75,29 @@ const filteredTasks = computed(() => {
   }
 })
 
+const { equipmentLabel } = useTaskEquipmentOptions(() => props.boat)
+
+/** Équipement visé (moteur, voile, sécurité, générique), sinon le sujet. */
 function getTaskComponentLabel(task: MaintenanceTaskRow): string {
-  if (task.subject === 'engine' && task.boatEngineId) {
-    const engine = props.boat.engines.find((e) => e.id === task.boatEngineId)
-    if (engine) {
-      return `${[engineKindLabel(t, engine.kind), engine.brand, engine.model].filter(Boolean).join(' ')}${engineSerialSuffix(t, engine.serialNumber)}`
-    }
-  }
-  if (task.subject === 'sail' && task.boatSailId) {
-    const sail = props.boat.sails.find((s) => s.id === task.boatSailId)
-    if (sail) return sailTypeLabel(t, sail.sailType) ?? sail.sailType
-  }
-  return subjectLabel(t, task.subject)
+  const equipment = equipmentRefOf(task)
+  const label = equipment && equipment.type !== 'rig' ? equipmentLabel(equipment) : ''
+  return label || subjectLabel(t, task.subject)
 }
 </script>
 
 <template>
   <div class="space-y-6">
-    <!-- Header with filter pills -->
-    <div class="flex flex-wrap items-center justify-between gap-4">
-      <div class="flex flex-wrap gap-2">
-        <button
-          v-for="filter in [
-            { key: 'all', label: t('boats.show.tasksFilter.all') },
-            {
-              key: 'overdue',
-              label: t('boats.show.tasksFilter.overdue'),
-              count: overdueTasks.length,
-            },
-            { key: 'soon', label: t('boats.show.tasksFilter.soon'), count: soonTasks.length },
-            {
-              key: 'planned',
-              label: t('boats.show.tasksFilter.planned'),
-              count: plannedTasks.length,
-            },
-            {
-              key: 'undated',
-              label: t('boats.show.tasksFilter.undated'),
-              count: undatedTasks.length,
-            },
-          ]"
-          :key="filter.key"
-          type="button"
-          :class="[
-            'rounded-full px-3 py-1.5 text-sm font-medium transition-colors flex items-center gap-2',
-            tasksFilter === filter.key
-              ? 'bg-brand text-white'
-              : 'bg-surface-muted text-fg-muted hover:bg-surface-elevated hover:text-fg',
-          ]"
-          @click="tasksFilter = filter.key as typeof tasksFilter"
-        >
-          {{ filter.label }}
-          <span
-            v-if="filter.count !== undefined && filter.count > 0"
-            :class="[
-              'rounded-full px-2 py-0.5 text-xs font-semibold',
-              tasksFilter === filter.key ? 'bg-white/20' : 'bg-surface-elevated',
-            ]"
-          >
-            {{ filter.count }}
-          </span>
-        </button>
-      </div>
-    </div>
+    <MaintenanceTaskQuickAdd v-if="canManageMaintenance" :boat-id="boat.id" />
+
+    <BoatTasksFilterPills
+      v-model="tasksFilter"
+      :counts="{
+        overdue: overdueTasks.length,
+        soon: soonTasks.length,
+        planned: plannedTasks.length,
+        undated: undatedTasks.length,
+      }"
+    />
 
     <!-- Overdue section -->
     <div

@@ -1,5 +1,8 @@
 import BoatPolicy from '#policies/boat_policy'
 import { toMediaRow } from '#transformers/media_row_transformer'
+import { toMaintenanceTaskRows } from '#transformers/boat_transformer'
+import { toTaskEquipmentSource } from '#transformers/maintenance_transformer'
+import { maintenanceTaskPermissions } from '#utils/maintenance_task_permissions'
 import AiAnalysisService from '#services/ai_analysis_service'
 import BoatEquipmentService, { BoatEquipmentNotFoundError } from '#services/boat_equipment_service'
 import BoatEngineDiagnosticService from '#services/boat_engine_diagnostic_service'
@@ -246,8 +249,12 @@ export default class BoatEquipmentController {
       return
     }
 
-    const canManage = await bouncer.with(BoatPolicy).allows('edit', boat)
-    const media = await this.mediaService.listForEntity('boat_sail', sail.id)
+    const [canManage, media, maintenanceTasks, taskPermissions] = await Promise.all([
+      bouncer.with(BoatPolicy).allows('edit', boat),
+      this.mediaService.listForEntity('boat_sail', sail.id),
+      this.taskService.listForEquipment(boat.id, { type: 'sail', id: sail.id }),
+      maintenanceTaskPermissions(bouncer, boat),
+    ])
 
     return inertia.render('boats/sail_show', {
       boat: { id: boat.id, name: boat.name },
@@ -265,6 +272,9 @@ export default class BoatEquipmentController {
         photos: media.filter((m) => m.kind === 'photo').map(toMediaRow),
       },
       canManage,
+      maintenanceTasks: toMaintenanceTaskRows(maintenanceTasks),
+      taskEquipment: toTaskEquipmentSource({ sails: [sail] }),
+      taskPermissions,
     })
   }
 
@@ -281,8 +291,12 @@ export default class BoatEquipmentController {
       return
     }
 
-    const canManage = await bouncer.with(BoatPolicy).allows('edit', boat)
-    const media = await this.mediaService.listForEntity('boat_rig', rig.id)
+    const [canManage, media, maintenanceTasks, taskPermissions] = await Promise.all([
+      bouncer.with(BoatPolicy).allows('edit', boat),
+      this.mediaService.listForEntity('boat_rig', rig.id),
+      this.taskService.listForEquipment(boat.id, { type: 'rig', id: rig.id }),
+      maintenanceTaskPermissions(bouncer, boat),
+    ])
 
     return inertia.render('boats/rig_show', {
       boat: { id: boat.id, name: boat.name },
@@ -297,6 +311,9 @@ export default class BoatEquipmentController {
         photos: media.filter((m) => m.kind === 'photo').map(toMediaRow),
       },
       canManage,
+      maintenanceTasks: toMaintenanceTaskRows(maintenanceTasks),
+      taskEquipment: toTaskEquipmentSource({ rig }),
+      taskPermissions,
     })
   }
 
@@ -430,12 +447,14 @@ export default class BoatEquipmentController {
       engineMedia,
       engineParts,
       diagnosticCheckedStepKeys,
+      taskPermissions,
     ] = await Promise.all([
       this.maintenanceService.listEventsForEngine(boat.id, engineId),
       this.taskService.listForEngine(boat.id, engineId),
       this.mediaService.listForEntity('boat_engine', engineId),
       this.enginePartService.listForEngine(engineId),
       this.diagnosticService.getCheckedStepKeysIfEligible(engine),
+      maintenanceTaskPermissions(bouncer, boat),
     ])
 
     return inertia.render('boats/engine_show', {
@@ -485,17 +504,9 @@ export default class BoatEquipmentController {
           notes: p.notes,
         })),
       })),
-      maintenanceTasks: maintenanceTasks.map((t) => ({
-        id: t.id,
-        subject: t.subject,
-        title: t.title,
-        notes: t.notes,
-        status: t.status as 'open' | 'done',
-        dueAt: t.dueAt ? t.dueAt.toISODate() : null,
-        dueEngineHours: t.dueEngineHours,
-        boatEngineId: t.boatEngineId,
-        recurrenceIntervalEngineHours: t.recurrenceIntervalEngineHours,
-      })),
+      maintenanceTasks: toMaintenanceTaskRows(maintenanceTasks),
+      taskEquipment: toTaskEquipmentSource({ engines: [engine] }),
+      taskPermissions,
       diagnosticCheckedStepKeys,
       canManage,
       // Jamais `null` ici : le serializer d'Inertia jette « Cannot serialize

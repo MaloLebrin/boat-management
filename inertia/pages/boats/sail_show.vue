@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3'
-import { onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseBreadcrumb from '~/components/base/BaseBreadcrumb.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
@@ -8,23 +8,37 @@ import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseTabs from '~/components/base/BaseTabs.vue'
 import SailShowTabInfo from '~/components/boats/sail/show/tabs/SailShowTabInfo.vue'
 import SailShowTabPhotos from '~/components/boats/sail/show/tabs/SailShowTabPhotos.vue'
+import EquipmentTasksSection from '~/components/boats/maintenance/EquipmentTasksSection.vue'
 import { useT } from '~/composables/use_t'
-import type { BoatSailDetail } from '~/types/boat_show'
+import type { BoatSailDetail, MaintenanceTaskRow } from '~/types/boat_show'
+import type {
+  MaintenanceTaskPermissions,
+  TaskEquipmentRef,
+  TaskEquipmentSource,
+} from '#shared/types/maintenance'
 
 const { t } = useT()
 
-defineProps<{
+const props = defineProps<{
   boat: { id: number; name: string }
   sail: BoatSailDetail
   canManage: boolean
+  maintenanceTasks: MaintenanceTaskRow[]
+  taskEquipment: TaskEquipmentSource
+  taskPermissions: MaintenanceTaskPermissions
 }>()
 
-type TabKey = 'info' | 'photos'
+const taskRef = computed<TaskEquipmentRef>(() => ({ type: 'sail', id: props.sail.id }))
+const openTaskCount = computed(
+  () => props.maintenanceTasks.filter((t) => t.status === 'open').length
+)
+
+type TabKey = 'info' | 'tasks' | 'photos'
 const tab = ref<TabKey>('info')
 
 onMounted(() => {
   const fromUrl = new URLSearchParams(window.location.search).get('tab') as TabKey | null
-  if (fromUrl === 'photos') tab.value = fromUrl
+  if (fromUrl === 'photos' || fromUrl === 'tasks') tab.value = fromUrl
 })
 
 watch(tab, (newTab) => {
@@ -87,6 +101,11 @@ function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutra
         :tabs="[
           { key: 'info', label: t('boats.sailShow.tabs.info') },
           {
+            key: 'tasks',
+            label: t('boats.maintenance.tasks.sectionTitle'),
+            badge: String(openTaskCount || ''),
+          },
+          {
             key: 'photos',
             label: t('boats.sailShow.tabs.photos'),
             badge: String(sail.photos.length || ''),
@@ -98,7 +117,20 @@ function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutra
     <Transition name="tab" mode="out-in">
       <div :key="tab" class="mt-8">
         <SailShowTabInfo v-if="tab === 'info'" :sail="sail" />
-        <SailShowTabPhotos v-else :boat="boat" :sail="sail" :can-manage="canManage" />
+        <SailShowTabPhotos
+          v-else-if="tab === 'photos'"
+          :boat="boat"
+          :sail="sail"
+          :can-manage="canManage"
+        />
+        <EquipmentTasksSection
+          v-else
+          :boat-id="boat.id"
+          :equipment-ref="taskRef"
+          :equipment="taskEquipment"
+          :tasks="maintenanceTasks"
+          :permissions="taskPermissions"
+        />
       </div>
     </Transition>
   </div>

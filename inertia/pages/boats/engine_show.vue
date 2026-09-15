@@ -23,6 +23,7 @@ import { useT } from '~/composables/use_t'
 import { engineDisplayTitle, engineFuelLabel } from '~/utils/boat_enum_labels'
 import type { AiSuggestion } from '#shared/types/ai'
 import type { BoatShowEngine, MaintenanceEventRow, MaintenanceTaskRow } from '~/types/boat_show'
+import type { MaintenanceTaskPermissions, TaskEquipmentSource } from '#shared/types/maintenance'
 
 const { t } = useT()
 
@@ -31,6 +32,8 @@ const props = defineProps<{
   engine: BoatShowEngine
   maintenanceEvents: MaintenanceEventRow[]
   maintenanceTasks: MaintenanceTaskRow[]
+  taskEquipment: TaskEquipmentSource
+  taskPermissions: MaintenanceTaskPermissions
   diagnosticCheckedStepKeys: string[] | null
   canManage: boolean
   /** Prop différée (deferJson) — `undefined` tant qu'Inertia ne l'a pas résolue. */
@@ -325,7 +328,8 @@ function formatYear(iso: string): string {
           :open-tasks="openTasks"
           :sorted-open-tasks="sortedOpenTasks"
           :total-parts="totalParts"
-          :can-manage="canManage"
+          :task-equipment="taskEquipment"
+          :task-permissions="taskPermissions"
           :events-by-year-month="eventsByYearMonth"
         />
         <EngineShowTabDiagnostic

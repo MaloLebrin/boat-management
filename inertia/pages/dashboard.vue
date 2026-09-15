@@ -17,6 +17,7 @@ import type {
   DashboardStats,
   DashboardUrgentMaintenanceRow,
 } from '#shared/types/dashboard'
+import type { BoatTaskEquipment } from '#shared/types/maintenance'
 import { useT } from '~/composables/use_t'
 import { useDateFormat } from '~/composables/use_date_format'
 import { usePlan } from '~/composables/use_plan'
@@ -41,6 +42,9 @@ defineProps<{
   portOptions: NavigationLogPortOption[]
   canCreateNavigationLogs: boolean
   canCreateIncidents: boolean
+  canCreateMaintenanceTasks: boolean
+  /** Prop optionnelle, chargée par l'ajout rapide de tâche une fois le bateau choisi. */
+  taskEquipment?: BoatTaskEquipment
   canAddBoat: boolean
   boatQuota: QuotaUsage['boats']
 }>()
@@ -90,6 +94,8 @@ function dismissAlert() {
           :port-options="portOptions"
           :can-create-navigation-logs="canCreateNavigationLogs"
           :can-create-incidents="canCreateIncidents"
+          :can-create-maintenance-tasks="canCreateMaintenanceTasks"
+          :task-equipment="taskEquipment"
         />
         <!-- Navigation (pas une action) : rendu « lien » ghost pour se distinguer
              des chips d'action « + Entrée journal » / « + Incident » (#419). -->
