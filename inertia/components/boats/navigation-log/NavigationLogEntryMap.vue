@@ -3,6 +3,7 @@ import { computed, onMounted, onUnmounted, watch } from 'vue'
 import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import type { NavigationLogEntryRow } from '~/types/boat_show'
+import { BOAT_MARKER_HTML, trackDotHtml } from '~/utils/map_markers'
 
 const props = defineProps<{
   entries: NavigationLogEntryRow[]
@@ -33,21 +34,19 @@ async function initMap() {
   const latlngs = points.map((p) => [p.latitude!, p.longitude!] as [number, number])
 
   if (latlngs.length > 1) {
-    L.polyline(latlngs, { color: 'var(--color-brand, #2563eb)', weight: 2, opacity: 0.7 }).addTo(
-      map
-    )
+    L.polyline(latlngs, { color: 'var(--color-brand)', weight: 2, opacity: 0.7 }).addTo(map)
   }
 
   const dotIcon = L.divIcon({
     className: '',
-    html: '<div style="width:10px;height:10px;border-radius:50%;background:var(--color-brand,#2563eb);border:2px solid #fff;box-shadow:0 0 2px rgba(0,0,0,0.4);"></div>',
+    html: trackDotHtml({ size: 10, ring: true }),
     iconSize: [10, 10],
     iconAnchor: [5, 5],
   })
 
   const lastIcon = L.divIcon({
     className: '',
-    html: '<div class="boat-marker">⚓</div>',
+    html: BOAT_MARKER_HTML,
     iconSize: [24, 24],
     iconAnchor: [12, 12],
   })
