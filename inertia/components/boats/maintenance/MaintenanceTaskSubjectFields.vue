@@ -45,6 +45,13 @@ const subjectOptions = computed<ReadonlyArray<{ label: string; value: Maintenanc
   { label: t('boats.maintenance.tasks.other'), value: 'other' },
 ])
 
+// Une échéance doit dépasser le compteur : sinon la tâche naît en retard.
+const selectedEngineHours = computed(() => {
+  const locked = props.lockedEquipment
+  const id = locked?.type === 'engine' ? locked.id : Number(engineId.value)
+  return props.equipment.engines.find((engine) => engine.id === id)?.hours ?? null
+})
+
 const DEDICATED_SUBJECTS: ReadonlyArray<MaintenanceSubject> = ['engine', 'sail', 'rig', 'safety']
 const showsGenericSelect = computed(
   () => !DEDICATED_SUBJECTS.includes(subject.value) && genericOptions.value.length > 0
@@ -143,9 +150,16 @@ const showsGenericSelect = computed(
         id="task-due-hours"
         name="dueEngineHours"
         :label="t('boats.maintenance.tasks.dueEngineHours')"
+        :hint="
+          selectedEngineHours === null
+            ? undefined
+            : t('boats.maintenance.tasks.currentEngineHoursHint', {
+                hours: String(selectedEngineHours),
+              })
+        "
         type="number"
         inputmode="numeric"
-        min="0"
+        :min="String((selectedEngineHours ?? 0) + 1)"
         step="1"
         v-model="dueEngineHours"
         :errors="errors"

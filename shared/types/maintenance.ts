@@ -116,6 +116,7 @@ export interface TaskEquipmentSource {
     brand: string | null
     model: string | null
     serialNumber: string | null
+    hours: number | null
   }>
   sails: Array<{ id: number; sailType: string; areaM2: number | null }>
   rig: { id: number } | null
