@@ -1,6 +1,11 @@
 import { computed, toValue, type MaybeRefOrGetter } from 'vue'
 import { useT } from '~/composables/use_t'
-import { engineKindLabel, engineSerialSuffix, sailTypeLabel } from '~/utils/boat_enum_labels'
+import {
+  engineKindLabel,
+  engineSerialSuffix,
+  engineStrokeSuffix,
+  sailTypeLabel,
+} from '~/utils/boat_enum_labels'
 import type { TaskEquipmentRef, TaskEquipmentSource } from '#shared/types/maintenance'
 
 export interface TaskEquipmentOption {
@@ -18,7 +23,7 @@ export function useTaskEquipmentOptions(source: MaybeRefOrGetter<TaskEquipmentSo
   const engineOptions = computed<TaskEquipmentOption[]>(() =>
     toValue(source).engines.map((e) => ({
       value: String(e.id),
-      label: `${`${engineKindLabel(t, e.kind) ?? e.kind} · ${e.brand ?? ''} ${e.model ?? ''}`.trim()}${engineSerialSuffix(t, e.serialNumber)}`,
+      label: `${`${engineKindLabel(t, e.kind) ?? e.kind} · ${e.brand ?? ''} ${e.model ?? ''}`.trim()}${engineStrokeSuffix(t, e)}${engineSerialSuffix(t, e.serialNumber)}`,
     }))
   )
 

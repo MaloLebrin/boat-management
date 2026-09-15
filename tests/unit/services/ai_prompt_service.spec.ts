@@ -169,6 +169,7 @@ test.group('ai_prompt_service — boat user message (#460)', () => {
           {
             kind: 'outboard',
             fuel: 'essence',
+            strokeType: '4_stroke',
             family: 'outboard_petrol',
             hours: 480,
             installHours: 0,
@@ -188,6 +189,79 @@ test.group('ai_prompt_service — boat user message (#460)', () => {
     const fr = buildBoatUserMessage(input, 'fr')
     assert.include(fr, 'pièces à remplacer : Turbine')
     assert.include(fr, 'stock bas : Filtre à huile')
+  })
+
+  test('engine line includes the stroke suffix when cycle is known', ({ assert }) => {
+    const inputWith2T: BoatSuggestionsInput = {
+      ...EMPTY_BOAT_INPUT,
+      boat: {
+        ...EMPTY_BOAT_INPUT.boat,
+        engines: [
+          {
+            kind: 'outboard',
+            fuel: 'essence',
+            strokeType: '2_stroke',
+            family: 'outboard_2t',
+            hours: 100,
+            installHours: 0,
+            brand: 'Tohatsu',
+            model: 'MFS6',
+            partsToReplace: [],
+            lowStockParts: [],
+          },
+        ],
+      },
+    }
+    const inputWith4T: BoatSuggestionsInput = {
+      ...EMPTY_BOAT_INPUT,
+      boat: {
+        ...EMPTY_BOAT_INPUT.boat,
+        engines: [
+          {
+            kind: 'inboard',
+            fuel: 'diesel',
+            strokeType: null,
+            family: 'inboard_diesel_shaft',
+            hours: 300,
+            installHours: 0,
+            brand: 'Yanmar',
+            model: '3YM30',
+            partsToReplace: [],
+            lowStockParts: [],
+          },
+        ],
+      },
+    }
+    // Hors-bord essence sans cycle ni famille : pas de suffixe.
+    const inputNoStroke: BoatSuggestionsInput = {
+      ...EMPTY_BOAT_INPUT,
+      boat: {
+        ...EMPTY_BOAT_INPUT.boat,
+        engines: [
+          {
+            kind: 'outboard',
+            fuel: 'essence',
+            strokeType: null,
+            family: null,
+            hours: 50,
+            installHours: 0,
+            brand: 'Honda',
+            model: 'BF5',
+            partsToReplace: [],
+            lowStockParts: [],
+          },
+        ],
+      },
+    }
+
+    assert.include(buildBoatUserMessage(inputWith2T, 'en'), 'outboard Tohatsu MFS6 2T')
+    assert.include(buildBoatUserMessage(inputWith2T, 'fr'), 'outboard Tohatsu MFS6 2T')
+    // Diesel in-bord sans strokeType saisi → 4T déduit.
+    assert.include(buildBoatUserMessage(inputWith4T, 'en'), 'inboard Yanmar 3YM30 4T')
+    assert.include(buildBoatUserMessage(inputWith4T, 'fr'), 'inboard Yanmar 3YM30 4T')
+    // Hors-bord essence sans indice : pas de « 2T » ni « 4T ».
+    assert.notInclude(buildBoatUserMessage(inputNoStroke, 'en'), '2T')
+    assert.notInclude(buildBoatUserMessage(inputNoStroke, 'en'), '4T')
   })
 
   test('generic equipment is listed with its status and purchase date', ({ assert }) => {

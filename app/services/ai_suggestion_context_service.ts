@@ -75,6 +75,7 @@ export default class AiSuggestionContextService {
         engines: boat.engines.map((engine) => ({
           kind: engine.kind,
           fuel: engine.fuel,
+          strokeType: engine.strokeType,
           family: engineFamilyOf(engine),
           hours: engine.hours,
           installHours: engine.installHours,
@@ -171,6 +172,7 @@ export default class AiSuggestionContextService {
       engine: {
         kind: engine.kind,
         fuel: engine.fuel,
+        strokeType: engine.strokeType,
         family: engineFamilyOf(engine),
         brand: engine.brand,
         model: engine.model,

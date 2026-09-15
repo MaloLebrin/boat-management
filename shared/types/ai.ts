@@ -211,6 +211,8 @@ export interface BoatSuggestionsInput {
     engines: Array<{
       kind: string
       fuel: string | null
+      /** Cycle moteur saisi (2T / 4T), `null` si non renseigné. */
+      strokeType: string | null
       family: string | null
       hours: number | null
       installHours: number | null
@@ -267,6 +269,8 @@ export interface EngineSuggestionsInput {
   engine: {
     kind: string
     fuel: string | null
+    /** Cycle moteur saisi (2T / 4T), `null` si non renseigné. */
+    strokeType: string | null
     family: string | null
     brand: string | null
     model: string | null

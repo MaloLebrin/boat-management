@@ -16,6 +16,8 @@ export function toSparePartsEngineRow(
     model: engine.model,
     serialNumber: engine.serialNumber,
     kind: engine.kind,
+    fuel: engine.fuel,
+    strokeType: engine.strokeType,
     family: engine.family,
     status: engine.status,
     cartCount,

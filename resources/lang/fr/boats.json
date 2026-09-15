@@ -228,6 +228,10 @@
       "2_stroke": "2 temps",
       "4_stroke": "4 temps"
     },
+    "strokeTypeShort": {
+      "2_stroke": "2T",
+      "4_stroke": "4T"
+    },
     "navigationCategory": {
       "A": "Catégorie A – Navigation hauturière (>8 Bf, >4 m)",
       "B": "Catégorie B – Navigation hauturière (≤8 Bf, ≤4 m)",

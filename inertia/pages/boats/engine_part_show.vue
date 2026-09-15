@@ -24,6 +24,9 @@ const props = defineProps<{
     brand: string | null
     model: string | null
     serialNumber: string | null
+    strokeType: string | null
+    fuel: string | null
+    family: string | null
   }
   part: BoatShowEnginePart
   canManage: boolean

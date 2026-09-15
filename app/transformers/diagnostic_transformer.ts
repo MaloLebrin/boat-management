@@ -23,6 +23,8 @@ export function toDiagnosticEngineRow(
     model: engine.model,
     serialNumber: engine.serialNumber,
     kind: engine.kind,
+    fuel: engine.fuel,
+    strokeType: engine.strokeType,
     family: progress.family,
     status: engine.status,
     checkedCount: progress.checkedCount,

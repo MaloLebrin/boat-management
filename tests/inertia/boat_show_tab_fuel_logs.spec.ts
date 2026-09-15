@@ -9,6 +9,7 @@ vi.mock('@inertiajs/vue3', () => ({
     props: {
       appT: {
         'boats.options.engineKind.inboard': 'In-bord',
+        'boats.options.strokeTypeShort.4_stroke': '4T',
         'fuel_logs.count': '{count} plein(s)',
       },
       locale: 'fr',
@@ -55,6 +56,18 @@ describe('BoatShowTabFuelLogs', () => {
 
     expect(wrapper.text()).toContain('In-bord — Volvo Penta — D2-40')
     expect(wrapper.text()).not.toContain('inboard')
+  })
+
+  test('appends the engine cycle to the log caption', () => {
+    const dieselBoat = {
+      ...boat,
+      engines: [{ id: 7, kind: 'inboard', fuel: 'diesel', brand: 'Volvo Penta', model: 'D2-40' }],
+    } as any
+    const wrapper = mount(BoatShowTabFuelLogs, {
+      props: { boat: dieselBoat, fuelLogs, canManage: true, canDelete: false },
+    })
+
+    expect(wrapper.text()).toContain('In-bord — Volvo Penta — D2-40 · 4T')
   })
 
   test('renders no engine caption when the log is not tied to an engine', () => {

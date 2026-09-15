@@ -104,6 +104,11 @@ async function makeBoat(organizationId: number, name = 'Mistral II') {
     kind: 'outboard',
     brand: 'Yamaha',
     model: '4AS',
+    // Cycle indécidable (hors-bord essence sans famille) : le libellé reste
+    // « Yamaha 4AS », sans suffixe 2T/4T tiré au hasard par la factory.
+    fuel: 'essence',
+    strokeType: null,
+    family: null,
   }).create()
   return { boat, engine }
 }
@@ -1069,6 +1074,67 @@ test.group('Assistant FleetAi chat — agent actionnable et contexte de page', (
 
     assert.notInclude(calls[0].messages[0].content, 'Secret Yacht')
     assert.notInclude(calls[0].messages[0].content, 'current page')
+  })
+
+  test('roster includes stroke suffix in diesel engine label', async ({ assert, client }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({
+      organizationId: user.organizationId!,
+      name: 'Navire',
+    }).create()
+    const engine = await BoatEngineFactory.merge({
+      boatId: boat.id,
+      kind: 'inboard',
+      fuel: 'diesel',
+      family: 'inboard_diesel_shaft',
+      brand: 'Yanmar',
+      model: '3YM30',
+      strokeType: null,
+    }).create()
+    const calls = swapAiService(ANSWER_RESPONSE)
+
+    await client
+      .post('/assistant/conversations')
+      .loginAs(user)
+      .form({ message: 'Hello' })
+      .redirects(0)
+
+    const system = calls[0].messages[0]
+    assert.equal(system.role, 'system')
+    // Diesel in-bord sans strokeType saisi : 4T est deduit.
+    assert.include(system.content, `#${engine.id} Yanmar 3YM30 · 4T`)
+  })
+
+  test('engine page context includes deduced stroke label', async ({ assert, client }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({
+      organizationId: user.organizationId!,
+      name: 'Navire2',
+    }).create()
+    const engine = await BoatEngineFactory.merge({
+      boatId: boat.id,
+      kind: 'outboard',
+      fuel: 'essence',
+      family: 'outboard_2t',
+      strokeType: null,
+      brand: 'Yamaha',
+      model: '2CM',
+    }).create()
+    const calls = swapAiService(ANSWER_RESPONSE)
+
+    await client
+      .post('/assistant/conversations')
+      .loginAs(user)
+      .form({
+        message: 'Check engine',
+        pageUrl: `/boats/${boat.id}/engines/${engine.id}`,
+      })
+      .redirects(0)
+
+    const system = calls[0].messages[0]
+    assert.equal(system.role, 'system')
+    // famille outboard_2t : cycle 2T deduit, present dans le contexte de page.
+    assert.include(system.content, 'Yamaha 2CM · 2T')
   })
 
   test('un pageUrl trop long est rejeté par la validation, rien n’est créé', async ({

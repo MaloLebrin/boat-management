@@ -39,6 +39,7 @@ vi.mock('@inertiajs/vue3', () => ({
       appT: {
         'boats.options.engineKind.inboard': 'In-bord',
         'boats.options.engineKind.outboard': 'Hors-bord',
+        'boats.options.strokeTypeShort.2_stroke': '2T',
       },
       locale: 'fr',
     },
@@ -119,5 +120,20 @@ describe('BoatFuelLogForm', () => {
     expect(labels).toContain('In-bord — Volvo Penta D2-40')
     expect(labels).toContain('Hors-bord')
     expect(labels.join(' ')).not.toContain('inboard')
+  })
+
+  test('engine options show the engine cycle when it is known', () => {
+    const boatWithEngines = {
+      ...boat,
+      engines: [
+        { id: 7, kind: 'outboard', strokeType: '2_stroke', brand: 'Yamaha', model: '40' },
+        { id: 8, kind: 'outboard', fuel: 'essence', brand: 'Suzuki', model: 'DF20' },
+      ],
+    } as any
+    const wrapper = mount(BoatFuelLogForm, { props: { boat: boatWithEngines } })
+    const labels = wrapper.findAll('option').map((o) => o.text())
+
+    expect(labels).toContain('Hors-bord — Yamaha 40 · 2T')
+    expect(labels).toContain('Hors-bord — Suzuki DF20')
   })
 })

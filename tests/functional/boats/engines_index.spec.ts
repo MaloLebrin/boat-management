@@ -227,6 +227,38 @@ test.group('Engines index (functional)', (group) => {
     assert.equal(props.engines.meta.total, 7)
   })
 
+  test('GET /engines expose strokeType dans chaque EngineListItem', async ({ client, assert }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    await BoatEngineFactory.merge({
+      boatId: boat.id,
+      kind: 'inboard',
+      fuel: 'diesel',
+      family: 'inboard_diesel_shaft',
+      strokeType: '4_stroke',
+    }).create()
+    await BoatEngineFactory.merge({
+      boatId: boat.id,
+      kind: 'outboard',
+      fuel: 'essence',
+      family: 'outboard_2t',
+      strokeType: null,
+    }).create()
+
+    const response = await client.get('/engines').loginAs(user).withInertia()
+
+    const props = response.inertiaProps as IndexProps
+    // strokeType présent sur chaque ligne.
+    assert.isTrue(
+      props.engines.data.every((e) => Object.prototype.hasOwnProperty.call(e, 'strokeType'))
+    )
+    const diesel = props.engines.data.find((e) => e.fuel === 'diesel')
+    const outboard = props.engines.data.find((e) => e.family === 'outboard_2t')
+    assert.equal(diesel?.strokeType, '4_stroke')
+    // strokeType null transmis tel quel (pas effacé par le transformer).
+    assert.isNull(outboard?.strokeType)
+  })
+
   test('GET /engines redirects a boat owner to their portal', async ({ client }) => {
     const admin = await createAdminUser()
     const owner = await createBoatOwnerUser(admin.organizationId!)

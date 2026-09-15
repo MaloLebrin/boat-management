@@ -115,6 +115,7 @@ export default class EngineListService {
         'kind',
         'fuel',
         'family',
+        'strokeType',
         'status',
         'powerHp',
         'hours',

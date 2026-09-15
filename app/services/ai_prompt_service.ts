@@ -1,3 +1,4 @@
+import { ENGINE_STROKE_SHORT_LABELS, resolveEngineStrokeType } from '#shared/helpers/engine_stroke'
 import type { AiSuggestionLocale, BoatSuggestionsInput, FleetAnalysisInput } from '#shared/types/ai'
 
 /**
@@ -171,7 +172,9 @@ export function buildBoatUserMessage(
             if (e.lowStockParts.length > 0) {
               alerts.push(`${l.lowStock}${l.colon}${e.lowStockParts.join(', ')}`)
             }
-            return `- ${e.kind} ${e.brand ?? ''} ${e.model ?? ''} (${e.fuel ?? l.unknownFuel}, ${e.hours ?? '?'}h)${alerts.length > 0 ? ` — ${alerts.join(' ; ')}` : ''}`
+            const strokeType = resolveEngineStrokeType(e)
+            const strokeSuffix = strokeType ? ` ${ENGINE_STROKE_SHORT_LABELS[strokeType]}` : ''
+            return `- ${e.kind} ${e.brand ?? ''} ${e.model ?? ''}${strokeSuffix} (${e.fuel ?? l.unknownFuel}, ${e.hours ?? '?'}h)${alerts.length > 0 ? ` — ${alerts.join(' ; ')}` : ''}`
           })
           .join('\n')
       : l.noneMasculine

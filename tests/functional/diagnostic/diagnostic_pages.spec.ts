@@ -254,6 +254,72 @@ test.group('Diagnostic pages (functional)', (group) => {
     response.assertHeader('location', '/diagnostic/first-contact')
   })
 
+  test('GET /diagnostic expose fuel et strokeType dans DiagnosticEngineRow', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const outboard = await makeEligibleEngine(boat.id) // strokeType 2_stroke, fuel essence
+    const saildrive = await makeSaildriveEngine(boat.id) // strokeType 4_stroke, fuel diesel
+
+    const response = await client.get('/diagnostic').loginAs(user).withInertia()
+
+    response.assertStatus(200)
+    const props = response.inertiaProps as {
+      engines: Array<{ id: number; fuel: string | null; strokeType: string | null }>
+    }
+    const rows = new Map(props.engines.map((e) => [e.id, e]))
+
+    assert.isTrue(Object.prototype.hasOwnProperty.call(rows.get(outboard.id), 'fuel'))
+    assert.isTrue(Object.prototype.hasOwnProperty.call(rows.get(outboard.id), 'strokeType'))
+    assert.equal(rows.get(outboard.id)?.fuel, 'essence')
+    assert.equal(rows.get(outboard.id)?.strokeType, '2_stroke')
+    assert.equal(rows.get(saildrive.id)?.fuel, 'diesel')
+    assert.equal(rows.get(saildrive.id)?.strokeType, '4_stroke')
+  })
+
+  test('GET checklist expose fuel et strokeType dans les props moteur', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const engine = await makeEligibleEngine(boat.id)
+
+    const response = await client
+      .get(`/boats/${boat.id}/engines/${engine.id}/diagnostic`)
+      .loginAs(user)
+      .withInertia()
+
+    response.assertStatus(200)
+    response.assertInertiaComponent('diagnostic/checklist')
+    const props = response.inertiaProps as {
+      engine: { fuel: string | null; strokeType: string | null }
+    }
+    assert.equal(props.engine.fuel, 'essence')
+    assert.equal(props.engine.strokeType, '2_stroke')
+  })
+
+  test('GET sheet expose fuel et strokeType dans les props moteur', async ({ client, assert }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const engine = await makeEligibleEngine(boat.id)
+
+    const response = await client
+      .get(`/boats/${boat.id}/engines/${engine.id}/diagnostic/sheets/fuel`)
+      .loginAs(user)
+      .withInertia()
+
+    response.assertStatus(200)
+    response.assertInertiaComponent('diagnostic/sheet')
+    const props = response.inertiaProps as {
+      engine: { fuel: string | null; strokeType: string | null }
+    }
+    assert.equal(props.engine.fuel, 'essence')
+    assert.equal(props.engine.strokeType, '2_stroke')
+  })
+
   test('GET /diagnostic is refused to a boat_owner (no maintenance.view)', async ({ client }) => {
     const admin = await createAdminUser()
     const owner = await createBoatOwnerUser(admin.organizationId!)

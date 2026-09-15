@@ -13,7 +13,7 @@ import { computed, ref } from 'vue'
 import { shouldReopenEngineForm } from '~/composables/use_engine_form_draft'
 import { useT } from '~/composables/use_t'
 import { useDateFormat } from '~/composables/use_date_format'
-import { engineFuelLabel } from '~/utils/boat_enum_labels'
+import { engineFuelLabel, engineStrokeShortLabel } from '~/utils/boat_enum_labels'
 import type { TaskEquipmentRef } from '#shared/types/maintenance'
 
 const props = withDefaults(
@@ -88,6 +88,9 @@ function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutra
               <p class="truncate text-sm font-semibold text-fg">
                 {{ t(`boats.engines.kindValues.${e.kind}`) }}
               </p>
+              <BaseBadge v-if="engineStrokeShortLabel(t, e)" variant="neutral">
+                {{ engineStrokeShortLabel(t, e) }}
+              </BaseBadge>
               <BaseBadge v-if="e.fuel" variant="neutral">
                 {{ engineFuelLabel(t, e.fuel) }}
               </BaseBadge>

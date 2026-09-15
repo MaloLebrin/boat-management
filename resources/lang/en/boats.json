@@ -228,6 +228,10 @@
       "2_stroke": "2-stroke",
       "4_stroke": "4-stroke"
     },
+    "strokeTypeShort": {
+      "2_stroke": "2T",
+      "4_stroke": "4T"
+    },
     "navigationCategory": {
       "A": "Category A – Ocean (>Force 8, >4m)",
       "B": "Category B – Offshore (≤Force 8, ≤4m)",

@@ -1,3 +1,4 @@
+import { ENGINE_STROKE_SHORT_LABELS, resolveEngineStrokeType } from '#shared/helpers/engine_stroke'
 import type { AiSuggestionLocale, EngineSuggestionsInput } from '#shared/types/ai'
 
 /**
@@ -78,6 +79,9 @@ export function buildEngineSuggestionsUserMessage(
   const { engine, parts, maintenanceTasks, maintenanceEvents, catalogOperations } = input
   const l = LABELS[locale]
 
+  const strokeType = resolveEngineStrokeType(engine)
+  const strokeSuffix = strokeType ? ` ${ENGINE_STROKE_SHORT_LABELS[strokeType]}` : ''
+
   const hoursInfo =
     engine.hours === null
       ? l.unknownHours
@@ -135,7 +139,7 @@ export function buildEngineSuggestionsUserMessage(
   if (locale === 'en') {
     return `Analyze this boat engine and generate specific maintenance suggestions:
 
-Engine: ${engine.kind} ${engine.brand ?? ''} ${engine.model ?? ''} (${engine.fuel ?? l.unknownFuel}${engine.powerHp !== null ? `, ${engine.powerHp}hp` : ''}${engine.manufacturedAt ? `, manufactured ${engine.manufacturedAt}` : ''})
+Engine: ${engine.kind} ${engine.brand ?? ''} ${engine.model ?? ''}${strokeSuffix} (${engine.fuel ?? l.unknownFuel}${engine.powerHp !== null ? `, ${engine.powerHp}hp` : ''}${engine.manufacturedAt ? `, manufactured ${engine.manufacturedAt}` : ''})
 Status: ${engine.status}, Hours: ${hoursInfo}
 
 Parts:
@@ -153,7 +157,7 @@ ${catalogList}`
 
   return `Analyse ce moteur de bateau et génère des suggestions de maintenance spécifiques :
 
-Moteur : ${engine.kind} ${engine.brand ?? ''} ${engine.model ?? ''} (${engine.fuel ?? l.unknownFuel}${engine.powerHp !== null ? `, ${engine.powerHp}ch` : ''}${engine.manufacturedAt ? `, fabriqué le ${engine.manufacturedAt}` : ''})
+Moteur : ${engine.kind} ${engine.brand ?? ''} ${engine.model ?? ''}${strokeSuffix} (${engine.fuel ?? l.unknownFuel}${engine.powerHp !== null ? `, ${engine.powerHp}ch` : ''}${engine.manufacturedAt ? `, fabriqué le ${engine.manufacturedAt}` : ''})
 Statut : ${engine.status}, Heures : ${hoursInfo}
 
 Pièces :

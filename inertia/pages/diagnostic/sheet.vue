@@ -25,6 +25,8 @@ const props = defineProps<{
     serialNumber: string | null
     kind: string
     family: EngineFamily | null
+    fuel: string | null
+    strokeType: string | null
     status: string
   }
   sheetSlug: DiagnosticSheetSlug

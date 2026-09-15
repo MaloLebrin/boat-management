@@ -6,6 +6,7 @@ import {
   SAIL_TYPE_OPTIONS,
 } from '../../shared/constants/boats/boat_form_options'
 import { MAINTENANCE_SUBJECT_OPTIONS } from '../../shared/constants/maintenance/maintenance_subjects'
+import { resolveEngineStrokeType, type EngineStrokeSignals } from '#shared/helpers/engine_stroke'
 
 type T = (key: string) => string
 
@@ -66,7 +67,7 @@ export function engineCaptionLabel(t: T, caption: string | null | undefined): st
   return engineKindLabel(t, caption)
 }
 
-interface EngineTitleLike {
+interface EngineTitleLike extends EngineStrokeSignals {
   brand: string | null
   model: string | null
   kind: string
@@ -82,13 +83,28 @@ export function engineSerialSuffix(t: T, serialNumber: string | null | undefined
   return serialNumber ? ` · ${t('boats.engines.sn')} ${serialNumber}` : ''
 }
 
+/** Short engine cycle label (« 2T » / « 4T »), resolved or inferred — `null` when undecidable. */
+export function engineStrokeShortLabel(t: T, engine: EngineStrokeSignals): string | null {
+  const strokeType = resolveEngineStrokeType(engine)
+  return strokeType ? t(`boats.options.strokeTypeShort.${strokeType}`) : null
+}
+
+/**
+ * Suffix « · 4T » to append after an engine's name — empty when the cycle is
+ * neither entered nor safely inferable (see `resolveEngineStrokeType`).
+ */
+export function engineStrokeSuffix(t: T, engine: EngineStrokeSignals): string {
+  const label = engineStrokeShortLabel(t, engine)
+  return label ? ` · ${label}` : ''
+}
+
 /**
  * Display title of an engine: its brand and model, falling back to the
- * translated `kind` when the engine carries neither (#472), always followed by
- * its serial number when it has one (#601).
+ * translated `kind` when the engine carries neither (#472), followed by its
+ * cycle (2T/4T) when known and by its serial number when it has one (#601).
  */
 export function engineDisplayTitle(t: T, engine: EngineTitleLike): string {
   const identity = [engine.brand, engine.model].filter(Boolean).join(' ').trim()
   const name = identity || engineKindLabel(t, engine.kind) || engine.kind
-  return `${name}${engineSerialSuffix(t, engine.serialNumber)}`
+  return `${name}${engineStrokeSuffix(t, engine)}${engineSerialSuffix(t, engine.serialNumber)}`
 }

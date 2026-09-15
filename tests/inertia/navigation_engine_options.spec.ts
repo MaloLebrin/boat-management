@@ -50,4 +50,28 @@ describe('toNavigationEngineOptions', () => {
 
     expect(options).toEqual([{ id: 1, label: 'Yanmar 4JH · translated:boats.engines.sn SN-42' }])
   })
+
+  test('appends the engine cycle between the name and the serial number', () => {
+    const options = toNavigationEngineOptions(t, [
+      engine({ id: 1, strokeType: '2_stroke', serialNumber: 'SN-42' }),
+      engine({ id: 2, brand: null, model: null, kind: 'inboard', fuel: 'diesel' }),
+    ])
+
+    expect(options).toEqual([
+      {
+        id: 1,
+        label:
+          'Yanmar 4JH · translated:boats.options.strokeTypeShort.2_stroke · translated:boats.engines.sn SN-42',
+      },
+      { id: 2, label: '#2 · translated:boats.options.strokeTypeShort.4_stroke' },
+    ])
+  })
+
+  test('omits the cycle when it cannot be inferred', () => {
+    const options = toNavigationEngineOptions(t, [
+      engine({ id: 1, kind: 'outboard', fuel: 'essence' }),
+    ])
+
+    expect(options).toEqual([{ id: 1, label: 'Yanmar 4JH' }])
+  })
 })

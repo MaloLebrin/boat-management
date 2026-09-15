@@ -9,6 +9,43 @@ import { createAdminUser } from '#tests/functional/helpers'
 import Media from '#models/media'
 import { CloudinaryService } from '#services/cloudinary_service'
 
+test.group('BoatEngineParts — show (functional)', (group) => {
+  group.each.setup(() => truncateDb())
+
+  test('GET engine_part_show expose strokeType et fuel dans les props moteur', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const engine = await BoatEngineFactory.merge({
+      boatId: boat.id,
+      kind: 'outboard',
+      fuel: 'essence',
+      family: 'outboard_4t',
+      strokeType: '4_stroke',
+      brand: 'Yamaha',
+      model: 'F60',
+    }).create()
+    const part = await BoatEnginePartFactory.merge({ boatEngineId: engine.id }).create()
+
+    const response = await client
+      .get(`/boats/${boat.id}/engines/${engine.id}/parts/${part.id}`)
+      .loginAs(user)
+      .withInertia()
+
+    response.assertStatus(200)
+    response.assertInertiaComponent('boats/engine_part_show')
+    const props = response.inertiaProps as {
+      engine: { id: number; fuel: string | null; strokeType: string | null; family: string | null }
+    }
+    assert.equal(props.engine.id, engine.id)
+    assert.equal(props.engine.fuel, 'essence')
+    assert.equal(props.engine.strokeType, '4_stroke')
+    assert.equal(props.engine.family, 'outboard_4t')
+  })
+})
+
 test.group('BoatEngineParts — destroyMedia (functional)', (group) => {
   group.each.setup(() => truncateDb())
 
