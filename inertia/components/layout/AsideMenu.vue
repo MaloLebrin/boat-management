@@ -5,8 +5,6 @@ import { computed } from 'vue'
 import AssistantEntryButton from '~/components/assistant/AssistantEntryButton.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import Logo from '~/components/Logo.vue'
-import LanguageSwitcher from '~/components/layout/LanguageSwitcher.vue'
-import ThemeSwitcher from '~/components/layout/ThemeSwitcher.vue'
 import NavItem from '~/components/layout/NavItem.vue'
 import NavScrollArea from '~/components/layout/NavScrollArea.vue'
 import NotificationBell from '~/components/layout/NotificationBell.vue'
@@ -81,10 +79,6 @@ function isActive(path: string): boolean {
           :icon="settingsItem.icon"
           :is-active="isActive(settingsItem.path)"
         />
-      </div>
-      <div class="flex items-center justify-between mb-3 px-0">
-        <LanguageSwitcher />
-        <ThemeSwitcher tone="onDark" />
       </div>
       <div class="flex items-center gap-3 mb-3">
         <div
