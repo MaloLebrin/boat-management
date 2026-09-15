@@ -8,7 +8,6 @@ import BaseCard from '~/components/base/BaseCard.vue'
 import DashboardAiPanel from '~/components/dashboard/DashboardAiPanel.vue'
 import DashboardStatsGrid from '~/components/dashboard/DashboardStatsGrid.vue'
 import PortDashboardCard from '~/components/dashboard/PortDashboardCard.vue'
-import NewBoatButton from '~/components/boats/NewBoatButton.vue'
 import DashboardQuickAddActions from '~/components/dashboard/DashboardQuickAddActions.vue'
 import type {
   DashboardBoatSummary,
@@ -88,22 +87,25 @@ function dismissAlert() {
         <h1 class="text-3xl font-semibold tracking-tight text-fg">{{ t('dashboard.title') }}</h1>
         <p class="mt-2 text-base text-fg-muted">{{ t('dashboard.subtitle') }}</p>
       </div>
-      <div class="flex flex-wrap items-center gap-2">
+      <!-- `ml-auto` : quand le groupe passe sous le titre (mobile), il reste calé à droite
+           pour que le panneau du menu « + Créer » (ancré à droite) reste dans l'écran. -->
+      <div class="ml-auto flex flex-wrap items-center gap-2">
         <DashboardQuickAddActions
           :boats="boats"
           :port-options="portOptions"
           :can-create-navigation-logs="canCreateNavigationLogs"
           :can-create-incidents="canCreateIncidents"
           :can-create-maintenance-tasks="canCreateMaintenanceTasks"
+          :can-add-boat="canAddBoat"
+          :boat-quota="boatQuota"
           :task-equipment="taskEquipment"
         />
         <!-- Navigation (pas une action) : rendu « lien » ghost pour se distinguer
-             des chips d'action « + Entrée journal » / « + Incident » (#419). -->
+             du menu d'actions « + Créer » (#419). -->
         <BaseButton variant="ghost" route="boats.index">
           <span>{{ t('nav.boats') }}</span>
           <span aria-hidden="true">&rarr;</span>
         </BaseButton>
-        <NewBoatButton :can-add-boat="canAddBoat" :quota="boatQuota" />
       </div>
     </div>
 

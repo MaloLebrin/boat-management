@@ -41,7 +41,6 @@ const stubs = {
   DashboardAiPanel: { template: '<div />' },
   DashboardQuickAddActions: { template: '<div />' },
   DashboardStatsGrid: { template: '<div />' },
-  NewBoatButton: { template: '<div />' },
   PortDashboardCard: { template: '<div class="port-dashboard-card" />' },
 }
 

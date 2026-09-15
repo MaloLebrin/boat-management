@@ -3,9 +3,12 @@
   "subtitle": "Overview of your fleet and upcoming maintenance.",
   "newBoat": "New boat",
   "quickAdd": {
-    "logbook": "+ Logbook entry",
-    "incident": "+ Incident",
-    "task": "+ Task",
+    "menuLabel": "Create",
+    "menuAria": "Create…",
+    "boat": "A boat",
+    "logbook": "A logbook entry",
+    "incident": "An incident",
+    "task": "A task",
     "taskModalTitle": "Add a task",
     "selectBoat": "Boat",
     "selectBoatPlaceholder": "— Choose a boat —"

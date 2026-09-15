@@ -3,9 +3,12 @@
   "subtitle": "Vue d'ensemble de votre flotte et de la maintenance à venir.",
   "newBoat": "Nouveau bateau",
   "quickAdd": {
-    "logbook": "+ Entrée journal",
-    "incident": "+ Incident",
-    "task": "+ Tâche",
+    "menuLabel": "Créer",
+    "menuAria": "Créer…",
+    "boat": "Un bateau",
+    "logbook": "Une entrée de journal",
+    "incident": "Un incident",
+    "task": "Une tâche",
     "taskModalTitle": "Ajouter une tâche",
     "selectBoat": "Bateau",
     "selectBoatPlaceholder": "— Choisir un bateau —"
