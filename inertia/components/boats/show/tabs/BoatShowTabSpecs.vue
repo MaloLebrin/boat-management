@@ -6,8 +6,7 @@ import BaseCard from '~/components/base/BaseCard.vue'
 import { useCountries } from '~/composables/use_countries'
 import { useT } from '~/composables/use_t'
 import type { BoatShowDetail } from '~/types/boat_show'
-import { boatCategoryLabel } from '~/utils/boat_category_label'
-import { propulsionLabel } from '~/utils/boat_propulsion_label'
+import { boatCategoryLabel, propulsionLabel } from '~/utils/boat_enum_labels'
 
 defineProps<{
   boat: BoatShowDetail

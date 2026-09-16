@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import { propulsionLabel } from '../../inertia/utils/boat_propulsion_label'
+import { propulsionLabel } from '../../inertia/utils/boat_enum_labels'
 
 describe('propulsionLabel', () => {
   const t = (key: string) => `translated:${key}`

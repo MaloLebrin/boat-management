@@ -17,6 +17,7 @@ import type {
   TaskEquipmentRef,
   TaskEquipmentSource,
 } from '#shared/types/maintenance'
+import { equipmentStatusVariant } from '~/utils/status_variants'
 
 const { t } = useT()
 
@@ -43,13 +44,6 @@ const tab = useTabDeepLink<TabKey>({
   defaultTab: 'info',
   initialTabParam: props.initialTab,
 })
-
-function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutral' {
-  if (status === 'operational') return 'success'
-  if (status === 'in_maintenance') return 'info'
-  if (status === 'out_of_service') return 'warning'
-  return 'neutral'
-}
 </script>
 
 <template>
@@ -73,7 +67,7 @@ function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutra
         <div class="min-w-0">
           <div class="flex flex-wrap items-center gap-3">
             <BaseHeading level="1">{{ t(`boats.options.sailType.${sail.sailType}`) }}</BaseHeading>
-            <BaseBadge :variant="statusVariant(sail.status)">
+            <BaseBadge :variant="equipmentStatusVariant(sail.status)">
               {{ t(`equipment.status.${sail.status}`) }}
             </BaseBadge>
           </div>

@@ -14,6 +14,7 @@ import { useT } from '~/composables/use_t'
 import { useDateFormat } from '~/composables/use_date_format'
 import { sailMaterialLabel, sailTypeLabel } from '~/utils/boat_enum_labels'
 import type { TaskEquipmentRef } from '#shared/types/maintenance'
+import { equipmentStatusVariant } from '~/utils/status_variants'
 
 withDefaults(
   defineProps<{
@@ -30,13 +31,6 @@ defineEmits<{ (e: 'addTask', equipment: TaskEquipmentRef): void }>()
 const { t } = useT()
 const { formatDate } = useDateFormat()
 const isCreateOpen = ref(false)
-
-function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutral' {
-  if (status === 'operational') return 'success'
-  if (status === 'in_maintenance') return 'info'
-  if (status === 'out_of_service') return 'warning'
-  return 'neutral'
-}
 </script>
 
 <template>
@@ -74,7 +68,7 @@ function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutra
               <BaseBadge v-if="s.material" variant="neutral">
                 {{ sailMaterialLabel(t, s.material) }}
               </BaseBadge>
-              <BaseBadge :variant="statusVariant(s.status)">
+              <BaseBadge :variant="equipmentStatusVariant(s.status)">
                 {{ t(`equipment.status.${s.status}`) }}
               </BaseBadge>
             </div>

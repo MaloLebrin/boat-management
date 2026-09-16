@@ -4,8 +4,8 @@ import { computed } from 'vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import type { BoatListItem } from './types'
 import { useT } from '~/composables/use_t'
-import { boatCategoryLabel } from '~/utils/boat_category_label'
-import { propulsionLabel } from '~/utils/boat_propulsion_label'
+import { maintenanceVariant } from '~/utils/status_variants'
+import { boatCategoryLabel, propulsionLabel } from '~/utils/boat_enum_labels'
 
 const { t } = useT()
 
@@ -17,12 +17,6 @@ const props = defineProps<{
 // pour éviter une colonne remplie uniquement de « — ».
 const showRegistration = computed(() => props.boats.some((b) => b.registrationNumber))
 const showCategory = computed(() => props.boats.some((b) => b.category))
-
-function maintenanceVariant(b: BoatListItem) {
-  if (b.maintenance.urgentCount > 0) return 'warning'
-  if (b.maintenance.upcomingCount > 0) return 'info'
-  return 'neutral'
-}
 
 function maintenanceLabel(b: BoatListItem) {
   if (b.maintenance.urgentCount > 0)
@@ -72,7 +66,7 @@ function maintenanceLabel(b: BoatListItem) {
             {{ propulsionLabel(t, boat.propulsionType) ?? '—' }}
           </td>
           <td class="px-4 py-3">
-            <BaseBadge :variant="maintenanceVariant(boat)">
+            <BaseBadge :variant="maintenanceVariant(boat.maintenance)">
               {{ maintenanceLabel(boat) }}
             </BaseBadge>
           </td>

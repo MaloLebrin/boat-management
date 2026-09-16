@@ -25,6 +25,7 @@ import { engineDisplayTitle, engineFuelLabel } from '~/utils/boat_enum_labels'
 import type { AiSuggestion } from '#shared/types/ai'
 import type { BoatShowEngine, MaintenanceEventRow, MaintenanceTaskRow } from '~/types/boat_show'
 import type { MaintenanceTaskPermissions, TaskEquipmentSource } from '#shared/types/maintenance'
+import { equipmentStatusVariant } from '~/utils/status_variants'
 
 const { t } = useT()
 
@@ -76,13 +77,6 @@ const statusOptions = computed(() => [
   { value: 'out_of_service', label: t('equipment.status.out_of_service') },
   { value: 'retired', label: t('equipment.status.retired') },
 ])
-
-function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutral' {
-  if (status === 'operational') return 'success'
-  if (status === 'in_maintenance') return 'info'
-  if (status === 'out_of_service') return 'warning'
-  return 'neutral'
-}
 
 function changeStatus(newStatus: string) {
   router.patch(
@@ -266,7 +260,7 @@ function formatYear(iso: string): string {
               class="w-48"
               @update:model-value="changeStatus"
             />
-            <BaseBadge v-else :variant="statusVariant(engine.status)">
+            <BaseBadge v-else :variant="equipmentStatusVariant(engine.status)">
               {{ t(`equipment.status.${engine.status}`) }}
             </BaseBadge>
           </div>

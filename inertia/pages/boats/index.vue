@@ -13,7 +13,7 @@ import UpgradePlanModal from '~/components/base/UpgradePlanModal.vue'
 import type { BoatListFilters, BoatsPaginated } from '~/components/boats/list/types'
 import type { QuotaUsage } from '../../../shared/types/plan'
 import { useT } from '~/composables/use_t'
-import { propulsionLabel } from '~/utils/boat_propulsion_label'
+import { propulsionLabel } from '~/utils/boat_enum_labels'
 import { useBoatOptions } from '~/composables/use_boat_options'
 
 const { t } = useT()

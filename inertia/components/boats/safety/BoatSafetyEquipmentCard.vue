@@ -12,6 +12,7 @@ import { useDateFormat } from '~/composables/use_date_format'
 import { suggestEquipmentActionType } from '#shared/helpers/equipment_action'
 import type { BoatShowSafetyEquipment, EquipmentActionPrefill } from '~/types/boat_show'
 import type { TaskEquipmentRef } from '#shared/types/maintenance'
+import { safetyStatusVariant } from '~/utils/status_variants'
 
 const props = withDefaults(
   defineProps<{
@@ -69,12 +70,6 @@ function openCreate() {
   isCreateOpen.value = true
 }
 
-function statusVariant(status: string): 'success' | 'warning' | 'danger' {
-  if (status === 'ok') return 'success'
-  if (status === 'to_check') return 'warning'
-  return 'danger'
-}
-
 const toDateInputValue = (iso: string | null) => (iso ? iso.slice(0, 10) : null)
 const openEdit = (item: BoatShowSafetyEquipment) => (editingItem.value = item)
 const closeEdit = () => (editingItem.value = null)
@@ -114,7 +109,7 @@ const closeEdit = () => (editingItem.value = null)
               <p class="truncate text-sm font-semibold text-fg">
                 {{ t(`boats.options.safetyEquipmentType.${item.equipmentType}`) }}
               </p>
-              <BaseBadge :variant="statusVariant(item.status)">
+              <BaseBadge :variant="safetyStatusVariant(item.status)">
                 {{ t(`boats.options.safetyEquipmentStatus.${item.status}`) }}
               </BaseBadge>
             </div>

@@ -20,10 +20,9 @@ import type { BoatTaskEquipment } from '#shared/types/maintenance'
 import { useT } from '~/composables/use_t'
 import { useDateFormat } from '~/composables/use_date_format'
 import { usePlan } from '~/composables/use_plan'
-import { propulsionLabel } from '~/utils/boat_propulsion_label'
-import { maintenanceSubjectLabel } from '~/utils/boat_enum_labels'
 import type { AiSuggestion, NavigationLogPortOption } from '~/types/boat_show'
 import type { QuotaUsage } from '../../shared/types/plan'
+import { maintenanceSubjectLabel, propulsionLabel } from '~/utils/boat_enum_labels'
 
 const { t } = useT()
 const { formatDate } = useDateFormat()

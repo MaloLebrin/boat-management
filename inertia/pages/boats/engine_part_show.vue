@@ -14,6 +14,7 @@ import { useTabDeepLink } from '~/composables/use_tab_deep_link'
 import { useT } from '~/composables/use_t'
 import { engineDisplayTitle } from '~/utils/boat_enum_labels'
 import type { BoatShowEnginePart } from '~/types/boat_show'
+import { wearStateVariant } from '~/utils/status_variants'
 
 const { t } = useT()
 
@@ -46,14 +47,6 @@ const isEditOpen = ref(false)
 
 function engineTitle(): string {
   return engineDisplayTitle(t, props.engine)
-}
-
-function wearStateVariant(state: string): 'success' | 'info' | 'warning' | 'neutral' | 'danger' {
-  if (state === 'new') return 'success'
-  if (state === 'good') return 'info'
-  if (state === 'worn') return 'warning'
-  if (state === 'to_replace') return 'danger'
-  return 'neutral'
 }
 </script>
 

@@ -5,7 +5,7 @@ import BaseBadge from '~/components/base/BaseBadge.vue'
 import type { EngineListItem } from '#shared/types/engine'
 import { useT } from '~/composables/use_t'
 import { engineDisplayTitle, engineKindLabel } from '~/utils/boat_enum_labels'
-import { engineStatusVariant } from '~/utils/engine_status'
+import { equipmentStatusVariant } from '~/utils/status_variants'
 
 const { t } = useT()
 
@@ -82,7 +82,7 @@ const showHours = computed(() => props.engines.some((engine) => engine.hours !==
             }}
           </td>
           <td class="px-4 py-3">
-            <BaseBadge :variant="engineStatusVariant(engine.status)">
+            <BaseBadge :variant="equipmentStatusVariant(engine.status)">
               {{ t(`equipment.status.${engine.status}`) }}
             </BaseBadge>
           </td>

@@ -1,6 +1,8 @@
 import {
+  BOAT_CATEGORY_OPTIONS,
   ENGINE_FUEL_OPTIONS,
   ENGINE_KIND_OPTIONS,
+  PROPULSION_OPTIONS,
   RIG_TYPE_OPTIONS,
   SAIL_MATERIAL_OPTIONS,
   SAIL_TYPE_OPTIONS,
@@ -107,4 +109,18 @@ export function engineDisplayTitle(t: T, engine: EngineTitleLike): string {
   const identity = [engine.brand, engine.model].filter(Boolean).join(' ').trim()
   const name = identity || engineKindLabel(t, engine.kind) || engine.kind
   return `${name}${engineStrokeSuffix(t, engine)}${engineSerialSuffix(t, engine.serialNumber)}`
+}
+
+/**
+ * Libellé traduit d'une catégorie de bateau (#571) — repli sur la valeur brute
+ * pour une catégorie inconnue. Rien à voir avec
+ * `boats.options.navigationCategory` (catégorie CE A/B/C/D).
+ */
+export function boatCategoryLabel(t: T, value: string | null | undefined): string | null {
+  return labelFor(BOAT_CATEGORY_OPTIONS, 'boats.options.category', t, value)
+}
+
+/** Libellé traduit du type de propulsion — repli sur la valeur brute pour une valeur inconnue. */
+export function propulsionLabel(t: T, value: string | null | undefined): string | null {
+  return labelFor(PROPULSION_OPTIONS, 'boats.options.propulsion', t, value)
 }

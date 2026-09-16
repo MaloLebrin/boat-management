@@ -5,7 +5,7 @@ import BaseCard from '~/components/base/BaseCard.vue'
 import type { EngineListItem } from '#shared/types/engine'
 import { useT } from '~/composables/use_t'
 import { engineDisplayTitle, engineKindLabel } from '~/utils/boat_enum_labels'
-import { engineStatusVariant } from '~/utils/engine_status'
+import { equipmentStatusVariant } from '~/utils/status_variants'
 
 const { t } = useT()
 
@@ -27,7 +27,7 @@ defineProps<{
           <h3 class="min-w-0 font-semibold text-fg group-hover:text-brand">
             {{ engineDisplayTitle(t, engine) }}
           </h3>
-          <BaseBadge :variant="engineStatusVariant(engine.status)" class="shrink-0">
+          <BaseBadge :variant="equipmentStatusVariant(engine.status)" class="shrink-0">
             {{ t(`equipment.status.${engine.status}`) }}
           </BaseBadge>
         </div>

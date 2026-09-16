@@ -6,6 +6,7 @@ import EquipmentAddTaskButton from '~/components/boats/maintenance/EquipmentAddT
 import { useT } from '~/composables/use_t'
 import type { BoatShowGenericEquipment } from '~/types/boat_show'
 import type { TaskEquipmentRef } from '#shared/types/maintenance'
+import { safetyStatusVariant } from '~/utils/status_variants'
 
 defineProps<{
   boatId: number
@@ -22,12 +23,6 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useT()
-
-function statusVariant(status: string): 'success' | 'warning' | 'danger' {
-  if (status === 'ok') return 'success'
-  if (status === 'to_check') return 'warning'
-  return 'danger'
-}
 </script>
 
 <template>
@@ -36,7 +31,7 @@ function statusVariant(status: string): 'success' | 'warning' | 'danger' {
       <div class="min-w-0">
         <div class="flex flex-wrap items-center gap-2">
           <p class="truncate text-sm font-semibold text-fg">{{ item.name }}</p>
-          <BaseBadge :variant="statusVariant(item.status)">
+          <BaseBadge :variant="safetyStatusVariant(item.status)">
             {{ t(`boats.options.genericEquipmentStatus.${item.status}`) }}
           </BaseBadge>
         </div>
