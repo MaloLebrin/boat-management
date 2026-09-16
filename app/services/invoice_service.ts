@@ -12,6 +12,12 @@ import InvoiceLine from '#models/invoice_line'
 import type Organization from '#models/organization'
 import { computeInvoiceTotals } from '#shared/helpers/invoice_totals'
 import { toDateTime } from '#shared/helpers/date'
+import {
+  clampInt,
+  normalizeEnum,
+  toIntegerOrUndefined,
+  toTrimmedStringOrUndefined,
+} from '#shared/helpers/query'
 import type {
   InvoiceListFilters,
   InvoiceKind,
@@ -28,8 +34,6 @@ import { inject } from '@adonisjs/core'
 import db from '@adonisjs/lucid/services/db'
 import type { TransactionClientContract } from '@adonisjs/lucid/types/database'
 import { DateTime } from 'luxon'
-
-export { InvoiceNotFoundError, NotAQuoteError, QuoteAlreadyConvertedError, CannotMarkPaidError }
 
 /**
  * Internal payload types that accept DateTime from VineJS validators.
@@ -54,51 +58,6 @@ const VALID_STATUSES: InvoiceStatus[] = ['draft', 'sent', 'paid', 'overdue', 'ca
 const VALID_KINDS: InvoiceKind[] = ['quote', 'invoice']
 const VALID_SORT_FIELDS: InvoiceSortField[] = ['issuedAt', 'number', 'total', 'status']
 const VALID_DIRECTIONS: InvoiceSortDirection[] = ['asc', 'desc']
-
-function toTrimmedStringOrUndefined(value: unknown): string | undefined {
-  if (typeof value !== 'string') return undefined
-  const trimmed = value.trim()
-  return trimmed ? trimmed : undefined
-}
-
-function toIntegerOrUndefined(value: unknown): number | undefined {
-  if (typeof value === 'number' && Number.isInteger(value)) return value
-  if (typeof value !== 'string') return undefined
-  const parsed = Number.parseInt(value, 10)
-  return Number.isFinite(parsed) ? parsed : undefined
-}
-
-function clampInt(value: number, min: number, max: number): number {
-  return Math.max(min, Math.min(max, value))
-}
-
-function normalizeStatus(value: unknown): InvoiceStatus | '' {
-  if (typeof value === 'string' && VALID_STATUSES.includes(value as InvoiceStatus)) {
-    return value as InvoiceStatus
-  }
-  return ''
-}
-
-function normalizeKind(value: unknown): InvoiceKind | '' {
-  if (typeof value === 'string' && VALID_KINDS.includes(value as InvoiceKind)) {
-    return value as InvoiceKind
-  }
-  return ''
-}
-
-function normalizeSort(value: unknown): InvoiceSortField {
-  if (typeof value === 'string' && VALID_SORT_FIELDS.includes(value as InvoiceSortField)) {
-    return value as InvoiceSortField
-  }
-  return 'issuedAt'
-}
-
-function normalizeDirection(value: unknown): InvoiceSortDirection {
-  if (typeof value === 'string' && VALID_DIRECTIONS.includes(value as InvoiceSortDirection)) {
-    return value as InvoiceSortDirection
-  }
-  return 'desc'
-}
 
 function normalizeDateString(value: unknown): string {
   if (typeof value !== 'string') return ''
@@ -125,13 +84,13 @@ function mapSortColumn(sort: InvoiceSortField): string {
 export default class InvoiceService {
   normalizeFilters(qs: Record<string, unknown>): InvoiceListFilters {
     const q = toTrimmedStringOrUndefined(qs.q) ?? ''
-    const status = normalizeStatus(qs.status)
-    const kind = normalizeKind(qs.kind)
+    const status = normalizeEnum(qs.status, VALID_STATUSES, '' as const)
+    const kind = normalizeEnum(qs.kind, VALID_KINDS, '' as const)
     const clientId = toIntegerOrUndefined(qs.clientId) ?? null
     const issuedFrom = normalizeDateString(qs.issuedFrom)
     const issuedTo = normalizeDateString(qs.issuedTo)
-    const sort = normalizeSort(qs.sort)
-    const direction = normalizeDirection(qs.direction)
+    const sort = normalizeEnum(qs.sort, VALID_SORT_FIELDS, 'issuedAt' as const)
+    const direction = normalizeEnum(qs.direction, VALID_DIRECTIONS, 'desc' as const)
     const page = clampInt(toIntegerOrUndefined(qs.page) ?? 1, 1, 10_000)
     const perPage = clampInt(toIntegerOrUndefined(qs.perPage) ?? 20, 1, 100)
 

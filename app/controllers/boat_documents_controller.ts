@@ -1,35 +1,21 @@
 import BoatPolicy from '#policies/boat_policy'
 import BoatDocumentService from '#services/boat_document_service'
-import BoatHullService, { BoatNotFoundError } from '#services/boat_hull_service'
 import { BoatDocumentNotFoundError } from '#exceptions/boat_document_errors'
 import { createBoatDocumentValidator, updateBoatDocumentValidator } from '#validators/boat_document'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
+import BoatContextService from '#services/boat_context_service'
 
 @inject()
 export default class BoatDocumentsController {
   constructor(
-    private boatService: BoatHullService,
+    private boatContext: BoatContextService,
     private documentService: BoatDocumentService
   ) {}
 
-  private async loadBoat(ctx: Pick<HttpContext, 'auth' | 'response' | 'params'>) {
-    const user = ctx.auth.getUserOrFail()
-    try {
-      const boat = await this.boatService.getForUserOrFail(user, Number(ctx.params.boatId))
-      return { user, boat }
-    } catch (error) {
-      if (error instanceof BoatNotFoundError) {
-        ctx.response.redirect('/boats')
-        return null
-      }
-      throw error
-    }
-  }
-
   async store({ request, response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const loaded = await this.loadBoat({ auth, response, params })
+    const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
     const { user, boat } = loaded
     await bouncer.with(BoatPolicy).authorize('edit', boat)
@@ -41,7 +27,7 @@ export default class BoatDocumentsController {
 
   async update({ request, response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const loaded = await this.loadBoat({ auth, response, params })
+    const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
     const { user, boat } = loaded
     await bouncer.with(BoatPolicy).authorize('edit', boat)
@@ -62,7 +48,7 @@ export default class BoatDocumentsController {
 
   async destroy({ response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const loaded = await this.loadBoat({ auth, response, params })
+    const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
     const { user, boat } = loaded
     await bouncer.with(BoatPolicy).authorize('edit', boat)

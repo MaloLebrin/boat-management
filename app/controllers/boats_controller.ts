@@ -34,7 +34,8 @@ import BoatIncidentService from '#services/boat_incident_service'
 import BoatMaintenanceService from '#services/boat_maintenance_service'
 import BoatMaintenanceSheetService from '#services/boat_maintenance_sheet_service'
 import BoatMaintenanceTaskService from '#services/boat_maintenance_task_service'
-import BoatService, { BoatNotFoundError } from '#services/boat_service'
+import BoatHullService from '#services/boat_hull_service'
+import { BoatNotFoundError } from '#exceptions/boat_errors'
 import { RegistrationNumberTakenError } from '#exceptions/boat_errors'
 import MediaService from '#services/media_service'
 import OrganizationService from '#services/organization_service'
@@ -57,7 +58,7 @@ import { initialTabParam } from '#utils/inertia_tab'
 @inject()
 export default class BoatsController {
   constructor(
-    private boatService: BoatService,
+    private boatService: BoatHullService,
     private maintenanceService: BoatMaintenanceService,
     private taskService: BoatMaintenanceTaskService,
     private sheetService: BoatMaintenanceSheetService,

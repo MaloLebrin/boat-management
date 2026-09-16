@@ -1,8 +1,9 @@
 import { test } from '@japa/runner'
-import BoatMaintenanceTaskService, {
+import BoatMaintenanceTaskService from '#services/boat_maintenance_task_service'
+import {
   BoatMaintenanceTaskNotFoundError,
   BoatMaintenanceTaskValidationError,
-} from '#services/boat_maintenance_task_service'
+} from '#exceptions/maintenance_errors'
 import BoatMaintenanceTask from '#models/boat_maintenance_task'
 import { DateTime } from 'luxon'
 import { UserFactory } from '#database/factories/user_factory'

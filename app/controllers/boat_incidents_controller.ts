@@ -1,6 +1,7 @@
 import { BoatIncidentNotFoundError, BoatIncidentValidationError } from '#exceptions/incident_errors'
 import BoatIncidentService from '#services/boat_incident_service'
-import BoatService, { BoatNotFoundError } from '#services/boat_service'
+import BoatHullService from '#services/boat_hull_service'
+import { BoatNotFoundError } from '#exceptions/boat_errors'
 import IncidentPolicy from '#policies/incident_policy'
 import { createBoatIncidentValidator, updateBoatIncidentValidator } from '#validators/boat_incident'
 import { inject } from '@adonisjs/core'
@@ -9,7 +10,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 @inject()
 export default class BoatIncidentsController {
   constructor(
-    private boatService: BoatService,
+    private boatService: BoatHullService,
     private boatIncidentService: BoatIncidentService
   ) {}
 

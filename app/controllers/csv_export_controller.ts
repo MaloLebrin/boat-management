@@ -1,4 +1,3 @@
-import BoatService, { BoatNotFoundError } from '#services/boat_service'
 import BoatPolicy from '#policies/boat_policy'
 import BoatMaintenanceService from '#services/boat_maintenance_service'
 import BoatFuelLogService from '#services/boat_fuel_log_service'
@@ -10,12 +9,13 @@ import { buildCsv, csvFilename } from '#services/csv_export_service'
 import { budgetYearValidator } from '#validators/budget_validator'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
+import BoatContextService from '#services/boat_context_service'
 import { contentDisposition } from '#shared/helpers/content_disposition'
 
 @inject()
 export default class CsvExportController {
   constructor(
-    private boatService: BoatService,
+    private boatContext: BoatContextService,
     private maintenanceService: BoatMaintenanceService,
     private fuelLogService: BoatFuelLogService,
     private navigationLogService: NavigationLogService,
@@ -38,13 +38,9 @@ export default class CsvExportController {
       throw error
     }
 
-    let boat
-    try {
-      boat = await this.boatService.getForUserOrFail(user, Number(params.id))
-    } catch (error) {
-      if (error instanceof BoatNotFoundError) return response.redirect('/boats')
-      throw error
-    }
+    const resolved = await this.boatContext.resolveBoat({ auth, response, params }, 'id')
+    if (!resolved) return
+    const { boat } = resolved
 
     const events = await this.maintenanceService.listForBoat(user, boat)
 
@@ -96,13 +92,9 @@ export default class CsvExportController {
       throw error
     }
 
-    let boat
-    try {
-      boat = await this.boatService.getForUserOrFail(user, Number(params.id))
-    } catch (error) {
-      if (error instanceof BoatNotFoundError) return response.redirect('/boats')
-      throw error
-    }
+    const resolved = await this.boatContext.resolveBoat({ auth, response, params }, 'id')
+    if (!resolved) return
+    const { boat } = resolved
 
     const logs = await this.fuelLogService.listForBoat(user, boat)
 
@@ -151,13 +143,9 @@ export default class CsvExportController {
       throw error
     }
 
-    let boat
-    try {
-      boat = await this.boatService.getForUserOrFail(user, Number(params.id))
-    } catch (error) {
-      if (error instanceof BoatNotFoundError) return response.redirect('/boats')
-      throw error
-    }
+    const resolved = await this.boatContext.resolveBoat({ auth, response, params }, 'id')
+    if (!resolved) return
+    const { boat } = resolved
 
     const logs = await this.navigationLogService.listForBoat(boat)
 
@@ -215,13 +203,9 @@ export default class CsvExportController {
       throw error
     }
 
-    let boat
-    try {
-      boat = await this.boatService.getForUserOrFail(user, Number(params.id))
-    } catch (error) {
-      if (error instanceof BoatNotFoundError) return response.redirect('/boats')
-      throw error
-    }
+    const resolved = await this.boatContext.resolveBoat({ auth, response, params }, 'id')
+    if (!resolved) return
+    const { boat } = resolved
 
     await bouncer.with(BoatPolicy).authorize('view', boat)
 

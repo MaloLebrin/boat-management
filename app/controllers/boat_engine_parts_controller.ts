@@ -1,44 +1,32 @@
 import BoatPolicy from '#policies/boat_policy'
 import { toMediaRow } from '#transformers/media_row_transformer'
-import BoatEquipmentService, { BoatEquipmentNotFoundError } from '#services/boat_equipment_service'
-import BoatHullService, { BoatNotFoundError } from '#services/boat_hull_service'
-import MediaService, { MediaNotFoundError } from '#services/media_service'
+import BoatEquipmentService from '#services/boat_equipment_service'
+import { BoatEquipmentNotFoundError } from '#exceptions/boat_errors'
+import MediaService from '#services/media_service'
+import { MediaNotFoundError } from '#exceptions/media_errors'
 import OrganizationService from '#services/organization_service'
 import { CloudinaryFolders, CloudinaryService } from '#services/cloudinary_service'
 import { createEnginePartValidator, updateEnginePartValidator } from '#validators/boat_engine_part'
 import { storeBoatDocumentsValidator } from '#validators/media'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
+import BoatContextService from '#services/boat_context_service'
 import { initialTabParam } from '#utils/inertia_tab'
 import { contentDisposition } from '#shared/helpers/content_disposition'
 
 @inject()
 export default class BoatEnginePartsController {
   constructor(
-    private boatService: BoatHullService,
+    private boatContext: BoatContextService,
     private equipmentService: BoatEquipmentService,
     private mediaService: MediaService,
     private organizationService: OrganizationService,
     private cloudinaryService: CloudinaryService
   ) {}
 
-  private async loadBoat(ctx: Pick<HttpContext, 'auth' | 'response' | 'params'>) {
-    const user = ctx.auth.getUserOrFail()
-    try {
-      const boat = await this.boatService.getForUserOrFail(user, Number(ctx.params.boatId))
-      return { user, boat }
-    } catch (error) {
-      if (error instanceof BoatNotFoundError) {
-        ctx.response.redirect('/boats')
-        return null
-      }
-      throw error
-    }
-  }
-
   async show({ inertia, request, response, auth, params, bouncer }: HttpContext) {
     await auth.authenticate()
-    const loaded = await this.loadBoat({ auth, response, params })
+    const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
     const { boat } = loaded
 
@@ -85,7 +73,7 @@ export default class BoatEnginePartsController {
 
   async store({ request, response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const loaded = await this.loadBoat({ auth, response, params })
+    const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
     const { user, boat } = loaded
     await bouncer.with(BoatPolicy).authorize('edit', boat)
@@ -106,7 +94,7 @@ export default class BoatEnginePartsController {
 
   async update({ request, response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const loaded = await this.loadBoat({ auth, response, params })
+    const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
     const { user, boat } = loaded
     await bouncer.with(BoatPolicy).authorize('edit', boat)
@@ -133,7 +121,7 @@ export default class BoatEnginePartsController {
 
   async destroy({ response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const loaded = await this.loadBoat({ auth, response, params })
+    const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
     const { user, boat } = loaded
     await bouncer.with(BoatPolicy).authorize('edit', boat)
@@ -160,7 +148,7 @@ export default class BoatEnginePartsController {
 
   async storeDocument({ request, response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const loaded = await this.loadBoat({ auth, response, params })
+    const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
     const { boat, user } = loaded
     await bouncer.with(BoatPolicy).authorize('edit', boat)
@@ -211,7 +199,7 @@ export default class BoatEnginePartsController {
 
   async destroyMedia({ response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const loaded = await this.loadBoat({ auth, response, params })
+    const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
     const { boat } = loaded
     await bouncer.with(BoatPolicy).authorize('edit', boat)
@@ -252,7 +240,7 @@ export default class BoatEnginePartsController {
 
   async downloadMedia({ response, auth, params }: HttpContext) {
     await auth.authenticate()
-    const loaded = await this.loadBoat({ auth, response, params })
+    const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
 
     const { boat } = loaded

@@ -1,6 +1,7 @@
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
-import BoatService, { BoatNotFoundError } from '#services/boat_service'
+import BoatHullService from '#services/boat_hull_service'
+import { BoatNotFoundError } from '#exceptions/boat_errors'
 import BoatBudgetEntryService from '#services/boat_budget_entry_service'
 import BoatPolicy from '#policies/boat_policy'
 import { budgetEntryValidator } from '#validators/budget_entry_validator'
@@ -8,7 +9,7 @@ import { budgetEntryValidator } from '#validators/budget_entry_validator'
 @inject()
 export default class BoatBudgetEntryController {
   constructor(
-    private boatService: BoatService,
+    private boatService: BoatHullService,
     private entryService: BoatBudgetEntryService
   ) {}
 

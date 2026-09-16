@@ -1,11 +1,11 @@
 import MaintenancePolicy from '#policies/maintenance_policy'
 import AiAnalysisService from '#services/ai_analysis_service'
-import BoatEngineDiagnosticService, {
-  BoatEquipmentNotFoundError,
+import BoatEngineDiagnosticService from '#services/boat_engine_diagnostic_service'
+import { BoatEquipmentNotFoundError } from '#exceptions/boat_errors'
+import {
   DiagnosticStepNotFoundError,
   EngineNotDiagnosticEligibleError,
-} from '#services/boat_engine_diagnostic_service'
-import BoatHullService, { BoatNotFoundError } from '#services/boat_hull_service'
+} from '#exceptions/diagnostic_errors'
 import { isSheetForEngine } from '#shared/helpers/diagnostic'
 import { resolveEngineFamily } from '#shared/helpers/engine_family'
 import { toAppLocale } from '#shared/helpers/locale_path'
@@ -16,28 +16,15 @@ import {
 } from '#validators/boat_engine_diagnostic'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
+import BoatContextService from '#services/boat_context_service'
 
 @inject()
 export default class BoatEngineDiagnosticController {
   constructor(
-    private boatService: BoatHullService,
+    private boatContext: BoatContextService,
     private diagnosticService: BoatEngineDiagnosticService,
     private aiAnalysisService: AiAnalysisService
   ) {}
-
-  private async loadBoat(ctx: Pick<HttpContext, 'auth' | 'response' | 'params'>) {
-    const user = ctx.auth.getUserOrFail()
-    try {
-      const boat = await this.boatService.getForUserOrFail(user, Number(ctx.params.boatId))
-      return { user, boat }
-    } catch (error) {
-      if (error instanceof BoatNotFoundError) {
-        ctx.response.redirect('/boats')
-        return null
-      }
-      throw error
-    }
-  }
 
   async index({ inertia, auth, response }: HttpContext) {
     await auth.authenticate()
@@ -68,7 +55,7 @@ export default class BoatEngineDiagnosticController {
   async checklist(ctx: HttpContext) {
     const { inertia, auth, response, params, bouncer, session, i18n } = ctx
     await auth.authenticate()
-    const loaded = await this.loadBoat(ctx)
+    const loaded = await this.boatContext.resolveBoat(ctx)
     if (!loaded) return
     const { user, boat } = loaded
 
@@ -124,7 +111,7 @@ export default class BoatEngineDiagnosticController {
   async sheet(ctx: HttpContext) {
     const { inertia, auth, response, params, bouncer, session, i18n } = ctx
     await auth.authenticate()
-    const loaded = await this.loadBoat(ctx)
+    const loaded = await this.boatContext.resolveBoat(ctx)
     if (!loaded) return
     const { user, boat } = loaded
 
@@ -189,7 +176,7 @@ export default class BoatEngineDiagnosticController {
   async toggleStep(ctx: HttpContext) {
     const { request, auth, response, params, bouncer, session, i18n } = ctx
     await auth.authenticate()
-    const loaded = await this.loadBoat(ctx)
+    const loaded = await this.boatContext.resolveBoat(ctx)
     if (!loaded) return
     const { user, boat } = loaded
 
@@ -227,7 +214,7 @@ export default class BoatEngineDiagnosticController {
   async reset(ctx: HttpContext) {
     const { request, auth, response, params, bouncer, session, i18n } = ctx
     await auth.authenticate()
-    const loaded = await this.loadBoat(ctx)
+    const loaded = await this.boatContext.resolveBoat(ctx)
     if (!loaded) return
     const { user, boat } = loaded
 

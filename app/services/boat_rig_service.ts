@@ -1,4 +1,3 @@
-import { BoatEquipmentNotFoundError } from '#exceptions/boat_errors'
 import type Boat from '#models/boat'
 import BoatRig from '#models/boat_rig'
 import type Organization from '#models/organization'
@@ -9,7 +8,6 @@ import type { BoatRigPayload } from '#shared/types/boat'
 import { assertBoatInUserOrg, toDateOrNull } from '#utils/boat_utils'
 import { inject } from '@adonisjs/core'
 
-export { BoatEquipmentNotFoundError }
 export type { BoatRigPayload }
 
 @inject()

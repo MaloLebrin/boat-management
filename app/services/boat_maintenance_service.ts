@@ -36,7 +36,6 @@ import { inject } from '@adonisjs/core'
 import db from '@adonisjs/lucid/services/db'
 import { assertBoatInUserOrg } from '#utils/boat_utils'
 
-export { BoatMaintenanceNotFoundError, BoatMaintenanceValidationError }
 export type { CreateMaintenancePayload }
 
 const VALID_HISTORY_SUBJECTS: readonly MaintenanceTaskSubject[] = [

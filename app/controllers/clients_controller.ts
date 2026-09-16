@@ -1,10 +1,7 @@
-import ClientService, {
-  ClientAlreadyAnonymizedError,
-  ClientNotFoundError,
-} from '#services/client_service'
+import ClientService from '#services/client_service'
+import { ClientAlreadyAnonymizedError, ClientNotFoundError } from '#exceptions/client_errors'
 import BoatReservationService from '#services/boat_reservation_service'
 import QuotaService from '#services/quota_service'
-import { QuotaExceededError } from '#exceptions/quota_errors'
 import { UserNotInOrganizationError } from '#exceptions/organization_errors'
 import ClientPolicy from '#policies/client_policy'
 import { createClientValidator, updateClientValidator } from '#validators/client'
@@ -28,29 +25,16 @@ export default class ClientsController {
   ) {}
 
   /**
-   * Écriture : exige le module CRM actif (tier ou add-on #327). Bloque toute
-   * création/édition/suppression dès que le module est résilié.
+   * Organisation de l'utilisateur. Le plan est déjà vérifié par la garde de
+   * module posée sur le groupe de routes (`requireModulePlan`) ; il ne reste
+   * qu'à protéger le cas d'un utilisateur sans organisation (#279).
    */
-  private async loadOrgForWrite({
-    auth,
-    session,
-    response,
-    i18n,
-  }: Pick<HttpContext, 'auth' | 'session' | 'response' | 'i18n'>): Promise<Organization | null> {
+  private async loadOrg(auth: HttpContext['auth']): Promise<Organization> {
     const user = auth.getUserOrFail()
     await user.load('organization')
-
-    try {
-      await this.quotaService.assertCanManageClients(user.organization)
-    } catch (error) {
-      if (error instanceof QuotaExceededError) {
-        session.flash('error', i18n.t('flash.quota.clientsExceeded'))
-        response.redirect(BILLING_SETTINGS_PATH)
-        return null
-      }
-      throw error
+    if (user.organization === null) {
+      throw new UserNotInOrganizationError()
     }
-
     return user.organization
   }
 
@@ -140,8 +124,7 @@ export default class ClientsController {
 
   async store({ request, response, auth, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const org = await this.loadOrgForWrite({ auth, session, response, i18n })
-    if (!org) return
+    const org = await this.loadOrg(auth)
 
     await bouncer.with(ClientPolicy).authorize('create')
 
@@ -154,8 +137,7 @@ export default class ClientsController {
 
   async update({ request, response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const org = await this.loadOrgForWrite({ auth, session, response, i18n })
-    if (!org) return
+    const org = await this.loadOrg(auth)
 
     await bouncer.with(ClientPolicy).authorize('update')
 
@@ -183,8 +165,7 @@ export default class ClientsController {
 
   async destroy({ response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const org = await this.loadOrgForWrite({ auth, session, response, i18n })
-    if (!org) return
+    const org = await this.loadOrg(auth)
 
     await bouncer.with(ClientPolicy).authorize('delete')
 
@@ -206,8 +187,7 @@ export default class ClientsController {
 
   async anonymize({ response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const org = await this.loadOrgForWrite({ auth, session, response, i18n })
-    if (!org) return
+    const org = await this.loadOrg(auth)
 
     await bouncer.with(ClientPolicy).authorize('anonymize')
 

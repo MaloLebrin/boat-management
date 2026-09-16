@@ -1,39 +1,26 @@
-import BoatMaintenanceSheetService, {
+import BoatMaintenanceSheetService from '#services/boat_maintenance_sheet_service'
+import {
   BoatMaintenanceSheetItemConflictError,
   BoatMaintenanceSheetItemNotFoundError,
   BoatMaintenanceSheetNotFoundError,
   BoatMaintenanceSheetValidationError,
-} from '#services/boat_maintenance_sheet_service'
-import BoatHullService, { BoatNotFoundError } from '#services/boat_hull_service'
+} from '#exceptions/maintenance_errors'
 import MaintenancePolicy from '#policies/maintenance_policy'
 import { updateSheetItemValidator } from '#validators/boat_maintenance_sheet'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
+import BoatContextService from '#services/boat_context_service'
 
 @inject()
 export default class BoatMaintenanceSheetItemsController {
   constructor(
-    private boatService: BoatHullService,
+    private boatContext: BoatContextService,
     private sheetService: BoatMaintenanceSheetService
   ) {}
 
-  private async loadBoat(ctx: Pick<HttpContext, 'auth' | 'response' | 'params'>) {
-    const user = ctx.auth.getUserOrFail()
-    try {
-      const boat = await this.boatService.getForUserOrFail(user, Number(ctx.params.boatId))
-      return { user, boat }
-    } catch (error) {
-      if (error instanceof BoatNotFoundError) {
-        ctx.response.redirect('/boats')
-        return null
-      }
-      throw error
-    }
-  }
-
   async update({ request, response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const loaded = await this.loadBoat({ auth, response, params })
+    const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
     const { user, boat } = loaded
 

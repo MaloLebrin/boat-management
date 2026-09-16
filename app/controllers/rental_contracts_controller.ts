@@ -1,12 +1,9 @@
-import { BoatNotFoundError } from '#exceptions/boat_errors'
 import {
   RentalContractAlreadyExistsError,
   RentalContractInvalidTransitionError,
   RentalContractNoClientEmailError,
   RentalContractNotFoundError,
 } from '#exceptions/rental_contract_errors'
-import BoatService from '#services/boat_service'
-import BoatReservationService from '#services/boat_reservation_service'
 import RentalContractService from '#services/rental_contract_service'
 import RentalContractPdfService from '#services/rental_contract_pdf_service'
 import EmailQueueService from '#services/email_queue_service'
@@ -19,16 +16,13 @@ import { toRentalContractRow } from '#transformers/rental_contract_transformer'
 import { toBoatReservationRow } from '#transformers/boat_reservation_transformer'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
-import type Boat from '#models/boat'
-import type BoatReservation from '#models/boat_reservation'
-import type User from '#models/user'
+import BoatContextService from '#services/boat_context_service'
 import { contentDisposition } from '#shared/helpers/content_disposition'
 
 @inject()
 export default class RentalContractsController {
   constructor(
-    private boatService: BoatService,
-    private reservationService: BoatReservationService,
+    private boatContext: BoatContextService,
     private contractService: RentalContractService,
     private pdfService: RentalContractPdfService,
     private emailQueueService: EmailQueueService,
@@ -37,42 +31,11 @@ export default class RentalContractsController {
     private cloudinaryService: CloudinaryService
   ) {}
 
-  private async resolve(
-    user: User,
-    boatId: number,
-    reservationId: number,
-    response: HttpContext['response']
-  ): Promise<{ boat: Boat; reservation: BoatReservation } | null> {
-    let boat: Boat
-    try {
-      boat = await this.boatService.getForUserOrFail(user, boatId)
-    } catch (error) {
-      if (error instanceof BoatNotFoundError) {
-        response.redirect('/boats')
-        return null
-      }
-      throw error
-    }
-
-    const reservation = await this.reservationService.findForBoat(user, boat, reservationId)
-    if (!reservation) {
-      response.redirect(`/boats/${boatId}/reservations`)
-      return null
-    }
-
-    return { boat, reservation }
-  }
-
   async show({ inertia, params, auth, bouncer, response }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
-    const loaded = await this.resolve(
-      user,
-      Number(params.boatId),
-      Number(params.reservationId),
-      response
-    )
+    const loaded = await this.boatContext.resolveBoatAndReservation({ auth, params, response })
     if (!loaded) return
 
     const { boat, reservation } = loaded
@@ -99,12 +62,7 @@ export default class RentalContractsController {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
-    const loaded = await this.resolve(
-      user,
-      Number(params.boatId),
-      Number(params.reservationId),
-      response
-    )
+    const loaded = await this.boatContext.resolveBoatAndReservation({ auth, params, response })
     if (!loaded) return
 
     const { boat, reservation } = loaded
@@ -128,12 +86,7 @@ export default class RentalContractsController {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
-    const loaded = await this.resolve(
-      user,
-      Number(params.boatId),
-      Number(params.reservationId),
-      response
-    )
+    const loaded = await this.boatContext.resolveBoatAndReservation({ auth, params, response })
     if (!loaded) return
 
     const { boat, reservation } = loaded
@@ -159,12 +112,7 @@ export default class RentalContractsController {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
-    const loaded = await this.resolve(
-      user,
-      Number(params.boatId),
-      Number(params.reservationId),
-      response
-    )
+    const loaded = await this.boatContext.resolveBoatAndReservation({ auth, params, response })
     if (!loaded) return
 
     const { boat, reservation } = loaded
@@ -196,12 +144,7 @@ export default class RentalContractsController {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
-    const loaded = await this.resolve(
-      user,
-      Number(params.boatId),
-      Number(params.reservationId),
-      response
-    )
+    const loaded = await this.boatContext.resolveBoatAndReservation({ auth, params, response })
     if (!loaded) return
 
     const { boat, reservation } = loaded
@@ -249,12 +192,7 @@ export default class RentalContractsController {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
-    const loaded = await this.resolve(
-      user,
-      Number(params.boatId),
-      Number(params.reservationId),
-      response
-    )
+    const loaded = await this.boatContext.resolveBoatAndReservation({ auth, params, response })
     if (!loaded) return
 
     const { boat, reservation } = loaded
@@ -314,12 +252,7 @@ export default class RentalContractsController {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
-    const loaded = await this.resolve(
-      user,
-      Number(params.boatId),
-      Number(params.reservationId),
-      response
-    )
+    const loaded = await this.boatContext.resolveBoatAndReservation({ auth, params, response })
     if (!loaded) return
 
     const { boat, reservation } = loaded

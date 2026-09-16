@@ -5,7 +5,7 @@ import Organization from '#models/organization'
 import User from '#models/user'
 import BoatEquipmentService from '#services/boat_equipment_service'
 import BoatMaintenanceService from '#services/boat_maintenance_service'
-import BoatService from '#services/boat_service'
+import BoatHullService from '#services/boat_hull_service'
 import UserService from '#services/user_service'
 import { splitFullName } from '#shared/helpers/full_name'
 import app from '@adonisjs/core/services/app'
@@ -62,7 +62,7 @@ export default class MaloSeeder extends BaseSeeder {
       await organization.merge({ plan: 'pro' }).save()
     }
 
-    const boatService = await app.container.make(BoatService)
+    const boatService = await app.container.make(BoatHullService)
     const equipmentService = await app.container.make(BoatEquipmentService)
 
     // Find or create boat

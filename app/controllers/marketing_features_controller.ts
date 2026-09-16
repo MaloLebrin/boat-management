@@ -1,11 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { marketingPath, toAppLocale } from '#shared/helpers/locale_path'
 import type { MarketingPage } from '#shared/helpers/locale_path'
-import type {
-  FeatureMockType,
-  FeaturePageKey,
-  FeaturePageProps,
-} from '../../shared/types/marketing.js'
+import type { FeatureMockType, FeaturePageKey, FeaturePageProps } from '#shared/types/marketing'
 
 interface MarketingI18n {
   t: (key: string, params?: Record<string, string>) => string

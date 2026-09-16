@@ -1,5 +1,7 @@
-import BoatService, { BoatNotFoundError } from '#services/boat_service'
-import NavigationLogService, { NavigationLogNotFoundError } from '#services/navigation_log_service'
+import BoatHullService from '#services/boat_hull_service'
+import { BoatNotFoundError } from '#exceptions/boat_errors'
+import NavigationLogService from '#services/navigation_log_service'
+import { NavigationLogNotFoundError } from '#exceptions/navigation_log_errors'
 import CrewRolePdfService from '#services/crew_role_pdf_service'
 import CrewMember from '#models/crew_member'
 import NavigationLogPolicy from '#policies/navigation_log_policy'
@@ -11,7 +13,7 @@ import { contentDisposition } from '#shared/helpers/content_disposition'
 @inject()
 export default class CrewRolePdfController {
   constructor(
-    private boatService: BoatService,
+    private boatService: BoatHullService,
     private navigationLogService: NavigationLogService,
     private pdfService: CrewRolePdfService
   ) {}

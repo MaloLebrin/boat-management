@@ -11,7 +11,6 @@ import type User from '#models/user'
 import { CloudinaryService } from '#services/cloudinary_service'
 import QuotaService from '#services/quota_service'
 
-export { MediaNotFoundError }
 export type { UploadMediaPayload }
 
 function resourceTypeFromKind(kind: MediaKind, format?: string): 'image' | 'raw' {

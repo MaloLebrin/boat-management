@@ -1,7 +1,6 @@
 import { middleware } from '#start/kernel'
 import router from '@adonisjs/core/services/router'
 import { AI_PROVIDERS } from '#shared/types/ai'
-import { isThemePreference } from '#shared/types/theme'
 
 // Un fournisseur inconnu ne matche pas la route → 404 natif (pas de 500).
 const AI_PROVIDER_MATCHER = new RegExp(`^(${AI_PROVIDERS.join('|')})$`)
@@ -11,44 +10,11 @@ const BillingController = () => import('#controllers/billing_controller')
 const AuditLogsController = () => import('#controllers/audit_logs_controller')
 const CsvImportController = () => import('#controllers/csv_import_controller')
 
-router
-  .post('/locale', async ({ request, response, auth }) => {
-    const locale = request.input('locale')
-    if (locale === 'en' || locale === 'fr') {
-      // httpOnly: false is intentional — the JS language switcher reads this cookie client-side
-      response.cookie('locale', locale, { maxAge: '365d', path: '/', httpOnly: false })
-
-      // Persist the preference on the profile for authenticated users so it
-      // survives logout (cf. #414 / #403). The cookie alone is lost once a
-      // fresh browser session starts.
-      if (await auth.check()) {
-        auth.user!.locale = locale
-        await auth.user!.save()
-      }
-    }
-    return response.redirect().back()
-  })
-  .as('locale.set')
-
-router
-  .post('/theme', async ({ request, response, auth }) => {
-    const theme = request.input('theme')
-    if (isThemePreference(theme)) {
-      // Cookie signé, lu côté serveur pour rendre le bon thème dès la
-      // première réponse (cf. `resolveSharedTheme`).
-      response.cookie('theme', theme, { maxAge: '365d', path: '/' })
-
-      // Route publique : le switcher est aussi disponible sur le marketing et
-      // l'écran de login. Quand l'utilisateur est connecté, on persiste en base
-      // pour que la préférence le suive d'un appareil à l'autre.
-      if (await auth.check()) {
-        auth.user!.theme = theme
-        await auth.user!.save()
-      }
-    }
-    return response.redirect().back()
-  })
-  .as('theme.set')
+// Préférences pré-auth (switchers de langue et de thème, aussi disponibles
+// sur le marketing et l'écran de login) : persistées sur le profil quand
+// l'utilisateur est connecté, en cookie sinon.
+router.post('/locale', [SettingsController, 'setLocale']).as('locale.set')
+router.post('/theme', [SettingsController, 'setTheme']).as('theme.set')
 
 router
   .group(() => {

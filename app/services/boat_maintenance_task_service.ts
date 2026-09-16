@@ -28,7 +28,6 @@ import type {
 } from '#shared/types/maintenance'
 import { assertBoatInUserOrg } from '#utils/boat_utils'
 
-export { BoatMaintenanceTaskNotFoundError, BoatMaintenanceTaskValidationError }
 export type { CreateMaintenanceTaskPayload, MaintenanceTaskSubject, MarkTaskDonePayload }
 
 function toDateTime(value: Date | string | DateTime): DateTime {
