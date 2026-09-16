@@ -24,12 +24,57 @@ export interface DesiredSubscriptionModule {
 }
 
 /**
+ * Lignes `organization_modules` lues pour une instance d'`Organization`
+ * donnée. Une requête HTTP hydrate en général une seule instance
+ * (`auth.user.organization`) que se partagent le middleware Inertia et les
+ * paires `canX`/`assertCanX` de `QuotaService` : la table n'est lue qu'une
+ * fois par requête. Une entrée est périmée dès qu'une ligne est écrite
+ * (`OrganizationModule.generation`), y compris depuis un autre chemin.
+ */
+const ROWS_BY_ORGANIZATION = new WeakMap<
+  Organization,
+  { rows: OrganizationModule[]; generation: number }
+>()
+
+/**
  * Modules add-ons actifs par organisation (épic #327). Source de vérité de la
  * table `organization_modules` : la résolution des quotas effectifs (#329) et
  * la sync Stripe (#330) passent par ce service, jamais par le modèle direct.
  */
 @inject()
 export default class OrganizationModuleService {
+  async #rowsFor(org: Organization): Promise<OrganizationModule[]> {
+    const generation = OrganizationModule.generation
+    const cached = ROWS_BY_ORGANIZATION.get(org)
+    if (cached !== undefined && cached.generation === generation) {
+      return cached.rows
+    }
+    const rows = await OrganizationModule.query().where('organizationId', org.id).orderBy('module')
+    ROWS_BY_ORGANIZATION.set(org, { rows, generation })
+    return rows
+  }
+
+  /**
+   * Modules booléens et add-ons quantitatifs actifs, tels que partagés avec le
+   * front par le middleware Inertia. Même lecture (mise en cache sur
+   * l'instance) que `getEffectiveQuotas`.
+   */
+  async sharedProps(
+    org: Organization
+  ): Promise<{ activeModules: PlanModule[]; activeAddons: ActiveAddonInfo[] }> {
+    const rows = await this.#rowsFor(org)
+    return {
+      activeModules: rows.map((row) => row.module).filter((m): m is PlanModule => isPlanModule(m)),
+      activeAddons: rows
+        .filter((row) => isPlanAddon(row.module))
+        .map((row) => ({
+          addon: row.module as PlanAddon,
+          quantity: row.quantity,
+          source: row.source,
+        })),
+    }
+  }
+
   /** Modules booléens actifs (exclut les lignes d'add-on quantitatif). */
   async getActiveModules(organizationId: number): Promise<PlanModule[]> {
     const rows = await OrganizationModule.query()
@@ -94,7 +139,7 @@ export default class OrganizationModuleService {
    * règle de profil.
    */
   async getEffectiveQuotas(org: Organization): Promise<PlanQuotas> {
-    const rows = await OrganizationModule.query().where('organizationId', org.id)
+    const rows = await this.#rowsFor(org)
     const modules = rows.map((row) => row.module).filter((m): m is PlanModule => isPlanModule(m))
     const addons = rows
       .filter((row) => isPlanAddon(row.module))
@@ -145,6 +190,7 @@ export default class OrganizationModuleService {
       .where('module', module)
       .where('source', options.source ?? 'subscription')
       .delete()
+    OrganizationModule.invalidate()
   }
 
   /**
@@ -165,6 +211,7 @@ export default class OrganizationModuleService {
         .where('module', addon)
         .where('source', source)
         .delete()
+      OrganizationModule.invalidate()
       return
     }
     await OrganizationModule.updateOrCreate(
