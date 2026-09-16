@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3'
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed } from 'vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseBreadcrumb from '~/components/base/BaseBreadcrumb.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
@@ -9,6 +9,7 @@ import BaseTabs from '~/components/base/BaseTabs.vue'
 import RigShowTabInfo from '~/components/boats/rig/show/tabs/RigShowTabInfo.vue'
 import RigShowTabPhotos from '~/components/boats/rig/show/tabs/RigShowTabPhotos.vue'
 import EquipmentTasksSection from '~/components/boats/maintenance/EquipmentTasksSection.vue'
+import { useTabDeepLink } from '~/composables/use_tab_deep_link'
 import { useT } from '~/composables/use_t'
 import type { BoatRigDetail, MaintenanceTaskRow } from '~/types/boat_show'
 import type {
@@ -26,6 +27,8 @@ const props = defineProps<{
   maintenanceTasks: MaintenanceTaskRow[]
   taskEquipment: TaskEquipmentSource
   taskPermissions: MaintenanceTaskPermissions
+  /** `?tab=` vu par le serveur : le rendu SSR part du bon onglet (#463). */
+  initialTab?: string | null
 }>()
 
 const taskRef = computed<TaskEquipmentRef>(() => ({ type: 'rig', id: props.rig.id }))
@@ -34,21 +37,11 @@ const openTaskCount = computed(
 )
 
 type TabKey = 'info' | 'tasks' | 'photos'
-const tab = ref<TabKey>('info')
-
-onMounted(() => {
-  const fromUrl = new URLSearchParams(window.location.search).get('tab') as TabKey | null
-  if (fromUrl === 'photos' || fromUrl === 'tasks') tab.value = fromUrl
-})
-
-watch(tab, (newTab) => {
-  const url = new URL(window.location.href)
-  if (newTab === 'info') {
-    url.searchParams.delete('tab')
-  } else {
-    url.searchParams.set('tab', newTab)
-  }
-  window.history.replaceState(window.history.state, '', url.pathname + url.search)
+const TABS: readonly TabKey[] = ['info', 'tasks', 'photos']
+const tab = useTabDeepLink<TabKey>({
+  tabs: TABS,
+  defaultTab: 'info',
+  initialTabParam: props.initialTab,
 })
 
 function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutral' {

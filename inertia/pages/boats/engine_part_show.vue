@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3'
-import { onMounted, ref, watch } from 'vue'
+import { ref } from 'vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseBreadcrumb from '~/components/base/BaseBreadcrumb.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
@@ -10,6 +10,7 @@ import EnginePartModal from '~/components/engine/show/EnginePartModal.vue'
 import EnginePartShowTabDocuments from '~/components/engine/parts/show/tabs/EnginePartShowTabDocuments.vue'
 import EnginePartShowTabInfo from '~/components/engine/parts/show/tabs/EnginePartShowTabInfo.vue'
 import EnginePartShowTabPhotos from '~/components/engine/parts/show/tabs/EnginePartShowTabPhotos.vue'
+import { useTabDeepLink } from '~/composables/use_tab_deep_link'
 import { useT } from '~/composables/use_t'
 import { engineDisplayTitle } from '~/utils/boat_enum_labels'
 import type { BoatShowEnginePart } from '~/types/boat_show'
@@ -30,27 +31,18 @@ const props = defineProps<{
   }
   part: BoatShowEnginePart
   canManage: boolean
+  /** `?tab=` vu par le serveur : le rendu SSR part du bon onglet (#463). */
+  initialTab?: string | null
 }>()
 
 type TabKey = 'info' | 'photos' | 'documents'
-const VALID_TABS: TabKey[] = ['info', 'photos', 'documents']
-const tab = ref<TabKey>('info')
+const VALID_TABS: readonly TabKey[] = ['info', 'photos', 'documents']
+const tab = useTabDeepLink<TabKey>({
+  tabs: VALID_TABS,
+  defaultTab: 'info',
+  initialTabParam: props.initialTab,
+})
 const isEditOpen = ref(false)
-
-onMounted(() => {
-  const fromUrl = new URLSearchParams(window.location.search).get('tab') as TabKey | null
-  if (fromUrl && VALID_TABS.includes(fromUrl)) tab.value = fromUrl
-})
-
-watch(tab, (newTab) => {
-  const url = new URL(window.location.href)
-  if (newTab === 'info') {
-    url.searchParams.delete('tab')
-  } else {
-    url.searchParams.set('tab', newTab)
-  }
-  window.history.replaceState(window.history.state, '', url.pathname + url.search)
-})
 
 function engineTitle(): string {
   return engineDisplayTitle(t, props.engine)

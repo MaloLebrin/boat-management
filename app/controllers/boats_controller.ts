@@ -52,6 +52,7 @@ import { createBoatValidator, updateBoatValidator } from '#validators/boat'
 import { assignBoatValidator } from '#validators/marina_layout'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
+import { initialTabParam } from '#utils/inertia_tab'
 
 @inject()
 export default class BoatsController {
@@ -284,8 +285,7 @@ export default class BoatsController {
         : false
       const canManagePricing = pricingEnabled && canManageMaintenance
       const pricing = pricingRow ? toBoatPricingRow(pricingRow) : null
-      const tabParam = request.qs().tab
-      const initialTab = typeof tabParam === 'string' && tabParam !== '' ? tabParam : null
+      const initialTab = initialTabParam(request)
 
       return inertia.render('boats/show', {
         ...toShowShellProps(boat, {

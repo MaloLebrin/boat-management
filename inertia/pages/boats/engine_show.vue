@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head, router } from '@inertiajs/vue3'
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseBreadcrumb from '~/components/base/BaseBreadcrumb.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
@@ -19,6 +19,7 @@ import EngineShowTabSpecs from '~/components/engine/show/tabs/EngineShowTabSpecs
 import { globalChecklistForFamily } from '#shared/helpers/diagnostic'
 import { resolveEngineFamily } from '#shared/helpers/engine_family'
 import { isSparePartsEligibleEngine } from '#shared/helpers/spare_parts'
+import { useTabDeepLink } from '~/composables/use_tab_deep_link'
 import { useT } from '~/composables/use_t'
 import { engineDisplayTitle, engineFuelLabel } from '~/utils/boat_enum_labels'
 import type { AiSuggestion } from '#shared/types/ai'
@@ -38,6 +39,8 @@ const props = defineProps<{
   canManage: boolean
   /** Prop différée (deferJson) — `undefined` tant qu'Inertia ne l'a pas résolue. */
   aiSuggestions?: AiSuggestion[] | null
+  /** `?tab=` vu par le serveur : le rendu SSR part du bon onglet (#463). */
+  initialTab?: string | null
 }>()
 
 type TabKey =
@@ -49,10 +52,9 @@ type TabKey =
   | 'parts'
   | 'photos'
   | 'documents'
-const tab = ref<TabKey>('overview')
 const addEventOpen = ref(false)
 
-const VALID_TABS: TabKey[] = [
+const VALID_TABS: readonly TabKey[] = [
   'overview',
   'specs',
   'maintenance',
@@ -62,20 +64,10 @@ const VALID_TABS: TabKey[] = [
   'photos',
   'documents',
 ]
-
-onMounted(() => {
-  const fromUrl = new URLSearchParams(window.location.search).get('tab') as TabKey | null
-  if (fromUrl && VALID_TABS.includes(fromUrl)) tab.value = fromUrl
-})
-
-watch(tab, (newTab) => {
-  const url = new URL(window.location.href)
-  if (newTab === 'overview') {
-    url.searchParams.delete('tab')
-  } else {
-    url.searchParams.set('tab', newTab)
-  }
-  window.history.replaceState(window.history.state, '', url.pathname + url.search)
+const tab = useTabDeepLink<TabKey>({
+  tabs: VALID_TABS,
+  defaultTab: 'overview',
+  initialTabParam: props.initialTab,
 })
 
 const statusOptions = computed(() => [
