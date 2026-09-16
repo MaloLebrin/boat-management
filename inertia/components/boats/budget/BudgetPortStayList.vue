@@ -4,7 +4,7 @@ import { useForm, router } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCombobox, { type ComboboxOption } from '~/components/base/BaseCombobox.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
-import { useCurrencyFormat } from '~/composables/use_currency_format'
+import { useNumberFormat } from '~/composables/use_number_format'
 import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import type { BoatPortStayItem } from '#shared/types/budget'
@@ -23,7 +23,7 @@ const { t } = useT()
 const portSuggestions = computed<ComboboxOption[]>(() =>
   (props.portOptions ?? []).map((port) => ({ value: String(port.id), label: port.name }))
 )
-const { formatCurrency } = useCurrencyFormat()
+const { formatCurrency } = useNumberFormat()
 const { formatDate } = useDateFormat()
 
 const editingId = ref<number | null>(null)

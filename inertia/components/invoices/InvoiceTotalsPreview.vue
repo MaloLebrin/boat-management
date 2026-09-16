@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useT } from '~/composables/use_t'
+import { useNumberFormat } from '~/composables/use_number_format'
 
 defineProps<{
   subtotal: number
@@ -10,12 +11,10 @@ defineProps<{
 }>()
 
 const { t } = useT()
+const { formatCurrency } = useNumberFormat()
 
 function formatAmount(amount: number, currency: string): string {
-  return new Intl.NumberFormat(undefined, {
-    style: 'currency',
-    currency,
-  }).format(amount)
+  return formatCurrency(amount, { currency })
 }
 </script>
 

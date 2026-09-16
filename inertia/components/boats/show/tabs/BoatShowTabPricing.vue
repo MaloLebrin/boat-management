@@ -6,6 +6,7 @@ import BaseCard from '~/components/base/BaseCard.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import { useT } from '~/composables/use_t'
+import { useNumberFormat } from '~/composables/use_number_format'
 import type { BoatShowDetail } from '~/types/boat_show'
 import type { BoatPricingRow } from '../../../../../shared/types/boat_pricing'
 
@@ -16,6 +17,7 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
+const { formatCurrency } = useNumberFormat()
 
 const form = useForm({
   baseDailyPrice: String(props.pricing?.baseDailyPrice ?? ''),
@@ -38,10 +40,7 @@ const hasPricing = computed(() => props.pricing !== null)
 
 function formatAmount(value: number | null, currency: string): string {
   if (value === null) return '—'
-  return new Intl.NumberFormat(undefined, {
-    style: 'currency',
-    currency,
-  }).format(value)
+  return formatCurrency(value, { currency })
 }
 
 function submit() {

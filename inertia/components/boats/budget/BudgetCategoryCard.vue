@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { QuestionMarkCircleIcon } from '@heroicons/vue/24/outline'
 import BaseButton from '~/components/base/BaseButton.vue'
-import { useCurrencyFormat } from '~/composables/use_currency_format'
+import { useNumberFormat } from '~/composables/use_number_format'
 import { useT } from '~/composables/use_t'
 
 const props = defineProps<{
@@ -14,7 +14,7 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
-const { formatCurrency } = useCurrencyFormat()
+const { formatCurrency } = useNumberFormat()
 
 const formatted = computed(() => formatCurrency(props.amount))
 
