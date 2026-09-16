@@ -87,7 +87,7 @@ test.group('SendInvoiceEmail job', (group) => {
 
   test('the subject, body and amount follow the requested locale', async ({ assert }) => {
     const { messages } = mail.fake()
-    const user = await createEnterpriseOrgUser()
+    const user = await createEnterpriseAdminUser()
     const orgId = user.organizationId!
     const org = await Organization.findOrFail(orgId)
     const invoice = await Invoice.create({
