@@ -35,7 +35,7 @@ export async function createEnterpriseAdminUser(): Promise<User> {
  * Comme `createAdminUser`, mais l'organisation (plan `pro`) a le module
  * Location (`charter`) actif. Requis par les routes du domaine réservations —
  * réservations, états des lieux, contrats — gardées par
- * `RequireReservationsPlanMiddleware` depuis #595.
+ * `RequireModulePlanMiddleware` (module `reservations`) depuis #595.
  */
 export async function createCharterAdminUser(): Promise<User> {
   const user = await createAdminUser()
@@ -89,7 +89,7 @@ export async function createProPlanUser(): Promise<User> {
  * Crée un utilisateur d'une organisation au plan `enterprise` (tous modules
  * inclus), sans membership. Sert notamment d'« attaquant » cross-org dans les
  * tests du domaine réservations : l'Entreprise passe
- * `RequireReservationsPlanMiddleware`, le test vérifie donc bien l'isolation
+ * `RequireModulePlanMiddleware` (module `reservations`), le test vérifie donc bien l'isolation
  * entre organisations, pas le gating de module (#595).
  */
 export async function createEnterprisePlanUser(): Promise<User> {

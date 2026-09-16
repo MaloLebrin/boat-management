@@ -6,8 +6,6 @@ import {
   InvalidSeasonPriceError,
   SeasonBoatNotFoundError,
 } from '#exceptions/pricing_season_errors'
-import QuotaService from '#services/quota_service'
-import { QuotaExceededError } from '#exceptions/quota_errors'
 import PricingSeasonPolicy from '#policies/pricing_season_policy'
 import {
   createPricingSeasonValidator,
@@ -16,42 +14,29 @@ import {
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import type Organization from '#models/organization'
-import { BILLING_SETTINGS_PATH } from '#shared/constants/billing'
+import { UserNotInOrganizationError } from '#exceptions/organization_errors'
 
 @inject()
 export default class PricingSeasonsController {
-  constructor(
-    private pricingSeasonService: PricingSeasonService,
-    private quotaService: QuotaService
-  ) {}
+  constructor(private pricingSeasonService: PricingSeasonService) {}
 
-  private async loadOrgAndAssertEnterprise({
-    auth,
-    session,
-    response,
-    i18n,
-  }: Pick<HttpContext, 'auth' | 'session' | 'response' | 'i18n'>): Promise<Organization | null> {
+  /**
+   * Organisation de l'utilisateur. Le plan est déjà vérifié par la garde de
+   * module posée sur le groupe de routes (`requireModulePlan`) ; il ne reste
+   * qu'à protéger le cas d'un utilisateur sans organisation (#279).
+   */
+  private async loadOrg(auth: HttpContext['auth']): Promise<Organization> {
     const user = auth.getUserOrFail()
     await user.load('organization')
-
-    try {
-      await this.quotaService.assertCanManagePricing(user.organization)
-    } catch (error) {
-      if (error instanceof QuotaExceededError) {
-        session.flash('error', i18n.t('flash.quota.pricingExceeded'))
-        response.redirect(BILLING_SETTINGS_PATH)
-        return null
-      }
-      throw error
+    if (user.organization === null) {
+      throw new UserNotInOrganizationError()
     }
-
     return user.organization
   }
 
-  async index({ inertia, auth, bouncer, request, session, response, i18n }: HttpContext) {
+  async index({ inertia, auth, bouncer, request }: HttpContext) {
     await auth.authenticate()
-    const org = await this.loadOrgAndAssertEnterprise({ auth, session, response, i18n })
-    if (!org) return
+    const org = await this.loadOrg(auth)
 
     await bouncer.with(PricingSeasonPolicy).authorize('create')
 
@@ -65,8 +50,7 @@ export default class PricingSeasonsController {
 
   async store({ request, response, auth, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const org = await this.loadOrgAndAssertEnterprise({ auth, session, response, i18n })
-    if (!org) return
+    const org = await this.loadOrg(auth)
 
     await bouncer.with(PricingSeasonPolicy).authorize('create')
 
@@ -108,8 +92,7 @@ export default class PricingSeasonsController {
 
   async update({ request, response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const org = await this.loadOrgAndAssertEnterprise({ auth, session, response, i18n })
-    if (!org) return
+    const org = await this.loadOrg(auth)
 
     await bouncer.with(PricingSeasonPolicy).authorize('update')
 
@@ -162,8 +145,7 @@ export default class PricingSeasonsController {
 
   async destroy({ response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const org = await this.loadOrgAndAssertEnterprise({ auth, session, response, i18n })
-    if (!org) return
+    const org = await this.loadOrg(auth)
 
     await bouncer.with(PricingSeasonPolicy).authorize('delete')
 

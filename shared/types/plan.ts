@@ -208,3 +208,10 @@ export function getUpgradeTier(current: PlanTier): PlanTier | null {
   if (current === 'pro') return 'enterprise'
   return null
 }
+
+/**
+ * Capacités gardées par module sur des groupes de routes
+ * (`middleware.requireModulePlan({ feature })`) : chacune correspond à un
+ * `assertCanManage*` de `QuotaService` et à un message `flash.quota.<feature>Exceeded`.
+ */
+export type ModulePlanFeature = 'clients' | 'invoices' | 'pricing' | 'reservations'
