@@ -1,0 +1,95 @@
+{
+  "meta": {
+    "title": "Conditions générales de vente",
+    "description": "Les conditions générales de vente de FleetAi : souscription, prix, paiement, reconduction, rétractation, résiliation et médiation."
+  },
+  "salesTerms": {
+    "hero": {
+      "eyebrow": "Légal",
+      "title": "Conditions générales",
+      "titleHighlight": "de vente",
+      "subtitle": "Les conditions de souscription, de facturation et de résiliation des abonnements payants FleetAi.",
+      "updatedLabel": "Dernière mise à jour :",
+      "updatedDate": "16 août 2026"
+    },
+    "sections": [
+      {
+        "title": "Objet et champ d'application",
+        "body": "Les présentes conditions générales de vente (« CGV ») régissent la souscription des abonnements payants à FleetAi, quel que soit le plan choisi. Elles complètent les CGU, qui encadrent l'utilisation du service : en cas de contradiction sur un point relatif à la vente (prix, paiement, durée, résiliation), les CGV prévalent. Elles s'appliquent aux professionnels comme aux consommateurs ; les clauses réservées aux consommateurs sont signalées comme telles."
+      },
+      {
+        "title": "Souscription de l'abonnement",
+        "body": "La souscription se fait en ligne depuis votre espace FleetAi :",
+        "bullets": [
+          "Vous choisissez un plan et une périodicité (mensuelle ou annuelle), auxquels peuvent s'ajouter des modules et des options facturés à la quantité.",
+          "Un récapitulatif affiche le détail de la commande et son montant avant tout paiement.",
+          "La validation du paiement vaut acceptation des présentes CGV et forme le contrat.",
+          "Un e-mail de confirmation récapitulant l'abonnement souscrit vous est envoyé."
+        ]
+      },
+      {
+        "title": "Prix",
+        "body": "Les prix en vigueur sont ceux affichés sur la page Tarifs au jour de la commande. Ils sont indiqués en euros et hors taxes : la TVA au taux légal applicable est ajoutée sur la facture, sauf exonération pour les clients professionnels intra-UE disposant d'un numéro de TVA valide. Le plan Starter est gratuit et sans limite de durée."
+      },
+      {
+        "title": "Paiement",
+        "body": "Le paiement s'effectue par carte bancaire via notre prestataire de paiement Stripe :",
+        "bullets": [
+          "L'abonnement est payable d'avance, à la souscription puis à chaque échéance.",
+          "Les coordonnées bancaires sont saisies et conservées par Stripe : FleetAi n'y a jamais accès et ne les stocke pas.",
+          "Les factures sont disponibles à tout moment depuis l'espace de facturation de votre organisation.",
+          "Les modules et options ajoutés en cours de période sont facturés au prorata sur l'échéance suivante."
+        ]
+      },
+      {
+        "title": "Durée et reconduction",
+        "body": "L'abonnement est conclu pour la période choisie (un mois ou un an) et se reconduit tacitement à l'identique à chaque échéance, jusqu'à résiliation. Conformément à l'article L215-1 du code de la consommation, les clients consommateurs sont informés par e-mail, au plus tard un mois avant la fin de la période de reconduction, de leur faculté de ne pas reconduire l'abonnement."
+      },
+      {
+        "title": "Droit de rétractation",
+        "body": "Le consommateur dispose d'un délai de quatorze jours à compter de la souscription pour se rétracter, sans motif ni pénalité, en écrivant à support@fleetai.app. FleetAi étant un service numérique fourni immédiatement, vous demandez expressément, en souscrivant, que son exécution commence avant la fin de ce délai : conformément à l'article L221-28 du code de la consommation, vous renoncez alors à votre droit de rétractation une fois le service pleinement exécuté. Ce droit ne s'applique pas aux clients professionnels. Le plan Starter, gratuit et sans engagement, permet d'essayer le service avant toute souscription payante."
+      },
+      {
+        "title": "Résiliation",
+        "body": "Vous pouvez résilier votre abonnement à tout moment, sans préavis ni frais, depuis l'espace de facturation ou par e-mail. La résiliation prend effet à la fin de la période déjà payée : le service reste accessible jusqu'à cette date et aucun remboursement au prorata n'est dû. Passé ce terme, l'organisation bascule sur le plan gratuit. FleetAi peut de son côté résilier l'abonnement en cas de manquement grave aux CGU, après mise en demeure restée sans effet pendant quinze jours."
+      },
+      {
+        "title": "Défaut de paiement",
+        "body": "En cas d'échec de prélèvement, une relance automatique est envoyée et de nouvelles tentatives sont effectuées. Si le paiement n'est pas régularisé sous quinze jours, l'abonnement payant est suspendu et l'organisation repasse sur les quotas du plan gratuit : vos données restent accessibles, seul l'ajout de nouvelles données au-delà des quotas est bloqué. Pour un client professionnel, les pénalités de retard légales et l'indemnité forfaitaire de recouvrement de 40 € sont applicables de plein droit."
+      },
+      {
+        "title": "Évolution des tarifs",
+        "body": "Les tarifs peuvent évoluer. Toute modification affectant un abonnement en cours vous est notifiée par e-mail au moins trente jours avant sa prise d'effet, laquelle intervient à la reconduction suivante. Si le nouveau tarif ne vous convient pas, vous pouvez résilier avant cette date : la période déjà payée reste facturée au tarif initial."
+      },
+      {
+        "title": "Fourniture du service",
+        "body": "L'accès aux fonctionnalités du plan souscrit est ouvert dès la validation du paiement. Le service est fourni en ligne, accessible 24 h/24 sous réserve des opérations de maintenance et des incidents indépendants de notre volonté. Le support est joignable par e-mail à support@fleetai.app ; les engagements de disponibilité et de délai de réponse propres au plan Entreprise figurent dans le contrat de service correspondant."
+      },
+      {
+        "title": "Garanties et conformité",
+        "body": "FleetAi est fourni conformément à sa description commerciale et aux CGU. Les clients consommateurs bénéficient de la garantie légale de conformité des contenus et services numériques (articles L224-25-12 et suivants du code de la consommation), indépendamment de toute garantie commerciale. Les estimations de coûts et les suggestions produites par les fonctionnalités d'intelligence artificielle sont des aides à la décision : elles ne constituent ni un diagnostic technique ni un engagement de résultat."
+      },
+      {
+        "title": "Responsabilité",
+        "body": "La responsabilité de FleetAi au titre de l'abonnement est limitée, pour les clients professionnels, aux sommes effectivement versées au cours des douze mois précédant le fait générateur, et ne couvre pas les dommages indirects tels qu'une perte d'exploitation ou de chiffre d'affaires. Aucune de ces limitations ne s'applique en cas de faute lourde, de dol ou de dommage corporel, ni ne restreint les droits que la loi reconnaît aux consommateurs."
+      },
+      {
+        "title": "Vos données et la réversibilité",
+        "body": "Vos données restent votre propriété. Elles sont exportables depuis le service pendant toute la durée de l'abonnement et jusqu'à trente jours après sa fin, délai au terme duquel elles sont supprimées ou anonymisées selon les modalités de notre politique de confidentialité. La suppression d'une organisation est définitive."
+      },
+      {
+        "title": "Réclamations et médiation",
+        "body": "Toute réclamation doit d'abord nous être adressée à support@fleetai.app : nous nous engageons à y répondre. À défaut de solution satisfaisante, le consommateur peut saisir gratuitement le médiateur de la consommation dont les coordonnées figurent dans nos mentions légales."
+      },
+      {
+        "title": "Droit applicable et juridiction",
+        "body": "Les présentes CGV sont soumises au droit français. À défaut de résolution amiable, le litige sera porté devant les juridictions françaises compétentes. Le consommateur conserve la faculté de saisir la juridiction de son lieu de domicile ou celle du lieu d'exécution du service."
+      }
+    ],
+    "contact": {
+      "title": "Une question sur votre abonnement ?",
+      "body": "Pour toute question sur la souscription, une facture ou une résiliation, écrivez-nous.",
+      "email": "support@fleetai.app"
+    }
+  }
+}

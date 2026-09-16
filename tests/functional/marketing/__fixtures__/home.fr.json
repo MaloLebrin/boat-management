@@ -1,0 +1,562 @@
+{
+  "t": {
+    "brand": {
+      "name": "FleetAi",
+      "tagline": "Fleet intelligence"
+    },
+    "meta": {
+      "title": "Tu gères ta flotte dans Excel.",
+      "description": "FleetAi remplace ton tableur partagé par un outil qui connaît tes bateaux, anticipe les maintenances et te prévient avant le retard."
+    },
+    "home": {
+      "hero": {
+        "cta": {
+          "primary": "Commencer gratuitement",
+          "secondary": "Essayer la démo"
+        },
+        "caption": "Plan Starter gratuit à vie - sans carte bleue - setup en 5 min",
+        "content": {
+          "loueurs": {
+            "title": "Tu gères ta flotte dans Excel.",
+            "titleHighlight": "Tu peux faire mieux.",
+            "subtitle": "FleetAi remplace ton tableur partagé par un outil qui connaît tes bateaux, anticipe les maintenances et te prévient avant le retard."
+          },
+          "ecoles": {
+            "title": "Tes moniteurs perdent du temps.",
+            "titleHighlight": "Tes bateaux aussi.",
+            "subtitle": "Centralise l'état de ta flotte, partage le avec tes moniteurs, et ne rate plus jamais une échéance de sécurité."
+          },
+          "marinas": {
+            "title": "Tes propriétaires te demandent où en est leur bateau.",
+            "titleHighlight": "Réponds.",
+            "subtitle": "Offre à chaque propriétaire une vue claire de son bateau : historique, prochaines tâches, état en temps réel."
+          }
+        }
+      },
+      "socialProof": {
+        "eyebrow": "40+ FLOTTES ONT RANGÉ L'EXCEL",
+        "logos": [
+          "Marina Bleue",
+          "SailCorp",
+          "École de la Mer",
+          "Port d'Argent",
+          "Yacht Concept",
+          "Cap d'Antibes",
+          "Voiles du Sud",
+          "La Rochelle Nautic"
+        ]
+      },
+      "problem": {
+        "title": "L'Excel partagé survit à chaque saison.",
+        "titleHighlight": "Pas tes bateaux.",
+        "items": [
+          {
+            "number": "01",
+            "label": "PROBLÈME",
+            "title": "Les données s'évaporent",
+            "stat": "73 %",
+            "statSub": "des flottes perdent de l'historique chaque année",
+            "body": "Un Excel fermé, un WhatsApp archivé, un mécano qui part. L'historique disparaît avec."
+          },
+          {
+            "number": "02",
+            "label": "PROBLÈME",
+            "title": "Les rappels viennent trop tard",
+            "stat": "1 200 €",
+            "statSub": "coût moyen d'une panne évitable",
+            "body": "Quand tu te souviens de la vidange, c'est souvent après la casse. Trop tard."
+          },
+          {
+            "number": "03",
+            "label": "PROBLÈME",
+            "title": "Personne n'est synchro",
+            "stat": "4h/sem",
+            "statSub": "perdues à chercher l'info",
+            "body": "Le skipper ne sait pas ce que le mécano a fait. Le mécano ne sait pas ce que le skipper a vu."
+          }
+        ]
+      },
+      "pillars": {
+        "title": "Trois choses,",
+        "titleHighlight": "faites bien.",
+        "items": [
+          {
+            "number": "I",
+            "title": "Historique immuable",
+            "description": "Chaque intervention, chaque pièce, chaque heure moteur. Rien ne se perd, rien ne se réinvente. Tu construis une mémoire de flotte qui traverse les saisons."
+          },
+          {
+            "number": "II",
+            "title": "Planification intelligente",
+            "description": "Calendrier ou heures moteur — FleetAi calcule les seuils et te prévient avant le retard. Plus de surprise, plus de panne évitable."
+          },
+          {
+            "number": "III",
+            "title": "Copilote contextualisé",
+            "description": "L'assistant FleetAi lit ta flotte et te suggère quoi faire — pas du blabla, des actions concrètes basées sur tes données.",
+            "isAi": true
+          }
+        ]
+      },
+      "modularOffer": {
+        "eyebrow": "OFFRE MODULAIRE",
+        "title": "Un socle,",
+        "titleHighlight": "tes modules.",
+        "subtitle": "Démarre avec le plan Pro, puis active uniquement les modules métier dont tu as besoin. Sans refonte, sans engagement caché.",
+        "baseName": "Plan Pro",
+        "baseDesc": "Tout le cœur FleetAi : flotte, maintenance, IA, documents.",
+        "basePrice": 20,
+        "pricePer": "/mois",
+        "modulesLabel": "LE SOCLE",
+        "note": "Modules disponibles sur le plan Pro — tous inclus dans Entreprise.",
+        "ctaLabel": "Composer mon offre",
+        "ctaHref": "/fr/tarifs",
+        "modules": [
+          {
+            "icon": "📅",
+            "name": "Location",
+            "desc": "Réservations, états des lieux, contrats, tarif par bateau et périodes saisonnières.",
+            "price": 15
+          },
+          {
+            "icon": "🧾",
+            "name": "CRM & Facturation",
+            "desc": "Fiches clients, devis et factures.",
+            "price": 15
+          }
+        ]
+      },
+      "features": [
+        {
+          "eyebrow": "HISTORIQUE IMMUABLE",
+          "title": "Chaque intervention reste",
+          "titleHighlight": "écrite dans le marbre.",
+          "body": "Un événement enregistré ne se modifie pas. C'est le contrat. Tu construis un historique fiable qui valorise ta flotte à la revente.",
+          "bullets": [
+            "Timeline complète par bateau",
+            "Pièces et coûts associés",
+            "Export PDF pour revente ou audit",
+            "Recherche instantanée dans l'historique"
+          ]
+        },
+        {
+          "eyebrow": "PLANIFICATION INTELLIGENTE",
+          "title": "Calendaire ou heures moteur —",
+          "titleHighlight": "l'app calcule.",
+          "body": "Définis tes seuils une fois. FleetAi calcule les dates d'alerte et te prévient 14 jours avant chaque échéance.",
+          "bullets": [
+            "Rappels par date ou heures moteur",
+            "Vue calendrier et Kanban",
+            "Assignation à l'équipe",
+            "Récurrence automatique"
+          ]
+        },
+        {
+          "eyebrow": "FLEETAI - COPILOTE IA",
+          "title": "Un assistant qui",
+          "titleHighlight": "connaît tes bateaux.",
+          "body": "Pose une question, obtiens une réponse contextuelle. FleetAi lit ta flotte et te suggère la prochaine action.",
+          "bullets": [
+            "Questions en langage naturel",
+            "Suggestions basées sur tes données",
+            "Actions en un clic",
+            "Propulsé par Mistral AI"
+          ]
+        }
+      ],
+      "personas": {
+        "title": "Pensé pour chaque opérateur",
+        "subtitle": "Que tu gères 3 ou 30 bateaux, FleetAi s'adapte à ton organisation.",
+        "ctaLabel": "Essayer gratuitement",
+        "items": [
+          {
+            "key": "loueurs",
+            "icon": "⛵",
+            "tabLabel": "Loueurs",
+            "title": "Loueurs & charters",
+            "subtitle": "Maximise la disponibilité. Ne perds plus une journée de location pour une panne non anticipée.",
+            "bullets": [
+              "Historique complet par bateau, toujours accessible",
+              "L'IA te prévient 14 jours avant toute intervention critique",
+              "Rapports PDF prêts pour les audits assurance"
+            ],
+            "quote": {
+              "text": "On est passé de 14 bateaux mal suivis à 22 bateaux parfaitement gérés — sans embaucher.",
+              "author": "Marc Lefèvre",
+              "role": "Marina Bleue - Gestionnaire flotte"
+            },
+            "stat": {
+              "value": "-80%",
+              "label": "temps consacré au suivi maintenance"
+            }
+          },
+          {
+            "key": "ecoles",
+            "icon": "🎓",
+            "tabLabel": "Écoles de voile",
+            "title": "Écoles de voile",
+            "subtitle": "La sécurité d'abord, entre les cours et les créneaux de maintenance.",
+            "bullets": [
+              "Suivi équipements sécurité avec alertes d'expiration",
+              "Calendrier maintenance respectant les plannings de cours",
+              "Statut bateau partageable avec les moniteurs"
+            ],
+            "quote": {
+              "text": "Nos moniteurs vérifient désormais l'état du bateau avant chaque cours. Ça a changé notre culture sécurité.",
+              "author": "Celine Morel",
+              "role": "École Bleue - Directrice"
+            },
+            "stat": {
+              "value": "100%",
+              "label": "des contrôles de sécurité réussis"
+            }
+          },
+          {
+            "key": "marinas",
+            "icon": "🏗",
+            "tabLabel": "Marinas",
+            "title": "Marinas & ports",
+            "subtitle": "Offre à chaque propriétaire une vue claire de son bateau.",
+            "bullets": [
+              "Vue ponton avec état de chaque bateau",
+              "Portail propriétaire en libre-service",
+              "Facturation des services intégrée"
+            ],
+            "quote": {
+              "text": "Les propriétaires ne m'appellent plus pour savoir où en est leur bateau. Ils regardent l'app.",
+              "author": "Jean-Pierre Duval",
+              "role": "Port d'Argent - Directeur"
+            },
+            "stat": {
+              "value": "3x",
+              "label": "moins d'appels propriétaires"
+            }
+          },
+          {
+            "key": "armateurs",
+            "icon": "⚓",
+            "tabLabel": "Armateurs privés",
+            "title": "Armateurs privés",
+            "subtitle": "Sache exactement ce qui a été fait, ce qui est dû, et ce qu'il faut budgéter.",
+            "bullets": [
+              "Carnet numérique, toujours avec toi sur ton téléphone",
+              "Export PDF revente — prouve chaque intervention",
+              "Suggestions IA basées sur tes heures moteur réelles"
+            ],
+            "quote": {
+              "text": "Quand j'ai vendu mon bateau, l'acheteur a d'abord demandé les carnets d'entretien. J'avais tout en PDF.",
+              "author": "Thomas Berger",
+              "role": "Armateur privé - 2 bateaux"
+            },
+            "stat": {
+              "value": "+15%",
+              "label": "valeur revente avec historique complet"
+            }
+          }
+        ]
+      },
+      "statsBand": [
+        {
+          "value": "40+",
+          "label": "flottes"
+        },
+        {
+          "value": "680",
+          "label": "bateaux"
+        },
+        {
+          "value": "28 240",
+          "label": "événements"
+        },
+        {
+          "value": "4,8/5",
+          "label": "satisfaction"
+        }
+      ],
+      "comparison": {
+        "title": "Excel, papier, ou un outil pensé pour la mer ?",
+        "subtitle": "Pourquoi FleetAi",
+        "cols": {
+          "feature": "Fonctionnalité",
+          "excel": "Excel partagé",
+          "paper": "Carnet papier",
+          "fleetai": "FleetAi"
+        },
+        "rows": [
+          {
+            "feature": "Historique immuable",
+            "excel": "non",
+            "paper": "partiel",
+            "fleetai": "oui"
+          },
+          {
+            "feature": "Rappels automatiques",
+            "excel": "non",
+            "paper": "non",
+            "fleetai": "oui"
+          },
+          {
+            "feature": "Multi-utilisateurs",
+            "excel": "partiel",
+            "paper": "non",
+            "fleetai": "oui"
+          },
+          {
+            "feature": "Mobile sur le ponton",
+            "excel": "non",
+            "paper": "oui",
+            "fleetai": "oui"
+          },
+          {
+            "feature": "Suggestions IA",
+            "excel": "non",
+            "paper": "non",
+            "fleetai": "oui"
+          },
+          {
+            "feature": "Export PDF revente",
+            "excel": "non",
+            "paper": "partiel",
+            "fleetai": "oui"
+          },
+          {
+            "feature": "Gestion seuils heures",
+            "excel": "manuel",
+            "paper": "non",
+            "fleetai": "auto"
+          },
+          {
+            "feature": "Sauvegarde sécurisée",
+            "excel": "partiel",
+            "paper": "non",
+            "fleetai": "oui UE"
+          },
+          {
+            "feature": "Accès équipe temps réel",
+            "excel": "partiel",
+            "paper": "non",
+            "fleetai": "oui"
+          }
+        ]
+      },
+      "testimonials": {
+        "title": "La confiance de vrais opérateurs",
+        "items": [
+          {
+            "quote": "On gérait 14 bateaux dans un Excel. Maintenant on en gère 22 sans embaucher.",
+            "author": "Marc Lefèvre",
+            "role": "Marina Bleue - 22 bateaux",
+            "featured": true
+          },
+          {
+            "quote": "Depuis FleetAi, je sais ce qui doit être fait avant que ça grince.",
+            "author": "Sophie Martin",
+            "role": "BaySail Co. - 8 bateaux charter"
+          },
+          {
+            "quote": "Les suggestions IA ont repéré une vidange que j'avais repoussée trois fois.",
+            "author": "Julien Petit",
+            "role": "Loueur - 12 bateaux à moteur"
+          },
+          {
+            "quote": "La migration depuis notre Excel s'est faite en deux heures.",
+            "author": "Isabelle Roux",
+            "role": "Co-fondatrice - BaySail Co."
+          }
+        ]
+      },
+      "security": {
+        "title": "Tes données restent les tiennes",
+        "subtitle": "Sécurité & conformité",
+        "items": [
+          {
+            "icon": "🇪🇺",
+            "title": "Hébergement UE",
+            "description": "OVHcloud Strasbourg - pas de transfert hors UE"
+          },
+          {
+            "icon": "🔒",
+            "title": "Chiffrement",
+            "description": "TLS 1.3 en transit, AES-256 au repos"
+          },
+          {
+            "icon": "📋",
+            "title": "RGPD",
+            "description": "DPO dédié - suppression sur demande sous 30j"
+          },
+          {
+            "icon": "🛡",
+            "title": "SOC 2",
+            "description": "En cours de certification - audit annuel"
+          },
+          {
+            "icon": "💾",
+            "title": "Sauvegardes",
+            "description": "Quotidiennes - rétention 30j - restauration en 1 clic"
+          }
+        ]
+      },
+      "faq": {
+        "title": "Tout ce que les loueurs nous demandent",
+        "subtitle": "On répond à tes questions les plus fréquentes.",
+        "cta": {
+          "label": "Essayer gratuitement",
+          "href": "/signup"
+        },
+        "items": [
+          {
+            "q": "Qu'est-ce qu'un logiciel de gestion de maintenance pour flotte maritime ?",
+            "a": "Une plateforme qui centralise l'historique d'entretien de chaque bateau, planifie les maintenances à venir selon des seuils calendaires ou horaires, et alerte avant que les opérations critiques deviennent du retard."
+          },
+          {
+            "q": "FleetAi remplace-t-il mon mécano ?",
+            "a": "Non. FleetAi t'aide à savoir quand et quoi planifier. Ton mécano reste indispensable pour faire les opérations."
+          },
+          {
+            "q": "Mes bateaux n'ont pas de capteurs connectés. Ça marche quand même ?",
+            "a": "Oui. FleetAi est conçu pour la saisie manuelle des heures moteur."
+          },
+          {
+            "q": "Combien coûte FleetAi pour 15 bateaux ?",
+            "a": "Le plan Pro couvre jusqu'à 8 bateaux pour 20 €/mois (16 €/mois en annuel). Au-delà, tu ajoutes des bateaux supplémentaires à 4 €/bateau/mois : 15 bateaux reviennent à 48 €/mois en Pro. Le plan Entreprise (99 €/mois) passe en bateaux illimités. Pas de frais cachés."
+          },
+          {
+            "q": "Puis-je migrer depuis un autre outil ?",
+            "a": "Oui — on importe Excel, Google Sheets, Airtable et les exports CSV/PDF de tes outils existants."
+          },
+          {
+            "q": "Les données sont-elles conservées si j'arrête mon abonnement ?",
+            "a": "Pendant 90 jours après l'arrêt, tu peux exporter en CSV/PDF. Au-delà, suppression définitive (RGPD)."
+          },
+          {
+            "q": "L'IA voit-elle les données des autres clients ?",
+            "a": "Non. Chaque organisation est cloisonnée. L'IA ne voit que tes données."
+          },
+          {
+            "q": "Combien d'utilisateurs puis-je ajouter ?",
+            "a": "Starter : 1 utilisateur. Pro : jusqu'à 5 utilisateurs. Entreprise : illimité. Tu paies par organisation, pas par siège."
+          }
+        ]
+      },
+      "diagnosis": {
+        "eyebrow": "ESSAI GRATUIT",
+        "title": "Ton moteur fait des siennes ?",
+        "titleHighlight": "Demande à l'IA.",
+        "subtitle": "Décris la panne en deux phrases : l'assistant te pose les bonnes questions, puis t'oriente vers les causes probables — sans compte, directement depuis le site.",
+        "items": [
+          "Quelques questions ciblées pour cerner le symptôme",
+          "Les causes probables classées de la moins chère à la plus chère à vérifier",
+          "Une prochaine étape concrète, à faire toi-même ou à confier à ton mécanicien"
+        ],
+        "ctaLabel": "Diagnostiquer ma panne",
+        "ctaHref": "/fr/diagnostic-panne-ia",
+        "note": "Gratuit, sans compte · 2 diagnostics offerts",
+        "disclaimer": "L'assistant t'aide à orienter le diagnostic : il ne remplace ni le manuel de ton moteur ni un professionnel."
+      },
+      "demo": {
+        "eyebrow": "DÉMO PRODUIT",
+        "title": "Deux minutes pour voir",
+        "titleHighlight": "la différence.",
+        "subtitle": "Essaie l'app en accès libre sur une flotte de démo, ou écris-nous via le formulaire de contact — sans jargon, sans présentation PowerPoint.",
+        "items": [
+          "Dashboard flotte configure avec tes bateaux",
+          "Historique maintenance et alertes en temps réel",
+          "Assistant IA FleetAi sur tes cas concrets",
+          "Configuration initiale en moins de 15 minutes"
+        ],
+        "ctaLabel": "Nous écrire",
+        "ctaHref": "/contact",
+        "secondaryLabel": "Voir les tarifs",
+        "noCommitment": "Sans engagement · Réponse sous 24h",
+        "tryDemoLabel": "Essayer la démo",
+        "tryDemoSubtitle": "Accès instantané · Données réinitialisées automatiquement · Sans inscription",
+        "demoLoginPath": "/demo"
+      },
+      "finalCta": {
+        "title": "Commence gratuitement, monte en plan quand tu veux.",
+        "titleHighlight": "Sans engagement.",
+        "subtitle": "Crée ton organisation, importe tes bateaux, et laisse FleetAi te montrer ce que tu rates.",
+        "primaryCta": "Créer mon organisation",
+        "secondaryCta": "Essayer la démo"
+      },
+      "caseStudy": {
+        "title": "Comment une marina a réduit ses retards de maintenance de 80 %",
+        "subtitle": "Étude de cas",
+        "company": "Marina Bleue — 22 bateaux en flotte",
+        "challengeLabel": "Le défi",
+        "challenge": "Suivi dispersé dans 4 fichiers Excel partagés, retards de sécurité fréquents et 3 h/semaine perdues en coordination entre l'équipe.",
+        "solutionLabel": "La solution",
+        "solution": "Déploiement de FleetAi en 2 jours — historique importé depuis Excel, alertes automatiques activées, équipe formée en 30 min.",
+        "resultsLabel": "Les résultats",
+        "results": [
+          "Zéro retard de sécurité depuis la mise en place",
+          "Historique complet accessible en un clic",
+          "Rapport mensuel généré automatiquement"
+        ],
+        "metrics": [
+          {
+            "value": "−80 %",
+            "label": "de retards de maintenance"
+          },
+          {
+            "value": "2 j",
+            "label": "d'onboarding"
+          },
+          {
+            "value": "3 h",
+            "label": "récupérées par semaine"
+          }
+        ],
+        "cta": {
+          "text": "Estimer mes coûts d'entretien",
+          "href": "/fr/simulateur-cout-entretien"
+        }
+      },
+      "howItWorks": {
+        "title": "Opérationnel en 3 étapes",
+        "subtitle": "Sans formation longue, sans intégration complexe, sans risque.",
+        "items": [
+          {
+            "step": "01",
+            "title": "Importe ta flotte",
+            "description": "Depuis Excel, CSV ou en saisie manuelle. Tous tes bateaux et équipements sont disponibles en moins de 10 minutes.",
+            "detail": "Formats supportés : Excel, CSV, Google Sheets"
+          },
+          {
+            "step": "02",
+            "title": "Planifie tes maintenances",
+            "description": "FleetAi génère automatiquement les tâches selon les intervalles calendaires ou horaires de chaque équipement.",
+            "detail": "Alertes par email avant chaque échéance"
+          },
+          {
+            "step": "03",
+            "title": "Pilote avec l'IA",
+            "description": "Chaque matin, ton tableau de bord affiche les urgences, les prochaines échéances et les anomalies détectées par l'IA.",
+            "detail": "Rapport hebdomadaire envoyé automatiquement"
+          }
+        ],
+        "timeline": {
+          "title": "Timeline d'onboarding",
+          "items": [
+            {
+              "day": "J1",
+              "label": "Import de ta flotte"
+            },
+            {
+              "day": "J7",
+              "label": "Premières alertes actives"
+            },
+            {
+              "day": "J30",
+              "label": "ROI mesurable"
+            }
+          ]
+        }
+      },
+      "preview": {
+        "title": "Zéro retard de maintenance.",
+        "subtitle": "FleetAi surveille ta flotte 24 h/24, t'alerte avant les échéances critiques et te libère du temps pour ce qui compte vraiment."
+      }
+    }
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "meta": {
+    "title": "Politique de confidentialité",
+    "description": "Comment FleetAi collecte, utilise et protège vos données personnelles, conformément au RGPD."
+  },
+  "privacy": {
+    "hero": {
+      "eyebrow": "Confidentialité",
+      "title": "Politique de",
+      "titleHighlight": "confidentialité",
+      "subtitle": "Nous prenons la protection de vos données au sérieux. Cette page explique quelles données nous collectons, pourquoi, et quels sont vos droits.",
+      "updatedLabel": "Dernière mise à jour :",
+      "updatedDate": "9 juillet 2026"
+    },
+    "sections": [
+      {
+        "title": "Responsable du traitement",
+        "body": "FleetAi est responsable du traitement des données personnelles collectées via la plateforme et les pages publiques. Pour toute question relative à cette politique, vous pouvez nous contacter à l'adresse indiquée en bas de page."
+      },
+      {
+        "title": "Données que nous collectons",
+        "body": "Nous collectons uniquement les données nécessaires au fonctionnement du service :",
+        "bullets": [
+          "Données de compte : nom, adresse e-mail, organisation et mot de passe (chiffré).",
+          "Données de flotte : bateaux, équipements, historiques de maintenance et documents que vous importez.",
+          "Données d'usage : pages consultées, actions effectuées et journaux techniques.",
+          "Données de facturation : informations d'abonnement traitées via notre prestataire de paiement."
+        ]
+      },
+      {
+        "title": "Pourquoi nous utilisons vos données",
+        "body": "Vos données sont utilisées pour les finalités suivantes :",
+        "bullets": [
+          "Fournir et maintenir le service de gestion de flotte.",
+          "Générer des estimations de coûts et des recommandations d'entretien assistées par IA.",
+          "Assurer le support, la sécurité et l'amélioration continue de la plateforme.",
+          "Gérer la facturation et respecter nos obligations légales."
+        ]
+      },
+      {
+        "title": "Base légale",
+        "body": "Nous traitons vos données sur la base de l'exécution du contrat (fourniture du service), de votre consentement (communications marketing), de notre intérêt légitime (sécurité et amélioration du produit) et du respect de nos obligations légales."
+      },
+      {
+        "title": "Partage et sous-traitants",
+        "body": "Nous ne vendons jamais vos données. Nous faisons appel à des sous-traitants soigneusement sélectionnés pour opérer le service :",
+        "bullets": [
+          "Hébergement et base de données au sein de l'Union européenne.",
+          "Cloudinary pour le stockage et la diffusion des documents et images.",
+          "Mistral AI pour les fonctionnalités d'intelligence artificielle.",
+          "Stripe pour le traitement des paiements."
+        ]
+      },
+      {
+        "title": "Durée de conservation",
+        "body": "Vos données sont conservées tant que votre compte est actif. Après la fermeture de votre compte, elles sont supprimées ou anonymisées dans un délai raisonnable, sauf obligation légale de conservation (facturation, comptabilité)."
+      },
+      {
+        "title": "Sécurité",
+        "body": "Nous mettons en œuvre des mesures techniques et organisationnelles appropriées : chiffrement des mots de passe, connexions sécurisées (HTTPS), contrôle d'accès et sauvegardes régulières."
+      },
+      {
+        "title": "Vos droits",
+        "body": "Conformément au RGPD, vous disposez des droits suivants sur vos données personnelles :",
+        "bullets": [
+          "Droit d'accès à vos données.",
+          "Droit de rectification des données inexactes.",
+          "Droit à l'effacement (« droit à l'oubli »).",
+          "Droit à la portabilité de vos données.",
+          "Droit d'opposition et de limitation du traitement."
+        ]
+      },
+      {
+        "title": "Cookies",
+        "body": "Nous utilisons des cookies strictement nécessaires au fonctionnement de la plateforme (session, sécurité) ainsi que des cookies de mesure d'audience anonymisés. Vous pouvez configurer votre navigateur pour les refuser."
+      },
+      {
+        "title": "Modifications de cette politique",
+        "body": "Nous pouvons mettre à jour cette politique de confidentialité pour refléter des évolutions légales ou techniques. La date de dernière mise à jour est indiquée en haut de cette page."
+      }
+    ],
+    "contact": {
+      "title": "Une question sur vos données ?",
+      "body": "Pour exercer vos droits ou pour toute question relative à cette politique, écrivez-nous.",
+      "email": "privacy@fleetai.app"
+    }
+  }
+}

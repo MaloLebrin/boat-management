@@ -1,0 +1,147 @@
+{
+  "t": {
+    "meta": {
+      "title": "Aide & support — FleetAi",
+      "description": "Besoin d'un coup de main ? Canaux de contact, questions fréquentes et ressources pour bien utiliser FleetAi."
+    },
+    "hero": {
+      "eyebrow": "Aide & support",
+      "title": "Besoin d'un",
+      "titleHighlight": "coup de main ?",
+      "subtitle": "Une question sur le produit, ton compte ou la facturation : commence ici — et si tu ne trouves pas, on est à un email."
+    },
+    "channels": [
+      {
+        "title": "Écris au support",
+        "description": "Une question, un blocage ? L'équipe te répond sous 4 h ouvrées.",
+        "ctaLabel": "support@fleetai.app",
+        "href": "mailto:support@fleetai.app",
+        "external": true
+      },
+      {
+        "title": "Envoie un message",
+        "description": "Décris ton besoin via le formulaire de contact, on revient vers toi rapidement.",
+        "ctaLabel": "Ouvrir le formulaire",
+        "href": "/fr/contact#contact-form"
+      },
+      {
+        "title": "Essaie la démo",
+        "description": "Explore FleetAi en accès libre sur une flotte de démo, sans inscription.",
+        "ctaLabel": "Lancer la démo",
+        "href": "/demo",
+        "demo": true
+      }
+    ],
+    "faq": {
+      "eyebrow": "FAQ",
+      "title": "Les réponses",
+      "titleHighlight": "aux questions fréquentes",
+      "groups": [
+        {
+          "title": "Bien démarrer",
+          "items": [
+            {
+              "q": "Qu'est-ce qu'un logiciel de gestion de maintenance pour flotte maritime ?",
+              "a": "Une plateforme qui centralise l'historique d'entretien de chaque bateau, planifie les maintenances à venir selon des seuils calendaires ou horaires, et alerte avant que les opérations critiques deviennent du retard."
+            },
+            {
+              "q": "Mes bateaux n'ont pas de capteurs connectés. Ça marche quand même ?",
+              "a": "Oui. FleetAi est conçu pour la saisie manuelle des heures moteur."
+            },
+            {
+              "q": "Puis-je migrer depuis un autre outil ?",
+              "a": "Oui — on importe Excel, Google Sheets, Airtable et les exports CSV/PDF de tes outils existants."
+            },
+            {
+              "q": "Combien d'utilisateurs puis-je ajouter ?",
+              "a": "Starter : 1 utilisateur. Pro : jusqu'à 5 utilisateurs. Entreprise : illimité. Tu paies par organisation, pas par siège."
+            }
+          ]
+        },
+        {
+          "title": "Tarifs & facturation",
+          "items": [
+            {
+              "q": "Le plan Starter est-il vraiment gratuit ?",
+              "a": "Oui, gratuit à vie : jusqu'à 2 bateaux, 1 utilisateur, historique illimité. Pas de carte bancaire, pas de date limite. Tu passes sur Pro ou Entreprise quand tu veux depuis tes réglages, et tu peux revenir sur Starter sans perdre tes données."
+            },
+            {
+              "q": "Combien coûte FleetAi pour 15 bateaux ?",
+              "a": "Le plan Pro couvre jusqu'à 8 bateaux pour 20 €/mois (16 €/mois en annuel). Au-delà, tu ajoutes des bateaux supplémentaires à 4 €/bateau/mois : 15 bateaux reviennent à 48 €/mois en Pro. Le plan Entreprise (99 €/mois) passe en bateaux illimités. Pas de frais cachés."
+            },
+            {
+              "q": "Y a-t-il un engagement ?",
+              "a": "Non. Mensuel ou annuel, tu peux annuler à tout moment en 1 clic depuis ton compte. L'annuel offre simplement -20 % en échange de ton engagement annuel."
+            },
+            {
+              "q": "Que se passe-t-il si j'annule ?",
+              "a": "Tu gardes l'accès jusqu'à la fin de la période payée. Ensuite, tu retombes sur le plan Starter gratuit pendant 90 jours pour exporter tes données."
+            }
+          ]
+        },
+        {
+          "title": "Données & sécurité",
+          "items": [
+            {
+              "q": "Où sont hébergées mes données ?",
+              "a": "En Union européenne (OVHcloud, Strasbourg), sans transfert hors UE. Tout est chiffré en transit (TLS 1.3) et au repos (AES-256)."
+            },
+            {
+              "q": "FleetAi est-il conforme au RGPD ?",
+              "a": "Oui : DPO dédié, suppression de tes données sur demande sous 30 jours, sauvegardes quotidiennes conservées 30 jours."
+            },
+            {
+              "q": "Les données sont-elles conservées si j'arrête mon abonnement ?",
+              "a": "Pendant 90 jours après l'arrêt, tu peux exporter en CSV/PDF. Au-delà, suppression définitive (RGPD)."
+            },
+            {
+              "q": "L'IA voit-elle les données des autres clients ?",
+              "a": "Non. Chaque organisation est cloisonnée. L'IA ne voit que tes données."
+            }
+          ]
+        }
+      ]
+    },
+    "resources": {
+      "eyebrow": "Ressources",
+      "title": "Avance en autonomie",
+      "subtitle": "Guides et outils gratuits, accessibles sans compte.",
+      "linkLabel": "Découvrir",
+      "items": [
+        {
+          "title": "Guide : le coût d'entretien d'un bateau",
+          "description": "Budgets moyens par type de bateau, postes de dépense et leviers d'économie.",
+          "href": "/fr/cout-entretien-bateau"
+        },
+        {
+          "title": "Simulateur de coût d'entretien",
+          "description": "Estime en 2 minutes le budget annuel d'entretien de ton bateau. Gratuit, sans compte.",
+          "href": "/fr/simulateur-cout-entretien"
+        },
+        {
+          "title": "Diagnostic de panne IA",
+          "description": "Décris ta panne moteur, l'IA t'oriente vers les causes probables. Gratuit, sans compte.",
+          "href": "/fr/diagnostic-panne-ia"
+        },
+        {
+          "title": "Recherche de pièces IA",
+          "description": "Retrouve la référence exacte d'une pièce moteur à partir de son numéro de série. Gratuit, sans compte.",
+          "href": "/fr/reference-piece-moteur-ia"
+        }
+      ]
+    },
+    "finalCta": {
+      "title": "Toujours bloqué ?",
+      "titleHighlight": "On est là.",
+      "subtitle": "Écris-nous — une vraie personne te répond.",
+      "primaryCta": {
+        "label": "Contacter l'équipe",
+        "href": "/fr/contact#contact-form"
+      },
+      "secondaryCta": {
+        "label": "Créer un compte gratuit",
+        "href": "/signup"
+      }
+    }
+  }
+}

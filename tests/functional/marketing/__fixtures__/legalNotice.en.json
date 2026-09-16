@@ -1,0 +1,119 @@
+{
+  "meta": {
+    "title": "Legal notice",
+    "description": "FleetAi legal notice: publisher of the service, publication director, hosting provider, intellectual property and consumer mediation."
+  },
+  "legalNotice": {
+    "hero": {
+      "eyebrow": "Legal",
+      "title": "Legal",
+      "titleHighlight": "notice",
+      "subtitle": "Who publishes FleetAi and who hosts it, disclosed as required by the French law on confidence in the digital economy (LCEN).",
+      "updatedLabel": "Last updated:",
+      "updatedDate": "August 16, 2026"
+    },
+    "sections": [
+      {
+        "title": "Publisher of the service",
+        "body": "The fleetai.app website and the FleetAi software are published by:",
+        "entries": [
+          {
+            "label": "Company name",
+            "value": "To be completed — write to support@fleetai.app"
+          },
+          {
+            "label": "Legal form",
+            "value": "To be completed — write to support@fleetai.app"
+          },
+          {
+            "label": "Share capital",
+            "value": "To be completed — write to support@fleetai.app"
+          },
+          {
+            "label": "Registered office",
+            "value": "To be completed — write to support@fleetai.app"
+          },
+          {
+            "label": "Company registration (RCS / SIREN)",
+            "value": "To be completed — write to support@fleetai.app"
+          },
+          {
+            "label": "EU VAT number",
+            "value": "To be completed — write to support@fleetai.app"
+          },
+          {
+            "label": "Email",
+            "value": "support@fleetai.app"
+          },
+          {
+            "label": "Phone",
+            "value": "To be completed — write to support@fleetai.app"
+          }
+        ]
+      },
+      {
+        "title": "Publication director",
+        "body": "The publication director is the legal representative of the publishing company.",
+        "entries": [
+          {
+            "label": "Publication director",
+            "value": "To be completed — write to support@fleetai.app"
+          }
+        ]
+      },
+      {
+        "title": "Hosting",
+        "body": "The website and the service data are hosted in the European Union by:",
+        "entries": [
+          {
+            "label": "Hosting provider",
+            "value": "To be completed — write to support@fleetai.app"
+          },
+          {
+            "label": "Address",
+            "value": "To be completed — write to support@fleetai.app"
+          },
+          {
+            "label": "Contact",
+            "value": "To be completed — write to support@fleetai.app"
+          }
+        ]
+      },
+      {
+        "title": "Intellectual property",
+        "body": "The FleetAi brand, logo, interface, texts, illustrations and source code are protected by intellectual property law and remain the exclusive property of the publisher. Your subscription grants you a personal, non-exclusive right to use the service, with no transfer of ownership. Any reproduction, extraction or reuse, in whole or in part, without prior written permission is prohibited. The data you upload to FleetAi remains yours and is not covered by this clause."
+      },
+      {
+        "title": "Personal data and cookies",
+        "body": "How personal data is processed (purposes, legal basis, retention periods, processors, how to exercise your rights) is described in detail in our privacy policy. For any request about your data, write to the address below."
+      },
+      {
+        "title": "Reporting illegal content",
+        "body": "Under article 6-I-5 of the LCEN, any manifestly illegal content hosted on the service can be reported to us by email at support@fleetai.app. The report should state the date, a description of the content, where it is located and the reasons why it should be removed."
+      },
+      {
+        "title": "Consumer mediation",
+        "body": "If you are a consumer and a complaint sent to our support has not been resolved, you may refer the matter free of charge to a consumer mediator (article L612-1 of the French consumer code):",
+        "entries": [
+          {
+            "label": "Mediator",
+            "value": "To be completed — write to support@fleetai.app"
+          },
+          {
+            "label": "Refer a case to the mediator",
+            "value": "To be completed — write to support@fleetai.app"
+          }
+        ]
+      },
+      {
+        "title": "Governing law",
+        "body": "This legal notice is governed by French law. The rules for using the service are set out in the terms of service, and those for subscribing to a paid plan in the sales terms."
+      }
+    ],
+    "contact": {
+      "title": "A question about this notice?",
+      "body": "For any request about the publisher of the service, a content report or your data, write to us.",
+      "email": "support@fleetai.app"
+    }
+  }
+}

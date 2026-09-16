@@ -1,0 +1,136 @@
+{
+  "meta": {
+    "title": "Coût d'entretien bateau 2026 : Guide complet + Simulateur gratuit",
+    "description": "Découvre le budget réel d'entretien de ton bateau (voilier, catamaran, moteur). Estime tes coûts annuels selon la réglementation Division 240."
+  },
+  "guide": {
+    "hero": {
+      "eyebrow": "Guide pratique",
+      "title": "Quel est le coût d'entretien",
+      "titleHighlight": "d'un bateau ?",
+      "subtitle": "Voilier, catamaran, bateau moteur : tous les budgets détaillés selon la réglementation française (Division 240 - Annexe 240-A.2).",
+      "ctaLabel": "Calculer mon budget →"
+    },
+    "stats": [
+      {
+        "value": "1 500 – 5 000 €",
+        "label": "Budget annuel moyen"
+      },
+      {
+        "value": "20 – 30 %",
+        "label": "Du prix d'achat sur 10 ans"
+      },
+      {
+        "value": "4 postes",
+        "label": "De dépenses principaux"
+      }
+    ],
+    "costs": {
+      "eyebrow": "Les dépenses clés",
+      "title": "Les 4 postes d'entretien",
+      "titleHighlight": "incontournables",
+      "items": [
+        {
+          "title": "Coque & carénage",
+          "desc": "Antifouling, traitement osmose, nettoyage carène, peinture antirouille. À réaliser chaque saison."
+        },
+        {
+          "title": "Moteur & propulsion",
+          "desc": "Vidange, filtres, courroies, anodes, hélice. Critique pour la sécurité et la longévité."
+        },
+        {
+          "title": "Sécurité réglementaire",
+          "desc": "Gilets, extincteurs, VHF, fusées pyrotechniques. Obligatoire selon la Division 240."
+        },
+        {
+          "title": "Gréement & voiles",
+          "desc": "Étais, haubans, winches, voiles. Spécifique aux voiliers et catamarans."
+        }
+      ]
+    },
+    "table": {
+      "eyebrow": "Budgets indicatifs",
+      "title": "Coûts annuels estimés par type de bateau",
+      "colType": "Type",
+      "colLength": "Longueur",
+      "colBudget": "Budget annuel",
+      "colNote": "Note",
+      "rows": [
+        {
+          "type": "Voilier",
+          "length": "8 – 12 m",
+          "budget": "1 500 – 3 500 €",
+          "note": "Hors gros travaux de gréement"
+        },
+        {
+          "type": "Catamaran",
+          "length": "12 – 15 m",
+          "budget": "3 000 – 7 000 €",
+          "note": "Deux moteurs, deux coques"
+        },
+        {
+          "type": "Bateau moteur",
+          "length": "7 – 10 m",
+          "budget": "1 800 – 4 000 €",
+          "note": "Variable selon l'âge du moteur"
+        },
+        {
+          "type": "Semi-rigide (RIB)",
+          "length": "5 – 8 m",
+          "budget": "500 – 1 500 €",
+          "note": "Usage plus simple"
+        }
+      ],
+      "ctaLabel": "Lancer le simulateur →"
+    },
+    "cta": {
+      "eyebrow": "Outil gratuit",
+      "title": "Calcule ton budget précis en 2 minutes",
+      "subtitle": "Notre simulateur gratuit prend en compte le type de bateau, sa longueur, son année de construction et l'état d'usure de chaque équipement.",
+      "button": "Lancer le simulateur →"
+    },
+    "regulation": {
+      "eyebrow": "Réglementation",
+      "title": "La Division 240 : ce que ça implique",
+      "body": "La Division 240 (Annexe 240-A.2) définit les équipements de sécurité obligatoires selon la catégorie de navigation (A à D). Ces équipements ont une durée de vie limitée et doivent être remplacés régulièrement, représentant une part fixe et non négligeable du budget d'entretien."
+    },
+    "faq": {
+      "eyebrow": "Questions fréquentes",
+      "title": "Tout savoir sur le coût",
+      "titleHighlight": "d'entretien d'un bateau",
+      "items": [
+        {
+          "q": "Quel est le budget annuel pour un voilier de 10 m ?",
+          "a": "Pour un voilier de 10 m en bon état, comptez entre 2 000 et 4 000 € par an. Ce budget couvre le carénage (600 – 1 200 €), l'entretien moteur (300 – 600 €), la sécurité Division 240 (200 – 400 €) et l'entretien courant du gréement. Un bateau usé peut doubler ce budget."
+        },
+        {
+          "q": "Un bateau de location est-il plus coûteux à entretenir ?",
+          "a": "Oui, généralement 30 à 50 % de plus. La fréquence d'utilisation plus élevée accélère l'usure des équipements, et les obligations de sécurité sont souvent plus strictes pour les bateaux à usage commercial."
+        },
+        {
+          "q": "La Division 240 impose-t-elle des contrôles payants ?",
+          "a": "La Division 240 n'impose pas de visite payante obligatoire pour les plaisanciers en plaisance privée. Cependant, certains équipements (extincteurs, fusées, gilets) ont une date de péremption légale et doivent être remplacés à intervalle régulier, représentant un coût annuel récurrent."
+        },
+        {
+          "q": "Comment réduire les coûts d'entretien de son bateau ?",
+          "a": "L'entretien préventif est la meilleure stratégie : un carénage annuel soigné coûte moins cher que traiter une osmose avancée. Planifier les interventions avec un logiciel de suivi (comme FleetAi) permet d'anticiper les dépenses et d'éviter les pannes coûteuses."
+        },
+        {
+          "q": "L'âge du bateau influence-t-il beaucoup les coûts ?",
+          "a": "Fortement. Un bateau de plus de 15 ans peut nécessiter 2 à 3 fois plus de budget annuel qu'un bateau récent, notamment à cause du remplacement des équipements électriques, du gréement dormant et des traitements de coque. Notre simulateur prend l'année de construction en compte."
+        },
+        {
+          "q": "Existe-t-il un outil pour estimer précisément les coûts ?",
+          "a": "Oui, notre simulateur gratuit calcule ton budget en 2 minutes selon le type de bateau, sa longueur, son année de construction et l'état d'usure de chaque système (coque, moteur, sécurité, gréement). Il est basé sur la réglementation Division 240."
+        }
+      ]
+    },
+    "finalCta": {
+      "title": "Commence à suivre ton entretien",
+      "titleHighlight": "gratuitement",
+      "subtitle": "Crée ton compte FleetAi et ajoute ton premier bateau. Le plan Starter est gratuit à vie, sans carte bancaire.",
+      "primaryCta": "Essayer gratuitement",
+      "secondaryCta": "Voir le simulateur"
+    }
+  }
+}

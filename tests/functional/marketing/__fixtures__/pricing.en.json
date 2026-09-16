@@ -1,0 +1,441 @@
+{
+  "t": {
+    "meta": {
+      "title": "Pricing",
+      "description": "One price per fleet, not per user. Free plan for 2 boats · €20/month (€16 annual) for up to 8 boats · Enterprise €99/month (€79 annual)."
+    },
+    "pricing": {
+      "hero": {
+        "eyebrowLabel": "PRICING",
+        "title": "One price,",
+        "titleHighlight": "per fleet.",
+        "subtitle": "You pay for the number of boats you manage, not per seat. Starter: 1 user · Pro: up to 5 · Enterprise: unlimited.",
+        "monthlyLabel": "Monthly",
+        "annualLabel": "Annual",
+        "annualBadge": "−20%"
+      },
+      "tierFeaturedBadge": "Recommended",
+      "billedAnnuallyNote": "Billed annually.",
+      "tierFreeLabel": "Free",
+      "tiers": [
+        {
+          "name": "Starter",
+          "tag": "Get started",
+          "price": 0,
+          "pricePer": "/ month",
+          "sub": "Ideal for 1 or 2 personal boats",
+          "feats": [
+            ["Up to 2 boats"],
+            ["1 user"],
+            ["Unlimited history", "immutable, exportable"],
+            ["Event & task entry"],
+            ["Email support", "48h response"],
+            ["2 AI breakdown diagnoses", "on the public chat, no expiry date"]
+          ],
+          "cta": "Start for free",
+          "ctaVariant": "outline"
+        },
+        {
+          "name": "Pro",
+          "tag": "Most popular",
+          "price": 20,
+          "pricePer": "/ month",
+          "priceAnnual": 16,
+          "priceAnnualPer": "/ month",
+          "sub": "Up to 8 boats · up to 5 users",
+          "featured": true,
+          "feats": [
+            ["Up to 8 boats"],
+            ["Up to 5 users", "mechanics, skippers, yards"],
+            ["FleetAi AI", "Mistral copilot"],
+            ["Calendar + Kanban"],
+            ["Documents & insurance", "20 GB"],
+            ["PDF / CSV export"],
+            ["Full mobile app"],
+            ["Email notifications"],
+            ["Priority support", "4h response"]
+          ],
+          "cta": "Choose Pro",
+          "ctaVariant": "primary"
+        },
+        {
+          "name": "Enterprise",
+          "tag": "Large fleet",
+          "price": 99,
+          "pricePer": "/ month",
+          "priceAnnual": 79,
+          "priceAnnualPer": "/ month",
+          "sub": "Beyond 8 boats · specific needs",
+          "feats": [
+            ["Unlimited boats"],
+            ["Marina mapping", "pontoons, moorings, berths"],
+            ["99.9% SLA guaranteed"],
+            ["Dedicated hosting", "on-premise EU option"],
+            ["Guided onboarding", "2 days on-site"],
+            ["DPO & GDPR audit"],
+            ["Dedicated account manager"]
+          ],
+          "cta": "Choose Enterprise",
+          "ctaVariant": "secondary"
+        }
+      ],
+      "reassurance": [
+        {
+          "icon": "✓",
+          "label": "No commitment"
+        },
+        {
+          "icon": "✓",
+          "label": "No credit card"
+        },
+        {
+          "icon": "✓",
+          "label": "Cancel in 1 click"
+        },
+        {
+          "icon": "✓",
+          "label": "Free migration"
+        },
+        {
+          "icon": "✓",
+          "label": "GDPR & EU hosting"
+        }
+      ],
+      "roi": {
+        "eyebrow": "ROI CALCULATOR",
+        "title": "How much do",
+        "titleHighlight": "you save",
+        "subtitle": "Estimate based on data from 40+ fleets. Adjust the sliders to match your reality.",
+        "profileLabel": "Your profile",
+        "boatsLabel": "Boats",
+        "hourlyLabel": "Average hourly cost",
+        "studyNote": "Internal 2025 study on 40 fleets — adjust the parameters to match your reality.",
+        "savingsLabel": "Estimated savings · annual",
+        "perMonthLabel": "i.e. {amount} / month",
+        "timeLabel": "Team time saved",
+        "maintLabel": "Missed maintenances avoided",
+        "fleetideLabel": "FleetAi optimisations",
+        "fleetCostLabel": "FleetAi cost",
+        "roiLabel": "Net ROI",
+        "ctaLabel": "Test with my fleet",
+        "profiles": {
+          "loueurs": {
+            "label": "Rental",
+            "emoji": "⛵"
+          },
+          "ecoles": {
+            "label": "School",
+            "emoji": "🎓"
+          },
+          "marinas": {
+            "label": "Marina",
+            "emoji": "🏗"
+          },
+          "armateurs": {
+            "label": "Owner",
+            "emoji": "⚓"
+          }
+        }
+      },
+      "testimonials": {
+        "eyebrow": "RETURN ON INVESTMENT",
+        "title": "They",
+        "titleHighlight": "broke even",
+        "items": [
+          {
+            "stat": "2 months",
+            "statLabel": "to break even",
+            "quote": "With 14 boats, the math was quick: one avoided missed maintenance, and FleetAi paid for itself.",
+            "name": "Marc Lefèvre",
+            "org": "Marina Bleue · 22 boats",
+            "role": "Manager",
+            "plan": "Pro Plan"
+          },
+          {
+            "stat": "8h / week",
+            "statLabel": "saved by the team",
+            "quote": "We cut a part-time admin role. Mechanics log from the dock, admin handles exceptions.",
+            "name": "Anaïs Mercier",
+            "org": "SailCorp · 38 boats",
+            "role": "Co-founder",
+            "plan": "Pro Plan"
+          },
+          {
+            "stat": "×4.5",
+            "statLabel": "annual ROI",
+            "quote": "€380 invested for €1,700 saved in FleetAi optimisations. I don't see the debate.",
+            "name": "Thomas Garnier",
+            "org": "École de la Mer · 14 dinghies",
+            "role": "Education Director",
+            "plan": "Pro Plan"
+          }
+        ]
+      },
+      "configurator": {
+        "eyebrow": "CONFIGURATOR",
+        "title": "Build",
+        "titleHighlight": "your plan.",
+        "subtitle": "Start from the Pro core and switch on the modules you need — the price updates live.",
+        "baseName": "Pro core",
+        "baseDesc": "The FleetAi core, always included.",
+        "basePriceMonthly": 20,
+        "basePriceAnnual": 16,
+        "modulesLabel": "ADD YOUR MODULES",
+        "perMonth": "/mo",
+        "perYear": "/yr",
+        "totalLabel": "Your total",
+        "annualSaveLabel": "You save",
+        "billedAnnuallyNote": "Billed annually.",
+        "ctaLabel": "Start with this plan",
+        "ctaHref": "/signup",
+        "modules": [
+          {
+            "key": "charter",
+            "icon": "📅",
+            "name": "Charter",
+            "desc": "Reservations, inspections, contracts and seasonal pricing for rental businesses.",
+            "priceMonthly": 15,
+            "priceAnnual": 12,
+            "features": ["Per-boat pricing", "Seasonal periods"]
+          },
+          {
+            "key": "crm_invoicing",
+            "icon": "🧾",
+            "name": "CRM & Invoicing",
+            "desc": "Client records, GDPR, quotes and invoices.",
+            "priceMonthly": 15,
+            "priceAnnual": 12,
+            "features": ["Client records & GDPR", "Quotes & invoices"]
+          }
+        ],
+        "enterprise": {
+          "name": "Enterprise",
+          "priceMonthly": 99,
+          "priceAnnual": 79,
+          "note": "All modules included, no limits.",
+          "ctaLabel": "See Enterprise"
+        },
+        "extraBoats": {
+          "name": "Extra boats",
+          "desc": "Beyond the boats included in the Pro base, on demand.",
+          "priceMonthly": 4,
+          "priceAnnual": 3,
+          "perBoatLabel": "/boat/month"
+        }
+      },
+      "detailedTable": {
+        "eyebrow": "DETAILED COMPARISON",
+        "title": "Compare the plans,",
+        "titleHighlight": "line by line.",
+        "subtitle": "No surprises in the fine print. Everything is here.",
+        "expandAll": "Expand all",
+        "collapseAll": "Collapse all",
+        "addonLabel": "Add-on",
+        "billedAnnuallyNote": "Billed annually.",
+        "planHeaders": [
+          {
+            "name": "Starter",
+            "price": "Free",
+            "cta": "Get started"
+          },
+          {
+            "name": "Pro",
+            "priceMonthly": 20,
+            "priceAnnual": 16,
+            "pricePer": "/ month",
+            "cta": "Choose Pro"
+          },
+          {
+            "name": "Enterprise",
+            "priceMonthly": 99,
+            "priceAnnual": 79,
+            "pricePer": "/ month",
+            "cta": "Contact"
+          }
+        ],
+        "groups": [
+          {
+            "title": "Core product",
+            "rows": [
+              ["Boats managed", "2", "up to 8", "unlimited"],
+              ["Users", "1", "up to 5", "unlimited"],
+              ["Immutable history", true, true, true],
+              ["White-label application", false, false, true]
+            ]
+          },
+          {
+            "title": "Maintenance",
+            "rows": [
+              ["Unlimited event entry", true, true, true],
+              ["Calendar scheduling", false, true, true],
+              ["Engine-hours scheduling", false, true, true],
+              ["Automatic grouping", false, true, true],
+              ["Equipment & job photos", true, true, true],
+              ["PDF maintenance log", false, true, true],
+              ["Parts & stock tracking", false, true, true],
+              ["Marina mapping (pontoons, moorings, berths)", false, false, true]
+            ]
+          },
+          {
+            "title": "Team & collaboration",
+            "rows": [
+              ["Granular roles & permissions", false, "basic", "advanced"],
+              ["Audit log", false, "90 days", "unlimited"],
+              ["Email notifications", true, true, true]
+            ]
+          },
+          {
+            "title": "FleetAi · AI",
+            "rows": [
+              ["Conversational copilot", false, true, true],
+              ["Contextual suggestions", false, true, true],
+              ["Conversational scheduling", false, true, true],
+              ["EU-hosted Mistral model", false, true, true],
+              ["Model customisation", false, false, true],
+              ["Tokens / month", false, "1M", "unlimited"],
+              [
+                "Public breakdown diagnosis",
+                "2 for life",
+                "no conversation cap",
+                "no conversation cap"
+              ]
+            ]
+          },
+          {
+            "title": "Documents & insurance",
+            "rows": [
+              ["Document storage", "1 GB", "20 GB", "unlimited"],
+              ["Insurance expiry reminders", false, true, true],
+              ["PDF / CSV export", false, true, true]
+            ]
+          },
+          {
+            "title": "Support & onboarding",
+            "rows": [
+              ["Email support", "48h", "4h", "< 1h"],
+              ["Chat support", false, true, true],
+              ["Phone support", false, false, true],
+              ["Dedicated Account Manager", false, false, true],
+              ["Initial video onboarding", false, "1h", "1 day"],
+              ["Uptime SLA", "99%", "99.5%", "99.9%"]
+            ]
+          },
+          {
+            "title": "Add-on modules",
+            "rows": [
+              ["Per-boat pricing & seasons", false, "addon", true],
+              ["Client records (CRM)", false, "addon", true],
+              ["Quotes & invoices", false, "addon", true]
+            ]
+          }
+        ]
+      },
+      "extras": {
+        "eyebrow": "OPTIONS & SERVICES",
+        "title": "Beyond the subscription.",
+        "subtitle": "A few à la carte services to get started faster or go further.",
+        "items": [
+          {
+            "icon": "⚓",
+            "title": "Migration from Excel",
+            "sub": "Our team imports your fleet and 5 years of history.",
+            "price": "Free",
+            "priceSub": "Pro plans and above",
+            "tone": "mint"
+          },
+          {
+            "icon": "🚀",
+            "title": "Guided onboarding",
+            "sub": "2 × 90-minute sessions with an expert to configure your organisation.",
+            "price": "€490",
+            "priceSub": "one-off",
+            "tone": "coral"
+          },
+          {
+            "icon": "🔗",
+            "title": "Custom integration",
+            "sub": "Custom API, third-party connectors, booking platform.",
+            "price": "Custom quote",
+            "priceSub": "Enterprise plans",
+            "tone": "bone"
+          }
+        ]
+      },
+      "modules": {
+        "eyebrow": "ADD-ON MODULES",
+        "title": "Pay only for what you use",
+        "subtitle": "Activate business modules on top of your Pro plan, billed separately.",
+        "note": "Available on the Pro plan.",
+        "pricePer": "/mo",
+        "includedLabel": "All modules are included in Enterprise.",
+        "items": [
+          {
+            "icon": "📅",
+            "name": "Charter",
+            "desc": "Reservations, inspections, contracts and seasonal pricing for rental businesses.",
+            "price": 15
+          },
+          {
+            "icon": "🧾",
+            "name": "CRM & Invoicing",
+            "desc": "Client records, GDPR, quotes and invoices.",
+            "price": 15
+          }
+        ]
+      },
+      "faq": {
+        "eyebrow": "PRICING FAQ",
+        "title": "Questions we actually",
+        "titleHighlight": "get asked.",
+        "subtitle": "If yours isn't listed, we reply within 4 business hours.",
+        "ctaLabel": "Ask a question",
+        "items": [
+          {
+            "q": "Is the Starter plan really free?",
+            "a": "Yes, free forever: up to 2 boats, 1 user, unlimited history. No credit card, no deadline. You can move to Pro or Enterprise any time from your settings, and back to Starter without losing your data."
+          },
+          {
+            "q": "How do I pay for boats?",
+            "a": "You pay a flat fee per plan, regardless of the exact number of boats within the range. Beyond the 8 boats included in Pro, you add extra boats at €4/boat/month, or move to Enterprise (unlimited boats) — no cutoff, no surprise overage."
+          },
+          {
+            "q": "Is there a commitment?",
+            "a": "No. Monthly or annual, you can cancel any time in 1 click from your account. Annual simply offers −20% in exchange for a yearly commitment."
+          },
+          {
+            "q": "What about VAT?",
+            "a": "Prices shown are excluding tax. VAT (20% for French B2C customers, exempt for EU B2B with a valid VAT number) is applied at billing."
+          },
+          {
+            "q": "What happens if I cancel?",
+            "a": "You keep access until the end of the paid period. Then you move to the free Starter plan for 90 days to export your data."
+          },
+          {
+            "q": "Which payment methods do you accept?",
+            "a": "Credit card (Visa, Mastercard, AmEx), SEPA direct debit, bank transfer (annual only). Secure Stripe billing."
+          },
+          {
+            "q": "Can I test FleetAi on the Starter plan?",
+            "a": "The full FleetAi AI (copilot, contextual suggestions, conversational scheduling) is reserved for the Pro and Enterprise plans. The Starter plan stays free for fleet tracking, maintenance and history, and includes 2 AI breakdown diagnoses — upgrade to Pro any time to unlock the rest."
+          },
+          {
+            "q": "Do you offer student / non-profit pricing?",
+            "a": "Yes — 50% discount for non-profit schools and sports associations. Contact us with your registration number."
+          },
+          {
+            "q": "Can I try the AI without an account?",
+            "a": "Yes. The engine breakdown diagnosis is open to everyone from the site: you describe the fault, the assistant asks a few questions, then points you to the likely causes, from the cheapest to the most expensive to check. It is free and account-free, up to 2 diagnoses — the Pro and Enterprise plans have no conversation cap at all, only their monthly AI token quota."
+          }
+        ]
+      },
+      "finalCta": {
+        "title": "The Starter plan,",
+        "titleHighlight": "free forever.",
+        "subtitle": "No credit card. No commitment. Set up your fleet in 5 minutes.",
+        "primaryCta": "Create my organisation",
+        "secondaryCta": "Try the demo",
+        "demoLoginPath": "/demo"
+      }
+    }
+  }
+}

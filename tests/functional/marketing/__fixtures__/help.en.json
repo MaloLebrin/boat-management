@@ -1,0 +1,147 @@
+{
+  "t": {
+    "meta": {
+      "title": "Help & support — FleetAi",
+      "description": "Need a hand? Contact channels, frequently asked questions and resources to get the most out of FleetAi."
+    },
+    "hero": {
+      "eyebrow": "Help & support",
+      "title": "Need a",
+      "titleHighlight": "hand?",
+      "subtitle": "A question about the product, your account or billing: start here — and if you can't find it, we're one email away."
+    },
+    "channels": [
+      {
+        "title": "Email support",
+        "description": "A question, a blocker? The team replies within 4 business hours.",
+        "ctaLabel": "support@fleetai.app",
+        "href": "mailto:support@fleetai.app",
+        "external": true
+      },
+      {
+        "title": "Send a message",
+        "description": "Describe what you need through the contact form and we'll get back to you quickly.",
+        "ctaLabel": "Open the form",
+        "href": "/en/contact#contact-form"
+      },
+      {
+        "title": "Try the demo",
+        "description": "Explore FleetAi freely on a demo fleet, no sign-up needed.",
+        "ctaLabel": "Launch the demo",
+        "href": "/demo",
+        "demo": true
+      }
+    ],
+    "faq": {
+      "eyebrow": "FAQ",
+      "title": "Answers to",
+      "titleHighlight": "frequent questions",
+      "groups": [
+        {
+          "title": "Getting started",
+          "items": [
+            {
+              "q": "What is fleet maintenance management software?",
+              "a": "A platform that centralizes each boat's maintenance history, schedules upcoming maintenance by calendar or hour thresholds, and alerts before critical operations become overdue."
+            },
+            {
+              "q": "My boats don't have connected sensors. Does it still work?",
+              "a": "Yes. FleetAi is designed for manual entry of engine hours."
+            },
+            {
+              "q": "Can I migrate from another tool?",
+              "a": "Yes — we import Excel, Google Sheets, Airtable and CSV/PDF exports from your existing tools."
+            },
+            {
+              "q": "How many users can I add?",
+              "a": "Starter: 1 user. Pro: up to 5 users. Enterprise: unlimited. You pay per organization, not per seat."
+            }
+          ]
+        },
+        {
+          "title": "Pricing & billing",
+          "items": [
+            {
+              "q": "Is the Starter plan really free?",
+              "a": "Yes, free forever: up to 2 boats, 1 user, unlimited history. No credit card, no deadline. You can move to Pro or Enterprise any time from your settings, and back to Starter without losing your data."
+            },
+            {
+              "q": "How much does FleetAi cost for 15 boats?",
+              "a": "The Pro plan covers up to 8 boats for €20/month (€16/month billed annually). Beyond that you add extra boats at €4/boat/month: 15 boats comes to €48/month on Pro. The Enterprise plan (€99/month) lifts the boat limit entirely. No hidden fees."
+            },
+            {
+              "q": "Is there a commitment?",
+              "a": "No. Monthly or annual, you can cancel any time in 1 click from your account. Annual simply offers −20% in exchange for a yearly commitment."
+            },
+            {
+              "q": "What happens if I cancel?",
+              "a": "You keep access until the end of the paid period. Then you move to the free Starter plan for 90 days to export your data."
+            }
+          ]
+        },
+        {
+          "title": "Data & security",
+          "items": [
+            {
+              "q": "Where is my data hosted?",
+              "a": "In the European Union (OVHcloud, Strasbourg), with no transfer outside the EU. Everything is encrypted in transit (TLS 1.3) and at rest (AES-256)."
+            },
+            {
+              "q": "Is FleetAi GDPR compliant?",
+              "a": "Yes: dedicated DPO, deletion of your data on request within 30 days, daily backups kept for 30 days."
+            },
+            {
+              "q": "Is my data kept if I cancel my subscription?",
+              "a": "For 90 days after cancellation, you can export to CSV/PDF. After that, permanent deletion (GDPR)."
+            },
+            {
+              "q": "Does the AI see other customers' data?",
+              "a": "No. Each organization is isolated. The AI only sees your data."
+            }
+          ]
+        }
+      ]
+    },
+    "resources": {
+      "eyebrow": "Resources",
+      "title": "Move forward on your own",
+      "subtitle": "Free guides and tools, no account needed.",
+      "linkLabel": "Explore",
+      "items": [
+        {
+          "title": "Guide: boat maintenance costs",
+          "description": "Average budgets by boat type, cost categories and ways to save.",
+          "href": "/en/boat-maintenance-cost"
+        },
+        {
+          "title": "Maintenance cost simulator",
+          "description": "Estimate your boat's yearly maintenance budget in 2 minutes. Free, no account needed.",
+          "href": "/en/maintenance-cost-simulator"
+        },
+        {
+          "title": "AI engine diagnosis",
+          "description": "Describe your engine issue and the AI points you to the likely causes. Free, no account needed.",
+          "href": "/en/engine-diagnosis-ai"
+        },
+        {
+          "title": "AI part finder",
+          "description": "Find the exact engine part reference from its serial number. Free, no account needed.",
+          "href": "/en/engine-part-finder-ai"
+        }
+      ]
+    },
+    "finalCta": {
+      "title": "Still stuck?",
+      "titleHighlight": "We're here.",
+      "subtitle": "Write to us — a real person answers.",
+      "primaryCta": {
+        "label": "Contact the team",
+        "href": "/en/contact#contact-form"
+      },
+      "secondaryCta": {
+        "label": "Create a free account",
+        "href": "/signup"
+      }
+    }
+  }
+}

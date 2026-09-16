@@ -1,0 +1,136 @@
+{
+  "meta": {
+    "title": "Boat Maintenance Cost 2026: Complete Guide + Free Calculator",
+    "description": "Discover the real annual maintenance cost of your boat (sailboat, catamaran, motorboat). Estimate your budget using French Division 240 regulation benchmarks."
+  },
+  "guide": {
+    "hero": {
+      "eyebrow": "Practical guide",
+      "title": "What Does Boat Maintenance",
+      "titleHighlight": "Actually Cost?",
+      "subtitle": "Sailboat, catamaran, motorboat: detailed budgets for every type, benchmarked against the Division 240 regulation (Annex 240-A.2).",
+      "ctaLabel": "Calculate my budget →"
+    },
+    "stats": [
+      {
+        "value": "€1,500 – €5,000",
+        "label": "Average annual budget"
+      },
+      {
+        "value": "20 – 30 %",
+        "label": "Of purchase price over 10 years"
+      },
+      {
+        "value": "4 categories",
+        "label": "Of main expenses"
+      }
+    ],
+    "costs": {
+      "eyebrow": "Key expenses",
+      "title": "The 4 essential",
+      "titleHighlight": "maintenance categories",
+      "items": [
+        {
+          "title": "Hull & antifouling",
+          "desc": "Antifouling paint, osmosis treatment, hull cleaning, antirust coating. Required every season."
+        },
+        {
+          "title": "Engine & propulsion",
+          "desc": "Oil change, filters, belts, anodes, propeller. Critical for safety and longevity."
+        },
+        {
+          "title": "Regulatory safety",
+          "desc": "Life jackets, fire extinguishers, VHF radio, flares. Mandatory under Division 240."
+        },
+        {
+          "title": "Rigging & sails",
+          "desc": "Stays, shrouds, winches, sails. Specific to sailboats and catamarans."
+        }
+      ]
+    },
+    "table": {
+      "eyebrow": "Indicative budgets",
+      "title": "Estimated annual costs by boat type",
+      "colType": "Type",
+      "colLength": "Length",
+      "colBudget": "Annual budget",
+      "colNote": "Note",
+      "rows": [
+        {
+          "type": "Sailboat",
+          "length": "8 – 12 m",
+          "budget": "€1,500 – €3,500",
+          "note": "Excluding major rigging work"
+        },
+        {
+          "type": "Catamaran",
+          "length": "12 – 15 m",
+          "budget": "€3,000 – €7,000",
+          "note": "Two engines, two hulls"
+        },
+        {
+          "type": "Motorboat",
+          "length": "7 – 10 m",
+          "budget": "€1,800 – €4,000",
+          "note": "Varies with engine age"
+        },
+        {
+          "type": "RIB",
+          "length": "5 – 8 m",
+          "budget": "€500 – €1,500",
+          "note": "Simpler maintenance"
+        }
+      ],
+      "ctaLabel": "Launch the simulator →"
+    },
+    "cta": {
+      "eyebrow": "Free tool",
+      "title": "Calculate your exact budget in 2 minutes",
+      "subtitle": "Our free simulator accounts for boat type, length, year of construction and wear level of each system.",
+      "button": "Launch the simulator →"
+    },
+    "regulation": {
+      "eyebrow": "Regulation",
+      "title": "Division 240: what it means for your budget",
+      "body": "Division 240 (Annex 240-A.2) defines mandatory safety equipment by navigation category (A to D). These items have a legal lifespan and must be replaced periodically, representing a fixed and unavoidable share of annual maintenance costs."
+    },
+    "faq": {
+      "eyebrow": "Frequently asked questions",
+      "title": "Everything about boat",
+      "titleHighlight": "maintenance costs",
+      "items": [
+        {
+          "q": "What is the annual budget for a 10 m sailboat?",
+          "a": "For a 10 m sailboat in good condition, budget €2,000 to €4,000 per year. This covers antifouling (€600 – €1,200), engine servicing (€300 – €600), Division 240 safety gear (€200 – €400), and routine rigging maintenance. A worn boat can double this budget."
+        },
+        {
+          "q": "Does a charter boat cost more to maintain?",
+          "a": "Yes, typically 30 to 50 % more. Higher usage frequency accelerates wear, and safety requirements are often stricter for commercially operated vessels."
+        },
+        {
+          "q": "Does Division 240 impose paid inspections?",
+          "a": "Division 240 does not require paid inspections for private leisure boaters. However, certain equipment (fire extinguishers, flares, life jackets) has legal expiry dates and must be replaced at set intervals, creating a recurring annual cost."
+        },
+        {
+          "q": "How can I reduce boat maintenance costs?",
+          "a": "Preventive maintenance is the best strategy: a timely antifouling job costs far less than treating advanced osmosis. Using maintenance tracking software (like FleetAi) helps schedule interventions in advance and avoid costly breakdowns."
+        },
+        {
+          "q": "Does a boat's age significantly impact maintenance costs?",
+          "a": "Significantly. A boat over 15 years old can require 2 to 3 times the annual budget of a newer vessel, mainly due to electrical system replacement, standing rigging, and hull treatment. Our simulator factors in the year of construction."
+        },
+        {
+          "q": "Is there a tool to estimate costs precisely?",
+          "a": "Yes, our free simulator calculates your budget in 2 minutes based on boat type, length, year of construction, and the wear level of each system (hull, engine, safety, rigging). It is benchmarked against the Division 240 regulation."
+        }
+      ]
+    },
+    "finalCta": {
+      "title": "Start tracking your maintenance",
+      "titleHighlight": "for free",
+      "subtitle": "Create your FleetAi account and add your first boat. The Starter plan is free forever, no credit card required.",
+      "primaryCta": "Try for free",
+      "secondaryCta": "View the simulator"
+    }
+  }
+}
