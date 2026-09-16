@@ -1,0 +1,155 @@
+{
+  "filename": "role-equipage-2026-07-14.pdf",
+  "calls": [
+    ["font", "Helvetica", null],
+    ["addPage"],
+    ["rect", 48, 48, 499.28, 48],
+    ["fill", "#0b1d2e"],
+    ["fillColor", "#0b1d2e"],
+    ["font", "Helvetica-Bold"],
+    ["fontSize", 16],
+    ["fillColor", "#ffffff"],
+    [
+      "text",
+      "Crew list",
+      64,
+      63,
+      {
+        "width": 467.28
+      }
+    ],
+    ["moveDown", 0.5],
+    ["font", "Helvetica"],
+    ["fontSize", 10],
+    ["fillColor", "#0b1d2e"],
+    ["text", "Departure : 14/07/2026 08:30", 48, 112],
+    ["text", "Arrival : 14/07/2026 17:45", 48, 128],
+    ["text", "Route : Marseille → Cassis", 48, 144],
+    ["moveDown", 2],
+    ["rect", 48, 186.68, 499.28, 24],
+    ["fill", "#e2674f"],
+    ["fillColor", "#e2674f"],
+    ["font", "Helvetica-Bold"],
+    ["fontSize", 9],
+    ["fillColor", "#ffffff"],
+    [
+      "text",
+      "Name",
+      56,
+      193.68,
+      {
+        "width": 174.75
+      }
+    ],
+    [
+      "text",
+      "Role",
+      230.75,
+      193.68,
+      {
+        "width": 124.82
+      }
+    ],
+    [
+      "text",
+      "Email",
+      355.57,
+      193.68,
+      {
+        "width": 191.71
+      }
+    ],
+    ["rect", 48, 210.68, 499.28, 22],
+    ["fill", "#f8f8f8"],
+    ["fillColor", "#f8f8f8"],
+    ["stroke", "#e0e0e0"],
+    ["strokeColor", "#e0e0e0"],
+    ["font", "Helvetica"],
+    ["fontSize", 9],
+    ["fillColor", "#0b1d2e"],
+    [
+      "text",
+      "Alice Dupont",
+      56,
+      216.68,
+      {
+        "width": 174.75
+      }
+    ],
+    [
+      "text",
+      "Skipper",
+      230.75,
+      216.68,
+      {
+        "width": 124.82
+      }
+    ],
+    [
+      "text",
+      "alice@example.com",
+      355.57,
+      216.68,
+      {
+        "width": 191.71
+      }
+    ],
+    ["rect", 48, 232.68, 499.28, 22],
+    ["fill", "#ffffff"],
+    ["fillColor", "#ffffff"],
+    ["stroke", "#e0e0e0"],
+    ["strokeColor", "#e0e0e0"],
+    ["font", "Helvetica"],
+    ["fontSize", 9],
+    ["fillColor", "#0b1d2e"],
+    [
+      "text",
+      "Bob Martin",
+      56,
+      238.68,
+      {
+        "width": 174.75
+      }
+    ],
+    [
+      "text",
+      "Crew",
+      230.75,
+      238.68,
+      {
+        "width": 124.82
+      }
+    ],
+    [
+      "text",
+      "bob@example.com",
+      355.57,
+      238.68,
+      {
+        "width": 191.71
+      }
+    ],
+    ["switchToPage", 0],
+    ["font", "Helvetica"],
+    ["fontSize", 7],
+    ["fillColor", "#888888"],
+    [
+      "text",
+      "Automatically generated document — to be validated by the captain",
+      48,
+      817.89,
+      {
+        "width": 499.28,
+        "align": "center"
+      }
+    ],
+    [
+      "addPage",
+      {
+        "margin": 48,
+        "size": "A4"
+      }
+    ],
+    ["fillColor", "#888888", null]
+  ]
+}

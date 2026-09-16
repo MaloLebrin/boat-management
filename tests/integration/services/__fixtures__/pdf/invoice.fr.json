@@ -1,0 +1,312 @@
+{
+  "filename": "FAC-000042.pdf",
+  "calls": [
+    ["font", "Helvetica", null],
+    ["addPage"],
+    ["rect", 0, 0, 595.28, 100],
+    ["fill", "#1e3a5f"],
+    ["fillColor", "#1e3a5f"],
+    ["fillColor", "#ffffff"],
+    ["fontSize", 18],
+    ["font", "Helvetica-Bold"],
+    ["text", "Marina Nord", 48, 25],
+    ["fillColor", "#e2674f"],
+    ["fontSize", 12],
+    ["font", "Helvetica"],
+    ["text", "Facture FAC-000042", 48, 50],
+    ["fillColor", "#888888"],
+    ["fontSize", 8],
+    ["font", "Helvetica"],
+    ["text", "Généré le <today>", 48, 75],
+    ["rect", 0, 100, 595.28, 3],
+    ["fill", "#e2674f"],
+    ["fillColor", "#e2674f"],
+    ["text", "", 48, 123],
+    ["fillColor", "#000"],
+    ["fontSize", 9],
+    ["font", "Helvetica-Bold"],
+    ["fillColor", "#0b1d2e"],
+    ["text", "Date d'émission", 48, 123],
+    ["fontSize", 9],
+    ["font", "Helvetica"],
+    ["fillColor", "#333333"],
+    ["text", "2026-07-05", 138, 123],
+    ["fontSize", 9],
+    ["font", "Helvetica-Bold"],
+    ["fillColor", "#0b1d2e"],
+    ["text", "Date d'échéance", 48, 137],
+    ["fontSize", 9],
+    ["font", "Helvetica"],
+    ["fillColor", "#333333"],
+    ["text", "2026-08-04", 138, 137],
+    ["fontSize", 9],
+    ["font", "Helvetica-Bold"],
+    ["fillColor", "#0b1d2e"],
+    ["text", "Statut", 48, 151],
+    ["fontSize", 9],
+    ["font", "Helvetica"],
+    ["fillColor", "#333333"],
+    ["text", "Envoyé", 138, 151],
+    ["fontSize", 9],
+    ["font", "Helvetica-Bold"],
+    ["fillColor", "#0b1d2e"],
+    ["text", "Client", 297.64, 123],
+    ["fontSize", 9],
+    ["font", "Helvetica"],
+    ["fillColor", "#333333"],
+    ["text", "Alice Martin", 297.64, 137],
+    ["text", "", 48, 181],
+    ["moveDown", 0.4],
+    ["rect", 48, 185.16, 499.28, 0.5],
+    ["fill", "#e0e0e0"],
+    ["fillColor", "#e0e0e0"],
+    ["moveDown", 0.8],
+    ["rect", 40, 189.48, 515.28, 20],
+    ["fill", "#1e3a5f"],
+    ["fillColor", "#1e3a5f"],
+    ["fontSize", 8],
+    ["font", "Helvetica-Bold"],
+    ["fillColor", "#ffffff"],
+    [
+      "text",
+      "Description",
+      48,
+      193.48,
+      {
+        "width": 245.64
+      }
+    ],
+    [
+      "text",
+      "Quantité",
+      297.64,
+      193.48,
+      {
+        "width": 55.91,
+        "align": "right"
+      }
+    ],
+    [
+      "text",
+      "Prix unitaire",
+      357.55,
+      193.48,
+      {
+        "width": 90.86,
+        "align": "right"
+      }
+    ],
+    [
+      "text",
+      "Montant",
+      452.42,
+      193.48,
+      {
+        "width": 94.86,
+        "align": "right"
+      }
+    ],
+    ["text", "", 48, 213.48],
+    ["fillColor", "#000"],
+    ["rect", 40, 211.48, 515.28, 18],
+    ["fill", "#f8f8f8"],
+    ["fillColor", "#f8f8f8"],
+    ["fontSize", 8],
+    ["font", "Helvetica"],
+    ["fillColor", "#333333"],
+    [
+      "text",
+      "Location Hermione — 7 jours",
+      48,
+      213.48,
+      {
+        "width": 241.64
+      }
+    ],
+    [
+      "text",
+      "7",
+      297.64,
+      213.48,
+      {
+        "width": 55.91,
+        "align": "right"
+      }
+    ],
+    [
+      "text",
+      "150,00 €",
+      357.55,
+      213.48,
+      {
+        "width": 90.86,
+        "align": "right"
+      }
+    ],
+    [
+      "text",
+      "1 050,00 €",
+      452.42,
+      213.48,
+      {
+        "width": 94.86,
+        "align": "right"
+      }
+    ],
+    ["text", "", 48, 229.48],
+    ["rect", 40, 227.48, 515.28, 18],
+    ["fill", "#ffffff"],
+    ["fillColor", "#ffffff"],
+    ["fontSize", 8],
+    ["font", "Helvetica"],
+    ["fillColor", "#333333"],
+    [
+      "text",
+      "Nettoyage de fin de séjour",
+      48,
+      229.48,
+      {
+        "width": 241.64
+      }
+    ],
+    [
+      "text",
+      "1",
+      297.64,
+      229.48,
+      {
+        "width": 55.91,
+        "align": "right"
+      }
+    ],
+    [
+      "text",
+      "184,50 €",
+      357.55,
+      229.48,
+      {
+        "width": 90.86,
+        "align": "right"
+      }
+    ],
+    [
+      "text",
+      "184,50 €",
+      452.42,
+      229.48,
+      {
+        "width": 94.86,
+        "align": "right"
+      }
+    ],
+    ["text", "", 48, 245.48],
+    ["moveDown", 0.5],
+    ["fontSize", 9],
+    ["font", "Helvetica"],
+    ["fillColor", "#333333"],
+    ["text", "Sous-total", 347.57, 250.11],
+    [
+      "text",
+      "1 234,50 €",
+      472.39,
+      250.11,
+      {
+        "width": 74.89,
+        "align": "right"
+      }
+    ],
+    ["fontSize", 9],
+    ["font", "Helvetica"],
+    ["fillColor", "#333333"],
+    ["text", "TVA (20%)", 347.57, 266.11],
+    [
+      "text",
+      "246,90 €",
+      472.39,
+      266.11,
+      {
+        "width": 74.89,
+        "align": "right"
+      }
+    ],
+    ["rect", 339.57, 282.11, 215.71, 22],
+    ["fill", "#0b1d2e"],
+    ["fillColor", "#0b1d2e"],
+    ["fontSize", 10],
+    ["font", "Helvetica-Bold"],
+    ["fillColor", "#ffffff"],
+    ["text", "Total", 347.57, 288.11],
+    [
+      "text",
+      "1 481,40 €",
+      472.39,
+      288.11,
+      {
+        "width": 74.89,
+        "align": "right"
+      }
+    ],
+    ["fillColor", "#000"],
+    ["text", "", 48, 316.11],
+    ["moveDown", 0.5],
+    ["fontSize", 9],
+    ["font", "Helvetica-Bold"],
+    ["fillColor", "#0b1d2e"],
+    ["text", "Notes", 48, 322.06],
+    ["moveDown", 0.3],
+    ["fontSize", 8],
+    ["font", "Helvetica"],
+    ["fillColor", "#333333"],
+    [
+      "text",
+      "Paiement à réception. Merci de votre confiance.",
+      48,
+      335.98,
+      {
+        "width": 499.28
+      }
+    ],
+    ["moveDown", 0.5],
+    ["moveDown", 0.4],
+    ["rect", 48, 353.55, 499.28, 0.5],
+    ["fill", "#e0e0e0"],
+    ["fillColor", "#e0e0e0"],
+    ["moveDown", 0.8],
+    ["fontSize", 7],
+    ["font", "Helvetica"],
+    ["fillColor", "#888888"],
+    [
+      "text",
+      "Ce document a été généré électroniquement. Veuillez le conserver pour vos archives.",
+      48,
+      360.95,
+      {
+        "width": 499.28,
+        "align": "center"
+      }
+    ],
+    ["switchToPage", 0],
+    ["font", "Helvetica"],
+    ["fontSize", 7],
+    ["fillColor", "#888888"],
+    [
+      "text",
+      "Page 1 sur 1 - Marina Nord",
+      48,
+      817.89,
+      {
+        "width": 499.28,
+        "align": "center"
+      }
+    ],
+    [
+      "addPage",
+      {
+        "margin": 48,
+        "size": "A4",
+        "bufferPages": true
+      }
+    ],
+    ["fillColor", "#888888", null]
+  ]
+}
