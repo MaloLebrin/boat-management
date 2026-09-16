@@ -1,18 +1,19 @@
 import type CrewMember from '#models/crew_member'
 import type NavigationLog from '#models/navigation_log'
 import type { I18n } from '@adonisjs/i18n'
-import PDFDocument from 'pdfkit'
+import { createPdfDocument, renderPagedFooter } from '#services/pdf/document'
+import { PDF_COLORS, PDF_PAGE } from '#services/pdf/theme'
 import type { NavigationLogCrewRole } from '#shared/types/crew'
 
-const NAVY = '#0b1d2e'
-const CORAL = '#e2674f'
-const GREY_B = '#e0e0e0'
-const GREY_M = '#888888'
-const WHITE = '#ffffff'
-
-const PAGE_W = 595.28
-const MARGIN = 48
-const CONTENT_W = PAGE_W - MARGIN * 2
+const {
+  navy: NAVY,
+  coral: CORAL,
+  greyB: GREY_B,
+  greyM: GREY_M,
+  white: WHITE,
+  rowAlt: ROW_ALT,
+} = PDF_COLORS
+const { margin: MARGIN, contentWidth: CONTENT_W } = PDF_PAGE
 
 export default class CrewRolePdfService {
   async generate(
@@ -20,23 +21,19 @@ export default class CrewRolePdfService {
     crewWithRoles: Array<{ member: CrewMember; role: NavigationLogCrewRole }>,
     i18n: I18n
   ): Promise<{ buffer: Buffer; filename: string }> {
-    const doc = new PDFDocument({ margin: MARGIN, size: 'A4' })
-    const chunks: Buffer[] = []
-
-    doc.on('data', (chunk: Buffer) => chunks.push(chunk))
+    const { doc, finish } = createPdfDocument()
 
     const t = (key: string) => i18n.t(`crew.pdf.${key}`)
 
     this.#renderHeader(doc, log, t)
     this.#renderCrewTable(doc, crewWithRoles, t)
-    this.#renderFooter(doc, t)
+    renderPagedFooter(doc, () => t('footer'))
 
-    doc.end()
-    await new Promise<void>((resolve) => doc.on('end', resolve))
+    const buffer = await finish()
 
     const dateStr = log.departedAt.toFormat('yyyy-MM-dd')
     return {
-      buffer: Buffer.concat(chunks),
+      buffer,
       filename: `role-equipage-${dateStr}.pdf`,
     }
   }
@@ -95,7 +92,7 @@ export default class CrewRolePdfService {
     // Rows
     let rowY = startY + 24
     for (const [i, { member, role }] of crewWithRoles.entries()) {
-      const bg = i % 2 === 0 ? '#f8f8f8' : WHITE
+      const bg = i % 2 === 0 ? ROW_ALT : WHITE
       doc.rect(MARGIN, rowY, CONTENT_W, 22).fill(bg).stroke(GREY_B)
 
       doc.font('Helvetica').fontSize(9).fillColor(NAVY)
@@ -116,20 +113,5 @@ export default class CrewRolePdfService {
     }
 
     doc.y = rowY + 12
-  }
-
-  #renderFooter(doc: PDFKit.PDFDocument, t: (key: string) => string): void {
-    const range = doc.bufferedPageRange()
-    for (let i = range.start; i < range.start + range.count; i++) {
-      doc.switchToPage(i)
-      doc
-        .font('Helvetica')
-        .fontSize(7)
-        .fillColor(GREY_M)
-        .text(t('footer'), MARGIN, doc.page.height - MARGIN / 2, {
-          width: CONTENT_W,
-          align: 'center',
-        })
-    }
   }
 }
