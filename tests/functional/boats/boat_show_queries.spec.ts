@@ -45,3 +45,45 @@ test.group('Boat show — membership queries (functional)', (group) => {
     assert.isAtMost(queries, 1)
   })
 })
+
+/**
+ * Garde-fou de la vague 1.2 : le middleware Inertia chargeait l'organisation
+ * trois fois par rendu et lisait `organization_modules` deux fois (modules
+ * puis add-ons) avant que les policies ne recalculent les quotas effectifs.
+ */
+test.group('Boat show — organization queries (functional)', (group) => {
+  group.each.setup(() => truncateDb())
+
+  test('an admin page load reads the organization at most once', async ({ client, assert }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    const queries = await countQueries(
+      async () => {
+        const response = await client.get(`/boats/${boat.id}`).loginAs(user)
+        response.assertStatus(200)
+      },
+      { table: 'organizations' }
+    )
+
+    assert.isAtMost(queries, 1)
+  })
+
+  test('an admin page load reads the organization modules at most once', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    const queries = await countQueries(
+      async () => {
+        const response = await client.get(`/boats/${boat.id}`).loginAs(user)
+        response.assertStatus(200)
+      },
+      { table: 'organization_modules' }
+    )
+
+    assert.isAtMost(queries, 1)
+  })
+})

@@ -34,11 +34,22 @@ import type {
 import type User from '#models/user'
 import type { OrganizationType } from '#shared/types/organization'
 
+/**
+ * Charge `user.organization` une seule fois par requête : une relation déjà
+ * hydratée (par un contrôleur, ou par le premier résolveur ci-dessous) n'est
+ * pas relue. `undefined` = jamais chargée ; `null` = chargée mais absente.
+ */
+export async function ensureOrganizationLoaded(user: User): Promise<void> {
+  if (user.organization === undefined) {
+    await user.load('organization')
+  }
+}
+
 export async function resolveSharedCurrentPlan(
   user: User | undefined
 ): Promise<PlanTier | undefined> {
   if (!user?.organizationId) return undefined
-  await user.load('organization')
+  await ensureOrganizationLoaded(user)
   // A loaded belongsTo can still be null (e.g. the organization row no longer
   // exists) — mirror the same guard resolveSharedBranding already has below,
   // instead of assuming the relation always resolved.
@@ -58,7 +69,7 @@ export async function resolveSharedOrganizationType(
   user: User | undefined
 ): Promise<OrganizationType | undefined> {
   if (!user?.organizationId) return undefined
-  await user.load('organization')
+  await ensureOrganizationLoaded(user)
   return user.organization?.type ?? undefined
 }
 
@@ -147,21 +158,27 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
 
     const BACKEND_NAMESPACES = new Set(['flash', 'marketing', 'validator'])
 
+    // L'organisation est chargée une seule fois (ou pas du tout si le
+    // contrôleur l'a déjà fait) : les résolveurs ci-dessous la réutilisent.
     if (auth?.user?.organizationId) {
-      await auth.user.load('organization')
+      await ensureOrganizationLoaded(auth.user)
     }
     const currentPlan = await resolveSharedCurrentPlan(auth?.user)
     const organizationType = await resolveSharedOrganizationType(auth?.user)
-    // Modules add-ons actifs (épic #327) : partagés avec `currentPlan` pour que
-    // le front résolve les quotas effectifs via le même helper que le backend.
-    const activeModules: PlanModule[] = auth?.user?.organizationId
-      ? await this.organizationModuleService.getActiveModules(auth.user.organizationId)
-      : []
-    // Add-ons quantitatifs actifs (épic #333) : partagés pour que le front
-    // résolve `maxBoats` effectif via le même helper que le backend.
-    const activeAddons: ActiveAddonInfo[] = auth?.user?.organizationId
-      ? await this.organizationModuleService.getActiveAddons(auth.user.organizationId)
-      : []
+    // Modules add-ons actifs (épic #327) et add-ons quantitatifs (épic #333) :
+    // partagés avec `currentPlan` pour que le front résolve les quotas
+    // effectifs via le même helper que le backend. Une seule lecture de
+    // `organization_modules`, partagée avec les quotas effectifs calculés sur
+    // la même instance d'organisation pendant la requête.
+    const {
+      activeModules,
+      activeAddons,
+    }: {
+      activeModules: PlanModule[]
+      activeAddons: ActiveAddonInfo[]
+    } = auth?.user?.organization
+      ? await this.organizationModuleService.sharedProps(auth.user.organization)
+      : { activeModules: [], activeAddons: [] }
     const branding = await resolveSharedBranding(auth?.user, this.brandingService)
     const notifications: NotificationsSharedProps = auth?.user
       ? await this.notificationService.sharedProps(auth.user.id)
