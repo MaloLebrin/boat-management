@@ -8,6 +8,10 @@ vi.mock('@inertiajs/vue3', () => ({
 
 import { useNumberFormat } from '../../inertia/composables/use_number_format'
 
+/** Les espaces insécables (fines ou non) d'ICU deviennent des espaces simples. */
+const ICU_SPACES = new RegExp('[\\u00a0\\u202f]', 'g')
+const plain = (value: string) => value.replace(ICU_SPACES, ' ')
+
 describe('useNumberFormat', () => {
   test('formatNumber groups thousands in en (comma)', () => {
     mockLocale.value = 'en'
@@ -55,5 +59,39 @@ describe('useNumberFormat', () => {
       new Intl.NumberFormat('en', { style: 'currency', currency: 'EUR' }).format(0)
     )
     mockLocale.value = 'en'
+  })
+
+  // Le composable `use_currency_format` (fr-FR codé en dur) est remplacé par
+  // ces deux fonctions : un utilisateur EN lisait `1 234,50 €` sur ses budgets.
+  test('formatCurrency renders French amounts for a French session', () => {
+    mockLocale.value = 'fr'
+    const { formatCurrency } = useNumberFormat()
+    expect(plain(formatCurrency(1234.5))).toBe('1 234,50 €')
+    expect(plain(formatCurrency(-50))).toBe('-50,00 €')
+    mockLocale.value = 'en'
+  })
+
+  test('formatCurrency renders English amounts for an English session', () => {
+    mockLocale.value = 'en'
+    const { formatCurrency } = useNumberFormat()
+    expect(plain(formatCurrency(1234.5))).toBe('€1,234.50')
+  })
+
+  test('formatCurrency honours the invoice currency', () => {
+    mockLocale.value = 'en'
+    const { formatCurrency } = useNumberFormat()
+    expect(plain(formatCurrency(99, { currency: 'USD' }))).toBe('$99.00')
+  })
+
+  test('formatCurrencyNoDecimals rounds to whole euros in the session locale', () => {
+    mockLocale.value = 'fr'
+    const { formatCurrencyNoDecimals } = useNumberFormat()
+    expect(plain(formatCurrencyNoDecimals(99.4))).toBe('99 €')
+    expect(plain(formatCurrencyNoDecimals(99.5))).toBe('100 €')
+    expect(plain(formatCurrencyNoDecimals(12000))).toBe('12 000 €')
+
+    mockLocale.value = 'en'
+    const { formatCurrencyNoDecimals: noDecimalsEn } = useNumberFormat()
+    expect(plain(noDecimalsEn(12000))).toBe('€12,000')
   })
 })

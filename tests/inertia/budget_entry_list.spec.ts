@@ -8,8 +8,8 @@ vi.mock('@inertiajs/vue3', async () => {
   return inertiaMock()
 })
 
-vi.mock('~/composables/use_currency_format', () => ({
-  useCurrencyFormat: () => ({
+vi.mock('~/composables/use_number_format', () => ({
+  useNumberFormat: () => ({
     formatCurrency: (v: number) => `${v.toFixed(2)} €`,
   }),
 }))

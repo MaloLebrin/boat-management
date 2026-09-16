@@ -7,6 +7,8 @@ vi.mock('~/composables/use_t', () => ({
   useT: () => ({
     t: (key: string, params?: Record<string, string>) =>
       params ? key + JSON.stringify(params) : key,
+    // `useNumberFormat()` lit la locale ici pour formater les montants.
+    locale: { value: 'fr' },
   }),
 }))
 

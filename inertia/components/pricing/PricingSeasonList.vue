@@ -4,6 +4,7 @@ import BaseCard from '~/components/base/BaseCard.vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
+import { useNumberFormat } from '~/composables/use_number_format'
 import type { PricingSeasonRow } from '../../../shared/types/pricing_season'
 
 defineProps<{
@@ -17,14 +18,12 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useT()
+const { formatCurrency } = useNumberFormat()
 const { formatDayMonth } = useDateFormat()
 
 function formatPricing(season: PricingSeasonRow): string {
   if (season.dailyPrice != null) {
-    return new Intl.NumberFormat(undefined, {
-      style: 'currency',
-      currency: 'EUR',
-    }).format(season.dailyPrice)
+    return formatCurrency(season.dailyPrice)
   }
   if (season.multiplier != null) {
     return t('pricingSeasons.multiplierFormat', { value: String(season.multiplier) })
