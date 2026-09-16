@@ -1,6 +1,4 @@
 import BoatPolicy from '#policies/boat_policy'
-import BoatHullService from '#services/boat_hull_service'
-import { BoatNotFoundError } from '#exceptions/boat_errors'
 import EquipmentMediaService from '#services/equipment_media_service'
 import MediaService from '#services/media_service'
 import { MediaNotFoundError } from '#exceptions/media_errors'
@@ -9,6 +7,7 @@ import type { EquipmentMediaSlug } from '#shared/types/equipment_media'
 import { storeBoatPhotosValidator } from '#validators/media'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
+import BoatContextService from '#services/boat_context_service'
 
 /**
  * Photos for every equipment kind (engine, engine part, sail, rig, generic,
@@ -18,7 +17,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 @inject()
 export default class BoatEquipmentMediaController {
   constructor(
-    private boatService: BoatHullService,
+    private boatContext: BoatContextService,
     private mediaService: MediaService,
     private organizationService: OrganizationService,
     private equipmentMediaService: EquipmentMediaService
@@ -37,20 +36,6 @@ export default class BoatEquipmentMediaController {
     return 'rig'
   }
 
-  private async loadBoat(ctx: Pick<HttpContext, 'auth' | 'response' | 'params'>) {
-    const user = ctx.auth.getUserOrFail()
-    try {
-      const boat = await this.boatService.getForUserOrFail(user, Number(ctx.params.boatId))
-      return { user, boat }
-    } catch (error) {
-      if (error instanceof BoatNotFoundError) {
-        ctx.response.redirect('/boats')
-        return null
-      }
-      throw error
-    }
-  }
-
   /**
    * Runs the shared chain: authenticate → org-scoped boat → edit policy →
    * resolve + verify equipment ownership. Returns `null` once a redirect has
@@ -58,7 +43,7 @@ export default class BoatEquipmentMediaController {
    */
   private async authorize(ctx: HttpContext) {
     await ctx.auth.authenticate()
-    const loaded = await this.loadBoat(ctx)
+    const loaded = await this.boatContext.resolveBoat(ctx)
     if (!loaded) return null
 
     const { boat, user } = loaded

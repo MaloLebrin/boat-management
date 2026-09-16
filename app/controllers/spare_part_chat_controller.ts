@@ -9,8 +9,6 @@ import MaintenancePolicy from '#policies/maintenance_policy'
 import BoatEngineSparePartsService from '#services/boat_engine_spare_parts_service'
 import { BoatEquipmentNotFoundError } from '#exceptions/boat_errors'
 import { EngineNotSparePartsEligibleError } from '#exceptions/spare_parts_errors'
-import BoatHullService from '#services/boat_hull_service'
-import { BoatNotFoundError } from '#exceptions/boat_errors'
 import QuotaService from '#services/quota_service'
 import SparePartChatService from '#services/spare_part_chat_service'
 import { toPartSearchConversationProps } from '#transformers/spare_part_chat_transformer'
@@ -18,6 +16,7 @@ import { sparePartChatMessageValidator } from '#validators/spare_part_chat'
 import { toAppLocale } from '#shared/helpers/locale_path'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
+import BoatContextService from '#services/boat_context_service'
 
 /**
  * Chat IA de recherche de références de pièces (#634).
@@ -30,30 +29,16 @@ import type { HttpContext } from '@adonisjs/core/http'
 @inject()
 export default class SparePartChatController {
   constructor(
-    private boatService: BoatHullService,
+    private boatContext: BoatContextService,
     private sparePartsService: BoatEngineSparePartsService,
     private quotaService: QuotaService,
     private chatService: SparePartChatService
   ) {}
 
-  private async loadBoat(ctx: Pick<HttpContext, 'auth' | 'response' | 'params'>) {
-    const user = ctx.auth.getUserOrFail()
-    try {
-      const boat = await this.boatService.getForUserOrFail(user, Number(ctx.params.boatId))
-      return { user, boat }
-    } catch (error) {
-      if (error instanceof BoatNotFoundError) {
-        ctx.response.redirect('/boats')
-        return null
-      }
-      throw error
-    }
-  }
-
   async show(ctx: HttpContext) {
     const { inertia, auth, response, params, bouncer, session, i18n } = ctx
     await auth.authenticate()
-    const loaded = await this.loadBoat(ctx)
+    const loaded = await this.boatContext.resolveBoat(ctx)
     if (!loaded) return
     const { user, boat } = loaded
 
@@ -95,7 +80,7 @@ export default class SparePartChatController {
   async start(ctx: HttpContext) {
     const { request, auth, response, params, bouncer, session, i18n } = ctx
     await auth.authenticate()
-    const loaded = await this.loadBoat(ctx)
+    const loaded = await this.boatContext.resolveBoat(ctx)
     if (!loaded) return
     const { user, boat } = loaded
 
@@ -124,7 +109,7 @@ export default class SparePartChatController {
   async message(ctx: HttpContext) {
     const { request, auth, response, params, bouncer, session, i18n } = ctx
     await auth.authenticate()
-    const loaded = await this.loadBoat(ctx)
+    const loaded = await this.boatContext.resolveBoat(ctx)
     if (!loaded) return
     const { user, boat } = loaded
 

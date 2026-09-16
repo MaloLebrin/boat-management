@@ -3,38 +3,23 @@ import {
   BoatMaintenanceSheetIncompleteError,
   BoatMaintenanceSheetNotFoundError,
 } from '#exceptions/maintenance_errors'
-import BoatHullService from '#services/boat_hull_service'
-import { BoatNotFoundError } from '#exceptions/boat_errors'
 import MaintenancePolicy from '#policies/maintenance_policy'
 import { createBoatMaintenanceSheetValidator } from '#validators/boat_maintenance_sheet'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import type { SheetType } from '#shared/types/maintenance'
+import BoatContextService from '#services/boat_context_service'
 
 @inject()
 export default class BoatMaintenanceSheetsController {
   constructor(
-    private boatService: BoatHullService,
+    private boatContext: BoatContextService,
     private boatMaintenanceSheetService: BoatMaintenanceSheetService
   ) {}
 
-  private async loadBoat(ctx: Pick<HttpContext, 'auth' | 'response' | 'params'>) {
-    const user = ctx.auth.getUserOrFail()
-    try {
-      const boat = await this.boatService.getForUserOrFail(user, Number(ctx.params.boatId))
-      return { user, boat }
-    } catch (error) {
-      if (error instanceof BoatNotFoundError) {
-        ctx.response.redirect('/boats')
-        return null
-      }
-      throw error
-    }
-  }
-
   async store({ request, response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const loaded = await this.loadBoat({ auth, response, params })
+    const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
     const { user, boat } = loaded
 
@@ -62,7 +47,7 @@ export default class BoatMaintenanceSheetsController {
 
   async complete({ response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const loaded = await this.loadBoat({ auth, response, params })
+    const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
     const { user, boat } = loaded
 
@@ -90,7 +75,7 @@ export default class BoatMaintenanceSheetsController {
 
   async destroy({ response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const loaded = await this.loadBoat({ auth, response, params })
+    const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
     const { user, boat } = loaded
 

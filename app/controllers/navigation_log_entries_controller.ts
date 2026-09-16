@@ -5,8 +5,6 @@ import {
   NavigationLogNotFoundError,
   NavigationLogValidationError,
 } from '#exceptions/navigation_log_errors'
-import BoatHullService from '#services/boat_hull_service'
-import { BoatNotFoundError } from '#exceptions/boat_errors'
 import NavigationLogPolicy from '#policies/navigation_log_policy'
 import {
   createNavigationLogEntryValidator,
@@ -14,11 +12,12 @@ import {
 } from '#validators/navigation_log'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
+import BoatContextService from '#services/boat_context_service'
 
 @inject()
 export default class NavigationLogEntriesController {
   constructor(
-    private boatService: BoatHullService,
+    private boatContext: BoatContextService,
     private entryService: NavigationLogEntryService
   ) {}
 
@@ -135,19 +134,9 @@ export default class NavigationLogEntriesController {
   }
 
   private async loadBoat(ctx: HttpContext) {
-    const { response, auth, params } = ctx
-    await auth.authenticate()
-    const user = auth.getUserOrFail()
-
-    try {
-      return await this.boatService.getForUserOrFail(user, Number(params.boatId))
-    } catch (error) {
-      if (error instanceof BoatNotFoundError) {
-        response.redirect('/boats')
-        return null
-      }
-      throw error
-    }
+    await ctx.auth.authenticate()
+    const resolved = await this.boatContext.resolveBoat(ctx)
+    return resolved?.boat ?? null
   }
 
   private flashKnownError(
