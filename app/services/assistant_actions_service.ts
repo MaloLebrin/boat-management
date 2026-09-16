@@ -80,8 +80,8 @@ export default class AssistantActionsService {
     const quotas =
       effectiveQuotas ?? (await this.moduleService.getEffectiveQuotas(user.organization))
 
-    // Rôle résolu UNE fois : `user.hasPermission` refait un SELECT sur
-    // `organization_memberships` à chaque appel, soit neuf par tour ici.
+    // Rôle résolu une fois pour la lisibilité (le cache de `User#getRoleInOrg`
+    // couvre de toute façon les neuf checks du tour).
     const role = await user.getEffectiveRoleInOrg(user.organizationId)
     if (role === null) return []
     const granted = ROLE_PERMISSIONS[role]
