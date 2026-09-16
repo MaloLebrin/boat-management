@@ -8,6 +8,7 @@ import NavigationLogPolicy from '#policies/navigation_log_policy'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import type { NavigationLogCrewRole } from '#shared/types/crew'
+import { contentDisposition } from '#shared/helpers/content_disposition'
 
 @inject()
 export default class CrewRolePdfController {
@@ -55,7 +56,7 @@ export default class CrewRolePdfController {
     const { buffer, filename } = await this.pdfService.generate(log, crewWithRoles, i18n)
 
     response.header('Content-Type', 'application/pdf')
-    response.header('Content-Disposition', `attachment; filename="${filename}"`)
+    response.header('Content-Disposition', contentDisposition(filename))
     response.send(buffer)
   }
 }

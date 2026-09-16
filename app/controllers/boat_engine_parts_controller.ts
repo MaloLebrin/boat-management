@@ -11,14 +11,8 @@ import { storeBoatDocumentsValidator } from '#validators/media'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import BoatContextService from '#services/boat_context_service'
-
-function buildContentDisposition(filename: string, format: string): string {
-  const full = `${filename}.${format}`
-  // eslint-disable-next-line no-control-regex
-  const ascii = full.replace(/[\x00-\x1f\x7f"\\]/g, '_')
-  const encoded = encodeURIComponent(full)
-  return `attachment; filename="${ascii}"; filename*=UTF-8''${encoded}`
-}
+import { initialTabParam } from '#utils/inertia_tab'
+import { contentDisposition } from '#shared/helpers/content_disposition'
 
 @inject()
 export default class BoatEnginePartsController {
@@ -30,7 +24,7 @@ export default class BoatEnginePartsController {
     private cloudinaryService: CloudinaryService
   ) {}
 
-  async show({ inertia, response, auth, params, bouncer }: HttpContext) {
+  async show({ inertia, request, response, auth, params, bouncer }: HttpContext) {
     await auth.authenticate()
     const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
@@ -49,6 +43,7 @@ export default class BoatEnginePartsController {
 
     return inertia.render('boats/engine_part_show', {
       boat: { id: boat.id, name: boat.name },
+      initialTab: initialTabParam(request),
       engine: {
         id: engine.id,
         kind: engine.kind,
@@ -276,7 +271,7 @@ export default class BoatEnginePartsController {
     response.header('Content-Type', contentType)
     response.header(
       'Content-Disposition',
-      buildContentDisposition(media.originalFilename, media.format)
+      contentDisposition(`${media.originalFilename}.${media.format}`)
     )
     return response.send(buffer)
   }

@@ -1483,5 +1483,41 @@
     "final_subtitle": "Write to us — a real person answers.",
     "final_primary": "Contact the team",
     "final_secondary": "Create a free account"
+  },
+  "emails": {
+    "nurturingD3": {
+      "subject": "3 tips to reduce your boat maintenance costs",
+      "text": "3 tips to reduce your boat maintenance costs\n\nCreate your account: {signupUrl}",
+      "tips": {
+        "1": {
+          "title": "Anticipate small repairs",
+          "body": "A neglected minor repair can quickly become a major expense. Regularly inspect your boat to catch problems before they worsen."
+        },
+        "2": {
+          "title": "Compare multiple quotes",
+          "body": "Don't settle for the first quote. Request at least 2 or 3 estimates for major work to get the best value for your money."
+        },
+        "3": {
+          "title": "Winter your boat properly",
+          "body": "Proper winterization protects your boat from frost, humidity, and corrosion. Investing in good winterization saves on spring repairs."
+        }
+      }
+    },
+    "nurturingD7": {
+      "subject": "Your boat maintenance estimate — still available",
+      "text": "Your boat will cost between {totalMin} and {totalMax} per year in maintenance. FleetAi helps you plan and anticipate these expenses.\n\nCreate your account: {signupUrl}"
+    },
+    "simulatorReport": {
+      "subject": "Your boat maintenance report — FleetAi",
+      "text": "Your cost estimation report\n\nTotal: {totalMin} - {totalMax}\n\nCreate your account: {signupUrl}",
+      "categories": {
+        "hull": "Hull",
+        "engine": "Engine",
+        "safety": "Safety",
+        "electrical": "Electrical",
+        "mooring": "Mooring",
+        "rigging": "Rigging"
+      }
+    }
   }
 }

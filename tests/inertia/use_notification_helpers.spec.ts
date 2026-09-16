@@ -112,28 +112,30 @@ test('formatRelativeTime returns daysAgo key when 2 days ago', () => {
 
 // getSeverityClasses tests
 
-test('getSeverityClasses returns blue classes for info', () => {
+// Palettes de marque (elles basculent en thème sombre), alignées sur les
+// variantes de `BaseBadge` — jamais la palette Tailwind par défaut (#416).
+test('getSeverityClasses returns the sky palette for info', () => {
   const { getSeverityClasses } = mountComposable()
-  expect(getSeverityClasses('info')).toBe('bg-blue-100 text-blue-600')
+  expect(getSeverityClasses('info')).toBe('bg-sky-100 text-sky-800')
 })
 
-test('getSeverityClasses returns green classes for success', () => {
+test('getSeverityClasses returns the mint palette for success', () => {
   const { getSeverityClasses } = mountComposable()
-  expect(getSeverityClasses('success')).toBe('bg-green-100 text-green-600')
+  expect(getSeverityClasses('success')).toBe('bg-mint-100 text-mint-700')
 })
 
-test('getSeverityClasses returns orange classes for warning', () => {
+test('getSeverityClasses returns the peach palette for warning', () => {
   const { getSeverityClasses } = mountComposable()
-  expect(getSeverityClasses('warning')).toBe('bg-orange-100 text-orange-600')
+  expect(getSeverityClasses('warning')).toBe('bg-peach-100 text-peach-800')
 })
 
-test('getSeverityClasses returns red classes for error', () => {
+test('getSeverityClasses returns the coral palette for error', () => {
   const { getSeverityClasses } = mountComposable()
-  expect(getSeverityClasses('error')).toBe('bg-red-100 text-red-600')
+  expect(getSeverityClasses('error')).toBe('bg-coral-100 text-coral-700')
 })
 
-test('getSeverityClasses returns gray classes for unknown severity', () => {
+test('getSeverityClasses returns the neutral lilac palette for unknown severity', () => {
   const { getSeverityClasses } = mountComposable()
   // Cast to NotificationSeverity to simulate an unknown value at runtime
-  expect(getSeverityClasses('unknown' as NotificationSeverity)).toBe('bg-gray-100 text-gray-600')
+  expect(getSeverityClasses('unknown' as NotificationSeverity)).toBe('bg-lilac-100 text-lilac-800')
 })

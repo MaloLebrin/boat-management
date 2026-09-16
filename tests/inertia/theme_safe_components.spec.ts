@@ -1,16 +1,20 @@
-import { readFileSync } from 'node:fs'
+import { readdirSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, test } from 'vitest'
 import { findUnsafeColors, formatUnsafeColors, UNSAFE_COLOR_PATTERNS } from './helpers/theme_tokens'
 
 /**
- * Garde-fou du thème sombre (#416), composant par composant.
+ * Garde-fou du thème sombre (#416), sur **tout** `inertia/`.
  *
  * Le thème bascule en redéfinissant des variables CSS sous `[data-theme='dark']` :
  * une couleur écrite en dur n'en fait pas partie et reste figée pendant que le
- * reste de la page s'inverse. Ces tests relisent le **source** de chaque
- * composant dont la PR #416 a réécrit les couleurs, et échouent si l'un d'eux
- * en réintroduit une.
+ * reste de la page s'inverse. Ce test relit le **source** de chaque fichier
+ * `.vue` et `.ts` d'`inertia/` et échoue dès que l'un d'eux en introduit une.
+ *
+ * Il a d'abord été une liste d'opt-in de 94 composants (ceux réécrits par
+ * #416) : un `bg-blue-100` posé dans un composable `.ts` ou dans un composant
+ * jamais listé passait sans bruit. Le scan est désormais exhaustif ; seules
+ * les **exceptions** restent déclarées, avec leur raison et leur budget.
  *
  * Pourquoi lire le source plutôt que monter le composant : un `mount()` ne voit
  * que la branche rendue, alors que les classes vivent souvent dans une map
@@ -18,8 +22,8 @@ import { findUnsafeColors, formatUnsafeColors, UNSAFE_COLOR_PATTERNS } from './h
  * entrée. Le scan couvre toutes les branches, et n'oblige pas à fabriquer les
  * props structurées des sections marketing.
  *
- * `allow` = exception assumée. Chaque entrée porte sa raison ; les deux
- * méta-tests en fin de fichier empêchent qu'elle devienne un mensonge.
+ * `allow` = exception assumée. Chaque entrée porte sa raison ; les méta-tests
+ * en fin de fichier empêchent qu'elle devienne un mensonge.
  */
 
 // `import.meta.url` n'est pas une URL `file:` sous happy-dom : on résout depuis
@@ -44,7 +48,7 @@ interface Exception {
 }
 
 interface Component {
-  /** Chemin relatif à `inertia/`. */
+  /** Chemin relatif à `inertia/` (séparateur `/`). */
   path: string
   allow?: Exception[]
 }
@@ -54,6 +58,8 @@ const NAVY_BAND = 'sur un bandeau navy permanent (sombre dans les deux thèmes) 
 const MOCK_ILLUSTRATION =
   'maquette d’écran décorative : palette interne cohérente, ne suit pas le thème de la page'
 const DECORATIVE_SVG = 'SVG décoratif en faible opacité sur panneau navy permanent'
+const MARINA_MAP =
+  'carte marina : illustration autonome (eau, pontons) à palette propre, cohérente dans les deux thèmes'
 /**
  * Le pendant du précédent pour la règle « palette navy à contre-rôle » (#457) :
  * un palier navy foncé posé sur une surface **elle aussi** permanente (sidebar,
@@ -64,37 +70,151 @@ const NAVY_ON_NAVY =
   'palier navy posé sur une surface navy permanente — cohérent dans les deux thèmes'
 
 /**
- * Les 80 composants dont la PR #416 a réécrit les couleurs.
- * Ajouter ici tout composant dont on veut garantir qu'il bascule.
+ * Les seules couleurs figées assumées d'`inertia/`. Tout fichier absent d'ici
+ * doit être exempt de couleur qui ne bascule pas.
  */
-const COMPONENTS: Component[] = [
-  { path: 'components/ConflictResolutionModal.vue' },
-  { path: 'components/Logo.vue' },
-  { path: 'components/OfflinePendingQueue.vue' },
-  // Sections extraites de `pages/auth/signup.vue` (#448) : la page était déjà
-  // couverte, ces composants héritent de cette couverture.
-  { path: 'components/auth/signup/SignupIdentityFields.vue' },
-  { path: 'components/auth/signup/SignupOrganizationFields.vue' },
-  { path: 'components/auth/signup/SignupSectionHeader.vue' },
-  { path: 'components/auth/signup/SignupTermsCheckbox.vue' },
-  { path: 'components/base/BaseBadge.vue' },
-  { path: 'components/base/BaseButton.vue' },
-  { path: 'components/base/BaseDropdown.vue' },
-  { path: 'components/base/BaseFormErrorSummary.vue' },
-  { path: 'components/base/BaseOptionCard.vue' },
-  { path: 'components/base/BaseSegmentedControl.vue' },
-  { path: 'components/base/BaseTabs.vue' },
-  { path: 'components/base/UpgradePlanModal.vue' },
-  { path: 'components/boats/budget/BudgetCategoryCard.vue' },
-  { path: 'components/boats/budget/BudgetEntryList.vue' },
-  { path: 'components/boats/budget/BudgetPortStayList.vue' },
-  { path: 'components/boats/equipment-actions/BoatEquipmentActionCard.vue' },
-  { path: 'components/boats/maintenance/BoatTaskActions.vue' },
-  { path: 'components/boats/rig/BoatShowRigCard.vue' },
-  { path: 'components/boats/sail/BoatShowSailsCard.vue' },
+const EXCEPTIONS: Component[] = [
+  // Panneaux Assistant IA, diagnostic et pièces — panneaux navy permanents,
+  // exception documentée dans CLAUDE.md (#457).
+  {
+    path: 'components/assistant/AssistantActionCard.vue',
+    allow: [
+      { pattern: 'bg-white', count: 1, reason: `bouton blanc ${NAVY_BAND}` },
+      { pattern: 'text-navy-900', count: 1, reason: `encre du bouton blanc ${NAVY_BAND}` },
+    ],
+  },
+  {
+    path: 'components/assistant/AssistantComposer.vue',
+    allow: [{ pattern: 'border-navy-600', count: 1, reason: NAVY_ON_NAVY }],
+  },
+  {
+    path: 'components/assistant/AssistantPanel.vue',
+    allow: [{ pattern: 'border-navy-700', count: 3, reason: NAVY_ON_NAVY }],
+  },
+  {
+    path: 'components/assistant/AssistantThread.vue',
+    allow: [{ pattern: 'border-navy-600', count: 1, reason: NAVY_ON_NAVY }],
+  },
+  {
+    path: 'components/assistant/AssistantUpsell.vue',
+    allow: [
+      { pattern: 'bg-white', count: 1, reason: `bouton blanc ${NAVY_BAND}` },
+      { pattern: 'text-navy-900', count: 1, reason: `encre du bouton blanc ${NAVY_BAND}` },
+    ],
+  },
+  {
+    path: 'components/diagnostic/DiagnosticAiPanel.vue',
+    allow: [{ pattern: 'border-navy-600', count: 1, reason: NAVY_ON_NAVY }],
+  },
+  {
+    path: 'components/spare_parts/chat/SparePartsAiEntryCard.vue',
+    allow: [{ pattern: 'border-navy-600', count: 1, reason: NAVY_ON_NAVY }],
+  },
+  // Panneau navy des pages d'authentification (`AuthNavyPanel`) : exception
+  // documentée dans CLAUDE.md. Ce qui avait un token (accent corail, avatar
+  // navy) l'utilise désormais ; restent la boussole décorative et l'accent
+  // lilas de la maquette de carte IA, sans équivalent dans la palette.
+  {
+    path: 'components/auth/AuthNavyPanel.vue',
+    allow: [
+      { pattern: 'fill="#faf6ee"', count: 1, reason: DECORATIVE_SVG },
+      { pattern: 'fill="#e2674f"', count: 1, reason: DECORATIVE_SVG },
+      { pattern: 'fill="#0b1d2e"', count: 1, reason: DECORATIVE_SVG },
+      { pattern: 'stroke="#faf6ee"', count: 1, reason: DECORATIVE_SVG },
+      { pattern: 'stroke="#bcb1e0"', count: 1, reason: MOCK_ILLUSTRATION },
+      { pattern: 'text-[#bcb1e0]', count: 1, reason: MOCK_ILLUSTRATION },
+    ],
+  },
+  // Sidebar et coquille de l'app : surfaces navy permanentes.
+  {
+    path: 'components/layout/NavScrollArea.vue',
+    allow: [{ pattern: 'ring-navy-600', count: 1, reason: NAVY_ON_NAVY }],
+  },
+  {
+    path: 'layouts/default.vue',
+    allow: [{ pattern: 'border-navy-700', count: 1, reason: NAVY_ON_NAVY }],
+  },
+  // Carte marina (#SVG interactif) : illustration autonome, palette propre
+  // (eau, bois des pontons) cohérente dans les deux thèmes.
+  {
+    path: 'components/ports/show/MarinaCanvas.vue',
+    allow: [
+      { pattern: 'fill="#D6EAF8"', count: 1, reason: MARINA_MAP },
+      { pattern: 'fill="#B0C9DD"', count: 1, reason: MARINA_MAP },
+    ],
+  },
+  {
+    path: 'components/ports/show/MarinaMouillage.vue',
+    allow: [
+      { pattern: 'stroke="#2196F3"', count: 2, reason: MARINA_MAP },
+      { pattern: 'fill="#1565C0"', count: 2, reason: MARINA_MAP },
+      { pattern: 'fill="#2196F3"', count: 1, reason: MARINA_MAP },
+    ],
+  },
+  {
+    path: 'components/ports/show/MarinaPontoon.vue',
+    allow: [
+      { pattern: 'fill="#5D4037"', count: 3, reason: MARINA_MAP },
+      { pattern: 'stroke="#5D4037"', count: 1, reason: MARINA_MAP },
+    ],
+  },
+  // Marketing : bandeaux navy et illustrations autonomes.
+  {
+    path: 'components/marketing/about/AboutNumbersSection.vue',
+    allow: [
+      { pattern: 'fill="#faf6ee"', count: 1, reason: DECORATIVE_SVG },
+      { pattern: 'fill="#e2674f"', count: 1, reason: DECORATIVE_SVG },
+    ],
+  },
+  {
+    path: 'components/marketing/about/AboutOriginSection.vue',
+    allow: [
+      {
+        pattern: 'style="aspect-ratio: 4/5; background: linear-gradient(135deg, #dde7f0, #faf6ee',
+        count: 1,
+        reason: MOCK_ILLUSTRATION,
+      },
+      { pattern: 'fill="#fbeacb"', count: 1, reason: MOCK_ILLUSTRATION },
+      { pattern: 'fill="#1a3a55"', count: 1, reason: MOCK_ILLUSTRATION },
+      { pattern: 'fill="#0b1d2e"', count: 1, reason: MOCK_ILLUSTRATION },
+      { pattern: 'fill="#faf6ee"', count: 2, reason: MOCK_ILLUSTRATION },
+      { pattern: 'fill="#e2674f"', count: 1, reason: MOCK_ILLUSTRATION },
+      { pattern: 'stroke="#0b1d2e"', count: 4, reason: MOCK_ILLUSTRATION },
+    ],
+  },
+  {
+    path: 'components/marketing/home/HomeFinalCtaSection.vue',
+    allow: [
+      { pattern: 'stroke="#faf6ee"', count: 1, reason: DECORATIVE_SVG },
+      { pattern: 'fill="#faf6ee"', count: 2, reason: DECORATIVE_SVG },
+      { pattern: 'fill="#e2674f"', count: 1, reason: DECORATIVE_SVG },
+      { pattern: 'text-navy-900', count: 1, reason: `encre du bouton crème ${NAVY_BAND}` },
+    ],
+  },
+  {
+    path: 'components/marketing/home/HomeHowItWorksSection.vue',
+    allow: [{ pattern: 'border-navy-800', count: 1, reason: NAVY_ON_NAVY }],
+  },
+  {
+    path: 'components/marketing/pricing/PricingExtrasSection.vue',
+    allow: [{ pattern: 'border-navy-900', count: 1, reason: NAVY_ON_NAVY }],
+  },
+  {
+    path: 'components/marketing/pricing/PricingHeroSection.vue',
+    allow: [
+      { pattern: 'bg-white', count: 2, reason: `bouton blanc ${NAVY_BAND}` },
+      { pattern: 'text-navy-900', count: 2, reason: `encre du bouton blanc ${NAVY_BAND}` },
+    ],
+  },
+  {
+    path: 'components/marketing/pricing/PricingTiersSection.vue',
+    allow: [
+      { pattern: 'bg-white', count: 1, reason: `bouton blanc ${NAVY_BAND}` },
+      { pattern: 'text-navy-900', count: 1, reason: `encre du bouton blanc ${NAVY_BAND}` },
+    ],
+  },
   // Panneaux Assistant IA — panneaux navy permanents, exception documentée dans
   // CLAUDE.md (#457).
-  { path: 'components/boats/show/tabs/overview/BoatOverviewAiPanel.vue' },
   {
     path: 'components/dashboard/DashboardAiPanel.vue',
     allow: [
@@ -102,36 +222,22 @@ const COMPONENTS: Component[] = [
       { pattern: 'text-navy-900', count: 1, reason: `encre du bouton blanc ${NAVY_BAND}` },
     ],
   },
-  { path: 'components/layout/AppHeader.vue' },
-  { path: 'components/layout/AppHeaderMobileDrawer.vue' },
-  { path: 'components/layout/MobileBottomNav.vue' },
-  { path: 'components/maintenance/MaintenanceHistoryCard.vue' },
-  { path: 'components/navigation/FuelLogCard.vue' },
-  { path: 'components/navigation/IncidentCard.vue' },
-  { path: 'components/navigation/LogbookCard.vue' },
   {
     path: 'components/layout/AsideMenu.vue',
     allow: [{ pattern: 'border-navy-700', count: 2, reason: NAVY_ON_NAVY }],
   },
-  { path: 'components/layout/DemoSessionBanner.vue' },
   {
     path: 'components/layout/MobileSidebarDrawer.vue',
     allow: [{ pattern: 'border-navy-700', count: 2, reason: NAVY_ON_NAVY }],
   },
-  { path: 'components/layout/NotificationBell.vue' },
-  { path: 'components/layout/ThemeSwitcher.vue' },
   {
     path: 'components/marketing/about/AboutOfficeSection.vue',
     allow: [{ pattern: 'fill="#faf6ee"', count: 2, reason: DECORATIVE_SVG }],
   },
-  { path: 'components/marketing/about/AboutTeamSection.vue' },
-  { path: 'components/marketing/about/AboutValuesSection.vue' },
   {
     path: 'components/marketing/contact/ContactChannelsSection.vue',
     allow: [{ pattern: 'border-navy-900', count: 1, reason: NAVY_ON_NAVY }],
   },
-  { path: 'components/marketing/contact/ContactFaqSection.vue' },
-  { path: 'components/marketing/contact/ContactFormSection.vue' },
   {
     path: 'components/marketing/contact/ContactFormSidebar.vue',
     allow: [
@@ -141,14 +247,10 @@ const COMPONENTS: Component[] = [
       { pattern: 'text-navy-900', count: 1, reason: `encre du bouton blanc ${NAVY_BAND}` },
     ],
   },
-  { path: 'components/marketing/contact/ContactPillGroup.vue' },
-  { path: 'components/marketing/contact/ContactHeroSection.vue' },
   {
     path: 'components/marketing/contact/ContactOfficesSection.vue',
     allow: [{ pattern: 'fill="#faf6ee"', count: 2, reason: DECORATIVE_SVG }],
   },
-  { path: 'components/marketing/home/HomeCaseStudySection.vue' },
-  { path: 'components/marketing/home/HomeDemoSection.vue' },
   {
     path: 'components/marketing/home/HomeFaqCtaSection.vue',
     allow: [
@@ -156,9 +258,6 @@ const COMPONENTS: Component[] = [
       { pattern: 'text-navy-900', count: 1, reason: `encre du bouton blanc ${NAVY_BAND}` },
     ],
   },
-  { path: 'components/marketing/home/HomeFaqSection.vue' },
-  { path: 'components/marketing/home/HomeHeroSection.vue' },
-  { path: 'components/marketing/home/HomeIndustriesSection.vue' },
   {
     path: 'components/marketing/home/HomeMockBoatDetail.vue',
     allow: [
@@ -216,18 +315,10 @@ const COMPONENTS: Component[] = [
       },
     ],
   },
-  { path: 'components/marketing/home/HomeModularOfferSection.vue' },
-  { path: 'components/marketing/home/HomePersonasSection.vue' },
-  { path: 'components/marketing/home/HomePillarsSection.vue' },
-  { path: 'components/marketing/home/HomeProblemSection.vue' },
-  { path: 'components/marketing/home/HomeProofSections.vue' },
-  { path: 'components/marketing/home/HomeSecuritySection.vue' },
-  { path: 'components/marketing/home/HomeTestimonialsSection.vue' },
   {
     path: 'components/marketing/pricing/PricingConfigurator.vue',
     allow: [{ pattern: 'border-navy-900', count: 1, reason: NAVY_ON_NAVY }],
   },
-  { path: 'components/marketing/pricing/PricingConfiguratorModuleCard.vue' },
   {
     path: 'components/marketing/pricing/PricingDetailedTableSection.vue',
     allow: [
@@ -235,7 +326,6 @@ const COMPONENTS: Component[] = [
       { pattern: 'text-navy-900', count: 1, reason: `encre du bouton blanc ${NAVY_BAND}` },
     ],
   },
-  { path: 'components/marketing/pricing/PricingFaqSection.vue' },
   {
     path: 'components/marketing/pricing/PricingROISection.vue',
     allow: [
@@ -243,43 +333,37 @@ const COMPONENTS: Component[] = [
       { pattern: 'text-navy-900', count: 1, reason: `encre du bouton blanc ${NAVY_BAND}` },
     ],
   },
-  { path: 'components/marketing/pricing/PricingTestimonialsSection.vue' },
-  { path: 'components/marketing/simulator/SimulatorStepBoat.vue' },
-  { path: 'components/marketing/simulator/SimulatorStepWear.vue' },
-  { path: 'components/marketing/simulator/SimulatorStepWintering.vue' },
-  { path: 'components/planning/PlanningCalendar.vue' },
-  { path: 'components/planning/PlanningCalendarHourTasks.vue' },
-  { path: 'components/planning/PlanningKanban.vue' },
-  { path: 'components/planning/PlanningTaskGroup.vue' },
-  { path: 'components/reservations/ReservationTimeline.vue' },
-  { path: 'components/settings/SettingsBillingExtraBoats.vue' },
-  { path: 'components/settings/SettingsBillingModules.vue' },
-  { path: 'components/settings/SettingsBillingUsageGauge.vue' },
-  { path: 'components/settings/me/ThemeCard.vue' },
-  { path: 'components/settings/tabs/SettingsBillingTab.vue' },
-  { path: 'components/settings/tabs/SettingsImportTab.vue' },
-  { path: 'components/settings/tabs/SettingsMeTab.vue' },
-  { path: 'pages/auth/forgot_password.vue' },
-  { path: 'pages/dashboard.vue' },
-  { path: 'pages/auth/login.vue' },
-  { path: 'pages/auth/reset_password.vue' },
-  { path: 'pages/auth/signup.vue' },
-  { path: 'pages/marketing/privacy.vue' },
-  { path: 'pages/marketing/simulator.vue' },
-  { path: 'pages/marketing/simulator_share.vue' },
-  { path: 'pages/notifications/index.vue' },
-  { path: 'pages/planning/index.vue' },
 ]
 
 function read(path: string): string {
   return readFileSync(`${INERTIA_ROOT}/${path}`, 'utf8')
 }
 
-describe('dark mode (#416) · aucune couleur figée par composant', () => {
-  for (const component of COMPONENTS) {
-    test(component.path, () => {
-      const hits = findUnsafeColors(read(component.path))
-      const budget = new Map((component.allow ?? []).map((e) => [e.pattern, e.count]))
+/** Tous les `.vue` et `.ts` d'`inertia/`, en chemins relatifs triés. */
+function listSources(): string[] {
+  return readdirSync(INERTIA_ROOT, { recursive: true, encoding: 'utf8' })
+    .filter((file) => /\.(vue|ts)$/.test(file) && !file.endsWith('.d.ts'))
+    .map((file) => file.split('\\').join('/'))
+    .sort()
+}
+
+const SOURCES = listSources()
+const EXCEPTIONS_BY_PATH = new Map(EXCEPTIONS.map((c) => [c.path, c]))
+
+describe('dark mode (#416) · aucune couleur figée dans inertia/', () => {
+  test('le scan voit bien toute la base', () => {
+    // Si `readdirSync` cessait de descendre dans l'arborescence, les tests
+    // ci-dessous passeraient au vert sur une liste vide.
+    expect(SOURCES.length).toBeGreaterThan(400)
+    expect(SOURCES).toContain('components/base/BaseButton.vue')
+    expect(SOURCES).toContain('composables/use_t.ts')
+  })
+
+  for (const path of SOURCES) {
+    test(path, () => {
+      const component = EXCEPTIONS_BY_PATH.get(path)
+      const hits = findUnsafeColors(read(path))
+      const budget = new Map((component?.allow ?? []).map((e) => [e.pattern, e.count]))
 
       // Quand une classe dépasse son budget, on remonte *toutes* ses
       // occurrences : impossible de deviner laquelle est l'intruse, et pointer
@@ -296,17 +380,15 @@ describe('dark mode (#416) · aucune couleur figée par composant', () => {
 
       expect(
         unexpected,
-        unexpected.length
-          ? formatUnsafeColors(component.path, unexpected, component.allow ?? [])
-          : ''
+        unexpected.length ? formatUnsafeColors(path, unexpected, component?.allow ?? []) : ''
       ).toEqual([])
     })
   }
 })
 
 describe('dark mode (#416) · cohérence de la table', () => {
-  test('chaque composant listé existe encore', () => {
-    const missing = COMPONENTS.filter((c) => {
+  test('chaque exception vise un fichier qui existe encore', () => {
+    const missing = EXCEPTIONS.filter((c) => {
       try {
         read(c.path)
         return false
@@ -317,7 +399,7 @@ describe('dark mode (#416) · cohérence de la table', () => {
 
     expect(
       missing.map((c) => c.path),
-      'des composants de la table ont été déplacés ou supprimés — mettre la table à jour'
+      'des fichiers de la table ont été déplacés ou supprimés — mettre la table à jour'
     ).toEqual([])
   })
 
@@ -326,7 +408,7 @@ describe('dark mode (#416) · cohérence de la table', () => {
     // réintroduction : il doit coller exactement au nombre d'occurrences.
     const stale: string[] = []
 
-    for (const component of COMPONENTS) {
+    for (const component of EXCEPTIONS) {
       if (!component.allow) continue
       const hits = findUnsafeColors(read(component.path))
       for (const exception of component.allow) {
@@ -346,7 +428,7 @@ describe('dark mode (#416) · cohérence de la table', () => {
   })
 
   test('chaque exception porte une raison lisible', () => {
-    const unexplained = COMPONENTS.flatMap((c) =>
+    const unexplained = EXCEPTIONS.flatMap((c) =>
       (c.allow ?? [])
         .filter((e) => e.reason.trim().length < 20)
         .map((e) => `${c.path} → ${e.pattern}`)
@@ -358,7 +440,7 @@ describe('dark mode (#416) · cohérence de la table', () => {
   })
 
   test('le détecteur reconnaît bien les couleurs qui ne basculent pas', () => {
-    // Garde-fou du garde-fou : si les motifs cessaient de matcher, les 80 tests
+    // Garde-fou du garde-fou : si les motifs cessaient de matcher, les tests
     // ci-dessus passeraient au vert sans rien vérifier.
     const samples = [
       '<div class="bg-red-100 text-gray-600">',

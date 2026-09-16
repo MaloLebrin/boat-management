@@ -1,11 +1,13 @@
 import edge from 'edge.js'
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
+import i18nManager from '@adonisjs/i18n/services/main'
 import { Job } from '@adonisjs/queue'
 import type { JobOptions } from '@adonisjs/queue/types'
 import SimulatorLead from '#models/simulator_lead'
 import SendEmail, { type SendEmailPayload } from '#jobs/send_email'
 import QueueDedupService from '#services/queue_dedup_service'
+import { formatCurrency } from '#shared/helpers/number_format'
 import type {
   SimulatorBoatInput,
   SimulatorBoatType,
@@ -19,6 +21,11 @@ interface Payload {
   leadId: string
 }
 
+/**
+ * Rapport d'estimation envoyé après une simulation publique. Sujet, texte,
+ * libellés de catégories et montants suivent la langue du lead via `i18n` ;
+ * le gabarit Edge garde sa bascule `isFr` interne.
+ */
 @inject()
 export default class SendSimulatorReportJob extends Job<Payload> {
   static options: JobOptions = {
@@ -37,6 +44,7 @@ export default class SendSimulatorReportJob extends Job<Payload> {
       return
     }
 
+    const i18n = i18nManager.locale(lead.locale)
     const isFr = lead.locale === 'fr'
     const boatType = lead.boatType as SimulatorBoatType
 
@@ -54,43 +62,32 @@ export default class SendSimulatorReportJob extends Job<Payload> {
     }
 
     const breakdown = computeSimulatorCosts(input)
+    const money = (value: number) => formatCurrency(value, lead.locale, { fractionDigits: 0 })
+    const appUrl = env.get('APP_URL')
 
-    const subject = isFr
-      ? "Votre rapport d'entretien bateau — FleetAi"
-      : 'Your boat maintenance report — FleetAi'
+    const totalMinFormatted = money(breakdown.totalMin)
+    const totalMaxFormatted = money(breakdown.totalMax)
 
-    const text = isFr
-      ? `Votre rapport d'estimation de couts\n\nTotal: ${breakdown.totalMin} - ${breakdown.totalMax} EUR\n\nCreez votre compte: ${env.get('APP_URL')}/signup`
-      : `Your cost estimation report\n\nTotal: ${breakdown.totalMin} - ${breakdown.totalMax} EUR\n\nCreate your account: ${env.get('APP_URL')}/signup`
-
-    const categoryLabels: Record<string, string> = {
-      hull: isFr ? 'Coque' : 'Hull',
-      engine: isFr ? 'Moteur' : 'Engine',
-      safety: isFr ? 'Securite' : 'Safety',
-      electrical: isFr ? 'Electrique' : 'Electrical',
-      mooring: isFr ? 'Mouillage' : 'Mooring',
-      rigging: isFr ? 'Greement' : 'Rigging',
-    }
-
-    const formatter = new Intl.NumberFormat(isFr ? 'fr-FR' : 'en-US', {
-      style: 'currency',
-      currency: 'EUR',
-      minimumFractionDigits: 0,
+    const subject = i18n.t('marketing.emails.simulatorReport.subject')
+    const text = i18n.t('marketing.emails.simulatorReport.text', {
+      totalMin: totalMinFormatted,
+      totalMax: totalMaxFormatted,
+      signupUrl: `${appUrl}/signup`,
     })
 
     const categories = breakdown.categories.map((cat) => ({
       key: cat.key,
-      label: categoryLabels[cat.key] ?? cat.key,
-      minFormatted: formatter.format(cat.minCost),
-      maxFormatted: formatter.format(cat.maxCost),
+      label: i18n.t(`marketing.emails.simulatorReport.categories.${cat.key}`),
+      minFormatted: money(cat.minCost),
+      maxFormatted: money(cat.maxCost),
     }))
 
     const html = await edge.render('emails/simulator_report', {
       isFr,
       categories,
-      totalMinFormatted: formatter.format(breakdown.totalMin),
-      totalMaxFormatted: formatter.format(breakdown.totalMax),
-      appUrl: env.get('APP_URL'),
+      totalMinFormatted,
+      totalMaxFormatted,
+      appUrl,
     })
 
     const partialPayload: Omit<SendEmailPayload, 'dedupKey'> = {

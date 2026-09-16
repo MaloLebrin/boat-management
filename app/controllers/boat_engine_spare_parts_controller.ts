@@ -13,6 +13,7 @@ import { addRepairCartItemValidator, updateRepairCartItemValidator } from '#vali
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import BoatContextService from '#services/boat_context_service'
+import { contentDisposition } from '#shared/helpers/content_disposition'
 
 @inject()
 export default class BoatEngineSparePartsController {
@@ -254,7 +255,7 @@ export default class BoatEngineSparePartsController {
       const filename = `repair-list${slug ? `-${slug}` : ''}.csv`
 
       response.header('Content-Type', 'text/csv; charset=utf-8')
-      response.header('Content-Disposition', `attachment; filename="${filename}"`)
+      response.header('Content-Disposition', contentDisposition(filename))
       // BOM UTF-8 pour qu'Excel détecte l'encodage des accents.
       return response.send('\ufeff' + csv)
     } catch (error) {

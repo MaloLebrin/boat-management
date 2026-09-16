@@ -8,8 +8,8 @@ vi.mock('@inertiajs/vue3', () => ({
   usePage: () => ({ props: { appT: {}, locale: 'en' } }),
 }))
 
-vi.mock('~/composables/use_currency_format', () => ({
-  useCurrencyFormat: () => ({ formatCurrency: (n: number) => `${n} €` }),
+vi.mock('~/composables/use_number_format', () => ({
+  useNumberFormat: () => ({ formatCurrency: (n: number) => `${n} €` }),
 }))
 
 vi.mock('~/components/base/BaseButton.vue', () => ({

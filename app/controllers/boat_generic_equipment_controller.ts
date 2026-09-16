@@ -16,6 +16,7 @@ import {
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import BoatContextService from '#services/boat_context_service'
+import { initialTabParam } from '#utils/inertia_tab'
 
 @inject()
 export default class BoatGenericEquipmentController {
@@ -27,7 +28,7 @@ export default class BoatGenericEquipmentController {
     private taskService: BoatMaintenanceTaskService
   ) {}
 
-  async show({ inertia, response, auth, params, bouncer, session, i18n }: HttpContext) {
+  async show({ inertia, request, response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
     const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
@@ -49,6 +50,7 @@ export default class BoatGenericEquipmentController {
 
     return inertia.render('boats/generic_equipment_show', {
       boat: { id: boat.id, name: boat.name },
+      initialTab: initialTabParam(request),
       item: {
         id: item.id,
         name: item.name,

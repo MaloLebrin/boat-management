@@ -5,7 +5,7 @@ import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseConfirmModal from '~/components/base/BaseConfirmModal.vue'
 import InspectionDefectModal from '~/components/reservations/inspection/InspectionDefectModal.vue'
-import { useCurrencyFormat } from '~/composables/use_currency_format'
+import { useNumberFormat } from '~/composables/use_number_format'
 import { useT } from '~/composables/use_t'
 import type { BoatEquipmentActionRow } from '~/types/boat_show'
 
@@ -24,7 +24,7 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
-const { formatCurrency } = useCurrencyFormat()
+const { formatCurrency } = useNumberFormat()
 
 const isModalOpen = ref(false)
 const toDelete = ref<BoatEquipmentActionRow | null>(null)

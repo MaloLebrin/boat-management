@@ -25,12 +25,7 @@ import { inject } from '@adonisjs/core'
 import db from '@adonisjs/lucid/services/db'
 import type { TransactionClientContract } from '@adonisjs/lucid/types/database'
 import { DateTime } from 'luxon'
-
-function assertBoatScope(user: User, boat: Boat) {
-  if (user.organizationId === null || user.organizationId !== boat.organizationId) {
-    throw new ReservationNotFoundError()
-  }
-}
+import { assertBoatInUserOrg } from '#utils/boat_utils'
 
 /**
  * Allowed status transitions for a reservation. A firm booking can only be
@@ -52,7 +47,7 @@ export default class BoatReservationService {
   ) {}
 
   async listForBoat(user: User, boat: Boat): Promise<BoatReservation[]> {
-    assertBoatScope(user, boat)
+    assertBoatInUserOrg(user, boat, () => new ReservationNotFoundError())
 
     return BoatReservation.query().where('boatId', boat.id).orderBy('starts_at', 'asc')
   }
@@ -94,7 +89,7 @@ export default class BoatReservationService {
     boat: Boat,
     payload: CreateReservationPayload
   ): Promise<{ reservation: BoatReservation; cancelledOptions: number }> {
-    assertBoatScope(user, boat)
+    assertBoatInUserOrg(user, boat, () => new ReservationNotFoundError())
 
     const startsAt = toUtcFromLocalInput(payload.startsAt, payload.tzOffsetMinutes)
     const endsAt = toUtcFromLocalInput(payload.endsAt, payload.tzOffsetMinutes)
@@ -169,7 +164,7 @@ export default class BoatReservationService {
     reservationId: number,
     payload: UpdateReservationPayload
   ): Promise<{ reservation: BoatReservation; cancelledOptions: number }> {
-    assertBoatScope(user, boat)
+    assertBoatInUserOrg(user, boat, () => new ReservationNotFoundError())
 
     const reservation = await BoatReservation.query()
       .where('id', reservationId)
@@ -258,7 +253,7 @@ export default class BoatReservationService {
     boat: Boat,
     reservationId: number
   ): Promise<BoatReservation | null> {
-    assertBoatScope(user, boat)
+    assertBoatInUserOrg(user, boat, () => new ReservationNotFoundError())
 
     return BoatReservation.query().where('id', reservationId).where('boatId', boat.id).first()
   }

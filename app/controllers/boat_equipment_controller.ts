@@ -36,6 +36,7 @@ import { deferJson } from '#utils/inertia_defer'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import BoatContextService from '#services/boat_context_service'
+import { initialTabParam } from '#utils/inertia_tab'
 
 @inject()
 export default class BoatEquipmentController {
@@ -223,7 +224,16 @@ export default class BoatEquipmentController {
     })
   }
 
-  async showSail({ inertia, response, auth, params, bouncer, session, i18n }: HttpContext) {
+  async showSail({
+    inertia,
+    request,
+    response,
+    auth,
+    params,
+    bouncer,
+    session,
+    i18n,
+  }: HttpContext) {
     await auth.authenticate()
     const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
@@ -245,6 +255,7 @@ export default class BoatEquipmentController {
 
     return inertia.render('boats/sail_show', {
       boat: { id: boat.id, name: boat.name },
+      initialTab: initialTabParam(request),
       sail: {
         id: sail.id,
         sailType: sail.sailType,
@@ -265,7 +276,7 @@ export default class BoatEquipmentController {
     })
   }
 
-  async showRig({ inertia, response, auth, params, bouncer, session, i18n }: HttpContext) {
+  async showRig({ inertia, request, response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
     const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
@@ -287,6 +298,7 @@ export default class BoatEquipmentController {
 
     return inertia.render('boats/rig_show', {
       boat: { id: boat.id, name: boat.name },
+      initialTab: initialTabParam(request),
       rig: {
         id: rig.id,
         rigType: rig.rigType,
@@ -413,7 +425,7 @@ export default class BoatEquipmentController {
     response.redirect(`/boats/${boat.id}`)
   }
 
-  async showEngine({ inertia, response, auth, params, bouncer, i18n }: HttpContext) {
+  async showEngine({ inertia, request, response, auth, params, bouncer, i18n }: HttpContext) {
     await auth.authenticate()
     const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
@@ -446,6 +458,7 @@ export default class BoatEquipmentController {
 
     return inertia.render('boats/engine_show', {
       boat: { id: boat.id, name: boat.name },
+      initialTab: initialTabParam(request),
       engine: {
         id: engine.id,
         kind: engine.kind,

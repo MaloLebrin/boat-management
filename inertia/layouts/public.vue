@@ -60,7 +60,7 @@ const contactHref = computed(() => marketingPath('contact', locale.value))
       <div class="mx-auto grid max-w-7xl gap-10 px-6 py-12 md:grid-cols-3 lg:grid-cols-5">
         <div class="space-y-3">
           <p class="font-display text-sm text-fg" style="letter-spacing: -0.025em">
-            Fleet<em style="font-style: italic; color: #e2674f">Ai</em>
+            Fleet<em class="italic text-coral-500">Ai</em>
           </p>
           <p class="text-sm text-fg-muted">{{ t('public.footer.tagline') }}</p>
         </div>

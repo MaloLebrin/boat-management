@@ -117,7 +117,9 @@ function dismissAlert() {
       <PortDashboardCard :ports="ports" :port-stats="portStats" />
     </div>
 
-    <div class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_16rem]">
+    <!-- `lg:items-start` : sans lui la grille étire le panneau Assistant IA sur
+         toute la hauteur de la colonne principale (grand aplat navy vide). -->
+    <div class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start">
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
         <BaseCard>
           <template #header>

@@ -5,18 +5,23 @@ import type Boat from '#models/boat'
 import type User from '#models/user'
 import type { CreateFuelLogPayload } from '#shared/types/fuel_log'
 import { toDateTime } from '#shared/helpers/date'
+import { assertBoatInUserOrg } from '#utils/boat_utils'
 
 export type { CreateFuelLogPayload }
 
 export default class BoatFuelLogService {
-  async listForBoat(_user: User, boat: Boat) {
+  async listForBoat(user: User, boat: Boat) {
+    assertBoatInUserOrg(user, boat)
+
     return await BoatFuelLog.query()
       .where('boatId', boat.id)
       .orderBy('fueledAt', 'desc')
       .orderBy('id', 'desc')
   }
 
-  async createForBoat(_user: User, boat: Boat, payload: CreateFuelLogPayload) {
+  async createForBoat(user: User, boat: Boat, payload: CreateFuelLogPayload) {
+    assertBoatInUserOrg(user, boat)
+
     let engineFuel: string | null = null
 
     if (payload.boatEngineId) {
@@ -80,7 +85,9 @@ export default class BoatFuelLogService {
     })
   }
 
-  async deleteForBoat(_user: User, boat: Boat, logId: number) {
+  async deleteForBoat(user: User, boat: Boat, logId: number) {
+    assertBoatInUserOrg(user, boat)
+
     const log = await BoatFuelLog.query().where('id', logId).where('boatId', boat.id).first()
 
     if (!log) throw new BoatFuelLogNotFoundError()

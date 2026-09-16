@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import { useT } from '~/composables/use_t'
+import { useNumberFormat } from '~/composables/use_number_format'
 import { computeInvoiceTotals } from '#shared/helpers/invoice_totals'
 import type { InvoiceLineInput } from '../../../shared/types/invoice'
 
@@ -17,6 +18,7 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useT()
+const { formatCurrency } = useNumberFormat()
 
 const totals = computed(() => computeInvoiceTotals(props.modelValue, props.taxRate))
 
@@ -42,10 +44,7 @@ function addLine() {
 }
 
 function formatAmount(amount: number): string {
-  return new Intl.NumberFormat(undefined, {
-    style: 'currency',
-    currency: props.currency,
-  }).format(amount)
+  return formatCurrency(amount, { currency: props.currency })
 }
 </script>
 

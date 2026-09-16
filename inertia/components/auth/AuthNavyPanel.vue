@@ -83,7 +83,7 @@ const modeKey = {
           <circle cx="32" cy="32" r="2.6" fill="#0b1d2e" stroke="#faf6ee" stroke-width="1.4" />
         </svg>
         <span class="font-display text-base text-white" style="letter-spacing: -0.025em">
-          Fleet<em style="font-style: italic; color: #e2674f">Ai</em>
+          Fleet<em class="italic text-coral-500">Ai</em>
         </span>
       </Link>
 
@@ -100,7 +100,7 @@ const modeKey = {
           style="font-size: 52px; line-height: 1.04; letter-spacing: -0.02em"
         >
           {{ t(`auth.${modeKey[mode]}.marketing.taglineMain`) }}<br />
-          <em style="font-style: italic; color: #e2674f">{{
+          <em class="italic text-coral-500">{{
             t(`auth.${modeKey[mode]}.marketing.taglineAccent`)
           }}</em>
         </h1>
@@ -143,8 +143,7 @@ const modeKey = {
           </p>
           <div class="mt-3 flex gap-1.5">
             <span
-              class="rounded-full px-2.5 py-1 text-[11px] font-semibold text-white"
-              style="background: #e2674f"
+              class="rounded-full bg-coral-500 px-2.5 py-1 text-[11px] font-semibold text-white"
               >{{ t('auth.aiCard.action') }}</span
             >
             <span
@@ -161,8 +160,8 @@ const modeKey = {
         <template v-if="mode === 'login' || mode === 'register'">
           <div class="flex items-start gap-3">
             <div
-              class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full font-display text-lg text-white"
-              style="background: #2a527a; font-size: 18px"
+              class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-navy-600 font-display text-lg text-white"
+              style="font-size: 18px"
             >
               M
             </div>

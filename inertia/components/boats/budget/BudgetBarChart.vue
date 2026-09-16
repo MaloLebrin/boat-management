@@ -10,7 +10,7 @@ import {
   Title,
   Tooltip,
 } from 'chart.js'
-import { useCurrencyFormat } from '~/composables/use_currency_format'
+import { useNumberFormat } from '~/composables/use_number_format'
 import { useT } from '~/composables/use_t'
 import type { BudgetMonthlyData } from '~/types/budget'
 
@@ -21,7 +21,7 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
-const { formatCurrency, formatCurrencyNoDecimals } = useCurrencyFormat()
+const { formatCurrency, formatCurrencyNoDecimals } = useNumberFormat()
 
 const isDark = ref(false)
 let darkObserver: MutationObserver | null = null

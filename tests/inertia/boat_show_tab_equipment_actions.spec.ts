@@ -1,47 +1,27 @@
-import { mount, config } from '@vue/test-utils'
+import { config } from '@vue/test-utils'
 import { test, expect, vi, beforeAll, afterAll } from 'vitest'
 import BoatShowTabEquipmentActions from '../../inertia/components/boats/show/tabs/BoatShowTabEquipmentActions.vue'
 import type { BoatEquipmentActionRow } from '../../shared/types/equipment_action'
 import type { BoatShowDetail } from '../../inertia/types/boat_show'
+import { mountWithStubs } from './helpers/mount'
 
-vi.mock('~/composables/use_t', () => ({
-  useT: () => ({
-    t: (key: string) => key,
-  }),
-}))
+vi.mock('@inertiajs/vue3', async () => {
+  const { inertiaMock } = await import('./helpers/inertia_mock')
+  return inertiaMock()
+})
 
-vi.mock('@inertiajs/vue3', () => ({
-  router: { delete: vi.fn() },
-}))
-
-vi.mock('~/components/base/BaseButton.vue', () => ({
-  default: { template: '<button @click="$emit(\'click\')"><slot /></button>', emits: ['click'] },
-}))
-
-vi.mock('~/components/base/BaseSegmentedControl.vue', () => ({
-  default: {
-    template:
-      '<div class="segmented-control"><button v-for="opt in options" :key="opt.value" @click="$emit(\'update:modelValue\', opt.value)">{{ opt.label }}</button></div>',
-    props: ['modelValue', 'options'],
-    emits: ['update:modelValue'],
-  },
-}))
-
-vi.mock('~/components/boats/equipment-actions/BoatEquipmentActionCard.vue', () => ({
-  default: {
+const TAB_STUBS = {
+  BoatEquipmentActionCard: {
     template: '<div class="action-card" :data-id="action.id">{{ action.label }}</div>',
     props: ['action', 'canManage', 'canDelete'],
     emits: ['edit', 'delete'],
   },
-}))
-
-vi.mock('~/components/boats/equipment-actions/BoatEquipmentActionModal.vue', () => ({
-  default: {
+  BoatEquipmentActionModal: {
     template: '<div v-if="open" class="modal">Modal</div>',
     props: ['boat', 'open', 'editingAction'],
     emits: ['update:open'],
   },
-}))
+}
 
 const minimalBoat: BoatShowDetail = {
   id: 10,
@@ -140,7 +120,8 @@ function mountTab(
   canManage = true,
   canDelete = true
 ) {
-  return mount(BoatShowTabEquipmentActions, {
+  return mountWithStubs(BoatShowTabEquipmentActions, {
+    stubs: TAB_STUBS,
     props: {
       boat: minimalBoat,
       equipmentActions,
@@ -186,7 +167,7 @@ test('filters by status when status filter is changed', async () => {
   expect(w.findAll('.action-card').length).toBe(3)
 
   // Click on 'pending' status filter
-  const segmentedControls = w.findAll('.segmented-control')
+  const segmentedControls = w.findAll('[data-base-segmented-control]')
   const statusControl = segmentedControls[0]
   const pendingButton = statusControl.findAll('button').find((b) => b.text().includes('pending'))
   await pendingButton?.trigger('click')
@@ -203,7 +184,7 @@ test('filters by action type when type filter is changed', async () => {
   expect(w.findAll('.action-card').length).toBe(3)
 
   // Click on 'to_repair' type filter
-  const segmentedControls = w.findAll('.segmented-control')
+  const segmentedControls = w.findAll('[data-base-segmented-control]')
   const typeControl = segmentedControls[1]
   const repairButton = typeControl.findAll('button').find((b) => b.text().includes('to_repair'))
   await repairButton?.trigger('click')
@@ -217,7 +198,7 @@ test('combines status and type filters', async () => {
   const w = mountTab()
 
   // Click on 'pending' status
-  const segmentedControls = w.findAll('.segmented-control')
+  const segmentedControls = w.findAll('[data-base-segmented-control]')
   const statusControl = segmentedControls[0]
   const pendingButton = statusControl.findAll('button').find((b) => b.text().includes('pending'))
   await pendingButton?.trigger('click')

@@ -6,6 +6,7 @@ import QuotaService from '#services/quota_service'
 import { QuotaExceededError } from '#exceptions/quota_errors'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
+import { contentDisposition } from '#shared/helpers/content_disposition'
 
 @inject()
 export default class MaintenanceLogPdfController {
@@ -50,10 +51,7 @@ export default class MaintenanceLogPdfController {
 
     const inline = request.input('inline') === '1'
     response.header('Content-Type', 'application/pdf')
-    response.header(
-      'Content-Disposition',
-      inline ? `inline; filename="${filename}"` : `attachment; filename="${filename}"`
-    )
+    response.header('Content-Disposition', contentDisposition(filename, { inline }))
     response.header('Content-Length', String(buffer.length))
     return response.send(buffer)
   }

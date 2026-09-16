@@ -1,46 +1,17 @@
-import { mount } from '@vue/test-utils'
-import { describe, test, expect, vi } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 import BudgetEntryList from '../../inertia/components/boats/budget/BudgetEntryList.vue'
 import type { BoatBudgetEntryItem } from '../../shared/types/budget'
+import { mountWithStubs } from './helpers/mount'
 
-vi.mock('~/composables/use_t', () => ({
-  useT: () => ({
-    t: (key: string) => key,
-    locale: { value: 'fr' },
-  }),
-}))
+vi.mock('@inertiajs/vue3', async () => {
+  const { inertiaMock } = await import('./helpers/inertia_mock')
+  return inertiaMock()
+})
 
-vi.mock('~/composables/use_currency_format', () => ({
-  useCurrencyFormat: () => ({
+vi.mock('~/composables/use_number_format', () => ({
+  useNumberFormat: () => ({
     formatCurrency: (v: number) => `${v.toFixed(2)} €`,
   }),
-}))
-
-vi.mock('@inertiajs/vue3', () => ({
-  router: { delete: vi.fn() },
-  useForm: () => ({
-    label: '',
-    amount: '',
-    date: '',
-    category: '',
-    description: '',
-    errors: {},
-    processing: false,
-    patch: vi.fn(),
-    reset: vi.fn(),
-  }),
-}))
-
-vi.mock('~/components/base/BaseButton.vue', () => ({
-  default: { template: '<button @click="$emit(\'click\')"><slot /></button>', emits: ['click'] },
-}))
-
-vi.mock('~/components/base/BaseInput.vue', () => ({
-  default: { template: '<input />', props: ['modelValue', 'label', 'error', 'type', 'required'] },
-}))
-
-vi.mock('~/components/base/BaseSelect.vue', () => ({
-  default: { template: '<select />', props: ['modelValue', 'label', 'options', 'error'] },
 }))
 
 const sampleEntry: BoatBudgetEntryItem = {
@@ -53,9 +24,7 @@ const sampleEntry: BoatBudgetEntryItem = {
 }
 
 function mountList(entries: BoatBudgetEntryItem[] = [], canManage = true) {
-  return mount(BudgetEntryList, {
-    props: { boatId: 1, entries, canManage },
-  })
+  return mountWithStubs(BudgetEntryList, { props: { boatId: 1, entries, canManage } })
 }
 
 test('shows noEntries message when list is empty', () => {

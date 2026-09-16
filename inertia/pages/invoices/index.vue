@@ -13,6 +13,7 @@ import InvoiceListToolbar from '~/components/invoices/InvoiceListToolbar.vue'
 import InvoiceStatusBadge from '~/components/invoices/InvoiceStatusBadge.vue'
 import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
+import { useNumberFormat } from '~/composables/use_number_format'
 import type {
   InvoiceListFilters,
   InvoiceRow,
@@ -29,6 +30,7 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
+const { formatCurrency } = useNumberFormat()
 const { formatDate } = useDateFormat()
 const page = usePage()
 
@@ -70,10 +72,7 @@ function executeDelete() {
 }
 
 function formatTotal(invoice: InvoiceRow): string {
-  return new Intl.NumberFormat(undefined, {
-    style: 'currency',
-    currency: invoice.currency,
-  }).format(invoice.total)
+  return formatCurrency(invoice.total, { currency: invoice.currency })
 }
 </script>
 

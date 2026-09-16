@@ -128,5 +128,17 @@
   "fromReservation": {
     "line": "Rental {boat} ({start} → {end})"
   },
-  "readOnlyNotice": "Read-only: the Invoicing module is inactive. Your existing documents stay available; creating and editing are disabled."
+  "readOnlyNotice": "Read-only: the Invoicing module is inactive. Your existing documents stay available; creating and editing are disabled.",
+  "email": {
+    "kind": {
+      "quote": "quote",
+      "invoice": "invoice"
+    },
+    "kindTitle": {
+      "quote": "Quote",
+      "invoice": "Invoice"
+    },
+    "subject": "{kindTitle} {number} from {orgName}",
+    "text": "Hello,\n\nPlease find attached {kind} no. {number}.\n\nTotal amount: {total}\n\nBest regards,\n{orgName}"
+  }
 }
