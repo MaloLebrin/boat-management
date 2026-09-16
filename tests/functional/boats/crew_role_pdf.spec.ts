@@ -49,8 +49,9 @@ test.group('Rôle d’équipage PDF — GET …/navigation-logs/:logId/crew-role
 
     response.assertStatus(200)
     response.assertHeader('content-type', 'application/pdf')
-    response.assertHeader(
-      'content-disposition',
+    // Le helper partagé ajoute `filename*=` : on ne fige que le nom du fichier.
+    assert.include(
+      response.header('content-disposition'),
       'attachment; filename="role-equipage-2026-07-14.pdf"'
     )
     // Le corps binaire n'est pas exposé par le client d'API : la taille suffit
