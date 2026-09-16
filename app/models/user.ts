@@ -48,12 +48,37 @@ export default class User extends compose(
     return `${first.slice(0, 2)}`.toUpperCase()
   }
 
+  /**
+   * Rôle par organisation, mémoïsé sur l'instance. Une requête HTTP hydrate
+   * un seul `User` (`auth.user`) que se partagent le middleware Inertia, les
+   * policies Bouncer et `PermissionService` : sans cache, une page bateau
+   * refaisait 10 à 20 fois le même SELECT sur `organization_memberships`.
+   *
+   * Chaque entrée porte la génération de `OrganizationMembership` au moment
+   * de la lecture : toute écriture sur une adhésion (create/save/delete) la
+   * rend caduque, y compris pour une instance déjà en vie. `forgetRoles()`
+   * vide le cache à la main si besoin.
+   */
+  #roleCache = new Map<number, { role: OrgRole | null; generation: number }>()
+
+  forgetRoles(): void {
+    this.#roleCache.clear()
+  }
+
   async getRoleInOrg(orgId: number): Promise<OrgRole | null> {
+    const generation = OrganizationMembership.generation
+    const cached = this.#roleCache.get(orgId)
+    if (cached !== undefined && cached.generation === generation) {
+      return cached.role
+    }
+
     const membership = await OrganizationMembership.query()
       .where('userId', this.id)
       .where('organizationId', orgId)
       .first()
-    return (membership?.role as OrgRole) ?? null
+    const role = (membership?.role as OrgRole) ?? null
+    this.#roleCache.set(orgId, { role, generation })
+    return role
   }
 
   async isAdminOf(orgId: number): Promise<boolean> {
