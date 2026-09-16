@@ -13,24 +13,14 @@ import { DateTime } from 'luxon'
 export default class EmailQueueService {
   constructor(private dedup: QueueDedupService) {}
 
-  async sendWelcome(params: { to: string; name: string | null }) {
-    const displayName = params.name || params.to
-    const subject = 'Bienvenue sur FleetAi / Welcome to FleetAi'
-    const text = `Bonjour ${displayName},\n\nBienvenue sur FleetAi, votre plateforme de gestion de flotte.\n\nHello ${displayName},\n\nWelcome to FleetAi, your fleet management platform.\n\nAccess your dashboard: /dashboard`
-
-    const html = await edge.render('emails/welcome', {
-      displayName,
-      appUrl: env.get('APP_URL'),
-    })
-
-    const partialPayload: Omit<SendEmailPayload, 'dedupKey'> = {
-      to: params.to,
-      subject,
-      text,
-      html,
-      correlationId: `welcome:${params.to}`,
-    }
-
+  /**
+   * Toute notification `SendEmail` passe ici : clé de déduplication dérivée
+   * du payload (`correlationId` sinon empreinte sujet + texte), file
+   * `emails`, dispatch du job. Les envois qui ont leur propre job (facture,
+   * contrat de location) gardent leur clé horodatée et appellent `dedup`
+   * directement.
+   */
+  async #enqueue(partialPayload: Omit<SendEmailPayload, 'dedupKey'>): Promise<void> {
     const key = SendEmail.dedupKey(partialPayload)
     const payload: SendEmailPayload = { ...partialPayload, dedupKey: key }
 
@@ -45,6 +35,25 @@ export default class EmailQueueService {
     })
   }
 
+  async sendWelcome(params: { to: string; name: string | null }) {
+    const displayName = params.name || params.to
+    const subject = 'Bienvenue sur FleetAi / Welcome to FleetAi'
+    const text = `Bonjour ${displayName},\n\nBienvenue sur FleetAi, votre plateforme de gestion de flotte.\n\nHello ${displayName},\n\nWelcome to FleetAi, your fleet management platform.\n\nAccess your dashboard: /dashboard`
+
+    const html = await edge.render('emails/welcome', {
+      displayName,
+      appUrl: env.get('APP_URL'),
+    })
+
+    await this.#enqueue({
+      to: params.to,
+      subject,
+      text,
+      html,
+      correlationId: `welcome:${params.to}`,
+    })
+  }
+
   async sendPasswordReset(params: { to: string; resetUrl: string }) {
     const subject = 'Reset your password / Reinitialisation de mot de passe'
     const text = `Click here to reset your password: ${params.resetUrl}\n\nCliquez ici pour reinitialiser votre mot de passe : ${params.resetUrl}`
@@ -53,25 +62,12 @@ export default class EmailQueueService {
       resetUrl: params.resetUrl,
     })
 
-    const partialPayload: Omit<SendEmailPayload, 'dedupKey'> = {
+    await this.#enqueue({
       to: params.to,
       subject,
       text,
       html,
       correlationId: `password-reset:${params.to}:${Date.now()}`,
-    }
-
-    const key = SendEmail.dedupKey(partialPayload)
-    const payload: SendEmailPayload = { ...partialPayload, dedupKey: key }
-
-    await this.dedup.enqueueUnique({
-      key,
-      jobName: SendEmail.name,
-      queue: 'emails',
-      payload,
-      dispatch: async (p) => {
-        await SendEmail.dispatch(p)
-      },
     })
   }
 
@@ -93,25 +89,12 @@ export default class EmailQueueService {
       branding: params.branding ?? null,
     })
 
-    const partialPayload: Omit<SendEmailPayload, 'dedupKey'> = {
+    await this.#enqueue({
       to: params.to,
       subject,
       text,
       html,
       correlationId: `invitation:${params.to}:${Date.now()}`,
-    }
-
-    const key = SendEmail.dedupKey(partialPayload)
-    const payload: SendEmailPayload = { ...partialPayload, dedupKey: key }
-
-    await this.dedup.enqueueUnique({
-      key,
-      jobName: SendEmail.name,
-      queue: 'emails',
-      payload,
-      dispatch: async (p) => {
-        await SendEmail.dispatch(p)
-      },
     })
   }
 
@@ -134,25 +117,12 @@ export default class EmailQueueService {
 
     const correlationId = `reminder-inactive-account:${params.to}:${params.orgName}`
 
-    const partialPayload: Omit<SendEmailPayload, 'dedupKey'> = {
+    await this.#enqueue({
       to: params.to,
       subject,
       text,
       html,
       correlationId,
-    }
-
-    const key = SendEmail.dedupKey(partialPayload)
-    const payload: SendEmailPayload = { ...partialPayload, dedupKey: key }
-
-    await this.dedup.enqueueUnique({
-      key,
-      jobName: SendEmail.name,
-      queue: 'emails',
-      payload,
-      dispatch: async (p) => {
-        await SendEmail.dispatch(p)
-      },
     })
   }
 
@@ -177,25 +147,12 @@ export default class EmailQueueService {
 
     const correlationId = `reminder-incomplete-boats:${params.to}:${params.boats.map((b) => b.id).join('-')}`
 
-    const partialPayload: Omit<SendEmailPayload, 'dedupKey'> = {
+    await this.#enqueue({
       to: params.to,
       subject,
       text,
       html,
       correlationId,
-    }
-
-    const key = SendEmail.dedupKey(partialPayload)
-    const payload: SendEmailPayload = { ...partialPayload, dedupKey: key }
-
-    await this.dedup.enqueueUnique({
-      key,
-      jobName: SendEmail.name,
-      queue: 'emails',
-      payload,
-      dispatch: async (p) => {
-        await SendEmail.dispatch(p)
-      },
     })
   }
 
@@ -220,25 +177,12 @@ export default class EmailQueueService {
 
     const correlationId = `reminder-incomplete-ports:${params.to}:${params.ports.map((p) => p.id).join('-')}`
 
-    const partialPayload: Omit<SendEmailPayload, 'dedupKey'> = {
+    await this.#enqueue({
       to: params.to,
       subject,
       text,
       html,
       correlationId,
-    }
-
-    const key = SendEmail.dedupKey(partialPayload)
-    const payload: SendEmailPayload = { ...partialPayload, dedupKey: key }
-
-    await this.dedup.enqueueUnique({
-      key,
-      jobName: SendEmail.name,
-      queue: 'emails',
-      payload,
-      dispatch: async (p) => {
-        await SendEmail.dispatch(p)
-      },
     })
   }
 
@@ -260,25 +204,12 @@ export default class EmailQueueService {
 
     const correlationId = `reminder-inactive-login:${params.to}`
 
-    const partialPayload: Omit<SendEmailPayload, 'dedupKey'> = {
+    await this.#enqueue({
       to: params.to,
       subject,
       text,
       html,
       correlationId,
-    }
-
-    const key = SendEmail.dedupKey(partialPayload)
-    const payload: SendEmailPayload = { ...partialPayload, dedupKey: key }
-
-    await this.dedup.enqueueUnique({
-      key,
-      jobName: SendEmail.name,
-      queue: 'emails',
-      payload,
-      dispatch: async (p) => {
-        await SendEmail.dispatch(p)
-      },
     })
   }
 
@@ -304,25 +235,12 @@ export default class EmailQueueService {
     const taskIds = params.tasks.map((t) => t.id).join('-')
     const correlationId = `reminder-overdue-tasks:${params.to}:${taskIds}`
 
-    const partialPayload: Omit<SendEmailPayload, 'dedupKey'> = {
+    await this.#enqueue({
       to: params.to,
       subject,
       text,
       html,
       correlationId,
-    }
-
-    const key = SendEmail.dedupKey(partialPayload)
-    const payload: SendEmailPayload = { ...partialPayload, dedupKey: key }
-
-    await this.dedup.enqueueUnique({
-      key,
-      jobName: SendEmail.name,
-      queue: 'emails',
-      payload,
-      dispatch: async (p) => {
-        await SendEmail.dispatch(p)
-      },
     })
   }
 
@@ -347,25 +265,12 @@ export default class EmailQueueService {
     const taskIds = params.tasks.map((t) => t.id).join('-')
     const correlationId = `reminder-engine-tasks:${params.to}:${taskIds}`
 
-    const partialPayload: Omit<SendEmailPayload, 'dedupKey'> = {
+    await this.#enqueue({
       to: params.to,
       subject,
       text,
       html,
       correlationId,
-    }
-
-    const key = SendEmail.dedupKey(partialPayload)
-    const payload: SendEmailPayload = { ...partialPayload, dedupKey: key }
-
-    await this.dedup.enqueueUnique({
-      key,
-      jobName: SendEmail.name,
-      queue: 'emails',
-      payload,
-      dispatch: async (p) => {
-        await SendEmail.dispatch(p)
-      },
     })
   }
 
@@ -390,25 +295,12 @@ export default class EmailQueueService {
     const taskIds = params.tasks.map((t) => t.id).join('-')
     const correlationId = `reminder-boat-check-tasks:${params.to}:${taskIds}`
 
-    const partialPayload: Omit<SendEmailPayload, 'dedupKey'> = {
+    await this.#enqueue({
       to: params.to,
       subject,
       text,
       html,
       correlationId,
-    }
-
-    const key = SendEmail.dedupKey(partialPayload)
-    const payload: SendEmailPayload = { ...partialPayload, dedupKey: key }
-
-    await this.dedup.enqueueUnique({
-      key,
-      jobName: SendEmail.name,
-      queue: 'emails',
-      payload,
-      dispatch: async (p) => {
-        await SendEmail.dispatch(p)
-      },
     })
   }
 
@@ -441,25 +333,12 @@ export default class EmailQueueService {
 
     const correlationId = `storage-quota-warning:${params.correlationSuffix}`
 
-    const partialPayload: Omit<SendEmailPayload, 'dedupKey'> = {
+    await this.#enqueue({
       to: params.to,
       subject,
       text,
       html,
       correlationId,
-    }
-
-    const key = SendEmail.dedupKey(partialPayload)
-    const payload: SendEmailPayload = { ...partialPayload, dedupKey: key }
-
-    await this.dedup.enqueueUnique({
-      key,
-      jobName: SendEmail.name,
-      queue: 'emails',
-      payload,
-      dispatch: async (p) => {
-        await SendEmail.dispatch(p)
-      },
     })
   }
 
@@ -492,25 +371,12 @@ export default class EmailQueueService {
 
     const correlationId = `ai-token-quota-warning:${params.correlationSuffix}`
 
-    const partialPayload: Omit<SendEmailPayload, 'dedupKey'> = {
+    await this.#enqueue({
       to: params.to,
       subject,
       text,
       html,
       correlationId,
-    }
-
-    const key = SendEmail.dedupKey(partialPayload)
-    const payload: SendEmailPayload = { ...partialPayload, dedupKey: key }
-
-    await this.dedup.enqueueUnique({
-      key,
-      jobName: SendEmail.name,
-      queue: 'emails',
-      payload,
-      dispatch: async (p) => {
-        await SendEmail.dispatch(p)
-      },
     })
   }
 
@@ -539,25 +405,12 @@ export default class EmailQueueService {
 
     const correlationId = `doc-expiry:${params.to}:${params.daysLabel}:${DateTime.now().toISODate()}`
 
-    const partialPayload: Omit<SendEmailPayload, 'dedupKey'> = {
+    await this.#enqueue({
       to: params.to,
       subject,
       text,
       html,
       correlationId,
-    }
-
-    const key = SendEmail.dedupKey(partialPayload)
-    const payload: SendEmailPayload = { ...partialPayload, dedupKey: key }
-
-    await this.dedup.enqueueUnique({
-      key,
-      jobName: SendEmail.name,
-      queue: 'emails',
-      payload,
-      dispatch: async (p) => {
-        await SendEmail.dispatch(p)
-      },
     })
   }
 
@@ -588,25 +441,12 @@ export default class EmailQueueService {
     const yearMonth = DateTime.now().toFormat('yyyy-MM')
     const correlationId = `plan-downgrade:${params.orgId}:${params.fromPlan}:${params.toPlan}:${yearMonth}`
 
-    const partialPayload: Omit<SendEmailPayload, 'dedupKey'> = {
+    await this.#enqueue({
       to: params.to,
       subject,
       text,
       html,
       correlationId,
-    }
-
-    const key = SendEmail.dedupKey(partialPayload)
-    const payload: SendEmailPayload = { ...partialPayload, dedupKey: key }
-
-    await this.dedup.enqueueUnique({
-      key,
-      jobName: SendEmail.name,
-      queue: 'emails',
-      payload,
-      dispatch: async (p) => {
-        await SendEmail.dispatch(p)
-      },
     })
   }
 
@@ -636,25 +476,12 @@ export default class EmailQueueService {
     const yearMonth = DateTime.now().toFormat('yyyy-MM')
     const correlationId = `module-deactivated:${params.orgId}:${params.module}:${yearMonth}`
 
-    const partialPayload: Omit<SendEmailPayload, 'dedupKey'> = {
+    await this.#enqueue({
       to: params.to,
       subject,
       text,
       html,
       correlationId,
-    }
-
-    const key = SendEmail.dedupKey(partialPayload)
-    const payload: SendEmailPayload = { ...partialPayload, dedupKey: key }
-
-    await this.dedup.enqueueUnique({
-      key,
-      jobName: SendEmail.name,
-      queue: 'emails',
-      payload,
-      dispatch: async (p) => {
-        await SendEmail.dispatch(p)
-      },
     })
   }
 
@@ -687,25 +514,12 @@ export default class EmailQueueService {
       locale: params.locale,
     })
 
-    const partialPayload: Omit<SendEmailPayload, 'dedupKey'> = {
+    await this.#enqueue({
       to: params.to,
       subject,
       text,
       html,
       correlationId: `contact-message:${params.messageId}`,
-    }
-
-    const key = SendEmail.dedupKey(partialPayload)
-    const payload: SendEmailPayload = { ...partialPayload, dedupKey: key }
-
-    await this.dedup.enqueueUnique({
-      key,
-      jobName: SendEmail.name,
-      queue: 'emails',
-      payload,
-      dispatch: async (p) => {
-        await SendEmail.dispatch(p)
-      },
     })
   }
 
@@ -732,25 +546,12 @@ export default class EmailQueueService {
       appUrl: env.get('APP_URL'),
     })
 
-    const partialPayload: Omit<SendEmailPayload, 'dedupKey'> = {
+    await this.#enqueue({
       to: params.to,
       subject,
       text,
       html,
       correlationId: `contact-message-ack:${params.messageId}`,
-    }
-
-    const key = SendEmail.dedupKey(partialPayload)
-    const payload: SendEmailPayload = { ...partialPayload, dedupKey: key }
-
-    await this.dedup.enqueueUnique({
-      key,
-      jobName: SendEmail.name,
-      queue: 'emails',
-      payload,
-      dispatch: async (p) => {
-        await SendEmail.dispatch(p)
-      },
     })
   }
 
