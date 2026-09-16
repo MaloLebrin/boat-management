@@ -27,8 +27,8 @@ vi.mock('~/components/base/BaseConfirmModal.vue', () => ({
   },
 }))
 
-vi.mock('~/components/clients/ClientDocumentAddModal.vue', () => ({
-  default: { template: '<div />', props: ['clientId', 'clientName', 'open'] },
+vi.mock('~/components/media/DocumentAddModal.vue', () => ({
+  default: { template: '<div />', props: ['open', 'uploadUrl', 'title', 'subtitle', 'labels'] },
 }))
 
 import ClientDocuments from '../../inertia/components/clients/ClientDocuments.vue'
