@@ -17,7 +17,14 @@ const score = computed(() => {
   return n
 })
 
-const segmentColors = ['#ebe2d0', '#c84a3a', '#b87b1d', '#1f6b54', '#1f6b54']
+// Tokens sémantiques plutôt qu'hex : les segments suivent le thème (#416).
+const segmentColors = [
+  'var(--color-bone)',
+  'var(--color-danger)',
+  'var(--color-warning)',
+  'var(--color-success)',
+  'var(--color-success)',
+]
 const labels = computed(() => [
   t('auth.passwordStrength.tooShort'),
   t('auth.passwordStrength.weak'),
@@ -37,7 +44,7 @@ const label = computed(() => (props.value ? labels.value[score.value] : ''))
         v-for="i in 4"
         :key="i"
         class="h-0.5 flex-1 rounded-full transition-colors duration-150"
-        :style="{ background: i - 1 < score ? activeColor : '#ebe2d0' }"
+        :style="{ background: i - 1 < score ? activeColor : 'var(--color-bone)' }"
       />
     </div>
     <span
