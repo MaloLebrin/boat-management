@@ -15,8 +15,21 @@ export function toDecimalStringOrNull(value: number | null | undefined): string 
   return value.toFixed(2)
 }
 
-export function assertBoatInUserOrg(user: User, boat: Boat): void {
+/**
+ * Garde de périmètre : le bateau doit appartenir à l'organisation de
+ * l'utilisateur. Un bateau étranger est traité comme inexistant.
+ *
+ * Chaque domaine lève l'erreur « introuvable » de sa propre ressource
+ * (réservation, incident, fiche d'entretien…) pour que le handler global la
+ * traduise dans le bon message ; `makeError` permet de la choisir sans copier
+ * la condition. Par défaut : `BoatNotFoundError`.
+ */
+export function assertBoatInUserOrg(
+  user: User,
+  boat: Boat,
+  makeError: () => Error = () => new BoatNotFoundError()
+): void {
   if (user.organizationId === null || user.organizationId !== boat.organizationId) {
-    throw new BoatNotFoundError()
+    throw makeError()
   }
 }

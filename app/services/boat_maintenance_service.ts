@@ -34,6 +34,7 @@ import BoatSail from '#models/boat_sail'
 import type User from '#models/user'
 import { inject } from '@adonisjs/core'
 import db from '@adonisjs/lucid/services/db'
+import { assertBoatInUserOrg } from '#utils/boat_utils'
 
 export { BoatMaintenanceNotFoundError, BoatMaintenanceValidationError }
 export type { CreateMaintenancePayload }
@@ -69,9 +70,11 @@ export default class BoatMaintenanceService {
   }
 
   async createForBoat(user: User, boat: Boat, payload: CreateMaintenancePayload) {
-    if (user.organizationId === null || user.organizationId !== boat.organizationId) {
-      throw new BoatMaintenanceValidationError('Invalid boat', 'invalidBoat')
-    }
+    assertBoatInUserOrg(
+      user,
+      boat,
+      () => new BoatMaintenanceValidationError('Invalid boat', 'invalidBoat')
+    )
 
     let boatEngineId: number | null = null
     let boatSailId: number | null = null
@@ -255,9 +258,7 @@ export default class BoatMaintenanceService {
   }
 
   async deleteForBoat(user: User, boat: Boat, eventId: number) {
-    if (user.organizationId === null || user.organizationId !== boat.organizationId) {
-      throw new BoatMaintenanceNotFoundError()
-    }
+    assertBoatInUserOrg(user, boat, () => new BoatMaintenanceNotFoundError())
 
     const event = await BoatMaintenanceEvent.query()
       .where('id', eventId)

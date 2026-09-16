@@ -26,6 +26,7 @@ import type {
   MarkTaskDonePayload,
   TaskEquipmentRef,
 } from '#shared/types/maintenance'
+import { assertBoatInUserOrg } from '#utils/boat_utils'
 
 export { BoatMaintenanceTaskNotFoundError, BoatMaintenanceTaskValidationError }
 export type { CreateMaintenanceTaskPayload, MaintenanceTaskSubject, MarkTaskDonePayload }
@@ -34,12 +35,6 @@ function toDateTime(value: Date | string | DateTime): DateTime {
   if (DateTime.isDateTime(value)) return value
   if (value instanceof Date) return DateTime.fromJSDate(value)
   return DateTime.fromISO(String(value))
-}
-
-function assertBoatScope(user: User, boat: Boat) {
-  if (user.organizationId === null || user.organizationId !== boat.organizationId) {
-    throw new BoatMaintenanceTaskNotFoundError()
-  }
 }
 
 const EQUIPMENT_MODELS = {
@@ -108,13 +103,13 @@ function orderTasks(query: ModelQueryBuilderContract<typeof BoatMaintenanceTask>
 @inject()
 export default class BoatMaintenanceTaskService {
   async listForBoat(user: User, boat: Boat) {
-    assertBoatScope(user, boat)
+    assertBoatInUserOrg(user, boat, () => new BoatMaintenanceTaskNotFoundError())
 
     return await orderTasks(BoatMaintenanceTask.query().where('boatId', boat.id))
   }
 
   async createForBoat(user: User, boat: Boat, payload: CreateMaintenanceTaskPayload) {
-    assertBoatScope(user, boat)
+    assertBoatInUserOrg(user, boat, () => new BoatMaintenanceTaskNotFoundError())
 
     const title = payload.title.trim()
     if (!title) throw new BoatMaintenanceTaskValidationError('title is required', 'titleRequired')
@@ -206,7 +201,7 @@ export default class BoatMaintenanceTaskService {
     taskId: number,
     payload: MarkTaskDonePayload
   ): Promise<{ task: BoatMaintenanceTask; completed: boolean }> {
-    assertBoatScope(user, boat)
+    assertBoatInUserOrg(user, boat, () => new BoatMaintenanceTaskNotFoundError())
 
     const task = await BoatMaintenanceTask.query()
       .where('id', taskId)
@@ -281,7 +276,7 @@ export default class BoatMaintenanceTaskService {
   }
 
   async deleteForBoat(user: User, boat: Boat, taskId: number) {
-    assertBoatScope(user, boat)
+    assertBoatInUserOrg(user, boat, () => new BoatMaintenanceTaskNotFoundError())
 
     const task = await BoatMaintenanceTask.query()
       .where('id', taskId)
