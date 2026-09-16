@@ -6,17 +6,12 @@ import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
 import type { CreateIncidentPayload, UpdateIncidentPayload } from '#shared/types/incident'
 import { toUtcFromLocalInput } from '#shared/helpers/date'
-
-function assertBoatScope(user: User, boat: Boat) {
-  if (user.organizationId === null || user.organizationId !== boat.organizationId) {
-    throw new BoatIncidentNotFoundError()
-  }
-}
+import { assertBoatInUserOrg } from '#utils/boat_utils'
 
 @inject()
 export default class BoatIncidentService {
   async listForBoat(user: User, boat: Boat) {
-    assertBoatScope(user, boat)
+    assertBoatInUserOrg(user, boat, () => new BoatIncidentNotFoundError())
 
     return await BoatIncident.query()
       .select([
@@ -40,7 +35,7 @@ export default class BoatIncidentService {
   }
 
   async createForBoat(user: User, boat: Boat, payload: CreateIncidentPayload) {
-    assertBoatScope(user, boat)
+    assertBoatInUserOrg(user, boat, () => new BoatIncidentNotFoundError())
 
     const description = payload.description.trim()
     if (!description) {
@@ -61,7 +56,7 @@ export default class BoatIncidentService {
   }
 
   async updateForBoat(user: User, boat: Boat, incidentId: number, payload: UpdateIncidentPayload) {
-    assertBoatScope(user, boat)
+    assertBoatInUserOrg(user, boat, () => new BoatIncidentNotFoundError())
 
     const incident = await BoatIncident.query()
       .where('id', incidentId)
@@ -101,7 +96,7 @@ export default class BoatIncidentService {
   }
 
   async deleteForBoat(user: User, boat: Boat, incidentId: number) {
-    assertBoatScope(user, boat)
+    assertBoatInUserOrg(user, boat, () => new BoatIncidentNotFoundError())
 
     const incident = await BoatIncident.query()
       .where('id', incidentId)
