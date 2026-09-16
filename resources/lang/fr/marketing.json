@@ -1483,5 +1483,41 @@
     "final_subtitle": "Écris-nous — une vraie personne te répond.",
     "final_primary": "Contacter l'équipe",
     "final_secondary": "Créer un compte gratuit"
+  },
+  "emails": {
+    "nurturingD3": {
+      "subject": "3 conseils pour réduire les coûts d'entretien de votre bateau",
+      "text": "3 conseils pour réduire vos coûts d'entretien bateau\n\nCréez votre compte : {signupUrl}",
+      "tips": {
+        "1": {
+          "title": "Anticipez les petites réparations",
+          "body": "Une réparation mineure négligée peut rapidement devenir une facture importante. Inspectez régulièrement votre bateau pour détecter les problèmes avant qu'ils ne s'aggravent."
+        },
+        "2": {
+          "title": "Comparez plusieurs devis",
+          "body": "Ne vous contentez pas du premier devis. Demandez au moins 2 ou 3 estimations pour les travaux importants afin d'obtenir le meilleur rapport qualité-prix."
+        },
+        "3": {
+          "title": "Hivernez votre bateau correctement",
+          "body": "Un hivernage bien fait protège votre bateau du gel, de l'humidité et de la corrosion. Investir dans un bon hivernage, c'est économiser sur les réparations au printemps."
+        }
+      }
+    },
+    "nurturingD7": {
+      "subject": "Votre estimation d'entretien bateau — toujours disponible",
+      "text": "Votre bateau vous coûtera entre {totalMin} et {totalMax} par an en entretien. FleetAi vous aide à planifier et anticiper ces dépenses.\n\nCréez votre compte : {signupUrl}"
+    },
+    "simulatorReport": {
+      "subject": "Votre rapport d'entretien bateau — FleetAi",
+      "text": "Votre rapport d'estimation de coûts\n\nTotal : {totalMin} - {totalMax}\n\nCréez votre compte : {signupUrl}",
+      "categories": {
+        "hull": "Coque",
+        "engine": "Moteur",
+        "safety": "Sécurité",
+        "electrical": "Électrique",
+        "mooring": "Mouillage",
+        "rigging": "Gréement"
+      }
+    }
   }
 }

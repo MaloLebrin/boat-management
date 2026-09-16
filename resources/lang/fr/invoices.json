@@ -128,5 +128,17 @@
   "fromReservation": {
     "line": "Location {boat} ({start} → {end})"
   },
-  "readOnlyNotice": "Lecture seule : le module Facturation est inactif. Vos documents existants restent consultables ; la création et l'édition sont désactivées."
+  "readOnlyNotice": "Lecture seule : le module Facturation est inactif. Vos documents existants restent consultables ; la création et l'édition sont désactivées.",
+  "email": {
+    "kind": {
+      "quote": "le devis",
+      "invoice": "la facture"
+    },
+    "kindTitle": {
+      "quote": "Devis",
+      "invoice": "Facture"
+    },
+    "subject": "{kindTitle} {number} de {orgName}",
+    "text": "Bonjour,\n\nVeuillez trouver ci-joint {kind} n° {number}.\n\nMontant total : {total}\n\nCordialement,\n{orgName}"
+  }
 }
