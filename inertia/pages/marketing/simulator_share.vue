@@ -8,7 +8,11 @@ import { Head } from '@inertiajs/vue3'
 import { Link } from '@adonisjs/inertia/vue'
 import { computed } from 'vue'
 import { useT } from '~/composables/use_t'
-import { formatLength } from '../../../shared/helpers/number_format'
+import {
+  formatCurrency as renderCurrency,
+  formatLength,
+} from '../../../shared/helpers/number_format'
+import { marketingPath } from '../../../shared/helpers/locale_path'
 import SimulatorResultCard from '~/components/marketing/simulator/SimulatorResultCard.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import type { SimulatorBoatInput, SimulatorCostBreakdown } from '../../../shared/types/simulator'
@@ -25,12 +29,7 @@ const props = defineProps<Props>()
 const { t } = useT()
 
 function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat(props.locale === 'fr' ? 'fr-FR' : 'en-US', {
-    style: 'currency',
-    currency: 'EUR',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount)
+  return renderCurrency(amount, props.locale, { fractionDigits: 0 })
 }
 
 const boatTypeLabel = computed(() => {
@@ -51,7 +50,7 @@ const ogTitle = computed(() => {
 const ogDescription = computed(() => t('simulator.share_page_subtitle'))
 
 const simulatorHref = computed(() => {
-  return props.locale === 'fr' ? '/fr/simulateur' : '/en/simulator'
+  return marketingPath('simulator', props.locale)
 })
 </script>
 

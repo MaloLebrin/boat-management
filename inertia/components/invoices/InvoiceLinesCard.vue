@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import BaseCard from '~/components/base/BaseCard.vue'
 import { useT } from '~/composables/use_t'
+import { useNumberFormat } from '~/composables/use_number_format'
 import type { InvoiceDetail } from '../../../shared/types/invoice'
 
 const props = defineProps<{
@@ -8,12 +9,10 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
+const { formatCurrency } = useNumberFormat()
 
 function formatAmount(amount: number): string {
-  return new Intl.NumberFormat(undefined, {
-    style: 'currency',
-    currency: props.invoice.currency,
-  }).format(amount)
+  return formatCurrency(amount, { currency: props.invoice.currency })
 }
 </script>
 

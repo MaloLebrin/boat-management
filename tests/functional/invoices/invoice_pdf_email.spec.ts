@@ -10,6 +10,10 @@ import Invoice from '#models/invoice'
 import InvoiceLine from '#models/invoice_line'
 import InvoicePdfService from '#services/invoice_pdf_service'
 import { createAdminUser, createEnterpriseAdminUser } from '#tests/functional/helpers'
+import PDFDocument from 'pdfkit'
+
+/** Les espaces insécables (fines ou non) d'ICU deviennent des espaces simples. */
+const ICU_SPACES = new RegExp('[\\u00a0\\u202f]', 'g')
 
 async function createInvoice(organizationId: number, opts: { clientId?: number } = {}) {
   const invoice = await Invoice.create({
@@ -57,6 +61,46 @@ test.group('Invoice PDF & email (functional)', (group) => {
     assert.isTrue(Buffer.isBuffer(buffer))
     assert.equal(buffer.subarray(0, 4).toString('ascii'), '%PDF')
     assert.isTrue(filename.endsWith('.pdf'))
+  })
+
+  test('the PDF formats amounts in the requested locale, never the server one', async ({
+    assert,
+  }) => {
+    const user = await createEnterpriseAdminUser()
+    const invoice = await createInvoice(user.organizationId!)
+    await invoice.load('lines')
+    await invoice.load('client')
+    const org = await Organization.findOrFail(user.organizationId!)
+    const service = await app.container.make(InvoicePdfService)
+
+    // Le flux PDF est compressé : on capture les chaînes au moment où PDFKit
+    // les écrit plutôt que d'ajouter un extracteur de texte aux dépendances.
+    const renderedText = async (locale: string) => {
+      const written: string[] = []
+      const original = PDFDocument.prototype.text
+      PDFDocument.prototype.text = function (
+        this: PDFKit.PDFDocument,
+        ...args: Parameters<typeof original>
+      ) {
+        written.push(String(args[0]))
+        return original.apply(this, args)
+      }
+      try {
+        await service.generate(invoice, org, i18nManager.locale(locale))
+      } finally {
+        PDFDocument.prototype.text = original
+      }
+      return written.map((s) => s.replace(ICU_SPACES, ' '))
+    }
+
+    const fr = await renderedText('fr')
+    assert.include(fr, '120,00 €')
+    assert.include(fr, '100,00 €')
+    assert.notInclude(fr, '€120.00')
+
+    const en = await renderedText('en')
+    assert.include(en, '€120.00')
+    assert.notInclude(en, '120,00 €')
   })
 
   test('downloads a PDF for an enterprise org', async ({ client, assert }) => {
