@@ -303,3 +303,12 @@ export interface AboutPageProps {
     }
   }
 }
+
+/** Fonction de traduction des builders marketing (`i18n.t` restreint à ce que la copie utilise). */
+export type MarketingTranslate = (key: string, params?: Record<string, string>) => string
+
+/** Contexte i18n reçu par les services de contenu marketing (`ctx.i18n` restreint). */
+export interface MarketingI18n {
+  t: MarketingTranslate
+  locale: string
+}
