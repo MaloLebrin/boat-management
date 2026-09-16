@@ -4,6 +4,7 @@ import QuotaService from '#services/quota_service'
 import { QuotaExceededError } from '#exceptions/quota_errors'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
+import { contentDisposition } from '#shared/helpers/content_disposition'
 
 @inject()
 export default class MaintenanceHistoryPdfController {
@@ -36,7 +37,7 @@ export default class MaintenanceHistoryPdfController {
     const { buffer, filename } = await this.pdfService.generate(events, filters, boatName, i18n)
 
     response.header('Content-Type', 'application/pdf')
-    response.header('Content-Disposition', `attachment; filename="${filename}"`)
+    response.header('Content-Disposition', contentDisposition(filename))
     response.header('Content-Length', String(buffer.length))
     return response.send(buffer)
   }

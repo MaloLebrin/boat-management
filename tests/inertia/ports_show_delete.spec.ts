@@ -1,39 +1,19 @@
-import { mount } from '@vue/test-utils'
-import { beforeEach, test, expect, vi } from 'vitest'
+import { beforeEach, expect, test, vi } from 'vitest'
 import type { MouillageRow, PontoonRow, PortShowDetail, SpotRow } from '../../inertia/types/port'
-
-const mockDelete = vi.hoisted(() => vi.fn())
-
-vi.mock('~/composables/use_t', () => ({
-  useT: () => ({ t: (k: string) => k, locale: { value: 'fr' } }),
-}))
-
-vi.mock('@inertiajs/vue3', () => ({
-  Head: { template: '<div><slot /></div>' },
-  router: { delete: mockDelete },
-}))
-
-vi.mock('@adonisjs/inertia/vue', () => ({
-  Link: { template: '<a :href="href"><slot /></a>', props: ['href'] },
-}))
-
-vi.mock('~/components/base/BaseTabs.vue', () => ({ default: { template: '<div />' } }))
-vi.mock('~/components/ports/show/tabs/MarinaMapTab.vue', () => ({
-  default: { template: '<div />' },
-}))
-vi.mock('~/components/ports/show/tabs/PortListTab.vue', () => ({
-  default: { template: '<div />' },
-}))
-vi.mock('~/components/base/BaseConfirmModal.vue', () => ({
-  default: {
-    template:
-      '<div v-if="open" class="confirm-modal"><button class="confirm-btn" @click="$emit(\'confirm\')">{{ confirmLabel }}</button></div>',
-    props: ['open', 'title', 'message', 'confirmLabel', 'cancelLabel'],
-    emits: ['update:open', 'confirm'],
-  },
-}))
-
 import PortsShow from '../../inertia/pages/ports/show.vue'
+import { mountWithStubs, routerSpies } from './helpers/mount'
+
+vi.mock('@inertiajs/vue3', async () => {
+  const { inertiaMock } = await import('./helpers/inertia_mock')
+  return inertiaMock()
+})
+
+/** Les onglets ne sont pas l'objet de la spec : seule la suppression compte. */
+const PAGE_STUBS = {
+  BaseTabs: { template: '<div />' },
+  MarinaMapTab: { template: '<div />' },
+  PortListTab: { template: '<div />' },
+}
 
 function makePort(overrides: Partial<PortShowDetail> = {}): PortShowDetail {
   return {
@@ -50,23 +30,22 @@ function makePort(overrides: Partial<PortShowDetail> = {}): PortShowDetail {
 }
 
 function mountShow(port: PortShowDetail = makePort()) {
-  return mount(PortsShow, { props: { port, boats: [] } })
+  return mountWithStubs(PortsShow, { props: { port, boats: [] }, stubs: PAGE_STUBS })
 }
 
 beforeEach(() => {
-  mockDelete.mockClear()
   window.alert = vi.fn()
 })
 
 test('clicking delete opens a confirmation modal without deleting immediately (#398)', async () => {
   const w = mountShow()
-  expect(w.find('.confirm-modal').exists()).toBe(false)
+  expect(w.find('[data-base-confirm-modal]').exists()).toBe(false)
 
   const deleteButton = w.findAll('button').find((b) => b.text().includes('common.delete'))
   await deleteButton!.trigger('click')
 
-  expect(w.find('.confirm-modal').exists()).toBe(true)
-  expect(mockDelete).not.toHaveBeenCalled()
+  expect(w.find('[data-base-confirm-modal]').exists()).toBe(true)
+  expect(routerSpies.delete).not.toHaveBeenCalled()
 })
 
 test('confirming the modal deletes the port (#398)', async () => {
@@ -74,9 +53,9 @@ test('confirming the modal deletes the port (#398)', async () => {
   const deleteButton = w.findAll('button').find((b) => b.text().includes('common.delete'))
   await deleteButton!.trigger('click')
 
-  await w.find('.confirm-btn').trigger('click')
+  await w.find('[data-confirm]').trigger('click')
 
-  expect(mockDelete).toHaveBeenCalledWith('/ports/9')
+  expect(routerSpies.delete).toHaveBeenCalledWith('/ports/9')
 })
 
 /**
@@ -113,9 +92,9 @@ test('a port with a boat moored on a pontoon spot shows an alert instead of the 
   const deleteButton = w.findAll('button').find((b) => b.text().includes('common.delete'))
   await deleteButton!.trigger('click')
 
-  expect(w.find('.confirm-modal').exists()).toBe(false)
+  expect(w.find('[data-base-confirm-modal]').exists()).toBe(false)
   expect(window.alert).toHaveBeenCalledWith('ports.hasBoats')
-  expect(mockDelete).not.toHaveBeenCalled()
+  expect(routerSpies.delete).not.toHaveBeenCalled()
 })
 
 test('a port with a boat moored on a mouillage spot shows an alert instead of the confirmation modal', async () => {
@@ -127,9 +106,9 @@ test('a port with a boat moored on a mouillage spot shows an alert instead of th
   const deleteButton = w.findAll('button').find((b) => b.text().includes('common.delete'))
   await deleteButton!.trigger('click')
 
-  expect(w.find('.confirm-modal').exists()).toBe(false)
+  expect(w.find('[data-base-confirm-modal]').exists()).toBe(false)
   expect(window.alert).toHaveBeenCalledWith('ports.hasBoats')
-  expect(mockDelete).not.toHaveBeenCalled()
+  expect(routerSpies.delete).not.toHaveBeenCalled()
 })
 
 test('a port whose pontoons and mouillages are all free still opens the confirmation modal', async () => {
@@ -142,7 +121,7 @@ test('a port whose pontoons and mouillages are all free still opens the confirma
   const deleteButton = w.findAll('button').find((b) => b.text().includes('common.delete'))
   await deleteButton!.trigger('click')
 
-  expect(w.find('.confirm-modal').exists()).toBe(true)
+  expect(w.find('[data-base-confirm-modal]').exists()).toBe(true)
   expect(window.alert).not.toHaveBeenCalled()
-  expect(mockDelete).not.toHaveBeenCalled()
+  expect(routerSpies.delete).not.toHaveBeenCalled()
 })

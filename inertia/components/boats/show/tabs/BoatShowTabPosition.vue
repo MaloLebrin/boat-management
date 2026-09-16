@@ -5,6 +5,7 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import { useT } from '~/composables/use_t'
 import type { BoatPositionHistoryRow } from '~/types/boat_show'
+import { BOAT_MARKER_HTML, trackDotHtml } from '~/utils/map_markers'
 
 const props = defineProps<{
   boatId: number
@@ -48,14 +49,14 @@ async function initMap() {
 
   const activeIcon = L.divIcon({
     className: '',
-    html: '<div class="boat-marker">⚓</div>',
+    html: BOAT_MARKER_HTML,
     iconSize: [24, 24],
     iconAnchor: [12, 12],
   })
 
   const dotIcon = L.divIcon({
     className: '',
-    html: '<div style="width:8px;height:8px;border-radius:50%;background:var(--color-brand,#2563eb);opacity:0.5;"></div>',
+    html: trackDotHtml({ size: 8, opacity: 0.5 }),
     iconSize: [8, 8],
     iconAnchor: [4, 4],
   })

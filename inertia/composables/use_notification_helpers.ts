@@ -15,18 +15,23 @@ export function useNotificationHelpers() {
     return t('notifications.time.daysAgo', { count: String(diffD) })
   }
 
+  /**
+   * Pastille de sévérité : palettes de marque (elles basculent en thème
+   * sombre), alignées sur les variantes de `BaseBadge` — la palette Tailwind
+   * par défaut restait figée en sombre (#416).
+   */
   function getSeverityClasses(severity: NotificationSeverity): string {
     switch (severity) {
       case 'info':
-        return 'bg-blue-100 text-blue-600'
+        return 'bg-sky-100 text-sky-800'
       case 'success':
-        return 'bg-green-100 text-green-600'
+        return 'bg-mint-100 text-mint-700'
       case 'warning':
-        return 'bg-orange-100 text-orange-600'
+        return 'bg-peach-100 text-peach-800'
       case 'error':
-        return 'bg-red-100 text-red-600'
+        return 'bg-coral-100 text-coral-700'
       default:
-        return 'bg-gray-100 text-gray-600'
+        return 'bg-lilac-100 text-lilac-800'
     }
   }
 

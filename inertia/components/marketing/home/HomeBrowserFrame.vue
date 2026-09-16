@@ -6,8 +6,7 @@ defineProps<{
 
 <template>
   <div
-    class="overflow-hidden rounded-xl bg-cream shadow-[0_32px_80px_rgba(11,29,46,0.18)]"
-    style="border: 1px solid #ebe2d0"
+    class="overflow-hidden rounded-xl border border-bone bg-cream shadow-[0_32px_80px_rgba(11,29,46,0.18)]"
   >
     <!-- Browser chrome -->
     <div class="flex items-center gap-2 border-b border-bone bg-paper px-3 py-2">

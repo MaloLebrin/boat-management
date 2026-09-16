@@ -11,15 +11,7 @@ import type Client from '#models/client'
 import type Organization from '#models/organization'
 import { BILLING_SETTINGS_PATH } from '#shared/constants/billing'
 import type User from '#models/user'
-
-function buildContentDisposition(filename: string, format: string): string {
-  const full = `${filename}.${format}`
-  // Strip control characters (CR, LF, NUL, etc.) and quotes to prevent header splitting
-  // eslint-disable-next-line no-control-regex
-  const ascii = full.replace(/[\x00-\x1f\x7f"\\]/g, '_')
-  const encoded = encodeURIComponent(full)
-  return `attachment; filename="${ascii}"; filename*=UTF-8''${encoded}`
-}
+import { contentDisposition } from '#shared/helpers/content_disposition'
 
 @inject()
 export default class ClientMediaController {
@@ -152,7 +144,7 @@ export default class ClientMediaController {
     response.header('Content-Type', contentType)
     response.header(
       'Content-Disposition',
-      buildContentDisposition(media.originalFilename, media.format)
+      contentDisposition(`${media.originalFilename}.${media.format}`)
     )
     return response.send(buffer)
   }

@@ -16,6 +16,7 @@ import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import type Organization from '#models/organization'
 import { BILLING_SETTINGS_PATH } from '#shared/constants/billing'
+import { contentDisposition } from '#shared/helpers/content_disposition'
 
 @inject()
 export default class ClientsController {
@@ -249,7 +250,7 @@ export default class ClientsController {
 
     const data = await this.clientService.exportData(org, client)
     response.header('Content-Type', 'application/json')
-    response.header('Content-Disposition', `attachment; filename="client-${client.id}.json"`)
+    response.header('Content-Disposition', contentDisposition(`client-${client.id}.json`))
     return response.send(JSON.stringify(data, null, 2))
   }
 }
