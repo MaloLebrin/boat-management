@@ -1,8 +1,6 @@
 import BoatPolicy from '#policies/boat_policy'
 import BoatGenericEquipmentService from '#services/boat_generic_equipment_service'
 import { BoatEquipmentNotFoundError } from '#exceptions/boat_errors'
-import BoatHullService from '#services/boat_hull_service'
-import { BoatNotFoundError } from '#exceptions/boat_errors'
 import MediaService from '#services/media_service'
 import OrganizationService from '#services/organization_service'
 import BoatMaintenanceTaskService from '#services/boat_maintenance_task_service'
@@ -17,34 +15,21 @@ import {
 } from '#validators/boat_generic_equipment'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
+import BoatContextService from '#services/boat_context_service'
 
 @inject()
 export default class BoatGenericEquipmentController {
   constructor(
-    private boatService: BoatHullService,
+    private boatContext: BoatContextService,
     private equipmentService: BoatGenericEquipmentService,
     private organizationService: OrganizationService,
     private mediaService: MediaService,
     private taskService: BoatMaintenanceTaskService
   ) {}
 
-  private async loadBoat(ctx: Pick<HttpContext, 'auth' | 'response' | 'params'>) {
-    const user = ctx.auth.getUserOrFail()
-    try {
-      const boat = await this.boatService.getForUserOrFail(user, Number(ctx.params.boatId))
-      return { user, boat }
-    } catch (error) {
-      if (error instanceof BoatNotFoundError) {
-        ctx.response.redirect('/boats')
-        return null
-      }
-      throw error
-    }
-  }
-
   async show({ inertia, response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const loaded = await this.loadBoat({ auth, response, params })
+    const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
     const { boat } = loaded
 
@@ -87,7 +72,7 @@ export default class BoatGenericEquipmentController {
 
   async store({ request, response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const loaded = await this.loadBoat({ auth, response, params })
+    const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
     const { user, boat } = loaded
     await bouncer.with(BoatPolicy).authorize('edit', boat)
@@ -113,7 +98,7 @@ export default class BoatGenericEquipmentController {
 
   async update({ request, response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const loaded = await this.loadBoat({ auth, response, params })
+    const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
     const { user, boat } = loaded
     await bouncer.with(BoatPolicy).authorize('edit', boat)
@@ -139,7 +124,7 @@ export default class BoatGenericEquipmentController {
 
   async destroy({ response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const loaded = await this.loadBoat({ auth, response, params })
+    const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
     const { user, boat } = loaded
     await bouncer.with(BoatPolicy).authorize('edit', boat)

@@ -6,36 +6,21 @@ import {
   RepairCartItemNotFoundError,
   SparePartNotFoundError,
 } from '#exceptions/spare_parts_errors'
-import BoatHullService from '#services/boat_hull_service'
-import { BoatNotFoundError } from '#exceptions/boat_errors'
 import EngineCatalogService from '#services/engine_catalog_service'
 import { isAssemblyForEngine } from '#shared/helpers/spare_parts'
 import { PART_ASSEMBLY_SLUGS, type PartAssemblySlug } from '#shared/types/spare_parts'
 import { addRepairCartItemValidator, updateRepairCartItemValidator } from '#validators/spare_parts'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
+import BoatContextService from '#services/boat_context_service'
 
 @inject()
 export default class BoatEngineSparePartsController {
   constructor(
-    private boatService: BoatHullService,
+    private boatContext: BoatContextService,
     private sparePartsService: BoatEngineSparePartsService,
     private engineCatalogService: EngineCatalogService
   ) {}
-
-  private async loadBoat(ctx: Pick<HttpContext, 'auth' | 'response' | 'params'>) {
-    const user = ctx.auth.getUserOrFail()
-    try {
-      const boat = await this.boatService.getForUserOrFail(user, Number(ctx.params.boatId))
-      return { user, boat }
-    } catch (error) {
-      if (error instanceof BoatNotFoundError) {
-        ctx.response.redirect('/boats')
-        return null
-      }
-      throw error
-    }
-  }
 
   async index({ inertia, auth, response }: HttpContext) {
     await auth.authenticate()
@@ -54,7 +39,7 @@ export default class BoatEngineSparePartsController {
   async identify(ctx: HttpContext) {
     const { inertia, auth, response, params, bouncer, session, i18n } = ctx
     await auth.authenticate()
-    const loaded = await this.loadBoat(ctx)
+    const loaded = await this.boatContext.resolveBoat(ctx)
     if (!loaded) return
     const { user, boat } = loaded
 
@@ -93,7 +78,7 @@ export default class BoatEngineSparePartsController {
   async assembly(ctx: HttpContext) {
     const { inertia, auth, response, params, bouncer, session, i18n } = ctx
     await auth.authenticate()
-    const loaded = await this.loadBoat(ctx)
+    const loaded = await this.boatContext.resolveBoat(ctx)
     if (!loaded) return
     const { user, boat } = loaded
 
@@ -144,7 +129,7 @@ export default class BoatEngineSparePartsController {
   async addCartItem(ctx: HttpContext) {
     const { request, auth, response, params, bouncer, session, i18n } = ctx
     await auth.authenticate()
-    const loaded = await this.loadBoat(ctx)
+    const loaded = await this.boatContext.resolveBoat(ctx)
     if (!loaded) return
     const { user, boat } = loaded
 
@@ -176,7 +161,7 @@ export default class BoatEngineSparePartsController {
   async updateCartItem(ctx: HttpContext) {
     const { request, auth, response, params, bouncer, session, i18n } = ctx
     await auth.authenticate()
-    const loaded = await this.loadBoat(ctx)
+    const loaded = await this.boatContext.resolveBoat(ctx)
     if (!loaded) return
     const { user, boat } = loaded
 
@@ -214,7 +199,7 @@ export default class BoatEngineSparePartsController {
   async removeCartItem(ctx: HttpContext) {
     const { auth, response, params, bouncer, session, i18n } = ctx
     await auth.authenticate()
-    const loaded = await this.loadBoat(ctx)
+    const loaded = await this.boatContext.resolveBoat(ctx)
     if (!loaded) return
     const { user, boat } = loaded
 
@@ -250,7 +235,7 @@ export default class BoatEngineSparePartsController {
   async exportCart(ctx: HttpContext) {
     const { auth, response, params, bouncer, session, i18n } = ctx
     await auth.authenticate()
-    const loaded = await this.loadBoat(ctx)
+    const loaded = await this.boatContext.resolveBoat(ctx)
     if (!loaded) return
     const { user, boat } = loaded
 
