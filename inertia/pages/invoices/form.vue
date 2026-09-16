@@ -2,7 +2,6 @@
 import { computed, ref } from 'vue'
 import { Head, router, usePage } from '@inertiajs/vue3'
 import { Link } from '@adonisjs/inertia/vue'
-import BaseAlert from '~/components/base/BaseAlert.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
@@ -29,7 +28,6 @@ const page = usePage()
 
 const isEdit = computed(() => Boolean(props.invoice))
 const errors = computed(() => (page.props.errors ?? {}) as Record<string, string>)
-const flash = computed(() => page.props.flash as { error?: string; success?: string } | undefined)
 
 function todayISO(): string {
   return new Date().toISOString().slice(0, 10)
@@ -100,10 +98,6 @@ function submit() {
     <BaseHeading level="1">
       {{ isEdit ? t('invoices.form.editTitle') : t('invoices.form.createTitle') }}
     </BaseHeading>
-
-    <BaseAlert v-if="flash?.error" variant="danger" class="mt-4" dismissible>
-      {{ flash.error }}
-    </BaseAlert>
 
     <form class="mt-6 space-y-6" @submit.prevent="submit">
       <BaseCard>

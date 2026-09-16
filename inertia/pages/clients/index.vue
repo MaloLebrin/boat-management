@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { Head, router, usePage } from '@inertiajs/vue3'
+import { ref } from 'vue'
+import { Head, router } from '@inertiajs/vue3'
 import { Link } from '@adonisjs/inertia/vue'
 import BaseAlert from '~/components/base/BaseAlert.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
@@ -25,9 +25,6 @@ const props = defineProps<{
 
 const { t } = useT()
 const { navigationTitleLabel } = useNavigationTitles()
-const page = usePage()
-
-const flash = computed(() => page.props.flash as { error?: string; success?: string } | undefined)
 
 const showCreateForm = ref(false)
 const editingClientId = ref<number | null>(null)
@@ -93,13 +90,6 @@ function getPermitLabel(client: ClientRow): string {
 
     <BaseAlert v-if="readOnly" variant="warning" class="mb-6">
       {{ t('clients.readOnlyNotice') }}
-    </BaseAlert>
-
-    <BaseAlert v-if="flash?.success" variant="success" class="mb-6" dismissible>
-      {{ flash.success }}
-    </BaseAlert>
-    <BaseAlert v-if="flash?.error" variant="danger" class="mb-6" dismissible>
-      {{ flash.error }}
     </BaseAlert>
 
     <ClientForm v-if="showCreateForm" class="mb-6" @close="showCreateForm = false" />

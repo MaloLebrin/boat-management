@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { Head, router, usePage } from '@inertiajs/vue3'
-import BaseAlert from '~/components/base/BaseAlert.vue'
+import { Head, router } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseConfirmModal from '~/components/base/BaseConfirmModal.vue'
 import BaseEmptyState from '~/components/base/BaseEmptyState.vue'
@@ -24,9 +23,6 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
-const page = usePage()
-
-const flash = computed(() => page.props.flash as { error?: string; success?: string } | undefined)
 
 const showCreateForm = ref(false)
 const editingSeason = ref<PricingSeasonRow | null>(null)
@@ -79,13 +75,6 @@ function executeDelete() {
         {{ t('pricingSeasons.add') }}
       </BaseButton>
     </div>
-
-    <BaseAlert v-if="flash?.success" variant="success" class="mb-6" dismissible>
-      {{ flash.success }}
-    </BaseAlert>
-    <BaseAlert v-if="flash?.error" variant="danger" class="mb-6" dismissible>
-      {{ flash.error }}
-    </BaseAlert>
 
     <PricingSeasonForm
       v-if="showCreateForm"
