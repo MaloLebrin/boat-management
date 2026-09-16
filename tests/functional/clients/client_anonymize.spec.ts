@@ -1,44 +1,16 @@
 import { BoatFactory } from '#database/factories/boat_factory'
 import { BoatReservationFactory } from '#database/factories/boat_reservation_factory'
 import { MediaFactory } from '#database/factories/media_factory'
-import { UserFactory } from '#database/factories/user_factory'
 import Client from '#models/client'
 import Media from '#models/media'
-import OrganizationMembership from '#models/organization_membership'
-import { createAdminUser } from '#tests/functional/helpers'
-import { CloudinaryService } from '#services/cloudinary_service'
-import app from '@adonisjs/core/services/app'
+import {
+  createAdminUser,
+  createEnterpriseAdminUser,
+  createMemberUser,
+} from '#tests/functional/helpers'
 import { truncateDb } from '#tests/utils/db'
 import { test } from '@japa/runner'
-
-async function createEnterpriseUser(role: 'admin' | 'member' = 'admin') {
-  const user = await UserFactory.with('organization', 1, (org) =>
-    org.merge({ plan: 'enterprise' })
-  ).create()
-  if (user.organizationId) {
-    await OrganizationMembership.create({
-      userId: user.id,
-      organizationId: user.organizationId,
-      role,
-    })
-  }
-  return user
-}
-
-function swapFakeCloudinary() {
-  const deletedFolders: string[] = []
-  app.container.swap(
-    CloudinaryService,
-    () =>
-      ({
-        deleteFile: async () => {},
-        deleteFolder: async (folder: string) => {
-          deletedFolders.push(folder)
-        },
-      }) as unknown as CloudinaryService
-  )
-  return { deletedFolders }
-}
+import { restoreCloudinary, swapFakeCloudinary } from '#tests/support/fakes'
 
 test.group('Client anonymize (functional)', (group) => {
   group.each.setup(() => truncateDb())
@@ -46,7 +18,7 @@ test.group('Client anonymize (functional)', (group) => {
   test('anonymizes PII, deletes documents and stamps anonymized_at', async ({ client, assert }) => {
     swapFakeCloudinary()
     try {
-      const user = await createEnterpriseUser('admin')
+      const user = await createEnterpriseAdminUser()
       const record = await Client.create({
         organizationId: user.organizationId!,
         firstName: 'Alice',
@@ -90,14 +62,14 @@ test.group('Client anonymize (functional)', (group) => {
         .count('* as total')
       assert.equal(Number(remainingDocs[0].$extras.total), 0)
     } finally {
-      app.container.restore(CloudinaryService)
+      restoreCloudinary()
     }
   })
 
   test('keeps reservation link but anonymizes the text snapshot', async ({ client, assert }) => {
     swapFakeCloudinary()
     try {
-      const user = await createEnterpriseUser('admin')
+      const user = await createEnterpriseAdminUser()
       const record = await Client.create({
         organizationId: user.organizationId!,
         firstName: 'Bob',
@@ -126,14 +98,14 @@ test.group('Client anonymize (functional)', (group) => {
       assert.isNull(reservation.clientEmail)
       assert.isNull(reservation.clientPhone)
     } finally {
-      app.container.restore(CloudinaryService)
+      restoreCloudinary()
     }
   })
 
   test('is idempotent (second call is a no-op)', async ({ client, assert }) => {
     swapFakeCloudinary()
     try {
-      const user = await createEnterpriseUser('admin')
+      const user = await createEnterpriseAdminUser()
       const record = await Client.create({
         organizationId: user.organizationId!,
         firstName: 'Carla',
@@ -151,14 +123,14 @@ test.group('Client anonymize (functional)', (group) => {
       await record.refresh()
       assert.equal(record.anonymizedAt?.toISO(), firstAnonymizedAt)
     } finally {
-      app.container.restore(CloudinaryService)
+      restoreCloudinary()
     }
   })
 
   test('blocks editing an anonymized client', async ({ client, assert }) => {
     swapFakeCloudinary()
     try {
-      const user = await createEnterpriseUser('admin')
+      const user = await createEnterpriseAdminUser()
       const record = await Client.create({
         organizationId: user.organizationId!,
         firstName: 'Denis',
@@ -179,14 +151,15 @@ test.group('Client anonymize (functional)', (group) => {
       assert.equal(record.firstName, 'Client')
       assert.equal(record.lastName, 'anonymisé')
     } finally {
-      app.container.restore(CloudinaryService)
+      restoreCloudinary()
     }
   })
 
   test('is admin-only (member cannot anonymize)', async ({ client, assert }) => {
     swapFakeCloudinary()
     try {
-      const user = await createEnterpriseUser('member')
+      const admin = await createEnterpriseAdminUser()
+      const user = await createMemberUser(admin.organizationId!)
       const record = await Client.create({
         organizationId: user.organizationId!,
         firstName: 'Emma',
@@ -200,15 +173,15 @@ test.group('Client anonymize (functional)', (group) => {
       assert.isNull(record.anonymizedAt)
       assert.equal(record.firstName, 'Emma')
     } finally {
-      app.container.restore(CloudinaryService)
+      restoreCloudinary()
     }
   })
 
   test('cannot anonymize a client from another organization (IDOR)', async ({ client, assert }) => {
     swapFakeCloudinary()
     try {
-      const user = await createEnterpriseUser('admin')
-      const other = await createEnterpriseUser('admin')
+      const user = await createEnterpriseAdminUser()
+      const other = await createEnterpriseAdminUser()
       const foreign = await Client.create({
         organizationId: other.organizationId!,
         firstName: 'Foreign',
@@ -222,7 +195,7 @@ test.group('Client anonymize (functional)', (group) => {
       assert.isNull(foreign.anonymizedAt)
       assert.equal(foreign.firstName, 'Foreign')
     } finally {
-      app.container.restore(CloudinaryService)
+      restoreCloudinary()
     }
   })
 
@@ -242,7 +215,7 @@ test.group('Client anonymize (functional)', (group) => {
   test('BoatReservation snapshot untouched for other clients', async ({ client, assert }) => {
     swapFakeCloudinary()
     try {
-      const user = await createEnterpriseUser('admin')
+      const user = await createEnterpriseAdminUser()
       const target = await Client.create({
         organizationId: user.organizationId!,
         firstName: 'Target',
@@ -268,7 +241,7 @@ test.group('Client anonymize (functional)', (group) => {
       await bystanderReservation.refresh()
       assert.equal(bystanderReservation.clientName, 'By Stander')
     } finally {
-      app.container.restore(CloudinaryService)
+      restoreCloudinary()
     }
   })
 })

@@ -1,53 +1,11 @@
 import { test } from '@japa/runner'
 import { truncateDb } from '#tests/utils/db'
-import app from '@adonisjs/core/services/app'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { BoatEngineFactory } from '#database/factories/boat_engine_factory'
 import { MediaFactory } from '#database/factories/media_factory'
 import { createAdminUser } from '#tests/functional/helpers'
 import Media from '#models/media'
-import { CloudinaryService } from '#services/cloudinary_service'
-
-function swapFakeCloudinary() {
-  const uploaded: string[] = []
-  app.container.swap(
-    CloudinaryService,
-    () =>
-      ({
-        uploadImage: async () => {
-          const publicId = `fake-boat-photo-${uploaded.length}`
-          uploaded.push(publicId)
-          return {
-            publicId,
-            url: `http://res.cloudinary.com/${publicId}.jpg`,
-            secureUrl: `https://res.cloudinary.com/${publicId}.jpg`,
-            format: 'jpg',
-            resourceType: 'image',
-            bytes: 1024,
-            originalFilename: 'photo',
-            width: 800,
-            height: 600,
-          }
-        },
-        uploadDocument: async () => {
-          const publicId = `fake-boat-doc-${uploaded.length}`
-          uploaded.push(publicId)
-          return {
-            publicId,
-            url: `http://res.cloudinary.com/${publicId}.pdf`,
-            secureUrl: `https://res.cloudinary.com/${publicId}.pdf`,
-            format: 'pdf',
-            resourceType: 'raw',
-            bytes: 2048,
-            originalFilename: 'doc',
-          }
-        },
-        deleteFile: async () => {},
-        deleteFolder: async () => {},
-      }) as unknown as CloudinaryService
-  )
-  return { uploaded }
-}
+import { restoreCloudinary, swapFakeCloudinary } from '#tests/support/fakes'
 
 test.group('Boat Media — DELETE (functional)', (group) => {
   group.each.setup(() => truncateDb())
@@ -56,16 +14,7 @@ test.group('Boat Media — DELETE (functional)', (group) => {
     client,
     assert,
   }) => {
-    const deletedPublicIds: string[] = []
-    app.container.swap(
-      CloudinaryService,
-      () =>
-        ({
-          deleteFile: async (publicId: string) => {
-            deletedPublicIds.push(publicId)
-          },
-        }) as unknown as CloudinaryService
-    )
+    const { deletedPublicIds } = swapFakeCloudinary()
 
     try {
       const user = await createAdminUser()
@@ -88,7 +37,7 @@ test.group('Boat Media — DELETE (functional)', (group) => {
       assert.isNull(found)
       assert.deepEqual(deletedPublicIds, [media.cloudinaryPublicId])
     } finally {
-      app.container.restore(CloudinaryService)
+      restoreCloudinary()
     }
   })
 
@@ -96,16 +45,7 @@ test.group('Boat Media — DELETE (functional)', (group) => {
     client,
     assert,
   }) => {
-    const deletedPublicIds: string[] = []
-    app.container.swap(
-      CloudinaryService,
-      () =>
-        ({
-          deleteFile: async (publicId: string) => {
-            deletedPublicIds.push(publicId)
-          },
-        }) as unknown as CloudinaryService
-    )
+    const { deletedPublicIds } = swapFakeCloudinary()
 
     try {
       const victim = await createAdminUser()
@@ -139,7 +79,7 @@ test.group('Boat Media — DELETE (functional)', (group) => {
       assert.isNotNull(found)
       assert.isEmpty(deletedPublicIds)
     } finally {
-      app.container.restore(CloudinaryService)
+      restoreCloudinary()
     }
   })
 
@@ -163,16 +103,7 @@ test.group('Boat Media — DELETE (functional)', (group) => {
     client,
     assert,
   }) => {
-    const deletedCalls: { publicId: string; resourceType: string }[] = []
-    app.container.swap(
-      CloudinaryService,
-      () =>
-        ({
-          deleteFile: async (publicId: string, resourceType: 'image' | 'raw' = 'image') => {
-            deletedCalls.push({ publicId, resourceType })
-          },
-        }) as unknown as CloudinaryService
-    )
+    const { deletedFiles: deletedCalls } = swapFakeCloudinary()
 
     try {
       const user = await createAdminUser()
@@ -198,7 +129,7 @@ test.group('Boat Media — DELETE (functional)', (group) => {
       assert.equal(deletedCalls[0].publicId, media.cloudinaryPublicId)
       assert.equal(deletedCalls[0].resourceType, 'raw')
     } finally {
-      app.container.restore(CloudinaryService)
+      restoreCloudinary()
     }
   })
 
@@ -251,7 +182,7 @@ test.group('Boat Media — POST photos (functional)', (group) => {
       assert.equal(medias[0].kind, 'photo')
       assert.lengthOf(fake.uploaded, 1)
     } finally {
-      app.container.restore(CloudinaryService)
+      restoreCloudinary()
     }
   })
 
@@ -284,7 +215,7 @@ test.group('Boat Media — POST photos (functional)', (group) => {
       assert.lengthOf(medias, 2)
       assert.lengthOf(fake.uploaded, 2)
     } finally {
-      app.container.restore(CloudinaryService)
+      restoreCloudinary()
     }
   })
 
@@ -340,7 +271,7 @@ test.group('Boat Media — POST documents (functional)', (group) => {
       assert.isTrue(medias.every((m) => m.kind === 'document'))
       assert.lengthOf(fake.uploaded, 2)
     } finally {
-      app.container.restore(CloudinaryService)
+      restoreCloudinary()
     }
   })
 
@@ -376,7 +307,7 @@ test.group('Boat Media — POST documents (functional)', (group) => {
       assert.lengthOf(medias, 2)
       assert.lengthOf(fake.uploaded, 2)
     } finally {
-      app.container.restore(CloudinaryService)
+      restoreCloudinary()
     }
   })
 })

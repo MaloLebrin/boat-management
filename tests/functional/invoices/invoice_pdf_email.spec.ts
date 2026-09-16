@@ -4,28 +4,12 @@ import mail from '@adonisjs/mail/services/main'
 import app from '@adonisjs/core/services/app'
 import i18nManager from '@adonisjs/i18n/services/main'
 import { DateTime } from 'luxon'
-import { UserFactory } from '#database/factories/user_factory'
-import OrganizationMembership from '#models/organization_membership'
 import Organization from '#models/organization'
 import Client from '#models/client'
 import Invoice from '#models/invoice'
 import InvoiceLine from '#models/invoice_line'
 import InvoicePdfService from '#services/invoice_pdf_service'
-import { createAdminUser } from '#tests/functional/helpers'
-
-async function createEnterpriseAdminUser() {
-  const user = await UserFactory.with('organization', 1, (org) =>
-    org.merge({ plan: 'enterprise' })
-  ).create()
-  if (user.organizationId) {
-    await OrganizationMembership.create({
-      userId: user.id,
-      organizationId: user.organizationId,
-      role: 'admin',
-    })
-  }
-  return user
-}
+import { createAdminUser, createEnterpriseAdminUser } from '#tests/functional/helpers'
 
 async function createInvoice(organizationId: number, opts: { clientId?: number } = {}) {
   const invoice = await Invoice.create({

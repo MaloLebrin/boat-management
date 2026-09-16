@@ -1,26 +1,10 @@
 import { BoatFactory } from '#database/factories/boat_factory'
 import { BoatReservationFactory } from '#database/factories/boat_reservation_factory'
 import { MediaFactory } from '#database/factories/media_factory'
-import { UserFactory } from '#database/factories/user_factory'
 import Client from '#models/client'
-import OrganizationMembership from '#models/organization_membership'
-import { createAdminUser } from '#tests/functional/helpers'
+import { createAdminUser, createEnterpriseAdminUser } from '#tests/functional/helpers'
 import { truncateDb } from '#tests/utils/db'
 import { test } from '@japa/runner'
-
-async function createEnterpriseAdminUser() {
-  const user = await UserFactory.with('organization', 1, (org) =>
-    org.merge({ plan: 'enterprise' })
-  ).create()
-  if (user.organizationId) {
-    await OrganizationMembership.create({
-      userId: user.id,
-      organizationId: user.organizationId,
-      role: 'admin',
-    })
-  }
-  return user
-}
 
 test.group('Client GDPR consent + export (functional)', (group) => {
   group.each.setup(() => truncateDb())

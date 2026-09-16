@@ -1,11 +1,9 @@
 import { test } from '@japa/runner'
 import { truncateDb } from '#tests/utils/db'
-import app from '@adonisjs/core/services/app'
 import encryption from '@adonisjs/core/services/encryption'
 import { DateTime } from 'luxon'
 import AiAssistantConversation from '#models/ai_assistant_conversation'
 import AiTokenUsage from '#models/ai_token_usage'
-import AiService from '#services/ai_service'
 import Organization from '#models/organization'
 import OrganizationMembership from '#models/organization_membership'
 import { BoatFactory } from '#database/factories/boat_factory'
@@ -13,9 +11,8 @@ import { BoatEngineFactory } from '#database/factories/boat_engine_factory'
 import { UserFactory } from '#database/factories/user_factory'
 import { createAdminUser, createMechanicUser } from '#tests/functional/helpers'
 import OrganizationAiKey from '#models/organization_ai_key'
-import type { AiChatMessage } from '#services/ai_service'
-import type { AiChatOptions, AiProvider, AiToolCall, AiToolDefinition } from '#shared/types/ai'
 import { ASSISTANT_CONVERSATION_TOKEN_BUDGET, type AssistantMessage } from '#shared/types/assistant'
+import { restoreAiService, swapAiService } from '#tests/support/fakes'
 
 const ANSWER_RESPONSE = JSON.stringify({
   type: 'answer',
@@ -49,52 +46,6 @@ function handoffResponse(boatId: number, engineId: number) {
     boatId,
     engineId,
   })
-}
-
-type AiCall = {
-  messages: AiChatMessage[]
-  provider: AiProvider | null
-  model: string | null
-  apiKey: string | null
-  tools: AiToolDefinition[] | null
-}
-
-/** Une réponse scriptée du fake — string = réponse finale sans appel d'outil. */
-type FakeAiTurn = { content?: string; toolCalls?: AiToolCall[]; tokensUsed?: number }
-
-/**
- * Fake AiService qui capture messages, fournisseur, modèle, clé BYOK et outils
- * proposés. `script` est une file de réponses (#642) : chaque appel consomme
- * la suivante, la dernière est répétée — ce qui simule « appel d'outil puis
- * réponse finale ». Une simple string reste le cas d'un tour sans outil.
- */
-function swapAiService(script: string | Array<string | FakeAiTurn>, tokensUsed = 42) {
-  const turns: FakeAiTurn[] = (Array.isArray(script) ? script : [script]).map((turn) =>
-    typeof turn === 'string' ? { content: turn } : turn
-  )
-  const calls: AiCall[] = []
-  app.container.swap(
-    AiService,
-    () =>
-      ({
-        chat: async (messages: AiChatMessage[], options: AiChatOptions = {}) => {
-          calls.push({
-            messages,
-            provider: options.provider ?? null,
-            model: options.model ?? null,
-            apiKey: options.apiKey ?? null,
-            tools: options.tools ?? null,
-          })
-          const turn = turns[Math.min(calls.length - 1, turns.length - 1)]
-          return {
-            content: turn.content ?? '',
-            toolCalls: turn.toolCalls ?? [],
-            tokensUsed: turn.tokensUsed ?? tokensUsed,
-          }
-        },
-      }) as unknown as AiService
-  )
-  return calls
 }
 
 async function makeBoat(organizationId: number, name = 'Mistral II') {
@@ -141,7 +92,7 @@ async function makeConversation(
 test.group('Assistant FleetAi chat (functional)', (group) => {
   group.each.setup(() => truncateDb())
   group.each.teardown(() => {
-    app.container.restore(AiService)
+    restoreAiService()
   })
 
   test('start creates a conversation with the fleet context in the system prompt', async ({
@@ -726,7 +677,7 @@ test.group('Assistant FleetAi chat (functional)', (group) => {
 test.group('Assistant FleetAi chat — boucle d’outils (#642)', (group) => {
   group.each.setup(() => truncateDb())
   group.each.teardown(() => {
-    app.container.restore(AiService)
+    restoreAiService()
   })
 
   const ANSWER_WITH_SOURCE = JSON.stringify({
@@ -873,7 +824,7 @@ test.group('Assistant FleetAi chat — boucle d’outils (#642)', (group) => {
 test.group('Assistant FleetAi chat — agent actionnable et contexte de page', (group) => {
   group.each.setup(() => truncateDb())
   group.each.teardown(() => {
-    app.container.restore(AiService)
+    restoreAiService()
   })
 
   test('une propose_action add_engine_hours est validée et rangée en pending', async ({

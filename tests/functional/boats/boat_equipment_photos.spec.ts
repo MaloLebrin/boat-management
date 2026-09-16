@@ -6,65 +6,13 @@ import { BoatRigFactory } from '#database/factories/boat_rig_factory'
 import { BoatSafetyEquipmentFactory } from '#database/factories/boat_safety_equipment_factory'
 import { BoatSailFactory } from '#database/factories/boat_sail_factory'
 import { MediaFactory } from '#database/factories/media_factory'
-import { UserFactory } from '#database/factories/user_factory'
 import Media from '#models/media'
-import OrganizationMembership from '#models/organization_membership'
 import type User from '#models/user'
-import { CloudinaryService } from '#services/cloudinary_service'
 import type { MediaEntityType } from '#shared/constants/media'
-import app from '@adonisjs/core/services/app'
 import { truncateDb } from '#tests/utils/db'
 import { test } from '@japa/runner'
-
-async function createEnterpriseAdminUser() {
-  const user = await UserFactory.with('organization', 1, (org) =>
-    org.merge({ plan: 'enterprise' })
-  ).create()
-  if (user.organizationId) {
-    await OrganizationMembership.create({
-      userId: user.id,
-      organizationId: user.organizationId,
-      role: 'admin',
-    })
-  }
-  return user
-}
-
-function swapFakeCloudinary() {
-  const uploaded: string[] = []
-  const uploadedFolders: string[] = []
-  const deletedPublicIds: string[] = []
-  const deletedFolders: string[] = []
-  app.container.swap(
-    CloudinaryService,
-    () =>
-      ({
-        uploadImage: async (_file: unknown, folder: string) => {
-          const publicId = `fake-photo-${uploaded.length}`
-          uploaded.push(publicId)
-          uploadedFolders.push(folder)
-          return {
-            publicId,
-            url: `http://res.cloudinary.com/${publicId}.jpg`,
-            secureUrl: `https://res.cloudinary.com/${publicId}.jpg`,
-            format: 'jpg',
-            resourceType: 'image',
-            bytes: 1024,
-            originalFilename: 'photo',
-            width: 800,
-            height: 600,
-          }
-        },
-        deleteFile: async (publicId: string) => {
-          deletedPublicIds.push(publicId)
-        },
-        deleteFolder: async (folder: string) => {
-          deletedFolders.push(folder)
-        },
-      }) as unknown as CloudinaryService
-  )
-  return { uploaded, uploadedFolders, deletedPublicIds, deletedFolders }
-}
+import { restoreCloudinary, swapFakeCloudinary } from '#tests/support/fakes'
+import { createEnterpriseAdminUser } from '#tests/functional/helpers'
 
 function photoBuffer() {
   return Buffer.from('\xff\xd8\xff\xe0 fake jpeg', 'binary')
@@ -179,7 +127,7 @@ test.group('Equipment photos — upload (functional)', (group) => {
         // The photo lands in the entity's own `photos/` folder, not a sibling's.
         assert.match(fake.uploadedFolders[0], /\/photos$/)
       } finally {
-        app.container.restore(CloudinaryService)
+        restoreCloudinary()
       }
     })
 
@@ -215,7 +163,7 @@ test.group('Equipment photos — upload (functional)', (group) => {
         )
         assert.lengthOf(fake.uploaded, 3)
       } finally {
-        app.container.restore(CloudinaryService)
+        restoreCloudinary()
       }
     })
   }
@@ -244,7 +192,7 @@ test.group('Equipment photos — upload (functional)', (group) => {
       response.assertStatus(302)
       response.assertHeader('location', c.photosUrl(seed))
     } finally {
-      app.container.restore(CloudinaryService)
+      restoreCloudinary()
     }
   })
 
@@ -253,31 +201,7 @@ test.group('Equipment photos — upload (functional)', (group) => {
     assert,
   }) => {
     const c = CASES[0]
-    let callCount = 0
-    app.container.swap(
-      CloudinaryService,
-      () =>
-        ({
-          uploadImage: async (_file: unknown, folder: string) => {
-            callCount += 1
-            if (callCount === 2) throw new Error('Cloudinary upload failed')
-            return {
-              publicId: `fake-photo-${callCount}`,
-              url: `http://res.cloudinary.com/fake-photo-${callCount}.jpg`,
-              secureUrl: `https://res.cloudinary.com/fake-photo-${callCount}.jpg`,
-              format: 'jpg',
-              resourceType: 'image',
-              bytes: 1024,
-              originalFilename: 'photo',
-              width: 800,
-              height: 600,
-              folder,
-            }
-          },
-          deleteFile: async () => {},
-          deleteFolder: async () => {},
-        }) as unknown as CloudinaryService
-    )
+    swapFakeCloudinary({ failUploadAt: 2 })
 
     try {
       const user = await createEnterpriseAdminUser()
@@ -299,7 +223,7 @@ test.group('Equipment photos — upload (functional)', (group) => {
 
       assert.lengthOf(medias, 1)
     } finally {
-      app.container.restore(CloudinaryService)
+      restoreCloudinary()
     }
   })
 
@@ -341,7 +265,7 @@ test.group('Equipment photos — delete (functional)', (group) => {
         assert.isNull(await Media.find(media.id))
         assert.deepEqual(fake.deletedPublicIds, [media.cloudinaryPublicId])
       } finally {
-        app.container.restore(CloudinaryService)
+        restoreCloudinary()
       }
     })
   }
@@ -385,7 +309,7 @@ test.group('Equipment photos — IDOR (functional)', (group) => {
       assert.isNotNull(await Media.find(media.id))
       assert.isEmpty(fake.deletedPublicIds)
     } finally {
-      app.container.restore(CloudinaryService)
+      restoreCloudinary()
     }
   })
 
@@ -419,7 +343,7 @@ test.group('Equipment photos — IDOR (functional)', (group) => {
       assert.isNotNull(await Media.find(media.id))
       assert.isEmpty(fake.deletedPublicIds)
     } finally {
-      app.container.restore(CloudinaryService)
+      restoreCloudinary()
     }
   })
 
@@ -448,7 +372,7 @@ test.group('Equipment photos — IDOR (functional)', (group) => {
       assert.isNotNull(await Media.find(media.id))
       assert.isEmpty(fake.deletedPublicIds)
     } finally {
-      app.container.restore(CloudinaryService)
+      restoreCloudinary()
     }
   })
 
@@ -482,7 +406,7 @@ test.group('Equipment photos — IDOR (functional)', (group) => {
       assert.isNotNull(await Media.find(media.id))
       assert.isEmpty(fake.deletedPublicIds)
     } finally {
-      app.container.restore(CloudinaryService)
+      restoreCloudinary()
     }
   })
 
@@ -513,7 +437,7 @@ test.group('Equipment photos — IDOR (functional)', (group) => {
       assert.isNotNull(await Media.find(media.id))
       assert.isEmpty(fake.deletedPublicIds)
     } finally {
-      app.container.restore(CloudinaryService)
+      restoreCloudinary()
     }
   })
 
@@ -544,7 +468,7 @@ test.group('Equipment photos — IDOR (functional)', (group) => {
       assert.isNotNull(await Media.find(media.id))
       assert.isEmpty(fake.deletedPublicIds)
     } finally {
-      app.container.restore(CloudinaryService)
+      restoreCloudinary()
     }
   })
 
@@ -569,7 +493,7 @@ test.group('Equipment photos — IDOR (functional)', (group) => {
       const count = await Media.query().where('entityType', 'boat_engine').count('* as total')
       assert.equal(Number(count[0].$extras.total), 0)
     } finally {
-      app.container.restore(CloudinaryService)
+      restoreCloudinary()
     }
   })
 })
@@ -593,7 +517,7 @@ test.group('Equipment photos — cleanup on delete (functional)', (group) => {
       assert.isNull(await Media.find(media.id))
       assert.isNotEmpty(fake.deletedFolders)
     } finally {
-      app.container.restore(CloudinaryService)
+      restoreCloudinary()
     }
   })
 
@@ -613,7 +537,7 @@ test.group('Equipment photos — cleanup on delete (functional)', (group) => {
       assert.isNull(await Media.find(media.id))
       assert.isNotEmpty(fake.deletedFolders)
     } finally {
-      app.container.restore(CloudinaryService)
+      restoreCloudinary()
     }
   })
 
@@ -636,7 +560,7 @@ test.group('Equipment photos — cleanup on delete (functional)', (group) => {
       assert.isNull(await Media.find(media.id))
       assert.isNotEmpty(fake.deletedFolders)
     } finally {
-      app.container.restore(CloudinaryService)
+      restoreCloudinary()
     }
   })
 
@@ -659,7 +583,7 @@ test.group('Equipment photos — cleanup on delete (functional)', (group) => {
       assert.isNull(await Media.find(media.id))
       assert.isNotEmpty(fake.deletedFolders)
     } finally {
-      app.container.restore(CloudinaryService)
+      restoreCloudinary()
     }
   })
 
@@ -689,7 +613,7 @@ test.group('Equipment photos — cleanup on delete (functional)', (group) => {
       assert.isNull(await Media.find(safetyMedia.id))
       assert.isNotEmpty(fake.deletedFolders)
     } finally {
-      app.container.restore(CloudinaryService)
+      restoreCloudinary()
     }
   })
 
@@ -722,7 +646,7 @@ test.group('Equipment photos — cleanup on delete (functional)', (group) => {
       // The purged folder is the part root, so both `photos/` and `documents/` go with it.
       assert.isTrue(fake.deletedFolders.some((f) => f.endsWith(`/parts/${seed.part.id}`)))
     } finally {
-      app.container.restore(CloudinaryService)
+      restoreCloudinary()
     }
   })
 })

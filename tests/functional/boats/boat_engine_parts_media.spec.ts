@@ -1,13 +1,12 @@
 import { test } from '@japa/runner'
 import { truncateDb } from '#tests/utils/db'
-import app from '@adonisjs/core/services/app'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { BoatEngineFactory } from '#database/factories/boat_engine_factory'
 import { BoatEnginePartFactory } from '#database/factories/boat_engine_part_factory'
 import { MediaFactory } from '#database/factories/media_factory'
 import { createAdminUser } from '#tests/functional/helpers'
 import Media from '#models/media'
-import { CloudinaryService } from '#services/cloudinary_service'
+import { restoreCloudinary, swapFakeCloudinary } from '#tests/support/fakes'
 
 test.group('BoatEngineParts — show (functional)', (group) => {
   group.each.setup(() => truncateDb())
@@ -50,16 +49,7 @@ test.group('BoatEngineParts — destroyMedia (functional)', (group) => {
   group.each.setup(() => truncateDb())
 
   test('DELETE supprime le media de la pièce moteur', async ({ client, assert }) => {
-    const deletedPublicIds: string[] = []
-    app.container.swap(
-      CloudinaryService,
-      () =>
-        ({
-          deleteFile: async (publicId: string) => {
-            deletedPublicIds.push(publicId)
-          },
-        }) as unknown as CloudinaryService
-    )
+    const { deletedPublicIds } = swapFakeCloudinary()
 
     try {
       const user = await createAdminUser()
@@ -88,7 +78,7 @@ test.group('BoatEngineParts — destroyMedia (functional)', (group) => {
       assert.isNull(found)
       assert.deepEqual(deletedPublicIds, [media.cloudinaryPublicId])
     } finally {
-      app.container.restore(CloudinaryService)
+      restoreCloudinary()
     }
   })
 
@@ -96,16 +86,7 @@ test.group('BoatEngineParts — destroyMedia (functional)', (group) => {
     client,
     assert,
   }) => {
-    const deletedPublicIds: string[] = []
-    app.container.swap(
-      CloudinaryService,
-      () =>
-        ({
-          deleteFile: async (publicId: string) => {
-            deletedPublicIds.push(publicId)
-          },
-        }) as unknown as CloudinaryService
-    )
+    const { deletedPublicIds } = swapFakeCloudinary()
 
     try {
       const victim = await createAdminUser()
@@ -145,7 +126,7 @@ test.group('BoatEngineParts — destroyMedia (functional)', (group) => {
       assert.isNotNull(found)
       assert.isEmpty(deletedPublicIds)
     } finally {
-      app.container.restore(CloudinaryService)
+      restoreCloudinary()
     }
   })
 
@@ -153,16 +134,7 @@ test.group('BoatEngineParts — destroyMedia (functional)', (group) => {
     client,
     assert,
   }) => {
-    const deletedPublicIds: string[] = []
-    app.container.swap(
-      CloudinaryService,
-      () =>
-        ({
-          deleteFile: async (publicId: string) => {
-            deletedPublicIds.push(publicId)
-          },
-        }) as unknown as CloudinaryService
-    )
+    const { deletedPublicIds } = swapFakeCloudinary()
 
     try {
       const user = await createAdminUser()
@@ -193,7 +165,7 @@ test.group('BoatEngineParts — destroyMedia (functional)', (group) => {
       assert.isNotNull(found)
       assert.isEmpty(deletedPublicIds)
     } finally {
-      app.container.restore(CloudinaryService)
+      restoreCloudinary()
     }
   })
 
@@ -303,26 +275,7 @@ test.group('BoatEngineParts — storeDocument (functional)', (group) => {
     client,
     assert,
   }) => {
-    const uploaded: string[] = []
-    app.container.swap(
-      CloudinaryService,
-      () =>
-        ({
-          uploadDocument: async () => {
-            const publicId = `fake-part-doc-${uploaded.length}`
-            uploaded.push(publicId)
-            return {
-              publicId,
-              url: `http://res.cloudinary.com/${publicId}.pdf`,
-              secureUrl: `https://res.cloudinary.com/${publicId}.pdf`,
-              format: 'pdf',
-              resourceType: 'raw',
-              bytes: 2048,
-              originalFilename: 'doc',
-            }
-          },
-        }) as unknown as CloudinaryService
-    )
+    const { uploaded } = swapFakeCloudinary()
 
     try {
       const user = await createAdminUser()
@@ -355,7 +308,7 @@ test.group('BoatEngineParts — storeDocument (functional)', (group) => {
       assert.lengthOf(medias, 2)
       assert.lengthOf(uploaded, 2)
     } finally {
-      app.container.restore(CloudinaryService)
+      restoreCloudinary()
     }
   })
 

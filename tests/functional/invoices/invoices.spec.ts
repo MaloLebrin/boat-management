@@ -1,28 +1,12 @@
 import { test } from '@japa/runner'
 import { truncateDb } from '#tests/utils/db'
-import { UserFactory } from '#database/factories/user_factory'
 import { BoatFactory } from '#database/factories/boat_factory'
-import OrganizationMembership from '#models/organization_membership'
 import BoatReservation from '#models/boat_reservation'
 import Client from '#models/client'
 import Invoice from '#models/invoice'
 import InvoiceLine from '#models/invoice_line'
-import { createAdminUser } from '#tests/functional/helpers'
+import { createAdminUser, createEnterpriseAdminUser } from '#tests/functional/helpers'
 import { DateTime } from 'luxon'
-
-async function createEnterpriseAdminUser() {
-  const user = await UserFactory.with('organization', 1, (org) =>
-    org.merge({ plan: 'enterprise' })
-  ).create()
-  if (user.organizationId) {
-    await OrganizationMembership.create({
-      userId: user.id,
-      organizationId: user.organizationId,
-      role: 'admin',
-    })
-  }
-  return user
-}
 
 /** A valid create payload with two lines, using bracketed form keys for the nested array. */
 function invoiceForm(overrides: Record<string, unknown> = {}) {

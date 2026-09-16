@@ -1,26 +1,9 @@
 import { UserFactory } from '#database/factories/user_factory'
 import Client from '#models/client'
 import OrganizationMembership from '#models/organization_membership'
-import { createAdminUser } from '#tests/functional/helpers'
+import { createAdminUser, createEnterpriseAdminUser } from '#tests/functional/helpers'
 import { truncateDb } from '#tests/utils/db'
 import { test } from '@japa/runner'
-
-/**
- * Creates an admin user with an Enterprise plan (required for clients feature).
- */
-async function createEnterpriseAdminUser() {
-  const user = await UserFactory.with('organization', 1, (org) =>
-    org.merge({ plan: 'enterprise' })
-  ).create()
-  if (user.organizationId) {
-    await OrganizationMembership.create({
-      userId: user.id,
-      organizationId: user.organizationId,
-      role: 'admin',
-    })
-  }
-  return user
-}
 
 test.group('Clients (functional)', (group) => {
   group.each.setup(() => truncateDb())

@@ -1,11 +1,9 @@
 import type Boat from '#models/boat'
 import type User from '#models/user'
-import OrganizationMembership from '#models/organization_membership'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { PortFactory } from '#database/factories/port_factory'
 import { BoatMaintenanceEventFactory } from '#database/factories/boat_maintenance_event_factory'
-import { UserFactory } from '#database/factories/user_factory'
-import { createAdminUser } from '#tests/functional/helpers'
+import { createAdminUser, createEnterpriseAdminUser } from '#tests/functional/helpers'
 
 /**
  * Shared helpers for the browser (e2e) suite.
@@ -17,26 +15,7 @@ import { createAdminUser } from '#tests/functional/helpers'
  * itself is what's under test.
  */
 
-export { createAdminUser }
-
-/**
- * Like `createAdminUser` but on the `enterprise` plan, so plan-gated screens
- * (AI settings, branding/white-label, clients) are reachable. Used by the
- * authenticated smoke test to cover every main screen.
- */
-export async function createEnterpriseAdminUser(): Promise<User> {
-  const user = await UserFactory.with('organization', 1, (org) =>
-    org.merge({ plan: 'enterprise' })
-  ).create()
-  if (user.organizationId) {
-    await OrganizationMembership.create({
-      userId: user.id,
-      organizationId: user.organizationId,
-      role: 'admin',
-    })
-  }
-  return user
-}
+export { createAdminUser, createEnterpriseAdminUser }
 
 /**
  * The plaintext password every factory-built user is created with

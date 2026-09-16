@@ -1,6 +1,5 @@
 import { test } from '@japa/runner'
 import { truncateDb } from '#tests/utils/db'
-import app from '@adonisjs/core/services/app'
 import { DateTime } from 'luxon'
 import AiAnalysis from '#models/ai_analysis'
 import { AiAnalysisFactory } from '#database/factories/ai_analysis_factory'
@@ -8,18 +7,7 @@ import { BoatEngineFactory } from '#database/factories/boat_engine_factory'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { UserFactory } from '#database/factories/user_factory'
 import { createAdminUser } from '#tests/functional/helpers'
-import AiService, { type AiChatMessage } from '#services/ai_service'
-
-function swapAiService(response = '[{"text":"Vérifier la turbine"}]') {
-  app.container.swap(
-    AiService,
-    () =>
-      ({
-        chat: async (_messages: AiChatMessage[]) => ({ content: response, tokensUsed: 42 }),
-      }) as unknown as AiService
-  )
-  return () => app.container.restore(AiService)
-}
+import { restoreAiService, swapAiService } from '#tests/support/fakes'
 
 test.group('AI engine suggestions — engineSuggestions (functional)', (group) => {
   group.each.setup(() => truncateDb())
@@ -78,7 +66,7 @@ test.group('AI engine suggestions — engineSuggestions (functional)', (group) =
     client,
     assert,
   }) => {
-    const restore = swapAiService()
+    swapAiService('[{"text":"Vérifier la turbine"}]')
     try {
       const user = await createAdminUser()
       const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
@@ -102,7 +90,7 @@ test.group('AI engine suggestions — engineSuggestions (functional)', (group) =
       assert.match(analysis.contextHash ?? '', /^[0-9a-f]{64}$/)
       assert.deepEqual(JSON.parse(analysis.responseText), [{ text: 'Vérifier la turbine' }])
     } finally {
-      restore()
+      restoreAiService()
     }
   })
 

@@ -11,8 +11,9 @@ import { BoatFactory } from '#database/factories/boat_factory'
 import { OrganizationFactory } from '#database/factories/organization_factory'
 import { UserFactory } from '#database/factories/user_factory'
 import AiProactiveSuggestionService from '#services/ai_proactive_suggestion_service'
-import AiService, { type AiChatMessage } from '#services/ai_service'
+import { type AiChatMessage } from '#services/ai_service'
 import AiTokenQuotaService from '#services/ai_token_quota_service'
+import { restoreAiService, swapAiService, type FakeAiCall } from '#tests/support/fakes'
 
 /**
  * Fixture standard : org `pro` + admin (locale fr) + bateau + moteur.
@@ -45,22 +46,11 @@ async function backdateAnalyses(orgId: number) {
 }
 
 test.group('AiProactiveSuggestionService — scheduled generation', (group) => {
-  let chatCalls = 0
+  let calls: FakeAiCall[] = []
 
   group.each.setup(() => {
-    chatCalls = 0
-    app.container.swap(
-      AiService,
-      () =>
-        ({
-          chat: async (_messages: AiChatMessage[]) => {
-            chatCalls++
-            return { content: '[{"text":"Suggestion planifiée"}]', tokensUsed: 42 }
-          },
-        }) as unknown as AiService
-    )
-
-    return () => app.container.restore(AiService)
+    calls = swapAiService('[{"text":"Suggestion planifiée"}]')
+    return () => restoreAiService()
   })
 
   test('a first run creates org-owned analyses (userId NULL) for boat and engine, and notifies admins', async ({
@@ -100,12 +90,12 @@ test.group('AiProactiveSuggestionService — scheduled generation', (group) => {
     const svc = await app.container.make(AiProactiveSuggestionService)
     await svc.run()
     const analysesAfterFirst = await orgAnalyses(org.id)
-    const callsAfterFirst = chatCalls
+    const callsAfterFirst = calls.length
 
     await svc.run()
 
     assert.lengthOf(await orgAnalyses(org.id), analysesAfterFirst.length)
-    assert.equal(chatCalls, callsAfterFirst)
+    assert.equal(calls.length, callsAfterFirst)
   })
 
   test('an old analysis with an unchanged context is not regenerated (contextHash)', async ({

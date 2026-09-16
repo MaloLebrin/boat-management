@@ -13,41 +13,8 @@ import {
 import RentalContract from '#models/rental_contract'
 import Organization from '#models/organization'
 import RentalContractPdfService from '#services/rental_contract_pdf_service'
-import { CloudinaryService } from '#services/cloudinary_service'
 import Media from '#models/media'
-
-function swapFakeCloudinaryUpload() {
-  const uploadedPublicIds: string[] = []
-  const deletedPublicIds: string[] = []
-  app.container.swap(
-    CloudinaryService,
-    () =>
-      ({
-        uploadDocument: async () => {
-          const publicId = `fake-public-id-${uploadedPublicIds.length}`
-          uploadedPublicIds.push(publicId)
-          return {
-            publicId,
-            url: `http://res.cloudinary.com/${publicId}.pdf`,
-            secureUrl: `https://res.cloudinary.com/${publicId}.pdf`,
-            format: 'pdf',
-            resourceType: 'raw',
-            bytes: 1234,
-            originalFilename: 'signed-contract',
-          }
-        },
-        deleteFile: async (publicId: string) => {
-          deletedPublicIds.push(publicId)
-        },
-        deleteFolder: async () => {},
-        downloadAsBuffer: async () => ({
-          buffer: Buffer.from('%PDF-1.4 fake'),
-          contentType: 'application/pdf',
-        }),
-      }) as unknown as CloudinaryService
-  )
-  return { uploadedPublicIds, deletedPublicIds }
-}
+import { restoreCloudinary, swapFakeCloudinary } from '#tests/support/fakes'
 
 test.group('Rental contracts (functional)', (group) => {
   group.each.setup(() => truncateDb())
@@ -342,7 +309,7 @@ test.group('Rental contracts (functional)', (group) => {
   // --- sign (signed document upload) ---
 
   test('POST .../contract/sign refuses to sign a draft contract', async ({ client, assert }) => {
-    swapFakeCloudinaryUpload()
+    swapFakeCloudinary()
     try {
       const user = await createCharterAdminUser()
       const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
@@ -371,7 +338,7 @@ test.group('Rental contracts (functional)', (group) => {
       assert.equal(contract.status, 'draft')
       assert.isNull(contract.mediaId)
     } finally {
-      app.container.restore(CloudinaryService)
+      restoreCloudinary()
     }
   })
 
@@ -379,7 +346,7 @@ test.group('Rental contracts (functional)', (group) => {
     client,
     assert,
   }) => {
-    swapFakeCloudinaryUpload()
+    swapFakeCloudinary()
     try {
       const user = await createCharterAdminUser()
       const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
@@ -417,7 +384,7 @@ test.group('Rental contracts (functional)', (group) => {
       assert.equal(media.entityType, 'rentalContract')
       assert.equal(media.entityId, contract.id)
     } finally {
-      app.container.restore(CloudinaryService)
+      restoreCloudinary()
     }
   })
 
@@ -427,7 +394,7 @@ test.group('Rental contracts (functional)', (group) => {
     client,
     assert,
   }) => {
-    swapFakeCloudinaryUpload()
+    swapFakeCloudinary()
     try {
       const user = await createCharterAdminUser()
       const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
@@ -457,7 +424,7 @@ test.group('Rental contracts (functional)', (group) => {
       response.assertHeader('content-type', 'application/pdf')
       assert.include(response.header('content-disposition'), 'attachment')
     } finally {
-      app.container.restore(CloudinaryService)
+      restoreCloudinary()
     }
   })
 
@@ -486,7 +453,7 @@ test.group('Rental contracts (functional)', (group) => {
     client,
     assert,
   }) => {
-    const { deletedPublicIds } = swapFakeCloudinaryUpload()
+    const { deletedPublicIds } = swapFakeCloudinary()
     try {
       const user = await createCharterAdminUser()
       const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
@@ -531,7 +498,7 @@ test.group('Rental contracts (functional)', (group) => {
       assert.isNull(await Media.find(firstMediaId!))
       assert.lengthOf(deletedPublicIds, 1)
     } finally {
-      app.container.restore(CloudinaryService)
+      restoreCloudinary()
     }
   })
 
@@ -584,7 +551,7 @@ test.group('Rental contracts (functional)', (group) => {
     client,
     assert,
   }) => {
-    const { deletedPublicIds } = swapFakeCloudinaryUpload()
+    const { deletedPublicIds } = swapFakeCloudinary()
     try {
       const admin = await createCharterAdminUser()
       const boat = await BoatFactory.merge({ organizationId: admin.organizationId! }).create()
@@ -620,7 +587,7 @@ test.group('Rental contracts (functional)', (group) => {
       assert.isNull(await Media.find(mediaId))
       assert.lengthOf(deletedPublicIds, 1)
     } finally {
-      app.container.restore(CloudinaryService)
+      restoreCloudinary()
     }
   })
 })
