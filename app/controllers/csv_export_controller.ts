@@ -10,6 +10,7 @@ import { buildCsv, csvFilename } from '#services/csv_export_service'
 import { budgetYearValidator } from '#validators/budget_validator'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
+import { contentDisposition } from '#shared/helpers/content_disposition'
 
 @inject()
 export default class CsvExportController {
@@ -75,7 +76,7 @@ export default class CsvExportController {
     const buffer = buildCsv(headers, rows)
     const filename = csvFilename('maintenance', boat.name)
     response.header('Content-Type', 'text/csv; charset=utf-8')
-    response.header('Content-Disposition', `attachment; filename="${filename}"`)
+    response.header('Content-Disposition', contentDisposition(filename))
     response.header('Content-Length', String(buffer.length))
     return response.send(buffer)
   }
@@ -130,7 +131,7 @@ export default class CsvExportController {
     const buffer = buildCsv(headers, rows)
     const filename = csvFilename('avitaillements', boat.name)
     response.header('Content-Type', 'text/csv; charset=utf-8')
-    response.header('Content-Disposition', `attachment; filename="${filename}"`)
+    response.header('Content-Disposition', contentDisposition(filename))
     response.header('Content-Length', String(buffer.length))
     return response.send(buffer)
   }
@@ -194,7 +195,7 @@ export default class CsvExportController {
     const buffer = buildCsv(headers, rows)
     const filename = csvFilename('journal_de_bord', boat.name)
     response.header('Content-Type', 'text/csv; charset=utf-8')
-    response.header('Content-Disposition', `attachment; filename="${filename}"`)
+    response.header('Content-Disposition', contentDisposition(filename))
     response.header('Content-Length', String(buffer.length))
     return response.send(buffer)
   }
@@ -262,7 +263,7 @@ export default class CsvExportController {
     const buffer = buildCsv(headers, rows)
     const filename = csvFilename(`budget_${year}`, boat.name)
     response.header('Content-Type', 'text/csv; charset=utf-8')
-    response.header('Content-Disposition', `attachment; filename="${filename}"`)
+    response.header('Content-Disposition', contentDisposition(filename))
     response.header('Content-Length', String(buffer.length))
     return response.send(buffer)
   }

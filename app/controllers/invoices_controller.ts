@@ -17,6 +17,7 @@ import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import type Organization from '#models/organization'
 import { BILLING_SETTINGS_PATH } from '#shared/constants/billing'
+import { contentDisposition } from '#shared/helpers/content_disposition'
 
 @inject()
 export default class InvoicesController {
@@ -255,10 +256,7 @@ export default class InvoicesController {
 
     const inline = request.input('inline') === '1'
     response.header('Content-Type', 'application/pdf')
-    response.header(
-      'Content-Disposition',
-      inline ? `inline; filename="${filename}"` : `attachment; filename="${filename}"`
-    )
+    response.header('Content-Disposition', contentDisposition(filename, { inline }))
     response.header('Content-Length', String(buffer.length))
     return response.send(buffer)
   }

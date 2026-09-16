@@ -9,14 +9,7 @@ import { createEnginePartValidator, updateEnginePartValidator } from '#validator
 import { storeBoatDocumentsValidator } from '#validators/media'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
-
-function buildContentDisposition(filename: string, format: string): string {
-  const full = `${filename}.${format}`
-  // eslint-disable-next-line no-control-regex
-  const ascii = full.replace(/[\x00-\x1f\x7f"\\]/g, '_')
-  const encoded = encodeURIComponent(full)
-  return `attachment; filename="${ascii}"; filename*=UTF-8''${encoded}`
-}
+import { contentDisposition } from '#shared/helpers/content_disposition'
 
 @inject()
 export default class BoatEnginePartsController {
@@ -288,7 +281,7 @@ export default class BoatEnginePartsController {
     response.header('Content-Type', contentType)
     response.header(
       'Content-Disposition',
-      buildContentDisposition(media.originalFilename, media.format)
+      contentDisposition(`${media.originalFilename}.${media.format}`)
     )
     return response.send(buffer)
   }
