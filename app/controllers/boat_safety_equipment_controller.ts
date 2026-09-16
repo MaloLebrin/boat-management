@@ -14,6 +14,7 @@ import {
 } from '#validators/boat_safety_equipment'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
+import { initialTabParam } from '#utils/inertia_tab'
 
 @inject()
 export default class BoatSafetyEquipmentController {
@@ -39,7 +40,7 @@ export default class BoatSafetyEquipmentController {
     }
   }
 
-  async show({ inertia, response, auth, params, bouncer, session, i18n }: HttpContext) {
+  async show({ inertia, request, response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
     const loaded = await this.loadBoat({ auth, response, params })
     if (!loaded) return
@@ -61,6 +62,7 @@ export default class BoatSafetyEquipmentController {
 
     return inertia.render('boats/safety_equipment_show', {
       boat: { id: boat.id, name: boat.name },
+      initialTab: initialTabParam(request),
       item: {
         id: item.id,
         equipmentType: item.equipmentType,

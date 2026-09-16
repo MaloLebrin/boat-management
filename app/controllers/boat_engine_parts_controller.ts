@@ -9,6 +9,7 @@ import { createEnginePartValidator, updateEnginePartValidator } from '#validator
 import { storeBoatDocumentsValidator } from '#validators/media'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
+import { initialTabParam } from '#utils/inertia_tab'
 import { contentDisposition } from '#shared/helpers/content_disposition'
 
 @inject()
@@ -35,7 +36,7 @@ export default class BoatEnginePartsController {
     }
   }
 
-  async show({ inertia, response, auth, params, bouncer }: HttpContext) {
+  async show({ inertia, request, response, auth, params, bouncer }: HttpContext) {
     await auth.authenticate()
     const loaded = await this.loadBoat({ auth, response, params })
     if (!loaded) return
@@ -54,6 +55,7 @@ export default class BoatEnginePartsController {
 
     return inertia.render('boats/engine_part_show', {
       boat: { id: boat.id, name: boat.name },
+      initialTab: initialTabParam(request),
       engine: {
         id: engine.id,
         kind: engine.kind,
