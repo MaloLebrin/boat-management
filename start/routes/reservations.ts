@@ -7,4 +7,4 @@ router
   .group(() => {
     router.get('reservations', [ReservationsController, 'index']).as('reservations.index')
   })
-  .use([middleware.auth(), middleware.requireReservationsPlan()])
+  .use([middleware.auth(), middleware.requireModulePlan({ feature: 'reservations' })])

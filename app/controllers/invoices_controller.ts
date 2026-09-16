@@ -9,7 +9,6 @@ import InvoicePdfService from '#services/invoice_pdf_service'
 import EmailQueueService from '#services/email_queue_service'
 import BoatReservationService from '#services/boat_reservation_service'
 import QuotaService from '#services/quota_service'
-import { QuotaExceededError } from '#exceptions/quota_errors'
 import { UserNotInOrganizationError } from '#exceptions/organization_errors'
 import InvoicePolicy from '#policies/invoice_policy'
 import { createInvoiceValidator, updateInvoiceValidator } from '#validators/invoice'
@@ -29,27 +28,17 @@ export default class InvoicesController {
     private quotaService: QuotaService
   ) {}
 
-  /** Écriture : exige le module Facturation actif (tier ou add-on #327). */
-  private async loadOrgForWrite({
-    auth,
-    session,
-    response,
-    i18n,
-  }: Pick<HttpContext, 'auth' | 'session' | 'response' | 'i18n'>): Promise<Organization | null> {
+  /**
+   * Organisation de l'utilisateur. Le plan est déjà vérifié par la garde de
+   * module posée sur le groupe de routes (`requireModulePlan`) ; il ne reste
+   * qu'à protéger le cas d'un utilisateur sans organisation (#279).
+   */
+  private async loadOrg(auth: HttpContext['auth']): Promise<Organization> {
     const user = auth.getUserOrFail()
     await user.load('organization')
-
-    try {
-      await this.quotaService.assertCanManageInvoices(user.organization)
-    } catch (error) {
-      if (error instanceof QuotaExceededError) {
-        session.flash('error', i18n.t('flash.quota.invoicesExceeded'))
-        response.redirect(BILLING_SETTINGS_PATH)
-        return null
-      }
-      throw error
+    if (user.organization === null) {
+      throw new UserNotInOrganizationError()
     }
-
     return user.organization
   }
 
@@ -136,10 +125,9 @@ export default class InvoicesController {
     }
   }
 
-  async create({ inertia, auth, bouncer, session, response, i18n }: HttpContext) {
+  async create({ inertia, auth, bouncer }: HttpContext) {
     await auth.authenticate()
-    const org = await this.loadOrgForWrite({ auth, session, response, i18n })
-    if (!org) return
+    const org = await this.loadOrg(auth)
 
     await bouncer.with(InvoicePolicy).authorize('create')
 
@@ -149,8 +137,7 @@ export default class InvoicesController {
 
   async store({ request, response, auth, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const org = await this.loadOrgForWrite({ auth, session, response, i18n })
-    if (!org) return
+    const org = await this.loadOrg(auth)
 
     await bouncer.with(InvoicePolicy).authorize('create')
 
@@ -163,8 +150,7 @@ export default class InvoicesController {
 
   async edit({ inertia, auth, bouncer, params, session, response, i18n }: HttpContext) {
     await auth.authenticate()
-    const org = await this.loadOrgForWrite({ auth, session, response, i18n })
-    if (!org) return
+    const org = await this.loadOrg(auth)
 
     await bouncer.with(InvoicePolicy).authorize('update')
 
@@ -187,8 +173,7 @@ export default class InvoicesController {
 
   async update({ request, response, auth, bouncer, params, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const org = await this.loadOrgForWrite({ auth, session, response, i18n })
-    if (!org) return
+    const org = await this.loadOrg(auth)
 
     await bouncer.with(InvoicePolicy).authorize('update')
 
@@ -211,8 +196,7 @@ export default class InvoicesController {
 
   async destroy({ response, auth, bouncer, params, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const org = await this.loadOrgForWrite({ auth, session, response, i18n })
-    if (!org) return
+    const org = await this.loadOrg(auth)
 
     await bouncer.with(InvoicePolicy).authorize('delete')
 
@@ -266,8 +250,7 @@ export default class InvoicesController {
 
   async send({ response, auth, bouncer, params, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const org = await this.loadOrgForWrite({ auth, session, response, i18n })
-    if (!org) return
+    const org = await this.loadOrg(auth)
 
     await bouncer.with(InvoicePolicy).authorize('update')
 
@@ -308,8 +291,7 @@ export default class InvoicesController {
 
   async convert({ response, auth, bouncer, params, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const org = await this.loadOrgForWrite({ auth, session, response, i18n })
-    if (!org) return
+    const org = await this.loadOrg(auth)
 
     await bouncer.with(InvoicePolicy).authorize('update')
 
@@ -343,8 +325,7 @@ export default class InvoicesController {
 
   async markPaid({ response, auth, bouncer, params, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const org = await this.loadOrgForWrite({ auth, session, response, i18n })
-    if (!org) return
+    const org = await this.loadOrg(auth)
 
     await bouncer.with(InvoicePolicy).authorize('update')
 
@@ -375,8 +356,7 @@ export default class InvoicesController {
 
   async createFromReservation({ response, auth, bouncer, params, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const org = await this.loadOrgForWrite({ auth, session, response, i18n })
-    if (!org) return
+    const org = await this.loadOrg(auth)
 
     await bouncer.with(InvoicePolicy).authorize('create')
 
