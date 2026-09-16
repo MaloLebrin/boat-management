@@ -11,6 +11,7 @@ import InvoicePdfService from '#services/invoice_pdf_service'
 import Invoice from '#models/invoice'
 import Organization from '#models/organization'
 import env from '#start/env'
+import { formatCurrency } from '#shared/helpers/number_format'
 
 export interface SendInvoiceEmailPayload {
   invoiceId: number
@@ -54,30 +55,29 @@ export default class SendInvoiceEmail extends Job<SendInvoiceEmailPayload> {
     // Generate PDF
     const { buffer, filename } = await pdfService.generate(invoice, org, i18n)
 
-    // Prepare email content
+    // Contenu de l'email dans la langue du destinataire (sujet, texte, montant).
+    // Le gabarit Edge garde sa bascule `isFr` interne.
     const isFr = this.payload.locale === 'fr'
-    const kindLabel =
-      invoice.kind === 'quote' ? (isFr ? 'devis' : 'quote') : isFr ? 'facture' : 'invoice'
-    const KindLabel =
-      invoice.kind === 'quote' ? (isFr ? 'Devis' : 'Quote') : isFr ? 'Facture' : 'Invoice'
-
-    const formatter = new Intl.NumberFormat(this.payload.locale, {
-      style: 'currency',
+    const kindLabel = i18n.t(`invoices.email.kind.${invoice.kind}`)
+    const KindLabel = i18n.t(`invoices.email.kindTitle.${invoice.kind}`)
+    const totalFormatted = formatCurrency(Number.parseFloat(invoice.total), this.payload.locale, {
       currency: invoice.currency,
-      minimumFractionDigits: 2,
     })
-    const totalFormatted = formatter.format(Number.parseFloat(invoice.total))
 
     const fromAddress = env.get('MAIL_FROM_ADDRESS')
     const fromName = env.get('MAIL_FROM_NAME')
 
-    const subject = isFr
-      ? `${KindLabel} ${invoice.number} de ${org.name}`
-      : `${KindLabel} ${invoice.number} from ${org.name}`
-
-    const text = isFr
-      ? `Bonjour,\n\nVeuillez trouver ci-joint le ${kindLabel} n° ${invoice.number}.\n\nMontant total : ${totalFormatted}\n\nCordialement,\n${org.name}`
-      : `Hello,\n\nPlease find attached ${kindLabel} no. ${invoice.number}.\n\nTotal amount: ${totalFormatted}\n\nBest regards,\n${org.name}`
+    const subject = i18n.t('invoices.email.subject', {
+      kindTitle: KindLabel,
+      number: invoice.number,
+      orgName: org.name,
+    })
+    const text = i18n.t('invoices.email.text', {
+      kind: kindLabel,
+      number: invoice.number,
+      total: totalFormatted,
+      orgName: org.name,
+    })
 
     const html = await edge.render('emails/invoice', {
       isFr,

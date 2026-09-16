@@ -1,17 +1,26 @@
 import edge from 'edge.js'
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
+import i18nManager from '@adonisjs/i18n/services/main'
 import { Job } from '@adonisjs/queue'
 import type { JobOptions } from '@adonisjs/queue/types'
+import type { I18n } from '@adonisjs/i18n'
 import SimulatorLead from '#models/simulator_lead'
 import SendEmail, { type SendEmailPayload } from '#jobs/send_email'
 import QueueDedupService from '#services/queue_dedup_service'
+import { formatCurrency } from '#shared/helpers/number_format'
 import env from '#start/env'
 
 interface Payload {
   leadId: string
 }
 
+/**
+ * Relances J+3 (conseils) et J+7 (rappel de l'estimation) après une simulation
+ * publique. Sujets, textes et montants suivent la langue du lead via `i18n` —
+ * la relance J+7 formatait ses montants en `fr-FR` quelle que soit la langue.
+ * Les gabarits Edge gardent leur bascule `isFr` interne.
+ */
 @inject()
 export default class SendSimulatorNurturingJob extends Job<Payload> {
   static options: JobOptions = {
@@ -30,116 +39,57 @@ export default class SendSimulatorNurturingJob extends Job<Payload> {
       return
     }
 
-    const isFr = lead.locale === 'fr'
+    const i18n = i18nManager.locale(lead.locale)
     const appUrl = env.get('APP_URL')
 
-    await this.#scheduleD3(lead.email, isFr, appUrl)
-    await this.#scheduleD7(lead.email, lead.totalMin, lead.totalMax, isFr, appUrl)
+    await this.#scheduleD3(lead, i18n, appUrl)
+    await this.#scheduleD7(lead, i18n, appUrl)
   }
 
-  async #scheduleD3(email: string, isFr: boolean, appUrl: string) {
-    const subject = isFr
-      ? "3 conseils pour reduire les couts d'entretien de votre bateau"
-      : '3 tips to reduce your boat maintenance costs'
-
-    const text = isFr
-      ? `3 conseils pour reduire vos couts d'entretien bateau\n\nCreez votre compte: ${appUrl}/signup`
-      : `3 tips to reduce your boat maintenance costs\n\nCreate your account: ${appUrl}/signup`
-
-    const tips = isFr
-      ? [
-          {
-            title: 'Anticipez les petites reparations',
-            body: "Une reparation mineure negligee peut rapidement devenir une facture importante. Inspectez regulierement votre bateau pour detecter les problemes avant qu'ils ne s'aggravent.",
-          },
-          {
-            title: 'Comparez plusieurs devis',
-            body: "Ne vous contentez pas du premier devis. Demandez au moins 2 ou 3 estimations pour les travaux importants afin d'obtenir le meilleur rapport qualite-prix.",
-          },
-          {
-            title: 'Hivernez votre bateau correctement',
-            body: "Un hivernage bien fait protege votre bateau du gel, de l'humidite et de la corrosion. Investir dans un bon hivernage, c'est economiser sur les reparations au printemps.",
-          },
-        ]
-      : [
-          {
-            title: 'Anticipate small repairs',
-            body: 'A neglected minor repair can quickly become a major expense. Regularly inspect your boat to catch problems before they worsen.',
-          },
-          {
-            title: 'Compare multiple quotes',
-            body: "Don't settle for the first quote. Request at least 2 or 3 estimates for major work to get the best value for your money.",
-          },
-          {
-            title: 'Winter your boat properly',
-            body: 'Proper winterization protects your boat from frost, humidity, and corrosion. Investing in good winterization saves on spring repairs.',
-          },
-        ]
+  async #scheduleD3(lead: SimulatorLead, i18n: I18n, appUrl: string) {
+    const isFr = lead.locale === 'fr'
+    const signupUrl = `${appUrl}/signup`
+    const subject = i18n.t('marketing.emails.nurturingD3.subject')
+    const text = i18n.t('marketing.emails.nurturingD3.text', { signupUrl })
+    const tips = ['1', '2', '3'].map((n) => ({
+      title: i18n.t(`marketing.emails.nurturingD3.tips.${n}.title`),
+      body: i18n.t(`marketing.emails.nurturingD3.tips.${n}.body`),
+    }))
 
     const html = await edge.render('emails/nurturing_d3', { isFr, tips, appUrl })
 
-    const partialPayload: Omit<SendEmailPayload, 'dedupKey'> = {
-      to: email,
-      subject,
-      text,
-      html,
-      correlationId: `simulator-nurture-d3:${email}`,
-    }
-
-    const key = `simulator-nurture-d3:${email}`
-    const emailPayload: SendEmailPayload = { ...partialPayload, dedupKey: key }
-
-    await this.dedup.enqueueUnique({
-      key,
-      jobName: SendEmail.name,
-      queue: 'emails',
-      payload: emailPayload,
-      dispatch: async (p) => {
-        await SendEmail.dispatch(p).in('3d')
-      },
-    })
+    await this.#enqueue(lead.email, `simulator-nurture-d3:${lead.email}`, subject, text, html, '3d')
   }
 
-  async #scheduleD7(
-    email: string,
-    totalMin: number,
-    totalMax: number,
-    isFr: boolean,
-    appUrl: string
+  async #scheduleD7(lead: SimulatorLead, i18n: I18n, appUrl: string) {
+    const isFr = lead.locale === 'fr'
+    const signupUrl = `${appUrl}/signup`
+    const totalMin = formatCurrency(lead.totalMin, lead.locale, { fractionDigits: 0 })
+    const totalMax = formatCurrency(lead.totalMax, lead.locale, { fractionDigits: 0 })
+
+    const subject = i18n.t('marketing.emails.nurturingD7.subject')
+    const text = i18n.t('marketing.emails.nurturingD7.text', { totalMin, totalMax, signupUrl })
+
+    const html = await edge.render('emails/nurturing_d7', { isFr, totalMin, totalMax, appUrl })
+
+    await this.#enqueue(lead.email, `simulator-nurture-d7:${lead.email}`, subject, text, html, '7d')
+  }
+
+  async #enqueue(
+    to: string,
+    key: string,
+    subject: string,
+    text: string,
+    html: string,
+    delay: string
   ) {
-    const formatter = new Intl.NumberFormat('fr-FR', {
-      style: 'currency',
-      currency: 'EUR',
-      minimumFractionDigits: 0,
-    })
-
-    const totalMinFormatted = formatter.format(totalMin)
-    const totalMaxFormatted = formatter.format(totalMax)
-
-    const subject = isFr
-      ? "Votre estimation d'entretien bateau — toujours disponible"
-      : 'Your boat maintenance estimate — still available'
-
-    const text = isFr
-      ? `Votre bateau vous coutera entre ${totalMinFormatted} et ${totalMaxFormatted} par an en entretien. FleetAi vous aide a planifier et anticiper ces depenses.\n\nCreez votre compte: ${appUrl}/signup`
-      : `Your boat will cost between ${totalMinFormatted} and ${totalMaxFormatted} per year in maintenance. FleetAi helps you plan and anticipate these expenses.\n\nCreate your account: ${appUrl}/signup`
-
-    const html = await edge.render('emails/nurturing_d7', {
-      isFr,
-      totalMin: totalMinFormatted,
-      totalMax: totalMaxFormatted,
-      appUrl,
-    })
-
     const partialPayload: Omit<SendEmailPayload, 'dedupKey'> = {
-      to: email,
+      to,
       subject,
       text,
       html,
-      correlationId: `simulator-nurture-d7:${email}`,
+      correlationId: key,
     }
-
-    const key = `simulator-nurture-d7:${email}`
     const emailPayload: SendEmailPayload = { ...partialPayload, dedupKey: key }
 
     await this.dedup.enqueueUnique({
@@ -148,7 +98,7 @@ export default class SendSimulatorNurturingJob extends Job<Payload> {
       queue: 'emails',
       payload: emailPayload,
       dispatch: async (p) => {
-        await SendEmail.dispatch(p).in('7d')
+        await SendEmail.dispatch(p).in(delay)
       },
     })
   }
