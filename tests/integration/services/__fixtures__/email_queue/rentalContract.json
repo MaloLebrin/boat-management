@@ -1,0 +1,12 @@
+{
+  "key": "rental-contract:42:5:<ts>",
+  "jobName": "SendRentalContractEmail",
+  "queue": "emails",
+  "payload": {
+    "contractId": 5,
+    "organizationId": 42,
+    "to": "client@example.com",
+    "locale": "en",
+    "dedupKey": "rental-contract:42:5:<ts>"
+  }
+}
