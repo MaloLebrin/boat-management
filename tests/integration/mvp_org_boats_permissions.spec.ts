@@ -1,7 +1,7 @@
 import { test } from '@japa/runner'
 import UserService from '#services/user_service'
 import OrganizationService from '#services/organization_service'
-import BoatService from '#services/boat_service'
+import BoatHullService from '#services/boat_hull_service'
 import BoatEquipmentService from '#services/boat_equipment_service'
 import { UserFactory } from '#database/factories/user_factory'
 import { OrganizationFactory } from '#database/factories/organization_factory'
@@ -31,7 +31,7 @@ test.group('MVP org/users/boats/permissions (integration)', () => {
     assert.isAbove(organization.slug.length, 0)
   })
 
-  test('BoatService.listForUser is scoped by organization', async ({ assert }) => {
+  test('BoatHullService.listForUser is scoped by organization', async ({ assert }) => {
     const org1 = await OrganizationFactory.create()
     const org2 = await OrganizationFactory.create()
 
@@ -48,7 +48,7 @@ test.group('MVP org/users/boats/permissions (integration)', () => {
       registrationNumber: 'B1',
     }).create()
 
-    const boatService = await app.container.make(BoatService)
+    const boatService = await app.container.make(BoatHullService)
     const boats = await boatService.listForUser(user1)
 
     assert.equal(boats.length, 1)
@@ -56,12 +56,12 @@ test.group('MVP org/users/boats/permissions (integration)', () => {
     assert.equal(boats[0]!.name, 'Org1 Boat')
   })
 
-  test('BoatService hull create then equipment methods add engines, sails, and rig', async ({
+  test('BoatHullService hull create then equipment methods add engines, sails, and rig', async ({
     assert,
   }) => {
     const user = await UserFactory.with('organization').create()
 
-    const boatService = await app.container.make(BoatService)
+    const boatService = await app.container.make(BoatHullService)
     const equipmentService = await app.container.make(BoatEquipmentService)
     const boat = await boatService.createForUser(user, {
       name: 'My Boat',
@@ -117,7 +117,7 @@ test.group('MVP org/users/boats/permissions (integration)', () => {
   test('sailboat requires mastHeightM', async ({ assert }) => {
     const user = await UserFactory.with('organization').create()
 
-    const boatService = await app.container.make(BoatService)
+    const boatService = await app.container.make(BoatHullService)
 
     await assert.rejects(
       () =>

@@ -1,4 +1,5 @@
-import BoatService, { BoatNotFoundError } from '#services/boat_service'
+import BoatHullService from '#services/boat_hull_service'
+import { BoatNotFoundError } from '#exceptions/boat_errors'
 import BoatPolicy from '#policies/boat_policy'
 import BoatMaintenanceService from '#services/boat_maintenance_service'
 import BoatFuelLogService from '#services/boat_fuel_log_service'
@@ -14,7 +15,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 @inject()
 export default class CsvExportController {
   constructor(
-    private boatService: BoatService,
+    private boatService: BoatHullService,
     private maintenanceService: BoatMaintenanceService,
     private fuelLogService: BoatFuelLogService,
     private navigationLogService: NavigationLogService,

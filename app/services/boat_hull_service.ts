@@ -26,7 +26,6 @@ import type { TransactionClientContract } from '@adonisjs/lucid/types/database'
 import { DateTime } from 'luxon'
 import { assertBoatInUserOrg, toDateOrNull } from '#utils/boat_utils'
 
-export { BoatNotFoundError }
 export type { BoatHullPayload }
 
 /**

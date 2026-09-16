@@ -5,7 +5,7 @@ import {
   RentalContractNoClientEmailError,
   RentalContractNotFoundError,
 } from '#exceptions/rental_contract_errors'
-import BoatService from '#services/boat_service'
+import BoatHullService from '#services/boat_hull_service'
 import BoatReservationService from '#services/boat_reservation_service'
 import RentalContractService from '#services/rental_contract_service'
 import RentalContractPdfService from '#services/rental_contract_pdf_service'
@@ -35,7 +35,7 @@ function buildContentDisposition(filename: string, format: string): string {
 @inject()
 export default class RentalContractsController {
   constructor(
-    private boatService: BoatService,
+    private boatService: BoatHullService,
     private reservationService: BoatReservationService,
     private contractService: RentalContractService,
     private pdfService: RentalContractPdfService,

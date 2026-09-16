@@ -1,6 +1,7 @@
 import BoatPolicy from '#policies/boat_policy'
 import BoatDocumentService from '#services/boat_document_service'
-import BoatHullService, { BoatNotFoundError } from '#services/boat_hull_service'
+import BoatHullService from '#services/boat_hull_service'
+import { BoatNotFoundError } from '#exceptions/boat_errors'
 import { BoatDocumentNotFoundError } from '#exceptions/boat_document_errors'
 import { createBoatDocumentValidator, updateBoatDocumentValidator } from '#validators/boat_document'
 import { inject } from '@adonisjs/core'

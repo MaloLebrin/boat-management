@@ -1,10 +1,12 @@
-import BoatMaintenanceSheetService, {
+import BoatMaintenanceSheetService from '#services/boat_maintenance_sheet_service'
+import {
   BoatMaintenanceSheetItemConflictError,
   BoatMaintenanceSheetItemNotFoundError,
   BoatMaintenanceSheetNotFoundError,
   BoatMaintenanceSheetValidationError,
-} from '#services/boat_maintenance_sheet_service'
-import BoatHullService, { BoatNotFoundError } from '#services/boat_hull_service'
+} from '#exceptions/maintenance_errors'
+import BoatHullService from '#services/boat_hull_service'
+import { BoatNotFoundError } from '#exceptions/boat_errors'
 import MaintenancePolicy from '#policies/maintenance_policy'
 import { updateSheetItemValidator } from '#validators/boat_maintenance_sheet'
 import { inject } from '@adonisjs/core'

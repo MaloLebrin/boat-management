@@ -1,7 +1,5 @@
-import ClientService, {
-  ClientAlreadyAnonymizedError,
-  ClientNotFoundError,
-} from '#services/client_service'
+import ClientService from '#services/client_service'
+import { ClientAlreadyAnonymizedError, ClientNotFoundError } from '#exceptions/client_errors'
 import BoatReservationService from '#services/boat_reservation_service'
 import QuotaService from '#services/quota_service'
 import { QuotaExceededError } from '#exceptions/quota_errors'

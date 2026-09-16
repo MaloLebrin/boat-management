@@ -17,8 +17,6 @@ import { toDiagnosticEngineRow } from '#transformers/diagnostic_transformer'
 import { assertBoatInUserOrg } from '#utils/boat_utils'
 import { inject } from '@adonisjs/core'
 
-export { BoatEquipmentNotFoundError, DiagnosticStepNotFoundError, EngineNotDiagnosticEligibleError }
-
 @inject()
 export default class BoatEngineDiagnosticService {
   /**

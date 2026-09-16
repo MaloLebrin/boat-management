@@ -2,12 +2,12 @@ import BoatPolicy from '#policies/boat_policy'
 import MaintenancePolicy from '#policies/maintenance_policy'
 import AiAnalysisService from '#services/ai_analysis_service'
 import AiQueueService from '#services/ai_queue_service'
-import BoatEngineDiagnosticService, {
-  BoatEquipmentNotFoundError,
-  EngineNotDiagnosticEligibleError,
-} from '#services/boat_engine_diagnostic_service'
+import BoatEngineDiagnosticService from '#services/boat_engine_diagnostic_service'
+import { BoatEquipmentNotFoundError } from '#exceptions/boat_errors'
+import { EngineNotDiagnosticEligibleError } from '#exceptions/diagnostic_errors'
 import AiSuggestionContextService from '#services/ai_suggestion_context_service'
-import BoatService, { BoatNotFoundError } from '#services/boat_service'
+import BoatHullService from '#services/boat_hull_service'
+import { BoatNotFoundError } from '#exceptions/boat_errors'
 import DashboardService from '#services/dashboard_service'
 import QuotaService from '#services/quota_service'
 import { AiInvalidResponseError } from '#exceptions/ai_errors'
@@ -24,7 +24,7 @@ export default class AiController {
     private aiQueueService: AiQueueService,
     private dashboardService: DashboardService,
     private aiAnalysisService: AiAnalysisService,
-    private boatService: BoatService,
+    private boatService: BoatHullService,
     private suggestionContextService: AiSuggestionContextService,
     private quotaService: QuotaService,
     private diagnosticService: BoatEngineDiagnosticService

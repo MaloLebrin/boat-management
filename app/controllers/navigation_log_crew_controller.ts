@@ -1,6 +1,8 @@
 import CrewService from '#services/crew_service'
-import NavigationLogService, { NavigationLogNotFoundError } from '#services/navigation_log_service'
-import BoatService, { BoatNotFoundError } from '#services/boat_service'
+import NavigationLogService from '#services/navigation_log_service'
+import { NavigationLogNotFoundError } from '#exceptions/navigation_log_errors'
+import BoatHullService from '#services/boat_hull_service'
+import { BoatNotFoundError } from '#exceptions/boat_errors'
 import NavigationLogPolicy from '#policies/navigation_log_policy'
 import { syncNavigationLogCrewValidator } from '#validators/crew'
 import { inject } from '@adonisjs/core'
@@ -9,7 +11,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 @inject()
 export default class NavigationLogCrewController {
   constructor(
-    private boatService: BoatService,
+    private boatService: BoatHullService,
     private navigationLogService: NavigationLogService,
     private crewService: CrewService
   ) {}

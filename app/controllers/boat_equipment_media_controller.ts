@@ -1,7 +1,9 @@
 import BoatPolicy from '#policies/boat_policy'
-import BoatService, { BoatNotFoundError } from '#services/boat_service'
+import BoatHullService from '#services/boat_hull_service'
+import { BoatNotFoundError } from '#exceptions/boat_errors'
 import EquipmentMediaService from '#services/equipment_media_service'
-import MediaService, { MediaNotFoundError } from '#services/media_service'
+import MediaService from '#services/media_service'
+import { MediaNotFoundError } from '#exceptions/media_errors'
 import OrganizationService from '#services/organization_service'
 import type { EquipmentMediaSlug } from '#shared/types/equipment_media'
 import { storeBoatPhotosValidator } from '#validators/media'
@@ -16,7 +18,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 @inject()
 export default class BoatEquipmentMediaController {
   constructor(
-    private boatService: BoatService,
+    private boatService: BoatHullService,
     private mediaService: MediaService,
     private organizationService: OrganizationService,
     private equipmentMediaService: EquipmentMediaService

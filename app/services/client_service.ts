@@ -28,8 +28,6 @@ import type {
   UpdateClientPayload,
 } from '#shared/types/client'
 
-export { ClientNotFoundError, ClientAlreadyAnonymizedError }
-
 const VALID_STATUSES: ClientStatus[] = ['active', 'inactive', 'blacklisted']
 const VALID_SORT_FIELDS: ClientSortField[] = ['lastName', 'createdAt', 'status']
 const VALID_DIRECTIONS: ClientSortDirection[] = ['asc', 'desc']

@@ -1,11 +1,13 @@
 import MaintenancePolicy from '#policies/maintenance_policy'
 import AiAnalysisService from '#services/ai_analysis_service'
-import BoatEngineDiagnosticService, {
-  BoatEquipmentNotFoundError,
+import BoatEngineDiagnosticService from '#services/boat_engine_diagnostic_service'
+import { BoatEquipmentNotFoundError } from '#exceptions/boat_errors'
+import {
   DiagnosticStepNotFoundError,
   EngineNotDiagnosticEligibleError,
-} from '#services/boat_engine_diagnostic_service'
-import BoatHullService, { BoatNotFoundError } from '#services/boat_hull_service'
+} from '#exceptions/diagnostic_errors'
+import BoatHullService from '#services/boat_hull_service'
+import { BoatNotFoundError } from '#exceptions/boat_errors'
 import { isSheetForEngine } from '#shared/helpers/diagnostic'
 import { resolveEngineFamily } from '#shared/helpers/engine_family'
 import { toAppLocale } from '#shared/helpers/locale_path'

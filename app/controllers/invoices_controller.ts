@@ -1,9 +1,10 @@
-import InvoiceService, {
+import InvoiceService from '#services/invoice_service'
+import {
   InvoiceNotFoundError,
   NotAQuoteError,
   QuoteAlreadyConvertedError,
   CannotMarkPaidError,
-} from '#services/invoice_service'
+} from '#exceptions/invoice_errors'
 import InvoicePdfService from '#services/invoice_pdf_service'
 import EmailQueueService from '#services/email_queue_service'
 import BoatReservationService from '#services/boat_reservation_service'

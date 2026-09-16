@@ -1,5 +1,6 @@
 import { test } from '@japa/runner'
-import BoatEquipmentService, { BoatEquipmentNotFoundError } from '#services/boat_equipment_service'
+import BoatEquipmentService from '#services/boat_equipment_service'
+import { BoatEquipmentNotFoundError } from '#exceptions/boat_errors'
 import { UserFactory } from '#database/factories/user_factory'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { BoatEngineFactory } from '#database/factories/boat_engine_factory'

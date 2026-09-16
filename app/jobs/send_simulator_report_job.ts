@@ -13,7 +13,7 @@ import type {
   SimulatorWinteringZone,
 } from '#shared/types/simulator'
 import env from '#start/env'
-import { computeSimulatorCosts } from '../../shared/simulator_costs.js'
+import { computeSimulatorCosts } from '#shared/simulator_costs'
 
 interface Payload {
   leadId: string

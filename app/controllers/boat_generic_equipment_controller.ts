@@ -1,8 +1,8 @@
 import BoatPolicy from '#policies/boat_policy'
-import BoatGenericEquipmentService, {
-  BoatEquipmentNotFoundError,
-} from '#services/boat_generic_equipment_service'
-import BoatHullService, { BoatNotFoundError } from '#services/boat_hull_service'
+import BoatGenericEquipmentService from '#services/boat_generic_equipment_service'
+import { BoatEquipmentNotFoundError } from '#exceptions/boat_errors'
+import BoatHullService from '#services/boat_hull_service'
+import { BoatNotFoundError } from '#exceptions/boat_errors'
 import MediaService from '#services/media_service'
 import OrganizationService from '#services/organization_service'
 import BoatMaintenanceTaskService from '#services/boat_maintenance_task_service'

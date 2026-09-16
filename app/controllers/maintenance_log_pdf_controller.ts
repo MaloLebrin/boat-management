@@ -1,5 +1,6 @@
 import BoatMaintenanceService from '#services/boat_maintenance_service'
-import BoatService, { BoatNotFoundError } from '#services/boat_service'
+import BoatHullService from '#services/boat_hull_service'
+import { BoatNotFoundError } from '#exceptions/boat_errors'
 import MaintenanceLogPdfService from '#services/maintenance_log_pdf_service'
 import QuotaService from '#services/quota_service'
 import { QuotaExceededError } from '#exceptions/quota_errors'
@@ -9,7 +10,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 @inject()
 export default class MaintenanceLogPdfController {
   constructor(
-    private boatService: BoatService,
+    private boatService: BoatHullService,
     private maintenanceService: BoatMaintenanceService,
     private pdfService: MaintenanceLogPdfService,
     private quotaService: QuotaService

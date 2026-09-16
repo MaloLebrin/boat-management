@@ -27,7 +27,6 @@ import type {
   TaskEquipmentRef,
 } from '#shared/types/maintenance'
 
-export { BoatMaintenanceTaskNotFoundError, BoatMaintenanceTaskValidationError }
 export type { CreateMaintenanceTaskPayload, MaintenanceTaskSubject, MarkTaskDonePayload }
 
 function toDateTime(value: Date | string | DateTime): DateTime {

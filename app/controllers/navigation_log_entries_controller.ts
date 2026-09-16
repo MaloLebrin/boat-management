@@ -5,7 +5,8 @@ import {
   NavigationLogNotFoundError,
   NavigationLogValidationError,
 } from '#exceptions/navigation_log_errors'
-import BoatService, { BoatNotFoundError } from '#services/boat_service'
+import BoatHullService from '#services/boat_hull_service'
+import { BoatNotFoundError } from '#exceptions/boat_errors'
 import NavigationLogPolicy from '#policies/navigation_log_policy'
 import {
   createNavigationLogEntryValidator,
@@ -17,7 +18,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 @inject()
 export default class NavigationLogEntriesController {
   constructor(
-    private boatService: BoatService,
+    private boatService: BoatHullService,
     private entryService: NavigationLogEntryService
   ) {}
 

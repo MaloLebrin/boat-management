@@ -1,4 +1,4 @@
-import BoatService from '#services/boat_service'
+import BoatHullService from '#services/boat_hull_service'
 import BoatOwnerService from '#services/boat_owner_service'
 import BoatPolicy from '#policies/boat_policy'
 import { InvalidBoatOwnerAssignmentError } from '#exceptions/boat_errors'
@@ -9,7 +9,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 @inject()
 export default class BoatOwnersController {
   constructor(
-    private boatService: BoatService,
+    private boatService: BoatHullService,
     private boatOwnerService: BoatOwnerService
   ) {}
 

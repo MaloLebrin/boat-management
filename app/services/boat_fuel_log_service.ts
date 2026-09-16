@@ -6,7 +6,6 @@ import type User from '#models/user'
 import type { CreateFuelLogPayload } from '#shared/types/fuel_log'
 import { toDateTime } from '#shared/helpers/date'
 
-export { BoatFuelLogNotFoundError, BoatFuelLogValidationError }
 export type { CreateFuelLogPayload }
 
 export default class BoatFuelLogService {

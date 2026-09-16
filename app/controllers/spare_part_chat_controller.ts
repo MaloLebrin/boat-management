@@ -6,11 +6,11 @@ import {
   PartSearchMaxMessagesReachedError,
 } from '#exceptions/spare_part_chat_errors'
 import MaintenancePolicy from '#policies/maintenance_policy'
-import BoatEngineSparePartsService, {
-  BoatEquipmentNotFoundError,
-  EngineNotSparePartsEligibleError,
-} from '#services/boat_engine_spare_parts_service'
-import BoatHullService, { BoatNotFoundError } from '#services/boat_hull_service'
+import BoatEngineSparePartsService from '#services/boat_engine_spare_parts_service'
+import { BoatEquipmentNotFoundError } from '#exceptions/boat_errors'
+import { EngineNotSparePartsEligibleError } from '#exceptions/spare_parts_errors'
+import BoatHullService from '#services/boat_hull_service'
+import { BoatNotFoundError } from '#exceptions/boat_errors'
 import QuotaService from '#services/quota_service'
 import SparePartChatService from '#services/spare_part_chat_service'
 import { toPartSearchConversationProps } from '#transformers/spare_part_chat_transformer'

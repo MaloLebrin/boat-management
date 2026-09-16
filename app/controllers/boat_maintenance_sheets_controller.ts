@@ -1,8 +1,10 @@
-import BoatMaintenanceSheetService, {
+import BoatMaintenanceSheetService from '#services/boat_maintenance_sheet_service'
+import {
   BoatMaintenanceSheetIncompleteError,
   BoatMaintenanceSheetNotFoundError,
-} from '#services/boat_maintenance_sheet_service'
-import BoatService, { BoatNotFoundError } from '#services/boat_service'
+} from '#exceptions/maintenance_errors'
+import BoatHullService from '#services/boat_hull_service'
+import { BoatNotFoundError } from '#exceptions/boat_errors'
 import MaintenancePolicy from '#policies/maintenance_policy'
 import { createBoatMaintenanceSheetValidator } from '#validators/boat_maintenance_sheet'
 import { inject } from '@adonisjs/core'
@@ -12,7 +14,7 @@ import type { SheetType } from '#shared/types/maintenance'
 @inject()
 export default class BoatMaintenanceSheetsController {
   constructor(
-    private boatService: BoatService,
+    private boatService: BoatHullService,
     private boatMaintenanceSheetService: BoatMaintenanceSheetService
   ) {}
 

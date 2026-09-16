@@ -1,7 +1,9 @@
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
-import BoatService, { BoatNotFoundError } from '#services/boat_service'
-import BoatPricingService, { InvalidPricingRangeError } from '#services/boat_pricing_service'
+import BoatHullService from '#services/boat_hull_service'
+import { BoatNotFoundError } from '#exceptions/boat_errors'
+import BoatPricingService from '#services/boat_pricing_service'
+import { InvalidPricingRangeError } from '#exceptions/boat_pricing_errors'
 import QuotaService from '#services/quota_service'
 import { QuotaExceededError } from '#exceptions/quota_errors'
 import BoatPolicy from '#policies/boat_policy'
@@ -10,7 +12,7 @@ import { upsertBoatPricingValidator } from '#validators/boat_pricing'
 @inject()
 export default class BoatPricingController {
   constructor(
-    private boatService: BoatService,
+    private boatService: BoatHullService,
     private pricingService: BoatPricingService,
     private quotaService: QuotaService
   ) {}

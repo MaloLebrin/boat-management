@@ -8,7 +8,7 @@ import {
   BoatEquipmentActionNotFoundError,
   BoatEquipmentActionValidationError,
 } from '#exceptions/equipment_action_errors'
-import BoatService from '#services/boat_service'
+import BoatHullService from '#services/boat_hull_service'
 import BoatReservationService from '#services/boat_reservation_service'
 import BoatInspectionService from '#services/boat_inspection_service'
 import BoatEquipmentActionService from '#services/boat_equipment_action_service'
@@ -44,7 +44,7 @@ import type User from '#models/user'
 @inject()
 export default class BoatInspectionsController {
   constructor(
-    private boatService: BoatService,
+    private boatService: BoatHullService,
     private reservationService: BoatReservationService,
     private inspectionService: BoatInspectionService,
     private equipmentActionService: BoatEquipmentActionService,

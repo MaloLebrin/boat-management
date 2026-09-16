@@ -1,10 +1,12 @@
 import BoatPolicy from '#policies/boat_policy'
 import InspectionPolicy from '#policies/inspection_policy'
-import BoatService, { BoatNotFoundError } from '#services/boat_service'
+import BoatHullService from '#services/boat_hull_service'
+import { BoatNotFoundError } from '#exceptions/boat_errors'
 import BoatReservationService from '#services/boat_reservation_service'
 import BoatInspectionService from '#services/boat_inspection_service'
 import { BoatInspectionNotFoundError } from '#exceptions/inspection_errors'
-import MediaService, { MediaNotFoundError } from '#services/media_service'
+import MediaService from '#services/media_service'
+import { MediaNotFoundError } from '#exceptions/media_errors'
 import OrganizationService from '#services/organization_service'
 import { CloudinaryFolders, CloudinaryService } from '#services/cloudinary_service'
 import { storeBoatPhotosValidator, storeBoatDocumentsValidator } from '#validators/media'
@@ -23,7 +25,7 @@ function buildContentDisposition(filename: string, format: string): string {
 @inject()
 export default class BoatMediaController {
   constructor(
-    private boatService: BoatService,
+    private boatService: BoatHullService,
     private mediaService: MediaService,
     private cloudinaryService: CloudinaryService,
     private organizationService: OrganizationService,

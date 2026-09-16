@@ -15,8 +15,6 @@ import type {
 import type Organization from '#models/organization'
 import { toDateTime } from '#shared/helpers/date'
 
-export { CrewMemberNotFoundError, CrewCertificationNotFoundError }
-
 export default class CrewService {
   async listForOrganization(organization: Organization): Promise<CrewMemberRow[]> {
     const members = await CrewMember.query()

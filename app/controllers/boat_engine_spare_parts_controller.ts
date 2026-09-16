@@ -1,11 +1,13 @@
 import MaintenancePolicy from '#policies/maintenance_policy'
-import BoatEngineSparePartsService, {
-  BoatEquipmentNotFoundError,
+import BoatEngineSparePartsService from '#services/boat_engine_spare_parts_service'
+import { BoatEquipmentNotFoundError } from '#exceptions/boat_errors'
+import {
   EngineNotSparePartsEligibleError,
   RepairCartItemNotFoundError,
   SparePartNotFoundError,
-} from '#services/boat_engine_spare_parts_service'
-import BoatHullService, { BoatNotFoundError } from '#services/boat_hull_service'
+} from '#exceptions/spare_parts_errors'
+import BoatHullService from '#services/boat_hull_service'
+import { BoatNotFoundError } from '#exceptions/boat_errors'
 import EngineCatalogService from '#services/engine_catalog_service'
 import { isAssemblyForEngine } from '#shared/helpers/spare_parts'
 import { PART_ASSEMBLY_SLUGS, type PartAssemblySlug } from '#shared/types/spare_parts'

@@ -1,10 +1,11 @@
-import PricingSeasonService, {
+import PricingSeasonService from '#services/pricing_season_service'
+import {
   PricingSeasonNotFoundError,
   SeasonOverlapError,
   InvalidSeasonDateRangeError,
   InvalidSeasonPriceError,
   SeasonBoatNotFoundError,
-} from '#services/pricing_season_service'
+} from '#exceptions/pricing_season_errors'
 import QuotaService from '#services/quota_service'
 import { QuotaExceededError } from '#exceptions/quota_errors'
 import PricingSeasonPolicy from '#policies/pricing_season_policy'

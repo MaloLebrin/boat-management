@@ -2,10 +2,11 @@ import { BoatFactory } from '#database/factories/boat_factory'
 import { BoatMaintenanceSheetFactory } from '#database/factories/boat_maintenance_sheet_factory'
 import { UserFactory } from '#database/factories/user_factory'
 import BoatMaintenanceSheetItem from '#models/boat_maintenance_sheet_item'
-import BoatMaintenanceSheetService, {
+import BoatMaintenanceSheetService from '#services/boat_maintenance_sheet_service'
+import {
   BoatMaintenanceSheetNotFoundError,
   BoatMaintenanceSheetValidationError,
-} from '#services/boat_maintenance_sheet_service'
+} from '#exceptions/maintenance_errors'
 import { test } from '@japa/runner'
 
 test.group('BoatMaintenanceSheetService.updateItem', () => {

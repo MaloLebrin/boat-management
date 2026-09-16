@@ -11,7 +11,6 @@ import type { BoatEnginePayload } from '#shared/types/boat'
 import { assertBoatInUserOrg, toDateOrNull } from '#utils/boat_utils'
 import { inject } from '@adonisjs/core'
 
-export { BoatEquipmentNotFoundError }
 export type { BoatEnginePayload }
 
 @inject()

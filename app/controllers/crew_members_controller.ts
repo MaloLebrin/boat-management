@@ -1,4 +1,5 @@
-import CrewService, { CrewMemberNotFoundError } from '#services/crew_service'
+import CrewService from '#services/crew_service'
+import { CrewMemberNotFoundError } from '#exceptions/crew_errors'
 import CrewMemberPolicy from '#policies/crew_member_policy'
 import { createCrewMemberValidator, updateCrewMemberValidator } from '#validators/crew'
 import { inject } from '@adonisjs/core'
