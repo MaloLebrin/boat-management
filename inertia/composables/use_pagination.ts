@@ -18,6 +18,24 @@ interface UsePaginationReturn {
   goToPage: (page: number) => void
 }
 
+/**
+ * Filtres de l'URL courante, à réémettre avec la nouvelle page : sur une visite
+ * GET, `data` est la *totalité* de la query envoyée — `{ page }` seul effaçait
+ * donc la recherche et les filtres que le serveur venait de rendre.
+ */
+function currentQuery(): Record<string, string | string[]> {
+  const search = window.location.search
+  if (!search) return {}
+
+  const query: Record<string, string | string[]> = {}
+  for (const [key, value] of new URLSearchParams(search)) {
+    const previous = query[key]
+    if (previous === undefined) query[key] = value
+    else query[key] = Array.isArray(previous) ? [...previous, value] : [previous, value]
+  }
+  return query
+}
+
 export function usePagination(
   meta: MaybeRefOrGetter<PaginationMeta>,
   baseUrl?: string
@@ -35,7 +53,7 @@ export function usePagination(
 
     const url = baseUrl ?? window.location.pathname
     router.visit(url, {
-      data: { page },
+      data: { ...currentQuery(), page },
       preserveScroll: true,
       preserveState: true,
     })
