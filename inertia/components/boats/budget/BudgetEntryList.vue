@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 import { useForm } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
@@ -8,6 +8,7 @@ import { useNumberFormat } from '~/composables/use_number_format'
 import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import type { BoatBudgetEntryItem } from '#shared/types/budget'
+import { useInlineRowEdit } from '~/composables/use_inline_row_edit'
 import { confirmDelete } from '~/utils/native_dialog'
 
 const props = defineProps<{
@@ -20,7 +21,6 @@ const { t } = useT()
 const { formatCurrency } = useNumberFormat()
 const { formatDate } = useDateFormat()
 
-const editingId = ref<number | null>(null)
 const editForm = useForm({
   label: '',
   amount: '',
@@ -39,29 +39,17 @@ const categoryOptions = computed(() => [
   { value: 'other', label: t('budget.entries.categories.other') },
 ])
 
-function startEdit(entry: BoatBudgetEntryItem) {
-  editingId.value = entry.id
-  editForm.label = entry.label
-  editForm.amount = String(entry.amount)
-  editForm.date = entry.date
-  editForm.category = entry.category
-  editForm.description = entry.description ?? ''
-}
-
-function cancelEdit() {
-  editingId.value = null
-  editForm.reset()
-}
-
-function submitEdit(entryId: number) {
-  editForm.patch(`/boats/${props.boatId}/budget/entries/${entryId}`, {
-    preserveScroll: true,
-    onSuccess: () => {
-      editingId.value = null
-      editForm.reset()
-    },
-  })
-}
+const edition = useInlineRowEdit<BoatBudgetEntryItem, ReturnType<typeof editForm.data>>({
+  form: editForm,
+  fill: (entry) => ({
+    label: entry.label,
+    amount: String(entry.amount),
+    date: entry.date,
+    category: entry.category,
+    description: entry.description ?? '',
+  }),
+  url: (entryId) => `/boats/${props.boatId}/budget/entries/${entryId}`,
+})
 
 function deleteEntry(entryId: number) {
   confirmDelete(
@@ -95,11 +83,11 @@ const CATEGORY_COLORS: Record<string, string> = {
     </div>
     <ul v-else class="divide-y divide-border">
       <li v-for="entry in entries" :key="entry.id" class="py-3">
-        <template v-if="editingId === entry.id">
+        <template v-if="edition.isEditing(entry.id)">
           <p class="text-sm font-semibold text-fg mb-3">{{ t('budget.entries.editTitle') }}</p>
           <form
             class="grid grid-cols-1 gap-3 sm:grid-cols-2"
-            @submit.prevent="submitEdit(entry.id)"
+            @submit.prevent="edition.submit(entry.id)"
           >
             <BaseInput
               v-model="editForm.label"
@@ -137,7 +125,7 @@ const CATEGORY_COLORS: Record<string, string> = {
               />
             </div>
             <div class="sm:col-span-2 flex justify-end gap-2">
-              <BaseButton variant="secondary" size="sm" type="button" @click="cancelEdit">
+              <BaseButton variant="secondary" size="sm" type="button" @click="edition.cancel()">
                 {{ t('common.cancel') }}
               </BaseButton>
               <BaseButton type="submit" size="sm" :loading="editForm.processing">
@@ -168,7 +156,7 @@ const CATEGORY_COLORS: Record<string, string> = {
                 {{ formatCurrency(entry.amount) }}
               </span>
               <template v-if="canManage">
-                <BaseButton variant="secondary" size="sm" @click="startEdit(entry)">
+                <BaseButton variant="secondary" size="sm" @click="edition.start(entry)">
                   {{ t('common.edit') }}
                 </BaseButton>
                 <BaseButton variant="danger" size="sm" @click="deleteEntry(entry.id)">
