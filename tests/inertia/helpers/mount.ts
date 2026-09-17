@@ -142,9 +142,11 @@ export const BASE_STUBS = {
     name: 'BaseConfirmModal',
     props: ['open', 'title', 'message', 'confirmLabel', 'cancelLabel'],
     emits: ['update:open', 'confirm'],
+    // Le vrai composant émet `confirm` **puis** `update:open: false` : les deux,
+    // sinon l'écran testé garde une modale ouverte que l'app referme.
     template:
       '<div v-if="open" data-base-confirm-modal role="alertdialog"><p>{{ title }}</p><p v-if="message">{{ message }}</p>' +
-      '<button data-confirm @click="$emit(\'confirm\')">{{ confirmLabel }}</button>' +
+      "<button data-confirm @click=\"$emit('confirm'); $emit('update:open', false)\">{{ confirmLabel }}</button>" +
       '<button data-cancel @click="$emit(\'update:open\', false)">{{ cancelLabel }}</button></div>',
   },
   BaseBadge: {
