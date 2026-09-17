@@ -1,7 +1,6 @@
 import PasswordResetToken from '#models/password_reset_token'
 import User from '#models/user'
 import { inject } from '@adonisjs/core'
-import hashService from '@adonisjs/core/services/hash'
 import { DateTime } from 'luxon'
 import { createHash, randomBytes, timingSafeEqual } from 'node:crypto'
 
@@ -48,12 +47,20 @@ export default class PasswordResetService {
   /**
    * Updates the password for a user by email.
    * Returns true if user was found and password updated, false otherwise.
+   *
+   * ⚠️ Le mot de passe est assigné **en clair** : le hachage appartient au
+   * modèle. `User` compose `withAuthFinder(() => hash.use())`, dont le hook
+   * `beforeSave` hache `password` dès qu'il est modifié. Pré-hacher ici le
+   * faisait hacher deux fois, et le hash stocké ne correspondait alors à aucune
+   * saisie possible : après une réinitialisation, ni l'ancien ni le nouveau mot
+   * de passe ne fonctionnaient, et redemander un lien reproduisait le même
+   * effet (#691).
    */
   async updatePassword(email: string, newPassword: string): Promise<boolean> {
     const user = await User.findBy('email', email)
     if (!user) return false
 
-    user.password = await hashService.make(newPassword)
+    user.password = newPassword
     await user.save()
     return true
   }
