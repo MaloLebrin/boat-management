@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { useForm, router } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCombobox, { type ComboboxOption } from '~/components/base/BaseCombobox.vue'
@@ -9,6 +9,7 @@ import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import type { BoatPortStayItem } from '#shared/types/budget'
 import type { PortNameOption } from '#shared/types/port'
+import { useInlineRowEdit } from '~/composables/use_inline_row_edit'
 
 const props = defineProps<{
   boatId: number
@@ -26,7 +27,6 @@ const portSuggestions = computed<ComboboxOption[]>(() =>
 const { formatCurrency } = useNumberFormat()
 const { formatDate } = useDateFormat()
 
-const editingId = ref<number | null>(null)
 const editForm = useForm({
   portName: '',
   startedAt: '',
@@ -35,29 +35,17 @@ const editForm = useForm({
   notes: '',
 })
 
-function startEdit(stay: BoatPortStayItem) {
-  editingId.value = stay.id
-  editForm.portName = stay.portName
-  editForm.startedAt = stay.startedAt
-  editForm.endedAt = stay.endedAt ?? ''
-  editForm.cost = stay.cost !== null ? String(stay.cost) : ''
-  editForm.notes = stay.notes ?? ''
-}
-
-function cancelEdit() {
-  editingId.value = null
-  editForm.reset()
-}
-
-function submitEdit(stayId: number) {
-  editForm.patch(`/boats/${props.boatId}/port-stays/${stayId}`, {
-    preserveScroll: true,
-    onSuccess: () => {
-      editingId.value = null
-      editForm.reset()
-    },
-  })
-}
+const edition = useInlineRowEdit<BoatPortStayItem, ReturnType<typeof editForm.data>>({
+  form: editForm,
+  fill: (stay) => ({
+    portName: stay.portName,
+    startedAt: stay.startedAt,
+    endedAt: stay.endedAt ?? '',
+    cost: stay.cost !== null ? String(stay.cost) : '',
+    notes: stay.notes ?? '',
+  }),
+  url: (stayId) => `/boats/${props.boatId}/port-stays/${stayId}`,
+})
 
 function deleteStay(stayId: number) {
   if (!confirm(t('budget.portStay.deleteConfirm'))) return
@@ -77,9 +65,12 @@ function deleteStay(stayId: number) {
     </div>
     <ul v-else class="divide-y divide-border">
       <li v-for="stay in stays" :key="stay.id" class="py-3">
-        <template v-if="editingId === stay.id">
+        <template v-if="edition.isEditing(stay.id)">
           <p class="text-sm font-semibold text-fg mb-3">{{ t('budget.portStay.editTitle') }}</p>
-          <form class="grid grid-cols-1 gap-3 sm:grid-cols-2" @submit.prevent="submitEdit(stay.id)">
+          <form
+            class="grid grid-cols-1 gap-3 sm:grid-cols-2"
+            @submit.prevent="edition.submit(stay.id)"
+          >
             <BaseCombobox
               :id="`portStayEditPortName-${stay.id}`"
               v-model="editForm.portName"
@@ -120,7 +111,7 @@ function deleteStay(stayId: number) {
               />
             </div>
             <div class="sm:col-span-2 flex justify-end gap-2">
-              <BaseButton variant="secondary" size="sm" type="button" @click="cancelEdit">
+              <BaseButton variant="secondary" size="sm" type="button" @click="edition.cancel()">
                 {{ t('common.cancel') }}
               </BaseButton>
               <BaseButton type="submit" size="sm" :loading="editForm.processing">
@@ -147,7 +138,7 @@ function deleteStay(stayId: number) {
               </span>
               <span v-else class="text-fg-subtle">—</span>
               <template v-if="canManage">
-                <BaseButton variant="secondary" size="sm" @click="startEdit(stay)">
+                <BaseButton variant="secondary" size="sm" @click="edition.start(stay)">
                   {{ t('common.edit') }}
                 </BaseButton>
                 <BaseButton variant="danger" size="sm" @click="deleteStay(stay.id)">
