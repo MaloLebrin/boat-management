@@ -25,8 +25,15 @@ const baseProps = {
   labels,
 }
 
+// Rendue en `en` : les unités de taille viennent de `common.units.*`, elles ne
+// sont plus figées en français.
+const UNIT_LABELS = { 'common.units.bytes': 'B', 'common.units.kb': 'KB', 'common.units.mb': 'MB' }
+
 function mountModal(props: Record<string, unknown> = {}) {
-  return mountWithStubs(DocumentAddModal, { props: { ...baseProps, ...props } })
+  return mountWithStubs(DocumentAddModal, {
+    props: { ...baseProps, ...props },
+    pageProps: { appT: UNIT_LABELS },
+  })
 }
 
 function fileInput(wrapper: ReturnType<typeof mountModal>) {
@@ -75,7 +82,7 @@ describe('DocumentAddModal', () => {
     await wrapper.vm.$nextTick()
 
     expect(wrapper.text()).toContain('Selected files')
-    expect(wrapper.text()).toContain('doc-1.pdf · 1 o')
+    expect(wrapper.text()).toContain('doc-1.pdf · 1 B')
     expect(wrapper.text()).toContain('doc-2.pdf')
 
     await wrapper.findAll('li button')[0].trigger('click')

@@ -1,10 +1,12 @@
 <script setup lang="ts">
+import { useByteFormat } from '~/composables/use_byte_format'
 import { useNumberFormat } from '~/composables/use_number_format'
 import { useT } from '~/composables/use_t'
 import { computed } from 'vue'
 
 const { t } = useT()
 const { formatNumber } = useNumberFormat()
+const { formatStorageSize } = useByteFormat()
 
 const props = defineProps<{
   label: string
@@ -13,13 +15,6 @@ const props = defineProps<{
   isBytes?: boolean
 }>()
 
-function formatBytes(bytes: number): string {
-  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} ${t('settings.billing.usage.kb')}`
-  if (bytes < 1024 * 1024 * 1024)
-    return `${Math.round(bytes / (1024 * 1024))} ${t('settings.billing.usage.mb')}`
-  return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} ${t('settings.billing.usage.gb')}`
-}
-
 function formatCount(value: number | string): string {
   const n = typeof value === 'number' ? value : Number(value)
   return Number.isFinite(n) ? formatNumber(n) : String(value)
@@ -27,7 +22,7 @@ function formatCount(value: number | string): string {
 
 const displayUsed = computed(() => {
   if (props.isBytes) {
-    return formatBytes(Number(props.used))
+    return formatStorageSize(Number(props.used))
   }
   return formatCount(props.used)
 })
@@ -37,7 +32,7 @@ const displayLimit = computed(() => {
     return t('settings.billing.usage.unlimited')
   }
   if (props.isBytes) {
-    return formatBytes(Number(props.limit))
+    return formatStorageSize(Number(props.limit))
   }
   return formatCount(props.limit)
 })

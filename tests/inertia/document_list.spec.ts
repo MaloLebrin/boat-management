@@ -46,9 +46,14 @@ const urls = {
   deleteUrlFor: (doc: { id: number }) => `/clients/3/media/${doc.id}`,
 }
 
+// L'app est rendue en `en` ici : les unités de taille doivent l'être aussi.
+// Elles passaient en dur en français, la liste affichait « 3.0 Mo ».
+const UNIT_LABELS = { 'common.units.bytes': 'B', 'common.units.kb': 'KB', 'common.units.mb': 'MB' }
+
 function mountList(props: Record<string, unknown> = {}) {
   return mountWithStubs(DocumentList, {
     props: { documents: [], canManage: true, labels, ...urls, ...props },
+    pageProps: { appT: UNIT_LABELS },
   })
 }
 
@@ -84,7 +89,7 @@ describe('DocumentList', () => {
     const items = wrapper.findAll('li')
     expect(items).toHaveLength(2)
     expect(items[0].text()).toContain('First')
-    expect(items[0].text()).toContain('PDF · 3.0 Mo')
+    expect(items[0].text()).toContain('PDF · 3.0 MB')
     expect(items[0].find('a').attributes('href')).toBe('/clients/3/media/7/download')
     expect(items[0].find('a').attributes('title')).toBe('Download')
     expect(items[1].text()).toContain('Second')

@@ -78,10 +78,7 @@
       "storage": "Storage",
       "aiTokens": "AI Tokens (current month)",
       "unlimited": "Unlimited",
-      "of": "of",
-      "kb": "KB",
-      "mb": "MB",
-      "gb": "GB"
+      "of": "of"
     },
     "storageOverflow": "Your storage usage exceeds your current plan limit. New uploads are blocked. Free up space or upgrade your plan.",
     "features": {

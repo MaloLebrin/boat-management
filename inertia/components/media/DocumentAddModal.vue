@@ -5,7 +5,7 @@ import { ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseModal from '~/components/base/BaseModal.vue'
 import { useT } from '~/composables/use_t'
-import { formatBytes } from '~/utils/format_bytes'
+import { useByteFormat } from '~/composables/use_byte_format'
 import type { DocumentModalLabels } from '~/types/documents'
 
 /**
@@ -34,6 +34,7 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useT()
+const { formatFileSize } = useByteFormat()
 const fileInput = ref<HTMLInputElement>()
 const isDragging = ref(false)
 
@@ -134,7 +135,7 @@ function submit() {
             :key="`${file.name}-${index}`"
             class="flex items-center justify-between gap-2 text-fg-muted"
           >
-            <span class="truncate">{{ file.name }} · {{ formatBytes(file.size) }}</span>
+            <span class="truncate">{{ file.name }} · {{ formatFileSize(file.size) }}</span>
             <BaseButton
               type="button"
               variant="ghost"
