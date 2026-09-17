@@ -8,12 +8,19 @@ import { BoatRigFactory } from '#database/factories/boat_rig_factory'
 import { BoatSafetyEquipmentFactory } from '#database/factories/boat_safety_equipment_factory'
 import { BoatSailFactory } from '#database/factories/boat_sail_factory'
 import { createAdminUser } from '#tests/functional/helpers'
+import { assertPageContract } from '#tests/support/inertia_page'
 
 /**
  * Les six pages d'équipement à onglets reçoivent `initialTab` du serveur
  * (valeur brute de `?tab=`, `null` sans paramètre) pour que le rendu SSR parte
  * du bon onglet — même contrat que `boats.show` (#463).
+ *
+ * Ces six cas tenaient dans une seule boucle jusqu'à #689. Le nom du composant
+ * y était lu dans un tableau : l'assertion était juste, mais aucune garde
+ * statique ne pouvait la compter, et un échec ne disait pas *quelle* page avait
+ * cassé. Un test par page, avec son nom en toutes lettres, corrige les deux.
  */
+
 async function seed() {
   const user = await createAdminUser()
   const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
@@ -23,43 +30,101 @@ async function seed() {
   await BoatRigFactory.merge({ boatId: boat.id }).create()
   const safety = await BoatSafetyEquipmentFactory.merge({ boatId: boat.id }).create()
   const generic = await BoatGenericEquipmentFactory.merge({ boatId: boat.id }).create()
+
   return {
     user,
-    urls: [
-      { component: 'boats/engine_show', url: `/boats/${boat.id}/engines/${engine.id}` },
-      {
-        component: 'boats/engine_part_show',
-        url: `/boats/${boat.id}/engines/${engine.id}/parts/${part.id}`,
-      },
-      { component: 'boats/sail_show', url: `/boats/${boat.id}/sails/${sail.id}` },
-      { component: 'boats/rig_show', url: `/boats/${boat.id}/rig` },
-      {
-        component: 'boats/safety_equipment_show',
-        url: `/boats/${boat.id}/safety-equipment/${safety.id}`,
-      },
-      {
-        component: 'boats/generic_equipment_show',
-        url: `/boats/${boat.id}/generic-equipment/${generic.id}`,
-      },
-    ],
+    urls: {
+      engine: `/boats/${boat.id}/engines/${engine.id}`,
+      enginePart: `/boats/${boat.id}/engines/${engine.id}/parts/${part.id}`,
+      sail: `/boats/${boat.id}/sails/${sail.id}`,
+      rig: `/boats/${boat.id}/rig`,
+      safety: `/boats/${boat.id}/safety-equipment/${safety.id}`,
+      generic: `/boats/${boat.id}/generic-equipment/${generic.id}`,
+    },
   }
 }
 
 test.group('Pages d’équipement — prop initialTab (functional)', (group) => {
   group.each.setup(() => truncateDb())
 
-  test('chaque page transmet le ?tab= demandé, ou null sans paramètre', async ({ client }) => {
+  test('la fiche moteur transmet le ?tab= demandé, ou null sans paramètre', async ({
+    client,
+    assert,
+  }) => {
     const { user, urls } = await seed()
 
-    for (const { component, url } of urls) {
-      const withTab = await client.get(`${url}?tab=photos`).loginAs(user).withInertia()
-      withTab.assertStatus(200)
-      withTab.assertInertiaComponent(component)
-      withTab.assertInertiaPropsContains({ initialTab: 'photos' })
+    const withTab = await client.get(`${urls.engine}?tab=photos`).loginAs(user).withInertia()
+    assertPageContract(assert, withTab, 'boats/engine_show')
+    withTab.assertInertiaPropsContains({ initialTab: 'photos' })
 
-      const without = await client.get(url).loginAs(user).withInertia()
-      without.assertStatus(200)
-      without.assertInertiaPropsContains({ initialTab: null })
-    }
+    const without = await client.get(urls.engine).loginAs(user).withInertia()
+    assertPageContract(assert, without, 'boats/engine_show')
+    without.assertInertiaPropsContains({ initialTab: null })
+  })
+
+  test('la fiche pièce moteur transmet le ?tab= demandé, ou null', async ({ client, assert }) => {
+    const { user, urls } = await seed()
+
+    const withTab = await client.get(`${urls.enginePart}?tab=photos`).loginAs(user).withInertia()
+    assertPageContract(assert, withTab, 'boats/engine_part_show')
+    withTab.assertInertiaPropsContains({ initialTab: 'photos' })
+
+    const without = await client.get(urls.enginePart).loginAs(user).withInertia()
+    assertPageContract(assert, without, 'boats/engine_part_show')
+    without.assertInertiaPropsContains({ initialTab: null })
+  })
+
+  test('la fiche voile transmet le ?tab= demandé, ou null', async ({ client, assert }) => {
+    const { user, urls } = await seed()
+
+    const withTab = await client.get(`${urls.sail}?tab=photos`).loginAs(user).withInertia()
+    assertPageContract(assert, withTab, 'boats/sail_show')
+    withTab.assertInertiaPropsContains({ initialTab: 'photos' })
+
+    const without = await client.get(urls.sail).loginAs(user).withInertia()
+    assertPageContract(assert, without, 'boats/sail_show')
+    without.assertInertiaPropsContains({ initialTab: null })
+  })
+
+  test('la fiche gréement transmet le ?tab= demandé, ou null', async ({ client, assert }) => {
+    const { user, urls } = await seed()
+
+    const withTab = await client.get(`${urls.rig}?tab=photos`).loginAs(user).withInertia()
+    assertPageContract(assert, withTab, 'boats/rig_show')
+    withTab.assertInertiaPropsContains({ initialTab: 'photos' })
+
+    const without = await client.get(urls.rig).loginAs(user).withInertia()
+    assertPageContract(assert, without, 'boats/rig_show')
+    without.assertInertiaPropsContains({ initialTab: null })
+  })
+
+  test('la fiche matériel de sécurité transmet le ?tab= demandé, ou null', async ({
+    client,
+    assert,
+  }) => {
+    const { user, urls } = await seed()
+
+    const withTab = await client.get(`${urls.safety}?tab=photos`).loginAs(user).withInertia()
+    assertPageContract(assert, withTab, 'boats/safety_equipment_show')
+    withTab.assertInertiaPropsContains({ initialTab: 'photos' })
+
+    const without = await client.get(urls.safety).loginAs(user).withInertia()
+    assertPageContract(assert, without, 'boats/safety_equipment_show')
+    without.assertInertiaPropsContains({ initialTab: null })
+  })
+
+  test('la fiche équipement générique transmet le ?tab= demandé, ou null', async ({
+    client,
+    assert,
+  }) => {
+    const { user, urls } = await seed()
+
+    const withTab = await client.get(`${urls.generic}?tab=photos`).loginAs(user).withInertia()
+    assertPageContract(assert, withTab, 'boats/generic_equipment_show')
+    withTab.assertInertiaPropsContains({ initialTab: 'photos' })
+
+    const without = await client.get(urls.generic).loginAs(user).withInertia()
+    assertPageContract(assert, without, 'boats/generic_equipment_show')
+    without.assertInertiaPropsContains({ initialTab: null })
   })
 })
