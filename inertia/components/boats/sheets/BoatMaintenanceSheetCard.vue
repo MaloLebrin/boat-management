@@ -14,7 +14,7 @@ import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import { MAINTENANCE_SHEET_TEMPLATES } from '#shared/constants/maintenance/maintenance_sheet_content'
 import type { BoatShowDetail, MaintenanceSheetRow } from '~/types/boat_show'
-import { confirmed } from '~/utils/confirm_delete'
+import { confirmed } from '~/utils/native_dialog'
 
 const { t } = useT()
 const { formatDate } = useDateFormat()

@@ -8,7 +8,7 @@ import { useNumberFormat } from '~/composables/use_number_format'
 import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import type { BoatBudgetEntryItem } from '#shared/types/budget'
-import { confirmDelete } from '~/utils/confirm_delete'
+import { confirmDelete } from '~/utils/native_dialog'
 
 const props = defineProps<{
   boatId: number

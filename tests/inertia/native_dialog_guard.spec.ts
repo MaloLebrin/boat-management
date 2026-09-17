@@ -18,7 +18,7 @@ function offenders(files: string[], pattern: RegExp): string[] {
 
 /**
  * Garde de la vague 3.5 : la confirmation native n'a plus qu'un appelant,
- * `utils/confirm_delete.ts`. Ailleurs, un `confirm()` nu lève côté SSR, et
+ * `utils/native_dialog.ts`. Ailleurs, un `confirm()` nu lève côté SSR, et
  * disperser ces dialogues rend impossible leur passage groupé à
  * `BaseConfirmModal`. Les écrans qui confirment dans l'app continuent de
  * passer par leur modale — cette garde ne regarde que le dialogue natif.
@@ -39,7 +39,7 @@ describe('Confirmation native', () => {
   })
 
   test('le helper partagé est le seul à porter le dialogue', () => {
-    const helper = readFileSync(join(ROOT, 'utils/confirm_delete.ts'), 'utf8')
+    const helper = readFileSync(join(ROOT, 'utils/native_dialog.ts'), 'utf8')
     expect(helper).toContain('window.confirm(message)')
   })
 })

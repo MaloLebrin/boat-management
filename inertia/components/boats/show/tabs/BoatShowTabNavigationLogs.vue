@@ -16,7 +16,7 @@ import type {
   NavigationLogPortOption,
 } from '~/types/boat_show'
 import type { CrewMemberOption } from '../../../../../shared/types/crew'
-import { confirmDelete } from '~/utils/confirm_delete'
+import { confirmDelete } from '~/utils/native_dialog'
 
 const props = withDefaults(
   defineProps<{

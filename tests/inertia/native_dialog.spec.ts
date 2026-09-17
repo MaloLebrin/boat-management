@@ -6,7 +6,7 @@ vi.mock('@inertiajs/vue3', async () => {
   return inertiaMock()
 })
 
-import { confirmDelete, confirmed } from '../../inertia/utils/confirm_delete'
+import { confirmDelete, confirmed } from '../../inertia/utils/native_dialog'
 
 let answers: boolean[] = []
 let asked: string[] = []

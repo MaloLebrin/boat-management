@@ -6,7 +6,7 @@ import EnginePartModal from '~/components/engine/show/EnginePartModal.vue'
 import { useT } from '~/composables/use_t'
 import type { BoatShowEnginePart } from '~/types/boat_show'
 import { wearStateVariant } from '~/utils/status_variants'
-import { confirmDelete } from '~/utils/confirm_delete'
+import { confirmDelete } from '~/utils/native_dialog'
 
 const props = defineProps<{
   parts: BoatShowEnginePart[]

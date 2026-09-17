@@ -10,7 +10,7 @@ import {
   engineStrokeSuffix,
 } from '~/utils/boat_enum_labels'
 import type { BoatShowDetail, FuelLogRow } from '~/types/boat_show'
-import { confirmDelete } from '~/utils/confirm_delete'
+import { confirmDelete } from '~/utils/native_dialog'
 
 const props = defineProps<{
   boat: BoatShowDetail
