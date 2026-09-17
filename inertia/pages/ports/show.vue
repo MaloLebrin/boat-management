@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head, router } from '@inertiajs/vue3'
+import { Head } from '@inertiajs/vue3'
 import { Link } from '@adonisjs/inertia/vue'
 import { ref } from 'vue'
 import { MapPinIcon, PencilIcon, TrashIcon } from '@heroicons/vue/24/outline'
@@ -11,6 +11,7 @@ import MarinaMapTab from '~/components/ports/show/tabs/MarinaMapTab.vue'
 import PortListTab from '~/components/ports/show/tabs/PortListTab.vue'
 import { useCountries } from '~/composables/use_countries'
 import { useT } from '~/composables/use_t'
+import { useDeleteConfirmation } from '~/composables/use_delete_confirmation'
 import type { BoatOption, PortShowDetail } from '~/types/port'
 import { notify } from '~/utils/native_dialog'
 
@@ -34,7 +35,7 @@ const tabs = [
   { key: 'plan', label: t('ports.tabs.plan') },
 ]
 
-const showDeleteConfirm = ref(false)
+const deletion = useDeleteConfirmation({ url: () => `/ports/${props.port.id}` })
 
 function handleDeletePort() {
   // Un bateau est rattaché à une place, pas au ponton : le ponton n'expose pas
@@ -47,11 +48,7 @@ function handleDeletePort() {
     notify(t('ports.hasBoats'))
     return
   }
-  showDeleteConfirm.value = true
-}
-
-function executeDeletePort() {
-  router.delete(`/ports/${props.port.id}`)
+  deletion.ask()
 }
 </script>
 
@@ -106,13 +103,13 @@ function executeDeletePort() {
     </div>
 
     <BaseConfirmModal
-      :open="showDeleteConfirm"
+      :open="deletion.isOpen.value"
       :title="t('ports.delete')"
       :message="t('ports.deleteConfirm')"
       :confirm-label="t('common.delete')"
       :cancel-label="t('common.cancel')"
-      @update:open="showDeleteConfirm = $event"
-      @confirm="executeDeletePort"
+      @update:open="deletion.release()"
+      @confirm="deletion.confirm()"
     />
   </div>
 </template>

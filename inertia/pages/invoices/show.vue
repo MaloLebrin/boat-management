@@ -9,6 +9,7 @@ import BaseHeading from '~/components/base/BaseHeading.vue'
 import InvoiceStatusBadge from '~/components/invoices/InvoiceStatusBadge.vue'
 import InvoiceLinesCard from '~/components/invoices/InvoiceLinesCard.vue'
 import { useDateFormat } from '~/composables/use_date_format'
+import { useDeleteConfirmation } from '~/composables/use_delete_confirmation'
 import { useT } from '~/composables/use_t'
 import type { InvoiceDetail } from '../../../shared/types/invoice'
 
@@ -20,7 +21,11 @@ const props = defineProps<{
 const { t } = useT()
 const { formatDate } = useDateFormat()
 
-const showDeleteModal = ref(false)
+const deletion = useDeleteConfirmation({
+  url: () => `/invoices/${props.invoice.id}`,
+  visit: { preserveScroll: true },
+})
+
 const sendingEmail = ref(false)
 const busy = ref(false)
 
@@ -82,12 +87,6 @@ function markPaid() {
       },
     }
   )
-}
-
-function executeDelete() {
-  router.delete(`/invoices/${props.invoice.id}`, {
-    preserveScroll: true,
-  })
 }
 </script>
 
@@ -172,7 +171,7 @@ function executeDelete() {
           variant="danger"
           size="sm"
           type="button"
-          @click="showDeleteModal = true"
+          @click="deletion.ask()"
         >
           {{ t('invoices.delete') }}
         </BaseButton>
@@ -225,13 +224,13 @@ function executeDelete() {
     </BaseCard>
 
     <BaseConfirmModal
-      :open="showDeleteModal"
+      :open="deletion.isOpen.value"
       :title="t('invoices.deleteConfirm.title')"
       :message="t('invoices.deleteConfirm.message')"
       :confirm-label="t('invoices.delete')"
       :cancel-label="t('invoices.form.cancel')"
-      @update:open="showDeleteModal = false"
-      @confirm="executeDelete"
+      @update:open="deletion.release()"
+      @confirm="deletion.confirm()"
     />
   </div>
 </template>

@@ -1,8 +1,5 @@
-import { router } from '@inertiajs/vue3'
 import { computed, ref, type ComputedRef, type Ref } from 'vue'
-
-/** Options de visite acceptées par `router.delete`, dérivées de sa signature. */
-type DeleteVisitOptions = Parameters<typeof router.delete>[1]
+import { deleteVisit, type DeleteVisitOptions } from '~/utils/delete_visit'
 
 export interface UseRowDeleteConfirmationOptions<T> {
   /** URL de suppression de la ligne visée, calculée au moment de confirmer. */
@@ -53,12 +50,7 @@ export function useRowDeleteConfirmation<T>(
     const row = target.value
     if (row === null) return
 
-    const url = options.url(row)
-    if (options.visit === undefined) {
-      router.delete(url)
-    } else {
-      router.delete(url, options.visit)
-    }
+    deleteVisit(options.url(row), options.visit)
     release()
   }
 
