@@ -5,7 +5,7 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import { useT } from '~/composables/use_t'
 import type { NavigationLogCrewRow, CrewMemberOption } from '../../../../../shared/types/crew'
-import { confirmed } from '~/utils/confirm_delete'
+import { confirmed } from '~/utils/native_dialog'
 
 const props = defineProps<{
   boatId: number

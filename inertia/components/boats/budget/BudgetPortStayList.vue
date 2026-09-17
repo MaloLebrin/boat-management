@@ -10,7 +10,7 @@ import { useT } from '~/composables/use_t'
 import type { BoatPortStayItem } from '#shared/types/budget'
 import type { PortNameOption } from '#shared/types/port'
 import { useInlineRowEdit } from '~/composables/use_inline_row_edit'
-import { confirmDelete } from '~/utils/confirm_delete'
+import { confirmDelete } from '~/utils/native_dialog'
 
 const props = defineProps<{
   boatId: number

@@ -9,7 +9,7 @@ import { usePendingInspection } from '~/composables/use_pending_inspection'
 import { useT } from '~/composables/use_t'
 import type { BoatCategory } from '#shared/types/boat_catalog'
 import type { InspectionKind, InspectionWithPhotos } from '~/types/inspection'
-import { confirmDelete } from '~/utils/confirm_delete'
+import { confirmDelete } from '~/utils/native_dialog'
 
 const props = defineProps<{
   boatId: number

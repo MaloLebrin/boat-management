@@ -11,7 +11,7 @@ import type {
   EquipmentActionStatus,
   EquipmentActionType,
 } from '~/types/boat_show'
-import { confirmDelete } from '~/utils/confirm_delete'
+import { confirmDelete } from '~/utils/native_dialog'
 
 const props = defineProps<{
   boat: BoatShowDetail

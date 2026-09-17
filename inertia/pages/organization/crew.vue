@@ -9,7 +9,7 @@ import CrewCertificationForm from '~/components/crew/CrewCertificationForm.vue'
 import CrewCertificationBadge from '~/components/crew/CrewCertificationBadge.vue'
 import { useT } from '~/composables/use_t'
 import type { CrewMemberRow } from '../../../shared/types/crew'
-import { confirmDelete } from '~/utils/confirm_delete'
+import { confirmDelete } from '~/utils/native_dialog'
 
 const props = defineProps<{
   crewMembers: CrewMemberRow[]

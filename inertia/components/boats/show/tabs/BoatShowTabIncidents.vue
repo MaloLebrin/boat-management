@@ -5,7 +5,7 @@ import BoatIncidentForm from '~/components/boats/show/tabs/BoatIncidentForm.vue'
 import { useT } from '~/composables/use_t'
 import { useDateFormat } from '~/composables/use_date_format'
 import type { BoatIncidentRow, BoatShowDetail, IncidentStatus } from '~/types/boat_show'
-import { confirmDelete } from '~/utils/confirm_delete'
+import { confirmDelete } from '~/utils/native_dialog'
 
 const props = defineProps<{
   boat: BoatShowDetail

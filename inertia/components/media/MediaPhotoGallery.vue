@@ -6,7 +6,7 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import { useNetworkStatus } from '~/composables/use_network_status'
 import { useT } from '~/composables/use_t'
 import type { MediaRow } from '~/types/boat_show'
-import { confirmDelete } from '~/utils/confirm_delete'
+import { confirmDelete } from '~/utils/native_dialog'
 
 const props = defineProps<{
   uploadUrl: string
