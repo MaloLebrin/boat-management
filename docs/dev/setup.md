@@ -29,6 +29,19 @@ Valeurs par défaut dans le compose:
 - User: `3d-website`
 - Password: `3d-website`
 
+### Base de test
+
+Les tests ne tournent **pas** sur la base de dev : le compose expose un second
+service `postgres_test` (profil `test`), sur le port hôte `5432`, avec `test`
+comme base, utilisateur et mot de passe. C'est ce que déclarent `.env.test` et
+le bloc `env:` des jobs de tests de la CI — les trois doivent rester alignés.
+
+```bash
+pnpm test:db:up     # démarre postgres_test et attend qu'il soit prêt
+pnpm test           # suites unit, integration, functional
+pnpm test:db:down   # arrête le conteneur (données en tmpfs, rien à nettoyer)
+```
+
 ## Lancer en dev
 
 ```bash

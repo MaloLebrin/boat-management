@@ -43,33 +43,35 @@ jobs:
       - name: Garde-fou service worker
         run: pnpm check:sw
 
-  test-backend-shards:
-    name: "test-backend (${{ matrix.name }})"
+  # La matrice n'est plus écrite à la main : `scripts/ci_test_shards.mjs` la
+  # dérive de `tests/functional/` et équilibre les specs au fichier près. Un
+  # nouveau répertoire de tests est donc shardé sans toucher à ce fichier — la
+  # liste `--files` d'avant était une allowlist, et tout répertoire absent de
+  # cette liste ne tournait jamais en CI sans que rien n'échoue (#687).
+  test-backend-matrix:
+    name: test-backend (matrice)
     runs-on: ubuntu-latest
+    outputs:
+      shards: ${{ steps.compute.outputs.shards }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      # Script sans dépendance : pas de pnpm install à payer pour 150 ms de calcul.
+      - id: compute
+        run: echo "shards=$(node scripts/ci_test_shards.mjs)" >> "$GITHUB_OUTPUT"
+      - name: Répartition des shards
+        run: node scripts/ci_test_shards.mjs --explain
+
+  test-backend-shards:
+    name: "test-backend (${{ matrix.shard.name }})"
+    runs-on: ubuntu-latest
+    needs: [test-backend-matrix]
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - name: unit-integration
-            suites: unit integration
-            files: ""
-          - name: functional-boats
-            suites: functional
-            files: "boats/*"
-          - name: functional-core
-            suites: functional
-            # Le flag Japa --files ne supporte pas `**` : chaque filtre matche
-            # un segment de chemin (le `*` ne couvre qu'un seul niveau), donc
-            # "dossier/*" cible tous les fichiers directement sous ce dossier.
-            files: "billing/*,settings/*,marketing/*,auth/*,invoices/*,maintenance/*,ports/*,routing/*"
-          - name: functional-other
-            suites: functional
-            # "functional/contact" et "functional/simulator" ciblent les 2
-            # fichiers à la racine de tests/functional/ — un filtre "contact"
-            # ou "simulator" seul matcherait aussi des fichiers d'autres
-            # dossiers au nom similaire (routing/contact.spec.ts,
-            # boats/boat_simulator.spec.ts), d'où l'ancrage sur 2 segments.
-            files: "spare_parts/*,ai/*,assistant/*,clients/*,organization/*,quota/*,simulator/*,crew/*,dashboard/*,diagnostic/*,navigation/*,notifications/*,errors/*,health/*,planning/*,pricing/*,push/*,search/*,functional/contact,functional/simulator"
+        shard: ${{ fromJson(needs.test-backend-matrix.outputs.shards) }}
     services:
       postgres:
         image: postgres:18-alpine
@@ -96,8 +98,8 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - name: "Backend tests (PostgreSQL) — ${{ matrix.name }}"
-        run: node ace test ${{ matrix.suites }} ${{ matrix.files != '' && format('--files={0}', matrix.files) || '' }}
+      - name: "Backend tests (PostgreSQL) — ${{ matrix.shard.name }}"
+        run: node ace test ${{ matrix.shard.suites }} ${{ matrix.shard.files != '' && format('--files="{0}"', matrix.shard.files) || '' }}
         env:
           NODE_ENV: test
           TZ: UTC
@@ -127,11 +129,15 @@ jobs:
   test-backend:
     name: test-backend
     runs-on: ubuntu-latest
-    needs: [test-backend-shards]
+    needs: [test-backend-matrix, test-backend-shards]
     if: always()
     steps:
       - name: Check backend shard results
         run: |
+          if [ "${{ needs.test-backend-matrix.result }}" != "success" ]; then
+            echo "Shard matrix generation failed."
+            exit 1
+          fi
           if [ "${{ needs.test-backend-shards.result }}" != "success" ]; then
             echo "One or more test-backend shards failed."
             exit 1

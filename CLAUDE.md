@@ -4,11 +4,11 @@
 
 - **Backend** : AdonisJS v7 (TypeScript strict)
 - **Frontend** : Vue 3 (Composition API) + Inertia.js (SSR)
-- **Base de données** : PostgreSQL via Lucid ORM (SQLite pour les tests)
+- **Base de données** : PostgreSQL via Lucid ORM (PostgreSQL aussi en test — service `postgres_test` du `docker-compose.yml`, jamais SQLite)
 - **ORM** : Lucid (migrations, seeders)
 - **Auth** : @adonisjs/auth avec bouncer + abilities pour les ACL
 - **IA** : Mistral AI via `@mistralai/mistralai` + système de queue AdonisJS
-- **Tests backend** : Japa (functional + unit)
+- **Tests backend** : Japa — suites `unit`, `integration`, `functional` (`pnpm test`) et `browser`/Playwright (`pnpm test:e2e`, hors `pnpm test`)
 - **Tests frontend** : Vitest + @vue/test-utils
 - **Package manager** : pnpm
 - **Déploiement** : Docker + CI/CD GitHub Actions
