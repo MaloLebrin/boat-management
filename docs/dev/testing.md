@@ -5,6 +5,17 @@
 Script: `pnpm test` (alias `node ace test`).
 Répertoire: `tests/` (unit/functional, selon la suite).
 
+**CI** : le job `test-backend` tourne en 4 shards parallèles (`unit-integration`,
+`functional-boats`, `functional-core`, `functional-other`), équilibrés par nombre de
+fichiers via le flag natif `--files` de Japa, chacun avec son propre conteneur Postgres
+éphémère. Un job d'agrégation `test-backend` (`needs` sur les 4 shards) reste l'unique
+check requis pour la protection de branche. En local, `pnpm test` est inchangé et lance
+toujours `unit`, `integration` et `functional` en séquentiel.
+
+Le flag `--files` matche par segment de chemin, sans support du glob récursif `**` :
+`"dossier/*"` cible tous les fichiers directement sous ce dossier (un seul niveau) — voir
+`.github/workflows/ci.yml` pour le détail des filtres par shard.
+
 ## Frontend Inertia (Vitest)
 
 Script: `pnpm test:inertia` (alias `vitest run`).

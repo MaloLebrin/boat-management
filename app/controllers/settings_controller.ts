@@ -27,6 +27,8 @@ import hash from '@adonisjs/core/services/hash'
 import type { HttpContext } from '@adonisjs/core/http'
 import { isAiProvider, modelBelongsToProvider } from '#shared/types/ai'
 import { PLAN_LIMITS } from '#shared/types/plan'
+import { isThemePreference } from '#shared/types/theme'
+import type { ThemePreference } from '#shared/types/theme'
 import type { BooleanQuotaKey } from '#shared/types/plan'
 import { BILLING_SETTINGS_PATH } from '#shared/constants/billing'
 
@@ -163,16 +165,32 @@ export default class SettingsController {
     return response.redirect().back()
   }
 
+  /**
+   * Le cookie double la colonne `users.locale` pour que les pages pré-auth
+   * (login, marketing) rendent la bonne langue dès le serveur — cf. #403.
+   * `httpOnly: false` est voulu : le switcher de langue lit ce cookie côté
+   * client.
+   */
+  #rememberLocale(response: HttpContext['response'], locale: 'en' | 'fr'): void {
+    response.cookie('locale', locale, { maxAge: '365d', path: '/', httpOnly: false })
+  }
+
+  /**
+   * Même schéma pour le thème (#416) : cookie signé, lu côté serveur
+   * uniquement (`resolveSharedTheme`) — le front applique le thème via la
+   * prop partagée.
+   */
+  #rememberTheme(response: HttpContext['response'], theme: ThemePreference): void {
+    response.cookie('theme', theme, { maxAge: '365d', path: '/' })
+  }
+
   async updateLocale({ request, response, session, auth, i18n }: HttpContext) {
     const user = await auth.authenticate()
     const { locale } = await request.validateUsing(updateLocaleValidator)
 
     user.locale = locale
     await user.save()
-
-    // Keep the cookie in sync so pre-auth pages (login, marketing) match the
-    // persisted preference right away — cf. #403.
-    response.cookie('locale', locale, { maxAge: '365d', path: '/', httpOnly: false })
+    this.#rememberLocale(response, locale)
 
     session.flash('success', i18n.t('flash.settings.localeUpdated'))
     return response.redirect().back()
@@ -184,14 +202,40 @@ export default class SettingsController {
 
     user.theme = theme
     await user.save()
-
-    // Le cookie double la colonne pour que les pages pré-auth (login,
-    // marketing) rendent le bon thème dès le serveur, sans flash de couleur —
-    // même schéma que la locale (#403). Il est signé et lu côté serveur
-    // uniquement : le front applique le thème via la prop partagée.
-    response.cookie('theme', theme, { maxAge: '365d', path: '/' })
+    this.#rememberTheme(response, theme)
 
     session.flash('success', i18n.t('flash.settings.themeUpdated'))
+    return response.redirect().back()
+  }
+
+  /**
+   * Route publique `POST /locale` (switcher de l'en-tête, aussi présent sur
+   * le marketing et l'écran de login). Une valeur inconnue est ignorée sans
+   * erreur ; la préférence est persistée sur le profil quand l'utilisateur
+   * est connecté, pour survivre au logout (#414 / #403).
+   */
+  async setLocale({ request, response, auth }: HttpContext) {
+    const locale = request.input('locale')
+    if (locale === 'en' || locale === 'fr') {
+      this.#rememberLocale(response, locale)
+      if (await auth.check()) {
+        auth.user!.locale = locale
+        await auth.user!.save()
+      }
+    }
+    return response.redirect().back()
+  }
+
+  /** Route publique `POST /theme`, pendant de `setLocale` pour le thème (#416). */
+  async setTheme({ request, response, auth }: HttpContext) {
+    const theme = request.input('theme')
+    if (isThemePreference(theme)) {
+      this.#rememberTheme(response, theme)
+      if (await auth.check()) {
+        auth.user!.theme = theme
+        await auth.user!.save()
+      }
+    }
     return response.redirect().back()
   }
 

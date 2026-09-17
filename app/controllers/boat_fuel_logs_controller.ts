@@ -1,8 +1,7 @@
-import BoatFuelLogService, {
-  BoatFuelLogNotFoundError,
-  BoatFuelLogValidationError,
-} from '#services/boat_fuel_log_service'
-import BoatService, { BoatNotFoundError } from '#services/boat_service'
+import BoatFuelLogService from '#services/boat_fuel_log_service'
+import { BoatFuelLogNotFoundError, BoatFuelLogValidationError } from '#exceptions/fuel_log_errors'
+import BoatHullService from '#services/boat_hull_service'
+import { BoatNotFoundError } from '#exceptions/boat_errors'
 import FuelLogPolicy from '#policies/fuel_log_policy'
 import { createBoatFuelLogValidator } from '#validators/boat_fuel_log'
 import { inject } from '@adonisjs/core'
@@ -11,7 +10,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 @inject()
 export default class BoatFuelLogsController {
   constructor(
-    private boatService: BoatService,
+    private boatService: BoatHullService,
     private fuelLogService: BoatFuelLogService
   ) {}
 

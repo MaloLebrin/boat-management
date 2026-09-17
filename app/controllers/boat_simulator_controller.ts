@@ -6,7 +6,7 @@ import {
   SIMULATOR_BOAT_TYPES,
   type SimulatorBoatInput,
   type SimulatorBoatType,
-} from '../../shared/types/simulator.js'
+} from '#shared/types/simulator'
 
 @inject()
 export default class BoatSimulatorController {

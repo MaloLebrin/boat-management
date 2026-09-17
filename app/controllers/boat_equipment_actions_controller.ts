@@ -3,7 +3,8 @@ import {
   BoatEquipmentActionValidationError,
 } from '#exceptions/equipment_action_errors'
 import BoatEquipmentActionService from '#services/boat_equipment_action_service'
-import BoatService, { BoatNotFoundError } from '#services/boat_service'
+import BoatHullService from '#services/boat_hull_service'
+import { BoatNotFoundError } from '#exceptions/boat_errors'
 import EquipmentActionPolicy from '#policies/equipment_action_policy'
 import {
   createBoatEquipmentActionValidator,
@@ -15,7 +16,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 @inject()
 export default class BoatEquipmentActionsController {
   constructor(
-    private boatService: BoatService,
+    private boatService: BoatHullService,
     private equipmentActionService: BoatEquipmentActionService
   ) {}
 

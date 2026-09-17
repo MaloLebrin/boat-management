@@ -13,6 +13,7 @@ import type Boat from '#models/boat'
 import type User from '#models/user'
 import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
+import { assertBoatInUserOrg } from '#utils/boat_utils'
 
 export {
   BoatMaintenanceSheetIncompleteError,
@@ -28,12 +29,6 @@ function toDateTime(value: Date | DateTime): DateTime {
   return DateTime.fromJSDate(value)
 }
 
-function assertBoatScope(user: User, boat: Boat) {
-  if (user.organizationId === null || user.organizationId !== boat.organizationId) {
-    throw new BoatMaintenanceSheetNotFoundError()
-  }
-}
-
 @inject()
 export default class BoatMaintenanceSheetService {
   constructor(private templateService: BoatMaintenanceSheetTemplateService) {}
@@ -43,7 +38,7 @@ export default class BoatMaintenanceSheetService {
    * Items are preloaded and ordered by position asc.
    */
   async listForBoat(user: User, boat: Boat): Promise<BoatMaintenanceSheet[]> {
-    assertBoatScope(user, boat)
+    assertBoatInUserOrg(user, boat, () => new BoatMaintenanceSheetNotFoundError())
 
     return await BoatMaintenanceSheet.query()
       .where('boatId', boat.id)
@@ -64,7 +59,7 @@ export default class BoatMaintenanceSheetService {
     payload: CreateSheetPayload,
     locale?: string
   ): Promise<BoatMaintenanceSheet> {
-    assertBoatScope(user, boat)
+    assertBoatInUserOrg(user, boat, () => new BoatMaintenanceSheetNotFoundError())
 
     const sheet = await BoatMaintenanceSheet.create({
       boatId: boat.id,
@@ -101,7 +96,7 @@ export default class BoatMaintenanceSheetService {
    * Marks a maintenance sheet as completed.
    */
   async completeSheet(user: User, boat: Boat, sheetId: number): Promise<void> {
-    assertBoatScope(user, boat)
+    assertBoatInUserOrg(user, boat, () => new BoatMaintenanceSheetNotFoundError())
 
     const sheet = await BoatMaintenanceSheet.query()
       .where('id', sheetId)
@@ -127,7 +122,7 @@ export default class BoatMaintenanceSheetService {
    * Deletes a maintenance sheet and its items.
    */
   async deleteSheet(user: User, boat: Boat, sheetId: number): Promise<void> {
-    assertBoatScope(user, boat)
+    assertBoatInUserOrg(user, boat, () => new BoatMaintenanceSheetNotFoundError())
 
     const sheet = await BoatMaintenanceSheet.query()
       .where('id', sheetId)
@@ -151,7 +146,7 @@ export default class BoatMaintenanceSheetService {
     itemId: number,
     payload: UpdateItemPayload
   ): Promise<void> {
-    assertBoatScope(user, boat)
+    assertBoatInUserOrg(user, boat, () => new BoatMaintenanceSheetNotFoundError())
 
     const sheet = await BoatMaintenanceSheet.query()
       .where('id', sheetId)

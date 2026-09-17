@@ -2,6 +2,7 @@ import type Invoice from '#models/invoice'
 import type Organization from '#models/organization'
 import type { I18n } from '@adonisjs/i18n'
 import { formatDate } from '#shared/helpers/date_format'
+import { formatCurrency } from '#shared/helpers/number_format'
 import { inject } from '@adonisjs/core'
 import PDFDocument from 'pdfkit'
 import { PLAN_LIMITS } from '#shared/types/plan'
@@ -43,8 +44,8 @@ export default class InvoicePdfService {
 
     await this.#renderHeader(doc, invoice, org, primaryColor, canWhiteLabel, t, i18n.locale)
     this.#renderMetadata(doc, invoice, t)
-    this.#renderLinesTable(doc, invoice, primaryColor, t)
-    this.#renderTotals(doc, invoice, t)
+    this.#renderLinesTable(doc, invoice, primaryColor, t, i18n.locale)
+    this.#renderTotals(doc, invoice, t, i18n.locale)
     this.#renderNotes(doc, invoice, t)
     this.#renderLegalMentions(doc, t)
     this.#renderFooter(doc, org, t)
@@ -172,18 +173,17 @@ export default class InvoicePdfService {
     doc: PDFKit.PDFDocument,
     invoice: Invoice,
     primaryColor: string,
-    t: (key: string, data?: Record<string, string>) => string
+    t: (key: string, data?: Record<string, string>) => string,
+    locale: string
   ): void {
     const C_DESC = CONTENT_W * 0.5
     const C_QTY = CONTENT_W * 0.12
     const C_UNIT = CONTENT_W * 0.19
     const C_AMOUNT = CONTENT_W * 0.19
 
-    const formatter = new Intl.NumberFormat(undefined, {
-      style: 'currency',
-      currency: invoice.currency,
-      minimumFractionDigits: 2,
-    })
+    // Locale du lecteur (celle de la requête ou du destinataire), jamais
+    // celle du serveur : `undefined` rendait « €120.00 » sur un devis français.
+    const money = (value: number) => formatCurrency(value, locale, { currency: invoice.currency })
 
     // Header row
     const headerY = doc.y
@@ -221,11 +221,11 @@ export default class InvoicePdfService {
       doc.fontSize(8).font('Helvetica').fillColor(GREY_D)
       doc.text(line.label, MARGIN, rowY, { width: C_DESC - 8 })
       doc.text(String(qty), MARGIN + C_DESC, rowY, { width: C_QTY - 4, align: 'right' })
-      doc.text(formatter.format(unitPrice), MARGIN + C_DESC + C_QTY, rowY, {
+      doc.text(money(unitPrice), MARGIN + C_DESC + C_QTY, rowY, {
         width: C_UNIT - 4,
         align: 'right',
       })
-      doc.text(formatter.format(amount), MARGIN + C_DESC + C_QTY + C_UNIT, rowY, {
+      doc.text(money(amount), MARGIN + C_DESC + C_QTY + C_UNIT, rowY, {
         width: C_AMOUNT,
         align: 'right',
       })
@@ -239,13 +239,10 @@ export default class InvoicePdfService {
   #renderTotals(
     doc: PDFKit.PDFDocument,
     invoice: Invoice,
-    t: (key: string, data?: Record<string, string>) => string
+    t: (key: string, data?: Record<string, string>) => string,
+    locale: string
   ): void {
-    const formatter = new Intl.NumberFormat(undefined, {
-      style: 'currency',
-      currency: invoice.currency,
-      minimumFractionDigits: 2,
-    })
+    const money = (value: number) => formatCurrency(value, locale, { currency: invoice.currency })
 
     const subtotal = Number.parseFloat(invoice.subtotal)
     const taxRate = Number.parseFloat(invoice.taxRate)
@@ -261,7 +258,7 @@ export default class InvoicePdfService {
     // Subtotal
     let y = doc.y
     doc.fontSize(9).font('Helvetica').fillColor(GREY_D).text(t('subtotal'), labelX, y)
-    doc.text(formatter.format(subtotal), valueX, y, { width: valueW, align: 'right' })
+    doc.text(money(subtotal), valueX, y, { width: valueW, align: 'right' })
 
     // Tax
     y += 16
@@ -270,7 +267,7 @@ export default class InvoicePdfService {
       .font('Helvetica')
       .fillColor(GREY_D)
       .text(t('tax', { rate: String(taxRate) }), labelX, y)
-    doc.text(formatter.format(taxAmount), valueX, y, { width: valueW, align: 'right' })
+    doc.text(money(taxAmount), valueX, y, { width: valueW, align: 'right' })
 
     // Total
     y += 20
@@ -280,7 +277,7 @@ export default class InvoicePdfService {
       .font('Helvetica-Bold')
       .fillColor(WHITE)
       .text(t('total'), labelX, y + 2)
-    doc.text(formatter.format(total), valueX, y + 2, { width: valueW, align: 'right' })
+    doc.text(money(total), valueX, y + 2, { width: valueW, align: 'right' })
 
     doc.fillColor('#000')
     doc.text('', MARGIN, y + 30)

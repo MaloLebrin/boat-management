@@ -1,6 +1,6 @@
 import BoatPolicy from '#policies/boat_policy'
-import BoatEquipmentService, { BoatEquipmentNotFoundError } from '#services/boat_equipment_service'
-import BoatHullService, { BoatNotFoundError } from '#services/boat_hull_service'
+import BoatEquipmentService from '#services/boat_equipment_service'
+import { BoatEquipmentNotFoundError } from '#exceptions/boat_errors'
 import MediaService from '#services/media_service'
 import OrganizationService from '#services/organization_service'
 import BoatMaintenanceTaskService from '#services/boat_maintenance_task_service'
@@ -14,34 +14,22 @@ import {
 } from '#validators/boat_safety_equipment'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
+import BoatContextService from '#services/boat_context_service'
+import { initialTabParam } from '#utils/inertia_tab'
 
 @inject()
 export default class BoatSafetyEquipmentController {
   constructor(
-    private boatService: BoatHullService,
+    private boatContext: BoatContextService,
     private equipmentService: BoatEquipmentService,
     private organizationService: OrganizationService,
     private mediaService: MediaService,
     private taskService: BoatMaintenanceTaskService
   ) {}
 
-  private async loadBoat(ctx: Pick<HttpContext, 'auth' | 'response' | 'params'>) {
-    const user = ctx.auth.getUserOrFail()
-    try {
-      const boat = await this.boatService.getForUserOrFail(user, Number(ctx.params.boatId))
-      return { user, boat }
-    } catch (error) {
-      if (error instanceof BoatNotFoundError) {
-        ctx.response.redirect('/boats')
-        return null
-      }
-      throw error
-    }
-  }
-
-  async show({ inertia, response, auth, params, bouncer, session, i18n }: HttpContext) {
+  async show({ inertia, request, response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const loaded = await this.loadBoat({ auth, response, params })
+    const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
     const { boat } = loaded
 
@@ -61,6 +49,7 @@ export default class BoatSafetyEquipmentController {
 
     return inertia.render('boats/safety_equipment_show', {
       boat: { id: boat.id, name: boat.name },
+      initialTab: initialTabParam(request),
       item: {
         id: item.id,
         equipmentType: item.equipmentType,
@@ -81,7 +70,7 @@ export default class BoatSafetyEquipmentController {
 
   async store({ request, response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const loaded = await this.loadBoat({ auth, response, params })
+    const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
     const { user, boat } = loaded
     await bouncer.with(BoatPolicy).authorize('edit', boat)
@@ -102,7 +91,7 @@ export default class BoatSafetyEquipmentController {
 
   async update({ request, response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const loaded = await this.loadBoat({ auth, response, params })
+    const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
     const { user, boat } = loaded
     await bouncer.with(BoatPolicy).authorize('edit', boat)
@@ -123,7 +112,7 @@ export default class BoatSafetyEquipmentController {
 
   async destroy({ response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const loaded = await this.loadBoat({ auth, response, params })
+    const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
     const { user, boat } = loaded
     await bouncer.with(BoatPolicy).authorize('edit', boat)

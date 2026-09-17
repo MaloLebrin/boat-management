@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
-import { useCurrencyFormat } from '~/composables/use_currency_format'
+import { useNumberFormat } from '~/composables/use_number_format'
 import { useT } from '~/composables/use_t'
 import type { BoatEquipmentActionRow, EquipmentActionStatus } from '~/types/boat_show'
 
@@ -17,7 +17,7 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useT()
-const { formatCurrency } = useCurrencyFormat()
+const { formatCurrency } = useNumberFormat()
 
 const STATUS_COLORS: Record<EquipmentActionStatus, string> = {
   pending: 'bg-amber-50 text-amber-700 border-amber-200',

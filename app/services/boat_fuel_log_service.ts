@@ -7,7 +7,6 @@ import type { CreateFuelLogPayload } from '#shared/types/fuel_log'
 import { toDateTime } from '#shared/helpers/date'
 import { assertBoatInUserOrg } from '#utils/boat_utils'
 
-export { BoatFuelLogNotFoundError, BoatFuelLogValidationError }
 export type { CreateFuelLogPayload }
 
 export default class BoatFuelLogService {

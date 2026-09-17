@@ -1,4 +1,3 @@
-import { BoatEquipmentNotFoundError, BoatNotFoundError } from '#exceptions/boat_errors'
 import type Boat from '#models/boat'
 import type Organization from '#models/organization'
 import type User from '#models/user'
@@ -16,7 +15,6 @@ import BoatSafetyEquipmentService from '#services/boat_safety_equipment_service'
 import BoatSailService from '#services/boat_sail_service'
 import { inject } from '@adonisjs/core'
 
-export { BoatEquipmentNotFoundError, BoatNotFoundError }
 export type {
   BoatEnginePartPayload,
   BoatEnginePayload,

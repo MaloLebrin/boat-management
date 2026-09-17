@@ -7,7 +7,7 @@ import {
 } from '#exceptions/reservation_errors'
 import { BoatNotFoundError } from '#exceptions/boat_errors'
 import BoatReservationService from '#services/boat_reservation_service'
-import BoatService from '#services/boat_service'
+import BoatHullService from '#services/boat_hull_service'
 import BoatPricingService from '#services/boat_pricing_service'
 import PricingSeasonService from '#services/pricing_season_service'
 import ClientService from '#services/client_service'
@@ -26,7 +26,7 @@ import type User from '#models/user'
 @inject()
 export default class BoatReservationsController {
   constructor(
-    private boatService: BoatService,
+    private boatService: BoatHullService,
     private reservationService: BoatReservationService,
     private boatPricingService: BoatPricingService,
     private pricingSeasonService: PricingSeasonService,

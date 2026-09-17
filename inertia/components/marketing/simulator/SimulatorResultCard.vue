@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useT } from '~/composables/use_t'
+import { useNumberFormat } from '~/composables/use_number_format'
 import type {
   SimulatorBoatInput,
   SimulatorCostBreakdown,
@@ -24,6 +25,7 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useT()
+const { formatCurrencyNoDecimals } = useNumberFormat()
 
 const categoryLabels: Record<string, string> = {
   hull: 'simulator.cat_hull',
@@ -35,12 +37,7 @@ const categoryLabels: Record<string, string> = {
 }
 
 function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('fr-FR', {
-    style: 'currency',
-    currency: 'EUR',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount)
+  return formatCurrencyNoDecimals(amount)
 }
 
 const maxCategoryCost = computed(() =>

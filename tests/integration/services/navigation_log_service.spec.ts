@@ -1,11 +1,12 @@
 import { test } from '@japa/runner'
 import { DateTime } from 'luxon'
-import NavigationLogService, {
+import NavigationLogService from '#services/navigation_log_service'
+import {
   NavigationLogNotFoundError,
   NavigationLogInProgressError,
   NavigationLogConflictError,
   NavigationLogValidationError,
-} from '#services/navigation_log_service'
+} from '#exceptions/navigation_log_errors'
 import NavigationLog from '#models/navigation_log'
 import BoatEngine from '#models/boat_engine'
 import { BoatFactory } from '#database/factories/boat_factory'

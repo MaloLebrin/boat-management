@@ -12,6 +12,7 @@ import type {
   CreateEquipmentActionPayload,
   UpdateEquipmentActionPayload,
 } from '#shared/types/equipment_action'
+import { assertBoatInUserOrg } from '#utils/boat_utils'
 
 const ACTION_COLUMNS: string[] = [
   'id',
@@ -32,16 +33,10 @@ const ACTION_COLUMNS: string[] = [
   'updatedAt',
 ]
 
-function assertBoatScope(user: User, boat: Boat) {
-  if (user.organizationId === null || user.organizationId !== boat.organizationId) {
-    throw new BoatEquipmentActionNotFoundError()
-  }
-}
-
 @inject()
 export default class BoatEquipmentActionService {
   async listForBoat(user: User, boat: Boat) {
-    assertBoatScope(user, boat)
+    assertBoatInUserOrg(user, boat, () => new BoatEquipmentActionNotFoundError())
 
     return await BoatEquipmentAction.query()
       .select(ACTION_COLUMNS)
@@ -55,7 +50,7 @@ export default class BoatEquipmentActionService {
    * to the boat so an inspection id from another boat surfaces nothing.
    */
   async listForInspection(user: User, boat: Boat, inspection: BoatInspection) {
-    assertBoatScope(user, boat)
+    assertBoatInUserOrg(user, boat, () => new BoatEquipmentActionNotFoundError())
 
     return await BoatEquipmentAction.query()
       .select(ACTION_COLUMNS)
@@ -66,7 +61,7 @@ export default class BoatEquipmentActionService {
   }
 
   async createForBoat(user: User, boat: Boat, payload: CreateEquipmentActionPayload) {
-    assertBoatScope(user, boat)
+    assertBoatInUserOrg(user, boat, () => new BoatEquipmentActionNotFoundError())
 
     const label = payload.label.trim()
     if (!label) {
@@ -99,7 +94,7 @@ export default class BoatEquipmentActionService {
     inspection: BoatInspection,
     payload: CreateEquipmentActionPayload
   ) {
-    assertBoatScope(user, boat)
+    assertBoatInUserOrg(user, boat, () => new BoatEquipmentActionNotFoundError())
 
     const label = payload.label.trim()
     if (!label) {
@@ -128,7 +123,7 @@ export default class BoatEquipmentActionService {
     actionId: number,
     payload: UpdateEquipmentActionPayload
   ) {
-    assertBoatScope(user, boat)
+    assertBoatInUserOrg(user, boat, () => new BoatEquipmentActionNotFoundError())
 
     const action = await BoatEquipmentAction.query()
       .where('id', actionId)
@@ -184,7 +179,7 @@ export default class BoatEquipmentActionService {
   }
 
   async deleteForBoat(user: User, boat: Boat, actionId: number) {
-    assertBoatScope(user, boat)
+    assertBoatInUserOrg(user, boat, () => new BoatEquipmentActionNotFoundError())
 
     const action = await BoatEquipmentAction.query()
       .where('id', actionId)

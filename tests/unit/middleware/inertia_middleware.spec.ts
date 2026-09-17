@@ -1,5 +1,9 @@
 import { test } from '@japa/runner'
-import { resolveSharedCurrentPlan, resolveSharedBranding } from '#middleware/inertia_middleware'
+import {
+  resolveSharedCurrentPlan,
+  resolveSharedBranding,
+  resolveSharedOrganizationType,
+} from '#middleware/inertia_middleware'
 
 test.group('resolveSharedCurrentPlan', () => {
   test('returns undefined when user is missing (e.g. after logout)', async ({ assert }) => {
@@ -17,6 +21,36 @@ test.group('resolveSharedCurrentPlan', () => {
   }) => {
     const user = { organizationId: 1, load: async () => {}, organization: null }
     assert.isUndefined(await resolveSharedCurrentPlan(user as any))
+  })
+
+  test('does not reload an organization that is already loaded', async ({ assert }) => {
+    let loads = 0
+    const user = {
+      organizationId: 1,
+      load: async () => {
+        loads++
+      },
+      organization: { plan: 'pro', type: 'rental' },
+    }
+
+    assert.equal(await resolveSharedCurrentPlan(user as any), 'pro')
+    assert.equal(await resolveSharedOrganizationType(user as any), 'rental')
+    assert.equal(loads, 0)
+  })
+
+  test('loads the organization once when it is not loaded yet', async ({ assert }) => {
+    let loads = 0
+    const user: { organizationId: number; organization?: unknown; load: () => Promise<void> } = {
+      organizationId: 1,
+      load: async () => {
+        loads++
+        user.organization = { plan: 'starter', type: 'private' }
+      },
+    }
+
+    assert.equal(await resolveSharedCurrentPlan(user as any), 'starter')
+    assert.equal(await resolveSharedOrganizationType(user as any), 'private')
+    assert.equal(loads, 1)
   })
 })
 

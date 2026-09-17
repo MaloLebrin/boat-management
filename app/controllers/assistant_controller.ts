@@ -28,7 +28,7 @@ import {
 import AssistantActionsService from '#services/assistant_actions_service'
 import AssistantChatService from '#services/assistant_chat_service'
 import AuditLogService from '#services/audit_log_service'
-import { BoatNotFoundError } from '#services/boat_hull_service'
+import { BoatNotFoundError } from '#exceptions/boat_errors'
 import QuotaService from '#services/quota_service'
 import { assistantMessageValidator } from '#validators/assistant'
 import { toAppLocale } from '#shared/helpers/locale_path'

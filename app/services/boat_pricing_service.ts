@@ -5,8 +5,6 @@ import type Organization from '#models/organization'
 import type { UpsertBoatPricingPayload } from '#shared/types/boat_pricing'
 import { InvalidPricingRangeError } from '#exceptions/boat_pricing_errors'
 
-export { InvalidPricingRangeError }
-
 @inject()
 export default class BoatPricingService {
   /**

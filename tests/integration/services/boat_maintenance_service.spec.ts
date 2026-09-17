@@ -1,8 +1,7 @@
 import { test } from '@japa/runner'
-import BoatMaintenanceService, {
-  BoatMaintenanceValidationError,
-} from '#services/boat_maintenance_service'
-import BoatService from '#services/boat_service'
+import BoatMaintenanceService from '#services/boat_maintenance_service'
+import { BoatMaintenanceValidationError } from '#exceptions/maintenance_errors'
+import BoatHullService from '#services/boat_hull_service'
 import BoatEquipmentService from '#services/boat_equipment_service'
 import BoatMaintenanceEvent from '#models/boat_maintenance_event'
 import { UserFactory } from '#database/factories/user_factory'
@@ -77,7 +76,7 @@ test.group('BoatMaintenanceService (unit)', () => {
 
   test('createForBoat sail and rig subjects', async ({ assert }) => {
     const user = await UserFactory.with('organization').create()
-    const boatService = await app.container.make(BoatService)
+    const boatService = await app.container.make(BoatHullService)
     const equipmentService = await app.container.make(BoatEquipmentService)
     const boat = await boatService.createForUser(user, {
       name: 'Sloop',

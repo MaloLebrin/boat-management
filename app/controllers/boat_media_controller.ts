@@ -1,21 +1,22 @@
 import BoatPolicy from '#policies/boat_policy'
 import InspectionPolicy from '#policies/inspection_policy'
-import BoatService, { BoatNotFoundError } from '#services/boat_service'
 import BoatReservationService from '#services/boat_reservation_service'
 import BoatInspectionService from '#services/boat_inspection_service'
 import { BoatInspectionNotFoundError } from '#exceptions/inspection_errors'
-import MediaService, { MediaNotFoundError } from '#services/media_service'
+import MediaService from '#services/media_service'
+import { MediaNotFoundError } from '#exceptions/media_errors'
 import OrganizationService from '#services/organization_service'
 import { CloudinaryFolders, CloudinaryService } from '#services/cloudinary_service'
 import { storeBoatPhotosValidator, storeBoatDocumentsValidator } from '#validators/media'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
+import BoatContextService from '#services/boat_context_service'
 import { contentDisposition } from '#shared/helpers/content_disposition'
 
 @inject()
 export default class BoatMediaController {
   constructor(
-    private boatService: BoatService,
+    private boatContext: BoatContextService,
     private mediaService: MediaService,
     private cloudinaryService: CloudinaryService,
     private organizationService: OrganizationService,
@@ -23,23 +24,9 @@ export default class BoatMediaController {
     private inspectionService: BoatInspectionService
   ) {}
 
-  private async loadBoat(ctx: Pick<HttpContext, 'auth' | 'response' | 'params'>) {
-    const user = ctx.auth.getUserOrFail()
-    try {
-      const boat = await this.boatService.getForUserOrFail(user, Number(ctx.params.boatId))
-      return { user, boat }
-    } catch (error) {
-      if (error instanceof BoatNotFoundError) {
-        ctx.response.redirect('/boats')
-        return null
-      }
-      throw error
-    }
-  }
-
   async storePhoto({ request, response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const loaded = await this.loadBoat({ auth, response, params })
+    const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
 
     const { boat, user } = loaded
@@ -82,7 +69,7 @@ export default class BoatMediaController {
 
   async storeDocument({ request, response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const loaded = await this.loadBoat({ auth, response, params })
+    const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
 
     const { boat, user } = loaded
@@ -125,7 +112,7 @@ export default class BoatMediaController {
 
   async destroy({ response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const loaded = await this.loadBoat({ auth, response, params })
+    const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
 
     const { boat } = loaded
@@ -157,7 +144,7 @@ export default class BoatMediaController {
     i18n,
   }: HttpContext) {
     await auth.authenticate()
-    const loaded = await this.loadBoat({ auth, response, params })
+    const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
 
     const { boat, user } = loaded
@@ -207,7 +194,7 @@ export default class BoatMediaController {
 
   async destroyEngineMedia({ response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const loaded = await this.loadBoat({ auth, response, params })
+    const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
 
     const { boat } = loaded
@@ -254,7 +241,7 @@ export default class BoatMediaController {
     i18n,
   }: HttpContext) {
     await auth.authenticate()
-    const loaded = await this.loadBoat({ auth, response, params })
+    const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
 
     const { boat, user } = loaded
@@ -326,7 +313,7 @@ export default class BoatMediaController {
 
   async destroyInspectionMedia({ response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const loaded = await this.loadBoat({ auth, response, params })
+    const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
 
     const { boat, user } = loaded
@@ -378,7 +365,7 @@ export default class BoatMediaController {
 
   async downloadMedia({ response, auth, params }: HttpContext) {
     await auth.authenticate()
-    const loaded = await this.loadBoat({ auth, response, params })
+    const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
 
     const { boat } = loaded
@@ -408,7 +395,7 @@ export default class BoatMediaController {
 
   async downloadEngineMedia({ response, auth, params }: HttpContext) {
     await auth.authenticate()
-    const loaded = await this.loadBoat({ auth, response, params })
+    const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
 
     const { boat } = loaded

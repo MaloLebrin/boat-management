@@ -4,6 +4,7 @@ import BaseAlert from '~/components/base/BaseAlert.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import { useT } from '~/composables/use_t'
+import { useNumberFormat } from '~/composables/use_number_format'
 import { computeReservationQuote } from '#shared/helpers/reservation_quote'
 import type { BoatPricingRow } from '#shared/types/boat_pricing'
 import type { PricingSeasonRow } from '#shared/types/pricing_season'
@@ -19,17 +20,15 @@ const emit = defineEmits<{
   apply: [total: number]
 }>()
 
-const { t, locale } = useT()
+const { t } = useT()
+const { formatCurrency: money } = useNumberFormat()
 
 const quote = computed(() =>
   computeReservationQuote(props.pricing, props.seasons, props.startsAt, props.endsAt)
 )
 
 function formatCurrency(value: number): string {
-  return new Intl.NumberFormat(locale.value, {
-    style: 'currency',
-    currency: quote.value.currency || 'EUR',
-  }).format(value)
+  return money(value, { currency: quote.value.currency || 'EUR' })
 }
 
 function lineLabel(line: { seasonName: string | null; isWeekly: boolean }): string {

@@ -11,7 +11,7 @@ import BudgetPortStayForm from '~/components/boats/budget/BudgetPortStayForm.vue
 import BudgetPortStayList from '~/components/boats/budget/BudgetPortStayList.vue'
 import BudgetEntryForm from '~/components/boats/budget/BudgetEntryForm.vue'
 import BudgetEntryList from '~/components/boats/budget/BudgetEntryList.vue'
-import { useCurrencyFormat } from '~/composables/use_currency_format'
+import { useNumberFormat } from '~/composables/use_number_format'
 import { useT } from '~/composables/use_t'
 import type { BudgetData, BoatPortStayItem, BoatBudgetEntryItem } from '~/types/budget'
 import type { PortNameOption } from '../../../shared/types/port'
@@ -27,7 +27,7 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
-const { formatCurrency } = useCurrencyFormat()
+const { formatCurrency } = useNumberFormat()
 
 const selectedYear = ref(props.year)
 const currentYear = new Date().getFullYear()

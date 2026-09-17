@@ -1,4 +1,5 @@
-import BoatService, { BoatNotFoundError } from '#services/boat_service'
+import BoatHullService from '#services/boat_hull_service'
+import { BoatNotFoundError } from '#exceptions/boat_errors'
 import { parseMaintenanceCsv, importMaintenanceRows } from '#services/csv_import_service'
 import { csvPreviewValidator, csvConfirmValidator } from '#validators/csv_import'
 import type { CsvImportPreviewData, CsvPreviewRow, MaintenanceImportRow } from '#shared/types/csv'
@@ -14,7 +15,7 @@ interface PendingImport {
 
 @inject()
 export default class CsvImportController {
-  constructor(private boatService: BoatService) {}
+  constructor(private boatService: BoatHullService) {}
 
   async show({ inertia, session, auth }: HttpContext) {
     await auth.authenticate()

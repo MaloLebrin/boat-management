@@ -1,4 +1,5 @@
-import BoatService, { BoatNotFoundError } from '#services/boat_service'
+import BoatHullService from '#services/boat_hull_service'
+import { BoatNotFoundError } from '#exceptions/boat_errors'
 import BudgetService from '#services/budget_service'
 import BoatPortStayService from '#services/boat_port_stay_service'
 import BoatBudgetEntryService from '#services/boat_budget_entry_service'
@@ -12,7 +13,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 @inject()
 export default class BudgetController {
   constructor(
-    private boatService: BoatService,
+    private boatService: BoatHullService,
     private budgetService: BudgetService,
     private portStayService: BoatPortStayService,
     private entryService: BoatBudgetEntryService,

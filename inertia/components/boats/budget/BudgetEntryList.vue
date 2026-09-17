@@ -4,7 +4,7 @@ import { useForm, router } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
-import { useCurrencyFormat } from '~/composables/use_currency_format'
+import { useNumberFormat } from '~/composables/use_number_format'
 import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import type { BoatBudgetEntryItem } from '#shared/types/budget'
@@ -16,7 +16,7 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
-const { formatCurrency } = useCurrencyFormat()
+const { formatCurrency } = useNumberFormat()
 const { formatDate } = useDateFormat()
 
 const editingId = ref<number | null>(null)

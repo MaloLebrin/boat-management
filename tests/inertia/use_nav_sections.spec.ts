@@ -304,7 +304,7 @@ test('maintenance section contains planning and history items', () => {
 })
 
 // réservations gatées par le module Location / plan Entreprise (#595) — même
-// garde que `RequireReservationsPlanMiddleware` côté serveur, sinon lien mort.
+// garde que `RequireModulePlanMiddleware` (module `reservations`) côté serveur, sinon lien mort.
 
 test('enterprise plan includes nav.reservations item in business section', () => {
   const { navSections } = mountWithPlan('enterprise')

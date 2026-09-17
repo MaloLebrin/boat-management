@@ -4,10 +4,10 @@ import { toMaintenanceTaskRows } from '#transformers/boat_transformer'
 import { toTaskEquipmentSource } from '#transformers/maintenance_transformer'
 import { maintenanceTaskPermissions } from '#utils/maintenance_task_permissions'
 import AiAnalysisService from '#services/ai_analysis_service'
-import BoatEquipmentService, { BoatEquipmentNotFoundError } from '#services/boat_equipment_service'
+import BoatEquipmentService from '#services/boat_equipment_service'
+import { BoatEquipmentNotFoundError } from '#exceptions/boat_errors'
 import BoatEngineDiagnosticService from '#services/boat_engine_diagnostic_service'
 import BoatEnginePartService from '#services/boat_engine_part_service'
-import BoatHullService, { BoatNotFoundError } from '#services/boat_hull_service'
 import BoatMaintenanceService from '#services/boat_maintenance_service'
 import BoatMaintenanceTaskService from '#services/boat_maintenance_task_service'
 import EngineCatalogService from '#services/engine_catalog_service'
@@ -35,11 +35,13 @@ import type { AiSuggestion } from '#shared/types/ai'
 import { deferJson } from '#utils/inertia_defer'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
+import BoatContextService from '#services/boat_context_service'
+import { initialTabParam } from '#utils/inertia_tab'
 
 @inject()
 export default class BoatEquipmentController {
   constructor(
-    private boatService: BoatHullService,
+    private boatContext: BoatContextService,
     private equipmentService: BoatEquipmentService,
     private maintenanceService: BoatMaintenanceService,
     private taskService: BoatMaintenanceTaskService,
@@ -52,23 +54,9 @@ export default class BoatEquipmentController {
     private aiAnalysisService: AiAnalysisService
   ) {}
 
-  private async loadBoatForEquipment(ctx: Pick<HttpContext, 'auth' | 'response' | 'params'>) {
-    const user = ctx.auth.getUserOrFail()
-    try {
-      const boat = await this.boatService.getForUserOrFail(user, Number(ctx.params.boatId))
-      return { user, boat }
-    } catch (error) {
-      if (error instanceof BoatNotFoundError) {
-        ctx.response.redirect('/boats')
-        return null
-      }
-      throw error
-    }
-  }
-
   async storeEngine({ request, response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const loaded = await this.loadBoatForEquipment({ auth, response, params })
+    const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
 
     const { boat } = loaded
@@ -92,7 +80,7 @@ export default class BoatEquipmentController {
     i18n,
   }: HttpContext) {
     await auth.authenticate()
-    const loaded = await this.loadBoatForEquipment({ auth, response, params })
+    const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
 
     const { boat } = loaded
@@ -134,7 +122,7 @@ export default class BoatEquipmentController {
 
   async updateEngine({ request, response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const loaded = await this.loadBoatForEquipment({ auth, response, params })
+    const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
 
     const { boat } = loaded
@@ -165,7 +153,7 @@ export default class BoatEquipmentController {
 
   async destroyEngine({ response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const loaded = await this.loadBoatForEquipment({ auth, response, params })
+    const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
 
     const { boat } = loaded
@@ -190,7 +178,7 @@ export default class BoatEquipmentController {
 
   async storeSail({ request, response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const loaded = await this.loadBoatForEquipment({ auth, response, params })
+    const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
 
     const { boat } = loaded
@@ -205,7 +193,7 @@ export default class BoatEquipmentController {
 
   async editSail({ inertia, response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const loaded = await this.loadBoatForEquipment({ auth, response, params })
+    const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
 
     const { boat } = loaded
@@ -236,9 +224,18 @@ export default class BoatEquipmentController {
     })
   }
 
-  async showSail({ inertia, response, auth, params, bouncer, session, i18n }: HttpContext) {
+  async showSail({
+    inertia,
+    request,
+    response,
+    auth,
+    params,
+    bouncer,
+    session,
+    i18n,
+  }: HttpContext) {
     await auth.authenticate()
-    const loaded = await this.loadBoatForEquipment({ auth, response, params })
+    const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
 
     const { boat } = loaded
@@ -258,6 +255,7 @@ export default class BoatEquipmentController {
 
     return inertia.render('boats/sail_show', {
       boat: { id: boat.id, name: boat.name },
+      initialTab: initialTabParam(request),
       sail: {
         id: sail.id,
         sailType: sail.sailType,
@@ -278,9 +276,9 @@ export default class BoatEquipmentController {
     })
   }
 
-  async showRig({ inertia, response, auth, params, bouncer, session, i18n }: HttpContext) {
+  async showRig({ inertia, request, response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const loaded = await this.loadBoatForEquipment({ auth, response, params })
+    const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
 
     const { boat } = loaded
@@ -300,6 +298,7 @@ export default class BoatEquipmentController {
 
     return inertia.render('boats/rig_show', {
       boat: { id: boat.id, name: boat.name },
+      initialTab: initialTabParam(request),
       rig: {
         id: rig.id,
         rigType: rig.rigType,
@@ -319,7 +318,7 @@ export default class BoatEquipmentController {
 
   async updateSail({ request, response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const loaded = await this.loadBoatForEquipment({ auth, response, params })
+    const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
 
     const { boat } = loaded
@@ -349,7 +348,7 @@ export default class BoatEquipmentController {
 
   async destroySail({ response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const loaded = await this.loadBoatForEquipment({ auth, response, params })
+    const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
 
     const { boat } = loaded
@@ -374,7 +373,7 @@ export default class BoatEquipmentController {
 
   async editRig({ inertia, response, auth, params, bouncer }: HttpContext) {
     await auth.authenticate()
-    const loaded = await this.loadBoatForEquipment({ auth, response, params })
+    const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
 
     const { boat } = loaded
@@ -398,7 +397,7 @@ export default class BoatEquipmentController {
 
   async upsertRig({ request, response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const loaded = await this.loadBoatForEquipment({ auth, response, params })
+    const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
 
     const { boat } = loaded
@@ -413,7 +412,7 @@ export default class BoatEquipmentController {
 
   async destroyRig({ response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const loaded = await this.loadBoatForEquipment({ auth, response, params })
+    const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
 
     const { boat } = loaded
@@ -426,9 +425,9 @@ export default class BoatEquipmentController {
     response.redirect(`/boats/${boat.id}`)
   }
 
-  async showEngine({ inertia, response, auth, params, bouncer, i18n }: HttpContext) {
+  async showEngine({ inertia, request, response, auth, params, bouncer, i18n }: HttpContext) {
     await auth.authenticate()
-    const loaded = await this.loadBoatForEquipment({ auth, response, params })
+    const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
 
     const { boat } = loaded
@@ -459,6 +458,7 @@ export default class BoatEquipmentController {
 
     return inertia.render('boats/engine_show', {
       boat: { id: boat.id, name: boat.name },
+      initialTab: initialTabParam(request),
       engine: {
         id: engine.id,
         kind: engine.kind,
@@ -541,7 +541,7 @@ export default class BoatEquipmentController {
     i18n,
   }: HttpContext) {
     await auth.authenticate()
-    const loaded = await this.loadBoatForEquipment({ auth, response, params })
+    const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
 
     const { boat } = loaded
@@ -578,7 +578,7 @@ export default class BoatEquipmentController {
     i18n,
   }: HttpContext) {
     await auth.authenticate()
-    const loaded = await this.loadBoatForEquipment({ auth, response, params })
+    const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
 
     const { boat } = loaded
@@ -615,7 +615,7 @@ export default class BoatEquipmentController {
     i18n,
   }: HttpContext) {
     await auth.authenticate()
-    const loaded = await this.loadBoatForEquipment({ auth, response, params })
+    const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
 
     const { boat } = loaded

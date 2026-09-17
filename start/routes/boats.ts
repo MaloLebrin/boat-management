@@ -502,6 +502,6 @@ router
           ])
           .as('boats.reservations.contract.destroy')
       })
-      .use(middleware.requireReservationsPlan())
+      .use(middleware.requireModulePlan({ feature: 'reservations' }))
   })
   .use(middleware.auth())
