@@ -1,10 +1,8 @@
 <script setup lang="ts">
-import { useDebounceFn } from '@vueuse/core'
-import { ref, watch } from 'vue'
-import { router } from '@inertiajs/vue3'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import { useT } from '~/composables/use_t'
+import { useListFilters, visitList } from '~/composables/use_list_filters'
 import type { InvoiceListFilters, InvoiceStatus, InvoiceKind } from '../../../shared/types/invoice'
 import type { ClientOption } from '../../../shared/types/client'
 
@@ -15,7 +13,22 @@ const props = defineProps<{
 
 const { t } = useT()
 
-const qDraft = ref(props.filters.q ?? '')
+const { qDraft, update, onSearchInput } = useListFilters<InvoiceListFilters>({
+  filters: () => props.filters,
+  apply: (next) =>
+    visitList('/invoices', {
+      q: next.q,
+      status: next.status,
+      kind: next.kind,
+      clientId: next.clientId,
+      issuedFrom: next.issuedFrom,
+      issuedTo: next.issuedTo,
+      sort: next.sort,
+      direction: next.direction,
+      page: next.page,
+      perPage: next.perPage,
+    }),
+})
 
 const statusOptions: Array<{ label: string; value: InvoiceStatus }> = [
   { label: t('invoices.status.draft'), value: 'draft' },
@@ -35,60 +48,24 @@ const clientSelectOptions = props.clientOptions.map((c) => ({
   value: String(c.id),
 }))
 
-watch(
-  () => props.filters.q,
-  (value) => {
-    qDraft.value = value ?? ''
-  }
-)
-
-function navigate(partial: Partial<InvoiceListFilters>) {
-  const next = { ...props.filters, ...partial }
-  router.get(
-    '/invoices',
-    {
-      q: next.q || undefined,
-      status: next.status || undefined,
-      kind: next.kind || undefined,
-      clientId: next.clientId || undefined,
-      issuedFrom: next.issuedFrom || undefined,
-      issuedTo: next.issuedTo || undefined,
-      sort: next.sort,
-      direction: next.direction,
-      page: next.page,
-      perPage: next.perPage,
-    },
-    { preserveScroll: true, preserveState: true, replace: true }
-  )
-}
-
-const emitSearch = useDebounceFn((value: string) => {
-  navigate({ q: value || '', page: 1 })
-}, 300)
-
-function onSearchInput(value: string) {
-  qDraft.value = value
-  emitSearch(value)
-}
-
 function onStatusChange(value: string | number) {
-  navigate({ status: String(value) as InvoiceStatus | '', page: 1 })
+  update({ status: String(value) as InvoiceStatus | '', page: 1 })
 }
 
 function onKindChange(value: string | number) {
-  navigate({ kind: String(value) as InvoiceKind | '', page: 1 })
+  update({ kind: String(value) as InvoiceKind | '', page: 1 })
 }
 
 function onClientChange(value: string | number) {
-  navigate({ clientId: value ? Number(value) : undefined, page: 1 })
+  update({ clientId: value ? Number(value) : undefined, page: 1 })
 }
 
 function onIssuedFromChange(value: string) {
-  navigate({ issuedFrom: value || undefined, page: 1 })
+  update({ issuedFrom: value || undefined, page: 1 })
 }
 
 function onIssuedToChange(value: string) {
-  navigate({ issuedTo: value || undefined, page: 1 })
+  update({ issuedTo: value || undefined, page: 1 })
 }
 </script>
 

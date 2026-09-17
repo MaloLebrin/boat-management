@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { useDebounceFn } from '@vueuse/core'
-import { computed, ref, watch } from 'vue'
+import { computed } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
@@ -11,6 +10,7 @@ import type {
   MaintenanceTaskSubject,
 } from '#shared/types/maintenance'
 import { useT } from '~/composables/use_t'
+import { useListFilters } from '~/composables/use_list_filters'
 
 const { t } = useT()
 
@@ -52,14 +52,11 @@ const sortOptions = computed<Array<{ label: string; value: MaintenanceHistorySor
   { label: t('maintenance.history.filterBar.sortOldest'), value: 'oldest' },
 ])
 
-const qDraft = ref(props.filters.q ?? '')
-
-watch(
-  () => props.filters.q,
-  (value) => {
-    qDraft.value = value ?? ''
-  }
-)
+const { qDraft, update, onSearchInput } = useListFilters<MaintenanceHistoryFilters>({
+  filters: () => props.filters,
+  apply: (next) => emit('update:filters', next),
+  normalizeSearch: (value) => value.trim(),
+})
 
 const hasActiveFilters = computed(
   () =>
@@ -69,19 +66,6 @@ const hasActiveFilters = computed(
     Boolean(props.filters.dateFrom) ||
     Boolean(props.filters.dateTo)
 )
-
-const emitSearch = useDebounceFn((value: string) => {
-  update({ q: value.trim(), page: 1 })
-}, 300)
-
-function onSearchInput(value: string) {
-  qDraft.value = value
-  emitSearch(value)
-}
-
-function update(partial: Partial<MaintenanceHistoryFilters>) {
-  emit('update:filters', { ...props.filters, ...partial })
-}
 </script>
 
 <template>

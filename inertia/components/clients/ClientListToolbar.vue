@@ -1,10 +1,8 @@
 <script setup lang="ts">
-import { useDebounceFn } from '@vueuse/core'
-import { ref, watch } from 'vue'
-import { router } from '@inertiajs/vue3'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import { useT } from '~/composables/use_t'
+import { useListFilters, visitList } from '~/composables/use_list_filters'
 import type { ClientListFilters, ClientStatus } from '../../../shared/types/client'
 
 const props = defineProps<{
@@ -13,7 +11,18 @@ const props = defineProps<{
 
 const { t } = useT()
 
-const qDraft = ref(props.filters.q ?? '')
+const { qDraft, update, onSearchInput } = useListFilters<ClientListFilters>({
+  filters: () => props.filters,
+  apply: (next) =>
+    visitList('/clients', {
+      q: next.q,
+      status: next.status,
+      sort: next.sort,
+      direction: next.direction,
+      page: next.page,
+      perPage: next.perPage,
+    }),
+})
 
 const statusOptions: Array<{ label: string; value: ClientStatus }> = [
   { label: t('clients.status.active'), value: 'active' },
@@ -21,40 +30,8 @@ const statusOptions: Array<{ label: string; value: ClientStatus }> = [
   { label: t('clients.status.blacklisted'), value: 'blacklisted' },
 ]
 
-watch(
-  () => props.filters.q,
-  (value) => {
-    qDraft.value = value ?? ''
-  }
-)
-
-function navigate(partial: Partial<ClientListFilters>) {
-  const next = { ...props.filters, ...partial }
-  router.get(
-    '/clients',
-    {
-      q: next.q || undefined,
-      status: next.status || undefined,
-      sort: next.sort,
-      direction: next.direction,
-      page: next.page,
-      perPage: next.perPage,
-    },
-    { preserveScroll: true, preserveState: true, replace: true }
-  )
-}
-
-const emitSearch = useDebounceFn((value: string) => {
-  navigate({ q: value || '', page: 1 })
-}, 300)
-
-function onSearchInput(value: string) {
-  qDraft.value = value
-  emitSearch(value)
-}
-
-function onStatusChange(value: string) {
-  navigate({ status: value as ClientStatus | '', page: 1 })
+function onStatusChange(value: string | number) {
+  update({ status: String(value) as ClientStatus | '', page: 1 })
 }
 </script>
 

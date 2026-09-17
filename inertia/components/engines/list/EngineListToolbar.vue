@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { useDebounceFn } from '@vueuse/core'
-import { computed, ref, watch } from 'vue'
+import { computed } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
@@ -12,6 +11,7 @@ import type {
   EngineListSort,
 } from '#shared/types/engine'
 import { useT } from '~/composables/use_t'
+import { useListFilters } from '~/composables/use_list_filters'
 import { useBoatOptions } from '~/composables/use_boat_options'
 
 const { t } = useT()
@@ -60,7 +60,10 @@ const statusOptions = computed(() => [
   { label: t('equipment.status.retired'), value: 'retired' },
 ])
 
-const qDraft = ref(props.filters.q ?? '')
+const { qDraft, update, onSearchInput } = useListFilters<EngineListFilters>({
+  filters: () => props.filters,
+  apply: (next) => emit('update:filters', next),
+})
 
 const hasActiveFilters = computed(
   () =>
@@ -70,26 +73,6 @@ const hasActiveFilters = computed(
     Boolean(props.filters.status) ||
     Boolean(props.filters.family)
 )
-
-watch(
-  () => props.filters.q,
-  (value) => {
-    qDraft.value = value ?? ''
-  }
-)
-
-const emitSearch = useDebounceFn((value: string) => {
-  update({ q: value, page: 1 })
-}, 300)
-
-function onSearchInput(value: string) {
-  qDraft.value = value
-  emitSearch(value)
-}
-
-function update(partial: Partial<EngineListFilters>) {
-  emit('update:filters', { ...props.filters, ...partial })
-}
 </script>
 
 <template>

@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { useDebounceFn } from '@vueuse/core'
-import { computed, ref, watch } from 'vue'
+import { computed } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseTabs from '~/components/base/BaseTabs.vue'
 import type { BoatListDirection, BoatListFilters, BoatListSort } from './types'
 import { useT } from '~/composables/use_t'
+import { useListFilters } from '~/composables/use_list_filters'
 
 const { t } = useT()
 
@@ -40,7 +40,11 @@ const directionOptions = computed<Array<{ label: string; value: BoatListDirectio
   { label: t('boats.list.desc'), value: 'desc' },
 ])
 
-const qDraft = ref(props.filters.q ?? '')
+const { qDraft, update, onSearchInput } = useListFilters<BoatListFilters>({
+  filters: () => props.filters,
+  apply: (next) => emit('update:filters', next),
+  normalizeSearch: (value) => value || undefined,
+})
 
 const hasActiveFilters = computed(() => {
   return (
@@ -49,26 +53,6 @@ const hasActiveFilters = computed(() => {
     Boolean(props.filters.propulsionType)
   )
 })
-
-watch(
-  () => props.filters.q,
-  (value) => {
-    qDraft.value = value ?? ''
-  }
-)
-
-const emitSearch = useDebounceFn((value: string) => {
-  update({ q: value || undefined, page: 1 })
-}, 300)
-
-function onSearchInput(value: string) {
-  qDraft.value = value
-  emitSearch(value)
-}
-
-function update(partial: Partial<BoatListFilters>) {
-  emit('update:filters', { ...props.filters, ...partial })
-}
 </script>
 
 <template>
